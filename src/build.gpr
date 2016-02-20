@@ -1,0 +1,13 @@
+with "libadalang.gpr";
+project Build is
+
+   for Object_Dir use "../obj";
+
+   for Main use ("contract_coverage.adb");
+
+   package Compiler is
+      for Default_Switches ("ada") use
+        ("-g", "-O0", "-gnata", "-gnatyg", "-gnatwae");
+   end Compiler;
+
+end Build;
