@@ -84,6 +84,11 @@ class BaseDriver(TestDriver):
                                      type(comment)))
             self.expect_failure_comment = comment
 
+    def read_file(self, filename):
+        """Return the content of `filename`."""
+        with open(filename, 'r') as f:
+            return f.read()
+
     def set_setup_error(self, message):
         self.result.set_status('PROBLEM', message)
 
