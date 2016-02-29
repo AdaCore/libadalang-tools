@@ -1,5 +1,7 @@
 # TODO??? Remove this once we have copyright notices
 src/*.adb no-precommit-check
 src/*.ads no-precommit-check
+src.asis/*.adb no-precommit-check
+src.asis/*.ads no-precommit-check
 
 testsuite/tests/*/* no-precommit-check
