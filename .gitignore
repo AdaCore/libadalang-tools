@@ -1,5 +1,6 @@
 # Build artifacts
 obj
+bin
 
 # Testsuite output
 out
