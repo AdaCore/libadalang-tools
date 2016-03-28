@@ -25,8 +25,8 @@ pragma Ada_2012;
 
 with Unchecked_Deallocation;
 with Ada.Containers.Indefinite_Vectors;
-with Ada.Strings.UTF_Encoding.Wide_Strings;
-with Ada.Strings.Wide_Fixed;
+with Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
+with Ada.Strings.Wide_Wide_Fixed;
 
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
@@ -34,8 +34,8 @@ package LAL_UL.String_Utilities is
 
    --  String-related utilities
 
-   subtype W_Char is Wide_Character;
-   subtype W_Str is Wide_String;
+   subtype W_Char is Wide_Wide_Character;
+   subtype W_Str is Wide_Wide_String;
    type W_Str_Access is access all W_Str;
    procedure Free is new Unchecked_Deallocation (W_Str, W_Str_Access);
 
@@ -65,7 +65,7 @@ package LAL_UL.String_Utilities is
 
    procedure To_Lower (S : in out String);
    procedure To_Lower (S : in out W_Str);
-   --  Same as the ones in Ada.[Wide_]Characters.Handling, except we use a
+   --  Same as the ones in Ada.[Wide_Wide_]Characters.Handling, except we use a
    --  procedure to avoid inefficient secondary stack usage.
 
    function Escape_String_Literal (S : String) return String;
@@ -76,9 +76,9 @@ package LAL_UL.String_Utilities is
    --  Return X with X'First = 1
 
    function Find
-     (Source : Wide_String;
-      Pattern : Wide_String) return Natural is
-      (Ada.Strings.Wide_Fixed.Index (Source, Pattern));
+     (Source : Wide_Wide_String;
+      Pattern : Wide_Wide_String) return Natural is
+      (Ada.Strings.Wide_Wide_Fixed.Index (Source, Pattern));
 
    function Has_Prefix (X, Prefix : String) return Boolean;
    function Has_Prefix (X, Prefix : W_Str) return Boolean;
@@ -132,12 +132,12 @@ package LAL_UL.String_Utilities is
      (Item       : W_Str;
       Output_BOM : Boolean := False)
       return       Ada.Strings.UTF_Encoding.UTF_8_String renames
-     Ada.Strings.UTF_Encoding.Wide_Strings.Encode;
+     Ada.Strings.UTF_Encoding.Wide_Wide_Strings.Encode;
 
    function From_UTF8
      (Item : Ada.Strings.UTF_Encoding.UTF_8_String)
       return W_Str renames
-     Ada.Strings.UTF_Encoding.Wide_Strings.Decode;
+     Ada.Strings.UTF_Encoding.Wide_Wide_Strings.Decode;
 
    procedure Text_IO_Put_Char (C : Character);
    --  Put C to Current_Output. Used to instantiate Formatted_Output.

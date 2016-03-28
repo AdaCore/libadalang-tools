@@ -23,6 +23,7 @@ package METRICS.Command_Lines is
 
    --  Old metric control options, are kept for upward compatibility
    --  reasons (as non-documented feature)
+   --  ????????????????These really should be shorthands.
       La_Switch,
       Lcode_Switch,
       Lcomm_Switch,
@@ -42,8 +43,10 @@ package METRICS.Command_Lines is
       Noec_Switch,
       Nonl_Switch,
 
-      Treat_Exit_As_Goto, -- defaults to False????????????????
-      Compute_Local_Metrics, -- defaults to False????????????????
+      No_Treat_Exit_As_Goto, -- Option for Essential_Complexity
+      No_Local_Metrics,
+
+      No_Static_Loop, -- Option for Complexity_Cyclomatic
 
       Generate_XML_Output,
       Generate_XML_Schema,
@@ -77,8 +80,10 @@ package METRICS.Command_Lines is
        Noec_Switch   => +"-noec",
        Nonl_Switch   => +"-nonl",
 
-       Treat_Exit_As_Goto    => +"-ne",
-       Compute_Local_Metrics => +"-nolocal",
+       No_Treat_Exit_As_Goto => +"-ne",
+       No_Local_Metrics => +"-nolocal",
+
+       No_Static_Loop => null,
 
        Generate_XML_Output     => +"-x",
        Generate_XML_Schema     => +"-xs",
@@ -87,24 +92,27 @@ package METRICS.Command_Lines is
        Progress_Indicator_Mode => +"-dd"));
 
    type Metrics_Booleans is
+   --  Contract metrics options:
+     (Contract,
+      Post,
+      Contract_Complete,
+      Contract_Cyclomatic,
+
    --  Complexity metrics options:
-     (Complexity_Cyclomatic,
+      Complexity_Cyclomatic,
       Complexity_Essential,
-      Complexity_Average,
+      Complexity_Average, -- global
       Loop_Nesting,
       Extra_Exit_Points,
-      Complexity_All,
-      Static_Loop,
 
    --  Line metrics options:
       Lines,
       Lines_Code,
       Lines_Comment,
       Lines_Eol_Comment,
-      Lines_Ratio,
+      Lines_Ratio, -- ????Requires above counts?
       Lines_Blank,
-      Lines_Average,
-      Lines_All,
+      Lines_Average, -- global
 
    --  Syntax element metrics options:
       Declarations,
@@ -115,7 +123,7 @@ package METRICS.Command_Lines is
       All_Types,
       Unit_Nesting,
       Construct_Nesting,
-      Syntax_All,
+      Param_Number,
 
    --  Coupling metrics
       Tagged_Coupling_Out,
@@ -127,18 +135,43 @@ package METRICS.Command_Lines is
       Control_Coupling_Out,
       Control_Coupling_In,
 
-   --  Old coupling metric control options, kept for upward
-   --  compatibility reasons (as non_documented feature)
-
-      Package_Efferent_Coupling,
-      Package_Afferent_Coupling,
-      Category_Efferent_Coupling,
-      Category_Afferent_Coupling,
+      Contract_All,
+      Complexity_All,
+      Lines_All,
+      Syntax_All,
       Coupling_All);
+
+   subtype Metrics_Enum is Metrics_Booleans
+     range Metrics_Booleans'First .. Metrics_Booleans'Pred (Contract_All);
+   subtype Metrics_All_Enum is Metrics_Booleans
+     range Contract_All .. Metrics_Booleans'Last;
+   subtype Contract_Metrics is Metrics_Booleans
+     range Contract .. Contract_Cyclomatic;
+   subtype Complexity_Metrics is Metrics_Booleans
+     range Complexity_Cyclomatic .. Extra_Exit_Points;
+   subtype Lines_Metrics is Metrics_Booleans
+     range Lines .. Lines_Average;
+   subtype Syntax_Metrics is Metrics_Booleans
+     range Declarations .. Param_Number;
+   subtype Coupling_Metrics is Metrics_Booleans
+     range Tagged_Coupling_Out .. Control_Coupling_In;
+
+   type Metrics_Set is array (Metrics_Enum) of Boolean with Pack;
 
    package Metrics_Boolean_Switches is new Boolean_Switches
      (Descriptor,
       Metrics_Booleans);
+
+   --  Old coupling metric control options, kept for upward
+   --  compatibility reasons (as non_documented feature):
+
+   package Metrics_Boolean_Shorthands is new
+     Metrics_Boolean_Switches.Set_Shorthands
+       ((Tagged_Coupling_Out    => +"--package-efferent-coupling",
+         Tagged_Coupling_In     => +"--package-afferent-coupling",
+         Hierarchy_Coupling_Out => +"--category-efferent-coupling",
+         Hierarchy_Coupling_In  => +"--category-afferent-coupling",
+         others                 => null));
 
    type Metrics_Strings is
      (Output_Suffix, Global_File_Name, Xml_File_Name, Output_Directory);

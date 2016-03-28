@@ -158,6 +158,33 @@ package body LAL_UL.Command_Lines is
          end loop;
       end Set_Defaults;
 
+      package body Set_Shorthands is
+      begin
+         for J in Shorthands'Range loop
+            if Shorthands (J) /= null then
+               pragma Assert (Shorthands (J) (1 .. 2) = "--");
+               Append
+                 (Descriptor.Allowed_Switches_Vector,
+                  Switch_Descriptor'
+                    (Kind   => True_Switch,
+                     Text   => Shorthands (J),
+                     Alias  => To_All (J),
+                     others => <>));
+
+               Append
+                 (Descriptor.Allowed_Switches_Vector,
+                  Switch_Descriptor'
+                    (Kind   => False_Switch,
+                     Text   => new String'
+                       ("--no-" & Shorthands (J) (3 .. Shorthands (J)'Last)),
+                       --  So if the shorthand is "--foo-bar", this is
+                       --  "--no-foo-bar".
+                     Alias  => To_All (J),
+                     others => <>));
+            end if;
+         end loop;
+      end Set_Shorthands;
+
       Base_Switch : constant All_Switches :=
         Last_Index (Descriptor.Allowed_Switches_Vector) + 1;
 

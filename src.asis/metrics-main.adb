@@ -72,6 +72,14 @@ procedure METRICS.Main is
       Put ("selected metrics are computed.\n");
       Put ("\n");
 
+      Put ("Contract metrics:\n");
+      Put ("  --contract-all        - all contract metrics\n");
+      Put ("  --contract            - subprograms with contracts\n");
+      Put ("  --post                - subprograms with postconditions\n");
+      Put ("  --contract-complete   - subprograms with complete contracts\n");
+      Put ("  --contract-cyclomatic - McCabe Cyclomatic Complexity of contracts\n");
+      Put ("\n");
+
       Put ("Complexity metrics:\n");
       Put ("  --complexity-all        - all complexity metrics\n");
       Put ("  --complexity-cyclomatic - McCabe Cyclomatic Complexity\n");

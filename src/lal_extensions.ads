@@ -44,4 +44,7 @@ package LAL_Extensions is
    function Full_Name (Name : Expr) return Text_Type;
    --  Returns the full expanded name
 
+   function Name (Decl : Ada_Node) return Expr;
+   --  Returns the defining name of a declaration or body
+
 end LAL_Extensions;

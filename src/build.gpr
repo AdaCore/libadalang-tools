@@ -1,14 +1,20 @@
+with "gnat_util";
 with "libadalang.gpr";
 project Build is
 
+   for Source_Dirs use (".", "../src.asis");
    for Object_Dir use "../obj";
    for Exec_Dir use "../bin";
 
-   for Main use ("contract_coverage.adb");
+   for Main use ("contract_coverage.adb", "metrics-main.adb");
 
    package Compiler is
       for Default_Switches ("ada") use
         ("-g", "-O0", "-gnata", "-gnatyg", "-gnatwae");
    end Compiler;
+
+   package Builder is
+      for Executable ("metrics-main.adb") use "lal-metric";
+   end Builder;
 
 end Build;

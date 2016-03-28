@@ -23,11 +23,12 @@
 
 pragma Ada_2012;
 
+with Ada.Characters.Conversions;
 with Ada.Characters.Handling;      use Ada.Characters.Handling;
 with Ada.Directories;
-with Ada.Wide_Characters.Handling; use Ada.Wide_Characters.Handling;
+with Ada.Wide_Wide_Characters.Handling; use Ada.Wide_Wide_Characters.Handling;
 with Ada.Strings.Unbounded;
-with Ada.Strings.Wide_Unbounded;
+with Ada.Strings.Wide_Wide_Unbounded;
 with Ada.Text_IO; use Ada;
 
 package body LAL_UL.String_Utilities is
@@ -79,7 +80,7 @@ package body LAL_UL.String_Utilities is
 
    function Char_To_Digit (C : W_Char) return Digit is
    begin
-      return Char_To_Digit (To_Character (C));
+      return Char_To_Digit (Characters.Conversions.To_Character (C));
    end Char_To_Digit;
 
    -----------
@@ -333,8 +334,8 @@ package body LAL_UL.String_Utilities is
 
    function Replace_All (S, From, To : W_Str;
       Replaced : out Boolean) return W_Str is
-      use Ada.Strings.Wide_Unbounded;
-      Result : Unbounded_Wide_String;
+      use Ada.Strings.Wide_Wide_Unbounded;
+      Result : Unbounded_Wide_Wide_String;
 
       J : Positive := S'First;
 
@@ -354,7 +355,7 @@ package body LAL_UL.String_Utilities is
          end if;
       end loop;
 
-      return To_Wide_String (Result);
+      return To_Wide_Wide_String (Result);
    end Replace_All;
 
    function Replace_All
@@ -457,9 +458,9 @@ package body LAL_UL.String_Utilities is
       return Strip_Prefix (Strip_Prefix (S, Prefix => "A_"), Prefix => "AN_");
    end Strip_Article;
 
-   ---------------------------
-   -- Wide_Text_IO_Put_Char --
-   ---------------------------
+   ----------------------
+   -- Text_IO_Put_Char --
+   ----------------------
 
    procedure Text_IO_Put_Char (C : Character) is
    begin

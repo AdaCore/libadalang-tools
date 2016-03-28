@@ -103,4 +103,43 @@ package body LAL_Extensions is
       end case;
    end Full_Name;
 
+   function Name (Decl : Ada_Node) return Expr is
+   begin
+      case Kind (Decl) is
+         when Compilation_Unit_Kind =>
+            pragma Assert
+              (Child_Count (F_Bodies (Compilation_Unit (Decl))) = 1);
+            return Name (Childx (F_Bodies (Compilation_Unit (Decl)), 0));
+         when Library_Item_Kind =>
+            return Name (F_Item (Library_Item (Decl)));
+
+         when Generic_Instantiation_Kind =>
+            return F_Name (Generic_Instantiation (Decl));
+         when Generic_Renaming_Decl_Kind =>
+            return F_Name (Generic_Renaming_Decl (Decl));
+         when Package_Body_Stub_Kind =>
+            return F_Name (Package_Body_Stub (Decl));
+         when Package_Renaming_Decl_Kind =>
+            return F_Name (Package_Renaming_Decl (Decl));
+         when Accept_Statement_Kind =>
+            return Expr (F_Name (Accept_Statement (Decl)));
+         when Block_Statement_Kind =>
+            return Expr (F_Name (Block_Statement (Decl)));
+         when Loop_Statement_Kind =>
+            return Expr (F_Name (Loop_Statement (Decl)));
+         when Subprogram_Decl_Kind =>
+            return F_Name (F_Subp_Spec (Subprogram_Decl (Decl)));
+         when Subunit_Kind =>
+            return F_Name (Subunit (Decl));
+         when Package_Decl_Kind | Generic_Package_Decl_Kind =>
+            return F_Package_Name (Base_Package_Decl (Decl));
+         when Package_Body_Kind =>
+            return F_Package_Name (Package_Body (Decl));
+         when Subprogram_Body_Kind =>
+            return F_Name (F_Subp_Spec (Subprogram_Body (Decl)));
+         when others =>
+            raise Program_Error with "Name of " & Short_Image (Decl);
+      end case;
+   end Name;
+
 end LAL_Extensions;

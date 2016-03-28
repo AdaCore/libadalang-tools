@@ -94,13 +94,14 @@ package body LAL_UL.Projects is
         or else
         (Option'Length >= 10
          and then Option (First_Idx .. First_Idx + 6) = "-gnateD")
+        or else
+         (Option'Length >= 10
+         and then
+          Option (First_Idx .. First_Idx + 6) = "-gnatep")
         or else Option = "-gnatI"
         or else
         (Option'Length >= 7
          and then Option (First_Idx .. First_Idx + 5) = "--RTS=")
-
---        or else
---         Option = ""
       then
          Result := True;
       end if;
@@ -877,6 +878,11 @@ package body LAL_UL.Projects is
          Compiler_Local_Config_File : constant Attribute_Pkg_String
            := Build (Compiler_Package, "Local_Config_File");
 
+         function Normalize_Switch (S : String) return String;
+         --  If the switch contains a path, normalizes this path. This is
+         --  needed because the switch will be used from the temporary
+         --  directory created by a tool.
+
          procedure Add_Switch (S : String) is
          begin
             Append (File_Switches, new String'(S));
@@ -890,7 +896,7 @@ package body LAL_UL.Projects is
                end if;
 
                if Needed_For_Tree_Creation (Sws (J).all) then
-                  Add_Switch (Sws (J).all);
+                  Add_Switch (Normalize_Switch (Sws (J).all));
                end if;
             end loop;
 
@@ -904,6 +910,37 @@ package body LAL_UL.Projects is
 
             Free (Sws);
          end Scan_Switches;
+
+         function Normalize_Switch (S : String) return String is
+            Res : constant String := Trim (S, Both);
+            Opt_Start  : constant Natural := S'First;
+            Opt_End    :          Natural;
+            Path_Start :          Natural;
+            Path_End   : constant Natural := S'Last;
+         begin
+            if Res'Length >= 9
+              and then
+               Res (Opt_Start .. Opt_Start + 5) = "-gnate"
+              and then
+               Res (Opt_Start + 6) in 'e' | 'p'
+            then
+               Opt_End    := Opt_Start + 6;
+               Path_Start := Opt_End + 1;
+
+               while Path_Start < Path_End and then
+                     Res (Path_Start) in ' ' | '='
+               loop
+                  Path_Start := Path_Start + 1;
+               end loop;
+
+               return Res (Opt_Start .. Opt_End) &
+                           Normalize_Pathname (Res (Path_Start .. Path_End));
+            else
+               return Res;
+            end if;
+         end Normalize_Switch;
+
+      --  Start of processing for Set_Individual_Source_Options
 
       begin
          for S in Sources'Range loop

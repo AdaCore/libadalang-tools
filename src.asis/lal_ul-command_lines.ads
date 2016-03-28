@@ -200,11 +200,17 @@ package LAL_UL.Command_Lines is
       function Arg (Cmd : Command_Line; Switch : Switches) return Boolean;
 
       type Switch_To_Boolean_Mapping is array (Switches) of Boolean;
+      type Switch_To_String_Mapping is array (Switches) of String_Ref;
 
       generic
          Defaults : Switch_To_Boolean_Mapping;
       package Set_Defaults is
       end Set_Defaults;
+
+      generic
+         Shorthands : Switch_To_String_Mapping;
+      package Set_Shorthands is
+      end Set_Shorthands;
 
    end Boolean_Switches;
 
