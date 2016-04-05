@@ -214,4 +214,15 @@ package METRICS.Command_Lines is
    use Metrics_Flag_Switches, Metrics_Boolean_Switches,
      Metrics_String_Switches, Metrics_String_Seq_Switches;
 
+   ----------------
+
+   function Gen_XML (Cmd : Command_Line) return Boolean is
+     (Arg (Cmd, Generate_XML_Output)
+      or else Arg (Cmd, Generate_XML_Schema)
+      or else Arg (Cmd, No_Text_Output)
+      or else Arg (Cmd, Xml_File_Name) /= null);
+
+   function Gen_Text (Cmd : Command_Line) return Boolean is
+     (not Arg (Cmd, No_Text_Output));
+
 end METRICS.Command_Lines;

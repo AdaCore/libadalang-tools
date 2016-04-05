@@ -5,6 +5,8 @@
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
 with ASIS_UL.Vectors;
+with Ada.Containers.Hashed_Sets; use Ada.Containers;
+with GNAT.String_Hash;
 
 package LAL_UL.Command_Lines is
 
@@ -132,6 +134,25 @@ package LAL_UL.Command_Lines is
    type String_Ref is access constant String with
         Predicate => (if String_Ref /= null then String_Ref'First = 1);
    type String_Ref_Array is array (Positive range <>) of String_Ref;
+
+   package String_Ref_Vectors is new ASIS_UL.Vectors
+     (Positive,
+      String_Ref,
+      String_Ref_Array);
+   use String_Ref_Vectors;
+   subtype String_Ref_Vector is String_Ref_Vectors.Vector;
+
+   function Hash_String  is new GNAT.String_Hash.Hash
+     (Character, String, Hash_Type);
+   function Hash_String_Ref (X : String_Ref) return Hash_Type is
+     (Hash_String (X.all));
+   function String_Eq (X, Y : String_Ref) return Boolean is
+     (X.all = Y.all);
+
+   package String_Ref_Sets is new Ada.Containers.Hashed_Sets
+     (String_Ref, Hash_String_Ref, String_Eq, String_Eq);
+   use String_Ref_Sets;
+   subtype String_Ref_Set is String_Ref_Sets.Set;
 
    --  ???For each _Switches generic, specify:
    --  Help text. Allowed in proj file. Or specify
@@ -440,13 +461,6 @@ package LAL_UL.Command_Lines is
    --  and Other_Switches.
 
    type Logical_Position is new Natural;
-
-   package String_Ref_Vectors is new ASIS_UL.Vectors
-     (Positive,
-      String_Ref,
-      String_Ref_Array);
-   use String_Ref_Vectors;
-   subtype String_Ref_Vector is String_Ref_Vectors.Vector;
 
    type Dynamically_Typed_Switch (Kind : Switch_Kind := No_Such) is record
       Switch : All_Switches;

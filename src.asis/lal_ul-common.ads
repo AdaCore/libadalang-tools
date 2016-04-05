@@ -147,6 +147,8 @@ package LAL_UL.Common is
       To_All (Configuration_Pragmas_File),
       To_All (Object_Path_File_Name));
 
+   ----------------
+
    function Mimic_gcc (Cmd : Command_Line) return Boolean is
      (Arg (Cmd, Outer_Dir) /= null);
    --  True if this is an inner invocation of the tool for incremental mode, so

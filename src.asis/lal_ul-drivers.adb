@@ -36,12 +36,14 @@ with LAL_UL.Common.Post;
 with LAL_UL.Projects; use LAL_UL.Projects;
 with LAL_UL.Tool_Names;
 with LAL_UL.Check_Parameters;
+with LAL_UL.String_Utilities; use LAL_UL.String_Utilities;
 
 with GNATCOLL.Iconv;
 
 with Langkit_Support.Diagnostics;
 
 with Libadalang;     use Libadalang;
+with Libadalang.Analysis; use Libadalang.Analysis;
 with Libadalang.AST; use Libadalang.AST;
 with Libadalang.AST.Types; use Libadalang.AST.Types;
 
@@ -52,15 +54,15 @@ package body LAL_UL.Drivers is
      Common_String_Seq_Switches, Common_Nat_Switches;
    pragma Warnings (On);
 
+   use Tools;
+
    procedure Driver
      (Cmd                   : in out Command_Line;
+      Tool                  : in out Tool_State'Class;
       Tool_Package_Name     :        String;
       Needs_Per_File_Output :        Boolean        := False;
       No_Preprocessing      :        Boolean        := False;
-      Callback              :        Parse_Callback := null;
-      Per_File_Tool_Action  :        not null access procedure
-        (Cmd : Command_Line; File_Name : String; Unit : Analysis_Unit);
-      Print_Help            : not null access procedure)
+      Callback              :        Parse_Callback := null)
    is
       pragma Unreferenced (No_Preprocessing);
 
@@ -76,7 +78,7 @@ package body LAL_UL.Drivers is
       --  This is called by Process_Command_Line after the first pass through
       --  the command-line arguments.
 
-      procedure Process_File (File_Name : String);
+      procedure Process_Files;
 
       procedure Local_Callback
         (Phase : Parse_Phase;
@@ -109,30 +111,95 @@ package body LAL_UL.Drivers is
         Create (Charset => GNATCOLL.Iconv.UTF8);
       --  ???Charset is hardwired to UTF8 for now
 
-      procedure Process_File (File_Name : String) is
-         Unit : constant Analysis_Unit :=
-           Get_From_File (Context, File_Name);
---         pragma Assert (Root (Unit) /= null);
+      function ASIS_Order_File_Names
+        (X : String_Ref_Array) return String_Ref_Array;
+      --  ????ASIS (or maybe just gnatmetric) seems to process files in a
+      --  strange order. First, all files with bodies, in alphabetical
+      --  order. Then all files without bodies, in alphabetical order.
+      --  We're temporarily mimicking that here.
+
+      function ASIS_Order_File_Names
+        (X : String_Ref_Array) return String_Ref_Array
+      is
+         use String_Ref_Sets;
+         Bodies : String_Ref_Set;
+
+         function Has_Body (S : String_Ref) return Boolean;
+         function Has_Body (S : String_Ref) return Boolean is
+            Body_String : aliased constant String :=
+              S (1 .. S'Last - 1) & "b";
+         begin
+            return Contains (Bodies, Body_String'Unchecked_Access);
+         end Has_Body;
+
+         Result : String_Ref_Vector;
       begin
-         if Root (Unit) = null then -- ????????????????
-            return;
-         end if;
+         for S of X loop
+            if Has_Suffix (S.all, ".adb") then
+               Insert (Bodies, S);
+            end if;
+         end loop;
 
-         if Arg (Cmd, Verbose) then
-            Put_Line ("Doing file " & File_Name);
-         end if;
+         for S of X loop
+            if not Has_Suffix (S.all, ".ads") then
+               Append (Result, S);
+            end if;
+            if Has_Suffix (S.all, ".ads") and then Has_Body (S) then
+               Append (Result, S);
+            end if;
+         end loop;
 
-         if Has_Diagnostics (Unit) then
-            Put_Line ("Errors while parsing " & File_Name);
-            for D of Diagnostics (Unit) loop
-               Put_Line (Langkit_Support.Diagnostics.To_Pretty_String (D));
-            end loop;
-         end if;
+         for S of X loop
+            if Has_Suffix (S.all, ".ads") and then not Has_Body (S) then
+               Append (Result, S);
+            end if;
+         end loop;
 
-         --  We continue even in the presence of errors
+         return To_Array (Result);
+      end ASIS_Order_File_Names;
 
-         Per_File_Tool_Action (Cmd, File_Name, Unit);
-      end Process_File;
+      procedure Process_Files is
+         Counter : Natural := File_Names (Cmd)'Length;
+      begin
+         for F of ASIS_Order_File_Names (File_Names (Cmd)) loop
+--         ASIS_UL.Options.No_Argument_File_Specified := False;
+            declare
+               File_Name : String renames F.all;
+               Unit : constant Analysis_Unit :=
+                 Get_From_File (Context, File_Name);
+--         pragma Assert (Root (Unit) /= null);
+            begin
+               if Root (Unit) = null then -- ????????????????
+                  return;
+               end if;
+
+               if Arg (Cmd, Verbose) then
+                  Put_Line ("[" & Image (Counter) & "] " & File_Name);
+                  --  ????Use Formatted_Output?
+                  Counter := Counter - 1;
+               end if;
+
+               if Has_Diagnostics (Unit) then
+                  Put_Line ("Errors while parsing " & File_Name);
+                  for D of Diagnostics (Unit) loop
+                     Put_Line
+                       (Langkit_Support.Diagnostics.To_Pretty_String (D));
+                  end loop;
+               end if;
+
+               --  We continue even in the presence of errors
+
+               Per_File_Action (Tool, Cmd, File_Name, Unit);
+            end;
+         end loop;
+         pragma Assert (Counter = 0);
+      end Process_Files;
+
+      procedure Print_Help;
+      procedure Print_Help is
+      begin
+         Tool_Help (Tool);
+      end Print_Help;
 
    begin
       Environment.Create_Temp_Dir;
@@ -151,14 +218,14 @@ package body LAL_UL.Drivers is
          Callback                  => Local_Callback'Unrestricted_Access,
          Post_Cmd_Line_1_Action    => Post_Cmd_Line_1'Access,
          Tool_Temp_Dir             => Environment.Tool_Temp_Dir.all,
-         Print_Help                => Print_Help);
+         Print_Help                => Print_Help'Access);
       LAL_UL.Common.Post.Postprocess_Common (Cmd);
 
       if Debug_Flag_C then
          Dump_Cmd (Cmd);
       end if;
 
-      LAL_UL.Check_Parameters;
+      LAL_UL.Check_Parameters; -- ????Move into Init?
 
       --  ????????????????Stuff from Environment:
 
@@ -191,10 +258,9 @@ package body LAL_UL.Drivers is
 --         ASIS_UL.Source_Table.Processing.Process_Sources;
 --      end if;
 
-      for F of File_Names (Cmd) loop
---         ASIS_UL.Options.No_Argument_File_Specified := False;
-         Process_File (F.all);
-      end loop;
+      Init (Tool, Cmd);
+      Process_Files;
+      Final (Tool, Cmd);
 
       Environment.Clean_Up;
 

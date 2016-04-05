@@ -1,6 +1,5 @@
 with Ada.Wide_Wide_Characters.Handling;
 with Ada.Wide_Wide_Text_IO; use Ada;
-with Text_IO;
 
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
@@ -16,6 +15,7 @@ with LAL_Extensions; use LAL_Extensions;
 with LAL_UL.Common; use LAL_UL; use LAL_UL.Common;
 with LAL_UL.Formatted_Output; use LAL_UL.Formatted_Output;
 with LAL_UL.String_Utilities; use LAL_UL.String_Utilities;
+with LAL_UL.Tool_Names;
 
 with ASIS_UL.Debug; use ASIS_UL.Debug;
 
@@ -53,7 +53,8 @@ package body METRICS.Actions is
      (File_Name : String; Unit : Analysis_Unit);
 
    procedure Walk
-     (Cmd : Command_Line;
+     (Tool : in out Metrics_Tool'Class;
+      Cmd : Command_Line;
       File_Name : String;
       CU_Node : Ada_Node;
       Metrics_To_Compute : Metrics_Set);
@@ -192,6 +193,12 @@ package body METRICS.Actions is
 
    type Metrics_Values is array (Metrics_Enum) of Metric_Int;
 
+   type Metrix;
+   type Metrix_Ref is access all Metrix;
+
+   package Metrix_Vectors is new Langkit_Support.Vectors (Metrix_Ref);
+   use Metrix_Vectors;
+
    type Metrix is record
       Node : Ada_Node;
       --  Node to which the metrics are associated
@@ -202,12 +209,10 @@ package body METRICS.Actions is
       --  both have Nesting = 0, and Metrix_Stack[2].Nesting = 1.
 
       Vals : Metrics_Values;
+
+      Submetrix : Metrix_Vectors.Vector;
+      --  Metrix records for units nested within this one
    end record;
-
-   type Metrix_Ref is access all Metrix;
-
-   package Metrix_Vectors is new Langkit_Support.Vectors (Metrix_Ref);
-   use Metrix_Vectors;
 
    subtype Eligible is Ada_Node_Type_Kind with
      Predicate => Eligible in
@@ -269,8 +274,7 @@ package body METRICS.Actions is
    procedure XML_Print_Metrix
      (File_Name : String;
       Metrics_To_Compute : Metrics_Set;
-      Node_Metrix : Metrix_Vectors.Vector;
-      Index : Natural);
+      M : Metrix);
 
    function Node_Kind_String (Node : Ada_Node) return String is
    begin
@@ -345,7 +349,7 @@ package body METRICS.Actions is
 
          for I in First .. Last loop
             if Metrics_To_Compute (I) then
-               if M.Vals (I) /= 0 then -- ????????????????
+               if True or else M.Vals (I) /= 0 then -- ????????????????
                   Put ("\1           : \2\n",
                        Metric_Name_String (I),
                        Image (Integer (M.Vals (I))));
@@ -494,18 +498,13 @@ package body METRICS.Actions is
    procedure XML_Print_Metrix
      (File_Name : String;
       Metrics_To_Compute : Metrics_Set;
-      Node_Metrix : Metrix_Vectors.Vector;
-      Index : Natural)
+      M : Metrix)
    is
-      M : Metrix renames Get (Node_Metrix, Index).all;
    begin
-      Indent (M.Nesting * Default_Indentation_Amount);
+      Indent;
 
-      if Index = 0 then
-         pragma Assert (Kind (M.Node) = Compilation_Unit_Kind);
+      if Kind (M.Node) = Compilation_Unit_Kind then
          Put ("<file name=\1>\n", Q (File_Name_To_Print (Cmd, File_Name)));
-         Indent;
-
       else
          declare
             Sloc : constant Tokens.Source_Location_Range :=
@@ -521,30 +520,41 @@ package body METRICS.Actions is
 
       Indent;
 
-      for I in M.Vals'Range loop
-         if Metrics_To_Compute (I) then
-            if M.Vals (I) /= 0 then -- ????????????????
-               Put ("<metric name=\1>\2</metric>\n",
-                    Q (XML_Metric_Name_String (I)),
-                    Image (Integer (M.Vals (I))));
+      --  Print metrics for this unit
+
+      if Kind (M.Node) /= Compilation_Unit_Kind then
+         --  ????But need to print line metrics for CU
+         for I in M.Vals'Range loop
+            if Metrics_To_Compute (I) then
+               if True or else M.Vals (I) /= 0 then -- ????????????????
+                  Put ("<metric name=\1>\2</metric>\n",
+                       Q (XML_Metric_Name_String (I)),
+                       Image (Integer (M.Vals (I))));
+               end if;
             end if;
-         end if;
-      end loop;
+         end loop;
+      end if;
 
       Outdent;
 
-      if Index = 0 then
-         Outdent;
+      --  Then recursively print metrix of nested units
+
+      for Child of M.Submetrix loop
+         XML_Print_Metrix (File_Name, Metrics_To_Compute, Child.all);
+      end loop;
+
+      if Kind (M.Node) = Compilation_Unit_Kind then
          Put ("</file>\n");
       else
          Put ("</unit>\n");
       end if;
 
-      Outdent (M.Nesting * Default_Indentation_Amount);
+      Outdent;
    end XML_Print_Metrix;
 
    procedure Walk
-     (Cmd : Command_Line;
+     (Tool : in out Metrics_Tool'Class;
+      Cmd : Command_Line;
       File_Name : String;
       CU_Node : Ada_Node;
       Metrics_To_Compute : Metrics_Set)
@@ -562,7 +572,7 @@ package body METRICS.Actions is
            when others => raise Program_Error);
       --  ????????????????Could be subunit
 
-      Node_Stack : Ada_Node_Vectors.Vector;
+      Node_Stack : Ada_Node_Vectors.Vector; -- Needed????
       --  Stack of all nodes currently being walked
 
       Metrix_Stack : Metrix_Vectors.Vector;
@@ -579,7 +589,7 @@ package body METRICS.Actions is
       --  This stack contains the relevant nodes currently being processed by
       --  the recursive walk.
 
-      Node_Metrix : Metrix_Vectors.Vector;
+      Node_Metrix : Metrix_Vectors.Vector; -- ????Get rid of
       --  This contains all the computed metrix (not just the ones currently
       --  being processed, as Metrix_Stack does).
 
@@ -603,12 +613,16 @@ package body METRICS.Actions is
 
          if Node = Lib_Item or else Kind (Node) in Eligible then
             declare
+               Parent : Metrix renames
+                 Get (Metrix_Stack, Last_Index (Metrix_Stack)).all;
                M : constant Metrix_Ref :=
                  new Metrix'(Node => Node,
                              Nesting => Last_Index (Metrix_Stack),
-                             Vals => (others => 0));
+                             Vals => (others => 0),
+                             Submetrix => Metrix_Vectors.Empty_Vector);
             begin
                Append (Metrix_Stack, M); -- push
+               Append (Parent.Submetrix, M);
                Append (Node_Metrix, M);
                Gather_Metrics_And_Walk_Children (Node);
                Pop (Metrix_Stack);
@@ -665,26 +679,33 @@ package body METRICS.Actions is
             --  Otherwise, we could overwrite the input!
             raise Program_Error with "empty suffix";
          end if;
-         Create (Text, Name => Text_Name);
-         Set_Output (Text);
 
-         for I in 1 .. Length (Node_Metrix) loop
-            Print_Metrix (File_Name, Metrics_To_Compute, Node_Metrix, I - 1);
-         end loop;
+         if Gen_Text (Cmd) then
+            Create (Text, Name => Text_Name);
+            Set_Output (Text);
 
-         Set_Output (Standard_Output);
-         Close (Text);
-
-         if False then -- ????????????????
             for I in 1 .. Length (Node_Metrix) loop
-               XML_Print_Metrix
+               Print_Metrix
                  (File_Name, Metrics_To_Compute, Node_Metrix, I - 1);
             end loop;
+
+            Set_Output (Standard_Output);
+            Close (Text);
+         end if;
+
+         if Gen_XML (Cmd) then
+            Set_Output (Tool.XML);
+            XML_Print_Metrix
+              (File_Name, Metrics_To_Compute, Get (Node_Metrix, 0).all);
+            Set_Output (Standard_Output);
          end if;
       end Print;
 
       M : constant Metrix_Ref :=
-        new Metrix'(Node => CU_Node, Nesting => 0, Vals => (others => 0));
+        new Metrix'(Node => CU_Node,
+                    Nesting => 0,
+                    Vals => (others => 0),
+                    Submetrix => Metrix_Vectors.Empty_Vector);
 
    --  Start of processing for Walk
 
@@ -717,8 +738,49 @@ package body METRICS.Actions is
       Destroy (Node_Stack);
    end Walk;
 
+   ----------
+   -- Init --
+   ----------
+
+   procedure Init (Tool : in out Metrics_Tool; Cmd : Command_Line) is
+      Xml_Name : constant String :=
+        (if Arg (Cmd, Xml_File_Name) = null
+           then "metrix.xml"
+           else Arg (Cmd, Xml_File_Name).all);
+   begin
+      if Gen_XML (Cmd) then
+         Text_IO.Create (Tool.XML, Name => Xml_Name);
+         Text_IO.Set_Output (Tool.XML);
+         Put ("<?xml version=\1?>\n", Q ("1.0"));
+         Put ("<global>\n");
+         Text_IO.Set_Output (Text_IO.Standard_Output);
+      end if;
+   end Init;
+
+   -----------
+   -- Final --
+   -----------
+
+   procedure Final (Tool : in out Metrics_Tool; Cmd : Command_Line) is
+   begin
+      if Gen_XML (Cmd) then
+         Text_IO.Set_Output (Tool.XML);
+         --  ????Here, we need to print global metrics for all files.
+         Put ("</global>\n");
+         Text_IO.Set_Output (Text_IO.Standard_Output);
+         Text_IO.Close (Tool.XML);
+      end if;
+   end Final;
+
+   ---------------------
+   -- Per_File_Action --
+   ---------------------
+
    procedure Per_File_Action
-     (Cmd : Command_Line; File_Name : String; Unit : Analysis_Unit) is
+     (Tool : in out Metrics_Tool;
+      Cmd : Command_Line;
+      File_Name : String;
+      Unit : Analysis_Unit) is
 
       function To_Compute return Metrics_Set;
       --  Computes which metrics we should compute
@@ -760,12 +822,14 @@ package body METRICS.Actions is
 
       Metrics_To_Compute : constant Metrics_Set := To_Compute;
 
+   --  Start of processing for Per_File_Action
+
    begin
       if Debug_Flag_V then
          Print (Unit);
       end if;
 
-      Walk (Cmd, File_Name, Root (Unit), Metrics_To_Compute);
+      Walk (Tool, Cmd, File_Name, Root (Unit), Metrics_To_Compute);
 
       if Metrics_To_Compute (Contract_Metrics) /=
         (Contract_Metrics => False)
@@ -773,5 +837,127 @@ package body METRICS.Actions is
          Compute_Contract_Metrics (File_Name, Unit); -- ????????????????
       end if;
    end Per_File_Action;
+
+   ---------------
+   -- Tool_Help --
+   ---------------
+
+   procedure Tool_Help (Tool : Metrics_Tool) is
+      pragma Unreferenced (Tool);
+   begin
+      pragma Style_Checks ("M200"); -- Allow long lines
+
+      Put ("usage: gnatmetric [options] {filename} {-files filename} [-cargs gcc_switches]\n");
+      Put (" options:\n");
+      Put (" --version - Display version and exit\n");
+      Put (" --help    - Display usage and exit\n");
+      Put ("\n");
+      Put (" -Pproject        - Use project file project. Only one such switch can be used\n");
+      Put (" -U               - process all sources of the argument project\n");
+      Put (" -U main          - process the closure of units rooted at unit main\n");
+      Put (" -Xname=value     - specify an external reference for argument project file\n");
+      Put (" --subdirs=dir    - specify subdirectory to place the result files into\n");
+      Put (" --no_objects_dir - place results into current dir instead of project dir\n");
+      Put (" -eL              - follow all symbolic links when processing project files\n");
+
+      Put ("\n");
+      Put (" -a    - process sources from RTL\n");
+      if False then -- Disable this for now
+         Put (" --incremental -- incremental processing on a per-file basis\n");
+      end if;
+      Put (" -jn   - n is the maximal number of processes\n");
+      Put (" -v    - verbose mode\n");
+      Put (" -q    - quiet mode\n");
+      Put ("\n");
+
+      Put (" -nolocal - do not compute detailed metrics for local program units\n");
+      Put ("\n");
+
+      Put ("Options to control metrics to compute. An option --<metric> turns computing\n");
+      Put ("the metric ON, the corresponding --no-<metric> option turns computing the\n");
+      Put ("metric OFF. If no metric option is specified, all the metrics are computed\n");
+      Put ("and reported. If at least one positive option is  specified, only explicitly\n");
+      Put ("selected metrics are computed.\n");
+      Put ("\n");
+
+      Put ("Contract metrics:\n");
+      Put ("  --contract-all        - all contract metrics\n");
+      Put ("  --contract            - subprograms with contracts\n");
+      Put ("  --post                - subprograms with postconditions\n");
+      Put ("  --contract-complete   - subprograms with complete contracts\n");
+      Put ("  --contract-cyclomatic - McCabe Cyclomatic Complexity of contracts\n");
+      Put ("\n");
+
+      Put ("Complexity metrics:\n");
+      Put ("  --complexity-all        - all complexity metrics\n");
+      Put ("  --complexity-cyclomatic - McCabe Cyclomatic Complexity\n");
+      Put ("  --complexity-essential  - Essential Complexity\n");
+      Put ("  --complexity-average    - average McCabe Cyclomatic Complexity of a body\n");
+      Put ("  --loop-nesting          - maximal loop nesting level\n");
+      Put ("  --no-static-loop        - do not count static loops for cyclomatic complexity\n");
+      Put ("  -ne                     - do not consider exit statements as gotos when\n");
+      Put ("                            computing Essential Complexity\n");
+      Put ("  --extra-exit-points     - extra exit points in subprograms\n");
+      Put ("\n");
+
+      Put ("Line metrics:\n");
+      Put ("  --lines-all         - all line metrics\n");
+      Put ("  --lines             - number of all lines\n");
+      Put ("  --lines-code        - number of code lines\n");
+      Put ("  --lines-comment     - number of comment lines\n");
+      Put ("  --lines-eol-comment - number of code lines also containing comments\n");
+      Put ("  --lines-ratio       - comment/code lines percentage\n");
+      Put ("  --lines-blank       - number of blank lines\n");
+      Put ("  --lines-average     - average number of code lines in a body\n");
+      Put ("\n");
+
+      Put (" Syntax element metrics:\n");
+      Put ("  --syntax-all         - all syntax element metrics\n");
+      Put ("  --declarations       - total number of declarations\n");
+      Put ("  --statements         - total number of statements\n");
+      Put ("  --public-subprograms - number of public subprograms in a compilation unit\n");
+      Put ("  --all-subprograms    - number of subprograms in a compilation unit\n");
+      Put ("  --public-types       - number of public types in a compilation unit\n");
+      Put ("  --all-types          - number of types in a compilation unit\n");
+      Put ("  --unit-nesting       - maximal unit nesting level\n");
+      Put ("  --construct-nesting  - maximal construct nesting level\n");
+      Put ("\n");
+
+      Put (" Coupling metrics. By default they are disabled, options below enable all or\n");
+      Put (" specific coupling metrics, there is no  option to disable coupling metrics\n");
+      Put ("  --coupling-all           - all coupling metrics\n");
+      Put ("  --tagged-coupling-out    - tagged (class) fan-out coupling\n");
+      Put ("  --tagged-coupling-in     - tagged (class) fan-in coupling\n");
+      Put ("  --hierarchy-coupling-out - hierarchy (category) fan-out coupling\n");
+      Put ("  --hierarchy-coupling-in  - hierarchy (category) fan-in coupling\n");
+      Put ("  --unit-coupling-out      - unit fan-out coupling\n");
+      Put ("  --unit-coupling-in       - unit fan-in coupling\n");
+      Put ("  --control-coupling-out   - control fan-out coupling\n");
+      Put ("  --control-coupling-in    - control fan-in coupling\n");
+      Put ("\n");
+
+      Put (" output file control:\n");
+      Put ("  -d=dirname     - put files with detailed metrics into 'dirname'\n");
+      Put ("  -x             - generate XML output\n");
+      Put ("  -xs            - generate XML output and corresponding schema file\n");
+      Put ("  -nt            - do not generate output in text form, implies '-x'\n");
+      Put ("  -o file-suffix - suffix for the file to put detailed metrics for\n");
+      Put ("                   a source file into (file suffix should follow OS\n");
+      Put ("                   file name conventions and contain '.' or '$' character)\n");
+      Put ("  -og filename   - name of the file to put global metrics info into\n");
+      Put ("                   (if not set, this info is sent to Stdout),\n");
+      Put ("                   ignored if -nt is used\n");
+      Put ("  -ox filename   - name of the file to put XML output into, implies '-x'\n");
+      Put ("  -sfn           - use short source file name in output\n");
+      Put ("\n");
+      Put (" filename        - name of Ada source file for which metrics\n");
+      Put ("                   should be computed (wildcards are allowed)\n");
+      Put (" -files filename - name of the text file containing a list of Ada\n");
+      Put ("                   source files for which metrics should be computed\n");
+
+      Put (" gcc_switches    - switches to be passed to gcc called by \1\n", Tool_Names.Tool_Name);
+
+      pragma Style_Checks ("M79");
+   end Tool_Help;
 
 end METRICS.Actions;
