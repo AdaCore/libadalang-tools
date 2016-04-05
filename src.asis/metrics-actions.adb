@@ -17,6 +17,8 @@ with LAL_UL.Common; use LAL_UL; use LAL_UL.Common;
 with LAL_UL.Formatted_Output; use LAL_UL.Formatted_Output;
 with LAL_UL.String_Utilities; use LAL_UL.String_Utilities;
 
+with ASIS_UL.Debug; use ASIS_UL.Debug;
+
 pragma Warnings (Off);
 with LAL_UL.Projects;
 with LAL_UL.Drivers;
@@ -29,10 +31,10 @@ package body METRICS.Actions is
    function Image (X : Integer) return String
      renames String_Utilities.Image;
 
+   pragma Warnings (Off); -- ????????????????
    use Common_Flag_Switches, Common_String_Switches,
      Common_String_Seq_Switches, Common_Nat_Switches;
 
-   pragma Warnings (Off); -- ????????????????
    use Metrics_Flag_Switches, Metrics_Boolean_Switches,
      Metrics_String_Switches, Metrics_String_Seq_Switches;
    pragma Warnings (On);
@@ -42,19 +44,18 @@ package body METRICS.Actions is
 
    subtype Percent is Float range 0.0 .. 100.0;
 
-   function Get_Coverage
-     (Cmd : Command_Line; Pkg_Decl : Base_Package_Decl) return Percent;
+   function Get_Coverage (Pkg_Decl : Base_Package_Decl) return Percent;
    --  Returns the percentage of subprograms with contracts, so if all
    --  subprograms have contracts, 100.0 is returned. 100.0 is returned if
    --  there are no subprograms.
 
    procedure Compute_Contract_Metrics
-     (Cmd : Command_Line; File_Name : String; Unit : Analysis_Unit);
+     (File_Name : String; Unit : Analysis_Unit);
 
    procedure Walk
      (Cmd : Command_Line;
       File_Name : String;
-      Node : Ada_Node;
+      CU_Node : Ada_Node;
       Metrics_To_Compute : Metrics_Set);
 
    function Has_Contracts (Subp_Decl : Ada_Node) return Boolean is
@@ -95,8 +96,7 @@ package body METRICS.Actions is
       return False;
    end Has_Contracts;
 
-   function Get_Coverage
-     (Cmd : Command_Line; Pkg_Decl : Base_Package_Decl) return Percent is
+   function Get_Coverage (Pkg_Decl : Base_Package_Decl) return Percent is
       Decls : constant List_Ada_Node := F_Decls (Pkg_Decl);
 
       Has_Contracts_Count : Natural := 0;
@@ -114,7 +114,7 @@ package body METRICS.Actions is
                Decl : constant Ada_Node := Childx (Decls, I);
             begin
                if Kind (Decl) = Subprogram_Decl_Kind then
-                  if Arg (Cmd, Verbose) then
+                  if Debug_Flag_V then
                      Put ("    Doing subprogram ");
                      Wide_Wide_Text_IO.Put
                        (Full_Name
@@ -124,13 +124,13 @@ package body METRICS.Actions is
                   Subp_Count := Subp_Count + 1;
 
                   if Has_Contracts (Decl) then
-                     if Arg (Cmd, Verbose) then
+                     if Debug_Flag_V then
                         Put (": yes\n");
                      end if;
 
                      Has_Contracts_Count := Has_Contracts_Count + 1;
 
-                  elsif Arg (Cmd, Verbose) then
+                  elsif Debug_Flag_V then
                      Put (": no\n");
                   end if;
                end if;
@@ -146,7 +146,7 @@ package body METRICS.Actions is
    end Get_Coverage;
 
    procedure Compute_Contract_Metrics
-     (Cmd : Command_Line; File_Name : String; Unit : Analysis_Unit) is
+     (File_Name : String; Unit : Analysis_Unit) is
 
       pragma Unreferenced (File_Name);
 
@@ -159,9 +159,8 @@ package body METRICS.Actions is
         Find_All (Root (Unit), Is_Pkg_Or_Gen'Access);
 
    begin
-      if Arg (Cmd, Verbose) then
-         null;
---         Print (Unit);
+      if Debug_Flag_V then
+         Print (Unit);
       end if;
 
       --  Go through all the [generic] package declarations in the
@@ -171,7 +170,7 @@ package body METRICS.Actions is
          declare
             Pkg_Decl : constant Base_Package_Decl :=
               Base_Package_Decl (P);
-            Coverage : constant Percent := Get_Coverage (Cmd, Pkg_Decl);
+            Coverage : constant Percent := Get_Coverage (Pkg_Decl);
          begin
             Put ("Contract coverage for package ");
             Wide_Wide_Text_IO.Put
@@ -222,6 +221,19 @@ package body METRICS.Actions is
        Task_Body_Kind |
        Task_Decl_Kind |
        Task_Type_Decl_Kind;
+   --  These are the node kinds that the gnatmetric documentation calls
+   --  "eligible local units". We compute metrics for the outermost node (the
+   --  compilation unit), as well as eligible local units. A procedure
+   --  declaration, for example, has metrics only if it is the outer node.
+
+   function Q (S : String) return String is -- quote
+     ("""" & S & """");
+
+   function File_Name_To_Print
+     (Cmd : Command_Line; File_Name : String) return String is
+      (if Arg (Cmd, Short_File_Name_In_Output)
+         then File_Name
+         else Normalize_Pathname (File_Name));
 
    function Lines_String
      (Sloc_Range : Tokens.Source_Location_Range) return String is
@@ -229,17 +241,32 @@ package body METRICS.Actions is
        Image (Integer (Sloc_Range.End_Line)));
 
    function Node_Kind_String (Node : Ada_Node) return String;
+   --  Name of the node kind for printing in both XML and text
 
-   function Metric_XML_Name_String (Metric : Metrics_Enum) return String;
+   function XML_Metric_Name_String (Metric : Metrics_Enum) return String;
+   --  Name of the metric for printing in XML
+
    function Metric_Name_String (Metric : Metrics_Enum) return String;
+   --  Name of the metric for printing in text
 
    procedure Print_Range
      (Name : String;
       Metrics_To_Compute : Metrics_Set;
       First, Last : Metrics_Enum;
       M : Metrix);
+   --  Prints a range of metrics. This is needed because the metrics are
+   --  printed in groups (line metrics, contract metrics, etc).  Name is the
+   --  name of the group, e.g. "=== Lines metrics ===". Prints the name
+   --  followed by metrics First..Last. (????Leave out the "===")
 
    procedure Print_Metrix
+     (File_Name : String;
+      Metrics_To_Compute : Metrics_Set;
+      Node_Metrix : Metrix_Vectors.Vector;
+      Index : Natural);
+   --  Print the metrics for one node
+
+   procedure XML_Print_Metrix
      (File_Name : String;
       Metrics_To_Compute : Metrics_Set;
       Node_Metrix : Metrix_Vectors.Vector;
@@ -247,7 +274,7 @@ package body METRICS.Actions is
 
    function Node_Kind_String (Node : Ada_Node) return String is
    begin
-      case Eligible'(Kind (Node)) is
+      case Kind (Node) is
          when Generic_Package_Decl_Kind =>
             return "generic package";
          when Package_Body_Kind =>
@@ -273,85 +300,36 @@ package body METRICS.Actions is
             return "single task";
          when Task_Type_Decl_Kind =>
             return "task type";
+
+         when Generic_Instantiation_Kind =>
+            return "generic instantiation kind";
+         when Generic_Renaming_Decl_Kind =>
+            return "generic renaming decl_kind";
+         when Generic_Subprogram_Decl_Kind =>
+            return "generic subprogram decl_kind";
+         when Package_Renaming_Decl_Kind =>
+            return "package renaming decl_kind";
+         when Subprogram_Decl_Kind =>
+            return "subprogram decl kind";
+
+         when others => raise Program_Error;
       end case;
    end Node_Kind_String;
 
-   function Metric_XML_Name_String (Metric : Metrics_Enum) return String is
-   begin
-      case Metric is
-         when Contract =>
-            return "contract";
-         when Post =>
-            return "post";
-         when Contract_Complete =>
-            return "contract_complete";
-         when Contract_Cyclomatic =>
-            return "contract_cyclomatic";
-         when Complexity_Cyclomatic =>
-            return "complexity_cyclomatic";
-         when Complexity_Essential =>
-            return "complexity_essential";
-         when Complexity_Average =>
-            return "complexity_average";
-         when Loop_Nesting =>
-            return "loop_nesting";
-         when Extra_Exit_Points =>
-            return "extra_exit_points";
-         when Lines =>
-            return "lines";
-         when Lines_Code =>
-            return "lines_code";
-         when Lines_Comment =>
-            return "lines_comment";
-         when Lines_Eol_Comment =>
-            return "lines_eol_comment";
-         when Lines_Ratio =>
-            return "lines_ratio";
-         when Lines_Blank =>
-            return "lines_blank";
-         when Lines_Average =>
-            return "lines_average";
-         when Declarations =>
-            return "declarations";
-         when Statements =>
-            return "all_statements";
-         when Public_Subprograms =>
-            return "public_subprograms";
-         when All_Subprograms =>
-            return "all_subprograms";
-         when Public_Types =>
-            return "public_types";
-         when All_Types =>
-            return "all_types";
-         when Unit_Nesting =>
-            return "unit_nesting";
-         when Construct_Nesting =>
-            return "construct_nesting";
-         when Param_Number =>
-            return "param_number";
-         when Tagged_Coupling_Out =>
-            return "tagged_coupling_out";
-         when Tagged_Coupling_In =>
-            return "tagged_coupling_in";
-         when Hierarchy_Coupling_Out =>
-            return "hierarchy_coupling_out";
-         when Hierarchy_Coupling_In =>
-            return "hierarchy_coupling_in";
-         when Unit_Coupling_Out =>
-            return "unit_coupling_out";
-         when Unit_Coupling_In =>
-            return "unit_coupling_in";
-         when Control_Coupling_Out =>
-            return "control_coupling_out";
-         when Control_Coupling_In =>
-            return "control_coupling_in";
-      end case;
-   end Metric_XML_Name_String;
-
    function Metric_Name_String (Metric : Metrics_Enum) return String is
    begin
-      return Replace_String
-        (Metric_XML_Name_String (Metric), From => "_", To => " ");
+      --  In many, but not all, cases the name of the metric in the text output
+      --  is the same as the name in the XML, replacing "_" with " ".
+
+      case Metric is
+         when Statements =>
+            return "all statements";
+         --  ????More 'when's go here.
+
+         when others =>
+            return Replace_String
+              (XML_Metric_Name_String (Metric), From => "_", To => " ");
+      end case;
    end Metric_Name_String;
 
    procedure Print_Range
@@ -392,18 +370,18 @@ package body METRICS.Actions is
       if Index = 0 then
          pragma Assert (Kind (M.Node) = Compilation_Unit_Kind);
          declare
+            pragma Assert (Last_Index (Node_Metrix) >= 1); -- ????????????????
             Lib_Item : constant Ada_Node := Get (Node_Metrix, 1).Node;
             --  Node_Metrix[0] is the compilation unit, and Node_Metrix[1] is
             --  the library item therein. Note this isn't what libadalang calls
             --  Library_Item; this is the package body or whatever node.
+            --  ????????????????Lib_Item could be a subunit.
          begin
             Put ("Metrics computed for \1\n",
-                 (if Arg (Cmd, Short_SFN_In_Output)
-                    then File_Name
-                    else Normalize_Pathname (File_Name)));
+                 File_Name_To_Print (Cmd, File_Name));
             Put ("containing \1 \2\n",
                  Node_Kind_String (Lib_Item),
-                 To_UTF8 (Full_Name (Name (Lib_Item))));
+                 To_UTF8 (Full_Name (Get_Name (Lib_Item))));
          end;
 
       else
@@ -412,7 +390,7 @@ package body METRICS.Actions is
               (if Index = 1 then " - library item" else "");
          begin
             Put ("\n\1 (\2\3 at lines  \4)\n",
-                 To_UTF8 (Full_Name (Name (M.Node))),
+                 To_UTF8 (Full_Name (Get_Name (M.Node))),
                  Node_Kind_String (M.Node), LI,
                  Lines_String (Sloc_Range (M.Node)));
          end;
@@ -441,15 +419,148 @@ package body METRICS.Actions is
       Outdent (M.Nesting * Default_Indentation_Amount);
    end Print_Metrix;
 
+   function XML_Metric_Name_String (Metric : Metrics_Enum) return String is
+   begin
+      case Metric is
+         when Contract =>
+            return "contract";
+         when Post =>
+            return "post";
+         when Contract_Complete =>
+            return "contract_complete";
+         when Contract_Cyclomatic =>
+            return "contract_cyclomatic";
+         when Complexity_Cyclomatic =>
+            return "complexity_cyclomatic";
+         when Complexity_Essential =>
+            return "complexity_essential";
+         when Complexity_Average =>
+            return "complexity_average";
+         when Loop_Nesting =>
+            return "loop_nesting";
+         when Extra_Exit_Points =>
+            return "extra_exit_points";
+         when Lines =>
+            return "lines";
+         when Lines_Code =>
+            return "lines_code";
+         when Lines_Comment =>
+            return "lines_comment";
+         when Lines_Eol_Comment =>
+            return "lines_eol_comment";
+         when Lines_Ratio =>
+            return "lines_ratio";
+         when Lines_Blank =>
+            return "lines_blank";
+         when Lines_Average =>
+            return "lines_average";
+         when Declarations =>
+            return "declarations";
+         when Statements =>
+            return "all_stmts";
+         when Public_Subprograms =>
+            return "public_subprograms";
+         when All_Subprograms =>
+            return "all_subprograms";
+         when Public_Types =>
+            return "public_types";
+         when All_Types =>
+            return "all_types";
+         when Unit_Nesting =>
+            return "unit_nesting";
+         when Construct_Nesting =>
+            return "construct_nesting";
+         when Param_Number =>
+            return "param_number";
+         when Tagged_Coupling_Out =>
+            return "tagged_coupling_out";
+         when Tagged_Coupling_In =>
+            return "tagged_coupling_in";
+         when Hierarchy_Coupling_Out =>
+            return "hierarchy_coupling_out";
+         when Hierarchy_Coupling_In =>
+            return "hierarchy_coupling_in";
+         when Unit_Coupling_Out =>
+            return "unit_coupling_out";
+         when Unit_Coupling_In =>
+            return "unit_coupling_in";
+         when Control_Coupling_Out =>
+            return "control_coupling_out";
+         when Control_Coupling_In =>
+            return "control_coupling_in";
+      end case;
+   end XML_Metric_Name_String;
+
+   procedure XML_Print_Metrix
+     (File_Name : String;
+      Metrics_To_Compute : Metrics_Set;
+      Node_Metrix : Metrix_Vectors.Vector;
+      Index : Natural)
+   is
+      M : Metrix renames Get (Node_Metrix, Index).all;
+   begin
+      Indent (M.Nesting * Default_Indentation_Amount);
+
+      if Index = 0 then
+         pragma Assert (Kind (M.Node) = Compilation_Unit_Kind);
+         Put ("<file name=\1>\n", Q (File_Name_To_Print (Cmd, File_Name)));
+         Indent;
+
+      else
+         declare
+            Sloc : constant Tokens.Source_Location_Range :=
+              Sloc_Range (M.Node);
+         begin
+            Put ("<unit name=\1 kind=\2 line=\3 col=\4>\n",
+                 Q (To_UTF8 (Full_Name (Get_Name (M.Node)))),
+                 Q (Node_Kind_String (M.Node)),
+                 Q (Image (Integer (Sloc.Start_Line))),
+                 Q (Image (Integer (Sloc.Start_Column))));
+         end;
+      end if;
+
+      Indent;
+
+      for I in M.Vals'Range loop
+         if Metrics_To_Compute (I) then
+            if M.Vals (I) /= 0 then -- ????????????????
+               Put ("<metric name=\1>\2</metric>\n",
+                    Q (XML_Metric_Name_String (I)),
+                    Image (Integer (M.Vals (I))));
+            end if;
+         end if;
+      end loop;
+
+      Outdent;
+
+      if Index = 0 then
+         Outdent;
+         Put ("</file>\n");
+      else
+         Put ("</unit>\n");
+      end if;
+
+      Outdent (M.Nesting * Default_Indentation_Amount);
+   end XML_Print_Metrix;
+
    procedure Walk
      (Cmd : Command_Line;
       File_Name : String;
-      Node : Ada_Node;
+      CU_Node : Ada_Node;
       Metrics_To_Compute : Metrics_Set)
    is
-      pragma Assert (Node /= null);
-      pragma Assert (Kind (Node) = Compilation_Unit_Kind);
-      pragma Assert (Child_Count (F_Bodies (Compilation_Unit (Node))) = 1);
+      pragma Assert (CU_Node /= null);
+      pragma Assert (Kind (CU_Node) = Compilation_Unit_Kind);
+--    pragma Assert (Child_Count (F_Bodies (Compilation_Unit (CU_Node))) = 1);
+
+      First_Body : constant Ada_Node :=
+        Childx (F_Bodies (Compilation_Unit (CU_Node)), 0);
+      Lib_Item : constant Ada_Node :=
+        (case Kind (First_Body) is
+           when Library_Item_Kind => F_Item (Library_Item (First_Body)),
+           when Subunit_Kind => Ada_Node (F_Body (Subunit (First_Body))),
+           when others => raise Program_Error);
+      --  ????????????????Could be subunit
 
       Node_Stack : Ada_Node_Vectors.Vector;
       --  Stack of all nodes currently being walked
@@ -469,6 +580,8 @@ package body METRICS.Actions is
       --  the recursive walk.
 
       Node_Metrix : Metrix_Vectors.Vector;
+      --  This contains all the computed metrix (not just the ones currently
+      --  being processed, as Metrix_Stack does).
 
       procedure Rec (Node : Ada_Node);
       --  Recursive tree walk. Rec and Gather_Metrics_And_Walk_Children are
@@ -481,14 +594,14 @@ package body METRICS.Actions is
 
       procedure Rec (Node : Ada_Node) is
       begin
-         if Arg (Cmd, Verbose) then
+         if Debug_Flag_V then
             Put ("-->Walk: \1\n", Short_Image (Node));
             Indent;
          end if;
 
          Append (Node_Stack, Node); -- push
 
-         if Kind (Node) in Eligible then
+         if Node = Lib_Item or else Kind (Node) in Eligible then
             declare
                M : constant Metrix_Ref :=
                  new Metrix'(Node => Node,
@@ -506,7 +619,7 @@ package body METRICS.Actions is
 
          Pop (Node_Stack);
 
-         if Arg (Cmd, Verbose) then
+         if Debug_Flag_V then
             Outdent;
             Put ("<--Walk: \1\n", Short_Image (Node));
          end if;
@@ -561,24 +674,31 @@ package body METRICS.Actions is
 
          Set_Output (Standard_Output);
          Close (Text);
+
+         if False then -- ????????????????
+            for I in 1 .. Length (Node_Metrix) loop
+               XML_Print_Metrix
+                 (File_Name, Metrics_To_Compute, Node_Metrix, I - 1);
+            end loop;
+         end if;
       end Print;
 
       M : constant Metrix_Ref :=
-        new Metrix'(Node => Node, Nesting => 0, Vals => (others => 0));
+        new Metrix'(Node => CU_Node, Nesting => 0, Vals => (others => 0));
 
    --  Start of processing for Walk
 
    begin
-      if Arg (Cmd, Verbose) then
-         Put ("-->Walk: \1\n", Short_Image (Node));
+      if Debug_Flag_V then
+         Put ("-->Walk: \1\n", Short_Image (CU_Node));
          Indent;
       end if;
 
-      Append (Node_Stack, Node); -- push
+      Append (Node_Stack, CU_Node); -- push
       Append (Metrix_Stack, M); -- push
       Append (Node_Metrix, M);
 
-      Gather_Metrics_And_Walk_Children (Node);
+      Gather_Metrics_And_Walk_Children (CU_Node);
 
       Pop (Metrix_Stack);
       Pop (Node_Stack);
@@ -587,9 +707,9 @@ package body METRICS.Actions is
 
       Print;
 
-      if Arg (Cmd, Verbose) then
+      if Debug_Flag_V then
          Outdent;
-         Put ("<--Walk: \1\n", Short_Image (Node));
+         Put ("<--Walk: \1\n", Short_Image (CU_Node));
       end if;
 
       --  ????????????????Free all the Node_Metrix.
@@ -641,12 +761,16 @@ package body METRICS.Actions is
       Metrics_To_Compute : constant Metrics_Set := To_Compute;
 
    begin
+      if Debug_Flag_V then
+         Print (Unit);
+      end if;
+
       Walk (Cmd, File_Name, Root (Unit), Metrics_To_Compute);
 
       if Metrics_To_Compute (Contract_Metrics) /=
         (Contract_Metrics => False)
       then
-         Compute_Contract_Metrics (Cmd, File_Name, Unit); -- ????????????????
+         Compute_Contract_Metrics (File_Name, Unit); -- ????????????????
       end if;
    end Per_File_Action;
 

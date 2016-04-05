@@ -165,8 +165,9 @@ procedure METRICS.Main is
             begin
                case Switch is
                   when Gnatmetric_Debug =>
-                     Set_Debug_Options
-                       (Swit.Seq_Val (Last_Index (Swit.Seq_Val)).all);
+                     for Dbg of Swit.Seq_Val loop
+                        Set_Debug_Options (Dbg.all);
+                     end loop;
                end case;
             end;
          end if;
@@ -177,7 +178,7 @@ procedure METRICS.Main is
 
 begin
    LAL_UL.Drivers.Driver
-     (METRICS.Command_Lines.Cmd,
+     (METRICS.Command_Lines.Cmd, -- local????
       Tool_Package_Name     => "metrics",
       Needs_Per_File_Output => True,
       Callback              => Callback'Unrestricted_Access,

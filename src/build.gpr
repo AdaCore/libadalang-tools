@@ -14,7 +14,7 @@ project Build is
    end Compiler;
 
    package Builder is
-      for Executable ("metrics-main.adb") use "lal-metric";
+      for Executable ("metrics-main.adb") use "lalmetric";
    end Builder;
 
 end Build;

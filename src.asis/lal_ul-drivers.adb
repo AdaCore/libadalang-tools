@@ -47,6 +47,11 @@ with Libadalang.AST.Types; use Libadalang.AST.Types;
 
 package body LAL_UL.Drivers is
 
+   pragma Warnings (Off); -- ????????????????
+   use Common_Flag_Switches, Common_String_Switches,
+     Common_String_Seq_Switches, Common_Nat_Switches;
+   pragma Warnings (On);
+
    procedure Driver
      (Cmd                   : in out Command_Line;
       Tool_Package_Name     :        String;
@@ -60,11 +65,6 @@ package body LAL_UL.Drivers is
       pragma Unreferenced (No_Preprocessing);
 
       use String_Ref_Vectors;
-
-      pragma Warnings (Off); -- ????????????????
-      use Common_Flag_Switches, Common_String_Switches,
-        Common_String_Seq_Switches, Common_Nat_Switches;
-      pragma Warnings (On);
 
       procedure Local_Callback
         (Phase : Parse_Phase;

@@ -41,10 +41,10 @@ package LAL_Extensions is
       Node_Kind : Ada_Node_Type_Kind) return Ada_Node_Vecs.Elements_Array;
    --  Same as above, except return an array of the relevant nodes
 
-   function Full_Name (Name : Expr) return Text_Type;
+   function Full_Name (Nm : Name) return Text_Type;
    --  Returns the full expanded name
 
-   function Name (Decl : Ada_Node) return Expr;
+   function Get_Name (Decl : Ada_Node) return Name;
    --  Returns the defining name of a declaration or body
 
 end LAL_Extensions;
