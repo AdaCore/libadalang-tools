@@ -60,6 +60,9 @@ package LAL_UL.Generic_Formatted_Output is
    function Cur_Column return Positive;
    --  Current output column. The next output character will be in this column.
 
+   procedure Tab_To_Column (Column : Positive);
+   --  Put spaces until we're at or past Column.
+
    Output_Enabled : Boolean := Output_Enabled_Initially;
    --  Set this to False to send all output into the bit bucket. Used for
    --  debugging output.

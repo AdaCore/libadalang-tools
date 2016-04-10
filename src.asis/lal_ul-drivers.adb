@@ -176,8 +176,8 @@ package body LAL_UL.Drivers is
                if Arg (Cmd, Verbose) then
                   Put_Line ("[" & Image (Counter) & "] " & File_Name);
                   --  ????Use Formatted_Output?
-                  Counter := Counter - 1;
                end if;
+               Counter := Counter - 1;
 
                if Has_Diagnostics (Unit) then
                   Put_Line ("Errors while parsing " & File_Name);

@@ -1,14 +1,13 @@
 with Ada.Wide_Wide_Characters.Handling;
 with Ada.Wide_Wide_Text_IO; use Ada;
+with Ada.Strings.Unbounded;
 
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
 with Langkit_Support.Text; use Langkit_Support.Text;
-with Langkit_Support.Vectors;
 with Langkit_Support.Tokens; use Langkit_Support;
 
 with Libadalang;     use Libadalang;
-with Libadalang.AST; use Libadalang.AST;
 with Libadalang.AST.Types; use Libadalang.AST.Types;
 with LAL_Extensions; use LAL_Extensions;
 
@@ -24,12 +23,26 @@ with LAL_UL.Projects;
 with LAL_UL.Drivers;
 pragma Warnings (On);
 
-with METRICS.Command_Lines; use METRICS.Command_Lines;
-
 package body METRICS.Actions is
+
+   Output_To_Standard_Output : Boolean renames Debug_Flag_S;
 
    function Image (X : Integer) return String
      renames String_Utilities.Image;
+
+   procedure Stop (Node : Ada_Node);
+   procedure Stop (Node : Ada_Node) is
+      P : constant Ada_Node_Array_Access := Parents (Node);
+   begin
+      if False then -- ????????????????
+         Put ("Node:\n");
+         Print (Node);
+         for X in P.Items'Range loop
+            Put ("Parent \1:\n", Image (X));
+            Print (P.Items (X));
+         end loop;
+      end if;
+   end Stop;
 
    pragma Warnings (Off); -- ????????????????
    use Common_Flag_Switches, Common_String_Switches,
@@ -183,36 +196,12 @@ package body METRICS.Actions is
 
    use Ada_Node_Vectors;
 
-   type Metric_Int is new Natural;
-   procedure Inc (X : in out Metric_Int);
+   procedure Inc (X : in out Metric_Int; By : Metric_Int := 1);
 
-   procedure Inc (X : in out Metric_Int) is
+   procedure Inc (X : in out Metric_Int; By : Metric_Int := 1) is
    begin
-      X := X + 1;
+      X := X + By;
    end Inc;
-
-   type Metrics_Values is array (Metrics_Enum) of Metric_Int;
-
-   type Metrix;
-   type Metrix_Ref is access all Metrix;
-
-   package Metrix_Vectors is new Langkit_Support.Vectors (Metrix_Ref);
-   use Metrix_Vectors;
-
-   type Metrix is record
-      Node : Ada_Node;
-      --  Node to which the metrics are associated
-
-      Nesting : Natural;
-      --  Nesting level. 0 for the compilation unit, and 0 for the library item
-      --  therein. Then increasing by 1. So Metrix_Stack[0] and Metrix_Stack[1]
-      --  both have Nesting = 0, and Metrix_Stack[2].Nesting = 1.
-
-      Vals : Metrics_Values;
-
-      Submetrix : Metrix_Vectors.Vector;
-      --  Metrix records for units nested within this one
-   end record;
 
    subtype Eligible is Ada_Node_Type_Kind with
      Predicate => Eligible in
@@ -222,6 +211,7 @@ package body METRICS.Actions is
        Protected_Body_Kind |
        Protected_Decl_Kind |
        Protected_Type_Decl_Kind |
+       Entry_Body_Kind |
        Subprogram_Body_Kind |
        Task_Body_Kind |
        Task_Decl_Kind |
@@ -248,6 +238,10 @@ package body METRICS.Actions is
    function Node_Kind_String (Node : Ada_Node) return String;
    --  Name of the node kind for printing in both XML and text
 
+   function XML (X : Text_Type) return String;
+   --  Returns X, converted to UTF8, and with replacements like "&" -->
+   --  "&amp", and quoted.
+
    function XML_Metric_Name_String (Metric : Metrics_Enum) return String;
    --  Name of the metric for printing in XML
 
@@ -258,18 +252,24 @@ package body METRICS.Actions is
      (Name : String;
       Metrics_To_Compute : Metrics_Set;
       First, Last : Metrics_Enum;
-      M : Metrix);
+      M : Metrix;
+      Global : Boolean := False);
    --  Prints a range of metrics. This is needed because the metrics are
    --  printed in groups (line metrics, contract metrics, etc).  Name is the
    --  name of the group, e.g. "=== Lines metrics ===". Prints the name
-   --  followed by metrics First..Last. (????Leave out the "===")
+   --  followed by metrics First..Last. Global is True when printing the
+   --  global metrics for all files.
 
    procedure Print_Metrix
      (File_Name : String;
       Metrics_To_Compute : Metrics_Set;
-      Node_Metrix : Metrix_Vectors.Vector;
-      Index : Natural);
+      M : Metrix;
+      Depth : Natural);
    --  Print the metrics for one node
+
+   procedure XML_Print_Metrix_Vals
+     (Metrics_To_Compute : Metrics_Set;
+      M : Metrix);
 
    procedure XML_Print_Metrix
      (File_Name : String;
@@ -288,9 +288,11 @@ package body METRICS.Actions is
          when Protected_Body_Kind =>
             return "protected body";
          when Protected_Decl_Kind =>
-            return "single protected object";
+            return "protected object";
          when Protected_Type_Decl_Kind =>
             return "protected type";
+         when Entry_Body_Kind =>
+            return "entry body";
          when Subprogram_Body_Kind =>
             declare
                R : constant Type_Expression :=
@@ -301,24 +303,55 @@ package body METRICS.Actions is
          when Task_Body_Kind =>
             return "task body";
          when Task_Decl_Kind =>
-            return "single task";
+            return "task";
          when Task_Type_Decl_Kind =>
             return "task type";
 
          when Generic_Instantiation_Kind =>
-            return "generic instantiation kind";
+            return "package instantiation"; -- ????Or proc/func
          when Generic_Renaming_Decl_Kind =>
-            return "generic renaming decl_kind";
+            return "generic package renaming"; -- ????Or proc/func
          when Generic_Subprogram_Decl_Kind =>
-            return "generic subprogram decl_kind";
+            declare
+               R : constant Type_Expression :=
+                 F_Returns (F_Subp_Spec (Generic_Subprogram_Decl (Node)));
+               --  ????R is null here even for functions
+            begin
+               return "generic " &
+                 (if R = null then "procedure" else "function");
+            end;
          when Package_Renaming_Decl_Kind =>
-            return "package renaming decl_kind";
+            return "package renaming";
          when Subprogram_Decl_Kind =>
-            return "subprogram decl kind";
+            declare -- ????????????????Duplicated code
+               R : constant Type_Expression :=
+                 F_Returns (F_Subp_Spec (Subprogram_Decl (Node)));
+            begin
+               return (if R = null then "procedure" else "function");
+            end;
 
          when others => raise Program_Error;
       end case;
    end Node_Kind_String;
+
+   function Is_Private (Node : Ada_Node) return Boolean;
+   --  True if Node is a private library unit. ????This doesn't work for
+   --  bodies.
+
+   function Is_Private (Node : Ada_Node) return Boolean is
+      P : constant Ada_Node := Parents (Node).Items (1);
+   begin
+      return Kind (P) = Library_Item_Kind
+        and then F_Is_Private (Library_Item (P));
+   end Is_Private;
+
+   function Node_Kind_String_For_Header (Node : Ada_Node) return String is
+      ((if Is_Private (Node) then "private " else "") &
+        Replace_String
+         (Node_Kind_String (Node), From => "instantiation", To => "instance"));
+   --  Prepend "private " if appropriate.
+   --  Also, gnatmetric says "containing package instance" at the top, but
+   --  uses "instantiation" elsewhere.
 
    function Metric_Name_String (Metric : Metrics_Enum) return String is
    begin
@@ -340,72 +373,92 @@ package body METRICS.Actions is
      (Name : String;
       Metrics_To_Compute : Metrics_Set;
       First, Last : Metrics_Enum;
-      M : Metrix)
+      M : Metrix;
+      Global : Boolean := False)
    is
    begin
       if Metrics_To_Compute (First .. Last) /= (First .. Last => False) then
-         Put ("\n\1\n", Name);
-         Indent;
+         if not Global then
+            Put ("\n");
+         end if;
+
+         Put ("\1\n", Name);
+         Indent (if Global then 2 else Default_Indentation_Amount);
 
          for I in First .. Last loop
             if Metrics_To_Compute (I) then
                if True or else M.Vals (I) /= 0 then -- ????????????????
-                  Put ("\1           : \2\n",
-                       Metric_Name_String (I),
-                       Image (Integer (M.Vals (I))));
+                  Put ("\1", Metric_Name_String (I));
+                  Tab_To_Column (Indentation + (if Global then 21 else 26));
+                  Put (": \1\n", Image (Integer (M.Vals (I))));
                end if;
             end if;
          end loop;
 
-         Outdent;
+         Outdent (if Global then 2 else Default_Indentation_Amount);
       end if;
    end Print_Range;
 
    procedure Print_Metrix
      (File_Name : String;
       Metrics_To_Compute : Metrics_Set;
-      Node_Metrix : Metrix_Vectors.Vector;
-      Index : Natural)
+      M : Metrix;
+      Depth : Natural)
    is
-      M : Metrix renames Get (Node_Metrix, Index).all;
    begin
-      Indent (M.Nesting * Default_Indentation_Amount);
+      if Depth > 1 then
+         Indent;
+      end if;
 
-      if Index = 0 then
-         pragma Assert (Kind (M.Node) = Compilation_Unit_Kind);
+      if Kind (M.Node) = Compilation_Unit_Kind then
          declare
-            pragma Assert (Last_Index (Node_Metrix) >= 1); -- ????????????????
-            Lib_Item : constant Ada_Node := Get (Node_Metrix, 1).Node;
-            --  Node_Metrix[0] is the compilation unit, and Node_Metrix[1] is
-            --  the library item therein. Note this isn't what libadalang calls
+            pragma Assert (Length (M.Submetrix) = 1);
+            Lib_Item : constant Ada_Node := Get (M.Submetrix, 0).Node;
+            --  Note this isn't what libadalang calls
             --  Library_Item; this is the package body or whatever node.
             --  ????????????????Lib_Item could be a subunit.
+            First_Body : constant Ada_Node :=
+              Childx (F_Bodies (Compilation_Unit (M.Node)), 0);
+            Subunit_Parent : constant String :=
+              (if Kind (First_Body) = Subunit_Kind
+                 then "subunit " &
+                   To_UTF8 (Full_Name (F_Name (Subunit (First_Body)))) &
+                   "."
+                 else "");
          begin
             Put ("Metrics computed for \1\n",
                  File_Name_To_Print (Cmd, File_Name));
-            Put ("containing \1 \2\n",
-                 Node_Kind_String (Lib_Item),
+            Put ("containing \1 \2\3\n",
+                 Node_Kind_String_For_Header (Lib_Item),
+                 Subunit_Parent,
                  To_UTF8 (Full_Name (Get_Name (Lib_Item))));
          end;
 
       else
          declare
-            LI : constant String :=
-              (if Index = 1 then " - library item" else "");
+            P : constant Ada_Node := Parents (M.Node).Items (1);
+            LI_Sub : constant String :=
+              (if Depth = 1
+                 then (if Kind (P) = Subunit_Kind
+                         then " - subunit"
+                         else " - library item")
+                 else "");
          begin
             Put ("\n\1 (\2\3 at lines  \4)\n",
                  To_UTF8 (Full_Name (Get_Name (M.Node))),
-                 Node_Kind_String (M.Node), LI,
+                 Node_Kind_String (M.Node), LI_Sub,
                  Lines_String (Sloc_Range (M.Node)));
          end;
       end if;
 
+      --  Print metrix for this unit
+
       Print_Range
-        ("=== Lines metrics ===",
+        ("=== Code line metrics ===",
          Metrics_To_Compute,
          Lines_Metrics'First, Lines_Metrics'Last, M);
 
-      if Index /= 0 then
+      if Kind (M.Node) /= Compilation_Unit_Kind then
          Print_Range
            ("=== Contract metrics ===",
             Metrics_To_Compute,
@@ -420,8 +473,33 @@ package body METRICS.Actions is
             Complexity_Metrics'First, Complexity_Metrics'Last, M);
       end if;
 
-      Outdent (M.Nesting * Default_Indentation_Amount);
+      --  Then recursively print metrix of nested units
+
+      for Child of M.Submetrix loop
+         Print_Metrix (File_Name, Metrics_To_Compute, Child.all, Depth + 1);
+      end loop;
+
+      if Depth > 1 then
+         Outdent;
+      end if;
    end Print_Metrix;
+
+   function XML (X : Text_Type) return String is
+      use Ada.Strings.Unbounded;
+      Result : Unbounded_String;
+   begin
+      for C of X loop
+         case C is
+            when '&' => Append (Result, "&amp;");
+            when '<' => Append (Result, "&lt;");
+            when '>' => Append (Result, "&gt;");
+            when '"' => Append (Result, "&quot;");
+            when ''' => Append (Result, "&apos;");
+            when others => Append (Result, (To_UTF8 ((1 => C))));
+         end case;
+      end loop;
+      return Q (To_String (Result));
+   end XML;
 
    function XML_Metric_Name_String (Metric : Metrics_Enum) return String is
    begin
@@ -495,6 +573,26 @@ package body METRICS.Actions is
       end case;
    end XML_Metric_Name_String;
 
+   procedure XML_Print_Metrix_Vals
+     (Metrics_To_Compute : Metrics_Set;
+      M : Metrix)
+   is
+   begin
+      Indent;
+
+      for I in M.Vals'Range loop
+         if Metrics_To_Compute (I) then
+            if True or else M.Vals (I) /= 0 then -- ????????????????
+               Put ("<metric name=\1>\2</metric>\n",
+                    Q (XML_Metric_Name_String (I)),
+                    Image (Integer (M.Vals (I))));
+            end if;
+         end if;
+      end loop;
+
+      Outdent;
+   end XML_Print_Metrix_Vals;
+
    procedure XML_Print_Metrix
      (File_Name : String;
       Metrics_To_Compute : Metrics_Set;
@@ -511,31 +609,19 @@ package body METRICS.Actions is
               Sloc_Range (M.Node);
          begin
             Put ("<unit name=\1 kind=\2 line=\3 col=\4>\n",
-                 Q (To_UTF8 (Full_Name (Get_Name (M.Node)))),
+                 XML (Full_Name (Get_Name (M.Node))),
                  Q (Node_Kind_String (M.Node)),
                  Q (Image (Integer (Sloc.Start_Line))),
                  Q (Image (Integer (Sloc.Start_Column))));
          end;
       end if;
 
-      Indent;
-
       --  Print metrics for this unit
 
       if Kind (M.Node) /= Compilation_Unit_Kind then
          --  ????But need to print line metrics for CU
-         for I in M.Vals'Range loop
-            if Metrics_To_Compute (I) then
-               if True or else M.Vals (I) /= 0 then -- ????????????????
-                  Put ("<metric name=\1>\2</metric>\n",
-                       Q (XML_Metric_Name_String (I)),
-                       Image (Integer (M.Vals (I))));
-               end if;
-            end if;
-         end loop;
+         XML_Print_Metrix_Vals (Metrics_To_Compute, M);
       end if;
-
-      Outdent;
 
       --  Then recursively print metrix of nested units
 
@@ -563,6 +649,9 @@ package body METRICS.Actions is
       pragma Assert (Kind (CU_Node) = Compilation_Unit_Kind);
 --    pragma Assert (Child_Count (F_Bodies (Compilation_Unit (CU_Node))) = 1);
 
+      Metrix_Stack : Metrix_Vectors.Vector renames Tool.Metrix_Stack;
+      --  Why don't we use Fast_Vectors????
+
       First_Body : constant Ada_Node :=
         Childx (F_Bodies (Compilation_Unit (CU_Node)), 0);
       Lib_Item : constant Ada_Node :=
@@ -572,26 +661,22 @@ package body METRICS.Actions is
            when others => raise Program_Error);
       --  ????????????????Could be subunit
 
-      Node_Stack : Ada_Node_Vectors.Vector; -- Needed????
+      Node_Stack : Ada_Node_Vectors.Vector;
       --  Stack of all nodes currently being walked
 
-      Metrix_Stack : Metrix_Vectors.Vector;
-      --  Metrix_Stack[0] is the Metrix for the Compilation_Unit node.
-      --
-      --  Metrix_Stack[1] is the Metrix for the library item within that; this
-      --  is a Package_Decl, Package_Body, or whatever node.
-      --
-      --  The rest are Metrix for the nested nodes that are "eligible" for
-      --  computing metrics. These nodes are [generic] package specs, single
-      --  task/protected declarations, task/protected type declarations, and
-      --  proper bodies other than entry bodies.
-      --
-      --  This stack contains the relevant nodes currently being processed by
-      --  the recursive walk.
+      function Ancestor_Node (N : Natural) return Ada_Node;
+      --  Returns the N'th ancestor of the current node. Ancestor (0) is the
+      --  current node, Ancestor (1) is the parent of the current node,
+      --  Ancestor (2) is the grandparent of the current node, and so on.
 
-      Node_Metrix : Metrix_Vectors.Vector; -- ????Get rid of
-      --  This contains all the computed metrix (not just the ones currently
-      --  being processed, as Metrix_Stack does).
+      function Ancestor_Node (N : Natural) return Ada_Node is
+      begin
+         pragma Assert (Last_Index (Node_Stack) >= N);
+         return Get (Node_Stack, Last_Index (Node_Stack) - N);
+      end Ancestor_Node;
+
+      function Parent_Node return Ada_Node is (Ancestor_Node (1));
+      pragma Unreferenced (Parent_Node); -- ????
 
       procedure Rec (Node : Ada_Node);
       --  Recursive tree walk. Rec and Gather_Metrics_And_Walk_Children are
@@ -617,13 +702,11 @@ package body METRICS.Actions is
                  Get (Metrix_Stack, Last_Index (Metrix_Stack)).all;
                M : constant Metrix_Ref :=
                  new Metrix'(Node => Node,
-                             Nesting => Last_Index (Metrix_Stack),
                              Vals => (others => 0),
                              Submetrix => Metrix_Vectors.Empty_Vector);
             begin
                Append (Metrix_Stack, M); -- push
                Append (Parent.Submetrix, M);
-               Append (Node_Metrix, M);
                Gather_Metrics_And_Walk_Children (Node);
                Pop (Metrix_Stack);
             end;
@@ -640,18 +723,134 @@ package body METRICS.Actions is
       end Rec;
 
       procedure Gather_Metrics_And_Walk_Children (Node : Ada_Node) is
+         function Num_Statements
+           (Node : access Ada_Node_Type'Class)
+           return Natural;
+         function Num_Statements
+           (Node : access Ada_Node_Type'Class)
+           return Natural is
+         begin
+            if Node = null then
+               --  ????Probably these things should be empty lists, not
+               --  'null'.
+               return 0;
+            end if;
+            return Result : Natural := 0 do
+               for Stm of Children (Node) loop
+                  if Stm /= null
+                    and then Kind (Stm) not in Pragma_Node_Kind | Label_Kind
+                  then
+                     Inc (Result);
+                  end if;
+               end loop;
+            end return;
+         end Num_Statements;
       begin
          declare
             M : Metrix renames
               Get (Metrix_Stack, Last_Index (Metrix_Stack)).all;
             pragma Unreferenced (M);
          begin
-            if Node.all in Statement_Type'Class then
+            if Parents (Node).Items'Length >= 2 then
+               pragma Assert
+                 (Parents (Node).Items (2) =
+                    Get (Node_Stack, Last_Index (Node_Stack) - 2));
+            end if;
+            if False and then -- ????????????????
+              (Node.all in Statement_Type'Class
+              or else
+                (Kind (Node) in Identifier_Kind |
+                     Prefix_Kind |
+                     Call_Expr_Kind |
+                     Attribute_Ref_Kind
+                   and then Kind
+                     (Get (Node_Stack, Last_Index (Node_Stack) - 2))
+                       in Handled_Statements_Kind |
+                          Case_Statement_Alternative_Kind |
+                          Elsif_Statement_Part_Kind |
+                          Ext_Return_Statement_Kind |
+                          Accept_Statement_Kind |
+                          If_Statement_Kind |
+                          Loop_Statement_Kind |
+                          Select_Statement_Kind))
+            then
+               if Debug_Flag_W then
+                  Put ("Statement: \1\n", Short_Image (Node));
+               end if;
                for X of Metrix_Stack loop
                   Inc (X.Vals (Statements));
                end loop;
             end if;
+
+            --  ????????????????Write an Inc looper.
+            for X of Metrix_Stack loop
+               case Kind (Node) is
+                  when Handled_Statements_Kind =>
+                     Inc (X.Vals (Statements),
+                          By => Num_Statements
+                            (F_Statements
+                               (Handled_Statements (Node))));
+                  when Exception_Handler_Kind =>
+                     Inc (X.Vals (Statements),
+                          By => Num_Statements
+                            (F_Statements
+                               (Exception_Handler (Node))));
+                  when Case_Statement_Alternative_Kind =>
+                     Inc (X.Vals (Statements),
+                          By => Num_Statements
+                            (F_Statements
+                               (Case_Statement_Alternative (Node))));
+                  when If_Statement_Kind =>
+                     Inc (X.Vals (Statements),
+                          By =>
+                            Num_Statements
+                              (F_Statements (If_Statement (Node))) +
+                            Num_Statements
+                              (F_Else_Statements (If_Statement (Node))));
+                  when Elsif_Statement_Part_Kind =>
+                     Inc (X.Vals (Statements),
+                          By => Num_Statements
+                            (F_Statements
+                               (Elsif_Statement_Part (Node))));
+                  when Ext_Return_Statement_Kind =>
+                     if False then -- Currently uses Handled_Statements????
+                        Inc (X.Vals (Statements),
+                             By => Num_Statements
+                               (F_Statements
+                                  (Ext_Return_Statement (Node))));
+                     end if;
+                  when Accept_Statement_Kind =>
+                     if False then -- Currently uses Handled_Statements????
+                        Inc (X.Vals (Statements),
+                             By => Num_Statements
+                               (F_Statements
+                                  (Accept_Statement (Node))));
+                     end if;
+                  when Loop_Statement_Kind =>
+                     Inc (X.Vals (Statements),
+                          By => Num_Statements
+                            (F_Statements
+                               (Loop_Statement (Node))));
+                  when Select_Statement_Kind =>
+                     Inc (X.Vals (Statements),
+                          By =>
+                            Num_Statements
+                              (F_Else_Statements (Select_Statement (Node))) +
+                            Num_Statements
+                              (F_Abort_Statements (Select_Statement (Node))));
+                  when Select_When_Part_Kind =>
+                     Inc (X.Vals (Statements),
+                          By => Num_Statements
+                            (F_Statements
+                               (Select_When_Part (Node))));
+                  when others => null;
+               end case;
+            end loop;
          end;
+
+         if Node.all in Prefix_Type'Class then
+            Stop (Node);
+         end if;
 
          for I in 1 .. Child_Count (Node) loop
             declare
@@ -681,29 +880,35 @@ package body METRICS.Actions is
          end if;
 
          if Gen_Text (Cmd) then
-            Create (Text, Name => Text_Name);
-            Set_Output (Text);
+            if not Output_To_Standard_Output then
+               Create (Text, Name => Text_Name);
+               Set_Output (Text);
+            end if;
 
-            for I in 1 .. Length (Node_Metrix) loop
-               Print_Metrix
-                 (File_Name, Metrics_To_Compute, Node_Metrix, I - 1);
-            end loop;
+            Print_Metrix
+              (File_Name, Metrics_To_Compute, Get (Metrix_Stack, 1).all,
+               Depth => 0);
 
-            Set_Output (Standard_Output);
-            Close (Text);
+            if not Output_To_Standard_Output then
+               Set_Output (Standard_Output);
+               Close (Text);
+            end if;
          end if;
 
          if Gen_XML (Cmd) then
-            Set_Output (Tool.XML);
+            if not Output_To_Standard_Output then
+               Set_Output (Tool.XML);
+            end if;
             XML_Print_Metrix
-              (File_Name, Metrics_To_Compute, Get (Node_Metrix, 0).all);
-            Set_Output (Standard_Output);
+              (File_Name, Metrics_To_Compute, Get (Metrix_Stack, 1).all);
+            if not Output_To_Standard_Output then
+               Set_Output (Standard_Output);
+            end if;
          end if;
       end Print;
 
       M : constant Metrix_Ref :=
         new Metrix'(Node => CU_Node,
-                    Nesting => 0,
                     Vals => (others => 0),
                     Submetrix => Metrix_Vectors.Empty_Vector);
 
@@ -715,15 +920,15 @@ package body METRICS.Actions is
          Indent;
       end if;
 
+      pragma Assert (Length (Metrix_Stack) = 1);
       Append (Node_Stack, CU_Node); -- push
       Append (Metrix_Stack, M); -- push
-      Append (Node_Metrix, M);
 
       Gather_Metrics_And_Walk_Children (CU_Node);
 
       Pop (Metrix_Stack);
       Pop (Node_Stack);
-      pragma Assert (Length (Metrix_Stack) = 0);
+      pragma Assert (Length (Metrix_Stack) = 1);
       pragma Assert (Length (Node_Stack) = 0);
 
       Print;
@@ -734,7 +939,6 @@ package body METRICS.Actions is
       end if;
 
       --  ????????????????Free all the Node_Metrix.
-      Destroy (Metrix_Stack);
       Destroy (Node_Stack);
    end Walk;
 
@@ -743,44 +947,6 @@ package body METRICS.Actions is
    ----------
 
    procedure Init (Tool : in out Metrics_Tool; Cmd : Command_Line) is
-      Xml_Name : constant String :=
-        (if Arg (Cmd, Xml_File_Name) = null
-           then "metrix.xml"
-           else Arg (Cmd, Xml_File_Name).all);
-   begin
-      if Gen_XML (Cmd) then
-         Text_IO.Create (Tool.XML, Name => Xml_Name);
-         Text_IO.Set_Output (Tool.XML);
-         Put ("<?xml version=\1?>\n", Q ("1.0"));
-         Put ("<global>\n");
-         Text_IO.Set_Output (Text_IO.Standard_Output);
-      end if;
-   end Init;
-
-   -----------
-   -- Final --
-   -----------
-
-   procedure Final (Tool : in out Metrics_Tool; Cmd : Command_Line) is
-   begin
-      if Gen_XML (Cmd) then
-         Text_IO.Set_Output (Tool.XML);
-         --  ????Here, we need to print global metrics for all files.
-         Put ("</global>\n");
-         Text_IO.Set_Output (Text_IO.Standard_Output);
-         Text_IO.Close (Tool.XML);
-      end if;
-   end Final;
-
-   ---------------------
-   -- Per_File_Action --
-   ---------------------
-
-   procedure Per_File_Action
-     (Tool : in out Metrics_Tool;
-      Cmd : Command_Line;
-      File_Name : String;
-      Unit : Analysis_Unit) is
 
       function To_Compute return Metrics_Set;
       --  Computes which metrics we should compute
@@ -820,7 +986,96 @@ package body METRICS.Actions is
          end return;
       end To_Compute;
 
-      Metrics_To_Compute : constant Metrics_Set := To_Compute;
+      Metrics_To_Compute : Metrics_Set renames Tool.Metrics_To_Compute;
+
+      Metrix_Stack : Metrix_Vectors.Vector renames Tool.Metrix_Stack;
+
+      Xml_Name : constant String :=
+        (if Arg (Cmd, Xml_File_Name) = null
+           then "metrix.xml"
+           else Arg (Cmd, Xml_File_Name).all);
+
+      M : constant Metrix_Ref :=
+        new Metrix'(Node => null,
+                    Vals => (others => 0),
+                    Submetrix => Metrix_Vectors.Empty_Vector);
+
+   --  Start of processing for Init
+
+   begin
+      Metrics_To_Compute := To_Compute;
+      Append (Metrix_Stack, M); -- push
+
+      if Gen_XML (Cmd) then
+         if not Output_To_Standard_Output then
+            Text_IO.Create (Tool.XML, Name => Xml_Name);
+            Text_IO.Set_Output (Tool.XML);
+         end if;
+         Put ("<?xml version=\1?>\n", Q ("1.0"));
+         Put ("<global>\n");
+         if not Output_To_Standard_Output then
+            Text_IO.Set_Output (Text_IO.Standard_Output);
+         end if;
+      end if;
+   end Init;
+
+   -----------
+   -- Final --
+   -----------
+
+   procedure Final (Tool : in out Metrics_Tool; Cmd : Command_Line) is
+      Metrics_To_Compute : Metrics_Set renames Tool.Metrics_To_Compute;
+      Metrix_Stack : Metrix_Vectors.Vector renames Tool.Metrix_Stack;
+      Summed : constant String :=
+        "summed over " & Image (Num_File_Names (Cmd)) & " units";
+      pragma Assert (Length (Metrix_Stack) = 1);
+      M : Metrix renames Get (Metrix_Stack, 0).all;
+   begin
+      if Gen_Text (Cmd) then
+         Print_Range
+           ("Line metrics " & Summed,
+            Metrics_To_Compute,
+            Lines_Metrics'First, Lines_Metrics'Last, M,
+            Global => True);
+         Print_Range
+           ("Contract metrics " & Summed,
+            Metrics_To_Compute,
+            Contract_Metrics'First, Contract_Metrics'Last, M,
+            Global => True);
+         Print_Range
+           ("Element metrics " & Summed,
+            Metrics_To_Compute,
+            Syntax_Metrics'First, Syntax_Metrics'Last, M,
+            Global => True);
+      end if;
+
+      if Gen_XML (Cmd) then
+         if not Output_To_Standard_Output then
+            Text_IO.Set_Output (Tool.XML);
+         end if;
+         XML_Print_Metrix_Vals (Metrics_To_Compute, M);
+         Put ("</global>\n");
+         if not Output_To_Standard_Output then
+            Text_IO.Set_Output (Text_IO.Standard_Output);
+            Text_IO.Close (Tool.XML);
+         end if;
+      end if;
+
+      Pop (Metrix_Stack);
+      Destroy (Metrix_Stack);
+   end Final;
+
+   ---------------------
+   -- Per_File_Action --
+   ---------------------
+
+   procedure Per_File_Action
+     (Tool : in out Metrics_Tool;
+      Cmd : Command_Line;
+      File_Name : String;
+      Unit : Analysis_Unit) is
+
+      Metrics_To_Compute : Metrics_Set renames Tool.Metrics_To_Compute;
 
    --  Start of processing for Per_File_Action
 

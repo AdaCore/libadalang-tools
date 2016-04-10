@@ -223,4 +223,15 @@ package body LAL_UL.Generic_Formatted_Output is
       end if;
    end Raw_Put_Char;
 
+   -------------------
+   -- Tab_To_Column --
+   -------------------
+
+   procedure Tab_To_Column (Column : Positive) is
+   begin
+      while Cur_Column < Column loop
+         Put_Char (Char_Type'Val (W_Char'Pos (' ')));
+      end loop;
+   end Tab_To_Column;
+
 end LAL_UL.Generic_Formatted_Output;

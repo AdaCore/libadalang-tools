@@ -108,44 +108,97 @@ package body LAL_Extensions is
 
    function Get_Name (Decl : Ada_Node) return Name is
    begin
-      case Kind (Decl) is
-         when Compilation_Unit_Kind =>
+      return Result : Name do
+         case Kind (Decl) is
+            when Compilation_Unit_Kind =>
 --            pragma Assert
 --              (Child_Count (F_Bodies (Compilation_Unit (Decl))) = 1);
-            return Get_Name (Childx (F_Bodies (Compilation_Unit (Decl)), 0));
-         when Library_Item_Kind =>
-            return Get_Name (F_Item (Library_Item (Decl)));
+               Result :=
+                 Get_Name (Childx (F_Bodies (Compilation_Unit (Decl)), 0));
+            when Library_Item_Kind =>
+               Result :=
+                 Get_Name (F_Item (Library_Item (Decl)));
 
-         when Generic_Instantiation_Kind =>
-            return F_Name (Generic_Instantiation (Decl));
-         when Generic_Renaming_Decl_Kind =>
-            return F_Name (Generic_Renaming_Decl (Decl));
-         when Package_Body_Stub_Kind =>
-            return F_Name (Package_Body_Stub (Decl));
-         when Package_Renaming_Decl_Kind =>
-            return F_Name (Package_Renaming_Decl (Decl));
-         when Accept_Statement_Kind =>
-            return Name (F_Name (Accept_Statement (Decl)));
-         when Block_Statement_Kind =>
-            return Name (F_Name (Block_Statement (Decl)));
-         when Loop_Statement_Kind =>
-            return Name (F_Name (Loop_Statement (Decl)));
-         when Subprogram_Decl_Kind =>
-            return F_Name (F_Subp_Spec (Subprogram_Decl (Decl)));
-         when Subunit_Kind =>
-            return F_Name (Subunit (Decl));
-         when Package_Decl_Kind =>
-            return F_Package_Name (Base_Package_Decl (Decl));
-         when Generic_Package_Decl_Kind =>
-            return F_Package_Name
-              (F_Package_Decl (Generic_Package_Decl (Decl)));
-         when Package_Body_Kind =>
-            return F_Package_Name (Package_Body (Decl));
-         when Subprogram_Body_Kind =>
-            return F_Name (F_Subp_Spec (Subprogram_Body (Decl)));
-         when others =>
-            raise Program_Error with "Name of " & Short_Image (Decl);
-      end case;
+            when Generic_Instantiation_Kind =>
+               Result :=
+                 F_Name (Generic_Instantiation (Decl));
+            when Generic_Renaming_Decl_Kind =>
+               Result :=
+                 F_Name (Generic_Renaming_Decl (Decl));
+            when Package_Body_Stub_Kind =>
+               Result :=
+                 F_Name (Package_Body_Stub (Decl));
+            when Package_Renaming_Decl_Kind =>
+               Result :=
+                 F_Name (Package_Renaming_Decl (Decl));
+            when Accept_Statement_Kind =>
+               Result :=
+                 Name (F_Name (Accept_Statement (Decl)));
+            when Block_Statement_Kind =>
+               Result :=
+                 Name (F_Name (Block_Statement (Decl)));
+            when Loop_Statement_Kind =>
+               Result :=
+                 Name (F_Name (Loop_Statement (Decl)));
+            when Subprogram_Decl_Kind =>
+               Result :=
+                 F_Name (F_Subp_Spec (Subprogram_Decl (Decl)));
+            when Subunit_Kind =>
+               Result :=
+                 F_Name (Subunit (Decl));
+            when Package_Decl_Kind =>
+               Result :=
+                 F_Package_Name (Base_Package_Decl (Decl));
+            when Generic_Package_Decl_Kind =>
+               Result :=
+                 F_Package_Name
+                 (F_Package_Decl (Generic_Package_Decl (Decl)));
+            when Generic_Subprogram_Decl_Kind =>
+               Result :=
+                 F_Name (F_Subp_Spec (Generic_Subprogram_Decl (Decl)));
+            when Package_Body_Kind =>
+               Result :=
+                 F_Package_Name (Package_Body (Decl));
+            when Subprogram_Body_Kind =>
+               Result :=
+                 F_Name (F_Subp_Spec (Subprogram_Body (Decl)));
+            when Protected_Decl_Kind =>
+               Result :=
+                 Name (F_Protected_Name (Protected_Decl (Decl)));
+            when Protected_Type_Decl_Kind =>
+               Result :=
+                 Name (F_Protected_Type_Name (Protected_Type_Decl (Decl)));
+            when Protected_Body_Kind =>
+               Result :=
+                 F_Package_Name (Protected_Body (Decl)); -- package????
+            when Entry_Body_Kind =>
+               Result :=
+                 Name (F_Entry_Name (Entry_Body (Decl)));
+            when Task_Decl_Kind =>
+               Result :=
+                 Name (F_Task_Name (Task_Decl (Decl)));
+            when Task_Type_Decl_Kind =>
+               Result :=
+                 Name (F_Task_Type_Name (Task_Type_Decl (Decl)));
+            when Task_Body_Kind =>
+               Result :=
+                 F_Package_Name (Task_Body (Decl)); -- package????
+            when others =>
+               raise Program_Error with "Name of " & Short_Image (Decl);
+         end case;
+
+         if Decl.all in Basic_Decl_Type then
+            --  Should Subprogram_Decl_Type be in Basic_Decl_Type????
+            declare
+               D : constant Name_Array_Access :=
+                 P_Defining_Names (Basic_Decl (Decl));
+               --  ????Free
+            begin
+               pragma Assert (D.N = 1);
+               pragma Assert (Result = D.Items (1));
+            end;
+         end if;
+      end return;
    end Get_Name;
 
 end LAL_Extensions;
