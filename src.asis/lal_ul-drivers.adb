@@ -161,36 +161,39 @@ package body LAL_UL.Drivers is
       procedure Process_Files is
          Counter : Natural := File_Names (Cmd)'Length;
       begin
-         for F of ASIS_Order_File_Names (File_Names (Cmd)) loop
+         for F_Name of ASIS_Order_File_Names (File_Names (Cmd)) loop
+            if Arg (Cmd, Verbose) then
+               Put_Line ("[" & Image (Counter) & "] " & F_Name.all);
+               --  ????Use Formatted_Output?  To stderr?
+            end if;
+            Counter := Counter - 1;
+
 --         ASIS_UL.Options.No_Argument_File_Specified := False;
             declare
-               File_Name : String renames F.all;
                Unit : constant Analysis_Unit :=
-                 Get_From_File (Context, File_Name);
---         pragma Assert (Root (Unit) /= null);
+                 Get_From_File (Context, F_Name.all);
             begin
-               if Root (Unit) = null then -- ????????????????
-                  return;
-               end if;
-
-               if Arg (Cmd, Verbose) then
-                  Put_Line ("[" & Image (Counter) & "] " & File_Name);
-                  --  ????Use Formatted_Output?
-               end if;
-               Counter := Counter - 1;
-
                if Has_Diagnostics (Unit) then
-                  Put_Line ("Errors while parsing " & File_Name);
+                  Put_Line ("Errors while parsing " & F_Name.all);
                   for D of Diagnostics (Unit) loop
                      Put_Line
                        (Langkit_Support.Diagnostics.To_Pretty_String (D));
+                     --  To stderr????
                   end loop;
+
+                  if Root (Unit) = null then
+                     goto Continue;
+                  end if;
                end if;
 
-               --  We continue even in the presence of errors
+               --  We continue even in the presence of errors (if we have a
+               --  tree).
 
-               Per_File_Action (Tool, Cmd, File_Name, Unit);
+               pragma Assert (Root (Unit) /= null);
+               Per_File_Action (Tool, Cmd, F_Name.all, Unit);
             end;
+
+            <<Continue>>
          end loop;
          pragma Assert (Counter = 0);
       end Process_Files;

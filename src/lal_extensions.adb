@@ -184,7 +184,7 @@ package body LAL_Extensions is
                Result :=
                  F_Package_Name (Task_Body (Decl)); -- package????
             when others =>
-               raise Program_Error with "Name of " & Short_Image (Decl);
+               raise Program_Error with "Get_Name of " & Short_Image (Decl);
          end case;
 
          if Decl.all in Basic_Decl_Type then

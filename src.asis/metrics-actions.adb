@@ -656,8 +656,10 @@ package body METRICS.Actions is
         Childx (F_Bodies (Compilation_Unit (CU_Node)), 0);
       Lib_Item : constant Ada_Node :=
         (case Kind (First_Body) is
-           when Library_Item_Kind => F_Item (Library_Item (First_Body)),
-           when Subunit_Kind => Ada_Node (F_Body (Subunit (First_Body))),
+           when Library_Item_Kind =>
+              Ada_Node (F_Item (Library_Item (First_Body))),
+           when Subunit_Kind =>
+              Ada_Node (F_Body (Subunit (First_Body))),
            when others => raise Program_Error);
       --  ????????????????Could be subunit
 
@@ -738,7 +740,8 @@ package body METRICS.Actions is
             return Result : Natural := 0 do
                for Stm of Children (Node) loop
                   if Stm /= null
-                    and then Kind (Stm) not in Pragma_Node_Kind | Label_Kind
+                    and then Kind (Stm) not in
+                      Pragma_Node_Kind | Label_Kind | Terminate_Statement_Kind
                   then
                      Inc (Result);
                   end if;
