@@ -100,6 +100,8 @@ package METRICS.Command_Lines is
 
    --  Complexity metrics options:
       Complexity_Cyclomatic,
+      Complexity_Statement, -- undocumented
+      Complexity_Expression, -- undocumented
       Complexity_Essential,
       Complexity_Average, -- global
       Loop_Nesting,

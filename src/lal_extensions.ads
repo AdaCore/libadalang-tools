@@ -1,6 +1,7 @@
 with Langkit_Support.Text; use Langkit_Support.Text;
 
 with Libadalang; use Libadalang;
+with Libadalang.Analysis; use Libadalang.Analysis;
 with Libadalang.AST; use Libadalang.AST;
 with Libadalang.AST.Types; use Libadalang.AST.Types;
 
@@ -41,10 +42,13 @@ package LAL_Extensions is
       Node_Kind : Ada_Node_Type_Kind) return Ada_Node_Vecs.Elements_Array;
    --  Same as above, except return an array of the relevant nodes
 
-   function Full_Name (Nm : Name) return Text_Type;
+   function Full_Name (Nm : Name; Unit : Analysis_Unit) return Text_Type;
    --  Returns the full expanded name
 
    function Get_Name (Decl : Ada_Node) return Name;
    --  Returns the defining name of a declaration or body
+
+   function Get_Aspects (Decl : Basic_Decl) return Aspect_Specification;
+   --  Wrapper for F_Aspects functions
 
 end LAL_Extensions;

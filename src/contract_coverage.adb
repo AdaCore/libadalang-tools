@@ -34,6 +34,11 @@ procedure Contract_Coverage is
    Verbose : Boolean := False;
    --  Set by "--verbose" command-line switch; causes extra debugging output.
 
+   Unit : Analysis_Unit;
+
+   function Full_Name (Nm : Libadalang.AST.Types.Name) return Text_Type is
+     (Full_Name (Nm, Unit));
+
    function Has_Contracts (Subp_Decl : Ada_Node) return Boolean;
    --  True if the subprogram has contract aspects
 
@@ -46,7 +51,7 @@ procedure Contract_Coverage is
 
    function Has_Contracts (Subp_Decl : Ada_Node) return Boolean is
       Aspects : constant Aspect_Specification :=
-        F_Aspects (Subprogram_Decl (Subp_Decl));
+        Get_Aspects (Basic_Decl (Subp_Decl));
    begin
       --  Search through the aspects, and return True if we find one of the
       --  relevant ones.
@@ -64,7 +69,9 @@ procedure Contract_Coverage is
                   if Kind (Id) = Identifier_Kind then
                      declare
                         Text : constant Text_Type :=
-                          To_Lower (F_Tok (Single_Tok_Node (Id)).Text.all);
+                          To_Lower
+                            (Get_Token
+                              (Unit, F_Tok (Single_Tok_Node (Id))).Text.all);
                      begin
                         if Text = "contract_cases"
                           or else Text = "pre"
@@ -99,12 +106,14 @@ procedure Contract_Coverage is
             declare
                Decl : constant Ada_Node := Childx (Decls, I);
             begin
-               if Kind (Decl) = Subprogram_Decl_Kind then
+               if Decl.all in Basic_Subprogram_Decl_Type'Class then
                   if Verbose then
                      Put ("    Doing subprogram ");
                      Wide_Wide_Text_IO.Put
                        (Full_Name
-                          (F_Name (F_Subp_Spec (Subprogram_Decl (Decl)))));
+                         (F_Name
+                           (F_Subp_Spec
+                             (Basic_Subprogram_Decl (Decl)))));
                   end if;
 
                   Subp_Count := Subp_Count + 1;
@@ -153,52 +162,49 @@ begin
 
          File_Count := File_Count + 1;
 
+         Unit := Get_From_File (Context, Filename => Arg);
+         pragma Assert (Root (Unit) /= null);
+
+         if Has_Diagnostics (Unit) then
+            Put_Line ("Errors while parsing " & Arg);
+            for D of Diagnostics (Unit) loop
+               Put_Line (Langkit_Support.Diagnostics.To_Pretty_String (D));
+            end loop;
+         end if;
+
+         --  We calculate metrics even in the presence of errors
+
          declare
-            Unit : constant Analysis_Unit :=
-              Get_From_File (Context, Filename => Arg);
-            pragma Assert (Root (Unit) /= null);
+            function Is_Pkg_Or_Gen (Node : Ada_Node) return Boolean is
+              (Kind (Node) in Base_Package_Decl_Kind | Package_Decl_Kind);
+            --  True if the node is a generic package declaration or a
+            --  package declaration.
+
+            Packs : constant Ada_Node_Vectors.Elements_Array :=
+              Find_All (Root (Unit), Is_Pkg_Or_Gen'Access);
+
          begin
-            if Has_Diagnostics (Unit) then
-               Put_Line ("Errors while parsing " & Arg);
-               for D of Diagnostics (Unit) loop
-                  Put_Line (Langkit_Support.Diagnostics.To_Pretty_String (D));
-               end loop;
+            if Verbose then
+               Print (Unit);
             end if;
 
-            --  We calculate metrics even in the presence of errors
+            --  Go through all the [generic] package declarations in the
+            --  file, calculate the coverage, and print it out.
 
-            declare
-               function Is_Pkg_Or_Gen (Node : Ada_Node) return Boolean is
-                 (Kind (Node) in Base_Package_Decl_Kind | Package_Decl_Kind);
-               --  True if the node is a generic package declaration or a
-               --  package declaration.
-
-               Packs : constant Ada_Node_Vectors.Elements_Array :=
-                 Find_All (Root (Unit), Is_Pkg_Or_Gen'Access);
-
-            begin
-               if Verbose then
-                  Print (Unit);
-               end if;
-
-               --  Go through all the [generic] package declarations in the
-               --  file, calculate the coverage, and print it out.
-
-               for P : Ada_Node of Packs loop
-                  declare
-                     Pkg_Decl : constant Base_Package_Decl :=
-                       Base_Package_Decl (P);
-                     Coverage : constant Percent := Get_Coverage (Pkg_Decl);
-                  begin
-                     Put ("Contract coverage for package ");
-                     Wide_Wide_Text_IO.Put
-                       (Full_Name (F_Package_Name (Pkg_Decl)));
-                     Put (":");
-                     Put (Integer (Coverage)'Img);
-                     Put_Line ("%");
-                  end;
-               end loop;
-            end;
+            for P : Ada_Node of Packs loop
+               declare
+                  Pkg_Decl : constant Base_Package_Decl :=
+                    Base_Package_Decl (P);
+                  Coverage : constant Percent := Get_Coverage (Pkg_Decl);
+               begin
+                  Put ("Contract coverage for package ");
+                  Wide_Wide_Text_IO.Put
+                    (Full_Name (F_Package_Name (Pkg_Decl)));
+                  Put (":");
+                  Put (Integer (Coverage)'Img);
+                  Put_Line ("%");
+               end;
+            end loop;
          end;
       exception
          when others =>

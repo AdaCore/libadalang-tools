@@ -27,6 +27,12 @@ package body METRICS.Actions is
 
    Output_To_Standard_Output : Boolean renames Debug_Flag_S;
 
+   Unit : Analysis_Unit;
+   --  Make this a global variable for now. Not sure if it should be passed
+   --  as parameters all over.????
+
+   function Full_Name (Nm : Name) return Text_Type is (Full_Name (Nm, Unit));
+
    function Image (X : Integer) return String
      renames String_Utilities.Image;
 
@@ -37,10 +43,12 @@ package body METRICS.Actions is
       if False then -- ????????????????
          Put ("Node:\n");
          Print (Node);
-         for X in P.Items'Range loop
-            Put ("Parent \1:\n", Image (X));
-            Print (P.Items (X));
-         end loop;
+         if False then
+            for X in P.Items'Range loop
+               Put ("Parent \1:\n", Image (X));
+               Print (P.Items (X));
+            end loop;
+         end if;
       end if;
    end Stop;
 
@@ -52,12 +60,14 @@ package body METRICS.Actions is
      Metrics_String_Switches, Metrics_String_Seq_Switches;
    pragma Warnings (On);
 
-   function Has_Contracts (Subp_Decl : Ada_Node) return Boolean;
+   function Has_Contracts
+     (Subp_Decl : Ada_Node; Unit : Analysis_Unit) return Boolean;
    --  True if the subprogram has contract aspects
 
    subtype Percent is Float range 0.0 .. 100.0;
 
-   function Get_Coverage (Pkg_Decl : Base_Package_Decl) return Percent;
+   function Get_Coverage
+     (Pkg_Decl : Base_Package_Decl; Unit : Analysis_Unit) return Percent;
    --  Returns the percentage of subprograms with contracts, so if all
    --  subprograms have contracts, 100.0 is returned. 100.0 is returned if
    --  there are no subprograms.
@@ -72,9 +82,10 @@ package body METRICS.Actions is
       CU_Node : Ada_Node;
       Metrics_To_Compute : Metrics_Set);
 
-   function Has_Contracts (Subp_Decl : Ada_Node) return Boolean is
+   function Has_Contracts
+     (Subp_Decl : Ada_Node; Unit : Analysis_Unit) return Boolean is
       Aspects : constant Aspect_Specification :=
-        F_Aspects (Subprogram_Decl (Subp_Decl));
+        Get_Aspects (Basic_Decl (Subp_Decl));
    begin
       --  Search through the aspects, and return True if we find one of the
       --  relevant ones.
@@ -92,7 +103,9 @@ package body METRICS.Actions is
                   if Kind (Id) = Identifier_Kind then
                      declare
                         Text : constant Text_Type :=
-                          To_Lower (F_Tok (Single_Tok_Node (Id)).Text.all);
+                          To_Lower
+                            (Get_Token
+                              (Unit, F_Tok (Single_Tok_Node (Id))).Text.all);
                      begin
                         if Text = "contract_cases"
                           or else Text = "pre"
@@ -110,7 +123,8 @@ package body METRICS.Actions is
       return False;
    end Has_Contracts;
 
-   function Get_Coverage (Pkg_Decl : Base_Package_Decl) return Percent is
+   function Get_Coverage
+     (Pkg_Decl : Base_Package_Decl; Unit : Analysis_Unit) return Percent is
       Decls : constant List_Ada_Node := F_Decls (Pkg_Decl);
 
       Has_Contracts_Count : Natural := 0;
@@ -127,17 +141,19 @@ package body METRICS.Actions is
             declare
                Decl : constant Ada_Node := Childx (Decls, I);
             begin
-               if Kind (Decl) = Subprogram_Decl_Kind then
+               if Decl.all in Basic_Subprogram_Decl_Type'Class then
                   if Debug_Flag_V then
                      Put ("    Doing subprogram ");
                      Wide_Wide_Text_IO.Put
                        (Full_Name
-                          (F_Name (F_Subp_Spec (Subprogram_Decl (Decl)))));
+                         (F_Name
+                           (F_Subp_Spec
+                             (Basic_Subprogram_Decl (Decl)))));
                   end if;
 
                   Subp_Count := Subp_Count + 1;
 
-                  if Has_Contracts (Decl) then
+                  if Has_Contracts (Decl, Unit) then
                      if Debug_Flag_V then
                         Put (": yes\n");
                      end if;
@@ -184,7 +200,7 @@ package body METRICS.Actions is
          declare
             Pkg_Decl : constant Base_Package_Decl :=
               Base_Package_Decl (P);
-            Coverage : constant Percent := Get_Coverage (Pkg_Decl);
+            Coverage : constant Percent := Get_Coverage (Pkg_Decl, Unit);
          begin
             Put ("Contract coverage for package ");
             Wide_Wide_Text_IO.Put
@@ -205,6 +221,7 @@ package body METRICS.Actions is
 
    subtype Eligible is Ada_Node_Type_Kind with
      Predicate => Eligible in
+       Expression_Function_Kind |
        Generic_Package_Decl_Kind |
        Package_Body_Kind |
        Package_Decl_Kind |
@@ -303,12 +320,16 @@ package body METRICS.Actions is
          when Task_Body_Kind =>
             return "task body";
          when Task_Decl_Kind =>
-            return "task";
+            return "task object";
          when Task_Type_Decl_Kind =>
             return "task type";
 
-         when Generic_Instantiation_Kind =>
-            return "package instantiation"; -- ????Or proc/func
+         when Generic_Function_Instantiation_Kind =>
+            return "function instantiation";
+         when Generic_Package_Instantiation_Kind =>
+            return "package instantiation";
+         when Generic_Procedure_Instantiation_Kind =>
+            return "procedure instantiation";
          when Generic_Renaming_Decl_Kind =>
             return "generic package renaming"; -- ????Or proc/func
          when Generic_Subprogram_Decl_Kind =>
@@ -322,13 +343,19 @@ package body METRICS.Actions is
             end;
          when Package_Renaming_Decl_Kind =>
             return "package renaming";
-         when Subprogram_Decl_Kind =>
+         when Abstract_Subprogram_Decl_Kind |
+             Null_Subprogram_Decl_Kind |
+             Renaming_Subprogram_Decl_Kind |
+             Subprogram_Decl_Kind =>
             declare -- ????????????????Duplicated code
                R : constant Type_Expression :=
-                 F_Returns (F_Subp_Spec (Subprogram_Decl (Node)));
+                 F_Returns (F_Subp_Spec (Basic_Subprogram_Decl (Node)));
             begin
                return (if R = null then "procedure" else "function");
             end;
+
+         when Expression_Function_Kind =>
+            return "expression function";
 
          when others => raise Program_Error;
       end case;
@@ -513,11 +540,15 @@ package body METRICS.Actions is
          when Contract_Cyclomatic =>
             return "contract_cyclomatic";
          when Complexity_Cyclomatic =>
-            return "complexity_cyclomatic";
+            return "cyclomatic_complexity";
+         when Complexity_Statement =>
+            return "statement_complexity";
+         when Complexity_Expression =>
+            return "expression_complexity";
          when Complexity_Essential =>
-            return "complexity_essential";
+            return "essential_complexity";
          when Complexity_Average =>
-            return "complexity_average";
+            return "average_complexity";
          when Loop_Nesting =>
             return "loop_nesting";
          when Extra_Exit_Points =>
@@ -698,7 +729,12 @@ package body METRICS.Actions is
 
          Append (Node_Stack, Node); -- push
 
-         if Node = Lib_Item or else Kind (Node) in Eligible then
+         if Node = Lib_Item or else
+           (Kind (Node) in Eligible
+              and then not -- ????This part is a workaround for prot-body-stubs
+                (Kind (Node) = Protected_Body_Kind
+                   and then F_Body_Stub (Protected_Body (Node)) /= null))
+         then
             declare
                Parent : Metrix renames
                  Get (Metrix_Stack, Last_Index (Metrix_Stack)).all;
@@ -707,6 +743,7 @@ package body METRICS.Actions is
                              Vals => (others => 0),
                              Submetrix => Metrix_Vectors.Empty_Vector);
             begin
+               Stop (Node); -- ????????????????
                Append (Metrix_Stack, M); -- push
                Append (Parent.Submetrix, M);
                Gather_Metrics_And_Walk_Children (Node);
@@ -1087,6 +1124,7 @@ package body METRICS.Actions is
          Print (Unit);
       end if;
 
+      Actions.Unit := Unit;
       Walk (Tool, Cmd, File_Name, Root (Unit), Metrics_To_Compute);
 
       if Metrics_To_Compute (Contract_Metrics) /=
