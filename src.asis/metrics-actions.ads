@@ -36,10 +36,17 @@ private
    use Metrix_Vectors;
 
    type Metrix is record
-      Node : Ada_Node;
+      Node : Ada_Node := null;
       --  Node to which the metrics are associated
 
-      Vals : Metrics_Values;
+      Vals : Metrics_Values :=
+        (Complexity_Statement | Complexity_Cyclomatic => 1, others => 0);
+      --  Also Essential_Complexity => 1????
+
+      Num_With_Complexity : Metric_Int := 0;
+      --  Number of descendants for which complexity metrics apply. Used
+      --  only for the Compilation_Unit, which is used to represent the
+      --  per-file metrics.
 
       Submetrix : Metrix_Vectors.Vector;
       --  Metrix records for units nested within this one

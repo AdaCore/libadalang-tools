@@ -213,11 +213,17 @@ package body METRICS.Actions is
    use Ada_Node_Vectors;
 
    procedure Inc (X : in out Metric_Int; By : Metric_Int := 1);
+   procedure Dec (X : in out Metric_Int; By : Metric_Int := 1);
 
    procedure Inc (X : in out Metric_Int; By : Metric_Int := 1) is
    begin
       X := X + By;
    end Inc;
+
+   procedure Dec (X : in out Metric_Int; By : Metric_Int := 1) is
+   begin
+      X := X - By;
+   end Dec;
 
    subtype Eligible is Ada_Node_Type_Kind with
      Predicate => Eligible in
@@ -240,6 +246,11 @@ package body METRICS.Actions is
 
    function Q (S : String) return String is -- quote
      ("""" & S & """");
+
+   function Has_Complexity_Metrics
+     (Node : Ada_Node; Lib_Item : Boolean) return Boolean;
+   --  True if complexity metrix should be computed for Node (assuming it's
+   --  requested on the command line).
 
    function File_Name_To_Print
      (Cmd : Command_Line; File_Name : String) return String is
@@ -265,6 +276,18 @@ package body METRICS.Actions is
    function Metric_Name_String (Metric : Metrics_Enum) return String;
    --  Name of the metric for printing in text
 
+   function Should_Print (Metric : Metrics_Enum; M : Metrix) return Boolean;
+   --  Return True if the given Metric should be printed, based on the node
+   --  associated with M.
+
+   function Val_To_Print
+     (Metric : Metrics_Enum; M : Metrix; XML : Boolean) return String;
+   --  Return the string value to print for the metric. This is normally
+   --  just the value converted to a string. But if the Metric is a
+   --  complexity metric, and we are printing the "totals" for the file, we
+   --  don't actually want to print the total. We want to print the average.
+   --  We prefix the average with an extra blank if it's not XML.
+
    procedure Print_Range
      (Name : String;
       Metrics_To_Compute : Metrics_Set;
@@ -286,12 +309,36 @@ package body METRICS.Actions is
 
    procedure XML_Print_Metrix_Vals
      (Metrics_To_Compute : Metrics_Set;
-      M : Metrix);
+      M : Metrix;
+      Do_Complexity_Metrics : Boolean);
+   --  Do_Complexity_Metrics is true if we should print complexity
+   --  metrics. This is so we can put average complexity metrics for the
+   --  file at the end.
 
    procedure XML_Print_Metrix
      (File_Name : String;
       Metrics_To_Compute : Metrics_Set;
       M : Metrix);
+
+   function Has_Complexity_Metrics
+     (Node : Ada_Node; Lib_Item : Boolean) return Boolean is
+   begin
+      case Kind (Node) is
+         when Expression_Function_Kind |
+           Entry_Body_Kind |
+           Subprogram_Body_Kind |
+           Task_Body_Kind =>
+            return True;
+
+         when Package_Body_Kind =>
+            --  Apparently, gnatmetric doesn't do package bodies if there
+            --  are no statements.
+            return Lib_Item or else F_Statements (Package_Body (Node)) /= null;
+
+         when others =>
+            return False;
+      end case;
+   end Has_Complexity_Metrics;
 
    function Node_Kind_String (Node : Ada_Node) return String is
    begin
@@ -396,6 +443,109 @@ package body METRICS.Actions is
       end case;
    end Metric_Name_String;
 
+   function Should_Print (Metric : Metrics_Enum; M : Metrix) return Boolean is
+   begin
+      case Metric is
+         when Lines_Metrics =>
+            return True;
+
+         when Contract_Metrics | Syntax_Metrics =>
+            return M.Node = null
+              or else Kind (M.Node) /= Compilation_Unit_Kind;
+
+         when Complexity_Metrics =>
+            if M.Node = null then
+               return False;
+            end if;
+
+            --  Return True if Has_Complexity_Metrics is True for the node,
+            --  or it's a compilation unit containing such a node as its
+            --  library item.
+
+            if Kind (M.Node) = Compilation_Unit_Kind then
+               declare
+                  First_Body : constant Ada_Node :=
+                    Childx (F_Bodies (Compilation_Unit (M.Node)), 0);
+                  Lib_Item : constant Ada_Node :=
+                    (case Kind (First_Body) is
+                       when Library_Item_Kind =>
+                          Ada_Node (F_Item (Library_Item (First_Body))),
+                       when Subunit_Kind =>
+                          Ada_Node (F_Body (Subunit (First_Body))),
+                       when others => raise Program_Error);
+               begin
+                  return Has_Complexity_Metrics (Lib_Item, Lib_Item => True)
+                    or else Kind (Lib_Item) in
+                      Package_Decl_Kind | Generic_Package_Decl_Kind |
+                      Protected_Body_Kind;
+                  --  Why [generic] pkg and protected????
+               end;
+            else
+               return Has_Complexity_Metrics (M.Node, Lib_Item => False);
+            end if;
+
+         when Coupling_Metrics =>
+            return True;
+      end case;
+   end Should_Print;
+
+   function Val_To_Print
+     (Metric : Metrics_Enum; M : Metrix; XML : Boolean) return String is
+   begin
+      if Metric in Complexity_Metrics
+        and then Kind (M.Node) = Compilation_Unit_Kind
+      then
+         declare
+            --  Calculate average, using poor-man's fixed point with delta =
+            --  small = .01. We need to adjust M.Vals (Metric) by
+            --  M.Num_With_Complexity for certain metrics, because
+            --  those were initialized to 1 in the subnodes, and not
+            --  incremented in the file-level data.
+
+            pragma Assert (M.Num_With_Complexity > 0);
+            Adjust : constant Metric_Int :=
+              (if Metric in Complexity_Statement | Complexity_Cyclomatic
+                 then M.Num_With_Complexity - 1
+                 else 0);
+            A : constant Metric_Int :=
+              ((M.Vals (Metric) + Adjust) * 100) / M.Num_With_Complexity;
+            Im : constant String := Image (A);
+
+            --  Now make sure it's at least 3 characters long:
+            Im3 : constant String :=
+              (case Im'Length is
+                 when 1 => "00" & Im,
+                 when 2 => "0" & Im,
+                 when others => Im);
+            pragma Assert (Im3'First = 1 and then Im3'Last >= 3);
+
+            --  ????????????????Get rid of (some of) above.
+
+            Av : constant Float :=
+              Float (M.Vals (Metric) + Adjust) / Float (M.Num_With_Complexity);
+            type Fixed is delta 0.01 digits 8;
+            Img : constant String := Fixed (Av)'Img;
+         begin
+            if False then
+               --  A is 100 times the average, so we want to insert a decimal
+               --  point before the last two characters.
+               return (if XML then "" else " ") &
+                 Im3 (1 .. Im3'Last - 2) & "." &
+                 Im3 (Im3'Last - 1 .. Im3'Last);
+            end if;
+            pragma Assert (Img'First = 1 and then Img (1) = ' ');
+            return (if XML then "" else " ") & Img (2 .. Img'Last);
+         end;
+      else
+         return Image (M.Vals (Metric));
+      end if;
+   end Val_To_Print;
+
+   Average_Complexity_Metrics : constant String :=
+     "=== Average complexity metrics ===";
+   --  Used to indicate we should indent an extra level, and that we should
+   --  put underscores in the metric name.
+
    procedure Print_Range
      (Name : String;
       Metrics_To_Compute : Metrics_Set;
@@ -403,26 +553,42 @@ package body METRICS.Actions is
       M : Metrix;
       Global : Boolean := False)
    is
+      Indentation_Amount : constant Natural :=
+        (if Global
+           then 2
+         elsif Name = Average_Complexity_Metrics
+           then 2 * Default_Indentation_Amount
+         else Default_Indentation_Amount);
    begin
-      if Metrics_To_Compute (First .. Last) /= (First .. Last => False) then
+      pragma Assert (Should_Print (First, M) = Should_Print (Last, M));
+      if Should_Print (First, M) and then
+        Metrics_To_Compute (First .. Last) /= (First .. Last => False)
+      then
          if not Global then
             Put ("\n");
          end if;
 
          Put ("\1\n", Name);
-         Indent (if Global then 2 else Default_Indentation_Amount);
+         Indent (Indentation_Amount);
 
          for I in First .. Last loop
             if Metrics_To_Compute (I) then
                if True or else M.Vals (I) /= 0 then -- ????????????????
-                  Put ("\1", Metric_Name_String (I));
-                  Tab_To_Column (Indentation + (if Global then 21 else 26));
-                  Put (": \1\n", Image (Integer (M.Vals (I))));
+                  declare
+                     Metric_Name : constant String :=
+                       (if Name = Average_Complexity_Metrics
+                          then XML_Metric_Name_String (I)
+                          else Metric_Name_String (I));
+                  begin
+                     Put ("\1", Metric_Name);
+                     Tab_To_Column (Indentation + (if Global then 21 else 26));
+                     Put (": \1\n", Val_To_Print (I, M, XML => False));
+                  end;
                end if;
             end if;
          end loop;
 
-         Outdent (if Global then 2 else Default_Indentation_Amount);
+         Outdent (Indentation_Amount);
       end if;
    end Print_Range;
 
@@ -485,15 +651,16 @@ package body METRICS.Actions is
          Metrics_To_Compute,
          Lines_Metrics'First, Lines_Metrics'Last, M);
 
+      Print_Range
+        ("=== Contract metrics ===",
+         Metrics_To_Compute,
+         Contract_Metrics'First, Contract_Metrics'Last, M);
+      Print_Range
+        ("=== Element metrics ===",
+         Metrics_To_Compute,
+         Syntax_Metrics'First, Syntax_Metrics'Last, M);
+
       if Kind (M.Node) /= Compilation_Unit_Kind then
-         Print_Range
-           ("=== Contract metrics ===",
-            Metrics_To_Compute,
-            Contract_Metrics'First, Contract_Metrics'Last, M);
-         Print_Range
-           ("=== Element metrics ===",
-            Metrics_To_Compute,
-            Syntax_Metrics'First, Syntax_Metrics'Last, M);
          Print_Range
            ("=== Complexity metrics ===",
             Metrics_To_Compute,
@@ -505,6 +672,17 @@ package body METRICS.Actions is
       for Child of M.Submetrix loop
          Print_Metrix (File_Name, Metrics_To_Compute, Child.all, Depth + 1);
       end loop;
+
+      --  At the file level, average complexity metrics come last:
+
+      if Kind (M.Node) = Compilation_Unit_Kind
+        and then M.Num_With_Complexity > 0
+      then
+         Print_Range
+           (Average_Complexity_Metrics,
+            Metrics_To_Compute,
+            Complexity_Metrics'First, Complexity_Metrics'Last, M);
+      end if;
 
       if Depth > 1 then
          Outdent;
@@ -539,12 +717,12 @@ package body METRICS.Actions is
             return "contract_complete";
          when Contract_Cyclomatic =>
             return "contract_cyclomatic";
-         when Complexity_Cyclomatic =>
-            return "cyclomatic_complexity";
          when Complexity_Statement =>
             return "statement_complexity";
          when Complexity_Expression =>
             return "expression_complexity";
+         when Complexity_Cyclomatic =>
+            return "cyclomatic_complexity";
          when Complexity_Essential =>
             return "essential_complexity";
          when Complexity_Average =>
@@ -606,17 +784,20 @@ package body METRICS.Actions is
 
    procedure XML_Print_Metrix_Vals
      (Metrics_To_Compute : Metrics_Set;
-      M : Metrix)
+      M : Metrix;
+      Do_Complexity_Metrics : Boolean)
    is
    begin
       Indent;
 
       for I in M.Vals'Range loop
-         if Metrics_To_Compute (I) then
-            if True or else M.Vals (I) /= 0 then -- ????????????????
-               Put ("<metric name=\1>\2</metric>\n",
-                    Q (XML_Metric_Name_String (I)),
-                    Image (Integer (M.Vals (I))));
+         if Should_Print (I, M) and then Metrics_To_Compute (I) then
+            if Do_Complexity_Metrics or else I not in Complexity_Metrics then
+               if True or else M.Vals (I) /= 0 then -- ????????????????
+                  Put ("<metric name=\1>\2</metric>\n",
+                       Q (XML_Metric_Name_String (I)),
+                       Val_To_Print (I, M, XML => True));
+               end if;
             end if;
          end if;
       end loop;
@@ -649,10 +830,9 @@ package body METRICS.Actions is
 
       --  Print metrics for this unit
 
-      if Kind (M.Node) /= Compilation_Unit_Kind then
-         --  ????But need to print line metrics for CU
-         XML_Print_Metrix_Vals (Metrics_To_Compute, M);
-      end if;
+      XML_Print_Metrix_Vals
+        (Metrics_To_Compute, M,
+         Do_Complexity_Metrics => Kind (M.Node) /= Compilation_Unit_Kind);
 
       --  Then recursively print metrix of nested units
 
@@ -660,7 +840,12 @@ package body METRICS.Actions is
          XML_Print_Metrix (File_Name, Metrics_To_Compute, Child.all);
       end loop;
 
+      --  At the file level, average complexity metrics go at the end:
+
       if Kind (M.Node) = Compilation_Unit_Kind then
+         XML_Print_Metrix_Vals
+           (Metrics_To_Compute, M,
+            Do_Complexity_Metrics => M.Num_With_Complexity > 0);
          Put ("</file>\n");
       else
          Put ("</unit>\n");
@@ -682,6 +867,16 @@ package body METRICS.Actions is
 
       Metrix_Stack : Metrix_Vectors.Vector renames Tool.Metrix_Stack;
       --  Why don't we use Fast_Vectors????
+
+      procedure Inc_All (Metric : Metrics_Enum; By : Metric_Int := 1);
+      --  Increment all values on the stack for a given Metric
+
+      procedure Inc_All (Metric : Metrics_Enum; By : Metric_Int := 1) is
+      begin
+         for M of Metrix_Stack loop
+            Inc (M.Vals (Metric), By);
+         end loop;
+      end Inc_All;
 
       First_Body : constant Ada_Node :=
         Childx (F_Bodies (Compilation_Unit (CU_Node)), 0);
@@ -711,9 +906,33 @@ package body METRICS.Actions is
       function Parent_Node return Ada_Node is (Ancestor_Node (1));
       pragma Unreferenced (Parent_Node); -- ????
 
+      Exception_Handler_Count : Natural := 0;
+      --  Number of exception handlers we are nested within. Used to
+      --  suppress computing cyclomatic complexity within handlers.
+
+      Quantified_Expr_Count : Natural := 0;
+      --  Number of quantified expressions we are nested within. This is
+      --  used to get around the fact that For_Loop_Spec is used for both
+      --  for loops and quantified expressions. For complexity metrics, the
+      --  former increments the statement metric, and the latter the
+      --  expression metric.
+
+      Expression_Function_Count : Natural := 0;
+      --  Apparently, gnatmetric doesn't walk expression functions for
+      --  complexity metrics.
+
+      --  Maybe count all kinds, via an array indexed by kind????????????????
+
+      In_Assertion : Boolean := False;
+      --  True if we are nested within an assertion (pragma Assert,
+      --  or a pre/post/etc aspect). 'gnatmetric' skips such constructs.
+
       procedure Rec (Node : Ada_Node);
       --  Recursive tree walk. Rec and Gather_Metrics_And_Walk_Children are
       --  mutually recursive.
+
+      procedure Cyclomate (Node : Ada_Node; M : in out Metrix);
+      --  Gather McCabe Cyclomatic Complexity metrics
 
       procedure Gather_Metrics_And_Walk_Children (Node : Ada_Node);
 
@@ -721,10 +940,50 @@ package body METRICS.Actions is
       --  Print out the per-file metrics
 
       procedure Rec (Node : Ada_Node) is
+
+         function Is_Assertion return Boolean;
+
+         function Is_Assertion return Boolean is
+         begin
+            case Kind (Node) is
+               when Pragma_Node_Kind =>
+                  declare
+                     use Ada.Wide_Wide_Characters.Handling;
+                     Pragma_Name : constant Text_Type :=
+                       To_Lower (Get_Token
+                         (Unit, F_Tok (Single_Tok_Node
+                                       (F_Id (Pragma_Node (Node))))).Text.all);
+                  begin
+                     return Pragma_Name = "assert";
+                  end;
+               when Aspect_Assoc_Kind =>
+                  return False; -- ????????????????For now.
+               when others =>
+                  return False;
+            end case;
+         end Is_Assertion;
+
+      --  Start of processing for Rec
+
       begin
          if Debug_Flag_V then
             Put ("-->Walk: \1\n", Short_Image (Node));
             Indent;
+         end if;
+
+         case Kind (Node) is
+            when Exception_Handler_Kind =>
+               Inc (Exception_Handler_Count);
+            when Quantified_Expr_Kind =>
+               Inc (Quantified_Expr_Count);
+            when Expression_Function_Kind =>
+               Inc (Expression_Function_Count);
+            when others => null;
+         end case;
+
+         if Is_Assertion then
+            pragma Assert (not In_Assertion);
+            In_Assertion := True;
          end if;
 
          Append (Node_Stack, Node); -- push
@@ -736,16 +995,17 @@ package body METRICS.Actions is
                    and then F_Body_Stub (Protected_Body (Node)) /= null))
          then
             declare
+               File_M : Metrix renames Get (Metrix_Stack, 1).all;
                Parent : Metrix renames
                  Get (Metrix_Stack, Last_Index (Metrix_Stack)).all;
-               M : constant Metrix_Ref :=
-                 new Metrix'(Node => Node,
-                             Vals => (others => 0),
-                             Submetrix => Metrix_Vectors.Empty_Vector);
+               M : constant Metrix_Ref := new Metrix'(Node, others => <>);
             begin
                Stop (Node); -- ????????????????
                Append (Metrix_Stack, M); -- push
                Append (Parent.Submetrix, M);
+               if Has_Complexity_Metrics (Node, Lib_Item => False) then
+                  Inc (File_M.Num_With_Complexity);
+               end if;
                Gather_Metrics_And_Walk_Children (Node);
                Pop (Metrix_Stack);
             end;
@@ -755,11 +1015,254 @@ package body METRICS.Actions is
 
          Pop (Node_Stack);
 
+         if Is_Assertion then
+            pragma Assert (In_Assertion);
+            In_Assertion := False;
+         end if;
+
+         case Kind (Node) is
+            when Exception_Handler_Kind =>
+               Dec (Exception_Handler_Count);
+            when Quantified_Expr_Kind =>
+               Dec (Quantified_Expr_Count);
+            when Expression_Function_Kind =>
+               Dec (Expression_Function_Count);
+            when others => null;
+         end case;
+
          if Debug_Flag_V then
             Outdent;
             Put ("<--Walk: \1\n", Short_Image (Node));
          end if;
       end Rec;
+
+      procedure Cyclomate (Node : Ada_Node; M : in out Metrix) is
+         File_M : Metrix renames Get (Metrix_Stack, 1).all;
+         --  We don't walk up the stack as for other metrics. We increment
+         --  the current Metrix (M) and the one for the file as a whole
+         --  (File_M). Thus, the one for the file ends up being the total,
+         --  which is then used to compute the average.
+
+         --  Complexity_Cyclomatic is the sum of Complexity_Statement and
+         --  Complexity_Expression. Therefore, we increment the former every
+         --  time we increment one of the latter.
+
+         --  How we compute the cyclomatic complexity:
+         --
+         --  1. Control statements:
+         --
+         --     IF adds 1 + the number of ELSIF paths
+         --
+         --     CASE statement adds the number of alternatives minus 1
+         --
+         --     WHILE loop always adds 1
+         --
+         --     FOR loop adds 1 unless we can detect that in any case this
+         --          loop will be executes at least once
+         --
+         --     LOOP (condition-less) adds nothing
+         --
+         --     EXIT statement adds 1 if contains the exit condition, otherwise
+         --          adds nothing
+         --
+         --     GOTO statement adds nothing
+         --
+         --     RETURN statement adds nothing
+         --
+         --     SELECT STATEMENTS:
+         --
+         --        SELECTIVE_ACCEPT is treaded as a CASE statement (number of
+         --           alternatives minus 1). Opposite to IF statement, ELSE
+         --           path adds 1 to the complexity (that is, for IF,
+         --           both IF ... END IF; and IF ... ELSE ... END IF; adds 1,
+         --           whereas
+         --              SELECT
+         --                 ...
+         --              OR
+         --                 ...
+         --              END SELECT;
+         --           adds 1, but
+         --
+         --              SELECT
+         --                 ...
+         --              OR
+         --                 ...
+         --              ELSE
+         --                 ...
+         --              END SELECT;
+         --           adds 2
+         --
+         --        TIMED_ENTRY_CALL, CONDITIONAL_ENTRY_CALL and
+         --        ASYNCHRONOUS_SELECT add 1 (they are considered as an IF
+         --           statement with no ELSIF parts
+         --
+         --  2. We do not check if some code or some path is dead (unreachable)
+         --
+         --  3. We do not take into account the code in the exception handlers
+         --     (only the main statement sequence is analyzed). RAISE statement
+         --     adds nothing
+         --
+         --  4. A short-circuit control form add to the complexity value the
+         --     number of AND THEN or OR ELSE at the given level (that is, if
+         --     we have
+         --
+         --       Bool := A and then (B and then C) and then E;
+         --
+         --     we consider this as two short-circuit control forms: the outer
+         --     adds to the complexity 2 and the inner adds 1.
+         --
+         --     Any short-circuit control form is taken into account, including
+         --     expressions being parts of type and object definitions.
+         --
+         --  5. Conditional expressions.
+         --
+         --  5.1 An IF expression is treated in the same way as an IF
+         --      statement: it adds 1 + the number of ELSIF paths, but to the
+         --      expression complexity.
+         --
+         --  5.2 A CASE expression is treated in the same way as an CASE
+         --      statement: it adds the number of CASE paths minus 1, but to
+         --      the expression complexity.
+         --
+         --  6. Quantified expressions are treated as the equivalent loop
+         --     construct:
+         --
+         --        for some X in Y => Z (X)
+         --
+         --     is considered as a shortcut for
+         --
+         --        Result := False;
+         --        Tmp := First (X);
+         --
+         --        while Present (Tmp) loop
+         --           if Z (Tmp) then
+         --              Result := True;
+         --              exit;
+         --           end if;
+         --
+         --           Tmp := Next (Tmp);
+         --        end loop;
+         --
+         --     That is, it adds 2 (1 as WHILE loop and 1 as IF statement with
+         --     no ELSIF parts.
+         --
+         --     'for all' expression is treated in a similar way.
+         --
+         --     For essential complexity, quantified expressions add 1 if
+         --     Treat_Exit_As_Goto is set ON.
+         --
+         --  7. Any enclosed body is just skipped and is not taken into
+         --     account. The only situation that is not completely clear is
+         --     an enclosed package body with statement sequence part. When
+         --     enclosing body is executed, this enclosed package body will
+         --     also be executed inconditionally and exactly once - this is the
+         --     reason to count it when computing the complexity of enclosing
+         --     body. From the other side, the enclosed package body is similar
+         --     to enclosed local procedures, and we for sure do not want to
+         --     count enclosed procedures...
+
+         procedure Inc_Stm (By : Metric_Int := 1);
+         --  Increment statement complexity
+
+         procedure Inc_Exp (By : Metric_Int := 1);
+         --  Increment expression complexity
+
+         procedure Inc_Stm (By : Metric_Int := 1) is
+         begin
+            if Debug_Flag_V then
+               Put ("Inc_Stm\1 for \2 in \3\n",
+                    (if By = 1 then "" else "(" & Image (By) & ")"),
+                    Short_Image (Node), Short_Image (M.Node));
+            end if;
+
+            Inc (M.Vals (Complexity_Statement), By);
+            Inc (M.Vals (Complexity_Cyclomatic), By);
+            Inc (File_M.Vals (Complexity_Statement), By);
+            Inc (File_M.Vals (Complexity_Cyclomatic), By);
+         end Inc_Stm;
+
+         procedure Inc_Exp (By : Metric_Int := 1) is
+         begin
+            if Debug_Flag_V then
+               Put ("Inc_Exp\1 for \2 in \3\n",
+                    (if By = 1 then "" else "(" & Image (By) & ")"),
+                    Short_Image (Node), Short_Image (M.Node));
+            end if;
+
+            Inc (M.Vals (Complexity_Expression), By);
+            Inc (M.Vals (Complexity_Cyclomatic), By);
+            Inc (File_M.Vals (Complexity_Expression), By);
+            Inc (File_M.Vals (Complexity_Cyclomatic), By);
+         end Inc_Exp;
+
+      --  Start of processing for Cyclomate
+
+      begin
+         --  Don't compute these metrics within exception handlers.
+         --  Apparently, gnatmetric doesn't walk expression functions for
+         --  complexity metrics.
+
+         if Exception_Handler_Count > 0
+           or else (False and then Expression_Function_Count > 0)
+         then
+            return;
+         end if;
+
+         case Kind (Node) is
+            when If_Statement_Kind |
+              Elsif_Statement_Part_Kind |
+              While_Loop_Spec_Kind =>
+               Inc_Stm;
+
+            when For_Loop_Spec_Kind =>
+               if Quantified_Expr_Count = 0 then
+                  --  We want to increment the statement count only for real
+                  --  for loops.
+                  Inc_Stm;
+                  --  ????except in some cases (see No_Static_Loop)
+               end if;
+
+            when Case_Statement_Kind =>
+               Inc_Stm
+                 (By => Child_Count (F_Case_Alts (Case_Statement (Node))) - 1);
+
+            when Exit_Statement_Kind =>
+               if F_Condition (Exit_Statement (Node)) /= null then
+                  Inc_Stm;
+               end if;
+
+            when Select_Statement_Kind =>
+               declare
+                  S : constant Select_Statement := Select_Statement (Node);
+                  Num_Alts : constant Metric_Int := Child_Count (F_Guards (S));
+                  Num_Else : constant Metric_Int :=
+                    (if F_Else_Statements (S) = null then 0 else 1);
+                  Num_Abort : constant Metric_Int :=
+                    (if F_Abort_Statements (S) = null then 0 else 1);
+               begin
+                  Inc_Stm (By => Num_Alts + Num_Else + Num_Abort - 1);
+               end;
+
+            when Expression_Function_Kind =>
+               null; -- It's already set to 1
+
+            when Bin_Op_Kind =>
+               if F_Op (Bin_Op (Node)) in Or_Else | And_Then then
+                  Inc_Exp;
+               end if;
+
+            when If_Expr_Kind | Elsif_Expr_Part_Kind =>
+               Inc_Exp;
+
+            when Case_Expr_Kind =>
+               Inc_Exp (By => Child_Count (F_Cases (Case_Expr (Node))) - 1);
+
+            when Quantified_Expr_Kind =>
+               Inc_Exp (By => 2);
+
+            when others => null;
+         end case;
+      end Cyclomate;
 
       procedure Gather_Metrics_And_Walk_Children (Node : Ada_Node) is
          function Num_Statements
@@ -785,17 +1288,19 @@ package body METRICS.Actions is
                end loop;
             end return;
          end Num_Statements;
+
+         M : Metrix renames
+           Get (Metrix_Stack, Last_Index (Metrix_Stack)).all;
+
+      --  Start of processing for Gather_Metrics_And_Walk_Children
+
       begin
-         declare
-            M : Metrix renames
-              Get (Metrix_Stack, Last_Index (Metrix_Stack)).all;
-            pragma Unreferenced (M);
-         begin
-            if Parents (Node).Items'Length >= 2 then
-               pragma Assert
-                 (Parents (Node).Items (2) =
-                    Get (Node_Stack, Last_Index (Node_Stack) - 2));
-            end if;
+         if Parents (Node).Items'Length >= 2 then
+            pragma Assert
+              (Parents (Node).Items (2) =
+                 Get (Node_Stack, Last_Index (Node_Stack) - 2));
+         end if;
+         if not In_Assertion then
             if False and then -- ????????????????
               (Node.all in Statement_Type'Class
               or else
@@ -817,79 +1322,74 @@ package body METRICS.Actions is
                if Debug_Flag_W then
                   Put ("Statement: \1\n", Short_Image (Node));
                end if;
-               for X of Metrix_Stack loop
-                  Inc (X.Vals (Statements));
-               end loop;
+               Inc_All (Statements);
             end if;
 
-            --  ????????????????Write an Inc looper.
-            for X of Metrix_Stack loop
-               case Kind (Node) is
-                  when Handled_Statements_Kind =>
-                     Inc (X.Vals (Statements),
+            case Kind (Node) is
+               when Handled_Statements_Kind =>
+                  Inc_All (Statements,
+                       By => Num_Statements
+                         (F_Statements
+                            (Handled_Statements (Node))));
+               when Exception_Handler_Kind =>
+                  Inc_All (Statements,
+                       By => Num_Statements
+                         (F_Statements
+                            (Exception_Handler (Node))));
+               when Case_Statement_Alternative_Kind =>
+                  Inc_All (Statements,
+                       By => Num_Statements
+                         (F_Statements
+                            (Case_Statement_Alternative (Node))));
+               when If_Statement_Kind =>
+                  Inc_All (Statements,
+                       By =>
+                         Num_Statements
+                           (F_Statements (If_Statement (Node))) +
+                         Num_Statements
+                           (F_Else_Statements (If_Statement (Node))));
+               when Elsif_Statement_Part_Kind =>
+                  Inc_All (Statements,
+                       By => Num_Statements
+                         (F_Statements
+                            (Elsif_Statement_Part (Node))));
+               when Ext_Return_Statement_Kind =>
+                  if False then -- Currently uses Handled_Statements????
+                     Inc_All (Statements,
                           By => Num_Statements
                             (F_Statements
-                               (Handled_Statements (Node))));
-                  when Exception_Handler_Kind =>
-                     Inc (X.Vals (Statements),
+                               (Ext_Return_Statement (Node))));
+                  end if;
+               when Accept_Statement_Kind =>
+                  if False then -- Currently uses Handled_Statements????
+                     Inc_All (Statements,
                           By => Num_Statements
                             (F_Statements
-                               (Exception_Handler (Node))));
-                  when Case_Statement_Alternative_Kind =>
-                     Inc (X.Vals (Statements),
-                          By => Num_Statements
-                            (F_Statements
-                               (Case_Statement_Alternative (Node))));
-                  when If_Statement_Kind =>
-                     Inc (X.Vals (Statements),
-                          By =>
-                            Num_Statements
-                              (F_Statements (If_Statement (Node))) +
-                            Num_Statements
-                              (F_Else_Statements (If_Statement (Node))));
-                  when Elsif_Statement_Part_Kind =>
-                     Inc (X.Vals (Statements),
-                          By => Num_Statements
-                            (F_Statements
-                               (Elsif_Statement_Part (Node))));
-                  when Ext_Return_Statement_Kind =>
-                     if False then -- Currently uses Handled_Statements????
-                        Inc (X.Vals (Statements),
-                             By => Num_Statements
-                               (F_Statements
-                                  (Ext_Return_Statement (Node))));
-                     end if;
-                  when Accept_Statement_Kind =>
-                     if False then -- Currently uses Handled_Statements????
-                        Inc (X.Vals (Statements),
-                             By => Num_Statements
-                               (F_Statements
-                                  (Accept_Statement (Node))));
-                     end if;
-                  when Loop_Statement_Kind =>
-                     Inc (X.Vals (Statements),
-                          By => Num_Statements
-                            (F_Statements
-                               (Loop_Statement (Node))));
-                  when Select_Statement_Kind =>
-                     Inc (X.Vals (Statements),
-                          By =>
-                            Num_Statements
-                              (F_Else_Statements (Select_Statement (Node))) +
-                            Num_Statements
-                              (F_Abort_Statements (Select_Statement (Node))));
-                  when Select_When_Part_Kind =>
-                     Inc (X.Vals (Statements),
-                          By => Num_Statements
-                            (F_Statements
-                               (Select_When_Part (Node))));
-                  when others => null;
-               end case;
-            end loop;
-         end;
+                               (Accept_Statement (Node))));
+                  end if;
+               when Loop_Statement_Kind =>
+                  Inc_All (Statements,
+                       By => Num_Statements
+                         (F_Statements
+                            (Loop_Statement (Node))));
+               when Select_Statement_Kind =>
+                  Inc_All (Statements,
+                       By =>
+                         Num_Statements
+                           (F_Else_Statements (Select_Statement (Node))) +
+                         Num_Statements
+                           (F_Abort_Statements (Select_Statement (Node))));
+               when Select_When_Part_Kind =>
+                  Inc_All (Statements,
+                       By => Num_Statements
+                         (F_Statements
+                            (Select_When_Part (Node))));
+               when others => null;
+            end case;
 
-         if Node.all in Prefix_Type'Class then
-            Stop (Node);
+            if Has_Complexity_Metrics (M.Node, Lib_Item => False) then
+               Cyclomate (Node, M);
+            end if;
          end if;
 
          for I in 1 .. Child_Count (Node) loop
@@ -913,6 +1413,7 @@ package body METRICS.Actions is
          use Text_IO;
          Text : File_Type;
          Text_Name : constant String := File_Name & Suffix;
+         File_M : Metrix renames Get (Metrix_Stack, 1).all;
       begin
          if Text_Name = File_Name then
             --  Otherwise, we could overwrite the input!
@@ -926,7 +1427,7 @@ package body METRICS.Actions is
             end if;
 
             Print_Metrix
-              (File_Name, Metrics_To_Compute, Get (Metrix_Stack, 1).all,
+              (File_Name, Metrics_To_Compute, File_M,
                Depth => 0);
 
             if not Output_To_Standard_Output then
@@ -940,17 +1441,14 @@ package body METRICS.Actions is
                Set_Output (Tool.XML);
             end if;
             XML_Print_Metrix
-              (File_Name, Metrics_To_Compute, Get (Metrix_Stack, 1).all);
+              (File_Name, Metrics_To_Compute, File_M);
             if not Output_To_Standard_Output then
                Set_Output (Standard_Output);
             end if;
          end if;
       end Print;
 
-      M : constant Metrix_Ref :=
-        new Metrix'(Node => CU_Node,
-                    Vals => (others => 0),
-                    Submetrix => Metrix_Vectors.Empty_Vector);
+      M : constant Metrix_Ref := new Metrix'(CU_Node, others => <>);
 
    --  Start of processing for Walk
 
@@ -970,8 +1468,13 @@ package body METRICS.Actions is
       Pop (Node_Stack);
       pragma Assert (Length (Metrix_Stack) = 1);
       pragma Assert (Length (Node_Stack) = 0);
+      pragma Assert (M.Vals (Complexity_Cyclomatic) =
+                       M.Vals (Complexity_Statement) +
+                       M.Vals (Complexity_Expression));
 
+      pragma Assert (Debug_Flag_V or else Indentation = 0);
       Print;
+      pragma Assert (Debug_Flag_V or else Indentation = 0);
 
       if Debug_Flag_V then
          Outdent;
@@ -1017,6 +1520,13 @@ package body METRICS.Actions is
                Result (Coupling_Metrics) := (others => True);
             end if;
 
+            --  Special cases
+
+            if Arg (Cmd, Complexity_Cyclomatic) then
+               Result (Complexity_Statement) := True;
+               Result (Complexity_Expression) := True;
+            end if;
+
             --  If no metrics were requested on the command line, we compute
             --  all metrics:
 
@@ -1035,10 +1545,7 @@ package body METRICS.Actions is
            then "metrix.xml"
            else Arg (Cmd, Xml_File_Name).all);
 
-      M : constant Metrix_Ref :=
-        new Metrix'(Node => null,
-                    Vals => (others => 0),
-                    Submetrix => Metrix_Vectors.Empty_Vector);
+      M : constant Metrix_Ref := new Metrix;
 
    --  Start of processing for Init
 
@@ -1071,6 +1578,10 @@ package body METRICS.Actions is
       pragma Assert (Length (Metrix_Stack) = 1);
       M : Metrix renames Get (Metrix_Stack, 0).all;
    begin
+      pragma Assert (M.Vals (Complexity_Cyclomatic) =
+                       M.Vals (Complexity_Statement) +
+                       M.Vals (Complexity_Expression));
+
       if Gen_Text (Cmd) then
          Print_Range
            ("Line metrics " & Summed,
@@ -1093,7 +1604,8 @@ package body METRICS.Actions is
          if not Output_To_Standard_Output then
             Text_IO.Set_Output (Tool.XML);
          end if;
-         XML_Print_Metrix_Vals (Metrics_To_Compute, M);
+         XML_Print_Metrix_Vals
+           (Metrics_To_Compute, M, Do_Complexity_Metrics => False);
          Put ("</global>\n");
          if not Output_To_Standard_Output then
             Text_IO.Set_Output (Text_IO.Standard_Output);

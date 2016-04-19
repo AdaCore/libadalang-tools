@@ -91,6 +91,12 @@ package METRICS.Command_Lines is
        Short_File_Name_In_Output => +"-sfn",
        Progress_Indicator_Mode   => +"-dd"));
 
+   --  Metrics_Booleans serves both as switch names, and as index into
+   --  arrays of metric values. The ones marked "undocumented" below
+   --  are not intended to be switches, but are enabled by other
+   --  switches. For example, "--complexity-cyclomatic" enables
+   --  Complexity_Statement and Complexity_Expression.
+
    type Metrics_Booleans is
    --  Contract metrics options:
      (Contract,
@@ -99,9 +105,9 @@ package METRICS.Command_Lines is
       Contract_Cyclomatic,
 
    --  Complexity metrics options:
-      Complexity_Cyclomatic,
       Complexity_Statement, -- undocumented
       Complexity_Expression, -- undocumented
+      Complexity_Cyclomatic,
       Complexity_Essential,
       Complexity_Average, -- global
       Loop_Nesting,
@@ -150,7 +156,7 @@ package METRICS.Command_Lines is
    subtype Contract_Metrics is Metrics_Booleans
      range Contract .. Contract_Cyclomatic;
    subtype Complexity_Metrics is Metrics_Booleans
-     range Complexity_Cyclomatic .. Extra_Exit_Points;
+     range Complexity_Statement .. Extra_Exit_Points;
    subtype Lines_Metrics is Metrics_Booleans
      range Lines .. Lines_Average;
    subtype Syntax_Metrics is Metrics_Booleans
