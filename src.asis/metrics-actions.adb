@@ -37,10 +37,11 @@ package body METRICS.Actions is
      renames String_Utilities.Image;
 
    procedure Stop (Node : Ada_Node);
+   --  For setting breakpoints in gdb
    procedure Stop (Node : Ada_Node) is
       P : constant Ada_Node_Array_Access := Parents (Node);
    begin
-      if False then -- ????????????????
+      if False then
          Put ("Node:\n");
          Print (Node);
          if False then
@@ -305,7 +306,7 @@ package body METRICS.Actions is
       Metrics_To_Compute : Metrics_Set;
       M : Metrix;
       Depth : Natural);
-   --  Print the metrics for one node
+   --  Print the metrics for one node in text form
 
    procedure XML_Print_Metrix_Vals
      (Metrics_To_Compute : Metrics_Set;
@@ -319,6 +320,7 @@ package body METRICS.Actions is
      (File_Name : String;
       Metrics_To_Compute : Metrics_Set;
       M : Metrix);
+   --  Print the metrics for one node in XML form
 
    function Has_Complexity_Metrics
      (Node : Ada_Node; Lib_Item : Boolean) return Boolean is
@@ -394,7 +396,7 @@ package body METRICS.Actions is
              Null_Subprogram_Decl_Kind |
              Renaming_Subprogram_Decl_Kind |
              Subprogram_Decl_Kind =>
-            declare -- ????????????????Duplicated code
+            declare
                R : constant Type_Expression :=
                  F_Returns (F_Subp_Spec (Basic_Subprogram_Decl (Node)));
             begin
@@ -410,7 +412,7 @@ package body METRICS.Actions is
 
    function Is_Private (Node : Ada_Node) return Boolean;
    --  True if Node is a private library unit. ????This doesn't work for
-   --  bodies.
+   --  bodies; we need semantic information.
 
    function Is_Private (Node : Ada_Node) return Boolean is
       P : constant Ada_Node := Parents (Node).Items (1);
@@ -496,8 +498,9 @@ package body METRICS.Actions is
         and then Kind (M.Node) = Compilation_Unit_Kind
       then
          declare
-            --  Calculate average, using poor-man's fixed point with delta =
-            --  small = .01. We need to adjust M.Vals (Metric) by
+            --  Calculate average in type Float, then convert to
+            --  fixed-point for printing in a form like "12.34".
+            --  We need to adjust M.Vals (Metric) by
             --  M.Num_With_Complexity for certain metrics, because
             --  those were initialized to 1 in the subnodes, and not
             --  incremented in the file-level data.
@@ -507,32 +510,11 @@ package body METRICS.Actions is
               (if Metric in Complexity_Statement | Complexity_Cyclomatic
                  then M.Num_With_Complexity - 1
                  else 0);
-            A : constant Metric_Int :=
-              ((M.Vals (Metric) + Adjust) * 100) / M.Num_With_Complexity;
-            Im : constant String := Image (A);
-
-            --  Now make sure it's at least 3 characters long:
-            Im3 : constant String :=
-              (case Im'Length is
-                 when 1 => "00" & Im,
-                 when 2 => "0" & Im,
-                 when others => Im);
-            pragma Assert (Im3'First = 1 and then Im3'Last >= 3);
-
-            --  ????????????????Get rid of (some of) above.
-
             Av : constant Float :=
               Float (M.Vals (Metric) + Adjust) / Float (M.Num_With_Complexity);
             type Fixed is delta 0.01 digits 8;
             Img : constant String := Fixed (Av)'Img;
          begin
-            if False then
-               --  A is 100 times the average, so we want to insert a decimal
-               --  point before the last two characters.
-               return (if XML then "" else " ") &
-                 Im3 (1 .. Im3'Last - 2) & "." &
-                 Im3 (Im3'Last - 1 .. Im3'Last);
-            end if;
             pragma Assert (Img'First = 1 and then Img (1) = ' ');
             return (if XML then "" else " ") & Img (2 .. Img'Last);
          end;
@@ -932,7 +914,7 @@ package body METRICS.Actions is
       --  mutually recursive.
 
       procedure Cyclomate (Node : Ada_Node; M : in out Metrix);
-      --  Gather McCabe Cyclomatic Complexity metrics
+      --  Compute McCabe Cyclomatic Complexity metrics
 
       procedure Gather_Metrics_And_Walk_Children (Node : Ada_Node);
 
@@ -1396,7 +1378,6 @@ package body METRICS.Actions is
             declare
                Cur_Child : constant Ada_Node := Child (Node, I - 1);
             begin
---             pragma Assert (Cur_Child /= null); -- ????
                if Cur_Child /= null then
                   Rec (Cur_Child);
                end if;
@@ -1550,6 +1531,11 @@ package body METRICS.Actions is
    --  Start of processing for Init
 
    begin
+      --  Decide what metrics to compute. Initialize the Metrix_Stack
+      --  by pushing the outermost Metrix, which is for totals for all
+      --  the files together. If XML requested, create the XML file
+      --  and put the first lines.
+
       Metrics_To_Compute := To_Compute;
       Append (Metrix_Stack, M); -- push
 
@@ -1582,6 +1568,8 @@ package body METRICS.Actions is
                        M.Vals (Complexity_Statement) +
                        M.Vals (Complexity_Expression));
 
+      --  Print the totals in text form
+
       if Gen_Text (Cmd) then
          Print_Range
            ("Line metrics " & Summed,
@@ -1599,6 +1587,8 @@ package body METRICS.Actions is
             Syntax_Metrics'First, Syntax_Metrics'Last, M,
             Global => True);
       end if;
+
+      --  Print the totals in XML form
 
       if Gen_XML (Cmd) then
          if not Output_To_Standard_Output then
