@@ -37,7 +37,8 @@ private
 
    type Metrix is record
       Node : Ada_Node := null;
-      --  Node to which the metrics are associated
+      --  Node to which the metrics are associated, except for
+      --  Metrix_Stack[0], which has Node = null.
 
       Vals : Metrics_Values :=
         (Complexity_Statement | Complexity_Cyclomatic => 1, others => 0);
@@ -60,8 +61,10 @@ private
       --  Metrics requested on via command line args
 
       Metrix_Stack : Metrix_Vectors.Vector;
-      --  ????????????????Actually, we have one for global metrics.
-      --  Metrix_Stack[0] is the Metrix for the Compilation_Unit node.
+      --  Metrix_Stack[0] is the global Metrix (totals for all files).
+      --
+      --  Metrix_Stack[1] is the Metrix for the Compilation_Unit node.
+      --  This is for per-file metrics.
       --
       --  Metrix_Stack[1] is the Metrix for the library item within that; this
       --  is a Package_Decl, Package_Body, or whatever node.
@@ -74,5 +77,24 @@ private
       --  This stack contains the relevant nodes currently being processed by
       --  the recursive walk.
    end record;
+
+   --  Init is called once, before processing any files. It pushes
+   --  Metrix_Stack[0].
+   --
+   --  Then for each file, we walk the tree, pushing and popping the
+   --  Metrix_Stack as we go. When we push a Metrix, we append it to
+   --  the Submetrix of its parent, so when we're done walking the
+   --  tree, the Metrix form a tree as well.
+   --
+   --  At each node, we increment relevant Vals, depending on the kind
+   --  of node. For example, if we see a node that is a statement, we
+   --  increment all the Vals(Statements) of all the Metrix in Metrix
+   --  stack. Thus Vals(Statements) for a unit will include the number
+   --  of statement in nested units, and Metrix_Stack[0].Vals(Statements)
+   --  will contain to total number of statements in all files.
+   --
+   --  Final is called once, after processing all files. It prints out
+   --  the totals for all files that have been computed in
+   --  Metrix_Stack[0].
 
 end METRICS.Actions;
