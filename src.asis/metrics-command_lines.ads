@@ -18,6 +18,8 @@ package METRICS.Command_Lines is
    --  of "-debugx". Therefore, we disable Common.Debug, and define
    --  Gnatmetric_Debug below.
 
+   --  -eL switch is missing????
+
    type Metrics_Flags is
      (Test,
 
@@ -102,16 +104,7 @@ package METRICS.Command_Lines is
      (Contract,
       Post,
       Contract_Complete,
-      Contract_Cyclomatic,
-
-   --  Complexity metrics options:
-      Complexity_Statement, -- undocumented
-      Complexity_Expression, -- undocumented
-      Complexity_Cyclomatic,
-      Complexity_Essential,
-      Complexity_Average, -- global
-      Loop_Nesting,
-      Extra_Exit_Points,
+      Contract_Complexity,
 
    --  Line metrics options:
       Lines,
@@ -133,6 +126,15 @@ package METRICS.Command_Lines is
       Construct_Nesting,
       Param_Number,
 
+   --  Complexity metrics options:
+      Complexity_Statement, -- undocumented
+      Complexity_Expression, -- undocumented
+      Complexity_Cyclomatic,
+      Complexity_Essential,
+      Complexity_Average, -- global
+      Loop_Nesting,
+      Extra_Exit_Points,
+
    --  Coupling metrics
       Tagged_Coupling_Out,
       Tagged_Coupling_In,
@@ -144,9 +146,9 @@ package METRICS.Command_Lines is
       Control_Coupling_In,
 
       Contract_All,
-      Complexity_All,
       Lines_All,
       Syntax_All,
+      Complexity_All,
       Coupling_All);
 
    subtype Metrics_Enum is Metrics_Booleans
@@ -154,7 +156,7 @@ package METRICS.Command_Lines is
    subtype Metrics_All_Enum is Metrics_Booleans
      range Contract_All .. Metrics_Booleans'Last;
    subtype Contract_Metrics is Metrics_Booleans
-     range Contract .. Contract_Cyclomatic;
+     range Contract .. Contract_Complexity;
    subtype Complexity_Metrics is Metrics_Booleans
      range Complexity_Statement .. Extra_Exit_Points;
    subtype Lines_Metrics is Metrics_Booleans

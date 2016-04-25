@@ -1,3 +1,5 @@
+with Ada.Wide_Wide_Characters.Handling;
+
 package body LAL_Extensions is
 
    use Ada_Node_Vecs;
@@ -90,6 +92,25 @@ package body LAL_Extensions is
       end return;
    end Find_All;
 
+   function Id_Name
+     (Nm : access Ada_Node_Type'Class;
+      Unit : Analysis_Unit)
+     return Text_Type
+   is
+   begin
+      return Get_Token (Unit, F_Tok (Single_Tok_Node (Nm))).Text.all;
+   end Id_Name;
+
+   function L_Name
+     (Nm : access Ada_Node_Type'Class;
+      Unit : Analysis_Unit)
+     return Text_Type
+   is
+      use Ada.Wide_Wide_Characters.Handling;
+   begin
+      return To_Lower (Id_Name (Nm, Unit));
+   end L_Name;
+
    function Full_Name (Nm : Name; Unit : Analysis_Unit) return Text_Type is
    begin
       case Kind (Nm) is
@@ -106,7 +127,7 @@ package body LAL_Extensions is
       end case;
    end Full_Name;
 
-   function Get_Name (Decl : Ada_Node) return Name is
+   function Get_Def_Name (Decl : Ada_Node) return Name is
    begin
       return Result : Name do
          case Kind (Decl) is
@@ -114,10 +135,10 @@ package body LAL_Extensions is
 --            pragma Assert
 --              (Child_Count (F_Bodies (Compilation_Unit (Decl))) = 1);
                Result :=
-                 Get_Name (Childx (F_Bodies (Compilation_Unit (Decl)), 0));
+                 Get_Def_Name (Childx (F_Bodies (Compilation_Unit (Decl)), 0));
             when Library_Item_Kind =>
                Result :=
-                 Get_Name (Ada_Node (F_Item (Library_Item (Decl))));
+                 Get_Def_Name (Ada_Node (F_Item (Library_Item (Decl))));
 
             when Generic_Function_Instantiation_Kind |
               Generic_Package_Instantiation_Kind |
@@ -190,7 +211,8 @@ package body LAL_Extensions is
                Result :=
                  F_Package_Name (Task_Body (Decl)); -- package????
             when others =>
-               raise Program_Error with "Get_Name of " & Short_Image (Decl);
+               raise Program_Error with
+                 "Get_Def_Name of " & Short_Image (Decl);
          end case;
 
          if Decl.all in Basic_Decl_Type then
@@ -205,7 +227,7 @@ package body LAL_Extensions is
             end;
          end if;
       end return;
-   end Get_Name;
+   end Get_Def_Name;
 
    function Get_Aspects (Decl : Basic_Decl) return Aspect_Specification is
    begin
@@ -271,5 +293,24 @@ package body LAL_Extensions is
 --            F_Aspects (Protected_Body_Stub (Decl)),
          when others => raise Program_Error);
    end Get_Aspects;
+
+   function Visible_Part
+     (Node : access Ada_Node_Type'Class) return List_Ada_Node
+   is
+      --  I'm confused about Base_Package_Decl
+   begin
+      case Kind (Node) is
+         when Package_Decl_Kind =>
+            return F_Decls (Base_Package_Decl (Node));
+            --  That's the visible part, not all the declarations
+         when Generic_Package_Decl_Kind =>
+            return F_Decls (F_Package_Decl (Generic_Package_Decl (Node)));
+         when Task_Def_Kind =>
+            return F_Items (Task_Def (Node));
+         when Protected_Def_Kind =>
+            return F_Public_Ops (Protected_Def (Node));
+         when others => raise Program_Error;
+      end case;
+   end Visible_Part;
 
 end LAL_Extensions;

@@ -1,6 +1,4 @@
-with Ada.Wide_Wide_Characters.Handling;
-with Ada.Wide_Wide_Text_IO; use Ada;
-with Ada.Strings.Unbounded;
+with Ada.Strings.Unbounded; use Ada;
 
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
@@ -36,12 +34,14 @@ package body METRICS.Actions is
    function Image (X : Integer) return String
      renames String_Utilities.Image;
 
+   pragma Warnings (Off);
    procedure Stop (Node : Ada_Node);
    --  For setting breakpoints in gdb
+
    procedure Stop (Node : Ada_Node) is
       P : constant Ada_Node_Array_Access := Parents (Node);
    begin
-      if False then
+      if True then
          Put ("Node:\n");
          Print (Node);
          if False then
@@ -53,7 +53,22 @@ package body METRICS.Actions is
       end if;
    end Stop;
 
-   pragma Warnings (Off); -- ????????????????
+   procedure knd (X : Ada_Node);
+   procedure pp (X : Ada_Node);
+   --  Debugging printouts
+
+   procedure knd (X : Ada_Node) is
+   begin
+      Put ("\1\n", Kind (X)'Img);
+   end knd;
+
+   procedure pp (X : Ada_Node) is
+   begin
+      Print (X);
+   end pp;
+   pragma Warnings (On);
+
+   pragma Warnings (Off); -- ???
    use Common_Flag_Switches, Common_String_Switches,
      Common_String_Seq_Switches, Common_Nat_Switches;
 
@@ -61,155 +76,12 @@ package body METRICS.Actions is
      Metrics_String_Switches, Metrics_String_Seq_Switches;
    pragma Warnings (On);
 
-   function Has_Contracts
-     (Subp_Decl : Ada_Node; Unit : Analysis_Unit) return Boolean;
-   --  True if the subprogram has contract aspects
-
-   subtype Percent is Float range 0.0 .. 100.0;
-
-   function Get_Coverage
-     (Pkg_Decl : Base_Package_Decl; Unit : Analysis_Unit) return Percent;
-   --  Returns the percentage of subprograms with contracts, so if all
-   --  subprograms have contracts, 100.0 is returned. 100.0 is returned if
-   --  there are no subprograms.
-
-   procedure Compute_Contract_Metrics
-     (File_Name : String; Unit : Analysis_Unit);
-
    procedure Walk
      (Tool : in out Metrics_Tool'Class;
       Cmd : Command_Line;
       File_Name : String;
       CU_Node : Ada_Node;
       Metrics_To_Compute : Metrics_Set);
-
-   function Has_Contracts
-     (Subp_Decl : Ada_Node; Unit : Analysis_Unit) return Boolean is
-      Aspects : constant Aspect_Specification :=
-        Get_Aspects (Basic_Decl (Subp_Decl));
-   begin
-      --  Search through the aspects, and return True if we find one of the
-      --  relevant ones.
-
-      if Aspects /= null then
-         declare
-            Assocs : constant List_Aspect_Assoc := F_Aspect_Assocs (Aspects);
-         begin
-            for I in 0 .. Child_Count (Assocs) - 1 loop
-               declare
-                  Assoc : constant Ada_Node := Childx (Assocs, I);
-                  use Ada.Wide_Wide_Characters.Handling;
-                  Id : constant Expr := F_Id (Aspect_Assoc (Assoc));
-               begin
-                  if Kind (Id) = Identifier_Kind then
-                     declare
-                        Text : constant Text_Type :=
-                          To_Lower
-                            (Get_Token
-                              (Unit, F_Tok (Single_Tok_Node (Id))).Text.all);
-                     begin
-                        if Text = "contract_cases"
-                          or else Text = "pre"
-                          or else Text = "post"
-                        then
-                           return True;
-                        end if;
-                     end;
-                  end if;
-               end;
-            end loop;
-         end;
-      end if;
-
-      return False;
-   end Has_Contracts;
-
-   function Get_Coverage
-     (Pkg_Decl : Base_Package_Decl; Unit : Analysis_Unit) return Percent is
-      Decls : constant List_Ada_Node := F_Decls (Pkg_Decl);
-
-      Has_Contracts_Count : Natural := 0;
-      --  Number of subprograms in the package with contracts
-
-      Subp_Count : Natural := 0;
-      --  Number of subprograms in the package.
-
-      --  The result will be the ratio of the above two.
-
-   begin
-      if Decls /= null then -- Shouldn't it be empty list???
-         for I in 0 .. Child_Count (Decls) - 1 loop
-            declare
-               Decl : constant Ada_Node := Childx (Decls, I);
-            begin
-               if Decl.all in Basic_Subprogram_Decl_Type'Class then
-                  if Debug_Flag_V then
-                     Put ("    Doing subprogram ");
-                     Wide_Wide_Text_IO.Put
-                       (Full_Name
-                         (F_Name
-                           (F_Subp_Spec
-                             (Basic_Subprogram_Decl (Decl)))));
-                  end if;
-
-                  Subp_Count := Subp_Count + 1;
-
-                  if Has_Contracts (Decl, Unit) then
-                     if Debug_Flag_V then
-                        Put (": yes\n");
-                     end if;
-
-                     Has_Contracts_Count := Has_Contracts_Count + 1;
-
-                  elsif Debug_Flag_V then
-                     Put (": no\n");
-                  end if;
-               end if;
-            end;
-         end loop;
-      end if;
-
-      if Subp_Count = 0 then -- Don't divide by zero!
-         return 100.0;
-      else
-         return (100.0 * Float (Has_Contracts_Count)) / Float (Subp_Count);
-      end if;
-   end Get_Coverage;
-
-   procedure Compute_Contract_Metrics
-     (File_Name : String; Unit : Analysis_Unit) is
-
-      pragma Unreferenced (File_Name);
-
-      function Is_Pkg_Or_Gen (Node : Ada_Node) return Boolean is
-        (Kind (Node) in Base_Package_Decl_Kind | Package_Decl_Kind);
-      --  True if the node is a generic package declaration or a
-      --  package declaration.
-
-      Packs : constant Ada_Node_Vectors.Elements_Array :=
-        Find_All (Root (Unit), Is_Pkg_Or_Gen'Access);
-
-   begin
-      if Debug_Flag_V then
-         Print (Unit);
-      end if;
-
-      --  Go through all the [generic] package declarations in the
-      --  file, calculate the coverage, and print it out.
-
-      for P : Ada_Node of Packs loop
-         declare
-            Pkg_Decl : constant Base_Package_Decl :=
-              Base_Package_Decl (P);
-            Coverage : constant Percent := Get_Coverage (Pkg_Decl, Unit);
-         begin
-            Put ("Contract coverage for package ");
-            Wide_Wide_Text_IO.Put
-              (Full_Name (F_Package_Name (Pkg_Decl)));
-            Put (":\1%\n", Integer (Coverage)'Img);
-         end;
-      end loop;
-   end Compute_Contract_Metrics;
 
    use Ada_Node_Vectors;
 
@@ -226,8 +98,8 @@ package body METRICS.Actions is
       X := X - By;
    end Dec;
 
-   subtype Eligible is Ada_Node_Type_Kind with
-     Predicate => Eligible in
+   subtype Gnatmetric_Eligible is Ada_Node_Type_Kind with
+     Predicate => Gnatmetric_Eligible in
        Expression_Function_Kind |
        Generic_Package_Decl_Kind |
        Package_Body_Kind |
@@ -245,8 +117,40 @@ package body METRICS.Actions is
    --  compilation unit), as well as eligible local units. A procedure
    --  declaration, for example, has metrics only if it is the outer node.
 
+   subtype Contract_Complexity_Eligible is Ada_Node_Type_Kind with
+     Predicate => Contract_Complexity_Eligible in
+       Generic_Subprogram_Decl_Kind |
+       Abstract_Subprogram_Decl_Kind |
+       Null_Subprogram_Decl_Kind |
+       Renaming_Subprogram_Decl_Kind |
+       Subprogram_Decl_Kind;
+   --  For the new lalmetric tool, we have the --contract-complexity
+   --  metric, which is on subprogram declarations, so we need
+   --  additional "eligible" nodes.
+
+   subtype Eligible is Ada_Node_Type_Kind with
+     Predicate => Eligible in Gnatmetric_Eligible |
+       Contract_Complexity_Eligible;
+
    function Q (S : String) return String is -- quote
      ("""" & S & """");
+
+   type Assertion_Enum is (Postcondition, Other_Assertion, Not_An_Assertion);
+
+   function Assertion_Kind (Node : Ada_Node) return Assertion_Enum;
+   --  Return what kind of assertion it it, if any. Postconditions have their
+   --  own metric, so we have to split that out.
+
+   function Is_Assertion (Node : Ada_Node) return Boolean is
+     (case Assertion_Kind (Node) is
+        when Postcondition | Other_Assertion => True,
+        when Not_An_Assertion => False);
+   --  True for pragma Assert and for Pre, Post, Contract_Cases,
+   --  Pre'Class, and Post'Class.
+
+   function Is_Private_Part (Parent, Child : Ada_Node) return Boolean;
+   --  True if Parent is a package decl, generic package decl, task decl, or
+   --  protected decl, and Child is its private part.
 
    function Has_Complexity_Metrics
      (Node : Ada_Node; Lib_Item : Boolean) return Boolean;
@@ -277,9 +181,25 @@ package body METRICS.Actions is
    function Metric_Name_String (Metric : Metrics_Enum) return String;
    --  Name of the metric for printing in text
 
-   function Should_Print (Metric : Metrics_Enum; M : Metrix) return Boolean;
-   --  Return True if the given Metric should be printed, based on the node
-   --  associated with M.
+   function Should_Print
+     (Metric : Metrics_Enum;
+      Metrics_To_Compute : Metrics_Set;
+      M : Metrix;
+      Depth : Natural;
+      XML : Boolean) return Boolean;
+   --  Return True if the given Metric should be printed, based on
+   --  Metrics_To_Compute, the node associated with M and other
+   --  special cases.
+
+   function Should_Print_Any
+     (First, Last : Metrics_Enum;
+      Metrics_To_Compute : Metrics_Set;
+      M : Metrix;
+      Depth : Natural;
+      XML : Boolean) return Boolean is
+      (for some Metric in First .. Last =>
+         Should_Print (Metric, Metrics_To_Compute, M, Depth, XML));
+   --  True if at least one metric in the range should be printed
 
    function Val_To_Print
      (Metric : Metrics_Enum; M : Metrix; XML : Boolean) return String;
@@ -294,6 +214,7 @@ package body METRICS.Actions is
       Metrics_To_Compute : Metrics_Set;
       First, Last : Metrics_Enum;
       M : Metrix;
+      Depth : Natural;
       Global : Boolean := False);
    --  Prints a range of metrics. This is needed because the metrics are
    --  printed in groups (line metrics, contract metrics, etc).  Name is the
@@ -311,7 +232,8 @@ package body METRICS.Actions is
    procedure XML_Print_Metrix_Vals
      (Metrics_To_Compute : Metrics_Set;
       M : Metrix;
-      Do_Complexity_Metrics : Boolean);
+      Do_Complexity_Metrics : Boolean;
+      Depth : Natural);
    --  Do_Complexity_Metrics is true if we should print complexity
    --  metrics. This is so we can put average complexity metrics for the
    --  file at the end.
@@ -319,8 +241,93 @@ package body METRICS.Actions is
    procedure XML_Print_Metrix
      (File_Name : String;
       Metrics_To_Compute : Metrics_Set;
-      M : Metrix);
+      M : Metrix;
+      Depth : Natural);
    --  Print the metrics for one node in XML form
+
+   function Assertion_Kind (Node : Ada_Node) return Assertion_Enum is
+      Contract_Cases : constant Wide_Wide_String := "contract_cases";
+      Pre : constant Wide_Wide_String := "pre";
+      Post : constant Wide_Wide_String := "post";
+      Class : constant Wide_Wide_String := "class";
+   begin
+      case Kind (Node) is
+         when Pragma_Node_Kind =>
+            declare
+               Pragma_Name : constant Text_Type :=
+                 L_Name (F_Id (Pragma_Node (Node)), Unit);
+            begin
+               if Pragma_Name = "assert" then
+                  return Other_Assertion;
+               end if;
+            end;
+
+         when Aspect_Assoc_Kind =>
+            declare
+               Id : constant Expr := F_Id (Aspect_Assoc (Node));
+            begin
+               case Kind (Id) is
+                  when Identifier_Kind =>
+                     declare
+                        Text : constant Text_Type := L_Name (Id, Unit);
+                     begin
+                        if Text = Pre then
+                           return Other_Assertion;
+                        elsif Text = Contract_Cases
+                          or else Text = Post
+                        then
+                           return Postcondition;
+                        end if;
+                     end;
+
+                  when Attribute_Ref_Kind =>
+                     declare
+                        Prefix : constant Text_Type :=
+                          L_Name (F_Prefix (Attribute_Ref (Id)), Unit);
+                        Attr : constant Text_Type :=
+                          L_Name (F_Attribute (Attribute_Ref (Id)), Unit);
+                     begin
+                        if Attr = Class then
+                           if Prefix = Pre then
+                              return Other_Assertion;
+                           elsif Prefix = Post then
+                              return Postcondition;
+                           end if;
+                        end if;
+                     end;
+                  when others => raise Program_Error;
+               end case;
+            end;
+         when others =>
+            null;
+      end case;
+
+      return Not_An_Assertion;
+   end Assertion_Kind;
+
+   function Is_Private_Part (Parent, Child : Ada_Node) return Boolean is
+      --  We don't collect metrics on entries????
+      --  What about private child units?
+   begin
+      if Child.all in List_Ada_Node_Type'Class then
+         declare
+            pragma Warnings (Off);
+            C : constant List_Ada_Node := List_Ada_Node (Child);
+         begin
+            case Kind (Parent) is
+--               when Package_Decl_Kind | Base_Package_Decl_Kind =>
+--                  return C = F_Private_Part (Base_Package_Decl (Parent));
+--               when Task_Def_Kind =>
+--                  return C = F_Private_Items (Task_Def (Parent));
+--               when Protected_Def =>
+--                  return C = F_Private_Components (Protected_Def (Parent));
+               when others => null;
+            end case;
+         end;
+      end if;
+
+      return False;
+   end Is_Private_Part;
 
    function Has_Complexity_Metrics
      (Node : Ada_Node; Lib_Item : Boolean) return Boolean is
@@ -333,8 +340,8 @@ package body METRICS.Actions is
             return True;
 
          when Package_Body_Kind =>
-            --  Apparently, gnatmetric doesn't do package bodies if there
-            --  are no statements.
+            --  Apparently, gnatmetric doesn't do nested package bodies if
+            --  there are no statements.
             return Lib_Item or else F_Statements (Package_Body (Node)) /= null;
 
          when others =>
@@ -437,6 +444,10 @@ package body METRICS.Actions is
       case Metric is
          when Statements =>
             return "all statements";
+         when Loop_Nesting =>
+            return "maximum loop nesting";
+         when All_Subprograms =>
+            return "all subprogram bodies";
          --  ????More 'when's go here.
 
          when others =>
@@ -445,15 +456,65 @@ package body METRICS.Actions is
       end case;
    end Metric_Name_String;
 
-   function Should_Print (Metric : Metrics_Enum; M : Metrix) return Boolean is
+   function Should_Print
+     (Metric : Metrics_Enum;
+      Metrics_To_Compute : Metrics_Set;
+      M : Metrix;
+      Depth : Natural;
+      XML : Boolean) return Boolean
+   is
    begin
+      if not Metrics_To_Compute (Metric) then
+         return False;
+      end if;
+
+      --  Don't print metrics for nested subprogram declarations
+      --  unless it's Contract_Complexity, which is the only metric
+      --  that applies to those.
+
+      if Depth > 2
+        and then Kind (M.Node) in Contract_Complexity_Eligible
+        and then Metric /= Contract_Complexity
+      then
+         return False;
+      end if;
+
       case Metric is
          when Lines_Metrics =>
             return True;
 
-         when Contract_Metrics | Syntax_Metrics =>
+         when All_Subprograms =>
+            return (Depth = 2
+              and then Kind (M.Node) in
+                      Package_Body_Kind |
+                      Subprogram_Body_Kind)
+              or else (XML and then Depth = 0);
+         when Public_Subprograms =>
+            return (Depth = 2
+              and then Kind (M.Node) in
+                      Package_Decl_Kind |
+                      Generic_Package_Decl_Kind |
+                      Subprogram_Decl_Kind |
+                      Subprogram_Body_Kind |
+                      --  Only if no spec????
+                      Generic_Subprogram_Decl_Kind)
+              or else (XML and then Depth = 0);
+         when Declarations |
+           Statements |
+           Public_Types |
+           All_Types |
+           Unit_Nesting |
+           Construct_Nesting |
+           Param_Number =>
             return M.Node = null
               or else Kind (M.Node) /= Compilation_Unit_Kind;
+
+         when Contract_Complexity =>
+            return M.Node /= null
+              and then Kind (M.Node) in Contract_Complexity_Eligible
+              and then M.Visible;
+         when Contract | Post | Contract_Complete =>
+            return M.Visible;
 
          when Complexity_Metrics =>
             if M.Node = null then
@@ -493,10 +554,22 @@ package body METRICS.Actions is
 
    function Val_To_Print
      (Metric : Metrics_Enum; M : Metrix; XML : Boolean) return String is
+      type Fixed is delta 0.01 digits 8;
    begin
       if Metric in Complexity_Metrics
         and then Kind (M.Node) = Compilation_Unit_Kind
       then
+         if Metric = Loop_Nesting then
+            --  We want the total here, not the average.
+
+            declare
+               Img : constant String := Fixed (Float (M.Vals (Metric)))'Img;
+            begin
+               pragma Assert (Img'First = 1 and then Img (1) = ' ');
+               return (if XML then "" else " ") & Img (2 .. Img'Last);
+            end;
+         end if;
+
          declare
             --  Calculate average in type Float, then convert to
             --  fixed-point for printing in a form like "12.34".
@@ -507,12 +580,13 @@ package body METRICS.Actions is
 
             pragma Assert (M.Num_With_Complexity > 0);
             Adjust : constant Metric_Int :=
-              (if Metric in Complexity_Statement | Complexity_Cyclomatic
+              (if Metric in Complexity_Statement |
+                            Complexity_Cyclomatic |
+                            Complexity_Essential
                  then M.Num_With_Complexity - 1
                  else 0);
             Av : constant Float :=
               Float (M.Vals (Metric) + Adjust) / Float (M.Num_With_Complexity);
-            type Fixed is delta 0.01 digits 8;
             Img : constant String := Fixed (Av)'Img;
          begin
             pragma Assert (Img'First = 1 and then Img (1) = ' ');
@@ -533,6 +607,7 @@ package body METRICS.Actions is
       Metrics_To_Compute : Metrics_Set;
       First, Last : Metrics_Enum;
       M : Metrix;
+      Depth : Natural;
       Global : Boolean := False)
    is
       Indentation_Amount : constant Natural :=
@@ -542,9 +617,8 @@ package body METRICS.Actions is
            then 2 * Default_Indentation_Amount
          else Default_Indentation_Amount);
    begin
-      pragma Assert (Should_Print (First, M) = Should_Print (Last, M));
-      if Should_Print (First, M) and then
-        Metrics_To_Compute (First .. Last) /= (First .. Last => False)
+      if Should_Print_Any
+        (First, Last, Metrics_To_Compute, M, Depth, XML => False)
       then
          if not Global then
             Put ("\n");
@@ -554,8 +628,10 @@ package body METRICS.Actions is
          Indent (Indentation_Amount);
 
          for I in First .. Last loop
-            if Metrics_To_Compute (I) then
-               if True or else M.Vals (I) /= 0 then -- ????????????????
+            if Should_Print
+              (I, Metrics_To_Compute, M, Depth, XML => False)
+            then
+               if True or else M.Vals (I) /= 0 then -- ???
                   declare
                      Metric_Name : constant String :=
                        (if Name = Average_Complexity_Metrics
@@ -581,7 +657,18 @@ package body METRICS.Actions is
       Depth : Natural)
    is
    begin
-      if Depth > 1 then
+      --  Return immediately if M is for a Contract_Complexity_Eligible
+      --  node, and we're not going to print.
+
+      if Depth > 2
+        and then Kind (M.Node) in Contract_Complexity_Eligible
+        and then not Should_Print
+          (Contract_Complexity, Metrics_To_Compute, M, Depth, XML => True)
+      then
+         return;
+      end if;
+
+      if Depth > 2 then
          Indent;
       end if;
 
@@ -606,21 +693,21 @@ package body METRICS.Actions is
             Put ("containing \1 \2\3\n",
                  Node_Kind_String_For_Header (Lib_Item),
                  Subunit_Parent,
-                 To_UTF8 (Full_Name (Get_Name (Lib_Item))));
+                 To_UTF8 (Full_Name (Get_Def_Name (Lib_Item))));
          end;
 
       else
          declare
             P : constant Ada_Node := Parents (M.Node).Items (1);
             LI_Sub : constant String :=
-              (if Depth = 1
+              (if Depth = 2
                  then (if Kind (P) = Subunit_Kind
                          then " - subunit"
                          else " - library item")
                  else "");
          begin
             Put ("\n\1 (\2\3 at lines  \4)\n",
-                 To_UTF8 (Full_Name (Get_Name (M.Node))),
+                 To_UTF8 (Full_Name (Get_Def_Name (M.Node))),
                  Node_Kind_String (M.Node), LI_Sub,
                  Lines_String (Sloc_Range (M.Node)));
          end;
@@ -631,22 +718,23 @@ package body METRICS.Actions is
       Print_Range
         ("=== Code line metrics ===",
          Metrics_To_Compute,
-         Lines_Metrics'First, Lines_Metrics'Last, M);
+         Lines_Metrics'First, Lines_Metrics'Last, M, Depth);
 
       Print_Range
         ("=== Contract metrics ===",
          Metrics_To_Compute,
-         Contract_Metrics'First, Contract_Metrics'Last, M);
+         Contract_Metrics'First, Contract_Metrics'Last, M, Depth);
+
       Print_Range
         ("=== Element metrics ===",
          Metrics_To_Compute,
-         Syntax_Metrics'First, Syntax_Metrics'Last, M);
+         Syntax_Metrics'First, Syntax_Metrics'Last, M, Depth);
 
       if Kind (M.Node) /= Compilation_Unit_Kind then
          Print_Range
            ("=== Complexity metrics ===",
             Metrics_To_Compute,
-            Complexity_Metrics'First, Complexity_Metrics'Last, M);
+            Complexity_Metrics'First, Complexity_Metrics'Last, M, Depth);
       end if;
 
       --  Then recursively print metrix of nested units
@@ -663,10 +751,10 @@ package body METRICS.Actions is
          Print_Range
            (Average_Complexity_Metrics,
             Metrics_To_Compute,
-            Complexity_Metrics'First, Complexity_Metrics'Last, M);
+            Complexity_Metrics'First, Complexity_Metrics'Last, M, Depth);
       end if;
 
-      if Depth > 1 then
+      if Depth > 2 then
          Outdent;
       end if;
    end Print_Metrix;
@@ -697,8 +785,8 @@ package body METRICS.Actions is
             return "post";
          when Contract_Complete =>
             return "contract_complete";
-         when Contract_Cyclomatic =>
-            return "contract_cyclomatic";
+         when Contract_Complexity =>
+            return "contract_complexity";
          when Complexity_Statement =>
             return "statement_complexity";
          when Complexity_Expression =>
@@ -710,7 +798,7 @@ package body METRICS.Actions is
          when Complexity_Average =>
             return "average_complexity";
          when Loop_Nesting =>
-            return "loop_nesting";
+            return "max_loop_nesting";
          when Extra_Exit_Points =>
             return "extra_exit_points";
          when Lines =>
@@ -728,7 +816,7 @@ package body METRICS.Actions is
          when Lines_Average =>
             return "lines_average";
          when Declarations =>
-            return "declarations";
+            return "all_dcls";
          when Statements =>
             return "all_stmts";
          when Public_Subprograms =>
@@ -767,15 +855,16 @@ package body METRICS.Actions is
    procedure XML_Print_Metrix_Vals
      (Metrics_To_Compute : Metrics_Set;
       M : Metrix;
-      Do_Complexity_Metrics : Boolean)
+      Do_Complexity_Metrics : Boolean;
+      Depth : Natural)
    is
    begin
       Indent;
 
       for I in M.Vals'Range loop
-         if Should_Print (I, M) and then Metrics_To_Compute (I) then
+         if Should_Print (I, Metrics_To_Compute, M, Depth, XML => True) then
             if Do_Complexity_Metrics or else I not in Complexity_Metrics then
-               if True or else M.Vals (I) /= 0 then -- ????????????????
+               if True or else M.Vals (I) /= 0 then -- ???
                   Put ("<metric name=\1>\2</metric>\n",
                        Q (XML_Metric_Name_String (I)),
                        Val_To_Print (I, M, XML => True));
@@ -790,9 +879,21 @@ package body METRICS.Actions is
    procedure XML_Print_Metrix
      (File_Name : String;
       Metrics_To_Compute : Metrics_Set;
-      M : Metrix)
+      M : Metrix;
+      Depth : Natural)
    is
    begin
+      --  Return immediately if M is for a Contract_Complexity_Eligible
+      --  node, and we're not going to print.
+
+      if Depth > 2
+        and then Kind (M.Node) in Contract_Complexity_Eligible
+        and then not Should_Print
+          (Contract_Complexity, Metrics_To_Compute, M, Depth, XML => True)
+      then
+         return;
+      end if;
+
       Indent;
 
       if Kind (M.Node) = Compilation_Unit_Kind then
@@ -803,7 +904,7 @@ package body METRICS.Actions is
               Sloc_Range (M.Node);
          begin
             Put ("<unit name=\1 kind=\2 line=\3 col=\4>\n",
-                 XML (Full_Name (Get_Name (M.Node))),
+                 XML (Full_Name (Get_Def_Name (M.Node))),
                  Q (Node_Kind_String (M.Node)),
                  Q (Image (Integer (Sloc.Start_Line))),
                  Q (Image (Integer (Sloc.Start_Column))));
@@ -814,12 +915,14 @@ package body METRICS.Actions is
 
       XML_Print_Metrix_Vals
         (Metrics_To_Compute, M,
-         Do_Complexity_Metrics => Kind (M.Node) /= Compilation_Unit_Kind);
+         Do_Complexity_Metrics => Kind (M.Node) /= Compilation_Unit_Kind,
+         Depth => Depth);
 
       --  Then recursively print metrix of nested units
 
       for Child of M.Submetrix loop
-         XML_Print_Metrix (File_Name, Metrics_To_Compute, Child.all);
+         XML_Print_Metrix
+           (File_Name, Metrics_To_Compute, Child.all, Depth + 1);
       end loop;
 
       --  At the file level, average complexity metrics go at the end:
@@ -827,7 +930,8 @@ package body METRICS.Actions is
       if Kind (M.Node) = Compilation_Unit_Kind then
          XML_Print_Metrix_Vals
            (Metrics_To_Compute, M,
-            Do_Complexity_Metrics => M.Num_With_Complexity > 0);
+            Do_Complexity_Metrics => M.Num_With_Complexity > 0,
+            Depth => Depth);
          Put ("</file>\n");
       else
          Put ("</unit>\n");
@@ -903,50 +1007,76 @@ package body METRICS.Actions is
       --  Apparently, gnatmetric doesn't walk expression functions for
       --  complexity metrics.
 
-      --  Maybe count all kinds, via an array indexed by kind????????????????
+      Loop_Count : Natural := 0;
+      --  Number of loop statements we are nested within, within the
+      --  current program unit. So if a loop contains a block, which
+      --  contains a body, the outer loop doesn't count within that
+      --  body. Used to compute the maximum loop nesting level.
+
+      --  Maybe count all kinds, via an array indexed by kind????
+
+      Private_Part_Count : Natural := 0;
+      --  Number of private parts we are nested within. Used for contract
+      --  metrics, which are only supposed to be shown for visible subprograms.
+
+      function In_Visible_Part_1 return Boolean is
+         (Last_Index (Metrix_Stack) >= 2
+            and then Kind (Get (Metrix_Stack, 2).Node) in
+              Package_Decl_Kind | Generic_Package_Decl_Kind
+            and then
+              not Is_Private (Get (Metrix_Stack, 2).Node)
+            and then Private_Part_Count = 0);
+
+      function In_Visible_Part_2 return Boolean; -- Get rid????????????????
+      function In_Visible_Part_2 return Boolean is
+         A : constant Boolean := Last_Index (Metrix_Stack) >= 2;
+         N2 : constant Ada_Node := Get (Metrix_Stack, 2).Node;
+         B : constant Boolean :=
+           A and then Kind (N2) in
+              Package_Decl_Kind | Generic_Package_Decl_Kind;
+         D : constant Boolean := B and then
+           not Is_Private (N2);
+         E : constant Boolean := D and then Private_Part_Count = 0;
+      begin
+         return E;
+      end In_Visible_Part_2;
+
+      function In_Visible_Part return Boolean;
+      function In_Visible_Part return Boolean is
+      begin
+         pragma Assert (In_Visible_Part_1 = In_Visible_Part_2);
+         return In_Visible_Part_1;
+      end In_Visible_Part;
 
       In_Assertion : Boolean := False;
       --  True if we are nested within an assertion (pragma Assert,
       --  or a pre/post/etc aspect). 'gnatmetric' skips such constructs.
+      --  However, we need to process those, but only for the
+      --  --contract-complexity metric.
 
       procedure Rec (Node : Ada_Node);
       --  Recursive tree walk. Rec and Gather_Metrics_And_Walk_Children are
       --  mutually recursive.
 
       procedure Cyclomate (Node : Ada_Node; M : in out Metrix);
-      --  Compute McCabe Cyclomatic Complexity metrics
+      --  Compute McCabe Cyclomatic Complexity metrics. This also handles the
+      --  Contract_Complexity metric, even though that's considered a "contract
+      --  metric".
+
+      procedure Gather_Contract_Metrics (Node : Ada_Node);
+      --  Compute contract metrics, except for Contract_Complexity, which is
+      --  handled by Cyclomate.
+
+      procedure Gather_Syntax_Metrics (Node : Ada_Node; M : in out Metrix);
+      --  Compute syntax element metrics
 
       procedure Gather_Metrics_And_Walk_Children (Node : Ada_Node);
 
       procedure Print;
-      --  Print out the per-file metrics
+      --  Print out the metrics for this file, and for all units
+      --  within it.
 
       procedure Rec (Node : Ada_Node) is
-
-         function Is_Assertion return Boolean;
-
-         function Is_Assertion return Boolean is
-         begin
-            case Kind (Node) is
-               when Pragma_Node_Kind =>
-                  declare
-                     use Ada.Wide_Wide_Characters.Handling;
-                     Pragma_Name : constant Text_Type :=
-                       To_Lower (Get_Token
-                         (Unit, F_Tok (Single_Tok_Node
-                                       (F_Id (Pragma_Node (Node))))).Text.all);
-                  begin
-                     return Pragma_Name = "assert";
-                  end;
-               when Aspect_Assoc_Kind =>
-                  return False; -- ????????????????For now.
-               when others =>
-                  return False;
-            end case;
-         end Is_Assertion;
-
-      --  Start of processing for Rec
-
       begin
          if Debug_Flag_V then
             Put ("-->Walk: \1\n", Short_Image (Node));
@@ -960,10 +1090,14 @@ package body METRICS.Actions is
                Inc (Quantified_Expr_Count);
             when Expression_Function_Kind =>
                Inc (Expression_Function_Count);
+            when Loop_Statement_Kind =>
+               Inc (Loop_Count);
+            when Private_Part_Kind =>
+               Inc (Private_Part_Count);
             when others => null;
          end case;
 
-         if Is_Assertion then
+         if Is_Assertion (Node) then
             pragma Assert (not In_Assertion);
             In_Assertion := True;
          end if;
@@ -980,16 +1114,20 @@ package body METRICS.Actions is
                File_M : Metrix renames Get (Metrix_Stack, 1).all;
                Parent : Metrix renames
                  Get (Metrix_Stack, Last_Index (Metrix_Stack)).all;
-               M : constant Metrix_Ref := new Metrix'(Node, others => <>);
+               M : constant Metrix_Ref :=
+                 new Metrix'(Node, others => <>);
+               Saved_Loop_Count : constant Natural := Loop_Count;
             begin
-               Stop (Node); -- ????????????????
+               Loop_Count := 0;
                Append (Metrix_Stack, M); -- push
+               M.Visible := In_Visible_Part; -- must be after push
                Append (Parent.Submetrix, M);
                if Has_Complexity_Metrics (Node, Lib_Item => False) then
                   Inc (File_M.Num_With_Complexity);
                end if;
                Gather_Metrics_And_Walk_Children (Node);
                Pop (Metrix_Stack);
+               Loop_Count := Saved_Loop_Count;
             end;
          else
             Gather_Metrics_And_Walk_Children (Node);
@@ -997,7 +1135,7 @@ package body METRICS.Actions is
 
          Pop (Node_Stack);
 
-         if Is_Assertion then
+         if Is_Assertion (Node) then
             pragma Assert (In_Assertion);
             In_Assertion := False;
          end if;
@@ -1009,6 +1147,10 @@ package body METRICS.Actions is
                Dec (Quantified_Expr_Count);
             when Expression_Function_Kind =>
                Dec (Expression_Function_Count);
+            when Loop_Statement_Kind =>
+               Dec (Loop_Count);
+            when Private_Part_Kind =>
+               Dec (Private_Part_Count);
             when others => null;
          end case;
 
@@ -1143,39 +1285,32 @@ package body METRICS.Actions is
          --     to enclosed local procedures, and we for sure do not want to
          --     count enclosed procedures...
 
-         procedure Inc_Stm (By : Metric_Int := 1);
-         --  Increment statement complexity
+         procedure Inc_Cyc (Metric : Metrics_Enum; By : Metric_Int := 1) with
+           Pre => Metric in Complexity_Statement | Complexity_Expression;
+         --  Increment the specified complexity metric, and also
+         --  Complexity_Cyclomatic. Increment the current unit's metrics, as
+         --  well as the file-level ones. However, if this is something like a
+         --  subprogram declaration, we actually increment the
+         --  Contract_Complexity.
 
-         procedure Inc_Exp (By : Metric_Int := 1);
-         --  Increment expression complexity
-
-         procedure Inc_Stm (By : Metric_Int := 1) is
+         procedure Inc_Cyc (Metric : Metrics_Enum; By : Metric_Int := 1) is
          begin
             if Debug_Flag_V then
-               Put ("Inc_Stm\1 for \2 in \3\n",
+               Put ("Inc_Cyc\1 for \2 in \3\n",
                     (if By = 1 then "" else "(" & Image (By) & ")"),
                     Short_Image (Node), Short_Image (M.Node));
             end if;
 
-            Inc (M.Vals (Complexity_Statement), By);
-            Inc (M.Vals (Complexity_Cyclomatic), By);
-            Inc (File_M.Vals (Complexity_Statement), By);
-            Inc (File_M.Vals (Complexity_Cyclomatic), By);
-         end Inc_Stm;
-
-         procedure Inc_Exp (By : Metric_Int := 1) is
-         begin
-            if Debug_Flag_V then
-               Put ("Inc_Exp\1 for \2 in \3\n",
-                    (if By = 1 then "" else "(" & Image (By) & ")"),
-                    Short_Image (Node), Short_Image (M.Node));
+            if Kind (M.Node) in Contract_Complexity_Eligible then
+               Inc (M.Vals (Contract_Complexity), By);
+               Inc (File_M.Vals (Contract_Complexity), By);
+            elsif not In_Assertion then
+               Inc (M.Vals (Metric), By);
+               Inc (M.Vals (Complexity_Cyclomatic), By);
+               Inc (File_M.Vals (Metric), By);
+               Inc (File_M.Vals (Complexity_Cyclomatic), By);
             end if;
-
-            Inc (M.Vals (Complexity_Expression), By);
-            Inc (M.Vals (Complexity_Cyclomatic), By);
-            Inc (File_M.Vals (Complexity_Expression), By);
-            Inc (File_M.Vals (Complexity_Cyclomatic), By);
-         end Inc_Exp;
+         end Inc_Cyc;
 
       --  Start of processing for Cyclomate
 
@@ -1194,23 +1329,23 @@ package body METRICS.Actions is
             when If_Statement_Kind |
               Elsif_Statement_Part_Kind |
               While_Loop_Spec_Kind =>
-               Inc_Stm;
+               Inc_Cyc (Complexity_Statement);
 
             when For_Loop_Spec_Kind =>
                if Quantified_Expr_Count = 0 then
                   --  We want to increment the statement count only for real
                   --  for loops.
-                  Inc_Stm;
+                  Inc_Cyc (Complexity_Statement);
                   --  ????except in some cases (see No_Static_Loop)
                end if;
 
             when Case_Statement_Kind =>
-               Inc_Stm
-                 (By => Child_Count (F_Case_Alts (Case_Statement (Node))) - 1);
+               Inc_Cyc (Complexity_Statement,
+                 By => Child_Count (F_Case_Alts (Case_Statement (Node))) - 1);
 
             when Exit_Statement_Kind =>
                if F_Condition (Exit_Statement (Node)) /= null then
-                  Inc_Stm;
+                  Inc_Cyc (Complexity_Statement);
                end if;
 
             when Select_Statement_Kind =>
@@ -1222,7 +1357,8 @@ package body METRICS.Actions is
                   Num_Abort : constant Metric_Int :=
                     (if F_Abort_Statements (S) = null then 0 else 1);
                begin
-                  Inc_Stm (By => Num_Alts + Num_Else + Num_Abort - 1);
+                  Inc_Cyc (Complexity_Statement,
+                           By => Num_Alts + Num_Else + Num_Abort - 1);
                end;
 
             when Expression_Function_Kind =>
@@ -1230,21 +1366,148 @@ package body METRICS.Actions is
 
             when Bin_Op_Kind =>
                if F_Op (Bin_Op (Node)) in Or_Else | And_Then then
-                  Inc_Exp;
+                  Inc_Cyc (Complexity_Expression);
                end if;
 
             when If_Expr_Kind | Elsif_Expr_Part_Kind =>
-               Inc_Exp;
+               Inc_Cyc (Complexity_Expression);
 
             when Case_Expr_Kind =>
-               Inc_Exp (By => Child_Count (F_Cases (Case_Expr (Node))) - 1);
+               Inc_Cyc (Complexity_Expression,
+                        By => Child_Count (F_Cases (Case_Expr (Node))) - 1);
 
             when Quantified_Expr_Kind =>
-               Inc_Exp (By => 2);
+               Inc_Cyc (Complexity_Expression, By => 2);
+
+            when Loop_Statement_Kind =>
+               --  Compute M.Vals (Loop_Nesting) as the maximum loop
+               --  nesting level for this unit. We only set it for the
+               --  innermost unit and at the file level.
+
+               if not In_Assertion then
+                  if Loop_Count > M.Vals (Loop_Nesting) then
+                     M.Vals (Loop_Nesting) := Loop_Count;
+                  end if;
+
+                  if Loop_Count > File_M.Vals (Loop_Nesting) then
+                     File_M.Vals (Loop_Nesting) := Loop_Count;
+                  end if;
+               end if;
 
             when others => null;
          end case;
       end Cyclomate;
+
+      procedure Gather_Contract_Metrics (Node : Ada_Node) is
+         Vis_Decls : constant List_Ada_Node := Visible_Part (Node);
+
+         --  At some point we might want to compute the ratio of
+         --  --contracts and --public-subprograms.
+
+         procedure Search_Aspects
+           (Subp_Decl : Ada_Node;
+            Has_Contracts, Has_Post : out Boolean);
+         --  Search through the subprogram's aspects, and set
+         --  Has_Contracts and/or Has_Post as appropriate.
+
+         procedure Search_Aspects
+           (Subp_Decl : Ada_Node;
+            Has_Contracts, Has_Post : out Boolean)
+         is
+            Aspects : constant Aspect_Specification :=
+              Get_Aspects (Basic_Decl (Subp_Decl));
+         begin
+            if Kind (Subp_Decl) = Expression_Function_Kind then
+               --  Expression functions are considered to have
+               --  contracts and postconditions.
+               Has_Contracts := True;
+               Has_Post := True;
+
+            elsif Aspects /= null then
+               Has_Contracts := False;
+               Has_Post := False;
+
+               declare
+                  Assocs : constant List_Aspect_Assoc :=
+                    F_Aspect_Assocs (Aspects);
+               begin
+                  for I in 0 .. Child_Count (Assocs) - 1 loop
+                     case Assertion_Kind (Childx (Assocs, I)) is
+                        when Postcondition =>
+                           Has_Contracts := True;
+                           Has_Post := True;
+                        when Other_Assertion =>
+                           Has_Contracts := True;
+                        when Not_An_Assertion =>
+                           null;
+                     end case;
+                  end loop;
+               end;
+            end if;
+         end Search_Aspects;
+
+      --  Start of processing for Gather_Contract_Metrics
+
+      begin
+         if Vis_Decls /= null then -- Shouldn't it be empty list???
+            for I in 0 .. Child_Count (Vis_Decls) - 1 loop
+               declare
+                  Decl : constant Ada_Node := Childx (Vis_Decls, I);
+                  Has_Contracts, Has_Post : Boolean;
+               begin
+                  if Decl.all in Basic_Subprogram_Decl_Type'Class then
+                     Search_Aspects (Decl, Has_Contracts, Has_Post);
+
+                     if Has_Contracts then
+                        Inc_All (Contract);
+                     end if;
+
+                     if Has_Post then
+                        Inc_All (Post);
+                     end if;
+                  end if;
+               end;
+            end loop;
+         end if;
+      end Gather_Contract_Metrics;
+
+      procedure Gather_Syntax_Metrics (Node : Ada_Node; M : in out Metrix) is
+      begin
+         if Kind (Node) = Subprogram_Body_Kind then
+            Inc_All (All_Subprograms);
+         end if;
+
+         if Last_Index (Metrix_Stack) = 2 then
+            if Node = M.Node and then
+              Kind (M.Node) in Subprogram_Decl_Kind |
+                Generic_Subprogram_Decl_Kind |
+                Renaming_Subprogram_Decl_Kind |
+                Subprogram_Body_Kind
+            then
+               Inc_All (Public_Subprograms);
+            end if;
+
+            if Kind (Node) in
+              Package_Decl_Kind | Generic_Package_Decl_Kind
+            then
+               declare
+                  Vis_Decls : constant List_Ada_Node := Visible_Part (Node);
+               begin
+                  if Vis_Decls /= null then
+                     for I in 0 .. Child_Count (Vis_Decls) - 1 loop
+                        declare
+                           Decl : constant Ada_Node := Childx (Vis_Decls, I);
+                        begin
+                           if Decl.all in Basic_Subprogram_Decl_Type'Class then
+                              Inc_All (Public_Subprograms);
+                           end if;
+                        end;
+                     end loop;
+                  end if;
+               end;
+            end if;
+         end if;
+      end Gather_Syntax_Metrics;
 
       procedure Gather_Metrics_And_Walk_Children (Node : Ada_Node) is
          function Num_Statements
@@ -1369,9 +1632,24 @@ package body METRICS.Actions is
                when others => null;
             end case;
 
-            if Has_Complexity_Metrics (M.Node, Lib_Item => False) then
-               Cyclomate (Node, M);
+            Gather_Syntax_Metrics (Node, M);
+
+            if Kind (Node) in
+                Package_Decl_Kind | Generic_Package_Decl_Kind |
+                Task_Def_Kind | Protected_Def_Kind
+              and then In_Visible_Part
+            then
+               --  We only gather contract metrics for public subprograms
+
+               Gather_Contract_Metrics (Node);
             end if;
+         end if;
+
+         if Has_Complexity_Metrics (M.Node, Lib_Item => False)
+           or else (Kind (M.Node) in Contract_Complexity_Eligible
+                      and then In_Visible_Part)
+         then
+            Cyclomate (Node, M);
          end if;
 
          for I in 1 .. Child_Count (Node) loop
@@ -1379,7 +1657,30 @@ package body METRICS.Actions is
                Cur_Child : constant Ada_Node := Child (Node, I - 1);
             begin
                if Cur_Child /= null then
-                  Rec (Cur_Child);
+                  --  We don't have a separate node kind for the private part,
+                  --  so we have to check whether the child is the private part
+                  --  here.
+                  --  ????Actually, we do for packages. Probably tasks and
+                  --  protecteds should be changed to work the same way.
+
+                  if False then
+                     declare
+                        P : constant Boolean :=
+                          Is_Private_Part (Node, Cur_Child);
+                     begin
+                        if P then
+                           Private_Part_Count := Private_Part_Count + 1;
+                        end if;
+
+                        Rec (Cur_Child);
+
+                        if P then
+                           Private_Part_Count := Private_Part_Count - 1;
+                        end if;
+                     end;
+                  else
+                     Rec (Cur_Child);
+                  end if;
                end if;
             end;
          end loop;
@@ -1409,7 +1710,7 @@ package body METRICS.Actions is
 
             Print_Metrix
               (File_Name, Metrics_To_Compute, File_M,
-               Depth => 0);
+               Depth => 1);
 
             if not Output_To_Standard_Output then
                Set_Output (Standard_Output);
@@ -1422,7 +1723,7 @@ package body METRICS.Actions is
                Set_Output (Tool.XML);
             end if;
             XML_Print_Metrix
-              (File_Name, Metrics_To_Compute, File_M);
+              (File_Name, Metrics_To_Compute, File_M, Depth => 1);
             if not Output_To_Standard_Output then
                Set_Output (Standard_Output);
             end if;
@@ -1509,10 +1810,13 @@ package body METRICS.Actions is
             end if;
 
             --  If no metrics were requested on the command line, we compute
-            --  all metrics:
+            --  all metrics except coupling metrics. Also, at least for now,
+            --  disable contract metrics, because those don't exist in
+            --  gnatmetric and we're trying to be compatible.
 
             if Result = (Metrics_Enum => False) then
-               Result := (Metrics_Enum => True);
+               Result := (Coupling_Metrics | Contract_Metrics => False,
+                          others => True);
             end if;
          end return;
       end To_Compute;
@@ -1575,16 +1879,19 @@ package body METRICS.Actions is
            ("Line metrics " & Summed,
             Metrics_To_Compute,
             Lines_Metrics'First, Lines_Metrics'Last, M,
+            Depth => 0,
             Global => True);
          Print_Range
            ("Contract metrics " & Summed,
             Metrics_To_Compute,
             Contract_Metrics'First, Contract_Metrics'Last, M,
+            Depth => 0,
             Global => True);
          Print_Range
            ("Element metrics " & Summed,
             Metrics_To_Compute,
             Syntax_Metrics'First, Syntax_Metrics'Last, M,
+            Depth => 0,
             Global => True);
       end if;
 
@@ -1595,7 +1902,7 @@ package body METRICS.Actions is
             Text_IO.Set_Output (Tool.XML);
          end if;
          XML_Print_Metrix_Vals
-           (Metrics_To_Compute, M, Do_Complexity_Metrics => False);
+           (Metrics_To_Compute, M, Do_Complexity_Metrics => False, Depth => 0);
          Put ("</global>\n");
          if not Output_To_Standard_Output then
             Text_IO.Set_Output (Text_IO.Standard_Output);
@@ -1628,12 +1935,6 @@ package body METRICS.Actions is
 
       Actions.Unit := Unit;
       Walk (Tool, Cmd, File_Name, Root (Unit), Metrics_To_Compute);
-
-      if Metrics_To_Compute (Contract_Metrics) /=
-        (Contract_Metrics => False)
-      then
-         Compute_Contract_Metrics (File_Name, Unit); -- ????????????????
-      end if;
    end Per_File_Action;
 
    ---------------

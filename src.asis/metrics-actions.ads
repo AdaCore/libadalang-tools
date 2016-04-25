@@ -40,9 +40,19 @@ private
       --  Node to which the metrics are associated, except for
       --  Metrix_Stack[0], which has Node = null.
 
+      Visible : Boolean := False;
+      --  True if the node is public as defined by gnatmetric -- not nested in
+      --  any body or private part. Used for Contract_Complexity, which should
+      --  be displayed only for public subprograms. (The other contract metrics
+      --  are also displayed only for public subprograms, but they use a
+      --  different mechanism.)
+
       Vals : Metrics_Values :=
-        (Complexity_Statement | Complexity_Cyclomatic => 1, others => 0);
-      --  Also Essential_Complexity => 1????
+        (Complexity_Statement |
+         Complexity_Cyclomatic |
+         Complexity_Essential |
+         Contract_Complexity => 1,
+         others => 0);
 
       Num_With_Complexity : Metric_Int := 0;
       --  Number of descendants for which complexity metrics apply. Used
@@ -66,7 +76,7 @@ private
       --  Metrix_Stack[1] is the Metrix for the Compilation_Unit node.
       --  This is for per-file metrics.
       --
-      --  Metrix_Stack[1] is the Metrix for the library item within that; this
+      --  Metrix_Stack[2] is the Metrix for the library item within that; this
       --  is a Package_Decl, Package_Body, or whatever node.
       --
       --  The rest are Metrix for the nested nodes that are "eligible" for
@@ -96,5 +106,8 @@ private
    --  Final is called once, after processing all files. It prints out
    --  the totals for all files that have been computed in
    --  Metrix_Stack[0].
+   --
+   --  We always compute all metrics. The metrics requested on the
+   --  command line are taken into account when we print the data.
 
 end METRICS.Actions;
