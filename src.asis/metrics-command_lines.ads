@@ -16,16 +16,16 @@ package METRICS.Command_Lines is
    --  Note: Most tools allow "--debugx" with a shorthand of "-dx".
    --  Gnatmetric, however, uses "--gnatmetric-debugx" with a shorthand
    --  of "-debugx". Therefore, we disable Common.Debug, and define
-   --  Gnatmetric_Debug below.
-
-   --  -eL switch is missing????
+   --  Gnatmetric_Debug below. Gnatmetric uses -d for the output directory;
+   --  we should probably allow --output-dir in addition to --output-directory
+   --  (see below).
 
    type Metrics_Flags is
      (Test,
 
    --  Old metric control options, are kept for upward compatibility
    --  reasons (as non-documented feature)
-   --  ????????????????These really should be shorthands.
+   --  These really should be shorthands, but that doesn't work???
       La_Switch,
       Lcode_Switch,
       Lcomm_Switch,
@@ -177,6 +177,27 @@ package METRICS.Command_Lines is
 
    package Metrics_Boolean_Shorthands is new
      Metrics_Boolean_Switches.Set_Shorthands
+   --  Old metric control options, are kept for upward compatibility
+   --  reasons (as non-documented feature)
+--       ((Lines              => +"-la",
+--         Lines_Code         => +"-lcode",
+--         Lines_Comment      => +"-lcomm",
+--         Lines_Eol_Comment  => +"-leol",
+--         Lines_Blank        => +"-lb",
+--         Lines_Ratio        => +"-lratio",
+--         Lines_Average      => +"-lav",
+--         Unit_Nesting       => +"-enu",
+--         Statements         => +"-es",
+--         Declarations       => +"-ed",
+--         Public_Subprograms => +"-eps",
+--         All_Subprograms    => +"-eas",
+--         Public_Types       => +"-ept",
+--         All_Types          => +"-eat",
+--         Construct_Nesting  => +"-ec",
+--  Above are commented out, because these shorthands do not have exactly the
+--  same semantics as the long forms. For example, -lratio seems to turn on
+--  --complexity-average, whereas --lines-ratio does not.
+
        ((Tagged_Coupling_Out    => +"--package-efferent-coupling",
          Tagged_Coupling_In     => +"--package-afferent-coupling",
          Hierarchy_Coupling_Out => +"--category-efferent-coupling",

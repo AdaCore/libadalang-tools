@@ -1,3 +1,4 @@
+with Ada.Directories;
 with Ada.Strings.Unbounded; use Ada;
 
 with GNAT.OS_Lib; use GNAT.OS_Lib;
@@ -75,6 +76,8 @@ package body METRICS.Actions is
    use Metrics_Flag_Switches, Metrics_Boolean_Switches,
      Metrics_String_Switches, Metrics_String_Seq_Switches;
    pragma Warnings (On);
+
+   function Output_Dir (Cmd : Command_Line) return String;
 
    procedure Walk
      (Tool : in out Metrics_Tool'Class;
@@ -223,7 +226,8 @@ package body METRICS.Actions is
    --  global metrics for all files.
 
    procedure Print_Metrix
-     (File_Name : String;
+     (Cmd : Command_Line;
+      File_Name : String;
       Metrics_To_Compute : Metrics_Set;
       M : Metrix;
       Depth : Natural);
@@ -239,7 +243,8 @@ package body METRICS.Actions is
    --  file at the end.
 
    procedure XML_Print_Metrix
-     (File_Name : String;
+     (Cmd : Command_Line;
+      File_Name : String;
       Metrics_To_Compute : Metrics_Set;
       M : Metrix;
       Depth : Natural);
@@ -651,21 +656,28 @@ package body METRICS.Actions is
    end Print_Range;
 
    procedure Print_Metrix
-     (File_Name : String;
+     (Cmd : Command_Line;
+      File_Name : String;
       Metrics_To_Compute : Metrics_Set;
       M : Metrix;
       Depth : Natural)
    is
    begin
-      --  Return immediately if M is for a Contract_Complexity_Eligible
-      --  node, and we're not going to print.
+      --  Return immediately if M is for a Contract_Complexity_Eligible node,
+      --  and we're not going to print. Also don't print metrics for "eligible
+      --  local program units" if the -nolocal switch was given.
 
-      if Depth > 2
-        and then Kind (M.Node) in Contract_Complexity_Eligible
-        and then not Should_Print
-          (Contract_Complexity, Metrics_To_Compute, M, Depth, XML => True)
-      then
-         return;
+      if Depth > 2 then
+         if Kind (M.Node) in Contract_Complexity_Eligible
+           and then not Should_Print
+             (Contract_Complexity, Metrics_To_Compute, M, Depth, XML => True)
+         then
+            return;
+         end if;
+
+         if Arg (Cmd, No_Local_Metrics) then
+            return;
+         end if;
       end if;
 
       if Depth > 2 then
@@ -740,7 +752,8 @@ package body METRICS.Actions is
       --  Then recursively print metrix of nested units
 
       for Child of M.Submetrix loop
-         Print_Metrix (File_Name, Metrics_To_Compute, Child.all, Depth + 1);
+         Print_Metrix
+           (Cmd, File_Name, Metrics_To_Compute, Child.all, Depth + 1);
       end loop;
 
       --  At the file level, average complexity metrics come last:
@@ -877,21 +890,28 @@ package body METRICS.Actions is
    end XML_Print_Metrix_Vals;
 
    procedure XML_Print_Metrix
-     (File_Name : String;
+     (Cmd : Command_Line;
+      File_Name : String;
       Metrics_To_Compute : Metrics_Set;
       M : Metrix;
       Depth : Natural)
    is
    begin
-      --  Return immediately if M is for a Contract_Complexity_Eligible
-      --  node, and we're not going to print.
+      --  Return immediately if M is for a Contract_Complexity_Eligible node,
+      --  and we're not going to print. Also don't print metrics for "eligible
+      --  local program units" if the -nolocal switch was given.
 
-      if Depth > 2
-        and then Kind (M.Node) in Contract_Complexity_Eligible
-        and then not Should_Print
-          (Contract_Complexity, Metrics_To_Compute, M, Depth, XML => True)
-      then
-         return;
+      if Depth > 2 then
+         if Kind (M.Node) in Contract_Complexity_Eligible
+           and then not Should_Print
+             (Contract_Complexity, Metrics_To_Compute, M, Depth, XML => True)
+         then
+            return;
+         end if;
+
+         if Arg (Cmd, No_Local_Metrics) then
+            return;
+         end if;
       end if;
 
       Indent;
@@ -922,7 +942,7 @@ package body METRICS.Actions is
 
       for Child of M.Submetrix loop
          XML_Print_Metrix
-           (File_Name, Metrics_To_Compute, Child.all, Depth + 1);
+           (Cmd, File_Name, Metrics_To_Compute, Child.all, Depth + 1);
       end loop;
 
       --  At the file level, average complexity metrics go at the end:
@@ -939,6 +959,15 @@ package body METRICS.Actions is
 
       Outdent;
    end XML_Print_Metrix;
+
+   function Output_Dir (Cmd : Command_Line) return String is
+   begin
+      if Arg (Cmd, Output_Directory) = null then
+         return "";
+      else
+         return Arg (Cmd, Output_Directory).all;
+      end if;
+   end Output_Dir;
 
    procedure Walk
      (Tool : in out Metrics_Tool'Class;
@@ -1687,14 +1716,15 @@ package body METRICS.Actions is
       end Gather_Metrics_And_Walk_Children;
 
       procedure Print is
-         --  ????Compute correct directory.
          Suffix : constant String :=
            (if Arg (Cmd, Output_Suffix) = null
               then ".metrix"
               else Arg (Cmd, Output_Suffix).all);
          use Text_IO;
          Text : File_Type;
-         Text_Name : constant String := File_Name & Suffix;
+         Text_Name : constant String :=
+           Directories.Compose (Output_Dir (Cmd), File_Name & Suffix);
+         --  Can't pass Suffix as Extension, because that inserts an extra "."
          File_M : Metrix renames Get (Metrix_Stack, 1).all;
       begin
          if Text_Name = File_Name then
@@ -1709,8 +1739,7 @@ package body METRICS.Actions is
             end if;
 
             Print_Metrix
-              (File_Name, Metrics_To_Compute, File_M,
-               Depth => 1);
+              (Cmd, File_Name, Metrics_To_Compute, File_M, Depth => 1);
 
             if not Output_To_Standard_Output then
                Set_Output (Standard_Output);
@@ -1723,7 +1752,7 @@ package body METRICS.Actions is
                Set_Output (Tool.XML);
             end if;
             XML_Print_Metrix
-              (File_Name, Metrics_To_Compute, File_M, Depth => 1);
+              (Cmd, File_Name, Metrics_To_Compute, File_M, Depth => 1);
             if not Output_To_Standard_Output then
                Set_Output (Standard_Output);
             end if;
@@ -1826,9 +1855,13 @@ package body METRICS.Actions is
       Metrix_Stack : Metrix_Vectors.Vector renames Tool.Metrix_Stack;
 
       Xml_Name : constant String :=
-        (if Arg (Cmd, Xml_File_Name) = null
-           then "metrix.xml"
-           else Arg (Cmd, Xml_File_Name).all);
+        (if Arg (Cmd, Xml_File_Name) /= null
+           then Arg (Cmd, Xml_File_Name).all
+           else Directories.Compose
+             (Output_Dir (Cmd),
+              (if Arg (Cmd, Xml_File_Name) = null
+                 then "metrix.xml"
+                 else Arg (Cmd, Xml_File_Name).all)));
 
       M : constant Metrix_Ref := new Metrix;
 
@@ -1842,6 +1875,32 @@ package body METRICS.Actions is
 
       Metrics_To_Compute := To_Compute;
       Append (Metrix_Stack, M); -- push
+
+      --  Create output directory if necessary
+
+      if Arg (Cmd, Output_Directory) /= null then
+         declare
+            Dir : constant String := Arg (Cmd, Output_Directory).all;
+            Cannot_Create : constant String :=
+              "cannot create directory '" & Dir & "'";
+            use Directories;
+         begin
+            if Exists (Dir) then
+               if Kind (Dir) /= Directory then
+                  Cmd_Error (Cannot_Create & "; file already exists");
+               end if;
+            else
+               begin
+                  Create_Directory (Dir);
+               exception
+                  when Name_Error | Use_Error =>
+                     Cmd_Error (Cannot_Create);
+               end;
+            end if;
+         end;
+      end if;
+
+      --  Put initial lines of XML
 
       if Gen_XML (Cmd) then
          if not Output_To_Standard_Output then
@@ -1867,14 +1926,29 @@ package body METRICS.Actions is
         "summed over " & Image (Num_File_Names (Cmd)) & " units";
       pragma Assert (Length (Metrix_Stack) = 1);
       M : Metrix renames Get (Metrix_Stack, 0).all;
+
+      Global : Text_IO.File_Type;
+      --  File for global information in text form, if --global-file-name
+      --  switch was given. By default, this information is sent to standard
+      --  output.
    begin
       pragma Assert (M.Vals (Complexity_Cyclomatic) =
                        M.Vals (Complexity_Statement) +
                        M.Vals (Complexity_Expression));
 
-      --  Print the totals in text form
+      --  Print the totals in text form. These go to standard output, unless
+      --  --global-file-name was specified. Note that Output_Dir (Cmd) is
+      --  ignored by gnatmetric for this output.
 
       if Gen_Text (Cmd) then
+         if Arg (Cmd, Global_File_Name) /= null then
+            if not Output_To_Standard_Output then
+               Text_IO.Create
+                 (Global, Name => Arg (Cmd, Global_File_Name).all);
+               Text_IO.Set_Output (Global);
+            end if;
+         end if;
+
          Print_Range
            ("Line metrics " & Summed,
             Metrics_To_Compute,
@@ -1893,6 +1967,13 @@ package body METRICS.Actions is
             Syntax_Metrics'First, Syntax_Metrics'Last, M,
             Depth => 0,
             Global => True);
+
+         if Arg (Cmd, Global_File_Name) /= null then
+            if not Output_To_Standard_Output then
+               Text_IO.Set_Output (Text_IO.Standard_Output);
+               Text_IO.Close (Global);
+            end if;
+         end if;
       end if;
 
       --  Print the totals in XML form
