@@ -1,5 +1,6 @@
 with Ada.Directories;
 with Ada.Strings.Unbounded; use Ada;
+with Unchecked_Deallocation;
 
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
@@ -81,6 +82,9 @@ package body METRICS.Actions is
    pragma Warnings (On);
 
    function Output_Dir (Cmd : Command_Line) return String;
+
+   procedure Destroy (M : in out Metrix_Ref);
+   --  Reclaim memory for a tree of Metrix records
 
    procedure Walk
      (Tool : in out Metrics_Tool'Class;
@@ -974,6 +978,21 @@ package body METRICS.Actions is
       end if;
    end Output_Dir;
 
+   procedure Destroy (M : in out Metrix_Ref) is
+      procedure Free is new Unchecked_Deallocation (Metrix, Metrix_Ref);
+   begin
+      for Index in 0 .. Last_Index (M.Submetrix) loop
+         declare
+            Sub : Metrix_Ref renames Get_Access (M.Submetrix, Index).all;
+         begin
+            Destroy (Sub);
+         end;
+      end loop;
+      Destroy (M.Submetrix);
+
+      Free (M);
+   end Destroy;
+
    procedure Walk
      (Tool : in out Metrics_Tool'Class;
       Cmd : Command_Line;
@@ -1053,34 +1072,13 @@ package body METRICS.Actions is
       --  Number of private parts we are nested within. Used for contract
       --  metrics, which are only supposed to be shown for visible subprograms.
 
-      function In_Visible_Part_1 return Boolean is
+      function In_Visible_Part return Boolean is
          (Last_Index (Metrix_Stack) >= 2
             and then Kind (Get (Metrix_Stack, 2).Node) in
               Package_Decl_Kind | Generic_Package_Decl_Kind
             and then
               not Is_Private (Get (Metrix_Stack, 2).Node)
             and then Private_Part_Count = 0);
-
-      function In_Visible_Part_2 return Boolean; -- Get rid????????????????
-      function In_Visible_Part_2 return Boolean is
-         A : constant Boolean := Last_Index (Metrix_Stack) >= 2;
-         N2 : constant Ada_Node := Get (Metrix_Stack, 2).Node;
-         B : constant Boolean :=
-           A and then Kind (N2) in
-              Package_Decl_Kind | Generic_Package_Decl_Kind;
-         D : constant Boolean := B and then
-           not Is_Private (N2);
-         E : constant Boolean := D and then Private_Part_Count = 0;
-      begin
-         return E;
-      end In_Visible_Part_2;
-
-      function In_Visible_Part return Boolean;
-      function In_Visible_Part return Boolean is
-      begin
-         pragma Assert (In_Visible_Part_1 = In_Visible_Part_2);
-         return In_Visible_Part_1;
-      end In_Visible_Part;
 
       In_Assertion : Boolean := False;
       --  True if we are nested within an assertion (pragma Assert,
@@ -1763,7 +1761,7 @@ package body METRICS.Actions is
          end if;
       end Print;
 
-      M : constant Metrix_Ref := new Metrix'(CU_Node, others => <>);
+      M : Metrix_Ref := new Metrix'(CU_Node, others => <>);
 
    --  Start of processing for Walk
 
@@ -1796,7 +1794,7 @@ package body METRICS.Actions is
          Put ("<--Walk: \1\n", Short_Image (CU_Node));
       end if;
 
-      --  ????????????????Free all the Node_Metrix.
+      Destroy (M);
       Destroy (Node_Stack);
    end Walk;
 
@@ -1929,7 +1927,7 @@ package body METRICS.Actions is
       Summed : constant String :=
         "summed over " & Image (Num_File_Names (Cmd)) & " units";
       pragma Assert (Length (Metrix_Stack) = 1);
-      M : Metrix renames Get (Metrix_Stack, 0).all;
+      M : Metrix_Ref := Get (Metrix_Stack, 0);
 
       Global : Text_IO.File_Type;
       --  File for global information in text form, if --global-file-name
@@ -1956,19 +1954,19 @@ package body METRICS.Actions is
          Print_Range
            ("Line metrics " & Summed,
             Metrics_To_Compute,
-            Lines_Metrics'First, Lines_Metrics'Last, M,
+            Lines_Metrics'First, Lines_Metrics'Last, M.all,
             Depth => 0,
             Global => True);
          Print_Range
            ("Contract metrics " & Summed,
             Metrics_To_Compute,
-            Contract_Metrics'First, Contract_Metrics'Last, M,
+            Contract_Metrics'First, Contract_Metrics'Last, M.all,
             Depth => 0,
             Global => True);
          Print_Range
            ("Element metrics " & Summed,
             Metrics_To_Compute,
-            Syntax_Metrics'First, Syntax_Metrics'Last, M,
+            Syntax_Metrics'First, Syntax_Metrics'Last, M.all,
             Depth => 0,
             Global => True);
 
@@ -1987,7 +1985,8 @@ package body METRICS.Actions is
             Text_IO.Set_Output (Tool.XML);
          end if;
          XML_Print_Metrix_Vals
-           (Metrics_To_Compute, M, Do_Complexity_Metrics => False, Depth => 0);
+           (Metrics_To_Compute, M.all,
+            Do_Complexity_Metrics => False, Depth => 0);
          Put ("</global>\n");
          if not Output_To_Standard_Output then
             Text_IO.Set_Output (Text_IO.Standard_Output);
@@ -1996,6 +1995,7 @@ package body METRICS.Actions is
       end if;
 
       Pop (Metrix_Stack);
+      Destroy (M);
       Destroy (Metrix_Stack);
    end Final;
 
