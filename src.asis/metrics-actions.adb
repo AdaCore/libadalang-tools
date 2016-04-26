@@ -30,6 +30,9 @@ package body METRICS.Actions is
    --  Make this a global variable for now. Not sure if it should be passed
    --  as parameters all over.????
 
+   function Parent (Node : Ada_Node) return Ada_Node is
+     (Parents (Node).Items (2));
+
    function Full_Name (Nm : Name) return Text_Type is (Full_Name (Nm, Unit));
 
    function Image (X : Integer) return String
@@ -117,8 +120,10 @@ package body METRICS.Actions is
        Task_Type_Decl_Kind;
    --  These are the node kinds that the gnatmetric documentation calls
    --  "eligible local units". We compute metrics for the outermost node (the
-   --  compilation unit), as well as eligible local units. A procedure
-   --  declaration, for example, has metrics only if it is the outer node.
+   --  compilation unit, for the file-level metrics), and the library item or
+   --  subunit, as well as eligible local units. A procedure declaration, for
+   --  example, has metrics only if it is the outer node. There is one
+   --  exception: see Contract_Complexity below.
 
    subtype Contract_Complexity_Eligible is Ada_Node_Type_Kind with
      Predicate => Contract_Complexity_Eligible in
@@ -427,7 +432,7 @@ package body METRICS.Actions is
    --  bodies; we need semantic information.
 
    function Is_Private (Node : Ada_Node) return Boolean is
-      P : constant Ada_Node := Parents (Node).Items (1);
+      P : constant Ada_Node := Parent (Node);
    begin
       return Kind (P) = Library_Item_Kind
         and then F_Is_Private (Library_Item (P));
@@ -710,7 +715,7 @@ package body METRICS.Actions is
 
       else
          declare
-            P : constant Ada_Node := Parents (M.Node).Items (1);
+            P : constant Ada_Node := Parent (M.Node);
             LI_Sub : constant String :=
               (if Depth = 2
                  then (if Kind (P) = Subunit_Kind
@@ -1133,12 +1138,11 @@ package body METRICS.Actions is
 
          Append (Node_Stack, Node); -- push
 
-         if Node = Lib_Item or else
-           (Kind (Node) in Eligible
-              and then not -- ????This part is a workaround for prot-body-stubs
-                (Kind (Node) = Protected_Body_Kind
-                   and then F_Body_Stub (Protected_Body (Node)) /= null))
-         then
+         --  For the library item and eligible local units, we push and pop the
+         --  Metrix_Stack around the call to Gather_Metrics_And_Walk_Children;
+         --  otherwise we just call Gather_Metrics_And_Walk_Children.
+
+         if Node = Lib_Item or else Kind (Node) in Eligible then
             declare
                File_M : Metrix renames Get (Metrix_Stack, 1).all;
                Parent : Metrix renames
@@ -1569,9 +1573,9 @@ package body METRICS.Actions is
       --  Start of processing for Gather_Metrics_And_Walk_Children
 
       begin
-         if Parents (Node).Items'Length >= 2 then
+         if Parents (Node).Items'Length > 2 then
             pragma Assert
-              (Parents (Node).Items (2) =
+              (Parents (Node).Items (3) =
                  Get (Node_Stack, Last_Index (Node_Stack) - 2));
          end if;
          if not In_Assertion then
