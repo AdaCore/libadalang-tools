@@ -171,7 +171,7 @@ package body LAL_UL.Drivers is
 --         ASIS_UL.Options.No_Argument_File_Specified := False;
             declare
                Unit : constant Analysis_Unit :=
-                 Get_From_File (Context, F_Name.all);
+                 Get_From_File (Context, F_Name.all, With_Trivia => True);
             begin
                if Has_Diagnostics (Unit) then
                   Put_Line ("Errors while parsing " & F_Name.all);

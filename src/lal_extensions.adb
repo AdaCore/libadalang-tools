@@ -298,17 +298,18 @@ package body LAL_Extensions is
      (Node : access Ada_Node_Type'Class) return List_Ada_Node
    is
       --  I'm confused about Base_Package_Decl
+      --  Maybe return the Public_Part node?
    begin
       case Kind (Node) is
          when Package_Decl_Kind =>
-            return F_Decls (Base_Package_Decl (Node));
-            --  That's the visible part, not all the declarations
+            return F_Decls (F_Public_Part (Base_Package_Decl (Node)));
          when Generic_Package_Decl_Kind =>
-            return F_Decls (F_Package_Decl (Generic_Package_Decl (Node)));
+            return F_Decls
+              (F_Public_Part (F_Package_Decl (Generic_Package_Decl (Node))));
          when Task_Def_Kind =>
-            return F_Items (Task_Def (Node));
+            return F_Decls (F_Public_Part (Task_Def (Node)));
          when Protected_Def_Kind =>
-            return F_Public_Ops (Protected_Def (Node));
+            return F_Decls (F_Public_Part (Protected_Def (Node)));
          when others => raise Program_Error;
       end case;
    end Visible_Part;

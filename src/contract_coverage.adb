@@ -90,7 +90,7 @@ procedure Contract_Coverage is
    end Has_Contracts;
 
    function Get_Coverage (Pkg_Decl : Base_Package_Decl) return Percent is
-      Decls : constant List_Ada_Node := F_Decls (Pkg_Decl);
+      Decls : constant List_Ada_Node := F_Decls (F_Public_Part (Pkg_Decl));
 
       Has_Contracts_Count : Natural := 0;
       --  Number of subprograms in the package with contracts

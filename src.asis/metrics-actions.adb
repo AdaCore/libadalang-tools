@@ -1,5 +1,6 @@
 with Ada.Directories;
 with Ada.Strings.Unbounded; use Ada;
+with Interfaces; use type Interfaces.Unsigned_16;
 with Unchecked_Deallocation;
 
 with GNAT.OS_Lib; use GNAT.OS_Lib;
@@ -9,6 +10,7 @@ with Langkit_Support.Tokens; use Langkit_Support;
 
 with Libadalang;     use Libadalang;
 with Libadalang.AST.Types; use Libadalang.AST.Types;
+with Libadalang.Lexer;
 with LAL_Extensions; use LAL_Extensions;
 
 with LAL_UL.Common; use LAL_UL; use LAL_UL.Common;
@@ -40,13 +42,13 @@ package body METRICS.Actions is
      renames String_Utilities.Image;
 
    pragma Warnings (Off);
-   procedure Stop (Node : Ada_Node);
+   procedure Stop (Node : Ada_Node; S : Wide_Wide_String);
    --  For setting breakpoints in gdb
 
-   procedure Stop (Node : Ada_Node) is
+   procedure Stop (Node : Ada_Node; S : Wide_Wide_String) is
       P : constant Ada_Node_Array_Access := Parents (Node);
    begin
-      if True then
+      if False then
          Put ("Node:\n");
          Print (Node);
          if False then
@@ -60,6 +62,8 @@ package body METRICS.Actions is
 
    procedure knd (X : Ada_Node);
    procedure pp (X : Ada_Node);
+   procedure Put_Child_Record (C : Child_Record);
+   procedure Put_Children_Array (A : Children_Arrays.Array_Type);
    --  Debugging printouts
 
    procedure knd (X : Ada_Node) is
@@ -72,6 +76,24 @@ package body METRICS.Actions is
       Print (X);
    end pp;
    pragma Warnings (On);
+
+   procedure Put_Child_Record (C : Child_Record) is
+   begin
+      case C.Kind is
+         when Child =>
+            Put ("Child: \1\n", Short_Image (C.Node));
+         when Trivia =>
+            Put ("Trivia: ""\1""\n", Tokens.Image (C.Trivia));
+      end case;
+   end Put_Child_Record;
+
+   procedure Put_Children_Array (A : Children_Arrays.Array_Type) is
+   begin
+      for I in A'Range loop
+         Put ("\1: ", Image (I));
+         Put_Child_Record (A (I));
+      end loop;
+   end Put_Children_Array;
 
    pragma Warnings (Off); -- ???
    use Common_Flag_Switches, Common_String_Switches,
@@ -159,10 +181,6 @@ package body METRICS.Actions is
         when Not_An_Assertion => False);
    --  True for pragma Assert and for Pre, Post, Contract_Cases,
    --  Pre'Class, and Post'Class.
-
-   function Is_Private_Part (Parent, Child : Ada_Node) return Boolean;
-   --  True if Parent is a package decl, generic package decl, task decl, or
-   --  protected decl, and Child is its private part.
 
    function Has_Complexity_Metrics
      (Node : Ada_Node; Lib_Item : Boolean) return Boolean;
@@ -318,30 +336,6 @@ package body METRICS.Actions is
 
       return Not_An_Assertion;
    end Assertion_Kind;
-
-   function Is_Private_Part (Parent, Child : Ada_Node) return Boolean is
-      --  We don't collect metrics on entries????
-      --  What about private child units?
-   begin
-      if Child.all in List_Ada_Node_Type'Class then
-         declare
-            pragma Warnings (Off);
-            C : constant List_Ada_Node := List_Ada_Node (Child);
-         begin
-            case Kind (Parent) is
---               when Package_Decl_Kind | Base_Package_Decl_Kind =>
---                  return C = F_Private_Part (Base_Package_Decl (Parent));
---               when Task_Def_Kind =>
---                  return C = F_Private_Items (Task_Def (Parent));
---               when Protected_Def =>
---                  return C = F_Private_Components (Protected_Def (Parent));
-               when others => null;
-            end case;
-         end;
-      end if;
-
-      return False;
-   end Is_Private_Part;
 
    function Has_Complexity_Metrics
      (Node : Ada_Node; Lib_Item : Boolean) return Boolean is
@@ -1079,6 +1073,9 @@ package body METRICS.Actions is
             and then
               not Is_Private (Get (Metrix_Stack, 2).Node)
             and then Private_Part_Count = 0);
+      --  True if we're without only visible parts. Note that it is possible to
+      --  be in a visible part that is within a private part; we return False
+      --  in that case.
 
       In_Assertion : Boolean := False;
       --  True if we are nested within an assertion (pragma Assert,
@@ -1568,9 +1565,22 @@ package body METRICS.Actions is
          M : Metrix renames
            Get (Metrix_Stack, Last_Index (Metrix_Stack)).all;
 
+         With_Trivia : constant Children_Arrays.Array_Type :=
+           Children_With_Trivia (Node);
+
       --  Start of processing for Gather_Metrics_And_Walk_Children
 
       begin
+         for Trivium of With_Trivia loop
+            if False and then Trivium.Kind = Trivia then
+               Put_Children_Array (With_Trivia);
+               Put ("----\n");
+               Stop (Node, Trivium.Trivia.Text.all);
+               pragma Assert (Trivium.Trivia.Id = Lexer.QUEX_TKN_COMMENT);
+               exit;
+            end if;
+         end loop;
+
          if Parents (Node).Items'Length > 2 then
             pragma Assert
               (Parents (Node).Items (3) =
@@ -1688,30 +1698,7 @@ package body METRICS.Actions is
                Cur_Child : constant Ada_Node := Child (Node, I - 1);
             begin
                if Cur_Child /= null then
-                  --  We don't have a separate node kind for the private part,
-                  --  so we have to check whether the child is the private part
-                  --  here.
-                  --  ????Actually, we do for packages. Probably tasks and
-                  --  protecteds should be changed to work the same way.
-
-                  if False then
-                     declare
-                        P : constant Boolean :=
-                          Is_Private_Part (Node, Cur_Child);
-                     begin
-                        if P then
-                           Private_Part_Count := Private_Part_Count + 1;
-                        end if;
-
-                        Rec (Cur_Child);
-
-                        if P then
-                           Private_Part_Count := Private_Part_Count - 1;
-                        end if;
-                     end;
-                  else
-                     Rec (Cur_Child);
-                  end if;
+                  Rec (Cur_Child);
                end if;
             end;
          end loop;
@@ -2016,6 +2003,8 @@ package body METRICS.Actions is
    begin
       if Debug_Flag_V then
          Print (Unit);
+         Put ("With trivia\n");
+         PP_Trivia (Unit);
       end if;
 
       Actions.Unit := Unit;
