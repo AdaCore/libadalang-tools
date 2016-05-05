@@ -1,5 +1,7 @@
 with Ada.Wide_Wide_Characters.Handling;
 
+with Libadalang.Analysis; use Libadalang.Analysis;
+
 package body LAL_Extensions is
 
    use Ada_Node_Vecs;
@@ -93,33 +95,31 @@ package body LAL_Extensions is
    end Find_All;
 
    function Id_Name
-     (Nm : access Ada_Node_Type'Class;
-      Unit : Analysis_Unit)
+     (Nm : access Ada_Node_Type'Class)
      return Text_Type
    is
    begin
-      return Get_Token (Unit, F_Tok (Single_Tok_Node (Nm))).Text.all;
+      return Data (F_Tok (Single_Tok_Node (Nm))).Text.all;
    end Id_Name;
 
    function L_Name
-     (Nm : access Ada_Node_Type'Class;
-      Unit : Analysis_Unit)
+     (Nm : access Ada_Node_Type'Class)
      return Text_Type
    is
       use Ada.Wide_Wide_Characters.Handling;
    begin
-      return To_Lower (Id_Name (Nm, Unit));
+      return To_Lower (Id_Name (Nm));
    end L_Name;
 
-   function Full_Name (Nm : Name; Unit : Analysis_Unit) return Text_Type is
+   function Full_Name (Nm : Name) return Text_Type is
    begin
       case Kind (Nm) is
          when Prefix_Kind =>
             --  ????Not sure why we have to convert to Name here:
-            return Full_Name (Name (F_Prefix (Prefix (Nm))), Unit) &
-              "." & Full_Name (Name (F_Suffix (Prefix (Nm))), Unit);
+            return Full_Name (Name (F_Prefix (Prefix (Nm)))) &
+              "." & Full_Name (Name (F_Suffix (Prefix (Nm))));
          when Identifier_Kind | String_Literal_Kind =>
-            return Get_Token (Unit, F_Tok (Single_Tok_Node (Nm))).Text.all;
+            return Data (F_Tok (Single_Tok_Node (Nm))).Text.all;
 
          when others =>
             raise Program_Error with
@@ -132,13 +132,14 @@ package body LAL_Extensions is
       return Result : Name do
          case Kind (Decl) is
             when Compilation_Unit_Kind =>
---            pragma Assert
---              (Child_Count (F_Bodies (Compilation_Unit (Decl))) = 1);
                Result :=
-                 Get_Def_Name (Childx (F_Bodies (Compilation_Unit (Decl)), 0));
+                 Get_Def_Name (F_Body (Compilation_Unit (Decl)));
             when Library_Item_Kind =>
                Result :=
                  Get_Def_Name (Ada_Node (F_Item (Library_Item (Decl))));
+            when Subunit_Kind =>
+               Result :=
+                 Get_Def_Name (Ada_Node (F_Body (Subunit (Decl))));
 
             when Generic_Function_Instantiation_Kind |
               Generic_Package_Instantiation_Kind |
@@ -170,9 +171,6 @@ package body LAL_Extensions is
               Subprogram_Decl_Kind =>
                Result :=
                  F_Name (F_Subp_Spec (Basic_Subprogram_Decl (Decl)));
-            when Subunit_Kind =>
-               Result :=
-                 F_Name (Subunit (Decl));
             when Package_Decl_Kind =>
                Result :=
                  F_Package_Name (Base_Package_Decl (Decl));

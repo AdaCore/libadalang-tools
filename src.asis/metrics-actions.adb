@@ -6,7 +6,7 @@ with Unchecked_Deallocation;
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
 with Langkit_Support.Text; use Langkit_Support.Text;
-with Langkit_Support.Tokens; use Langkit_Support;
+with Langkit_Support.Slocs; use Langkit_Support;
 
 with Libadalang;     use Libadalang;
 with Libadalang.AST.Types; use Libadalang.AST.Types;
@@ -14,7 +14,8 @@ with Libadalang.Lexer;
 with LAL_Extensions; use LAL_Extensions;
 
 with LAL_UL.Common; use LAL_UL; use LAL_UL.Common;
-with LAL_UL.Formatted_Output; use LAL_UL.Formatted_Output;
+with LAL_UL.Dbg_Out;
+with LAL_UL.Formatted_Output;
 with LAL_UL.String_Utilities; use LAL_UL.String_Utilities;
 with LAL_UL.Tool_Names;
 
@@ -29,14 +30,8 @@ package body METRICS.Actions is
 
    Output_To_Standard_Output : Boolean renames Debug_Flag_S;
 
-   Unit : Analysis_Unit;
-   --  Make this a global variable for now. Not sure if it should be passed
-   --  as parameters all over.????
-
    function Parent (Node : Ada_Node) return Ada_Node is
      (Parents (Node).Items (2));
-
-   function Full_Name (Nm : Name) return Text_Type is (Full_Name (Nm, Unit));
 
    function Image (X : Integer) return String
      renames String_Utilities.Image;
@@ -47,6 +42,7 @@ package body METRICS.Actions is
 
    procedure Stop (Node : Ada_Node; S : Wide_Wide_String) is
       P : constant Ada_Node_Array_Access := Parents (Node);
+      use LAL_UL.Dbg_Out;
    begin
       if False then
          Put ("Node:\n");
@@ -67,27 +63,35 @@ package body METRICS.Actions is
    --  Debugging printouts
 
    procedure knd (X : Ada_Node) is
+      use LAL_UL.Dbg_Out;
    begin
       Put ("\1\n", Kind (X)'Img);
    end knd;
 
    procedure pp (X : Ada_Node) is
+      use LAL_UL.Dbg_Out;
    begin
-      Print (X);
+      Put ("\1\n", Short_Image (X));
+--      Print (X);
    end pp;
    pragma Warnings (On);
 
    procedure Put_Child_Record (C : Child_Record) is
+      use LAL_UL.Dbg_Out;
    begin
       case C.Kind is
          when Child =>
             Put ("Child: \1\n", Short_Image (C.Node));
          when Trivia =>
-            Put ("Trivia: ""\1""\n", Tokens.Image (C.Trivia));
+            Put ("Trivia: \1 ""\2"" \3\n",
+                 C.Trivia.Kind'Img,
+                 To_UTF8 (C.Trivia.Text.all),
+                 Slocs.Image (C.Trivia.Sloc_Range));
       end case;
    end Put_Child_Record;
 
    procedure Put_Children_Array (A : Children_Arrays.Array_Type) is
+      use LAL_UL.Dbg_Out;
    begin
       for I in A'Range loop
          Put ("\1: ", Image (I));
@@ -103,6 +107,8 @@ package body METRICS.Actions is
      Metrics_String_Switches, Metrics_String_Seq_Switches;
    pragma Warnings (On);
 
+   use LAL_UL.Formatted_Output;
+
    function Output_Dir (Cmd : Command_Line) return String;
 
    procedure Destroy (M : in out Metrix_Ref);
@@ -112,7 +118,7 @@ package body METRICS.Actions is
      (Tool : in out Metrics_Tool'Class;
       Cmd : Command_Line;
       File_Name : String;
-      CU_Node : Ada_Node;
+      CU_List : Ada_Node;
       Metrics_To_Compute : Metrics_Set);
 
    use Ada_Node_Vectors;
@@ -169,6 +175,16 @@ package body METRICS.Actions is
    function Q (S : String) return String is -- quote
      ("""" & S & """");
 
+   function Get_Outer_Unit (Node : Ada_Node) return Ada_Node with
+     Pre => Kind (Node) = Compilation_Unit_Kind;
+   --  Given the Compilation_Unit node, return the program unit (Package_Decl,
+   --  Package_Body, or whatever node) that is outermost (i.e. directly within
+   --  the library item or subunit).
+
+   function Unit_Is_Subunit (Node : Ada_Node) return Boolean is
+     (Kind (Parent (Node)) = Subunit_Kind);
+   --  True if this is the body of a subunit
+
    type Assertion_Enum is (Postcondition, Other_Assertion, Not_An_Assertion);
 
    function Assertion_Kind (Node : Ada_Node) return Assertion_Enum;
@@ -194,7 +210,7 @@ package body METRICS.Actions is
          else Normalize_Pathname (File_Name));
 
    function Lines_String
-     (Sloc_Range : Tokens.Source_Location_Range) return String is
+     (Sloc_Range : Slocs.Source_Location_Range) return String is
       (Image (Integer (Sloc_Range.Start_Line)) & ": " &
        Image (Integer (Sloc_Range.End_Line)));
 
@@ -210,6 +226,9 @@ package body METRICS.Actions is
 
    function Metric_Name_String (Metric : Metrics_Enum) return String;
    --  Name of the metric for printing in text
+
+   --  Below, Depth parameters are the nesting depth, starting with 0 for the
+   --  global metrics.
 
    function Should_Print
      (Metric : Metrics_Enum;
@@ -244,13 +263,11 @@ package body METRICS.Actions is
       Metrics_To_Compute : Metrics_Set;
       First, Last : Metrics_Enum;
       M : Metrix;
-      Depth : Natural;
-      Global : Boolean := False);
+      Depth : Natural);
    --  Prints a range of metrics. This is needed because the metrics are
    --  printed in groups (line metrics, contract metrics, etc).  Name is the
    --  name of the group, e.g. "=== Lines metrics ===". Prints the name
-   --  followed by metrics First..Last. Global is True when printing the
-   --  global metrics for all files.
+   --  followed by metrics First..Last.
 
    procedure Print_Metrix
      (Cmd : Command_Line;
@@ -263,11 +280,7 @@ package body METRICS.Actions is
    procedure XML_Print_Metrix_Vals
      (Metrics_To_Compute : Metrics_Set;
       M : Metrix;
-      Do_Complexity_Metrics : Boolean;
       Depth : Natural);
-   --  Do_Complexity_Metrics is true if we should print complexity
-   --  metrics. This is so we can put average complexity metrics for the
-   --  file at the end.
 
    procedure XML_Print_Metrix
      (Cmd : Command_Line;
@@ -276,6 +289,19 @@ package body METRICS.Actions is
       M : Metrix;
       Depth : Natural);
    --  Print the metrics for one node in XML form
+
+   function Get_Outer_Unit (Node : Ada_Node) return Ada_Node is
+      Lib_Item_Or_Subunit : constant Ada_Node :=
+        F_Body (Compilation_Unit (Node));
+   begin
+      return
+        (case Kind (Lib_Item_Or_Subunit) is
+           when Library_Item_Kind =>
+              Ada_Node (F_Item (Library_Item (Lib_Item_Or_Subunit))),
+           when Subunit_Kind =>
+              Ada_Node (F_Body (Subunit (Lib_Item_Or_Subunit))),
+           when others => raise Program_Error);
+   end Get_Outer_Unit;
 
    function Assertion_Kind (Node : Ada_Node) return Assertion_Enum is
       Contract_Cases : constant Wide_Wide_String := "contract_cases";
@@ -287,7 +313,7 @@ package body METRICS.Actions is
          when Pragma_Node_Kind =>
             declare
                Pragma_Name : constant Text_Type :=
-                 L_Name (F_Id (Pragma_Node (Node)), Unit);
+                 L_Name (F_Id (Pragma_Node (Node)));
             begin
                if Pragma_Name = "assert" then
                   return Other_Assertion;
@@ -301,7 +327,7 @@ package body METRICS.Actions is
                case Kind (Id) is
                   when Identifier_Kind =>
                      declare
-                        Text : constant Text_Type := L_Name (Id, Unit);
+                        Text : constant Text_Type := L_Name (Id);
                      begin
                         if Text = Pre then
                            return Other_Assertion;
@@ -315,9 +341,9 @@ package body METRICS.Actions is
                   when Attribute_Ref_Kind =>
                      declare
                         Prefix : constant Text_Type :=
-                          L_Name (F_Prefix (Attribute_Ref (Id)), Unit);
+                          L_Name (F_Prefix (Attribute_Ref (Id)));
                         Attr : constant Text_Type :=
-                          L_Name (F_Attribute (Attribute_Ref (Id)), Unit);
+                          L_Name (F_Attribute (Attribute_Ref (Id)));
                      begin
                         if Attr = Class then
                            if Prefix = Pre then
@@ -535,18 +561,10 @@ package body METRICS.Actions is
 
             if Kind (M.Node) = Compilation_Unit_Kind then
                declare
-                  First_Body : constant Ada_Node :=
-                    Childx (F_Bodies (Compilation_Unit (M.Node)), 0);
-                  Lib_Item : constant Ada_Node :=
-                    (case Kind (First_Body) is
-                       when Library_Item_Kind =>
-                          Ada_Node (F_Item (Library_Item (First_Body))),
-                       when Subunit_Kind =>
-                          Ada_Node (F_Body (Subunit (First_Body))),
-                       when others => raise Program_Error);
+                  Outer_Unit : constant Ada_Node := Get_Outer_Unit (M.Node);
                begin
-                  return Has_Complexity_Metrics (Lib_Item, Lib_Item => True)
-                    or else Kind (Lib_Item) in
+                  return Has_Complexity_Metrics (Outer_Unit, Lib_Item => True)
+                    or else Kind (Outer_Unit) in
                       Package_Decl_Kind | Generic_Package_Decl_Kind |
                       Protected_Body_Kind;
                   --  Why [generic] pkg and protected????
@@ -615,20 +633,23 @@ package body METRICS.Actions is
       Metrics_To_Compute : Metrics_Set;
       First, Last : Metrics_Enum;
       M : Metrix;
-      Depth : Natural;
-      Global : Boolean := False)
+      Depth : Natural)
    is
       Indentation_Amount : constant Natural :=
-        (if Global
+        (if Depth = 0
+           then 2
+         elsif Depth = 1 and then First in Lines_Metrics
            then 2
          elsif Name = Average_Complexity_Metrics
            then 2 * Default_Indentation_Amount
          else Default_Indentation_Amount);
+      --  Indentation_Amount, and Tab below, are intended to mimic some
+      --  partially arbitrary behavior of gnatmetric.
    begin
       if Should_Print_Any
         (First, Last, Metrics_To_Compute, M, Depth, XML => False)
       then
-         if not Global then
+         if Depth /= 0 then
             Put ("\n");
          end if;
 
@@ -645,14 +666,24 @@ package body METRICS.Actions is
                        (if Name = Average_Complexity_Metrics
                           then XML_Metric_Name_String (I)
                           else Metric_Name_String (I));
+                     Tab : constant Positive :=
+                         (if Depth = 0 and then I in Lines_Metrics
+                            then 22
+                          elsif Depth = 0 or else I in Lines_Metrics
+                            then 21
+                            else 26);
                   begin
                      Put ("\1", Metric_Name);
-                     Tab_To_Column (Indentation + (if Global then 21 else 26));
+                     Tab_To_Column (Indentation + Tab);
                      Put (": \1\n", Val_To_Print (I, M, XML => False));
                   end;
                end if;
             end if;
          end loop;
+
+         if Depth = 0 and then First in Lines_Metrics then
+            Put ("\n");
+         end if;
 
          Outdent (Indentation_Amount);
       end if;
@@ -690,33 +721,31 @@ package body METRICS.Actions is
       if Kind (M.Node) = Compilation_Unit_Kind then
          declare
             pragma Assert (Length (M.Submetrix) = 1);
-            Lib_Item : constant Ada_Node := Get (M.Submetrix, 0).Node;
-            --  Note this isn't what libadalang calls
-            --  Library_Item; this is the package body or whatever node.
-            --  ????????????????Lib_Item could be a subunit.
-            First_Body : constant Ada_Node :=
-              Childx (F_Bodies (Compilation_Unit (M.Node)), 0);
+            Outer_Unit : constant Ada_Node := Get_Outer_Unit (M.Node);
+            pragma Assert (Outer_Unit = Get (M.Submetrix, 0).Node);
             Subunit_Parent : constant String :=
-              (if Kind (First_Body) = Subunit_Kind
+              (if Unit_Is_Subunit (Outer_Unit)
                  then "subunit " &
-                   To_UTF8 (Full_Name (F_Name (Subunit (First_Body)))) &
+                   To_UTF8
+                     (Full_Name
+                       (F_Name
+                         (Subunit (F_Body (Compilation_Unit (M.Node)))))) &
                    "."
                  else "");
          begin
             Put ("Metrics computed for \1\n",
                  File_Name_To_Print (Cmd, File_Name));
             Put ("containing \1 \2\3\n",
-                 Node_Kind_String_For_Header (Lib_Item),
+                 Node_Kind_String_For_Header (Outer_Unit),
                  Subunit_Parent,
-                 To_UTF8 (Full_Name (Get_Def_Name (Lib_Item))));
+                 To_UTF8 (Full_Name (Get_Def_Name (Outer_Unit))));
          end;
 
       else
          declare
-            P : constant Ada_Node := Parent (M.Node);
             LI_Sub : constant String :=
               (if Depth = 2
-                 then (if Kind (P) = Subunit_Kind
+                 then (if Unit_Is_Subunit (M.Node)
                          then " - subunit"
                          else " - library item")
                  else "");
@@ -818,7 +847,7 @@ package body METRICS.Actions is
          when Extra_Exit_Points =>
             return "extra_exit_points";
          when Lines =>
-            return "lines";
+            return "all_lines";
          when Lines_Code =>
             return "lines_code";
          when Lines_Comment =>
@@ -871,7 +900,6 @@ package body METRICS.Actions is
    procedure XML_Print_Metrix_Vals
      (Metrics_To_Compute : Metrics_Set;
       M : Metrix;
-      Do_Complexity_Metrics : Boolean;
       Depth : Natural)
    is
    begin
@@ -879,12 +907,10 @@ package body METRICS.Actions is
 
       for I in M.Vals'Range loop
          if Should_Print (I, Metrics_To_Compute, M, Depth, XML => True) then
-            if Do_Complexity_Metrics or else I not in Complexity_Metrics then
-               if True or else M.Vals (I) /= 0 then -- ???
-                  Put ("<metric name=\1>\2</metric>\n",
-                       Q (XML_Metric_Name_String (I)),
-                       Val_To_Print (I, M, XML => True));
-               end if;
+            if True or else M.Vals (I) /= 0 then -- ???
+               Put ("<metric name=\1>\2</metric>\n",
+                    Q (XML_Metric_Name_String (I)),
+                    Val_To_Print (I, M, XML => True));
             end if;
          end if;
       end loop;
@@ -899,6 +925,30 @@ package body METRICS.Actions is
       M : Metrix;
       Depth : Natural)
    is
+
+      Complexity_Only : constant Metrics_Set :=
+        (Complexity_Metrics => True, others => False);
+      --  Set of complexity metrics
+
+      To_Print_First : constant Metrics_Set :=
+        Metrics_To_Compute and
+          (if Kind (M.Node) = Compilation_Unit_Kind
+             then not Complexity_Only
+             else Metrics_Set'(others => True));
+      --  Set of metrics to print first, before printing subtrees. Same as
+      --  Metrics_To_Compute, except at the top level, we leave out complexity
+      --  metrics, because they will be printed last.
+
+      To_Print_Last : constant Metrics_Set :=
+        Metrics_To_Compute and
+          (if Kind (M.Node) = Compilation_Unit_Kind
+               and then M.Num_With_Complexity > 0
+             then Complexity_Only
+             else Metrics_Set'(others => False));
+      --  Set of metrics to print last, after printing subtrees. This is
+      --  normally empty. At the top level it is the intersection of
+      --  Metrics_To_Compute and Complexity_Only, but only if we have
+      --  some with complexity metrics.
    begin
       --  Return immediately if M is for a Contract_Complexity_Eligible node,
       --  and we're not going to print. Also don't print metrics for "eligible
@@ -923,7 +973,7 @@ package body METRICS.Actions is
          Put ("<file name=\1>\n", Q (File_Name_To_Print (Cmd, File_Name)));
       else
          declare
-            Sloc : constant Tokens.Source_Location_Range :=
+            Sloc : constant Slocs.Source_Location_Range :=
               Sloc_Range (M.Node);
          begin
             Put ("<unit name=\1 kind=\2 line=\3 col=\4>\n",
@@ -936,10 +986,7 @@ package body METRICS.Actions is
 
       --  Print metrics for this unit
 
-      XML_Print_Metrix_Vals
-        (Metrics_To_Compute, M,
-         Do_Complexity_Metrics => Kind (M.Node) /= Compilation_Unit_Kind,
-         Depth => Depth);
+      XML_Print_Metrix_Vals (To_Print_First, M, Depth => Depth);
 
       --  Then recursively print metrix of nested units
 
@@ -951,10 +998,7 @@ package body METRICS.Actions is
       --  At the file level, average complexity metrics go at the end:
 
       if Kind (M.Node) = Compilation_Unit_Kind then
-         XML_Print_Metrix_Vals
-           (Metrics_To_Compute, M,
-            Do_Complexity_Metrics => M.Num_With_Complexity > 0,
-            Depth => Depth);
+         XML_Print_Metrix_Vals (To_Print_Last, M, Depth => Depth);
          Put ("</file>\n");
       else
          Put ("</unit>\n");
@@ -991,12 +1035,14 @@ package body METRICS.Actions is
      (Tool : in out Metrics_Tool'Class;
       Cmd : Command_Line;
       File_Name : String;
-      CU_Node : Ada_Node;
+      CU_List : Ada_Node;
       Metrics_To_Compute : Metrics_Set)
    is
-      pragma Assert (CU_Node /= null);
-      pragma Assert (Kind (CU_Node) = Compilation_Unit_Kind);
---    pragma Assert (Child_Count (F_Bodies (Compilation_Unit (CU_Node))) = 1);
+      pragma Assert (CU_List /= null);
+--      pragma Assert (Kind (CU_List) = List_Kind);
+--    pragma Assert (Child_Count (CU_List) = 1);
+      --  libadalang supports multiple compilation units per file,
+      --  but gnatmetric does not, and lalmetric does not yet.
 
       Metrix_Stack : Metrix_Vectors.Vector renames Tool.Metrix_Stack;
       --  Why don't we use Fast_Vectors????
@@ -1011,16 +1057,10 @@ package body METRICS.Actions is
          end loop;
       end Inc_All;
 
-      First_Body : constant Ada_Node :=
-        Childx (F_Bodies (Compilation_Unit (CU_Node)), 0);
-      Lib_Item : constant Ada_Node :=
-        (case Kind (First_Body) is
-           when Library_Item_Kind =>
-              Ada_Node (F_Item (Library_Item (First_Body))),
-           when Subunit_Kind =>
-              Ada_Node (F_Body (Subunit (First_Body))),
-           when others => raise Program_Error);
-      --  ????????????????Could be subunit
+      --  CU_Node : constant Ada_Node := Childx (CU_List, 0);
+      CU_Node : constant Ada_Node := CU_List;
+      pragma Assert (Kind (CU_Node) = Compilation_Unit_Kind);
+      Outer_Unit : constant Ada_Node := Get_Outer_Unit (CU_Node);
 
       Node_Stack : Ada_Node_Vectors.Vector;
       --  Stack of all nodes currently being walked
@@ -1092,6 +1132,9 @@ package body METRICS.Actions is
       --  Contract_Complexity metric, even though that's considered a "contract
       --  metric".
 
+      procedure Gather_Line_Metrics (Node : Ada_Node; M : in out Metrix);
+      --  Compute line metrics
+
       procedure Gather_Contract_Metrics (Node : Ada_Node);
       --  Compute contract metrics, except for Contract_Complexity, which is
       --  handled by Cyclomate.
@@ -1137,7 +1180,7 @@ package body METRICS.Actions is
          --  Metrix_Stack around the call to Gather_Metrics_And_Walk_Children;
          --  otherwise we just call Gather_Metrics_And_Walk_Children.
 
-         if Node = Lib_Item or else Kind (Node) in Eligible then
+         if Node = Outer_Unit or else Kind (Node) in Eligible then
             declare
                File_M : Metrix renames Get (Metrix_Stack, 1).all;
                Parent : Metrix renames
@@ -1426,6 +1469,34 @@ package body METRICS.Actions is
          end case;
       end Cyclomate;
 
+      procedure Gather_Line_Metrics (Node : Ada_Node; M : in out Metrix) is
+         Global_M : Metrix renames Get (Metrix_Stack, 0).all;
+      begin
+         if Node = M.Node then
+            declare
+               Sloc : constant Slocs.Source_Location_Range :=
+                 Sloc_Range (Node);
+               use type Interfaces.Unsigned_32;
+               Start : constant Interfaces.Unsigned_32 :=
+                 (if Kind (Node) = Compilation_Unit_Kind
+                    then 1
+                    else Sloc.Start_Line);
+               --  At the file level, we want to include all the comments and
+               --  blank lines preceding the compilation unit. We should also
+               --  include trailing lines, but we don't do that yet.
+
+               Lines_Count : constant Metric_Int :=
+                 Metric_Int (Sloc.End_Line - Start + 1);
+            begin
+               pragma Assert (M.Vals (Lines) = 0);
+               M.Vals (Lines) := Lines_Count;
+               if Kind (Node) = Compilation_Unit_Kind then
+                  Inc (Global_M.Vals (Lines), Lines_Count);
+               end if;
+            end;
+         end if;
+      end Gather_Line_Metrics;
+
       procedure Gather_Contract_Metrics (Node : Ada_Node) is
          Vis_Decls : constant List_Ada_Node := Visible_Part (Node);
 
@@ -1568,6 +1639,8 @@ package body METRICS.Actions is
          With_Trivia : constant Children_Arrays.Array_Type :=
            Children_With_Trivia (Node);
 
+         use type Lexer.Token_Kind;
+
       --  Start of processing for Gather_Metrics_And_Walk_Children
 
       begin
@@ -1576,8 +1649,12 @@ package body METRICS.Actions is
                Put_Children_Array (With_Trivia);
                Put ("----\n");
                Stop (Node, Trivium.Trivia.Text.all);
-               pragma Assert (Trivium.Trivia.Id = Lexer.QUEX_TKN_COMMENT);
                exit;
+            end if;
+         end loop;
+         for Trivium of With_Trivia loop
+            if Trivium.Kind = Trivia then
+               pragma Assert (Trivium.Trivia.Kind = Lexer.Ada_Comment);
             end if;
          end loop;
 
@@ -1673,6 +1750,7 @@ package body METRICS.Actions is
                when others => null;
             end case;
 
+            Gather_Line_Metrics (Node, M);
             Gather_Syntax_Metrics (Node, M);
 
             if Kind (Node) in
@@ -1680,7 +1758,7 @@ package body METRICS.Actions is
                 Task_Def_Kind | Protected_Def_Kind
               and then In_Visible_Part
             then
-               --  We only gather contract metrics for public subprograms
+               --  We gather contract metrics only for public subprograms
 
                Gather_Contract_Metrics (Node);
             end if;
@@ -1851,6 +1929,7 @@ package body METRICS.Actions is
               (if Arg (Cmd, Xml_File_Name) = null
                  then "metrix.xml"
                  else Arg (Cmd, Xml_File_Name).all)));
+      --  Actually, gnatmetric seems to ignore Output_Dir for the xml
 
       M : constant Metrix_Ref := new Metrix;
 
@@ -1942,20 +2021,17 @@ package body METRICS.Actions is
            ("Line metrics " & Summed,
             Metrics_To_Compute,
             Lines_Metrics'First, Lines_Metrics'Last, M.all,
-            Depth => 0,
-            Global => True);
+            Depth => 0);
          Print_Range
            ("Contract metrics " & Summed,
             Metrics_To_Compute,
             Contract_Metrics'First, Contract_Metrics'Last, M.all,
-            Depth => 0,
-            Global => True);
+            Depth => 0);
          Print_Range
            ("Element metrics " & Summed,
             Metrics_To_Compute,
             Syntax_Metrics'First, Syntax_Metrics'Last, M.all,
-            Depth => 0,
-            Global => True);
+            Depth => 0);
 
          if Arg (Cmd, Global_File_Name) /= null then
             if not Output_To_Standard_Output then
@@ -1971,9 +2047,7 @@ package body METRICS.Actions is
          if not Output_To_Standard_Output then
             Text_IO.Set_Output (Tool.XML);
          end if;
-         XML_Print_Metrix_Vals
-           (Metrics_To_Compute, M.all,
-            Do_Complexity_Metrics => False, Depth => 0);
+         XML_Print_Metrix_Vals (Metrics_To_Compute, M.all, Depth => 0);
          Put ("</global>\n");
          if not Output_To_Standard_Output then
             Text_IO.Set_Output (Text_IO.Standard_Output);
@@ -2007,7 +2081,6 @@ package body METRICS.Actions is
          PP_Trivia (Unit);
       end if;
 
-      Actions.Unit := Unit;
       Walk (Tool, Cmd, File_Name, Root (Unit), Metrics_To_Compute);
    end Per_File_Action;
 

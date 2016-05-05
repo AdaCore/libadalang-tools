@@ -36,9 +36,6 @@ procedure Contract_Coverage is
 
    Unit : Analysis_Unit;
 
-   function Full_Name (Nm : Libadalang.AST.Types.Name) return Text_Type is
-     (Full_Name (Nm, Unit));
-
    function Has_Contracts (Subp_Decl : Ada_Node) return Boolean;
    --  True if the subprogram has contract aspects
 
@@ -70,8 +67,7 @@ procedure Contract_Coverage is
                      declare
                         Text : constant Text_Type :=
                           To_Lower
-                            (Get_Token
-                              (Unit, F_Tok (Single_Tok_Node (Id))).Text.all);
+                            (Data (F_Tok (Single_Tok_Node (Id))).Text.all);
                      begin
                         if Text = "contract_cases"
                           or else Text = "pre"

@@ -1,7 +1,6 @@
 with Langkit_Support.Text; use Langkit_Support.Text;
 
 with Libadalang; use Libadalang;
-with Libadalang.Analysis; use Libadalang.Analysis;
 with Libadalang.AST; use Libadalang.AST;
 with Libadalang.AST.Types; use Libadalang.AST.Types;
 
@@ -43,19 +42,17 @@ package LAL_Extensions is
    --  Same as above, except return an array of the relevant nodes
 
    function Id_Name
-     (Nm : access Ada_Node_Type'Class;
-      Unit : Analysis_Unit)
+     (Nm : access Ada_Node_Type'Class)
      return Text_Type with
      Pre => Kind (Nm) = Identifier_Kind;
    function L_Name
-     (Nm : access Ada_Node_Type'Class;
-      Unit : Analysis_Unit)
+     (Nm : access Ada_Node_Type'Class)
      return Text_Type with
      Pre => Kind (Nm) = Identifier_Kind;
    --  Text name of an identifier. The L_Name is converted to lower
    --  case.
 
-   function Full_Name (Nm : Name; Unit : Analysis_Unit) return Text_Type;
+   function Full_Name (Nm : Name) return Text_Type;
    --  Returns the full expanded name
 
    function Get_Def_Name (Decl : Ada_Node) return Name;

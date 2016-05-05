@@ -74,7 +74,8 @@ private
       --  Metrix_Stack[0] is the global Metrix (totals for all files).
       --
       --  Metrix_Stack[1] is the Metrix for the Compilation_Unit node.
-      --  This is for per-file metrics.
+      --  This is for per-file metrics. Note that lalmetric does not
+      --  yet support multiple compilation units per file.
       --
       --  Metrix_Stack[2] is the Metrix for the library item within that; this
       --  is a Package_Decl, Package_Body, or whatever node.
