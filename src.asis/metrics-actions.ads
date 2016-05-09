@@ -9,6 +9,7 @@ with LAL_UL.Command_Lines; use LAL_UL.Command_Lines;
 with LAL_UL.Tools; use LAL_UL.Tools;
 
 with METRICS.Command_Lines; use METRICS.Command_Lines;
+with METRICS.Line_Counting; use METRICS.Line_Counting;
 
 package METRICS.Actions is
 
@@ -25,9 +26,7 @@ package METRICS.Actions is
 
 private
 
-   subtype Metric_Int is Natural;
-
-   type Metrics_Values is array (Metrics_Enum) of Metric_Int;
+   type Metrics_Values is array (Metrics_Enum) of Metric_Nat;
 
    type Metrix;
    type Metrix_Ref is access all Metrix;
@@ -54,7 +53,7 @@ private
          Contract_Complexity => 1,
          others => 0);
 
-      Num_With_Complexity : Metric_Int := 0;
+      Num_With_Complexity : Metric_Nat := 0;
       --  Number of descendants for which complexity metrics apply. Used
       --  only for the Compilation_Unit, which is used to represent the
       --  per-file metrics.

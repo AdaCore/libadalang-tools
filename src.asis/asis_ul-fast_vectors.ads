@@ -131,6 +131,7 @@ package ASIS_UL.Fast_Vectors is
    procedure Append (Container : in out Vector; New_Item : Element_Type);
 
    type Element_Access is access all Element_Type;
+   function Last_Ptr (Container : in out Vector) return Element_Access;
    function Append (Container : in out Vector) return Element_Access;
 
    procedure Delete_Last (Container : in out Vector);

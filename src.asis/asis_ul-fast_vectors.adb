@@ -498,6 +498,11 @@ package body ASIS_UL.Fast_Vectors is
    -- Last --
    ----------
 
+   function Last_Ptr (Container : in out Vector) return Element_Access is
+   begin
+      return Container.Elements.EA (Container.Last)'Unrestricted_Access;
+   end Last_Ptr;
+
    function Last (Container : Vector) return Cursor is
    begin
       if Is_Empty (Container) then

@@ -111,9 +111,14 @@ package METRICS.Command_Lines is
       Lines_Code,
       Lines_Comment,
       Lines_Eol_Comment,
-      Lines_Ratio, -- ????Requires above counts?
+      Lines_Ratio,
       Lines_Blank,
       Lines_Average, -- global
+      Lines_Code_In_Bodies, -- undocumented, not included in Lines_All
+      Num_Bodies,
+      --  Lines_Code_In_Bodies is the number of code lines in various
+      --  bodies, and Num_Bodies is the number of various bodies. These
+      --  are used to compute Lines_Average, as the ratio of these.
 
    --  Syntax element metrics options:
       Declarations,
@@ -160,7 +165,7 @@ package METRICS.Command_Lines is
    subtype Complexity_Metrics is Metrics_Booleans
      range Complexity_Statement .. Extra_Exit_Points;
    subtype Lines_Metrics is Metrics_Booleans
-     range Lines .. Lines_Average;
+     range Lines .. Lines_Average; -- not Lines_Code_In_Bodies, Num_Bodies
    subtype Syntax_Metrics is Metrics_Booleans
      range Declarations .. Param_Number;
    subtype Coupling_Metrics is Metrics_Booleans
@@ -183,8 +188,8 @@ package METRICS.Command_Lines is
 --         Lines_Code         => +"-lcode",
 --         Lines_Comment      => +"-lcomm",
 --         Lines_Eol_Comment  => +"-leol",
---         Lines_Blank        => +"-lb",
 --         Lines_Ratio        => +"-lratio",
+--         Lines_Blank        => +"-lb",
 --         Lines_Average      => +"-lav",
 --         Unit_Nesting       => +"-enu",
 --         Statements         => +"-es",

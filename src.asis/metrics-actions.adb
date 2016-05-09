@@ -111,6 +111,9 @@ package body METRICS.Actions is
 
    function Output_Dir (Cmd : Command_Line) return String;
 
+   procedure Validate (M : Metrix);
+   --  For testing/debugging. Check consistency of M.
+
    procedure Destroy (M : in out Metrix_Ref);
    --  Reclaim memory for a tree of Metrix records
 
@@ -119,22 +122,10 @@ package body METRICS.Actions is
       Cmd : Command_Line;
       File_Name : String;
       CU_List : Ada_Node;
+      Cumulative : Cumulative_Counts_Array;
       Metrics_To_Compute : Metrics_Set);
 
    use Ada_Node_Vectors;
-
-   procedure Inc (X : in out Metric_Int; By : Metric_Int := 1);
-   procedure Dec (X : in out Metric_Int; By : Metric_Int := 1);
-
-   procedure Inc (X : in out Metric_Int; By : Metric_Int := 1) is
-   begin
-      X := X + By;
-   end Inc;
-
-   procedure Dec (X : in out Metric_Int; By : Metric_Int := 1) is
-   begin
-      X := X - By;
-   end Dec;
 
    subtype Gnatmetric_Eligible is Ada_Node_Type_Kind with
      Predicate => Gnatmetric_Eligible in
@@ -217,6 +208,9 @@ package body METRICS.Actions is
    function Node_Kind_String (Node : Ada_Node) return String;
    --  Name of the node kind for printing in both XML and text
 
+   procedure Write_XML_Schema (Xsd_File_Name : String);
+   --  Write the XSD file
+
    function XML (X : Text_Type) return String;
    --  Returns X, converted to UTF8, and with replacements like "&" -->
    --  "&amp", and quoted.
@@ -257,6 +251,7 @@ package body METRICS.Actions is
    --  complexity metric, and we are printing the "totals" for the file, we
    --  don't actually want to print the total. We want to print the average.
    --  We prefix the average with an extra blank if it's not XML.
+   --  Lines_Average is also an average.
 
    procedure Print_Range
      (Name : String;
@@ -482,7 +477,10 @@ package body METRICS.Actions is
             return "maximum loop nesting";
          when All_Subprograms =>
             return "all subprogram bodies";
-         --  ????More 'when's go here.
+         when Lines_Eol_Comment =>
+            return "end-of-line comments";
+         when Lines_Average =>
+            return "Average lines in body";
 
          when others =>
             return Replace_String
@@ -514,8 +512,17 @@ package body METRICS.Actions is
       end if;
 
       case Metric is
-         when Lines_Metrics =>
+         when Lines |
+           Lines_Code |
+           Lines_Comment |
+           Lines_Eol_Comment |
+           Lines_Blank |
+           Lines_Ratio =>
             return True;
+         when Lines_Code_In_Bodies | Num_Bodies =>
+            return Depth = 0;
+         when Lines_Average =>
+            return Depth = 0;
 
          when All_Subprograms =>
             return (Depth = 2
@@ -582,8 +589,10 @@ package body METRICS.Actions is
      (Metric : Metrics_Enum; M : Metrix; XML : Boolean) return String is
       type Fixed is delta 0.01 digits 8;
    begin
-      if Metric in Complexity_Metrics
-        and then Kind (M.Node) = Compilation_Unit_Kind
+      if (Metric in Complexity_Metrics
+            and then Kind (M.Node) = Compilation_Unit_Kind)
+      or else (Metric = Lines_Average
+            and then M.Node = null)
       then
          if Metric = Loop_Nesting then
             --  We want the total here, not the average.
@@ -604,20 +613,52 @@ package body METRICS.Actions is
             --  those were initialized to 1 in the subnodes, and not
             --  incremented in the file-level data.
 
-            pragma Assert (M.Num_With_Complexity > 0);
-            Adjust : constant Metric_Int :=
+            Num : constant Metric_Nat :=
+              (if Metric = Lines_Average
+                 then (if M.Vals (Num_Bodies) = 0
+                         then 1
+                         else M.Vals (Num_Bodies))
+                 else M.Num_With_Complexity);
+            --  Number of items (divide by this to compute average)
+            pragma Assert (Num > 0);
+            Adjust : constant Metric_Nat :=
               (if Metric in Complexity_Statement |
                             Complexity_Cyclomatic |
                             Complexity_Essential
-                 then M.Num_With_Complexity - 1
+                 then Num - 1
                  else 0);
+            Numerator_Metric : constant Metrics_Enum :=
+              (if Metric = Lines_Average
+                then Lines_Code_In_Bodies
+                else Metric);
+            --  Metric whose value is used as the numerator when
+            --  computing the average. For complexity metrics, that
+            --  the Metric itself, but for Lines_Average, we need to
+            --  divide Lines_Code_In_Bodies by something.
             Av : constant Float :=
-              Float (M.Vals (Metric) + Adjust) / Float (M.Num_With_Complexity);
+              Float (M.Vals (Numerator_Metric) + Adjust) / Float (Num);
             Img : constant String := Fixed (Av)'Img;
          begin
             pragma Assert (Img'First = 1 and then Img (1) = ' ');
-            return (if XML then "" else " ") & Img (2 .. Img'Last);
+            return (if XML or else Metric = Lines_Average then "" else " ") &
+                   Img (2 .. Img'Last);
          end;
+
+      elsif Metric = Lines_Ratio then
+         declare
+            --  Mimic gnatmetric, here:
+            Comments : constant Float :=
+              Float (M.Vals (Lines_Comment)) +
+              Float (M.Vals (Lines_Eol_Comment));
+            Code : constant Float :=
+              Float (M.Vals (Lines_Comment)) +
+              Float (M.Vals (Lines_Code));
+            Img : constant String := Fixed (Comments / Code * 100.0)'Img;
+         begin
+            pragma Assert (Img'First = 1 and then Img (1) = ' ');
+            return Img (2 .. Img'Last);
+         end;
+
       else
          return Image (M.Vals (Metric));
       end if;
@@ -635,16 +676,6 @@ package body METRICS.Actions is
       M : Metrix;
       Depth : Natural)
    is
-      Indentation_Amount : constant Natural :=
-        (if Depth = 0
-           then 2
-         elsif Depth = 1 and then First in Lines_Metrics
-           then 2
-         elsif Name = Average_Complexity_Metrics
-           then 2 * Default_Indentation_Amount
-         else Default_Indentation_Amount);
-      --  Indentation_Amount, and Tab below, are intended to mimic some
-      --  partially arbitrary behavior of gnatmetric.
    begin
       if Should_Print_Any
         (First, Last, Metrics_To_Compute, M, Depth, XML => False)
@@ -654,7 +685,6 @@ package body METRICS.Actions is
          end if;
 
          Put ("\1\n", Name);
-         Indent (Indentation_Amount);
 
          for I in First .. Last loop
             if Should_Print
@@ -666,16 +696,34 @@ package body METRICS.Actions is
                        (if Name = Average_Complexity_Metrics
                           then XML_Metric_Name_String (I)
                           else Metric_Name_String (I));
+                     Indentation_Amount : constant Natural :=
+                       (if I = Lines_Average
+                          then 0
+                        elsif Depth = 0
+                          then 2
+                        elsif Depth = 1 and then First in Lines_Metrics
+                          then 2
+                        elsif Name = Average_Complexity_Metrics
+                          then 2 * Default_Indentation_Amount
+                        else Default_Indentation_Amount);
+                     --  Indentation_Amount, and Tab below, are
+                     --  intended to mimic some partially arbitrary
+                     --  behavior of gnatmetric.
                      Tab : constant Positive :=
-                         (if Depth = 0 and then I in Lines_Metrics
-                            then 22
-                          elsif Depth = 0 or else I in Lines_Metrics
-                            then 21
-                            else 26);
+                       (if Depth = 0 and then I in Lines_Metrics
+                          then 22
+                        elsif Depth = 0 or else I in Lines_Metrics
+                          then 21
+                        else 26);
                   begin
+                     Indent (Indentation_Amount);
+                     if I = Lines_Average then -- gnatmetric puts extra line
+                        Put ("\n");
+                     end if;
                      Put ("\1", Metric_Name);
                      Tab_To_Column (Indentation + Tab);
                      Put (": \1\n", Val_To_Print (I, M, XML => False));
+                     Outdent (Indentation_Amount);
                   end;
                end if;
             end if;
@@ -684,8 +732,6 @@ package body METRICS.Actions is
          if Depth = 0 and then First in Lines_Metrics then
             Put ("\n");
          end if;
-
-         Outdent (Indentation_Amount);
       end if;
    end Print_Range;
 
@@ -697,6 +743,8 @@ package body METRICS.Actions is
       Depth : Natural)
    is
    begin
+      Validate (M);
+
       --  Return immediately if M is for a Contract_Complexity_Eligible node,
       --  and we're not going to print. Also don't print metrics for "eligible
       --  local program units" if the -nolocal switch was given.
@@ -849,17 +897,21 @@ package body METRICS.Actions is
          when Lines =>
             return "all_lines";
          when Lines_Code =>
-            return "lines_code";
+            return "code_lines";
          when Lines_Comment =>
-            return "lines_comment";
+            return "comment_lines";
          when Lines_Eol_Comment =>
-            return "lines_eol_comment";
-         when Lines_Ratio =>
-            return "lines_ratio";
+            return "eol_comments";
          when Lines_Blank =>
-            return "lines_blank";
+            return "blank_lines";
          when Lines_Average =>
-            return "lines_average";
+            return "average_lines_in_bodies";
+         when Lines_Code_In_Bodies =>
+            return "lines_in_bodies";
+         when Num_Bodies =>
+            return "num_bodies";
+         when Lines_Ratio =>
+            return "comment_percentage";
          when Declarations =>
             return "all_dcls";
          when Statements =>
@@ -925,7 +977,6 @@ package body METRICS.Actions is
       M : Metrix;
       Depth : Natural)
    is
-
       Complexity_Only : constant Metrics_Set :=
         (Complexity_Metrics => True, others => False);
       --  Set of complexity metrics
@@ -1036,6 +1087,7 @@ package body METRICS.Actions is
       Cmd : Command_Line;
       File_Name : String;
       CU_List : Ada_Node;
+      Cumulative : Cumulative_Counts_Array;
       Metrics_To_Compute : Metrics_Set)
    is
       pragma Assert (CU_List /= null);
@@ -1047,10 +1099,10 @@ package body METRICS.Actions is
       Metrix_Stack : Metrix_Vectors.Vector renames Tool.Metrix_Stack;
       --  Why don't we use Fast_Vectors????
 
-      procedure Inc_All (Metric : Metrics_Enum; By : Metric_Int := 1);
+      procedure Inc_All (Metric : Metrics_Enum; By : Metric_Nat := 1);
       --  Increment all values on the stack for a given Metric
 
-      procedure Inc_All (Metric : Metrics_Enum; By : Metric_Int := 1) is
+      procedure Inc_All (Metric : Metrics_Enum; By : Metric_Nat := 1) is
       begin
          for M of Metrix_Stack loop
             Inc (M.Vals (Metric), By);
@@ -1105,6 +1157,10 @@ package body METRICS.Actions is
       Private_Part_Count : Natural := 0;
       --  Number of private parts we are nested within. Used for contract
       --  metrics, which are only supposed to be shown for visible subprograms.
+
+      Non_Package_Body_Count : Natural := 0;
+      --  Number of bodies we are nested within, except package bodies
+      --  don't count.
 
       function In_Visible_Part return Boolean is
          (Last_Index (Metrix_Stack) >= 2
@@ -1166,6 +1222,8 @@ package body METRICS.Actions is
                Inc (Loop_Count);
             when Private_Part_Kind =>
                Inc (Private_Part_Count);
+            when Entry_Body_Kind | Subprogram_Body_Kind | Task_Body_Kind =>
+               Inc (Non_Package_Body_Count);
             when others => null;
          end case;
 
@@ -1197,6 +1255,7 @@ package body METRICS.Actions is
                   Inc (File_M.Num_With_Complexity);
                end if;
                Gather_Metrics_And_Walk_Children (Node);
+               Validate (M.all);
                Pop (Metrix_Stack);
                Loop_Count := Saved_Loop_Count;
             end;
@@ -1222,6 +1281,8 @@ package body METRICS.Actions is
                Dec (Loop_Count);
             when Private_Part_Kind =>
                Dec (Private_Part_Count);
+            when Entry_Body_Kind | Subprogram_Body_Kind | Task_Body_Kind =>
+               Dec (Non_Package_Body_Count);
             when others => null;
          end case;
 
@@ -1356,7 +1417,7 @@ package body METRICS.Actions is
          --     to enclosed local procedures, and we for sure do not want to
          --     count enclosed procedures...
 
-         procedure Inc_Cyc (Metric : Metrics_Enum; By : Metric_Int := 1) with
+         procedure Inc_Cyc (Metric : Metrics_Enum; By : Metric_Nat := 1) with
            Pre => Metric in Complexity_Statement | Complexity_Expression;
          --  Increment the specified complexity metric, and also
          --  Complexity_Cyclomatic. Increment the current unit's metrics, as
@@ -1364,7 +1425,7 @@ package body METRICS.Actions is
          --  subprogram declaration, we actually increment the
          --  Contract_Complexity.
 
-         procedure Inc_Cyc (Metric : Metrics_Enum; By : Metric_Int := 1) is
+         procedure Inc_Cyc (Metric : Metrics_Enum; By : Metric_Nat := 1) is
          begin
             if Debug_Flag_V then
                Put ("Inc_Cyc\1 for \2 in \3\n",
@@ -1422,10 +1483,10 @@ package body METRICS.Actions is
             when Select_Statement_Kind =>
                declare
                   S : constant Select_Statement := Select_Statement (Node);
-                  Num_Alts : constant Metric_Int := Child_Count (F_Guards (S));
-                  Num_Else : constant Metric_Int :=
+                  Num_Alts : constant Metric_Nat := Child_Count (F_Guards (S));
+                  Num_Else : constant Metric_Nat :=
                     (if F_Else_Statements (S) = null then 0 else 1);
-                  Num_Abort : constant Metric_Int :=
+                  Num_Abort : constant Metric_Nat :=
                     (if F_Abort_Statements (S) = null then 0 else 1);
                begin
                   Inc_Cyc (Complexity_Statement,
@@ -1470,6 +1531,23 @@ package body METRICS.Actions is
       end Cyclomate;
 
       procedure Gather_Line_Metrics (Node : Ada_Node; M : in out Metrix) is
+         function Should_Gather_Body_Lines return Boolean;
+         --  True if we should gather the Lines_Code_In_Bodies for
+         --  this node. True for entry, subprogram, and task bodies,
+         --  and True for package bodies if there is a statement part.
+
+         function Should_Gather_Body_Lines return Boolean is
+         begin
+            case Kind (Node) is
+               when Package_Body_Kind =>
+                  return F_Statements (Package_Body (Node)) /= null;
+               when Entry_Body_Kind | Subprogram_Body_Kind | Task_Body_Kind =>
+                  return True;
+               when others =>
+                  return False;
+            end case;
+         end Should_Gather_Body_Lines;
+
          Global_M : Metrix renames Get (Metrix_Stack, 0).all;
       begin
          if Node = M.Node then
@@ -1485,14 +1563,73 @@ package body METRICS.Actions is
                --  blank lines preceding the compilation unit. We should also
                --  include trailing lines, but we don't do that yet.
 
-               Lines_Count : constant Metric_Int :=
-                 Metric_Int (Sloc.End_Line - Start + 1);
+               Lines_Count : constant Metric_Nat :=
+                 Metric_Nat (Sloc.End_Line - Start + 1);
             begin
                pragma Assert (M.Vals (Lines) = 0);
                M.Vals (Lines) := Lines_Count;
                if Kind (Node) = Compilation_Unit_Kind then
-                  Inc (Global_M.Vals (Lines), Lines_Count);
+                  Inc (Global_M.Vals (Lines), By => Lines_Count);
                end if;
+
+               for Metric in Cumulative_Metrics loop
+                  declare
+                     Range_Count : Metric_Nat :=
+                       Line_Range_Count
+                         (Cumulative,
+                          First_Line => Start, Last_Line => Sloc.End_Line,
+                          Metric => Metric);
+                  begin
+                     M.Vals (Metric) := Range_Count;
+                     if Kind (Node) = Compilation_Unit_Kind then
+                        Inc (Global_M.Vals (Metric), By => Range_Count);
+                     end if;
+
+                     --  If we're doing Lines_Code, gather the
+                     --  Lines_Code_In_Bodies metric as well. For
+                     --  appropriate nodes, Lines_Code_In_Bodies is
+                     --  the same a Lines_Code, except for package
+                     --  bodies, where we just count the lines in
+                     --  statements (so we overwrite Range_Count in
+                     --  that case).
+
+                     if Metric = Lines_Code
+                       and then Should_Gather_Body_Lines
+                     then
+                        if Kind (Node) = Package_Body_Kind then
+                           declare
+                              Statements_Sloc : constant
+                                Slocs.Source_Location_Range :=
+                                  Sloc_Range
+                                    (Ada_Node
+                                      (F_Statements
+                                        (F_Statements (Package_Body (Node)))));
+                           begin
+                              Range_Count :=
+                                Line_Range_Count
+                                  (Cumulative,
+                                   First_Line => Statements_Sloc.Start_Line,
+                                   Last_Line => Statements_Sloc.End_Line,
+                                   Metric => Metric);
+                           end;
+                        end if;
+
+                        --  Mimic gnatmetric, which counts procedures
+                        --  within procedures, but not their lines.
+
+                        if Node = Outer_Unit
+                          or else Non_Package_Body_Count <= 1
+                          or else Kind (Node) = Package_Body_Kind
+                        then
+                           Inc (Global_M.Vals (Lines_Code_In_Bodies),
+                                By => Range_Count);
+                        end if;
+
+                        Inc (M.Vals (Num_Bodies));
+                        Inc (Global_M.Vals (Num_Bodies));
+                     end if;
+                  end;
+               end loop;
             end;
          end if;
       end Gather_Line_Metrics;
@@ -1863,6 +2000,76 @@ package body METRICS.Actions is
       Destroy (Node_Stack);
    end Walk;
 
+   ----------------------
+   -- Write_XML_Schema --
+   ----------------------
+
+   procedure Write_XML_Schema (Xsd_File_Name : String) is
+      XSD_Out_File : Text_IO.File_Type;
+   begin
+      if not Output_To_Standard_Output then
+         Text_IO.Create (XSD_Out_File, Name => Xsd_File_Name);
+         Text_IO.Set_Output (XSD_Out_File);
+      end if;
+
+      pragma Style_Checks (Off);
+      Put ("<?xml version=""1.0"" encoding=""UTF-8""?>\n");
+      Put ("<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"">\n");
+      Put ("        <xs:element name=""global"">\n");
+      Put ("                <xs:complexType>\n");
+      Put ("                        <xs:sequence>\n");
+      Put ("                                <xs:element ref=""file"" minOccurs=""0"" maxOccurs=""unbounded""/>\n");
+      Put ("                                <xs:element ref=""metric"" minOccurs=""0"" maxOccurs=""unbounded""/>\n");
+      Put ("                                <xs:element ref=""coupling"" minOccurs=""0"" maxOccurs=""1""/>\n");
+      Put ("                        </xs:sequence>\n");
+      Put ("                </xs:complexType>\n");
+      Put ("        </xs:element>\n");
+      Put ("        <xs:element name=""file"">\n");
+      Put ("                <xs:complexType>\n");
+      Put ("                        <xs:sequence>\n");
+      Put ("                                <xs:element ref=""metric"" minOccurs=""0"" maxOccurs=""unbounded""/>\n");
+      Put ("                                <xs:element ref=""unit"" minOccurs=""0"" maxOccurs=""unbounded""/>\n");
+      Put ("                        </xs:sequence>\n");
+      Put ("                        <xs:attribute name=""name"" use=""required"" type=""xs:string""/>\n");
+      Put ("                </xs:complexType>\n");
+      Put ("        </xs:element>\n");
+      Put ("        <xs:element name=""unit"">\n");
+      Put ("                <xs:complexType>\n");
+      Put ("                        <xs:sequence>\n");
+      Put ("                                <xs:element ref=""metric"" minOccurs=""0"" maxOccurs=""unbounded""/>\n");
+      Put ("                                <xs:element ref=""unit"" minOccurs=""0"" maxOccurs=""unbounded""/>\n");
+      Put ("                        </xs:sequence>\n");
+      Put ("                        <xs:attribute name=""name"" use=""required"" type=""xs:string""/>\n");
+      Put ("                        <xs:attribute name=""line"" use=""required"" type=""xs:decimal""/>\n");
+      Put ("                        <xs:attribute name=""kind"" type=""xs:string""/>\n");
+      Put ("                        <xs:attribute name=""col"" use=""required"" type=""xs:byte""/>\n");
+      Put ("                </xs:complexType>\n");
+      Put ("        </xs:element>\n");
+      Put ("        <xs:element name=""metric"">\n");
+      Put ("                <xs:complexType>\n");
+      Put ("                        <xs:simpleContent>\n");
+      Put ("                                <xs:extension base=""xs:decimal"">\n");
+      Put ("                                        <xs:attribute name=""name"" use=""required"" type=""xs:string""/>\n");
+      Put ("                                </xs:extension>\n");
+      Put ("                        </xs:simpleContent>\n");
+      Put ("                </xs:complexType>\n");
+      Put ("        </xs:element>\n");
+      Put ("        <xs:element name=""coupling"">\n");
+      Put ("                <xs:complexType>\n");
+      Put ("                        <xs:sequence>\n");
+      Put ("                                <xs:element ref=""file"" minOccurs=""0"" maxOccurs=""unbounded""/>\n");
+      Put ("                        </xs:sequence>\n");
+      Put ("                </xs:complexType>\n");
+      Put ("        </xs:element>\n");
+      Put ("</xs:schema>\n");
+      pragma Style_Checks (On);
+
+      if not Output_To_Standard_Output then
+         Text_IO.Set_Output (Text_IO.Standard_Output);
+         Text_IO.Close (XSD_Out_File);
+      end if;
+   end Write_XML_Schema;
+
    ----------
    -- Init --
    ----------
@@ -1931,6 +2138,28 @@ package body METRICS.Actions is
                  else Arg (Cmd, Xml_File_Name).all)));
       --  Actually, gnatmetric seems to ignore Output_Dir for the xml
 
+      function Xsd_File_Name return String;
+      --  Return the name of the XSD (schema) file name, which is based
+      --  on the XML file name. In particular if the XML file name
+      --  ends in ".xml", that is replaced by ".xsd"; otherwise,
+      --  ".xsd" is appended. So "foo.xml" --> "foo.xsd", but
+      --  "foo.bar" --> "foo.bar.xsd".
+      --
+      --  Note that this name is written to the XML file, in addition
+      --  to being used to open the XSD file.
+
+      function Xsd_File_Name return String is
+         Norm : constant String  := Normalize_Pathname (Xml_Name);
+         Xml : constant String := ".xml";
+         Xsd : constant String := ".xsd";
+      begin
+         if Has_Suffix (Norm, Suffix => Xml) then
+            return Replace_String (Norm, Xml, Xsd);
+         else
+            return Norm & Xsd;
+         end if;
+      end Xsd_File_Name;
+
       M : constant Metrix_Ref := new Metrix;
 
    --  Start of processing for Init
@@ -1968,7 +2197,8 @@ package body METRICS.Actions is
          end;
       end if;
 
-      --  Put initial lines of XML
+      --  Put initial lines of XML. Also generate XSD file, if
+      --  requested.
 
       if Gen_XML (Cmd) then
          if not Output_To_Standard_Output then
@@ -1976,9 +2206,22 @@ package body METRICS.Actions is
             Text_IO.Set_Output (Tool.XML);
          end if;
          Put ("<?xml version=\1?>\n", Q ("1.0"));
-         Put ("<global>\n");
+
+         if Arg (Cmd, Generate_XML_Schema) then
+            Put ("<global xmlns:xsi=" &
+                 """http://www.w3.org/2001/XMLSchema-instance"" " &
+                 "xsi:noNamespaceSchemaLocation=""\1"">\n",
+                 Xsd_File_Name);
+         else
+            Put ("<global>\n");
+         end if;
+
          if not Output_To_Standard_Output then
             Text_IO.Set_Output (Text_IO.Standard_Output);
+         end if;
+
+         if Arg (Cmd, Generate_XML_Schema) then
+            Write_XML_Schema (Xsd_File_Name);
          end if;
       end if;
    end Init;
@@ -2081,7 +2324,8 @@ package body METRICS.Actions is
          PP_Trivia (Unit);
       end if;
 
-      Walk (Tool, Cmd, File_Name, Root (Unit), Metrics_To_Compute);
+      Walk (Tool, Cmd, File_Name, Root (Unit),
+            Cumulative (Unit), Metrics_To_Compute);
    end Per_File_Action;
 
    ---------------
@@ -2205,5 +2449,18 @@ package body METRICS.Actions is
 
       pragma Style_Checks ("M79");
    end Tool_Help;
+
+   --------------
+   -- Validate --
+   --------------
+
+   procedure Validate (M : Metrix) is
+      L : constant Metric_Nat := M.Vals (Lines);
+   begin
+      pragma Assert (M.Vals (Lines_Code) <= L);
+      pragma Assert (M.Vals (Lines_Comment) <= L);
+      pragma Assert (M.Vals (Lines_Eol_Comment) <= L);
+      pragma Assert (M.Vals (Lines_Blank) <= L);
+   end Validate;
 
 end METRICS.Actions;

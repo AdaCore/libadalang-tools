@@ -107,8 +107,7 @@ package body LAL_UL.Drivers is
       Individual_Source_Options       : String_String_List_Map;
       Result_Dirs                     : String_String_Map;
 
-      Context : constant Analysis_Context :=
-        Create (Charset => GNATCOLL.Iconv.UTF8);
+      Context : Analysis_Context := Create (Charset => GNATCOLL.Iconv.UTF8);
       --  ???Charset is hardwired to UTF8 for now
 
       function ASIS_Order_File_Names
@@ -191,6 +190,7 @@ package body LAL_UL.Drivers is
 
                pragma Assert (Root (Unit) /= null);
                Per_File_Action (Tool, Cmd, F_Name.all, Unit);
+               Remove (Context, F_Name.all);
             end;
 
             <<Continue>>
@@ -265,6 +265,7 @@ package body LAL_UL.Drivers is
       Process_Files;
       Final (Tool, Cmd);
 
+      Destroy (Context);
       Environment.Clean_Up;
 
 --      if not ASIS_UL.Options.Incremental_Mode then
