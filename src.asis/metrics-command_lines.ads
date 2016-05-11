@@ -115,7 +115,7 @@ package METRICS.Command_Lines is
       Lines_Blank,
       Lines_Average, -- global
       Lines_Code_In_Bodies, -- undocumented, not included in Lines_All
-      Num_Bodies,
+      Num_Bodies, -- undocumented
       --  Lines_Code_In_Bodies is the number of code lines in various
       --  bodies, and Num_Bodies is the number of various bodies. These
       --  are used to compute Lines_Average, as the ratio of these.

@@ -2012,7 +2012,7 @@ package body METRICS.Actions is
          Text_IO.Set_Output (XSD_Out_File);
       end if;
 
-      pragma Style_Checks (Off);
+      pragma Style_Checks ("M200"); -- Allow long lines
       Put ("<?xml version=""1.0"" encoding=""UTF-8""?>\n");
       Put ("<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"">\n");
       Put ("        <xs:element name=""global"">\n");
@@ -2062,7 +2062,7 @@ package body METRICS.Actions is
       Put ("                </xs:complexType>\n");
       Put ("        </xs:element>\n");
       Put ("</xs:schema>\n");
-      pragma Style_Checks (On);
+      pragma Style_Checks ("M79");
 
       if not Output_To_Standard_Output then
          Text_IO.Set_Output (Text_IO.Standard_Output);
@@ -2336,7 +2336,6 @@ package body METRICS.Actions is
       pragma Unreferenced (Tool);
    begin
       pragma Style_Checks ("M200"); -- Allow long lines
-
       Put ("usage: gnatmetric [options] {filename} {-files filename} [-cargs gcc_switches]\n");
       Put (" options:\n");
       Put (" --version - Display version and exit\n");
@@ -2446,7 +2445,6 @@ package body METRICS.Actions is
       Put ("                   source files for which metrics should be computed\n");
 
       Put (" gcc_switches    - switches to be passed to gcc called by \1\n", Tool_Names.Tool_Name);
-
       pragma Style_Checks ("M79");
    end Tool_Help;
 
