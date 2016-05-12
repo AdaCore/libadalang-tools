@@ -1188,12 +1188,12 @@ package body METRICS.Actions is
       --  Contract_Complexity metric, even though that's considered a "contract
       --  metric".
 
-      procedure Gather_Line_Metrics (Node : Ada_Node; M : in out Metrix);
-      --  Compute line metrics
-
       procedure Gather_Contract_Metrics (Node : Ada_Node);
       --  Compute contract metrics, except for Contract_Complexity, which is
       --  handled by Cyclomate.
+
+      procedure Gather_Line_Metrics (Node : Ada_Node; M : in out Metrix);
+      --  Compute line metrics
 
       procedure Gather_Syntax_Metrics (Node : Ada_Node; M : in out Metrix);
       --  Compute syntax element metrics
@@ -1709,9 +1709,31 @@ package body METRICS.Actions is
 
       procedure Gather_Syntax_Metrics (Node : Ada_Node; M : in out Metrix) is
       begin
+         --  --statements
+
+         --  ????I don't see why Select_When_Part_Type is
+         --  classified as a statement, nor why
+         --  Ext_Return_Statement_Type is not.
+
+         if (Node.all in Statement_Type'Class
+               and then Node.all not in Label_Type'Class
+               and then Node.all not in Terminate_Statement_Type'Class
+               and then Node.all not in Select_When_Part_Type'Class)
+           or else Node.all in Ext_Return_Statement_Type'Class -- ???????
+         then
+            if Debug_Flag_W then
+               Put ("Statement: \1\n", Short_Image (Node));
+            end if;
+            Inc_All (Statements);
+         end if;
+
+         --  --all-subprograms
+
          if Kind (Node) = Subprogram_Body_Kind then
             Inc_All (All_Subprograms);
          end if;
+
+         --  --public-subprograms
 
          if Last_Index (Metrix_Stack) = 2 then
             if Node = M.Node and then
@@ -1746,30 +1768,6 @@ package body METRICS.Actions is
       end Gather_Syntax_Metrics;
 
       procedure Gather_Metrics_And_Walk_Children (Node : Ada_Node) is
-         function Num_Statements
-           (Node : access Ada_Node_Type'Class)
-           return Natural;
-         function Num_Statements
-           (Node : access Ada_Node_Type'Class)
-           return Natural is
-         begin
-            if Node = null then
-               --  ????Probably these things should be empty lists, not
-               --  'null'.
-               return 0;
-            end if;
-            return Result : Natural := 0 do
-               for Stm of Children (Node) loop
-                  if Stm /= null
-                    and then Kind (Stm) not in
-                      Pragma_Node_Kind | Label_Kind | Terminate_Statement_Kind
-                  then
-                     Inc (Result);
-                  end if;
-               end loop;
-            end return;
-         end Num_Statements;
-
          M : Metrix renames
            Get (Metrix_Stack, Last_Index (Metrix_Stack)).all;
 
@@ -1801,92 +1799,6 @@ package body METRICS.Actions is
                  Get (Node_Stack, Last_Index (Node_Stack) - 2));
          end if;
          if not In_Assertion then
-            if False and then -- ????????????????
-              (Node.all in Statement_Type'Class
-              or else
-                (Kind (Node) in Identifier_Kind |
-                     Prefix_Kind |
-                     Call_Expr_Kind |
-                     Attribute_Ref_Kind
-                   and then Kind
-                     (Get (Node_Stack, Last_Index (Node_Stack) - 2))
-                       in Handled_Statements_Kind |
-                          Case_Statement_Alternative_Kind |
-                          Elsif_Statement_Part_Kind |
-                          Ext_Return_Statement_Kind |
-                          Accept_Statement_Kind |
-                          If_Statement_Kind |
-                          Loop_Statement_Kind |
-                          Select_Statement_Kind))
-            then
-               if Debug_Flag_W then
-                  Put ("Statement: \1\n", Short_Image (Node));
-               end if;
-               Inc_All (Statements);
-            end if;
-
-            case Kind (Node) is
-               when Handled_Statements_Kind =>
-                  Inc_All (Statements,
-                       By => Num_Statements
-                         (F_Statements
-                            (Handled_Statements (Node))));
-               when Exception_Handler_Kind =>
-                  Inc_All (Statements,
-                       By => Num_Statements
-                         (F_Statements
-                            (Exception_Handler (Node))));
-               when Case_Statement_Alternative_Kind =>
-                  Inc_All (Statements,
-                       By => Num_Statements
-                         (F_Statements
-                            (Case_Statement_Alternative (Node))));
-               when If_Statement_Kind =>
-                  Inc_All (Statements,
-                       By =>
-                         Num_Statements
-                           (F_Statements (If_Statement (Node))) +
-                         Num_Statements
-                           (F_Else_Statements (If_Statement (Node))));
-               when Elsif_Statement_Part_Kind =>
-                  Inc_All (Statements,
-                       By => Num_Statements
-                         (F_Statements
-                            (Elsif_Statement_Part (Node))));
-               when Ext_Return_Statement_Kind =>
-                  if False then -- Currently uses Handled_Statements????
-                     Inc_All (Statements,
-                          By => Num_Statements
-                            (F_Statements
-                               (Ext_Return_Statement (Node))));
-                  end if;
-               when Accept_Statement_Kind =>
-                  if False then -- Currently uses Handled_Statements????
-                     Inc_All (Statements,
-                          By => Num_Statements
-                            (F_Statements
-                               (Accept_Statement (Node))));
-                  end if;
-               when Loop_Statement_Kind =>
-                  Inc_All (Statements,
-                       By => Num_Statements
-                         (F_Statements
-                            (Loop_Statement (Node))));
-               when Select_Statement_Kind =>
-                  Inc_All (Statements,
-                       By =>
-                         Num_Statements
-                           (F_Else_Statements (Select_Statement (Node))) +
-                         Num_Statements
-                           (F_Abort_Statements (Select_Statement (Node))));
-               when Select_When_Part_Kind =>
-                  Inc_All (Statements,
-                       By => Num_Statements
-                         (F_Statements
-                            (Select_When_Part (Node))));
-               when others => null;
-            end case;
-
             Gather_Line_Metrics (Node, M);
             Gather_Syntax_Metrics (Node, M);
 
