@@ -37,10 +37,11 @@ procedure METRICS.Main is
    end Callback;
 
    Tool : Actions.Metrics_Tool;
+   Cmd : Command_Line (METRICS.Command_Lines.Descriptor'Access);
 
 begin
    LAL_UL.Drivers.Driver
-     (METRICS.Command_Lines.Cmd, -- local????
+     (Cmd,
       Tool,
       Tool_Package_Name     => "metrics",
       Needs_Per_File_Output => True,

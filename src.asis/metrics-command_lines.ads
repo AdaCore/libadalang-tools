@@ -121,10 +121,10 @@ package METRICS.Command_Lines is
       --  are used to compute Lines_Average, as the ratio of these.
 
    --  Syntax element metrics options:
-      Declarations,
-      Statements,
       Public_Subprograms,
       All_Subprograms,
+      Statements,
+      Declarations,
       Public_Types,
       All_Types,
       Unit_Nesting,
@@ -142,13 +142,13 @@ package METRICS.Command_Lines is
 
    --  Coupling metrics
       Tagged_Coupling_Out,
-      Tagged_Coupling_In,
       Hierarchy_Coupling_Out,
+      Tagged_Coupling_In,
       Hierarchy_Coupling_In,
-      Unit_Coupling_Out,
-      Unit_Coupling_In,
       Control_Coupling_Out,
       Control_Coupling_In,
+      Unit_Coupling_Out,
+      Unit_Coupling_In,
 
       Contract_All,
       Lines_All,
@@ -167,11 +167,20 @@ package METRICS.Command_Lines is
    subtype Lines_Metrics is Metrics_Booleans
      range Lines .. Lines_Average; -- not Lines_Code_In_Bodies, Num_Bodies
    subtype Syntax_Metrics is Metrics_Booleans
-     range Declarations .. Param_Number;
+     range Public_Subprograms .. Param_Number;
    subtype Coupling_Metrics is Metrics_Booleans
-     range Tagged_Coupling_Out .. Control_Coupling_In;
+     range Tagged_Coupling_Out .. Unit_Coupling_In;
 
    type Metrics_Set is array (Metrics_Enum) of Boolean with Pack;
+   function Empty_Metrics_Set return Metrics_Set is (Metrics_Enum => False);
+
+   Complexity_Only : constant Metrics_Set :=
+     (Complexity_Metrics => True, others => False);
+   --  Set of complexity metrics
+
+   Coupling_Only : constant Metrics_Set :=
+     (Coupling_Metrics => True, others => False);
+   --  Set of coupling metrics
 
    package Metrics_Boolean_Switches is new Boolean_Switches
      (Descriptor,
@@ -244,8 +253,6 @@ package METRICS.Command_Lines is
      ((Gnatmetric_Debug => +"-debug"));
 
    package Freeze is new Freeze_Descriptor (Descriptor);
-
-   Cmd : Command_Line (Descriptor'Access);
 
    use Metrics_Flag_Switches, Metrics_Boolean_Switches,
      Metrics_String_Switches, Metrics_String_Seq_Switches;
