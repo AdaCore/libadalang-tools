@@ -63,7 +63,7 @@ procedure Contract_Coverage is
                   use Ada.Wide_Wide_Characters.Handling;
                   Id : constant Expr := F_Id (Aspect_Assoc (Assoc));
                begin
-                  if Kind (Id) = Identifier_Kind then
+                  if Kind (Id) = Ada_Identifier then
                      declare
                         Text : constant Text_Type :=
                           To_Lower
@@ -171,8 +171,9 @@ begin
          --  We calculate metrics even in the presence of errors
 
          declare
-            function Is_Pkg_Or_Gen (Node : Ada_Node) return Boolean is
-              (Kind (Node) in Base_Package_Decl_Kind | Package_Decl_Kind);
+            function Is_Pkg_Or_Gen
+              (Node : access Ada_Node_Type'Class) return Boolean is
+                (Kind (Node) in Ada_Base_Package_Decl | Ada_Package_Decl);
             --  True if the node is a generic package declaration or a
             --  package declaration.
 

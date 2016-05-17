@@ -17,38 +17,42 @@ package LAL_Extensions is
    --  Should this replace AST.Child???
 
    procedure Find_Iter
-     (Node      : Ada_Node;
-      Predicate : not null access function (Node : Ada_Node) return Boolean;
-      Visit     : not null access procedure (Node : Ada_Node));
+     (Node      : access Ada_Node_Type'Class;
+      Predicate : not null access function
+        (Node : access Ada_Node_Type'Class) return Boolean;
+      Visit     : not null access procedure
+        (Node : access Ada_Node_Type'Class));
    --  Iterate over the tree in depth-first search order, calling Visit for
    --  each node that satisfies the Predicate.
 
    procedure Find_Iter
-     (Node      : Ada_Node;
-      Node_Kind : Ada_Node_Type_Kind;
-      Visit     : not null access procedure (Node : Ada_Node));
+     (Node      : access Ada_Node_Type'Class;
+      Node_Kind : Ada_Node_Kind_Type;
+      Visit     : not null access procedure
+        (Node : access Ada_Node_Type'Class));
    --  Iterate over the tree in depth-first search order, calling Visit for
    --  each node whose kind is Node_Kind.
 
    function Find_All
-     (Node      : Ada_Node;
-      Predicate : not null access function (Node : Ada_Node) return Boolean)
+     (Node      : access Ada_Node_Type'Class;
+      Predicate : not null access function
+        (Node : access Ada_Node_Type'Class) return Boolean)
       return Ada_Node_Vecs.Elements_Array;
    --  Same as above, except return an array of the relevant nodes
 
    function Find_All
-     (Node      : Ada_Node;
-      Node_Kind : Ada_Node_Type_Kind) return Ada_Node_Vecs.Elements_Array;
+     (Node      : access Ada_Node_Type'Class;
+      Node_Kind : Ada_Node_Kind_Type) return Ada_Node_Vecs.Elements_Array;
    --  Same as above, except return an array of the relevant nodes
 
    function Id_Name
      (Nm : access Ada_Node_Type'Class)
      return Text_Type with
-     Pre => Kind (Nm) = Identifier_Kind;
+     Pre => Kind (Nm) = Ada_Identifier;
    function L_Name
      (Nm : access Ada_Node_Type'Class)
      return Text_Type with
-     Pre => Kind (Nm) = Identifier_Kind;
+     Pre => Kind (Nm) = Ada_Identifier;
    --  Text name of an identifier. The L_Name is converted to lower
    --  case.
 

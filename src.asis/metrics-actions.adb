@@ -1,5 +1,6 @@
 with Text_IO;
 
+with Ada.Containers.Generic_Constrained_Array_Sort;
 with Ada.Directories;
 with Ada.Strings.Unbounded; use Ada;
 with Ada.Characters.Handling;
@@ -116,6 +117,8 @@ package body METRICS.Actions is
    Subunit_Sym : constant Symbol := Intern (" - subunit");
    Library_Item_Sym : constant Symbol := Intern (" - library item");
 
+   Empty_CU_Sym : constant CU_Symbol := Intern ("");
+
    type Metrix_Ref_Array is
      array (CU_Symbol_Index range <>) of aliased Metrix_Ref;
 
@@ -130,12 +133,16 @@ package body METRICS.Actions is
    function Get_CU_Access
      (A : in out CU_Metrix.Vector; S : CU_Symbol)
      return CU_Metrix.Element_Access;
+   --  Return a pointer to Specs[S] or Bodies[S]
+
    function Get_CU_Access
      (A : in out CU_Metrix.Vector; S : CU_Symbol)
      return CU_Metrix.Element_Access
    is
       I : constant CU_Symbol_Index := Get_Symbol_Index (S);
    begin
+      --  If A is too short, append nulls until it's long enough
+
       while Last_Index (A) < I loop
          Append (A, null);
       end loop;
@@ -163,20 +170,20 @@ package body METRICS.Actions is
 
    use Ada_Node_Vectors;
 
-   subtype Gnatmetric_Eligible is Ada_Node_Type_Kind with
+   subtype Gnatmetric_Eligible is Ada_Node_Kind_Type with
      Predicate => Gnatmetric_Eligible in
-       Expression_Function_Kind |
-       Generic_Package_Decl_Kind |
-       Package_Body_Kind |
-       Package_Decl_Kind |
-       Protected_Body_Kind |
-       Protected_Decl_Kind |
-       Protected_Type_Decl_Kind |
-       Entry_Body_Kind |
-       Subprogram_Body_Kind |
-       Task_Body_Kind |
-       Task_Decl_Kind |
-       Task_Type_Decl_Kind;
+       Ada_Expression_Function |
+       Ada_Generic_Package_Decl |
+       Ada_Package_Body |
+       Ada_Package_Decl |
+       Ada_Protected_Body |
+       Ada_Protected_Decl |
+       Ada_Protected_Type_Decl |
+       Ada_Entry_Body |
+       Ada_Subprogram_Body |
+       Ada_Task_Body |
+       Ada_Task_Decl |
+       Ada_Task_Type_Decl;
    --  These are the node kinds that the gnatmetric documentation calls
    --  "eligible local units". We compute metrics for the outermost node (the
    --  compilation unit, for the file-level metrics), and the library item or
@@ -184,18 +191,18 @@ package body METRICS.Actions is
    --  example, has metrics only if it is the outer node. There is one
    --  exception: see Contract_Complexity below.
 
-   subtype Contract_Complexity_Eligible is Ada_Node_Type_Kind with
+   subtype Contract_Complexity_Eligible is Ada_Node_Kind_Type with
      Predicate => Contract_Complexity_Eligible in
-       Generic_Subprogram_Decl_Kind |
-       Abstract_Subprogram_Decl_Kind |
-       Null_Subprogram_Decl_Kind |
-       Renaming_Subprogram_Decl_Kind |
-       Subprogram_Decl_Kind;
+       Ada_Generic_Subprogram_Decl |
+       Ada_Abstract_Subprogram_Decl |
+       Ada_Null_Subprogram_Decl |
+       Ada_Renaming_Subprogram_Decl |
+       Ada_Subprogram_Decl;
    --  For the new lalmetric tool, we have the --contract-complexity
    --  metric, which is on subprogram declarations, so we need
    --  additional "eligible" nodes.
 
-   subtype Eligible is Ada_Node_Type_Kind with
+   subtype Eligible is Ada_Node_Kind_Type with
      Predicate => Eligible in Gnatmetric_Eligible |
        Contract_Complexity_Eligible;
 
@@ -208,17 +215,17 @@ package body METRICS.Actions is
       Source_File_Name : String_Ref := null)
      return Metrix_Ref with
      Pre => (Source_File_Name /= null) =
-            (Node /= null and then Kind (Node) = Compilation_Unit_Kind);
+            (Node /= null and then Kind (Node) = Ada_Compilation_Unit);
    --  Pushes a new Metrix onto the Metrix_Stack, and returns it
 
    function Get_Outer_Unit (Node : Ada_Node) return Ada_Node with
-     Pre => Kind (Node) = Compilation_Unit_Kind;
+     Pre => Kind (Node) = Ada_Compilation_Unit;
    --  Given the Compilation_Unit node, return the program unit (Package_Decl,
    --  Package_Body, or whatever node) that is outermost (i.e. directly within
    --  the library item or subunit).
 
    function Unit_Is_Subunit (Node : Ada_Node) return Boolean is
-     (Kind (Parent (Node)) = Subunit_Kind);
+     (Kind (Parent (Node)) = Ada_Subunit);
    --  True if this is the body of a subunit
 
    type Assertion_Enum is (Postcondition, Other_Assertion, Not_An_Assertion);
@@ -350,45 +357,55 @@ package body METRICS.Actions is
       Source_File_Name : String_Ref := null)
      return Metrix_Ref
    is
-      K : constant Ada_Node_Type_Kind :=
+      K : constant Ada_Node_Kind_Type :=
         (if Node = null then Null_Kind else Kind (Node));
 
       procedure Set_CU_Metrix
-        (M : Metrix_Ref; Outer_Unit_Kind : Ada_Node_Type_Kind);
+        (M : Metrix_Ref;
+         Outer_Unit_Kind : Ada_Node_Kind_Type;
+         Is_Subunit : Boolean);
       --  Set the appropriate elements of Specs or Bodies.
       --  Also sets M.Is_Spec.
 
       procedure Set_CU_Metrix
-        (M : Metrix_Ref; Outer_Unit_Kind : Ada_Node_Type_Kind)
+        (M : Metrix_Ref;
+         Outer_Unit_Kind : Ada_Node_Kind_Type;
+         Is_Subunit : Boolean)
       is
          S : Metrix_Ref renames Get_CU_Access (Specs, M.CU_Name).all;
          B : Metrix_Ref renames Get_CU_Access (Bodies, M.CU_Name).all;
          --  M will be placed in either S or B, depending on whether
          --  it's a spec or a body.
       begin
+         if Is_Subunit then
+            B := M;
+            M.Is_Spec := False;
+            return;
+         end if;
+
          case Outer_Unit_Kind is
-            when Generic_Package_Decl_Kind |
-              Package_Decl_Kind |
-              Protected_Decl_Kind |
-              Protected_Type_Decl_Kind |
-              Task_Decl_Kind |
-              Task_Type_Decl_Kind |
-              Generic_Function_Instantiation_Kind |
-              Generic_Package_Instantiation_Kind |
-              Generic_Procedure_Instantiation_Kind |
-              Generic_Renaming_Decl_Kind |
-              Package_Renaming_Decl_Kind |
-              Abstract_Subprogram_Decl_Kind |
-              Null_Subprogram_Decl_Kind |
-              Renaming_Subprogram_Decl_Kind =>
+            when Ada_Generic_Package_Decl |
+              Ada_Package_Decl |
+              Ada_Protected_Decl |
+              Ada_Protected_Type_Decl |
+              Ada_Task_Decl |
+              Ada_Task_Type_Decl |
+              Ada_Generic_Function_Instantiation |
+              Ada_Generic_Package_Instantiation |
+              Ada_Generic_Procedure_Instantiation |
+              Ada_Generic_Renaming_Decl |
+              Ada_Package_Renaming_Decl |
+              Ada_Abstract_Subprogram_Decl |
+              Ada_Null_Subprogram_Decl |
+              Ada_Renaming_Subprogram_Decl =>
                pragma Assert (S = null);
                S := M;
                M.Is_Spec := True;
 
-            when Package_Body_Kind |
-              Protected_Body_Kind |
-              Entry_Body_Kind |
-              Task_Body_Kind =>
+            when Ada_Package_Body |
+              Ada_Protected_Body |
+              Ada_Entry_Body |
+              Ada_Task_Body =>
                pragma Assert (B = null);
                B := M;
                M.Is_Spec := False;
@@ -397,19 +414,20 @@ package body METRICS.Actions is
             --  seen the spec (yet), we assume the body is a spec.
             --  If we later see a spec, we move the body to the Bodies array.
 
-            when Subprogram_Body_Kind =>
+            when Ada_Subprogram_Body =>
                pragma Assert (B = null);
                if S = null then
                   S := M;
                   M.Is_Spec := True;
                   --  ???Is_Spec could be wrong here. We need semantic
                   --  information to know if this body is acting as a spec.
+                  --  It will be fixed up below if the spec comes along later.
                else
                   B := M;
                   M.Is_Spec := False;
                end if;
 
-            when Subprogram_Decl_Kind | Generic_Subprogram_Decl_Kind =>
+            when Ada_Subprogram_Decl | Ada_Generic_Subprogram_Decl =>
                if S /= null then
                   pragma Assert (B = null);
                   B := S;
@@ -422,6 +440,8 @@ package body METRICS.Actions is
                raise Program_Error with Short_Image (M.Node);
          end case;
       end Set_CU_Metrix;
+
+   --  Start of processing for Push_New_Metrix
 
    begin
       return Result : constant Metrix_Ref := new Metrix (Kind => K) do
@@ -442,29 +462,33 @@ package body METRICS.Actions is
             begin
                Result.XML_Name := Intern (Get_Name (Node));
 
-               if K = Compilation_Unit_Kind then
+               if K = Ada_Compilation_Unit then
                   declare
                      Outer_Unit : constant Ada_Node := Get_Outer_Unit (Node);
+                     Is_Subunit : constant Boolean :=
+                       Unit_Is_Subunit (Outer_Unit);
                      Sub_Str : constant String :=
-                       (if Unit_Is_Subunit (Outer_Unit)
+                       (if Is_Subunit
                           then "subunit "
                           else "");
-                     Subunit_Parent : constant String :=
-                       (if Unit_Is_Subunit (Outer_Unit)
-                          then
-                            To_UTF8
+                     Dot : constant String := (if Is_Subunit then "." else "");
+                  begin
+                     Result.Subunit_Parent :=
+                       (if Is_Subunit
+                          then Intern
+                            (To_UTF8
                               (Full_Name
                                 (F_Name
                                   (Subunit
-                                    (F_Body (Compilation_Unit (Node)))))) &
-                            "."
-                          else "");
-                  begin
-                     Result.Text_Name := Intern
-                       (Sub_Str & Subunit_Parent & Get_Name (Outer_Unit));
+                                    (F_Body (Compilation_Unit (Node)))))))
+                          else Empty_CU_Sym);
+                     Result.Text_Name :=
+                       Intern (Sub_Str & Str (Result.Subunit_Parent).S & Dot &
+                                 Get_Name (Outer_Unit));
                      Result.CU_Name :=
-                       Intern (Subunit_Parent & Get_Name (Outer_Unit));
-                     Set_CU_Metrix (Result, Kind (Outer_Unit));
+                       Intern (Str (Result.Subunit_Parent).S &
+                                 Get_Name (Outer_Unit));
+                     Set_CU_Metrix (Result, Kind (Outer_Unit), Is_Subunit);
                   end;
 
                else
@@ -484,7 +508,7 @@ package body METRICS.Actions is
          end if;
 
          if Node /= null
-           and then Kind (Node) = Package_Body_Kind
+           and then Kind (Node) = Ada_Package_Body
            and then F_Statements (Package_Body (Node)) /= null
          then
             Result.Statements_Sloc :=
@@ -502,9 +526,9 @@ package body METRICS.Actions is
    begin
       return
         (case Kind (Lib_Item_Or_Subunit) is
-           when Library_Item_Kind =>
+           when Ada_Library_Item =>
               Ada_Node (F_Item (Library_Item (Lib_Item_Or_Subunit))),
-           when Subunit_Kind =>
+           when Ada_Subunit =>
               Ada_Node (F_Body (Subunit (Lib_Item_Or_Subunit))),
            when others => raise Program_Error);
    end Get_Outer_Unit;
@@ -516,7 +540,7 @@ package body METRICS.Actions is
       Class : constant Wide_Wide_String := "class";
    begin
       case Kind (Node) is
-         when Pragma_Node_Kind =>
+         when Ada_Pragma_Node =>
             declare
                Pragma_Name : constant Text_Type :=
                  L_Name (F_Id (Pragma_Node (Node)));
@@ -526,12 +550,12 @@ package body METRICS.Actions is
                end if;
             end;
 
-         when Aspect_Assoc_Kind =>
+         when Ada_Aspect_Assoc =>
             declare
                Id : constant Expr := F_Id (Aspect_Assoc (Node));
             begin
                case Kind (Id) is
-                  when Identifier_Kind =>
+                  when Ada_Identifier =>
                      declare
                         Text : constant Text_Type := L_Name (Id);
                      begin
@@ -544,7 +568,7 @@ package body METRICS.Actions is
                         end if;
                      end;
 
-                  when Attribute_Ref_Kind =>
+                  when Ada_Attribute_Ref =>
                      declare
                         Prefix : constant Text_Type :=
                           L_Name (F_Prefix (Attribute_Ref (Id)));
@@ -576,7 +600,7 @@ package body METRICS.Actions is
       end if;
 
       case Kind (Node) is
-         when Compilation_Unit_Kind =>
+         when Ada_Compilation_Unit =>
             --  At the file level, we print complexity metrics if the outermost
             --  unit has complexity metrics, or if it's a package decl, etc.
 
@@ -585,17 +609,17 @@ package body METRICS.Actions is
             begin
                return Has_Complexity_Metrics (Outer_Unit)
                        or else Kind (Outer_Unit) in
-                         Package_Decl_Kind | Generic_Package_Decl_Kind |
-                         Package_Body_Kind | Protected_Body_Kind;
+                         Ada_Package_Decl | Ada_Generic_Package_Decl |
+                         Ada_Package_Body | Ada_Protected_Body;
             end;
 
-         when Expression_Function_Kind |
-           Entry_Body_Kind |
-           Subprogram_Body_Kind |
-           Task_Body_Kind =>
+         when Ada_Expression_Function |
+           Ada_Entry_Body |
+           Ada_Subprogram_Body |
+           Ada_Task_Body =>
             return True;
 
-         when Package_Body_Kind =>
+         when Ada_Package_Body =>
             --  Apparently, gnatmetric doesn't do nested package bodies if
             --  there are no statements.
             return F_Statements (Package_Body (Node)) /= null;
@@ -612,24 +636,24 @@ package body METRICS.Actions is
       end if;
 
       case Kind (Node) is
-         when Compilation_Unit_Kind =>
+         when Ada_Compilation_Unit =>
             return No_Such_Knd;
 
-         when Generic_Package_Decl_Kind =>
+         when Ada_Generic_Package_Decl =>
             return Generic_Package_Knd;
-         when Package_Body_Kind =>
+         when Ada_Package_Body =>
             return Package_Body_Knd;
-         when Package_Decl_Kind =>
+         when Ada_Package_Decl =>
             return Package_Knd;
-         when Protected_Body_Kind =>
+         when Ada_Protected_Body =>
             return Protected_Body_Knd;
-         when Protected_Decl_Kind =>
+         when Ada_Protected_Decl =>
             return Protected_Object_Knd;
-         when Protected_Type_Decl_Kind =>
+         when Ada_Protected_Type_Decl =>
             return Protected_Type_Knd;
-         when Entry_Body_Kind =>
+         when Ada_Entry_Body =>
             return Entry_Body_Knd;
-         when Subprogram_Body_Kind =>
+         when Ada_Subprogram_Body =>
             declare
                R : constant Type_Expression :=
                  F_Returns (F_Subp_Spec (Subprogram_Body (Node)));
@@ -637,22 +661,22 @@ package body METRICS.Actions is
                return
                  (if R = null then Procedure_Body_Knd else Function_Body_Knd);
             end;
-         when Task_Body_Kind =>
+         when Ada_Task_Body =>
             return Task_Body_Knd;
-         when Task_Decl_Kind =>
+         when Ada_Task_Decl =>
             return Task_Object_Knd;
-         when Task_Type_Decl_Kind =>
+         when Ada_Task_Type_Decl =>
             return Task_Type_Knd;
 
-         when Generic_Function_Instantiation_Kind =>
+         when Ada_Generic_Function_Instantiation =>
             return Function_Instantiation_Knd;
-         when Generic_Package_Instantiation_Kind =>
+         when Ada_Generic_Package_Instantiation =>
             return Package_Instantiation_Knd;
-         when Generic_Procedure_Instantiation_Kind =>
+         when Ada_Generic_Procedure_Instantiation =>
             return Procedure_Instantiation_Knd;
-         when Generic_Renaming_Decl_Kind =>
+         when Ada_Generic_Renaming_Decl =>
             return Generic_Package_Renaming_Knd; -- ???Or proc/func
-         when Generic_Subprogram_Decl_Kind =>
+         when Ada_Generic_Subprogram_Decl =>
             declare
                R : constant Type_Expression :=
                  F_Returns (F_Subp_Spec (Generic_Subprogram_Decl (Node)));
@@ -663,12 +687,12 @@ package body METRICS.Actions is
                     then Generic_Procedure_Knd
                     else Generic_Function_Knd);
             end;
-         when Package_Renaming_Decl_Kind =>
+         when Ada_Package_Renaming_Decl =>
             return Package_Renaming_Knd;
-         when Abstract_Subprogram_Decl_Kind |
-             Null_Subprogram_Decl_Kind |
-             Renaming_Subprogram_Decl_Kind |
-             Subprogram_Decl_Kind =>
+         when Ada_Abstract_Subprogram_Decl |
+             Ada_Null_Subprogram_Decl |
+             Ada_Renaming_Subprogram_Decl |
+             Ada_Subprogram_Decl =>
             declare
                R : constant Type_Expression :=
                  F_Returns (F_Subp_Spec (Basic_Subprogram_Decl (Node)));
@@ -676,7 +700,7 @@ package body METRICS.Actions is
                return (if R = null then Procedure_Knd else Function_Knd);
             end;
 
-         when Expression_Function_Kind =>
+         when Ada_Expression_Function =>
             return Expression_Function_Knd;
 
          when others => raise Program_Error;
@@ -707,14 +731,14 @@ package body METRICS.Actions is
 
    function Is_Private (Node : Ada_Node) return Boolean is
    begin
-      if Node = null or else Kind (Node) = Compilation_Unit_Kind then
+      if Node = null or else Kind (Node) = Ada_Compilation_Unit then
          return False;
       end if;
 
       declare
          P : constant Ada_Node := Parent (Node);
       begin
-         return Kind (P) = Library_Item_Kind
+         return Kind (P) = Ada_Library_Item
            and then F_Is_Private (Library_Item (P));
       end;
    end Is_Private;
@@ -750,6 +774,9 @@ package body METRICS.Actions is
       XML : Boolean) return Boolean
    is
    begin
+      --  Don't print metrics that weren't requested on the command line (or by
+      --  default).
+
       if not Metrics_To_Compute (Metric) then
          return False;
       end if;
@@ -781,18 +808,18 @@ package body METRICS.Actions is
          when All_Subprograms =>
             return (Depth = 2
               and then M.Kind in
-                      Package_Body_Kind |
-                      Subprogram_Body_Kind)
+                      Ada_Package_Body |
+                      Ada_Subprogram_Body)
               or else (XML and then Depth = 0);
          when Public_Subprograms =>
             return (Depth = 2
               and then M.Kind in
-                      Package_Decl_Kind |
-                      Generic_Package_Decl_Kind |
-                      Subprogram_Decl_Kind |
-                      Subprogram_Body_Kind |
+                      Ada_Package_Decl |
+                      Ada_Generic_Package_Decl |
+                      Ada_Subprogram_Decl |
+                      Ada_Subprogram_Body |
                       --  Only if no spec???
-                      Generic_Subprogram_Decl_Kind)
+                      Ada_Generic_Subprogram_Decl)
               or else (XML and then Depth = 0);
          when Declarations |
            Statements |
@@ -801,7 +828,7 @@ package body METRICS.Actions is
            Unit_Nesting |
            Construct_Nesting |
            Param_Number =>
-            return M.Kind /= Compilation_Unit_Kind;
+            return M.Kind /= Ada_Compilation_Unit;
 
          when Contract_Complexity =>
             return M.Kind in Contract_Complexity_Eligible and then M.Visible;
@@ -812,14 +839,7 @@ package body METRICS.Actions is
             return M.Has_Complexity_Metrics;
 
          when Coupling_Metrics =>
-            return Depth = 2
-              and then M.Kind in
-                      Package_Decl_Kind |
-                      Generic_Package_Decl_Kind |
-                      Subprogram_Decl_Kind |
-                      Subprogram_Body_Kind |
-                      --  Only if no spec???
-                      Generic_Subprogram_Decl_Kind;
+            return Depth = 2;
       end case;
    end Should_Print;
 
@@ -828,7 +848,7 @@ package body METRICS.Actions is
       type Fixed is delta 0.01 digits 8;
    begin
       if (Metric in Complexity_Metrics
-            and then M.Kind = Compilation_Unit_Kind)
+            and then M.Kind = Ada_Compilation_Unit)
       or else (Metric = Lines_Average and then M.Kind = Null_Kind)
       then
          if Metric = Loop_Nesting then
@@ -1004,7 +1024,7 @@ package body METRICS.Actions is
          Indent;
       end if;
 
-      if M.Kind = Compilation_Unit_Kind then
+      if M.Kind = Ada_Compilation_Unit then
          Put ("Metrics computed for \1\n",
               File_Name_To_Print (Cmd, File_Name));
          Put ("containing \1 \2\n",
@@ -1034,7 +1054,7 @@ package body METRICS.Actions is
          Metrics_To_Compute,
          Syntax_Metrics'First, Syntax_Metrics'Last, M, Depth);
 
-      if M.Kind /= Compilation_Unit_Kind then
+      if M.Kind /= Ada_Compilation_Unit then
          Print_Range
            ("=== Complexity metrics ===",
             Metrics_To_Compute,
@@ -1050,7 +1070,7 @@ package body METRICS.Actions is
 
       --  At the file level, average complexity metrics come last:
 
-      if M.Kind = Compilation_Unit_Kind
+      if M.Kind = Ada_Compilation_Unit
         and then M.Num_With_Complexity > 0
       then
          Print_Range
@@ -1195,7 +1215,7 @@ package body METRICS.Actions is
 
       To_Print_First : constant Metrics_Set :=
         Metrics_To_Compute and
-          (if M.Kind = Compilation_Unit_Kind
+          (if M.Kind = Ada_Compilation_Unit
              then not Complexity_Only
              else Metrics_Set'(others => True));
       --  Set of metrics to print first, before printing subtrees. Same as
@@ -1204,7 +1224,7 @@ package body METRICS.Actions is
 
       To_Print_Last : constant Metrics_Set :=
         Metrics_To_Compute and
-          (if M.Kind = Compilation_Unit_Kind
+          (if M.Kind = Ada_Compilation_Unit
                and then M.Num_With_Complexity > 0
              then Complexity_Only
              else Metrics_Set'(others => False));
@@ -1240,7 +1260,7 @@ package body METRICS.Actions is
 
       --  Coupling metrics are only printed for specs
 
-      if M.Kind = Compilation_Unit_Kind
+      if M.Kind = Ada_Compilation_Unit
         and then Doing_Coupling_Metrics
         and then not M.Is_Spec
       then
@@ -1249,7 +1269,7 @@ package body METRICS.Actions is
 
       Indent;
 
-      if M.Kind = Compilation_Unit_Kind then
+      if M.Kind = Ada_Compilation_Unit then
          Put ("<file name=\1>\n", Q (File_Name_To_Print (Cmd, File_Name)));
       else
          Put ("<unit name=\1\2 line=\3 col=\4>\n",
@@ -1275,7 +1295,17 @@ package body METRICS.Actions is
 
       --  At the file level, average complexity metrics go at the end:
 
-      if M.Kind = Compilation_Unit_Kind then
+      if M.Kind = Ada_Compilation_Unit then
+         if Debug_Flag_V and Doing_Coupling_Metrics then
+            for Sym of M.Depends_On loop
+               Put ("<dependence dep=""\1 \2 depends on \3"">\n",
+                    Str (M.CU_Name).S,
+                    (if M.Is_Spec then "spec" else "body"),
+                    Str (Sym).S);
+            end loop;
+            Put ("\n");
+         end if;
+
          XML_Print_Metrix_Vals
            (To_Print_Last, M.Vals'First, M.Vals'Last, M, Depth => Depth);
          Put ("</file>\n");
@@ -1386,7 +1416,7 @@ package body METRICS.Actions is
 
       --  CU_Node : constant Ada_Node := Childx (CU_List, 0);
       CU_Node : constant Ada_Node := CU_List;
-      pragma Assert (Kind (CU_Node) = Compilation_Unit_Kind);
+      pragma Assert (Kind (CU_Node) = Ada_Compilation_Unit);
       Outer_Unit : constant Ada_Node := Get_Outer_Unit (CU_Node);
 
       Node_Stack : Ada_Node_Vectors.Vector;
@@ -1440,7 +1470,7 @@ package body METRICS.Actions is
       function In_Visible_Part return Boolean is
          (Last_Index (Metrix_Stack) >= 2
             and then Get (Metrix_Stack, 2).Kind in
-              Package_Decl_Kind | Generic_Package_Decl_Kind
+              Ada_Package_Decl | Ada_Generic_Package_Decl
             and then not Get (Metrix_Stack, 2).Is_Private_Lib_Unit
             and then Private_Part_Count = 0);
       --  True if we're within only visible parts. Note that it is possible to
@@ -1638,12 +1668,12 @@ package body METRICS.Actions is
          end if;
 
          case Kind (Node) is
-            when If_Statement_Kind |
-              Elsif_Statement_Part_Kind |
-              While_Loop_Spec_Kind =>
+            when Ada_If_Statement |
+              Ada_Elsif_Statement_Part |
+              Ada_While_Loop_Spec =>
                Inc_Cyc (Complexity_Statement);
 
-            when For_Loop_Spec_Kind =>
+            when Ada_For_Loop_Spec =>
                if Quantified_Expr_Count = 0 then
                   --  We want to increment the statement count only for real
                   --  for loops.
@@ -1651,16 +1681,16 @@ package body METRICS.Actions is
                   --  ???except in some cases (see No_Static_Loop)
                end if;
 
-            when Case_Statement_Kind =>
+            when Ada_Case_Statement =>
                Inc_Cyc (Complexity_Statement,
                  By => Child_Count (F_Case_Alts (Case_Statement (Node))) - 1);
 
-            when Exit_Statement_Kind =>
+            when Ada_Exit_Statement =>
                if F_Condition (Exit_Statement (Node)) /= null then
                   Inc_Cyc (Complexity_Statement);
                end if;
 
-            when Select_Statement_Kind =>
+            when Ada_Select_Statement =>
                declare
                   S : constant Select_Statement := Select_Statement (Node);
                   Num_Alts : constant Metric_Nat := Child_Count (F_Guards (S));
@@ -1673,25 +1703,25 @@ package body METRICS.Actions is
                            By => Num_Alts + Num_Else + Num_Abort - 1);
                end;
 
-            when Expression_Function_Kind =>
+            when Ada_Expression_Function =>
                null; -- It's already set to 1
 
-            when Bin_Op_Kind =>
+            when Ada_Bin_Op =>
                if F_Op (Bin_Op (Node)) in Or_Else | And_Then then
                   Inc_Cyc (Complexity_Expression);
                end if;
 
-            when If_Expr_Kind | Elsif_Expr_Part_Kind =>
+            when Ada_If_Expr | Ada_Elsif_Expr_Part =>
                Inc_Cyc (Complexity_Expression);
 
-            when Case_Expr_Kind =>
+            when Ada_Case_Expr =>
                Inc_Cyc (Complexity_Expression,
                         By => Child_Count (F_Cases (Case_Expr (Node))) - 1);
 
-            when Quantified_Expr_Kind =>
+            when Ada_Quantified_Expr =>
                Inc_Cyc (Complexity_Expression, By => 2);
 
-            when Loop_Statement_Kind =>
+            when Ada_Loop_Statement =>
                --  Compute M.Vals (Loop_Nesting) as the maximum loop
                --  nesting level for this unit. We only set it for the
                --  innermost unit and at the file level.
@@ -1719,9 +1749,9 @@ package body METRICS.Actions is
          function Should_Gather_Body_Lines return Boolean is
          begin
             case Kind (Node) is
-               when Package_Body_Kind =>
+               when Ada_Package_Body =>
                   return F_Statements (Package_Body (Node)) /= null;
-               when Entry_Body_Kind | Subprogram_Body_Kind | Task_Body_Kind =>
+               when Ada_Entry_Body | Ada_Subprogram_Body | Ada_Task_Body =>
                   return True;
                when others =>
                   return False;
@@ -1734,7 +1764,7 @@ package body METRICS.Actions is
             declare
                use type Interfaces.Unsigned_32;
                Start : constant Interfaces.Unsigned_32 :=
-                 (if Kind (Node) = Compilation_Unit_Kind
+                 (if Kind (Node) = Ada_Compilation_Unit
                     then 1
                     else M.Sloc.Start_Line);
                --  At the file level, we want to include all the comments and
@@ -1746,7 +1776,7 @@ package body METRICS.Actions is
             begin
                pragma Assert (M.Vals (Lines) = 0);
                M.Vals (Lines) := Lines_Count;
-               if Kind (Node) = Compilation_Unit_Kind then
+               if Kind (Node) = Ada_Compilation_Unit then
                   Inc (Global_M.Vals (Lines), By => Lines_Count);
                end if;
 
@@ -1759,7 +1789,7 @@ package body METRICS.Actions is
                           Metric => Metric);
                   begin
                      M.Vals (Metric) := Range_Count;
-                     if Kind (Node) = Compilation_Unit_Kind then
+                     if Kind (Node) = Ada_Compilation_Unit then
                         Inc (Global_M.Vals (Metric), By => Range_Count);
                      end if;
 
@@ -1774,7 +1804,7 @@ package body METRICS.Actions is
                      if Metric = Lines_Code
                        and then Should_Gather_Body_Lines
                      then
-                        if Kind (Node) = Package_Body_Kind then
+                        if Kind (Node) = Ada_Package_Body then
                            Range_Count :=
                              Line_Range_Count
                                (Cumulative,
@@ -1788,7 +1818,7 @@ package body METRICS.Actions is
 
                         if Node = Outer_Unit
                           or else Non_Package_Body_Count <= 1
-                          or else Kind (Node) = Package_Body_Kind
+                          or else Kind (Node) = Ada_Package_Body
                         then
                            Inc (Global_M.Vals (Lines_Code_In_Bodies),
                                 By => Range_Count);
@@ -1822,7 +1852,7 @@ package body METRICS.Actions is
             Aspects : constant Aspect_Specification :=
               Get_Aspects (Basic_Decl (Subp_Decl));
          begin
-            if Kind (Subp_Decl) = Expression_Function_Kind then
+            if Kind (Subp_Decl) = Ada_Expression_Function then
                --  Expression functions are considered to have
                --  contracts and postconditions.
                Has_Contracts := True;
@@ -1880,15 +1910,13 @@ package body METRICS.Actions is
       begin
          --  --statements
 
-         --  ???I don't see why Select_When_Part_Type is
-         --  classified as a statement, nor why
-         --  Ext_Return_Statement_Type is not.
+         --  Labels and terminate alternatives are classified as statements by
+         --  libadalang, but they are not actually statements, so shouldn't be
+         --  counted in the metric.
 
-         if (Node.all in Statement_Type'Class
-               and then Node.all not in Label_Type'Class
-               and then Node.all not in Terminate_Statement_Type'Class
-               and then Node.all not in Select_When_Part_Type'Class)
-           or else Node.all in Ext_Return_Statement_Type'Class
+         if Node.all in Statement_Type'Class
+           and then Node.all not in Label_Type'Class
+           and then Node.all not in Terminate_Statement_Type'Class
          then
             if Debug_Flag_W then
                Put ("Statement: \1\n", Short_Image (Node));
@@ -1898,7 +1926,7 @@ package body METRICS.Actions is
 
          --  --all-subprograms
 
-         if Kind (Node) = Subprogram_Body_Kind then
+         if Kind (Node) = Ada_Subprogram_Body then
             Inc_All (All_Subprograms);
          end if;
 
@@ -1906,16 +1934,16 @@ package body METRICS.Actions is
 
          if Last_Index (Metrix_Stack) = 2 then
             if Node = M.Node and then
-              M.Kind in Subprogram_Decl_Kind |
-                Generic_Subprogram_Decl_Kind |
-                Renaming_Subprogram_Decl_Kind |
-                Subprogram_Body_Kind
+              M.Kind in Ada_Subprogram_Decl |
+                Ada_Generic_Subprogram_Decl |
+                Ada_Renaming_Subprogram_Decl |
+                Ada_Subprogram_Body
             then
                Inc_All (Public_Subprograms);
             end if;
 
             if Kind (Node) in
-              Package_Decl_Kind | Generic_Package_Decl_Kind
+              Ada_Package_Decl | Ada_Generic_Package_Decl
             then
                declare
                   Vis_Decls : constant List_Ada_Node := Visible_Part (Node);
@@ -1940,30 +1968,40 @@ package body METRICS.Actions is
          File_M : Metrix renames Get (Metrix_Stack, 1).all;
       begin
          case Kind (Node) is
-            when With_Decl_Kind =>
+            --  For "with P, Q;" include P and Q. For "limited with P, Q;"
+            --  increment Num_Limited_Withs by 2.
+
+            when Ada_With_Decl =>
                declare
-                  Names : constant List_Name := F_Packages (With_Decl (Node));
+                  Names : constant List_Name :=
+                    F_Packages (With_Decl (Node));
                begin
-                  for I in 0 .. Child_Count (Names) - 1 loop
-                     Include
-                       (File_M.Depends_On,
-                        Intern
-                          (To_UTF8 (Full_Name (Name (Childx (Names, I))))));
-                  end loop;
+                  if F_Is_Limited (With_Decl (Node)) then
+                     Inc (File_M.Num_Limited_Withs, By => Child_Count (Names));
+                  else
+                     for I in 0 .. Child_Count (Names) - 1 loop
+                        Include
+                          (File_M.Depends_On,
+                           Intern
+                             (To_UTF8 (Full_Name (Name (Childx (Names, I))))));
+                     end loop;
+                  end if;
                end;
 
-            when Generic_Function_Instantiation_Kind |
-              Generic_Package_Instantiation_Kind |
-              Generic_Renaming_Decl_Kind |
-              Package_Renaming_Decl_Kind |
-              Renaming_Subprogram_Decl_Kind |
-              Package_Decl_Kind |
-              Generic_Package_Decl_Kind |
-              Generic_Subprogram_Decl_Kind =>
+            --  A child unit depends on its parent
+
+            when Ada_Generic_Function_Instantiation |
+              Ada_Generic_Package_Instantiation |
+              Ada_Generic_Renaming_Decl |
+              Ada_Package_Renaming_Decl |
+              Ada_Renaming_Subprogram_Decl |
+              Ada_Package_Decl |
+              Ada_Generic_Package_Decl |
+              Ada_Generic_Subprogram_Decl =>
                declare
                   Def_Name : constant Name := Get_Def_Name (Node);
                begin
-                  if Kind (Def_Name) = Prefix_Kind then
+                  if Kind (Def_Name) = Ada_Prefix then
                      Include
                        (File_M.Depends_On,
                         Intern (To_UTF8
@@ -1983,17 +2021,17 @@ package body METRICS.Actions is
          end if;
 
          case Kind (Node) is
-            when Exception_Handler_Kind =>
+            when Ada_Exception_Handler =>
                Inc (Exception_Handler_Count);
-            when Quantified_Expr_Kind =>
+            when Ada_Quantified_Expr =>
                Inc (Quantified_Expr_Count);
-            when Expression_Function_Kind =>
+            when Ada_Expression_Function =>
                Inc (Expression_Function_Count);
-            when Loop_Statement_Kind =>
+            when Ada_Loop_Statement =>
                Inc (Loop_Count);
-            when Private_Part_Kind =>
+            when Ada_Private_Part =>
                Inc (Private_Part_Count);
-            when Entry_Body_Kind | Subprogram_Body_Kind | Task_Body_Kind =>
+            when Ada_Entry_Body | Ada_Subprogram_Body | Ada_Task_Body =>
                Inc (Non_Package_Body_Count);
             when others => null;
          end case;
@@ -2041,17 +2079,17 @@ package body METRICS.Actions is
          end if;
 
          case Kind (Node) is
-            when Exception_Handler_Kind =>
+            when Ada_Exception_Handler =>
                Dec (Exception_Handler_Count);
-            when Quantified_Expr_Kind =>
+            when Ada_Quantified_Expr =>
                Dec (Quantified_Expr_Count);
-            when Expression_Function_Kind =>
+            when Ada_Expression_Function =>
                Dec (Expression_Function_Count);
-            when Loop_Statement_Kind =>
+            when Ada_Loop_Statement =>
                Dec (Loop_Count);
-            when Private_Part_Kind =>
+            when Ada_Private_Part =>
                Dec (Private_Part_Count);
-            when Entry_Body_Kind | Subprogram_Body_Kind | Task_Body_Kind =>
+            when Ada_Entry_Body | Ada_Subprogram_Body | Ada_Task_Body =>
                Dec (Non_Package_Body_Count);
             when others => null;
          end case;
@@ -2098,8 +2136,8 @@ package body METRICS.Actions is
             Gather_Syntax_Metrics (Node, M);
 
             if Kind (Node) in
-                Package_Decl_Kind | Generic_Package_Decl_Kind |
-                Task_Def_Kind | Protected_Def_Kind
+                Ada_Package_Decl | Ada_Generic_Package_Decl |
+                Ada_Task_Def | Ada_Protected_Def
               and then In_Visible_Part
             then
                --  We gather contract metrics only for public subprograms
@@ -2111,7 +2149,7 @@ package body METRICS.Actions is
          end if;
 
          if (M.Has_Complexity_Metrics
-               and then M.Kind /= Compilation_Unit_Kind)
+               and then M.Kind /= Ada_Compilation_Unit)
            or else (M.Kind in Contract_Complexity_Eligible
                       and then In_Visible_Part)
          then
@@ -2332,9 +2370,19 @@ package body METRICS.Actions is
    -- Final --
    -----------
 
+   procedure Compute_Indirect_Dependencies (Global_M : Metrix) with
+     Pre => Global_M.Kind = Null_Kind;
+   --  Depends_On contains direct dependencies. This computes the indirect
+   --  dependencies for all compilation units by walking the dependency graph.
+
    procedure Compute_Coupling (Tool : in out Metrics_Tool);
-   --  Dependencies were computed during Per_File_Action. This uses the
-   --  information to compute the coupling metrics.
+   --  This uses the dependency information to compute the coupling metrics.
+
+   function Get_Spec (M : Metrix_Ref) return Metrix_Ref with
+     Pre => M.Kind = Ada_Compilation_Unit;
+   --  If M is a spec, return M. If it's a library unit body, return the
+   --  corresponding spec. If it's a subunit, return the spec of the innermost
+   --  enclosing library unit.
 
    procedure XML_Print_Coupling
      (Cmd : Command_Line;
@@ -2342,103 +2390,184 @@ package body METRICS.Actions is
    --  Print the metrics computed by Compute_Coupling
 
    Metrix_For_Coupling : Metrix_Vectors.Vector;
-   --  This is intended to mimic the ordering behavior of gnatmetric, for
+   --  ???This is intended to mimic the ordering behavior of gnatmetric, for
    --  printing coupling metrics.
 
-   procedure Compute_Coupling (Tool : in out Metrics_Tool) is
-      --  ???This is a work in progress. It only deals with
-      --  --unit-coupling-out, and even that is incomplete.
+   procedure Compute_Indirect_Dependencies (Global_M : Metrix) is
 
-      type State is (Not_Started, Pending, Done);
-      subtype Index is CU_Symbol_Index range 1 .. Last_Symbol;
-      Spec_States, Body_States : array (Index) of State :=
-        (others => Not_Started);
-      pragma Unreferenced (Tool, Body_States);
-      --  Above are for keeping track of where we've been in the dependency
-      --  graph walk. Needed in case of cycles.
+      procedure Remove_Nonexistent_Units (M : Metrix_Ref);
+      --  Removes units from M.Depends_On if those units are not being
+      --  processed by this run of the tool. So "with X;" is ignored if x.ads
+      --  is not being processed. We can't do this in the first place, because
+      --  we need to wait until all the Metrix exist.
 
-      procedure Deps_Iter
-        (M : Metrix_Ref;
-         Action : not null access procedure (Dep : Metrix_Ref));
-      --  Call Action for each compilation unit that M depends upon
-
-      procedure Visit (M : Metrix_Ref; Vals : in out Metrics_Values);
+      procedure Visit
+        (M : Metrix_Ref; Depends_On : in out CU_Symbol_Sets.Set);
       --  Visit one node in the dependency graph of compilation units.
       --  Recursively calls Visit to visit compilation units that M depends
-      --  upon. Vals should be the Vals component of the compilation unit that
-      --  depends on M. This accumulates metrics for M into Vals.
+      --  upon. Depends_On is that of the caller (some unit that depends on M);
+      --  this unions-in M and everything M depends upon directly or
+      --  indirectly.
 
-      procedure Deps_Iter
-        (M : Metrix_Ref;
-         Action : not null access procedure (Dep : Metrix_Ref)) is
-      begin
-         for Sym of M.Depends_On loop
-            Action (Specs (Get_Symbol_Index (Sym)));
-         end loop;
-      end Deps_Iter;
-
-      procedure Visit (M : Metrix_Ref; Vals : in out Metrics_Values) is
+      procedure Remove_Nonexistent_Units (M : Metrix_Ref) is
+         Nonexistent_Units : CU_Symbol_Sets.Set;
       begin
          if M = null then
             return;
          end if;
 
-         if Debug_Flag_V then
-            LAL_UL.Dbg_Out.Output_Enabled := True;
-            Dbg_Out.Put ("Doing \1\n", Str (M.CU_Name).S);
-            Dbg_Out.Indent;
+         for Sym of M.Depends_On loop
+            if Specs (Get_Symbol_Index (Sym)) = null then
+               Insert (Nonexistent_Units, Sym);
+            end if;
+         end loop;
+
+         Difference (M.Depends_On, Nonexistent_Units);
+      end Remove_Nonexistent_Units;
+
+      procedure Visit
+        (M : Metrix_Ref; Depends_On : in out CU_Symbol_Sets.Set) is
+      begin
+         --  The "limited with" clauses aare not included in
+         --  Depends_On. Therefore, there cannot be cycles in the
+         --  graph.
+
+         if not M.Indirect_Dependences_Computed then
+            M.Indirect_Dependences_Computed := True;
+            if M.Is_Spec then
+               Append (Metrix_For_Coupling, M);
+            end if;
+
+            for Sym of Copy (M.Depends_On) loop
+               --  Copy is necessary, because we are passing M.Depends_On to
+               --  the recursive Visit, which is going to modify it, so we
+               --  can't be iterating over it directly.
+
+               Visit (Specs (Get_Symbol_Index (Sym)), M.Depends_On);
+            end loop;
          end if;
 
-         declare
-            Outer_Unit : Metrix renames Get (M.Submetrix, 0).all;
-            procedure Rec (Dep : Metrix_Ref);
-            procedure Rec (Dep : Metrix_Ref) is
-            begin
-               Inc (Outer_Unit.Vals (Unit_Coupling_Out));
-               Visit (Dep, Outer_Unit.Vals);
-            end Rec;
-         begin
-            case Spec_States (Get_Symbol_Index (M.CU_Name)) is
-               when Not_Started =>
-                  Append (Metrix_For_Coupling, M);
-                  Spec_States (Get_Symbol_Index (M.CU_Name)) := Pending;
-                  Deps_Iter (M, Rec'Access);
-                  Spec_States (Get_Symbol_Index (M.CU_Name)) := Done;
-                  Inc (Vals (Unit_Coupling_Out),
-                       By => Outer_Unit.Vals (Unit_Coupling_Out));
-               when Pending =>
-                  null;
-               when Done =>
-                  Inc (Vals (Unit_Coupling_Out),
-                       By => Outer_Unit.Vals (Unit_Coupling_Out));
-            end case;
-         end;
-
-         if Debug_Flag_V then
-            Dbg_Out.Outdent;
-         end if;
+         Include (Depends_On, M.CU_Name);
+         Union (Depends_On, M.Depends_On);
       end Visit;
 
-      Ignored : Metrics_Values := (others => 0);
+      Ignored : CU_Symbol_Sets.Set;
 
    begin
+      --  First remove nonexistent units from the Depends_On sets, because
+      --  we're not supposed to count those in the coupling metrics.
+
+      for File_M of Global_M.Submetrix loop
+         Remove_Nonexistent_Units (File_M);
+      end loop;
+
+      --  Then compute indirect dependences
+
+      for File_M of Global_M.Submetrix loop
+         Visit (File_M, Ignored);
+      end loop;
+   end Compute_Indirect_Dependencies;
+
+   function Get_Spec (M : Metrix_Ref) return Metrix_Ref is
+   begin
+      if M.Is_Spec then
+         return M;
+      elsif M.Subunit_Parent = Empty_CU_Sym then
+         declare
+            Spec : constant Metrix_Ref := Specs (Get_Symbol_Index (M.CU_Name));
+         begin
+            return (if Spec = null then M else Spec);
+         end;
+      else
+         declare
+            Parent_Body : constant Metrix_Ref :=
+              Bodies (Get_Symbol_Index (M.Subunit_Parent));
+         begin
+            return (if Parent_Body = null then M else Get_Spec (Parent_Body));
+            --  This recursion will climb up a chain of nested subunits until
+            --  it reaches a library unit, and then we'll get the spec of that
+            --  library unit.
+         end;
+      end if;
+   end Get_Spec;
+
+   procedure Compute_Coupling (Tool : in out Metrics_Tool) is
+      pragma Unreferenced (Tool);
+      --  ???This is a work in progress. It only deals with
+      --  --unit-coupling-out, and even that is incomplete.
+   begin
+      --  Union the Depends_On set for each body (including subunits) into that
+      --  of the corresponding spec. We can't put it there in the first place
+      --  (during Compute_Indirect_Dependencies), because that would compute
+      --  too-high numbers. For example, if A-body with's B, we want to count
+      --  that in the metrics for A, but not in the metrics of things that
+      --  depend on A.
+
+      for B of Bodies loop
+         if B /= null then
+            declare
+               pragma Assert (B.Indirect_Dependences_Computed);
+               S : constant Metrix_Ref := Get_Spec (B);
+               pragma Assert (S.Indirect_Dependences_Computed);
+               --  S is the compilation unit node for the spec; dependences of
+               --  bodies (including subunits) should be counted on the spec.
+            begin
+               Union (S.Depends_On, B.Depends_On);
+               Inc (S.Num_Limited_Withs, By => B.Num_Limited_Withs);
+            end;
+         end if;
+      end loop;
+
+      --  Compute metrics for the specs
+
       for S of Specs loop
-         Visit (S, Ignored);
+         if S /= null then
+            declare
+               pragma Assert (S.Indirect_Dependences_Computed);
+               Outer_Unit : Metrix renames Get (S.Submetrix, 0).all;
+               --  Outer_Unit is the outermost package spec, procedure spec,
+               --  etc.
+            begin
+               Inc (Outer_Unit.Vals (Unit_Coupling_Out),
+                    By => Integer (Length (S.Depends_On)) +
+                          S.Num_Limited_Withs);
+            end;
+         end if;
       end loop;
    end Compute_Coupling;
 
    procedure XML_Print_Coupling
      (Cmd : Command_Line;
-      Metrics_To_Compute : Metrics_Set) is
+      Metrics_To_Compute : Metrics_Set)
+   is
+      subtype Arr_Index is Natural range 0 .. Last_Index (Metrix_For_Coupling);
+      subtype Arr is Metrix_Vectors.Elements_Array (Arr_Index);
+      A : Arr := To_Array (Metrix_For_Coupling);
+
+      function Lt (X, Y : Metrix_Ref) return Boolean;
+      pragma Inline (Lt);
+
+      procedure Sort is new Ada.Containers.Generic_Constrained_Array_Sort
+        (Arr_Index, Metrix_Ref, Arr, "<" => Lt);
+
+      function Lt (X, Y : Metrix_Ref) return Boolean is
+         U1 : constant String := Str (X.CU_Name).S;
+         U2 : constant String := Str (Y.CU_Name).S;
+      begin
+         return U1 < U2;
+      end Lt;
+
    begin
       if Metrics_To_Compute = Empty_Metrics_Set then
          return;
       end if;
 
+      Sort (A);
+
       Indent;
       Put ("<coupling>\n");
 
-      for File_M of Metrix_For_Coupling loop
+      for File_M of A loop
          XML_Print_Metrix
            (Cmd,
             File_M.Source_File_Name.all,
@@ -2517,6 +2646,7 @@ package body METRICS.Actions is
       Pop (Metrix_Stack);
       Destroy (Metrix_Stack);
 
+      Compute_Indirect_Dependencies (M.all);
       Compute_Coupling (Tool);
 
       if Gen_XML (Cmd) then
