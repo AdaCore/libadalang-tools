@@ -2395,9 +2395,8 @@ package body METRICS.Actions is
       Metrics_To_Compute : Metrics_Set);
    --  Print the metrics computed by Compute_Coupling
 
-   Metrix_For_Coupling : Metrix_Vectors.Vector;
-   --  ???This is intended to mimic the ordering behavior of gnatmetric, for
-   --  printing coupling metrics.
+   Units_For_Coupling : Metrix_Vectors.Vector;
+   --  Compilation units for which coupling metrics will be printed
 
    procedure Compute_Indirect_Dependencies (Global_M : Metrix) is
 
@@ -2445,7 +2444,7 @@ package body METRICS.Actions is
          if not M.Indirect_Dependences_Computed then
             M.Indirect_Dependences_Computed := True;
             if M.Is_Spec then
-               Append (Metrix_For_Coupling, M);
+               Append (Units_For_Coupling, M);
             end if;
 
             for Sym of Copy (M.Depends_On) loop
@@ -2593,9 +2592,8 @@ package body METRICS.Actions is
      (Cmd : Command_Line;
       Metrics_To_Compute : Metrics_Set)
    is
-      subtype Arr_Index is Natural range 0 .. Last_Index (Metrix_For_Coupling);
+      subtype Arr_Index is Natural range 0 .. Last_Index (Units_For_Coupling);
       subtype Arr is Metrix_Vectors.Elements_Array (Arr_Index);
-      A : Arr := To_Array (Metrix_For_Coupling);
 
       function Lt (X, Y : Metrix_Ref) return Boolean;
       pragma Inline (Lt);
@@ -2610,17 +2608,24 @@ package body METRICS.Actions is
          return U1 < U2;
       end Lt;
 
+      Sorted_Units : Arr := To_Array (Units_For_Coupling);
+
+   --  Start of processing for XML_Print_Coupling
+
    begin
       if Metrics_To_Compute = Empty_Metrics_Set then
          return;
       end if;
 
-      Sort (A);
+      --  Sort the compilation units by name, so they will get printed in
+      --  alphabetical order, rather than some order caused by the graph walk.
+
+      Sort (Sorted_Units);
 
       Indent;
       Put ("<coupling>\n");
 
-      for File_M of A loop
+      for File_M of Sorted_Units loop
          XML_Print_Metrix
            (Cmd,
             File_M.Source_File_Name.all,
