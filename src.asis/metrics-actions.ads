@@ -177,6 +177,7 @@ private
 
             Depends_On : CU_Symbol_Sets.Set;
             Indirect_Dependences_Computed : Boolean := False;
+            Limited_Depends_On : CU_Symbol_Sets.Set;
             --  Depends_On is the set of compilation units this one depends
             --  upon. It is computed in 3 steps:
             --
@@ -201,14 +202,13 @@ private
             --  This is because coupling metrics treat a spec along with its
             --  body and subunits as a single entity.
             --
-            --  We're working with names here, because we don't
-            --  have semantic information. We use a set so that
-            --  redundancies don't count (e.g. "with X; with X;"
-            --  should count as depending on X (once)).
-
-            Num_Limited_Withs : Metric_Nat := 0;
-            --  Number of "limited with" clauses in the context clause of this
-            --  compilation unit. These are not included in Depends_On.
+            --  We're working with names here, because we don't have semantic
+            --  information. We use a set so that redundancies don't count
+            --  (e.g. "with X; with X;" should count as depending on X (once)).
+            --
+            --  "limited with" clauses are treated separately
+            --  (Limited_Depends_On), because those are counted as just 1
+            --  dependence (not followed to find indirect dependencies).
 
             Source_File_Name : String_Ref := null;
 
@@ -270,5 +270,13 @@ private
    --
    --  We always compute all metrics. The metrics requested on the
    --  command line are taken into account when we print the data.
+
+   --  For Debugging:
+
+   procedure Dump_Metrix (M : Metrix);
+   procedure Dump
+     (Tool : in out Metrics_Tool;
+      Global_M : Metrix;
+      Message : String := "");
 
 end METRICS.Actions;

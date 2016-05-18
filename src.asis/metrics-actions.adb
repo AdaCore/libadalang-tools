@@ -486,7 +486,7 @@ package body METRICS.Actions is
                        Intern (Sub_Str & Str (Result.Subunit_Parent).S & Dot &
                                  Get_Name (Outer_Unit));
                      Result.CU_Name :=
-                       Intern (Str (Result.Subunit_Parent).S &
+                       Intern (Str (Result.Subunit_Parent).S & Dot &
                                  Get_Name (Outer_Unit));
                      Set_CU_Metrix (Result, Kind (Outer_Unit), Is_Subunit);
                   end;
@@ -1968,35 +1968,40 @@ package body METRICS.Actions is
          File_M : Metrix renames Get (Metrix_Stack, 1).all;
       begin
          case Kind (Node) is
-            --  For "with P, Q;" include P and Q. For "limited with P, Q;"
-            --  increment Num_Limited_Withs by 2.
+            --  For "with P, Q;" include P and Q
 
             when Ada_With_Decl =>
                declare
                   Names : constant List_Name :=
                     F_Packages (With_Decl (Node));
                begin
-                  if F_Is_Limited (With_Decl (Node)) then
-                     Inc (File_M.Num_Limited_Withs, By => Child_Count (Names));
-                  else
-                     for I in 0 .. Child_Count (Names) - 1 loop
+                  for I in 0 .. Child_Count (Names) - 1 loop
+                     if F_Is_Limited (With_Decl (Node)) then
+                        Include
+                          (File_M.Limited_Depends_On,
+                           Intern
+                             (To_UTF8 (Full_Name (Name (Childx (Names, I))))));
+                     else
                         Include
                           (File_M.Depends_On,
                            Intern
                              (To_UTF8 (Full_Name (Name (Childx (Names, I))))));
-                     end loop;
-                  end if;
+                     end if;
+                  end loop;
                end;
 
             --  A child unit depends on its parent
 
             when Ada_Generic_Function_Instantiation |
+              Ada_Generic_Procedure_Instantiation |
               Ada_Generic_Package_Instantiation |
               Ada_Generic_Renaming_Decl |
               Ada_Package_Renaming_Decl |
               Ada_Renaming_Subprogram_Decl |
               Ada_Package_Decl |
               Ada_Generic_Package_Decl |
+              Ada_Subprogram_Decl |
+              Ada_Subprogram_Body | -- could be acting as spec
               Ada_Generic_Subprogram_Decl =>
                declare
                   Def_Name : constant Name := Get_Def_Name (Node);
@@ -2375,7 +2380,8 @@ package body METRICS.Actions is
    --  Depends_On contains direct dependencies. This computes the indirect
    --  dependencies for all compilation units by walking the dependency graph.
 
-   procedure Compute_Coupling (Tool : in out Metrics_Tool);
+   procedure Compute_Coupling
+     (Tool : in out Metrics_Tool; Global_M : Metrix);
    --  This uses the dependency information to compute the coupling metrics.
 
    function Get_Spec (M : Metrix_Ref) return Metrix_Ref with
@@ -2416,8 +2422,12 @@ package body METRICS.Actions is
             return;
          end if;
 
+         --  Remove nonexistent units:
+
          for Sym of M.Depends_On loop
-            if Specs (Get_Symbol_Index (Sym)) = null then
+            if Get_Symbol_Index (Sym) > Last_Index (Specs)
+              or else Specs (Get_Symbol_Index (Sym)) = null
+            then
                Insert (Nonexistent_Units, Sym);
             end if;
          end loop;
@@ -2466,6 +2476,15 @@ package body METRICS.Actions is
       for File_M of Global_M.Submetrix loop
          Visit (File_M, Ignored);
       end loop;
+
+      --  A compilation unit can depend on itself at this point. For example,
+      --  if body-A says "with B;", and spec-B says "with A;", A will end up
+      --  depending on itself, which we don't want. So we remove such
+      --  self-referential dependences at this point, if present.
+
+      for File_M of Global_M.Submetrix loop
+         Exclude (File_M.Depends_On, File_M.CU_Name);
+      end loop;
    end Compute_Indirect_Dependencies;
 
    function Get_Spec (M : Metrix_Ref) return Metrix_Ref is
@@ -2476,13 +2495,22 @@ package body METRICS.Actions is
          declare
             Spec : constant Metrix_Ref := Specs (Get_Symbol_Index (M.CU_Name));
          begin
+            pragma Assert (Spec /= null);
             return (if Spec = null then M else Spec);
          end;
       else
          declare
-            Parent_Body : constant Metrix_Ref :=
+            Parent_Body : Metrix_Ref :=
               Bodies (Get_Symbol_Index (M.Subunit_Parent));
          begin
+            --  The parent could be a body acting as spec, in which case it's
+            --  in Specs, not Bodies.
+
+            if Parent_Body = null then
+               Parent_Body := Specs (Get_Symbol_Index (M.Subunit_Parent));
+            end if;
+
+            pragma Assert (Parent_Body /= null);
             return (if Parent_Body = null then M else Get_Spec (Parent_Body));
             --  This recursion will climb up a chain of nested subunits until
             --  it reaches a library unit, and then we'll get the spec of that
@@ -2491,10 +2519,8 @@ package body METRICS.Actions is
       end if;
    end Get_Spec;
 
-   procedure Compute_Coupling (Tool : in out Metrics_Tool) is
-      pragma Unreferenced (Tool);
-      --  ???This is a work in progress. It only deals with
-      --  --unit-coupling-out, and even that is incomplete.
+   procedure Compute_Coupling
+     (Tool : in out Metrics_Tool; Global_M : Metrix) is
    begin
       --  Union the Depends_On set for each body (including subunits) into that
       --  of the corresponding spec. We can't put it there in the first place
@@ -2513,10 +2539,12 @@ package body METRICS.Actions is
                --  bodies (including subunits) should be counted on the spec.
             begin
                Union (S.Depends_On, B.Depends_On);
-               Inc (S.Num_Limited_Withs, By => B.Num_Limited_Withs);
+               Union (S.Limited_Depends_On, B.Limited_Depends_On);
             end;
          end if;
       end loop;
+
+      Dump (Tool, Global_M, "After bodies:");
 
       --  Compute metrics for the specs
 
@@ -2528,9 +2556,34 @@ package body METRICS.Actions is
                --  Outer_Unit is the outermost package spec, procedure spec,
                --  etc.
             begin
+               --  Unit_Coupling_Out counts the number of things this depends
+               --  on.
+
                Inc (Outer_Unit.Vals (Unit_Coupling_Out),
                     By => Integer (Length (S.Depends_On)) +
-                          S.Num_Limited_Withs);
+                          Integer (Length (S.Limited_Depends_On)));
+
+               --  Unit_Coupling_In counts the number of things that depend on
+               --  this.
+
+               for Sym of S.Depends_On loop
+                  declare
+                     Dep : Metrix renames Specs (Get_Symbol_Index (Sym)).all;
+                     Dep_Outer_Unit : Metrix renames
+                       Get (Dep.Submetrix, 0).all;
+                  begin
+                     Inc (Dep_Outer_Unit.Vals (Unit_Coupling_In));
+                  end;
+               end loop;
+               for Sym of S.Limited_Depends_On loop
+                  declare
+                     Dep : Metrix renames Specs (Get_Symbol_Index (Sym)).all;
+                     Dep_Outer_Unit : Metrix renames
+                       Get (Dep.Submetrix, 0).all;
+                  begin
+                     Inc (Dep_Outer_Unit.Vals (Unit_Coupling_In));
+                  end;
+               end loop;
             end;
          end if;
       end loop;
@@ -2646,8 +2699,10 @@ package body METRICS.Actions is
       Pop (Metrix_Stack);
       Destroy (Metrix_Stack);
 
+      Dump (Tool, M.all, "Initial:");
       Compute_Indirect_Dependencies (M.all);
-      Compute_Coupling (Tool);
+      Dump (Tool, M.all, "After Compute_Indirect_Dependencies");
+      Compute_Coupling (Tool, M.all);
 
       if Gen_XML (Cmd) then
 
@@ -2894,5 +2949,38 @@ package body METRICS.Actions is
       pragma Assert (M.Vals (Lines_Eol_Comment) <= L);
       pragma Assert (M.Vals (Lines_Blank) <= L);
    end Validate;
+
+   procedure Dump_Metrix (M : Metrix) is
+   begin
+      Put ("\1 \2:\n",
+           Str (M.CU_Name).S,
+           (if M.Is_Spec then "spec" else "body"));
+      Indent;
+
+      for Sym of M.Depends_On loop
+         Put ("<dependence dep=""\1 \2 depends on \3"">\n",
+              Str (M.CU_Name).S,
+              (if M.Is_Spec then "spec" else "body"),
+                Str (Sym).S);
+      end loop;
+
+      Outdent;
+      Put ("\n");
+   end Dump_Metrix;
+
+   procedure Dump
+     (Tool : in out Metrics_Tool;
+      Global_M : Metrix;
+      Message : String := "")
+   is
+      pragma Unreferenced (Tool);
+   begin
+      if Debug_Flag_V then
+         Put ("\1\n", Message);
+         for File_M of Global_M.Submetrix loop
+            Dump_Metrix (File_M.all);
+         end loop;
+      end if;
+   end Dump;
 
 end METRICS.Actions;
