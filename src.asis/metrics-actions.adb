@@ -809,7 +809,9 @@ package body METRICS.Actions is
             return (Depth = 2
               and then M.Kind in
                       Ada_Package_Body |
-                      Ada_Subprogram_Body)
+                      Ada_Subprogram_Body |
+                      Ada_Task_Body |
+                      Ada_Protected_Body)
               or else (XML and then Depth = 0);
          when Public_Subprograms =>
             return (Depth = 2
