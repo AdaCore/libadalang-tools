@@ -120,10 +120,10 @@ package body LAL_Extensions is
    function Full_Name (Nm : Name) return Text_Type is
    begin
       case Kind (Nm) is
-         when Ada_Prefix =>
+         when Ada_Dotted_Name =>
             --  ????Not sure why we have to convert to Name here:
-            return Full_Name (Name (F_Prefix (Prefix (Nm)))) &
-              "." & Full_Name (Name (F_Suffix (Prefix (Nm))));
+            return Full_Name (Name (F_Prefix (Dotted_Name (Nm)))) &
+              "." & Full_Name (Name (F_Suffix (Dotted_Name (Nm))));
          when Ada_Identifier | Ada_String_Literal =>
             return Data (F_Tok (Single_Tok_Node (Nm))).Text.all;
 
@@ -200,8 +200,7 @@ package body LAL_Extensions is
                Result :=
                  Name (F_Protected_Type_Name (Protected_Type_Decl (Decl)));
             when Ada_Protected_Body =>
-               Result :=
-                 F_Package_Name (Protected_Body (Decl)); -- package????
+               Result := F_Name (Protected_Body (Decl));
             when Ada_Entry_Body =>
                Result :=
                  Name (F_Entry_Name (Entry_Body (Decl)));
@@ -212,8 +211,7 @@ package body LAL_Extensions is
                Result :=
                  Name (F_Task_Type_Name (Task_Type_Decl (Decl)));
             when Ada_Task_Body =>
-               Result :=
-                 F_Package_Name (Task_Body (Decl)); -- package????
+               Result := F_Name (Task_Body (Decl));
             when others =>
                raise Program_Error with
                  "Get_Def_Name of " & Short_Image (Decl);

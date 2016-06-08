@@ -2008,11 +2008,12 @@ package body METRICS.Actions is
                declare
                   Def_Name : constant Name := Get_Def_Name (Node);
                begin
-                  if Kind (Def_Name) = Ada_Prefix then
+                  if Kind (Def_Name) = Ada_Dotted_Name then
                      Include
                        (File_M.Depends_On,
                         Intern (To_UTF8
-                          (Full_Name (Name (F_Prefix (Prefix (Def_Name)))))));
+                          (Full_Name
+                            (Name (F_Prefix (Dotted_Name (Def_Name)))))));
                   end if;
                end;
 
