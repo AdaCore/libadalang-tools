@@ -4,6 +4,8 @@ with Libadalang; use Libadalang;
 with Libadalang.AST; use Libadalang.AST;
 with Libadalang.AST.Types; use Libadalang.AST.Types;
 
+with LAL_UL.String_Utilities;
+
 package LAL_Extensions is
 
    --  ???Perhaps we should move (some of?) this stuff into package
@@ -69,5 +71,8 @@ package LAL_Extensions is
      (Node : access Ada_Node_Type'Class) return List_Ada_Node;
    --  Return the visible part of a package, generic package, task decl, or
    --  protected decl.
+
+   function Short_Image (Node : Ada_Node) return String is
+      (LAL_UL.String_Utilities.To_UTF8 (Short_Image (Node)));
 
 end LAL_Extensions;

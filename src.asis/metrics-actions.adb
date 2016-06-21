@@ -33,9 +33,6 @@ package body METRICS.Actions is
 
    Output_To_Standard_Output : Boolean renames Debug_Flag_S;
 
-   function Parent (Node : Ada_Node) return Ada_Node is
-     (Parents (Node).Items (2));
-
    function Image (X : Integer) return String
      renames String_Utilities.Image;
 

@@ -34,9 +34,7 @@ package body LAL_UL.Generic_Symbols is
    end record;
 
    function Hash_String is new System.String_Hash.Hash
-     (Character,
-      String,
-      Hash_Type);
+     (Character, String, Hash_Type);
 
    --  Note that there are two kinds of hashing going on here.
    --  The Hash_String function is used in the creation of Symbols
