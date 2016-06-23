@@ -35,7 +35,7 @@ with LAL_UL.Common;   use LAL_UL.Common;
 with LAL_UL.Common.Post;
 with LAL_UL.Projects; use LAL_UL.Projects;
 with LAL_UL.Tool_Names;
-with LAL_UL.Check_Parameters;
+--  with LAL_UL.Check_Parameters;
 with LAL_UL.String_Utilities; use LAL_UL.String_Utilities;
 
 with GNATCOLL.Iconv;
@@ -228,7 +228,7 @@ package body LAL_UL.Drivers is
          Dump_Cmd (Cmd);
       end if;
 
-      LAL_UL.Check_Parameters; -- ????Move into Init?
+--      LAL_UL.Check_Parameters; -- ????Move into Init?
 
       --  ????????????????Stuff from Environment:
 

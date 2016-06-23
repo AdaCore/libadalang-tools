@@ -37,8 +37,9 @@ package body LAL_UL.Command_Lines is
          --  with -rules sections. ????Perhaps this should be parameterized
          --  by sections to skip and section to pay attention to.
 
-         elsif Argument (Cur) = "-cargs"
-           or else Argument (Cur) = "-inner-cargs"
+         elsif False and then -- ????????????????
+           (Argument (Cur) = "-cargs"
+           or else Argument (Cur) = "-inner-cargs")
          then
             --  Skip until we get to the end or see "-asis-tool-args"
 

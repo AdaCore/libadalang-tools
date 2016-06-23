@@ -89,7 +89,7 @@ package LAL_UL.Common is
    package Common_String_Shorthands is new Common_String_Switches
      .Set_Shorthands
      ((Project_File               => +"-P",
-       Run_Time_System            => +"-RTS",
+       Run_Time_System            => +"--RTS",
        Configuration_Pragmas_File => +"-gnatec",
        Mapping_File               => +"-gnatem",
        Object_Path_File_Name      => +"-gnateO",
@@ -117,6 +117,7 @@ package LAL_UL.Common is
      .Set_Shorthands
      ((Debug => +"-d", Files => +"-files", External_Variable => +"-X"));
 
+   --  ????????????????I think -j is ignored.
    type Common_Nats is (Jobs);
    package Common_Nat_Switches is new Other_Switches
      (Common_Descriptor,
