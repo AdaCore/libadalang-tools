@@ -159,6 +159,8 @@ package LAL_UL.String_Utilities is
    --  an ASIS tool is called from gprbuild in parallel using the -j switch.
    --  If Give_Message is True and the directory is successfully created, a
    --  message saying so is printed.
+   --  Why don't we create the directory in the outer invocation, so it won't
+   --  happen in parallel????????????????
 
    procedure Move_File (Old_Name : String; New_Name : String);
    --  Same as GNAT.OS_Lib.Rename_File, but overwrites New_Name if it already

@@ -23,8 +23,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Exceptions;
-
 with GNAT.Command_Line;
 with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 with GNAT.OS_Lib;
@@ -34,7 +32,6 @@ with LAL_UL.Environment;
 with LAL_UL.Common;   use LAL_UL.Common;
 with LAL_UL.Common.Post;
 with LAL_UL.Projects; use LAL_UL.Projects;
-with LAL_UL.Tool_Names;
 --  with LAL_UL.Check_Parameters;
 with LAL_UL.String_Utilities; use LAL_UL.String_Utilities;
 
@@ -61,11 +58,9 @@ package body LAL_UL.Drivers is
       Tool                  : in out Tool_State'Class;
       Tool_Package_Name     :        String;
       Needs_Per_File_Output :        Boolean        := False;
-      No_Preprocessing      :        Boolean        := False;
+      Preprocessing_Allowed :        Boolean        := True;
       Callback              :        Parse_Callback := null)
    is
-      pragma Unreferenced (No_Preprocessing);
-
       use String_Ref_Vectors;
 
       procedure Local_Callback
@@ -100,7 +95,8 @@ package body LAL_UL.Drivers is
          --  Leave Tool_Inner_Dir = null
       end Post_Cmd_Line_1;
 
-      Cmd_Text, Project_Switches_Text : GNAT.OS_Lib.Argument_List_Access;
+      Cmd_Text, Cmd_Cargs, Project_Switches_Text :
+        GNAT.OS_Lib.Argument_List_Access;
       Global_Report_Dir               : String_Ref;
       Compiler_Options                : GNAT.OS_Lib.Argument_List_Access;
       Custom_RTS                      : GNAT.OS_Lib.String_Access;
@@ -159,6 +155,7 @@ package body LAL_UL.Drivers is
 
       procedure Process_Files is
          Counter : Natural := File_Names (Cmd)'Length;
+         use Text_IO;
       begin
          for F_Name of ASIS_Order_File_Names (File_Names (Cmd)) loop
             if Arg (Cmd, Verbose) then
@@ -210,6 +207,7 @@ package body LAL_UL.Drivers is
       Process_Command_Line
         (Cmd,
          Cmd_Text,
+         Cmd_Cargs,
          Project_Switches_Text,
          Global_Report_Dir,
          Compiler_Options,
@@ -217,6 +215,7 @@ package body LAL_UL.Drivers is
          Individual_Source_Options => Individual_Source_Options,
          Result_Dirs               => Result_Dirs,
          Needs_Per_File_Output     => Needs_Per_File_Output,
+         Preprocessing_Allowed     => Preprocessing_Allowed,
          Tool_Package_Name         => Tool_Package_Name,
          Callback                  => Local_Callback'Unrestricted_Access,
          Post_Cmd_Line_1_Action    => Post_Cmd_Line_1'Access,
@@ -279,9 +278,8 @@ package body LAL_UL.Drivers is
       ASIS_UL.Main_Done := True;
 
    exception
-      when X : LAL_UL.Command_Lines.Command_Line_Error =>
-         Put (Standard_Error, LAL_UL.Tool_Names.Tool_Name & ": ");
-         Put_Line (Standard_Error, Ada.Exceptions.Exception_Message (X));
+      when LAL_UL.Command_Lines.Command_Line_Error =>
+         --  Error message has already been printed.
          GNAT.Command_Line.Try_Help;
          Environment.Clean_Up;
          GNAT.OS_Lib.OS_Exit (1);

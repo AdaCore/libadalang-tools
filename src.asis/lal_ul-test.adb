@@ -28,7 +28,7 @@ procedure LAL_UL.Test is
 begin
    Put_Line ("Hello");
    declare
-      Cmd_Text, Project_Switches_Text : Argument_List_Access;
+      Cmd_Text, Cmd_Cargs, Project_Switches_Text : Argument_List_Access;
       Global_Report_Dir               : String_Ref;
       Compiler_Options                : String_List_Access;
       Project_RTS                     : String_Access;
@@ -38,6 +38,7 @@ begin
       Process_Command_Line
         (Cmd,
          Cmd_Text,
+         Cmd_Cargs,
          Project_Switches_Text,
          Global_Report_Dir,
          Compiler_Options,

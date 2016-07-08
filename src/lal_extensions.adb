@@ -8,7 +8,7 @@ package body LAL_Extensions is
 
    function Childx
      (Node  : access Ada_Node_Type'Class;
-      Index : Natural) return Ada_Node
+      Index : Positive) return Ada_Node
    is
    begin
       return Child (Ada_Node (Node), Index);

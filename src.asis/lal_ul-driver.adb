@@ -23,15 +23,11 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 with Ada.Calendar;
-with Ada.Command_Line;
 with Ada.Directories; use Ada.Directories;
-with Ada.Exceptions;
 
 with GNAT.Command_Line;
 with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 with GNAT.OS_Lib;
-
-with Asis.Exceptions;
 
 with ASIS_UL.Common;
 with ASIS_UL.Compiler_Options;
@@ -50,9 +46,10 @@ with LAL_UL.Check_Parameters;
 procedure LAL_UL.Driver
   (Prj                   : in out ASIS_UL.Projects.Arg_Project_Type'Class;
    Cmd                   : in out Command_Line;
+   Print_Help            :        not null access procedure;
    Tool_Package_Name     :        String;
    Needs_Per_File_Output :        Boolean        := False;
-   No_Preprocessing      :        Boolean        := False;
+   Preprocessing_Allowed :        Boolean        := True;
    Callback              :        Parse_Callback := null)
 is
    use String_Ref_Vectors;
@@ -90,8 +87,12 @@ is
                      null; -- ????????????????No need for Store_RTS_Path
 
                   when Target =>
-                     ASIS_UL.Common.Target_From_Command_Line :=
+--                     ASIS_UL.Common.Target_From_Command_Line :=
+                     ASIS_UL.Common.Target :=
                        new String'(Swit.String_Val.all);
+--  ????????????????Need to deal with:
+--  r249370 | rybin | 2016-06-28 08:02:23 -0400 (Tue, 28 Jun 2016) | 8 lines
+
                   when others =>
                      null;
                end case;
@@ -114,8 +115,10 @@ is
                   when Configuration_Pragmas_File |
                     Mapping_File                  |
                     Object_Path_File_Name         =>
+                     pragma Assert (Swit.Text'First = 1);
+                     --  Store_GNAT_Option_With_Path adds the '-'
                      Store_GNAT_Option_With_Path
-                       (Swit.Text.all,
+                       (Swit.Text (2 .. Swit.Text'Last),
                         Swit.String_Val.all);
 
                   when Include_Path =>
@@ -163,35 +166,45 @@ is
          ASIS_UL.Options.Incremental_Mode := True;
       end if;
 
+      if ASIS_UL.Options.Incremental_Mode then
+         if Arg (Cmd, Project_File) = null then
+            ASIS_UL.Output.Error
+              ("--incremental mode requires a project file, " &
+               "and cannot be used with the gnat driver");
+            raise ASIS_UL.Common.Fatal_Error;
+         end if;
+      end if;
+
       if ASIS_UL.Options.Mimic_gcc then
-         Tool_Current_Dir := new String'(Arg (Cmd, Outer_Dir).all);
-         Tool_Inner_Dir   := new String'(Initial_Dir);
+         ASIS_UL.Environment.Tool_Current_Dir :=
+           new String'(Arg (Cmd, Outer_Dir).all);
+         ASIS_UL.Environment.Tool_Inner_Dir := new String'(Initial_Dir);
          pragma Assert
            (Full_Name (Arg (Cmd, Outer_Dir).all) = Arg (Cmd, Outer_Dir).all);
          --  ????????????????Should we be using Normalize_Pathname instead of
          --  Ada.Directories.Full_Name? Version of Arg that returns String?
          pragma Assert (Get_Current_Dir = Initial_Dir & "/");
-         Change_Dir (Tool_Current_Dir.all);
+         Change_Dir (ASIS_UL.Environment.Tool_Current_Dir.all);
       else
-         Tool_Current_Dir := new String'(Initial_Dir);
+         ASIS_UL.Environment.Tool_Current_Dir := new String'(Initial_Dir);
          --  Leave Tool_Inner_Dir = null
       end if;
+
+      --  Need to set verbose and quiet modes again, in case they were
+      --  specified in the project file.
 
       Verbose_Mode := Arg (Cmd, Verbose);
       Quiet_Mode   := Arg (Cmd, Quiet);
    end Post_Cmd_Line_1;
 
-   Cmd_Text, Project_Switches_Text : GNAT.OS_Lib.Argument_List_Access;
+   Cmd_Text, Cmd_Cargs, Project_Switches_Text :
+     GNAT.OS_Lib.Argument_List_Access;
    Global_Report_Dir               : String_Ref;
    Compiler_Options                : GNAT.OS_Lib.Argument_List_Access;
    Individual_Source_Options       : String_String_List_Map;
    Result_Dirs                     : String_String_Map;
 
-   procedure Print_Help;
-   procedure Print_Help is
-   begin
-      Put_Line ("Help!");
-   end Print_Help;
+--  Start of processing for LAL_UL.Driver
 
 begin
    ASIS_UL.Environment.Create_Temp_Dir;
@@ -199,6 +212,7 @@ begin
    Process_Command_Line
      (Cmd,
       Cmd_Text,
+      Cmd_Cargs,
       Project_Switches_Text,
       Global_Report_Dir,
       Compiler_Options,
@@ -206,14 +220,18 @@ begin
       Individual_Source_Options => Individual_Source_Options,
       Result_Dirs               => Result_Dirs,
       Needs_Per_File_Output     => Needs_Per_File_Output,
+      Preprocessing_Allowed     => Preprocessing_Allowed,
       Tool_Package_Name         => Tool_Package_Name,
       Callback                  => Local_Callback'Unrestricted_Access,
       Post_Cmd_Line_1_Action    => Post_Cmd_Line_1'Access,
       Tool_Temp_Dir             => ASIS_UL.Environment.Tool_Temp_Dir.all,
-      Print_Help                => Print_Help'Access);
+      Print_Help                => Print_Help);
    LAL_UL.Common.Post.Postprocess_Common (Cmd);
    pragma Assert
      (not (ASIS_UL.Options.Incremental_Mode and ASIS_UL.Options.Mimic_gcc));
+
+   ASIS_UL.Options.Verbose_Mode := Arg (Cmd, Verbose);
+   ASIS_UL.Options.Quiet_Mode   := Arg (Cmd, Quiet);
 
    for Opt of Compiler_Options.all loop
       ASIS_UL.Compiler_Options.Store_Option (Opt.all);
@@ -229,12 +247,12 @@ begin
          Project_Switches_Text,
          Section_Delimiters => "cargs rules asis-tool-args");
       --  'rules' is only for gnatcheck, which seems harmless
-      Process_cargs_Section (Parser, No_Preprocessing);
+      Process_cargs_Section (Parser, Preprocessing_Allowed);
       Initialize_Option_Scan
         (Parser,
-         Cmd_Text,
+         Cmd_Cargs,
          Section_Delimiters => "cargs rules asis-tool-args");
-      Process_cargs_Section (Parser, No_Preprocessing);
+      Process_cargs_Section (Parser, Preprocessing_Allowed);
    end;
 
    if Global_Report_Dir /= null then
@@ -258,14 +276,15 @@ begin
    --  ????????????????Stuff from Environment:
 
    declare
-      use GNAT.OS_Lib, ASIS_UL.Environment, ASIS_UL.Options;
+      use GNAT.OS_Lib, ASIS_UL.Options;
    begin
-      Copy_Gnat_Adc;
+      ASIS_UL.Environment.Copy_Gnat_Adc;
       pragma Assert
-        (Get_Current_Dir = Tool_Current_Dir.all & Directory_Separator);
+        (Get_Current_Dir = ASIS_UL.Environment.Tool_Current_Dir.all &
+           Directory_Separator);
 
       if not ASIS_UL.Options.Incremental_Mode then
-         Change_Dir (Tool_Temp_Dir.all);
+         Change_Dir (ASIS_UL.Environment.Tool_Temp_Dir.all);
          ASIS_UL.Compiler_Options.Store_I_Options;
       end if;
 
@@ -337,39 +356,17 @@ begin
    ASIS_UL.Main_Done := True;
 
 exception
-   when X : LAL_UL.Command_Lines.Command_Line_Error =>
-      ASIS_UL.Output.Error (Ada.Exceptions.Exception_Message (X));
-      --  Should we print here or at the raise????
+   when LAL_UL.Command_Lines.Command_Line_Error |
+     ASIS_UL.Common.Parameter_Error =>
+      --  ????Get rid of Parameter_Error, and dependence on
+      --  ASIS_UL.Compiler_Options.
+
+      --  Error message has already been printed.
       GNAT.Command_Line.Try_Help;
-      Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
       ASIS_UL.Environment.Clean_Up;
       GNAT.OS_Lib.OS_Exit (1);
-
    when ASIS_UL.Common.Fatal_Error =>
-      --  Just a trap; all the diagnostic messages should already have been
-      --  generated.
-      Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
+      --  Error message has already been printed.
       ASIS_UL.Environment.Clean_Up;
       GNAT.OS_Lib.OS_Exit (1);
-
-   when Ex : Asis.Exceptions
-     .ASIS_Inappropriate_Context | Asis.Exceptions
-     .ASIS_Inappropriate_Container | Asis.Exceptions
-     .ASIS_Inappropriate_Compilation_Unit | Asis.Exceptions
-     .ASIS_Inappropriate_Element | Asis.Exceptions
-     .ASIS_Inappropriate_Line | Asis.Exceptions
-     .ASIS_Inappropriate_Line_Number | Asis.Exceptions
-     .ASIS_Failed =>
-
-      Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
-      ASIS_UL.Output.Report_Unhandled_ASIS_Exception (Ex);
-      ASIS_UL.Environment.Clean_Up;
-      GNAT.OS_Lib.OS_Exit (1);
-
-   when Ex : others =>
-      Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
-      ASIS_UL.Output.Report_Unhandled_Exception (Ex);
-      ASIS_UL.Environment.Clean_Up;
-      GNAT.OS_Lib.OS_Exit (1);
-
 end LAL_UL.Driver;

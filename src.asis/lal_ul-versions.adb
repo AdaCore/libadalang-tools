@@ -1,12 +1,12 @@
 ------------------------------------------------------------------------------
 --                                                                          --
---                     ASIS UTILITY LIBRARY COMPONENTS                      --
+--                  COMMON ASIS TOOLS COMPONENTS LIBRARY                    --
 --                                                                          --
---                       A S I S _ U L . D R I V E R                        --
+--                       A S I S _ U L . O U T P U T                        --
 --                                                                          --
---                                 S p e c                                  --
+--                                 B o d y                                  --
 --                                                                          --
---                    Copyright (C) 2013-2014, AdaCore                      --
+--                    Copyright (C) 2004-2016, AdaCore                      --
 --                                                                          --
 -- Asis Utility Library (ASIS UL) is free software; you can redistribute it --
 -- and/or  modify  it  under  terms  of  the  GNU General Public License as --
@@ -23,20 +23,40 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
---  This is the version of the top-level tool driver that implements a tool
---  that has one or more source file arguments. It does make use of the source
---  file table. It allows to have a direct project support in a tool.
+pragma Ada_2012;
 
-with ASIS_UL.Projects;
-with LAL_UL.Command_Lines; use LAL_UL.Command_Lines;
+with Ada.Characters.Handling; use Ada.Characters.Handling;
 
-procedure LAL_UL.Driver
-  (Prj                   : in out ASIS_UL.Projects.Arg_Project_Type'Class;
-   Cmd                   : in out Command_Line;
-   Print_Help            :        not null access procedure;
-   Tool_Package_Name     :        String;
-   Needs_Per_File_Output :        Boolean        := False;
-   Preprocessing_Allowed :        Boolean        := True;
-   Callback              :        Parse_Callback := null);
---  Preprocessing_Allowed needs to be OFF for gnatpp, because it is updating
---  the source. It is also OFF for gnat2xml; not sure why.
+with Gnatvsn;
+
+with LAL_UL.Tool_Names;
+with LAL_UL.Formatted_Output; use LAL_UL.Formatted_Output;
+
+package body LAL_UL.Versions is
+
+   ------------------------
+   -- Print_Tool_Version --
+   ------------------------
+
+   procedure Print_Tool_Version is
+   begin
+      Put ("\1 \2\n",
+           To_Upper (Tool_Names.Tool_Name), Gnatvsn.Gnat_Version_String);
+      Put ("Copyright (C) \1, \2\n",
+           Gnatvsn.Current_Year, Gnatvsn.Copyright_Holder);
+      Put ("\1", Gnatvsn.Gnat_Free_Software);
+      Put ("\n");
+   end Print_Tool_Version;
+
+   ------------------------
+   -- Print_Version_Info --
+   ------------------------
+
+   procedure Print_Version_Info is
+   begin
+      Put ("\1 \2\n", Tool_Names.Tool_Name, Gnatvsn.Gnat_Version_String);
+      Put ("Copyright (C) \1, \2.\n",
+           Gnatvsn.Current_Year, "AdaCore");
+   end Print_Version_Info;
+
+end LAL_UL.Versions;

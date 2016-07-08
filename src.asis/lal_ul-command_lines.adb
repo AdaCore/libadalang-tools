@@ -1,18 +1,29 @@
 with Ada.Characters.Handling; use Ada.Characters.Handling;
 with Ada.Command_Line;
+with Ada.Exceptions;
 with Ada.Strings;             use Ada.Strings;
 with Ada.Strings.Fixed;       use Ada.Strings.Fixed;
+use Ada;
 
 with GNAT.Command_Line;
 --  We don't use most of the facilities of GNAT.Command_Line.
 --  We use it mainly for the wildcard-expansion facility.
 
+with LAL_UL.Tool_Names;
 with LAL_UL.Utils; use LAL_UL.Utils;
 
 package body LAL_UL.Command_Lines is
+   use Text_IO; -- ????????????????
+
+   procedure Raise_Cmd_Error (Message : String) is
+   begin
+      raise Command_Line_Error with Message;
+   end Raise_Cmd_Error;
 
    procedure Cmd_Error (Message : String) is
    begin
+      Put (Standard_Error, LAL_UL.Tool_Names.Tool_Name & ": ");
+      Put_Line (Standard_Error, Message);
       raise Command_Line_Error with Message;
    end Cmd_Error;
 
@@ -29,7 +40,7 @@ package body LAL_UL.Command_Lines is
 
          if Argument (Cur) = "-x"
            and then Cur < Argument_Count
-           and then Argument (Cur) = "ada"
+           and then Argument (Cur + 1) = "ada"
          then
             Cur := Cur + 2;
 
@@ -37,11 +48,11 @@ package body LAL_UL.Command_Lines is
          --  with -rules sections. ????Perhaps this should be parameterized
          --  by sections to skip and section to pay attention to.
 
-         elsif False and then -- ????????????????
-           (Argument (Cur) = "-cargs"
-           or else Argument (Cur) = "-inner-cargs")
+         elsif Argument (Cur) = "-cargs"
+           or else Argument (Cur) = "-inner-cargs"
          then
             --  Skip until we get to the end or see "-asis-tool-args"
+            --  Shouldn't we stop at "-rules" as well????
 
             loop
                Cur := Cur + 1;
@@ -53,6 +64,10 @@ package body LAL_UL.Command_Lines is
                   exit;
                end if;
             end loop;
+
+         elsif Argument (Cur) = "-asis-tool-args" then
+            Cur := Cur + 1;
+
          else
             Append (Result, new String'(Argument (Cur)));
             Cur := Cur + 1;
@@ -61,6 +76,43 @@ package body LAL_UL.Command_Lines is
 
       return new Argument_List'(To_Array (Result));
    end Text_Args_From_Command_Line;
+
+   function Text_Cargs_From_Command_Line return Argument_List_Access is
+      use Ada.Command_Line;
+      Result : String_Access_Vector;
+
+      Cur : Positive := 1;
+   begin
+      while Cur <= Argument_Count loop
+         if Argument (Cur) = "-cargs"
+           or else Argument (Cur) = "-inner-cargs"
+         then
+            --  Append until we get to the end or see "-asis-tool-args"
+            --  Shouldn't we stop at "-rules" as well????
+
+            loop
+               Append
+                 (Result,
+                  new String'
+                    (if Argument (Cur) = "-inner-cargs"
+                       then "-cargs"
+                       else Argument (Cur)));
+               Cur := Cur + 1;
+               if Cur > Argument_Count then
+                  exit;
+               end if;
+               if Argument (Cur) = "-asis-tool-args" then
+                  Cur := Cur + 1;
+                  exit;
+               end if;
+            end loop;
+         else -- skip
+            Cur := Cur + 1;
+         end if;
+      end loop;
+
+      return new Argument_List'(To_Array (Result));
+   end Text_Cargs_From_Command_Line;
 
    generic
       type Switches is (<>);
@@ -530,7 +582,7 @@ package body LAL_UL.Command_Lines is
 
       exception
          when Constraint_Error =>
-            Cmd_Error ("Malformed argument: " & Text);
+            Raise_Cmd_Error ("Malformed argument: " & Text);
       end Validate;
 
    begin
@@ -666,7 +718,7 @@ package body LAL_UL.Command_Lines is
          end if;
       end loop;
 
-      Cmd_Error ("invalid switch : " & Text);
+      Raise_Cmd_Error ("invalid switch : " & Text);
    end Text_To_Switch;
 
    procedure Parse_Helper
@@ -755,7 +807,8 @@ package body LAL_UL.Command_Lines is
                      First := 1;
 
                      if Cur > Text_Args'Last then
-                        Cmd_Error ("missing switch parameter for: " & Text);
+                        Raise_Cmd_Error
+                          ("missing switch parameter for: " & Text);
                      end if;
 
                   --  The case of:
@@ -769,7 +822,10 @@ package body LAL_UL.Command_Lines is
                   --  Split out the "arg" part.
 
                   else
-                     pragma Assert (Has_Prefix (Text, Prefix => Allowed));
+                     pragma Assert
+                       (Has_Prefix
+                          (Replace_String (Text, "_", "-"),
+                           Prefix => Replace_String (Allowed, "_", "-")));
 
                      if Text (Allowed'Length + 1) = '=' then
                         First := Allowed'Length + 2;
@@ -790,9 +846,9 @@ package body LAL_UL.Command_Lines is
                            Descriptor.Allowed_Switches
                              (Descriptor.Allowed_Switches (Switch).Alias)
                                .Validator (S);
-                           --  Call the Validator. This will call Cmd_Error if
-                           --  the switch parameter is malformed; Cmd_Error
-                           --  raises.
+                           --  Call the Validator. This will call
+                           --  Raise_Cmd_Error if the switch parameter
+                           --  is malformed; Raise_Cmd_Error raises.
 
                            --  ????????????????Free (Dyn.String_Val);
                            if Dyn.String_Val = null
@@ -839,12 +895,14 @@ package body LAL_UL.Command_Lines is
             begin
                Parse_One_Switch;
             exception
-               when Command_Line_Error =>
+               when X : Command_Line_Error =>
                   Cmd.Error_Detected := True;
                   --  This works, event though we're about to raise, because
                   --  Cmd is a pointer.
 
                   if not Ignore_Errors then
+                     Put_Line (Standard_Error, LAL_UL.Tool_Names.Tool_Name &
+                                  ": " & Exceptions.Exception_Message (X));
                      raise;
                   end if;
             end;

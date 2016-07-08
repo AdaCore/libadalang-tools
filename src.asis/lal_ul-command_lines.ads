@@ -510,9 +510,9 @@ package LAL_UL.Command_Lines is
    --
    --  Ignore_Errors is normally set True the first time, so we can detect
    --  switches like "--help" and "--version", ignoring all other switches. If
-   --  Ignore_Errors is False, an error causes Command_Line_Error to be raised,
-   --  with the Exception_Message set to an appropriate message. The caller
-   --  should print the message and exit the program.
+   --  Ignore_Errors is False, an error causes a message to be printed, and
+   --  Command_Line_Error to be raised. The caller should print the "try
+   --  --help" message and exit the program.
 
    procedure Clear_File_Names (Cmd : in out Command_Line);
    --  Sets the File_Names of Cmd to empty
@@ -550,6 +550,9 @@ package LAL_UL.Command_Lines is
    function Text_Args_From_Command_Line return Argument_List_Access;
    --  Returns the sequence of command-line arguments
 
+   function Text_Cargs_From_Command_Line return Argument_List_Access;
+   --  Returns the -cargs sections
+
    function "+" (S : String) return String_Ref is (new String'(S));
    --  Hack to get around the fact that Ada doesn't allow arrays of String
 
@@ -564,6 +567,9 @@ package LAL_UL.Command_Lines is
    --  Prints an error message, and raises Command_Line_Error. This is
    --  called by Parse to report errors, and may also be used by clients
    --  of Parse.
+
+   procedure Raise_Cmd_Error (Message : String) with No_Return;
+   --  Raises Command_Line_Error with the given message.
 
 private
 

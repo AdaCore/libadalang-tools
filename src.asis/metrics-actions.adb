@@ -1027,7 +1027,7 @@ package body METRICS.Actions is
          Put ("Metrics computed for \1\n",
               File_Name_To_Print (Cmd, File_Name));
          Put ("containing \1 \2\n",
-              Fine_Kind_String_For_Header (Get (M.Submetrix, 0).all),
+              Fine_Kind_String_For_Header (Get (M.Submetrix, 1).all),
               Str (M.Text_Name).S);
       else
          Put ("\n\1 (\2\3 at lines  \4)\n",
@@ -1376,7 +1376,7 @@ package body METRICS.Actions is
    procedure Destroy (M : in out Metrix_Ref) is
       procedure Free is new Unchecked_Deallocation (Metrix, Metrix_Ref);
    begin
-      for Index in 0 .. Last_Index (M.Submetrix) loop
+      for Index in 1 .. Last_Index (M.Submetrix) loop
          declare
             Sub : Metrix_Ref renames Get_Access (M.Submetrix, Index).all;
          begin
@@ -1413,7 +1413,7 @@ package body METRICS.Actions is
          end loop;
       end Inc_All;
 
-      --  CU_Node : constant Ada_Node := Childx (CU_List, 0);
+      --  CU_Node : constant Ada_Node := Childx (CU_List, 1);
       CU_Node : constant Ada_Node := CU_List;
       pragma Assert (Kind (CU_Node) = Ada_Compilation_Unit);
       Outer_Unit : constant Ada_Node := Get_Outer_Unit (CU_Node);
@@ -1467,10 +1467,10 @@ package body METRICS.Actions is
       --  don't count.
 
       function In_Visible_Part return Boolean is
-         (Last_Index (Metrix_Stack) >= 2
-            and then Get (Metrix_Stack, 2).Kind in
+         (Last_Index (Metrix_Stack) >= 3
+            and then Get (Metrix_Stack, 3).Kind in
               Ada_Package_Decl | Ada_Generic_Package_Decl
-            and then not Get (Metrix_Stack, 2).Is_Private_Lib_Unit
+            and then not Get (Metrix_Stack, 3).Is_Private_Lib_Unit
             and then Private_Part_Count = 0);
       --  True if we're within only visible parts. Note that it is possible to
       --  be in a visible part that is within a private part; we return False
@@ -1508,7 +1508,7 @@ package body METRICS.Actions is
       procedure Gather_Metrics_And_Walk_Children (Node : Ada_Node);
 
       procedure Cyclomate (Node : Ada_Node; M : in out Metrix) is
-         File_M : Metrix renames Get (Metrix_Stack, 1).all;
+         File_M : Metrix renames Get (Metrix_Stack, 2).all;
          --  We don't walk up the stack as for other metrics. We increment
          --  the current Metrix (M) and the one for the file as a whole
          --  (File_M). Thus, the one for the file ends up being the total,
@@ -1757,7 +1757,7 @@ package body METRICS.Actions is
             end case;
          end Should_Gather_Body_Lines;
 
-         Global_M : Metrix renames Get (Metrix_Stack, 0).all;
+         Global_M : Metrix renames Get (Metrix_Stack, 1).all;
       begin
          if Node = M.Node then
             declare
@@ -1865,7 +1865,7 @@ package body METRICS.Actions is
                   Assocs : constant List_Aspect_Assoc :=
                     F_Aspect_Assocs (Aspects);
                begin
-                  for I in 0 .. Child_Count (Assocs) - 1 loop
+                  for I in 1 .. Child_Count (Assocs) loop
                      case Assertion_Kind (Childx (Assocs, I)) is
                         when Postcondition =>
                            Has_Contracts := True;
@@ -1884,7 +1884,7 @@ package body METRICS.Actions is
 
       begin
          if Vis_Decls /= null then -- Shouldn't it be empty list???
-            for I in 0 .. Child_Count (Vis_Decls) - 1 loop
+            for I in 1 .. Child_Count (Vis_Decls) loop
                declare
                   Decl : constant Ada_Node := Childx (Vis_Decls, I);
                   Has_Contracts, Has_Post : Boolean;
@@ -1931,7 +1931,7 @@ package body METRICS.Actions is
 
          --  --public-subprograms
 
-         if Last_Index (Metrix_Stack) = 2 then
+         if Last_Index (Metrix_Stack) = 3 then
             if Node = M.Node and then
               M.Kind in Ada_Subprogram_Decl |
                 Ada_Generic_Subprogram_Decl |
@@ -1948,7 +1948,7 @@ package body METRICS.Actions is
                   Vis_Decls : constant List_Ada_Node := Visible_Part (Node);
                begin
                   if Vis_Decls /= null then
-                     for I in 0 .. Child_Count (Vis_Decls) - 1 loop
+                     for I in 1 .. Child_Count (Vis_Decls) loop
                         declare
                            Decl : constant Ada_Node := Childx (Vis_Decls, I);
                         begin
@@ -1964,7 +1964,7 @@ package body METRICS.Actions is
       end Gather_Syntax_Metrics;
 
       procedure Gather_Dependencies (Node : Ada_Node) is
-         File_M : Metrix renames Get (Metrix_Stack, 1).all;
+         File_M : Metrix renames Get (Metrix_Stack, 2).all;
       begin
          case Kind (Node) is
             --  For "with P, Q;" include P and Q
@@ -1974,7 +1974,7 @@ package body METRICS.Actions is
                   Names : constant List_Name :=
                     F_Packages (With_Decl (Node));
                begin
-                  for I in 0 .. Child_Count (Names) - 1 loop
+                  for I in 1 .. Child_Count (Names) loop
                      if F_Is_Limited (With_Decl (Node)) then
                         Include
                           (File_M.Limited_Depends_On,
@@ -2054,7 +2054,7 @@ package body METRICS.Actions is
 
          if Node = Outer_Unit or else Kind (Node) in Eligible then
             declare
-               File_M : Metrix renames Get (Metrix_Stack, 1).all;
+               File_M : Metrix renames Get (Metrix_Stack, 2).all;
                Parent : Metrix renames
                  Get (Metrix_Stack, Last_Index (Metrix_Stack)).all;
                M : constant Metrix_Ref := Push_New_Metrix (Tool, Node);
@@ -2163,7 +2163,7 @@ package body METRICS.Actions is
 
          for I in 1 .. Child_Count (Node) loop
             declare
-               Cur_Child : constant Ada_Node := Child (Node, I - 1);
+               Cur_Child : constant Ada_Node := Child (Node, I);
             begin
                if Cur_Child /= null then
                   Rec (Cur_Child);
@@ -2173,7 +2173,7 @@ package body METRICS.Actions is
       end Gather_Metrics_And_Walk_Children;
 
       pragma Assert (Length (Metrix_Stack) = 1);
-      Parent : Metrix renames Get (Metrix_Stack, 0).all;
+      Parent : Metrix renames Get (Metrix_Stack, 1).all;
       M : constant Metrix_Ref :=
         Push_New_Metrix
           (Tool, CU_Node, Source_File_Name => new String'(File_Name));
@@ -2551,7 +2551,7 @@ package body METRICS.Actions is
          if S /= null then
             declare
                pragma Assert (S.Indirect_Dependences_Computed);
-               Outer_Unit : Metrix renames Get (S.Submetrix, 0).all;
+               Outer_Unit : Metrix renames Get (S.Submetrix, 1).all;
                --  Outer_Unit is the outermost package spec, procedure spec,
                --  etc.
             begin
@@ -2569,7 +2569,7 @@ package body METRICS.Actions is
                   declare
                      Dep : Metrix renames Specs (Get_Symbol_Index (Sym)).all;
                      Dep_Outer_Unit : Metrix renames
-                       Get (Dep.Submetrix, 0).all;
+                       Get (Dep.Submetrix, 1).all;
                   begin
                      Inc (Dep_Outer_Unit.Vals (Unit_Coupling_In));
                   end;
@@ -2578,7 +2578,7 @@ package body METRICS.Actions is
                   declare
                      Dep : Metrix renames Specs (Get_Symbol_Index (Sym)).all;
                      Dep_Outer_Unit : Metrix renames
-                       Get (Dep.Submetrix, 0).all;
+                       Get (Dep.Submetrix, 1).all;
                   begin
                      Inc (Dep_Outer_Unit.Vals (Unit_Coupling_In));
                   end;
@@ -2592,7 +2592,7 @@ package body METRICS.Actions is
      (Cmd : Command_Line;
       Metrics_To_Compute : Metrics_Set)
    is
-      subtype Arr_Index is Natural range 0 .. Last_Index (Units_For_Coupling);
+      subtype Arr_Index is Positive range 1 .. Last_Index (Units_For_Coupling);
       subtype Arr is Metrix_Vectors.Elements_Array (Arr_Index);
 
       function Lt (X, Y : Metrix_Ref) return Boolean;
@@ -2648,7 +2648,7 @@ package body METRICS.Actions is
       Summed : constant String :=
         "summed over " & Image (Num_File_Names (Cmd)) & " units";
       pragma Assert (Length (Metrix_Stack) = 1);
-      M : Metrix_Ref := Get (Metrix_Stack, 0);
+      M : Metrix_Ref := Get (Metrix_Stack, 1);
 
       Global : Text_IO.File_Type;
       --  File for global information in text form, if --global-file-name

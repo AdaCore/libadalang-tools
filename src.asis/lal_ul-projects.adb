@@ -15,11 +15,14 @@ with GNATCOLL.Traces;
 pragma Warnings (On);
 
 with LAL_UL.Common;     use LAL_UL.Common;
+with LAL_UL.Environment;
 with LAL_UL.Formatted_Output;
 with LAL_UL.Tool_Names; use LAL_UL.Tool_Names;
 with LAL_UL.Utils;      use LAL_UL.Utils;
+with LAL_UL.Versions;
 
 package body LAL_UL.Projects is
+   use Text_IO;
 
    pragma Warnings (Off); -- ????????????????
    use Common_Flag_Switches, Common_String_Switches,
@@ -44,10 +47,6 @@ package body LAL_UL.Projects is
    procedure Recompute_View_Errors (S : String);
    --  Print out all errors but the warnings about missing directories.
 
-   function Needed_For_Tree_Creation (Option : String) return Boolean;
-   --  Checks if the argument is the compilation option that is needed for tree
-   --  creation
-
    procedure Process_Project
      (Cmd                       : in out Command_Line;
       Project_Switches_Text     :    out Argument_List_Access;
@@ -57,6 +56,7 @@ package body LAL_UL.Projects is
       Individual_Source_Options :    out String_String_List_Map;
       Result_Dirs               :    out String_String_Map;
       Needs_Per_File_Output     :        Boolean;
+      Preprocessing_Allowed     :        Boolean;
       My_Project                : in out Project_Tree;
       Tool_Package_Name         :        String;
       Compute_Project_Closure   :        Boolean;
@@ -75,39 +75,6 @@ package body LAL_UL.Projects is
      (Cmd           : in out Command_Line;
       Par_File_Name :        String);
    --  ????????????????Should replace Read_Args_From_File
-
-   ------------------------------
-   -- Needed_For_Tree_Creation --
-   ------------------------------
-
-   function Needed_For_Tree_Creation (Option : String) return Boolean is
-      Result    : Boolean          := False;
-      First_Idx : constant Natural := Option'First;
-   begin
-      --  a simple prototype for the moment, to be completed...
-      if Option = "-gnat83"
-        or else Option = "-gnat95"
-        or else Option = "-gnat05"
-        or else Option = "-gnat12"
-        or else Option = "-gnatdm"
-        or else Option = "-gnatd.V"
-        or else
-        (Option'Length >= 10
-         and then Option (First_Idx .. First_Idx + 6) = "-gnateD")
-        or else
-         (Option'Length >= 10
-         and then
-          Option (First_Idx .. First_Idx + 6) = "-gnatep")
-        or else Option = "-gnatI"
-        or else
-        (Option'Length >= 7
-         and then Option (First_Idx .. First_Idx + 5) = "--RTS=")
-      then
-         Result := True;
-      end if;
-
-      return Result;
-   end Needed_For_Tree_Creation;
 
    ---------------------------
    -- Recompute_View_Errors --
@@ -135,6 +102,7 @@ package body LAL_UL.Projects is
       Individual_Source_Options :    out String_String_List_Map;
       Result_Dirs               :    out String_String_Map;
       Needs_Per_File_Output     :        Boolean;
+      Preprocessing_Allowed     :        Boolean;
       My_Project : in out Project_Tree; -- My_Project_Tree????????????????
       Tool_Package_Name         :        String;
       Compute_Project_Closure   :        Boolean;
@@ -243,6 +211,11 @@ package body LAL_UL.Projects is
       --  files in the source table. It is NOT a part of the actions combined
       --  in Process_Project_File procedure.????????????????
 
+      function Needed_For_Tree_Creation (Option : String) return Boolean;
+      --  Checks if the argument is the compilation option that is needed for
+      --  tree creation. Also gives an error message if there is a preprocessor
+      --  switch, and Preprocessing_Allowed is False.
+
       ----------------------------
       -- Initialize_Environment --
       ----------------------------
@@ -267,15 +240,18 @@ package body LAL_UL.Projects is
       -----------------------
 
       procedure Load_Tool_Project is
+         Error_Printed : Boolean := False;
          procedure Errors (S : String);
          procedure Errors (S : String) is
          begin
             if Index (S, " not a regular file") /= 0 then
-               Cmd_Error
-                 ("project file " & Project_File_Name (Cmd) & " not found");
+               Ada.Text_IO.Put_Line
+                 (Tool_Name & ": project file " &
+                  Project_File_Name (Cmd) & " not found");
             else
-               Cmd_Error (S);
+               Ada.Text_IO.Put_Line (Tool_Name & ": " & S);
             end if;
+            Error_Printed := True;
          end Errors;
       begin
          My_Project.Load
@@ -290,7 +266,11 @@ package body LAL_UL.Projects is
          end if;
       exception
          when Invalid_Project =>
-            Cmd_Error (Project_File_Name (Cmd) & ": invalid project");
+            if Error_Printed then
+               raise Command_Line_Error;
+            else
+               Cmd_Error (Project_File_Name (Cmd) & ": invalid project");
+            end if;
       end Load_Tool_Project;
 
       -----------------
@@ -326,6 +306,7 @@ package body LAL_UL.Projects is
       ------------------------------------
 
       procedure Get_Files_From_Binder_Output is
+         --  ????See Store_Files_From_Closure in asis_ul-projects.adb.
          Command : String_Access;
          Return_Code : Integer;
 
@@ -754,7 +735,7 @@ package body LAL_UL.Projects is
          use GNAT.Directory_Operations;
          Cur_Dir : constant String := Get_Current_Dir;
       begin
---         Change_Dir (Tool_Temp_Dir);
+         Change_Dir (Tool_Temp_Dir);
          --  Create it in the temp dir so it gets deleted at the end
 
          declare
@@ -778,7 +759,7 @@ package body LAL_UL.Projects is
          use GNAT.Directory_Operations;
          Cur_Dir : constant String := Get_Current_Dir;
       begin
---         Change_Dir (Tool_Temp_Dir);
+         Change_Dir (Tool_Temp_Dir);
          --  Create it in the temp dir so it gets deleted at the end
 
          declare
@@ -1054,6 +1035,37 @@ package body LAL_UL.Projects is
          end loop;
       end Set_Individual_Source_Options;
 
+      ------------------------------
+      -- Needed_For_Tree_Creation --
+      ------------------------------
+
+      function Needed_For_Tree_Creation (Option : String) return Boolean is
+         Result : Boolean := False;
+      begin
+         if Has_Prefix (Option, Prefix => "-gnateD")
+           or else Has_Prefix (Option, Prefix => "-gnatep")
+         then
+            if Preprocessing_Allowed then
+               Result := True;
+            else
+               Cmd_Error ("cannot preprocess argument file, " &
+                            "do preprocessing as a separate step");
+            end if;
+         elsif Option = "-gnat83"
+           or else Option = "-gnat95"
+           or else Option = "-gnat05"
+           or else Option = "-gnat12"
+           or else Option = "-gnatdm"
+           or else Option = "-gnatd.V"
+           or else Option = "-gnatI"
+           or else Has_Prefix (Option, Prefix => "--RTS=")
+         then
+            Result := True;
+         end if;
+
+         return Result;
+      end Needed_For_Tree_Creation;
+
    --  Start of processing for Process_Project
 
    begin
@@ -1196,13 +1208,14 @@ package body LAL_UL.Projects is
 
    procedure Process_Command_Line
      (Cmd                             : in out Command_Line;
-      Cmd_Text, Project_Switches_Text :    out Argument_List_Access;
+      Cmd_Text, Cmd_Cargs, Project_Switches_Text :    out Argument_List_Access;
       Global_Report_Dir               :    out String_Ref;
       Compiler_Options                :    out String_List_Access;
       Project_RTS                     :    out String_Access;
       Individual_Source_Options       :    out String_String_List_Map;
       Result_Dirs                     :    out String_String_Map;
       Needs_Per_File_Output           :        Boolean;
+      Preprocessing_Allowed           :        Boolean;
       Tool_Package_Name               :        String;
       Compute_Project_Closure         :        Boolean        := True;
       Callback                        :        Parse_Callback := null;
@@ -1224,6 +1237,7 @@ package body LAL_UL.Projects is
    --  --version and --help switches. ???This also sets debug flags, etc.
    begin
       Cmd_Text := Text_Args_From_Command_Line;
+      Cmd_Cargs := Text_Cargs_From_Command_Line;
 
       --  First, process --version or --help switches, if present
 
@@ -1244,15 +1258,22 @@ package body LAL_UL.Projects is
       end if;
 
       if Arg (Cmd, Version) then
-         Put_Line (Tool_Name & " version 0.0");
-         --  ???Not sure what to print here. ASIS tools have an elaborate
-         --  scheme that depends on package Gnatvsn in the compiler sources.
+         Versions.Print_Tool_Version;
+         Environment.Clean_Up;
          OS_Exit (0);
       end if;
 
       if Arg (Cmd, Help) then
          Print_Help.all;
+         Environment.Clean_Up;
          OS_Exit (0);
+      end if;
+
+      if False and then -- ????????????????
+        --  I don't think gnatmetric does this.
+        Arg (Cmd, Verbose)
+      then
+         Versions.Print_Version_Info;
       end if;
 
       if Error_Detected (Cmd) then
@@ -1304,6 +1325,7 @@ package body LAL_UL.Projects is
                Individual_Source_Options,
                Result_Dirs,
                Needs_Per_File_Output,
+               Preprocessing_Allowed,
                My_Project,
                Tool_Package_Name,
                Compute_Project_Closure,

@@ -513,6 +513,7 @@ package body LAL_UL.Environment is
       --  deletion and dir creation and snatch this name for itself. This is
       --  quite unlikely and anyway we don't have any other system-independent
       --  way at the moment
+      --  ????????????????I think ASIS_UL is now using a better method.
       Create_Temp_File (FD, Temp_Name);
       Close (FD);
       Delete_File (Temp_Name, Success);

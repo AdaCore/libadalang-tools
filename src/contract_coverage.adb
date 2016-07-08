@@ -57,7 +57,7 @@ procedure Contract_Coverage is
          declare
             Assocs : constant List_Aspect_Assoc := F_Aspect_Assocs (Aspects);
          begin
-            for I in 0 .. Child_Count (Assocs) - 1 loop
+            for I in 1 .. Child_Count (Assocs) loop
                declare
                   Assoc : constant Ada_Node := Childx (Assocs, I);
                   use Ada.Wide_Wide_Characters.Handling;
@@ -98,7 +98,7 @@ procedure Contract_Coverage is
 
    begin
       if Decls /= null then -- Shouldn't it be empty list???
-         for I in 0 .. Child_Count (Decls) - 1 loop
+         for I in 1 .. Child_Count (Decls) loop
             declare
                Decl : constant Ada_Node := Childx (Decls, I);
             begin
@@ -203,9 +203,9 @@ begin
                end;
             end loop;
          end;
-      exception
-         when others =>
-            Put_Line ("Contract coverage analysis failed for file " & Arg);
+--      exception
+--         when others =>
+--            Put_Line ("Contract coverage analysis failed for file " & Arg);
       end;
 
       <<Continue>>

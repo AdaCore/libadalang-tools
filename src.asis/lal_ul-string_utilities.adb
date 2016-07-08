@@ -542,6 +542,7 @@ package body LAL_UL.String_Utilities is
             Create_Path (New_Directory);
             if Give_Message then
                Ada.Text_IO.Put_Line ("Created directory " & New_Directory);
+               Ada.Text_IO.Put_Line (" (" & Full_Name (New_Directory) & ")");
             end if;
          exception
             when Ada.Directories.Use_Error =>

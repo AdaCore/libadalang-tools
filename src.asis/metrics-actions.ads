@@ -230,13 +230,13 @@ private
       --  Metrics requested on via command line args
 
       Metrix_Stack : Metrix_Vectors.Vector;
-      --  Metrix_Stack[0] is the global Metrix (totals for all files).
+      --  Metrix_Stack[1] is the global Metrix (totals for all files).
       --
-      --  Metrix_Stack[1] is the Metrix for the Compilation_Unit node.
+      --  Metrix_Stack[2] is the Metrix for the Compilation_Unit node.
       --  This is for per-file metrics. Note that lalmetric does not
       --  yet support multiple compilation units per file.
       --
-      --  Metrix_Stack[2] is the Metrix for the library item within that; this
+      --  Metrix_Stack[3] is the Metrix for the library item within that; this
       --  is a Package_Decl, Package_Body, or whatever node.
       --
       --  The rest are Metrix for the nested nodes that are "eligible" for
@@ -250,7 +250,7 @@ private
    end record;
 
    --  Init is called once, before processing any files. It pushes
-   --  Metrix_Stack[0].
+   --  Metrix_Stack[1].
    --
    --  Then for each file, we walk the tree, pushing and popping the
    --  Metrix_Stack as we go. When we push a Metrix, we append it to
@@ -261,12 +261,12 @@ private
    --  of node. For example, if we see a node that is a statement, we
    --  increment all the Vals(Statements) of all the Metrix in Metrix
    --  stack. Thus Vals(Statements) for a unit will include the number
-   --  of statement in nested units, and Metrix_Stack[0].Vals(Statements)
+   --  of statement in nested units, and Metrix_Stack[1].Vals(Statements)
    --  will contain to total number of statements in all files.
    --
    --  Final is called once, after processing all files. It prints out
    --  the totals for all files that have been computed in
-   --  Metrix_Stack[0].
+   --  Metrix_Stack[1].
    --
    --  We always compute all metrics. The metrics requested on the
    --  command line are taken into account when we print the data.

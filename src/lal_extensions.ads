@@ -15,7 +15,7 @@ package LAL_Extensions is
 
    function Childx
      (Node  : access Ada_Node_Type'Class;
-      Index : Natural) return Ada_Node;
+      Index : Positive) return Ada_Node;
    --  Should this replace AST.Child???
 
    procedure Find_Iter

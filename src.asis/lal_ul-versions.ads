@@ -2,11 +2,11 @@
 --                                                                          --
 --                     ASIS UTILITY LIBRARY COMPONENTS                      --
 --                                                                          --
---                       A S I S _ U L . D R I V E R                        --
+--                       A S I S _ U L . O U T P U T                        --
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
---                    Copyright (C) 2013-2014, AdaCore                      --
+--                    Copyright (C) 2004-2016, AdaCore                      --
 --                                                                          --
 -- Asis Utility Library (ASIS UL) is free software; you can redistribute it --
 -- and/or  modify  it  under  terms  of  the  GNU General Public License as --
@@ -23,20 +23,23 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
---  This is the version of the top-level tool driver that implements a tool
---  that has one or more source file arguments. It does make use of the source
---  file table. It allows to have a direct project support in a tool.
+pragma Ada_2012;
 
-with ASIS_UL.Projects;
-with LAL_UL.Command_Lines; use LAL_UL.Command_Lines;
+package LAL_UL.Versions is
 
-procedure LAL_UL.Driver
-  (Prj                   : in out ASIS_UL.Projects.Arg_Project_Type'Class;
-   Cmd                   : in out Command_Line;
-   Print_Help            :        not null access procedure;
-   Tool_Package_Name     :        String;
-   Needs_Per_File_Output :        Boolean        := False;
-   Preprocessing_Allowed :        Boolean        := True;
-   Callback              :        Parse_Callback := null);
---  Preprocessing_Allowed needs to be OFF for gnatpp, because it is updating
---  the source. It is also OFF for gnat2xml; not sure why.
+   procedure Print_Tool_Version;
+   --  Similar to Print_Version_Info, but sends the output into Stdout and
+   --  the format of the information printed is similar to what is printed
+   --  for '--version' option by all the other GNAT tools.
+   --
+   --  This is used when --version is specified.
+
+   procedure Print_Version_Info;
+   --  Prints the tool version information in the following format:
+   --
+   --  <toolname>
+   --  Copyright <current year>, AdaCore.
+   --
+   --  This is used when -v is specified.
+
+end LAL_UL.Versions;

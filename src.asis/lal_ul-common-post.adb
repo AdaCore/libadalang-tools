@@ -1,4 +1,5 @@
 pragma Warnings (Off); -- ????????????????
+with Ada.Directories; use Ada.Directories;
 with System.Multiprocessors;
 
 --  with ASIS_UL.Compiler_Options;
@@ -14,21 +15,21 @@ package body LAL_UL.Common.Post is
       --  We need to ignore -j in the inner invocation; otherwise we will
       --  complain about mixing -j with -rnb when not in --incremental mode.
 
---      ASIS_UL.Options.Process_Num :=
---        (if Mimic_gcc then 1 else Arg (Cmd, Jobs));
---      J_Specified := ASIS_UL.Options.Process_Num /= 1;
---
---      if ASIS_UL.Options.Process_Num = 0 then
---         ASIS_UL.Options.Process_Num :=
---           Positive (System.Multiprocessors.Number_Of_CPUs);
---      end if;
---
+      ASIS_UL.Options.Process_Num :=
+        (if Mimic_gcc (Cmd) then 1 else Arg (Cmd, Jobs));
+      J_Specified := ASIS_UL.Options.Process_Num /= 1;
+
+      if ASIS_UL.Options.Process_Num = 0 then
+         ASIS_UL.Options.Process_Num :=
+           Positive (System.Multiprocessors.Number_Of_CPUs);
+      end if;
+
 --      ASIS_UL.Options.Outer_Parallel := Arg (Cmd, Outer_Parallel);
---
---      if Arg (Cmd, Output_Dir) /= null then
---         Out_Dir := new String'(Arg (Cmd, Output_Dir).all);
---      end if;
---
+
+      if Arg (Cmd, Output_Dir) /= null then
+         Out_Dir := new String'(Full_Name (Arg (Cmd, Output_Dir).all));
+      end if;
+
 --      Generate_Representation_Clauses := Arg (Cmd, Rep_Clauses);
 --
 --      Source_Table.Total_Sources := File_Names (Cmd)'Length;

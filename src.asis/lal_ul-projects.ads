@@ -38,13 +38,14 @@ package LAL_UL.Projects is
 
    procedure Process_Command_Line
      (Cmd                             : in out Command_Line;
-      Cmd_Text, Project_Switches_Text :    out Argument_List_Access;
+      Cmd_Text, Cmd_Cargs, Project_Switches_Text :    out Argument_List_Access;
       Global_Report_Dir               :    out String_Ref;
       Compiler_Options                :    out String_List_Access;
       Project_RTS                     :    out String_Access;
       Individual_Source_Options       :    out String_String_List_Map;
       Result_Dirs                     :    out String_String_Map;
       Needs_Per_File_Output           :        Boolean;
+      Preprocessing_Allowed           :        Boolean;
       Tool_Package_Name               :        String;
       Compute_Project_Closure         :        Boolean        := True;
       Callback                        :        Parse_Callback := null;
