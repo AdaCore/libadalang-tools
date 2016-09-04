@@ -58,6 +58,7 @@ package body METRICS.Actions is
 
    procedure knd (X : Ada_Node);
    procedure pp (X : Ada_Node);
+   procedure ppp (X : Ada_Node);
    procedure Put_Child_Record (C : Child_Record);
    procedure Put_Children_Array (A : Children_Arrays.Array_Type);
    function Par (X : Ada_Node) return Ada_Node is (Parent (X));
@@ -74,8 +75,14 @@ package body METRICS.Actions is
    begin
       LAL_UL.Dbg_Out.Output_Enabled := True;
       Put ("\1\n", (if X = null then "null" else Short_Image (X)));
---      Print (X);
    end pp;
+
+   procedure ppp (X : Ada_Node) is
+      use LAL_UL.Dbg_Out;
+   begin
+      pp (X);
+      Print (X);
+   end ppp;
    pragma Warnings (On);
 
    procedure Put_Child_Record (C : Child_Record) is
@@ -1876,6 +1883,9 @@ package body METRICS.Actions is
             P : constant Ada_Node := M.Node;
          begin
             case Kind (P) is
+               when Ada_Compilation_Unit =>
+                  return P;
+
                when Ada_Package_Decl
                  | Ada_Protected_Decl
                  | Ada_Protected_Type_Decl
@@ -1997,7 +2007,8 @@ package body METRICS.Actions is
             Metric => Lines_Code);
          if ON then
             case Kind (Section) is
-               when Ada_Package_Decl
+               when Ada_Compilation_Unit
+                 | Ada_Package_Decl
                  | Ada_Protected_Decl
                  | Ada_Protected_Type_Decl
                  | Ada_Task_Decl
