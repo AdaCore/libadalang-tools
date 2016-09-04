@@ -1931,6 +1931,12 @@ package body METRICS.Actions is
          File_M : Metrix renames Get (Metrix_Stack, 2).all;
          Global_M : Metrix renames Get (Metrix_Stack, 1).all;
          Section : Ada_Node;
+
+         Spark_Mode : constant Wide_Wide_String := "spark_mode";
+         On_Str : constant Wide_Wide_String := "on";
+
+      --  Start of processing for Gather_SPARK_Line_Metrics
+
       begin
          case Kind (Node) is
             when Ada_Basic_Subprogram_Decl
@@ -1947,19 +1953,33 @@ package body METRICS.Actions is
                Prev_Subp_Decl := null;
          end case;
 
-         if Kind (Node) /= Ada_Pragma_Node
-           or else Pragma_Name (Node) /= "spark_mode"
+         if Kind (Node) = Ada_Pragma_Node
+           and then Pragma_Name (Node) = Spark_Mode
          then
+            case Child_Count (F_Args (Pragma_Node (Node))) is
+               when 0 => ON := True;
+               when 1 =>
+                  ON := L_Name (F_Expr (Item (F_Args (Pragma_Node (Node)), 1)))
+                        = "on";
+               when others => raise Program_Error;
+            end case;
+            Section := Find_Section;
+
+         elsif Kind (Node) = Ada_Aspect_Assoc
+           and then Kind (F_Id (Aspect_Assoc (Node))) = Ada_Identifier
+           and then L_Name (F_Id (Aspect_Assoc (Node))) = Spark_Mode
+         then
+            if F_Expr (Aspect_Assoc (Node)) = null then
+               ON := True;
+            else
+               ON :=
+                 L_Name (Identifier (F_Expr (Aspect_Assoc (Node)))) = On_Str;
+            end if;
+            Section := M.Node;
+
+         else
             return;
          end if;
-
-         case Child_Count (F_Args (Pragma_Node (Node))) is
-            when 0 => ON := True;
-            when 1 =>
-               ON := L_Name (F_Expr (Item (F_Args (Pragma_Node (Node)), 1)))
-                     = "on";
-            when others => raise Program_Error;
-         end case;
 
          --  We ignore the pragma if ON is True and it applies to a private
          --  part, statement part of a package, or a subprogram
@@ -1970,7 +1990,6 @@ package body METRICS.Actions is
          --
          --  OFF pragmas are not ignored.
 
-         Section := Find_Section;
          Range_Count := Line_Range_Count
            (Cumulative,
             First_Line => Sloc_Range (Section).Start_Line,
@@ -1999,8 +2018,19 @@ package body METRICS.Actions is
                when others => raise Program_Error;
             end case;
          else
-            Dec (File_M.Vals (Lines_Spark), By => Range_Count);
-            Dec (Global_M.Vals (Lines_Spark), By => Range_Count);
+            --  Protect against seeing "OFF" with no previous "ON".
+
+            if File_M.Vals (Lines_Spark) > Range_Count then
+               Dec (File_M.Vals (Lines_Spark), By => Range_Count);
+            else
+               File_M.Vals (Lines_Spark) := 0;
+            end if;
+
+            if Global_M.Vals (Lines_Spark) > Range_Count then
+               Dec (Global_M.Vals (Lines_Spark), By => Range_Count);
+            else
+               Global_M.Vals (Lines_Spark) := 0;
+            end if;
          end if;
       end Gather_SPARK_Line_Metrics;
 
