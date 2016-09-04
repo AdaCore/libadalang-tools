@@ -152,26 +152,30 @@ is
       ASIS_UL.Options.Mimic_gcc := Arg (Cmd, Outer_Dir) /= null;
       --  We use --outer-dir to detect that we were called from gprbuild.
 
-      ASIS_UL.Options.Incremental_Mode :=
-        Arg (Cmd, Incremental) and then not ASIS_UL.Options.Mimic_gcc;
-      --  We need to ignore --incremental in the inner invocation, because
-      --  --incremental could be specified in package Pretty_Printer of the
-      --  project file, which will cause the builder to pass it to the inner
-      --  invocation.
+      if False then
+         --  ???Ignore --incremental, because it's not implemented
 
-      if ASIS_UL.Options.Incremental_Mode_By_Default
-        and then Arg (Cmd, Project_File) /= null
-      then
-         pragma Assert (not ASIS_UL.Options.Mimic_gcc);
-         ASIS_UL.Options.Incremental_Mode := True;
-      end if;
+         ASIS_UL.Options.Incremental_Mode :=
+           Arg (Cmd, Incremental) and then not ASIS_UL.Options.Mimic_gcc;
+         --  We need to ignore --incremental in the inner invocation, because
+         --  --incremental could be specified in package Pretty_Printer of the
+         --  project file, which will cause the builder to pass it to the inner
+         --  invocation.
 
-      if ASIS_UL.Options.Incremental_Mode then
-         if Arg (Cmd, Project_File) = null then
-            ASIS_UL.Output.Error
-              ("--incremental mode requires a project file, " &
-               "and cannot be used with the gnat driver");
-            raise ASIS_UL.Common.Fatal_Error;
+         if ASIS_UL.Options.Incremental_Mode_By_Default
+           and then Arg (Cmd, Project_File) /= null
+         then
+            pragma Assert (not ASIS_UL.Options.Mimic_gcc);
+            ASIS_UL.Options.Incremental_Mode := True;
+         end if;
+
+         if ASIS_UL.Options.Incremental_Mode then
+            if Arg (Cmd, Project_File) = null then
+               ASIS_UL.Output.Error
+                 ("--incremental mode requires a project file, " &
+                  "and cannot be used with the gnat driver");
+               raise ASIS_UL.Common.Fatal_Error;
+            end if;
          end if;
       end if;
 
@@ -363,6 +367,10 @@ exception
 
       --  Error message has already been printed.
       GNAT.Command_Line.Try_Help;
+      ASIS_UL.Environment.Clean_Up;
+      GNAT.OS_Lib.OS_Exit (1);
+   when LAL_UL.Command_Lines.Command_Line_Error_No_Tool_Name =>
+      --  Error message has already been printed.
       ASIS_UL.Environment.Clean_Up;
       GNAT.OS_Lib.OS_Exit (1);
    when ASIS_UL.Common.Fatal_Error =>

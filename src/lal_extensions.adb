@@ -296,24 +296,53 @@ package body LAL_Extensions is
          when others => raise Program_Error);
    end Get_Aspects;
 
-   function Visible_Part
-     (Node : access Ada_Node_Type'Class) return List_Ada_Node
+   function Vis_Part
+     (Node : access Ada_Node_Type'Class) return Public_Part
    is
       --  I'm confused about Base_Package_Decl
-      --  Maybe return the Public_Part node?
    begin
       case Kind (Node) is
          when Ada_Package_Decl =>
-            return F_Decls (F_Public_Part (Base_Package_Decl (Node)));
+            return F_Public_Part (Base_Package_Decl (Node));
          when Ada_Generic_Package_Decl =>
-            return F_Decls
-              (F_Public_Part (F_Package_Decl (Generic_Package_Decl (Node))));
+            return
+              F_Public_Part (F_Package_Decl (Generic_Package_Decl (Node)));
          when Ada_Task_Def =>
-            return F_Decls (F_Public_Part (Task_Def (Node)));
+            return F_Public_Part (Task_Def (Node));
          when Ada_Protected_Def =>
-            return F_Decls (F_Public_Part (Protected_Def (Node)));
+            return F_Public_Part (Protected_Def (Node));
          when others => raise Program_Error;
       end case;
-   end Visible_Part;
+   end Vis_Part;
+
+   function Priv_Part
+     (Node : access Ada_Node_Type'Class) return Private_Part is
+   begin
+      case Kind (Node) is
+         when Ada_Package_Decl =>
+            return F_Private_Part (Base_Package_Decl (Node));
+         when Ada_Generic_Package_Decl =>
+            return
+              F_Private_Part (F_Package_Decl (Generic_Package_Decl (Node)));
+         when Ada_Task_Def =>
+            return F_Private_Part (Task_Def (Node));
+         when Ada_Protected_Def =>
+            return F_Private_Part (Protected_Def (Node));
+         when others => raise Program_Error;
+      end case;
+   end Priv_Part;
+
+   function Body_Decls
+     (Node : access Ada_Node_Type'Class) return Declarative_Part is
+   begin
+      case Kind (Node) is
+         when Ada_Entry_Body => return F_Decls (Entry_Body (Node));
+         when Ada_Package_Body => return F_Decls (Package_Body (Node));
+         when Ada_Protected_Body => return F_Decls (Protected_Body (Node));
+         when Ada_Subprogram_Body => return F_Decls (Subprogram_Body (Node));
+         when Ada_Task_Body => return F_Decls (Task_Body (Node));
+         when others => raise Program_Error;
+      end case;
+   end Body_Decls;
 
 end LAL_Extensions;

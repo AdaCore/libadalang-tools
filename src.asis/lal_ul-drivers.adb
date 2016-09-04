@@ -283,6 +283,10 @@ package body LAL_UL.Drivers is
          GNAT.Command_Line.Try_Help;
          Environment.Clean_Up;
          GNAT.OS_Lib.OS_Exit (1);
+      when LAL_UL.Command_Lines.Command_Line_Error_No_Tool_Name =>
+         --  Error message has already been printed.
+         Environment.Clean_Up;
+         GNAT.OS_Lib.OS_Exit (1);
    end Driver;
 
 end LAL_UL.Drivers;

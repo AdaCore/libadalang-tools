@@ -556,7 +556,7 @@ package LAL_UL.Command_Lines is
    function "+" (S : String) return String_Ref is (new String'(S));
    --  Hack to get around the fact that Ada doesn't allow arrays of String
 
-   Command_Line_Error : exception;
+   Command_Line_Error, Command_Line_Error_No_Tool_Name : exception;
    --  Raised by Parse if there are errors. The tool should handle this,
    --  print out the Exception_Message, and exit the process.
 
@@ -567,6 +567,12 @@ package LAL_UL.Command_Lines is
    --  Prints an error message, and raises Command_Line_Error. This is
    --  called by Parse to report errors, and may also be used by clients
    --  of Parse.
+
+   procedure Cmd_Error_No_Tool_Name (Message : String) with No_Return;
+   --  Same as Cmd_Error, but doesn't print the tool name, and raises
+   --  Command_Line_Error_No_Tool_Name instead of Command_Line_Error.  It's not
+   --  clear why we want to suppress the tool name, but we're mimicking the way
+   --  ASIS tools work.
 
    procedure Raise_Cmd_Error (Message : String) with No_Return;
    --  Raises Command_Line_Error with the given message.

@@ -27,6 +27,12 @@ package body LAL_UL.Command_Lines is
       raise Command_Line_Error with Message;
    end Cmd_Error;
 
+   procedure Cmd_Error_No_Tool_Name (Message : String) is
+   begin
+      Put_Line (Standard_Error, Message);
+      raise Command_Line_Error_No_Tool_Name with Message;
+   end Cmd_Error_No_Tool_Name;
+
    function Text_Args_From_Command_Line return Argument_List_Access is
       use Ada.Command_Line;
       Result : String_Access_Vector;

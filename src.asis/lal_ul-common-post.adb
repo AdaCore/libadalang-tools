@@ -15,9 +15,16 @@ package body LAL_UL.Common.Post is
       --  We need to ignore -j in the inner invocation; otherwise we will
       --  complain about mixing -j with -rnb when not in --incremental mode.
 
-      ASIS_UL.Options.Process_Num :=
-        (if Mimic_gcc (Cmd) then 1 else Arg (Cmd, Jobs));
-      J_Specified := ASIS_UL.Options.Process_Num /= 1;
+      if False then
+         --  ???Disable -j for now. --incremental mode is not implemented, and
+         --  in non-incremental mode, it fails with Constraint_Error in
+         --  Start_Tree_Creation. No point in debugging that; it's got nothing
+         --  to do with lal.
+
+         ASIS_UL.Options.Process_Num :=
+           (if Mimic_gcc (Cmd) then 1 else Arg (Cmd, Jobs));
+         J_Specified := ASIS_UL.Options.Process_Num /= 1;
+      end if;
 
       if ASIS_UL.Options.Process_Num = 0 then
          ASIS_UL.Options.Process_Num :=

@@ -240,9 +240,7 @@ private
       --  is a Package_Decl, Package_Body, or whatever node.
       --
       --  The rest are Metrix for the nested nodes that are "eligible" for
-      --  computing metrics. These nodes are [generic] package specs, single
-      --  task/protected declarations, task/protected type declarations, and
-      --  proper bodies other than entry bodies.
+      --  computing metrics. See subtype Eligible in the body.
       --
       --  This stack contains the relevant nodes currently being processed by
       --  the recursive walk. It is used while computing the metrics; printing

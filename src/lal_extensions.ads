@@ -67,10 +67,19 @@ package LAL_Extensions is
    function Get_Aspects (Decl : Basic_Decl) return Aspect_Specification;
    --  Wrapper for F_Aspects functions
 
-   function Visible_Part
-     (Node : access Ada_Node_Type'Class) return List_Ada_Node;
+   function Vis_Part
+     (Node : access Ada_Node_Type'Class) return Public_Part;
    --  Return the visible part of a package, generic package, task decl, or
    --  protected decl.
+
+   function Priv_Part
+     (Node : access Ada_Node_Type'Class) return Private_Part;
+   --  Return the private part of a package, generic package, task decl, or
+   --  protected decl.
+
+   function Body_Decls
+     (Node : access Ada_Node_Type'Class) return Declarative_Part;
+   --  Return the declarative part of a body
 
    function Short_Image (Node : Ada_Node) return String is
       (LAL_UL.String_Utilities.To_UTF8 (Short_Image (Node)));

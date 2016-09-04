@@ -60,6 +60,7 @@ package body METRICS.Actions is
    procedure pp (X : Ada_Node);
    procedure Put_Child_Record (C : Child_Record);
    procedure Put_Children_Array (A : Children_Arrays.Array_Type);
+   function Par (X : Ada_Node) return Ada_Node is (Parent (X));
    --  Debugging printouts
 
    procedure knd (X : Ada_Node) is
@@ -126,6 +127,10 @@ package body METRICS.Actions is
    Bodies : CU_Metrix.Vector;
    --  Mappings from Symbols representing compilation unit full names to the
    --  spec and body of that compilation unit. Used for coupling metrics.
+
+   function Pragma_Name (Node : Ada_Node) return Text_Type is
+     (L_Name (F_Id (Pragma_Node (Node))));
+   --  Name of a pragma node, in lower case
 
    function Get_CU_Access
      (A : in out CU_Metrix.Vector; S : CU_Symbol)
@@ -538,14 +543,9 @@ package body METRICS.Actions is
    begin
       case Kind (Node) is
          when Ada_Pragma_Node =>
-            declare
-               Pragma_Name : constant Text_Type :=
-                 L_Name (F_Id (Pragma_Node (Node)));
-            begin
-               if Pragma_Name = "assert" then
-                  return Other_Assertion;
-               end if;
-            end;
+            if Pragma_Name (Node) = "assert" then
+               return Other_Assertion;
+            end if;
 
          when Ada_Aspect_Assoc =>
             declare
@@ -797,6 +797,8 @@ package body METRICS.Actions is
            Lines_Blank |
            Lines_Ratio =>
             return True;
+         when Lines_Spark =>
+            return Depth in 0 | 1;
          when Lines_Code_In_Bodies | Num_Bodies =>
             return Depth = 0;
          when Lines_Average =>
@@ -1135,6 +1137,8 @@ package body METRICS.Actions is
             return "eol_comments";
          when Lines_Blank =>
             return "blank_lines";
+         when Lines_Spark =>
+            return "spark_lines";
          when Lines_Average =>
             return "average_lines_in_bodies";
          when Lines_Code_In_Bodies =>
@@ -1466,6 +1470,11 @@ package body METRICS.Actions is
       --  Number of bodies we are nested within, except package bodies
       --  don't count.
 
+      Prev_Subp_Decl : Ada_Node := null;
+      --  When we're walking a pragma, this is the most recently seen
+      --  subprogram declaration, if any. Used in the implementation of pragma
+      --  SPARK_Mode, which can immediately follow a subprogram declaration.
+
       function In_Visible_Part return Boolean is
          (Last_Index (Metrix_Stack) >= 3
             and then Get (Metrix_Stack, 3).Kind in
@@ -1493,6 +1502,8 @@ package body METRICS.Actions is
 
       procedure Gather_Line_Metrics (Node : Ada_Node; M : in out Metrix);
       --  Compute line metrics
+
+      procedure Gather_SPARK_Line_Metrics (Node : Ada_Node; M : in out Metrix);
 
       procedure Gather_Syntax_Metrics (Node : Ada_Node; M : in out Metrix);
       --  Compute syntax element metrics
@@ -1832,8 +1843,169 @@ package body METRICS.Actions is
          end if;
       end Gather_Line_Metrics;
 
+      procedure Gather_SPARK_Line_Metrics
+        (Node : Ada_Node; M : in out Metrix)
+      is
+         --  Note that "pragma SPARK_Mode (ON);" is always redundant except on
+         --  the first "section" of root library unit. However, we're not yet
+         --  implementing that correctly.
+
+         --  Not yet implemented:
+         --     Pragma SPARK_Mode as a configuration pragma.
+         --     SPARK_Mode aspect.
+         --     Inheritance of SPARK_Mode from parent to child, and from spec
+         --     to body.
+         --     Redundant OFF's.
+         --  Basically, we're doing a purely syntactic analysis, and anything
+         --  else is not yet implemented.
+
+         function Find_Section return Ada_Node;
+         --  Find a node representing the appropriate section for Node (which
+         --  must be a pragma SPARK_Mode). For a pragma that applies to the
+         --  first declaration list (e.g. the visible part of a package), we
+         --  return the declaration or body node (e.g. the package
+         --  declaration). If it applies to a private part or to the statements
+         --  of a package body, we return just that. If it applies to a
+         --  subprogram declaration, we return that declaration.
+
+         function Find_Pragma (L : List_Ada_Node) return Boolean;
+         --  True if L contains Node at the start (preceded only by other
+         --  pragmas). Node must be a pragma SPARK_Mode.
+
+         function Find_Section return Ada_Node is
+            P : constant Ada_Node := M.Node;
+         begin
+            case Kind (P) is
+               when Ada_Package_Decl
+                 | Ada_Protected_Decl
+                 | Ada_Protected_Type_Decl
+                 | Ada_Task_Decl
+                 | Ada_Task_Type_Decl
+                 | Ada_Generic_Package_Decl
+               =>
+                  if Find_Pragma (F_Decls (Vis_Part (P))) then
+                     return P;
+                  elsif Find_Pragma (F_Decls (Priv_Part (P))) then
+                     return Ada_Node (Priv_Part (P));
+                  end if;
+
+               when Ada_Body_Node =>
+                  if Kind (Node) = Ada_Package_Body
+                    and then
+                      Find_Pragma
+                        (F_Statements (F_Statements (Package_Body (P))))
+                  then
+                     return Ada_Node (F_Statements (Package_Body (P)));
+                  elsif Find_Pragma (F_Decls (Body_Decls (P))) then
+                     return P;
+                  end if;
+
+               when others => raise Program_Error;
+            end case;
+
+            --  We didn't find the pragma at the start of a declaration list,
+            --  so it must be immediately following a subprogram declaration
+            --  (preceded only by other pragmas).
+
+            pragma Assert (Prev_Subp_Decl /= null);
+            return Prev_Subp_Decl;
+         end Find_Section;
+
+         function Find_Pragma (L : List_Ada_Node) return Boolean is
+         begin
+            for C in 1 .. Child_Count (L) loop
+               if Kind (Childx (L, C)) /= Ada_Pragma_Node then
+                  return False;
+               end if;
+
+               if Childx (L, C) = Node then
+                  return True;
+               end if;
+            end loop;
+
+            return False;
+         end Find_Pragma;
+
+         ON : Boolean;
+         Range_Count : Metric_Nat;
+         File_M : Metrix renames Get (Metrix_Stack, 2).all;
+         Global_M : Metrix renames Get (Metrix_Stack, 1).all;
+         Section : Ada_Node;
+      begin
+         case Kind (Node) is
+            when Ada_Basic_Subprogram_Decl
+              | Ada_Abstract_Subprogram_Decl
+              | Ada_Expression_Function
+              | Ada_Null_Subprogram_Decl
+              | Ada_Renaming_Subprogram_Decl
+              | Ada_Subprogram_Decl
+            =>
+               Prev_Subp_Decl := Node;
+            when Ada_Pragma_Node =>
+               null; -- Leave Prev_Subp_Decl alone
+            when others =>
+               Prev_Subp_Decl := null;
+         end case;
+
+         if Kind (Node) /= Ada_Pragma_Node
+           or else Pragma_Name (Node) /= "spark_mode"
+         then
+            return;
+         end if;
+
+         case Child_Count (F_Args (Pragma_Node (Node))) is
+            when 0 => ON := True;
+            when 1 =>
+               ON := L_Name (F_Expr (Item (F_Args (Pragma_Node (Node)), 1)))
+                     = "on";
+            when others => raise Program_Error;
+         end case;
+
+         --  We ignore the pragma if ON is True and it applies to a private
+         --  part, statement part of a package, or a subprogram
+         --  declaration. Such a pragma is necessarily redundant.
+         --  A non-ignored ON applies to the whole syntactic construct
+         --  (e.g. for ON in a visible part, we increment by the size of the
+         --  whole package declaration, including the private part).
+         --
+         --  OFF pragmas are not ignored.
+
+         Section := Find_Section;
+         Range_Count := Line_Range_Count
+           (Cumulative,
+            First_Line => Sloc_Range (Section).Start_Line,
+            Last_Line => Sloc_Range (Section).End_Line,
+            Metric => Lines_Code);
+         if ON then
+            case Kind (Section) is
+               when Ada_Package_Decl
+                 | Ada_Protected_Decl
+                 | Ada_Protected_Type_Decl
+                 | Ada_Task_Decl
+                 | Ada_Task_Type_Decl
+                 | Ada_Generic_Package_Decl
+                 | Ada_Body_Node
+               =>
+                  Inc (File_M.Vals (Lines_Spark), By => Range_Count);
+                  Inc (Global_M.Vals (Lines_Spark), By => Range_Count);
+               when Ada_Private_Part | Ada_Handled_Statements
+                 | Ada_Abstract_Subprogram_Decl
+                 | Ada_Expression_Function
+                 | Ada_Null_Subprogram_Decl
+                 | Ada_Renaming_Subprogram_Decl
+                 | Ada_Subprogram_Decl
+               =>
+                  null;
+               when others => raise Program_Error;
+            end case;
+         else
+            Dec (File_M.Vals (Lines_Spark), By => Range_Count);
+            Dec (Global_M.Vals (Lines_Spark), By => Range_Count);
+         end if;
+      end Gather_SPARK_Line_Metrics;
+
       procedure Gather_Contract_Metrics (Node : Ada_Node) is
-         Vis_Decls : constant List_Ada_Node := Visible_Part (Node);
+         Vis_Decls : constant List_Ada_Node := F_Decls (Vis_Part (Node));
 
          --  At some point we might want to compute the ratio of
          --  --contracts and --public-subprograms.
@@ -1945,7 +2117,8 @@ package body METRICS.Actions is
               Ada_Package_Decl | Ada_Generic_Package_Decl
             then
                declare
-                  Vis_Decls : constant List_Ada_Node := Visible_Part (Node);
+                  Vis_Decls : constant List_Ada_Node :=
+                    F_Decls (Vis_Part (Node));
                begin
                   if Vis_Decls /= null then
                      for I in 1 .. Child_Count (Vis_Decls) loop
@@ -2138,6 +2311,7 @@ package body METRICS.Actions is
          end if;
          if not In_Assertion then
             Gather_Line_Metrics (Node, M);
+            Gather_SPARK_Line_Metrics (Node, M);
             Gather_Syntax_Metrics (Node, M);
 
             if Kind (Node) in

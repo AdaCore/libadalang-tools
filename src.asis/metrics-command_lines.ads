@@ -114,6 +114,7 @@ package METRICS.Command_Lines is
       Lines_Ratio,
       Lines_Blank,
       Lines_Average, -- global
+      Lines_Spark, -- not included in Lines_All
       Lines_Code_In_Bodies, -- undocumented, not included in Lines_All
       Num_Bodies, -- undocumented
       --  Lines_Code_In_Bodies is the number of code lines in various
@@ -165,7 +166,8 @@ package METRICS.Command_Lines is
    subtype Complexity_Metrics is Metrics_Booleans
      range Complexity_Statement .. Extra_Exit_Points;
    subtype Lines_Metrics is Metrics_Booleans
-     range Lines .. Lines_Average; -- not Lines_Code_In_Bodies, Num_Bodies
+     range Lines .. Lines_Average;
+   --  not Lines_Spark, Lines_Code_In_Bodies, Num_Bodies
    subtype Syntax_Metrics is Metrics_Booleans
      range Public_Subprograms .. Param_Number;
    subtype Coupling_Metrics is Metrics_Booleans

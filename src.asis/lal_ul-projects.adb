@@ -134,12 +134,10 @@ package body LAL_UL.Projects is
       --  not know values of external variables. ????????????????Inspect all
       --  comments below.
 
-      procedure Get_Files_From_Binder_Output;
+      procedure Get_Files_From_Closure;
       --  Provided that the tool arguments contain '-U main_unit' parameter,
       --  tries to get the full closure of main_unit and to store it as tool
-      --  argument files. This procedure assumes that: * the tool temporary
-      --  directory has already been created; * we are in the directory the
-      --  tool has been called from
+      --  argument files.
 
       procedure Get_Sources_From_Project;
       --  Extracts and stores the list of sources of the project to process as
@@ -264,6 +262,9 @@ package body LAL_UL.Projects is
          if Is_Aggregate_Project (My_Project.Root_Project) then
             Cmd_Error ("aggregate projects are not supported");
          end if;
+
+         My_Project.Recompute_View
+           (Errors => Recompute_View_Errors'Unrestricted_Access);
       exception
          when Invalid_Project =>
             if Error_Printed then
@@ -301,125 +302,59 @@ package body LAL_UL.Projects is
          return False;
       end Is_Externally_Built;
 
-      ------------------------------------
-      -- Get_Files_From_Binder_Output --
-      ------------------------------------
+      ----------------------------
+      -- Get_Files_From_Closure --
+      ----------------------------
 
-      procedure Get_Files_From_Binder_Output is
+      procedure Get_Files_From_Closure is
          --  ????See Store_Files_From_Closure in asis_ul-projects.adb.
-         Command : String_Access;
-         Return_Code : Integer;
-
-         Bind_Out_File_Name : constant String := Tool_Temp_Dir & ".bind_out";
-         Success            : Boolean;
-
-         Max_Str_Len : constant Positive := 1_024;
-         Str_Buff    : String (1 .. Max_Str_Len);
-         Str_Len     : Natural;
-
-         Builder_Options : String_Access_Vector;
-         Program_Output_File : File_Type;
-      --  File used to redirect the program output into.
-
+         Closure_Files : GNATCOLL.VFS.File_Array_Access;
+         Main_Files    : GNATCOLL.VFS.File_Array_Access;
+         Status        : Status_Type;
       begin
-         --  Define the name of the command to call:
-         Command := Locate_Exec_On_Path ("gprbuild");
+         Append (Main_Files, Create (+Main_Unit_Name (Cmd).all));
+         Get_Closures
+           (My_Project.Root_Project,
+            Main_Files,
+            All_Projects => True,
+            Include_Externally_Built => False,
+            Status => Status,
+            Result => Closure_Files);
 
-         Append (Builder_Options, new String'("-f"));
-         Append (Builder_Options, new String'("-q"));
-         Append (Builder_Options, new String'("-b"));
+         case Status is
+            when Error =>
+               Cmd_Error_No_Tool_Name
+                 ("could not get closure of " & Main_Unit_Name (Cmd).all);
+            when Incomplete_Closure =>
+               Cmd_Error_No_Tool_Name
+                 ("could not get complete closure of " &
+                    Main_Unit_Name (Cmd).all);
+            when Success =>
+               null;
+         end case;
 
-         if Target /= "" then
-            Append (Builder_Options, new String'("--target=" & Target));
+         --  We first need to erase the Main_Unit_Name from the command
+         --  line, because we're about to append the actual files.
+         --  Otherwise, if the Main_Unit_Name is "foo.adb", it would be
+         --  duplicated, and if it's "foo", then we would try to read
+         --  "foo" (possibly an executable file) as an Ada source file:
+         Clear_File_Names (Cmd);
+
+         if Debug_Flag_U then
+            Formatted_Output.Put ("Closure:\n");
          end if;
-
-         Append (Builder_Options, new String'("-P"));
-         Append (Builder_Options, new String'(Arg (Cmd, Project_File).all));
-
-         declare
-            X_Vars : constant String_Ref_Array := Arg (Cmd, External_Variable);
-         begin
-            for X of X_Vars loop
-               Append (Builder_Options, new String'("-X" & X.all));
-            end loop;
-         end;
-
-         if Arg (Cmd, Run_Time_System).all /= "" then
-            Append (Builder_Options,
-                    new String'("--RTS=" & Arg (Cmd, Run_Time_System).all));
-         end if;
-
-         Append (Builder_Options, new String'("-gnatws"));
-
-         Append (Builder_Options, new String'(Main_Unit_Name (Cmd).all));
-
-         Append (Builder_Options, new String'("-bargs"));
-
-         Append (Builder_Options, new String'("-ws"));
-         Append (Builder_Options, new String'("-R"));
-         Append (Builder_Options, new String'("-Z"));
-
-         if ASIS_UL.Debug.Debug_Flag_C then
---            Info_No_EOL (Command.all);
---            Info_No_EOL (" ");
---
---            for J in 1 .. Tool_Switches.Last loop
---               Info_No_EOL (Tool_Switches.Table (J).all);
---               Info_No_EOL (" ");
---            end loop;
-            raise Program_Error; -- ????
-         end if;
-
-         Spawn
-           (Program_Name => Command.all,
-            Args         => To_Array (Builder_Options),
-            Output_File  => Bind_Out_File_Name,
-            Success      => Success,
-            Return_Code  => Return_Code,
-            Err_To_Out   => False);
-
-         --  Read source files
-
-         if Success and then Return_Code = 0 then
-
-            Open (Program_Output_File, In_File, Bind_Out_File_Name);
-
-            --  We first need to erase the Main_Unit_Name from the command
-            --  line, because we're about to append the actual files.
-            --  Otherwise, if the Main_Unit_Name is "foo.adb", it would be
-            --  duplicated, and if it's "foo", then we would try to read
-            --  "foo" (possibly an executable file) as an Ada source file:
-            Clear_File_Names (Cmd);
-
-            while not End_Of_File (Program_Output_File) loop
-               Get_Line (Program_Output_File, Str_Buff, Str_Len);
-               Append_File_Name (Cmd, Trim (Str_Buff (1 .. Str_Len), Both));
-            end loop;
-
-            Close (Program_Output_File);
-         else
-            Cmd_Error ("could not get closure of " & Main_Unit_Name (Cmd).all);
-         end if;
+         for I in Closure_Files'Range loop
+            Append_File_Name (Cmd, Closure_Files (I).Display_Full_Name);
+            if Debug_Flag_U then
+               Formatted_Output.Put
+                 ("\1\n", Closure_Files (I).Display_Full_Name);
+            end if;
+         end loop;
 
          --  Clean-up
-         Free (Command);
-
-         if not ASIS_UL.Debug.Debug_Flag_N then
-            Delete_File (Bind_Out_File_Name, Success);
-         end if;
-
-      exception
-         when others =>
-            if Is_Open (Program_Output_File) then
-               Close (Program_Output_File);
-            end if;
-
-            if ASIS_UL.Debug.Debug_Flag_N then
-               Delete_File (Bind_Out_File_Name, Success);
-            end if;
-
-            raise;
-      end Get_Files_From_Binder_Output;
+         Unchecked_Free (Main_Files);
+         Unchecked_Free (Closure_Files);
+      end Get_Files_From_Closure;
 
       ------------------------------
       -- Get_Sources_From_Project --
@@ -492,7 +427,7 @@ package body LAL_UL.Projects is
                end if;
 
             else
-               Get_Files_From_Binder_Output;
+               Get_Files_From_Closure;
             end if;
          end if;
       end Get_Sources_From_Project;
@@ -502,12 +437,7 @@ package body LAL_UL.Projects is
       -------------------------
 
       procedure Set_External_Values is
-         Vars   : Scenario_Variable_Array   := My_Project.Scenario_Variables;
          X_Vars : constant String_Ref_Array := Arg (Cmd, External_Variable);
---         Vars : Scenario_Variable_Array := My_Project.Scenario_Variables;
---         use X_Vars_Sets;
---         C        : Cursor;
---         Next_Var : X_Var_Record;
       begin
          for X of X_Vars loop
             --  X is of the form "VAR=value"
@@ -522,40 +452,9 @@ package body LAL_UL.Projects is
                   Cmd_Error ("wrong parameter of -X option: " & X.all);
                end if;
 
-               for V of Vars loop
-                  if X_Var = External_Name (V) then
-                     declare
-                        Pos_Vals : constant String_List :=
-                          My_Project.Possible_Values_Of (V);
-                        Present : Boolean := False;
-                     begin
-                        for Pos_Val of Pos_Vals loop
-                           if X_Val = Pos_Val.all then
-                              Present := True;
-                              exit;
-                           end if;
-                        end loop;
-
-                        if not Present then
-                           Cmd_Error
-                             ("value " & X_Val & " is illegal for " & X_Var);
-                        end if;
-
-                     end;
-
-                     Set_Value (V, X_Val);
-                     exit;
-
-                  else
-                     null; -- ????????????????Cmd_Error?
-                  end if;
-               end loop;
+               Project_Env.Change_Environment (X_Var, X_Val);
             end;
          end loop;
-
-         My_Project.Change_Environment (Vars);
-         My_Project.Recompute_View
-         (Errors => Recompute_View_Errors'Unrestricted_Access);
       end Set_External_Values;
 
       ------------------------------------
@@ -1079,8 +978,8 @@ package body LAL_UL.Projects is
       --  (LA17-020-gnat2xml_1).
 
       Initialize_Environment;
-      Load_Tool_Project;
       Set_External_Values;
+      Load_Tool_Project;
       Extract_Compilation_Attributes;
       Extract_Tool_Options;
       Get_Sources_From_Project;
@@ -1292,6 +1191,7 @@ package body LAL_UL.Projects is
          My_Project : Project_Tree;
 
          procedure Update_File_Name (File_Name : in out String_Ref);
+         --  Set File_Name to the full name if -P specified
 
          procedure Update_File_Name (File_Name : in out String_Ref) is
          begin
@@ -1304,11 +1204,7 @@ package body LAL_UL.Projects is
                   Res : constant Virtual_File :=
                     GNATCOLL.Projects.Create (My_Project, +File_Name.all);
                begin
-                  if Res = No_File then
-                     Cmd_Error (File_Name.all & " not found");
-                     --  ????Warning in Source_Table
-                  end if;
-
+                  pragma Assert (Res /= No_File);
                   File_Name := new String'(Res.Display_Full_Name);
                end;
             end if;
