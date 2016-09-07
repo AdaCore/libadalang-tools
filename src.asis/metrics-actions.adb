@@ -59,6 +59,7 @@ package body METRICS.Actions is
    procedure knd (X : Ada_Node);
    procedure pp (X : Ada_Node);
    procedure ppp (X : Ada_Node);
+   procedure Put_Ada_Node_Array (X : Ada_Node_Array);
    procedure Put_Child_Record (C : Child_Record);
    procedure Put_Children_Array (A : Children_Arrays.Array_Type);
    function Par (X : Ada_Node) return Ada_Node is (Parent (X));
@@ -83,6 +84,15 @@ package body METRICS.Actions is
       pp (X);
       Print (X);
    end ppp;
+
+   procedure Put_Ada_Node_Array (X : Ada_Node_Array) is
+      use LAL_UL.Dbg_Out;
+   begin
+      for N of X loop
+         pp (N);
+         Put ("----------------\n");
+      end loop;
+   end Put_Ada_Node_Array;
    pragma Warnings (On);
 
    procedure Put_Child_Record (C : Child_Record) is
@@ -1955,6 +1965,7 @@ package body METRICS.Actions is
               | Ada_Null_Subprogram_Decl
               | Ada_Renaming_Subprogram_Decl
               | Ada_Subprogram_Decl
+              | Ada_Generic_Subprogram_Decl
             =>
                Prev_Subp_Decl := Node;
             when Ada_Pragma_Node =>
@@ -2015,16 +2026,16 @@ package body METRICS.Actions is
                  | Ada_Task_Type_Decl
                  | Ada_Generic_Package_Decl
                  | Ada_Body_Node
-               =>
-                  Inc (File_M.Vals (Lines_Spark), By => Range_Count);
-                  Inc (Global_M.Vals (Lines_Spark), By => Range_Count);
-               when Ada_Private_Part | Ada_Handled_Statements
                  | Ada_Abstract_Subprogram_Decl
                  | Ada_Expression_Function
                  | Ada_Null_Subprogram_Decl
                  | Ada_Renaming_Subprogram_Decl
                  | Ada_Subprogram_Decl
+                 | Ada_Generic_Subprogram_Decl
                =>
+                  Inc (File_M.Vals (Lines_Spark), By => Range_Count);
+                  Inc (Global_M.Vals (Lines_Spark), By => Range_Count);
+               when Ada_Private_Part | Ada_Handled_Statements =>
                   null;
                when others => raise Program_Error;
             end case;
@@ -2345,7 +2356,8 @@ package body METRICS.Actions is
             end if;
          end loop;
 
-         if Parents (Node).Items'Length > 2 then
+         if Parents (Node).Items'Length > 2 and then False then
+            --  ???See P907-045
             pragma Assert
               (Parents (Node).Items (3) =
                  Get (Node_Stack, Last_Index (Node_Stack) - 2));
