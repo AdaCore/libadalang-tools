@@ -3107,6 +3107,7 @@ package body METRICS.Actions is
       Put ("  --lines-ratio       - comment/code lines percentage\n");
       Put ("  --lines-blank       - number of blank lines\n");
       Put ("  --lines-average     - average number of code lines in a body\n");
+      Put ("  --lines-spark       - code lines with SPARK_Mode (not included in --lines-all)\n");
       Put ("\n");
 
       Put (" Syntax element metrics:\n");
