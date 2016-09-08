@@ -1348,9 +1348,11 @@ package body METRICS.Actions is
            else Arg (Cmd, Output_Suffix).all);
       use Text_IO;
       Text : File_Type;
-      File_Name : String renames File_M.Source_File_Name.all;
+      File_Name : constant String := File_M.Source_File_Name.all;
       Text_File_Name : constant String :=
-        Directories.Compose (Output_Dir (Cmd), File_Name & Suffix);
+        (if Output_Dir (Cmd) = ""
+           then File_Name & Suffix
+           else Directories.Compose (Output_Dir (Cmd), File_Name & Suffix));
       --  Can't pass Suffix as Extension, because that inserts an extra "."
    begin
       if Text_File_Name = File_Name then
@@ -2886,12 +2888,11 @@ package body METRICS.Actions is
       Xml_F_Name : constant String :=
         (if Arg (Cmd, Xml_File_Name) /= null
            then Arg (Cmd, Xml_File_Name).all
-           else Directories.Compose
-             (Output_Dir (Cmd),
-              (if Arg (Cmd, Xml_File_Name) = null
-                 then "metrix.xml"
-                 else Arg (Cmd, Xml_File_Name).all)));
-      --  Actually, gnatmetric seems to ignore Output_Dir for the xml
+           else
+             (if Arg (Cmd, Xml_File_Name) = null
+                then "metrix.xml"
+                else Arg (Cmd, Xml_File_Name).all));
+      --  Gnatmetric ignores Output_Dir for the xml.
 
       XML_File : Text_IO.File_Type;
       --  All XML output for all source files goes to this file.
