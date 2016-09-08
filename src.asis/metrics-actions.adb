@@ -2615,7 +2615,7 @@ package body METRICS.Actions is
      Pre => M.Kind = Ada_Compilation_Unit;
    --  If M is a spec, return M. If it's a library unit body, return the
    --  corresponding spec. If it's a subunit, return the spec of the innermost
-   --  enclosing library unit.
+   --  enclosing library unit. If the spec is not present, return M.
 
    procedure XML_Print_Coupling
      (Cmd : Command_Line;
@@ -2721,7 +2721,6 @@ package body METRICS.Actions is
          declare
             Spec : constant Metrix_Ref := Specs (Get_Symbol_Index (M.CU_Name));
          begin
-            pragma Assert (Spec /= null);
             return (if Spec = null then M else Spec);
          end;
       else
@@ -2764,8 +2763,10 @@ package body METRICS.Actions is
                --  S is the compilation unit node for the spec; dependences of
                --  bodies (including subunits) should be counted on the spec.
             begin
-               Union (S.Depends_On, B.Depends_On);
-               Union (S.Limited_Depends_On, B.Limited_Depends_On);
+               if S /= B then
+                  Union (S.Depends_On, B.Depends_On);
+                  Union (S.Limited_Depends_On, B.Limited_Depends_On);
+               end if;
             end;
          end if;
       end loop;
