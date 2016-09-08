@@ -1871,9 +1871,7 @@ package body METRICS.Actions is
 
          --  Not yet implemented:
          --     Pragma SPARK_Mode as a configuration pragma.
-         --     SPARK_Mode aspect.
-         --     Inheritance of SPARK_Mode from parent to child, and from spec
-         --     to body.
+         --     Inheritance of SPARK_Mode e.g. from parent to child.
          --     Redundant OFF's.
          --  Basically, we're doing a purely syntactic analysis, and anything
          --  else is not yet implemented.
