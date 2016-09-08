@@ -1979,13 +1979,18 @@ package body METRICS.Actions is
          if Kind (Node) = Ada_Pragma_Node
            and then Pragma_Name (Node) = Spark_Mode
          then
-            case Child_Count (F_Args (Pragma_Node (Node))) is
-               when 0 => ON := True;
-               when 1 =>
-                  ON := L_Name (F_Expr (Item (F_Args (Pragma_Node (Node)), 1)))
-                        = "on";
-               when others => raise Program_Error;
-            end case;
+            if F_Args (Pragma_Node (Node)) = null then
+               ON := True;
+            else
+               case Child_Count (F_Args (Pragma_Node (Node))) is
+                  when 0 => ON := True; pragma Assert (False);
+                  when 1 =>
+                     ON :=
+                       L_Name (F_Expr (Item (F_Args (Pragma_Node (Node)), 1)))
+                       = "on";
+                  when others => raise Program_Error;
+               end case;
+            end if;
             Section := Find_Section;
 
          elsif Kind (Node) = Ada_Aspect_Assoc
