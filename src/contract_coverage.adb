@@ -1,11 +1,9 @@
-with Ada.Wide_Wide_Characters.Handling;
 with Text_IO;               use Text_IO;
-with Ada.Wide_Wide_Text_IO; use Ada;
+with Ada.Wide_Text_IO; use Ada;
 with Ada.Command_Line;      use Ada.Command_Line;
 
 with GNATCOLL.Iconv;
 
-with Langkit_Support.Text; use Langkit_Support.Text;
 with Langkit_Support.Diagnostics;
 
 with Libadalang;     use Libadalang;
@@ -13,6 +11,8 @@ with Libadalang.Analysis; use Libadalang.Analysis;
 with Libadalang.AST; use Libadalang.AST;
 with Libadalang.AST.Types; use Libadalang.AST.Types;
 with LAL_Extensions; use LAL_Extensions;
+
+with LAL_UL.String_Utilities; use LAL_UL.String_Utilities;
 
 procedure Contract_Coverage is
 
@@ -60,14 +60,11 @@ procedure Contract_Coverage is
             for I in 1 .. Child_Count (Assocs) loop
                declare
                   Assoc : constant Ada_Node := Childx (Assocs, I);
-                  use Ada.Wide_Wide_Characters.Handling;
-                  Id : constant Expr := F_Id (Aspect_Assoc (Assoc));
+                  Nm : constant Expr := F_Id (Aspect_Assoc (Assoc));
                begin
-                  if Kind (Id) = Ada_Identifier then
+                  if Kind (Nm) = Ada_Identifier then
                      declare
-                        Text : constant Text_Type :=
-                          To_Lower
-                            (Data (F_Tok (Single_Tok_Node (Id))).Text.all);
+                        Text : constant W_Str := L_Name (Nm);
                      begin
                         if Text = "contract_cases"
                           or else Text = "pre"
@@ -105,7 +102,7 @@ procedure Contract_Coverage is
                if Decl.all in Basic_Subprogram_Decl_Type'Class then
                   if Verbose then
                      Put ("    Doing subprogram ");
-                     Wide_Wide_Text_IO.Put
+                     Wide_Text_IO.Put
                        (Full_Name
                          (F_Name
                            (F_Subp_Spec
@@ -195,7 +192,7 @@ begin
                   Coverage : constant Percent := Get_Coverage (Pkg_Decl);
                begin
                   Put ("Contract coverage for package ");
-                  Wide_Wide_Text_IO.Put
+                  Wide_Text_IO.Put
                     (Full_Name (F_Package_Name (Pkg_Decl)));
                   Put (":");
                   Put (Integer (Coverage)'Img);

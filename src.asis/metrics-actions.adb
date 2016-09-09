@@ -9,8 +9,6 @@ with Unchecked_Deallocation;
 
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
-with Langkit_Support.Text; use Langkit_Support.Text;
-
 with Libadalang;     use Libadalang;
 with Libadalang.Lexer;
 with LAL_Extensions; use LAL_Extensions;
@@ -37,10 +35,10 @@ package body METRICS.Actions is
      renames String_Utilities.Image;
 
    pragma Warnings (Off);
-   procedure Stop (Node : Ada_Node; S : Wide_Wide_String);
+   procedure Stop (Node : Ada_Node; S : W_Str);
    --  For setting breakpoints in gdb
 
-   procedure Stop (Node : Ada_Node; S : Wide_Wide_String) is
+   procedure Stop (Node : Ada_Node; S : W_Str) is
       P : constant Ada_Node_Array_Access := Parents (Node);
       use LAL_UL.Dbg_Out;
    begin
@@ -104,7 +102,7 @@ package body METRICS.Actions is
          when Trivia =>
             Put ("Trivia: \1 ""\2"" \3\n",
                  C.Trivia.Kind'Img,
-                 To_UTF8 (C.Trivia.Text.all),
+                 To_UTF8 (Text_To_W_Str (C.Trivia.Text.all)),
                  Slocs.Image (C.Trivia.Sloc_Range));
       end case;
    end Put_Child_Record;
@@ -145,7 +143,7 @@ package body METRICS.Actions is
    --  Mappings from Symbols representing compilation unit full names to the
    --  spec and body of that compilation unit. Used for coupling metrics.
 
-   function Pragma_Name (Node : Ada_Node) return Text_Type is
+   function Pragma_Name (Node : Ada_Node) return W_Str is
      (L_Name (F_Id (Pragma_Node (Node))));
    --  Name of a pragma node, in lower case
 
@@ -553,10 +551,10 @@ package body METRICS.Actions is
    end Get_Outer_Unit;
 
    function Assertion_Kind (Node : Ada_Node) return Assertion_Enum is
-      Contract_Cases : constant Wide_Wide_String := "contract_cases";
-      Pre : constant Wide_Wide_String := "pre";
-      Post : constant Wide_Wide_String := "post";
-      Class : constant Wide_Wide_String := "class";
+      Contract_Cases : constant W_Str := "contract_cases";
+      Pre : constant W_Str := "pre";
+      Post : constant W_Str := "post";
+      Class : constant W_Str := "class";
    begin
       case Kind (Node) is
          when Ada_Pragma_Node =>
@@ -571,7 +569,7 @@ package body METRICS.Actions is
                case Kind (Id) is
                   when Ada_Identifier =>
                      declare
-                        Text : constant Text_Type := L_Name (Id);
+                        Text : constant W_Str := L_Name (Id);
                      begin
                         if Text = Pre then
                            return Other_Assertion;
@@ -584,9 +582,9 @@ package body METRICS.Actions is
 
                   when Ada_Attribute_Ref =>
                      declare
-                        Prefix : constant Text_Type :=
+                        Prefix : constant W_Str :=
                           L_Name (F_Prefix (Attribute_Ref (Id)));
-                        Attr : constant Text_Type :=
+                        Attr : constant W_Str :=
                           L_Name (F_Attribute (Attribute_Ref (Id)));
                      begin
                         if Attr = Class then
@@ -1952,8 +1950,8 @@ package body METRICS.Actions is
          Global_M : Metrix renames Get (Metrix_Stack, 1).all;
          Section : Ada_Node;
 
-         Spark_Mode : constant Wide_Wide_String := "spark_mode";
-         On_Str : constant Wide_Wide_String := "on";
+         Spark_Mode : constant W_Str := "spark_mode";
+         On_Str : constant W_Str := "on";
 
       --  Start of processing for Gather_SPARK_Line_Metrics
 
@@ -2351,7 +2349,7 @@ package body METRICS.Actions is
             if False and then Trivium.Kind = Trivia then
                Put_Children_Array (With_Trivia);
                Put ("----\n");
-               Stop (Node, Trivium.Trivia.Text.all);
+               Stop (Node, Text_To_W_Str (Trivium.Trivia.Text.all));
                exit;
             end if;
          end loop;

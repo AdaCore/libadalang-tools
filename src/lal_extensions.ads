@@ -4,7 +4,7 @@ with Libadalang; use Libadalang;
 with Libadalang.AST; use Libadalang.AST;
 with Libadalang.AST.Types; use Libadalang.AST.Types;
 
-with LAL_UL.String_Utilities;
+with LAL_UL.String_Utilities; use LAL_UL.String_Utilities;
 
 package LAL_Extensions is
 
@@ -49,16 +49,16 @@ package LAL_Extensions is
 
    function Id_Name
      (Nm : access Ada_Node_Type'Class)
-     return Text_Type with
-     Pre => Kind (Nm) = Ada_Identifier;
+     return W_Str with
+     Pre => Kind (Nm) in Ada_Identifier | Ada_String_Literal;
    function L_Name
      (Nm : access Ada_Node_Type'Class)
-     return Text_Type with
+     return W_Str with
      Pre => Kind (Nm) = Ada_Identifier;
    --  Text name of an identifier. The L_Name is converted to lower
    --  case.
 
-   function Full_Name (Nm : Name) return Text_Type;
+   function Full_Name (Nm : Name) return W_Str;
    --  Returns the full expanded name
 
    function Get_Def_Name (Decl : Ada_Node) return Name;
@@ -81,7 +81,15 @@ package LAL_Extensions is
      (Node : access Ada_Node_Type'Class) return Declarative_Part;
    --  Return the declarative part of a body
 
+   function Text_To_W_Str (X : Text_Type) return W_Str;
+   --  Libadalang deals with Wide_Wide_Strings, whereas ASIS deals with
+   --  Wide_Strings. We want to share code with ASIS tools at least for a
+   --  while, so we convert Wide_Wide_Strings to Wide_Strings, and use
+   --  Wide_Strings in libadalang-tools. This function does the conversion.
+
    function Short_Image (Node : Ada_Node) return String is
-      (LAL_UL.String_Utilities.To_UTF8 (Short_Image (Node)));
+     (LAL_UL.String_Utilities.To_UTF8
+       (Text_To_W_Str
+         (Text_Type'(Short_Image (Node)))));
 
 end LAL_Extensions;

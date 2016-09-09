@@ -1,4 +1,5 @@
-with Ada.Wide_Wide_Characters.Handling;
+with Ada.Characters.Conversions; use Ada;
+with Ada.Wide_Characters.Handling;
 
 with Libadalang.Analysis; use Libadalang.Analysis;
 
@@ -102,22 +103,22 @@ package body LAL_Extensions is
 
    function Id_Name
      (Nm : access Ada_Node_Type'Class)
-     return Text_Type
+     return W_Str
    is
    begin
-      return Data (F_Tok (Single_Tok_Node (Nm))).Text.all;
+      return Text_To_W_Str (Data (F_Tok (Single_Tok_Node (Nm))).Text.all);
    end Id_Name;
 
    function L_Name
      (Nm : access Ada_Node_Type'Class)
-     return Text_Type
+     return W_Str
    is
-      use Ada.Wide_Wide_Characters.Handling;
+      use Ada.Wide_Characters.Handling;
    begin
       return To_Lower (Id_Name (Nm));
    end L_Name;
 
-   function Full_Name (Nm : Name) return Text_Type is
+   function Full_Name (Nm : Name) return W_Str is
    begin
       case Kind (Nm) is
          when Ada_Dotted_Name =>
@@ -125,7 +126,7 @@ package body LAL_Extensions is
             return Full_Name (Name (F_Prefix (Dotted_Name (Nm)))) &
               "." & Full_Name (Name (F_Suffix (Dotted_Name (Nm))));
          when Ada_Identifier | Ada_String_Literal =>
-            return Data (F_Tok (Single_Tok_Node (Nm))).Text.all;
+            return Id_Name (Nm);
 
          when others =>
             raise Program_Error with
@@ -344,5 +345,11 @@ package body LAL_Extensions is
          when others => raise Program_Error;
       end case;
    end Body_Decls;
+
+   function Text_To_W_Str (X : Text_Type) return W_Str is
+   begin
+      pragma Assert (Characters.Conversions.Is_Wide_String (X));
+      return Characters.Conversions.To_Wide_String (X);
+   end Text_To_W_Str;
 
 end LAL_Extensions;
