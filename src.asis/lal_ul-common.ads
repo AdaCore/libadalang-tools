@@ -54,7 +54,7 @@ package LAL_UL.Common is
    --  ASIS_UL.Environment.Scan_Common_Arg for details. Perhaps we could put
    --  a kludge in Text_Args_From_Command_Line.
       Outer_Dir,
-      Output_Dir,
+      Output_Directory,
       Target,
       Subdirs);
 
@@ -70,7 +70,7 @@ package LAL_UL.Common is
        Object_Path_File_Name      => '!',
        Include_Path               => ':',
        Outer_Dir                  => '=',
-       Output_Dir                 => '=',
+       Output_Directory           => '=',
        Target                     => '=',
        Subdirs                    => '='));
 
@@ -82,7 +82,7 @@ package LAL_UL.Common is
        Object_Path_File_Name      => null,
        Include_Path               => null,
        Outer_Dir                  => null,
-       Output_Dir                 => null,
+       Output_Directory           => null,
        Target                     => null,
        Subdirs                    => null));
 
@@ -95,7 +95,7 @@ package LAL_UL.Common is
        Object_Path_File_Name      => +"-gnateO",
        Include_Path               => +"-I",
        Outer_Dir                  => null,
-       Output_Dir                 => null,
+       Output_Directory           => +"--output-dir",
        Target                     => null,
        Subdirs                    => null));
 
@@ -131,8 +131,6 @@ package LAL_UL.Common is
      ((Jobs => 1));
    package Common_Nat_Shorthands is new Common_Nat_Switches.Set_Shorthands
      ((Jobs => +"-j"));
-
-   package Freeze is new Freeze_Descriptor (Common_Descriptor);
 
    use Common_Flag_Switches, Common_String_Switches,
      Common_String_Seq_Switches, Common_Nat_Switches;

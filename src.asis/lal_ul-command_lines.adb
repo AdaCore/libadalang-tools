@@ -157,6 +157,7 @@ package body LAL_UL.Command_Lines is
       end Arg;
 
       package body Set_Shorthands is
+         pragma Assert (Descriptor.Allowed_Switches = null);
       begin
          for J in Shorthands'Range loop
             if Shorthands (J) /= null then
@@ -210,6 +211,7 @@ package body LAL_UL.Command_Lines is
       end Arg;
 
       package body Set_Defaults is
+         pragma Assert (Descriptor.Allowed_Switches = null);
       begin
          for J in Defaults'Range loop
             Descriptor.Allowed_Switches_Vector (To_All (J)).Default_Bool :=
@@ -218,6 +220,7 @@ package body LAL_UL.Command_Lines is
       end Set_Defaults;
 
       package body Set_Shorthands is
+         pragma Assert (Descriptor.Allowed_Switches = null);
          After_Dashes : Natural := 0;
       begin
          for J in Shorthands'Range loop
@@ -314,6 +317,7 @@ package body LAL_UL.Command_Lines is
       end Arg;
 
       package body Set_Shorthands is
+         pragma Assert (Descriptor.Allowed_Switches = null);
       begin
          for J in Shorthands'Range loop
             if Shorthands (J) /= null then
@@ -369,6 +373,7 @@ package body LAL_UL.Command_Lines is
       Set_Shorthands_Instantiated : Boolean := False;
 
       package body Set_Syntax is
+         pragma Assert (Descriptor.Allowed_Switches = null);
          pragma Assert (not Set_Shorthands_Instantiated);
       begin
          for J in Syntax'Range loop
@@ -378,6 +383,7 @@ package body LAL_UL.Command_Lines is
       end Set_Syntax;
 
       package body Set_Defaults is
+         pragma Assert (Descriptor.Allowed_Switches = null);
       begin
          for J in Defaults'Range loop
             Descriptor.Allowed_Switches_Vector (To_All (J)).Default :=
@@ -386,6 +392,7 @@ package body LAL_UL.Command_Lines is
       end Set_Defaults;
 
       package body Set_Shorthands is
+         pragma Assert (Descriptor.Allowed_Switches = null);
       begin
          Set_Shorthands_Instantiated := True;
 
@@ -454,6 +461,7 @@ package body LAL_UL.Command_Lines is
       Set_Shorthands_Instantiated : Boolean := False;
 
       package body Set_Syntax is
+         pragma Assert (Descriptor.Allowed_Switches = null);
          pragma Assert (not Set_Shorthands_Instantiated);
       begin
          for J in Syntax'Range loop
@@ -463,6 +471,7 @@ package body LAL_UL.Command_Lines is
       end Set_Syntax;
 
       package body Set_Shorthands is
+         pragma Assert (Descriptor.Allowed_Switches = null);
       begin
          Set_Shorthands_Instantiated := True;
 
@@ -522,6 +531,7 @@ package body LAL_UL.Command_Lines is
       Set_Shorthands_Instantiated : Boolean := False;
 
       package body Set_Syntax is
+         pragma Assert (Descriptor.Allowed_Switches = null);
          pragma Assert (not Set_Shorthands_Instantiated);
       begin
          for J in Syntax'Range loop
@@ -531,6 +541,7 @@ package body LAL_UL.Command_Lines is
       end Set_Syntax;
 
       package body Set_Defaults is
+         pragma Assert (Descriptor.Allowed_Switches = null);
       begin
          for J in Defaults'Range loop
             Descriptor.Allowed_Switches_Vector (To_All (J)).Default :=
@@ -539,6 +550,7 @@ package body LAL_UL.Command_Lines is
       end Set_Defaults;
 
       package body Set_Shorthands is
+         pragma Assert (Descriptor.Allowed_Switches = null);
       begin
          Set_Shorthands_Instantiated := True;
 
@@ -615,55 +627,63 @@ package body LAL_UL.Command_Lines is
    end Disable_Switches;
 
    package body Freeze_Descriptor is
-   begin
       pragma Assert (Descriptor.Allowed_Switches = null);
       --  Don't call this twice
 
+      procedure Do_It (Descriptor : in out Command_Line_Descriptor);
+      --  Do most of the work in a procedure so the debugger works.
+
+      procedure Do_It (Descriptor : in out Command_Line_Descriptor) is
+      begin
+         --  Validate that the allowed switches make sense. We can't have two
+         --  switches with the same name. We can't have one switch a prefix of
+         --  another if one of them is a String_Switch. For example, if we
+         --  allowed "--outputparm" and "--output-dirparm", then we can't tell
+         --  whether the latter is "--output-dir" with parameter "parm", or
+         --  "--output" with parameter "-dirparm".
+
+         for Switch1 in Descriptor.Allowed_Switches'Range loop
+            pragma Assert
+              (Descriptor.Allowed_Switches (Switch1).Kind /= No_Such);
+
+            for Switch2 in Descriptor.Allowed_Switches'Range loop
+               if Switch1 /= Switch2
+                 and then Enabled (Descriptor, Switch1)
+                 and then Enabled (Descriptor, Switch2)
+               then
+                  declare
+                     Desc1 :
+                       Switch_Descriptor renames
+                         Descriptor.Allowed_Switches (Switch1);
+                     Desc2 :
+                       Switch_Descriptor renames
+                         Descriptor.Allowed_Switches (Switch2);
+                  begin
+                     pragma Assert
+                       (Desc1.Text.all /= Desc2.Text.all,
+                        "duplicate " & Desc1.Text.all);
+
+                     if Desc1.Kind in String_Switch | String_Seq_Switch
+                       and then Syntax (Descriptor, Switch1) /= '='
+                     then
+                        pragma Assert
+                          (not Has_Prefix (Desc2.Text.all, Desc1.Text.all),
+                           Desc1.Text.all & " is prefix of " & Desc2.Text.all);
+                     end if;
+                  end;
+               end if;
+            end loop;
+         end loop;
+      end Do_It;
+
+   begin
       --  Switch over to using Allowed_Switches from Allowed_Switches_Vector
 
       Descriptor.Allowed_Switches :=
         new Switch_Descriptor_Array'
-          (To_Array (Descriptor.Allowed_Switches_Vector));
+        (To_Array (Descriptor.Allowed_Switches_Vector));
       Free (Descriptor.Allowed_Switches_Vector);
-
-      --  Validate that the allowed switches make sense. We can't have two
-      --  switches with the same name. We can't have one switch a prefix of
-      --  another if one of them is a String_Switch. For example, if we allowed
-      --  "--outputparm" and "--output-dirparm", then we can't tell whether the
-      --  latter is "--output-dir" with parameter "parm", or "--output" with
-      --  parameter "-dirparm".
-
-      for Switch1 in Descriptor.Allowed_Switches'Range loop
-         pragma Assert (Descriptor.Allowed_Switches (Switch1).Kind /= No_Such);
-
-         for Switch2 in Descriptor.Allowed_Switches'Range loop
-            if Switch1 /= Switch2
-              and then Enabled (Descriptor, Switch1)
-              and then Enabled (Descriptor, Switch2)
-            then
-               declare
-                  Desc1 :
-                    Switch_Descriptor renames
-                    Descriptor.Allowed_Switches (Switch1);
-                  Desc2 :
-                    Switch_Descriptor renames
-                    Descriptor.Allowed_Switches (Switch2);
-               begin
-                  pragma Assert
-                    (Desc1.Text.all /= Desc2.Text.all,
-                     "duplicate " & Desc1.Text.all);
-
-                  if Desc1.Kind in String_Switch | String_Seq_Switch
-                    and then Syntax (Descriptor, Switch1) /= '='
-                  then
-                     pragma Assert
-                       (not Has_Prefix (Desc2.Text.all, Desc1.Text.all),
-                        Desc1.Text.all & " is prefix of " & Desc2.Text.all);
-                  end if;
-               end;
-            end if;
-         end loop;
-      end loop;
+      Do_It (Descriptor);
    end Freeze_Descriptor;
 
    function Copy_Descriptor
@@ -1212,5 +1232,24 @@ package body LAL_UL.Command_Lines is
          <<Continue>>
       end loop;
    end Dump_Cmd;
+
+   procedure Dump_Descriptor (Descriptor : Command_Line_Descriptor) is
+      pragma Assert (Descriptor.Allowed_Switches /= null);
+      pragma Assert (Is_Empty (Descriptor.Allowed_Switches_Vector));
+      --  Assert that Freeze_Descriptor has been called
+   begin
+      for J in Descriptor.Allowed_Switches'Range loop
+         declare
+            X : Switch_Descriptor renames Descriptor.Allowed_Switches (J);
+         begin
+            Put_Line
+              (J'Img &
+                 " " & X.Kind'Img &
+                 " " & X.Text.all &
+                 (if X.Alias = J then "" else X.Alias'Img) &
+                 " " & (if X.Enabled then "" else " DISABLED"));
+         end;
+      end loop;
+   end Dump_Descriptor;
 
 end LAL_UL.Command_Lines;

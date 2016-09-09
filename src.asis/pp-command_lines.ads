@@ -2,16 +2,18 @@ with LAL_UL.Command_Lines; use LAL_UL.Command_Lines;
 with LAL_UL.Common;        use LAL_UL.Common;
 package Pp.Command_Lines is
 
+   package Freeze_Common is new Freeze_Descriptor (Common_Descriptor);
+
    Descriptor : aliased Command_Line_Descriptor :=
      Copy_Descriptor (Common_Descriptor);
 
    use Common_Flag_Switches, Common_String_Switches,
      Common_String_Seq_Switches, Common_Nat_Switches;
 
-   package Gnatpp_Disable is new Disable_Switches
+   package Pp_Disable is new Disable_Switches
      (Descriptor, (1 => To_All (Rep_Clauses)));
 
-   type Gnatpp_Flags is
+   type Pp_Flags is
      (No_Alignment,
       Alignment,
       Obsolete_A2,
@@ -42,11 +44,11 @@ package Pp.Command_Lines is
       Test, -- Not documented
       Warnings); -- Not documented
 
-   package Gnatpp_Flag_Switches is new Flag_Switches
+   package Pp_Flag_Switches is new Flag_Switches
      (Descriptor,
-      Gnatpp_Flags);
+      Pp_Flags);
 
-   package Gnatpp_Flag_Shorthands is new Gnatpp_Flag_Switches.Set_Shorthands
+   package Pp_Flag_Shorthands is new Pp_Flag_Switches.Set_Shorthands
      ((No_Alignment => +"-A0",
        Alignment => +"-A1",
        Obsolete_A2 => +"-A2",
@@ -77,7 +79,7 @@ package Pp.Command_Lines is
        Test => null, -- Not documented
        Warnings => +"-w")); -- Not documented
 
-   package Gnatpp_Flag_Shorthands_N is new Gnatpp_Flag_Switches.Set_Shorthands
+   package Pp_Flag_Shorthands_N is new Pp_Flag_Switches.Set_Shorthands
      ((No_Tab => +"-N", -- Not documented
        others => null)); -- Not documented
 
@@ -192,7 +194,7 @@ package Pp.Command_Lines is
        Pragma_Upper_Case => +"-pU",
        Pragma_Mixed_Case => +"-pM"));
 
-   type Gnatpp_Booleans is
+   type Pp_Booleans is
      (End_Id,
       Separate_Is,
       Use_On_New_Line,
@@ -200,12 +202,12 @@ package Pp.Command_Lines is
       Rm_Style_Spacing,
       Ff_After_Pragma_Page);
 
-   package Gnatpp_Boolean_Switches is new Boolean_Switches
+   package Pp_Boolean_Switches is new Boolean_Switches
      (Descriptor,
-      Gnatpp_Booleans);
+      Pp_Booleans);
 
-   package Gnatpp_Boolean_Shorthands is new
-     Gnatpp_Boolean_Switches.Set_Shorthands
+   package Pp_Boolean_Shorthands is new
+     Pp_Boolean_Switches.Set_Shorthands
        ((End_Id => null,
          Separate_Is => null,
          Use_On_New_Line => null,
@@ -213,8 +215,8 @@ package Pp.Command_Lines is
          Rm_Style_Spacing => +"--RM-style-spacing",
          Ff_After_Pragma_Page => +"-ff"));
 
-   package Gnatpp_Boolean_Defaults is new
-     Gnatpp_Boolean_Switches.Set_Defaults
+   package Pp_Boolean_Defaults is new
+     Pp_Boolean_Switches.Set_Defaults
        ((End_Id => True,
          Separate_Is => True,
          Use_On_New_Line => False,
@@ -222,7 +224,7 @@ package Pp.Command_Lines is
          Rm_Style_Spacing => False,
          Ff_After_Pragma_Page => False));
 
-   type Gnatpp_Strings is
+   type Pp_Strings is
      (File_Name_File,
       Dictionary,
       Output,
@@ -232,11 +234,11 @@ package Pp.Command_Lines is
       Pp_Off,
       Pp_On);
 
-   package Gnatpp_String_Switches is new String_Switches
+   package Pp_String_Switches is new String_Switches
      (Descriptor,
-      Gnatpp_Strings);
+      Pp_Strings);
 
-   package Gnatpp_String_Syntax is new Gnatpp_String_Switches.Set_Syntax
+   package Pp_String_Syntax is new Pp_String_Switches.Set_Syntax
      ((File_Name_File => '=',
        Dictionary => ':',
        Output => '=',
@@ -246,7 +248,7 @@ package Pp.Command_Lines is
        Pp_Off => '=',
        Pp_On => '='));
 
-   package Gnatpp_String_Shorthands is new Gnatpp_String_Switches
+   package Pp_String_Shorthands is new Pp_String_Switches
      .Set_Shorthands
      ((File_Name_File => null,
        Dictionary => +"-D",
@@ -257,21 +259,21 @@ package Pp.Command_Lines is
        Pp_Off => null,
        Pp_On => null));
 
---   type Gnatpp_String_Seqs is ();
+--   type Pp_String_Seqs is ();
 --
---   package Gnatpp_String_Seq_Switches is new String_Seq_Switches
+--   package Pp_String_Seq_Switches is new String_Seq_Switches
 --     (Descriptor,
---      Gnatpp_String_Seqs);
+--      Pp_String_Seqs);
 --
---   package Gnatpp_String_Seq_Syntax is new Gnatpp_String_Seq_Switches
+--   package Pp_String_Seq_Syntax is new Pp_String_Seq_Switches
 --     .Set_Syntax
 --     (());
 --
---   package Gnatpp_String_Seq_Shorthands is new Gnatpp_String_Seq_Switches
+--   package Pp_String_Seq_Shorthands is new Pp_String_Seq_Switches
 --     .Set_Shorthands
 --     (());
 
-   type Gnatpp_Nats is
+   type Pp_Nats is
      (Max_Line_Length,
       Indentation,
       Indent_Continuation,
@@ -281,14 +283,14 @@ package Pp.Command_Lines is
       Par_Threshold,
       Case_Threshold); -- Not documented
 
-   package Gnatpp_Nat_Switches is new Other_Switches
+   package Pp_Nat_Switches is new Other_Switches
      (Descriptor,
-      Gnatpp_Nats,
+      Pp_Nats,
       Natural,
       Natural'Image,
       Natural'Value);
 
-   package Gnatpp_Nat_Syntax is new Gnatpp_Nat_Switches.Set_Syntax
+   package Pp_Nat_Syntax is new Pp_Nat_Switches.Set_Syntax
      ((Max_Line_Length => '!',
        Indentation => '!',
        Indent_Continuation => '!',
@@ -298,7 +300,7 @@ package Pp.Command_Lines is
        Par_Threshold => '=',
        Case_Threshold => '!')); -- Not documented
 
-   package Gnatpp_Nat_Defaults is new Gnatpp_Nat_Switches.Set_Defaults
+   package Pp_Nat_Defaults is new Pp_Nat_Switches.Set_Defaults
      ((Max_Line_Length => 79,
        Indentation => 3,
        Indent_Continuation => 0,
@@ -309,7 +311,7 @@ package Pp.Command_Lines is
        Par_Threshold => 0,
        Case_Threshold => 10)); -- Not documented
 
-   package Gnatpp_Nat_Shorthands is new Gnatpp_Nat_Switches.Set_Shorthands
+   package Pp_Nat_Shorthands is new Pp_Nat_Switches.Set_Shorthands
      ((Max_Line_Length => +"-M",
        Indentation => +"-i",
        Indent_Continuation => +"-cl",
@@ -321,8 +323,8 @@ package Pp.Command_Lines is
 
    package Freeze is new Freeze_Descriptor (Descriptor);
 
-   use Gnatpp_Flag_Switches,
-     Gnatpp_Boolean_Switches,
+   use Pp_Flag_Switches,
+     Pp_Boolean_Switches,
      Attribute_Casing_Switches,
      Keyword_Casing_Switches,
      Name_Casing_Switches,
@@ -330,8 +332,8 @@ package Pp.Command_Lines is
      Type_Casing_Switches,
      Number_Casing_Switches,
      Pragma_Casing_Switches,
-     Gnatpp_String_Switches,
-     Gnatpp_Nat_Switches;
-   --  , ????Gnatpp_String_Seq_Switches;
+     Pp_String_Switches,
+     Pp_Nat_Switches;
+   --  , ????Pp_String_Seq_Switches;
 
 end Pp.Command_Lines;

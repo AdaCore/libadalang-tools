@@ -2,23 +2,29 @@ with LAL_UL.Command_Lines; use LAL_UL.Command_Lines;
 with LAL_UL.Common;        use LAL_UL.Common;
 package METRICS.Command_Lines is
 
-   Descriptor : aliased Command_Line_Descriptor :=
-     Copy_Descriptor (Common_Descriptor);
-
    use Common_Flag_Switches, Common_String_Switches,
      Common_String_Seq_Switches, Common_Nat_Switches;
 
    package Metrics_Disable is new Disable_Switches
-     (Descriptor,
-      (To_All (Rep_Clauses), To_All (Output_Dir), To_All (Debug)) &
-      Incremental_Switches);
+     (Common_Descriptor,
+      (To_All (Rep_Clauses), To_All (Debug)) & Incremental_Switches);
 
    --  Note: Most tools allow "--debugx" with a shorthand of "-dx".
    --  Gnatmetric, however, uses "--gnatmetric-debugx" with a shorthand
    --  of "-debugx". Therefore, we disable Common.Debug, and define
-   --  Gnatmetric_Debug below. Gnatmetric uses -d for the output directory;
-   --  we should probably allow --output-dir in addition to --output-directory
-   --  (see below).
+   --  Gnatmetric_Debug below.
+
+   package Metrics_Common_String_Shorthands is new Common_String_Switches
+     .Set_Shorthands
+     ((Output_Directory => +"-d",
+       others => null));
+   --  Note: gnatmetric allows -d to specify the directory. This must come
+   --  before the Copy_Descriptor below.
+
+   package Freeze_Common is new Freeze_Descriptor (Common_Descriptor);
+
+   Descriptor : aliased Command_Line_Descriptor :=
+     Copy_Descriptor (Common_Descriptor);
 
    type Metrics_Flags is
      (Test,
@@ -221,7 +227,7 @@ package METRICS.Command_Lines is
          others                 => null));
 
    type Metrics_Strings is
-     (Output_Suffix, Global_File_Name, Xml_File_Name, Output_Directory);
+     (Output_Suffix, Global_File_Name, Xml_File_Name);
 
    package Metrics_String_Switches is new String_Switches
      (Descriptor,
@@ -230,15 +236,13 @@ package METRICS.Command_Lines is
    package Metrics_String_Syntax is new Metrics_String_Switches.Set_Syntax
      ((Output_Suffix    => '=',
        Global_File_Name => '=',
-       Xml_File_Name    => '=',
-       Output_Directory => '='));
+       Xml_File_Name    => '='));
 
    package Metrics_String_Shorthands is new Metrics_String_Switches
      .Set_Shorthands
      ((Output_Suffix    => +"-o",
        Global_File_Name => +"-og",
-       Xml_File_Name    => +"-ox",
-       Output_Directory => +"-d"));
+       Xml_File_Name    => +"-ox"));
 
    type Metrics_String_Seqs is (Gnatmetric_Debug);
 

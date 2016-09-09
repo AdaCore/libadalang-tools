@@ -2,6 +2,7 @@ with Libadalang.Analysis; use Libadalang.Analysis;
 with LAL_UL.Command_Lines; use LAL_UL.Command_Lines;
 with LAL_UL.Tools; use LAL_UL.Tools;
 
+pragma Warnings (Off); -- ????
 private with Ada.Containers.Hashed_Sets;
 private with Langkit_Support.Vectors;
 private with Langkit_Support.Slocs;
@@ -10,6 +11,7 @@ private with Libadalang.AST.Types;
 private with Pp.Command_Lines;
 private with LAL_UL.Generic_Symbols;
 private with LAL_UL.Symbols;
+pragma Warnings (On); -- ????
 
 package Pp.Actions is
 

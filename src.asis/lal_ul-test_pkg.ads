@@ -3,6 +3,8 @@ with LAL_UL.Command_Lines; use LAL_UL.Command_Lines;
 with LAL_UL.Common; use LAL_UL.Common;
 package LAL_UL.Test_Pkg is
 
+   package Freeze_Common is new Freeze_Descriptor (Common_Descriptor);
+
    Descriptor : aliased Command_Line_Descriptor :=
      Copy_Descriptor (Common_Descriptor);
 

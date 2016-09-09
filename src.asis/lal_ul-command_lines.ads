@@ -547,6 +547,8 @@ package LAL_UL.Command_Lines is
    procedure Dump_Cmd (Cmd : Command_Line; Verbose : Boolean := False);
    --  Debugging printout. Without Verbose, skips defaulted args.
 
+   procedure Dump_Descriptor (Descriptor : Command_Line_Descriptor);
+
    function Text_Args_From_Command_Line return Argument_List_Access;
    --  Returns the sequence of command-line arguments
 

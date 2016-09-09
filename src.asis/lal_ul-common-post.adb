@@ -33,8 +33,8 @@ package body LAL_UL.Common.Post is
 
 --      ASIS_UL.Options.Outer_Parallel := Arg (Cmd, Outer_Parallel);
 
-      if Arg (Cmd, Output_Dir) /= null then
-         Out_Dir := new String'(Full_Name (Arg (Cmd, Output_Dir).all));
+      if Arg (Cmd, Output_Directory) /= null then
+         Out_Dir := new String'(Full_Name (Arg (Cmd, Output_Directory).all));
       end if;
 
 --      Generate_Representation_Clauses := Arg (Cmd, Rep_Clauses);

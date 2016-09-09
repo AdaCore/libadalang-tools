@@ -256,7 +256,7 @@ package body Pp.Formatting is
             return           W_Str
          is
             use GNATCOLL.Paragraph_Filling, Ada.Strings.Unbounded;
-            S1 : constant String := Namet.Get_Name_String (Comment_Tok.Text);
+            S1 : constant String := Get_Name_String (Comment_Tok.Text);
             S2 : constant String :=
               To_String
                 (Pretty_Fill
