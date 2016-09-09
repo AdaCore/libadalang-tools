@@ -14,9 +14,9 @@ with Libadalang.Lexer;
 with LAL_Extensions; use LAL_Extensions;
 
 with LAL_UL.Common; use LAL_UL; use LAL_UL.Common;
-with LAL_UL.Dbg_Out;
+with ASIS_UL.Dbg_Out;
 with LAL_UL.Formatted_Output;
-with LAL_UL.String_Utilities; use LAL_UL.String_Utilities;
+with ASIS_UL.String_Utilities; use ASIS_UL.String_Utilities;
 with LAL_UL.Tool_Names;
 
 with ASIS_UL.Debug; use ASIS_UL.Debug;
@@ -32,7 +32,7 @@ package body METRICS.Actions is
    Output_To_Standard_Output : Boolean renames Debug_Flag_S;
 
    function Image (X : Integer) return String
-     renames String_Utilities.Image;
+     renames ASIS_UL.String_Utilities.Image;
 
    pragma Warnings (Off);
    procedure Stop (Node : Ada_Node; S : W_Str);
@@ -40,7 +40,7 @@ package body METRICS.Actions is
 
    procedure Stop (Node : Ada_Node; S : W_Str) is
       P : constant Ada_Node_Array_Access := Parents (Node);
-      use LAL_UL.Dbg_Out;
+      use ASIS_UL.Dbg_Out;
    begin
       if False then
          Put ("Node:\n");
@@ -64,27 +64,27 @@ package body METRICS.Actions is
    --  Debugging printouts
 
    procedure knd (X : Ada_Node) is
-      use LAL_UL.Dbg_Out;
+      use ASIS_UL.Dbg_Out;
    begin
       Put ("\1\n", Kind (X)'Img);
    end knd;
 
    procedure pp (X : Ada_Node) is
-      use LAL_UL.Dbg_Out;
+      use ASIS_UL.Dbg_Out;
    begin
-      LAL_UL.Dbg_Out.Output_Enabled := True;
+      ASIS_UL.Dbg_Out.Output_Enabled := True;
       Put ("\1\n", (if X = null then "null" else Short_Image (X)));
    end pp;
 
    procedure ppp (X : Ada_Node) is
-      use LAL_UL.Dbg_Out;
+      use ASIS_UL.Dbg_Out;
    begin
       pp (X);
       Print (X);
    end ppp;
 
    procedure Put_Ada_Node_Array (X : Ada_Node_Array) is
-      use LAL_UL.Dbg_Out;
+      use ASIS_UL.Dbg_Out;
    begin
       for N of X loop
          pp (N);
@@ -94,7 +94,7 @@ package body METRICS.Actions is
    pragma Warnings (On);
 
    procedure Put_Child_Record (C : Child_Record) is
-      use LAL_UL.Dbg_Out;
+      use ASIS_UL.Dbg_Out;
    begin
       case C.Kind is
          when Child =>
@@ -108,7 +108,7 @@ package body METRICS.Actions is
    end Put_Child_Record;
 
    procedure Put_Children_Array (A : Children_Arrays.Array_Type) is
-      use LAL_UL.Dbg_Out;
+      use ASIS_UL.Dbg_Out;
    begin
       for I in A'Range loop
          Put ("\1: ", Image (I));

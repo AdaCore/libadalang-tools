@@ -30,7 +30,7 @@ with Ada.Strings.Wide_Fixed;
 
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
-package LAL_UL.String_Utilities is
+package ASIS_UL.String_Utilities is
 
    --  String-related utilities
 
@@ -140,6 +140,8 @@ package LAL_UL.String_Utilities is
      Ada.Strings.UTF_Encoding.Wide_Strings.Decode;
 
    procedure Text_IO_Put_Char (C : Character);
+   procedure Wide_Text_IO_Put_Char (C : Character);
+   procedure Wide_Text_IO_Put_Char (C : W_Char);
    --  Put C to Current_Output. Used to instantiate Formatted_Output.
 
    procedure Std_Err_Put_Char (C : Character);
@@ -198,4 +200,4 @@ package LAL_UL.String_Utilities is
    function To_String (X : Bounded_W_Str) return W_Str;
    function "+" (X : Bounded_W_Str) return W_Str renames To_String;
 
-end LAL_UL.String_Utilities;
+end ASIS_UL.String_Utilities;

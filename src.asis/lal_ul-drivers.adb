@@ -33,7 +33,7 @@ with LAL_UL.Common;   use LAL_UL.Common;
 with LAL_UL.Common.Post;
 with LAL_UL.Projects; use LAL_UL.Projects;
 --  with LAL_UL.Check_Parameters;
-with LAL_UL.String_Utilities; use LAL_UL.String_Utilities;
+with ASIS_UL.String_Utilities; use ASIS_UL.String_Utilities;
 
 with GNATCOLL.Iconv;
 

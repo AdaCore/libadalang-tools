@@ -29,7 +29,7 @@ generic
    --  e.g. String or Wide_String
    with procedure Basic_Put_Char (C : Char_Type);
    Output_Enabled_Initially : Boolean := True;
-package LAL_UL.Generic_Formatted_Output is
+package ASIS_UL.Generic_Formatted_Output is
 
    --  Simple formatted output.
 
@@ -72,4 +72,4 @@ package LAL_UL.Generic_Formatted_Output is
    --  to clients, because some need to directly get/set this, bypassing
    --  In/Outdent.
 
-end LAL_UL.Generic_Formatted_Output;
+end ASIS_UL.Generic_Formatted_Output;

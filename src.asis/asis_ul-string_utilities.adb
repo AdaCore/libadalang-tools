@@ -29,9 +29,10 @@ with Ada.Directories;
 with Ada.Wide_Characters.Handling; use Ada.Wide_Characters.Handling;
 with Ada.Strings.Unbounded;
 with Ada.Strings.Wide_Unbounded;
-with Ada.Text_IO; use Ada;
+with Ada.Text_IO;
+with Ada.Wide_Text_IO;             use Ada;
 
-package body LAL_UL.String_Utilities is
+package body ASIS_UL.String_Utilities is
 
    ------------
    -- Append --
@@ -472,6 +473,24 @@ package body LAL_UL.String_Utilities is
       end if;
    end Text_IO_Put_Char;
 
+   ---------------------------
+   -- Wide_Text_IO_Put_Char --
+   ---------------------------
+
+   procedure Wide_Text_IO_Put_Char (C : Character) is
+   begin
+      Wide_Text_IO_Put_Char (To_Wide_Character (C));
+   end Wide_Text_IO_Put_Char;
+
+   procedure Wide_Text_IO_Put_Char (C : W_Char) is
+   begin
+      if C = NL then
+         Wide_Text_IO.New_Line;
+      else
+         Wide_Text_IO.Put (C);
+      end if;
+   end Wide_Text_IO_Put_Char;
+
    ----------------------
    -- Std_Err_Put_Char --
    ----------------------
@@ -638,4 +657,4 @@ package body LAL_UL.String_Utilities is
       return X.Chars (1 .. X.Length);
    end To_String;
 
-end LAL_UL.String_Utilities;
+end ASIS_UL.String_Utilities;

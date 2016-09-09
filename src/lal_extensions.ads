@@ -4,7 +4,7 @@ with Libadalang; use Libadalang;
 with Libadalang.AST; use Libadalang.AST;
 with Libadalang.AST.Types; use Libadalang.AST.Types;
 
-with LAL_UL.String_Utilities; use LAL_UL.String_Utilities;
+with ASIS_UL.String_Utilities; use ASIS_UL.String_Utilities;
 
 package LAL_Extensions is
 
@@ -88,7 +88,7 @@ package LAL_Extensions is
    --  Wide_Strings in libadalang-tools. This function does the conversion.
 
    function Short_Image (Node : Ada_Node) return String is
-     (LAL_UL.String_Utilities.To_UTF8
+     (ASIS_UL.String_Utilities.To_UTF8
        (Text_To_W_Str
          (Text_Type'(Short_Image (Node)))));
 

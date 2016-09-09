@@ -25,11 +25,9 @@ pragma Ada_2012;
 
 with Ada.Finalization; use Ada.Finalization;
 
-with ASIS_UL;
+with ASIS_UL.String_Utilities; use ASIS_UL.String_Utilities;
 
-with LAL_UL.String_Utilities; use LAL_UL.String_Utilities;
-
-package body LAL_UL.Generic_Formatted_Output is
+package body ASIS_UL.Generic_Formatted_Output is
 
    Column : Natural := 1;
 
@@ -62,7 +60,7 @@ package body LAL_UL.Generic_Formatted_Output is
    procedure Finalize (X : in out Finalization) is
       pragma Unreferenced (X);
    begin
-      if ASIS_UL.Main_Done then
+      if Main_Done then
          if Indentation /= 0 then
             raise Program_Error with "Indentation should be zero at end.";
          end if;
@@ -234,4 +232,4 @@ package body LAL_UL.Generic_Formatted_Output is
       end loop;
    end Tab_To_Column;
 
-end LAL_UL.Generic_Formatted_Output;
+end ASIS_UL.Generic_Formatted_Output;

@@ -23,10 +23,10 @@
 
 pragma Ada_2012;
 
-with LAL_UL.Generic_Formatted_Output;
-with LAL_UL.String_Utilities; use LAL_UL.String_Utilities;
+with ASIS_UL.Generic_Formatted_Output;
+with ASIS_UL.String_Utilities; use ASIS_UL.String_Utilities;
 
-package LAL_UL.Formatted_Output is new LAL_UL.Generic_Formatted_Output
+package LAL_UL.Formatted_Output is new ASIS_UL.Generic_Formatted_Output
   (Char_Type      => Character,
    Str_Type       => String,
    Basic_Put_Char => Text_IO_Put_Char);

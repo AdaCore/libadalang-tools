@@ -12,7 +12,7 @@ with Libadalang.AST; use Libadalang.AST;
 with Libadalang.AST.Types; use Libadalang.AST.Types;
 with LAL_Extensions; use LAL_Extensions;
 
-with LAL_UL.String_Utilities; use LAL_UL.String_Utilities;
+with ASIS_UL.String_Utilities; use ASIS_UL.String_Utilities;
 
 procedure Contract_Coverage is
 

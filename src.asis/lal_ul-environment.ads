@@ -31,8 +31,8 @@ pragma Ada_2012;
 with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 with GNAT.OS_Lib;               use GNAT.OS_Lib;
 
-with LAL_UL.String_Utilities; use LAL_UL.String_Utilities;
-  use LAL_UL.String_Utilities.String_Vectors;
+with ASIS_UL.String_Utilities; use ASIS_UL.String_Utilities;
+  use ASIS_UL.String_Utilities.String_Vectors;
 
 package LAL_UL.Environment is
 

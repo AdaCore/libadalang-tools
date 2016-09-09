@@ -23,14 +23,14 @@
 
 pragma Ada_2012;
 
-with LAL_UL.Generic_Formatted_Output;
-with LAL_UL.String_Utilities;
+with ASIS_UL.Generic_Formatted_Output;
+with ASIS_UL.String_Utilities;
 
-package LAL_UL.Dbg_Out is new LAL_UL.Generic_Formatted_Output
+package ASIS_UL.Dbg_Out is new ASIS_UL.Generic_Formatted_Output
   (Char_Type                => Character,
    Str_Type                 => String,
-   Basic_Put_Char           => LAL_UL.String_Utilities.Std_Err_Put_Char,
+   Basic_Put_Char           => ASIS_UL.String_Utilities.Std_Err_Put_Char,
    Output_Enabled_Initially => False);
 --  All data is sent to Text_IO.Standard_Error. In gdb, set
---  "LAL_UL.Dbg_Out.Output_Enabled:=True" to enable debugging output, which
---  is turned off by default.
+--  "ASIS_UL.Dbg_Out.Output_Enabled:=True" to enable debugging output,
+--  which is turned off by default.

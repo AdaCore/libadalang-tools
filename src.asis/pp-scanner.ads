@@ -276,4 +276,15 @@ package Pp.Scanner is
    --  indicate a slice of Tokens, and we tolerate out-of-bounds indices.
    --  We draw a comment line before Highlight.
 
+   function W_Name_Find
+     (S    : W_Str)
+      return Namet.Name_Id is
+     (Namet.Name_Find (To_UTF8 (S)));
+   --  Wrapper for Namet.Name_Find
+
+   function Get_Name_String
+     (Id   : Namet.Name_Id)
+      return W_Str is
+     (From_UTF8 (Namet.Get_Name_String (Id)));
+
 end Pp.Scanner;
