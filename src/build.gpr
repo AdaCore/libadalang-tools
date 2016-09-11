@@ -10,7 +10,7 @@ project Build is
 
    package Compiler is
       for Default_Switches ("ada") use
-        ("-g", "-O0", "-gnata", "-gnatyg", "-gnatwae");
+        ("-g", "-O0", "-gnata", "-gnatyg", "-gnatwae", "-gnatw.u");
    end Compiler;
 
    package Builder is
