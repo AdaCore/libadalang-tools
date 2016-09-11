@@ -25,21 +25,16 @@ pragma Ada_2012;
 
 with Text_IO;
 
-with Snames;
-with Scans;
+with LAL_UL.Symbols; use LAL_UL.Symbols;
+with LAL_UL.Predefined_Symbols; use LAL_UL.Predefined_Symbols;
 
 package body Pp.Scanner is
 
-   subtype Name_Id is Namet.Name_Id;
-   use type Name_Id;
-   No_Name : constant Name_Id := Namet.No_Name;
-   function Name_Find (Buf : Namet.Bounded_String) return Name_Id
-     renames Namet.Name_Find;
-   function Name_Find (S : String) return Name_Id renames Namet.Name_Find;
-   procedure Append (Buf : in out Namet.Bounded_String; C : Character)
-     renames Namet.Append;
-   procedure Append (Buf : in out Namet.Bounded_String; S : String)
-     renames Namet.Append;
+   subtype Symbol is Syms.Symbol;
+   No_Symbol : constant Symbol := Syms.No_Symbol;
+   function Intern (Buf : Bounded_Str) return Symbol
+     renames Syms.Intern;
+   function Intern (S : String) return Symbol renames Syms.Intern;
 
    function First_Pos
      (Input : Buffer;
@@ -62,6 +57,7 @@ package body Pp.Scanner is
    procedure Get_Tokens
      (Input                     : in out Buffer;
       Result                    : out Token_Vectors.Vector;
+      Ada_Version               : Ada_Version_Type;
       Pp_Off_On_Delimiters      : Pp_Off_On_Delimiters_Rec;
       Ignore_Single_Line_Breaks : Boolean           := True;
       Max_Tokens                : Token_Index       := Token_Index'Last;
@@ -77,15 +73,15 @@ package body Pp.Scanner is
          then
            Char_At (Input, Last_Position (Input)) = NL);
 
-      Name_Empty   : constant Name_Id := Name_Find ("");
-      Name_R_Paren : constant Name_Id := Name_Find (")");
-      Name_Tick    : constant Name_Id := Name_Find ("'");
-      Name_NL      : constant Name_Id := W_Name_Find ((1 => NL));
+      Name_Empty   : constant Symbol := Intern ("");
+      Name_R_Paren : constant Symbol := Intern (")");
+      Name_Tick    : constant Symbol := Intern ("'");
+      Name_NL      : constant Symbol := W_Intern ((1 => NL));
 
       Cur_Line, Cur_Col : Positive := 1;
       Cur_First         : Positive := 1;
 
-      Name_Buffer : Namet.Bounded_String;
+      Name_Buffer : Bounded_Str;
       Name_Len : Natural renames Name_Buffer.Length;
 
       procedure Get;
@@ -188,7 +184,7 @@ package body Pp.Scanner is
       Preceding_Lexeme,
       Preceding_Token : Token :=
         (Kind => Nil,
-         Text | Normalized => No_Name,
+         Text | Normalized => No_Symbol,
          Leading_Blanks | Width => Natural'Last,
          Is_Special_Comment | Is_Fillable_Comment => False,
          Sloc =>
@@ -397,9 +393,7 @@ package body Pp.Scanner is
 
                   if Preceding_Lexeme.Kind in Identifier | String_Literal
                     or else Preceding_Lexeme.Normalized in
-                      Snames.Name_Access |
-                        Snames.Name_All |
-                        Name_R_Paren
+                      Name_Access | Name_All | Name_R_Paren
                   then
                      null; -- it's a tick
                   else
@@ -505,7 +499,7 @@ package body Pp.Scanner is
       begin
          pragma Assert (Name_Len = 0);
          Append_Tok (Tok);
-         Tok.Text := Name_Find (Name_Buffer);
+         Tok.Text := Intern (Name_Buffer);
          case Tok.Kind is
             when Comment_Kind =>
                pragma Assert (False);
@@ -517,14 +511,12 @@ package body Pp.Scanner is
                Name_Buffer.Chars (1 .. Name_Len) :=
                  To_UTF8 (To_Lower
                             (From_UTF8 (Name_Buffer.Chars (1 .. Name_Len))));
-               Tok.Normalized := Name_Find (Name_Buffer);
+               Tok.Normalized := Intern (Name_Buffer);
 
-               --  Check for reserved word. Note that Is_Keyword_Name takes
-               --  into account Opt.Ada_Version. In T'Range, we consider
-               --  "Range" to be an identifier, not a keyword, and similarly
-               --  for others.
+               --  Check for reserved word. In T'Range, we consider "Range" to
+               --  be an identifier, not a keyword, and similarly for others.
 
-               if Snames.Is_Keyword_Name (Tok.Normalized)
+               if Is_Reserved_Word (Tok.Normalized, Ada_Version)
                  and then Preceding_Lexeme.Normalized /= Name_Tick
                then
                   Tok.Kind := Reserved_Word;
@@ -537,7 +529,7 @@ package body Pp.Scanner is
 
                if Name_Len <= 5 then
                   To_Lower (Name_Buffer.Chars (1 .. Name_Len));
-                  Tok.Normalized := Name_Find (Name_Buffer);
+                  Tok.Normalized := Intern (Name_Buffer);
                else
                   Tok.Normalized := Tok.Text;
                end if;
@@ -583,8 +575,8 @@ package body Pp.Scanner is
            (if
               Tok.Kind not in Comment_Kind
             then
-              Get_Name_String (Tok.Text) =
-              Slice (Input, Tok.Sloc.Firstx, Tok.Sloc.Lastx));
+              To_W_Str (Tok.Text) =
+                Slice (Input, Tok.Sloc.Firstx, Tok.Sloc.Lastx));
 
          if Tok.Kind = End_Of_Line then
             if Preceding_Token.Kind in End_Of_Line | Blank_Line then
@@ -689,8 +681,8 @@ package body Pp.Scanner is
                if Tok.Kind = End_Of_Line_Comment
                  or else not Tok.Is_Fillable_Comment
                then
-                  Tok.Text       := Name_Find (Name_Buffer);
-                  Tok.Normalized := No_Name;
+                  Tok.Text       := Intern (Name_Buffer);
+                  Tok.Normalized := No_Symbol;
                   Append_To_Result (Tok);
                else
                   pragma Assert (Tok.Kind in Whole_Line_Comment);
@@ -710,16 +702,16 @@ package body Pp.Scanner is
                         --  Tok_2.
 
                         if not Tok_2.Is_Fillable_Comment then
-                           Tok.Text       := Name_Find (Name_Buffer);
-                           Tok.Normalized := No_Name;
+                           Tok.Text       := Intern (Name_Buffer);
+                           Tok.Normalized := No_Symbol;
                            Append_To_Result (Tok);
                            Name_Len := 0;
                            Finish_Token (Tok_EOL);
                            Append_To_Result (Tok_EOL);
                            Name_Len := 0;
                            Append_Tok (Tok_2);
-                           Tok_2.Text       := Name_Find (Name_Buffer);
-                           Tok_2.Normalized := No_Name;
+                           Tok_2.Text       := Intern (Name_Buffer);
+                           Tok_2.Normalized := No_Symbol;
                            Append_To_Result (Tok_2);
                            exit;
 
@@ -740,8 +732,8 @@ package body Pp.Scanner is
                         --  to Result, and use Tok_2 as the new Tok.
 
                         else
-                           Tok.Text       := Name_Find (Name_Buffer);
-                           Tok.Normalized := No_Name;
+                           Tok.Text       := Intern (Name_Buffer);
+                           Tok.Normalized := No_Symbol;
                            Append_To_Result (Tok);
                            Name_Len := 0;
                            Finish_Token (Tok_EOL);
@@ -759,8 +751,8 @@ package body Pp.Scanner is
 
                      else
                         pragma Assert (Tok_2.Kind not in Comment_Kind);
-                        Tok.Text       := Name_Find (Name_Buffer);
-                        Tok.Normalized := No_Name;
+                        Tok.Text       := Intern (Name_Buffer);
+                        Tok.Normalized := No_Symbol;
                         Append_To_Result (Tok);
                         Name_Len := 0;
                         Finish_Token (Tok_EOL);
@@ -824,14 +816,15 @@ package body Pp.Scanner is
       return Tokens (X);
    end Prev_Lexeme;
 
-   function Get_Token (Input : W_Str) return Token is
+   function Get_Token
+     (Input : W_Str; Ada_Version : Ada_Version_Type)
+     return Token is
       pragma Assert (Assert_Enabled); -- This is called only for debugging
       Tokens : Token_Vectors.Vector;
       Buf    : Buffer := String_To_Buffer (Input);
    begin
       Get_Tokens
-        (Buf,
-         Tokens,
+        (Buf, Tokens, Ada_Version,
          Pp_Off_On_Delimiters => (others => <>),
          Ignore_Single_Line_Breaks => True,
          Max_Tokens                => 1);
@@ -910,7 +903,7 @@ package body Pp.Scanner is
            (Text_IO.Standard_Output,
             "--" & (1 .. Tok.Leading_Blanks => ' '));
       end if;
-      for C of Namet.Get_Name_String (Tok.Text) loop
+      for C of Syms.Str (Tok.Text).S loop
          if Tok.Kind in Comment_Kind and then C = ASCII.LF then
             Text_IO.Put (Text_IO.Standard_Output, "$");
          else
@@ -993,7 +986,4 @@ package body Pp.Scanner is
       end loop;
    end Check_Same_Tokens;
 
-begin
-   Snames.Initialize;
-   Scans.Initialize_Ada_Keywords;
 end Pp.Scanner;

@@ -28,26 +28,14 @@ pragma Ada_2012;
 with Ada.Text_IO;             use Ada.Text_IO;
 with Ada.Characters.Handling; use Ada.Characters.Handling;
 with Ada.Containers.Hashed_Sets; use Ada.Containers;
-pragma Warnings (Off, "internal GNAT unit");
-with System.String_Hash;
-pragma Warnings (On, "internal GNAT unit");
 
 package body Pp.Formatting.Dictionaries is
+   package Syms renames LAL_UL.Symbols;
 
-   subtype Name_Id is Namet.Name_Id;
-
-   function Hash_String is new System.String_Hash.Hash
-     (Character, String, Hash_Type);
-
-   function Hash (Name : Name_Id) return Hash_Type is
-     (Hash_String (To_Lower (Namet.Get_Name_String (Name))));
-
-   function Same_Name (Left, Right : Name_Id) return Boolean is
-     (To_Lower (Namet.Get_Name_String (Left)) =
-      To_Lower (Namet.Get_Name_String (Right)));
+   subtype Symbol is Syms.Symbol;
 
    package Name_Sets is new Ada.Containers.Hashed_Sets
-     (Name_Id, Hash, Same_Name, Namet."=");
+     (Symbol, Syms.Hash_Symbol, Syms.Case_Insensitive_Equal, Syms."=");
 
    use Name_Sets;
    subtype Name_Set is Name_Sets.Set;
@@ -67,7 +55,7 @@ package body Pp.Formatting.Dictionaries is
    -- Local subprograms --
    -----------------------
 
-   function Present (Id : Name_Id) return Boolean;
+   function Present (Id : Symbol) return Boolean;
    --  Checks if the argument is not equal to No_String
 
    procedure Add_To_Dictionary
@@ -80,7 +68,7 @@ package body Pp.Formatting.Dictionaries is
    function Find_In_Dictionary
      (Name           : String;
       Exception_Kind : Casing_Exception_Kinds)
-      return           Name_Id;
+      return           Symbol;
    --  Tries to find in the dictionary the entry which corresponds to Name
    --  without taking into account the character casing. (Exception_Kind
    --  is used to limit the search by the corresponding kind of dictionary
@@ -95,7 +83,7 @@ package body Pp.Formatting.Dictionaries is
      (Name           : String;
       Exception_Kind : Casing_Exception_Kinds)
    is
-      Id : constant Name_Id := Namet.Name_Find (Name);
+      Id : constant Symbol := Syms.Intern (Name);
    begin
       case Exception_Kind is
          when Whole_Word =>
@@ -120,7 +108,7 @@ package body Pp.Formatting.Dictionaries is
       SW_End    : Integer          := Name_Last;
       --  Indexes of a subword in the Name
 
-      Dictionary_String : Name_Id;
+      Dictionary_String : Symbol;
 
       procedure Set_Subword;
       --  Provided that Name has subwords, and that the current settings of
@@ -214,7 +202,7 @@ package body Pp.Formatting.Dictionaries is
       end if;
 
       if Present (Dictionary_String) then
-         Name := Namet.Get_Name_String (Dictionary_String);
+         Name := Syms.Str (Dictionary_String).S;
       else
 
          if SW_End < Name'Last then
@@ -229,7 +217,7 @@ package body Pp.Formatting.Dictionaries is
 
                if Present (Dictionary_String) then
                   Name (SW_Start .. SW_End) :=
-                    Namet.Get_Name_String (Dictionary_String);
+                    Syms.Str (Dictionary_String).S;
                else
                   Name (SW_Start .. SW_End) :=
                     Capitalize_Subword (Name (SW_Start .. SW_End), Casing);
@@ -256,9 +244,9 @@ package body Pp.Formatting.Dictionaries is
    function Find_In_Dictionary
      (Name           : String;
       Exception_Kind : Casing_Exception_Kinds)
-      return           Name_Id
+      return           Symbol
    is
-      Id : constant Name_Id := Namet.Name_Find (Name);
+      Id : constant Symbol := Syms.Intern (Name);
       C : constant Name_Sets.Cursor :=
         (case Exception_Kind is
             when Whole_Word =>
@@ -266,17 +254,17 @@ package body Pp.Formatting.Dictionaries is
             when Subword =>
                 Find (Subword_Exceptions, Id));
    begin
-      return (if Has_Element (C) then Element (C) else Namet.No_Name);
+      return (if Has_Element (C) then Element (C) else Syms.No_Symbol);
    end Find_In_Dictionary;
 
    -------------
    -- Present --
    -------------
 
-   function Present (Id : Name_Id) return Boolean is
-      use type Name_Id;
+   function Present (Id : Symbol) return Boolean is
+      use type Symbol;
    begin
-      return Id /= Namet.No_Name;
+      return Id /= Syms.No_Symbol;
    end Present;
 
    ----------------------

@@ -162,6 +162,8 @@ package METRICS.Command_Lines is
       Syntax_All,
       Complexity_All,
       Coupling_All);
+   pragma Ordered (Metrics_Booleans);
+   --  Otherwise, we get bogus warnings in Metrics.Actions.
 
    subtype Metrics_Enum is Metrics_Booleans
      range Metrics_Booleans'First .. Metrics_Booleans'Pred (Contract_All);

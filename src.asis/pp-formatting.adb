@@ -30,11 +30,10 @@ with Ada.Wide_Text_IO;
 with System.WCh_Con;
 use type System.WCh_Con.WC_Encoding_Method;
 
-with Snames;
-with Types;
-use type Types.Int;
-
 with GNATCOLL.Paragraph_Filling;
+
+with LAL_UL.Symbols; use LAL_UL.Symbols;
+with LAL_UL.Predefined_Symbols; use LAL_UL.Predefined_Symbols;
 
 with Text_IO;
 
@@ -43,11 +42,9 @@ with Pp.Formatting.Tree_Formatting;
 
 package body Pp.Formatting is
 
-   subtype Name_Id is Namet.Name_Id;
-   use type Name_Id;
-   function Name_Find (S : String) return Name_Id renames Namet.Name_Find;
-   function Get_Name_String (Id : Name_Id) return String
-     renames Namet.Get_Name_String;
+   subtype Symbol is Syms.Symbol;
+   function "=" (X, Y : Symbol) return Boolean renames Syms."=";
+   function Intern (S : String) return Symbol renames Syms.Intern;
 
    pragma Style_Checks ("M85");
    package body Generic_Lines_Data is
@@ -228,7 +225,7 @@ package body Pp.Formatting is
                Indentation => Cur_Indentation,
                Length      => <>,
    --            Kind        => Not_An_Element,
-               Template    => Name_Find ("Insert_Comments_And_Blank_Lines"),
+               Template    => Intern ("Insert_Comments_And_Blank_Lines"),
                UID         => Next_Line_Break_Unique_Id));
          Next_Line_Break_Unique_Id := Next_Line_Break_Unique_Id + 1;
          pragma Assert (Char_At (Out_Buf, M) = NL);
@@ -256,7 +253,7 @@ package body Pp.Formatting is
             return           W_Str
          is
             use GNATCOLL.Paragraph_Filling, Ada.Strings.Unbounded;
-            S1 : constant String := Get_Name_String (Comment_Tok.Text);
+            S1 : constant String := Str (Comment_Tok.Text).S;
             S2 : constant String :=
               To_String
                 (Pretty_Fill
@@ -291,7 +288,7 @@ package body Pp.Formatting is
              and then Comment_Tok.Is_Fillable_Comment;
          Text : constant W_Str :=
            (if Do_Filling then Filled_Text (Comment_Tok, Leading_Blanks)
-            else Get_Name_String (Comment_Tok.Text));
+            else To_W_Str (Comment_Tok.Text));
 
       --  Start of processing for Insert_Comment_Text
 
@@ -354,8 +351,9 @@ package body Pp.Formatting is
       --  Start of processing for Do_Comments_Only
 
       begin
-         Get_Tokens (Src_Buf, Src_Toks, Pp_Off_On_Delimiters,
-                     Ignore_Single_Line_Breaks => False);
+         Get_Tokens
+           (Src_Buf, Src_Toks, LAL_UL.Ada_Version, Pp_Off_On_Delimiters,
+            Ignore_Single_Line_Breaks => False);
          Insert_NL (Out_Buf);
 
          while Cur_Tok.Kind /= End_Of_Input loop
@@ -425,43 +423,43 @@ package body Pp.Formatting is
          Inner_Loop_Count : Natural := 0;
 
          pragma Warnings (Off); -- ????
-         --  Miscellaneous useful Name_Ids (???duplicate):
+         --  Miscellaneous useful Symbols (???duplicate):
          --  These need to be duplicated, because they need to be initialized
          --  late (not during library-level elaboration), because Tree_Read
          --  destroys the name table. Better to use LAL_UL.Symbols.
 
-         Name_Empty : constant Name_Id := Name_Find ("");
+         Name_Empty : constant Symbol := Intern ("");
 
-         Name_Semicolon : constant Name_Id := Name_Find (";");
-         Name_L_Paren   : constant Name_Id := Name_Find ("(");
-         Name_R_Paren   : constant Name_Id := Name_Find (")");
-         Name_Colon     : constant Name_Id := Name_Find (":");
-         Name_Assign    : constant Name_Id := Name_Find (":=");
-         Name_Bang      : constant Name_Id := Name_Find ("!");
-         Name_Bar       : constant Name_Id := Name_Find ("|");
-         Name_Arrow     : constant Name_Id := Name_Find ("=>");
-         Name_Dot       : constant Name_Id := Name_Find (".");
+         Name_Semicolon : constant Symbol := Intern (";");
+         Name_L_Paren   : constant Symbol := Intern ("(");
+         Name_R_Paren   : constant Symbol := Intern (")");
+         Name_Colon     : constant Symbol := Intern (":");
+         Name_Assign    : constant Symbol := Intern (":=");
+         Name_Bang      : constant Symbol := Intern ("!");
+         Name_Bar       : constant Symbol := Intern ("|");
+         Name_Arrow     : constant Symbol := Intern ("=>");
+         Name_Dot       : constant Symbol := Intern (".");
 
-         Name_And_Then : constant Name_Id := Name_Find ("and then");
-         Name_Or_Else  : constant Name_Id := Name_Find ("or else");
+         Name_And_Then : constant Symbol := Intern ("and then");
+         Name_Or_Else  : constant Symbol := Intern ("or else");
 
-         Name_Q_And : constant Name_Id := Name_Find ("""and""");
-         Name_Q_Or  : constant Name_Id := Name_Find ("""or""");
-         Name_Q_Xor : constant Name_Id := Name_Find ("""xor""");
-         Name_Q_Mod : constant Name_Id := Name_Find ("""mod""");
-         Name_Q_Rem : constant Name_Id := Name_Find ("""rem""");
-         Name_Q_Abs : constant Name_Id := Name_Find ("""abs""");
-         Name_Q_Not : constant Name_Id := Name_Find ("""not""");
+         Name_Q_And : constant Symbol := Intern ("""and""");
+         Name_Q_Or  : constant Symbol := Intern ("""or""");
+         Name_Q_Xor : constant Symbol := Intern ("""xor""");
+         Name_Q_Mod : constant Symbol := Intern ("""mod""");
+         Name_Q_Rem : constant Symbol := Intern ("""rem""");
+         Name_Q_Abs : constant Symbol := Intern ("""abs""");
+         Name_Q_Not : constant Symbol := Intern ("""not""");
 
-         Name_Depends : constant Name_Id := Name_Find ("Depends");
+         Name_Depends : constant Symbol := Intern ("Depends");
 
-         Name_Tab_Insertion_Point : constant Name_Id :=
-           Name_Find ("tab insertion point");
-         Name_Tab_In_Out : constant Name_Id := Name_Find ("tab in out");
-         Name_Dot_Dot : constant Name_Id := Name_Find ("..");
-         Name_R_Sq : constant Name_Id := Name_Find ("]");
+         Name_Tab_Insertion_Point : constant Symbol :=
+           Intern ("tab insertion point");
+         Name_Tab_In_Out : constant Symbol := Intern ("tab in out");
+         Name_Dot_Dot : constant Symbol := Intern ("..");
+         Name_R_Sq : constant Symbol := Intern ("]");
 
-         Op_Sym_Table : constant array (Positive range <>) of Name_Id :=
+         Op_Sym_Table : constant array (Positive range <>) of Symbol :=
            (Name_Q_And,
             Name_Q_Or,
             Name_Q_Xor,
@@ -471,7 +469,7 @@ package body Pp.Formatting is
             Name_Q_Not);
 
          function Is_Op_Sym_With_Letters
-           (N    : Name_Id)
+           (N    : Symbol)
             return Boolean is
            (for some Op of Op_Sym_Table => N = Op);
          --  True if N looks like a string literal that can be used as an operator
@@ -936,8 +934,10 @@ package body Pp.Formatting is
                            return True;
                         end if;
                         declare
-                           Tok1_Text : constant W_Str := Get_Name_String (Tok1.Text);
-                           Tok2_Text : constant W_Str := Get_Name_String (Tok2.Text);
+                           Tok1_Text : constant W_Str :=
+                             To_W_Str (Tok1.Text);
+                           Tok2_Text : constant W_Str :=
+                             To_W_Str (Tok2.Text);
                         begin
                            if (Options.Decimal_Grouping = 0
                                  and then Options.Based_Grouping = 0)
@@ -1023,7 +1023,7 @@ package body Pp.Formatting is
 
             function Extra_Blank_On_Return return Boolean is
             begin
-               if Out_Tok.Normalized = Snames.Name_Return then
+               if Out_Tok.Normalized = Name_Return then
                   declare
                      Paren : constant Token      := Out_Tokens (Out_Index - 1);
                      LB    : constant Line_Break := EOL_Line_Breaks (EOL_Cur_Line);
@@ -1160,10 +1160,10 @@ package body Pp.Formatting is
 
                   --  Should the following list include "exception"???
                   return not
-                    (Out_Tok.Normalized = Snames.Name_Begin
-                     or else Out_Tok.Normalized = Snames.Name_When
-                     or else Out_Tok.Normalized = Snames.Name_Elsif
-                     or else Out_Tok.Normalized = Snames.Name_Else);
+                    (Out_Tok.Normalized = Name_Begin
+                     or else Out_Tok.Normalized = Name_When
+                     or else Out_Tok.Normalized = Name_Elsif
+                     or else Out_Tok.Normalized = Name_Else);
                end Look_Before;
 
                Indentation : Natural;
@@ -1386,7 +1386,8 @@ package body Pp.Formatting is
             pragma Debug
               (Format_Debug_Output
                  (Lines_Data, "before Insert_Comments_And_Blank_Lines"));
-            Get_Tokens (Out_Buf, Out_Tokens, Pp_Off_On_Delimiters);
+            Get_Tokens
+              (Out_Buf, Out_Tokens, LAL_UL.Ada_Version, Pp_Off_On_Delimiters);
             --  ???At this point, we might need another pass to insert hard line
             --  breaks after end-of-line comments, so they will be indented properly.
             --  Or better yet, insert the EOL comments, with tabs and soft line break
@@ -1477,7 +1478,7 @@ package body Pp.Formatting is
                   if Src_Tok.Text = Name_Semicolon
                     and then
                       Prev_Lexeme (Src_Tokens, Src_Index).Normalized =
-                      Snames.Name_End
+                      Name_End
                     and then Out_Tok.Kind in Identifier | String_Literal
                   then
                      loop -- could be "end A.B.C;"
@@ -1505,19 +1506,19 @@ package body Pp.Formatting is
                     and then Out_Tok.Text = Name_Semicolon
                     and then
                       Prev_Lexeme (Out_Tokens, Out_Index).Normalized =
-                      Snames.Name_End
+                      Name_End
                     and then Src_Tok.Kind in Identifier | String_Literal
                   then
                      Insert (Out_Buf, " ");
                      loop -- could be "end A.B.C;"
-                        Insert (Out_Buf, Get_Name_String (Src_Tok.Text));
+                        Insert (Out_Buf, To_W_Str (Src_Tok.Text));
                         Move_Past_Src_Tok;
                         Src_Index := Src_Index + 1;
                         Src_Tok   := Src_Tokens (Src_Index);
 
                         exit when Src_Tok.Normalized /= Name_Dot;
 
-                        Insert (Out_Buf, Get_Name_String (Src_Tok.Text));
+                        Insert (Out_Buf, To_W_Str (Src_Tok.Text));
                         Move_Past_Src_Tok;
                         Src_Index := Src_Index + 1;
                         Src_Tok   := Src_Tokens (Src_Index);
@@ -1528,22 +1529,22 @@ package body Pp.Formatting is
                   --  Check for "declare begin" --> "begin" case, with a possible
                   --  comment between "declare" and "begin".
 
-                  elsif Src_Tok.Normalized = Snames.Name_Declare
-                    and then Out_Tok.Normalized = Snames.Name_Begin
+                  elsif Src_Tok.Normalized = Name_Declare
+                    and then Out_Tok.Normalized = Name_Begin
                   then
                      pragma Assert
                        (Next_Lexeme (Src_Tokens, Src_Index).Normalized =
-                        Snames.Name_Begin);
+                        Name_Begin);
                      Insert_Declare_Or_Private ("declare");
 
                   --  Check for "private end" --> "end" case.
 
-                  elsif Src_Tok.Normalized = Snames.Name_Private
-                    and then Out_Tok.Normalized = Snames.Name_End
+                  elsif Src_Tok.Normalized = Name_Private
+                    and then Out_Tok.Normalized = Name_End
                   then
                      pragma Assert
                        (Next_Lexeme (Src_Tokens, Src_Index).Normalized =
-                        Snames.Name_End);
+                        Name_End);
                      Insert_Declare_Or_Private ("private");
 
                   --  Check for "T'((X, Y, Z))" --> "T'(X, Y, Z)" case
@@ -1566,7 +1567,7 @@ package body Pp.Formatting is
                   --  Check for "X : in T" --> "X : T" case
 
                   elsif False -- Deletion of "in" is currently disabled
-                    and then Src_Tok.Normalized = Snames.Name_In
+                    and then Src_Tok.Normalized = Name_In
                     and then Prev_Lexeme (Src_Tokens, Src_Index).Text = Name_Colon
 
                   then
@@ -1941,8 +1942,8 @@ package body Pp.Formatting is
                      declare
                         XX : constant Tab_Index := X (J);
                         YY : constant Tab_Index := Y (J);
-                        XT : constant Name_Id   := Tabs (XX).Token;
-                        YT : constant Name_Id   := Tabs (YY).Token;
+                        XT : constant Symbol   := Tabs (XX).Token;
+                        YT : constant Symbol   := Tabs (YY).Token;
                      begin
                         if XT /= YT then
                            --  "=>" matches a preceding "|"
@@ -2079,7 +2080,7 @@ package body Pp.Formatting is
             Clear (Out_Buf_Line_Ends);
             Scanner.Get_Tokens
               (Out_Buf,
-               Out_Tokens, Pp_Off_On_Delimiters,
+               Out_Tokens, LAL_UL.Ada_Version, Pp_Off_On_Delimiters,
                Ignore_Single_Line_Breaks => False,
                Line_Ends => Out_Buf_Line_Ends'Unchecked_Access);
 
@@ -2153,7 +2154,9 @@ package body Pp.Formatting is
                   null;
 
                when Upper_Case =>
-                  Scanner.Get_Tokens (Out_Buf, Out_Tokens, Pp_Off_On_Delimiters);
+                  Scanner.Get_Tokens
+                    (Out_Buf, Out_Tokens, LAL_UL.Ada_Version,
+                     Pp_Off_On_Delimiters);
                   for Out_Index in 2 .. Last_Index (Out_Tokens) loop
                      Out_Tok := Out_Tokens (Out_Index);
                      loop
@@ -2188,7 +2191,8 @@ package body Pp.Formatting is
                return;
             end if;
 
-            Scanner.Get_Tokens (Out_Buf, Out_Tokens, Pp_Off_On_Delimiters);
+            Scanner.Get_Tokens
+              (Out_Buf, Out_Tokens, LAL_UL.Ada_Version, Pp_Off_On_Delimiters);
             for Out_Index in 2 + 3 - 1 .. Last_Index (Out_Tokens) loop
                --  Skip sentinel and first 3 tokens
 
@@ -2201,8 +2205,8 @@ package body Pp.Formatting is
                end loop;
 
                if Out_Tok.Text = Name_Semicolon
-                 and then Prev_Tok.Normalized = Snames.Name_Page
-                 and then Prev_Prev_Tok.Normalized = Snames.Name_Pragma
+                 and then Prev_Tok.Normalized = Name_Page
+                 and then Prev_Prev_Tok.Normalized = Name_Pragma
                then
                   Insert_Any (Out_Buf, W_FF);
                end if;
@@ -2304,10 +2308,12 @@ package body Pp.Formatting is
             --  want to copy/ignore starting at the beginning of the line on which
             --  the OFF appears. For an ON, we ignore the Prev_Tok.
 
-            Get_Tokens (Src_Buf, Src_Toks, Pp_Off_On_Delimiters,
-                        Ignore_Single_Line_Breaks => False);
-            Get_Tokens (Out_Buf, Out_Tokens, Pp_Off_On_Delimiters,
-                        Ignore_Single_Line_Breaks => False);
+            Get_Tokens
+              (Src_Buf, Src_Toks, LAL_UL.Ada_Version,
+               Pp_Off_On_Delimiters, Ignore_Single_Line_Breaks => False);
+            Get_Tokens
+              (Out_Buf, Out_Tokens, LAL_UL.Ada_Version,
+               Pp_Off_On_Delimiters, Ignore_Single_Line_Breaks => False);
             if Debug_Mode then
                Dbg_Out.Put ("Copy_Pp_Off_Regions: Src_Toks:\n");
                Put_Tokens (Src_Toks);
@@ -2406,9 +2412,9 @@ package body Pp.Formatting is
                  (Text_IO.Standard_Output,
                   Message &
                     ": Token mismatch: " &
-                    Get_Name_String (Src_Tok.Text) &
+                    Str (Src_Tok.Text).S &
                     " --> " &
-                    Get_Name_String (Out_Tok.Text));
+                    Str (Out_Tok.Text).S);
                Text_IO.Put_Line (Text_IO.Standard_Output, "Src tokens:");
                Put_Tokens
                  (Src_Tokens,
@@ -2454,40 +2460,40 @@ package body Pp.Formatting is
              renames Lines_Data.Pp_Off_On_Delimiters;
 
          pragma Warnings (Off); -- ????
-         --  Miscellaneous useful Name_Ids (???duplicate):
+         --  Miscellaneous useful Symbols (???duplicate):
 
-         Name_Empty : constant Name_Id := Name_Find ("");
+         Name_Empty : constant Symbol := Intern ("");
 
-         Name_Semicolon : constant Name_Id := Name_Find (";");
-         Name_L_Paren   : constant Name_Id := Name_Find ("(");
-         Name_R_Paren   : constant Name_Id := Name_Find (")");
-         Name_Colon     : constant Name_Id := Name_Find (":");
-         Name_Assign    : constant Name_Id := Name_Find (":=");
-         Name_Bang      : constant Name_Id := Name_Find ("!");
-         Name_Bar       : constant Name_Id := Name_Find ("|");
-         Name_Arrow     : constant Name_Id := Name_Find ("=>");
-         Name_Dot       : constant Name_Id := Name_Find (".");
+         Name_Semicolon : constant Symbol := Intern (";");
+         Name_L_Paren   : constant Symbol := Intern ("(");
+         Name_R_Paren   : constant Symbol := Intern (")");
+         Name_Colon     : constant Symbol := Intern (":");
+         Name_Assign    : constant Symbol := Intern (":=");
+         Name_Bang      : constant Symbol := Intern ("!");
+         Name_Bar       : constant Symbol := Intern ("|");
+         Name_Arrow     : constant Symbol := Intern ("=>");
+         Name_Dot       : constant Symbol := Intern (".");
 
-         Name_And_Then : constant Name_Id := Name_Find ("and then");
-         Name_Or_Else  : constant Name_Id := Name_Find ("or else");
+         Name_And_Then : constant Symbol := Intern ("and then");
+         Name_Or_Else  : constant Symbol := Intern ("or else");
 
-         Name_Q_And : constant Name_Id := Name_Find ("""and""");
-         Name_Q_Or  : constant Name_Id := Name_Find ("""or""");
-         Name_Q_Xor : constant Name_Id := Name_Find ("""xor""");
-         Name_Q_Mod : constant Name_Id := Name_Find ("""mod""");
-         Name_Q_Rem : constant Name_Id := Name_Find ("""rem""");
-         Name_Q_Abs : constant Name_Id := Name_Find ("""abs""");
-         Name_Q_Not : constant Name_Id := Name_Find ("""not""");
+         Name_Q_And : constant Symbol := Intern ("""and""");
+         Name_Q_Or  : constant Symbol := Intern ("""or""");
+         Name_Q_Xor : constant Symbol := Intern ("""xor""");
+         Name_Q_Mod : constant Symbol := Intern ("""mod""");
+         Name_Q_Rem : constant Symbol := Intern ("""rem""");
+         Name_Q_Abs : constant Symbol := Intern ("""abs""");
+         Name_Q_Not : constant Symbol := Intern ("""not""");
 
-         Name_Depends : constant Name_Id := Name_Find ("Depends");
+         Name_Depends : constant Symbol := Intern ("Depends");
 
-         Name_Tab_Insertion_Point : constant Name_Id :=
-           Name_Find ("tab insertion point");
-         Name_Tab_In_Out : constant Name_Id := Name_Find ("tab in out");
-         Name_Dot_Dot : constant Name_Id := Name_Find ("..");
-         Name_R_Sq : constant Name_Id := Name_Find ("]");
+         Name_Tab_Insertion_Point : constant Symbol :=
+           Intern ("tab insertion point");
+         Name_Tab_In_Out : constant Symbol := Intern ("tab in out");
+         Name_Dot_Dot : constant Symbol := Intern ("..");
+         Name_R_Sq : constant Symbol := Intern ("]");
 
-         Op_Sym_Table : constant array (Positive range <>) of Name_Id :=
+         Op_Sym_Table : constant array (Positive range <>) of Symbol :=
            (Name_Q_And,
             Name_Q_Or,
             Name_Q_Xor,
@@ -2497,7 +2503,7 @@ package body Pp.Formatting is
             Name_Q_Not);
 
          function Is_Op_Sym_With_Letters
-           (N    : Name_Id)
+           (N    : Symbol)
             return Boolean is
            (for some Op of Op_Sym_Table => N = Op);
          --  True if N looks like a string literal that can be used as an operator
@@ -2555,8 +2561,8 @@ package body Pp.Formatting is
                         return True;
                      end if;
                      declare
-                        Tok1_Text : constant W_Str := Get_Name_String (Tok1.Text);
-                        Tok2_Text : constant W_Str := Get_Name_String (Tok2.Text);
+                        Tok1_Text : constant W_Str := To_W_Str (Tok1.Text);
+                        Tok2_Text : constant W_Str := To_W_Str (Tok2.Text);
                      begin
                         if (Options.Decimal_Grouping = 0
                               and then Options.Based_Grouping = 0)
@@ -2630,7 +2636,7 @@ package body Pp.Formatting is
          begin
             while Tok.Kind in Whole_Line_Comment loop
                declare
-                  Text : constant W_Str := Get_Name_String (Tok.Text);
+                  Text : constant W_Str := To_W_Str (Tok.Text);
                   function White
                     (X    : Positive)
                      return Boolean is
@@ -2670,7 +2676,8 @@ package body Pp.Formatting is
       --  Start of processing for Final_Check_Helper
 
       begin
-         Get_Tokens (Out_Buf, Out_Tokens, Pp_Off_On_Delimiters);
+         Get_Tokens
+           (Out_Buf, Out_Tokens, LAL_UL.Ada_Version, Pp_Off_On_Delimiters);
          pragma Assert (Cur (Out_Buf) = NL);
          Move_Forward (Out_Buf); -- skip sentinel
 
@@ -2764,7 +2771,7 @@ package body Pp.Formatting is
                elsif Src_Tok.Text = Name_Semicolon
                  and then
                    Prev_Lexeme (Src_Tokens, Src_Index).Normalized =
-                   Snames.Name_End
+                   Name_End
                  and then Out_Tok.Kind in Identifier | String_Literal
                then
                   loop -- could be "end A.B.C;"
@@ -2795,7 +2802,7 @@ package body Pp.Formatting is
                --  Check for "X : in T" --> "X : T" case
 
                elsif False -- Deletion of "in" is currently disabled
-                 and then Src_Tok.Normalized = Snames.Name_In
+                 and then Src_Tok.Normalized = Name_In
                  and then Prev_Lexeme (Src_Tokens, Src_Index).Text = Name_Colon
                   --???Check prev&next ids match???
 
@@ -2920,7 +2927,7 @@ package body Pp.Formatting is
            Image (Integer (X)) &
            ") = ^" &
            Image (Integer (Tab.Index_In_Line)) &
-           Get_Name_String (Tab.Token) &
+           Str (Tab.Token).S &
            ASCII.HT &
            " at " &
            Image (Position (Out_Buf, Tab.Mark)) &
@@ -3042,7 +3049,7 @@ package body Pp.Formatting is
 
             if False then
    --            Put ("\t\1", Image (Line_Breaks (Cur_Line).Kind));
-               Put ("\t\1", Get_Name_String (Line_Breaks (Cur_Line).Template));
+               Put ("\t\1", Str (Line_Breaks (Cur_Line).Template).S);
             end if;
 
             if Line_Breaks (Cur_Line).Enabled

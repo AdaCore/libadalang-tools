@@ -156,6 +156,7 @@ package body LAL_UL.Generic_Symbols is
                 (Length             => S'Length,
                  Same_Hash_Link     => Chain,
                  Same_Ignoring_Case => Same_Ignoring_Case,
+                 Reserved_Word      => No_Ada_Version,
                  Chars              => (Length => S'Length, S => S));
             Hash_Table (H) := Result; -- link it in (atomic write)
 
@@ -215,6 +216,26 @@ package body LAL_UL.Generic_Symbols is
    --  record are Hash_Table and Symbols_Pool.  These are only
    --  *updated* inside the protected record, which implies abort
    --  deferral.
+
+   function Intern (Buf : Bounded_Str) return Symbol is
+   begin
+      return Intern (+Buf);
+   end Intern;
+
+   function Intern_Reserved_Word
+     (S : String; Ada_Version : Ada_Version_Type) return Symbol is
+   begin
+      return Result : constant Symbol := Intern (S) do
+         pragma Assert (Result.Reserved_Word = No_Ada_Version);
+         Result.Reserved_Word := Ada_Version;
+      end return;
+   end Intern_Reserved_Word;
+
+   function Is_Reserved_Word
+     (S : Symbol; Ada_Version : Ada_Version_Type) return Boolean is
+   begin
+      return S.Reserved_Word <= Ada_Version;
+   end Is_Reserved_Word;
 
    function Lookup (S : String; Fold_Case : Boolean) return Symbol is
       Lower : constant String    := To_Lower (S); -- case folded

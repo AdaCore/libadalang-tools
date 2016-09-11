@@ -23,9 +23,8 @@
 
 pragma Ada_2012;
 
-with Namet;
-
 with ASIS_UL.Vectors;
+with LAL_UL.Symbols;
 
 with Pp.Buffers; use Pp.Buffers;
 use Pp.Buffers.Marker_Vectors;
@@ -48,6 +47,8 @@ package Pp.Scanner is
    --
    --     We don't check for errors, because we're in ASIS, where Ada code is
    --     known to be legal.
+
+   package Syms renames LAL_UL.Symbols;
 
    type Token_Kind is
      (Nil,
@@ -123,7 +124,7 @@ package Pp.Scanner is
    type Token is record
       Kind : Token_Kind := Nil;
 
-      Text : Namet.Name_Id;
+      Text : Syms.Symbol;
       --  The text of the token as it appears in the source, with these
       --  exceptions and clarifications:
       --
@@ -141,7 +142,7 @@ package Pp.Scanner is
       --  is that GNATCOLL.Paragraph_Filling expects it, so it's simpler and
       --  more efficient this way.
 
-      Normalized : Namet.Name_Id;
+      Normalized : Syms.Symbol;
       --  Same as Text, or converted to lower case, depending on the Kind.
       --  Comments have Normalized = No_Name, so we can detect specific
       --  reserved words. For example, the "BEGIN" reserved word will have Text
@@ -213,6 +214,7 @@ package Pp.Scanner is
    procedure Get_Tokens
      (Input                     : in out Buffer;
       Result                    : out Token_Vectors.Vector;
+      Ada_Version               : Ada_Version_Type;
       Pp_Off_On_Delimiters      : Pp_Off_On_Delimiters_Rec;
       Ignore_Single_Line_Breaks : Boolean           := True;
       Max_Tokens                : Token_Index       := Token_Index'Last;
@@ -249,7 +251,9 @@ package Pp.Scanner is
    --  Returns the previous token before Index that is not a blank line or
    --  comment
 
-   function Get_Token (Input : W_Str) return Token;
+   function Get_Token
+     (Input : W_Str; Ada_Version : Ada_Version_Type)
+     return Token;
    --  Get just one token, ignoring single line breaks
 
    procedure Check_Same_Tokens (X, Y : Token_Vectors.Vector);
@@ -275,16 +279,5 @@ package Pp.Scanner is
    --  should have identical semantics to the original Ada code. First and Last
    --  indicate a slice of Tokens, and we tolerate out-of-bounds indices.
    --  We draw a comment line before Highlight.
-
-   function W_Name_Find
-     (S    : W_Str)
-      return Namet.Name_Id is
-     (Namet.Name_Find (To_UTF8 (S)));
-   --  Wrapper for Namet.Name_Find
-
-   function Get_Name_String
-     (Id   : Namet.Name_Id)
-      return W_Str is
-     (From_UTF8 (Namet.Get_Name_String (Id)));
 
 end Pp.Scanner;
