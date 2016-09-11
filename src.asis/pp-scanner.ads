@@ -207,8 +207,9 @@ package Pp.Scanner is
       --  We do not want these comments to be fillable.
    end record;
 
-   Gen_Plus : constant W_Str := "--gen+"; -- (style) two spaces required
-   Gen_Minus : constant W_Str := "--gen-";
+   Gen_Plus : constant Syms.Symbol := Syms.W_Intern ("--gen+");
+   --  (style) two spaces required
+   Gen_Minus : constant Syms.Symbol := Syms.W_Intern ("--gen-");
    --  Strings to mark start and end of automatically generated code.
 
    procedure Get_Tokens

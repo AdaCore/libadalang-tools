@@ -33,7 +33,6 @@ use type System.WCh_Con.WC_Encoding_Method;
 with GNATCOLL.Paragraph_Filling;
 
 with LAL_UL.Symbols; use LAL_UL.Symbols;
-with LAL_UL.Predefined_Symbols; use LAL_UL.Predefined_Symbols;
 
 with Text_IO;
 
@@ -45,6 +44,21 @@ package body Pp.Formatting is
    subtype Symbol is Syms.Symbol;
    function "=" (X, Y : Symbol) return Boolean renames Syms."=";
    function Intern (S : String) return Symbol renames Syms.Intern;
+
+   Op_Sym_Table : constant array (Positive range <>) of Symbol :=
+     (Name_Q_And,
+      Name_Q_Or,
+      Name_Q_Xor,
+      Name_Q_Mod,
+      Name_Q_Rem,
+      Name_Q_Abs,
+      Name_Q_Not);
+
+   function Is_Op_Sym_With_Letters (N : Symbol) return Boolean is
+     (for some Op of Op_Sym_Table => N = Op);
+      --  True if N looks like a string literal that can be used as an operator
+      --  symbol containing letters, so case might matter. N should be in all
+      --  lower case.
 
    pragma Style_Checks ("M85");
    package body Generic_Lines_Data is
@@ -421,61 +435,6 @@ package body Pp.Formatting is
              renames Lines_Data.Pp_Off_On_Delimiters;
 
          Inner_Loop_Count : Natural := 0;
-
-         pragma Warnings (Off); -- ????
-         --  Miscellaneous useful Symbols (???duplicate):
-         --  These need to be duplicated, because they need to be initialized
-         --  late (not during library-level elaboration), because Tree_Read
-         --  destroys the name table. Better to use LAL_UL.Symbols.
-
-         Name_Empty : constant Symbol := Intern ("");
-
-         Name_Semicolon : constant Symbol := Intern (";");
-         Name_L_Paren   : constant Symbol := Intern ("(");
-         Name_R_Paren   : constant Symbol := Intern (")");
-         Name_Colon     : constant Symbol := Intern (":");
-         Name_Assign    : constant Symbol := Intern (":=");
-         Name_Bang      : constant Symbol := Intern ("!");
-         Name_Bar       : constant Symbol := Intern ("|");
-         Name_Arrow     : constant Symbol := Intern ("=>");
-         Name_Dot       : constant Symbol := Intern (".");
-
-         Name_And_Then : constant Symbol := Intern ("and then");
-         Name_Or_Else  : constant Symbol := Intern ("or else");
-
-         Name_Q_And : constant Symbol := Intern ("""and""");
-         Name_Q_Or  : constant Symbol := Intern ("""or""");
-         Name_Q_Xor : constant Symbol := Intern ("""xor""");
-         Name_Q_Mod : constant Symbol := Intern ("""mod""");
-         Name_Q_Rem : constant Symbol := Intern ("""rem""");
-         Name_Q_Abs : constant Symbol := Intern ("""abs""");
-         Name_Q_Not : constant Symbol := Intern ("""not""");
-
-         Name_Depends : constant Symbol := Intern ("Depends");
-
-         Name_Tab_Insertion_Point : constant Symbol :=
-           Intern ("tab insertion point");
-         Name_Tab_In_Out : constant Symbol := Intern ("tab in out");
-         Name_Dot_Dot : constant Symbol := Intern ("..");
-         Name_R_Sq : constant Symbol := Intern ("]");
-
-         Op_Sym_Table : constant array (Positive range <>) of Symbol :=
-           (Name_Q_And,
-            Name_Q_Or,
-            Name_Q_Xor,
-            Name_Q_Mod,
-            Name_Q_Rem,
-            Name_Q_Abs,
-            Name_Q_Not);
-
-         function Is_Op_Sym_With_Letters
-           (N    : Symbol)
-            return Boolean is
-           (for some Op of Op_Sym_Table => N = Op);
-         --  True if N looks like a string literal that can be used as an operator
-         --  symbol containing letters, so case might matter. N should be in all
-         --  lower case.
-         pragma Warnings (On);
 
          procedure Split_Lines (First_Time : Boolean);
          --  Enable soft line breaks as necessary to prevent too-long lines.
@@ -2459,58 +2418,6 @@ package body Pp.Formatting is
          Pp_Off_On_Delimiters : Scanner.Pp_Off_On_Delimiters_Rec
              renames Lines_Data.Pp_Off_On_Delimiters;
 
-         pragma Warnings (Off); -- ????
-         --  Miscellaneous useful Symbols (???duplicate):
-
-         Name_Empty : constant Symbol := Intern ("");
-
-         Name_Semicolon : constant Symbol := Intern (";");
-         Name_L_Paren   : constant Symbol := Intern ("(");
-         Name_R_Paren   : constant Symbol := Intern (")");
-         Name_Colon     : constant Symbol := Intern (":");
-         Name_Assign    : constant Symbol := Intern (":=");
-         Name_Bang      : constant Symbol := Intern ("!");
-         Name_Bar       : constant Symbol := Intern ("|");
-         Name_Arrow     : constant Symbol := Intern ("=>");
-         Name_Dot       : constant Symbol := Intern (".");
-
-         Name_And_Then : constant Symbol := Intern ("and then");
-         Name_Or_Else  : constant Symbol := Intern ("or else");
-
-         Name_Q_And : constant Symbol := Intern ("""and""");
-         Name_Q_Or  : constant Symbol := Intern ("""or""");
-         Name_Q_Xor : constant Symbol := Intern ("""xor""");
-         Name_Q_Mod : constant Symbol := Intern ("""mod""");
-         Name_Q_Rem : constant Symbol := Intern ("""rem""");
-         Name_Q_Abs : constant Symbol := Intern ("""abs""");
-         Name_Q_Not : constant Symbol := Intern ("""not""");
-
-         Name_Depends : constant Symbol := Intern ("Depends");
-
-         Name_Tab_Insertion_Point : constant Symbol :=
-           Intern ("tab insertion point");
-         Name_Tab_In_Out : constant Symbol := Intern ("tab in out");
-         Name_Dot_Dot : constant Symbol := Intern ("..");
-         Name_R_Sq : constant Symbol := Intern ("]");
-
-         Op_Sym_Table : constant array (Positive range <>) of Symbol :=
-           (Name_Q_And,
-            Name_Q_Or,
-            Name_Q_Xor,
-            Name_Q_Mod,
-            Name_Q_Rem,
-            Name_Q_Abs,
-            Name_Q_Not);
-
-         function Is_Op_Sym_With_Letters
-           (N    : Symbol)
-            return Boolean is
-           (for some Op of Op_Sym_Table => N = Op);
-         --  True if N looks like a string literal that can be used as an operator
-         --  symbol containing letters, so case might matter. N should be in all
-         --  lower case.
-         pragma Warnings (On);
-
          use Scanner;
          --  use all type Token_Vector;
 
@@ -2577,7 +2484,6 @@ package body Pp.Formatting is
                   when String_Literal =>
                      if True or else Is_Op_Sym_With_Letters (Tok1.Normalized) then
                         return Tok1.Normalized = Tok2.Normalized;
-
                      else
                         return Tok1.Text = Tok2.Text;
                      end if;

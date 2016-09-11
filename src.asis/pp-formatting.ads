@@ -33,6 +33,7 @@ with ASIS_UL.Vectors;
 with ASIS_UL.Char_Vectors; use ASIS_UL.Char_Vectors;
 use ASIS_UL.Char_Vectors.Char_Vectors;
 with LAL_UL.Symbols;
+with LAL_UL.Predefined_Symbols; use LAL_UL.Predefined_Symbols;
 with Pp.Buffers; use Pp.Buffers; use Pp.Buffers.Marker_Vectors;
 with Pp.Scanner; use Pp.Scanner.Token_Vectors;
 
@@ -377,7 +378,7 @@ package Pp.Formatting is
          --  line all come from the same tree; other tabs in the line are ignored.
          --  Parent is used across lines to ensure that all lines within a
          --  paragraph to be aligned together all come from the same parent tree.
-         Token : Syms.Symbol := Syms.Intern ("");
+         Token : Syms.Symbol := Name_Empty;
          --  This is some text associated with the Tab. Usually, it is the text of
          --  the token that follows the Tab in the template.
          Mark : Marker;

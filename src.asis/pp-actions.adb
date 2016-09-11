@@ -32,8 +32,8 @@ with ASIS_UL.Vectors;
 
 with LAL_UL.Projects;
 with LAL_UL.Drivers;
-pragma Warnings (On);
 with LAL_UL.Symbols; use LAL_UL.Symbols;
+pragma Warnings (On);
 
 package body Pp.Actions is
 
@@ -141,9 +141,6 @@ package body Pp.Actions is
    pragma Warnings (On);
 
    use LAL_UL.Formatted_Output;
-
-   Empty_Sym : constant Symbol := Intern ("");
-   pragma Unreferenced (Empty_Sym);
 
    function Output_Dir (Cmd : Command_Line) return String;
    pragma Unreferenced (Output_Dir);

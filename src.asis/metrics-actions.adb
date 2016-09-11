@@ -21,6 +21,7 @@ with LAL_UL.Tool_Names;
 
 with ASIS_UL.Debug; use ASIS_UL.Debug;
 with ASIS_UL.Vectors;
+with LAL_UL.Predefined_Symbols; use LAL_UL.Predefined_Symbols;
 
 pragma Warnings (Off);
 with LAL_UL.Projects;
@@ -126,7 +127,6 @@ package body METRICS.Actions is
 
    use LAL_UL.Formatted_Output;
 
-   Empty_Sym : constant Symbol := Intern ("");
    Subunit_Sym : constant Symbol := Intern (" - subunit");
    Library_Item_Sym : constant Symbol := Intern (" - library item");
 
@@ -492,12 +492,11 @@ package body METRICS.Actions is
                   begin
                      Result.Subunit_Parent :=
                        (if Is_Subunit
-                          then Intern
-                            (To_UTF8
-                              (Full_Name
-                                (F_Name
-                                  (Subunit
-                                    (F_Body (Compilation_Unit (Node)))))))
+                          then W_Intern
+                            (Full_Name
+                              (F_Name
+                                (Subunit
+                                  (F_Body (Compilation_Unit (Node))))))
                           else Empty_CU_Sym);
                      Result.Text_Name :=
                        Intern (Sub_Str & Str (Result.Subunit_Parent).S & Dot &
@@ -515,7 +514,7 @@ package body METRICS.Actions is
                        then (if Unit_Is_Subunit (Node)
                                then Subunit_Sym
                                else Library_Item_Sym)
-                       else Empty_Sym);
+                       else Name_Empty);
                end if;
             end;
          end if;
@@ -2206,13 +2205,11 @@ package body METRICS.Actions is
                      if F_Is_Limited (With_Decl (Node)) then
                         Include
                           (File_M.Limited_Depends_On,
-                           Intern
-                             (To_UTF8 (Full_Name (Name (Childx (Names, I))))));
+                           W_Intern (Full_Name (Name (Childx (Names, I)))));
                      else
                         Include
                           (File_M.Depends_On,
-                           Intern
-                             (To_UTF8 (Full_Name (Name (Childx (Names, I))))));
+                           W_Intern (Full_Name (Name (Childx (Names, I)))));
                      end if;
                   end loop;
                end;
@@ -2236,9 +2233,9 @@ package body METRICS.Actions is
                   if Kind (Def_Name) = Ada_Dotted_Name then
                      Include
                        (File_M.Depends_On,
-                        Intern (To_UTF8
+                        W_Intern
                           (Full_Name
-                            (Name (F_Prefix (Dotted_Name (Def_Name)))))));
+                            (Name (F_Prefix (Dotted_Name (Def_Name))))));
                   end if;
                end;
 

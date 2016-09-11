@@ -1,4 +1,5 @@
 with LAL_UL.Symbols; use LAL_UL.Symbols;
+with ASIS_UL.String_Utilities;
 
 package LAL_UL.Predefined_Symbols is
 
@@ -104,7 +105,43 @@ package LAL_UL.Predefined_Symbols is
 
    Name_Some : constant Symbol := R2012 ("some");
 
-   --  Other names
+   --  Miscellaneous useful Symbols:
+
+   Name_Empty : constant Symbol := Intern ("");
+   Name_NL    : constant Symbol :=
+     W_Intern ((1 => ASIS_UL.String_Utilities.NL));
+
+   Name_Semicolon : constant Symbol := Intern (";");
+   Name_L_Paren   : constant Symbol := Intern ("(");
+   Name_R_Paren   : constant Symbol := Intern (")");
+   Name_Colon     : constant Symbol := Intern (":");
+   Name_Assign    : constant Symbol := Intern (":=");
+   Name_Bang      : constant Symbol := Intern ("!");
+   Name_Bar       : constant Symbol := Intern ("|");
+   Name_Arrow     : constant Symbol := Intern ("=>");
+   Name_Dot       : constant Symbol := Intern (".");
+   Name_Tick      : constant Symbol := Intern ("'");
+
+   Name_And_Then : constant Symbol := Intern ("and then");
+   Name_Or_Else  : constant Symbol := Intern ("or else");
+
+   Name_Q_And : constant Symbol := Intern ("""and""");
+   Name_Q_Or  : constant Symbol := Intern ("""or""");
+   Name_Q_Xor : constant Symbol := Intern ("""xor""");
+   Name_Q_Mod : constant Symbol := Intern ("""mod""");
+   Name_Q_Rem : constant Symbol := Intern ("""rem""");
+   Name_Q_Abs : constant Symbol := Intern ("""abs""");
+   Name_Q_Not : constant Symbol := Intern ("""not""");
+
+   Name_Depends : constant Symbol := Intern ("Depends");
+   Name_Elab_Spec : constant Symbol := Intern ("Elab_Spec");
+   Name_Elab_Body : constant Symbol := Intern ("Elab_Body");
+
+   Name_Tab_Insertion_Point : constant Symbol :=
+     Intern ("tab insertion point");
+   Name_Tab_In_Out : constant Symbol := Intern ("tab in out");
+   Name_Dot_Dot : constant Symbol := Intern ("..");
+   Name_R_Sq : constant Symbol := Intern ("]");
 
    Name_Page : constant Symbol := Intern ("page");
 

@@ -25,16 +25,10 @@ pragma Ada_2012;
 
 with Text_IO;
 
-with LAL_UL.Symbols; use LAL_UL.Symbols;
 with LAL_UL.Predefined_Symbols; use LAL_UL.Predefined_Symbols;
 
 package body Pp.Scanner is
-
-   subtype Symbol is Syms.Symbol;
-   No_Symbol : constant Symbol := Syms.No_Symbol;
-   function Intern (Buf : Bounded_Str) return Symbol
-     renames Syms.Intern;
-   function Intern (S : String) return Symbol renames Syms.Intern;
+   use Syms;
 
    function First_Pos
      (Input : Buffer;
@@ -72,11 +66,6 @@ package body Pp.Scanner is
            Line_Ends /= null
          then
            Char_At (Input, Last_Position (Input)) = NL);
-
-      Name_Empty   : constant Symbol := Intern ("");
-      Name_R_Paren : constant Symbol := Intern (")");
-      Name_Tick    : constant Symbol := Intern ("'");
-      Name_NL      : constant Symbol := W_Intern ((1 => NL));
 
       Cur_Line, Cur_Col : Positive := 1;
       Cur_First         : Positive := 1;
@@ -551,13 +540,14 @@ package body Pp.Scanner is
                Comment_Text : constant W_Str :=
                  Slice (Input, Tok.Sloc.First, Cur_First - 1);
             begin
-               if Has_Prefix (Comment_Text, Prefix => Gen_Plus) then
+               if Has_Prefix (Comment_Text, Prefix => To_W_Str (Gen_Plus)) then
                   if Gen_Regions /= null then
                      Append (Gen_Regions.all, Tok);
                   end if;
                   Ignore_Tokens := True;
                   goto Ignore_It;
-               elsif Has_Prefix (Comment_Text, Prefix => Gen_Minus) then
+               elsif Has_Prefix (Comment_Text, Prefix => To_W_Str (Gen_Minus))
+               then
                   if Gen_Regions /= null then
                      Append (Gen_Regions.all, Tok);
                   end if;
@@ -903,7 +893,7 @@ package body Pp.Scanner is
            (Text_IO.Standard_Output,
             "--" & (1 .. Tok.Leading_Blanks => ' '));
       end if;
-      for C of Syms.Str (Tok.Text).S loop
+      for C of Str (Tok.Text).S loop
          if Tok.Kind in Comment_Kind and then C = ASCII.LF then
             Text_IO.Put (Text_IO.Standard_Output, "$");
          else
