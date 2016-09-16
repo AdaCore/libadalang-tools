@@ -26,5 +26,7 @@
 pragma Ada_2012;
 
 package body Pp.Formatting.Tree_Formatting is
-   --  ????????????????
+
+   --  Why not put all the work in Pp.Actions????
+
 end Pp.Formatting.Tree_Formatting;

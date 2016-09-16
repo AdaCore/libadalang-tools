@@ -136,8 +136,8 @@ package body Pp.Actions is
      Number_Casing_Switches,
      Pragma_Casing_Switches,
      Pp_String_Switches,
-     Pp_Nat_Switches;
-   --  , ????Pp_String_Seq_Switches;
+     Pp_Nat_Switches,
+     Pp_String_Seq_Switches;
    pragma Warnings (On);
 
    use LAL_UL.Formatted_Output;

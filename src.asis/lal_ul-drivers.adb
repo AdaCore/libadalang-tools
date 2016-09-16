@@ -30,7 +30,7 @@ with GNAT.OS_Lib;
 with LAL_UL.Environment;
 
 with LAL_UL.Common;   use LAL_UL.Common;
-with LAL_UL.Common.Post;
+--  with LAL_UL.Common.Post;
 with LAL_UL.Projects; use LAL_UL.Projects;
 --  with LAL_UL.Check_Parameters;
 with ASIS_UL.String_Utilities; use ASIS_UL.String_Utilities;
@@ -221,7 +221,7 @@ package body LAL_UL.Drivers is
          Post_Cmd_Line_1_Action    => Post_Cmd_Line_1'Access,
          Tool_Temp_Dir             => Environment.Tool_Temp_Dir.all,
          Print_Help                => Print_Help'Access);
-      LAL_UL.Common.Post.Postprocess_Common (Cmd);
+--      LAL_UL.Common.Post.Postprocess_Common (Cmd);
 
       if Debug_Flag_C then
          Dump_Cmd (Cmd);

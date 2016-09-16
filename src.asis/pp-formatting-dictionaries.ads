@@ -26,6 +26,7 @@
 --  This package contains routines for dealing with the casing exception
 --  dictionaries
 
+with Pp.Command_Lines; use Pp.Command_Lines;
 package Pp.Formatting.Dictionaries is
 
    procedure Reset_Dictionary;

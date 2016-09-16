@@ -35,8 +35,9 @@ procedure LAL_UL.Driver
    Cmd                   : in out Command_Line;
    Print_Help            :        not null access procedure;
    Tool_Package_Name     :        String;
-   Needs_Per_File_Output :        Boolean        := False;
-   Preprocessing_Allowed :        Boolean        := True;
-   Callback              :        Parse_Callback := null);
+   Needs_Per_File_Output :        Boolean := False;
+   Preprocessing_Allowed :        Boolean := True;
+   Callback              :        Parse_Callback;
+   Post_Cmds_Callback    : access procedure (Cmd : Command_Line) := null);
 --  Preprocessing_Allowed needs to be OFF for gnatpp, because it is updating
 --  the source. It is also OFF for gnat2xml; not sure why.

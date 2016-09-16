@@ -27,19 +27,33 @@ pragma Ada_2012;
 
 with Ada.Strings.Unbounded;
 with Ada.Wide_Text_IO;
-with System.WCh_Con;
-use type System.WCh_Con.WC_Encoding_Method;
 
 with GNATCOLL.Paragraph_Filling;
 
 with LAL_UL.Symbols; use LAL_UL.Symbols;
-
 with Text_IO;
 
 with Pp.Formatting.Tree_Formatting;
---  pragma Warnings (On); -- ????
+with Pp.Command_Lines; use Pp.Command_Lines;
 
 package body Pp.Formatting is
+   use LAL_UL.Command_Lines;
+
+--   use Common_Flag_Switches, Common_String_Switches,
+--     Common_String_Seq_Switches, Common_Nat_Switches;
+
+   use Pp_Flag_Switches,
+     Pp_Boolean_Switches,
+     Attribute_Casing_Switches,
+     Keyword_Casing_Switches,
+     Name_Casing_Switches,
+     Enum_Casing_Switches,
+     Type_Casing_Switches,
+     Number_Casing_Switches,
+     Pragma_Casing_Switches,
+     Pp_String_Switches,
+     Pp_Nat_Switches,
+     Pp_String_Seq_Switches;
 
    subtype Symbol is Syms.Symbol;
    function "=" (X, Y : Symbol) return Boolean renames Syms."=";
@@ -68,7 +82,7 @@ package body Pp.Formatting is
 
       procedure Insert_Comment_Text
         (Lines_Data : in out Lines_Data_Rec;
-         Options : Formatting_Options;
+         Cmd : LAL_UL.Command_Lines.Command_Line;
          Comment_Tok : Scanner.Token);
       --  Insert the text of the comment into Out_Buf, including the initial
       --  "--" and leading blanks.
@@ -181,11 +195,11 @@ package body Pp.Formatting is
       procedure Final_Check_Helper
         (Lines_Data : in out Lines_Data_Rec;
          Src_Buf : in out Buffer;
-         Options : Formatting_Options);
+         Cmd : LAL_UL.Command_Lines.Command_Line);
       procedure Final_Check
         (Lines_Data : in out Lines_Data_Rec;
          Src_Buf : in out Buffer;
-         Options : Formatting_Options);
+         Cmd : LAL_UL.Command_Lines.Command_Line);
       --  Final pass: check that we have not damaged the input source text.
       --  Parameters and Out_Buf are as for Insert_Comments_And_Blank_Lines,
       --  except that comments are now included in Out_[Tokens|Buf], and this
@@ -247,7 +261,7 @@ package body Pp.Formatting is
 
       procedure Insert_Comment_Text
         (Lines_Data : in out Lines_Data_Rec;
-         Options : Formatting_Options;
+         Cmd : LAL_UL.Command_Lines.Command_Line;
          Comment_Tok : Scanner.Token)
       is
          Out_Buf : Buffer renames Lines_Data.Out_Buf;
@@ -273,32 +287,32 @@ package body Pp.Formatting is
                 (Pretty_Fill
                    (S1,
                     Max_Line_Length =>
-                      Options.Max_Line_Length -
+                      Arg (Cmd, Max_Line_Length) -
                       (Cur_Indentation + String'("--")'Length + Leading_Blanks)));
             pragma Debug (Assert_No_Trailing_Blanks (From_UTF8 (S2)));
          begin
             return From_UTF8 (S2);
          end Filled_Text;
 
-         --  GNAT_Comment_Start causes the comment to start with at least 2
+         --  Comments_Gnat_Beginning causes the comment to start with at least 2
          --  blanks.
 
          Leading_Blanks : constant Natural :=
            (if
-              Options.GNAT_Comment_Start and Comment_Tok.Is_Fillable_Comment
+              Arg (Cmd, Comments_Gnat_Beginning) and Comment_Tok.Is_Fillable_Comment
             then
               Natural'Max (Comment_Tok.Leading_Blanks, 2)
             else Comment_Tok.Leading_Blanks);
          --  In Comments_Only mode, we need to indent "by hand" here. In normal
          --  mode, Cur_Indentation will be heeded by the line breaks.
          Indentation : constant W_Str :=
-            (if Options.Comments_Only
+            (if Arg (Cmd, Comments_Only)
                then (1 .. Cur_Indentation => ' ')
                else "");
          Prelude    : constant W_Str   :=
            Indentation & "--" & (1 .. Leading_Blanks => ' ');
          Do_Filling : constant Boolean :=
-           Comment_Filling_Enabled (Options)
+           Comment_Filling_Enabled (Cmd)
              and then Comment_Tok.Is_Fillable_Comment;
          Text : constant W_Str :=
            (if Do_Filling then Filled_Text (Comment_Tok, Leading_Blanks)
@@ -323,7 +337,7 @@ package body Pp.Formatting is
       procedure Do_Comments_Only
         (Lines_Data : in out Lines_Data_Rec;
          Src_Buf : in out Buffer;
-         Options : Formatting_Options)
+         Cmd : LAL_UL.Command_Lines.Command_Line)
       is
          Out_Buf : Buffer renames Lines_Data.Out_Buf;
          Cur_Indentation : Natural renames Lines_Data.Cur_Indentation;
@@ -337,13 +351,13 @@ package body Pp.Formatting is
 
          procedure Assert;
          --  If Comments_Only is True, but Comment_Filling_Enabled and
-         --  GNAT_Comment_Start are both False, then the input and output should
+         --  Comments_Gnat_Beginning are both False, then the input and output should
          --  be identical. So assert.
 
          procedure Assert is
          begin
-            if Comment_Filling_Enabled (Options)
-              or else Options.GNAT_Comment_Start
+            if Comment_Filling_Enabled (Cmd)
+              or else Arg (Cmd, Comments_Gnat_Beginning)
             then
                return;
             end if;
@@ -389,7 +403,7 @@ package body Pp.Formatting is
                   when others => null;
                end case;
 
-               Insert_Comment_Text (Lines_Data, Options, Cur_Tok);
+               Insert_Comment_Text (Lines_Data, Cmd, Cur_Tok);
                Cur_Indentation := 0;
             end if;
 
@@ -410,14 +424,14 @@ package body Pp.Formatting is
 
          pragma Debug (Assert);
 
-         Final_Check (Lines_Data, Src_Buf, Options);
+         Final_Check (Lines_Data, Src_Buf, Cmd);
       end Do_Comments_Only;
 
       procedure Post_Tree_Phases
         (Lines_Data : in out Lines_Data_Rec;
          Source_File_Name : String;
          Src_Buf : in out Buffer;
-         Options : Formatting_Options)
+         Cmd : Command_Line)
       is
          Out_Buf : Buffer renames Lines_Data.Out_Buf;
          Cur_Indentation : Natural renames Lines_Data.Cur_Indentation;
@@ -559,8 +573,8 @@ package body Pp.Formatting is
                  X < Last_Index (Line_Breaks)
                  and then not Line_Breaks (X + 1).Enabled;
                Threshold : constant Positive :=
-                 (if True then Options.PP_Cont_Line_Indentation -- ????
-                 else Positive'Max (Options.PP_Cont_Line_Indentation - 1,
+                 (if True then PP_Indent_Continuation (Cmd) -- ????
+                 else Positive'Max (PP_Indent_Continuation (Cmd) - 1,
                                     (if More then 6 -- arbitrary
                                     else 1)));
             begin
@@ -621,7 +635,7 @@ package body Pp.Formatting is
                loop -- through levels
                   L   := Next_Enabled (All_Line_Breaks, F);
                   Len := Line_Length (F, L);
-                  exit when Len <= Options.Max_Line_Length; -- short enough
+                  exit when Len <= Arg (Cmd, Max_Line_Length); -- short enough
                   exit when not More_Levels; -- no more line breaks to enable
 
                   More_Levels := False;
@@ -655,7 +669,7 @@ package body Pp.Formatting is
                            if True -- ????
                              or else L = Last_Index (Line_Breaks)
                              or else
-                               Line_Length (F, L + 1) >= Options.Max_Line_Length
+                               Line_Length (F, L + 1) >= Arg (Cmd, Max_Line_Length)
                            then
                               Line_Breaks (X).Enabled := True;
                            end if;
@@ -818,7 +832,7 @@ package body Pp.Formatting is
 
          procedure Insert_Comment_Text (Comment_Tok : Scanner.Token) is
          begin
-            Insert_Comment_Text (Lines_Data, Options, Comment_Tok);
+            Insert_Comment_Text (Lines_Data, Cmd, Comment_Tok);
          end Insert_Comment_Text;
 
          Pp_Off_Present : Boolean := False;
@@ -898,8 +912,8 @@ package body Pp.Formatting is
                            Tok2_Text : constant W_Str :=
                              To_W_Str (Tok2.Text);
                         begin
-                           if (Options.Decimal_Grouping = 0
-                                 and then Options.Based_Grouping = 0)
+                           if (Arg (Cmd, Decimal_Grouping) = 0
+                                 and then Arg (Cmd, Based_Grouping) = 0)
                              or else Find (Tok1_Text, "_") /= 0
                            then
                               return False;
@@ -1131,7 +1145,7 @@ package body Pp.Formatting is
                begin
                   if Src_Tok.Sloc.Col = 1
                     or else Src_Tok.Is_Special_Comment
-                    or else not Options.Format_Comments
+                    or else Arg (Cmd, Comments_Unchanged)
                   then
                      Cur_Indentation := Src_Tok.Sloc.Col - 1; -- Keep as in input
 
@@ -1143,19 +1157,18 @@ package body Pp.Formatting is
                      --  it past Max_Line_Length, and the comment would fit if
                      --  not indented, then reduce the indentation.
 
-                     if
-                       (not Comment_Filling_Enabled (Options)
+                     if (not Comment_Filling_Enabled (Cmd)
                         or else not Src_Tok.Is_Fillable_Comment)
                        and then
                          Cur_Indentation + Src_Tok.Width >
-                         Options.Max_Line_Length
-                       and then Src_Tok.Width <= Options.Max_Line_Length
+                         Arg (Cmd, Max_Line_Length)
+                       and then Src_Tok.Width <= Arg (Cmd, Max_Line_Length)
                      then
                         Cur_Indentation :=
-                          Good_Column (Options.PP_Indentation,
-                                       Options.Max_Line_Length - Src_Tok.Width);
+                          Good_Column (PP_Indentation (Cmd),
+                                       Arg (Cmd, Max_Line_Length) - Src_Tok.Width);
                         pragma Assert
-                          ((Cur_Indentation mod Options.PP_Indentation) = 0);
+                          ((Cur_Indentation mod PP_Indentation (Cmd)) = 0);
                      end if;
                   end if;
                end Set_Cur_Indent;
@@ -1235,8 +1248,8 @@ package body Pp.Formatting is
                --  style checking complains "(style) bad column".
 
                Indentation :=
-                 (Indentation / Options.PP_Indentation) * Options.PP_Indentation;
-               pragma Assert ((Indentation mod Options.PP_Indentation) = 0);
+                 (Indentation / PP_Indentation (Cmd)) * PP_Indentation (Cmd);
+               pragma Assert ((Indentation mod PP_Indentation (Cmd)) = 0);
 
                Set_Cur_Indent;
                if Src_Tokens (Src_Index - 1).Kind = Blank_Line
@@ -1257,8 +1270,8 @@ package body Pp.Formatting is
 
                --  If we don't have an enabled line break here, we need to add one.
 
-               if not Options.Insert_Blank_Lines
-                 and then not Options.Preserve_Blank_Lines
+               if not Insert_Blank_Lines (Cmd)
+                 and then not Preserve_Blank_Lines (Cmd)
                then
                   pragma Assert
                     ((Cur (Out_Buf) = NL) =
@@ -1461,7 +1474,7 @@ package body Pp.Formatting is
                   --  when the --no-end-id switch was given. Here, the name was
                   --  present in the source, so we insert it.
 
-                  elsif not Options.End_Id
+                  elsif not Arg (Cmd, End_Id)
                     and then Out_Tok.Text = Name_Semicolon
                     and then
                       Prev_Lexeme (Out_Tokens, Out_Index).Normalized =
@@ -1545,10 +1558,10 @@ package body Pp.Formatting is
                         Src_Index := Src_Index + 1;
                         Src_Tok   := Src_Tokens (Src_Index);
                         exit when Src_Tok.Kind /= Blank_Line
-                          or else Options.Preserve_Blank_Lines;
+                          or else Preserve_Blank_Lines (Cmd);
                      end loop;
                      if Src_Tok.Kind /= End_Of_Input
-                       or else Options.Preserve_Blank_Lines
+                       or else Preserve_Blank_Lines (Cmd)
                      then
                         Append_Temp_Line_Break (Lines_Data);
                      end if;
@@ -2032,7 +2045,7 @@ package body Pp.Formatting is
          --  Start of processing for Insert_Alignment
 
          begin
-            if not Alignment_Enabled (Options) then
+            if not Alignment_Enabled (Cmd) then
                return;
             end if;
 
@@ -2074,7 +2087,7 @@ package body Pp.Formatting is
                           Out_Buf_Line_Ends,
                           Cur_Line_Num) +
                        Cur_Tab.Num_Blanks <=
-                       Options.Max_Line_Length
+                       Arg (Cmd, Max_Line_Length)
                      then
                         for J in 1 .. Cur_Tab.Num_Blanks loop
                            Insert (Out_Buf, ' ');
@@ -2108,7 +2121,7 @@ package body Pp.Formatting is
             --  use all type Token_Vector;
             Out_Tok : Token;
          begin
-            case Options.PP_Keyword_Casing is
+            case PP_Keyword_Casing (Cmd) is
                when Lower_Case =>
                   null;
 
@@ -2146,7 +2159,7 @@ package body Pp.Formatting is
             --  use all type Token_Vector;
             Out_Tok, Prev_Tok, Prev_Prev_Tok : Token;
          begin
-            if not Options.Add_FF then
+            if not Arg (Cmd, Ff_After_Pragma_Page) then
                return;
             end if;
 
@@ -2333,7 +2346,7 @@ package body Pp.Formatting is
          --  sequence of tokens we have constructed matches the original source
          --  code (with some allowed exceptions).
 
-         Final_Check (Lines_Data, Src_Buf, Options);
+         Final_Check (Lines_Data, Src_Buf, Cmd);
       end Post_Tree_Phases;
 
       procedure Raise_Token_Mismatch
@@ -2410,7 +2423,7 @@ package body Pp.Formatting is
       procedure Final_Check_Helper
         (Lines_Data : in out Lines_Data_Rec;
          Src_Buf : in out Buffer;
-         Options : Formatting_Options)
+         Cmd : LAL_UL.Command_Lines.Command_Line)
       is
          Out_Buf : Buffer renames Lines_Data.Out_Buf;
          Src_Tokens : Scanner.Token_Vector renames Lines_Data.Src_Tokens;
@@ -2440,7 +2453,7 @@ package body Pp.Formatting is
          --  Collect up all the text of a sequence of Whole_Line_Comments,
          --  ignoring changes made by paragraph filling. Paragraph_Filling might
          --  have changed blank to NL and vice versa, and it turns a series of
-         --  blanks into a single one. Similarly needed if GNAT_Comment_Start is
+         --  blanks into a single one. Similarly needed if Comments_Gnat_Beginning is
          --  True.
 
          function Match (Tok1, Tok2 : Token) return Boolean is
@@ -2456,7 +2469,7 @@ package body Pp.Formatting is
 
                   when Comment_Kind =>
                      return
-                       (Options.GNAT_Comment_Start
+                       (Arg (Cmd, Comments_Gnat_Beginning)
                         or else Tok1.Leading_Blanks = Tok2.Leading_Blanks)
                        and then Tok1.Text = Tok2.Text;
 
@@ -2471,8 +2484,8 @@ package body Pp.Formatting is
                         Tok1_Text : constant W_Str := To_W_Str (Tok1.Text);
                         Tok2_Text : constant W_Str := To_W_Str (Tok2.Text);
                      begin
-                        if (Options.Decimal_Grouping = 0
-                              and then Options.Based_Grouping = 0)
+                        if (Arg (Cmd, Decimal_Grouping) = 0
+                              and then Arg (Cmd, Based_Grouping) = 0)
                           or else Find (Tok1_Text, "_") /= 0
                         then
                            return False;
@@ -2495,7 +2508,7 @@ package body Pp.Formatting is
                return Tok1.Text = Tok2.Text
                  and then
                  (if
-                    not Options.GNAT_Comment_Start
+                    not Arg (Cmd, Comments_Gnat_Beginning)
                   then
                     Tok1.Leading_Blanks = Tok2.Leading_Blanks);
                --  ???This case will be needed if/when we turn end-of-line
@@ -2626,7 +2639,7 @@ package body Pp.Formatting is
                --  we collect them all together and check that their text
                --  more-or-less matches.
                --
-               --  Similarly, we do this if GNAT_Comment_Start. For example, if
+               --  Similarly, we do this if Comments_Gnat_Beginning. For example, if
                --  one comment starts with a single blank and the next starts with
                --  two, then they will not look like a single paragraph during
                --  Insert_Comments_And_Blank_Lines, but here they will, because an
@@ -2739,8 +2752,8 @@ package body Pp.Formatting is
             end if;
          end loop;
 
-         if not Options.Comments_Only
-           and then not Options.Preserve_Blank_Lines
+         if not Arg (Cmd, Comments_Only)
+           and then not Preserve_Blank_Lines (Cmd)
          then
             if Point (Out_Buf) /= Last_Position (Out_Buf) then
                Raise_Token_Mismatch
@@ -2787,7 +2800,7 @@ package body Pp.Formatting is
       procedure Final_Check
         (Lines_Data : in out Lines_Data_Rec;
          Src_Buf : in out Buffer;
-         Options : Formatting_Options)
+         Cmd : LAL_UL.Command_Lines.Command_Line)
       is
          Out_Buf : Buffer renames Lines_Data.Out_Buf;
       begin
@@ -2798,12 +2811,12 @@ package body Pp.Formatting is
             declare
                Old_Out_Buf : constant Char_Vector := To_Vector (Out_Buf);
             begin
-               Final_Check_Helper (Lines_Data, Src_Buf, Options);
+               Final_Check_Helper (Lines_Data, Src_Buf, Cmd);
                pragma Assert (To_Vector (Out_Buf) = Old_Out_Buf);
                pragma Debug (Assert_No_Trailing_Blanks (To_W_Str (Out_Buf)));
             end;
          else
-            Final_Check_Helper (Lines_Data, Src_Buf, Options);
+            Final_Check_Helper (Lines_Data, Src_Buf, Cmd);
          end if;
       end Final_Check;
 

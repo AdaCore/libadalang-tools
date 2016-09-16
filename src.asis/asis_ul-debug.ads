@@ -6,7 +6,7 @@
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
---                    Copyright (C) 2009-2012, AdaCore                      --
+--                    Copyright (C) 2009-2016, AdaCore                      --
 --                                                                          --
 -- Asis Utility Library (ASIS UL) is free software; you can redistribute it --
 -- and/or  modify  it  under  terms  of  the  GNU General Public License as --
@@ -89,9 +89,6 @@ package ASIS_UL.Debug is
    --  the given value. Does nothing if C is not in a-z or 0-9.
 
    procedure Set_Debug_Options (Options : String);
-   --  Sets debug flags treating its argument as a parameter of '-d' option. If
-   --  the parameter is an empty string, sets ASIS_UL.Options.Debug_Mode ON. At
-   --  some point we have to get rid of ASIS_UL.Options.Debug_Mode and
-   --  the parameterless '-d' option.
+   --  Sets debug flags treating its argument as a parameter of '-d' option.
 
 end ASIS_UL.Debug;

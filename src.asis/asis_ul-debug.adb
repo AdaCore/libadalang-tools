@@ -6,7 +6,7 @@
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
---                    Copyright (C) 2009-2014, AdaCore                      --
+--                    Copyright (C) 2009-2016, AdaCore                      --
 --                                                                          --
 -- Asis Utility Library (ASIS UL) is free software; you can redistribute it --
 -- and/or  modify  it  under  terms  of  the  GNU General Public License as --
@@ -22,8 +22,6 @@
 -- ASIS UL is maintained by AdaCore (http://www.adacore.com).               --
 --                                                                          --
 ------------------------------------------------------------------------------
-
-with ASIS_UL.Options;
 
 package body ASIS_UL.Debug is
 
@@ -185,15 +183,11 @@ package body ASIS_UL.Debug is
    -----------------------
 
    procedure Set_Debug_Options (Options : String) is
+      pragma Assert (Options /= "");
    begin
-      if Options = "" then
-         ASIS_UL.Options.Debug_Mode := True;
-         --  !!! At some point we should get rid of it.
-      else
-         for J in Options'Range loop
-            Set_Debug_Flag (Options (J));
-         end loop;
-      end if;
+      for J in Options'Range loop
+         Set_Debug_Flag (Options (J));
+      end loop;
    end Set_Debug_Options;
 
 end ASIS_UL.Debug;

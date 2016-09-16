@@ -493,6 +493,9 @@ package LAL_UL.Command_Lines is
      (Phase : Parse_Phase;
       Swit  : Dynamically_Typed_Switch);
 
+   procedure Null_Callback
+     (Phase : Parse_Phase; Swit : Dynamically_Typed_Switch) is null;
+
    procedure Parse
      (Text_Args          :        Argument_List_Access;
       Cmd                : in out Command_Line;
