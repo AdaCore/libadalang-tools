@@ -81,7 +81,7 @@ package Pp.Command_Lines is
 
    package Pp_Flag_Shorthands_N is new Pp_Flag_Switches.Set_Shorthands
      ((No_Tab => +"-N", -- Not documented
-       others => null)); -- Not documented
+       others => null));
 
    type Attribute_Casing is
      (Attribute_Mixed_Case,

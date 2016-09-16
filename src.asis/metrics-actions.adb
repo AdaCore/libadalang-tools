@@ -171,8 +171,6 @@ package body METRICS.Actions is
       end;
    end Get_CU_Access;
 
-   function Output_Dir (Cmd : Command_Line) return String;
-
    procedure Validate (M : Metrix);
    --  For testing/debugging. Check consistency of M.
 
@@ -1347,9 +1345,10 @@ package body METRICS.Actions is
       Text : File_Type;
       File_Name : constant String := File_M.Source_File_Name.all;
       Text_File_Name : constant String :=
-        (if Output_Dir (Cmd) = ""
+        (if Arg (Cmd, Output_Directory) = null
            then File_Name & Suffix
-           else Directories.Compose (Output_Dir (Cmd), File_Name & Suffix));
+           else Directories.Compose
+             (Arg (Cmd, Output_Directory).all, File_Name & Suffix));
       --  Can't pass Suffix as Extension, because that inserts an extra "."
    begin
       if Text_File_Name = File_Name then
@@ -1383,15 +1382,6 @@ package body METRICS.Actions is
          end if;
       end if;
    end Print_File_Metrics;
-
-   function Output_Dir (Cmd : Command_Line) return String is
-   begin
-      if Arg (Cmd, Output_Directory) = null then
-         return "";
-      else
-         return Arg (Cmd, Output_Directory).all;
-      end if;
-   end Output_Dir;
 
    procedure Destroy (M : in out Metrix_Ref) is
       procedure Free is new Unchecked_Deallocation (Metrix, Metrix_Ref);
@@ -2572,30 +2562,6 @@ package body METRICS.Actions is
       --  and put the first lines.
 
       Metrics_To_Compute := To_Compute;
-
-      --  Create output directory if necessary
-
-      if Arg (Cmd, Output_Directory) /= null then
-         declare
-            Dir : constant String := Arg (Cmd, Output_Directory).all;
-            Cannot_Create : constant String :=
-              "cannot create directory '" & Dir & "'";
-            use Directories;
-         begin
-            if Exists (Dir) then
-               if Kind (Dir) /= Directory then
-                  Cmd_Error (Cannot_Create & "; file already exists");
-               end if;
-            else
-               begin
-                  Create_Directory (Dir);
-               exception
-                  when Name_Error | Use_Error =>
-                     Cmd_Error (Cannot_Create);
-               end;
-            end if;
-         end;
-      end if;
    end Init;
 
    -----------
@@ -2973,8 +2939,8 @@ package body METRICS.Actions is
       end loop;
 
       --  Print the totals in text form. These go to standard output, unless
-      --  --global-file-name was specified. Note that Output_Dir (Cmd) is
-      --  ignored by gnatmetric for this output.
+      --  --global-file-name was specified. Note that Output_Dir is ignored by
+      --  gnatmetric for this output.
 
       if Gen_Text (Cmd) then
          if Arg (Cmd, Global_File_Name) /= null then

@@ -23,6 +23,7 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Directories; use Ada;
 with GNAT.Command_Line;
 with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 with GNAT.OS_Lib;
@@ -259,6 +260,30 @@ package body LAL_UL.Drivers is
 --      else
 --         ASIS_UL.Source_Table.Processing.Process_Sources;
 --      end if;
+
+      --  Create output directory if necessary
+
+      if Arg (Cmd, Output_Directory) /= null then
+         declare
+            Dir : constant String := Arg (Cmd, Output_Directory).all;
+            Cannot_Create : constant String :=
+              "cannot create directory '" & Dir & "'";
+            use Directories;
+         begin
+            if Exists (Dir) then
+               if Kind (Dir) /= Directory then
+                  Cmd_Error (Cannot_Create & "; file already exists");
+               end if;
+            else
+               begin
+                  Create_Directory (Dir);
+               exception
+                  when Name_Error | Use_Error =>
+                     Cmd_Error (Cannot_Create);
+               end;
+            end if;
+         end;
+      end if;
 
       Init (Tool, Cmd);
       Process_Files;
