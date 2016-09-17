@@ -25,6 +25,13 @@
 
 pragma Ada_2012;
 
+with Libadalang;     use Libadalang;
+with Libadalang.AST; use Libadalang.AST;
+
 package Pp.Formatting.Tree_Formatting is
-   pragma Elaborate_Body; -- ????????????????
+
+   pragma Elaborate_Body;
+
+   --  ????I think all this should be in pp.actions.
+
 end Pp.Formatting.Tree_Formatting;

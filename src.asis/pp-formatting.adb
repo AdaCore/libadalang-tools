@@ -33,7 +33,6 @@ with GNATCOLL.Paragraph_Filling;
 with LAL_UL.Symbols; use LAL_UL.Symbols;
 with Text_IO;
 
-with Pp.Formatting.Tree_Formatting;
 with Pp.Command_Lines; use Pp.Command_Lines;
 
 package body Pp.Formatting is

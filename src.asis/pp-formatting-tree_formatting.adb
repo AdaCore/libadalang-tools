@@ -25,8 +25,32 @@
 
 pragma Ada_2012;
 
-package body Pp.Formatting.Tree_Formatting is
+pragma Warnings (Off);
+with Unchecked_Deallocation;
 
-   --  Why not put all the work in Pp.Actions????
+with Libadalang.Lexer;
+with LAL_Extensions; use LAL_Extensions;
+with Pp.Command_Lines; use Pp.Command_Lines;
+
+package body Pp.Formatting.Tree_Formatting is
+   use LAL_UL.Command_Lines;
+
+   pragma Style_Checks ("M85");
+
+--   use Common_Flag_Switches, Common_String_Switches,
+--     Common_String_Seq_Switches, Common_Nat_Switches;
+
+   use Pp_Flag_Switches,
+     Pp_Boolean_Switches,
+     Attribute_Casing_Switches,
+     Keyword_Casing_Switches,
+     Name_Casing_Switches,
+     Enum_Casing_Switches,
+     Type_Casing_Switches,
+     Number_Casing_Switches,
+     Pragma_Casing_Switches,
+     Pp_String_Switches,
+     Pp_Nat_Switches,
+     Pp_String_Seq_Switches;
 
 end Pp.Formatting.Tree_Formatting;
