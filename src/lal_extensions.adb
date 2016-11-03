@@ -109,6 +109,14 @@ package body LAL_Extensions is
       return Text_To_W_Str (Data (F_Tok (Single_Tok_Node (Nm))).Text.all);
    end Id_Name;
 
+   function Label_Name
+     (L : access Ada_Node_Type'Class)
+     return W_Str
+   is
+   begin
+      return Text_To_W_Str (Data (F_Token (Label (L))).Text.all);
+   end Label_Name;
+
    function L_Name
      (Nm : access Ada_Node_Type'Class)
      return W_Str
