@@ -3589,7 +3589,7 @@ end if;
               ("\1",
                Id_With_Casing
                  (W_Intern (Id_Name (Tree)),
-                  Kind => Ada_Abort_Statement,
+                  Kind => Ada_Abort_Stmt,
                   Is_Predef => False,
                   Use_Name_Casing_For_Nils => False));
          end Do_Usage_Name;
@@ -3776,7 +3776,7 @@ end if;
             Affects_Comments => True,
             Level    => 0,
 --            Kind     => Not_An_Element,
-            Kind     => Ada_Abort_Statement, -- ????
+            Kind     => Ada_Abort_Stmt, -- ????
             Template => Name_Empty);
          pragma Assert (Check_Whitespace);
          Subtree_To_Ada (Tree, Cur_Level => 0, Index_In_Parent => 1);
