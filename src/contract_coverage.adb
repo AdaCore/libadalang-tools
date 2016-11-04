@@ -47,7 +47,7 @@ procedure Contract_Coverage is
    --  there are no subprograms.
 
    function Has_Contracts (Subp_Decl : Ada_Node) return Boolean is
-      Aspects : constant Aspect_Specification :=
+      Aspects : constant Aspect_Spec :=
         Get_Aspects (Basic_Decl (Subp_Decl));
    begin
       --  Search through the aspects, and return True if we find one of the

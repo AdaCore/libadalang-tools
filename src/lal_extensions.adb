@@ -101,21 +101,24 @@ package body LAL_Extensions is
       end return;
    end Find_All;
 
+   function Token_Text (Tok : Token_Type) return W_Str is
+   begin
+      return Text_To_W_Str (Text (Tok));
+   end Token_Text;
+
+   function L_Token_Text (Tok : Token_Type) return W_Str is
+      use Ada.Wide_Characters.Handling;
+   begin
+      return To_Lower (Token_Text (Tok));
+   end L_Token_Text;
+
    function Id_Name
      (Nm : access Ada_Node_Type'Class)
      return W_Str
    is
    begin
-      return Text_To_W_Str (Data (F_Tok (Single_Tok_Node (Nm))).Text.all);
+      return Text_To_W_Str (Text (F_Tok (Single_Tok_Node (Nm))));
    end Id_Name;
-
-   function Label_Name
-     (L : access Ada_Node_Type'Class)
-     return W_Str
-   is
-   begin
-      return Text_To_W_Str (Data (F_Token (Label (L))).Text.all);
-   end Label_Name;
 
    function L_Name
      (Nm : access Ada_Node_Type'Class)
@@ -125,6 +128,14 @@ package body LAL_Extensions is
    begin
       return To_Lower (Id_Name (Nm));
    end L_Name;
+
+   function Label_Name
+     (L : access Ada_Node_Type'Class)
+     return W_Str
+   is
+   begin
+      return Text_To_W_Str (Text (F_Token (Label (L))));
+   end Label_Name;
 
    function Full_Name (Nm : Name) return W_Str is
    begin
@@ -170,19 +181,19 @@ package body LAL_Extensions is
             when Ada_Package_Renaming_Decl =>
                Result :=
                  F_Name (Package_Renaming_Decl (Decl));
-            when Ada_Accept_Statement =>
+            when Ada_Accept_Stmt =>
                Result :=
-                 Name (F_Name (Accept_Statement (Decl)));
-            when Ada_Block_Statement =>
+                 Name (F_Name (Accept_Stmt (Decl)));
+            when Ada_Block_Stmt =>
                Result :=
-                 Name (F_Name (Block_Statement (Decl)));
-            when Ada_Loop_Statement =>
+                 Name (F_Name (Block_Stmt (Decl)));
+            when Ada_Loop_Stmt =>
                Result :=
-                 Name (F_Name (Loop_Statement (Decl)));
+                 Name (F_Name (Loop_Stmt (Decl)));
             when Ada_Abstract_Subprogram_Decl |
-              Ada_Expression_Function |
+              Ada_Expr_Function |
               Ada_Null_Subprogram_Decl |
-              Ada_Renaming_Subprogram_Decl |
+              Ada_Subprogram_Renaming_Decl |
               Ada_Subprogram_Decl =>
                Result :=
                  F_Name (F_Subp_Spec (Basic_Subprogram_Decl (Decl)));
@@ -202,9 +213,9 @@ package body LAL_Extensions is
             when Ada_Subprogram_Body =>
                Result :=
                  F_Name (F_Subp_Spec (Subprogram_Body (Decl)));
-            when Ada_Protected_Decl =>
+            when Ada_Single_Protected_Decl =>
                Result :=
-                 Name (F_Protected_Name (Protected_Decl (Decl)));
+                 Name (F_Protected_Name (Single_Protected_Decl (Decl)));
             when Ada_Protected_Type_Decl =>
                Result :=
                  Name (F_Protected_Type_Name (Protected_Type_Decl (Decl)));
@@ -213,9 +224,9 @@ package body LAL_Extensions is
             when Ada_Entry_Body =>
                Result :=
                  Name (F_Entry_Name (Entry_Body (Decl)));
-            when Ada_Task_Decl =>
+            when Ada_Single_Task_Decl =>
                Result :=
-                 Name (F_Task_Name (Task_Decl (Decl)));
+                 Name (F_Task_Name (Single_Task_Decl (Decl)));
             when Ada_Task_Type_Decl =>
                Result :=
                  Name (F_Task_Type_Name (Task_Type_Decl (Decl)));
@@ -240,19 +251,19 @@ package body LAL_Extensions is
       end return;
    end Get_Def_Name;
 
-   function Get_Aspects (Decl : Basic_Decl) return Aspect_Specification is
+   function Get_Aspects (Decl : Basic_Decl) return Aspect_Spec is
    begin
       return (case Kind (Decl) is
          when Ada_Base_Package_Decl =>
             F_Aspects (Base_Package_Decl (Decl)),
          when Ada_Abstract_Subprogram_Decl =>
             F_Aspects (Abstract_Subprogram_Decl (Decl)),
-         when Ada_Expression_Function =>
-            F_Aspects (Expression_Function (Decl)),
+         when Ada_Expr_Function =>
+            F_Aspects (Expr_Function (Decl)),
          when Ada_Null_Subprogram_Decl =>
             F_Aspects (Null_Subprogram_Decl (Decl)),
-         when Ada_Renaming_Subprogram_Decl =>
-            F_Aspects (Renaming_Subprogram_Decl (Decl)),
+         when Ada_Subprogram_Renaming_Decl =>
+            F_Aspects (Subprogram_Renaming_Decl (Decl)),
          when Ada_Subprogram_Decl =>
             F_Aspects (Subprogram_Decl (Decl)),
          when Ada_Package_Body_Stub =>
@@ -283,16 +294,16 @@ package body LAL_Extensions is
             F_Aspects (Object_Decl (Decl)),
          when Ada_Package_Renaming_Decl =>
             F_Aspects (Package_Renaming_Decl (Decl)),
-         when Ada_Protected_Decl =>
-            F_Aspects (Protected_Decl (Decl)),
+         when Ada_Single_Protected_Decl =>
+            F_Aspects (Single_Protected_Decl (Decl)),
          when Ada_Protected_Type_Decl =>
             F_Aspects (Protected_Type_Decl (Decl)),
-         when Ada_Task_Decl =>
-            F_Aspects (Task_Decl (Decl)),
+         when Ada_Single_Task_Decl =>
+            F_Aspects (Single_Task_Decl (Decl)),
          when Ada_Task_Type_Decl =>
             F_Aspects (Task_Type_Decl (Decl)),
-         when Ada_Full_Type_Decl =>
-            F_Aspects (Full_Type_Decl (Decl)),
+         when Ada_Type_Decl =>
+            F_Aspects (Type_Decl (Decl)),
          when Ada_Subtype_Decl =>
             F_Aspects (Subtype_Decl (Decl)),
 --  See P415-048:

@@ -64,11 +64,15 @@ package body METRICS.Line_Counting is
             end if;
 
             if Cur_Line = Prev_Line then
-               pragma Assert
-                 (Last_Ptr (Result) (Lines_Code) =
-                    Result (Last_Index (Result) - 1) (Lines_Code) + 1);
-               --  We must have seen a previous non-comment token on
-               --  this line.
+               declare
+                  Last : Cumulative_Counts renames Last_Ptr (Result).all;
+                  Prev : Cumulative_Counts renames
+                    Result (Last_Index (Result) - 1);
+               begin
+                  pragma Assert (Last (Lines_Code) = Prev (Lines_Code) + 1);
+                  --  We must have seen a previous non-comment token on
+                  --  this line.
+               end;
 
                if TD.Kind = Ada_Comment then
                   Inc (Last_Ptr (Result) (Lines_Eol_Comment));

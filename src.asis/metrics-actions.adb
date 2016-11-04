@@ -187,17 +187,17 @@ package body METRICS.Actions is
 
    subtype Gnatmetric_Eligible is Ada_Node_Kind_Type with
      Predicate => Gnatmetric_Eligible in
-       Ada_Expression_Function |
+       Ada_Expr_Function |
        Ada_Generic_Package_Decl |
        Ada_Package_Body |
        Ada_Package_Decl |
        Ada_Protected_Body |
-       Ada_Protected_Decl |
+       Ada_Single_Protected_Decl |
        Ada_Protected_Type_Decl |
        Ada_Entry_Body |
        Ada_Subprogram_Body |
        Ada_Task_Body |
-       Ada_Task_Decl |
+       Ada_Single_Task_Decl |
        Ada_Task_Type_Decl;
    --  These are the node kinds that the gnatmetric documentation calls
    --  "eligible local units". We compute metrics for the outermost node (the
@@ -211,7 +211,7 @@ package body METRICS.Actions is
        Ada_Generic_Subprogram_Decl |
        Ada_Abstract_Subprogram_Decl |
        Ada_Null_Subprogram_Decl |
-       Ada_Renaming_Subprogram_Decl |
+       Ada_Subprogram_Renaming_Decl |
        Ada_Subprogram_Decl;
    --  For the new lalmetric tool, we have the --contract-complexity
    --  metric, which is on subprogram declarations, so we need
@@ -401,9 +401,9 @@ package body METRICS.Actions is
          case Outer_Unit_Kind is
             when Ada_Generic_Package_Decl |
               Ada_Package_Decl |
-              Ada_Protected_Decl |
+              Ada_Single_Protected_Decl |
               Ada_Protected_Type_Decl |
-              Ada_Task_Decl |
+              Ada_Single_Task_Decl |
               Ada_Task_Type_Decl |
               Ada_Generic_Function_Instantiation |
               Ada_Generic_Package_Instantiation |
@@ -412,7 +412,7 @@ package body METRICS.Actions is
               Ada_Package_Renaming_Decl |
               Ada_Abstract_Subprogram_Decl |
               Ada_Null_Subprogram_Decl |
-              Ada_Renaming_Subprogram_Decl =>
+              Ada_Subprogram_Renaming_Decl =>
                pragma Assert (S = null);
                S := M;
                M.Is_Spec := True;
@@ -523,13 +523,13 @@ package body METRICS.Actions is
 
          if Node /= null
            and then Kind (Node) = Ada_Package_Body
-           and then F_Statements (Package_Body (Node)) /= null
+           and then F_Stmts (Package_Body (Node)) /= null
          then
             Result.Statements_Sloc :=
               Sloc_Range
                 (Ada_Node
-                   (F_Statements
-                      (F_Statements (Package_Body (Node)))));
+                   (F_Stmts
+                      (F_Stmts (Package_Body (Node)))));
          end if;
       end return;
    end Push_New_Metrix;
@@ -622,7 +622,7 @@ package body METRICS.Actions is
                          Ada_Package_Body | Ada_Protected_Body;
             end;
 
-         when Ada_Expression_Function |
+         when Ada_Expr_Function |
            Ada_Entry_Body |
            Ada_Subprogram_Body |
            Ada_Task_Body =>
@@ -631,7 +631,7 @@ package body METRICS.Actions is
          when Ada_Package_Body =>
             --  Apparently, gnatmetric doesn't do nested package bodies if
             --  there are no statements.
-            return F_Statements (Package_Body (Node)) /= null;
+            return F_Stmts (Package_Body (Node)) /= null;
 
          when others =>
             return False;
@@ -656,7 +656,7 @@ package body METRICS.Actions is
             return Package_Knd;
          when Ada_Protected_Body =>
             return Protected_Body_Knd;
-         when Ada_Protected_Decl =>
+         when Ada_Single_Protected_Decl =>
             return Protected_Object_Knd;
          when Ada_Protected_Type_Decl =>
             return Protected_Type_Knd;
@@ -664,7 +664,7 @@ package body METRICS.Actions is
             return Entry_Body_Knd;
          when Ada_Subprogram_Body =>
             declare
-               R : constant Type_Expression :=
+               R : constant Type_Expr :=
                  F_Returns (F_Subp_Spec (Subprogram_Body (Node)));
             begin
                return
@@ -672,7 +672,7 @@ package body METRICS.Actions is
             end;
          when Ada_Task_Body =>
             return Task_Body_Knd;
-         when Ada_Task_Decl =>
+         when Ada_Single_Task_Decl =>
             return Task_Object_Knd;
          when Ada_Task_Type_Decl =>
             return Task_Type_Knd;
@@ -687,7 +687,7 @@ package body METRICS.Actions is
             return Generic_Package_Renaming_Knd; -- ???Or proc/func
          when Ada_Generic_Subprogram_Decl =>
             declare
-               R : constant Type_Expression :=
+               R : constant Type_Expr :=
                  F_Returns (F_Subp_Spec (Generic_Subprogram_Decl (Node)));
                --  ???R is null here even for functions
             begin
@@ -700,16 +700,16 @@ package body METRICS.Actions is
             return Package_Renaming_Knd;
          when Ada_Abstract_Subprogram_Decl |
              Ada_Null_Subprogram_Decl |
-             Ada_Renaming_Subprogram_Decl |
+             Ada_Subprogram_Renaming_Decl |
              Ada_Subprogram_Decl =>
             declare
-               R : constant Type_Expression :=
+               R : constant Type_Expr :=
                  F_Returns (F_Subp_Spec (Basic_Subprogram_Decl (Node)));
             begin
                return (if R = null then Procedure_Knd else Function_Knd);
             end;
 
-         when Ada_Expression_Function =>
+         when Ada_Expr_Function =>
             return Expression_Function_Knd;
 
          when others => raise Program_Error;
@@ -748,7 +748,7 @@ package body METRICS.Actions is
          P : constant Ada_Node := Parent (Node);
       begin
          return Kind (P) = Ada_Library_Item
-           and then F_Is_Private (Library_Item (P));
+           and then F_Has_Private (Library_Item (P));
       end;
    end Is_Private;
 
@@ -1456,7 +1456,7 @@ package body METRICS.Actions is
       --  former increments the statement metric, and the latter the
       --  expression metric.
 
-      Expression_Function_Count : Natural := 0;
+      Expr_Function_Count : Natural := 0;
       --  Apparently, gnatmetric doesn't walk expression functions for
       --  complexity metrics.
 
@@ -1678,14 +1678,14 @@ package body METRICS.Actions is
          --  complexity metrics.
 
          if Exception_Handler_Count > 0
-           or else (False and then Expression_Function_Count > 0)
+           or else (False and then Expr_Function_Count > 0)
          then
             return;
          end if;
 
          case Kind (Node) is
-            when Ada_If_Statement |
-              Ada_Elsif_Statement_Part |
+            when Ada_If_Stmt |
+              Ada_Elsif_Stmt_Part |
               Ada_While_Loop_Spec =>
                Inc_Cyc (Complexity_Statement);
 
@@ -1697,33 +1697,33 @@ package body METRICS.Actions is
                   --  ???except in some cases (see No_Static_Loop)
                end if;
 
-            when Ada_Case_Statement =>
+            when Ada_Case_Stmt =>
                Inc_Cyc (Complexity_Statement,
-                 By => Child_Count (F_Case_Alts (Case_Statement (Node))) - 1);
+                 By => Child_Count (F_Case_Alts (Case_Stmt (Node))) - 1);
 
-            when Ada_Exit_Statement =>
-               if F_Condition (Exit_Statement (Node)) /= null then
+            when Ada_Exit_Stmt =>
+               if F_Condition (Exit_Stmt (Node)) /= null then
                   Inc_Cyc (Complexity_Statement);
                end if;
 
-            when Ada_Select_Statement =>
+            when Ada_Select_Stmt =>
                declare
-                  S : constant Select_Statement := Select_Statement (Node);
+                  S : constant Select_Stmt := Select_Stmt (Node);
                   Num_Alts : constant Metric_Nat := Child_Count (F_Guards (S));
                   Num_Else : constant Metric_Nat :=
-                    (if F_Else_Statements (S) = null then 0 else 1);
+                    (if Child_Count (F_Else_Stmts (S)) = 0 then 0 else 1);
                   Num_Abort : constant Metric_Nat :=
-                    (if F_Abort_Statements (S) = null then 0 else 1);
+                    (if Child_Count (F_Abort_Stmts (S)) = 0 then 0 else 1);
                begin
                   Inc_Cyc (Complexity_Statement,
                            By => Num_Alts + Num_Else + Num_Abort - 1);
                end;
 
-            when Ada_Expression_Function =>
+            when Ada_Expr_Function =>
                null; -- It's already set to 1
 
             when Ada_Bin_Op =>
-               if F_Op (Bin_Op (Node)) in Or_Else | And_Then then
+               if F_Op (Bin_Op (Node)) in Ada_Op_Or_Else | Ada_Op_And_Then then
                   Inc_Cyc (Complexity_Expression);
                end if;
 
@@ -1737,7 +1737,7 @@ package body METRICS.Actions is
             when Ada_Quantified_Expr =>
                Inc_Cyc (Complexity_Expression, By => 2);
 
-            when Ada_Loop_Statement =>
+            when Ada_Loop_Stmt =>
                --  Compute M.Vals (Loop_Nesting) as the maximum loop
                --  nesting level for this unit. We only set it for the
                --  innermost unit and at the file level.
@@ -1766,7 +1766,7 @@ package body METRICS.Actions is
          begin
             case Kind (Node) is
                when Ada_Package_Body =>
-                  return F_Statements (Package_Body (Node)) /= null;
+                  return F_Stmts (Package_Body (Node)) /= null;
                when Ada_Entry_Body | Ada_Subprogram_Body | Ada_Task_Body =>
                   return True;
                when others =>
@@ -1884,9 +1884,9 @@ package body METRICS.Actions is
                   return P;
 
                when Ada_Package_Decl
-                 | Ada_Protected_Decl
+                 | Ada_Single_Protected_Decl
                  | Ada_Protected_Type_Decl
-                 | Ada_Task_Decl
+                 | Ada_Single_Task_Decl
                  | Ada_Task_Type_Decl
                  | Ada_Generic_Package_Decl
                =>
@@ -1900,9 +1900,9 @@ package body METRICS.Actions is
                   if Kind (Node) = Ada_Package_Body
                     and then
                       Find_Pragma
-                        (F_Statements (F_Statements (Package_Body (P))))
+                        (F_Stmts (F_Stmts (Package_Body (P))))
                   then
-                     return Ada_Node (F_Statements (Package_Body (P)));
+                     return Ada_Node (F_Stmts (Package_Body (P)));
                   elsif Find_Pragma (F_Decls (Body_Decls (P))) then
                      return P;
                   end if;
@@ -1947,11 +1947,6 @@ package body METRICS.Actions is
       begin
          case Kind (Node) is
             when Ada_Basic_Subprogram_Decl
-              | Ada_Abstract_Subprogram_Decl
-              | Ada_Expression_Function
-              | Ada_Null_Subprogram_Decl
-              | Ada_Renaming_Subprogram_Decl
-              | Ada_Subprogram_Decl
               | Ada_Generic_Subprogram_Decl
             =>
                Prev_Subp_Decl := Node;
@@ -2012,22 +2007,22 @@ package body METRICS.Actions is
             case Kind (Section) is
                when Ada_Compilation_Unit
                  | Ada_Package_Decl
-                 | Ada_Protected_Decl
+                 | Ada_Single_Protected_Decl
                  | Ada_Protected_Type_Decl
-                 | Ada_Task_Decl
+                 | Ada_Single_Task_Decl
                  | Ada_Task_Type_Decl
                  | Ada_Generic_Package_Decl
                  | Ada_Body_Node
                  | Ada_Abstract_Subprogram_Decl
-                 | Ada_Expression_Function
+                 | Ada_Expr_Function
                  | Ada_Null_Subprogram_Decl
-                 | Ada_Renaming_Subprogram_Decl
+                 | Ada_Subprogram_Renaming_Decl
                  | Ada_Subprogram_Decl
                  | Ada_Generic_Subprogram_Decl
                =>
                   Inc (File_M.Vals (Lines_Spark), By => Range_Count);
                   Inc (Global_M.Vals (Lines_Spark), By => Range_Count);
-               when Ada_Private_Part | Ada_Handled_Statements =>
+               when Ada_Private_Part | Ada_Handled_Stmts =>
                   null;
                when others => raise Program_Error;
             end case;
@@ -2064,10 +2059,10 @@ package body METRICS.Actions is
            (Subp_Decl : Ada_Node;
             Has_Contracts, Has_Post : out Boolean)
          is
-            Aspects : constant Aspect_Specification :=
+            Aspects : constant Aspect_Spec :=
               Get_Aspects (Basic_Decl (Subp_Decl));
          begin
-            if Kind (Subp_Decl) = Ada_Expression_Function then
+            if Kind (Subp_Decl) = Ada_Expr_Function then
                --  Expression functions are considered to have
                --  contracts and postconditions.
                Has_Contracts := True;
@@ -2129,9 +2124,9 @@ package body METRICS.Actions is
          --  libadalang, but they are not actually statements, so shouldn't be
          --  counted in the metric.
 
-         if Node.all in Statement_Type'Class
+         if Node.all in Stmt_Type'Class
            and then Node.all not in Label_Type'Class
-           and then Node.all not in Terminate_Statement_Type'Class
+           and then Node.all not in Terminate_Alternative_Type'Class
          then
             if Debug_Flag_W then
                Put ("Statement: \1\n", Short_Image (Node));
@@ -2151,7 +2146,7 @@ package body METRICS.Actions is
             if Node = M.Node and then
               M.Kind in Ada_Subprogram_Decl |
                 Ada_Generic_Subprogram_Decl |
-                Ada_Renaming_Subprogram_Decl |
+                Ada_Subprogram_Renaming_Decl |
                 Ada_Subprogram_Body
             then
                Inc_All (Public_Subprograms);
@@ -2186,13 +2181,13 @@ package body METRICS.Actions is
          case Kind (Node) is
             --  For "with P, Q;" include P and Q
 
-            when Ada_With_Decl =>
+            when Ada_With_Clause =>
                declare
                   Names : constant List_Name :=
-                    F_Packages (With_Decl (Node));
+                    F_Packages (With_Clause (Node));
                begin
                   for I in 1 .. Child_Count (Names) loop
-                     if F_Is_Limited (With_Decl (Node)) then
+                     if F_Has_Limited (With_Clause (Node)) then
                         Include
                           (File_M.Limited_Depends_On,
                            W_Intern (Full_Name (Name (Childx (Names, I)))));
@@ -2211,7 +2206,7 @@ package body METRICS.Actions is
               Ada_Generic_Package_Instantiation |
               Ada_Generic_Renaming_Decl |
               Ada_Package_Renaming_Decl |
-              Ada_Renaming_Subprogram_Decl |
+              Ada_Subprogram_Renaming_Decl |
               Ada_Package_Decl |
               Ada_Generic_Package_Decl |
               Ada_Subprogram_Decl |
@@ -2245,9 +2240,9 @@ package body METRICS.Actions is
                Inc (Exception_Handler_Count);
             when Ada_Quantified_Expr =>
                Inc (Quantified_Expr_Count);
-            when Ada_Expression_Function =>
-               Inc (Expression_Function_Count);
-            when Ada_Loop_Statement =>
+            when Ada_Expr_Function =>
+               Inc (Expr_Function_Count);
+            when Ada_Loop_Stmt =>
                Inc (Loop_Count);
             when Ada_Private_Part =>
                Inc (Private_Part_Count);
@@ -2303,9 +2298,9 @@ package body METRICS.Actions is
                Dec (Exception_Handler_Count);
             when Ada_Quantified_Expr =>
                Dec (Quantified_Expr_Count);
-            when Ada_Expression_Function =>
-               Dec (Expression_Function_Count);
-            when Ada_Loop_Statement =>
+            when Ada_Expr_Function =>
+               Dec (Expr_Function_Count);
+            when Ada_Loop_Stmt =>
                Dec (Loop_Count);
             when Ada_Private_Part =>
                Dec (Private_Part_Count);

@@ -47,11 +47,15 @@ package LAL_Extensions is
       Node_Kind : Ada_Node_Kind_Type) return Ada_Node_Vecs.Elements_Array;
    --  Same as above, except return an array of the relevant nodes
 
+   function Token_Text (Tok : Token_Type) return W_Str;
+   function L_Token_Text (Tok : Token_Type) return W_Str;
+   --  Text of a token. The L_Token_Text is converted to lower case.
+
    function Id_Name
      (Nm : access Ada_Node_Type'Class)
      return W_Str with
      Pre => Kind (Nm) in Ada_Identifier |
-       Ada_Int_Literal | Ada_Dec_Literal | Ada_String_Literal;
+       Ada_Int_Literal | Ada_Real_Literal | Ada_String_Literal;
    function L_Name
      (Nm : access Ada_Node_Type'Class)
      return W_Str with
@@ -70,7 +74,7 @@ package LAL_Extensions is
    function Get_Def_Name (Decl : Ada_Node) return Name;
    --  Returns the defining name of a declaration or body
 
-   function Get_Aspects (Decl : Basic_Decl) return Aspect_Specification;
+   function Get_Aspects (Decl : Basic_Decl) return Aspect_Spec;
    --  Wrapper for F_Aspects functions
 
    function Vis_Part
