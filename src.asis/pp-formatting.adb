@@ -889,49 +889,63 @@ package body Pp.Formatting is
 
             function Match (Tok1, Tok2 : Token) return Boolean is
             begin
-               if Tok1.Kind = Tok2.Kind then
-                  case Tok1.Kind is
-                     when Nil | End_Of_Line | Comment_Kind =>
-                        pragma Assert (False);
-
-                     when Start_Of_Input | End_Of_Input | Blank_Line =>
-                        pragma Assert (Tok1.Normalized = Tok2.Normalized);
-                        return True;
-
-                     when Lexeme | Identifier | Reserved_Word =>
-                        return Tok1.Normalized = Tok2.Normalized;
-
-                     when Numeric_Literal =>
-                        if Tok1.Text = Tok2.Text then
-                           return True;
-                        end if;
-                        declare
-                           Tok1_Text : constant W_Str :=
-                             To_W_Str (Tok1.Text);
-                           Tok2_Text : constant W_Str :=
-                             To_W_Str (Tok2.Text);
-                        begin
-                           if (Arg (Cmd, Decimal_Grouping) = 0
-                                 and then Arg (Cmd, Based_Grouping) = 0)
-                             or else Find (Tok1_Text, "_") /= 0
-                           then
-                              return False;
-                           else
-                              return Tok1_Text = Replace_All (Tok2_Text, "_", "");
-                           end if;
-                        end;
-
-                     when String_Literal =>
-                        if Is_Op_Sym_With_Letters (Tok1.Normalized) then
-                           return Tok1.Normalized = Tok2.Normalized;
-
-                        else
-                           return Tok1.Text = Tok2.Text;
-                        end if;
-                  end case;
+               if Debug_Mode then
+                  Dbg_Out.Output_Enabled := True;
+                  Dbg_Out.Put
+                    ("match ""\1"", ""\2"" ? ",
+                     Str (Tok1.Text).S, Str (Tok2.Text).S);
                end if;
+               return R : Boolean do
+                  if Tok1.Kind = Tok2.Kind then
+                     case Tok1.Kind is
+                        when Nil | End_Of_Line | Comment_Kind =>
+                           raise Program_Error;
 
-               return False;
+                        when Start_Of_Input | End_Of_Input | Blank_Line =>
+                           pragma Assert (Tok1.Normalized = Tok2.Normalized);
+                           R := True;
+
+                        when Lexeme | Identifier | Reserved_Word =>
+                           R := Tok1.Normalized = Tok2.Normalized;
+
+                        when Numeric_Literal =>
+                           if Tok1.Text = Tok2.Text then
+                              R := True;
+                           else
+                              declare
+                                 Tok1_Text : constant W_Str :=
+                                   To_W_Str (Tok1.Text);
+                                 Tok2_Text : constant W_Str :=
+                                   To_W_Str (Tok2.Text);
+                              begin
+                                 if (Arg (Cmd, Decimal_Grouping) = 0
+                                       and then Arg (Cmd, Based_Grouping) = 0)
+                                   or else Find (Tok1_Text, "_") /= 0
+                                 then
+                                    R := False;
+                                 else
+                                    R := Tok1_Text =
+                                      Replace_All (Tok2_Text, "_", "");
+                                 end if;
+                              end;
+                           end if;
+
+                        when String_Literal =>
+                           if Is_Op_Sym_With_Letters (Tok1.Normalized) then
+                              R := Tok1.Normalized = Tok2.Normalized;
+
+                           else
+                              R := Tok1.Text = Tok2.Text;
+                           end if;
+                     end case;
+                  else
+                     R := False;
+                  end if;
+
+                  if Debug_Mode then
+                     Dbg_Out.Put ("\1\n", (if R then "yes" else "No!"));
+                  end if;
+               end return;
             end Match;
 
             Src_Index, Out_Index : Token_Index := 2;
@@ -1444,9 +1458,30 @@ package body Pp.Formatting is
                   Out_Index := Out_Index + 1;
 
                else
+                  --  ????Check for:
+                  --    "generic package G renames" --> "generic G renames"
+                  --  And likewise for procedure and function.
+                  --  This is only needed temporarily, until the lal tree is
+                  --  fixed.
+
+                  if not Disable_Final_Check
+                    and then (Src_Tok.Normalized = Name_Package
+                                or else Src_Tok.Normalized = Name_Procedure
+                                or else Src_Tok.Normalized = Name_Function)
+                    and then Out_Tok.Kind = Identifier
+                  then
+                     pragma Assert
+                       (Src_Tokens (Src_Index - 1).Normalized = Name_Generic);
+                     pragma Assert
+                       (Out_Tokens (Out_Index - 1).Normalized = Name_Generic);
+                     Insert (Out_Buf, " " & To_W_Str (Src_Tok.Normalized));
+                     Move_Past_Src_Tok;
+                     Src_Index := Src_Index + 1;
+                     Src_Tok   := Src_Tokens (Src_Index);
+
                   --  Check for "end;" --> "end Some_Name;" case
 
-                  if Src_Tok.Text = Name_Semicolon
+                  elsif Src_Tok.Text = Name_Semicolon
                     and then
                       Prev_Lexeme (Src_Tokens, Src_Index).Normalized =
                       Name_End
@@ -1467,7 +1502,9 @@ package body Pp.Formatting is
                         Out_Tok   := Out_Tokens (Out_Index);
                         pragma Assert (Out_Tok.Kind in Identifier | String_Literal);
                      end loop;
-                     pragma Assert (Out_Tok.Normalized = Name_Semicolon);
+                     pragma Assert
+                       (Disable_Final_Check
+                          or else Src_Tok.Normalized = Name_Semicolon);
 
                   --  Check for "end Some_Name;" --> "end;" case. This only happens
                   --  when the --no-end-id switch was given. Here, the name was
@@ -1495,7 +1532,9 @@ package body Pp.Formatting is
                         Src_Tok   := Src_Tokens (Src_Index);
                         pragma Assert (Src_Tok.Kind in Identifier | String_Literal);
                      end loop;
-                     pragma Assert (Src_Tok.Normalized = Name_Semicolon);
+                     pragma Assert
+                       (Disable_Final_Check
+                          or else Src_Tok.Normalized = Name_Semicolon);
 
                   --  Check for "declare begin" --> "begin" case, with a possible
                   --  comment between "declare" and "begin".
@@ -1504,7 +1543,8 @@ package body Pp.Formatting is
                     and then Out_Tok.Normalized = Name_Begin
                   then
                      pragma Assert
-                       (Next_Lexeme (Src_Tokens, Src_Index).Normalized =
+                       (Disable_Final_Check or else
+                          Next_Lexeme (Src_Tokens, Src_Index).Normalized =
                         Name_Begin);
                      Insert_Declare_Or_Private ("declare");
 
@@ -1514,8 +1554,10 @@ package body Pp.Formatting is
                     and then Out_Tok.Normalized = Name_End
                   then
                      pragma Assert
-                       (Next_Lexeme (Src_Tokens, Src_Index).Normalized =
-                        Name_End);
+                       (Disable_Final_Check
+                          or else
+                        Next_Lexeme (Src_Tokens, Src_Index).Normalized =
+                          Name_End);
                      Insert_Declare_Or_Private ("private");
 
                   --  Check for "T'((X, Y, Z))" --> "T'(X, Y, Z)" case
@@ -1572,9 +1614,24 @@ package body Pp.Formatting is
                      Move_Past_Out_Tok;
                      Out_Index := Out_Index + 1;
 
-                  --  Else print out debugging information and crash. This avoids
-                  --  damaging the source code in case of bugs.
+                  --  Else print out debugging information and crash. This
+                  --  avoids damaging the source code in case of bugs. However,
+                  --  if the Disable_Final_Check debug flag is set, try to
+                  --  continue by skipping one source token, or one output
+                  --  token.
 
+                  elsif Disable_Final_Check then
+                     Move_Past_Src_Tok;
+                     Src_Index := Src_Index + 1;
+                     if Src_Index < Last_Index (Src_Tokens) then
+                        Src_Tok := Src_Tokens (Src_Index);
+                     else
+                        while not At_End (Out_Buf) loop
+                           Move_Forward (Out_Buf); -- ????Move_Past_Char;
+                        end loop;
+
+                        goto Done;
+                     end if;
                   else
                      Raise_Token_Mismatch
                        ("Inserting",
@@ -1594,6 +1651,7 @@ package body Pp.Formatting is
 
             pragma Assert (Point (Out_Buf) = Last_Position (Out_Buf));
             pragma Assert (Cur (Out_Buf) = NL);
+            pragma Debug (Assert_No_Trailing_Blanks (To_W_Str (Out_Buf)));
             Move_Past_Out_Tok;
 
             pragma Assert (Cur_Indentation = 0);
@@ -1604,6 +1662,8 @@ package body Pp.Formatting is
             pragma Assert (Cur_Line = Last_Index (Line_Breaks) + 1);
             pragma Assert (EOL_Cur_Line = Last_Index (EOL_Line_Breaks) + 1);
 
+            <<Done>> null;
+
             pragma Assert (Line_Break_Sorting.Is_Sorted (All_Line_Breaks));
             pragma Assert (Line_Break_Sorting.Is_Sorted (Temp_Line_Breaks));
             Line_Break_Sorting.Merge
@@ -1611,8 +1671,7 @@ package body Pp.Formatting is
                Source => Temp_Line_Breaks);
             pragma Assert (Is_Empty (Temp_Line_Breaks));
             pragma Assert (Line_Break_Sorting.Is_Sorted (All_Line_Breaks));
-            pragma Assert (Qual_Nesting = 0);
-            pragma Debug (Assert_No_Trailing_Blanks (To_W_Str (Out_Buf)));
+            pragma Assert (Disable_Final_Check or else Qual_Nesting = 0);
             Reset (Out_Buf);
             Clear (Out_Tokens);
          end Insert_Comments_And_Blank_Lines;
@@ -1873,7 +1932,12 @@ package body Pp.Formatting is
                               Have_Insertion_Point := True;
                               Insertion_Point := Cur_Tab.Mark;
                               IP_Index_In_Line := Cur_Tab.Index_In_Line;
-                           else
+
+                           --  Ignore if too many tabs in one line:
+
+                           elsif Last_Index (Cur_Line_Tabs) <
+                             Tab_Index_In_Line'Last
+                           then
                               Append (Cur_Line_Tabs, Cur_Tab_Index);
                               if Cur_Tab.Index_In_Line /=
                                 Last_Index (Cur_Line_Tabs)
@@ -2457,68 +2521,77 @@ package body Pp.Formatting is
 
          function Match (Tok1, Tok2 : Token) return Boolean is
          begin
-            if Tok1.Kind = Tok2.Kind then
-               case Tok1.Kind is
-                  when Nil | End_Of_Line =>
-                     raise Program_Error;
+            return R : Boolean do
+               if Tok1.Kind = Tok2.Kind then
+                  case Tok1.Kind is
+                     when Nil | End_Of_Line =>
+                        raise Program_Error;
 
-                  when Start_Of_Input | End_Of_Input | Blank_Line =>
-                     pragma Assert (Tok1.Normalized = Tok2.Normalized);
-                     return True;
+                     when Start_Of_Input | End_Of_Input | Blank_Line =>
+                        pragma Assert (Tok1.Normalized = Tok2.Normalized);
+                        R := True;
 
-                  when Comment_Kind =>
-                     return
-                       (Arg (Cmd, Comments_Gnat_Beginning)
-                        or else Tok1.Leading_Blanks = Tok2.Leading_Blanks)
-                       and then Tok1.Text = Tok2.Text;
+                     when Comment_Kind =>
+                        R :=
+                          (Arg (Cmd, Comments_Gnat_Beginning)
+                           or else Tok1.Leading_Blanks = Tok2.Leading_Blanks)
+                          and then Tok1.Text = Tok2.Text;
 
-                  when Lexeme | Identifier | Reserved_Word =>
-                     return Tok1.Normalized = Tok2.Normalized;
+                     when Lexeme | Identifier | Reserved_Word =>
+                        R := Tok1.Normalized = Tok2.Normalized;
 
-                  when Numeric_Literal =>
-                     if Tok1.Text = Tok2.Text then
-                        return True;
-                     end if;
-                     declare
-                        Tok1_Text : constant W_Str := To_W_Str (Tok1.Text);
-                        Tok2_Text : constant W_Str := To_W_Str (Tok2.Text);
-                     begin
-                        if (Arg (Cmd, Decimal_Grouping) = 0
-                              and then Arg (Cmd, Based_Grouping) = 0)
-                          or else Find (Tok1_Text, "_") /= 0
-                        then
-                           return False;
+                     when Numeric_Literal =>
+                        if Tok1.Text = Tok2.Text then
+                           R := True;
                         else
-                           return Tok1_Text = Replace_All (Tok2_Text, "_", "");
+                           declare
+                              Tok1_Text : constant W_Str :=
+                                To_W_Str (Tok1.Text);
+                              Tok2_Text : constant W_Str :=
+                                To_W_Str (Tok2.Text);
+                           begin
+                              if (Arg (Cmd, Decimal_Grouping) = 0
+                                    and then Arg (Cmd, Based_Grouping) = 0)
+                                or else Find (Tok1_Text, "_") /= 0
+                              then
+                                 R := False;
+                              else
+                                 R := Tok1_Text =
+                                   Replace_All (Tok2_Text, "_", "");
+                              end if;
+                           end;
                         end if;
-                     end;
 
-                  when String_Literal =>
-                     if True or else Is_Op_Sym_With_Letters (Tok1.Normalized) then
-                        return Tok1.Normalized = Tok2.Normalized;
-                     else
-                        return Tok1.Text = Tok2.Text;
-                     end if;
-               end case;
+                     when String_Literal =>
+                        if True
+                          or else Is_Op_Sym_With_Letters (Tok1.Normalized)
+                        then
+                           R := Tok1.Normalized = Tok2.Normalized;
+                        else
+                           R := Tok1.Text = Tok2.Text;
+                        end if;
+                  end case;
 
-            elsif Tok1.Kind = End_Of_Line_Comment
-              and then Tok2.Kind in Whole_Line_Comment
-            then
-               return Tok1.Text = Tok2.Text
-                 and then
-                 (if
-                    not Arg (Cmd, Comments_Gnat_Beginning)
-                  then
-                    Tok1.Leading_Blanks = Tok2.Leading_Blanks);
-               --  ???This case will be needed if/when we turn end-of-line
-               --  comments that don't fit into whole-line comments. That
-               --  transformation seems questionable, because it would damage
-               --  idempotency: first run of gnatpp turns an end-of-line comment
-               --  into a whole-line-comment, and then a second run considers it
-               --  part of a comment paragraph and fills it.
-            end if;
-
-            return False;
+               elsif Tok1.Kind = End_Of_Line_Comment
+                 and then Tok2.Kind in Whole_Line_Comment
+               then
+                  R := Tok1.Text = Tok2.Text
+                    and then
+                    (if
+                       not Arg (Cmd, Comments_Gnat_Beginning)
+                     then
+                       Tok1.Leading_Blanks = Tok2.Leading_Blanks);
+                  --  ???This case will be needed if/when we turn end-of-line
+                  --  comments that don't fit into whole-line comments. That
+                  --  transformation seems questionable, because it would
+                  --  damage idempotency: first run of gnatpp turns an
+                  --  end-of-line comment into a whole-line-comment, and then a
+                  --  second run considers it part of a comment paragraph and
+                  --  fills it.
+               else
+                  R := False;
+               end if;
+            end return;
          end Match;
 
          Src_Index, Out_Index : Token_Index := 2;

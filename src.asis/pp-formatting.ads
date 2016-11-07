@@ -167,7 +167,7 @@ package Pp.Formatting is
          --  point" indicated by "&". This feature provides for
          --  right-justification.
          --  See Tree_To_Ada.Insert_Alignment.Calculate_Num_Blanks.Process_Line in
-         --  ada_trees-formatting-tree_to_ada.adb for more information.
+         --  pp-formatting.adb for more information.
       end record;
 
       type Tab_Index is new Positive;

@@ -49,6 +49,28 @@ pragma Warnings (On);
 
 package body Pp.Actions is
 
+--  Following are to get around "creative" naming in libadalang.
+Ada_If_Path : constant Ada_Node_Kind_Type := Ada_If_Stmt;
+Ada_Elsif_Path : constant Ada_Node_Kind_Type := Ada_Elsif_Stmt_Part;
+Ada_Ordinary_Type_Declaration : constant Ada_Node_Kind_Type := Ada_Type_Decl;
+Ada_Task_Type_Declaration : constant Ada_Node_Kind_Type := Ada_Task_Type_Decl;
+Ada_Protected_Type_Declaration : constant Ada_Node_Kind_Type := Ada_Protected_Type_Decl;
+Ada_Single_Task_Declaration : constant Ada_Node_Kind_Type := Ada_Single_Task_Decl;
+Ada_Single_Protected_Declaration : constant Ada_Node_Kind_Type := Ada_Single_Protected_Decl;
+Ada_Procedure_Body_Declaration : constant Ada_Node_Kind_Type := Ada_Subprogram_Body;
+Ada_Function_Body_Declaration : constant Ada_Node_Kind_Type := Ada_Subprogram_Body;
+Ada_Package_Declaration : constant Ada_Node_Kind_Type := Ada_Package_Decl;
+Ada_Package_Body_Declaration : constant Ada_Node_Kind_Type := Ada_Package_Body;
+Ada_Task_Body_Declaration : constant Ada_Node_Kind_Type := Ada_Task_Body;
+Ada_Protected_Body_Declaration : constant Ada_Node_Kind_Type := Ada_Protected_Body;
+Ada_Entry_Body_Declaration : constant Ada_Node_Kind_Type := Ada_Entry_Body;
+Ada_Generic_Procedure_Declaration : constant Ada_Node_Kind_Type := Ada_Generic_Subprogram_Decl;
+Ada_Generic_Function_Declaration : constant Ada_Node_Kind_Type := Ada_Generic_Subprogram_Decl;
+Ada_Generic_Package_Declaration : constant Ada_Node_Kind_Type := Ada_Generic_Package_Decl;
+Ada_Enumeration_Type_Definition : constant Ada_Node_Kind_Type := Ada_Enum_Type_Decl;
+Ada_Record_Representation_Clause : constant Ada_Node_Kind_Type := Ada_Record_Rep_Clause;
+Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
+
    function Image (X : Integer) return String
      renames ASIS_UL.String_Utilities.Image;
 
@@ -73,6 +95,7 @@ package body Pp.Actions is
    end Stop;
 
    procedure knd (X : Ada_Node);
+   procedure psloc (X : Ada_Node);
    procedure nn (X : Ada_Node); -- was pp, but that conflicts with pkg name
    procedure ppp (X : Ada_Node);
    procedure Put_Ada_Node_Array (X : Ada_Node_Array);
@@ -89,8 +112,22 @@ package body Pp.Actions is
    procedure knd (X : Ada_Node) is
       use ASIS_UL.Dbg_Out;
    begin
+      ASIS_UL.Dbg_Out.Output_Enabled := True;
       Put ("\1\n", Kind (X)'Img);
    end knd;
+
+   procedure psloc (X : Ada_Node) is
+
+      function Lines_String
+        (Sloc_Range : Slocs.Source_Location_Range) return String is
+         (Image (Integer (Sloc_Range.Start_Line)) & ": " &
+          Image (Integer (Sloc_Range.End_Line)));
+
+      use ASIS_UL.Dbg_Out;
+   begin
+      ASIS_UL.Dbg_Out.Output_Enabled := True;
+      Put ("\1\n", Lines_String (Sloc_Range (X)));
+   end psloc;
 
    procedure nn (X : Ada_Node) is
       use ASIS_UL.Dbg_Out;
@@ -498,33 +535,28 @@ package body Pp.Actions is
    --  Note: If you want to add new special characters, look at the case
    --  statement in Interpret_Template.
 
-   type Ada_Template_Ptr is access Ada_Template;
-
-   function Handled_Seq (Name_Subtree : Ada_Template) return Ada_Template;
-   --  Template for a handled_sequence_of_statements. Name_Subtree is the index
-   --  of the subtree that is the defining name, which is used to insert that
-   --  name after "end", as in "end Package_Name;".
+   type Ada_Template_Ptr is access all Ada_Template;
 
    --  ???Use some renamings for now, to ease the transition from ASIS to
    --  libadalang:
    subtype Ada_Tree_Kind is Ada_Node_Kind_Type;
    subtype Opt_ASIS_Elems is Ada_Node_Kind_Type;
-   subtype Flat_Attribute_Reference_Kinds is Ada_Node_Kind_Type;
-   subtype Flat_Pragma_Kinds is Ada_Node_Kind_Type;
    subtype Query_Index is Positive;
    subtype Query_Count is Natural;
    subtype Ada_Tree_Base is Ada_Node;
    subtype Ada_Tree is Ada_Node;
    subtype Ada_Tree_Array is Ada_Node_Arrays.Array_Type;
    function Is_Nil (T : Ada_Node) return Boolean is (T = null);
-   function Subtree_Count (T : Ada_Tree) return Query_Count is
-     (if T = null then 0 else Last_Child_Index (T));
+   function Subtree_Count
+     (T : access Ada_Node_Type'Class) return Query_Count is
+       (if T = null then 0 else Last_Child_Index (T));
    function Empty_Tree_Array return Ada_Node_Arrays.Array_Type is
      ((1 .. 0 => <>));
-   function Subtrees (T : Ada_Tree) return Ada_Tree_Array is
+   function Subtrees (T : access Ada_Node_Type'Class) return Ada_Tree_Array is
      (if T = null then Empty_Tree_Array else Children (T));
-   function Subtree (T : Ada_Tree; X : Query_Index) return Ada_Tree is
-     (Child (T, X));
+   function Subtree
+     (T : access Ada_Node_Type'Class; X : Query_Index) return Ada_Tree is
+       (Child (T, X));
 
    function Template_For_Kind (Kind : Ada_Tree_Kind) return Ada_Template_Ptr;
 
@@ -544,26 +576,9 @@ package body Pp.Actions is
    --  All the L functions form a template by concatenating together a bunch of
    --  lines.
 
-   function Handled_Seq (Name_Subtree : Ada_Template) return Ada_Template is
-   begin
-      return "?begin$" &
-        "{~;$~;$}~" &
-        "?exception$" &
-        "{~$~}~" &
-        "end?" &
-        Name_Subtree &
-        " ~~~";
-      --  The name after "end" is optional; it is often missing for
-      --  block_statements, for example.
-   end Handled_Seq;
+   function Empty_T return Ada_Template_Ptr is (L (""));
 
-   Handled_Seq_1 : constant Ada_Template := Handled_Seq ("1");
-   Handled_Seq_2 : constant Ada_Template := Handled_Seq ("2");
-   Handled_Seq_3 : constant Ada_Template := Handled_Seq ("3");
-
-   Aspects : constant Ada_Template := "? with$" & "{~,$~}~";
-   --  ???We could try something like the following: return "? with[@1 ~,@1
-   --  ~]~";
+   Aspects : constant Ada_Template := "?~~~";
 
    Labels : constant Ada_Template := "?<<~>> <<~>>$~";
 
@@ -620,28 +635,333 @@ package body Pp.Actions is
 
    function Template_For_Kind (Kind : Ada_Tree_Kind) return Ada_Template_Ptr is
    begin
-      return
-        (case Kind is
-           when Ada_Library_Item =>
-             L ("!"), -- misses "private"
-           when Ada_Package_Decl =>
---             L ("package ![@",
---                Aspects,
---                "]@ is$",
---                "?${~;$~};$~",
---                "?$private$",
---                "{~;$~};$~",
---                "end !1"),
+      return (case Kind is
+         when Ada_List => null,
+         when Ada_Subprogram_Spec => L ("? ~~~? @(~; ~)~?[@1 return] ~~~"),
+        --  F_Name is optional for access-to-subp.
+         when Ada_Aggregate_Member => L ("?~ ^|@ ~~"),
+         when Ada_Constrained_Array_Indices =>
+           L ("(?~, ~~)"),
+         when Ada_Unconstrained_Array_Indices =>
+           L ("(?~ range <>,@ ~ range <>~)"),
+         when Ada_Aspect_Assoc => L ("!? => ~~~"),
+         when Ada_At_Clause => L ("for ! use at !"),
+         when Ada_Attribute_Def_Clause => L ("for ! use !"),
+         when Ada_Enum_Rep_Clause => L ("for ! use !"),
+         when Ada_Record_Rep_Clause => L ("for ! use record? at mod ~~;~$", "{?~;$~;$~}", "end record"),
+         when Ada_Aspect_Spec => L ("? with$" & "{~,$~}~"),
+   --  ???We could try something like the following: return "? with[@1 ~,@1
+   --  ~]~";
+         when Ada_Component_Decl => L ("?~, ~~ : !? := ~~~", Aspects),
+         when Ada_Param_Spec => L ("?~, ~~ : ?~~ ~?~~ ~!? := ~~~"),
+         when Ada_Base_Package_Decl | Ada_Package_Decl =>
              L ("package ![@",
                 Aspects,
                 "]@ is$",
                 "!",
-                "?$private$",
-                "{~~}~",
+                "!",
                 "end !1/"),
-           when Ada_Public_Part | Ada_Private_Part =>
-             L ("?{~;$~};$~"),
-           when others => null);
+         when Ada_Abstract_Subprogram_Decl => L ("?~~ ~procedure!", " is abstract", Aspects),
+         when Ada_Expr_Function => L ("?~~ ~procedure!", " is[@ (!)]", Aspects),
+         when Ada_Null_Subprogram_Decl => L ("?~~ ~procedure!", " is null", Aspects),
+         when Ada_Subprogram_Renaming_Decl => L ("?~~ ~procedure!!", Aspects),
+         when Ada_Subprogram_Decl => L ("?~~ ~procedure!" & Aspects),
+         when Ada_Subprogram_Body_Stub => L ("?~~ ~procedure! is separate" & Aspects),
+         when Ada_Formal_Subp_Decl => L ("with procedure!? is ~~~? is ~~~" & Aspects),
+             --  Here and elsewhere, the "procedure" gets replaced with
+             --  "function" when appropriate.
+
+         when Ada_Package_Body_Stub => L ("package body ! is separate", Aspects),
+         when Ada_Protected_Body_Stub => L ("protected body ! is separate", Aspects),
+         when Ada_Task_Body_Stub => L ("task body ! is separate", Aspects),
+         when Ada_Package_Body =>
+             L ("package body ![@",
+                Aspects,
+                "]@ is$",
+                "!",
+                "!",
+                "end !1"),
+         when Ada_Protected_Body => L ("protected body !", Aspects, " is$", "?${~;$~}$~", "end !1"),
+         when Ada_Subprogram_Body =>
+             L ("?~~ ~procedure!",
+                Aspects,
+                "@ is$",
+                "!",
+                "!",
+                "end !"),
+               --  The last "!" refers to the name of the procedure, which
+               --  replaces the F_End_Id (see Do_Subp_Decl). This is necessary
+               --  because the name of the subprogram is buried in a subtree.
+
+         when Ada_Task_Body =>
+             L ("task body !",
+                Aspects,
+                " is$",
+                "!",
+                "!",
+                "end !1"),
+         when Ada_Discriminant_Spec => L ("?~, ~~ : !? := ~~~"),
+         when Ada_Entry_Decl => L ("?~~ ~entry !?[@ (~~)]~? @(~; ~)~", Aspects),
+         when Ada_Entry_Body =>
+             L ("entry !?[@ (~~)]~? @(~; ~)~[@ when !@ is]$",
+                "!",
+                "!",
+                "end !1"),
+         when Ada_Enum_Literal_Decl => L ("!"),
+         when Ada_Exception_Decl =>
+               L ("?~, ~~ : exception!", Aspects),
+         when Ada_Generic_Function_Instantiation => L ("function ! is new !? @(~, ~)~", Aspects),
+                 --  ???? We need to prepend "?~~ ~?~~ ~" to
+                 --  Ada_Generic_Function_Instantiation and Ada_Generic_Procedure_Instantiation,
+                 --  which are currently missing from the tree.
+         when Ada_Generic_Package_Instantiation => L ("package ! is new !? @(~, ~)~", Aspects),
+         when Ada_Generic_Procedure_Instantiation => L ("procedure ! is new !? @(~, ~)~", Aspects),
+         when Ada_Generic_Package_Decl =>
+             L ("generic$",
+                "{?~;$~;$~}", -- Should be generic_formal_part, not a list????
+                "!"),
+         when Ada_Generic_Renaming_Decl =>
+               L ("generic ! renames !", Aspects),
+                 --  ????We need an indication of whether it's a
+                 --  package, procedure, of function.
+         when Ada_Generic_Subprogram_Decl => L ("generic$", "{?~;$~;$~}", "procedure!", Aspects),
+         when Ada_Number_Decl => L ("?~, ~~ ^: constant ^2:=[@ !]"),
+         when Ada_Object_Decl =>
+               L ("?~, ~~ :? ~~~? ~~~? ~~~ !? := ~~~!", Aspects),
+         when Ada_Package_Renaming_Decl => L ("package !!", Aspects),
+         when Ada_Single_Protected_Decl =>
+                 L ("protected !", Aspects, " is$", "!", "end !1"),
+         when Ada_Protected_Type_Decl =>
+             L ("protected type !!",
+                Aspects,
+                " is? new ~ and ~ with~$",
+                "!",
+                "end !1"),
+         when Ada_Protected_Def =>
+               L ("!$",
+                  "!$/"),
+         when Ada_Single_Task_Decl =>
+               L ("task !", Aspects, "? is$~~~"),
+         when Ada_Task_Type_Decl =>
+             L ("task type !!",
+                Aspects,
+                "? is$~~~"),
+         when Ada_Task_Def =>
+               L ("? new ~ and ~ with~$",
+                "!$",
+                "!$",
+                "end? ~~~"), -- ???End id is in wrong case.
+
+         when Ada_Enum_Type_Decl => L ("type ! is", "[ @(?~,@ ~~)", Aspects, "]"),
+         when Ada_Type_Decl => L ("type !! is[@ !", Aspects, "]"),
+         when Ada_Subtype_Decl => L ("subtype ! is[@ !", Aspects, "]"),
+         when Ada_Compilation_Unit => null,
+         when Ada_Component_Def => L ("?~~ ~!"),
+         when Ada_Delta_Constraint => L ("delta !? range ~~~"),
+         when Ada_Digits_Constraint => L ("digits !? range ~~~"),
+         when Ada_Discriminant_Association => null,
+         when Ada_Discriminant_Constraint | Ada_Index_Constraint =>
+               L ("?@(~,@ ~)~"),
+         when Ada_Range_Constraint => L ("range !"),
+         when Ada_Declarative_Part => L ("?${~;$~};$$~"),
+         when Ada_Private_Part => L ("?$private${~;$~};$~"),
+         when Ada_Public_Part => L ("?{~;$~};$~"),
+         when Ada_Elsif_Expr_Part => L ("elsif[@ !]@ then[@ !]"),
+         when Ada_Entry_Index_Spec => L ("for ! in[@ !]"),
+         when Ada_Exception_Handler =>
+             L ("when? ~~ :~ ?~ | ~~ =>$", "{?~;$~;$~}"),
+         when Ada_Explicit_Deref => L ("!.all"),
+         when Ada_Aggregate => L ("@(?~~ with @~", "!)"),
+         when Ada_Allocator => L ("new? @(~~)~ !"),
+         when Ada_Attribute_Ref => L ("!'[@!? @(~, ~)~]"),
+               --  ???This includes function calls to attributes, such as
+               --  T'Max(X, Y), which isn't really right.
+         when Ada_Bin_Op => null,
+         when Ada_Call_Expr => L ("!? @(~, ~)~"),
+         when Ada_Case_Expr => L ("case ! is[@ ?@~,@ ~~]"),
+         when Ada_Case_Expr_Alternative => L ("when[ ?~ |@ ~~] =>[@ !]"),
+         when Ada_Box_Expr => L ("<>"),
+         when Ada_If_Expr => L ("if[@ !]@ then[@ !]", "?[ @~ @~]~", "? else[@ ~~]~"),
+         when Ada_Membership_Expr => L ("! ![@ ?[@~ |@ ~]~]"),
+         when Ada_Dotted_Name => L ("![@.!]"),
+         when Ada_Char_Literal => null,
+         when Ada_Identifier => null,
+         when Ada_String_Literal => null,
+         when Ada_Null_Literal => L ("null"),
+         when Ada_Real_Literal => null,
+         when Ada_Int_Literal => null,
+         when Ada_Qual_Expr => L ("!'[@(!)]"),
+         when Ada_Quantified_Expr => L ("for ! ! => !"),
+         when Ada_Raise_Expr => L ("raise !?[@ with ~~]~"),
+         when Ada_Un_Op => null,
+         when Ada_Handled_Stmts => null,
+         when Ada_Library_Item => L ("?~~ ~!"),
+         when Ada_Null_Component_Decl => L ("null"),
+         when Ada_Others_Designator => L ("others"),
+         when Ada_Param_Assoc => null,
+         when Ada_Param_List => L ("?~,@ ~~"),
+         when Ada_Pragma_Argument_Assoc => null,
+         when Ada_Pragma_Node => null,
+         when Ada_Component_Clause => null, -- ?
+         when Ada_Renaming_Clause => L ("? renames ~~~"),
+         when Ada_Select_Stmt =>
+               L ("select",
+                  "!",
+                  "?else$", "{~;$~;$}~",
+                  "?then abort$", "{~;$~;$}~",
+                  "end select"),
+         when Ada_Select_When_Part => null,
+         when Ada_Accept_Stmt =>
+             L ("accept !? @(~~)~? @(~; ~)~",
+                "!",
+                "end !1"),
+         when Ada_Block_Stmt =>
+                   L ("?~~ :$~",
+                      "?declare$",
+                      "{~;$~;$$}~", -- ????Should be Declarative_Part, not a list.
+                      "!",
+                      "end?1 ~~~"),
+         when Ada_Component_List => L ("{?~;$~;$~}", "{?~~;$~}"),
+         when Ada_Variant =>
+                     L ("when[ ?~ ^|@ ~~] =>$", "{?~;$~$~}"),
+         when Ada_Case_Stmt_Alternative =>
+                     L ("when[ ?~ ^|@ ~~] =>$", "{?~;$~;$~}"),
+         when Ada_Case_Stmt | Ada_Variant_Part =>
+                       L ("case !@ is$", "{?~~~}", "end case"),
+         when Ada_Extended_Return_Stmt =>
+             L ("return[@ !]",
+                "!",
+                "end return"),
+         when Ada_If_Stmt =>
+                   L ("if[ !]@ then$",
+                      "{?~;$~;$~}",
+                      "?~~~",
+                      "?else$",
+                      "{~;$~;$}~",
+                      "end if"),
+         when Ada_Elsif_Stmt_Part => L ("elsif[ !]@ then$", "{?~;$~;$~}"),
+         when Ada_Loop_Stmt =>
+                     L ("?~~ :$~?~~ ~loop$", "{?~;$~;$~}", "end loop?1 ~~~"),
+         when Ada_For_Loop_Spec => null,
+         when Ada_While_Loop_Spec => L ("while[ !]@"),
+         when Ada_Abort_Stmt => L ("abort ?~, ~~"),
+         when Ada_Assign_Stmt => L ("! ^:=[@ !]"),
+         when Ada_Call_Stmt => L ("!"),
+         when Ada_Delay_Stmt => L ("delay? ~~~ !"),
+         when Ada_Exit_Stmt => L ("exit? ~~~? when[ ~~]~"),
+         when Ada_Goto_Stmt => L ("goto !"),
+         when Ada_Label => null,
+         when Ada_Null_Stmt => L ("!"),
+         when Ada_Raise_Stmt => L ("raise? ~~~?[@ with ~~]~"),
+         when Ada_Requeue_Stmt => L ("requeue !? ~~~"),
+         when Ada_Return_Stmt => L ("return[? ~~~]"),
+         when Ada_Terminate_Alternative => L ("terminate"),
+         when Ada_Subunit => L ("separate (!)$", "!"),
+         when Ada_Type_Access_Def => L ("?~~ ~access? ~~~? ~~~ !? ~~~"),
+         when Ada_Array_Type_Def => L ("array[@ !] of !"),
+         when Ada_Derived_Type_Def =>
+             L ("?~~ ~?~~ ~?~~ ~new !? and ~ and ~~? with@ ~~~? ~~~"),
+
+         when Ada_Formal_Discrete_Type_Def => L ("@(<>)"),
+         when Ada_Incomplete_Type_Def => L ("?~~~"),
+         when Ada_Interface_Type_Def => L ("?~~ ~interface? and ~ and ~~"),
+         when Ada_Mod_Int_Type_Def => L ("mod !"),
+         when Ada_Private_Type_Def => L ("?~~ ~?~~ ~?~~ ~private"),
+         when Ada_Decimal_Fixed_Point_Def => L ("delta ! digits !? range ~~~"),
+         when Ada_Floating_Point_Def => L ("digits !? range ~~~"),
+         when Ada_Ordinary_Fixed_Point_Def => L ("delta !? range ~~~"),
+         when Ada_Record_Def => L ("record$", "!", "end record"),
+         when Ada_Record_Type_Def => L ("?~~ ~?~~ ~?~~ ~!"),
+                 --  ???LAL: Separate node for "null record" would be better
+                 --  for allowing illegal syntax ("record end record;")
+
+         when Ada_Signed_Int_Type_Def => L ("range !"),
+         when Ada_Known_Discriminant_Part => L ("? @(~; ~)~@"),
+         when Ada_Unknown_Discriminant_Part => L (" @(<>)"),
+         when Ada_Access_To_Subprogram_Def => L ("?~~ ~access? ~~~ procedure!"),
+--         when Ada_Type_Access_Expression => L ("access? ~~~? ~~~ !"),
+         when Ada_Anonymous_Type_Decl => L ("//!", Aspects),
+--         when Ada_Type_Ref => L ("!? ~~~"),
+         when Ada_Subtype_Indication => L ("?~~ ~!? ~~~"),
+         when Ada_Anonymous_Type => L ("!"),
+         when Ada_Use_Package_Clause => L ("use[@ ?~,@ ~~]"),
+         when Ada_Use_Type_Clause => L ("use? ~~~ type[@ ?~,@ ~~]"),
+         when Ada_With_Clause => L ("?~~ ~?~~ ~with ^?~, ~~"),
+         when Ada_Paren_Expr => L ("@(!)"),
+   --  Note: the tab ('^') is ignored for limited/private 'with's (see
+   --  Append_Tab).
+
+         when Ada_Abort_Absent => null,
+         when Ada_Abort_Present => L ("with abort"),
+         when Ada_Abstract_Absent => null,
+         when Ada_Abstract_Present => L ("abstract"),
+         when Ada_Aliased_Absent => null,
+         when Ada_Aliased_Present => L ("aliased"),
+         when Ada_All_Absent => null,
+         when Ada_All_Present => L ("all"),
+         when Ada_Constant_Absent => null,
+         when Ada_Constant_Present => L ("constant"),
+         when Ada_Mode_Default => null,
+         when Ada_Mode_In => L ("in"),
+         when Ada_Mode_In_Out => L ("in out"),
+         when Ada_Mode_Out => L ("out"),
+         when Ada_Interface_Kind_Limited => L ("limited"),
+         when Ada_Interface_Kind_Protected => L ("protected"),
+         when Ada_Interface_Kind_Synchronized => L ("synchronized"),
+         when Ada_Interface_Kind_Task => L ("task"),
+         when Ada_Iter_Type_In => L ("in"),
+         when Ada_Iter_Type_Of => L ("of"),
+         when Ada_Limited_Absent => null,
+         when Ada_Limited_Present => L ("limited"),
+         when Ada_Not_Null_Absent => null,
+         when Ada_Not_Null_Present => L ("not null"),
+
+         when Ada_Op_In => L ("in"),
+         when Ada_Op_Not_In => L ("not in"),
+
+         when Ada_Op_And => null,
+         when Ada_Op_Or => null,
+         when Ada_Op_Or_Else => null,
+         when Ada_Op_And_Then => null,
+         when Ada_Op_Concat => null,
+         when Ada_Op_Xor => null,
+         when Ada_Op_Abs => null,
+         when Ada_Op_Not => null,
+         when Ada_Op_Pow => null,
+         when Ada_Op_Mult => null,
+         when Ada_Op_Div => null,
+         when Ada_Op_Mod => null,
+         when Ada_Op_Rem => null,
+         when Ada_Op_Plus => null,
+         when Ada_Op_Minus => null,
+         when Ada_Op_Eq => null,
+         when Ada_Op_Neq => null,
+         when Ada_Op_Lt => null,
+         when Ada_Op_Lte => null,
+         when Ada_Op_Gt => null,
+         when Ada_Op_Gte => null,
+         when Ada_Op_Ellipsis => null,
+
+         when Ada_Overriding_Not_Overriding => L ("not overriding"),
+         when Ada_Overriding_Overriding => L ("overriding"),
+         when Ada_Overriding_Unspecified => null,
+         when Ada_Private_Absent => null,
+         when Ada_Private_Present => L ("private"),
+         when Ada_Protected_Absent => null,
+         when Ada_Protected_Present => L ("protected"),
+         when Ada_Quantifier_All => L ("all"),
+         when Ada_Quantifier_Some => L ("some"),
+         when Ada_Reverse_Absent => null,
+         when Ada_Reverse_Present => L ("reverse"),
+         when Ada_Synchronized_Absent => null,
+         when Ada_Synchronized_Present => L ("synchronized"),
+         when Ada_Tagged_Absent => null,
+         when Ada_Tagged_Present => L ("tagged"),
+         when Ada_Until_Absent => null,
+         when Ada_Until_Present => L ("until"),
+         when Ada_With_Private_Absent => null,
+         when Ada_With_Private_Present => L ("with private")
+               );
    end Template_For_Kind;
 
    type Template_Table_Type is array (Ada_Tree_Kind) of Ada_Template_Ptr;
@@ -725,53 +1045,25 @@ package body Pp.Actions is
       Use_Predefined_Casing : constant Boolean := Init_Use_Predefined_Casing;
       --  True if the -D- switch was NOT given
 
-      type Out_File_Formats is (CRLF, LF);
-
-      function Get_Out_File_Format return Out_File_Formats;
-      --  This function is supposed to be used as a part of tool parameters
-      --  processing. It tries to convert its parameter into the corresponding
-      --  value of Out_File_Formats type using the following conventions:
-      --
-      --    "dos"     -> CRLF
-      --    "crlf"    -> CRLF
-      --    "unix"    -> LF
-      --     "lf"     -> LF
-      --
-      --  Generates the error message and raises Parameter_Error if such a
-      --  conversion is not possible.
-
-      function Get_Out_File_Format return Out_File_Formats is
-         Is_Windows : constant Boolean := GNAT.OS_Lib.Directory_Separator = '\';
-         Val : constant String_Ref := Arg (Cmd, End_Of_Line);
-      begin
-         if Val = null then
-            return (if Is_Windows then CRLF else LF);
-         elsif Val.all = "dos" or else Val.all = "crlf" then
-            return CRLF;
-         elsif Val.all = "unix" or else Val.all = "lf" then
-            return LF;
-         else
-            raise Program_Error; -- Should have been validated earlier.
-   --         Error ("Unrecognized output file format " & Val.all);
-   --         raise Parameter_Error;
-         end if;
-      end Get_Out_File_Format;
-
-      Out_File_Format : constant Out_File_Formats := Get_Out_File_Format;
-      --  Format of the tool report file(s)
-
       procedure Put_To_Buffer (C : W_Char) is
       begin
-         pragma Assert
-           (if
-              Check_Whitespace and then Arg (Cmd, Par_Threshold) = Natural'Last
+         if Assert_Enabled then
+            pragma Assert (if C = NL then Lookback (Out_Buf) /= ' ');
+            --  no trailing blanks
+
+            if Check_Whitespace
+              and then Arg (Cmd, Par_Threshold) = Natural'Last
+              and then C = ' '
+              and then Lookback (Out_Buf) = ' '
             then
-              (if C = ' ' then Lookback (Out_Buf) /= ' '));
-         --  No double blanks. Except that there is one special case when the
-         --  Par_Specs_Threshold switch is used, where we have an extra blank
-         --  (see Subp_Decl_With_Hard_Breaks).
-         pragma Assert (if C = NL then Lookback (Out_Buf) /= ' ');
-         --  no trailing blanks
+               --  No double blanks. Except that there is one special case when
+               --  the Par_Specs_Threshold switch is used, where we have an
+               --  extra blank (see Subp_Decl_With_Hard_Breaks).
+               if not Debug_Flag_4 then
+                  raise Program_Error;
+               end if;
+            end if;
+         end if;
 
          Append_Any (Out_Buf, C);
          if False then
@@ -824,15 +1116,15 @@ package body Pp.Actions is
 
          Casing : constant PP_Casing :=
            (if Str (1) = ''' then As_Declared
-            elsif
-              Kind not in Flat_Attribute_Reference_Kinds
-              and then
-              (Str (1) = '"' -- operator symbol
-               or else Is_Reserved_Word (Id, LAL_UL.Ada_Version)
-               or else Id = Name_And_Then
-               or else Id = Name_Or_Else)
-            then
-              PP_Keyword_Casing (Cmd)
+--            elsif
+--              Kind not in Flat_Attribute_Reference_Kinds
+--              and then
+--              (Str (1) = '"' -- operator symbol
+--               or else Is_Reserved_Word (Id, LAL_UL.Ada_Version)
+--               or else Id = Name_And_Then
+--               or else Id = Name_Or_Else)
+--            then
+--              PP_Keyword_Casing (Cmd)
             elsif
               Is_Predef and then Use_Predefined_Casing
             then
@@ -841,17 +1133,17 @@ package body Pp.Actions is
               (case Kind is
 --                 when Flat_Attribute_Reference_Kinds =>
 --                   PP_Attribute_Casing (Cmd),
---                 when Flat_Pragma_Kinds => PP_Pragma_Casing (Cmd),
---                 when An_Enumeration_Literal_Specification =>
+                 when Ada_Pragma_Node => PP_Pragma_Casing (Cmd),
+--                 when Ada_Enumeration_Literal_Specification =>
 --                   PP_Enum_Casing (Cmd),
---                 when A_Flat_Type_Declaration |
---                   A_Subtype_Declaration |
---                   A_Formal_Type_Declaration |
---                   A_Formal_Incomplete_Type_Declaration |
---                   A_Task_Body_Declaration |
---                   A_Protected_Body_Declaration =>
+--                 when Ada_Flat_Type_Declaration |
+--                   Ada_Subtype_Declaration |
+--                   Ada_Formal_Type_Declaration |
+--                   Ada_Formal_Incomplete_Type_Declaration |
+--                   Ada_Task_Body_Declaration |
+--                   Ada_Protected_Body_Declaration =>
 --                   PP_Type_Casing (Cmd),
---                 when A_Flat_Number_Declaration => PP_Number_Casing (Cmd),
+--                 when Ada_Flat_Number_Declaration => PP_Number_Casing (Cmd),
 --                 when Not_An_Element            =>
 --                   (if Is_PP
 --                      and then not Use_Name_Casing_For_Nils
@@ -879,21 +1171,21 @@ package body Pp.Actions is
                   return To_Upper (Str);
 
                when Mixed =>
-                  if Kind in Flat_Attribute_Reference_Kinds | Flat_Pragma_Kinds
-                  then
-                     --  Handle pragma and attribute names that are special cases
-                     --  (some portion should be in ALL CAPS).
-
-                     declare
-                        Lower : constant W_Str := To_Lower (Str);
-                     begin
-                        for Special of Special_Case_Names loop
-                           if Lower = To_Lower (Special.all) then
-                              return Special.all;
-                           end if;
-                        end loop;
-                     end;
-                  end if;
+--                  if Kind in Flat_Attribute_Reference_Kinds | ada_pragma_node
+--                  then
+--                     --  Handle pragma and attribute names that are special cases
+--                     --  (some portion should be in ALL CAPS).
+--
+--                     declare
+--                        Lower : constant W_Str := To_Lower (Str);
+--                     begin
+--                        for Special of Special_Case_Names loop
+--                           if Lower = To_Lower (Special.all) then
+--                              return Special.all;
+--                           end if;
+--                        end loop;
+--                     end;
+--                  end if;
 
                   return Capitalize (Str);
 
@@ -955,10 +1247,10 @@ package body Pp.Actions is
       --  Compute a new nesting level for a subtree. This is usually one more than
       --  the current level, but we also add in Max_Nesting_Increment.
 
-      procedure If_Statement_Check_1;
-      procedure If_Statement_Check_2 (Level_Of_If : Nesting_Level);
+      procedure If_Stmt_Check_1;
+      procedure If_Stmt_Check_2 (Level_Of_If : Nesting_Level);
       --  The above are for a special check related to if_statements, which comes
-      --  in two parts. If_Statement_Check_1 and _2 are called before and after
+      --  in two parts. If_Stmt_Check_1 and _2 are called before and after
       --  calling Subtree_To_Ada on the condition of an 'if'.
       --
       --  The compiler style checks complain if "then" appears by itself on the
@@ -1073,24 +1365,24 @@ package body Pp.Actions is
       is
       begin
 --         pragma Assert
---           (if Tree.Kind in An_If_Path | An_Elsif_Path then Subtree_Index = 1);
+--           (if Tree.Kind in Ada_If_Path | Ada_Elsif_Path then Subtree_Index = 1);
 
          return Cur_Level + Max_Nesting_Increment (Temp) + 1;
       end New_Level;
 
       First_If_Line_Break : Line_Break_Index;
-      --  Valid only between calls to If_Statement_Check_1 and
-      --  If_Statement_Check_2. Set by _1 to 1 past the end of the table, which
+      --  Valid only between calls to If_Stmt_Check_1 and
+      --  If_Stmt_Check_2. Set by _1 to 1 past the end of the table, which
       --  is where the next line break will be placed. Used by _2 to find the
       --  first line break (if any) belonging to the condition.
 
-      procedure If_Statement_Check_1 is
+      procedure If_Stmt_Check_1 is
          Line_Breaks : Line_Break_Vector renames All_Line_Breaks;
       begin
          First_If_Line_Break := Last_Index (Line_Breaks) + 1;
-      end If_Statement_Check_1;
+      end If_Stmt_Check_1;
 
-      procedure If_Statement_Check_2 (Level_Of_If : Nesting_Level) is
+      procedure If_Stmt_Check_2 (Level_Of_If : Nesting_Level) is
          Line_Breaks : Line_Break_Vector renames All_Line_Breaks;
          Min : Nesting_Level := Nesting_Level'Last;
       begin
@@ -1106,83 +1398,7 @@ package body Pp.Actions is
                Line_Breaks (J).Level := Level_Of_If;
             end if;
          end loop;
-      end If_Statement_Check_2;
-
-      function Remove_Extra_Line_Breaks return Char_Vector;
-      --  Removes extra NL's. The result has exactly one NL at the beginning, and
-      --  exactly one at the end. Also, if Preserve_Blank_Lines is False, we
-      --  collapse 3 or more NL's in a row down to 2.  ???It would be cleaner if
-      --  we didn't put multiple blank lines in in the first place.
-      --
-      --  This also converts LF to CRLF if appropriate.
-
-      --  Wide_Text_IO accepts a Form parameter that inserts CR's on windows, but
-      --  it doesn't do that on unix, so we insert CR's by hand.
-
-      function Remove_Extra_Line_Breaks return Char_Vector is
-         Add_CR : constant Boolean := Out_File_Format = CRLF;
-         --  True if we should convert LF to CRLF -- if it was requested on the
-         --  command line, or if we're on windows and nothing was requested.
-      begin
-         --  Optimize the case where we're not changing anything. The reason
-         --  Remove_Extra_Line_Breaks keeps the initial NL is that this
-         --  optimization wouldn't work otherwise.
-
-         if Preserve_Blank_Lines (Cmd) and then not Add_CR then
-            return To_Vector (Out_Buf);
-         end if;
-
-         declare
-            Result : Char_Vector;
-         begin
-            while Cur (Out_Buf) = NL loop
-               Move_Forward (Out_Buf);
-            end loop;
-            Append (Result, W_LF);
-            --  We don't want a CR here; caller skips the one LF character
-
-            loop
-               declare
-                  NL_Count : Natural := 0;
-               begin
-                  while Cur (Out_Buf) = NL loop
-                     Move_Forward (Out_Buf);
-                     NL_Count := NL_Count + 1;
-                  end loop;
-
-                  exit when At_End (Out_Buf);
-
-                  if not Preserve_Blank_Lines (Cmd) and then NL_Count > 2 then
-                     NL_Count := 2;
-                  end if;
-
-                  for J in 1 .. NL_Count loop
-                     if Add_CR then
-                        Append (Result, W_CR);
-                     end if;
-                     Append (Result, W_LF);
-                  end loop;
-               end;
-
-               pragma Assert (Cur (Out_Buf) /= NL);
-               Append (Result, Cur (Out_Buf));
-               Move_Forward (Out_Buf);
-            end loop;
-
-            if Add_CR then
-               Append (Result, W_CR);
-            end if;
-            Append (Result, W_LF);
-            Reset (Out_Buf);
-            pragma Assert (Result (1) = NL);
-            pragma Assert (Result (2) /= NL);
-            if not Add_CR then
-               pragma Assert (Result (Last_Index (Result) - 1) /= NL);
-               pragma Assert (Result (Last_Index (Result)) = NL);
-            end if;
-            return Result;
-         end;
-      end Remove_Extra_Line_Breaks;
+      end If_Stmt_Check_2;
 
       function Munge_Template
         (T    : Ada_Template;
@@ -1216,10 +1432,10 @@ package body Pp.Actions is
                   elsif Match (" ^:") and then not Match (" ^:=") then
                      X := X + 1; -- skip ' ' before ':'
 --                  elsif Kind in
---                      A_Loop_Statement |
---                        A_While_Loop_Statement |
---                        A_For_Loop_Statement |
---                        A_Block_Statement
+--                      Ada_Loop_Stmt |
+--                        Ada_While_Loop_Stmt |
+--                        Ada_For_Loop_Stmt |
+--                        Ada_Block_Stmt
 --                    and then Match (" :")
 --                  then
 --                     X := X + 1; -- skip ' ' before ':' for statement name
@@ -1244,7 +1460,8 @@ package body Pp.Actions is
          Temp := Replace_All (Temp, "? @(~; ~)~", "?[@ (~;@ ~)]~");
          Temp := Replace_All (Temp, "? @(~, ~)~", "?[@ (~,@ ~)]~");
          Temp := Replace_All (Temp, "? := ~~~", "? :=[@ ~~]~");
-         Temp := Replace_All (Temp, " renames !", " renames[@ !]");
+--OLD:         Temp := Replace_All (Temp, " renames !", " renames[@ !]");
+         Temp := Replace_All (Temp, "? renames ~~~", "? renames[@ ~~]~");
          --  ???Should be a weaker @, at least for function renamings.
          Temp := Replace_All (Temp, "? and ~ and ~~", "? and[@ ~ and@ ~]~");
          Temp := Replace_All (Temp, " => !", " =>[@ !]");
@@ -1255,14 +1472,16 @@ package body Pp.Actions is
          Temp :=
            Replace_All
              (Temp,
-              "?~, ~~ :? ~~~ !? :=[@ ~~]~",
-              "?~, ~~ ^:? ~~~ !? ^2:=[@ ~~]~");
-         Temp :=
-           Replace_All
-             (Temp,
-              "?~, ~~ :? ~~~ constant !? :=[@ ~~]~",
-              "?~, ~~ ^:? ~~~ constant !? ^2:=[@ ~~]~");
-         --  This doesn't cover A_Parameter_Specification, which is handled
+--OLD:              "?~, ~~ :? ~~~ !? :=[@ ~~]~",
+--OLD:              "?~, ~~ ^:? ~~~ !? ^2:=[@ ~~]~");
+              "?~, ~~ :? ~~~? ~~~? ~~~ !? :=[@ ~~]~",
+              "?~, ~~ ^:? ~~~? ~~~? ~~~ !? ^2:=[@ ~~]~");
+--OLD:         Temp :=
+--OLD:           Replace_All
+--OLD:             (Temp,
+--OLD:              "?~, ~~ :? ~~~ constant !? :=[@ ~~]~",
+--OLD:              "?~, ~~ ^:? ~~~ constant !? ^2:=[@ ~~]~");
+         --  This doesn't cover Ada_Param_Spec, which is handled
          --  specially by Do_Parameter_Specification.
 
          --  Replacements inserting soft line breaks in comma-separated lists of
@@ -1284,10 +1503,8 @@ package body Pp.Actions is
 
          if not Arg (Cmd, End_Id) then
             Temp := Replace_All (Temp, "end !1", "end");
-            Temp := Replace_All (Temp, "end !2", "end");
             Temp := Replace_All (Temp, "end?1 ~~~", "end");
             Temp := Replace_All (Temp, "end?2 ~~~", "end");
-            Temp := Replace_All (Temp, "end?3 ~~~", "end");
          end if;
 
          return Result : constant Ada_Template := Ada_Template (Temp.all) do
@@ -1343,19 +1560,19 @@ package body Pp.Actions is
          --  "then" and "loop".
 
 --         if Arg (Cmd, Separate_Loop_Then) then
---            Replace_One (An_If_Path, "@ then$", "$then$");
---            Replace_One (An_Elsif_Path, "@ then$", "$then$");
---            Replace_One (A_While_Loop_Statement, "@ loop$", "$loop$");
---            Replace_One (A_For_Loop_Statement, "@ loop$", "$loop$");
+--            Replace_One (Ada_If_Path, "@ then$", "$then$");
+--            Replace_One (Ada_Elsif_Path, "@ then$", "$then$");
+--            Replace_One (Ada_While_Loop_Stmt, "@ loop$", "$loop$");
+--            Replace_One (Ada_For_Loop_Stmt, "@ loop$", "$loop$");
 --
 --         --  For No_Separate_Loop_Then, we remove the soft line break
 --         --  before "then" and "loop".
 --
 --         elsif Arg (Cmd, No_Separate_Loop_Then) then
---            Replace_One (An_If_Path, "@ then$", " then$");
---            Replace_One (An_Elsif_Path, "@ then$", " then$");
---            Replace_One (A_While_Loop_Statement, "@ loop$", " loop$");
---            Replace_One (A_For_Loop_Statement, "@ loop$", " loop$");
+--            Replace_One (Ada_If_Path, "@ then$", " then$");
+--            Replace_One (Ada_Elsif_Path, "@ then$", " then$");
+--            Replace_One (Ada_While_Loop_Stmt, "@ loop$", " loop$");
+--            Replace_One (Ada_For_Loop_Stmt, "@ loop$", " loop$");
 --         end if;
 --
 --         --  Now do some validity checking on the templates
@@ -1472,9 +1689,59 @@ package body Pp.Actions is
 
       function Parent_Tree return Ada_Tree is (Ancestor_Tree (1));
 
-      Implicit_Null_Statement_Seen : Boolean := False;
-      --  See the comments about labels under "when A_Null_Statement =>" below for
-      --  an explanation of this.
+      Label_Seen : Boolean := False;
+      --  See the comments in Do_Label below for an explanation of this.
+
+      function Subp_Decl_Template
+        (Tree : Ada_Tree; Is_Function, Is_Body : Boolean)
+        return Ada_Template;
+      --  Returns a modified version of the template in the table for the given
+      --  node kind. If it's a function, we replace "procedure" --> "function".
+      --  If it's an expression function with an aggregate, we remove the
+      --  parentheses.
+
+      function Subp_Decl_Template
+        (Tree : Ada_Tree; Is_Function, Is_Body : Boolean)
+        return Ada_Template
+      is
+         pragma Assert
+           (Tree.Kind in
+              Ada_Subprogram_Decl |
+              Ada_Abstract_Subprogram_Decl |
+              Ada_Null_Subprogram_Decl |
+              Ada_Expr_Function |
+              Ada_Subprogram_Body_Stub |
+              Ada_Subprogram_Body |
+              Ada_Formal_Subp_Decl |
+              Ada_Access_To_Subprogram_Def |
+              Ada_Generic_Subprogram_Decl |
+              Ada_Subprogram_Renaming_Decl |
+              Ada_Entry_Body |
+              Ada_Entry_Decl);
+
+         T : Ada_Template renames Template_Table (Tree.Kind).all;
+      begin
+         if not Is_Function then
+            return T;
+         end if;
+
+         declare
+            F : W_Str renames
+              Must_Replace (W_Str (T), "procedure", "function");
+         begin
+            if Tree.Kind = Ada_Expr_Function
+              and then Subtree (Tree, 3).Kind = Ada_Aggregate
+            then
+               return Ada_Template (Must_Replace (F, "[@ (!)]", "[@ !]"));
+               --  If the thing after the "is" of an expression function is an
+               --  aggregate, we leave out the parentheses here, because the
+               --  aggregate will insert them. We want "function F is (X)", not
+               --  "function F is ((X))".
+            end if;
+
+            return Ada_Template (F);
+         end;
+      end Subp_Decl_Template;
 
       function Subp_Decl_With_Hard_Breaks
         (Tree : Ada_Tree;
@@ -1484,6 +1751,8 @@ package body Pp.Actions is
       --  between parameters with a hard line break. If Is_Function is True, put
       --  a hard line break before "return". If Is_Body is True, put a hard line
       --  break before "is".
+      --  ????This needs to be split into template for the spec and
+      --  for whatever contains "is".
 
       function Subp_Decl_With_Hard_Breaks
         (Tree : Ada_Tree;
@@ -1522,50 +1791,50 @@ package body Pp.Actions is
          --  Some templates that are used instead of the ones in Template_Table
 
          Prefix_Notation_Call_Alt_Templ_1 : constant Ada_Template :=
-           Munge_Template (" @(", A_Function_Call);
+           Munge_Template (" @(", Ada_Call_Expr);
 
          Prefix_Notation_Call_Alt_Templ_2 : constant Ada_Template :=
-           Munge_Template ("[$(", A_Function_Call);
+           Munge_Template ("[$(", Ada_Call_Expr);
 
-         Accept_Statement_Alt_Templ : constant Ada_Template :=
+         Accept_Stmt_Alt_Templ : constant Ada_Template :=
            Munge_Template
-             (Labels & "accept !? @(~~)~?[ @(~;@ ~)]~!!",
-              An_Accept_Statement);
-         --  The last "!!" generates nothing, but satisfies the requirement that
-         --  we use all the subtrees.
+             ("accept !? @(~~)~?[ @(~;@ ~)]~/",
+              Ada_Accept_Stmt);
 
          --  ???Is the following correct for multi-dim arrays (only some indices
          --  need "range")?
          Constrained_Array_Definition_Alt_Templ_1 : constant Ada_Template :=
            Munge_Template
              ("array @(?range ~, range ~~) of !",
-              A_Constrained_Array_Definition);
+              Ada_Constrained_Array_Indices);
 
          Constrained_Array_Definition_Alt_Templ_2 : constant Ada_Template :=
            Munge_Template
              ("array @(?~, ~~) of !",
-              A_Constrained_Array_Definition);
+              Ada_Constrained_Array_Indices);
 
          Pragma_Alt_Templ : constant Ada_Template :=
-           Munge_Template ("?[ @(~,@ ~)]~", Flat_Pragma_Kinds'First);
+           Munge_Template ("/?[ @(~,@ ~)]~", Ada_Pragma_Node);
 
          Parameter_Specification_Alt_Templ : constant Ada_Template :=
-           Munge_Template (" ^: ", A_Parameter_Specification);
+           Munge_Template (" ^: ", Ada_Param_Spec);
 
-         Block_Statement_Alt_Templ_1 : constant Ada_Template :=
+         Block_Stmt_Alt_Templ_1 : constant Ada_Template :=
            Munge_Template
-             (Labels & "?~~ : ~!" & Handled_Seq_2,
-              A_Block_Statement);
+             ("?~~ : ~!" & "end?2 ~~~",
+              Ada_Block_Stmt);
 
-         Block_Statement_Alt_Templ_2 : constant Ada_Template :=
+         Block_Stmt_Alt_Templ_2 : constant Ada_Template :=
            Munge_Template
-             (Labels & "?~~ : ~?declare$" & "{~;$~;$$}~" & Handled_Seq_2,
-              A_Block_Statement);
+             ("?~~ : ~?declare$" & "{~;$~;$$}~" & "end?2 ~~~",
+              Ada_Block_Stmt);
 
-         Extended_Return_Statement_Alt_Templ : constant Ada_Template :=
-           Munge_Template (Labels & "return !!!", An_Extended_Return_Statement);
-         --  The last "!!" generates nothing, but satisfies the requirement that
-         --  we use all the subtrees.
+         Extended_Return_Stmt_Alt_Templ : constant Ada_Template :=
+           Munge_Template ("return !/", Ada_Extended_Return_Stmt);
+
+         Incomplete_Type_Decl_Alt_Templ : constant Ada_Template :=
+           Munge_Template ("type !![@!" & Aspects & "]", Ada_Type_Decl);
+         --  Same as Ada_Type_Decl with " is[@ " --> "[@".
 
       end Alternative_Templates;
 
@@ -1592,7 +1861,7 @@ package body Pp.Actions is
          --  for debugging.
 
          procedure Prefix_Notation_Call (Label_Names, Callee, Actuals : Ada_Tree);
-         --  This is called for A_Function_Call and A_Procedure_Call_Statement
+         --  This is called for Ada_Call_Expr and Ada_Procedure_Call_Stmt
          --  when the Is_Prefix_Notation subtree is True. Prefix notation calls
          --  have special visibility rules, so we don't want to turn X.F(Y) into
          --  F(X, Y). Label_Names is always empty for function calls.
@@ -1610,7 +1879,7 @@ package body Pp.Actions is
          --  Fake tabs are used to deal with situations like this:
          --
          --     A_Long_Var_Name      : T          := 123;
-         --     X                    : A_Long_Type_Name;
+         --     X                    : Ada_Long_Type_Name;
          --     A_Long_Constant_Name : constant T := 123;
          --
          --  where we wish to align the ":" and ":=" tokens. But the
@@ -1692,7 +1961,7 @@ package body Pp.Actions is
                if T = "" then
                   pragma Assert
                     (Tree.Kind in
-                       A_Parameter_Specification | A_Formal_Object_Declaration);
+                       Ada_Param_Spec | Ada_Object_Decl);
                   Text := Name_Tab_In_Out;
                else
                   case T (T'First) is
@@ -1714,11 +1983,11 @@ package body Pp.Actions is
                         pragma Assert (Has_Prefix (W_Str (T), Prefix => "range"));
                         Text := Name_Range;
                      when '.' =>
-                        pragma Assert (Tree.Kind in A_Component_Clause);
+                        pragma Assert (Tree.Kind in Ada_Component_Clause);
                         pragma Assert (Has_Prefix (W_Str (T), Prefix => ".."));
                         Text := Name_Dot_Dot;
                      when ']' =>
-                        pragma Assert (Tree.Kind in A_Component_Clause);
+                        pragma Assert (Tree.Kind in Ada_Component_Clause);
                         Text := Name_R_Sq;
                         goto Skip_Assertion; -- ']' is not a legal token
                      when others =>
@@ -1752,16 +2021,16 @@ package body Pp.Actions is
                return;
             end if;
 
-            if Tree /= null and then Tree.Kind = A_With_Clause then
---               if Is_Nil (Get (Tree, Has_Limited))
---                 and then Is_Nil (Get (Tree, Has_Private))
---               then
+            if Tree /= null and then Tree.Kind = Ada_With_Clause then
+               if not F_Has_Limited (With_Clause (Tree))
+                 and then not F_Has_Private (With_Clause (Tree))
+               then
                   Pa   := null;
                   Tr   := null;
                   Text := Name_With;
---               else
---                  return; -- ignore "limited with" and "private with"
---               end if;
+               else
+                  return; -- ignore "limited with" and "private with"
+               end if;
             elsif Token_Text = Name_Empty then
                if Is_Insertion_Point then
                   Text := Name_Tab_Insertion_Point;
@@ -1795,93 +2064,85 @@ package body Pp.Actions is
 
             --  Append a fake tab if appropriate
 
---            if Tree /= null and then not Is_Insertion_Point then
---               case Tree.Kind is
---                  when A_Variable_Declaration |
---                    A_Constant_Declaration |
---                    An_Integer_Number_Declaration |
---                    A_Real_Number_Declaration |
---                    A_Discriminant_Specification |
---                    A_Component_Declaration |
---                    A_Return_Variable_Specification =>
---                     if Index_In_Line = 1 then
---                        pragma Assert (Text = Name_Colon);
---                        Append
---                          (Tabs,
---                           Tab_Rec'
---                             (Parent          => Pa,
---                              Tree            => Tr,
---                              Token           => Name_Assign,
---                              Mark            => Mark (Out_Buf, '^'),
---                              Index_In_Line   => 2,
---                              Col             => <>,
---                              Num_Blanks      => <>,
---                              Is_Fake         => True,
---                              Is_Insertion_Point => False));
---                     end if;
---
---                  when A_Parameter_Specification | A_Formal_Object_Declaration =>
---                     if Index_In_Line = 3 then
---                        pragma Assert (Text = Name_Tab_In_Out);
---                        Append
---                          (Tabs,
---                           Tab_Rec'
---                             (Parent          => Pa,
---                              Tree            => Tr,
---                              Token           => Name_Assign,
---                              Mark            => Mark (Out_Buf, '^'),
---                              Index_In_Line   => 4,
---                              Col             => <>,
---                              Num_Blanks      => <>,
---                              Is_Fake         => True,
---                              Is_Insertion_Point => False));
---                     end if;
---
---                  when A_With_Clause =>
---                     if Index_In_Line = 1 then
---                        pragma Assert (Text = Name_With);
---                        Append
---                          (Tabs,
---                           Tab_Rec'
---                             (Parent          => Pa,
---                              Tree            => Tr,
---                              Token           => Name_Use,
---                              Mark            => Mark (Out_Buf, '^'),
---                              Index_In_Line   => 2,
---                              Col             => <>,
---                              Num_Blanks      => <>,
---                              Is_Fake         => True,
---                              Is_Insertion_Point => False));
---                     end if;
---
---                  when A_Variant |
---                    An_Aspect_Specification |
---                    A_For_All_Quantified_Expression |
---                    A_For_Some_Quantified_Expression |
---                    An_Assignment_Statement |
---                    A_Case_Path |
---                    A_Select_Path |
---                    An_Or_Path |
---                    A_Case_Expression_Path |
---                    A_Component_Clause |
---                    An_Exception_Handler |
---                    An_Exception_Renaming_Declaration |
---                    An_Exception_Declaration =>
---                     null;
---
---                  when A_Pragma_Argument_Association |
---                    A_Discriminant_Association       |
---                    A_Record_Component_Association   |
---                    An_Array_Component_Association   |
---                    A_Parameter_Association          |
---                    A_Generic_Association            =>
---                     null;
---
---                  when others =>
---                     --  No other tree kinds have tabs
---                     pragma Assert (False);
---               end case;
---            end if;
+            if Tree /= null and then not Is_Insertion_Point then
+               case Tree.Kind is
+                  when Ada_Object_Decl |
+                    Ada_Number_Decl |
+                    Ada_Discriminant_Spec |
+                    Ada_Component_Decl =>
+                     if Index_In_Line = 1 then
+                        pragma Assert (Text = Name_Colon);
+                        Append
+                          (Tabs,
+                           Tab_Rec'
+                             (Parent          => Pa,
+                              Tree            => Tr,
+                              Token           => Name_Assign,
+                              Mark            => Mark (Out_Buf, '^'),
+                              Index_In_Line   => 2,
+                              Col             => <>,
+                              Num_Blanks      => <>,
+                              Is_Fake         => True,
+                              Is_Insertion_Point => False));
+                     end if;
+
+                  when Ada_Param_Spec => -- Formal obj: | Ada_Object_Decl =>
+                     if Index_In_Line = 3 then
+                        pragma Assert (Text = Name_Tab_In_Out);
+                        Append
+                          (Tabs,
+                           Tab_Rec'
+                             (Parent          => Pa,
+                              Tree            => Tr,
+                              Token           => Name_Assign,
+                              Mark            => Mark (Out_Buf, '^'),
+                              Index_In_Line   => 4,
+                              Col             => <>,
+                              Num_Blanks      => <>,
+                              Is_Fake         => True,
+                              Is_Insertion_Point => False));
+                     end if;
+
+                  when Ada_With_Clause =>
+                     if Index_In_Line = 1 then
+                        pragma Assert (Text = Name_With);
+                        Append
+                          (Tabs,
+                           Tab_Rec'
+                             (Parent          => Pa,
+                              Tree            => Tr,
+                              Token           => Name_Use,
+                              Mark            => Mark (Out_Buf, '^'),
+                              Index_In_Line   => 2,
+                              Col             => <>,
+                              Num_Blanks      => <>,
+                              Is_Fake         => True,
+                              Is_Insertion_Point => False));
+                     end if;
+
+                  when Ada_Variant |
+                    Ada_Quantified_Expr |
+                    Ada_Assign_Stmt |
+                    Ada_Case_Stmt_Alternative |
+                    Ada_Case_Expr_Alternative |
+                    Ada_Select_When_Part |
+                    Ada_Component_Clause |
+                    Ada_Exception_Handler |
+                    Ada_Exception_Decl =>
+                     null;
+
+                  when Ada_Pragma_Argument_Assoc |
+                    Ada_Aspect_Assoc |
+                    Ada_Discriminant_Association       |
+                    Ada_Aggregate_Member |
+                    Ada_Param_Assoc =>
+                     null;
+
+                  when others =>
+                     --  No other tree kinds have tabs
+                     pragma Assert (False, Tree.Kind'Img);
+               end case;
+            end if;
          end Append_Tab;
 
          procedure Subtrees_To_Ada
@@ -1924,9 +2185,11 @@ package body Pp.Actions is
                return Ada_Template (To_String (Result));
             end Keep_Indentation;
 
---            pragma Assert (Tree.Kind in Flat_List_Kinds);
-            Prev_With : Ada_Tree_Base := null;
+            pragma Assert (Tree.Kind in Ada_List);
+            Prev_With : With_Clause := null;
             --  See Use_Same_Line below
+
+         --  Start of processing for Subtrees_To_Ada
 
          begin
             if Subtree_Count (Tree) = 0 then
@@ -1945,23 +2208,17 @@ package body Pp.Actions is
                   --  A; use A.B;". This returns True in these cases. We don't do
                   --  this special processing for use type clauses.
 
-                  function Has_Prefix (X, Y : Ada_Tree) return Boolean; -- with
---                     Pre => X.Kind in Usage_Names | A_Selected_Component
---                     and then Y.Kind in Usage_Names | A_Selected_Component;
+                  function Has_Prefix (X, Y : Ada_Tree) return Boolean with
+                     Pre => X.Kind in Ada_Identifier | Ada_Dotted_Name
+                     and then Y.Kind in Ada_Identifier | Ada_Dotted_Name;
                      --  True if X contains Y, as in "A.B.C.D" contains "A.B".
                      --  I.e. if Y is a prefix of X.
 
                   function Has_Prefix (X, Y : Ada_Tree) return Boolean is
+                     subtype Name is AST.Types.Name;
                   begin
-                     return raise Program_Error;
---                     if Ref (X) = Ref (Y) then
---                        return True;
---                     elsif X.Kind in Usage_Names then
---                        return False;
---                     else
---                        pragma Assert (X.Kind = A_Selected_Component);
---                        return Has_Prefix (Subtree (X, 1), Y);
---                     end if;
+                     return Has_Prefix
+                       (L_Full_Name (Name (X)), L_Full_Name (Name (Y)));
                   end Has_Prefix;
 
                   function Use_Same_Line return Boolean is
@@ -1977,22 +2234,27 @@ package body Pp.Actions is
                      end if;
 
                      declare
-                        pragma Assert (Prev_With.Kind = A_With_Clause);
-                        With_Names : constant Ada_Tree := Subtree (Prev_With, 3);
+                        pragma Assert (Prev_With.Kind = Ada_With_Clause);
+                        With_Names : constant List_Name := F_Packages (Prev_With);
                         Next_Subtree : constant Ada_Tree :=
                           Subtree (Tree, Index + 1);
                      begin
-                        if Next_Subtree.Kind = A_Use_Package_Clause
-                          and then Subtree_Count (Subtree (Next_Subtree, 1)) = 1
-                          and then Subtree_Count (With_Names) = 1
-                        then
+                        if Next_Subtree.Kind = Ada_Use_Package_Clause then
                            declare
-                              W : constant Ada_Tree := Subtree (With_Names, 1);
-                              U : constant Ada_Tree :=
-                                Subtrees (Subtree (Next_Subtree, 1)) (1);
+                              Use_Names : constant List_Name :=
+                                F_Packages (Use_Package_Clause (Next_Subtree));
                            begin
-                              if Has_Prefix (W, U) or else Has_Prefix (U, W) then
-                                 return True;
+                              if Subtree_Count (With_Names) = 1
+                                and then Subtree_Count (Use_Names) = 1
+                              then
+                                 declare
+                                    W : constant Ada_Tree := Subtree (With_Names, 1);
+                                    U : constant Ada_Tree := Subtree (Use_Names, 1);
+                                 begin
+                                    if Has_Prefix (W, U) or else Has_Prefix (U, W) then
+                                       return True;
+                                    end if;
+                                 end;
                               end if;
                            end;
                         end if;
@@ -2002,8 +2264,8 @@ package body Pp.Actions is
                   end Use_Same_Line;
 
                begin
-                  pragma Assert (Tree.Kind not in An_If_Path | An_Elsif_Path);
-                  --  No need for If_Statement_Check here
+                  pragma Assert (Tree.Kind not in Ada_If_Path | Ada_Elsif_Path);
+                  --  No need for If_Stmt_Check here
                   Subtree_To_Ada
                     (Subt,
                      New_Level (Tree, Index, Cur_Level, Pre & Between & Post),
@@ -2012,16 +2274,16 @@ package body Pp.Actions is
 
 if Subt /= null then
                   case Subt.Kind is
-                     when A_With_Clause =>
---                        if Is_Nil (Get (Subt, Has_Limited))
---                          and then Is_Nil (Get (Subt, Has_Private))
---                        then
-                           Prev_With := Subt;
---                        else
---                           --  ignore "limited with" and "private with"
---                           Prev_With := null;
---                        end if;
-                     when A_Use_Package_Clause =>
+                     when Ada_With_Clause =>
+                        if not F_Has_Limited (With_Clause (Subt))
+                          and then not F_Has_Private (With_Clause (Subt))
+                        then
+                           Prev_With := With_Clause (Subt);
+                        else
+                           --  ignore "limited with" and "private with"
+                           Prev_With := null;
+                        end if;
+                     when Ada_Use_Package_Clause =>
                         null; -- Leave Prev_With alone
                      when others =>
                         Prev_With := null;
@@ -2032,18 +2294,17 @@ if Subt /= null then
                         Same_Line : constant Boolean := Use_Same_Line;
                         pragma Assert (if Same_Line then Between = ";$");
                         Tween : constant Ada_Template :=
-                          (if
-                             Same_Line
-                           then
-                             (if Prev_With = Subtree (Tree, Index) then ";@ "
-                              else ";$")
+                          (if Same_Line then
+                             (if Ada_Tree (Prev_With) = Subtree (Tree, Index)
+                                then ";@ "
+                                else ";$")
                            else -- else ";@1 "???
                            Between);
                      begin
-                        if Subt.Kind /= A_Comment then
+--                        if Subt.Kind /= Ada_Comment then
                            Interpret_Template
                              (Tween, Subtrees => Empty_Tree_Array);
-                        end if;
+--                        end if;
                         if Same_Line then
                            Append_Tab
                              (Parent        => null,
@@ -2057,12 +2318,12 @@ if Subt /= null then
 
                   else
                      pragma Assert (Index = Subtree_Count (Tree));
-                     if Subt.Kind = A_Comment then
-                        Interpret_Template
-                          (Keep_Indentation (Post), Subtrees => Empty_Tree_Array);
-                     else
+--                     if Subt.Kind = Ada_Comment then
+--                        Interpret_Template
+--                          (Keep_Indentation (Post), Subtrees => Empty_Tree_Array);
+--                     else
                         Interpret_Template (Post, Subtrees => Empty_Tree_Array);
-                     end if;
+--                     end if;
                   end if;
 end if;
                end;
@@ -2114,7 +2375,7 @@ end if;
                     '~'           |
                     '#'           |
                     '*'           |
---                    '_'           |
+                    '_'           |
                     '"'           |
                     '\'           =>
                      raise Program_Error with "Illegal template character";
@@ -2206,10 +2467,15 @@ end if;
                         else
                            Subtree_Index := Cur_Subtree_Index;
                         end if;
+                        if Subtree_Index not in Subtrees_Index then
+                           ASIS_UL.Dbg_Out.Output_Enabled := True;
+                           ASIS_UL.Dbg_Out.Put
+                             ("Subtree_Index = \1, not in \2..\3 <<\4>>\n",
+                              Image (Subtree_Index),
+                              Image (Subtrees'First), Image (Subtrees'Last),
+                              Kind'Img);
+                        end if;
                         pragma Assert (Subtree_Index in Subtrees_Index);
-                        --  Put ("Subtree_Index = \1, not in \2..\3 <<\4>>\n",
-                        --  Image (Subtree_Index), Image (Subtrees'First), Image
-                        --  (Subtrees'Last), "???Image (Tr.Kind)");
 
                         declare
                            Subt : constant Ada_Tree :=
@@ -2218,9 +2484,9 @@ end if;
                         begin
                            Used (Subtree_Index) := True;
                            if C = '!' then
-                              if Tree.Kind in An_If_Path | An_Elsif_Path then
+                              if Tree.Kind in Ada_If_Path | Ada_Elsif_Path then
                                  pragma Assert (Subtree_Index = 1);
-                                 If_Statement_Check_1;
+                                 If_Stmt_Check_1;
                               end if;
 
                               Subtree_To_Ada
@@ -2228,8 +2494,8 @@ end if;
                                  New_Level (Tree, Subtree_Index, Cur_Level, T),
                                  Subtree_Index);
 
-                              if Tree.Kind in An_If_Path | An_Elsif_Path then
-                                 If_Statement_Check_2 (Cur_Level);
+                              if Tree.Kind in Ada_If_Path | Ada_Elsif_Path then
+                                 If_Stmt_Check_2 (Cur_Level);
                               end if;
 
                            else
@@ -2260,10 +2526,37 @@ end if;
                                  Post_Last  : constant Positive := Scan_To_Tilde;
                                  pragma Assert (T (J) = '~');
 
+                                 subtype Absent_Kinds is Ada_Node_Kind_Type with
+                                   Predicate => Absent_Kinds in
+                                     Ada_Abort_Absent |
+                                     Ada_Abstract_Absent |
+                                     Ada_Aliased_Absent |
+                                     Ada_All_Absent |
+                                     Ada_Constant_Absent |
+                                     Ada_Limited_Absent |
+                                     Ada_Not_Null_Absent |
+                                     Ada_Private_Absent |
+                                     Ada_Protected_Absent |
+                                     Ada_Reverse_Absent |
+                                     Ada_Synchronized_Absent |
+                                     Ada_Tagged_Absent |
+                                     Ada_Until_Absent |
+                                     Ada_With_Private_Absent |
+
+                                     Ada_Mode_Default |
+                                     Ada_Overriding_Unspecified;
+                                 --  This is needed because we have templates
+                                 --  like "?~~ ~", which inserts a space after
+                                 --  the subtree, which might be "private". But
+                                 --  if "private" is not present, we don't want
+                                 --  the space. Perhaps we should get rid of
+                                 --  this, and move the space into the subtree,
+                                 --  as in "private ".
+
                               begin
                                  Used (Subtree_Index) := True;
                                  --  ???The following could use some cleanup
-                                 if Subt /= null then
+                                 if Subt /= null  and then Subt.Kind not in Absent_Kinds then
                                     case Subt.Kind is
                                        when Ada_List =>
                                           Append (Tree_Stack, Subt); -- push
@@ -2286,8 +2579,8 @@ end if;
                                           --  String (T)); pragma Assert (Between =
                                           --  ""); end if;
                                           pragma Assert
-                                            (Kind not in An_If_Path | An_Elsif_Path);
-                                          --  No need for If_Statement_Check here
+                                            (Kind not in Ada_If_Path | Ada_Elsif_Path);
+                                          --  No need for If_Stmt_Check here
                                           Subtree_To_Ada
                                             (Subt,
                                              New_Level
@@ -2307,9 +2600,8 @@ end if;
                      end;
 
                   when ';' =>
-                     if Implicit_Null_Statement_Seen then
-                        Implicit_Null_Statement_Seen := False;
-
+                     if Label_Seen then
+                        Label_Seen := False;
                      else
                         Buffered_Output.Put_Char (C);
                      end if;
@@ -2322,10 +2614,13 @@ end if;
                J := J + 1;
             end loop;
 
-            if Used /= (Subtrees_Index => True) then -- ???
-               Buffered_Output.Put ("???Not all used: \1", "???Image (Tr.Kind)");
+            if True and then -- ????????????????
+              Used /= (Subtrees_Index => True) then -- ???
+               ASIS_UL.Dbg_Out.Output_Enabled := True;
+               ASIS_UL.Dbg_Out.Put ("???Not all used: \1", Kind'Img);
+               raise Program_Error;
             end if;
-            --  ???pragma Assert (Used = (Subtrees_Index => True));
+            pragma Assert (Used = (Subtrees_Index => True));
          end Interpret_Template;
 
          use Alternative_Templates;
@@ -2357,7 +2652,7 @@ end if;
 --            First : constant Ada_Tree := Subtree (Actuals, 1);
 --
 --            The_Rest : aliased Ada_Tree_Rec :=
---                (Kind          => An_Association_List,
+--                (Kind          => Ada_Association_List,
 --                 Checks        => Asis.Extensions.Empty_Check_Set,
 --                 Subtree_Count => Subtree_Count (Actuals) - 1,
 --                 Sloc          => Asis.Text.Nil_Span,
@@ -2374,9 +2669,9 @@ end if;
 --            end if;
 --
 --            --  ???Work around possible bug in Function_Call_Parameters. Not sure
---            --  why Callee would be A_Selected_Component.
+--            --  why Callee would be Ada_Dotted_Name.
 --
---            if Callee.Kind /= A_Selected_Component then
+--            if Callee.Kind /= Ada_Dotted_Name then
 --               Subtree_To_Ada (First, Cur_Level + 1, Index_In_Parent => 1);
 --               Buffered_Output.Put (".");
 --            end if;
@@ -2400,46 +2695,43 @@ end if;
                return;
             end if;
 
-            if Tree.Kind = A_Compilation_Unit then
+            if Tree.Kind = Ada_Compilation_Unit then
                Insert_Blank_Line_Before := True;
             end if;
 
             if Tree.Kind in
-                An_Ordinary_Type_Declaration |
-               --  ???(if rec etc)A_Record_Type_Definition
-               --  A_Derived_Record_Extension_Definition
+                Ada_Ordinary_Type_Declaration |
+               --  ???(if rec etc)Ada_Record_Type_Definition
+               --  Ada_Derived_Record_Extension_Definition
 
-                  A_Task_Type_Declaration |
-                  A_Protected_Type_Declaration |
-                  A_Single_Task_Declaration |
-                  A_Single_Protected_Declaration |
-                  A_Procedure_Body_Declaration |
-                  A_Function_Body_Declaration |
-                  A_Package_Declaration | -- ???(non lib unit)
-                  A_Package_Body_Declaration |
-                  A_Task_Body_Declaration |
-                  A_Protected_Body_Declaration |
-                  An_Entry_Body_Declaration |
-                  A_Generic_Procedure_Declaration |
-                  A_Generic_Function_Declaration |
-                  A_Generic_Package_Declaration |
-                  An_Enumeration_Type_Definition | --???(if big)
-                  A_Loop_Statement |
-                  A_While_Loop_Statement |
-                  A_For_Loop_Statement |
-                  A_Block_Statement |
-                  An_Extended_Return_Statement |
-                  An_Accept_Statement |
-                  A_Selective_Accept_Statement |
-                  A_Timed_Entry_Call_Statement |
-                  A_Conditional_Entry_Call_Statement |
-                  An_Asynchronous_Select_Statement |
-                  An_If_Path | --???look up to If_Statement, then up to list.
-                  An_Elsif_Path |
-                  An_Else_Path |
-                  A_Case_Path |
-                  A_Record_Representation_Clause
-   --           An_Exception_Handler |???
+                  Ada_Task_Type_Declaration |
+                  Ada_Protected_Type_Declaration |
+                  Ada_Single_Task_Declaration |
+                  Ada_Single_Protected_Declaration |
+                  Ada_Procedure_Body_Declaration |
+                  Ada_Function_Body_Declaration |
+                  Ada_Package_Declaration | -- ???(non lib unit)
+                  Ada_Package_Body_Declaration |
+                  Ada_Task_Body_Declaration |
+                  Ada_Protected_Body_Declaration |
+                  Ada_Entry_Body_Declaration |
+                  Ada_Generic_Procedure_Declaration |
+                  Ada_Generic_Function_Declaration |
+                  Ada_Generic_Package_Declaration |
+                  Ada_Enumeration_Type_Definition | --???(if big)
+                  Ada_Loop_Stmt |
+--                  Ada_While_Loop_Stmt |
+--                  Ada_For_Loop_Stmt |
+                  Ada_Block_Stmt |
+                  Ada_Extended_Return_Stmt |
+                  Ada_Accept_Stmt |
+                  Ada_Select_Stmt |
+                  Ada_If_Path | --???look up to If_Stmt, then up to list.
+                  Ada_Elsif_Path |
+--                  Ada_Else_Path |
+--                  Ada_Case_Path |
+                  Ada_Record_Representation_Clause
+   --           Ada_Exception_Handler |???
 
             then
                declare
@@ -2480,104 +2772,110 @@ end if;
          --  Procedures for formatting the various kinds of node that are not
          --  fully covered by Template_Table:
 
---         procedure Do_Accept_Statement;
+         procedure Do_Accept_Stmt;
+         procedure Do_Aggregate;
 --         procedure Do_Array_Aggregate;
---         procedure Do_Association;
+         procedure Do_Assoc;
 --         procedure Do_Attribute_Reference;
---         procedure Do_Block_Statement;
+--         procedure Do_Block_Stmt;
          procedure Do_Compilation_Unit;
 --         procedure Do_Comment;
 --         procedure Do_Case_Path;
---         procedure Do_Case_Statement;
---         procedure Do_Component_Clause;
+--         procedure Do_Case_Stmt;
+         procedure Do_Component_Clause;
 --         procedure Do_Constrained_Array_Definition; -- also generic formal
 --         procedure Do_Def_Name;
---         procedure Do_Extended_Return_Statement;
+         procedure Do_Generic_Package_Instantiation;
+         procedure Do_Handled_Stmts;
+         procedure Do_Extended_Return_Stmt;
 --         procedure Do_Extension_Aggregate;
+         procedure Do_For_Loop_Spec;
 --         procedure Do_Function_Call;
---         procedure Do_List;
---         procedure Do_Literal;
---         procedure Do_Null_Statement;
+         procedure Do_List;
+         procedure Do_Literal;
+         procedure Do_Label;
 --         procedure Do_Ordinary_Type_Declaration;
 --         procedure Do_Parameter_Specification; -- also Formal_Object_Declaration
---         procedure Do_Pragma;
---         procedure Do_Procedure_Call_Statement; -- also Entry_Call_Statement
---         procedure Do_Qualified_Expression;
+         procedure Do_Pragma;
+--         procedure Do_Procedure_Call_Stmt; -- also Entry_Call_Stmt
+         procedure Do_Qual_Expr;
 --         procedure Do_Record_Aggregate;
+         procedure Do_Record_Def;
 --         procedure Do_Single_Task_Declaration;
---         procedure Do_Subp_Decl -- subprograms and the like
---           (Is_Function, Is_Body : Boolean;
---            Params_Query         : Structural_Queries);
+         procedure Do_Select_When_Part;
+         procedure Do_Subp_Decl; -- subprograms and the like
 --         procedure Do_Subtype_Indication;
 --         procedure Do_Task_Type_Declaration;
---         procedure Do_Usage_Name;
+         procedure Do_Type_Decl;
+         procedure Do_Usage_Name;
 --
          procedure Do_Others; -- anything not listed above
 
---         procedure Do_Accept_Statement is
---         begin
---            --  If there are no statements or exception handlers, use short form
---
---            if Subtree_Count (Subtree (Tree, 5)) = 0
---              and then Subtree_Count (Subtree (Tree, 6)) = 0
---            then
---               Interpret_Template (Accept_Statement_Alt_Templ);
---            else
---               Interpret_Template;
---            end if;
---         end Do_Accept_Statement;
---
+         procedure Do_Accept_Stmt is
+         begin
+            --  If there are no statements or exception handlers, use short form
+
+            if F_Stmts (Accept_Stmt (Tree)) = null then
+               Interpret_Template (Accept_Stmt_Alt_Templ);
+            else
+               Interpret_Template;
+            end if;
+         end Do_Accept_Stmt;
+
+         procedure Do_Aggregate is
+         begin
+            if Subtree_Count (F_Assocs (Aggregate (Tree))) = 0 then
+               Interpret_Template ("@(?~~ with @~" & "null record/)");
+            else
+               Interpret_Template;
+            end if;
+         end Do_Aggregate;
+
 --         procedure Do_Array_Aggregate is
 --         begin
---            if Parent_Tree.Kind = An_Enumeration_Representation_Clause then
+--            if Parent_Tree.Kind = Ada_Enumeration_Representation_Clause then
 --               Interpret_Template ("?[@(~,@ ~)]~");
 --            else
 --               Interpret_Template;
 --            end if;
 --         end Do_Array_Aggregate;
---
---         procedure Do_Association is
---            --  Some have a single name before the "=>", and some have a list
---            --  separated by "|". Single_Name_Only is True in the former case.
---            --  Positional_Notation is True if there are no names (no "=>").
---            --  Single_Name is True if there is a single name before "=>",
---            --  regardless of whether a list is allowed.
---            Single_Name_Only : constant Boolean :=
---              (case Tree.Kind is
---                 when A_Pragma_Argument_Association |
---                   A_Parameter_Association |
---                   A_Generic_Association =>
---                   True,
---                 when A_Discriminant_Association |
---                   A_Record_Component_Association |
---                   An_Array_Component_Association =>
---                   False,
---                 when others => False); -- Can't happen
---            Positional_Notation : constant Boolean :=
---              (if Single_Name_Only then Subtree (Tree, 1).Kind = Not_An_Element
---               else Subtree_Count (Subtree (Tree, 1)) = 0 -- list length 0?
---               );
---         begin
---            if Positional_Notation then
---               Interpret_Template ("?~~~!");
---            --  The "?~~~" generates nothing.
---
---            else
---               declare
---                  Single_Name : constant Boolean :=
---                    Single_Name_Only or else Subtree_Count (Subtree (Tree, 1)) = 1;
---               begin
---                  --  This is needed because the "[]" is not properly nested with
---                  --  the "?~~~".
---                  if Single_Name then
---                     Interpret_Template ("?~~ ^=>[@ ~!]");
---                  else
---                     Interpret_Template ("?~ ^|@ ~ ^=>[@ ~!]");
---                  end if;
---               end;
---            end if;
---         end Do_Association;
---
+
+         procedure Do_Assoc is
+            --  Some have a single name before the "=>", and some have a list
+            --  separated by "|".
+            --  Positional_Notation is True if there are no names (no "=>").
+            --  Single_Name is True if there is a single name before "=>",
+            --  regardless of whether a list is allowed.
+
+            Designator : constant Ada_Tree := Subtree (Tree, 1);
+            Positional_Notation : constant Boolean := Designator = null;
+         begin
+            if Positional_Notation then
+               Interpret_Template ("?~~~!");
+            --  The "?~~~" generates nothing.
+
+            else
+               declare
+                  Single_Name : constant Boolean :=
+                    (if Tree.Kind = Ada_Discriminant_Association
+                       then Subtree_Count
+                         (F_Ids (Discriminant_Association (Tree))) = 1
+                     elsif Designator.Kind = Ada_Aggregate_Member
+                       then Subtree_Count
+                        (F_Choice_List (Aggregate_Member (Designator))) = 1
+                     else True);
+               begin
+                  --  This is needed because the "[]" is not properly nested with
+                  --  the "?~~~".
+                  if Single_Name then
+                     Interpret_Template ("?~~ ^=>[@ ~!]");
+                  else
+                     Interpret_Template ("?~ ^|@ ~ ^=>[@ ~!]");
+                  end if;
+               end;
+            end if;
+         end Do_Assoc;
+
 --         procedure Do_Attribute_Reference is
 --            Attribute_Designator_Id : constant String :=
 --              To_Lower (Str (Subtree (Tree, 2).Ref_Name).S);
@@ -2590,23 +2888,23 @@ end if;
 --            --      X'Update((X => Y)).
 --
 --            if Attribute_Designator_Id = "update" then
---               pragma Assert (Tree.Kind = An_Implementation_Defined_Attribute);
+--               pragma Assert (Tree.Kind = Ada_Implementation_Defined_Attribute);
 --               Interpret_Template ("!'[@!? @~, ~~]");
 --            else
 --               Interpret_Template;
 --            end if;
 --         end Do_Attribute_Reference;
 --
---         procedure Do_Block_Statement is
+--         procedure Do_Block_Stmt is
 --         begin
 --            --  If Block_Declarative_Items is empty, leave off the "declare"
 --
 --            if Subtree_Count (Subtree (Tree, 3)) = 0 then
---               Interpret_Template (Block_Statement_Alt_Templ_1);
+--               Interpret_Template (Block_Stmt_Alt_Templ_1);
 --            else
---               Interpret_Template (Block_Statement_Alt_Templ_2);
+--               Interpret_Template (Block_Stmt_Alt_Templ_2);
 --            end if;
---         end Do_Block_Statement;
+--         end Do_Block_Stmt;
 
          use Buffered_Output;
 
@@ -2632,7 +2930,7 @@ end if;
                Post    => ";$$");
             --  If it's a subunit, we need "separate (Parent.Name)"
 
---            if Tree.Unit_Kind in A_Subunit then
+--            if Tree.Unit_Kind in Ada_Subunit then
 --               declare
 --                  N    : constant W_Str :=
 --                    To_W_Str (Tree.Unit_Full_Name);
@@ -2655,17 +2953,17 @@ end if;
 --            end if;
 --
 --            case Tree.Unit_Class is
---               when A_Private_Declaration =>
+--               when Ada_Private_Declaration =>
 --                  Put ("private ");
 --
---               when A_Public_Declaration       |
---                 A_Public_Body                 |
---                 A_Public_Declaration_And_Body |
---                 A_Private_Body                |
---                 A_Separate_Body               =>
+--               when Ada_Public_Declaration       |
+--                 Ada_Public_Body                 |
+--                 Ada_Public_Declaration_And_Body |
+--                 Ada_Private_Body                |
+--                 Ada_Separate_Body               =>
 --                  null;
 --
---               when Not_A_Class =>
+--               when Not_Ada_Class =>
 --                  raise Program_Error;
 --            end case;
 
@@ -2718,7 +3016,7 @@ end if;
 --            --     when Upper_Case => Upper_Case_Case : begin
 --
 --            if Subtree_Count (Stms) = 1
---              and then Subtree (Stms, 1).Kind = A_Block_Statement
+--              and then Subtree (Stms, 1).Kind = Ada_Block_Stmt
 --              and then Subtree (Stms, 1).Sloc.First_Line = Tree.Sloc.First_Line
 --            then
 --               Interpret_Template ("when ?[@~ |@ ~]~ => " & "?~~;$~");
@@ -2728,7 +3026,7 @@ end if;
 --            end if;
 --         end Do_Case_Path;
 --
---         procedure Do_Case_Statement is
+--         procedure Do_Case_Stmt is
 --            --  If all the "when"s appear in the same column as "case", then we
 --            --  assume that's what the user intended, and avoid indenting the
 --            --  "when"s. ???But the old gnatpp doesn't do that, so disable it
@@ -2749,37 +3047,40 @@ end if;
 --
 --            Whens_Col := Positive'Last; -- ???disable for now
 --            if Case_Col = Whens_Col and then Case_Col /= 1 then
---               Interpret_Template (Labels & "case[@ !]@ is$" & "!" & "end case");
+--               Interpret_Template ("case[@ !]@ is$" & "!" & "end case");
 --
 --            else
 --               Interpret_Template;
 --            end if;
---         end Do_Case_Statement;
---
---         procedure Do_Component_Clause is
---            --  We use "&" to right-justify the three expressions X, Y, and Z in
---            --  "at X range Y .. Z". We need to lift the Y and Z expressions up so
---            --  they appear at the same level as X, so the Tree and Parent of the
---            --  "&" will match that of the following "^". The Index_In_Lines must
---            --  also match. The end result will be something like:
---            --     Thing   at 0 range   0 ..  127;
---            --     Thing_2 at 0 range 128 .. 1023;
---
---            pragma Assert
---              (Subtree (Tree, 3).Kind = A_Discrete_Simple_Expression_Range);
---            Subts : constant Ada_Tree_Array :=
---              Subtrees (Tree) (1 .. 2) & Subtrees (Subtree (Tree, 3));
---            pragma Assert (Subts'Last = 4);
---            Cc_Templ : constant Ada_Template :=
---              "! ^at &2! ^2range [@&3! ^3..[@ &4!^4]]";
---         begin
---            Interpret_Template (Cc_Templ, Subts);
---         end Do_Component_Clause;
---
+--         end Do_Case_Stmt;
+
+         procedure Do_Component_Clause is
+            --  We use "&" to right-justify the three expressions X, Y, and Z in
+            --  "at X range Y .. Z". We need to lift the Y and Z expressions up so
+            --  they appear at the same level as X, so the Tree and Parent of the
+            --  "&" will match that of the following "^". The Index_In_Lines must
+            --  also match. The end result will be something like:
+            --     Thing   at 0 range   0 ..  127;
+            --     Thing_2 at 0 range 128 .. 1023;
+
+            use type Ada_Node_Arrays.Array_Type;
+            pragma Assert
+              (F_Op (Bin_Op (Subtree (Tree, 3))) = Ada_Op_Ellipsis);
+            Subts : constant Ada_Tree_Array :=
+              Subtrees (Tree) (1 .. 2) & Subtrees (Subtree (Tree, 3));
+            pragma Assert (Subts'Last = 5);
+            Cc_Templ : constant Ada_Template :=
+              "! ^at &2! ^2range [@&3! ^3../[@ &4!^4]]";
+            --  We need to ignore the ".." subtree, and put it explicitly in
+            --  the template, because function Tab_Token checks for the ".".
+         begin
+            Interpret_Template (Cc_Templ, Subts);
+         end Do_Component_Clause;
+
 --         procedure Do_Constrained_Array_Definition is
 --         begin
 --            case Subtree (Subtree (Tree, 1), 1).Kind is
---               when A_Range_Attribute_Reference | A_Simple_Expression_Range =>
+--               when Ada_Range_Attribute_Reference | Ada_Simple_Expression_Range =>
 --                  Interpret_Template (Constrained_Array_Definition_Alt_Templ_1);
 --               when others =>
 --                  Interpret_Template (Constrained_Array_Definition_Alt_Templ_2);
@@ -2789,7 +3090,7 @@ end if;
 --         procedure Do_Def_Name is
 --            Kind : Ada_Tree_Kind;
 --         begin
---            if Tree.Kind = A_Defining_Expanded_Name then
+--            if Tree.Kind = Ada_Defining_Expanded_Name then
 --               Interpret_Template ("![@.!]");
 --            else
 --               --  Odd special case for task and protected bodies: If we have
@@ -2801,7 +3102,7 @@ end if;
 --               --  case.
 --
 --               if Decl_Of_Def (Symtab, Tree).Kind in
---                 A_Task_Body_Declaration | A_Protected_Body_Declaration
+--                 Ada_Task_Body_Declaration | Ada_Protected_Body_Declaration
 --               then
 --                  Kind := Decl_Of_Def_Kind (Symtab, Spec_Of_Body (Symtab, Tree));
 --               else
@@ -2812,20 +3113,56 @@ end if;
 --                    Id_With_Casing (Tree.Def_Name, Kind, Is_Predef => False));
 --            end if;
 --         end Do_Def_Name;
---
---         procedure Do_Extended_Return_Statement is
---         begin
---            --  If there are no statements or exception handlers, use short form
---
---            if Subtree_Count (Subtree (Tree, 3)) = 0
---              and then Subtree_Count (Subtree (Tree, 4)) = 0
---            then
---               Interpret_Template (Extended_Return_Statement_Alt_Templ);
---            else
---               Interpret_Template;
---            end if;
---         end Do_Extended_Return_Statement;
---
+
+         procedure Do_Generic_Package_Instantiation is
+            --  ????This is needed because there's no Generic_Formal_Package
+            --  node kind.
+         begin
+            if Parent (Parent (Tree)).Kind in
+              Ada_Generic_Package_Decl | Ada_Generic_Subprogram_Decl
+            then
+               --  It's really a formal package
+               put ("\1", "with ");
+            end if;
+
+            Interpret_Template;
+         end Do_Generic_Package_Instantiation;
+
+         Stmts_And_Handlers : constant Ada_Template :=
+           "{~;$~;$}~" &
+           "?exception$" &
+           "{~$~}~";
+         Handled_Stmts_With_Begin : constant Ada_Template :=
+           "?begin$" & Stmts_And_Handlers;
+         Handled_Stmts_With_Do : constant Ada_Template :=
+           "@ ?do$" & Stmts_And_Handlers;
+
+         procedure Do_Handled_Stmts is
+         begin
+            case Parent (Tree).Kind is
+               when Ada_Entry_Body |
+                 Ada_Package_Body |
+                 Ada_Subprogram_Body |
+                 Ada_Task_Body |
+                 Ada_Block_Stmt =>
+                  Interpret_Template (Handled_Stmts_With_Begin);
+               when Ada_Extended_Return_Stmt | Ada_Accept_Stmt =>
+                  Interpret_Template (Handled_Stmts_With_Do);
+               when others => raise Program_Error;
+            end case;
+         end Do_Handled_Stmts;
+
+         procedure Do_Extended_Return_Stmt is
+         begin
+            --  If there are no statements or exception handlers, use short form
+
+            if F_Stmts (Extended_Return_Stmt (Tree)) = null then
+               Interpret_Template (Extended_Return_Stmt_Alt_Templ);
+            else
+               Interpret_Template;
+            end if;
+         end Do_Extended_Return_Stmt;
+
 --         procedure Do_Extension_Aggregate is
 --         begin
 --            if Subtree_Count (Subtree (Tree, 2)) = 0 then
@@ -2835,76 +3172,116 @@ end if;
 --               Interpret_Template;
 --            end if;
 --         end Do_Extension_Aggregate;
---
---         type Precedence_Level is range 1 .. 7;
---         function Precedence (Expr : Ada_Tree) return Precedence_Level;
---
---         function Precedence (Expr : Ada_Tree) return Precedence_Level is
---         begin
---            case Expr.Kind is
---   --  ???Don't treat membership tests as operators, for now
---   --            when An_In_Membership_Test | A_Not_In_Membership_Test =>
---   --               return 1;
---               when An_And_Then_Short_Circuit | An_Or_Else_Short_Circuit =>
---                  return 2;
---
---               when A_Function_Call =>
---                  --  Binary operator using operator notation
---
---                  if Subtree (Expr, 3).Kind /= An_Is_Prefix_Call
---                    and then Subtree_Count (Subtree (Expr, 2)) /= 1
---                  then
---                     pragma Assert
---                       (Subtree (Expr, 4).Kind /= An_Is_Prefix_Notation);
---                     pragma Assert (Subtree_Count (Subtree (Expr, 2)) = 2);
---                     case Subtree (Expr, 1).Kind is
---                        when An_And_Operator | An_Or_Operator | An_Xor_Operator =>
---                           return 2; -- same as 'and then' and 'or else'
---
---                        when An_Equal_Operator             |
---                          A_Not_Equal_Operator             |
---                          A_Less_Than_Operator             |
---                          A_Less_Than_Or_Equal_Operator    |
---                          A_Greater_Than_Operator          |
---                          A_Greater_Than_Or_Equal_Operator =>
---                           return 3;
---
---                        when A_Plus_Operator     |
---                          A_Minus_Operator       |
---                          A_Concatenate_Operator =>
---                           return 4;
---
---                        when A_Multiply_Operator |
---                          A_Divide_Operator      |
---                          A_Mod_Operator         |
---                          A_Rem_Operator         =>
---                           return 5;
---
---                        when An_Exponentiate_Operator =>
---                           return 6;
---
---                        when others =>
---                           raise Program_Error;
---                     end case;
---
---                  --  Unary operator or normal function-call notation
---
---                  else
---                     return 7;
---                  end if;
---
---               --  Assume anything else is a primary (highest precedence)
---
---               when others =>
---                  return 7;
---            end case;
---         end Precedence;
---
+
+         Operator_Symbol_Table : constant array (Ada_Op) of Symbol :=
+           (Ada_Op_And => Intern ("and"),
+            Ada_Op_Or => Intern ("or"),
+            Ada_Op_Or_Else => Intern ("or else"),
+            Ada_Op_And_Then => Intern ("and then"),
+            Ada_Op_Concat => Intern ("&"),
+            Ada_Op_Xor => Intern ("xor"),
+            Ada_Op_In => Intern ("in"),
+            Ada_Op_Not_In => Intern ("not in"),
+            Ada_Op_Abs => Intern ("abs"),
+            Ada_Op_Not => Intern ("not"),
+            Ada_Op_Pow => Intern ("**"),
+            Ada_Op_Mult => Intern ("*"),
+            Ada_Op_Div => Intern ("/"),
+            Ada_Op_Mod => Intern ("mod"),
+            Ada_Op_Rem => Intern ("rem"),
+            Ada_Op_Plus => Intern ("+"),
+            Ada_Op_Minus => Intern ("-"),
+            Ada_Op_Eq => Intern ("="),
+            Ada_Op_Neq => Intern ("/="),
+            Ada_Op_Lt => Intern ("<"),
+            Ada_Op_Lte => Intern ("<="),
+            Ada_Op_Gt => Intern (">"),
+            Ada_Op_Gte => Intern (">="),
+            Ada_Op_Ellipsis => Intern (".."));
+
+         function Operator_Symbol (Op : Ada_Op) return W_Str is
+            (To_W_Str (Operator_Symbol_Table (Op)));
+
+         procedure Do_Un_Op is
+            Op : constant Ada_Op := Kind (F_Op (Un_Op (Tree)));
+         begin
+            Put ("\1 ", Operator_Symbol (Op));
+            Subtree_To_Ada
+              (Ada_Tree (F_Expr (Un_Op (Tree))),
+               Cur_Level + 1, Index_In_Parent => 2);
+         end Do_Un_Op;
+
+         procedure Do_Bin_Op is
+            Op : constant Ada_Op := Kind (F_Op (Bin_Op (Tree)));
+         begin
+            Subtree_To_Ada
+              (Ada_Tree (F_Left (Bin_Op (Tree))),
+               Cur_Level + 1, Index_In_Parent => 1);
+            Put ((if Op = Ada_Op_Pow then "\1" else " \1 "),
+                 Operator_Symbol (Op));
+            Subtree_To_Ada
+              (Ada_Tree (F_Right (Bin_Op (Tree))),
+               Cur_Level + 1, Index_In_Parent => 3);
+         end Do_Bin_Op;
+
+         type Precedence_Level is range 1 .. 8;
+         function Precedence (Expr : Ada_Tree) return Precedence_Level;
+
+         function Precedence (Expr : Ada_Tree) return Precedence_Level is
+         begin
+            case Expr.Kind is
+               when Ada_Bin_Op =>
+                  case F_Op (Bin_Op (Expr)) is
+                     when Ada_Op_In | Ada_Op_Not_In =>
+                        raise Program_Error;
+--  ???Don't treat membership tests as operators, for now
+--               return 1;
+
+                     when Ada_Op_And_Then | Ada_Op_Or_Else |
+                       Ada_Op_And | Ada_Op_Or | Ada_Op_Xor =>
+                        return 2;
+
+                     when Ada_Op_Eq |
+                       Ada_Op_Neq |
+                       Ada_Op_Gt |
+                       Ada_Op_Gte |
+                       Ada_Op_Lt |
+                       Ada_Op_Lte =>
+                        return 3;
+
+                     when Ada_Op_Ellipsis =>
+                        return 4; -- ???
+
+                     when Ada_Op_Plus | Ada_Op_Minus | Ada_Op_Concat =>
+                        return 5;
+
+                     when Ada_Op_Mult | Ada_Op_Div | Ada_Op_Mod | Ada_Op_Rem =>
+                        return 6;
+
+                     when Ada_Op_Pow =>
+                        return 7;
+
+
+
+                     --  Unary-only operator
+
+                     when Ada_Op_Abs | Ada_Op_Not =>
+                        raise Program_Error;
+                  end case;
+
+               --  Assume anything else is a unary operator or a primary
+               --  (highest precedence)
+
+               when others =>
+                  return 8;
+            end case;
+         end Precedence;
+
 --         function Get_Arg (Expr : Ada_Tree; N : Query_Index) return Ada_Tree;
 --
 --         function Get_Arg (Expr : Ada_Tree; N : Query_Index) return Ada_Tree is
 --            Assoc : constant Ada_Tree := Subtree (Subtree (Expr, 2), N);
---            pragma Assert (Assoc.Kind = A_Parameter_Association);
+--            pragma Assert (Assoc.Kind = Ada_Parameter_Association);
 --            function Is_Positional
 --              (Assoc : Ada_Tree)
 --               return  Boolean is
@@ -2921,9 +3298,9 @@ end if;
 --
 --         function Make_Op (Expr : Ada_Tree) return Ada_Tree is
 --         begin
---            return Result : constant Ada_Tree := Make (An_Identifier) do
+--            return Result : constant Ada_Tree := Make (Ada_Identifier) do
 --               case Expr.Kind is
---                  when A_Function_Call =>
+--                  when Ada_Call_Expr =>
 --                     declare
 --                        Q_Op_Sym : constant String :=
 --                          To_Lower (Str (Subtree (Expr, 1).Ref_Name).S);
@@ -2934,10 +3311,10 @@ end if;
 --                        Result.Ref := Intern (Un_Q);
 --                     end;
 --
---                  when An_And_Then_Short_Circuit =>
+--                  when Ada_And_Then_Short_Circuit =>
 --                     Result.Ref := Name_And_Then;
 --
---                  when An_Or_Else_Short_Circuit =>
+--                  when Ada_Or_Else_Short_Circuit =>
 --                     Result.Ref := Name_Or_Else;
 --
 --                  when others =>
@@ -2946,36 +3323,37 @@ end if;
 --               Result.Ref_Name := Result.Ref;
 --            end return;
 --         end Make_Op;
---
---         procedure Do_Unary_Operator (Expr : Ada_Tree);
---
---         procedure Do_Binary_Operator
---           (Expr      : Ada_Tree;
---            Is_Right  : Boolean;
---            Cur_Level : Nesting_Level);
---         --  Also handles some things that look like operators, like "and then".
---         --  Is_Right is True if Expr is the right-hand argument of an outer
---         --  binary operator. Otherwise (Expr is the left-hand argument, or Expr's
---         --  parent is something else, like a parenthesized expression), Is_Right
---         --  is False.
---
+
+         procedure Do_Unary_Operator (Tree : Ada_Tree);
+
+         procedure Do_Binary_Operator
+           (Tree      : Ada_Tree;
+            Is_Right  : Boolean;
+            Cur_Level : Nesting_Level);
+         --  Also handles some things that look like operators, like "and then".
+         --  Is_Right is True if Tree is the right-hand argument of an outer
+         --  binary operator. Otherwise (Tree is the left-hand argument, or Tree's
+         --  parent is something else, like a parenthesized expression), Is_Right
+         --  is False.
+
 --         function Is_Bin_Op (Expr : Ada_Tree) return Boolean;
---
---         procedure Do_Unary_Operator (Expr : Ada_Tree) is
+
+         procedure Do_Unary_Operator (Tree : Ada_Tree) is
+            Expr : constant Un_Op := Un_Op (Tree);
 --            Op       : constant Ada_Tree       := Make_Op (Expr);
 --            Arg1     : constant Ada_Tree       := Get_Arg (Expr, 1);
---         begin
---            --  First we have a special case for the Depends aspect specification.
---            --  We want to pretend that "=>+" is an operator, so we print:
---            --   "Depends => (A =>+ B)" instead of "Depends => (A => +B)".
---            --  We don't bother with this for pragma Depends, because that's
---            --  mainly for the compiler's implementation of the aspect, so we
---            --  don't expect it to be used much.
---
---            if Ancestor_Tree (4).Kind = An_Aspect_Specification
+         begin
+            --  First we have a special case for the Depends aspect specification.
+            --  We want to pretend that "=>+" is an operator, so we print:
+            --   "Depends => (A =>+ B)" instead of "Depends => (A => +B)".
+            --  We don't bother with this for pragma Depends, because that's
+            --  mainly for the compiler's implementation of the aspect, so we
+            --  don't expect it to be used much.
+
+--            if Ancestor_Tree (4).Kind = Ada_Aspect_Spec
 --              and then Subtree (Ancestor_Tree (4), 1).Ref_Name = Name_Depends
 --            then
---               pragma Assert (Subtree (Expr, 1).Kind = A_Unary_Plus_Operator);
+--               pragma Assert (Subtree (Expr, 1).Kind = Ada_Unary_Plus_Operator);
 --               pragma Assert
 --                 (Slice (Out_Buf, Point (Out_Buf) - 4, Point (Out_Buf) - 1)
 --                    = " => ");
@@ -2990,11 +3368,19 @@ end if;
 --            --  except for "+" and "-".
 --
 --            else
+            Put ("\1", Operator_Symbol (F_Op (Expr)));
+            case F_Op (Expr) is
+               when Ada_Op_Plus | Ada_Op_Minus =>
+                  Interpret_Template ("/!", Subtrees (Expr));
+               when Ada_Op_Abs | Ada_Op_Not =>
+                  Interpret_Template ("/ !", Subtrees (Expr));
+               when others => raise Program_Error;
+            end case;
 --               declare
 --                  Subtrees : constant Ada_Tree_Array := (Op, Arg1);
 --               begin
 --                  if Subtree (Expr, 1).Kind in
---                    A_Unary_Plus_Operator | A_Unary_Minus_Operator
+--                    Ada_Unary_Plus_Operator | Ada_Unary_Minus_Operator
 --                  then
 --                     Interpret_Template ("!!", Subtrees);
 --                  else
@@ -3002,126 +3388,133 @@ end if;
 --                  end if;
 --               end;
 --            end if;
---         end Do_Unary_Operator;
---
+         end Do_Unary_Operator;
+
 --         function Is_Bin_Op (Expr : Ada_Tree) return Boolean is
 --         begin
 --            case Expr.Kind is
---               when A_Function_Call =>
---                  return Subtree (Expr, 3).Kind /= An_Is_Prefix_Call
+--               when Ada_Call_Expr =>
+--                  return Subtree (Expr, 3).Kind /= Ada_Is_Prefix_Call
 --                    and then Subtree_Count (Subtree (Expr, 2)) = 2;
 --
---               when An_And_Then_Short_Circuit | An_Or_Else_Short_Circuit =>
+--               when Ada_And_Then_Short_Circuit | Ada_Or_Else_Short_Circuit =>
 --                  return True;
 --
 --               when others =>
 --                  return False;
 --            end case;
 --         end Is_Bin_Op;
---
---         procedure Do_Binary_Operator
---           (Expr      : Ada_Tree;
---            Is_Right  : Boolean;
---            Cur_Level : Nesting_Level)
---         is
---            Is_Short_C : constant Boolean :=
---              Expr.Kind in An_And_Then_Short_Circuit | An_Or_Else_Short_Circuit;
---            Is_Expon : constant Boolean := -- True for "**"
---              (Expr.Kind in A_Function_Call
---               and then Subtree (Expr, 1).Kind = An_Exponentiate_Operator);
---            Op          : constant Ada_Tree := Make_Op (Expr);
---            Arg1, Arg2  : Ada_Tree;
---            Arg1_Higher : Boolean; -- Arg1 is higher precedence than Expr
---
---         --  Calculate template fragments for the args (Arg1/2_T), that indent
---         --  if the arg is a higher precedence binary operator than the whole
---         --  expression.
---
---         --  Start of processing for Do_Binary_Operator
---
---         begin
---            if Is_Short_C then
---               Arg1 := Subtree (Expr, 1);
---               Arg2 := Subtree (Expr, 2);
---
---            else -- function call
---               Arg1 := Get_Arg (Expr, 1);
---               Arg2 := Get_Arg (Expr, 2);
---            end if;
---
---            --  The arguments can't have lower precedence than the expression as
---            --  a whole; that's what precedence means -- you need parens to put
---            --  a "+" inside a "*". The right-hand argument can't have equal
---            --  precedence, because Ada has no right-associative binary operators.
---
---            pragma Assert (Precedence (Arg1) >= Precedence (Expr));
---            pragma Assert (Precedence (Arg2) > Precedence (Expr));
---
---            Arg1_Higher := Precedence (Arg1) > Precedence (Expr);
---
---            --  The recursive calls to Do_Binary_Operator below bypass the
---            --  normal recursion via Subtree_To_Ada, so we need to pass along the
---            --  Cur_Level to Interpret_Template. When we reach something that's
---            --  not a binary op, we switch back to the normal recursion via
---            --  Interpret_Template on the Arg. We split lines after the
---            --  operator symbol, as in:
---            --     Some_Long_Thing +
---            --     Some_Other_Long_Thing
---            --  except in the case of short circuits:
---            --     Some_Long_Thing
---            --     and then Some_Other_Long_Thing
---            --  The --split-line-before-op switch causes all operators to be
---            --  treated like short circuits in this regard.
---            --
---            --  All operators are surrounded by blanks, except for "**":
---            --     Max : constant := 2**31 - 1;
---
---            if Is_Bin_Op (Arg1) then
---               if Is_Right and then Arg1_Higher then
---                  Interpret_Template ("[@", Empty_Tree_Array, Cur_Level);
---               end if;
---               Do_Binary_Operator
---                 (Arg1,
---                  Is_Right  => Is_Right,
---                  Cur_Level => Cur_Level + (if Arg1_Higher then 1 else 0));
---               if Is_Right and then Arg1_Higher then
---                  Interpret_Template ("]", Empty_Tree_Array, Cur_Level);
---               end if;
---
---            else
---               Interpret_Template
---                 ("!",
---                  Subtrees  => (1 => Arg1),
---                  Cur_Level => Cur_Level);
---            end if;
---
---            if Is_Short_C or Arg (Cmd, Split_Line_Before_Op) then
---               Interpret_Template ("@", Empty_Tree_Array, Cur_Level);
---            end if;
+
+         procedure Do_Binary_Operator
+           (Tree      : Ada_Tree;
+            Is_Right  : Boolean;
+            Cur_Level : Nesting_Level)
+         is
+            Expr : constant Bin_Op := Bin_Op (Tree);
+            Oper : constant Ada_Op := F_Op (Expr);
+            Is_Short_C : constant Boolean :=
+              Oper in Ada_Op_And_Then | Ada_Op_Or_Else;
+            Arg1 : constant Ada_Tree := Ada_Tree (F_Left (Expr));
+            Arg2 : constant Ada_Tree := Ada_Tree (F_Right (Expr));
+
+            --  The arguments can't have lower precedence than the expression as
+            --  a whole; that's what precedence means -- you need parens to put
+            --  a "+" inside a "*". The right-hand argument can't have equal
+            --  precedence, because Ada has no right-associative binary operators.
+
+            pragma Assert (Precedence (Arg1) >= Precedence (Tree));
+--  ????Associativity is wrong for "and", "or", "xor", "and then", and "or else".
+--            pragma Assert (Precedence (Arg2) > Precedence (Tree));
+            pragma Assert (Precedence (Arg2) >= Precedence (Tree)); -- Should be ">".
+
+            Arg1_Higher : constant Boolean := Precedence (Arg1) > Precedence (Tree);
+            --  Arg1 is higher precedence than Expr
+
+         --  Calculate template fragments for the args (Arg1/2_T), that indent
+         --  if the arg is a higher precedence binary operator than the whole
+         --  expression.
+
+         --  Start of processing for Do_Binary_Operator
+
+         begin
+            --  The recursive calls to Do_Binary_Operator below bypass the
+            --  normal recursion via Subtree_To_Ada, so we need to pass along the
+            --  Cur_Level to Interpret_Template. When we reach something that's
+            --  not a binary op, we switch back to the normal recursion via
+            --  Interpret_Template on the Arg. We split lines after the
+            --  operator symbol, as in:
+            --     Some_Long_Thing +
+            --     Some_Other_Long_Thing
+            --  except in the case of short circuits:
+            --     Some_Long_Thing
+            --     and then Some_Other_Long_Thing
+            --  The --split-line-before-op switch causes all operators to be
+            --  treated like short circuits in this regard.
+            --
+            --  All binary operators are surrounded by blanks, except for "**":
+            --     Max : constant := 2**31 - 1;
+
+            if Arg1.Kind = Ada_Bin_Op then
+               if Is_Right and then Arg1_Higher then
+                  Interpret_Template ("[@", Empty_Tree_Array, Cur_Level);
+               end if;
+               Do_Binary_Operator
+                 (Arg1,
+                  Is_Right  => Is_Right,
+                  Cur_Level => Cur_Level + (if Arg1_Higher then 1 else 0));
+               if Is_Right and then Arg1_Higher then
+                  Interpret_Template ("]", Empty_Tree_Array, Cur_Level);
+               end if;
+
+            else
+               Interpret_Template
+                 ("!",
+                  Subtrees  => (1 => Arg1),
+                  Cur_Level => Cur_Level);
+            end if;
+
+            if Is_Short_C or Arg (Cmd, Split_Line_Before_Op) then
+               Interpret_Template ("@", Empty_Tree_Array, Cur_Level);
+            end if;
 --            Interpret_Template
---              ((if Is_Expon then "!" else " ! "), -- no blanks for "**"
---               Subtrees  => (1 => Op),
+--              ((if Oper = Ada_Op_Pow then "!" else " ! "), -- no blanks for "**"
+--               Subtrees  => (1 => Ada_Tree (Oper)),
 --               Cur_Level => Cur_Level);
---            if not (Is_Short_C or Arg (Cmd, Split_Line_Before_Op)) then
---               Interpret_Template ("@", Empty_Tree_Array, Cur_Level);
---            end if;
---
---            if Is_Bin_Op (Arg2) then
---               Interpret_Template ("[@", Empty_Tree_Array, Cur_Level + 1);
---               Do_Binary_Operator
---                 (Arg2,
---                  Is_Right  => True,
---                  Cur_Level => Cur_Level + 1);
---               Interpret_Template ("]", Empty_Tree_Array, Cur_Level + 1);
---
---            else
---               Interpret_Template
---                 ("!",
---                  Subtrees  => (1 => Arg2),
---                  Cur_Level => Cur_Level + 1);
---            end if;
---         end Do_Binary_Operator;
---
+            Put ((if Oper = Ada_Op_Pow then "\1" else " \1 "),
+                 Operator_Symbol (Oper));
+            if not (Is_Short_C or Arg (Cmd, Split_Line_Before_Op)) then
+               Interpret_Template ("@", Empty_Tree_Array, Cur_Level);
+            end if;
+
+            if Arg2.Kind = Ada_Bin_Op then
+               Interpret_Template ("[@", Empty_Tree_Array, Cur_Level + 1);
+               Do_Binary_Operator
+                 (Arg2,
+                  Is_Right  => True,
+                  Cur_Level => Cur_Level + 1);
+               Interpret_Template ("]", Empty_Tree_Array, Cur_Level + 1);
+
+            else
+               Interpret_Template
+                 ("!",
+                  Subtrees  => (1 => Arg2),
+                  Cur_Level => Cur_Level + 1);
+            end if;
+         end Do_Binary_Operator;
+
+         procedure Do_For_Loop_Spec is
+         begin
+            case Parent (Tree).Kind is
+               when Ada_Loop_Stmt =>
+                  Interpret_Template ("for !? : ~~~ !? ~~~ !@");
+               when Ada_Quantified_Expr =>
+                  --  In this case, the quantfied_expression already printed
+                  --  "for ".
+                  Interpret_Template ("!? : ~~~ !? ~~~ !@");
+               when others => raise Program_Error;
+            end case;
+         end Do_For_Loop_Spec;
+
 --         procedure Do_Function_Call is
 --         begin
 --            --  Note: Is_Prefix_Notation is for Object.Operation(...) notation,
@@ -3129,10 +3522,10 @@ end if;
 --            --  notation call. Thus Is_Prefix_Call is True for "&"(X, Y), and
 --            --  False for X&Y.
 --
---            if Subtree (Tree, 4).Kind = An_Is_Prefix_Notation then
---               pragma Assert (Subtree (Tree, 3).Kind = An_Is_Prefix_Call);
+--            if Subtree (Tree, 4).Kind = Ada_Is_Prefix_Notation then
+--               pragma Assert (Subtree (Tree, 3).Kind = Ada_Is_Prefix_Call);
 --               Prefix_Notation_Call
---                 (Label_Names => Empty (A_Defining_Name_List),
+--                 (Label_Names => Empty (Ada_Defining_Name_List),
 --                  Callee      => Subtree (Tree, 1),
 --                  Actuals     => Subtree (Tree, 2));
 --
@@ -3149,7 +3542,7 @@ end if;
 --            --  name, and therefore cannot be used as the prefix of an indexed
 --            --  component.
 --
---            elsif Subtree (Tree, 3).Kind = An_Is_Prefix_Call then
+--            elsif Subtree (Tree, 3).Kind = Ada_Is_Prefix_Call then
 --               if Past_Call_Threshold (Subtree (Tree, 2)) then
 --                  Interpret_Template (Hard_Breaks_For_Call (Tree.Kind));
 --               else
@@ -3178,182 +3571,168 @@ end if;
 --               end if;
 --            end if;
 --         end Do_Function_Call;
---
---         procedure Do_List is
---         --  This formats the list elements with a hard line break in between. It
---         --  is called when a "!" in a template refers to a list subtree. If you
---         --  don't want this formatting, you must use "?" instead of "!". See,
---         --  for example, the template for An_If_Expression, where we want soft
---         --  line breaks in between paths. Sometimes this is called for a list
---         --  of one element, in which case the Between doesn't matter (e.g.
---         --  Defining_Name_List, where there is only one).
---         begin
---            Subtrees_To_Ada (Tree, Pre => "", Between => "$", Post => "");
---         end Do_List;
---
---         procedure Do_Literal is
---            S : constant W_Str := To_W_Str (Tree.Lit_Val);
---
---            function Last_Digit
---              (First : Positive; Based : Boolean) return Positive;
---            --  Returns the index of the last digit in S starting at
---            --  First
---
---            procedure Put_With_Underscores
---              (Part : W_Str; Grouping : Positive; Int : Boolean);
---            --  Part is the integer part (before the '.', if any) or the
---            --  fractional part (after the '.'). Int is True for the integer part.
---            --  For example, for "16#12345.67890#e2", this will be called for Part
---            --  = "12345" and Int = True, then for Part = "67890" and Int = False.
---            --  We want to get "16#1_2345.6789_0#e2" (assuming Grouping = 4).
---
---            procedure Put_With_Underscores
---              (Part : W_Str; Grouping : Positive; Int : Boolean)
---            is
---               Count : Natural := (if Int then Part'Length else 0);
---               Inc : constant Integer := (if Int then -1 else 1);
---               --  For the integer part, we count downward from the Length; for
---               --  the fractional part, we count upward from zero. If Count is
---               --  divisible by Grouping, the next character should be preceded by
---               --  an underscore, except there is never a leading underscore.
---            begin
---               for J in Part'Range loop
---                  if J /= Part'First and then Count mod Grouping = 0 then
---                     Put_Char ('_');
---                  end if;
---                  Put_Char (Part (J));
---                  Count := Count + Inc;
---               end loop;
---            end Put_With_Underscores;
---
---            function Last_Digit
---              (First : Positive; Based : Boolean) return Positive
---            is
---            begin
---               for J in First .. S'Last loop
---                  if Is_Digit (S (J)) then
---                     null;
---                  elsif Based and then Is_Letter (S (J)) then
---                     null;
---                  else
---                     return J - 1;
---                  end if;
---               end loop;
---               return S'Last;
---            end Last_Digit;
---
---         --  Start of processing for Do_Literal
---
---         begin
---            pragma Assert (Check_Whitespace);
---            Check_Whitespace := False;
---
---            --  In most cases, we simply print out S. All of the complicated code
---            --  below is for the --decimal-grouping and --based-grouping
---            --  switches. If --decimal-grouping was used to specify a nonzero
---            --  value, and we have a numeric literal without a base, and that
---            --  literal contains no underscores, we insert underscores. Similarly
---            --  for --based-grouping. A based literal is one containing "#" or
---            --  ":"; note that "10#...#" is considered based, not decimal.
---
---            case Tree.Kind is
---               when A_String_Literal =>
---                  Put ("\1", S);
---
---               when An_Integer_Literal | A_Real_Literal =>
---                  if Arg (Cmd, Decimal_Grouping) = 0
---                    and then Arg (Cmd, Based_Grouping) = 0
---                  then
---                     Put ("\1", S);
---                  else
---                     declare
---                        Sharp : constant Natural :=
---                          (if Find (S, "#") /= 0 then Find (S, "#")
---                           else Find (S, ":"));
---                        Underscore : constant Natural := Find (S, "_");
---
---                        Grouping : constant Natural :=
---                          (if Underscore /= 0 then 0
---                           elsif Sharp = 0 then Arg (Cmd, Decimal_Grouping)
---                           else Arg (Cmd, Based_Grouping));
---
---                        Int_First, Int_Last, Frac_First, Frac_Last : Natural;
---                        --  These point to the slices of the literal that should
---                        --  have underscores inserted. For example:
---                        --     For 12345 or 12345E6:
---                        --       S (Int_First .. Int_Last) = "12345"
---                        --     For 12345.6789 or 16#12345.6789#E-3:
---                        --       S (Int_First .. Int_Last) = "12345", and
---                        --       S (Frac_First .. Frac_Last) = "6789"
---                     begin
---                        if Grouping = 0 then
---                           Put ("\1", S);
---                        else
---                           Int_First := Sharp + 1;
---                           Int_Last :=
---                             Last_Digit (Int_First, Based => Sharp /= 0);
---                           Put ("\1", S (1 .. Sharp));
---                           Put_With_Underscores
---                             (S (Int_First .. Int_Last),
---                              Grouping, Int => True);
---                           if Tree.Kind = An_Integer_Literal then
---                              Put ("\1", S (Int_Last + 1 .. S'Last));
---                           else
---                              Frac_First := Int_Last + 2; -- skip '.'
---                              Frac_Last := Last_Digit
---                                (Frac_First, Based => Sharp /= 0);
---                              pragma Assert
---                                (S (Int_Last + 1 .. Frac_First - 1) = ".");
---                              Put_Char ('.');
---                              Put_With_Underscores
---                                (S (Frac_First .. Frac_Last),
---                                 Grouping, Int => False);
---                              Put ("\1", S (Frac_Last + 1 .. S'Last));
---                           end if;
---                        end if;
---                     end;
---                  end if;
---
---               when others => raise Program_Error;
---            end case;
---
---            Check_Whitespace := True;
---         end Do_Literal;
---
---         procedure Do_Null_Statement is
---         begin
---            --  If a label comes at the end of a statement list, as allowed in Ada
---            --  2012, ASIS inserts an extra implicit null statement to hang the
---            --  label off of. We don't want to print that statement, because
---            --  it wasn't in the source code. We can detect such implicit null
---            --  statements by checking for a nil Sloc. We also need to suppress
---            --  the ";" that comes after the implicit 'null', which is the purpose
---            --  of Implicit_Null_Statement_Seen. We set that flag True here, and
---            --  the very next template character seen by Interpret_Template will
---            --  be that ";", so Interpret_Template will suppress the ";" and reset
---            --  Implicit_Null_Statement_Seen to False.
---
---            if Subtree_Count (Subtree (Tree, 1)) /= 0
---              and then Asis.Text.Is_Nil (Tree.Sloc)
---            then
---               Interpret_Template (Labels);
---               Implicit_Null_Statement_Seen := True;
---
---            else
---               Interpret_Template;
---            end if;
---         end Do_Null_Statement;
---
+
+         procedure Do_List is
+         --  This formats the list elements with a hard line break in between. It
+         --  is called when a "!" in a template refers to a list subtree. If you
+         --  don't want this formatting, you must use "?" instead of "!". See,
+         --  for example, the template for Ada_If_Expression, where we want soft
+         --  line breaks in between paths. Sometimes this is called for a list
+         --  of one element, in which case the Between doesn't matter (e.g.
+         --  Defining_Name_List, where there is only one).
+         begin
+            Subtrees_To_Ada (Tree, Pre => "", Between => "$", Post => "");
+         end Do_List;
+
+         procedure Do_Literal is
+            S : constant W_Str := Id_Name (Tree);
+
+            function Last_Digit
+              (First : Positive; Based : Boolean) return Positive;
+            --  Returns the index of the last digit in S starting at
+            --  First
+
+            procedure Put_With_Underscores
+              (Part : W_Str; Grouping : Positive; Int : Boolean);
+            --  Part is the integer part (before the '.', if any) or the
+            --  fractional part (after the '.'). Int is True for the integer part.
+            --  For example, for "16#12345.67890#e2", this will be called for Part
+            --  = "12345" and Int = True, then for Part = "67890" and Int = False.
+            --  We want to get "16#1_2345.6789_0#e2" (assuming Grouping = 4).
+
+            procedure Put_With_Underscores
+              (Part : W_Str; Grouping : Positive; Int : Boolean)
+            is
+               Count : Natural := (if Int then Part'Length else 0);
+               Inc : constant Integer := (if Int then -1 else 1);
+               --  For the integer part, we count downward from the Length; for
+               --  the fractional part, we count upward from zero. If Count is
+               --  divisible by Grouping, the next character should be preceded by
+               --  an underscore, except there is never a leading underscore.
+            begin
+               for J in Part'Range loop
+                  if J /= Part'First and then Count mod Grouping = 0 then
+                     Put_Char ('_');
+                  end if;
+                  Put_Char (Part (J));
+                  Count := Count + Inc;
+               end loop;
+            end Put_With_Underscores;
+
+            function Last_Digit
+              (First : Positive; Based : Boolean) return Positive
+            is
+            begin
+               for J in First .. S'Last loop
+                  if Is_Digit (S (J)) then
+                     null;
+                  elsif Based and then Is_Letter (S (J)) then
+                     null;
+                  else
+                     return J - 1;
+                  end if;
+               end loop;
+               return S'Last;
+            end Last_Digit;
+
+         --  Start of processing for Do_Literal
+
+         begin
+            pragma Assert (Check_Whitespace);
+            Check_Whitespace := False;
+
+            --  In most cases, we simply print out S. All of the complicated code
+            --  below is for the --decimal-grouping and --based-grouping
+            --  switches. If --decimal-grouping was used to specify a nonzero
+            --  value, and we have a numeric literal without a base, and that
+            --  literal contains no underscores, we insert underscores. Similarly
+            --  for --based-grouping. A based literal is one containing "#" or
+            --  ":"; note that "10#...#" is considered based, not decimal.
+
+            case Tree.Kind is
+               when Ada_String_Literal | Ada_Char_Literal =>
+                  Put ("\1", S);
+
+               when Ada_Integer_Literal | Ada_Real_Literal =>
+                  if Arg (Cmd, Decimal_Grouping) = 0
+                    and then Arg (Cmd, Based_Grouping) = 0
+                  then
+                     Put ("\1", S);
+                  else
+                     declare
+                        Sharp : constant Natural :=
+                          (if Find (S, "#") /= 0 then Find (S, "#")
+                           else Find (S, ":"));
+                        Underscore : constant Natural := Find (S, "_");
+
+                        Grouping : constant Natural :=
+                          (if Underscore /= 0 then 0
+                           elsif Sharp = 0 then Arg (Cmd, Decimal_Grouping)
+                           else Arg (Cmd, Based_Grouping));
+
+                        Int_First, Int_Last, Frac_First, Frac_Last : Natural;
+                        --  These point to the slices of the literal that should
+                        --  have underscores inserted. For example:
+                        --     For 12345 or 12345E6:
+                        --       S (Int_First .. Int_Last) = "12345"
+                        --     For 12345.6789 or 16#12345.6789#E-3:
+                        --       S (Int_First .. Int_Last) = "12345", and
+                        --       S (Frac_First .. Frac_Last) = "6789"
+                     begin
+                        if Grouping = 0 then
+                           Put ("\1", S);
+                        else
+                           Int_First := Sharp + 1;
+                           Int_Last :=
+                             Last_Digit (Int_First, Based => Sharp /= 0);
+                           Put ("\1", S (1 .. Sharp));
+                           Put_With_Underscores
+                             (S (Int_First .. Int_Last),
+                              Grouping, Int => True);
+                           if Tree.Kind = Ada_Integer_Literal then
+                              Put ("\1", S (Int_Last + 1 .. S'Last));
+                           else
+                              Frac_First := Int_Last + 2; -- skip '.'
+                              Frac_Last := Last_Digit
+                                (Frac_First, Based => Sharp /= 0);
+                              pragma Assert
+                                (S (Int_Last + 1 .. Frac_First - 1) = ".");
+                              Put_Char ('.');
+                              Put_With_Underscores
+                                (S (Frac_First .. Frac_Last),
+                                 Grouping, Int => False);
+                              Put ("\1", S (Frac_Last + 1 .. S'Last));
+                           end if;
+                        end if;
+                     end;
+                  end if;
+
+               when others => raise Program_Error;
+            end case;
+
+            Check_Whitespace := True;
+         end Do_Literal;
+
+         procedure Do_Label is
+         begin
+            --  We don't want to put ";" after a label; it's not really a
+            --  statement. The Label_Seen flag suppresses the ";" that normally
+            --  follows statements.
+
+            Label_Seen := True;
+            Put ("\1", Label_Name (Tree));
+         end Do_Label;
+
 --         procedure Do_Ordinary_Type_Declaration is
 --         begin
 --            if Subtree (Tree, 3).Kind in
---                A_Derived_Record_Extension_Definition |
---                  A_Record_Type_Definition |
---                  A_Tagged_Record_Type_Definition |
---                  An_Access_To_Procedure |
---                  An_Access_To_Protected_Procedure |
---                  An_Access_To_Function |
---                  An_Access_To_Protected_Function
+--                Ada_Derived_Record_Extension_Definition |
+--                  Ada_Record_Type_Definition |
+--                  Ada_Tagged_Record_Type_Definition |
+--                  Ada_Access_To_Procedure |
+--                  Ada_Access_To_Protected_Procedure |
+--                  Ada_Access_To_Function |
+--                  Ada_Access_To_Protected_Function
 --            then
 --               Interpret_Template ("type !! is !" & Aspects);
 --            --  Record_Definition or other subtree will take care of new lines.
@@ -3368,9 +3747,9 @@ end if;
          begin
             if Template_Table (Tree.Kind) = null then
                ASIS_UL.Dbg_Out.Output_Enabled := True;
-               Put ("null templ:\1", Capitalize (Tree.Kind'Img));
+               Put ("null templ:\1", Short_Image (Tree));
                Subtrees_To_Ada (Tree, Pre => "{", Between => "|", Post => "}");
---               raise Program_Error;
+               raise Program_Error;
             else
                Interpret_Template;
             end if;
@@ -3388,7 +3767,7 @@ end if;
 --               Subtrees => Empty_Tree_Array);
 --
 --            case Tree.Kind is
---               when A_Parameter_Specification =>
+--               when Ada_Param_Spec =>
 --                  Index := Index + 1;
 --
 --                  if Subtree (Tree, Index).Kind /=
@@ -3398,18 +3777,18 @@ end if;
 --                     Put (" ");
 --                  end if;
 --
---               when A_Formal_Object_Declaration =>
---                  null; -- A_Formal_Object_Declaration doesn't have "aliased"
+--               when Ada_Object_Decl =>
+--                  null; -- Ada_Object_Decl doesn't have "aliased"
 --
 --               when others =>
 --                  raise Program_Error;
 --            end case;
 --
---            if Tree.Mode in An_In_Mode | An_In_Out_Mode then
+--            if Tree.Mode in Ada_Mode_In | Ada_Mode_In_Out then
 --               Put ("in ");
 --            end if;
 --            Interpret_Template ("^2", Subtrees => Empty_Tree_Array);
---            if Tree.Mode in An_Out_Mode | An_In_Out_Mode then
+--            if Tree.Mode in Ada_Mode_Out | Ada_Mode_In_Out then
 --               Put ("out ");
 --            end if;
 --            Interpret_Template ("^3", Subtrees => Empty_Tree_Array);
@@ -3431,19 +3810,20 @@ end if;
 --                  Subtrees => (1 => Subtree (Tree, Index)));
 --            end if;
 --         end Do_Parameter_Specification;
---
---         procedure Do_Pragma is
+
+         procedure Do_Pragma is
+         begin
+            Put
+              ("pragma \1",
+               Id_With_Casing (W_Intern (Id_Name (F_Id (Pragma_Node (Tree)))),
+                               Tree.Kind, Is_Predef => False));
+            Interpret_Template (Pragma_Alt_Templ);
+         end Do_Pragma;
+
+--         procedure Do_Procedure_Call_Stmt is
 --         begin
---            Put
---              ("pragma \1",
---               Id_With_Casing (Tree.Pragma_Name, Tree.Kind, Is_Predef => False));
---            Interpret_Template (Pragma_Alt_Templ);
---         end Do_Pragma;
---
---         procedure Do_Procedure_Call_Statement is
---         begin
---            if Tree.Kind = A_Procedure_Call_Statement
---              and then Subtree (Tree, 4).Kind = An_Is_Prefix_Notation
+--            if Tree.Kind = Ada_Procedure_Call_Stmt
+--              and then Subtree (Tree, 4).Kind = Ada_Is_Prefix_Notation
 --            then
 --               Prefix_Notation_Call
 --                 (Label_Names => Subtree (Tree, 1),
@@ -3454,26 +3834,21 @@ end if;
 --            else
 --               Interpret_Template;
 --            end if;
---         end Do_Procedure_Call_Statement;
---
---         procedure Do_Qualified_Expression is
---         begin
---            if Subtree (Tree, 2).Kind in
---                A_Record_Aggregate |
---                  An_Extension_Aggregate |
---                  A_Positional_Array_Aggregate |
---                  A_Named_Array_Aggregate
---            then
---               Interpret_Template ("!'[@!]");
---            --  If the thing after the ' is an aggregate, we leave out the
---            --  parentheses here, because the aggregate will insert them. We
---            --  want T'(X, Y, Z), not T'((X, Y, Z)).
---
---            else
---               Interpret_Template;
---            end if;
---         end Do_Qualified_Expression;
---
+--         end Do_Procedure_Call_Stmt;
+
+         procedure Do_Qual_Expr is
+         begin
+            if Subtree (Tree, 2).Kind = Ada_Aggregate then
+               Interpret_Template ("!'[@!]");
+            --  If the thing after the ' is an aggregate, we leave out the
+            --  parentheses here, because the aggregate will insert them. We
+            --  want T'(X, Y, Z), not T'((X, Y, Z)).
+
+            else
+               Interpret_Template;
+            end if;
+         end Do_Qual_Expr;
+
 --         procedure Do_Record_Aggregate is
 --         begin
 --            if Subtree_Count (Subtree (Tree, 1)) = 0 then
@@ -3482,7 +3857,19 @@ end if;
 --               Interpret_Template;
 --            end if;
 --         end Do_Record_Aggregate;
---
+
+         procedure Do_Record_Def is
+         begin
+            --  ????This will not be needed if we have a new node kind for
+            --  "null record".
+
+            if F_Components (Record_Def (Tree)) = null then
+               Interpret_Template ("null record/");
+            else
+               Interpret_Template;
+            end if;
+         end Do_Record_Def;
+
 --         procedure Do_Single_Task_Declaration is
 --         begin
 --            --  For single task declarations, use short form if
@@ -3495,39 +3882,115 @@ end if;
 --               Interpret_Template;
 --            end if;
 --         end Do_Single_Task_Declaration;
---
---         procedure Do_Subp_Decl
---           (Is_Function, Is_Body : Boolean;
---            Params_Query         : Structural_Queries)
---            --  Params_Query is the query for getting the formal parameters
---         is
---            --  This is for subprogram declarations and the like -- everything
---            --  that has a formal parameter list.
---
+
+         procedure Do_Select_When_Part is
+         begin
+            if Index_In_Parent = 1 then
+               Interpret_Template ("? when ~~ =>~$" & "{?~;$~;$~}");
+            else
+               Interpret_Template ("or? when ~~ =>~$" & "{?~;$~;$~}");
+            end if;
+         end Do_Select_When_Part;
+
+         procedure Do_Subp_Decl is
+            --  This is for subprogram declarations and the like -- everything
+            --  that has a formal parameter list.
+
+            Spec : constant Subprogram_Spec :=
+              (case Tree.Kind is
+                 when Ada_Subprogram_Decl |
+                      Ada_Abstract_Subprogram_Decl |
+                      Ada_Expr_Function |
+                      Ada_Null_Subprogram_Decl |
+                      Ada_Subprogram_Renaming_Decl =>
+                    F_Subp_Spec (Basic_Subprogram_Decl (Tree)),
+                 when Ada_Formal_Subp_Decl =>
+                    F_Subp_Spec (Formal_Subp_Decl (Tree)),
+                 when Ada_Access_To_Subprogram_Def =>
+                    F_Subp_Spec (Access_To_Subprogram_Def (Tree)),
+                 when Ada_Subprogram_Body_Stub =>
+                    F_Subp_Spec (Subprogram_Body_Stub (Tree)),
+                 when Ada_Subprogram_Body =>
+                    F_Subp_Spec (Subprogram_Body (Tree)),
+                 when Ada_Entry_Decl =>
+                    null,
+                 when Ada_Entry_Body =>
+                    null,
+                 when Ada_Generic_Subprogram_Decl =>
+                    F_Subp_Spec (Generic_Subprogram_Decl (Tree)),
+                 when others => raise Program_Error);
+
+            Params : constant List_Param_Spec :=
+              (case Tree.Kind is
+                 when Ada_Entry_Decl =>
+                    F_Params (Entry_Decl (Tree)),
+                 when Ada_Entry_Body =>
+                    F_Params (Entry_Body (Tree)),
+                 when others =>
+                    F_Params (Spec));
+
+            Is_Body : constant Boolean :=
+              (case Tree.Kind is
+                 when Ada_Subprogram_Decl |
+                      Ada_Subprogram_Renaming_Decl |
+                      Ada_Access_To_Subprogram_Def |
+                      Ada_Entry_Decl |
+                      Ada_Formal_Subp_Decl |
+                      Ada_Generic_Subprogram_Decl => False,
+                 when Ada_Subprogram_Body_Stub |
+                      Ada_Subprogram_Body |
+                      Ada_Abstract_Subprogram_Decl |
+                      Ada_Expr_Function |
+                      Ada_Null_Subprogram_Decl |
+                      Ada_Entry_Body => True,
+                 when others => raise Program_Error);
+
+--  ???The following gets SIGSEGV:
+--            Is_Function : constant Boolean :=
+--              Spec /= null and then F_Returns (Spec) /= null;
 --            Param_Count : constant Query_Count :=
---              Subtree_Count (Get (Tree, Params_Query)) +
+--              Subtree_Count (Params) +
 --              Boolean'Pos (Is_Function); -- Add one extra for function result
---         begin
---            if Param_Count > Query_Count (Arg (Cmd, Par_Threshold)) then
---               Interpret_Template
---                 (Subp_Decl_With_Hard_Breaks
---                    (Tree,
---                     Is_Function,
---                     Is_Body));
---            else
---               Interpret_Template;
---            end if;
---         end Do_Subp_Decl;
---
+            Is_Function : Boolean;
+            Param_Count : Query_Count := Subtree_Count (Params);
+         begin
+            if Tree.Kind in Ada_Entry_Decl | Ada_Entry_Body then
+               Is_Function := False;
+            else
+               Is_Function := F_Returns (Spec) /= null;
+               Param_Count := Param_Count + 1;
+            end if;
+            if (Arg (Cmd, Par_Threshold) = 0 and then Arg (Cmd, Separate_Is))
+              or else Param_Count > Query_Count (Arg (Cmd, Par_Threshold))
+            then
+               pragma Assert (False, "not used yet");
+               Interpret_Template
+                 (Subp_Decl_With_Hard_Breaks (Tree, Is_Function, Is_Body));
+            else
+               declare
+                  use type Ada_Node_Arrays.Array_Type;
+                  Subs : constant Ada_Tree_Array :=
+                    (if Tree.Kind = Ada_Subprogram_Body
+                       then Subtrees (Tree)(1 .. Subtree_Count (Tree) - 1) &
+                            Ada_Tree (P_Defining_Name (Subprogram_Body (Tree)))
+                       else Subtrees (Tree));
+               begin
+                  Interpret_Template
+                    (Subp_Decl_Template (Tree, Is_Function, Is_Body),
+                     Subtrees => Subs);
+               end;
+            end if;
+         end Do_Subp_Decl;
+
 --         procedure Do_Subtype_Indication is
 --         begin
 --            if Subtree (Tree, 4).Kind in
---                A_Range_Attribute_Reference |
---                  A_Simple_Expression_Range
+--                Ada_Range_Attribute_Reference |
+--                  Ada_Simple_Expression_Range
 --            then
 --               Interpret_Template ("?~~ ~?~~ ~!? range ~~~");
 --            elsif Arg (Cmd, Rm_Style_Spacing)
---              and then Subtree (Tree, 4).Kind = An_Index_Constraint
+--              and then Subtree (Tree, 4).Kind = Ada_Index_Constraint
 --            then
 --               Interpret_Template ("?~~ ~?~~ ~!?~~~");
 --            else
@@ -3548,6 +4011,18 @@ end if;
 --            end if;
 --         end Do_Task_Type_Declaration;
 
+         procedure Do_Type_Decl is
+            Def : constant Type_Def := F_Type_Def (Type_Decl (Tree));
+         begin
+            if Def.Kind = Ada_Incomplete_Type_Def
+              and then not F_Has_Tagged (Incomplete_Type_Def (Def))
+            then
+               Interpret_Template (Incomplete_Type_Decl_Alt_Templ);
+            else
+               Interpret_Template;
+            end if;
+         end Do_Type_Decl;
+
          procedure Do_Usage_Name is
 --            --  The following works around a compiler limitation related to
 --            --  'Elab_Spec and 'Elab_Body attributes. For something like
@@ -3561,13 +4036,13 @@ end if;
 --            P              : Ada_Tree_Base;
 --            A              : Symbol;
          begin
---            while N > 1 and then Tree_Stack (N - 1).Kind = A_Selected_Component
+--            while N > 1 and then Tree_Stack (N - 1).Kind = Ada_Dotted_Name
 --            loop
 --               N := N - 1;
 --            end loop;
 --            if N > 1 then
 --               P := Tree_Stack (N - 1);
---               if P.Kind = An_Implementation_Defined_Attribute then
+--               if P.Kind = Ada_Implementation_Defined_Attribute then
 --                  A := Subtree (P, 2).Ref_Name;
 --                  if (A in Name_Elab_Spec | Name_Elab_Body)
 --                    and then Subtree (P, 1) = Tree_Stack (N)
@@ -3609,7 +4084,7 @@ end if;
             when Ada_Compilation_Unit =>
                Do_Compilation_Unit;
 
---            when A_Comment =>
+--            when Ada_Comment =>
 --               Do_Comment;
 --
 --            when Def_Names =>
@@ -3617,151 +4092,201 @@ end if;
 --
             when Ada_Identifier => -- Usage_Names =>
                Do_Usage_Name;
---
---            when An_Integer_Literal | A_Real_Literal | A_String_Literal =>
---               Do_Literal;
---
---            when Flat_Pragma_Kinds =>
---               Do_Pragma;
---
---            when A_Null_Statement =>
---               Do_Null_Statement;
---
---            when An_Ordinary_Type_Declaration =>
+
+            when Ada_Int_Literal | Ada_Real_Literal |
+              Ada_String_Literal | Ada_Char_Literal =>
+               Do_Literal;
+
+            when Ada_Label =>
+               Do_Label;
+
+            when Ada_Pragma_Node =>
+               Do_Pragma;
+
+--            when Ada_Ordinary_Type_Declaration =>
 --               Do_Ordinary_Type_Declaration;
 --
---            when A_Procedure_Call_Statement | An_Entry_Call_Statement =>
---               Do_Procedure_Call_Statement;
---
---            when A_Function_Call =>
+--            when Ada_Procedure_Call_Stmt | Ada_Entry_Call_Stmt =>
+--               Do_Procedure_Call_Stmt;
+
+            when Ada_Un_Op =>
+               if False then -- ????
+                  Do_Un_Op;
+               else
+                  Do_Unary_Operator (Tree);
+               end if;
+
+            when Ada_Bin_Op =>
+               if False then -- ????
+                  Do_Bin_Op;
+               else
+                  Do_Binary_Operator
+                    (Tree,
+                     Is_Right  => False,
+                     Cur_Level => Cur_Level);
+               end if;
+
+            when Ada_For_Loop_Spec =>
+               Do_For_Loop_Spec;
+
+--            when Ada_Call_Expr =>
 --               Do_Function_Call;
 --
---            when An_And_Then_Short_Circuit | An_Or_Else_Short_Circuit =>
+--            when Ada_And_Then_Short_Circuit | Ada_Or_Else_Short_Circuit =>
 --               Do_Binary_Operator
 --                 (Tree,
 --                  Is_Right  => False,
 --                  Cur_Level => Cur_Level);
 --
---            when A_Task_Type_Declaration =>
+--            when Ada_Task_Type_Declaration =>
 --               Do_Task_Type_Declaration;
---
---            when A_Single_Task_Declaration =>
+
+            when Ada_Record_Def =>
+               Do_Record_Def;
+
+--            when Ada_Single_Task_Declaration =>
 --               Do_Single_Task_Declaration;
---
---            when A_Pragma_Argument_Association |
---              A_Discriminant_Association       |
---              A_Record_Component_Association   |
---              An_Array_Component_Association   |
---              A_Parameter_Association          |
---              A_Generic_Association            =>
---               Do_Association;
---
+
+            when Ada_Param_Assoc |
+              Ada_Discriminant_Association |
+              Ada_Pragma_Argument_Assoc =>
+               Do_Assoc;
+
 --            when Flat_Attribute_Reference_Kinds =>
 --               Do_Attribute_Reference;
 --
---            when A_Block_Statement =>
---               Do_Block_Statement;
+--            when Ada_Block_Stmt =>
+--               Do_Block_Stmt;
 --
---            when A_Subtype_Indication =>
+--            when Ada_Subtype_Indication =>
 --               Do_Subtype_Indication;
 --
---            when A_Case_Path =>
+--            when Ada_Case_Path =>
 --               Do_Case_Path;
 --
---            when A_Case_Statement =>
---               Do_Case_Statement;
---
---            when A_Component_Clause =>
---               Do_Component_Clause;
---
---            when A_Constrained_Array_Definition     |
---              A_Formal_Constrained_Array_Definition =>
+--            when Ada_Case_Stmt =>
+--               Do_Case_Stmt;
+
+            when Ada_Component_Clause =>
+               Do_Component_Clause;
+
+--            when Ada_Constrained_Array_Indices     |
+--              Ada_Formal_Constrained_Array_Definition =>
 --               Do_Constrained_Array_Definition;
---
---            when An_Extended_Return_Statement =>
---               Do_Extended_Return_Statement;
---
---            when An_Accept_Statement =>
---               Do_Accept_Statement;
---
---            when A_Positional_Array_Aggregate |
---                A_Named_Array_Aggregate =>
+
+            when Ada_Generic_Package_Instantiation =>
+               Do_Generic_Package_Instantiation;
+
+            when Ada_Handled_Stmts =>
+               Do_Handled_Stmts;
+
+            when Ada_Extended_Return_Stmt =>
+               Do_Extended_Return_Stmt;
+
+            when Ada_Accept_Stmt =>
+               Do_Accept_Stmt;
+
+            when Ada_Aggregate =>
+               Do_Aggregate;
+
+--            when Ada_Positional_Array_Aggregate |
+--                Ada_Named_Array_Aggregate =>
 --               Do_Array_Aggregate;
---
---            when A_Qualified_Expression =>
---               Do_Qualified_Expression;
---
---            when A_Record_Aggregate =>
+
+            when Ada_Qual_Expr =>
+               Do_Qual_Expr;
+
+--            when Ada_Record_Aggregate =>
 --               Do_Record_Aggregate;
 --
---            when An_Extension_Aggregate =>
+--            when Ada_Extension_Aggregate =>
 --               Do_Extension_Aggregate;
 --
---            when A_Parameter_Specification | A_Formal_Object_Declaration =>
+--            when Ada_Param_Spec | Ada_Object_Decl =>
 --               Do_Parameter_Specification;
---
---            when A_Procedure_Declaration       |
---              A_Null_Procedure_Declaration     |
---              A_Procedure_Renaming_Declaration |
---              An_Entry_Declaration             |
---              A_Generic_Procedure_Declaration  |
---              A_Formal_Procedure_Declaration   |
---              A_Procedure_Body_Stub            =>
---               --  An_Accept_Statement goes through Do_Accept_Statement
+
+            when Ada_Type_Decl =>
+               Do_Type_Decl;
+
+            when Ada_Select_When_Part =>
+               Do_Select_When_Part;
+
+            when Ada_Subprogram_Decl |
+                 Ada_Abstract_Subprogram_Decl |
+                 Ada_Expr_Function |
+                 Ada_Null_Subprogram_Decl |
+                 Ada_Subprogram_Renaming_Decl |
+                 Ada_Subprogram_Body_Stub |
+                 Ada_Formal_Subp_Decl |
+                 Ada_Subprogram_Body |
+                 Ada_Access_To_Subprogram_Def |
+                 Ada_Generic_Subprogram_Decl |
+                 Ada_Entry_Body |
+                 Ada_Entry_Decl =>
+               Do_Subp_Decl;
+
+--            when Ada_Procedure_Declaration       |
+--              Ada_Null_Procedure_Declaration     |
+--              Ada_Procedure_Renaming_Declaration |
+--              Ada_Entry_Declaration             |
+--              Ada_Generic_Procedure_Declaration  |
+--              Ada_Formal_Procedure_Declaration   |
+--              Ada_Procedure_Body_Stub            =>
+--               --  Ada_Accept_Stmt goes through Do_Accept_Stmt
 --               Do_Subp_Decl
 --                 (Is_Function  => False,
 --                  Is_Body      => False,
---                  Params_Query => Parameter_Profile);
+--                  Params_Query => Param_Spec);
 --
---            when A_Procedure_Body_Declaration |
---              An_Entry_Body_Declaration       =>
+--            when Ada_Procedure_Body_Declaration |
+--              Ada_Entry_Body_Declaration       =>
 --               Do_Subp_Decl
 --                 (Is_Function  => False,
 --                  Is_Body      => True,
---                  Params_Query => Parameter_Profile);
+--                  Params_Query => Param_Spec);
 --
---            when An_Access_To_Procedure                  |
---              An_Access_To_Protected_Procedure           |
---              An_Anonymous_Access_To_Procedure           |
---              An_Anonymous_Access_To_Protected_Procedure |
---              A_Formal_Access_To_Procedure               |
---              A_Formal_Access_To_Protected_Procedure     =>
+--            when Ada_Access_To_Procedure                  |
+--              Ada_Access_To_Protected_Procedure           |
+--              Ada_Anonymous_Access_To_Procedure           |
+--              Ada_Anonymous_Access_To_Protected_Procedure |
+--              Ada_Formal_Access_To_Procedure               |
+--              Ada_Formal_Access_To_Protected_Procedure     =>
 --               Do_Subp_Decl
 --                 (Is_Function  => False,
 --                  Is_Body      => False,
---                  Params_Query => Access_To_Subprogram_Parameter_Profile);
+--                  Params_Query => Access_To_Subprogram_Param_Spec);
 --
---            when A_Function_Declaration          |
---              An_Expression_Function_Declaration |
---              A_Function_Renaming_Declaration    |
---              A_Generic_Function_Declaration     |
---              A_Formal_Function_Declaration      |
---              A_Function_Body_Stub               =>
+--            when Ada_Function_Declaration          |
+--              Ada_Expression_Function_Declaration |
+--              Ada_Function_Renaming_Declaration    |
+--              Ada_Generic_Function_Declaration     |
+--              Ada_Formal_Function_Declaration      |
+--              Ada_Function_Body_Stub               =>
 --               Do_Subp_Decl
 --                 (Is_Function  => True,
 --                  Is_Body      => False,
---                  Params_Query => Parameter_Profile);
+--                  Params_Query => Param_Spec);
 --
---            when A_Function_Body_Declaration  =>
+--            when Ada_Function_Body_Declaration  =>
 --               Do_Subp_Decl
 --                 (Is_Function  => True,
 --                  Is_Body      => True,
---                  Params_Query => Parameter_Profile);
+--                  Params_Query => Param_Spec);
 --
---            when An_Access_To_Function                  |
---              An_Access_To_Protected_Function           |
---              An_Anonymous_Access_To_Function           |
---              An_Anonymous_Access_To_Protected_Function |
---              A_Formal_Access_To_Function               |
---              A_Formal_Access_To_Protected_Function     =>
+--            when Ada_Access_To_Function                  |
+--              Ada_Access_To_Protected_Function           |
+--              Ada_Anonymous_Access_To_Function           |
+--              Ada_Anonymous_Access_To_Protected_Function |
+--              Ada_Formal_Access_To_Function               |
+--              Ada_Formal_Access_To_Protected_Function     =>
 --               Do_Subp_Decl
 --                 (Is_Function  => True,
 --                  Is_Body      => False,
---                  Params_Query => Access_To_Subprogram_Parameter_Profile);
---
---            when Flat_List_Kinds =>
---               Do_List;
---
+--                  Params_Query => Access_To_Subprogram_Param_Spec);
+
+            when Ada_List =>
+               Do_List;
+
             when others =>
                Do_Others;
          end case;
@@ -3838,6 +4363,41 @@ end if;
       Output_Mode : constant Output_Modes := Get_Output_Mode (Cmd);
       Do_Diff : constant Boolean := Output_Mode in Replace_Modes;
 
+      type Out_File_Formats is (CRLF, LF);
+
+      function Get_Out_File_Format return Out_File_Formats;
+      --  This function is supposed to be used as a part of tool parameters
+      --  processing. It tries to convert its parameter into the corresponding
+      --  value of Out_File_Formats type using the following conventions:
+      --
+      --    "dos"     -> CRLF
+      --    "crlf"    -> CRLF
+      --    "unix"    -> LF
+      --     "lf"     -> LF
+      --
+      --  Generates the error message and raises Parameter_Error if such a
+      --  conversion is not possible.
+
+      function Get_Out_File_Format return Out_File_Formats is
+         Is_Windows : constant Boolean := GNAT.OS_Lib.Directory_Separator = '\';
+         Val : constant String_Ref := Arg (Cmd, End_Of_Line);
+      begin
+         if Val = null then
+            return (if Is_Windows then CRLF else LF);
+         elsif Val.all = "dos" or else Val.all = "crlf" then
+            return CRLF;
+         elsif Val.all = "unix" or else Val.all = "lf" then
+            return LF;
+         else
+            raise Program_Error; -- Should have been validated earlier.
+   --         Error ("Unrecognized output file format " & Val.all);
+   --         raise Parameter_Error;
+         end if;
+      end Get_Out_File_Format;
+
+      Out_File_Format : constant Out_File_Formats := Get_Out_File_Format;
+      --  Format of the tool report file(s)
+
       --  We initially write the output to Temp_Output_Name, then later rename it
       --  to Output_Name (except in Pipe mode). These are full pathnames. If we
       --  are overwriting the Source_Name, and it's a link link-->file, we want to
@@ -3873,6 +4433,82 @@ end if;
       --  True if Tree_To_Ada wrote the output to Temp_Output_Name. It always
       --  does, except in Replace_Modes if the output would be identical to the
       --  input.
+
+      function Remove_Extra_Line_Breaks return Char_Vector;
+      --  Removes extra NL's. The result has exactly one NL at the beginning, and
+      --  exactly one at the end. Also, if Preserve_Blank_Lines is False, we
+      --  collapse 3 or more NL's in a row down to 2.  ???It would be cleaner if
+      --  we didn't put multiple blank lines in in the first place.
+      --
+      --  This also converts LF to CRLF if appropriate.
+
+      --  Wide_Text_IO accepts a Form parameter that inserts CR's on windows, but
+      --  it doesn't do that on unix, so we insert CR's by hand.
+
+      function Remove_Extra_Line_Breaks return Char_Vector is
+         Add_CR : constant Boolean := Out_File_Format = CRLF;
+         --  True if we should convert LF to CRLF -- if it was requested on the
+         --  command line, or if we're on windows and nothing was requested.
+      begin
+         --  Optimize the case where we're not changing anything. The reason
+         --  Remove_Extra_Line_Breaks keeps the initial NL is that this
+         --  optimization wouldn't work otherwise.
+
+         if Preserve_Blank_Lines (Cmd) and then not Add_CR then
+            return To_Vector (Out_Buf);
+         end if;
+
+         declare
+            Result : Char_Vector;
+         begin
+            while Cur (Out_Buf) = NL loop
+               Move_Forward (Out_Buf);
+            end loop;
+            Append (Result, W_LF);
+            --  We don't want a CR here; caller skips the one LF character
+
+            loop
+               declare
+                  NL_Count : Natural := 0;
+               begin
+                  while Cur (Out_Buf) = NL loop
+                     Move_Forward (Out_Buf);
+                     NL_Count := NL_Count + 1;
+                  end loop;
+
+                  exit when At_End (Out_Buf);
+
+                  if not Preserve_Blank_Lines (Cmd) and then NL_Count > 2 then
+                     NL_Count := 2;
+                  end if;
+
+                  for J in 1 .. NL_Count loop
+                     if Add_CR then
+                        Append (Result, W_CR);
+                     end if;
+                     Append (Result, W_LF);
+                  end loop;
+               end;
+
+               pragma Assert (Cur (Out_Buf) /= NL);
+               Append (Result, Cur (Out_Buf));
+               Move_Forward (Out_Buf);
+            end loop;
+
+            if Add_CR then
+               Append (Result, W_CR);
+            end if;
+            Append (Result, W_LF);
+            Reset (Out_Buf);
+            pragma Assert (Result (1) = NL);
+            pragma Assert (Result (2) /= NL);
+            if not Add_CR then
+               pragma Assert (Result (Last_Index (Result) - 1) /= NL);
+               pragma Assert (Result (Last_Index (Result)) = NL);
+            end if;
+            return Result;
+         end;
+      end Remove_Extra_Line_Breaks;
 
       procedure Write_File_Name_File;
       --  If the Output_Mode /= Pipe, and Output_Written is True, add a pair of
@@ -4096,29 +4732,15 @@ end if;
             --  Otherwise, convert the tree to text, and then run all the
             --  text-based passes.
 
-            if True then
-               Tree_To_Ada_2
-                 (Root (Unit), Src_Buf, Out_Buf, Cmd, Is_PP => True);
-               Post_Tree_Phases (Lines_Data, File_Name, Src_Buf, Cmd);
-            else
-               pragma Assert (Is_Empty (Out_Buf));
-               pragma Assert (At_Beginning (Src_Buf));
-               declare
-                  Temp : W_Str renames
-                    Elements (Src_Buf) (1 .. Last_Position (Src_Buf));
-               begin
-                  Insert_NL (Out_Buf);
-                  Insert_Any (Out_Buf, Temp);
-                  Reset (Out_Buf);
-               end;
-            end if;
+            Tree_To_Ada_2 (Root (Unit), Src_Buf, Out_Buf, Cmd, Is_PP => True);
+            Post_Tree_Phases (Lines_Data, File_Name, Src_Buf, Cmd);
          end if;
 
          --  Finally, print out the result to Current_Output
 
          declare
---            Out_Vec : constant Char_Vector := Remove_Extra_Line_Breaks;
-            Out_Vec : constant Char_Vector := To_Vector (Out_Buf);
+            Out_Vec : constant Char_Vector := Remove_Extra_Line_Breaks;
+--            Out_Vec : constant Char_Vector := To_Vector (Out_Buf);
          begin
             Write_Out_Buf (Out_Vec);
          end;
@@ -4272,8 +4894,8 @@ end if;
    begin
       if Debug_Flag_V then
          Print (Unit);
-         Put ("With trivia\n");
-         PP_Trivia (Unit);
+--         Put ("With trivia\n");
+--         PP_Trivia (Unit);
       end if;
 
 --      case Output_Mode is

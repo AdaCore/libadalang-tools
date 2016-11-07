@@ -55,7 +55,8 @@ package LAL_Extensions is
      (Nm : access Ada_Node_Type'Class)
      return W_Str with
      Pre => Kind (Nm) in Ada_Identifier |
-       Ada_Int_Literal | Ada_Real_Literal | Ada_String_Literal;
+       Ada_Int_Literal | Ada_Real_Literal |
+       Ada_String_Literal | Ada_Char_Literal;
    function L_Name
      (Nm : access Ada_Node_Type'Class)
      return W_Str with
@@ -69,7 +70,9 @@ package LAL_Extensions is
      Pre => Kind (L) = Ada_Label;
 
    function Full_Name (Nm : Name) return W_Str;
-   --  Returns the full expanded name
+   function L_Full_Name (Nm : Name) return W_Str;
+   --  Returns the full expanded name. The L_Full_Name is converted to lower
+   --  case.
 
    function Get_Def_Name (Decl : Ada_Node) return Name;
    --  Returns the defining name of a declaration or body

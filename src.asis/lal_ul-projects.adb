@@ -88,8 +88,7 @@ package body LAL_UL.Projects is
       then
          return;
       else
-         Put_Line (S);
-         --  ????????????????Raise?
+         Cmd_Error_No_Tool_Name (S);
       end if;
    end Recompute_View_Errors;
 
@@ -253,11 +252,11 @@ package body LAL_UL.Projects is
          end Errors;
       begin
          My_Project.Load
-         (GNATCOLL.VFS.Create
-            (+Project_File_Name (Cmd)), Project_Env, Errors =>
-            Errors'Unrestricted_Access, Recompute_View      =>
-            False);
-         --  Report_Missing_Dirs => False????????????????
+           (GNATCOLL.VFS.Create (+Project_File_Name (Cmd)),
+            Project_Env,
+            Errors => Errors'Unrestricted_Access,
+            Recompute_View => False,
+            Report_Missing_Dirs => False);
 
          if Is_Aggregate_Project (My_Project.Root_Project) then
             Cmd_Error ("aggregate projects are not supported");

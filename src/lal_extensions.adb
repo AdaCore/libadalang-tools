@@ -153,6 +153,12 @@ package body LAL_Extensions is
       end case;
    end Full_Name;
 
+   function L_Full_Name (Nm : Name) return W_Str is
+      use Ada.Wide_Characters.Handling;
+   begin
+      return To_Lower (Full_Name (Nm));
+   end L_Full_Name;
+
    function Get_Def_Name (Decl : Ada_Node) return Name is
    begin
       return Result : Name do

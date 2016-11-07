@@ -159,6 +159,7 @@ package body Pp.Buffers is
    procedure Dump_Buf (Buf : Buffer) is
       use Dbg_Out;
    begin
+      Dbg_Out.Output_Enabled := True;
       Put
         ("To[\1..\2] = <<\3>>end To[\1..\2]\n",
          "1",
@@ -181,6 +182,7 @@ package body Pp.Buffers is
    procedure Dump_Buffer (Buf : Buffer) is
       use Dbg_Out;
    begin
+      Dbg_Out.Output_Enabled := True;
       if False then
          Put ("Buf = <<\1>>end Buf\n", To_String (Buf));
          Put ("Dbg = <<\1>>end Dbg\n", To_Debug_String (Buf));
@@ -216,9 +218,9 @@ package body Pp.Buffers is
       Pos : constant Positive := Position (Buf, Mark);
 
    begin
+      Dbg_Out.Output_Enabled := True;
       if Rec.Flag = Buf.To_Flag then
          Put ("to   ");
-
       else
          Put ("from ");
       end if;

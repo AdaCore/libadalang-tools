@@ -25,11 +25,14 @@
 
 pragma Ada_2012;
 
-with Ada.Characters.Handling; use Ada.Characters.Handling;
+--  ???Version printing is currently commented out, to avoid a dependence on
+--  Gnatvsn. See P912-011.
 
-with Gnatvsn;
-
-with LAL_UL.Tool_Names;
+--  with Ada.Characters.Handling; use Ada.Characters.Handling;
+--
+--  with Gnatvsn;
+--
+--  with LAL_UL.Tool_Names;
 with LAL_UL.Formatted_Output; use LAL_UL.Formatted_Output;
 
 package body LAL_UL.Versions is
@@ -40,12 +43,13 @@ package body LAL_UL.Versions is
 
    procedure Print_Tool_Version is
    begin
-      Put ("\1 \2\n",
-           To_Upper (Tool_Names.Tool_Name), Gnatvsn.Gnat_Version_String);
-      Put ("Copyright (C) \1, \2\n",
-           Gnatvsn.Current_Year, Gnatvsn.Copyright_Holder);
-      Put ("\1", Gnatvsn.Gnat_Free_Software);
-      Put ("\n");
+      Put ("???Print_Tool_Version\n");
+--      Put ("\1 \2\n",
+--           To_Upper (Tool_Names.Tool_Name), Gnatvsn.Gnat_Version_String);
+--      Put ("Copyright (C) \1, \2\n",
+--           Gnatvsn.Current_Year, Gnatvsn.Copyright_Holder);
+--      Put ("\1", Gnatvsn.Gnat_Free_Software);
+--      Put ("\n");
    end Print_Tool_Version;
 
    ------------------------
@@ -54,9 +58,10 @@ package body LAL_UL.Versions is
 
    procedure Print_Version_Info is
    begin
-      Put ("\1 \2\n", Tool_Names.Tool_Name, Gnatvsn.Gnat_Version_String);
-      Put ("Copyright (C) \1, \2.\n",
-           Gnatvsn.Current_Year, "AdaCore");
+      Put ("???Print_Version_Info\n");
+--      Put ("\1 \2\n", Tool_Names.Tool_Name, Gnatvsn.Gnat_Version_String);
+--      Put ("Copyright (C) \1, \2.\n",
+--           Gnatvsn.Current_Year, "AdaCore");
    end Print_Version_Info;
 
 end LAL_UL.Versions;

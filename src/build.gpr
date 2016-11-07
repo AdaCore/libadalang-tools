@@ -1,4 +1,7 @@
-with "gnat_util";
+--  ???with "gnat_util";
+--  gnat_util is needed only for the "with Gnatvsn;" in lal_ul-versions.adb,
+--  which is currently commented out.
+
 with "libadalang.gpr";
 project Build is
 
@@ -11,6 +14,8 @@ project Build is
    package Compiler is
       for Default_Switches ("ada") use
         ("-g", "-O0", "-gnata", "-gnatyg", "-gnatwae", "-gnatw.u");
+--  For optimization:
+--        ("-g", "-O2", "-gnatp", "-gnatyg", "-gnatwae", "-gnatw.u");
    end Compiler;
 
    package Builder is
