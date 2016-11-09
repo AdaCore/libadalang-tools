@@ -1872,7 +1872,8 @@ package body METRICS.Actions is
          --  of a package body, we return just that. If it applies to a
          --  subprogram declaration, we return that declaration.
 
-         function Find_Pragma (L : List_Ada_Node) return Boolean;
+         function Find_Pragma
+           (L : access Ada_Node_List_Type'Class) return Boolean;
          --  True if L contains Node at the start (preceded only by other
          --  pragmas). Node must be a pragma SPARK_Mode.
 
@@ -1918,7 +1919,8 @@ package body METRICS.Actions is
             return Prev_Subp_Decl;
          end Find_Section;
 
-         function Find_Pragma (L : List_Ada_Node) return Boolean is
+         function Find_Pragma
+           (L : access Ada_Node_List_Type'Class) return Boolean is
          begin
             for C in 1 .. Child_Count (L) loop
                if Kind (Childx (L, C)) /= Ada_Pragma_Node then
@@ -2044,7 +2046,7 @@ package body METRICS.Actions is
       end Gather_SPARK_Line_Metrics;
 
       procedure Gather_Contract_Metrics (Node : Ada_Node) is
-         Vis_Decls : constant List_Ada_Node := F_Decls (Vis_Part (Node));
+         Vis_Decls : constant Ada_Node_List := F_Decls (Vis_Part (Node));
 
          --  At some point we might want to compute the ratio of
          --  --contracts and --public-subprograms.
@@ -2073,7 +2075,7 @@ package body METRICS.Actions is
                Has_Post := False;
 
                declare
-                  Assocs : constant List_Aspect_Assoc :=
+                  Assocs : constant Aspect_Assoc_List :=
                     F_Aspect_Assocs (Aspects);
                begin
                   for I in 1 .. Child_Count (Assocs) loop
@@ -2156,7 +2158,7 @@ package body METRICS.Actions is
               Ada_Package_Decl | Ada_Generic_Package_Decl
             then
                declare
-                  Vis_Decls : constant List_Ada_Node :=
+                  Vis_Decls : constant Ada_Node_List :=
                     F_Decls (Vis_Part (Node));
                begin
                   if Vis_Decls /= null then
@@ -2183,7 +2185,7 @@ package body METRICS.Actions is
 
             when Ada_With_Clause =>
                declare
-                  Names : constant List_Name :=
+                  Names : constant Name_List :=
                     F_Packages (With_Clause (Node));
                begin
                   for I in 1 .. Child_Count (Names) loop

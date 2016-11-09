@@ -54,7 +54,7 @@ private
    package Metrix_Vectors is new Langkit_Support.Vectors (Metrix_Ref);
    use Metrix_Vectors;
 
-   Null_Kind : constant Ada_Node_Kind_Type := Ada_List;
+   Null_Kind : constant Ada_Node_Kind_Type := Ada_Abort_Absent;
    --  ???We need a special value
 
    type Fine_Kind is

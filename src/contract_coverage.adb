@@ -55,7 +55,7 @@ procedure Contract_Coverage is
 
       if Aspects /= null then
          declare
-            Assocs : constant List_Aspect_Assoc := F_Aspect_Assocs (Aspects);
+            Assocs : constant Aspect_Assoc_List := F_Aspect_Assocs (Aspects);
          begin
             for I in 1 .. Child_Count (Assocs) loop
                declare
@@ -83,7 +83,7 @@ procedure Contract_Coverage is
    end Has_Contracts;
 
    function Get_Coverage (Pkg_Decl : Base_Package_Decl) return Percent is
-      Decls : constant List_Ada_Node := F_Decls (F_Public_Part (Pkg_Decl));
+      Decls : constant Ada_Node_List := F_Decls (F_Public_Part (Pkg_Decl));
 
       Has_Contracts_Count : Natural := 0;
       --  Number of subprograms in the package with contracts

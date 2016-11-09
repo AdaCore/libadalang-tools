@@ -420,6 +420,32 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
 
    ----------------
 
+   subtype List_Node_Kinds is Ada_Node_Kind_Type with
+     Predicate => List_Node_Kinds in
+       Ada_Ada_Node_List |
+       Ada_Aspect_Assoc_List |
+       Ada_Case_Expr_Alternative_List |
+       Ada_Case_Stmt_Alternative_List |
+       Ada_Compilation_Unit_List |
+       Ada_Component_Clause_List |
+       Ada_Discriminant_Assoc_List |
+       Ada_Discriminant_Spec_List |
+       Ada_Elsif_Expr_Part_List |
+       Ada_Elsif_Stmt_Part_List |
+       Ada_Enum_Literal_Decl_List |
+       Ada_Exception_Handler_List |
+       Ada_Expr_List |
+       Ada_Identifier_List |
+       Ada_Name_List |
+     Ada_Param_Assoc_List |
+     Ada_Param_List |
+       Ada_Param_Assoc_List |
+       Ada_Param_Spec_List |
+       Ada_Pragma_Argument_Assoc_List |
+       Ada_Pragma_Node_List |
+       Ada_Select_When_Part_List |
+       Ada_Variant_List;
+
    function Is_Null (Tree : Ada_Node) return Boolean is (Tree = null);
    function T_Img (Tree : Ada_Node) return String is (Short_Image (Tree));
 
@@ -636,7 +662,7 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
    function Template_For_Kind (Kind : Ada_Tree_Kind) return Ada_Template_Ptr is
    begin
       return (case Kind is
-         when Ada_List => null,
+         when List_Node_Kinds => null,
          when Ada_Subprogram_Spec => L ("? ~~~? @(~; ~)~?[@1 return] ~~~"),
         --  F_Name is optional for access-to-subp.
          when Ada_Aggregate_Member => L ("?~ ^|@ ~~"),
@@ -685,10 +711,15 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
          when Ada_Subprogram_Body =>
              L ("?~~ ~procedure!",
                 Aspects,
-                "@ is$",
+                "@9 is$",
                 "!",
                 "!",
                 "end !"),
+               --  We increase the level of the @ before " is", so it will be
+               --  equal to that of the formal parameters, so if the "is" goes
+               --  on a new line, the parameters will be split as well.
+               --  ????Doesn't work!
+               --
                --  The last "!" refers to the name of the procedure, which
                --  replaces the F_End_Id (see Do_Subp_Decl). This is necessary
                --  because the name of the subprogram is buried in a subtree.
@@ -753,13 +784,13 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
                 "end? ~~~"), -- ???End id is in wrong case.
 
          when Ada_Enum_Type_Decl => L ("type ! is", "[ @(?~,@ ~~)", Aspects, "]"),
-         when Ada_Type_Decl => L ("type !! is[@ !", Aspects, "]"),
+         when Ada_Type_Decl => null,
          when Ada_Subtype_Decl => L ("subtype ! is[@ !", Aspects, "]"),
          when Ada_Compilation_Unit => null,
          when Ada_Component_Def => L ("?~~ ~!"),
          when Ada_Delta_Constraint => L ("delta !? range ~~~"),
          when Ada_Digits_Constraint => L ("digits !? range ~~~"),
-         when Ada_Discriminant_Association => null,
+         when Ada_Discriminant_Assoc => null,
          when Ada_Discriminant_Constraint | Ada_Index_Constraint =>
                L ("?@(~,@ ~)~"),
          when Ada_Range_Constraint => L ("range !"),
@@ -771,7 +802,7 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
          when Ada_Exception_Handler =>
              L ("when? ~~ :~ ?~ | ~~ =>$", "{?~;$~;$~}"),
          when Ada_Explicit_Deref => L ("!.all"),
-         when Ada_Aggregate => L ("@(?~~ with @~", "!)"),
+         when Ada_Aggregate => L ("@(?~~ with @~", "?~,@ ~~)"),
          when Ada_Allocator => L ("new? @(~~)~ !"),
          when Ada_Attribute_Ref => L ("!'[@!? @(~, ~)~]"),
                --  ???This includes function calls to attributes, such as
@@ -799,7 +830,7 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
          when Ada_Null_Component_Decl => L ("null"),
          when Ada_Others_Designator => L ("others"),
          when Ada_Param_Assoc => null,
-         when Ada_Param_List => L ("?~,@ ~~"),
+--         when Ada_Param_List => L ("?~,@ ~~"),
          when Ada_Pragma_Argument_Assoc => null,
          when Ada_Pragma_Node => null,
          when Ada_Component_Clause => null, -- ?
@@ -816,18 +847,23 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
                 "!",
                 "end !1"),
          when Ada_Block_Stmt =>
-                   L ("?~~ :$~",
+                   L ("?~~ : ~",
                       "?declare$",
                       "{~;$~;$$}~", -- ????Should be Declarative_Part, not a list.
                       "!",
                       "end?1 ~~~"),
+         when Ada_Null_Record_Def => L ("null record/"),
+                     --  Null_Record_Def inherits F_Components from
+                     --  Base_Record_Def_Type, and it return null.
+         when Ada_Record_Def => L ("record$", "!", "end record"),
+         when Ada_Record_Type_Def => L ("?~~ ~?~~ ~?~~ ~!"),
          when Ada_Component_List => L ("{?~;$~;$~}", "{?~~;$~}"),
          when Ada_Variant =>
-                     L ("when[ ?~ ^|@ ~~] =>$", "{?~;$~$~}"),
+                     L ("when[ ?~ ^|@ ~~] =>$", "!"),
          when Ada_Case_Stmt_Alternative =>
                      L ("when[ ?~ ^|@ ~~] =>$", "{?~;$~;$~}"),
          when Ada_Case_Stmt | Ada_Variant_Part =>
-                       L ("case !@ is$", "{?~~~}", "end case"),
+                       L ("case !@ is$", "{!}", "end case"),
          when Ada_Extended_Return_Stmt =>
              L ("return[@ !]",
                 "!",
@@ -870,10 +906,6 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
          when Ada_Decimal_Fixed_Point_Def => L ("delta ! digits !? range ~~~"),
          when Ada_Floating_Point_Def => L ("digits !? range ~~~"),
          when Ada_Ordinary_Fixed_Point_Def => L ("delta !? range ~~~"),
-         when Ada_Record_Def => L ("record$", "!", "end record"),
-         when Ada_Record_Type_Def => L ("?~~ ~?~~ ~?~~ ~!"),
-                 --  ???LAL: Separate node for "null record" would be better
-                 --  for allowing illegal syntax ("record end record;")
 
          when Ada_Signed_Int_Type_Def => L ("range !"),
          when Ada_Known_Discriminant_Part => L ("? @(~; ~)~@"),
@@ -1205,10 +1237,7 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
       procedure Indent (Amount : Integer) is
          pragma Assert
            (abs (Amount) in
-              0 |
-                1 |
-                PP_Indentation (Cmd) |
-                PP_Indent_Continuation (Cmd));
+              0 | 1 | PP_Indentation (Cmd) | PP_Indent_Continuation (Cmd));
          Line_Breaks : Line_Break_Vector renames All_Line_Breaks;
       begin
          Cur_Indentation := Cur_Indentation + Amount;
@@ -2133,7 +2162,7 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
 
                   when Ada_Pragma_Argument_Assoc |
                     Ada_Aspect_Assoc |
-                    Ada_Discriminant_Association       |
+                    Ada_Discriminant_Assoc       |
                     Ada_Aggregate_Member |
                     Ada_Param_Assoc =>
                      null;
@@ -2185,7 +2214,7 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
                return Ada_Template (To_String (Result));
             end Keep_Indentation;
 
-            pragma Assert (Tree.Kind in Ada_List);
+            pragma Assert (Tree.Kind in List_Node_Kinds);
             Prev_With : With_Clause := null;
             --  See Use_Same_Line below
 
@@ -2235,13 +2264,13 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
 
                      declare
                         pragma Assert (Prev_With.Kind = Ada_With_Clause);
-                        With_Names : constant List_Name := F_Packages (Prev_With);
+                        With_Names : constant Name_List := F_Packages (Prev_With);
                         Next_Subtree : constant Ada_Tree :=
                           Subtree (Tree, Index + 1);
                      begin
                         if Next_Subtree.Kind = Ada_Use_Package_Clause then
                            declare
-                              Use_Names : constant List_Name :=
+                              Use_Names : constant Name_List :=
                                 F_Packages (Use_Package_Clause (Next_Subtree));
                            begin
                               if Subtree_Count (With_Names) = 1
@@ -2558,7 +2587,7 @@ end if;
                                  --  ???The following could use some cleanup
                                  if Subt /= null  and then Subt.Kind not in Absent_Kinds then
                                     case Subt.Kind is
-                                       when Ada_List =>
+                                       when List_Node_Kinds =>
                                           Append (Tree_Stack, Subt); -- push
                                           Subtrees_To_Ada
                                             (Subt,
@@ -2614,13 +2643,8 @@ end if;
                J := J + 1;
             end loop;
 
-            if True and then -- ????????????????
-              Used /= (Subtrees_Index => True) then -- ???
-               ASIS_UL.Dbg_Out.Output_Enabled := True;
-               ASIS_UL.Dbg_Out.Put ("???Not all used: \1", Kind'Img);
-               raise Program_Error;
-            end if;
-            pragma Assert (Used = (Subtrees_Index => True));
+            pragma Assert
+              (Used = (Subtrees_Index => True), "???Not all used: " &Kind'Img);
          end Interpret_Template;
 
          use Alternative_Templates;
@@ -2767,8 +2791,6 @@ end if;
             end if;
          end Maybe_Blank_Line;
 
-         Index : Query_Index := 1;
-
          --  Procedures for formatting the various kinds of node that are not
          --  fully covered by Template_Table:
 
@@ -2790,17 +2812,29 @@ end if;
          procedure Do_Extended_Return_Stmt;
 --         procedure Do_Extension_Aggregate;
          procedure Do_For_Loop_Spec;
+
+         procedure Do_Un_Op (Tree : Ada_Tree);
+
+         procedure Do_Bin_Op
+           (Tree      : Ada_Tree;
+            Is_Right  : Boolean;
+            Cur_Level : Nesting_Level);
+         --  Also handles some things that look like operators, like "and then".
+         --  Is_Right is True if Tree is the right-hand argument of an outer
+         --  binary operator. Otherwise (Tree is the left-hand argument, or Tree's
+         --  parent is something else, like a parenthesized expression), Is_Right
+         --  is False.
+
 --         procedure Do_Function_Call;
          procedure Do_List;
          procedure Do_Literal;
          procedure Do_Label;
 --         procedure Do_Ordinary_Type_Declaration;
---         procedure Do_Parameter_Specification; -- also Formal_Object_Declaration
+         procedure Do_Parameter_Specification; -- also Formal_Object_Declaration
          procedure Do_Pragma;
 --         procedure Do_Procedure_Call_Stmt; -- also Entry_Call_Stmt
          procedure Do_Qual_Expr;
 --         procedure Do_Record_Aggregate;
-         procedure Do_Record_Def;
 --         procedure Do_Single_Task_Declaration;
          procedure Do_Select_When_Part;
          procedure Do_Subp_Decl; -- subprograms and the like
@@ -2848,7 +2882,10 @@ end if;
             --  regardless of whether a list is allowed.
 
             Designator : constant Ada_Tree := Subtree (Tree, 1);
-            Positional_Notation : constant Boolean := Designator = null;
+            Positional_Notation : constant Boolean :=
+              Designator = null or else
+                (Designator.Kind in List_Node_Kinds
+                   and then Subtree_Count (Designator) = 0);
          begin
             if Positional_Notation then
                Interpret_Template ("?~~~!");
@@ -2857,9 +2894,9 @@ end if;
             else
                declare
                   Single_Name : constant Boolean :=
-                    (if Tree.Kind = Ada_Discriminant_Association
+                    (if Tree.Kind = Ada_Discriminant_Assoc
                        then Subtree_Count
-                         (F_Ids (Discriminant_Association (Tree))) = 1
+                         (F_Ids (Discriminant_Assoc (Tree))) = 1
                      elsif Designator.Kind = Ada_Aggregate_Member
                        then Subtree_Count
                         (F_Choice_List (Aggregate_Member (Designator))) = 1
@@ -3202,28 +3239,6 @@ end if;
          function Operator_Symbol (Op : Ada_Op) return W_Str is
             (To_W_Str (Operator_Symbol_Table (Op)));
 
-         procedure Do_Un_Op is
-            Op : constant Ada_Op := Kind (F_Op (Un_Op (Tree)));
-         begin
-            Put ("\1 ", Operator_Symbol (Op));
-            Subtree_To_Ada
-              (Ada_Tree (F_Expr (Un_Op (Tree))),
-               Cur_Level + 1, Index_In_Parent => 2);
-         end Do_Un_Op;
-
-         procedure Do_Bin_Op is
-            Op : constant Ada_Op := Kind (F_Op (Bin_Op (Tree)));
-         begin
-            Subtree_To_Ada
-              (Ada_Tree (F_Left (Bin_Op (Tree))),
-               Cur_Level + 1, Index_In_Parent => 1);
-            Put ((if Op = Ada_Op_Pow then "\1" else " \1 "),
-                 Operator_Symbol (Op));
-            Subtree_To_Ada
-              (Ada_Tree (F_Right (Bin_Op (Tree))),
-               Cur_Level + 1, Index_In_Parent => 3);
-         end Do_Bin_Op;
-
          type Precedence_Level is range 1 .. 8;
          function Precedence (Expr : Ada_Tree) return Precedence_Level;
 
@@ -3324,21 +3339,9 @@ end if;
 --            end return;
 --         end Make_Op;
 
-         procedure Do_Unary_Operator (Tree : Ada_Tree);
-
-         procedure Do_Binary_Operator
-           (Tree      : Ada_Tree;
-            Is_Right  : Boolean;
-            Cur_Level : Nesting_Level);
-         --  Also handles some things that look like operators, like "and then".
-         --  Is_Right is True if Tree is the right-hand argument of an outer
-         --  binary operator. Otherwise (Tree is the left-hand argument, or Tree's
-         --  parent is something else, like a parenthesized expression), Is_Right
-         --  is False.
-
 --         function Is_Bin_Op (Expr : Ada_Tree) return Boolean;
 
-         procedure Do_Unary_Operator (Tree : Ada_Tree) is
+         procedure Do_Un_Op (Tree : Ada_Tree) is
             Expr : constant Un_Op := Un_Op (Tree);
 --            Op       : constant Ada_Tree       := Make_Op (Expr);
 --            Arg1     : constant Ada_Tree       := Get_Arg (Expr, 1);
@@ -3388,7 +3391,7 @@ end if;
 --                  end if;
 --               end;
 --            end if;
-         end Do_Unary_Operator;
+         end Do_Un_Op;
 
 --         function Is_Bin_Op (Expr : Ada_Tree) return Boolean is
 --         begin
@@ -3405,7 +3408,7 @@ end if;
 --            end case;
 --         end Is_Bin_Op;
 
-         procedure Do_Binary_Operator
+         procedure Do_Bin_Op
            (Tree      : Ada_Tree;
             Is_Right  : Boolean;
             Cur_Level : Nesting_Level)
@@ -3423,9 +3426,7 @@ end if;
             --  precedence, because Ada has no right-associative binary operators.
 
             pragma Assert (Precedence (Arg1) >= Precedence (Tree));
---  ????Associativity is wrong for "and", "or", "xor", "and then", and "or else".
---            pragma Assert (Precedence (Arg2) > Precedence (Tree));
-            pragma Assert (Precedence (Arg2) >= Precedence (Tree)); -- Should be ">".
+            pragma Assert (Precedence (Arg2) > Precedence (Tree));
 
             Arg1_Higher : constant Boolean := Precedence (Arg1) > Precedence (Tree);
             --  Arg1 is higher precedence than Expr
@@ -3434,10 +3435,10 @@ end if;
          --  if the arg is a higher precedence binary operator than the whole
          --  expression.
 
-         --  Start of processing for Do_Binary_Operator
+         --  Start of processing for Do_Bin_Op
 
          begin
-            --  The recursive calls to Do_Binary_Operator below bypass the
+            --  The recursive calls to Do_Bin_Op below bypass the
             --  normal recursion via Subtree_To_Ada, so we need to pass along the
             --  Cur_Level to Interpret_Template. When we reach something that's
             --  not a binary op, we switch back to the normal recursion via
@@ -3458,7 +3459,7 @@ end if;
                if Is_Right and then Arg1_Higher then
                   Interpret_Template ("[@", Empty_Tree_Array, Cur_Level);
                end if;
-               Do_Binary_Operator
+               Do_Bin_Op
                  (Arg1,
                   Is_Right  => Is_Right,
                   Cur_Level => Cur_Level + (if Arg1_Higher then 1 else 0));
@@ -3488,7 +3489,7 @@ end if;
 
             if Arg2.Kind = Ada_Bin_Op then
                Interpret_Template ("[@", Empty_Tree_Array, Cur_Level + 1);
-               Do_Binary_Operator
+               Do_Bin_Op
                  (Arg2,
                   Is_Right  => True,
                   Cur_Level => Cur_Level + 1);
@@ -3500,7 +3501,7 @@ end if;
                   Subtrees  => (1 => Arg2),
                   Cur_Level => Cur_Level + 1);
             end if;
-         end Do_Binary_Operator;
+         end Do_Bin_Op;
 
          procedure Do_For_Loop_Spec is
          begin
@@ -3559,12 +3560,12 @@ end if;
 --               --  Unary operator
 --
 --               if Subtree_Count (Subtree (Tree, 2)) = 1 then
---                  Do_Unary_Operator (Tree);
+--                  Do_Un_Op (Tree);
 --
 --               --  Binary operator
 --
 --               else
---                  Do_Binary_Operator
+--                  Do_Bin_Op
 --                    (Tree,
 --                     Is_Right  => False,
 --                     Cur_Level => Cur_Level);
@@ -3755,61 +3756,54 @@ end if;
             end if;
          end Do_Others;
 
---         procedure Do_Parameter_Specification is
---         begin
---            Subtrees_To_Ada
---              (Subtree (Tree, Index),
---               Pre     => "",
---               Between => ",@ ",
---               Post    => "");
---            Interpret_Template
---              (Parameter_Specification_Alt_Templ,
---               Subtrees => Empty_Tree_Array);
---
---            case Tree.Kind is
---               when Ada_Param_Spec =>
---                  Index := Index + 1;
---
---                  if Subtree (Tree, Index).Kind /=
---                    Not_An_Element
---                  then -- "aliased"
---                     Subtree_To_Ada (Subtree (Tree, Index), Cur_Level + 1, Index);
---                     Put (" ");
---                  end if;
---
---               when Ada_Object_Decl =>
---                  null; -- Ada_Object_Decl doesn't have "aliased"
---
---               when others =>
---                  raise Program_Error;
---            end case;
---
---            if Tree.Mode in Ada_Mode_In | Ada_Mode_In_Out then
---               Put ("in ");
---            end if;
---            Interpret_Template ("^2", Subtrees => Empty_Tree_Array);
---            if Tree.Mode in Ada_Mode_Out | Ada_Mode_In_Out then
---               Put ("out ");
---            end if;
---            Interpret_Template ("^3", Subtrees => Empty_Tree_Array);
---
---            Index := Index + 1;
---
---            if Subtree (Tree, Index).Kind /= Not_An_Element then -- "not null"
---               Subtree_To_Ada (Subtree (Tree, Index), Cur_Level + 1, Index);
---               Put (" ");
---            end if;
---
---            Index := Index + 1;
---            Subtree_To_Ada (Subtree (Tree, Index), Cur_Level + 1, Index);
---
---            Index := Index + 1;
---            if Subtree (Tree, Index).Kind /= Not_An_Element then
---               Interpret_Template
---                 (" ^4:=[@ !]",
---                  Subtrees => (1 => Subtree (Tree, Index)));
---            end if;
---         end Do_Parameter_Specification;
+         procedure Do_Parameter_Specification is
+            Index : Query_Index := 1;
+         begin
+            Subtrees_To_Ada
+              (Subtree (Tree, Index),
+               Pre     => "",
+               Between => ",@ ",
+               Post    => "");
+            Interpret_Template
+              (Parameter_Specification_Alt_Templ,
+               Subtrees => Empty_Tree_Array);
+
+            case Tree.Kind is
+               when Ada_Param_Spec =>
+                  Index := Index + 1;
+
+                  if Subtree (Tree, Index).Kind = Ada_Aliased_Present then
+                     Subtree_To_Ada (Subtree (Tree, Index), Cur_Level + 1, Index);
+                     Put (" ");
+                  end if;
+
+               when Ada_Object_Decl =>
+                  null; -- Ada_Object_Decl doesn't have "aliased"
+
+               when others =>
+                  raise Program_Error;
+            end case;
+
+            Index := Index + 1;
+            if F_Mode (Param_Spec (Tree)) in Ada_Mode_In | Ada_Mode_In_Out then
+               Put ("in ");
+            end if;
+            Interpret_Template ("^2", Subtrees => Empty_Tree_Array);
+            if F_Mode (Param_Spec (Tree)) in Ada_Mode_Out | Ada_Mode_In_Out then
+               Put ("out ");
+            end if;
+            Interpret_Template ("^3", Subtrees => Empty_Tree_Array);
+
+            Index := Index + 1;
+            Subtree_To_Ada (Subtree (Tree, Index), Cur_Level + 1, Index);
+
+            Index := Index + 1;
+            if Subtree (Tree, Index) /= null then
+               Interpret_Template
+                 (" ^4:=[@ !]",
+                  Subtrees => (1 => Subtree (Tree, Index)));
+            end if;
+         end Do_Parameter_Specification;
 
          procedure Do_Pragma is
          begin
@@ -3857,18 +3851,6 @@ end if;
 --               Interpret_Template;
 --            end if;
 --         end Do_Record_Aggregate;
-
-         procedure Do_Record_Def is
-         begin
-            --  ????This will not be needed if we have a new node kind for
-            --  "null record".
-
-            if F_Components (Record_Def (Tree)) = null then
-               Interpret_Template ("null record/");
-            else
-               Interpret_Template;
-            end if;
-         end Do_Record_Def;
 
 --         procedure Do_Single_Task_Declaration is
 --         begin
@@ -3920,7 +3902,7 @@ end if;
                     F_Subp_Spec (Generic_Subprogram_Decl (Tree)),
                  when others => raise Program_Error);
 
-            Params : constant List_Param_Spec :=
+            Params : constant Param_Spec_List :=
               (case Tree.Kind is
                  when Ada_Entry_Decl =>
                     F_Params (Entry_Decl (Tree)),
@@ -4018,8 +4000,13 @@ end if;
               and then not F_Has_Tagged (Incomplete_Type_Def (Def))
             then
                Interpret_Template (Incomplete_Type_Decl_Alt_Templ);
+            elsif Def.Kind = Ada_Record_Type_Def
+              or else (Def.Kind = Ada_Derived_Type_Def
+                and then F_Record_Extension (Derived_Type_Def (Def)) /= null)
+            then
+               Interpret_Template ("type !! is ![@" & Aspects & "]");
             else
-               Interpret_Template;
+               Interpret_Template ("type !! is[@ !" & Aspects & "]");
             end if;
          end Do_Type_Decl;
 
@@ -4110,45 +4097,25 @@ end if;
 --               Do_Procedure_Call_Stmt;
 
             when Ada_Un_Op =>
-               if False then -- ????
-                  Do_Un_Op;
-               else
-                  Do_Unary_Operator (Tree);
-               end if;
+               Do_Un_Op (Tree);
 
             when Ada_Bin_Op =>
-               if False then -- ????
-                  Do_Bin_Op;
-               else
-                  Do_Binary_Operator
-                    (Tree,
-                     Is_Right  => False,
-                     Cur_Level => Cur_Level);
-               end if;
+               Do_Bin_Op (Tree, Is_Right  => False, Cur_Level => Cur_Level);
 
             when Ada_For_Loop_Spec =>
                Do_For_Loop_Spec;
 
 --            when Ada_Call_Expr =>
 --               Do_Function_Call;
---
---            when Ada_And_Then_Short_Circuit | Ada_Or_Else_Short_Circuit =>
---               Do_Binary_Operator
---                 (Tree,
---                  Is_Right  => False,
---                  Cur_Level => Cur_Level);
---
+
 --            when Ada_Task_Type_Declaration =>
 --               Do_Task_Type_Declaration;
-
-            when Ada_Record_Def =>
-               Do_Record_Def;
 
 --            when Ada_Single_Task_Declaration =>
 --               Do_Single_Task_Declaration;
 
             when Ada_Param_Assoc |
-              Ada_Discriminant_Association |
+              Ada_Discriminant_Assoc |
               Ada_Pragma_Argument_Assoc =>
                Do_Assoc;
 
@@ -4201,9 +4168,9 @@ end if;
 --
 --            when Ada_Extension_Aggregate =>
 --               Do_Extension_Aggregate;
---
---            when Ada_Param_Spec | Ada_Object_Decl =>
---               Do_Parameter_Specification;
+
+            when Ada_Param_Spec => -- ???generic formal object: | Ada_Object_Decl =>
+               Do_Parameter_Specification;
 
             when Ada_Type_Decl =>
                Do_Type_Decl;
@@ -4284,7 +4251,7 @@ end if;
 --                  Is_Body      => False,
 --                  Params_Query => Access_To_Subprogram_Param_Spec);
 
-            when Ada_List =>
+            when List_Node_Kinds =>
                Do_List;
 
             when others =>
