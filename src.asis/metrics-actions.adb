@@ -195,7 +195,7 @@ package body METRICS.Actions is
        Ada_Single_Protected_Decl |
        Ada_Protected_Type_Decl |
        Ada_Entry_Body |
-       Ada_Subprogram_Body |
+       Ada_Subp_Body |
        Ada_Task_Body |
        Ada_Single_Task_Decl |
        Ada_Task_Type_Decl;
@@ -208,11 +208,11 @@ package body METRICS.Actions is
 
    subtype Contract_Complexity_Eligible is Ada_Node_Kind_Type with
      Predicate => Contract_Complexity_Eligible in
-       Ada_Generic_Subprogram_Decl |
-       Ada_Abstract_Subprogram_Decl |
-       Ada_Null_Subprogram_Decl |
-       Ada_Subprogram_Renaming_Decl |
-       Ada_Subprogram_Decl;
+       Ada_Generic_Subp_Decl |
+       Ada_Abstract_Subp_Decl |
+       Ada_Null_Subp_Decl |
+       Ada_Subp_Renaming_Decl |
+       Ada_Subp_Decl;
    --  For the new lalmetric tool, we have the --contract-complexity
    --  metric, which is on subprogram declarations, so we need
    --  additional "eligible" nodes.
@@ -410,9 +410,9 @@ package body METRICS.Actions is
               Ada_Generic_Procedure_Instantiation |
               Ada_Generic_Renaming_Decl |
               Ada_Package_Renaming_Decl |
-              Ada_Abstract_Subprogram_Decl |
-              Ada_Null_Subprogram_Decl |
-              Ada_Subprogram_Renaming_Decl =>
+              Ada_Abstract_Subp_Decl |
+              Ada_Null_Subp_Decl |
+              Ada_Subp_Renaming_Decl =>
                pragma Assert (S = null);
                S := M;
                M.Is_Spec := True;
@@ -429,7 +429,7 @@ package body METRICS.Actions is
             --  seen the spec (yet), we assume the body is a spec.
             --  If we later see a spec, we move the body to the Bodies array.
 
-            when Ada_Subprogram_Body =>
+            when Ada_Subp_Body =>
                pragma Assert (B = null);
                if S = null then
                   S := M;
@@ -442,7 +442,7 @@ package body METRICS.Actions is
                   M.Is_Spec := False;
                end if;
 
-            when Ada_Subprogram_Decl | Ada_Generic_Subprogram_Decl =>
+            when Ada_Subp_Decl | Ada_Generic_Subp_Decl =>
                if S /= null then
                   pragma Assert (B = null);
                   B := S;
@@ -624,7 +624,7 @@ package body METRICS.Actions is
 
          when Ada_Expr_Function |
            Ada_Entry_Body |
-           Ada_Subprogram_Body |
+           Ada_Subp_Body |
            Ada_Task_Body =>
             return True;
 
@@ -662,10 +662,10 @@ package body METRICS.Actions is
             return Protected_Type_Knd;
          when Ada_Entry_Body =>
             return Entry_Body_Knd;
-         when Ada_Subprogram_Body =>
+         when Ada_Subp_Body =>
             declare
                R : constant Type_Expr :=
-                 F_Returns (F_Subp_Spec (Subprogram_Body (Node)));
+                 F_Returns (F_Subp_Spec (Subp_Body (Node)));
             begin
                return
                  (if R = null then Procedure_Body_Knd else Function_Body_Knd);
@@ -685,10 +685,10 @@ package body METRICS.Actions is
             return Procedure_Instantiation_Knd;
          when Ada_Generic_Renaming_Decl =>
             return Generic_Package_Renaming_Knd; -- ???Or proc/func
-         when Ada_Generic_Subprogram_Decl =>
+         when Ada_Generic_Subp_Decl =>
             declare
                R : constant Type_Expr :=
-                 F_Returns (F_Subp_Spec (Generic_Subprogram_Decl (Node)));
+                 F_Returns (F_Subp_Spec (Generic_Subp_Decl (Node)));
                --  ???R is null here even for functions
             begin
                return
@@ -698,13 +698,13 @@ package body METRICS.Actions is
             end;
          when Ada_Package_Renaming_Decl =>
             return Package_Renaming_Knd;
-         when Ada_Abstract_Subprogram_Decl |
-             Ada_Null_Subprogram_Decl |
-             Ada_Subprogram_Renaming_Decl |
-             Ada_Subprogram_Decl =>
+         when Ada_Abstract_Subp_Decl |
+             Ada_Null_Subp_Decl |
+             Ada_Subp_Renaming_Decl |
+             Ada_Subp_Decl =>
             declare
                R : constant Type_Expr :=
-                 F_Returns (F_Subp_Spec (Basic_Subprogram_Decl (Node)));
+                 F_Returns (F_Subp_Spec (Basic_Subp_Decl (Node)));
             begin
                return (if R = null then Procedure_Knd else Function_Knd);
             end;
@@ -820,7 +820,7 @@ package body METRICS.Actions is
             return (Depth = 2
               and then M.Kind in
                       Ada_Package_Body |
-                      Ada_Subprogram_Body |
+                      Ada_Subp_Body |
                       Ada_Task_Body |
                       Ada_Protected_Body)
               or else (XML and then Depth = 0);
@@ -829,10 +829,10 @@ package body METRICS.Actions is
               and then M.Kind in
                       Ada_Package_Decl |
                       Ada_Generic_Package_Decl |
-                      Ada_Subprogram_Decl |
-                      Ada_Subprogram_Body |
+                      Ada_Subp_Decl |
+                      Ada_Subp_Body |
                       --  Only if no spec???
-                      Ada_Generic_Subprogram_Decl)
+                      Ada_Generic_Subp_Decl)
               or else (XML and then Depth = 0);
          when Declarations |
            Statements |
@@ -1767,7 +1767,7 @@ package body METRICS.Actions is
             case Kind (Node) is
                when Ada_Package_Body =>
                   return F_Stmts (Package_Body (Node)) /= null;
-               when Ada_Entry_Body | Ada_Subprogram_Body | Ada_Task_Body =>
+               when Ada_Entry_Body | Ada_Subp_Body | Ada_Task_Body =>
                   return True;
                when others =>
                   return False;
@@ -1948,8 +1948,8 @@ package body METRICS.Actions is
 
       begin
          case Kind (Node) is
-            when Ada_Basic_Subprogram_Decl
-              | Ada_Generic_Subprogram_Decl
+            when Ada_Basic_Subp_Decl
+              | Ada_Generic_Subp_Decl
             =>
                Prev_Subp_Decl := Node;
             when Ada_Pragma_Node =>
@@ -2015,12 +2015,12 @@ package body METRICS.Actions is
                  | Ada_Task_Type_Decl
                  | Ada_Generic_Package_Decl
                  | Ada_Body_Node
-                 | Ada_Abstract_Subprogram_Decl
+                 | Ada_Abstract_Subp_Decl
                  | Ada_Expr_Function
-                 | Ada_Null_Subprogram_Decl
-                 | Ada_Subprogram_Renaming_Decl
-                 | Ada_Subprogram_Decl
-                 | Ada_Generic_Subprogram_Decl
+                 | Ada_Null_Subp_Decl
+                 | Ada_Subp_Renaming_Decl
+                 | Ada_Subp_Decl
+                 | Ada_Generic_Subp_Decl
                =>
                   Inc (File_M.Vals (Lines_Spark), By => Range_Count);
                   Inc (Global_M.Vals (Lines_Spark), By => Range_Count);
@@ -2102,7 +2102,7 @@ package body METRICS.Actions is
                   Decl : constant Ada_Node := Childx (Vis_Decls, I);
                   Has_Contracts, Has_Post : Boolean;
                begin
-                  if Decl.all in Basic_Subprogram_Decl_Type'Class then
+                  if Decl.all in Basic_Subp_Decl_Type'Class then
                      Search_Aspects (Decl, Has_Contracts, Has_Post);
 
                      if Has_Contracts then
@@ -2138,7 +2138,7 @@ package body METRICS.Actions is
 
          --  --all-subprograms
 
-         if Kind (Node) = Ada_Subprogram_Body then
+         if Kind (Node) = Ada_Subp_Body then
             Inc_All (All_Subprograms);
          end if;
 
@@ -2146,10 +2146,10 @@ package body METRICS.Actions is
 
          if Last_Index (Metrix_Stack) = 3 then
             if Node = M.Node and then
-              M.Kind in Ada_Subprogram_Decl |
-                Ada_Generic_Subprogram_Decl |
-                Ada_Subprogram_Renaming_Decl |
-                Ada_Subprogram_Body
+              M.Kind in Ada_Subp_Decl |
+                Ada_Generic_Subp_Decl |
+                Ada_Subp_Renaming_Decl |
+                Ada_Subp_Body
             then
                Inc_All (Public_Subprograms);
             end if;
@@ -2166,7 +2166,7 @@ package body METRICS.Actions is
                         declare
                            Decl : constant Ada_Node := Childx (Vis_Decls, I);
                         begin
-                           if Decl.all in Basic_Subprogram_Decl_Type'Class then
+                           if Decl.all in Basic_Subp_Decl_Type'Class then
                               Inc_All (Public_Subprograms);
                            end if;
                         end;
@@ -2208,12 +2208,12 @@ package body METRICS.Actions is
               Ada_Generic_Package_Instantiation |
               Ada_Generic_Renaming_Decl |
               Ada_Package_Renaming_Decl |
-              Ada_Subprogram_Renaming_Decl |
+              Ada_Subp_Renaming_Decl |
               Ada_Package_Decl |
               Ada_Generic_Package_Decl |
-              Ada_Subprogram_Decl |
-              Ada_Subprogram_Body | -- could be acting as spec
-              Ada_Generic_Subprogram_Decl =>
+              Ada_Subp_Decl |
+              Ada_Subp_Body | -- could be acting as spec
+              Ada_Generic_Subp_Decl =>
                declare
                   Def_Name : constant Name := Get_Def_Name (Node);
                begin
@@ -2248,7 +2248,7 @@ package body METRICS.Actions is
                Inc (Loop_Count);
             when Ada_Private_Part =>
                Inc (Private_Part_Count);
-            when Ada_Entry_Body | Ada_Subprogram_Body | Ada_Task_Body =>
+            when Ada_Entry_Body | Ada_Subp_Body | Ada_Task_Body =>
                Inc (Non_Package_Body_Count);
             when others => null;
          end case;
@@ -2306,7 +2306,7 @@ package body METRICS.Actions is
                Dec (Loop_Count);
             when Ada_Private_Part =>
                Dec (Private_Part_Count);
-            when Ada_Entry_Body | Ada_Subprogram_Body | Ada_Task_Body =>
+            when Ada_Entry_Body | Ada_Subp_Body | Ada_Task_Body =>
                Dec (Non_Package_Body_Count);
             when others => null;
          end case;

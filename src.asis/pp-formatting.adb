@@ -1470,6 +1470,9 @@ package body Pp.Formatting is
                                 or else Src_Tok.Normalized = Name_Function)
                     and then Out_Tok.Kind = Identifier
                   then
+                     if True then
+                        raise Program_Error; -- ????????????????
+                     end if;
                      pragma Assert
                        (Src_Tokens (Src_Index - 1).Normalized = Name_Generic);
                      pragma Assert

@@ -178,9 +178,12 @@ package body LAL_Extensions is
               Ada_Generic_Procedure_Instantiation =>
                Result :=
                  F_Name (Generic_Instantiation (Decl));
-            when Ada_Generic_Renaming_Decl =>
+            when Ada_Generic_Package_Renaming_Decl =>
                Result :=
-                 F_Name (Generic_Renaming_Decl (Decl));
+                 F_Name (Generic_Package_Renaming_Decl (Decl));
+            when Ada_Generic_Subp_Renaming_Decl =>
+               Result :=
+                 F_Name (Generic_Subp_Renaming_Decl (Decl));
             when Ada_Package_Body_Stub =>
                Result :=
                  F_Name (Package_Body_Stub (Decl));
@@ -196,13 +199,13 @@ package body LAL_Extensions is
             when Ada_Loop_Stmt =>
                Result :=
                  Name (F_Name (Loop_Stmt (Decl)));
-            when Ada_Abstract_Subprogram_Decl |
+            when Ada_Abstract_Subp_Decl |
               Ada_Expr_Function |
-              Ada_Null_Subprogram_Decl |
-              Ada_Subprogram_Renaming_Decl |
-              Ada_Subprogram_Decl =>
+              Ada_Null_Subp_Decl |
+              Ada_Subp_Renaming_Decl |
+              Ada_Subp_Decl =>
                Result :=
-                 F_Name (F_Subp_Spec (Basic_Subprogram_Decl (Decl)));
+                 F_Name (F_Subp_Spec (Basic_Subp_Decl (Decl)));
             when Ada_Package_Decl =>
                Result :=
                  F_Package_Name (Base_Package_Decl (Decl));
@@ -210,15 +213,15 @@ package body LAL_Extensions is
                Result :=
                  F_Package_Name
                  (F_Package_Decl (Generic_Package_Decl (Decl)));
-            when Ada_Generic_Subprogram_Decl =>
+            when Ada_Generic_Subp_Decl =>
                Result :=
-                 F_Name (F_Subp_Spec (Generic_Subprogram_Decl (Decl)));
+                 F_Name (F_Subp_Spec (Generic_Subp_Decl (Decl)));
             when Ada_Package_Body =>
                Result :=
                  F_Package_Name (Package_Body (Decl));
-            when Ada_Subprogram_Body =>
+            when Ada_Subp_Body =>
                Result :=
-                 F_Name (F_Subp_Spec (Subprogram_Body (Decl)));
+                 F_Name (F_Subp_Spec (Subp_Body (Decl)));
             when Ada_Single_Protected_Decl =>
                Result :=
                  Name (F_Protected_Name (Single_Protected_Decl (Decl)));
@@ -244,7 +247,7 @@ package body LAL_Extensions is
          end case;
 
          if Decl.all in Basic_Decl_Type then
-            --  Should Subprogram_Decl_Type be in Basic_Decl_Type????
+            --  Should Subp_Decl_Type be in Basic_Decl_Type????
             declare
                D : constant Name_Array_Access :=
                  P_Defining_Names (Basic_Decl (Decl));
@@ -262,28 +265,28 @@ package body LAL_Extensions is
       return (case Kind (Decl) is
          when Ada_Base_Package_Decl =>
             F_Aspects (Base_Package_Decl (Decl)),
-         when Ada_Abstract_Subprogram_Decl =>
-            F_Aspects (Abstract_Subprogram_Decl (Decl)),
+         when Ada_Abstract_Subp_Decl =>
+            F_Aspects (Abstract_Subp_Decl (Decl)),
          when Ada_Expr_Function =>
             F_Aspects (Expr_Function (Decl)),
-         when Ada_Null_Subprogram_Decl =>
-            F_Aspects (Null_Subprogram_Decl (Decl)),
-         when Ada_Subprogram_Renaming_Decl =>
-            F_Aspects (Subprogram_Renaming_Decl (Decl)),
-         when Ada_Subprogram_Decl =>
-            F_Aspects (Subprogram_Decl (Decl)),
+         when Ada_Null_Subp_Decl =>
+            F_Aspects (Null_Subp_Decl (Decl)),
+         when Ada_Subp_Renaming_Decl =>
+            F_Aspects (Subp_Renaming_Decl (Decl)),
+         when Ada_Subp_Decl =>
+            F_Aspects (Subp_Decl (Decl)),
          when Ada_Package_Body_Stub =>
             F_Aspects (Package_Body_Stub (Decl)),
-         when Ada_Subprogram_Body_Stub =>
-            F_Aspects (Subprogram_Body_Stub (Decl)),
+         when Ada_Subp_Body_Stub =>
+            F_Aspects (Subp_Body_Stub (Decl)),
          when Ada_Task_Body_Stub =>
             F_Aspects (Task_Body_Stub (Decl)),
          when Ada_Package_Body =>
             F_Aspects (Package_Body (Decl)),
          when Ada_Protected_Body =>
             F_Aspects (Protected_Body (Decl)),
-         when Ada_Subprogram_Body =>
-            F_Aspects (Subprogram_Body (Decl)),
+         when Ada_Subp_Body =>
+            F_Aspects (Subp_Body (Decl)),
          when Ada_Task_Body =>
             F_Aspects (Task_Body (Decl)),
          when Ada_Exception_Decl =>
@@ -292,10 +295,12 @@ package body LAL_Extensions is
               Ada_Generic_Package_Instantiation |
               Ada_Generic_Procedure_Instantiation =>
             F_Aspects (Generic_Instantiation (Decl)),
-         when Ada_Generic_Renaming_Decl =>
-            F_Aspects (Generic_Renaming_Decl (Decl)),
-         when Ada_Generic_Subprogram_Decl =>
-            F_Aspects (Generic_Subprogram_Decl (Decl)),
+         when Ada_Generic_Package_Renaming_Decl =>
+            F_Aspects (Generic_Package_Renaming_Decl (Decl)),
+         when Ada_Generic_Subp_Renaming_Decl =>
+            F_Aspects (Generic_Subp_Renaming_Decl (Decl)),
+         when Ada_Generic_Subp_Decl =>
+            F_Aspects (Generic_Subp_Decl (Decl)),
          when Ada_Object_Decl =>
             F_Aspects (Object_Decl (Decl)),
          when Ada_Package_Renaming_Decl =>
@@ -365,7 +370,7 @@ package body LAL_Extensions is
          when Ada_Entry_Body => return F_Decls (Entry_Body (Node));
          when Ada_Package_Body => return F_Decls (Package_Body (Node));
          when Ada_Protected_Body => return F_Decls (Protected_Body (Node));
-         when Ada_Subprogram_Body => return F_Decls (Subprogram_Body (Node));
+         when Ada_Subp_Body => return F_Decls (Subp_Body (Node));
          when Ada_Task_Body => return F_Decls (Task_Body (Node));
          when others => raise Program_Error;
       end case;

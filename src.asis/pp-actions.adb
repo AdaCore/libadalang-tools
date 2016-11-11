@@ -57,15 +57,15 @@ Ada_Task_Type_Declaration : constant Ada_Node_Kind_Type := Ada_Task_Type_Decl;
 Ada_Protected_Type_Declaration : constant Ada_Node_Kind_Type := Ada_Protected_Type_Decl;
 Ada_Single_Task_Declaration : constant Ada_Node_Kind_Type := Ada_Single_Task_Decl;
 Ada_Single_Protected_Declaration : constant Ada_Node_Kind_Type := Ada_Single_Protected_Decl;
-Ada_Procedure_Body_Declaration : constant Ada_Node_Kind_Type := Ada_Subprogram_Body;
-Ada_Function_Body_Declaration : constant Ada_Node_Kind_Type := Ada_Subprogram_Body;
+Ada_Procedure_Body_Declaration : constant Ada_Node_Kind_Type := Ada_Subp_Body;
+Ada_Function_Body_Declaration : constant Ada_Node_Kind_Type := Ada_Subp_Body;
 Ada_Package_Declaration : constant Ada_Node_Kind_Type := Ada_Package_Decl;
 Ada_Package_Body_Declaration : constant Ada_Node_Kind_Type := Ada_Package_Body;
 Ada_Task_Body_Declaration : constant Ada_Node_Kind_Type := Ada_Task_Body;
 Ada_Protected_Body_Declaration : constant Ada_Node_Kind_Type := Ada_Protected_Body;
 Ada_Entry_Body_Declaration : constant Ada_Node_Kind_Type := Ada_Entry_Body;
-Ada_Generic_Procedure_Declaration : constant Ada_Node_Kind_Type := Ada_Generic_Subprogram_Decl;
-Ada_Generic_Function_Declaration : constant Ada_Node_Kind_Type := Ada_Generic_Subprogram_Decl;
+Ada_Generic_Procedure_Declaration : constant Ada_Node_Kind_Type := Ada_Generic_Subp_Decl;
+Ada_Generic_Function_Declaration : constant Ada_Node_Kind_Type := Ada_Generic_Subp_Decl;
 Ada_Generic_Package_Declaration : constant Ada_Node_Kind_Type := Ada_Generic_Package_Decl;
 Ada_Enumeration_Type_Definition : constant Ada_Node_Kind_Type := Ada_Enum_Type_Decl;
 Ada_Record_Representation_Clause : constant Ada_Node_Kind_Type := Ada_Record_Rep_Clause;
@@ -663,9 +663,9 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
    begin
       return (case Kind is
          when List_Node_Kinds => null,
-         when Ada_Subprogram_Spec => L ("? ~~~? @(~; ~)~?[@1 return] ~~~"),
+         when Ada_Subp_Spec => L ("? ~~~? @(~; ~)~?[@1 return] ~~~"),
         --  F_Name is optional for access-to-subp.
-         when Ada_Aggregate_Member => L ("?~ ^|@ ~~"),
+         when Ada_Component_Assoc => L ("?~ ^|@ ~~"),
          when Ada_Constrained_Array_Indices =>
            L ("(?~, ~~)"),
          when Ada_Unconstrained_Array_Indices =>
@@ -687,16 +687,17 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
                 "!",
                 "!",
                 "end !1/"),
-         when Ada_Abstract_Subprogram_Decl => L ("?~~ ~procedure!", " is abstract", Aspects),
+         when Ada_Abstract_Subp_Decl => L ("?~~ ~procedure!", " is abstract", Aspects),
          when Ada_Expr_Function => L ("?~~ ~procedure!", " is[@ (!)]", Aspects),
-         when Ada_Null_Subprogram_Decl => L ("?~~ ~procedure!", " is null", Aspects),
-         when Ada_Subprogram_Renaming_Decl => L ("?~~ ~procedure!!", Aspects),
-         when Ada_Subprogram_Decl => L ("?~~ ~procedure!" & Aspects),
-         when Ada_Subprogram_Body_Stub => L ("?~~ ~procedure! is separate" & Aspects),
+         when Ada_Null_Subp_Decl => L ("?~~ ~procedure!", " is null", Aspects),
+         when Ada_Subp_Renaming_Decl => L ("?~~ ~procedure!!", Aspects),
+         when Ada_Subp_Decl => L ("?~~ ~procedure!" & Aspects),
+         when Ada_Subp_Body_Stub => L ("?~~ ~procedure! is separate" & Aspects),
          when Ada_Formal_Subp_Decl => L ("with procedure!? is ~~~? is ~~~" & Aspects),
              --  Here and elsewhere, the "procedure" gets replaced with
              --  "function" when appropriate.
-
+         when Ada_Subp_Kind_Function => L ("function"),
+         when Ada_Subp_Kind_Procedure => L ("procedure"),
          when Ada_Package_Body_Stub => L ("package body ! is separate", Aspects),
          when Ada_Protected_Body_Stub => L ("protected body ! is separate", Aspects),
          when Ada_Task_Body_Stub => L ("task body ! is separate", Aspects),
@@ -708,7 +709,7 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
                 "!",
                 "end !1"),
          when Ada_Protected_Body => L ("protected body !", Aspects, " is$", "?${~;$~}$~", "end !1"),
-         when Ada_Subprogram_Body =>
+         when Ada_Subp_Body =>
              L ("?~~ ~procedure!",
                 Aspects,
                 "@9 is$",
@@ -751,11 +752,11 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
              L ("generic$",
                 "{?~;$~;$~}", -- Should be generic_formal_part, not a list????
                 "!"),
-         when Ada_Generic_Renaming_Decl =>
-               L ("generic ! renames !", Aspects),
-                 --  ????We need an indication of whether it's a
-                 --  package, procedure, of function.
-         when Ada_Generic_Subprogram_Decl => L ("generic$", "{?~;$~;$~}", "procedure!", Aspects),
+         when Ada_Generic_Package_Renaming_Decl =>
+               L ("generic package ! renames !", Aspects),
+         when Ada_Generic_Subp_Renaming_Decl =>
+               L ("generic ! ! renames !", Aspects),
+         when Ada_Generic_Subp_Decl => L ("generic$", "{?~;$~;$~}", "procedure!", Aspects),
          when Ada_Number_Decl => L ("?~, ~~ ^: constant ^2:=[@ !]"),
          when Ada_Object_Decl =>
                L ("?~, ~~ :? ~~~? ~~~? ~~~ !? := ~~~!", Aspects),
@@ -792,7 +793,7 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
          when Ada_Digits_Constraint => L ("digits !? range ~~~"),
          when Ada_Discriminant_Assoc => null,
          when Ada_Discriminant_Constraint | Ada_Index_Constraint =>
-               L ("?@(~,@ ~)~"),
+               L ("?[@(~,@ ~)]~"),
          when Ada_Range_Constraint => L ("range !"),
          when Ada_Declarative_Part => L ("?${~;$~};$$~"),
          when Ada_Private_Part => L ("?$private${~;$~};$~"),
@@ -849,7 +850,7 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
          when Ada_Block_Stmt =>
                    L ("?~~ : ~",
                       "?declare$",
-                      "{~;$~;$$}~", -- ????Should be Declarative_Part, not a list.
+                      "~~~",
                       "!",
                       "end?1 ~~~"),
          when Ada_Null_Record_Def => L ("null record/"),
@@ -910,7 +911,7 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
          when Ada_Signed_Int_Type_Def => L ("range !"),
          when Ada_Known_Discriminant_Part => L ("? @(~; ~)~@"),
          when Ada_Unknown_Discriminant_Part => L (" @(<>)"),
-         when Ada_Access_To_Subprogram_Def => L ("?~~ ~access? ~~~ procedure!"),
+         when Ada_Access_To_Subp_Def => L ("?~~ ~access? ~~~ procedure!"),
 --         when Ada_Type_Access_Expression => L ("access? ~~~? ~~~ !"),
          when Ada_Anonymous_Type_Decl => L ("//!", Aspects),
 --         when Ada_Type_Ref => L ("!? ~~~"),
@@ -972,7 +973,7 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
          when Ada_Op_Lte => null,
          when Ada_Op_Gt => null,
          when Ada_Op_Gte => null,
-         when Ada_Op_Ellipsis => null,
+         when Ada_Op_Double_Dot => null,
 
          when Ada_Overriding_Not_Overriding => L ("not overriding"),
          when Ada_Overriding_Overriding => L ("overriding"),
@@ -1505,6 +1506,12 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
 --OLD:              "?~, ~~ ^:? ~~~ !? ^2:=[@ ~~]~");
               "?~, ~~ :? ~~~? ~~~? ~~~ !? :=[@ ~~]~",
               "?~, ~~ ^:? ~~~? ~~~? ~~~ !? ^2:=[@ ~~]~");
+         --  For Ada_Component_Decl:
+         Temp :=
+           Replace_All
+             (Temp,
+              "?~, ~~ : !? :=[@ ~~]~?~~~",
+              "?~, ~~ ^: !? ^2:=[@ ~~]~?~~~");
 --OLD:         Temp :=
 --OLD:           Replace_All
 --OLD:             (Temp,
@@ -1735,16 +1742,16 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
       is
          pragma Assert
            (Tree.Kind in
-              Ada_Subprogram_Decl |
-              Ada_Abstract_Subprogram_Decl |
-              Ada_Null_Subprogram_Decl |
+              Ada_Subp_Decl |
+              Ada_Abstract_Subp_Decl |
+              Ada_Null_Subp_Decl |
               Ada_Expr_Function |
-              Ada_Subprogram_Body_Stub |
-              Ada_Subprogram_Body |
+              Ada_Subp_Body_Stub |
+              Ada_Subp_Body |
               Ada_Formal_Subp_Decl |
-              Ada_Access_To_Subprogram_Def |
-              Ada_Generic_Subprogram_Decl |
-              Ada_Subprogram_Renaming_Decl |
+              Ada_Access_To_Subp_Def |
+              Ada_Generic_Subp_Decl |
+              Ada_Subp_Renaming_Decl |
               Ada_Entry_Body |
               Ada_Entry_Decl);
 
@@ -2163,7 +2170,7 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
                   when Ada_Pragma_Argument_Assoc |
                     Ada_Aspect_Assoc |
                     Ada_Discriminant_Assoc       |
-                    Ada_Aggregate_Member |
+                    Ada_Component_Assoc |
                     Ada_Param_Assoc =>
                      null;
 
@@ -2897,9 +2904,9 @@ end if;
                     (if Tree.Kind = Ada_Discriminant_Assoc
                        then Subtree_Count
                          (F_Ids (Discriminant_Assoc (Tree))) = 1
-                     elsif Designator.Kind = Ada_Aggregate_Member
+                     elsif Designator.Kind = Ada_Component_Assoc
                        then Subtree_Count
-                        (F_Choice_List (Aggregate_Member (Designator))) = 1
+                        (F_Choice_List (Component_Assoc (Designator))) = 1
                      else True);
                begin
                   --  This is needed because the "[]" is not properly nested with
@@ -3102,7 +3109,7 @@ end if;
 
             use type Ada_Node_Arrays.Array_Type;
             pragma Assert
-              (F_Op (Bin_Op (Subtree (Tree, 3))) = Ada_Op_Ellipsis);
+              (F_Op (Bin_Op (Subtree (Tree, 3))) = Ada_Op_Double_Dot);
             Subts : constant Ada_Tree_Array :=
               Subtrees (Tree) (1 .. 2) & Subtrees (Subtree (Tree, 3));
             pragma Assert (Subts'Last = 5);
@@ -3156,7 +3163,7 @@ end if;
             --  node kind.
          begin
             if Parent (Parent (Tree)).Kind in
-              Ada_Generic_Package_Decl | Ada_Generic_Subprogram_Decl
+              Ada_Generic_Package_Decl | Ada_Generic_Subp_Decl
             then
                --  It's really a formal package
                put ("\1", "with ");
@@ -3179,7 +3186,7 @@ end if;
             case Parent (Tree).Kind is
                when Ada_Entry_Body |
                  Ada_Package_Body |
-                 Ada_Subprogram_Body |
+                 Ada_Subp_Body |
                  Ada_Task_Body |
                  Ada_Block_Stmt =>
                   Interpret_Template (Handled_Stmts_With_Begin);
@@ -3234,7 +3241,7 @@ end if;
             Ada_Op_Lte => Intern ("<="),
             Ada_Op_Gt => Intern (">"),
             Ada_Op_Gte => Intern (">="),
-            Ada_Op_Ellipsis => Intern (".."));
+            Ada_Op_Double_Dot => Intern (".."));
 
          function Operator_Symbol (Op : Ada_Op) return W_Str is
             (To_W_Str (Operator_Symbol_Table (Op)));
@@ -3264,7 +3271,7 @@ end if;
                        Ada_Op_Lte =>
                         return 3;
 
-                     when Ada_Op_Ellipsis =>
+                     when Ada_Op_Double_Dot =>
                         return 4; -- ???
 
                      when Ada_Op_Plus | Ada_Op_Minus | Ada_Op_Concat =>
@@ -3438,6 +3445,18 @@ end if;
          --  Start of processing for Do_Bin_Op
 
          begin
+            if Oper = Ada_Op_Double_Dot then
+               --  Old gnatpp did this separately from Do_Bin_Op.
+               if Ancestor_Tree (3).Kind = Ada_Derived_Type_Def then
+                  --  This is wrong formatting, but gnatpp has an extra level
+                  --  of indentation here. ???
+                  Interpret_Template ("[[@! ../[@ !]]]");
+               else
+                  Interpret_Template ("[@! ../[@ !]]");
+               end if;
+               return;
+            end if;
+
             --  The recursive calls to Do_Bin_Op below bypass the
             --  normal recursion via Subtree_To_Ada, so we need to pass along the
             --  Cur_Level to Interpret_Template. When we reach something that's
@@ -3474,16 +3493,18 @@ end if;
                   Cur_Level => Cur_Level);
             end if;
 
-            if Is_Short_C or Arg (Cmd, Split_Line_Before_Op) then
+         --  Don't split lines before or after "**"
+
+            if (Is_Short_C or Arg (Cmd, Split_Line_Before_Op))
+              and Oper /= Ada_Op_Pow
+            then
                Interpret_Template ("@", Empty_Tree_Array, Cur_Level);
             end if;
---            Interpret_Template
---              ((if Oper = Ada_Op_Pow then "!" else " ! "), -- no blanks for "**"
---               Subtrees  => (1 => Ada_Tree (Oper)),
---               Cur_Level => Cur_Level);
             Put ((if Oper = Ada_Op_Pow then "\1" else " \1 "),
-                 Operator_Symbol (Oper));
-            if not (Is_Short_C or Arg (Cmd, Split_Line_Before_Op)) then
+                 Operator_Symbol (Oper)); -- no blanks for "**"
+            if not (Is_Short_C or Arg (Cmd, Split_Line_Before_Op))
+              and Oper /= Ada_Op_Pow
+            then
                Interpret_Template ("@", Empty_Tree_Array, Cur_Level);
             end if;
 
@@ -3878,28 +3899,28 @@ end if;
             --  This is for subprogram declarations and the like -- everything
             --  that has a formal parameter list.
 
-            Spec : constant Subprogram_Spec :=
+            Spec : constant Subp_Spec :=
               (case Tree.Kind is
-                 when Ada_Subprogram_Decl |
-                      Ada_Abstract_Subprogram_Decl |
+                 when Ada_Subp_Decl |
+                      Ada_Abstract_Subp_Decl |
                       Ada_Expr_Function |
-                      Ada_Null_Subprogram_Decl |
-                      Ada_Subprogram_Renaming_Decl =>
-                    F_Subp_Spec (Basic_Subprogram_Decl (Tree)),
+                      Ada_Null_Subp_Decl |
+                      Ada_Subp_Renaming_Decl =>
+                    F_Subp_Spec (Basic_Subp_Decl (Tree)),
                  when Ada_Formal_Subp_Decl =>
                     F_Subp_Spec (Formal_Subp_Decl (Tree)),
-                 when Ada_Access_To_Subprogram_Def =>
-                    F_Subp_Spec (Access_To_Subprogram_Def (Tree)),
-                 when Ada_Subprogram_Body_Stub =>
-                    F_Subp_Spec (Subprogram_Body_Stub (Tree)),
-                 when Ada_Subprogram_Body =>
-                    F_Subp_Spec (Subprogram_Body (Tree)),
+                 when Ada_Access_To_Subp_Def =>
+                    F_Subp_Spec (Access_To_Subp_Def (Tree)),
+                 when Ada_Subp_Body_Stub =>
+                    F_Subp_Spec (Subp_Body_Stub (Tree)),
+                 when Ada_Subp_Body =>
+                    F_Subp_Spec (Subp_Body (Tree)),
                  when Ada_Entry_Decl =>
                     null,
                  when Ada_Entry_Body =>
                     null,
-                 when Ada_Generic_Subprogram_Decl =>
-                    F_Subp_Spec (Generic_Subprogram_Decl (Tree)),
+                 when Ada_Generic_Subp_Decl =>
+                    F_Subp_Spec (Generic_Subp_Decl (Tree)),
                  when others => raise Program_Error);
 
             Params : constant Param_Spec_List :=
@@ -3913,17 +3934,17 @@ end if;
 
             Is_Body : constant Boolean :=
               (case Tree.Kind is
-                 when Ada_Subprogram_Decl |
-                      Ada_Subprogram_Renaming_Decl |
-                      Ada_Access_To_Subprogram_Def |
+                 when Ada_Subp_Decl |
+                      Ada_Subp_Renaming_Decl |
+                      Ada_Access_To_Subp_Def |
                       Ada_Entry_Decl |
                       Ada_Formal_Subp_Decl |
-                      Ada_Generic_Subprogram_Decl => False,
-                 when Ada_Subprogram_Body_Stub |
-                      Ada_Subprogram_Body |
-                      Ada_Abstract_Subprogram_Decl |
+                      Ada_Generic_Subp_Decl => False,
+                 when Ada_Subp_Body_Stub |
+                      Ada_Subp_Body |
+                      Ada_Abstract_Subp_Decl |
                       Ada_Expr_Function |
-                      Ada_Null_Subprogram_Decl |
+                      Ada_Null_Subp_Decl |
                       Ada_Entry_Body => True,
                  when others => raise Program_Error);
 
@@ -3952,9 +3973,9 @@ end if;
                declare
                   use type Ada_Node_Arrays.Array_Type;
                   Subs : constant Ada_Tree_Array :=
-                    (if Tree.Kind = Ada_Subprogram_Body
+                    (if Tree.Kind = Ada_Subp_Body
                        then Subtrees (Tree)(1 .. Subtree_Count (Tree) - 1) &
-                            Ada_Tree (P_Defining_Name (Subprogram_Body (Tree)))
+                            Ada_Tree (P_Defining_Name (Subp_Body (Tree)))
                        else Subtrees (Tree));
                begin
                   Interpret_Template
@@ -4178,16 +4199,16 @@ end if;
             when Ada_Select_When_Part =>
                Do_Select_When_Part;
 
-            when Ada_Subprogram_Decl |
-                 Ada_Abstract_Subprogram_Decl |
+            when Ada_Subp_Decl |
+                 Ada_Abstract_Subp_Decl |
                  Ada_Expr_Function |
-                 Ada_Null_Subprogram_Decl |
-                 Ada_Subprogram_Renaming_Decl |
-                 Ada_Subprogram_Body_Stub |
+                 Ada_Null_Subp_Decl |
+                 Ada_Subp_Renaming_Decl |
+                 Ada_Subp_Body_Stub |
                  Ada_Formal_Subp_Decl |
-                 Ada_Subprogram_Body |
-                 Ada_Access_To_Subprogram_Def |
-                 Ada_Generic_Subprogram_Decl |
+                 Ada_Subp_Body |
+                 Ada_Access_To_Subp_Def |
+                 Ada_Generic_Subp_Decl |
                  Ada_Entry_Body |
                  Ada_Entry_Decl =>
                Do_Subp_Decl;
@@ -4221,7 +4242,7 @@ end if;
 --               Do_Subp_Decl
 --                 (Is_Function  => False,
 --                  Is_Body      => False,
---                  Params_Query => Access_To_Subprogram_Param_Spec);
+--                  Params_Query => Access_To_Subp_Param_Spec);
 --
 --            when Ada_Function_Declaration          |
 --              Ada_Expression_Function_Declaration |
@@ -4249,7 +4270,7 @@ end if;
 --               Do_Subp_Decl
 --                 (Is_Function  => True,
 --                  Is_Body      => False,
---                  Params_Query => Access_To_Subprogram_Param_Spec);
+--                  Params_Query => Access_To_Subp_Param_Spec);
 
             when List_Node_Kinds =>
                Do_List;

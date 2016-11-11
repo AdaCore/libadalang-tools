@@ -99,14 +99,14 @@ procedure Contract_Coverage is
             declare
                Decl : constant Ada_Node := Childx (Decls, I);
             begin
-               if Decl.all in Basic_Subprogram_Decl_Type'Class then
+               if Decl.all in Basic_Subp_Decl_Type'Class then
                   if Verbose then
                      Put ("    Doing subprogram ");
                      Wide_Text_IO.Put
                        (Full_Name
                          (F_Name
                            (F_Subp_Spec
-                             (Basic_Subprogram_Decl (Decl)))));
+                             (Basic_Subp_Decl (Decl)))));
                   end if;
 
                   Subp_Count := Subp_Count + 1;
