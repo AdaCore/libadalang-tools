@@ -1458,33 +1458,9 @@ package body Pp.Formatting is
                   Out_Index := Out_Index + 1;
 
                else
-                  --  ????Check for:
-                  --    "generic package G renames" --> "generic G renames"
-                  --  And likewise for procedure and function.
-                  --  This is only needed temporarily, until the lal tree is
-                  --  fixed.
-
-                  if not Disable_Final_Check
-                    and then (Src_Tok.Normalized = Name_Package
-                                or else Src_Tok.Normalized = Name_Procedure
-                                or else Src_Tok.Normalized = Name_Function)
-                    and then Out_Tok.Kind = Identifier
-                  then
-                     if True then
-                        raise Program_Error; -- ????????????????
-                     end if;
-                     pragma Assert
-                       (Src_Tokens (Src_Index - 1).Normalized = Name_Generic);
-                     pragma Assert
-                       (Out_Tokens (Out_Index - 1).Normalized = Name_Generic);
-                     Insert (Out_Buf, " " & To_W_Str (Src_Tok.Normalized));
-                     Move_Past_Src_Tok;
-                     Src_Index := Src_Index + 1;
-                     Src_Tok   := Src_Tokens (Src_Index);
-
                   --  Check for "end;" --> "end Some_Name;" case
 
-                  elsif Src_Tok.Text = Name_Semicolon
+                  if Src_Tok.Text = Name_Semicolon
                     and then
                       Prev_Lexeme (Src_Tokens, Src_Index).Normalized =
                       Name_End

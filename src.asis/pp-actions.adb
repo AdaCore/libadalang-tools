@@ -663,14 +663,14 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
    begin
       return (case Kind is
          when List_Node_Kinds => null,
-         when Ada_Subp_Spec => L ("? ~~~? @(~; ~)~?[@1 return] ~~~"),
+         when Ada_Subp_Spec => L ("? ~~~?[@ (~;@ ~)]~?[@1 return] ~~~"),
         --  F_Name is optional for access-to-subp.
          when Ada_Component_Assoc => L ("?~ ^|@ ~~"),
          when Ada_Constrained_Array_Indices =>
            L ("(?~, ~~)"),
          when Ada_Unconstrained_Array_Indices =>
            L ("(?~ range <>,@ ~ range <>~)"),
-         when Ada_Aspect_Assoc => L ("!? => ~~~"),
+         when Ada_Aspect_Assoc => L ("!? ^=> ~~~"),
          when Ada_At_Clause => L ("for ! use at !"),
          when Ada_Attribute_Def_Clause => L ("for ! use !"),
          when Ada_Enum_Rep_Clause => L ("for ! use !"),
@@ -678,8 +678,9 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
          when Ada_Aspect_Spec => L ("? with$" & "{~,$~}~"),
    --  ???We could try something like the following: return "? with[@1 ~,@1
    --  ~]~";
-         when Ada_Component_Decl => L ("?~, ~~ : !? := ~~~", Aspects),
-         when Ada_Param_Spec => L ("?~, ~~ : ?~~ ~?~~ ~!? := ~~~"),
+         when Ada_Component_Decl => L ("?~,@ ~~ ^: !? ^2:=[@ ~~]~", Aspects),
+         when Ada_Discriminant_Spec => L ("?~,@ ~~ ^: !? ^2:=[@ ~~]~"),
+         when Ada_Param_Spec => L ("?~, ~~ : ?~~ ~?~~ ~!? :=[@ ~~]~"), -- ????????????????Is this even used?
          when Ada_Base_Package_Decl | Ada_Package_Decl =>
              L ("package ![@",
                 Aspects,
@@ -695,7 +696,9 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
          when Ada_Subp_Body_Stub => L ("?~~ ~procedure! is separate" & Aspects),
          when Ada_Formal_Subp_Decl => L ("with procedure!? is ~~~? is ~~~" & Aspects),
              --  Here and elsewhere, the "procedure" gets replaced with
-             --  "function" when appropriate.
+             --  "function" when appropriate. ???This wouldn't be necessary if
+             --  all Subp things worked like Generic_Subp_Renaming_Decl, which
+             --  has a Subp_Kind.
          when Ada_Subp_Kind_Function => L ("function"),
          when Ada_Subp_Kind_Procedure => L ("procedure"),
          when Ada_Package_Body_Stub => L ("package body ! is separate", Aspects),
@@ -708,11 +711,11 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
                 "!",
                 "!",
                 "end !1"),
-         when Ada_Protected_Body => L ("protected body !", Aspects, " is$", "?${~;$~}$~", "end !1"),
+         when Ada_Protected_Body => L ("protected body !", Aspects, " is$", "!", "end !1"),
          when Ada_Subp_Body =>
              L ("?~~ ~procedure!",
                 Aspects,
-                "@9 is$",
+                "@+1 is$",
                 "!",
                 "!",
                 "end !"),
@@ -732,22 +735,21 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
                 "!",
                 "!",
                 "end !1"),
-         when Ada_Discriminant_Spec => L ("?~, ~~ : !? := ~~~"),
-         when Ada_Entry_Decl => L ("?~~ ~entry !?[@ (~~)]~? @(~; ~)~", Aspects),
+         when Ada_Entry_Decl => L ("?~~ ~entry !?[@ (~~)]~?[@ (~;@ ~)]~", Aspects),
          when Ada_Entry_Body =>
-             L ("entry !?[@ (~~)]~? @(~; ~)~[@ when !@ is]$",
+             L ("entry !?[@ (~~)]~?[@ (~;@ ~)]~[@ when !@ is]$",
                 "!",
                 "!",
                 "end !1"),
          when Ada_Enum_Literal_Decl => L ("!"),
          when Ada_Exception_Decl =>
                L ("?~, ~~ : exception!", Aspects),
-         when Ada_Generic_Function_Instantiation => L ("function ! is new !? @(~, ~)~", Aspects),
+         when Ada_Generic_Function_Instantiation => L ("function ! is new !?[@ (~,@ ~)]~", Aspects),
                  --  ???? We need to prepend "?~~ ~?~~ ~" to
                  --  Ada_Generic_Function_Instantiation and Ada_Generic_Procedure_Instantiation,
                  --  which are currently missing from the tree.
-         when Ada_Generic_Package_Instantiation => L ("package ! is new !? @(~, ~)~", Aspects),
-         when Ada_Generic_Procedure_Instantiation => L ("procedure ! is new !? @(~, ~)~", Aspects),
+         when Ada_Generic_Package_Instantiation => L ("package ! is new !?[@ (~,@ ~)]~", Aspects),
+         when Ada_Generic_Procedure_Instantiation => L ("procedure ! is new !?[@ (~,@ ~)]~", Aspects),
          when Ada_Generic_Package_Decl =>
              L ("generic$",
                 "{?~;$~;$~}", -- Should be generic_formal_part, not a list????
@@ -757,9 +759,9 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
          when Ada_Generic_Subp_Renaming_Decl =>
                L ("generic ! ! renames !", Aspects),
          when Ada_Generic_Subp_Decl => L ("generic$", "{?~;$~;$~}", "procedure!", Aspects),
-         when Ada_Number_Decl => L ("?~, ~~ ^: constant ^2:=[@ !]"),
+         when Ada_Number_Decl => L ("?~,@ ~~ ^: constant ^2:=[@ !]"),
          when Ada_Object_Decl =>
-               L ("?~, ~~ :? ~~~? ~~~? ~~~ !? := ~~~!", Aspects),
+               L ("?~,@ ~~ ^:? ~~~? ~~~? ~~~ !? ^2:=[@ ~~]~!", Aspects),
          when Ada_Package_Renaming_Decl => L ("package !!", Aspects),
          when Ada_Single_Protected_Decl =>
                  L ("protected !", Aspects, " is$", "!", "end !1"),
@@ -784,7 +786,7 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
                 "!$",
                 "end? ~~~"), -- ???End id is in wrong case.
 
-         when Ada_Enum_Type_Decl => L ("type ! is", "[ @(?~,@ ~~)", Aspects, "]"),
+         when Ada_Enum_Type_Decl => L ("type ! is", "[ @(?~,@1 ~~)", Aspects, "]"),
          when Ada_Type_Decl => null,
          when Ada_Subtype_Decl => L ("subtype ! is[@ !", Aspects, "]"),
          when Ada_Compilation_Unit => null,
@@ -801,19 +803,19 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
          when Ada_Elsif_Expr_Part => L ("elsif[@ !]@ then[@ !]"),
          when Ada_Entry_Index_Spec => L ("for ! in[@ !]"),
          when Ada_Exception_Handler =>
-             L ("when? ~~ :~ ?~ | ~~ =>$", "{?~;$~;$~}"),
+             L ("when? ~~ :~ ?~ | ~~ ^=>$", "{?~;$~;$~}"),
          when Ada_Explicit_Deref => L ("!.all"),
          when Ada_Aggregate => L ("@(?~~ with @~", "?~,@ ~~)"),
          when Ada_Allocator => L ("new? @(~~)~ !"),
-         when Ada_Attribute_Ref => L ("!'[@!? @(~, ~)~]"),
+         when Ada_Attribute_Ref => L ("!'[@1!?@ (~,@ ~)~]"),
                --  ???This includes function calls to attributes, such as
                --  T'Max(X, Y), which isn't really right.
          when Ada_Bin_Op => null,
-         when Ada_Call_Expr => L ("!? @(~, ~)~"),
+         when Ada_Call_Expr => L ("!?[@ (~,@ ~)]~"),
          when Ada_Case_Expr => L ("case ! is[@ ?@~,@ ~~]"),
-         when Ada_Case_Expr_Alternative => L ("when[ ?~ |@ ~~] =>[@ !]"),
+         when Ada_Case_Expr_Alternative => L ("when[ ?~ |@ ~~] ^=>[@ !]"),
          when Ada_Box_Expr => L ("<>"),
-         when Ada_If_Expr => L ("if[@ !]@ then[@ !]", "?[ @~ @~]~", "? else[@ ~~]~"),
+         when Ada_If_Expr => L ("if[@1 !]@1 then[@1 !]", "? @~ @~~", "?@ else[ ~~]~"),
          when Ada_Membership_Expr => L ("! ![@ ?[@~ |@ ~]~]"),
          when Ada_Dotted_Name => L ("![@.!]"),
          when Ada_Char_Literal => null,
@@ -823,7 +825,7 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
          when Ada_Real_Literal => null,
          when Ada_Int_Literal => null,
          when Ada_Qual_Expr => L ("!'[@(!)]"),
-         when Ada_Quantified_Expr => L ("for ! ! => !"),
+         when Ada_Quantified_Expr => L ("for ! ! ^=>[@ !]"),
          when Ada_Raise_Expr => L ("raise !?[@ with ~~]~"),
          when Ada_Un_Op => null,
          when Ada_Handled_Stmts => null,
@@ -835,7 +837,7 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
          when Ada_Pragma_Argument_Assoc => null,
          when Ada_Pragma_Node => null,
          when Ada_Component_Clause => null, -- ?
-         when Ada_Renaming_Clause => L ("? renames ~~~"),
+         when Ada_Renaming_Clause => L ("? renames[@ ~~]~"),
          when Ada_Select_Stmt =>
                L ("select",
                   "!",
@@ -844,7 +846,7 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
                   "end select"),
          when Ada_Select_When_Part => null,
          when Ada_Accept_Stmt =>
-             L ("accept !? @(~~)~? @(~; ~)~",
+             L ("accept !? @(~~)~?[@ (~;@ ~)]~",
                 "!",
                 "end !1"),
          when Ada_Block_Stmt =>
@@ -860,9 +862,9 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
          when Ada_Record_Type_Def => L ("?~~ ~?~~ ~?~~ ~!"),
          when Ada_Component_List => L ("{?~;$~;$~}", "{?~~;$~}"),
          when Ada_Variant =>
-                     L ("when[ ?~ ^|@ ~~] =>$", "!"),
+                     L ("when[ ?~ ^|@ ~~] ^=>$", "!"),
          when Ada_Case_Stmt_Alternative =>
-                     L ("when[ ?~ ^|@ ~~] =>$", "{?~;$~;$~}"),
+                     L ("when[ ?~ ^|@ ~~] ^=>$", "{?~;$~;$~}"),
          when Ada_Case_Stmt | Ada_Variant_Part =>
                        L ("case !@ is$", "{!}", "end case"),
          when Ada_Extended_Return_Stmt =>
@@ -897,11 +899,11 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
          when Ada_Type_Access_Def => L ("?~~ ~access? ~~~? ~~~ !? ~~~"),
          when Ada_Array_Type_Def => L ("array[@ !] of !"),
          when Ada_Derived_Type_Def =>
-             L ("?~~ ~?~~ ~?~~ ~new !? and ~ and ~~? with@ ~~~? ~~~"),
+             L ("?~~ ~?~~ ~?~~ ~new !? and[@ ~ and@ ~]~? with@ ~~~? ~~~"),
 
          when Ada_Formal_Discrete_Type_Def => L ("@(<>)"),
          when Ada_Incomplete_Type_Def => L ("?~~~"),
-         when Ada_Interface_Type_Def => L ("?~~ ~interface? and ~ and ~~"),
+         when Ada_Interface_Type_Def => L ("?~~ ~interface? and[@ ~ and@ ~]~"),
          when Ada_Mod_Int_Type_Def => L ("mod !"),
          when Ada_Private_Type_Def => L ("?~~ ~?~~ ~?~~ ~private"),
          when Ada_Decimal_Fixed_Point_Def => L ("delta ! digits !? range ~~~"),
@@ -909,7 +911,7 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
          when Ada_Ordinary_Fixed_Point_Def => L ("delta !? range ~~~"),
 
          when Ada_Signed_Int_Type_Def => L ("range !"),
-         when Ada_Known_Discriminant_Part => L ("? @(~; ~)~@"),
+         when Ada_Known_Discriminant_Part => L ("?[@ (~;@ ~)]~@"),
          when Ada_Unknown_Discriminant_Part => L (" @(<>)"),
          when Ada_Access_To_Subp_Def => L ("?~~ ~access? ~~~ procedure!"),
 --         when Ada_Type_Access_Expression => L ("access? ~~~? ~~~ !"),
@@ -1487,6 +1489,8 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
       begin
          --  Replacements inserting soft line breaks
 
+if False then -- ????????????????
+   --  These have been replaced inline in Template_For_Kind.
          Temp := Replace_All (Temp, "? @(~; ~)~", "?[@ (~;@ ~)]~");
          Temp := Replace_All (Temp, "? @(~, ~)~", "?[@ (~,@ ~)]~");
          Temp := Replace_All (Temp, "? := ~~~", "? :=[@ ~~]~");
@@ -1525,6 +1529,7 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
 
          Temp := Replace_All (Temp, "?~, ~~ ^:", "?~,@ ~~ ^:");
          --  Note @ without []
+end if;
 
          --  Replacements for --no-separate-is
 
@@ -2424,8 +2429,14 @@ end if;
                         Kind     => Kind,
                         Template => Debug_Template);
                   when '@' =>
+                     --  ????????????????Document the @+1 syntax, and
+                     --  comment Max_Nesting_Increment.
+                     if J < T'Last and then T (J + 1) = '+' then
+                        J := J + 1;
+                     end if;
+
                      if J < T'Last and then T (J + 1) in '0' .. '9' then
-                        J                 := J + 1;
+                        J := J + 1;
                         Nesting_Increment :=
                           Nesting_Level (Char_To_Digit (T (J)));
                      else
@@ -3742,7 +3753,9 @@ end if;
             --  follows statements.
 
             Label_Seen := True;
-            Put ("\1", Label_Name (Tree));
+            Put ("\1", Replace_All (Label_Name (Tree), " ", ""));
+            --  ???libadalang parses a label as a single token, which is
+            --  wrong. This is a workaround.
          end Do_Label;
 
 --         procedure Do_Ordinary_Type_Declaration is
