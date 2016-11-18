@@ -24,6 +24,7 @@
 ------------------------------------------------------------------------------
 
 with Ada.Directories; use Ada;
+with GNAT.Byte_Order_Mark;
 with GNAT.Command_Line;
 with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 with GNAT.OS_Lib;
@@ -104,9 +105,6 @@ package body LAL_UL.Drivers is
       Individual_Source_Options       : String_String_List_Map;
       Result_Dirs                     : String_String_Map;
 
-      Context : Analysis_Context := Create (Charset => GNATCOLL.Iconv.UTF8);
-      --  ???Charset is hardwired to UTF8 for now
-
       function ASIS_Order_File_Names
         (X : String_Ref_Array) return String_Ref_Array;
       --  ????ASIS (or maybe just gnatmetric) seems to process files in a
@@ -155,6 +153,27 @@ package body LAL_UL.Drivers is
       end ASIS_Order_File_Names;
 
       procedure Process_Files is
+
+         --  ???Libadalang doesn't support all the encodings we need.
+
+         WCEM : constant String := Arg (Cmd, Wide_Character_Encoding).all;
+         Encoding_Method : constant String :=
+           (if WCEM = "h" then
+              "Hex"
+            elsif WCEM = "u" then
+              "Upper"
+            elsif WCEM = "s" then
+              "Shift_JIS"
+            elsif WCEM = "e" then
+              "EUC"
+            elsif WCEM = "8" then
+              GNATCOLL.Iconv.UTF8
+            elsif WCEM = "b" then
+              GNATCOLL.Iconv.ISO_8859_1 -- brackets
+            else raise Program_Error);
+
+         Context : Analysis_Context := Create (Charset => Encoding_Method);
+
          Counter : Natural := File_Names (Cmd)'Length;
          use Text_IO;
       begin
@@ -162,37 +181,78 @@ package body LAL_UL.Drivers is
             if Arg (Cmd, Verbose) then
                Put_Line ("[" & Image (Counter) & "] " & F_Name.all);
                --  ????Use Formatted_Output?  To stderr?
+            elsif not Arg (Cmd, Quiet) then
+               Put
+                 ("Units remaining: " & Image (Counter) & "     " & ASCII.CR);
             end if;
             Counter := Counter - 1;
 
 --         ASIS_UL.Options.No_Argument_File_Specified := False;
             declare
-               Unit : constant Analysis_Unit :=
-                 Get_From_File (Context, F_Name.all, With_Trivia => True);
-            begin
-               if Has_Diagnostics (Unit) then
-                  Put_Line ("Errors while parsing " & F_Name.all);
-                  for D of Diagnostics (Unit) loop
-                     Put_Line
-                       (Langkit_Support.Diagnostics.To_Pretty_String (D));
-                     --  To stderr????
-                  end loop;
+               use GNAT.OS_Lib, GNAT.Byte_Order_Mark;
+               --  We read the file into a String, and convert to wide
+               --  characters according to the encoding method.
+               --
+               --  No matter what the encoding method is, we recognize brackets
+               --  encoding, but not within comments.
+               --
+               --  These behaviors are intended to match what the compiler
+               --  does.
 
-                  if Root (Unit) = null then
-                     goto Continue;
-                  end if;
+               Input : String_Access := Read_File (F_Name.all);
+               First : Natural       := 1;
+
+               BOM     : BOM_Kind;
+               BOM_Len : Natural;
+               BOM_Seen : Boolean := False;
+            begin
+               --  Check for BOM at start of file. The only supported BOM is
+               --  UTF8_All. If present, when we're called from gnatpp, the
+               --  Wide_Character_Encoding_Method should already be set to
+               --  WCEM_UTF8, but when we're called from xml2gnat, we need to
+               --  set it.
+
+               Read_BOM (Input.all, BOM_Len, BOM);
+               if BOM = UTF8_All then
+                  First := BOM_Len + 1; -- skip it
+                  BOM_Seen := True;
+               else
+                  pragma Assert (BOM = Unknown); -- no BOM found
                end if;
 
-               --  We continue even in the presence of errors (if we have a
-               --  tree).
+               declare
+                  Inp : String renames Input (First .. Input'Last);
+                  Unit : constant Analysis_Unit := Get_From_Buffer
+                    (Context, F_Name.all,
+                     Buffer => Inp,
+                     With_Trivia => True);
+               begin
+                  if Has_Diagnostics (Unit) then
+                     Put_Line ("Errors while parsing " & F_Name.all);
+                     for D of Diagnostics (Unit) loop
+                        Put_Line
+                          (Langkit_Support.Diagnostics.To_Pretty_String (D));
+                        --  To stderr????
+                     end loop;
 
-               pragma Assert (Root (Unit) /= null);
-               Per_File_Action (Tool, Cmd, F_Name.all, Unit);
-               Remove (Context, F_Name.all);
+                     if Root (Unit) = null then
+                        goto Continue;
+                     end if;
+                  end if;
+
+                  --  We continue even in the presence of errors (if we have a
+                  --  tree).
+
+                  pragma Assert (Root (Unit) /= null);
+                  Per_File_Action (Tool, Cmd, F_Name.all, Inp, BOM_Seen, Unit);
+                  Remove (Context, F_Name.all);
+                  Free (Input);
+               end;
             end;
 
             <<Continue>>
          end loop;
+         Destroy (Context);
          pragma Assert (Counter = 0);
       end Process_Files;
 
@@ -289,7 +349,6 @@ package body LAL_UL.Drivers is
       Process_Files;
       Final (Tool, Cmd);
 
-      Destroy (Context);
       Environment.Clean_Up;
 
 --      if not ASIS_UL.Options.Incremental_Mode then

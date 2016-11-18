@@ -609,7 +609,7 @@ package body Pp.Formatting is
             More_Levels : Boolean;
 
             Again : constant String :=
-              (if First_Time then "first time" else " again");
+              (if First_Time then "first time" else "again");
 
          --  Start of processing for Split_Lines
 
@@ -687,7 +687,7 @@ package body Pp.Formatting is
 
             pragma Debug
               (Format_Debug_Output
-                 (Lines_Data, "after Split_Lines" & Again));
+                 (Lines_Data, "after Split_Lines " & Again));
             pragma Debug (Assert);
          end Split_Lines;
 

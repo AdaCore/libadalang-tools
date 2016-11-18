@@ -56,7 +56,9 @@ package LAL_UL.Common is
       Outer_Dir,
       Output_Directory,
       Target,
-      Subdirs);
+      Subdirs,
+      Wide_Character_Encoding -- Use Enum_Switches????
+     );
 
    package Common_String_Switches is new String_Switches
      (Common_Descriptor,
@@ -72,7 +74,8 @@ package LAL_UL.Common is
        Outer_Dir                  => '=',
        Output_Directory           => '=',
        Target                     => '=',
-       Subdirs                    => '='));
+       Subdirs                    => '=',
+       Wide_Character_Encoding    => '!'));
 
    package Common_String_Defaults is new Common_String_Switches.Set_Defaults
      ((Project_File               => null,
@@ -84,7 +87,8 @@ package LAL_UL.Common is
        Outer_Dir                  => null,
        Output_Directory           => null,
        Target                     => null,
-       Subdirs                    => null));
+       Subdirs                    => null,
+       Wide_Character_Encoding    => +"b"));
 
    package Common_String_Shorthands is new Common_String_Switches
      .Set_Shorthands
@@ -97,7 +101,8 @@ package LAL_UL.Common is
        Outer_Dir                  => null,
        Output_Directory           => +"--output-dir",
        Target                     => null,
-       Subdirs                    => null));
+       Subdirs                    => null,
+       Wide_Character_Encoding    => +"-W"));
 
    --  Note: Most tools allow "--debugx" with a shorthand of "-dx".
    --  Gnatmetric, however, uses "--gnatmetric-debugx" with a shorthand

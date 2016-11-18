@@ -229,7 +229,6 @@ package Pp.Command_Lines is
       Output,
       Output_Force,
       End_Of_Line,
-      Wide_Character_Encoding, -- Use Enum_Switches????
       Pp_Off,
       Pp_On);
 
@@ -242,7 +241,6 @@ package Pp.Command_Lines is
        Output => '=',
        Output_Force => '=',
        End_Of_Line => '=',
-       Wide_Character_Encoding => '!',
        Pp_Off => '=',
        Pp_On => '='));
 
@@ -252,7 +250,6 @@ package Pp.Command_Lines is
        Output => +"-o",
        Output_Force => +"-of",
        End_Of_Line => +"--eol",
-       Wide_Character_Encoding => +"-W",
        Pp_Off => null,
        Pp_On => null));
 

@@ -500,7 +500,8 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
    --      { -- indent
    --      } -- outdent
    --      @ -- insert a soft line break. May be followed by 1, 2, etc,
-   --           to indicate additional nesting depth.
+   --           to indicate additional nesting depth. Also +1, +2, etc
+   --           (see below).
    --      [ -- continuation-line indent
    --      ] -- continuation-line outdent
    --      ( -- insert a "(", and add "extra" indent by 1 character
@@ -534,6 +535,15 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
    --  example, if we have "blah @blah @1blah", then the @1 is considered more
    --  nested than the @, so if the line is too long, we first enable the @,
    --  and only enable the @1 if the line is still too long.
+   --  @ may also be followed by "+" and a digit, as in "@+1".
+   --  The difference is that for "@1", all subtrees start out deeper than the
+   --  deepest of the outer ones, whereas for "@+1", the subtrees are just one
+   --  level deeper than the outer tree. So for example, suppose we have a tree
+   --  T at depth 5. Its immediate subtrees will normally be at depth 6.
+   --  However, if there is a "@1" in the template for T, the immediate
+   --  subtrees will be at depth 7. But if we change "@1" to "@+1", then the
+   --  immediate subtrees will normally be at depth 6. Thus, "@+1" allows a
+   --  given soft line break to be of equal depth to those of subtrees.
    --
    --  Examples:
    --  "!X!X!" -- inserts three subtrees, with "X" in between. "!1X!2X!3" --
@@ -680,7 +690,7 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
    --  ~]~";
          when Ada_Component_Decl => L ("?~,@ ~~ ^: !? ^2:=[@ ~~]~", Aspects),
          when Ada_Discriminant_Spec => L ("?~,@ ~~ ^: !? ^2:=[@ ~~]~"),
-         when Ada_Param_Spec => L ("?~, ~~ : ?~~ ~?~~ ~!? :=[@ ~~]~"), -- ????????????????Is this even used?
+         when Ada_Param_Spec => null,
          when Ada_Base_Package_Decl | Ada_Package_Decl =>
              L ("package ![@",
                 Aspects,
@@ -722,7 +732,6 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
                --  We increase the level of the @ before " is", so it will be
                --  equal to that of the formal parameters, so if the "is" goes
                --  on a new line, the parameters will be split as well.
-               --  ????Doesn't work!
                --
                --  The last "!" refers to the name of the procedure, which
                --  replaces the F_End_Id (see Do_Subp_Decl). This is necessary
@@ -743,7 +752,7 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
                 "end !1"),
          when Ada_Enum_Literal_Decl => L ("!"),
          when Ada_Exception_Decl =>
-               L ("?~, ~~ : exception!", Aspects),
+               L ("?~,@ ~~ ^: exception!", Aspects),
          when Ada_Generic_Function_Instantiation => L ("function ! is new !?[@ (~,@ ~)]~", Aspects),
                  --  ???? We need to prepend "?~~ ~?~~ ~" to
                  --  Ada_Generic_Function_Instantiation and Ada_Generic_Procedure_Instantiation,
@@ -779,12 +788,15 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
          when Ada_Task_Type_Decl =>
              L ("task type !!",
                 Aspects,
-                "? is$~~~"),
+                "? is~~~"),
          when Ada_Task_Def =>
                L ("? new ~ and ~ with~$",
                 "!$",
                 "!$",
-                "end? ~~~"), -- ???End id is in wrong case.
+                 "end !"),
+               --  The last "!" refers to the name of the task, which
+               --  replaces the F_End_Id (see Do_Task_Def). This is necessary
+               --  because the name of the task is buried in a subtree.
 
          when Ada_Enum_Type_Decl => L ("type ! is", "[ @(?~,@1 ~~)", Aspects, "]"),
          when Ada_Type_Decl => null,
@@ -1003,6 +1015,41 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
 
    Template_Table             : Template_Table_Type;
    Template_Table_Initialized : Boolean := False;
+
+   function Is_Generic_Formal_Object_Decl (Tree : Ada_Tree) return Boolean;
+   --  Much simpler to have a separate node kind????
+
+   function Is_Generic_Formal_Object_Decl (Tree : Ada_Tree) return Boolean is
+      P : Ada_Tree := Parent (Tree);
+      Formals : Ada_Tree;
+   begin
+      return Result : Boolean := False do
+         if Tree.Kind = Ada_Object_Decl then
+            if P.Kind = Ada_Ada_Node_List then
+               P := Parent (P);
+               if P.Kind in
+                 Ada_Generic_Package_Decl | Ada_Generic_Subp_Decl
+               then
+                  if P.Kind = Ada_Generic_Package_Decl then
+                     Formals :=
+                       F_Formal_Part
+                       (Generic_Package_Decl (P)).all'Access;
+                  else
+                     Formals :=
+                       F_Formal_Part
+                       (Generic_Subp_Decl (P)).all'Access;
+                  end if;
+                  for Formal of Formals.all loop
+                     if Tree = Formal then
+                        Result := True;
+                        exit;
+                     end if;
+                  end loop;
+               end if;
+            end if;
+         end if;
+      end return;
+   end Is_Generic_Formal_Object_Decl;
 
    procedure Tree_To_Ada_2
      (Root      : Ada_Node;
@@ -1269,6 +1316,8 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
       --  subtree. This is intended to allow some line breaks to have precedence
       --  over others. If no such digit occurs, the default is zero. This function
       --  returns the maximum such nesting increment in the template.
+      --
+      --  Note that "@+1" is ignored by this function.
 
       function New_Level
         (Tree          : Ada_Tree;
@@ -1487,50 +1536,6 @@ Ada_Integer_Literal : constant Ada_Node_Kind_Type := Ada_Int_Literal;
       function Replacements (T : Ada_Template) return Ada_Template is
          Temp : W_Str_Access := new W_Str'(W_Str (T));
       begin
-         --  Replacements inserting soft line breaks
-
-if False then -- ????????????????
-   --  These have been replaced inline in Template_For_Kind.
-         Temp := Replace_All (Temp, "? @(~; ~)~", "?[@ (~;@ ~)]~");
-         Temp := Replace_All (Temp, "? @(~, ~)~", "?[@ (~,@ ~)]~");
-         Temp := Replace_All (Temp, "? := ~~~", "? :=[@ ~~]~");
---OLD:         Temp := Replace_All (Temp, " renames !", " renames[@ !]");
-         Temp := Replace_All (Temp, "? renames ~~~", "? renames[@ ~~]~");
-         --  ???Should be a weaker @, at least for function renamings.
-         Temp := Replace_All (Temp, "? and ~ and ~~", "? and[@ ~ and@ ~]~");
-         Temp := Replace_All (Temp, " => !", " =>[@ !]");
-
-         --  Replacements inserting tabs
-
-         Temp := Replace_All (Temp, "=>", "^=>");
-         Temp :=
-           Replace_All
-             (Temp,
---OLD:              "?~, ~~ :? ~~~ !? :=[@ ~~]~",
---OLD:              "?~, ~~ ^:? ~~~ !? ^2:=[@ ~~]~");
-              "?~, ~~ :? ~~~? ~~~? ~~~ !? :=[@ ~~]~",
-              "?~, ~~ ^:? ~~~? ~~~? ~~~ !? ^2:=[@ ~~]~");
-         --  For Ada_Component_Decl:
-         Temp :=
-           Replace_All
-             (Temp,
-              "?~, ~~ : !? :=[@ ~~]~?~~~",
-              "?~, ~~ ^: !? ^2:=[@ ~~]~?~~~");
---OLD:         Temp :=
---OLD:           Replace_All
---OLD:             (Temp,
---OLD:              "?~, ~~ :? ~~~ constant !? :=[@ ~~]~",
---OLD:              "?~, ~~ ^:? ~~~ constant !? ^2:=[@ ~~]~");
-         --  This doesn't cover Ada_Param_Spec, which is handled
-         --  specially by Do_Parameter_Specification.
-
-         --  Replacements inserting soft line breaks in comma-separated lists of
-         --  defining identifiers.
-
-         Temp := Replace_All (Temp, "?~, ~~ ^:", "?~,@ ~~ ^:");
-         --  Note @ without []
-end if;
-
          --  Replacements for --no-separate-is
 
          if not Arg (Cmd, Separate_Is) then
@@ -2111,23 +2116,43 @@ end if;
                     Ada_Number_Decl |
                     Ada_Discriminant_Spec |
                     Ada_Component_Decl =>
-                     if Index_In_Line = 1 then
-                        pragma Assert (Text = Name_Colon);
-                        Append
-                          (Tabs,
-                           Tab_Rec'
-                             (Parent          => Pa,
-                              Tree            => Tr,
-                              Token           => Name_Assign,
-                              Mark            => Mark (Out_Buf, '^'),
-                              Index_In_Line   => 2,
-                              Col             => <>,
-                              Num_Blanks      => <>,
-                              Is_Fake         => True,
-                              Is_Insertion_Point => False));
+                     if Is_Generic_Formal_Object_Decl (Tree) then
+                        pragma Assert (Tree.Kind = Ada_Object_Decl); -- generic formal obj
+
+                        if Index_In_Line = 3 then
+                           pragma Assert (Text = Name_Tab_In_Out);
+                           Append
+                             (Tabs,
+                              Tab_Rec'
+                                (Parent          => Pa,
+                                 Tree            => Tr,
+                                 Token           => Name_Assign,
+                                 Mark            => Mark (Out_Buf, '^'),
+                                 Index_In_Line   => 4,
+                                 Col             => <>,
+                                 Num_Blanks      => <>,
+                                 Is_Fake         => True,
+                                 Is_Insertion_Point => False));
+                        end if;
+                     else
+                        if Index_In_Line = 1 then
+                           pragma Assert (Text = Name_Colon);
+                           Append
+                             (Tabs,
+                              Tab_Rec'
+                                (Parent          => Pa,
+                                 Tree            => Tr,
+                                 Token           => Name_Assign,
+                                 Mark            => Mark (Out_Buf, '^'),
+                                 Index_In_Line   => 2,
+                                 Col             => <>,
+                                 Num_Blanks      => <>,
+                                 Is_Fake         => True,
+                                 Is_Insertion_Point => False));
+                        end if;
                      end if;
 
-                  when Ada_Param_Spec => -- Formal obj: | Ada_Object_Decl =>
+                  when Ada_Param_Spec => -- ????Formal obj: | Ada_Object_Decl =>
                      if Index_In_Line = 3 then
                         pragma Assert (Text = Name_Tab_In_Out);
                         Append
@@ -2429,8 +2454,9 @@ end if;
                         Kind     => Kind,
                         Template => Debug_Template);
                   when '@' =>
-                     --  ????????????????Document the @+1 syntax, and
-                     --  comment Max_Nesting_Increment.
+                     --  "@+n" is treated the same as "@n" (where n is a
+                     --  digit), except that Max_Nesting_Increment ignores
+                     --  the former.
                      if J < T'Last and then T (J + 1) = '+' then
                         J := J + 1;
                      end if;
@@ -2603,8 +2629,9 @@ end if;
                               begin
                                  Used (Subtree_Index) := True;
                                  --  ???The following could use some cleanup
-                                 if Subt /= null  and then Subt.Kind not in Absent_Kinds then
+                                 if Subt /= null then
                                     case Subt.Kind is
+                                       when Absent_Kinds => null;
                                        when List_Node_Kinds =>
                                           Append (Tree_Stack, Subt); -- push
                                           Subtrees_To_Ada
@@ -2857,10 +2884,10 @@ end if;
          procedure Do_Select_When_Part;
          procedure Do_Subp_Decl; -- subprograms and the like
 --         procedure Do_Subtype_Indication;
---         procedure Do_Task_Type_Declaration;
+         procedure Do_Task_Def;
          procedure Do_Type_Decl;
          procedure Do_Usage_Name;
---
+
          procedure Do_Others; -- anything not listed above
 
          procedure Do_Accept_Stmt is
@@ -3460,8 +3487,11 @@ end if;
                --  Old gnatpp did this separately from Do_Bin_Op.
                if Ancestor_Tree (3).Kind = Ada_Derived_Type_Def then
                   --  This is wrong formatting, but gnatpp has an extra level
-                  --  of indentation here. ???
+                  --  of indentation here. And it doesn't have "@1", which
+                  --  actually would improve.???
                   Interpret_Template ("[[@! ../[@ !]]]");
+               elsif Parent_Tree.Kind = Ada_For_Loop_Spec then
+                  Interpret_Template ("[@! ../[@1 !]]");
                else
                   Interpret_Template ("[@! ../[@ !]]");
                end if;
@@ -3793,6 +3823,7 @@ end if;
          procedure Do_Parameter_Specification is
             Index : Query_Index := 1;
          begin
+            --  F_Ids:
             Subtrees_To_Ada
               (Subtree (Tree, Index),
                Pre     => "",
@@ -3802,41 +3833,49 @@ end if;
               (Parameter_Specification_Alt_Templ,
                Subtrees => Empty_Tree_Array);
 
-            case Tree.Kind is
-               when Ada_Param_Spec =>
-                  Index := Index + 1;
-
-                  if Subtree (Tree, Index).Kind = Ada_Aliased_Present then
-                     Subtree_To_Ada (Subtree (Tree, Index), Cur_Level + 1, Index);
-                     Put (" ");
-                  end if;
-
-               when Ada_Object_Decl =>
-                  null; -- Ada_Object_Decl doesn't have "aliased"
-
-               when others =>
-                  raise Program_Error;
-            end case;
-
+            --  F_Has_Aliased:
             Index := Index + 1;
-            if F_Mode (Param_Spec (Tree)) in Ada_Mode_In | Ada_Mode_In_Out then
+
+            if Subtree (Tree, Index).Kind = Ada_Aliased_Present then
+               Subtree_To_Ada (Subtree (Tree, Index), Cur_Level + 1, Index);
+               Put (" ");
+            end if;
+
+            --  Skip F_Has_Constant:
+            if Tree.Kind = Ada_Object_Decl then
+               Index := Index + 1;
+            end if;
+
+            --  F_Mode/F_Inout: ???Why not use the same name?
+            Index := Index + 1;
+            if Subtree (Tree, Index).Kind in Ada_Mode_In | Ada_Mode_In_Out then
                Put ("in ");
             end if;
             Interpret_Template ("^2", Subtrees => Empty_Tree_Array);
-            if F_Mode (Param_Spec (Tree)) in Ada_Mode_Out | Ada_Mode_In_Out then
+            if Subtree (Tree, Index).Kind in Ada_Mode_Out | Ada_Mode_In_Out then
                Put ("out ");
             end if;
             Interpret_Template ("^3", Subtrees => Empty_Tree_Array);
 
+            --  F_Type_Expr:
             Index := Index + 1;
             Subtree_To_Ada (Subtree (Tree, Index), Cur_Level + 1, Index);
 
+            --  F_Default_Expr:
             Index := Index + 1;
             if Subtree (Tree, Index) /= null then
                Interpret_Template
                  (" ^4:=[@ !]",
                   Subtrees => (1 => Subtree (Tree, Index)));
             end if;
+
+            --  Skip F_Renaming_Clause, F_Aspects:
+            if Tree.Kind = Ada_Object_Decl then
+               Index := Index + 1;
+               Index := Index + 1;
+            end if;
+
+            pragma Assert (Index = Subtree_Count (Tree));
          end Do_Parameter_Specification;
 
          procedure Do_Pragma is
@@ -4013,19 +4052,17 @@ end if;
 --               Interpret_Template ("?~~ ~?~~ ~!? ~~~");
 --            end if;
 --         end Do_Subtype_Indication;
---
---         procedure Do_Task_Type_Declaration is
---         begin
---            --  For task type declarations, use short form if
---            --  Type_Declaration_View is Nil
---
---            if Is_Nil (Subtree (Tree, 5)) then
---               Interpret_Template ("task type !!" & Aspects & "!!");
---
---            else
---               Interpret_Template;
---            end if;
---         end Do_Task_Type_Declaration;
+
+         procedure Do_Task_Def is
+            use type Ada_Node_Arrays.Array_Type;
+            --  Replace the F_End_Id with the name found in our parent, which
+            --  is an Ada_Task_Type_Decl or Ada_Single_Task_Decl.
+            Subs : constant Ada_Tree_Array :=
+              Subtrees (Tree)(1 .. Subtree_Count (Tree) - 1) &
+              Ada_Tree (P_Defining_Name (Basic_Decl (Parent (Tree))));
+         begin
+            Interpret_Template (Subtrees => Subs);
+         end Do_Task_Def;
 
          procedure Do_Type_Decl is
             Def : constant Type_Def := F_Type_Def (Type_Decl (Tree));
@@ -4038,7 +4075,16 @@ end if;
               or else (Def.Kind = Ada_Derived_Type_Def
                 and then F_Record_Extension (Derived_Type_Def (Def)) /= null)
             then
-               Interpret_Template ("type !! is ![@" & Aspects & "]");
+               if F_Aspects (Type_Decl (Tree)) = null then
+                  Interpret_Template ("type !! is ![" & Aspects & "]");
+                  --  Otherwise, we could have a line break just before the
+                  --  last semicolon.
+               else
+                  Interpret_Template ("type !! is ![@" & Aspects & "]");
+               end if;
+            elsif Def.Kind = Ada_Access_To_Subp_Def then
+               Interpret_Template ("type !! is !" & Aspects);
+               --  gnatpp doesn't put a line break after "is" in this case.
             else
                Interpret_Template ("type !! is[@ !" & Aspects & "]");
             end if;
@@ -4142,8 +4188,8 @@ end if;
 --            when Ada_Call_Expr =>
 --               Do_Function_Call;
 
---            when Ada_Task_Type_Declaration =>
---               Do_Task_Type_Declaration;
+            when Ada_Task_Def =>
+               Do_Task_Def;
 
 --            when Ada_Single_Task_Declaration =>
 --               Do_Single_Task_Declaration;
@@ -4205,6 +4251,20 @@ end if;
 
             when Ada_Param_Spec => -- ???generic formal object: | Ada_Object_Decl =>
                Do_Parameter_Specification;
+
+            when Ada_Object_Decl =>
+               --  ???This would be simpler if we had
+               --  Ada_Generic_Formal_Object_Decl and/or generic_formal_part.
+               if Is_Generic_Formal_Object_Decl (Tree) then
+                  Do_Parameter_Specification;
+               elsif F_Renaming_Clause (Object_Decl (Tree)) /= null then
+                  Interpret_Template
+                    ("?~,@ ~~ :@? ~~~? ~~~? ~~~ !? :=[@ ~~]~!" & Aspects);
+                  --  ???This kludgery is to match gnatpp, which doesn't tab
+                  --  for renamings. Probably should be removed.
+               else
+                  Do_Others;
+               end if;
 
             when Ada_Type_Decl =>
                Do_Type_Decl;
@@ -4346,6 +4406,8 @@ end if;
      (Tool : in out Pp_Tool;
       Cmd : Command_Line;
       File_Name : String;
+      Input : String;
+      BOM_Seen : Boolean;
       Unit : Analysis_Unit)
    is
       pragma Unreferenced (Tool);
@@ -4354,9 +4416,6 @@ end if;
 
       Form_String : constant String := "WCEM=8";
       --  ????Should use Set_Form_String
-      Write_BOM : Boolean := False;
-      --  True if a byte order mark was found in the input file, in which case
-      --  we want to write a BOM to the output file.
 
       Src_Buf : Buffer;
       --  Buffer containing the text of the original source file
@@ -4634,7 +4693,7 @@ end if;
          --  If a BOM (byte order mark) was found in the input, we want to put it
          --  in the output.
 
-         if Write_BOM then
+         if BOM_Seen then
    --         if Options.Output_Encoding /= System.WCh_Con.WCEM_UTF8 then
    --            raise Program_Error;
    --         end if;
@@ -4804,7 +4863,7 @@ end if;
 --         Gen_Regions : Scanner.Token_Vector_Ptr := null;
 --         --  Set to point to Src_Gen_Regions if necessary.
 --
---         Write_BOM : Boolean;
+--         BOM_Seen : Boolean;
 --         --  True if BOM should be written to the output
 --
 --         procedure Walk_Dependencies (CU : Asis.Compilation_Unit);
@@ -4829,6 +4888,22 @@ end if;
 --         Id : constant Unit_Id := Set_Get.Get_Unit_Id (CU);
 --         use type System.WCh_Con.WC_Encoding_Method;
 
+         WCEM : constant String := Arg (Cmd, Wide_Character_Encoding).all;
+         Encoding_Method : constant System.WCh_Con.WC_Encoding_Method :=
+           (if WCEM = "h" then
+              System.WCh_Con.WCEM_Hex
+            elsif WCEM = "u" then
+              System.WCh_Con.WCEM_Upper
+            elsif WCEM = "s" then
+              System.WCh_Con.WCEM_Shift_JIS
+            elsif WCEM = "e" then
+              System.WCh_Con.WCEM_EUC
+            elsif WCEM = "8" then
+              System.WCh_Con.WCEM_UTF8
+            elsif WCEM = "b" then
+              System.WCh_Con.WCEM_Brackets
+            else raise Program_Error);
+
       --  Start of processing for Maybe_To_Ada
 
       begin
@@ -4846,16 +4921,18 @@ end if;
 
          if To_Ada then -- ??? or Skip_Gen then
 --            Read_Ada_File (Src_Buf, File_Name,
---                           Opt.Wide_Character_Encoding_Method, Write_BOM,
+--                           Opt.Wide_Character_Encoding_Method, BOM_Seen,
 --                           Expand_Tabs => True);
-            Read_Ada_File (Src_Buf, File_Name,
-                           System.WCh_Con.WCEM_Brackets, Write_BOM,
-                           Expand_Tabs => True);
+            Clear (Src_Buf);
+            Insert_Ada_Source
+              (Src_Buf, Input, Encoding_Method, Expand_Tabs => True);
             --  Expand tabs unconditionally. This differs from the behavior of
             --  the old gnatpp, which has an option for that (but only for
             --  comments).
+            --  ???Encoding needs to match the call to libadalang.
+            Reset (Src_Buf);
 --            pragma Assert
---              (if Write_BOM then
+--              (if BOM_Seen then
 --                 Opt.Wide_Character_Encoding_Method = System.WCh_Con.WCEM_UTF8);
 --
 --            if Skip_Gen then
@@ -4884,7 +4961,7 @@ end if;
 --
             if To_Ada then
                Tree_To_Ada;
---                 (Tree, Src_Buf, Write_BOM, Cmd, Output_Name,
+--                 (Tree, Src_Buf, BOM_Seen, Cmd, Output_Name,
 --                  Form_String, Do_Diff, Output_Written, Is_PP => True);
             end if;
 --         end;
@@ -4893,7 +4970,7 @@ end if;
    --  Start of processing for Per_File_Action
 
    begin
-      if Debug_Flag_V then
+      if Debug_Mode then
          Print (Unit);
 --         Put ("With trivia\n");
 --         PP_Trivia (Unit);

@@ -2999,9 +2999,11 @@ package body METRICS.Actions is
      (Tool : in out Metrics_Tool;
       Cmd : Command_Line;
       File_Name : String;
+      Input : String;
+      BOM_Seen : Boolean;
       Unit : Analysis_Unit)
    is
-      pragma Unreferenced (Cmd);
+      pragma Unreferenced (Cmd, Input, BOM_Seen);
    begin
       if Debug_Flag_V then
          Print (Unit);

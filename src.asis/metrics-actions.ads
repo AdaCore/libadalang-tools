@@ -16,16 +16,18 @@ package METRICS.Actions is
 
    type Metrics_Tool is new Tool_State with private;
 
+private
+
    overriding procedure Init (Tool : in out Metrics_Tool; Cmd : Command_Line);
    overriding procedure Per_File_Action
      (Tool : in out Metrics_Tool;
       Cmd : Command_Line;
       File_Name : String;
+      Input : String;
+      BOM_Seen : Boolean;
       Unit : Analysis_Unit);
    overriding procedure Final (Tool : in out Metrics_Tool; Cmd : Command_Line);
    overriding procedure Tool_Help (Tool : Metrics_Tool);
-
-private
 
    use Langkit_Support;
    use Libadalang.AST;
