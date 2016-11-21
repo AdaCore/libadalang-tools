@@ -3,6 +3,7 @@ all:
 #???	gprbuild -v -P src/build.gpr -p
 	gprbuild -v -k -XLIBRARY_TYPE=static -P src/build.gpr -p
 #???	LIBRARY_TYPE=relocatable gprbuild -v -P src/build.gpr -p
+	cd bin ; rm -f gnatmetric gnatpp
 	cd bin ; cp -p lalmetric gnatmetric
 	cd bin ; cp -p lalpp gnatpp
 
