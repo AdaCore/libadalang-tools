@@ -174,16 +174,19 @@ package body LAL_UL.Drivers is
 
          Context : Analysis_Context := Create (Charset => Encoding_Method);
 
-         Counter : Natural := File_Names (Cmd)'Length;
+         Num_File_Names : constant Natural := File_Names (Cmd)'Length;
+         Counter : Natural := Num_File_Names;
          use Text_IO;
       begin
          for F_Name of ASIS_Order_File_Names (File_Names (Cmd)) loop
             if Arg (Cmd, Verbose) then
-               Put_Line ("[" & Image (Counter) & "] " & F_Name.all);
-               --  ????Use Formatted_Output?  To stderr?
-            elsif not Arg (Cmd, Quiet) then
+               Put_Line
+                 (Standard_Error, "[" & Image (Counter) & "] " & F_Name.all);
+               --  ????Use Formatted_Output?
+            elsif not Arg (Cmd, Quiet) and then Num_File_Names > 1 then
                Put
-                 ("Units remaining: " & Image (Counter) & "     " & ASCII.CR);
+                 (Standard_Error,
+                  "Units remaining: " & Image (Counter) & "     " & ASCII.CR);
             end if;
             Counter := Counter - 1;
 
