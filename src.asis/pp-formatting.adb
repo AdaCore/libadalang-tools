@@ -73,6 +73,24 @@ package body Pp.Formatting is
       --  symbol containing letters, so case might matter. N should be in all
       --  lower case.
 
+   function Sname_83 (Tok : Scanner.Token) return Boolean;
+   --  True if Tok can be a simple_name (in Ada 83).
+   --  This includes reserved words that were added to the language
+   --  after Ada 83. Needed because we don't necessarily know
+   --  which language version is being used.
+
+   function Sname_83 (Tok : Scanner.Token) return Boolean is
+      use Scanner;
+   begin
+      return Tok.Kind in Identifier | String_Literal
+        or else
+          (Tok.Kind = Reserved_Word
+             and then Is_Reserved_Word
+               (Tok.Normalized, Ada_Version => Ada_2012)
+             and then not Is_Reserved_Word
+               (Tok.Normalized, Ada_Version => Ada_83));
+   end Sname_83;
+
    pragma Style_Checks ("M85");
    package body Generic_Lines_Data is
 
@@ -853,7 +871,6 @@ package body Pp.Formatting is
 
             procedure Move_Past_Char;
             procedure Move_Past_Out_Tok;
-            procedure Move_Past_Src_Tok;
 
             procedure Insert_End_Of_Line_Comment;
             --  Found an End_Of_Line_Comment comment; copy it to the buffer. If it
@@ -998,14 +1015,6 @@ package body Pp.Formatting is
                   exit when At_Point (Out_Buf, Out_Tok.Sloc.Lastx);
                end loop;
             end Move_Past_Out_Tok;
-
-            procedure Move_Past_Src_Tok is
-            begin
-               loop
-                  Move_Forward (Src_Buf);
-                  exit when At_Point (Src_Buf, Src_Tok.Sloc.Lastx);
-               end loop;
-            end Move_Past_Src_Tok;
 
             function Extra_Blank_On_Return return Boolean is
             begin
@@ -1462,9 +1471,8 @@ package body Pp.Formatting is
 
                   if Src_Tok.Text = Name_Semicolon
                     and then
-                      Prev_Lexeme (Src_Tokens, Src_Index).Normalized =
-                      Name_End
-                    and then Out_Tok.Kind in Identifier | String_Literal
+                      Prev_Lexeme (Src_Tokens, Src_Index).Normalized = Name_End
+                    and then Sname_83 (Out_Tok)
                   then
                      loop -- could be "end A.B.C;"
                         Move_Past_Out_Tok;
@@ -1479,7 +1487,7 @@ package body Pp.Formatting is
                         Move_Past_Out_Tok;
                         Out_Index := Out_Index + 1;
                         Out_Tok   := Out_Tokens (Out_Index);
-                        pragma Assert (Out_Tok.Kind in Identifier | String_Literal);
+                        pragma Assert (Sname_83 (Out_Tok));
                      end loop;
                      pragma Assert
                        (Disable_Final_Check
@@ -1499,14 +1507,12 @@ package body Pp.Formatting is
                      Insert (Out_Buf, " ");
                      loop -- could be "end A.B.C;"
                         Insert (Out_Buf, To_W_Str (Src_Tok.Text));
-                        Move_Past_Src_Tok;
                         Src_Index := Src_Index + 1;
                         Src_Tok   := Src_Tokens (Src_Index);
 
                         exit when Src_Tok.Normalized /= Name_Dot;
 
                         Insert (Out_Buf, To_W_Str (Src_Tok.Text));
-                        Move_Past_Src_Tok;
                         Src_Index := Src_Index + 1;
                         Src_Tok   := Src_Tokens (Src_Index);
                         pragma Assert (Src_Tok.Kind in Identifier | String_Literal);
@@ -1600,7 +1606,6 @@ package body Pp.Formatting is
                   --  token.
 
                   elsif Disable_Final_Check then
-                     Move_Past_Src_Tok;
                      Src_Index := Src_Index + 1;
                      if Src_Index < Last_Index (Src_Tokens) then
                         Src_Tok := Src_Tokens (Src_Index);
@@ -1613,13 +1618,8 @@ package body Pp.Formatting is
                      end if;
                   else
                      Raise_Token_Mismatch
-                       ("Inserting",
-                        Lines_Data,
-                        Src_Buf,
-                        Src_Index,
-                        Out_Index,
-                        Src_Tok,
-                        Out_Tok);
+                       ("Inserting", Lines_Data, Src_Buf,
+                        Src_Index, Out_Index, Src_Tok, Out_Tok);
                   end if;
                end if;
             end loop;
@@ -1653,6 +1653,7 @@ package body Pp.Formatting is
             pragma Assert (Disable_Final_Check or else Qual_Nesting = 0);
             Reset (Out_Buf);
             Clear (Out_Tokens);
+            pragma Assert (At_Beginning (Src_Buf));
          end Insert_Comments_And_Blank_Lines;
 
          procedure Insert_Alignment (Tokens : Scanner.Token_Vector);
@@ -2658,13 +2659,8 @@ package body Pp.Formatting is
             if Src_Index > 5 and then Simulate_Token_Mismatch then
                --  Simulate a token mismatch, for testing
                Raise_Token_Mismatch
-                 ("Final_Check 0",
-                  Lines_Data,
-                  Src_Buf,
-                  Src_Index,
-                  Out_Index,
-                  Src_Tok,
-                  Out_Tok);
+                 ("Final_Check 0", Lines_Data, Src_Buf,
+                  Src_Index, Out_Index, Src_Tok, Out_Tok);
             end if;
 
             if Src_Tok.Kind /= Blank_Line
@@ -2726,23 +2722,18 @@ package body Pp.Formatting is
                            " --> " &
                            To_UTF8 (To_Array (Out_Comments)));
                         Raise_Token_Mismatch
-                          ("Final_Check 1",
-                           Lines_Data,
-                           Src_Buf,
-                           Src_Index,
-                           Out_Index,
-                           Src_Tok,
-                           Out_Tok);
+                          ("Final_Check 1", Lines_Data, Src_Buf,
+                           Src_Index, Out_Index, Src_Tok, Out_Tok);
                      end if;
                   end;
 
                --  Check for "end;" --> "end Some_Name;" case
-   --???Check next Out token is ";"
+
                elsif Src_Tok.Text = Name_Semicolon
                  and then
                    Prev_Lexeme (Src_Tokens, Src_Index).Normalized =
                    Name_End
-                 and then Out_Tok.Kind in Identifier | String_Literal
+                 and then Sname_83 (Out_Tok)
                then
                   loop -- could be "end A.B.C;"
                      Move_Past_Out_Tok;
@@ -2757,17 +2748,17 @@ package body Pp.Formatting is
                      Move_Past_Out_Tok;
                      Out_Index := Out_Index + 1;
                      Out_Tok   := Out_Tokens (Out_Index);
-                     if Out_Tok.Kind not in Identifier | String_Literal then
+                     if not Sname_83 (Out_Tok) then
                         Raise_Token_Mismatch
-                          ("Final_Check 2",
-                           Lines_Data,
-                           Src_Buf,
-                           Src_Index,
-                           Out_Index,
-                           Src_Tok,
-                           Out_Tok);
+                          ("Final_Check 2", Lines_Data, Src_Buf,
+                           Src_Index, Out_Index, Src_Tok, Out_Tok);
                      end if;
                   end loop;
+                  if Src_Tok.Normalized /= Name_Semicolon then
+                     Raise_Token_Mismatch
+                       ("Final_Check 3", Lines_Data, Src_Buf,
+                        Src_Index, Out_Index, Src_Tok, Out_Tok);
+                  end if;
 
                --  Check for "X : in T" --> "X : T" case
 
@@ -2792,13 +2783,8 @@ package body Pp.Formatting is
 
                else
                   Raise_Token_Mismatch
-                    ("Final_Check 3",
-                     Lines_Data,
-                     Src_Buf,
-                     Src_Index,
-                     Out_Index,
-                     Src_Tok,
-                     Out_Tok);
+                    ("Final_Check 4", Lines_Data, Src_Buf,
+                     Src_Index, Out_Index, Src_Tok, Out_Tok);
                end if;
             end if;
          end loop;
@@ -2808,25 +2794,15 @@ package body Pp.Formatting is
          then
             if Point (Out_Buf) /= Last_Position (Out_Buf) then
                Raise_Token_Mismatch
-                 ("Final_Check 4",
-                  Lines_Data,
-                  Src_Buf,
-                  Src_Index,
-                  Out_Index,
-                  Src_Tok,
-                  Out_Tok);
+                 ("Final_Check 5", Lines_Data, Src_Buf,
+                  Src_Index, Out_Index, Src_Tok, Out_Tok);
             end if;
          end if;
          while not At_End (Out_Buf) loop
             if not Is_Line_Terminator (Cur (Out_Buf)) then
                Raise_Token_Mismatch
-                 ("Final_Check 5",
-                  Lines_Data,
-                  Src_Buf,
-                  Src_Index,
-                  Out_Index,
-                  Src_Tok,
-                  Out_Tok);
+                 ("Final_Check 6", Lines_Data, Src_Buf,
+                  Src_Index, Out_Index, Src_Tok, Out_Tok);
             end if;
 
             Move_Forward (Out_Buf);
@@ -2838,13 +2814,8 @@ package body Pp.Formatting is
            or else Out_Index /= Last_Index (Out_Tokens)
          then
             Raise_Token_Mismatch
-              ("Final_Check 6",
-               Lines_Data,
-               Src_Buf,
-               Src_Index,
-               Out_Index,
-               Src_Tok,
-               Out_Tok);
+              ("Final_Check 7", Lines_Data, Src_Buf,
+               Src_Index, Out_Index, Src_Tok, Out_Tok);
          end if;
       end Final_Check_Helper;
 

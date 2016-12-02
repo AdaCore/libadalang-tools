@@ -405,9 +405,8 @@ package body METRICS.Actions is
               Ada_Protected_Type_Decl |
               Ada_Single_Task_Decl |
               Ada_Task_Type_Decl |
-              Ada_Generic_Function_Instantiation |
+              Ada_Generic_Subp_Instantiation |
               Ada_Generic_Package_Instantiation |
-              Ada_Generic_Procedure_Instantiation |
               Ada_Generic_Renaming_Decl |
               Ada_Package_Renaming_Decl |
               Ada_Abstract_Subp_Decl |
@@ -677,14 +676,22 @@ package body METRICS.Actions is
          when Ada_Task_Type_Decl =>
             return Task_Type_Knd;
 
-         when Ada_Generic_Function_Instantiation =>
-            return Function_Instantiation_Knd;
          when Ada_Generic_Package_Instantiation =>
             return Package_Instantiation_Knd;
-         when Ada_Generic_Procedure_Instantiation =>
-            return Procedure_Instantiation_Knd;
          when Ada_Generic_Renaming_Decl =>
             return Generic_Package_Renaming_Knd; -- ???Or proc/func
+         when Ada_Generic_Subp_Instantiation =>
+            declare
+               R : constant Type_Expr :=
+                 F_Returns
+                   (Subp_Spec (F_Params (Generic_Subp_Instantiation (Node))));
+               --  ???R is null here even for functions
+            begin
+               return
+                 (if R = null
+                    then Procedure_Instantiation_Knd
+                    else Function_Instantiation_Knd);
+            end;
          when Ada_Generic_Subp_Decl =>
             declare
                R : constant Type_Expr :=
@@ -2203,8 +2210,7 @@ package body METRICS.Actions is
 
             --  A child unit depends on its parent
 
-            when Ada_Generic_Function_Instantiation |
-              Ada_Generic_Procedure_Instantiation |
+            when Ada_Generic_Subp_Instantiation |
               Ada_Generic_Package_Instantiation |
               Ada_Generic_Renaming_Decl |
               Ada_Package_Renaming_Decl |

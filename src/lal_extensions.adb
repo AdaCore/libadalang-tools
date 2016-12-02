@@ -173,11 +173,12 @@ package body LAL_Extensions is
                Result :=
                  Get_Def_Name (Ada_Node (F_Body (Subunit (Decl))));
 
-            when Ada_Generic_Function_Instantiation |
-              Ada_Generic_Package_Instantiation |
-              Ada_Generic_Procedure_Instantiation =>
+            when Ada_Generic_Subp_Instantiation =>
                Result :=
-                 F_Name (Generic_Instantiation (Decl));
+                 F_Name (Generic_Subp_Instantiation (Decl));
+            when Ada_Generic_Package_Instantiation =>
+               Result :=
+                 F_Name (Generic_Package_Instantiation (Decl));
             when Ada_Generic_Package_Renaming_Decl =>
                Result :=
                  F_Name (Generic_Package_Renaming_Decl (Decl));
@@ -291,10 +292,10 @@ package body LAL_Extensions is
             F_Aspects (Task_Body (Decl)),
          when Ada_Exception_Decl =>
             F_Aspects (Exception_Decl (Decl)),
-         when Ada_Generic_Function_Instantiation |
-              Ada_Generic_Package_Instantiation |
-              Ada_Generic_Procedure_Instantiation =>
-            F_Aspects (Generic_Instantiation (Decl)),
+         when Ada_Generic_Subp_Instantiation =>
+            F_Aspects (Generic_Subp_Instantiation (Decl)),
+         when Ada_Generic_Package_Instantiation =>
+            F_Aspects (Generic_Package_Instantiation (Decl)),
          when Ada_Generic_Package_Renaming_Decl =>
             F_Aspects (Generic_Package_Renaming_Decl (Decl)),
          when Ada_Generic_Subp_Renaming_Decl =>

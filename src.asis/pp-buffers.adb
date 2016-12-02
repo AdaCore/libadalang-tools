@@ -73,7 +73,9 @@ package body Pp.Buffers is
 
    function At_Beginning (Buf : Buffer) return Boolean is
    begin
-      return Is_Empty (Buf.To);
+      return Result : constant Boolean := Is_Empty (Buf.To) do
+         pragma Assert (Result = (Point (Buf) = 1));
+      end return;
    end At_Beginning;
 
    function At_Point (Buf : Buffer; Mark : Marker) return Boolean is

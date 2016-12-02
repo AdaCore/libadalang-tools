@@ -416,6 +416,7 @@ package body Pp.Actions is
      Predicate => List_Node_Kinds in
        Ada_Ada_Node_List |
        Ada_Aspect_Assoc_List |
+       Ada_Assoc_List |
        Ada_Case_Expr_Alternative_List |
        Ada_Case_Stmt_Alternative_List |
        Ada_Compilation_Unit_List |
@@ -425,13 +426,8 @@ package body Pp.Actions is
        Ada_Elsif_Expr_Part_List |
        Ada_Elsif_Stmt_Part_List |
        Ada_Enum_Literal_Decl_List |
-       Ada_Exception_Handler_List |
-       Ada_Expr_List |
        Ada_Identifier_List |
        Ada_Name_List |
-     Ada_Param_Assoc_List |
-     Ada_Param_List |
-       Ada_Param_Assoc_List |
        Ada_Param_Spec_List |
        Ada_Pragma_Argument_Assoc_List |
        Ada_Pragma_Node_List |
@@ -667,7 +663,7 @@ package body Pp.Actions is
       return (case Kind is
          when List_Node_Kinds => null,
          when Ada_Subp_Spec => null,
-         when Ada_Component_Assoc => L ("?~ ^|@ ~~"),
+         when Ada_Aggregate_Assoc => null,
          when Ada_Constrained_Array_Indices =>
            L ("(?~, ~~)"),
          when Ada_Unconstrained_Array_Indices =>
@@ -698,7 +694,7 @@ package body Pp.Actions is
          when Ada_Subp_Renaming_Decl => L ("?~~ ~procedure!!", Aspects),
          when Ada_Subp_Decl => L ("?~~ ~procedure!" & Aspects),
          when Ada_Subp_Body_Stub => L ("?~~ ~procedure! is separate" & Aspects),
-         when Ada_Formal_Subp_Decl => L ("with procedure!? is ~~~? is ~~~" & Aspects),
+         when Ada_Formal_Subp_Decl => L ("?~~ ~with procedure!? is ~~~? is ~~~" & Aspects),
              --  Here and elsewhere, the "procedure" gets replaced with
              --  "function" when appropriate. ???This wouldn't be necessary if
              --  all Subp things worked like Generic_Subp_Renaming_Decl, which
@@ -748,12 +744,8 @@ package body Pp.Actions is
          when Ada_Enum_Literal_Decl => L ("!"),
          when Ada_Exception_Decl =>
                L ("?~,@ ~~ ^: exception!", Aspects),
-         when Ada_Generic_Function_Instantiation => L ("function ! is new !?[@ (~,@ ~)]~", Aspects),
-                 --  ???? We need to prepend "?~~ ~?~~ ~" to
-                 --  Ada_Generic_Function_Instantiation and Ada_Generic_Procedure_Instantiation,
-                 --  which are currently missing from the tree.
          when Ada_Generic_Package_Instantiation => L ("package ! is new !?[@ (~,@ ~)]~", Aspects),
-         when Ada_Generic_Procedure_Instantiation => L ("procedure ! is new !?[@ (~,@ ~)]~", Aspects),
+         when Ada_Generic_Subp_Instantiation => L ("?~~ ~! ! is new !?[@ (~,@ ~)]~", Aspects),
          when Ada_Generic_Package_Decl =>
              L ("generic$",
                 "{?~;$~;$~}", -- Should be generic_formal_part, not a list????
@@ -768,13 +760,20 @@ package body Pp.Actions is
                L ("?~,@ ~~ ^:? ~~~? ~~~? ~~~ !? ^2:=[@ ~~]~!", Aspects),
          when Ada_Package_Renaming_Decl => L ("package !!", Aspects),
          when Ada_Single_Protected_Decl =>
-                 L ("protected !", Aspects, " is$", "!", "end !1"),
+                 L ("protected !",
+                    Aspects,
+                    " is? new ~ and ~ with~$",
+                    "!",
+                    "end !1"),
          when Ada_Protected_Type_Decl =>
              L ("protected type !!",
                 Aspects,
                 " is? new ~ and ~ with~$",
                 "!",
                 "end !1"),
+               --  ???The interfaces should be moved from
+               --  Ada_Single_Protected_Decl and Ada_Protected_Type_Decl to
+               --  Ada_Protected_Def.
          when Ada_Protected_Def =>
                L ("!$",
                   "!$/"),
@@ -929,10 +928,10 @@ package body Pp.Actions is
          when Ada_Use_Package_Clause => L ("use[@ ?~,@ ~~]"),
          when Ada_Use_Type_Clause => L ("use? ~~~ type[@ ?~,@ ~~]"),
          when Ada_With_Clause => L ("?~~ ~?~~ ~with ^?~, ~~"),
-         when Ada_Paren_Expr => L ("@(!)"),
    --  Note: the tab ('^') is ignored for limited/private 'with's (see
    --  Append_Tab).
 
+         when Ada_Paren_Expr => L ("@(!)"),
          when Ada_Abort_Absent => null,
          when Ada_Abort_Present => L ("with abort"),
          when Ada_Abstract_Absent => null,
@@ -2186,7 +2185,7 @@ package body Pp.Actions is
                   when Ada_Pragma_Argument_Assoc |
                     Ada_Aspect_Assoc |
                     Ada_Discriminant_Assoc       |
-                    Ada_Component_Assoc |
+                    Ada_Aggregate_Assoc |
                     Ada_Param_Assoc =>
                      null;
 
@@ -2864,6 +2863,7 @@ end if;
          procedure Do_Select_When_Part;
          procedure Do_Subp_Spec;
          procedure Do_Subp_Decl; -- subprograms and the like
+         procedure Do_Generic_Subp_Instantiation;
          procedure Do_Call_Expr;
          procedure Do_Subtype_Indication;
          procedure Do_Task_Def;
@@ -2924,17 +2924,18 @@ end if;
                     (if Tree.Kind = Ada_Discriminant_Assoc
                        then Subtree_Count
                          (F_Ids (Discriminant_Assoc (Tree))) = 1
-                     elsif Designator.Kind = Ada_Component_Assoc
+                     elsif Tree.Kind = Ada_Aggregate_Assoc
                        then Subtree_Count
-                        (F_Choice_List (Component_Assoc (Designator))) = 1
+                        (F_Designators (Aggregate_Assoc (Tree))) = 1
                      else True);
                begin
                   --  This is needed because the "[]" is not properly nested with
-                  --  the "?~~~".
+                  --  the "?~~~".????????????????
+                  --  "! ^=>[@ !]" doesn't work for discrims.
                   if Single_Name then
                      Interpret_Template ("?~~ ^=>[@ ~!]");
                   else
-                     Interpret_Template ("?~ ^|@ ~ ^=>[@ ~!]");
+                     Interpret_Template ("?~ ^|@1 ~ ^=>[@ ~!]");
                   end if;
                end;
             end if;
@@ -3375,7 +3376,7 @@ end if;
          begin
             --  First we have a special case for the Depends aspect specification.
             --  We want to pretend that "=>+" is an operator, so we print:
-            --   "Depends => (A =>+ B)" instead of "Depends => (A => +B)".
+            --  "Depends => (A =>+ B)" instead of "Depends => (A => +B)".
             --  We don't bother with this for pragma Depends, because that's
             --  mainly for the compiler's implementation of the aspect, so we
             --  don't expect it to be used much.
@@ -3956,7 +3957,8 @@ end if;
 
          procedure Do_Subp_Decl is
             --  This is for subprogram declarations and the like -- everything
-            --  that has a formal parameter list.
+            --  that has a formal parameter list. Also subprogram
+            --  instantiations, which have no such list.
 
             Spec : constant Subp_Spec :=
               (case Tree.Kind is
@@ -4045,6 +4047,12 @@ end if;
                end if;
             end;
          end Do_Subp_Decl;
+
+         procedure Do_Generic_Subp_Instantiation is
+         begin
+            --  ????????????????Always prints "procedure".
+            Interpret_Template;
+         end Do_Generic_Subp_Instantiation;
 
          procedure Do_Call_Expr is
             function Past_Call_Threshold (Actuals : Ada_Tree) return Boolean is
@@ -4229,6 +4237,7 @@ end if;
 --               Do_Single_Task_Declaration;
 
             when Ada_Param_Assoc |
+              Ada_Aggregate_Assoc |
               Ada_Discriminant_Assoc |
               Ada_Pragma_Argument_Assoc =>
                Do_Assoc;
@@ -4293,7 +4302,7 @@ end if;
                   Do_Parameter_Specification;
                elsif F_Renaming_Clause (Object_Decl (Tree)) /= null then
                   Interpret_Template
-                    ("?~,@ ~~ :@? ~~~? ~~~? ~~~ !? :=[@ ~~]~!" & Aspects);
+                    ("?~,@ ~~ :[@? ~~~? ~~~? ~~~ !? :=[@ ~~]~!]" & Aspects);
                   --  ???This kludgery is to match gnatpp, which doesn't tab
                   --  for renamings. Probably should be removed.
                else
@@ -4322,6 +4331,9 @@ end if;
                  Ada_Entry_Body |
                  Ada_Entry_Decl =>
                Do_Subp_Decl;
+
+            when Ada_Generic_Subp_Instantiation =>
+               Do_Generic_Subp_Instantiation;
 
             when Ada_Call_Expr =>
                Do_Call_Expr;
@@ -4796,7 +4808,8 @@ end if;
       end Write_Str;
 
       procedure Write_Out_Buf (Out_Vec : Char_Vector) is
-         pragma Assert (Point (Out_Buf) = 1);
+         pragma Assert (At_Beginning (Out_Buf));
+         pragma Assert (At_Beginning (Src_Buf));
          Out_Elems : W_Str renames Elems (Out_Vec)
            (2 .. Last_Index (Out_Vec)); -- 2 to skip initial NL
       begin
