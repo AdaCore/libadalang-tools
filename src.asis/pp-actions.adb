@@ -662,6 +662,7 @@ package body Pp.Actions is
    begin
       return (case Kind is
          when List_Node_Kinds => null,
+         when Ada_Subtype_Indication_List => null, -- ????
          when Ada_Subp_Spec => null,
          when Ada_Aggregate_Assoc => null,
          when Ada_Constrained_Array_Indices =>
