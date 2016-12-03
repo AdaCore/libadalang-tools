@@ -1611,7 +1611,7 @@ package body Pp.Formatting is
                         Src_Tok := Src_Tokens (Src_Index);
                      else
                         while not At_End (Out_Buf) loop
-                           Move_Forward (Out_Buf); -- ????Move_Past_Char;
+                           Move_Forward (Out_Buf);
                         end loop;
 
                         goto Done;

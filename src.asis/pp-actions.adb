@@ -411,29 +411,6 @@ package body Pp.Actions is
 
    ----------------
 
-   subtype List_Node_Kinds is Ada_Node_Kind_Type with
-     --  ???No longer needed.
-     Predicate => List_Node_Kinds in
-       Ada_Ada_Node_List |
-       Ada_Aspect_Assoc_List |
-       Ada_Assoc_List |
-       Ada_Case_Expr_Alternative_List |
-       Ada_Case_Stmt_Alternative_List |
-       Ada_Compilation_Unit_List |
-       Ada_Component_Clause_List |
-       Ada_Discriminant_Assoc_List |
-       Ada_Discriminant_Spec_List |
-       Ada_Elsif_Expr_Part_List |
-       Ada_Elsif_Stmt_Part_List |
-       Ada_Enum_Literal_Decl_List |
-       Ada_Identifier_List |
-       Ada_Name_List |
-       Ada_Param_Spec_List |
-       Ada_Pragma_Argument_Assoc_List |
-       Ada_Pragma_Node_List |
-       Ada_Select_When_Part_List |
-       Ada_Variant_List;
-
    function Is_Null (Tree : Ada_Node) return Boolean is (Tree = null);
    function T_Img (Tree : Ada_Node) return String is (Short_Image (Tree));
 
@@ -661,19 +638,19 @@ package body Pp.Actions is
    function Template_For_Kind (Kind : Ada_Tree_Kind) return Ada_Template_Ptr is
    begin
       return (case Kind is
-         when List_Node_Kinds => null,
-         when Ada_Subtype_Indication_List => null, -- ????
+         when Ada_Ada_List => null,
          when Ada_Subp_Spec => null,
          when Ada_Aggregate_Assoc => null,
          when Ada_Constrained_Array_Indices =>
            L ("(?~, ~~)"),
          when Ada_Unconstrained_Array_Indices =>
-           L ("(?~ range <>,@ ~ range <>~)"),
+             null,
+             --  ???L ("(?~ range <>,@ ~ range <>~)"),
          when Ada_Aspect_Assoc => L ("!? ^=> ~~~"),
          when Ada_At_Clause => L ("for ! use at !"),
          when Ada_Attribute_Def_Clause => L ("for ! use [!]"),
          when Ada_Enum_Rep_Clause => L ("for ! use !"),
-             --  ????An enumeration representation clause is incorrectly parsed
+             --  ???An enumeration representation clause is incorrectly parsed
              --  as an attribute definition clause.
          when Ada_Record_Rep_Clause => L ("for ! use record? at mod ~~;~$", "{?~;$~;$~}", "end record"),
          when Ada_Aspect_Spec => L ("? with$" & "{~,$~}~"),
@@ -749,7 +726,7 @@ package body Pp.Actions is
          when Ada_Generic_Subp_Instantiation => L ("?~~ ~! ! is new !?[@ (~,@ ~)]~", Aspects),
          when Ada_Generic_Package_Decl =>
              L ("generic$",
-                "{?~;$~;$~}", -- Should be generic_formal_part, not a list????
+                "{?~;$~;$~}", -- Should be generic_formal_part, not a list???
                 "!"),
          when Ada_Generic_Package_Renaming_Decl =>
                L ("generic package ! renames !", Aspects),
@@ -1012,7 +989,7 @@ package body Pp.Actions is
    Template_Table_Initialized : Boolean := False;
 
    function Is_Generic_Formal_Object_Decl (Tree : Ada_Tree) return Boolean;
-   --  Much simpler to have a separate node kind????
+   --  Much simpler to have a separate node kind???
 
    function Is_Generic_Formal_Object_Decl (Tree : Ada_Tree) return Boolean is
       P : Ada_Tree := Parent (Tree);
@@ -1785,8 +1762,6 @@ package body Pp.Actions is
       --  between parameters with a hard line break. If Is_Function is True, put
       --  a hard line break before "return". If Is_Body is True, put a hard line
       --  break before "is".
-      --  ????This needs to be split into template for the spec and
-      --  for whatever contains "is".
 
       function Subp_Decl_With_Hard_Breaks
         (Tree : Ada_Tree;
@@ -2237,7 +2212,7 @@ package body Pp.Actions is
                return Ada_Template (To_String (Result));
             end Keep_Indentation;
 
-            pragma Assert (Tree.Kind in List_Node_Kinds);
+            pragma Assert (Tree.Kind in Ada_Ada_List);
             Prev_With : With_Clause := null;
             --  See Use_Same_Line below
 
@@ -2617,7 +2592,7 @@ end if;
                                  if Subt /= null then
                                     case Subt.Kind is
                                        when Absent_Kinds => null;
-                                       when List_Node_Kinds =>
+                                       when Ada_Ada_List =>
                                           Append (Tree_Stack, Subt); -- push
                                           Subtrees_To_Ada
                                             (Subt,
@@ -2784,7 +2759,7 @@ end if;
                      Parent : constant Ada_Tree := Parent_Tree;
                   begin
                      null;
-                     if Parent.Kind in List_Node_Kinds then
+                     if Parent.Kind in Ada_Ada_List then
                         if Subtree (Parent, 1) /= Tree then
                            Insert_Blank_Line_Before := True;
                         end if;
@@ -2864,7 +2839,6 @@ end if;
          procedure Do_Select_When_Part;
          procedure Do_Subp_Spec;
          procedure Do_Subp_Decl; -- subprograms and the like
-         procedure Do_Generic_Subp_Instantiation;
          procedure Do_Call_Expr;
          procedure Do_Subtype_Indication;
          procedure Do_Task_Def;
@@ -2912,7 +2886,7 @@ end if;
             Designator : constant Ada_Tree := Subtree (Tree, 1);
             Positional_Notation : constant Boolean :=
               Designator = null or else
-                (Designator.Kind in List_Node_Kinds
+                (Designator.Kind in Ada_Ada_List
                    and then Subtree_Count (Designator) = 0);
          begin
             if Positional_Notation then
@@ -2931,7 +2905,7 @@ end if;
                      else True);
                begin
                   --  This is needed because the "[]" is not properly nested with
-                  --  the "?~~~".????????????????
+                  --  the "?~~~".
                   --  "! ^=>[@ !]" doesn't work for discrims.
                   if Single_Name then
                      Interpret_Template ("?~~ ^=>[@ ~!]");
@@ -3181,7 +3155,7 @@ end if;
 --         end Do_Def_Name;
 
          procedure Do_Generic_Package_Instantiation is
-            --  ????This is needed because there's no Generic_Formal_Package
+            --  ???This is needed because there's no Generic_Formal_Package
             --  node kind.
          begin
             if Parent (Parent (Tree)).Kind in
@@ -4049,12 +4023,6 @@ end if;
             end;
          end Do_Subp_Decl;
 
-         procedure Do_Generic_Subp_Instantiation is
-         begin
-            --  ????????????????Always prints "procedure".
-            Interpret_Template;
-         end Do_Generic_Subp_Instantiation;
-
          procedure Do_Call_Expr is
             function Past_Call_Threshold (Actuals : Ada_Tree) return Boolean is
                (Natural (Subtree_Count (Actuals)) >
@@ -4182,7 +4150,7 @@ end if;
       --  Start of processing for Subtree_To_Ada
 
       begin
-         if Tree = null then -- ????
+         if Tree = null then -- ???
             return;
          end if;
 
@@ -4313,6 +4281,35 @@ end if;
             when Ada_Type_Decl =>
                Do_Type_Decl;
 
+            when Ada_Unconstrained_Array_Indices => raise Program_Error;
+               --  ???No longer used.  Seems to have been replaced
+               --  by Ada_Constrained_Array_Indices.
+
+            when Ada_Constrained_Array_Indices =>
+               declare
+                  SI : constant Ada_Tree :=
+                    Subtree (F_List (Constrained_Array_Indices (Tree)), 1);
+               begin
+                  if Kind (SI) = Ada_Subtype_Indication then
+                     declare
+                        C : constant Constraint :=
+                          F_Constraint (Subtype_Indication (SI));
+                     begin
+                        if C /= null
+                          and then Kind (C) = Ada_Range_Constraint
+                          and then Kind (F_Range (Range_Constraint (C))) =
+                            Ada_Box_Expr
+                        then
+                           Interpret_Template ("(?~,@ ~~)");
+                           goto Done_Ada_Unconstrained_Array_Indices;
+                        end if;
+                     end;
+                  end if;
+               end;
+               Interpret_Template;
+
+               <<Done_Ada_Unconstrained_Array_Indices>>
+
             when Ada_Select_When_Part =>
                Do_Select_When_Part;
 
@@ -4332,9 +4329,6 @@ end if;
                  Ada_Entry_Body |
                  Ada_Entry_Decl =>
                Do_Subp_Decl;
-
-            when Ada_Generic_Subp_Instantiation =>
-               Do_Generic_Subp_Instantiation;
 
             when Ada_Call_Expr =>
                Do_Call_Expr;
@@ -4398,7 +4392,7 @@ end if;
 --                  Is_Body      => False,
 --                  Params_Query => Access_To_Subp_Param_Spec);
 
-            when List_Node_Kinds =>
+            when Ada_Ada_List =>
                Do_List;
 
             when others =>
@@ -4410,13 +4404,15 @@ end if;
 
       procedure Convert_Tree_To_Ada (Tree : Ada_Tree) is
       begin
+         --  Append first link break. The Kind here doesn't matter. We use
+         --  Ada_Abort_Stmt because there is no "null" kind.
          Append_Line_Break
            (Hard     => True,
             Affects_Comments => True,
             Level    => 0,
---            Kind     => Not_An_Element,
-            Kind     => Ada_Abort_Stmt, -- ????
+            Kind     => Ada_Abort_Stmt,
             Template => Name_Empty);
+
          pragma Assert (Check_Whitespace);
          Subtree_To_Ada (Tree, Cur_Level => 0, Index_In_Parent => 1);
          pragma Debug (Assert_No_Trailing_Blanks (To_W_Str (Out_Buf)));
