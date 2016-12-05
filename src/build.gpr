@@ -5,18 +5,25 @@
 with "libadalang.gpr";
 project Build is
 
+   type Build_Mode_Type is ("dev", "prod");
+   Build_Mode : Build_Mode_Type := external ("BUILD_MODE", "dev");
+
    for Source_Dirs use (".", "../src.asis");
    for Object_Dir use "../obj";
    for Exec_Dir use "../bin";
 
    for Main use ("pp-main.adb", "metrics-main.adb", "contract_coverage.adb");
---   for Main use ("metrics-main.adb");
 
    package Compiler is
-      for Default_Switches ("ada") use
-        ("-g", "-O0", "-gnata", "-gnatyg", "-gnatwae", "-gnatw.u");
---  For optimization:
---        ("-g", "-O2", "-gnatp", "-gnatyg", "-gnatwae", "-gnatw.u");
+      case Build_Mode is
+         when "dev" =>
+            for Default_Switches ("Ada") use
+              ("-gnatyg", "-gnatwae", "-gnatw.u", "-g", "-O0", "-gnata");
+
+         when "prod" =>
+            for Default_Switches ("Ada") use
+              ("-gnatyg", "-gnatwae", "-gnatw.u", "-g", "-Ofast", "-gnatp", "-gnatn2");
+      end case;
    end Compiler;
 
    package Builder is

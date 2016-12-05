@@ -1,7 +1,12 @@
+# To build in production mode, do "make BUILD_MODE=prod".
+# To build in development mode, do "make BUILD_MODE=dev" or just "make".
+
+BUILD_MODE = dev
+PROCESSORS = 0
+
 .PHONY: all
 all:
-#???	gprbuild -v -P src/build.gpr -p
-	gprbuild -v -k -XLIBRARY_TYPE=static -P src/build.gpr -p
+	gprbuild -v -k -XLIBRARY_TYPE=static -XBUILD_MODE=${BUILD_MODE} -P src/build.gpr -p -j${PROCESSORS}
 #???	LIBRARY_TYPE=relocatable gprbuild -v -P src/build.gpr -p
 	cd bin ; rm -f gnatmetric gnatpp
 	cd bin ; cp -p lalmetric gnatmetric
