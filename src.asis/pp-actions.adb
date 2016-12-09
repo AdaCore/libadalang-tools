@@ -1723,10 +1723,11 @@ package body Pp.Actions is
                         case T (J) is
                            when '!' | '?' =>
                               if J < T'Last and then T (J + 1) in '1' .. '9' then
+                                 pragma Warnings (Off, "if it is invalid");
                                  pragma Assert
                                    (Query_Index (Char_To_Digit (T (J + 1))) in
                                       Constrained_Query_Count);
-
+                                 pragma Warnings (On, "if it is invalid");
                               else
                                  Subtree_Count := Subtree_Count + 1;
                               end if;
