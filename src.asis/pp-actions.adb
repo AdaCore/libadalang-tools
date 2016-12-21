@@ -1779,6 +1779,8 @@ package body Pp.Actions is
       --  at the beginning, and a sentinel Tab at the end.
 
       type Tree_Stack_Index is new Positive;
+      subtype Tree_Stack_Count is
+        Tree_Stack_Index'Base range 0 .. Tree_Stack_Index'Last;
       type Tree_Array is array (Tree_Stack_Index range <>) of Ada_Tree;
       package Tree_Stacks is new ASIS_UL.Vectors
         (Tree_Stack_Index,
@@ -1792,7 +1794,7 @@ package body Pp.Actions is
       --  popped at the beginning and end of Subtree_To_Ada.
 
       function Ancestor_Tree
-        (N    : Tree_Stack_Index)
+        (N    : Tree_Stack_Count)
         return Ada_Tree;
       --  Returns the N'th ancestor of the current tree. Ancestor (0) is the
       --  current tree, Ancestor (1) is the parent of the current tree, Ancestor
@@ -1800,7 +1802,7 @@ package body Pp.Actions is
       --  isn't deep enough.
 
       function Ancestor_Tree
-        (N    : Tree_Stack_Index)
+        (N    : Tree_Stack_Count)
         return Ada_Tree is
       begin
          if Last_Index (Tree_Stack) <= N then
@@ -2888,7 +2890,12 @@ package body Pp.Actions is
 
          procedure Do_Aggregate is
          begin
-            if Subtree_Count (F_Assocs (Aggregate (Tree))) = 0 then
+            if Parent_Tree.Kind = Ada_Attribute_Ref then
+               --  For the 'Update attribute, the F_Args is an Ada_Aggregate
+               --  for some reason, so we need to leave off the parentheses, or
+               --  else we will get an extra pair.
+               Interpret_Template ("?~~ with @~?~,@ ~~");
+            elsif Subtree_Count (F_Assocs (Aggregate (Tree))) = 0 then
                Interpret_Template ("@(?~~ with @~" & "null record/)");
             else
                Interpret_Template;
@@ -3983,7 +3990,8 @@ package body Pp.Actions is
                --  We use % instead of $ here, so that the indentation of these
                --  will not affect following comments.
             else
-               Interpret_Template ("!?[@ (~,@ ~)]~");
+               Interpret_Template
+                 (Munge_Template ("!?[@ (~,@ ~)]~", Ada_Call_Expr));
             end if;
          end Do_Call_Expr;
 
