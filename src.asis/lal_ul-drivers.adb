@@ -24,6 +24,7 @@
 ------------------------------------------------------------------------------
 
 with Ada.Directories; use Ada;
+with Ada.Exceptions;
 with GNAT.Byte_Order_Mark;
 with GNAT.Command_Line;
 with GNAT.Directory_Operations; use GNAT.Directory_Operations;
@@ -36,6 +37,7 @@ with LAL_UL.Common;   use LAL_UL.Common;
 with LAL_UL.Projects; use LAL_UL.Projects;
 --  with LAL_UL.Check_Parameters;
 with ASIS_UL.String_Utilities; use ASIS_UL.String_Utilities;
+with LAL_UL.Tool_Names;
 
 with GNATCOLL.Iconv;
 
@@ -365,6 +367,15 @@ package body LAL_UL.Drivers is
       ASIS_UL.Main_Done := True;
 
    exception
+      when X : File_Not_Found =>
+         declare
+            use Text_IO, Ada.Exceptions, LAL_UL.Tool_Names;
+         begin
+            Put_Line
+              (Standard_Error, Tool_Name & ": " & Exception_Message (X));
+         end;
+         Environment.Clean_Up;
+         GNAT.OS_Lib.OS_Exit (1);
       when LAL_UL.Command_Lines.Command_Line_Error =>
          --  Error message has already been printed.
          GNAT.Command_Line.Try_Help;

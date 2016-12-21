@@ -151,6 +151,10 @@ package ASIS_UL.String_Utilities is
    function Read_File (File_Name : String) return String_Access;
    --  Reads the entire contents of the file
 
+   File_Not_Found : exception;
+   --  Raised by Read_File if it can't find the file. The Exception_Message is
+   --  appropriate for printing.
+
    procedure Parallel_Make_Dir
      (New_Directory : String; Give_Message : Boolean := False);
    --  Creates a new directory with the given name if it does not already

@@ -535,12 +535,10 @@ package body ASIS_UL.String_Utilities is
    end Read_File;
 
    function Read_File (File_Name : String) return String_Access is
-
       FD : constant File_Descriptor := Open_Read (File_Name, Fmode => Binary);
-
    begin
       if FD = Invalid_FD then
-         raise Program_Error with "file not found: " & File_Name;
+         raise File_Not_Found with "file not found: " & File_Name;
       end if;
 
       return Result : constant String_Access := Read_File (FD) do
