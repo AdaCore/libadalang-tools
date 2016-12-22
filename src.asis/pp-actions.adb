@@ -1796,10 +1796,10 @@ package body Pp.Actions is
       function Ancestor_Tree
         (N    : Tree_Stack_Count)
         return Ada_Tree;
-      --  Returns the N'th ancestor of the current tree. Ancestor (0) is the
-      --  current tree, Ancestor (1) is the parent of the current tree, Ancestor
-      --  (2) is the grandparent of the current tree, and so on. Nil if the tree
-      --  isn't deep enough.
+      --  Returns the N'th ancestor of the current tree. Ancestor_Tree (0) is
+      --  the current tree, Ancestor_Tree (1) is the parent of the current
+      --  tree, Ancestor (2) is the grandparent of the current tree, and so
+      --  on. Nil if the tree isn't deep enough.
 
       function Ancestor_Tree
         (N    : Tree_Stack_Count)
