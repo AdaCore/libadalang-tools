@@ -681,17 +681,14 @@ package body METRICS.Actions is
          when Ada_Generic_Renaming_Decl =>
             return Generic_Package_Renaming_Knd; -- ???Or proc/func
          when Ada_Generic_Subp_Instantiation =>
-            declare
-               R : constant Type_Expr :=
-                 F_Returns
-                   (Subp_Spec (F_Params (Generic_Subp_Instantiation (Node))));
-               --  ???R is null here even for functions
-            begin
-               return
-                 (if R = null
-                    then Procedure_Instantiation_Knd
-                    else Function_Instantiation_Knd);
-            end;
+            return
+              (case Ada_Subp_Kind'
+                 (Kind (F_Kind (Generic_Subp_Instantiation (Node))))
+               is
+                 when Ada_Subp_Kind_Function =>
+                    Function_Instantiation_Knd,
+                 when Ada_Subp_Kind_Procedure =>
+                    Procedure_Instantiation_Knd);
          when Ada_Generic_Subp_Decl =>
             declare
                R : constant Type_Expr :=
