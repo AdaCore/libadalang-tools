@@ -930,10 +930,17 @@ package body METRICS.Actions is
             Code : constant Float :=
               Float (M.Vals (Lines_Comment)) +
               Float (M.Vals (Lines_Code));
-            Img : constant String := Fixed (Comments / Code * 100.0)'Img;
          begin
-            pragma Assert (Img'First = 1 and then Img (1) = ' ');
-            return Img (2 .. Img'Last);
+            if Code = 0.0 then
+               return "0/0"; -- avoid division by zero
+            else
+               declare
+                  Img : constant String := Fixed (Comments / Code * 100.0)'Img;
+               begin
+                  pragma Assert (Img'First = 1 and then Img (1) = ' ');
+                  return Img (2 .. Img'Last);
+               end;
+            end if;
          end;
 
       else
