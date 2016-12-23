@@ -25,8 +25,8 @@
 
 pragma Ada_2012;
 
-with Libadalang;     use Libadalang;
-with Libadalang.AST; use Libadalang.AST;
+with Libadalang;          use Libadalang;
+with Libadalang.Analysis; use Libadalang.Analysis;
 
 package Pp.Formatting.Tree_Formatting is
 

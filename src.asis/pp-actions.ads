@@ -2,9 +2,6 @@ with Libadalang.Analysis; use Libadalang.Analysis;
 with LAL_UL.Command_Lines; use LAL_UL.Command_Lines;
 with LAL_UL.Tools; use LAL_UL.Tools;
 
-private with Libadalang.AST;
-private with Libadalang.AST.Types;
-
 package Pp.Actions is
 
    type Pp_Tool is new Tool_State with private;
@@ -21,9 +18,6 @@ package Pp.Actions is
    overriding procedure Tool_Help (Tool : Pp_Tool);
 
 private
-
-   use Libadalang.AST;
-   use Libadalang.AST.Types;
 
    type Pp_Tool is new Tool_State with null record;
 

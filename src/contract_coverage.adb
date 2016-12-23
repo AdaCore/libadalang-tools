@@ -8,8 +8,6 @@ with Langkit_Support.Diagnostics;
 
 with Libadalang;     use Libadalang;
 with Libadalang.Analysis; use Libadalang.Analysis;
-with Libadalang.AST; use Libadalang.AST;
-with Libadalang.AST.Types; use Libadalang.AST.Types;
 with LAL_Extensions; use LAL_Extensions;
 
 with ASIS_UL.String_Utilities; use ASIS_UL.String_Utilities;

@@ -2,8 +2,7 @@
 with Langkit_Support.Text; use Langkit_Support.Text;
 
 with Libadalang; use Libadalang;
-with Libadalang.AST; use Libadalang.AST;
-with Libadalang.Lexer; use Libadalang.Lexer;
+with Libadalang.Lexer;    use Libadalang.Lexer;
 
 with LAL_UL.Formatted_Output; use LAL_UL.Formatted_Output;
 

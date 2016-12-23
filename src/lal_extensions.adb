@@ -1,8 +1,6 @@
 with Ada.Characters.Conversions; use Ada;
 with Ada.Wide_Characters.Handling;
 
-with Libadalang.Analysis; use Libadalang.Analysis;
-
 package body LAL_Extensions is
 
    use Ada_Node_Vecs;

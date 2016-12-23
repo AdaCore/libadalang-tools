@@ -1,22 +1,21 @@
 with Langkit_Support.Text; use Langkit_Support.Text;
 
 with Libadalang; use Libadalang;
-with Libadalang.AST; use Libadalang.AST;
-with Libadalang.AST.Types; use Libadalang.AST.Types;
+with Libadalang.Analysis; use Libadalang.Analysis;
 
 with ASIS_UL.String_Utilities; use ASIS_UL.String_Utilities;
 
 package LAL_Extensions is
 
    --  ???Perhaps we should move (some of?) this stuff into package
-   --  Libadalang.AST.
+   --  Libadalang.Analysis.
 
-   package Ada_Node_Vecs renames AST.Ada_Node_Vectors;
+   package Ada_Node_Vecs renames Analysis.Ada_Node_Vectors;
 
    function Childx
      (Node  : access Ada_Node_Type'Class;
       Index : Positive) return Ada_Node;
-   --  Should this replace AST.Child???
+   --  Should this replace Analysis.Child???
 
    procedure Find_Iter
      (Node      : access Ada_Node_Type'Class;

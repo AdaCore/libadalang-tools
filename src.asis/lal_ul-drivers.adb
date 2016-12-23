@@ -45,8 +45,6 @@ with Langkit_Support.Diagnostics;
 
 with Libadalang;     use Libadalang;
 with Libadalang.Analysis; use Libadalang.Analysis;
-with Libadalang.AST; use Libadalang.AST;
-with Libadalang.AST.Types; use Libadalang.AST.Types;
 
 package body LAL_UL.Drivers is
 

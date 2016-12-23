@@ -2333,7 +2333,7 @@ package body Pp.Actions is
                      --  I.e. if Y is a prefix of X.
 
                   function Has_Prefix (X, Y : Ada_Tree) return Boolean is
-                     subtype Name is AST.Types.Name;
+                     subtype Name is Analysis.Name;
                   begin
                      return Has_Prefix
                        (L_Full_Name (Name (X)), L_Full_Name (Name (Y)));

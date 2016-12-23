@@ -5,8 +5,6 @@ with LAL_UL.Tools; use LAL_UL.Tools;
 private with Ada.Containers.Hashed_Sets;
 private with Langkit_Support.Vectors;
 private with Langkit_Support.Slocs;
-private with Libadalang.AST;
-private with Libadalang.AST.Types;
 private with METRICS.Command_Lines;
 private with METRICS.Line_Counting;
 private with LAL_UL.Generic_Symbols;
@@ -30,8 +28,6 @@ private
    overriding procedure Tool_Help (Tool : Metrics_Tool);
 
    use Langkit_Support;
-   use Libadalang.AST;
-   use Libadalang.AST.Types;
    use METRICS.Command_Lines;
    use METRICS.Line_Counting;
 
