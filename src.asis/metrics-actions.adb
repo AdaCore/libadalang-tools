@@ -1354,12 +1354,13 @@ package body METRICS.Actions is
            else Arg (Cmd, Output_Suffix).all);
       use Text_IO;
       Text : File_Type;
-      File_Name : constant String := File_M.Source_File_Name.all;
+      File_Name : String renames File_M.Source_File_Name.all;
       Text_File_Name : constant String :=
         (if Arg (Cmd, Output_Directory) = null
            then File_Name & Suffix
            else Directories.Compose
-             (Arg (Cmd, Output_Directory).all, File_Name & Suffix));
+             (Arg (Cmd, Output_Directory).all,
+              Directories.Simple_Name (File_Name) & Suffix));
       --  Can't pass Suffix as Extension, because that inserts an extra "."
    begin
       if Text_File_Name = File_Name then
