@@ -1117,7 +1117,7 @@ package body Pp.Actions is
                        F_Formal_Part
                        (Generic_Subp_Decl (P)).all'Access;
                   end if;
-                  for Formal of Formals.all loop
+                  for Formal of Formals.Children loop
                      if Tree = Formal then
                         Result := True;
                         exit;
