@@ -3,7 +3,7 @@ with LAL_UL.Command_Lines; use LAL_UL.Command_Lines;
 with LAL_UL.Tools; use LAL_UL.Tools;
 
 private with Ada.Containers.Hashed_Sets;
-private with Langkit_Support.Vectors;
+private with ASIS_UL.Vectors;
 private with Langkit_Support.Slocs;
 private with METRICS.Command_Lines;
 private with METRICS.Line_Counting;
@@ -49,7 +49,10 @@ private
    type Metrix;
    type Metrix_Ref is access all Metrix;
 
-   package Metrix_Vectors is new Langkit_Support.Vectors (Metrix_Ref);
+   type Metrix_Index is new Positive;
+   type Metrix_Array is array (Metrix_Index range <>) of Metrix_Ref;
+   package Metrix_Vectors is
+      new ASIS_UL.Vectors (Metrix_Index, Metrix_Ref, Metrix_Array);
    use Metrix_Vectors;
 
    Null_Kind : constant Ada_Node_Kind_Type := Ada_Abort_Absent;

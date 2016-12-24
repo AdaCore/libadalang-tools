@@ -1,6 +1,6 @@
 with Text_IO;
 
-with Ada.Containers.Generic_Constrained_Array_Sort;
+with Ada.Containers; use type Ada.Containers.Count_Type;
 with Ada.Directories;
 with Ada.Strings.Unbounded; use Ada;
 with Ada.Characters.Handling;
@@ -20,7 +20,6 @@ with ASIS_UL.String_Utilities; use ASIS_UL.String_Utilities;
 with LAL_UL.Tool_Names;
 
 with ASIS_UL.Debug; use ASIS_UL.Debug;
-with ASIS_UL.Vectors;
 with LAL_UL.Predefined_Symbols; use LAL_UL.Predefined_Symbols;
 
 pragma Warnings (Off);
@@ -1023,15 +1022,23 @@ package body METRICS.Actions is
       M : Metrix;
       Depth : Natural)
    is
-   begin
-      Validate (M);
       pragma Assert (M.Node = null);
 
-      --  Return immediately if M is for a Contract_Complexity_Eligible node,
-      --  and we're not going to print. Also don't print metrics for "eligible
-      --  local program units" if the -nolocal switch was given.
+      Doing_Coupling_Metrics : constant Boolean :=
+        (Metrics_To_Compute and not Coupling_Only) = Empty_Metrics_Set;
+   begin
+      Validate (M);
+
+      --  Return immediately if we're doing coupling metrics, and this is not a
+      --  compilation unit spec, or if M is for a Contract_Complexity_Eligible
+      --  node, and we're not going to print. Also don't print metrics for
+      --  "eligible local program units" if the -nolocal switch was given.
 
       if Depth > 2 then
+         if Doing_Coupling_Metrics then
+            return;
+         end if;
+
          if M.Kind in Contract_Complexity_Eligible
            and then not Should_Print
              (Contract_Complexity, Metrics_To_Compute, M, Depth, XML => True)
@@ -1044,21 +1051,49 @@ package body METRICS.Actions is
          end if;
       end if;
 
+      --  Coupling metrics are only printed for specs
+
+      if M.Kind = Ada_Compilation_Unit
+        and then Doing_Coupling_Metrics
+        and then not M.Is_Spec
+      then
+         return;
+      end if;
+
       if Depth > 2 then
          Indent;
       end if;
 
-      if M.Kind = Ada_Compilation_Unit then
+      if Doing_Coupling_Metrics then
+         if Depth = 2 then
+            Put ("Unit \1 (\2)\n", Str (M.Text_Name).S, File_Name);
+         end if;
+      elsif M.Kind = Ada_Compilation_Unit then
          Put ("Metrics computed for \1\n",
               File_Name_To_Print (Cmd, File_Name));
          Put ("containing \1 \2\n",
-              Fine_Kind_String_For_Header (Get (M.Submetrix, 1).all),
+              Fine_Kind_String_For_Header (Element (M.Submetrix, 1).all),
               Str (M.Text_Name).S);
       else
          Put ("\n\1 (\2\3 at lines  \4)\n",
               Str (M.Text_Name).S,
               Fine_Kind_String (M.Knd), Str (M.LI_Sub).S,
               Lines_String (M.Sloc));
+      end if;
+
+      if Doing_Coupling_Metrics and then Depth = 2 then
+         Indent;
+         for I in Coupling_Metrics loop
+            if Should_Print
+              (I, Metrics_To_Compute, M, Depth, XML => False)
+            then
+               Put ("\1", Metric_Name_String (I));
+               Tab_To_Column (33);
+               Put (": \1\n", Val_To_Print (I, M, XML => False));
+            end if;
+         end loop;
+         Outdent;
+         Put ("\n");
       end if;
 
       --  Print metrix for this unit
@@ -1400,12 +1435,12 @@ package body METRICS.Actions is
    begin
       for Index in 1 .. Last_Index (M.Submetrix) loop
          declare
-            Sub : Metrix_Ref renames Get_Access (M.Submetrix, Index).all;
+            Sub : Metrix_Ref := Element (M.Submetrix, Index);
          begin
             Destroy (Sub);
          end;
       end loop;
-      Destroy (M.Submetrix);
+      Clear (M.Submetrix);
 
       Free (M);
    end Destroy;
@@ -1495,9 +1530,9 @@ package body METRICS.Actions is
 
       function In_Visible_Part return Boolean is
          (Last_Index (Metrix_Stack) >= 3
-            and then Get (Metrix_Stack, 3).Kind in
+            and then Element (Metrix_Stack, 3).Kind in
               Ada_Package_Decl | Ada_Generic_Package_Decl
-            and then not Get (Metrix_Stack, 3).Is_Private_Lib_Unit
+            and then not Element (Metrix_Stack, 3).Is_Private_Lib_Unit
             and then Private_Part_Count = 0);
       --  True if we're within only visible parts. Note that it is possible to
       --  be in a visible part that is within a private part; we return False
@@ -1537,7 +1572,7 @@ package body METRICS.Actions is
       procedure Gather_Metrics_And_Walk_Children (Node : Ada_Node);
 
       procedure Cyclomate (Node : Ada_Node; M : in out Metrix) is
-         File_M : Metrix renames Get (Metrix_Stack, 2).all;
+         File_M : Metrix renames Element (Metrix_Stack, 2).all;
          --  We don't walk up the stack as for other metrics. We increment
          --  the current Metrix (M) and the one for the file as a whole
          --  (File_M). Thus, the one for the file ends up being the total,
@@ -1786,7 +1821,7 @@ package body METRICS.Actions is
             end case;
          end Should_Gather_Body_Lines;
 
-         Global_M : Metrix renames Get (Metrix_Stack, 1).all;
+         Global_M : Metrix renames Element (Metrix_Stack, 1).all;
       begin
          if Node = M.Node then
             declare
@@ -1949,8 +1984,8 @@ package body METRICS.Actions is
 
          ON : Boolean;
          Range_Count : Metric_Nat;
-         File_M : Metrix renames Get (Metrix_Stack, 2).all;
-         Global_M : Metrix renames Get (Metrix_Stack, 1).all;
+         File_M : Metrix renames Element (Metrix_Stack, 2).all;
+         Global_M : Metrix renames Element (Metrix_Stack, 1).all;
          Section : Ada_Node;
 
          Spark_Mode : constant W_Str := "spark_mode";
@@ -2190,7 +2225,7 @@ package body METRICS.Actions is
       end Gather_Syntax_Metrics;
 
       procedure Gather_Dependencies (Node : Ada_Node) is
-         File_M : Metrix renames Get (Metrix_Stack, 2).all;
+         File_M : Metrix renames Element (Metrix_Stack, 2).all;
       begin
          case Kind (Node) is
             --  For "with P, Q;" include P and Q
@@ -2277,9 +2312,9 @@ package body METRICS.Actions is
 
          if Node = Outer_Unit or else Kind (Node) in Eligible then
             declare
-               File_M : Metrix renames Get (Metrix_Stack, 2).all;
+               File_M : Metrix renames Element (Metrix_Stack, 2).all;
                Parent : Metrix renames
-                 Get (Metrix_Stack, Last_Index (Metrix_Stack)).all;
+                 Element (Metrix_Stack, Last_Index (Metrix_Stack)).all;
                M : constant Metrix_Ref := Push_New_Metrix (Tool, Node);
                Saved_Loop_Count : constant Natural := Loop_Count;
             begin
@@ -2330,7 +2365,7 @@ package body METRICS.Actions is
 
       procedure Gather_Metrics_And_Walk_Children (Node : Ada_Node) is
          M : Metrix renames
-           Get (Metrix_Stack, Last_Index (Metrix_Stack)).all;
+           Element (Metrix_Stack, Last_Index (Metrix_Stack)).all;
 
          With_Trivia : constant Children_Arrays.Array_Type :=
            Children_With_Trivia (Node);
@@ -2398,7 +2433,7 @@ package body METRICS.Actions is
       end Gather_Metrics_And_Walk_Children;
 
       pragma Assert (Length (Metrix_Stack) = 1);
-      Parent : Metrix renames Get (Metrix_Stack, 1).all;
+      Parent : Metrix renames Element (Metrix_Stack, 1).all;
       M : constant Metrix_Ref :=
         Push_New_Metrix
           (Tool, CU_Node, Source_File_Name => new String'(File_Name));
@@ -2591,6 +2626,9 @@ package body METRICS.Actions is
    --  corresponding spec. If it's a subunit, return the spec of the innermost
    --  enclosing library unit. If the spec is not present, return M.
 
+   procedure Print_Coupling
+     (Cmd : Command_Line;
+      Metrics_To_Compute : Metrics_Set);
    procedure XML_Print_Coupling
      (Cmd : Command_Line;
       Metrics_To_Compute : Metrics_Set);
@@ -2662,6 +2700,8 @@ package body METRICS.Actions is
       end Visit;
 
       Ignored : CU_Symbol_Sets.Set;
+
+   --  Start of processing for Compute_Indirect_Dependencies
 
    begin
       --  First remove nonexistent units from the Depends_On sets, because
@@ -2753,7 +2793,7 @@ package body METRICS.Actions is
          if S /= null then
             declare
                pragma Assert (S.Indirect_Dependences_Computed);
-               Outer_Unit : Metrix renames Get (S.Submetrix, 1).all;
+               Outer_Unit : Metrix renames Element (S.Submetrix, 1).all;
                --  Outer_Unit is the outermost package spec, procedure spec,
                --  etc.
             begin
@@ -2771,7 +2811,7 @@ package body METRICS.Actions is
                   declare
                      Dep : Metrix renames Specs (Get_Symbol_Index (Sym)).all;
                      Dep_Outer_Unit : Metrix renames
-                       Get (Dep.Submetrix, 1).all;
+                       Element (Dep.Submetrix, 1).all;
                   begin
                      Inc (Dep_Outer_Unit.Vals (Unit_Coupling_In));
                   end;
@@ -2780,7 +2820,7 @@ package body METRICS.Actions is
                   declare
                      Dep : Metrix renames Specs (Get_Symbol_Index (Sym)).all;
                      Dep_Outer_Unit : Metrix renames
-                       Get (Dep.Submetrix, 1).all;
+                       Element (Dep.Submetrix, 1).all;
                   begin
                      Inc (Dep_Outer_Unit.Vals (Unit_Coupling_In));
                   end;
@@ -2788,46 +2828,65 @@ package body METRICS.Actions is
             end;
          end if;
       end loop;
+
+      --  Sort the compilation units by name, so they will get printed in
+      --  alphabetical order, rather than some order caused by the graph walk.
+
+      declare
+         function Lt (X, Y : Metrix_Ref) return Boolean;
+         pragma Inline (Lt);
+
+         package Sorting is new Metrix_Vectors.Generic_Sorting (Lt);
+
+         function Lt (X, Y : Metrix_Ref) return Boolean is
+            U1 : constant String := Str (X.CU_Name).S;
+            U2 : constant String := Str (Y.CU_Name).S;
+         begin
+            return U1 < U2;
+         end Lt;
+      begin
+         Sorting.Sort (Units_For_Coupling);
+      end;
    end Compute_Coupling;
 
-   procedure XML_Print_Coupling
+   procedure Print_Coupling
      (Cmd : Command_Line;
       Metrics_To_Compute : Metrics_Set)
    is
-      subtype Arr_Index is Positive range 1 .. Last_Index (Units_For_Coupling);
-      subtype Arr is Metrix_Vectors.Elements_Array (Arr_Index);
-
-      function Lt (X, Y : Metrix_Ref) return Boolean;
-      pragma Inline (Lt);
-
-      procedure Sort is new Ada.Containers.Generic_Constrained_Array_Sort
-        (Arr_Index, Metrix_Ref, Arr, "<" => Lt);
-
-      function Lt (X, Y : Metrix_Ref) return Boolean is
-         U1 : constant String := Str (X.CU_Name).S;
-         U2 : constant String := Str (Y.CU_Name).S;
-      begin
-         return U1 < U2;
-      end Lt;
-
-      Sorted_Units : Arr := To_Array (Units_For_Coupling);
-
-   --  Start of processing for XML_Print_Coupling
-
    begin
       if Metrics_To_Compute = Empty_Metrics_Set then
          return;
       end if;
 
-      --  Sort the compilation units by name, so they will get printed in
-      --  alphabetical order, rather than some order caused by the graph walk.
+      Put ("\nCoupling metrics:\n");
+      Put ("=================\n");
+      Indent;
 
-      Sort (Sorted_Units);
+      for File_M of Units_For_Coupling loop
+         Print_Metrix
+           (Cmd,
+            File_M.Source_File_Name.all,
+            Metrics_To_Compute,
+            File_M.all,
+            Depth => 1);
+      end loop;
+
+      Outdent;
+   end Print_Coupling;
+
+   procedure XML_Print_Coupling
+     (Cmd : Command_Line;
+      Metrics_To_Compute : Metrics_Set)
+   is
+   begin
+      if Metrics_To_Compute = Empty_Metrics_Set then
+         return;
+      end if;
 
       Indent;
       Put ("<coupling>\n");
 
-      for File_M of Sorted_Units loop
+      for File_M of Units_For_Coupling loop
          XML_Print_Metrix
            (Cmd,
             File_M.Source_File_Name.all,
@@ -2850,7 +2909,7 @@ package body METRICS.Actions is
       Summed : constant String :=
         "summed over " & Image (Num_File_Names (Cmd)) & " units";
       pragma Assert (Length (Metrix_Stack) = 1);
-      M : Metrix_Ref := Get (Metrix_Stack, 1);
+      M : Metrix_Ref := Element (Metrix_Stack, 1);
 
       Global : Text_IO.File_Type;
       --  File for global information in text form, if --global-file-name
@@ -2903,7 +2962,7 @@ package body METRICS.Actions is
 
       M.Node := null;
       Pop (Metrix_Stack);
-      Destroy (Metrix_Stack);
+      Clear (Metrix_Stack);
 
       Dump (Tool, M.all, "Initial:");
       Compute_Indirect_Dependencies (M.all);
@@ -2984,6 +3043,8 @@ package body METRICS.Actions is
       end if;
 
       --  Print the totals in XML form
+
+      Print_Coupling (Cmd, With_Coupling);
 
       if Gen_XML (Cmd) then
          if not Output_To_Standard_Output then

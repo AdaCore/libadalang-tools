@@ -135,6 +135,7 @@ package ASIS_UL.Fast_Vectors is
    function Append (Container : in out Vector) return Element_Access;
 
    procedure Delete_Last (Container : in out Vector);
+   procedure Pop (Container : in out Vector) renames Delete_Last;
 
    function First (Container : Vector) return Cursor;
 
