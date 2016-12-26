@@ -45,6 +45,12 @@ private
    use CU_Symbol_Sets;
 
    type Metrics_Values is array (Metrics_Enum) of Metric_Nat;
+   Initial_Metrics_Values : constant Metrics_Values :=
+     (Complexity_Statement |
+        Complexity_Cyclomatic |
+        Complexity_Essential |
+        Contract_Complexity => 1,
+      others => 0);
 
    type Metrix;
    type Metrix_Ref is access all Metrix;
@@ -118,12 +124,12 @@ private
 
    type Metrix (Kind : Ada_Node_Kind_Type) is record
       Node : Ada_Node := null;
-      --  Node to which the metrics are associated, except for Metrix_Stack[0],
+      --  Node to which the metrics are associated, except for Metrix_Stack[1],
       --  which has Node = null. Node is used only while gathering metrics; it
       --  is not used while printing metrics.
 
       --  The Kind discriminant is equal to Node.Kind, or Null_Kind for
-      --  Metrix_Stack[0].
+      --  Metrix_Stack[1].
 
       Knd : Fine_Kind;
       --  Finer-grained version of Kind
@@ -141,12 +147,7 @@ private
       --  are also displayed only for public subprograms, but they use a
       --  different mechanism.)
 
-      Vals : Metrics_Values :=
-        (Complexity_Statement |
-         Complexity_Cyclomatic |
-         Complexity_Essential |
-         Contract_Complexity => 1,
-         others => 0);
+      Vals : Metrics_Values := Initial_Metrics_Values;
 
       Has_Complexity_Metrics : Boolean := False;
       --  True if complexity metrix should be computed for Node (assuming it's
@@ -160,7 +161,7 @@ private
       --  For the outermost unit, this is a string indicating whether the unit
       --  is a subunit or a library unit. For other units, this is the empty
       --  string.
-      --  Above symbols are undefined for Metrix_Stack[0].
+      --  Above symbols are undefined for Metrix_Stack[1].
 
       Submetrix : Metrix_Vectors.Vector;
       --  Metrix records for units nested within this one

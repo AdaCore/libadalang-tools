@@ -31,6 +31,61 @@ package body METRICS.Actions is
 
    Output_To_Standard_Output : Boolean renames Debug_Flag_S;
 
+   Implemented : constant Metrics_Set :=
+   --  Set of metrics that are implemented in lalmetric so far
+     (Contract            => True,
+      Post                => True,
+      Contract_Complete   => False, ----------------
+      Contract_Complexity => True,
+
+      Lines                => True,
+      Lines_Code           => True,
+      Lines_Comment        => True,
+      Lines_Eol_Comment    => True,
+      Lines_Ratio          => True,
+      Lines_Blank          => True,
+      Lines_Average        => True,
+      Lines_Spark          => False, ----------------
+      Lines_Code_In_Bodies => True,
+      Num_Bodies           => True,
+
+      Public_Subprograms => True, -- partial
+      --  We need semantic information to distinguish specless bodies from
+      --  specful bodies.
+
+      All_Subprograms    => True,
+      Statements         => True,
+      Declarations       => False, ----------------
+      Public_Types       => False, ----------------
+      All_Types          => False, ----------------
+      Unit_Nesting       => False, ----------------
+      Construct_Nesting  => False, ----------------
+      Param_Number       => False, ----------------
+
+      Computed_Line_Metrics       => False, ----------------
+      Computed_Element_Metrics    => False, ----------------
+      Computed_Public_Subprograms => False, ----------------
+      Computed_All_Subprograms    => True,
+      Computed_Public_Types       => False, ----------------
+      Computed_All_Types          => False, ----------------
+
+      Complexity_Statement  => True,
+      Complexity_Expression => True,
+      Complexity_Cyclomatic => True,
+      Complexity_Essential  => False, ----------------
+      Complexity_Average    => False, ----------------
+      Loop_Nesting          => True,
+      Extra_Exit_Points     => False, ----------------
+
+      Tagged_Coupling_Out    => False, ----------------
+      Hierarchy_Coupling_Out => False, ----------------
+      Tagged_Coupling_In     => False, ----------------
+      Hierarchy_Coupling_In  => False, ----------------
+      Control_Coupling_Out   => False, ----------------
+      Control_Coupling_In    => False, ----------------
+      Unit_Coupling_Out      => True,
+      Unit_Coupling_In       => True);
+
    function Image (X : Integer) return String
      renames ASIS_UL.String_Utilities.Image;
 
@@ -856,13 +911,27 @@ package body METRICS.Actions is
 
          when Coupling_Metrics =>
             return Depth = 2;
+         when Computed_Metrics =>
+            raise Program_Error;
       end case;
    end Should_Print;
+
+   Metric_Found : Metrics_Set := (others => False);
+   --  Metric_Found(M) is True if we computed some non-default value for M.
 
    function Val_To_Print
      (Metric : Metrics_Enum; M : Metrix; XML : Boolean) return String is
       type Fixed is delta 0.01 digits 8;
    begin
+      if M.Vals (Metric) /= Initial_Metrics_Values (Metric) then
+         Metric_Found (Metric) := True;
+      end if;
+
+      if not Implemented (Metric) then
+         pragma Assert (M.Vals (Metric) = Initial_Metrics_Values (Metric));
+         return "nyi";
+      end if;
+
       if (Metric in Complexity_Metrics
             and then M.Kind = Ada_Compilation_Unit)
       or else (Metric = Lines_Average and then M.Kind = Null_Kind)
@@ -1239,6 +1308,8 @@ package body METRICS.Actions is
             return "unit_fan-out_coupling";
          when Unit_Coupling_In =>
             return "unit_fan-in_coupling";
+         when Computed_Metrics =>
+            raise Program_Error;
       end case;
    end XML_Metric_Name_String;
 
@@ -1822,6 +1893,9 @@ package body METRICS.Actions is
          end Should_Gather_Body_Lines;
 
          Global_M : Metrix renames Element (Metrix_Stack, 1).all;
+
+      --  Start of processing for Gather_Line_Metrics
+
       begin
          if Node = M.Node then
             declare
@@ -2433,7 +2507,7 @@ package body METRICS.Actions is
       end Gather_Metrics_And_Walk_Children;
 
       pragma Assert (Length (Metrix_Stack) = 1);
-      Parent : Metrix renames Element (Metrix_Stack, 1).all;
+      Global_M : Metrix renames Element (Metrix_Stack, 1).all;
       M : constant Metrix_Ref :=
         Push_New_Metrix
           (Tool, CU_Node, Source_File_Name => new String'(File_Name));
@@ -2447,9 +2521,15 @@ package body METRICS.Actions is
       end if;
 
       Append (Node_Stack, CU_Node); -- push
-      Append (Parent.Submetrix, M);
+      Append (Global_M.Submetrix, M);
 
       Gather_Metrics_And_Walk_Children (CU_Node);
+
+      --  Gather "Computed_" metrics.
+
+      if M.Vals (All_Subprograms) /= 0 then
+         Inc (Global_M.Vals (Computed_All_Subprograms));
+      end if;
 
       M.Node := null;
       Pop (Metrix_Stack);
@@ -2581,13 +2661,15 @@ package body METRICS.Actions is
             end if;
 
             --  If no metrics were requested on the command line, we compute
-            --  all metrics except coupling metrics. Also, at least for now,
-            --  disable contract metrics, because those don't exist in
-            --  gnatmetric and we're trying to be compatible.
+            --  all metrics except coupling and "computed" metrics. Also, at
+            --  least for now, disable contract metrics, because those don't
+            --  exist in gnatmetric and we're trying to be compatible.
 
             if Result = (Metrics_Enum => False) then
-               Result := (Coupling_Metrics | Contract_Metrics => False,
-                          others => True);
+               Result :=
+                 (Coupling_Metrics | Computed_Metrics | Contract_Metrics =>
+                    False,
+                  others => True);
             end if;
          end return;
       end To_Compute;
@@ -3034,6 +3116,12 @@ package body METRICS.Actions is
             Syntax_Metrics'First, Syntax_Metrics'Last, M.all,
             Depth => 0);
 
+         if Arg (Cmd, All_Subprograms) then
+            Put ("\n \1 subprogram bodies in \2 units\n",
+                 Val_To_Print (All_Subprograms, M.all, XML => False),
+                 Val_To_Print (Computed_All_Subprograms, M.all, XML => False));
+         end if;
+
          if Arg (Cmd, Global_File_Name) /= null then
             if not Output_To_Standard_Output then
                Text_IO.Set_Output (Text_IO.Standard_Output);
@@ -3059,6 +3147,12 @@ package body METRICS.Actions is
             Text_IO.Close (XML_File);
          end if;
       end if;
+
+      for Metric in Metrics_Enum loop
+         if Metric_Found (Metric) and then not Implemented (Metric) then
+            Put ("Metric is implemented: \1\n", Capitalize (Metric'Img));
+         end if;
+      end loop;
 
       Destroy (M);
    end Final;

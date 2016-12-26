@@ -2,8 +2,11 @@ with LAL_UL.Command_Lines; use LAL_UL.Command_Lines;
 with LAL_UL.Common;        use LAL_UL.Common;
 package METRICS.Command_Lines is
 
-   use Common_Flag_Switches, Common_String_Switches,
-     Common_String_Seq_Switches, Common_Nat_Switches;
+   use
+     Common_Flag_Switches,
+     Common_String_Switches,
+     Common_String_Seq_Switches,
+     Common_Nat_Switches;
 
    package Metrics_Disable is new Disable_Switches
      (Common_Descriptor,
@@ -16,8 +19,7 @@ package METRICS.Command_Lines is
 
    package Metrics_Common_String_Shorthands is new Common_String_Switches
      .Set_Shorthands
-     ((Output_Directory => +"-d",
-       others => null));
+     ((Output_Directory => +"-d", others => null));
    --  Note: gnatmetric allows -d to specify the directory. This must come
    --  before the Copy_Descriptor below. This shorthand is in addition to
    --  --output-dir, as defined in LAL_UL.Common.
@@ -90,7 +92,7 @@ package METRICS.Command_Lines is
        Nonl_Switch   => +"-nonl",
 
        No_Treat_Exit_As_Goto => +"-ne",
-       No_Local_Metrics => +"-nolocal",
+       No_Local_Metrics      => +"-nolocal",
 
        No_Static_Loop => null,
 
@@ -124,9 +126,9 @@ package METRICS.Command_Lines is
       Lines_Spark, -- not included in Lines_All
       Lines_Code_In_Bodies, -- undocumented, not included in Lines_All
       Num_Bodies, -- undocumented
-      --  Lines_Code_In_Bodies is the number of code lines in various
-      --  bodies, and Num_Bodies is the number of various bodies. These
-      --  are used to compute Lines_Average, as the ratio of these.
+   --  Lines_Code_In_Bodies is the number of code lines in various
+   --  bodies, and Num_Bodies is the number of various bodies. These
+   --  are used to compute Lines_Average, as the ratio of these.
 
    --  Syntax element metrics options:
       Public_Subprograms,
@@ -138,6 +140,25 @@ package METRICS.Command_Lines is
       Unit_Nesting,
       Construct_Nesting,
       Param_Number,
+
+      Computed_Line_Metrics,
+   --  The number of units for which line metrics are safely computed
+      Computed_Element_Metrics,
+   --  The number of units for which element metrics are safely computed
+      Computed_Public_Subprograms,
+   --  The number of units for which public subprograms are safely
+   --  computed
+      Computed_All_Subprograms,
+   --  The number of units for which all the subprograms are safely
+   --  computed
+      Computed_Public_Types,
+      Computed_All_Types,
+   --  Copied from ASIS/tools/gnatmetric/metrics-metric_definitions.ads.
+   --  I don't know what "safely computed" means, but (e.g.)
+   --  Computed_All_Subprograms appears to be the number of library units
+   --  with a nonzero value for All_Subprograms.
+   --  See ASIS/tools/gnatmetric/metrics-compute.adb.
+   --  These are undocumented.
 
    --  Complexity metrics options:
       Complexity_Statement, -- undocumented
@@ -166,23 +187,27 @@ package METRICS.Command_Lines is
    pragma Ordered (Metrics_Booleans);
    --  Otherwise, we get bogus warnings in Metrics.Actions.
 
-   subtype Metrics_Enum is Metrics_Booleans
-     range Metrics_Booleans'First .. Metrics_Booleans'Pred (Contract_All);
-   subtype Metrics_All_Enum is Metrics_Booleans
-     range Contract_All .. Metrics_Booleans'Last;
-   subtype Contract_Metrics is Metrics_Booleans
-     range Contract .. Contract_Complexity;
-   subtype Complexity_Metrics is Metrics_Booleans
-     range Complexity_Statement .. Extra_Exit_Points;
-   subtype Lines_Metrics is Metrics_Booleans
-     range Lines .. Lines_Average;
+   subtype Metrics_Enum is
+     Metrics_Booleans range
+       Metrics_Booleans'First ..
+         Metrics_Booleans'Pred (Contract_All);
+   subtype Metrics_All_Enum is
+     Metrics_Booleans range Contract_All .. Metrics_Booleans'Last;
+   subtype Contract_Metrics is
+     Metrics_Booleans range Contract .. Contract_Complexity;
+   subtype Complexity_Metrics is
+     Metrics_Booleans range Complexity_Statement .. Extra_Exit_Points;
+   subtype Lines_Metrics is Metrics_Booleans range Lines .. Lines_Average;
    --  not Lines_Spark, Lines_Code_In_Bodies, Num_Bodies
-   subtype Syntax_Metrics is Metrics_Booleans
-     range Public_Subprograms .. Param_Number;
-   subtype Coupling_Metrics is Metrics_Booleans
-     range Tagged_Coupling_Out .. Unit_Coupling_In;
+   subtype Syntax_Metrics is
+     Metrics_Booleans range Public_Subprograms .. Param_Number;
+   subtype Computed_Metrics is
+     Metrics_Booleans range Computed_Line_Metrics .. Computed_All_Types;
+   subtype Coupling_Metrics is
+     Metrics_Booleans range Tagged_Coupling_Out .. Unit_Coupling_In;
 
-   type Metrics_Set is array (Metrics_Enum) of Boolean with Pack;
+   type Metrics_Set is array (Metrics_Enum) of Boolean with
+        Pack;
    function Empty_Metrics_Set return Metrics_Set is (Metrics_Enum => False);
 
    Complexity_Only : constant Metrics_Set :=
@@ -200,8 +225,8 @@ package METRICS.Command_Lines is
    --  Old coupling metric control options, kept for upward
    --  compatibility reasons (as non_documented feature):
 
-   package Metrics_Boolean_Shorthands is new
-     Metrics_Boolean_Switches.Set_Shorthands
+   package Metrics_Boolean_Shorthands is new Metrics_Boolean_Switches
+     .Set_Shorthands
    --  Old metric control options, are kept for upward compatibility
    --  reasons (as non-documented feature)
 --       ((Lines              => +"-la",
@@ -223,23 +248,20 @@ package METRICS.Command_Lines is
 --  same semantics as the long forms. For example, -lratio seems to turn on
 --  --complexity-average, whereas --lines-ratio does not.
 
-       ((Tagged_Coupling_Out    => +"--package-efferent-coupling",
-         Tagged_Coupling_In     => +"--package-afferent-coupling",
-         Hierarchy_Coupling_Out => +"--category-efferent-coupling",
-         Hierarchy_Coupling_In  => +"--category-afferent-coupling",
-         others                 => null));
+     ((Tagged_Coupling_Out    => +"--package-efferent-coupling",
+       Tagged_Coupling_In     => +"--package-afferent-coupling",
+       Hierarchy_Coupling_Out => +"--category-efferent-coupling",
+       Hierarchy_Coupling_In  => +"--category-afferent-coupling",
+       others                 => null));
 
-   type Metrics_Strings is
-     (Output_Suffix, Global_File_Name, Xml_File_Name);
+   type Metrics_Strings is (Output_Suffix, Global_File_Name, Xml_File_Name);
 
    package Metrics_String_Switches is new String_Switches
      (Descriptor,
       Metrics_Strings);
 
    package Metrics_String_Syntax is new Metrics_String_Switches.Set_Syntax
-     ((Output_Suffix    => '=',
-       Global_File_Name => '=',
-       Xml_File_Name    => '='));
+     ((Output_Suffix => '=', Global_File_Name => '=', Xml_File_Name => '='));
 
    package Metrics_String_Shorthands is new Metrics_String_Switches
      .Set_Shorthands
@@ -263,8 +285,11 @@ package METRICS.Command_Lines is
 
    package Freeze is new Freeze_Descriptor (Descriptor);
 
-   use Metrics_Flag_Switches, Metrics_Boolean_Switches,
-     Metrics_String_Switches, Metrics_String_Seq_Switches;
+   use
+     Metrics_Flag_Switches,
+     Metrics_Boolean_Switches,
+     Metrics_String_Switches,
+     Metrics_String_Seq_Switches;
 
    ----------------
 
