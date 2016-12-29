@@ -3,7 +3,7 @@ with Libadalang.Analysis; use Libadalang.Analysis;
 with METRICS.Command_Lines; use METRICS.Command_Lines;
 package METRICS.Line_Counting is
 
-   subtype Metric_Nat is Natural;
+   subtype Metric_Nat is Natural range 0 .. 1_000_000_000;
 
    procedure Inc (X : in out Metric_Nat; By : Metric_Nat := 1);
    procedure Dec (X : in out Metric_Nat; By : Metric_Nat := 1);

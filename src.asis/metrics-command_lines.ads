@@ -135,6 +135,7 @@ package METRICS.Command_Lines is
       All_Subprograms,
       Statements,
       Declarations,
+      Logical_Source_Lines, -- undocumented, enabled by Statements+Declarations
       Public_Types,
       All_Types,
       Unit_Nesting,
@@ -194,17 +195,17 @@ package METRICS.Command_Lines is
    subtype Metrics_All_Enum is
      Metrics_Booleans range Contract_All .. Metrics_Booleans'Last;
    subtype Contract_Metrics is
-     Metrics_Booleans range Contract .. Contract_Complexity;
+     Metrics_Enum range Contract .. Contract_Complexity;
    subtype Complexity_Metrics is
-     Metrics_Booleans range Complexity_Statement .. Extra_Exit_Points;
-   subtype Lines_Metrics is Metrics_Booleans range Lines .. Lines_Average;
+     Metrics_Enum range Complexity_Statement .. Extra_Exit_Points;
+   subtype Lines_Metrics is Metrics_Enum range Lines .. Lines_Average;
    --  not Lines_Spark, Lines_Code_In_Bodies, Num_Bodies
    subtype Syntax_Metrics is
-     Metrics_Booleans range Public_Subprograms .. Param_Number;
+     Metrics_Enum range Public_Subprograms .. Param_Number;
    subtype Computed_Metrics is
-     Metrics_Booleans range Computed_Line_Metrics .. Computed_All_Types;
+     Metrics_Enum range Computed_Line_Metrics .. Computed_All_Types;
    subtype Coupling_Metrics is
-     Metrics_Booleans range Tagged_Coupling_Out .. Unit_Coupling_In;
+     Metrics_Enum range Tagged_Coupling_Out .. Unit_Coupling_In;
 
    type Metrics_Set is array (Metrics_Enum) of Boolean with
         Pack;

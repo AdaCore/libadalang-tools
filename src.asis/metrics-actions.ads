@@ -163,6 +163,11 @@ private
       --  string.
       --  Above symbols are undefined for Metrix_Stack[1].
 
+      Comp_Unit : Metrix_Ref := null;
+      --  The compilation unit in which this Metrix is nested.
+      --  Null for Metrix_Stack[1]. For Metrix_Stack[1], points
+      --  to itself.
+
       Submetrix : Metrix_Vectors.Vector;
       --  Metrix records for units nested within this one
 
@@ -191,7 +196,7 @@ private
             --     units that do not exist in the set of units being
             --     processed. It then walks the dependence graph, and computes
             --     indirect dependences. Indirect_Dependences_Computed is set
-            --     to true as each node in the graph is processed.
+            --     to True as each node in the graph is processed.
             --
             --     Finally Compute_Coupling, merges the Depends_On from bodies
             --     into the corresponding library unit spec, because that's
@@ -211,6 +216,11 @@ private
             --  "limited with" clauses are treated separately
             --  (Limited_Depends_On), because those are counted as just 1
             --  dependence (not followed to find indirect dependencies).
+
+            Has_Tagged_Type, Has_Subprogram : Boolean := False;
+            --  True if this is a unit containing a tagged type or a
+            --  subprogram. Used to compute coupling metrics. Ignored for
+            --  bodies.
 
             Source_File_Name : String_Ref := null;
 

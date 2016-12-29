@@ -35,8 +35,9 @@ package body METRICS.Actions is
    --  Set of metrics that are implemented in lalmetric so far
      (Contract            => True,
       Post                => True,
-      Contract_Complete   => False, ----------------
+      Contract_Complete   => False, ---------------- (needs semantic info)
       Contract_Complexity => True,
+      --  The above 4 are new (not implemented in the old gnatmetric).
 
       Lines                => True,
       Lines_Code           => True,
@@ -45,26 +46,28 @@ package body METRICS.Actions is
       Lines_Ratio          => True,
       Lines_Blank          => True,
       Lines_Average        => True,
-      Lines_Spark          => False, ----------------
+      Lines_Spark          => True, -- partial (needs semantic info)
+      --  We don't inherit properly from spec to body, and we don't take
+      --  configuration files into account.
       Lines_Code_In_Bodies => True,
       Num_Bodies           => True,
 
-      Public_Subprograms => True, -- partial
+      Public_Subprograms => True, -- partial (needs semantic info)
       --  We need semantic information to distinguish specless bodies from
       --  specful bodies.
-
-      All_Subprograms    => True,
-      Statements         => True,
-      Declarations       => False, ----------------
-      Public_Types       => False, ----------------
-      All_Types          => False, ----------------
-      Unit_Nesting       => False, ----------------
-      Construct_Nesting  => False, ----------------
-      Param_Number       => False, ----------------
+      All_Subprograms      => True,
+      Statements           => True,
+      Declarations         => True,
+      Logical_Source_Lines => True,
+      Public_Types         => False, ----------------
+      All_Types            => False, ----------------
+      Unit_Nesting         => False, ----------------
+      Construct_Nesting    => False, ----------------
+      Param_Number         => False, ----------------
 
       Computed_Line_Metrics       => False, ----------------
       Computed_Element_Metrics    => False, ----------------
-      Computed_Public_Subprograms => False, ----------------
+      Computed_Public_Subprograms => True,
       Computed_All_Subprograms    => True,
       Computed_Public_Types       => False, ----------------
       Computed_All_Types          => False, ----------------
@@ -77,12 +80,14 @@ package body METRICS.Actions is
       Loop_Nesting          => True,
       Extra_Exit_Points     => False, ----------------
 
-      Tagged_Coupling_Out    => False, ----------------
+      Tagged_Coupling_Out    => True,
       Hierarchy_Coupling_Out => False, ----------------
-      Tagged_Coupling_In     => False, ----------------
+      Tagged_Coupling_In     => True,
       Hierarchy_Coupling_In  => False, ----------------
-      Control_Coupling_Out   => False, ----------------
-      Control_Coupling_In    => False, ----------------
+      Control_Coupling_Out   => True, -- partial (needs semantic info)
+      Control_Coupling_In    => True, -- partial (needs semantic info)
+      --  For control coupling, we need to know whether a package instantiation
+      --  contains any subprograms, so we need to find the generic package.
       Unit_Coupling_Out      => True,
       Unit_Coupling_In       => True);
 
@@ -524,6 +529,8 @@ package body METRICS.Actions is
          Result.Has_Complexity_Metrics := Has_Complexity_Metrics (Node);
 
          if Node /= null then
+            Result.Comp_Unit := Element (Tool.Metrix_Stack, 2);
+
             declare
                function Get_Name (N : Ada_Node) return String is
                  (To_UTF8 (Full_Name (Get_Def_Name (N))));
@@ -818,6 +825,10 @@ package body METRICS.Actions is
       case Metric is
          when Statements =>
             return "all statements";
+         when Declarations =>
+            return "all declarations";
+         when Logical_Source_Lines =>
+            return "logical SLOC";
          when Loop_Nesting =>
             return "maximum loop nesting";
          when All_Subprograms =>
@@ -840,6 +851,7 @@ package body METRICS.Actions is
       Depth : Natural;
       XML : Boolean) return Boolean
    is
+      pragma Assert ((M.Kind = Ada_Compilation_Unit) = (Depth = 1));
    begin
       --  Don't print metrics that weren't requested on the command line (or by
       --  default).
@@ -874,7 +886,7 @@ package body METRICS.Actions is
          when Lines_Average =>
             return Depth = 0;
 
-         when All_Subprograms =>
+         when All_Subprograms | All_Types =>
             return (Depth = 2
               and then M.Kind in
                       Ada_Package_Body |
@@ -882,7 +894,12 @@ package body METRICS.Actions is
                       Ada_Task_Body |
                       Ada_Protected_Body)
               or else (XML and then Depth = 0);
-         when Public_Subprograms =>
+         when Public_Subprograms | Public_Types =>
+            if Depth = 2 and then M.Is_Private_Lib_Unit then
+               pragma Assert (M.Vals (Public_Subprograms) = 0);
+               return False;
+            end if;
+
             return (Depth = 2
               and then M.Kind in
                       Ada_Package_Decl |
@@ -894,8 +911,7 @@ package body METRICS.Actions is
               or else (XML and then Depth = 0);
          when Declarations |
            Statements |
-           Public_Types |
-           All_Types |
+           Logical_Source_Lines |
            Unit_Nesting |
            Construct_Nesting |
            Param_Number =>
@@ -910,7 +926,19 @@ package body METRICS.Actions is
             return M.Has_Complexity_Metrics;
 
          when Coupling_Metrics =>
-            return Depth = 2;
+            pragma Assert (Depth <= 2);
+            if Depth /= 2 then
+               return False;
+            end if;
+            case Coupling_Metrics'(Metric) is
+               when Tagged_Coupling_Out | Tagged_Coupling_In |
+                 Hierarchy_Coupling_Out | Hierarchy_Coupling_In =>
+                  return M.Comp_Unit.Has_Tagged_Type;
+               when Control_Coupling_Out | Control_Coupling_In =>
+                  return M.Comp_Unit.Has_Subprogram;
+               when Unit_Coupling_Out | Unit_Coupling_In =>
+                  return True;
+            end case;
          when Computed_Metrics =>
             raise Program_Error;
       end case;
@@ -930,6 +958,10 @@ package body METRICS.Actions is
       if not Implemented (Metric) then
          pragma Assert (M.Vals (Metric) = Initial_Metrics_Values (Metric));
          return "nyi";
+      end if;
+
+      if M.Vals (Metric) = Metric_Nat'Last then
+         return "unknown";
       end if;
 
       if (Metric in Complexity_Metrics
@@ -1026,61 +1058,63 @@ package body METRICS.Actions is
       Depth : Natural)
    is
    begin
-      if Should_Print_Any
+      if not Should_Print_Any
         (First, Last, Metrics_To_Compute, M, Depth, XML => False)
       then
-         if Depth /= 0 then
-            Put ("\n");
-         end if;
+         return;
+      end if;
 
-         Put ("\1\n", Name);
+      if Depth /= 0 then
+         Put ("\n");
+      end if;
 
-         for I in First .. Last loop
-            if Should_Print
-              (I, Metrics_To_Compute, M, Depth, XML => False)
-            then
-               if True or else M.Vals (I) /= 0 then -- ???
-                  declare
-                     Metric_Name : constant String :=
-                       (if Name = Average_Complexity_Metrics
-                          then XML_Metric_Name_String (I)
-                          else Metric_Name_String (I));
-                     Indentation_Amount : constant Natural :=
-                       (if I = Lines_Average
-                          then 0
-                        elsif Depth = 0
-                          then 2
-                        elsif Depth = 1 and then First in Lines_Metrics
-                          then 2
-                        elsif Name = Average_Complexity_Metrics
-                          then 2 * Default_Indentation_Amount
-                        else Default_Indentation_Amount);
-                     --  Indentation_Amount, and Tab below, are
-                     --  intended to mimic some partially arbitrary
-                     --  behavior of gnatmetric.
-                     Tab : constant Positive :=
-                       (if Depth = 0 and then I in Lines_Metrics
-                          then 22
-                        elsif Depth = 0 or else I in Lines_Metrics
-                          then 21
-                        else 26);
-                  begin
-                     Indent (Indentation_Amount);
-                     if I = Lines_Average then -- gnatmetric puts extra line
-                        Put ("\n");
-                     end if;
-                     Put ("\1", Metric_Name);
-                     Tab_To_Column (Indentation + Tab);
-                     Put (": \1\n", Val_To_Print (I, M, XML => False));
-                     Outdent (Indentation_Amount);
-                  end;
-               end if;
+      Put ("\1\n", Name);
+
+      for I in First .. Last loop
+         if Should_Print
+           (I, Metrics_To_Compute, M, Depth, XML => False)
+         then
+            if True or else M.Vals (I) /= 0 then -- ???
+               declare
+                  Metric_Name : constant String :=
+                    (if Name = Average_Complexity_Metrics
+                       then XML_Metric_Name_String (I)
+                       else Metric_Name_String (I));
+                  Indentation_Amount : constant Natural :=
+                    (if I = Lines_Average
+                       then 0
+                     elsif Depth = 0
+                       then 2
+                     elsif Depth = 1 and then First in Lines_Metrics
+                       then 2
+                     elsif Name = Average_Complexity_Metrics
+                       then 2 * Default_Indentation_Amount
+                     else Default_Indentation_Amount);
+                  --  Indentation_Amount, and Tab below, are
+                  --  intended to mimic some partially arbitrary
+                  --  behavior of gnatmetric.
+                  Tab : constant Positive :=
+                    (if Depth = 0 and then I in Lines_Metrics
+                       then 22
+                     elsif Depth = 0 or else I in Lines_Metrics
+                       then 21
+                     else 26);
+               begin
+                  Indent (Indentation_Amount);
+                  if I = Lines_Average then -- gnatmetric puts extra line
+                     Put ("\n");
+                  end if;
+                  Put ("\1", Metric_Name);
+                  Tab_To_Column (Indentation + Tab);
+                  Put (": \1\n", Val_To_Print (I, M, XML => False));
+                  Outdent (Indentation_Amount);
+               end;
             end if;
-         end loop;
-
-         if Depth = 0 and then First in Lines_Metrics then
-            Put ("\n");
          end if;
+      end loop;
+
+      if Depth = 0 and then First in Lines_Metrics then
+         Put ("\n");
       end if;
    end Print_Range;
 
@@ -1151,18 +1185,23 @@ package body METRICS.Actions is
       end if;
 
       if Doing_Coupling_Metrics and then Depth = 2 then
-         Indent;
-         for I in Coupling_Metrics loop
-            if Should_Print
-              (I, Metrics_To_Compute, M, Depth, XML => False)
-            then
-               Put ("\1", Metric_Name_String (I));
-               Tab_To_Column (33);
-               Put (": \1\n", Val_To_Print (I, M, XML => False));
-            end if;
-         end loop;
-         Outdent;
-         Put ("\n");
+         if Should_Print_Any
+           (Coupling_Metrics'First, Coupling_Metrics'Last,
+            Metrics_To_Compute, M, Depth, XML => False)
+         then
+            Indent;
+            for I in Coupling_Metrics loop
+               if Should_Print
+                 (I, Metrics_To_Compute, M, Depth, XML => False)
+               then
+                  Put ("\1", Metric_Name_String (I));
+                  Tab_To_Column (33);
+                  Put (": \1\n", Val_To_Print (I, M, XML => False));
+               end if;
+            end loop;
+            Outdent;
+            Put ("\n");
+         end if;
       end if;
 
       --  Print metrix for this unit
@@ -1274,10 +1313,12 @@ package body METRICS.Actions is
             return "num_bodies";
          when Lines_Ratio =>
             return "comment_percentage";
-         when Declarations =>
-            return "all_dcls";
          when Statements =>
             return "all_stmts";
+         when Declarations =>
+            return "all_dcls";
+         when Logical_Source_Lines =>
+            return "lsloc";
          when Public_Subprograms =>
             return "public_subprograms";
          when All_Subprograms =>
@@ -1366,8 +1407,12 @@ package body METRICS.Actions is
       --  some with complexity metrics.
 
       Doing_Coupling_Metrics : constant Boolean :=
-        (Metrics_To_Compute and not Coupling_Only) = Empty_Metrics_Set;
+        (Metrics_To_Compute and Coupling_Only) /= Empty_Metrics_Set;
    begin
+      if Metrics_To_Compute = Empty_Metrics_Set then
+         return;
+      end if;
+
       --  Return immediately if we're doing coupling metrics, and this is not a
       --  compilation unit spec, or if M is for a Contract_Complexity_Eligible
       --  node, and we're not going to print. Also don't print metrics for
@@ -1529,7 +1574,6 @@ package body METRICS.Actions is
       --  but gnatmetric does not, and lalmetric does not yet.
 
       Metrix_Stack : Metrix_Vectors.Vector renames Tool.Metrix_Stack;
-      --  Why don't we use Fast_Vectors???
 
       procedure Inc_All (Metric : Metrics_Enum; By : Metric_Nat := 1);
       --  Increment all values on the stack for a given Metric
@@ -2241,6 +2285,36 @@ package body METRICS.Actions is
 
       procedure Gather_Syntax_Metrics (Node : Ada_Node; M : in out Metrix) is
       begin
+         --  --public-subprograms
+
+         if Last_Index (Metrix_Stack) = 3 or else In_Visible_Part then
+            if Node = M.Node and then not M.Is_Private_Lib_Unit then
+               if M.Kind in Ada_Subp_Decl |
+                 Ada_Abstract_Subp_Decl |
+                 Ada_Generic_Subp_Decl
+                 --  Not Ada_Subp_Renaming_Decl
+               then
+                  Inc_All (Public_Subprograms);
+               end if;
+
+               --  Ada_Subp_Body should be counted only if there is no
+               --  corresponding spec. Here we increment by an obviously-wrong
+               --  value, so it stands out. ???
+
+               if Last_Index (Metrix_Stack) = 3
+                 and then M.Kind = Ada_Subp_Body
+               then
+                  Inc_All (Public_Subprograms, By => Metric_Nat'Last);
+               end if;
+            end if;
+         end if;
+
+         --  --all-subprograms
+
+         if Kind (Node) = Ada_Subp_Body then
+            Inc_All (All_Subprograms);
+         end if;
+
          --  --statements
 
          --  Labels and terminate alternatives are classified as statements by
@@ -2255,46 +2329,44 @@ package body METRICS.Actions is
                Put ("Statement: \1\n", Short_Image (Node));
             end if;
             Inc_All (Statements);
+            Inc_All (Logical_Source_Lines);
          end if;
 
-         --  --all-subprograms
+         --  --declarations
 
-         if Kind (Node) = Ada_Subp_Body then
-            Inc_All (All_Subprograms);
+         pragma Assert
+           (if Kind (Node) = Ada_Base_Package_Decl then
+              Kind (Parent (Node)) = Ada_Generic_Package_Decl);
+
+         if Kind (Node) in
+             Ada_Basic_Decl | Ada_For_Loop_Spec | Ada_Entry_Index_Spec
+           and then Kind (Node) not in
+             Ada_Base_Package_Decl | Ada_Anonymous_Type_Decl
+         then
+            Inc_All (Declarations);
+            Inc_All (Logical_Source_Lines);
+         end if;
+         if Kind (Node) = Ada_Exception_Handler
+           and then F_Exc_Name (Exception_Handler (Node)) /= null
+         then
+            Inc_All (Declarations);
+            Inc_All (Logical_Source_Lines);
          end if;
 
-         --  --public-subprograms
+         --  --public-types
 
-         if Last_Index (Metrix_Stack) = 3 then
-            if Node = M.Node and then
-              M.Kind in Ada_Subp_Decl |
-                Ada_Generic_Subp_Decl |
-                Ada_Subp_Renaming_Decl |
-                Ada_Subp_Body
-            then
-               Inc_All (Public_Subprograms);
+         if Last_Index (Metrix_Stack) = 3 or else In_Visible_Part then
+            if not M.Is_Private_Lib_Unit then
+               if Kind (Node) = Ada_Type_Decl then
+                  Inc_All (Public_Types);
+               end if;
             end if;
+         end if;
 
-            if Kind (Node) in
-              Ada_Package_Decl | Ada_Generic_Package_Decl
-            then
-               declare
-                  Vis_Decls : constant Ada_Node_List :=
-                    F_Decls (Vis_Part (Node));
-               begin
-                  if Vis_Decls /= null then
-                     for I in 1 .. Child_Count (Vis_Decls) loop
-                        declare
-                           Decl : constant Ada_Node := Childx (Vis_Decls, I);
-                        begin
-                           if Decl.all in Basic_Subp_Decl_Type'Class then
-                              Inc_All (Public_Subprograms);
-                           end if;
-                        end;
-                     end loop;
-                  end if;
-               end;
-            end if;
+         --  --all-types
+
+         if Kind (Node) = Ada_Type_Decl then
+            Inc_All (All_Types);
          end if;
       end Gather_Syntax_Metrics;
 
@@ -2345,6 +2417,44 @@ package body METRICS.Actions is
                             (Name (F_Prefix (Dotted_Name (Def_Name))))));
                   end if;
                end;
+
+            when others => null;
+         end case;
+
+         --  Set Has_Tagged_Type or Has_Subprogram if appropriate:
+
+         case Kind (Node) is
+            when Ada_Interface_Type_Def =>
+               File_M.Has_Tagged_Type := True;
+            when Ada_Incomplete_Type_Def =>
+               if F_Has_Tagged (Incomplete_Type_Def (Node)) then
+                  File_M.Has_Tagged_Type := True;
+               end if;
+            when Ada_Private_Type_Def =>
+               if F_Has_Tagged (Private_Type_Def (Node)) then
+                  File_M.Has_Tagged_Type := True;
+               end if;
+            when Ada_Record_Type_Def =>
+               if F_Has_Tagged (Record_Type_Def (Node)) then
+                  File_M.Has_Tagged_Type := True;
+               end if;
+            when Ada_Derived_Type_Def =>
+               if F_Record_Extension (Derived_Type_Def (Node)) /= null
+                 or else F_Has_With_Private (Derived_Type_Def (Node))
+               then
+                  File_M.Has_Tagged_Type := True;
+               end if;
+
+            when Ada_Generic_Subp_Instantiation |
+              Ada_Subp_Renaming_Decl |
+              Ada_Subp_Decl |
+              Ada_Subp_Body =>
+               File_M.Has_Subprogram := True;
+            when Ada_Generic_Package_Instantiation =>
+               File_M.Has_Subprogram := True;
+               --  ???This isn't correct. We need to set Has_Subprogram if the
+               --  generic being instantiated has subprograms. For that, we
+               --  need semantic info.
 
             when others => null;
          end case;
@@ -2527,6 +2637,10 @@ package body METRICS.Actions is
 
       --  Gather "Computed_" metrics.
 
+      if M.Vals (Public_Subprograms) /= 0 then
+         Inc (Global_M.Vals (Computed_Public_Subprograms));
+      end if;
+
       if M.Vals (All_Subprograms) /= 0 then
          Inc (Global_M.Vals (Computed_All_Subprograms));
       end if;
@@ -2658,6 +2772,10 @@ package body METRICS.Actions is
             if Arg (Cmd, Complexity_Cyclomatic) then
                Result (Complexity_Statement) := True;
                Result (Complexity_Expression) := True;
+            end if;
+
+            if Arg (Cmd, Statements) and then Arg (Cmd, Declarations) then
+               Result (Logical_Source_Lines) := True;
             end if;
 
             --  If no metrics were requested on the command line, we compute
@@ -2841,7 +2959,41 @@ package body METRICS.Actions is
    end Get_Spec;
 
    procedure Compute_Coupling
-     (Tool : in out Metrics_Tool; Global_M : Metrix) is
+     (Tool : in out Metrics_Tool; Global_M : Metrix)
+   is
+
+      procedure Do_Edge (Metric : Coupling_Metrics; From, To : Metrix_Ref);
+      --  Process one edge in the dependency graph for the given Metric.
+      --  If the Metric is Coupling_Out, then From depends on To.
+      --  If the Metric is Coupling_In, then To depends on From.
+      --  Thus, the metric is always recorded in the Outer_Unit of From.
+
+      procedure Do_Edge (Metric : Coupling_Metrics; From, To : Metrix_Ref) is
+         Outer_Unit : Metrix renames Element (From.Submetrix, 1).all;
+         --  Outer_Unit is the outermost package spec, procedure spec, etc.
+      begin
+         case Metric is
+            when Tagged_Coupling_Out | Tagged_Coupling_In =>
+               if From.Has_Tagged_Type and To.Has_Tagged_Type then
+                  Inc (Outer_Unit.Vals (Metric));
+               end if;
+            when Hierarchy_Coupling_Out | Hierarchy_Coupling_In =>
+               if False and -- ???
+                 From.Has_Tagged_Type and To.Has_Tagged_Type
+               then
+                  Inc (Outer_Unit.Vals (Metric));
+               end if;
+            when Control_Coupling_Out | Control_Coupling_In =>
+               if From.Has_Tagged_Type and To.Has_Tagged_Type then
+                  Inc (Outer_Unit.Vals (Metric));
+               end if;
+            when Unit_Coupling_Out | Unit_Coupling_In =>
+               Inc (Outer_Unit.Vals (Metric));
+         end case;
+      end Do_Edge;
+
+   --  Start of processing for Compute_Coupling
+
    begin
       --  Union the Depends_On set for each body (including subunits) into that
       --  of the corresponding spec. We can't put it there in the first place
@@ -2873,41 +3025,36 @@ package body METRICS.Actions is
 
       for S of Specs loop
          if S /= null then
-            declare
-               pragma Assert (S.Indirect_Dependences_Computed);
-               Outer_Unit : Metrix renames Element (S.Submetrix, 1).all;
-               --  Outer_Unit is the outermost package spec, procedure spec,
-               --  etc.
-            begin
-               --  Unit_Coupling_Out counts the number of things this depends
-               --  on.
+            pragma Assert (S.Indirect_Dependences_Computed);
 
-               Inc (Outer_Unit.Vals (Unit_Coupling_Out),
-                    By => Integer (Length (S.Depends_On)) +
-                          Integer (Length (S.Limited_Depends_On)));
+            for Sym of Union (S.Depends_On, S.Limited_Depends_On) loop
+               declare
+                  Dep : constant Metrix_Ref := Specs (Get_Symbol_Index (Sym));
+               begin
+                  if Dep /= null then
+                     --  ???It shouldn't be null, because we removed
+                     --  nonexistent units. But Set_CU_Metrix doesn't work
+                     --  right for subprogram bodies yet.
 
-               --  Unit_Coupling_In counts the number of things that depend on
-               --  this.
+                     --  Compute *_Coupling_Out From this unit To what it
+                     --  depends on:
 
-               for Sym of S.Depends_On loop
-                  declare
-                     Dep : Metrix renames Specs (Get_Symbol_Index (Sym)).all;
-                     Dep_Outer_Unit : Metrix renames
-                       Element (Dep.Submetrix, 1).all;
-                  begin
-                     Inc (Dep_Outer_Unit.Vals (Unit_Coupling_In));
-                  end;
-               end loop;
-               for Sym of S.Limited_Depends_On loop
-                  declare
-                     Dep : Metrix renames Specs (Get_Symbol_Index (Sym)).all;
-                     Dep_Outer_Unit : Metrix renames
-                       Element (Dep.Submetrix, 1).all;
-                  begin
-                     Inc (Dep_Outer_Unit.Vals (Unit_Coupling_In));
-                  end;
-               end loop;
-            end;
+                     Do_Edge (Tagged_Coupling_Out, S, Dep);
+                     Do_Edge (Hierarchy_Coupling_Out, S, Dep);
+                     Do_Edge (Control_Coupling_Out, S, Dep);
+                     Do_Edge (Unit_Coupling_Out, S, Dep);
+
+                     --  Compute *_Coupling_In To this unit From what it
+                     --  depends on (noting that To and From are reversed from
+                     --  the above):
+
+                     Do_Edge (Tagged_Coupling_In, Dep, S);
+                     Do_Edge (Hierarchy_Coupling_In, Dep, S);
+                     Do_Edge (Control_Coupling_In, Dep, S);
+                     Do_Edge (Unit_Coupling_In, Dep, S);
+                  end if;
+               end;
+            end loop;
          end if;
       end loop;
 
@@ -2945,12 +3092,21 @@ package body METRICS.Actions is
       Indent;
 
       for File_M of Units_For_Coupling loop
-         Print_Metrix
-           (Cmd,
-            File_M.Source_File_Name.all,
-            Metrics_To_Compute,
-            File_M.all,
-            Depth => 1);
+         declare
+            Outer_Unit : Metrix renames Element (File_M.Submetrix, 1).all;
+         begin
+            if Should_Print_Any
+              (Coupling_Metrics'First, Coupling_Metrics'Last,
+               Metrics_To_Compute, Outer_Unit, Depth => 2, XML => False)
+            then
+               Print_Metrix
+                 (Cmd,
+                  File_M.Source_File_Name.all,
+                  Metrics_To_Compute,
+                  File_M.all,
+                  Depth => 1);
+            end if;
+         end;
       end loop;
 
       Outdent;
@@ -2969,12 +3125,21 @@ package body METRICS.Actions is
       Put ("<coupling>\n");
 
       for File_M of Units_For_Coupling loop
-         XML_Print_Metrix
-           (Cmd,
-            File_M.Source_File_Name.all,
-            Metrics_To_Compute,
-            File_M.all,
-            Depth => 1);
+         declare
+            Outer_Unit : Metrix renames Element (File_M.Submetrix, 1).all;
+         begin
+            if Should_Print_Any
+              (Coupling_Metrics'First, Coupling_Metrics'Last,
+               Metrics_To_Compute, Outer_Unit, Depth => 2, XML => True)
+            then
+               XML_Print_Metrix
+                 (Cmd,
+                  File_M.Source_File_Name.all,
+                  Metrics_To_Compute,
+                  File_M.all,
+                  Depth => 1);
+            end if;
+         end;
       end loop;
 
       Put ("</coupling>\n");
@@ -3031,6 +3196,18 @@ package body METRICS.Actions is
             return Norm & Xsd;
          end if;
       end Xsd_File_Name;
+
+      procedure Print_Computed_Metric
+        (T : Template; Metric : Metrics_Enum; C_Metric : Computed_Metrics);
+      procedure Print_Computed_Metric
+        (T : Template; Metric : Metrics_Enum; C_Metric : Computed_Metrics) is
+      begin
+         if Arg (Cmd, Metric) then
+            Put (T,
+                 Val_To_Print (Metric, M.all, XML => False),
+                 Val_To_Print (C_Metric, M.all, XML => False));
+         end if;
+      end Print_Computed_Metric;
 
    --  Start of processing for Final
 
@@ -3116,11 +3293,12 @@ package body METRICS.Actions is
             Syntax_Metrics'First, Syntax_Metrics'Last, M.all,
             Depth => 0);
 
-         if Arg (Cmd, All_Subprograms) then
-            Put ("\n \1 subprogram bodies in \2 units\n",
-                 Val_To_Print (All_Subprograms, M.all, XML => False),
-                 Val_To_Print (Computed_All_Subprograms, M.all, XML => False));
-         end if;
+         Print_Computed_Metric
+           ("\n \1 public subprograms in \2 units\n",
+            Public_Subprograms, Computed_Public_Subprograms);
+         Print_Computed_Metric
+           ("\n \1 subprogram bodies in \2 units\n",
+            All_Subprograms, Computed_All_Subprograms);
 
          if Arg (Cmd, Global_File_Name) /= null then
             if not Output_To_Standard_Output then
@@ -3132,7 +3310,9 @@ package body METRICS.Actions is
 
       --  Print the totals in XML form
 
-      Print_Coupling (Cmd, With_Coupling);
+      if Gen_Text (Cmd) then
+         Print_Coupling (Cmd, With_Coupling);
+      end if;
 
       if Gen_XML (Cmd) then
          if not Output_To_Standard_Output then
@@ -3312,6 +3492,9 @@ package body METRICS.Actions is
       pragma Assert (M.Vals (Lines_Comment) <= L);
       pragma Assert (M.Vals (Lines_Eol_Comment) <= L);
       pragma Assert (M.Vals (Lines_Blank) <= L);
+
+      pragma Assert (M.Vals (Logical_Source_Lines) =
+                       M.Vals (Statements) + M.Vals (Declarations));
    end Validate;
 
    procedure Dump_Metrix (M : Metrix) is

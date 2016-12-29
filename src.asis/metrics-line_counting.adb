@@ -11,7 +11,13 @@ package body METRICS.Line_Counting is
 
    procedure Inc (X : in out Metric_Nat; By : Metric_Nat := 1) is
    begin
-      X := X + By;
+      --  Use saturating arithmetic in case of really huge values.
+
+      if X > Metric_Nat'Last - By then -- X + By > Metric_Nat'Last
+         X := Metric_Nat'Last;
+      else
+         X := X + By;
+      end if;
    end Inc;
 
    procedure Dec (X : in out Metric_Nat; By : Metric_Nat := 1) is
