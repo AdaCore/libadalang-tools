@@ -347,14 +347,14 @@ package body METRICS.Actions is
    function Metric_Name_String (Metric : Metrics_Enum) return String;
    --  Name of the metric for printing in text
 
-   --  Below, Depth parameters are the nesting depth, starting with 0 for the
+   --  Below, Depth parameters are the nesting depth, starting with 1 for the
    --  global metrics.
 
    function Should_Print
      (Metric : Metrics_Enum;
       Metrics_To_Compute : Metrics_Set;
       M : Metrix;
-      Depth : Natural;
+      Depth : Positive;
       XML : Boolean) return Boolean;
    --  Return True if the given Metric should be printed, based on
    --  Metrics_To_Compute, the node associated with M and other
@@ -364,7 +364,7 @@ package body METRICS.Actions is
      (First, Last : Metrics_Enum;
       Metrics_To_Compute : Metrics_Set;
       M : Metrix;
-      Depth : Natural;
+      Depth : Positive;
       XML : Boolean) return Boolean is
       (for some Metric in First .. Last =>
          Should_Print (Metric, Metrics_To_Compute, M, Depth, XML));
@@ -384,7 +384,7 @@ package body METRICS.Actions is
       Metrics_To_Compute : Metrics_Set;
       First, Last : Metrics_Enum;
       M : Metrix;
-      Depth : Natural);
+      Depth : Positive);
    --  Prints a range of metrics. This is needed because the metrics are
    --  printed in groups (line metrics, contract metrics, etc).  Name is the
    --  name of the group, e.g. "=== Lines metrics ===". Prints the name
@@ -395,7 +395,7 @@ package body METRICS.Actions is
       File_Name : String;
       Metrics_To_Compute : Metrics_Set;
       M : Metrix;
-      Depth : Natural);
+      Depth : Positive);
    --  Print the metrics for one node in text form
 
    procedure XML_Print_Metrix_Vals
@@ -403,14 +403,14 @@ package body METRICS.Actions is
       First : Metrics_Enum;
       Last : Metrics_Enum;
       M : Metrix;
-      Depth : Natural);
+      Depth : Positive);
 
    procedure XML_Print_Metrix
      (Cmd : Command_Line;
       File_Name : String;
       Metrics_To_Compute : Metrics_Set;
       M : Metrix;
-      Depth : Natural);
+      Depth : Positive);
    --  Print the metrics for one node in XML form
 
    procedure Print_File_Metrics
@@ -848,10 +848,10 @@ package body METRICS.Actions is
      (Metric : Metrics_Enum;
       Metrics_To_Compute : Metrics_Set;
       M : Metrix;
-      Depth : Natural;
+      Depth : Positive;
       XML : Boolean) return Boolean
    is
-      pragma Assert ((M.Kind = Ada_Compilation_Unit) = (Depth = 1));
+      pragma Assert ((M.Kind = Ada_Compilation_Unit) = (Depth = 2));
    begin
       --  Don't print metrics that weren't requested on the command line (or by
       --  default).
@@ -864,7 +864,7 @@ package body METRICS.Actions is
       --  unless it's Contract_Complexity, which is the only metric
       --  that applies to those.
 
-      if Depth > 2
+      if Depth > 3
         and then M.Kind in Contract_Complexity_Eligible
         and then Metric /= Contract_Complexity
       then
@@ -880,27 +880,27 @@ package body METRICS.Actions is
            Lines_Ratio =>
             return True;
          when Lines_Spark =>
-            return Depth in 0 | 1;
+            return Depth in 1 | 2;
          when Lines_Code_In_Bodies | Num_Bodies =>
-            return Depth = 0;
+            return Depth = 1;
          when Lines_Average =>
-            return Depth = 0;
+            return Depth = 1;
 
          when All_Subprograms | All_Types =>
-            return (Depth = 2
+            return (Depth = 3
               and then M.Kind in
                       Ada_Package_Body |
                       Ada_Subp_Body |
                       Ada_Task_Body |
                       Ada_Protected_Body)
-              or else (XML and then Depth = 0);
+              or else (XML and then Depth = 1);
          when Public_Subprograms | Public_Types =>
-            if Depth = 2 and then M.Is_Private_Lib_Unit then
+            if Depth = 3 and then M.Is_Private_Lib_Unit then
                pragma Assert (M.Vals (Public_Subprograms) = 0);
                return False;
             end if;
 
-            return (Depth = 2
+            return (Depth = 3
               and then M.Kind in
                       Ada_Package_Decl |
                       Ada_Generic_Package_Decl |
@@ -908,7 +908,7 @@ package body METRICS.Actions is
                       Ada_Subp_Body |
                       --  Only if no spec???
                       Ada_Generic_Subp_Decl)
-              or else (XML and then Depth = 0);
+              or else (XML and then Depth = 1);
          when Declarations |
            Statements |
            Logical_Source_Lines |
@@ -926,8 +926,8 @@ package body METRICS.Actions is
             return M.Has_Complexity_Metrics;
 
          when Coupling_Metrics =>
-            pragma Assert (Depth <= 2);
-            if Depth /= 2 then
+            pragma Assert (Depth <= 3);
+            if Depth /= 3 then
                return False;
             end if;
             case Coupling_Metrics'(Metric) is
@@ -1055,7 +1055,7 @@ package body METRICS.Actions is
       Metrics_To_Compute : Metrics_Set;
       First, Last : Metrics_Enum;
       M : Metrix;
-      Depth : Natural)
+      Depth : Positive)
    is
    begin
       if not Should_Print_Any
@@ -1064,7 +1064,7 @@ package body METRICS.Actions is
          return;
       end if;
 
-      if Depth /= 0 then
+      if Depth /= 1 then
          Put ("\n");
       end if;
 
@@ -1083,9 +1083,9 @@ package body METRICS.Actions is
                   Indentation_Amount : constant Natural :=
                     (if I = Lines_Average
                        then 0
-                     elsif Depth = 0
+                     elsif Depth = 1
                        then 2
-                     elsif Depth = 1 and then First in Lines_Metrics
+                     elsif Depth = 2 and then First in Lines_Metrics
                        then 2
                      elsif Name = Average_Complexity_Metrics
                        then 2 * Default_Indentation_Amount
@@ -1094,9 +1094,9 @@ package body METRICS.Actions is
                   --  intended to mimic some partially arbitrary
                   --  behavior of gnatmetric.
                   Tab : constant Positive :=
-                    (if Depth = 0 and then I in Lines_Metrics
+                    (if Depth = 1 and then I in Lines_Metrics
                        then 22
-                     elsif Depth = 0 or else I in Lines_Metrics
+                     elsif Depth = 1 or else I in Lines_Metrics
                        then 21
                      else 26);
                begin
@@ -1113,7 +1113,7 @@ package body METRICS.Actions is
          end if;
       end loop;
 
-      if Depth = 0 and then First in Lines_Metrics then
+      if Depth = 1 and then First in Lines_Metrics then
          Put ("\n");
       end if;
    end Print_Range;
@@ -1123,7 +1123,7 @@ package body METRICS.Actions is
       File_Name : String;
       Metrics_To_Compute : Metrics_Set;
       M : Metrix;
-      Depth : Natural)
+      Depth : Positive)
    is
       pragma Assert (M.Node = null);
 
@@ -1137,7 +1137,7 @@ package body METRICS.Actions is
       --  node, and we're not going to print. Also don't print metrics for
       --  "eligible local program units" if the -nolocal switch was given.
 
-      if Depth > 2 then
+      if Depth > 3 then
          if Doing_Coupling_Metrics then
             return;
          end if;
@@ -1163,12 +1163,12 @@ package body METRICS.Actions is
          return;
       end if;
 
-      if Depth > 2 then
+      if Depth > 3 then
          Indent;
       end if;
 
       if Doing_Coupling_Metrics then
-         if Depth = 2 then
+         if Depth = 3 then
             Put ("Unit \1 (\2)\n", Str (M.Text_Name).S, File_Name);
          end if;
       elsif M.Kind = Ada_Compilation_Unit then
@@ -1184,7 +1184,7 @@ package body METRICS.Actions is
               Lines_String (M.Sloc));
       end if;
 
-      if Doing_Coupling_Metrics and then Depth = 2 then
+      if Doing_Coupling_Metrics and then Depth = 3 then
          if Should_Print_Any
            (Coupling_Metrics'First, Coupling_Metrics'Last,
             Metrics_To_Compute, M, Depth, XML => False)
@@ -1246,7 +1246,7 @@ package body METRICS.Actions is
             Complexity_Metrics'First, Complexity_Metrics'Last, M, Depth);
       end if;
 
-      if Depth > 2 then
+      if Depth > 3 then
          Outdent;
       end if;
    end Print_Metrix;
@@ -1359,7 +1359,7 @@ package body METRICS.Actions is
       First : Metrics_Enum;
       Last : Metrics_Enum;
       M : Metrix;
-      Depth : Natural)
+      Depth : Positive)
    is
    begin
       Indent;
@@ -1382,7 +1382,7 @@ package body METRICS.Actions is
       File_Name : String;
       Metrics_To_Compute : Metrics_Set;
       M : Metrix;
-      Depth : Natural)
+      Depth : Positive)
    is
       pragma Assert (M.Node = null);
 
@@ -1418,7 +1418,7 @@ package body METRICS.Actions is
       --  node, and we're not going to print. Also don't print metrics for
       --  "eligible local program units" if the -nolocal switch was given.
 
-      if Depth > 2 then
+      if Depth > 3 then
          if Doing_Coupling_Metrics then
             return;
          end if;
@@ -1461,7 +1461,7 @@ package body METRICS.Actions is
       --  Print metrics for this unit
 
       XML_Print_Metrix_Vals
-        (To_Print_First, M.Vals'First, M.Vals'Last, M, Depth => Depth);
+        (To_Print_First, M.Vals'First, M.Vals'Last, M, Depth);
 
       --  Then recursively print metrix of nested units
 
@@ -1484,7 +1484,7 @@ package body METRICS.Actions is
          end if;
 
          XML_Print_Metrix_Vals
-           (To_Print_Last, M.Vals'First, M.Vals'Last, M, Depth => Depth);
+           (To_Print_Last, M.Vals'First, M.Vals'Last, M, Depth);
          Put ("</file>\n");
       else
          Put ("</unit>\n");
@@ -1526,7 +1526,7 @@ package body METRICS.Actions is
          end if;
 
          Print_Metrix
-           (Cmd, File_Name, Metrics_To_Compute, File_M, Depth => 1);
+           (Cmd, File_Name, Metrics_To_Compute, File_M, Depth => 2);
 
          if not Output_To_Standard_Output then
             Set_Output (Standard_Output);
@@ -1539,7 +1539,7 @@ package body METRICS.Actions is
             Set_Output (XML_File);
          end if;
          XML_Print_Metrix
-           (Cmd, File_Name, Metrics_To_Compute, File_M, Depth => 1);
+           (Cmd, File_Name, Metrics_To_Compute, File_M, Depth => 2);
          if not Output_To_Standard_Output then
             Set_Output (Standard_Output);
          end if;
@@ -3097,14 +3097,14 @@ package body METRICS.Actions is
          begin
             if Should_Print_Any
               (Coupling_Metrics'First, Coupling_Metrics'Last,
-               Metrics_To_Compute, Outer_Unit, Depth => 2, XML => False)
+               Metrics_To_Compute, Outer_Unit, Depth => 3, XML => False)
             then
                Print_Metrix
                  (Cmd,
                   File_M.Source_File_Name.all,
                   Metrics_To_Compute,
                   File_M.all,
-                  Depth => 1);
+                  Depth => 2);
             end if;
          end;
       end loop;
@@ -3130,14 +3130,14 @@ package body METRICS.Actions is
          begin
             if Should_Print_Any
               (Coupling_Metrics'First, Coupling_Metrics'Last,
-               Metrics_To_Compute, Outer_Unit, Depth => 2, XML => True)
+               Metrics_To_Compute, Outer_Unit, Depth => 3, XML => True)
             then
                XML_Print_Metrix
                  (Cmd,
                   File_M.Source_File_Name.all,
                   Metrics_To_Compute,
                   File_M.all,
-                  Depth => 1);
+                  Depth => 2);
             end if;
          end;
       end loop;
@@ -3281,17 +3281,17 @@ package body METRICS.Actions is
            ("Line metrics " & Summed,
             Metrics_To_Compute,
             Lines_Metrics'First, Lines_Metrics'Last, M.all,
-            Depth => 0);
+            Depth => 1);
          Print_Range
            ("Contract metrics " & Summed,
             Metrics_To_Compute,
             Contract_Metrics'First, Contract_Metrics'Last, M.all,
-            Depth => 0);
+            Depth => 1);
          Print_Range
            ("Element metrics " & Summed,
             Metrics_To_Compute,
             Syntax_Metrics'First, Syntax_Metrics'Last, M.all,
-            Depth => 0);
+            Depth => 1);
 
          Print_Computed_Metric
            ("\n \1 public subprograms in \2 units\n",
@@ -3319,7 +3319,7 @@ package body METRICS.Actions is
             Text_IO.Set_Output (XML_File);
          end if;
          XML_Print_Metrix_Vals
-           (Metrics_To_Compute, M.Vals'First, M.Vals'Last, M.all, Depth => 0);
+           (Metrics_To_Compute, M.Vals'First, M.Vals'Last, M.all, Depth => 1);
          XML_Print_Coupling (Cmd, With_Coupling);
          Put ("</global>\n");
          if not Output_To_Standard_Output then
