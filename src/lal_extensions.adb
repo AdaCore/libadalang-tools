@@ -326,6 +326,18 @@ package body LAL_Extensions is
          when others => raise Program_Error);
    end Get_Aspects;
 
+   function G_Formal_Part
+     (Node : access Ada_Node_Type'Class) return Ada_Node_List is
+   begin
+      case Kind (Node) is
+         when Ada_Generic_Package_Decl =>
+            return F_Formal_Part (Generic_Package_Decl (Node));
+         when Ada_Generic_Subp_Decl =>
+            return F_Formal_Part (Generic_Subp_Decl (Node));
+         when others => raise Program_Error;
+      end case;
+   end G_Formal_Part;
+
    function Vis_Part
      (Node : access Ada_Node_Type'Class) return Public_Part
    is
@@ -374,6 +386,60 @@ package body LAL_Extensions is
          when others => raise Program_Error;
       end case;
    end Body_Decls;
+
+   function Is_Program_Unit (Node : Ada_Node) return Boolean is
+   begin
+      case Kind (Node) is
+         when Ada_Entry_Decl =>
+            return Kind (Parent (Parent (Parent (Node)))) = Ada_Protected_Def;
+
+         when Ada_Task_Type_Decl |
+           Ada_Protected_Type_Decl |
+           Ada_Single_Task_Decl |
+           Ada_Single_Protected_Decl |
+           Ada_Subp_Decl |
+           Ada_Abstract_Subp_Decl |
+           --  But not Ada_Null_Subp_Decl
+           Ada_Subp_Body |
+           Ada_Package_Decl |
+           Ada_Package_Body |
+           Ada_Task_Body |
+           Ada_Protected_Body |
+           Ada_Entry_Body |
+           Ada_Subp_Body_Stub |
+           Ada_Package_Body_Stub |
+           Ada_Task_Body_Stub |
+           Ada_Protected_Body_Stub |
+           Ada_Generic_Subp_Decl |
+           Ada_Generic_Package_Decl =>
+            return True;
+
+         when others => return False;
+      end case;
+   end Is_Program_Unit;
+
+   function Adds_New_Nesting_Level (Node : Ada_Node) return Boolean is
+   begin
+      case Kind (Node) is
+         when Ada_Subp_Body |
+           Ada_Package_Decl |
+           Ada_Package_Body |
+           Ada_Task_Body |
+           Ada_Protected_Body |
+           Ada_Entry_Body |
+           Ada_Generic_Package_Decl |
+
+           Ada_Block_Stmt |
+           Ada_Case_Stmt |
+           Ada_Select_Stmt |
+           Ada_Loop_Stmt |
+           Ada_Accept_Stmt |
+           Ada_If_Stmt =>
+            return True;
+
+         when others => return False;
+      end case;
+   end Adds_New_Nesting_Level;
 
    function Text_To_W_Str (X : Text_Type) return W_Str is
    begin

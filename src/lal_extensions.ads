@@ -79,6 +79,10 @@ package LAL_Extensions is
    function Get_Aspects (Decl : Basic_Decl) return Aspect_Spec;
    --  Wrapper for F_Aspects functions
 
+   function G_Formal_Part
+     (Node : access Ada_Node_Type'Class) return Ada_Node_List;
+   --  Return the generic formal part of a generic unit.
+
    function Vis_Part
      (Node : access Ada_Node_Type'Class) return Public_Part;
    --  Return the visible part of a package, generic package, task decl, or
@@ -98,6 +102,13 @@ package LAL_Extensions is
    --  Wide_Strings. We want to share code with ASIS tools at least for a
    --  while, so we convert Wide_Wide_Strings to Wide_Strings, and use
    --  Wide_Strings in libadalang-tools. This function does the conversion.
+
+   function Is_Program_Unit (Node : Ada_Node) return Boolean;
+   --  True if Node is a program unit as defined in the Ada RM
+
+   function Adds_New_Nesting_Level (Node : Ada_Node) return Boolean;
+   --  True if Node should be counted as a nesting level for the purposes of
+   --  the Construct_Nesting metric in gnatmetric.
 
    function Short_Image (Node : Ada_Node) return String is
      (ASIS_UL.String_Utilities.To_UTF8

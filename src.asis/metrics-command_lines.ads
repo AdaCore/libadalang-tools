@@ -54,7 +54,7 @@ package METRICS.Command_Lines is
       Noec_Switch,
       Nonl_Switch,
 
-      No_Treat_Exit_As_Goto, -- Option for Essential_Complexity
+      No_Treat_Exit_As_Goto, -- Option for Complexity_Essential
       No_Local_Metrics,
 
       No_Static_Loop, -- Option for Complexity_Cyclomatic
@@ -131,29 +131,33 @@ package METRICS.Command_Lines is
    --  are used to compute Lines_Average, as the ratio of these.
 
    --  Syntax element metrics options:
+      Public_Types,
+      Private_Types, -- undocumented, enabled by Public_Types
+      All_Types,
       Public_Subprograms,
       All_Subprograms,
       Statements,
       Declarations,
       Logical_Source_Lines, -- undocumented, enabled by Statements+Declarations
-      Public_Types,
-      All_Types,
       Unit_Nesting,
       Construct_Nesting,
+      Current_Construct_Nesting, -- undocumented, not printed
+      --  Current_Construct_Nesting is used in the computation of
+      --  Construct_Nesting, which is the high-water mark of
+      --  Current_Construct_Nesting.
       Param_Number,
+      In_Parameters,
+      Out_Parameters,
+      In_Out_Parameters,
 
-      Computed_Line_Metrics,
-   --  The number of units for which line metrics are safely computed
-      Computed_Element_Metrics,
-   --  The number of units for which element metrics are safely computed
+      Computed_Public_Types,
+      Computed_All_Types,
       Computed_Public_Subprograms,
    --  The number of units for which public subprograms are safely
    --  computed
       Computed_All_Subprograms,
    --  The number of units for which all the subprograms are safely
    --  computed
-      Computed_Public_Types,
-      Computed_All_Types,
    --  Copied from ASIS/tools/gnatmetric/metrics-metric_definitions.ads.
    --  I don't know what "safely computed" means, but (e.g.)
    --  Computed_All_Subprograms appears to be the number of library units
@@ -201,9 +205,9 @@ package METRICS.Command_Lines is
    subtype Lines_Metrics is Metrics_Enum range Lines .. Lines_Average;
    --  not Lines_Spark, Lines_Code_In_Bodies, Num_Bodies
    subtype Syntax_Metrics is
-     Metrics_Enum range Public_Subprograms .. Param_Number;
+     Metrics_Enum range Public_Types .. In_Out_Parameters;
    subtype Computed_Metrics is
-     Metrics_Enum range Computed_Line_Metrics .. Computed_All_Types;
+     Metrics_Enum range Computed_Public_Types .. Computed_All_Subprograms;
    subtype Coupling_Metrics is
      Metrics_Enum range Tagged_Coupling_Out .. Unit_Coupling_In;
 

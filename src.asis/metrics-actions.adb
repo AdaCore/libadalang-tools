@@ -37,7 +37,7 @@ package body METRICS.Actions is
       Post                => True,
       Contract_Complete   => False, ---------------- (needs semantic info)
       Contract_Complexity => True,
-      --  The above 4 are new (not implemented in the old gnatmetric).
+      --  The above 4 are new (not implemented in the old gnatmetric)
 
       Lines                => True,
       Lines_Code           => True,
@@ -49,28 +49,36 @@ package body METRICS.Actions is
       Lines_Spark          => True, -- partial (needs semantic info)
       --  We don't inherit properly from spec to body, and we don't take
       --  configuration files into account.
+      --  Lines_Spark is new (not implemented in the old gnatmetric).
       Lines_Code_In_Bodies => True,
       Num_Bodies           => True,
 
-      Public_Subprograms => True, -- partial (needs semantic info)
+      Public_Types         => True,
+      Private_Types        => True,
+      All_Types            => True, -- partial (needs semantic info)
+      --  We need to know if a full type is completion of a private type
+      Public_Subprograms   => True, -- partial (needs semantic info)
       --  We need semantic information to distinguish specless bodies from
       --  specful bodies.
       All_Subprograms      => True,
       Statements           => True,
       Declarations         => True,
       Logical_Source_Lines => True,
-      Public_Types         => False, ----------------
-      All_Types            => False, ----------------
-      Unit_Nesting         => False, ----------------
-      Construct_Nesting    => False, ----------------
-      Param_Number         => False, ----------------
+      Unit_Nesting         => True,
+      Construct_Nesting    => True,
+      Current_Construct_Nesting => True,
+      Param_Number         => True, -- partial (needs semantic info)
+      In_Parameters        => True,
+      Out_Parameters       => True,
+      In_Out_Parameters    => True,
+      --  We need semantic information to distinguish specless bodies from
+      --  specful bodies, for the above four. For a subprogram instantiation,
+      --  we also need to find then generic subprogram.
 
-      Computed_Line_Metrics       => False, ----------------
-      Computed_Element_Metrics    => False, ----------------
+      Computed_Public_Types       => True,
+      Computed_All_Types          => True,
       Computed_Public_Subprograms => True,
       Computed_All_Subprograms    => True,
-      Computed_Public_Types       => False, ----------------
-      Computed_All_Types          => False, ----------------
 
       Complexity_Statement  => True,
       Complexity_Expression => True,
@@ -829,14 +837,26 @@ package body METRICS.Actions is
             return "all declarations";
          when Logical_Source_Lines =>
             return "logical SLOC";
+         when All_Types =>
+            return "all type definitions";
          when Loop_Nesting =>
             return "maximum loop nesting";
          when All_Subprograms =>
             return "all subprogram bodies";
+         when Unit_Nesting =>
+            return "maximal unit nesting";
+         when Construct_Nesting =>
+            return "maximal construct nesting";
          when Lines_Eol_Comment =>
             return "end-of-line comments";
          when Lines_Average =>
             return "Average lines in body";
+         when In_Parameters =>
+            return "IN parameters";
+         when Out_Parameters =>
+            return "OUT parameters";
+         when In_Out_Parameters =>
+            return "IN OUT parameters";
 
          when others =>
             return Replace_String
@@ -860,13 +880,13 @@ package body METRICS.Actions is
          return False;
       end if;
 
-      --  Don't print metrics for nested subprogram declarations
-      --  unless it's Contract_Complexity, which is the only metric
-      --  that applies to those.
+      --  Don't print metrics for nested subprogram declarations unless it's
+      --  one of the few metrics that applies to those.
 
       if Depth > 3
         and then M.Kind in Contract_Complexity_Eligible
-        and then Metric /= Contract_Complexity
+        and then Metric not in Contract_Complexity | Param_Number |
+          In_Parameters | Out_Parameters | In_Out_Parameters
       then
          return False;
       end if;
@@ -886,7 +906,7 @@ package body METRICS.Actions is
          when Lines_Average =>
             return Depth = 1;
 
-         when All_Subprograms | All_Types =>
+         when All_Subprograms =>
             return (Depth = 3
               and then M.Kind in
                       Ada_Package_Body |
@@ -894,9 +914,15 @@ package body METRICS.Actions is
                       Ada_Task_Body |
                       Ada_Protected_Body)
               or else (XML and then Depth = 1);
-         when Public_Subprograms | Public_Types =>
+         when All_Types | Public_Types =>
+            return ((Depth = 3)
+                or else (XML and then Depth = 1))
+              and then M.Vals (Metric) > 0;
+         when Private_Types =>
+            return Depth = 3 and then M.Vals (Metric) > 0;
+         when Public_Subprograms =>
             if Depth = 3 and then M.Is_Private_Lib_Unit then
-               pragma Assert (M.Vals (Public_Subprograms) = 0);
+               pragma Assert (M.Vals (Metric) = 0);
                return False;
             end if;
 
@@ -911,11 +937,21 @@ package body METRICS.Actions is
               or else (XML and then Depth = 1);
          when Declarations |
            Statements |
-           Logical_Source_Lines |
-           Unit_Nesting |
-           Construct_Nesting |
-           Param_Number =>
+           Logical_Source_Lines =>
             return M.Kind /= Ada_Compilation_Unit;
+         when Unit_Nesting | Construct_Nesting =>
+            return Depth >= 3 and then M.Vals (Metric) > 0;
+         when Current_Construct_Nesting =>
+            return False;
+         when Param_Number =>
+            return M.Kind in Ada_Subp_Decl | Ada_Generic_Subp_Instantiation |
+              Ada_Expr_Function | Ada_Subp_Body; -- only if acting as spec???
+         when In_Parameters |
+           Out_Parameters |
+           In_Out_Parameters =>
+            return M.Vals (Param_Number) > 0
+              and then
+                Should_Print (Param_Number, Metrics_To_Compute, M, Depth, XML);
 
          when Contract_Complexity =>
             return M.Kind in Contract_Complexity_Eligible and then M.Visible;
@@ -1143,8 +1179,12 @@ package body METRICS.Actions is
          end if;
 
          if M.Kind in Contract_Complexity_Eligible
-           and then not Should_Print
-             (Contract_Complexity, Metrics_To_Compute, M, Depth, XML => True)
+           and then not
+             (Should_Print
+               (Contract_Complexity, Metrics_To_Compute, M, Depth, XML => True)
+                or else
+              Should_Print
+               (Param_Number, Metrics_To_Compute, M, Depth, XML => True))
          then
             return;
          end if;
@@ -1313,6 +1353,12 @@ package body METRICS.Actions is
             return "num_bodies";
          when Lines_Ratio =>
             return "comment_percentage";
+         when Public_Types =>
+            return "public_types";
+         when Private_Types =>
+            return "private_types";
+         when All_Types =>
+            return "all_types";
          when Statements =>
             return "all_stmts";
          when Declarations =>
@@ -1323,16 +1369,20 @@ package body METRICS.Actions is
             return "public_subprograms";
          when All_Subprograms =>
             return "all_subprograms";
-         when Public_Types =>
-            return "public_types";
-         when All_Types =>
-            return "all_types";
          when Unit_Nesting =>
             return "unit_nesting";
          when Construct_Nesting =>
             return "construct_nesting";
+         when Current_Construct_Nesting =>
+            raise Program_Error;
          when Param_Number =>
-            return "param_number";
+            return "all_parameters";
+         when In_Parameters =>
+            return "in_parameters";
+         when Out_Parameters =>
+            return "out_parameters";
+         when In_Out_Parameters =>
+            return "in_out_parameters";
          when Tagged_Coupling_Out =>
             return "tagged_fan-out_coupling";
          when Hierarchy_Coupling_Out =>
@@ -1372,6 +1422,12 @@ package body METRICS.Actions is
                     Val_To_Print (I, M, XML => True));
             end if;
          end if;
+
+         case I is
+            when Param_Number => Indent;
+            when In_Out_Parameters => Outdent;
+            when others => null;
+         end case;
       end loop;
 
       Outdent;
@@ -1424,8 +1480,12 @@ package body METRICS.Actions is
          end if;
 
          if M.Kind in Contract_Complexity_Eligible
-           and then not Should_Print
-             (Contract_Complexity, Metrics_To_Compute, M, Depth, XML => True)
+           and then not
+             (Should_Print
+               (Contract_Complexity, Metrics_To_Compute, M, Depth, XML => True)
+                or else
+              Should_Print
+               (Param_Number, Metrics_To_Compute, M, Depth, XML => True))
          then
             return;
          end if;
@@ -1585,6 +1645,16 @@ package body METRICS.Actions is
          end loop;
       end Inc_All;
 
+      procedure Dec_All (Metric : Metrics_Enum; By : Metric_Nat := 1);
+      --  Decrement all values on the stack for a given Metric
+
+      procedure Dec_All (Metric : Metrics_Enum; By : Metric_Nat := 1) is
+      begin
+         for M of Metrix_Stack loop
+            Dec (M.Vals (Metric), By);
+         end loop;
+      end Dec_All;
+
       --  CU_Node : constant Ada_Node := Childx (CU_List, 1);
       CU_Node : constant Ada_Node := CU_List;
       pragma Assert (Kind (CU_Node) = Ada_Compilation_Unit);
@@ -1642,6 +1712,11 @@ package body METRICS.Actions is
       --  When we're walking a pragma, this is the most recently seen
       --  subprogram declaration, if any. Used in the implementation of pragma
       --  SPARK_Mode, which can immediately follow a subprogram declaration.
+
+      In_Generic_Formal_Part : Boolean := False;
+      --  True when we are processing a generic formal part. ???It would be
+      --  better to have a Generic_Formal_Part node, similar to Visible_Part
+      --  and Private_Part.
 
       function In_Visible_Part return Boolean is
          (Last_Index (Metrix_Stack) >= 3
@@ -2285,7 +2360,7 @@ package body METRICS.Actions is
 
       procedure Gather_Syntax_Metrics (Node : Ada_Node; M : in out Metrix) is
       begin
-         --  --public-subprograms
+         --  Public_Subprograms
 
          if Last_Index (Metrix_Stack) = 3 or else In_Visible_Part then
             if Node = M.Node and then not M.Is_Private_Lib_Unit then
@@ -2309,13 +2384,13 @@ package body METRICS.Actions is
             end if;
          end if;
 
-         --  --all-subprograms
+         --  All_Subprograms
 
          if Kind (Node) = Ada_Subp_Body then
             Inc_All (All_Subprograms);
          end if;
 
-         --  --statements
+         --  Statements
 
          --  Labels and terminate alternatives are classified as statements by
          --  libadalang, but they are not actually statements, so shouldn't be
@@ -2332,7 +2407,7 @@ package body METRICS.Actions is
             Inc_All (Logical_Source_Lines);
          end if;
 
-         --  --declarations
+         --  Declarations
 
          pragma Assert
            (if Kind (Node) = Ada_Base_Package_Decl then
@@ -2353,20 +2428,123 @@ package body METRICS.Actions is
             Inc_All (Logical_Source_Lines);
          end if;
 
-         --  --public-types
+         --  Public_Types
 
-         if Last_Index (Metrix_Stack) = 3 or else In_Visible_Part then
-            if not M.Is_Private_Lib_Unit then
-               if Kind (Node) = Ada_Type_Decl then
+         if In_Visible_Part then
+            if not M.Is_Private_Lib_Unit and not In_Generic_Formal_Part then
+               if Kind (Node) in Ada_Type_Decl | Ada_Enum_Type_Decl |
+                 Ada_Protected_Type_Decl | Ada_Task_Type_Decl
+               then
                   Inc_All (Public_Types);
+               end if;
+
+               if Kind (Node) = Ada_Type_Decl then
+                  declare
+                     Def : constant Type_Def := F_Type_Def (Type_Decl (Node));
+                  begin
+                     if Kind (Def) = Ada_Private_Type_Def
+                       or else
+                       (Kind (Def) = Ada_Derived_Type_Def
+                          and then F_Has_With_Private (Derived_Type_Def (Def)))
+                     then
+                        Inc_All (Private_Types);
+                     end if;
+                  end;
                end if;
             end if;
          end if;
 
-         --  --all-types
+         --  All_Types
 
-         if Kind (Node) = Ada_Type_Decl then
-            Inc_All (All_Types);
+         if Kind (Node) in Ada_Type_Decl | Ada_Enum_Type_Decl |
+           Ada_Protected_Type_Decl | Ada_Task_Type_Decl
+         then
+            --  ???We're not supposed to count the full type declaration of a
+            --  private type/extension. The following 'if' is an approximation
+            --  of that, given that we don't have semantic information.
+
+            if Private_Part_Count = 0 then
+               Inc_All (All_Types);
+            end if;
+         end if;
+
+         --  Unit_Nesting
+
+         if Is_Program_Unit (Node) then
+            if Last_Index (Metrix_Stack) >= 3 then
+               declare
+                  Top : constant Metrix_Index := Last_Index (Metrix_Stack);
+                  Start : constant Metrix_Index :=
+                    (if Node = M.Node then Top - 1 else Top);
+               begin
+                  for X in reverse 3 .. Start loop
+                     declare
+                        MM : Metrix renames Element (Metrix_Stack, X).all;
+                     begin
+                        MM.Vals (Unit_Nesting) := Metric_Nat'Max
+                          (MM.Vals (Unit_Nesting), Metric_Nat (Start - X) + 1);
+                     end;
+                  end loop;
+               end;
+            end if;
+         end if;
+
+         --  Construct_Nesting
+
+         if Kind (Node) in
+           Ada_Subp_Decl | Ada_Expr_Function | Ada_Generic_Subp_Decl |
+           Ada_Task_Type_Decl | Ada_Single_Task_Decl |
+           Ada_Protected_Type_Decl | Ada_Single_Protected_Decl |
+           Ada_Generic_Package_Instantiation | Ada_Generic_Subp_Instantiation
+         then
+            pragma Assert
+              (M.Vals (Construct_Nesting) = 0
+                 or else Kind (Node) in
+                   Ada_Generic_Package_Instantiation |
+                   Ada_Generic_Subp_Instantiation);
+            if M.Vals (Construct_Nesting) = 0 then
+               M.Vals (Construct_Nesting) := 1;
+            end if;
+         end if;
+
+         if Adds_New_Nesting_Level (Node) then
+            if Last_Index (Metrix_Stack) >= 3 then
+               declare
+                  Top : constant Metrix_Index := Last_Index (Metrix_Stack);
+                  Start : constant Metrix_Index := Top;
+               begin
+                  for X in reverse 3 .. Start loop
+                     declare
+                        MM : Metrix renames Element (Metrix_Stack, X).all;
+                     begin
+                        MM.Vals (Construct_Nesting) := Metric_Nat'Max
+                          (MM.Vals (Construct_Nesting),
+                           MM.Vals (Current_Construct_Nesting));
+                     end;
+                  end loop;
+               end;
+            end if;
+         end if;
+
+         --  Param_Number and friends
+
+         if Kind (Node) = Ada_Param_Spec then
+            declare
+               N : constant Param_Spec := Param_Spec (Node);
+               Num : constant Metric_Nat :=
+                 Metric_Nat (Child_Count (F_Ids (N)));
+            begin
+               Inc (M.Vals (Param_Number), By => Num);
+
+               case F_Mode (N) is
+                  when Ada_Mode_Default | Ada_Mode_In =>
+                     Inc (M.Vals (In_Parameters), By => Num);
+                  when Ada_Mode_Out =>
+                     Inc (M.Vals (Out_Parameters), By => Num);
+                  when Ada_Mode_In_Out =>
+                     Inc (M.Vals (In_Out_Parameters), By => Num);
+               end case;
+            end;
          end if;
       end Gather_Syntax_Metrics;
 
@@ -2573,6 +2751,14 @@ package body METRICS.Actions is
             end if;
          end loop;
 
+         --  Gather Current_Construct_Nesting
+
+         if Adds_New_Nesting_Level (Node) then
+            if Last_Index (Metrix_Stack) >= 3 then
+               Inc_All (Current_Construct_Nesting);
+            end if;
+         end if;
+
          if Parents (Node).Items'Length > 2 and then False then
             --  ???See P907-045
             pragma Assert
@@ -2608,12 +2794,37 @@ package body METRICS.Actions is
          for I in 1 .. Child_Count (Node) loop
             declare
                Cur_Child : constant Ada_Node := Child (Node, I);
+               In_Generic_Formal_Part_Set : Boolean := False;
             begin
                if Cur_Child /= null then
+                  if Kind (Node) in
+                    Ada_Generic_Package_Decl | Ada_Generic_Subp_Decl
+                  then
+                     pragma Assert
+                       ((I = 1) =
+                        (Cur_Child = Ada_Node (G_Formal_Part (Node))));
+                     pragma Assert (not In_Generic_Formal_Part);
+                     if I = 1 then
+                        In_Generic_Formal_Part := True;
+                        In_Generic_Formal_Part_Set := True;
+                     end if;
+                  end if;
+
                   Rec (Cur_Child);
+
+                  if In_Generic_Formal_Part_Set then
+                     pragma Assert (In_Generic_Formal_Part);
+                     In_Generic_Formal_Part := False;
+                  end if;
                end if;
             end;
          end loop;
+
+         if Adds_New_Nesting_Level (Node) then
+            if Last_Index (Metrix_Stack) >= 3 then
+               Dec_All (Current_Construct_Nesting);
+            end if;
+         end if;
       end Gather_Metrics_And_Walk_Children;
 
       pragma Assert (Length (Metrix_Stack) = 1);
@@ -2636,6 +2847,14 @@ package body METRICS.Actions is
       Gather_Metrics_And_Walk_Children (CU_Node);
 
       --  Gather "Computed_" metrics.
+
+      if M.Vals (Public_Types) /= 0 then
+         Inc (Global_M.Vals (Computed_Public_Types));
+      end if;
+
+      if M.Vals (All_Types) /= 0 then
+         Inc (Global_M.Vals (Computed_All_Types));
+      end if;
 
       if M.Vals (Public_Subprograms) /= 0 then
          Inc (Global_M.Vals (Computed_Public_Subprograms));
@@ -2774,19 +2993,30 @@ package body METRICS.Actions is
                Result (Complexity_Expression) := True;
             end if;
 
+            if Arg (Cmd, Public_Types) then
+               Result (Private_Types) := True;
+            end if;
+
             if Arg (Cmd, Statements) and then Arg (Cmd, Declarations) then
                Result (Logical_Source_Lines) := True;
             end if;
 
+            if Arg (Cmd, Param_Number) then
+               Result (In_Parameters) := True;
+               Result (Out_Parameters) := True;
+               Result (In_Out_Parameters) := True;
+            end if;
+
             --  If no metrics were requested on the command line, we compute
             --  all metrics except coupling and "computed" metrics. Also, at
-            --  least for now, disable contract metrics, because those don't
-            --  exist in gnatmetric and we're trying to be compatible.
+            --  least for now, disable contract metrics and Lines_Spark,
+            --  because those don't exist in gnatmetric and we're trying to
+            --  be compatible.
 
             if Result = (Metrics_Enum => False) then
                Result :=
-                 (Coupling_Metrics | Computed_Metrics | Contract_Metrics =>
-                    False,
+                 (Coupling_Metrics | Computed_Metrics |
+                    Contract_Metrics | Lines_Spark => False,
                   others => True);
             end if;
          end return;
@@ -2949,7 +3179,6 @@ package body METRICS.Actions is
                Parent_Body := Specs (Get_Symbol_Index (M.Subunit_Parent));
             end if;
 
-            pragma Assert (Parent_Body /= null);
             return (if Parent_Body = null then M else Get_Spec (Parent_Body));
             --  This recursion will climb up a chain of nested subunits until
             --  it reaches a library unit, and then we'll get the spec of that
@@ -3206,6 +3435,12 @@ package body METRICS.Actions is
             Put (T,
                  Val_To_Print (Metric, M.all, XML => False),
                  Val_To_Print (C_Metric, M.all, XML => False));
+
+            if Metric = Public_Types then
+               Put (" including\n");
+               Put ("    \1 private types\n",
+                    Val_To_Print (Private_Types, M.all, XML => False));
+            end if;
          end if;
       end Print_Computed_Metric;
 
@@ -3294,11 +3529,17 @@ package body METRICS.Actions is
             Depth => 1);
 
          Print_Computed_Metric
+           ("\n \1 public types in \2 units\n",
+            Public_Types, Computed_Public_Types);
+         Print_Computed_Metric
            ("\n \1 public subprograms in \2 units\n",
             Public_Subprograms, Computed_Public_Subprograms);
          Print_Computed_Metric
            ("\n \1 subprogram bodies in \2 units\n",
             All_Subprograms, Computed_All_Subprograms);
+         Print_Computed_Metric
+           ("\n \1 type declarations in \2 units\n",
+            All_Types, Computed_All_Types);
 
          if Arg (Cmd, Global_File_Name) /= null then
             if not Output_To_Standard_Output then
