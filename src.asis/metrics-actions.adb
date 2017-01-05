@@ -127,7 +127,7 @@ package body METRICS.Actions is
    procedure ppp (X : Ada_Node);
    procedure Put_Ada_Node_Array (X : Ada_Node_Array);
    procedure Put_Child_Record (C : Child_Record);
-   procedure Put_Children_Array (A : Children_Arrays.Array_Type);
+   procedure Put_Children_Array (A : Children_Array);
    function Par (X : Ada_Node) return Ada_Node is (Parent (X));
    --  Debugging printouts
 
@@ -168,14 +168,18 @@ package body METRICS.Actions is
          when Child =>
             Put ("Child: \1\n", Short_Image (C.Node));
          when Trivia =>
-            Put ("Trivia: \1 ""\2"" \3\n",
-                 C.Trivia.Kind'Img,
-                 To_UTF8 (Text_To_W_Str (C.Trivia.Text.all)),
-                 Slocs.Image (C.Trivia.Sloc_Range));
+            declare
+               Trivia_Data : constant Token_Data_Type := Data (C.Trivia);
+            begin
+               Put ("Trivia: \1 ""\2"" \3\n",
+                    Trivia_Data.Kind'Img,
+                    To_UTF8 (Text_To_W_Str (Text (C.Trivia))),
+                    Slocs.Image (Trivia_Data.Sloc_Range));
+            end;
       end case;
    end Put_Child_Record;
 
-   procedure Put_Children_Array (A : Children_Arrays.Array_Type) is
+   procedure Put_Children_Array (A : Children_Array) is
       use ASIS_UL.Dbg_Out;
    begin
       for I in A'Range loop
@@ -2729,8 +2733,7 @@ package body METRICS.Actions is
          M : Metrix renames
            Element (Metrix_Stack, Last_Index (Metrix_Stack)).all;
 
-         With_Trivia : constant Children_Arrays.Array_Type :=
-           Children_With_Trivia (Node);
+         With_Trivia : constant Children_Array := Children_With_Trivia (Node);
 
          use type Lexer.Token_Kind;
 
@@ -2741,13 +2744,13 @@ package body METRICS.Actions is
             if False and then Trivium.Kind = Trivia then
                Put_Children_Array (With_Trivia);
                Put ("----\n");
-               Stop (Node, Text_To_W_Str (Trivium.Trivia.Text.all));
+               Stop (Node, Text_To_W_Str (Text (Trivium.Trivia)));
                exit;
             end if;
          end loop;
          for Trivium of With_Trivia loop
             if Trivium.Kind = Trivia then
-               pragma Assert (Trivium.Trivia.Kind = Lexer.Ada_Comment);
+               pragma Assert (Data (Trivium.Trivia).Kind = Lexer.Ada_Comment);
             end if;
          end loop;
 

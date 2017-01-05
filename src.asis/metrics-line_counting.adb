@@ -9,6 +9,8 @@ with LAL_UL.Formatted_Output; use LAL_UL.Formatted_Output;
 with ASIS_UL.Vectors;
 package body METRICS.Line_Counting is
 
+   subtype Token_Data_Type is Libadalang.Analysis.Token_Data_Type;
+
    procedure Inc (X : in out Metric_Nat; By : Metric_Nat := 1) is
    begin
       --  Use saturating arithmetic in case of really huge values.

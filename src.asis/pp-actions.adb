@@ -1028,14 +1028,18 @@ package body Pp.Actions is
          when Child =>
             Put ("Child: \1\n", Short_Image (C.Node));
          when Trivia =>
-            Put ("Trivia: \1 ""\2"" \3\n",
-                 C.Trivia.Kind'Img,
-                 To_UTF8 (Text_To_W_Str (C.Trivia.Text.all)),
-                 Slocs.Image (C.Trivia.Sloc_Range));
+            declare
+               Trivia_Data : constant Token_Data_Type := Data (C.Trivia);
+            begin
+               Put ("Trivia: \1 ""\2"" \3\n",
+                    Trivia_Data.Kind'Img,
+                    To_UTF8 (Text_To_W_Str (Text (C.Trivia))),
+                    Slocs.Image (Trivia_Data.Sloc_Range));
+            end;
       end case;
    end Put_Child_Record;
 
-   procedure Put_Children_Array (A : Children_Arrays.Array_Type) is
+   procedure Put_Children_Array (A : Children_Array) is
       use ASIS_UL.Dbg_Out;
    begin
       for I in A'Range loop
