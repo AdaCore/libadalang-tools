@@ -24,7 +24,7 @@ package body METRICS.Line_Counting is
 
    function Line (TD : Token_Data_Type) return Line_Num is
    --  Return the line number on which the token appears
-     (Line_Num (TD.Sloc_Range.Start_Line));
+     (Line_Num (Sloc_Range (TD).Start_Line));
 
    procedure Validate (Prev, This : Cumulative_Counts);
    --  Check some required properties of subsequent elements, and
@@ -56,7 +56,7 @@ package body METRICS.Line_Counting is
             TD : constant Token_Data_Type := Data (Cur);
             Cur_Line : constant Line_Num := Line (TD);
          begin
-            exit when TD.Kind = Ada_Termination;
+            exit when Kind (TD) = Ada_Termination;
 
             if Cur_Line = Prev_Line then
                declare
@@ -69,7 +69,7 @@ package body METRICS.Line_Counting is
                   --  this line.
                end;
 
-               if TD.Kind = Ada_Comment then
+               if Kind (TD) = Ada_Comment then
                   Inc (Last_Ptr (Result) (Lines_Eol_Comment));
                end if;
 
@@ -88,7 +88,7 @@ package body METRICS.Line_Counting is
 
                Append (Result, Last_Element (Result));
 
-               if TD.Kind = Ada_Comment then
+               if Kind (TD) = Ada_Comment then
                   Inc (Last_Ptr (Result) (Lines_Comment));
                else
                   Inc (Last_Ptr (Result) (Lines_Code));

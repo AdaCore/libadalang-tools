@@ -174,9 +174,9 @@ package body METRICS.Actions is
                Trivia_Data : constant Token_Data_Type := Data (C.Trivia);
             begin
                Put ("Trivia: \1 ""\2"" \3\n",
-                    Trivia_Data.Kind'Img,
+                    Kind (Trivia_Data)'Img,
                     To_UTF8 (Text_To_W_Str (Text (C.Trivia))),
-                    Slocs.Image (Trivia_Data.Sloc_Range));
+                    Slocs.Image (Sloc_Range (Trivia_Data)));
             end;
       end case;
    end Put_Child_Record;
@@ -2834,7 +2834,8 @@ package body METRICS.Actions is
          end loop;
          for Trivium of With_Trivia loop
             if Trivium.Kind = Trivia then
-               pragma Assert (Data (Trivium.Trivia).Kind = Lexer.Ada_Comment);
+               pragma Assert
+                 (Kind (Data (Trivium.Trivia)) = Lexer.Ada_Comment);
             end if;
          end loop;
 
