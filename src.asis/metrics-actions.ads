@@ -147,8 +147,6 @@ private
       --  are also displayed only for public subprograms, but they use a
       --  different mechanism.)
 
-      Vals : Metrics_Values := Initial_Metrics_Values;
-
       Has_Complexity_Metrics : Boolean := False;
       --  True if complexity metrix should be computed for Node (assuming it's
       --  requested on the command line).
@@ -167,6 +165,8 @@ private
       --  The compilation unit in which this Metrix is nested.
       --  Null for Metrix_Stack[1]. For Metrix_Stack[1], points
       --  to itself.
+
+      Vals : Metrics_Values := Initial_Metrics_Values;
 
       Submetrix : Metrix_Vectors.Vector;
       --  Metrix records for units nested within this one
@@ -257,6 +257,8 @@ private
       --  This stack contains the relevant nodes currently being processed by
       --  the recursive walk. It is used while computing the metrics; printing
       --  the metrics walks the tree formed by Submetrix.
+
+      Treat_Exit_As_Goto : Boolean; -- Option for Complexity_Essential
    end record;
 
    --  Init is called once, before processing any files. It pushes

@@ -265,7 +265,9 @@ package body Pp.Actions is
       Result : Output_Modes := Default;
    begin
       if Arg (Cmd, Output_Directory) /= null then
+         pragma Warnings (Off, "condition can only be False if invalid");
          pragma Assert (Result = Default);
+         pragma Warnings (On, "condition can only be False if invalid");
          Result := Output_Directory;
       end if;
       if Arg (Cmd, Pipe) then

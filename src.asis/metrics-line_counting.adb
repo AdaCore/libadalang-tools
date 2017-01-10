@@ -1,10 +1,5 @@
---  with Interfaces; use Interfaces;
-with Langkit_Support.Text; use Langkit_Support.Text;
-
 with Libadalang; use Libadalang;
 with Libadalang.Lexer;    use Libadalang.Lexer;
-
-with LAL_UL.Formatted_Output; use LAL_UL.Formatted_Output;
 
 with ASIS_UL.Vectors;
 package body METRICS.Line_Counting is
@@ -62,13 +57,6 @@ package body METRICS.Line_Counting is
             Cur_Line : constant Line_Num := Line (TD);
          begin
             exit when TD.Kind = Ada_Termination;
-
-            if False then
-               Put ("\1\2\n", Token_Kind_Name (TD.Kind),
-                    (if TD.Text = null
-                       then ""
-                       else " " & Image (TD.Text.all, With_Quotes => True)));
-            end if;
 
             if Cur_Line = Prev_Line then
                declare

@@ -83,7 +83,9 @@ package body METRICS.Actions is
       Complexity_Statement  => True,
       Complexity_Expression => True,
       Complexity_Cyclomatic => True,
-      Complexity_Essential  => False, ----------------
+      Complexity_Essential  => True, -- partial (needs semantic info)
+      --  We need to hook goto's up to their label, and know which level the
+      --  label is at in the tree. Similarly for exit statements with names.
       Complexity_Average    => False, ----------------
       Loop_Nesting          => True,
       Extra_Exit_Points     => False, ----------------
@@ -1683,7 +1685,7 @@ package body METRICS.Actions is
 
       Exception_Handler_Count : Natural := 0;
       --  Number of exception handlers we are nested within. Used to
-      --  suppress computing cyclomatic complexity within handlers.
+      --  suppress computing complexity metrics within handlers.
 
       Quantified_Expr_Count : Natural := 0;
       --  Number of quantified expressions we are nested within. This is
@@ -1742,6 +1744,9 @@ package body METRICS.Actions is
       --  Compute McCabe Cyclomatic Complexity metrics. This also handles the
       --  Contract_Complexity metric, even though that's considered a "contract
       --  metric".
+
+      procedure Gather_Essential_Complexity
+        (Node : Ada_Node; M : in out Metrix);
 
       procedure Gather_Contract_Metrics (Node : Ada_Node);
       --  Compute contract metrics, except for Contract_Complexity, which is
@@ -1915,12 +1920,8 @@ package body METRICS.Actions is
 
       begin
          --  Don't compute these metrics within exception handlers.
-         --  Apparently, gnatmetric doesn't walk expression functions for
-         --  complexity metrics.
 
-         if Exception_Handler_Count > 0
-           or else (False and then Expr_Function_Count > 0)
-         then
+         if Exception_Handler_Count > 0 then
             return;
          end if;
 
@@ -1996,6 +1997,89 @@ package body METRICS.Actions is
             when others => null;
          end case;
       end Cyclomate;
+
+      --  To compute the Complexity_Essential metric, we keep a stack of nodes
+      --  currently being processed, which includes all the Gnatmetric_Eligible
+      --  nodes, and all the compound statements we are counting. When we see a
+      --  jump, we walk up the stack and increment the count for each compound
+      --  statement we're jumping out of. We stop when we get to a
+      --  non-compound-statement (i.e. a Gnatmetric_Eligible node). Exit
+      --  statements are treated as jumps by default, and we stop when we get
+      --  to a loop.  If the No_Treat_Exit_As_Goto command-line option is
+      --  given, exits are ignored. There seem to be some bugs in the
+      --  gnatmetric version, which we are not mimicing here. Each compound
+      --  statement in the stack has a Counted flag, which is set to True
+      --  when we encounter a jump out of that statement; this prevents us from
+      --  counting multiple jumps out of the same statement. For example, if a
+      --  loop contains 3 exit statements, that counts as 1, not 3.
+
+      type EC_Rec is record
+         Node : Ada_Node;
+         Counted : Boolean;
+      end record;
+
+      type EC_Index is new Positive;
+      type EC_Array is array (EC_Index range <>) of EC_Rec;
+      package EC_Vectors is
+         new ASIS_UL.Vectors (EC_Index, EC_Rec, EC_Array);
+      use EC_Vectors;
+      EC_Stack : EC_Vectors.Vector; -- "essential complexity" stack
+
+      procedure Gather_Essential_Complexity
+        (Node : Ada_Node; M : in out Metrix)
+      is
+         File_M : Metrix renames Element (Metrix_Stack, 2).all;
+      begin
+         --  Don't compute this metric within exception handlers.
+
+         if Exception_Handler_Count > 0 then
+            return;
+         end if;
+
+         --  Push the stack if appropriate
+
+         if Kind (Node) in Gnatmetric_Eligible |
+           Ada_If_Stmt | Ada_Case_Stmt | Ada_Loop_Stmt | Ada_Select_Stmt
+         then
+            Append (EC_Stack, EC_Rec'(Node, Counted => False)); -- push
+            --  (The corresponding Pop is at the end of
+            --  Gather_Metrics_And_Walk_Children.)
+         end if;
+
+         --  If this is a jump, increment appropriate counts
+
+         if Kind (Node) in -- Not Ada_Extended_Return_Stmt
+             Ada_Return_Stmt |
+             Ada_Raise_Stmt |
+             Ada_Terminate_Alternative |
+             Ada_Goto_Stmt
+           or else
+             (Kind (Node) = Ada_Exit_Stmt and then Tool.Treat_Exit_As_Goto)
+         then
+            declare
+               X : EC_Index := Last_Index (EC_Stack);
+               K : Ada_Node_Kind_Type;
+            begin
+               loop
+                  K := Kind (Ada_Node'(EC_Stack (X).Node));
+
+                  exit when K in Gnatmetric_Eligible;
+
+                  if not EC_Stack (X).Counted then
+                     EC_Stack (X).Counted := True;
+                     Inc (M.Vals (Complexity_Essential));
+                     Inc (File_M.Vals (Complexity_Essential));
+                  end if;
+
+                  exit when X = 1;
+                  exit when Kind (Node) = Ada_Exit_Stmt
+                    and then K = Ada_Loop_Stmt;
+
+                  X := X - 1;
+               end loop;
+            end;
+         end if;
+      end Gather_Essential_Complexity;
 
       procedure Gather_Line_Metrics (Node : Ada_Node; M : in out Metrix) is
          function Should_Gather_Body_Lines return Boolean;
@@ -2792,6 +2876,7 @@ package body METRICS.Actions is
                       and then In_Visible_Part)
          then
             Cyclomate (Node, M);
+            Gather_Essential_Complexity (Node, M);
          end if;
 
          for I in 1 .. Child_Count (Node) loop
@@ -2827,6 +2912,12 @@ package body METRICS.Actions is
             if Last_Index (Metrix_Stack) >= 3 then
                Dec_All (Current_Construct_Nesting);
             end if;
+         end if;
+
+         if not Is_Empty (EC_Stack) -- See Gather_Essential_Complexity
+           and then Last_Element (EC_Stack).Node = Node
+         then
+            Pop (EC_Stack);
          end if;
       end Gather_Metrics_And_Walk_Children;
 
@@ -3013,7 +3104,7 @@ package body METRICS.Actions is
             --  If no metrics were requested on the command line, we compute
             --  all metrics except coupling and "computed" metrics. Also, at
             --  least for now, disable contract metrics and Lines_Spark,
-            --  because those don't exist in gnatmetric and we're trying to
+            --  because those don't exist in lalmetric and we're trying to
             --  be compatible.
 
             if Result = (Metrics_Enum => False) then
@@ -3032,6 +3123,8 @@ package body METRICS.Actions is
    --  Start of processing for Init
 
    begin
+      Tool.Treat_Exit_As_Goto := not Arg (Cmd, No_Treat_Exit_As_Goto);
+
       --  Decide what metrics to compute. Initialize the Metrix_Stack
       --  by pushing the outermost Metrix, which is for totals for all
       --  the files together. If XML requested, create the XML file
