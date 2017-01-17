@@ -172,60 +172,68 @@ private
       --  Metrix records for units nested within this one
 
       case Kind is
-         when Ada_Compilation_Unit =>
-            Is_Spec : Boolean;
-
-            CU_Name : CU_Symbol;
-            --  Name of this compilation unit
-
-            Subunit_Parent : CU_Symbol;
-            --  If this is a subunit, name of the parent; empty string
-            --  otherwise.
-
-            Depends_On : CU_Symbol_Sets.Set;
-            Indirect_Dependences_Computed : Boolean := False;
-            Limited_Depends_On : CU_Symbol_Sets.Set;
-            --  Depends_On is the set of compilation units this one depends
-            --  upon. It is computed in 3 steps:
-            --
-            --     During the initial walk of each source file tree,
-            --     Gather_Dependencies sets it to include just direct
-            --     dependencies.
-            --
-            --     During Final, Compute_Indirect_Dependencies first removes
-            --     units that do not exist in the set of units being
-            --     processed. It then walks the dependence graph, and computes
-            --     indirect dependences. Indirect_Dependences_Computed is set
-            --     to True as each node in the graph is processed.
-            --
-            --     Finally Compute_Coupling, merges the Depends_On from bodies
-            --     into the corresponding library unit spec, because that's
-            --     what coupling metrics want.
-            --
-            --  This is used for coupling metrics, so it doesn't exactly match
-            --  the Ada notion of dependence. As mentioned above, body
-            --  dependences are merged with the spec. Body-->spec and
-            --  subunit-->parent-body dependences are not recorded.
-            --  This is because coupling metrics treat a spec along with its
-            --  body and subunits as a single entity.
-            --
-            --  We're working with names here, because we don't have semantic
-            --  information. We use a set so that redundancies don't count
-            --  (e.g. "with X; with X;" should count as depending on X (once)).
-            --
-            --  "limited with" clauses are treated separately
-            --  (Limited_Depends_On), because those are counted as just 1
-            --  dependence (not followed to find indirect dependencies).
-
-            Has_Tagged_Type, Has_Subprogram : Boolean := False;
-            --  True if this is a unit containing a tagged type or a
-            --  subprogram. Used to compute coupling metrics. Ignored for
-            --  bodies.
-
-            Source_File_Name : String_Ref := null;
-
+         when Ada_Compilation_Unit | Null_Kind =>
             Num_With_Complexity : Metric_Nat := 0;
             --  Number of descendants for which complexity metrics apply
+
+            case Kind is
+               when Ada_Compilation_Unit =>
+                  Is_Spec : Boolean;
+
+                  CU_Name : CU_Symbol;
+                  --  Name of this compilation unit
+
+                  Subunit_Parent : CU_Symbol;
+                  --  If this is a subunit, name of the parent; empty string
+                  --  otherwise.
+
+                  Depends_On : CU_Symbol_Sets.Set;
+                  Indirect_Dependences_Computed : Boolean := False;
+                  Limited_Depends_On : CU_Symbol_Sets.Set;
+                  --  Depends_On is the set of compilation units this one
+                  --  depends upon. It is computed in 3 steps:
+                  --
+                  --     During the initial walk of each source file tree,
+                  --     Gather_Dependencies sets it to include just direct
+                  --     dependencies.
+                  --
+                  --     During Final, Compute_Indirect_Dependencies first
+                  --     removes units that do not exist in the set of units
+                  --     being processed. It then walks the dependence graph,
+                  --     and computes indirect dependences.
+                  --     Indirect_Dependences_Computed is set to True as each
+                  --     node in the graph is processed.
+
+                  --     Finally Compute_Coupling, merges the Depends_On from
+                  --     bodies into the corresponding library unit spec,
+                  --     because that's what coupling metrics want.
+                  --
+                  --  This is used for coupling metrics, so it doesn't exactly
+                  --  match the Ada notion of dependence. As mentioned above,
+                  --  body dependences are merged with the spec. Body-->spec
+                  --  and subunit-->parent-body dependences are not recorded.
+                  --  This is because coupling metrics treat a spec along with
+                  --  its body and subunits as a single entity.
+                  --
+                  --  We're working with names here, because we don't have
+                  --  semantic information. We use a set so that redundancies
+                  --  don't count (e.g. "with X; with X;" should count as
+                  --  depending on X (once)).
+                  --
+                  --  "limited with" clauses are treated separately
+                  --  (Limited_Depends_On), because those are counted as just 1
+                  --  dependence (not followed to find indirect dependencies).
+
+                  Has_Tagged_Type, Has_Subprogram : Boolean := False;
+                  --  True if this is a unit containing a tagged type or a
+                  --  subprogram. Used to compute coupling metrics. Ignored for
+                  --  bodies.
+
+                  Source_File_Name : String_Ref := null;
+
+               when others =>
+                  null;
+            end case;
 
          when Ada_Package_Body =>
             Statements_Sloc : Slocs.Source_Location_Range;

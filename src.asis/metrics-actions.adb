@@ -86,7 +86,7 @@ package body METRICS.Actions is
       Complexity_Essential  => True, -- partial (needs semantic info)
       --  We need to hook goto's up to their label, and know which level the
       --  label is at in the tree. Similarly for exit statements with names.
-      Complexity_Average    => False, ----------------
+      Complexity_Average    => True,
       Loop_Nesting          => True,
       Extra_Exit_Points     => False, ----------------
 
@@ -965,7 +965,11 @@ package body METRICS.Actions is
             return M.Visible;
 
          when Complexity_Metrics =>
-            return M.Has_Complexity_Metrics;
+            if Metric = Complexity_Average then
+               return XML and Depth = 1;
+            else
+               return M.Has_Complexity_Metrics;
+            end if;
 
          when Coupling_Metrics =>
             pragma Assert (Depth <= 3);
@@ -1007,7 +1011,7 @@ package body METRICS.Actions is
       end if;
 
       if (Metric in Complexity_Metrics
-            and then M.Kind = Ada_Compilation_Unit)
+            and then M.Kind in Ada_Compilation_Unit | Null_Kind)
       or else (Metric = Lines_Average and then M.Kind = Null_Kind)
       then
          if Metric = Loop_Nesting then
@@ -1425,7 +1429,11 @@ package body METRICS.Actions is
             if True or else M.Vals (I) /= 0 then -- ???
                Put ("<metric name=\1>\2</metric>\n",
                     Q (XML_Metric_Name_String (I)),
-                    Val_To_Print (I, M, XML => True));
+                    Val_To_Print
+                      ((if I = Complexity_Average
+                          then Complexity_Cyclomatic
+                          else I),
+                       M, XML => True));
             end if;
          end if;
 
@@ -1771,6 +1779,7 @@ package body METRICS.Actions is
       procedure Gather_Metrics_And_Walk_Children (Node : Ada_Node);
 
       procedure Cyclomate (Node : Ada_Node; M : in out Metrix) is
+         Global_M : Metrix renames Element (Metrix_Stack, 1).all;
          File_M : Metrix renames Element (Metrix_Stack, 2).all;
          --  We don't walk up the stack as for other metrics. We increment
          --  the current Metrix (M) and the one for the file as a whole
@@ -1913,6 +1922,8 @@ package body METRICS.Actions is
                Inc (M.Vals (Complexity_Cyclomatic), By);
                Inc (File_M.Vals (Metric), By);
                Inc (File_M.Vals (Complexity_Cyclomatic), By);
+               Inc (Global_M.Vals (Metric), By);
+               Inc (Global_M.Vals (Complexity_Cyclomatic), By);
             end if;
          end Inc_Cyc;
 
@@ -2762,6 +2773,7 @@ package body METRICS.Actions is
 
          if Node = Outer_Unit or else Kind (Node) in Eligible then
             declare
+               Global_M : Metrix renames Element (Metrix_Stack, 1).all;
                File_M : Metrix renames Element (Metrix_Stack, 2).all;
                Parent : Metrix renames
                  Element (Metrix_Stack, Last_Index (Metrix_Stack)).all;
@@ -2773,6 +2785,7 @@ package body METRICS.Actions is
                Append (Parent.Submetrix, M);
                if M.Has_Complexity_Metrics then
                   Inc (File_M.Num_With_Complexity);
+                  Inc (Global_M.Num_With_Complexity);
                end if;
                Gather_Metrics_And_Walk_Children (Node);
                Validate (M.all);
@@ -3528,7 +3541,7 @@ package body METRICS.Actions is
       procedure Print_Computed_Metric
         (T : Template; Metric : Metrics_Enum; C_Metric : Computed_Metrics) is
       begin
-         if Arg (Cmd, Metric) then
+         if Gen_Text (Cmd) and then Metrics_To_Compute (Metric) then
             Put (T,
                  Val_To_Print (Metric, M.all, XML => False),
                  Val_To_Print (C_Metric, M.all, XML => False));
@@ -3637,6 +3650,18 @@ package body METRICS.Actions is
          Print_Computed_Metric
            ("\n \1 type declarations in \2 units\n",
             All_Types, Computed_All_Types);
+
+         --  For Complexity_Average, the actual metric value is in
+         --  Complexity_Cyclomatic, and Val_To_Print will compute the
+         --  average. We set XML to True, even though it's not XML to
+         --  avoid an annoying extra space.
+
+         if Gen_Text (Cmd)
+           and then Metrics_To_Compute (Complexity_Average)
+         then
+            Put ("\nAverage cyclomatic complexity: \1\n",
+                 Val_To_Print (Complexity_Cyclomatic, M.all, XML => True));
+         end if;
 
          if Arg (Cmd, Global_File_Name) /= null then
             if not Output_To_Standard_Output then

@@ -1,3 +1,5 @@
+--  with Interfaces; use Interfaces;
+
 with Libadalang; use Libadalang;
 with Libadalang.Lexer;    use Libadalang.Lexer;
 
