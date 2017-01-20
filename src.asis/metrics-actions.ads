@@ -28,6 +28,7 @@ private
    overriding procedure Tool_Help (Tool : Metrics_Tool);
 
    use Langkit_Support;
+   use type Slocs.Source_Location_Range;
    use METRICS.Command_Lines;
    use METRICS.Line_Counting;
 
@@ -236,9 +237,10 @@ private
             end case;
 
          when Ada_Package_Body =>
-            Statements_Sloc : Slocs.Source_Location_Range;
+            Statements_Sloc : Slocs.Source_Location_Range :=
+              Slocs.No_Source_Location_Range;
             --  For a package body with statements, this is their location.
-            --  Undefined if there are no statements.
+            --  No_Source_Location_Range if there are no statements.
 
          when others =>
             null;

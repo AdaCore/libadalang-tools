@@ -88,7 +88,9 @@ package body METRICS.Actions is
       --  label is at in the tree. Similarly for exit statements with names.
       Complexity_Average    => True,
       Loop_Nesting          => True,
-      Extra_Exit_Points     => False, ----------------
+      Extra_Exit_Points     => True, -- partial (needs semantic info)
+      --  We need to know which exception is denoted by the name in a raise
+      --  statement or in an exception handler.
 
       Tagged_Coupling_Out    => True,
       Hierarchy_Coupling_Out => False, ----------------
@@ -964,12 +966,19 @@ package body METRICS.Actions is
          when Contract | Post | Contract_Complete =>
             return M.Visible;
 
-         when Complexity_Metrics =>
-            if Metric = Complexity_Average then
-               return XML and Depth = 1;
-            else
-               return M.Has_Complexity_Metrics;
-            end if;
+         when Complexity_Statement |
+           Complexity_Expression |
+           Complexity_Cyclomatic |
+           Complexity_Essential |
+           Loop_Nesting =>
+            return M.Has_Complexity_Metrics;
+         when Complexity_Average =>
+            return XML and Depth = 1;
+         when Extra_Exit_Points =>
+            return M.Kind in Ada_Subp_Body | Ada_Task_Body | Ada_Entry_Body
+                or else
+              (M.Kind = Ada_Package_Body
+               and then M.Statements_Sloc /= Slocs.No_Source_Location_Range);
 
          when Coupling_Metrics =>
             pragma Assert (Depth <= 3);
@@ -1756,6 +1765,9 @@ package body METRICS.Actions is
       procedure Gather_Essential_Complexity
         (Node : Ada_Node; M : in out Metrix);
 
+      procedure Gather_Extra_Exit_Points
+        (Node : Ada_Node; M : in out Metrix);
+
       procedure Gather_Contract_Metrics (Node : Ada_Node);
       --  Compute contract metrics, except for Contract_Complexity, which is
       --  handled by Cyclomate.
@@ -2091,6 +2103,29 @@ package body METRICS.Actions is
             end;
          end if;
       end Gather_Essential_Complexity;
+
+      procedure Gather_Extra_Exit_Points
+        (Node : Ada_Node; M : in out Metrix) is
+      begin
+         --  Don't compute this metric within exception handlers.
+
+         if Exception_Handler_Count > 0 then
+            return;
+         end if;
+
+         case Kind (Node) is
+            when Ada_Return_Stmt | Ada_Extended_Return_Stmt =>
+               Inc (M.Vals (Extra_Exit_Points));
+            when Ada_Raise_Stmt =>
+               --  gnatmetric does some additional analysis to determine
+               --  whether the exception will be handled locally. That's
+               --  impossible to get completely right, but in any case, we need
+               --  semantic information to do what gnatmetric does (which
+               --  exception is denoted by a raise and a handler).
+               Inc (M.Vals (Extra_Exit_Points));
+            when others => null;
+         end case;
+      end Gather_Extra_Exit_Points;
 
       procedure Gather_Line_Metrics (Node : Ada_Node; M : in out Metrix) is
          function Should_Gather_Body_Lines return Boolean;
@@ -2783,11 +2818,15 @@ package body METRICS.Actions is
                Loop_Count := 0;
                M.Visible := In_Visible_Part; -- must be after Push_New_Metrix
                Append (Parent.Submetrix, M);
+               Gather_Metrics_And_Walk_Children (Node);
                if M.Has_Complexity_Metrics then
                   Inc (File_M.Num_With_Complexity);
                   Inc (Global_M.Num_With_Complexity);
                end if;
-               Gather_Metrics_And_Walk_Children (Node);
+               if M.Knd = Function_Body_Knd then
+                  pragma Assert (M.Vals (Extra_Exit_Points) >= 1);
+                  Dec (M.Vals (Extra_Exit_Points));
+               end if;
                Validate (M.all);
                M.Node := null;
                Pop (Metrix_Stack);
@@ -2891,6 +2930,7 @@ package body METRICS.Actions is
          then
             Cyclomate (Node, M);
             Gather_Essential_Complexity (Node, M);
+            Gather_Extra_Exit_Points (Node, M);
          end if;
 
          for I in 1 .. Child_Count (Node) loop
