@@ -132,6 +132,7 @@ package METRICS.Command_Lines is
 
    --  Syntax element metrics options:
       Public_Types,
+      --  ????????Tagged_Types, -- undocumented, enabled by Public_Types
       Private_Types, -- undocumented, enabled by Public_Types
       All_Types,
       Public_Subprograms,

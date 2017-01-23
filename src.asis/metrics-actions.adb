@@ -32,10 +32,16 @@ package body METRICS.Actions is
    Output_To_Standard_Output : Boolean renames Debug_Flag_S;
 
    Implemented : constant Metrics_Set :=
-   --  Set of metrics that are implemented in lalmetric so far
+   --  Set of metrics that are implemented in lalmetric so far.
+   --    47 metrics total
+   --    33 fully implemented
+   --    11 partially implemented
+   --    3 not implemented
+
      (Contract            => True,
       Post                => True,
       Contract_Complete   => False, ---------------- (needs semantic info)
+      --  We need to know what each name in pre/etc denotes
       Contract_Complexity => True,
       --  The above 4 are new (not implemented in the old gnatmetric)
 
@@ -47,8 +53,8 @@ package body METRICS.Actions is
       Lines_Blank          => True,
       Lines_Average        => True,
       Lines_Spark          => True, -- partial (needs semantic info)
-      --  We don't inherit properly from spec to body, and we don't take
-      --  configuration files into account.
+      --  We don't inherit properly from spec to body or parent to child, and
+      --  we don't take configuration files into account.
       --  Lines_Spark is new (not implemented in the old gnatmetric).
       Lines_Code_In_Bodies => True,
       Num_Bodies           => True,
@@ -56,7 +62,7 @@ package body METRICS.Actions is
       Public_Types         => True,
       Private_Types        => True,
       All_Types            => True, -- partial (needs semantic info)
-      --  We need to know if a full type is completion of a private type
+      --  We need to know if a full type is the completion of a private type
       Public_Subprograms   => True, -- partial (needs semantic info)
       --  We need semantic information to distinguish specless bodies from
       --  specful bodies.
@@ -68,12 +74,12 @@ package body METRICS.Actions is
       Construct_Nesting    => True,
       Current_Construct_Nesting => True,
       Param_Number         => True, -- partial (needs semantic info)
-      In_Parameters        => True,
-      Out_Parameters       => True,
-      In_Out_Parameters    => True,
+      In_Parameters        => True, -- partial (needs semantic info)
+      Out_Parameters       => True, -- partial (needs semantic info)
+      In_Out_Parameters    => True, -- partial (needs semantic info)
       --  We need semantic information to distinguish specless bodies from
       --  specful bodies, for the above four. For a subprogram instantiation,
-      --  we also need to find then generic subprogram.
+      --  we also need to find the generic subprogram.
 
       Computed_Public_Types       => True,
       Computed_All_Types          => True,
@@ -93,13 +99,16 @@ package body METRICS.Actions is
       --  statement or in an exception handler.
 
       Tagged_Coupling_Out    => True,
-      Hierarchy_Coupling_Out => False, ----------------
+      Hierarchy_Coupling_Out => False, ---------------- (needs semantic info)
       Tagged_Coupling_In     => True,
-      Hierarchy_Coupling_In  => False, ----------------
+      Hierarchy_Coupling_In  => False, ---------------- (needs semantic info)
+      --  For hierarchy coupling, we need to know whether a package
+      --  instantiation contains tagged types, so we need to find the generic
+      --  package. We also need to find parent packages.
       Control_Coupling_Out   => True, -- partial (needs semantic info)
       Control_Coupling_In    => True, -- partial (needs semantic info)
       --  For control coupling, we need to know whether a package instantiation
-      --  contains any subprograms, so we need to find the generic package.
+      --  contains any subprograms.
       Unit_Coupling_Out      => True,
       Unit_Coupling_In       => True);
 
@@ -126,14 +135,11 @@ package body METRICS.Actions is
       end if;
    end Stop;
 
-   procedure knd (X : Ada_Node);
-   procedure pp (X : Ada_Node);
-   procedure ppp (X : Ada_Node);
-   procedure Put_Ada_Node_Array (X : Ada_Node_Array);
-   procedure Put_Child_Record (C : Child_Record);
-   procedure Put_Children_Array (A : Children_Array);
-   function Par (X : Ada_Node) return Ada_Node is (Parent (X));
    --  Debugging printouts
+   --  See also Libadalang.Debug.
+   pragma Warnings (Off);
+   pragma Style_Checks (Off);
+   function Par (X : Ada_Node) return Ada_Node is (Parent (X));
 
    procedure knd (X : Ada_Node) is
       use ASIS_UL.Dbg_Out;
@@ -191,6 +197,8 @@ package body METRICS.Actions is
          Put_Child_Record (A (I));
       end loop;
    end Put_Children_Array;
+   pragma Style_Checks (On);
+   pragma Warnings (On);
 
    pragma Warnings (Off); -- ???
    use Common_Flag_Switches, Common_String_Switches,
@@ -251,12 +259,6 @@ package body METRICS.Actions is
 
    procedure Destroy (M : in out Metrix_Ref);
    --  Reclaim memory for a tree of Metrix records
-
-   procedure Walk
-     (Tool : in out Metrics_Tool'Class;
-      File_Name : String;
-      CU_List : Ada_Node;
-      Cumulative : Cumulative_Counts_Array);
 
    use Ada_Node_Vectors;
 
@@ -1644,18 +1646,741 @@ package body METRICS.Actions is
       Free (M);
    end Destroy;
 
-   procedure Walk
-     (Tool : in out Metrics_Tool'Class;
-      File_Name : String;
-      CU_List : Ada_Node;
-      Cumulative : Cumulative_Counts_Array)
+   ----------------------
+   -- Write_XML_Schema --
+   ----------------------
+
+   procedure Write_XML_Schema (Xsd_File_Name : String) is
+      XSD_Out_File : Text_IO.File_Type;
+   begin
+      if not Output_To_Standard_Output then
+         Text_IO.Create (XSD_Out_File, Name => Xsd_File_Name);
+         Text_IO.Set_Output (XSD_Out_File);
+      end if;
+
+      pragma Style_Checks ("M200"); -- Allow long lines
+      Put ("<?xml version=""1.0"" encoding=""UTF-8""?>\n");
+      Put ("<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"">\n");
+      Put ("        <xs:element name=""global"">\n");
+      Put ("                <xs:complexType>\n");
+      Put ("                        <xs:sequence>\n");
+      Put ("                                <xs:element ref=""file"" minOccurs=""0"" maxOccurs=""unbounded""/>\n");
+      Put ("                                <xs:element ref=""metric"" minOccurs=""0"" maxOccurs=""unbounded""/>\n");
+      Put ("                                <xs:element ref=""coupling"" minOccurs=""0"" maxOccurs=""1""/>\n");
+      Put ("                        </xs:sequence>\n");
+      Put ("                </xs:complexType>\n");
+      Put ("        </xs:element>\n");
+      Put ("        <xs:element name=""file"">\n");
+      Put ("                <xs:complexType>\n");
+      Put ("                        <xs:sequence>\n");
+      Put ("                                <xs:element ref=""metric"" minOccurs=""0"" maxOccurs=""unbounded""/>\n");
+      Put ("                                <xs:element ref=""unit"" minOccurs=""0"" maxOccurs=""unbounded""/>\n");
+      Put ("                        </xs:sequence>\n");
+      Put ("                        <xs:attribute name=""name"" use=""required"" type=""xs:string""/>\n");
+      Put ("                </xs:complexType>\n");
+      Put ("        </xs:element>\n");
+      Put ("        <xs:element name=""unit"">\n");
+      Put ("                <xs:complexType>\n");
+      Put ("                        <xs:sequence>\n");
+      Put ("                                <xs:element ref=""metric"" minOccurs=""0"" maxOccurs=""unbounded""/>\n");
+      Put ("                                <xs:element ref=""unit"" minOccurs=""0"" maxOccurs=""unbounded""/>\n");
+      Put ("                        </xs:sequence>\n");
+      Put ("                        <xs:attribute name=""name"" use=""required"" type=""xs:string""/>\n");
+      Put ("                        <xs:attribute name=""line"" use=""required"" type=""xs:decimal""/>\n");
+      Put ("                        <xs:attribute name=""kind"" type=""xs:string""/>\n");
+      Put ("                        <xs:attribute name=""col"" use=""required"" type=""xs:byte""/>\n");
+      Put ("                </xs:complexType>\n");
+      Put ("        </xs:element>\n");
+      Put ("        <xs:element name=""metric"">\n");
+      Put ("                <xs:complexType>\n");
+      Put ("                        <xs:simpleContent>\n");
+      Put ("                                <xs:extension base=""xs:decimal"">\n");
+      Put ("                                        <xs:attribute name=""name"" use=""required"" type=""xs:string""/>\n");
+      Put ("                                </xs:extension>\n");
+      Put ("                        </xs:simpleContent>\n");
+      Put ("                </xs:complexType>\n");
+      Put ("        </xs:element>\n");
+      Put ("        <xs:element name=""coupling"">\n");
+      Put ("                <xs:complexType>\n");
+      Put ("                        <xs:sequence>\n");
+      Put ("                                <xs:element ref=""file"" minOccurs=""0"" maxOccurs=""unbounded""/>\n");
+      Put ("                        </xs:sequence>\n");
+      Put ("                </xs:complexType>\n");
+      Put ("        </xs:element>\n");
+      Put ("</xs:schema>\n");
+      pragma Style_Checks ("M79");
+
+      if not Output_To_Standard_Output then
+         Text_IO.Set_Output (Text_IO.Standard_Output);
+         Text_IO.Close (XSD_Out_File);
+      end if;
+   end Write_XML_Schema;
+
+   ----------
+   -- Init --
+   ----------
+
+   procedure Init (Tool : in out Metrics_Tool; Cmd : Command_Line) is
+
+      function To_Compute return Metrics_Set;
+      --  Computes which metrics we should compute
+
+      function To_Compute return Metrics_Set is
+      begin
+         return Result : Metrics_Set do
+            --  Set Result components True for all metrics requested on the
+            --  command line:
+
+            for Metric in Metrics_Enum loop
+               Result (Metric) := Arg (Cmd, Metric);
+            end loop;
+
+            if Arg (Cmd, Contract_All) then
+               Result (Contract_Metrics) := (others => True);
+            end if;
+            if Arg (Cmd, Complexity_All) then
+               Result (Complexity_Metrics) := (others => True);
+            end if;
+            if Arg (Cmd, Lines_All) then
+               Result (Lines_Metrics) := (others => True);
+            end if;
+            if Arg (Cmd, Syntax_All) then
+               Result (Syntax_Metrics) := (others => True);
+            end if;
+            if Arg (Cmd, Coupling_All) then
+               Result (Coupling_Metrics) := (others => True);
+            end if;
+
+            --  Special cases
+
+            if Arg (Cmd, Complexity_Cyclomatic) then
+               Result (Complexity_Statement) := True;
+               Result (Complexity_Expression) := True;
+            end if;
+
+            if Arg (Cmd, Public_Types) then
+               Result (Private_Types) := True;
+            end if;
+
+            if Arg (Cmd, Statements) and then Arg (Cmd, Declarations) then
+               Result (Logical_Source_Lines) := True;
+            end if;
+
+            if Arg (Cmd, Param_Number) then
+               Result (In_Parameters) := True;
+               Result (Out_Parameters) := True;
+               Result (In_Out_Parameters) := True;
+            end if;
+
+            --  If no metrics were requested on the command line, we compute
+            --  all metrics except coupling and "computed" metrics. Also, at
+            --  least for now, disable contract metrics and Lines_Spark,
+            --  because those don't exist in lalmetric and we're trying to
+            --  be compatible.
+
+            if Result = (Metrics_Enum => False) then
+               Result :=
+                 (Coupling_Metrics | Computed_Metrics |
+                    Contract_Metrics | Lines_Spark => False,
+                  others => True);
+            end if;
+         end return;
+      end To_Compute;
+
+      Metrics_To_Compute : Metrics_Set renames Tool.Metrics_To_Compute;
+
+      Ignored : constant Metrix_Ref := Push_New_Metrix (Tool, Node => null);
+
+   --  Start of processing for Init
+
+   begin
+      Tool.Treat_Exit_As_Goto := not Arg (Cmd, No_Treat_Exit_As_Goto);
+
+      --  Decide what metrics to compute. Initialize the Metrix_Stack
+      --  by pushing the outermost Metrix, which is for totals for all
+      --  the files together. If XML requested, create the XML file
+      --  and put the first lines.
+
+      Metrics_To_Compute := To_Compute;
+   end Init;
+
+   -----------
+   -- Final --
+   -----------
+
+   procedure Compute_Indirect_Dependencies (Global_M : Metrix) with
+     Pre => Global_M.Kind = Null_Kind;
+   --  Depends_On contains direct dependencies. This computes the indirect
+   --  dependencies for all compilation units by walking the dependency graph.
+
+   procedure Compute_Coupling
+     (Tool : in out Metrics_Tool; Global_M : Metrix);
+   --  This uses the dependency information to compute the coupling metrics.
+
+   function Get_Spec (M : Metrix_Ref) return Metrix_Ref with
+     Pre => M.Kind = Ada_Compilation_Unit;
+   --  If M is a spec, return M. If it's a library unit body, return the
+   --  corresponding spec. If it's a subunit, return the spec of the innermost
+   --  enclosing library unit. If the spec is not present, return M.
+
+   procedure Print_Coupling
+     (Cmd : Command_Line;
+      Metrics_To_Compute : Metrics_Set);
+   procedure XML_Print_Coupling
+     (Cmd : Command_Line;
+      Metrics_To_Compute : Metrics_Set);
+   --  Print the metrics computed by Compute_Coupling
+
+   Units_For_Coupling : Metrix_Vectors.Vector;
+   --  Compilation units for which coupling metrics will be printed
+
+   procedure Compute_Indirect_Dependencies (Global_M : Metrix) is
+
+      procedure Remove_Nonexistent_Units (M : Metrix_Ref);
+      --  Removes units from M.Depends_On if those units are not being
+      --  processed by this run of the tool. So "with X;" is ignored if x.ads
+      --  is not being processed. We can't do this in the first place, because
+      --  we need to wait until all the Metrix exist.
+
+      procedure Visit
+        (M : Metrix_Ref; Depends_On : in out CU_Symbol_Sets.Set);
+      --  Visit one node in the dependency graph of compilation units.
+      --  Recursively calls Visit to visit compilation units that M depends
+      --  upon. Depends_On is that of the caller (some unit that depends on M);
+      --  this unions-in M and everything M depends upon directly or
+      --  indirectly.
+
+      procedure Remove_Nonexistent_Units (M : Metrix_Ref) is
+         Nonexistent_Units : CU_Symbol_Sets.Set;
+      begin
+         if M = null then
+            return;
+         end if;
+
+         --  Remove nonexistent units:
+
+         for Sym of M.Depends_On loop
+            if Get_Symbol_Index (Sym) > Last_Index (Specs)
+              or else Specs (Get_Symbol_Index (Sym)) = null
+            then
+               Insert (Nonexistent_Units, Sym);
+            end if;
+         end loop;
+
+         Difference (M.Depends_On, Nonexistent_Units);
+      end Remove_Nonexistent_Units;
+
+      procedure Visit
+        (M : Metrix_Ref; Depends_On : in out CU_Symbol_Sets.Set) is
+      begin
+         --  The "limited with" clauses aare not included in
+         --  Depends_On. Therefore, there cannot be cycles in the
+         --  graph.
+
+         if not M.Indirect_Dependences_Computed then
+            M.Indirect_Dependences_Computed := True;
+            if M.Is_Spec then
+               Append (Units_For_Coupling, M);
+            end if;
+
+            for Sym of Copy (M.Depends_On) loop
+               --  Copy is necessary, because we are passing M.Depends_On to
+               --  the recursive Visit, which is going to modify it, so we
+               --  can't be iterating over it directly.
+
+               Visit (Specs (Get_Symbol_Index (Sym)), M.Depends_On);
+            end loop;
+         end if;
+
+         Include (Depends_On, M.CU_Name);
+         Union (Depends_On, M.Depends_On);
+      end Visit;
+
+      Ignored : CU_Symbol_Sets.Set;
+
+   --  Start of processing for Compute_Indirect_Dependencies
+
+   begin
+      --  First remove nonexistent units from the Depends_On sets, because
+      --  we're not supposed to count those in the coupling metrics.
+
+      for File_M of Global_M.Submetrix loop
+         Remove_Nonexistent_Units (File_M);
+      end loop;
+
+      --  Then compute indirect dependences
+
+      for File_M of Global_M.Submetrix loop
+         Visit (File_M, Ignored);
+      end loop;
+
+      --  A compilation unit can depend on itself at this point. For example,
+      --  if body-A says "with B;", and spec-B says "with A;", A will end up
+      --  depending on itself, which we don't want. So we remove such
+      --  self-referential dependences at this point, if present.
+
+      for File_M of Global_M.Submetrix loop
+         Exclude (File_M.Depends_On, File_M.CU_Name);
+      end loop;
+   end Compute_Indirect_Dependencies;
+
+   function Get_Spec (M : Metrix_Ref) return Metrix_Ref is
+   begin
+      if M.Is_Spec then
+         return M;
+      elsif M.Subunit_Parent = Empty_CU_Sym then
+         declare
+            Spec : constant Metrix_Ref := Specs (Get_Symbol_Index (M.CU_Name));
+         begin
+            return (if Spec = null then M else Spec);
+         end;
+      else
+         declare
+            Parent_Body : Metrix_Ref :=
+              Bodies (Get_Symbol_Index (M.Subunit_Parent));
+         begin
+            --  The parent could be a body acting as spec, in which case it's
+            --  in Specs, not Bodies.
+
+            if Parent_Body = null then
+               Parent_Body := Specs (Get_Symbol_Index (M.Subunit_Parent));
+            end if;
+
+            return (if Parent_Body = null then M else Get_Spec (Parent_Body));
+            --  This recursion will climb up a chain of nested subunits until
+            --  it reaches a library unit, and then we'll get the spec of that
+            --  library unit.
+         end;
+      end if;
+   end Get_Spec;
+
+   procedure Compute_Coupling
+     (Tool : in out Metrics_Tool; Global_M : Metrix)
    is
+
+      procedure Do_Edge (Metric : Coupling_Metrics; From, To : Metrix_Ref);
+      --  Process one edge in the dependency graph for the given Metric.
+      --  If the Metric is Coupling_Out, then From depends on To.
+      --  If the Metric is Coupling_In, then To depends on From.
+      --  Thus, the metric is always recorded in the Outer_Unit of From.
+
+      procedure Do_Edge (Metric : Coupling_Metrics; From, To : Metrix_Ref) is
+         Outer_Unit : Metrix renames Element (From.Submetrix, 1).all;
+         --  Outer_Unit is the outermost package spec, procedure spec, etc.
+      begin
+         case Metric is
+            when Tagged_Coupling_Out | Tagged_Coupling_In =>
+               if From.Has_Tagged_Type and To.Has_Tagged_Type then
+                  Inc (Outer_Unit.Vals (Metric));
+               end if;
+            when Hierarchy_Coupling_Out | Hierarchy_Coupling_In =>
+               if False and -- ???
+                 From.Has_Tagged_Type and To.Has_Tagged_Type
+               then
+                  Inc (Outer_Unit.Vals (Metric));
+               end if;
+            when Control_Coupling_Out | Control_Coupling_In =>
+               if From.Has_Tagged_Type and To.Has_Tagged_Type then
+                  Inc (Outer_Unit.Vals (Metric));
+               end if;
+            when Unit_Coupling_Out | Unit_Coupling_In =>
+               Inc (Outer_Unit.Vals (Metric));
+         end case;
+      end Do_Edge;
+
+   --  Start of processing for Compute_Coupling
+
+   begin
+      --  Union the Depends_On set for each body (including subunits) into that
+      --  of the corresponding spec. We can't put it there in the first place
+      --  (during Compute_Indirect_Dependencies), because that would compute
+      --  too-high numbers. For example, if A-body with's B, we want to count
+      --  that in the metrics for A, but not in the metrics of things that
+      --  depend on A.
+
+      for B of Bodies loop
+         if B /= null then
+            declare
+               pragma Assert (B.Indirect_Dependences_Computed);
+               S : constant Metrix_Ref := Get_Spec (B);
+               pragma Assert (S.Indirect_Dependences_Computed);
+               --  S is the compilation unit node for the spec; dependences of
+               --  bodies (including subunits) should be counted on the spec.
+            begin
+               if S /= B then
+                  Union (S.Depends_On, B.Depends_On);
+                  Union (S.Limited_Depends_On, B.Limited_Depends_On);
+               end if;
+            end;
+         end if;
+      end loop;
+
+      Dump (Tool, Global_M, "After bodies:");
+
+      --  Compute metrics for the specs
+
+      for S of Specs loop
+         if S /= null then
+            pragma Assert (S.Indirect_Dependences_Computed);
+
+            for Sym of Union (S.Depends_On, S.Limited_Depends_On) loop
+               declare
+                  Dep : constant Metrix_Ref := Specs (Get_Symbol_Index (Sym));
+               begin
+                  if Dep /= null then
+                     --  ???It shouldn't be null, because we removed
+                     --  nonexistent units. But Set_CU_Metrix doesn't work
+                     --  right for subprogram bodies yet.
+
+                     --  Compute *_Coupling_Out From this unit To what it
+                     --  depends on:
+
+                     Do_Edge (Tagged_Coupling_Out, S, Dep);
+                     Do_Edge (Hierarchy_Coupling_Out, S, Dep);
+                     Do_Edge (Control_Coupling_Out, S, Dep);
+                     Do_Edge (Unit_Coupling_Out, S, Dep);
+
+                     --  Compute *_Coupling_In To this unit From what it
+                     --  depends on (noting that To and From are reversed from
+                     --  the above):
+
+                     Do_Edge (Tagged_Coupling_In, Dep, S);
+                     Do_Edge (Hierarchy_Coupling_In, Dep, S);
+                     Do_Edge (Control_Coupling_In, Dep, S);
+                     Do_Edge (Unit_Coupling_In, Dep, S);
+                  end if;
+               end;
+            end loop;
+         end if;
+      end loop;
+
+      --  Sort the compilation units by name, so they will get printed in
+      --  alphabetical order, rather than some order caused by the graph walk.
+
+      declare
+         function Lt (X, Y : Metrix_Ref) return Boolean;
+         pragma Inline (Lt);
+
+         package Sorting is new Metrix_Vectors.Generic_Sorting (Lt);
+
+         function Lt (X, Y : Metrix_Ref) return Boolean is
+            U1 : constant String := Str (X.CU_Name).S;
+            U2 : constant String := Str (Y.CU_Name).S;
+         begin
+            return U1 < U2;
+         end Lt;
+      begin
+         Sorting.Sort (Units_For_Coupling);
+      end;
+   end Compute_Coupling;
+
+   procedure Print_Coupling
+     (Cmd : Command_Line;
+      Metrics_To_Compute : Metrics_Set)
+   is
+   begin
+      if Metrics_To_Compute = Empty_Metrics_Set then
+         return;
+      end if;
+
+      Put ("\nCoupling metrics:\n");
+      Put ("=================\n");
+      Indent;
+
+      for File_M of Units_For_Coupling loop
+         declare
+            Outer_Unit : Metrix renames Element (File_M.Submetrix, 1).all;
+         begin
+            if Should_Print_Any
+              (Coupling_Metrics'First, Coupling_Metrics'Last,
+               Metrics_To_Compute, Outer_Unit, Depth => 3, XML => False)
+            then
+               Print_Metrix
+                 (Cmd,
+                  File_M.Source_File_Name.all,
+                  Metrics_To_Compute,
+                  File_M.all,
+                  Depth => 2);
+            end if;
+         end;
+      end loop;
+
+      Outdent;
+   end Print_Coupling;
+
+   procedure XML_Print_Coupling
+     (Cmd : Command_Line;
+      Metrics_To_Compute : Metrics_Set)
+   is
+   begin
+      if Metrics_To_Compute = Empty_Metrics_Set then
+         return;
+      end if;
+
+      Indent;
+      Put ("<coupling>\n");
+
+      for File_M of Units_For_Coupling loop
+         declare
+            Outer_Unit : Metrix renames Element (File_M.Submetrix, 1).all;
+         begin
+            if Should_Print_Any
+              (Coupling_Metrics'First, Coupling_Metrics'Last,
+               Metrics_To_Compute, Outer_Unit, Depth => 3, XML => True)
+            then
+               XML_Print_Metrix
+                 (Cmd,
+                  File_M.Source_File_Name.all,
+                  Metrics_To_Compute,
+                  File_M.all,
+                  Depth => 2);
+            end if;
+         end;
+      end loop;
+
+      Put ("</coupling>\n");
+      Outdent;
+   end XML_Print_Coupling;
+
+   procedure Final (Tool : in out Metrics_Tool; Cmd : Command_Line) is
+      Metrics_To_Compute : Metrics_Set renames Tool.Metrics_To_Compute;
+      Without_Coupling : constant Metrics_Set :=
+        Metrics_To_Compute and not Coupling_Only;
+      With_Coupling : constant Metrics_Set :=
+        Metrics_To_Compute and Coupling_Only;
+      Metrix_Stack : Metrix_Vectors.Vector renames Tool.Metrix_Stack;
+      Summed : constant String :=
+        "summed over " & Image (Num_File_Names (Cmd)) & " units";
+      pragma Assert (Length (Metrix_Stack) = 1);
+      Global_M : Metrix_Ref := Element (Metrix_Stack, 1);
+
+      Global : Text_IO.File_Type;
+      --  File for global information in text form, if --global-file-name
+      --  switch was given. By default, this information is sent to standard
+      --  output.
+
+      Xml_F_Name : constant String :=
+        (if Arg (Cmd, Xml_File_Name) /= null
+           then Arg (Cmd, Xml_File_Name).all
+           else
+             (if Arg (Cmd, Xml_File_Name) = null
+                then "metrix.xml"
+                else Arg (Cmd, Xml_File_Name).all));
+      --  Gnatmetric ignores Output_Dir for the xml.
+
+      XML_File : Text_IO.File_Type;
+      --  All XML output for all source files goes to this file.
+
+      function Xsd_File_Name return String;
+      --  Return the name of the XSD (schema) file name, which is based
+      --  on the XML file name. In particular if the XML file name
+      --  ends in ".xml", that is replaced by ".xsd"; otherwise,
+      --  ".xsd" is appended. So "foo.xml" --> "foo.xsd", but
+      --  "foo.bar" --> "foo.bar.xsd".
+      --
+      --  Note that this name is written to the XML file, in addition
+      --  to being used to open the XSD file.
+
+      function Xsd_File_Name return String is
+         Norm : constant String  := Normalize_Pathname (Xml_F_Name);
+         Xml : constant String := ".xml";
+         Xsd : constant String := ".xsd";
+      begin
+         if Has_Suffix (Norm, Suffix => Xml) then
+            return Replace_String (Norm, Xml, Xsd);
+         else
+            return Norm & Xsd;
+         end if;
+      end Xsd_File_Name;
+
+      procedure Print_Computed_Metric
+        (T : Template; Metric : Metrics_Enum; C_Metric : Computed_Metrics);
+      procedure Print_Computed_Metric
+        (T : Template; Metric : Metrics_Enum; C_Metric : Computed_Metrics) is
+      begin
+         if Gen_Text (Cmd) and then Metrics_To_Compute (Metric) then
+            Put (T,
+                 Val_To_Print (Metric, Global_M.all, XML => False),
+                 Val_To_Print (C_Metric, Global_M.all, XML => False));
+
+            if Metric = Public_Types then
+               Put (" including\n");
+               Put ("    \1 private types\n",
+                    Val_To_Print (Private_Types, Global_M.all, XML => False));
+            end if;
+         end if;
+      end Print_Computed_Metric;
+
+   --  Start of processing for Final
+
+   begin
+      pragma Assert (Global_M.Vals (Complexity_Cyclomatic) =
+                       Global_M.Vals (Complexity_Statement) +
+                       Global_M.Vals (Complexity_Expression));
+
+      --  We're done with Metrix_Stack at this point. Printing uses the tree
+      --  formed by Submetrix.
+
+      Global_M.Node := null;
+      Pop (Metrix_Stack);
+      Clear (Metrix_Stack);
+
+      Dump (Tool, Global_M.all, "Initial:");
+      Compute_Indirect_Dependencies (Global_M.all);
+      Dump (Tool, Global_M.all, "After Compute_Indirect_Dependencies");
+      Compute_Coupling (Tool, Global_M.all);
+
+      if Gen_XML (Cmd) then
+
+         --  Generate schema (XSD file), if requested
+
+         if Arg (Cmd, Generate_XML_Schema) then
+            Write_XML_Schema (Xsd_File_Name);
+         end if;
+
+         --  Put initial lines of XML
+
+         if not Output_To_Standard_Output then
+            Text_IO.Create (XML_File, Name => Xml_F_Name);
+            Text_IO.Set_Output (XML_File);
+         end if;
+         Put ("<?xml version=\1?>\n", Q ("1.0"));
+
+         if Arg (Cmd, Generate_XML_Schema) then
+            Put ("<global xmlns:xsi=" &
+                 """http://www.w3.org/2001/XMLSchema-instance"" " &
+                 "xsi:noNamespaceSchemaLocation=""\1"">\n",
+                 Xsd_File_Name);
+         else
+            Put ("<global>\n");
+         end if;
+      end if;
+
+      --  Print the metrics for each file in text and XML form
+
+      for File_M of Global_M.Submetrix loop
+         pragma Assert (Debug_Flag_V or else Indentation = 0);
+         Print_File_Metrics
+           (Cmd, XML_File, File_M.all, Without_Coupling);
+         pragma Assert (Debug_Flag_V or else Indentation = 0);
+--         Destroy (File_M);
+      end loop;
+
+      --  Print the totals in text form. These go to standard output, unless
+      --  --global-file-name was specified. Note that Output_Dir is ignored by
+      --  gnatmetric for this output.
+
+      if Gen_Text (Cmd) then
+         if Arg (Cmd, Global_File_Name) /= null then
+            if not Output_To_Standard_Output then
+               Text_IO.Create
+                 (Global, Name => Arg (Cmd, Global_File_Name).all);
+               Text_IO.Set_Output (Global);
+            end if;
+         end if;
+
+         Print_Range
+           ("Line metrics " & Summed,
+            Metrics_To_Compute,
+            Lines_Metrics'First, Lines_Metrics'Last, Global_M.all,
+            Depth => 1);
+         Print_Range
+           ("Contract metrics " & Summed,
+            Metrics_To_Compute,
+            Contract_Metrics'First, Contract_Metrics'Last, Global_M.all,
+            Depth => 1);
+         Print_Range
+           ("Element metrics " & Summed,
+            Metrics_To_Compute,
+            Syntax_Metrics'First, Syntax_Metrics'Last, Global_M.all,
+            Depth => 1);
+
+         Print_Computed_Metric
+           ("\n \1 public types in \2 units\n",
+            Public_Types, Computed_Public_Types);
+         Print_Computed_Metric
+           ("\n \1 public subprograms in \2 units\n",
+            Public_Subprograms, Computed_Public_Subprograms);
+         Print_Computed_Metric
+           ("\n \1 subprogram bodies in \2 units\n",
+            All_Subprograms, Computed_All_Subprograms);
+         Print_Computed_Metric
+           ("\n \1 type declarations in \2 units\n",
+            All_Types, Computed_All_Types);
+
+         --  For Complexity_Average, the actual metric value is in
+         --  Complexity_Cyclomatic, and Val_To_Print will compute the
+         --  average. We set XML to True, even though it's not XML to
+         --  avoid an annoying extra space.
+
+         if Gen_Text (Cmd)
+           and then Metrics_To_Compute (Complexity_Average)
+         then
+            Put ("\nAverage cyclomatic complexity: \1\n",
+                 Val_To_Print (Complexity_Cyclomatic,
+                               Global_M.all, XML => True));
+         end if;
+
+         if Arg (Cmd, Global_File_Name) /= null then
+            if not Output_To_Standard_Output then
+               Text_IO.Set_Output (Text_IO.Standard_Output);
+               Text_IO.Close (Global);
+            end if;
+         end if;
+      end if;
+
+      --  Print the totals in XML form
+
+      if Gen_Text (Cmd) then
+         Print_Coupling (Cmd, With_Coupling);
+      end if;
+
+      if Gen_XML (Cmd) then
+         if not Output_To_Standard_Output then
+            Text_IO.Set_Output (XML_File);
+         end if;
+         XML_Print_Metrix_Vals
+           (Metrics_To_Compute, Global_M.Vals'First, Global_M.Vals'Last,
+            Global_M.all, Depth => 1);
+         XML_Print_Coupling (Cmd, With_Coupling);
+         Put ("</global>\n");
+         if not Output_To_Standard_Output then
+            Text_IO.Set_Output (Text_IO.Standard_Output);
+            Text_IO.Close (XML_File);
+         end if;
+      end if;
+
+      for Metric in Metrics_Enum loop
+         if Metric_Found (Metric) and then not Implemented (Metric) then
+            Put ("Metric is implemented: \1\n", Capitalize (Metric'Img));
+         end if;
+      end loop;
+
+      Destroy (Global_M);
+   end Final;
+
+   ---------------------
+   -- Per_File_Action --
+   ---------------------
+
+   procedure Per_File_Action
+     (Tool : in out Metrics_Tool;
+      Cmd : Command_Line;
+      File_Name : String;
+      Input : String;
+      BOM_Seen : Boolean;
+      Unit : Analysis_Unit)
+   is
+      pragma Unreferenced (Cmd, Input, BOM_Seen);
+      CU_List : constant Ada_Node := Root (Unit);
       pragma Assert (CU_List /= null);
 --      pragma Assert (Kind (CU_List) = List_Kind);
 --    pragma Assert (Child_Count (CU_List) = 1);
       --  libadalang supports multiple compilation units per file,
       --  but gnatmetric does not, and lalmetric does not yet.
 
+      Cumulative : constant Cumulative_Counts_Array :=
+        Get_Cumulative_Counts (Unit);
       Metrix_Stack : Metrix_Vectors.Vector renames Tool.Metrix_Stack;
 
       procedure Inc_All (Metric : Metrics_Enum; By : Metric_Nat := 1);
@@ -2311,8 +3036,8 @@ package body METRICS.Actions is
 
          ON : Boolean;
          Range_Count : Metric_Nat;
-         File_M : Metrix renames Element (Metrix_Stack, 2).all;
          Global_M : Metrix renames Element (Metrix_Stack, 1).all;
+         File_M : Metrix renames Element (Metrix_Stack, 2).all;
          Section : Ada_Node;
 
          Spark_Mode : constant W_Str := "spark_mode";
@@ -2977,782 +3702,11 @@ package body METRICS.Actions is
 
       pragma Assert (Length (Metrix_Stack) = 1);
       Global_M : Metrix renames Element (Metrix_Stack, 1).all;
-      M : constant Metrix_Ref :=
+      File_M : constant Metrix_Ref :=
         Push_New_Metrix
           (Tool, CU_Node, Source_File_Name => new String'(File_Name));
 
-   --  Start of processing for Walk
-
-   begin
-      if Debug_Flag_V then
-         Put ("-->Walk: \1\n", Short_Image (CU_Node));
-         Indent;
-      end if;
-
-      Append (Node_Stack, CU_Node); -- push
-      Append (Global_M.Submetrix, M);
-
-      Gather_Metrics_And_Walk_Children (CU_Node);
-
-      --  Gather "Computed_" metrics.
-
-      if M.Vals (Public_Types) /= 0 then
-         Inc (Global_M.Vals (Computed_Public_Types));
-      end if;
-
-      if M.Vals (All_Types) /= 0 then
-         Inc (Global_M.Vals (Computed_All_Types));
-      end if;
-
-      if M.Vals (Public_Subprograms) /= 0 then
-         Inc (Global_M.Vals (Computed_Public_Subprograms));
-      end if;
-
-      if M.Vals (All_Subprograms) /= 0 then
-         Inc (Global_M.Vals (Computed_All_Subprograms));
-      end if;
-
-      M.Node := null;
-      Pop (Metrix_Stack);
-      Pop (Node_Stack);
-      pragma Assert (Length (Metrix_Stack) = 1);
-      pragma Assert (Length (Node_Stack) = 0);
-      pragma Assert (M.Vals (Complexity_Cyclomatic) =
-                       M.Vals (Complexity_Statement) +
-                       M.Vals (Complexity_Expression));
-
-      if Debug_Flag_V then
-         Outdent;
-         Put ("<--Walk: \1\n", Short_Image (CU_Node));
-      end if;
-
-      Destroy (Node_Stack);
-   end Walk;
-
-   ----------------------
-   -- Write_XML_Schema --
-   ----------------------
-
-   procedure Write_XML_Schema (Xsd_File_Name : String) is
-      XSD_Out_File : Text_IO.File_Type;
-   begin
-      if not Output_To_Standard_Output then
-         Text_IO.Create (XSD_Out_File, Name => Xsd_File_Name);
-         Text_IO.Set_Output (XSD_Out_File);
-      end if;
-
-      pragma Style_Checks ("M200"); -- Allow long lines
-      Put ("<?xml version=""1.0"" encoding=""UTF-8""?>\n");
-      Put ("<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"">\n");
-      Put ("        <xs:element name=""global"">\n");
-      Put ("                <xs:complexType>\n");
-      Put ("                        <xs:sequence>\n");
-      Put ("                                <xs:element ref=""file"" minOccurs=""0"" maxOccurs=""unbounded""/>\n");
-      Put ("                                <xs:element ref=""metric"" minOccurs=""0"" maxOccurs=""unbounded""/>\n");
-      Put ("                                <xs:element ref=""coupling"" minOccurs=""0"" maxOccurs=""1""/>\n");
-      Put ("                        </xs:sequence>\n");
-      Put ("                </xs:complexType>\n");
-      Put ("        </xs:element>\n");
-      Put ("        <xs:element name=""file"">\n");
-      Put ("                <xs:complexType>\n");
-      Put ("                        <xs:sequence>\n");
-      Put ("                                <xs:element ref=""metric"" minOccurs=""0"" maxOccurs=""unbounded""/>\n");
-      Put ("                                <xs:element ref=""unit"" minOccurs=""0"" maxOccurs=""unbounded""/>\n");
-      Put ("                        </xs:sequence>\n");
-      Put ("                        <xs:attribute name=""name"" use=""required"" type=""xs:string""/>\n");
-      Put ("                </xs:complexType>\n");
-      Put ("        </xs:element>\n");
-      Put ("        <xs:element name=""unit"">\n");
-      Put ("                <xs:complexType>\n");
-      Put ("                        <xs:sequence>\n");
-      Put ("                                <xs:element ref=""metric"" minOccurs=""0"" maxOccurs=""unbounded""/>\n");
-      Put ("                                <xs:element ref=""unit"" minOccurs=""0"" maxOccurs=""unbounded""/>\n");
-      Put ("                        </xs:sequence>\n");
-      Put ("                        <xs:attribute name=""name"" use=""required"" type=""xs:string""/>\n");
-      Put ("                        <xs:attribute name=""line"" use=""required"" type=""xs:decimal""/>\n");
-      Put ("                        <xs:attribute name=""kind"" type=""xs:string""/>\n");
-      Put ("                        <xs:attribute name=""col"" use=""required"" type=""xs:byte""/>\n");
-      Put ("                </xs:complexType>\n");
-      Put ("        </xs:element>\n");
-      Put ("        <xs:element name=""metric"">\n");
-      Put ("                <xs:complexType>\n");
-      Put ("                        <xs:simpleContent>\n");
-      Put ("                                <xs:extension base=""xs:decimal"">\n");
-      Put ("                                        <xs:attribute name=""name"" use=""required"" type=""xs:string""/>\n");
-      Put ("                                </xs:extension>\n");
-      Put ("                        </xs:simpleContent>\n");
-      Put ("                </xs:complexType>\n");
-      Put ("        </xs:element>\n");
-      Put ("        <xs:element name=""coupling"">\n");
-      Put ("                <xs:complexType>\n");
-      Put ("                        <xs:sequence>\n");
-      Put ("                                <xs:element ref=""file"" minOccurs=""0"" maxOccurs=""unbounded""/>\n");
-      Put ("                        </xs:sequence>\n");
-      Put ("                </xs:complexType>\n");
-      Put ("        </xs:element>\n");
-      Put ("</xs:schema>\n");
-      pragma Style_Checks ("M79");
-
-      if not Output_To_Standard_Output then
-         Text_IO.Set_Output (Text_IO.Standard_Output);
-         Text_IO.Close (XSD_Out_File);
-      end if;
-   end Write_XML_Schema;
-
-   ----------
-   -- Init --
-   ----------
-
-   procedure Init (Tool : in out Metrics_Tool; Cmd : Command_Line) is
-
-      function To_Compute return Metrics_Set;
-      --  Computes which metrics we should compute
-
-      function To_Compute return Metrics_Set is
-      begin
-         return Result : Metrics_Set do
-            --  Set Result components True for all metrics requested on the
-            --  command line:
-
-            for Metric in Metrics_Enum loop
-               Result (Metric) := Arg (Cmd, Metric);
-            end loop;
-
-            if Arg (Cmd, Contract_All) then
-               Result (Contract_Metrics) := (others => True);
-            end if;
-            if Arg (Cmd, Complexity_All) then
-               Result (Complexity_Metrics) := (others => True);
-            end if;
-            if Arg (Cmd, Lines_All) then
-               Result (Lines_Metrics) := (others => True);
-            end if;
-            if Arg (Cmd, Syntax_All) then
-               Result (Syntax_Metrics) := (others => True);
-            end if;
-            if Arg (Cmd, Coupling_All) then
-               Result (Coupling_Metrics) := (others => True);
-            end if;
-
-            --  Special cases
-
-            if Arg (Cmd, Complexity_Cyclomatic) then
-               Result (Complexity_Statement) := True;
-               Result (Complexity_Expression) := True;
-            end if;
-
-            if Arg (Cmd, Public_Types) then
-               Result (Private_Types) := True;
-            end if;
-
-            if Arg (Cmd, Statements) and then Arg (Cmd, Declarations) then
-               Result (Logical_Source_Lines) := True;
-            end if;
-
-            if Arg (Cmd, Param_Number) then
-               Result (In_Parameters) := True;
-               Result (Out_Parameters) := True;
-               Result (In_Out_Parameters) := True;
-            end if;
-
-            --  If no metrics were requested on the command line, we compute
-            --  all metrics except coupling and "computed" metrics. Also, at
-            --  least for now, disable contract metrics and Lines_Spark,
-            --  because those don't exist in lalmetric and we're trying to
-            --  be compatible.
-
-            if Result = (Metrics_Enum => False) then
-               Result :=
-                 (Coupling_Metrics | Computed_Metrics |
-                    Contract_Metrics | Lines_Spark => False,
-                  others => True);
-            end if;
-         end return;
-      end To_Compute;
-
-      Metrics_To_Compute : Metrics_Set renames Tool.Metrics_To_Compute;
-
-      Ignored : constant Metrix_Ref := Push_New_Metrix (Tool, Node => null);
-
-   --  Start of processing for Init
-
-   begin
-      Tool.Treat_Exit_As_Goto := not Arg (Cmd, No_Treat_Exit_As_Goto);
-
-      --  Decide what metrics to compute. Initialize the Metrix_Stack
-      --  by pushing the outermost Metrix, which is for totals for all
-      --  the files together. If XML requested, create the XML file
-      --  and put the first lines.
-
-      Metrics_To_Compute := To_Compute;
-   end Init;
-
-   -----------
-   -- Final --
-   -----------
-
-   procedure Compute_Indirect_Dependencies (Global_M : Metrix) with
-     Pre => Global_M.Kind = Null_Kind;
-   --  Depends_On contains direct dependencies. This computes the indirect
-   --  dependencies for all compilation units by walking the dependency graph.
-
-   procedure Compute_Coupling
-     (Tool : in out Metrics_Tool; Global_M : Metrix);
-   --  This uses the dependency information to compute the coupling metrics.
-
-   function Get_Spec (M : Metrix_Ref) return Metrix_Ref with
-     Pre => M.Kind = Ada_Compilation_Unit;
-   --  If M is a spec, return M. If it's a library unit body, return the
-   --  corresponding spec. If it's a subunit, return the spec of the innermost
-   --  enclosing library unit. If the spec is not present, return M.
-
-   procedure Print_Coupling
-     (Cmd : Command_Line;
-      Metrics_To_Compute : Metrics_Set);
-   procedure XML_Print_Coupling
-     (Cmd : Command_Line;
-      Metrics_To_Compute : Metrics_Set);
-   --  Print the metrics computed by Compute_Coupling
-
-   Units_For_Coupling : Metrix_Vectors.Vector;
-   --  Compilation units for which coupling metrics will be printed
-
-   procedure Compute_Indirect_Dependencies (Global_M : Metrix) is
-
-      procedure Remove_Nonexistent_Units (M : Metrix_Ref);
-      --  Removes units from M.Depends_On if those units are not being
-      --  processed by this run of the tool. So "with X;" is ignored if x.ads
-      --  is not being processed. We can't do this in the first place, because
-      --  we need to wait until all the Metrix exist.
-
-      procedure Visit
-        (M : Metrix_Ref; Depends_On : in out CU_Symbol_Sets.Set);
-      --  Visit one node in the dependency graph of compilation units.
-      --  Recursively calls Visit to visit compilation units that M depends
-      --  upon. Depends_On is that of the caller (some unit that depends on M);
-      --  this unions-in M and everything M depends upon directly or
-      --  indirectly.
-
-      procedure Remove_Nonexistent_Units (M : Metrix_Ref) is
-         Nonexistent_Units : CU_Symbol_Sets.Set;
-      begin
-         if M = null then
-            return;
-         end if;
-
-         --  Remove nonexistent units:
-
-         for Sym of M.Depends_On loop
-            if Get_Symbol_Index (Sym) > Last_Index (Specs)
-              or else Specs (Get_Symbol_Index (Sym)) = null
-            then
-               Insert (Nonexistent_Units, Sym);
-            end if;
-         end loop;
-
-         Difference (M.Depends_On, Nonexistent_Units);
-      end Remove_Nonexistent_Units;
-
-      procedure Visit
-        (M : Metrix_Ref; Depends_On : in out CU_Symbol_Sets.Set) is
-      begin
-         --  The "limited with" clauses aare not included in
-         --  Depends_On. Therefore, there cannot be cycles in the
-         --  graph.
-
-         if not M.Indirect_Dependences_Computed then
-            M.Indirect_Dependences_Computed := True;
-            if M.Is_Spec then
-               Append (Units_For_Coupling, M);
-            end if;
-
-            for Sym of Copy (M.Depends_On) loop
-               --  Copy is necessary, because we are passing M.Depends_On to
-               --  the recursive Visit, which is going to modify it, so we
-               --  can't be iterating over it directly.
-
-               Visit (Specs (Get_Symbol_Index (Sym)), M.Depends_On);
-            end loop;
-         end if;
-
-         Include (Depends_On, M.CU_Name);
-         Union (Depends_On, M.Depends_On);
-      end Visit;
-
-      Ignored : CU_Symbol_Sets.Set;
-
-   --  Start of processing for Compute_Indirect_Dependencies
-
-   begin
-      --  First remove nonexistent units from the Depends_On sets, because
-      --  we're not supposed to count those in the coupling metrics.
-
-      for File_M of Global_M.Submetrix loop
-         Remove_Nonexistent_Units (File_M);
-      end loop;
-
-      --  Then compute indirect dependences
-
-      for File_M of Global_M.Submetrix loop
-         Visit (File_M, Ignored);
-      end loop;
-
-      --  A compilation unit can depend on itself at this point. For example,
-      --  if body-A says "with B;", and spec-B says "with A;", A will end up
-      --  depending on itself, which we don't want. So we remove such
-      --  self-referential dependences at this point, if present.
-
-      for File_M of Global_M.Submetrix loop
-         Exclude (File_M.Depends_On, File_M.CU_Name);
-      end loop;
-   end Compute_Indirect_Dependencies;
-
-   function Get_Spec (M : Metrix_Ref) return Metrix_Ref is
-   begin
-      if M.Is_Spec then
-         return M;
-      elsif M.Subunit_Parent = Empty_CU_Sym then
-         declare
-            Spec : constant Metrix_Ref := Specs (Get_Symbol_Index (M.CU_Name));
-         begin
-            return (if Spec = null then M else Spec);
-         end;
-      else
-         declare
-            Parent_Body : Metrix_Ref :=
-              Bodies (Get_Symbol_Index (M.Subunit_Parent));
-         begin
-            --  The parent could be a body acting as spec, in which case it's
-            --  in Specs, not Bodies.
-
-            if Parent_Body = null then
-               Parent_Body := Specs (Get_Symbol_Index (M.Subunit_Parent));
-            end if;
-
-            return (if Parent_Body = null then M else Get_Spec (Parent_Body));
-            --  This recursion will climb up a chain of nested subunits until
-            --  it reaches a library unit, and then we'll get the spec of that
-            --  library unit.
-         end;
-      end if;
-   end Get_Spec;
-
-   procedure Compute_Coupling
-     (Tool : in out Metrics_Tool; Global_M : Metrix)
-   is
-
-      procedure Do_Edge (Metric : Coupling_Metrics; From, To : Metrix_Ref);
-      --  Process one edge in the dependency graph for the given Metric.
-      --  If the Metric is Coupling_Out, then From depends on To.
-      --  If the Metric is Coupling_In, then To depends on From.
-      --  Thus, the metric is always recorded in the Outer_Unit of From.
-
-      procedure Do_Edge (Metric : Coupling_Metrics; From, To : Metrix_Ref) is
-         Outer_Unit : Metrix renames Element (From.Submetrix, 1).all;
-         --  Outer_Unit is the outermost package spec, procedure spec, etc.
-      begin
-         case Metric is
-            when Tagged_Coupling_Out | Tagged_Coupling_In =>
-               if From.Has_Tagged_Type and To.Has_Tagged_Type then
-                  Inc (Outer_Unit.Vals (Metric));
-               end if;
-            when Hierarchy_Coupling_Out | Hierarchy_Coupling_In =>
-               if False and -- ???
-                 From.Has_Tagged_Type and To.Has_Tagged_Type
-               then
-                  Inc (Outer_Unit.Vals (Metric));
-               end if;
-            when Control_Coupling_Out | Control_Coupling_In =>
-               if From.Has_Tagged_Type and To.Has_Tagged_Type then
-                  Inc (Outer_Unit.Vals (Metric));
-               end if;
-            when Unit_Coupling_Out | Unit_Coupling_In =>
-               Inc (Outer_Unit.Vals (Metric));
-         end case;
-      end Do_Edge;
-
-   --  Start of processing for Compute_Coupling
-
-   begin
-      --  Union the Depends_On set for each body (including subunits) into that
-      --  of the corresponding spec. We can't put it there in the first place
-      --  (during Compute_Indirect_Dependencies), because that would compute
-      --  too-high numbers. For example, if A-body with's B, we want to count
-      --  that in the metrics for A, but not in the metrics of things that
-      --  depend on A.
-
-      for B of Bodies loop
-         if B /= null then
-            declare
-               pragma Assert (B.Indirect_Dependences_Computed);
-               S : constant Metrix_Ref := Get_Spec (B);
-               pragma Assert (S.Indirect_Dependences_Computed);
-               --  S is the compilation unit node for the spec; dependences of
-               --  bodies (including subunits) should be counted on the spec.
-            begin
-               if S /= B then
-                  Union (S.Depends_On, B.Depends_On);
-                  Union (S.Limited_Depends_On, B.Limited_Depends_On);
-               end if;
-            end;
-         end if;
-      end loop;
-
-      Dump (Tool, Global_M, "After bodies:");
-
-      --  Compute metrics for the specs
-
-      for S of Specs loop
-         if S /= null then
-            pragma Assert (S.Indirect_Dependences_Computed);
-
-            for Sym of Union (S.Depends_On, S.Limited_Depends_On) loop
-               declare
-                  Dep : constant Metrix_Ref := Specs (Get_Symbol_Index (Sym));
-               begin
-                  if Dep /= null then
-                     --  ???It shouldn't be null, because we removed
-                     --  nonexistent units. But Set_CU_Metrix doesn't work
-                     --  right for subprogram bodies yet.
-
-                     --  Compute *_Coupling_Out From this unit To what it
-                     --  depends on:
-
-                     Do_Edge (Tagged_Coupling_Out, S, Dep);
-                     Do_Edge (Hierarchy_Coupling_Out, S, Dep);
-                     Do_Edge (Control_Coupling_Out, S, Dep);
-                     Do_Edge (Unit_Coupling_Out, S, Dep);
-
-                     --  Compute *_Coupling_In To this unit From what it
-                     --  depends on (noting that To and From are reversed from
-                     --  the above):
-
-                     Do_Edge (Tagged_Coupling_In, Dep, S);
-                     Do_Edge (Hierarchy_Coupling_In, Dep, S);
-                     Do_Edge (Control_Coupling_In, Dep, S);
-                     Do_Edge (Unit_Coupling_In, Dep, S);
-                  end if;
-               end;
-            end loop;
-         end if;
-      end loop;
-
-      --  Sort the compilation units by name, so they will get printed in
-      --  alphabetical order, rather than some order caused by the graph walk.
-
-      declare
-         function Lt (X, Y : Metrix_Ref) return Boolean;
-         pragma Inline (Lt);
-
-         package Sorting is new Metrix_Vectors.Generic_Sorting (Lt);
-
-         function Lt (X, Y : Metrix_Ref) return Boolean is
-            U1 : constant String := Str (X.CU_Name).S;
-            U2 : constant String := Str (Y.CU_Name).S;
-         begin
-            return U1 < U2;
-         end Lt;
-      begin
-         Sorting.Sort (Units_For_Coupling);
-      end;
-   end Compute_Coupling;
-
-   procedure Print_Coupling
-     (Cmd : Command_Line;
-      Metrics_To_Compute : Metrics_Set)
-   is
-   begin
-      if Metrics_To_Compute = Empty_Metrics_Set then
-         return;
-      end if;
-
-      Put ("\nCoupling metrics:\n");
-      Put ("=================\n");
-      Indent;
-
-      for File_M of Units_For_Coupling loop
-         declare
-            Outer_Unit : Metrix renames Element (File_M.Submetrix, 1).all;
-         begin
-            if Should_Print_Any
-              (Coupling_Metrics'First, Coupling_Metrics'Last,
-               Metrics_To_Compute, Outer_Unit, Depth => 3, XML => False)
-            then
-               Print_Metrix
-                 (Cmd,
-                  File_M.Source_File_Name.all,
-                  Metrics_To_Compute,
-                  File_M.all,
-                  Depth => 2);
-            end if;
-         end;
-      end loop;
-
-      Outdent;
-   end Print_Coupling;
-
-   procedure XML_Print_Coupling
-     (Cmd : Command_Line;
-      Metrics_To_Compute : Metrics_Set)
-   is
-   begin
-      if Metrics_To_Compute = Empty_Metrics_Set then
-         return;
-      end if;
-
-      Indent;
-      Put ("<coupling>\n");
-
-      for File_M of Units_For_Coupling loop
-         declare
-            Outer_Unit : Metrix renames Element (File_M.Submetrix, 1).all;
-         begin
-            if Should_Print_Any
-              (Coupling_Metrics'First, Coupling_Metrics'Last,
-               Metrics_To_Compute, Outer_Unit, Depth => 3, XML => True)
-            then
-               XML_Print_Metrix
-                 (Cmd,
-                  File_M.Source_File_Name.all,
-                  Metrics_To_Compute,
-                  File_M.all,
-                  Depth => 2);
-            end if;
-         end;
-      end loop;
-
-      Put ("</coupling>\n");
-      Outdent;
-   end XML_Print_Coupling;
-
-   procedure Final (Tool : in out Metrics_Tool; Cmd : Command_Line) is
-      Metrics_To_Compute : Metrics_Set renames Tool.Metrics_To_Compute;
-      Without_Coupling : constant Metrics_Set :=
-        Metrics_To_Compute and not Coupling_Only;
-      With_Coupling : constant Metrics_Set :=
-        Metrics_To_Compute and Coupling_Only;
-      Metrix_Stack : Metrix_Vectors.Vector renames Tool.Metrix_Stack;
-      Summed : constant String :=
-        "summed over " & Image (Num_File_Names (Cmd)) & " units";
-      pragma Assert (Length (Metrix_Stack) = 1);
-      M : Metrix_Ref := Element (Metrix_Stack, 1);
-
-      Global : Text_IO.File_Type;
-      --  File for global information in text form, if --global-file-name
-      --  switch was given. By default, this information is sent to standard
-      --  output.
-
-      Xml_F_Name : constant String :=
-        (if Arg (Cmd, Xml_File_Name) /= null
-           then Arg (Cmd, Xml_File_Name).all
-           else
-             (if Arg (Cmd, Xml_File_Name) = null
-                then "metrix.xml"
-                else Arg (Cmd, Xml_File_Name).all));
-      --  Gnatmetric ignores Output_Dir for the xml.
-
-      XML_File : Text_IO.File_Type;
-      --  All XML output for all source files goes to this file.
-
-      function Xsd_File_Name return String;
-      --  Return the name of the XSD (schema) file name, which is based
-      --  on the XML file name. In particular if the XML file name
-      --  ends in ".xml", that is replaced by ".xsd"; otherwise,
-      --  ".xsd" is appended. So "foo.xml" --> "foo.xsd", but
-      --  "foo.bar" --> "foo.bar.xsd".
-      --
-      --  Note that this name is written to the XML file, in addition
-      --  to being used to open the XSD file.
-
-      function Xsd_File_Name return String is
-         Norm : constant String  := Normalize_Pathname (Xml_F_Name);
-         Xml : constant String := ".xml";
-         Xsd : constant String := ".xsd";
-      begin
-         if Has_Suffix (Norm, Suffix => Xml) then
-            return Replace_String (Norm, Xml, Xsd);
-         else
-            return Norm & Xsd;
-         end if;
-      end Xsd_File_Name;
-
-      procedure Print_Computed_Metric
-        (T : Template; Metric : Metrics_Enum; C_Metric : Computed_Metrics);
-      procedure Print_Computed_Metric
-        (T : Template; Metric : Metrics_Enum; C_Metric : Computed_Metrics) is
-      begin
-         if Gen_Text (Cmd) and then Metrics_To_Compute (Metric) then
-            Put (T,
-                 Val_To_Print (Metric, M.all, XML => False),
-                 Val_To_Print (C_Metric, M.all, XML => False));
-
-            if Metric = Public_Types then
-               Put (" including\n");
-               Put ("    \1 private types\n",
-                    Val_To_Print (Private_Types, M.all, XML => False));
-            end if;
-         end if;
-      end Print_Computed_Metric;
-
-   --  Start of processing for Final
-
-   begin
-      pragma Assert (M.Vals (Complexity_Cyclomatic) =
-                       M.Vals (Complexity_Statement) +
-                       M.Vals (Complexity_Expression));
-
-      --  We're done with Metrix_Stack at this point. Printing uses the tree
-      --  formed by Submetrix.
-
-      M.Node := null;
-      Pop (Metrix_Stack);
-      Clear (Metrix_Stack);
-
-      Dump (Tool, M.all, "Initial:");
-      Compute_Indirect_Dependencies (M.all);
-      Dump (Tool, M.all, "After Compute_Indirect_Dependencies");
-      Compute_Coupling (Tool, M.all);
-
-      if Gen_XML (Cmd) then
-
-         --  Generate schema (XSD file), if requested
-
-         if Arg (Cmd, Generate_XML_Schema) then
-            Write_XML_Schema (Xsd_File_Name);
-         end if;
-
-         --  Put initial lines of XML
-
-         if not Output_To_Standard_Output then
-            Text_IO.Create (XML_File, Name => Xml_F_Name);
-            Text_IO.Set_Output (XML_File);
-         end if;
-         Put ("<?xml version=\1?>\n", Q ("1.0"));
-
-         if Arg (Cmd, Generate_XML_Schema) then
-            Put ("<global xmlns:xsi=" &
-                 """http://www.w3.org/2001/XMLSchema-instance"" " &
-                 "xsi:noNamespaceSchemaLocation=""\1"">\n",
-                 Xsd_File_Name);
-         else
-            Put ("<global>\n");
-         end if;
-      end if;
-
-      --  Print the metrics for each file in text and XML form
-
-      for File_M of M.Submetrix loop
-         pragma Assert (Debug_Flag_V or else Indentation = 0);
-         Print_File_Metrics
-           (Cmd, XML_File, File_M.all, Without_Coupling);
-         pragma Assert (Debug_Flag_V or else Indentation = 0);
---         Destroy (File_M);
-      end loop;
-
-      --  Print the totals in text form. These go to standard output, unless
-      --  --global-file-name was specified. Note that Output_Dir is ignored by
-      --  gnatmetric for this output.
-
-      if Gen_Text (Cmd) then
-         if Arg (Cmd, Global_File_Name) /= null then
-            if not Output_To_Standard_Output then
-               Text_IO.Create
-                 (Global, Name => Arg (Cmd, Global_File_Name).all);
-               Text_IO.Set_Output (Global);
-            end if;
-         end if;
-
-         Print_Range
-           ("Line metrics " & Summed,
-            Metrics_To_Compute,
-            Lines_Metrics'First, Lines_Metrics'Last, M.all,
-            Depth => 1);
-         Print_Range
-           ("Contract metrics " & Summed,
-            Metrics_To_Compute,
-            Contract_Metrics'First, Contract_Metrics'Last, M.all,
-            Depth => 1);
-         Print_Range
-           ("Element metrics " & Summed,
-            Metrics_To_Compute,
-            Syntax_Metrics'First, Syntax_Metrics'Last, M.all,
-            Depth => 1);
-
-         Print_Computed_Metric
-           ("\n \1 public types in \2 units\n",
-            Public_Types, Computed_Public_Types);
-         Print_Computed_Metric
-           ("\n \1 public subprograms in \2 units\n",
-            Public_Subprograms, Computed_Public_Subprograms);
-         Print_Computed_Metric
-           ("\n \1 subprogram bodies in \2 units\n",
-            All_Subprograms, Computed_All_Subprograms);
-         Print_Computed_Metric
-           ("\n \1 type declarations in \2 units\n",
-            All_Types, Computed_All_Types);
-
-         --  For Complexity_Average, the actual metric value is in
-         --  Complexity_Cyclomatic, and Val_To_Print will compute the
-         --  average. We set XML to True, even though it's not XML to
-         --  avoid an annoying extra space.
-
-         if Gen_Text (Cmd)
-           and then Metrics_To_Compute (Complexity_Average)
-         then
-            Put ("\nAverage cyclomatic complexity: \1\n",
-                 Val_To_Print (Complexity_Cyclomatic, M.all, XML => True));
-         end if;
-
-         if Arg (Cmd, Global_File_Name) /= null then
-            if not Output_To_Standard_Output then
-               Text_IO.Set_Output (Text_IO.Standard_Output);
-               Text_IO.Close (Global);
-            end if;
-         end if;
-      end if;
-
-      --  Print the totals in XML form
-
-      if Gen_Text (Cmd) then
-         Print_Coupling (Cmd, With_Coupling);
-      end if;
-
-      if Gen_XML (Cmd) then
-         if not Output_To_Standard_Output then
-            Text_IO.Set_Output (XML_File);
-         end if;
-         XML_Print_Metrix_Vals
-           (Metrics_To_Compute, M.Vals'First, M.Vals'Last, M.all, Depth => 1);
-         XML_Print_Coupling (Cmd, With_Coupling);
-         Put ("</global>\n");
-         if not Output_To_Standard_Output then
-            Text_IO.Set_Output (Text_IO.Standard_Output);
-            Text_IO.Close (XML_File);
-         end if;
-      end if;
-
-      for Metric in Metrics_Enum loop
-         if Metric_Found (Metric) and then not Implemented (Metric) then
-            Put ("Metric is implemented: \1\n", Capitalize (Metric'Img));
-         end if;
-      end loop;
-
-      Destroy (M);
-   end Final;
-
-   ---------------------
-   -- Per_File_Action --
-   ---------------------
-
-   procedure Per_File_Action
-     (Tool : in out Metrics_Tool;
-      Cmd : Command_Line;
-      File_Name : String;
-      Input : String;
-      BOM_Seen : Boolean;
-      Unit : Analysis_Unit)
-   is
-      pragma Unreferenced (Cmd, Input, BOM_Seen);
+   --  Start of processing for Per_File_Action
    begin
       if Debug_Flag_V then
          Print (Unit);
@@ -3760,7 +3714,49 @@ package body METRICS.Actions is
          PP_Trivia (Unit);
       end if;
 
-      Walk (Tool, File_Name, Root (Unit), Cumulative (Unit));
+      if Debug_Flag_V then
+         Put ("-->Walk: \1\n", Short_Image (CU_Node));
+         Indent;
+      end if;
+
+      Append (Node_Stack, CU_Node); -- push
+      Append (Global_M.Submetrix, File_M);
+
+      Gather_Metrics_And_Walk_Children (CU_Node);
+
+      --  Gather "Computed_" metrics.
+
+      if File_M.Vals (Public_Types) /= 0 then
+         Inc (Global_M.Vals (Computed_Public_Types));
+      end if;
+
+      if File_M.Vals (All_Types) /= 0 then
+         Inc (Global_M.Vals (Computed_All_Types));
+      end if;
+
+      if File_M.Vals (Public_Subprograms) /= 0 then
+         Inc (Global_M.Vals (Computed_Public_Subprograms));
+      end if;
+
+      if File_M.Vals (All_Subprograms) /= 0 then
+         Inc (Global_M.Vals (Computed_All_Subprograms));
+      end if;
+
+      File_M.Node := null;
+      Pop (Metrix_Stack);
+      Pop (Node_Stack);
+      pragma Assert (Length (Metrix_Stack) = 1);
+      pragma Assert (Length (Node_Stack) = 0);
+      pragma Assert (File_M.Vals (Complexity_Cyclomatic) =
+                       File_M.Vals (Complexity_Statement) +
+                       File_M.Vals (Complexity_Expression));
+
+      if Debug_Flag_V then
+         Outdent;
+         Put ("<--Walk: \1\n", Short_Image (CU_Node));
+      end if;
+
+      Destroy (Node_Stack);
    end Per_File_Action;
 
    ---------------

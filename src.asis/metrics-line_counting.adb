@@ -33,7 +33,9 @@ package body METRICS.Line_Counting is
    package Cumulative_Counts_Vectors is new ASIS_UL.Vectors
      (Line_Num, Cumulative_Counts, Cumulative_Counts_Array);
 
-   function Cumulative (Unit : Analysis_Unit) return Cumulative_Counts_Array is
+   function Get_Cumulative_Counts
+     (Unit : Analysis_Unit) return Cumulative_Counts_Array
+   is
       Result : Cumulative_Counts_Vectors.Vector;
       use Cumulative_Counts_Vectors;
       Prev_Line : Line_Num'Base := 0;
@@ -119,7 +121,7 @@ package body METRICS.Line_Counting is
             end;
          end loop;
       end return;
-   end Cumulative;
+   end Get_Cumulative_Counts;
 
    function Line_Range_Count
      (Counts : Cumulative_Counts_Array;

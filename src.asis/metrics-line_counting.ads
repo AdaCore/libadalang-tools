@@ -17,7 +17,8 @@ package METRICS.Line_Counting is
 
    type Cumulative_Counts_Array (<>) is private;
 
-   function Cumulative (Unit : Analysis_Unit) return Cumulative_Counts_Array;
+   function Get_Cumulative_Counts
+     (Unit : Analysis_Unit) return Cumulative_Counts_Array;
    --  Precompute the data used by Line_Range_Count
 
    function Line_Range_Count
