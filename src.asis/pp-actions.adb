@@ -978,6 +978,7 @@ package body Pp.Actions is
    Template_Table_Initialized : Boolean := False;
 
    --  Debugging printouts:
+   --  See also Libadalang.Debug.
    pragma Warnings (Off);
    pragma Style_Checks (Off);
    procedure knd (X : Ada_Node) is
@@ -4850,6 +4851,10 @@ package body Pp.Actions is
             --  (like a token mismatch in Final_Check), we avoid writing the output
             --  file in Do_Diff mode; otherwise, we write the input to the output
             --  unchanged. This happens only in production builds.
+
+            Text_IO.Put_Line
+              (Text_IO.Standard_Error,
+               "gnatpp: pretty-printing failed; unable to format " & File_Name);
 
             if Enable_Token_Mismatch then
                raise;
