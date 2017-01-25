@@ -618,14 +618,18 @@ package body Pp.Actions is
              L ("?~~ ~! ! is new !?[@ (~,@ ~)]~", Aspects),
            when Ada_Generic_Package_Decl =>
              L ("generic$",
-                "{?~;$~;$~}", -- Should be generic_formal_part, not a list???
+                "!",
                 "!"),
+           when Ada_Generic_Formal_Part =>
+             L ("{?~;$~;$~}"),
+           when Ada_Generic_Formal =>
+             L ("!"),
            when Ada_Generic_Package_Renaming_Decl =>
              L ("generic package ! renames !", Aspects),
            when Ada_Generic_Subp_Renaming_Decl =>
              L ("generic ! ! renames !", Aspects),
            when Ada_Generic_Subp_Decl =>
-             L ("generic$", "{?~;$~;$~}", "procedure!", Aspects),
+             L ("generic$", "!", "procedure!", Aspects),
            when Ada_Number_Decl =>
              L ("?~,@ ~~ ^: constant ^2:=[@ !]"),
            when Ada_Object_Decl =>
@@ -1744,7 +1748,10 @@ package body Pp.Actions is
                            --  "${".
 
                            when '{' =>
-                              if Kind in Ada_Component_List | Ada_Public_Part then
+                              if Kind in Ada_Component_List |
+                                Ada_Public_Part |
+                                Ada_Generic_Formal_Part
+                              then
                                  null;
                               else
                                  pragma Assert (T (J - 1) = '$');
@@ -3190,9 +3197,7 @@ package body Pp.Actions is
             --  ???This is needed because there's no Generic_Formal_Package
             --  node kind.
          begin
-            if Parent (Parent (Tree)).Kind in
-              Ada_Generic_Package_Decl | Ada_Generic_Subp_Decl
-            then
+            if Parent (Tree).Kind = Ada_Generic_Formal then
                --  It's really a formal package
                Put ("\1", "with ");
             end if;

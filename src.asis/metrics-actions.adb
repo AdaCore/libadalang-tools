@@ -3275,7 +3275,8 @@ package body METRICS.Actions is
          if Kind (Node) in
              Ada_Basic_Decl | Ada_For_Loop_Spec | Ada_Entry_Index_Spec
            and then Kind (Node) not in
-             Ada_Base_Package_Decl | Ada_Anonymous_Type_Decl
+             Ada_Generic_Formal | Ada_Base_Package_Decl |
+             Ada_Anonymous_Type_Decl
          then
             Inc_All (Declarations);
             Inc_All (Logical_Source_Lines);

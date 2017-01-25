@@ -80,7 +80,7 @@ package LAL_Extensions is
    --  Wrapper for F_Aspects functions
 
    function G_Formal_Part
-     (Node : access Ada_Node_Type'Class) return Ada_Node_List;
+     (Node : access Ada_Node_Type'Class) return Generic_Formal_Part;
    --  Return the generic formal part of a generic unit.
 
    function Vis_Part

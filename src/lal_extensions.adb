@@ -327,7 +327,7 @@ package body LAL_Extensions is
    end Get_Aspects;
 
    function G_Formal_Part
-     (Node : access Ada_Node_Type'Class) return Ada_Node_List is
+     (Node : access Ada_Node_Type'Class) return Generic_Formal_Part is
    begin
       case Kind (Node) is
          when Ada_Generic_Package_Decl =>
