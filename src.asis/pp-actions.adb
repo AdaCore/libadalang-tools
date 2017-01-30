@@ -796,6 +796,8 @@ package body Pp.Actions is
            when Ada_Elsif_Stmt_Part =>
              L ("elsif[ !]@ then$", "{?~;$~;$~}"),
            when Ada_Loop_Stmt =>
+             L ("?~~@ ~loop$", "{?~;$~;$~}", "end loop"),
+           when Ada_Named_Loop_Stmt =>
              L ("?~~ :$~?~~@ ~loop$", "{?~;$~;$~}", "end loop?1 ~~~"),
            when Ada_For_Loop_Spec => null,
            when Ada_While_Loop_Spec =>
@@ -1603,7 +1605,7 @@ package body Pp.Actions is
                   X := X + 1; -- skip ' ' before '('
                elsif Match (" ^:") and then not Match (" ^:=") then
                   X := X + 1; -- skip ' ' before ':'
-               elsif Kind in Ada_Loop_Stmt | Ada_Block_Stmt
+               elsif Kind in Ada_Named_Loop_Stmt | Ada_Block_Stmt
                  and then Match (" :")
                then
                   X := X + 1; -- skip ' ' before ':' for statement name
@@ -1707,6 +1709,7 @@ package body Pp.Actions is
             Replace_One (Ada_If_Stmt, "@ then$", "$then$");
             Replace_One (Ada_Elsif_Stmt_Part, "@ then$", "$then$");
             Replace_One (Ada_Loop_Stmt, "?~~@ ~loop$", "?~~$~loop$");
+            Replace_One (Ada_Named_Loop_Stmt, "?~~@ ~loop$", "?~~$~loop$");
 
          --  For No_Separate_Loop_Then, we remove the soft line break
          --  before "then" and "loop".
@@ -1715,6 +1718,7 @@ package body Pp.Actions is
             Replace_One (Ada_If_Stmt, "@ then$", " then$");
             Replace_One (Ada_Elsif_Stmt_Part, "@ then$", " then$");
             Replace_One (Ada_Loop_Stmt, "?~~@ ~loop$", "?~~ ~loop$");
+            Replace_One (Ada_Named_Loop_Stmt, "?~~@ ~loop$", "?~~ ~loop$");
          end if;
 
          --  Now do some validity checking on the templates
@@ -2792,6 +2796,7 @@ package body Pp.Actions is
                  Ada_Generic_Package_Decl |
                  Ada_Enum_Type_Decl |
                  Ada_Loop_Stmt |
+                 Ada_Named_Loop_Stmt |
                  Ada_Block_Stmt |
                  Ada_Extended_Return_Stmt |
                  Ada_Accept_Stmt |
@@ -3564,7 +3569,7 @@ package body Pp.Actions is
          procedure Do_For_Loop_Spec is
          begin
             case Parent (Tree).Kind is
-               when Ada_Loop_Stmt =>
+               when Ada_Loop_Stmt | Ada_Named_Loop_Stmt =>
                   Interpret_Template ("for !? : ~~~ !? ~~~ !");
                when Ada_Quantified_Expr =>
                   --  In this case, the quantfied_expression already printed

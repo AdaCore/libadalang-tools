@@ -140,7 +140,7 @@ package body LAL_Extensions is
       case Kind (Nm) is
          when Ada_Dotted_Name =>
             --  ????Not sure why we have to convert to Name here:
-            return Full_Name (Name (F_Prefix (Dotted_Name (Nm)))) &
+            return Full_Name (F_Prefix (Dotted_Name (Nm))) &
               "." & Full_Name (Name (F_Suffix (Dotted_Name (Nm))));
          when Ada_Identifier | Ada_String_Literal =>
             return Id_Name (Nm);
@@ -195,9 +195,8 @@ package body LAL_Extensions is
             when Ada_Block_Stmt =>
                Result :=
                  Name (F_Name (Block_Stmt (Decl)));
-            when Ada_Loop_Stmt =>
-               Result :=
-                 Name (F_Name (Loop_Stmt (Decl)));
+            when Ada_Named_Loop_Stmt =>
+               Result := Name (F_Name (Named_Loop_Stmt (Decl)));
             when Ada_Abstract_Subp_Decl |
               Ada_Expr_Function |
               Ada_Null_Subp_Decl |
@@ -433,6 +432,7 @@ package body LAL_Extensions is
            Ada_Case_Stmt |
            Ada_Select_Stmt |
            Ada_Loop_Stmt |
+           Ada_Named_Loop_Stmt |
            Ada_Accept_Stmt |
            Ada_If_Stmt =>
             return True;

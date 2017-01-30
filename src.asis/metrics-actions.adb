@@ -2727,7 +2727,7 @@ package body METRICS.Actions is
             when Ada_Quantified_Expr =>
                Inc_Cyc (Complexity_Expression, By => 2);
 
-            when Ada_Loop_Stmt =>
+            when Ada_Loop_Stmt | Ada_Named_Loop_Stmt =>
                --  Compute M.Vals (Loop_Nesting) as the maximum loop
                --  nesting level for this unit. We only set it for the
                --  innermost unit and at the file level.
@@ -2787,7 +2787,8 @@ package body METRICS.Actions is
          --  Push the stack if appropriate
 
          if Kind (Node) in Gnatmetric_Eligible |
-           Ada_If_Stmt | Ada_Case_Stmt | Ada_Loop_Stmt | Ada_Select_Stmt
+           Ada_If_Stmt | Ada_Case_Stmt | Ada_Loop_Stmt | Ada_Named_Loop_Stmt |
+           Ada_Select_Stmt
          then
             Append (EC_Stack, EC_Rec'(Node, Counted => False)); -- push
             --  (The corresponding Pop is at the end of
@@ -2821,7 +2822,7 @@ package body METRICS.Actions is
 
                   exit when X = 1;
                   exit when Kind (Node) = Ada_Exit_Stmt
-                    and then K = Ada_Loop_Stmt;
+                    and then K in Ada_Loop_Stmt | Ada_Named_Loop_Stmt;
 
                   X := X - 1;
                end loop;
@@ -3451,8 +3452,7 @@ package body METRICS.Actions is
                      Include
                        (File_M.Depends_On,
                         W_Intern
-                          (Full_Name
-                            (Name (F_Prefix (Dotted_Name (Def_Name))))));
+                          (Full_Name (F_Prefix (Dotted_Name (Def_Name)))));
                   end if;
                end;
 
@@ -3512,7 +3512,7 @@ package body METRICS.Actions is
                Inc (Quantified_Expr_Count);
             when Ada_Expr_Function =>
                Inc (Expr_Function_Count);
-            when Ada_Loop_Stmt =>
+            when Ada_Loop_Stmt | Ada_Named_Loop_Stmt =>
                Inc (Loop_Count);
             when Ada_Private_Part =>
                Inc (Private_Part_Count);
@@ -3576,7 +3576,7 @@ package body METRICS.Actions is
                Dec (Quantified_Expr_Count);
             when Ada_Expr_Function =>
                Dec (Expr_Function_Count);
-            when Ada_Loop_Stmt =>
+            when Ada_Loop_Stmt | Ada_Named_Loop_Stmt =>
                Dec (Loop_Count);
             when Ada_Private_Part =>
                Dec (Private_Part_Count);
