@@ -1574,23 +1574,34 @@ package body Pp.Formatting is
                   elsif Src_Tok.Kind = End_Of_Line_Comment then
                      Insert_End_Of_Line_Comment;
 
-                  --  If the source has a blank line at this point, send it to the
-                  --  output, but avoid multiple blank lines (unless
-                  --  Preserve_Blank_Lines is True) and blank lines just before
-                  --  End_Of_Input.
+                  --  If the source has a blank line at this point, send it to
+                  --  the output (unless Insert_Blank_Lines is True, in which
+                  --  case we want to ignore blank lines in the input, since a
+                  --  previous phase inserted them in the "right" place). But
+                  --  avoid multiple blank lines (unless Preserve_Blank_Lines
+                  --  is True) and blank lines just before End_Of_Input.
 
                   elsif Src_Tok.Kind = Blank_Line then
-                     loop
-                        Src_Index := Src_Index + 1;
-                        Src_Tok   := Src_Tokens (Src_Index);
-                        exit when Src_Tok.Kind /= Blank_Line
-                          or else Preserve_Blank_Lines (Cmd);
-                     end loop;
-                     if Src_Tok.Kind /= End_Of_Input
-                       or else Preserve_Blank_Lines (Cmd)
-                     then
-                        Append_Temp_Line_Break (Lines_Data);
-                     end if;
+                     declare
+                        Prev_Src_Tok : constant Token :=
+                          Src_Tokens (Src_Index - 1);
+                     begin
+                        loop
+                           Src_Index := Src_Index + 1;
+                           Src_Tok   := Src_Tokens (Src_Index);
+                           exit when Src_Tok.Kind /= Blank_Line
+                             or else Preserve_Blank_Lines (Cmd);
+                        end loop;
+                        if (not Insert_Blank_Lines (Cmd)
+                              and then Src_Tok.Kind /= End_Of_Input)
+                          or else Prev_Src_Tok.Kind in Comment_Kind
+                          or else Src_Tokens (Src_Index + 1).Kind -- next token
+                            in Comment_Kind
+                          or else Preserve_Blank_Lines (Cmd)
+                        then
+                           Append_Temp_Line_Break (Lines_Data);
+                        end if;
+                     end;
 
                   elsif Src_Tok.Kind in Whole_Line_Comment then
                      Insert_Whole_Line_Comment;
