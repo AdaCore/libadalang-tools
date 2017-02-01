@@ -1,0 +1,49 @@
+This is an alpha version of lalmetric, which is intended to replace
+gnatmetric, an ASIS-based tool, with a libadalang-based tool.
+
+Status of metrics switches in lalmetric:
+
+--contract                        implemented
+--post                            implemented
+--contract-complete       not yet implemented
+--contract-complexity             implemented
+  The above 4 are new (not implemented in the old gnatmetric).
+
+--lines                           implemented
+--lines-code                      implemented
+--lines-comment                   implemented
+--lines-eol-comment               implemented
+--lines-ratio                     implemented
+--lines-blank                     implemented
+--lines-average                   implemented
+--lines-spark           partially implemented
+  Lines_Spark is new (not implemented in the old gnatmetric).
+
+--public-types                    implemented
+--all-types             partially implemented
+--public-subprograms    partially implemented
+--all-subprograms                 implemented
+--statements                      implemented
+--declarations                    implemented
+--logical-source-lines            implemented
+--unit-nesting                    implemented
+--construct-nesting               implemented
+--param-number          partially implemented
+--in-parameters         partially implemented
+--out-parameters        partially implemented
+--in-out-parameters     partially implemented
+
+--complexity-cyclomatic           implemented
+--complexity-essential  partially implemented
+--complexity-average              implemented
+--loop-nesting                    implemented
+--extra-exit-points     partially implemented
+
+--tagged-coupling-out             implemented
+--hierarchy-coupling-out  not yet implemented
+--tagged-coupling-in              implemented
+--hierarchy-coupling-in   not yet implemented
+--control-coupling-out  partially implemented
+--control-coupling-in   partially implemented
+--unit-coupling-out               implemented
+--unit-coupling-in                implemented
