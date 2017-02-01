@@ -1,4 +1,4 @@
-with Interfaces; use Interfaces;
+with Langkit_Support.Slocs; use Langkit_Support;
 with Libadalang.Analysis; use Libadalang.Analysis;
 with METRICS.Command_Lines; use METRICS.Command_Lines;
 package METRICS.Line_Counting is
@@ -23,7 +23,7 @@ package METRICS.Line_Counting is
 
    function Line_Range_Count
      (Counts : Cumulative_Counts_Array;
-      First_Line, Last_Line : Unsigned_32;
+      First_Line, Last_Line : Slocs.Line_Number;
       Metric : Cumulative_Metrics) return Metric_Nat;
    --  Return the value of Metric for the range of lines given
 
@@ -39,6 +39,7 @@ private
    --  printed in the right order. So we need to skip that one.
 
    type Line_Num is new Positive;
+   --  Use Slocs.Line_Number????
    type Cumulative_Counts_Array is
      array (Line_Num range <>) of Cumulative_Counts;
 

@@ -2727,7 +2727,7 @@ package body METRICS.Actions is
             when Ada_Quantified_Expr =>
                Inc_Cyc (Complexity_Expression, By => 2);
 
-            when Ada_Loop_Stmt | Ada_Named_Loop_Stmt =>
+            when Ada_Loop_Stmt =>
                --  Compute M.Vals (Loop_Nesting) as the maximum loop
                --  nesting level for this unit. We only set it for the
                --  innermost unit and at the file level.
@@ -2787,7 +2787,7 @@ package body METRICS.Actions is
          --  Push the stack if appropriate
 
          if Kind (Node) in Gnatmetric_Eligible |
-           Ada_If_Stmt | Ada_Case_Stmt | Ada_Loop_Stmt | Ada_Named_Loop_Stmt |
+           Ada_If_Stmt | Ada_Case_Stmt | Ada_Loop_Stmt |
            Ada_Select_Stmt
          then
             Append (EC_Stack, EC_Rec'(Node, Counted => False)); -- push
@@ -2822,7 +2822,7 @@ package body METRICS.Actions is
 
                   exit when X = 1;
                   exit when Kind (Node) = Ada_Exit_Stmt
-                    and then K in Ada_Loop_Stmt | Ada_Named_Loop_Stmt;
+                    and then K = Ada_Loop_Stmt;
 
                   X := X - 1;
                end loop;
@@ -2878,8 +2878,8 @@ package body METRICS.Actions is
       begin
          if Node = M.Node then
             declare
-               use type Interfaces.Unsigned_32;
-               Start : constant Interfaces.Unsigned_32 :=
+               use type Slocs.Line_Number;
+               Start : constant Slocs.Line_Number :=
                  (if Kind (Node) = Ada_Compilation_Unit
                     then 1
                     else M.Sloc.Start_Line);
@@ -3259,6 +3259,7 @@ package body METRICS.Actions is
          if Node.all in Stmt_Type'Class
            and then Node.all not in Label_Type'Class
            and then Node.all not in Terminate_Alternative_Type'Class
+           and then Node.all not in Named_Stmt_Type'Class
          then
             if Debug_Flag_W then
                Put ("Statement: \1\n", Short_Image (Node));
@@ -3274,10 +3275,10 @@ package body METRICS.Actions is
               Kind (Parent (Node)) = Ada_Generic_Package_Decl);
 
          if Kind (Node) in
-             Ada_Basic_Decl | Ada_For_Loop_Spec | Ada_Entry_Index_Spec
+             Ada_Basic_Decl | Ada_Entry_Index_Spec
            and then Kind (Node) not in
              Ada_Generic_Formal | Ada_Base_Package_Decl |
-             Ada_Anonymous_Type_Decl
+             Ada_Anonymous_Type_Decl | Ada_Named_Stmt_Decl | Ada_Label_Decl
          then
             Inc_All (Declarations);
             Inc_All (Logical_Source_Lines);
@@ -3512,7 +3513,7 @@ package body METRICS.Actions is
                Inc (Quantified_Expr_Count);
             when Ada_Expr_Function =>
                Inc (Expr_Function_Count);
-            when Ada_Loop_Stmt | Ada_Named_Loop_Stmt =>
+            when Ada_Loop_Stmt =>
                Inc (Loop_Count);
             when Ada_Private_Part =>
                Inc (Private_Part_Count);
@@ -3576,7 +3577,7 @@ package body METRICS.Actions is
                Dec (Quantified_Expr_Count);
             when Ada_Expr_Function =>
                Dec (Expr_Function_Count);
-            when Ada_Loop_Stmt | Ada_Named_Loop_Stmt =>
+            when Ada_Loop_Stmt =>
                Dec (Loop_Count);
             when Ada_Private_Part =>
                Dec (Private_Part_Count);

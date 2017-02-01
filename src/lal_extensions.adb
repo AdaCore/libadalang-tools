@@ -132,7 +132,7 @@ package body LAL_Extensions is
      return W_Str
    is
    begin
-      return Text_To_W_Str (Text (F_Token (Label (L))));
+      return Text_To_W_Str (Text (F_Name (F_Decl (Label (L)))));
    end Label_Name;
 
    function Full_Name (Nm : Name) return W_Str is
@@ -192,11 +192,8 @@ package body LAL_Extensions is
             when Ada_Accept_Stmt =>
                Result :=
                  Name (F_Name (Accept_Stmt (Decl)));
-            when Ada_Block_Stmt =>
-               Result :=
-                 Name (F_Name (Block_Stmt (Decl)));
-            when Ada_Named_Loop_Stmt =>
-               Result := Name (F_Name (Named_Loop_Stmt (Decl)));
+            when Ada_Named_Stmt_Decl =>
+               Result := Name (F_Name (Named_Stmt_Decl (Decl)));
             when Ada_Abstract_Subp_Decl |
               Ada_Expr_Function |
               Ada_Null_Subp_Decl |
@@ -432,7 +429,6 @@ package body LAL_Extensions is
            Ada_Case_Stmt |
            Ada_Select_Stmt |
            Ada_Loop_Stmt |
-           Ada_Named_Loop_Stmt |
            Ada_Accept_Stmt |
            Ada_If_Stmt =>
             return True;

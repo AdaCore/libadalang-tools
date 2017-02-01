@@ -125,7 +125,7 @@ package body METRICS.Line_Counting is
 
    function Line_Range_Count
      (Counts : Cumulative_Counts_Array;
-      First_Line, Last_Line : Unsigned_32;
+      First_Line, Last_Line : Slocs.Line_Number;
       Metric : Cumulative_Metrics) return Metric_Nat
    is
      (Counts (Line_Num (Last_Line) + 1) (Metric) -

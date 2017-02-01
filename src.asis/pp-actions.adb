@@ -708,7 +708,7 @@ package body Pp.Actions is
              L ("!'[@1!?@ (~,@ ~)~]"),
              --  ???This includes function calls to attributes, such as
              --  T'Max(X, Y), which isn't really right.
-           when Ada_Bin_Op => null,
+           when Ada_Bin_Op |  Ada_Relation => null,
            when Ada_Call_Expr => null,
            when Ada_Case_Expr =>
              L ("case ! is[@ ?@~,@ ~~]"),
@@ -760,12 +760,6 @@ package body Pp.Actions is
              L ("accept !? @(~~)~?[@ (~;@ ~)]~",
                 "!",
                 "end !1"),
-           when Ada_Block_Stmt =>
-             L ("?~~ : ~",
-                "?declare$",
-                "~~~",
-                "!",
-                "end?1 ~~~"),
            when Ada_Null_Record_Def =>
              L ("null record/"),
              --  Null_Record_Def inherits F_Components from
@@ -795,11 +789,20 @@ package body Pp.Actions is
                 "end if"),
            when Ada_Elsif_Stmt_Part =>
              L ("elsif[ !]@ then$", "{?~;$~;$~}"),
+           when Ada_Named_Stmt =>
+             L ("! : ! !1"),
+           when Ada_Named_Stmt_Decl =>
+             L ("!"),
+           when Ada_Block_Stmt =>
+             L ("?declare$",
+                "~~~",
+                "!",
+                "end"),
            when Ada_Loop_Stmt =>
              L ("?~~@ ~loop$", "{?~;$~;$~}", "end loop"),
-           when Ada_Named_Loop_Stmt =>
-             L ("?~~ :$~?~~@ ~loop$", "{?~;$~;$~}", "end loop?1 ~~~"),
            when Ada_For_Loop_Spec => null,
+           when Ada_For_Loop_Var_Decl =>
+             L ("!? : ~~~"),
            when Ada_While_Loop_Spec =>
              L ("while[ !]"),
            when Ada_Abort_Stmt =>
@@ -815,6 +818,7 @@ package body Pp.Actions is
            when Ada_Goto_Stmt =>
              L ("goto !"),
            when Ada_Label => null,
+           when Ada_Label_Decl => L ("!"),
            when Ada_Null_Stmt =>
              L ("!"),
            when Ada_Raise_Stmt =>
@@ -1605,9 +1609,7 @@ package body Pp.Actions is
                   X := X + 1; -- skip ' ' before '('
                elsif Match (" ^:") and then not Match (" ^:=") then
                   X := X + 1; -- skip ' ' before ':'
-               elsif Kind in Ada_Named_Loop_Stmt | Ada_Block_Stmt
-                 and then Match (" :")
-               then
+               elsif Kind in Ada_Named_Stmt_Decl and then Match (" :") then
                   X := X + 1; -- skip ' ' before ':' for statement name
                elsif Kind = Ada_Array_Type_Def and then Match (" !] of") then
                   X := X + 1; -- skip ' ' before '('
@@ -1709,7 +1711,6 @@ package body Pp.Actions is
             Replace_One (Ada_If_Stmt, "@ then$", "$then$");
             Replace_One (Ada_Elsif_Stmt_Part, "@ then$", "$then$");
             Replace_One (Ada_Loop_Stmt, "?~~@ ~loop$", "?~~$~loop$");
-            Replace_One (Ada_Named_Loop_Stmt, "?~~@ ~loop$", "?~~$~loop$");
 
          --  For No_Separate_Loop_Then, we remove the soft line break
          --  before "then" and "loop".
@@ -1718,7 +1719,6 @@ package body Pp.Actions is
             Replace_One (Ada_If_Stmt, "@ then$", " then$");
             Replace_One (Ada_Elsif_Stmt_Part, "@ then$", " then$");
             Replace_One (Ada_Loop_Stmt, "?~~@ ~loop$", "?~~ ~loop$");
-            Replace_One (Ada_Named_Loop_Stmt, "?~~@ ~loop$", "?~~ ~loop$");
          end if;
 
          --  Now do some validity checking on the templates
@@ -2796,7 +2796,6 @@ package body Pp.Actions is
                  Ada_Generic_Package_Decl |
                  Ada_Enum_Type_Decl |
                  Ada_Loop_Stmt |
-                 Ada_Named_Loop_Stmt |
                  Ada_Block_Stmt |
                  Ada_Extended_Return_Stmt |
                  Ada_Accept_Stmt |
@@ -2852,6 +2851,7 @@ package body Pp.Actions is
          procedure Do_Assoc;
 --         procedure Do_Attribute_Reference;
 --         procedure Do_Block_Stmt;
+         procedure Do_Named_Stmt;
          procedure Do_Compilation_Unit;
 --         procedure Do_Comment;
 --         procedure Do_Case_Path;
@@ -2999,6 +2999,20 @@ package body Pp.Actions is
 --               Interpret_Template (Block_Stmt_Alt_Templ_2);
 --            end if;
 --         end Do_Block_Stmt;
+
+         procedure Do_Named_Stmt is
+         begin
+            --  ???Not clear why we're putting a line break in one case but not
+            --  the other. The normal template in the table should suffice.
+
+            case F_Stmt (Named_Stmt (Tree)).Kind is
+               when Ada_Block_Stmt =>
+                  Interpret_Template ("! : ! !1");
+               when Ada_Loop_Stmt =>
+                  Interpret_Template ("! :$! !1");
+               when others => raise Program_Error;
+            end case;
+         end Do_Named_Stmt;
 
          use Buffered_Output;
 
@@ -3290,7 +3304,7 @@ package body Pp.Actions is
          function Precedence (Expr : Ada_Tree) return Precedence_Level is
          begin
             case Expr.Kind is
-               when Ada_Bin_Op =>
+               when Ada_Bin_Op | Ada_Relation =>
                   case F_Op (Bin_Op (Expr)) is
                      when Ada_Op_In | Ada_Op_Not_In =>
                         raise Program_Error;
@@ -3516,7 +3530,7 @@ package body Pp.Actions is
             --  All binary operators are surrounded by blanks, except for "**":
             --     Max : constant := 2**31 - 1;
 
-            if Arg1.Kind = Ada_Bin_Op then
+            if Arg1.Kind in Ada_Bin_Op | Ada_Relation then
                if Is_Right and then Arg1_Higher then
                   Interpret_Template ("[@", Empty_Tree_Array, Cur_Level);
                end if;
@@ -3550,7 +3564,7 @@ package body Pp.Actions is
                Interpret_Template ("@", Empty_Tree_Array, Cur_Level);
             end if;
 
-            if Arg2.Kind = Ada_Bin_Op then
+            if Arg2.Kind in Ada_Bin_Op | Ada_Relation then
                Interpret_Template ("[@", Empty_Tree_Array, Cur_Level + 1);
                Do_Bin_Op
                  (Arg2,
@@ -3569,12 +3583,12 @@ package body Pp.Actions is
          procedure Do_For_Loop_Spec is
          begin
             case Parent (Tree).Kind is
-               when Ada_Loop_Stmt | Ada_Named_Loop_Stmt =>
-                  Interpret_Template ("for !? : ~~~ !? ~~~ !");
+               when Ada_Loop_Stmt =>
+                  Interpret_Template ("for ! !? ~~~ !");
                when Ada_Quantified_Expr =>
                   --  In this case, the quantfied_expression already printed
                   --  "for ".
-                  Interpret_Template ("!? : ~~~ !? ~~~ !@");
+                  Interpret_Template ("! !? ~~~ !@");
                when others => raise Program_Error;
             end case;
          end Do_For_Loop_Spec;
@@ -3727,9 +3741,11 @@ package body Pp.Actions is
             --  follows statements.
 
             Label_Seen := True;
-            Put ("\1", Replace_All (Label_Name (Tree), " ", ""));
-            --  ???libadalang parses a label as a single token, which is
-            --  wrong. This is a workaround.
+            if False then -- ????The template should suffice.
+               Interpret_Template ("<<!>>");
+            else
+               Put ("<<\1>>", Label_Name (Tree));
+            end if;
          end Do_Label;
 
 --         procedure Do_Ordinary_Type_Declaration is
@@ -4157,7 +4173,7 @@ package body Pp.Actions is
             when Ada_Un_Op =>
                Do_Un_Op (Tree);
 
-            when Ada_Bin_Op =>
+            when Ada_Bin_Op | Ada_Relation =>
                Do_Bin_Op (Tree, Is_Right  => False, Cur_Level => Cur_Level);
 
             when Ada_For_Loop_Spec =>
@@ -4180,6 +4196,9 @@ package body Pp.Actions is
 --
 --            when Ada_Block_Stmt =>
 --               Do_Block_Stmt;
+
+            when Ada_Named_Stmt =>
+               Do_Named_Stmt;
 
             when Ada_Subtype_Indication =>
                Do_Subtype_Indication;
