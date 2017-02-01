@@ -1583,8 +1583,8 @@ package body Pp.Formatting is
 
                   elsif Src_Tok.Kind = Blank_Line then
                      declare
-                        Prev_Src_Tok : constant Token :=
-                          Src_Tokens (Src_Index - 1);
+                        Prev_Tok_Kind : constant Token_Kind :=
+                          Src_Tokens (Src_Index - 1).Kind;
                      begin
                         loop
                            Src_Index := Src_Index + 1;
@@ -1592,15 +1592,21 @@ package body Pp.Formatting is
                            exit when Src_Tok.Kind /= Blank_Line
                              or else Preserve_Blank_Lines (Cmd);
                         end loop;
-                        if (not Insert_Blank_Lines (Cmd)
-                              and then Src_Tok.Kind /= End_Of_Input)
-                          or else Prev_Src_Tok.Kind in Comment_Kind
-                          or else Src_Tokens (Src_Index + 1).Kind -- next token
-                            in Comment_Kind
-                          or else Preserve_Blank_Lines (Cmd)
-                        then
-                           Append_Temp_Line_Break (Lines_Data);
-                        end if;
+                        declare
+                           Next_Tok_Kind : constant Token_Kind :=
+                             (if Src_Index < Last_Index (Src_Tokens)
+                                then Src_Tokens (Src_Index + 1).Kind
+                                else Nil);
+                        begin
+                           if Preserve_Blank_Lines (Cmd)
+                             or else (not Insert_Blank_Lines (Cmd)
+                                        and then Src_Tok.Kind /= End_Of_Input)
+                             or else Prev_Tok_Kind in Comment_Kind
+                             or else Next_Tok_Kind in Comment_Kind
+                           then
+                              Append_Temp_Line_Break (Lines_Data);
+                           end if;
+                        end;
                      end;
 
                   elsif Src_Tok.Kind in Whole_Line_Comment then
