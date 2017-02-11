@@ -4,13 +4,17 @@ with Libadalang; use Libadalang;
 with Libadalang.Analysis; use Libadalang.Analysis;
 
 with ASIS_UL.String_Utilities; use ASIS_UL.String_Utilities;
+with ASIS_UL.Vectors;
 
 package LAL_Extensions is
 
    --  ???Perhaps we should move (some of?) this stuff into package
    --  Libadalang.Analysis.
 
-   package Ada_Node_Vecs renames Analysis.Ada_Node_Vectors;
+   package Ada_Node_Vectors is new ASIS_UL.Vectors
+     (Index_Type => Positive,
+      Element_Type => Ada_Node,
+      Elements_Array => Ada_Node_Array);
 
    function Childx
      (Node  : access Ada_Node_Type'Class;
@@ -38,12 +42,12 @@ package LAL_Extensions is
      (Node      : access Ada_Node_Type'Class;
       Predicate : not null access function
         (Node : access Ada_Node_Type'Class) return Boolean)
-      return Ada_Node_Vecs.Elements_Array;
+      return Ada_Node_Array;
    --  Same as above, except return an array of the relevant nodes
 
    function Find_All
      (Node      : access Ada_Node_Type'Class;
-      Node_Kind : Ada_Node_Kind_Type) return Ada_Node_Vecs.Elements_Array;
+      Node_Kind : Ada_Node_Kind_Type) return Ada_Node_Array;
    --  Same as above, except return an array of the relevant nodes
 
    function Token_Text (Tok : Token_Type) return W_Str;

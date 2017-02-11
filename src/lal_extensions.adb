@@ -3,7 +3,7 @@ with Ada.Wide_Characters.Handling;
 
 package body LAL_Extensions is
 
-   use Ada_Node_Vecs;
+   use Ada_Node_Vectors;
 
    function Childx
      (Node  : access Ada_Node_Type'Class;
@@ -55,10 +55,10 @@ package body LAL_Extensions is
      (Node      : access Ada_Node_Type'Class;
       Predicate : not null access function
         (Node : access Ada_Node_Type'Class) return Boolean)
-      return Ada_Node_Vecs.Elements_Array
+      return Ada_Node_Array
    is
 
-      Result_Vector : Ada_Node_Vecs.Vector;
+      Result_Vector : Ada_Node_Vectors.Vector;
 
       procedure Append (Node : access Ada_Node_Type'Class);
 
@@ -69,19 +69,15 @@ package body LAL_Extensions is
    begin
       Find_Iter (Node, Predicate, Append'Access);
 
-      return Result : constant Ada_Node_Vecs.Elements_Array :=
-        To_Array (Result_Vector)
-      do
-         Destroy (Result_Vector);
-      end return;
+      return To_Array (Result_Vector);
    end Find_All;
 
    function Find_All
      (Node      : access Ada_Node_Type'Class;
-      Node_Kind : Ada_Node_Kind_Type) return Ada_Node_Vecs.Elements_Array
+      Node_Kind : Ada_Node_Kind_Type) return Ada_Node_Array
    is
 
-      Result_Vector : Ada_Node_Vecs.Vector;
+      Result_Vector : Ada_Node_Vectors.Vector;
 
       procedure Append (Node : access Ada_Node_Type'Class);
 
@@ -92,11 +88,7 @@ package body LAL_Extensions is
    begin
       Find_Iter (Node, Node_Kind, Append'Access);
 
-      return Result : constant Ada_Node_Vecs.Elements_Array :=
-        To_Array (Result_Vector)
-      do
-         Destroy (Result_Vector);
-      end return;
+      return To_Array (Result_Vector);
    end Find_All;
 
    function Token_Text (Tok : Token_Type) return W_Str is
@@ -200,7 +192,7 @@ package body LAL_Extensions is
               Ada_Subp_Renaming_Decl |
               Ada_Subp_Decl =>
                Result :=
-                 F_Name (F_Subp_Spec (Basic_Subp_Decl (Decl)));
+                 F_Subp_Name (F_Subp_Spec (Basic_Subp_Decl (Decl)));
             when Ada_Package_Decl =>
                Result :=
                  F_Package_Name (Base_Package_Decl (Decl));
@@ -210,13 +202,13 @@ package body LAL_Extensions is
                  (F_Package_Decl (Generic_Package_Decl (Decl)));
             when Ada_Generic_Subp_Decl =>
                Result :=
-                 F_Name (F_Subp_Spec (Generic_Subp_Decl (Decl)));
+                 F_Subp_Name (F_Subp_Spec (Generic_Subp_Decl (Decl)));
             when Ada_Package_Body =>
                Result :=
                  F_Package_Name (Package_Body (Decl));
             when Ada_Subp_Body =>
                Result :=
-                 F_Name (F_Subp_Spec (Subp_Body (Decl)));
+                 F_Subp_Name (F_Subp_Spec (Subp_Body (Decl)));
             when Ada_Single_Protected_Decl =>
                Result :=
                  Name (F_Protected_Name (Single_Protected_Decl (Decl)));
@@ -230,10 +222,10 @@ package body LAL_Extensions is
                  Name (F_Entry_Name (Entry_Body (Decl)));
             when Ada_Single_Task_Decl =>
                Result :=
-                 Name (F_Task_Name (Single_Task_Decl (Decl)));
+                 Name (F_Type_Id (F_Task_Type (Single_Task_Decl (Decl))));
             when Ada_Task_Type_Decl =>
                Result :=
-                 Name (F_Task_Type_Name (Task_Type_Decl (Decl)));
+                 Name (F_Type_Id (Task_Type_Decl (Decl)));
             when Ada_Task_Body =>
                Result := F_Name (Task_Body (Decl));
             when others =>
@@ -305,7 +297,8 @@ package body LAL_Extensions is
          when Ada_Protected_Type_Decl =>
             F_Aspects (Protected_Type_Decl (Decl)),
          when Ada_Single_Task_Decl =>
-            F_Aspects (Single_Task_Decl (Decl)),
+            F_Aspects (F_Task_Type (Single_Task_Decl (Decl))),
+            --  The aspects are on the anonymous task type.
          when Ada_Task_Type_Decl =>
             F_Aspects (Task_Type_Decl (Decl)),
          when Ada_Type_Decl =>

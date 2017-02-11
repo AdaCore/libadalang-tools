@@ -126,7 +126,7 @@ package body Pp.Actions is
          end if;
       end if;
 
-      --  ????????????????Other checks from gnatpp/lal_ul-check_parameters.adb?
+      --  ????Other checks from gnatpp/lal_ul-check_parameters.adb?
 
       pragma Assert (Environment.Initial_Dir = Current_Directory);
       if Mimic_gcc (Cmd) then
@@ -429,7 +429,7 @@ package body Pp.Actions is
    subtype Query_Count is Natural;
    subtype Ada_Tree_Base is Ada_Node;
    subtype Ada_Tree is Ada_Node;
-   subtype Ada_Tree_Array is Ada_Node_Arrays.Array_Type;
+   subtype Ada_Tree_Array is Ada_Node_Array;
    function Is_Nil (T : access Ada_Node_Type'Class) return Boolean is
      (T = null);
    function Present (T : access Ada_Node_Type'Class) return Boolean is
@@ -437,7 +437,7 @@ package body Pp.Actions is
    function Subtree_Count
      (T : access Ada_Node_Type'Class) return Query_Count is
        (if Is_Nil (T) then 0 else Last_Child_Index (T));
-   function Empty_Tree_Array return Ada_Node_Arrays.Array_Type is
+   function Empty_Tree_Array return Ada_Node_Array is
      ((1 .. 0 => <>));
    function Subtrees (T : access Ada_Node_Type'Class) return Ada_Tree_Array is
      (if Is_Nil (T) then Empty_Tree_Array else Children (T));
@@ -506,6 +506,10 @@ package body Pp.Actions is
    begin
       return
         (case Kind is
+           when Ada_Contract_Case_Assoc => null,
+           when Ada_Contract_Cases => null,
+            --  ???Not sure what those are.
+
            when Ada_Ada_List => null,
            when Ada_Subp_Spec => null,
            when Ada_Aggregate_Assoc => null,
@@ -575,7 +579,7 @@ package body Pp.Actions is
                 "]@ is$",
                 "!",
                 "!",
-                "end !1"),
+                "end !1/"),
            when Ada_Protected_Body =>
              L ("protected body !", Aspects, " is$", "!", "end !1"),
            when Ada_Subp_Body =>
@@ -655,7 +659,9 @@ package body Pp.Actions is
              L ("!$",
                 "!$/"),
            when Ada_Single_Task_Decl =>
-             L ("task !", Aspects, "? is$~~~"),
+             L ("!"),
+           when Ada_Single_Task_Type_Decl =>
+             L ("task !!", Aspects, "? is$~~~"),
            when Ada_Task_Type_Decl =>
              L ("task type !!",
                 Aspects,
@@ -672,6 +678,7 @@ package body Pp.Actions is
            when Ada_Enum_Type_Decl =>
              L ("type ! is", "[ @(?~,@1 ~~)", Aspects, "]"),
            when Ada_Type_Decl => null,
+           when Ada_Classwide_Type_Decl => null,
            when Ada_Subtype_Decl =>
              L ("subtype ! is[@ !", Aspects, "]"),
            when Ada_Compilation_Unit => null,
@@ -797,9 +804,9 @@ package body Pp.Actions is
              L ("?declare$",
                 "~~~",
                 "!",
-                "end"),
+                "end/"),
            when Ada_Loop_Stmt =>
-             L ("?~~@ ~loop$", "{?~;$~;$~}", "end loop"),
+             L ("?~~@ ~loop$", "{?~;$~;$~}", "end loop/"),
            when Ada_For_Loop_Spec => null,
            when Ada_For_Loop_Var_Decl =>
              L ("!? : ~~~"),
@@ -841,7 +848,9 @@ package body Pp.Actions is
            when Ada_Formal_Discrete_Type_Def =>
              L ("@(<>)"),
            when Ada_Incomplete_Type_Def =>
-             L ("?~~~"),
+             L (""),
+           when Ada_Incomplete_Tagged_Type_Def =>
+             L (" is tagged"),
            when Ada_Interface_Type_Def =>
              L ("?~~ ~interface? and[@ ~ and@ ~]~"),
            when Ada_Mod_Int_Type_Def =>
@@ -3171,7 +3180,6 @@ package body Pp.Actions is
             --     Thing   at 0 range   0 ..  127;
             --     Thing_2 at 0 range 128 .. 1023;
 
-            use type Ada_Node_Arrays.Array_Type;
             pragma Assert
               (F_Op (Bin_Op (Subtree (Tree, 3))) = Ada_Op_Double_Dot);
             Subts : constant Ada_Tree_Array :=
@@ -3892,9 +3900,9 @@ package body Pp.Actions is
          end Do_Select_When_Part;
 
          procedure Do_Subp_Spec is
-            Params : constant Param_Spec_List := F_Params (Subp_Spec (Tree));
+            Params : constant Param_Spec_List := F_Subp_Params (Subp_Spec (Tree));
             Is_Function : constant Boolean :=
-              Present (F_Returns (Subp_Spec (Tree)));
+              Present (F_Subp_Returns (Subp_Spec (Tree)));
             Param_Count : Query_Count := Subtree_Count (Params);
          begin
             if Is_Function then
@@ -3950,7 +3958,7 @@ package body Pp.Actions is
                  when Ada_Entry_Body =>
                     F_Params (Entry_Body (Tree)),
                  when others =>
-                    F_Params (Spec));
+                    F_Subp_Params (Spec));
 
             Is_Body : constant Boolean :=
               (case Tree.Kind is
@@ -3970,7 +3978,7 @@ package body Pp.Actions is
 
 --  ???The following gets SIGSEGV:
 --            Is_Function : constant Boolean :=
---              Present (Spec) and then Present (F_Returns (Spec));
+--              Present (Spec) and then Present (F_Subp_Returns (Spec));
 --            Param_Count : constant Query_Count :=
 --              Subtree_Count (Params) +
 --              Boolean'Pos (Is_Function); -- Add one extra for function result
@@ -3980,14 +3988,13 @@ package body Pp.Actions is
             if Tree.Kind in Ada_Entry_Decl | Ada_Entry_Body then
                Is_Function := False;
             else
-               Is_Function := Present (F_Returns (Spec));
+               Is_Function := Present (F_Subp_Returns (Spec));
                if Is_Function then
                   Param_Count := Param_Count + 1;
                   --  Add one extra for function result
                end if;
             end if;
             declare
-               use type Ada_Node_Arrays.Array_Type;
                Subs : constant Ada_Tree_Array :=
                  (if Tree.Kind = Ada_Subp_Body
                     then Subtrees (Tree)(1 .. Subtree_Count (Tree) - 1) &
@@ -4045,7 +4052,6 @@ package body Pp.Actions is
          end Do_Subtype_Indication;
 
          procedure Do_Task_Def is
-            use type Ada_Node_Arrays.Array_Type;
             --  Replace the F_End_Id with the name found in our parent, which
             --  is an Ada_Task_Type_Decl or Ada_Single_Task_Decl.
             Subs : constant Ada_Tree_Array :=
@@ -4058,9 +4064,7 @@ package body Pp.Actions is
          procedure Do_Type_Decl is
             Def : constant Type_Def := F_Type_Def (Type_Decl (Tree));
          begin
-            if Def.Kind = Ada_Incomplete_Type_Def
-              and then not F_Has_Tagged (Incomplete_Type_Def (Def))
-            then
+            if Def.Kind = Ada_Incomplete_Type_Def then
                Interpret_Template (Incomplete_Type_Decl_Alt_Templ);
             elsif Def.Kind = Ada_Record_Type_Def
               or else (Def.Kind = Ada_Derived_Type_Def

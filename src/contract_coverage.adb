@@ -102,7 +102,7 @@ procedure Contract_Coverage is
                      Put ("    Doing subprogram ");
                      Wide_Text_IO.Put
                        (Full_Name
-                         (F_Name
+                         (F_Subp_Name
                            (F_Subp_Spec
                              (Basic_Subp_Decl (Decl)))));
                   end if;
@@ -172,7 +172,7 @@ begin
             --  True if the node is a generic package declaration or a
             --  package declaration.
 
-            Packs : constant Ada_Node_Vectors.Elements_Array :=
+            Packs : constant Ada_Node_Array :=
               Find_All (Root (Unit), Is_Pkg_Or_Gen'Access);
 
          begin

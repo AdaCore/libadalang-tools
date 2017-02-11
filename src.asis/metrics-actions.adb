@@ -743,7 +743,7 @@ package body METRICS.Actions is
          when Ada_Subp_Body =>
             declare
                R : constant Type_Expr :=
-                 F_Returns (F_Subp_Spec (Subp_Body (Node)));
+                 F_Subp_Returns (F_Subp_Spec (Subp_Body (Node)));
             begin
                return
                  (if R = null then Procedure_Body_Knd else Function_Body_Knd);
@@ -771,7 +771,7 @@ package body METRICS.Actions is
          when Ada_Generic_Subp_Decl =>
             declare
                R : constant Type_Expr :=
-                 F_Returns (F_Subp_Spec (Generic_Subp_Decl (Node)));
+                 F_Subp_Returns (F_Subp_Spec (Generic_Subp_Decl (Node)));
                --  ???R is null here even for functions
             begin
                return
@@ -787,7 +787,7 @@ package body METRICS.Actions is
              Ada_Subp_Decl =>
             declare
                R : constant Type_Expr :=
-                 F_Returns (F_Subp_Spec (Basic_Subp_Decl (Node)));
+                 F_Subp_Returns (F_Subp_Spec (Basic_Subp_Decl (Node)));
             begin
                return (if R = null then Procedure_Knd else Function_Knd);
             end;
@@ -2419,7 +2419,7 @@ package body METRICS.Actions is
       function Ancestor_Node (N : Natural) return Ada_Node is
       begin
          pragma Assert (Last_Index (Node_Stack) >= N);
-         return Get (Node_Stack, Last_Index (Node_Stack) - N);
+         return Element (Node_Stack, Last_Index (Node_Stack) - N);
       end Ancestor_Node;
 
       function Parent_Node return Ada_Node is (Ancestor_Node (1));
@@ -3067,8 +3067,8 @@ package body METRICS.Actions is
                case Child_Count (F_Args (Pragma_Node (Node))) is
                   when 0 => ON := True; pragma Assert (False);
                   when 1 =>
-                     ON :=
-                       L_Name (F_Expr (Item (F_Args (Pragma_Node (Node)), 1)))
+                     ON := L_Name
+                       (P_Assoc_Expr (Item (F_Args (Pragma_Node (Node)), 1)))
                        = "on";
                   when others => raise Program_Error;
                end case;
@@ -3278,7 +3278,8 @@ package body METRICS.Actions is
              Ada_Basic_Decl | Ada_Entry_Index_Spec
            and then Kind (Node) not in
              Ada_Generic_Formal | Ada_Base_Package_Decl |
-             Ada_Anonymous_Type_Decl | Ada_Named_Stmt_Decl | Ada_Label_Decl
+             Ada_Anonymous_Type_Decl | Ada_Named_Stmt_Decl | Ada_Label_Decl |
+             Ada_Single_Task_Type_Decl
          then
             Inc_All (Declarations);
             Inc_All (Logical_Source_Lines);
@@ -3465,10 +3466,8 @@ package body METRICS.Actions is
          case Kind (Node) is
             when Ada_Interface_Type_Def =>
                File_M.Has_Tagged_Type := True;
-            when Ada_Incomplete_Type_Def =>
-               if F_Has_Tagged (Incomplete_Type_Def (Node)) then
-                  File_M.Has_Tagged_Type := True;
-               end if;
+            when Ada_Incomplete_Tagged_Type_Def =>
+               File_M.Has_Tagged_Type := True;
             when Ada_Private_Type_Def =>
                if F_Has_Tagged (Private_Type_Def (Node)) then
                   File_M.Has_Tagged_Type := True;
@@ -3630,7 +3629,7 @@ package body METRICS.Actions is
             --  ???See P907-045
             pragma Assert
               (Parents (Node).Items (3) =
-                 Get (Node_Stack, Last_Index (Node_Stack) - 2));
+                 Element (Node_Stack, Last_Index (Node_Stack) - 2));
          end if;
          if not In_Assertion then
             Gather_Line_Metrics (Node, M);
@@ -3757,8 +3756,6 @@ package body METRICS.Actions is
          Outdent;
          Put ("<--Walk: \1\n", Short_Image (CU_Node));
       end if;
-
-      Destroy (Node_Stack);
    end Per_File_Action;
 
    ---------------
