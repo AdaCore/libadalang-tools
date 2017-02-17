@@ -1979,10 +1979,15 @@ package body Pp.Formatting is
                      begin
                         if XT /= YT then
                            --  "=>" matches a preceding "|"
-                           if XT = Name_Arrow and then YT = Name_Bar then
+                           if (XT = Name_Arrow and then YT = Name_Bar)
+                             or else (XT = Name_Bar and then YT = Name_Arrow)
+                           then
                               null;
                            else
-                              raise Program_Error;
+                              Put_Token (Cur_Tok);
+                              raise Program_Error with
+                                "Tab token mismatch: " &
+                                Str (XT).S & " " & Str (YT).S;
                            end if;
                         end if;
                      end;

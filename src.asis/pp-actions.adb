@@ -715,7 +715,7 @@ package body Pp.Actions is
              L ("!'[@1!?@ (~,@ ~)~]"),
              --  ???This includes function calls to attributes, such as
              --  T'Max(X, Y), which isn't really right.
-           when Ada_Bin_Op |  Ada_Relation => null,
+           when Ada_Bin_Op |  Ada_Relation_Op => null,
            when Ada_Call_Expr => null,
            when Ada_Case_Expr =>
              L ("case ! is[@ ?@~,@ ~~]"),
@@ -3312,7 +3312,7 @@ package body Pp.Actions is
          function Precedence (Expr : Ada_Tree) return Precedence_Level is
          begin
             case Expr.Kind is
-               when Ada_Bin_Op | Ada_Relation =>
+               when Ada_Bin_Op | Ada_Relation_Op =>
                   case F_Op (Bin_Op (Expr)) is
                      when Ada_Op_In | Ada_Op_Not_In =>
                         raise Program_Error;
@@ -3538,7 +3538,7 @@ package body Pp.Actions is
             --  All binary operators are surrounded by blanks, except for "**":
             --     Max : constant := 2**31 - 1;
 
-            if Arg1.Kind in Ada_Bin_Op | Ada_Relation then
+            if Arg1.Kind in Ada_Bin_Op | Ada_Relation_Op then
                if Is_Right and then Arg1_Higher then
                   Interpret_Template ("[@", Empty_Tree_Array, Cur_Level);
                end if;
@@ -3572,7 +3572,7 @@ package body Pp.Actions is
                Interpret_Template ("@", Empty_Tree_Array, Cur_Level);
             end if;
 
-            if Arg2.Kind in Ada_Bin_Op | Ada_Relation then
+            if Arg2.Kind in Ada_Bin_Op | Ada_Relation_Op then
                Interpret_Template ("[@", Empty_Tree_Array, Cur_Level + 1);
                Do_Bin_Op
                  (Arg2,
@@ -4177,7 +4177,7 @@ package body Pp.Actions is
             when Ada_Un_Op =>
                Do_Un_Op (Tree);
 
-            when Ada_Bin_Op | Ada_Relation =>
+            when Ada_Bin_Op | Ada_Relation_Op =>
                Do_Bin_Op (Tree, Is_Right  => False, Cur_Level => Cur_Level);
 
             when Ada_For_Loop_Spec =>
