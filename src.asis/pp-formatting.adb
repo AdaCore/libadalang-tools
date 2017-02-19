@@ -1978,7 +1978,7 @@ package body Pp.Formatting is
                         YT : constant Symbol   := Tabs (YY).Token;
                      begin
                         if XT /= YT then
-                           --  "=>" matches a preceding "|"
+                           --  "=>" matches a preceding "|", and vice versa
                            if (XT = Name_Arrow and then YT = Name_Bar)
                              or else (XT = Name_Bar and then YT = Name_Arrow)
                            then
