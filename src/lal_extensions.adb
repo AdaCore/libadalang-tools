@@ -164,7 +164,7 @@ package body LAL_Extensions is
 
             when Ada_Generic_Subp_Instantiation =>
                Result :=
-                 F_Name (Generic_Subp_Instantiation (Decl));
+                 F_Subp_Name (Generic_Subp_Instantiation (Decl));
             when Ada_Generic_Package_Instantiation =>
                Result :=
                  F_Name (Generic_Package_Instantiation (Decl));
