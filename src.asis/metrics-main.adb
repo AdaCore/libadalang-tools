@@ -8,7 +8,7 @@ with METRICS.Command_Lines;
 
 procedure METRICS.Main is
 
-   --  Prototype metrics tool.
+   --  Main procedure for lalmetric
 
    procedure Callback (Phase : Parse_Phase; Swit : Dynamically_Typed_Switch);
 

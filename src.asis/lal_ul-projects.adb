@@ -7,12 +7,10 @@ with Ada.Text_IO;
 
 with GNAT.Directory_Operations;
 
-pragma Warnings (Off); -- ????????????????
 with GNATCOLL.Projects; use GNATCOLL.Projects;
 with GNATCOLL.VFS;      use GNATCOLL.VFS;
 with GNATCOLL.Projects.Aux;
 with GNATCOLL.Traces;
-pragma Warnings (On);
 
 with LAL_UL.Common;     use LAL_UL.Common;
 with LAL_UL.Environment;
@@ -24,10 +22,8 @@ with LAL_UL.Versions;
 package body LAL_UL.Projects is
    use Text_IO;
 
-   pragma Warnings (Off); -- ????????????????
    use Common_Flag_Switches, Common_String_Switches,
      Common_String_Seq_Switches, Common_Nat_Switches;
-   pragma Warnings (On);
 
    function Project_File_Name (Cmd : Command_Line) return String with
       Pre => Arg (Cmd, Project_File) /= null;

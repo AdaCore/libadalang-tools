@@ -48,10 +48,8 @@ with Libadalang.Analysis; use Libadalang.Analysis;
 
 package body LAL_UL.Drivers is
 
-   pragma Warnings (Off); -- ????????????????
    use Common_Flag_Switches, Common_String_Switches,
      Common_String_Seq_Switches, Common_Nat_Switches;
-   pragma Warnings (On);
 
    use Tools;
 

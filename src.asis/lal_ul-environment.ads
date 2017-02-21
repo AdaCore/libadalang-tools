@@ -32,7 +32,7 @@ with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 with GNAT.OS_Lib;               use GNAT.OS_Lib;
 
 with ASIS_UL.String_Utilities; use ASIS_UL.String_Utilities;
-  use ASIS_UL.String_Utilities.String_Vectors;
+use ASIS_UL.String_Utilities.String_Vectors;
 
 package LAL_UL.Environment is
 
@@ -49,10 +49,6 @@ package LAL_UL.Environment is
    --  Performs the general final clean-up actions, including closing and
    --  deleting of all files in the temporary directory and deleting this
    --  temporary directory itself.
-
-   procedure Call_Builder;
-   --  Used by the outer invocation in incremental mode to call the
-   --  builder. Raises Fatal_Error on failure.
 
    Extra_Inner_Pre_Args, Extra_Inner_Post_Args : String_Vector;
    --  In Incremental_Mode, these may be used by the outer invocation of the

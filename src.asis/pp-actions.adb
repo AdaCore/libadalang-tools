@@ -4887,7 +4887,7 @@ package body Pp.Actions is
 
             Text_IO.Put_Line
               (Text_IO.Standard_Error,
-               "gnatpp: pretty-printing failed; unable to format " & File_Name);
+               "gnatpp: pretty-printing failed; cannot format " & File_Name);
 
             if Enable_Token_Mismatch then
                raise;

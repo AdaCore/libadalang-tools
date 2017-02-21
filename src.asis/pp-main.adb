@@ -1,7 +1,3 @@
-pragma Warnings (Off); -- ????????????????
-with ASIS_UL.Debug; use ASIS_UL.Debug;
-pragma Warnings (On); -- ????????????????
-
 with LAL_UL.Command_Lines; use LAL_UL.Command_Lines;
 with LAL_UL.Drivers;
 
@@ -10,7 +6,7 @@ with Pp.Command_Lines;
 
 procedure Pp.Main is
 
-   --  Prototype Pp tool.
+   --  Main procedure for lalpp
 
    procedure Callback (Phase : Parse_Phase; Swit : Dynamically_Typed_Switch);
 

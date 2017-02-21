@@ -131,7 +131,6 @@ package body LAL_Extensions is
    begin
       case Kind (Nm) is
          when Ada_Dotted_Name =>
-            --  ????Not sure why we have to convert to Name here:
             return Full_Name (F_Prefix (Dotted_Name (Nm))) &
               "." & Full_Name (Name (F_Suffix (Dotted_Name (Nm))));
          when Ada_Identifier | Ada_String_Literal =>
