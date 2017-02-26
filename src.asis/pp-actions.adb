@@ -339,8 +339,7 @@ package body Pp.Actions is
    type Ada_Template is new W_Str;
    --  This is similar to Formatted_Output.Template, except instead of
    --  inserting strings into the template, it inserts subtrees. See
-   --  Interpret_Template in the subunit Tree_To_Ada. The special
-   --  characters are:
+   --  Interpret_Template. The special characters are:
    --
    --      $ -- insert a hard line break
    --      % -- same as $, but doesn't affect comment indentation
@@ -3929,27 +3928,8 @@ package body Pp.Actions is
 
             Spec : constant Subp_Spec :=
               (case Tree.Kind is
-                 when Ada_Subp_Decl |
-                      Ada_Abstract_Subp_Decl |
-                      Ada_Expr_Function |
-                      Ada_Null_Subp_Decl |
-                      Ada_Subp_Renaming_Decl =>
-                    F_Subp_Spec (Basic_Subp_Decl (Tree)),
-                 when Ada_Formal_Subp_Decl =>
-                    F_Subp_Spec (Formal_Subp_Decl (Tree)),
-                 when Ada_Access_To_Subp_Def =>
-                    F_Subp_Spec (Access_To_Subp_Def (Tree)),
-                 when Ada_Subp_Body_Stub =>
-                    F_Subp_Spec (Subp_Body_Stub (Tree)),
-                 when Ada_Subp_Body =>
-                    F_Subp_Spec (Subp_Body (Tree)),
-                 when Ada_Entry_Decl =>
-                    null,
-                 when Ada_Entry_Body =>
-                    null,
-                 when Ada_Generic_Subp_Decl =>
-                    F_Subp_Spec (Generic_Subp_Decl (Tree)),
-                 when others => raise Program_Error);
+                 when Ada_Entry_Decl | Ada_Entry_Body => null,
+                 when others => Get_Subp_Spec (Tree));
 
             Params : constant Param_Spec_List :=
               (case Tree.Kind is

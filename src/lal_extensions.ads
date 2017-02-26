@@ -110,6 +110,9 @@ package LAL_Extensions is
    function Is_Program_Unit (Node : Ada_Node) return Boolean;
    --  True if Node is a program unit as defined in the Ada RM
 
+   function Get_Subp_Spec (Node : Ada_Node) return Subp_Spec;
+   --  Return F_Subp_Spec
+
    function Adds_New_Nesting_Level (Node : Ada_Node) return Boolean;
    --  True if Node should be counted as a nesting level for the purposes of
    --  the Construct_Nesting metric in gnatmetric.

@@ -191,7 +191,7 @@ package body LAL_Extensions is
               Ada_Subp_Renaming_Decl |
               Ada_Subp_Decl =>
                Result :=
-                 F_Subp_Name (F_Subp_Spec (Basic_Subp_Decl (Decl)));
+                 F_Subp_Name (Get_Subp_Spec (Decl));
             when Ada_Package_Decl =>
                Result :=
                  F_Package_Name (Base_Package_Decl (Decl));
@@ -201,13 +201,13 @@ package body LAL_Extensions is
                  (F_Package_Decl (Generic_Package_Decl (Decl)));
             when Ada_Generic_Subp_Decl =>
                Result :=
-                 F_Subp_Name (F_Subp_Spec (Generic_Subp_Decl (Decl)));
+                 F_Subp_Name (Get_Subp_Spec (Decl));
             when Ada_Package_Body =>
                Result :=
                  F_Package_Name (Package_Body (Decl));
             when Ada_Subp_Body =>
                Result :=
-                 F_Subp_Name (F_Subp_Spec (Subp_Body (Decl)));
+                 F_Subp_Name (Get_Subp_Spec (Decl));
             when Ada_Single_Protected_Decl =>
                Result :=
                  Name (F_Protected_Name (Single_Protected_Decl (Decl)));
@@ -405,6 +405,23 @@ package body LAL_Extensions is
          when others => return False;
       end case;
    end Is_Program_Unit;
+
+   function Get_Subp_Spec (Node : Ada_Node) return Subp_Spec is
+   begin
+      case Kind (Node) is
+         when Ada_Classic_Subp_Decl =>
+            return F_Subp_Spec (Classic_Subp_Decl (Node));
+         when Ada_Generic_Subp_Decl =>
+            return F_Subp_Spec (Generic_Subp_Decl (Node));
+         when Ada_Subp_Body_Stub =>
+            return F_Subp_Spec (Subp_Body_Stub (Node));
+         when Ada_Subp_Body =>
+            return F_Subp_Spec (Subp_Body (Node));
+         when Ada_Access_To_Subp_Def =>
+            return F_Subp_Spec (Access_To_Subp_Def (Node));
+         when others => raise Program_Error;
+      end case;
+   end Get_Subp_Spec;
 
    function Adds_New_Nesting_Level (Node : Ada_Node) return Boolean is
    begin

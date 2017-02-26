@@ -743,7 +743,7 @@ package body METRICS.Actions is
          when Ada_Subp_Body =>
             declare
                R : constant Type_Expr :=
-                 F_Subp_Returns (F_Subp_Spec (Subp_Body (Node)));
+                 F_Subp_Returns (Get_Subp_Spec (Node));
             begin
                return
                  (if R = null then Procedure_Body_Knd else Function_Body_Knd);
@@ -771,7 +771,7 @@ package body METRICS.Actions is
          when Ada_Generic_Subp_Decl =>
             declare
                R : constant Type_Expr :=
-                 F_Subp_Returns (F_Subp_Spec (Generic_Subp_Decl (Node)));
+                 F_Subp_Returns (Get_Subp_Spec (Node));
                --  ???R is null here even for functions
             begin
                return
@@ -787,7 +787,7 @@ package body METRICS.Actions is
              Ada_Subp_Decl =>
             declare
                R : constant Type_Expr :=
-                 F_Subp_Returns (F_Subp_Spec (Basic_Subp_Decl (Node)));
+                 F_Subp_Returns (Get_Subp_Spec (Node));
             begin
                return (if R = null then Procedure_Knd else Function_Knd);
             end;
@@ -3048,9 +3048,7 @@ package body METRICS.Actions is
 
       begin
          case Kind (Node) is
-            when Ada_Basic_Subp_Decl
-              | Ada_Generic_Subp_Decl
-            =>
+            when Ada_Basic_Subp_Decl =>
                Prev_Subp_Decl := Node;
             when Ada_Pragma_Node =>
                null; -- Leave Prev_Subp_Decl alone

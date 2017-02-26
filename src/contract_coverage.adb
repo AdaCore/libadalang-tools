@@ -101,10 +101,7 @@ procedure Contract_Coverage is
                   if Verbose then
                      Put ("    Doing subprogram ");
                      Wide_Text_IO.Put
-                       (Full_Name
-                         (F_Subp_Name
-                           (F_Subp_Spec
-                             (Basic_Subp_Decl (Decl)))));
+                       (Full_Name (F_Subp_Name (Get_Subp_Spec (Decl))));
                   end if;
 
                   Subp_Count := Subp_Count + 1;
