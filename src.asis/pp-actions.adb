@@ -507,6 +507,7 @@ package body Pp.Actions is
         (case Kind is
            when Ada_Contract_Case_Assoc => null,
            when Ada_Contract_Cases => null,
+           when Ada_Instantiation_Env_Holder => null,
             --  ???Not sure what those are.
 
            when Ada_Ada_List => null,
@@ -616,9 +617,11 @@ package body Pp.Actions is
            when Ada_Exception_Decl =>
                  L ("?~,@ ~~ ^: exception!", Aspects),
            when Ada_Generic_Package_Instantiation =>
-             L ("package ! is new !?[@ (~,@ ~)]~", Aspects),
+             L ("package ! is new !?[@ (~,@ ~)]~", Aspects, "/"),
+                --  The "/" is to ignore the instantiation_env_holder.
+                --  ???Not sure what it is, nor why it's syntactic.
            when Ada_Generic_Subp_Instantiation =>
-             L ("?~~ ~! ! is new !?[@ (~,@ ~)]~", Aspects),
+             L ("?~~ ~! ! is new !?[@ (~,@ ~)]~", Aspects, "/"),
            when Ada_Generic_Package_Decl =>
              L ("generic$",
                 "!",
