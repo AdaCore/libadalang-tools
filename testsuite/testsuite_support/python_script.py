@@ -1,20 +1,23 @@
-import os
-import os.path
-import re
+import sys
 
 from testsuite_support.base_driver import (
     BaseDriver, catch_test_errors,
 )
 
 
-class ContractCoverageDriver(BaseDriver):
+class PythonScriptDriver(BaseDriver):
     """
-    Driver to test the "contract_coverage" tool.
+    Driver to run a Python script.
 
-    In order to use it, just put *.adb and/or *.ads source files in the test
-    directory. The output of "contract_coverage [FILES]" (FILES being the
-    sorted list of these source files) will be checked against the expected
-    output (test.out).
+    Interface:
+
+    * put a "test.py" script in the test directory;
+    * put a "test.out" text file in the test directory.
+
+    This driver will run the Python script. Its output is then checked against
+    the expected output (test.out file). This mechanism is the most flexible
+    way to write a testcase, but also the more verbose one and the most complex
+    one. Use this driver when no other one fits.
     """
 
     TIMEOUT = 300
@@ -36,12 +39,7 @@ class ContractCoverageDriver(BaseDriver):
 
     @catch_test_errors
     def run(self):
-        source_files = sorted(
-            filename
-            for filename in os.listdir(self.test_dir)
-            if re.match(r'.*\.ad[bs]', filename)
-        )
-        self.call_and_check(['contract_coverage'] + source_files)
+        self.call_and_check([sys.executable, 'test.py'])
         if self.diff:
             for diff_pair in self.diff:
                 self.call(['diff', '-r'] + diff_pair.split() +

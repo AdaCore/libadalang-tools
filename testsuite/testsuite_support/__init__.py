@@ -1,13 +1,12 @@
-import os
-
 from gnatpython.testsuite import Testsuite as BaseTestsuite
 
-import testsuite_support.contract_coverage
+from testsuite_support.contract_coverage import ContractCoverageDriver
+from testsuite_support.python_script import PythonScriptDriver
 
 
 class Testsuite(BaseTestsuite):
     TEST_SUBDIR = 'tests'
     DRIVERS = {
-        'contract_coverage':
-            testsuite_support.contract_coverage.ContractCoverageDriver,
+        'contract_coverage': ContractCoverageDriver,
+        'python_script': PythonScriptDriver,
     }

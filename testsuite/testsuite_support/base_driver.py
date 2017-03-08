@@ -1,11 +1,12 @@
 import os
 import os.path
-import pipes
-import subprocess
 
 from gnatpython import fileutils
 from gnatpython.ex import Run, STDOUT
 from gnatpython.testsuite.driver import TestDriver
+
+
+CWD = os.path.dirname(os.path.abspath(__file__))
 
 
 class SetupError(Exception):
@@ -58,13 +59,13 @@ class BaseDriver(TestDriver):
     def tear_up(self):
         super(BaseDriver, self).tear_up()
         self.create_test_workspace()
+        self.register_path_subst(self.working_dir())
 
-        try:
-            _ = self.test_env['description']
-        except KeyError:
+        if 'description' not in self.test_env:
             raise SetupError('test.yaml: missing "description" field')
 
         self.check_file(self.expected_file)
+        self.result.expected_output = self.read_file(self.expected_file)
 
         # See if we expect a failure for this testcase
         try:
@@ -171,37 +172,38 @@ class BaseDriver(TestDriver):
     # Run helpers
     #
 
-    def run_and_check(self, argv):
+    def call(self, argv):
+        """
+        Run a subprocess with `argv`
+        """
+        Run(argv, cwd=self.working_dir(),
+            parse_shebang=True,
+            timeout=self.TIMEOUT,
+            output=self.output_file,
+            error=STDOUT)
+        self.result.actual_output += self.read_file(self.output_file)
+
+    def call_and_check(self, argv):
         """
         Run a subprocess with `argv` and check it completes with status code 0.
 
-        In case of failure, the test output is appended to the actual output
-        and a TestError is raised.
+        In case of failure, the status is appended to the actual output
         """
         program = argv[0]
 
         p = Run(argv, cwd=self.working_dir(),
+                parse_shebang=True,
                 timeout=self.TIMEOUT,
                 output=self.output_file,
                 error=STDOUT)
-
+        self.result.actual_output += self.read_file(self.output_file)
         if p.status != 0:
             self.result.actual_output += (
                 '{} returned status code {}\n'.format(program, p.status))
-            self.result.actual_output += self.read_file(self.output_file)
-            raise TestError(
-                '{} returned status code {}'.format(program, p.status))
 
     #
     # Analysis helpers
     #
 
     def analyze(self):
-        # Check for the test output itself
-        diff = fileutils.diff(self.expected_file, self.output_file,
-                              ignore_white_chars=False)
-        if diff:
-            self.set_failure('output is not as expected')
-            self.result.actual_output += diff
-        else:
-            self.set_passed()
+        self.analyze_diff()
