@@ -1,23 +1,22 @@
 import sys
+import os
 
 from testsuite_support.base_driver import (
     BaseDriver, catch_test_errors,
 )
 
 
-class PythonScriptDriver(BaseDriver):
+class ShellScriptDriver(BaseDriver):
     """
-    Driver to run a Python script.
+    Driver to run a sh script.
 
     Interface:
 
-    * put a "test.py" script in the test directory;
+    * put a "test.sh" script in the test directory;
     * put a "test.out" text file in the test directory.
 
-    This driver will run the Python script. Its output is then checked against
-    the expected output (test.out file). This mechanism is the most flexible
-    way to write a testcase, but also the more verbose one and the most complex
-    one. Use this driver when no other one fits.
+    This driver will run the sh script. Its output is then checked against
+    the expected output (test.out file). Use this driver only for legacy tests.
     """
 
     TIMEOUT = 300
@@ -28,7 +27,7 @@ class PythonScriptDriver(BaseDriver):
 
     @catch_test_errors
     def tear_up(self):
-        super(PythonScriptDriver, self).tear_up()
+        super(ShellScriptDriver, self).tear_up()
 
         args = self.test_env.get('args', None)
 
@@ -39,7 +38,8 @@ class PythonScriptDriver(BaseDriver):
 
     @catch_test_errors
     def run(self):
-        self.call_and_check([sys.executable, 'test.py'])
+        os.chmod(os.path.join(self.working_dir(), 'test.sh'), 0755)
+        self.call_and_check(['test.sh'])
         if self.diff:
             for diff_pair in self.diff:
                 self.call(['diff', '-r'] + diff_pair.split() +
