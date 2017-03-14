@@ -538,7 +538,7 @@ package body Pp.Actions is
            when Ada_Discriminant_Spec =>
              L ("?~,@ ~~ ^: !? ^2:=[@ ~~]~"),
            when Ada_Param_Spec => null,
-           when Ada_Base_Package_Decl | Ada_Package_Decl =>
+           when Ada_Base_Package_Decl =>
              L ("package !@",
                 Aspects,
                 "@ is$",

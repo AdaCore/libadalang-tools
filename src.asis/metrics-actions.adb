@@ -3269,13 +3269,13 @@ package body METRICS.Actions is
          --  Declarations
 
          pragma Assert
-           (if Kind (Node) = Ada_Base_Package_Decl then
+           (if Kind (Node) = Ada_Generic_Package_Internal then
               Kind (Parent (Node)) = Ada_Generic_Package_Decl);
 
          if Kind (Node) in
              Ada_Basic_Decl | Ada_Entry_Index_Spec
            and then Kind (Node) not in
-             Ada_Generic_Formal | Ada_Base_Package_Decl |
+             Ada_Generic_Formal | Ada_Generic_Package_Internal |
              Ada_Anonymous_Type_Decl | Ada_Named_Stmt_Decl | Ada_Label_Decl |
              Ada_Single_Task_Type_Decl
          then
