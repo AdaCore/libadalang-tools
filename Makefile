@@ -1,20 +1,19 @@
-# To build in production mode, do "make BUILD_MODE=prod".
-# To build in development mode, do "make BUILD_MODE=dev" or just "make".
+# To build in production mode, do "make BUILD_MODE=prod LIBRARY_TYPE=relocatable".
+# To build in development mode, do "make BUILD_MODE=dev LIBRARY_TYPE=static".
 
 BUILD_MODE = dev
 PROCESSORS = 0
+LIBRARY_TYPE = relocatable
 
 .PHONY: all
 all:
 	which gprbuild
 	which gcc
-	gprbuild -v -k -XLIBRARY_TYPE=static -XBUILD_MODE=${BUILD_MODE} -P src/build.gpr -p -j${PROCESSORS}
-#???	LIBRARY_TYPE=relocatable gprbuild -v -P src/build.gpr -p
+	gprbuild -v -k -XLIBRARY_TYPE=${LIBRARY_TYPE} -XXMLADA_BUILD=${LIBRARY_TYPE} \
+		-XBUILD_MODE=${BUILD_MODE} -P src/build.gpr -p -j${PROCESSORS}
 	cd bin ; rm -f gnatmetric gnatpp
 	cd bin ; cp -p lalmetric gnatmetric
 	cd bin ; cp -p lalpp gnatpp
-
-#???It's not clear to me why LIBRARY_TYPE=relocatable is needed.
 
 .PHONY: clean
 clean:
