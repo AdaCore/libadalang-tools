@@ -13,7 +13,9 @@ class ShellScriptDriver(BaseDriver):
     Interface:
 
     * put a "test.sh" script in the test directory;
-    * put a "test.out" text file in the test directory.
+    * put a "test.out" text file in the test directory,
+      with expected results. A missing test.out is treated
+      as empty.
 
     This driver will run the sh script. Its output is then checked against
     the expected output (test.out file). Use this driver only for legacy tests.

@@ -64,8 +64,11 @@ class BaseDriver(TestDriver):
         if 'description' not in self.test_env:
             raise SetupError('test.yaml: missing "description" field')
 
-        self.check_file(self.expected_file)
-        self.result.expected_output = self.read_file(self.expected_file)
+        # Allow a missing test.out -- treat as empty.
+        if os.path.isfile(os.path.join(self.test_dir, self.expected_file)):
+            self.result.expected_output = self.read_file(self.expected_file)
+        else:
+            self.result.expected_output = ''
 
         # See if we expect a failure for this testcase
         try:
@@ -205,5 +208,9 @@ class BaseDriver(TestDriver):
     # Analysis helpers
     #
 
+    # Do a case insensitive diff, because gnatpp does not yet generate the
+    # correct case of identifiers. ???When that is fixed, change this.
     def analyze(self):
-        self.analyze_diff()
+        self.analyze_diff(
+            expected=self.result.expected_output.lower(),
+            actual=self.result.actual_output.lower())
