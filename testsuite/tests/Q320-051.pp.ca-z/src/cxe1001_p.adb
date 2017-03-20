@@ -1,0 +1,92 @@
+-- CXE1001.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained 
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making 
+--     this public release, the Government intends to confer upon all 
+--     recipients unlimited rights  equal to those held by the Government.  
+--     These rights include rights to use, duplicate, release or disclose the 
+--     released technical data and computer software in whole or in part, in 
+--     any manner and for any purpose whatsoever, and to have or permit others 
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED 
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE 
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE: 
+--      Check that the attribute D'Partition_ID is available where D denotes
+--      a library level declaration.  Check that this attribute identifies
+--      the partition in which D is elaborated.
+--
+-- TEST DESCRIPTION:
+--      Two library level routines are separately compiled.  Two partitions 
+--      are linked each with a main program that includes these two routines.
+--      In each partition the main program compares the 'Partition_ID of each
+--      of the routines - they should be the same within the partition.   Each
+--      partition then displays this ID.  This has to be examined by "hand" 
+--      and should be different between the partitions.
+--
+-- SPECIAL REQUIREMENTS:
+--      Compile the compilation units in this file.
+--      Create the two partitions (A and B) with the following contents:
+--        Partition A contains:
+--           CXE1001_A  (main procedure)
+--           CXE1001_P
+--           CXE1001_Q
+--           Report
+--           and all normal and pure packages with'ed by these units.
+--        Partition B contains:
+--           CXE1001_B  (main procedure)
+--           CXE1001_P
+--           CXE1001_Q
+--           Report
+--           and all normal and pure packages with'ed by these units.
+--      
+--      Execute CXE1001_A and CXE1001_B in their respective partitions "in
+--      parallel".  They will each display and a
+--      "Tentatively passed" or a "Failed" message.  These displays will have
+--      to be examined to determine if the test has actually passed.
+--
+--
+-- PASS/FAIL CRITERIA: 
+--      Both partitions will display Report.Comment messages indicating that
+--      Procedure_P and Procedure_Q have been executed.
+--
+--      Both partitions must display "Tentatively passed" messages.  They
+--      will each also display, on lines with "!" identifiers, the partition
+--      number assigned by the operating system to the partition.  These
+--      displays must be examined.  The test passes if the partition numbers
+--      differ.  The test fails if the numbers displayed are the same or
+--      if either partition reports "Failed".
+--
+--
+-- CHANGE HISTORY:
+--      06 Dec 94   SAIC    ACVC 2.0
+--      01 Nov 95   SAIC    Changed naming conventions and fixed reported
+--                          problems for ACVC 2.0.1 
+--      18 Jul 96   SAIC    Added check of main procedure partition id.
+--
+--!
+
+------------------------------------------------------------------------
+
+-- The following are the two library level declarations who's Partition_ID
+-- attributes are to be checked
+
+with Report; 
+--
+procedure CXE1001_P is
+   -- Note: This module is not declared-pure
+begin 
+   Report.Comment ("Executing Procedure CXE1001_P");
+end CXE1001_P;

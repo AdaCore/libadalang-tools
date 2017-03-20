@@ -1,0 +1,108 @@
+-- CXE5002.A
+--
+--                             Grant of Unlimited Rights
+--
+--     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
+--     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
+--     unlimited rights in the software and documentation contained herein.
+--     Unlimited rights are defined in DFAR 252.227-7013(a)(19).  By making
+--     this public release, the Government intends to confer upon all
+--     recipients unlimited rights  equal to those held by the Government.
+--     These rights include rights to use, duplicate, release or disclose the
+--     released technical data and computer software in whole or in part, in
+--     any manner and for any purpose whatsoever, and to have or permit others
+--     to do so.
+--
+--                                    DISCLAIMER
+--
+--     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
+--     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
+--     WARRANTY AS TO ANY MATTER WHATSOEVER, INCLUDING THE CONDITIONS OF THE
+--     SOFTWARE, DOCUMENTATION OR OTHER INFORMATION RELEASED, MADE AVAILABLE
+--     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
+--     PARTICULAR PURPOSE OF SAID MATERIAL.
+--*
+--
+-- OBJECTIVE:
+--      Check that the Partition Communication Subsystem is used for handling
+--      remote calls. Check that pragma Asynchronous causes procedure Do_APC
+--      to be called and that all other calls go through Do_RPC.  Check that
+--      pragma All_Calls_Remote is honored by making a call to an RCI unit in
+--      the same partition.
+--
+-- TEST DESCRIPTION:
+--      This test is composed of the following compilation units:
+--          System.RPC (body)
+--          CXE5002_A
+--          CXE5002_Part_A
+--          CXE5002_State
+--          CXE5002_B
+--          CXE5002_Part_B
+--      The main procedure, CXE5002_A, makes calls to RCI procedures in
+--      both partition A and partition B.  These calls should all result in
+--      a Communication_Error exception being raised by the System.RPC body
+--      that is included here.  By having all the RCI calls result in an
+--      exception we don't have to worry about the implementation expecting
+--      something to be returned in the Result stream.
+--
+-- SPECIAL REQUIREMENTS:
+--      Compile the compilation units in this file.
+--      Create the two partitions (A and B) with the following contents:
+--        Partition A contains:
+--           CXE5002_A  (main procedure)
+--           CXE5002_Part_A  (RCI package)
+--           System.RPC (body of this package included with this test)
+--           and all other normal and pure packages with'ed by these units.
+--        Partition B contains:
+--           CXE5002_B  (main procedure)
+--           CXE5002_Partition_B  (RCI package)
+--           and all normal and pure packages with'ed by these units.
+--      Note that a body for package System.RPC is included in this test
+--      and replaces any implementation provided version of that package
+--      body.
+--
+--      Only CXE5002_A need be run as no actual communication between
+--      the partitions occurs.  Partition B need not be built unless the
+--      implementation requires it.
+--
+--      IMPORTANT:  Be sure to remove the body of System.RPC that is
+--      compiled as part of this test from the library before continuing
+--      with any other test as the other tests may require the
+--      implementation provided version of System.RPC.
+--
+-- APPLICABILITY CRITERIA:
+--      This test applies only to implementations:
+--         supporting the Distribution Annex,
+--         supporting the Remote_Call_Interface pragma, and
+--         supporting the language-defined System.RPC interface
+--            rather than an alternative declaration as allowed by E.5(27.1/2).
+--
+-- PASS/FAIL CRITERIA:
+--      This test passes if and only if CXE5002_A prints a message
+--      reporting that the test passed.  If the implementation requires
+--      that both partitions be executed then CXE5002_B must also print
+--      a message reporting that the test passed.
+--
+--
+-- CHANGE HISTORY:
+--     18 APR 95   SAIC    Initial version
+--     23 OCT 95   SAIC    Added checks on Partition_ID.
+--     21 OCT 98   RLB     Corrected so Partition B does not display a
+--                         spurious failure message.
+--     08 JUL 99   RLB     Revised the applicability criteria to require
+--                         support for the recompilation of the body of
+--                         System.RPC (AI95-00082).
+--     21 DEC 07   RLB     Revised the applicability criteria to make
+--                         the test inapplicable if an alternative definition
+--                         of System.RPC is used.
+--!
+
+
+-----------------------------------------------------------------------------
+
+package CXE5002_Part_A is
+  pragma Remote_Call_Interface;
+  pragma All_Calls_Remote;
+
+  procedure Local_Remote_Call;
+end CXE5002_Part_A;
