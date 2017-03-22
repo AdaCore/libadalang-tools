@@ -1,0 +1,20 @@
+
+
+PACKAGE BODY CA5004B2 IS
+
+     PROCEDURE REQUIRE_BODY IS
+     BEGIN
+       NULL;
+     END;
+
+BEGIN
+
+     IF K1 /= 4 THEN
+          WRONG ("OBSOLETE BODY");
+     END IF;
+
+     IF K2 /= 5 THEN
+          WRONG ("NO BODY");
+     END IF;
+
+END CA5004B2;

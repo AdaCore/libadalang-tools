@@ -1,0 +1,11 @@
+
+PACKAGE BODY CA1022A0 IS
+
+     PROCEDURE P0 (X : IN OUT INTEGER) IS
+     BEGIN
+
+          X := X + 1;
+
+     END P0;
+
+END CA1022A0;
