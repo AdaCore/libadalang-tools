@@ -185,6 +185,7 @@ package METRICS.Command_Lines is
       Unit_Coupling_Out,
       Unit_Coupling_In,
 
+      Metrics_All, -- undocumented; turns on all metrics
       Contract_All,
       Lines_All,
       Syntax_All,
@@ -196,9 +197,7 @@ package METRICS.Command_Lines is
    subtype Metrics_Enum is
      Metrics_Booleans range
        Metrics_Booleans'First ..
-         Metrics_Booleans'Pred (Contract_All);
-   subtype Metrics_All_Enum is
-     Metrics_Booleans range Contract_All .. Metrics_Booleans'Last;
+         Metrics_Booleans'Pred (Metrics_All);
    subtype Contract_Metrics is
      Metrics_Enum range Contract .. Contract_Complexity;
    subtype Complexity_Metrics is
@@ -214,7 +213,8 @@ package METRICS.Command_Lines is
 
    type Metrics_Set is array (Metrics_Enum) of Boolean with
         Pack;
-   function Empty_Metrics_Set return Metrics_Set is (Metrics_Enum => False);
+   function Empty_Metrics_Set return Metrics_Set is (others => False);
+   function All_Metrics_Set return Metrics_Set is (others => True);
 
    Complexity_Only : constant Metrics_Set :=
      (Complexity_Metrics => True, others => False);
@@ -258,6 +258,7 @@ package METRICS.Command_Lines is
        Tagged_Coupling_In     => +"--package-afferent-coupling",
        Hierarchy_Coupling_Out => +"--category-efferent-coupling",
        Hierarchy_Coupling_In  => +"--category-afferent-coupling",
+       Metrics_All            => +"--all",
        others                 => null));
 
    type Metrics_Strings is (Output_Suffix, Global_File_Name, Xml_File_Name);

@@ -1471,7 +1471,7 @@ package body METRICS.Actions is
         Metrics_To_Compute and
           (if M.Kind = Ada_Compilation_Unit
              then not Complexity_Only
-             else Metrics_Set'(others => True));
+             else All_Metrics_Set);
       --  Set of metrics to print first, before printing subtrees. Same as
       --  Metrics_To_Compute, except at the top level, we leave out complexity
       --  metrics, because they will be printed last.
@@ -1481,7 +1481,7 @@ package body METRICS.Actions is
           (if M.Kind = Ada_Compilation_Unit
                and then M.Num_With_Complexity > 0
              then Complexity_Only
-             else Metrics_Set'(others => False));
+             else Empty_Metrics_Set);
       --  Set of metrics to print last, after printing subtrees. This is
       --  normally empty. At the top level it is the intersection of
       --  Metrics_To_Compute and Complexity_Only, but only if we have
@@ -1772,13 +1772,16 @@ package body METRICS.Actions is
                Result (In_Out_Parameters) := True;
             end if;
 
+            if Arg (Cmd, Metrics_All) then
+               Result := (Computed_Metrics => False, others => True);
+
             --  If no metrics were requested on the command line, we compute
             --  all metrics except coupling and "computed" metrics. Also, at
             --  least for now, disable contract metrics and Lines_Spark,
             --  because those don't exist in lalmetric and we're trying to
             --  be compatible.
 
-            if Result = (Metrics_Enum => False) then
+            elsif Result = Empty_Metrics_Set then
                Result :=
                  (Coupling_Metrics | Computed_Metrics |
                     Contract_Metrics | Lines_Spark => False,
