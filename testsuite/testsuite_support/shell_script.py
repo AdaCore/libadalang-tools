@@ -40,6 +40,9 @@ class ShellScriptDriver(BaseDriver):
 
     @catch_test_errors
     def run(self):
+        # We need to add "." to the PATH, because some tests run programs in
+        # the current directory.
+        os.environ['PATH'] = "%s:." % os.environ['PATH']
         os.chmod(os.path.join(self.working_dir(), 'test.sh'), 0755)
         self.call_and_check(['sh', '-c', './test.sh'])
         if self.diff:
