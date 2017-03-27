@@ -44,7 +44,7 @@ class ShellScriptDriver(BaseDriver):
         # the current directory.
         os.environ['PATH'] = "%s:." % os.environ['PATH']
         os.chmod(os.path.join(self.working_dir(), 'test.sh'), 0755)
-        self.call_and_check(['sh', '-c', './test.sh'])
+        self.call_and_check(['sh', './test.sh'])
         if self.diff:
             for diff_pair in self.diff:
                 self.call(['diff', '-r'] + diff_pair.split() +
