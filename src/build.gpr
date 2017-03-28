@@ -12,7 +12,7 @@ project Build is
    for Object_Dir use "../obj";
    for Exec_Dir use "../bin";
 
-   for Main use ("pp-main.adb", "metrics-main.adb", "contract_coverage.adb");
+   for Main use ("pp-main.adb", "metrics-main.adb");
 
    package Compiler is
       case Build_Mode is

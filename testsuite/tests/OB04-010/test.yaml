@@ -1,4 +1,0 @@
-description:
-    Tests basic features of the contract_coverage tool.
-
-driver: contract_coverage
