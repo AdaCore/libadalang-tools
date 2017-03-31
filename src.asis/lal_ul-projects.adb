@@ -1142,6 +1142,9 @@ package body LAL_UL.Projects is
          Phase              => Cmd_Line_1,
          Callback           => Callback,
          Ignore_Errors      => True);
+      if Incremental_Mode (Cmd) then
+         Cmd_Error ("--incremental not yet supported");
+      end if;
 
       Post_Cmd_Line_1_Action (Cmd);
       --  Why not just move that processing here? We have vis on
