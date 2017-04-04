@@ -852,7 +852,9 @@ package body Pp.Actions is
            when Ada_Incomplete_Type_Def =>
              L (""),
            when Ada_Incomplete_Tagged_Type_Def =>
-             L (" is tagged"),
+             L ("/tagged"),
+               --  The "/" is for F_Has_Abstract, which is always
+               --  Abstract_Absent.
            when Ada_Interface_Type_Def =>
              L ("?~~ ~interface? and[@ ~ and@ ~]~"),
            when Ada_Mod_Int_Type_Def =>
