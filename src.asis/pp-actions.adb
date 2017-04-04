@@ -265,33 +265,24 @@ package body Pp.Actions is
       Result : Output_Modes := Default;
    begin
       if Arg (Cmd, Output_Directory) /= null then
-         pragma Warnings (Off, "condition can only be False if invalid");
-         pragma Assert (Result = Default);
-         pragma Warnings (On, "condition can only be False if invalid");
          Result := Output_Directory;
       end if;
       if Arg (Cmd, Pipe) then
-         pragma Assert (Result = Default);
          Result := Pipe;
       end if;
       if Arg (Cmd, Replace) then
-         pragma Assert (Result = Default);
          Result := Replace;
       end if;
       if Arg (Cmd, Replace_Force) then
-         pragma Assert (Result = Default);
          Result := Replace_Force;
       end if;
       if Arg (Cmd, Replace_No_Backup) then
-         pragma Assert (Result = Default);
          Result := Replace_No_Backup;
       end if;
       if Arg (Cmd, Output) /= null then
-         pragma Assert (Result = Default);
          Result := Output;
       end if;
       if Arg (Cmd, Output_Force) /= null then
-         pragma Assert (Result = Default);
          Result := Output_Force;
       end if;
       return Result;
