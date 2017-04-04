@@ -122,12 +122,12 @@ begin  -- Main test procedure.
 
    Tctouch.Validate ("SVARAIRA", "Error case check");
 
-   -- check that the exceptions and procedure were stored correctly
-   -- on the stack
+   -- check that the exceptions and procedure were stored correctly on the
+   -- stack
    Raise_Error := False;
 
-   -- return procedure pointer from top of stack and call the procedure
-   -- through that pointer:
+   -- return procedure pointer from top of stack and call the procedure through
+   -- that pointer:
 
    Fail_Soft.Top_Event_Procedure.all;
 
@@ -155,8 +155,8 @@ begin  -- Main test procedure.
 
    Fail_Soft.Pop_Event;
 
-   -- return procedure pointer from top of stack and call the procedure
-   -- through that pointer:
+   -- return procedure pointer from top of stack and call the procedure through
+   -- that pointer:
 
    Fail_Soft.Top_Event_Procedure.all;
 

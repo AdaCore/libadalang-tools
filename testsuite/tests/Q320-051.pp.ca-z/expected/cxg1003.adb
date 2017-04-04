@@ -78,10 +78,10 @@ begin
    begin
 
       -- An application creates a text file in mode Out_File, with the
-      -- intention of entering complex data into the file as appropriate.
-      -- In the event that the particular environment where the application
-      -- is running does not support Text_IO, Use_Error or Name_Error will be
-      -- raised on calls to Text_IO operations.  Either of these exceptions
+      -- intention of entering complex data into the file as appropriate. In
+      -- the event that the particular environment where the application is
+      -- running does not support Text_IO, Use_Error or Name_Error will be
+      -- raised on calls to Text_IO operations. Either of these exceptions
       -- will be handled to produce a Not_Applicable result.
 
       Text_Io.Create
@@ -122,12 +122,11 @@ begin
             use Ada.Text_Io;
          begin
             -- This procedure does not create, open, or close the data file;
-            -- The_File file object must be Open at this point.
-            -- This procedure is designed to load complex data into a data
-            -- file twice, first using Text_IO, then Complex_IO.  In this
-            -- first case, the complex data values are entered as strings,
-            -- assuming a variety of legal formats, as provided in the
-            -- reference manual.
+            -- The_File file object must be Open at this point. This procedure
+            -- is designed to load complex data into a data file twice, first
+            -- using Text_IO, then Complex_IO. In this first case, the complex
+            -- data values are entered as strings, assuming a variety of legal
+            -- formats, as provided in the reference manual.
 
             Put_Line (The_File, "(3.0, 9.0)");
             Put_Line (The_File, "+4. +7.");    -- Relaxed real literal format.
@@ -147,8 +146,8 @@ begin
             end if;
 
             -- Use the Complex_IO procedure Put to enter Complex data items
-            -- into the data file.
-            -- Note: Data is being entered into the file for the *second* time
+            -- into the data file. Note: Data is being entered into the file
+            -- for the *second* time
             --       at this point. (Using Complex_IO here, Text_IO above)
 
             for I in 1 .. Number_Of_Complex_Items loop
@@ -176,10 +175,9 @@ begin
             Tc_Width   : Integer              := 0;
          begin
             -- This procedure does not create, open, or close the data file;
-            -- The_File file object must be Open at this point.
-            -- Use procedure Get (for Files) to extract the complex data from
-            -- the Text_IO file.  This data was placed into the file using
-            -- Text_IO.
+            -- The_File file object must be Open at this point. Use procedure
+            -- Get (for Files) to extract the complex data from the Text_IO
+            -- file. This data was placed into the file using Text_IO.
 
             for I in 1 .. Number_Of_Complex_Items loop
 
@@ -202,9 +200,9 @@ begin
             end if;
 
             -- Use procedure Get (for Files) to extract the complex data from
-            -- the Text_IO file.  This data was placed into the file using
-            -- procedure Complex_IO.Put.
-            -- Note: Data is being extracted from the file for the *second*
+            -- the Text_IO file. This data was placed into the file using
+            -- procedure Complex_IO.Put. Note: Data is being extracted from
+            -- the file for the *second*
             --       time at this point (Using Complex_IO here, Text_IO above)
 
             for I in 1 .. Number_Of_Complex_Items loop
@@ -307,11 +305,11 @@ begin
             end if;
 
             -- Check the format of the strings containing a complex number.
-            -- The resulting strings are of 15 character length, with the
-            -- real component left justified within the string, followed by
-            -- a comma, and with the imaginary component and closing
-            -- parenthesis right justified in the string, with blank fill
-            -- for the balance of the string.
+            -- The resulting strings are of 15 character length, with the real
+            -- component left justified within the string, followed by a comma,
+            -- and with the imaginary component and closing parenthesis right
+            -- justified in the string, with blank fill for the balance of the
+            -- string.
 
             if Tc_String_Array (1) /= "(3.0,      9.0)" or
               Tc_String_Array (2) /= "(4.0,      7.0)" or
@@ -331,8 +329,8 @@ begin
                Report.Comment ("String format of Complex values verified");
             end if;
 
-            -- Get complex values from strings using the Procedure Get.
-            -- Compare with expected complex values.
+            -- Get complex values from strings using the Procedure Get. Compare
+            -- with expected complex values.
 
             for I in 1 .. Number_Of_Complex_Items loop
 
@@ -355,8 +353,8 @@ begin
                Report.Comment ("Complex values removed from String array");
             end if;
 
-            -- Verify that Layout_Error is raised if the given string is
-            -- too short to hold the formatted output.
+            -- Verify that Layout_Error is raised if the given string is too
+            -- short to hold the formatted output.
             Layout_Error_On_Put : declare
                Much_Too_Short : String (1 .. 2);
                Complex_Value  : Complex_Pack.Complex := (5.0, 0.0);
@@ -387,8 +385,8 @@ begin
                   "evaluation of Put and Get for Strings");
          end;
 
-         -- Place complex values into strings using a variety of legal
-         -- complex data formats.
+         -- Place complex values into strings using a variety of legal complex
+         -- data formats.
          declare
 
             type String_Ptr is access String;
@@ -402,9 +400,9 @@ begin
                new String'("  (   2.0   , 5.0  )  "),
                new String'("(3.0              7.0)"));
 
-            -- The following array contains Positive values that correspond
-            -- to the last character that will be read by Procedure Get when
-            -- given each of the above strings as input.
+            -- The following array contains Positive values that correspond to
+            -- the last character that will be read by Procedure Get when given
+            -- each of the above strings as input.
 
             Tc_Last_Char_Array : array
               (1 .. Number_Of_Complex_Items) of Positive :=
@@ -412,8 +410,8 @@ begin
 
          begin
 
-            -- Get complex values from strings using the Procedure Get.
-            -- Compare with expected complex values.
+            -- Get complex values from strings using the Procedure Get. Compare
+            -- with expected complex values.
 
             for I in 1 .. Number_Of_Complex_Items loop
 
@@ -471,9 +469,9 @@ begin
 
    exception
 
-      -- Since Use_Error can be raised if, for the specified mode,
-      -- the environment does not support Text_IO operations, the
-      -- following handlers are included:
+      -- Since Use_Error can be raised if, for the specified mode, the
+      -- environment does not support Text_IO operations, the following
+      -- handlers are included:
 
       when Ada.Text_Io.Use_Error =>
          Report.Not_Applicable ("Use_Error raised on Text_IO Create");

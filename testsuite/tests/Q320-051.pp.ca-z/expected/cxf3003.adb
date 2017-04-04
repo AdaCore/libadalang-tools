@@ -67,8 +67,8 @@ begin
       type Str_Ptr is access String;
       type Edited_Output_Array_Type is array (Integer range <>) of Str_Ptr;
 
-      -- Define a decimal data type, and instantiate the Decimal_Output
-      -- generic package for the data type.
+      -- Define a decimal data type, and instantiate the Decimal_Output generic
+      -- package for the data type.
 
       type Decimal_Data_Type is delta 0.01 digits 16;
 
@@ -131,8 +131,8 @@ begin
 
    begin
 
-      -- Check the results of function Valid, using the first five decimal
-      -- data items and picture strings.
+      -- Check the results of function Valid, using the first five decimal data
+      -- items and picture strings.
 
       if not Image_Io.Valid (Decimal_Data (1), Picture_1) then
          Report.Failed ("Picture string 1 not valid");
@@ -145,8 +145,8 @@ begin
       end if;
 
       -- Check the results of function Image, using the picture strings
-      -- constructed above, with a variety of named vs. positional
-      -- parameter notation and defaulted parameters.
+      -- constructed above, with a variety of named vs. positional parameter
+      -- notation and defaulted parameters.
 
       for I in 1 .. 5 loop
          if Image_Io.Image (Item => Decimal_Data (I), Pic => Picture_1) /=

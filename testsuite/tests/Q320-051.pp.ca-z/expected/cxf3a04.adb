@@ -74,10 +74,9 @@ begin
 
       use Ada.Text_Io;
 
-      -- Instantiate the Decimal_Output generic package for the two data
-      -- types, using the default values for the Default_Currency,
-      -- Default_Fill, Default_Separator, and Default_Radix_Mark
-      -- parameters.
+      -- Instantiate the Decimal_Output generic package for the two data types,
+      -- using the default values for the Default_Currency, Default_Fill,
+      -- Default_Separator, and Default_Radix_Mark parameters.
 
       package Pack_Ndp is new Editing.Decimal_Output
         (Fxf3a00.Decimal_Type_Ndp);
@@ -104,11 +103,11 @@ begin
            Fxf3a00.Number_Of_2dp_Items - Fxf3a00.Number_Of_Foreign_Strings;
 
       begin
-         -- The first 10 picture strings in the Valid_Strings array
-         -- correspond to data values of a decimal type with delta 0.01.
+         -- The first 10 picture strings in the Valid_Strings array correspond
+         -- to data values of a decimal type with delta 0.01.
 
          -- Compare string result of Image with expected edited output
-         -- string.  Evaluate data using both default parameters of Image
+         -- string. Evaluate data using both default parameters of Image
          -- and user-provided parameter values.
          for I in 1 .. Tc_Loop_End loop
 
@@ -167,13 +166,13 @@ begin
            Tc_Loop_Start + Number_Of_Ndp_Items - 1;         -- 22
 
       begin
-         -- The following evaluations correspond to data values of a
-         -- decimal type with delta 1.0.
+         -- The following evaluations correspond to data values of a decimal
+         -- type with delta 1.0.
 
          -- Compare string result of Image with expected edited output
-         -- string.  Evaluate data using both default parameters of Image
-         -- and user-provided parameter values.
-         -- Note: TC_Offset is used to align corresponding data the various
+         -- string. Evaluate data using both default parameters of Image and
+         -- user-provided parameter values. Note: TC_Offset is used to align
+         -- corresponding data the various
          --       data tables in foundation package FXF3A00.
 
          for I in Tc_Loop_Start .. Tc_Loop_End loop
@@ -221,11 +220,11 @@ begin
 
       Exception_Block :
          -- The following three calls of Function Image, using the specific
-         -- decimal values and picture strings provided, will cause
-         -- a Layout_Error to be raised.
-         -- The first two evaluations use the instantiation of Decimal_Output
-         -- with a decimal type with delta 0.01, while the last evaluation
-         -- uses the instantiation with decimal type with delta 1.0.
+         -- decimal values and picture strings provided, will cause a
+         -- Layout_Error to be raised. The first two evaluations use the
+         -- instantiation of Decimal_Output with a decimal type with delta
+         -- 0.01, while the last evaluation uses the instantiation with
+         -- decimal type with delta 1.0.
 
          -- Note: The data and the picture strings used in the following
          --       evaluations are not themselves erroneous, but when used in

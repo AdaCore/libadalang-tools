@@ -230,10 +230,9 @@ begin
 
          begin
 
-            -- Function To_Domain returns the shortest Character_Sequence
-            -- value such that each character not in the result maps to
-            -- itself, and all characters in the result are in ascending
-            -- order.
+            -- Function To_Domain returns the shortest Character_Sequence value
+            -- such that each character not in the result maps to itself, and
+            -- all characters in the result are in ascending order.
 
             Tc_Domain_3 := Maps.To_Domain (Tc_Unordered_Map);
 
@@ -258,8 +257,8 @@ begin
                   "an unordered mapping as input");
             end if;
 
-            -- The lower bound on the returned Character_Sequence value
-            -- from To_Domain must be 1.
+            -- The lower bound on the returned Character_Sequence value from
+            -- To_Domain must be 1.
 
             if Tc_Domain_1'First /= 1 or
               Tc_Domain_2'First /= 1 or
@@ -290,8 +289,8 @@ begin
                   "an unordered mapping as input");
             end if;
 
-            -- The lower bound on the returned Character_Sequence value
-            -- must be 1.
+            -- The lower bound on the returned Character_Sequence value must be
+            -- 1.
 
             if Tc_Range_1'First /= 1 or
               Tc_Range_2'First /= 1 or
@@ -300,8 +299,8 @@ begin
                Report.Failed ("Incorrect lower bound returned from To_Range");
             end if;
 
-            -- The upper bound on the returned Character_Sequence value
-            -- must be Map'Length.
+            -- The upper bound on the returned Character_Sequence value must be
+            -- Map'Length.
 
             if Tc_Range_1'Last /= Tc_Lower_Case_Sequence'Length or
               Tc_Range_2'Last /= Tc_Upper_Case_Sequence'Length or
@@ -312,8 +311,8 @@ begin
 
          end;
 
-         -- Both function To_Domain and To_Range return the null string
-         -- when provided the Identity character map as an input parameter.
+         -- Both function To_Domain and To_Range return the null string when
+         -- provided the Identity character map as an input parameter.
 
          if Maps.To_Domain (Maps.Identity) /= Null_Sequence then
             Report.Failed

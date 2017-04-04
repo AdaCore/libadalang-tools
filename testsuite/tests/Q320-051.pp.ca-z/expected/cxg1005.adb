@@ -103,19 +103,19 @@ begin
          return (Re (Z) = 0.0 and Im (Z) = 0.0);
       end A_Zero_Result;
 
-      -- In order to evaluate complex elementary functions that are
-      -- prescribed to return a "real" result (meaning that the imaginary
-      -- component is zero), the Function A_Real_Result is defined.
+      -- In order to evaluate complex elementary functions that are prescribed
+      -- to return a "real" result (meaning that the imaginary component is
+      -- zero), the Function A_Real_Result is defined.
 
       function A_Real_Result (Z : Complex) return Boolean is
       begin
          return Im (Z) = 0.0;
       end A_Real_Result;
 
-      -- In order to evaluate complex elementary functions that are
-      -- prescribed to return an "imaginary" result (meaning that the real
-      -- component of the complex number is zero, and the imaginary
-      -- component is non-zero), the Function An_Imaginary_Result is defined.
+      -- In order to evaluate complex elementary functions that are prescribed
+      -- to return an "imaginary" result (meaning that the real component of
+      -- the complex number is zero, and the imaginary component is non-zero),
+      -- the Function An_Imaginary_Result is defined.
 
       function An_Imaginary_Result (Z : Complex) return Boolean is
       begin
@@ -232,8 +232,8 @@ begin
             "value of one");
       end if;
 
-      -- Check that when the input parameter value is one, the Arcsin
-      -- function yields a real result.
+      -- Check that when the input parameter value is one, the Arcsin function
+      -- yields a real result.
 
       if not A_Real_Result (Arcsin (Plus_One)) then
          Report.Failed
@@ -243,8 +243,8 @@ begin
 
       -- Check that when the input parameter value is minus one, the Sqrt
       -- function yields a result of "i", when the sign of the imaginary
-      -- component of the input parameter is positive (and yields "-i", if
-      -- the sign on the imaginary component is negative), and the
+      -- component of the input parameter is positive (and yields "-i",
+      -- if the sign on the imaginary component is negative), and the
       -- Complex_Types.Real'Signed_Zeros attribute is True.
 
       if Tc_Signed_Zeros then
@@ -275,9 +275,9 @@ begin
 
       else   -- Signed_Zeros is False.
 
-         -- Check that when the input parameter value is minus one, the Sqrt
-         -- function yields a result of "i", when the
-         -- Complex_Types.Real'Signed_Zeros attribute is False.
+         -- Check that when the input parameter value is minus
+         -- one, the Sqrt function yields a result of "i", when
+         -- the Complex_Types.Real'Signed_Zeros attribute is False.
 
          if Sqrt (Minus_One) /= Plus_I then
             Report.Failed
@@ -312,8 +312,8 @@ begin
             "minus one input value");
       end if;
 
-      -- Check that when the input parameter has a value of +i or -i, the
-      -- Log function yields an imaginary result.
+      -- Check that when the input parameter has a value of +i or -i, the Log
+      -- function yields an imaginary result.
 
       if not An_Imaginary_Result (Log (Plus_I)) then
          Report.Failed
@@ -341,8 +341,8 @@ begin
       end if;
 
       -- Check that exponentiation by a unit exponent yields the value of
-      -- the left operand (as a complex value).
-      -- Note: a "unit exponent" is considered the complex number (1.0, 0.0)
+      -- the left operand (as a complex value). Note: a "unit exponent" is
+      -- considered the complex number (1.0, 0.0)
 
       if "**" (Complex_Negative_Real, Plus_One) /= Complex_Negative_Real or
         Complex_Negative_Imaginary**Plus_One /= Complex_Negative_Imaginary or

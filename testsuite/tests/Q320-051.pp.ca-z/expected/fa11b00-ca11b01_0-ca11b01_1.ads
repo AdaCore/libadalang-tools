@@ -2,7 +2,7 @@
 
 -- Grandchild package of FA11B00, child package of FA11B00.CA11B01_0.
    package Fa11b00.Ca11b01_0.Ca11b01_1 is     -- Application_Three_Widget
--- This public grandchild declares a derived type from its parent.  It
+-- This public grandchild declares a derived type from its parent. It
 -- represents processing of widgets in a window system.
 
    type App3_Widget is new App2_Widget;    -- Derived record of App2_Widget.

@@ -77,19 +77,19 @@ procedure Cxd1001 is
    --This application uses the full range of the portable priorities
    subtype App_Priority is
      System.Priority range System.Priority'First .. System.Priority'First + 29;
-   -- Note:  too small a range in System.Priority will cause
-   -- Constraint_Error during elaboration
+   -- Note: too small a range in System.Priority will cause Constraint_Error
+   -- during elaboration
 
    -- The application requires that the Most Urgent priority be labeled
-   -- App_Priority_1 corresponding to "the first priority" and the
-   -- "least urgent" App_Priority_30
+   -- App_Priority_1 corresponding to "the first priority" and the "least
+   -- urgent" App_Priority_30
    App_Priority_30 : App_Priority := App_Priority'First;
    App_Priority_29 : App_Priority := App_Priority'First + 1;
    --         ......     and so on
    --         ......     to
    App_Priority_1 : App_Priority := App_Priority'First + 29;
--- Note:  too small a range in System.Priority will cause
--- Constraint_Error during elaboration
+-- Note: too small a range in System.Priority will cause Constraint_Error
+-- during elaboration
 
 begin
 

@@ -43,8 +43,7 @@
 --
 --!
 
--- Simulates map of physical features, i.e., desert, forest, water,
--- or plains.
+-- Simulates map of physical features, i.e., desert, forest, water, or plains.
 
 package Ca11015_0 is
    type Map_Type is private;

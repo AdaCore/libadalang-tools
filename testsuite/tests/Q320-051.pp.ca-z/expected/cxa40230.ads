@@ -58,10 +58,10 @@ with Ada.Strings;
 package Cxa40230 is
 
    -- The following two functions are used to translate character and string
-   -- values to non-character "Wide" values.  They will be applied to all the
+   -- values to non-character "Wide" values. They will be applied to all the
    -- Wide_Bounded subprogram character and string parameters to simulate the
-   -- use of Wide_Characters and Wide_Strings in actual practice.
-   -- Note: These functions do not actually return "equivalent" wide
+   -- use of Wide_Characters and Wide_Strings in actual practice. Note: These
+   -- functions do not actually return "equivalent" wide
    --       characters to their character inputs, just "non-character"
    --       wide characters.
 

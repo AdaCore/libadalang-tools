@@ -78,7 +78,7 @@ begin
 
    Test_For_Io_Support : begin
 
-      -- Check for Text_IO support in creating the data file.  If the
+      -- Check for Text_IO support in creating the data file. If the
       -- implementation does not support external files, Name_Error or
       -- Use_Error will be raised at the point of the following call to
       -- Create, resulting in a Not_Applicable test result.
@@ -152,9 +152,9 @@ begin
 
    begin
 
-      -- Use the 'Write attribute to enter the three sets of data items
-      -- into the data stream.
-      -- Note that the data will be mixed within the text file.
+      -- Use the 'Write attribute to enter the three sets of data items into
+      -- the data stream. Note that the data will be mixed within the text
+      -- file.
 
       for I in 1 .. Tc_Items loop
          Character'Write (Data_Stream, Char_Array (I));
@@ -167,10 +167,9 @@ begin
          Unbounded_String'Write (Data_Stream, Ustr_Array (I));
       end loop;
 
-      -- Use the 'Output attribute to enter the entire arrays of each
-      -- type of data items into the data stream.
-      -- Note that the array bounds will be written to the stream as part
-      -- of the action of the 'Output attribute.
+      -- Use the 'Output attribute to enter the entire arrays of each type of
+      -- data items into the data stream. Note that the array bounds will be
+      -- written to the stream as part of the action of the 'Output attribute.
 
       Char_Array_Type'Output (Data_Stream, Char_Array);
       Enum_Array_Type'Output (Data_Stream, Enum_Array);
@@ -181,9 +180,9 @@ begin
       Str_Array_Type'Output (Data_Stream, Str_Array);
       Unb_Str_Array_Type'Output (Data_Stream, Ustr_Array);
 
-      -- Reset the data file to mode In_File.  The data file will now serve
-      -- as the source of data which will be compared to the original data
-      -- written to the file above.
+      -- Reset the data file to mode In_File. The data file will now serve as
+      -- the source of data which will be compared to the original data written
+      -- to the file above.
       Reset1 : begin
          Ada.Text_Io.Reset (File => Data_File, Mode => Ada.Text_Io.In_File);
       exception
@@ -231,9 +230,9 @@ begin
          Report.Failed ("Unbounded_String values do not match");
       end if;
 
-      -- Extract and validate all data arrays from the data stream.
-      -- Note that the 'Input attribute denotes a function, whereas the
-      -- other stream oriented attributes in this test denote procedures.
+      -- Extract and validate all data arrays from the data stream. Note that
+      -- the 'Input attribute denotes a function, whereas the other stream
+      -- oriented attributes in this test denote procedures.
 
       Tc_Char_Array_2 := Char_Array_Type'Input (Data_Stream);
       Tc_Enum_Array_2 := Enum_Array_Type'Input (Data_Stream);

@@ -132,11 +132,10 @@ begin
 
    begin
 
-      -- Check that Procedure Update modifies the value pointed to by
-      -- the chars_ptr parameter Item, starting at the position
-      -- corresponding to parameter Offset, using the chars in
-      -- char_array parameter Chars.
-      -- Note: If parameter Chars contains a nul char (such as a
+      -- Check that Procedure Update modifies the value pointed to by the
+      -- chars_ptr parameter Item, starting at the position corresponding to
+      -- parameter Offset, using the chars in char_array parameter Chars. Note:
+      -- If parameter Chars contains a nul char (such as a
       --       terminating nul), the result may be the overall shortening
       --       of parameter Item.
 
@@ -189,10 +188,10 @@ begin
          Report.Failed ("Incorrect result from Procedure Update - 4");
       end if;
 
-      -- Perform a character-by-character comparison of the result of
-      -- Procedure Update. Note that char_array lower bound is 0, and
-      -- that the nul char is not compared with any character in the
-      -- string (since the string is not nul terminated).
+      -- Perform a character-by-character comparison of the result of Procedure
+      -- Update. Note that char_array lower bound is 0, and that the nul char
+      -- is not compared with any character in the string (since the string is
+      -- not nul terminated).
       begin
          Tc_Length                      := Ics.Strlen (Tc_Chars_Ptr);
          Tc_Result_Char_Array (0 .. 10) := Ics.Value (Tc_Chars_Ptr);
@@ -215,10 +214,10 @@ begin
       end;
       Ics.Free (Tc_Chars_Ptr);
 
-      -- Check that the version of Procedure Update with a String rather
-      -- than a char_array parameter behaves in the manner described above,
-      -- but with the character values in the String overwriting the char
-      -- values in Item.
+      -- Check that the version of Procedure Update with a String rather than
+      -- a char_array parameter behaves in the manner described above, but
+      -- with the character values in the String overwriting the char values
+      -- in Item.
       --
       -- Note: In Ada 95, in each of the cases below, the String parameter
       --       Str is treated as if it were nul terminated, which means that
@@ -275,8 +274,8 @@ begin
       end if;
       Ics.Free (Tc_Chars_Ptr);
 
-      -- Check what happens if the string and array are the same size (this
-      -- is the case that caused the change made by the Amendment).
+      -- Check what happens if the string and array are the same size (this is
+      -- the case that caused the change made by the Amendment).
       begin
          Tc_Chars_Ptr := Ics.New_Char_Array (Tc_Char_Array);
          Ics.Update
@@ -301,9 +300,9 @@ begin
       Ics.Free (Tc_Chars_Ptr);
 
       -- Check that both of the above versions of Procedure Update will
-      -- propagate Update_Error if Check is True, and if the length of
-      -- the new chars in Chars, when overlaid starting from position
-      -- Offset, will overwrite the first nul in Item.
+      -- propagate Update_Error if Check is True, and if the length of the
+      -- new chars in Chars, when overlaid starting from position Offset,
+      -- will overwrite the first nul in Item.
 
       begin
          Tc_Chars_Ptr := Ics.New_Char_Array (Tc_Char_Array);
@@ -355,8 +354,8 @@ begin
       Ics.Free (Tc_Chars_Ptr);
 
       -- Check that both of the above versions of Procedure Update will
-      -- propagate Dereference_Error if Item is Null_Ptr.
-      -- Note: Free sets TC_chars_ptr to Null_Ptr.
+      -- propagate Dereference_Error if Item is Null_Ptr. Note: Free sets
+      -- TC_chars_ptr to Null_Ptr.
 
       begin
          Ics.Update

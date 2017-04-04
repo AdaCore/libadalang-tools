@@ -2,11 +2,11 @@ with Ada.Iterator_Interfaces;
 with Ada.Strings.Unbounded; use Ada;
 
 package F552a00_Bingo_Balls is
-   --  This package defines an iterable container that is only iterable
-   --  in the forward direction. In addition, it only supports constant
-   --  indexing. It presents the abstraction of a Bingo game, where
-   --  a set of Bingo balls is drawn one by one randomly from the set of
-   --  available balls. A particular ball can only be drawn once in a game.
+   --  This package defines an iterable container that is only iterable in the
+   --  forward direction. In addition, it only supports constant indexing. It
+   --  presents the abstraction of a Bingo game, where a set of Bingo balls is
+   --  drawn one by one randomly from the set of available balls. A particular
+   --  ball can only be drawn once in a game.
 
    type Bingo_Call is
      (B_1,
@@ -111,8 +111,8 @@ package F552a00_Bingo_Balls is
 
    Tc_Call_History : Strings.Unbounded.Unbounded_String;
    --
-   --  A string capturing the call sequence to the above subprogams.
-   --  The following gets appended to the history for the above calls;
+   --  A string capturing the call sequence to the above subprogams. The
+   --  following gets appended to the history for the above calls;
    --      Iterate  => I
    --      First    => 1
    --      Next     => N( nn)        where nn is the physical index of the

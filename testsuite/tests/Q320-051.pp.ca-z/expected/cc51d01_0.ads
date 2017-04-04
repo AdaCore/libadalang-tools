@@ -96,7 +96,7 @@ package Cc51d01_0 is -- This package simulates support for a personnel
 
    type Ranked_Id_Type is new Named_Id_Type with record
       Level : Integer := 0;                              -- Indirect derivative
-      -- ... Other components.                           -- of root type.
+      -- ... Other components. -- of root type.
    end record;
 
    -- Inherits Update_ID from parent.

@@ -59,8 +59,8 @@ procedure Cxd1002 is
    Priority_1q : constant System.Priority := (System.Priority'First + 5);
 
    -- Set the priority of the Main program fairly low to allow ample scope
-   -- to vary the priority of spawned tasks.
-   -- Note: this is different from the default priority
+   -- to vary the priority of spawned tasks. Note: this is different from
+   -- the default priority
    --
    pragma Priority (Priority_1q);
 
@@ -77,8 +77,8 @@ begin
       task type Message_Task;
       type Acc_Message_Task is access Message_Task;
 
-      -- Simulate the Assembly of messages received from an external source
-      -- The Line_Driver creates a message task for each
+      -- Simulate the Assembly of messages received from an external source The
+      -- Line_Driver creates a message task for each
       --      Such a task would normally be designed to loop continuously
       --      creating the messages as input is received.  In this test
       --      just create one dummy message task to check the base priority
@@ -87,9 +87,9 @@ begin
 
       begin
 
-         -- This task was created by the Main subprogram which had set its
-         -- base priority by means of a pragma.  Check that this task has
-         -- the same priority as the Main
+         -- This task was created by the Main subprogram which had set its base
+         -- priority by means of a pragma. Check that this task has the same
+         -- priority as the Main
          --
          if Adp.Get_Priority /= Priority_1q then
             Report.Failed ("Line_Driver's Priority incorrectly set");
@@ -111,15 +111,15 @@ begin
 
       task body Message_Task is
       begin
-         -- This task was created by a task whose base priority was set
-         -- when its creator's priority was set by a pragma priority.  Check
-         -- that the base priority is the same as the main (once removed).
+         -- This task was created by a task whose base priority was set when
+         -- its creator's priority was set by a pragma priority. Check that
+         -- the base priority is the same as the main (once removed).
          --
          if Adp.Get_Priority /= Priority_1q then
             Report.Failed ("Message_Task's Priority incorrectly set");
          end if;
 
-         -- null;  perform the application code
+         -- null; perform the application code
 
       exception
          when others =>

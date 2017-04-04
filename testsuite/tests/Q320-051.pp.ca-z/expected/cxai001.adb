@@ -443,8 +443,8 @@ begin
 
          end if;
 
-         -- Toggle between the two forms of Update_Element.  Different modulo
-         -- to give more permutations
+         -- Toggle between the two forms of Update_Element. Different modulo to
+         -- give more permutations
 
          if I mod 3 = 0 then
 
@@ -513,7 +513,7 @@ begin
 
    end if;
 
-   -- Test Move.  Target has the test values in reverse order, after Move these
+   -- Test Move. Target has the test values in reverse order, after Move these
    -- should be replaced (not appended) by the test values in forward order
 
    My_Vector_2.Clear;
@@ -563,7 +563,7 @@ begin
       Position => My_Cursor_2, -- First of added elements
       Count    => 2);
 
-   -- Elements with Default_Value.  Should insert in-between the previous two
+   -- Elements with Default_Value. Should insert in-between the previous two
    -- blocks.
    My_Vector_2.Insert
      (Before   => My_Cursor_2,
@@ -649,9 +649,9 @@ begin
    My_Vector_3.Insert (Before => 3, New_Item => My_Vector_2);
 
    -- The order should now be Default_Value, Value_In_Array (1), Default_Value,
-   -- Default_Value, Value_In_Array (1), Default_Value,
-   -- Value_In_Array (2), Value_In_Array (2), Default_Value,
-   -- Value_In_Array (2), Value_In_Array (2), Default_Value
+   -- Default_Value, Value_In_Array (1), Default_Value, Value_In_Array (2),
+   -- Value_In_Array (2), Default_Value, Value_In_Array (2), Value_In_Array
+   -- (2), Default_Value
 
    My_Vector_3.Insert
      (Before   => My_Vectors.No_Element, -- At end
@@ -659,10 +659,9 @@ begin
       Position => My_Cursor_3); -- First of added elements
 
    -- The order should now be Default_Value, Value_In_Array (1), Default_Value,
-   -- Default_Value, Value_In_Array (1), Default_Value,
-   -- Value_In_Array (2), Value_In_Array (2), Default_Value,
-   -- Value_In_Array (2), Value_In_Array (2), Default_Value,
-   -- Default_Value, Value_In_Array (1), Default_Value,
+   -- Default_Value, Value_In_Array (1), Default_Value, Value_In_Array (2),
+   -- Value_In_Array (2), Default_Value, Value_In_Array (2), Value_In_Array
+   -- (2), Default_Value, Default_Value, Value_In_Array (1), Default_Value,
    -- Value_In_Array (2), Value_In_Array (2), Default_Value
 
    -- Check a few sample values
@@ -731,10 +730,10 @@ begin
 
    My_Vector_2.Delete_First;
 
--- The order should now be Value_In_Array (1), Value_In_Array (2),
--- Default_Value, Value_In_Array (3), Value_In_Array (4), Value_In_Array (5),
--- Value_In_Array (6), Value_In_Array (7), Value_In_Array (8),
--- Value_In_Array (9), Value_In_Array (10)
+   -- The order should now be Value_In_Array (1), Value_In_Array (2),
+   -- Default_Value, Value_In_Array (3), Value_In_Array (4), Value_In_Array
+   -- (5), Value_In_Array (6), Value_In_Array (7), Value_In_Array (8),
+   -- Value_In_Array (9), Value_In_Array (10)
 
    -- My_Vector_2 should now be empty so re-fill
 
@@ -754,10 +753,10 @@ begin
 
    My_Vector_2.Delete (Position => My_Cursor_2); -- Count should default to 1
 
--- The order should now be Value_In_Array (1), Value_In_Array (2),
--- Default_Value, Value_In_Array (3), Value_In_Array (4), Value_In_Array (7),
--- Value_In_Array (5), Value_In_Array (6), Value_In_Array (7),
--- Value_In_Array (8), Value_In_Array (9), Value_In_Array (10)
+   -- The order should now be Value_In_Array (1), Value_In_Array (2),
+   -- Default_Value, Value_In_Array (3), Value_In_Array (4), Value_In_Array
+   -- (7), Value_In_Array (5), Value_In_Array (6), Value_In_Array (7),
+   -- Value_In_Array (8), Value_In_Array (9), Value_In_Array (10)
 
    My_Index_1 := My_Vector_1.Find_Index (Item => Value_In_Array (9));
 
@@ -767,20 +766,20 @@ begin
      (Before   => My_Cursor_3,
       New_Item => My_Vector_1.Element (Index => My_Index_1));
 
-   -- My_Cursor_1 is now "ambiguous" as an element has been inserted earlier in
-   -- the vector.  (In the GNAT v7.1.2 implementation it is still pointing to
-   -- the 11th element, but the original Value_In_Array (9) is now the 12th
-   -- element).  So find again, using Reverse_Find_Index to find the original
+   -- My_Cursor_1 is now "ambiguous" as an element has been inserted earlier
+   -- in the vector. (In the GNAT v7.1.2 implementation it is still pointing
+   -- to the 11th element, but the original Value_In_Array (9) is now the 12th
+   -- element). So find again, using Reverse_Find_Index to find the original
    -- Value_In_Array (9) not the copy before Value_In_Array (2)
 
    My_Index_1 := My_Vector_1.Reverse_Find_Index (Item => Value_In_Array (9));
 
    My_Vector_1.Delete (Index => My_Index_1); -- Count should default to 1
 
--- The order should now be Value_In_Array (1), Value_In_Array (9),
--- Value_In_Array (2), Default_Value, Value_In_Array (3), Value_In_Array (4),
--- Value_In_Array (7), Value_In_Array (5), Value_In_Array (6),
--- Value_In_Array (7), Value_In_Array (8), Value_In_Array (10)
+   -- The order should now be Value_In_Array (1), Value_In_Array (9),
+   -- Value_In_Array (2), Default_Value, Value_In_Array (3), Value_In_Array
+   -- (4), Value_In_Array (7), Value_In_Array (5), Value_In_Array (6),
+   -- Value_In_Array (7), Value_In_Array (8), Value_In_Array (10)
 
    My_Cursor_1 := My_Vector_1.First;
 
@@ -1048,16 +1047,16 @@ begin
 
    My_Vector_3 := Value_In_Array (1) & My_Vector_3;
 
-   -- My Vector_3 should now contain Value_In_Array (1), Value_In_Array (2),
-   -- Value_In_Array (3), Value_In_Array (4), Value_In_Array (5),
+   -- My Vector_3 should now contain Value_In_Array (1), Value_In_Array
+   -- (2), Value_In_Array (3), Value_In_Array (4), Value_In_Array (5),
    -- Value_In_Array (6)
 
    My_Vector_2 := Value_In_Array (7) & Value_In_Array (8);
 
    My_Vector_3.Append (New_Item => My_Vector_2);
 
-   -- My Vector_3 should now contain Value_In_Array (1), Value_In_Array (2),
-   -- Value_In_Array (3), Value_In_Array (4), Value_In_Array (5),
+   -- My Vector_3 should now contain Value_In_Array (1), Value_In_Array
+   -- (2), Value_In_Array (3), Value_In_Array (4), Value_In_Array (5),
    -- Value_In_Array (6), Value_In_Array (7), Value_In_Array (8)
 
    for I in 0 .. 7 loop

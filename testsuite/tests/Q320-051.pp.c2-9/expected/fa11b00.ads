@@ -35,10 +35,10 @@
 
 package Fa11b00 is          -- Application_One_Widget
 -- This foundation simulates code that might be obtained as an already
--- implemented set of objects and services, perhaps from a source code
--- vendor.  It represents processing of widgets in a window system.
--- These widgets all have the same characteristics, but they are application
--- specific, so we do not allow assignment of an App_1_Widget to App_2_Widget.
+-- implemented set of objects and services, perhaps from a source code vendor.
+-- It represents processing of widgets in a window system. These widgets all
+-- have the same characteristics, but they are application specific, so we do
+-- not allow assignment of an App_1_Widget to App_2_Widget.
 
 -- The dimension measurement is in pixels (dots on the screen).
    type Pixels is range 0 .. 10_000;
@@ -65,8 +65,8 @@ package Fa11b00 is          -- Application_One_Widget
       Label    : Widget_Label_Str  := "               ";
    end record;
 
-   -- Primitive operation of type Widget.
-   -- To be inherited by its children derivatives.
+   -- Primitive operation of type Widget. To be inherited by its children
+   -- derivatives.
    procedure App1_Widget_Specific_Oper
      (The_Widget : in out App1_Widget;
       I          : in     Widget_Id;

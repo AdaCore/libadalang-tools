@@ -112,8 +112,8 @@ begin
 
       -- Check that the function Valid with Packed_Decimal and Packed_Format
       -- parameters returns True if Item (the Packed_Decimal parameter) has
-      -- a value consistent with the Packed_Format parameter.
-      -- Note: Since the formation rules for Packed_Decimal values are
+      -- a value consistent with the Packed_Format parameter. Note: Since the
+      -- formation rules for Packed_Decimal values are
       --       implementation defined, the parameter values here are
       --       created by function To_Packed.
 
@@ -268,10 +268,9 @@ begin
                Exception_Name (The_Error));
       end;
 
-      -- Check that the function To_Packed with Decimal (Num) and
-      -- Packed_Format parameters produces a Packed_Decimal result that
-      -- corresponds to the decimal parameter under conditions of the
-      -- Packed_Format parameter.
+      -- Check that the function To_Packed with Decimal (Num) and Packed_Format
+      -- parameters produces a Packed_Decimal result that corresponds to the
+      -- decimal parameter under conditions of the Packed_Format parameter.
 
       if Pack_1.To_Packed (Item => 123.4, Format => Packed_Unsigned) =
         Pack_1.To_Packed (Item => -123.4, Format => Packed_Signed)
@@ -303,8 +302,8 @@ begin
       end if;
 
       -- Check that Conversion_Error is propagated by function To_Packed if
-      -- the value of the decimal parameter Item is negative and the
-      -- specified Packed_Format parameter is Packed_Unsigned.
+      -- the value of the decimal parameter Item is negative and the specified
+      -- Packed_Format parameter is Packed_Unsigned.
 
       begin
          if Pack_1.To_Packed (Item => -12.3, Format => Packed_Unsigned) =

@@ -112,10 +112,10 @@ procedure Cd92001 is
 
    subtype Test_Width is Positive range 1 .. 100;
 
--- Note: There is no required relationship between 'Size and 'Component_Size,
--- so we must use component_size clauses here.
--- We use the following expressions to insure that the component size is a
--- multiple of the Storage_Unit.
+   -- Note: There is no required relationship between 'Size and
+   -- 'Component_Size, so we must use component_size clauses here. We use the
+   -- following expressions to insure that the component size is a multiple of
+   -- the Storage_Unit.
    Sparse_Component_Size : constant :=
      ((Sparse_Enumerated'Size / System.Storage_Unit) +
       Boolean'Pos ((Sparse_Enumerated'Size mod System.Storage_Unit) /= 0)) *

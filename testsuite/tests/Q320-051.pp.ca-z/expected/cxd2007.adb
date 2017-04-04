@@ -135,13 +135,12 @@ procedure Cxd2007 is
       delay 0.0;
 
       loop
-         -- we should never get a chance to run.  Getting to the
-         -- next statement implies something failed.
+         -- we should never get a chance to run. Getting to the next statement
+         -- implies something failed.
          Registry.Running (Low_A);
 
-         -- now that we recorded the failing condition, go back to
-         -- the end of the ready queue so that the next part of the
-         -- test can run.
+         -- now that we recorded the failing condition, go back to the end of
+         -- the ready queue so that the next part of the test can run.
          delay 0.0;
       end loop;
    end Low_A_Task;
@@ -180,11 +179,10 @@ procedure Cxd2007 is
 
       loop
          Registry.Running (High);
-         -- until we get ready to do the suspension test we don't
-         -- want to call Suspend_Until_True.  That is because
-         -- Suspend_Until_True is a potentially blocking operation
-         -- and we don't want to do any potentially blocking operation
-         -- until it is time to do so.
+         -- until we get ready to do the suspension test we don't want to
+         -- call Suspend_Until_True. That is because Suspend_Until_True is
+         -- a potentially blocking operation and we don't want to do any
+         -- potentially blocking operation until it is time to do so.
          if Check_Suspension then
             Stc.Suspend_Until_True (Suspension);
          end if;
@@ -193,10 +191,9 @@ procedure Cxd2007 is
 
 ----------------------------------------------------------
 
-   -- verify that the tasks that were expected to run have
-   -- run and only those tasks ran.
-   -- The results are cleared after being checked in preparation
-   -- for the next test.
+   -- verify that the tasks that were expected to run have run and only those
+   -- tasks ran. The results are cleared after being checked in preparation for
+   -- the next test.
    procedure Check (Expected : Task_Flags; Msg : String) is
       Actual : Task_Flags;
    begin
@@ -258,8 +255,8 @@ begin
    delay Impdef.Clear_Ready_Queue;
    Check ((False, False, True), "delay expiration preemption");
 
-   -- hold the high priority task - it should not have run since the
-   -- results were cleared above.
+   -- hold the high priority task - it should not have run since the results
+   -- were cleared above.
    Atc.Hold (Task_Ids (High));
    Check ((False, False, False), "hold should not be a blocking operation");
 
@@ -267,8 +264,8 @@ begin
    delay Impdef.Clear_Ready_Queue;
    Check ((False, True, False), "high priority task is held");
 
-   -- Low_B was preempted by the above delay expiring.  Make sure
-   -- that it continues to run when we delay again.
+   -- Low_B was preempted by the above delay expiring. Make sure that it
+   -- continues to run when we delay again.
    delay Impdef.Clear_Ready_Queue;
    Check ((False, True, False), "preempted task stays at head of queue");
 
@@ -285,10 +282,9 @@ begin
    -- now, have the high priority task suspend itself
    Check_Suspension := True;
    Stc.Set_False (Suspension);
-   -- depending upon where Hi_Task is in its loop, it may or may
-   -- not record that it has run prior to suspending.  We will go
-   -- ahead and mark it as having run so that we can know what to
-   -- expect as a result.
+   -- depending upon where Hi_Task is in its loop, it may or may not record
+   -- that it has run prior to suspending. We will go ahead and mark it as
+   -- having run so that we can know what to expect as a result.
    Registry.Running (High);
    delay Impdef.Clear_Ready_Queue;
    Check ((False, True, True), "started suspension");

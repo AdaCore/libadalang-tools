@@ -357,9 +357,9 @@ begin
               (Container => My_List_2,
                Where     => "Update_Element");
 
-         -- Note that can only perform writes that don't change the length of
-         -- the element otherwise will fail length check, only
-         -- Replace_Element can change the length.
+            -- Note that can only perform writes that don't change the
+            -- length of the element otherwise will fail length check,
+            -- only Replace_Element can change the length.
 
             -- Increment the second character of the string.
 
@@ -436,7 +436,7 @@ begin
 
    end if;
 
-   -- Test Move.  Target has the test values in reverse order, after Move these
+   -- Test Move. Target has the test values in reverse order, after Move these
    -- should be replaced (not appended) by the test values in forward order
 
    My_List_2.Clear;
@@ -489,7 +489,7 @@ begin
       Position => My_Cursor_2, -- First of added elements
       Count    => 2);
 
-   -- Elements with Default_Value.  Should insert in-between the previous two
+   -- Elements with Default_Value. Should insert in-between the previous two
    -- blocks
    My_List_2.Insert
      (Before   => My_Cursor_2,
@@ -506,9 +506,9 @@ begin
      (I => My_List_2.First,
       J => My_Cursor_2); -- First of added elements
 
-   -- The order should now be Default_Value, Value_In_Ptr_Array (1).all,
-   -- Default_Value, Default_Value, Value_In_Ptr_Array (2).all,
-   -- Value_In_Ptr_Array (2).all
+   -- The order should now be Default_Value, Value_In_Ptr_Array
+   -- (1).all, Default_Value, Default_Value, Value_In_Ptr_Array
+   -- (2).all, Value_In_Ptr_Array (2).all
 
    -- This exchanges the values between the elements
    My_List_2.Swap
@@ -632,12 +632,11 @@ begin
 
    My_List_1.Splice (Before => My_Cursor_1, Source => My_List_2);
 
-   -- The order should now be Value_In_Ptr_Array (1).all,
-   -- Value_In_Ptr_Array (2).all, Default_Value, Value_In_Ptr_Array (3).all,
-   -- Value_In_Ptr_Array (4).all, Value_In_Ptr_Array (5).all,
-   -- Value_In_Ptr_Array (6).all, Value_In_Ptr_Array (7).all
-   -- Value_In_Ptr_Array (8).all, Value_In_Ptr_Array (9).all
-   -- Value_In_Ptr_Array (10).all
+   -- The order should now be Value_In_Ptr_Array (1).all, Value_In_Ptr_Array
+   -- (2).all, Default_Value, Value_In_Ptr_Array (3).all, Value_In_Ptr_Array
+   -- (4).all, Value_In_Ptr_Array (5).all, Value_In_Ptr_Array (6).all,
+   -- Value_In_Ptr_Array (7).all Value_In_Ptr_Array (8).all, Value_In_Ptr_Array
+   -- (9).all Value_In_Ptr_Array (10).all
 
    -- My_List_2 should now be empty so re-fill
 
@@ -656,12 +655,12 @@ begin
       Source   => My_List_2,
       Position => My_Cursor_2);
 
-   -- The order should now be Value_In_Ptr_Array (1).all
-   -- Value_In_Ptr_Array (2).all, Default_Value, Value_In_Ptr_Array (3).all,
-   -- Value_In_Ptr_Array (4).all, Value_In_Ptr_Array (7).all,
-   -- Value_In_Ptr_Array (5).all, Value_In_Ptr_Array (6).all,
-   -- Value_In_Ptr_Array (7).all, Value_In_Ptr_Array (8).all,
-   -- Value_In_Ptr_Array (9).all, Value_In_Ptr_Array (10).all
+   -- The order should now be Value_In_Ptr_Array (1).all Value_In_Ptr_Array
+   -- (2).all, Default_Value, Value_In_Ptr_Array (3).all, Value_In_Ptr_Array
+   -- (4).all, Value_In_Ptr_Array (7).all, Value_In_Ptr_Array
+   -- (5).all, Value_In_Ptr_Array (6).all, Value_In_Ptr_Array
+   -- (7).all, Value_In_Ptr_Array (8).all, Value_In_Ptr_Array
+   -- (9).all, Value_In_Ptr_Array (10).all
 
    My_Cursor_1 := My_List_1.Find (Item => Value_In_Ptr_Array (9).all);
 
@@ -669,10 +668,10 @@ begin
 
    My_List_1.Splice (Before => My_Cursor_3, Position => My_Cursor_1);
 
-   -- The order should now be Value_In_Ptr_Array (1).all,
-   -- Value_In_Ptr_Array (9).all, Value_In_Ptr_Array (2).all, Default_Value,
-   -- Value_In_Ptr_Array (3).all, Value_In_Ptr_Array (4).
-   -- Value_In_Ptr_Array (8).all, Value_In_Ptr_Array (10).all
+   -- The order should now be Value_In_Ptr_Array (1).all, Value_In_Ptr_Array
+   -- (9).all, Value_In_Ptr_Array (2).all, Default_Value, Value_In_Ptr_Array
+   -- (3).all, Value_In_Ptr_Array (4). Value_In_Ptr_Array (8).all,
+   -- Value_In_Ptr_Array (10).all
 
    My_Cursor_1 := My_List_1.First;
 

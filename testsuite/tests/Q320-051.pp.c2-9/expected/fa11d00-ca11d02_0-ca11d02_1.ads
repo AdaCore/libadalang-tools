@@ -1,7 +1,6 @@
 --=======================================================================--
 
--- Child package of FA11D00.CA11D02_0.
--- Grandchild package of FA11D00.
+-- Child package of FA11D00.CA11D02_0. Grandchild package of FA11D00.
 
 package Fa11d00.Ca11d02_0.Ca11d02_1 is     -- Array_Complex
 

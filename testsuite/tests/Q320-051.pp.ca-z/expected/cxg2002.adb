@@ -61,10 +61,8 @@
 
 --
 -- Reference:
--- Problems and Methodologies in Mathematical Software Production;
--- editors: P. C. Messina and A Murli;
--- Lecture Notes in Computer Science
--- Volume 142
+-- Problems and Methodologies in Mathematical Software Production; editors:
+-- P. C. Messina and A Murli; Lecture Notes in Computer Science Volume 142
 -- Springer Verlag 1982
 --
 
@@ -93,8 +91,8 @@ procedure Cxg2002 is
       is
          Rel_Error, Abs_Error, Max_Error : Real;
       begin
-         -- In the case where the expected result is very small or 0
-         -- we compute the maximum error as a multiple of Model_Epsilon instead
+         -- In the case where the expected result is very small or 0 we
+         -- compute the maximum error as a multiple of Model_Epsilon instead
          -- of Model_Epsilon and Expected.
          Rel_Error := Mre * (abs Expected * Real'Model_Epsilon);
          Abs_Error := Mre * Real'Model_Epsilon;
@@ -234,7 +232,7 @@ procedure Cxg2002 is
 
          --- test 8 ---
          declare
-            -- CRC Standard Mathematical Tables;  23rd Edition; pg 738
+            -- CRC Standard Mathematical Tables; 23rd Edition; pg 738
             Sqrt2 : constant :=
               1.41421_35623_73095_04880_16887_24209_69807_85696_71875_37695;
          begin
@@ -282,8 +280,8 @@ procedure Cxg2002 is
       is
          Rel_Error, Abs_Error, Max_Error : Real;
       begin
-         -- In the case where the expected result is very small or 0
-         -- we compute the maximum error as a multiple of Model_Epsilon instead
+         -- In the case where the expected result is very small or 0 we
+         -- compute the maximum error as a multiple of Model_Epsilon instead
          -- of Model_Epsilon and Expected.
          Rel_Error := Mre * (abs Expected * Real'Model_Epsilon);
          Abs_Error := Mre * Real'Model_Epsilon;
@@ -423,7 +421,7 @@ procedure Cxg2002 is
 
          --- test 8 ---
          declare
-            -- CRC Standard Mathematical Tables;  23rd Edition; pg 738
+            -- CRC Standard Mathematical Tables; 23rd Edition; pg 738
             Sqrt2 : constant :=
               1.41421_35623_73095_04880_16887_24209_69807_85696_71875_37695;
          begin

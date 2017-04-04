@@ -108,10 +108,10 @@ begin
       "puts the task at the tail " &
       "of the ready queue for that priority");
 
-   -- Some implementations will boot with the time set to 1901/1/1/0.0
-   -- This delay is such that the implementation guarantees that a
-   -- subsequent call to Ada.Calendar.Time_Of(1901,1,1) will yield a
-   -- time that has already passed
+   -- Some implementations will boot with the time set to 1901/1/1/0.0 This
+   -- delay is such that the implementation guarantees that a subsequent call
+   -- to Ada.Calendar.Time_Of(1901,1,1) will yield a time that has already
+   -- passed
    --
    delay Impdef.Delay_For_Time_Past;
 
@@ -150,7 +150,7 @@ begin
                   -- keep track of how many subtasks register
                   Subtask_Count := Subtask_Count + 1;
                else
-                  -- This is the low priority task.  Since it is on the lower
+                  -- This is the low priority task. Since it is on the lower
                   -- priority queue it must execute after the Delay_Task
                   -- completes the first phase.
                   if not Delay_Task_Is_Complete then
@@ -253,8 +253,8 @@ begin
 
          -- For TEST II
          --
-         -- Create another set of three Sub_Tasks which will each wait to
-         -- be called by Driver_Task
+         -- Create another set of three Sub_Tasks which will each wait to be
+         -- called by Driver_Task
          --
          Task_Array : array (1 .. 3) of Sub_Task;
 
@@ -271,23 +271,23 @@ begin
             -- Wait to be called by Driver_Task
             accept Start_Test_1;
 
-            -- When this section is executed the task has reached the
-            -- head of the ready queue for its priority
+            -- When this section is executed the task has reached the head of
+            -- the ready queue for its priority
             --
-            -- Execute a non-blocking delay statement.  This should put the
-            -- task on the tail of the ready queue behind the Sub_Tasks
+            -- Execute a non-blocking delay statement. This should put the task
+            -- on the tail of the ready queue behind the Sub_Tasks
             --
             delay 0.0;
 
             -- When the task reaches the head of the queue once again it is
-            -- reactivated here.  Register this fact.
+            -- reactivated here. Register this fact.
             --
             Register.Running_Order (This_Ident);
 
-            -- Now indicate that this part is complete.  If all has gone well
-            -- this means that everything on the medium priority ready queue
-            -- is finished, the queue is empty and the lower priority queue
-            -- can be serviced
+            -- Now indicate that this part is complete. If all has gone well
+            -- this means that everything on the medium priority ready queue is
+            -- finished, the queue is empty and the lower priority queue can be
+            -- serviced
             --
             Register.Delay_Complete;
 
@@ -297,20 +297,20 @@ begin
             -- When this section is executed the task has again reached the
             -- head of the ready queue for its priority
             --
-            -- Execute a non-blocking delay statement.  This should put the
-            -- task on the tail of the ready queue behind the Sub_Tasks
+            -- Execute a non-blocking delay statement. This should put the task
+            -- on the tail of the ready queue behind the Sub_Tasks
             --
             delay until Time_In_The_Past;
 
             -- When the task reaches the head of the queue once again it is
-            -- reactivated here.  Register this fact.
+            -- reactivated here. Register this fact.
             --
             Register.Running_Order (This_Ident);
 
-            -- Now indicate that this part is complete.  If all has gone well
-            -- this means that everything on the medium priority ready queue
-            -- is finished, the queue is empty and the lower priority queue
-            -- can be serviced
+            -- Now indicate that this part is complete. If all has gone well
+            -- this means that everything on the medium priority ready queue is
+            -- finished, the queue is empty and the lower priority queue can be
+            -- serviced
             --
             Register.Delay_Complete;
 
@@ -333,8 +333,8 @@ begin
                Report.Comment ("relative delay test");
             end if;
 
-            -- Call the Delay_Task.  After completion of the rendezvous it
-            -- will be placed on the head of the ready queue
+            -- Call the Delay_Task. After completion of the rendezvous it will
+            -- be placed on the head of the ready queue
             --
             Delay_Task.Start_Test_1;
 
@@ -344,15 +344,15 @@ begin
             Task_C.Start;
             Task_D.Start;
 
-            -- Call the low priority task.  This puts it on the ready queue
-            -- for its priority
+            -- Call the low priority task. This puts it on the ready queue for
+            -- its priority
             --
             Low_Priority_Task.Start;
 
-            -- Now delay this high priority task.  At this point, as there
-            -- are no other high priority tasks to execute, the lower
-            -- priority ready queues will be serviced.  All the waiting tasks
-            -- will get run
+            -- Now delay this high priority task. At this point, as there are
+            -- no other high priority tasks to execute, the lower priority
+            -- ready queues will be serviced. All the waiting tasks will get
+            -- run
             --
             while not Register.Test_Complete loop
                delay Impdef.Clear_Ready_Queue;
@@ -368,8 +368,8 @@ begin
             -- Reset for the second part of the test
             Register.Reset;
 
-            -- Call the second entry of the Delay_Task, this puts it on
-            -- the ready queue
+            -- Call the second entry of the Delay_Task, this puts it on the
+            -- ready queue
             --
             Delay_Task.Start_Test_2;
 
@@ -378,10 +378,10 @@ begin
                Task_Array (I).Start;
             end loop;
 
-         -- Now allow the high priority task to terminate. At this point,
-         -- as there are no other high priority tasks to execute, the medium
-         -- priority ready queue will be serviced.  (There is no low priority
-         -- task involved in the second part of the test)
+            -- Now allow the high priority task to terminate. At this point,
+            -- as there are no other high priority tasks to execute, the medium
+            -- priority ready queue will be serviced. (There is no low priority
+            -- task involved in the second part of the test)
 
          exception
             when others =>

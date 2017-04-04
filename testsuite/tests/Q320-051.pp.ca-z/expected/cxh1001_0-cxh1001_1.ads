@@ -5,8 +5,8 @@ package Cxh1001_0.Cxh1001_1 is
 
    -- kill as many birds as possible with a single stone:
    --   embed a protected object in the body of a child package,
-   -- checks the multiple compilation unit case,
-   -- and part of the subcomponent case.
+   -- checks the multiple compilation unit case, and part of the subcomponent
+   -- case.
 
    protected Thingy is
       procedure Check_Embedded_Values;

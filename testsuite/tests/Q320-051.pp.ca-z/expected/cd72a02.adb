@@ -163,8 +163,8 @@ begin  -- Main test procedure.
       "System.Address_To_Access_Conversions " &
       "for composite types");
 
-   -- take several pointer objects, convert them to addresses, and store
-   -- the address as a hexadecimal representation for later reconversion
+   -- take several pointer objects, convert them to addresses, and store the
+   -- address as a hexadecimal representation for later reconversion
 
    The_Strings (Tagged_Type) :=
      new String'(Address_To_Hex (Class_Atac.To_Address (My_Rec'Access)));
@@ -175,10 +175,10 @@ begin  -- Main test procedure.
    The_Strings (Protected_Type) :=
      new String'(Address_To_Hex (Protected_Atac.To_Address (My_Prot'Access)));
 
-   -- now, reconvert the hexadecimal address values back to pointers,
-   -- and check that the dereferenced pointer still designates the
-   -- value placed at that location.  The use of the intermediate
-   -- string representation should foil even the cleverest of optimizers
+   -- now, reconvert the hexadecimal address values back to pointers, and check
+   -- that the dereferenced pointer still designates the value placed at that
+   -- location. The use of the intermediate string representation should foil
+   -- even the cleverest of optimizers
 
    if Tagged_Record
        (Class_Atac.To_Pointer
@@ -204,8 +204,8 @@ begin  -- Main test procedure.
    Protected_Atac.To_Pointer (Hex_To_Address (The_Strings (Protected_Type))).E;
    My_Prot.F;    -- checks that call to E occurred
 
-   -- check that the resulting values are equal to the 'Unchecked_Access
-   -- of the value
+   -- check that the resulting values are equal to the 'Unchecked_Access of the
+   -- value
 
    if Class_Atac.To_Pointer (Hex_To_Address (The_Strings (Tagged_Type))) /=
      My_Rec'Unchecked_Access

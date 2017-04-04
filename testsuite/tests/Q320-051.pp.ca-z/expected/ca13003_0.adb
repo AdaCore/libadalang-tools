@@ -7,8 +7,8 @@ package body Ca13003_0 is
       Id_In   : in     File_Id;
       File_In :    out File_Rec)
    is
-   -- Not a real initialization.  Real application can use file
-   -- database to create the file record.
+   -- Not a real initialization. Real application can use file database to
+   -- create the file record.
    begin
       File_In.Name := Name_In;
       File_In.Id   := Id_In;

@@ -130,9 +130,9 @@ begin
 
       Char_Ptr := Tc_Char_Array (0)'Access;
 
-      -- Provide a new Terminator char in the call of Function Value.
-      -- This call should return only a portion (the first 10 chars) of
-      -- the referenced char_array, up to and including the char 'j'.
+      -- Provide a new Terminator char in the call of Function Value. This call
+      -- should return only a portion (the first 10 chars) of the referenced
+      -- char_array, up to and including the char 'j'.
 
       Tc_Char_Array_1 :=
         Char_Pointers.Value (Ref => Char_Ptr, Terminator => Char_J);
@@ -146,9 +146,9 @@ begin
             "a non-default Terminator char");
       end if;
 
-      -- Use the default Terminator char in the call of Function Value.
-      -- This call should return the entire char_array, including the
-      -- terminating nul char.
+      -- Use the default Terminator char in the call of Function Value. This
+      -- call should return the entire char_array, including the terminating
+      -- nul char.
 
       Tc_Char_Array_2 := Char_Pointers.Value (Char_Ptr);
 
@@ -161,12 +161,12 @@ begin
             "default Terminator char");
       end if;
 
-      -- Check that the Function Value with Pointer and Length parameters
-      -- will return an Element_Array result of appropriate size and content
-      -- (the first Length elements pointed to by the parameter Ref).
+      -- Check that the Function Value with Pointer and Length parameters will
+      -- return an Element_Array result of appropriate size and content (the
+      -- first Length elements pointed to by the parameter Ref).
 
-      -- This call should return only a portion (the first 20 chars) of
-      -- the referenced char_array.
+      -- This call should return only a portion (the first 20 chars) of the
+      -- referenced char_array.
 
       Tc_Char_Array_3 :=
         Char_Pointers.Value
@@ -200,9 +200,9 @@ begin
             "entire array size");
       end if;
 
-      -- Check that both of the above versions of Function Value will
-      -- propagate Interfaces.C.Strings.Dereference_Error when the value of
-      -- the Ref Pointer parameter is null.
+      -- Check that both of the above versions of Function Value will propagate
+      -- Interfaces.C.Strings.Dereference_Error when the value of the Ref
+      -- Pointer parameter is null.
 
       Char_Ptr := null;
 

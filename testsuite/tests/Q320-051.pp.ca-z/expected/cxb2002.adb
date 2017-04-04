@@ -137,9 +137,9 @@ begin
 
       -- Function Shift_Right_Arithmetic.
 
-      -- Case where the parameter Value is less than
-      -- one half of the modulus.  Zero bits will be shifted in.
-      -- Modulus of type Unsigned_16 is 2**16; one half is 2**15.
+      -- Case where the parameter Value is less than one half of the modulus.
+      -- Zero bits will be shifted in. Modulus of type Unsigned_16 is 2**16;
+      -- one half is 2**15.
 
       Tc_Amount             := 3;
       Tc_Val_Unsigned_16    := 2**15 - 1; -- Less than one half of modulus.
@@ -160,8 +160,8 @@ begin
          Report.Failed ("Incorrect result from Shift_Right_Arithmetic - 2");
       end if;
 
-      -- Case where the parameter Value is greater than or equal to
-      -- one half of the modulus.  One bits will be shifted in.
+      -- Case where the parameter Value is greater than or equal to one half of
+      -- the modulus. One bits will be shifted in.
 
       Tc_Amount             := 1;
       Tc_Val_Unsigned_16    := 2**15;  -- One half of modulus.

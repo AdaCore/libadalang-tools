@@ -68,8 +68,8 @@ begin
 
    Test_For_Text_Io_Support : begin
 
-      -- Use_Error or Name_Error will be raised if Text_IO operations
-      -- or external files are not supported.
+      -- Use_Error or Name_Error will be raised if Text_IO operations or
+      -- external files are not supported.
 
       Text_Io.Create (Text_File, Text_Io.Out_File, Text_Filename);
 
@@ -100,8 +100,8 @@ begin
 
 -- During the course of its processing, the application may become confused
 -- and erroneously attempt to read data from the file that is currently in
--- Append_File mode (instead of the anticipated In_File mode).
--- This would result in the raising of Mode_Error.
+-- Append_File mode (instead of the anticipated In_File mode). This would
+-- result in the raising of Mode_Error.
 
          Text_Io.Get_Line (Text_File, Tc_Data, Tc_Length);
          Report.Failed ("Exception not raised by Get_Line");
@@ -120,15 +120,15 @@ begin
          Tc_End_Of_File : Boolean;
       begin
 
--- Again, during the course of its processing, the application attempts to
--- call the End_Of_File function for the file that is currently in
--- Append_File mode (instead of the anticipated In_File mode).
+-- Again, during the course of its processing, the application attempts to call
+-- the End_Of_File function for the file that is currently in Append_File mode
+-- (instead of the anticipated In_File mode).
 
          Tc_End_Of_File := Text_Io.End_Of_File (Text_File);
          Report.Failed ("Exception not raised by End_Of_File");
 
--- Once again, an exception handler present within the application handles
--- the exception and processing continues.
+-- Once again, an exception handler present within the application handles the
+-- exception and processing continues.
 
       exception
          when Text_Io.Mode_Error =>

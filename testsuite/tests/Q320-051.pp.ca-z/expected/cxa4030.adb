@@ -114,9 +114,9 @@ begin
            Latin_1.Uc_Icelandic_Thorn);
 
       -- In this test, access objects are defined to refer to two functions
-      -- from the Ada.Characters.Handling package.  These access objects
-      -- will be provided as parameters to the subprograms under test.
-      -- Note: There will be several examples in this test of these character
+      -- from the Ada.Characters.Handling package. These access objects will be
+      -- provided as parameters to the subprograms under test. Note: There will
+      -- be several examples in this test of these character
       --       handling functions being referenced directly within the
       --       parameter list of the subprograms under test.
 
@@ -128,8 +128,8 @@ begin
 
    begin
 
-      -- Function Index, Forward direction search.
-      -- Note: Several of the following cases use the default value
+      -- Function Index, Forward direction search. Note: Several of the
+      -- following cases use the default value
       --       Forward for the Going parameter.
 
       if Unb.Index

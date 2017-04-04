@@ -60,27 +60,22 @@
 
 with Fa11c00_0.Fa11c00_1.Fa11c00_2;  -- "with" of child library package
 -- Animal.Mammal.Primate.
--- This will be used in conjunction with
--- a "use" of FA11C00_0.FA11C00_1 below
+-- This will be used in conjunction with a "use" of FA11C00_0.FA11C00_1 below
 -- to verify a portion of the objective.
 with Report;
 
 procedure Ca11c03 is
 
    Blank_Name_String : constant Fa11c00_0.Species_Name_Type := (others => ' ');
-   -- Visibility of grandparent package.
-   -- The package FA11C00_0 is visible since
-   -- it is an ancestor that is mentioned in
-   -- the expanded name of its "withed"
+   -- Visibility of grandparent package. The package FA11C00_0 is visible since
+   -- it is an ancestor that is mentioned in the expanded name of its "withed"
    -- grandchild package.
 
    Blank_Hair_Color : String
      (1 .. Fa11c00_0.Fa11c00_1.Hair_Color_Type'Width) :=
      (others => ' ');
-   -- Visibility of parent package.
-   -- The package FA11C00_0.FA11C00_1 is
-   -- visible due to the "with" of its
-   -- child package.
+   -- Visibility of parent package. The package FA11C00_0.FA11C00_1 is visible
+   -- due to the "with" of its child package.
 
    subtype Data_String_Type is String (1 .. 60);
 
@@ -123,10 +118,9 @@ begin
 
    declare
       use Fa11c00_0.Fa11c00_1;    -- This "use" clause will allow direct
-      -- visibility to the simple name of
-      -- package FA11C00_0.FA11C00_1.FA11C00_2,
-      -- since this child package was "withed" by
-      -- the main program.
+      -- visibility to the simple name of package
+      -- FA11C00_0.FA11C00_1.FA11C00_2, since this child package was
+      -- "withed" by the main program.
 
       Tarsier : Fa11c00_2.Primate :=
         (Common_Name => "East-Indian Tarsier ",
@@ -134,14 +128,12 @@ begin
          Hair_Color  => Brown,
          Habitat     => Fa11c00_2.Arboreal);
 
-   -- Demonstrates visibility of package
-   -- FA11C00_0.FA11C00_1.FA11C00_2.
+   -- Demonstrates visibility of package FA11C00_0.FA11C00_1.FA11C00_2.
    --
-   -- Type Primate referenced with the simple
-   -- name of package FA11C00_2 only.
+   -- Type Primate referenced with the simple name of package FA11C00_2 only.
    --
-   -- Simple name of package FA11C00_2 is
-   -- directly visible through "use" of parent.
+   -- Simple name of package FA11C00_2 is directly visible through "use" of
+   -- parent.
 
    begin
 
@@ -159,19 +151,15 @@ begin
       Tc_Result_String :=
         Format_Primate_Data
           (Name => Fa11c00_2.Image (Tarsier),
-      -- Function returns a 37 character string
-      -- value.
+      -- Function returns a 37 character string value.
            Hair => Hair_Color_Type'Image (Tarsier.Hair_Color));
-      -- The Hair_Color_Type is referenced
-      -- directly, without package
-      -- FA11C00_0.FA11C00_1 qualifier.
-      -- No qualification of Hair_Color_Type is
-      -- needed due to "use" clause.
+      -- The Hair_Color_Type is referenced directly, without package
+      -- FA11C00_0.FA11C00_1 qualifier. No qualification of Hair_Color_Type
+      -- is needed due to "use" clause.
 
-      -- Note that the result of calling 'Image
-      -- with an enumeration type argument
-      -- results in an upper-case string.
-      -- (See conditional statement below.)
+      -- Note that the result of calling 'Image with an enumeration type
+      -- argument results in an upper-case string. (See conditional statement
+      -- below.)
 
       -- Verify the results of the function call.
 

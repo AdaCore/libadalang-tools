@@ -78,11 +78,10 @@ begin
    Test_For_Text_Io_Support : begin
 
       -- An implementation that does not support Text_IO in a particular
-      -- environment will raise Use_Error on calls to various
-      -- Text_IO operations.  This block statement encloses a call to
-      -- Create, which should raise the exception in a non-supportive
-      -- environment.  This exception will be handled to produce a
-      -- Not_Applicable result.
+      -- environment will raise Use_Error on calls to various Text_IO
+      -- operations. This block statement encloses a call to Create, which
+      -- should raise the exception in a non-supportive environment. This
+      -- exception will be handled to produce a Not_Applicable result.
 
       Text_Io.Create
         (File => Inventory_File,
@@ -149,13 +148,11 @@ begin
       -- data file containing information on items that have been ordered
       -- and received.
       --
-      -- As new orders are received, the file is opened in Append_File
-      -- mode.
-      -- Data is taken from the inventory list and entered into the file,
-      -- in specific format.
-      -- Enter the order into the inventory file.  This is item 1 in
-      -- the inventory list.
-      -- The data entry process can be repeated numerous times as required.
+      -- As new orders are received, the file is opened in Append_File mode.
+      -- Data is taken from the inventory list and entered into the file, in
+      -- specific format. Enter the order into the inventory file. This is
+      -- item 1 in the inventory list. The data entry process can be repeated
+      -- numerous times as required.
 
       Entry_Io.Put (Inventory_File, Inventory_List (Daily_Order).Entry_Number);
       Item_Io.Put (Inventory_File, Inventory_List (Daily_Order).Item_Number);

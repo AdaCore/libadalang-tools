@@ -69,10 +69,10 @@ begin
    begin
 
       -- An application creates a text file in mode Out_File, with the
-      -- intention of entering modular data into the file as appropriate.
-      -- In the event that the particular environment where the application
-      -- is running does not support Text_IO, Use_Error or Name_Error will be
-      -- raised on calls to Text_IO operations.  Either of these exceptions
+      -- intention of entering modular data into the file as appropriate. In
+      -- the event that the particular environment where the application is
+      -- running does not support Text_IO, Use_Error or Name_Error will be
+      -- raised on calls to Text_IO operations. Either of these exceptions
       -- will be handled to produce a Not_Applicable result.
 
       Ada.Text_Io.Create
@@ -83,9 +83,9 @@ begin
       Test_Block : declare
 
          type Mod_Type is mod System.Max_Binary_Modulus;
-         -- Max_Binary_Modulus must be at least 2**16, which would result
-         -- in a base range of 0..65535 (zero to one less than the given
-         -- modulus) for this modular type.
+         -- Max_Binary_Modulus must be at least 2**16, which would result in
+         -- a base range of 0..65535 (zero to one less than the given modulus)
+         -- for this modular type.
 
          package Mod_Io is new Ada.Text_Io.Modular_Io (Mod_Type);
          use Ada.Text_Io, Mod_Io;
@@ -103,9 +103,8 @@ begin
          procedure Load_File (The_File : in out Ada.Text_Io.File_Type) is
          begin
             -- This procedure does not create, open, or close the data file;
-            -- The_File file object must be Open at this point.
-            -- This procedure is designed to load Modular_Type data into a
-            -- data file.
+            -- The_File file object must be Open at this point. This procedure
+            -- is designed to load Modular_Type data into a data file.
             --
             -- Use the Modular_IO procedure Put to enter modular data items
             -- into the data file.
@@ -119,10 +118,10 @@ begin
                   Base  => Mod_Io.Default_Base);
             end loop;
 
-            -- Enter data into the file such that on the corresponding "Get"
-            -- of this data, Data_Error must be raised.  This value is outside
-            -- the base range of Modular_Type.
-            -- Text_IO is used to enter the value in the file.
+            -- Enter data into the file such that on the corresponding "Get" of
+            -- this data, Data_Error must be raised. This value is outside the
+            -- base range of Modular_Type. Text_IO is used to enter the value
+            -- in the file.
 
             for I in 1 .. Number_Of_Error_Items loop
                Ada.Text_Io.Put (The_File, "-10");
@@ -133,9 +132,9 @@ begin
          procedure Process_File (The_File : in out Ada.Text_Io.File_Type) is
          begin
             -- This procedure does not create, open, or close the data file;
-            -- The_File file object must be Open at this point.
-            -- Use procedure Get (for Files) to extract the modular data from
-            -- the Text_IO file.
+            -- The_File file object must be Open at this point. Use procedure
+            -- Get (for Files) to extract the modular data from the Text_IO
+            -- file.
 
             for I in 1 .. Number_Of_Modular_Items loop
                Mod_Io.Get (The_File, Tc_Modular, Width => 6);
@@ -149,7 +148,7 @@ begin
             end loop;
 
             -- The final item in the Data_File is a modular value that is
-            -- outside the base range 0..Num'Last.  This value should raise
+            -- outside the base range 0..Num'Last. This value should raise
             -- Data_Error on an attempt to "Get" it from the file.
 
             for I in 1 .. Number_Of_Error_Items loop
@@ -198,9 +197,9 @@ begin
               (others => (others => ' '));
          begin
 
-            -- Place modular values into strings using the Procedure Put,
-            -- Use a variety of different "Base" parameter values.
-            -- Note: This version of Put uses the length of the given
+            -- Place modular values into strings using the Procedure Put, Use a
+            -- variety of different "Base" parameter values. Note: This version
+            -- of Put uses the length of the given
             --       string as the value of the "Width" parameter.
 
             for I in 1 .. 2 loop
@@ -216,8 +215,8 @@ begin
                Mod_Io.Put (Tc_String_Array (I), Modular_Array (I), 16);
             end loop;
 
-            -- Get modular values from strings using the Procedure Get.
-            -- Compare with expected modular values.
+            -- Get modular values from strings using the Procedure Get. Compare
+            -- with expected modular values.
 
             for I in 1 .. Number_Of_Modular_Items loop
 
@@ -258,9 +257,9 @@ begin
 
    exception
 
-      -- Since Use_Error can be raised if, for the specified mode,
-      -- the environment does not support Text_IO operations, the
-      -- following handlers are included:
+      -- Since Use_Error can be raised if, for the specified mode, the
+      -- environment does not support Text_IO operations, the following
+      -- handlers are included:
 
       when Ada.Text_Io.Use_Error =>
          Report.Not_Applicable ("Use_Error raised on Text_IO Create");

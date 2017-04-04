@@ -70,8 +70,8 @@ begin
 
       type String_Pointer_Type is access String;
 
-      -- Define a decimal data type, and instantiate the Decimal_Output
-      -- generic package for the data type.
+      -- Define a decimal data type, and instantiate the Decimal_Output generic
+      -- package for the data type.
 
       type Decimal_Data_Type is delta 0.01 digits 16;
       package Ed_Out is new Editing.Decimal_Output (Decimal_Data_Type);

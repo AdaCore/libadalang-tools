@@ -11,8 +11,8 @@ package body Ca11022_0.Ca11022_3 is
 
       ------------------------------------
 
-      -- Declare instance of the generic sibling package to draw a circle,
-      -- a square, or an ellipse customized for the IBM3270.
+      -- Declare instance of the generic sibling package to draw a circle, a
+      -- square, or an ellipse customized for the IBM3270.
       package Ibm3270_Graphic is new Ca11022_0.Ca11022_1 (Ibm3270_Putdot);
 
    begin

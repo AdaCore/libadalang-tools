@@ -49,9 +49,8 @@
 --
 with Ada.Finalization;
 package F431a00 is
-   --  Protected object and Task types used to check that limited
-   --  components are properly initialized (and thus are fully
-   --  operational).
+   --  Protected object and Task types used to check that limited components
+   --  are properly initialized (and thus are fully operational).
 
    protected type T_Po is
       entry Set (Value : in Integer);

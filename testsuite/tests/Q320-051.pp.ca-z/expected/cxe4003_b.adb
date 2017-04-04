@@ -12,6 +12,6 @@ begin
      ("CXE4003_B",
       "Check the blocking properties of " & "remote calls");
 
-   -- the call to Report.Result is made by the task in
-   -- CXE4003_Part_B1 when partition A is finished.
+   -- the call to Report.Result is made by the task in CXE4003_Part_B1 when
+   -- partition A is finished.
 end Cxe4003_B;

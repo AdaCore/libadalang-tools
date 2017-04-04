@@ -79,8 +79,8 @@ begin
 
       use Ada.Text_Io;
 
-      -- Instantiate the Decimal_Output generic package for two
-      -- different decimal data types.
+      -- Instantiate the Decimal_Output generic package for two different
+      -- decimal data types.
 
       package Pack_2dp is          -- Uses decimal type with delta 0.01.
       new Editing.Decimal_Output
@@ -113,9 +113,9 @@ begin
 
    begin
 
-      -- Examine cases where the output string is longer than the length
-      -- of the edited output result.  Use the instantiation of
-      -- Decimal_Output specific to data with two decimal places.
+      -- Examine cases where the output string is longer than the length of the
+      -- edited output result. Use the instantiation of Decimal_Output specific
+      -- to data with two decimal places.
 
       Tc_Start_Loop := 1;
       Tc_End_Loop   :=
@@ -131,15 +131,15 @@ begin
              (Fxf3a00.Valid_Strings (I).all,
               Blank_When_Zero => False);
 
-         -- Determine the actual length of the edited output string
-         -- that is expected from Put and Image.
+         -- Determine the actual length of the edited output string that is
+         -- expected from Put and Image.
 
          Tc_Length := Pack_2dp.Length (Pic => Tc_Picture, Currency => "$");
 
          -- Determine the difference in length between the receiving string
-         -- object and the expected length of the edited output string.
-         -- Define a blank filled string constant with length equal to this
-         -- length difference.
+         -- object and the expected length of the edited output string. Define
+         -- a blank filled string constant with length equal to this length
+         -- difference.
 
          declare
             Tc_Length_Diff   : Integer := Tc_Put_String_20'Length - Tc_Length;
@@ -147,8 +147,8 @@ begin
               (others => ' ');
          begin
 
-            -- Fill the two receiving string objects with edited output,
-            -- using the two different methods (Put and Move).
+            -- Fill the two receiving string objects with edited output, using
+            -- the two different methods (Put and Move).
 
             Pack_2dp.Put
               (To         => Tc_Put_String_20,
@@ -174,11 +174,11 @@ begin
                Pad     => Ada.Strings.Space);
 
             -- Each receiving string object is now filled with the edited
-            -- output result, right justified.
-            -- Compare these two string objects with the expected edited
-            -- output value, which is appended to the blank filled string
-            -- whose length is the difference between the expected edited
-            -- output length and the length of the receiving strings.
+            -- output result, right justified. Compare these two string objects
+            -- with the expected edited output value, which is appended to the
+            -- blank filled string whose length is the difference between the
+            -- expected edited output length and the length of the receiving
+            -- strings.
 
             if Tc_Buffer_String & Fxf3a00.Edited_Output (I).all /=
               Tc_Put_String_20 or
@@ -210,9 +210,9 @@ begin
 
       -- Repeat the above loop, but only evaluate three cases - those where
       -- the length of the expected edited output string is the exact length
-      -- of the receiving strings (no justification will be required within
-      -- the string.  This series of evaluations again uses decimal data
-      -- with two decimal places.
+      -- of the receiving strings (no justification will be required within the
+      -- string. This series of evaluations again uses decimal data with two
+      -- decimal places.
 
       for I in Tc_Start_Loop .. Tc_End_Loop loop                    -- 1..10
 
@@ -224,8 +224,8 @@ begin
                  Editing.To_Picture (Fxf3a00.Valid_Strings (I).all);
 
                -- Fill the two receiving string objects with edited output,
-               -- using the two different methods (Put and Move).
-               -- Use default parameters in the various calls where possible.
+               -- using the two different methods (Put and Move). Use default
+               -- parameters in the various calls where possible.
 
                Pack_2dp.Put
                  (To   => Tc_Put_String_17,
@@ -259,9 +259,9 @@ begin
       end loop;
 
       -- Evaluate a mix of cases, where the expected edited output string
-      -- length is either exactly as long or shorter than the receiving
-      -- output string parameter.  This series of evaluations uses decimal
-      -- data with no decimal places.
+      -- length is either exactly as long or shorter than the receiving output
+      -- string parameter. This series of evaluations uses decimal data with no
+      -- decimal places.
 
       Tc_Start_Loop := Tc_End_Loop + 1;                           -- 11
       Tc_End_Loop   := Tc_Start_Loop +                            -- 22
@@ -276,13 +276,13 @@ begin
 
          Tc_Picture := Editing.To_Picture (Fxf3a00.Valid_Strings (I).all);
 
-         -- Determine the actual length of the edited output string
-         -- that is expected from Put and Image.
+         -- Determine the actual length of the edited output string that is
+         -- expected from Put and Image.
 
          Tc_Length := Pack_Ndp.Length (Tc_Picture);
 
-         -- Fill the two receiving string objects with edited output,
-         -- using the two different methods (Put and Move).
+         -- Fill the two receiving string objects with edited output, using the
+         -- two different methods (Put and Move).
 
          Pack_Ndp.Put
            (Tc_Put_String_8,
@@ -296,10 +296,10 @@ begin
             Ada.Strings.Right,
             Ada.Strings.Space);
 
-         -- Determine if there is a difference in length between the
-         -- receiving string object and the expected length of the edited
-         -- output string.  If so, then define a blank filled string constant
-         -- with length equal to this length difference.
+         -- Determine if there is a difference in length between the receiving
+         -- string object and the expected length of the edited output string.
+         -- If so, then define a blank filled string constant with length equal
+         -- to this length difference.
 
          if Tc_Length < Tc_Put_String_8'Length then
             declare
@@ -309,11 +309,11 @@ begin
             begin
 
                -- Each receiving string object is now filled with the edited
-               -- output result, right justified.
-               -- Compare these two string objects with the expected edited
-               -- output value, which is appended to the blank filled string
-               -- whose length is the difference between the expected edited
-               -- output length and the length of the receiving strings.
+               -- output result, right justified. Compare these two string
+               -- objects with the expected edited output value, which is
+               -- appended to the blank filled string whose length is the
+               -- difference between the expected edited output length and
+               -- the length of the receiving strings.
 
                if Tc_Buffer_String &
                  Fxf3a00.Edited_Output (I + Tc_Offset).all /=
@@ -332,10 +332,10 @@ begin
             end;
          else
 
-            -- Compare these two string objects with the expected edited
-            -- output value, which is appended to the blank filled string
-            -- whose length is the difference between the expected edited
-            -- output length and the length of the receiving strings.
+            -- Compare these two string objects with the expected edited output
+            -- value, which is appended to the blank filled string whose length
+            -- is the difference between the expected edited output length and
+            -- the length of the receiving strings.
 
             if Fxf3a00.Edited_Output (I + Tc_Offset).all /= Tc_Put_String_8 or
               Fxf3a00.Edited_Output (I + Tc_Offset).all /= Tc_Move_String_8

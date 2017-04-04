@@ -28,8 +28,8 @@ begin
       " operations on controlled objects but" &
       " restored immediately afterward");
 
-   -- the requirements on the abort being immediate are
-   -- only placed upon uni-processor systems.
+   -- the requirements on the abort being immediate are only placed upon
+   -- uni-processor systems.
    if Impdef.Annex_D.Processor /= Impdef.Annex_D.Uni_Processor then
       Report.Not_Applicable ("Multi-Processor configuration");
       Report.Result;
@@ -38,8 +38,8 @@ begin
 
    Check_State (Unknown, "initial condition");
 
-   -- check that initialization and finalization both take place
-   -- and are abort deferred
+   -- check that initialization and finalization both take place and are abort
+   -- deferred
    Completed_Init := False;
    select
       State_Manager.Wait_For_Change;
@@ -71,9 +71,9 @@ begin
          Report.Failed ("abort not immediate - adjust");
       end select;
 
-      -- note that assignment operation is not the same as an
-      -- assignment statement.  The state could be either Finished_Adjust
-      -- or Finished_Final depending upon the use of temporaries.
+      -- note that assignment operation is not the same as an assignment
+      -- statement. The state could be either Finished_Adjust or Finished_Final
+      -- depending upon the use of temporaries.
       case State_Manager.Current is
          when Finished_Adjust =>
             if Verbose then
@@ -96,9 +96,8 @@ begin
       end case;
 
       if Dest.Id /= 3 then
-         -- depending upon the implementation, the copy into the
-         -- resulting object may not have occurred yet.
-         -- Just note it.
+         -- depending upon the implementation, the copy into the resulting
+         -- object may not have occurred yet. Just note it.
          Report.Comment ("assignment not performed");
       end if;
    end;
@@ -127,8 +126,7 @@ begin
       Check_State (Finished_Final, "finalization in dealloc");
    end;
 
-   -- explicitly calling Initialize, Finalize, or Adjust is not
-   -- abort deferred.
+   -- explicitly calling Initialize, Finalize, or Adjust is not abort deferred.
    declare
       Obj : Is_Controlled;
    begin

@@ -159,45 +159,42 @@ package Impdef.Annex_H is
       Idb5,
       Idb6);
 
-   -- NO MODIFICATION NEEDED TO TYPE SCALAR_TO_NORMALIZE.  DO NOT MODIFY.
+   -- NO MODIFICATION NEEDED TO TYPE SCALAR_TO_NORMALIZE. DO NOT MODIFY.
 
    type Small_Number is range 1 .. 100;
 
-   -- NO MODIFICATION NEEDED TO TYPE SMALL_NUMBER.  DO NOT MODIFY.
+   -- NO MODIFICATION NEEDED TO TYPE SMALL_NUMBER. DO NOT MODIFY.
 
 --=====================================================================
-   -- When the value documented in H.1(5) as the predictable initial value
-   -- for an uninitialized object of the type Scalar_To_Normalize
-   -- (an enumeration type containing 127 identifiers) is to be in the range
-   -- Id0..IdB6, set the following constant to True; otherwise leave it set
-   -- to False.
+   -- When the value documented in H.1(5) as the predictable initial value for
+   -- an uninitialized object of the type Scalar_To_Normalize (an enumeration
+   -- type containing 127 identifiers) is to be in the range Id0..IdB6, set the
+   -- following constant to True; otherwise leave it set to False.
 
    Default_For_Scalar_To_Normalize_Is_In_Range : constant Boolean := False;
    --                                      MODIFY HERE AS NEEDED --- ^^^^^
 
 --=====================================================================
    -- If the above constant Default_For_Scalar_To_Normalize_Is_In_Range is
-   -- set True, the following constant must be set to the value documented
-   -- in H.1(5) as the predictable initial value for the type
-   -- Scalar_To_Normalize.
+   -- set True, the following constant must be set to the value documented in
+   -- H.1(5) as the predictable initial value for the type Scalar_To_Normalize.
 
    Default_For_Scalar_To_Normalize : constant Scalar_To_Normalize := Id0;
    --                                      MODIFY HERE AS NEEDED --- ^^^
 
 --=====================================================================
    -- When the value documented in H.1(5) as the predictable initial value
-   -- for an uninitialized object of the type Small_Number
-   -- (an integer type containing 100 values) is to be in the range
-   -- 1..100, set the following constant to True; otherwise leave it set
-   -- to False.
+   -- for an uninitialized object of the type Small_Number (an integer type
+   -- containing 100 values) is to be in the range 1..100, set the following
+   -- constant to True; otherwise leave it set to False.
 
    Default_For_Small_Number_Is_In_Range : constant Boolean := False;
    --                               MODIFY HERE AS NEEDED --- ^^^^^
 
 --=====================================================================
-   -- If the above constant Default_For_Small_Number_Is_In_Range is
-   -- set True, the following constant must be set to the value documented
-   -- in H.1(5) as the predictable initial value for the type Small_Number.
+   -- If the above constant Default_For_Small_Number_Is_In_Range is set True,
+   -- the following constant must be set to the value documented in H.1(5) as
+   -- the predictable initial value for the type Small_Number.
 
    Default_For_Small_Number : constant Small_Number := 100;
    --                        MODIFY HERE AS NEEDED --- ^^^

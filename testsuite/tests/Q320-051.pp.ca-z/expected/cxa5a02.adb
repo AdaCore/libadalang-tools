@@ -94,8 +94,8 @@ begin
       -- Testing of Cos Function, both instantiated and pre-instantiated
       -- version.
 
-      -- Check that no exception occurs on computing the Cos with very
-      -- large (positive and negative) input values.
+      -- Check that no exception occurs on computing the Cos with very large
+      -- (positive and negative) input values.
 
       begin
          New_Float_Result := Gef.Cos (New_Float (Fxa5a00.Large));

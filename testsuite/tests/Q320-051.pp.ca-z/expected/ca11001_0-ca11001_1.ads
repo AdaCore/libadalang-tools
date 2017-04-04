@@ -2,7 +2,7 @@
 
 package Ca11001_0.Ca11001_1 is    -- Polar_Complex
 --  This public child provides a different view of the private type from its
---  parent.  It provides a polar view by the provision of subprograms which
+--  parent. It provides a polar view by the provision of subprograms which
 --  construct and decompose a complex number.
 
    procedure Polar_Assign (R, Theta : in Complex_Int; C : out Complex_Type);

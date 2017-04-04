@@ -59,12 +59,10 @@
 --
 -- W. J. Cody
 -- CELEFUNT: A Portable Test Package for Complex Elementary Functions
--- Algorithm 714, Collected Algorithms from ACM.
--- Published in Transactions On Mathematical Software,
--- Vol. 19, No. 1, March, 1993, pp. 1-21.
+-- Algorithm 714, Collected Algorithms from ACM. Published in Transactions
+-- On Mathematical Software, Vol. 19, No. 1, March, 1993, pp. 1-21.
 --
--- CRC Standard Mathematical Tables
--- 23rd Edition
+-- CRC Standard Mathematical Tables 23rd Edition
 --
 
 with System;
@@ -73,9 +71,9 @@ with Ada.Numerics.Generic_Complex_Types;
 with Ada.Numerics.Generic_Complex_Elementary_Functions;
 procedure Cxg2019 is
    Verbose : constant Boolean := False;
-   -- Note that Max_Samples is the number of samples taken in
-   -- both the real and imaginary directions.  Thus, for Max_Samples
-   -- of 100 the number of values checked is 10000.
+   -- Note that Max_Samples is the number of samples taken in both the real and
+   -- imaginary directions. Thus, for Max_Samples of 100 the number of values
+   -- checked is 10000.
    Max_Samples : constant := 100;
 
    E  : constant := Ada.Numerics.E;
@@ -108,8 +106,8 @@ procedure Cxg2019 is
          Rel_Error : Real;
          Abs_Error : Real;
       begin
-         -- In the case where the expected result is very small or 0
-         -- we compute the maximum error as a multiple of Model_Small instead
+         -- In the case where the expected result is very small or 0 we
+         -- compute the maximum error as a multiple of Model_Small instead
          -- of Model_Epsilon and Expected.
          Rel_Error := Mre * abs Expected * Real'Model_Epsilon;
          Abs_Error := Mre * Real'Model_Epsilon;
@@ -151,19 +149,17 @@ procedure Cxg2019 is
       end Check;
 
       procedure Special_Value_Test is
-         -- In the following tests the expected result is accurate
-         -- to the machine precision so the minimum guaranteed error
-         -- bound can be used if the argument is exact.
+         -- In the following tests the expected result is accurate to the
+         -- machine precision so the minimum guaranteed error bound can be
+         -- used if the argument is exact.
          --
-         -- When using pi there is an extra error of 1.0ME.
-         -- Although the real component has an error bound of 13.0,
-         -- the complex component must take into account this error
-         -- in the value for Pi.
+         -- When using pi there is an extra error of 1.0ME. Although the real
+         -- component has an error bound of 13.0, the complex component must
+         -- take into account this error in the value for Pi.
          --
-         -- One or i is added to the actual and expected results in
-         -- order to prevent the expected result from having a
-         -- real or imaginary part of 0.  This is to allow a reasonable
-         -- relative error for that component.
+         -- One or i is added to the actual and expected results in order to
+         -- prevent the expected result from having a real or imaginary part of
+         -- 0. This is to allow a reasonable relative error for that component.
          Minimum_Error : constant := 13.0;
       begin
          Check
@@ -196,10 +192,9 @@ procedure Cxg2019 is
       end Exact_Result_Test;
 
       procedure Identity_Test (Ra, Rb, Ia, Ib : Real) is
-         -- Tests an identity over a range of values specified
-         -- by the 4 parameters.  RA and RB denote the range for the
-         -- real part while IA and IB denote the range for the
-         -- imaginary part.
+         -- Tests an identity over a range of values specified by the 4
+         -- parameters. RA and RB denote the range for the real part while
+         -- IA and IB denote the range for the imaginary part.
          --
          -- For this test we use the identity
          --    Log(Z*Z) = 2 * Log(Z)
@@ -216,10 +211,9 @@ procedure Cxg2019 is
             for J in 1 .. Max_Samples loop
                Y := (Ib - Ia) * Real (J) / Real (Max_Samples) + Ia;
 
-               -- purify the arguments to minimize roundoff error.
-               -- We construct the values so that the products X*X,
-               -- Y*Y, and X*Y are all exact machine numbers.
-               -- See Cody page 7 and CELEFUNT code.
+               -- purify the arguments to minimize roundoff error. We construct
+               -- the values so that the products X*X, Y*Y, and X*Y are all
+               -- exact machine numbers. See Cody page 7 and CELEFUNT code.
                Z  := X * Scale;
                W  := Z + X;
                X  := W - Z;
@@ -231,8 +225,8 @@ procedure Cxg2019 is
                W  := X * Y;
                Cy := Compose_From_Cartesian (Z, W + W);
 
-               -- The arguments are now ready so on with the
-               -- identity computation.
+               -- The arguments are now ready so on with the identity
+               -- computation.
                Actual1 := Log (Cx);
 
                Actual2 := Log (Cy) * 0.5;
@@ -278,13 +272,12 @@ procedure Cxg2019 is
       end Identity_Test;
 
       procedure Exception_Test is
-         -- Check that log((0,0)) causes constraint_error.
-         -- G.1.2(29);
+         -- Check that log((0,0)) causes constraint_error. G.1.2(29);
 
          X : Complex := (0.0, 0.0);
       begin
          if not Real'Machine_Overflows then
-            -- not applicable:   G.1.2(28);6.0
+            -- not applicable: G.1.2(28);6.0
             return;
          end if;
 
@@ -308,9 +301,8 @@ procedure Cxg2019 is
       begin
          Special_Value_Test;
          Exact_Result_Test;
-         -- test regions that do not include the unit circle so that
-         -- the real part of LOG(Z) does not vanish
-         -- See Cody page 9.
+         -- test regions that do not include the unit circle so that the real
+         -- part of LOG(Z) does not vanish See Cody page 9.
          Identity_Test (2.0, 10.0, 0.0, 10.0);
          Identity_Test (1_000.0, 2_000.0, -4_000.0, -1_000.0);
          Identity_Test (Real'Model_Epsilon, 0.25, -0.25, -Real'Model_Epsilon);

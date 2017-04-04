@@ -78,10 +78,10 @@ begin
 
       -- If an implementation does not support Stream_IO in a particular
       -- environment, the exception Use_Error or Name_Error will be raised on
-      -- calls to various Stream_IO operations.  This block statement
-      -- encloses a call to Create, which should produce an exception in a
-      -- non-supportive environment.  These exceptions will be handled to
-      -- produce a Not_Applicable result.
+      -- calls to various Stream_IO operations. This block statement encloses a
+      -- call to Create, which should produce an exception in a non-supportive
+      -- environment. These exceptions will be handled to produce a
+      -- Not_Applicable result.
 
       Strm_Pack.Create (The_File, Strm_Pack.Out_File, The_Filename);
 
@@ -165,12 +165,11 @@ begin
       -- Assign access value.
       The_Stream := Strm_Pack.Stream (The_File);
 
-      -- Product information is to be stored in the stream file.  These
-      -- data arrays are of different sizes (actually, the records
-      -- are stored individually, not as a single array).  Prior to the
-      -- record data being written, a header record is initialized with
-      -- information about the data to be written, then itself is written
-      -- to the stream.
+      -- Product information is to be stored in the stream file. These data
+      -- arrays are of different sizes (actually, the records are stored
+      -- individually, not as a single array). Prior to the record data being
+      -- written, a header record is initialized with information about the
+      -- data to be written, then itself is written to the stream.
 
       Store_Data (The_Stream, Product_Information_1);
       Store_Data (The_Stream, Product_Information_2);
@@ -191,9 +190,9 @@ begin
                raise Incomplete;
          end Reset1;
 
-         -- Data is read from the stream, first the appropriate header,
-         -- then the associated data records, which are then reconstructed
-         -- into a data array of product information.
+         -- Data is read from the stream, first the appropriate header, then
+         -- the associated data records, which are then reconstructed into a
+         -- data array of product information.
 
          Retrieve_Data (The_Stream, Product_Header_1, Product_Array_1);
 
@@ -214,9 +213,9 @@ begin
             end if;
          end loop;
 
-         -- Repeat this read and verify operation for the next parcel of
-         -- data.  Again, header and data record information are read from
-         -- the same stream file.
+         -- Repeat this read and verify operation for the next parcel of data.
+         -- Again, header and data record information are read from the same
+         -- stream file.
          Retrieve_Data (The_Stream, Product_Header_2, Product_Array_2);
 
          if (Product_Header_2.Origination_Date /= Todays_Date) or

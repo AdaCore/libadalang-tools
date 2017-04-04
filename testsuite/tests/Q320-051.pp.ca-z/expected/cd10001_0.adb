@@ -30,8 +30,8 @@ package body Cd10001_0 is
 
 -- I don't see how to reliably check this one:
 --
---  type Enumeration_1 is (First, Second, Third);
---  for Enumeration_1 use (First => One, Second => Two, Third => Three);
+--  type Enumeration_1 is (First, Second, Third); for Enumeration_1 use (First
+--  => One, Second => Two, Third => Three);
 
       Assert
         (Some_Tagged_Type'External_Tag = Tag_String,

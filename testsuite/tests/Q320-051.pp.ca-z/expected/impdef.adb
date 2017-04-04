@@ -2,14 +2,14 @@
 
 package body Impdef is
 
-   -- NOTE: These are example bodies.  It is expected that implementors
+   -- NOTE: These are example bodies. It is expected that implementors
    --       will write their own versions of these routines.
 
 --=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--
 
-   -- The time required to execute this procedure must be greater than the
-   -- time slice unit on implementations which use time slicing.  For
-   -- implementations which do not use time slicing the body can be null.
+   -- The time required to execute this procedure must be greater than the time
+   -- slice unit on implementations which use time slicing. For implementations
+   -- which do not use time slicing the body can be null.
 
    procedure Exceed_Time_Slice is
       T        : Integer          := 0;

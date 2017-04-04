@@ -71,22 +71,17 @@
 --
 -- References:
 --
--- Software Manual for the Elementary Functions
--- William J. Cody, Jr. and William Waite
--- Prentice-Hall, 1980
+-- Software Manual for the Elementary Functions William J. Cody, Jr. and
+-- William Waite Prentice-Hall, 1980
 --
--- CRC Standard Mathematical Tables
--- 23rd Edition
+-- CRC Standard Mathematical Tables 23rd Edition
 --
--- Implementation and Testing of Function Software
--- W. J. Cody
--- Problems and Methodologies in Mathematical Software Production
--- editors P. C. Messina and A. Murli
--- Lecture Notes in Computer Science   Volume 142
--- Springer Verlag, 1982
+-- Implementation and Testing of Function Software W. J. Cody Problems and
+-- Methodologies in Mathematical Software Production editors P. C. Messina and
+-- A. Murli Lecture Notes in Computer Science Volume 142 Springer Verlag, 1982
 --
--- The sin and cos checks are translated directly from
--- the netlib FORTRAN code that was written by W. Cody.
+-- The sin and cos checks are translated directly from the netlib FORTRAN code
+-- that was written by W. Cody.
 --
 
 with System;
@@ -97,7 +92,7 @@ procedure Cxg2004 is
    Verbose        : constant Boolean := False;
    Number_Samples : constant         := 1_000;
 
-   -- CRC Standard Mathematical Tables;  23rd Edition; pg 738
+   -- CRC Standard Mathematical Tables; 23rd Edition; pg 738
    Sqrt2 : constant :=
      1.41421_35623_73095_04880_16887_24209_69807_85696_71875_37695;
    Sqrt3 : constant :=
@@ -135,8 +130,8 @@ procedure Cxg2004 is
          Rel_Error, Abs_Error, Max_Error : Real;
       begin
 
-         -- In the case where the expected result is very small or 0
-         -- we compute the maximum error as a multiple of Model_Epsilon instead
+         -- In the case where the expected result is very small or 0 we
+         -- compute the maximum error as a multiple of Model_Epsilon instead
          -- of Model_Epsilon and Expected.
          Rel_Error := Mre * abs Expected * Real'Model_Epsilon;
          Abs_Error := Mre * Real'Model_Epsilon;
@@ -146,8 +141,8 @@ procedure Cxg2004 is
             Max_Error := Abs_Error;
          end if;
 
-         -- in addition to the relative error checks we apply the
-         -- criteria of G.2.4(16)
+         -- in addition to the relative error checks we apply the criteria of
+         -- G.2.4(16)
          if abs (Actual) > 1.0 then
             Accuracy_Error_Reported := True;
             Report.Failed (Test_Name & " result > 1.0");
@@ -179,10 +174,9 @@ procedure Cxg2004 is
          -- This test uses the identity
          --   sin(x) = sin(x/3)*(3 - 4 * sin(x/3)**2)
          --
-         -- Note that in this test we must take into account the
-         -- error in the calculation of the expected result so
-         -- the maximum relative error is larger than the
-         -- accuracy required by the ARM.
+         -- Note that in this test we must take into account the error in the
+         -- calculation of the expected result so the maximum relative error
+         -- is larger than the accuracy required by the ARM.
 
          X, Y, Zz         : Real;
          Actual, Expected : Real;
@@ -194,9 +188,9 @@ procedure Cxg2004 is
             -- Evenly distributed selection of arguments
             Ran := Real (I) / Real (Number_Samples);
 
-            -- make sure x and x/3 are both exactly representable
-            -- on the machine.  See "Implementation and Testing of
-            -- Function Software" page 44.
+            -- make sure x and x/3 are both exactly representable on the
+            -- machine. See "Implementation and Testing of Function Software"
+            -- page 44.
             X := (B - A) * Ran + A;
             Y :=
               Real'Leading_Part
@@ -209,9 +203,8 @@ procedure Cxg2004 is
             Zz       := Sin (Y);
             Expected := Zz * (3.0 - 4.0 * Zz * Zz);
 
-            -- note that since the expected value is computed, we
-            -- must take the error in that computation into account.
-            -- See Cody pp 139-141.
+            -- note that since the expected value is computed, we must take the
+            -- error in that computation into account. See Cody pp 139-141.
             Mre := 4.0;
 
             Check
@@ -235,10 +228,9 @@ procedure Cxg2004 is
          -- This test uses the identity
          --   cos(x) = cos(x/3)*(4 * cos(x/3)**2 - 3)
          --
-         -- Note that in this test we must take into account the
-         -- error in the calculation of the expected result so
-         -- the maximum relative error is larger than the
-         -- accuracy required by the ARM.
+         -- Note that in this test we must take into account the error in the
+         -- calculation of the expected result so the maximum relative error
+         -- is larger than the accuracy required by the ARM.
 
          X, Y, Zz         : Real;
          Actual, Expected : Real;
@@ -250,9 +242,9 @@ procedure Cxg2004 is
             -- Evenly distributed selection of arguments
             Ran := Real (I) / Real (Number_Samples);
 
-            -- make sure x and x/3 are both exactly representable
-            -- on the machine.  See "Implementation and Testing of
-            -- Function Software" page 44.
+            -- make sure x and x/3 are both exactly representable on the
+            -- machine. See "Implementation and Testing of Function Software"
+            -- page 44.
             X := (B - A) * Ran + A;
             Y :=
               Real'Leading_Part
@@ -265,9 +257,8 @@ procedure Cxg2004 is
             Zz       := Cos (Y);
             Expected := Zz * (4.0 * Zz * Zz - 3.0);
 
-            -- note that since the expected value is computed, we
-            -- must take the error in that computation into account.
-            -- See Cody pp 141-143.
+            -- note that since the expected value is computed, we must take the
+            -- error in that computation into account. See Cody pp 141-143.
             Mre := 6.0;
 
             Check
@@ -292,17 +283,15 @@ procedure Cxg2004 is
 
          type Test_Data_Type is array (Positive range <>) of Data_Point;
 
-         -- the values in the following table only involve static
-         -- expressions to minimize any loss of precision.  However,
-         -- there are two sources of error that must be accounted for
-         -- in the following tests.
-         -- First, when a cycle is not specified there can be a roundoff
-         -- error in the value of Pi used.  This error does not apply
-         -- when a cycle of 2.0 * Pi is explicitly provided.
-         -- Second, the expected results that involve sqrt values also
-         -- have a potential roundoff error.
-         -- The amount of error due to error in the argument is computed
-         -- as follows:
+         -- the values in the following table only involve static expressions
+         -- to minimize any loss of precision. However, there are two sources
+         -- of error that must be accounted for in the following tests. First,
+         -- when a cycle is not specified there can be a roundoff error in the
+         -- value of Pi used. This error does not apply when a cycle of 2.0
+         -- * Pi is explicitly provided. Second, the expected results that
+         -- involve sqrt values also have a potential roundoff error. The
+         -- amount of error due to error in the argument is computed as
+         -- follows:
          --   sin(x+err) = sin(x)*cos(err) + cos(x)*sin(err)
          --              ~= sin(x) + err * cos(x)
          -- similarly for cos the error due to error in the argument is
@@ -313,7 +302,7 @@ procedure Cxg2004 is
 
          Test_Data : constant Test_Data_Type :=
            (
---  degrees      radians          sine       cosine  sin_er cos_er    test #
+--  degrees radians sine cosine sin_er cos_er test #
          (0.0, 0.0, 0.0, 1.0, False, False),    -- 1
             (30.0, Pi / 6.0, 0.5, Sqrt3 / 2.0, False, True),    -- 2
             (60.0, Pi / 3.0, Sqrt3 / 2.0, 0.5, True, False),    -- 3
@@ -415,9 +404,8 @@ procedure Cxg2004 is
             Report.Failed ("exception in special angle test");
       end Special_Angle_Checks;
 
-      -- check the rule of A.5.1(41);6.0 which requires that the
-      -- result be exact if the mathematical result is 0.0, 1.0,
-      -- or -1.0
+      -- check the rule of A.5.1(41);6.0 which requires that the result be
+      -- exact if the mathematical result is 0.0, 1.0, or -1.0
       procedure Exact_Result_Checks is
          type Data_Point is record
             Degrees, Sine, Cosine : Real;
@@ -426,7 +414,7 @@ procedure Cxg2004 is
          type Test_Data_Type is array (Positive range <>) of Data_Point;
          Test_Data : constant Test_Data_Type :=
            (
-         -- degrees       sine       cosine       test #
+         -- degrees sine cosine test #
          (0.0, 0.0, 1.0),    -- 1
             (90.0, 1.0, 0.0),    -- 2
             (180.0, 0.0, -1.0),    -- 3

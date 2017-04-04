@@ -16,7 +16,7 @@ begin
       Tc_Stream_Element_Array  : Ada.Streams.Stream_Element_Array (1 .. 100);
       Tc_Stream_Element_Offset : Ada.Streams.Stream_Element_Offset;
 
-      --  Note:  In the following, the RPC spec. being tested is shown
+      --  Note: In the following, the RPC spec. being tested is shown
       --         as comment lines
       --
       --   type Partition_ID is range 0 .. 100;
@@ -39,8 +39,8 @@ begin
 
    begin    -- encapsulation
 
-      -- Arrange that the calls to the subprograms are compiled but
-      -- not executed
+      -- Arrange that the calls to the subprograms are compiled but not
+      -- executed
       --
       if not Report.Equal (Tc_Int, Tc_Int) then
 

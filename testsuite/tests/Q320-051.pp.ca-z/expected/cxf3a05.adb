@@ -119,14 +119,14 @@ begin
 
    begin
 
-      -- In the case of each particular type of foreign string examined,
-      -- two versions of Function Image are examined.  First, a version of
-      -- the function that originated from an instantiation of Decimal_Output
-      -- with non-default parameters is checked.  This version of Image is
-      -- called making use of default parameters in the actual function call.
-      -- In addition, a version of Function Image is checked that resulted
-      -- from an instantiation of Decimal_Output using default parameters,
-      -- but which uses non-default parameters in the function call.
+      -- In the case of each particular type of foreign string examined, two
+      -- versions of Function Image are examined. First, a version of the
+      -- function that originated from an instantiation of Decimal_Output with
+      -- non-default parameters is checked. This version of Image is called
+      -- making use of default parameters in the actual function call. In
+      -- addition, a version of Function Image is checked that resulted from
+      -- an instantiation of Decimal_Output using default parameters, but which
+      -- uses non-default parameters in the function call.
 
       for I in Tc_Start_Loop .. Tc_End_Loop loop
 
@@ -136,18 +136,18 @@ begin
            Editing.To_Picture
              (Fxf3a00.Foreign_Strings (I - Tc_Start_Loop + 1).all);
 
-         -- Based on the ordering of the specific foreign picture strings
-         -- in the FXF3A00.Foreign_Strings table, the following conditional
-         -- is used to determine which type of currency is being examined
-         -- as the loop executes.
+         -- Based on the ordering of the specific foreign picture strings in
+         -- the FXF3A00.Foreign_Strings table, the following conditional is
+         -- used to determine which type of currency is being examined as the
+         -- loop executes.
 
          if I < Tc_Start_Loop + Fxf3a00.Number_Of_Ff_Strings then -- (11-14)
             -- Process the FF picture strings.
 
-            -- Check the result of Function Image from an instantiation
-            -- of Decimal_Output that provided non-default actual
-            -- parameters at the time of package instantiation, and uses
-            -- default parameters in the call of Image.
+            -- Check the result of Function Image from an instantiation of
+            -- Decimal_Output that provided non-default actual parameters at
+            -- the time of package instantiation, and uses default parameters
+            -- in the call of Image.
 
             if Pack_Ff.Image
                 (Item => Fxf3a00.Data_With_2dp (I),
@@ -161,10 +161,10 @@ begin
                   Fxf3a00.Foreign_Strings (I - Tc_Start_Loop + 1).all);
             end if;
 
-            -- Check the result of Function Image that originated from
-            -- an instantiation of Decimal_Output where default parameters
-            -- were used at the time of package Instantiation, but where
-            -- non-default parameters are provided in the call of Image.
+            -- Check the result of Function Image that originated from an
+            -- instantiation of Decimal_Output where default parameters were
+            -- used at the time of package Instantiation, but where non-default
+            -- parameters are provided in the call of Image.
 
             if Pack_Def.Image
                 (Item       => Fxf3a00.Data_With_2dp (I),

@@ -66,9 +66,9 @@
 --!
 
 ------------------------------------------------------------------------------
--- Check that the required pure packages are pure by withing them from a
--- pure package. The non-generic versions of those packages are required to
--- be pure by Defect Report 8652/0020, Technical Corrigendum 1 [A.5.1(9/1) and
+-- Check that the required pure packages are pure by withing them from a pure
+-- package. The non-generic versions of those packages are required to be
+-- pure by Defect Report 8652/0020, Technical Corrigendum 1 [A.5.1(9/1) and
 -- G.1.1(25/1)].
 with Ada.Numerics.Generic_Elementary_Functions;
 with Ada.Numerics.Elementary_Functions;
@@ -78,7 +78,7 @@ with Ada.Numerics.Generic_Complex_Elementary_Functions;
 with Ada.Numerics.Complex_Elementary_Functions;
 package Cxg2008_0 is
    pragma Pure;
-   -- CRC Standard Mathematical Tables;  23rd Edition; pg 738
+   -- CRC Standard Mathematical Tables; 23rd Edition; pg 738
    Sqrt2 : constant :=
      1.41421_35623_73095_04880_16887_24209_69807_85696_71875_37695;
    Sqrt3 : constant :=

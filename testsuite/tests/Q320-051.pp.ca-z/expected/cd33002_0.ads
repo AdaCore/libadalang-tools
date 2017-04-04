@@ -85,8 +85,8 @@ package Cd33002_0 is
       Item_2 at 1 range 0 .. 3;
    end record;
 
-   -- by definition (13.5.2(2)) abs(Item_2'Address - Item_1'Address) = 1
-   -- it therefore follows that:
+   -- by definition (13.5.2(2)) abs(Item_2'Address - Item_1'Address) = 1 it
+   -- therefore follows that:
    --     Address_Calculator'Size = 2 * Addressable_Unit'Size
 
 end Cd33002_0;

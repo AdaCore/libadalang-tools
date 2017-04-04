@@ -7,8 +7,7 @@ with Report;
 procedure Cxac007 is
    Log_File_Name : constant String :=
      Report.Legal_File_Name (Nam => "CXAC007");
--- A file name that will be used for the log file. This file will
--- be written.
+-- A file name that will be used for the log file. This file will be written.
 begin
    Report.Test ("CXAC007", "Check that Stream_IO is preelaborated");
 
@@ -17,10 +16,10 @@ begin
    begin
       -- If an implementation does not support Stream_IO in a particular
       -- environment, the exception Use_Error or Name_Error will be raised on
-      -- calls to various Stream_IO operations.  This block statement
-      -- encloses a call to Create, which should produce an exception in a
-      -- non-supportive environment.  These exceptions will be handled to
-      -- produce a Not_Applicable result.
+      -- calls to various Stream_IO operations. This block statement encloses a
+      -- call to Create, which should produce an exception in a non-supportive
+      -- environment. These exceptions will be handled to produce a
+      -- Not_Applicable result.
 
       Ada.Streams.Stream_Io.Create
         (Test_File,

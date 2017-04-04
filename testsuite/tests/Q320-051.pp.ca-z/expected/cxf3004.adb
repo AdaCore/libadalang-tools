@@ -72,8 +72,8 @@ begin
       Blank_Fill   : constant Character := ' ';
       Star_Fill    : constant Character := '*';
 
-      -- Define a decimal data type, and instantiate the Decimal_Output
-      -- generic package for the data type.
+      -- Define a decimal data type, and instantiate the Decimal_Output generic
+      -- package for the data type.
 
       type Decimal_Data_Type is delta 0.01 digits 16;
 
@@ -84,8 +84,8 @@ begin
          Default_Separator  => Default_Separator,
          Default_Radix_Mark => Dm_Radix);
 
-      -- The following decimal data items are used with picture strings
-      -- in evaluating use of foreign currency symbols.
+      -- The following decimal data items are used with picture strings in
+      -- evaluating use of foreign currency symbols.
 
       Dec_Data_1 : Decimal_Data_Type := 123_456.78;
       Dec_Data_2 : Decimal_Data_Type := 32.10;
@@ -95,10 +95,9 @@ begin
       Dec_Data_6 : Decimal_Data_Type := 12.34;
       Dec_Data_7 : Decimal_Data_Type := 12_345.67;
 
-      -- Statically identifiable picture strings.
-      -- These strings are used in conjunction with non-default values
-      -- for Currency string, Radix mark, and Separator in calls to
-      -- function Image.
+      -- Statically identifiable picture strings. These strings are used in
+      -- conjunction with non-default values for Currency string, Radix mark,
+      -- and Separator in calls to function Image.
 
       Picture_1 : Picture := To_Picture ("-###**_***_**9.99");    -- FF
       Picture_2 : Picture := To_Picture ("###z_ZZ9.99");          -- FF
@@ -108,8 +107,8 @@ begin
       Picture_6 : Picture := To_Picture ("$$$9.99");              -- DM
       Picture_7 : Picture := To_Picture ("###_###_##9.99");       -- CHF
 
-      -- The following ten edited output strings correspond to the ten
-      -- foreign currency picture strings.
+      -- The following ten edited output strings correspond to the ten foreign
+      -- currency picture strings.
 
       Output_1 : constant String := "  FF***123.456,78";
       Output_2 : constant String := " FF   32,10";
@@ -122,8 +121,7 @@ begin
    begin
 
       -- Check the results of function Image, using the picture strings
-      -- constructed above, in creating foreign currency edited output
-      -- strings.
+      -- constructed above, in creating foreign currency edited output strings.
 
       if Image_Io.Image
           (Item       => Dec_Data_1,
@@ -209,10 +207,9 @@ begin
          Report.Failed ("Incorrect result from Fn. Image using Picture_7");
       end if;
 
-      -- The following calls of Function Image, using the specific
-      -- decimal values and picture strings provided, will cause
-      -- a Layout_Error to be raised.
-      -- Note: The data and the picture strings used in the following
+      -- The following calls of Function Image, using the specific decimal
+      -- values and picture strings provided, will cause a Layout_Error to be
+      -- raised. Note: The data and the picture strings used in the following
       --       evaluations are not themselves erroneous, but when used in
       --       combination will cause Layout_Error to be raised.
 

@@ -101,8 +101,8 @@ begin
       Tc_Natural_Count : Natural              := Natural'First;
 
       -- We can use the wide character forms of To_Ada and To_C here to check
-      -- the results; they were tested in CXB3006. We give them different
-      -- names to avoid confusion below.
+      -- the results; they were tested in CXB3006. We give them different names
+      -- to avoid confusion below.
 
       function Wide_Character_To_Wchar_T
         (Source : in Wide_Character) return Wchar_T renames
@@ -127,8 +127,8 @@ begin
          Count      => Tc_Size_T_Count,
          Append_Nul => True);
 
-      -- Check that the out parameter Count is set to the appropriate value
-      -- for the wide_nul terminated case.
+      -- Check that the out parameter Count is set to the appropriate value for
+      -- the wide_nul terminated case.
 
       if Tc_Size_T_Count /= 7 then
          Report.Failed
@@ -173,8 +173,8 @@ begin
          Count      => Tc_Size_T_Count,
          Append_Nul => False);
 
-      -- Check that the out parameter Count is set to the appropriate value
-      -- for the non-wide_nul terminated case.
+      -- Check that the out parameter Count is set to the appropriate value for
+      -- the non-wide_nul terminated case.
 
       if Tc_Size_T_Count /= 4 then
          Report.Failed
@@ -208,10 +208,9 @@ begin
             "of Append_Nul => False");
       end if;
 
-      -- Check that Constraint_Error is raised by procedure To_C if the
-      -- length of the target wchar_array parameter is not sufficient to
-      -- hold the converted Wide_String value (plus wide_nul if Append_Nul
-      -- is True).
+      -- Check that Constraint_Error is raised by procedure To_C if the length
+      -- of the target wchar_array parameter is not sufficient to hold the
+      -- converted Wide_String value (plus wide_nul if Append_Nul is True).
 
       Tc_Wchar_Array := (others => Wchar_T'First);
       begin

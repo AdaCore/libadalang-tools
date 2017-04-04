@@ -61,12 +61,10 @@
 --
 -- W. J. Cody
 -- CELEFUNT: A Portable Test Package for Complex Elementary Functions
--- Algorithm 714, Collected Algorithms from ACM.
--- Published in Transactions On Mathematical Software,
--- Vol. 19, No. 1, March, 1993, pp. 1-21.
+-- Algorithm 714, Collected Algorithms from ACM. Published in Transactions
+-- On Mathematical Software, Vol. 19, No. 1, March, 1993, pp. 1-21.
 --
--- CRC Standard Mathematical Tables
--- 23rd Edition
+-- CRC Standard Mathematical Tables 23rd Edition
 --
 
 with System;
@@ -75,15 +73,15 @@ with Ada.Numerics.Generic_Complex_Types;
 with Ada.Numerics.Generic_Complex_Elementary_Functions;
 procedure Cxg2020 is
    Verbose : constant Boolean := False;
-   -- Note that Max_Samples is the number of samples taken in
-   -- both the real and imaginary directions.  Thus, for Max_Samples
-   -- of 100 the number of values checked is 10000.
+   -- Note that Max_Samples is the number of samples taken in both the real and
+   -- imaginary directions. Thus, for Max_Samples of 100 the number of values
+   -- checked is 10000.
    Max_Samples : constant := 100;
 
    E  : constant := Ada.Numerics.E;
    Pi : constant := Ada.Numerics.Pi;
 
-   -- CRC Standard Mathematical Tables;  23rd Edition; pg 738
+   -- CRC Standard Mathematical Tables; 23rd Edition; pg 738
    Sqrt2 : constant :=
      1.41421_35623_73095_04880_16887_24209_69807_85696_71875_37695;
    Sqrt3 : constant :=
@@ -116,9 +114,9 @@ procedure Cxg2020 is
          Rel_Error : Real;
          Abs_Error : Real;
       begin
-         -- In the case where the expected result is very small or 0
-         -- we compute the maximum error as a multiple of Model_Epsilon
-         -- instead of Model_Epsilon and Expected.
+         -- In the case where the expected result is very small or 0 we
+         -- compute the maximum error as a multiple of Model_Epsilon instead
+         -- of Model_Epsilon and Expected.
          Rel_Error := Mre * (abs Expected * Real'Model_Epsilon);
          Abs_Error := Mre * Real'Model_Epsilon;
          if Rel_Error > Abs_Error then
@@ -159,14 +157,13 @@ procedure Cxg2020 is
       end Check;
 
       procedure Special_Value_Test is
-         -- In the following tests the expected result is accurate
-         -- to the machine precision so the minimum guaranteed error
-         -- bound can be used if the argument is exact.
+         -- In the following tests the expected result is accurate to the
+         -- machine precision so the minimum guaranteed error bound can be
+         -- used if the argument is exact.
          --
-         -- One or i is added to the actual and expected results in
-         -- order to prevent the expected result from having a
-         -- real or imaginary part of 0.  This is to allow a reasonable
-         -- relative error for that component.
+         -- One or i is added to the actual and expected results in order to
+         -- prevent the expected result from having a real or imaginary part of
+         -- 0. This is to allow a reasonable relative error for that component.
          Minimum_Error : constant := 6.0;
          Z1, Z2        : Complex;
       begin
@@ -181,8 +178,8 @@ procedure Cxg2020 is
             "sqrt(-2)+1 ",
             Minimum_Error);
 
-         -- make sure no exception occurs when taking the sqrt of
-         -- very large and very small values.
+         -- make sure no exception occurs when taking the sqrt of very large
+         -- and very small values.
 
          Z1 := (Real'Safe_Last * 0.9, Real'Safe_Last * 0.9);
          Z2 := Sqrt (Z1);
@@ -246,10 +243,9 @@ procedure Cxg2020 is
       end Exact_Result_Test;
 
       procedure Identity_Test (Ra, Rb, Ia, Ib : Real) is
-         -- Tests an identity over a range of values specified
-         -- by the 4 parameters.  RA and RB denote the range for the
-         -- real part while IA and IB denote the range for the
-         -- imaginary part of the result.
+         -- Tests an identity over a range of values specified by the 4
+         -- parameters. RA and RB denote the range for the real part while
+         -- IA and IB denote the range for the imaginary part of the result.
          --
          -- For this test we use the identity
          --    Sqrt(Z*Z) = Z
@@ -266,10 +262,9 @@ procedure Cxg2020 is
             for J in 1 .. Max_Samples loop
                Y := (Ib - Ia) * Real (J) / Real (Max_Samples) + Ia;
 
-               -- purify the arguments to minimize roundoff error.
-               -- We construct the values so that the products X*X,
-               -- Y*Y, and X*Y are all exact machine numbers.
-               -- See Cody page 7 and CELEFUNT code.
+               -- purify the arguments to minimize roundoff error. We construct
+               -- the values so that the products X*X, Y*Y, and X*Y are all
+               -- exact machine numbers. See Cody page 7 and CELEFUNT code.
                Z := X * Scale;
                W := Z + X;
                X := W - Z;
@@ -282,8 +277,8 @@ procedure Cxg2020 is
                W        := X * Y;
                Cx       := Compose_From_Cartesian (Z, W + W);
 
-               -- The arguments are now ready so on with the
-               -- identity computation.
+               -- The arguments are now ready so on with the identity
+               -- computation.
                Actual := Sqrt (Cx);
 
                Check
@@ -331,8 +326,7 @@ procedure Cxg2020 is
       begin
          Special_Value_Test;
          Exact_Result_Test;
-         -- ranges where the sign is the same and where it
-         -- differs.
+         -- ranges where the sign is the same and where it differs.
          Identity_Test (0.0, 10.0, 0.0, 10.0);
          Identity_Test (0.0, 100.0, -100.0, 0.0);
       end Do_Test;

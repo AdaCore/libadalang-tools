@@ -93,8 +93,8 @@ begin
 
    begin
 
-      -- Check that the attribute 'Machine_Radix returns the value assigned
-      -- by the attribute definition clause.
+      -- Check that the attribute 'Machine_Radix returns the value assigned by
+      -- the attribute definition clause.
 
       if Radix_2_Type_1'Machine_Radix /= 2
         or else Radix_2_Type_2'Machine_Radix /= 2
@@ -168,10 +168,9 @@ begin
 
    begin
 
-      -- Radix 2 Cases, three different values.
-      -- Compare the result of the repetitive addition with the expected
-      -- Radix 2 result, as well as with the Radix 10 value after type
-      -- conversion.
+      -- Radix 2 Cases, three different values. Compare the result of the
+      -- repetitive addition with the expected Radix 2 result, as well as
+      -- with the Radix 10 value after type conversion.
 
       if Repetitive_Radix_2_Add (0.05) /= Result_Array (1).Rad_2 or
         Repetitive_Radix_2_Add (0.05) /= Radix_2_Type (Result_Array (1).Rad_10)
@@ -193,10 +192,9 @@ begin
          Report.Failed ("Incorrect Radix 2 Result, Case 3");
       end if;
 
-      -- Radix 10 Cases, three different values.
-      -- Compare the result of the repetitive addition with the expected
-      -- Radix 10 result, as well as with the Radix 2 value after type
-      -- conversion.
+      -- Radix 10 Cases, three different values. Compare the result of the
+      -- repetitive addition with the expected Radix 10 result, as well as
+      -- with the Radix 2 value after type conversion.
 
       if Repetitive_Radix_10_Add (0.05) /= Result_Array (1).Rad_10 or
         Repetitive_Radix_10_Add (0.05) /=

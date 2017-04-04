@@ -17,8 +17,7 @@ begin
    -- Clear all calls to the elevator.
 
    Clear_Calls (Call_Waiting);            -- Reference subprogram declared
-   -- in the parent of the subunit
-   -- parent's body.
+   -- in the parent of the subunit parent's body.
    for I in Floor loop
       if Call_Waiting (I) then            -- Reference private part of the
          Tc_Operation := False;            -- parent of the subunit parent's

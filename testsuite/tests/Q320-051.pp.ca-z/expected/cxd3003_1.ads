@@ -62,15 +62,15 @@ package Cxd3003_1 is
 
    type Task_Number is range 1 .. 2;    -- the test tasks
 
-   -- This is an array of flags showing which tasks have successfully
-   -- called the protected procedure
+   -- This is an array of flags showing which tasks have successfully called
+   -- the protected procedure
    --
    Check_Called : array (Task_Number) of Boolean := (others => False);
 
    protected Protected_Object is
 
-      -- This protected object has no Pragma Priority
-      -- thus its priority ceiling should be System.Priority'Last
+      -- This protected object has no Pragma Priority thus its priority ceiling
+      -- should be System.Priority'Last
 
       procedure For_Ceiling_Check (Numb : Task_Number);
       function Verify_Calls return Boolean;

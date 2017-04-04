@@ -16,8 +16,8 @@ package body Cc54004_2 is
 
    -- Call Handle for each element on the stack. Since the dereferenced access
    -- object is of a class-wide type, all calls to Handle are dispatching. The
-   -- version of Handle called will be that declared for the type
-   -- corresponding to the tag of the operand.
+   -- version of Handle called will be that declared for the type corresponding
+   -- to the tag of the operand.
 
    procedure Process_Stack (Stack : in out Stack_Type) is
    begin -- Artificial: no Constraint_Error protection.

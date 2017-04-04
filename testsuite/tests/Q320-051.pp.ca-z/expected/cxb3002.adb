@@ -64,8 +64,8 @@ begin
       Tc_Char_Array : C.Char_Array (1 .. 5);
       Tc_Size_T     : C.Size_T := C.Size_T'First;
 
-      --  Note In all of the following the Strings spec. being tested
-      --  is shown in comment lines
+      --  Note In all of the following the Strings spec. being tested is shown
+      --  in comment lines
       --
       --    type char_array_access is access all char_array;
       Tst_Char_Array_Access : Strings.Char_Array_Access :=
@@ -80,8 +80,8 @@ begin
 
    begin    -- encapsulation
 
-      -- Arrange that the calls to the subprograms are compiled but
-      -- not executed
+      -- Arrange that the calls to the subprograms are compiled but not
+      -- executed
       --
       if not Report.Equal (Tc_Int_1, Tc_Int_2) then
 
@@ -111,8 +111,8 @@ begin
          --       return char_array;
          Tc_Char_Array := Strings.Value (Tst_Chars_Ptr, Tc_Size_T);
 
-         -- Use Report.Comment as a known procedure which takes a string as
-         -- a parameter (this does not actually get output)
+         -- Use Report.Comment as a known procedure which takes a string as a
+         -- parameter (this does not actually get output)
          --    function Value (Item : in chars_ptr) return String;
          Report.Comment (Strings.Value (Tst_Chars_Ptr));
 
@@ -142,8 +142,8 @@ begin
 
       if not Report.Equal (Tc_Int_2, Tc_Int_1) then
 
-         -- This exception is out of LRM presentation order to avoid
-         -- compiler warnings about unreachable code
+         -- This exception is out of LRM presentation order to avoid compiler
+         -- warnings about unreachable code
          --    Dereference_Error : exception;
          raise Strings.Dereference_Error;
 

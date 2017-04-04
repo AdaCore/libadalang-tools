@@ -80,11 +80,10 @@ begin
    Test_For_Text_Io_Support : begin
 
       -- An implementation that does not support Text_IO in a particular
-      -- environment will raise Use_Error on calls to various
-      -- Text_IO operations.  This block statement encloses a call to
-      -- Create, which should raise the exception in a non-supportive
-      -- environment.  This exception will be handled to produce a
-      -- Not_Applicable result.
+      -- environment will raise Use_Error on calls to various Text_IO
+      -- operations. This block statement encloses a call to Create, which
+      -- should raise the exception in a non-supportive environment. This
+      -- exception will be handled to produce a Not_Applicable result.
 
       Text_Io.Create
         (File => Data_File,
@@ -105,9 +104,8 @@ begin
       Glossary_Title   : constant String := "GLOSSARY";
       Glossary_Content : constant String := "TBD";
 
-      -- The following procedure simulates the addition of a Glossary page
-      -- to an existing text file that has been reset with mode
-      -- Append_File.
+      -- The following procedure simulates the addition of a Glossary page to
+      -- an existing text file that has been reset with mode Append_File.
 
       procedure Position_Glossary_Text (The_File : in out Text_Io.File_Type) is
          use Text_Io;   -- To provide visibility to the "/=" operator.
@@ -126,7 +124,7 @@ begin
          if (Text_Io.Col (The_File) /= Default_Position) then
             Report.Failed ("Incorrect default column number");
          end if;
-         -- Simulated usage code.  Set new page/line positions.
+         -- Simulated usage code. Set new page/line positions.
          Text_Io.New_Page (The_File);
          Text_Io.New_Page (The_File);
          Text_Io.New_Line (File => The_File, Spacing => 1);
@@ -138,7 +136,7 @@ begin
             Report.Failed ("Incorrect results from page/line positioning");
          end if;
 
-         -- Simulated usage code.  Position title of Glossary.
+         -- Simulated usage code. Position title of Glossary.
          Text_Io.Put (The_File, Section_Header);
          Text_Io.Put_Line (The_File, Glossary_Title);
          -- Set line to the current line.
@@ -163,7 +161,7 @@ begin
             Report.Failed ("Incorrect results from line/column positioning");
          end if;
 
-         -- Simulated usage code.                          -- Position
+         -- Simulated usage code. -- Position
          Text_Io.Put_Line (The_File, Glossary_Content);    -- content of
          -- Glossary.
       end Position_Glossary_Text;
@@ -173,17 +171,17 @@ begin
       -- In the scenario, data is added to the file here.
       Text_Io.Put_Line (File => Data_File, Item => "Some optional data");
 
-      -- This code section simulates a scenario that could occur in a
-      -- text processing environment.  Text is to be appended to an
-      -- existing document:
+      -- This code section simulates a scenario that could occur in a text
+      -- processing environment. Text is to be appended to an existing
+      -- document:
       --   The file is reset to append mode.
       --   A procedure is called to perform the positioning and placement
       --   of text.
       --   The position on the appended page is set, verified, and text is
       --   placed in the file.
       --
-      -- Note: The text file has been originally created in Out_File
-      -- mode, and has subsequently been reset to Append_File mode.
+      -- Note: The text file has been originally created in Out_File mode, and
+      -- has subsequently been reset to Append_File mode.
 
       Reset1 : begin
          -- Reset has effect of calling New_Page.
@@ -215,9 +213,9 @@ begin
          Text_Io.Skip_Page (Data_File);
          Text_Io.Skip_Page (Data_File);
 
-         -- If the Reset to Append_File mode actually put a page terminator
-         -- on the file, as allowed (but not required) by RM A.10.2(4), then
-         -- we are now on page 3, an empty page.  We'll need to skip one more.
+         -- If the Reset to Append_File mode actually put a page terminator on
+         -- the file, as allowed (but not required) by RM A.10.2(4), then we
+         -- are now on page 3, an empty page. We'll need to skip one more.
 
          if Text_Io.End_Of_Page (Data_File) then
             Text_Io.Skip_Page (Data_File);

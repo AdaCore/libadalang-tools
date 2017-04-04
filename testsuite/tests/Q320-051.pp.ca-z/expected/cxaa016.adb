@@ -84,9 +84,9 @@ begin
       begin
          Create (The_File, Mode, Report.Legal_File_Name (Next));
       exception
-         -- The following two exceptions may be raised if a system is not
-         -- capable of supporting external Text_IO files.  The handler will
-         -- raise a user-defined exception which will result in a
+         -- The following two exceptions may be raised if a system is
+         -- not capable of supporting external Text_IO files. The handler
+         -- will raise a user-defined exception which will result in a
          -- Not_Applicable result for the test.
          when Use_Error | Name_Error =>
             raise Non_Applicable_System;
@@ -95,8 +95,8 @@ begin
       procedure Check_Initial_Environment (Env : System_File_Array_Type) is
       begin
          -- Check that the system has defined the following sources/
-         -- destinations for input/output/error, and that the six functions
-         -- returning File_Access values are available.
+         -- destinations for input/output/error, and that the six
+         -- functions returning File_Access values are available.
          if not
            (Env (1) = Standard_Input and
             Env (2) = Standard_Output and
@@ -136,9 +136,9 @@ begin
          Set_Output (Initial_Env (5).all);
          Set_Error (Initial_Env (6).all);
 
-         -- At this point, the user-defined files that were functioning as
-         -- the Current Input, Output, and Error files have been replaced in
-         -- that capacity by the state of the original environment.
+         -- At this point, the user-defined files that were functioning as the
+         -- Current Input, Output, and Error files have been replaced in that
+         -- capacity by the state of the original environment.
 
          declare
 
@@ -153,8 +153,8 @@ begin
                Current_Error);
          begin
 
-            -- Compare the current environment with that of the saved
-            -- initial environment.
+            -- Compare the current environment with that of the saved initial
+            -- environment.
 
             if Current_Env /= Initial_Env then
                Report.Failed
@@ -169,8 +169,8 @@ begin
          Len_1, Len_2, Len_3, Len_4, Len_5, Len_6 : Natural;
       begin
 
-         -- Get the lines that are contained in all the files, and verify
-         -- them against the expected results.
+         -- Get the lines that are contained in all the files, and verify them
+         -- against the expected results.
 
          Get_Line (O_File, Str_1, Len_1);  -- The user defined output file
          Get_Line (O_File, Str_2, Len_2);  -- should contain two lines of data.
@@ -213,7 +213,7 @@ begin
       New_File (New_Error_File_1, Out_File, 3);
       New_File (New_Error_File_2, Out_File, 4);
 
-      -- Enter several lines of text into the new input file.  This file will
+      -- Enter several lines of text into the new input file. This file will
       -- be reset to mode In_File to function as the current system input file.
       -- Note: File_Access value used as parameter to this procedure.
 
@@ -238,8 +238,8 @@ begin
       Set_Output (New_Output_Ptr.all);
       Set_Error (New_Error_Ptr.all);
 
-      -- Perform various file processing tasks, exercising specific new
-      -- Text_IO functionality.
+      -- Perform various file processing tasks, exercising specific new Text_IO
+      -- functionality.
       --
       -- Read two lines from Current_Input and write them to Current_Output.
 
@@ -266,11 +266,11 @@ begin
          Put_Line (Current_Error, Line (1 .. Length));
       end loop;
 
-      -- At this point in the processing, the new Output file, and each of
-      -- the two Error files, contain two lines of data.
-      -- Note that New_Error_File_1 has been replaced by New_Error_File_2
-      -- as the current system error file, allowing New_Error_File_1 to be
-      -- reset (Mode_Error raised otherwise).
+      -- At this point in the processing, the new Output file, and each of the
+      -- two Error files, contain two lines of data. Note that New_Error_File_1
+      -- has been replaced by New_Error_File_2 as the current system error
+      -- file, allowing New_Error_File_1 to be reset (Mode_Error raised
+      -- otherwise).
       --
       -- Reset the first Error file to Append_File mode, and then set it to
       -- function as the current system error file.
@@ -286,8 +286,8 @@ begin
 
       Set_Error (New_Error_File_1);
 
-      -- Reset the second Error file to In_File mode, then set it to become
-      -- the current system input file.
+      -- Reset the second Error file to In_File mode, then set it to become the
+      -- current system input file.
 
       Reset3 : begin
          Reset (New_Error_File_2, In_File);
@@ -301,8 +301,8 @@ begin
       New_Error_Ptr := New_Error_File_2'Access;
       Set_Input (New_Error_Ptr.all);
 
-      -- Append all of the text lines (2) in the new current system input
-      -- file onto the current system error file.
+      -- Append all of the text lines (2) in the new current system input file
+      -- onto the current system error file.
 
       while not End_Of_File (Current_Input) loop
          Get_Line (Current_Input, Line, Length);
@@ -310,13 +310,13 @@ begin
       end loop;
 
       -- Restore the original system file environment, based upon the values
-      -- stored at the start of this test.
-      -- Check that the original environment has been restored.
+      -- stored at the start of this test. Check that the original environment
+      -- has been restored.
 
       Restore_Initial_Environment (Initial_Environment);
 
-      -- Reset all three files to In_File_Mode prior to verification.
-      -- Note: If these three files had still been the designated Current
+      -- Reset all three files to In_File_Mode prior to verification. Note: If
+      -- these three files had still been the designated Current
       --       Input, Output, or Error files for the system, a Reset
       --       operation at this point would raise Mode_Error.
       --       However, at this point, the environment has been restored to

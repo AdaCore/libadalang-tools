@@ -102,8 +102,8 @@ begin
       -- Testing of Cot Function, both instantiated and pre-instantiated
       -- version.
 
-      -- Check that Constraint_Error is raised with the Cot function is
-      -- given a parameter input value of 0.0.
+      -- Check that Constraint_Error is raised with the Cot function is given a
+      -- parameter input value of 0.0.
 
       if New_Float'Machine_Overflows = True then
          begin
@@ -122,8 +122,8 @@ begin
          end;
       end if;
 
-      -- Check that no exception occurs on computing the Cot with very
-      -- large (positive and negative) input values.
+      -- Check that no exception occurs on computing the Cot with very large
+      -- (positive and negative) input values.
 
       begin
          New_Float_Result := Gef.Cot (New_Float (Fxa5a00.Large));
@@ -161,8 +161,8 @@ begin
             "input parameters");
       end if;
 
-      -- Check the results of the Cot function against the results of
-      -- various trigonometric relationships.
+      -- Check the results of the Cot function against the results of various
+      -- trigonometric relationships.
 
       if not Fxa5a00.Result_Within_Range
           (Gef.Cot (New_Float (Pi / 4.0)),
@@ -185,8 +185,8 @@ begin
 
       -- Testing of Cot with Cycle parameter.
 
-      -- Check that Argument_Error is raised by the Cot function when the
-      -- value of the Cycle parameter is zero or negative.
+      -- Check that Argument_Error is raised by the Cot function when the value
+      -- of the Cycle parameter is zero or negative.
 
       begin
          New_Float_Result := Gef.Cot (1.0, Cycle => 0.0);
@@ -320,8 +320,8 @@ begin
       -- Testing of Coth Function, both instantiated and pre-instantiated
       -- version.
 
-      -- Check that no exception occurs on computing the Coth with very
-      -- large (positive and negative) input values.
+      -- Check that no exception occurs on computing the Coth with very large
+      -- (positive and negative) input values.
 
       begin
          The_Result := Ef.Coth (Fxa5a00.Large);
@@ -351,8 +351,8 @@ begin
                "negative value");
       end;
 
-      -- Check that Constraint_Error is raised by the Coth function, when
-      -- the value of the parameter X is 0.0.
+      -- Check that Constraint_Error is raised by the Coth function, when the
+      -- value of the parameter X is 0.0.
 
       if New_Float'Machine_Overflows = True then
          begin
@@ -374,8 +374,8 @@ begin
       -- Testing of Arccoth Function, both instantiated and pre-instantiated
       -- version.
 
-      -- Check that Constraint_Error is raised by the Arccoth function
-      -- when the absolute value of the parameter X is 1.0.
+      -- Check that Constraint_Error is raised by the Arccoth function when the
+      -- absolute value of the parameter X is 1.0.
 
       if New_Float'Machine_Overflows = True then
          begin
@@ -411,8 +411,8 @@ begin
          end;
       end if;
 
-      -- Check that Argument_Error is raised by the Arccoth function when
-      -- the absolute value of the parameter X is less than 1.0.
+      -- Check that Argument_Error is raised by the Arccoth function when the
+      -- absolute value of the parameter X is less than 1.0.
 
       begin
          New_Float_Result := Gef.Arccoth (X => New_Float (One_Minus_Delta));

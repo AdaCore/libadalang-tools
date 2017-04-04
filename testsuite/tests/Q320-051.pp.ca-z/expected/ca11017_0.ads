@@ -1,6 +1,5 @@
 --
--- No package body needed for this specification.
--- CA11017.A
+-- No package body needed for this specification. CA11017.A
 --
 --                             Grant of Unlimited Rights
 --

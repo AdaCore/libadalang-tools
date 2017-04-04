@@ -90,17 +90,17 @@ begin
       task body Suspending_Task is
       begin
 
-         -- Start the second task which will, after a suitable delay,
-         -- set the Suspension_Object true
+         -- Start the second task which will, after a suitable delay, set the
+         -- Suspension_Object true
          Enabling_Task.Start;
 
          Astc.Suspend_Until_True (Susp_Obj);   -- task should suspend here
 
          if not Tc.Enabling_Task_Has_Run then
             -- Enabling_Task_Has_Run will be set when the second task is
-            -- about to set the suspension_object true.  It is not set,
-            -- so this indicates that the suspension did not take place or
-            -- the object was set true prematurely.
+            -- about to set the suspension_object true. It is not set, so this
+            -- indicates that the suspension did not take place or the object
+            -- was set true prematurely.
             Report.Failed ("Suspending_Task was not suspended");
          end if;
 
@@ -120,16 +120,15 @@ begin
          delay (Impdef.Minimum_Task_Switch);
 
          declare -- exception scope
-         -- Before releasing the first task we take advantage of the fact
-         -- that this Suspension_Object is in use to make another check:
-         -- Now verify that a call on Suspend_Until_True will raise
-         -- Program_Error as another task is waiting on the same
-         -- Suspension_Object
+         -- Before releasing the first task we take advantage of the fact that
+         -- this Suspension_Object is in use to make another check: Now verify
+         -- that a call on Suspend_Until_True will raise Program_Error as
+         -- another task is waiting on the same Suspension_Object
          begin
             Astc.Suspend_Until_True (Susp_Obj);
             Report.Failed ("Program Error not raised");
-            -- Another possible failure could occur here:  the task actually
-            -- does suspend even though the object is in use.  In which case
+            -- Another possible failure could occur here: the task actually
+            -- does suspend even though the object is in use. In which case
             -- the test will hang as no Set_True will be issued.
          exception
             when Program_Error =>
@@ -138,8 +137,8 @@ begin
                Report.Failed ("Wrong Exception Raised");
          end;  -- exception scope
 
-         -- Delay long enough to allow the first task to (erroneously)
-         -- continue after the call to Suspend_Until_True;
+         -- Delay long enough to allow the first task to (erroneously) continue
+         -- after the call to Suspend_Until_True;
          --
          delay (Impdef.Minimum_Task_Switch * 3);
          --

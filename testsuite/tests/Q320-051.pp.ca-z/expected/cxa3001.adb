@@ -287,8 +287,8 @@ begin
          end if;
       end loop;
 
-      -- Evaluate function Is_Basic with basic/non-basic inputs.
-      -- (Note: Basic letters are those without diacritical marks.)
+      -- Evaluate function Is_Basic with basic/non-basic inputs. (Note: Basic
+      -- letters are those without diacritical marks.)
 
       for I in Character'Pos ('A') .. Character'Pos ('Z') loop
          if not Ach.Is_Basic (Character'Val (I)) then
@@ -391,8 +391,8 @@ begin
          Report.Failed ("Incorrect Is_HexaDecimal_Digit result - 4");
       end if;
 
-      -- Evaluate functions Is_Alphanumeric and Is_Special with
-      -- letters, digits, and non-alphanumeric inputs.
+      -- Evaluate functions Is_Alphanumeric and Is_Special with letters,
+      -- digits, and non-alphanumeric inputs.
 
       for I in Character'Pos (Ac.Latin_1.Nul) .. Character'Pos (Ac.Latin_1.Us)
       loop

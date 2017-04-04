@@ -60,33 +60,27 @@
 --
 -- References:
 --
--- Software Manual for the Elementary Functions
--- William J. Cody, Jr. and William Waite
--- Prentice-Hall, 1980
+-- Software Manual for the Elementary Functions William J. Cody, Jr. and
+-- William Waite Prentice-Hall, 1980
 --
--- CRC Standard Mathematical Tables
--- 23rd Edition
+-- CRC Standard Mathematical Tables 23rd Edition
 --
--- Implementation and Testing of Function Software
--- W. J. Cody
--- Problems and Methodologies in Mathematical Software Production
--- editors P. C. Messina and A. Murli
--- Lecture Notes in Computer Science   Volume 142
--- Springer Verlag, 1982
+-- Implementation and Testing of Function Software W. J. Cody Problems and
+-- Methodologies in Mathematical Software Production editors P. C. Messina and
+-- A. Murli Lecture Notes in Computer Science Volume 142 Springer Verlag, 1982
 --
 
 --
 -- Notes on derivation of error bound for exp(p)*exp(-p)
 --
--- Let a = true value of exp(p) and ac be the computed value.
--- Then a = ac(1+e1), where |e1| <= 4*Model_Epsilon.
--- Similarly, let b = true value of exp(-p) and bc be the computed value.
--- Then b = bc(1+e2), where |e2| <= 4*ME.
+-- Let a = true value of exp(p) and ac be the computed value. Then a =
+-- ac(1+e1), where |e1| <= 4*Model_Epsilon. Similarly, let b = true value of
+-- exp(-p) and bc be the computed value. Then b = bc(1+e2), where |e2| <= 4*ME.
 --
 -- The product of x and y is (x*y)(1+e3), where |e3| <= 1.0ME
 --
--- Hence, the computed ab is [ac(1+e1)*bc(1+e2)](1+e3) =
--- (ac*bc)[1 + e1 + e2 + e3 + e1e2 + e1e3 + e2e3 + e1e2e3).
+-- Hence, the computed ab is [ac(1+e1)*bc(1+e2)](1+e3) = (ac*bc)[1 + e1 + e2 +
+-- e3 + e1e2 + e1e3 + e2e3 + e1e2e3).
 --
 -- Throwing away the last four tiny terms, we have (ac*bc)(1 + eta),
 --
@@ -113,12 +107,11 @@ procedure Cxg2010 is
       function Sqrt (X : Real) return Real renames Elementary_Functions.Sqrt;
       function Exp (X : Real) return Real renames Elementary_Functions.Exp;
 
-      -- The following value is a lower bound on the accuracy
-      -- required.  It is normally 0.0 so that the lower bound
-      -- is computed from Model_Epsilon.  However, for tests
-      -- where the expected result is only known to a certain
-      -- amount of precision this bound takes on a non-zero
-      -- value to account for that level of precision.
+      -- The following value is a lower bound on the accuracy required. It is
+      -- normally 0.0 so that the lower bound is computed from Model_Epsilon.
+      -- However, for tests where the expected result is only known to a
+      -- certain amount of precision this bound takes on a non-zero value
+      -- to account for that level of precision.
       Error_Low_Bound : Real := 0.0;
 
       procedure Check
@@ -130,9 +123,9 @@ procedure Cxg2010 is
          Rel_Error : Real;
          Abs_Error : Real;
       begin
-         -- In the case where the expected result is very small or 0
-         -- we compute the maximum error as a multiple of Model_Epsilon
-         -- instead of Model_Epsilon and Expected.
+         -- In the case where the expected result is very small or 0 we
+         -- compute the maximum error as a multiple of Model_Epsilon instead
+         -- of Model_Epsilon and Expected.
          Rel_Error := Mre * abs Expected * Real'Model_Epsilon;
          Abs_Error := Mre * Real'Model_Epsilon;
          if Rel_Error > Abs_Error then
@@ -168,13 +161,12 @@ procedure Cxg2010 is
       end Check;
 
       procedure Argument_Range_Check_1 (A, B : Real; Test : String) is
-         -- test a evenly distributed selection of
-         -- arguments selected from the range A to B.
-         -- Test using identity: EXP(X-V) = EXP(X) * EXP (-V)
-         -- The parameter One_Minus_Exp_Minus_V is the value
+         -- test a evenly distributed selection of arguments selected from the
+         -- range A to B. Test using identity: EXP(X-V) = EXP(X) * EXP (-V) The
+         -- parameter One_Minus_Exp_Minus_V is the value
          --   1.0 - Exp (-V)
-         -- accurate to machine precision.
-         -- This procedure is a translation of part of Cody's test
+         -- accurate to machine precision. This procedure is a translation of
+         -- part of Cody's test
          X                     : Real;
          Y                     : Real;
          Zx, Zy                : Real;
@@ -193,12 +185,12 @@ procedure Cxg2010 is
             Zx := Exp (X);
             Zy := Exp (Y);
 
-            -- ZX := Exp(X) - Exp(X) * (1 - Exp(-V);
-            -- which simplifies to ZX := Exp (X-V);
+            -- ZX := Exp(X) - Exp(X) * (1 - Exp(-V); which simplifies to ZX :=
+            -- Exp (X-V);
             Zx := Zx - Zx * One_Minus_Exp_Minus_V;
 
-            -- note that since the expected value is computed, we
-            -- must take the error in that computation into account.
+            -- note that since the expected value is computed, we must take the
+            -- error in that computation into account.
             Check
               (Zy,
                Zx,
@@ -221,13 +213,12 @@ procedure Cxg2010 is
       end Argument_Range_Check_1;
 
       procedure Argument_Range_Check_2 (A, B : Real; Test : String) is
-         -- test a evenly distributed selection of
-         -- arguments selected from the range A to B.
-         -- Test using identity: EXP(X-V) = EXP(X) * EXP (-V)
-         -- The parameter One_Minus_Exp_Minus_V is the value
+         -- test a evenly distributed selection of arguments selected from the
+         -- range A to B. Test using identity: EXP(X-V) = EXP(X) * EXP (-V) The
+         -- parameter One_Minus_Exp_Minus_V is the value
          --   1.0 - Exp (-V)
-         -- accurate to machine precision.
-         -- This procedure is a translation of part of Cody's test
+         -- accurate to machine precision. This procedure is a translation of
+         -- part of Cody's test
          X      : Real;
          Y      : Real;
          Zx, Zy : Real;
@@ -247,13 +238,12 @@ procedure Cxg2010 is
             Zx := Exp (X);
             Zy := Exp (Y);
 
-            -- ZX := Exp(X) * 1/16 - Exp(X) * Coeff;
-            -- where Coeff is 1/16 - Exp(45/16)
-            -- which simplifies to ZX := Exp (X-V);
+            -- ZX := Exp(X) * 1/16 - Exp(X) * Coeff; where Coeff is 1/16 -
+            -- Exp(45/16) which simplifies to ZX := Exp (X-V);
             Zx := Zx * 0.062_5 - Zx * Coeff;
 
-            -- note that since the expected value is computed, we
-            -- must take the error in that computation into account.
+            -- note that since the expected value is computed, we must take the
+            -- error in that computation into account.
             Check
               (Zy,
                Zx,
@@ -374,12 +364,11 @@ procedure Cxg2010 is
       function Sqrt (X : Real) return Real renames Elementary_Functions.Sqrt;
       function Exp (X : Real) return Real renames Elementary_Functions.Exp;
 
-      -- The following value is a lower bound on the accuracy
-      -- required.  It is normally 0.0 so that the lower bound
-      -- is computed from Model_Epsilon.  However, for tests
-      -- where the expected result is only known to a certain
-      -- amount of precision this bound takes on a non-zero
-      -- value to account for that level of precision.
+      -- The following value is a lower bound on the accuracy required. It is
+      -- normally 0.0 so that the lower bound is computed from Model_Epsilon.
+      -- However, for tests where the expected result is only known to a
+      -- certain amount of precision this bound takes on a non-zero value
+      -- to account for that level of precision.
       Error_Low_Bound : Real := 0.0;
 
       procedure Check
@@ -391,9 +380,9 @@ procedure Cxg2010 is
          Rel_Error : Real;
          Abs_Error : Real;
       begin
-         -- In the case where the expected result is very small or 0
-         -- we compute the maximum error as a multiple of Model_Epsilon
-         -- instead of Model_Epsilon and Expected.
+         -- In the case where the expected result is very small or 0 we
+         -- compute the maximum error as a multiple of Model_Epsilon instead
+         -- of Model_Epsilon and Expected.
          Rel_Error := Mre * abs Expected * Real'Model_Epsilon;
          Abs_Error := Mre * Real'Model_Epsilon;
          if Rel_Error > Abs_Error then
@@ -429,13 +418,12 @@ procedure Cxg2010 is
       end Check;
 
       procedure Argument_Range_Check_1 (A, B : Real; Test : String) is
-         -- test a evenly distributed selection of
-         -- arguments selected from the range A to B.
-         -- Test using identity: EXP(X-V) = EXP(X) * EXP (-V)
-         -- The parameter One_Minus_Exp_Minus_V is the value
+         -- test a evenly distributed selection of arguments selected from the
+         -- range A to B. Test using identity: EXP(X-V) = EXP(X) * EXP (-V) The
+         -- parameter One_Minus_Exp_Minus_V is the value
          --   1.0 - Exp (-V)
-         -- accurate to machine precision.
-         -- This procedure is a translation of part of Cody's test
+         -- accurate to machine precision. This procedure is a translation of
+         -- part of Cody's test
          X                     : Real;
          Y                     : Real;
          Zx, Zy                : Real;
@@ -454,12 +442,12 @@ procedure Cxg2010 is
             Zx := Exp (X);
             Zy := Exp (Y);
 
-            -- ZX := Exp(X) - Exp(X) * (1 - Exp(-V);
-            -- which simplifies to ZX := Exp (X-V);
+            -- ZX := Exp(X) - Exp(X) * (1 - Exp(-V); which simplifies to ZX :=
+            -- Exp (X-V);
             Zx := Zx - Zx * One_Minus_Exp_Minus_V;
 
-            -- note that since the expected value is computed, we
-            -- must take the error in that computation into account.
+            -- note that since the expected value is computed, we must take the
+            -- error in that computation into account.
             Check
               (Zy,
                Zx,
@@ -482,13 +470,12 @@ procedure Cxg2010 is
       end Argument_Range_Check_1;
 
       procedure Argument_Range_Check_2 (A, B : Real; Test : String) is
-         -- test a evenly distributed selection of
-         -- arguments selected from the range A to B.
-         -- Test using identity: EXP(X-V) = EXP(X) * EXP (-V)
-         -- The parameter One_Minus_Exp_Minus_V is the value
+         -- test a evenly distributed selection of arguments selected from the
+         -- range A to B. Test using identity: EXP(X-V) = EXP(X) * EXP (-V) The
+         -- parameter One_Minus_Exp_Minus_V is the value
          --   1.0 - Exp (-V)
-         -- accurate to machine precision.
-         -- This procedure is a translation of part of Cody's test
+         -- accurate to machine precision. This procedure is a translation of
+         -- part of Cody's test
          X      : Real;
          Y      : Real;
          Zx, Zy : Real;
@@ -508,13 +495,12 @@ procedure Cxg2010 is
             Zx := Exp (X);
             Zy := Exp (Y);
 
-            -- ZX := Exp(X) * 1/16 - Exp(X) * Coeff;
-            -- where Coeff is 1/16 - Exp(45/16)
-            -- which simplifies to ZX := Exp (X-V);
+            -- ZX := Exp(X) * 1/16 - Exp(X) * Coeff; where Coeff is 1/16 -
+            -- Exp(45/16) which simplifies to ZX := Exp (X-V);
             Zx := Zx * 0.062_5 - Zx * Coeff;
 
-            -- note that since the expected value is computed, we
-            -- must take the error in that computation into account.
+            -- note that since the expected value is computed, we must take the
+            -- error in that computation into account.
             Check
               (Zy,
                Zx,
@@ -632,12 +618,11 @@ procedure Cxg2010 is
       function Sqrt (X : Real) return Real renames Elementary_Functions.Sqrt;
       function Exp (X : Real) return Real renames Elementary_Functions.Exp;
 
-      -- The following value is a lower bound on the accuracy
-      -- required.  It is normally 0.0 so that the lower bound
-      -- is computed from Model_Epsilon.  However, for tests
-      -- where the expected result is only known to a certain
-      -- amount of precision this bound takes on a non-zero
-      -- value to account for that level of precision.
+      -- The following value is a lower bound on the accuracy required. It is
+      -- normally 0.0 so that the lower bound is computed from Model_Epsilon.
+      -- However, for tests where the expected result is only known to a
+      -- certain amount of precision this bound takes on a non-zero value
+      -- to account for that level of precision.
       Error_Low_Bound : Real := 0.0;
 
       procedure Check
@@ -649,9 +634,9 @@ procedure Cxg2010 is
          Rel_Error : Real;
          Abs_Error : Real;
       begin
-         -- In the case where the expected result is very small or 0
-         -- we compute the maximum error as a multiple of Model_Epsilon
-         -- instead of Model_Epsilon and Expected.
+         -- In the case where the expected result is very small or 0 we
+         -- compute the maximum error as a multiple of Model_Epsilon instead
+         -- of Model_Epsilon and Expected.
          Rel_Error := Mre * abs Expected * Real'Model_Epsilon;
          Abs_Error := Mre * Real'Model_Epsilon;
          if Rel_Error > Abs_Error then
@@ -687,13 +672,12 @@ procedure Cxg2010 is
       end Check;
 
       procedure Argument_Range_Check_1 (A, B : Real; Test : String) is
-         -- test a evenly distributed selection of
-         -- arguments selected from the range A to B.
-         -- Test using identity: EXP(X-V) = EXP(X) * EXP (-V)
-         -- The parameter One_Minus_Exp_Minus_V is the value
+         -- test a evenly distributed selection of arguments selected from the
+         -- range A to B. Test using identity: EXP(X-V) = EXP(X) * EXP (-V) The
+         -- parameter One_Minus_Exp_Minus_V is the value
          --   1.0 - Exp (-V)
-         -- accurate to machine precision.
-         -- This procedure is a translation of part of Cody's test
+         -- accurate to machine precision. This procedure is a translation of
+         -- part of Cody's test
          X                     : Real;
          Y                     : Real;
          Zx, Zy                : Real;
@@ -712,12 +696,12 @@ procedure Cxg2010 is
             Zx := Exp (X);
             Zy := Exp (Y);
 
-            -- ZX := Exp(X) - Exp(X) * (1 - Exp(-V);
-            -- which simplifies to ZX := Exp (X-V);
+            -- ZX := Exp(X) - Exp(X) * (1 - Exp(-V); which simplifies to ZX :=
+            -- Exp (X-V);
             Zx := Zx - Zx * One_Minus_Exp_Minus_V;
 
-            -- note that since the expected value is computed, we
-            -- must take the error in that computation into account.
+            -- note that since the expected value is computed, we must take the
+            -- error in that computation into account.
             Check
               (Zy,
                Zx,
@@ -740,13 +724,12 @@ procedure Cxg2010 is
       end Argument_Range_Check_1;
 
       procedure Argument_Range_Check_2 (A, B : Real; Test : String) is
-         -- test a evenly distributed selection of
-         -- arguments selected from the range A to B.
-         -- Test using identity: EXP(X-V) = EXP(X) * EXP (-V)
-         -- The parameter One_Minus_Exp_Minus_V is the value
+         -- test a evenly distributed selection of arguments selected from the
+         -- range A to B. Test using identity: EXP(X-V) = EXP(X) * EXP (-V) The
+         -- parameter One_Minus_Exp_Minus_V is the value
          --   1.0 - Exp (-V)
-         -- accurate to machine precision.
-         -- This procedure is a translation of part of Cody's test
+         -- accurate to machine precision. This procedure is a translation of
+         -- part of Cody's test
          X      : Real;
          Y      : Real;
          Zx, Zy : Real;
@@ -766,13 +749,12 @@ procedure Cxg2010 is
             Zx := Exp (X);
             Zy := Exp (Y);
 
-            -- ZX := Exp(X) * 1/16 - Exp(X) * Coeff;
-            -- where Coeff is 1/16 - Exp(45/16)
-            -- which simplifies to ZX := Exp (X-V);
+            -- ZX := Exp(X) * 1/16 - Exp(X) * Coeff; where Coeff is 1/16 -
+            -- Exp(45/16) which simplifies to ZX := Exp (X-V);
             Zx := Zx * 0.062_5 - Zx * Coeff;
 
-            -- note that since the expected value is computed, we
-            -- must take the error in that computation into account.
+            -- note that since the expected value is computed, we must take the
+            -- error in that computation into account.
             Check
               (Zy,
                Zx,

@@ -67,8 +67,7 @@ begin
       Tc_New_Ub_Character_String : Unbounded_Wide_String :=
         To_Unbounded_Wide_String (Tc_New_Character_String);
 
-      -- Access objects that will be provided as parameters to the
-      -- subprograms.
+      -- Access objects that will be provided as parameters to the subprograms.
       Map_To_Lower_Case_Ptr : Wide_Maps.Wide_Character_Mapping_Function :=
         Cxa4033_0.Map_To_Lower_Case'Access;
       Map_To_Upper_Case_Ptr : Wide_Maps.Wide_Character_Mapping_Function :=

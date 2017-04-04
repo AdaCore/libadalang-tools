@@ -181,8 +181,8 @@ begin
       end if;
 
       -- Check that the Function Strlen returns a size_t result that
-      -- corresponds to the number of chars in the array pointed to by
-      -- parameter Item, up to but not including the terminating nul.
+      -- corresponds to the number of chars in the array pointed to
+      -- by parameter Item, up to but not including the terminating nul.
 
       Tc_Chars_Ptr := Ics.New_Char_Array (Ic.To_C ("A longer string value"));
       Tc_Size_T    := Ics.Strlen (Tc_Chars_Ptr);
@@ -205,9 +205,8 @@ begin
          Report.Failed ("Incorrect result from Function Strlen - 3");
       end if;
 
-      -- Check that both of the above versions of Function Value and
-      -- function Strlen propagate Dereference_Error if the Item parameter
-      -- is Null_Ptr.
+      -- Check that both of the above versions of Function Value and function
+      -- Strlen propagate Dereference_Error if the Item parameter is Null_Ptr.
 
       begin
          Tc_Chars_Ptr := Ics.Null_Ptr;

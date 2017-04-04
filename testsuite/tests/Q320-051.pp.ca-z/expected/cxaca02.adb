@@ -73,10 +73,10 @@ begin
 
       -- If an implementation does not support Stream_IO in a particular
       -- environment, the exception Use_Error or Name_Error will be raised on
-      -- calls to various Stream_IO operations.  This block statement
-      -- encloses a call to Create, which should produce an exception in a
-      -- non-supportive environment.  These exceptions will be handled to
-      -- produce a Not_Applicable result.
+      -- calls to various Stream_IO operations. This block statement encloses a
+      -- call to Create, which should produce an exception in a non-supportive
+      -- environment. These exceptions will be handled to produce a
+      -- Not_Applicable result.
 
       Ada.Streams.Stream_Io.Create
         (Data_File,
@@ -104,10 +104,9 @@ begin
             Cash_Discount     : Boolean;
          end record;
 
-         -- Mode conformant, user defined subprograms that will override
-         -- the type-related attributes.
-         -- In this test, the user defines these subprograms to add/subtract
-         -- specific values from global variables.
+         -- Mode conformant, user defined subprograms that will override the
+         -- type-related attributes. In this test, the user defines these
+         -- subprograms to add/subtract specific values from global variables.
 
          procedure Product_Read
            (Stream   :     access Ada.Streams.Root_Stream_Type'Class;
@@ -160,14 +159,14 @@ begin
 
          -- Subprogram bodies.
          -- These subprograms are designed to override the default attributes
-         -- 'Read and 'Write for the specified types.  Each adds/subtracts
+         -- 'Read and 'Write for the specified types. Each adds/subtracts
          -- a quantity to/from a program control variable, indicating its
-         -- activity.   In addition, each component of the record is
-         -- individually read from or written to the stream, using the
-         -- appropriate 'Read or 'Write attribute for the component type.
-         -- The string components are moved to/from the stream using the
-         -- 'Input and 'Output attributes for the string subtype, so that
-         -- the bounds of the strings are also written/read.
+         -- activity. In addition, each component of the record is individually
+         -- read from or written to the stream, using the appropriate 'Read or
+         -- 'Write attribute for the component type. The string components are
+         -- moved to/from the stream using the 'Input and 'Output attributes
+         -- for the string subtype, so that the bounds of the strings are also
+         -- written/read.
 
          procedure Product_Read
            (Stream   :     access Ada.Streams.Root_Stream_Type'Class;
@@ -271,8 +270,8 @@ begin
 
          begin
 
-            -- Reset the mode of the stream file so that Read/Input
-            -- operations may be performed.
+            -- Reset the mode of the stream file so that Read/Input operations
+            -- may be performed.
 
             Ada.Streams.Stream_Io.Reset
               (Data_File,
@@ -315,10 +314,10 @@ begin
                Report.Failed ("Data verification error, Sale_Rec_05");
             end if;
 
-            -- Verify that the user defined subprograms were used to
-            -- override the default 'Read and 'Write attributes.
-            -- There were two "product" reads and two writes; there
-            -- were five "sale record" reads and five writes.
+            -- Verify that the user defined subprograms were used to override
+            -- the default 'Read and 'Write attributes. There were two
+            -- "product" reads and two writes; there were five "sale
+            -- record" reads and five writes.
 
             if (Tc_Read_Total /= -20) or (Tc_Write_Total /= 60) then
                Report.Failed ("Incorrect use of user defined attributes");
@@ -346,8 +345,8 @@ begin
    exception
 
       -- Since Use_Error or Name_Error can be raised if, for the specified
-      -- mode, the environment does not support Stream_IO operations,
-      -- the following handlers are included:
+      -- mode, the environment does not support Stream_IO operations, the
+      -- following handlers are included:
 
       when Ada.Streams.Stream_Io.Name_Error =>
          Report.Not_Applicable ("Name_Error raised on Stream IO Create");

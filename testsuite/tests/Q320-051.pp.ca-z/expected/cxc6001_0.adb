@@ -2,11 +2,10 @@ with Report;
 package body Cxc6001_0 is
 
    procedure Check_Reference_Semantics (Material : in out Element) is
-   -- perform a little alchemy here...
-   -- this checks that the parameter is passed by reference by changing
-   -- the object that was passed, and then checking that the parameter
-   -- contains the updated value.  If the parameter was copied, the value
-   -- will be that at the time the parameter was passed.
+   -- perform a little alchemy here... this checks that the parameter is passed
+   -- by reference by changing the object that was passed, and then checking
+   -- that the parameter contains the updated value. If the parameter was
+   -- copied, the value will be that at the time the parameter was passed.
    begin
       Plutonium := (Atomic_Weight => 195);
       if Material.Atomic_Weight /= 195 then

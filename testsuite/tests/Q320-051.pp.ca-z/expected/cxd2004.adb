@@ -87,16 +87,15 @@ procedure Cxd2004 is
    -- A priority which is higher than the Default Priority
    Priority_3q : constant System.Priority := (System.Default_Priority + 1);
 
-   -- We cannot use Report.Failed in the PO - bounded error.  Initialize these
+   -- We cannot use Report.Failed in the PO - bounded error. Initialize these
    -- to true in case Register.Running_Order does not get called.
    --
    Failed_1 : Boolean := True;
    Failed_2 : Boolean := True;
 
-   -- This protected object is executed by the task whos active
-   -- priority we wish to raise.
-   -- We must ensure that that call to this entry is not optimized
-   -- away as the test depends on this inheritance
+   -- This protected object is executed by the task whos active priority
+   -- we wish to raise. We must ensure that that call to this entry is not
+   -- optimized away as the test depends on this inheritance
    --
    protected Very_High_Priority_Po is
       pragma Priority (System.Priority'Last);
@@ -184,19 +183,19 @@ begin
          accept Start;
          --
          -- The Driver task has higher priority so, after the rendezvous is
-         -- complete this task is placed on the ready queue waiting to
-         -- resume.  From the nature of the test Sub_Task_B will also be
-         -- on the queue behind this task at that time.
+         -- complete this task is placed on the ready queue waiting to resume.
+         -- From the nature of the test Sub_Task_B will also be on the queue
+         -- behind this task at that time.
 
          -- Upon reactivation:
-         -- During this call to the  PO the inherited priority will be raised.
+         -- During this call to the PO the inherited priority will be raised.
          --
          Very_High_Priority_Po.E1 (Dummy_Int);
 
          -- Now that we are back from the PO our priority has reverted.
-         -- Register the running order. Even though there is another task
-         -- of the same priority on the ready queue this task should continue
-         -- to run
+         -- Register the running order. Even though there is another task of
+         -- the same priority on the ready queue this task should continue to
+         -- run
          --
          Register.Running_Order (This_Id);
 
@@ -212,11 +211,11 @@ begin
 
          delay 0.0;
          accept Start;
-         -- After the rendezvous this task will be placed on the ready
-         -- queue.  It will be behind Sub_Task_A.
+         -- After the rendezvous this task will be placed on the ready queue.
+         -- It will be behind Sub_Task_A.
 
-         -- Upon reactivation we just register.  By this time Sub_Task_A
-         -- should have already registered UNLESS it was suspended.
+         -- Upon reactivation we just register. By this time Sub_Task_A should
+         -- have already registered UNLESS it was suspended.
          --
          Register.Running_Order (This_Id);
 
@@ -258,11 +257,10 @@ begin
       Report.Failed ("A did not register before B");
    end if;
 
-   -- Get the value of the optimizer foil and take action depending
-   -- on the value - this increases difficulty of optimizing away
-   -- the original call to E1.  Note: if this check fails the test is
-   -- definitely failed but it is not necessarily a failure of the actual
-   -- objective.
+   -- Get the value of the optimizer foil and take action depending on the
+   -- value - this increases difficulty of optimizing away the original call to
+   -- E1. Note: if this check fails the test is definitely failed but it is not
+   -- necessarily a failure of the actual objective.
    --
    if Very_High_Priority_Po.Get_Foil = 1 then
       Report.Failed ("Optimizer_Foil value did not change");

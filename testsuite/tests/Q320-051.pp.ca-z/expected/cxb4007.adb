@@ -156,8 +156,8 @@ begin
       end if;
 
       -- Check that function Valid returns False if the Byte_Array parameter
-      -- corresponds to a value outside the range of Num.
-      -- Note: use a Byte_Array value Item created by an instantiation of
+      -- corresponds to a value outside the range of Num. Note: use a
+      -- Byte_Array value Item created by an instantiation of
       --       To_Binary with a larger Num type as the generic formal.
 
       if Pack_1.Valid
@@ -221,10 +221,10 @@ begin
          Report.Failed ("Incorrect result from function To_Decimal - 3");
       end if;
 
-      -- Check that Conversion_Error is propagated by function To_Decimal
-      -- if the Byte_Array parameter Item represents a decimal value outside
-      -- the range of decimal type Num.
-      -- Note: use a Byte_Array value Item created by an instantiation of
+      -- Check that Conversion_Error is propagated by function To_Decimal if
+      -- the Byte_Array parameter Item represents a decimal value outside the
+      -- range of decimal type Num. Note: use a Byte_Array value Item created
+      -- by an instantiation of
       --       To_Binary with a larger Num type as the generic formal.
 
       begin

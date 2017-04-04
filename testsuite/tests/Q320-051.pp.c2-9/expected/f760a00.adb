@@ -16,30 +16,28 @@ package body F760a00 is
    end Finalize;
 
    procedure Use_It (Object : in out Tc_Copy_Check) is
-   -- Ensure that Object is not removed by optimization
-   -- as a dead variable.
+   -- Ensure that Object is not removed by optimization as a dead variable.
    begin
       if Report.Ident_Int (10) /= Object.Val then
          Report.Failed ("Unusual value in TC_Copy_Check");
-         -- This should not be possible; we never change the component
-         -- from its default value of 10.
+         -- This should not be possible; we never change the component from its
+         -- default value of 10.
       end if;
    end Use_It;
 
    procedure Use_Cnst (Object : in Tc_Copy_Check) is
-   -- Ensure that Object is not removed by optimization
-   -- as a dead variable.
+   -- Ensure that Object is not removed by optimization as a dead variable.
    begin
       if Report.Ident_Int (10) /= Object.Val then
          Report.Failed ("Unusual value in TC_Copy_Check");
-         -- This should not be possible; we never change the component
-         -- from its default value of 10.
+         -- This should not be possible; we never change the component from its
+         -- default value of 10.
       end if;
    end Use_Cnst;
 
    procedure Check_Tc_Copy_Check is
-   -- Verify the operation of TC_Copy_Check.
-   -- This checks that Adjust can be called.
+   -- Verify the operation of TC_Copy_Check. This checks that Adjust can be
+   -- called.
    begin
       declare
          Obj  : Tc_Copy_Check; -- I
@@ -64,15 +62,13 @@ package body F760a00 is
    end Check_Fin_Lim_Rec;
 
    procedure Use_It (Object : in out Lim_Rec) is
-   -- Ensure that Object is not removed by optimization
-   -- as a dead variable.
+   -- Ensure that Object is not removed by optimization as a dead variable.
    begin
       Use_It (Object.Tc);
    end Use_It;
 
    procedure Use_Cnst (Object : in Lim_Rec) is
-   -- Ensure that Object is not removed by optimization
-   -- as a dead variable.
+   -- Ensure that Object is not removed by optimization as a dead variable.
    begin
       Use_Cnst (Object.Tc);
    end Use_Cnst;
@@ -88,8 +84,7 @@ package body F760a00 is
    end Check_Fin_Lim_Array;
 
    procedure Use_It (Object : in out Lim_Array) is
-   -- Ensure that Object is not removed by optimization
-   -- as a dead variable.
+   -- Ensure that Object is not removed by optimization as a dead variable.
    begin
       for I in Object'Range loop
          Use_It (Object (I).Tc);
@@ -107,8 +102,7 @@ package body F760a00 is
    end Check_Fin_Lim_Tagged;
 
    procedure Use_It (Object : in out Lim_Tagged'Class) is
-   -- Ensure that Object is not removed by optimization
-   -- as a dead variable.
+   -- Ensure that Object is not removed by optimization as a dead variable.
    begin
       Use_It (Object.Tc);
       Use_It (Object.R);
@@ -125,8 +119,7 @@ package body F760a00 is
    end Check_Fin_Prot;
 
    procedure Use_It (Object : in out Prot) is
-   -- Ensure that Object is not removed by optimization
-   -- as a dead variable.
+   -- Ensure that Object is not removed by optimization as a dead variable.
    begin
       Object.Use_It;
    end Use_It;
@@ -159,8 +152,7 @@ package body F760a00 is
    end Check_Fin_Lim_Comp;
 
    procedure Use_It (Object : in out Lim_Comp) is
-   -- Ensure that Object is not removed by optimization
-   -- as a dead variable.
+   -- Ensure that Object is not removed by optimization as a dead variable.
    begin
       Use_It (Object.Tc);
       Object.P.Use_It;

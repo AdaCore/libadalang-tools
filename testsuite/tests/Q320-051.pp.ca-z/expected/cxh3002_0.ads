@@ -51,8 +51,7 @@ pragma Reviewable;
 
 -- This test requires that this configuration pragma be applied to all
 -- following compilation units in the environment; specifically the ones
--- in file CXH30031.AM
--- CXH3002.A
+-- in file CXH30031.AM CXH3002.A
 --
 --                             Grant of Unlimited Rights
 --

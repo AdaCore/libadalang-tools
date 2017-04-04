@@ -29,8 +29,8 @@ begin
 
    Student_File := (Id => First_File_Id, Name => First_File_Name);
 
-   -- Note that all subunits have the same simple name.
-   -- Generate report from file processing.
+   -- Note that all subunits have the same simple name. Generate report from
+   -- file processing.
    Ca13003_0.Ca13003_1.Ca13003_3;
    Expected_Name := Process_Input_Files (First_File_Id, Student_File);
    Ca13003_0.Ca13003_1.Ca13003_5.Generate_Report;

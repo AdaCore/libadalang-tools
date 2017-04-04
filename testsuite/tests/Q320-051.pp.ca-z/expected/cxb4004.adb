@@ -156,10 +156,9 @@ begin
 
    begin
 
-      -- Check that function Length with Display_Format parameter will
-      -- return the minimal length of a Numeric value (number of
-      -- COBOL_Characters) that will be required to hold the largest
-      -- value of type Num.
+      -- Check that function Length with Display_Format parameter will return
+      -- the minimal length of a Numeric value (number of COBOL_Characters)
+      -- that will be required to hold the largest value of type Num.
 
       if Package_1.Length (Cobol.Unsigned) /= 4 or
         Package_2.Length (Cobol.Unsigned) /= 10
@@ -288,9 +287,9 @@ begin
       declare
          Tc_Numeric_1 : Decimal_Type_1 := Decimal_Type_1_Items (1);
       begin
-         -- The COBOL.Numeric type used as parameter Item represents a
-         -- Decimal value that is outside the range of the Decimal type
-         -- used to instantiate Package_1.
+         -- The COBOL.Numeric type used as parameter Item represents a Decimal
+         -- value that is outside the range of the Decimal type used to
+         -- instantiate Package_1.
          Tc_Numeric_1 :=
            Package_1.To_Decimal
              (Item   => Package_2_Numeric_Items (8).all,
@@ -319,8 +318,8 @@ begin
       end;
 
       -- Check that function To_Display with decimal type Num and
-      -- Display_Format parameters returns a Numeric type result that
-      -- represents Item under the specific Display_Format.
+      -- Display_Format parameters returns a Numeric type result
+      -- that represents Item under the specific Display_Format.
 
       -- Unsigned Display_Format parameter.
       Tc_Num_1       := 13.04;

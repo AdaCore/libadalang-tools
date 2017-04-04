@@ -27,8 +27,8 @@ package body Cxe4001_Partition_B is
       Report.Failed ("exception propagation in Call_A_Raise_Invisible_1");
    end Call_A_Raise_Invisible_1;
 
--- Call_A_Raise_Invisible_2 differs from *_1 in that it handles the
--- invisible exception and then re-raises it.
+-- Call_A_Raise_Invisible_2 differs from *_1 in that it handles the invisible
+-- exception and then re-raises it.
    procedure Call_A_Raise_Invisible_2 is
    begin
       Cxe4001_Partition_A.Raise_Invisible;
@@ -38,10 +38,9 @@ package body Cxe4001_Partition_B is
          raise;  -- re-raise the invisible exception
    end Call_A_Raise_Invisible_2;
 
--- the following task is used to keep this partition from
--- completing until partition A informs it that the test is
--- finished.  This is done by calling the Finished procedure
--- in the specification of this package.
+-- the following task is used to keep this partition from completing until
+-- partition A informs it that the test is finished. This is done by calling
+-- the Finished procedure in the specification of this package.
 
    task Coordinate_Completion is
       entry Finished;

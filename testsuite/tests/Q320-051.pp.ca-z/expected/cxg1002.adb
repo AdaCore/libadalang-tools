@@ -68,8 +68,8 @@ begin
         (Real_Type);
       use Complex_Pack;
 
-      -- Declare a zero valued complex number using the record
-      -- aggregate approach.
+      -- Declare a zero valued complex number using the record aggregate
+      -- approach.
 
       Complex_Zero : constant Complex_Pack.Complex := (0.0, 0.0);
 
@@ -85,8 +85,8 @@ begin
    begin
 
       -- Check that the imaginary component of the result of a binary addition
-      -- operator that yields a result of complex type is exact when either
-      -- of its operands is of pure-real type.
+      -- operator that yields a result of complex type is exact when either of
+      -- its operands is of pure-real type.
 
       Tc_Complex := Compose_From_Cartesian (2.0, 3.0);
       Tc_Real    := 3.0;
@@ -120,8 +120,8 @@ begin
       end if;
 
       -- Check that the imaginary component of the result of a binary
-      -- subtraction operator that yields a result of complex type is exact
-      -- when its right operand is of pure-real type.
+      -- subtraction operator that yields a result of complex type is
+      -- exact when its right operand is of pure-real type.
 
       Tc_Complex := (8.0, -4.0);
       Tc_Real    := 2.0;
@@ -158,9 +158,9 @@ begin
             "one Complex and one Imaginary argument");
       end if;
 
-      -- Check that the real component of the result of a binary
-      -- subtraction operator that yields a result of complex type is exact
-      -- when its right operand is of pure-imaginary type.
+      -- Check that the real component of the result of a binary subtraction
+      -- operator that yields a result of complex type is exact when its right
+      -- operand is of pure-imaginary type.
 
       Tc_Complex := Tc_Complex + I;    -- Should produce (5.0, 1.0)
 
@@ -176,9 +176,9 @@ begin
       end if;
 
       -- Check that the result of a binary addition operation is exact when
-      -- one of its operands is of real type and the other is of
-      -- pure-imaginary type; the operator is analogous to the
-      -- Compose_From_Cartesian function; it performs no arithmetic.
+      -- one of its operands is of real type and the other is of pure-imaginary
+      -- type; the operator is analogous to the Compose_From_Cartesian
+      -- function; it performs no arithmetic.
 
       Tc_Complex := Complex_Pack."+" (5.0, Complex_Pack.I);
 

@@ -75,9 +75,9 @@ procedure Cxai021 is
 
    subtype Array_Bounds_Type is Ada.Containers.Count_Type range 1 .. Num_Tests;
 
-   -- No fractional parts so that can compare values for equality.
-   -- In ascending order so that can check that iterators have proceeded in the
-   -- correct order
+   -- No fractional parts so that can compare values for equality. In ascending
+   -- order so that can check that iterators have proceeded in the correct
+   -- order
 
    Value_In_Array : constant array (Array_Bounds_Type) of My_Float :=
      (12.0, 23.0, 34.0, 45.0, 56.0, 67.0, 78.0, 89.0, 100.0, 111.0);
@@ -188,9 +188,9 @@ begin
 
    end;
 
-   -- Test Constant_Reference and Reference explicitly using
-   -- a generalized reference and implicitly via Constant_Indexing and
-   -- Variable_Indexing -- in a way that corresponds to likely usage.
+   -- Test Constant_Reference and Reference explicitly using a generalized
+   -- reference and implicitly via Constant_Indexing and Variable_Indexing
+   -- -- in a way that corresponds to likely usage.
 
    declare
       procedure Test
@@ -200,10 +200,9 @@ begin
       is
       begin
          Tampering_Check (Container => My_Map_1, Where => Test_Case);
-         -- The tampering check here prevents the
-         -- Value parameter to this subprogram from
-         -- disappearing (if passed by-reference) while
-         -- it is still in use.
+         -- The tampering check here prevents the Value parameter to this
+         -- subprogram from disappearing (if passed by-reference) while it
+         -- is still in use.
 
          if Value /= Expected then
             Report.Failed ("Wrong value for " & Test_Case);
@@ -218,10 +217,9 @@ begin
       is
       begin
          Tampering_Check (Container => My_Map_1, Where => Test_Case);
-         -- The tampering check here prevents the
-         -- Value parameter to this subprogram from
-         -- disappearing (if passed by-reference) while
-         -- it is still in use.
+         -- The tampering check here prevents the Value parameter to this
+         -- subprogram from disappearing (if passed by-reference) while it
+         -- is still in use.
 
          if Value /= Expected then
             Report.Failed ("Wrong value for " & Test_Case);

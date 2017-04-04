@@ -11,6 +11,6 @@ package Cc30001_2 is  -- System message type and operations.
 
    procedure Send (Item : in out Sys_Message); -- For this test, this version
    -- of Send should never be
-   -- ... Other operations.                    -- called (it will have been
+   -- ... Other operations. -- called (it will have been
    -- overridden).
 end Cc30001_2;

@@ -4,11 +4,11 @@ package body Cxd3003_1 is
       procedure For_Ceiling_Check (Numb : Task_Number) is
 
       begin
-         -- In order to verify the check of Ceiling_Priority
-         -- we must ensure that this procedure actually gets called.
-         -- If calls to this procedure were optimized out then this
-         -- part of the test would become a no-op.  The Check_Called
-         -- array is checked at the end preventing optimization.
+         -- In order to verify the check of Ceiling_Priority we must ensure
+         -- that this procedure actually gets called. If calls to this
+         -- procedure were optimized out then this part of the test would
+         -- become a no-op. The Check_Called array is checked at the end
+         -- preventing optimization.
          --
          Check_Called (Numb) := True;
 

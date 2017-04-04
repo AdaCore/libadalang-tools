@@ -16,8 +16,8 @@ package Cc51007_3 is
       Addendum : Note := (others => '*');
    end record;
 
-   -- In instance, inherits version of Handle from
-   -- actual corresponding to formal type.
+   -- In instance, inherits version of Handle from actual corresponding to
+   -- formal type.
 
    function Annotate_Alert (A : in Alert_Type'Class)      -- Function returning
    return Extended_Alert;                              -- derived type.

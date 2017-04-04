@@ -22,8 +22,8 @@ begin
          pragma Interrupt_Priority (Priority_Int);
       end Task_Of_Int_Priority;
 
-      -- These tasks call a protected object whose ceiling should be
-      -- higher than the task's priority
+      -- These tasks call a protected object whose ceiling should be higher
+      -- than the task's priority
       --
 
       task body Task_Of_Top_Priority is

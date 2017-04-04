@@ -15,9 +15,8 @@ begin
       "parent unit's visible definitions");
 
    File_Creation :                   -- This processing block will demonstrate
-   -- use of child package subroutine that
-      -- takes advantage of components declared
-      -- in the parent package.
+   -- use of child package subroutine that takes advantage of components
+      -- declared in the parent package.
       declare
       User_File : File_Type;
    begin
@@ -34,12 +33,10 @@ begin
 
    --------------------------------------------------------------
    File_Mode_Conversion :            -- This processing block will demonstrate
-   -- the occurrence of a (forced) exception
-      -- being raised in a child subprogram, and
-      -- propagated to the caller.  The exception
-      -- is handled, and the child subprogram
-      -- is called again, this time to perform
-      -- without error.
+   -- the occurrence of a (forced) exception being raised in a child
+      -- subprogram, and propagated to the caller. The exception is handled,
+      -- and the child subprogram is called again, this time to perform without
+      -- error.
       declare
       procedure Convert_File_Mode
         (File     : in out File_Type;
@@ -47,8 +44,7 @@ begin
         Ca11002_0.Ca11002_2;
       New_File : File_Type;
    begin                               -- Raise an exception with this
-      -- illegal conversion operation
-      -- (attempt to change to current mode).
+      -- illegal conversion operation (attempt to change to current mode).
 
       Convert_File_Mode (File => New_File, New_Mode => Default_Mode);
       Report.Failed ("Exception should have been raised in child unit");

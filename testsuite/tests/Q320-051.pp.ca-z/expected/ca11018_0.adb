@@ -37,17 +37,16 @@ package body Ca11018_0 is
       return Particularly_Designated_Pkg.Tc_Function_Called;
    end Tc_Particularly_Designated_Success;
    --------------------------------------------------------------
-   -- Calls functions from public child to search for a key word.
-   -- If the word appears more than once in each message,
-   -- highlight all of them.
+   -- Calls functions from public child to search for a key word. If the word
+   -- appears more than once in each message, highlight all of them.
 
    procedure Highlight_Designated
      (The_Word       : in     Message;
       In_The_Message : in out Designated_Msg)
    is
 
-   -- Not a real highlight procedure.  Real application can use graphic
-   -- device to highlight all occurrences of words.
+   -- Not a real highlight procedure. Real application can use graphic device
+   -- to highlight all occurrences of words.
 
    begin
       --------------------------------------------------------------
@@ -70,8 +69,8 @@ package body Ca11018_0 is
       In_The_Message : in out Particularly_Designated_Msg)
    is
 
-   -- Not a real highlight procedure.  Real application can use graphic
-   -- device to highlight all occurrences of words.
+   -- Not a real highlight procedure. Real application can use graphic device
+   -- to highlight all occurrences of words.
 
    begin
       --------------------------------------------------------------
@@ -84,8 +83,8 @@ package body Ca11018_0 is
         0
       then
 
-         -- Highlight all occurrences in chartreuse.
-         -- Do other more secret stuff.
+         -- Highlight all occurrences in chartreuse. Do other more secret
+         -- stuff.
 
          Tc_Particularly_Designated_Not_Zero := True;
       end if;

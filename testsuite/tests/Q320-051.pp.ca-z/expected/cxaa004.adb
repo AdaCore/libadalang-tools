@@ -78,11 +78,10 @@ begin
    Test_For_Text_Io_Support : begin
 
       -- An implementation that does not support Text_IO in a particular
-      -- environment will raise Use_Error on calls to various
-      -- Text_IO operations.  This block statement encloses a call to
-      -- Create, which should raise the exception in a non-supportive
-      -- environment.  This exception will be handled to produce a
-      -- Not_Applicable result.
+      -- environment will raise Use_Error on calls to various Text_IO
+      -- operations. This block statement encloses a call to Create, which
+      -- should raise the exception in a non-supportive environment. This
+      -- exception will be handled to produce a Not_Applicable result.
 
       Text_Io.Create
         (File => Data_File,
@@ -110,20 +109,19 @@ begin
       -- following file creation, prior to file closure.
       Text_Io.Put_Line (File => Data_File, Item => "Some optional data");
 
-      -- Close has the effect of a call to New_Page (adding a page
-      -- terminator).
+      -- Close has the effect of a call to New_Page (adding a page terminator).
       Text_Io.Close (Data_File);
 
-      -- This code section simulates a scenario that could occur in a
-      -- text processing environment:
+      -- This code section simulates a scenario that could occur in a text
+      -- processing environment:
       --     Certain text is to be appended to a document.
       --     The file is opened in Append_File mode.
       --     The position on the appended page is set, verified, and text
       --     is placed in the file.
       --
-      -- Note: The text file has been originally created in Out_File
-      -- mode, has been subsequently closed and is now being reopened in
-      -- Append_File mode for further processing.
+      -- Note: The text file has been originally created in Out_File mode, has
+      -- been subsequently closed and is now being reopened in Append_File mode
+      -- for further processing.
 
       Text_Io.Open (Data_File, Text_Io.Append_File, Data_Filename);
 
@@ -144,7 +142,7 @@ begin
       Text_Io.Put (Data_File, Section_Header);        -- Position
       Text_Io.Put_Line (Data_File, Reference_Title);       -- title.
 
-      -- Test control code.                                -- Verify new
+      -- Test control code. -- Verify new
       if (Integer (Text_Io.Page (Data_File)) /=             -- page and
       Report.Ident_Int (2))
         or else                     -- line.
@@ -185,10 +183,10 @@ begin
 
          Text_Io.Skip_Page (Data_File);
 
-         -- If the Reset to Append_File mode actually put a page terminator
-         -- in the file, as allowed (but not required) by RM A.10.2(4), then
-         -- we are now on page 2, an empty page.  Therefore, we need to skip
-         -- one more page.
+         -- If the Reset to Append_File mode actually put a page terminator in
+         -- the file, as allowed (but not required) by RM A.10.2(4), then we
+         -- are now on page 2, an empty page. Therefore, we need to skip one
+         -- more page.
 
          if Text_Io.End_Of_Page (Data_File) then
             Text_Io.Skip_Page (Data_File);

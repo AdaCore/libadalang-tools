@@ -59,19 +59,14 @@
 --
 -- References:
 --
--- Software Manual for the Elementary Functions
--- William J. Cody, Jr. and William Waite
--- Prentice-Hall, 1980
+-- Software Manual for the Elementary Functions William J. Cody, Jr. and
+-- William Waite Prentice-Hall, 1980
 --
--- CRC Standard Mathematical Tables
--- 23rd Edition
+-- CRC Standard Mathematical Tables 23rd Edition
 --
--- Implementation and Testing of Function Software
--- W. J. Cody
--- Problems and Methodologies in Mathematical Software Production
--- editors P. C. Messina and A. Murli
--- Lecture Notes in Computer Science   Volume 142
--- Springer Verlag, 1982
+-- Implementation and Testing of Function Software W. J. Cody Problems and
+-- Methodologies in Mathematical Software Production editors P. C. Messina and
+-- A. Murli Lecture Notes in Computer Science Volume 142 Springer Verlag, 1982
 --
 
 with System;
@@ -101,12 +96,11 @@ procedure Cxg2017 is
       -- flag used to terminate some tests early
       Accuracy_Error_Reported : Boolean := False;
 
-      -- The following value is a lower bound on the accuracy
-      -- required.  It is normally 0.0 so that the lower bound
-      -- is computed from Model_Epsilon.  However, for tests
-      -- where the expected result is only known to a certain
-      -- amount of precision this bound takes on a non-zero
-      -- value to account for that level of precision.
+      -- The following value is a lower bound on the accuracy required. It is
+      -- normally 0.0 so that the lower bound is computed from Model_Epsilon.
+      -- However, for tests where the expected result is only known to a
+      -- certain amount of precision this bound takes on a non-zero value
+      -- to account for that level of precision.
       Error_Low_Bound : Real := 0.0;
 
       procedure Check
@@ -118,8 +112,8 @@ procedure Cxg2017 is
          Rel_Error : Real;
          Abs_Error : Real;
       begin
-         -- In the case where the expected result is very small or 0
-         -- we compute the maximum error as a multiple of Model_Small instead
+         -- In the case where the expected result is very small or 0 we
+         -- compute the maximum error as a multiple of Model_Small instead
          -- of Model_Epsilon and Expected.
          Rel_Error := Mre * abs Expected * Real'Model_Epsilon;
          Abs_Error := Mre * Real'Model_Small;
@@ -155,9 +149,9 @@ procedure Cxg2017 is
       end Check;
 
       procedure Special_Value_Test is
-         -- In the following tests the expected result is accurate
-         -- to the machine precision so the minimum guaranteed error
-         -- bound can be used.
+         -- In the following tests the expected result is accurate to the
+         -- machine precision so the minimum guaranteed error bound can be
+         -- used.
          Minimum_Error : constant := 8.0;
          E2            : constant := E * E;
       begin
@@ -197,8 +191,8 @@ procedure Cxg2017 is
          --    TANH(x) = [TANH(y)+C] / [1 + TANH(y) * C]
          -- where C = TANH(1/8) and y = x - 1/8
          --
-         -- see Cody pg 248-249 for details on the error analysis.
-         -- The net result is a relative error bound of 16 * Model_Epsilon.
+         -- see Cody pg 248-249 for details on the error analysis. The net
+         -- result is a relative error bound of 16 * Model_Epsilon.
          --
          -- The second part of this test checks the identity
          --    TANH(-x) = -TANH(X)
@@ -208,8 +202,8 @@ procedure Cxg2017 is
          C                : constant := 1.243_530_017_715_962_080_5e-1;
       begin
          if Real'Digits > 20 then
-            -- constant C is accurate to 20 digits.  Set the low bound
-            -- on the error to 16*10**-20
+            -- constant C is accurate to 20 digits. Set the low bound on the
+            -- error to 16*10**-20
             Error_Low_Bound := 0.00000_00000_00000_00016;
             Report.Comment ("tanh accuracy checked to 20 digits");
          end if;

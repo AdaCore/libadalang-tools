@@ -71,10 +71,9 @@ package Fxa5a00 is
       Relative_Error  : Float) return Boolean;
 
    -- This procedure is designed to defeat optimization attempts by an
-   -- implementation in cases where an exception is specifically raised
-   -- in a test to test a prescribed exception result condition.
-   -- The parameter Num is a unique identifier for location purposes within
-   -- the test.
+   -- implementation in cases where an exception is specifically raised in a
+   -- test to test a prescribed exception result condition. The parameter Num
+   -- is a unique identifier for location purposes within the test.
 
    generic
       type Eval_Type is digits <>;

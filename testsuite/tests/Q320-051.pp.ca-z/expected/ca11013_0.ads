@@ -57,8 +57,8 @@ generic               -- Complex number abstraction.
 
 package Ca11013_0 is
 
-   -- Simulate a generic complex number support package. Complex numbers
-   -- are treated as coordinates in the Cartesian plane.
+   -- Simulate a generic complex number support package. Complex numbers are
+   -- treated as coordinates in the Cartesian plane.
 
    type Complex_Type is record
       Real : Real_Type;

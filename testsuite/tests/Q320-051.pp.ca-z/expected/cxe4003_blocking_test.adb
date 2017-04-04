@@ -20,15 +20,14 @@ package body Cxe4003_Blocking_Test is
    procedure Do_Test is
    begin
       Gets_Blocked.Go;
-      -- Gets_Blocked is now free to make the RPC
-      -- The following delay gives Gets_Blocked plenty of
-      -- opportunity to run but isn't really necessary since
-      -- we explicitly block when we call Release_1
+      -- Gets_Blocked is now free to make the RPC The following delay gives
+      -- Gets_Blocked plenty of opportunity to run but isn't really necessary
+      -- since we explicitly block when we call Release_1
       delay Impdef.Minimum_Task_Switch;
       -- At this point the call should be in progress
       Cxe4003_Part_B1.Release_1;
-      -- at this point we know that task Gets_Blocked should be
-      -- blocked in the call to Block_2.
+      -- at this point we know that task Gets_Blocked should be blocked in the
+      -- call to Block_2.
       if not Rpc_In_Progress then
          Report.Failed ("task did not block during RPC");
       end if;

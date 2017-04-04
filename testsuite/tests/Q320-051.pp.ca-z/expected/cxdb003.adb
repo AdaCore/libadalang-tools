@@ -116,8 +116,8 @@ begin
       task body Target_Task is
       begin
          accept Get_Id (Task_Id : out Ati.Task_Id) do
-            -- Get the system assigned Task_Id for this task and
-            -- "return" it to the caller
+            -- Get the system assigned Task_Id for this task and "return" it to
+            -- the caller
             Task_Id := Ati.Current_Task;
          end Get_Id;
 
@@ -149,20 +149,19 @@ begin
 
    begin -- encapsulation
 
-      -- Get the task's Id for the Hold/Continue instructions and start
-      -- the Target_Task
+      -- Get the task's Id for the Hold/Continue instructions and start the
+      -- Target_Task
       Target_Task.Get_Id (Target_Task_Id);
 
       -- Switch to allow Target_Task to get to the Selective_Accept
       delay Impdef.Switch_To_New_Task;
 
       Aatc.Hold (Target_Task_Id);
-      -- Other tests in the suite are checking to ensure that the "Hold"
-      -- takes effect properly.
+      -- Other tests in the suite are checking to ensure that the "Hold" takes
+      -- effect properly.
 
-      -- Call an entry in the Selective_Accept of Target_Task.  The
-      -- rendezvous should complete.  The test will hang here if it does
-      -- not do so.
+      -- Call an entry in the Selective_Accept of Target_Task. The rendezvous
+      -- should complete. The test will hang here if it does not do so.
       Target_Task.Read;
 
       -- Delay to allow Target_Task to (erroneously) proceed beyond the
@@ -182,8 +181,8 @@ begin
       Aatc.Continue (Target_Task_Id);
       --
       Target_Task.Write;
-      -- If the Continue does not allow Target_Task to proceed the test
-      -- will hang here
+      -- If the Continue does not allow Target_Task to proceed the test will
+      -- hang here
       while not Tc_Po.Target_Executed loop
          delay Impdef.Minimum_Task_Switch;
       end loop;

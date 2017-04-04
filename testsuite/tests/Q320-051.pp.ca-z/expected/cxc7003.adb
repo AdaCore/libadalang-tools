@@ -25,8 +25,8 @@ begin
       begin
          declare
 
-         -- The following task doesn't really do anything.  It is just around
-         -- so we can set its attribute.
+            -- The following task doesn't really do anything. It is just around
+            -- so we can set its attribute.
 
             task Check_It is
                entry Get_Id (Id : out Tid.Task_Id);
@@ -63,8 +63,8 @@ begin
                   raise Not_Supported_Error;
             end;
 
-            -- set a new value for Check_It's attribute and make sure that
-            -- the object with Id 1 was finalized.
+            -- set a new value for Check_It's attribute and make sure that the
+            -- object with Id 1 was finalized.
             Cxc7003_0.Last_Finalized := 9; -- state known not to be
             -- produced by finalize
             Fta.Set_Value (Cxc7003_0.Object_3, Check_It_Tid);
@@ -83,7 +83,7 @@ begin
                      Integer'Image (Cxc7003_0.Last_Finalized));
             end case;
 
-            -- restore the default value for the environment task.  This should
+            -- restore the default value for the environment task. This should
             -- finalize the object with Id 2
             Cxc7003_0.Last_Finalized := 9; -- state known not to be
             -- produced by finalize
@@ -125,8 +125,8 @@ begin
       when Not_Supported_Error =>
          null; -- Not Supported already reported.
       when Info : others =>
-         -- This handler should be reachable only for exceptions raised
-         -- during the instantiation of task attributes.
+         -- This handler should be reachable only for exceptions raised during
+         -- the instantiation of task attributes.
          Report.Not_Applicable
            ("System not capable of supporting a task " &
             "attribute of a controlled type -- exception " &

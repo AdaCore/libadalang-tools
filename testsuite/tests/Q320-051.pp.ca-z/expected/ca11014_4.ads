@@ -2,9 +2,9 @@
 
      --==================================================================--
 
--- Declare instances of the generic list packages for the discrete type.
--- The instance of the child must itself be declared as a child of the
--- instance of the parent.
+-- Declare instances of the generic list packages for the discrete type. The
+-- instance of the child must itself be declared as a child of the instance
+-- of the parent.
 
 with Ca11014_0;               -- Generic list abstraction.
 with Ca11014_3;               -- Package containing discrete type declaration.

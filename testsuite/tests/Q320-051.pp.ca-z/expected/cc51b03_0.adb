@@ -6,7 +6,7 @@ package body Cc51b03_0 is
       function Is_Definite return Boolean is
       begin
          if Formal'Definite then                -- Attribute used in "if"
-            -- ...Execute algorithm #1...       -- condition inside subprogram.
+            -- ...Execute algorithm #1... -- condition inside subprogram.
             return True;
          else
             -- ...Execute algorithm #2...

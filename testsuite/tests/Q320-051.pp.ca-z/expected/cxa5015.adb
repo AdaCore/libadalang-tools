@@ -301,8 +301,8 @@ begin
    Tc_Dfloat_1 := Derived_Float_1'Machine (Tc_Dfloat_1);
    Tc_Dfloat_2 := Derived_Float_2'Machine (Tc_Dfloat_2);
 
-   -- Checking for the closest machine number to each of the variables at
-   -- this point should produce the same values.
+   -- Checking for the closest machine number to each of the variables at this
+   -- point should produce the same values.
    if Float'Machine (Tc_Float) /= Tc_Float or
      Float_Subtype'Machine (Tc_Sfloat) /= Tc_Sfloat or
      Derived_Float_1'Machine (Tc_Dfloat_1) /= Tc_Dfloat_1 or

@@ -180,10 +180,10 @@ begin
                "operator when both operands are zero");
       end;
 
-      -- Check that Constraint_Error is raised by the exponentiation
-      -- operator when the value of the left parameter (operand) is zero,
-      -- and the value of the right parameter (exponent) is negative.
-      -- This check applies only if Machine_Overflows is true [A.5.1(28, 30)].
+      -- Check that Constraint_Error is raised by the exponentiation operator
+      -- when the value of the left parameter (operand) is zero, and the value
+      -- of the right parameter (exponent) is negative. This check applies only
+      -- if Machine_Overflows is true [A.5.1(28, 30)].
 
       if New_Float'Machine_Overflows = True then
          begin
@@ -240,8 +240,8 @@ begin
             "operator when the value of the exponent is 0.0");
       end if;
 
-      -- Check that exponentiation by a unit exponent yields the value
-      -- of the left operand.
+      -- Check that exponentiation by a unit exponent yields the value of the
+      -- left operand.
 
       if Gef."**" (Left => 50.0, Right => 1.0) /= 50.0 or
         Ef."**" (Fxa5a00.Large, Right => 1.0) /= Fxa5a00.Large or
@@ -277,8 +277,8 @@ begin
             "operator when the value of the operand is 0.0");
       end if;
 
-      -- Check that exponentiation of various operands with a variety of
-      -- of exponent values yield correct results.
+      -- Check that exponentiation of various operands with a variety of of
+      -- exponent values yield correct results.
 
       if not Result_Within_Range (Gef."**" (5.0, 2.0), 25.0, 0.01) or
         not Result_Within_Range (Gef."**" (1.225, 1.5), 1.36, 0.01) or
@@ -298,8 +298,7 @@ begin
       -- inverse functions.
 
       declare
-         -- Use the relative error value to account for non-exact
-         -- computations.
+         -- Use the relative error value to account for non-exact computations.
          Tc_Relative_Error : Float := 0.005;
       begin
          for I in 1 .. 5 loop
@@ -397,8 +396,8 @@ begin
             "given a parameter value of 0.0");
       end if;
 
-      -- Check that the Exp Function provides correct results when provided
-      -- a variety of input parameter values.
+      -- Check that the Exp Function provides correct results when provided a
+      -- variety of input parameter values.
 
       if not Result_Within_Range (Gef.Exp (0.001), 1.01, 0.01) or
         not Result_Within_Range (Ef.Exp (0.1), 1.11, 0.01) or
@@ -470,8 +469,8 @@ begin
       -- Testing of Sqrt Function, both instantiated and pre-instantiated
       -- version.
 
-      -- Check that Argument_Error is raised by the Sqrt Function when
-      -- the value of the input parameter X is negative.
+      -- Check that Argument_Error is raised by the Sqrt Function when the
+      -- value of the input parameter X is negative.
 
       begin
          Float_Result := Ef.Sqrt (X => -Fxa5a00.Small);
@@ -516,8 +515,8 @@ begin
             "an input parameter value of 0.0");
       end if;
 
-      -- Check that the Sqrt Function, when given an X parameter input value
-      -- of 1.0, returns a result of 1.0.
+      -- Check that the Sqrt Function, when given an X parameter input value of
+      -- 1.0, returns a result of 1.0.
 
       if Gef.Sqrt (X => 1.0) /= 1.0 or Ef.Sqrt (1.0) /= 1.0 then
          Report.Failed
@@ -525,8 +524,8 @@ begin
             "an input parameter value of 1.0");
       end if;
 
-      -- Check that the Sqrt Function provides correct results when provided
-      -- a variety of input parameter values.
+      -- Check that the Sqrt Function provides correct results when provided a
+      -- variety of input parameter values.
 
       if not Fxa5a00.Result_Within_Range (Gef.Sqrt (0.032_7), 0.181, 0.001) or
         not Fxa5a00.Result_Within_Range (Ef.Sqrt (0.180_8), 0.425, 0.001) or

@@ -73,10 +73,10 @@ begin
 
       -- If an implementation does not support Stream_IO in a particular
       -- environment, the exception Use_Error or Name_Error will be raised on
-      -- calls to various Stream_IO operations.  This block statement
-      -- encloses a call to Create, which should produce an exception in a
-      -- non-supportive environment.  These exceptions will be handled to
-      -- produce a Not_Applicable result.
+      -- calls to various Stream_IO operations. This block statement encloses a
+      -- call to Create, which should produce an exception in a non-supportive
+      -- environment. These exceptions will be handled to produce a
+      -- Not_Applicable result.
 
       Ada.Streams.Stream_Io.Create
         (Order_File,
@@ -111,16 +111,16 @@ begin
         Ada.Tags.External_Tag (Fxacc00.Last_Minute_Request'Tag);
 
       -- The following procedure will take an object of the Ticket_Request
-      -- class and output it to the stream.  Objects of any extended type
-      -- in the class can be output to the stream with this procedure.
+      -- class and output it to the stream. Objects of any extended type in
+      -- the class can be output to the stream with this procedure.
 
       procedure Order_Entry (Order : Fxacc00.Ticket_Request'Class) is
       begin
          Fxacc00.Ticket_Request'Class'Output (Order_Stream, Order);
       end Order_Entry;
 
-      -- The following function will retrieve from the stream an object of
-      -- the Ticket_Request class.
+      -- The following function will retrieve from the stream an object of the
+      -- Ticket_Request class.
 
       function Order_Retrieval return Fxacc00.Ticket_Request'Class is
       begin
@@ -131,8 +131,8 @@ begin
 
       Order_Stream := Ada.Streams.Stream_Io.Stream (Order_File);
 
-      -- Store the data objects in the stream.
-      -- Each of the objects is of a different type within the class.
+      -- Store the data objects in the stream. Each of the objects is of a
+      -- different type within the class.
 
       Order_Entry (Fxacc00.Box_Office_Request);     -- Object of root type
       Order_Entry (Fxacc00.Summer_Subscription);    -- Obj. of extended type
@@ -156,18 +156,17 @@ begin
 
          use Fxacc00;
 
-         -- Declare variables of the root type class,
-         -- and initialize them with class-wide objects returned from
-         -- the stream as function result.
+         -- Declare variables of the root type class, and initialize them with
+         -- class-wide objects returned from the stream as function result.
 
          Order_1 : Ticket_Request'Class := Order_Retrieval;
          Order_2 : Ticket_Request'Class := Order_Retrieval;
          Order_3 : Ticket_Request'Class := Order_Retrieval;
          Order_4 : Ticket_Request'Class := Order_Retrieval;
 
-         -- Declare objects of the specific types from within the class
-         -- that correspond to the types of the data written to the
-         -- stream.  Perform a type conversion on the class-wide objects.
+         -- Declare objects of the specific types from within the class that
+         -- correspond to the types of the data written to the stream. Perform
+         -- a type conversion on the class-wide objects.
 
          Ticket_Order      : Ticket_Request      := Ticket_Request (Order_1);
          Subscriber_Order : Subscriber_Request := Subscriber_Request (Order_2);
@@ -177,9 +176,9 @@ begin
 
       begin
 
-         -- Perform a field-by-field comparison of all the class-wide
-         -- objects input from the stream with specific type objects
-         -- originally written to the stream.
+         -- Perform a field-by-field comparison of all the class-wide objects
+         -- input from the stream with specific type objects originally written
+         -- to the stream.
 
          if Ticket_Order.Location /= Box_Office_Request.Location or
            Ticket_Order.Number_Of_Tickets /=
@@ -216,8 +215,8 @@ begin
             Report.Failed ("Last_Minute_Request object validation failure");
          end if;
 
-         -- Verify tag values from before and after processing.
-         -- The 'Tag attribute is used with objects of a class-wide type.
+         -- Verify tag values from before and after processing. The 'Tag
+         -- attribute is used with objects of a class-wide type.
 
          if Tc_Box_Office_Tag /= Ada.Tags.External_Tag (Order_1'Tag) then
             Report.Failed ("Failed tag comparison - 1");
@@ -237,8 +236,8 @@ begin
 
       end Process_Order_Block;
 
-      -- After all the data has been correctly extracted, the file
-      -- should be empty.
+      -- After all the data has been correctly extracted, the file should be
+      -- empty.
 
       if not Ada.Streams.Stream_Io.End_Of_File (Order_File) then
          Report.Failed ("Stream file not empty");

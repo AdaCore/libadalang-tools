@@ -59,8 +59,7 @@ begin
    Data_Retrieval_Block : begin
 
       Data_Buffer.Get (Data);  -- Retrieval of buffer data, buffer now empty.
-      -- Exception will be raised in entry body, with
-      -- propagation to caller.
+      -- Exception will be raised in entry body, with propagation to caller.
       Report.Failed ("Data_Degradation Exception not raised in processing");
    exception
       when Buffer.Data_Degradation =>

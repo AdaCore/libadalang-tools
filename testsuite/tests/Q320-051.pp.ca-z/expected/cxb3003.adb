@@ -62,8 +62,8 @@ begin
 
       Tc_Int : Integer := 1;
 
-      --  Note:  In all of the following the Pointers spec. being tested
-      --  is shown in comments
+      --  Note: In all of the following the Pointers spec. being tested is
+      --  shown in comments
       --
       --    type Pointer is access all Element;
       subtype Tst_Pointer_Type is Test_Ptrs.Pointer;
@@ -76,8 +76,8 @@ begin
 
    begin    -- encapsulation
 
-      -- Arrange that the calls to the subprograms are compiled but
-      -- not executed
+      -- Arrange that the calls to the subprograms are compiled but not
+      -- executed
       --
       if not Report.Equal (Tc_Int, Tc_Int) then
 

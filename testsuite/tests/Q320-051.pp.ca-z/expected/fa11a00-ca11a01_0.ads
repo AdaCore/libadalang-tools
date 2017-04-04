@@ -55,8 +55,8 @@
 --!
 
 package Fa11a00.Ca11a01_0 is     -- Color_Widget_Pkg
--- This public child declares an extension from its parent.  It
--- represents processing of widgets in a window system.
+-- This public child declares an extension from its parent. It represents
+-- processing of widgets in a window system.
 
    type Widget_Color_Enum is (Black, Green, White);
 
@@ -65,8 +65,8 @@ package Fa11a00.Ca11a01_0 is     -- Color_Widget_Pkg
       Color : Widget_Color_Enum;
    end record;
 
-   -- Inherits procedure Set_Width from Widget.
-   -- Inherits procedure Set_Height from Widget.
+   -- Inherits procedure Set_Width from Widget. Inherits procedure Set_Height
+   -- from Widget.
 
    -- To be inherited by its derivatives.
    procedure Set_Color

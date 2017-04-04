@@ -17,8 +17,7 @@ package body Ca11019_0.Ca11019_1 is
       Ptr : Data_Ptr;
    begin
       if To.First = null then
-         -- assign new record with data value to
-         -- to.next <- null;
+         -- assign new record with data value to to.next <- null;
          To.First := new Data_Elem'(Next => null, Value => Datum, Seq => 1);
          Sequence (To.First);
          To.Last := To.First;

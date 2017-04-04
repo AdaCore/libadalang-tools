@@ -54,11 +54,11 @@ begin
 
    --=============================================
 
-   -- Subtest  01 - check the comparison functions - Time_Span
+   -- Subtest 01 - check the comparison functions - Time_Span
    declare
    begin
 
-      -- 01a   function "<"  (Left, Right: Time_Span) Return Boolean;
+      -- 01a function "<" (Left, Right: Time_Span) Return Boolean;
       if not Art."<" (Art.Time_Span_First, Art.Time_Span_Last) or
         Art."<" (Art.Time_Span_First, Art.Time_Span_First) or
         Art."<" (Art.Time_Span_Last, Art.Time_Span_First)
@@ -69,7 +69,7 @@ begin
          Report.Comment ("test 01a");
       end if;
 
-      -- 01b   function "<=" (Left, Right: Time_Span) Return Boolean;
+      -- 01b function "<=" (Left, Right: Time_Span) Return Boolean;
       if not Art."<=" (Art.Time_Span_First, Art.Time_Span_First) or
         not Art."<=" (Art.Time_Span_First, Art.Time_Span_Last) or
         Art."<=" (Art.Time_Span_Last, Art.Time_Span_First)
@@ -80,7 +80,7 @@ begin
          Report.Comment ("test 01b");
       end if;
 
-      -- 01c   function ">"  (Left, Right: Time_Span) Return Boolean;
+      -- 01c function ">" (Left, Right: Time_Span) Return Boolean;
       if not Art.">" (Art.Time_Span_Last, Art.Time_Span_First) or
         Art.">" (Art.Time_Span_Last, Art.Time_Span_Last) or
         Art.">" (Art.Time_Span_First, Art.Time_Span_Last)
@@ -91,7 +91,7 @@ begin
          Report.Comment ("test 01c");
       end if;
 
-      -- 01d   function ">=" (Left, Right: Time_Span) Return Boolean;
+      -- 01d function ">=" (Left, Right: Time_Span) Return Boolean;
       if not Art.">=" (Art.Time_Span_Last, Art.Time_Span_Last) or
         not Art.">=" (Art.Time_Span_Last, Art.Time_Span_First) or
         Art.">=" (Art.Time_Span_First, Art.Time_Span_Last)
@@ -109,11 +109,11 @@ begin
 
       --=============================================
 
-   -- Subtest  02 - check the comparison functions - Time
+   -- Subtest 02 - check the comparison functions - Time
    declare
    begin
 
-      -- 02a   function  "<"  (Left, Right: Time) Return Boolean;
+      -- 02a function "<" (Left, Right: Time) Return Boolean;
       if not Art."<" (Art.Time_First, Art.Time_Last) or
         Art."<" (Art.Time_First, Art.Time_First) or
         Art."<" (Art.Time_Last, Art.Time_First)
@@ -124,7 +124,7 @@ begin
          Report.Comment ("test 02a");
       end if;
 
-      -- 02b   function  "<=" (Left, Right: Time) Return Boolean;
+      -- 02b function "<=" (Left, Right: Time) Return Boolean;
       if not Art."<=" (Art.Time_First, Art.Time_First) or
         not Art."<=" (Art.Time_First, Art.Time_Last) or
         Art."<=" (Art.Time_Last, Art.Time_First)
@@ -135,7 +135,7 @@ begin
          Report.Comment ("test 02b");
       end if;
 
-      -- 02c   function  ">"  (Left, Right: Time) Return Boolean;
+      -- 02c function ">" (Left, Right: Time) Return Boolean;
       if not Art.">" (Art.Time_Last, Art.Time_First) or
         Art.">" (Art.Time_Last, Art.Time_Last) or
         Art.">" (Art.Time_First, Art.Time_Last)
@@ -146,7 +146,7 @@ begin
          Report.Comment ("test 02c");
       end if;
 
-      -- 02d   function  ">=" (Left, Right: Time) Return Boolean;
+      -- 02d function ">=" (Left, Right: Time) Return Boolean;
       if not Art.">=" (Art.Time_Last, Art.Time_Last) or
         not Art.">=" (Art.Time_Last, Art.Time_First) or
         Art.">=" (Art.Time_First, Art.Time_Last)
@@ -165,14 +165,14 @@ begin
 
       --=============================================
 
-   -- Subtest  03 - check the arithmetic functions - Time/Time_Span
+   -- Subtest 03 - check the arithmetic functions - Time/Time_Span
    declare
       Test_Time   : Art.Time;
       Test_Time_2 : Art.Time;
       Start_Time  : Art.Time;
    begin
 
-      -- 03a   function "+" (Left: Time; Right: Time_Span) return Time;
+      -- 03a function "+" (Left: Time; Right: Time_Span) return Time;
       --
       Test_Time := Art.Time_First;
       -- Call the function
@@ -184,7 +184,7 @@ begin
          Report.Comment ("test 03a");
       end if;
 
-      -- 03b   function "+" (Left: Time_Span; Right: Time) return Time;
+      -- 03b function "+" (Left: Time_Span; Right: Time) return Time;
       --
       Test_Time := Art.Time_First;
       -- call the function
@@ -194,7 +194,7 @@ begin
          Report.Failed ("Test 03b failed");
       end if;
 
-      -- 03c   function "-" (Left: Time; Right: Time_Span) return Time;
+      -- 03c function "-" (Left: Time; Right: Time_Span) return Time;
       Test_Time_2 := Art.Time_Last;
       -- Call the function
       Test_Time_2 := Art."-" (Test_Time_2, Art.Time_Span_Unit);
@@ -205,14 +205,14 @@ begin
       -- Now use the result from 03b
       Test_Time := Art."-" (Test_Time, Art.Time_Span_Unit);
 
-      -- check for equality (for a private type, "=" is automatically
-      -- available and is qualifiable)
+      -- check for equality (for a private type, "=" is automatically available
+      -- and is qualifiable)
       if not Art."=" (Test_Time, Art.Time_First) then
          Report.Failed ("Test 03c part II failed");
       end if;
 
-      -- 03d   function "-" (Left: Time; Right: Time) return Time_Span;
-      -- Set Start_Time to a bit more than Time_First
+      -- 03d function "-" (Left: Time; Right: Time) return Time_Span; Set
+      -- Start_Time to a bit more than Time_First
       Start_Time := Art."+" (Art.Time_First, Art.Time_Span_Unit);
       Test_Time  := Art."+" (Start_Time, Art.Time_Span_Unit);
       -- Test the function
@@ -232,14 +232,14 @@ begin
 
       --=============================================
 
-   -- Subtest  04 - check the arithmetic functions - Time_Span
+   -- Subtest 04 - check the arithmetic functions - Time_Span
    declare
       Test_Integer : Integer;
       Integer_One  : constant Integer := 1;
       Integer_Two  : constant Integer := 2;
    begin
 
-      -- 04a   function "+"  (Left, Right: Time_Span) Return Time_Span;
+      -- 04a function "+" (Left, Right: Time_Span) Return Time_Span;
       --
       -- call the function
       Test_Time_Span := Art."+" (Art.Time_Span_First, Art.Time_Span_Unit);
@@ -250,7 +250,7 @@ begin
          Report.Comment ("test 04a");
       end if;
 
-      -- 04b   function "-"  (Left, Right: Time_Span) Return Time_Span;
+      -- 04b function "-" (Left, Right: Time_Span) Return Time_Span;
       --
       -- call the function
       -- use the results of the last test
@@ -264,7 +264,7 @@ begin
          Report.Comment ("test 04b");
       end if;
 
-      -- 04c   function "-"  (Right: Time_Span) Return Time_Span;
+      -- 04c function "-" (Right: Time_Span) Return Time_Span;
       --
       -- call the function
       Time_Span_Neg := Art."-" (Art.Time_Span_Unit);
@@ -277,7 +277,7 @@ begin
          Report.Comment ("test 04c");
       end if;
 
-      -- 04d   function "/"  (Left, Right: Time_Span) Return Integer;
+      -- 04d function "/" (Left, Right: Time_Span) Return Integer;
       --
       -- call the function
       Test_Integer := Art."/" (Art.Time_Span_Unit, Art.Time_Span_Unit);
@@ -288,7 +288,7 @@ begin
          Report.Comment ("test 04d");
       end if;
 
-      -- 04e  function "/"(Left : Time_Span; Right : Integer) Return Time_Span;
+      -- 04e function "/"(Left : Time_Span; Right : Integer) Return Time_Span;
       --
       -- call the function
       Test_Time_Span := Art."/" (Art.Time_Span_Unit, Integer_One);
@@ -299,7 +299,7 @@ begin
          Report.Comment ("test 04e");
       end if;
 
-      -- 04f  function "*"(Left : Time_Span; Right : Integer) Return Time_Span;
+      -- 04f function "*"(Left : Time_Span; Right : Integer) Return Time_Span;
       --
       -- call the function
       Test_Time_Span := Art."*" (Art.Time_Span_Unit, Integer_Two);
@@ -311,7 +311,7 @@ begin
          Report.Comment ("test 04f");
       end if;
 
-      -- 04g  function "*"(Left : Integer; Right : Time_Span) Return Time_Span;
+      -- 04g function "*"(Left : Integer; Right : Time_Span) Return Time_Span;
       --
       -- call the function
       Test_Time_Span := Art."*" (Integer_Two, Art.Time_Span_Unit);
@@ -331,15 +331,15 @@ begin
 
       --=============================================
 
-   -- Subtest  05 - Miscellaneous
+   -- Subtest 05 - Miscellaneous
    declare
       Test_Duration   : Duration;
       Time_Span_Nano  : Art.Time_Span;
       Time_Span_Micro : Art.Time_Span;
       Time_Span_Milli : Art.Time_Span;
    begin
-      -- 05a   function "abs" (Right : Time_Span) return Time_Span;
-      -- Call the function
+      -- 05a function "abs" (Right : Time_Span) return Time_Span; Call the
+      -- function
       Test_Time_Span := Art."abs" (Time_Span_Neg);  -- (-Time_Span_Unit)
       -- Check the result
       Test_Time_Span := Art."+" (Test_Time_Span, Art.Time_Span_Unit);
@@ -349,16 +349,16 @@ begin
          Report.Comment ("test 05a");
       end if;
 
-      -- 05b   function To_Duration  (TS : Time_Span) return Duration;
+      -- 05b function To_Duration (TS : Time_Span) return Duration;
       --       function To_Time_Span (D  : Duration)  return Time_Span;
       -- Call the functions
       Test_Duration  := Art.To_Duration (Art.Time_Span_Unit);
       Test_Time_Span := Art.To_Time_Span (Test_Duration);
-      -- No check of the results because information could
-      -- be lost in the conversion process.
+      -- No check of the results because information could be lost in the
+      -- conversion process.
       Report.Comment ("test 05b");
 
-      -- 05c   function Nanoseconds  (NS : Integer) return Time_Span;
+      -- 05c function Nanoseconds (NS : Integer) return Time_Span;
       --       function Microseconds (US : Integer) return Time_Span;
       -- call the functions
       Time_Span_Nano  := Art.Nanoseconds (1_000);
@@ -371,7 +371,7 @@ begin
          Report.Comment ("test 05c");
       end if;
 
-      -- 05d   function Microseconds (US : Integer) return Time_Span;
+      -- 05d function Microseconds (US : Integer) return Time_Span;
       --       function Milliseconds (MS : Integer) return Time_Span;
       -- call the functions
       Time_Span_Micro := Art.Microseconds (1_000);

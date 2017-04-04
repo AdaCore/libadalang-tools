@@ -17,8 +17,8 @@ procedure Cxg2008 is
       package Complex_Types is new Ada.Numerics.Generic_Complex_Types (Real);
       use Complex_Types;
 
-      -- keep track if an accuracy failure has occurred so the test
-      -- can be short-circuited to avoid thousands of error messages.
+      -- keep track if an accuracy failure has occurred so the test can be
+      -- short-circuited to avoid thousands of error messages.
       Failure_Detected : Boolean := False;
 
       Mult_Mbe   : constant Real := 5.0;
@@ -33,8 +33,8 @@ procedure Cxg2008 is
          Abs_Error : Real;
          Max_Error : Real;
       begin
-         -- In the case where the expected result is very small or 0
-         -- we compute the maximum error as a multiple of Model_Epsilon instead
+         -- In the case where the expected result is very small or 0 we
+         -- compute the maximum error as a multiple of Model_Epsilon instead
          -- of Model_Epsilon and Expected.
          Rel_Error := Mbe * abs Expected.Re * Real'Model_Epsilon;
          Abs_Error := Mbe * Real'Model_Epsilon;
@@ -258,9 +258,9 @@ procedure Cxg2008 is
             Report.Failed ("exception in Do_Mult_Div for " & Args);
       end Do_Mult_Div;
 
-      -- select complex values X and Y where the real and imaginary
-      -- parts are selected from the ranges (1/radix..1) and
-      -- (1..radix).  This translates into quite a few combinations.
+      -- select complex values X and Y where the real and imaginary parts are
+      -- selected from the ranges (1/radix..1) and (1..radix). This translates
+      -- into quite a few combinations.
       procedure Mult_Div_Check is
          Samples     : constant      := 17;
          Radix       : constant Real := Real (Real'Machine_Radix);
@@ -314,8 +314,8 @@ procedure Cxg2008 is
       package Complex_Types is new Ada.Numerics.Generic_Complex_Types (Real);
       use Complex_Types;
 
-      -- keep track if an accuracy failure has occurred so the test
-      -- can be short-circuited to avoid thousands of error messages.
+      -- keep track if an accuracy failure has occurred so the test can be
+      -- short-circuited to avoid thousands of error messages.
       Failure_Detected : Boolean := False;
 
       Mult_Mbe   : constant Real := 5.0;
@@ -330,8 +330,8 @@ procedure Cxg2008 is
          Abs_Error : Real;
          Max_Error : Real;
       begin
-         -- In the case where the expected result is very small or 0
-         -- we compute the maximum error as a multiple of Model_Epsilon instead
+         -- In the case where the expected result is very small or 0 we
+         -- compute the maximum error as a multiple of Model_Epsilon instead
          -- of Model_Epsilon and Expected.
          Rel_Error := Mbe * abs Expected.Re * Real'Model_Epsilon;
          Abs_Error := Mbe * Real'Model_Epsilon;
@@ -555,9 +555,9 @@ procedure Cxg2008 is
             Report.Failed ("exception in Do_Mult_Div for " & Args);
       end Do_Mult_Div;
 
-      -- select complex values X and Y where the real and imaginary
-      -- parts are selected from the ranges (1/radix..1) and
-      -- (1..radix).  This translates into quite a few combinations.
+      -- select complex values X and Y where the real and imaginary parts are
+      -- selected from the ranges (1/radix..1) and (1..radix). This translates
+      -- into quite a few combinations.
       procedure Mult_Div_Check is
          Samples     : constant      := 17;
          Radix       : constant Real := Real (Real'Machine_Radix);
@@ -608,8 +608,8 @@ procedure Cxg2008 is
 
       use Ada.Numerics.Complex_Types;
 
-      -- keep track if an accuracy failure has occurred so the test
-      -- can be short-circuited to avoid thousands of error messages.
+      -- keep track if an accuracy failure has occurred so the test can be
+      -- short-circuited to avoid thousands of error messages.
       Failure_Detected : Boolean := False;
 
       Mult_Mbe   : constant Real := 5.0;
@@ -624,8 +624,8 @@ procedure Cxg2008 is
          Abs_Error : Real;
          Max_Error : Real;
       begin
-         -- In the case where the expected result is very small or 0
-         -- we compute the maximum error as a multiple of Model_Epsilon instead
+         -- In the case where the expected result is very small or 0 we
+         -- compute the maximum error as a multiple of Model_Epsilon instead
          -- of Model_Epsilon and Expected.
          Rel_Error := Mbe * abs Expected.Re * Real'Model_Epsilon;
          Abs_Error := Mbe * Real'Model_Epsilon;
@@ -849,9 +849,9 @@ procedure Cxg2008 is
             Report.Failed ("exception in Do_Mult_Div for " & Args);
       end Do_Mult_Div;
 
-      -- select complex values X and Y where the real and imaginary
-      -- parts are selected from the ranges (1/radix..1) and
-      -- (1..radix).  This translates into quite a few combinations.
+      -- select complex values X and Y where the real and imaginary parts are
+      -- selected from the ranges (1/radix..1) and (1..radix). This translates
+      -- into quite a few combinations.
       procedure Mult_Div_Check is
          Samples     : constant      := 17;
          Radix       : constant Real := Real (Real'Machine_Radix);

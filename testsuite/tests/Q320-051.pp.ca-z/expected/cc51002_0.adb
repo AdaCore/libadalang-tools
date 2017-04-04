@@ -2,9 +2,9 @@
 
 package body Cc51002_0 is
 
-   -- The implementation of Send is purely artificial; the validity of
-   -- its implementation in the context of the abstraction is irrelevant to
-   -- the feature being tested.
+   -- The implementation of Send is purely artificial; the validity of its
+   -- implementation in the context of the abstraction is irrelevant to the
+   -- feature being tested.
 
    function Send
      (Msg : in Msg_Type;

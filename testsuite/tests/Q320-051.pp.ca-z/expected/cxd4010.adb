@@ -73,16 +73,14 @@ procedure Cxd4010 is
          Expected          : Integer;
       end record;
 
-      -- enumeration of all the interesting cases where the
-      -- two delay alternatives may have different delay
-      -- expiration times and either of the delay alternatives
-      -- may be closed.
-      -- The second delay alternative will be taken only if
-      -- it has a shorter delay time than the first alternative
-      -- or if the first alternative is closed.
+      -- enumeration of all the interesting cases where the two delay
+      -- alternatives may have different delay expiration times and either of
+      -- the delay alternatives may be closed. The second delay alternative
+      -- will be taken only if it has a shorter delay time than the first
+      -- alternative or if the first alternative is closed.
       Tests : constant array (Positive range <>) of Test_Data :=
         (
-      --  1 open   long   2 open  long  expected
+      --  1 open long 2 open long expected
       (True, False, False, False, 1),
          (True, False, True, False, 1),
          (True, True, True, False, 2),

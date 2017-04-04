@@ -131,8 +131,8 @@ begin
          end if;
       end;
 
-      -- Check that Translation_Error is raised when a character is
-      -- repeated in the parameter "From" string.
+      -- Check that Translation_Error is raised when a character is repeated in
+      -- the parameter "From" string.
       declare
          Bad_Map : Wide_Maps.Wide_Character_Mapping;
       begin
@@ -165,9 +165,9 @@ begin
       end;
 
       -- Check that the access-to-subprogram type is defined and available.
-      -- This provides for one Wide_Character mapping capability only.
-      -- The actual mapping functionality will be tested in conjunction with
-      -- the tests of subprograms defined for Wide_String handling.
+      -- This provides for one Wide_Character mapping capability only. The
+      -- actual mapping functionality will be tested in conjunction with the
+      -- tests of subprograms defined for Wide_String handling.
 
       declare
 

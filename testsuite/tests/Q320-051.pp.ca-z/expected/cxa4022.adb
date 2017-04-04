@@ -100,9 +100,8 @@ begin
 
       -- Procedure Replace_Element
 
-      -- The unbounded wide string Incorrect_Spelling starts as "Guob Dai",
-      -- and is transformed by the following three procedure calls to
-      -- "Good Day".
+      -- The unbounded wide string Incorrect_Spelling starts as "Guob Dai", and
+      -- is transformed by the following three procedure calls to "Good Day".
 
       Asw.Replace_Element (Incorrect_Spelling, 2, Equiv ('o'));
 
@@ -122,10 +121,9 @@ begin
          Report.Failed ("Incorrect result from Procedure Replace_Element");
       end if;
 
-      -- Function Index with non-Identity map.
-      -- Evaluate the function Index with a non-identity map
-      -- parameter which will cause mapping of the source parameter
-      -- prior to the evaluation of the index position search.
+      -- Function Index with non-Identity map. Evaluate the function Index with
+      -- a non-identity map parameter which will cause mapping of the source
+      -- parameter prior to the evaluation of the index position search.
 
       Location :=
         Asw.Index
@@ -169,7 +167,7 @@ begin
       -- Function Index (for Sets).
       -- This version of Index uses Sets as the basis of the search.
 
-      -- Test = Inside, Going = Forward  (Default case).
+      -- Test = Inside, Going = Forward (Default case).
       Location :=
         Asw.Index
           (Source => Asw.To_Unbounded_Wide_String (Equiv ("abcdeabcde")),
@@ -232,9 +230,9 @@ begin
          Report.Failed ("Incorrect result from Index using Sets - 4");
       end if;
 
-      -- Function Index using access-to-subprogram mapping.
-      -- Evaluate the function Index with an access value that supplies the
-      -- mapping function for this version of Index.
+      -- Function Index using access-to-subprogram mapping. Evaluate the
+      -- function Index with an access value that supplies the mapping
+      -- function for this version of Index.
 
       Map_Ptr := Ab_To_Us_Mapping_Function'Access;
 
@@ -303,10 +301,10 @@ begin
            ("Incorrect result from Function Count, wide string parameter");
       end if;
 
-      -- Function Count with non-Identity mapping.
-      -- Evaluate the function Count with a non-identity map
-      -- parameter which will cause mapping of the source parameter
-      -- prior to the evaluation of the number of matching patterns.
+      -- Function Count with non-Identity mapping. Evaluate the function Count
+      -- with a non-identity map parameter which will cause mapping of the
+      -- source parameter prior to the evaluation of the number of matching
+      -- patterns.
 
       Total_Count :=
         Asw.Count
@@ -358,9 +356,9 @@ begin
          Report.Failed ("Incorrect result from function Count, w,w/o mapping");
       end if;
 
-      -- Function Count using access-to-subprogram mapping.
-      -- Evaluate the function Count with an access value specifying the
-      -- mapping that is going to occur to Source.
+      -- Function Count using access-to-subprogram mapping. Evaluate the
+      -- function Count with an access value specifying the mapping that
+      -- is going to occur to Source.
 
       Map_Ptr := Ab_To_Us_Mapping_Function'Access;
 

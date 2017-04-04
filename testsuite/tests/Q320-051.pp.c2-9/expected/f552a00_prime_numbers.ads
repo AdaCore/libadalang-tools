@@ -60,8 +60,8 @@ with Ada.Strings.Unbounded; use Ada;
 
 package F552a00_Prime_Numbers is
 
-   --  This package defines a simple Iterator Type that represents a
-   --  set of prime numbers from 1 to N.
+   --  This package defines a simple Iterator Type that represents a set of
+   --  prime numbers from 1 to N.
 
    function Is_Prime (Value : Natural) return Boolean;
 
@@ -73,9 +73,9 @@ package F552a00_Prime_Numbers is
      (Max_Value : Natural)
    is new Prime_Number_Iterator.Forward_Iterator with
    null record;
-   --  A Prime_Number_Set represents all the prime numbers between
-   --  1 and Max_Value. Two is not considered to be a prime number.
-   --  Max_Value may or may not be a prime number
+   --  A Prime_Number_Set represents all the prime numbers between 1 and
+   --  Max_Value. Two is not considered to be a prime number. Max_Value may
+   --  or may not be a prime number
 
    overriding function First (Object : Prime_Number_Set) return Natural;
 
@@ -89,8 +89,8 @@ package F552a00_Prime_Numbers is
 
    Tc_Call_History : Strings.Unbounded.Unbounded_String;
    --
-   --  A string capturing the call sequence to the above subprogams.
-   --  The following gets appended to the history for the above calls;
+   --  A string capturing the call sequence to the above subprogams. The
+   --  following gets appended to the history for the above calls;
    --      Iterate  => I
    --      First    => 1
    --      Next     => N( nn)        where nn is the next prime number

@@ -7,9 +7,9 @@ with Cxe4006_Normal;
 package body Cxe4006_Part_A1 is
 
    ---------  partition termination coordination ----------
-   -- use a task to prevent the partition from completing its execution
-   -- until the main procedure in partition B tells it to quit, and to insure
-   -- that Report.Result is not called until after the partition is started.
+   -- use a task to prevent the partition from completing its execution until
+   -- the main procedure in partition B tells it to quit, and to insure that
+   -- Report.Result is not called until after the partition is started.
 
    task Wait_For_Quit is
       entry Can_Quit;

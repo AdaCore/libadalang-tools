@@ -86,8 +86,8 @@ begin
       Message_2_Numb : Integer := 101;
       Message_3_Numb : Integer := 102;
 
-      -- Repository for the Task Identifications returned by the tasks
-      -- at the Start entries
+      -- Repository for the Task Identifications returned by the tasks at the
+      -- Start entries
       Message_1_Id : Ati.Task_Id;
       Message_2_Id : Ati.Task_Id;
       Message_3_Id : Ati.Task_Id;
@@ -108,12 +108,12 @@ begin
       begin
          accept Start (Numb : in Integer; Task_Id : out Ati.Task_Id) do
 
-            -- Hold the "message" in this task.  For the test we are just
-            -- noting the Message_Number
+            -- Hold the "message" in this task. For the test we are just noting
+            -- the Message_Number
             This_Message_Number := Numb;
 
-            -- Get the system assigned Task_Id for this task and "return"
-            -- it to the caller
+            -- Get the system assigned Task_Id for this task and "return" it to
+            -- the caller
             Task_Id := Ati.Current_Task;
 
          end Start;
@@ -124,13 +124,12 @@ begin
       end Message_Task;
 
       task body Distributor is
-      -- In an application the messages would be requeued to
-      -- other tasks downstream; for this test we just check
-      -- the arrival order
+      -- In an application the messages would be requeued to other tasks
+      -- downstream; for this test we just check the arrival order
       begin
          loop
-            -- This loop is used to wait for all the messages to arrive
-            -- on the Input queue
+            -- This loop is used to wait for all the messages to arrive on the
+            -- Input queue
             select
                accept Nb_Waiting (Number : out Natural) do
                   Number := Input'Count;
@@ -165,10 +164,10 @@ begin
 
    begin -- declare
 
-      -- Start up the first Message carrier task.  For the test, just
-      -- present it with a message Number rather than a whole message.
-      -- Save the Task Identification, which is returned at the end of the
-      -- rendezvous, for later priority modification
+      -- Start up the first Message carrier task. For the test, just present
+      -- it with a message Number rather than a whole message. Save the Task
+      -- Identification, which is returned at the end of the rendezvous, for
+      -- later priority modification
       Message_1.Start (Message_1_Numb, Message_1_Id);
 
       -- Wait for the message to arrive at the Distributor's queue
@@ -204,15 +203,15 @@ begin
 
       --===============
 
-      -- All messages are now waiting on the Distributor's queue.
-      -- Increase the priority of the third message.
+      -- All messages are now waiting on the Distributor's queue. Increase the
+      -- priority of the third message.
       Adp.Set_Priority (Priority_3q, Message_3_Id);
 
       -- allow time for the priority change to take effect
       delay Impdef.Minimum_Task_Switch;
 
-      -- The third message should now have been moved to the front of
-      -- the queue.  Start processing the messages, the distributor will now
+      -- The third message should now have been moved to the front of the
+      -- queue. Start processing the messages, the distributor will now
       -- check the ordering.
       Distributor.Go;
 

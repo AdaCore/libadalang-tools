@@ -8,17 +8,17 @@ with Cxe4005_Part_B;
 with Report;
 procedure Cxe4005_B is
 
-   -- table of remote access values to all the objects of interest.
-   -- Given this table, we can select a remote access value based upon
-   -- the type of the object and where the access attribute was evaluated.
+   -- table of remote access values to all the objects of interest. Given this
+   -- table, we can select a remote access value based upon the type of the
+   -- object and where the access attribute was evaluated.
    type Pointer_Table_Type is
      array (Access_Evaluation, Type_Selection) of Cxe4005_Part_A1.Racwt;
    Pointers : Pointer_Table_Type;
 
-   -- table of serial numbers for the objects used in the Pointers table.
-   -- Note that the serial numbers follow the convention that the hundreds
-   -- place indicates the package where the object is declared and the
-   -- least significant digit indicates the type of the object.
+   -- table of serial numbers for the objects used in the Pointers table. Note
+   -- that the serial numbers follow the convention that the hundreds place
+   -- indicates the package where the object is declared and the least
+   -- significant digit indicates the type of the object.
    type Object_Sn_Table_Type is
      array (Access_Evaluation, Type_Selection) of Integer;
    Objects : Object_Sn_Table_Type :=
@@ -57,12 +57,11 @@ begin  -- CXE4005_B
    end loop;
 
    -- Check the legal calls
-   -- This is done by calling Single_Controlling_Operand with
-   -- all the legal remote access to class wide type values we have
-   -- in the Pointers table and check that the serial number of the object
-   -- reported back is the expected value.
-   -- Dual_Controlling_Operands is also called with both operands
-   -- being the same.
+   -- This is done by calling Single_Controlling_Operand with all the legal
+   -- remote access to class wide type values we have in the Pointers table and
+   -- check that the serial number of the object reported back is the expected
+   -- value. Dual_Controlling_Operands is also called with both operands being
+   -- the same.
    declare
       Sn1 : Integer;
       Sn2 : Integer;
@@ -125,9 +124,8 @@ begin  -- CXE4005_B
            ("Unexpected exception during test" & Integer'Image (Test_Number));
    end;
 
-   -- Check that Program_Error is raised if the tag of the actual
-   -- parameter identifies a tagged type declared in a normal package.
-   -- E.4(18);6.0
+   -- Check that Program_Error is raised if the tag of the actual parameter
+   -- identifies a tagged type declared in a normal package. E.4(18);6.0
    declare
       X : Cxe4005_Normal.Open_But_Not_For_Export;
    begin
@@ -157,9 +155,9 @@ begin  -- CXE4005_B
             " a normal package");
    end;
 
-   -- Check that Program_Error is raised if the tag of the actual
-   -- parameter identifies a tagged type declared in the body of a
-   -- remote call interface package.
+   -- Check that Program_Error is raised if the tag of the actual parameter
+   -- identifies a tagged type declared in the body of a remote call interface
+   -- package.
    begin
       Cxe4005_Part_A1.Takes_Class_Wide
         (Cxe4005_Part_A1.Return_Open_Tagged_Type_Class);
@@ -185,10 +183,10 @@ begin  -- CXE4005_B
             " package body");
    end;
 
-   -- Check that in a dispatching call with two controlling operands
-   -- where the two remote access-to-class-wide values originated
-   -- from Access attribute_references in different partitions that
-   -- Constraint_Error is raised.
+   -- Check that in a dispatching call with two controlling operands where
+   -- the two remote access-to-class-wide values originated from Access
+   -- attribute_references in different partitions that Constraint_Error
+   -- is raised.
    declare
       Sn1 : Integer;
       Sn2 : Integer;
@@ -216,10 +214,10 @@ begin  -- CXE4005_B
            ("Incorrect exception raised." & " Constraint_Error was expected");
    end;
 
-   -- Check that in a dispatching call with two controlling operands
-   -- where the two remote access-to-class-wide values originated
-   -- from Access attribute_references in the same partition but
-   -- different RCI packages that no exception is raised.
+   -- Check that in a dispatching call with two controlling operands where
+   -- the two remote access-to-class-wide values originated from Access
+   -- attribute_references in the same partition but different RCI packages
+   -- that no exception is raised.
    declare
       Sn1 : Integer;
       Sn2 : Integer;

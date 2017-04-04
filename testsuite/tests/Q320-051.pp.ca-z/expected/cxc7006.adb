@@ -83,8 +83,8 @@ begin
    end Test_1;
 
    Test_2 :
-      -- Test fallback handler set up by a task that is not the direct
-      -- master of the tasks that are terminating.
+      -- Test fallback handler set up by a task that is not the direct master
+      -- of the tasks that are terminating.
        declare
       Raise_Code : constant String := "second";
    begin
@@ -179,9 +179,8 @@ begin
    end Test_2;
 
    Test_3 :
-      -- Test fallback handler when fallback handlers are set up by
-      -- multiple "ancestors" of a task; make sure the correct handler is
-      -- called.
+      -- Test fallback handler when fallback handlers are set up by multiple
+      -- "ancestors" of a task; make sure the correct handler is called.
        declare
       Raise_Code : constant String := "third";
    begin
@@ -425,14 +424,14 @@ begin
 
    Test_5 :
       -- Make sure behavior is correct when tasks that terminate also have
-      -- controlled local variables.  Make sure that (1) local variables are
-      -- finalized before the termination handler is called; (2) if
-      -- the task terminates normally but finalization raises an exception,
-      -- the termination handler is still called with
-      -- Cause=Unhandled_Exception; (3) if the task terminates because of an
-      -- unhandled exception, and the finalization then raises the exception,
-      -- the termination handler is called with an Exception_Occurrence that
-      -- identifies Program_Error (AI05-0202).
+      -- controlled local variables. Make sure that (1) local variables
+      -- are finalized before the termination handler is called; (2) if the
+      -- task terminates normally but finalization raises an exception, the
+      -- termination handler is still called with Cause=Unhandled_Exception;
+      -- (3) if the task terminates because of an unhandled exception, and the
+      -- finalization then raises the exception, the termination handler is
+      -- called with an Exception_Occurrence that identifies Program_Error
+      -- (AI05-0202).
        declare
       Raise_Code : constant String := "fifth";
    begin
@@ -487,9 +486,9 @@ begin
 
          for I in Id_Array'Range loop
             Cxc7006_1.Set_Handler_Test (I, Cxc7006_2.Test_Finalized'Access, I);
-            -- Effect is that when termination handler is called, it will
-            -- call a procedure that makes sure that the local controlled
-            -- object has been finalized before the handler was called.
+            -- Effect is that when termination handler is called, it will call
+            -- a procedure that makes sure that the local controlled object has
+            -- been finalized before the handler was called.
          end loop;
 
          Tt_Array (1).Which_Test (1, Body_Exception);

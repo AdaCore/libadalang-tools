@@ -109,8 +109,8 @@ package Cxe4003_Part_B1 is
 
    procedure Test_Complete;
 
-   -- a call to Block_2 will not return until Release_1 and Release_2
-   -- have been called.
+   -- a call to Block_2 will not return until Release_1 and Release_2 have been
+   -- called.
    procedure Block_2;
    -- a call to Release_1 is not accepted until Block_2 has been called
    procedure Release_1;

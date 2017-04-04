@@ -37,8 +37,8 @@ package body Cxd1008_0 is
 
    procedure Stop is
    begin
-      -- if the task is waiting then allow it to die gracefully.
-      -- otherwise, kill it.
+      -- if the task is waiting then allow it to die gracefully. otherwise,
+      -- kill it.
       select
          Cyclic.Stop;
          if Verbose then

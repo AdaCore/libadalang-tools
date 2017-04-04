@@ -11,7 +11,6 @@ package F760a00.Child is
    procedure Check_Fin_Lim_Ext (Message : in String);
 
    procedure Use_It (Object : in out Lim_Ext'Class);
-   -- Ensure that Object is not removed by optimization
-   -- as a dead variable.
+   -- Ensure that Object is not removed by optimization as a dead variable.
 
 end F760a00.Child;

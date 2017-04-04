@@ -72,12 +72,12 @@ begin
 
    Test_For_Text_Io_Support : begin
 
-   -- An application creates a text file in mode Out_File, with the intention
-   -- of entering string data packets into the file as appropriate.  In the
-   -- event that the particular environment where the application is running
-   -- does not support Text_IO, Use_Error will be raised on calls to Text_IO
-   -- operations.
-   -- This exception will be handled to produce a Not_Applicable result.
+      -- An application creates a text file in mode Out_File, with the
+      -- intention of entering string data packets into the file as
+      -- appropriate. In the event that the particular environment where the
+      -- application is running does not support Text_IO, Use_Error will be
+      -- raised on calls to Text_IO operations. This exception will be handled
+      -- to produce a Not_Applicable result.
 
       Ada.Text_Io.Create
         (File => An_Unbounded_File,
@@ -94,8 +94,8 @@ begin
       type String_Pointer_Type is access String_Sequence_Type;
 
 -- During the course of processing, the application creates a variety of data
--- pointers that refer to particular data items.  The possibility of having
--- null data values in this environment exists.
+-- pointers that refer to particular data items. The possibility of having null
+-- data values in this environment exists.
 
       Data_Packet_1 : String_Pointer_Type :=
         new String_Sequence_Type'("One Data Sequence 01");
@@ -141,8 +141,8 @@ begin
          Report.Failed ("Incorrect Col position after 1st Put");
       end if;
 
--- The application may close the file at some point following its initial
--- entry of data.
+-- The application may close the file at some point following its initial entry
+-- of data.
 
       Ada.Text_Io.Close (An_Unbounded_File);
 
@@ -172,7 +172,7 @@ begin
 
 -- In order to accommodate various scenarios, the application may have changed
 -- the mode of the data file to In_File in order to retrieve/verify some of
--- the data contained there.  However, with the need to place more data into
+-- the data contained there. However, with the need to place more data into
 -- the file, the file can be reset to Append_File mode.
 
       Reset1 : begin
@@ -191,8 +191,8 @@ begin
       Tc_Line := Natural (Ada.Text_Io.Line (An_Unbounded_File));
       Tc_Col  := Natural (Ada.Text_Io.Col (An_Unbounded_File));
 
--- Additional data can then be appended to the file.  On some occasions, an
--- attempt to enter a null string value into the file may occur.  This should
+-- Additional data can then be appended to the file. On some occasions, an
+-- attempt to enter a null string value into the file may occur. This should
 -- have no effect on the file, leaving it unchanged.
 
       -- No measurable effect from Put with null string.
@@ -237,11 +237,11 @@ begin
          Ada.Text_Io.Get_Line (An_Unbounded_File, File_Data, Tc_Width);
 
          -- Test control code.
-         -- Since it is implementation defined whether a page
-         -- terminator separates preexisting text from new text
-         -- following an open in append mode (as occurred above),
-         -- verify only that the first data item written to the
-         -- file was not overwritten by any subsequent call to Put.
+         -- Since it is implementation defined whether a page terminator
+         -- separates preexisting text from new text following an open in
+         -- append mode (as occurred above), verify only that the first data
+         -- item written to the file was not overwritten by any subsequent
+         -- call to Put.
 
          if (File_Data (File_Data'First) /= 'O') or
            (File_Data (20) /= '1')

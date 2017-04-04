@@ -79,8 +79,8 @@ begin
      ("CXAI032",
       "Test cursor iterators using function Iterate for ordered " & "maps");
 
-   -- Initialization: some distances from Paris
-   -- Entered in order of increasing distances to make sure that keys are not initially sorted
+   -- Initialization: some distances from Paris Entered in order of increasing
+   -- distances to make sure that keys are not initially sorted
    Insert (Distances, "NOGENT    ", 167.00 * Km);
    Insert (Distances, "LONDON    ", 343.15 * Km);
    Insert (Distances, "STUTTGART ", 505.54 * Km);

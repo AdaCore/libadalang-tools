@@ -20,10 +20,10 @@ procedure Cdb4001 is
            Integer (Subpool_Id'Last) *
            Integer (Index'Last + ((Index'Last * (Index'Last + 1)) / 2));
    --
-   -- For each (Subpool,Index) pair, one object is created for the
-   -- Obj_Ref array (declared below) and Index objects are created
-   -- for the Vec_Ref array (declared below; see also the "1 .. Idx" in
-   -- the body of Initializer_Task below).
+   -- For each (Subpool,Index) pair, one object is created for the Obj_Ref
+   -- array (declared below) and Index objects are created for the Vec_Ref
+   -- array (declared below; see also the "1 .. Idx" in the body of
+   -- Initializer_Task below).
 
    subtype Object_Id is Object_Id_Or_Nil range 1 .. Object_Id_Or_Nil'Last;
 
@@ -89,8 +89,8 @@ procedure Cdb4001 is
 
       Subpools : array (Subpool_Id) of Subpool_Handle;
       --  := (others => CDB4001_Tracked_Subpools.Create_Subpool (The_Pool));
-      --  Can't initialize with aggregate because Create_Subpool's
-      --  parameter is in-out.
+      --  Can't initialize with aggregate because Create_Subpool's parameter
+      --  is in-out.
 
       type Vec is array (Index range <>) of Rec;
 

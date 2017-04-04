@@ -82,15 +82,14 @@ begin
 
    begin
 
-      -- Determine whether the machine uses high-order first or low-order
-      -- first bit ordering.
-      -- On a high-order first machine, bit zero of a storage element is
-      -- the most significant bit (interpreting the sequence of bits that
-      -- represent a component as an unsigned integer value).
-      -- On a low-order first machine, bit zero is the least significant.
-      -- In this check, a right shift of one place on a Big Endian machine
-      -- will yield a result of one, while on a Little Endian machine the
-      -- result would be four.
+      -- Determine whether the machine uses high-order first or low-order first
+      -- bit ordering. On a high-order first machine, bit zero of a storage
+      -- element is the most significant bit (interpreting the sequence of
+      -- bits that represent a component as an unsigned integer value). On a
+      -- low-order first machine, bit zero is the least significant. In this
+      -- check, a right shift of one place on a Big Endian machine will yield
+      -- a result of one, while on a Little Endian machine the result would be
+      -- four.
 
       Tc_Val_Unsigned_8 := 2;
       Big_Endian        := (Shift_Right (Tc_Val_Unsigned_8, 1) = 1);
@@ -279,9 +278,9 @@ begin
 
       if Big_Endian then   -- High-order first bit ordering.
 
-         -- Case where the parameter Value is less than
-         -- one half of the modulus.  Zero bits will be shifted in.
-         -- Modulus of type Unsigned_8 is 256; half of the modulus is 128.
+         -- Case where the parameter Value is less than one half of the
+         -- modulus. Zero bits will be shifted in. Modulus of type
+         -- Unsigned_8 is 256; half of the modulus is 128.
 
          Tc_Amount            := 1;
          Tc_Val_Unsigned_8    := 127;  -- Less than one half of modulus.
@@ -310,8 +309,8 @@ begin
               ("Incorrect result from BE Shift_Right_Arithmetic - 3");
          end if;
 
-         -- Case where the parameter Value is greater than or equal to
-         -- one half of the modulus.  One bits will be shifted in.
+         -- Case where the parameter Value is greater than or equal to one half
+         -- of the modulus. One bits will be shifted in.
 
          Tc_Amount            := 1;
          Tc_Val_Unsigned_8    := 128;  -- One half of modulus.
@@ -351,8 +350,8 @@ begin
 
       else  -- Low-order first bit ordering
 
-         -- Case where the parameter Value is less than
-         -- one half of the modulus.  Zero bits will be shifted in.
+         -- Case where the parameter Value is less than one half of the
+         -- modulus. Zero bits will be shifted in.
 
          Tc_Amount            := 1;
          Tc_Val_Unsigned_8    := 127;  -- Less than one half of modulus.
@@ -382,8 +381,8 @@ begin
               ("Incorrect result from LE Shift_Right_Arithmetic - 3");
          end if;
 
-         -- Case where the parameter Value is greater than or equal to
-         -- one half of the modulus.  One bits will be shifted in.
+         -- Case where the parameter Value is greater than or equal to one half
+         -- of the modulus. One bits will be shifted in.
 
          Tc_Amount            := 1;
          Tc_Val_Unsigned_8    := 128;  -- One half of modulus.

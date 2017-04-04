@@ -80,8 +80,8 @@ procedure Cxd1003 is
 
    type Call_Id is range 1 .. 2;
    --
-   -- This is an array of flags showing the calls to the
-   -- the protected procedure.
+   -- This is an array of flags showing the calls to the the protected
+   -- procedure.
    Check_Called : array (1 .. Call_Id'Last) of Boolean := (others => False);
 
    -- test conditions detected during interrupt priority processing
@@ -112,10 +112,10 @@ begin
          procedure For_Ceiling_Check (Id : Call_Id) is
          --
          begin
-            -- In order to verify the check of Ceiling_Priority
-            -- we must ensure that this procedure actually gets called.
-            -- Since this accesses a global which is later checked the
-            -- call will not be optimized away.
+            -- In order to verify the check of Ceiling_Priority we must ensure
+            -- that this procedure actually gets called. Since this accesses
+            -- a global which is later checked the call will not be optimized
+            -- away.
             --
             Check_Called (Id) := True;
             --
@@ -134,9 +134,8 @@ begin
          pragma Interrupt_Priority (Priority_Int);
       end Interrupt_Task;
 
-      -- This task has the low priority.  It is called by the high priority
-      -- task.  We check that the rendezvous is performed at the high
-      -- priority
+      -- This task has the low priority. It is called by the high priority
+      -- task. We check that the rendezvous is performed at the high priority
       --
       task body Normal_Task is
 
@@ -146,8 +145,8 @@ begin
       begin
          declare  -- scope for good call
          begin
-            -- Call the PO.  The ceiling is higher than the active priority
-            -- of this task so the call should be accepted
+            -- Call the PO. The ceiling is higher than the active priority of
+            -- this task so the call should be accepted
             --
             Protected_Object.For_Ceiling_Check (Id1);  -- Should be O.K.
          exception
@@ -158,7 +157,7 @@ begin
          -- Now wait to be called by the Interrupt Task
          accept Interrupt_Action do
             -- The rendezvous should inherit the priority of the Interrupt
-            -- Task.  The call to the PO will now be at a higher priority
+            -- Task. The call to the PO will now be at a higher priority
             -- than the ceiling so Program_Error should be raised
             --
             Protected_Object.For_Ceiling_Check (Id2);
@@ -177,8 +176,8 @@ begin
             Report.Failed ("Unexpected Exception in Normal_Task");
       end Normal_Task;
 
-      -- This task has a high priority.  When it calls the Interrupt_Action
-      -- that rendezvous should inherit the high priority.
+      -- This task has a high priority. When it calls the Interrupt_Action that
+      -- rendezvous should inherit the high priority.
       --
       task body Interrupt_Task is
 
@@ -186,8 +185,8 @@ begin
          Normal_Task.Interrupt_Action;
       exception
          when others =>
-            -- Program_Error should be raised in the rendezvous but it
-            -- should be handled there and not propagated.
+            -- Program_Error should be raised in the rendezvous but it should
+            -- be handled there and not propagated.
             Unexpected_Exception_Raised_2 := True;
       end Interrupt_Task;
 
@@ -197,8 +196,8 @@ begin
 
    --=====================
 
-   -- Now check that the first call to the PO was made and that the second
-   -- was not
+   -- Now check that the first call to the PO was made and that the second was
+   -- not
    if not Check_Called (1) then
       -- The legitimate call did not take place
       Report.Failed ("First call to For_Ceiling_Check not effective");

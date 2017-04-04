@@ -69,9 +69,8 @@ begin
 
    Test_For_Text_Io_Support : begin
 
--- An application creates a text file with mode Append_File.
--- Use_Error will be raised if Text_IO operations or external files are not
--- supported.
+-- An application creates a text file with mode Append_File. Use_Error will be
+-- raised if Text_IO operations or external files are not supported.
 
       Text_Io.Create (Text_File, Text_Io.Append_File, Text_Filename);
    exception
@@ -121,8 +120,8 @@ begin
          Text_Io.Open (Text_File, Text_Io.Append_File, Text_Filename);
          Report.Failed ("Exception not raised by improper Open - 1");
 
--- Once again, an exception handler present within the application handles
--- the exception and processing continues.
+-- Once again, an exception handler present within the application handles the
+-- exception and processing continues.
 
       exception
          when Text_Io.Status_Error =>
@@ -142,9 +141,9 @@ begin
 
 -- At this point, the application attempts to Open (in Append_File mode) the
 -- file used in previous processing, but it attempts this Open using a name
--- string that does not correspond to any existing external file.
--- First make sure the file doesn't exist.  (If it did, then the check
--- for open in append mode wouldn't work.)
+-- string that does not correspond to any existing external file. First make
+-- sure the file doesn't exist. (If it did, then the check for open in append
+-- mode wouldn't work.)
 
          Verify_No_File : begin
             Text_Io.Open (Text_File, Text_Io.In_File, Tc_Wrong_Filename);

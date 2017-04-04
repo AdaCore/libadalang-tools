@@ -14,8 +14,7 @@ begin
       Report.Failed ("Incorrect result returned from Operate_On_It");
    end if;
    delay 2.5;
-   -- Now, let the main subprogram exit. It should start waiting for the
-   -- task in the body of CXC7004_0. The test's result is reported by that
-   -- task.
+   -- Now, let the main subprogram exit. It should start waiting for the task
+   -- in the body of CXC7004_0. The test's result is reported by that task.
 
 end Cxc7004;

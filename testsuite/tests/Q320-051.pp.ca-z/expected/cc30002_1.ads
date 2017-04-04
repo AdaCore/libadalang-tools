@@ -18,15 +18,15 @@ private
 
    -- The following explicit declaration of Set_Shutter_Speed does NOT override
    -- a corresponding implicit declaration in the generic. Therefore, its copy
-   -- does NOT override the implicit declaration (inherited from the actual)
-   -- in the instance.
+   -- does NOT override the implicit declaration (inherited from the actual) in
+   -- the instance.
 
    procedure Set_Shutter_Speed (C : in out Speed_Camera);
 
-   -- The following explicit declaration of Focus DOES override a
-   -- corresponding implicit declaration (inherited from the parent) in the
-   -- generic. Therefore, its copy overrides the implicit declaration
-   -- (inherited from the actual) in the instance.
+   -- The following explicit declaration of Focus DOES override a corresponding
+   -- implicit declaration (inherited from the parent) in the generic.
+   -- Therefore, its copy overrides the implicit declaration (inherited
+   -- from the actual) in the instance.
 
    procedure Focus (C : in out Speed_Camera);  -- Overrides implicit Focus
    -- in generic.

@@ -121,10 +121,9 @@ begin
    begin
 
       -- Procedure Replace_Slice
-      -- The functionality of this procedure
-      -- is similar to procedure Move, and
-      -- is tested here in the same manner, evaluated
-      -- with various combinations of parameters.
+      -- The functionality of this procedure is similar to procedure Move, and
+      -- is tested here in the same manner, evaluated with various combinations
+      -- of parameters.
 
       -- Index_Error propagation when Low > Source'Last + 1
 
@@ -218,9 +217,9 @@ begin
             "Justify = Center - 2");
       end if;
 
-      -- When the source string is longer than the target string, several
-      -- cases can be examined, with the results depending on the value of
-      -- the Drop parameter.
+      -- When the source string is longer than the target string, several cases
+      -- can be examined, with the results depending on the value of the Drop
+      -- parameter.
 
       -- Drop = Left
 
@@ -250,9 +249,9 @@ begin
 
       -- Drop = Error
 
-      -- The effect in this case depends on the value of the justify
-      -- parameter, and on whether any characters in Source other than
-      -- Pad would fail to be copied.
+      -- The effect in this case depends on the value of the justify parameter,
+      -- and on whether any characters in Source other than Pad would fail to
+      -- be copied.
 
       -- Drop = Error, Justify = Left, right overflow characters are pad.
 
@@ -561,8 +560,8 @@ begin
 
       Trim_String := "cdabcdefcd";
 
-      -- Remove the "cd" from each end of the string.  This will not effect
-      -- the "cd" slice at 5..6.
+      -- Remove the "cd" from each end of the string. This will not effect the
+      -- "cd" slice at 5..6.
 
       declare
          New_String : constant String :=
@@ -632,8 +631,8 @@ begin
 
       Tc_Set_Name ("Head");
 
-      -- Use the characters of Source_String1 ("abcde") and pad the
-      -- last five characters of Result_String with 'x' characters.
+      -- Use the characters of Source_String1 ("abcde") and pad the last five
+      -- characters of Result_String with 'x' characters.
 
       Result_String := Tc_Check (Asf.Head (Source_String1, 10, 'x'));
 
@@ -654,8 +653,8 @@ begin
 
       Tc_Set_Name ("Tail");
 
-      -- Use the characters of Source_String1 ("abcde") and pad the
-      -- first five characters of Result_String with 'x' characters.
+      -- Use the characters of Source_String1 ("abcde") and pad the first five
+      -- characters of Result_String with 'x' characters.
 
       Result_String := Tc_Check (Asf.Tail (Source_String1, 10, 'x'));
 
@@ -675,7 +674,7 @@ begin
          Report.Failed ("Incorrect result from Function Tail");
       end if;
 
-      -- Function "*"  - with (Natural, String) parameters
+      -- Function "*" - with (Natural, String) parameters
 
       Tc_Set_Name ("""*""");
 

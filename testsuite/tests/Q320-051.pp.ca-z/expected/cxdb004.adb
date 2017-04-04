@@ -132,9 +132,9 @@ begin
          accept Long_Rendezvous do
 
             Tc_Po.Set_In_Rendezvous;
-            -- This accept is here for handshaking only.  Once we reach
-            -- this point we know the caller is waiting within the rendezvous.
-            -- We arrange to Hold the caller.
+            -- This accept is here for handshaking only. Once we reach this
+            -- point we know the caller is waiting within the rendezvous. We
+            -- arrange to Hold the caller.
             accept Handshake;
          end Long_Rendezvous;
 
@@ -152,18 +152,17 @@ begin
       task body Caller is
       begin
          accept Get_Id (Task_Id : out Ati.Task_Id) do
-            -- Get the system assigned Task_Id for this task and
-            -- "return" it to the caller
+            -- Get the system assigned Task_Id for this task and "return" it to
+            -- the caller
             Task_Id := Ati.Current_Task;
          end Get_Id;
 
-         -- Call the receiver.  Once in the rendezvous both tasks
-         -- will wait.
+         -- Call the receiver. Once in the rendezvous both tasks will wait.
          Receiver.Long_Rendezvous;
 
-         -- When we first get back from the rendezvous the Caller should
-         -- be held and thus we should not execute the following.  Only
-         -- when the Caller is Continued should we execute it.
+         -- When we first get back from the rendezvous the Caller should be
+         -- held and thus we should not execute the following. Only when the
+         -- Caller is Continued should we execute it.
          Tc_Po.Set_Caller_Progressing;
 
       exception
@@ -183,9 +182,9 @@ begin
       --
       Aatc.Hold (Caller_Id);
 
-      -- We have Held the caller while it was in the rendezvous. We
-      -- now call the handshake entry. The Hold operation should not affect
-      -- the priority of the Receiver so the rendezvous should complete.
+      -- We have Held the caller while it was in the rendezvous. We now call
+      -- the handshake entry. The Hold operation should not affect the priority
+      -- of the Receiver so the rendezvous should complete.
       Receiver.Handshake;
 
       --
@@ -195,8 +194,8 @@ begin
          delay Impdef.Minimum_Task_Switch;
       end loop;
 
-      -- Prove that the Caller does not progress after the rendezvous
-      -- Delay enough to allow the Caller to (erroneously) progress
+      -- Prove that the Caller does not progress after the rendezvous Delay
+      -- enough to allow the Caller to (erroneously) progress
       --
       delay 3 * Impdef.Minimum_Task_Switch;
       --

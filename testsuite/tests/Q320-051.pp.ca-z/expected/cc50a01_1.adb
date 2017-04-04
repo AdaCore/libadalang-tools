@@ -1,8 +1,7 @@
      --==================================================================--
 
 --
--- This generic procedure performs all of the testing of the
--- stack abstraction.
+-- This generic procedure performs all of the testing of the stack abstraction.
 --
 
 with Report;

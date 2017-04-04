@@ -19,21 +19,21 @@ package body Cxc7004_0 is
    begin
       for I in 1 .. 60 loop
          -- Note: We use a for loop here so the test will terminate if
-         -- Is_Callable fails. In a real application, this would be
-         -- an unconditional, infinite loop.
+         -- Is_Callable fails. In a real application, this would be an
+         -- unconditional, infinite loop.
          select
             accept Operation
               (Caller_Id : out Ada.Task_Identification.Task_Id) do
                Caller_Id              := Operation'Caller;
                Any_Calls_Of_Operation := True;
-               -- A real application would do the processing for
-               -- "Operation" here.
+               -- A real application would do the processing for "Operation"
+               -- here.
                Report.Comment ("Operation called");
             end Operation;
          or
             delay 1.0;
-            -- A real application would do needed background processing
-            -- here. For instance, a GUI might check for messages here.
+            -- A real application would do needed background processing here.
+            -- For instance, a GUI might check for messages here.
          end select;
 
          -- Check if the main subprogram is waiting for tasks to terminate.
@@ -93,8 +93,7 @@ package body Cxc7004_0 is
          return; -- Processor terminated prematurely.
       end select;
 
-      -- Check that the various ways to get a task_id all have the
-      -- same result:
+      -- Check that the various ways to get a task_id all have the same result:
       Processor_Task_Id := Processor'Identity;
       Could_Have_Been_A_Lock.Get_Lock (Pt_Caller_Id);
       My_Caller_Id := Ada.Task_Identification.Current_Task;

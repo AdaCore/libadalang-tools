@@ -80,10 +80,10 @@ begin
 
    begin
 
-      -- Function To_Unbounded_String (version with Length parameter)
-      -- returns an unbounded string that represents an uninitialized String
-      -- whose length is Length.
-      -- Note: Unbounded_String length can vary conceptually between 0 and
+      -- Function To_Unbounded_String (version with Length parameter) returns
+      -- an unbounded string that represents an uninitialized String whose
+      -- length is Length. Note: Unbounded_String length can vary conceptually
+      -- between 0 and
       --       Natural'Last.
 
       if Unb.Length (Unb.To_Unbounded_String (Length => 10)) /= 10 or
@@ -102,8 +102,8 @@ begin
             "Length parameter");
       end if;
 
-      -- Procedure Append (Unbounded - Unbounded)
-      -- Note: For each of the Append procedures, the resulting string
+      -- Procedure Append (Unbounded - Unbounded) Note: For each of the Append
+      -- procedures, the resulting string
       --       represented by the Source parameter is given by the
       --       concatenation of the original value of Source and the value
       --       of New_Item.

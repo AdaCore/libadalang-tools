@@ -74,10 +74,10 @@ package Cxd6001_1 is
    package Tid renames Ada.Task_Identification;
    package Stc renames Ada.Synchronous_Task_Control;
 
-   -- Killer_Task takes a task_id of a task to abort.  Once it receives
-   -- the task_id it will suspend on Kill_Now awaiting notification
-   -- that it is time for it to do its dastardly deed.  Once it has
-   -- aborted its prey it will go back to waiting for another mission.
+   -- Killer_Task takes a task_id of a task to abort. Once it receives the
+   -- task_id it will suspend on Kill_Now awaiting notification that it is time
+   -- for it to do its dastardly deed. Once it has aborted its prey it will go
+   -- back to waiting for another mission.
    Kill_Now : Stc.Suspension_Object;
    task Killer_Task is
       -- high enough to preempt any non-interrupt level item

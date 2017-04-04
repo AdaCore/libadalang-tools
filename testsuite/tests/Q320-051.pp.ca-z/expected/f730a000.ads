@@ -52,8 +52,8 @@ package F730a000 is                                      -- tagged type.
    type Priv_Node_Type is new Parent_Type with private;  -- Private extension
    -- of parent type.
 
-   -- Inherits primitive operations of actual parameter corresponding
-   -- to Parent_Type.
+   -- Inherits primitive operations of actual parameter corresponding to
+   -- Parent_Type.
 
    type Priv_Node_Ptr is access Priv_Node_Type;
 

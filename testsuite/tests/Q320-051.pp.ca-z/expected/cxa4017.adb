@@ -114,11 +114,10 @@ begin
          Clear_Line : Natural := Lines_Per_Page;
       begin
          -- If two consecutive lines on the page are together less than the
-         -- maximum line length, then append those two lines, move up all
-         -- lower lines on the page, and blank out the last line.
-         -- This algorithm works one time through the page, does not perform
-         -- repetitive compression, and is designed for use with this test
-         -- program only.
+         -- maximum line length, then append those two lines, move up all lower
+         -- lines on the page, and blank out the last line. This algorithm
+         -- works one time through the page, does not perform repetitive
+         -- compression, and is designed for use with this test program only.
          for I in 1 .. Lines_Per_Page - 1 loop
             if Bs_40.Length (Page (I)) + Bs_40.Length (Page (I + 1)) <=
               Bs_40.Max_Length
@@ -173,8 +172,8 @@ begin
                    (Source  => Page (Line),
                     Pattern => Bs_40.To_Wide_String (Sm_Ada),
                     Going   => Ada.Strings.Backward);
-               -- A zero is returned by function Index if no occurrences of
-               -- the pattern wide string are found.
+               -- A zero is returned by function Index if no occurrences of the
+               -- pattern wide string are found.
                Finished := (Char_Pos = 0);
                if not Finished then
                   Bs_40.Replace_Slice
@@ -197,8 +196,8 @@ begin
          type Dictionary_Type is array (1 .. 2) of Word_Array_Type;
 
          -- Note that the "words" in the dictionary will require various
-         -- amounts of Trimming prior to their use in the bounded wide string
-         -- functions.
+         -- amounts of Trimming prior to their use in the bounded wide
+         -- string functions.
          Dictionary : Dictionary_Type :=
            (1 =>
               (Bs_40.To_Bounded_Wide_String ("  reliabel          "),
@@ -214,9 +213,9 @@ begin
 
          for Line in Page_Type'Range loop
 
-            -- Search for the first incorrectly spelled word in the
-            -- Dictionary, if it is found, replace it with the correctly
-            -- spelled word, using the Overwrite function.
+            -- Search for the first incorrectly spelled word in the Dictionary,
+            -- if it is found, replace it with the correctly spelled word,
+            -- using the Overwrite function.
 
             while not Finished loop
                Pos :=
@@ -297,10 +296,9 @@ begin
          Pos      : Natural := Natural'First;
          Finished : Boolean := False;
       begin
-         -- This procedure is designed to change the case of the phrase
-         -- "highly reliable" into upper case (a type of "Bolding").
-         -- All instances of the phrase on all lines of the page will be
-         -- modified.
+         -- This procedure is designed to change the case of the phrase "highly
+         -- reliable" into upper case (a type of "Bolding"). All instances of
+         -- the phrase on all lines of the page will be modified.
 
          for Line in Page_Type'First .. Page_Type'Last loop
             while not Finished loop

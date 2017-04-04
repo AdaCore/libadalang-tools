@@ -10,8 +10,8 @@ package body Fa11d00.Ca11d02_0.Ca11d02_1 is     -- Array_Complex
    is
 
       -- This procedure will raise an exception depending on the input
-      -- parameter.  The exception will be handled locally by the
-      -- "others" handler.
+      -- parameter. The exception will be handled locally by the "others"
+      -- handler.
 
       Result : Complex_Array_Type := (others => Zero);
 
@@ -40,8 +40,7 @@ package body Fa11d00.Ca11d02_0.Ca11d02_1 is     -- Array_Complex
    function Add (Left, Right : Complex_Array_Type) return Complex_Array_Type is
 
       -- This function will raise an exception depending on the input
-      -- parameter.  The exception will be propagated and handled
-      -- by the caller.
+      -- parameter. The exception will be propagated and handled by the caller.
 
       Result : Complex_Array_Type := (others => Zero);
 
@@ -67,8 +66,8 @@ package body Fa11d00.Ca11d02_0.Ca11d02_1 is     -- Array_Complex
    is
 
       -- This function will raise an exception depending on the input
-      -- parameter.  The exception will be handled/reraised to be
-      -- handled by the caller.
+      -- parameter. The exception will be handled/reraised to be handled by
+      -- the caller.
 
       Result : Complex_Array_Type := (others => Zero);
 

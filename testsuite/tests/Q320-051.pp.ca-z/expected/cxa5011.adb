@@ -97,10 +97,10 @@ begin
       Discrete_Generator_1, Discrete_Generator_2 : Discrete_Package.Generator;
       Float_Generator_1, Float_Generator_2       : Float_Random.Generator;
 
-      -- Declaration of bounded string packages instantiated with the
-      -- value of Max_Image_Width constant from each random number generator
-      -- package, and bounded string variables used to hold the image of
-      -- random number generator states.
+      -- Declaration of bounded string packages instantiated with the value of
+      -- Max_Image_Width constant from each random number generator package,
+      -- and bounded string variables used to hold the image of random number
+      -- generator states.
 
       package Discrete_String_Pack is new Generic_Bounded_Length
         (Discrete_Package.Max_Image_Width);
@@ -114,9 +114,9 @@ begin
       Tc_Max_Loop_Count : constant Natural := 1_000;
       Allowed_Matches   : constant Natural := 2;
       --
-      -- In a sequence of TC_Max_Loop_Count random numbers that should
-      -- not match, some may match by chance.  Up to Allowed_Matches
-      -- numbers may match before the test is considered to fail.
+      -- In a sequence of TC_Max_Loop_Count random numbers that should not
+      -- match, some may match by chance. Up to Allowed_Matches numbers may
+      -- match before the test is considered to fail.
       --
 
       procedure Check_Float_State
@@ -334,8 +334,8 @@ begin
 
          -- Since the discrete and float random generators are in the initial
          -- state, using Procedure Save to save the states of the generator
-         -- objects, and transforming these states into strings using
-         -- Function Image, should yield identical strings.
+         -- objects, and transforming these states into strings using Function
+         -- Image, should yield identical strings.
 
          Check_Discrete_State
            (Discrete_Generator_1,
@@ -349,9 +349,9 @@ begin
             Sub_Test            => 1,
             States_Should_Match => True);
 
-         -- Since the two random generator objects are in their initial
-         -- state, the values produced from each (upon calls to Random)
-         -- should be identical.
+         -- Since the two random generator objects are in their initial state,
+         -- the values produced from each (upon calls to Random) should be
+         -- identical.
 
          Check_Discrete_Values
            (Discrete_Generator_1,
@@ -368,16 +368,15 @@ begin
       end Sub_Test_1;
 
       Sub_Test_3 :
-         -- Check that when the Function Reset uses the same integer
-         -- initiator to reset two generators to the same state, the
-         -- resulting random values and the state from each generator
-         -- are identical.
+         -- Check that when the Function Reset uses the same integer initiator
+         -- to reset two generators to the same state, the resulting random
+         -- values and the state from each generator are identical.
           declare
          use Discrete_Package, Float_Random;
       begin
 
-         -- Reset the generators to the same states, using the version of
-         -- Function Reset with both generator parameter and initiator
+         -- Reset the generators to the same states, using the version
+         -- of Function Reset with both generator parameter and initiator
          -- specified.
 
          Tc_Seed := Integer (Random (Discrete_Generator_1));
@@ -403,8 +402,8 @@ begin
             States_Should_Match => True);
 
          -- Since the random generators have been reset to identical states,
-         -- the values produced from each (upon calls to Random) should
-         -- be identical.
+         -- the values produced from each (upon calls to Random) should be
+         -- identical.
 
          Check_Discrete_Values
            (Discrete_Generator_1,
@@ -421,9 +420,9 @@ begin
       end Sub_Test_3;
 
       Sub_Test_4 :
-         -- Check that when the Function Reset uses different integer
-         -- initiator values to reset two generators, the resulting random
-         -- numbers and states are different.
+         -- Check that when the Function Reset uses different integer initiator
+         -- values to reset two generators, the resulting random numbers and
+         -- states are different.
           begin
 
          -- Reset the generators to different states.
@@ -434,9 +433,9 @@ begin
            (Gen       => Discrete_Generator_1,
             Initiator => Tc_Seed);
 
-         -- Set the seed value to a different value for the second call
-         -- to Reset.
-         -- Note: A second call to Random could be made, as above, but that
+         -- Set the seed value to a different value for the second call to
+         -- Reset. Note: A second call to Random could be made, as above,
+         -- but that
          --       would not ensure that the resulting seed value was
          --       different from the first.
 
@@ -453,9 +452,8 @@ begin
          Float_Random.Reset (Float_Generator_1, 16#FF#);             -- 255
          Float_Random.Reset (Float_Generator_2, 2#1110_0000#);       -- 224
 
-         -- Since the two float random generators are in different
-         -- states, the bounded string images depicting their states should
-         -- differ.
+         -- Since the two float random generators are in different states, the
+         -- bounded string images depicting their states should differ.
 
          Check_Discrete_State
            (Discrete_Generator_1,
@@ -469,9 +467,9 @@ begin
             Sub_Test            => 4,
             States_Should_Match => False);
 
-         -- Since the two discrete random generator objects were reset
-         -- to different states, the values produced from each (upon calls
-         -- to Random) should differ.
+         -- Since the two discrete random generator objects were reset to
+         -- different states, the values produced from each (upon calls to
+         -- Random) should differ.
 
          Check_Discrete_Values
            (Discrete_Generator_1,

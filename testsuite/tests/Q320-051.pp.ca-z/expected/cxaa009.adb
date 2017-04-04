@@ -77,11 +77,10 @@ begin
    Test_For_Text_Io_Support : begin
 
       -- An implementation that does not support Text_IO in a particular
-      -- environment will raise Use_Error on calls to various
-      -- Text_IO operations.  This block statement encloses a call to
-      -- Create, which should raise the exception in a non-supportive
-      -- environment.  This exception will be handled to produce a
-      -- Not_Applicable result.
+      -- environment will raise Use_Error on calls to various Text_IO
+      -- operations. This block statement encloses a call to Create, which
+      -- should raise the exception in a non-supportive environment. This
+      -- exception will be handled to produce a Not_Applicable result.
 
       Text_Io.Create
         (File => Loan_File,                    -- Create in
@@ -122,10 +121,10 @@ begin
       package Loan_Io is new Text_Io.Float_Io (Loan_Balance_Type);
       package Rate_Io is new Text_Io.Float_Io (Interest_Rate_Type);
 
-      -- The following procedure performs the addition of loan information
-      -- into a data file.  Boolean status of True is returned if all of
-      -- the data entry was successful, False otherwise.
-      -- This demonstrates use of Float_IO using a variety of data formats.
+      -- The following procedure performs the addition of loan information into
+      -- a data file. Boolean status of True is returned if all of the data
+      -- entry was successful, False otherwise. This demonstrates use of
+      -- Float_IO using a variety of data formats.
 
       procedure Update_Loan_Info
         (The_File : in out Text_Io.File_Type;
@@ -150,9 +149,8 @@ begin
 
    begin
 
-      -- This code section simulates a bank maintaining a data file
-      -- containing information on loans that have been made.
-      -- The scenario:
+      -- This code section simulates a bank maintaining a data file containing
+      -- information on loans that have been made. The scenario:
       --    The loan file was created in Out_File mode.
       --    Some number of data records are added.
       --    The file is closed.
@@ -171,8 +169,8 @@ begin
 
       Text_Io.Close (Loan_File);
 
-      -- When subsequent data items are to be added to the file, the file
-      -- is opened in Append_File mode.
+      -- When subsequent data items are to be added to the file, the file is
+      -- opened in Append_File mode.
 
       Text_Io.Open (Loan_File,                            -- Open with
       Text_Io.Append_File,                  -- Append mode.
@@ -186,9 +184,8 @@ begin
 
       Text_Io.Close (Loan_File);
 
-      -- To add additional data to the file, the file
-      -- is again opened in Append_File mode (appending to a file
-      -- previously appended to).
+      -- To add additional data to the file, the file is again opened in
+      -- Append_File mode (appending to a file previously appended to).
 
       Text_Io.Open (Loan_File,                            -- Open with
       Text_Io.Append_File,                  -- Append mode.
@@ -234,8 +231,8 @@ begin
 
          end loop;
 
-         -- Verify all of the data fields read from the file.  Compare
-         -- with the values that were originally entered into the file.
+         -- Verify all of the data fields read from the file. Compare with the
+         -- values that were originally entered into the file.
 
          if (Tc_Bank_Ledger (1) /= Home_Refinance_Loan) or
            (Tc_Bank_Ledger (2) /= Line_Of_Credit_Loan) or

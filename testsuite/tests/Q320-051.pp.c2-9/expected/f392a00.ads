@@ -96,8 +96,8 @@ package F392a00 is          -- package Accounts
       Minimum_Balance : Dollar_Amount;
    end record;
 
-   -- Procedure Increment_Bank_Reserve inherited twice.
-   -- Procedure Assign_Representative inherited from parent (Savings_Account).
+   -- Procedure Increment_Bank_Reserve inherited twice. Procedure
+   -- Assign_Representative inherited from parent (Savings_Account).
 
    -- Primitive operations (Overridden).
    procedure Increment_Counters (Acct : in Preferred_Account);

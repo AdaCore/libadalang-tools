@@ -51,45 +51,45 @@ package Impdef.Annex_C is
 
 --=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--
 
-   -- Interrupt_To_Generate should identify a non-reserved interrupt
-   -- that can be predictably generated within a reasonable time interval
-   -- (as specified by the constant Wait_For_Interrupt) during testing.
+   -- Interrupt_To_Generate should identify a non-reserved interrupt that can
+   -- be predictably generated within a reasonable time interval (as specified
+   -- by the constant Wait_For_Interrupt) during testing.
 
    Interrupt_To_Generate : constant Ada.Interrupts.Interrupt_Id :=
      Ada.Interrupts.Names.Sigpipe;  -- to allow trivial compilation
-   -- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- MODIFY HERE AS NEEDED
+   -- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ --- MODIFY HERE AS NEEDED
 
 --=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--
 
    -- Wait_For_Interrupt should specify the reasonable time interval during
-   -- which the interrupt identified by Interrupt_To_Generate can be
-   -- expected to be generated.
+   -- which the interrupt identified by Interrupt_To_Generate can be expected
+   -- to be generated.
 
    Wait_For_Interrupt : constant := 1.0;
    --                               ^^^^ --- MODIFY HERE AS NEEDED
 
 --=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--
 
-   -- The procedure Enable_Interrupts should enable interrupts, if this
-   -- is required by the implementation. [See additional notes on this
-   -- procedure in the package body.]
+   -- The procedure Enable_Interrupts should enable interrupts, if this is
+   -- required by the implementation. [See additional notes on this procedure
+   -- in the package body.]
 
    procedure Enable_Interrupts;
 
 --=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--
 
    -- The procedure Generate_Interrupt should generate the interrupt
-   -- identified by Interrupt_To_Generate within the time interval
-   -- specified by Wait_For_Interrupt. [See additional notes on this
-   -- procedure in the package body.]
+   -- identified by Interrupt_To_Generate within the time interval specified
+   -- by Wait_For_Interrupt. [See additional notes on this procedure in the
+   -- package body.]
 
    procedure Generate_Interrupt;
 
 --=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--
 
-   -- Minimum_Atomic_Component_Size should specify the minimum number of
-   -- bits required for an atomic component of an integer type with range
-   -- 0 .. 15. This usually will be some multiple of System.Storage_Unit.
+   -- Minimum_Atomic_Component_Size should specify the minimum number of bits
+   -- required for an atomic component of an integer type with range 0 .. 15.
+   -- This usually will be some multiple of System.Storage_Unit.
 
    Minimum_Atomic_Component_Size : constant := System.Storage_Unit;
 --                                ^^^^^^^^^^^^^^^^^^^ --- MODIFY HERE AS NEEDED

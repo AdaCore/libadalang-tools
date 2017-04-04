@@ -54,8 +54,8 @@
 
 -- Child package of FA11B00.
    package Fa11b00.Ca11b02_0 is     -- Application_Two_Widget
--- This public child declares a derived type from its parent.  It
--- represents processing of widgets in a window system.
+-- This public child declares a derived type from its parent. It represents
+-- processing of widgets in a window system.
 
    -- Dimension of app2_widget is limited to 5000 pixels.
 

@@ -48,9 +48,8 @@
 --!
 
 package Ca11001_0 is   -- Cartesian_Complex
---  This package represents a Cartesian view of a complex number.  It contains
---  a private type plus subprograms to construct and decompose a complex
---  number.
+--  This package represents a Cartesian view of a complex number. It contains a
+--  private type plus subprograms to construct and decompose a complex number.
 
    type Complex_Int is range 0 .. 100;
 

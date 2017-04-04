@@ -107,13 +107,13 @@ package Cd30006_0 is
 
    Multiple_Type_Alignment : constant :=
      Integer'Min (Impdef.Max_Default_Alignment, 2 * S_Units_Per_Word);
-   -- Calculate a reasonable alignment, but not larger than the
-   -- implementation is required to support.
+   -- Calculate a reasonable alignment, but not larger than the implementation
+   -- is required to support.
 
    Small_Alignment : constant := Integer'Max (S_Units_Per_Word / 2, 1);
-   -- Calculate a reasonable small alignment, but not less than 1.
-   -- (If S_Units_per_Word = 1, 1/2 => 0 which causes problems
-   -- verifying alignment.)
+   -- Calculate a reasonable small alignment, but not less than 1. (If
+   -- S_Units_per_Word = 1, 1/2 => 0 which causes problems verifying
+   -- alignment.)
 
    type O_Some_Stuff is array (1 .. S_Units_Per_Word) of Storage_Element;
 
@@ -126,7 +126,7 @@ package Cd30006_0 is
 
    Multiple_Object_Alignment : constant :=
      Integer'Min (Impdef.Max_Linker_Alignment, 2 * S_Units_Per_Word);
-   -- Calculate a reasonable object alignment, but not larger than
-   -- the implementation is required to support.
+   -- Calculate a reasonable object alignment, but not larger than the
+   -- implementation is required to support.
 
 end Cd30006_0;

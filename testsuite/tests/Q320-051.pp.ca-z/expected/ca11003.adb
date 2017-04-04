@@ -16,11 +16,9 @@ begin
       "its ancestor unit's visible definitions");
 
    File_Processing :         -- Validate all of the capabilities contained in
-   -- the Menu package by exercising them on specific
-      -- files.  This will demonstrate the use of child
-      -- and grandchild functionality based on components
-      -- that have been declared in the
-      -- parent/grandparent package.
+   -- the Menu package by exercising them on specific files. This will
+      -- demonstrate the use of child and grandchild functionality based on
+      -- components that have been declared in the parent/grandparent package.
       declare
 
       function Validate

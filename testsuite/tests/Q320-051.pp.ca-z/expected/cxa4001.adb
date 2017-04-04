@@ -174,8 +174,8 @@ begin
          end if;
       end;
 
-      -- Check that Translation_Error is raised when a character is
-      -- repeated in the parameter "From" string.
+      -- Check that Translation_Error is raised when a character is repeated in
+      -- the parameter "From" string.
       declare
          Bad_Map : Maps.Character_Mapping;
       begin

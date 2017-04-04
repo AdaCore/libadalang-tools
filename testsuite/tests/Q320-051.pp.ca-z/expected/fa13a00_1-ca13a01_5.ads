@@ -1,7 +1,7 @@
 --==================================================================--
 
--- Public child package of an elevator application.  This package provides
--- an emergency operation.
+-- Public child package of an elevator application. This package provides an
+-- emergency operation.
 
 package Fa13a00_1.Ca13a01_5 is            -- Emergency Operation
 

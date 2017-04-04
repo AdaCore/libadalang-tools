@@ -75,11 +75,10 @@ begin
    Test_For_Text_Io_Support : begin
 
       -- An implementation that does not support Text_IO in a particular
-      -- environment will raise Use_Error on calls to various
-      -- Text_IO operations.  This block statement encloses a call to
-      -- Create, which should raise the exception in a non-supportive
-      -- environment.  This exception will be handled to produce a
-      -- Not_Applicable result.
+      -- environment will raise Use_Error on calls to various Text_IO
+      -- operations. This block statement encloses a call to Create, which
+      -- should raise the exception in a non-supportive environment. This
+      -- exception will be handled to produce a Not_Applicable result.
 
       Text_Io.Create
         (File => Status_Log,
@@ -200,8 +199,8 @@ begin
          Status_Io.Get (Status_Log, Tc_Reading1.Status);
          Text_Io.Skip_Line (Status_Log);
 
-         -- Verify the data read from the file.  Compare with the
-         -- record that was originally entered into the file.
+         -- Verify the data read from the file. Compare with the record that
+         -- was originally entered into the file.
 
          if (Tc_Reading1 /= Morning_Reading) then
             Report.Failed ("Data error on reading first record");
@@ -212,8 +211,8 @@ begin
          Status_Io.Get (Status_Log, Tc_Reading2.Status);
          Text_Io.Skip_Line (Status_Log);
 
-         -- Verify all of the data fields read from the file.  Compare
-         -- with the values that were originally entered into the file.
+         -- Verify all of the data fields read from the file. Compare with the
+         -- values that were originally entered into the file.
 
          if (Tc_Reading2.Day /= Evening_Reading.Day) or
            (Tc_Reading2.Hour /= Evening_Reading.Hour) or

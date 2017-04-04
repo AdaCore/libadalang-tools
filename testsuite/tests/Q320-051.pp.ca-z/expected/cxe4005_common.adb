@@ -5,11 +5,10 @@ package body Cxe4005_Common is
    Op_Is_Zero : exception;
 
    -- All objects that do not have an overriding definition of
-   -- Single_Controlling_Operand and Dual_Controlling_Operands
-   -- have a serial number with the least significant digit in
-   -- the range from 1 to 5.
-   -- If a wrong object is passed to these
-   -- routines then the exception Wrong_Object is raised.
+   -- Single_Controlling_Operand and Dual_Controlling_Operands have a serial
+   -- number with the least significant digit in the range from 1 to 5. If a
+   -- wrong object is passed to these routines then the exception Wrong_Object
+   -- is raised.
 
    procedure Single_Controlling_Operand
      (Rtt         :        access Root_Tagged_Type;

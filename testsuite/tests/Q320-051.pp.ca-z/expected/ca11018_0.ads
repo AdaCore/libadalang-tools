@@ -86,8 +86,8 @@ package Ca11018_0 is
 
    Tc_Particularly_Designated_Not_Zero : Boolean := False;
 
-   -- The following two functions are used to check for function
-   -- calls from the public generic child.
+   -- The following two functions are used to check for function calls from the
+   -- public generic child.
 
    function Tc_Designated_Success return Boolean;
 

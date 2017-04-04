@@ -57,8 +57,8 @@
 --
 --!
 
--- Private child package of an elevator application.  This package
--- provides maintenance operations.
+-- Private child package of an elevator application. This package provides
+-- maintenance operations.
 
 private package Fa13a00_1.Ca13a01_4 is    -- Maintenance operation
 

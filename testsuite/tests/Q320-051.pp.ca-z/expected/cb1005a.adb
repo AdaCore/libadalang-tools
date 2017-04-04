@@ -25,18 +25,16 @@
 -- CHECK THAT EXCEPTIONS DECLARED IN GENERIC PACKAGES AND PROCEDURES ARE
 -- CONSIDERED DISTINCT FOR EACH INSTANTIATION.
 
--- CHECK THAT AN EXCEPTION NAME DECLARED IN A GENERIC PACKAGE
--- INSTANTIATION IN A RECURSIVE PROCEDURE DENOTES THE SAME ENTITY
--- EVEN WHEN THE INSTANTIATION IS ELABORATED MORE THAN ONCE BECAUSE
--- OF RECURSIVE CALLS.
+-- CHECK THAT AN EXCEPTION NAME DECLARED IN A GENERIC PACKAGE INSTANTIATION IN
+-- A RECURSIVE PROCEDURE DENOTES THE SAME ENTITY EVEN WHEN THE INSTANTIATION IS
+-- ELABORATED MORE THAN ONCE BECAUSE OF RECURSIVE CALLS.
 
--- *** NOTE: This test has been modified since ACVC version 1.11 to    -- 9X
--- ***       remove incompatibilities associated with the transition   -- 9X
--- ***       to Ada 9X.                                                -- 9X
--- ***                                                                 -- 9X
+-- *** NOTE: This test has been modified since ACVC version 1.11 to -- 9X ***
+-- remove incompatibilities associated with the transition -- 9X *** to Ada 9X.
+-- -- 9X *** -- 9X
 
 -- TBN  9/23/86
--- MRM  03/30/93  REMOVED NUMERIC_ERROR FOR 9X COMPATIBILITY
+-- MRM 03/30/93 REMOVED NUMERIC_ERROR FOR 9X COMPATIBILITY
 
 with Report; use Report;
 procedure Cb1005a is

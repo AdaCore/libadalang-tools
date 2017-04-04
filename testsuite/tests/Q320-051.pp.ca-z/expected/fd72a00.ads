@@ -47,9 +47,9 @@ package Fd72a00 is
    package Num_Io renames Impdef.Address_Value_Io;
 
    -- the following conversions To/From Hex are to prevent optimizers from
-   -- optimizing out the otherwise senseless identity conversions, and
-   -- given the unknown nature of the type Number, the Identity operations
-   -- provided in Report will not suffice to this cause.
+   -- optimizing out the otherwise senseless identity conversions, and given
+   -- the unknown nature of the type Number, the Identity operations provided
+   -- in Report will not suffice to this cause.
 
    function Address_To_Hex (Adder : System.Address) return String;
 

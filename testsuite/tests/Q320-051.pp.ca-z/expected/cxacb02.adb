@@ -72,10 +72,10 @@ begin
 
       -- If an implementation does not support Stream_IO in a particular
       -- environment, the exception Use_Error or Name_Error will be raised on
-      -- calls to various Stream_IO operations.  This block statement
-      -- encloses a call to Create, which should produce an exception in a
-      -- non-supportive environment.  These exceptions will be handled to
-      -- produce a Not_Applicable result.
+      -- calls to various Stream_IO operations. This block statement encloses a
+      -- call to Create, which should produce an exception in a non-supportive
+      -- environment. These exceptions will be handled to produce a
+      -- Not_Applicable result.
 
       Ada.Streams.Stream_Io.Create
         (Util_File,
@@ -106,10 +106,9 @@ begin
             end case;
          end record;
 
-         -- Mode conformant, user defined subprograms that will override
-         -- the type-related attributes.
-         -- In this test, the user defines these subprograms to add/subtract
-         -- specific values from global variables.
+         -- Mode conformant, user defined subprograms that will override the
+         -- type-related attributes. In this test, the user defines these
+         -- subprograms to add/subtract specific values from global variables.
 
          function Service_Input
            (Stream : access Ada.Streams.Root_Stream_Type'Class)
@@ -174,12 +173,12 @@ begin
 
          -- Subprogram bodies.
          -- These subprograms are designed to override the default attributes
-         -- 'Input and 'Output for the specified types.  Each adds/subtracts
+         -- 'Input and 'Output for the specified types. Each adds/subtracts
          -- a quantity to/from a program control variable, indicating its
-         -- activity.  Each user defined "Input" function uses the 'Read
-         -- attribute for the type to accomplish the operation.  Likewise,
-         -- each user defined "Output" subprogram uses the 'Write attribute
-         -- for the type.
+         -- activity. Each user defined "Input" function uses the 'Read
+         -- attribute for the type to accomplish the operation. Likewise, each
+         -- user defined "Output" subprogram uses the 'Write attribute for the
+         -- type.
 
          function Service_Input
            (Stream : access Ada.Streams.Root_Stream_Type'Class)
@@ -189,15 +188,14 @@ begin
          begin
             Tc_Input_Total := Tc_Input_Total + 1;
 
-            -- Extract the discriminant value from the stream.
-            -- This discriminant would not otherwise be extracted from the
+            -- Extract the discriminant value from the stream. This
+            -- discriminant would not otherwise be extracted from the
             -- stream when the Service_Type'Read attribute is used below.
             Customer_Type'Read (Stream, Customer);
 
             declare
-               -- Declare a constant of Service_Type, using the value just
-               -- read from the stream as the discriminant value of the
-               -- object.
+               -- Declare a constant of Service_Type, using the value just read
+               -- from the stream as the discriminant value of the object.
                Service : Service_Type (Customer);
             begin
                Service_Type'Read (Stream, Service);
@@ -211,11 +209,10 @@ begin
          is
          begin
             Tc_Output_Total := Tc_Output_Total + 2;
-            -- Write the discriminant value to the stream.
-            -- The attribute 'Write (for the record type) will not write the
-            -- discriminant of the record object to the stream.  Therefore, it
-            -- must be explicitly written using the 'Write attribute of the
-            -- discriminant type.
+            -- Write the discriminant value to the stream. The attribute 'Write
+            -- (for the record type) will not write the discriminant of the
+            -- record object to the stream. Therefore, it must be explicitly
+            -- written using the 'Write attribute of the discriminant type.
             Customer_Type'Write (Stream, Item.Customer);
             -- Write the record component values (but not the discriminant) to
             -- the stream.
@@ -233,11 +230,11 @@ begin
          begin
             Tc_Input_Total := Tc_Input_Total + 3;
 
-            -- Read the value of the array bounds from the stream.
-            -- Use these bounds in the creation of an array object that will
-            -- be used to store data from the stream.
-            -- The array bound values would not otherwise be read from the
-            -- stream by use of the Service_History_Type'Read attribute.
+            -- Read the value of the array bounds from the stream. Use
+            -- these bounds in the creation of an array object that will be
+            -- used to store data from the stream. The array bound values
+            -- would not otherwise be read from the stream by use of the
+            -- Service_History_Type'Read attribute.
             Quarterly_Period_Type'Read (Stream, Quarter_Bound_Low);
             Quarterly_Period_Type'Read (Stream, Quarter_Bound_High);
             Month_In_Quarter_Type'Read (Stream, Month_Bound_Low);
@@ -278,8 +275,8 @@ begin
 
          Util_Stream := Ada.Streams.Stream_Io.Stream (Util_File);
 
-         -- Write data to the stream. A customer service record is followed
-         -- by a service history array.
+         -- Write data to the stream. A customer service record is followed by
+         -- a service history array.
 
          Service_Type'Output (Util_Stream, Customer1);
          Service_History_Type'Output (Util_Stream, C1_Service_History);
@@ -369,8 +366,8 @@ begin
             end if;
 
             -- Verify that the user defined subprograms were used to override
-            -- the default 'Input and 'Output attributes.
-            -- There were three calls on each of the user defined attributes.
+            -- the default 'Input and 'Output attributes. There were three
+            -- calls on each of the user defined attributes.
 
             if (Tc_Input_Total /= 12) or (Tc_Output_Total /= 27) then
                Report.Failed ("Incorrect use of user defined attributes");
@@ -398,8 +395,8 @@ begin
    exception
 
       -- Since Use_Error or Name_Error can be raised if, for the specified
-      -- mode, the environment does not support Stream_IO operations,
-      -- the following handlers are included:
+      -- mode, the environment does not support Stream_IO operations, the
+      -- following handlers are included:
 
       when Ada.Streams.Stream_Io.Name_Error =>
          Report.Not_Applicable ("Name_Error raised on Stream IO Create");

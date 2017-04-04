@@ -63,10 +63,10 @@ begin
       "Test that a timed entry call is attempted" &
       " regardless of the specified expiration time");
 
-   -- Some implementations will boot with the time set to 1901/1/1/0.0
-   -- This delay is such that the implementation guarantees that a
-   -- subsequent call to Ada.Calendar.Time_Of(1901,1,1) will yeild a
-   -- time that has already passed
+   -- Some implementations will boot with the time set to 1901/1/1/0.0 This
+   -- delay is such that the implementation guarantees that a subsequent call
+   -- to Ada.Calendar.Time_Of(1901,1,1) will yeild a time that has already
+   -- passed
    --
    delay Impdef.Delay_For_Time_Past;
 

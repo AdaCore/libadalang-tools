@@ -108,8 +108,8 @@ package body Cxd6002_1 is
    end Simple_Victim;
 
    procedure Simple_Case is
-   -- the action being aborted is not in a abort-deferred region
-   -- when the abort occurs.
+   -- the action being aborted is not in a abort-deferred region when the abort
+   -- occurs.
    begin
       Initialize;
       select

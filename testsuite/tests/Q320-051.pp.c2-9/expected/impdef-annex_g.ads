@@ -45,8 +45,8 @@ package Impdef.Annex_G is
 
 --=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--
 
-   -- This function must return a "negative zero" value for implementations
-   -- for which Float'Signed_Zeros is True.
+   -- This function must return a "negative zero" value for implementations for
+   -- which Float'Signed_Zeros is True.
 
    function Negative_Zero return Float;
 

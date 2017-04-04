@@ -102,8 +102,8 @@ begin
          entry Do_Test (Did_Suspend, Did_Resume : out Boolean);
       end Task_Of_Int_Priority;
 
-      -- These tasks call a protected object whose ceiling should be
-      -- higher than the task's priority
+      -- These tasks call a protected object whose ceiling should be higher
+      -- than the task's priority
       --
 
       task body Does_Suspension is

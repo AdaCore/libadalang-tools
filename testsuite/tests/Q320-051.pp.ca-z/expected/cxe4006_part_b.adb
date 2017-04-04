@@ -52,10 +52,9 @@ package body Cxe4006_Part_B is
 
    end Single_Controlling_Operand;
 
-   -- this procedure will pass all the parameters along to
-   -- partition A CXE4006_Part_A1.Make_Dispatching_Call_With.
-   -- Prior to making the call, the tag of X is checked to make
-   -- sure it is correct.
+   -- this procedure will pass all the parameters along to partition A
+   -- CXE4006_Part_A1.Make_Dispatching_Call_With. Prior to making the call,
+   -- the tag of X is checked to make sure it is correct.
    procedure Wrapped_Around
      (X           : in out Root_Tagged_Type'Class;
       Test_Number : in     Integer;

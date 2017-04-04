@@ -45,12 +45,11 @@ package Impdef.Annex_D is
 
 --=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--
 
-   -- This constant is the maximum storage size that can be specified
-   -- for a task.  A single task that has this size must be able to
-   -- run.  Ideally, this value is large enough that two tasks of this
-   -- size cannot run at the same time.  If the value is too small then
-   -- test CXDC001 may take longer to run.  See the test for further
-   -- information.
+   -- This constant is the maximum storage size that can be specified for a
+   -- task. A single task that has this size must be able to run. Ideally, this
+   -- value is large enough that two tasks of this size cannot run at the same
+   -- time. If the value is too small then test CXDC001 may take longer to run.
+   -- See the test for further information.
 
    Maximum_Task_Storage_Size : constant := 16_000_000;
    --                                      ^^^^^^^^^^ --- MODIFY HERE AS NEEDED

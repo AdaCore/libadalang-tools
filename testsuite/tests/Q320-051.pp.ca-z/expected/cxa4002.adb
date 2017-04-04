@@ -103,8 +103,8 @@ begin
          Pattern_String : in     String)
       is
 
-         -- Create a replacement string that is the same length as the
-         -- pattern string being removed.
+         -- Create a replacement string that is the same length as the pattern
+         -- string being removed.
          Replacement : constant String :=                              -- "*"
            Ada.Strings.Fixed."*" (Pattern_String'Length, 'X');
 
@@ -148,11 +148,10 @@ begin
 
    begin
 
-      -- Invoke Censor subprogram to cleanse text.
-      -- Loop through each line of text, and check for the presence of each
-      -- restricted word.
-      -- Use the Trim function to eliminate leading or trailing blanks from
-      -- the restricted word parameters.
+      -- Invoke Censor subprogram to cleanse text. Loop through each line of
+      -- text, and check for the presence of each restricted word. Use the Trim
+      -- function to eliminate leading or trailing blanks from the restricted
+      -- word parameters.
 
       for Line in 1 .. Number_Of_Lines loop
          for Word in Restricted_Words'Range loop

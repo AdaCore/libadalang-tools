@@ -84,8 +84,8 @@ begin
       -- Testing of Sin Function, both instantiated and pre-instantiated
       -- version.
 
-      -- Check that no exception occurs on computing the Sin with very
-      -- large (positive and negative) input values.
+      -- Check that no exception occurs on computing the Sin with very large
+      -- (positive and negative) input values.
 
       begin
          New_Float_Result := Gef.Sin (New_Float (Fxa5a00.Large));
@@ -205,8 +205,8 @@ begin
                "when the Cycle parameter is negative");
       end;
 
-      -- Check that no exception occurs on computing the Sin with very
-      -- large (positive and negative) input values and Cycle parameter.
+      -- Check that no exception occurs on computing the Sin with very large
+      -- (positive and negative) input values and Cycle parameter.
 
       begin
          New_Float_Result := Gef.Sin (New_Float (Fxa5a00.Large), 360.0);

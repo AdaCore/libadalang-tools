@@ -42,9 +42,9 @@
 --
 --!
 
--- Simulates a file processing application.  The processing package opens
--- files, reads files, does file processing, and generates reports.
--- The auditing package opens files, read files, and generates reports.
+-- Simulates a file processing application. The processing package opens files,
+-- reads files, does file processing, and generates reports. The auditing
+-- package opens files, read files, and generates reports.
 
 package Ca13003_0 is
 

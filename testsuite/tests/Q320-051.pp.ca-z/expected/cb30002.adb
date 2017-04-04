@@ -162,8 +162,8 @@ begin
          end;
       end loop;
 
-      -- Verify that the exception specific message is carried across
-      -- various boundaries:
+      -- Verify that the exception specific message is carried across various
+      -- boundaries:
 
       begin
 
@@ -203,8 +203,8 @@ begin
          exception
             when Exc : User_Exception_2 =>
 
-               -- The exception is reraised here; message should propagate
-               -- with exception occurrence.
+               -- The exception is reraised here; message should propagate with
+               -- exception occurrence.
 
                Ada.Exceptions.Reraise_Occurrence (Exc);
             when others =>

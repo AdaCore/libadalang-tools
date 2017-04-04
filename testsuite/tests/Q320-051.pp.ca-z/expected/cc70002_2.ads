@@ -19,8 +19,8 @@ generic          -- Mathematical 2D matrix addition group.
 
 package Cc70002_2 is
 
-   -- Add two matrices that are to be multiplied by coefficients:
-   -- [ ] = CA*[ ] + CB*[ ].
+   -- Add two matrices that are to be multiplied by coefficients: [ ] = CA*[ ]
+   -- + CB*[ ].
 
    function Add_Matrices_With_Coefficients
      (A  : Matrix_Ops.Matrix_2d;

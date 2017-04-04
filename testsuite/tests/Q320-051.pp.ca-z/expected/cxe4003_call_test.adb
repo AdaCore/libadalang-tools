@@ -7,20 +7,18 @@ with Cxe4003_Part_B4;
 with Cxe4003_Part_B5;
 package body Cxe4003_Call_Test is
 
-   -- Check that remote subprogram calls are executed at most once.
-   -- Check that potentially concurrent calls from multiple tasks
-   -- can be handled by the PCS.
+   -- Check that remote subprogram calls are executed at most once. Check that
+   -- potentially concurrent calls from multiple tasks can be handled by the
+   -- PCS.
    --
-   -- This is done by having several tasks each calling different
-   -- RCI packages in the partition B and passing in a sequence
-   -- number. The sequence number is checked to insure that each
-   -- call arrives and that they come in order.
-   -- The tasks are all of different priorities (if the Real-Time        --RT
-   -- annex is supported.  This should result in preemption occurring    --RT
-   -- which will exercise the PCS better.                                --RT
-   -- The Id is a unique value used to identify each task, tell it
-   -- what RCI package it is to be using, and initialize the Cycle so
-   -- that each task starts out on a slightly different schedule.
+   -- This is done by having several tasks each calling different RCI packages
+   -- in the partition B and passing in a sequence number. The sequence number
+   -- is checked to insure that each call arrives and that they come in order.
+   -- The tasks are all of different priorities (if the Real-Time --RT annex
+   -- is supported. This should result in preemption occurring --RT which will
+   -- exercise the PCS better. --RT The Id is a unique value used to identify
+   -- each task, tell it what RCI package it is to be using, and initialize the
+   -- Cycle so that each task starts out on a slightly different schedule.
 
    task type Client
      (Low   : Integer;

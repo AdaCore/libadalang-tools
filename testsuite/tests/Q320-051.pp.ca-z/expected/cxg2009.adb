@@ -102,8 +102,8 @@ procedure Cxg2009 is
       end Inf_Norm;
 
       function Two_Norm (V : Vector) return Real is
-         -- if greatest absolute vector element is 0 then return 0
-         -- else return greatest * sqrt (sum((element / greatest) ** 2)))
+         -- if greatest absolute vector element is 0 then return 0 else return
+         -- greatest * sqrt (sum((element / greatest) ** 2)))
          --   where greatest is Inf_Norm of the vector
          Inf_N       : Real;
          Sum_Squares : Real;
@@ -131,8 +131,8 @@ procedure Cxg2009 is
          Abs_Error : Real;
          Max_Error : Real;
       begin
-         -- In the case where the expected result is very small or 0
-         -- we compute the maximum error as a multiple of Model_Epsilon instead
+         -- In the case where the expected result is very small or 0 we
+         -- compute the maximum error as a multiple of Model_Epsilon instead
          -- of Model_Epsilon and Expected.
          Rel_Error := Mre * abs Expected * Real'Model_Epsilon;
          Abs_Error := Mre * Real'Model_Epsilon;
@@ -202,8 +202,8 @@ procedure Cxg2009 is
                   Vector_Length);
                Check (Inf_Norm (V1), 1.0, "inf_norm (1)", 0.0, Vector_Length);
 
-               -- error in computing Two_Norm and expected result
-               -- are as follows  (ME is Model_Epsilon * Expected_Value):
+               -- error in computing Two_Norm and expected result are as
+               -- follows (ME is Model_Epsilon * Expected_Value):
                --   2ME from expected Sqrt
                --   2ME from Sqrt in Two_Norm times the error in the
                --   vector calculation.
@@ -212,9 +212,8 @@ procedure Cxg2009 is
                --      N*1ME from squaring terms in Two_Norm
                --      N*1ME from the division of each term in Two_Norm
                --      (N-1)*1ME from the sum of the terms
-               -- This gives (2 + 2 * (N + N + (N-1)) ) * ME
-               -- which simplifies to (2 + 2N + 2N + 2N - 2) * ME
-               -- or 6*N*ME
+               -- This gives (2 + 2 * (N + N + (N-1)) ) * ME which simplifies
+               -- to (2 + 2N + 2N + 2N - 2) * ME or 6*N*ME
                Check
                  (Two_Norm (V1),
                   Sqrt (Real (Vector_Length)),
@@ -296,8 +295,8 @@ procedure Cxg2009 is
          Abs_Error : Real;
          Max_Error : Real;
       begin
-         -- In the case where the expected result is very small or 0
-         -- we compute the maximum error as a multiple of Model_Epsilon instead
+         -- In the case where the expected result is very small or 0 we
+         -- compute the maximum error as a multiple of Model_Epsilon instead
          -- of Model_Epsilon and Expected.
          Rel_Error := Mre * abs Expected * Real'Model_Epsilon;
          Abs_Error := Mre * Real'Model_Epsilon;
@@ -409,8 +408,7 @@ procedure Cxg2009 is
                --       N*ME for squaring
                --       N*ME for division
                --       (N-1)ME for sum
-               -- this results in [2 + 3 + 2(6N-1) ] * ME
-               -- or (12N + 3)ME
+               -- this results in [2 + 3 + 2(6N-1) ] * ME or (12N + 3)ME
                Check
                  (Two_Norm (V),
                   5.0 * Sqrt (Real (Vector_Length)),

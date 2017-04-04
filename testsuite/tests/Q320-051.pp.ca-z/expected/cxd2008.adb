@@ -190,15 +190,14 @@ procedure Cxd2008 is
    procedure Do_The_Test is
       Bunch_Of_Tasks : array (1 .. Max_Tasks) of Low_Task;
 
-      -- The main task needs to block until all the tasks in the
-      -- Bunch_Of_Tasks have had time to do their thing.
-      -- Since the Bunch_Of_Tasks cannot inform the main task when
-      -- they are done another mechanism is needed to insure that
-      -- they are given sufficient time to accomplish their work.
-      -- This is done by having a task of lower priority than the
-      -- Bunch_Of_Tasks that notifies the main task when it gets
-      -- a chance to run.  If it gets to run then the Bunch_Of_Tasks
-      -- must not be able to run so they must be done.
+      -- The main task needs to block until all the tasks in the Bunch_Of_Tasks
+      -- have had time to do their thing. Since the Bunch_Of_Tasks cannot
+      -- inform the main task when they are done another mechanism is needed
+      -- to insure that they are given sufficient time to accomplish their
+      -- work. This is done by having a task of lower priority than the
+      -- Bunch_Of_Tasks that notifies the main task when it gets a chance to
+      -- run. If it gets to run then the Bunch_Of_Tasks must not be able to
+      -- run so they must be done.
       Just_Waiting : Semaphore;
 
       task Lowest_Priority is
@@ -223,14 +222,11 @@ procedure Cxd2008 is
          Bunch_Of_Tasks (I).Take_A_Number (I);
       end loop;
 
-      -- the tasks are ready to block themselves so give
-      -- them a chance to do it.
-      -- The blocking here depends upon priorities.
-      -- Once we tell Lowest_Priority task that we are
-      -- ready to schedule a wakeup, the Lowest_Priority
-      -- task will not get a chance to run again until
-      -- the Bunch_Of_Tasks have had a chance to run
-      -- and put themselves to sleep.
+      -- the tasks are ready to block themselves so give them a chance to
+      -- do it. The blocking here depends upon priorities. Once we tell
+      -- Lowest_Priority task that we are ready to schedule a wakeup, the
+      -- Lowest_Priority task will not get a chance to run again until the
+      -- Bunch_Of_Tasks have had a chance to run and put themselves to sleep.
       Lowest_Priority.Wake_Me_Up;
       Just_Waiting.Wait;
 

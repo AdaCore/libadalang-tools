@@ -22,11 +22,10 @@
 --     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
 --     PARTICULAR PURPOSE OF SAID MATERIAL.
 --*
--- CHECK THAT DEFAULT GENERIC SUBPROGRAM PARAMETERS WORK CORRECTLY,
--- INCLUDING OVERLOADED AND PREDEFINED OPERATOR_SYMBOLS,
--- AND SUBPROGRAMS HIDDEN AT THE INSTANTIATION.
--- BOTH KINDS OF DEFAULTS ARE TESTED, FOR BOTH PROCEDURES
--- AND FUNCTIONS.
+-- CHECK THAT DEFAULT GENERIC SUBPROGRAM PARAMETERS WORK CORRECTLY, INCLUDING
+-- OVERLOADED AND PREDEFINED OPERATOR_SYMBOLS, AND SUBPROGRAMS HIDDEN AT THE
+-- INSTANTIATION. BOTH KINDS OF DEFAULTS ARE TESTED, FOR BOTH PROCEDURES AND
+-- FUNCTIONS.
 
 -- DAT 8/14/81
 -- JBG 5/5/83
@@ -100,10 +99,8 @@ procedure Cc1301a is
       -- (W := 61 + 7)
       -- (W := 68)
       Wi := Next (Int'(3) * 4 - 2 + Nexto (0));
-      -- (3 * 4) => (3 - 4) => (-3 + 4 - 10) = -9
-      -- ((-9) - 2) => (2 + 2 - (-9) - 20) = -7
-      -- (-7 + (-9)) => -16
-      -- (WI := 7 - (-16)) => (WI := 23)
+      -- (3 * 4) => (3 - 4) => (-3 + 4 - 10) = -9 ((-9) - 2) => (2 + 2 - (-9) -
+      -- 20) = -7 (-7 + (-9)) => -16 (WI := 7 - (-16)) => (WI := 23)
       Bumpo (Wi);
       -- (WI := 23 - 9) (= 14)
       Bump (Wi);

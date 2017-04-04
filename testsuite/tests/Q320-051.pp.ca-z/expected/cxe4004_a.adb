@@ -6,8 +6,7 @@ with Cxe4004_Part_A2;
 with Report;
 procedure Cxe4004_A is
 begin
-   -- this partition is a server that deals with calls
-   -- from CXE4004_B.
+   -- this partition is a server that deals with calls from CXE4004_B.
    Report.Test ("CXE4004_A", "Parameter passing across partitions (server)");
    Cxe4004_Part_A1.Can_Quit; -- OK to quit now.
 

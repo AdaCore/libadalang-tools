@@ -1,14 +1,13 @@
 --==================================================================--
 
--- Generic child package of physical map.  Instantiate this package to
--- create map copy with a new geographic feature, i.e., population, density,
--- or weather.
+-- Generic child package of physical map. Instantiate this package to create
+-- map copy with a new geographic feature, i.e., population, density, or
+-- weather.
 
 generic
 
    type Generic_Feature is (<>);  -- Any geographic feature, i.e., population,
-   -- density, or weather that can be
-   -- characterized by a scalar value.
+   -- density, or weather that can be characterized by a scalar value.
 
 package Ca11015_0.Ca11015_1 is
 

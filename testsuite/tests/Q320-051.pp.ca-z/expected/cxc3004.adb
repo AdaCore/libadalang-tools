@@ -19,8 +19,8 @@ begin -- CXC3004.
 
    Impdef.Annex_C.Enable_Interrupts;  -- Enable interrupts, if necessary.
 
---  The pragma Attach_Handler within the protected object (Static_Handler)
---  has attached Static_Handler.Handle_Interrupt to Interrupt_To_Generate.
+--  The pragma Attach_Handler within the protected object (Static_Handler) has
+--  attached Static_Handler.Handle_Interrupt to Interrupt_To_Generate.
 
    begin
 

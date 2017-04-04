@@ -48,8 +48,7 @@ begin
       The_Message : Message_Pkg.Particularly_Designated_Msg;
       -- Parent's private type.
 
-      -- Instantiate the public child to copy words to the top secret
-      -- message.
+      -- Instantiate the public child to copy words to the top secret message.
 
       package Copy_Particularly_Designated_Pkg is new Ca11018_0.Ca11018_2
         (Message_Pkg.Particularly_Designated_Msg);

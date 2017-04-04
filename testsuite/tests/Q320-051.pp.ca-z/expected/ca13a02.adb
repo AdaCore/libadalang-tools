@@ -1,8 +1,7 @@
 --==================================================================--
 
 with Fa13a00_1.Ca13a02_4;         -- Outside Elevator Button Operations
--- implicitly with Basic Elevator
--- Operations
+-- implicitly with Basic Elevator Operations
 with Report;
 
 procedure Ca13a02 is

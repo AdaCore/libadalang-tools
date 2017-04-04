@@ -34,9 +34,9 @@ begin
       Location => 2);
 
    -- Manipulation of the objects on the list is performed below directly
-   -- through the access objects. Although such manipulation is artificial
-   -- from the perspective of this usage model, it is not artificial in
-   -- general and is necessary in order to test the objective.
+   -- through the access objects. Although such manipulation is artificial from
+   -- the perspective of this usage model, it is not artificial in general and
+   -- is necessary in order to test the objective.
 
    -- Modify the first list element through the access object:
 

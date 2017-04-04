@@ -72,9 +72,8 @@ procedure Cxd4007 is
      (1 .. Number_Of_Levels => -1);
 
    protected Checker is
-      -- 30 numbered entries in jumbled order so that declaration
-      -- order bares no relationship to expected order for them to
-      -- be taken.
+      -- 30 numbered entries in jumbled order so that declaration order bares
+      -- no relationship to expected order for them to be taken.
       entry E25;
       entry E26;
       entry E1;
@@ -411,8 +410,8 @@ begin
       " serviced based upon the priority of the tasks waiting");
 
    declare  -- encapsulate the test
-      -- 30 tasks but not declared in order to prevent the source order
-      -- of the declarations from affecting the outcome
+      -- 30 tasks but not declared in order to prevent the source order of the
+      -- declarations from affecting the outcome
       T26 : T (26);
       T27 : T (27);
       T28 : T (28);
@@ -448,8 +447,8 @@ begin
       delay 31 * Impdef.Switch_To_New_Task;
       -- do all the protected actions now
       Checker.Open_The_Gates;
-      -- all the protected operations should complete before
-      -- the main procedure gets a chance to run again.
+      -- all the protected operations should complete before the main procedure
+      -- gets a chance to run again.
 
       -- check the results
       for I in Failed'Range loop

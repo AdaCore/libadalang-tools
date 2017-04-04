@@ -14,10 +14,9 @@ procedure Ca11009 is
 
 begin
 
-   -- This test indicates one approach to file management.
-   -- It is not intended to demonstrate full functionality, but rather
-   -- that the use of a private child package could provide a solution
-   -- to this type of situation.
+   -- This test indicates one approach to file management. It is not intended
+   -- to demonstrate full functionality, but rather that the use of a private
+   -- child package could provide a solution to this type of situation.
 
    Report.Test
      ("CA11009",
@@ -25,9 +24,8 @@ begin
       "entities declared in the visible part of the " &
       "parent unit of its parent unit");
 
-   -- Check initial conditions of the first entry in the file table.
-   -- These are all default values provided in the declaration of the
-   -- type File_Type.
+   -- Check initial conditions of the first entry in the file table. These are
+   -- all default values provided in the declaration of the type File_Type.
 
    if (not (Data_Base_File_Key = Default_Descriptor))
      and then
@@ -42,14 +40,14 @@ begin
    end if;
 
    -- Create/initialize file using the capability provided by the visible
-   -- interface to the operating system, OS.File_Manager.  The actual
-   -- processing routine is contained in the private grandchild package
-   -- Internals, which utilize the components from the grandparent package.
+   -- interface to the operating system, OS.File_Manager. The actual processing
+   -- routine is contained in the private grandchild package Internals, which
+   -- utilize the components from the grandparent package.
 
    File_Manager.Create_File (New_Mode, Data_Base_File_Key);
 
-   -- Verify that the initial conditions of the file table component have
-   -- been properly modified by the initialization function.
+   -- Verify that the initial conditions of the file table component have been
+   -- properly modified by the initialization function.
 
    if not
      ((File_Table (1).Descriptor = Data_Base_File_Key)

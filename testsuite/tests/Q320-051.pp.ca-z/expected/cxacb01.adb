@@ -82,10 +82,10 @@ begin
 
       -- If an implementation does not support Stream_IO in a particular
       -- environment, the exception Use_Error or Name_Error will be raised on
-      -- calls to various Stream_IO operations.  This block statement
-      -- encloses a call to Create, which should produce an exception in a
-      -- non-supportive environment.  These exceptions will be handled to
-      -- produce a Not_Applicable result.
+      -- calls to various Stream_IO operations. This block statement encloses a
+      -- call to Create, which should produce an exception in a non-supportive
+      -- environment. These exceptions will be handled to produce a
+      -- Not_Applicable result.
 
       Ada.Streams.Stream_Io.Create
         (Util_File,
@@ -126,8 +126,8 @@ begin
 
          Util_Stream := Ada.Streams.Stream_Io.Stream (Util_File);
 
-         -- Write all of the customer service information (record, numeric,
-         -- and array objects) defined in package FXACB00 into the stream.
+         -- Write all of the customer service information (record, numeric, and
+         -- array objects) defined in package FXACB00 into the stream.
 
          Data_Storage_Block : begin
 
@@ -183,9 +183,9 @@ begin
               (Util_File,
                Ada.Streams.Stream_Io.In_File);
 
-            -- Input all of the data that is contained in the stream.
-            -- Compare all data with the original data in package FXACB00
-            -- that was written to the stream.
+            -- Input all of the data that is contained in the stream. Compare
+            -- all data with the original data in package FXACB00 that was
+            -- written to the stream.
 
             Retrieve_Data_From_Stream (Tc_Residence, Tc_Months1, Tc_History1);
             Retrieve_Data_From_Stream (Tc_Apartment, Tc_Months2, Tc_History2);
@@ -194,15 +194,15 @@ begin
                Months   => Tc_Months3,
                History  => Tc_History3);
 
-            -- After all the data has been correctly extracted, the file
-            -- should be empty.
+            -- After all the data has been correctly extracted, the file should
+            -- be empty.
 
             if not Ada.Streams.Stream_Io.End_Of_File (Util_File) then
                Report.Failed ("Stream file not empty");
             end if;
 
-            -- Verify that the data values read from the stream are the same
-            -- as those written to the stream.
+            -- Verify that the data values read from the stream are the same as
+            -- those written to the stream.
 
             if
               ((Fxacb00."/=" (Fxacb00.Customer1, Tc_Residence))
@@ -251,8 +251,8 @@ begin
    exception
 
       -- Since Use_Error or Name_Error can be raised if, for the specified
-      -- mode, the environment does not support Stream_IO operations,
-      -- the following handlers are included:
+      -- mode, the environment does not support Stream_IO operations, the
+      -- following handlers are included:
 
       when Ada.Streams.Stream_Io.Name_Error =>
          Report.Not_Applicable ("Name_Error raised on Stream IO Create");

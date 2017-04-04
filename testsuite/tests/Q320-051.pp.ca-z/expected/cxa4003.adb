@@ -171,13 +171,13 @@ begin
          Db_Record.Name :=
            As.Fixed.Head (Info_String (1 .. Stop), Db_Record.Name'Length);
 
-         -- Replace any underscore characters in the name field
-         -- that were used to separate first/middle/last names.
+         -- Replace any underscore characters in the name field that were used
+         -- to separate first/middle/last names.
 
          As.Fixed.Translate (Db_Record.Name, Underscore_To_Blank_Map);
 
-         -- Continue the extraction process; now find the position of
-         -- the street number in the string.
+         -- Continue the extraction process; now find the position of the
+         -- street number in the string.
 
          Start := Stop + 1;
 
@@ -188,18 +188,17 @@ begin
             Start,
             Stop);
 
-         -- Store the street number field in the appropriate data base
-         -- element.
-         -- No modification of the default parameters of procedure Move
-         -- is required.
+         -- Store the street number field in the appropriate data base element.
+         -- No modification of the default parameters of procedure Move is
+         -- required.
 
          As.Fixed.Move
            (Source => Info_String (Start .. Stop),
             Target => Db_Record.Street_Number);
 
-         -- Continue the extraction process; find the street name in the
-         -- info string.  Skip blanks to the start of the street name, then
-         -- search for the index of the next blank character in the string.
+         -- Continue the extraction process; find the street name in the info
+         -- string. Skip blanks to the start of the street name, then search
+         -- for the index of the next blank character in the string.
 
          Start :=
            As.Fixed.Index_Non_Blank
@@ -218,8 +217,8 @@ begin
             1,
             Info_String (Start .. Stop));
 
-         -- Replace any underscore characters in the street name field
-         -- that were used as word separation.
+         -- Replace any underscore characters in the street name field that
+         -- were used as word separation.
 
          Db_Record.Street_Name :=
            As.Fixed.Translate (Db_Record.Street_Name, Underscore_To_Blank_Map);
@@ -244,13 +243,13 @@ begin
             Db_Record.City'Length,
             Info_String (Start .. Stop));
 
-         -- Replace any underscore characters in the city name field
-         -- that were used as word separation.
+         -- Replace any underscore characters in the city name field that were
+         -- used as word separation.
 
          As.Fixed.Translate (Db_Record.City, Underscore_To_Blank_Map);
 
-         -- Continue the extraction; remove the state identifier from the
-         -- info string.
+         -- Continue the extraction; remove the state identifier from the info
+         -- string.
 
          Start := Stop + 1;
 
@@ -272,9 +271,9 @@ begin
             Justify => Ada.Strings.Left,
             Pad     => As.Space);
 
-         -- Continue the extraction process; remove the final data item in
-         -- the info string, the zip code, and place it into the
-         -- corresponding data base element.
+         -- Continue the extraction process; remove the final data item in the
+         -- info string, the zip code, and place it into the corresponding data
+         -- base element.
 
          Db_Record.Zip_Code :=
            As.Fixed.Tail (Info_String, Db_Record.Zip_Code'Length);

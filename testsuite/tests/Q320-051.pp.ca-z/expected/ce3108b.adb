@@ -78,8 +78,7 @@ begin
          Txt_File_Name := new String'(Name (Txt_File));
          Close (Txt_File);
 
-         -- ATTEMPT TO RE-OPEN TEXT TEST FILE USING RETURNED NAME
-         -- VALUE
+         -- ATTEMPT TO RE-OPEN TEXT TEST FILE USING RETURNED NAME VALUE
 
          begin
             Open (Txt_File, In_File, Txt_File_Name.all);

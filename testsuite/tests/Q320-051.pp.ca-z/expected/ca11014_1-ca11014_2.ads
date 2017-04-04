@@ -1,7 +1,7 @@
 --==================================================================--
 
--- Generic child of list operation.  This child adds a layer of
--- functionality to the parent generic.
+-- Generic child of list operation. This child adds a layer of functionality to
+-- the parent generic.
 
 generic
 

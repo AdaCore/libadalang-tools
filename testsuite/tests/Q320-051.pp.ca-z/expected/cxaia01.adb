@@ -432,9 +432,9 @@ begin
               (Container => My_Vector_2,
                Where     => "Update_Element");
 
-         -- Note that can only perform writes that don't change the length of
-         -- the element otherwise will fail length check, only
-         -- Replace_Element can change the length.
+            -- Note that can only perform writes that don't change the
+            -- length of the element otherwise will fail length check,
+            -- only Replace_Element can change the length.
 
             -- Increment the second character of the string
 
@@ -454,8 +454,8 @@ begin
 
          if I mod 2 = 0 then
 
-         -- Replace by the "Keyth" string of the test data but with the second
-         -- character incremented
+            -- Replace by the "Keyth" string of the test data but with the
+            -- second character incremented
 
             My_Vector_1.Replace_Element
               (Position => My_Cursor_1,
@@ -469,8 +469,8 @@ begin
 
          end if;
 
-         -- Toggle between the two forms of Update_Element.  Different modulo
-         -- to give more permutations
+         -- Toggle between the two forms of Update_Element. Different modulo to
+         -- give more permutations
 
          if I mod 3 = 0 then
 
@@ -539,7 +539,7 @@ begin
 
    end if;
 
-   -- Test Move.  Target has the test values in reverse order, after Move these
+   -- Test Move. Target has the test values in reverse order, after Move these
    -- should be replaced (not appended) by the test values in forward order
 
    My_Vector_2.Clear;
@@ -589,7 +589,7 @@ begin
       Position => My_Cursor_2, -- First of added elements
       Count    => 2);
 
-   -- Elements with Default_Value.  Should insert in-between the previous two
+   -- Elements with Default_Value. Should insert in-between the previous two
    -- blocks
    My_Vector_2.Insert
      (Before   => My_Cursor_2,
@@ -605,9 +605,9 @@ begin
      (I => My_Vector_2.First,
       J => My_Cursor_2); -- First of added elements
 
-   -- The order should now be Default_Value, Value_In_Ptr_Array (1).all,
-   -- Default_Value, Default_Value, Value_In_Ptr_Array (2).all,
-   -- Value_In_Ptr_Array (2).all
+   -- The order should now be Default_Value, Value_In_Ptr_Array
+   -- (1).all, Default_Value, Default_Value, Value_In_Ptr_Array
+   -- (2).all, Value_In_Ptr_Array (2).all
 
    My_Vector_2.Swap
      (I => My_Vector_2.Last_Index,
@@ -773,12 +773,11 @@ begin
 
    My_Vector_2.Delete_First;
 
-   -- The order should now be Value_In_Ptr_Array (1).all,
-   -- Value_In_Ptr_Array (2).all, Default_Value, Value_In_Ptr_Array (3).all
-   -- Value_In_Ptr_Array (4).all, Value_In_Ptr_Array (5).all,
-   -- Value_In_Ptr_Array (6).all, Value_In_Ptr_Array (7).all,
-   -- Value_In_Ptr_Array (8).all,Value_In_Ptr_Array (9).all,
-   -- Value_In_Ptr_Array (10).all
+   -- The order should now be Value_In_Ptr_Array (1).all, Value_In_Ptr_Array
+   -- (2).all, Default_Value, Value_In_Ptr_Array (3).all Value_In_Ptr_Array
+   -- (4).all, Value_In_Ptr_Array (5).all, Value_In_Ptr_Array (6).all,
+   -- Value_In_Ptr_Array (7).all, Value_In_Ptr_Array (8).all,Value_In_Ptr_Array
+   -- (9).all, Value_In_Ptr_Array (10).all
 
    -- My_Vector_2 should now be empty so re-fill
 
@@ -799,11 +798,11 @@ begin
 
    My_Vector_2.Delete (Position => My_Cursor_2); -- Count should default to 1
 
-   -- The order should now be Value_In_Ptr_Array (1).all,
-   -- Value_In_Ptr_Array (2).all, Default_Value, Value_In_Ptr_Array (3).all,
-   -- Value_In_Ptr_Array (4).all, Value_In_Ptr_Array (7).all,
-   -- Value_In_Ptr_Array (5).all, Value_In_Ptr_Array (6).al
-   -- Value_In_Ptr_Array (9).all, Value_In_Ptr_Array (10).all
+   -- The order should now be Value_In_Ptr_Array (1).all, Value_In_Ptr_Array
+   -- (2).all, Default_Value, Value_In_Ptr_Array (3).all, Value_In_Ptr_Array
+   -- (4).all, Value_In_Ptr_Array (7).all, Value_In_Ptr_Array (5).all,
+   -- Value_In_Ptr_Array (6).al Value_In_Ptr_Array (9).all, Value_In_Ptr_Array
+   -- (10).all
 
    My_Index_1 := My_Vector_1.Find_Index (Item => Value_In_Ptr_Array (9).all);
 
@@ -814,9 +813,9 @@ begin
       New_Item => My_Vector_1.Element (Index => My_Index_1));
 
    -- My_Cursor_1 is now "ambiguous" as an element has been inserted earlier in
-   -- the list.  (In the GNAT v7.1.2 implementation it is still pointing to the
+   -- the list. (In the GNAT v7.1.2 implementation it is still pointing to the
    -- 11th element, but the original Value_In_Ptr_Array (9).all is now the 12th
-   -- element).  So find again, using Reverse_Find_Index to find the original
+   -- element). So find again, using Reverse_Find_Index to find the original
    -- Value_In_Ptr_Array (9).all not the copy before Value_In_Ptr_Array (2).all
 
    My_Index_1 :=
@@ -824,12 +823,12 @@ begin
 
    My_Vector_1.Delete (Index => My_Index_1); -- Count should default to 1
 
-   -- The order should now be Value_In_Ptr_Array (1).all,
-   -- Value_In_Ptr_Array (9).all, Value_In_Ptr_Array (2).all, Default_Value,
-   -- Value_In_Ptr_Array (3).all, Value_In_Ptr_Array (4).all,
-   -- Value_In_Ptr_Array (7).all, Value_In_Ptr_Array (5).all,
-   -- Value_In_Ptr_Array (6).all, Value_In_Ptr_Array (7).all,
-   -- Value_In_Ptr_Array (8).all, Value_In_Ptr_Array (10).all
+   -- The order should now be Value_In_Ptr_Array (1).all, Value_In_Ptr_Array
+   -- (9).all, Value_In_Ptr_Array (2).all, Default_Value, Value_In_Ptr_Array
+   -- (3).all, Value_In_Ptr_Array (4).all, Value_In_Ptr_Array
+   -- (7).all, Value_In_Ptr_Array (5).all, Value_In_Ptr_Array
+   -- (6).all, Value_In_Ptr_Array (7).all, Value_In_Ptr_Array
+   -- (8).all, Value_In_Ptr_Array (10).all
 
    My_Cursor_1 := My_Vector_1.First;
 

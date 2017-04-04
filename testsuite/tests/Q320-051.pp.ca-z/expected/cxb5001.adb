@@ -80,8 +80,8 @@ begin
 
    begin    -- encapsulation
 
-      -- Arrange that the calls to the subprograms are compiled but
-      -- not executed
+      -- Arrange that the calls to the subprograms are compiled but not
+      -- executed
       --
       if not Report.Equal (Tc_Int, Tc_Int) then
 

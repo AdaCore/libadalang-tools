@@ -3,7 +3,7 @@
 --=======================================================================--
 
 with F393b00.C393b14_0;               -- private sibling is visible in the
--- Alert_Foundation.Private_Child   -- body of a public sibling
+-- Alert_Foundation.Private_Child -- body of a public sibling
 package body F393b00.C393b14_1 is
    -- Alert_Foundation.Public_Child
    package Priv renames F393b00.C393b14_0;

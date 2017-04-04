@@ -63,16 +63,14 @@
 
 package Cxa4026_0 is
 
-   -- Function Map_To_Lower_Case will return the lower case form of
-   -- Characters in the range 'A'..'Z' only, and return the input
-   -- character otherwise.
+   -- Function Map_To_Lower_Case will return the lower case form of Characters
+   -- in the range 'A'..'Z' only, and return the input character otherwise.
 
    function Map_To_Lower_Case (From : Character) return Character;
 
-   -- Function Map_To_Upper_Case will return the upper case form of
-   -- Characters in the range 'a'..'z', or whose position is in one
-   -- of the ranges 223..246 or 248..255, provided the character has
-   -- an upper case form.
+   -- Function Map_To_Upper_Case will return the upper case form of Characters
+   -- in the range 'a'..'z', or whose position is in one of the ranges 223..246
+   -- or 248..255, provided the character has an upper case form.
 
    function Map_To_Upper_Case (From : Character) return Character;
 

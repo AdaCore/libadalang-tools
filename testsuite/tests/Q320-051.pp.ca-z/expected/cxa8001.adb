@@ -96,9 +96,9 @@ begin
 
       -- An implementation that does not support Sequential_IO in a particular
       -- environment will raise Use_Error or Name_Error on calls to various
-      -- Sequential_IO operations.  This block statement encloses a call to
-      -- Create, which should produce an exception in a non-supportive
-      -- environment.  These exceptions will be handled to produce a
+      -- Sequential_IO operations. This block statement encloses a call
+      -- to Create, which should produce an exception in a non-supportive
+      -- environment. These exceptions will be handled to produce a
       -- Not_Applicable result.
 
       Order_Io.Create
@@ -129,7 +129,7 @@ begin
       Order_Io.Close (File => Order_File);     -- Close file.
 
       --
-      -- Enter additional data records into the file.  (Append to a file of
+      -- Enter additional data records into the file. (Append to a file of
       -- previous mode Out_File).
       --
       Order_Io.Open (Order_File,               -- Open Sequential_IO file
@@ -152,8 +152,8 @@ begin
       end;
 
       --
-      -- The following code segment demonstrates appending data to a file
-      -- that has been previously appended to.
+      -- The following code segment demonstrates appending data to a file that
+      -- has been previously appended to.
       --
 
       Order_Io.Open (Order_File,               -- Open Sequential_IO file
@@ -177,9 +177,9 @@ begin
          Order_Io.Read (Order_File, Tc_Order2);
          Order_Io.Read (Order_File, Tc_Order3);
 
-         -- Compare the contents of each with the individual data items.
-         -- If items read from file do not match the items placed into
-         -- the file, in the appropriate order, then fail.
+         -- Compare the contents of each with the individual data items. If
+         -- items read from file do not match the items placed into the file,
+         -- in the appropriate order, then fail.
 
          if
            ((Tc_Order1 /= Buyer_1) or

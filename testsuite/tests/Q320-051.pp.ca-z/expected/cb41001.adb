@@ -77,13 +77,13 @@ begin
       procedure Propagate_User_Exception is
          Hidden_Exception : exception;
       begin
-         -- Use the 'Identity function to store the unique identity of a
-         -- user defined exception into a variable of type Exception_Id.
+         -- Use the 'Identity function to store the unique identity of a user
+         -- defined exception into a variable of type Exception_Id.
 
          An_Exception_Id := A_User_Defined_Exception'Identity;
 
-         -- Raise this user defined exception using the result of the
-         -- 'Identity attribute.
+         -- Raise this user defined exception using the result of the 'Identity
+         -- attribute.
 
          Ada.Exceptions.Raise_Exception (E => An_Exception_Id);
 
@@ -173,8 +173,8 @@ begin
             when Block_Excpt : Constraint_Error =>  -- Expected exception.
                Tc_Check_Points (4) := True;
 
-               -- Reraise the exception in a scope where the exception
-               -- was not originally raised.
+               -- Reraise the exception in a scope where the exception was not
+               -- originally raised.
 
                Ada.Exceptions.Reraise_Occurrence (X => Block_Excpt);
                Report.Failed

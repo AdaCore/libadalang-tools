@@ -105,8 +105,8 @@ begin
 
    begin
 
-      -- Check that the function To_Decimal with Binary parameter will
-      -- return the corresponding value of the decimal type Num.
+      -- Check that the function To_Decimal with Binary parameter will return
+      -- the corresponding value of the decimal type Num.
 
       if Pack_1.To_Decimal (Item => Pack_1.To_Binary (Tc_Dec_1)) /= Tc_Dec_1 or
         Pack_2.To_Decimal (Pack_2.To_Binary (Tc_Dec_2)) /= Tc_Dec_2
@@ -129,8 +129,8 @@ begin
             "Binary parameter - 3");
       end if;
 
-      -- Check that the function To_Decimal with Long_Binary parameter
-      -- will return the corresponding value of the decimal type Num.
+      -- Check that the function To_Decimal with Long_Binary parameter will
+      -- return the corresponding value of the decimal type Num.
 
       if Pack_3.To_Decimal (Item => Pack_3.To_Long_Binary (Tc_Dec_3)) /=
         Tc_Dec_3 or
@@ -156,10 +156,10 @@ begin
             "Long_Binary parameter - 3");
       end if;
 
-      -- Check that both of the To_Decimal functions described above
-      -- will propagate Conversion_Error if the converted value Item is
-      -- outside the range of type Num.
-      -- Note: Binary/Long_Binary parameter values are created by an
+      -- Check that both of the To_Decimal functions described above will
+      -- propagate Conversion_Error if the converted value Item is outside
+      -- the range of type Num. Note: Binary/Long_Binary parameter values
+      -- are created by an
       --       instantiation of To_Binary/To_Long_Binary with a larger
       --       Num type as the generic formal.
 
@@ -207,8 +207,8 @@ begin
                "value Item was outside the range of type Num");
       end Long_Binary_Parameter;
 
-      -- Check that the function To_Binary converts a value of the Ada
-      -- decimal type Num into a Binary type value.
+      -- Check that the function To_Binary converts a value of the Ada decimal
+      -- type Num into a Binary type value.
 
       Tc_Dec_1 := 123.4;
       Tc_Dec_2 := 9.99;
@@ -224,8 +224,8 @@ begin
          Report.Failed ("Incorrect result from function To_Binary - 2");
       end if;
 
-      -- Check that the function To_Long_Binary converts a value of the
-      -- Ada decimal type Num into a Long_Binary type value.
+      -- Check that the function To_Long_Binary converts a value of the Ada
+      -- decimal type Num into a Long_Binary type value.
 
       Tc_Dec_3 := 9.001;
       Tc_Dec_4 := 123.456_7;

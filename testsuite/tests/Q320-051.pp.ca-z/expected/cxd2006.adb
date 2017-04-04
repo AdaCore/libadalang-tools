@@ -66,23 +66,20 @@ with Ada.Task_Identification;
 procedure Cxd2006 is
    Verbose : constant Boolean := False;
 
-   -- the following flag is used to relay information
-   -- about the outcome of the priority check back to
-   -- the main task.  This is done so we won't be
-   -- trying to call Report.Failed while running at
-   -- an interrupt priority.
+   -- the following flag is used to relay information about the outcome of the
+   -- priority check back to the main task. This is done so we won't be trying
+   -- to call Report.Failed while running at an interrupt priority.
    Priority_Check_Ok : Boolean := False;
    pragma Volatile (Priority_Check_Ok);
 
    package Tid renames Ada.Task_Identification;
 
-   -- the following protected object is used to detect
-   -- an active priority in the interrupt_priority range.
+   -- the following protected object is used to detect an active priority in
+   -- the interrupt_priority range.
    protected Priority_Normal is
-      -- priority ceiling is below interrupt_priority range.
-      -- Therefore, any attempt to call Check while running
-      -- with a priority in the interrupt_priority range
-      -- will result in a program_error.
+      -- priority ceiling is below interrupt_priority range. Therefore,
+      -- any attempt to call Check while running with a priority in the
+      -- interrupt_priority range will result in a program_error.
       procedure Check;
       -- Get_Count is to thwart optimizing the PO away
       function Get_Count return Integer;
@@ -102,9 +99,8 @@ procedure Cxd2006 is
       end Get_Count;
    end Priority_Normal;
 
-   -- if the current active priority is in the interrupt range
-   -- then the check passes.
-   -- Otherwise, the check fails.
+   -- if the current active priority is in the interrupt range then the check
+   -- passes. Otherwise, the check fails.
    procedure Assert_High_Priority is
    begin
       Priority_Normal.Check;  -- expect exception here
@@ -114,9 +110,8 @@ procedure Cxd2006 is
          Priority_Check_Ok := True;
    end Assert_High_Priority;
 
-   -- if the current active priority is in the normal range
-   -- then the check passes.
-   -- Otherwise, the check fails and Msg is to be displayed as the
+   -- if the current active priority is in the normal range then the check
+   -- passes. Otherwise, the check fails and Msg is to be displayed as the
    -- failure message.
    procedure Assert_Normal_Priority is
    begin
@@ -160,8 +155,8 @@ procedure Cxd2006 is
       loop
          select
             accept Inherit_Priority do
-               -- stay in this rendezvous until we are told to
-               -- complete the rendezvous
+               -- stay in this rendezvous until we are told to complete the
+               -- rendezvous
                Ip_Loop :
                loop
                   select
@@ -207,8 +202,8 @@ procedure Cxd2006 is
          Me := Myself;
       end Cause_Inheritance;
 
-      -- This task will rendezvous with Inherits thus raising the
-      -- priority of that task.
+      -- This task will rendezvous with Inherits thus raising the priority of
+      -- that task.
       Inherits.Inherit_Priority;
       if Verbose then
          Report.Comment ("Hi_Priority_Task is done");
@@ -236,22 +231,22 @@ begin
 
       Hi.Cause_Inheritance (Id_Hi);
       delay Impdef.Clear_Ready_Queue;
-      -- at this point Hi should have caused Inherits to inherit
-      -- a high priority
+      -- at this point Hi should have caused Inherits to inherit a high
+      -- priority
       Inherits.High;
       Check_It ("high priority task waiting");
 
       Inherits.Complete_Rendezvous;
       delay Impdef.Clear_Ready_Queue;
 
-      -- Hi is no longer contributing to Inherits
-      -- priority so Inherits should be back to normal.
+      -- Hi is no longer contributing to Inherits priority so Inherits should
+      -- be back to normal.
       Inherits.Normal;
       Check_It ("revert back to normal priority");
    end;     -- encapsulation
 
-   -- don't let the compiler think we don't care about the value
-   -- in the protected object
+   -- don't let the compiler think we don't care about the value in the
+   -- protected object
    if Priority_Normal.Get_Count /= 2 then
       Report.Failed ("protected object count is messed up");
    end if;

@@ -89,8 +89,8 @@ procedure Cxai015 is
 
    subtype Array_Bounds_Type is Ada.Containers.Count_Type range 1 .. Num_Tests;
 
-   -- No fractional parts so that can compare values for equality.
-   -- Values in ascending order as this is what determines the order for a set.
+   -- No fractional parts so that can compare values for equality. Values in
+   -- ascending order as this is what determines the order for a set.
 
    Value_In_Array : constant array (Array_Bounds_Type) of My_Float :=
      (1.0, 12.0, 23.0, 34.0, 45.0, 56.0, 67.0, 78.0, 89.0, 99.0);
@@ -371,8 +371,8 @@ begin
 
    -- Test Replace_Element
 
-   -- Increment the values of the two Bounded_Ordered_Sets and check
-   -- still equal.  Only a small adjustment made so as not to change the order
+   -- Increment the values of the two Bounded_Ordered_Sets and check still
+   -- equal. Only a small adjustment made so as not to change the order
 
    My_Cursor_1 := My_Set_1.First;
    My_Cursor_2 := My_Set_2.First;
@@ -420,7 +420,7 @@ begin
 
    end if;
 
-   -- Test Move.  Target has the test values in reverse order, after Move these
+   -- Test Move. Target has the test values in reverse order, after Move these
    -- should be replaced (not appended) by the test values in forward order
 
    My_Set_2.Clear;
@@ -457,9 +457,8 @@ begin
 
    -- Test Insert (two forms), Include and Replace (element form)
 
-   -- My_Set_2 should initially be empty
-   -- Insert in fairly mixed order to check that order is determined by the
-   -- element, not the order of insertion
+   -- My_Set_2 should initially be empty Insert in fairly mixed order to check
+   -- that order is determined by the element, not the order of insertion
 
    declare
    begin
@@ -600,7 +599,7 @@ begin
    end;
 
    -- Element with double Default_Value (double to avoid clash with existing
-   -- element with that value).  Should insert at end.
+   -- element with that value). Should insert at end.
    My_Set_2.Insert
      (New_Item => My_Default_Value * 2.0,
       Position => My_Cursor_2, -- Added element
@@ -613,8 +612,8 @@ begin
    end if;
 
    -- The order should now be Value_In_Array (1), Value_In_Array (2),
-   -- Value_In_Array (7), Value_In_Array (9), Default_Value,
-   -- Default_Value * 2.0
+   -- Value_In_Array (7), Value_In_Array (9), Default_Value, Default_Value
+   -- * 2.0
 
    My_Cursor_2 := My_Set_2.First;
 
@@ -680,8 +679,7 @@ begin
    -- Test Delete (cursor and element forms), Exclude (element form),
    -- Delete_First and Delete_Last
 
-   -- My_Cursor_2 should initially be pointing to the last element of
-   -- My_Set_2
+   -- My_Cursor_2 should initially be pointing to the last element of My_Set_2
 
    My_Set_2.Delete (Position => My_Cursor_2);
 
@@ -836,8 +834,8 @@ begin
    -- Test Union, Overlap and Is_Subset
 
    -- My_Set_1 should still contain the test values (in forward order).
-   -- My_Set_2 should still contain test value Value_In_Array (2).
-   -- My_Set_3 should initially be empty
+   -- My_Set_2 should still contain test value Value_In_Array (2). My_Set_3
+   -- should initially be empty
 
    My_Set_3.Insert (New_Item => My_Default_Value);
 
@@ -1318,12 +1316,12 @@ begin
 
    end;
 
-   -- Test Key, Element (key form), Replace (key form), Exclude (key form),
-   -- Delete (key form), Find (key form), Contains (key form) and
-   -- Update_Element_Preserving_Key
+   -- Test Key, Element (key form), Replace (key form), Exclude (key
+   -- form), Delete (key form), Find (key form), Contains (key form)
+   -- and Update_Element_Preserving_Key
 
--- My_Set_3 should still contain the test values (in forward order), followed
--- by Default_Value
+   -- My_Set_3 should still contain the test values (in forward order),
+   -- followed by Default_Value
 
    My_Cursor_3 := My_Set_3.First;
 

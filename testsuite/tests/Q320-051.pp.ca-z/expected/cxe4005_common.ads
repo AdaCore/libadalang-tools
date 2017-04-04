@@ -108,13 +108,12 @@ package Cxe4005_Common is
    -- controls progress output from the tests.
    Verbose : constant Boolean := False;
 
-   -- exception to signify that the serial number of an object
-   -- was not a one of the expected values for that type
+   -- exception to signify that the serial number of an object was not a one of
+   -- the expected values for that type
    Wrong_Object : exception;
 
-   -- identification of where a type is declared and where
-   -- an access type was evaluated that refers to an object
-   -- of that type.
+   -- identification of where a type is declared and where an access type was
+   -- evaluated that refers to an object of that type.
    type Type_Selection is (Common_Spec,        --  xx1
    Rt_Spec,            --  xx6
    B_Body,             --  xx7

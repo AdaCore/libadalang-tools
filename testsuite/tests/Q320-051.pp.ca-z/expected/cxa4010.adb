@@ -102,11 +102,10 @@ begin
       procedure Enter_Text_Into_Document (Document : in out Document_Type) is
       begin
 
-         -- Fill in both "paragraphs" of the document.  Each unbounded string
+         -- Fill in both "paragraphs" of the document. Each unbounded string
          -- functions as an individual paragraph, containing an unspecified
-         -- number of characters.
-         -- Use a variety of different unbounded string subprograms to load
-         -- the data.
+         -- number of characters. Use a variety of different unbounded string
+         -- subprograms to load the data.
 
          Document (1) := Asunb.To_Unbounded_String ("Ada is a language");
 
@@ -201,9 +200,9 @@ begin
            Asunb.Slice (Document (1), -- Characters 80-88
            80, Asunb.Length (Document (1)));
 
-         -- Break the second unbounded string into the appropriate length.
-         -- It is only twelve characters in length, so the entire unbounded
-         -- string will be placed on one string of the output object.
+         -- Break the second unbounded string into the appropriate length. It
+         -- is only twelve characters in length, so the entire unbounded string
+         -- will be placed on one string of the output object.
 
          Camera_Copy (4) (1 .. Asunb.Length (Document (2))) :=
            Asunb.To_String
@@ -219,7 +218,7 @@ begin
       begin
 
          -- Evaluate strings for equality, using the operators defined in
-         -- package Ada.Strings.Unbounded.  The less than/greater than or
+         -- package Ada.Strings.Unbounded. The less than/greater than or
          -- equal comparisons should evaluate to "equals => True".
 
          if Asunb.To_Unbounded_String (Draft (1)) =       -- "="(Unb,Unb)

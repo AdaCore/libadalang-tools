@@ -3,9 +3,9 @@
 package body Cc54001_1 is
 
    procedure Create_Message_Stack is
-   -- Push access objects onto stack. Note that some are statically
-   -- allocated, and some are dynamically allocated (using an aliased
-   -- object to initialize).
+   -- Push access objects onto stack. Note that some are statically allocated,
+   -- and some are dynamically allocated (using an aliased object to
+   -- initialize).
    begin
       Stack_Of_Messages.Push (Message_Stack, Message_0'Access); -- Static.
       Stack_Of_Messages.Push

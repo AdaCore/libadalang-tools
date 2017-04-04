@@ -152,8 +152,8 @@ begin
             "an input parameter value of 1.0");
       end if;
 
-      -- Check that the Log function provides correct results when provided
-      -- a variety of input parameters.
+      -- Check that the Log function provides correct results when provided a
+      -- variety of input parameters.
 
       if not Fxa5a00.Result_Within_Range (Gef.Log (0.015), -4.20, 0.01) or
         not Fxa5a00.Result_Within_Range (Gef.Log (0.592), -0.524, 0.001) or
@@ -219,8 +219,8 @@ begin
       -- Testing of Log Function, with specified Base parameter, both
       -- instantiated and pre-instantiated versions.
 
-      -- Check that Argument_Error is raised by the Log function with
-      -- specified Base parameter, when the X parameter value is negative.
+      -- Check that Argument_Error is raised by the Log function with specified
+      -- Base parameter, when the X parameter value is negative.
 
       begin
          New_Float_Result := Gef.Log (X => -1.0, Base => 16.0);
@@ -256,8 +256,8 @@ begin
                "value is a large negative value");
       end;
 
-      -- Check that Argument_Error is raised by the Log function when
-      -- the specified Base parameter is zero.
+      -- Check that Argument_Error is raised by the Log function when the
+      -- specified Base parameter is zero.
 
       begin
          New_Float_Result := Gef.Log (X => 10.0, Base => 0.0);
@@ -274,8 +274,8 @@ begin
                "with Base parameter of 0.0");
       end;
 
-      -- Check that Argument_Error is raised by the Log function when
-      -- the specified Base parameter is one.
+      -- Check that Argument_Error is raised by the Log function when the
+      -- specified Base parameter is one.
 
       begin
          Float_Result := Ef.Log (X => 12.3, Base => 1.0);
@@ -292,8 +292,8 @@ begin
                "with Base parameter of 1.0");
       end;
 
-      -- Check that Argument_Error is raised by the Log function when
-      -- the specified Base parameter is negative.
+      -- Check that Argument_Error is raised by the Log function when the
+      -- specified Base parameter is negative.
 
       begin
          New_Float_Result := Gef.Log (X => 12.3, Base => -10.0);

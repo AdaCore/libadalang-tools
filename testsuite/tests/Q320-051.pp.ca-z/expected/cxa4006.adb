@@ -161,8 +161,8 @@ begin
                    (Source  => Page (Line),
                     Pattern => Bs_40.To_String (Sm_Ada),
                     Going   => Ada.Strings.Backward);
-               -- A zero is returned by function Index if no occurrences of
-               -- the pattern string are found.
+               -- A zero is returned by function Index if no occurrences of the
+               -- pattern string are found.
                Finished := (Char_Pos = 0);
                if not Finished then
                   Bs_40.Replace_Slice
@@ -282,10 +282,9 @@ begin
          Pos      : Natural := Natural'First;
          Finished : Boolean := False;
       begin
-         -- This procedure is designed to change the case of the phrase
-         -- "highly reliable" into upper case (a type of "Bolding").
-         -- All instances of the phrase on all lines of the page will be
-         -- modified.
+         -- This procedure is designed to change the case of the phrase "highly
+         -- reliable" into upper case (a type of "Bolding"). All instances of
+         -- the phrase on all lines of the page will be modified.
 
          for Line in Page_Type'First .. Page_Type'Last loop
             while not Finished loop

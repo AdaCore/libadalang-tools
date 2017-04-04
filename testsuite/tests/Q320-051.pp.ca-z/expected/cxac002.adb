@@ -20,10 +20,10 @@ begin
 
       -- If an implementation does not support Stream_IO in a particular
       -- environment, the exception Use_Error or Name_Error will be raised on
-      -- calls to various Stream_IO operations.  This block statement
-      -- encloses a call to Create, which should produce an exception in a
-      -- non-supportive environment.  These exceptions will be handled to
-      -- produce a Not_Applicable result.
+      -- calls to various Stream_IO operations. This block statement encloses a
+      -- call to Create, which should produce an exception in a non-supportive
+      -- environment. These exceptions will be handled to produce a
+      -- Not_Applicable result.
 
       Ada.Streams.Stream_Io.Create
         (Filter_File,                    -- Create.
@@ -68,8 +68,8 @@ begin
          Report.Failed ("File not open following Create");
       end if;
 
-      -- Call function Find to determine if the filename (Sub) is contained
-      -- in the result of Function Name.
+      -- Call function Find to determine if the filename (Sub) is contained in
+      -- the result of Function Name.
 
       if not Find
           (Str => Ada.Streams.Stream_Io.Name (Filter_File), -- Name.
@@ -231,22 +231,22 @@ begin
             if Current_Char /= Full_String (Pos) then
                Report.Failed ("Incorrect character read from stream");
             else
-               -- Capitalize the characters read from the stream, and
-               -- place them in a string variable.
+               -- Capitalize the characters read from the stream, and place
+               -- them in a string variable.
                Cap_String (Pos) := Capitalize (Current_Char);
             end if;
             Pos := Pos + 1;
          end loop;
 
          -- File index should now be set to the position following the final
-         -- character in the file (the same as the index value stored at
-         -- the completion of the Enter_Data_In_Stream block).
+         -- character in the file (the same as the index value stored at the
+         -- completion of the Enter_Data_In_Stream block).
          if Ada.Streams.Stream_Io.Index (Filter_File) /=           -- Index.
          File_Index then
             Report.Failed ("Incorrect file index position");
          end if;
 
-         -- The stream file should now be at EOF.                  -- EOF.
+         -- The stream file should now be at EOF. -- EOF.
          if not Ada.Streams.Stream_Io.End_Of_File (Filter_File) then
             Report.Failed ("File not empty following filtering");
          end if;
@@ -264,8 +264,8 @@ begin
 
       Verification_Block : begin
 
-         -- Verify that the entire string was examined, and that the
-         -- process of capitalizing the character data was successful.
+         -- Verify that the entire string was examined, and that the process of
+         -- capitalizing the character data was successful.
          if Cap_String /= Tc_Capital_String then
             Report.Failed ("Incorrect Capitalization");
          end if;

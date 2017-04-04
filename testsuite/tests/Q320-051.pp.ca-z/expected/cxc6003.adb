@@ -62,20 +62,19 @@ with Report;
 procedure Cxc6003 is
    Verbose : constant Boolean := False;
 
-   -- the number of tasks is the number of instantiations of
-   -- the package Checker.
+   -- the number of tasks is the number of instantiations of the package
+   -- Checker.
    Number_Of_Tasks : constant := 5;
 
-   -- the number of times a task gives up control in the
-   -- looping tests.
+   -- the number of times a task gives up control in the looping tests.
    Iterations : constant := 100;
 
-   -- computed value that indicates how many bytes are in
-   -- the standard type Integer.
+   -- computed value that indicates how many bytes are in the standard type
+   -- Integer.
    Num_Bytes_In_Integer : Integer;
 
-   -- Counter is used by the tasks to record the number of
-   -- events being counted in a given test section.
+   -- Counter is used by the tasks to record the number of events being counted
+   -- in a given test section.
    protected Counter is
       procedure Reset;
       procedure Increment;
@@ -101,16 +100,13 @@ procedure Cxc6003 is
       end Value;
    end Counter;
 
-   -- Test_Section is used to coordinate between the tasks
-   -- and the main procedure.
-   -- The tasks performing a test call Start_Section before
-   -- starting and Done when the test is complete.
-   -- The main procedure calls Start_All to start a test.
-   -- Start_All waits until all the tasks are waiting at
-   -- Start_Section and then releases them all at once.
-   -- The main procedure calls All_Done to wait for all
-   -- the tasks to complete the test.  At that point the
-   -- main procedure can check the results of the test.
+   -- Test_Section is used to coordinate between the tasks and the main
+   -- procedure. The tasks performing a test call Start_Section before starting
+   -- and Done when the test is complete. The main procedure calls Start_All
+   -- to start a test. Start_All waits until all the tasks are waiting at
+   -- Start_Section and then releases them all at once. The main procedure
+   -- calls All_Done to wait for all the tasks to complete the test. At that
+   -- point the main procedure can check the results of the test.
    protected Test_Section is
       -- for coordinating the start of a test section
       entry Start_Section;
@@ -217,53 +213,47 @@ begin
             My_Atomic_Value      : Integer := 0;
             X                    : Integer;
          begin
-            -- Check that reads and writes to volatile objects
-            -- occur directly to memory.  Each task sets Volatile_Int
-            -- and then delays long enough for the other tasks to
-            -- perform the assignment.
+            -- Check that reads and writes to volatile objects occur directly
+            -- to memory. Each task sets Volatile_Int and then delays long
+            -- enough for the other tasks to perform the assignment.
             Test_Section.Start_Section;
             Volatile_Int := Id;
-            -- wait for all the tasks to do the setting.
-            -- note that delay is not one of the operations that would
-            -- make the operations "sequential"   9.10;6.0
+            -- wait for all the tasks to do the setting. note that delay
+            -- is not one of the operations that would make the operations
+            -- "sequential" 9.10;6.0
             delay Impdef.Clear_Ready_Queue;
-            -- see if the values in the Volatile object
-            -- has changed.  At most, one task should see the same
-            -- value as it just set.
+            -- see if the values in the Volatile object has changed. At most,
+            -- one task should see the same value as it just set.
             if Volatile_Int = Id then
                Counter.Increment;
             end if;
             Test_Section.Done;
 
-            -- Check that reads and writes to atomic objects
-            -- occur directly to memory.  Each task sets Volatile_Int
-            -- and then delays long enough for the other tasks to
-            -- perform the assignment.
+            -- Check that reads and writes to atomic objects occur directly to
+            -- memory. Each task sets Volatile_Int and then delays long enough
+            -- for the other tasks to perform the assignment.
             Test_Section.Start_Section;
             Atomic_Int := Id;
-            -- wait for all the tasks to do the setting.
-            -- note that delay is not one of the operations that would
-            -- make the operations "sequential"   9.10;6.0
+            -- wait for all the tasks to do the setting. note that delay
+            -- is not one of the operations that would make the operations
+            -- "sequential" 9.10;6.0
             delay Impdef.Clear_Ready_Queue;
-            -- see if the values in the Atomic object
-            -- has changed.  At most, one task should see the same
-            -- value as it just set.
+            -- see if the values in the Atomic object has changed. At most, one
+            -- task should see the same value as it just set.
             if Atomic_Int = Id then
                Counter.Increment;
             end if;
             Test_Section.Done;
 
-            -- Check that reads and writes to elements of the packed
-            -- array of atomic components do not disturb the surrounding
-            -- components.
-            -- Note that each task writes to a different element
-            -- of the array Nibbles.  These writes should not
-            -- affect the values read or written by any of the
-            -- other tasks.  However, if the compiler allocates the
-            -- array such that shifts and masks are required to read and
-            -- write the elements of the array then the writes may well
-            -- impact the values of adjacent elements if preempted at
-            -- a bad time.
+            -- Check that reads and writes to elements of the packed array of
+            -- atomic components do not disturb the surrounding components.
+            -- Note that each task writes to a different element of the array
+            -- Nibbles. These writes should not affect the values read or
+            -- written by any of the other tasks. However, if the compiler
+            -- allocates the array such that shifts and masks are required to
+            -- read and write the elements of the array then the writes may
+            -- well impact the values of adjacent elements if preempted at a
+            -- bad time.
             Test_Section.Start_Section;
             for I in 1 .. Iterations loop
                -- try to get some preemption occurring
@@ -297,13 +287,12 @@ begin
             end loop;
             Test_Section.Done;
 
-            -- Check that only "complete" values are stored in an
-            -- atomic object.  This is checked by having each task
-            -- write a value to the atomic object that is composed
-            -- of the Id value replicated in each byte of the value
-            -- written.  When a value is read from the atomic object
-            -- it is checked to be sure the same value is replicated
-            -- in the bytes.
+            -- Check that only "complete" values are stored in an atomic
+            -- object. This is checked by having each task write a value to
+            -- the atomic object that is composed of the Id value replicated
+            -- in each byte of the value written. When a value is read from
+            -- the atomic object it is checked to be sure the same value is
+            -- replicated in the bytes.
             Test_Section.Start_Section;
             for I in 1 .. Num_Bytes_In_Integer loop
                My_Atomic_Value := My_Atomic_Value * 256 + Id;
@@ -315,13 +304,13 @@ begin
             for I in 1 .. Iterations loop
                delay Impdef.Minimum_Task_Switch;
                for J in 1 .. 1_000 loop
-                  -- read what is currently there and put
-                  -- our own value in there.
+                  -- read what is currently there and put our own value in
+                  -- there.
                   Copy_Of_Atomic_Value := Atomic_Int;
                   Atomic_Int           := My_Atomic_Value;
 
-                  -- check the value we read to see if it is ok.
-                  -- use the low byte as the check value
+                  -- check the value we read to see if it is ok. use the low
+                  -- byte as the check value
                   X := Copy_Of_Atomic_Value mod 256;
                   -- do the remaining bytes equal the check value?
                   for K in 1 .. Num_Bytes_In_Integer - 1 loop

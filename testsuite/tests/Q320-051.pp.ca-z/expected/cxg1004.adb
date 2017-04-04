@@ -160,8 +160,8 @@ begin
                "operand = complex zero");
       end;
 
-      -- Check that the exception Constraint_Error is raised under the
-      -- specified circumstances, provided that
+      -- Check that the exception Constraint_Error is raised
+      -- under the specified circumstances, provided that
       -- Complex_Types.Real'Machine_Overflows is True.
 
       if Tc_Overflows then
@@ -214,9 +214,8 @@ begin
                   "Coth given parameter value of complex zero");
          end;
 
-         -- Raised by the exponentiation operator, when the value of the
-         -- left operand is zero and the real component of the exponent
-         -- is negative.
+         -- Raised by the exponentiation operator, when the value of the left
+         -- operand is zero and the real component of the exponent is negative.
          begin
             Tc_Complex := Complex_Zero**Complex_Negative_Real;
             Report.Failed
@@ -236,9 +235,9 @@ begin
                   "the exponent is negative");
          end;
 
-         -- Raised by the exponentiation operator, when the value of the
-         -- left operand is zero and the exponent itself (when it is of
-         -- type real) is negative.
+         -- Raised by the exponentiation operator, when the value of the left
+         -- operand is zero and the exponent itself (when it is of type real)
+         -- is negative.
          declare
             Negative_Exponent : constant Real_Type := -4.0;
          begin

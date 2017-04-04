@@ -50,8 +50,7 @@ begin
 
       -- Functions used to supply mapping capability.
 
-      -- Access objects that will be provided as parameters to the
-      -- subprograms.
+      -- Access objects that will be provided as parameters to the subprograms.
 
       Map_To_Lower_Case_Ptr : Maps.Character_Mapping_Function :=
         Map_To_Lower_Case'Access;
@@ -61,8 +60,8 @@ begin
 
    begin
 
-      -- Function Index, Forward direction search.
-      -- Note: Several of the following cases use the default value
+      -- Function Index, Forward direction search. Note: Several of the
+      -- following cases use the default value
       --       Forward for the Going parameter.
 
       if Fixed.Index

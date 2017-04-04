@@ -1,10 +1,10 @@
 package body Cxa40120 is
 
    -- The following two functions are used to translate character and string
-   -- values to "Wide" values.  They will be applied to certain Wide_Map
+   -- values to "Wide" values. They will be applied to certain Wide_Map
    -- subprogram parameters to simulate the use of Wide_Characters and
-   -- Wide_Character_Sequences in actual practice.
-   -- Note: These functions do not actually return "equivalent" wide
+   -- Wide_Character_Sequences in actual practice. Note: These functions do
+   -- not actually return "equivalent" wide
    --       characters to their character inputs, just "non-character"
    --       wide characters.
 

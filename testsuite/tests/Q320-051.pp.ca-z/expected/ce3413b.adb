@@ -30,10 +30,9 @@
 --     THIS TEST IS APPLICABLE ONLY TO IMPLEMENTATIONS WHICH SUPPORT
 --     TEXT FILES.
 
--- *** NOTE: This test has been modified since ACVC version 1.11 to    -- 9X
--- ***       remove incompatibilities associated with the transition   -- 9X
--- ***       to Ada 9X.                                                -- 9X
--- ***                                                                 -- 9X
+-- *** NOTE: This test has been modified since ACVC version 1.11 to -- 9X ***
+-- remove incompatibilities associated with the transition -- 9X *** to Ada 9X.
+-- -- 9X *** -- 9X
 
 -- HISTORY:
 --     JLH 07/27/88  CREATED ORIGINAL TEST.

@@ -37,8 +37,7 @@ begin
             Call
               (Current_Floor,
                Call_Waiting);  -- Reference subprogram declared
-            -- in the parent of the subunit
-            -- parent's body.
+            -- in the parent of the subunit parent's body.
             Elevator_Button := Up;
 
          when Down =>
@@ -59,8 +58,7 @@ begin
             Call
               (Current_Floor,
                Call_Waiting);  -- Reference subprogram declared
-            -- in the parent of the subunit
-            -- parent's body.
+            -- in the parent of the subunit parent's body.
       end case;
 
       if not Call_Waiting (Current_Floor)     -- Reference private part of the

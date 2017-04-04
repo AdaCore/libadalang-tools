@@ -104,8 +104,8 @@ begin
          Report.Failed ("Incorrect results from addition");
       end if;
 
-      -- Error is raised in grandchild package and exception
-      -- will be propagated to caller.
+      -- Error is raised in grandchild package and exception will be propagated
+      -- to caller.
 
       Complex_No := Add (Operand_1, Operand_3);
 
@@ -152,8 +152,8 @@ begin
          Report.Failed ("Incorrect results from inverse");
       end if;
 
-      -- Error is raised in grandchild package and exception
-      -- will be handled/reraised to caller.
+      -- Error is raised in grandchild package and exception will be
+      -- handled/reraised to caller.
 
       Inverse (Operand_3, Complex_No);
 

@@ -1,8 +1,7 @@
 --=======================================================================--
 
 with Fa11a00.Ca11a01_0.Ca11a01_1;     -- Label_Widget_Pkg,
--- implicitly with Widget_Pkg,
--- implicitly with Color_Widget_Pkg
+-- implicitly with Widget_Pkg, implicitly with Color_Widget_Pkg
 with Report;
 
 procedure Ca11a01 is

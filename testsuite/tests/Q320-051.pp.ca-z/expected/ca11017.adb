@@ -31,8 +31,8 @@ begin
 
       Replace (The_First_String, The_Position, The_Second_String);
 
-      -- Compare results using function from public child since
-      -- the type is private.
+      -- Compare results using function from public child since the type is
+      -- private.
 
       if not Ca11017_1.Same_Content (The_First_String, The_Second_String) then
          Report.Failed ("Incorrect results");
@@ -41,8 +41,7 @@ begin
    end Replace_Subtest;
 
 -- During processing, the application may erroneously attempt to replace
--- strings of different size. This would result in the raising of an
--- exception.
+-- strings of different size. This would result in the raising of an exception.
 
    Exception_Subtest : declare
       The_First_String : String_Rec (17);

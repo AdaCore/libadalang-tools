@@ -115,8 +115,8 @@ begin  -- Main test procedure.
       "System.Address_To_Access_Conversions " &
       "for simple types");
 
-   -- take several pointer objects, convert them to addresses, and store
-   -- the address as a hexadecimal representation for later reconversion
+   -- take several pointer objects, convert them to addresses, and store the
+   -- address as a hexadecimal representation for later reconversion
 
    The_Strings (Addr_Type) :=
      new String'(Address_To_Hex (Number_Atac.To_Address (My_Number'Access)));
@@ -124,10 +124,10 @@ begin  -- Main test procedure.
    The_Strings (Record_Type) :=
      new String'(Address_To_Hex (Data_Atac.To_Address (My_Data'Access)));
 
-   -- now, reconvert the hexadecimal address values back to pointers,
-   -- and check that the dereferenced pointer still designates the
-   -- value placed at that location.  The use of the intermediate
-   -- string representation should foil even the cleverest of optimizers
+   -- now, reconvert the hexadecimal address values back to pointers, and check
+   -- that the dereferenced pointer still designates the value placed at that
+   -- location. The use of the intermediate string representation should foil
+   -- even the cleverest of optimizers
 
    if Number_Atac.To_Pointer (Hex_To_Address (The_Strings (Addr_Type))).all /=
      Number'First
@@ -141,8 +141,8 @@ begin  -- Main test procedure.
       Report.Failed ("Data reconversion");
    end if;
 
-   -- check that the resulting values are equal to the 'Unchecked_Access
-   -- of the value
+   -- check that the resulting values are equal to the 'Unchecked_Access of the
+   -- value
 
    if Number_Atac.To_Pointer (Hex_To_Address (The_Strings (Addr_Type))) /=
      My_Number'Unchecked_Access

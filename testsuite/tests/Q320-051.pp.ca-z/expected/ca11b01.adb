@@ -1,8 +1,8 @@
 --=======================================================================--
 
 with Fa11b00.Ca11b01_0.Ca11b01_1; -- Application_Three_Widget,
--- implicitly with Application_Two_Widget,
--- implicitly with Application_Three_Widget.
+-- implicitly with Application_Two_Widget, implicitly with
+-- Application_Three_Widget.
 with Report;
 
 procedure Ca11b01 is

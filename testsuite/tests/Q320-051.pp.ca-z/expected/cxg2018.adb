@@ -63,12 +63,10 @@
 --
 -- W. J. Cody
 -- CELEFUNT: A Portable Test Package for Complex Elementary Functions
--- Algorithm 714, Collected Algorithms from ACM.
--- Published in Transactions On Mathematical Software,
--- Vol. 19, No. 1, March, 1993, pp. 1-21.
+-- Algorithm 714, Collected Algorithms from ACM. Published in Transactions
+-- On Mathematical Software, Vol. 19, No. 1, March, 1993, pp. 1-21.
 --
--- CRC Standard Mathematical Tables
--- 23rd Edition
+-- CRC Standard Mathematical Tables 23rd Edition
 --
 
 with System;
@@ -77,9 +75,9 @@ with Ada.Numerics.Generic_Complex_Types;
 with Ada.Numerics.Generic_Complex_Elementary_Functions;
 procedure Cxg2018 is
    Verbose : constant Boolean := False;
-   -- Note that Max_Samples is the number of samples taken in
-   -- both the real and imaginary directions.  Thus, for Max_Samples
-   -- of 100 the number of values checked is 10000.
+   -- Note that Max_Samples is the number of samples taken in both the real and
+   -- imaginary directions. Thus, for Max_Samples of 100 the number of values
+   -- checked is 10000.
    Max_Samples : constant := 100;
 
    E  : constant := Ada.Numerics.E;
@@ -104,12 +102,11 @@ procedure Cxg2018 is
       -- flag used to terminate some tests early
       Accuracy_Error_Reported : Boolean := False;
 
-      -- The following value is a lower bound on the accuracy
-      -- required.  It is normally 0.0 so that the lower bound
-      -- is computed from Model_Epsilon.  However, for tests
-      -- where the expected result is only known to a certain
-      -- amount of precision this bound takes on a non-zero
-      -- value to account for that level of precision.
+      -- The following value is a lower bound on the accuracy required. It is
+      -- normally 0.0 so that the lower bound is computed from Model_Epsilon.
+      -- However, for tests where the expected result is only known to a
+      -- certain amount of precision this bound takes on a non-zero value
+      -- to account for that level of precision.
       Error_Low_Bound : Real := 0.0;
 
       procedure Check
@@ -121,8 +118,8 @@ procedure Cxg2018 is
          Rel_Error : Real;
          Abs_Error : Real;
       begin
-         -- In the case where the expected result is very small or 0
-         -- we compute the maximum error as a multiple of Model_Small instead
+         -- In the case where the expected result is very small or 0 we
+         -- compute the maximum error as a multiple of Model_Small instead
          -- of Model_Epsilon and Expected.
          Rel_Error := Mre * abs Expected * Real'Model_Epsilon;
          Abs_Error := Mre * Real'Model_Small;
@@ -169,22 +166,20 @@ procedure Cxg2018 is
       end Check;
 
       procedure Special_Value_Test is
-         -- In the following tests the expected result is accurate
-         -- to the machine precision so the minimum guaranteed error
-         -- bound can be used.
+         -- In the following tests the expected result is accurate to the
+         -- machine precision so the minimum guaranteed error bound can be
+         -- used.
          --
-         -- The error bounds given assumed z is  exact.  When using
-         -- pi there is an extra error of 1.0ME.
-         -- The pi inside the exp call requires that the complex
-         -- component have an extra error allowance of 1.0*angle*ME.
-         -- Thus for pi/2,the Minimum_Error_I is
-         -- (2.0 + 1.0(pi/2))ME <= 3.6ME.
-         -- For pi, it is (2.0 + 1.0*pi)ME <= 5.2ME,
+         -- The error bounds given assumed z is exact. When using pi there
+         -- is an extra error of 1.0ME. The pi inside the exp call requires
+         -- that the complex component have an extra error allowance of
+         -- 1.0*angle*ME. Thus for pi/2,the Minimum_Error_I is (2.0 +
+         -- 1.0(pi/2))ME <= 3.6ME. For pi, it is (2.0 + 1.0*pi)ME <= 5.2ME,
          -- and for 2pi, it is (2.0 + 1.0(2pi))ME <= 8.3ME.
 
-         -- The addition of 1 or i to a result is so that neither of
-         -- the components of an expected result is 0.  This is so
-         -- that a reasonable relative error is allowed.
+         -- The addition of 1 or i to a result is so that neither of the
+         -- components of an expected result is 0. This is so that a
+         -- reasonable relative error is allowed.
          Minimum_Error_C : constant := 7.0;   -- for exp(Complex)
          Minimum_Error_I : constant := 2.0;   -- for exp(Imaginary)
       begin
@@ -224,14 +219,14 @@ procedure Cxg2018 is
          X, Y             : Complex;
          Actual1, Actual2 : Complex;
          W                : constant Complex := (0.062_5, 0.062_5);
-         -- the following constant was taken from the CELEFUNC EXP test.
-         -- This is the value EXP(W) - 1
+         -- the following constant was taken from the CELEFUNC EXP test. This
+         -- is the value EXP(W) - 1
          C : constant Complex :=
            (6.241_604_487_701_856_368_1e-2, 6.648_759_775_100_311_276_8e-2);
       begin
          if Real'Digits > 20 then
-            -- constant ExpW is accurate to 20 digits.
-            -- The low bound is 19 * 10**-20
+            -- constant ExpW is accurate to 20 digits. The low bound is 19 *
+            -- 10**-20
             Error_Low_Bound := 0.00000_00000_00019;
             Report.Comment ("complex exp accuracy checked to 20 digits");
          end if;
@@ -266,14 +261,12 @@ procedure Cxg2018 is
                   Real'Image (X.Im) &
                   ")) ",
                   20.0);   -- 2 exp and 1 multiply and 1 add = 2*7+1*5+1
-               -- Note: The above is not strictly correct, as multiply
-               -- has a box error, rather than a relative error.
-               -- Supposedly, the interval is chosen to avoid the need
-               -- to worry about this.
+               -- Note: The above is not strictly correct, as multiply has
+               -- a box error, rather than a relative error. Supposedly, the
+               -- interval is chosen to avoid the need to worry about this.
 
-               -- Exp(X) * Exp(-X) + i  = 1 + i
-               -- The addition of i is to allow a reasonable relative
-               -- error in the imaginary part
+               -- Exp(X) * Exp(-X) + i = 1 + i The addition of i is to allow a
+               -- reasonable relative error in the imaginary part
                Actual2 := (Actual1 * Exp (-X)) + I;
                Check
                  (Actual2,
@@ -319,8 +312,8 @@ procedure Cxg2018 is
       begin
          Special_Value_Test;
          Exact_Result_Test;
-         -- test regions where we can avoid cancellation error problems
-         -- See Cody page 10.
+         -- test regions where we can avoid cancellation error problems See
+         -- Cody page 10.
          Identity_Test (0.062_5, 1.0);
          Identity_Test (15.0, 17.0);
          Identity_Test (1.625, 3.0);

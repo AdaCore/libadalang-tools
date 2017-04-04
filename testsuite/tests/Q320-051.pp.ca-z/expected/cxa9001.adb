@@ -73,7 +73,7 @@ begin
 
       -- The following Create does not have any bearing on the test scenario,
       -- but is included to check that the implementation supports Direct_IO
-      -- files.  An exception on this Create statement will raise a Name_Error
+      -- files. An exception on this Create statement will raise a Name_Error
       -- or Use_Error, which will be handled to produce a Not_Applicable
       -- result. If created, the file is immediately deleted, as it is not
       -- needed for the program scenario.
@@ -115,28 +115,25 @@ begin
          Result          :    out Natural)
       is
 
-         -- Type based on input parameter.  Uses type Unit_Type
-         -- as the array element.
+         -- Type based on input parameter. Uses type Unit_Type as the array
+         -- element.
          type Unit_Array_Type is array (1 .. Number_Of_Units) of Unit_Type;
 
-         -- This type definition is the ultimate storage type used
-         -- in this test; uses type Unit_Array_Type as a record
-         -- component field.
-         -- This record type contains a component that is an array of
-         -- records, with each of these records containing a Natural
-         -- and a String value (i.e., a record containing an array of
-         -- records).
+         -- This type definition is the ultimate storage type used in this
+         -- test; uses type Unit_Array_Type as a record component field. This
+         -- record type contains a component that is an array of records,
+         -- with each of these records containing a Natural and a String
+         -- value (i.e., a record containing an array of records).
 
          type Data_Storage_Type is record
             Data_Value : Natural := Number_Of_Units;
             Unit_Array : Unit_Array_Type;
          end record;
 
-         -- The instantiation of the following generic package is a
-         -- central point in this test.  Storage_IO is instantiated for
-         -- a specific data type, and will be used to "flatten" objects
-         -- of that type into buffers.  Direct_IO is instantiated for
-         -- these Storage_IO buffers.
+         -- The instantiation of the following generic package is a central
+         -- point in this test. Storage_IO is instantiated for a specific
+         -- data type, and will be used to "flatten" objects of that type into
+         -- buffers. Direct_IO is instantiated for these Storage_IO buffers.
 
          package Flat_Storage_Io is new Ada.Storage_Io (Data_Storage_Type);
          package Buffer_Io is new Ada.Direct_Io (Flat_Storage_Io.Buffer_Type);
@@ -153,9 +150,9 @@ begin
            (Buffer => Outbound_Buffer,
             Item   => Storage_Item);
 
-         -- At this point, any levels of indirection have been removed
-         -- by the Storage_IO procedure, and the buffered data can be
-         -- written to a file.
+         -- At this point, any levels of indirection have been removed by the
+         -- Storage_IO procedure, and the buffered data can be written to a
+         -- file.
 
          Buffer_Io.Write (Buffer_File, Outbound_Buffer);
          Buffer_Io.Close (Buffer_File);
@@ -200,8 +197,7 @@ begin
 
          Flat_Storage_Io.Read (Inbound_Buffer, Storage_Item);
 
-         -- Validate the reconstructed value against an "unflattened"
-         -- value.
+         -- Validate the reconstructed value against an "unflattened" value.
 
          if Storage_Item.Data_Value /= Tc_Item.Data_Value then
             Report.Failed ("Data_Retrieval Error - 1");

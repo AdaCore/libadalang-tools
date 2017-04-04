@@ -121,9 +121,9 @@ begin
          end;
       end loop;
 
-      -- Validate that function To_Picture raises Picture_Error when an
-      -- invalid picture string is provided as an input parameter.
-      -- Default value used for parameter Blank_When_Zero.
+      -- Validate that function To_Picture raises Picture_Error when an invalid
+      -- picture string is provided as an input parameter. Default value used
+      -- for parameter Blank_When_Zero.
 
       for I in 1 .. Fxf3a00.Number_Of_Invalid_Strings loop
          begin
@@ -249,8 +249,8 @@ begin
 
             -- Ensure that function Blank_When_Zero returns the correct value
             -- of the Blank_When_Zero parameter used in forming the Picture
-            -- (default parameter value False overridden in call to
-            -- To_Picture above).
+            -- (default parameter value False overridden in call to To_Picture
+            -- above).
 
             if not Editing.Blank_When_Zero (Pic => Tc_Picture) then
                Report.Failed

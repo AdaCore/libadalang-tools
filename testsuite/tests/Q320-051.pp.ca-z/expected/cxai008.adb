@@ -108,22 +108,20 @@ procedure Cxai008 is
       Parent          : in     Node_Tree.Cursor;
       End_Of_Children :    out Boolean)
    is
-      -- Parse Input starting at Start, create an appropriate subtree,
-      -- and append it as a child to the designated parent.
-      -- Update Start to point after the parsed input.
-      -- If the input is an end tag, then End_Of_Children is set
-      -- to True and Start is updated to point to the start of the end tag.
-      -- If the input is at the end of the string, then End_Of_Children
-      -- is set to True and Start is updated to point past the end of the
-      -- string.
+      -- Parse Input starting at Start, create an appropriate subtree, and
+      -- append it as a child to the designated parent. Update Start to
+      -- point after the parsed input. If the input is an end tag, then
+      -- End_Of_Children is set to True and Start is updated to point to the
+      -- start of the end tag. If the input is at the end of the string, then
+      -- End_Of_Children is set to True and Start is updated to point past the
+      -- end of the string.
       Within_Start_Tag : Boolean := False;
       Element_Name     : String_Ptr;
       Element_Cursor   : Node_Tree.Cursor;
 
       procedure Absorb (Match : String) is
-         -- Require a match to specified string.
-         -- Allow leading white space.
-         -- If Match = "", then this just absorbs white space.
+         -- Require a match to specified string. Allow leading white space. If
+         -- Match = "", then this just absorbs white space.
          Len : Natural := 0;
       begin
          while Start <= Input'Last loop
@@ -207,8 +205,8 @@ procedure Cxai008 is
       end Parse_Text;
 
       function Parse_Attrib_Value return String_Ptr is
-      -- Return characters that make up an attribute value
-      -- Ignore leading white space
+      -- Return characters that make up an attribute value Ignore leading white
+      -- space
       begin
          while Start <= Input'Last loop
             declare

@@ -102,9 +102,8 @@ begin
 
       -- The function Image has been overridden in the child and grandchild
       -- packages, but the client has inherited all versions of the function,
-      -- and can successfully use them to enter data into the database.
-      -- Each of the following procedures updates the global variable
-      -- Zoo_Data_Base.
+      -- and can successfully use them to enter data into the database. Each
+      -- of the following procedures updates the global variable Zoo_Data_Base.
 
       procedure Enter_Animal_Data (A : Animal; I : Integer) is
       begin

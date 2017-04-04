@@ -103,10 +103,9 @@ begin
       end if;
    end;
 
-   -- access to remote subprogram tests
-   -- here we make sure the correct procedure is called by having
-   -- several procedures with the same parameter profile but each
-   -- procedure expects a different value to be passed to it as is
+   -- access to remote subprogram tests here we make sure the correct procedure
+   -- is called by having several procedures with the same parameter profile
+   -- but each procedure expects a different value to be passed to it as is
    -- indicated by the procedure name.
    declare
       P2, P3, P4 : Cxe4002_Part_A2.Remote_Proc;
@@ -121,8 +120,8 @@ begin
       P4 (4);
    end;
 
-   -- access to remote subprogram tests with mixed parameters.
-   -- make sure the pointer is used.
+   -- access to remote subprogram tests with mixed parameters. make sure the
+   -- pointer is used.
    declare
       M1 : Cxe4002_Part_A2.Remote_Proc_Mixed;
       M2 : Cxe4002_Part_A2.Remote_Proc_Mixed;

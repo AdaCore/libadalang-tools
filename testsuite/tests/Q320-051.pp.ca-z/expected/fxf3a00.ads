@@ -62,9 +62,8 @@ package Fxf3a00 is
    Number_Of_Erroneous_Conditions  : constant := 3;
    Number_Of_Edited_Output_Strings : constant := 32;
 
-   -- The following string is to be used as a picture string with length
-   -- beyond the maximum (Max_Picture_Length) that is supported by the
-   -- implementation.
+   -- The following string is to be used as a picture string with length beyond
+   -- the maximum (Max_Picture_Length) that is supported by the implementation.
 
    A_Picture_String_Too_Long : constant String
      (1 .. Ada.Text_Io.Editing.Max_Picture_Length + 1) :=
@@ -109,8 +108,8 @@ package Fxf3a00 is
       9  => 1.23,
       10 => 12.34,
 
-   -- Items 11-20 are used with picture strings in evaluating use of
-   -- foreign currency symbols.
+   -- Items 11-20 are used with picture strings in evaluating use of foreign
+   -- currency symbols.
 
       11 => 123_456.78,
       12 => 123_456.78,
@@ -125,9 +124,8 @@ package Fxf3a00 is
 
    Valid_Strings : Picture_String_Array_Type (1 .. Number_Of_Valid_Strings) :=
 
-   -- Items 1-10 are used in conjunction with Data_With_2DP values
-   -- to produce edited output strings, as well as in tests of
-   -- function Valid.
+   -- Items 1-10 are used in conjunction with Data_With_2DP values to produce
+   -- edited output strings, as well as in tests of function Valid.
 
      (1  => new String'("-###**_***_**9.99"),
       2  => new String'("-$**_***_**9.99"),
@@ -140,8 +138,8 @@ package Fxf3a00 is
       9  => new String'("$_$$9.99"),
       10 => new String'("$$9.99"),
 
-   -- Items 11-22 are used in conjunction with Data_With_NDP values
-   -- to produce edited output strings.
+   -- Items 11-22 are used in conjunction with Data_With_NDP values to produce
+   -- edited output strings.
 
       11 => new String'("ZZZZ9"),
       12 => new String'("ZZZZ9"),
@@ -157,8 +155,8 @@ package Fxf3a00 is
       22 => new String'("$$$$9"),
 
    -- Items 23-40 are used in validation of the Valid, To_Picture, and
-   -- Pic_String subprograms of package Text_IO.Editing, and are not
-   -- used to generate edited output.
+   -- Pic_String subprograms of package Text_IO.Editing, and are not used
+   -- to generate edited output.
 
       23 => new String'("zZzZzZzZzZzZzZzZzZ"),
       24 => new String'("999999999999999999"),
@@ -176,8 +174,8 @@ package Fxf3a00 is
       36 => new String'("******************.99"),
       37 => new String'("$$$$$$$$$$$$$$$$$$.99"),
 
-   -- The following string has length 30, which is the minimum value
-   -- that must be supported for Max_Picture_Length.
+   -- The following string has length 30, which is the minimum value that must
+   -- be supported for Max_Picture_Length.
 
       38 => new String'("9_999_999_999_999_999_999BB.99"),
       39 => new String'("<<<_<<<_<<<_<<<.99>"),
@@ -186,9 +184,9 @@ package Fxf3a00 is
    Foreign_Strings : Picture_String_Array_Type
      (1 .. Number_Of_Foreign_Strings) :=
 
-   -- These strings are going to be used in conjunction with non-default
-   -- values for Currency string, Radix mark, and Separator in calls to
-   -- Image and Put, as well as in tests of function Valid.
+   -- These strings are going to be used in conjunction with non-default values
+   -- for Currency string, Radix mark, and Separator in calls to Image and Put,
+   -- as well as in tests of function Valid.
 
      (1  => new String'("-###**_***_**9.99"),    -- FF
       2  => new String'("-$**_***_**9.99"),      -- FF
@@ -205,11 +203,11 @@ package Fxf3a00 is
    Invalid_Strings : Picture_String_Array_Type
      (1 .. Number_Of_Invalid_Strings) :=
    --
-   -- The RM references to the right of these invalid picture strings
-   -- indicates which of the composition constraints of picture strings
-   -- is violated by the particular string (and all following strings
-   -- until another reference is presented).  However, certain strings
-   -- violate multiple of the constraints.
+   -- The RM references to the right of these invalid picture strings indicates
+   -- which of the composition constraints of picture strings is violated by
+   -- the particular string (and all following strings until another reference
+   -- is presented). However, certain strings violate multiple of the
+   -- constraints.
    --
      (1  => new String'("<<<"),
       2  => new String'("<<>>"),
@@ -240,9 +238,8 @@ package Fxf3a00 is
    Edited_Output : Edited_Output_Results_Array_Type
      (1 .. Number_Of_Edited_Output_Strings) :=
 
-   -- The following 10 edited output strings result from the first 10
-   -- valid strings when used with the first 10 Data_With_2DP numeric
-   -- values.
+   -- The following 10 edited output strings result from the first 10 valid
+   -- strings when used with the first 10 Data_With_2DP numeric values.
      (1  => new String'("   $***123,456.78"),
       2  => new String'(" $***123,456.78"),
       3  => new String'("          "),
@@ -255,9 +252,9 @@ package Fxf3a00 is
       10 => new String'("$12.34"),
 
    -- The following 10 edited output strings correspond to the 10 foreign
-   -- currency picture strings (the currency string is supplied at the
-   -- time of the call to Editing.Image or Editing.Put), when used in
-   -- conjunction with Data_With_2DP items 11-20
+   -- currency picture strings (the currency string is supplied at the time of
+   -- the call to Editing.Image or Editing.Put), when used in conjunction with
+   -- Data_With_2DP items 11-20
 
       11 => new String'("  FF***123.456,78"),
       12 => new String'(" FF***123.456,78"),
@@ -270,10 +267,9 @@ package Fxf3a00 is
       19 => new String'("   DM1.23"),
       20 => new String'("  CHF12,345.67"),
 
-   -- The following 12 edited output strings correspond to the 12
-   -- Data_With_NDP items formatted using Valid_String items 11-22.
-   -- This combination shows decimal data with no decimal places
-   -- formatted using picture strings.
+   -- The following 12 edited output strings correspond to the 12 Data_With_NDP
+   -- items formatted using Valid_String items 11-22. This combination shows
+   -- decimal data with no decimal places formatted using picture strings.
 
       21 => new String'(" 1234"),
       22 => new String'("51234"),
@@ -289,7 +285,7 @@ package Fxf3a00 is
       32 => new String'("   $0"));
 
    -- The following data is used to create exception situations in tests of
-   -- the Edited Output capabilities of package Ada.Text_IO.Editing.  The data
+   -- the Edited Output capabilities of package Ada.Text_IO.Editing. The data
    -- are not themselves erroneous, but will produce exceptions based on the
    -- data/picture string combination used.
 

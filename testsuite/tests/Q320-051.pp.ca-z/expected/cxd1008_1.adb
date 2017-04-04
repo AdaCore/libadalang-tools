@@ -4,19 +4,18 @@ with Report;
 package body Cxd1008_1 is
    Verbose : constant Boolean := False;
 
-   -- how many times must a computation be preempted before we
-   -- will allow it to complete
+   -- how many times must a computation be preempted before we will allow it to
+   -- complete
    Desired_Preemptions : constant := 10;
 
-   -- The purpose of the manager is to keep track of how many times
-   -- a particular computation has been preempted.  This is done by
-   -- having each computation register that it is starting.  Whenever
-   -- a computation starts, it preempts anything running at a lower
-   -- priority (or lower id).
-   -- The condition for the termination of a computation depends upon
-   -- the preemption count.
-   -- The count of the number of tests started at each priority level
-   -- is kept and used for determining when to terminate the test
+   -- The purpose of the manager is to keep track of how many times a
+   -- particular computation has been preempted. This is done by having
+   -- each computation register that it is starting. Whenever a computation
+   -- starts, it preempts anything running at a lower priority (or lower id).
+   -- The condition for the termination of a computation depends upon the
+   -- preemption count. The count of the number of tests started at each
+   -- priority level is kept and used for determining when to terminate
+   -- the test
 
    subtype Valid_Id is Integer range 1 .. 7;
    type Counters is array (Valid_Id) of Natural;
@@ -39,8 +38,8 @@ package body Cxd1008_1 is
          end loop;
          Preemptions (Id) := 0;
          Test_Counts (Id) := Test_Counts (Id) + 1;
-         -- only count the tests of each type that are below
-         -- the highest priority for that type
+         -- only count the tests of each type that are below the highest
+         -- priority for that type
          if Id <= Valid_Id'Last - 3 then
             Starts := Starts + 1;
          end if;
@@ -58,8 +57,7 @@ package body Cxd1008_1 is
    end Manager;
 
    procedure Do_Float (Id : Integer) is
-      -- hopefully, some of these variables will be allocated
-      -- to registers.
+      -- hopefully, some of these variables will be allocated to registers.
       A, B, C, D, E, F : Float;
       -- two values that are the same as Id but not obvious to the compiler
       Id2 : Integer := Report.Ident_Int (Id);
@@ -114,8 +112,8 @@ package body Cxd1008_1 is
                Float'Image (F));
          end if;
 
-         -- optimization thwarting - make it look like the values
-         -- computed in the loop might change.
+         -- optimization thwarting - make it look like the values computed in
+         -- the loop might change.
          if Report.Ident_Bool (False) then
             F   := F * 10.0;
             Id1 := Id1 + 2;
@@ -133,8 +131,8 @@ package body Cxd1008_1 is
             Recurse (Levels - 1);
          else
             if Id < 4 then
-               -- note that constraint_error will be raised in
-               -- the following line (divide by 0)
+               -- note that constraint_error will be raised in the following
+               -- line (divide by 0)
                Report.Comment
                  ("shouldn't print" &
                   Integer'Image (5 / Report.Ident_Int (0)));

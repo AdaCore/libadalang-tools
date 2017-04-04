@@ -87,8 +87,8 @@ begin
 
    begin
 
-      -- Check the result of function Argument_Count.
-      -- Note: If the external environment does not support passing arguments
+      -- Check the result of function Argument_Count. Note: If the external
+      -- environment does not support passing arguments
       --       to the program invoking the function, the function result
       --       will be zero.
 
@@ -101,15 +101,15 @@ begin
            ("Argument_Count = " & Integer'Image (Number_Of_Arguments));
       end if;
 
-      -- Check that the result of Function Argument is Constraint_Error
-      -- when the Number argument is outside the range of 1..Argument_Count.
+      -- Check that the result of Function Argument is Constraint_Error when
+      -- the Number argument is outside the range of 1..Argument_Count.
 
       Test_Function_Argument_1 : begin
          declare
 
             -- Define a value that will be outside the range of
-            -- 1..Argument_Count.
-            -- Note: If the external execution environment does not support
+            -- 1..Argument_Count. Note: If the external execution
+            -- environment does not support
             --       passing arguments to a program, then Argument(N) for
             --       any N will raise Constraint_Error, since
             --       Argument_Count = 0;
@@ -117,8 +117,8 @@ begin
             Arguments_Plus_One : Positive :=
               Ada.Command_Line.Argument_Count + 1;
 
-            -- Using the above value in a call to Argument must result in
-            -- the raising of Constraint_Error.
+            -- Using the above value in a call to Argument must result in the
+            -- raising of Constraint_Error.
 
             Argument_String : constant String :=
               Ada.Command_Line.Argument (Arguments_Plus_One);
@@ -172,8 +172,8 @@ begin
          Report.Comment ("Invoking command is " & Name_Of_Command.all);
       end if;
 
-      -- Check that procedure Set_Exit_Status is available.
-      -- Note: If the external execution environment does not support
+      -- Check that procedure Set_Exit_Status is available. Note: If the
+      -- external execution environment does not support
       --       returning an exit value from a program, then Set_Exit_Status
       --       does nothing.
 

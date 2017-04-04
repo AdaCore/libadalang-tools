@@ -10,16 +10,16 @@ begin
    Report.Test
      ("CXE4003_A",
       "Check the blocking properties of " & "remote calls");
-   -- Check that the task executing a remote subprogram call blocks
-   -- until the subprogram in the called partition returns.
+   -- Check that the task executing a remote subprogram call blocks until the
+   -- subprogram in the called partition returns.
    Cxe4003_Blocking_Test.Do_Test;
 
    -- Check that a remote procedure call can be aborted.
    Cxe4003_Cancellation_Test.Do_Test;
 
-   -- Check that remote subprogram calls are executed at most once.
-   -- Check that potentially concurrent calls from multiple tasks
-   -- can be handled by the PCS.
+   -- Check that remote subprogram calls are executed at most once. Check that
+   -- potentially concurrent calls from multiple tasks can be handled by the
+   -- PCS.
    Cxe4003_Call_Test.Do_Test;
 
    -- All done.

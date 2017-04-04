@@ -417,7 +417,7 @@ begin
 
    end if;
 
-   -- Test Move.  Target has the test values in reverse order, after Move these
+   -- Test Move. Target has the test values in reverse order, after Move these
    -- should be replaced (not appended) by the test values in forward order
 
    My_List_2.Clear;
@@ -470,7 +470,7 @@ begin
       Position => My_Cursor_2, -- First of added elements
       Count    => 2);
 
-   -- Elements with Default_Value.  Should insert in-between the previous two
+   -- Elements with Default_Value. Should insert in-between the previous two
    -- blocks
    My_List_2.Insert
      (Before   => My_Cursor_2,
@@ -607,10 +607,10 @@ begin
 
    My_List_1.Splice (Before => My_Cursor_1, Source => My_List_2);
 
--- The order should now be Value_In_Array (1), Value_In_Array (2),
--- Default_Value, Value_In_Array (3), Value_In_Array (4), Value_In_Array (5),
--- Value_In_Array (6), Value_In_Array (7), Value_In_Array (8),
--- Value_In_Array (9), Value_In_Array (10)
+   -- The order should now be Value_In_Array (1), Value_In_Array (2),
+   -- Default_Value, Value_In_Array (3), Value_In_Array (4), Value_In_Array
+   -- (5), Value_In_Array (6), Value_In_Array (7), Value_In_Array (8),
+   -- Value_In_Array (9), Value_In_Array (10)
 
    -- My_List_2 should now be empty so re-fill
 
@@ -629,10 +629,10 @@ begin
       Source   => My_List_2,
       Position => My_Cursor_2);
 
--- The order should now be Value_In_Array (1), Value_In_Array (2),
--- Default_Value, Value_In_Array (3), Value_In_Array (4), Value_In_Array (7),
--- Value_In_Array (5), Value_In_Array (6), Value_In_Array (7),
--- Value_In_Array (8), Value_In_Array (9), Value_In_Array (10)
+   -- The order should now be Value_In_Array (1), Value_In_Array (2),
+   -- Default_Value, Value_In_Array (3), Value_In_Array (4), Value_In_Array
+   -- (7), Value_In_Array (5), Value_In_Array (6), Value_In_Array (7),
+   -- Value_In_Array (8), Value_In_Array (9), Value_In_Array (10)
 
    My_Cursor_1 := My_List_1.Find (Item => Value_In_Array (9));
 
@@ -640,10 +640,10 @@ begin
 
    My_List_1.Splice (Before => My_Cursor_3, Position => My_Cursor_1);
 
--- The order should now be Value_In_Array (1), Value_In_Array (9),
--- Value_In_Array (2), Default_Value, Value_In_Array (3), Value_In_Array (4),
--- Value_In_Array (7), Value_In_Array (5), Value_In_Array (6),
--- Value_In_Array (7), Value_In_Array (8), Value_In_Array (10)
+   -- The order should now be Value_In_Array (1), Value_In_Array (9),
+   -- Value_In_Array (2), Default_Value, Value_In_Array (3), Value_In_Array
+   -- (4), Value_In_Array (7), Value_In_Array (5), Value_In_Array (6),
+   -- Value_In_Array (7), Value_In_Array (8), Value_In_Array (10)
 
    My_Cursor_1 := My_List_1.First;
 

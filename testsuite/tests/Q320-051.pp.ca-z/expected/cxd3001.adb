@@ -72,11 +72,10 @@ with System;
 procedure Cxd3001 is
 
    -- Because implementations have permission to round up the ceiling
-   -- priorities to the top of the current range we have to choose
-   -- Interrupt priority and call a PO of ceiling Priority'Last to ensure
-   -- we get a call to a PO with a lower ceiling.  For equality we
-   -- deliberately choose Priority'Last for both in case such rounding is
-   -- in effect.
+   -- priorities to the top of the current range we have to choose Interrupt
+   -- priority and call a PO of ceiling Priority'Last to ensure we get a
+   -- call to a PO with a lower ceiling. For equality we deliberately
+   -- choose Priority'Last for both in case such rounding is in effect.
 
    Priority_Lo : constant System.Priority           := (System.Priority'First);
    Priority_Md : constant System.Priority           := (System.Priority'Last);
@@ -107,10 +106,10 @@ begin
          entry P_Entry;
 
       private
-         -- In order to verify the check of Ceiling_Priority
-         -- we must ensure that the calls to the subprograms and entry
-         -- actually get executed and not optimized away.  Each one accesses
-         -- this variable which gets checked at the end of the test.
+         -- In order to verify the check of Ceiling_Priority we must ensure
+         -- that the calls to the subprograms and entry actually get executed
+         -- and not optimized away. Each one accesses this variable which gets
+         -- checked at the end of the test.
          --
          Number_Of_Calls : Natural := 0;
 
@@ -136,8 +135,8 @@ begin
 
       --====================================================
 
-      -- This task calls a protected object whose ceiling is higher
-      -- than the task
+      -- This task calls a protected object whose ceiling is higher than the
+      -- task
       --
       task Task_Lo is
          pragma Priority (Priority_Lo);
@@ -155,9 +154,9 @@ begin
          Protected_Object.P_Entry;                       -- Should be O.K.
          Func_Return := Protected_Object.P_Function;     -- Should be O.K.
 
-         -- Now execute a dummy routine with an external effect to make use
-         -- of the result returned by the function.  This ensures that
-         -- nothing will be optimized away
+         -- Now execute a dummy routine with an external effect to make use of
+         -- the result returned by the function. This ensures that nothing will
+         -- be optimized away
          --
          if Func_Return = Natural'Last then
             Unexpected_Code_Reached := True;
@@ -170,8 +169,8 @@ begin
 
       --=====================
 
-      -- This task calls a protected object whose declared ceiling is
-      -- the same as the tasks declared priority (no defaults)
+      -- This task calls a protected object whose declared ceiling is the same
+      -- as the tasks declared priority (no defaults)
       --
       task Task_Md is
          pragma Priority (Priority_Md);
@@ -189,9 +188,9 @@ begin
          Protected_Object.P_Entry;                       -- Should be O.K.
          Func_Return := Protected_Object.P_Function;     -- Should be O.K.
 
-         -- Now execute a dummy routine with an external effect to make use
-         -- of the result returned by the function.  This ensures that
-         -- nothing will be optimized away
+         -- Now execute a dummy routine with an external effect to make use of
+         -- the result returned by the function. This ensures that nothing will
+         -- be optimized away
          --
          if Func_Return = Natural'Last then
             Unexpected_Code_Reached := True;
@@ -212,9 +211,9 @@ begin
       --
       task body Task_Hi_Proc is
 
-      -- This task calls a protected procedure whose declared ceiling is
-      -- lower than the task's declared priority (no defaults). The
-      -- ceiling check should raise Program_Error.
+      -- This task calls a protected procedure whose declared ceiling is lower
+      -- than the task's declared priority (no defaults). The ceiling check
+      -- should raise Program_Error.
       begin
          Protected_Object.P_Procedure;  -- not o.k.
          Expected_Exception_Not_Raised_In_Proc := True;
@@ -236,8 +235,8 @@ begin
       task body Task_Hi_Func is
 
          -- This task calls a protected function whose declared ceiling is
-         -- lower than the task's declared priority (no defaults). The
-         -- ceiling check should raise Program_Error.
+         -- lower than the task's declared priority (no defaults). The ceiling
+         -- check should raise Program_Error.
          Func_Return : Natural;
 
       begin
@@ -245,10 +244,9 @@ begin
          Func_Return := Protected_Object.P_Function;  -- not o.k.
          Expected_Exception_Not_Raised_In_Func := True;
 
-         -- This dummy routine with an external effect makes use
-         -- of the result returned by the function.  This ensures that
-         -- nothing will be optimized away.  The routine should not get
-         -- executed
+         -- This dummy routine with an external effect makes use of the
+         -- result returned by the function. This ensures that nothing will
+         -- be optimized away. The routine should not get executed
          --
          if Func_Return = Natural'Last then
             Unexpected_Code_Reached := True;
@@ -270,9 +268,9 @@ begin
       end Task_Hi_Ent;
       --
       task body Task_Hi_Ent is
-      -- This task calls a protected entry whose declared ceiling is
-      -- lower than the task's declared priority (no defaults). The
-      -- ceiling check should raise Program_Error.
+      -- This task calls a protected entry whose declared ceiling is lower than
+      -- the task's declared priority (no defaults). The ceiling check should
+      -- raise Program_Error.
       begin
          Protected_Object.P_Entry;  -- not o.k.
          Expected_Exception_Not_Raised_In_Ent := True;

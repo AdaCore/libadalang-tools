@@ -23,7 +23,7 @@ begin
 
       -- The following Create does not have any bearing on the test scenario,
       -- but is included to check that the implementation supports Direct_IO
-      -- files.  An exception on this Create statement will raise a Name_Error
+      -- files. An exception on this Create statement will raise a Name_Error
       -- or Use_Error, which will be handled to produce a Not_Applicable
       -- result. If created, the file is immediately deleted, as it is not
       -- needed for the program scenario.
@@ -89,10 +89,10 @@ begin
          Savings_Account    : Savings_Account_Type    := Tc_Savings_Account;
 
          -- The instantiations below are a central point in this test.
-         -- Storage_IO is instantiated for each of the specific tagged
-         -- type. These instantiated packages will be used to compress
-         -- tagged objects of these various types into buffers that will
-         -- be written to the Direct_IO files declared below.
+         -- Storage_IO is instantiated for each of the specific tagged type.
+         -- These instantiated packages will be used to compress tagged objects
+         -- of these various types into buffers that will be written to the
+         -- Direct_IO files declared below.
 
          package Acct_Sio is new Ada.Storage_Io (Account_Type);
          package Cash_Sio is new Ada.Storage_Io (Cash_Account_Type);
@@ -129,8 +129,8 @@ begin
          Chk_Dio.Create (Chk_File, Chk_Dio.Out_File, Chk_Filename);
          Sav_Dio.Create (Sav_File, Sav_Dio.Out_File, Sav_Filename);
 
-         -- Store the tag values of the objects declared above for
-         -- comparison with tag values of objects following processing.
+         -- Store the tag values of the objects declared above for comparison
+         -- with tag values of objects following processing.
 
          Tc_Account_Type_Tag :=
            new String'(Ada.Tags.External_Tag (Account_Type'Tag));
@@ -157,8 +157,8 @@ begin
          Sav_Sio.Write (Sav_Buffer, Savings_Account);
 
          -- At this point, the data and associated tag values have been
-         -- buffered by the Storage_IO procedure, and the buffered data
-         -- can be written to the appropriate Direct_IO file.
+         -- buffered by the Storage_IO procedure, and the buffered data can
+         -- be written to the appropriate Direct_IO file.
 
          Acct_Dio.Write (File => Acct_File, Item => Acct_Buffer);
          Cash_Dio.Write (Cash_File, Cash_Buffer);
@@ -187,8 +187,7 @@ begin
          Checking_Account   : Checking_Account_Type;
          Savings_Account    : Savings_Account_Type;
 
-         -- Storage_IO is instantiated for each of the specific tagged
-         -- type.
+         -- Storage_IO is instantiated for each of the specific tagged type.
 
          package Acct_Sio is new Ada.Storage_Io (Account_Type);
          package Cash_Sio is new Ada.Storage_Io (Cash_Account_Type);
@@ -235,9 +234,9 @@ begin
          Chk_Dio.Read (File => Chk_File, Item => Chk_Buffer);
          Sav_Dio.Read (Sav_File, Sav_Buffer);
 
-         -- At this point, the data and associated tag values are stored
-         -- in buffers. Use the Storage_IO procedure Read to recreate the
-         -- tagged objects from the buffers.
+         -- At this point, the data and associated tag values are stored in
+         -- buffers. Use the Storage_IO procedure Read to recreate the tagged
+         -- objects from the buffers.
 
          Acct_Sio.Read (Buffer => Acct_Buffer, Item => Account);
          Cash_Sio.Read (Cash_Buffer, Cash_Account);
@@ -284,10 +283,10 @@ begin
                  ("Exception raised during Data_Verification Block");
          end Data_Verification_Block;
 
-         -- To ensure that the tags of the values reconstructed by
-         -- Storage_IO were properly preserved, object tag values following
-         -- object reconstruction are compared with tag values of objects
-         -- stored prior to processing.
+         -- To ensure that the tags of the values reconstructed by Storage_IO
+         -- were properly preserved, object tag values following object
+         -- reconstruction are compared with tag values of objects stored
+         -- prior to processing.
 
          Tag_Verification_Block : begin
 

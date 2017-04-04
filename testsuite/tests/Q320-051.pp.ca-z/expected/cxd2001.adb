@@ -121,9 +121,8 @@ begin
                else
                   -- This is a Sub_Task
                   -- Both Sub_Task tasks should complete before Prime_Task
-                  -- registers
-                  -- All Subtasks must run before the Prime task is
-                  -- reactivated
+                  -- registers All Subtasks must run before the Prime task
+                  -- is reactivated
                   if Prime_Task_Has_Registered then
                      -- Cannot call Report.Failed from within a PO.
                      Tc_Failed := True;
@@ -134,16 +133,16 @@ begin
 
          task Prime_Task is
 
-            -- Set the priority of this task high to ensure that it runs
-            -- to the exclusion of the Sub_Task children
+            -- Set the priority of this task high to ensure that it runs to the
+            -- exclusion of the Sub_Task children
             pragma Priority (Priority_2q);
 
             entry Dummy_Entry;
 
          end Prime_Task;
 
-         -- The priority of the Sub_Task is the priority of the ready queue
-         -- we are using for the test
+         -- The priority of the Sub_Task is the priority of the ready queue we
+         -- are using for the test
          --
          task type Sub_Task is
             pragma Priority (Priority_1q);
@@ -172,8 +171,8 @@ begin
          begin
 
             -- At this point the two Sub_Tasks are on the Priority_1Q queue
-            -- waiting to run but this task is running at Priority_2Q.
-            -- Now lower the priority of this task to the same as the others on
+            -- waiting to run but this task is running at Priority_2Q. Now
+            -- lower the priority of this task to the same as the others on
             -- the queue.
             --
             Adp.Set_Priority (Priority_1q);   -- in ADP the default
@@ -181,10 +180,10 @@ begin
             -- "current_task"
 
             -- When the setting of the active priority (in this case the base
-            -- priority) takes effect the task should be suspended and added
-            -- to the tail of the queue.  This dummy accept statement is
-            -- an abort completion point; the change in the priority must be
-            -- effective no later than this.
+            -- priority) takes effect the task should be suspended and added to
+            -- the tail of the queue. This dummy accept statement is an abort
+            -- completion point; the change in the priority must be effective
+            -- no later than this.
             --
             select
                accept Dummy_Entry;
@@ -193,7 +192,7 @@ begin
             end select;
 
             -- When the task reaches the head of the queue it is reactivated
-            -- here.  Register this fact.
+            -- here. Register this fact.
             --
             Register.E1 (This_Task_Type);
 

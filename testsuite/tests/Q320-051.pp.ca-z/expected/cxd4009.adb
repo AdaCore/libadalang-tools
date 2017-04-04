@@ -70,8 +70,8 @@ procedure Cxd4009 is
    --------------------------------------------------------------
 
    task Checker is
-      -- order of declaration is not important so they are
-      -- not declared in the order expected.
+      -- order of declaration is not important so they are not declared in the
+      -- order expected.
       entry E2;
       entry E3;
       entry E1;
@@ -254,9 +254,8 @@ procedure Cxd4009 is
    --------------------------------------------------------------
 
    task type T (Id : Natural) is
-      -- make the priorities surround the default priority
-      -- The priorities are set for the first test where they
-      -- need to be in reverse order of Id
+      -- make the priorities surround the default priority The priorities are
+      -- set for the first test where they need to be in reverse order of Id
       pragma Priority (System.Default_Priority + 3 - Id);
    end T;
 
@@ -278,11 +277,10 @@ procedure Cxd4009 is
             Report.Failed ("bad Id in task");
       end case;
 
-      -- The second check expects E5_2 to go first and E1_2 last.
-      -- (Note: We use a second set of entries; if we didn't, we could queue
-      -- again before the first subtest is finished, causing havoc.)
-      -- We change our priority to make correspond to the Id
-      -- instead of the reverse order of Id.
+      -- The second check expects E5_2 to go first and E1_2 last. (Note: We use
+      -- a second set of entries; if we didn't, we could queue again before the
+      -- first subtest is finished, causing havoc.) We change our priority to
+      -- make correspond to the Id instead of the reverse order of Id.
       Ada.Dynamic_Priorities.Set_Priority (System.Default_Priority - 3 + Id);
 
       case Id is
@@ -314,8 +312,8 @@ begin
       " all waiting tasks are of different priority");
 
    declare  -- encapsulate the test
-      -- tasks not declared in order to prevent the source order
-      -- of the declarations from affecting the outcome
+      -- tasks not declared in order to prevent the source order of the
+      -- declarations from affecting the outcome
       T3 : T (3);
       T1 : T (1);
       T5 : T (5);

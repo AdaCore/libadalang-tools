@@ -324,7 +324,7 @@ begin
    -- Test Replace_Element
 
    -- Increment the values of the two Indefinite_Hashed_Sets and check still
-   -- equal.  Only a small adjustment made so as not to change the order
+   -- equal. Only a small adjustment made so as not to change the order
 
    My_Cursor_1 := My_Set_1.First;
    My_Cursor_2 := My_Set_2.First;
@@ -378,8 +378,8 @@ begin
 
    end if;
 
--- Test Move.  After Move the target values should be replaced (not appended)
--- by the test values
+   -- Test Move. After Move the target values should be replaced (not appended)
+   -- by the test values
 
    My_Set_2.Clear;
 
@@ -419,9 +419,8 @@ begin
 
    -- Test Insert (two forms), Include and Replace (element form)
 
-   -- My_Set_2 should initially be empty
-   -- Insert in fairly mixed order to check that order is determined by the
-   -- element, not the order of insertion
+   -- My_Set_2 should initially be empty Insert in fairly mixed order to check
+   -- that order is determined by the element, not the order of insertion
 
    declare
    begin
@@ -577,8 +576,7 @@ begin
 
    -- Test Delete (cursor and element forms) and Exclude (element form)
 
-   -- My_Cursor_2 should initially be pointing to the last element of
-   -- My_Set_2
+   -- My_Cursor_2 should initially be pointing to the last element of My_Set_2
 
    My_Set_2.Delete (Position => My_Cursor_2); -- Last
 
@@ -670,9 +668,9 @@ begin
 
    My_Cursor_2 := My_Set_2.First;
 
-   -- Hashed sets are not ordered so could be read out in any order.
-   -- My_Set_2 should still contain a single element so we know which the
-   -- cursor points to
+   -- Hashed sets are not ordered so could be read out in any order. My_Set_2
+   -- should still contain a single element so we know which the cursor points
+   -- to
 
    if not My_Indefinite_Hashed_Sets.Has_Element (Position => My_Cursor_2) then
 
@@ -692,9 +690,8 @@ begin
 
    -- Test Union, Overlap and Is_Subset
 
-   -- My_Set_1 should still contain the test values.
-   -- My_Set_2 should still contain the default value.
-   -- My_Set_3 should initially be empty
+   -- My_Set_1 should still contain the test values. My_Set_2 should still
+   -- contain the default value. My_Set_3 should initially be empty
 
    My_Set_2.Clear;
 
@@ -777,8 +774,8 @@ begin
 
    -- Test Intersection
 
-   -- My_Set_1 should still contain the test values.
-   -- My_Set_2 should still contain test value Value_In_Ptr_Array (2).all
+   -- My_Set_1 should still contain the test values. My_Set_2 should still
+   -- contain test value Value_In_Ptr_Array (2).all
 
    My_Set_3.Clear;
 
@@ -837,8 +834,8 @@ begin
 
    -- Test Difference
 
-   -- My_Set_1 should still contain the test values.
-   -- My_Set_2 should still contain test value Value_In_Ptr_Array (2).all
+   -- My_Set_1 should still contain the test values. My_Set_2 should still
+   -- contain test value Value_In_Ptr_Array (2).all
 
    My_Set_3.Clear;
 
@@ -869,8 +866,8 @@ begin
        (Left  => My_Set_1,
         Right => My_Set_2);
 
-   -- My_Set_3 should contain the test values except for
-   -- Value_In_Ptr_Array (2).all
+   -- My_Set_3 should contain the test values except for Value_In_Ptr_Array
+   -- (2).all
 
    if My_Set_3.Length /= Fxaia00.Num_Tests - 1 then
 
@@ -880,8 +877,8 @@ begin
 
    My_Set_3 := My_Set_1 - My_Set_2;
 
-   -- My_Set_3 should contain the test values except for
-   -- Value_In_Ptr_Array (2).all
+   -- My_Set_3 should contain the test values except for Value_In_Ptr_Array
+   -- (2).all
 
    if My_Set_3.Length /= Fxaia00.Num_Tests - 1 then
 
@@ -891,8 +888,8 @@ begin
 
    -- Test Symmetric_Difference
 
-   -- My_Set_1 should still contain the test values.
-   -- My_Set_2 should still contain test value Value_In_Ptr_Array (2).all
+   -- My_Set_1 should still contain the test values. My_Set_2 should still
+   -- contain test value Value_In_Ptr_Array (2).all
 
    My_Set_3.Clear;
 
@@ -915,8 +912,8 @@ begin
        (Left  => My_Set_1,
         Right => My_Set_3);
 
-   -- My_Set_3 should contain the test values except for
-   -- Value_In_Ptr_Array (2).all, plus Default_Value
+   -- My_Set_3 should contain the test values except for Value_In_Ptr_Array
+   -- (2).all, plus Default_Value
 
    if My_Set_3.Length /= Fxaia00.Num_Tests then
 
@@ -934,18 +931,18 @@ begin
 
    end if;
 
-   -- Test Key, Element (key form), Replace (key form), Exclude (key form),
-   -- Delete (key form), Find (key form), Contains (key form) and
-   -- Update_Element_Preserving_Key
+   -- Test Key, Element (key form), Replace (key form), Exclude (key
+   -- form), Delete (key form), Find (key form), Contains (key form)
+   -- and Update_Element_Preserving_Key
 
    -- My_Set_3 should still contain the test values, plus Default_Value
    -- My_Set_2 should still contain test value Value_In_Ptr_Array (2).all
 
    My_Cursor_2 := My_Set_2.First;
 
-   -- Hashed sets are not ordered so could be read out in any order.
-   -- My_Set_2 should still contain a single element so we know which the
-   -- cursor points to
+   -- Hashed sets are not ordered so could be read out in any order. My_Set_2
+   -- should still contain a single element so we know which the cursor points
+   -- to
 
    if My_Keys.Key (Position => My_Cursor_2) /=
      My_Key_Type (Character'Pos (Value_In_Ptr_Array (2).all (1)))
@@ -1070,7 +1067,7 @@ begin
            (Container => My_Set_3,
             Where     => "Update_Element_Preserving_Key");
 
-         -- Increment the second character of the string.  Doesn't change key
+         -- Increment the second character of the string. Doesn't change key
 
          Element (Element'First + 1) :=
            Character'Succ (Element (Element'First + 1));

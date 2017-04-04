@@ -96,9 +96,9 @@ begin
       Tc_Size_T_Count  : Size_T              := Size_T'First;
       Tc_Natural_Count : Natural             := Natural'First;
 
-      -- We can use the character forms of To_Ada and To_C here to check
-      -- the results; they were tested in CXB3004. We give them different
-      -- names to avoid confusion below.
+      -- We can use the character forms of To_Ada and To_C here to check the
+      -- results; they were tested in CXB3004. We give them different names
+      -- to avoid confusion below.
 
       function Character_To_Char
         (Source : in Character) return Char renames
@@ -123,8 +123,8 @@ begin
          Count      => Tc_Size_T_Count,
          Append_Nul => True);
 
-      -- Check that the out parameter Count is set to the appropriate value
-      -- for the nul terminated case.
+      -- Check that the out parameter Count is set to the appropriate value for
+      -- the nul terminated case.
 
       if Tc_Size_T_Count /= 7 then
          Report.Failed
@@ -169,8 +169,8 @@ begin
          Count      => Tc_Size_T_Count,
          Append_Nul => False);
 
-      -- Check that the out parameter Count is set to the appropriate value
-      -- for the non-nul terminated case.
+      -- Check that the out parameter Count is set to the appropriate value for
+      -- the non-nul terminated case.
 
       if Tc_Size_T_Count /= 4 then
          Report.Failed
@@ -204,9 +204,9 @@ begin
             "of Append_Nul => False");
       end if;
 
-      -- Check that Constraint_Error is raised by procedure To_C if the
-      -- length of the target char_array parameter is not sufficient to
-      -- hold the converted string value (plus nul if Append_Nul is True).
+      -- Check that Constraint_Error is raised by procedure To_C if the length
+      -- of the target char_array parameter is not sufficient to hold the
+      -- converted string value (plus nul if Append_Nul is True).
 
       begin
          To_C
@@ -233,9 +233,9 @@ begin
       end;
 
       -- Check that the procedure To_Ada converts char elements of the
-      -- char_array parameter Item to the corresponding character elements
-      -- of string out parameter Target, with result string length based on
-      -- the Trim_Nul parameter.
+      -- char_array parameter Item to the corresponding character elements of
+      -- string out parameter Target, with result string length based on the
+      -- Trim_Nul parameter.
       --
       -- Case of appended nul char on the char_array In parameter.
 
@@ -394,9 +394,9 @@ begin
                "Trim_Nul => True");
       end;
 
-      -- Check that Constraint_Error is propagated by procedure To_Ada if the
-      -- length of string parameter Target is not long enough to hold the
-      -- converted char_array value (plus nul if Trim_Nul is False).
+      -- Check that Constraint_Error is propagated by procedure To_Ada if
+      -- the length of string parameter Target is not long enough to hold
+      -- the converted char_array value (plus nul if Trim_Nul is False).
 
       begin
          Tc_Char_Array (0 .. 4) := To_C ("ABCD", Append_Nul => True);

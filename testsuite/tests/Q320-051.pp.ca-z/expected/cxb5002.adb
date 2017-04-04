@@ -164,8 +164,8 @@ begin
 
    begin
 
-      -- Check that the Function To_Fortran with a Character parameter
-      -- will return the corresponding Fortran Character_Set value.
+      -- Check that the Function To_Fortran with a Character parameter will
+      -- return the corresponding Fortran Character_Set value.
 
       for Tc_Character in Acl.Lc_A .. Acl.Lc_Z loop
          if To_Fortran (Item => Tc_Character) /=
@@ -194,8 +194,8 @@ begin
            ("Incorrect result from To_Fortran with null character input");
       end if;
 
-      -- Check that the Function To_Ada with a Character_Set parameter
-      -- will return the corresponding Ada Character value.
+      -- Check that the Function To_Ada with a Character_Set parameter will
+      -- return the corresponding Ada Character value.
 
       Tc_Low_Character_Set  := Character_To_Character_Set ('a');
       Tc_High_Character_Set := Character_To_Character_Set ('z');
@@ -231,9 +231,9 @@ begin
             "Character_Set input");
       end if;
 
-      -- Check that the Function To_Fortran with a String parameter
-      -- will return the corresponding Fortran_Character value.
-      -- Note: The type Fortran_Character is a character array type that
+      -- Check that the Function To_Fortran with a String parameter will
+      -- return the corresponding Fortran_Character value. Note: The type
+      -- Fortran_Character is a character array type that
       --       corresponds to Ada type String.
 
       Fortran_Character_1 := To_Fortran (Item => Tc_String_1);
@@ -264,8 +264,8 @@ begin
          Report.Failed ("Incorrect result from procedure To_Fortran - 5");
       end if;
 
-      -- Check that the Function To_Ada with a Fortran_Character parameter
-      -- will return the corresponding Ada String value.
+      -- Check that the Function To_Ada with a Fortran_Character parameter will
+      -- return the corresponding Ada String value.
 
       String_1 := To_Ada (Tc_Fortran_Character_1);
 

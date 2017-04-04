@@ -57,11 +57,11 @@ with Report;
 procedure Cxa4018 is
 
    -- The following two functions are used to translate character and string
-   -- values to "Wide" values.  They will be applied to all the Wide_Bounded
+   -- values to "Wide" values. They will be applied to all the Wide_Bounded
    -- subprogram parameters to simulate the use of Wide_Characters and
    -- Wide_Strings in actual practice. Blanks are translated to Wide_Character
-   -- blanks and all other characters are translated into Wide_Characters with
-   -- position values 256 greater than their (narrow) character position
+   -- blanks and all other characters are translated into Wide_Characters
+   -- with position values 256 greater than their (narrow) character position
    -- values.
 
    function Translate (Ch : Character) return Wide_Character is
@@ -182,8 +182,8 @@ begin
             " and comparison");
       end if;
 
-      -- Evaluate the overloaded forms of the Constructor function "*" and
-      -- the Replicate function.
+      -- Evaluate the overloaded forms of the Constructor function "*" and the
+      -- Replicate function.
 
       Constructed_String :=
         Bs80."*" (2, Chara) &                     -- "AA"
@@ -197,11 +197,11 @@ begin
 
       -- Use of Function Replicate that involves dropping wide characters.
       -- The attempt to replicate the 15 character wide string six times will
-      -- exceed the 80 wide character bound of the wide string.  Therefore,
+      -- exceed the 80 wide character bound of the wide string. Therefore,
       -- the result should be the catenation of 5 copies of the 15 character
       -- wide string, followed by 5 'A' wide characters (the first five wide
-      -- characters of the 6th replication) with the remaining wide
-      -- characters of the 6th replication dropped.
+      -- characters of the 6th replication) with the remaining wide characters
+      -- of the 6th replication dropped.
 
       Drop_String :=
         Bs80.Replicate
@@ -256,9 +256,9 @@ begin
 
          -- Evaluate the results from function Count by comparing the number
          -- of A's to the number of F's, B's to E's, and C's to D's in the
-         -- Constructed_String.
-         -- There should be an equal number of each of the wide characters that
-         -- are being compared (i.e., 2 A's and F's, 4 B's and E's, etc)
+         -- Constructed_String. There should be an equal number of each of the
+         -- wide characters that are being compared (i.e., 2 A's and F's, 4 B's
+         -- and E's, etc)
 
          if Bs80.Count (Constructed_String, A_Set) /=
            Bs80.Count (Constructed_String, F_Set) or
@@ -271,8 +271,8 @@ begin
             Report.Failed ("Incorrect result from function Count");
          end if;
 
-         -- Evaluate the functions Head, Tail, and Find_Token.
-         -- Create the Token_String from the Constructed_String above.
+         -- Evaluate the functions Head, Tail, and Find_Token. Create the
+         -- Token_String from the Constructed_String above.
 
          Token_String :=
            Bs80.Tail (Bs80.Head (Constructed_String, 3), 2) &     -- "AB" &
@@ -286,10 +286,9 @@ begin
          end if;
 
          -- Find the starting/ending position of the first A in the
-         -- Token_String (both should be 1, only one A appears in string).
-         -- The Function Head uses the default pad character to return a
-         -- bounded wide string longer than its input parameter bounded
-         -- wide string.
+         -- Token_String (both should be 1, only one A appears in string). The
+         -- Function Head uses the default pad character to return a bounded
+         -- wide string longer than its input parameter bounded wide string.
 
          Bs80.Find_Token
            (Bs80.Head (Token_String, 10),  -- Default pad.
@@ -302,9 +301,9 @@ begin
             Report.Failed ("Incorrect result from Find_Token - 1");
          end if;
 
-         -- Find the starting/ending position of the first non-AB slice in
-         -- the "head" five wide characters of Token_String (slice CDE at
-         -- positions 3-5)
+         -- Find the starting/ending position of the first non-AB slice in the
+         -- "head" five wide characters of Token_String (slice CDE at positions
+         -- 3-5)
 
          Bs80.Find_Token
            (Bs80.Head (Token_String, 5),               -- "ABCDE"
@@ -317,10 +316,10 @@ begin
             Report.Failed ("Incorrect result from Find_Token - 2");
          end if;
 
-         -- Find the starting/ending position of the first CD slice in
-         -- the "tail" eight wide characters (including two pad wide
-         -- characters) of Token_String (slice CD at positions 5-6 of
-         -- the tail portion specified)
+         -- Find the starting/ending position of the first CD slice in the
+         -- "tail" eight wide characters (including two pad wide characters)
+         -- of Token_String (slice CD at positions 5-6 of the tail portion
+         -- specified)
 
          Bs80.Find_Token
            (Bs80.Tail (Token_String, 8, Ada.Strings.Wide_Space),

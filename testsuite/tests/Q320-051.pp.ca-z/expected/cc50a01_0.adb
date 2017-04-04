@@ -35,9 +35,9 @@ package body Cc50a01_0 is
    end Pop;
 
    -- Return the value of the top item on the stack. This procedure only
-   -- returns the value; it does not remove the top item from the stack.
-   -- Hence, in order to accomplish a "true" pop, both View_Top and Pop must
-   -- be called consecutively.
+   -- returns the value; it does not remove the top item from the stack. Hence,
+   -- in order to accomplish a "true" pop, both View_Top and Pop must be called
+   -- consecutively.
    --
    -- Since items on the stack are of a type (Stack_Item) derived from Item,
    -- which is a (tagged) private type, type conversion toward the root is the

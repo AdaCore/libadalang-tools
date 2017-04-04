@@ -24,15 +24,15 @@
 --*
 -- OBJECTIVE: See CA5004B2M.ADA
 --
--- SPECIAL INSTRUCTIONS:  See CA5004B2M.ADA
+-- SPECIAL INSTRUCTIONS: See CA5004B2M.ADA
 --
 -- TEST FILES:
 --     => CA5004B0.ADA
 --        CA5004B1.ADA
 --        CA5004B2M.ADA
 
--- PWN 05/31/96 Split test into files without duplicate unit names.
--- RLB 03/11/99 Split test into files so that units that will be replaced
+-- PWN 05/31/96 Split test into files without duplicate unit names. RLB
+-- 03/11/99 Split test into files so that units that will be replaced
 --              and units that won't are not in the same source file.
 
 -------------------------------------------------------------

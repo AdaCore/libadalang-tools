@@ -133,9 +133,9 @@ begin
 
       -- Check that the procedure To_Fortran converts the character elements
       -- of the String parameter Item into Character_Set elements of the
-      -- Fortran_Character type parameter Target.
-      -- Check that the parameter Last contains the index of the last element
-      -- of parameter Target that was assigned by To_Fortran.
+      -- Fortran_Character type parameter Target. Check that the parameter Last
+      -- contains the index of the last element of parameter Target that was
+      -- assigned by To_Fortran.
 
       To_Fortran
         (Item   => Tc_String_1,
@@ -214,11 +214,11 @@ begin
                Exception_Name (The_Error));
       end;
 
-      -- Check that the procedure To_Ada converts the Character_Set
-      -- elements of the Fortran_Character parameter Item into Character
-      -- elements of the String parameter Target.
-      -- Check that the parameter Last contains the index of the last
-      -- element of parameter Target that was assigned by To_Ada.
+      -- Check that the procedure To_Ada converts the Character_Set elements
+      -- of the Fortran_Character parameter Item into Character elements of the
+      -- String parameter Target. Check that the parameter Last contains the
+      -- index of the last element of parameter Target that was assigned by
+      -- To_Ada.
 
       To_Ada
         (Item   => Tc_Fortran_Character_1,
@@ -263,9 +263,9 @@ begin
             "parameter Item is null array");
       end if;
 
-      -- Check that Constraint_Error is propagated by procedure To_Ada
-      -- when the length of Fortran_Character parameter Item exceeds the
-      -- length of String parameter Target.
+      -- Check that Constraint_Error is propagated by procedure To_Ada when
+      -- the length of Fortran_Character parameter Item exceeds the length
+      -- of String parameter Target.
 
       begin
 

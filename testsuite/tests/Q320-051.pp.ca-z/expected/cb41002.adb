@@ -114,9 +114,9 @@ begin
             return False;
          end Is_Substring_Of;
       begin
-         -- We can't display Info, as it often contains line breaks
-         -- (confusing Report), and might look much like the failure of a test
-         -- with an unhandled exception (thus confusing grading tools).
+         -- We can't display Info, as it often contains line breaks (confusing
+         -- Report), and might look much like the failure of a test with an
+         -- unhandled exception (thus confusing grading tools).
          --
          -- We don't particular care if the implementation advice is followed,
          -- but we make these checks to insure that a compiler cannot optimize
@@ -189,8 +189,8 @@ begin
          end;
       end loop;
 
-      -- Verify that the exception specific message is carried across
-      -- various boundaries:
+      -- Verify that the exception specific message is carried across various
+      -- boundaries:
 
       begin
 
@@ -225,8 +225,8 @@ begin
          exception
             when Exc : User_Exception_2 =>
 
-               -- The exception is reraised here; message should propagate
-               -- with exception occurrence.
+               -- The exception is reraised here; message should propagate with
+               -- exception occurrence.
 
                Ada.Exceptions.Reraise_Occurrence (Exc);
             when others =>

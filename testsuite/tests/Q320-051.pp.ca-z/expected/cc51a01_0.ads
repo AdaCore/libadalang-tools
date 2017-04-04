@@ -58,9 +58,8 @@ generic               -- Fraction I/O support.
 package Cc51a01_0 is                               -- (private) record type.
 
    -- Simulate writing a fraction to standard output. In a real application,
-   -- this subprogram might be a procedure which uses Text_IO routines. For
-   -- the purposes of the test, the "output" is returned to the caller as a
-   -- string.
+   -- this subprogram might be a procedure which uses Text_IO routines. For the
+   -- purposes of the test, the "output" is returned to the caller as a string.
    function Put (Item : in Fraction) return String;
 
    -- ... Other I/O operations for fractions.

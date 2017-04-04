@@ -10,8 +10,8 @@ procedure Ca11021 is
 
    --------------------------------------------------
 
--- Declare instance of the generic complex package for one particular
--- integer type.
+-- Declare instance of the generic complex package for one particular integer
+-- type.
 
    package My_Complex_Pkg is new Ca11021_0 (Int_Type => My_Integer);
 

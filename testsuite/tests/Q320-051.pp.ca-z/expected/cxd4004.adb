@@ -91,16 +91,16 @@ begin
       Message_2_Numb : Message_Number := 101;   -- Low priority
       Message_3_Numb : Message_Number := 102;   -- High active priority
 
-      -- Two instances of a task of this type place the first two
-      -- messages on the queue
+      -- Two instances of a task of this type place the first two messages on
+      -- the queue
       task type Message_Task is
          pragma Priority (Priority_1q);
          entry Start (Numb : in Message_Number);
       end Message_Task;
       type Acc_Message_Task is access Message_Task;
 
-      -- This task places the third message on the queue then has its
-      -- active priority raised
+      -- This task places the third message on the queue then has its active
+      -- priority raised
       task Modified_Task is
          pragma Priority (Priority_1q);
          entry Start (Numb : in Message_Number);
@@ -150,8 +150,8 @@ begin
       begin
          accept Start (Numb : in Message_Number) do
 
-            -- Hold the "message" in this task.  For the test we are just
-            -- noting the Message_Number
+            -- Hold the "message" in this task. For the test we are just noting
+            -- the Message_Number
             This_Message_Number := Numb;
 
          end Start;
@@ -169,14 +169,14 @@ begin
       begin
          accept Start (Numb : in Message_Number) do
 
-            -- Hold the "message" in this task.  For the test we are just
-            -- noting the Message_Number
+            -- Hold the "message" in this task. For the test we are just noting
+            -- the Message_Number
             This_Message_Number := Numb;
 
          end Start;
 
-         -- Now use an ATC to queue self on the Distributor's Input queue
-         -- and, in parallel raise our priority
+         -- Now use an ATC to queue self on the Distributor's Input queue and,
+         -- in parallel raise our priority
          --
          select
             Distributor.Input (This_Message_Number);
@@ -188,9 +188,9 @@ begin
             -- announce that the priority is now raised
             Signal.Priority_Raised;
 
-            -- We block here waiting on the Distributor's input
-            -- queue to be serviced and triggering the async
-            -- select (thus aborting this part).
+            -- We block here waiting on the Distributor's input queue to be
+            -- serviced and triggering the async select (thus aborting this
+            -- part).
             Signal.Block;
 
          end select;
@@ -211,8 +211,8 @@ begin
            (100, 101, 102);
       begin
          loop
-            -- This is the handshaking loop used to ensure all the items
-            -- are queued before processing the Input queue
+            -- This is the handshaking loop used to ensure all the items are
+            -- queued before processing the Input queue
             select
                accept Nb_Waiting (Number : out Natural) do
 
@@ -234,8 +234,8 @@ begin
                end if;
             end Input;
 
-            -- When all items have been processed, allow the distributor
-            -- to terminate
+            -- When all items have been processed, allow the distributor to
+            -- terminate
             exit when Input'Count = 0;
 
          end loop;
@@ -252,8 +252,8 @@ begin
 
    begin -- declare
 
-      -- Start up the Message carrier tasks.  For the test, just
-      -- present them with a message Number rather than a whole message.
+      -- Start up the Message carrier tasks. For the test, just present them
+      -- with a message Number rather than a whole message.
       Message_1.Start (Message_1_Numb);
 
       -- Wait for the first message to arrive at the Distributor's queue
@@ -272,9 +272,8 @@ begin
          delay Impdef.Minimum_Task_Switch;
       end loop;
 
-      -- There are now two calls waiting on the queue.  Start up the
-      -- Modified_Task which will place the third call on the
-      -- queue.
+      -- There are now two calls waiting on the queue. Start up the
+      -- Modified_Task which will place the third call on the queue.
       Modified_Task.Start (Message_3_Numb);
 
       -- Wait for the third message to arrive at the Distributor's queue
@@ -284,13 +283,13 @@ begin
          delay Impdef.Clear_Ready_Queue;
       end loop;
 
-      -- All messages are now waiting on the Distributor's queue.
-      -- Wait for Modified_Task to raise its priority.
+      -- All messages are now waiting on the Distributor's queue. Wait for
+      -- Modified_Task to raise its priority.
       Signal.Wait_For_Priority_Raised;
 
       -- The Modified_Task is now running with an ACTIVE priority of
-      -- Priority_3Q.  Allow the distributor to service the queue
-      -- and to check the sequence of entries
+      -- Priority_3Q. Allow the distributor to service the queue and to
+      -- check the sequence of entries
       Distributor.Go;
 
    end; -- declare,   wait here till all the tasks have terminated

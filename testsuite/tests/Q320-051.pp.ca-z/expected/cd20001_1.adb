@@ -5,8 +5,8 @@ with Tctouch;
 package body Cd20001_1 is
 
    function Next_Factor (Value : Positive) return Integer is
-      -- Returns the factor of Word_Size that is next larger than Value.
-      -- If Value is greater than Word_Size, then returns Word_Size.
+      -- Returns the factor of Word_Size that is next larger than Value. If
+      -- Value is greater than Word_Size, then returns Word_Size.
       Test  : Integer := Value;
       Found : Boolean := False;
    begin  -- Next_Factor

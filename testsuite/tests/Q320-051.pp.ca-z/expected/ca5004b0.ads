@@ -41,12 +41,12 @@
 
 -- BHS 8/03/84
 -- JRK 9/20/84
--- PWN 11/30/94 ADDED A PROCEDURE TO KEEP PACKAGE BODIES LEGAL.
--- PWN 05/31/96 Split test into files without duplicate unit names.
--- TMB 11/20/96 ADDED PROCEDURE DECL TO CA5004B0 TO INSURE IT MAKES
+-- PWN 11/30/94 ADDED A PROCEDURE TO KEEP PACKAGE BODIES LEGAL. PWN 05/31/96
+-- Split test into files without duplicate unit names. TMB 11/20/96 ADDED
+-- PROCEDURE DECL TO CA5004B0 TO INSURE IT MAKES
 --               THE OLD BODY OBSOLETE
--- TMB 12/2/96  MADE NAME OF MAIN PROCEDURE SAME AS FILE NAME
--- RLB 03/11/99 Split first test file in order to prevent good units
+-- TMB 12/2/96 MADE NAME OF MAIN PROCEDURE SAME AS FILE NAME RLB 03/11/99 Split
+-- first test file in order to prevent good units
 --              from being made obsolete.
 
 -------------------------------------------------------------

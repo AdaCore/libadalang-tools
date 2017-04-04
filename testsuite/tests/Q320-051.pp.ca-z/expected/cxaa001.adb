@@ -75,11 +75,10 @@ begin
    Test_For_Text_Io_Support : begin
 
       -- An implementation that does not support Text_IO in a particular
-      -- environment will raise Use_Error on calls to various
-      -- Text_IO operations.  This block statement encloses a call to
-      -- Create, which should raise an exception in a non-supportive
-      -- environment.  This exception will be handled to produce a
-      -- Not_Applicable result.
+      -- environment will raise Use_Error on calls to various Text_IO
+      -- operations. This block statement encloses a call to Create, which
+      -- should raise an exception in a non-supportive environment. This
+      -- exception will be handled to produce a Not_Applicable result.
 
       Text_Io.Create
         (File => Data_File,
@@ -163,13 +162,13 @@ begin
 
    begin
 
-      -- The following call simulates processing occurring after the create
-      -- of a Text_IO file with mode Append_File.
+      -- The following call simulates processing occurring after the create of
+      -- a Text_IO file with mode Append_File.
 
       Write_Confidential_Data (Confidential_Item);
 
-      -- The following call simulates processing occurring after the reset
-      -- of a Text_IO file with mode Append_File.
+      -- The following call simulates processing occurring after the reset of a
+      -- Text_IO file with mode Append_File.
 
       Reset1 : begin
          Text_Io.Reset (Data_File, Text_Io.Append_File); -- Reset to
@@ -215,9 +214,9 @@ begin
          Text_Io.Get_Line (Data_File, Tc_String2, Tc_Length2);
          Text_Io.Get_Line (Data_File, Tc_String3, Tc_Length3);
 
-         -- Verify that the line lengths of each line were accurate.
-         -- Note: Each data line was written to the file after the
-         -- particular line length had been set (to the data length).
+         -- Verify that the line lengths of each line were accurate. Note: Each
+         -- data line was written to the file after the particular line length
+         -- had been set (to the data length).
 
          if not
            ((Tc_Length1 = Natural (Confidential_Data_Size)) and

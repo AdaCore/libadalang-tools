@@ -100,42 +100,42 @@ package Impdef is
 
 --=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--
 
-   -- This is the minimum time required to allow another task to get
-   -- control.  It is expected that the task is on the Ready queue.
-   -- A duration of 0.0 would normally be sufficient but some number
-   -- greater than that is expected.
+   -- This is the minimum time required to allow another task to get control.
+   -- It is expected that the task is on the Ready queue. A duration of
+   -- 0.0 would normally be sufficient but some number greater than that
+   -- is expected.
 
    Minimum_Task_Switch : constant Duration := 0.5;
    --                                         ^^^ --- MODIFY HERE AS NEEDED
 
 --=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--
 
-   -- This is the time required to activate another task and allow it
-   -- to run to its first accept statement.  We are considering a simple task
-   -- with very few Ada statements before the accept.  An implementation is
-   -- free to specify a delay of several seconds, or even minutes if need be.
-   -- The main effect of specifying a longer delay than necessary will be an
-   -- extension of the time needed to run the associated tests.
+   -- This is the time required to activate another task and allow it to run
+   -- to its first accept statement. We are considering a simple task with
+   -- very few Ada statements before the accept. An implementation is free to
+   -- specify a delay of several seconds, or even minutes if need be. The main
+   -- effect of specifying a longer delay than necessary will be an extension
+   -- of the time needed to run the associated tests.
 
    Switch_To_New_Task : constant Duration := 1.0;
    --                                        ^^^ -- MODIFY HERE AS NEEDED
 
 --=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--
 
-   -- This is the time which will clear the queues of other tasks
-   -- waiting to run.  It is expected that this will be about five
-   -- times greater than Switch_To_New_Task.
+   -- This is the time which will clear the queues of other tasks waiting
+   -- to run. It is expected that this will be about five times greater
+   -- than Switch_To_New_Task.
 
    Clear_Ready_Queue : constant Duration := 5.0;
    --                                       ^^^ --- MODIFY HERE AS NEEDED
 
 --=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--
 
-   -- Some implementations will boot with the time set to 1901/1/1/0.0
-   -- When a delay of Delay_For_Time_Past is given, the implementation
-   -- guarantees that a subsequent call to Ada.Calendar.Time_Of(1901,1,1)
-   -- will yield a time that has already passed (for example, when used in
-   -- a delay_until statement).
+   -- Some implementations will boot with the time set to 1901/1/1/0.0 When
+   -- a delay of Delay_For_Time_Past is given, the implementation guarantees
+   -- that a subsequent call to Ada.Calendar.Time_Of(1901,1,1) will yield a
+   -- time that has already passed (for example, when used in a delay_until
+   -- statement).
 
    Delay_For_Time_Past : constant Duration := 0.1;
    --                                         ^^^ --- MODIFY HERE AS NEEDED
@@ -144,41 +144,40 @@ package Impdef is
 
    -- Minimum time interval between calls to the time dependent Reset
    -- procedures in Float_Random and Discrete_Random packages that is
-   -- guaranteed to initiate different sequences.  See RM A.5.2(45).
+   -- guaranteed to initiate different sequences. See RM A.5.2(45).
 
    Time_Dependent_Reset : constant Duration := 0.3;
    --                                          ^^^ --- MODIFY HERE AS NEEDED
 
 --=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--
 
-   -- Test CXA5013 will loop, trying to generate the required sequence
-   -- of random numbers.  If the RNG is faulty, the required sequence
-   -- will never be generated.  Delay_Per_Random_Test is a time-out value
-   -- which allows the test to run for a period of time after which the
-   -- test is failed if the required sequence has not been produced.
-   -- This value should be the time allowed for the test to run before it
-   -- times out.  It should be long enough to allow multiple (independent)
-   -- runs of the testing code, each generating up to 1000 random
-   -- numbers.
+   -- Test CXA5013 will loop, trying to generate the required sequence of
+   -- random numbers. If the RNG is faulty, the required sequence will never
+   -- be generated. Delay_Per_Random_Test is a time-out value which allows the
+   -- test to run for a period of time after which the test is failed if the
+   -- required sequence has not been produced. This value should be the time
+   -- allowed for the test to run before it times out. It should be long enough
+   -- to allow multiple (independent) runs of the testing code, each generating
+   -- up to 1000 random numbers.
 
    Delay_Per_Random_Test : constant Duration := 1.0;
    --                                           ^^^ --- MODIFY HERE AS NEEDED
 
 --=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--
 
-   -- The time required to execute this procedure must be greater than the
-   -- time slice unit on implementations which use time slicing.  For
-   -- implementations which do not use time slicing the body can be null.
+   -- The time required to execute this procedure must be greater than the time
+   -- slice unit on implementations which use time slicing. For implementations
+   -- which do not use time slicing the body can be null.
 
    procedure Exceed_Time_Slice;
 
 --=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--
 
-   -- This constant must not depict a random number generator state value.
-   -- Using this string in a call to function Value from either the
-   -- Discrete_Random or Float_Random packages will result in
-   -- Constraint_Error or Program_Error (expected result in test CXA5012).
-   -- If there is no such string, set it to "**NONE**".
+   -- This constant must not depict a random number generator state
+   -- value. Using this string in a call to function Value from either the
+   -- Discrete_Random or Float_Random packages will result in Constraint_Error
+   -- or Program_Error (expected result in test CXA5012). If there is no such
+   -- string, set it to "**NONE**".
 
    Non_State_String : constant String := "By No Means A State";
    --           MODIFY HERE AS NEEDED --- ^^^^^^^^^^^^^^^^^^^
@@ -186,17 +185,17 @@ package Impdef is
 --=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--
 
    -- This string constant must be a legal external tag value as used by
-   -- CD10001 for the type Some_Tagged_Type in the representation
-   -- specification for the value of 'External_Tag.
+   -- CD10001 for the type Some_Tagged_Type in the representation specification
+   -- for the value of 'External_Tag.
 
    External_Tag_Value : constant String := "implementation_defined";
    --             MODIFY HERE AS NEEDED --- ^^^^^^^^^^^^^^^^^^^^^^
 
 --=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--
 
-   -- The following address constant must be a valid address to locate
-   -- the C program CD30005_1.  It is shown here as a named number;
-   -- the implementation may choose to type the constant as appropriate.
+   -- The following address constant must be a valid address to locate the C
+   -- program CD30005_1. It is shown here as a named number; the implementation
+   -- may choose to type the constant as appropriate.
 
    function Cd30005_Proc (X : Integer) return Integer;
    pragma Import (C, Cd30005_Proc, "_cd30005_1");
@@ -211,9 +210,9 @@ package Impdef is
 
 --=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--
 
-   -- The following string constant must be the external name resulting
-   -- from the C compilation of CD30005_1.  The string will be used as an
-   -- argument to pragma Import.
+   -- The following string constant must be the external name resulting from
+   -- the C compilation of CD30005_1. The string will be used as an argument
+   -- to pragma Import.
 
    Cd30005_1_External_Name : constant String := "_cd30005_1";
    --                  MODIFY HERE AS NEEDED --- ^^^^^^^^^
@@ -221,8 +220,8 @@ package Impdef is
 --=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--
 
    -- The following constants should represent the largest default alignment
-   -- value and the largest alignment value supported by the linker.
-   -- See RM 13.3(35).
+   -- value and the largest alignment value supported by the linker. See RM
+   -- 13.3(35).
 
    Max_Default_Alignment : constant := Standard'Maximum_Alignment;
    --                                  ^ --- MODIFY HERE AS NEEDED
@@ -232,20 +231,19 @@ package Impdef is
 
 --=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--
 
-   -- The following constant represents the largest amount that a
-   -- reported Storage_Size will exceed that specified for an access type.
-   -- This should reflect any rounding up that the implementation may do
-   -- to a specified Storage_Size. Used in tests CDB0001 and CDB0002.
+   -- The following constant represents the largest amount that a reported
+   -- Storage_Size will exceed that specified for an access type. This should
+   -- reflect any rounding up that the implementation may do to a specified
+   -- Storage_Size. Used in tests CDB0001 and CDB0002.
 
    Maximum_Adjustment_To_Specified_Storage_Size : constant := 1_024;
    --                          MODIFY HERE AS NEEDED ---------^^^^
 
 --=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--
 
-   -- The following string constants must be the external names resulting
-   -- from the C compilation of CXB30040.C, CXB30060.C, CXB30130.C,
-   -- CXB30131.C, and CXB30170.  The strings will be used as arguments
-   -- to pragma Import.
+   -- The following string constants must be the external names resulting from
+   -- the C compilation of CXB30040.C, CXB30060.C, CXB30130.C, CXB30131.C, and
+   -- CXB30170. The strings will be used as arguments to pragma Import.
 
    Cxb30040_External_Name : constant String := "CXB30040";
    --                 MODIFY HERE AS NEEDED --- ^^^^^^^^
@@ -266,8 +264,7 @@ package Impdef is
 
    -- The following string constants must be the external names that the
    -- C compilation of CXB30170.C will use for the items exported from
-   -- CXB30171.A. The strings will be used as arguments
-   -- to pragma Export.
+   -- CXB30171.A. The strings will be used as arguments to pragma Export.
 
    Cxb30171_Global_External_Name : constant String := "CXB30171_Global";
    --                        MODIFY HERE AS NEEDED --- ^^^^^^^^^^^^^^^
@@ -277,18 +274,18 @@ package Impdef is
 
 --=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--
 
-   -- The following string constant must be the external name resulting
-   -- from the C compilation of CXB30180. The strings will be used as the
-   -- argument to aspect External_Name.
+   -- The following string constant must be the external name resulting from
+   -- the C compilation of CXB30180. The strings will be used as the argument
+   -- to aspect External_Name.
 
    Cxb30180_External_Name : constant String := "CXB30180";
    --                 MODIFY HERE AS NEEDED --- ^^^^^^^^
 
 --=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--
 
-   -- The following string constants must be the external names that the
-   -- C compilation of CXB30180.C will use for the items exported from
-   -- CXB30181.A. The strings will be used as arguments to aspect
+   -- The following string constants must be the external names that
+   -- the C compilation of CXB30180.C will use for the items exported
+   -- from CXB30181.A. The strings will be used as arguments to aspect
    -- External_Name.
 
    Cxb30181_Global_External_Name : constant String := "CXB30181_Global";
@@ -299,9 +296,9 @@ package Impdef is
 
 --=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--
 
-   -- The following string constants must be the external names resulting
-   -- from the COBOL compilation of CXB40090.CBL, CXB40091.CBL, and
-   -- CXB40092.CBL.  The strings will be used as arguments to pragma Import.
+   -- The following string constants must be the external names resulting from
+   -- the COBOL compilation of CXB40090.CBL, CXB40091.CBL, and CXB40092.CBL.
+   -- The strings will be used as arguments to pragma Import.
 
    Cxb40090_External_Name : constant String := "CXB40090";
    --                 MODIFY HERE AS NEEDED --- ^^^^^^^^
@@ -314,9 +311,9 @@ package Impdef is
 
 --=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--
 
-   -- The following string constants must be the external names resulting
-   -- from the Fortran compilation of CXB50040.FTN, CXB50041.FTN,
-   -- CXB50050.FTN, and CXB50051.FTN.
+   -- The following string constants must be the external names resulting from
+   -- the Fortran compilation of CXB50040.FTN, CXB50041.FTN, CXB50050.FTN, and
+   -- CXB50051.FTN.
    --
    -- The strings will be used as arguments to pragma Import.
    --
@@ -337,13 +334,13 @@ package Impdef is
 
 --=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--
 
-   -- The following constants have been defined for use with the
-   -- representation clause in FXACA00 of type Sales_Record_Type.
+   -- The following constants have been defined for use with the representation
+   -- clause in FXACA00 of type Sales_Record_Type.
    --
-   -- Char_Bits should be an integer at least as large as the number
-   -- of bits needed to hold a character in an array.
-   -- A value of 6 * Char_Bits will be used in a representation clause
-   -- to reserve space for a six character string.
+   -- Char_Bits should be an integer at least as large as the number of bits
+   -- needed to hold a character in an array. A value of 6 * Char_Bits will
+   -- be used in a representation clause to reserve space for a six character
+   -- string.
    --
    -- Next_Storage_Slot should indicate the next storage unit in the record
    -- representation clause that does not overlap the storage designated for
@@ -357,30 +354,28 @@ package Impdef is
 
 --=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--
 
-   -- The following string constant must be the path name for the .AW
-   -- files that will be processed by the Wide Character processor to
-   -- create the C250001 and C250002 tests.  The Wide Character processor
-   -- will expect to find the files to process at this location.
+   -- The following string constant must be the path name for the .AW files
+   -- that will be processed by the Wide Character processor to create the
+   -- C250001 and C250002 tests. The Wide Character processor will expect
+   -- to find the files to process at this location.
 
    Test_Path_Root : constant String :=
      "/data/ftp/public/AdaIC/testing/acvc/95acvc/";
    -- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ --- MODIFY HERE AS NEEDED
 
-   -- The following two strings must not be modified unless the .AW file
-   -- names have been changed.  The Wide Character processor will use
-   -- these strings to find the .AW files used in creating the C250001
-   -- and C250002 tests.
+   -- The following two strings must not be modified unless the .AW file names
+   -- have been changed. The Wide Character processor will use these strings to
+   -- find the .AW files used in creating the C250001 and C250002 tests.
 
    Wide_Character_Test : constant String := Test_Path_Root & "c250001";
    Upper_Latin_Test    : constant String := Test_Path_Root & "c250002";
 
 --=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--
 
-   -- The following instance of Integer_IO or Modular_IO must be supplied
-   -- in order for test CD72A02 to compile correctly.
-   -- Depending on the choice of base type used for the type
-   -- System.Storage_Elements.Integer_Address; one of the two instances will
-   -- be correct.  Comment out the incorrect instance.
+   -- The following instance of Integer_IO or Modular_IO must be supplied in
+   -- order for test CD72A02 to compile correctly. Depending on the choice of
+   -- base type used for the type System.Storage_Elements.Integer_Address; one
+   -- of the two instances will be correct. Comment out the incorrect instance.
 
    --M package Address_Value_IO is
 --M      new Ada.Text_IO.Integer_IO(System.Storage_Elements.Integer_Address);

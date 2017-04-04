@@ -12,8 +12,8 @@ package body Cde0001_0.Cde0001_4 is
    Obj4 : Limited_Private_Subtype := Sea;
    Obj5 : New_Tagtype             := (1, 5);
 
-   -- Instantiate the generic package declared in the visible part of
-   -- the parent.
+   -- Instantiate the generic package declared in the visible part of the
+   -- parent.
 
    package Formal_Obj_Pck is new Cde0001_1 (Obj1, Obj2, Obj3, Obj4, Obj5);
 

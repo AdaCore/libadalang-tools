@@ -61,8 +61,7 @@ package F760a00 is
 
    procedure Use_It (Object : in out Tc_Copy_Check);
    procedure Use_Cnst (Object : in Tc_Copy_Check);
-   -- Ensure that Object is not removed by optimization
-   -- as a dead variable.
+   -- Ensure that Object is not removed by optimization as a dead variable.
 
    type Lim_Rec is limited record
       A  : Integer;
@@ -76,8 +75,7 @@ package F760a00 is
 
    procedure Use_It (Object : in out Lim_Rec);
    procedure Use_Cnst (Object : in Lim_Rec);
-   -- Ensure that Object is not removed by optimization
-   -- as a dead variable.
+   -- Ensure that Object is not removed by optimization as a dead variable.
 
    type Lim_Array is array (Positive range <>) of Lim_Rec;
 
@@ -86,8 +84,7 @@ package F760a00 is
    procedure Check_Fin_Lim_Array (Length : in Natural; Message : in String);
 
    procedure Use_It (Object : in out Lim_Array);
-   -- Ensure that Object is not removed by optimization
-   -- as a dead variable.
+   -- Ensure that Object is not removed by optimization as a dead variable.
 
    type Lim_Tagged is tagged limited record
       R  : Lim_Rec;
@@ -99,8 +96,7 @@ package F760a00 is
    procedure Check_Fin_Lim_Tagged (Message : in String);
 
    procedure Use_It (Object : in out Lim_Tagged'Class);
-   -- Ensure that Object is not removed by optimization
-   -- as a dead variable.
+   -- Ensure that Object is not removed by optimization as a dead variable.
 
    protected type Prot is
       function Get return Natural;
@@ -116,8 +112,7 @@ package F760a00 is
    procedure Check_Fin_Prot (Message : in String);
 
    procedure Use_It (Object : in out Prot);
-   -- Ensure that Object is not removed by optimization
-   -- as a dead variable.
+   -- Ensure that Object is not removed by optimization as a dead variable.
 
    type Lim_Comp is record
       P  : Prot;
@@ -130,8 +125,7 @@ package F760a00 is
    procedure Check_Fin_Lim_Comp (Message : in String);
 
    procedure Use_It (Object : in out Lim_Comp);
-   -- Ensure that Object is not removed by optimization
-   -- as a dead variable.
+   -- Ensure that Object is not removed by optimization as a dead variable.
 
 private
 

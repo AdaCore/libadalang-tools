@@ -57,11 +57,10 @@ begin
 
    -- In the subtest below, an object of a class-wide type (TC_Initial_3) is
    -- passed to Update_and_Write. It has been initialized with an object of
-   -- type Named_ID_Type, so the result should be identical to
-   -- that of the Named_ID_Type subtest (namely TC_Expected_2). Note that
-   -- a new list of Named IDs is used (Maimed_List). This is to assure test
-   -- validity, since Named_List has already been updated by a previous
-   -- subtest.
+   -- type Named_ID_Type, so the result should be identical to that of the
+   -- Named_ID_Type subtest (namely TC_Expected_2). Note that a new list of
+   -- Named IDs is used (Maimed_List). This is to assure test validity, since
+   -- Named_List has already been updated by a previous subtest.
 
    Update_And_Write (Maimed_List, Tc_Initial_3);   -- Test class-wide actual.
 

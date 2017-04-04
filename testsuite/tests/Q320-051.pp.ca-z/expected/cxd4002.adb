@@ -102,8 +102,8 @@ begin
             --          Ada.Task_Identification.Current_Task)
             Adp.Set_Priority (Task_Priority);
 
-            -- Hold the "message" in this task.  For the test we are just
-            -- noting the Message_Number
+            -- Hold the "message" in this task. For the test we are just noting
+            -- the Message_Number
             This_Message_Number := Numb;
 
          end Start;
@@ -120,7 +120,7 @@ begin
 
          Next_Expected : Natural := 0;
          -- We expect the order processed to be the order of arrival even
-         -- though they are arriving in inverse priority order.  (e.g. the
+         -- though they are arriving in inverse priority order. (e.g. the
          -- last call is from the highest priority task)
          Expected_Order : constant array
            (1 .. Max_Messages) of Message_Number :=
@@ -137,9 +137,9 @@ begin
             end select;
          end loop;
 
-         -- In a real situation this would more likely be an endless loop
-         -- with a terminate alternative in the select.  For this test
-         -- arbitrarily limit it to the number expected.
+         -- In a real situation this would more likely be an endless loop with
+         -- a terminate alternative in the select. For this test arbitrarily
+         -- limit it to the number expected.
          for I in 1 .. Max_Messages loop
             select
 
@@ -159,9 +159,9 @@ begin
             Report.Failed ("Unexpected Exception in Distributor");
       end Distributor;
 
-      -- Create three tasks. They start out at the default priority but
-      -- initial calls from the test driver will set the priorities as
-      -- required by the test.
+      -- Create three tasks. They start out at the default priority but initial
+      -- calls from the test driver will set the priorities as required by the
+      -- test.
       --
       Message_1 : Acc_Message_Task := new Message_Task;  -- Low Priority
       Message_2 : Acc_Message_Task := new Message_Task;  -- Medium Priority
@@ -169,11 +169,10 @@ begin
 
    begin -- declare
 
-      -- Start up the first Message carrier task.  For the test, just
-      -- present it with a message Number rather than a whole message.
-      -- Save the Task Identification, which is returned at the end of the
-      -- rendezvous, for later priority modification
-      -- Make the first caller a Low priority task
+      -- Start up the first Message carrier task. For the test, just present
+      -- it with a message Number rather than a whole message. Save the Task
+      -- Identification, which is returned at the end of the rendezvous, for
+      -- later priority modification Make the first caller a Low priority task
       Message_1.Start (Message_1_Numb, Priority_1q);
 
       -- Wait for the message to arrive at the Distributor's queue
@@ -205,10 +204,9 @@ begin
          delay Impdef.Minimum_Task_Switch;
       end loop;
 
-      -- All messages are now waiting on the Distributor's queue.
-      -- Allow the Distributor to proceed to the rendezvous with the
-      -- callers - the distributor will now check that the ordering
-      -- is FIFO
+      -- All messages are now waiting on the Distributor's queue. Allow the
+      -- Distributor to proceed to the rendezvous with the callers - the
+      -- distributor will now check that the ordering is FIFO
       --
       Distributor.Go;
 

@@ -87,7 +87,8 @@ begin  -- Main test procedure.
 
          end case;
 
-      -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- ---==
+         -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- --
+         -- ---==
          pragma Inspection_Point
            (                                       -- CQP
            Main_Final,                                    -- M
@@ -102,7 +103,8 @@ begin  -- Main test procedure.
             Main_A_Proc,                                   -- F
             Main_Pt,                                       -- L
             Main_Tt);                                     -- N
-      -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- ---==
+         -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- --
+         -- ---==
 
       end loop;
    end Enclosure;

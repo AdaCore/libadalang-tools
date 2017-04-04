@@ -232,7 +232,7 @@ begin
 
       --==============================
 
-         -- Create three tasks of each priority.  They will each be activated
+         -- Create three tasks of each priority. They will each be activated
          -- and will be blocked waiting to be called by Prime_Task
          --
          Task_1q_A, Task_1q_B, Task_1q_C : Priority_1q_Task;
@@ -261,17 +261,16 @@ begin
 
          begin
 
-            -- Ensure all the lower priority tasks have been started and
-            -- are blocked waiting to be called
+            -- Ensure all the lower priority tasks have been started and are
+            -- blocked waiting to be called
             --
             delay Impdef.Clear_Ready_Queue;
 
             -- Call each of the subtasks, give each an identifier. Call them
-            -- in a "random" order.  As each is unblocked it should be
-            -- placed at the end of its priority queue.
-            -- NOTE: we call them in a "random" order to ensure there are no
-            -- residual queuing effects left over from the original blocking
-            -- order
+            -- in a "random" order. As each is unblocked it should be placed at
+            -- the end of its priority queue. NOTE: we call them in a "random"
+            -- order to ensure there are no residual queuing effects left over
+            -- from the original blocking order
             --
             Task_2q_B.Start (Next_Id);    -- ID will be 1
             Task_3q_C.Start (Next_Id);    -- ID will be 2

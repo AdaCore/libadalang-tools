@@ -140,8 +140,8 @@ begin
 
       -- Replace_Element
 
-      -- The unbounded string Incorrect_Spelling starts as "Guob Dai", and
-      -- is transformed by the following three procedure calls to "Good Day".
+      -- The unbounded string Incorrect_Spelling starts as "Guob Dai", and is
+      -- transformed by the following three procedure calls to "Good Day".
 
       Asunb.Replace_Element (Incorrect_Spelling, 2, 'o');
 
@@ -161,8 +161,8 @@ begin
 
       -- Count
 
-      -- Determine the number of characters in the unbounded string that
-      -- are contained in the set.
+      -- Determine the number of characters in the unbounded string that are
+      -- contained in the set.
 
       Matching_Letters :=
         Asunb.Count (Source => Magic_String, Set => Abcd_Set);
@@ -225,9 +225,8 @@ begin
 
       -- Translate
 
-      -- Use a mapping ("abcd" -> "wxyz") to transform the contents of
-      -- the unbounded string.
-      -- Magic_String = "abracadabra"
+      -- Use a mapping ("abcd" -> "wxyz") to transform the contents of the
+      -- unbounded string. Magic_String = "abracadabra"
 
       Incantation := Asunb.Translate (Magic_String, Code_Map);
 
@@ -276,8 +275,8 @@ begin
 
       begin
 
-         -- Examine the version of Trim that removes blanks from
-         -- the left and/or right of a string.
+         -- Examine the version of Trim that removes blanks from the left
+         -- and/or right of a string.
 
          for I in 1 .. 4 loop
             if Asunb.Trim (Space_Array (I), Ada.Strings.Both) /= Pad then
@@ -287,8 +286,8 @@ begin
             end if;
          end loop;
 
-         -- Examine the version of Trim that removes set characters from
-         -- the left and right of a string.
+         -- Examine the version of Trim that removes set characters from the
+         -- left and right of a string.
 
          for I in 1 .. 5 loop
             if Asunb.Trim
@@ -343,9 +342,9 @@ begin
       begin
 
          -- Use the following constructor forms to construct the string
-         -- "Dot_Dot_Dot_Dash_Dash_Dash_Dot_Dot_Dot".  Note that the
-         -- trailing underscore in the string is removed in the call to
-         -- Trim in the If statement condition.
+         -- "Dot_Dot_Dot_Dash_Dash_Dash_Dot_Dot_Dot". Note that the trailing
+         -- underscore in the string is removed in the call to Trim in the If
+         -- statement condition.
 
          Sos := Asunb."*" (Repeat, Dot);        -- "*"(#, Unb Str)
 

@@ -1,6 +1,6 @@
 --==================================================================--
 
--- Generic child of complex number package.  This child adds a layer of
+-- Generic child of complex number package. This child adds a layer of
 -- functionality to the parent generic.
 
 generic               -- Random complex number operation.

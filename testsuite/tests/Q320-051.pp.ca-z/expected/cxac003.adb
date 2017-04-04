@@ -87,10 +87,10 @@ begin
    Test_For_Stream_Io_Support : begin
       -- If an implementation does not support Stream_IO in a particular
       -- environment, the exception Use_Error or Name_Error will be raised on
-      -- calls to various Stream_IO operations.  This block statement
-      -- encloses a call to Create, which should produce an exception in a
-      -- non-supportive environment.  These exceptions will be handled to
-      -- produce a Not_Applicable result.
+      -- calls to various Stream_IO operations. This block statement encloses a
+      -- call to Create, which should produce an exception in a non-supportive
+      -- environment. These exceptions will be handled to produce a
+      -- Not_Applicable result.
 
       Ada.Streams.Stream_Io.Create
         (Stream_File_Object,
@@ -109,9 +109,9 @@ begin
    end Test_For_Stream_Io_Support;
 
    Operational_Test_Block : begin
-      -- A potentially common error in a file processing environment
-      -- is to attempt to perform an operation on a stream file that is
-      -- not currently open. Status_Error should be raised in this case.
+      -- A potentially common error in a file processing environment is to
+      -- attempt to perform an operation on a stream file that is not currently
+      -- open. Status_Error should be raised in this case.
       Check_Status_Error : begin
          Ada.Streams.Stream_Io.Close (Stream_File_Object);
          -- Attempt to reset a file that is closed.
@@ -126,10 +126,10 @@ begin
             Report.Failed ("Incorrect exception raised - 1");
       end Check_Status_Error;
 
-      -- A similar error is to use Ada.Streams.Stream_IO.Stream
-      -- to attempt to perform an operation on a stream file that is
-      -- not currently open. Status_Error should be raised in this case.
-      -- (Defect Report 8652/0046, as reflected in Technical Corrigendum 1.)
+      -- A similar error is to use Ada.Streams.Stream_IO.Stream to attempt
+      -- to perform an operation on a stream file that is not currently open.
+      -- Status_Error should be raised in this case. (Defect Report 8652/0046,
+      -- as reflected in Technical Corrigendum 1.)
       Check_Status_Error2 : begin
          -- Ensure that the file is not open.
          if Ada.Streams.Stream_Io.Is_Open (Stream_File_Object) then
@@ -145,9 +145,9 @@ begin
             Report.Failed ("Incorrect exception raised - 2");
       end Check_Status_Error2;
 
-      -- Another potentially common error in a file processing environment
-      -- is to attempt to Open a stream file that is currently open.
-      -- Status_Error should be raised in this case.
+      -- Another potentially common error in a file processing environment is
+      -- to attempt to Open a stream file that is currently open. Status_Error
+      -- should be raised in this case.
       Check_Status_Error3 : begin
          -- Ensure that the file is open.
          if not Ada.Streams.Stream_Io.Is_Open (Stream_File_Object) then
@@ -168,10 +168,10 @@ begin
             Report.Failed ("Incorrect exception raised - 3");
       end Check_Status_Error3;
 
-      -- Another example of a potential error occurring in a file
-      -- processing environment is to attempt to use the 'Read attribute
-      -- on a stream file that is currently in Out_File or Append_File
-      -- mode. Mode_Error should be raised in both of these cases.
+      -- Another example of a potential error occurring in a file processing
+      -- environment is to attempt to use the 'Read attribute on a stream file
+      -- that is currently in Out_File or Append_File mode. Mode_Error should
+      -- be raised in both of these cases.
       Check_Mode_Error : declare
          Int_Var : Integer := -10;
       begin
@@ -229,10 +229,10 @@ begin
             Report.Failed ("Incorrect exception raised - 4a");
       end Check_Mode_Error;
 
-      -- Another example of a this type of potential error is to attempt
-      -- to check for End Of File on a stream file that is currently in
-      -- Out_File or Append_File mode. Mode_Error should also be raised
-      -- in both of these cases.
+      -- Another example of a this type of potential error is to attempt to
+      -- check for End Of File on a stream file that is currently in Out_File
+      -- or Append_File mode. Mode_Error should also be raised in both of these
+      -- cases.
       Check_End_File : declare
          Test_Boolean : Boolean := False;
       begin
@@ -286,8 +286,7 @@ begin
 
       -- In a similar situation to the above cases for attribute 'Read,
       -- an attempt to use the 'Output attribute on a stream file that
-      -- is currently in In_File mode should result in Mode_Error being
-      -- raised.
+      -- is currently in In_File mode should result in Mode_Error being raised.
       Check_Output_Mode_Error : begin
          Reset5 : begin
             Ada.Streams.Stream_Io.Reset
@@ -313,17 +312,16 @@ begin
             Report.Failed ("Incorrect exception raised - 6");
       end Check_Output_Mode_Error;
 
-      -- Any case of attempting to Open a stream file with a string for
-      -- the parameter Name that does not allow the identification of an
-      -- external file will result in the exception Name_Error being
-      -- raised.
+      -- Any case of attempting to Open a stream file with a string for the
+      -- parameter Name that does not allow the identification of an external
+      -- file will result in the exception Name_Error being raised.
       Check_Illegal_File_Name : begin
          if Ada.Streams.Stream_Io.Is_Open (Stream_File_Object) then
             Ada.Streams.Stream_Io.Close (Stream_File_Object);
          end if;
-         -- No external file exists with this filename, allowing no
-         -- association with an internal file object, resulting in the
-         -- raising of the exception Name_Error.
+         -- No external file exists with this filename, allowing no association
+         -- with an internal file object, resulting in the raising of the
+         -- exception Name_Error.
          Ada.Streams.Stream_Io.Open
            (File => Stream_File_Object,
             Mode => Ada.Streams.Stream_Io.Out_File,

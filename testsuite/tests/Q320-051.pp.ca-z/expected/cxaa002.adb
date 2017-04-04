@@ -78,11 +78,10 @@ begin
    Test_For_Text_Io_Support : begin
 
       -- An implementation that does not support Text_IO in a particular
-      -- environment will raise Use_Error on calls to various
-      -- Text_IO operations.  This block statement encloses a call to
-      -- Create, which should raise the exception in a non-supportive
-      -- environment.  This exception will be handled to produce a
-      -- Not_Applicable result.
+      -- environment will raise Use_Error on calls to various Text_IO
+      -- operations. This block statement encloses a call to Create, which
+      -- should raise the exception in a non-supportive environment. This
+      -- exception will be handled to produce a Not_Applicable result.
 
       Text_Io.Create
         (File => Data_File,
@@ -104,8 +103,8 @@ begin
       Appendix_Title   : constant String                 := "Appendix A";
       Appendix_Content : constant String                 := "TBD";
 
-      -- The following procedure simulates the addition of an Appendix page
-      -- to an existing text file.
+      -- The following procedure simulates the addition of an Appendix page to
+      -- an existing text file.
       procedure Position_Appendix_Text is
          use Text_Io;   -- To provide visibility to the "/=" operator.
       begin
@@ -151,23 +150,23 @@ begin
             Report.Failed ("Incorrect results from line/column positioning");
          end if;
 
-         -- Simulated usage code.                          -- Position
+         -- Simulated usage code. -- Position
          Text_Io.Put_Line (Data_File, Appendix_Content);   -- content of
          -- Appendix.
       end Position_Appendix_Text;
 
    begin
 
-      -- This code section simulates a scenario that could occur in a
-      -- text processing environment:
+      -- This code section simulates a scenario that could occur in a text
+      -- processing environment:
       --    A document is created/modified/edited Then...
       --    Text is to be appended to the document.
       --    A procedure is called to perform that operation.
       --    The position on the appended page is set, verified, and text is
       --    appended to the existing file.
       --
-      -- Note: The text file has been originally created in Append_File
-      -- mode, and has not been closed prior to this processing.
+      -- Note: The text file has been originally created in Append_File mode,
+      -- and has not been closed prior to this processing.
 
       Position_Appendix_Text;
 

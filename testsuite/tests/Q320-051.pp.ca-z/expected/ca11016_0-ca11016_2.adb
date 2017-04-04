@@ -5,8 +5,8 @@ pragma Elaborate (Ca11016_0.Ca11016_1);
 
 package body Ca11016_0.Ca11016_2 is
 
-   -- Declare instance of the private generic sibling for
-   -- an integer type that represents color intensity.
+   -- Declare instance of the private generic sibling for an integer type that
+   -- represents color intensity.
 
    package Sdugd is new Ca11016_0.Ca11016_1 (Display_Val);
 
@@ -16,9 +16,8 @@ package body Ca11016_0.Ca11016_2 is
       Output_Packet : in out Io_Packet)
    is
 
-   -- Simulates sending control information to a display device.
-   -- Control information consists of latitude, longitude, a
-   -- color, and an intensity.
+   -- Simulates sending control information to a display device. Control
+   -- information consists of latitude, longitude, a color, and an intensity.
 
    begin
       case Get_Physical_Feature (Lat, Long, Basic_Map) is

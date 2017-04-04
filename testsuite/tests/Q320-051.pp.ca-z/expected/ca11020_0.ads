@@ -70,8 +70,7 @@ private
    type Node_Type is record
       The_Element : Element;
 
-      -- Other components in real application, i.e.,
-      -- The_Count   : positive;
+      -- Other components in real application, i.e., The_Count : positive;
 
       Next : Bag;
    end record;

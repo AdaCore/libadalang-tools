@@ -65,19 +65,14 @@
 --
 -- References:
 --
--- Software Manual for the Elementary Functions
--- William J. Cody, Jr. and William Waite
--- Prentice-Hall, 1980
+-- Software Manual for the Elementary Functions William J. Cody, Jr. and
+-- William Waite Prentice-Hall, 1980
 --
--- CRC Standard Mathematical Tables
--- 23rd Edition
+-- CRC Standard Mathematical Tables 23rd Edition
 --
--- Implementation and Testing of Function Software
--- W. J. Cody
--- Problems and Methodologies in Mathematical Software Production
--- editors P. C. Messina and A. Murli
--- Lecture Notes in Computer Science   Volume 142
--- Springer Verlag, 1982
+-- Implementation and Testing of Function Software W. J. Cody Problems and
+-- Methodologies in Mathematical Software Production editors P. C. Messina and
+-- A. Murli Lecture Notes in Computer Science Volume 142 Springer Verlag, 1982
 --
 
 with System;
@@ -87,7 +82,7 @@ procedure Cxg2012 is
    Verbose     : constant Boolean := False;
    Max_Samples : constant         := 1_000;
 
-   -- CRC Standard Mathematical Tables;  23rd Edition; pg 738
+   -- CRC Standard Mathematical Tables; 23rd Edition; pg 738
    Sqrt2 : constant :=
      1.41421_35623_73095_04880_16887_24209_69807_85696_71875_37695;
    Sqrt3 : constant :=
@@ -122,9 +117,9 @@ procedure Cxg2012 is
          Rel_Error : Real;
          Abs_Error : Real;
       begin
-         -- In the case where the expected result is very small or 0
-         -- we compute the maximum error as a multiple of Model_Epsilon
-         -- instead of Model_Epsilon and Expected.
+         -- In the case where the expected result is very small or 0 we
+         -- compute the maximum error as a multiple of Model_Epsilon instead
+         -- of Model_Epsilon and Expected.
          Rel_Error := Mre * (abs Expected * Real'Model_Epsilon);
          Abs_Error := Mre * Real'Model_Epsilon;
          if Rel_Error > Abs_Error then
@@ -154,8 +149,8 @@ procedure Cxg2012 is
          end if;
       end Check;
 
-      -- the following version of Check computes the allowed error bound
-      -- using the operands
+      -- the following version of Check computes the allowed error bound using
+      -- the operands
       procedure Check
         (Actual, Expected : Real;
          Left, Right      : Real;
@@ -176,8 +171,8 @@ procedure Cxg2012 is
          end record;
          type Int_Checks is array (Positive range <>) of Int_Check;
 
-         -- the following tests use only model numbers so the result
-         -- is expected to be exact.
+         -- the following tests use only model numbers so the result is
+         -- expected to be exact.
          Ic : constant Int_Checks :=
            ((2.0, 5, 32.0),
             (-2.0, 5, -32.0),
@@ -236,13 +231,11 @@ procedure Cxg2012 is
          A : constant Real := 1.0 / Real (Real'Machine_Radix);
          B : constant Real := 1.0;
          X : Real;
-      -- In the cases below where the expected result is
-      -- inexact we allow an additional error amount of
-      -- 1.0 * Model_Epsilon to account for that error.
-      -- This is accomplished by the factor of 1.25 times
-      -- the computed error bound (which is > 4.0) thus
-      -- increasing the error bound by at least
-      -- 1.0 * Model_Epsilon
+      -- In the cases below where the expected result is inexact we allow an
+      -- additional error amount of 1.0 * Model_Epsilon to account for that
+      -- error. This is accomplished by the factor of 1.25 times the computed
+      -- error bound (which is > 4.0) thus increasing the error bound by at
+      -- least 1.0 * Model_Epsilon
       begin
          Accuracy_Error_Reported := False;  -- reset
          for I in 0 .. Max_Samples loop
@@ -310,16 +303,15 @@ procedure Cxg2012 is
       end Small_Range_Test;
 
       procedure Large_Range_Test is
-         -- Check over the range A to B where A is 1.0 and
-         -- B is a large value.
+         -- Check over the range A to B where A is 1.0 and B is a large value.
          A         : constant Real := 1.0;
          B         : Real;
          X         : Real;
          Iteration : Integer       := 0;
          Subtest   : Character     := 'X';
       begin
-         -- upper bound of range should be as large as possible where
-         -- B**3 is still valid.
+         -- upper bound of range should be as large as possible where B**3 is
+         -- still valid.
          B                       := Real'Safe_Last**0.333;
          Accuracy_Error_Reported := False;  -- reset
          for I in 0 .. Max_Samples loop

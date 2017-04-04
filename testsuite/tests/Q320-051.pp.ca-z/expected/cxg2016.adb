@@ -64,19 +64,14 @@
 --
 -- References:
 --
--- Software Manual for the Elementary Functions
--- William J. Cody, Jr. and William Waite
--- Prentice-Hall, 1980
+-- Software Manual for the Elementary Functions William J. Cody, Jr. and
+-- William Waite Prentice-Hall, 1980
 --
--- CRC Standard Mathematical Tables
--- 23rd Edition
+-- CRC Standard Mathematical Tables 23rd Edition
 --
--- Implementation and Testing of Function Software
--- W. J. Cody
--- Problems and Methodologies in Mathematical Software Production
--- editors P. C. Messina and A. Murli
--- Lecture Notes in Computer Science   Volume 142
--- Springer Verlag, 1982
+-- Implementation and Testing of Function Software W. J. Cody Problems and
+-- Methodologies in Mathematical Software Production editors P. C. Messina and
+-- A. Murli Lecture Notes in Computer Science Volume 142 Springer Verlag, 1982
 --
 
 with System;
@@ -87,7 +82,7 @@ procedure Cxg2016 is
    Verbose     : constant Boolean := False;
    Max_Samples : constant         := 1_000;
 
-   -- CRC Standard Mathematical Tables;  23rd Edition; pg 738
+   -- CRC Standard Mathematical Tables; 23rd Edition; pg 738
    Sqrt2 : constant :=
      1.41421_35623_73095_04880_16887_24209_69807_85696_71875_37695;
    Sqrt3 : constant :=
@@ -127,12 +122,11 @@ procedure Cxg2016 is
       -- flag used to terminate some tests early
       Accuracy_Error_Reported : Boolean := False;
 
-      -- The following value is a lower bound on the accuracy
-      -- required.  It is normally 0.0 so that the lower bound
-      -- is computed from Model_Epsilon.  However, for tests
-      -- where the expected result is only known to a certain
-      -- amount of precision this bound takes on a non-zero
-      -- value to account for that level of precision.
+      -- The following value is a lower bound on the accuracy required. It is
+      -- normally 0.0 so that the lower bound is computed from Model_Epsilon.
+      -- However, for tests where the expected result is only known to a
+      -- certain amount of precision this bound takes on a non-zero value
+      -- to account for that level of precision.
       Error_Low_Bound : Real := 0.0;
 
       procedure Check
@@ -144,9 +138,9 @@ procedure Cxg2016 is
          Rel_Error : Real;
          Abs_Error : Real;
       begin
-         -- In the case where the expected result is very small or 0
-         -- we compute the maximum error as a multiple of Model_Epsilon
-         -- instead of Model_Epsilon and Expected.
+         -- In the case where the expected result is very small or 0 we
+         -- compute the maximum error as a multiple of Model_Epsilon instead
+         -- of Model_Epsilon and Expected.
          Rel_Error := Mre * abs Expected * Real'Model_Epsilon;
          Abs_Error := Mre * Real'Model_Epsilon;
          if Rel_Error > Abs_Error then
@@ -184,14 +178,15 @@ procedure Cxg2016 is
       procedure Special_Value_Test is
          -- If eta is very small, arctan(x + eta) ~= arctan(x) + eta/(1+x*x).
          --
-   -- For tests 4 and 5, there is an error of 4.0ME for arctan + an
-   -- additional error of 1.0ME because pi is not exact for a total of 5.0ME.
+         -- For tests 4 and 5, there is an error of 4.0ME for arctan + an
+         -- additional error of 1.0ME because pi is not exact for a total
+         -- of 5.0ME.
          --
-         -- In test 3 there is the error for pi plus an additional error
-         -- of (1.0ME)/4 since sqrt3 is not exact, for a total of 5.25ME.
+         -- In test 3 there is the error for pi plus an additional error of
+         -- (1.0ME)/4 since sqrt3 is not exact, for a total of 5.25ME.
          --
-         -- In test 2 there is the error for pi plus an additional error
-         -- of (3/4)(1.0ME) since sqrt3 is not exact, for a total of 5.75ME.
+         -- In test 2 there is the error for pi plus an additional error of
+         -- (3/4)(1.0ME) since sqrt3 is not exact, for a total of 5.75ME.
 
          type Data_Point is record
             Degrees, Radians, Tangent, Allowed_Error : Real;
@@ -199,11 +194,11 @@ procedure Cxg2016 is
 
          type Test_Data_Type is array (Positive range <>) of Data_Point;
 
-         -- the values in the following table only involve static
-         -- expressions so no additional loss of precision occurs.
+         -- the values in the following table only involve static expressions
+         -- so no additional loss of precision occurs.
          Test_Data : constant Test_Data_Type :=
            (
-         --  degrees      radians       tangent   error     test #
+         --  degrees radians tangent error test #
          (0.0, 0.0, 0.0, 4.0),    -- 1
             (30.0, Pi / 6.0, Sqrt3 / 3.0, 5.75),    -- 2
             (60.0, Pi / 3.0, Sqrt3, 5.25),    -- 3
@@ -243,11 +238,11 @@ procedure Cxg2016 is
         (Actual, Expected_Low, Expected_High : Real;
          Test_Name                           : String)
       is
-         -- If the expected result is not a model number, then Expected_Low is
-         -- the first machine number less than the (exact) expected
-         -- result, and Expected_High is the first machine number greater than
-         -- the (exact) expected result. If the expected result is a model
-         -- number, Expected_Low = Expected_High = the result.
+         -- If the expected result is not a model number, then Expected_Low
+         -- is the first machine number less than the (exact) expected result,
+         -- and Expected_High is the first machine number greater than the
+         -- (exact) expected result. If the expected result is a model number,
+         -- Expected_Low = Expected_High = the result.
          Model_Expected_Low  : Real := Expected_Low;
          Model_Expected_High : Real := Expected_High;
       begin
@@ -354,8 +349,8 @@ procedure Cxg2016 is
 
       procedure Taylor_Series_Test is
          -- This test checks the Arctan by using a taylor series expansion that
-         -- will produce a result accurate to 19 decimal digits for
-         -- the range under test.
+         -- will produce a result accurate to 19 decimal digits for the range
+         -- under test.
          --
          -- The maximum relative error bound for this test is
          --  4 for the arctan operation and 2 for the Taylor series
@@ -368,10 +363,10 @@ procedure Cxg2016 is
          Sum, Em, X_Squared : Real;
       begin
          if Real'Digits > 19 then
-            -- Taylor series calculation produces result accurate to 19
-            -- digits.  If type being tested has more digits then set
-            -- the error low bound to account for this.
-            -- The error low bound is conservatively set to 6*10**-19
+            -- Taylor series calculation produces result accurate to 19 digits.
+            -- If type being tested has more digits then set the error low
+            -- bound to account for this. The error low bound is conservatively
+            -- set to 6*10**-19
             Error_Low_Bound := 0.00000_00000_00000_0006;
             Report.Comment ("arctan accuracy checked to 19 digits");
          end if;

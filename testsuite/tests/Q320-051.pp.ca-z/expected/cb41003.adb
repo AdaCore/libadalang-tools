@@ -89,8 +89,8 @@ begin
       Raise_And_Save_Block_1 : begin
 
          -- This nested exception structure is designed to ensure that the
-         -- appropriate exception occurrence is saved using the
-         -- Save_Occurrence procedure.
+         -- appropriate exception occurrence is saved using the Save_Occurrence
+         -- procedure.
 
          raise Program_Error;
          Report.Failed ("Program_Error not raised");
@@ -100,7 +100,7 @@ begin
 
             begin
                -- Use the procedure Raise_Exception, along with the 'Identity
-               -- attribute to raise the first user defined exception.  Note
+               -- attribute to raise the first user defined exception. Note
                -- that a 200 character message is included in the call.
 
                Raise_Exception (User_Exception_1'Identity, User_Message);
@@ -109,9 +109,9 @@ begin
             exception
                when Exc : User_Exception_1 =>
 
-                  -- This exception occurrence is saved into a variable using
-                  -- procedure Save_Occurrence.  This saved occurrence should
-                  -- not be confused with the raised occurrence of
+                  -- This exception occurrence is saved into a variable
+                  -- using procedure Save_Occurrence. This saved occurrence
+                  -- should not be confused with the raised occurrence of
                   -- Program_Error above.
 
                   Save_Occurrence (Target => Saved_Occurrence, Source => Exc);
@@ -135,8 +135,8 @@ begin
       exception
          when Exc : User_Exception_1 => -- Expected exception.
             -- Check the exception id of the handled id by using the
-            -- Exception_Identity function, and compare with the id of the
-            -- originally raised exception.
+            -- Exception_Identity function, and compare with the id of
+            -- the originally raised exception.
 
             if User_Exception_1'Identity /= Exception_Identity (Exc) then
                Report.Failed ("Exception_Ids do not match - 1");
@@ -162,8 +162,8 @@ begin
       exception
          when Exc : User_Exception_2 =>
 
-            -- This exception occurrence is saved into an access object
-            -- using function Save_Occurrence.
+            -- This exception occurrence is saved into an access object using
+            -- function Save_Occurrence.
 
             Occurrence_Ptr := Save_Occurrence (Source => Exc);
 
@@ -182,8 +182,8 @@ begin
       exception
          when Exc : User_Exception_2 => -- Expected exception.
             -- Check the exception id of the handled id by using the
-            -- Exception_Identity function, and compare with the id of the
-            -- originally raised exception.
+            -- Exception_Identity function, and compare with the id of
+            -- the originally raised exception.
 
             if User_Exception_2'Identity /= Exception_Identity (Exc) then
                Report.Failed ("Exception_Ids do not match - 2");
@@ -201,10 +201,9 @@ begin
               ("Incorrect exception raised by Reraise_Occurrence - 2");
       end Reraise_And_Handle_Saved_Exception_2;
 
-      -- Another example of the use of saving an exception occurrence
-      -- is demonstrated in the following block, where the ability to
-      -- save an occurrence into a data structure, for later processing,
-      -- is modeled.
+      -- Another example of the use of saving an exception occurrence is
+      -- demonstrated in the following block, where the ability to save
+      -- an occurrence into a data structure, for later processing, is modeled.
 
       Store_And_Handle_Block : declare
 
@@ -249,8 +248,8 @@ begin
                   exception
                      when Exc : others =>
 
-                        -- Save each occurrence into a storage array for
-                        -- later processing.
+                        -- Save each occurrence into a storage array for later
+                        -- processing.
 
                         Save_Occurrence (Exception_Storage (I), Exc);
                   end;
@@ -270,9 +269,9 @@ begin
                   Integer'Image (I));
             exception
                when Exc : others =>
-                  -- The following sequence of checks ensures that the
-                  -- correct occurrence was stored, and the associated
-                  -- exception was raised and handled in the proper order.
+                  -- The following sequence of checks ensures that the correct
+                  -- occurrence was stored, and the associated exception was
+                  -- raised and handled in the proper order.
                   if I = 1 then
                      if Exception_1'Identity /= Exception_Identity (Exc) then
                         Report.Failed ("Exception_1 not raised");

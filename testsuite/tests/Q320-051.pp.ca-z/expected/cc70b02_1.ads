@@ -10,8 +10,8 @@ generic
    -- type from the discrete-operation abstraction as an actual parameter to
    -- the list-abstraction formal package.
    --
-   -- Only list instances declared for the same discrete type as that used
-   -- to instantiate the discrete-operation package will be accepted.
+   -- Only list instances declared for the same discrete type as that used to
+   -- instantiate the discrete-operation package will be accepted.
 
    with package Discrete_Ops is new Cc70b02_0 (<>);
 

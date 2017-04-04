@@ -56,8 +56,8 @@ package F340a000 is                                      -- tagged type.
       Next : Node_Ptr := null;                           -- of parent type.
    end record;
 
-   -- Inherits primitive operations of actual type corresponding
-   -- to Parent_Type.
+   -- Inherits primitive operations of actual type corresponding to
+   -- Parent_Type.
 
    -- Add node at head of list.
    procedure Add (Item : in Node_Ptr; Head : in out Node_Ptr);
@@ -70,8 +70,8 @@ package F340a000 is                                      -- tagged type.
    type Priv_Node_Type is new Parent_Type with private;  -- Private extension
    -- of parent type.
 
-   -- Inherits primitive operations of actual parameter corresponding
-   -- to Parent_Type.
+   -- Inherits primitive operations of actual parameter corresponding to
+   -- Parent_Type.
 
    type Priv_Node_Ptr is access Priv_Node_Type;
 

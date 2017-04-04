@@ -17,10 +17,10 @@ package F341a00_2 is    -- package Interest_Checking
    end record;
 
    -- "Twice" inherited primitive operations (Bank.Account, Checking.Account)
-   -- procedure Deposit       (A : in out Account; X : in Bank.Dollar_Amount);
-   -- procedure Withdrawal    (A : in out Account; X : in Bank.Dollar_Amount);
-   -- function  Balance       (A : in     Account) return Bank.Dollar_Amount;
-   -- procedure Service_Charge(A : in out Account);
+   -- procedure Deposit (A : in out Account; X : in Bank.Dollar_Amount);
+   -- procedure Withdrawal (A : in out Account; X : in Bank.Dollar_Amount);
+   -- function Balance (A : in Account) return Bank.Dollar_Amount; procedure
+   -- Service_Charge(A : in out Account);
 
    -- Overridden primitive operations.
    procedure Add_Interest (A : in out Account);

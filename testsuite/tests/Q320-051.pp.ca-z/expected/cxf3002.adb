@@ -87,8 +87,8 @@ begin
       type String_Pointer_Type is access String;
       type Wide_String_Pointer_Type is access Wide_String;
 
-      -- Define a decimal data type, and instantiate the Decimal_Output
-      -- generic package for the data type.
+      -- Define a decimal data type, and instantiate the Decimal_Output generic
+      -- package for the data type.
 
       type Decimal_Data_Type is delta 0.01 digits 16;
 

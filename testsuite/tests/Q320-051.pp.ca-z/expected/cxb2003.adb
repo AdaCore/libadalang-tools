@@ -67,7 +67,7 @@ begin
 
       Tc_Amount : Natural := Natural'First;
 
-      -- Range of type Unsigned_32 is 0..(2**32)-1    (0..Modulus-1).
+      -- Range of type Unsigned_32 is 0..(2**32)-1 (0..Modulus-1).
       Tc_Val_Unsigned_32,
       Tc_Result_Unsigned_32 : Unsigned_32 :=
         Unsigned_32'First;
@@ -135,8 +135,8 @@ begin
 
       -- Function Shift_Right_Arithmetic.
 
-      -- Case where the parameter Value is less than
-      -- one half of the modulus.  Zero bits will be shifted in.
+      -- Case where the parameter Value is less than one half of the modulus.
+      -- Zero bits will be shifted in.
 
       Tc_Amount             := 3;
       Tc_Val_Unsigned_32    := 2**15 + 2**10 + 2**1;
@@ -153,8 +153,8 @@ begin
          Report.Failed ("Incorrect result from Shift_Right_Arithmetic - 2");
       end if;
 
-      -- Case where the parameter Value is greater than or equal to
-      -- one half of the modulus.  One bits will be shifted in.
+      -- Case where the parameter Value is greater than or equal to one half of
+      -- the modulus. One bits will be shifted in.
 
       Tc_Amount             := 1;
       Tc_Val_Unsigned_32    := 2**31; -- One half of modulus

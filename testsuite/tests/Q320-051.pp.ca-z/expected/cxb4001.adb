@@ -87,11 +87,11 @@ begin
       Tst_Cobol_To_Ada : Character :=
         Cobol.Cobol_To_Ada (Cobol.Cobol_Character'First);
 
-      --  assignment to make sure it is an array of  COBOL_Character
+      --  assignment to make sure it is an array of COBOL_Character
       Tst_Alphanumeric : Cobol.Alphanumeric (1 .. 5) :=
         (others => Tst_Cobol_Character);
 
-      --  assignment to make sure it is an array of  COBOL_Character
+      --  assignment to make sure it is an array of COBOL_Character
       Tst_Numeric : Cobol.Numeric (1 .. 5) := (others => Tst_Cobol_Character);
 
       procedure Collect_All_Calls is
@@ -177,8 +177,7 @@ begin
          Cagc_Packed_Decimal :=
            Bx4001_Conv.To_Packed (Cagc_Num, Cagc_Packed_Format);
 
-         --  Binary Formats: external data values are represented as
-         --  Byte_Array
+         --  Binary Formats: external data values are represented as Byte_Array
 
          Cagc_Boolean :=
            Bx4001_Conv.Valid (Cagc_Byte_Array, Cagc_Binary_Format);

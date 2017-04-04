@@ -13,10 +13,9 @@ procedure Ca11011 is
 
 begin
 
-   -- This test indicates one approach to file management operations.
-   -- It is not intended to demonstrate full functionality, but rather
-   -- that the use of a private child package can provide a solution
-   -- to a typical user situation.
+   -- This test indicates one approach to file management operations. It is not
+   -- intended to demonstrate full functionality, but rather that the use of a
+   -- private child package can provide a solution to a typical user situation.
 
    Report.Test
      ("CA11011",

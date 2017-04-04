@@ -243,7 +243,7 @@ begin
 
       Tc_Unb_String := Unb.To_Unbounded_String ("Test String");
 
-      -- From > Through  (No change to Source)
+      -- From > Through (No change to Source)
 
       Unb.Delete
         (Source  => Tc_Unb_String,

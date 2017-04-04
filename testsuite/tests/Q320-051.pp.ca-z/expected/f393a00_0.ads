@@ -29,9 +29,9 @@
 --      dispatching of various forms of subprogram defined/inherited and
 --      overridden with the abstract type.
 --
---  type                       procedures                  functions
+--  type procedures functions
 --  ----                       ----------                  ---------
---  Object                     Initialize, Swap(abstract)  Create(abstract)
+--  Object Initialize, Swap(abstract) Create(abstract)
 --        Object'Class                                     Initialized
 --    Windmill is new Object   Swap, Stop, Add_Spin        Create, Spin
 --      Pump is new Windmill   Set_Rate                    Create, Rate

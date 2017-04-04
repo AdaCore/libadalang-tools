@@ -1,9 +1,8 @@
 with Report;
 package body Cxe4004_Shared is
-   -- The following constant controls whether or not comment
-   -- messages are generated to show progress during the test.
-   -- The setting of Verbose does not affect the result of the
-   -- test.
+   -- The following constant controls whether or not comment messages are
+   -- generated to show progress during the test. The setting of Verbose
+   -- does not affect the result of the test.
    Verbose : constant Boolean := False;
 
    procedure Gen_Chk (Note : String; Actual, Expected : The_Type) is

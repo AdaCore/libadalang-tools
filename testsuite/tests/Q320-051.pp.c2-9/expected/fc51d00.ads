@@ -37,9 +37,8 @@ generic
    type Element_Type (<>) is private;
 package Fc51d00 is  -- This package simulates a generic list abstraction.
 
-   -- The definition of List_Type below is purely artificial; its validity
-   -- in the context of the abstraction is irrelevant to the feature being
-   -- tested.
+   -- The definition of List_Type below is purely artificial; its validity in
+   -- the context of the abstraction is irrelevant to the feature being tested.
 
    type Element_Ptr is access Element_Type;
 

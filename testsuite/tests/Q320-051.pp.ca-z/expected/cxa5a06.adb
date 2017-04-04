@@ -269,8 +269,8 @@ begin
       -- Testing of Arccosh Function, both instantiated and pre-instantiated
       -- version.
 
-      -- Check that Argument_Error is raised by the Arccosh function when
-      -- the value of the parameter X is less than 1.0.
+      -- Check that Argument_Error is raised by the Arccosh function when the
+      -- value of the parameter X is less than 1.0.
 
       begin
          New_Float_Result := Gef.Arccosh (New_Float (Fxa5a00.One_Minus_Delta));

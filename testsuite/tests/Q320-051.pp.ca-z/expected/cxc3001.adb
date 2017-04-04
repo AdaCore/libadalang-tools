@@ -115,8 +115,8 @@ procedure Cxc3001 is
                   Report.Failed ("Unexpected exception from Attach_Handler");
             end;
 
-            -- Don't generate interrupt if no user-handler attached at
-            -- this point (could cause unpredictable results):
+            -- Don't generate interrupt if no user-handler attached at this
+            -- point (could cause unpredictable results):
             if Ai.Is_Attached (Impdef.Annex_C.Interrupt_To_Generate) then
                Impdef.Annex_C.Generate_Interrupt;
                delay Impdef.Annex_C.Wait_For_Interrupt;
@@ -172,8 +172,8 @@ procedure Cxc3001 is
                   Report.Failed ("Unexpected exception from Exchange_Handler");
             end;
 
-            -- Don't generate interrupt if no user-handler attached at
-            -- this point (could cause unpredictable results):
+            -- Don't generate interrupt if no user-handler attached at this
+            -- point (could cause unpredictable results):
             if Ai.Is_Attached (Impdef.Annex_C.Interrupt_To_Generate) then
                Impdef.Annex_C.Generate_Interrupt;
                delay Impdef.Annex_C.Wait_For_Interrupt;

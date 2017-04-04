@@ -85,7 +85,7 @@ package body Report is
    -- VERSION OF ACATS BEING RUN (X.XX).
 
    procedure Put_Msg (Msg : String) is
-      -- WRITE MESSAGE.  LONG MESSAGES ARE FOLDED (AND INDENTED).
+      -- WRITE MESSAGE. LONG MESSAGES ARE FOLDED (AND INDENTED).
       Max_Len : constant Integer range 50 .. 150 := 72;  -- MAXIMUM
       -- OUTPUT LINE LENGTH.
       Indent : constant Integer := Test_Name_Len + 9;  -- AMOUNT TO

@@ -68,7 +68,7 @@ with Ada.Numerics.Generic_Complex_Types;
 procedure Cxg2007 is
    Verbose : constant Boolean := False;
 
-   -- CRC Standard Mathematical Tables;  23rd Edition; pg 738
+   -- CRC Standard Mathematical Tables; 23rd Edition; pg 738
    Sqrt2 : constant :=
      1.41421_35623_73095_04880_16887_24209_69807_85696_71875_37695;
    Sqrt3 : constant :=
@@ -94,15 +94,15 @@ procedure Cxg2007 is
          Mre              : Real;
          Arg_Error        : Real)
       is
-         -- Arg_Error is additional absolute error that is allowed beyond
-         -- the MRE to account for error in the result that can be
-         -- attributed to error in the arguments.
+         -- Arg_Error is additional absolute error that is allowed beyond the
+         -- MRE to account for error in the result that can be attributed to
+         -- error in the arguments.
          Max_Error : Real;
          Rel_Error : Real;
          Abs_Error : Real;
       begin
-         -- In the case where the expected result is very small or 0
-         -- we compute the maximum error as a multiple of Model_Small instead
+         -- In the case where the expected result is very small or 0 we
+         -- compute the maximum error as a multiple of Model_Small instead
          -- of Model_Epsilon and Expected.
          Rel_Error := Mre * abs Expected * Real'Model_Epsilon;
          Abs_Error := Mre * Real'Model_Epsilon;
@@ -139,9 +139,9 @@ procedure Cxg2007 is
          Mre              : Real;
          Arg_Error        : Real)
       is
-      -- Arg_Error is additional absolute error that is allowed beyond
-      -- the MRE to account for error in the result that can be
-      -- attributed to error in the arguments.
+      -- Arg_Error is additional absolute error that is allowed beyond the MRE
+      -- to account for error in the result that can be attributed to error in
+      -- the arguments.
       begin
          Check
            (Actual.Re,
@@ -170,8 +170,8 @@ procedure Cxg2007 is
 
          type Test_Data_Type is array (Positive range <>) of Data_Point;
 
-         -- the values in the following table only involve static
-         -- expressions so no loss of precision occurs.
+         -- the values in the following table only involve static expressions
+         -- so no loss of precision occurs.
          Test_Data : constant Test_Data_Type :=
            (
          --Re          Im   Modulus     Radians  Degrees  Arg_Err
@@ -265,8 +265,8 @@ procedure Cxg2007 is
          end;
 
          if Report.Ident_Int (1) = 2 then
-            -- not executed - used to make it appear that we use the
-            -- results of the above computation
+            -- not executed - used to make it appear that we use the results of
+            -- the above computation
             Z := Z * W;
             Report.Failed (Real'Image (Z.Re + Z.Im));
          end if;

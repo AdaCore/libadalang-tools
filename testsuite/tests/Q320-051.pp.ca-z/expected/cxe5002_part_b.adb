@@ -2,7 +2,7 @@
 
 with Report;
 package body Cxe5002_Part_B is
-   -- the procedures in this package are never actually called.  If a call
+   -- the procedures in this package are never actually called. If a call
    -- actually occurs then probably the wrong body of System.RPC was used.
 
    procedure Remote_Normal (X : Integer) is

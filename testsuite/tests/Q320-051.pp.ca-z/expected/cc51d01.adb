@@ -30,8 +30,8 @@ procedure Cc51d01 is
    -- preceding list package instance.
    --
    -- In order to cover all the important cases, this test instantiates several
-   -- packages and subprograms (probably more than would typically appear
-   -- in user code).
+   -- packages and subprograms (probably more than would typically appear in
+   -- user code).
 
    -- Support for lists of blind IDs:
 

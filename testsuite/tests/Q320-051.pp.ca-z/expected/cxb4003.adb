@@ -204,10 +204,10 @@ begin
 
    begin
 
-      -- Check that function Valid, with the Display_Format parameter
-      -- set to Unsigned, will return True if Numeric parameter Item
-      -- comprises one or more decimal digit characters; check that it
-      -- returns False if the parameter Item is otherwise comprised.
+      -- Check that function Valid, with the Display_Format parameter set to
+      -- Unsigned, will return True if Numeric parameter Item comprises one
+      -- or more decimal digit characters; check that it returns False if the
+      -- parameter Item is otherwise comprised.
 
       for I in 1 .. Number_Of_Valid_Unsigned_Items loop
          -- Fail if the Item parameter is _NOT_ considered Valid.
@@ -238,11 +238,10 @@ begin
       end loop;
 
       -- Check that function Valid, with Display_Format parameter set to
-      -- Leading_Separate, will return True if Numeric parameter Item
-      -- comprises a single occurrence of a Plus_Sign or Minus_Sign
-      -- character, and then by one or more decimal digit characters;
-      -- check that it returns False if the parameter Item is otherwise
-      -- comprised.
+      -- Leading_Separate, will return True if Numeric parameter Item comprises
+      -- a single occurrence of a Plus_Sign or Minus_Sign character, and then
+      -- by one or more decimal digit characters; check that it returns False
+      -- if the parameter Item is otherwise comprised.
 
       for I in 1 .. Number_Of_Valid_Leading_Separate_Items loop
          -- Fail if the Item parameter is _NOT_ considered Valid.
@@ -274,10 +273,9 @@ begin
 
       -- Check that function Valid, with Display_Format parameter set to
       -- Trailing_Separate, will return True if Numeric parameter Item
-      -- comprises one or more decimal digit characters, and then by a
-      -- single occurrence of the Plus_Sign or Minus_Sign character;
-      -- check that it returns False if the parameter Item is otherwise
-      -- comprised.
+      -- comprises one or more decimal digit characters, and then by a single
+      -- occurrence of the Plus_Sign or Minus_Sign character; check that it
+      -- returns False if the parameter Item is otherwise comprised.
 
       for I in 1 .. Number_Of_Valid_Trailing_Separate_Items loop
          -- Fail if the Item parameter is _NOT_ considered Valid.

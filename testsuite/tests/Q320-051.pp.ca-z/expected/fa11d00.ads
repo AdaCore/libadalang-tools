@@ -35,8 +35,8 @@
 
 package Fa11d00 is  -- Complex_Definition_Pkg
 
-   -- Simulate a complex number support package. Complex numbers
-   -- are treated as coordinates in the Cartesian plane.
+   -- Simulate a complex number support package. Complex numbers are treated as
+   -- coordinates in the Cartesian plane.
 
    type Int_Type is range -200 .. 100;
 

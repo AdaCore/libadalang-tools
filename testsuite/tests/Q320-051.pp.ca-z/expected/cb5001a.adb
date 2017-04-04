@@ -22,20 +22,18 @@
 --     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
 --     PARTICULAR PURPOSE OF SAID MATERIAL.
 --*
--- CHECK THAT AN EXCEPTION RAISED IN A RENDEVOUS IS PROPAGATED BOTH TO
--- THE CALLER AND TO THE CALLED TASK.
+-- CHECK THAT AN EXCEPTION RAISED IN A RENDEVOUS IS PROPAGATED BOTH TO THE
+-- CALLER AND TO THE CALLED TASK.
 
--- THIS VERSION CHECKS THAT THE EXCEPTION IS PROPAGATED THROUGH ONE
--- LEVEL OF RENDEVOUS.
+-- THIS VERSION CHECKS THAT THE EXCEPTION IS PROPAGATED THROUGH ONE LEVEL OF
+-- RENDEVOUS.
 
--- *** NOTE: This test has been modified since ACVC version 1.11 to    -- 9X
--- ***       remove incompatibilities associated with the transition   -- 9X
--- ***       to Ada 9X.                                                -- 9X
--- ***                                                                 -- 9X
+-- *** NOTE: This test has been modified since ACVC version 1.11 to -- 9X ***
+-- remove incompatibilities associated with the transition -- 9X *** to Ada 9X.
+-- -- 9X *** -- 9X
 
--- JEAN-PIERRE ROSEN 09 MARCH 1984
--- JBG 6/1/84
--- MRM 03/30/93   REMOVED NUMERIC_ERROR FOR 9X COMPATIBILITY
+-- JEAN-PIERRE ROSEN 09 MARCH 1984 JBG 6/1/84 MRM 03/30/93 REMOVED
+-- NUMERIC_ERROR FOR 9X COMPATIBILITY
 
 with System; use System;
 with Report; use Report;

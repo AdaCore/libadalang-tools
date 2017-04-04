@@ -24,8 +24,8 @@ package body Cxe4003_Part_B1 is
          accept Release_2;
       end Block_2;
 
-      -- allow the task to complete which will then allow the partition
-      -- to complete but only when told to do so.
+      -- allow the task to complete which will then allow the partition to
+      -- complete but only when told to do so.
       accept Finished;
       Report.Result;
 
@@ -70,8 +70,8 @@ package body Cxe4003_Part_B1 is
       -- the cancellation should come in during this delay
       delay Delay_Time;
 
-      -- this statement should only be executed if the remote call is
-      -- not really cancelled.  This is legal but not especially desirable.
+      -- this statement should only be executed if the remote call is not
+      -- really cancelled. This is legal but not especially desirable.
       Cancellation_Test_Finish_Count := Cancellation_Test_Finish_Count + 1;
    end May_Be_Cancelled;
 
@@ -105,8 +105,8 @@ package body Cxe4003_Part_B1 is
                Name &
                " test");
          when others =>
-            -- some, but not all, of the calls were cancelled.
-            -- this is undesirable but not illegal.
+            -- some, but not all, of the calls were cancelled. this is
+            -- undesirable but not illegal.
             Report.Comment
               (Integer'Image (11 - Cancellation_Test_Finish_Count) &
                " remote calls out of 10 were cancelled for " &

@@ -169,8 +169,8 @@ begin
          Tampering_Check (Container => My_Holder_2, Where => "Update_Element");
 
          Element := Animal_2;
-      -- New element has to have the same length as the old one otherwise get
-      -- CONSTRAINT_ERROR : length check failed
+         -- New element has to have the same length as the old one otherwise
+         -- get CONSTRAINT_ERROR : length check failed
 
       end My_Update;
 
@@ -261,8 +261,8 @@ begin
 
    end if;
 
-   -- Test Constant_Reference and Reference explicitly in a way
-   -- that shows a possible use.
+   -- Test Constant_Reference and Reference explicitly in a way that shows a
+   -- possible use.
 
    declare
       procedure Test
@@ -272,10 +272,9 @@ begin
       is
       begin
          Tampering_Check (Container => My_Holder_1, Where => Test_Case);
-         -- The tampering check here prevents the
-         -- Value parameter to this subprogram from
-         -- disappearing (if passed by-reference) while
-         -- it is still in use.
+         -- The tampering check here prevents the Value parameter to this
+         -- subprogram from disappearing (if passed by-reference) while it
+         -- is still in use.
 
          if Value /= Expected then
             Report.Failed ("Wrong value for " & Test_Case);
@@ -317,8 +316,8 @@ begin
         (Value     => My_Holder_1.Reference,
          Expected  => Animal_1,
          Test_Case => "Reference generalized");
-      -- This case is the way that we expect that a holder reference
-      -- will be used.
+      -- This case is the way that we expect that a holder reference will be
+      -- used.
 
    end;
 

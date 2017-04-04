@@ -25,15 +25,14 @@
 -- CHECK THAT THE NON-SPECIFIC RAISE STATEMENT PROPAGATES THE EXCEPTION
 --    FOR FURTHER PROCESSING(HANDLING) IN ANOTHER HANDLER.
 
--- *** NOTE: This test has been modified since ACVC version 1.11 to    -- 9X
--- ***       remove incompatibilities associated with the transition   -- 9X
--- ***       to Ada 9X.                                                -- 9X
--- ***                                                                 -- 9X
+-- *** NOTE: This test has been modified since ACVC version 1.11 to -- 9X ***
+-- remove incompatibilities associated with the transition -- 9X *** to Ada 9X.
+-- -- 9X *** -- 9X
 
 -- DCB 04/01/80
 -- JRK 11/19/80
 -- SPS 11/2/82
--- MRM 03/30/93   REMOVED NUMERIC_ERROR FOR 9X COMPATIBILITY
+-- MRM 03/30/93 REMOVED NUMERIC_ERROR FOR 9X COMPATIBILITY
 
 with Report;
 procedure Cb3003a is

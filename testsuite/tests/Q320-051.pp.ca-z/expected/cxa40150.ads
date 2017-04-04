@@ -46,8 +46,8 @@
 
 package Cxa40150 is
 
-   -- Wide Character mapping function defined for use with specific
-   -- versions of functions Index and Count.
+   -- Wide Character mapping function defined for use with specific versions of
+   -- functions Index and Count.
 
    function Ak_To_Zq_Mapping (From : Wide_Character) return Wide_Character;
 

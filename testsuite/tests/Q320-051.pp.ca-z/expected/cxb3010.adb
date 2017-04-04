@@ -99,9 +99,9 @@ begin
       Tc_String_2     : constant String          := "AbCdE";
       Tc_Blank_String : constant String (1 .. 5) := (others => ' ');
 
-      -- The initialization of the following char_array objects
-      -- includes the appending of a terminating nul char, in order to
-      -- prevent the erroneous execution of Function Value.
+      -- The initialization of the following char_array objects includes the
+      -- appending of a terminating nul char, in order to prevent the erroneous
+      -- execution of Function Value.
 
       Tc_Char_Array       : Ic.Char_Array := Ic.To_C (Tc_Blank_String, True);
       Tc_Char_Array_1 : constant Ic.Char_Array := Ic.To_C (Tc_String_1, True);
@@ -109,14 +109,13 @@ begin
       Tc_Blank_Char_Array : constant Ic.Char_Array :=
         Ic.To_C (Tc_Blank_String, True);
 
-      -- This chars_ptr is initialized via the use of New_Chars_Array to
-      -- avoid erroneous execution of procedure Free.
+      -- This chars_ptr is initialized via the use of New_Chars_Array to avoid
+      -- erroneous execution of procedure Free.
       Tc_Chars_Ptr : Ics.Chars_Ptr := Ics.New_Char_Array (Tc_Blank_Char_Array);
 
    begin
 
-      -- Check that the Procedure Free resets the parameter Item
-      -- to Null_Ptr.
+      -- Check that the Procedure Free resets the parameter Item to Null_Ptr.
 
       if Tc_Chars_Ptr = Ics.Null_Ptr then
          Report.Failed
@@ -151,8 +150,8 @@ begin
       end;
 
       -- Check that the version of Function Value with a chars_ptr parameter
-      -- that returns a char_array result returns an array of chars (up to
-      -- and including the first nul).
+      -- that returns a char_array result returns an array of chars (up to and
+      -- including the first nul).
 
       Tc_Chars_Ptr  := Ics.New_Char_Array (Tc_Char_Array_1);
       Tc_Char_Array := Ics.Value (Item => Tc_Chars_Ptr);
@@ -179,8 +178,8 @@ begin
       end if;
 
       -- Check that the version of Function Value with a chars_ptr parameter
-      -- and a size_t parameter that returns a char_array result returns
-      -- the shorter of:
+      -- and a size_t parameter that returns a char_array result returns the
+      -- shorter of:
       --   1) the first size_t number of characters, or
       --   2) the characters up to and including the first nul.
 
@@ -207,7 +206,7 @@ begin
       Tc_Chars_Ptr := Ics.New_Char_Array (Tc_Char_Array_2);
 
       -- The length supplied as a parameter exceeds the total length of
-      -- TC_char_array_2.  The result should be the entire TC_char_array_2
+      -- TC_char_array_2. The result should be the entire TC_char_array_2
       -- including the terminating nul.
 
       Tc_Char_Array := Ics.Value (Item => Tc_Chars_Ptr, Length => 7);

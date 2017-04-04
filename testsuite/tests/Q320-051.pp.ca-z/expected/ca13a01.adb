@@ -1,8 +1,7 @@
 --==================================================================--
 
 with Fa13a00_1.Ca13a01_5;                 -- Emergency Operation
--- implicitly with Basic Elevator
--- Operations
+-- implicitly with Basic Elevator Operations
 
 with Fa13a00_1.Ca13a01_6;                 -- Express Operation
 

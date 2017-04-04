@@ -182,8 +182,7 @@ procedure Cxg2023 is
    procedure Generic_Check;
    procedure Generic_Check is
 
-      -- the following code is copied directly from the
-      -- above procedure Check_1
+      -- the following code is copied directly from the above procedure Check_1
 
       P1 : Pennies;
       F1 : Franklins;

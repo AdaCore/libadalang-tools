@@ -71,8 +71,8 @@ begin -- CXD5001
       task body Target_Task is
       begin
          accept Get_Id (Task_Id : out Ati.Task_Id) do
-            -- Get the system assigned Task_Id for this task and
-            -- "return" it to the caller
+            -- Get the system assigned Task_Id for this task and "return" it to
+            -- the caller
             Task_Id := Ati.Current_Task;
          end Get_Id;
 
@@ -93,8 +93,7 @@ begin -- CXD5001
 
       Target_Task.Get_Id (Target_Task_Id);
 
-      -- Ensure Target_Task is Terminated before starting the rest of
-      -- the test
+      -- Ensure Target_Task is Terminated before starting the rest of the test
       --
       while not Target_Task'Terminated loop
          delay Impdef.Minimum_Task_Switch;
@@ -121,8 +120,8 @@ begin -- CXD5001
 
       declare   -- Subtest 02
 
-      -- We now invoke Get_Priority using a Null_Task_Id
-      -- Program_Error should be raised
+      -- We now invoke Get_Priority using a Null_Task_Id Program_Error should
+      -- be raised
       begin
          Report.Comment ("Subtest 02");
          Target_Task_Priority := Adp.Get_Priority (Uninitialized_Id);
@@ -137,8 +136,8 @@ begin -- CXD5001
 
       declare   -- Subtest 03
 
-      -- We now invoke Set_Priority  using a Null_Task_Id
-      -- Program_Error should be raised
+      -- We now invoke Set_Priority using a Null_Task_Id Program_Error should
+      -- be raised
       begin
          Report.Comment ("Subtest 03");
          Adp.Set_Priority (Priority_1q, Uninitialized_Id);

@@ -87,8 +87,8 @@ procedure Cxd8003 is
             Integer'Image (Ts / Rt.Time_Span_Unit));
       end if;
 
-      -- compute a time_span that has one less time unit than is found
-      -- in a second.
+      -- compute a time_span that has one less time unit than is found in a
+      -- second.
       T := Rt.Time_Of (1, Rt.Time_Span_Zero) - Rt.Time_Span_Unit;
       -- Almost_A_Second is just below 1 second
       Rt.Split (T, Sc, Almost_A_Second);

@@ -12,9 +12,9 @@ package body Cxa4029_0 is
    end Map_To_Lower_Case;
 
    -- Function Map_To_Upper_Case will return the upper case form of
-   -- Wide_Characters in the range 'a'..'z', or whose position is in one
-   -- of the ranges 223..246 or 248..255, provided the wide_character has
-   -- an upper case form.
+   -- Wide_Characters in the range 'a'..'z', or whose position is in one of
+   -- the ranges 223..246 or 248..255, provided the wide_character has an
+   -- upper case form.
 
    function Map_To_Upper_Case (From : Wide_Character) return Wide_Character is
    begin

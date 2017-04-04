@@ -393,8 +393,8 @@ begin
 
       begin
 
-      -- Hashed maps are not ordered by key value so could be read out in any
-      -- order
+         -- Hashed maps are not ordered by key value so could be read out in
+         -- any order
 
          My_Map_1.Replace_Element
            (Position => My_Cursor_1,
@@ -440,9 +440,9 @@ begin
 
    end if;
 
--- Test Move.  Target has the test values in reverse order when sorted by
--- key, after Move these should be replaced (not appended) by the test values
--- in forward order when sorted by key
+   -- Test Move. Target has the test values in reverse order when sorted by
+   -- key, after Move these should be replaced (not appended) by the test
+   -- values in forward order when sorted by key
 
    My_Map_2.Clear;
 
@@ -664,9 +664,8 @@ begin
 
    -- Test Insert (three forms), Include and Replace
 
--- My_Map_2 should initially be empty
--- Insert in fairly mixed order to check that order is determined by the key,
--- not the order of insertion
+   -- My_Map_2 should initially be empty Insert in fairly mixed order to check
+   -- that order is determined by the key, not the order of insertion
 
    declare
    begin

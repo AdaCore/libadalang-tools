@@ -47,8 +47,8 @@ procedure Cxac006 is
    File_Contents : array (Strm_Io.Count range 1 .. 40) of Character;
    File_Length   : Strm_Io.Count   := 0;
    File_Name : constant String := Report.Legal_File_Name (Nam => "CXAC006");
-   -- A file name that will be used for the test file. This file will
-   -- be written, and should be positionable, if possible.
+   -- A file name that will be used for the test file. This file will be
+   -- written, and should be positionable, if possible.
 
    File         : Strm_Io.File_Type;
    Another_File : Strm_Io.File_Type;
@@ -63,9 +63,9 @@ procedure Cxac006 is
       Data           : in Character;
       Positioning_Ok : in Boolean := False)
    is
-   -- Write an item at Index, updating the local copy of the data as well.
-   -- Any file positioning has already been accomplished. Positioning of
-   -- the file is OK if Positioning_OK is True.
+   -- Write an item at Index, updating the local copy of the data as well. Any
+   -- file positioning has already been accomplished. Positioning of the file
+   -- is OK if Positioning_OK is True.
    begin
       if Positioning_Ok then
          if Strm_Io.Index (File) /= Index then
@@ -74,8 +74,8 @@ procedure Cxac006 is
                Strm_Io.Count'Image (Index) &
                " File Index=" &
                Strm_Io.Count'Image (Strm_Io.Index (File)));
-            -- We allow the test to continue here, because some
-            -- implementations have a broken implementation of Index.
+            -- We allow the test to continue here, because some implementations
+            -- have a broken implementation of Index.
          end if;
       end if;
       Character'Write (Strm_Io.Stream (File), Data);
@@ -89,8 +89,8 @@ procedure Cxac006 is
      (File : in out Strm_Io.File_Type;
       Code : in     Character)
    is
-      -- Check the file contents against the local set. File will have
-      -- mode "In_File" after this check.
+      -- Check the file contents against the local set. File will have mode
+      -- "In_File" after this check.
       Data       : Character;
       Any_Errors : Boolean := False;
    begin
@@ -480,8 +480,7 @@ begin
 
       Strm_Io.Close (File);
 
-      -- Re-open file (with a different file object) and check
-      -- contents again:
+      -- Re-open file (with a different file object) and check contents again:
       begin
          Strm_Io.Open
            (File => Another_File,
@@ -498,8 +497,8 @@ begin
             raise Abort_Test;
       end;
       Check_File_Contents (Another_File, '5');
-      -- Note: This checks AI-85 question 2: does Reset start at the
-      -- beginning of the external file?
+      -- Note: This checks AI-85 question 2: does Reset start at the beginning
+      -- of the external file?
 
       begin
          Strm_Io.Set_Index (Another_File, 6);

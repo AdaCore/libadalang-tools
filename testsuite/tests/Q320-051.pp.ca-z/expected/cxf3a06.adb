@@ -93,16 +93,16 @@ begin
       Text_Filename : constant String := Report.Legal_File_Name (1);
    begin
 
-      -- Use_Error will be raised if Text_IO operations or external files
-      -- are not supported.
+      -- Use_Error will be raised if Text_IO operations or external files are
+      -- not supported.
 
       Text_Io.Create (Text_File, Text_Io.Out_File, Text_Filename);
 
       Test_Block : declare
          use Ada.Text_Io;
 
-         -- Instantiate the Decimal_Output generic package for two
-         -- different decimal data types.
+         -- Instantiate the Decimal_Output generic package for two different
+         -- decimal data types.
 
          package Pack_2dp is          -- Uses decimal type with delta 0.01.
          new Editing.Decimal_Output
@@ -129,9 +129,9 @@ begin
 
       begin
 
-         -- Use the two versions of Put, for data with two decimal points,
-         -- to write edited output strings to the text file.  Use a separate
-         -- line for each string entry.
+         -- Use the two versions of Put, for data with two decimal points, to
+         -- write edited output strings to the text file. Use a separate line
+         -- for each string entry.
 
          for I in Tc_Start_Loop .. Tc_End_Loop_1 loop               -- 1..10
 
@@ -139,9 +139,9 @@ begin
 
             Tc_Picture := Editing.To_Picture (Fxf3a00.Valid_Strings (I).all);
 
-            -- Use the Text_IO version of Put to place an edited output
-            -- string into a text file. Use default parameters in the call
-            -- to Image for Currency, Fill, Separator, and Radix_Mark.
+            -- Use the Text_IO version of Put to place an edited output string
+            -- into a text file. Use default parameters in the call to Image
+            -- for Currency, Fill, Separator, and Radix_Mark.
 
             Text_Io.Put
               (Text_File,
@@ -150,10 +150,10 @@ begin
                   Pic  => Tc_Picture));
             Text_Io.New_Line (Text_File);
 
-            -- Use the version of Put from the instantiation of
-            -- Decimal_Output to place an edited output string on a separate
-            -- line of the Text_File.  Use default parameters for Currency,
-            -- Fill, Separator, and Radix_Mark.
+            -- Use the version of Put from the instantiation of Decimal_Output
+            -- to place an edited output string on a separate line of the
+            -- Text_File. Use default parameters for Currency, Fill,
+            -- Separator, and Radix_Mark.
 
             Pack_2dp.Put
               (File => Text_File,
@@ -165,8 +165,8 @@ begin
 
          Text_Io.Close (Text_File);
 
-         -- Reopen the text file in In_File mode, and verify the edited
-         -- output found on consecutive lines of the file.
+         -- Reopen the text file in In_File mode, and verify the edited output
+         -- found on consecutive lines of the file.
 
          Text_Io.Open (Text_File, Text_Io.In_File, Text_Filename);
 
@@ -176,7 +176,7 @@ begin
             Text_Io.Get_Line (Text_File, Tc_String_2, Tc_Last_2);
 
             -- Compare the two strings for equality with the expected edited
-            -- output result.  Failure results if strings don't match, or if
+            -- output result. Failure results if strings don't match, or if
             -- a reading error occurred from the attempted Get_Line resulting
             -- from an improperly formed edited output string.
 
@@ -193,26 +193,26 @@ begin
 
          Text_Io.Close (Text_File);
 
-         -- Reopen the text file in Append_File mode.
-         -- Use the two versions of Put, for data with no decimal points,
-         -- to write edited output strings to the text file.  Use a separate
-         -- line for each string entry.
+         -- Reopen the text file in Append_File mode. Use the two versions
+         -- of Put, for data with no decimal points, to write edited output
+         -- strings to the text file. Use a separate line for each string
+         -- entry.
 
          Text_Io.Open (Text_File, Text_Io.Append_File, Text_Filename);
 
          for I in Tc_Start_Loop .. Tc_End_Loop_2 loop               -- 1..12
 
             -- Create the picture object from the picture string specific to
-            -- data with no decimal points.  Use appropriate offset into the
+            -- data with no decimal points. Use appropriate offset into the
             -- Valid_Strings array to account for the string data used above.
 
             Tc_Picture :=
               Editing.To_Picture
                 (Fxf3a00.Valid_Strings (I + Tc_End_Loop_1).all);
 
-            -- Use the Text_IO version of Put to place an edited output
-            -- string into a text file.  Use non-default parameters in the
-            -- call to Image for Currency, Fill, Separator, and Radix_Mark.
+            -- Use the Text_IO version of Put to place an edited output string
+            -- into a text file. Use non-default parameters in the call to
+            -- Image for Currency, Fill, Separator, and Radix_Mark.
 
             Text_Io.Put
               (Text_File,
@@ -225,10 +225,10 @@ begin
                   Radix_Mark => '.'));
             Text_Io.New_Line (Text_File);
 
-            -- Use the version of Put from the instantiation of
-            -- Decimal_Output to place an edited output string on a separate
-            -- line of the Text_File.  Use non-default parameters for
-            -- Currency, Fill, Separator, and Radix_Mark.
+            -- Use the version of Put from the instantiation of Decimal_Output
+            -- to place an edited output string on a separate line of the
+            -- Text_File. Use non-default parameters for Currency, Fill,
+            -- Separator, and Radix_Mark.
 
             Pack_Ndp.Put
               (File       => Text_File,
@@ -244,13 +244,13 @@ begin
 
          Text_Io.Close (Text_File);
 
-         -- Reopen the text file in In_File mode, and verify the edited
-         -- output found on consecutive lines of the file.
+         -- Reopen the text file in In_File mode, and verify the edited output
+         -- found on consecutive lines of the file.
 
          Text_Io.Open (Text_File, Text_Io.In_File, Text_Filename);
 
-         -- Read past data that has been verified above, skipping two lines
-         -- of the data file for each loop.
+         -- Read past data that has been verified above, skipping two lines of
+         -- the data file for each loop.
 
          for I in Tc_Start_Loop .. Tc_End_Loop_1 loop               -- 1..10
             Text_Io.Skip_Line (Text_File, 2);
@@ -263,7 +263,7 @@ begin
             Text_Io.Get_Line (Text_File, Tc_String_2, Tc_Last_2);
 
             -- Compare the two strings for equality with the expected edited
-            -- output result.  Failure results if strings don't match, or if
+            -- output result. Failure results if strings don't match, or if
             -- a reading error occurred from the attempted Get_Line resulting
             -- from an improperly formed edited output string.
 
@@ -296,9 +296,9 @@ begin
 
    exception
 
-      -- Since Use_Error can be raised if, for the specified mode,
-      -- the environment does not support Text_IO operations, the
-      -- following handlers are included:
+      -- Since Use_Error can be raised if, for the specified mode, the
+      -- environment does not support Text_IO operations, the following
+      -- handlers are included:
 
       when Text_Io.Use_Error =>
          Report.Not_Applicable ("Use_Error raised on Text_IO Create");

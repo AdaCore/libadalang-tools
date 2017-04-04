@@ -60,19 +60,14 @@
 --
 -- References:
 --
--- Software Manual for the Elementary Functions
--- William J. Cody, Jr. and William Waite
--- Prentice-Hall, 1980
+-- Software Manual for the Elementary Functions William J. Cody, Jr. and
+-- William Waite Prentice-Hall, 1980
 --
--- CRC Standard Mathematical Tables
--- 23rd Edition
+-- CRC Standard Mathematical Tables 23rd Edition
 --
--- Implementation and Testing of Function Software
--- W. J. Cody
--- Problems and Methodologies in Mathematical Software Production
--- editors P. C. Messina and A. Murli
--- Lecture Notes in Computer Science   Volume 142
--- Springer Verlag, 1982
+-- Implementation and Testing of Function Software W. J. Cody Problems and
+-- Methodologies in Mathematical Software Production editors P. C. Messina and
+-- A. Murli Lecture Notes in Computer Science Volume 142 Springer Verlag, 1982
 --
 
 with System;
@@ -82,7 +77,7 @@ procedure Cxg2013 is
    Verbose     : constant Boolean := False;
    Max_Samples : constant         := 1_001;
 
-   -- CRC Standard Mathematical Tables;  23rd Edition; pg 738
+   -- CRC Standard Mathematical Tables; 23rd Edition; pg 738
    Sqrt2 : constant :=
      1.41421_35623_73095_04880_16887_24209_69807_85696_71875_37695;
    Sqrt3 : constant :=
@@ -125,8 +120,8 @@ procedure Cxg2013 is
          Rel_Error : Real;
          Abs_Error : Real;
       begin
-         -- In the case where the expected result is very small or 0
-         -- we compute the maximum error as a multiple of Model_Epsilon instead
+         -- In the case where the expected result is very small or 0 we
+         -- compute the maximum error as a multiple of Model_Epsilon instead
          -- of Model_Epsilon and Expected.
          Rel_Error := Mre * abs Expected * Real'Model_Epsilon;
          Abs_Error := Mre * Real'Model_Epsilon;
@@ -181,17 +176,17 @@ procedure Cxg2013 is
       end Exact_Result_Test;
 
       procedure Tan_Test (A, B : Real) is
-         -- Use identity Tan(X) = [2*Tan(x/2)]/[1-Tan(x/2) ** 2]
-         -- checks over the range -pi/4 .. pi/4 require no argument reduction
-         -- checks over the range 7pi/8 .. 9pi/8 require argument reduction
+         -- Use identity Tan(X) = [2*Tan(x/2)]/[1-Tan(x/2) ** 2] checks over
+         -- the range -pi/4 .. pi/4 require no argument reduction checks over
+         -- the range 7pi/8 .. 9pi/8 require argument reduction
          X, Y             : Real;
          Actual1, Actual2 : Real;
       begin
          Accuracy_Error_Reported := False;  -- reset
          for I in 1 .. Max_Samples loop
             X := (B - A) * Real (I) / Real (Max_Samples) + A;
-            -- argument purification to insure x and x/2 are exact
-            -- See Cody page 170.
+            -- argument purification to insure x and x/2 are exact See Cody
+            -- page 170.
             Y := Real'Machine (X * 0.5);
             X := Real'Machine (Y + Y);
 
@@ -236,8 +231,8 @@ procedure Cxg2013 is
          Accuracy_Error_Reported := False;  -- reset
          for I in 1 .. Max_Samples loop
             X := (B - A) * Real (I) / Real (Max_Samples) + A;
-            -- argument purification to insure x and x/2 are exact.
-            -- See Cody page 170.
+            -- argument purification to insure x and x/2 are exact. See Cody
+            -- page 170.
             Y := Real'Machine (X * 0.5);
             X := Real'Machine (Y + Y);
 

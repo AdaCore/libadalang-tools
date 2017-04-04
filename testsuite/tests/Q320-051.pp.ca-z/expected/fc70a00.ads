@@ -36,8 +36,8 @@ generic               -- Complex integer abstraction.
    type Int_Type is range <>;
 package Fc70a00 is
 
-   -- Simulate a generic complex integer support package. Complex integers
-   -- are treated as coordinates in the Cartesian plane.
+   -- Simulate a generic complex integer support package. Complex integers are
+   -- treated as coordinates in the Cartesian plane.
 
    type Complex_Type is private;
 

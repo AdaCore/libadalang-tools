@@ -1,8 +1,8 @@
 ---------------------------------------------------------------- CDB0A02_3
 
--- This package is essentially identical to CDB0A02_2, except that the size
--- of a cell is significantly larger.  This is used to check that different
--- access types may share a single pool
+-- This package is essentially identical to CDB0A02_2, except that the size of
+-- a cell is significantly larger. This is used to check that different access
+-- types may share a single pool
 
 with Fdb0a00.Pool2;
 package Cdb0a02_3 is

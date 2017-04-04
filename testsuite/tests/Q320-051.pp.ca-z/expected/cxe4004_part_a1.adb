@@ -154,8 +154,8 @@ package body Cxe4004_Part_A1 is
    end "+";
 
    ---------  partition termination coordination ----------
-   -- use a task to prevent the partition from completing its execution
-   -- until the main procedure in partition B tells it to quit.
+   -- use a task to prevent the partition from completing its execution until
+   -- the main procedure in partition B tells it to quit.
 
    task Wait_For_Quit is
       entry Can_Quit;

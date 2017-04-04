@@ -67,9 +67,8 @@ begin
 
    Test_For_Text_Io_Support : begin
 
--- An application creates a text file with mode Append_File.
--- Use_Error will be raised if Text_IO operations or external files are not
--- supported.
+-- An application creates a text file with mode Append_File. Use_Error will be
+-- raised if Text_IO operations or external files are not supported.
 
       Text_Io.Create (Text_File, Text_Io.Append_File, Text_Filename);
 
@@ -95,10 +94,10 @@ begin
          Tc_Spacing : constant Text_Io.Count := 3;
       begin
 
--- During the course of its processing, the application may attempt to
--- invoke the Skip_Line procedure on a file that is currently in Append_File
--- mode (instead of the anticipated In_File mode).  This results in the
--- raising of Mode_Error.
+-- During the course of its processing, the application may attempt to invoke
+-- the Skip_Line procedure on a file that is currently in Append_File mode
+-- (instead of the anticipated In_File mode). This results in the raising
+-- of Mode_Error.
 
          Text_Io.Skip_Line (Text_File, Tc_Spacing);
          Report.Failed ("Exception not raised by Skip_Line");
@@ -122,8 +121,8 @@ begin
          Text_Io.Skip_Page (Text_File);
          Report.Failed ("Exception not raised by Skip_Page");
 
--- Once again, an exception handler present within the application handles
--- the exception and processing continues.
+-- Once again, an exception handler present within the application handles the
+-- exception and processing continues.
 
       exception
          when Text_Io.Mode_Error =>

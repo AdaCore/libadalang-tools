@@ -122,9 +122,8 @@ package Tctouch is
       Expected_5 : String := "";
       Expected_6 : String := "";
       Message    : String);
-   -- OK if any of the expected strings is found.
-   -- If the null string is a legitimate result, it must be given
-   -- first.
+   -- OK if any of the expected strings is found. If the null string is a
+   -- legitimate result, it must be given first.
 
    procedure Flush;
 
@@ -135,12 +134,11 @@ package Tctouch is
      (Message : in String;
       Annex   : in Special_Needs_Annexes := Annex_C);
    -- If Impdef.Validating_Annex_<Annex> is true, will call Report.Failed
-   -- otherwise will call Report.Not_Applicable.  This is to allow tests
-   -- which are driven by wording in the core of the language, yet have
-   -- their functionality dictated by the Special Needs Annexes to perform
-   -- dual purpose.
-   -- The default of Annex_C for the Annex parameter is to support early
-   -- tests written with the assumption that Implementation_Check was
+   -- otherwise will call Report.Not_Applicable. This is to allow tests
+   -- which are driven by wording in the core of the language, yet have their
+   -- functionality dictated by the Special Needs Annexes to perform dual
+   -- purpose. The default of Annex_C for the Annex parameter is to support
+   -- early tests written with the assumption that Implementation_Check was
    -- expressly for use with the Systems Programming Annex.
 
 end Tctouch;

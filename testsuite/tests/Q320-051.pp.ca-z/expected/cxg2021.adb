@@ -60,12 +60,10 @@
 --
 -- W. J. Cody
 -- CELEFUNT: A Portable Test Package for Complex Elementary Functions
--- Algorithm 714, Collected Algorithms from ACM.
--- Published in Transactions On Mathematical Software,
--- Vol. 19, No. 1, March, 1993, pp. 1-21.
+-- Algorithm 714, Collected Algorithms from ACM. Published in Transactions
+-- On Mathematical Software, Vol. 19, No. 1, March, 1993, pp. 1-21.
 --
--- CRC Standard Mathematical Tables
--- 23rd Edition
+-- CRC Standard Mathematical Tables 23rd Edition
 --
 
 with System;
@@ -74,9 +72,9 @@ with Ada.Numerics.Generic_Complex_Types;
 with Ada.Numerics.Generic_Complex_Elementary_Functions;
 procedure Cxg2021 is
    Verbose : constant Boolean := False;
-   -- Note that Max_Samples is the number of samples taken in
-   -- both the real and imaginary directions.  Thus, for Max_Samples
-   -- of 100 the number of values checked is 10000.
+   -- Note that Max_Samples is the number of samples taken in both the real and
+   -- imaginary directions. Thus, for Max_Samples of 100 the number of values
+   -- checked is 10000.
    Max_Samples : constant := 100;
 
    E  : constant := Ada.Numerics.E;
@@ -101,18 +99,16 @@ procedure Cxg2021 is
       -- flag used to terminate some tests early
       Accuracy_Error_Reported : Boolean := False;
 
-      -- The following value is a lower bound on the accuracy
-      -- required.  It is normally 0.0 so that the lower bound
-      -- is computed from Model_Epsilon.  However, for tests
-      -- where the expected result is only known to a certain
-      -- amount of precision this bound takes on a non-zero
-      -- value to account for that level of precision.
+      -- The following value is a lower bound on the accuracy required. It is
+      -- normally 0.0 so that the lower bound is computed from Model_Epsilon.
+      -- However, for tests where the expected result is only known to a
+      -- certain amount of precision this bound takes on a non-zero value
+      -- to account for that level of precision.
       Error_Low_Bound : Real := 0.0;
 
-      -- the E_Factor is an additional amount added to the Expected
-      -- value prior to computing the maximum relative error.
-      -- This is needed because the error analysis (Cody pg 17-20)
-      -- requires this additional allowance.
+      -- the E_Factor is an additional amount added to the Expected value prior
+      -- to computing the maximum relative error. This is needed because the
+      -- error analysis (Cody pg 17-20) requires this additional allowance.
       procedure Check
         (Actual, Expected : Real;
          Test_Name        : String;
@@ -123,8 +119,8 @@ procedure Cxg2021 is
          Rel_Error : Real;
          Abs_Error : Real;
       begin
-         -- In the case where the expected result is very small or 0
-         -- we compute the maximum error as a multiple of Model_Epsilon instead
+         -- In the case where the expected result is very small or 0 we
+         -- compute the maximum error as a multiple of Model_Epsilon instead
          -- of Model_Epsilon and Expected.
          Rel_Error := Mre * Real'Model_Epsilon * (abs Expected + E_Factor);
          Abs_Error := Mre * Real'Model_Epsilon;
@@ -196,11 +192,10 @@ procedure Cxg2021 is
       end Check;
 
       procedure Special_Value_Test is
-         -- In the following tests the expected result is accurate
-         -- to the machine precision so the minimum guaranteed error
-         -- bound can be used if the argument is exact.
-         -- Since the argument involves Pi, we must allow for this
-         -- inexact argument.
+         -- In the following tests the expected result is accurate to the
+         -- machine precision so the minimum guaranteed error bound can be used
+         -- if the argument is exact. Since the argument involves Pi, we must
+         -- allow for this inexact argument.
          Minimum_Error : constant := 11.0;
       begin
          Check
@@ -234,10 +229,9 @@ procedure Cxg2021 is
       end Exact_Result_Test;
 
       procedure Identity_Test (Ra, Rb, Ia, Ib : Real) is
-         -- Tests an identity over a range of values specified
-         -- by the 4 parameters.  RA and RB denote the range for the
-         -- real part while IA and IB denote the range for the
-         -- imaginary part.
+         -- Tests an identity over a range of values specified by the 4
+         -- parameters. RA and RB denote the range for the real part while
+         -- IA and IB denote the range for the imaginary part.
          --
          -- For this test we use the identity
          --    Sin(Z) = Sin(Z-W) * Cos(W) + Cos(Z-W) * Sin(W)
@@ -262,8 +256,8 @@ procedure Cxg2021 is
 
       begin
          if Real'Digits > 20 then
-            -- constants used here accurate to 20 digits.  Allow 1
-            -- additional digit of error for computation.
+            -- constants used here accurate to 20 digits. Allow 1 additional
+            -- digit of error for computation.
             Error_Low_Bound := 0.00000_00000_00000_0001;
             Report.Comment ("accuracy checked to 19 digits");
          end if;
@@ -386,10 +380,9 @@ procedure Cxg2021 is
       begin
          Special_Value_Test;
          Exact_Result_Test;
-         -- test regions where sin and cos have the same sign and
-         -- about the same magnitude.  This will minimize subtraction
-         -- errors in the identities.
-         -- See Cody page 17.
+         -- test regions where sin and cos have the same sign and about the
+         -- same magnitude. This will minimize subtraction errors in the
+         -- identities. See Cody page 17.
          Identity_Test (0.062_5, 10.0, 0.062_5, 10.0);
          Identity_Test (16.0, 17.0, 16.0, 17.0);
       end Do_Test;

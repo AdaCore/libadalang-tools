@@ -100,8 +100,8 @@ procedure Cxai035 is
    begin
 
       -- Elements with an odd index are filled with negative elements of
-      -- increasing magnitude and elements with an even index are filled with
-      -- positive elements of increasing magnitude.
+      -- increasing magnitude and elements with an even index are filled
+      -- with positive elements of increasing magnitude.
 
       for I in Array_Bounds_Type loop
 
@@ -223,8 +223,8 @@ begin
 
       if I <= No_Tests_Rounded_Up_To_Even / 2 then
 
-      -- The negative elements should be extracted first, in reverse order of
-      -- enqueuing.
+         -- The negative elements should be extracted first, in reverse order
+         -- of enqueuing.
 
          if Value_Out_Array (I) /=
            Value_In_Array (No_Tests_Rounded_Up_To_Even + 1 - 2 * I)

@@ -103,8 +103,8 @@ package Ca12001_Win is
       Id     : in     Window_Id_Type;
       Width  : in     Window_Size;
       Height : in     Window_Size);
-   -- Create a new top-level window with the specified characteristics.
-   -- Raises Not_Valid_Error if the Window has already been created.
+   -- Create a new top-level window with the specified characteristics. Raises
+   -- Not_Valid_Error if the Window has already been created.
 
    procedure Create
      (Window : in out Window_Type;
@@ -112,48 +112,48 @@ package Ca12001_Win is
       Id     : in     Window_Id_Type;
       Width  : in     Window_Size;
       Height : in     Window_Size);
-   -- Create a new child window with the specified characteristics.
-   -- Raises Not_Valid_Error if the Window has already been created,
-   -- or if the Parent window has not been created.
+   -- Create a new child window with the specified characteristics. Raises
+   -- Not_Valid_Error if the Window has already been created, or if the
+   -- Parent window has not been created.
 
    procedure Destroy (Window : in out Window_Type);
    -- Destroy a window.
-   -- Raises Not_Valid_Error if the Window has not been created, or
-   -- if Window has any children that have not been destroyed.
+   -- Raises Not_Valid_Error if the Window has not been created, or if Window
+   -- has any children that have not been destroyed.
 
    function Id (Window : in Window_Type) return Window_Id_Type;
-   -- Returns the Id of a window.
-   -- Raises Not_Valid_Error if the Window has not been created.
+   -- Returns the Id of a window. Raises Not_Valid_Error if the Window has not
+   -- been created.
 
    function Height (Window : in Window_Type) return Window_Size;
-   -- Returns the Height of a window.
-   -- Raises Not_Valid_Error if the Window has not been created.
+   -- Returns the Height of a window. Raises Not_Valid_Error if the Window has
+   -- not been created.
 
    function Width (Window : in Window_Type) return Window_Size;
-   -- Returns the Width of a window.
-   -- Raises Not_Valid_Error if the Window has not been created.
+   -- Returns the Width of a window. Raises Not_Valid_Error if the Window has
+   -- not been created.
 
    procedure Resize
      (Window : in Window_Type;
       Width  : in Window_Size;
       Height : in Window_Size);
-   -- Change the size of a window.
-   -- Raises Not_Valid_Error if the Window has not been created.
+   -- Change the size of a window. Raises Not_Valid_Error if the Window has not
+   -- been created.
 
    function Parent (Window : in Window_Type) return Any_Window_Access_Type;
-   -- Returns an access to the parent of this window. Returns null if
-   -- this is a top-level window.
-   -- Raises Not_Valid_Error if the Window has not been created.
+   -- Returns an access to the parent of this window. Returns null if this is
+   -- a top-level window. Raises Not_Valid_Error if the Window has not been
+   -- created.
 
    function Child (Window : in Window_Type) return Any_Window_Access_Type;
-   -- Returns an access to a child of this window. Returns null if
-   -- this window has no children.
-   -- Raises Not_Valid_Error if the Window has not been created.
+   -- Returns an access to a child of this window. Returns null if this window
+   -- has no children. Raises Not_Valid_Error if the Window has not been
+   -- created.
 
    function Sibling (Window : in Window_Type) return Any_Window_Access_Type;
-   -- Returns an access to a sibling of this window. Returns null if
-   -- this window has no siblings.
-   -- Raises Not_Valid_Error if the Window has not been created.
+   -- Returns an access to a sibling of this window. Returns null if this
+   -- window has no siblings. Raises Not_Valid_Error if the Window has not
+   -- been created.
 
 private
    type Low_Win_Access is access Ca12001_Win.Impl.Low_Win_Type;
@@ -162,8 +162,8 @@ private
       Id         : Window_Id_Type := ' ';
       Win_Obj    : Low_Win_Access := null;
       -- Size information is accessed from the low-level object.
-      -- Relationship pointers: (In a real package, we'd use controlled
-      -- types to ensure that these are cleaned up.)
+      -- Relationship pointers: (In a real package, we'd use controlled types
+      -- to ensure that these are cleaned up.)
       Parent       : Any_Window_Access_Type := null;
       Next_Sibling : Any_Window_Access_Type := null;
       Child        : Any_Window_Access_Type := null;

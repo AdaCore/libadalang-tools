@@ -24,7 +24,7 @@ package body Cc40001_0 is
       -- note that the calls to touch will not be directly validated, it is
       -- expected that some number > 0 of calls will be made to this procedure,
       -- the subtests then clear (Flush) the Touch buffer and perform actions
-      -- where an incorrect implementation might call this procedure.  Such a
+      -- where an incorrect implementation might call this procedure. Such a
       -- call will fail on the attempt to "Validate" the null string.
    end Adjust;
 

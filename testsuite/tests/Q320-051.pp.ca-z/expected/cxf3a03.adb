@@ -138,9 +138,9 @@ begin
             Tc_Radix_Adjustment := 1;
          end if;
 
-         -- Calculate the length, using the version of Length that comes
-         -- from the appropriate instantiation of Decimal_Output, based
-         -- on the decimal type used in the instantiation.
+         -- Calculate the length, using the version of Length that comes from
+         -- the appropriate instantiation of Decimal_Output, based on the
+         -- decimal type used in the instantiation.
          if Inst = Ndp then
             Tc_Length := Pack_Ndp.Length (Tc_Picture, Currency_String);
          else
@@ -158,8 +158,8 @@ begin
       Length_Block : begin
 
          -- The first 10 picture strings in the Valid_Strings array correspond
-         -- to data values of a decimal type with delta 0.01.
-         -- Note: The appropriate instantiation of the Decimal_Output package
+         -- to data values of a decimal type with delta 0.01. Note: The
+         -- appropriate instantiation of the Decimal_Output package
          --       (and therefore function Length) is used by function
          --       Accurate_Length to calculate length.
 
@@ -179,10 +179,9 @@ begin
             end if;
          end loop;
 
-         -- Picture strings 17-20 in the Valid_Strings array correspond
-         -- to data values of a decimal type with delta 1.0.  Again, the
-         -- instantiation of Decimal_Output used is based on this particular
-         -- decimal type.
+         -- Picture strings 17-20 in the Valid_Strings array correspond to data
+         -- values of a decimal type with delta 1.0. Again, the instantiation
+         -- of Decimal_Output used is based on this particular decimal type.
 
          for I in 17 .. 20 loop
             if not Accurate_Length
@@ -200,9 +199,9 @@ begin
             end if;
          end loop;
 
-         -- The first 4 picture strings in the Foreign_Strings array
-         -- correspond to data values of a decimal type with delta 0.01,
-         -- and to the currency string "FF" (two characters).
+         -- The first 4 picture strings in the Foreign_Strings array correspond
+         -- to data values of a decimal type with delta 0.01, and to the
+         -- currency string "FF" (two characters).
 
          for I in 1 .. Fxf3a00.Number_Of_Ff_Strings loop
             if not Accurate_Length
@@ -220,9 +219,9 @@ begin
             end if;
          end loop;
 
-         -- Picture strings 5-9 in the Foreign_Strings array correspond
-         -- to data values of a decimal type with delta 0.01, and to the
-         -- currency string "DM" (two characters).
+         -- Picture strings 5-9 in the Foreign_Strings array correspond to
+         -- data values of a decimal type with delta 0.01, and to the currency
+         -- string "DM" (two characters).
 
          Tc_Lower_Bound  := Fxf3a00.Number_Of_Ff_Strings + 1;
          Tc_Higher_Bound :=
@@ -244,9 +243,9 @@ begin
             end if;
          end loop;
 
-         -- Picture string #10 in the Foreign_Strings array corresponds
-         -- to a data value of a decimal type with delta 0.01, and to the
-         -- currency string "CHF" (three characters).
+         -- Picture string #10 in the Foreign_Strings array corresponds to a
+         -- data value of a decimal type with delta 0.01, and to the currency
+         -- string "CHF" (three characters).
 
          if not Accurate_Length
              (Fxf3a00.Foreign_Strings (10).all,
@@ -275,17 +274,17 @@ begin
 
       begin
 
-         -- The following four For Loops examine cases where the
-         -- decimal data/picture string/currency combinations used will
-         -- generate valid Edited Output strings.  These combinations, when
-         -- provided to the Function Valid (from instantiations of
-         -- Decimal_Output), should result in a return result of True.
-         -- The particular instantiated version of Valid used in these loops
-         -- is that for decimal data with delta 0.01.
+         -- The following four For Loops examine cases where the decimal
+         -- data/picture string/currency combinations used will generate valid
+         -- Edited Output strings. These combinations, when provided to the
+         -- Function Valid (from instantiations of Decimal_Output), should
+         -- result in a return result of True. The particular instantiated
+         -- version of Valid used in these loops is that for decimal data
+         -- with delta 0.01.
 
-         -- The first 4 picture strings in the Foreign_Strings array
-         -- correspond to data values of a decimal type with delta 0.01,
-         -- and to the currency string "FF" (two characters).
+         -- The first 4 picture strings in the Foreign_Strings array correspond
+         -- to data values of a decimal type with delta 0.01, and to the
+         -- currency string "FF" (two characters).
 
          for I in 1 .. Fxf3a00.Number_Of_Ff_Strings loop
             -- Create the picture object from the picture string.
@@ -306,9 +305,9 @@ begin
             end if;
          end loop;
 
-         -- Picture strings 5-9 in the Foreign_Strings array correspond
-         -- to data values of a decimal type with delta 0.01, and to the
-         -- currency string "DM" (two characters).
+         -- Picture strings 5-9 in the Foreign_Strings array correspond to
+         -- data values of a decimal type with delta 0.01, and to the currency
+         -- string "DM" (two characters).
 
          Tc_Lower_Bound  := Fxf3a00.Number_Of_Ff_Strings + 1;
          Tc_Higher_Bound :=
@@ -333,9 +332,9 @@ begin
             end if;
          end loop;
 
-         -- Picture string #10 in the Foreign_Strings array corresponds
-         -- to a data value of a decimal type with delta 0.01, and to the
-         -- currency string "CHF" (three characters).
+         -- Picture string #10 in the Foreign_Strings array corresponds to a
+         -- data value of a decimal type with delta 0.01, and to the currency
+         -- string "CHF" (three characters).
 
          -- Create the picture object from the picture string.
          Tc_Picture := Editing.To_Picture (Fxf3a00.Foreign_Strings (10).all);
@@ -352,13 +351,12 @@ begin
                Tc_Chf_String);
          end if;
 
-         -- The following For Loop examines cases where the
-         -- decimal data/picture string/currency combinations used will
-         -- generate valid Edited Output strings.
-         -- The particular instantiated version of Valid used in this loop
-         -- is that for decimal data with delta 1.0; the others above have
-         -- been for decimal data with delta 0.01.
-         -- Note: TC_Offset is used here to align picture strings from the
+         -- The following For Loop examines cases where the decimal
+         -- data/picture string/currency combinations used will generate valid
+         -- Edited Output strings. The particular instantiated version of Valid
+         -- used in this loop is that for decimal data with delta 1.0; the
+         -- others above have been for decimal data with delta 0.01. Note:
+         -- TC_Offset is used here to align picture strings from the
          --       FXF3A00.Valid_Strings table with the appropriate decimal
          --       data in the FXF3A00.Data_With_NDP table.
 
@@ -385,11 +383,10 @@ begin
          -- The following three evaluations of picture strings, used in
          -- conjunction with the specific decimal values provided, will cause
          -- Editing.Image to raise Layout_Error (to be examined in other
-         -- tests).  Function Valid should return a False result for these
-         -- combinations.
-         -- The first two evaluations use the instantiation of Decimal_Output
-         -- with a decimal type with delta 0.01, while the last evaluation
-         -- uses the instantiation with decimal type with delta 1.0.
+         -- tests). Function Valid should return a False result for these
+         -- combinations. The first two evaluations use the instantiation of
+         -- Decimal_Output with a decimal type with delta 0.01, while the last
+         -- evaluation uses the instantiation with decimal type with delta 1.0.
 
          for I in 1 .. Fxf3a00.Number_Of_Erroneous_Conditions loop
 

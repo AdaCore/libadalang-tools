@@ -94,8 +94,8 @@ begin
       Tst_Char : C.Char;
       Tst_Nul  : C.Char := C.Nul;
 
-      -- Collect all the subprogram calls such that they are compiled
-      -- but not executed
+      -- Collect all the subprogram calls such that they are compiled but not
+      -- executed
       --
       procedure Collect_All_Calls is
 
@@ -120,8 +120,8 @@ begin
          Cac_Char_Array := C.To_C (Cac_String, Cac_Boolean);
          Cac_String     := C.To_Ada (Cac_Char_Array, Cac_Boolean);
 
-         -- This call is out of LRM order so that we can use the
-         -- array initialized above
+         -- This call is out of LRM order so that we can use the array
+         -- initialized above
          Cac_Boolean := C.Is_Nul_Terminated (Cac_Char_Array);
 
          C.To_C (Cac_String, Cac_Char_Array, Cac_Size_T, Cac_Boolean);
@@ -134,8 +134,8 @@ begin
          Cac_Wchar_Array := C.To_C (Cac_Wide_String, Cac_Boolean);
          Cac_Wide_String := C.To_Ada (Cac_Wchar_Array, Cac_Boolean);
 
-         -- This call is out of LRM order so that we can use the
-         -- array initialized above
+         -- This call is out of LRM order so that we can use the array
+         -- initialized above
          Cac_Boolean := C.Is_Nul_Terminated (Cac_Wchar_Array);
 
          C.To_C (Cac_Wide_String, Cac_Wchar_Array, Cac_Size_T, Cac_Boolean);

@@ -213,7 +213,7 @@ begin
 
       -- Replace an element of the Short_Array with the element used as the
       -- terminator of the entire array; now there are two occurrences of the
-      -- terminator element in the array.  The call to Virtual_Length should
+      -- terminator element in the array. The call to Virtual_Length should
       -- return the number of array elements prior to the first terminator.
 
       Short_Array (5) := Short_Terminator;
@@ -224,10 +224,10 @@ begin
             "with Short_ptr parameter - 2");
       end if;
 
-      -- Check that the procedure Copy_Terminated_Array copies the array of
-      -- elements referenced by Pointer parameter Source, into the array
-      -- pointed to by parameter Target, based on which of the following
-      -- two scenarios occurs first:
+      -- Check that the procedure Copy_Terminated_Array copies the array
+      -- of elements referenced by Pointer parameter Source, into the array
+      -- pointed to by parameter Target, based on which of the following two
+      -- scenarios occurs first:
       --   1) copying the Terminator element, or
       --   2) copying the number of elements specified in parameter Limit.
       -- Note: Terminator element must be copied to Target, as well as
@@ -239,7 +239,7 @@ begin
             "call to Copy_Terminated_Array - 1");
       end if;
 
-      -- Case 1: Copying the Terminator Element.  (Default terminator)
+      -- Case 1: Copying the Terminator Element. (Default terminator)
 
       Char_Pointers.Copy_Terminated_Array
         (Source => Char_Ptr,
@@ -263,7 +263,7 @@ begin
             "call to Copy_Terminated_Array - 2");
       end if;
 
-      -- Case 2: Copying the Terminator Element.  (Non-Default terminator)
+      -- Case 2: Copying the Terminator Element. (Non-Default terminator)
 
       Tc_Char := 'b';  -- Second char in char_array pointed to by Char_Ptr
       Char_Pointers.Copy_Terminated_Array
@@ -418,10 +418,9 @@ begin
                "Copy_Terminated_Array with null Target parameter");
       end;
 
-      -- Check that the procedure Copy_Array will copy the array of
-      -- elements of length specified in parameter Length, referenced by
-      -- the Pointer parameter Source, into the array pointed to by
-      -- parameter Target.
+      -- Check that the procedure Copy_Array will copy the array of elements
+      -- of length specified in parameter Length, referenced by the Pointer
+      -- parameter Source, into the array pointed to by parameter Target.
 
       -- Reinitialize Target arrays prior to test cases below.
 
@@ -464,8 +463,8 @@ begin
             "pointer arguments, entire array copied");
       end if;
 
-      -- Check that procedure Copy_Array will propagate Dereference_Error
-      -- if either the Source or Target parameter is null.
+      -- Check that procedure Copy_Array will propagate Dereference_Error if
+      -- either the Source or Target parameter is null.
 
       Char_Ptr := null;
       begin
@@ -503,8 +502,8 @@ begin
                "Copy_Array with null Target parameter");
       end;
 
-      -- Check that function Virtual_Length will propagate Dereference_Error
-      -- if the Source parameter is null.
+      -- Check that function Virtual_Length will propagate Dereference_Error if
+      -- the Source parameter is null.
 
       Char_Ptr := null;
       begin

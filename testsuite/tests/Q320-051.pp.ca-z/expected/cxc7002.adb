@@ -17,9 +17,9 @@ procedure Cxc7002 is
 begin
    Report.Test ("CXC7002", "Check the package Task_Attributes");
 
-   -- make sure a copy was made of the initial value for ATA.
-   -- The following value should not get used as the initial
-   -- value for the local task Check_It.
+   -- make sure a copy was made of the initial value for ATA. The following
+   -- value should not get used as the initial value for the local task
+   -- Check_It.
    Cxc7002_0.Countdown := (7, 6, 5);
 
    declare
@@ -29,8 +29,8 @@ begin
       end Check_It;
 
       task body Check_It is
-         -- retrieves attribute value for the current task.
-         -- make sure that it is the default value.
+         -- retrieves attribute value for the current task. make sure that it
+         -- is the default value.
          Val    : Integer := Ita.Value;
          Handle : Ata.Attribute_Handle;
       begin
@@ -45,8 +45,8 @@ begin
          end if;
          Ita.Set_Value (135);
 
-         -- get a handle to the ATA attribute for the current task.
-         -- make sure the attribute has the default value.
+         -- get a handle to the ATA attribute for the current task. make sure
+         -- the attribute has the default value.
          Handle := Ata.Reference;
          if Handle.all /= (3, 2, 1) then
             Report.Failed
@@ -108,8 +108,8 @@ begin
          Report.Comment ("Check_It 135 ok");
       end if;
 
-      -- check the initial values for the tasks that were created
-      -- before the attributes were created
+      -- check the initial values for the tasks that were created before the
+      -- attributes were created
 
       Xa := Ata.Value (T1_Tid);
       if Xa /= (3, 2, 1) then
@@ -130,8 +130,8 @@ begin
          Report.Comment ("T2 321 ok");
       end if;
 
-      -- restore the initial value to Check_It and then check
-      -- that the value is correct
+      -- restore the initial value to Check_It and then check that the value is
+      -- correct
       Ata.Reinitialize (Check_It_Tid);
 
       Xa := Ata.Value (Check_It_Tid);
@@ -151,9 +151,9 @@ begin
          Report.Failed ("environment task attributes");
       end if;
 
-      -- check the operations on the library level tasks.
-      -- Interleave the operations to make sure they are working
-      -- on the proper attribute value.
+      -- check the operations on the library level tasks. Interleave the
+      -- operations to make sure they are working on the proper attribute
+      -- value.
       Handle_T1_Ata     := Ata.Reference (T1_Tid);
       Handle_T2_Ata     := Ata.Reference (T2_Tid);
       Handle_T1_Ata.all := (1, 1, 1);

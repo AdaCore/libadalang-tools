@@ -102,16 +102,16 @@
 package Cxe4006_Common is
    pragma Pure;
 
-   -- controls progress output from the tests.  The value of this
-   -- flag does not affect whether or not the test passes.
+   -- controls progress output from the tests. The value of this flag does not
+   -- affect whether or not the test passes.
    Verbose : constant Boolean := False;
 
-   -- exception to signify that the test number or object
-   -- was not a one of the expected values
+   -- exception to signify that the test number or object was not a one of the
+   -- expected values
    Failed_Check : exception;
 
-   -- instances of types derived from Root_Tagged_Type.
-   -- Used to identify the routine that received the dispatching call.
+   -- instances of types derived from Root_Tagged_Type. Used to identify the
+   -- routine that received the dispatching call.
 
    type Type_Decl_Location is
      (Common_Spec,

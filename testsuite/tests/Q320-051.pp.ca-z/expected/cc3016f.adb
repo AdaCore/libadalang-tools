@@ -86,8 +86,7 @@ begin
       end R2;
    begin
       Xx1 := 5;                   -- IMPLICIT CONVERSION FROM
-      -- UNIVERSAL INTEGER TO P2.NT2
-      -- IN P2.
+      -- UNIVERSAL INTEGER TO P2.NT2 IN P2.
       Xx2 := Xx1 + Xx1;           -- PREDEFINED "+" DECLARED FOR
       -- P2.NT2.
       Xx3 := P2.F;                -- FUNCTION F DERIVED WITH THE
@@ -164,9 +163,8 @@ begin
          D : Positive := 7;
       end record;
       package P5 is new Gp5 (T5 => Rec);
-      -- P5.Y INITIALIZED WITH VALUE USING COMPONENT SELECTION
-      -- OPERATION FOR THE DISCRIMINANT, I.E. FOR PARENT TYPE
-      -- T5 WHICH DENOTES REC.
+      -- P5.Y INITIALIZED WITH VALUE USING COMPONENT SELECTION OPERATION FOR
+      -- THE DISCRIMINANT, I.E. FOR PARENT TYPE T5 WHICH DENOTES REC.
 
       W1 : Positive := P5.X.D;     -- VALUE IS 7
       W2 : Positive := P5.X.A;     -- VALUE IS 5

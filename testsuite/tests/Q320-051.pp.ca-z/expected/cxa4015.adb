@@ -53,8 +53,7 @@ begin
    begin
 
       -- Procedure Move
-      -- Evaluate the Procedure Move with various combinations of
-      -- parameters.
+      -- Evaluate the Procedure Move with various combinations of parameters.
 
       -- Justify = Left (default case)
 
@@ -124,9 +123,9 @@ begin
       end if;
 
       -- Drop = Error
-      -- The effect in this case depends on the value of the justify
-      -- parameter, and on whether any characters in Source other than
-      -- Pad would fail to be copied.
+      -- The effect in this case depends on the value of the justify parameter,
+      -- and on whether any characters in Source other than Pad would fail to
+      -- be copied.
 
       -- Drop = Error, Justify = Left, right overflow characters are pad.
 
@@ -172,8 +171,8 @@ begin
       end;
 
       -- Function Index
-      -- (Other usage examples of this function found in CXA4013-14.)
-      -- Check when the pattern is not found in the source.
+      -- (Other usage examples of this function found in CXA4013-14.) Check
+      -- when the pattern is not found in the source.
 
       if Asf.Index ("abcdef", "gh") /= 0 or
         Asf.Index ("abcde", "abcdef") /= 0 or  -- pattern > source
@@ -184,8 +183,8 @@ begin
          Report.Failed ("Incorrect result from Index, no pattern match");
       end if;
 
-      -- Check that Pattern_Error is raised when the pattern is the
-      -- null Wide_String.
+      -- Check that Pattern_Error is raised when the pattern is the null
+      -- Wide_String.
       begin
          Location := Asf.Index (Source_String6,    -- "abcdefabcdef"
          "",                -- null pattern Wide_String.
@@ -199,8 +198,8 @@ begin
               ("Incorrect exception raised by Index, null pattern");
       end;
 
-      -- Use the search direction "backward" to locate the particular
-      -- pattern within the source Wide_String.
+      -- Use the search direction "backward" to locate the particular pattern
+      -- within the source Wide_String.
 
       Location := Asf.Index (Source_String6,         -- "abcdefabcdef"
       "de",                   -- slice 4..5, 10..11
@@ -212,9 +211,8 @@ begin
 
       -- Function Index
       -- Use the version of Index that takes a Wide_Character_Mapping_Function
-      -- parameter.
-      -- Use the search directions Forward and Backward to locate the
-      -- particular pattern wide string within the source wide string.
+      -- parameter. Use the search directions Forward and Backward to locate
+      -- the particular pattern wide string within the source wide string.
 
       Location :=
         Asf.Index ("akzqefakzqef", "qzq",                  -- slice 8..10
@@ -256,8 +254,8 @@ begin
            ("Incorrect result from Index w/map ptr, no pattern match");
       end if;
 
-      -- Check that Pattern_Error is raised when the pattern is a
-      -- null Wide_String.
+      -- Check that Pattern_Error is raised when the pattern is a null
+      -- Wide_String.
       begin
          Location :=
            Asf.Index
@@ -406,8 +404,8 @@ begin
          Report.Failed ("Incorrect result from Function Count w/map ptr");
       end if;
 
-      -- If the pattern supplied to Function Count is a null Wide_String,
-      -- then Pattern_Error is propagated.
+      -- If the pattern supplied to Function Count is a null Wide_String, then
+      -- Pattern_Error is propagated.
       declare
          The_Null_Wide_String : constant Wide_String := "";
       begin
@@ -423,8 +421,8 @@ begin
               ("Incorrect exception from Count w/map ptr, null pattern");
       end;
 
-      -- Function Count returning the number of characters in a particular
-      -- set that are found in source Wide_String.
+      -- Function Count returning the number of characters in a particular set
+      -- that are found in source Wide_String.
 
       if Asf.Count (Source_String6, Cd_Set) /= 4 or  -- 2 'c' and 'd' chars.
         Asf.Count ("cddaccdaccdd", Cd_Set) /= 10
@@ -447,8 +445,8 @@ begin
       end if;
 
       -- If no appropriate slice is contained by the source Wide_String,
-      -- then the value returned in Last is zero, and the value in First is
-      -- Source'First.
+      -- then the value returned in Last is zero, and the value in First
+      -- is Source'First.
 
       Asf.Find_Token
         (Source_String6,      -- "abcdefabcdef"

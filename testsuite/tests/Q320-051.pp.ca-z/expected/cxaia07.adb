@@ -487,7 +487,7 @@ begin
 
    end if;
 
-   -- Test Move.  Target has the test values in reverse order, after Move these
+   -- Test Move. Target has the test values in reverse order, after Move these
    -- should be replaced (not appended) by the test values in forward order
 
    My_Tree_2.Clear;
@@ -544,7 +544,7 @@ begin
       Position => My_Cursor_2, -- First of added elements
       Count    => 2);
 
-   -- Elements with Default_Value.  Should insert in-between the previous two
+   -- Elements with Default_Value. Should insert in-between the previous two
    -- blocks
    My_Tree_2.Insert_Child
      (Parent   => Root_2,
@@ -635,9 +635,9 @@ begin
 
    end if;
 
-   -- For a Multiway_Tree (but not necessarily for a vector) a cursor
-   -- should stay pointing to the same element even if the order has changed,
-   -- e.g. by insertions earlier in the tree
+   -- For a Multiway_Tree (but not necessarily for a vector) a cursor should
+   -- stay pointing to the same element even if the order has changed, e.g.
+   -- by insertions earlier in the tree
 
    if My_Indefinite_Multiway_Trees.Element (Position => My_Cursor_1) /=
      Value_In_Ptr_Array (1).all
@@ -699,12 +699,11 @@ begin
       Source        => My_Tree_2,
       Source_Parent => Root_2); -- Copies all under Root_2
 
-   -- The order should now be Value_In_Ptr_Array (1).all,
-   -- Value_In_Ptr_Array (2).all,
-   -- Default_Value, Value_In_Ptr_Array (3).all, Value_In_Ptr_Array (4).all,
-   -- Value_In_Ptr_Array (5).all, Value_In_Ptr_Array (6).all,
-   -- Value_In_Ptr_Array (7).all, Value_In_Ptr_Array (8).all,
-   -- Value_In_Ptr_Array (9).all, Value_In_Ptr_Array (10).all
+   -- The order should now be Value_In_Ptr_Array (1).all, Value_In_Ptr_Array
+   -- (2).all, Default_Value, Value_In_Ptr_Array (3).all, Value_In_Ptr_Array
+   -- (4).all, Value_In_Ptr_Array (5).all, Value_In_Ptr_Array
+   -- (6).all, Value_In_Ptr_Array (7).all, Value_In_Ptr_Array
+   -- (8).all, Value_In_Ptr_Array (9).all, Value_In_Ptr_Array (10).all
 
    -- My_Tree_2 should now be empty so re-fill
 
@@ -727,12 +726,11 @@ begin
       Before        => My_Cursor_1,
       Source_Parent => My_Cursor_2);
 
-   -- The order should still be Value_In_Ptr_Array (1).all,
-   -- Value_In_Ptr_Array (2).all, Default_Value, Value_In_Ptr_Array (3).all
-   -- Value_In_Ptr_Array (4).all, Value_In_Ptr_Array (5).all,
-   -- Value_In_Ptr_Array (6).all, Value_In_Ptr_Array (7).all,
-   -- Value_In_Ptr_Array (8).all, Value_In_Ptr_Array (9).all,
-   -- Value_In_Ptr_Array (10).all
+   -- The order should still be Value_In_Ptr_Array (1).all, Value_In_Ptr_Array
+   -- (2).all, Default_Value, Value_In_Ptr_Array (3).all Value_In_Ptr_Array
+   -- (4).all, Value_In_Ptr_Array (5).all, Value_In_Ptr_Array
+   -- (6).all, Value_In_Ptr_Array (7).all, Value_In_Ptr_Array
+   -- (8).all, Value_In_Ptr_Array (9).all, Value_In_Ptr_Array (10).all
 
    My_Cursor_1 := My_Indefinite_Multiway_Trees.First_Child (Parent => Root_1);
 
@@ -1034,14 +1032,7 @@ begin
    -- Root
    -- |
    -- ------------------------------
-   -- |    |    |    | | | | | | | |
-   -- 1    2 Default 3 4 5 6 7 8 9 10
-   -- |    |
-   -- ---  9
-   -- | |
-   -- 2 8
-   -- |
-   -- 9
+   -- | | | | | | | | | | | 1 2 Default 3 4 5 6 7 8 9 10 | | --- 9 | | 2 8 | 9
 
    if My_Tree_1.Node_Count /= Fxaia00.Num_Tests + 6 then
       -- Remember to count the root node.
@@ -1279,14 +1270,8 @@ begin
    -- Root
    -- |
    -- ---------------------------------
-   -- |       |    |    | | | | | | | |
-   -- 1       2 Default 3 4 5 6 7 8 9 10
-   -- |       |
-   -- -----   9
-   -- | | |
-   -- 2 2 8
-   -- | |
-   -- 9 9
+   -- | | | | | | | | | | | 1 2 Default 3 4 5 6 7 8 9 10 | | ----- 9 | | | 2 2
+   -- 8 | | 9 9
 
    if My_Tree_1.Node_Count /= Fxaia00.Num_Tests + 8 then
       -- Remember to count the root node.
@@ -1331,14 +1316,8 @@ begin
    -- Root
    -- |
    -- ---------------------------------
-   -- |       |    |    | | | | | | | |
-   -- 1       2 Default 3 4 5 6 7 8 9 10
-   -- |       |                       |
-   -- -----   9                       10
-   -- | | |
-   -- 2 2 8
-   -- | |
-   -- 9 9
+   -- | | | | | | | | | | | 1 2 Default 3 4 5 6 7 8 9 10 | | | ----- 9 10 | | |
+   -- 2 2 8 | | 9 9
 
    -- Check that My_Tree_1 has gained a node
 
@@ -1404,14 +1383,9 @@ begin
    -- Root
    -- |
    -- -----------------------------
-   -- |   |    |    | | | | | | | |
-   -- 1   2 Default 3 4 5 6 7 8 9 10
-   -- |   |                       |
+   -- | | | | | | | | | | | 1 2 Default 3 4 5 6 7 8 9 10 | | |
    -- --- 9                       ----
-   -- | |                         |  |
-   -- 2 8                         10 2
-   -- |                              |
-   -- 9                              9
+   -- | | | | 2 8 10 2 | | 9 9
 
    -- Check that My_Tree_1 has the same number of nodes (just rearranged)
 
@@ -1482,14 +1456,7 @@ begin
    -- Root
    -- |
    -- ---------------------------
-   -- |   |    |    | | | | | | |
-   -- 1   2 Default 3 4 5 6 7 8 9
-   -- |   |
-   -- --- 9
-   -- | |
-   -- 2 8
-   -- |
-   -- 9
+   -- | | | | | | | | | | 1 2 Default 3 4 5 6 7 8 9 | | --- 9 | | 2 8 | 9
 
    if My_Tree_1.Node_Count /= Fxaia00.Num_Tests + 5 then
       -- Remember to count the root node.

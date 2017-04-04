@@ -85,10 +85,10 @@ begin
 
       -- If an implementation does not support Stream_IO in a particular
       -- environment, the exception Use_Error or Name_Error will be raised on
-      -- calls to various Stream_IO operations.  This block statement
-      -- encloses a call to Create, which should produce an exception in a
-      -- non-supportive environment.  These exceptions will be handled to
-      -- produce a Not_Applicable result.
+      -- calls to various Stream_IO operations. This block statement encloses a
+      -- call to Create, which should produce an exception in a non-supportive
+      -- environment. These exceptions will be handled to produce a
+      -- Not_Applicable result.
 
       Ada.Streams.Stream_Io.Create
         (Info_File,
@@ -115,8 +115,8 @@ begin
               (Info_Stream,
                Fxaca00.Product_01_Stats);
 
-            -- Write information about second product to the stream.
-            -- Note: No Sales_Record_Type objects.
+            -- Write information about second product to the stream. Note: No
+            -- Sales_Record_Type objects.
             Fxaca00.Product_Type'Write (Info_Stream, Fxaca00.Product_02);
             Integer'Write (Info_Stream, Fxaca00.Sale_Count_02);
             Fxaca00.Sales_Statistics_Type'Write
@@ -167,14 +167,13 @@ begin
               (Info_File,
                Ada.Streams.Stream_Io.In_File);
 
-            -- Read all of the data that is contained in the stream.
-            -- Compare all data with the original data in package FXACA00
-            -- that was written to the stream.
-            -- The calls to the read attribute are in anticipated order, based
-            -- on the order of data written to the stream.  Possible errors,
-            -- such as data placement, overwriting, etc., will be manifest as
-            -- exceptions raised by the attribute during an unsuccessful read
-            -- attempt.
+            -- Read all of the data that is contained in the stream. Compare
+            -- all data with the original data in package FXACA00 that was
+            -- written to the stream. The calls to the read attribute are in
+            -- anticipated order, based on the order of data written to the
+            -- stream. Possible errors, such as data placement, overwriting,
+            -- etc., will be manifest as exceptions raised by the attribute
+            -- during an unsuccessful read attempt.
 
             -- Extract data on first product.
             Product_Type'Read (Info_Stream, Tc_Product1);
@@ -205,15 +204,15 @@ begin
 
             Sales_Statistics_Type'Read (Info_Stream, Tc_Stat3);
 
-            -- After all the data has been correctly extracted, the file
-            -- should be empty.
+            -- After all the data has been correctly extracted, the file should
+            -- be empty.
 
             if not Ada.Streams.Stream_Io.End_Of_File (Info_File) then
                Report.Failed ("Stream file not empty");
             end if;
 
-            -- Verify that the data values read from the stream are the same
-            -- as those written to the stream.
+            -- Verify that the data values read from the stream are the same as
+            -- those written to the stream.
 
             -- Verify the information of the first product.
             if
@@ -276,8 +275,8 @@ begin
    exception
 
       -- Since Use_Error or Name_Error can be raised if, for the specified
-      -- mode, the environment does not support Stream_IO operations,
-      -- the following handlers are included:
+      -- mode, the environment does not support Stream_IO operations, the
+      -- following handlers are included:
 
       when Ada.Streams.Stream_Io.Name_Error =>
          Report.Not_Applicable ("Name_Error raised on Stream IO Create");

@@ -1,15 +1,14 @@
 --=================================================================--
 
---  After child is added to the subsystem, a maintainer decides
---  to take advantage of the new functionality and rewrites the
---  parent's body.
+--  After child is added to the subsystem, a maintainer decides to take
+--  advantage of the new functionality and rewrites the parent's body.
 
 with Ca11017_0.Ca11017_1;
 
 package body Ca11017_0 is
 
-   -- Calls functions from public child for a quick comparison of the
-   -- input strings.  If their lengths are the same, do the replacement.
+   -- Calls functions from public child for a quick comparison of the input
+   -- strings. If their lengths are the same, do the replacement.
 
    procedure Replace
      (In_The_String   : in out String_Rec;

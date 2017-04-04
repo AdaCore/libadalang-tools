@@ -11,8 +11,8 @@ package body Cxe4005_Part_A1 is
    Normal_Obj : aliased Cxe4005_Normal.Cant_Use_In_Remote_Call;
 
    ---------  partition termination coordination ----------
-   -- use a task to prevent the partition from completing its execution
-   -- until the main procedure in partition B tells it to quit.
+   -- use a task to prevent the partition from completing its execution until
+   -- the main procedure in partition B tells it to quit.
 
    task Wait_For_Quit is
       entry Can_Quit;

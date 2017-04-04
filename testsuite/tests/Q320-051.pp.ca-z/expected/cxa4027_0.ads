@@ -60,9 +60,8 @@
 --
 --!
 
--- Function CXA4027_0 will return the lower case form of
--- the character input if it is in upper case, and return the input
--- character otherwise.
+-- Function CXA4027_0 will return the lower case form of the character input if
+-- it is in upper case, and return the input character otherwise.
 
 with Ada.Characters.Handling;
 function Cxa4027_0 (From : Character) return Character;

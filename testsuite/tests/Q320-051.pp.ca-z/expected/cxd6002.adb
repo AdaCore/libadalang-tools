@@ -15,8 +15,8 @@ begin
       " as the aborted statement is no longer in an" &
       " abort-deferred region.");
 
-   -- the requirements on the abort being immediate are
-   -- only placed upon uni-processor systems.
+   -- the requirements on the abort being immediate are only placed upon
+   -- uni-processor systems.
    if Impdef.Annex_D.Processor /= Impdef.Annex_D.Uni_Processor then
       Report.Not_Applicable ("Multi-Processor configuration");
       Report.Result;

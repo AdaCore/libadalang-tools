@@ -113,8 +113,8 @@ begin
 
       end;
 
-      -- Check that the functions Re and Im (both versions) provide
-      -- correct results.
+      -- Check that the functions Re and Im (both versions) provide correct
+      -- results.
 
       declare
          Tc_Complex_1 : Complex_Pack.Complex := (1.0, 0.0);
@@ -176,9 +176,8 @@ begin
                "Compose_From_Cartesian - 1");
          end if;
 
-         -- If only one component is given, the other component is
-         -- implicitly zero (Both components are set by the following two
-         -- function calls).
+         -- If only one component is given, the other component is implicitly
+         -- zero (Both components are set by the following two function calls).
 
          Tc_Complex := Complex_Pack.Compose_From_Cartesian (Re => 6.0);
 
@@ -199,8 +198,8 @@ begin
 
       end;
 
-      -- Verify the results of Function Compose_From_Polar, Modulus, "abs",
-      -- and Argument.
+      -- Verify the results of Function Compose_From_Polar, Modulus, "abs", and
+      -- Argument.
 
       declare
 
@@ -216,18 +215,18 @@ begin
 
       begin
 
-         -- Verify the result of Function Compose_From_Polar.
-         -- When the value of the parameter Modulus is zero, the
-         -- Compose_From_Polar function yields a result of zero.
+         -- Verify the result of Function Compose_From_Polar. When the value
+         -- of the parameter Modulus is zero, the Compose_From_Polar function
+         -- yields a result of zero.
 
          if Compose_From_Polar (0.0, 30.0, 360.0) /= Complex_Zero then
             Report.Failed
               ("Incorrect result from Function " & "Compose_From_Polar - 1");
          end if;
 
-         -- When the value of the parameter Argument is equal to a multiple
-         -- of the quarter cycle, the result of the Compose_From_Polar
-         -- function with specified cycle lies on one of the axes.
+         -- When the value of the parameter Argument is equal to a multiple of
+         -- the quarter cycle, the result of the Compose_From_Polar function
+         -- with specified cycle lies on one of the axes.
 
          if Compose_From_Polar (5.0, Angle_0, Angle_360) /= (5.0, 0.0) or
            Compose_From_Polar (5.0, Angle_90, Angle_360) /= (0.0, 5.0) or
@@ -240,8 +239,8 @@ begin
               ("Incorrect result from Function " & "Compose_From_Polar - 2");
          end if;
 
-         -- When the parameter to Function Argument represents a point on
-         -- the non-negative real axis, the function yields a zero result.
+         -- When the parameter to Function Argument represents a point on the
+         -- non-negative real axis, the function yields a zero result.
 
          if Argument (Complex_Zero, Angle_360) /= 0.0 then
             Report.Failed ("Incorrect result from Function Argument");

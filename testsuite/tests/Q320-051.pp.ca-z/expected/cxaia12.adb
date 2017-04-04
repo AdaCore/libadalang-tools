@@ -261,10 +261,9 @@ begin
       is
       begin
          Tampering_Check (Container => My_Set_1, Where => Test_Case);
-         -- The tampering check here prevents the
-         -- Value parameter to this subprogram from
-         -- disappearing (if passed by-reference) while
-         -- it is still in use.
+         -- The tampering check here prevents the Value parameter to this
+         -- subprogram from disappearing (if passed by-reference) while it
+         -- is still in use.
 
          if Value /= Expected then
             Report.Failed ("Wrong value for " & Test_Case);
@@ -279,10 +278,9 @@ begin
          Pre => Value'Length = New_Item'Length is
       begin
          Tampering_Check (Container => My_Set_1, Where => Test_Case);
-         -- The tampering check here prevents the
-         -- Value parameter to this subprogram from
-         -- disappearing (if passed by-reference) while
-         -- it is still in use.
+         -- The tampering check here prevents the Value parameter to this
+         -- subprogram from disappearing (if passed by-reference) while it
+         -- is still in use.
 
          if Value /= Expected then
             Report.Failed ("Wrong value for " & Test_Case);
@@ -364,8 +362,8 @@ begin
          New_Item  => "00", -- Reset to original.
          Test_Case => "Reference normal generalized cursor");
 
-      -- Prefix call with all components explicit (only possible for
-      -- cursor form of Constant_Reference):
+      -- Prefix call with all components explicit (only possible for cursor
+      -- form of Constant_Reference):
       Test
         (Value =>
            My_Set_1.Constant_Reference (Position => My_Cursor_1).Element.all,

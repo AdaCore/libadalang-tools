@@ -78,9 +78,8 @@ begin
 
    begin
 
-      -- An application creates a text file with mode Out_File.
-      -- Use_Error will be raised if Direct_IO operations or external
-      -- files are not supported.
+      -- An application creates a text file with mode Out_File. Use_Error will
+      -- be raised if Direct_IO operations or external files are not supported.
 
       Dir_Io.Create (Data_File, Dir_Io.Out_File, Dir_Filename);
 
@@ -134,10 +133,10 @@ begin
       begin
 
          -- At some point in the processing, the application may call a
-         -- procedure to change the mode of the file (perhaps for
-         -- additional data entry, data verification, etc.).  It is at
-         -- this point that a use of Append_File mode for a Direct_IO
-         -- file would cause an exception.
+         -- procedure to change the mode of the file (perhaps for additional
+         -- data entry, data verification, etc.). It is at this point that
+         -- a use of Append_File mode for a Direct_IO file would cause an
+         -- exception.
 
          for I in reverse Mode_Selection_Type loop
             Change_Mode (Data_File, I);
@@ -150,9 +149,8 @@ begin
 
       exception
 
-         -- A handler has been provided in the application, which
-         -- handles the constraint error, allowing processing to
-         -- continue.
+         -- A handler has been provided in the application, which handles the
+         -- constraint error, allowing processing to continue.
 
          when Constraint_Error =>
 
@@ -187,9 +185,9 @@ begin
 
    exception
 
-      -- Since Use_Error or Name_Error can be raised if, for the
-      -- specified mode, the environment does not support Direct_IO
-      -- operations, the following handlers are included:
+      -- Since Use_Error or Name_Error can be raised if, for the specified
+      -- mode, the environment does not support Direct_IO operations, the
+      -- following handlers are included:
 
       when Dir_Io.Name_Error =>
          Report.Not_Applicable ("Name_Error raised on Direct IO Create");

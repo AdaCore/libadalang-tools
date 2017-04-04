@@ -123,8 +123,8 @@ begin
             Run_Flag := True;
          end Target_Task_Is_Running;
 
-         -- Has_Run returns true if Target_Task_Is_Running has been called
-         -- at least once since the previous call to Should_Be_Stopped
+         -- Has_Run returns true if Target_Task_Is_Running has been called at
+         -- least once since the previous call to Should_Be_Stopped
          --
          function Has_Run return Boolean is
          begin
@@ -155,8 +155,8 @@ begin
          Tc.Put_Id (This_Task_Id);  -- communicate ID to Driver
 
          while not Tc.Target_Task_Shut_Down loop
-            -- During the time this task is not Held it will be indicating
-            -- this fact in the PO
+            -- During the time this task is not Held it will be indicating this
+            -- fact in the PO
             Tc.Target_Task_Is_Running;
             -- Allow the Driver task to get control
             delay Target_Task_Delay;
@@ -185,7 +185,7 @@ begin
          -- Get the target task's ID
          Target_Id := Tc.Get_Id;
 
-         -- Target_Task is running.  It is NOT being held. Check that Is_Held
+         -- Target_Task is running. It is NOT being held. Check that Is_Held
          -- returns the proper value
          if Aatc.Is_Held (Target_Id) then
             Report.Failed ("Unheld task is shown as Held");
@@ -216,8 +216,8 @@ begin
                Report.Failed ("Holding a Held task raises exception");
          end; -- declare
 
-         -- Delay long enough for the Held task to indicate that
-         -- it is (erroneously) still running
+         -- Delay long enough for the Held task to indicate that it is
+         -- (erroneously) still running
          delay (5 * Target_Task_Delay);
 
          if Tc.Has_Run then
@@ -241,8 +241,8 @@ begin
 
          ------------------------------------------------------------
 
-         -- Now check the effects of these calls applied against a
-         -- terminated task
+         -- Now check the effects of these calls applied against a terminated
+         -- task
 
          Tc.Set_Shut_Down;    -- Allow Target_Task to terminate
          --

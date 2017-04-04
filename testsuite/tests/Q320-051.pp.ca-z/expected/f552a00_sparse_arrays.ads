@@ -9,10 +9,10 @@ generic
 
 package F552a00_Sparse_Arrays is
 
-   --  This package defines an iterable container that is a sparse array.
-   --  A sparse array has elements that can have large gaps beteen each
-   --  element. For instance an array from 1 .. 1000000 might only have a
-   --  dozen real elements in the array.
+   --  This package defines an iterable container that is a sparse array. A
+   --  sparse array has elements that can have large gaps beteen each element.
+   --  For instance an array from 1 .. 1000000 might only have a dozen real
+   --  elements in the array.
 
    type Count_Type is range 0 .. 2**31 - 1;
 
@@ -71,8 +71,8 @@ package F552a00_Sparse_Arrays is
 
    Tc_Call_History : Strings.Unbounded.Unbounded_String;
    --
-   --  A string capturing the call sequence to the above subprogams.
-   --  The following gets appended to the history for the above calls;
+   --  A string capturing the call sequence to the above subprogams. The
+   --  following gets appended to the history for the above calls;
    --      Iterate  => I
    --      First    => 1
    --      Next     => N( nn)        where nn is the physical index of the

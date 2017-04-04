@@ -121,8 +121,8 @@ begin  -- Main test procedure.
       "evaluation of a generic association for a " &
       "formal object of mode in");
 
-   -- check that the created constant objects are properly adjusted
-   -- and subsequently finalized
+   -- check that the created constant objects are properly adjusted and
+   -- subsequently finalized
 
    Cc40001_0.Finalization_Count := 0;
 

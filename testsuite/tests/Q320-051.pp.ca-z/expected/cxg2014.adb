@@ -59,19 +59,14 @@
 --
 -- References:
 --
--- Software Manual for the Elementary Functions
--- William J. Cody, Jr. and William Waite
--- Prentice-Hall, 1980
+-- Software Manual for the Elementary Functions William J. Cody, Jr. and
+-- William Waite Prentice-Hall, 1980
 --
--- CRC Standard Mathematical Tables
--- 23rd Edition
+-- CRC Standard Mathematical Tables 23rd Edition
 --
--- Implementation and Testing of Function Software
--- W. J. Cody
--- Problems and Methodologies in Mathematical Software Production
--- editors P. C. Messina and A. Murli
--- Lecture Notes in Computer Science   Volume 142
--- Springer Verlag, 1982
+-- Implementation and Testing of Function Software W. J. Cody Problems and
+-- Methodologies in Mathematical Software Production editors P. C. Messina and
+-- A. Murli Lecture Notes in Computer Science Volume 142 Springer Verlag, 1982
 --
 
 with System;
@@ -110,8 +105,8 @@ procedure Cxg2014 is
          Rel_Error : Real;
          Abs_Error : Real;
       begin
-         -- In the case where the expected result is very small or 0
-         -- we compute the maximum error as a multiple of Model_Small instead
+         -- In the case where the expected result is very small or 0 we
+         -- compute the maximum error as a multiple of Model_Small instead
          -- of Model_Epsilon and Expected.
          Rel_Error := Mre * abs Expected * Real'Model_Epsilon;
          Abs_Error := Mre * Real'Model_Small;
@@ -143,9 +138,9 @@ procedure Cxg2014 is
       end Check;
 
       procedure Special_Value_Test is
-         -- In the following tests the expected result is accurate
-         -- to the machine precision so the minimum guaranteed error
-         -- bound can be used.
+         -- In the following tests the expected result is accurate to the
+         -- machine precision so the minimum guaranteed error bound can be
+         -- used.
          Minimum_Error : constant := 8.0;
       begin
          Check (Sinh (1.0), (E - 1.0 / E) / 2.0, "sinh(1)", Minimum_Error);
@@ -194,12 +189,11 @@ procedure Cxg2014 is
          --    Cosh(x) = C * (Cosh(x+1) + Cosh(x-1))
          -- where C is the same as above
          --
-         -- see Cody pg 230-231 for details on the error analysis.
-         -- The net result is a relative error bound of 16 * Model_Epsilon.
+         -- see Cody pg 230-231 for details on the error analysis. The net
+         -- result is a relative error bound of 16 * Model_Epsilon.
 
          A : constant := 3.0;
-         -- large upper bound but not so large as to cause Cosh(B)
-         -- to overflow
+         -- large upper bound but not so large as to cause Cosh(B) to overflow
          B                      : constant Real := Log (Real'Safe_Last) - 2.0;
          X_Minus_1, X, X_Plus_1 : Real;
          Actual1, Actual2       : Real;
@@ -260,12 +254,11 @@ procedure Cxg2014 is
       end Identity_1_Test;
 
       procedure Subtraction_Error_Test is
-         -- This test detects the error resulting from subtraction if
-         -- the obvious algorithm was used for computing sinh.  That is,
-         -- it it is computed as (e**x - e**-x)/2.
-         -- We check the result by using a Taylor series expansion that
-         -- will produce a result accurate to the machine precision for
-         -- the range under test.
+         -- This test detects the error resulting from subtraction if the
+         -- obvious algorithm was used for computing sinh. That is, it it is
+         -- computed as (e**x - e**-x)/2. We check the result by using a Taylor
+         -- series expansion that will produce a result accurate to the machine
+         -- precision for the range under test.
          --
          -- The maximum relative error bound for this test is
          --  8 for the sinh operation and 7 for the Taylor series
@@ -278,10 +271,9 @@ procedure Cxg2014 is
       begin
          if Real'Digits > 15 then
             return; -- The approximation below is not accurate beyond
-            -- 15 digits. Adding more terms makes the error
-            -- larger, so it makes the test worse for more normal
-            -- values. Thus, we skip this subtest for larger than
-            -- 15 digits.
+            -- 15 digits. Adding more terms makes the error larger, so it
+            -- makes the test worse for more normal values. Thus, we skip
+            -- this subtest for larger than 15 digits.
          end if;
          Accuracy_Error_Reported := False;  -- reset
          for I in 1 .. Max_Samples loop
@@ -334,8 +326,8 @@ procedure Cxg2014 is
       procedure Exception_Test is
          X1, X2 : Real := 0.0;
       begin
-         -- this part of the test is only applicable if 'Machine_Overflows
-         -- is true.
+         -- this part of the test is only applicable if 'Machine_Overflows is
+         -- true.
          if Real'Machine_Overflows then
 
             begin

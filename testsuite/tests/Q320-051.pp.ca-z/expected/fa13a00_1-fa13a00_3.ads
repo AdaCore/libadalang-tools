@@ -1,7 +1,7 @@
 --==================================================================--
 
--- Public child package of an elevator application.  This package provides
--- the actual operation of the elevator.
+-- Public child package of an elevator application. This package provides the
+-- actual operation of the elevator.
 
 package Fa13a00_1.Fa13a00_3 is            -- Move Elevator
 

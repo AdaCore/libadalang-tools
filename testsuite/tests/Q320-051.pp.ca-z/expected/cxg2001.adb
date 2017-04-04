@@ -56,26 +56,23 @@
 --    Prentice-Hall; 1980
 -----------------------------------------------------------------------
 --
--- This test relies upon the fact that
--- (A+2.0)-A is not necessarily 2.0.  If A is large enough then adding
--- a small value to A does not change the value of A.  Consider the case
--- where we have a decimal based floating point representation with 4
--- digits of precision.  A floating point number would logically be
--- represented as "DDDD * 10 ** exp" where D is a value in the range 0..9.
--- The first loop of the test starts A at 2.0 and doubles it until
--- ((A+1.0)-A)-1.0 is no longer zero.  For our decimal floating point
--- number this will be 1638 * 10**1  (the value 16384 rounded or truncated
--- to fit in 4 digits).
--- The second loop starts B at 2.0 and keeps doubling B until (A+B)-A is
--- no longer 0.  This will keep looping until B is 8.0 because that is
--- the first value where rounding (assuming our machine rounds and addition
--- employs a guard digit) will change the upper 4 digits of the result:
+-- This test relies upon the fact that (A+2.0)-A is not necessarily 2.0.
+-- If A is large enough then adding a small value to A does not change the
+-- value of A. Consider the case where we have a decimal based floating point
+-- representation with 4 digits of precision. A floating point number would
+-- logically be represented as "DDDD * 10 ** exp" where D is a value in the
+-- range 0..9. The first loop of the test starts A at 2.0 and doubles it until
+-- ((A+1.0)-A)-1.0 is no longer zero. For our decimal floating point number
+-- this will be 1638 * 10**1 (the value 16384 rounded or truncated to fit in 4
+-- digits). The second loop starts B at 2.0 and keeps doubling B until (A+B)-A
+-- is no longer 0. This will keep looping until B is 8.0 because that is the
+-- first value where rounding (assuming our machine rounds and addition employs
+-- a guard digit) will change the upper 4 digits of the result:
 --       1638_
 --     +     8
 --      -------
 --       1639_
--- Without rounding the second loop will continue until
--- B is 16:
+-- Without rounding the second loop will continue until B is 16:
 --       1638_
 --     +    16
 --      -------
@@ -83,20 +80,20 @@
 --
 -- The radix is then determined by (A+B)-A which will give 10.
 --
--- The use of Tmp and ITmp in the test is to force values to be
--- stored into memory in the event that register precision is greater
--- than the stored precision of the floating point values.
+-- The use of Tmp and ITmp in the test is to force values to be stored into
+-- memory in the event that register precision is greater than the stored
+-- precision of the floating point values.
 --
 --
--- The test for rounding is (ignoring the temporary variables used to
--- get the stored precision) is
+-- The test for rounding is (ignoring the temporary variables used to get the
+-- stored precision) is
 --       Rounds := A + Radix/2.0 - A /= 0.0 ;
--- where A is the value determined in the first step that is the smallest
--- power of 2 such that A + 1.0 = A.  This means that the true value of
--- A has one more digit in its value than 'Machine_Mantissa.
--- This check will detect the case where a value is always rounded.
--- There is an additional case where values are rounded to the nearest
--- even value.  That is referred to as IEEE style rounding in the test.
+-- where A is the value determined in the first step that is the smallest power
+-- of 2 such that A + 1.0 = A. This means that the true value of A has one more
+-- digit in its value than 'Machine_Mantissa. This check will detect the case
+-- where a value is always rounded. There is an additional case where values
+-- are rounded to the nearest even value. That is referred to as IEEE style
+-- rounding in the test.
 --
 -----------------------------------------------------------------------
 
@@ -106,9 +103,9 @@ with Ada.Numerics.Generic_Elementary_Functions;
 procedure Cxg2001 is
    Verbose : constant Boolean := False;
 
-   -- if one of the attribute computation loops exceeds Max_Iterations
-   -- it is most likely due to the compiler reordering an expression
-   -- that should not be reordered.
+   -- if one of the attribute computation loops exceeds Max_Iterations it is
+   -- most likely due to the compiler reordering an expression that should not
+   -- be reordered.
    Illegal_Optimization : exception;
    Max_Iterations : constant := 10_000;
 
@@ -133,18 +130,16 @@ procedure Cxg2001 is
       Itmp            : Integer;
       Half_Radix      : Real;
 
-      -- special constants - not declared as constants so that
-      -- the "stored" precision will be used instead of a "register"
-      -- precision.
+      -- special constants - not declared as constants so that the "stored"
+      -- precision will be used instead of a "register" precision.
       Zero : Real := 0.0;
       One  : Real := 1.0;
       Two  : Real := 2.0;
 
       procedure Thwart_Optimization is
-      -- the purpose of this procedure is to reference the
-      -- global variables used by Determine_Attributes so
-      -- that the compiler is not likely to keep them in
-      -- a higher precision register for their entire lifetime.
+      -- the purpose of this procedure is to reference the global variables
+      -- used by Determine_Attributes so that the compiler is not likely to
+      -- keep them in a higher precision register for their entire lifetime.
       begin
          if Report.Ident_Bool (False) then
             -- never executed
@@ -159,10 +154,10 @@ procedure Cxg2001 is
          end if;
       end Thwart_Optimization;
 
-      -- determines values for Radix, Mantissa_Digits, and Rounds
-      -- This is mostly a straight translation of the C code.
-      -- The only significant addition is the iteration count
-      -- to prevent endless looping if things are really screwed up.
+      -- determines values for Radix, Mantissa_Digits, and Rounds This is
+      -- mostly a straight translation of the C code. The only significant
+      -- addition is the iteration count to prevent endless looping if things
+      -- are really screwed up.
       procedure Determine_Attributes is
          Iterations : Integer;
       begin
@@ -280,8 +275,8 @@ procedure Cxg2001 is
          end if;
 
          -- G.2.2(3/2) - corrected by Amendment 1.
-         --  'Model_Mantissa >= ceiling(d*log(10)/log(radix))+g,
-         --  where g is 0 for decimal machines and 1 for other machines.
+         --  'Model_Mantissa >= ceiling(d*log(10)/log(radix))+g, where g is 0
+         --  for decimal machines and 1 for other machines.
          Min_Mantissa_Digits :=
            Integer
              (Real'Ceiling

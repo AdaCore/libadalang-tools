@@ -1,10 +1,10 @@
 with Report;
 package body Cxe4003_Generic_Rci is
 
-   -- This package expects calls to come into Take_Call with the
-   -- Serial_Number parameter starting at Low and progressing to
-   -- High.  If any value is missed or repeated then the test fails.
-   -- Done is called after all the calls to Take_Call have completed.
+   -- This package expects calls to come into Take_Call with the Serial_Number
+   -- parameter starting at Low and progressing to High. If any value is missed
+   -- or repeated then the test fails. Done is called after all the calls to
+   -- Take_Call have completed.
 
    Last_Call : Integer := Low - 1;
 

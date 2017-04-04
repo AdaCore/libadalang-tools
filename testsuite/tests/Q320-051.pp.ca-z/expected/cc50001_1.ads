@@ -7,9 +7,9 @@ generic        -- Generic stack abstraction.
 
 package Cc50001_1 is
 
-   -- Simulate a generic stack abstraction. In a real application, the
-   -- second operand of Push might be of type Stack, and type Stack
-   -- would have at least one component (pointing to the top stack item).
+   -- Simulate a generic stack abstraction. In a real application, the second
+   -- operand of Push might be of type Stack, and type Stack would have at
+   -- least one component (pointing to the top stack item).
 
    type Stack is private;
 

@@ -20,9 +20,9 @@ begin
             A_Truth := Report.Ident_Bool (True);
          else
             A_Truth := Report.Ident_Bool (True);
-         -- We do this separately on each branch in order to insure that a
-         -- clever optimizer can find out little about this value. Ident_Bool
-         -- is supposed to be opaque to any optimizer.
+            -- We do this separately on each branch in order to insure that
+            -- a clever optimizer can find out little about this value.
+            -- Ident_Bool is supposed to be opaque to any optimizer.
          end if;
       exception
          when Constraint_Error | Program_Error =>

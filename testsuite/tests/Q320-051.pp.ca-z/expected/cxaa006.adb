@@ -120,7 +120,7 @@ begin
 
    begin
 
--- The application sets the line length of the file to be bound at 20.  All
+-- The application sets the line length of the file to be bound at 20. All
 -- lines in this file will be limited to that length.
 
       Ada.Text_Io.Set_Line_Length (A_Bounded_File, 20);
@@ -136,9 +136,9 @@ begin
          Report.Failed ("Incorrect position after 1st Put");
       end if;
 
--- The application finds that there is only one column available on the
--- current line, so the next string item to be output must be broken at
--- the appropriate place (following the first character).
+-- The application finds that there is only one column available on the current
+-- line, so the next string item to be output must be broken at the appropriate
+-- place (following the first character).
 
       Ada.Text_Io.Put (File => A_Bounded_File, Item => Twelve_Characters);
 
@@ -157,8 +157,8 @@ begin
 -- mode in order to continue the placement of data into the file, but modifies
 -- the original bounded line length for subsequent lines to be appended.
 
-      -- Reset to Append mode; call outputs page terminator and
-      -- resets line length to Unbounded.
+      -- Reset to Append mode; call outputs page terminator and resets line
+      -- length to Unbounded.
       Reset1 : begin
          Ada.Text_Io.Reset
            (A_Bounded_File,
@@ -175,10 +175,10 @@ begin
       -- Store line number for later comparison.
       Tc_Line := Natural (Ada.Text_Io.Line (A_Bounded_File));
 
--- The application finds that fifteen columns are available on the current
--- line but that the string item to be output exceeds this available space.
--- It must be split at the end of the line, and the balance placed on the
--- next file line.
+-- The application finds that fifteen columns are available on the current line
+-- but that the string item to be output exceeds this available space. It must
+-- be split at the end of the line, and the balance placed on the next file
+-- line.
 
       Ada.Text_Io.Put (File => A_Bounded_File, Item => Nineteen_Characters);
 

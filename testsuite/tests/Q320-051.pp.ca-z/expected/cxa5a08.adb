@@ -117,9 +117,9 @@ begin
                "function when provided 0.0, 0.0 input parameters");
       end;
 
-      -- Check that no exception is raised by the Arccot function when
-      -- provided a large positive or negative X parameter value, when
-      -- using the default value for parameter Y.
+      -- Check that no exception is raised by the Arccot function when provided
+      -- a large positive or negative X parameter value, when using the default
+      -- value for parameter Y.
 
       begin
          Float_Result := Ef.Arccot (X => Fxa5a00.Large);
@@ -141,9 +141,9 @@ begin
                "provided a large negative X parameter value");
       end;
 
-      -- Check that no exception is raised by the Arccot function when
-      -- provided a small positive or negative X parameter value, when
-      -- using the default value for parameter Y.
+      -- Check that no exception is raised by the Arccot function when provided
+      -- a small positive or negative X parameter value, when using the default
+      -- value for parameter Y.
 
       begin
          Float_Result := Ef.Arccot (X => Fxa5a00.Small);
@@ -165,9 +165,9 @@ begin
                "provided a small negative X parameter value");
       end;
 
-      -- Check that no exception is raised by the Arccot function when
-      -- provided combinations of large and small positive or negative
-      -- parameter values for both X and Y input parameters.
+      -- Check that no exception is raised by the Arccot function when provided
+      -- combinations of large and small positive or negative parameter values
+      -- for both X and Y input parameters.
 
       begin
          Float_Result := Ef.Arccot (X => Fxa5a00.Large, Y => Fxa5a00.Large);
@@ -216,9 +216,9 @@ begin
                "and a large negative Y parameter value");
       end;
 
-      -- Check that when the Arccot function is provided a Y parameter value
-      -- of 0.0 and a positive X parameter input value, the prescribed result
-      -- of zero is returned.
+      -- Check that when the Arccot function is provided a Y parameter value of
+      -- 0.0 and a positive X parameter input value, the prescribed result of
+      -- zero is returned.
 
       if Ef.Arccot (X => Fxa5a00.Large, Y => 0.0) /= 0.0 or
         Gef.Arccot (2.0 * Pi, Y => 0.0) /= 0.0 or
@@ -233,8 +233,8 @@ begin
             "positive X parameter values");
       end if;
 
-      -- Check that the Arccot function provides correct results when
-      -- provided a variety of X parameter values.
+      -- Check that the Arccot function provides correct results when provided
+      -- a variety of X parameter values.
 
       if not Result_Within_Range (Ef.Arccot (1.0), Pi / 4.0, 0.001) or
         not Result_Within_Range (Gef.Arccot (0.0), Pi / 2.0, 0.001) or
@@ -248,9 +248,9 @@ begin
       -- Check the results of the Arccot function with specified cycle
       -- parameter.
 
-      -- Check that the Arccot function with specified Cycle parameter
-      -- raises Argument_Error when the value of the Cycle parameter is zero
-      -- or negative.
+      -- Check that the Arccot function with specified Cycle parameter raises
+      -- Argument_Error when the value of the Cycle parameter is zero or
+      -- negative.
 
       begin
          Float_Result := Ef.Arccot (X => Pi, Cycle => 0.0);  -- Default Y value
@@ -389,9 +389,8 @@ begin
                "positive Y parameter value");
       end;
 
-      -- Check that the Arccot function with specified Cycle parameter
-      -- provides correct results when provided a variety of X parameter
-      -- input values.
+      -- Check that the Arccot function with specified Cycle parameter provides
+      -- correct results when provided a variety of X parameter input values.
 
       if not Fxa5a00.Result_Within_Range
           (Gef.Arccot (0.0, Cycle => 360.0),
@@ -452,8 +451,7 @@ begin
             "used as argument to Cot function");
       end if;
 
-      -- Check that inverse function results are correct.
-      -- Default Cycle test.
+      -- Check that inverse function results are correct. Default Cycle test.
 
       Angle := 0.001;
       while Angle < Pi and not Incorrect_Inverse loop

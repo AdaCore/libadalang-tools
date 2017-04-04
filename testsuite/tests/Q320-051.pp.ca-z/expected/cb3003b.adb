@@ -22,18 +22,16 @@
 --     OR DISCLOSED, OR THE OWNERSHIP, MERCHANTABILITY, OR FITNESS FOR A
 --     PARTICULAR PURPOSE OF SAID MATERIAL.
 --*
--- CHECK THAT A NON-EXPLICIT RAISE STATEMENT MAY APPEAR IN A BLOCK
--- STATEMENT WITHIN AN EXCEPTION HANDLER; IF THE BLOCK STATEMENT
--- INCLUDES A HANDLER FOR THE CURRENT EXCEPTION, THEN THE INNER
--- HANDLER RECEIVES CONTROL.
+-- CHECK THAT A NON-EXPLICIT RAISE STATEMENT MAY APPEAR IN A BLOCK STATEMENT
+-- WITHIN AN EXCEPTION HANDLER; IF THE BLOCK STATEMENT INCLUDES A HANDLER FOR
+-- THE CURRENT EXCEPTION, THEN THE INNER HANDLER RECEIVES CONTROL.
 
--- *** NOTE: This test has been modified since ACVC version 1.11 to    -- 9X
--- ***       remove incompatibilities associated with the transition   -- 9X
--- ***       to Ada 9X.                                                -- 9X
--- ***                                                                 -- 9X
+-- *** NOTE: This test has been modified since ACVC version 1.11 to -- 9X ***
+-- remove incompatibilities associated with the transition -- 9X *** to Ada 9X.
+-- -- 9X *** -- 9X
 
 -- L.BROWN  10/08/86
--- MRM  03/30/93   REMOVED NUMERIC_ERROR FOR 9X COMPATIBILITY
+-- MRM 03/30/93 REMOVED NUMERIC_ERROR FOR 9X COMPATIBILITY
 
 with Report; use Report;
 

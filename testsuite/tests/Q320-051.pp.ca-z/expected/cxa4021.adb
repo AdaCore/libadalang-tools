@@ -67,10 +67,10 @@ with Ada.Strings.Wide_Unbounded;
 procedure Cxa4021 is
 
    -- The following two functions are used to translate character and string
-   -- values to "Wide" values.  They will be applied to all the Wide_Bounded
+   -- values to "Wide" values. They will be applied to all the Wide_Bounded
    -- subprogram character and string parameters to simulate the use of non-
-   -- character Wide_Characters and Wide_Strings in actual practice.
-   -- Note: These functions do not actually return "equivalent" wide
+   -- character Wide_Characters and Wide_Strings in actual practice. Note:
+   -- These functions do not actually return "equivalent" wide
    --       characters to their character inputs, just "non-character"
    --       wide characters.
 
@@ -135,11 +135,10 @@ begin
       procedure Enter_Text_Into_Document (Document : in out Document_Type) is
       begin
 
-         -- Fill in both "paragraphs" of the document.  Each unbounded wide
+         -- Fill in both "paragraphs" of the document. Each unbounded wide
          -- string functions as an individual paragraph, containing an
-         -- unspecified number of characters.
-         -- Use a variety of different unbounded wide string subprograms to
-         -- load the data.
+         -- unspecified number of characters. Use a variety of different
+         -- unbounded wide string subprograms to load the data.
 
          Document (1) :=
            Asw.To_Unbounded_Wide_String (Equiv ("Ada is a language"));
@@ -236,10 +235,9 @@ begin
            Asw.Slice (Document (1), -- Characters 80-88
            80, Asw.Length (Document (1)));
 
-         -- Break the second unbounded wide string into the appropriate
-         -- length.  It is only twelve characters in length, so the entire
-         -- unbounded wide string will be placed on one string of the output
-         -- object.
+         -- Break the second unbounded wide string into the appropriate length.
+         -- It is only twelve characters in length, so the entire unbounded
+         -- wide string will be placed on one string of the output object.
 
          Camera_Copy (4) (1 .. Asw.Length (Document (2))) :=
            Asw.To_Wide_String
@@ -254,9 +252,9 @@ begin
       is
       begin
 
-         -- Evaluate wide strings for equality, using the operators defined
-         -- in package Ada.Strings.Wide_Unbounded.  The less than/greater
-         -- than or equal comparisons should evaluate to "equals => True".
+         -- Evaluate wide strings for equality, using the operators defined in
+         -- package Ada.Strings.Wide_Unbounded. The less than/greater than or
+         -- equal comparisons should evaluate to "equals => True".
 
          if Asw.To_Unbounded_Wide_String (Draft (1)) =     -- "="(WUnb,WUnb)
            Asw.To_Unbounded_Wide_String (Master (1)) and

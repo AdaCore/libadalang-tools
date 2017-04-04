@@ -388,8 +388,8 @@ begin
 
    -- Test Replace_Element and Update_Element
 
--- Double the values of the two Bounded_Ordered_Maps by two different methods
--- and check still equal
+   -- Double the values of the two Bounded_Ordered_Maps by two different
+   -- methods and check still equal
 
    My_Cursor_1 := My_Map_1.First;
    My_Cursor_2 := My_Map_2.First;
@@ -455,7 +455,7 @@ begin
 
    end if;
 
-   -- Test Move.  Target has the test values in reverse order, after Move these
+   -- Test Move. Target has the test values in reverse order, after Move these
    -- should be replaced (not appended) by the test values in forward order
 
    My_Map_2.Clear;
@@ -680,9 +680,8 @@ begin
 
    -- Test Insert (three forms), Include and Replace
 
--- My_Map_2 should initially be empty
--- Insert in fairly mixed order to check that order is determined by the key,
--- not the order of insertion
+   -- My_Map_2 should initially be empty Insert in fairly mixed order to check
+   -- that order is determined by the key, not the order of insertion
 
    declare
    begin
@@ -748,7 +747,7 @@ begin
 
    end if;
 
-   -- Element with Default_Value.  Should insert in-between the previous two
+   -- Element with Default_Value. Should insert in-between the previous two
    -- elements
    My_Map_2.Insert
      (Key      => 2,
@@ -826,7 +825,7 @@ begin
 
    end;
 
-   -- Element with Default_Value.  Should insert in-between the previous two
+   -- Element with Default_Value. Should insert in-between the previous two
    -- elements
    My_Map_2.Insert
      (Key      => 5,
@@ -839,8 +838,8 @@ begin
 
    end if;
 
-   -- The order should now be Value_In_Array (2), Default_Value,
-   -- Value_In_Array (1), Value_In_Array (1), Default_Value, Value_In_Array (2)
+   -- The order should now be Value_In_Array (2), Default_Value, Value_In_Array
+   -- (1), Value_In_Array (1), Default_Value, Value_In_Array (2)
 
    My_Cursor_2 := My_Map_2.First;
 
@@ -905,8 +904,7 @@ begin
 
    -- Test Delete, Exclude, Delete_First and Delete_Last
 
-   -- My_Cursor_2 should initially be pointing to the last element of
-   -- My_Map_2
+   -- My_Cursor_2 should initially be pointing to the last element of My_Map_2
 
    My_Map_2.Delete (Position => My_Cursor_2);
 

@@ -55,8 +55,8 @@ begin
            Acl1.Lc_German_Sharp_S &
            Acl1.Lc_Y_Diaeresis);
 
-      -- Note that there is no upper case version of the last two
-      -- characters from above.
+      -- Note that there is no upper case version of the last two characters
+      -- from above.
 
       Tc_New_Character_String : Wide_String (1 .. 12) :=
         Handling.To_Wide_String
@@ -73,8 +73,7 @@ begin
            Acl1.Lc_German_Sharp_S &
            Acl1.Lc_Y_Diaeresis);
 
-      -- Access objects that will be provided as parameters to the
-      -- subprograms.
+      -- Access objects that will be provided as parameters to the subprograms.
       Map_To_Lower_Case_Ptr : Wide_Maps.Wide_Character_Mapping_Function :=
         Cxa4025_0.Map_To_Lower_Case'Access;
       Map_To_Upper_Case_Ptr : Wide_Maps.Wide_Character_Mapping_Function :=
@@ -145,8 +144,8 @@ begin
                   "TC_Lower_to_Upper_Map as input");
             end if;
 
-            -- The lower bound on the returned Character_Sequence value
-            -- must be 1.
+            -- The lower bound on the returned Character_Sequence value must be
+            -- 1.
             if Tc_Range'First /= 1 then
                Report.Failed ("Incorrect lower bound returned from To_Range");
             end if;
@@ -156,8 +155,8 @@ begin
             end if;
          end;
 
-         -- Both function To_Domain and To_Range return the null string
-         -- when provided the Identity character map as an input parameter.
+         -- Both function To_Domain and To_Range return the null string when
+         -- provided the Identity character map as an input parameter.
          if Wide_Maps.To_Domain (Wide_Maps.Identity) /= Null_Sequence or
            Wide_Maps.To_Range (Wide_Maps.Identity) /= Null_Sequence
          then

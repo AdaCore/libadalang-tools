@@ -84,8 +84,8 @@ begin
 
       use Ada.Exceptions;
 
-      -- No initial values given for these two declarations; they default
-      -- to Null_Id and Null_Occurrence respectively.
+      -- No initial values given for these two declarations; they default to
+      -- Null_Id and Null_Occurrence respectively.
       A_Null_Exception_Id         : Ada.Exceptions.Exception_Id;
       A_Null_Exception_Occurrence : Ada.Exceptions.Exception_Occurrence;
 
@@ -93,8 +93,7 @@ begin
 
    begin
 
-      -- Verify that Null_Id is the default initial value of type
-      -- Exception_Id.
+      -- Verify that Null_Id is the default initial value of type Exception_Id.
 
       if not (A_Null_Exception_Id = Ada.Exceptions.Null_Id) then
          Report.Failed
@@ -121,8 +120,8 @@ begin
             "actual parameter");
       end if;
 
-      -- Verify that function Exception_Message raises Constraint_Error for
-      -- a Null_Occurrence actual parameter.
+      -- Verify that function Exception_Message raises Constraint_Error for a
+      -- Null_Occurrence actual parameter.
       begin
          declare
             Msg : constant String :=
@@ -141,8 +140,8 @@ begin
                "when called with a Null_Occurrence actual parameter");
       end;
 
-      -- Verify that function Exception_Name raises Constraint_Error for
-      -- a Null_Occurrence actual parameter.
+      -- Verify that function Exception_Name raises Constraint_Error for a
+      -- Null_Occurrence actual parameter.
       begin
          declare
             Name : constant String :=
@@ -161,8 +160,8 @@ begin
                "when called with a Null_Occurrence actual parameter");
       end;
 
-      -- Verify that function Exception_Information raises Constraint_Error
-      -- for a Null_Occurrence actual parameter.
+      -- Verify that function Exception_Information raises Constraint_Error for
+      -- a Null_Occurrence actual parameter.
       begin
          declare
             Info : constant String :=
@@ -183,8 +182,8 @@ begin
                "when called with a Null_Occurrence actual parameter");
       end;
 
-      -- Verify that function Raise_Exception raises Constraint_Error
-      -- for a Null_Id actual parameter.
+      -- Verify that function Raise_Exception raises Constraint_Error for a
+      -- Null_Id actual parameter.
       begin
          Ada.Exceptions.Raise_Exception (A_Null_Exception_Id);
          Report.Failed
@@ -200,8 +199,8 @@ begin
                "when called with a Null_Id actual parameter");
       end;
 
-      -- Verify that function Exception_Name raises Constraint_Error for
-      -- a Null_Id actual parameter.
+      -- Verify that function Exception_Name raises Constraint_Error for a
+      -- Null_Id actual parameter.
       begin
          declare
             Name : constant String :=
@@ -220,8 +219,8 @@ begin
                "when called with a Null_Id actual parameter");
       end;
 
-      -- Verify that function Exception_Identity returns Null_Id for
-      -- a Null_Occurrence actual parameter.
+      -- Verify that function Exception_Identity returns Null_Id for a
+      -- Null_Occurrence actual parameter.
       begin
          declare
             Id : Ada.Exceptions.Exception_Id :=
@@ -241,8 +240,8 @@ begin
       end;
 
       -- Verify that calling the Save_Occurrence procedure with a
-      -- Null_Occurrence actual parameter saves the Null_Occurrence to the
-      -- target object, and does not raise Constraint_Error.
+      -- Null_Occurrence actual parameter saves the Null_Occurrence to
+      -- the target object, and does not raise Constraint_Error.
       declare
          use Ada.Exceptions;
          Saved_Occurrence : Exception_Occurrence;
@@ -291,8 +290,8 @@ begin
       end;
 
       -- Verify that calling the Save_Occurrence function with a
-      -- Null_Occurrence actual parameter returns the Null_Occurrence as the
-      -- function result, and does not raise Constraint_Error.
+      -- Null_Occurrence actual parameter returns the Null_Occurrence as
+      -- the function result, and does not raise Constraint_Error.
       declare
          Occurrence_Ptr : Ada.Exceptions.Exception_Occurrence_Access;
       begin
@@ -312,11 +311,11 @@ begin
          -- Null_Occurrence value.
 
          begin
-            -- Dereferenced value of type Exception_Occurrence_Access
-            -- should be a Null_Occurrence value, based on the action
-            -- of Function Save_Occurrence above.  Providing this as an
-            -- actual parameter to Reraise_Exception should not result in
-            -- any exception being raised.
+            -- Dereferenced value of type Exception_Occurrence_Access should
+            -- be a Null_Occurrence value, based on the action of Function
+            -- Save_Occurrence above. Providing this as an actual parameter
+            -- to Reraise_Exception should not result in any exception being
+            -- raised.
 
             Ada.Exceptions.Reraise_Occurrence (Occurrence_Ptr.all);
 

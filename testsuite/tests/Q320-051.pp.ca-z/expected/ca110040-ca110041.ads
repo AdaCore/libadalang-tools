@@ -50,9 +50,9 @@ package Ca110040.Ca110041 is         -- Child Package Computer_System.Manager
 
 private
 
--- The private portion of this spec demonstrates that components contained
--- in the visible part of the parent are directly visible in the private
--- part of a public child.
+-- The private portion of this spec demonstrates that components contained in
+-- the visible part of the parent are directly visible in the private part of
+-- a public child.
 
    type Account_Access_Type is (None, Guest, User, System);
 

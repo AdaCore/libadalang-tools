@@ -77,19 +77,19 @@ begin
       begin
          Create (The_File, Mode, Report.Legal_File_Name (Next));
       exception
-         -- The following two exceptions can be raised if a system is not
-         -- capable of supporting external Text_IO files.  The handler will
-         -- raise a user-defined exception which will result in a
+         -- The following two exceptions can be raised if a system is
+         -- not capable of supporting external Text_IO files. The handler
+         -- will raise a user-defined exception which will result in a
          -- Not_Applicable result for the test.
          when Use_Error | Name_Error =>
             raise Non_Applicable_System;
       end Create_New_File;
 
       procedure Load_File (The_File : in out File_Type) is
-      -- This procedure will load several strings into the file denoted
-      -- by the input parameter.  A call to New_Line will add line/page
-      -- termination characters, which will be available  for processing
-      -- along with the text in the file.
+      -- This procedure will load several strings into the file denoted by the
+      -- input parameter. A call to New_Line will add line/page termination
+      -- characters, which will be available for processing along with the
+      -- text in the file.
       begin
          Put_Line (The_File, Tc_String_Ptr_Array (1).all);
          New_Line (The_File, Spacing => 1);
@@ -103,15 +103,15 @@ begin
 
       Create_New_File (User_Defined_Input_File, Out_File, 1);
 
-      -- Enter several lines of text into the new input file.
-      -- The characters that make up these text strings will be processed
-      -- using the procedures being exercised in this test.
+      -- Enter several lines of text into the new input file. The characters
+      -- that make up these text strings will be processed using the procedures
+      -- being exercised in this test.
 
       Load_File (User_Defined_Input_File);
 
-      -- Check that Mode_Error is raised by Look_Ahead and Get_Immedidate
-      -- if the mode of the file object is not In_File.
-      -- Currently, the file mode is Out_File.
+      -- Check that Mode_Error is raised by Look_Ahead and Get_Immedidate if
+      -- the mode of the file object is not In_File. Currently, the file mode
+      -- is Out_File.
 
       begin
          Look_Ahead (User_Defined_Input_File, Udla_Char, Udla_End_Of_Line);
@@ -145,8 +145,8 @@ begin
                Exception_Name (The_Error));
       end;
 
-      -- The file will then be reset to In_File mode to properly function as
-      -- a source of input.
+      -- The file will then be reset to In_File mode to properly function as a
+      -- source of input.
 
       Reset1 : begin
          Reset (User_Defined_Input_File, In_File);
@@ -157,9 +157,9 @@ begin
             raise No_Reset;
       end Reset1;
 
-      -- Process the input file, exercising various Text_IO
-      -- functionality, and validating the results at each step.
-      -- Note: The designated File_Access object is used in processing
+      -- Process the input file, exercising various Text_IO functionality, and
+      -- validating the results at each step. Note: The designated File_Access
+      -- object is used in processing
       --       the New_Default_Input_File in the second loop below.
 
       -- Process characters in first line of text of each file.
@@ -177,8 +177,8 @@ begin
 
          Get_Immediate (User_Defined_Input_File, Udgi_Char);
 
-         -- Check that the characters returned by both procedures are the
-         -- same, and that they match the expected character from the file.
+         -- Check that the characters returned by both procedures are the same,
+         -- and that they match the expected character from the file.
 
          if Udla_Char /= Tc_String_Ptr_Array (1).all (Char_Pos) or
            Udgi_Char /= Tc_String_Ptr_Array (1).all (Char_Pos)
@@ -192,8 +192,8 @@ begin
          -- Increment the character position counter.
          Char_Pos := Char_Pos + 1;
 
-         -- Check the next character on the line.  If at the end of line,
-         -- the processing flow will exit the While loop.
+         -- Check the next character on the line. If at the end of line, the
+         -- processing flow will exit the While loop.
 
          Look_Ahead (User_Defined_Input_File, Udla_Char, Udla_End_Of_Line);
 
@@ -235,8 +235,7 @@ begin
 
       Skip_Line (User_Input_Ptr.all);
 
-      -- Process characters in the third line of the file (second line
-      -- of text)
+      -- Process characters in the third line of the file (second line of text)
       -- Note: The version of Get_Immediate used in processing this line has
       --       the Boolean parameter Available.
 
@@ -253,10 +252,10 @@ begin
 
          Get_Immediate (User_Input_Ptr.all, Udgi_Char, Udgi_Available);
 
-         -- Check that the Available parameter of Get_Immediate was set
-         -- to indicate that a character was available in the file.
-         -- Check that the characters returned by both procedures are the
-         -- same, and they all match the expected character from the file.
+         -- Check that the Available parameter of Get_Immediate was set to
+         -- indicate that a character was available in the file. Check that the
+         -- characters returned by both procedures are the same, and they all
+         -- match the expected character from the file.
 
          if not Udgi_Available or
            Udla_Char /= Tc_String_Ptr_Array (2).all (Char_Pos) or
@@ -272,8 +271,8 @@ begin
 
          Char_Pos := Char_Pos + 1;
 
-         -- Check the next character on the line.  If at the end of line,
-         -- the processing flow will exit the While loop.
+         -- Check the next character on the line. If at the end of line, the
+         -- processing flow will exit the While loop.
 
          Look_Ahead (User_Input_Ptr.all, Udla_Char, Udla_End_Of_Line);
 

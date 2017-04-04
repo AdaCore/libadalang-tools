@@ -58,14 +58,14 @@
 
 -- Child package of FA11B00.
    package Fa11b00.Ca11b01_0 is          -- Application_Two_Widget
--- This public child declares a derived type from its parent.  It
--- represents processing of widgets in a window system.
+-- This public child declares a derived type from its parent. It represents
+-- processing of widgets in a window system.
 
    type App2_Widget is new App1_Widget (Maximum_Size => 5_000);
    -- Inherits procedure Create_Widget from parent.
 
-   -- Primitive operation of type App2_Widget.
-   -- To be inherited by its children derivatives.
+   -- Primitive operation of type App2_Widget. To be inherited by its children
+   -- derivatives.
    procedure App2_Widget_Specific_Oper
      (The_Widget : in out App2_Widget;
       Loc        : in     Widget_Location);

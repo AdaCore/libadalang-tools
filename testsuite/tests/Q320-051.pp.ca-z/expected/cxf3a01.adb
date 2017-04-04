@@ -72,10 +72,9 @@ begin
    begin
 
       -- Use a series of picture strings that conform to the composition
-      -- constraints to validate the Ada.Text_IO.Editing.Valid function.
-      -- The result for each of these calls should be True.
-      -- In all the following cases, the default value of the Blank_When_Zero
-      -- parameter is used.
+      -- constraints to validate the Ada.Text_IO.Editing.Valid function. The
+      -- result for each of these calls should be True. In all the following
+      -- cases, the default value of the Blank_When_Zero parameter is used.
 
       for I in 1 .. Fxf3a00.Number_Of_Valid_Strings loop
 
@@ -105,8 +104,8 @@ begin
 
       -- Use a series of picture strings that violate one or more of the
       -- composition constraints to validate the Ada.Text_IO.Editing.Valid
-      -- function.  The result for each of these calls should be False.
-      -- In all the following cases, the default value of the Blank_When_Zero
+      -- function. The result for each of these calls should be False. In
+      -- all the following cases, the default value of the Blank_When_Zero
       -- parameter is used.
 
       for I in 1 .. Fxf3a00.Number_Of_Invalid_Strings loop
@@ -121,15 +120,15 @@ begin
       end loop;
 
       -- In all the following cases, the default value of the Blank_When_Zero
-      -- parameter is overridden with a True actual parameter value.  Using
+      -- parameter is overridden with a True actual parameter value. Using
       -- valid picture strings that contain the '*' zero suppression character
-      -- when this parameter value is True must result in a False result
-      -- from function Valid.  Valid picture strings that do not contain the
-      -- '*' character should return a function result of True with True
-      -- provided as the actual parameter to Blank_When_Zero.
+      -- when this parameter value is True must result in a False result from
+      -- function Valid. Valid picture strings that do not contain the '*'
+      -- character should return a function result of True with True provided
+      -- as the actual parameter to Blank_When_Zero.
 
-      -- Check entries 1, 2, 25, 36 from the Valid_Strings array, all of
-      -- which contain the '*' zero suppression character.
+      -- Check entries 1, 2, 25, 36 from the Valid_Strings array, all of which
+      -- contain the '*' zero suppression character.
 
       if Editing.Valid (Valid_Strings (1).all, Blank_When_Zero => True) or
         Editing.Valid (Valid_Strings (2).all, Blank_When_Zero => True) or
@@ -142,8 +141,8 @@ begin
             "and using picture strings with the '*' character");
       end if;
 
-      -- Check entries from the Valid_Strings array, none of
-      -- which contain the '*' zero suppression character.
+      -- Check entries from the Valid_Strings array, none of which contain the
+      -- '*' zero suppression character.
 
       for I in 3 .. 24 loop
 

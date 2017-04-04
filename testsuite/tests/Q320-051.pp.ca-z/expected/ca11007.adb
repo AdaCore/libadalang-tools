@@ -14,13 +14,12 @@ procedure Ca11007 is
 
 begin
 
-   -- This code demonstrates how private extensions could be utilized
-   -- in child packages to allow for recording on different media.
-   -- The processing contained in the procedures and functions is
-   -- "dummy" processing, not intended to perform actual recording,
-   -- conversion, or validation operations, but simply to demonstrate
-   -- this type of structural decomposition  as a possible solution to
-   -- a user's design problem.
+   -- This code demonstrates how private extensions could be utilized in
+   -- child packages to allow for recording on different media. The processing
+   -- contained in the procedures and functions is "dummy" processing,
+   -- not intended to perform actual recording, conversion, or validation
+   -- operations, but simply to demonstrate this type of structural
+   -- decomposition as a possible solution to a user's design problem.
 
    Report.Test
      ("CA11007",

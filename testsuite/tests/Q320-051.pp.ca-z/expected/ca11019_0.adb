@@ -8,8 +8,8 @@ with Ca11019_0.Ca11019_1;     -- Private generic child.
 pragma Elaborate (Ca11019_0.Ca11019_1);
 package body Ca11019_0 is
 
-   -- instantiate the generic child with data types needed by the
-   -- package interface services
+   -- instantiate the generic child with data types needed by the package
+   -- interface services
    package Data_1_Ops is new Ca11019_1 (Data_Type => Data_1);
 
    package Data_2_Ops is new Ca11019_1 (Data_Type => Data_2);
@@ -29,8 +29,8 @@ package body Ca11019_0 is
 
    function Statistical_Op_1 (Data : Data_Collection) return Data_1 is
    begin
-      -- maybe use generic operation(s) in some complicated ways
-      -- (but simplified out, for the sake of testing)
+      -- maybe use generic operation(s) in some complicated ways (but
+      -- simplified out, for the sake of testing)
       return Data_1_Ops.Op (Data);
    end Statistical_Op_1;
 

@@ -14,9 +14,9 @@ begin
    Cxe5003_Check.Main := True;
 
    -- Note that the expected behavior is for all the elaboration to take
-   -- place first, System.RPC.Establish_RPC_Receiver to be called, and then
-   -- this main procedure to be called.  Report.Test is called in the
-   -- Establish_RPC_Receiver routine.
+   -- place first, System.RPC.Establish_RPC_Receiver to be called, and
+   -- then this main procedure to be called. Report.Test is called in
+   -- the Establish_RPC_Receiver routine.
 
    if not Cxe5003_Check.Establish then
       Report.Test

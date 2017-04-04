@@ -1,8 +1,7 @@
 --==================================================================--
 
 with Ca11015_0.Ca11015_1;              -- Generic map operation,
--- implicitly withs parent, basic map
--- application.
+-- implicitly withs parent, basic map application.
 with Report;
 
 procedure Ca11015 is
@@ -20,8 +19,8 @@ begin
    Population_Map_Subtest : declare
       type Population_Type is range 0 .. 10_000;
 
-      -- Declare instance of the child generic map package for one
-      -- particular integer type.
+      -- Declare instance of the child generic map package for one particular
+      -- integer type.
 
       package Population is new Ca11015_0.Ca11015_1 (Population_Type);
 
@@ -57,8 +56,8 @@ begin
    Weather_Map_Subtest : declare
       type Weather_Type is (Hot, Cold, Mild);
 
-      -- Declare instance of the child generic map package for one
-      -- particular enumeration type.
+      -- Declare instance of the child generic map package for one particular
+      -- enumeration type.
 
       package Weather_Pkg is new Ca11015_0.Ca11015_1 (Weather_Type);
 
@@ -89,15 +88,15 @@ begin
 
    end Weather_Map_Subtest;
 
--- During processing, the application may erroneously attempts to create
--- a density map on an unexplored area.  This would result in the raising
--- of an exception.
+-- During processing, the application may erroneously attempts to create a
+-- density map on an unexplored area. This would result in the raising of
+-- an exception.
 
    Density_Map_Subtest : declare
       type Density_Type is (High, Medium, Low);
 
-      -- Declare instance of the child generic map package for one
-      -- particular enumeration type.
+      -- Declare instance of the child generic map package for one particular
+      -- enumeration type.
 
       package Density_Pkg is new Ca11015_0.Ca11015_1 (Density_Type);
 

@@ -95,17 +95,17 @@ procedure Cd30003 is
    -- Sizes to try:
 
    -- The basic sizes are based on a "normal" Storage_Unit = 8 implementation.
-   -- We then use formulas to insure that the specified sizes meet the
-   -- the minimum level of support and AI-0051.
+   -- We then use formulas to insure that the specified sizes meet the the
+   -- minimum level of support and AI-0051.
 
    Modular_Single_Size : constant :=
      Integer'Min
        (((8 + (System.Storage_Unit - 1)) / System.Storage_Unit) *
         System.Storage_Unit,
         Max_Modular'Size);
-   -- Calulate an appropriate, legal, and required to be supported size to
-   -- try, which is the size of Byte. Note that object sizes must be
-   -- a multiple of the storage unit for the compiler.
+   -- Calulate an appropriate, legal, and required to be supported size to try,
+   -- which is the size of Byte. Note that object sizes must be a multiple of
+   -- the storage unit for the compiler.
 
    Modular_Double_Size : constant :=
      Integer'Min

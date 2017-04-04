@@ -111,9 +111,9 @@ begin
                "function when provided 0.0, 0.0 input parameters");
       end;
 
-      -- Check that no exception is raised by the Arctan function when
-      -- provided a large positive or negative Y parameter value, when
-      -- using the default value for parameter X.
+      -- Check that no exception is raised by the Arctan function when provided
+      -- a large positive or negative Y parameter value, when using the default
+      -- value for parameter X.
 
       begin
          Float_Result := Ef.Arctan (Y => Fxa5a00.Large);
@@ -135,9 +135,9 @@ begin
                "provided a large negative Y parameter value");
       end;
 
-      -- Check that no exception is raised by the Arctan function when
-      -- provided a small positive or negative Y parameter value, when
-      -- using the default value for parameter X.
+      -- Check that no exception is raised by the Arctan function when provided
+      -- a small positive or negative Y parameter value, when using the default
+      -- value for parameter X.
 
       begin
          Float_Result := Ef.Arctan (Y => Fxa5a00.Small);
@@ -159,9 +159,9 @@ begin
                "provided a small negative Y parameter value");
       end;
 
-      -- Check that no exception is raised by the Arctan function when
-      -- provided combinations of large and small positive or negative
-      -- parameter values for both Y and X input parameters.
+      -- Check that no exception is raised by the Arctan function when provided
+      -- combinations of large and small positive or negative parameter values
+      -- for both Y and X input parameters.
 
       begin
          Float_Result := Ef.Arctan (Y => Fxa5a00.Large, X => Fxa5a00.Large);
@@ -210,9 +210,9 @@ begin
                "and a large negative parameter value");
       end;
 
-      -- Check that when the Arctan function is provided a Y parameter value
-      -- of 0.0 and a positive X parameter input value, the prescribed result
-      -- of zero is returned.
+      -- Check that when the Arctan function is provided a Y parameter value of
+      -- 0.0 and a positive X parameter input value, the prescribed result of
+      -- zero is returned.
 
       if Gef.Arctan (Y => 0.0) /= 0.0 or -- Default X value
         Ef.Arctan (Y => 0.0, X => Fxa5a00.Large) /= 0.0 or
@@ -244,9 +244,9 @@ begin
       -- Check the results of the Arctan function with specified cycle
       -- parameter.
 
-      -- Check that the Arctan function with specified Cycle parameter
-      -- raises Argument_Error when the value of the Cycle parameter is zero
-      -- or negative.
+      -- Check that the Arctan function with specified Cycle parameter raises
+      -- Argument_Error when the value of the Cycle parameter is zero or
+      -- negative.
 
       begin
          Float_Result := Ef.Arctan (Y => Pi, Cycle => 0.0);  -- Default X value
@@ -385,9 +385,8 @@ begin
                "positive X parameter value");
       end;
 
-      -- Check that the Arctan function with specified Cycle parameter
-      -- provides correct results when provided a variety of Y parameter
-      -- input values.
+      -- Check that the Arctan function with specified Cycle parameter provides
+      -- correct results when provided a variety of Y parameter input values.
 
 --pwb-math      if not FXA5A00.Result_Within_Range(EF.Arctan(Pi,    Cycle => 2.0*Pi),
 --pwb-math                                         1.26,

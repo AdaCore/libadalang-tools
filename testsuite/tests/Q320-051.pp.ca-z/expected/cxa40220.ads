@@ -59,10 +59,10 @@ with Ada.Strings;
 package Cxa40220 is
 
    -- The following two functions are used to translate character and string
-   -- values to "Wide" values.  They will be applied to all the Wide_Bounded
+   -- values to "Wide" values. They will be applied to all the Wide_Bounded
    -- subprogram character and string parameters to simulate the use of non-
-   -- character Wide_Characters and Wide_Strings in actual practice.
-   -- Note: These functions do not actually return "equivalent" wide
+   -- character Wide_Characters and Wide_Strings in actual practice. Note:
+   -- These functions do not actually return "equivalent" wide
    --       characters to their character inputs, just "non-character"
    --       wide characters.
 
@@ -71,8 +71,7 @@ package Cxa40220 is
    function Equiv (Str : String) return Wide_String;
 
    -- Functions and access-to-subprogram value used to supply mapping
-   -- capability to the appropriate versions of Count, Index, and
-   -- Translate.
+   -- capability to the appropriate versions of Count, Index, and Translate.
 
    function Ab_To_Us_Mapping_Function
      (From : Wide_Character) return Wide_Character;

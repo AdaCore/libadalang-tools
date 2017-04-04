@@ -16,11 +16,9 @@ package Ca11006_0.Ca11006_1 is        -- Child package File_Package.Operations
    function Validate (File : in Extended_File_Type) return Boolean;
 
    function Validate_Compression (File : in Extended_File_Type) return Boolean;
-   -- These two validation functions provide
-   -- the capability to check the private
-   -- components defined in the parent and
-   -- child packages from within the client
-   -- program.
+   -- These two validation functions provide the capability to check the
+   -- private components defined in the parent and child packages from
+   -- within the client program.
 private
 
    type File_Length_Type is new File_Measure;       -- Parent private type.

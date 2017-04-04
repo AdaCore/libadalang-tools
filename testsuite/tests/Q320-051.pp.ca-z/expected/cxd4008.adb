@@ -95,9 +95,8 @@ procedure Cxd4008 is
    end Checker;
 
    protected body Checker is
-      -- minor jumbling of order here.  The significant order
-      -- for this part of the test is the order the entries
-      -- were declared in the specification.
+      -- minor jumbling of order here. The significant order for this part of
+      -- the test is the order the entries were declared in the specification.
 
       entry E1 when Gate is
       begin
@@ -150,8 +149,8 @@ procedure Cxd4008 is
 
    task Checker_2 is
       pragma Priority (Priority_High);
-      -- order of declaration is not important so they are
-      -- not declared in the order expected.
+      -- order of declaration is not important so they are not declared in the
+      -- order expected.
       entry E2;
       entry E3;
       entry E1;
@@ -382,8 +381,8 @@ begin
       " all waiting tasks are of equal priority");
 
    declare  -- encapsulate the test
-      -- tasks not declared in order to prevent the source order
-      -- of the declarations from affecting the outcome
+      -- tasks not declared in order to prevent the source order of the
+      -- declarations from affecting the outcome
       T3 : T (3);
       T1 : T (1);
       T5 : T (5);

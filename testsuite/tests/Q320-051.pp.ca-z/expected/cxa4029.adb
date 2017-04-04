@@ -72,8 +72,7 @@ begin
            Acl1.Uc_O_Oblique_Stroke &
            Acl1.Uc_Icelandic_Thorn);
 
-      -- Access objects that will be provided as parameters to the
-      -- subprograms.
+      -- Access objects that will be provided as parameters to the subprograms.
       Map_To_Lower_Case_Ptr : Wide_Maps.Wide_Character_Mapping_Function :=
         Cxa4029_0.Map_To_Lower_Case'Access;
       Map_To_Upper_Case_Ptr : Wide_Maps.Wide_Character_Mapping_Function :=

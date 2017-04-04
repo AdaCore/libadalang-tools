@@ -9,10 +9,9 @@ procedure Cc51a01 is
 
    type Distance is new Cc51a01_1.Pos_Fraction;    -- Derived indirectly from
    -- root type of class.
-   -- Inherits "/" indirectly from root type.
-   -- Inherits "-" indirectly from root type.
-   -- Inherits Numerator directly from parent type.
-   -- Inherits Denominator indirectly from root type.
+   -- Inherits "/" indirectly from root type. Inherits "-" indirectly from root
+   -- type. Inherits Numerator directly from parent type. Inherits Denominator
+   -- indirectly from root type.
 
    use Fc51a00, Cc51a01_1;                         -- All primitive subprograms
    -- directly visible.
@@ -22,12 +21,11 @@ procedure Cc51a01 is
    package Distance_Io is new Cc51a01_0 (Distance);
 
    -- For each of the instances above, the subprogram "Put" should produce
-   -- the same result. That is, the primitive subprograms called by Put
-   -- should in all cases be those of the type Fraction_Type, which is the
-   -- ancestor type for the formal derived type in the generic unit. In
-   -- particular, for Pos_Fraction_IO and Distance_IO, the versions of
-   -- Numerator called should NOT be those of the actual types, which override
-   -- Fraction_Type's version.
+   -- the same result. That is, the primitive subprograms called by Put should
+   -- in all cases be those of the type Fraction_Type, which is the ancestor
+   -- type for the formal derived type in the generic unit. In particular, for
+   -- Pos_Fraction_IO and Distance_IO, the versions of Numerator called should
+   -- NOT be those of the actual types, which override Fraction_Type's version.
 
    Tc_Expected_Result : constant String := "-3/ 16";
 

@@ -11,6 +11,6 @@ package Cc30001_1 is
 
    procedure Send (M : in out Mail_Type);      -- For this test, this version
    -- of Send should be called in
-   -- ... Other operations.                    -- all cases.
+   -- ... Other operations. -- all cases.
 
 end Cc30001_1;

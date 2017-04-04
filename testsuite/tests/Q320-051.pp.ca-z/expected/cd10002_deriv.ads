@@ -15,8 +15,8 @@ package Cd10002_Deriv is
    type T3 is array (Boolean) of Duration;
    function "+" (L, R : T3) return T3;
 
-   -- Parent is by-reference.  No need to check the case where the parent
-   -- is tagged, because the defect report only deals with untagged types.
+   -- Parent is by-reference. No need to check the case where the parent is
+   -- tagged, because the defect report only deals with untagged types.
 
    task type T4 is
    end T4;

@@ -97,23 +97,22 @@ begin
       use type Ic.Double;
 
       -- The String_Copy procedure copies the string pointed to by Source,
-      -- including the terminating nul char, into the char_array pointed
-      -- to by Target.
+      -- including the terminating nul char, into the char_array pointed to
+      -- by Target.
 
       procedure String_Copy
         (Target :    out Ic.Char_Array;
          Source : in     Ic.Char_Array);
 
       -- The String_Length function returns the length of the nul-terminated
-      -- string pointed to by The_String.  The nul is not included in
-      -- the count.
+      -- string pointed to by The_String. The nul is not included in the count.
 
       function String_Length (The_String : in Ic.Char_Array) return Ic.Size_T;
 
-      -- The String_To_Double function converts the char_array pointed to
-      -- by The_String into a double value returned through the function
-      -- name.  The_String must contain a valid floating-point number; if
-      -- not, the value returned is zero.
+      -- The String_To_Double function converts the char_array pointed to by
+      -- The_String into a double value returned through the function name.
+      -- The_String must contain a valid floating-point number; if not, the
+      -- value returned is zero.
 
 --      type Acc_ptr is access IC.char_array;
       function String_To_Double
@@ -121,8 +120,8 @@ begin
          End_Ptr    :    Icp.Pointer := null) return Ic.Double;
 
       -- Use the <string.h> strcpy function as a completion to the procedure
-      -- specification.  Note that the Ada interface to this C function is
-      -- in the form of a procedure (C function return value is not used).
+      -- specification. Note that the Ada interface to this C function is in
+      -- the form of a procedure (C function return value is not used).
 
       pragma Import (C, String_Copy, "strcpy");
 
@@ -144,8 +143,8 @@ begin
 
    begin
 
-      -- Check that the imported version of C function strcpy produces
-      -- the correct results.
+      -- Check that the imported version of C function strcpy produces the
+      -- correct results.
 
       Char_Source (0 .. 21) := "Test of Pragma Import" & Ic.Nul;
 
@@ -175,8 +174,8 @@ begin
            ("Incorrect result from the imported version of " & "strlen - 2");
       end if;
 
-      -- The following chars_ptr designates a char_array of 12 chars
-      -- (including the terminating nul char).
+      -- The following chars_ptr designates a char_array of 12 chars (including
+      -- the terminating nul char).
       Source_Ptr := Ics.New_Char_Array (Ic.To_C (Tc_String));
 
       String_Copy (Char_Target, Ics.Value (Source_Ptr));

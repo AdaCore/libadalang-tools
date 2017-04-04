@@ -1,7 +1,7 @@
 --==================================================================--
 
--- Generic child of complex number package.  Child must be generic since
--- parent is generic.
+-- Generic child of complex number package. Child must be generic since parent
+-- is generic.
 
 generic               -- Complex additional operations
 

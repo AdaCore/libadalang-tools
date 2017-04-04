@@ -96,8 +96,8 @@ begin
       --
       Awaited : Integer := 1;
 
-      -- Hold the Task_Id of the one message whose priority we are going
-      -- to reset later in the test
+      -- Hold the Task_Id of the one message whose priority we are going to
+      -- reset later in the test
       --
       Message_201_Task_Id : Ati.Task_Id;
       pragma Volatile (Message_201_Task_Id);
@@ -112,11 +112,11 @@ begin
       Max_Messages : constant := 9;
 
       -- This array is used to control the order of generation of the
-      -- Message_Tasks.  Indexing through the array gives the
-      -- Priority assigned to the next message and the message number.
-      -- Note the LH digit of the message number indicates its priority
-      -- and the RH digit the sequence (of generation) within that priority
-      -- NOTE: the ordering in the array causes the messages to be
+      -- Message_Tasks. Indexing through the array gives the Priority assigned
+      -- to the next message and the message number. Note the LH digit of the
+      -- message number indicates its priority and the RH digit the sequence
+      -- (of generation) within that priority NOTE: the ordering in the array
+      -- causes the messages to be
       --       generated in a pseudo random fashion.
       --
       Send_Order : constant array (1 .. Max_Messages) of Message_Type :=
@@ -146,8 +146,8 @@ begin
          entry Nb_Waiting (Number : out Natural);
       end Distributor;
 
-      -- This provides the handshaking to control the arrival of the
-      -- messages at the Distributor's Input queue
+      -- This provides the handshaking to control the arrival of the messages
+      -- at the Distributor's Input queue
       --
       procedure Await_Arrival is
          Current : Integer;
@@ -180,30 +180,27 @@ begin
                   Next_Priority : System.Priority;
                   Next_Task_Id  : Ati.Task_Id;
                begin
-                  -- Get the details of the message from the
-                  -- Send_Order array
+                  -- Get the details of the message from the Send_Order array
                   Next_Number   := Send_Order (Index).Number;
                   Next_Priority := Send_Order (Index).Priority;
-                  -- Start the task and present it with the required
-                  -- priority and Message_Number
+                  -- Start the task and present it with the required priority
+                  -- and Message_Number
                   Next_Message_Task.Start
                     (Next_Number,
                      Next_Priority,
                      Next_Task_Id);
 
-                  -- Later, we will want to set the base priority of
-                  -- one of the Message_Tasks.  This one is the one
-                  -- who's Message_Number is 201.  "Special Case" this
-                  -- one only to note the Task_Id.
+                  -- Later, we will want to set the base priority of one of the
+                  -- Message_Tasks. This one is the one who's Message_Number is
+                  -- 201. "Special Case" this one only to note the Task_Id.
                   --
                   if Next_Number = 201 then
                      Message_201_Task_Id := Next_Task_Id;
                   end if;
 
-                  -- The sequence of arrival at the Input queue is
-                  -- important to the test.  Wait for the call from
-                  -- the task created by this cycle through the loop
-                  -- to arrive before continuing
+                  -- The sequence of arrival at the Input queue is important to
+                  -- the test. Wait for the call from the task created by this
+                  -- cycle through the loop to arrive before continuing
                   --
                   Await_Arrival;
 
@@ -232,8 +229,8 @@ begin
             -- "Return" the current System defined Task_Id to the caller
             Task_Id := Ati.Current_Task;
 
-            -- Hold the "message" in this task.  For the test we are just
-            -- noting the Message_Number
+            -- Hold the "message" in this task. For the test we are just noting
+            -- the Message_Number
             This_Message_Number := Numb;
 
          end Start;
@@ -248,17 +245,16 @@ begin
 
       task body Distributor is
 
-         -- We expect the order processed to be the order of arrival
-         -- within priority EXCEPT for 201 which should come at the end
-         -- of its priority group because it was reinserted
+         -- We expect the order processed to be the order of arrival within
+         -- priority EXCEPT for 201 which should come at the end of its
+         -- priority group because it was reinserted
          Expected_Order : constant array
            (1 .. Max_Messages) of Message_Number :=
            (301, 302, 303, 202, 203, 201, 101, 102, 103);
       begin
          loop
             select
-               -- Used by the Await_Arrival to ensure pre-defined
-               -- arrival order
+               -- Used by the Await_Arrival to ensure pre-defined arrival order
                --
                accept Nb_Waiting (Number : out Natural) do
                   Number := Input'Count;
@@ -272,8 +268,8 @@ begin
          for Next_Expected in 1 .. Max_Messages loop
 
             accept Input (Numb : Message_Number) do
-               -- Process the input messages.  For this test just check
-               -- the expected order
+               -- Process the input messages. For this test just check the
+               -- expected order
                --
                if Numb /= Expected_Order (Next_Expected) then
                   Report.Failed
@@ -295,23 +291,22 @@ begin
 
    begin -- declare
 
-      -- Generate the messages which queue themselves in the Input
-      -- queue of the Distributor
+      -- Generate the messages which queue themselves in the Input queue of the
+      -- Distributor
       Generate_Messages.Start_Test;
 
-      -- All messages are now waiting on the Distributor's queue.
-      -- Set the base priority of the chosen task.  This is actually
-      -- the same base priority as the task had originally so it should
-      -- just be moved behind the others on the queue with the identical
-      -- priority
+      -- All messages are now waiting on the Distributor's queue. Set the base
+      -- priority of the chosen task. This is actually the same base priority
+      -- as the task had originally so it should just be moved behind the
+      -- others on the queue with the identical priority
       --
       Adp.Set_Priority (Priority_2q, Message_201_Task_Id);
 
       -- allow plenty of time for the Set_Priority to take effect
       delay Impdef.Clear_Ready_Queue;
 
-      -- Allow the Distributor to proceed to the rendezvous with the
-      -- callers - the Distributor will now check the ordering
+      -- Allow the Distributor to proceed to the rendezvous with the callers -
+      -- the Distributor will now check the ordering
       --
       Distributor.Go;
 

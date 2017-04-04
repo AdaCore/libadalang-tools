@@ -194,8 +194,8 @@ begin
       for I in Min_Array_Size .. Max_Array_Size - 1 loop
          Short_Array (I) := Interfaces.C.Short (I);
          for J in Min_Array_Size .. Max_Array_Size loop
-            -- Initialize this "array of arrays" so that element (i)(0)
-            -- is different for each value of i.
+            -- Initialize this "array of arrays" so that element (i)(0) is
+            -- different for each value of i.
             Array_Of_Arrays (I) (J) := Tc_Short;
             Tc_Short                := Tc_Short + 1;
          end loop;
@@ -219,8 +219,8 @@ begin
       end if;
 
       -- Check that both versions of the "+" function with Pointer and
-      -- ptrdiff_t parameters, that return a Pointer value, produce correct
-      -- results, based on the size of the array elements.
+      -- ptrdiff_t parameters, that return a Pointer value, produce
+      -- correct results, based on the size of the array elements.
 
       for I in Min_Array_Size + 1 .. Max_Array_Size loop
 
@@ -278,11 +278,11 @@ begin
       end loop;
 
       -- Check that the "-" function with Pointer and ptrdiff_t parameters,
-      -- that returns a Pointer result, produces correct results, based
-      -- on the size of the array elements.
+      -- that returns a Pointer result, produces correct results, based on
+      -- the size of the array elements.
 
-      -- Set the pointer to the last element in the char_array, which is a
-      -- nul char.
+      -- Set the pointer to the last element in the char_array, which is a nul
+      -- char.
       Char_Ptr := Ch_Array (Interfaces.C.Size_T (Alphabet'Length))'Access;
 
       if Char_Ptr.all /= Interfaces.C.Nul then
@@ -336,9 +336,9 @@ begin
          Tc_Count := Tc_Count - Interfaces.C.Size_T (Tc_Increment);
       end loop;
 
-      -- Check that the "-" function with two Pointer parameters, that
-      -- returns a ptrdiff_t type result, produces correct results,
-      -- based on the size of the array elements.
+      -- Check that the "-" function with two Pointer parameters, that returns
+      -- a ptrdiff_t type result, produces correct results, based on the size
+      -- of the array elements.
 
       Tc_Ptrdiff_T := 9;
       if Char_Pointers."-" (Left => End_Char_Ptr, Right => Start_Char_Ptr) /=
@@ -378,14 +378,14 @@ begin
            ("Incorrect result from pointer-pointer " & "subtraction - 4");
       end if;
 
-      -- Check that the Increment procedure produces correct results,
-      -- based upon the size of the array elements.
+      -- Check that the Increment procedure produces correct results, based
+      -- upon the size of the array elements.
 
       Short_Ptr := Short_Array (0)'Access;
 
       for I in Min_Array_Size + 1 .. Max_Array_Size loop
-         -- Increment the value of the Pointer; it should now point
-         -- to the next element in the array.
+         -- Increment the value of the Pointer; it should now point to the next
+         -- element in the array.
          Increment (Ref => Short_Ptr);
 
          if Short_Ptr.all /= Short_Array (I) then
@@ -403,8 +403,8 @@ begin
       Array_Ptr := Array_Of_Arrays (0)'Access;
 
       for I in Min_Array_Size + 1 .. Max_Array_Size loop
-         -- Increment the value of the Pointer; it should now point
-         -- to the next element in the array.
+         -- Increment the value of the Pointer; it should now point to the next
+         -- element in the array.
          Increment (Array_Ptr);
 
          if Array_Ptr.all /= Array_Of_Arrays (I) then
@@ -419,14 +419,14 @@ begin
          end if;
       end loop;
 
-      -- Check that the Decrement procedure produces correct results,
-      -- based upon the size of the array elements.
+      -- Check that the Decrement procedure produces correct results, based
+      -- upon the size of the array elements.
 
       Short_Ptr := Short_Array (Max_Array_Size)'Access;
 
       for I in reverse Min_Array_Size .. Max_Array_Size - 1 loop
-         -- Decrement the value of the Pointer; it should now point
-         -- to the previous element in the array.
+         -- Decrement the value of the Pointer; it should now point to the
+         -- previous element in the array.
          Decrement (Ref => Short_Ptr);
 
          if Short_Ptr.all /= Short_Array (I) then
@@ -444,8 +444,8 @@ begin
       Array_Ptr := Array_Of_Arrays (Max_Array_Size)'Access;
 
       for I in reverse Min_Array_Size .. Max_Array_Size - 1 loop
-         -- Decrement the value of the Pointer; it should now point
-         -- to the previous array element.
+         -- Decrement the value of the Pointer; it should now point to the
+         -- previous array element.
          Decrement (Array_Ptr);
 
          if Array_Ptr.all /= Array_Of_Arrays (I) then
@@ -460,8 +460,8 @@ begin
          end if;
       end loop;
 
-      -- Check that each of the "+" and "-" functions above will
-      -- propagate Pointer_Error if a Pointer parameter is null.
+      -- Check that each of the "+" and "-" functions above will propagate
+      -- Pointer_Error if a Pointer parameter is null.
 
       begin
          Short_Ptr := null;

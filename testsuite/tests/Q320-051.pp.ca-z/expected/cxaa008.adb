@@ -76,11 +76,10 @@ begin
    Test_For_Text_Io_Support : begin
 
       -- An implementation that does not support Text_IO in a particular
-      -- environment will raise Use_Error on calls to various
-      -- Text_IO operations.  This block statement encloses a call to
-      -- Create, which should raise the exception in a non-supportive
-      -- environment.  This exception will be handled to produce a
-      -- Not_Applicable result.
+      -- environment will raise Use_Error on calls to various Text_IO
+      -- operations. This block statement encloses a call to Create, which
+      -- should raise the exception in a non-supportive environment. This
+      -- exception will be handled to produce a Not_Applicable result.
 
       Text_Io.Create
         (File => Inventory_File,
@@ -136,7 +135,7 @@ begin
       end Tc_Mode_Selection;
 
       -- The following function simulates the addition of inventory item
-      -- information into a data file.  Boolean status of True is returned
+      -- information into a data file. Boolean status of True is returned
       -- if all of the data entry was successful, False otherwise.
 
       function Update_Inventory (The_List : Inventory_Type) return Boolean is
@@ -164,9 +163,9 @@ begin
       -- data file containing information on items that have been ordered
       -- and received.
 
-      -- Whenever items are received, the file is reset to Append_File
-      -- mode.  Data is taken from an inventory list and entered into the
-      -- file, in specific format.
+      -- Whenever items are received, the file is reset to Append_File mode.
+      -- Data is taken from an inventory list and entered into the file, in
+      -- specific format.
 
       Reset1 : begin                                                -- Reset to
          Text_Io.Reset
@@ -211,8 +210,8 @@ begin
             Text_Io.Skip_Line (Inventory_File);
             Tc_Item_Count := Tc_Item_Count + 1;
 
-            -- Verify all of the data fields read from the file.  Compare
-            -- with the values that were originally entered into the file.
+            -- Verify all of the data fields read from the file. Compare with
+            -- the values that were originally entered into the file.
 
             if (Tc_Item /= Daily_Inventory (Tc_Item_Count).Item_Number) then
                Report.Failed ("Error in Item_Number read from file");

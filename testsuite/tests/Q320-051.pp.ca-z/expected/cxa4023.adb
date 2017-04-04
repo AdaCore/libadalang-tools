@@ -124,9 +124,8 @@ begin
 
       -- Translate
 
-      -- Use a mapping ("abcd" -> "wxyz") to transform the contents of
-      -- the unbounded wide string.
-      -- Magic_String = "abracadabra"
+      -- Use a mapping ("abcd" -> "wxyz") to transform the contents of the
+      -- unbounded wide string. Magic_String = "abracadabra"
 
       Incantation := Asw.Translate (Magic_String, Code_Map);
 
@@ -199,8 +198,8 @@ begin
          Report.Failed ("Incorrect result from Procedure Translate - 5");
       end if;
 
-      -- Various degrees of mapping of source (full, partial, none) used
-      -- with Function Translate.
+      -- Various degrees of mapping of source (full, partial, none) used with
+      -- Function Translate.
 
       if Asw.Translate
           (Asw.To_Unbounded_Wide_String (Equiv ("abcdeabcabbbaaacaa")),
@@ -225,8 +224,8 @@ begin
          Report.Failed ("Incorrect result from Function Translate - 2");
       end if;
 
-      -- Procedure Translate using access-to-subprogram mapping.
-      -- Partial mapping of source.
+      -- Procedure Translate using access-to-subprogram mapping. Partial
+      -- mapping of source.
 
       Map_Ptr := Ab_To_Blank_Mapping_Function'Access;
 
@@ -333,8 +332,8 @@ begin
 
       begin
 
-         -- Examine the version of Trim that removes blanks from
-         -- the left and/or right of a wide string.
+         -- Examine the version of Trim that removes blanks from the left
+         -- and/or right of a wide string.
 
          for I in 1 .. 4 loop
             if Asw.Trim (Space_Array (I), Ada.Strings.Both) /= Pad then
@@ -344,8 +343,8 @@ begin
             end if;
          end loop;
 
-         -- Examine the version of Trim that removes set characters from
-         -- the left and right of a wide string.
+         -- Examine the version of Trim that removes set characters from the
+         -- left and right of a wide string.
 
          for I in 1 .. 5 loop
             if Asw.Trim
@@ -413,9 +412,9 @@ begin
       begin
 
          -- Use the following constructor forms to construct the wide string
-         -- "Dot_Dot_Dot_Dash_Dash_Dash_Dot_Dot_Dot".  Note that the
-         -- trailing underscore in the wide string is removed in the call to
-         -- Trim in the If statement condition.
+         -- "Dot_Dot_Dot_Dash_Dash_Dash_Dot_Dot_Dot". Note that the trailing
+         -- underscore in the wide string is removed in the call to Trim in
+         -- the If statement condition.
 
          Sos := Asw."*" (Repeat, Dot);                   -- "*"(#, W Unb Str)
 

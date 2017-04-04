@@ -78,8 +78,8 @@ begin
 
       use Ada.Text_Io;
 
-      -- Instantiate the Decimal_Output generic package for two
-      -- different decimal data types.
+      -- Instantiate the Decimal_Output generic package for two different
+      -- decimal data types.
       -- Uses decimal type with delta 0.01 and
       package Pack_2dp is          -- non-default generic actual parameters.
       new Editing.Decimal_Output
@@ -104,8 +104,8 @@ begin
    begin
 
       -- Examine cases where the out string parameter is shorter than
-      -- the length of the edited output result.  Use the instantiation of
-      -- Decimal_Output specific to data with two decimal places.
+      -- the length of the edited output result. Use the instantiation
+      -- of Decimal_Output specific to data with two decimal places.
 
       Tc_Start_Loop := 1;
       Tc_End_Loop   :=
@@ -121,17 +121,17 @@ begin
              (Pic_String      => Fxf3a00.Valid_Strings (I).all,
               Blank_When_Zero => False);
 
-         -- The out parameter string provided in the call to Put is
-         -- shorter than the edited output result of the procedure.
-         -- This will result in a Layout_Error being raised and handled.
-         -- Test failure results from no exception being raised, or from
-         -- the wrong exception being raised.
+         -- The out parameter string provided in the call to Put is shorter
+         -- than the edited output result of the procedure. This will result
+         -- in a Layout_Error being raised and handled. Test failure results
+         -- from no exception being raised, or from the wrong exception being
+         -- raised.
 
          begin
 
-            -- Use the instantiation of Decimal_Output specific to decimal
-            -- data with two decimal places, as well as non-default
-            -- parameters and named parameter association.
+            -- Use the instantiation of Decimal_Output specific to decimal data
+            -- with two decimal places, as well as non-default parameters and
+            -- named parameter association.
 
             Pack_2dp.Put
               (To         => Tc_Short_String,
@@ -160,8 +160,8 @@ begin
          end;
       end loop;
 
-      -- Perform similar evaluations as above, but use the instantiation
-      -- of Decimal_Output specific to decimal data with no decimal places.
+      -- Perform similar evaluations as above, but use the instantiation of
+      -- Decimal_Output specific to decimal data with no decimal places.
 
       Tc_Start_Loop := Tc_End_Loop + 1;                           -- 11
       Tc_End_Loop   := Tc_Start_Loop +                            -- 22
@@ -208,8 +208,8 @@ begin
 
       -- Check that Layout_Error is raised by Put resulting from an
       -- instantiation of Decimal_Output specific to foreign currency
-      -- representations.
-      -- Note: Both of the following evaluation sets use decimal data with
+      -- representations. Note: Both of the following evaluation sets
+      -- use decimal data with
       --       two decimal places.
 
       declare
@@ -259,10 +259,10 @@ begin
             end;
          end loop;
 
-         -- These evaluations use a version of Put resulting from a
-         -- non-default instantiation of Decimal_Output, but which has
-         -- specific foreign currency parameters provided in the call that
-         -- override the generic actual parameters provided at instantiation.
+         -- These evaluations use a version of Put resulting from a non-default
+         -- instantiation of Decimal_Output, but which has specific foreign
+         -- currency parameters provided in the call that override the generic
+         -- actual parameters provided at instantiation.
 
          Tc_Offset := Tc_Offset + Fxf3a00.Number_Of_Ff_Strings;      -- 14
 

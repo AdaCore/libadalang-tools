@@ -11,8 +11,8 @@ package body Ca11022_0.Ca11022_2 is
 
       ------------------------------------
 
-      -- Declare instance of the generic sibling package to draw a circle,
-      -- a square, or an ellipse customized for the VT100.
+      -- Declare instance of the generic sibling package to draw a circle, a
+      -- square, or an ellipse customized for the VT100.
       package Vt100_Graphic is new Ca11022_0.Ca11022_1 (Vt100_Putdot);
 
    begin

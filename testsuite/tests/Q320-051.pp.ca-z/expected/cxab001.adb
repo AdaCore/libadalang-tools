@@ -68,11 +68,10 @@ begin
    Test_For_Wide_Text_Io_Support : begin
 
       -- An implementation that does not support Wide_Text_IO in a particular
-      -- environment will raise Use_Error on calls to various
-      -- Wide_Text_IO operations.  This block statement encloses a call to
-      -- Create, which should raise an exception in a non-supportive
-      -- environment.  This exception will be handled to produce a
-      -- Not_Applicable result.
+      -- environment will raise Use_Error on calls to various Wide_Text_IO
+      -- operations. This block statement encloses a call to Create, which
+      -- should raise an exception in a non-supportive environment. This
+      -- exception will be handled to produce a Not_Applicable result.
 
       Ada.Wide_Text_Io.Create
         (File => Filter_File,                 -- Create.
@@ -101,9 +100,9 @@ begin
          Pos                 : Natural := 1;
          Bad_Character_Found : Boolean := False;
       begin
-         -- Use the Put procedure defined for Wide_Character data to
-         -- write all of the wide characters of the First_String into
-         -- the file individually, followed by a call to New_Line.
+         -- Use the Put procedure defined for Wide_Character data to write
+         -- all of the wide characters of the First_String into the file
+         -- individually, followed by a call to New_Line.
 
          while Pos <= First_String'Length loop
             Ada.Wide_Text_Io.Put (Filter_File, First_String (Pos));  -- Put.
@@ -137,13 +136,12 @@ begin
             Report.Failed ("Incorrect Wide_Character read from file - 1");
          end if;
 
-         -- Following user file/string processing, the Wide_String data
-         -- of the Second_String and Third_String Wide_String objects are
-         -- appended to the file.
-         -- The Put procedure defined for Wide_String data is used to
-         -- transfer the Second_String, followed by a call to New_Line.
-         -- The Put_Line procedure defined for Wide_String data is used
-         -- to transfer the Third_String.
+         -- Following user file/string processing, the Wide_String data of the
+         -- Second_String and Third_String Wide_String objects are appended to
+         -- the file. The Put procedure defined for Wide_String data is used
+         -- to transfer the Second_String, followed by a call to New_Line. The
+         -- Put_Line procedure defined for Wide_String data is used to transfer
+         -- the Third_String.
          Reset2 : begin
             Ada.Wide_Text_Io.Reset (Filter_File,                   -- Reset.
             Ada.Wide_Text_Io.Append_File);
@@ -189,9 +187,8 @@ begin
             Filter_Filename);
 
          -- Read the data of the First_String from the file, using the
-         -- Get procedure defined for Wide_Character data.
-         -- Verify that the character corresponds to the data originally
-         -- written to the file.
+         -- Get procedure defined for Wide_Character data. Verify that the
+         -- character corresponds to the data originally written to the file.
 
          while Pos <= First_String'Length loop
             Ada.Wide_Text_Io.Get (Filter_File, Current_Char);       -- Get.
@@ -204,8 +201,8 @@ begin
          -- The first line of the file has been read, move to the second.
          Ada.Wide_Text_Io.Skip_Line (Filter_File);             -- Skip_Line.
 
-         -- Read the Wide_String data from the second and third lines of
-         -- the file.
+         -- Read the Wide_String data from the second and third lines of the
+         -- file.
          Ada.Wide_Text_Io.Get (Filter_File, Tc_String2); -- Get.
          Ada.Wide_Text_Io.Skip_Line (Filter_File);             -- Skip_Line.
          Ada.Wide_Text_Io.Get_Line (Filter_File,              -- Get_Line.

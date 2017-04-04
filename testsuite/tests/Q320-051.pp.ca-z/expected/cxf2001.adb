@@ -58,26 +58,26 @@
 --      Note: Test cases are performed for both Radix 10 and Radix 2 types.
 --
 --
---  Divid  Divis    Delta     Delta       Delta       Delta       Delta
--- (Delta)(Delta)|  .1   |    .01    |   .001    |   .0001   |  .00001   |Test
+--  Divid Divis Delta Delta Delta Delta Delta
+-- (Delta)(Delta)| .1 | .01 | .001 | .0001 | .00001 |Test
 --               |---|---|-----|-----|-----|-----|-----|-----|-----|-----|Case
 --    quotient   | Q | R |  Q  |  R  |  Q  |  R  |  Q  |  R  |  Q  |  R  | No.
 -- ---------------------------------------------------------------------------
---  .05     .3   |.1             .02                                       1,21
--- (.01)   (.1)  |.1   0                                                   2,22
+--  .05 .3 |.1 .02 1,21
+-- (.01) (.1) |.1 0 2,22
 --               |         .16               .002                          3,23
 --   0.166666..  |         .16   .00                                       4,24
 --               |                     .166             .0002              5,25
 -- ---------------------------------------------------------------------------
---  .15     20   |         .00                          .1500              6,26
--- (.01)    (1)  |         .00               .150                          7,27
+--  .15 20 | .00 .1500 6,26
+-- (.01) (1) | .00 .150 7,27
 --               |         .00   .15                                       8,28
 --   0.0075      |               .01   .007                                9,29
 --               |                     .007  .010                         10,30
 --               |                                .0075 .0000             11,31
 -- ---------------------------------------------------------------------------
---  .03125   .5  |                                .0625 .0000             12,32
--- (.00001) (.1) |                     .062                        .00025 13,33
+--  .03125 .5 | .0625 .0000 12,32
+-- (.00001) (.1) | .062 .00025 13,33
 --               |                     .062             .0002             14,34
 --   0.0625      |                     .062  .000                         15,35
 --               |               .00   .062                               16,36
@@ -86,7 +86,7 @@
 --               |         .06               .001                         19,39
 --               |         .06   .00                                      20,40
 -- ---------------------------------------------------------------------------
--- Divide by Zero| Raise Constraint_Error                                 41
+-- Divide by Zero| Raise Constraint_Error 41
 -- ---------------------------------------------------------------------------
 --
 --
@@ -114,8 +114,8 @@ begin
       "is calculated exactly");
    Radix_10_Block : declare
 
-      -- Declare all types and variables used in the various blocks below
-      -- for all Radix 10 evaluations.
+      -- Declare all types and variables used in the various blocks below for
+      -- all Radix 10 evaluations.
 
       type Dt_1 is delta 1.0 digits 5;
       type Dt_0_1 is delta 0.1 digits 10;
@@ -525,8 +525,8 @@ begin
 
    Radix_2_Block : declare
 
-      -- Declare all types and variables used in the various blocks below
-      -- for all Radix 2 evaluations.
+      -- Declare all types and variables used in the various blocks below for
+      -- all Radix 2 evaluations.
 
       type Dt_1 is delta 1.0 digits 5;
       type Dt_0_1 is delta 0.1 digits 10;

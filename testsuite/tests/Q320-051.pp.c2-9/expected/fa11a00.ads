@@ -33,7 +33,7 @@
 --!
 
 package Fa11a00 is     -- Widget_Pkg
--- This package represents processing of widgets in a window system.  It
+-- This package represents processing of widgets in a window system. It
 -- contains a tagged type that can be extended by its children.
 
    type Widget_Length is range 1 .. 100;

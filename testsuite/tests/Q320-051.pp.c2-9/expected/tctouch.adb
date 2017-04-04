@@ -82,9 +82,8 @@ package body Tctouch is
       Expected_6 : String := "";
       Message    : String)
    is
-   -- OK if any of the expected strings is found.
-   -- If the null string is a legitimate result, it must be given
-   -- first.
+   -- OK if any of the expected strings is found. If the null string is a
+   -- legitimate result, it must be given first.
    begin
       if Collection (1 .. Finger) = Expected_1 then
          Finger := 0;

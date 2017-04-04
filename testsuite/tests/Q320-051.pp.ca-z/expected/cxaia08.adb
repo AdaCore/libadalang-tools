@@ -175,9 +175,9 @@ begin
 
    end;
 
-   -- Test Constant_Reference and Reference explicitly using
-   -- a generalized reference and implicitly via Constant_Indexing and
-   -- Variable_Indexing -- in a way that corresponds to likely usage.
+   -- Test Constant_Reference and Reference explicitly using a generalized
+   -- reference and implicitly via Constant_Indexing and Variable_Indexing
+   -- -- in a way that corresponds to likely usage.
 
    declare
       procedure Test
@@ -187,10 +187,9 @@ begin
       is
       begin
          Tampering_Check (Container => My_Vector_1, Where => Test_Case);
-         -- The tampering check here prevents the
-         -- Value parameter to this subprogram from
-         -- disappearing (if passed by-reference) while
-         -- it is still in use.
+         -- The tampering check here prevents the Value parameter to this
+         -- subprogram from disappearing (if passed by-reference) while it
+         -- is still in use.
 
          if Value /= Expected then
             Report.Failed ("Wrong value for " & Test_Case);
@@ -205,10 +204,9 @@ begin
          Pre => Value'Length = New_Item'Length is
       begin
          Tampering_Check (Container => My_Vector_1, Where => Test_Case);
-         -- The tampering check here prevents the
-         -- Value parameter to this subprogram from
-         -- disappearing (if passed by-reference) while
-         -- it is still in use.
+         -- The tampering check here prevents the Value parameter to this
+         -- subprogram from disappearing (if passed by-reference) while it
+         -- is still in use.
 
          if Value /= Expected then
             Report.Failed ("Wrong value for " & Test_Case);
@@ -611,9 +609,9 @@ begin
            (Container => My_Vector_1,
             Where     => "writing of loop");
 
-      -- Note that have to write something of the same length as the existing
-      -- element otherwise will fail length check, only Replace_Element can
-      -- change the length
+         -- Note that have to write something of the same length as
+         -- the existing element otherwise will fail length check,
+         -- only Replace_Element can change the length
 
          E := My_Default_Value;
 

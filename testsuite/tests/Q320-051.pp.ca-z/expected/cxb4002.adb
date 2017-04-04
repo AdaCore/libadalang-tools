@@ -133,10 +133,10 @@ begin
 
       -- Check that the procedure To_COBOL converts the character elements
       -- of the String parameter Item into COBOL_Character elements of the
-      -- Alphanumeric type parameter Target, using the Ada_to_COBOL mapping
-      -- as the basis of conversion.
-      -- Check that the parameter Last contains the index of the last element
-      -- of parameter Target that was assigned by To_COBOL.
+      -- Alphanumeric type parameter Target, using the Ada_to_COBOL mapping as
+      -- the basis of conversion. Check that the parameter Last contains the
+      -- index of the last element of parameter Target that was assigned by
+      -- To_COBOL.
 
       Cobol.To_Cobol
         (Item   => Tc_String_1,
@@ -195,9 +195,9 @@ begin
             "parameter Item is null array");
       end if;
 
-      -- Check that Constraint_Error is propagated by procedure To_COBOL
-      -- when the length of String parameter Item exceeds the length of
-      -- Alphanumeric parameter Target.
+      -- Check that Constraint_Error is propagated by procedure To_COBOL when
+      -- the length of String parameter Item exceeds the length of Alphanumeric
+      -- parameter Target.
 
       begin
 
@@ -217,12 +217,11 @@ begin
                "when Item'Length exceeds Target'Length");
       end;
 
-      -- Check that the procedure To_Ada converts the COBOL_Character
-      -- elements of the Alphanumeric parameter Item into Character elements
-      -- of the String parameter Target, using the COBOL_to_Ada mapping array
-      -- as the basis of conversion.
-      -- Check that the parameter Last contains the index of the last element
-      -- of parameter Target that was assigned by To_Ada.
+      -- Check that the procedure To_Ada converts the COBOL_Character elements
+      -- of the Alphanumeric parameter Item into Character elements of the
+      -- String parameter Target, using the COBOL_to_Ada mapping array as the
+      -- basis of conversion. Check that the parameter Last contains the index
+      -- of the last element of parameter Target that was assigned by To_Ada.
 
       Cobol.To_Ada
         (Item   => Tc_Alphanumeric_1,

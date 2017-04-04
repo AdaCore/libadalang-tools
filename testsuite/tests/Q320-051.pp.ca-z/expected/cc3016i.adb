@@ -59,9 +59,8 @@ begin
          D : Positive := 7;
       end record;
       package P5a is new Gp5a (T5a => Rec);
-      -- P5A.Y INITIALIZED WITH VALUE USING COMPONENT SELECTION
-      -- OPERATION FOR THE DISCRIMINANT, I.E. FOR PARENT TYPE
-      -- T5A WHICH DENOTES REC.
+      -- P5A.Y INITIALIZED WITH VALUE USING COMPONENT SELECTION OPERATION FOR
+      -- THE DISCRIMINANT, I.E. FOR PARENT TYPE T5A WHICH DENOTES REC.
 
       W1 : Positive := P5a.X.D;    -- VALUE IS 7
       W2 : Positive := P5a.X.A;    -- VALUE IS 5

@@ -60,19 +60,14 @@
 --
 -- References:
 --
--- Software Manual for the Elementary Functions
--- William J. Cody, Jr. and William Waite
--- Prentice-Hall, 1980
+-- Software Manual for the Elementary Functions William J. Cody, Jr. and
+-- William Waite Prentice-Hall, 1980
 --
--- CRC Standard Mathematical Tables
--- 23rd Edition
+-- CRC Standard Mathematical Tables 23rd Edition
 --
--- Implementation and Testing of Function Software
--- W. J. Cody
--- Problems and Methodologies in Mathematical Software Production
--- editors P. C. Messina and A. Murli
--- Lecture Notes in Computer Science   Volume 142
--- Springer Verlag, 1982
+-- Implementation and Testing of Function Software W. J. Cody Problems and
+-- Methodologies in Mathematical Software Production editors P. C. Messina and
+-- A. Murli Lecture Notes in Computer Science Volume 142 Springer Verlag, 1982
 --
 
 with System;
@@ -112,12 +107,11 @@ procedure Cxg2011 is
       -- flag used to terminate some tests early
       Accuracy_Error_Reported : Boolean := False;
 
-      -- The following value is a lower bound on the accuracy
-      -- required.  It is normally 0.0 so that the lower bound
-      -- is computed from Model_Epsilon.  However, for tests
-      -- where the expected result is only known to a certain
-      -- amount of precision this bound takes on a non-zero
-      -- value to account for that level of precision.
+      -- The following value is a lower bound on the accuracy required. It is
+      -- normally 0.0 so that the lower bound is computed from Model_Epsilon.
+      -- However, for tests where the expected result is only known to a
+      -- certain amount of precision this bound takes on a non-zero value
+      -- to account for that level of precision.
       Error_Low_Bound : Real := 0.0;
 
       procedure Check
@@ -129,9 +123,9 @@ procedure Cxg2011 is
          Rel_Error : Real;
          Abs_Error : Real;
       begin
-         -- In the case where the expected result is very small or 0
-         -- we compute the maximum error as a multiple of Model_Epsilon
-         -- instead of Model_Epsilon and Expected.
+         -- In the case where the expected result is very small or 0 we
+         -- compute the maximum error as a multiple of Model_Epsilon instead
+         -- of Model_Epsilon and Expected.
          Rel_Error := Mre * abs Expected * Real'Model_Epsilon;
          Abs_Error := Mre * Real'Model_Epsilon;
          if Rel_Error > Abs_Error then
@@ -228,9 +222,9 @@ procedure Cxg2011 is
 
       procedure Taylor_Series_Test is
          -- Use a 4 term taylor series expansion to check a selection of
-         -- arguments very near 1.0.
-         -- The range is chosen so that the 4 term taylor series will
-         -- provide accuracy to machine precision.   Cody pg 49-50.
+         -- arguments very near 1.0. The range is chosen so that the 4 term
+         -- taylor series will provide accuracy to machine precision. Cody
+         -- pg 49-50.
          Half_Range : constant Real := Real'Model_Epsilon * 50.0;
          A          : constant Real := 1.0 - Half_Range;
          B          : constant Real := 1.0 + Half_Range;
@@ -245,8 +239,8 @@ procedure Cxg2011 is
             X := (B - A) * Real (I) / Real (Max_Samples) + A;
 
             Xm1 := X - 1.0;
-            -- The following is the first 4 terms of the taylor series
-            -- that has been rearranged to minimize error in the calculation
+            -- The following is the first 4 terms of the taylor series that has
+            -- been rearranged to minimize error in the calculation
             Expected :=
               (Xm1 * (1.0 / 3.0 - Xm1 / 4.0) - 0.5) * Xm1 * Xm1 + Xm1;
 
@@ -274,11 +268,10 @@ procedure Cxg2011 is
       end Taylor_Series_Test;
 
       procedure Log_Difference_Identity is
-         -- Check using the identity ln(x) = ln(17x/16) - ln(17/16)
-         -- over the range A to B.
-         -- The selected range assures that both X and 17x/16 will
-         -- have the same exponents and neither argument gets too close
-         -- to 1.    Cody pg 50.
+         -- Check using the identity ln(x) = ln(17x/16) - ln(17/16) over the
+         -- range A to B. The selected range assures that both X and 17x/16
+         -- will have the same exponents and neither argument gets too close
+         -- to 1. Cody pg 50.
          A        : constant Real := 1.0 / Sqrt (2.0);
          B        : constant Real := 15.0 / 16.0;
          X        : Real;
@@ -319,10 +312,9 @@ procedure Cxg2011 is
       end Log_Difference_Identity;
 
       procedure Log_Product_Identity is
-         -- Check using the identity ln(x**2) = 2ln(x)
-         -- over the range A to B.
-         -- This large range is chosen to minimize the possibility of
-         -- undetected systematic errors.   Cody pg 53.
+         -- Check using the identity ln(x**2) = 2ln(x) over the range A to
+         -- B. This large range is chosen to minimize the possibility of
+         -- undetected systematic errors. Cody pg 53.
          A        : constant Real := 16.0;
          B        : constant Real := 240.0;
          X        : Real;
@@ -362,8 +354,8 @@ procedure Cxg2011 is
       end Log_Product_Identity;
 
       procedure Log10_Test is
-         -- Check using the identity log(x) = log(11x/10) - log(1.1)
-         -- over the range A to B.  See Cody pg 52.
+         -- Check using the identity log(x) = log(11x/10) - log(1.1) over the
+         -- range A to B. See Cody pg 52.
          A        : constant Real := 1.0 / Sqrt (10.0);
          B        : constant Real := 0.9;
          X        : Real;
@@ -395,8 +387,8 @@ procedure Cxg2011 is
                ")",
                4.0);
 
-            -- only report the first error in this test in order to keep
-            -- lots of failures from producing a huge error log
+            -- only report the first error in this test in order to keep lots
+            -- of failures from producing a huge error log
             exit when Accuracy_Error_Reported;
          end loop;
          Error_Low_Bound := 0.0;   -- reset
@@ -415,8 +407,8 @@ procedure Cxg2011 is
             X1 := Log (0.0);
             Report.Failed ("exception not raised for LOG(0)");
          exception
-            -- Log (0.0) must raise Constraint_Error, not Argument_Error,
-            -- as per A.5.1(28,29).  Was incorrect in ACVC 2.1 release.
+            -- Log (0.0) must raise Constraint_Error, not Argument_Error, as
+            -- per A.5.1(28,29). Was incorrect in ACVC 2.1 release.
             when Ada.Numerics.Argument_Error =>
                Report.Failed
                  ("Argument_Error raised instead of" &

@@ -77,8 +77,7 @@ procedure Cxg2003 is
       function Log (X : Real) return Real renames Elementary_Functions.Log;
       function Exp (X : Real) return Real renames Elementary_Functions.Exp;
 
-      -- The default Maximum Relative Error is the value specified
-      -- in the LRM.
+      -- The default Maximum Relative Error is the value specified in the LRM.
       Default_Mre : constant Real := 2.0;
 
       procedure Check
@@ -90,8 +89,8 @@ procedure Cxg2003 is
          Abs_Error : Real;
          Max_Error : Real;
       begin
-         -- In the case where the expected result is very small or 0
-         -- we compute the maximum error as a multiple of Model_Epsilon instead
+         -- In the case where the expected result is very small or 0 we
+         -- compute the maximum error as a multiple of Model_Epsilon instead
          -- of Model_Epsilon and Expected.
          Rel_Error := Mre * abs Expected * Real'Model_Epsilon;
          Abs_Error := Mre * Real'Model_Epsilon;
@@ -122,8 +121,8 @@ procedure Cxg2003 is
       end Check;
 
       procedure Argument_Range_Check (A, B : Real; Test : String) is
-         -- test a logarithmically distributed selection of
-         -- arguments selected from the range A to B.
+         -- test a logarithmically distributed selection of arguments selected
+         -- from the range A to B.
          X           : Real;
          Expected    : Real;
          Y           : Real;
@@ -136,8 +135,8 @@ procedure Cxg2003 is
             X        := Expected * Expected;
             Y        := Sqrt (X);
 
-            -- note that since the expected value is computed, we
-            -- must take the error in that computation into account.
+            -- note that since the expected value is computed, we must take the
+            -- error in that computation into account.
             Check
               (Y,
                Expected,
@@ -234,9 +233,8 @@ procedure Cxg2003 is
             Y : Real;
          begin
             Y := Sqrt (X);
-            -- the following code should not be executed.
-            -- The call to Check is to keep the call to Sqrt from
-            -- appearing to be dead code.
+            -- the following code should not be executed. The call to Check is
+            -- to keep the call to Sqrt from appearing to be dead code.
             Check (Y, -1.0, "test 5 -- sqrt(-1)");
             Report.Failed ("test 5 - argument_error expected");
          exception
@@ -292,8 +290,7 @@ procedure Cxg2003 is
       function Log (X : Real) return Real renames Elementary_Functions.Log;
       function Exp (X : Real) return Real renames Elementary_Functions.Exp;
 
-      -- The default Maximum Relative Error is the value specified
-      -- in the LRM.
+      -- The default Maximum Relative Error is the value specified in the LRM.
       Default_Mre : constant Real := 2.0;
 
       procedure Check
@@ -305,8 +302,8 @@ procedure Cxg2003 is
          Abs_Error : Real;
          Max_Error : Real;
       begin
-         -- In the case where the expected result is very small or 0
-         -- we compute the maximum error as a multiple of Model_Epsilon instead
+         -- In the case where the expected result is very small or 0 we
+         -- compute the maximum error as a multiple of Model_Epsilon instead
          -- of Model_Epsilon and Expected.
          Rel_Error := Mre * abs Expected * Real'Model_Epsilon;
          Abs_Error := Mre * Real'Model_Epsilon;
@@ -337,8 +334,8 @@ procedure Cxg2003 is
       end Check;
 
       procedure Argument_Range_Check (A, B : Real; Test : String) is
-         -- test a logarithmically distributed selection of
-         -- arguments selected from the range A to B.
+         -- test a logarithmically distributed selection of arguments selected
+         -- from the range A to B.
          X           : Real;
          Expected    : Real;
          Y           : Real;
@@ -351,8 +348,8 @@ procedure Cxg2003 is
             X        := Expected * Expected;
             Y        := Sqrt (X);
 
-            -- note that since the expected value is computed, we
-            -- must take the error in that computation into account.
+            -- note that since the expected value is computed, we must take the
+            -- error in that computation into account.
             Check
               (Y,
                Expected,
@@ -449,9 +446,8 @@ procedure Cxg2003 is
             Y : Real;
          begin
             Y := Sqrt (X);
-            -- the following code should not be executed.
-            -- The call to Check is to keep the call to Sqrt from
-            -- appearing to be dead code.
+            -- the following code should not be executed. The call to Check is
+            -- to keep the call to Sqrt from appearing to be dead code.
             Check (Y, -1.0, "test 5 -- sqrt(-1)");
             Report.Failed ("test 5 - argument_error expected");
          exception
@@ -500,8 +496,7 @@ procedure Cxg2003 is
       package Ef renames Ada.Numerics.Elementary_Functions;
       subtype Real is Float;
 
-      -- The default Maximum Relative Error is the value specified
-      -- in the LRM.
+      -- The default Maximum Relative Error is the value specified in the LRM.
       Default_Mre : constant Real := 2.0;
 
       procedure Check
@@ -513,8 +508,8 @@ procedure Cxg2003 is
          Abs_Error : Real;
          Max_Error : Real;
       begin
-         -- In the case where the expected result is very small or 0
-         -- we compute the maximum error as a multiple of Model_Epsilon instead
+         -- In the case where the expected result is very small or 0 we
+         -- compute the maximum error as a multiple of Model_Epsilon instead
          -- of Model_Epsilon and Expected.
          Rel_Error := Mre * abs Expected * Real'Model_Epsilon;
          Abs_Error := Mre * Real'Model_Epsilon;
@@ -545,8 +540,8 @@ procedure Cxg2003 is
       end Check;
 
       procedure Argument_Range_Check (A, B : Float; Test : String) is
-         -- test a logarithmically distributed selection of
-         -- arguments selected from the range A to B.
+         -- test a logarithmically distributed selection of arguments selected
+         -- from the range A to B.
          X           : Float;
          Expected    : Float;
          Y           : Float;
@@ -559,8 +554,8 @@ procedure Cxg2003 is
             X        := Expected * Expected;
             Y        := Ef.Sqrt (X);
 
-            -- note that since the expected value is computed, we
-            -- must take the error in that computation into account.
+            -- note that since the expected value is computed, we must take the
+            -- error in that computation into account.
             Check
               (Y,
                Expected,
@@ -657,9 +652,8 @@ procedure Cxg2003 is
             Y : Float;
          begin
             Y := Ef.Sqrt (X);
-            -- the following code should not be executed.
-            -- The call to Check is to keep the call to Sqrt from
-            -- appearing to be dead code.
+            -- the following code should not be executed. The call to Check is
+            -- to keep the call to Sqrt from appearing to be dead code.
             Check (Y, -1.0, "test 5 -- sqrt(-1)");
             Report.Failed ("test 5 - argument_error expected");
          exception

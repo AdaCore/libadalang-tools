@@ -6,8 +6,7 @@ with Report;
 
 procedure Ca11020 is
 
-   -- Instantiate the bag application for integer type and attribute
-   -- Image.
+   -- Instantiate the bag application for integer type and attribute Image.
 
    package Bag_Of_Integers is new Ca11020_0 (Integer, Integer'Image);
 

@@ -29,9 +29,8 @@ begin
          Int_2,
          Complex_No);
 
-      -- Read back in Polar coordinates.
-      -- Polar values are surrogates used in checking for correct
-      -- subprogram calls.
+      -- Read back in Polar coordinates. Polar values are surrogates used in
+      -- checking for correct subprogram calls.
       if Ca11001_0."/="
           (Ca11001_0.Ca11001_1.Polar_Real_Part (Complex_No),
            Ca11001_0.Cartesian_Real_Part (Complex_5x2)) and

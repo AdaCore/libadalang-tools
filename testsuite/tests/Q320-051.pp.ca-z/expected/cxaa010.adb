@@ -96,7 +96,7 @@ begin
       -- of external files in a particular environment will raise Use_Error
       -- or Name_Error on a call to Text_IO Create. This block statement
       -- encloses a call to Create, which should produce an exception in a
-      -- non-supportive environment.  Either of these exceptions will be
+      -- non-supportive environment. Either of these exceptions will be
       -- handled to produce a Not_Applicable result.
 
       Ada.Text_Io.Create (Tax_Roll, Ada.Text_Io.Out_File, Tax_Roll_Name);
@@ -153,8 +153,8 @@ begin
             Ada.Text_Io.Put (Tax_Roll, Neighborhood (Parcel).Parcel_Id);
             Ada.Text_Io.Put (Tax_Roll, Spacer);
 
-            -- Use Decimal_IO.Put with non-default format parameters to
-            -- place decimal data into file.
+            -- Use Decimal_IO.Put with non-default format parameters to place
+            -- decimal data into file.
             Price_Io.Put
               (Tax_Roll,
                Neighborhood (Parcel).Purchase_Price,
@@ -193,38 +193,34 @@ begin
          begin
 
             -- Extract information from the Text_IO file; one string, two
-            -- decimal values.
-            -- Note that the Spacers that were put in the file above are
-            -- not individually read here, due to the fact that each call
-            -- to Decimal_IO.Get below uses a zero in the Width field,
+            -- decimal values. Note that the Spacers that were put in the file
+            -- above are not individually read here, due to the fact that each
+            -- call to Decimal_IO.Get below uses a zero in the Width field,
             -- which allows each Get procedure to skip these leading blanks
             -- prior to extracting the numeric value.
 
             Ada.Text_Io.Get (Tax_Roll, Id);
 
-            -- A zero value of Width is provided, so the following
-            -- two calls to Decimal_IO.Get will skip the leading blanks,
-            -- (from the Spacer variable above), then read the numeric
-            -- literals.
+            -- A zero value of Width is provided, so the following two calls
+            -- to Decimal_IO.Get will skip the leading blanks, (from the Spacer
+            -- variable above), then read the numeric literals.
 
             Price_Io.Get (Tax_Roll, Price, 0);
             Value_Io.Get (Tax_Roll, Value, 0);
             Ada.Text_Io.Skip_Line (Tax_Roll);
 
-            -- Convert the values read from the file into string format,
-            -- using user-specified format parameters.
-            -- Format of the Price_String should be "nnn.n"
-            -- Format of the Value_String should be "nnn.nn"
+            -- Convert the values read from the file into string format, using
+            -- user-specified format parameters. Format of the Price_String
+            -- should be "nnn.n" Format of the Value_String should be "nnn.nn"
 
             Price_Io.Put (To => Price_String, Item => Price, Aft => 1);
             Value_Io.Put (Value_String, Value, 2);
 
             -- Construct a string of length 20 that contains the Parcel_ID,
             -- the Purchase_Price, and the Assessed_Value, separated by
-            -- two-character blank data spacers.  Store this string
-            -- into the string array out parameter.
-            -- Format of each Tax_Array element should be
-            -- "Xnnnn  nnn.n  nnn.nn" (with an 'n' signifying a digit).
+            -- two-character blank data spacers. Store this string into the
+            -- string array out parameter. Format of each Tax_Array element
+            -- should be "Xnnnn nnn.n nnn.nn" (with an 'n' signifying a digit).
 
             Tax_Array (Index) :=
               Id & Spacer & Price_String & Spacer & Value_String;
@@ -241,9 +237,9 @@ begin
 
          Ada.Text_Io.Open (Tax_Roll, Ada.Text_Io.In_File, Tax_Roll_Name);
 
-         -- Determine property tax bills for the entire neighborhood from
-         -- the information that is stored in the file. Store information
-         -- in the Neighborhood_Taxes string array.
+         -- Determine property tax bills for the entire neighborhood from the
+         -- information that is stored in the file. Store information in the
+         -- Neighborhood_Taxes string array.
 
          for Parcel in City_Block_Type'Range loop
             Collect_Tax (Parcel, Neighborhood_Taxes);
@@ -265,13 +261,13 @@ begin
       begin
 
          for Parcel in City_Block_Type'Range loop
-            -- Extract values from the strings of the string array.
-            -- Each element of the string array is 20 characters long; the
-            -- first five characters are the Parcel_ID, two blank characters
-            -- separate data, the next five characters contain the Price
-            -- decimal value, two blank characters separate data, the last
-            -- six characters contain the Value decimal value.
-            -- Extract each of these components in turn.
+            -- Extract values from the strings of the string array. Each
+            -- element of the string array is 20 characters long; the first
+            -- five characters are the Parcel_ID, two blank characters separate
+            -- data, the next five characters contain the Price decimal value,
+            -- two blank characters separate data, the last six characters
+            -- contain the Value decimal value. Extract each of these
+            -- components in turn.
 
             Front := 1;                                        --  1
             Rear  := Id_Length;                                --  5
@@ -285,8 +281,8 @@ begin
                Item => Tc_Price,
                Last => Length);
 
-            -- Extract next decimal value from slice of string, based on
-            -- length of preceding strings read from string array element.
+            -- Extract next decimal value from slice of string, based on length
+            -- of preceding strings read from string array element.
             Front := Rear + 3;                                 -- 15
             Rear  := Total_String_Length;                      -- 20
             Value_Io.Get

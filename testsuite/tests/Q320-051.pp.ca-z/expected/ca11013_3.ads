@@ -1,8 +1,8 @@
 --==================================================================--
 
--- Declare instances of the generic complex packages for real type.
--- The instance of the child must itself be declared as a child of the
--- instance of the parent.
+-- Declare instances of the generic complex packages for real type. The
+-- instance of the child must itself be declared as a child of the instance
+-- of the parent.
 
 with Ca11013_0;                       -- Complex number.
 with Ca11013_2;                       -- Random number generator.

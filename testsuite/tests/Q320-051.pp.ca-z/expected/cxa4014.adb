@@ -117,15 +117,14 @@ begin
          Db_Record.Name :=
            As.Wide_Fixed.Head (Info_String (1 .. Stop), Db_Record.Name'Length);
 
-         -- Replace any underscore characters in the name field
-         -- that were used to separate first/middle/last names.
-         -- Use the overloaded version of Translate that takes an
-         -- access-to-subprogram value.
+         -- Replace any underscore characters in the name field that were used
+         -- to separate first/middle/last names. Use the overloaded version of
+         -- Translate that takes an access-to-subprogram value.
 
          As.Wide_Fixed.Translate (Db_Record.Name, Blank_Ftn_Ptr);
 
-         -- Continue the extraction process; now find the position of
-         -- the street number in the string.
+         -- Continue the extraction process; now find the position of the
+         -- street number in the string.
 
          Start := Stop + 1;
 
@@ -136,18 +135,17 @@ begin
             Start,
             Stop);
 
-         -- Store the street number field in the appropriate data base
-         -- element.
-         -- No modification of the default parameters of procedure Move
-         -- is required.
+         -- Store the street number field in the appropriate data base element.
+         -- No modification of the default parameters of procedure Move is
+         -- required.
 
          As.Wide_Fixed.Move
            (Source => Info_String (Start .. Stop),
             Target => Db_Record.Street_Number);
 
-         -- Continue the extraction process; find the street name in the
-         -- info string.  Skip blanks to the start of the street name, then
-         -- search for the index of the next blank character in the string.
+         -- Continue the extraction process; find the street name in the info
+         -- string. Skip blanks to the start of the street name, then search
+         -- for the index of the next blank character in the string.
 
          Start :=
            As.Wide_Fixed.Index_Non_Blank
@@ -167,8 +165,8 @@ begin
             Info_String (Start .. Stop));
 
          -- Replace any underscore characters in the street name field
-         -- that were used as word separation with blanks.  Again, use the
-         -- access-to-subprogram value to provide the mapping.
+         -- that were used as word separation with blanks. Again, use
+         -- the access-to-subprogram value to provide the mapping.
 
          Db_Record.Street_Name :=
            As.Wide_Fixed.Translate (Db_Record.Street_Name, Blank_Ftn_Ptr);
@@ -193,13 +191,13 @@ begin
             Db_Record.City'Length,
             Info_String (Start .. Stop));
 
-         -- Replace any underscore characters in the city name field
-         -- that were used as word separation.
+         -- Replace any underscore characters in the city name field that were
+         -- used as word separation.
 
          As.Wide_Fixed.Translate (Db_Record.City, Blank_Ftn_Ptr);
 
-         -- Continue the extraction; remove the state identifier from the
-         -- info string.
+         -- Continue the extraction; remove the state identifier from the info
+         -- string.
 
          Start := Stop + 1;
 
@@ -221,9 +219,9 @@ begin
             Justify => Ada.Strings.Left,
             Pad     => As.Wide_Space);
 
-         -- Continue the extraction process; remove the final data item in
-         -- the info string, the zip code, and place it into the
-         -- corresponding data base element.
+         -- Continue the extraction process; remove the final data item in the
+         -- info string, the zip code, and place it into the corresponding data
+         -- base element.
 
          Db_Record.Zip_Code :=
            As.Wide_Fixed.Tail (Info_String, Db_Record.Zip_Code'Length);

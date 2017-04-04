@@ -25,15 +25,14 @@
 -- CHECK THAT ALL PREDEFINED EXCEPTIONS MAY BE RAISED EXPLICITLY
 --    AND MAY HAVE HANDLERS WRITTEN FOR THEM.
 
--- *** NOTE: This test has been modified since ACVC version 1.11 to    -- 9X
--- ***       remove incompatibilities associated with the transition   -- 9X
--- ***       to Ada 9X.                                                -- 9X
--- ***                                                                 -- 9X
+-- *** NOTE: This test has been modified since ACVC version 1.11 to -- 9X ***
+-- remove incompatibilities associated with the transition -- 9X *** to Ada 9X.
+-- -- 9X *** -- 9X
 
 -- DCB 03/25/80
 -- JRK 11/17/80
 -- SPS 11/2/82
--- MRM 03/30/93   REMOVED NUMERIC_ERROR FOR 9X COMPATIBILITY
+-- MRM 03/30/93 REMOVED NUMERIC_ERROR FOR 9X COMPATIBILITY
 
 with Report;
 procedure Cb1001a is

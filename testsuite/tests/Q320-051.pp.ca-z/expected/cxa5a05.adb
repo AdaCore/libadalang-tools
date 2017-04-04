@@ -97,8 +97,8 @@ begin
       -- Testing of Function Arcsin, both instantiated and pre-instantiated
       -- versions.
 
-      -- Check that Argument_Error is raised by the Arcsin function when
-      -- the absolute value of the parameter X is greater than 1.0.
+      -- Check that Argument_Error is raised by the Arcsin function when the
+      -- absolute value of the parameter X is greater than 1.0.
 
       begin
          New_Float_Result := Gef.Arcsin (New_Float (Fxa5a00.One_Plus_Delta));

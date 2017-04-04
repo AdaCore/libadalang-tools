@@ -22,8 +22,7 @@ begin
    Off_Screen_Block : begin
       Sonar_Contact := 1_500;
       Trident.Contact (Sonar_Contact);  -- Cause Off_Screen_Data exception
-      -- to be raised and handled in a task
-      -- accept body.
+      -- to be raised and handled in a task accept body.
    exception
       when Submarine_Tracking.Off_Screen_Data =>
          Tc_Main_Handler_Used := True;
@@ -38,10 +37,8 @@ begin
    Location_Error_Block : begin
       Sonar_Contact := 700;
       Trident.Contact (Sonar_Contact);  -- Cause Location_Error exception
-      -- to be raised in task accept body,
-      -- propogated to a task block, and
-      -- handled there.  Corresponding
-      -- exception propagated here also.
+      -- to be raised in task accept body, propogated to a task block, and
+      -- handled there. Corresponding exception propagated here also.
       Report.Failed ("Expected exception not raised");
    exception
       when Submarine_Tracking.Location_Error =>
@@ -54,8 +51,7 @@ begin
    Incorrect_Data_Block : begin
       Sonar_Contact := 200;
       Trident.Contact (Sonar_Contact);  -- Cause Incorrect_Data exception
-      -- to be raised in task accept body,
-      -- propogated to calling procedure.
+      -- to be raised in task accept body, propogated to calling procedure.
       Report.Failed ("Expected exception not raised");
    exception
       when Submarine_Tracking.Incorrect_Data =>

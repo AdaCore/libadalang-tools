@@ -120,11 +120,10 @@ begin
 
    begin
 
-      -- Check that the function To_COBOL will convert a String
-      -- parameter value into a type Alphanumeric array of
-      -- COBOL_Characters, with lower bound of one, and length
-      -- equal to length of the String parameter, based on the
-      -- mapping Ada_to_COBOL.
+      -- Check that the function To_COBOL will convert a String parameter value
+      -- into a type Alphanumeric array of COBOL_Characters, with lower bound
+      -- of one, and length equal to length of the String parameter, based on
+      -- the mapping Ada_to_COBOL.
 
       Unb_String        := Unb.To_Unbounded_String ("A");
       Tc_Alphanumeric_1 := Cobol.To_Cobol (Unb.To_String (Unb_String));
@@ -170,11 +169,10 @@ begin
          Report.Failed ("Incorrect result from function To_COBOL - 4");
       end if;
 
-      -- Check that the function To_Ada will convert a type
-      -- Alphanumeric parameter value into a String type result,
-      -- with lower bound of one, and length equal to the length
-      -- of the Alphanumeric parameter, based on the mapping
-      -- COBOL_to_Ada.
+      -- Check that the function To_Ada will convert a type Alphanumeric
+      -- parameter value into a String type result, with lower bound of one,
+      -- and length equal to the length of the Alphanumeric parameter, based
+      -- on the mapping COBOL_to_Ada.
 
       Tc_Unb_String :=
         Unb.To_Unbounded_String (Cobol.To_Ada (Tc_Alphanumeric_1));
@@ -231,9 +229,9 @@ begin
             "functions To_Ada and To_COBOL in combination");
       end if;
 
-      -- Check that the Ada_to_COBOL and COBOL_to_Ada mapping
-      -- arrays provide a mapping capability between Ada's type
-      -- Character and COBOL run-time character sets.
+      -- Check that the Ada_to_COBOL and COBOL_to_Ada mapping arrays provide
+      -- a mapping capability between Ada's type Character and COBOL run-time
+      -- character sets.
 
       Interfaces.Cobol.Ada_To_Cobol ('a') := 'A';
       Interfaces.Cobol.Ada_To_Cobol ('b') := 'B';
@@ -289,8 +287,8 @@ begin
       Interfaces.Cobol.Ada_To_Cobol ('f') := 'f';
       Interfaces.Cobol.Ada_To_Cobol (' ') := ' ';
 
-      -- Modify the COBOL_To_Ada mapping array to check its effect on
-      -- the function To_Ada.
+      -- Modify the COBOL_To_Ada mapping array to check its effect on the
+      -- function To_Ada.
 
       Interfaces.Cobol.Cobol_To_Ada (' ') := '*';
       Interfaces.Cobol.Cobol_To_Ada ('$') := 'F';

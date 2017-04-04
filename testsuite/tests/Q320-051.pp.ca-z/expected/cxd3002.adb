@@ -82,16 +82,16 @@ procedure Cxd3002 is
 
    type Task_Number is range 1 .. 3;    -- three tasks
 
-   -- This is an array of flags showing which tasks have successfully
-   -- called the protected procedure
+   -- This is an array of flags showing which tasks have successfully called
+   -- the protected procedure
    --
    Check_Called : array (1 .. Task_Number'Last) of Boolean :=
      (others => False);
 
    protected Protected_Object is
 
-      -- This protected object has no Pragma Priority
-      -- thus its priority ceiling should be System.Priority'Last
+      -- This protected object has no Pragma Priority thus its priority ceiling
+      -- should be System.Priority'Last
 
       procedure For_Ceiling_Check (Numb : Task_Number);
       function Verify_Calls return Boolean;
@@ -103,11 +103,11 @@ procedure Cxd3002 is
       procedure For_Ceiling_Check (Numb : Task_Number) is
 
       begin
-         -- In order to verify the check of Ceiling_Priority
-         -- we must ensure that this procedure actually gets called.
-         -- If calls to this procedure were optimized out then this
-         -- part of the test would become a no-op.  The Check_Called
-         -- array is checked at the end preventing optimization.
+         -- In order to verify the check of Ceiling_Priority we must ensure
+         -- that this procedure actually gets called. If calls to this
+         -- procedure were optimized out then this part of the test would
+         -- become a no-op. The Check_Called array is checked at the end
+         -- preventing optimization.
          --
          Check_Called (Numb) := True;
 
@@ -115,8 +115,8 @@ procedure Cxd3002 is
 
       function Verify_Calls return Boolean is
       begin
-         -- The first two tasks should have registered but the last one
-         -- will not have as Program_Error was raised by the call
+         -- The first two tasks should have registered but the last one will
+         -- not have as Program_Error was raised by the call
          --
          if Check_Called (1) and Check_Called (2) and not Check_Called (3) then
             return True;
@@ -146,8 +146,8 @@ begin
          pragma Interrupt_Priority (Priority_Int);
       end Task_Of_Int_Priority;
 
-      -- This task calls a protected object whose ceiling is higher
-      -- than the task
+      -- This task calls a protected object whose ceiling is higher than the
+      -- task
       --
       task body Task_Of_1q_Priority is
 
@@ -160,8 +160,8 @@ begin
             Report.Failed ("Unexpected Exception in Task_of_1Q_Priority");
       end Task_Of_1q_Priority;
 
-      -- This task calls a protected object whose declared ceiling is
-      -- the same as the task's declared priority (no defaults)
+      -- This task calls a protected object whose declared ceiling is the same
+      -- as the task's declared priority (no defaults)
       --
       task body Task_Of_Top_Priority is
 
@@ -174,9 +174,9 @@ begin
             Report.Failed ("Unexpected Exception in Task_of_Top_Priority");
       end Task_Of_Top_Priority;
 
-      -- This task calls a protected procedure whose declared ceiling is
-      -- lower than the task's declared priority (no defaults). The
-      -- ceiling check should raise Program_Error.
+      -- This task calls a protected procedure whose declared ceiling is lower
+      -- than the task's declared priority (no defaults). The ceiling check
+      -- should raise Program_Error.
       --
       task body Task_Of_Int_Priority is
          Numb : Task_Number := 3;
@@ -202,9 +202,9 @@ begin
       Report.Failed ("Unexpected Exception in Task_of_Int_Priority");
    end if;
 
-   -- Now check that the calls were actually made and not optimized away
-   -- Note: only two calls are actually made, the third results in an
-   -- exception being raised
+   -- Now check that the calls were actually made and not optimized away Note:
+   -- only two calls are actually made, the third results in an exception being
+   -- raised
    --
    if not Protected_Object.Verify_Calls then
       Report.Failed ("For_Ceiling_Check not called correctly");

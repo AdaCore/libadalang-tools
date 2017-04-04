@@ -140,8 +140,8 @@ begin
                Report.Failed ("Is_ISO_646 returns a false negative result");
             end if;
          end if;
-         -- Cross-check Is_ISO_646 with To_ISO_646.  '*' will be returned
-         -- if Char is not in the ISO_646 set.
+         -- Cross-check Is_ISO_646 with To_ISO_646. '*' will be returned if
+         -- Char is not in the ISO_646 set.
          Char := Ada.Characters.Handling.To_Iso_646 (Char, Star);
       exception
          when others =>
@@ -155,10 +155,10 @@ begin
            Ada.Characters.Latin_1.Asterisk;
       begin
          -- Checking that the string contains non-ISO_646 characters at this
-         -- point is not strictly necessary, since the function To_ISO_646
-         -- will perform that check as part of its processing, and would
-         -- return the original string if no modification were necessary.
-         -- However, this format allows for the testing of both functions.
+         -- point is not strictly necessary, since the function To_ISO_646 will
+         -- perform that check as part of its processing, and would return the
+         -- original string if no modification were necessary. However, this
+         -- format allows for the testing of both functions.
 
          if not Ada.Characters.Handling.Is_Iso_646 (Str) then
             return Ada.Characters.Handling.To_Iso_646
@@ -176,9 +176,9 @@ begin
    begin
 
       -- Check each character in turn, and if the character does not belong
-      -- to the ISO_646 subset of type Character, replace it with an
-      -- asterisk.  If the character is a member of the subset, the character
-      -- should be returned unchanged.
+      -- to the ISO_646 subset of type Character, replace it with an asterisk.
+      -- If the character is a member of the subset, the character should be
+      -- returned unchanged.
 
       Validate_Character (Char_1);
       Validate_Character (Char_2);
@@ -212,7 +212,7 @@ begin
 
       -- Check each string, and if the string contains characters that do not
       -- belong to the ISO_646 subset of type Character, replace that character
-      -- in the string with an asterisk.  If the string is comprised of only
+      -- in the string with an asterisk. If the string is comprised of only
       -- ISO_646 characters, the string should be returned unchanged.
 
       Str_1 := Validate_String (Str_1);

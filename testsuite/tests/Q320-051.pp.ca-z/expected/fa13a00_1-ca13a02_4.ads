@@ -50,7 +50,7 @@
 --
 --!
 
--- Public generic child package of an elevator application.  This package
+-- Public generic child package of an elevator application. This package
 -- provides outside elevator button operations.
 
 generic                           -- Instantiate once for each floor.

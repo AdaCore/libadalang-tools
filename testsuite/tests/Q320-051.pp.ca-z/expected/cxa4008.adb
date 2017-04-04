@@ -96,9 +96,8 @@ begin
         Maps.To_Mapping (From => "cd", To => "xy");
 
    begin
-      -- Function To_Bounded_String with Truncation
-      -- Evaluate the function Append with parameters that will
-      -- cause the truncation of the result.
+      -- Function To_Bounded_String with Truncation Evaluate the function
+      -- Append with parameters that will cause the truncation of the result.
 
       -- Drop = Error (default case, Length_Error will be raised)
 
@@ -137,9 +136,8 @@ begin
            ("Incorrect result from To_Bounded_String, Drop = Right");
       end if;
 
-      -- Function Append with Truncation
-      -- Evaluate the function Append with parameters that will
-      -- cause the truncation of the result.
+      -- Function Append with Truncation Evaluate the function Append with
+      -- parameters that will cause the truncation of the result.
 
       -- Drop = Error (default case, Length_Error will be raised)
 
@@ -248,10 +246,9 @@ begin
          Report.Failed ("Incorrect truncation performed by Append - 9");
       end if;
 
-      -- Function Index with non-Identity map.
-      -- Evaluate the function Index with a non-identity map
-      -- parameter which will cause mapping of the source parameter
-      -- prior to the evaluation of the index position search.
+      -- Function Index with non-Identity map. Evaluate the function Index with
+      -- a non-identity map parameter which will cause mapping of the source
+      -- parameter prior to the evaluation of the index position search.
 
       Location :=
         B10.Index
@@ -299,7 +296,7 @@ begin
       -- Function Index (for Sets).
       -- This version of Index uses Sets as the basis of the search.
 
-      -- Test = Inside, Going = Forward  (Default case).
+      -- Test = Inside, Going = Forward (Default case).
       Location :=
         B10.Index
           (Source => B10.To_Bounded_String ("abcdeabcde"),
@@ -360,10 +357,10 @@ begin
          Report.Failed ("Incorrect result from Index using Sets - 5");
       end if;
 
-      -- Function Count with non-Identity mapping.
-      -- Evaluate the function Count with a non-identity map
-      -- parameter which will cause mapping of the source parameter
-      -- prior to the evaluation of the number of matching patterns.
+      -- Function Count with non-Identity mapping. Evaluate the function Count
+      -- with a non-identity map parameter which will cause mapping of the
+      -- source parameter prior to the evaluation of the number of matching
+      -- patterns.
 
       Total_Count :=
         B10.Count
@@ -442,8 +439,7 @@ begin
       end if;
 
       -- Function Replace_Slice
-      -- Evaluate function Replace_Slice with
-      -- a variety of Truncation options.
+      -- Evaluate function Replace_Slice with a variety of Truncation options.
 
       -- Drop = Error (Default)
 
@@ -508,8 +504,7 @@ begin
       end if;
 
       -- Procedure Replace_Slice
-      -- Evaluate procedure Replace_Slice with
-      -- a variety of Truncation options.
+      -- Evaluate procedure Replace_Slice with a variety of Truncation options.
 
       -- Drop = Error (Default)
 
@@ -573,8 +568,7 @@ begin
          Report.Failed ("Incorrect result from Procedure Replace Slice");
       end if;
 
-      -- Function Insert with Truncation
-      -- Drop = Error (Default).
+      -- Function Insert with Truncation Drop = Error (Default).
 
       begin
          Result_String :=

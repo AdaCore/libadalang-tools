@@ -52,9 +52,9 @@ procedure Cxc7001 is
       Which := The_Ids (Item);
 
       -- Terminated and Callable can change values on a multiprocessor
-      -- implementation. However, they can change values only once and
-      -- only in a particular direction; therefore, we test the values
-      -- and direction of change.
+      -- implementation. However, they can change values only once and only in
+      -- a particular direction; therefore, we test the values and direction of
+      -- change.
 
       declare
          T1 : constant Boolean :=
@@ -63,7 +63,8 @@ procedure Cxc7001 is
          T3 : constant Boolean :=
            Ada.Task_Identification.Is_Terminated (Which);
       begin
-      -- Terminated can only change from False to True, if it changes at all.
+         -- Terminated can only change from False to True, if it changes at
+         -- all.
          if not ((T1 <= T2) and (T2 <= T3)) then
             Report.Failed
               ("Terminated value doesn't match for " &
@@ -153,9 +154,9 @@ begin  -- Main test procedure.
 ------------------ gentle programmers, start your tasks...
 
    -- The_Simple_Object activated at end of scope elaboration
-   -- The_Task_Array(1..2) activated at end of scope elaboration
-   -- The_Record_1, The_Record_2 activated at end of scope elaboration
-   -- The_Designator_2 activated at default value assignment
+   -- The_Task_Array(1..2) activated at end of scope elaboration The_Record_1,
+   -- The_Record_2 activated at end of scope elaboration The_Designator_2
+   -- activated at default value assignment
 
    The_Designator_1 := new Cxc7001_0.Task_Type;
 

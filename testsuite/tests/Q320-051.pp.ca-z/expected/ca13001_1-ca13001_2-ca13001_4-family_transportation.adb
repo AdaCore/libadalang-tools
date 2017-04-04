@@ -13,9 +13,8 @@ protected body Family_Transportation is
             if Destination (Who) = Work then
 
                -- Reference type declared in the private parent of the subunit
-               -- parent's body.
-               -- Reference type declared in the visible part of the
-               -- subunit parent's body.
+               -- parent's body. Reference type declared in the visible part of
+               -- the subunit parent's body.
                if not Vehicles (New_Car).In_Use and
                  Fuel (New_Car)
 

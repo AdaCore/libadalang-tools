@@ -95,10 +95,10 @@ procedure Cxd1004 is
    -- Store the resulting activation priorities of the tasks
    Resulting_Priorities : array (Task_Number) of Hi_Lo_Priority;
 
-   -- This protected object has a ceiling of Priority'Last.  Calls to
-   -- Check will be accepted if the caller has a priority in the regular
-   -- priority range, they will be rejected if the caller has a higher
-   -- priority (Program_Error will be raised)
+   -- This protected object has a ceiling of Priority'Last. Calls to Check will
+   -- be accepted if the caller has a priority in the regular priority range,
+   -- they will be rejected if the caller has a higher priority (Program_Error
+   -- will be raised)
    --
    protected For_Ceiling is
       pragma Priority (System.Priority'Last);
@@ -110,10 +110,9 @@ procedure Cxd1004 is
    protected body For_Ceiling is
       procedure Check is
       begin
-         -- We must ensure that the calls to this Protected_Object
-         -- are not optimized away, otherwise the test would be
-         -- invalid.  Count is also used by the function which is
-         -- checked at the end of the test.
+         -- We must ensure that the calls to this Protected_Object are not
+         -- optimized away, otherwise the test would be invalid. Count is
+         -- also used by the function which is checked at the end of the test.
          Count := Count + 1;
 
       end Check;
@@ -134,8 +133,7 @@ begin -- CXD1004
 
    declare     -- encapsulate the test
 
-      -- Determine the active priority of the task executing this
-      -- function
+      -- Determine the active priority of the task executing this function
       --
       function Get_Hi_Lo_Priority return Hi_Lo_Priority is
       begin
@@ -145,16 +143,16 @@ begin -- CXD1004
          return Low;
       exception
          when Program_Error =>
-            -- The call has violated the ceiling of the Protected Object
-            -- so the current active priority is High
+            -- The call has violated the ceiling of the Protected Object so the
+            -- current active priority is High
             return High;
          when others =>
             Get_High_Lo_Unexpected_Exception := True;
             raise;
       end Get_Hi_Lo_Priority;
 
-      -- The activation priority of tasks of this type is checked in
-      -- various circumstances
+      -- The activation priority of tasks of this type is checked in various
+      -- circumstances
       task type T1 (Numb : Task_Number) is
          -- All these tasks will have a base priority of Priority_1Q.
          pragma Priority (Priority_1q);
@@ -166,15 +164,14 @@ begin -- CXD1004
          Activation_Priority : Hi_Lo_Priority := Get_Hi_Lo_Priority;
       begin
 
-         -- Plug the Activation Priority into the appropriate slot
-         -- for this task in the Result array
+         -- Plug the Activation Priority into the appropriate slot for this
+         -- task in the Result array
          Resulting_Priorities (Thus_Task_Number) := Activation_Priority;
 
-         -- Now check the current base priority of the task.  We are
-         -- executing the body and the task has a Pragma Priority which
-         -- overrides the base priority of the creating task.  So, whatever
-         -- the activation priority might have been it should not affect the
-         -- base priority
+         -- Now check the current base priority of the task. We are executing
+         -- the body and the task has a Pragma Priority which overrides the
+         -- base priority of the creating task. So, whatever the activation
+         -- priority might have been it should not affect the base priority
          if (Adp.Get_Priority /= Priority_1q) then
             Report.Failed ("Base Priority of T1 is incorrect");
          end if;
@@ -192,9 +189,9 @@ begin -- CXD1004
 
       task body Task_3q is
 
-         -- Now create a task.  We are currently in a task who's priority
-         -- has been set by pragma to  Priority_3Q so this should, in turn,
-         -- be the activation priority of TT2
+         -- Now create a task. We are currently in a task who's priority has
+         -- been set by pragma to Priority_3Q so this should, in turn, be the
+         -- activation priority of TT2
          --
          Tt2 : T1 (2);    -- Task_Number passed in as a discriminant
 
@@ -212,9 +209,8 @@ begin -- CXD1004
       end Interrupt;
 
       task body Interrupt is
-         -- Now create a task.  We are currently in an Interrupt priority
-         -- task so this should, in turn, be the activation priority
-         -- of TT3
+         -- Now create a task. We are currently in an Interrupt priority task
+         -- so this should, in turn, be the activation priority of TT3
          --
          Tt3 : T1 (3);    -- Task_Number passed in as a discriminant
 
@@ -227,10 +223,10 @@ begin -- CXD1004
 
       --=======================
 
-      -- Now create a task.  We are in the activation phase of the Main
-      -- procedure which does not have a Pragma Priority so the base
-      -- priority will be the default ( Priority_2Q ).  Thus the activation
-      -- priority of TT1 should be Priority_2Q.
+      -- Now create a task. We are in the activation phase of the Main
+      -- procedure which does not have a Pragma Priority so the base priority
+      -- will be the default ( Priority_2Q ). Thus the activation priority of
+      -- TT1 should be Priority_2Q.
       --
       Tt1 : T1 (1);    -- Task_Number passed in as a discriminant
 
@@ -240,9 +236,9 @@ begin -- CXD1004
       null;
    end;     -- encapsulation
 
-   -- All tasks have terminated.  Check the activation priority results
+   -- All tasks have terminated. Check the activation priority results
    --
-   -- Task TT1 should have had a Low priority ( Priority_2Q  - the default )
+   -- Task TT1 should have had a Low priority ( Priority_2Q - the default )
    if Resulting_Priorities (1) = High then
       Report.Failed ("Task number 1 had incorrect priority");
    end if;
@@ -258,15 +254,15 @@ begin -- CXD1004
    end if;
 
    if For_Ceiling.Number_Of_Calls /= 2 then
-      -- Two Low priority calls should have been accepted, the High
-      -- priority call should have been rejected.  If this number is correct
-      -- we know the calls have not been optimized away
+      -- Two Low priority calls should have been accepted, the High priority
+      -- call should have been rejected. If this number is correct we know the
+      -- calls have not been optimized away
       --
       Report.Failed ("Incorrect number of calls accepted in Check");
    end if;
 
-   -- report any errors that may have occurred while we were
-   -- running at an interrupt priority
+   -- report any errors that may have occurred while we were running at an
+   -- interrupt priority
 
    if Get_High_Lo_Unexpected_Exception then
       Report.Failed ("Unexpected Exception in Get_Hi_Lo_Priority");

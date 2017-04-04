@@ -22,8 +22,7 @@ begin
       "may have the same simple names if they have distinct " &
       "expanded names");
 
-   -- Note that the leaves all have the same name.
-   -- Call the first grandchild.
+   -- Note that the leaves all have the same name. Call the first grandchild.
    Ca13002_0.Ca13002_1.Ca13002_5;
 
    -- Call the second grandchild.

@@ -1,8 +1,7 @@
 --=================================================================--
 
--- Public child added during code maintenance without disturbing a
--- large system.  This public child would add functionality to the
--- original system.
+-- Public child added during code maintenance without disturbing a large
+-- system. This public child would add functionality to the original system.
 
 package Ca11017_0.Ca11017_1 is
 

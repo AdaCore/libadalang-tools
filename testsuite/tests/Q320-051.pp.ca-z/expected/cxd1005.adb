@@ -91,10 +91,10 @@ procedure Cxd1005 is
    Unexpected_Exception_In_Interrupt_Task : Boolean := False;
    Unexpected_Exception_In_Get_Hi_Lo      : Boolean := False;
 
-   -- This protected object has a ceiling of Priority'Last.  Calls to
-   -- Check will be accepted if the caller has a priority in the regular
-   -- priority range, they will be rejected if the caller has a higher
-   -- priority (Program_Error will be raised)
+   -- This protected object has a ceiling of Priority'Last. Calls to Check will
+   -- be accepted if the caller has a priority in the regular priority range,
+   -- they will be rejected if the caller has a higher priority (Program_Error
+   -- will be raised)
    --
    protected For_Ceiling is
       pragma Priority (System.Priority'Last);
@@ -107,10 +107,9 @@ procedure Cxd1005 is
    protected body For_Ceiling is
       procedure Check is
       begin
-         -- We must ensure that the calls to this Protected_Object
-         -- are not optimized away, otherwise the test would be
-         -- invalid.  Count is also used by the function which is
-         -- checked at the end of the test.
+         -- We must ensure that the calls to this Protected_Object are not
+         -- optimized away, otherwise the test would be invalid. Count is
+         -- also used by the function which is checked at the end of the test.
          Count := Count + 1;
 
       end Check;
@@ -139,8 +138,8 @@ begin -- CXD1005
          return Low;
       exception
          when Program_Error =>
-            -- The call has violated the ceiling of the Protected Object
-            -- so the current active priority is High
+            -- The call has violated the ceiling of the Protected Object so the
+            -- current active priority is High
             return High;
          when others =>
             Unexpected_Exception_In_Get_Hi_Lo := True;
@@ -157,8 +156,8 @@ begin -- CXD1005
          accept E1 do
             declare
 
-               -- Now create a task.  The active priority at this point is
-               -- that of the rendezvous
+               -- Now create a task. The active priority at this point is that
+               -- of the rendezvous
                task Activating_Task is
                   pragma Priority (Priority_1q);
                end Activating_Task;
@@ -170,18 +169,18 @@ begin -- CXD1005
 
                begin
                   -- The activation priority should be that of the creating
-                  -- task at the time of creation.  We were in the
-                  -- rendezvous with the Interrupt task at the time.
+                  -- task at the time of creation. We were in the rendezvous
+                  -- with the Interrupt task at the time.
                   --
                   if Activation_Priority /= High then
                      Report.Failed
                        ("Activation Priority of Activating_Task incorrect");
                   end if;
-                  -- Now check the current base priority of the task.
-                  -- We are executing the body and the task has a
-                  -- Pragma Priority which overrides the base priority of
-                  -- the creating task. So, whatever the activation priority
-                  -- might have been it should not affect the base priority
+                  -- Now check the current base priority of the task. We are
+                  -- executing the body and the task has a Pragma Priority
+                  -- which overrides the base priority of the creating task.
+                  -- So, whatever the activation priority might have been it
+                  -- should not affect the base priority
                   --
                   if (Adp.Get_Priority /= Priority_1q) then
                      Report.Failed
@@ -211,8 +210,8 @@ begin -- CXD1005
       task body Interrupt is
       begin
 
-         -- Rendezvous with Task_3Q.  Currently we are at Interrupt
-         -- priority and the rendezvous will be executed at the same
+         -- Rendezvous with Task_3Q. Currently we are at Interrupt priority and
+         -- the rendezvous will be executed at the same
          --
          Task_3q.E1;
 
@@ -225,11 +224,10 @@ begin -- CXD1005
       null;
    end;
 
-   -- In this test the fact that High is returned and verified in
-   -- the body of Activating_Task shows that the call to Check was
-   -- not optimized away, however we make this call to Number_of_Calls
-   -- to aid in an optimizer foil.  If the optimizer were to remove
-   -- the call we would get a false fail
+   -- In this test the fact that High is returned and verified in the body
+   -- of Activating_Task shows that the call to Check was not optimized away,
+   -- however we make this call to Number_of_Calls to aid in an optimizer foil.
+   -- If the optimizer were to remove the call we would get a false fail
    --
    if For_Ceiling.Number_Of_Calls /= 0 then
       -- The high priority call should have been rejected.

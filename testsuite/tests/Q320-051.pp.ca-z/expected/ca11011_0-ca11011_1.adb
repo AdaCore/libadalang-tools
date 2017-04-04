@@ -12,11 +12,9 @@ package body Ca11011_0.Ca11011_1 is  -- Package body OS.File_Manager
    procedure Create_File (File_Key : in File_Descriptor_Type) is
    begin
       Internal.Create (Key => File_Key);  -- Other parameters are defaults,
-      -- since they are of private types
-      -- from the parent package.
-      -- File_Descriptor_Type is private,
-      -- but declared in visible part of
-      -- parent spec.
+      -- since they are of private types from the parent package.
+      -- File_Descriptor_Type is private, but declared in visible part
+      -- of parent spec.
    end Create_File;
 
 end Ca11011_0.Ca11011_1;        -- Package body OS.File_Manager

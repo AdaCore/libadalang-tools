@@ -4,8 +4,8 @@ with System.Storage_Pools.Subpools;
 with System.Storage_Elements;
 
 package Cdb4001_Tracked_Subpools is
-   -- Subpools which support mapping an address returned from a call
-   -- to Allocate back to its enclosing subpool.
+   -- Subpools which support mapping an address returned from a call to
+   -- Allocate back to its enclosing subpool.
 
    use System.Storage_Pools;
    use System.Storage_Elements;
@@ -13,8 +13,8 @@ package Cdb4001_Tracked_Subpools is
    type Tracked_Pool is
      new Subpools.Root_Storage_Pool_With_Subpools with private;
    --
-   -- Default_Subpool_For_Pool is not overridden, so allocators which
-   -- do not provide a subpool will raise Program_Error.
+   -- Default_Subpool_For_Pool is not overridden, so allocators which do not
+   -- provide a subpool will raise Program_Error.
 
    type Tracked_Subpool is new Subpools.Root_Subpool with private;
 
@@ -24,10 +24,10 @@ package Cdb4001_Tracked_Subpools is
    function Enclosing_Subpool
      (Pool            : Tracked_Pool;
       Storage_Address : System.Address) return Tracked_Subpool_Handle;
-   -- If the given address points into a block of storage that was
-   -- returned by a previous call to this Pool type's Allocate (and
-   -- was not subsequently freed), then return a reference to the
-   -- enclosing subpool. Otherwise, the result is undefined.
+   -- If the given address points into a block of storage that was returned by
+   -- a previous call to this Pool type's Allocate (and was not subsequently
+   -- freed), then return a reference to the enclosing subpool. Otherwise, the
+   -- result is undefined.
 
    function Enclosing_Subpool
      (Pool            : Tracked_Pool;

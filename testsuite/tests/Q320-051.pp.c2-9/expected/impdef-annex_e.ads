@@ -45,10 +45,10 @@ package Impdef.Annex_E is
 
 --=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====-=====--
 
-   -- The Max_RPC_Call_Time value is the longest time a test needs to wait for
-   -- an RPC to complete.  Included in this time is the time for the called
-   -- procedure to make a task entry call where the task is ready to accept
-   -- the call.
+   -- The Max_RPC_Call_Time value is the longest time a test needs to wait
+   -- for an RPC to complete. Included in this time is the time for the called
+   -- procedure to make a task entry call where the task is ready to accept the
+   -- call.
 
    Max_Rpc_Call_Time : constant Duration := 2.0;
    --                                       ^^^  --- MODIFY HERE AS NEEDED

@@ -101,10 +101,10 @@ begin
          Tc_End_Of_Line : Boolean;
       begin
 
--- During the course of its processing, the application may attempt to
--- invoke the End_Of_Line function on a file that is currently in Append_File
--- mode (instead of the anticipated In_File mode).  This results in the
--- raising of Mode_Error.
+-- During the course of its processing, the application may attempt to invoke
+-- the End_Of_Line function on a file that is currently in Append_File mode
+-- (instead of the anticipated In_File mode). This results in the raising of
+-- Mode_Error.
 
          Tc_End_Of_Line := Text_Io.End_Of_Line (Text_File);
          Report.Failed ("Exception not raised by End_Of_Line");
@@ -130,8 +130,8 @@ begin
          Tc_End_Of_Page := Text_Io.End_Of_Page (Text_File);
          Report.Failed ("Exception not raised by End_Of_Page");
 
--- Once again, an exception handler present within the application handles
--- the exception and processing continues.
+-- Once again, an exception handler present within the application handles the
+-- exception and processing continues.
 
       exception
          when Text_Io.Mode_Error =>

@@ -89,8 +89,8 @@ begin
       -- Testing of Tan Function, both instantiated and pre-instantiated
       -- version.
 
-      -- Check that no exception occurs on computing the Tan with very
-      -- large (positive and negative) input values.
+      -- Check that no exception occurs on computing the Tan with very large
+      -- (positive and negative) input values.
 
       begin
          New_Float_Result := Gef.Tan (New_Float (Fxa5a00.Large));
@@ -112,8 +112,8 @@ begin
                "negative value");
       end;
 
-      -- Check that no exception occurs on computing the Tan with very
-      -- small (positive and negative) input values.
+      -- Check that no exception occurs on computing the Tan with very small
+      -- (positive and negative) input values.
 
       begin
          New_Float_Result := Gef.Tan (New_Float (Fxa5a00.Small));
@@ -135,8 +135,8 @@ begin
                "negative value");
       end;
 
-      -- Check prescribed result from Tan function.  When the parameter X
-      -- has the value zero, the Tan function yields a result of zero.
+      -- Check prescribed result from Tan function. When the parameter X has
+      -- the value zero, the Tan function yields a result of zero.
 
       if Gef.Tan (0.0) /= 0.0 or Ef.Tan (0.0) /= 0.0 then
          Report.Failed
@@ -182,8 +182,8 @@ begin
          end;
       end if;
 
-      -- Check that the exception Numerics.Argument_Error is raised, when
-      -- the value of the parameter Cycle is zero or negative.
+      -- Check that the exception Numerics.Argument_Error is raised, when the
+      -- value of the parameter Cycle is zero or negative.
 
       begin
          New_Float_Result := Gef.Tan (X => 1.0, Cycle => -360.0);
@@ -215,8 +215,8 @@ begin
                "parameter has a zero value");
       end;
 
-      -- Check that no exception occurs on computing the Tan with very
-      -- large (positive and negative) input values.
+      -- Check that no exception occurs on computing the Tan with very large
+      -- (positive and negative) input values.
 
       begin
          New_Float_Result := Gef.Tan (New_Float (Fxa5a00.Large), 360.0);
@@ -248,8 +248,8 @@ begin
             "parameter, using a zero value input parameter");
       end if;
 
-      -- Check the Tan function, with specified Cycle parameter, with a
-      -- variety of input parameters.
+      -- Check the Tan function, with specified Cycle parameter, with a variety
+      -- of input parameters.
 
       if not Result_Within_Range (Gef.Tan (30.0, 360.0), 0.577, 0.001) or
         not Result_Within_Range (Ef.Tan (57.0, 360.0), 1.540, 0.001) or
@@ -267,8 +267,8 @@ begin
       -- Testing of Tanh Function, both instantiated and pre-instantiated
       -- version.
 
-      -- Check that no exception occurs on computing the Tan with very
-      -- large (positive and negative) input values.
+      -- Check that no exception occurs on computing the Tan with very large
+      -- (positive and negative) input values.
 
       begin
          New_Float_Result := Gef.Tanh (New_Float (Fxa5a00.Large));
@@ -296,8 +296,7 @@ begin
          Report.Failed ("Incorrect result from Tanh with zero parameter");
       end if;
 
-      -- Check the results of the Tanh function with various input
-      -- parameters.
+      -- Check the results of the Tanh function with various input parameters.
 
       if not
         (Fxa5a00.Result_Within_Range (Gef.Tanh (2.99), 0.995, 0.001) and
@@ -317,8 +316,8 @@ begin
       -- Testing of Arctanh Function, both instantiated and pre-instantiated
       -- version.
 
-      -- Check that Constraint_Error is raised by the Arctanh function
-      -- when the absolute value of the parameter X is one.
+      -- Check that Constraint_Error is raised by the Arctanh function when the
+      -- absolute value of the parameter X is one.
 
       if New_Float'Machine_Overflows = True then
          begin

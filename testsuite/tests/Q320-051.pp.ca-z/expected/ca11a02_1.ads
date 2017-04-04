@@ -11,8 +11,8 @@ package Ca11a02_1 is
       Label : String (1 .. Str_Disc);
    end record;
 
-   -- Inherits (inherited) procedure Set_Width from Color_Widget.
-   -- Inherits (inherited) procedure Set_Height from Color_Widget.
-   -- Inherits procedure Set_Color from Color_Widget.
+   -- Inherits (inherited) procedure Set_Width from Color_Widget. Inherits
+   -- (inherited) procedure Set_Height from Color_Widget. Inherits procedure
+   -- Set_Color from Color_Widget.
 
 end Ca11a02_1;

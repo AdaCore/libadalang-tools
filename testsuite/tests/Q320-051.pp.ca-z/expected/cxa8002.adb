@@ -85,9 +85,9 @@ begin
 
       -- An implementation that does not support Sequential_IO in a particular
       -- environment will raise Use_Error or Name_Error on calls to various
-      -- Sequential_IO operations.  This block statement encloses a call to
-      -- Create, which should produce an exception in a non-supportive
-      -- environment.  These exceptions will be handled to produce a
+      -- Sequential_IO operations. This block statement encloses a call
+      -- to Create, which should produce an exception in a non-supportive
+      -- environment. These exceptions will be handled to produce a
       -- Not_Applicable result.
 
       Data_Io.Create
@@ -140,9 +140,9 @@ begin
       Item                => Employee_1);          -- entry to file.
 
       --
-      -- The following portion of code demonstrates that a sequential file
-      -- can be reset to various file modes, including Append_File mode,
-      -- allowing data to be added to the end of the file.
+      -- The following portion of code demonstrates that a sequential file can
+      -- be reset to various file modes, including Append_File mode, allowing
+      -- data to be added to the end of the file.
       --
       begin
          Data_Io.Reset (File => Employee_Data_File,   -- Reset file with
@@ -177,8 +177,8 @@ begin
       end if;
 
       --
-      -- Simulate appending data to a file that has previously been written
-      -- to and read from.
+      -- Simulate appending data to a file that has previously been written to
+      -- and read from.
       --
       begin
          Data_Io.Reset

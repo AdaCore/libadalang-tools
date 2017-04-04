@@ -46,11 +46,11 @@ begin
          --
          --    0.154/12 = 0.01283333...
          --
-         -- The adjacent multiples of small are 0.012 and 0.013. Since
-         -- Factor is of an ordinary fixed point type, it may contain either
-         -- of these values. However, since "Rate / Period" is a static
-         -- expression, the value Factor contains is determined by the
-         -- value of CXF2004_1.Interest_Rate'Machine_Rounds:
+         -- The adjacent multiples of small are 0.012 and 0.013. Since Factor
+         -- is of an ordinary fixed point type, it may contain either of these
+         -- values. However, since "Rate / Period" is a static expression,
+         -- the value Factor contains is determined by the value of
+         -- CXF2004_1.Interest_Rate'Machine_Rounds:
          --
          --    If Machine_Rounds = FALSE : Factor = 0.012
          --    If Machine_Rounds = TRUE  : Factor = 0.013
@@ -118,11 +118,11 @@ begin
          --
          --    0.210/12 = 0.0175
          --
-         -- The adjacent multiples of small are 0.017 and 0.018. Since
-         -- Factor is of an ordinary fixed point type, it may contain either
-         -- of these values. However, since "Rate / Period" is a static
-         -- expression, the value Factor contains is determined by the
-         -- value of CXF2004_1.Interest_Rate'Machine_Rounds:
+         -- The adjacent multiples of small are 0.017 and 0.018. Since Factor
+         -- is of an ordinary fixed point type, it may contain either of these
+         -- values. However, since "Rate / Period" is a static expression,
+         -- the value Factor contains is determined by the value of
+         -- CXF2004_1.Interest_Rate'Machine_Rounds:
          --
          --    If Machine_Rounds = FALSE : Factor = 0.017
          --    If Machine_Rounds = TRUE  : Factor = 0.018
@@ -210,11 +210,11 @@ begin
          --
          --    0.095/12 = 0.00791666...
          --
-         -- The adjacent multiples of small are 0.007 and 0.008. Since
-         -- Factor is of an ordinary fixed point type, it may contain either
-         -- of these values. However, since "Rate / Period" is a static
-         -- expression, the value Factor contains can be determined based
-         -- on the value of CXF2004_1.Interest_Rate'Machine_Rounds:
+         -- The adjacent multiples of small are 0.007 and 0.008. Since Factor
+         -- is of an ordinary fixed point type, it may contain either of these
+         -- values. However, since "Rate / Period" is a static expression,
+         -- the value Factor contains can be determined based on the value
+         -- of CXF2004_1.Interest_Rate'Machine_Rounds:
          --
          --    If Machine_Rounds = FALSE : Factor = 0.007
          --    If Machine_Rounds = TRUE  : Factor = 0.008
@@ -290,8 +290,8 @@ begin
          --    1.0/0.024 = 41.66666... (Adjacent smalls 41.666 and 41.667)
          --    1.0/0.025 = 40.0
          --
-         -- The value of CXF2004_1.Interest_Rate'Machine_Rounds determines
-         -- what Divisor contains:
+         -- The value of CXF2004_1.Interest_Rate'Machine_Rounds determines what
+         -- Divisor contains:
          --
          --    If Machine_Rounds = FALSE : Divisor = 41.666
          --    If Machine_Rounds = TRUE  : Divisor = 40.000

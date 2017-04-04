@@ -82,14 +82,14 @@ begin -- CXDB002
       task body Target_Task is
       begin
          accept Get_Id (Task_Id : out Ati.Task_Id) do
-            -- Get the system assigned Task_Id for this task and
-            -- "return" it to the caller
+            -- Get the system assigned Task_Id for this task and "return" it to
+            -- the caller
             Task_Id := Ati.Current_Task;
          end Get_Id;
 
-         -- Wait here so that the task does not terminate before the
-         -- driver has completed the test.  The "Hold" will occur while
-         -- we are at this accept statement
+         -- Wait here so that the task does not terminate before the driver
+         -- has completed the test. The "Hold" will occur while we are at
+         -- this accept statement
          accept Shut_Down;
 
       exception
@@ -113,7 +113,7 @@ begin -- CXDB002
       Aatc.Hold (Target_Task_Id);
       --
       -- We should be able to get the base priority of a Held task and it
-      -- should not be affected.  Specifically it should NOT be the current
+      -- should not be affected. Specifically it should NOT be the current
       -- active priority (which is lower than the null task)
       Held_Priority := Adp.Get_Priority (Target_Task_Id);
       if Held_Priority /= Original_Priority then
@@ -129,8 +129,8 @@ begin -- CXDB002
          Report.Failed ("New Held Priority is incorrect");
       end if;
 
-      -- Now Continue the task and check that the priority that was
-      -- set while it was Held is still in effect
+      -- Now Continue the task and check that the priority that was set while
+      -- it was Held is still in effect
       Aatc.Continue (Target_Task_Id);
       --
       Held_Priority := Adp.Get_Priority (Target_Task_Id);

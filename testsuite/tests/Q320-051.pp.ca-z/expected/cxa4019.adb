@@ -8,7 +8,7 @@ with Ada.Strings.Wide_Maps.Wide_Constants;
 procedure Cxa4019 is
 
    -- The following two functions are used to translate character and string
-   -- values to "Wide" values.  They will be applied to all the Wide_Bounded
+   -- values to "Wide" values. They will be applied to all the Wide_Bounded
    -- subprogram parameters to simulate the use of Wide_Characters and
    -- Wide_Strings in actual practice.
 
@@ -89,9 +89,8 @@ begin
 
    begin
 
-      -- Function To_Bounded_Wide_String with Truncation
-      -- Evaluate the function Append with parameters that will
-      -- cause the truncation of the result.
+      -- Function To_Bounded_Wide_String with Truncation Evaluate the function
+      -- Append with parameters that will cause the truncation of the result.
 
       -- Drop = Error (default case, Length_Error will be raised)
 
@@ -132,9 +131,8 @@ begin
            ("Incorrect result from To_Bounded_Wide_String, Drop = Right");
       end if;
 
-      -- Function Append with Truncation
-      -- Evaluate the function Append with parameters that will
-      -- cause the truncation of the result.
+      -- Function Append with Truncation Evaluate the function Append with
+      -- parameters that will cause the truncation of the result.
 
       -- Drop = Error (default case, Length_Error will be raised)
 
@@ -254,10 +252,9 @@ begin
          Report.Failed ("Incorrect truncation performed by Append - 9");
       end if;
 
-      -- Function Index with non-Identity map.
-      -- Evaluate the function Index with a non-identity map
-      -- parameter which will cause mapping of the source parameter
-      -- prior to the evaluation of the index position search.
+      -- Function Index with non-Identity map. Evaluate the function Index with
+      -- a non-identity map parameter which will cause mapping of the source
+      -- parameter prior to the evaluation of the index position search.
 
       Location :=
         B10.Index
@@ -302,9 +299,9 @@ begin
          Report.Failed ("Incorrect result from Index with string patterns");
       end if;
 
-      -- Function Index with access-to-subprogram mapping value.
-      -- Evaluate the function Index with a wide character mapping function
-      -- object that performs the mapping operation.
+      -- Function Index with access-to-subprogram mapping value. Evaluate the
+      -- function Index with a wide character mapping function object that
+      -- performs the mapping operation.
 
       Location :=
         B10.Index
@@ -383,7 +380,7 @@ begin
       -- Function Index (for Sets).
       -- This version of Index uses Sets as the basis of the search.
 
-      -- Test = Inside, Going = Forward  (Default case).
+      -- Test = Inside, Going = Forward (Default case).
       Location :=
         B10.Index
           (Source => B10.To_Bounded_Wide_String (Equiv ("abcdeabcde")),
@@ -442,10 +439,10 @@ begin
          Report.Failed ("Incorrect result from Index using Sets - 5");
       end if;
 
-      -- Function Count with non-Identity mapping.
-      -- Evaluate the function Count with a non-identity map
-      -- parameter which will cause mapping of the source parameter
-      -- prior to the evaluation of the number of matching patterns.
+      -- Function Count with non-Identity mapping. Evaluate the function Count
+      -- with a non-identity map parameter which will cause mapping of the
+      -- source parameter prior to the evaluation of the number of matching
+      -- patterns.
 
       Total_Count :=
         B10.Count
@@ -487,9 +484,8 @@ begin
          Report.Failed ("Incorrect result from function Count, w,w/o mapping");
       end if;
 
-      -- Function Count with access-to-subprogram mapping.
-      -- Evaluate the version function Count that uses an access-to-subprogram
-      -- map parameter.
+      -- Function Count with access-to-subprogram mapping. Evaluate the version
+      -- function Count that uses an access-to-subprogram map parameter.
 
       Total_Count :=
         B10.Count
@@ -568,9 +564,9 @@ begin
          Report.Failed ("Incorrect result from procedure Translate - 4");
       end if;
 
-      -- Procedure Translate with access-to-subprogram mapping.
-      -- Use the version of Procedure Translate that takes an
-      -- access-to-subprogram parameter to perform the Source mapping.
+      -- Procedure Translate with access-to-subprogram mapping. Use the version
+      -- of Procedure Translate that takes an access-to-subprogram parameter to
+      -- perform the Source mapping.
 
       -- Partial mapping of source.
 
@@ -623,9 +619,9 @@ begin
            ("Incorrect result from procedure Translate w/map ptr - 5");
       end if;
 
-      -- Function Translate with access-to-subprogram mapping.
-      -- Use the version of Function Translate that takes an
-      -- access-to-subprogram parameter to perform the Source mapping.
+      -- Function Translate with access-to-subprogram mapping. Use the version
+      -- of Function Translate that takes an access-to-subprogram parameter to
+      -- perform the Source mapping.
 
       -- Partial mapping of source.
 
@@ -692,8 +688,7 @@ begin
       end if;
 
       -- Function Replace_Slice
-      -- Evaluate function Replace_Slice with
-      -- a variety of Truncation options.
+      -- Evaluate function Replace_Slice with a variety of Truncation options.
 
       -- Drop = Error (Default)
 
@@ -781,8 +776,7 @@ begin
       end;
 
       -- Procedure Replace_Slice
-      -- Evaluate procedure Replace_Slice with
-      -- a variety of Truncation options.
+      -- Evaluate procedure Replace_Slice with a variety of Truncation options.
 
       -- Drop = Error (Default)
 
@@ -852,8 +846,7 @@ begin
          Report.Failed ("Incorrect result from Procedure Replace Slice");
       end if;
 
-      -- Function Insert with Truncation
-      -- Drop = Error (Default).
+      -- Function Insert with Truncation Drop = Error (Default).
 
       begin
          Result_String :=

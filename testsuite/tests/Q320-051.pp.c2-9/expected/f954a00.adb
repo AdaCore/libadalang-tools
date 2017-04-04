@@ -8,7 +8,7 @@ package body F954a00 is  -- Printer server abstraction.
       begin
          Ready := False;                              -- Block other requests
          Done  := False;                              -- for this printer
-         -- Send data to the printer...               -- and begin printing.
+         -- Send data to the printer... -- and begin printing.
       end Start_Printing;
 
       -- Set the "not ready" one-shot

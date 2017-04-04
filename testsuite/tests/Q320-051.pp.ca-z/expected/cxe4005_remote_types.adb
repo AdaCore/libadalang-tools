@@ -1,8 +1,8 @@
 package body Cxe4005_Remote_Types is
    --
-   -- The serial number for all objects of RT_Tagged_Type will contain
-   -- a 6 as the least significant digit.  Make sure the correct object
-   -- is passed to these routines.
+   -- The serial number for all objects of RT_Tagged_Type will contain a 6 as
+   -- the least significant digit. Make sure the correct object is passed to
+   -- these routines.
    --
 
    procedure Single_Controlling_Operand

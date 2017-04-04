@@ -89,9 +89,9 @@ procedure Cxai030 is
 
    subtype Array_Bounds_Type is Ada.Containers.Count_Type range 1 .. Num_Tests;
 
-   -- No fractional parts so that can compare values for equality.
-   -- Values in ascending order as this is what determines the order for a set
-   -- and so that can check that iterators have proceeded in the correct order.
+   -- No fractional parts so that can compare values for equality. Values in
+   -- ascending order as this is what determines the order for a set and so
+   -- that can check that iterators have proceeded in the correct order.
 
    Value_In_Array : constant array (Array_Bounds_Type) of My_Float :=
      (12.0, 23.0, 34.0, 45.0, 56.0, 67.0, 78.0, 89.0, 100.0, 111.0);
@@ -238,10 +238,9 @@ begin
       is
       begin
          Tampering_Check (Container => My_Set_1, Where => Test_Case);
-         -- The tampering check here prevents the
-         -- Value parameter to this subprogram from
-         -- disappearing (if passed by-reference) while
-         -- it is still in use.
+         -- The tampering check here prevents the Value parameter to this
+         -- subprogram from disappearing (if passed by-reference) while it
+         -- is still in use.
 
          if Value /= Expected then
             Report.Failed ("Wrong value for " & Test_Case);
@@ -256,10 +255,9 @@ begin
       is
       begin
          Tampering_Check (Container => My_Set_1, Where => Test_Case);
-         -- The tampering check here prevents the
-         -- Value parameter to this subprogram from
-         -- disappearing (if passed by-reference) while
-         -- it is still in use.
+         -- The tampering check here prevents the Value parameter to this
+         -- subprogram from disappearing (if passed by-reference) while it
+         -- is still in use.
 
          if Value /= Expected then
             Report.Failed ("Wrong value for " & Test_Case);
@@ -341,8 +339,8 @@ begin
          New_Item  => Value_In_Array (1),
          Test_Case => "Reference normal generalized cursor");
 
-      -- Prefix call with all components explicit (only possible for
-      -- cursor form of Constant_Reference):
+      -- Prefix call with all components explicit (only possible for cursor
+      -- form of Constant_Reference):
       Test
         (Value =>
            My_Set_1.Constant_Reference (Position => My_Cursor_1).Element.all,

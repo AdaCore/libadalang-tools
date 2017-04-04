@@ -22,16 +22,15 @@ begin
       return;
    end if;
 
-   -- The requirements on the abort being immediate are
-   -- only placed upon uni-processor systems.
-   -- Only the simple case does not have an abort completion point
-   -- prior to the check for being aborted.
+   -- The requirements on the abort being immediate are only placed upon
+   -- uni-processor systems. Only the simple case does not have an abort
+   -- completion point prior to the check for being aborted.
    Cxd6001_2.Simple_Case;
 
-   -- A multi-processor could fail the following tests, as the
-   -- victim task may continue to execute, return from the rendezvous
-   -- or protected action, and set the Not_Protected flag for failure,
-   -- before the killer task can abort it.
+   -- A multi-processor could fail the following tests, as the victim task may
+   -- continue to execute, return from the rendezvous or protected action, and
+   -- set the Not_Protected flag for failure, before the killer task can abort
+   -- it.
    Cxd6001_2.In_Rendezvous;
    Cxd6001_2.In_Protected;
 

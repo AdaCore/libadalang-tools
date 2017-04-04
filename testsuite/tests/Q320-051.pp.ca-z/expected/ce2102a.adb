@@ -79,8 +79,7 @@ begin
             Failed ("WRONG EXCEPTION RAISED ON OPEN - 2");
       end;
 
--- CHECK THAT CREATE STATEMENT RAISES EXCEPTION WHEN FILE
--- IS ALREADY OPEN
+-- CHECK THAT CREATE STATEMENT RAISES EXCEPTION WHEN FILE IS ALREADY OPEN
 
       begin
          Create (Test_File_One, In_File, Legal_File_Name);

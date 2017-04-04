@@ -88,8 +88,7 @@ begin
 
    begin
 
-      -- Function Overwrite with Truncation
-      -- Drop = Error (Default).
+      -- Function Overwrite with Truncation Drop = Error (Default).
 
       begin
          Test_String   := Atoj_Bnd_Str;
@@ -290,7 +289,7 @@ begin
 
       -- Ensure that the characters in the set provided as the actual to
       -- parameter Right are not trimmed from the left side of the bounded
-      -- string; likewise for the opposite side.  Only "cd" trimmed from left
+      -- string; likewise for the opposite side. Only "cd" trimmed from left
       -- side, and only "xy" trimmed from right side.
 
       if B10.Trim (B10.To_Bounded_String ("cdxyabcdxy"), Cd_Set, Xy_Set) /=
@@ -300,8 +299,8 @@ begin
            ("Incorrect result from Fn Trim - Sets, Left & Right side - 2");
       end if;
 
-      -- Ensure that characters contained in the sets are not trimmed from
-      -- the "interior" of the bounded string, just the appropriate ends.
+      -- Ensure that characters contained in the sets are not trimmed from the
+      -- "interior" of the bounded string, just the appropriate ends.
 
       if B10.Trim (B10.To_Bounded_String ("cdabdxabxy"), Cd_Set, Xy_Set) /=
         B10.To_Bounded_String ("abdxab")
@@ -310,7 +309,7 @@ begin
            ("Incorrect result from Fn Trim - Sets, Left & Right side - 3");
       end if;
 
-      -- Trim characters in set from right side only.  No change to Left side.
+      -- Trim characters in set from right side only. No change to Left side.
 
       if B10.Trim (B10.To_Bounded_String ("abxyzddcd"), Xy_Set, Cd_Set) /=
         B10.To_Bounded_String ("abxyz")
@@ -347,7 +346,7 @@ begin
 
       -- Ensure that the characters in the set provided as the actual to
       -- parameter Right are not trimmed from the left side of the bounded
-      -- string; likewise for the opposite side.  Only "cd" trimmed from left
+      -- string; likewise for the opposite side. Only "cd" trimmed from left
       -- side, and only "xy" trimmed from right side.
 
       Test_String := B10.To_Bounded_String ("cdxyabcdxy");
@@ -358,8 +357,8 @@ begin
            ("Incorrect result from Proc Trim - Sets, Left & Right side - 2");
       end if;
 
-      -- Ensure that characters contained in the sets are not trimmed from
-      -- the "interior" of the bounded string, just the appropriate ends.
+      -- Ensure that characters contained in the sets are not trimmed from the
+      -- "interior" of the bounded string, just the appropriate ends.
 
       Test_String := B10.To_Bounded_String ("cdabdxabxy");
       B10.Trim (Test_String, Cd_Set, Xy_Set);
@@ -369,7 +368,7 @@ begin
            ("Incorrect result from Proc Trim - Sets, Left & Right side - 3");
       end if;
 
-      -- Trim characters in set from Left side only.  No change to Right side.
+      -- Trim characters in set from Left side only. No change to Right side.
 
       Test_String := B10.To_Bounded_String ("cccdabxyz");
       B10.Trim (Test_String, Cd_Set, Xy_Set);
@@ -388,8 +387,7 @@ begin
          Report.Failed ("Incorrect result from Proc Trim-Sets, Neither side");
       end if;
 
-      -- Function Head with Truncation
-      -- Drop = Error (Default).
+      -- Function Head with Truncation Drop = Error (Default).
 
       begin
          Result_String :=
@@ -407,10 +405,10 @@ begin
 
       -- Drop = Left
 
-      -- Pad characters (5) are appended to the right end of the string
-      -- (which is initially at its maximum length), then the first five
-      -- characters of the intermediate result are dropped to conform to
-      -- the maximum size limit of the bounded string (10).
+      -- Pad characters (5) are appended to the right end of the string (which
+      -- is initially at its maximum length), then the first five characters
+      -- of the intermediate result are dropped to conform to the maximum size
+      -- limit of the bounded string (10).
 
       Result_String :=
         B10.Head
@@ -425,11 +423,11 @@ begin
 
       -- Drop = Right
 
-      -- Pad characters (6) are appended to the left end of the string
-      -- (which is initially at one less than its maximum length), then the
-      -- last five characters of the intermediate result are dropped
-      -- (which in this case are the pad characters) to conform to the
-      -- maximum size limit of the bounded string (10).
+      -- Pad characters (6) are appended to the left end of the string (which
+      -- is initially at one less than its maximum length), then the last five
+      -- characters of the intermediate result are dropped (which in this case
+      -- are the pad characters) to conform to the maximum size limit of the
+      -- bounded string (10).
 
       Result_String :=
         B10.Head
@@ -451,8 +449,7 @@ begin
          Report.Failed ("Incorrect result from Function Head");
       end if;
 
-      -- Function Tail with Truncation
-      -- Drop = Error (Default Case)
+      -- Function Tail with Truncation Drop = Error (Default Case)
 
       begin
          Result_String :=
@@ -471,10 +468,10 @@ begin
 
       -- Drop = Left
 
-      -- Pad characters (5) are appended to the left end of the string
-      -- (which is initially at two less than its maximum length), then
-      -- the first three characters of the intermediate result (in this
-      -- case, 3 pad characters) are dropped.
+      -- Pad characters (5) are appended to the left end of the string (which
+      -- is initially at two less than its maximum length), then the first
+      -- three characters of the intermediate result (in this case, 3 pad
+      -- characters) are dropped.
 
       Result_String :=
         B10.Tail
@@ -489,9 +486,9 @@ begin
 
       -- Drop = Right
 
-      -- Pad characters (3) are appended to the left end of the string
-      -- (which is initially at its maximum length), then the last three
-      -- characters of the intermediate result are dropped.
+      -- Pad characters (3) are appended to the left end of the string (which
+      -- is initially at its maximum length), then the last three characters
+      -- of the intermediate result are dropped.
 
       Result_String :=
         B10.Tail
@@ -514,8 +511,7 @@ begin
          Report.Failed ("Incorrect result from Function Tail");
       end if;
 
-      -- Function Replicate (#, Char) with Truncation
-      -- Drop = Error (Default).
+      -- Function Replicate (#, Char) with Truncation Drop = Error (Default).
 
       begin
          Result_String :=
@@ -534,9 +530,9 @@ begin
 
       -- Drop = Left, Right
       -- Since this version of Replicate uses character parameters, the
-      -- result after truncation from left or right will appear the same.
-      -- The result will be a 10 character bounded string, composed of 10
-      -- "Item" characters.
+      -- result after truncation from left or right will appear the same. The
+      -- result will be a 10 character bounded string, composed of 10 "Item"
+      -- characters.
 
       if B10.Replicate (Count => 20, Item => 'A', Drop => Ada.Strings.Left) /=
         B10.Replicate (15, 'A', Ada.Strings.Right)
@@ -560,8 +556,7 @@ begin
          Report.Failed ("Incorrect result from Replicate for characters - 3");
       end if;
 
-      -- Function Replicate (#, String) with Truncation
-      -- Drop = Error (Default).
+      -- Function Replicate (#, String) with Truncation Drop = Error (Default).
 
       begin
          Result_String := B10.Replicate (Count => 5,  -- result would be 15.

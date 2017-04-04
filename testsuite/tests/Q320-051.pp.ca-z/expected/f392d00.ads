@@ -57,7 +57,7 @@ private
       Speed : in     Shutter_Speed);
 
    -- For the basic remote camera, shutter speed might be set as a function of
-   -- focus perhaps, thus it is declared as a private operation (usable
-   -- only internally within the abstraction).
+   -- focus perhaps, thus it is declared as a private operation (usable only
+   -- internally within the abstraction).
 
 end F392d00;

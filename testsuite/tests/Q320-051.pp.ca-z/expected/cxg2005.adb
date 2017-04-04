@@ -73,16 +73,14 @@ procedure Cxg2005 is
    end Guard_Digit_Check;
 
    package body Guard_Digit_Check is
-      -- made global so that the compiler will be more likely
-      -- to keep the values in memory instead of in higher
-      -- precision registers.
+      -- made global so that the compiler will be more likely to keep the
+      -- values in memory instead of in higher precision registers.
       X, Y, Z : Real;
       Onex    : Real;
       Eps, Bn : Real;
 
-      -- special constants - not declared as constants so that
-      -- the "stored" precision will be used instead of a "register"
-      -- precision.
+      -- special constants - not declared as constants so that the "stored"
+      -- precision will be used instead of a "register" precision.
       Zero : Real := 0.0;
       One  : Real := 1.0;
       Two  : Real := 2.0;
@@ -90,9 +88,8 @@ procedure Cxg2005 is
       Failure_Count : Natural := 0;
 
       procedure Thwart_Optimization is
-      -- the purpose of this procedure is to reference the
-      -- global variables used by the test so
-      -- that the compiler is not likely to keep them in
+      -- the purpose of this procedure is to reference the global variables
+      -- used by the test so that the compiler is not likely to keep them in
       -- a higher precision register for their entire lifetime.
       begin
          if Report.Ident_Bool (False) then

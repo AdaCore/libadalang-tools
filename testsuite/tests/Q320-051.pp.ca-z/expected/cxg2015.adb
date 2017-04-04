@@ -76,22 +76,17 @@
 --
 -- References:
 --
--- Software Manual for the Elementary Functions
--- William J. Cody, Jr. and William Waite
--- Prentice-Hall, 1980
+-- Software Manual for the Elementary Functions William J. Cody, Jr. and
+-- William Waite Prentice-Hall, 1980
 --
--- CRC Standard Mathematical Tables
--- 23rd Edition
+-- CRC Standard Mathematical Tables 23rd Edition
 --
--- Implementation and Testing of Function Software
--- W. J. Cody
--- Problems and Methodologies in Mathematical Software Production
--- editors P. C. Messina and A. Murli
--- Lecture Notes in Computer Science   Volume 142
--- Springer Verlag, 1982
+-- Implementation and Testing of Function Software W. J. Cody Problems and
+-- Methodologies in Mathematical Software Production editors P. C. Messina and
+-- A. Murli Lecture Notes in Computer Science Volume 142 Springer Verlag, 1982
 --
--- CELEFUNT: A Portable Test Package for Complex Elementary Functions
--- ACM Collected Algorithms number 714
+-- CELEFUNT: A Portable Test Package for Complex Elementary Functions ACM
+-- Collected Algorithms number 714
 
 with System;
 with Report;
@@ -100,7 +95,7 @@ procedure Cxg2015 is
    Verbose     : constant Boolean := False;
    Max_Samples : constant         := 1_000;
 
-   -- CRC Standard Mathematical Tables;  23rd Edition; pg 738
+   -- CRC Standard Mathematical Tables; 23rd Edition; pg 738
    Sqrt2 : constant :=
      1.41421_35623_73095_04880_16887_24209_69807_85696_71875_37695;
    Sqrt3 : constant :=
@@ -151,12 +146,11 @@ procedure Cxg2015 is
       -- flag used to terminate some tests early
       Accuracy_Error_Reported : Boolean := False;
 
-      -- The following value is a lower bound on the accuracy
-      -- required.  It is normally 0.0 so that the lower bound
-      -- is computed from Model_Epsilon.  However, for tests
-      -- where the expected result is only known to a certain
-      -- amount of precision this bound takes on a non-zero
-      -- value to account for that level of precision.
+      -- The following value is a lower bound on the accuracy required. It is
+      -- normally 0.0 so that the lower bound is computed from Model_Epsilon.
+      -- However, for tests where the expected result is only known to a
+      -- certain amount of precision this bound takes on a non-zero value
+      -- to account for that level of precision.
       Error_Low_Bound : Real := 0.0;
 
       procedure Check
@@ -168,8 +162,8 @@ procedure Cxg2015 is
          Rel_Error : Real;
          Abs_Error : Real;
       begin
-         -- In the case where the expected result is very small or 0
-         -- we compute the maximum error as a multiple of Model_Epsilon instead
+         -- In the case where the expected result is very small or 0 we
+         -- compute the maximum error as a multiple of Model_Epsilon instead
          -- of Model_Epsilon and Expected.
          Rel_Error := Mre * abs Expected * Real'Model_Epsilon;
          Abs_Error := Mre * Real'Model_Epsilon;
@@ -206,9 +200,9 @@ procedure Cxg2015 is
       end Check;
 
       procedure Special_Value_Test is
-         -- In the following tests the expected result is accurate
-         -- to the machine precision so the minimum guaranteed error
-         -- bound can be used.
+         -- In the following tests the expected result is accurate to the
+         -- machine precision so the minimum guaranteed error bound can be
+         -- used.
 
          type Data_Point is record
             Degrees, Radians, Argument, Error_Bound : Real;
@@ -216,17 +210,16 @@ procedure Cxg2015 is
 
          type Test_Data_Type is array (Positive range <>) of Data_Point;
 
-         -- the values in the following tables only involve static
-         -- expressions so no loss of precision occurs.  However,
-         -- rounding can be an issue with expressions involving Pi
-         -- and square roots.  The error bound specified in the
-         -- table takes the sqrt error into account but not the
-         -- error due to Pi.  The Pi error is added in in the
-         -- radians test below.
+         -- the values in the following tables only involve static expressions
+         -- so no loss of precision occurs. However, rounding can be an issue
+         -- with expressions involving Pi and square roots. The error bound
+         -- specified in the table takes the sqrt error into account but not
+         -- the error due to Pi. The Pi error is added in in the radians test
+         -- below.
 
          Arcsin_Test_Data : constant Test_Data_Type :=
            (
-         --  degrees      radians          sine  error_bound   test #
+         --  degrees radians sine error_bound test #
           --(  0.0,           0.0,          0.0,     0.0 ),    -- 1 - In Exact_Result_Test.
          (30.0, Pi / 6.0, 0.5, 4.0),    -- 2
             (60.0, Pi / 3.0, Sqrt3 / 2.0, 5.0),    -- 3
@@ -239,7 +232,7 @@ procedure Cxg2015 is
 
          Arccos_Test_Data : constant Test_Data_Type :=
            (
-         --  degrees      radians       cosine   error_bound   test #
+         --  degrees radians cosine error_bound test #
           --(  0.0,           0.0,         1.0,      0.0 ),    -- 1 - In Exact_Result_Test.
          (30.0, Pi / 6.0, Sqrt3 / 2.0, 5.0),    -- 2
             (60.0, Pi / 3.0, 0.5, 4.0),    -- 3
@@ -254,8 +247,7 @@ procedure Cxg2015 is
       begin
          for I in Arcsin_Test_Data'Range loop
 
-            -- note exact result requirements  A.5.1(38);6.0 and
-            -- G.2.4(12);6.0
+            -- note exact result requirements A.5.1(38);6.0 and G.2.4(12);6.0
             if Arcsin_Test_Data (I).Error_Bound = 0.0 then
                Cycle_Error  := 0.0;
                Radian_Error := 0.0;
@@ -294,8 +286,7 @@ procedure Cxg2015 is
 
          for I in Arccos_Test_Data'Range loop
 
-            -- note exact result requirements  A.5.1(39);6.0 and
-            -- G.2.4(12);6.0
+            -- note exact result requirements A.5.1(39);6.0 and G.2.4(12);6.0
             if Arccos_Test_Data (I).Error_Bound = 0.0 then
                Cycle_Error  := 0.0;
                Radian_Error := 0.0;
@@ -343,11 +334,11 @@ procedure Cxg2015 is
         (Actual, Expected_Low, Expected_High : Real;
          Test_Name                           : String)
       is
-         -- If the expected result is not a model number, then Expected_Low is
-         -- the first machine number less than the (exact) expected
-         -- result, and Expected_High is the first machine number greater than
-         -- the (exact) expected result. If the expected result is a model
-         -- number, Expected_Low = Expected_High = the result.
+         -- If the expected result is not a model number, then Expected_Low
+         -- is the first machine number less than the (exact) expected result,
+         -- and Expected_High is the first machine number greater than the
+         -- (exact) expected result. If the expected result is a model number,
+         -- Expected_Low = Expected_High = the result.
          Model_Expected_Low  : Real := Expected_Low;
          Model_Expected_High : Real := Expected_High;
       begin
@@ -429,11 +420,11 @@ procedure Cxg2015 is
       end Exact_Result_Test;
 
       procedure Arcsin_Taylor_Series_Test is
-         -- the following range is chosen so that the Taylor series
-         -- used will produce a result accurate to machine precision.
+         -- the following range is chosen so that the Taylor series used will
+         -- produce a result accurate to machine precision.
          --
          -- The following formula is used for the Taylor series:
-         --  TS(x) =  x { 1 + (xsq/2) [ (1/3) + (3/4)xsq { (1/5) +
+         --  TS(x) = x { 1 + (xsq/2) [ (1/3) + (3/4)xsq { (1/5) +
          --                (5/6)xsq [ (1/7) + (7/8)xsq/9 ] } ] }
          --   where xsq = x * x
          --
@@ -501,11 +492,11 @@ procedure Cxg2015 is
       end Arcsin_Taylor_Series_Test;
 
       procedure Arccos_Taylor_Series_Test is
-         -- the following range is chosen so that the Taylor series
-         -- used will produce a result accurate to machine precision.
+         -- the following range is chosen so that the Taylor series used will
+         -- produce a result accurate to machine precision.
          --
          -- The following formula is used for the Taylor series:
-         --  TS(x) =  x { 1 + (xsq/2) [ (1/3) + (3/4)xsq { (1/5) +
+         --  TS(x) = x { 1 + (xsq/2) [ (1/3) + (3/4)xsq { (1/5) +
          --                (5/6)xsq [ (1/7) + (7/8)xsq/9 ] } ] }
          --  arccos(x) = pi/2 - TS(x)
          A                  : constant := -0.125;
@@ -551,10 +542,9 @@ procedure Cxg2015 is
             end loop;
             Sum := Sum * Y;
 
-            -- at this point we have arcsin(x).
-            -- We compute arccos(x) = pi/2 - arcsin(x).
-            -- The following code segment is translated directly from
-            -- the CELEFUNT FORTRAN implementation
+            -- at this point we have arcsin(x). We compute arccos(x) = pi/2
+            -- - arcsin(x). The following code segment is translated directly
+            -- from the CELEFUNT FORTRAN implementation
 
             S      := C1 + C2;
             Sum    := ((C1 - S) + C2) - Sum;
@@ -578,8 +568,8 @@ procedure Cxg2015 is
                ") ",
                Minimum_Error);
 
-            -- only report the first error in this test in order to keep
-            -- lots of failures from producing a huge error log
+            -- only report the first error in this test in order to keep lots
+            -- of failures from producing a huge error log
             exit when Accuracy_Error_Reported;
          end loop;
          Error_Low_Bound := 0.0;  -- reset
@@ -597,8 +587,8 @@ procedure Cxg2015 is
       end Arccos_Taylor_Series_Test;
 
       procedure Identity_Test is
-         -- test the identity arcsin(-x) = -arcsin(x)
-         -- range chosen to be most of the valid range of the argument.
+         -- test the identity arcsin(-x) = -arcsin(x) range chosen to be most
+         -- of the valid range of the argument.
          A : constant := -0.999;
          B : constant := 0.999;
          X : Real;

@@ -54,8 +54,8 @@
    type Tc_Calls_Arr is array (Tc_Name, Tc_Call_From) of Boolean;
    Tc_Calls : Tc_Calls_Arr := (others => (others => False));
 
-   -- In real application, Send_Control_Sequence sends keystrokes from
-   -- the terminal, i.e., space, escape, etc.
+   -- In real application, Send_Control_Sequence sends keystrokes from the
+   -- terminal, i.e., space, escape, etc.
    procedure Send_Control_Sequence (Row : in Tc_Name; Col : in Tc_Call_From);
 
 end Ca13002_0;

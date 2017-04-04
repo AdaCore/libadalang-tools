@@ -5,13 +5,12 @@ package body Cxe4003_Cancellation_Test is
    -- Check that a remote procedure call can be aborted.
    --
    -- This is first done using asynchronous transfer of control where the
-   -- triggering_statement is a delay of a period that is shorter
-   -- than the time required for the RPC to complete.  The remote procedure
-   -- contains a delay to insure that it takes longer than the timeout.
-   -- The test is repeated several times to insure that once an RPC is
-   -- aborted it is still possible to try again.  Finally, the same remote
-   -- procedure is called without a timeout to make sure it is possible to
-   -- really call the procedure.
+   -- triggering_statement is a delay of a period that is shorter than the time
+   -- required for the RPC to complete. The remote procedure contains a delay
+   -- to insure that it takes longer than the timeout. The test is repeated
+   -- several times to insure that once an RPC is aborted it is still possible
+   -- to try again. Finally, the same remote procedure is called without a
+   -- timeout to make sure it is possible to really call the procedure.
 
    procedure Atc_Test is
       Was_Aborted : Boolean;
@@ -40,25 +39,23 @@ package body Cxe4003_Cancellation_Test is
       -- this one shouldn't be cancelled
       Cxe4003_Part_B1.May_Be_Cancelled (0.0);
 
-      -- tell the other partition that it can report its results for
-      -- this test now.
+      -- tell the other partition that it can report its results for this test
+      -- now.
       Cxe4003_Part_B1.End_Cancellation_Test ("atc");
    end Atc_Test;
 
    --
-   -- This is done again using an abort statement.  The remote procedure
-   -- contains a delay to insure that it takes longer than the delay used
-   -- here before the abort is performed.
-   -- The test is repeated several times to insure that once an RPC is
-   -- aborted it is still possible to try again.  Finally, the same remote
-   -- procedure is called without an abort to make sure it is possible to
-   -- really call the procedure.
+   -- This is done again using an abort statement. The remote procedure
+   -- contains a delay to insure that it takes longer than the delay used here
+   -- before the abort is performed. The test is repeated several times to
+   -- insure that once an RPC is aborted it is still possible to try again.
+   -- Finally, the same remote procedure is called without an abort to make
+   -- sure it is possible to really call the procedure.
 
    procedure Abort_Test is
       Preemptive_Abort : Boolean := True;
 
-      -- indication to the Agent_Task as to whether or not it will be
-      -- aborted.
+      -- indication to the Agent_Task as to whether or not it will be aborted.
       Abort_Expected : Boolean := True;
 
       task type Agent_Task;
@@ -68,20 +65,19 @@ package body Cxe4003_Cancellation_Test is
          Cxe4003_Part_B1.May_Be_Cancelled
            (Impdef.Annex_E.Max_Rpc_Call_Time +
             Impdef.Annex_E.Max_Rpc_Call_Time);
-         -- if preemptive aborts are supported then we should never get to
-         -- the next statement
+         -- if preemptive aborts are supported then we should never get to the
+         -- next statement
          Preemptive_Abort := False;
 
-         -- in the absence of preemptive aborts, give the runtime a
-         -- chance to do the abort
+         -- in the absence of preemptive aborts, give the runtime a chance to
+         -- do the abort
          delay 0.0;  -- abort completion point
 
          if Abort_Expected then
-            -- if we get here then the task was not aborted.
-            -- Could be because the RPC returned prematurely (an error).
-            -- Alternatively, the value of ImpDef.Annex_E.Max_RPC_Call_Time may
-            -- not be large enough.  If this is the case, a new value should
-            -- be picked.
+            -- if we get here then the task was not aborted. Could be because
+            -- the RPC returned prematurely (an error). Alternatively, the
+            -- value of ImpDef.Annex_E.Max_RPC_Call_Time may not be large
+            -- enough. If this is the case, a new value should be picked.
             Report.Failed ("abort did not take place");
          end if;
       end Agent_Task;
@@ -101,9 +97,8 @@ package body Cxe4003_Cancellation_Test is
 
       end loop;
 
-      -- state our findings about preemptive abort.  Note that
-      -- preemptive abort is only required if the Real-Time Annex
-      -- is supported.
+      -- state our findings about preemptive abort. Note that preemptive abort
+      -- is only required if the Real-Time Annex is supported.
       if not Preemptive_Abort then
          if Impdef.Validating_Annex_D then
             Report.Failed ("preemptive abort is not supported");
@@ -120,8 +115,8 @@ package body Cxe4003_Cancellation_Test is
          null;  -- wait for the agent to finish
       end;
 
-      -- tell the other partition that it can report its results for
-      -- this test now.
+      -- tell the other partition that it can report its results for this test
+      -- now.
       Cxe4003_Part_B1.End_Cancellation_Test ("abort");
 
    end Abort_Test;

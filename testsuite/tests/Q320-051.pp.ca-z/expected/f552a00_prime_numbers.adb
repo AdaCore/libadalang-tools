@@ -3,14 +3,14 @@ with Ada.Numerics.Elementary_Functions; use Ada.Numerics.Elementary_Functions;
 package body F552a00_Prime_Numbers is
 
    Disable_History : Boolean := False;
-   --  Used to disable call history for calls to Is_Prime that are internal
-   --  and not called as a result of loop iteration.
+   --  Used to disable call history for calls to Is_Prime that are internal and
+   --  not called as a result of loop iteration.
 
    function First (Object : Prime_Number_Set) return Natural is
    begin
-      --  The first prime number is 3, unless the Prime_Number_Set only
-      --  goes up to 2 or less, in which case a non-prime number is returned
-      --  since the set does not contain a prime number.
+      --  The first prime number is 3, unless the Prime_Number_Set only goes up
+      --  to 2 or less, in which case a non-prime number is returned since the
+      --  set does not contain a prime number.
 
       Ada.Strings.Unbounded.Append
         (Source   => Tc_Call_History,

@@ -1,9 +1,9 @@
 --=================================================================--
 
--- The Subprogram that performs the actual file operations is contained in a
--- private package so that it is not accessible to any client.
--- Default parameters are used in most cases in the subprogram calls, since
--- the caller does not have visibility to these private types.
+-- The Subprogram that performs the actual file operations is contained in
+-- a private package so that it is not accessible to any client. Default
+-- parameters are used in most cases in the subprogram calls, since the
+-- caller does not have visibility to these private types.
 
    -- Package OS.File_Manager.Internals
    private package Ca11011_0.Ca11011_1.Ca11011_2 is

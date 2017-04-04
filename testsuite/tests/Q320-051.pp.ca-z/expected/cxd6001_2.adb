@@ -108,8 +108,8 @@ package body Cxd6001_2 is
             Id := Tid.Current_Task;
          end Get_Id;
       or
-         -- allows clean termination when the test is
-         -- determined to be not applicable.
+         -- allows clean termination when the test is determined to be not
+         -- applicable.
          terminate;
       end select;
 
@@ -149,8 +149,8 @@ package body Cxd6001_2 is
    Simple_Victim : Victim_Type;
 
    procedure Simple_Case is
-      -- the task being aborted is not in a abort-deferred region
-      -- when the abort occurs.
+      -- the task being aborted is not in a abort-deferred region when the
+      -- abort occurs.
       Victim : Tid.Task_Id;
    begin
       Simple_Victim.Get_Id (Victim);
@@ -165,8 +165,8 @@ package body Cxd6001_2 is
    Rendezvous_Victim : Victim_Type;
 
    procedure In_Rendezvous is
-      -- the task being aborted is in a rendezvous with a server
-      -- when the abort occurs.
+      -- the task being aborted is in a rendezvous with a server when the abort
+      -- occurs.
       Victim : Tid.Task_Id;
    begin
       Rendezvous_Victim.Get_Id (Victim);
@@ -181,8 +181,8 @@ package body Cxd6001_2 is
    Protected_Victim : Victim_Type;
 
    procedure In_Protected is
-      -- the task being aborted is in a protected operation
-      -- when the abort occurs.
+      -- the task being aborted is in a protected operation when the abort
+      -- occurs.
       Victim : Tid.Task_Id;
    begin
       Protected_Victim.Get_Id (Victim);

@@ -106,9 +106,9 @@ procedure Cxd8002 is
 
    task body Delay_Test is
    begin
-      -- Normally only the environment task runs the delay test
-      -- in a verbose mode.  This is to prevent the output from
-      -- multiple tasks getting all jumbled.
+      -- Normally only the environment task runs the delay test in a verbose
+      -- mode. This is to prevent the output from multiple tasks getting all
+      -- jumbled.
       Do_Delay_Test (False, Pri);
    end Delay_Test;
 begin

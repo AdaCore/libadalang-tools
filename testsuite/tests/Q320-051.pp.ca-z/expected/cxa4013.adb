@@ -121,9 +121,9 @@ begin
 
          use Ada.Strings.Wide_Fixed; -- allows infix notation of "*" below.
 
-         -- Create a replacement string that is the same length as the
-         -- pattern string being removed.  Use the infix notation of the
-         -- wide string constructor function.
+         -- Create a replacement string that is the same length as the pattern
+         -- string being removed. Use the infix notation of the wide string
+         -- constructor function.
 
          Replacement : constant Wide_String :=
            Pattern_String'Length * Wc;                 -- "*"
@@ -166,11 +166,10 @@ begin
 
    begin
 
-      -- Invoke Censor subprogram to cleanse text.
-      -- Loop through each line of text, and check for the presence of each
-      -- restricted word.
-      -- Use the Trim function to eliminate leading or trailing blanks from
-      -- the restricted word parameters.
+      -- Invoke Censor subprogram to cleanse text. Loop through each line of
+      -- text, and check for the presence of each restricted word. Use the Trim
+      -- function to eliminate leading or trailing blanks from the restricted
+      -- word parameters.
 
       for Line in 1 .. Number_Of_Lines loop
          for Word in Restricted_Words'Range loop

@@ -3,8 +3,8 @@
 package body Ca11016_0 is
 
    procedure Initialize_Basic_Map (Map : in out Map_Type) is
-   -- Not a real initialization.  Real application can use geographic
-   -- database to create the basic map.
+   -- Not a real initialization. Real application can use geographic database
+   -- to create the basic map.
 
    begin
       for I in Latitude'First .. Latitude'Last loop

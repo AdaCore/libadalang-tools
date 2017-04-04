@@ -87,8 +87,8 @@ begin
 
       use Ada.Numerics, Ada.Strings.Bounded;
 
-      -- Declare an integer subtype and an enumeration subtype, and use them
-      -- to instantiate the discrete random number generator generic package.
+      -- Declare an integer subtype and an enumeration subtype, and use them to
+      -- instantiate the discrete random number generator generic package.
 
       subtype Discrete_Range is Integer range 1 .. 10_000;
       type Suit_Of_Cards is
@@ -115,23 +115,23 @@ begin
       Egen_1, Egen_2 : Card_Pack.Generator;
       Fgen_1, Fgen_2 : Float_Random.Generator;
 
-      -- Variables declared to hold random numbers over the inclusive range
-      -- of their corresponding type.
+      -- Variables declared to hold random numbers over the inclusive range of
+      -- their corresponding type.
 
       Dval_1, Dval_2 : Discrete_Range;
       Eval_1, Eval_2 : Suit_Of_Cards;
       Fval_1, Fval_2 : Float_Random.Uniformly_Distributed;
 
-      -- Declaration of State variables used to hold the state of the
-      -- random number generators.
+      -- Declaration of State variables used to hold the state of the random
+      -- number generators.
 
       Dstate_1, Dstate_2 : Discrete_Pack.State;
       Estate_1, Estate_2 : Card_Pack.State;
       Fstate_1, Fstate_2 : Float_Random.State;
 
-      -- Declaration of bounded string packages instantiated with the
-      -- value of Max_Image_Width constant, and bounded string variables
-      -- used to hold the image of random number generator states.
+      -- Declaration of bounded string packages instantiated with the value of
+      -- Max_Image_Width constant, and bounded string variables used to hold
+      -- the image of random number generator states.
 
       package Dstring_Pack is new Generic_Bounded_Length
         (Discrete_Pack.Max_Image_Width);
@@ -165,8 +165,8 @@ begin
 
       Objective_1 :
          -- Check that the procedures Save and Reset can be used to save the
-         -- specific state of a random number generator, and then restore the
-         -- specific state to the generator following some intermediate
+         -- specific state of a random number generator, and then restore
+         -- the specific state to the generator following some intermediate
          -- generator activity.
           declare
 
@@ -232,8 +232,8 @@ begin
          Card_Pack.Save (Gen => Egen_1, To_State => Estate_1);
          Float_Random.Save (Gen => Fgen_1, To_State => Fstate_1);
 
-         -- The last half of the first row of the arrays are filled with
-         -- values generated from the same random number generators.
+         -- The last half of the first row of the arrays are filled with values
+         -- generated from the same random number generators.
 
          for I in (Tc_Max_Values / 2 + 1) .. Tc_Max_Values loop
             Tc_Discrete_Array (First_Row, I) := Discrete_Pack.Random (Dgen_1);
@@ -249,9 +249,9 @@ begin
          Float_Random.Reset (Gen => Fgen_1, From_State => Fstate_1);
 
          -- The last half of the second row of the arrays are filled with
-         -- values generated from the same random number generator.
-         -- These values should exactly mirror the values in the last half
-         -- of the first row of the arrays that had been previously generated.
+         -- values generated from the same random number generator. These
+         -- values should exactly mirror the values in the last half of the
+         -- first row of the arrays that had been previously generated.
 
          for I in (Tc_Max_Values / 2 + 1) .. Tc_Max_Values loop
             Tc_Discrete_Array (Second_Row, I) := Discrete_Pack.Random (Dgen_1);
@@ -314,16 +314,15 @@ begin
 
       Objective_2 :
          -- Check that the Function Image can be used to obtain a string
-         -- representation of the state of a generator.
-         -- Check that the Function Value will transform a string
-         -- representation of the state of a random number generator
-         -- into the actual state object.
+         -- representation of the state of a generator. Check that the Function
+         -- Value will transform a string representation of the state of a
+         -- random number generator into the actual state object.
           begin
 
          -- Use two discrete and float random number generators to generate
          -- a series of values (so that the generators are no longer in their
-         -- initial states, and they have generated the same number of
-         -- random values).
+         -- initial states, and they have generated the same number of random
+         -- values).
 
          Tc_Seed := Integer (Discrete_Pack.Random (Dgen_1));
          Discrete_Pack.Reset (Dgen_1, Tc_Seed);
@@ -342,8 +341,8 @@ begin
             Fval_2 := Float_Random.Random (Fgen_2);
          end loop;
 
-         -- Use the Procedure Save to save the states of the generators
-         -- to state variables.
+         -- Use the Procedure Save to save the states of the generators to
+         -- state variables.
 
          Discrete_Pack.Save (Gen => Dgen_1, To_State => Dstate_1);
          Discrete_Pack.Save (Dgen_2, To_State => Dstate_2);
@@ -390,8 +389,8 @@ begin
                "depict different states of Float generators");
          end if;
 
-         -- The string representation of a state code is transformed back
-         -- to a state code variable using the Function Value.
+         -- The string representation of a state code is transformed back to a
+         -- state code variable using the Function Value.
 
          Dstate_1 :=
            Discrete_Pack.Value
@@ -417,8 +416,8 @@ begin
          Card_Pack.Reset (Gen => Egen_1, From_State => Estate_1);
          Float_Random.Reset (Gen => Fgen_1, From_State => Fstate_1);
 
-         -- All generators should now be in the same state, so the
-         -- random values they produce should be the same.
+         -- All generators should now be in the same state, so the random
+         -- values they produce should be the same.
 
          for I in 1 .. 1_000 loop
             if Discrete_Pack.Random (Dgen_1) /=

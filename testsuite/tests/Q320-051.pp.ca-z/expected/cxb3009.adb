@@ -116,8 +116,8 @@ begin
 
    begin
 
-      -- Check that the function To_Chars_Ptr will return a Null_Ptr value
-      -- when the parameter Item is null.
+      -- Check that the function To_Chars_Ptr will return a Null_Ptr value when
+      -- the parameter Item is null.
 
       if Ics.To_Chars_Ptr
           (Item      => Null_Char_Array_Access,
@@ -160,10 +160,9 @@ begin
                "validation of Function To_Chars_Ptr");
       end;
 
-      -- Check that if parameter Item is not null, and references a
-      -- chars_array object that does not contain nul, and parameter
-      -- Nul_Check is True, the To_Chars_Ptr function will propagate
-      -- Terminator_Error.
+      -- Check that if parameter Item is not null, and references a chars_array
+      -- object that does not contain nul, and parameter Nul_Check is True, the
+      -- To_Chars_Ptr function will propagate Terminator_Error.
 
       begin
          Tc_Chars_Ptr := Ics.To_Chars_Ptr (Char_Array_Wo_Nul_Ptr, True);
@@ -185,9 +184,9 @@ begin
                "char, but parameter Nul_Check is True");
       end;
 
-      -- Check that if the parameter Item is not null, and parameter
-      -- Nul_Check is False, function To_Chars_Ptr performs a pointer
-      -- conversion from char_array_access type to chars_ptr type.
+      -- Check that if the parameter Item is not null, and parameter Nul_Check
+      -- is False, function To_Chars_Ptr performs a pointer conversion from
+      -- char_array_access type to chars_ptr type.
 
       begin
          Tc_Chars_Ptr :=
@@ -215,8 +214,8 @@ begin
       end;
 
       -- Check that the New_Char_Array function will return a chars_ptr type
-      -- pointer to an allocated object that has been initialized with
-      -- the value of parameter Chars.
+      -- pointer to an allocated object that has been initialized with the
+      -- value of parameter Chars.
       Tc_Chars_Ptr := Ics.New_String ("");
       Ics.Free (Tc_Chars_Ptr);   -- Reset the chars_ptr to Null_Ptr;
 
@@ -233,8 +232,8 @@ begin
             "terminating nul char");
       end if;
 
-      -- Length of allocated array is determined using Strlen since array
-      -- is nul terminated.  Contents of array are validated using Value.
+      -- Length of allocated array is determined using Strlen since array is
+      -- nul terminated. Contents of array are validated using Value.
 
       if Ics.Value (Tc_Chars_Ptr, Length => 7) /= Char_Array_With_Nul or
         Ics.Strlen (Item => Tc_Chars_Ptr) /= 6
@@ -273,8 +272,8 @@ begin
             "contain a terminating nul char");
       end if;
 
-      -- Check that the function New_String returns a chars_ptr specifying
-      -- an allocated object initialized to the value of parameter Str.
+      -- Check that the function New_String returns a chars_ptr specifying an
+      -- allocated object initialized to the value of parameter Str.
 
       Ics.Free (Tc_Chars_Ptr);   -- Reset the chars_ptr to Null_Ptr;
       if Tc_Chars_Ptr /= Ics.Null_Ptr then

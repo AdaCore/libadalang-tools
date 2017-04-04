@@ -102,8 +102,8 @@ private
       type Formal_Arr01 is array (Small_Int) of Private_Type;
       type Formal_Arr02 is array (Small_Int) of Rec_Of_Limited_Private;
 
-      -- Formal access types of composite types with a subcomponent of
-      -- a private subtype.
+      -- Formal access types of composite types with a subcomponent of a
+      -- private subtype.
 
       type Formal_Acc01 is access Rec_Of_Private_Subtype;
       type Formal_Acc02 is access Array_Of_Lp_Subtype;

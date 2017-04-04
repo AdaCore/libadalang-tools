@@ -46,8 +46,7 @@ package Fxaca00 is
    type Origin_Type is (Foreign, Domestic);
 
    for Origin_Type'Size use 1;   -- Forces objects of the type to be
-   -- representable in 1 bit, used in rep clause
-   -- below for Sales_Record_Type.
+   -- representable in 1 bit, used in rep clause below for Sales_Record_Type.
 
    type Product_Type (Manufacture : Origin_Type := Domestic) is record
       Item : String (1 .. 8);
@@ -74,8 +73,8 @@ package Fxaca00 is
 
    String_Bits : constant := Impdef.Char_Bits * 6 - 1;
 
-   -- This discriminated record type has a representation clause that
-   -- includes the discriminant of the object of this type.
+   -- This discriminated record type has a representation clause that includes
+   -- the discriminant of the object of this type.
 
    for Sales_Record_Type use record
       Name              at                        0 range 0 .. String_Bits;
