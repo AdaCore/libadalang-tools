@@ -2811,19 +2811,10 @@ package body Pp.Formatting is
             end if;
          end loop;
 
-         if not Arg (Cmd, Comments_Only)
-           and then not Preserve_Blank_Lines (Cmd)
-         then
-            if Point (Out_Buf) /= Last_Position (Out_Buf) then
-               Raise_Token_Mismatch
-                 ("Final_Check 5", Lines_Data, Src_Buf,
-                  Src_Index, Out_Index, Src_Tok, Out_Tok);
-            end if;
-         end if;
          while not At_End (Out_Buf) loop
             if not Is_Line_Terminator (Cur (Out_Buf)) then
                Raise_Token_Mismatch
-                 ("Final_Check 6", Lines_Data, Src_Buf,
+                 ("Final_Check 5", Lines_Data, Src_Buf,
                   Src_Index, Out_Index, Src_Tok, Out_Tok);
             end if;
 
@@ -2836,7 +2827,7 @@ package body Pp.Formatting is
            or else Out_Index /= Last_Index (Out_Tokens)
          then
             Raise_Token_Mismatch
-              ("Final_Check 7", Lines_Data, Src_Buf,
+              ("Final_Check 6", Lines_Data, Src_Buf,
                Src_Index, Out_Index, Src_Tok, Out_Tok);
          end if;
       end Final_Check_Helper;
