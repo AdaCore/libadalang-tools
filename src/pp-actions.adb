@@ -290,12 +290,6 @@ package body Pp.Actions is
 
    ----------------
 
-   function Is_Null (Tree : Ada_Node) return Boolean is (Tree = null);
-   function T_Img (Tree : Ada_Node) return String is (Short_Image (Tree));
-
-   package Lines_Data_Pkg is new Generic_Lines_Data
-     (Ada_Node, Cmd_Error_No_Tool_Name);
-   use Lines_Data_Pkg;
    use Line_Break_Vectors;
    use Tab_Vectors, Tab_In_Line_Vectors, Tab_In_Line_Vector_Vectors;
    Lines_Data : Lines_Data_Rec;

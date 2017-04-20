@@ -28,6 +28,8 @@ pragma Ada_2012;
 with Ada.Containers.Bounded_Vectors;
 with Ada.Containers.Indefinite_Vectors;
 
+with Libadalang.Analysis;
+
 with ASIS_UL.Vectors;
 with ASIS_UL.Char_Vectors; use ASIS_UL.Char_Vectors;
 use ASIS_UL.Char_Vectors.Char_Vectors;
@@ -45,294 +47,277 @@ package Pp.Formatting is
    --  Raised by Tree_To_Ada if it detects a bug in itself that causes the
    --  output tokens to not match the input properly.
 
-   ----------------
+   -------------------
+   -- Line Breaking --
+   -------------------
 
-   pragma Style_Checks ("M82");
-   generic
-      type Ada_Tree_Base is private;
-      --  For now, we make this generic, so we can pass in the ASIS-based
-      --  Ada_Tree_Base type, or the libadalang-based Ada_Node type.
-      with procedure Error_Message (Message : String);
-      --  Should print the message and raise an exception to abort processing.
-      --  The exception is different between ASIS and LAL.
-      with function Is_Null (Tree : Ada_Tree_Base) return Boolean is <>;
-      with function T_Img (Tree : Ada_Tree_Base) return String is <>;
-   package Generic_Lines_Data is
+   type Nesting_Level is new Natural;
 
-      -------------------
-      -- Line Breaking --
-      -------------------
+   type Line_Break is record
+      Mark : Marker;
+      --  Marks the (potential) line break in the buffer. For a hard line
+      --  break, there is an NL character at that position. For a soft one,
+      --  there is initially nothing in the buffer; an NL will be inserted
+      --  at Mark if the line break becomes enabled.
+      --
+      --  The reason for inserting NL characters is so we can call Get_Tokens
+      --  on the buffer. The reason for not doing so for soft line breaks
+      --  is that it's not necessary (there will always be something to
+      --  prevent two tokens running together), and it makes the line
+      --  length calculation simpler.
 
-      type Nesting_Level is new Natural;
+      Hard : Boolean;
+      --  True for a hard line break, False for a soft one
+      Affects_Comments : Boolean;
+      --  True if the indentation of this Line_Break should affect the
+      --  indentation of surrounding comments. For example, True for '$' but
+      --  False for '%" (see type Ada_Template).
+      Enabled : Boolean;
+      --  True if this line break will appear in the final output
+      Level : Nesting_Level := 1000;
+      --  Nesting level of [...] (continuation-line indentation, mainly for
+      --  soft line breaks).
+      Indentation : Natural := 1000;
+      --  Indentation level of this line break
+      Length : Natural := Natural'Last;
+      --  Number of characters in line, not counting NL. Calculated by
+      --  Split_Lines. Valid only for enabled line breaks.
 
-      type Line_Break is record
-         Mark : Marker;
-         --  Marks the (potential) line break in the buffer. For a hard line
-         --  break, there is an NL character at that position. For a soft one,
-         --  there is initially nothing in the buffer; an NL will be inserted
-         --  at Mark if the line break becomes enabled.
-         --
-         --  The reason for inserting NL characters is so we can call Get_Tokens
-         --  on the buffer. The reason for not doing so for soft line breaks
-         --  is that it's not necessary (there will always be something to
-         --  prevent two tokens running together), and it makes the line
-         --  length calculation simpler.
-
-         Hard : Boolean;
-         --  True for a hard line break, False for a soft one
-         Affects_Comments : Boolean;
-         --  True if the indentation of this Line_Break should affect the
-         --  indentation of surrounding comments. For example, True for '$' but
-         --  False for '%" (see type Ada_Template).
-         Enabled : Boolean;
-         --  True if this line break will appear in the final output
-         Level : Nesting_Level := 1000;
-         --  Nesting level of [...] (continuation-line indentation, mainly for
-         --  soft line breaks).
-         Indentation : Natural := 1000;
-         --  Indentation level of this line break
-         Length : Natural := Natural'Last;
-         --  Number of characters in line, not counting NL. Calculated by
-         --  Split_Lines. Valid only for enabled line breaks.
-
-         --  For debugging:
+      --  For debugging:
 
 --  ????      Kind     : Ada_Tree_Kind;
-         Template : Syms.Symbol;
-         UID      : Modular := 123_456_789;
-      end record; -- Line_Break
+      Template : Syms.Symbol;
+      UID      : Modular := 123_456_789;
+   end record; -- Line_Break
 
-      type Line_Break_Index is new Positive;
-      type Line_Break_Array is array (Line_Break_Index range <>) of Line_Break;
-      package Line_Break_Vectors is new ASIS_UL.Vectors
-        (Line_Break_Index,
-         Line_Break,
-         Line_Break_Array);
-      subtype Line_Break_Vector is Line_Break_Vectors.Vector;
+   type Line_Break_Index is new Positive;
+   type Line_Break_Array is array (Line_Break_Index range <>) of Line_Break;
+   package Line_Break_Vectors is new ASIS_UL.Vectors
+     (Line_Break_Index,
+      Line_Break,
+      Line_Break_Array);
+   subtype Line_Break_Vector is Line_Break_Vectors.Vector;
 
-      use Line_Break_Vectors;
-      --  use all type Line_Break_Vector;
+   use Line_Break_Vectors;
+   --  use all type Line_Break_Vector;
 
-      ------------------------
-      -- Tabs and Alignment --
-      ------------------------
+   ------------------------
+   -- Tabs and Alignment --
+   ------------------------
 
-      --  We use "tabs" to implement alignment. For example, if the input is:
-      --     X : Integer := 123;
-      --     Long_Ident : Boolean := False;
-      --     Y : constant Long_Type_Name := Something;
-      --  we're going to align the ":" and ":=" in the output, like this:
-      --     X          : Integer                 := 123;
-      --     Long_Ident : Boolean                 := False;
-      --     Y          : constant Long_Type_Name := Something;
-      --
-      --  A "tab" appears before each ":" and ":=" in the above. This information
-      --  is recorded in Tabs, below. The position of the tab in the buffer
-      --  is indicated by Mark, which gets automatically updated as unrelated
-      --  passes update Out_Buf. Finally, Insert_Alignment calculates the Col
-      --  and Num_Blanks for each tab, and then inserts blanks accordingly.
-      --
-      --  A tab always occurs at the start of a token.
+   --  We use "tabs" to implement alignment. For example, if the input is:
+   --     X : Integer := 123;
+   --     Long_Ident : Boolean := False;
+   --     Y : constant Long_Type_Name := Something;
+   --  we're going to align the ":" and ":=" in the output, like this:
+   --     X          : Integer                 := 123;
+   --     Long_Ident : Boolean                 := False;
+   --     Y          : constant Long_Type_Name := Something;
+   --
+   --  A "tab" appears before each ":" and ":=" in the above. This information
+   --  is recorded in Tabs, below. The position of the tab in the buffer
+   --  is indicated by Mark, which gets automatically updated as unrelated
+   --  passes update Out_Buf. Finally, Insert_Alignment calculates the Col
+   --  and Num_Blanks for each tab, and then inserts blanks accordingly.
+   --
+   --  A tab always occurs at the start of a token.
 
-      type Tab_Index_In_Line is range 1 .. 9;
-      --  We probably never have more than a few tabs in a given construct, so 9
-      --  should be plenty, and it allows us to use a single digit in the
-      --  templates, as in "^2".
+   type Tab_Index_In_Line is range 1 .. 9;
+   --  We probably never have more than a few tabs in a given construct, so 9
+   --  should be plenty, and it allows us to use a single digit in the
+   --  templates, as in "^2".
 
-      type Tab_Rec is record
-         Parent, Tree : Ada_Tree_Base;
-         --  Tree is the tree whose template generated this tab, and Parent is its
-         --  parent. Tree is used to ensure that the relevant tabs within a single
-         --  line all come from the same tree; other tabs in the line are ignored.
-         --  Parent is used across lines to ensure that all lines within a
-         --  paragraph to be aligned together all come from the same parent tree.
-         Token : Syms.Symbol := Name_Empty;
-         --  This is some text associated with the Tab. Usually, it is the text of
-         --  the token that follows the Tab in the template.
-         Mark : Marker;
-         --  Position in the buffer of the tab
-         Index_In_Line   : Tab_Index_In_Line := Tab_Index_In_Line'Last;
-         Col             : Positive          := Positive'Last;
-         --  Column number of the tab
-         Num_Blanks : Natural := 0;
-         --  Number of blanks this tab should expand into
-         Is_Fake : Boolean;
-         --  True if this is a "fake tab", which means that it doesn't actually
-         --  insert any blanks (Num_Blanks = 0). See Append_Tab for more
-         --  explanation.
-         Is_Insertion_Point : Boolean;
-         --  False for "^", true for "&". Normally, "^" means insert blanks at the
-         --  point of the "^" to align things. However, if there is a preceding
-         --  (and matching) "&", then the blanks are inserted at the "insertion
-         --  point" indicated by "&". This feature provides for
-         --  right-justification.
-         --  See Tree_To_Ada.Insert_Alignment.Calculate_Num_Blanks.Process_Line in
-         --  pp-formatting.adb for more information.
-      end record;
+   type Tab_Rec is record
+      Parent, Tree : Libadalang.Analysis.Ada_Node;
+      --  Tree is the tree whose template generated this tab, and Parent is its
+      --  parent. Tree is used to ensure that the relevant tabs within a single
+      --  line all come from the same tree; other tabs in the line are ignored.
+      --  Parent is used across lines to ensure that all lines within a
+      --  paragraph to be aligned together all come from the same parent tree.
+      Token : Syms.Symbol := Name_Empty;
+      --  This is some text associated with the Tab. Usually, it is the text of
+      --  the token that follows the Tab in the template.
+      Mark : Marker;
+      --  Position in the buffer of the tab
+      Index_In_Line   : Tab_Index_In_Line := Tab_Index_In_Line'Last;
+      Col             : Positive          := Positive'Last;
+      --  Column number of the tab
+      Num_Blanks : Natural := 0;
+      --  Number of blanks this tab should expand into
+      Is_Fake : Boolean;
+      --  True if this is a "fake tab", which means that it doesn't actually
+      --  insert any blanks (Num_Blanks = 0). See Append_Tab for more
+      --  explanation.
+      Is_Insertion_Point : Boolean;
+      --  False for "^", true for "&". Normally, "^" means insert blanks at the
+      --  point of the "^" to align things. However, if there is a preceding
+      --  (and matching) "&", then the blanks are inserted at the "insertion
+      --  point" indicated by "&". This feature provides for
+      --  right-justification.
+      --  See Tree_To_Ada.Insert_Alignment.Calculate_Num_Blanks.Process_Line in
+      --  pp-formatting.adb for more information.
+   end record;
 
-      type Tab_Index is new Positive;
-      type Tab_Array is array (Tab_Index range <>) of Tab_Rec;
-      package Tab_Vectors is new ASIS_UL.Vectors (Tab_Index, Tab_Rec, Tab_Array);
-      subtype Tab_Vector is Tab_Vectors.Vector;
+   type Tab_Index is new Positive;
+   type Tab_Array is array (Tab_Index range <>) of Tab_Rec;
+   package Tab_Vectors is new ASIS_UL.Vectors (Tab_Index, Tab_Rec, Tab_Array);
+   subtype Tab_Vector is Tab_Vectors.Vector;
 
-      use Tab_Vectors;
-      --  use all type Tab_Vector;
+   use Tab_Vectors;
+   --  use all type Tab_Vector;
 
-      package Tab_In_Line_Vectors is new Ada.Containers.Bounded_Vectors
-        (Tab_Index_In_Line,
-         Tab_Index);
-      use Tab_In_Line_Vectors;
-      subtype Tab_In_Line_Vector is
-        Tab_In_Line_Vectors
-          .Vector
-        (Capacity => Ada.Containers.Count_Type (Tab_Index_In_Line'Last));
+   package Tab_In_Line_Vectors is new Ada.Containers.Bounded_Vectors
+     (Tab_Index_In_Line,
+      Tab_Index);
+   use Tab_In_Line_Vectors;
+   subtype Tab_In_Line_Vector is
+     Tab_In_Line_Vectors
+       .Vector
+     (Capacity => Ada.Containers.Count_Type (Tab_Index_In_Line'Last));
 
-      type Tab_In_Line_Vector_Index is new Positive;
-      package Tab_In_Line_Vector_Vectors is new Ada.Containers.Indefinite_Vectors
-        (Tab_In_Line_Vector_Index,
-         Tab_In_Line_Vector);
-      --  We use Indefinite_Vectors rather than Vectors because otherwise we get
-      --  "discriminant check failed" at a-cobove.ads:371. I'm not sure whether
-      --  that's a compiler bug.
-      use Tab_In_Line_Vector_Vectors;
+   type Tab_In_Line_Vector_Index is new Positive;
+   package Tab_In_Line_Vector_Vectors is new Ada.Containers.Indefinite_Vectors
+     (Tab_In_Line_Vector_Index,
+      Tab_In_Line_Vector);
+   --  We use Indefinite_Vectors rather than Vectors because otherwise we get
+   --  "discriminant check failed" at a-cobove.ads:371. I'm not sure whether
+   --  that's a compiler bug.
+   use Tab_In_Line_Vector_Vectors;
 
-      type Lines_Data_Rec is record
+   type Lines_Data_Rec is record
 
-         Out_Buf : Buffer;
-         --  Buffer containing the text that we will eventually output as the
-         --  final result. We first fill this with initially formatted text by
-         --  walking the tree, and then we modify it repeatedly in multiple
-         --  passes.
+      Out_Buf : Buffer;
+      --  Buffer containing the text that we will eventually output as the
+      --  final result. We first fill this with initially formatted text by
+      --  walking the tree, and then we modify it repeatedly in multiple
+      --  passes.
 
-         Cur_Indentation : Natural := 0;
+      Cur_Indentation : Natural := 0;
 
-         Next_Line_Break_Unique_Id : Modular := 1;
-         --  Used to set Line_Break.UID for debugging.
+      Next_Line_Break_Unique_Id : Modular := 1;
+      --  Used to set Line_Break.UID for debugging.
 
-         --  Each line break is represented by a Line_Break appended onto the
-         --  Line_Breaks vector. Hard line breaks are initially enabled. Soft
-         --  line breaks are initially disabled, and will be enabled if
-         --  necessary to make lines short enough.
+      --  Each line break is represented by a Line_Break appended onto the
+      --  Line_Breaks vector. Hard line breaks are initially enabled. Soft
+      --  line breaks are initially disabled, and will be enabled if
+      --  necessary to make lines short enough.
 
-         All_Line_Breaks : Line_Break_Vector;
-         --  All line breaks in the whole input file. Built in two passes.
+      All_Line_Breaks : Line_Break_Vector;
+      --  All line breaks in the whole input file. Built in two passes.
 
-         Temp_Line_Breaks : Line_Break_Vector;
-         --  Used by Insert_Comments_And_Blank_Lines to add new line breaks to
-         --  All_Line_Breaks; they are appended to Temp_Line_Breaks, which is
-         --  then merged with All_Line_Breaks when done. This is for efficiency
-         --  and to keep the tables in source-location order.
+      Temp_Line_Breaks : Line_Break_Vector;
+      --  Used by Insert_Comments_And_Blank_Lines to add new line breaks to
+      --  All_Line_Breaks; they are appended to Temp_Line_Breaks, which is
+      --  then merged with All_Line_Breaks when done. This is for efficiency
+      --  and to keep the tables in source-location order.
 
-         Enabled_Line_Breaks : Line_Break_Vector;
-         --  All enabled line breaks
-         Syntax_Line_Breaks : Line_Break_Vector;
-         --  All (enabled) nonblank hard line breaks. These are called
-         --  "Syntax_..."  because they are determined by the syntax (e.g. we
-         --  always put a line break after a statement).
+      Enabled_Line_Breaks : Line_Break_Vector;
+      --  All enabled line breaks
+      Syntax_Line_Breaks : Line_Break_Vector;
+      --  All (enabled) nonblank hard line breaks. These are called
+      --  "Syntax_..."  because they are determined by the syntax (e.g. we
+      --  always put a line break after a statement).
 
-         --  ???Perhaps make the above tables contain Line_Break_Indexes
-         --  instead of Line_Breaks. Can we use an index into a single table
-         --  instead of UID?
+      --  ???Perhaps make the above tables contain Line_Break_Indexes
+      --  instead of Line_Breaks. Can we use an index into a single table
+      --  instead of UID?
 
-         Tabs : Tab_Vector;
-         --  All of the tabs in the whole input file, in increasing order
+      Tabs : Tab_Vector;
+      --  All of the tabs in the whole input file, in increasing order
 
-         Src_Tokens, -- from original source file (Src_Buf)
-         Out_Tokens : -- from Out_Buf
-           Scanner.Token_Vector;
+      Src_Tokens, -- from original source file (Src_Buf)
+      Out_Tokens : -- from Out_Buf
+        Scanner.Token_Vector;
 
-         Out_Buf_Line_Ends : aliased Marker_Vector;
+      Out_Buf_Line_Ends : aliased Marker_Vector;
 
-         -------------------------------------
-         -- Support for -pp-off and --pp-on --
-         -------------------------------------
+      -------------------------------------
+      -- Support for -pp-off and --pp-on --
+      -------------------------------------
 
-         Pp_Off_On_Delimiters : Scanner.Pp_Off_On_Delimiters_Rec;
-
-         --  Debugging:
-
-         Check_Whitespace : Boolean := True;
-         --  Used during the Subtree_To_Ada phase. True except within comments and
-         --  literals. Check for two blanks in a row.
-      end record; -- Lines_Data_Rec
-
-      procedure Collect_Enabled_Line_Breaks
-        (Lines_Data : in out Lines_Data_Rec; Syntax_Also : Boolean);
-      --  Collect all the enabled line breaks, and (if Syntax_Also is True) also
-      --  the syntax line breaks.
-
-      function Next_Enabled
-        (Line_Breaks : Line_Break_Vector; F : Line_Break_Index)
-        return Line_Break_Index;
-      --  Next currently-enabled line break after F. Thus, F..Next_Enabled(F) is a
-      --  line.
-
-      function Is_Empty_Line
-        (Out_Buf : Buffer;
-         Line_Breaks : Line_Break_Vector;
-         F, L : Line_Break_Index) return Boolean;
-      --  True if F..L forms an empty line (or would, if both were enabled).
-
-      ----------------
-
-      function Good_Column
-        (PP_Indentation : Positive; Indentation : Natural)
-        return Natural is
-        ((Indentation / PP_Indentation) * PP_Indentation);
-      --  Make sure indentation is a multiple of PP_Indentation; otherwise style
-      --  checking complains "(style) bad column".
-
-      procedure Do_Comments_Only
-        (Lines_Data : in out Lines_Data_Rec;
-         Src_Buf : in out Buffer;
-         Cmd : LAL_UL.Command_Lines.Command_Line);
-      --  Implement the --comments-only switch. This skips most of the usual
-      --  pretty-printing passes, and just formats comments.
-
-      procedure Post_Tree_Phases
-        (Lines_Data : in out Lines_Data_Rec;
-         Source_File_Name : String;
-         Src_Buf : in out Buffer;
-         Cmd : LAL_UL.Command_Lines.Command_Line);
-      --  The first pretty-printing pass walks the tree and produces text,
-      --  along with various tables. This performs the remaining passes, which
-      --  do not make use of the tree.
-
-      ----------------
+      Pp_Off_On_Delimiters : Scanner.Pp_Off_On_Delimiters_Rec;
 
       --  Debugging:
 
-      function Line_Text
-        (Out_Buf : Buffer;
-         Line_Breaks : Line_Break_Vector;
-         F, L : Line_Break_Index) return W_Str;
-      --  F and L are the first and last index forming a line; returns the text of
-      --  the line, not including any new-lines.
+      Check_Whitespace : Boolean := True;
+      --  Used during the Subtree_To_Ada phase. True except within comments and
+      --  literals. Check for two blanks in a row.
+   end record; -- Lines_Data_Rec
 
-      function Tab_Image
-        (Out_Buf : Buffer; Tabs : Tab_Vector; X : Tab_Index) return String;
+   procedure Collect_Enabled_Line_Breaks
+     (Lines_Data : in out Lines_Data_Rec; Syntax_Also : Boolean);
+   --  Collect all the enabled line breaks, and (if Syntax_Also is True) also
+   --  the syntax line breaks.
 
-      procedure Put_Line_Breaks
-        (Out_Buf : Buffer; Line_Breaks : Line_Break_Vector);
-      --  ???This doesn't work unless Line_Breaks is All_Line_Breaks, because of
-      --  various global variables!
+   function Next_Enabled
+     (Line_Breaks : Line_Break_Vector; F : Line_Break_Index)
+     return Line_Break_Index;
+   --  Next currently-enabled line break after F. Thus, F..Next_Enabled(F) is a
+   --  line.
 
-      procedure Put_Line_Break (Out_Buf : Buffer; Break : Line_Break);
+   function Is_Empty_Line
+     (Out_Buf : Buffer;
+      Line_Breaks : Line_Break_Vector;
+      F, L : Line_Break_Index) return Boolean;
+   --  True if F..L forms an empty line (or would, if both were enabled).
 
-      procedure Put_Buf_With_Marks (Lines_Data : Lines_Data_Rec);
+   ----------------
 
-      procedure Format_Debug_Output
-        (Lines_Data : Lines_Data_Rec; Message : String);
+   function Good_Column
+     (PP_Indentation : Positive; Indentation : Natural)
+     return Natural is
+     ((Indentation / PP_Indentation) * PP_Indentation);
+   --  Make sure indentation is a multiple of PP_Indentation; otherwise style
+   --  checking complains "(style) bad column".
 
-      Simulate_Token_Mismatch : Boolean renames Debug.Debug_Flag_8;
-      Disable_Final_Check : Boolean renames Debug.Debug_Flag_7;
-      function Enable_Token_Mismatch return Boolean is
-         ((Assert_Enabled or Debug.Debug_Flag_5)
-            and not Simulate_Token_Mismatch
-            and not Debug.Debug_Flag_6);
+   procedure Do_Comments_Only
+     (Lines_Data : in out Lines_Data_Rec;
+      Src_Buf : in out Buffer;
+      Cmd : LAL_UL.Command_Lines.Command_Line);
+   --  Implement the --comments-only switch. This skips most of the usual
+   --  pretty-printing passes, and just formats comments.
 
-   end Generic_Lines_Data;
-   pragma Style_Checks ("M79");
+   procedure Post_Tree_Phases
+     (Lines_Data : in out Lines_Data_Rec;
+      Source_File_Name : String;
+      Src_Buf : in out Buffer;
+      Cmd : LAL_UL.Command_Lines.Command_Line);
+   --  The first pretty-printing pass walks the tree and produces text,
+   --  along with various tables. This performs the remaining passes, which
+   --  do not make use of the tree.
+
+   ----------------
+
+   --  Debugging:
+
+   function Line_Text
+     (Out_Buf : Buffer;
+      Line_Breaks : Line_Break_Vector;
+      F, L : Line_Break_Index) return W_Str;
+   --  F and L are the first and last index forming a line; returns the text of
+   --  the line, not including any new-lines.
+
+   function Tab_Image
+     (Out_Buf : Buffer; Tabs : Tab_Vector; X : Tab_Index) return String;
+
+   procedure Put_Line_Breaks
+     (Out_Buf : Buffer; Line_Breaks : Line_Break_Vector);
+   --  ???This doesn't work unless Line_Breaks is All_Line_Breaks, because of
+   --  various global variables!
+
+   procedure Put_Line_Break (Out_Buf : Buffer; Break : Line_Break);
+
+   procedure Put_Buf_With_Marks (Lines_Data : Lines_Data_Rec);
+
+   procedure Format_Debug_Output
+     (Lines_Data : Lines_Data_Rec; Message : String);
+
+   Simulate_Token_Mismatch : Boolean renames Debug.Debug_Flag_8;
+   Disable_Final_Check : Boolean renames Debug.Debug_Flag_7;
+   function Enable_Token_Mismatch return Boolean is
+      ((Assert_Enabled or Debug.Debug_Flag_5)
+         and not Simulate_Token_Mismatch
+         and not Debug.Debug_Flag_6);
 
    ----------------------------------------------------------------
    --
