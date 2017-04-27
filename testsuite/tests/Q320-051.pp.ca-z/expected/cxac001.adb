@@ -87,9 +87,8 @@ begin
 
    exception
 
-      when Ada.Streams.Stream_Io
-        .Use_Error | Ada.Streams.Stream_Io
-        .Name_Error =>
+      when Ada.Streams.Stream_Io.Use_Error |
+        Ada.Streams.Stream_Io.Name_Error   =>
          Report.Not_Applicable
            ("Files not supported - Create as Out_File for Stream_IO");
          raise Incomplete;

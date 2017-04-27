@@ -691,7 +691,7 @@ package body Pp.Actions is
            when Ada_Entry_Index_Spec =>
              L ("for ! in[@ !]"),
            when Ada_Exception_Handler =>
-             L ("when[? ~~ :~ ?~ ^|@ ~~] =>$", "{?~;$~;$~}"),
+             L ("when[? ~~ :~ ?~ ^|@ ~~] ^=>$", "{?~;$~;$~}"),
            when Ada_Explicit_Deref =>
              L ("!.all"),
            when Ada_Aggregate =>

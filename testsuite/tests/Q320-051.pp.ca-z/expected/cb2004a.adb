@@ -68,7 +68,12 @@ begin
             end;
 
          exception
-            when Constraint_Error | Program_Error | Storage_Error | Tasking_Error | E2 | E3 =>
+            when Constraint_Error |
+              Program_Error       |
+              Storage_Error       |
+              Tasking_Error       |
+              E2                  |
+              E3                  =>
                Failed ("WRONG  " & "EXCEPTION HANDLED   #1");
          end;
 
@@ -93,7 +98,12 @@ begin
             end;
 
          exception
-            when Constraint_Error | Program_Error | Storage_Error | Tasking_Error | E1 | E3 =>
+            when Constraint_Error |
+              Program_Error       |
+              Storage_Error       |
+              Tasking_Error       |
+              E1                  |
+              E3                  =>
                Failed ("WRONG  " & "EXCEPTION HANDLED   #2");
          end;
 
@@ -120,7 +130,12 @@ begin
             end;
 
          exception
-            when Constraint_Error | Program_Error | Storage_Error | Tasking_Error | E2 | E3 =>
+            when Constraint_Error |
+              Program_Error       |
+              Storage_Error       |
+              Tasking_Error       |
+              E2                  |
+              E3                  =>
                Failed ("WRONG " & "EXCEPTION HANDLED   #3");
          end;
 
