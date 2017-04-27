@@ -59,7 +59,10 @@ procedure Cb1005a is
          exception
             when Exc =>
                Failed ("EXCEPTION NOT DISTINCT - 10");
-            when Program_Error | Storage_Error | Tasking_Error | Constraint_Error =>
+            when Program_Error |
+              Storage_Error    |
+              Tasking_Error    |
+              Constraint_Error =>
                Failed ("WRONG EXCEPTION PROPAGATED - 11");
             when others =>
                null;
