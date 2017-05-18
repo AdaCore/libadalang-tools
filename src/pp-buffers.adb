@@ -21,8 +21,6 @@
 -- The gnat2xml tool was derived from the Avatox sources.                   --
 ------------------------------------------------------------------------------
 
-pragma Ada_2012;
-
 with GNAT.Decode_String;
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 with GNAT.Byte_Order_Mark;

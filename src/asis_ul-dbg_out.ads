@@ -21,8 +21,6 @@
 -- The gnat2xml tool was derived from the Avatox sources.                   --
 ------------------------------------------------------------------------------
 
-pragma Ada_2012;
-
 with ASIS_UL.Generic_Formatted_Output;
 with ASIS_UL.String_Utilities;
 

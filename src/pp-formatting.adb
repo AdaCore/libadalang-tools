@@ -23,8 +23,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-pragma Ada_2012;
-
 with Ada.Strings.Unbounded;
 with Ada.Wide_Text_IO;
 

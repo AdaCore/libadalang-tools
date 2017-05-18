@@ -21,8 +21,6 @@
 -- The gnat2xml tool was derived from the Avatox sources.                   --
 ------------------------------------------------------------------------------
 
-pragma Ada_2012;
-
 with Unchecked_Deallocation;
 with Ada.Containers.Indefinite_Vectors;
 with Ada.Strings.UTF_Encoding.Wide_Strings;

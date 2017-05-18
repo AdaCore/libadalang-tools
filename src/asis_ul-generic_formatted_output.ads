@@ -21,8 +21,6 @@
 -- The gnat2xml tool was derived from the Avatox sources.                   --
 ------------------------------------------------------------------------------
 
-pragma Ada_2012;
-
 generic
    type Char_Type is (<>); -- e.g. Character or Wide_Character
    type Str_Type is array (Positive range <>) of Char_Type;

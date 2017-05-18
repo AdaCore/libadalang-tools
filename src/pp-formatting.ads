@@ -23,8 +23,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-pragma Ada_2012;
-
 with Ada.Containers.Bounded_Vectors;
 with Ada.Containers.Indefinite_Vectors;
 

@@ -23,8 +23,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-pragma Ada_2012;
-
 package body Pp is
 
    procedure Set_Assert_Enabled;

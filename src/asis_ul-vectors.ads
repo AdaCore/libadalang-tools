@@ -21,8 +21,6 @@
 -- The gnat2xml tool was derived from the Avatox sources.                   --
 ------------------------------------------------------------------------------
 
-pragma Ada_2012;
-
 pragma Warnings (Off); -- One of these will be unreferenced
 with ASIS_UL.Fast_Vectors;
 with ASIS_UL.Slow_Vectors;

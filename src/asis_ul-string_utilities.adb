@@ -21,8 +21,6 @@
 -- The gnat2xml tool was derived from the Avatox sources.                   --
 ------------------------------------------------------------------------------
 
-pragma Ada_2012;
-
 with Ada.Characters.Conversions;
 with Ada.Characters.Handling;      use Ada.Characters.Handling;
 with Ada.Directories;

@@ -23,8 +23,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-pragma Ada_2012;
-
 --  This package contains routines for creating, maintaining and cleaning up
 --  the working environment for an ASIS tool
 

@@ -23,8 +23,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-pragma Ada_2012;
-
 pragma Warnings (Off);
 with Unchecked_Deallocation;
 

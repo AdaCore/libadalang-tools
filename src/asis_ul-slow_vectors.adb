@@ -21,8 +21,6 @@
 -- The gnat2xml tool was derived from the Avatox sources.                   --
 ------------------------------------------------------------------------------
 
-pragma Ada_2012;
-
 package body ASIS_UL.Slow_Vectors is
 
    procedure Free (Container : in out Vector) is

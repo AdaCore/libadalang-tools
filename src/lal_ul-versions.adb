@@ -23,8 +23,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-pragma Ada_2012;
-
 --  ???Version printing is currently commented out, to avoid a dependence on
 --  Gnatvsn. See P912-011.
 

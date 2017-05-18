@@ -23,8 +23,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-pragma Ada_2012;
-
 package LAL_UL.Versions is
 
    procedure Print_Tool_Version;

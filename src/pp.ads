@@ -23,8 +23,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-pragma Ada_2012;
-
 pragma Warnings (Off); -- imported for children
 with Ada.Wide_Characters.Handling; use Ada.Wide_Characters.Handling;
 use Ada;

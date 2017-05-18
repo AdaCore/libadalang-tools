@@ -21,8 +21,6 @@
 -- The gnat2xml tool was derived from the Avatox sources.                   --
 ------------------------------------------------------------------------------
 
-pragma Ada_2012;
-
 with Text_IO;
 
 with LAL_UL.Predefined_Symbols; use LAL_UL.Predefined_Symbols;

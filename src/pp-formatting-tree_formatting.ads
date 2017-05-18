@@ -23,8 +23,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-pragma Ada_2012;
-
 with Libadalang;          use Libadalang;
 with Libadalang.Analysis; use Libadalang.Analysis;
 

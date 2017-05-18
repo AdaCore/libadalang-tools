@@ -21,8 +21,6 @@
 -- The gnat2xml tool was derived from the Avatox sources.                   --
 ------------------------------------------------------------------------------
 
-pragma Ada_2012;
-
 with Ada.Containers.Generic_Array_Sort;
 with Ada.Unchecked_Deallocation;
 with Ada.Unchecked_Conversion;
