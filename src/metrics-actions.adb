@@ -3170,6 +3170,9 @@ package body METRICS.Actions is
             Aspects : constant Aspect_Spec :=
               Get_Aspects (Basic_Decl (Subp_Decl));
          begin
+            Has_Contracts := False;
+            Has_Post := False;
+
             if Kind (Subp_Decl) = Ada_Expr_Function then
                --  Expression functions are considered to have
                --  contracts and postconditions.
@@ -3177,9 +3180,6 @@ package body METRICS.Actions is
                Has_Post := True;
 
             elsif Aspects /= null then
-               Has_Contracts := False;
-               Has_Post := False;
-
                declare
                   Assocs : constant Aspect_Assoc_List :=
                     F_Aspect_Assocs (Aspects);
