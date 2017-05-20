@@ -634,13 +634,22 @@ package body LAL_UL.Command_Lines is
       --  Do most of the work in a procedure so the debugger works.
 
       procedure Do_It (Descriptor : in out Command_Line_Descriptor) is
+         OK : Boolean := True;
       begin
          --  Validate that the allowed switches make sense. We can't have two
-         --  switches with the same name. We can't have one switch a prefix of
-         --  another if one of them is a String_Switch. For example, if we
-         --  allowed "--outputparm" and "--output-dirparm", then we can't tell
-         --  whether the latter is "--output-dir" with parameter "parm", or
-         --  "--output" with parameter "-dirparm".
+         --  switches with the same name. We don't want to have one switch a
+         --  prefix of another if one of them is a String_Switch, and the
+         --  syntax is not '='. For example, if we allowed "--outputparm" and
+         --  "--output-dirparm", then we can't tell whether the latter is
+         --  "--output-dir" with parameter "parm", or "--output" with parameter
+         --  "-dirparm".
+         --
+         --  However, there is one case where we have to allow this sort of
+         --  thing for compatibility reasons: gnatstub has a string switch
+         --  -gnaty, which is a prefix of -gnatyo and -gnatyM. Hence the
+         --  special case for -gnaty below. In this case, Text_To_Switch will
+         --  return the longest one (e.g. -gnatyM123 is -gnatyM with an
+         --  argument of 123).
 
          for Switch1 in Descriptor.Allowed_Switches'Range loop
             pragma Assert
@@ -659,21 +668,27 @@ package body LAL_UL.Command_Lines is
                        Switch_Descriptor renames
                          Descriptor.Allowed_Switches (Switch2);
                   begin
-                     pragma Assert
-                       (Desc1.Text.all /= Desc2.Text.all,
-                        "duplicate " & Desc1.Text.all);
+                     if Desc1.Text.all = Desc2.Text.all then
+                        OK := False;
+                        Put_Line
+                          (Standard_Error, "duplicate " & Desc1.Text.all);
+                     end if;
 
                      if Desc1.Kind in String_Switch | String_Seq_Switch
                        and then Syntax (Descriptor, Switch1) /= '='
+                       and then Has_Prefix (Desc2.Text.all, Desc1.Text.all)
+                       and then Desc1.Text.all /= "-gnaty"
                      then
-                        pragma Assert
-                          (not Has_Prefix (Desc2.Text.all, Desc1.Text.all),
-                           Desc1.Text.all & " is prefix of " & Desc2.Text.all);
+                        OK := False;
+                        Put_Line (Standard_Error, Desc1.Text.all &
+                                    " is prefix of " & Desc2.Text.all);
                      end if;
                   end;
                end if;
             end loop;
          end loop;
+
+         pragma Assert (OK);
       end Do_It;
 
    begin
@@ -708,6 +723,10 @@ package body LAL_UL.Command_Lines is
       Text       : String) return All_Switches
    is
       DT : constant String := Dashes (Text);
+      Result : All_Switches := All_Switches'Last;
+      --  This is used in case of a String_Switch or String_Seq_Switch that
+      --  does not have '=' syntax. We want to choose the longest one.
+      --  All_Switches'Last indicates this hasn't been set.
    begin
       for Switch in Descriptor.Allowed_Switches'Range loop
          if Enabled (Descriptor, Switch) then
@@ -737,14 +756,23 @@ package body LAL_UL.Command_Lines is
                         end if;
 
                      when ':' | '!' | '?' =>
-                        return Switch;
+                        if Result = All_Switches'Last
+                          or else Desc.Text'Length >
+                            Descriptor.Allowed_Switches (Result).Text'Length
+                        then
+                           Result := Switch;
+                        end if;
                   end case;
                end if;
             end;
          end if;
       end loop;
 
-      Raise_Cmd_Error ("invalid switch : " & Text);
+      if Result = All_Switches'Last then
+         Raise_Cmd_Error ("invalid switch : " & Text);
+      else
+         return Result;
+      end if;
    end Text_To_Switch;
 
    procedure Parse_Helper
@@ -1241,10 +1269,16 @@ package body LAL_UL.Command_Lines is
       for J in Descriptor.Allowed_Switches'Range loop
          declare
             X : Switch_Descriptor renames Descriptor.Allowed_Switches (J);
+            S : constant String :=
+              (if X.Kind in String_Switch | String_Seq_Switch then
+                 Syntax (Descriptor, J)'Img
+               else
+                  "");
          begin
             Put_Line
               (J'Img &
                  " " & X.Kind'Img &
+                 S &
                  " " & X.Text.all &
                  (if X.Alias = J then "" else X.Alias'Img) &
                  " " & (if X.Enabled then "" else " DISABLED"));

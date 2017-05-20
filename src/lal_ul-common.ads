@@ -104,6 +104,11 @@ package LAL_UL.Common is
        Subdirs                    => null,
        Wide_Character_Encoding    => +"-W"));
 
+   package Common_String_Shorthands_2 is new Common_String_Switches
+     .Set_Shorthands
+     ((Output_Directory => +"--dir",
+       others => null));
+
    --  Note: Most tools allow "--debugx" with a shorthand of "-dx".
    --  Gnatmetric, however, uses "--gnatmetric-debugx" with a shorthand
    --  of "-debugx".

@@ -6,6 +6,8 @@ package Pp.Actions is
 
    type Pp_Tool is new Tool_State with private;
 
+private
+
    overriding procedure Init (Tool : in out Pp_Tool; Cmd : Command_Line);
    overriding procedure Per_File_Action
      (Tool : in out Pp_Tool;
@@ -16,8 +18,6 @@ package Pp.Actions is
       Unit : Analysis_Unit);
    overriding procedure Final (Tool : in out Pp_Tool; Cmd : Command_Line);
    overriding procedure Tool_Help (Tool : Pp_Tool);
-
-private
 
    type Pp_Tool is new Tool_State with null record;
 

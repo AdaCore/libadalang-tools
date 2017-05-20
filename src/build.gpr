@@ -12,7 +12,7 @@ project Build is
    for Object_Dir use "../obj";
    for Exec_Dir use "../bin";
 
-   for Main use ("pp-main.adb", "metrics-main.adb");
+   for Main use ("pp-main.adb", "metrics-main.adb", "stub-main.adb");
 
    package Compiler is
       case Build_Mode is
@@ -29,6 +29,7 @@ project Build is
    package Builder is
       for Executable ("pp-main.adb") use "lalpp";
       for Executable ("metrics-main.adb") use "lalmetric";
+      for Executable ("stub-main.adb") use "lalstub";
    end Builder;
 
 end Build;

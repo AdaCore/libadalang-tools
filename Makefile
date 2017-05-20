@@ -11,7 +11,7 @@ all:
 	which gcc
 	gprbuild -v -k -XLIBRARY_TYPE=${LIBRARY_TYPE} -XXMLADA_BUILD=${LIBRARY_TYPE} \
 		-XBUILD_MODE=${BUILD_MODE} -P src/build.gpr -p -j${PROCESSORS}
-	cd bin && rm -f gnatmetric gnatpp && cp -p lalmetric gnatmetric && cp -p lalpp gnatpp
+	cd bin && rm -f gnatmetric gnatpp gnatstub && cp -p lalmetric gnatmetric && cp -p lalpp gnatpp && cp -p lalstub gnatstub
 
 .PHONY: clean
 clean:
