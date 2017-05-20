@@ -1438,13 +1438,18 @@ package body METRICS.Actions is
       for I in First .. Last loop
          if Should_Print (I, Metrics_To_Compute, M, Depth, XML => True) then
             if True or else M.Vals (I) /= 0 then -- ???
-               Put ("<metric name=\1>\2</metric>\n",
-                    Q (XML_Metric_Name_String (I)),
-                    Val_To_Print
-                      ((if I = Complexity_Average
-                          then Complexity_Cyclomatic
-                          else I),
-                       M, XML => True));
+               if not (I = Complexity_Average
+                 and then M.Kind in Ada_Compilation_Unit | Null_Kind
+                 and then M.Num_With_Complexity = 0)
+               then
+                  Put ("<metric name=\1>\2</metric>\n",
+                       Q (XML_Metric_Name_String (I)),
+                       Val_To_Print
+                         ((if I = Complexity_Average
+                             then Complexity_Cyclomatic
+                             else I),
+                          M, XML => True));
+               end if;
             end if;
          end if;
 
@@ -2316,8 +2321,8 @@ package body METRICS.Actions is
          --  average. We set XML to True, even though it's not XML to
          --  avoid an annoying extra space.
 
-         if Gen_Text (Cmd)
-           and then Metrics_To_Compute (Complexity_Average)
+         if Metrics_To_Compute (Complexity_Average)
+           and then Global_M.Num_With_Complexity > 0
          then
             Put ("\nAverage cyclomatic complexity: \1\n",
                  Val_To_Print (Complexity_Cyclomatic,
