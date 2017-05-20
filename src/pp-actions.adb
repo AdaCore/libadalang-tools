@@ -4846,8 +4846,8 @@ package body Pp.Actions is
       exception
          --  If we got an error, don't produce output
 
---         when Common.Fatal_Error =>
---            raise;
+         when Command_Line_Error | Command_Line_Error_No_Tool_Name =>
+            raise;
 
          when others =>
             --  In order to avoid damaging the user's source code, if there is a bug
