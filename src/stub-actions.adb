@@ -1,16 +1,16 @@
-pragma Warnings (Off); -- ????????????????
 with Ada.Characters.Handling; use Ada.Characters.Handling;
-with Ada.Finalization;
+pragma Unreferenced (Ada.Characters.Handling); -- ???
 with Ada.Strings.Fixed;
+pragma Unreferenced (Ada.Strings.Fixed); -- ???
 with System.WCh_Con;
 with Text_IO, Ada.Wide_Text_IO;
+pragma Unreferenced (Text_IO); -- ???
+pragma Unreferenced (Ada.Wide_Text_IO); -- ???
 with Stub.Command_Lines; use Stub.Command_Lines;
 
 with Ada.Directories; use Ada.Directories;
 with Interfaces; use type Interfaces.Unsigned_16;
-with Unchecked_Deallocation;
 
-with GNAT.Lock_Files;
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
 with Langkit_Support.Slocs; use Langkit_Support;
@@ -23,14 +23,13 @@ with LAL_UL.Formatted_Output;
 with LAL_UL.Tool_Names;
 with ASIS_UL.Char_Vectors; use ASIS_UL.Char_Vectors;
 use ASIS_UL.Char_Vectors.Char_Vectors;
+pragma Warnings (Off); -- ???
 with ASIS_UL.Generic_Formatted_Output;
 
 with ASIS_UL.Debug; use ASIS_UL.Debug;
 with ASIS_UL.Vectors;
 
-with LAL_UL.Symbols; use LAL_UL.Symbols;
 with LAL_UL.Environment;
-with LAL_UL.Predefined_Symbols; use LAL_UL.Predefined_Symbols;
 
 package body Stub.Actions is
 
@@ -45,6 +44,7 @@ package body Stub.Actions is
    use Stub_Flag_Switches,
      Stub_String_Switches,
      Stub_Nat_Switches;
+pragma Warnings (On);
 
    ----------
    -- Init --
@@ -276,7 +276,8 @@ package body Stub.Actions is
       Put ("                         (-r also implies -k)\n");
       Put ("  -t                     overwrite the existing tree file\n");
       Put ("  -v                     verbose mode\n");
-      Put ("  gcc_switches           switches to be passed to gcc called by gnatstub\n");
+      Put ("  gcc_switches           switches to be passed to gcc called by \1\n",
+           Tool_Names.Tool_Name); -- ???
       Put ("\n");
       Put ("\n");
       Put ("Report bugs to report@adacore.com\n");

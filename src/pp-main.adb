@@ -31,4 +31,5 @@ begin
       Tool_Package_Name     => "pretty_printer",
       Needs_Per_File_Output => True,
       Callback              => Callback'Unrestricted_Access);
+   --  Should we pass Preprocessing_Allowed => False???
 end Pp.Main;

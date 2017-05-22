@@ -5272,7 +5272,7 @@ package body Pp.Actions is
       Put ("\n");
 
       Put (" gcc_switches - switches to be passed to gcc called by \1\n",
-            Tool_Names.Tool_Name);
+           Tool_Names.Tool_Name); -- ???
 
       Put ("\n\nReport bugs to report@adacore.com\n");
 
