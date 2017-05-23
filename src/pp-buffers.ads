@@ -24,8 +24,8 @@
 with System.WCh_Con;
 with ASIS_UL.Vectors;
 with ASIS_UL.Char_Vectors; use ASIS_UL.Char_Vectors;
-use ASIS_UL.Char_Vectors.Char_Vectors;
---  use all type ASIS_UL.Char_Vectors.Char_Vector;
+use ASIS_UL.Char_Vectors.WChar_Vectors;
+--  use all type ASIS_UL.Char_Vectors.WChar_Vector;
 
 private with Ada.Finalization;
 
@@ -110,14 +110,14 @@ package Pp.Buffers is
       Post => To_W_Str'Result'First = 1;
       --  Returns the current logical string of the buffer
 
-   function To_Vector (Buf : Buffer) return Char_Vector with
+   function To_Vector (Buf : Buffer) return WChar_Vector with
       Pre => At_Beginning (Buf);
       --  'point' must be at the beginning of the buffer (e.g. after Reset).
       --  Returns the content of the buffer.
 
    function Elements
      (Buf  : Buffer)
-      return ASIS_UL.Char_Vectors.Char_Vectors.Big_Ptr with
+      return ASIS_UL.Char_Vectors.WChar_Vectors.Big_Ptr with
       Pre => At_Beginning (Buf);
       --  'point' must be at the beginning of the buffer (e.g. after Reset).
       --  Returns the content of the buffer.
@@ -309,7 +309,7 @@ private
    --  use all type Marker_Rec_Vector;
 
    type Buffer is new Ada.Finalization.Limited_Controlled with record
-      To, From : Char_Vector;
+      To, From : WChar_Vector;
       --  The current characters of the buffer are:
       --
       --    To & From(From_First..From'Last)

@@ -534,15 +534,46 @@ package body ASIS_UL.String_Utilities is
 
    function Read_File (File_Name : String) return String_Access is
       FD : constant File_Descriptor := Open_Read (File_Name, Fmode => Binary);
+      Status : Boolean;
    begin
       if FD = Invalid_FD then
          raise File_Not_Found with "file not found: " & File_Name;
       end if;
 
       return Result : constant String_Access := Read_File (FD) do
-         Close (FD);
+         Close (FD, Status);
+         if not Status then
+            raise Program_Error with "read of " & File_Name & " failed";
+         end if;
       end return;
    end Read_File;
+
+   ----------------
+   -- Write_File --
+   ----------------
+
+   procedure Write_File (FD : File_Descriptor; S : String) is
+      Result : constant Integer := Write (FD, S'Address, S'Length);
+   begin
+      if Result /= S'Length then
+         raise Program_Error with "Write_File failed";
+      end if;
+   end Write_File;
+
+   procedure Write_File (File_Name : String; S : String) is
+      FD : constant File_Descriptor :=
+        Create_File (File_Name, Fmode => Binary);
+      Status : Boolean;
+   begin
+      if FD = Invalid_FD then
+         raise Program_Error with "write of " & File_Name & " failed";
+      end if;
+      Write_File (FD, S);
+      Close (FD, Status);
+      if not Status then
+         raise Program_Error with "write of " & File_Name & " failed";
+      end if;
+   end Write_File;
 
    -----------------------
    -- Parallel_Make_Dir --

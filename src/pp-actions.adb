@@ -1,6 +1,8 @@
 with Ada.Characters.Handling; use Ada.Characters.Handling;
 with Ada.Finalization;
 with Ada.Strings.Fixed;
+with Ada.Strings.UTF_Encoding;
+with System.WCh_Cnv;
 with System.WCh_Con;
 with Text_IO, Ada.Wide_Text_IO;
 with Pp.Buffers; use Pp.Buffers;
@@ -25,8 +27,6 @@ with LAL_UL.Common; use LAL_UL.Common;
 with ASIS_UL.Dbg_Out;
 with LAL_UL.Formatted_Output;
 with LAL_UL.Tool_Names;
-with ASIS_UL.Char_Vectors; use ASIS_UL.Char_Vectors;
-use ASIS_UL.Char_Vectors.Char_Vectors;
 with ASIS_UL.Generic_Formatted_Output;
 
 with ASIS_UL.Debug; use ASIS_UL.Debug;
@@ -37,6 +37,8 @@ with LAL_UL.Environment;
 with LAL_UL.Predefined_Symbols; use LAL_UL.Predefined_Symbols;
 
 package body Pp.Actions is
+
+   use ASIS_UL.Char_Vectors.WChar_Vectors;
 
    package Slocs renames Langkit_Support.Slocs;
 
@@ -4403,12 +4405,12 @@ package body Pp.Actions is
       Convert_Tree_To_Ada (Root);
    end Tree_To_Ada_2;
 
-   procedure Per_File_Action
+   procedure Format_Vector
      (Tool : in out Pp_Tool;
       Cmd : Command_Line;
       File_Name : String;
-      Input : String;
-      BOM_Seen : Boolean;
+      Input : Char_Vector;
+      Output : out Char_Vector;
       Unit : Analysis_Unit)
    is
       pragma Unreferenced (Tool);
@@ -4431,13 +4433,8 @@ package body Pp.Actions is
            System.WCh_Con.WCEM_Brackets
          else raise Program_Error);
 
-      Form_String : constant String := "WCEM=" & WCEM;
-
       Src_Buf : Buffer;
       --  Buffer containing the text of the original source file
-
-      Output_Mode : constant Output_Modes := Get_Output_Mode (Cmd);
-      Do_Diff : constant Boolean := Output_Mode in Replace_Modes;
 
       type Out_File_Formats is (CRLF, LF);
 
@@ -4474,42 +4471,6 @@ package body Pp.Actions is
       Out_File_Format : constant Out_File_Formats := Get_Out_File_Format;
       --  Format of the tool report file(s)
 
-      --  We initially write the output to Temp_Output_Name, then later rename it
-      --  to Output_Name (except in Pipe mode). These are full pathnames. If we
-      --  are overwriting the Source_Name, and it's a link link-->file, we want to
-      --  overwrite file. But we put the temp file in the directory containing
-      --  link, in case the directory containing file is not writable.
-
-      function Get_Output_Name (Resolve_Links : Boolean) return String;
-      function Get_Output_Name (Resolve_Links : Boolean) return String is
-      begin
-         pragma Assert (Environment.Initial_Dir = Current_Directory);
-         return (case Output_Mode is
-           when Pipe => "", -- not used
-           when Output => Arg (Cmd, Output).all,
-           when Output_Force => Arg (Cmd, Output_Force).all,
-           when Replace_Modes => Normalize_Pathname
-                                   (File_Name,
-                                    Resolve_Links  => Resolve_Links,
-                                    Case_Sensitive => True),
-
-           when Default => File_Name & PP_Suffix,
-           when Output_Directory =>
-             Compose (Arg (Cmd, Output_Directory).all,
-                      Simple_Name (File_Name)));
-      end Get_Output_Name;
-
-      Output_Name : constant String := Get_Output_Name (Resolve_Links => True);
-
-      Temp_Output_Name : constant String :=
-          (if Output_Mode = Pipe then "" -- means standard output
-           else Get_Output_Name (Resolve_Links => False) & "__GNATPP-TEMP");
-
-      Output_Written : Boolean := False;
-      --  True if Tree_To_Ada wrote the output to Temp_Output_Name. It always
-      --  does, except in Replace_Modes if the output would be identical to the
-      --  input.
-
       procedure Init_Pp_Off_And_On;
       --  Initialize Pp_Off_On_Delimiters
 
@@ -4530,7 +4491,7 @@ package body Pp.Actions is
          end if;
       end Init_Pp_Off_And_On;
 
-      function Remove_Extra_Line_Breaks return Char_Vector;
+      function Remove_Extra_Line_Breaks return WChar_Vector;
       --  Removes extra NL's. The result has exactly one NL at the beginning, and
       --  exactly one at the end. Also, if Preserve_Blank_Lines is False, we
       --  collapse 3 or more NL's in a row down to 2.  ???It would be cleaner if
@@ -4541,7 +4502,7 @@ package body Pp.Actions is
       --  Wide_Text_IO accepts a Form parameter that inserts CR's on windows, but
       --  it doesn't do that on unix, so we insert CR's by hand.
 
-      function Remove_Extra_Line_Breaks return Char_Vector is
+      function Remove_Extra_Line_Breaks return WChar_Vector is
          Add_CR : constant Boolean := Out_File_Format = CRLF;
          --  True if we should convert LF to CRLF -- if it was requested on the
          --  command line, or if we're on windows and nothing was requested.
@@ -4555,7 +4516,7 @@ package body Pp.Actions is
          end if;
 
          declare
-            Result : Char_Vector;
+            Result : WChar_Vector;
          begin
             while Cur (Out_Buf) = NL loop
                Move_Forward (Out_Buf);
@@ -4605,6 +4566,242 @@ package body Pp.Actions is
             return Result;
          end;
       end Remove_Extra_Line_Breaks;
+
+      procedure Tree_To_Ada;
+      procedure Tree_To_Ada is
+         use Scanner;
+      begin
+         if Debug_Mode then
+            ASIS_UL.Dbg_Out.Output_Enabled := True;
+         end if;
+
+         if not Pp_Off_On_Delimiters_Initialized then
+            Init_Pp_Off_And_On;
+         end if;
+
+         --  Note that if we're processing multiple files, we will get here multiple
+         --  times, so we need to clear out data structures left over from last time.
+
+         pragma Assert (Cur_Indentation = 0);
+         Clear (All_Line_Breaks);
+         Clear (Tabs);
+
+         Get_Tokens (Src_Buf, Src_Tokens, LAL_UL.Ada_Version, Pp_Off_On_Delimiters);
+         if Debug_Mode then
+            Dbg_Out.Put ("Src_Tokens:\n");
+            Put_Tokens (Src_Tokens);
+            Dbg_Out.Put ("end Src_Tokens:\n");
+         end if;
+
+         Clear (Out_Buf);
+
+         --  If --comments-only was specified, format the comments and quit
+
+         if Arg (Cmd, Comments_Only) then
+            Do_Comments_Only (Lines_Data, Src_Buf, Cmd);
+         else
+            --  Otherwise, convert the tree to text, and then run all the
+            --  text-based passes.
+
+            Tree_To_Ada_2 (Root (Unit), Out_Buf, Cmd);
+            Post_Tree_Phases (Lines_Data, File_Name, Src_Buf, Cmd);
+         end if;
+      end Tree_To_Ada;
+
+      --  ???See ada_trees.pp for commented-out stuff below.
+
+      procedure Maybe_To_Ada
+--        (CU : Asis.Compilation_Unit;
+--         Cmd         : LAL_UL.Command_Lines.Command_Line;
+--         Output_Name : String;
+--         Form_String : String;
+--         Do_Diff : Boolean;
+--         Output_Written : out Boolean;
+         (To_Ada : Boolean);
+      --  Helper for Asis_To_Ada. To_Ada is True for the first call, indicating
+      --  we're going to generate Ada text; it is False for subsequent (recursive)
+      --  calls, which merely generate trees for dependencies.
+
+      procedure Maybe_To_Ada
+--        (CU      : Asis.Compilation_Unit;
+--         Cmd         : LAL_UL.Command_Lines.Command_Line;
+--         Output_Name : String;
+--         Form_String : String;
+--         Do_Diff : Boolean;
+--         Output_Written : out Boolean;
+         (To_Ada : Boolean)
+      is
+--         Src_Tokens : Scanner.Token_Vector;
+--         Src_Gen_Regions : aliased Scanner.Token_Vector;
+--         Gen_Regions : Scanner.Token_Vector_Ptr := null;
+--         --  Set to point to Src_Gen_Regions if necessary.
+--
+--         BOM_Seen : Boolean;
+--         --  True if BOM should be written to the output
+--
+--         procedure Walk_Dependencies (CU : Asis.Compilation_Unit);
+--         --  Recursively walk compilation units this one depends on.
+--
+--         procedure Walk_Dependencies (CU : Asis.Compilation_Unit) is
+--            Ignore : Boolean;
+--         begin
+--            Maybe_To_Ada (CU, Cmd, "no Output_Name", "no Form_String",
+--                          False, Ignore, To_Ada => False);
+--         end Walk_Dependencies;
+--
+--         Do_Dependencies : constant Boolean :=
+--           PP_Type_Casing (Cmd) /= PP_Name_Casing (Cmd);
+--         --  Following all the dependencies is fairly expensive, so we only do it
+--         --  if necessary. It is necessary in order to get the casing right for
+--         --  the name of a task body, which should be PP_Type_Casing if it's the
+--         --  body of a task type, and PP_Name_Casing if it's the body of a
+--         --  singleton task. Same issue for protected bodies. See Do_Def_Name in
+--         --  ada_trees-formatting-tree_to_ada.adb.
+--
+--         Id : constant Unit_Id := Set_Get.Get_Unit_Id (CU);
+--         use type System.WCh_Con.WC_Encoding_Method;
+
+      --  Start of processing for Maybe_To_Ada
+
+      begin
+--         while Cache_Last < Id loop
+--            Cache_Last := Cache_Last + 1;
+--            Cache (Cache_Last) := null;
+--         end loop;
+--         pragma Assert (Cache (Id) /= Pending);
+--         if Cache (Id) /= null then
+--            pragma Assert (not To_Ada);
+--            return;
+--         end if;
+--
+--         Cache (Id) := Pending;
+
+         if To_Ada then -- ??? or Skip_Gen then
+--            Read_Ada_File (Src_Buf, File_Name,
+--                           Opt.Wide_Character_Encoding_Method, BOM_Seen,
+--                           Expand_Tabs => True);
+            Clear (Src_Buf);
+            Insert_Ada_Source
+              (Src_Buf, Elems (Input) (1 .. Last_Index (Input)),
+               Encoding_Method, Expand_Tabs => True);
+            --  Expand tabs unconditionally. This differs from the behavior of
+            --  the old gnatpp, which has an option for that (but only for
+            --  comments).
+            --  ???Encoding needs to match the call to libadalang.
+            Reset (Src_Buf);
+--            pragma Assert
+--              (if BOM_Seen then
+--                 Opt.Wide_Character_Encoding_Method = System.WCh_Con.WCEM_UTF8);
+--
+--            if Skip_Gen then
+--               Scanner.Get_Tokens
+--                 (Src_Buf, Src_Tokens, LAL_UL.Ada_Version, Pp_Off_On_Delimiters,
+--                  Gen_Regions => Src_Gen_Regions'Unchecked_Access);
+--               Gen_Regions := Src_Gen_Regions'Unchecked_Access;
+--            end if;
+         end if;
+
+--         declare
+--            Tree : constant Ada_Tree :=
+--              Compilation_Unit_To_Tree (CU, Gen_Regions);
+--         begin
+--            Cache (Id) := Tree;
+--            Resolve_Symbols (Tree);
+--
+--            if Ada_Trees.Debug_Mode or else ASIS_UL.Debug.Debug_Flag_2 then
+--               Ada_Trees.Self_Rep.Put_Ada_Tree (Tree);
+--               Put ("\n");
+--            end if;
+--
+--            if Do_Dependencies then
+--               Walk_Direct_Dependencies (CU, Walk_Dependencies'Access);
+--            end if;
+--
+            if To_Ada then
+               Tree_To_Ada;
+--                 (Tree, Src_Buf, BOM_Seen, Cmd, Output_Name,
+--                  Form_String, Do_Diff, Output_Written);
+            end if;
+--         end;
+      end Maybe_To_Ada;
+
+   --  Start of processing for Format_Vector
+
+   begin
+      Maybe_To_Ada (To_Ada => True);
+      declare
+         Out_Vec : constant WChar_Vector := Remove_Extra_Line_Breaks;
+         Out_Arr : W_Str renames Elems (Out_Vec) (2 .. Last_Index (Out_Vec));
+         --  2 to skip sentinel newline
+--         package Encoder is new GNAT.Encode_String (Encoding_Method);
+
+         procedure Append_One (C : Character);
+         procedure Append_One (C : Character) is
+         begin
+            Append (Output, C);
+         end Append_One;
+         procedure Encode is new
+           System.WCh_Cnv.Wide_Char_To_Char_Sequence (Append_One);
+      begin
+         Clear (Output);
+         for WC of Out_Arr loop
+            Encode (WC, Encoding_Method);
+         end loop;
+--         Append (Output, Encoder.Encode_Wide_String (Out_Arr));
+--            Out_Vec : constant WChar_Vector := To_Vector (Out_Buf);
+      end;
+   end Format_Vector;
+
+   procedure Per_File_Action
+     (Tool : in out Pp_Tool;
+      Cmd : Command_Line;
+      File_Name : String;
+      Input : String;
+      BOM_Seen : Boolean;
+      Unit : Analysis_Unit)
+   is
+      use LAL_UL.Formatted_Output;
+
+      Output_Mode : constant Output_Modes := Get_Output_Mode (Cmd);
+      Do_Diff : constant Boolean := Output_Mode in Replace_Modes;
+
+      In_Vec, Out_Vec : Char_Vector;
+
+      --  We initially write the output to Temp_Output_Name, then later rename it
+      --  to Output_Name (except in Pipe mode). These are full pathnames. If we
+      --  are overwriting the Source_Name, and it's a link link-->file, we want to
+      --  overwrite file. But we put the temp file in the directory containing
+      --  link, in case the directory containing file is not writable.
+
+      function Get_Output_Name (Resolve_Links : Boolean) return String;
+      function Get_Output_Name (Resolve_Links : Boolean) return String is
+      begin
+         pragma Assert (Environment.Initial_Dir = Current_Directory);
+         return (case Output_Mode is
+           when Pipe => "", -- not used
+           when Output => Arg (Cmd, Output).all,
+           when Output_Force => Arg (Cmd, Output_Force).all,
+           when Replace_Modes => Normalize_Pathname
+                                   (File_Name,
+                                    Resolve_Links  => Resolve_Links,
+                                    Case_Sensitive => True),
+
+           when Default => File_Name & PP_Suffix,
+           when Output_Directory =>
+             Compose (Arg (Cmd, Output_Directory).all,
+                      Simple_Name (File_Name)));
+      end Get_Output_Name;
+
+      Output_Name : constant String := Get_Output_Name (Resolve_Links => True);
+
+      Temp_Output_Name : constant String :=
+          (if Output_Mode = Pipe then "" -- means standard output
+           else Get_Output_Name (Resolve_Links => False) & "__GNATPP-TEMP");
+
+      Output_Written : Boolean := False;
+      --  True if Tree_To_Ada wrote the output to Temp_Output_Name. It always
+      --  does, except in Replace_Modes if the output would be identical to the
+      --  input.
 
       procedure Write_File_Name_File;
       --  If the Output_Mode /= Pipe, and Output_Written is True, add a pair of
@@ -4701,16 +4898,17 @@ package body Pp.Actions is
          pragma Warnings (On);
       end Write_File_Name_File;
 
-      procedure Write_Str (Out_Elems : W_Str);
-      procedure Write_Out_Buf (Out_Vec : Char_Vector);
+      procedure Write_Str (Out_Vec : Char_Vector);
+      procedure Write_Out_Buf;
       procedure Write_Src_Buf;
       --  Write_Out_Buf writes Out_Buf to the output. This is the normal
       --  case. Write_Src_Buf writes the Src_Buf to the output. Write_Str is the
       --  code common to both Write_Out_Buf and Write_Src_Buf.
 
-      procedure Write_Str (Out_Elems : W_Str) is
-         use Wide_Text_IO;
-         Out_File : File_Type;
+      procedure Write_Str (Out_Vec : Char_Vector) is
+         Out_File : File_Descriptor := Standout;
+         Out_String : String renames Elems (Out_Vec) (1 .. Last_Index (Out_Vec));
+         Status : Boolean;
       begin
    --  ???
    --      if False then -- ???Messes up the diff's.
@@ -4721,11 +4919,13 @@ package body Pp.Actions is
 
          Output_Written := True;
          if Temp_Output_Name /= "" then
-            --  If Temp_Output_Name = "", leave Current_Output pointing to
-            --  standard output; otherwise point it to the file.
-            Create (Out_File, Name => Temp_Output_Name,
-                    Form => Form_String & ",Text_Translation=NO");
-            Set_Output (Out_File);
+            --  If Temp_Output_Name = "", use standard output; otherwise point
+            --  open the file.
+            Out_File := Create_File (Temp_Output_Name, Fmode => Binary);
+            if Out_File = Invalid_FD then
+               raise Program_Error with
+                 "write of " & Temp_Output_Name & " failed";
+            end if;
          end if;
 
          --  If a BOM (byte order mark) was found in the input, we want to put it
@@ -4735,263 +4935,39 @@ package body Pp.Actions is
    --         if Options.Output_Encoding /= System.WCh_Con.WCEM_UTF8 then
    --            raise Program_Error;
    --         end if;
-            Put (W_Char'Val (16#FEFF#)); -- BOM as a wide character
+            Write_File (Out_File, Ada.Strings.UTF_Encoding.BOM_8);
+--            Put (W_Char'Val (16#FEFF#)); -- BOM as a wide character
          end if;
 
-         --  We must call New_Line for LF's (at least for the last one in the
-         --  Out_Elems), because otherwise Wide_Text_IO adds an annoying blank
-         --  line to the end of the file. It would probably be better to avoid
-         --  Wide_Text_IO altogether, but we're currently using it to do Unicode
-         --  encoding transformations. Note that Put(CR) is not guaranteed to work
-         --  by the Ada standard, but the GNAT implementation won't molest it.
-
-         for C of Out_Elems loop
-            if C = W_LF then
-               New_Line;
-            else
-               Put (C);
-            end if;
-         end loop;
+         Write_File (Out_File, Out_String);
 
          if Temp_Output_Name /= "" then
-            Close (Out_File);
-            Set_Output (Ada.Wide_Text_IO.Standard_Output);
+            Close (Out_File, Status);
+            if not Status then
+               raise Program_Error with
+                 "write of " & Temp_Output_Name & " failed";
+            end if;
          end if;
       end Write_Str;
 
-      procedure Write_Out_Buf (Out_Vec : Char_Vector) is
-         pragma Assert (At_Beginning (Out_Buf));
-         pragma Assert (At_Beginning (Src_Buf));
-         Out_Elems : W_Str renames Elems (Out_Vec)
-           (2 .. Last_Index (Out_Vec)); -- 2 to skip initial NL
+      procedure Write_Out_Buf is
       begin
          --  In Do_Diff mode, don't write the output if it is identical to the
          --  input.
 
-         if Do_Diff then
-            declare
-               Src_Elems : W_Str renames Elements (Src_Buf)
-                 (1 .. Last_Position (Src_Buf));
-            begin
-               if Out_Elems = Src_Elems then
-                  pragma Assert (not Output_Written);
-                  return;
-               end if;
-            end;
+         if Do_Diff and then Out_Vec = In_Vec then
+            pragma Assert (not Output_Written);
+            return;
          end if;
 
-         Write_Str (Out_Elems);
+         Write_Str (Out_Vec);
       end Write_Out_Buf;
 
       procedure Write_Src_Buf is
-         Out_Elems : W_Str renames Elements (Src_Buf)
-           (1 .. Last_Position (Src_Buf));
       begin
-         Write_Str (Out_Elems);
+         pragma Assert (Is_Empty (Out_Vec));
+         Write_Str (In_Vec);
       end Write_Src_Buf;
-
-      procedure Tree_To_Ada;
-      procedure Tree_To_Ada is
-
-         use Scanner;
-
-      --  Start of processing for Tree_To_Ada
-
-      begin
-         if Debug_Mode then
-            ASIS_UL.Dbg_Out.Output_Enabled := True;
-         end if;
-
-         if not Pp_Off_On_Delimiters_Initialized then
-            Init_Pp_Off_And_On;
-         end if;
-
-         --  Note that if we're processing multiple files, we will get here multiple
-         --  times, so we need to clear out data structures left over from last time.
-
-         pragma Assert (Cur_Indentation = 0);
-         Clear (All_Line_Breaks);
-         Clear (Tabs);
-
-         Get_Tokens (Src_Buf, Src_Tokens, LAL_UL.Ada_Version, Pp_Off_On_Delimiters);
-         if Debug_Mode then
-            Dbg_Out.Put ("Src_Tokens:\n");
-            Put_Tokens (Src_Tokens);
-            Dbg_Out.Put ("end Src_Tokens:\n");
-         end if;
-
-         Clear (Out_Buf);
-
-         --  If --comments-only was specified, format the comments and quit
-
-         if Arg (Cmd, Comments_Only) then
-            Do_Comments_Only (Lines_Data, Src_Buf, Cmd);
-         else
-            --  Otherwise, convert the tree to text, and then run all the
-            --  text-based passes.
-
-            Tree_To_Ada_2 (Root (Unit), Out_Buf, Cmd);
-            Post_Tree_Phases (Lines_Data, File_Name, Src_Buf, Cmd);
-         end if;
-
-         --  Finally, print out the result to Current_Output
-
-         declare
-            Out_Vec : constant Char_Vector := Remove_Extra_Line_Breaks;
---            Out_Vec : constant Char_Vector := To_Vector (Out_Buf);
-         begin
-            Write_Out_Buf (Out_Vec);
-         end;
-
-      exception
-         --  If we got an error, don't produce output
-
-         when Command_Line_Error | Command_Line_Error_No_Tool_Name =>
-            raise;
-
-         when others =>
-            --  In order to avoid damaging the user's source code, if there is a bug
-            --  (like a token mismatch in Final_Check), we avoid writing the output
-            --  file in Do_Diff mode; otherwise, we write the input to the output
-            --  unchanged. This happens only in production builds.
-
-            Text_IO.Put_Line
-              (Text_IO.Standard_Error,
-               "gnatpp: pretty-printing failed; cannot format " & File_Name);
-
-            if Enable_Token_Mismatch then
-               raise;
-            else
-               if Do_Diff then
-                  pragma Assert (not Output_Written);
-               else
-                  if not At_Beginning (Src_Buf) then
-                     while not At_End (Src_Buf) loop
-                        Move_Forward (Src_Buf);
-                     end loop;
-                     Reset (Src_Buf);
-                  end if;
-
-                  Write_Src_Buf;
-               end if;
-            end if;
-      end Tree_To_Ada;
-
-      --  ???See ada_trees.pp for commented-out stuff below.
-
-      procedure Maybe_To_Ada
---        (CU : Asis.Compilation_Unit;
---         Cmd         : LAL_UL.Command_Lines.Command_Line;
---         Output_Name : String;
---         Form_String : String;
---         Do_Diff : Boolean;
---         Output_Written : out Boolean;
-         (To_Ada : Boolean);
-      --  Helper for Asis_To_Ada. To_Ada is True for the first call, indicating
-      --  we're going to generate Ada text; it is False for subsequent (recursive)
-      --  calls, which merely generate trees for dependencies.
-
-      procedure Maybe_To_Ada
---        (CU      : Asis.Compilation_Unit;
---         Cmd         : LAL_UL.Command_Lines.Command_Line;
---         Output_Name : String;
---         Form_String : String;
---         Do_Diff : Boolean;
---         Output_Written : out Boolean;
-         (To_Ada : Boolean)
-      is
---         Src_Tokens : Scanner.Token_Vector;
---         Src_Gen_Regions : aliased Scanner.Token_Vector;
---         Gen_Regions : Scanner.Token_Vector_Ptr := null;
---         --  Set to point to Src_Gen_Regions if necessary.
---
---         BOM_Seen : Boolean;
---         --  True if BOM should be written to the output
---
---         procedure Walk_Dependencies (CU : Asis.Compilation_Unit);
---         --  Recursively walk compilation units this one depends on.
---
---         procedure Walk_Dependencies (CU : Asis.Compilation_Unit) is
---            Ignore : Boolean;
---         begin
---            Maybe_To_Ada (CU, Cmd, "no Output_Name", "no Form_String",
---                          False, Ignore, To_Ada => False);
---         end Walk_Dependencies;
---
---         Do_Dependencies : constant Boolean :=
---           PP_Type_Casing (Cmd) /= PP_Name_Casing (Cmd);
---         --  Following all the dependencies is fairly expensive, so we only do it
---         --  if necessary. It is necessary in order to get the casing right for
---         --  the name of a task body, which should be PP_Type_Casing if it's the
---         --  body of a task type, and PP_Name_Casing if it's the body of a
---         --  singleton task. Same issue for protected bodies. See Do_Def_Name in
---         --  ada_trees-formatting-tree_to_ada.adb.
---
---         Id : constant Unit_Id := Set_Get.Get_Unit_Id (CU);
---         use type System.WCh_Con.WC_Encoding_Method;
-
-      --  Start of processing for Maybe_To_Ada
-
-      begin
---         while Cache_Last < Id loop
---            Cache_Last := Cache_Last + 1;
---            Cache (Cache_Last) := null;
---         end loop;
---         pragma Assert (Cache (Id) /= Pending);
---         if Cache (Id) /= null then
---            pragma Assert (not To_Ada);
---            return;
---         end if;
---
---         Cache (Id) := Pending;
-
-         if To_Ada then -- ??? or Skip_Gen then
---            Read_Ada_File (Src_Buf, File_Name,
---                           Opt.Wide_Character_Encoding_Method, BOM_Seen,
---                           Expand_Tabs => True);
-            Clear (Src_Buf);
-            Insert_Ada_Source
-              (Src_Buf, Input, Encoding_Method, Expand_Tabs => True);
-            --  Expand tabs unconditionally. This differs from the behavior of
-            --  the old gnatpp, which has an option for that (but only for
-            --  comments).
-            --  ???Encoding needs to match the call to libadalang.
-            Reset (Src_Buf);
---            pragma Assert
---              (if BOM_Seen then
---                 Opt.Wide_Character_Encoding_Method = System.WCh_Con.WCEM_UTF8);
---
---            if Skip_Gen then
---               Scanner.Get_Tokens
---                 (Src_Buf, Src_Tokens, LAL_UL.Ada_Version, Pp_Off_On_Delimiters,
---                  Gen_Regions => Src_Gen_Regions'Unchecked_Access);
---               Gen_Regions := Src_Gen_Regions'Unchecked_Access;
---            end if;
-         end if;
-
---         declare
---            Tree : constant Ada_Tree :=
---              Compilation_Unit_To_Tree (CU, Gen_Regions);
---         begin
---            Cache (Id) := Tree;
---            Resolve_Symbols (Tree);
---
---            if Ada_Trees.Debug_Mode or else ASIS_UL.Debug.Debug_Flag_2 then
---               Ada_Trees.Self_Rep.Put_Ada_Tree (Tree);
---               Put ("\n");
---            end if;
---
---            if Do_Dependencies then
---               Walk_Direct_Dependencies (CU, Walk_Dependencies'Access);
---            end if;
---
-            if To_Ada then
-               Tree_To_Ada;
---                 (Tree, Src_Buf, BOM_Seen, Cmd, Output_Name,
---                  Form_String, Do_Diff, Output_Written);
-            end if;
---         end;
-      end Maybe_To_Ada;
 
    --  Start of processing for Per_File_Action
 
@@ -5067,14 +5043,44 @@ package body Pp.Actions is
       end if;
 
 --      pragma Assert (Is_Empty (Symtab));
-      Maybe_To_Ada (To_Ada => True);
+      Append (In_Vec, Input);
+      Format_Vector (Tool, Cmd, File_Name, In_Vec, Out_Vec, Unit);
 --        (CU, Cmd, Output_Name, Form_String,
 --         Do_Diff, Output_Written, To_Ada => True);
 --      --  We have to flush the cache here, because Unit_Id's get reused between
 --      --  runs of this.
 --      Flush_Cache;
 --      Clear (Symtab);
+
+      --  Finally, print out the result
+
+      Write_Out_Buf;
       Write_File_Name_File;
+   exception
+      --  If we got an error, don't produce output
+
+      when Command_Line_Error | Command_Line_Error_No_Tool_Name =>
+         raise;
+
+      when others =>
+         --  In order to avoid damaging the user's source code, if there is a bug
+         --  (like a token mismatch in Final_Check), we avoid writing the output
+         --  file in Do_Diff mode; otherwise, we write the input to the output
+         --  unchanged. This happens only in production builds.
+
+         Text_IO.Put_Line
+           (Text_IO.Standard_Error,
+            "gnatpp: pretty-printing failed; cannot format " & File_Name);
+
+         if Enable_Token_Mismatch then
+            raise;
+         else
+            if Do_Diff then
+               pragma Assert (not Output_Written);
+            else
+               Write_Src_Buf;
+            end if;
+         end if;
    end Per_File_Action;
 
    ---------------

@@ -986,7 +986,7 @@ package body Pp.Buffers is
            Last_Index (Buf.From_Markers));
       pragma Assert (Marks'First = 1);
       M_Index : Marker_Index := 1;
-      Result  : Char_Vector;
+      Result  : WChar_Vector;
 
    --  Start of processing for To_Debug_String
 
@@ -1033,7 +1033,7 @@ package body Pp.Buffers is
       return To_UTF8 (To_W_Str (Buf));
    end To_String;
 
-   function To_Vector (Buf : Buffer) return Char_Vector is
+   function To_Vector (Buf : Buffer) return WChar_Vector is
    begin
       pragma Assert (Is_Empty (Buf.To) and then Buf.From_First = 1);
       return Buf.From;
@@ -1041,7 +1041,7 @@ package body Pp.Buffers is
 
    function Elements
      (Buf  : Buffer)
-      return ASIS_UL.Char_Vectors.Char_Vectors.Big_Ptr
+      return ASIS_UL.Char_Vectors.WChar_Vectors.Big_Ptr
    is
    begin
       pragma Assert (Is_Empty (Buf.To) and then Buf.From_First = 1);

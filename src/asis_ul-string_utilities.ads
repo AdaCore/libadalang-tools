@@ -153,6 +153,10 @@ package ASIS_UL.String_Utilities is
    --  Raised by Read_File if it can't find the file. The Exception_Message is
    --  appropriate for printing.
 
+   procedure Write_File (FD : File_Descriptor; S : String);
+   procedure Write_File (File_Name : String; S : String);
+   --  Write S to the file, overwriting it if it already exists
+
    procedure Parallel_Make_Dir
      (New_Directory : String; Give_Message : Boolean := False);
    --  Creates a new directory with the given name if it does not already

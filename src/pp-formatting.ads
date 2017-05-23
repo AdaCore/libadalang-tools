@@ -30,7 +30,7 @@ with Libadalang.Analysis;
 
 with ASIS_UL.Vectors;
 with ASIS_UL.Char_Vectors; use ASIS_UL.Char_Vectors;
-use ASIS_UL.Char_Vectors.Char_Vectors;
+use ASIS_UL.Char_Vectors.WChar_Vectors;
 with LAL_UL.Symbols;
 with LAL_UL.Predefined_Symbols; use LAL_UL.Predefined_Symbols;
 with LAL_UL.Command_Lines;

@@ -2516,7 +2516,7 @@ package body Pp.Formatting is
         (Tokens : Token_Vector;
          Index  : in out Token_Index;
          Tok    : in out Token;
-         Result : in out Char_Vector;
+         Result : in out WChar_Vector;
          Is_Out : Boolean);
       --  Collect up all the text of a sequence of Whole_Line_Comments,
       --  ignoring changes made by paragraph filling. Paragraph_Filling might
@@ -2626,7 +2626,7 @@ package body Pp.Formatting is
         (Tokens : Token_Vector;
          Index  : in out Token_Index;
          Tok    : in out Token;
-         Result : in out Char_Vector;
+         Result : in out WChar_Vector;
          Is_Out : Boolean)
       is
       begin
@@ -2725,8 +2725,8 @@ package body Pp.Formatting is
               and then Out_Tok.Kind in Whole_Line_Comment
             then
                declare
-                  Src_Comments : Char_Vector;
-                  Out_Comments : Char_Vector;
+                  Src_Comments : WChar_Vector;
+                  Out_Comments : WChar_Vector;
                begin
                   Collect_Comments
                     (Src_Tokens,
@@ -2847,7 +2847,7 @@ package body Pp.Formatting is
       end if;
       if Enable_Token_Mismatch then
          declare
-            Old_Out_Buf : constant Char_Vector := To_Vector (Out_Buf);
+            Old_Out_Buf : constant WChar_Vector := To_Vector (Out_Buf);
          begin
             Final_Check_Helper (Lines_Data, Src_Buf, Cmd);
             pragma Assert (To_Vector (Out_Buf) = Old_Out_Buf);
