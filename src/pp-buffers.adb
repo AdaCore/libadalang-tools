@@ -671,13 +671,13 @@ package body Pp.Buffers is
    procedure Insert_Ada_Source
      (Buf         : in out Buffer;
       Input       : String;
-      Wide_Character_Encoding_Method : System.WCh_Con.WC_Encoding_Method;
+      Wide_Character_Encoding : System.WCh_Con.WC_Encoding_Method;
       Expand_Tabs : Boolean := False)
    is
       pragma Assert (Expand_Tabs); -- ???For now
 
       package Decoder is new GNAT.Decode_String
-        (Encoding_Method => Wide_Character_Encoding_Method);
+        (Encoding_Method => Wide_Character_Encoding);
       package Brackets_Decoder is new GNAT.Decode_String
         (Encoding_Method => System.WCh_Con.WCEM_Brackets);
       Ptr     : Natural  := Input'First;
@@ -771,7 +771,7 @@ package body Pp.Buffers is
    procedure Read_Ada_File
      (Buf         : in out Buffer;
       File_Name   : String;
-      Wide_Character_Encoding_Method : System.WCh_Con.WC_Encoding_Method :=
+      Wide_Character_Encoding : System.WCh_Con.WC_Encoding_Method :=
         System.WCh_Con.WCEM_Brackets;
       BOM_Seen    : out Boolean;
       Expand_Tabs : Boolean := False)
@@ -796,7 +796,7 @@ package body Pp.Buffers is
 
       --  Check for BOM at start of file. The only supported BOM is
       --  UTF8_All. If present, when we're called from gnatpp, the
-      --  Wide_Character_Encoding_Method should already be set to
+      --  Wide_Character_Encoding should already be set to
       --  WCEM_UTF8, but when we're called from xml2gnat, we need to set it.
 
       Read_BOM (Input.all, BOM_Len, BOM);
@@ -809,7 +809,7 @@ package body Pp.Buffers is
       end if;
 
       Insert_Ada_Source (Buf, Input (First .. Input'Last),
-                         Wide_Character_Encoding_Method, Expand_Tabs);
+                         Wide_Character_Encoding, Expand_Tabs);
 
       Free (Input);
       Reset (Buf);

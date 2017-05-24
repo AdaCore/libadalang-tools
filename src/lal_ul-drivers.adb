@@ -39,8 +39,6 @@ with LAL_UL.Projects; use LAL_UL.Projects;
 with ASIS_UL.String_Utilities; use ASIS_UL.String_Utilities;
 with LAL_UL.Tool_Names;
 
-with GNATCOLL.Iconv;
-
 with Langkit_Support.Diagnostics;
 
 with Libadalang;     use Libadalang;
@@ -151,26 +149,8 @@ package body LAL_UL.Drivers is
       end ASIS_Order_File_Names;
 
       procedure Process_Files is
-
-         --  ???Libadalang doesn't support all the encodings we need.
-
-         WCEM : constant String := Arg (Cmd, Wide_Character_Encoding).all;
-         Encoding_Method : constant String :=
-           (if WCEM = "h" then
-              "Hex"
-            elsif WCEM = "u" then
-              "Upper"
-            elsif WCEM = "s" then
-              "Shift_JIS"
-            elsif WCEM = "e" then
-              "EUC"
-            elsif WCEM = "8" then
-              GNATCOLL.Iconv.UTF8
-            elsif WCEM = "b" then
-              GNATCOLL.Iconv.ISO_8859_1 -- brackets
-            else raise Program_Error);
-
-         Context : Analysis_Context := Create (Charset => Encoding_Method);
+         Context : Analysis_Context :=
+           Create (Charset => Wide_Character_Encoding (Cmd));
 
          Num_File_Names : constant Natural := File_Names (Cmd)'Length;
          Counter : Natural := Num_File_Names;
@@ -209,7 +189,7 @@ package body LAL_UL.Drivers is
             begin
                --  Check for BOM at start of file. The only supported BOM is
                --  UTF8_All. If present, when we're called from gnatpp, the
-               --  Wide_Character_Encoding_Method should already be set to
+               --  Wide_Character_Encoding should already be set to
                --  WCEM_UTF8, but when we're called from xml2gnat, we need to
                --  set it.
 

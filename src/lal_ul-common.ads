@@ -1,4 +1,5 @@
 with LAL_UL.Command_Lines; use LAL_UL.Command_Lines;
+with System.WCh_Con;
 
 package LAL_UL.Common is
 
@@ -155,6 +156,14 @@ package LAL_UL.Common is
       To_All (Mapping_File),
       To_All (Configuration_Pragmas_File),
       To_All (Object_Path_File_Name));
+
+   ----------------
+
+   function Wide_Character_Encoding (Cmd : Command_Line) return String;
+   function Wide_Character_Encoding
+     (Cmd : Command_Line) return System.WCh_Con.WC_Encoding_Method;
+   --  Libadalang wants the encoding as a String, whereas Pp.Buffers uses
+   --  WC_Encoding_Method.
 
    ----------------
 

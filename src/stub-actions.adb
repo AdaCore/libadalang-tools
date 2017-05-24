@@ -174,26 +174,9 @@ pragma Warnings (On);
       Root_Node : constant Ada_Node := Root (Unit);
       pragma Unreferenced (Root_Node);
 
-      WCEM : constant String := Arg (Cmd, Wide_Character_Encoding).all;
-      Encoding_Method : constant System.WCh_Con.WC_Encoding_Method :=
-        (if WCEM = "h" then
-           System.WCh_Con.WCEM_Hex
-         elsif WCEM = "u" then
-           System.WCh_Con.WCEM_Upper
-         elsif WCEM = "s" then
-           System.WCh_Con.WCEM_Shift_JIS
-         elsif WCEM = "e" then
-           System.WCh_Con.WCEM_EUC
-         elsif WCEM = "8" then
-           System.WCh_Con.WCEM_UTF8
-         elsif WCEM = "b" then
-           System.WCh_Con.WCEM_Brackets
-         else raise Program_Error);
-      pragma Unreferenced (Encoding_Method);
-
-      Form_String : constant String := "WCEM=" & WCEM;
-      pragma Unreferenced (Form_String);
-      --  ????????????????Duplicates pp
+      Wide_Char_Encoding : constant System.WCh_Con.WC_Encoding_Method :=
+        Wide_Character_Encoding (Cmd);
+      pragma Unreferenced (Wide_Char_Encoding);
 
       function Get_Output_Name (Resolve_Links : Boolean) return String;
       function Get_Output_Name (Resolve_Links : Boolean) return String is

@@ -4417,24 +4417,11 @@ package body Pp.Actions is
 
       use LAL_UL.Formatted_Output;
 
-      WCEM : constant String := Arg (Cmd, Wide_Character_Encoding).all;
-      Encoding_Method : constant System.WCh_Con.WC_Encoding_Method :=
-        (if WCEM = "h" then
-           System.WCh_Con.WCEM_Hex
-         elsif WCEM = "u" then
-           System.WCh_Con.WCEM_Upper
-         elsif WCEM = "s" then
-           System.WCh_Con.WCEM_Shift_JIS
-         elsif WCEM = "e" then
-           System.WCh_Con.WCEM_EUC
-         elsif WCEM = "8" then
-           System.WCh_Con.WCEM_UTF8
-         elsif WCEM = "b" then
-           System.WCh_Con.WCEM_Brackets
-         else raise Program_Error);
-
       Src_Buf : Buffer;
       --  Buffer containing the text of the original source file
+
+      Wide_Char_Encoding : constant System.WCh_Con.WC_Encoding_Method :=
+        Wide_Character_Encoding (Cmd);
 
       type Out_File_Formats is (CRLF, LF);
 
@@ -4683,7 +4670,7 @@ package body Pp.Actions is
             Clear (Src_Buf);
             Insert_Ada_Source
               (Src_Buf, Elems (Input) (1 .. Last_Index (Input)),
-               Encoding_Method, Expand_Tabs => True);
+               Wide_Char_Encoding, Expand_Tabs => True);
             --  Expand tabs unconditionally. This differs from the behavior of
             --  the old gnatpp, which has an option for that (but only for
             --  comments).
@@ -4733,7 +4720,6 @@ package body Pp.Actions is
          Out_Vec : constant WChar_Vector := Remove_Extra_Line_Breaks;
          Out_Arr : W_Str renames Elems (Out_Vec) (2 .. Last_Index (Out_Vec));
          --  2 to skip sentinel newline
---         package Encoder is new GNAT.Encode_String (Encoding_Method);
 
          procedure Append_One (C : Character);
          procedure Append_One (C : Character) is
@@ -4745,10 +4731,8 @@ package body Pp.Actions is
       begin
          Clear (Output);
          for WC of Out_Arr loop
-            Encode (WC, Encoding_Method);
+            Encode (WC, Wide_Char_Encoding);
          end loop;
---         Append (Output, Encoder.Encode_Wide_String (Out_Arr));
---            Out_Vec : constant WChar_Vector := To_Vector (Out_Buf);
       end;
    end Format_Vector;
 

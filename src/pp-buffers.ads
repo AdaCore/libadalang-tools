@@ -234,12 +234,12 @@ package Pp.Buffers is
    procedure Insert_Ada_Source
      (Buf         : in out Buffer;
       Input       : String;
-      Wide_Character_Encoding_Method : System.WCh_Con.WC_Encoding_Method;
+      Wide_Character_Encoding : System.WCh_Con.WC_Encoding_Method;
       Expand_Tabs : Boolean := False);
    procedure Read_Ada_File
      (Buf         : in out Buffer;
       File_Name   : String;
-      Wide_Character_Encoding_Method : System.WCh_Con.WC_Encoding_Method :=
+      Wide_Character_Encoding : System.WCh_Con.WC_Encoding_Method :=
         System.WCh_Con.WCEM_Brackets;
       BOM_Seen    : out Boolean;
       Expand_Tabs : Boolean := False);
