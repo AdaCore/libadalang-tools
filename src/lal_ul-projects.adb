@@ -7,7 +7,6 @@ with Ada.Text_IO;
 
 with GNAT.Directory_Operations;
 
-with GNATCOLL.Projects; use GNATCOLL.Projects;
 with GNATCOLL.VFS;      use GNATCOLL.VFS;
 with GNATCOLL.Projects.Aux;
 with GNATCOLL.Traces;
@@ -24,6 +23,8 @@ package body LAL_UL.Projects is
 
    use Common_Flag_Switches, Common_String_Switches,
      Common_String_Seq_Switches, Common_Nat_Switches;
+
+   My_Project : aliased Project_Tree;
 
    function Project_File_Name (Cmd : Command_Line) return String with
       Pre => Arg (Cmd, Project_File) /= null;
@@ -1108,6 +1109,7 @@ package body LAL_UL.Projects is
       Project_RTS                     :    out String_Access;
       Individual_Source_Options       :    out String_String_List_Map;
       Result_Dirs                     :    out String_String_Map;
+      The_Project_Tree                :    out not null Project_Tree_Access;
       Needs_Per_File_Output           :        Boolean;
       Preprocessing_Allowed           :        Boolean;
       Tool_Package_Name               :        String;
@@ -1130,6 +1132,7 @@ package body LAL_UL.Projects is
    --  In addition, we parse the command line ignoring errors first, for
    --  --version and --help switches. ???This also sets debug flags, etc.
    begin
+      The_Project_Tree := My_Project'Access;
       Cmd_Text := Text_Args_From_Command_Line;
       Cmd_Cargs := Text_Cargs_From_Command_Line;
 
@@ -1186,8 +1189,6 @@ package body LAL_UL.Projects is
       end if;
 
       declare
-         My_Project : Project_Tree;
-
          procedure Update_File_Name (File_Name : in out String_Ref);
          --  Set File_Name to the full name if -P specified
 

@@ -1,3 +1,5 @@
+with GNATCOLL.Projects;
+
 with Libadalang.Analysis; use Libadalang.Analysis;
 
 with LAL_UL.Command_Lines; use LAL_UL.Command_Lines;
@@ -8,7 +10,12 @@ package LAL_UL.Tools is
    --  The driver calls Init, then Per_File_Action on each source file,
    --  then Final.
 
-   type Tool_State is abstract tagged limited null record;
+   type Tool_State is abstract tagged limited record
+      Project_Tree : GNATCOLL.Projects.Project_Tree_Access;
+      --  The only tool that needs access to the Project_Tree is gnatstub.
+      --  The driver sets this to the current project. If there is no
+      --  -P switch, then the Status will be Empty.
+   end record;
 
    procedure Init (Tool : in out Tool_State; Cmd : Command_Line) is abstract;
    procedure Per_File_Action

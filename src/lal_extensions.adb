@@ -58,7 +58,7 @@ package body LAL_Extensions is
       return Ada_Node_Array
    is
 
-      Result_Vector : Ada_Node_Vectors.Vector;
+      Result_Vector : Ada_Node_Vector;
 
       procedure Append (Node : access Ada_Node_Type'Class);
 
@@ -77,7 +77,7 @@ package body LAL_Extensions is
       Node_Kind : Ada_Node_Kind_Type) return Ada_Node_Array
    is
 
-      Result_Vector : Ada_Node_Vectors.Vector;
+      Result_Vector : Ada_Node_Vector;
 
       procedure Append (Node : access Ada_Node_Type'Class);
 
@@ -177,6 +177,15 @@ package body LAL_Extensions is
             when Ada_Package_Body_Stub =>
                Result :=
                  F_Name (Package_Body_Stub (Decl));
+            when Ada_Subp_Body_Stub =>
+               Result :=
+                 F_Subp_Name (Get_Subp_Spec (Decl));
+            when Ada_Task_Body_Stub =>
+               Result :=
+                 F_Name (Task_Body_Stub (Decl));
+            when Ada_Protected_Body_Stub =>
+               Result :=
+                 F_Name (Protected_Body_Stub (Decl));
             when Ada_Package_Renaming_Decl =>
                Result :=
                  F_Name (Package_Renaming_Decl (Decl));
@@ -216,6 +225,9 @@ package body LAL_Extensions is
                  Name (F_Protected_Type_Name (Protected_Type_Decl (Decl)));
             when Ada_Protected_Body =>
                Result := F_Name (Protected_Body (Decl));
+            when Ada_Entry_Decl =>
+               Result :=
+                 Name (F_Entry_Id (Entry_Decl (Decl)));
             when Ada_Entry_Body =>
                Result :=
                  Name (F_Entry_Name (Entry_Body (Decl)));
@@ -341,6 +353,15 @@ package body LAL_Extensions is
             return F_Public_Part (Task_Def (Node));
          when Ada_Protected_Def =>
             return F_Public_Part (Protected_Def (Node));
+         when Ada_Single_Task_Decl => -- This will recurse 2 levels!
+            return Vis_Part (F_Task_Type (Single_Task_Decl (Node)));
+         when Ada_Task_Type_Decl =>
+            return Vis_Part (F_Definition (Task_Type_Decl (Node)));
+         when Ada_Single_Protected_Decl => -- This will recurse 2 levels!
+            return Vis_Part (F_Definition (Single_Protected_Decl (Node)));
+            --  Why doesn't this parallel tasks???
+         when Ada_Protected_Type_Decl =>
+            return Vis_Part (F_Definition (Protected_Type_Decl (Node)));
          when others => raise Program_Error;
       end case;
    end Vis_Part;
@@ -358,6 +379,15 @@ package body LAL_Extensions is
             return F_Private_Part (Task_Def (Node));
          when Ada_Protected_Def =>
             return F_Private_Part (Protected_Def (Node));
+         when Ada_Single_Task_Decl => -- This will recurse 2 levels!
+            return Priv_Part (F_Task_Type (Single_Task_Decl (Node)));
+         when Ada_Task_Type_Decl =>
+            return Priv_Part (F_Definition (Task_Type_Decl (Node)));
+         when Ada_Single_Protected_Decl => -- This will recurse 2 levels!
+            return Priv_Part (F_Definition (Single_Protected_Decl (Node)));
+            --  Why doesn't this parallel tasks???
+         when Ada_Protected_Type_Decl =>
+            return Priv_Part (F_Definition (Protected_Type_Decl (Node)));
          when others => raise Program_Error;
       end case;
    end Priv_Part;

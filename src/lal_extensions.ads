@@ -15,6 +15,7 @@ package LAL_Extensions is
      (Index_Type => Positive,
       Element_Type => Ada_Node,
       Elements_Array => Ada_Node_Array);
+   subtype Ada_Node_Vector is Ada_Node_Vectors.Vector;
 
    function Childx
      (Node  : access Ada_Node_Type'Class;
@@ -63,7 +64,7 @@ package LAL_Extensions is
    function L_Name
      (Nm : access Ada_Node_Type'Class)
      return W_Str with
-     Pre => Kind (Nm) = Ada_Identifier;
+     Pre => Kind (Nm) in Ada_Identifier | Ada_String_Literal;
    --  Text name of an identifier. The L_Name is converted to lower
    --  case.
 
@@ -75,7 +76,7 @@ package LAL_Extensions is
    function Full_Name (Nm : Name) return W_Str;
    function L_Full_Name (Nm : Name) return W_Str;
    --  Returns the full expanded name. The L_Full_Name is converted to lower
-   --  case.
+   --  case.  ????????????????That comment is wrong.  So is the name.
 
    function Get_Def_Name (Decl : Ada_Node) return Name;
    --  Returns the defining name of a declaration or body

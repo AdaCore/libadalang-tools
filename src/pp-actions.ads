@@ -14,13 +14,14 @@ package Pp.Actions is
       File_Name : String;
       Input : Char_Vector;
       Output : out Char_Vector;
-      Unit : Analysis_Unit);
+      Node : Ada_Node);
    --  This pretty prints the given source. The input source text is in Source,
    --  and the output source text is left in Source. Note that the gnatpp
    --  program does not call this directly; it calls Per_File_Action.
    --  Format_Vector is for calling from text editors and the like.
    --  File_Name is for printing error messages; it can be empty if there
    --  is none. Modified indicates whether Source was modified.
+   --  Document empty Input????????????????
 
 private
 

@@ -451,7 +451,8 @@ package body Pp.Formatting is
      (Lines_Data : in out Lines_Data_Rec;
       Source_File_Name : String;
       Src_Buf : in out Buffer;
-      Cmd : Command_Line)
+      Cmd : Command_Line;
+      Partial : Boolean)
    is
       Out_Buf : Buffer renames Lines_Data.Out_Buf;
       Cur_Indentation : Natural renames Lines_Data.Cur_Indentation;
@@ -2401,6 +2402,12 @@ package body Pp.Formatting is
       end Copy_Pp_Off_Regions;
 
    begin
+      --  ????????????????We probably want to do more, but this is for lalstub
+      --  for now.
+      if Partial then
+         return;
+      end if;
+
       Split_Lines (First_Time => True);
       Insert_Comments_And_Blank_Lines;
       Split_Lines (First_Time => False);

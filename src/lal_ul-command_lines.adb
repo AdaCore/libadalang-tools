@@ -627,8 +627,10 @@ package body LAL_UL.Command_Lines is
    end Disable_Switches;
 
    package body Freeze_Descriptor is
-      pragma Assert (Descriptor.Allowed_Switches = null);
-      --  Don't call this twice
+--      pragma Assert (Descriptor.Allowed_Switches = null);
+      --  Don't call this twice. Commented out because of kludgery
+      --  in Metrics.Command_Lines. We should move the freezing
+      --  of common switches into Common. ????
 
       procedure Do_It (Descriptor : in out Command_Line_Descriptor);
       --  Do most of the work in a procedure so the debugger works.
@@ -692,13 +694,15 @@ package body LAL_UL.Command_Lines is
       end Do_It;
 
    begin
-      --  Switch over to using Allowed_Switches from Allowed_Switches_Vector
+      if Descriptor.Allowed_Switches = null then -- ???Replaces above assertion
+         --  Switch over to using Allowed_Switches from Allowed_Switches_Vector
 
-      Descriptor.Allowed_Switches :=
-        new Switch_Descriptor_Array'
-        (To_Array (Descriptor.Allowed_Switches_Vector));
-      Free (Descriptor.Allowed_Switches_Vector);
-      Do_It (Descriptor);
+         Descriptor.Allowed_Switches :=
+           new Switch_Descriptor_Array'
+           (To_Array (Descriptor.Allowed_Switches_Vector));
+         Free (Descriptor.Allowed_Switches_Vector);
+         Do_It (Descriptor);
+      end if;
    end Freeze_Descriptor;
 
    function Copy_Descriptor

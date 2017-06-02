@@ -3,6 +3,8 @@ with Ada.Containers.Hashed_Maps;
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 with GNAT.String_Hash;
 
+with GNATCOLL.Projects; use GNATCOLL.Projects;
+
 with LAL_UL.Command_Lines; use LAL_UL.Command_Lines;
 
 package LAL_UL.Projects is
@@ -44,6 +46,7 @@ package LAL_UL.Projects is
       Project_RTS                     :    out String_Access;
       Individual_Source_Options       :    out String_String_List_Map;
       Result_Dirs                     :    out String_String_Map;
+      The_Project_Tree                :    out not null Project_Tree_Access;
       Needs_Per_File_Output           :        Boolean;
       Preprocessing_Allowed           :        Boolean;
       Tool_Package_Name               :        String;

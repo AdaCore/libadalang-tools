@@ -256,6 +256,7 @@ package body LAL_UL.Drivers is
          Project_RTS               => Custom_RTS,
          Individual_Source_Options => Individual_Source_Options,
          Result_Dirs               => Result_Dirs,
+         The_Project_Tree          => Tool.Project_Tree,
          Needs_Per_File_Output     => Needs_Per_File_Output,
          Preprocessing_Allowed     => Preprocessing_Allowed,
          Tool_Package_Name         => Tool_Package_Name,

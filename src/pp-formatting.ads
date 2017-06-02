@@ -279,7 +279,8 @@ package Pp.Formatting is
      (Lines_Data : in out Lines_Data_Rec;
       Source_File_Name : String;
       Src_Buf : in out Buffer;
-      Cmd : LAL_UL.Command_Lines.Command_Line);
+      Cmd : LAL_UL.Command_Lines.Command_Line;
+      Partial : Boolean);
    --  The first pretty-printing pass walks the tree and produces text,
    --  along with various tables. This performs the remaining passes, which
    --  do not make use of the tree.

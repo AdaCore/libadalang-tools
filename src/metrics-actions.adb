@@ -2416,7 +2416,7 @@ package body METRICS.Actions is
       pragma Assert (Kind (CU_Node) = Ada_Compilation_Unit);
       Outer_Unit : constant Ada_Node := Get_Outer_Unit (CU_Node);
 
-      Node_Stack : Ada_Node_Vectors.Vector;
+      Node_Stack : Ada_Node_Vector;
       --  Stack of all nodes currently being walked
 
       function Ancestor_Node (N : Natural) return Ada_Node;

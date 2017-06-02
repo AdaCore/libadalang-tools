@@ -40,7 +40,7 @@ package body Pp.Actions is
 
    use ASIS_UL.Char_Vectors.WChar_Vectors;
 
-   package Slocs renames Langkit_Support.Slocs;
+--   package Slocs renames Langkit_Support.Slocs;????????????????
 
    function Image (X : Integer) return String
      renames ASIS_UL.String_Utilities.Image;
@@ -121,7 +121,7 @@ package body Pp.Actions is
 
       if Arg (Cmd, Pp_Off) /= null and then Arg (Cmd, Pp_On) /= null then
          if Arg (Cmd, Pp_Off).all = Arg (Cmd, Pp_On).all then
-            Text_IO.Put_Line
+            Text_IO.Put_Line -- Use Cmd_Error???
               (Text_IO.Standard_Error,
                "gnatpp: cannot specify --pp-off and --pp-on with same string");
             raise Command_Line_Error;
@@ -311,7 +311,9 @@ package body Pp.Actions is
    procedure Tree_To_Ada_2
      (Root      : Ada_Node;
       Out_Buf   : in out Buffer;
-      Cmd       : LAL_UL.Command_Lines.Command_Line);
+      Cmd       : LAL_UL.Command_Lines.Command_Line;
+      Partial   : Boolean);
+   --  Partial is True if we're not processing an entire file.
 
    --  Hard and soft line breaks:
    --
@@ -1150,7 +1152,8 @@ package body Pp.Actions is
    procedure Tree_To_Ada_2
      (Root      : Ada_Node;
       Out_Buf   : in out Buffer;
-      Cmd       : LAL_UL.Command_Lines.Command_Line)
+      Cmd       : LAL_UL.Command_Lines.Command_Line;
+      Partial   : Boolean)
    is
 
       procedure Put_To_Buffer (C : W_Char);
@@ -4370,7 +4373,20 @@ package body Pp.Actions is
 
          pragma Assert (Check_Whitespace);
          Subtree_To_Ada (Tree, Cur_Level => 0, Index_In_Parent => 1);
+
+         --  In Partial mode, we might need add a line break
+
+         pragma Assert (At_End (Out_Buf));
+         if Partial and then Cur (Out_Buf) /= NL then
+            Append_Line_Break
+              (Hard     => True,
+               Affects_Comments => True,
+               Level    => 0,
+               Kind     => Ada_Abort_Stmt,
+               Template => Name_Empty);
+         end if;
          pragma Debug (Assert_No_Trailing_Blanks (To_W_Str (Out_Buf)));
+
          Append
            (Tabs,
             Tab_Rec'
@@ -4411,9 +4427,11 @@ package body Pp.Actions is
       File_Name : String;
       Input : Char_Vector;
       Output : out Char_Vector;
-      Unit : Analysis_Unit)
+      Node : Ada_Node)
    is
       pragma Unreferenced (Tool);
+
+      Partial : constant Boolean := Is_Empty (Input);
 
       use LAL_UL.Formatted_Output;
 
@@ -4590,8 +4608,8 @@ package body Pp.Actions is
             --  Otherwise, convert the tree to text, and then run all the
             --  text-based passes.
 
-            Tree_To_Ada_2 (Root (Unit), Out_Buf, Cmd);
-            Post_Tree_Phases (Lines_Data, File_Name, Src_Buf, Cmd);
+            Tree_To_Ada_2 (Node, Out_Buf, Cmd, Partial);
+            Post_Tree_Phases (Lines_Data, File_Name, Src_Buf, Cmd, Partial);
          end if;
       end Tree_To_Ada;
 
@@ -5028,7 +5046,7 @@ package body Pp.Actions is
 
 --      pragma Assert (Is_Empty (Symtab));
       Append (In_Vec, Input);
-      Format_Vector (Tool, Cmd, File_Name, In_Vec, Out_Vec, Unit);
+      Format_Vector (Tool, Cmd, File_Name, In_Vec, Out_Vec, Root (Unit));
 --        (CU, Cmd, Output_Name, Form_String,
 --         Do_Diff, Output_Written, To_Ada => True);
 --      --  We have to flush the cache here, because Unit_Id's get reused between

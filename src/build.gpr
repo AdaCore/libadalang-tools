@@ -18,7 +18,7 @@ project Build is
       case Build_Mode is
          when "dev" =>
             for Default_Switches ("Ada") use
-              ("-gnatyg", "-gnatwae", "-gnatw.u", "-g", "-O0", "-gnata");
+              ("-gnatyg", "-gnatwae", "-gnatw.u", "-g", "-O0", "-gnata", "-gnatVa");
 
          when "prod" =>
             for Default_Switches ("Ada") use

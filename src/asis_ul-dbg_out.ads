@@ -29,6 +29,6 @@ package ASIS_UL.Dbg_Out is new ASIS_UL.Generic_Formatted_Output
    Str_Type                 => String,
    Basic_Put_Char           => ASIS_UL.String_Utilities.Std_Err_Put_Char,
    Output_Enabled_Initially => False);
---  All data is sent to Text_IO.Standard_Error. In gdb, set
---  "ASIS_UL.Dbg_Out.Output_Enabled:=True" to enable debugging output,
---  which is turned off by default.
+--  All data is sent to Text_IO.Standard_Error. In gdb, set:
+--     ASIS_UL.Dbg_Out.Output_Enabled := True
+--  to enable debugging output, which is turned off by default.
