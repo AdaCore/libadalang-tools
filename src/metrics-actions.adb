@@ -2735,7 +2735,7 @@ package body METRICS.Actions is
             when Ada_Quantified_Expr =>
                Inc_Cyc (Complexity_Expression, By => 2);
 
-            when Ada_Loop_Stmt =>
+            when Ada_For_Loop_Stmt | Ada_Loop_Stmt | Ada_While_Loop_Stmt =>
                --  Compute M.Vals (Loop_Nesting) as the maximum loop
                --  nesting level for this unit. We only set it for the
                --  innermost unit and at the file level.
@@ -2795,8 +2795,8 @@ package body METRICS.Actions is
          --  Push the stack if appropriate
 
          if Kind (Node) in Gnatmetric_Eligible |
-           Ada_If_Stmt | Ada_Case_Stmt | Ada_Loop_Stmt |
-           Ada_Select_Stmt
+           Ada_If_Stmt | Ada_Case_Stmt | Ada_For_Loop_Stmt | Ada_Loop_Stmt |
+           Ada_While_Loop_Stmt | Ada_Select_Stmt
          then
             Append (EC_Stack, EC_Rec'(Node, Counted => False)); -- push
             --  (The corresponding Pop is at the end of
@@ -2830,7 +2830,8 @@ package body METRICS.Actions is
 
                   exit when X = 1;
                   exit when Kind (Node) = Ada_Exit_Stmt
-                    and then K = Ada_Loop_Stmt;
+                    and then K in
+                      Ada_For_Loop_Stmt | Ada_Loop_Stmt | Ada_While_Loop_Stmt;
 
                   X := X - 1;
                end loop;
@@ -3283,8 +3284,12 @@ package body METRICS.Actions is
          if Kind (Node) in
              Ada_Basic_Decl | Ada_Entry_Index_Spec
            and then Kind (Node) not in
-             Ada_Generic_Formal | Ada_Generic_Package_Internal |
-             Ada_Anonymous_Type_Decl | Ada_Named_Stmt_Decl | Ada_Label_Decl |
+             Ada_Generic_Formal |
+             Ada_Generic_Formal_Obj_Decl |
+             Ada_Generic_Formal_Package | Ada_Generic_Formal_Subp_Decl |
+             Ada_Generic_Formal_Type_Decl |
+             Ada_Generic_Package_Internal | Ada_Anonymous_Type_Decl |
+             Ada_Named_Stmt_Decl | Ada_Label_Decl |
              Ada_Single_Task_Type_Decl
          then
             Inc_All (Declarations);
@@ -3302,7 +3307,8 @@ package body METRICS.Actions is
          if In_Visible_Part then
             if not M.Is_Private_Lib_Unit and not In_Generic_Formal_Part then
                if Kind (Node) in Ada_Type_Decl | Ada_Enum_Type_Decl |
-                 Ada_Protected_Type_Decl | Ada_Task_Type_Decl
+                 Ada_Protected_Type_Decl | Ada_Task_Type_Decl |
+                 Ada_Incomplete_Type_Decl | Ada_Incomplete_Tagged_Type_Decl
                then
                   Inc_All (Public_Types);
                end if;
@@ -3326,7 +3332,8 @@ package body METRICS.Actions is
          --  All_Types
 
          if Kind (Node) in Ada_Type_Decl | Ada_Enum_Type_Decl |
-           Ada_Protected_Type_Decl | Ada_Task_Type_Decl
+           Ada_Protected_Type_Decl | Ada_Task_Type_Decl |
+           Ada_Incomplete_Type_Decl | Ada_Incomplete_Tagged_Type_Decl
          then
             --  ???We're not supposed to count the full type declaration of a
             --  private type/extension. The following 'if' is an approximation
@@ -3380,9 +3387,8 @@ package body METRICS.Actions is
             if Last_Index (Metrix_Stack) >= 3 then
                declare
                   Top : constant Metrix_Index := Last_Index (Metrix_Stack);
-                  Start : constant Metrix_Index := Top;
                begin
-                  for X in reverse 3 .. Start loop
+                  for X in reverse 3 .. Top loop
                      declare
                         MM : Metrix renames Element (Metrix_Stack, X).all;
                      begin
@@ -3472,7 +3478,7 @@ package body METRICS.Actions is
          case Kind (Node) is
             when Ada_Interface_Type_Def =>
                File_M.Has_Tagged_Type := True;
-            when Ada_Incomplete_Tagged_Type_Def =>
+            when Ada_Incomplete_Tagged_Type_Decl =>
                File_M.Has_Tagged_Type := True;
             when Ada_Private_Type_Def =>
                if F_Has_Tagged (Private_Type_Def (Node)) then
@@ -3518,7 +3524,7 @@ package body METRICS.Actions is
                Inc (Quantified_Expr_Count);
             when Ada_Expr_Function =>
                Inc (Expr_Function_Count);
-            when Ada_Loop_Stmt =>
+            when Ada_For_Loop_Stmt | Ada_Loop_Stmt | Ada_While_Loop_Stmt =>
                Inc (Loop_Count);
             when Ada_Private_Part =>
                Inc (Private_Part_Count);
@@ -3582,7 +3588,7 @@ package body METRICS.Actions is
                Dec (Quantified_Expr_Count);
             when Ada_Expr_Function =>
                Dec (Expr_Function_Count);
-            when Ada_Loop_Stmt =>
+            when Ada_For_Loop_Stmt | Ada_Loop_Stmt | Ada_While_Loop_Stmt =>
                Dec (Loop_Count);
             when Ada_Private_Part =>
                Dec (Private_Part_Count);

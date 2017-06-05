@@ -464,10 +464,13 @@ package body LAL_Extensions is
            Ada_Entry_Body |
            Ada_Generic_Package_Decl |
 
-           Ada_Block_Stmt |
+           Ada_Begin_Block |
+           Ada_Decl_Block |
            Ada_Case_Stmt |
            Ada_Select_Stmt |
+           Ada_For_Loop_Stmt |
            Ada_Loop_Stmt |
+           Ada_While_Loop_Stmt |
            Ada_Accept_Stmt |
            Ada_If_Stmt =>
             return True;
