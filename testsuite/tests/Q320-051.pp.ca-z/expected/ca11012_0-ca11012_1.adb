@@ -27,8 +27,7 @@ package body Ca11012_0.Ca11012_1 is
       return Result;
    end "*";
    ---------------------------------------------------------------
-   function Vector_Magnitude
-     (Complex_No : Complex_Type) return Int_Type
+   function Vector_Magnitude (Complex_No : Complex_Type) return Int_Type
    is                -- Not a real vector magnitude.
    begin
       return (Complex_No.Real + Complex_No.Imag);

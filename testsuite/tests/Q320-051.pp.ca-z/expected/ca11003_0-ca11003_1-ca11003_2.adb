@@ -4,9 +4,7 @@ with Ca11003_0.Ca11003_1.Ca11003_3;
 -- Grandchild package body OS.Operations.Menu
 package body Ca11003_0.Ca11003_1.Ca11003_2 is
 
-   procedure News
-     (Mode : in     File_Mode;
-      File :    out Extended_File_Type)
+   procedure News (Mode : in File_Mode; File : out Extended_File_Type)
    is   -- Parent type.
    begin
       Create_File (Mode, File);                           -- Parent subprogram.

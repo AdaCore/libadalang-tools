@@ -15,9 +15,7 @@ package body C413003p is
       return 1;
    end Base_Func;
 
-   function Base_Func
-     (X     : access constant Tp;
-      Value : Integer) return Integer
+   function Base_Func (X : access constant Tp; Value : Integer) return Integer
    is
    begin
       return Value;
@@ -38,9 +36,7 @@ package body C413003p is
       return 2;
    end Prim_Func;
 
-   function Prim_Func
-     (X     : access constant Tp;
-      Value : Integer) return Integer
+   function Prim_Func (X : access constant Tp; Value : Integer) return Integer
    is
    begin
       return Value;

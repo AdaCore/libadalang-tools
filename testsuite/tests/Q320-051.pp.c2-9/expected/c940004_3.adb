@@ -39,7 +39,8 @@ package body C940004_3 is
 
          or
             accept Tc_Get_Descriptor
-              (Descriptor : out Printer_Mgr_Pkg.Instantiation.User_Rec_Type) do
+              (Descriptor : out Printer_Mgr_Pkg.Instantiation.User_Rec_Type)
+            do
 
                Descriptor := D;
             end Tc_Get_Descriptor;

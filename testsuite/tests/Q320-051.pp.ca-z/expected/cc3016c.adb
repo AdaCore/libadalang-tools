@@ -131,9 +131,7 @@ procedure Cc3016c is
 
    end Outer;
 
-   procedure Double
-     (This_Value         : in     Integer;
-      Giving_This_Result :    out Integer)
+   procedure Double (This_Value : in Integer; Giving_This_Result : out Integer)
    is
    begin -- DOUBLE
       Giving_This_Result := 2 * This_Value;

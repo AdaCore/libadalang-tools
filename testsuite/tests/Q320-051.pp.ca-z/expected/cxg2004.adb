@@ -113,19 +113,14 @@ procedure Cxg2004 is
 
       function Sin (X : Real) return Real renames Elementary_Functions.Sin;
       function Cos (X : Real) return Real renames Elementary_Functions.Cos;
-      function Sin
-        (X, Cycle : Real) return Real renames
+      function Sin (X, Cycle : Real) return Real renames
         Elementary_Functions.Sin;
-      function Cos
-        (X, Cycle : Real) return Real renames
+      function Cos (X, Cycle : Real) return Real renames
         Elementary_Functions.Cos;
 
       Accuracy_Error_Reported : Boolean := False;
 
-      procedure Check
-        (Actual, Expected : Real;
-         Test_Name        : String;
-         Mre              : Real)
+      procedure Check (Actual, Expected : Real; Test_Name : String; Mre : Real)
       is
          Rel_Error, Abs_Error, Max_Error : Real;
       begin

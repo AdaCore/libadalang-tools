@@ -19,8 +19,7 @@ package body C3a2001_4 is
       return It;
    end Construct;
 
-   function Status_Of
-     (It : C3a2001_1.Breaker) return C3a2001_1.Status renames
+   function Status_Of (It : C3a2001_1.Breaker) return C3a2001_1.Status renames
      C3a2001_1.Status_Of;
 
    procedure Flip (The_Breaker : in out Special_Breaker) is
@@ -73,8 +72,7 @@ package body C3a2001_4 is
       end case;
    end Fail;
 
-   function Status_Of
-     (The_Breaker : Special_Breaker) return C3a2001_1.Status
+   function Status_Of (The_Breaker : Special_Breaker) return C3a2001_1.Status
    is
    begin
       Tctouch.Touch ('n'); --------------------------------------------- n

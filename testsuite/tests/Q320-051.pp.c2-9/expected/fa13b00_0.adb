@@ -2,8 +2,7 @@
 
 package body Fa13b00_0 is
 
-   function Assign_Visible_Tagged
-     (I : Visible_Integer) return Visible_Tagged
+   function Assign_Visible_Tagged (I : Visible_Integer) return Visible_Tagged
    is
       Vt : Visible_Tagged := (Pr => (Vi => I));
    begin
@@ -12,8 +11,7 @@ package body Fa13b00_0 is
 
    -------------------------------------------------------
 
-   function Assign_Private_Tagged
-     (I : Visible_Integer) return Private_Tagged
+   function Assign_Private_Tagged (I : Visible_Integer) return Private_Tagged
    is
       Pt : Private_Tagged := (Vi => I);
    begin

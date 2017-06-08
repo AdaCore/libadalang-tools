@@ -77,8 +77,7 @@ procedure C3a0027 is
       return Po.Double'Access;
    end Double_Init;
 
-   procedure Use_It
-     (Obj : access protected function (X : Float) return Float)
+   procedure Use_It (Obj : access protected function (X : Float) return Float)
    is
    -- Use Obj so that the compiler cannot remove the actual from the program as
    -- a dead object.

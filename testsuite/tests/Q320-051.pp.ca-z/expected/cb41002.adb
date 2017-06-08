@@ -97,8 +97,7 @@ begin
          -- Simulates an error logging routine.
          Info : constant String :=
            Ada.Exceptions.Exception_Information (Occur);
-         function Is_Substring_Of
-           (Target, Search : in String) return Boolean
+         function Is_Substring_Of (Target, Search : in String) return Boolean
          is
          -- Returns True if Search is a substring of Target, and False
          -- otherwise.

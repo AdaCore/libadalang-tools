@@ -3,9 +3,7 @@
    -- Child package body File_Package.Operations
    package body Ca11006_0.Ca11006_1 is
 
-   procedure Create_File
-     (Mode : in     File_Mode;
-      File :    out Extended_File_Type)
+   procedure Create_File (Mode : in File_Mode; File : out Extended_File_Type)
    is
    begin
       File.Descriptor := Next_Available_File;    -- Parent subprogram.
@@ -36,8 +34,7 @@
       end if;
    end Validate;
    ------------------------------------------------------------------------
-   function Validate_Compression
-     (File : in Extended_File_Type) return Boolean
+   function Validate_Compression (File : in Extended_File_Type) return Boolean
    is
    begin
       if

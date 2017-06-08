@@ -157,9 +157,7 @@ procedure C360002 is
       end if;
    end Fail;
 
-   procedure Check_Array_01_10
-     (Checked_Item : Array_01_10;
-      Low_Sb       : Integer)
+   procedure Check_Array_01_10 (Checked_Item : Array_01_10; Low_Sb : Integer)
    is
    begin
       for Index in Checked_Item'Range loop
@@ -172,9 +170,7 @@ procedure C360002 is
       end loop;
    end Check_Array_01_10;
 
-   procedure Check_Array_11_20
-     (Checked_Item : Array_11_20;
-      Low_Sb       : Integer)
+   procedure Check_Array_11_20 (Checked_Item : Array_11_20; Low_Sb : Integer)
    is
    begin
       for Index in Checked_Item'Range loop
@@ -187,9 +183,7 @@ procedure C360002 is
       end loop;
    end Check_Array_11_20;
 
-   procedure Check_Single_Integer
-     (The_Integer, Sb : Integer;
-      Message         : String)
+   procedure Check_Single_Integer (The_Integer, Sb : Integer; Message : String)
    is
    begin
       if The_Integer /= Sb then

@@ -10,7 +10,8 @@ procedure Cxe4004_B is
    function "+"
      (L,
       R : Cxe4004_Common.Integer_Vector)
-      return Cxe4004_Common.Integer_Vector renames
+      return Cxe4004_Common
+     .Integer_Vector renames
      Cxe4004_Part_A1."+";
 
    procedure Chk is new Cxe4004_Shared.Gen_Chk (Integer);

@@ -23,8 +23,7 @@ package body Ca11011_0 is          -- Package body OS.
       end if;
    end Verify_Initial_Conditions;
    ---------------------------------------------------------------------
-   function Final_Conditions_Valid
-     (Key : File_Descriptor_Type) return Boolean
+   function Final_Conditions_Valid (Key : File_Descriptor_Type) return Boolean
    is
    begin
       if

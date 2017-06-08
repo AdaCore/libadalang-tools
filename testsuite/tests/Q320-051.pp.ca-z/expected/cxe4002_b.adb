@@ -5,16 +5,15 @@ with Cxe4002_Part_A1;
 with Cxe4002_Part_A2;
 with Report;
 procedure Cxe4002_B is
-   function "="
-     (L, R : Cxe4002_Common.Integer_Vector) return Boolean renames
+   function "=" (L, R : Cxe4002_Common.Integer_Vector) return Boolean renames
      Cxe4002_Common."=";
    function "+"
      (L,
       R : Cxe4002_Common.Integer_Vector)
-      return Cxe4002_Common.Integer_Vector renames
+      return Cxe4002_Common
+     .Integer_Vector renames
      Cxe4002_Part_A1."+";
-   function "="
-     (L, R : Cxe4002_Common.Little_Number) return Boolean renames
+   function "=" (L, R : Cxe4002_Common.Little_Number) return Boolean renames
      Cxe4002_Common."=";
 
    use type Cxe4002_Common.Record_Data;

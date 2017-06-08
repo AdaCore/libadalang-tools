@@ -213,7 +213,8 @@ begin
                  (D3      :     Integer;
                   E_First :     Integer;
                   E_Last  :     Integer;
-                  Ok      : out Boolean) do
+                  Ok      : out Boolean)
+               do
                   declare
                      Cnt : Natural;
                   begin

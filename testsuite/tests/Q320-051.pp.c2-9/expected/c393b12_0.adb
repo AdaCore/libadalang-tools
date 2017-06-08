@@ -10,8 +10,7 @@ package body C393b12_0 is
       Ga.Status := Generic_Status_Enum'Last;
    end Handle;
 
-   function Query_Status
-     (Ga : Generic_Alert_Type) return Generic_Status_Enum
+   function Query_Status (Ga : Generic_Alert_Type) return Generic_Status_Enum
    is
    begin
       return Ga.Status;

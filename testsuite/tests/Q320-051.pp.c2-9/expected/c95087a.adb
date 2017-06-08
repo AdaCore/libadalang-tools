@@ -77,7 +77,8 @@ begin
             accept E1
               (Rec1 : in     Rectype := (2, 0, "AB");
                Rec2 :    out Rectype;
-               Rec3 : in out Rectype) do
+               Rec3 : in out Rectype)
+            do
 
                if Rec1.Constraint /= Ident_Int (10) then
                   Failed
@@ -163,7 +164,8 @@ begin
             accept E1
               (Rec1 : in     Rectype;
                Rec2 :    out Rectype;
-               Rec3 : in out Rectype) do
+               Rec3 : in out Rectype)
+            do
                if Rec1.Constraint /= Ident_Int (10) then
                   Failed
                     ("PRIVATE TYPE IN " &
@@ -256,7 +258,8 @@ begin
             accept E1
               (Rec1 : in     Rectype;
                Rec2 :    out Rectype;
-               Rec3 : in out Rectype) do
+               Rec3 : in out Rectype)
+            do
                if Rec1.Constraint /= Ident_Int (10) then
                   Failed
                     ("LIMITED PRIVATE TYPE IN " &

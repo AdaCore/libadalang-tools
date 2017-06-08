@@ -102,9 +102,7 @@ procedure Cdd2a03 is
       Integer'Read (Stream, Integer (Item));
    end Actual_Read;
 
-   procedure Actual_Write
-     (Stream : access Root_Stream_Type'Class;
-      Item   : Int)
+   procedure Actual_Write (Stream : access Root_Stream_Type'Class; Item : Int)
    is
    begin
       Integer'Write (Stream, Integer (Item));
@@ -115,9 +113,7 @@ procedure Cdd2a03 is
       return Int (Integer'Input (Stream));
    end Actual_Input;
 
-   procedure Actual_Output
-     (Stream : access Root_Stream_Type'Class;
-      Item   : Int)
+   procedure Actual_Output (Stream : access Root_Stream_Type'Class; Item : Int)
    is
    begin
       Integer'Output (Stream, Integer (Item));
@@ -131,9 +127,7 @@ procedure Cdd2a03 is
       Integer'Read (Stream, Integer (Item.C));
    end Actual_Read;
 
-   procedure Actual_Write
-     (Stream : access Root_Stream_Type'Class;
-      Item   : Lim)
+   procedure Actual_Write (Stream : access Root_Stream_Type'Class; Item : Lim)
    is
    begin
       Integer'Write (Stream, Integer (Item.C));
@@ -146,9 +140,7 @@ procedure Cdd2a03 is
       end return;
    end Actual_Input;
 
-   procedure Actual_Output
-     (Stream : access Root_Stream_Type'Class;
-      Item   : Lim)
+   procedure Actual_Output (Stream : access Root_Stream_Type'Class; Item : Lim)
    is
    begin
       Integer'Output (Stream, Integer (Item.C));
@@ -182,8 +174,7 @@ procedure Cdd2a03 is
       Str'Write (Stream, Item.S);
    end Actual_Write;
 
-   function Actual_Input
-     (Stream : access Root_Stream_Type'Class) return Parent
+   function Actual_Input (Stream : access Root_Stream_Type'Class) return Parent
    is
    begin
       raise Input_Output_Error;
@@ -239,12 +230,9 @@ procedure Cdd2a03 is
      (Stream :     access Root_Stream_Type'Class;
       Item   : out Lim) renames
      Lim_Ops.Read;
-   procedure Write
-     (Stream : access Root_Stream_Type'Class;
-      Item   : Lim) renames
+   procedure Write (Stream : access Root_Stream_Type'Class; Item : Lim) renames
      Lim_Ops.Write;
-   function Input
-     (Stream : access Root_Stream_Type'Class) return Lim renames
+   function Input (Stream : access Root_Stream_Type'Class) return Lim renames
      Lim_Ops.Input;
    procedure Output
      (Stream : access Root_Stream_Type'Class;

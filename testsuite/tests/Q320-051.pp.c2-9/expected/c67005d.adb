@@ -54,8 +54,7 @@ begin
       -- REDEFINE INTEGER "=".
 
       package Int_Equality is new Equality_Operator (Integer, My_Equals);
-      function "="
-        (L, R : Integer) return Boolean renames
+      function "=" (L, R : Integer) return Boolean renames
         Int_Equality.Inner."=";
 
       Chk2 : Boolean := 3 = Ident_Int (3);     -- REDEFINED "=".

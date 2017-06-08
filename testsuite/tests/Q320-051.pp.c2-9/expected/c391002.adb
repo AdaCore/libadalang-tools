@@ -13,9 +13,7 @@ procedure C391002 is
    package Modules renames C391002_3;
    package Communications renames C391002_4;
 
-   procedure Assert
-     (Condition : Boolean;
-      Message   : String) renames
+   procedure Assert (Condition : Boolean; Message : String) renames
      Tctouch.Assert;
 
    use type Boards.Modes;

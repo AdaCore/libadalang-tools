@@ -379,9 +379,7 @@ begin
 
       declare
 
-         procedure My_Update
-           (Key     : in     My_Key_Type;
-            Element : in out My_Float)
+         procedure My_Update (Key : in My_Key_Type; Element : in out My_Float)
          is
          begin
 

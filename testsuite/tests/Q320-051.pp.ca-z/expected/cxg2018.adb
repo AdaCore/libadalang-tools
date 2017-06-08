@@ -109,10 +109,7 @@ procedure Cxg2018 is
       -- to account for that level of precision.
       Error_Low_Bound : Real := 0.0;
 
-      procedure Check
-        (Actual, Expected : Real;
-         Test_Name        : String;
-         Mre              : Real)
+      procedure Check (Actual, Expected : Real; Test_Name : String; Mre : Real)
       is
          Max_Error : Real;
          Rel_Error : Real;

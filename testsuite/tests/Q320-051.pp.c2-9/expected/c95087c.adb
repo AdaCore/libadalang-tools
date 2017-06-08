@@ -78,7 +78,8 @@ begin
             accept E
               (Rec1 : in     Rectype;
                Rec2 : in out Rectype;
-               Rec3 :    out Rectype) do
+               Rec3 :    out Rectype)
+            do
 
                if (not Rec1'Constrained) or
                  (Rec1.Constraint /= Ident_Int (9))
@@ -162,7 +163,8 @@ begin
             accept E
               (Rec1 : in     Rectype;
                Rec2 : in out Rectype;
-               Rec3 :    out Rectype) do
+               Rec3 :    out Rectype)
+            do
 
                if (not Rec1'Constrained) or
                  (Rec1.Constraint /= Ident_Int (9))
@@ -246,7 +248,8 @@ begin
             accept E
               (Rec1 : in     Rectype;
                Rec2 : in out Rectype;
-               Rec3 :    out Rectype) do
+               Rec3 :    out Rectype)
+            do
 
                if (not Rec1'Constrained) or (Rec1.Constraint /= 9) then
                   Failed

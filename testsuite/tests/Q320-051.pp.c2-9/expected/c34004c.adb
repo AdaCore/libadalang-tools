@@ -49,8 +49,8 @@ procedure C34004c is
 
    type T is
      new Parent delta 0.1 range
-         Ident_Int (1) * (-30.0) ..
-           Ident_Int (1) * (30.0);
+       Ident_Int (1) * (-30.0) ..
+         Ident_Int (1) * (30.0);
 
    subtype Subparent is Parent delta 0.1 range -30.0 .. 30.0;
 

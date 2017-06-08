@@ -75,9 +75,7 @@ begin
          D : Ta      := (1, 2, 3, 4, 5)) return Integer renames
         Proc1;
 
-      function Proc1
-        (A : Integer := 1;
-         B : Ta      := (1 .. 5 => 1)) return Integer
+      function Proc1 (A : Integer := 1; B : Ta := (1 .. 5 => 1)) return Integer
       is
       begin
          for I in 1 .. 5 loop

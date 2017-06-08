@@ -44,8 +44,7 @@ package Fxacb00 is
    subtype Month_In_Quarter_Type is Positive range 1 .. 3;
    type Service_History_Type is
      array
-       (Quarterly_Period_Type range <>,
-        Month_In_Quarter_Type range <>) of Electric_Usage_Type;
+       (Quarterly_Period_Type range <>, Month_In_Quarter_Type range <>) of Electric_Usage_Type;
 
    type Service_Type (Customer : Customer_Type) is record
       Name       : String (1 .. 21);

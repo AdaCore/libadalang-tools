@@ -72,11 +72,9 @@ begin
         (Left  : Ada.Calendar.Time;
          Right : Duration) return Ada.Calendar.Time renames
         Ada.Calendar."-";
-      function "-"
-        (Left, Right : Ada.Calendar.Time) return Duration renames
+      function "-" (Left, Right : Ada.Calendar.Time) return Duration renames
         Ada.Calendar."-";
-      function ">"
-        (Left, Right : Ada.Calendar.Time) return Boolean renames
+      function ">" (Left, Right : Ada.Calendar.Time) return Boolean renames
         Ada.Calendar.">";
 
       task Pulse_Task is

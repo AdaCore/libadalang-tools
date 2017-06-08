@@ -49,6 +49,7 @@ with Report;
 
 -- Child procedure of FA11D00.
 
-procedure Fa11d00.Ca11d011
+procedure Fa11d00
+  .Ca11d011
   (Left, Right : in Complex_Type;
    C : out Complex_Type);

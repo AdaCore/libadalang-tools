@@ -28,9 +28,7 @@ package body Ca11015_0.Ca11015_1 is
       end if;
    end Set_Feature_Val;
    ---------------------------------------------------
-   function Check_Page
-     (Map     : Feature_Map;
-      Page_No : Page_Type) return Boolean
+   function Check_Page (Map : Feature_Map; Page_No : Page_Type) return Boolean
    is
    begin
       return (Map.Page = Page_No);

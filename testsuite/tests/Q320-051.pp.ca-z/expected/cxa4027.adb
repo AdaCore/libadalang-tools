@@ -20,12 +20,10 @@ begin
 
       -- Functions used to supply mapping capability.
 
-      function Map_To_Lower_Case
-        (From : Character) return Character renames
+      function Map_To_Lower_Case (From : Character) return Character renames
         Cxa4027_0;
 
-      function Map_To_Upper_Case
-        (From : Character) return Character renames
+      function Map_To_Upper_Case (From : Character) return Character renames
         Cxa4027_1;
 
       Map_To_Lower_Case_Ptr : Maps.Character_Mapping_Function :=

@@ -125,22 +125,17 @@ procedure Cxg2015 is
         .Generic_Elementary_Functions
         (Real);
 
-      function Arcsin
-        (X : Real) return Real renames
+      function Arcsin (X : Real) return Real renames
         Elementary_Functions.Arcsin;
-      function Arcsin
-        (X, Cycle : Real) return Real renames
+      function Arcsin (X, Cycle : Real) return Real renames
         Elementary_Functions.Arcsin;
-      function Arccos
-        (X : Real) return Real renames
+      function Arccos (X : Real) return Real renames
         Elementary_Functions.Arccos;
-      function Arccos
-        (X, Cycle : Real) return Real renames
+      function Arccos (X, Cycle : Real) return Real renames
         Elementary_Functions.Arccos;
 
       -- needed for support
-      function Log
-        (X, Base : Real) return Real renames
+      function Log (X, Base : Real) return Real renames
         Elementary_Functions.Log;
 
       -- flag used to terminate some tests early
@@ -153,10 +148,7 @@ procedure Cxg2015 is
       -- to account for that level of precision.
       Error_Low_Bound : Real := 0.0;
 
-      procedure Check
-        (Actual, Expected : Real;
-         Test_Name        : String;
-         Mre              : Real)
+      procedure Check (Actual, Expected : Real; Test_Name : String; Mre : Real)
       is
          Max_Error : Real;
          Rel_Error : Real;

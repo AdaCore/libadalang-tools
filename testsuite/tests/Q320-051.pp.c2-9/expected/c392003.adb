@@ -310,8 +310,7 @@ procedure C392003 is
             -- objects.
             --
 
-            function Verify_Open
-              (Acct : in Preferred_Account) return Boolean
+            function Verify_Open (Acct : in Preferred_Account) return Boolean
             is
             begin
                return

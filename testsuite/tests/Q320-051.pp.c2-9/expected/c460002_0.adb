@@ -58,9 +58,7 @@ package body C460002_0 is
 
    -------------------------------------------------------------
 
-   procedure Called_By_Never_Fails_Same
-     (X :     access Desig;
-      R : out Result_Kind)
+   procedure Called_By_Never_Fails_Same (X : access Desig; R : out Result_Kind)
    is
       type Acc_Local is access all Desig;
       Al : Acc_Local;

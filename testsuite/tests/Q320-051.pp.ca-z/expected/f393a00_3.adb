@@ -7,9 +7,7 @@ package body F393a00_3 is
       return Sump;
    end Create;
 
-   procedure Set_Rate
-     (A_Pump  : in out Pump;
-      To_Rate :        Gallons_Per_Revolution)
+   procedure Set_Rate (A_Pump : in out Pump; To_Rate : Gallons_Per_Revolution)
    is
    begin
       F393a00_0.Tc_Touch ('i');

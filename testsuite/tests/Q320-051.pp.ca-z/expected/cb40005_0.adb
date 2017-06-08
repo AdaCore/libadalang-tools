@@ -56,7 +56,8 @@ package body Cb40005_0 is
    end Store_Event;
 
    function Top_Event_Exception
-     return Ada.Exceptions.Exception_Occurrence_Access
+     return Ada.Exceptions
+     .Exception_Occurrence_Access
    is
    begin
       if Stack_Top > 0 then

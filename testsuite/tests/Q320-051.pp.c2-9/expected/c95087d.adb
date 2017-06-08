@@ -81,7 +81,8 @@ begin
             accept E
               (Rec1 : in     Rectype;
                Rec2 : in out Rectype;
-               Rec3 :    out Rectype) do
+               Rec3 :    out Rectype)
+            do
 
                if not Rec1'Constrained then
                   Failed ("REC1 IS NOT CONSTRAINED - A.1");
@@ -163,7 +164,8 @@ begin
             accept E
               (Rec1 : in     Rectype;
                Rec2 : in out Rectype;
-               Rec3 :    out Rectype) do
+               Rec3 :    out Rectype)
+            do
 
                if Rec3'Constrained then
                   Failed ("REC3 IS CONSTRAINED - B.1");
@@ -237,7 +239,8 @@ begin
             accept E
               (Rec1 : in     Rectype;
                Rec2 : in out Rectype;
-               Rec3 :    out Rectype) do
+               Rec3 :    out Rectype)
+            do
 
                begin  -- ASSIGNMENT TO IN OUT PARAMETER.
                   Rec2 := Rec_Oops;

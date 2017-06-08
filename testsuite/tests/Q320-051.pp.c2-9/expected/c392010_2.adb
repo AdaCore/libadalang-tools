@@ -30,7 +30,8 @@ package body C392010_2 is
      (Cp_Ap    : access Tagtype_Level_2;
       Noncp_Ap : access C392010_0.Tagtype_Level_0 :=
         Lev2_Level_0_Global_Object'Access)
-      return C392010_1.Access_Tagtype_Level_1
+      return C392010_1
+     .Access_Tagtype_Level_1
    is
    begin
       Tctouch.Touch

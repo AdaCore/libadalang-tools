@@ -120,8 +120,7 @@ begin
       package Cost_Io is new Text_Io.Fixed_Io (Cost_Type);
       package Markup_Io is new Text_Io.Fixed_Io (Profit_Type);
 
-      function Tc_Mode_Selection
-        (Selector : Integer) return Text_Io.File_Mode
+      function Tc_Mode_Selection (Selector : Integer) return Text_Io.File_Mode
       is
       begin
          case Selector is

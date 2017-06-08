@@ -137,8 +137,7 @@ procedure C393009 is
          Display (Na, On => Display_Devices.Tty);
       end Handle;
 
-      procedure Init
-        (Na : in out New_Alert_Type)
+      procedure Init (Na : in out New_Alert_Type)
       is  -- new primitive operation
       begin                                           -- for New_Alert_Type
          Na :=

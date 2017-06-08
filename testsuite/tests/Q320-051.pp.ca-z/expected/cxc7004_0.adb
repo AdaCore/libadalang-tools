@@ -23,7 +23,8 @@ package body Cxc7004_0 is
          -- unconditional, infinite loop.
          select
             accept Operation
-              (Caller_Id : out Ada.Task_Identification.Task_Id) do
+              (Caller_Id : out Ada.Task_Identification.Task_Id)
+            do
                Caller_Id              := Operation'Caller;
                Any_Calls_Of_Operation := True;
                -- A real application would do the processing for "Operation"
@@ -68,8 +69,7 @@ package body Cxc7004_0 is
    end Could_Have_Been_A_Lock;
 
    protected body Could_Have_Been_A_Lock is
-      entry Get_Lock
-        (Caller_Id : out Ada.Task_Identification.Task_Id)
+      entry Get_Lock (Caller_Id : out Ada.Task_Identification.Task_Id)
         when True
         is
       begin

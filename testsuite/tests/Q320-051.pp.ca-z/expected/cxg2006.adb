@@ -97,10 +97,7 @@ procedure Cxg2006 is
       package Complex_Types is new Ada.Numerics.Generic_Complex_Types (Real);
       use Complex_Types;
 
-      procedure Check
-        (Actual, Expected : Real;
-         Test_Name        : String;
-         Mre              : Real)
+      procedure Check (Actual, Expected : Real; Test_Name : String; Mre : Real)
       is
          Rel_Error : Real;
          Abs_Error : Real;

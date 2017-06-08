@@ -106,7 +106,8 @@ begin
          accept Q
            (Pin1, Pin2 : in     Square;
             Pinout     : in out Square;
-            Pout       :    out Square) do
+            Pout       :    out Square)
+         do
 
             begin
                if Pin1'Constrained then

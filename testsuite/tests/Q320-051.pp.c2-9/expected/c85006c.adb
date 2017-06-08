@@ -218,7 +218,8 @@ begin
             Ar1 : in out Arr_Rec;
             Ap1 : in out Arr_Ptr;
             Av1 : in out Arr_Pvt;
-            At1 : in out Arr_Tsk) do
+            At1 : in out Arr_Tsk)
+         do
             declare
                Xri1 : Integer renames Rec.Ri1;
                Xra1 : Array1 renames Rec.Ra1;
@@ -265,7 +266,8 @@ begin
                      Tar1 :    out Arr_Rec;
                      Tap1 : in out Arr_Ptr;
                      Tav1 : in out Arr_Pvt;
-                     Tat1 : in out Arr_Tsk) do
+                     Tat1 : in out Arr_Tsk)
+                  do
                      Tri1 := Rec.Ri1 + 1;
                      Tra1 :=
                        (Rec.Ra1 (1) + 1, Rec.Ra1 (2) + 1, Rec.Ra1 (3) + 1);

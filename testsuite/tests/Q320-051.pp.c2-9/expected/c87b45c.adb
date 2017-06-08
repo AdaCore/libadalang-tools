@@ -113,7 +113,8 @@ begin
             C3 : Citrus  := (0 * 0);
             H3 : Hue     := (0 * 0);
             C4 : Citrus  := Orange;
-            H4 : Hue     := Orange) do
+            H4 : Hue     := Orange)
+         do
 
             if I1 /= -1 or
               W1 /= 0 or

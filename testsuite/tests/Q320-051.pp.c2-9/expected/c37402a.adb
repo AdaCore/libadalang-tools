@@ -143,7 +143,8 @@ begin
             Out_Con     :    out Square;
             In_Unc      : in     Square;
             Inout_Unc   : in out Square;
-            Out_Unc     :    out Square) do
+            Out_Unc     :    out Square)
+         do
             begin
                if Con'Constrained then
                   null;

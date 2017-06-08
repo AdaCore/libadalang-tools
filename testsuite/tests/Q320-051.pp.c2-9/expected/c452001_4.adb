@@ -58,8 +58,7 @@ package body C452001_4 is
       return R.S = L.S;
    end "=";
 
-   function "="
-     (L, R : in Untagged_Partial_Untagged_Array_Full) return Boolean
+   function "=" (L, R : in Untagged_Partial_Untagged_Array_Full) return Boolean
    is
    begin
       return R (1) = L (1) and

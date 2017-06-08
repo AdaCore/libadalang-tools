@@ -1,7 +1,6 @@
 --=======================================================================--
 
-function Fa11d00.Ca11d012
-  (Left, Right : Complex_Type) return Complex_Type
+function Fa11d00.Ca11d012 (Left, Right : Complex_Type) return Complex_Type
 is                       -- Divide_Complex
 
 begin

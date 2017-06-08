@@ -116,7 +116,8 @@ procedure C95067a is
                accept Look_Inout_I
                  (X : in out Itype;
                   V :        Integer;
-                  M :        String) do
+                  M :        String)
+               do
                   if Integer (X) /= V then
                      Failed ("WRONG SCALAR VALUE - " & M);
                   end if;
@@ -140,7 +141,8 @@ procedure C95067a is
                   C :    Integer;
                   I :    Integer;
                   S :    String;
-                  M :    String) do
+                  M :    String)
+               do
                   if (X.C /= C or X.I /= I) or else X.S /= S then
                      Failed ("WRONG COMPOSITE VALUE - " & M);
                   end if;
@@ -151,7 +153,8 @@ procedure C95067a is
                   C :        Integer;
                   I :        Integer;
                   S :        String;
-                  M :        String) do
+                  M :        String)
+               do
                   if (X.C /= C or X.I /= I) or else X.S /= S then
                      Failed ("WRONG COMPOSITE VALUE - " & M);
                   end if;
@@ -161,7 +164,8 @@ procedure C95067a is
                  (X : in out Vrtype;
                   C :        Integer;
                   I :        Integer;
-                  S :        String) do
+                  S :        String)
+               do
                   X := (Ident_Int (C), Ident_Int (I), Ident_Str (S));
                end Set_Vr;
             or
@@ -248,7 +252,8 @@ procedure C95067a is
         (X  : in out Itype;
          Ov :        Integer;
          Nv :        Integer;
-         M  :        String) do
+         M  :        String)
+      do
          T1.Look_Inout_I (X, Ov, M & " - A");
          T1.Set_I (X, Nv);
          T1.Look_Inout_I (X, Nv, M & " - B");
@@ -265,7 +270,8 @@ procedure C95067a is
         (X  : in out Atype;
          Ov :        Integer;
          Nv :        Integer;
-         M  :        String) do
+         M  :        String)
+      do
          for I in X'Range loop
             T1.Look_Inout_I (X (I), Ov + I, M & " - A" & Integer'Image (I));
             T1.Set_I (X (I), Nv + I);
@@ -279,7 +285,8 @@ procedure C95067a is
          C :    Integer;
          I :    Integer;
          S :    String;
-         M :    String) do
+         M :    String)
+      do
          T2.Look_In_Vr (X, C, I, S, M);
       end Check_In_Vr;
 
@@ -291,7 +298,8 @@ procedure C95067a is
          Nc :        Integer;
          Ni :        Integer;
          Ns :        String;
-         M  :        String) do
+         M  :        String)
+      do
          T2.Look_Inout_Vr (X, Oc, Oi, Os, M & " - A");
          T2.Set_Vr (X, Nc, Ni, Ns);
          T2.Look_Inout_Vr (X, Nc, Ni, Ns, M & " - B");
@@ -304,7 +312,8 @@ procedure C95067a is
          C :    Integer;
          I :    Integer;
          S :    String;
-         M :    String) do
+         M :    String)
+      do
          T1.Look_In_I (X.J, J, M & " - A");
          T2.Look_In_Vr (X.R, C, I, S, M & " - B");
       end Check_In_R;
@@ -319,7 +328,8 @@ procedure C95067a is
          Nc :        Integer;
          Ni :        Integer;
          Ns :        String;
-         M  :        String) do
+         M  :        String)
+      do
          T1.Look_Inout_I (X.J, Oj, M & " - A");
          T2.Look_Inout_Vr (X.R, Oc, Oi, Os, M & " - B");
          T1.Set_I (X.J, Nj);

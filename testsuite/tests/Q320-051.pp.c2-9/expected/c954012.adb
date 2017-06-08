@@ -64,8 +64,7 @@ with Ada.Calendar;
 
 procedure C954012 is
 
-   function "="
-     (X, Y : Ada.Calendar.Time) return Boolean renames
+   function "=" (X, Y : Ada.Calendar.Time) return Boolean renames
      Ada.Calendar."=";
 
    -- Arbitrary test values
@@ -189,8 +188,7 @@ procedure C954012 is
       -- Artificial: number of messages required for this test
       type Tc_Trans_Range is range 1 .. 6;
 
-      procedure Build_Credit_Record
-        (Next_Transaction : Acc_Transaction_Record)
+      procedure Build_Credit_Record (Next_Transaction : Acc_Transaction_Record)
       is
          Dummy_Account : constant Integer := 100;
       begin
@@ -202,8 +200,7 @@ procedure C954012 is
          Current_Id                      := Current_Id + 1;
       end Build_Credit_Record;
 
-      procedure Build_Debit_Record
-        (Next_Transaction : Acc_Transaction_Record)
+      procedure Build_Debit_Record (Next_Transaction : Acc_Transaction_Record)
       is
          Dummy_Account : constant Integer := 200;
       begin

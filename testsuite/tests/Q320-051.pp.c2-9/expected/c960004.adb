@@ -52,8 +52,7 @@ with Ada.Calendar;
 
 procedure C960004 is
 
-   function "-"
-     (Left, Right : Ada.Calendar.Time) return Duration renames
+   function "-" (Left, Right : Ada.Calendar.Time) return Duration renames
      Ada.Calendar."-";
    Tc_Start_Time   : Ada.Calendar.Time := Ada.Calendar.Clock;
    Tc_Elapsed_Time : Duration;

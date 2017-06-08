@@ -40,8 +40,8 @@ procedure C34003a is
 
    type T is
      new Subparent digits 4 range
-         Parent (Ident_Int (-30)) ..
-           Parent (Ident_Int (30));
+       Parent (Ident_Int (-30)) ..
+         Parent (Ident_Int (30));
 
    type Fixed is delta 0.1 range -1_000.0 .. 1_000.0;
 

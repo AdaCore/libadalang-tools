@@ -61,8 +61,7 @@ begin
          package Integer_Equal is new Equality_Operator (Integer, Equal);
       end Integer_Equals;
 
-      function "="
-        (L, R : Integer) return Boolean renames
+      function "=" (L, R : Integer) return Boolean renames
         Integer_Equals.Integer_Equal."=";
 
       package body Integer_Equals is

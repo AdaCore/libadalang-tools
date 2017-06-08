@@ -193,8 +193,7 @@ procedure C954013 is
       Current_Id            : Integer := 1;
       Tc_First_Message_Sent : Boolean := False;
 
-      procedure Build_Credit_Record
-        (Next_Transaction : Acc_Transaction_Record)
+      procedure Build_Credit_Record (Next_Transaction : Acc_Transaction_Record)
       is
          Dummy_Account : constant Integer := 100;
       begin
@@ -205,8 +204,7 @@ procedure C954013 is
          Current_Id                      := Current_Id + 1;
       end Build_Credit_Record;
 
-      procedure Build_Debit_Record
-        (Next_Transaction : Acc_Transaction_Record)
+      procedure Build_Debit_Record (Next_Transaction : Acc_Transaction_Record)
       is
          Dummy_Account : constant Integer := 200;
       begin

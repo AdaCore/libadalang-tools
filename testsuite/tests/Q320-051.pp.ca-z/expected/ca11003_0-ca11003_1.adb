@@ -2,9 +2,7 @@
 
 package body Ca11003_0.Ca11003_1 is     -- Child package body OS.Operations
 
-   procedure Create_File
-     (Mode : in     File_Mode;
-      File :    out Extended_File_Type)
+   procedure Create_File (Mode : in File_Mode; File : out Extended_File_Type)
    is
    begin
       File.Descriptor := Next_Available_File;           -- Parent subprogram.

@@ -182,7 +182,8 @@ begin
             Tr1 : in out Record1;
             Tp1 : in out Pointer1;
             Tv1 : in out Pack1.Privy;
-            Tt1 : in out Task1) do
+            Tt1 : in out Task1)
+         do
             declare
                Xti1 : Integer renames Ti1;
                Xta1 : Array1 renames Ta1;
@@ -228,7 +229,8 @@ begin
                      Ttr1 :    out Record1;
                      Ttp1 : in out Pointer1;
                      Ttv1 : in out Pack1.Privy;
-                     Ttt1 : in out Task1) do
+                     Ttt1 : in out Task1)
+                  do
                      Tti1 := Ti1 + 1;
                      Tta1 := (Ta1 (1) + 1, Ta1 (2) + 1, Ta1 (3) + 1);
                      Ttr1 := (D => 1, Field1 => Tr1.Field1 + 1);

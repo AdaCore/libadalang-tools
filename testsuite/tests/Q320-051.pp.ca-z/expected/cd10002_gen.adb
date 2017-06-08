@@ -101,12 +101,9 @@ package body Cd10002_Gen is
       Item   : Nt6'Base) renames
      Nt6_Ops.Output;
 
-   procedure Write
-     (Stream : access Root_Stream_Type'Class;
-      Item   : Nt7) renames
+   procedure Write (Stream : access Root_Stream_Type'Class; Item : Nt7) renames
      Nt7_Ops.Write;
-   function Input
-     (Stream : access Root_Stream_Type'Class) return Nt7 renames
+   function Input (Stream : access Root_Stream_Type'Class) return Nt7 renames
      Nt7_Ops.Input;
    procedure Read
      (Stream :     access Root_Stream_Type'Class;
@@ -133,12 +130,9 @@ package body Cd10002_Gen is
       Item   : Nt8'Base) renames
      Nt8_Ops.Output;
 
-   procedure Write
-     (Stream : access Root_Stream_Type'Class;
-      Item   : Nt9) renames
+   procedure Write (Stream : access Root_Stream_Type'Class; Item : Nt9) renames
      Nt9_Ops.Write;
-   function Input
-     (Stream : access Root_Stream_Type'Class) return Nt9 renames
+   function Input (Stream : access Root_Stream_Type'Class) return Nt9 renames
      Nt9_Ops.Input;
    procedure Read
      (Stream :     access Root_Stream_Type'Class;
@@ -175,8 +169,7 @@ package body Cd10002_Gen is
      (Stream : access Root_Stream_Type'Class;
       Item   : Nt11) renames
      Nt11_Ops.Write;
-   function Input
-     (Stream : access Root_Stream_Type'Class) return Nt11 renames
+   function Input (Stream : access Root_Stream_Type'Class) return Nt11 renames
      Nt11_Ops.Input;
    procedure Read
      (Stream :     access Root_Stream_Type'Class;
@@ -213,8 +206,7 @@ package body Cd10002_Gen is
      (Stream : access Root_Stream_Type'Class;
       Item   : Nt13) renames
      Nt13_Ops.Write;
-   function Input
-     (Stream : access Root_Stream_Type'Class) return Nt13 renames
+   function Input (Stream : access Root_Stream_Type'Class) return Nt13 renames
      Nt13_Ops.Input;
    procedure Read
      (Stream :     access Root_Stream_Type'Class;

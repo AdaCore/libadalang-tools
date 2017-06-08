@@ -39,8 +39,8 @@ procedure C34002a is
 
    type T is
      new Subparent range
-         Parent'Val (Ident_Int (-30)) ..
-           Parent'Val (Ident_Int (30));
+       Parent'Val (Ident_Int (-30)) ..
+         Parent'Val (Ident_Int (30));
 
    type Fixed is delta 0.1 range -1_000.0 .. 1_000.0;
 

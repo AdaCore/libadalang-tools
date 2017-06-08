@@ -237,7 +237,8 @@ procedure C85006b is
             Tar1 :    out Arr_Rec;
             Tap1 : in out Arr_Ptr;
             Tav1 : in out Arr_Pvt;
-            Tat1 : in out Arr_Tsk) do
+            Tat1 : in out Arr_Tsk)
+         do
             Tri1 := Rec.Ri1 + 1;
             Tra1 := (Rec.Ra1 (1) + 1, Rec.Ra1 (2) + 1, Rec.Ra1 (3) + 1);
             Trr1 := (D => 1, Field1 => Rec.Rr1.Field1 + 1);

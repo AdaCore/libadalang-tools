@@ -25,9 +25,7 @@ package body Cdd2001_0 is
       end if;
    end Read;
 
-   procedure Write
-     (Stream : in out My_Stream;
-      Item   : in     Stream_Element_Array)
+   procedure Write (Stream : in out My_Stream; Item : in Stream_Element_Array)
    is
    begin
       Stream.Contents (Stream.Last + 1 .. Stream.Last + Item'Length) := Item;

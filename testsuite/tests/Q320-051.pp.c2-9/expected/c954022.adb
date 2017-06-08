@@ -224,8 +224,7 @@ begin
 
          end Input;
 
-         entry Ordering_Queue
-           (Segment : Acc_Message_Segment)
+         entry Ordering_Queue (Segment : Acc_Message_Segment)
            when All_Segments_Arrived
            is
          begin

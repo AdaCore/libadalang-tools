@@ -165,9 +165,7 @@ procedure Cxac005 is
          Stream_Io.Delete (File.File);
       end Delete;
 
-      procedure Reset
-        (File : in out File_Type;
-         Mode : in     Stream_Io.File_Mode)
+      procedure Reset (File : in out File_Type; Mode : in Stream_Io.File_Mode)
       is
       begin
          Stream_Io.Reset (File.File, Mode);
@@ -235,9 +233,7 @@ procedure Cxac005 is
          Write (File, Item);
       end Write;
 
-      procedure Write
-        (File : in out File_Type;
-         Item : in     Stream_Element_Array)
+      procedure Write (File : in out File_Type; Item : in Stream_Element_Array)
       is
          Index : constant Stream_Element_Offset :=
            Stream_Element_Offset (File.Index);

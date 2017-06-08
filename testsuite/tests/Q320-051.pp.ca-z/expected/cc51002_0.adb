@@ -6,9 +6,7 @@ package body Cc51002_0 is
    -- implementation in the context of the abstraction is irrelevant to the
    -- feature being tested.
 
-   function Send
-     (Msg : in Msg_Type;
-      To  :    Recipients := Local) return Boolean
+   function Send (Msg : in Msg_Type; To : Recipients := Local) return Boolean
    is
    begin
       return (Msg.Text = "Greetings!" and To = Local);

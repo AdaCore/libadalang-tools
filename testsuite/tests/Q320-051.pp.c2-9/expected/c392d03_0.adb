@@ -2,9 +2,7 @@
 
 package body C392d03_0 is
 
-   procedure Focus
-     (C     : in out Auto_Focus;
-      Depth : in     F392d00.Depth_Of_Field)
+   procedure Focus (C : in out Auto_Focus; Depth : in F392d00.Depth_Of_Field)
    is
    begin
       -- Artificial for testing purposes.

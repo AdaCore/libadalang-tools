@@ -41,8 +41,8 @@ procedure C34002c is
 
    type T is
      new Parent range
-         Parent'Val (Ident_Int (-30)) ..
-           Parent'Val (Ident_Int (30));
+       Parent'Val (Ident_Int (-30)) ..
+         Parent'Val (Ident_Int (30));
 
    subtype Subparent is Parent range -30 .. 30;
 

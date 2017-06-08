@@ -7,8 +7,7 @@ package body C940a03_1 is
 
    protected body Login_Semaphore_Type is
 
-      entry Request_Login
-        (Resource_Key : in out Login_Record_Type)
+      entry Request_Login (Resource_Key : in out Login_Record_Type)
         when Logins_Avail > 0
         is
       begin

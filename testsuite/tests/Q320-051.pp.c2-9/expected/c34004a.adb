@@ -49,8 +49,8 @@ procedure C34004a is
 
    type T is
      new Subparent delta 2.0**(-4) range
-         Ident_Int (1) * (-30.0) ..
-           Ident_Int (1) * (30.0);
+       Ident_Int (1) * (-30.0) ..
+         Ident_Int (1) * (30.0);
 
    type Fixed is delta 2.0**(-4) range -1_000.0 .. 1_000.0;
 

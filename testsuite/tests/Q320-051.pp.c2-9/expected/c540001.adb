@@ -127,8 +127,7 @@ begin
 
    Function_Renaming_Subtest : declare
       use C540001_1;
-      function Rename_Get_Small_Int
-        (P : Boolean) return Small_Int renames
+      function Rename_Get_Small_Int (P : Boolean) return Small_Int renames
         Get_Small_Int;
       Mobj : Mixed   := None;
       Bobj : Boolean := False;

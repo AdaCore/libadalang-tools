@@ -378,8 +378,7 @@ begin
 
       end My_Process;
 
-      procedure My_Reverse_Process
-        (Position : in My_Indefinite_Vectors.Cursor)
+      procedure My_Reverse_Process (Position : in My_Indefinite_Vectors.Cursor)
       is
       begin
 

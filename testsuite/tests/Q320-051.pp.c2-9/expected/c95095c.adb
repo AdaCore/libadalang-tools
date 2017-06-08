@@ -66,7 +66,8 @@ begin
                accept E
                  (I1 :        Integer;
                   N1 :    out Integer;
-                  I2 : in out Integer) do
+                  I2 : in out Integer)
+               do
                   S (2) := 'B';
                   N1    := 0; -- THIS VALUE IS IRRELEVENT.
                end E;

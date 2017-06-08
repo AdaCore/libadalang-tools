@@ -178,8 +178,7 @@ procedure C954015 is
       -- Arbitrary limit for the number of messages sent for this test
       type Tc_Trans_Range is range 1 .. 3;
 
-      procedure Build_Credit_Record
-        (Next_Transaction : Acc_Transaction_Record)
+      procedure Build_Credit_Record (Next_Transaction : Acc_Transaction_Record)
       is
          Dummy_Account : constant Integer := 100;
       begin
@@ -189,8 +188,7 @@ procedure C954015 is
          Current_Id                      := Current_Id + 1;
       end Build_Credit_Record;
 
-      procedure Build_Debit_Record
-        (Next_Transaction : Acc_Transaction_Record)
+      procedure Build_Debit_Record (Next_Transaction : Acc_Transaction_Record)
       is
          Dummy_Account : constant Integer := 200;
       begin

@@ -98,11 +98,9 @@ procedure Cxg2013 is
       function Sqrt (X : Real) return Real renames Elementary_Functions.Sqrt;
       function Tan (X : Real) return Real renames Elementary_Functions.Tan;
       function Cot (X : Real) return Real renames Elementary_Functions.Cot;
-      function Tan
-        (X, Cycle : Real) return Real renames
+      function Tan (X, Cycle : Real) return Real renames
         Elementary_Functions.Tan;
-      function Cot
-        (X, Cycle : Real) return Real renames
+      function Cot (X, Cycle : Real) return Real renames
         Elementary_Functions.Cot;
 
       -- flag used to terminate some tests early
@@ -111,10 +109,7 @@ procedure Cxg2013 is
       -- factor to be applied in computing MRE
       Maximum_Relative_Error : constant Real := 4.0;
 
-      procedure Check
-        (Actual, Expected : Real;
-         Test_Name        : String;
-         Mre              : Real)
+      procedure Check (Actual, Expected : Real; Test_Name : String; Mre : Real)
       is
          Max_Error : Real;
          Rel_Error : Real;

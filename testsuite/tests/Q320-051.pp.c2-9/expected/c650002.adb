@@ -78,9 +78,7 @@ procedure C650002 is
    end Sentry;
 
    protected body Sentry is
-      entry Start_Job
-        (Job                : in     Natural;
-         Previously_Started :    out Boolean)
+      entry Start_Job (Job : in Natural; Previously_Started : out Boolean)
         when True
         is
       begin
@@ -122,7 +120,8 @@ procedure C650002 is
          select
             accept Start_Job
               (Job                   : in Natural;
-               Tc_Previously_Started : in Boolean) do
+               Tc_Previously_Started : in Boolean)
+            do
                Sentry.Start_Job (Job, Previously_Started);
                if Previously_Started then
                   if not Tc_Previously_Started then

@@ -349,8 +349,7 @@ begin
 
       I : Fxaia00.Array_Bounds_Type := Fxaia00.Array_Bounds_Type'First;
 
-      procedure My_Process
-        (Position : in My_Indefinite_Multiway_Trees.Cursor)
+      procedure My_Process (Position : in My_Indefinite_Multiway_Trees.Cursor)
       is
       begin
 
@@ -1135,8 +1134,7 @@ begin
 
       I : Fxaia00.Array_Bounds_Type := 1;
 
-      procedure My_Process
-        (Position : in My_Indefinite_Multiway_Trees.Cursor)
+      procedure My_Process (Position : in My_Indefinite_Multiway_Trees.Cursor)
       is
       begin
 
@@ -1209,8 +1207,7 @@ begin
 
       I : Fxaia00.Array_Bounds_Type := 1;
 
-      procedure My_Process
-        (Position : in My_Indefinite_Multiway_Trees.Cursor)
+      procedure My_Process (Position : in My_Indefinite_Multiway_Trees.Cursor)
       is
       begin
 

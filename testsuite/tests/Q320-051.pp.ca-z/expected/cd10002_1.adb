@@ -10,9 +10,7 @@ package body Cd10002_1 is
       Failed ("Unexpected call to the Read operation of Dummy_Stream");
    end Read;
 
-   procedure Write
-     (Stream : in out Dummy_Stream;
-      Item   :        Stream_Element_Array)
+   procedure Write (Stream : in out Dummy_Stream; Item : Stream_Element_Array)
    is
    begin
       Failed ("Unexpected call to the Write operation of Dummy_Stream");

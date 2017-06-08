@@ -9,9 +9,7 @@
       File.Tracks     := Max_Tracks;             -- Change initial value.
    end Recording;
    --------------------------------------------------------------------------
-   procedure Convert
-     (From : in     Analog_File_Type;
-      To   :    out Digital_File_Type)
+   procedure Convert (From : in Analog_File_Type; To : out Digital_File_Type)
    is
    begin
       To.Descriptor := From.Descriptor + 100;            -- Dummy conversion.

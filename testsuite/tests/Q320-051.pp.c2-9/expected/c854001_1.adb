@@ -20,8 +20,7 @@ package body C854001_1 is
    function Other_Name
      (P1, P2 : Short_Int_Subtype) return Short_Int_Subtype renames
      C854001_0."+";
-   function "-"
-     (P1, P2 : Short_Int_Subtype) return Short_Int_Subtype renames
+   function "-" (P1, P2 : Short_Int_Subtype) return Short_Int_Subtype renames
      C854001_0.Name;
 
 end C854001_1;

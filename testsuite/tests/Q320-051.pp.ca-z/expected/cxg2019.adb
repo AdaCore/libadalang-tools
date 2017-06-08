@@ -97,10 +97,7 @@ procedure Cxg2019 is
       -- flag used to terminate some tests early
       Accuracy_Error_Reported : Boolean := False;
 
-      procedure Check
-        (Actual, Expected : Real;
-         Test_Name        : String;
-         Mre              : Real)
+      procedure Check (Actual, Expected : Real; Test_Name : String; Mre : Real)
       is
          Max_Error : Real;
          Rel_Error : Real;

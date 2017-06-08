@@ -34,8 +34,7 @@ package body F750a00 is
       return (R => (A => 7, B => True), N => 5, G => 8);
    end Func_Lim_Ext;
 
-   function Func_Lim_Tagged_Access
-     (Ext : in Boolean) return Any_Tagged_Access
+   function Func_Lim_Tagged_Access (Ext : in Boolean) return Any_Tagged_Access
    is
    begin
       if Ext then

@@ -118,10 +118,7 @@ begin
          end if;
       end P3;
 
-      procedure P5
-        (X : in     Character;
-         Y : in out Character;
-         Z :    out Character)
+      procedure P5 (X : in Character; Y : in out Character; Z : out Character)
       is
       begin
          if X /= 'A' then

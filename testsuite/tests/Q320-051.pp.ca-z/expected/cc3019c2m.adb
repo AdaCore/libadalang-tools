@@ -406,9 +406,7 @@ begin  -- CC3019C2M
       procedure Show_Person_Iterate is new Person_Stack.Iterate
         (Process => Show_People);
 
-      procedure Gather_People
-        (This_Person : in     Person;
-         Continue    :    out Boolean)
+      procedure Gather_People (This_Person : in Person; Continue : out Boolean)
       is
       begin  -- GATHER_PEOPLE
 
@@ -419,9 +417,7 @@ begin  -- CC3019C2M
 
       end Gather_People;
 
-      procedure Show_People
-        (This_Person : in     Person;
-         Continue    :    out Boolean)
+      procedure Show_People (This_Person : in Person; Continue : out Boolean)
       is
 
       begin  -- SHOW_PEOPLE

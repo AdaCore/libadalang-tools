@@ -117,8 +117,7 @@ begin
 
       Tc_Employee_Data : Employee_Data := Blank_Data;
 
-      function Tc_Mode_Selection
-        (Selector : Integer) return Data_Io.File_Mode
+      function Tc_Mode_Selection (Selector : Integer) return Data_Io.File_Mode
       is
       begin
          case Report.Ident_Int (Selector) is

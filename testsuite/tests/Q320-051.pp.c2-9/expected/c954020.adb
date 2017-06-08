@@ -184,8 +184,7 @@ procedure C954020 is
       Current_Id             : Integer := 1;
       Tc_Last_Was_For_Credit : Boolean := False;
 
-      procedure Build_Credit_Record
-        (Next_Transaction : Acc_Transaction_Record)
+      procedure Build_Credit_Record (Next_Transaction : Acc_Transaction_Record)
       is
          Dummy_Account : constant Integer := 100;
       begin
@@ -196,8 +195,7 @@ procedure C954020 is
          Current_Id                      := Current_Id + 1;
       end Build_Credit_Record;
 
-      procedure Build_Debit_Record
-        (Next_Transaction : Acc_Transaction_Record)
+      procedure Build_Debit_Record (Next_Transaction : Acc_Transaction_Record)
       is
          Dummy_Account : constant Integer := 200;
       begin

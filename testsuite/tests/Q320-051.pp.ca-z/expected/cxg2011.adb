@@ -91,17 +91,13 @@ procedure Cxg2011 is
       package Elementary_Functions is new Ada.Numerics
         .Generic_Elementary_Functions
         (Real);
-      function Sqrt
-        (X : Real'Base) return Real'Base renames
+      function Sqrt (X : Real'Base) return Real'Base renames
         Elementary_Functions.Sqrt;
-      function Exp
-        (X : Real'Base) return Real'Base renames
+      function Exp (X : Real'Base) return Real'Base renames
         Elementary_Functions.Exp;
-      function Log
-        (X : Real'Base) return Real'Base renames
+      function Log (X : Real'Base) return Real'Base renames
         Elementary_Functions.Log;
-      function Log
-        (X, Base : Real'Base) return Real'Base renames
+      function Log (X, Base : Real'Base) return Real'Base renames
         Elementary_Functions.Log;
 
       -- flag used to terminate some tests early
@@ -114,10 +110,7 @@ procedure Cxg2011 is
       -- to account for that level of precision.
       Error_Low_Bound : Real := 0.0;
 
-      procedure Check
-        (Actual, Expected : Real;
-         Test_Name        : String;
-         Mre              : Real)
+      procedure Check (Actual, Expected : Real; Test_Name : String; Mre : Real)
       is
          Max_Error : Real;
          Rel_Error : Real;

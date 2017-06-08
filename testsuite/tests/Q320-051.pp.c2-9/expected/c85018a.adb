@@ -52,24 +52,16 @@ begin
          entry Ent1 (Boolean) (A : Integer := 1; B : Ta := (1 .. 5 => 1));
       end T;
 
-      procedure Enta
-        (C : Integer := 1;
-         D : Ta      := (1 .. 5 => 1)) renames
+      procedure Enta (C : Integer := 1; D : Ta := (1 .. 5 => 1)) renames
         T.Ent1 (True);
 
-      procedure Entb
-        (B : Integer := 1;
-         A : Ta      := (1 .. 5 => 1)) renames
+      procedure Entb (B : Integer := 1; A : Ta := (1 .. 5 => 1)) renames
         T.Ent1 (True);
 
-      procedure Entc
-        (A : Integer := 2;
-         B : Ta      := (1, 2, 3, 4, 5)) renames
+      procedure Entc (A : Integer := 2; B : Ta := (1, 2, 3, 4, 5)) renames
         T.Ent1 (True);
 
-      procedure Entd
-        (C : Integer := 2;
-         D : Ta      := (1, 2, 3, 4, 5)) renames
+      procedure Entd (C : Integer := 2; D : Ta := (1, 2, 3, 4, 5)) renames
         T.Ent1 (True);
 
       task body T is
@@ -77,9 +69,11 @@ begin
          loop
             select
                accept Ent1
-               (Ident_Bool (True))
+               (Ident_Bool
+                  (True))
                  (A : Integer := 1;
-                  B : Ta      := (1 .. 5 => 1)) do
+                  B : Ta      := (1 .. 5 => 1))
+               do
                   if A in 1 .. 5 then
                      Results := B (A);
                   else

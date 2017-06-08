@@ -4,9 +4,7 @@ package body C954001_0 is  -- Disk management abstraction.
 
    protected body Disk_Device is
 
-      entry Read
-        (Where :     Disk_Address;
-         Data  : out Disk_Buffer)
+      entry Read (Where : Disk_Address; Data : out Disk_Buffer)
         when not Operation_Pending
         is
       begin
@@ -36,9 +34,7 @@ package body C954001_0 is  -- Disk management abstraction.
          return (Current_Track);
       end Tc_Track;
 
-      entry Pending_Read
-        (Where :     Disk_Address;
-         Data  : out Disk_Buffer)
+      entry Pending_Read (Where : Disk_Address; Data : out Disk_Buffer)
         when Disk_Interrupted
         is
       begin

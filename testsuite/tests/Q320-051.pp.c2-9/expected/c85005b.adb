@@ -201,7 +201,8 @@ procedure C85005b is
             Tr1 :    out Record1;
             Tp1 : in out Pointer1;
             Tv1 : in out Pack1.Privy;
-            Tt1 : in out Task1) do
+            Tt1 : in out Task1)
+         do
             Ti1 := Pi1 + 1;
             Ta1 := (Pa1 (1) + 1, Pa1 (2) + 1, Pa1 (3) + 1);
             Tr1 := (D => 1, Field1 => Pr1.Field1 + 1);

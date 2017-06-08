@@ -326,8 +326,7 @@ begin
    --  Parameter tests --------------------------------------------------
 
    declare
-      procedure Proc_1
-        (F : not null access function (X : Float) return Float)
+      procedure Proc_1 (F : not null access function (X : Float) return Float)
       is
       begin
          Use_It (F);

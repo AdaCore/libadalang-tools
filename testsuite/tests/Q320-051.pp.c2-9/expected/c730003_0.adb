@@ -7,8 +7,7 @@ package body C730003_0 is
       Card.Face := Up;
    end Turn_Over_Card;
 
-   function Get_Private_View
-     (A_Card : Disp_Card) return Ascii_Representation
+   function Get_Private_View (A_Card : Disp_Card) return Ascii_Representation
    is
    begin
       return A_Card.View;

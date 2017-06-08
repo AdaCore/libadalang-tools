@@ -232,8 +232,7 @@ procedure C954021 is
          Release_All := True;
       end Underloaded;
 
-      entry Wait_For_Underload
-        (Transaction : Acc_Transaction_Record)
+      entry Wait_For_Underload (Transaction : Acc_Transaction_Record)
         when Release_All
         is
       begin
@@ -275,8 +274,7 @@ procedure C954021 is
       -- Artificial: number of messages required for this test
       type Tc_Trans_Range is range 1 .. 6;
 
-      procedure Build_Credit_Record
-        (Next_Transaction : Acc_Transaction_Record)
+      procedure Build_Credit_Record (Next_Transaction : Acc_Transaction_Record)
       is
          Dummy_Account : constant Integer := 100;
       begin
@@ -288,8 +286,7 @@ procedure C954021 is
          Current_Id                      := Current_Id + 1;
       end Build_Credit_Record;
 
-      procedure Build_Debit_Record
-        (Next_Transaction : Acc_Transaction_Record)
+      procedure Build_Debit_Record (Next_Transaction : Acc_Transaction_Record)
       is
          Dummy_Account : constant Integer := 200;
       begin

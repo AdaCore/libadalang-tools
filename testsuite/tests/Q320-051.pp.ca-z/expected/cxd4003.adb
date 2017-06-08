@@ -111,7 +111,8 @@ begin
       begin
          accept Start
            (Numb          : in Message_Number;
-            Task_Priority : in System.Priority) do
+            Task_Priority : in System.Priority)
+         do
 
             -- Set the priority of the task (uses the default
             --          Ada.Task_Identification.Current_Task)

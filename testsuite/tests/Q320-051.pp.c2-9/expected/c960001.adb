@@ -59,11 +59,9 @@ begin
         (Left  : Ada.Calendar.Time;
          Right : Duration) return Ada.Calendar.Time renames
         Ada.Calendar."+";
-      function "<"
-        (Left, Right : Ada.Calendar.Time) return Boolean renames
+      function "<" (Left, Right : Ada.Calendar.Time) return Boolean renames
         Ada.Calendar."<";
-      function ">"
-        (Left, Right : Ada.Calendar.Time) return Boolean renames
+      function ">" (Left, Right : Ada.Calendar.Time) return Boolean renames
         Ada.Calendar.">";
 
       Tc_Loop_Count : Integer range 0 .. 4 := 0;

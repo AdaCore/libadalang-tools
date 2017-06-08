@@ -8,8 +8,7 @@ package body Cdb4001_Serializer_Generic is
          return (null record);
       end Read;
 
-      procedure Update
-        (Op : access procedure (Current_State : in out State))
+      procedure Update (Op : access procedure (Current_State : in out State))
       is
       begin
          Op.all (Current_State);

@@ -31,8 +31,7 @@ procedure Cd30006 is
    subtype Intadd is System.Storage_Elements.Integer_Address;
    use type System.Storage_Elements.Integer_Address;
 
-   function A2i
-     (Value : System.Address) return Intadd renames
+   function A2i (Value : System.Address) return Intadd renames
      System.Storage_Elements.To_Integer;
 
    Nac : constant String := " not aligned correctly";

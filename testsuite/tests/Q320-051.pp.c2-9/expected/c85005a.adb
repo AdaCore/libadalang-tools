@@ -201,7 +201,8 @@ procedure C85005a is
          Tp1 : in out Pointer1;
          Tv1 : in out Pack1.Privy;
          Tt1 : in out Task1;
-         Tk1 : in out Integer) do
+         Tk1 : in out Integer)
+      do
 
          Ti1 := I1 + 1;
          Ta1 := (A1 (1) + 1, A1 (2) + 1, A1 (3) + 1);

@@ -41,8 +41,8 @@ procedure C34001c is
 
    type T is
      new Parent range
-         Parent'Val (Ident_Int (Parent'Pos (E3))) ..
-           Parent'Val (Ident_Int (Parent'Pos (E4)));
+       Parent'Val (Ident_Int (Parent'Pos (E3))) ..
+         Parent'Val (Ident_Int (Parent'Pos (E4)));
 
    subtype Subparent is Parent range E3 .. E4;
 

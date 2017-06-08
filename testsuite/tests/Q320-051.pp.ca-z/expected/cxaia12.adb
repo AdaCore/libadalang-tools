@@ -65,8 +65,7 @@ procedure Cxaia12 is
 
    use type Ada.Containers.Hash_Type;
 
-   function My_Element_Hash
-     (Element : String) return Ada.Containers.Hash_Type
+   function My_Element_Hash (Element : String) return Ada.Containers.Hash_Type
    is
    begin
 

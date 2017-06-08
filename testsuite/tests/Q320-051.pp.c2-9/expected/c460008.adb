@@ -117,9 +117,7 @@ procedure C460008 is
       type Target is mod <>;
    procedure Float_Conversion_Check (For_The_Value : Source; Message : String);
 
-   procedure Float_Conversion_Check
-     (For_The_Value : Source;
-      Message       : String)
+   procedure Float_Conversion_Check (For_The_Value : Source; Message : String)
    is
 
       Item : Target;
@@ -165,9 +163,7 @@ procedure C460008 is
       type Target is mod <>;
    procedure Fixed_Conversion_Check (For_The_Value : Source; Message : String);
 
-   procedure Fixed_Conversion_Check
-     (For_The_Value : Source;
-      Message       : String)
+   procedure Fixed_Conversion_Check (For_The_Value : Source; Message : String)
    is
 
       Item : Target;

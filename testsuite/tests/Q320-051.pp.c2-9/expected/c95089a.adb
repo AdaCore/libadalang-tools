@@ -71,7 +71,8 @@ procedure C95089a is
             accept E2
               (C1 : in     Character;
                C2 : in out Character;
-               C3 :    out Character) do
+               C3 :    out Character)
+            do
                C3 := C2;
                C2 := C1;
             end E2;

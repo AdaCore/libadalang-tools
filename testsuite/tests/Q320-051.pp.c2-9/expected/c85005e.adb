@@ -223,7 +223,8 @@ begin
             Tp1 : in out Pointer1;
             Tv1 : in out Pack1.Privy;
             Tt1 : in out Task1;
-            Tk1 : in out Integer) do
+            Tk1 : in out Integer)
+         do
             Ti1 := Ai1.all + 1;
             Ta1 := (Aa1.all (1) + 1, Aa1.all (2) + 1, Aa1.all (3) + 1);
             Tr1 := (D => 1, Field1 => Ar1.all.Field1 + 1);

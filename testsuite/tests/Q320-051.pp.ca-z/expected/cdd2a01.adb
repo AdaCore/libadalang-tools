@@ -87,9 +87,7 @@ procedure Cdd2a01 is
       Integer'Read (Stream, Integer (Item));
    end Actual_Read;
 
-   procedure Actual_Write
-     (Stream : access Root_Stream_Type'Class;
-      Item   : Int)
+   procedure Actual_Write (Stream : access Root_Stream_Type'Class; Item : Int)
    is
    begin
       Integer'Write (Stream, Integer (Item));
@@ -100,9 +98,7 @@ procedure Cdd2a01 is
       return Int (Integer'Input (Stream));
    end Actual_Input;
 
-   procedure Actual_Output
-     (Stream : access Root_Stream_Type'Class;
-      Item   : Int)
+   procedure Actual_Output (Stream : access Root_Stream_Type'Class; Item : Int)
    is
    begin
       Integer'Output (Stream, Integer (Item));
@@ -136,8 +132,7 @@ procedure Cdd2a01 is
       Str'Write (Stream, Item.S);
    end Actual_Write;
 
-   function Actual_Input
-     (Stream : access Root_Stream_Type'Class) return Parent
+   function Actual_Input (Stream : access Root_Stream_Type'Class) return Parent
    is
       X : Parent (1, 1, True);
    begin

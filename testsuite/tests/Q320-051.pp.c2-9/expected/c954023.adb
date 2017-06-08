@@ -163,8 +163,7 @@ begin
          procedure Release_Low;
          -- Family of entry queues indexed by App_Priority
          entry Wait_For_Underload
-           (App_Priority)
-           (Transaction : Acc_Transaction_Record);
+           (App_Priority) (Transaction : Acc_Transaction_Record);
       private
          Release : Priority_Block := (others => False);
       end Hold;
@@ -247,8 +246,7 @@ begin
 
          -- This is a family of entry queues indexed by App_Priority
          entry Wait_For_Underload
-           (for Ap in App_Priority)
-           (Transaction : Acc_Transaction_Record)
+           (for Ap in App_Priority) (Transaction : Acc_Transaction_Record)
            when Release (Ap)
            is
          begin

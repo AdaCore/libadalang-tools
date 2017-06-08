@@ -48,7 +48,8 @@ procedure C95082g is
               (I1         :     Integer;
                I2         :     Integer := 2;
                I3         :     Integer := 3;
-               O1, O2, O3 : out Integer) do
+               O1, O2, O3 : out Integer)
+            do
                O1 := I1;
                O2 := I2;
                O3 := I3;

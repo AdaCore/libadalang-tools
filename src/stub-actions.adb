@@ -189,6 +189,9 @@ package body Stub.Actions is
    function Needs_Completion (N : Ada_Node) return Boolean;
    --  Returns True if N is a declaration that needs a completion.
 
+   function Get_Parent_Name (Parent_Body_Of_Subunit : Ada_Node) return W_Str;
+   --  This is the name to put in "separate (...)" when generating a subunit.
+
    function Less_Than (X, Y : Ada_Node) return Boolean;
    package Sorting is new Ada_Node_Vectors.Generic_Sorting (Less_Than);
    --  Used to implement the Alphabetical_Order switch (-gnatyo).
@@ -290,8 +293,6 @@ package body Stub.Actions is
       end case;
    end Needs_Completion;
 
-   function Get_Parent_Name (Parent_Body_Of_Subunit : Ada_Node) return W_Str;
-   --  ????????????????
    function Get_Parent_Name (Parent_Body_Of_Subunit : Ada_Node) return W_Str is
    begin
       if Parent_Body_Of_Subunit = null then
@@ -595,7 +596,7 @@ package body Stub.Actions is
                   Pp_Cmd : constant Command_Line := Get_Pp_Cmd;
                   Empty_Vec, Pp_Out_Vec : Char_Vector;
                   Params : constant Param_Spec_List :=
-                    F_Params (Entry_Decl (Decl));
+                    F_Params (F_Params (Entry_Decl (Decl)));
                   Overrides : constant Ada_Overriding_Node :=
                      F_Overriding (Entry_Decl (Decl));
                begin

@@ -100,11 +100,9 @@ begin
       -- results; they were tested in CXB3004. We give them different names
       -- to avoid confusion below.
 
-      function Character_To_Char
-        (Source : in Character) return Char renames
+      function Character_To_Char (Source : in Character) return Char renames
         To_C;
-      function Char_To_Character
-        (Source : in Char) return Character renames
+      function Char_To_Character (Source : in Char) return Character renames
         To_Ada;
 
    begin

@@ -2,7 +2,8 @@
 with Report;
 
 -- Child library subprogram Convert_File_Mode body.
-procedure Ca11002_0.Ca11002_2
+procedure Ca11002_0
+  .Ca11002_2
   (File     : in out File_Type;
    New_Mode : in     File_Mode)
 is

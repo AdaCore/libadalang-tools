@@ -42,8 +42,8 @@ procedure C34003c is
 
    type T is
      new Parent digits 4 range
-         Parent (Ident_Int (-30)) ..
-           Parent (Ident_Int (30));
+       Parent (Ident_Int (-30)) ..
+         Parent (Ident_Int (30));
 
    subtype Subparent is Parent digits 4 range -30.0 .. 30.0;
 

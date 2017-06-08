@@ -57,8 +57,7 @@ begin
          end record;
          function Equal (L, R : Polar_Coord) return Boolean;
          package Polar_Equal is new Equality_Operator (Polar_Coord, Equal);
-         function "="
-           (L, R : Polar_Coord) return Boolean renames
+         function "=" (L, R : Polar_Coord) return Boolean renames
            Polar_Equal."=";
       end Polar_Coordinates;
 

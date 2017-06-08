@@ -2,9 +2,7 @@
 
 package body C730001_0 is
 
-   procedure Set_Display
-     (C    : in out Clock;
-      Disp : in     Display_Kind := Digital)
+   procedure Set_Display (C : in out Clock; Disp : in Display_Kind := Digital)
    is
    begin
       C.Display      := Disp;

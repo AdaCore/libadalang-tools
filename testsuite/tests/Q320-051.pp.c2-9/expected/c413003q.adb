@@ -14,9 +14,7 @@ package body C413003q is
       return 3;
    end Prim_Func;
 
-   function Prim_Func
-     (X     : access constant Tq;
-      Value : Integer) return Integer
+   function Prim_Func (X : access constant Tq; Value : Integer) return Integer
    is
    begin
       return 2 * Value;

@@ -136,9 +136,7 @@ package body Cc3019c1_Nested_Generics is
 
       end Pop;
 
-      procedure Copy
-        (This_Stack    : in out Stack;
-         To_This_Stack : in out Stack)
+      procedure Copy (This_Stack : in out Stack; To_This_Stack : in out Stack)
       is
 
       begin  -- COPY

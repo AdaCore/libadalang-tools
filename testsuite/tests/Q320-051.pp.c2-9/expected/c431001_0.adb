@@ -1,9 +1,7 @@
 with Report;
 package body C431001_0 is
 
-   function Summary
-     (R       : in Recording;
-      Tc_Type : in Tc_Type_Id) return String
+   function Summary (R : in Recording; Tc_Type : in Tc_Type_Id) return String
    is
    begin
 
@@ -36,9 +34,7 @@ package body C431001_0 is
 
    end Summary;
 
-   function Summary
-     (Album   : in Vinyl;
-      Tc_Type : in Tc_Type_Id) return String
+   function Summary (Album : in Vinyl; Tc_Type : in Tc_Type_Id) return String
    is
    begin
       if Tc_Type /= Tc_Vinyl then
@@ -60,9 +56,7 @@ package body C431001_0 is
 
    end Summary;
 
-   function Summary
-     (Disk    : in Cd_Rom;
-      Tc_Type : in Tc_Type_Id) return String
+   function Summary (Disk : in Cd_Rom; Tc_Type : in Tc_Type_Id) return String
    is
    begin
       if Tc_Type /= Tc_Cd_Rom then
@@ -132,9 +126,7 @@ package body C431001_0 is
       end if;
    end Tc_Check;
 
-   procedure Tc_Dispatch
-     (N       : in Null_Tagged'Class;
-      Tc_Type : in Tc_N_Type_Id)
+   procedure Tc_Dispatch (N : in Null_Tagged'Class; Tc_Type : in Tc_N_Type_Id)
    is
    begin
       Tc_Check (N, Tc_Type); -- dispatched call

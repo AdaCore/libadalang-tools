@@ -42,8 +42,7 @@ procedure C392002 is
    -- operation that has been defined for an ancestor type and inherited
    -- by each type derived from the ancestor.
 
-   function Get_Engine_Size
-     (V : in Sim_1970.Vehicle'Class) return Engine_Size
+   function Get_Engine_Size (V : in Sim_1970.Vehicle'Class) return Engine_Size
    is
    begin
       return (Sim_1970.Engine_Size (V)); -- Dispatch according to tag.

@@ -41,9 +41,7 @@ package body Cxe4005_Common is
       end if;
    end Dual_Controlling_Operands;
 
-   procedure Set_Serial_Number
-     (Rtt :    access Root_Tagged_Type;
-      Sn  : in Integer)
+   procedure Set_Serial_Number (Rtt : access Root_Tagged_Type; Sn : in Integer)
    is
    begin
       Rtt.Serial_Number := Sn;

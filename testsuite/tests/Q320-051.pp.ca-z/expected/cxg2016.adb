@@ -109,9 +109,7 @@ procedure Cxg2016 is
         .Generic_Elementary_Functions
         (Real);
 
-      function Arctan
-        (Y : Real;
-         X : Real := 1.0) return Real renames
+      function Arctan (Y : Real; X : Real := 1.0) return Real renames
         Elementary_Functions.Arctan;
       function Arctan
         (Y     : Real;
@@ -129,10 +127,7 @@ procedure Cxg2016 is
       -- to account for that level of precision.
       Error_Low_Bound : Real := 0.0;
 
-      procedure Check
-        (Actual, Expected : Real;
-         Test_Name        : String;
-         Mre              : Real)
+      procedure Check (Actual, Expected : Real; Test_Name : String; Mre : Real)
       is
          Max_Error : Real;
          Rel_Error : Real;

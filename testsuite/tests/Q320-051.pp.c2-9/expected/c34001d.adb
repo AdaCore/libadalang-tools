@@ -41,8 +41,8 @@ procedure C34001d is
 
    type T is
      new Subparent range
-         Parent'Val (Ident_Int (Parent'Pos (True))) ..
-           Parent'Val (Ident_Int (Parent'Pos (True)));
+       Parent'Val (Ident_Int (Parent'Pos (True))) ..
+         Parent'Val (Ident_Int (Parent'Pos (True)));
 
    X : T       := True;
    W : Parent  := False;

@@ -198,10 +198,10 @@ procedure C433005 is
 
    function Test_H return Sub_1_3 is
    -- Expression function.
-     ((5 => Ident_Int (88),
-      8  => <>,
-      10 => <>,
-      -- 10 not in applicable index constraint
+     ((5  => Ident_Int (88),
+       8  => <>,
+       10 => <>,
+       -- 10 not in applicable index constraint
      others => <>));
 
    function Test_J return Sub_2_2 is

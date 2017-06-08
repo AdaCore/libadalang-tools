@@ -16,9 +16,9 @@ procedure Cdb4001 is
 
    type Object_Id_Or_Nil is
      new Integer range
-         0 ..
-           Integer (Subpool_Id'Last) *
-           Integer (Index'Last + ((Index'Last * (Index'Last + 1)) / 2));
+       0 ..
+         Integer (Subpool_Id'Last) *
+         Integer (Index'Last + ((Index'Last * (Index'Last + 1)) / 2));
    --
    -- For each (Subpool,Index) pair, one object is created for the Obj_Ref
    -- array (declared below) and Index objects are created for the Vec_Ref

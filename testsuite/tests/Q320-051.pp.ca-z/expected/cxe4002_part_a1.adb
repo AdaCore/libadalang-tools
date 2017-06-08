@@ -3,14 +3,11 @@
 with Report;
 with Cxe4002_Common;
 package body Cxe4002_Part_A1 is
-   function "+"
-     (X, Y : Little_Number) return Little_Number renames
+   function "+" (X, Y : Little_Number) return Little_Number renames
      Cxe4002_Common."+";
-   function "-"
-     (X, Y : Little_Number) return Little_Number renames
+   function "-" (X, Y : Little_Number) return Little_Number renames
      Cxe4002_Common."-";
-   function "="
-     (X, Y : Little_Number) return Boolean renames
+   function "=" (X, Y : Little_Number) return Boolean renames
      Cxe4002_Common."=";
 
    -- simple integer and float tests

@@ -49,10 +49,7 @@ procedure C64108a is
       S2 := S1;
    end P1;
 
-   procedure P2
-     (C1 : in     Character;
-      C2 : in out Character;
-      C3 :    out Character)
+   procedure P2 (C1 : in Character; C2 : in out Character; C3 : out Character)
    is
    begin
       C3 := C2;

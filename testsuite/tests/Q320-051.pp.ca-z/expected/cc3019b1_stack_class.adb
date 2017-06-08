@@ -18,9 +18,7 @@ package body Cc3019b1_Stack_Class is
 
    end Push;
 
-   procedure Pop
-     (This_Element   : in out Element;
-      Off_This_Stack : in out Stack)
+   procedure Pop (This_Element : in out Element; Off_This_Stack : in out Stack)
    is
 
    begin  -- POP

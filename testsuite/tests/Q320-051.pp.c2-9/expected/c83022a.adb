@@ -171,9 +171,7 @@ begin
 
       procedure Template (X : in Integer := A; Y : in out Integer);
 
-      procedure Inner
-        (Z : in     Integer := A;
-         A : in out Integer) renames
+      procedure Inner (Z : in Integer := A; A : in out Integer) renames
         Template;
 
       B   : Integer := A;

@@ -70,7 +70,8 @@ package Cb40005_0 is -- Fail_Soft
       Retry_Routine             : Func_Pointer := null);
 
    function Top_Event_Exception
-     return Ada.Exceptions.Exception_Occurrence_Access;
+     return Ada.Exceptions
+     .Exception_Occurrence_Access;
 
    function Top_Event_Procedure return Proc_Pointer;
 

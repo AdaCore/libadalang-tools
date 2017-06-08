@@ -92,9 +92,8 @@ procedure C631001 is
       end Int_Proc;
 
       -----------------------------------------------------------------
-      procedure Enu_Proc
-        (P1 : in     Enu_Type := C631001_0.'C';          -- OK.
-         P2 :    out Enu_Type)
+      procedure Enu_Proc (P1 : in Enu_Type := C631001_0.'C';          -- OK.
+      P2                     :    out Enu_Type)
       is
       begin
          P2 := P1;

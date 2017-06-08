@@ -41,10 +41,8 @@ procedure C36174a is
 
    type A4 is
      array
-       (Integer range <>,
-        Integer range <>,
-        Integer range <>,
-        Integer range <>) of String (1 .. 0);
+       (Integer range <>, Integer range <>, Integer range <>, Integer range <>) of String
+       (1 .. 0);
    C4 : constant A4 :=
      (-6 .. -4 => (4 .. 5 => (-4 .. -5 => (1_000 .. 2_000 => S9))));
    S10 : constant String := (10 .. 9 => 'Q');
