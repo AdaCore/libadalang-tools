@@ -595,27 +595,18 @@ package body Stub.Actions is
                   Pp_Tool : Pp.Actions.Pp_Tool;
                   Pp_Cmd : constant Command_Line := Get_Pp_Cmd;
                   Empty_Vec, Pp_Out_Vec : Char_Vector;
-                  Params : constant Param_Spec_List :=
-                    F_Params (F_Params (Entry_Decl (Decl)));
+                  Parms : constant Params :=
+                    F_Params (Entry_Decl (Decl));
                   Overrides : constant Ada_Overriding_Node :=
                      F_Overriding (Entry_Decl (Decl));
                begin
-                  if Last_Child_Index (Params) = 0 then
-                     Put ("\1entry \2 when Standard.True is\n",
-                          (case Overrides is
-                             when Ada_Overriding_Not_Overriding =>
-                               "not overriding ",
-                             when Ada_Overriding_Overriding =>
-                               "overriding ",
-                             when Ada_Overriding_Unspecified => ""),
-                          Name);
-                  else
+                  if Parms /= null then
                      Pp.Actions.Format_Vector
                        (Pp_Tool, Pp_Cmd,
                         File_Name => "",
                         Input => Empty_Vec,
                         Output => Pp_Out_Vec,
-                        Node => Ada_Node (Params));
+                        Node => Ada_Node (Parms));
                      Put ("\1entry \2(\3) when Standard.True is\n",
                           (case Overrides is
                              when Ada_Overriding_Not_Overriding =>
@@ -627,6 +618,15 @@ package body Stub.Actions is
                           From_UTF8 -- ????????????????wrong
                             (Elems (Pp_Out_Vec)
                                (1 .. Last_Index (Pp_Out_Vec))));
+                  else
+                     Put ("\1entry \2 when Standard.True is\n",
+                          (case Overrides is
+                             when Ada_Overriding_Not_Overriding =>
+                               "not overriding ",
+                             when Ada_Overriding_Overriding =>
+                               "overriding ",
+                             when Ada_Overriding_Unspecified => ""),
+                          Name);
                   end if;
 
                   Generate_Stub_Begin_End (Name, "entry");
