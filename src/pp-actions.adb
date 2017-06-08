@@ -3382,16 +3382,17 @@ package body Pp.Actions is
 --            Op       : constant Ada_Tree       := Make_Op (Expr);
 --            Arg1     : constant Ada_Tree       := Get_Arg (Expr, 1);
          begin
-            --  First we have a special case for the Depends aspect specification.
-            --  We want to pretend that "=>+" is an operator, so we print:
-            --  "Depends => (A =>+ B)" instead of "Depends => (A => +B)".
-            --  We don't bother with this for pragma Depends, because that's
-            --  mainly for the compiler's implementation of the aspect, so we
-            --  don't expect it to be used much.
+            --  First we have a special case for the Depends and
+            --  Refined_Depends aspect specifications.  We want to pretend that
+            --  "=>+" is an operator, so we print: "Depends => (A =>+ B)"
+            --  instead of "Depends => (A => +B)".  We don't bother with this
+            --  for pragma [Refined_]Depends, because that's mainly for the
+            --  compiler's implementation of the aspect, so we don't expect it
+            --  to be used much.
 
             if Ancestor_Tree (4).Kind = Ada_Aspect_Assoc
-              and then W_Intern (Id_Name (Subtree (Ancestor_Tree (4), 1))) =
-                Name_Depends
+              and then W_Intern (Id_Name (Subtree (Ancestor_Tree (4), 1))) in
+                Name_Depends | Name_Refined_Depends
             then
                pragma Assert (Subtree (Expr, 1).Kind = Ada_Op_Plus);
                pragma Assert
@@ -3405,8 +3406,8 @@ package body Pp.Actions is
                   Interpret_Template (" !", Subtrees);
                end;
 
-            --  No special "Depends" case. Put a space after the operator,
-            --  except for "+" and "-".
+            --  No special "[Refined_]Depends" case. Put a space after the
+            --  operator, except for "+" and "-".
 
             else
                Put ("\1", Operator_Symbol (F_Op (Expr)));

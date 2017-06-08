@@ -3,21 +3,17 @@ with ASIS_UL.String_Utilities;
 
 package LAL_UL.Predefined_Symbols is
 
-   function R83
-     (S : String; Ada_Version : Ada_Version_Type := Ada_83) return Symbol
-     renames Intern_Reserved_Word;
+   function R83 (S : String) return Symbol is
+     (Intern_Reserved_Word (S, Ada_Version => Ada_83));
 
-   function R95
-     (S : String; Ada_Version : Ada_Version_Type := Ada_95) return Symbol
-     renames Intern_Reserved_Word;
+   function R95 (S : String) return Symbol is
+     (Intern_Reserved_Word (S, Ada_Version => Ada_95));
 
-   function R2005
-     (S : String; Ada_Version : Ada_Version_Type := Ada_2005) return Symbol
-     renames Intern_Reserved_Word;
+   function R2005 (S : String) return Symbol is
+     (Intern_Reserved_Word (S, Ada_Version => Ada_2005));
 
-   function R2012
-     (S : String; Ada_Version : Ada_Version_Type := Ada_2012) return Symbol
-     renames Intern_Reserved_Word;
+   function R2012 (S : String) return Symbol is
+     (Intern_Reserved_Word (S, Ada_Version => Ada_2012));
 
    --  Ada 83 reserved words
 
@@ -134,6 +130,7 @@ package LAL_UL.Predefined_Symbols is
    Name_Q_Not : constant Symbol := Intern ("""not""");
 
    Name_Depends : constant Symbol := Intern ("Depends");
+   Name_Refined_Depends : constant Symbol := Intern ("Refined_Depends");
    Name_Elab_Spec : constant Symbol := Intern ("Elab_Spec");
    Name_Elab_Body : constant Symbol := Intern ("Elab_Body");
 
