@@ -192,6 +192,9 @@ package body LAL_Extensions is
             when Ada_Accept_Stmt =>
                Result :=
                  Name (F_Name (Accept_Stmt (Decl)));
+            when Ada_Accept_Stmt_With_Stmts =>
+               Result :=
+                 Name (F_Name (Accept_Stmt_With_Stmts (Decl)));
             when Ada_Named_Stmt_Decl =>
                Result := Name (F_Name (Named_Stmt_Decl (Decl)));
             when Ada_Abstract_Subp_Decl |
@@ -472,6 +475,7 @@ package body LAL_Extensions is
            Ada_Loop_Stmt |
            Ada_While_Loop_Stmt |
            Ada_Accept_Stmt |
+           Ada_Accept_Stmt_With_Stmts |
            Ada_If_Stmt =>
             return True;
 

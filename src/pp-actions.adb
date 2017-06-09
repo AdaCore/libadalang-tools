@@ -492,6 +492,7 @@ package body Pp.Actions is
    begin
       return
         (case Kind is
+           when Ada_Unconstrained_Array_Index => null,
            when Ada_Contract_Case_Assoc => null,
            when Ada_Contract_Cases => null,
            when Ada_Instantiation_Env_Holder => null,
@@ -501,7 +502,6 @@ package body Pp.Actions is
            when Ada_Subp_Spec => null,
            when Ada_Multi_Dim_Array_Assoc => null,
            when Ada_Aggregate_Assoc => null,
-           when Ada_Base_Aggregate => null,
 
            when Ada_Constrained_Array_Indices =>
              L ("(?~, ~~)"),
@@ -537,23 +537,21 @@ package body Pp.Actions is
                 "!",
                 "end !1/"),
            when Ada_Abstract_Subp_Decl =>
-             L ("?~~ ~procedure!", " is abstract", Aspects),
+             L ("?~~ ~!", " is abstract", Aspects),
            when Ada_Expr_Function =>
-             L ("?~~ ~procedure!", " is[@ !]", Aspects),
+             L ("?~~ ~!", " is[@ !]", Aspects),
            when Ada_Null_Subp_Decl =>
-             L ("?~~ ~procedure!", " is null", Aspects),
+             L ("?~~ ~!", " is null", Aspects),
            when Ada_Subp_Renaming_Decl =>
-             L ("?~~ ~procedure!!", Aspects),
+             L ("?~~ ~!!", Aspects),
            when Ada_Subp_Decl =>
-             L ("?~~ ~procedure!" & Aspects),
+             L ("?~~ ~!" & Aspects),
            when Ada_Subp_Body_Stub =>
-             L ("?~~ ~procedure! is separate" & Aspects),
-           when Ada_Formal_Subp_Decl =>
-             L ("?~~ ~with procedure!? is ~~~? is ~~~" & Aspects),
-               --  Here and elsewhere, the "procedure" gets replaced with
-               --  "function" when appropriate. ???This wouldn't be necessary
-               --  if all Subp things worked like Generic_Subp_Renaming_Decl,
-               --  which has a Subp_Kind.
+             L ("?~~ ~! is separate" & Aspects),
+           when Ada_Concrete_Formal_Subp_Decl =>
+             L ("?~~ ~with !? is ~~~" & Aspects),
+           when Ada_Abstract_Formal_Subp_Decl =>
+             L ("?~~ ~with ! is abstract? ~~~" & Aspects),
            when Ada_Subp_Kind_Function =>
              L ("function"),
            when Ada_Subp_Kind_Procedure =>
@@ -572,9 +570,9 @@ package body Pp.Actions is
                 "!",
                 "end !1/"),
            when Ada_Protected_Body =>
-             L ("protected body !", Aspects, " is$", "!", "end !1"),
+             L ("protected body !", Aspects, " is$", "!", "end !1/"),
            when Ada_Subp_Body =>
-             L ("?~~ ~procedure!",
+             L ("?~~ ~!",
                 Aspects,
                 "@+1 is$",
                 "!",
@@ -594,7 +592,7 @@ package body Pp.Actions is
                 " is$",
                 "!",
                 "!",
-                "end !1"),
+                "end !1/"),
            when Ada_Entry_Decl =>
              L ("?~~ ~entry !?[@ (~~)]~?~~~", Aspects),
            when Ada_Entry_Body =>
@@ -602,7 +600,7 @@ package body Pp.Actions is
                 --  ???Perhaps "@ is]" should be "@+1 is]" or "@ ]is".
                 "!",
                 "!",
-                "end !1"),
+                "end !1/"),
            when Ada_Enum_Literal_Decl =>
              L ("!"),
            when Ada_Exception_Decl =>
@@ -619,7 +617,6 @@ package body Pp.Actions is
                 "!"),
            when Ada_Generic_Formal_Part =>
              L ("{?~;$~;$~}"),
-           when Ada_Generic_Formal => null,
            when Ada_Generic_Formal_Obj_Decl |
                Ada_Generic_Formal_Subp_Decl | Ada_Generic_Formal_Type_Decl =>
              L ("!"),
@@ -630,7 +627,7 @@ package body Pp.Actions is
            when Ada_Generic_Subp_Renaming_Decl =>
              L ("generic ! ! renames !", Aspects),
            when Ada_Generic_Subp_Decl =>
-             L ("generic$", "!", "procedure!", Aspects),
+             L ("generic$", "!", "!", Aspects),
            when Ada_Number_Decl =>
              L ("?~,@ ~~ ^: constant ^2:=[@ !]"),
            when Ada_Object_Decl |
@@ -772,9 +769,11 @@ package body Pp.Actions is
                 "end select"),
            when Ada_Select_When_Part => null,
            when Ada_Accept_Stmt =>
+             L ("accept !? @(~~)~?~~~"),
+           when Ada_Accept_Stmt_With_Stmts =>
              L ("accept !? @(~~)~?~~~",
                 "!",
-                "end !1"),
+                "end !1/"),
            when Ada_Null_Record_Def =>
              L ("null record/"),
              --  Null_Record_Def inherits F_Components from
@@ -808,7 +807,6 @@ package body Pp.Actions is
              L ("! : ! !1"),
            when Ada_Named_Stmt_Decl =>
              L ("!"),
-           when Ada_Block_Stmt => null,
            when Ada_Begin_Block =>
              L ("!",
                 "end/"),
@@ -881,7 +879,7 @@ package body Pp.Actions is
            when Ada_Unknown_Discriminant_Part =>
              L (" @(<>)"),
            when Ada_Access_To_Subp_Def =>
-             L ("?~~ ~access? ~~~ procedure!"),
+             L ("?~~ ~access? ~~~ !"),
            when Ada_Anonymous_Type_Decl =>
              L ("//!", Aspects),
            when Ada_Subtype_Indication |
@@ -1861,61 +1859,17 @@ package body Pp.Actions is
       Label_Seen : Boolean := False;
       --  See the comments in Do_Label below for an explanation of this.
 
-      function Subp_Decl_Template
-        (Tree : Ada_Tree; Is_Function : Boolean)
-        return Ada_Template;
-      --  Returns a modified version of the template in the table for the given
-      --  node kind. If it's a function, we replace "procedure" --> "function".
-
-      function Subp_Decl_Template
-        (Tree : Ada_Tree; Is_Function : Boolean)
-        return Ada_Template
-      is
-         pragma Assert
-           (Tree.Kind in
-              Ada_Subp_Decl |
-              Ada_Abstract_Subp_Decl |
-              Ada_Null_Subp_Decl |
-              Ada_Expr_Function |
-              Ada_Subp_Body_Stub |
-              Ada_Subp_Body |
-              Ada_Formal_Subp_Decl |
-              Ada_Access_To_Subp_Def |
-              Ada_Generic_Subp_Decl |
-              Ada_Subp_Renaming_Decl |
-              Ada_Entry_Body |
-              Ada_Entry_Decl);
-
-         T : Ada_Template renames Template_Table (Tree.Kind).all;
-      begin
-         if not Is_Function then
-            return T;
-         end if;
-
-         declare
-            F : W_Str renames
-              Must_Replace (W_Str (T), "procedure", "function");
-         begin
-            return Ada_Template (F);
-         end;
-      end Subp_Decl_Template;
-
       function Subp_Decl_With_Hard_Breaks
-        (Tree : Ada_Tree;
-         Is_Function, Is_Body : Boolean)
-         return                 Ada_Template;
+        (Tree : Ada_Tree; Is_Body : Boolean) return Ada_Template;
       --  For implementing Par_Threshold. This replaces the soft line break
       --  between parameters with a hard line break. If Is_Function is True, put
       --  a hard line break before "return". If Is_Body is True, put a hard line
       --  break before "is".
 
       function Subp_Decl_With_Hard_Breaks
-        (Tree : Ada_Tree;
-         Is_Function, Is_Body : Boolean)
-         return                 Ada_Template
+        (Tree : Ada_Tree; Is_Body : Boolean) return Ada_Template
       is
-         T : constant W_Str :=
-           W_Str (Subp_Decl_Template (Tree, Is_Function));
+         T : constant W_Str := W_Str (Template_Table (Tree.Kind).all);
          T2 : constant W_Str :=
            (if Is_Body and then Arg (Cmd, Separate_Is)
              then Replace_All (T, "@ is$", "$is$")
@@ -1942,11 +1896,6 @@ package body Pp.Actions is
       package Alternative_Templates is
 
          --  Some templates that are used instead of the ones in Template_Table
-
-         Accept_Stmt_Alt_Templ : constant Ada_Template :=
-           Munge_Template
-             ("accept !? @(~~)~?~~~/",
-              Ada_Accept_Stmt);
 
          Pragma_Alt_Templ : constant Ada_Template :=
            Munge_Template ("/?[ @(~,@ ~)]~", Ada_Pragma_Node);
@@ -2798,10 +2747,9 @@ package body Pp.Actions is
                  Ada_Enum_Type_Decl |
                  Ada_Loop_Stmt | Ada_For_Loop_Stmt | Ada_While_Loop_Stmt |
                  Ada_Block_Stmt |
-                 Ada_Begin_Block |
-                 Ada_Decl_Block |
                  Ada_Extended_Return_Stmt |
                  Ada_Accept_Stmt |
+                 Ada_Accept_Stmt_With_Stmts |
                  Ada_Select_Stmt |
                  Ada_If_Stmt | --???look up to If_Stmt, then up to list.
                  --                  Ada_Else_Path |
@@ -2848,7 +2796,6 @@ package body Pp.Actions is
          --  Procedures for formatting the various kinds of node that are not
          --  fully covered by Template_Table:
 
-         procedure Do_Accept_Stmt;
 --         procedure Do_Array_Aggregate;
          procedure Do_Assoc;
 --         procedure Do_Attribute_Reference;
@@ -2897,17 +2844,6 @@ package body Pp.Actions is
          procedure Do_Usage_Name;
 
          procedure Do_Others; -- anything not listed above
-
-         procedure Do_Accept_Stmt is
-         begin
-            --  If there are no statements or exception handlers, use short form
-
-            if Is_Nil (F_Stmts (Accept_Stmt (Tree))) then
-               Interpret_Template (Accept_Stmt_Alt_Templ);
-            else
-               Interpret_Template;
-            end if;
-         end Do_Accept_Stmt;
 
 --         procedure Do_Array_Aggregate is
 --         begin
@@ -3221,7 +3157,7 @@ package body Pp.Actions is
                  Ada_Begin_Block |
                  Ada_Decl_Block =>
                   Interpret_Template (Handled_Stmts_With_Begin);
-               when Ada_Extended_Return_Stmt | Ada_Accept_Stmt =>
+               when Ada_Extended_Return_Stmt | Ada_Accept_Stmt_With_Stmts =>
                   Interpret_Template (Handled_Stmts_With_Do);
                when others => raise Program_Error;
             end case;
@@ -3875,7 +3811,8 @@ package body Pp.Actions is
          procedure Do_Params is
             Is_Function : constant Boolean :=
               (if Parent_Tree.Kind in
-                   Ada_Entry_Decl | Ada_Entry_Body | Ada_Accept_Stmt
+                   Ada_Entry_Decl | Ada_Entry_Body |
+                   Ada_Accept_Stmt | Ada_Accept_Stmt_With_Stmts
                  then False
                  else Present (F_Subp_Returns (Subp_Spec (Parent_Tree))));
             Param_Count : Query_Count :=
@@ -3913,11 +3850,11 @@ package body Pp.Actions is
               or else Param_Count > Query_Count (Arg (Cmd, Par_Threshold))
             then
                Interpret_Template
-                 (Munge_Template ("? ~~~?~~~?[$ return] ~~~",
+                 (Munge_Template ("!? ~~~?~~~?[$ return] ~~~",
                   Tree.Kind));
             else
                Interpret_Template
-                 (Munge_Template ("? ~~~?~~~?[@+2 return] ~~~",
+                 (Munge_Template ("!? ~~~?~~~?[@+2 return] ~~~",
                   Tree.Kind));
                --  F_Name is optional for access-to-subp.
             end if;
@@ -3994,12 +3931,10 @@ package body Pp.Actions is
                  or else Param_Count > Query_Count (Arg (Cmd, Par_Threshold))
                then
                   Interpret_Template
-                    (Subp_Decl_With_Hard_Breaks (Tree, Is_Function, Is_Body),
+                    (Subp_Decl_With_Hard_Breaks (Tree, Is_Body),
                      Subtrees => Subs);
                else
-                  Interpret_Template
-                    (Subp_Decl_Template (Tree, Is_Function),
-                     Subtrees => Subs);
+                  Interpret_Template (Subtrees => Subs);
                end if;
             end;
          end Do_Subp_Decl;
@@ -4208,9 +4143,6 @@ package body Pp.Actions is
 
             when Ada_Extended_Return_Stmt =>
                Do_Extended_Return_Stmt;
-
-            when Ada_Accept_Stmt =>
-               Do_Accept_Stmt;
 
 --            when Ada_Positional_Array_Aggregate |
 --                Ada_Named_Array_Aggregate =>

@@ -395,14 +395,13 @@ package body Stub.Actions is
                Header : String_Access :=
                  Read_File (Arg (Cmd, Header_File).all);
             begin
-               Put ("\1", From_UTF8 -- ????????????????wrong
+               Put ("\1", From_UTF8 -- ????wrong
                       (Header.all));
                Free (Header);
             end;
          end if;
 
          if Arg (Cmd, Comment_Header_Sample) then
-            --  ????????????????Subunits not handled yet.
             declare
                With_Spaces : constant W_Str :=
                  Intersperse_Spaces (UC_Root_Node_Name);
@@ -488,7 +487,7 @@ package body Stub.Actions is
               Q (Name));
 
          if Arg (Cmd, No_Exception) and then not Returns then
-            --  ????????????????This is wrong; should usually generate
+            --  ????This is wrong; should usually generate
             --  "return Result;" if No_Exception.
             Put ("null;");
          else
@@ -575,15 +574,14 @@ package body Stub.Actions is
                      Input => Empty_Vec,
                      Output => Pp_Out_Vec,
                      Node => Ada_Node (Spec));
-                  Put ("\1\2 \3 is\n",
+                  Put ("\1 \2 is\n",
                        (case Overrides is
                           when Ada_Overriding_Not_Overriding =>
                             "not overriding ",
                           when Ada_Overriding_Overriding =>
                             "overriding ",
                           when Ada_Overriding_Unspecified => ""),
-                       (if Returns then "function" else "procedure"),
-                       From_UTF8 -- ????????????????wrong
+                       From_UTF8 -- ????wrong
                          (Elems (Pp_Out_Vec) (1 .. Last_Index (Pp_Out_Vec))));
                   Generate_Stub_Begin_End
                     (Name, (if Returns then "function" else "procedure"));
@@ -615,7 +613,7 @@ package body Stub.Actions is
                                "overriding ",
                              when Ada_Overriding_Unspecified => ""),
                           Name,
-                          From_UTF8 -- ????????????????wrong
+                          From_UTF8 -- ????wrong
                             (Elems (Pp_Out_Vec)
                                (1 .. Last_Index (Pp_Out_Vec))));
                   else
@@ -656,7 +654,7 @@ package body Stub.Actions is
                Collect_Local_Decls (F_Decls (Body_Decls (Decl)));
 
             when Ada_Package_Body_Stub | Ada_Protected_Body_Stub =>
-               null; -- ????????????????We should find the corresponding spec,
+               null; -- ????We should find the corresponding spec,
                --  and walk the decls therein.
 
             when Ada_Subp_Decl | Ada_Generic_Subp_Decl |
@@ -718,7 +716,7 @@ package body Stub.Actions is
             Buffer => Out_Str,
             With_Trivia => True);
       begin
-         if False then -- ????????????????
+         if False then -- ????
             pragma Assert (not Has_Diagnostics (Out_Unit));
             pragma Assert (Root (Out_Unit) /= null);
          elsif Has_Diagnostics (Out_Unit) then
@@ -791,8 +789,8 @@ package body Stub.Actions is
             Arg_File_Info : constant File_Info :=
               Info (Tool.Project_Tree.all, Arg_Virt_File);
          begin
-            --  ????????????????Doesn't put it in the right directory.
-            --  ????????????????Doesn't work for subunits.
+            --  ????Doesn't put it in the right directory.
+            --  Doesn't work for subunits.
             return +GNATCOLL.Projects.File_From_Unit
                 (Project         => Project (Arg_File_Info),
                  Unit_Name       => Unit_Name (Arg_File_Info),
@@ -805,7 +803,7 @@ package body Stub.Actions is
          --  use that. Otherwise, if there is a project file,
          --  use that. Otherwise use the default naming convention.
 
-         Simple : constant String := -- ????????????????misnamed?
+         Simple : constant String := -- ???
            (if Arg (Cmd, Output) = null then
               (if Status (Tool.Project_Tree.all) = Empty
                  then Default_Name
@@ -950,7 +948,7 @@ package body Stub.Actions is
          when Ada_Body_Node =>
             if not Arg (Cmd, Subunits) then
                Cmd_Error ("input file looks like a body");
-               --  ????????We should not print the "try --help" message.
+               --  ????We should not print the "try --help" message.
             end if;
          when others => raise Program_Error;
       end case;
