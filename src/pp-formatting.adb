@@ -891,13 +891,11 @@ package body Pp.Formatting is
          --  indent, except that if the comment starts in column 1, we assume
          --  the user wants to keep it that way.
 
-         procedure Insert_Declare_Or_Private (Declare_Or_Private : W_Str) with
-            Pre => Declare_Or_Private in "declare" | "private";
-            --  If a block statement has no declarations, the earlier passes
-            --  don't insert "declare", whether or not it was in the source code.
+         procedure Insert_Private;
+            --  If a private part has no declarations, the earlier passes
+            --  don't insert "private", whether or not it was in the source code.
             --  If Do_Inserts is True, and there is a comment, this re-inserts
-            --  "declare" before the comment, to avoid messing up the formatting.
-            --  Similarly for "private [possible comment] end".
+            --  "private" before the comment, to avoid messing up the formatting.
 
          function Extra_Blank_On_Return return Boolean;
          --  This is to deal with something like:
@@ -1326,7 +1324,7 @@ package body Pp.Formatting is
             Cur_Indentation := 0;
          end Insert_Whole_Line_Comment;
 
-         procedure Insert_Declare_Or_Private (Declare_Or_Private : W_Str) is
+         procedure Insert_Private is
             Out_Tok_Pos : constant Positive :=
               Position (Out_Buf, Out_Tok.Sloc.Firstx);
             LB_Pos : constant Positive :=
@@ -1335,34 +1333,23 @@ package body Pp.Formatting is
               Position (Out_Buf, Line_Breaks (Cur_Line - 1).Mark);
 
          begin
-            --  Either the current or previous line break is just before "begin"
-            --  or "end"; that's the indentation we want for "declare" or
-            --  "private", respectively. There is one exception: a named block
-            --  of the form "Name : begin", we want to insert the declare before
-            --  "begin", and we don't care about indentation. ???Better would be
-            --  to use indentation of "Name".
+            --  Either the current or previous line break is just before "end";
+            --  that's the indentation we want for "private".
 
             if LB_Pos = Out_Tok_Pos - 1 then
                Cur_Indentation := Line_Breaks (Cur_Line).Indentation;
-
             elsif Prev_LB_Pos = Out_Tok_Pos - 1 then
                Cur_Indentation := Line_Breaks (Cur_Line - 1).Indentation;
-
-            --  The "one exception" mentioned above
-
             else
-               pragma Assert
-                 (Declare_Or_Private = "declare"
-                  and then Out_Tokens (Out_Index - 1).Text = Name_Colon
-                  and then Out_Tokens (Out_Index - 2).Kind = Identifier);
+               pragma Assert (False);
             end if;
 
             Append_Temp_Line_Break (Lines_Data);
-            Insert (Out_Buf, Declare_Or_Private);
+            Insert (Out_Buf, "private");
             Cur_Indentation := 0;
 
             Src_Index := Src_Index + 1;
-         end Insert_Declare_Or_Private;
+         end Insert_Private;
 
          function Line_Break_LT (X, Y : Line_Break) return Boolean;
 
@@ -1525,19 +1512,8 @@ package body Pp.Formatting is
                     (Disable_Final_Check
                        or else Src_Tok.Normalized = Name_Semicolon);
 
-               --  Check for "declare begin" --> "begin" case, with a possible
-               --  comment between "declare" and "begin".
-
-               elsif Src_Tok.Normalized = Name_Declare
-                 and then Out_Tok.Normalized = Name_Begin
-               then
-                  pragma Assert
-                    (Disable_Final_Check or else
-                       Next_Lexeme (Src_Tokens, Src_Index).Normalized =
-                     Name_Begin);
-                  Insert_Declare_Or_Private ("declare");
-
-               --  Check for "private end" --> "end" case.
+               --  Check for "private end" --> "end" case, with a possible
+               --  comment between "private" and "end".
 
                elsif Src_Tok.Normalized = Name_Private
                  and then Out_Tok.Normalized = Name_End
@@ -1547,7 +1523,7 @@ package body Pp.Formatting is
                        or else
                      Next_Lexeme (Src_Tokens, Src_Index).Normalized =
                        Name_End);
-                  Insert_Declare_Or_Private ("private");
+                  Insert_Private;
 
                --  Check for "T'((X, Y, Z))" --> "T'(X, Y, Z)" case
 
