@@ -3319,9 +3319,9 @@ package body Pp.Actions is
 --            Arg1     : constant Ada_Tree       := Get_Arg (Expr, 1);
          begin
             --  First we have a special case for the Depends and
-            --  Refined_Depends aspect specifications.  We want to pretend that
+            --  Refined_Depends aspect specifications. We want to pretend that
             --  "=>+" is an operator, so we print: "Depends => (A =>+ B)"
-            --  instead of "Depends => (A => +B)".  We don't bother with this
+            --  instead of "Depends => (A => +B)". We don't bother with this
             --  for pragma [Refined_]Depends, because that's mainly for the
             --  compiler's implementation of the aspect, so we don't expect it
             --  to be used much.
