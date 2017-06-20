@@ -558,7 +558,6 @@ package body Stub.Actions is
                Generate_Local_Header (Name, Level);
                Generate_Subunit_Start;
                declare
-                  Pp_Tool : Pp.Actions.Pp_Tool;
                   Pp_Cmd : constant Command_Line := Get_Pp_Cmd;
                   Empty_Vec, Pp_Out_Vec : Char_Vector;
                   Spec : constant Subp_Spec := Get_Subp_Spec (Decl);
@@ -569,7 +568,7 @@ package body Stub.Actions is
                   Returns : constant Boolean := F_Subp_Returns (Spec) /= null;
                begin
                   Pp.Actions.Format_Vector
-                    (Pp_Tool, Pp_Cmd,
+                    (Pp_Cmd,
                      File_Name => "",
                      Input => Empty_Vec,
                      Output => Pp_Out_Vec,
@@ -590,7 +589,6 @@ package body Stub.Actions is
             when Ada_Entry_Decl =>
                Generate_Local_Header (Name, Level);
                declare
-                  Pp_Tool : Pp.Actions.Pp_Tool;
                   Pp_Cmd : constant Command_Line := Get_Pp_Cmd;
                   Empty_Vec, Pp_Out_Vec : Char_Vector;
                   Parms : constant Params :=
@@ -600,7 +598,7 @@ package body Stub.Actions is
                begin
                   if Parms /= null then
                      Pp.Actions.Format_Vector
-                       (Pp_Tool, Pp_Cmd,
+                       (Pp_Cmd,
                         File_Name => "",
                         Input => Empty_Vec,
                         Output => Pp_Out_Vec,
@@ -705,7 +703,6 @@ package body Stub.Actions is
       end Walk;
 
       procedure Format is
-         Pp_Tool : Pp.Actions.Pp_Tool;
          Pp_Cmd : constant Command_Line := Get_Pp_Cmd;
 
          Context : Analysis_Context :=
@@ -728,7 +725,7 @@ package body Stub.Actions is
             Pp_Out_Vec := Out_Vec;
          else
             Pp.Actions.Format_Vector
-              (Pp_Tool, Pp_Cmd,
+              (Pp_Cmd,
                File_Name => "",
                Input => Out_Vec,
                Output => Pp_Out_Vec,
