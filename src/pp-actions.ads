@@ -9,8 +9,7 @@ package Pp.Actions is
    type Pp_Tool is new Tool_State with private;
 
    procedure Format_Vector
-     (Tool : in out Pp_Tool;
-      Cmd : Command_Line;
+     (Cmd : Command_Line;
       File_Name : String;
       Input : Char_Vector;
       Output : out Char_Vector;
