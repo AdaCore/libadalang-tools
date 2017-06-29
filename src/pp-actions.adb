@@ -3552,7 +3552,7 @@ package body Pp.Actions is
                Subs : constant Ada_Tree_Array :=
                  (if Tree.Kind = Ada_Subp_Body
                     then Subtrees (Tree)(1 .. Subtree_Count (Tree) - 1) &
-                         Ada_Tree (P_Defining_Name (Subp_Body (Tree)))
+                         P_Defining_Name (Subp_Body (Tree))
                     else Subtrees (Tree));
             begin
                if (Arg (Cmd, Par_Threshold) = 0 and then Arg (Cmd, Separate_Is))
@@ -3608,7 +3608,7 @@ package body Pp.Actions is
             --  is an Ada_Task_Type_Decl or Ada_Single_Task_Decl.
             Subs : constant Ada_Tree_Array :=
               Subtrees (Tree)(1 .. Subtree_Count (Tree) - 1) &
-              Ada_Tree (P_Defining_Name (Basic_Decl (Parent (Tree))));
+                P_Defining_Name (Basic_Decl (Parent (Tree)));
          begin
             Interpret_Template (Subtrees => Subs);
          end Do_Task_Def;

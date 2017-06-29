@@ -489,4 +489,12 @@ package body LAL_Extensions is
       return Characters.Conversions.To_Wide_String (X);
    end Text_To_W_Str;
 
+   function P_Defining_Name
+     (Node : access Basic_Decl_Type'Class) return Name
+   is
+      Result : constant Entity_Name := P_Defining_Name (Node);
+   begin
+      return Result.El;
+   end P_Defining_Name;
+
 end LAL_Extensions;

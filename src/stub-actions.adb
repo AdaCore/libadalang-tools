@@ -10,7 +10,6 @@ with Interfaces; use type Interfaces.Unsigned_16;
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
 with Langkit_Support.Slocs; use Langkit_Support;
-with Langkit_Support.Diagnostics;
 with Libadalang;     use Libadalang;
 with LAL_Extensions; use LAL_Extensions;
 
@@ -219,6 +218,8 @@ package body Stub.Actions is
                 Collect_File_Names => False);
       end return;
    end Get_Pp_Cmd;
+
+   Pp_Cmd : constant Command_Line := Get_Pp_Cmd;
 
    function Intersperse_Spaces (S : W_Str) return W_Str is
       use WChar_Vectors;
@@ -558,7 +559,6 @@ package body Stub.Actions is
                Generate_Local_Header (Name, Level);
                Generate_Subunit_Start;
                declare
-                  Pp_Cmd : constant Command_Line := Get_Pp_Cmd;
                   Empty_Vec, Pp_Out_Vec : Char_Vector;
                   Spec : constant Subp_Spec := Get_Subp_Spec (Decl);
                   Overrides : constant Ada_Overriding_Node :=
@@ -589,7 +589,6 @@ package body Stub.Actions is
             when Ada_Entry_Decl =>
                Generate_Local_Header (Name, Level);
                declare
-                  Pp_Cmd : constant Command_Line := Get_Pp_Cmd;
                   Empty_Vec, Pp_Out_Vec : Char_Vector;
                   Parms : constant Params :=
                     F_Params (Entry_Decl (Decl));
@@ -703,8 +702,6 @@ package body Stub.Actions is
       end Walk;
 
       procedure Format is
-         Pp_Cmd : constant Command_Line := Get_Pp_Cmd;
-
          Context : Analysis_Context :=
            Create (Charset => Wide_Character_Encoding (Cmd));
          Out_Str : String renames Elems (Out_Vec) (1 .. Last_Index (Out_Vec));
@@ -713,24 +710,14 @@ package body Stub.Actions is
             Buffer => Out_Str,
             With_Trivia => True);
       begin
-         if False then -- ????
-            pragma Assert (not Has_Diagnostics (Out_Unit));
-            pragma Assert (Root (Out_Unit) /= null);
-         elsif Has_Diagnostics (Out_Unit) then
-            Formatted_Output.Put ("errors while parsing generated code\n");
-            for D of Analysis.Diagnostics (Out_Unit) loop
-               Formatted_Output.Put
-                 ("\1\n", Langkit_Support.Diagnostics.To_Pretty_String (D));
-            end loop;
-            Pp_Out_Vec := Out_Vec;
-         else
-            Pp.Actions.Format_Vector
-              (Pp_Cmd,
-               File_Name => "",
-               Input => Out_Vec,
-               Output => Pp_Out_Vec,
-               Node => Root (Out_Unit));
-         end if;
+         pragma Assert (not Has_Diagnostics (Out_Unit));
+         pragma Assert (Root (Out_Unit) /= null);
+         Pp.Actions.Format_Vector
+           (Pp_Cmd,
+            File_Name => "",
+            Input => Out_Vec,
+            Output => Pp_Out_Vec,
+            Node => Root (Out_Unit));
 
          Remove (Context, File_Name => "????");
          Destroy (Context);
