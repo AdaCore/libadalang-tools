@@ -301,7 +301,7 @@ package body LAL_Extensions is
          when Ada_Generic_Subp_Renaming_Decl =>
             F_Aspects (Generic_Subp_Renaming_Decl (Decl)),
          when Ada_Generic_Subp_Decl =>
-            F_Aspects (Generic_Subp_Decl (Decl)),
+            F_Aspects (F_Subp_Decl (Generic_Subp_Decl (Decl))),
          when Ada_Object_Decl =>
             F_Aspects (Object_Decl (Decl)),
          when Ada_Package_Renaming_Decl =>
@@ -445,7 +445,7 @@ package body LAL_Extensions is
          when Ada_Classic_Subp_Decl =>
             return F_Subp_Spec (Classic_Subp_Decl (Node));
          when Ada_Generic_Subp_Decl =>
-            return F_Subp_Spec (Generic_Subp_Decl (Node));
+            return F_Subp_Spec (F_Subp_Decl (Generic_Subp_Decl (Node)));
          when Ada_Subp_Body_Stub =>
             return F_Subp_Spec (Subp_Body_Stub (Node));
          when Ada_Subp_Body =>

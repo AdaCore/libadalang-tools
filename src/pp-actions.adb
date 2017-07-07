@@ -481,7 +481,7 @@ package body Pp.Actions is
            when Ada_Unconstrained_Array_Index => null,
            when Ada_Contract_Case_Assoc => null,
            when Ada_Contract_Cases => null,
-           when Ada_Instantiation_Env_Holder => null,
+           when Ada_Env_Holder => L (""),
             --  ???Not sure what those are.
 
            when Ada_Ada_List => null,
@@ -592,11 +592,12 @@ package body Pp.Actions is
            when Ada_Exception_Decl =>
                  L ("?~,@ ~~ ^: exception!", Aspects),
            when Ada_Generic_Package_Instantiation =>
-             L ("package ! is new !?[@ (~,@ ~)]~", Aspects, "/"),
-                --  The "/" is to ignore the instantiation_env_holder.
+             L ("/package ! is new !?[@ (~,@ ~)]~", Aspects),
+                --  The "/" is to ignore the env_holder.
                 --  ???Not sure what it is, nor why it's syntactic.
            when Ada_Generic_Subp_Instantiation =>
-             L ("?~~ ~! ! is new !?[@ (~,@ ~)]~", Aspects, "/"),
+             L ("/?~~ ~! ! is new !?[@ (~,@ ~)]~", Aspects, "/"),
+               --  ???Not sure why this has TWO env_holders.
            when Ada_Generic_Package_Decl =>
              L ("generic$",
                 "!",
@@ -613,7 +614,9 @@ package body Pp.Actions is
            when Ada_Generic_Subp_Renaming_Decl =>
              L ("generic ! ! renames !", Aspects),
            when Ada_Generic_Subp_Decl =>
-             L ("generic$", "!", "!", Aspects),
+             L ("generic$", "!", "!"),
+           when Ada_Generic_Subp_Internal =>
+             L ("!", Aspects),
            when Ada_Number_Decl =>
              L ("?~,@ ~~ ^: constant ^2:=[@ !]"),
            when Ada_Object_Decl |
