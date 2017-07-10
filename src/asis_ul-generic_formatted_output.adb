@@ -21,11 +21,27 @@
 -- The gnat2xml tool was derived from the Avatox sources.                   --
 ------------------------------------------------------------------------------
 
+with GNAT.Exception_Traces;
+with GNAT.Traceback.Symbolic;
+
 with Ada.Finalization; use Ada.Finalization;
 
 with ASIS_UL.String_Utilities; use ASIS_UL.String_Utilities;
 
 package body ASIS_UL.Generic_Formatted_Output is
+   package Dummy is
+   end Dummy;
+   package body Dummy is
+   begin
+      --  Turn on symbolic tracebacks on unhandled exceptions. We put this here
+      --  to make it happen as early as possible. It is supposed to be done in
+      --  System.Traceback.Symbolic (s-trasym-dwarf.adb), but that's not
+      --  working for some reason.
+
+      GNAT.Exception_Traces.Set_Trace_Decorator
+        (GNAT.Traceback.Symbolic.Symbolic_Traceback'Access);
+      GNAT.Exception_Traces.Trace_On (GNAT.Exception_Traces.Unhandled_Raise);
+   end Dummy;
 
    Column : Natural := 1;
 

@@ -243,6 +243,8 @@ package body LAL_UL.Drivers is
          Tool_Help (Tool);
       end Print_Help;
 
+   --  Start of processing for Driver
+
    begin
       Environment.Create_Temp_Dir;
 

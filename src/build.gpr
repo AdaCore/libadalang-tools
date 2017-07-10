@@ -22,7 +22,9 @@ project Build is
 
          when "prod" =>
             for Default_Switches ("Ada") use
-              ("-gnatyg", "-gnatwae", "-gnatw.u", "-g", "-Ofast", "-gnatp", "-gnatn2");
+--???              ("-gnatyg", "-gnatwae", "-gnatw.u", "-g", "-Ofast", "-gnatp", "-gnatn2");
+--  Temporarily use debug options, so we can get a stack traceback on Darwin.
+              ("-gnatyg", "-gnatwae", "-gnatw.u", "-g", "-O0", "-gnata", "-gnatVa");
       end case;
    end Compiler;
 
@@ -31,5 +33,9 @@ project Build is
       for Executable ("metrics-main.adb") use "lalmetric";
       for Executable ("stub-main.adb") use "lalstub";
    end Builder;
+
+   package Binder is
+      for Default_Switches ("Ada") use ("-Es");
+   end Binder;
 
 end Build;
