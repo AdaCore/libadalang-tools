@@ -45,7 +45,7 @@ class ShellScriptDriver(BaseDriver):
         os.environ['PATH'] = "%s:." % os.environ['PATH']
         with open(os.path.join(self.working_dir(), 'test.sh')) as f1, \
              open(os.path.join(self.working_dir(), '__test.sh'), 'w') as f2:
-            f2.write('#! /usr/bin/env sh\n' + f1.read())
+            f2.write('#!/bin/sh\n' + f1.read())
         os.chmod(os.path.join(self.working_dir(), '__test.sh'), 0755)
         self.call_and_check(['./__test.sh'])
         if self.diff:
