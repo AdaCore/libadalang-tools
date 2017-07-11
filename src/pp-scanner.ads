@@ -21,8 +21,8 @@
 -- The gnat2xml tool was derived from the Avatox sources.                   --
 ------------------------------------------------------------------------------
 
-with ASIS_UL.Vectors;
-with LAL_UL.Symbols;
+with Utils.Vectors;
+with Utils.Symbols;
 
 with Pp.Buffers; use Pp.Buffers;
 use Pp.Buffers.Marker_Vectors;
@@ -46,7 +46,7 @@ package Pp.Scanner is
    --     We don't check for errors, because we're in ASIS, where Ada code is
    --     known to be legal.
 
-   package Syms renames LAL_UL.Symbols;
+   package Syms renames Utils.Symbols;
 
    type Token_Kind is
      (Nil,
@@ -174,7 +174,7 @@ package Pp.Scanner is
 
    type Token_Index is new Positive;
    type Token_Array is array (Token_Index range <>) of Token;
-   package Token_Vectors is new ASIS_UL.Vectors
+   package Token_Vectors is new Utils.Vectors
      (Token_Index,
       Token,
       Token_Array);

@@ -28,7 +28,7 @@ with Ada.Characters.Handling; use Ada.Characters.Handling;
 with Ada.Containers.Hashed_Sets; use Ada.Containers;
 
 package body Pp.Formatting.Dictionaries is
-   package Syms renames LAL_UL.Symbols;
+   package Syms renames Utils.Symbols;
 
    subtype Symbol is Syms.Symbol;
 

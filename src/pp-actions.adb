@@ -23,25 +23,25 @@ with Langkit_Support.Slocs; use Langkit_Support;
 with Libadalang;     use Libadalang;
 with LAL_Extensions; use LAL_Extensions;
 
-with LAL_UL.Common; use LAL_UL.Common;
-with ASIS_UL.Dbg_Out;
-with LAL_UL.Formatted_Output;
-with LAL_UL.Tool_Names;
-with ASIS_UL.Generic_Formatted_Output;
+with Utils.Common; use Utils.Common;
+with Utils.Dbg_Out;
+with Utils.Formatted_Output;
+with Utils.Tool_Names;
+with Utils.Generic_Formatted_Output;
 
-with ASIS_UL.Debug; use ASIS_UL.Debug;
-with ASIS_UL.Vectors;
+with Utils_Debug; use Utils_Debug;
+with Utils.Vectors;
 
-with LAL_UL.Symbols; use LAL_UL.Symbols;
-with LAL_UL.Environment;
-with LAL_UL.Predefined_Symbols; use LAL_UL.Predefined_Symbols;
+with Utils.Symbols; use Utils.Symbols;
+with Utils.Environment;
+with Utils.Predefined_Symbols; use Utils.Predefined_Symbols;
 
 package body Pp.Actions is
 
-   use ASIS_UL.Char_Vectors.WChar_Vectors;
+   use Utils.Char_Vectors.WChar_Vectors;
 
    function Image (X : Integer) return String
-     renames ASIS_UL.String_Utilities.Image;
+     renames Utils.String_Utilities.Image;
 
    use Common_Flag_Switches, Common_String_Switches,
      Common_String_Seq_Switches, Common_Nat_Switches;
@@ -64,7 +64,7 @@ package body Pp.Actions is
    --  the output to a temp file, and Finalize moves the temp file to the
    --  actual output file. The file name file is used to pass the names of the
    --  temp and output files from ASIS_Processing to Finalize (both subunits of
-   --  ASIS_UL.Source_Table.Processing).
+   --  Utils.Source_Table.Processing).
    --
    --  ASIS_Processing is called once for each file, and it writes two lines to
    --  the file name file: the name of the temp file, and then the name of the
@@ -295,7 +295,7 @@ package body Pp.Actions is
    procedure Tree_To_Ada_2
      (Root      : Ada_Node;
       Out_Buf   : in out Buffer;
-      Cmd       : LAL_UL.Command_Lines.Command_Line;
+      Cmd       : Utils.Command_Lines.Command_Line;
       Partial   : Boolean);
    --  Partial is True if we're not processing an entire file.
 
@@ -1000,9 +1000,9 @@ package body Pp.Actions is
    pragma Warnings (Off);
    pragma Style_Checks (Off);
    procedure knd (X : Ada_Node) is
-      use ASIS_UL.Dbg_Out;
+      use Utils.Dbg_Out;
    begin
-      ASIS_UL.Dbg_Out.Output_Enabled := True;
+      Utils.Dbg_Out.Output_Enabled := True;
       Put ("\1\n", Kind (X)'Img);
    end knd;
 
@@ -1013,28 +1013,28 @@ package body Pp.Actions is
          (Image (Integer (Sloc_Range.Start_Line)) & ": " &
           Image (Integer (Sloc_Range.End_Line)));
 
-      use ASIS_UL.Dbg_Out;
+      use Utils.Dbg_Out;
    begin
-      ASIS_UL.Dbg_Out.Output_Enabled := True;
+      Utils.Dbg_Out.Output_Enabled := True;
       Put ("\1\n", Lines_String (Sloc_Range (X)));
    end psloc;
 
    procedure nn (X : Ada_Node) is
-      use ASIS_UL.Dbg_Out;
+      use Utils.Dbg_Out;
    begin
-      ASIS_UL.Dbg_Out.Output_Enabled := True;
+      Utils.Dbg_Out.Output_Enabled := True;
       Put ("\1\n", (if X = null then "null" else Short_Image (X)));
    end nn;
 
    procedure ppp (X : Ada_Node) is
-      use ASIS_UL.Dbg_Out;
+      use Utils.Dbg_Out;
    begin
       nn (X);
       Print (X);
    end ppp;
 
    procedure Put_Ada_Node_Array (X : Ada_Node_Array) is
-      use ASIS_UL.Dbg_Out;
+      use Utils.Dbg_Out;
    begin
       for N of X loop
          nn (N);
@@ -1043,7 +1043,7 @@ package body Pp.Actions is
    end Put_Ada_Node_Array;
 
    procedure Put_Child_Record (C : Child_Record) is
-      use ASIS_UL.Dbg_Out;
+      use Utils.Dbg_Out;
    begin
       case C.Kind is
          when Child =>
@@ -1061,7 +1061,7 @@ package body Pp.Actions is
    end Put_Child_Record;
 
    procedure Put_Children_Array (A : Children_Array) is
-      use ASIS_UL.Dbg_Out;
+      use Utils.Dbg_Out;
    begin
       for I in A'Range loop
          Put ("\1: ", Image (I));
@@ -1074,7 +1074,7 @@ package body Pp.Actions is
       Message : String := "")
    is
       pragma Unreferenced (Tool);
-      use LAL_UL.Formatted_Output;
+      use Utils.Formatted_Output;
    begin
       if Debug_Flag_V then
          Put ("\1\n", Message);
@@ -1158,7 +1158,7 @@ package body Pp.Actions is
    procedure Tree_To_Ada_2
      (Root      : Ada_Node;
       Out_Buf   : in out Buffer;
-      Cmd       : LAL_UL.Command_Lines.Command_Line;
+      Cmd       : Utils.Command_Lines.Command_Line;
       Partial   : Boolean)
    is
 
@@ -1305,7 +1305,7 @@ package body Pp.Actions is
 --              Kind not in Flat_Attribute_Reference_Kinds
 --              and then
 --              (Str (1) = '"' -- operator symbol
---               or else Is_Reserved_Word (Id, LAL_UL.Ada_Version)
+--               or else Is_Reserved_Word (Id, Utils.Ada_Version)
 --               or else Id = Name_And_Then
 --               or else Id = Name_Or_Else)
 --            then
@@ -1380,7 +1380,7 @@ package body Pp.Actions is
          end if;
       end Id_With_Casing;
 
-      package Buffered_Output is new ASIS_UL.Generic_Formatted_Output
+      package Buffered_Output is new Utils.Generic_Formatted_Output
         (W_Char,
          W_Str,
          Basic_Put_Char => Put_To_Buffer);
@@ -1810,7 +1810,7 @@ package body Pp.Actions is
       subtype Tree_Stack_Count is
         Tree_Stack_Index'Base range 0 .. Tree_Stack_Index'Last;
       type Tree_Array is array (Tree_Stack_Index range <>) of Ada_Tree;
-      package Tree_Stacks is new ASIS_UL.Vectors
+      package Tree_Stacks is new Utils.Vectors
         (Tree_Stack_Index,
          Ada_Tree,
          Tree_Array);
@@ -2034,7 +2034,7 @@ package body Pp.Actions is
                         pragma Assert (False);
                   end case;
                   if Assert_Enabled then
-                     Tok := Scanner.Get_Token (W_Str (T), LAL_UL.Ada_Version);
+                     Tok := Scanner.Get_Token (W_Str (T), Utils.Ada_Version);
                      pragma Assert (Text = Tok.Normalized);
                      pragma Assert (Tok.Sloc.First = 1);
                   end if;
@@ -2512,8 +2512,8 @@ package body Pp.Actions is
                            Subtree_Index := Cur_Subtree_Index;
                         end if;
                         if Subtree_Index not in Subtrees_Index then
-                           ASIS_UL.Dbg_Out.Output_Enabled := True;
-                           ASIS_UL.Dbg_Out.Put
+                           Utils.Dbg_Out.Output_Enabled := True;
+                           Utils.Dbg_Out.Put
                              ("Subtree_Index = \1, not in \2..\3 <<\4>>\n",
                               Image (Subtree_Index),
                               Image (Subtrees'First), Image (Subtrees'Last),
@@ -3337,10 +3337,10 @@ package body Pp.Actions is
          end Do_Label;
 
          procedure Do_Others is
-            use ASIS_UL.Dbg_Out;
+            use Utils.Dbg_Out;
          begin
             if Template_Table (Tree.Kind) = null then
-               ASIS_UL.Dbg_Out.Output_Enabled := True;
+               Utils.Dbg_Out.Output_Enabled := True;
                Put ("null template:\1", Short_Image (Tree));
                raise Program_Error;
             else
@@ -3879,7 +3879,7 @@ package body Pp.Actions is
    is
       Partial : constant Boolean := Is_Empty (Input);
 
-      use LAL_UL.Formatted_Output;
+      use Utils.Formatted_Output;
 
       Src_Buf : Buffer;
       --  Buffer containing the text of the original source file
@@ -4023,7 +4023,7 @@ package body Pp.Actions is
          use Scanner;
       begin
          if Debug_Mode then
-            ASIS_UL.Dbg_Out.Output_Enabled := True;
+            Utils.Dbg_Out.Output_Enabled := True;
          end if;
 
          if not Pp_Off_On_Delimiters_Initialized then
@@ -4037,7 +4037,7 @@ package body Pp.Actions is
          Clear (All_Line_Breaks);
          Clear (Tabs);
 
-         Get_Tokens (Src_Buf, Src_Tokens, LAL_UL.Ada_Version, Pp_Off_On_Delimiters);
+         Get_Tokens (Src_Buf, Src_Tokens, Utils.Ada_Version, Pp_Off_On_Delimiters);
          if Debug_Mode then
             Dbg_Out.Put ("Src_Tokens:\n");
             Put_Tokens (Src_Tokens);
@@ -4063,7 +4063,7 @@ package body Pp.Actions is
 
       procedure Maybe_To_Ada
 --        (CU : Asis.Compilation_Unit;
---         Cmd         : LAL_UL.Command_Lines.Command_Line;
+--         Cmd         : Utils.Command_Lines.Command_Line;
 --         Output_Name : String;
 --         Form_String : String;
 --         Do_Diff : Boolean;
@@ -4075,7 +4075,7 @@ package body Pp.Actions is
 
       procedure Maybe_To_Ada
 --        (CU      : Asis.Compilation_Unit;
---         Cmd         : LAL_UL.Command_Lines.Command_Line;
+--         Cmd         : Utils.Command_Lines.Command_Line;
 --         Output_Name : String;
 --         Form_String : String;
 --         Do_Diff : Boolean;
@@ -4146,7 +4146,7 @@ package body Pp.Actions is
 --
 --            if Skip_Gen then
 --               Scanner.Get_Tokens
---                 (Src_Buf, Src_Tokens, LAL_UL.Ada_Version, Pp_Off_On_Delimiters,
+--                 (Src_Buf, Src_Tokens, Utils.Ada_Version, Pp_Off_On_Delimiters,
 --                  Gen_Regions => Src_Gen_Regions'Unchecked_Access);
 --               Gen_Regions := Src_Gen_Regions'Unchecked_Access;
 --            end if;
@@ -4159,7 +4159,7 @@ package body Pp.Actions is
 --            Cache (Id) := Tree;
 --            Resolve_Symbols (Tree);
 --
---            if Ada_Trees.Debug_Mode or else ASIS_UL.Debug.Debug_Flag_2 then
+--            if Ada_Trees.Debug_Mode or else Utils_Debug.Debug_Flag_2 then
 --               Ada_Trees.Self_Rep.Put_Ada_Tree (Tree);
 --               Put ("\n");
 --            end if;
@@ -4209,7 +4209,7 @@ package body Pp.Actions is
       Unit : Analysis_Unit)
    is
       pragma Unreferenced (Tool);
-      use LAL_UL.Formatted_Output;
+      use Utils.Formatted_Output;
 
       Output_Mode : constant Output_Modes := Get_Output_Mode (Cmd);
       Do_Diff : constant Boolean := Output_Mode in Replace_Modes;
@@ -4341,8 +4341,8 @@ package body Pp.Actions is
       exception
          pragma Warnings (Off);
          when Lock_Error =>
---            ASIS_UL.Output.Error ("cannot create " & Lock_File_Name);
---            ASIS_UL.Output.Error ("delete it by hand if stale");
+--            Utils.Output.Error ("cannot create " & Lock_File_Name);
+--            Utils.Output.Error ("delete it by hand if stale");
             raise;
          pragma Warnings (On);
       end Write_File_Name_File;
@@ -4538,7 +4538,7 @@ package body Pp.Actions is
 
    procedure Tool_Help (Tool : Pp_Tool) is
       pragma Unreferenced (Tool);
-      use LAL_UL.Formatted_Output;
+      use Utils.Formatted_Output;
    begin
       pragma Style_Checks ("M200"); -- Allow long lines
 

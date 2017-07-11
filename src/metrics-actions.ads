@@ -1,14 +1,14 @@
 with Libadalang.Analysis; use Libadalang.Analysis;
-with LAL_UL.Command_Lines; use LAL_UL.Command_Lines;
-with LAL_UL.Tools; use LAL_UL.Tools;
+with Utils.Command_Lines; use Utils.Command_Lines;
+with Utils.Tools; use Utils.Tools;
 
 private with Ada.Containers.Hashed_Sets;
-private with ASIS_UL.Vectors;
+private with Utils.Vectors;
 private with Langkit_Support.Slocs;
 private with METRICS.Command_Lines;
 private with METRICS.Line_Counting;
-private with LAL_UL.Generic_Symbols;
-private with LAL_UL.Symbols;
+private with Utils.Generic_Symbols;
+private with Utils.Symbols;
 
 package METRICS.Actions is
 
@@ -32,10 +32,10 @@ private
    use METRICS.Command_Lines;
    use METRICS.Line_Counting;
 
-   use LAL_UL.Symbols;
-   subtype Symbol is LAL_UL.Symbols.Symbol;
+   use Utils.Symbols;
+   subtype Symbol is Utils.Symbols.Symbol;
 
-   package CU_Symbols is new LAL_UL.Generic_Symbols;
+   package CU_Symbols is new Utils.Generic_Symbols;
    use CU_Symbols;
    subtype CU_Symbol is CU_Symbols.Symbol;
    subtype CU_Symbol_Index is CU_Symbols.Symbol_Index;
@@ -59,7 +59,7 @@ private
    type Metrix_Index is new Positive;
    type Metrix_Array is array (Metrix_Index range <>) of Metrix_Ref;
    package Metrix_Vectors is
-      new ASIS_UL.Vectors (Metrix_Index, Metrix_Ref, Metrix_Array);
+      new Utils.Vectors (Metrix_Index, Metrix_Ref, Metrix_Array);
    use Metrix_Vectors;
 
    Null_Kind : constant Ada_Node_Kind_Type := Ada_Abort_Absent;

@@ -13,19 +13,19 @@ with Langkit_Support.Slocs; use Langkit_Support;
 with Libadalang;     use Libadalang;
 with LAL_Extensions; use LAL_Extensions;
 
-with LAL_UL.Common; use LAL_UL.Common;
-with ASIS_UL.Dbg_Out;
-with LAL_UL.Formatted_Output;
-with LAL_UL.Tool_Names;
-with ASIS_UL.Char_Vectors; use ASIS_UL.Char_Vectors;
-use ASIS_UL.Char_Vectors.Char_Vectors;
+with Utils.Common; use Utils.Common;
+with Utils.Dbg_Out;
+with Utils.Formatted_Output;
+with Utils.Tool_Names;
+with Utils.Char_Vectors; use Utils.Char_Vectors;
+use Utils.Char_Vectors.Char_Vectors;
 with GNATCOLL.VFS;
 with GNATCOLL.Projects;
-with ASIS_UL.Generic_Formatted_Output;
+with Utils.Generic_Formatted_Output;
 
-with ASIS_UL.Debug; use ASIS_UL.Debug;
+with Utils_Debug; use Utils_Debug;
 
-with LAL_UL.Environment;
+with Utils.Environment;
 
 with Pp.Actions;
 with Pp.Command_Lines;
@@ -33,7 +33,7 @@ with Pp.Command_Lines;
 package body Stub.Actions is
 
    function Image (X : Integer) return String
-     renames ASIS_UL.String_Utilities.Image;
+     renames Utils.String_Utilities.Image;
 
    use Common_Flag_Switches, Common_String_Switches,
      Common_String_Seq_Switches, Common_Nat_Switches;
@@ -72,9 +72,9 @@ package body Stub.Actions is
    pragma Warnings (Off);
    pragma Style_Checks (Off);
    procedure knd (X : Ada_Node) is
-      use ASIS_UL.Dbg_Out;
+      use Utils.Dbg_Out;
    begin
-      ASIS_UL.Dbg_Out.Output_Enabled := True;
+      Utils.Dbg_Out.Output_Enabled := True;
       Put ("\1\n", Kind (X)'Img);
    end knd;
 
@@ -85,28 +85,28 @@ package body Stub.Actions is
          (Image (Integer (Sloc_Range.Start_Line)) & ": " &
           Image (Integer (Sloc_Range.End_Line)));
 
-      use ASIS_UL.Dbg_Out;
+      use Utils.Dbg_Out;
    begin
-      ASIS_UL.Dbg_Out.Output_Enabled := True;
+      Utils.Dbg_Out.Output_Enabled := True;
       Put ("\1\n", Lines_String (Sloc_Range (X)));
    end psloc;
 
    procedure nn (X : Ada_Node) is
-      use ASIS_UL.Dbg_Out;
+      use Utils.Dbg_Out;
    begin
-      ASIS_UL.Dbg_Out.Output_Enabled := True;
+      Utils.Dbg_Out.Output_Enabled := True;
       Put ("\1\n", (if X = null then "null" else Short_Image (X)));
    end nn;
 
    procedure ppp (X : Ada_Node) is
-      use ASIS_UL.Dbg_Out;
+      use Utils.Dbg_Out;
    begin
       nn (X);
       Print (X);
    end ppp;
 
    procedure Put_Ada_Node_Array (X : Ada_Node_Array) is
-      use ASIS_UL.Dbg_Out;
+      use Utils.Dbg_Out;
    begin
       for N of X loop
          nn (N);
@@ -115,7 +115,7 @@ package body Stub.Actions is
    end Put_Ada_Node_Array;
 
    procedure Put_Child_Record (C : Child_Record) is
-      use ASIS_UL.Dbg_Out;
+      use Utils.Dbg_Out;
    begin
       case C.Kind is
          when Child =>
@@ -133,7 +133,7 @@ package body Stub.Actions is
    end Put_Child_Record;
 
    procedure Put_Children_Array (A : Children_Array) is
-      use ASIS_UL.Dbg_Out;
+      use Utils.Dbg_Out;
    begin
       for I in A'Range loop
          Put ("\1: ", Image (I));
@@ -146,7 +146,7 @@ package body Stub.Actions is
       Message : String := "")
    is
       pragma Unreferenced (Tool);
-      use LAL_UL.Formatted_Output;
+      use Utils.Formatted_Output;
    begin
       if Debug_Flag_V then
          Put ("\1\n", Message);
@@ -349,7 +349,7 @@ package body Stub.Actions is
          Encode (WC, Wide_Char_Encoding);
       end Put_To_Out_Vec;
 
-      package Buffered_Output is new ASIS_UL.Generic_Formatted_Output
+      package Buffered_Output is new Utils.Generic_Formatted_Output
         (W_Char,
          W_Str,
          Basic_Put_Char => Put_To_Out_Vec);
@@ -947,7 +947,7 @@ package body Stub.Actions is
 
    procedure Tool_Help (Tool : Stub_Tool) is
       pragma Unreferenced (Tool);
-      use LAL_UL.Formatted_Output;
+      use Utils.Formatted_Output;
    begin
       pragma Style_Checks ("M200"); -- Allow long lines
 

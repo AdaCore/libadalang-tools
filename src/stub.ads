@@ -26,10 +26,10 @@
 pragma Warnings (Off); -- imported for children
 with Ada.Wide_Characters.Handling; use Ada.Wide_Characters.Handling;
 use Ada;
-with ASIS_UL.Debug;
-with ASIS_UL.Dbg_Out; use ASIS_UL;
-with ASIS_UL.String_Utilities; use ASIS_UL.String_Utilities;
-with LAL_UL; use LAL_UL;
+with Utils_Debug;
+with Utils.Dbg_Out; use Utils;
+with Utils.String_Utilities; use Utils.String_Utilities;
+with Utils; use Utils;
 pragma Warnings (On);
 
 package Stub is
@@ -37,7 +37,7 @@ package Stub is
 
    pragma Elaborate_Body;
 
-   Debug_Mode : Boolean renames ASIS_UL.Debug.Debug_Flag_9;
+   Debug_Mode : Boolean renames Utils_Debug.Debug_Flag_9;
 
    Assert_Enabled : Boolean := False;
    --  Set to True in body if assertions are enabled. This should really be a

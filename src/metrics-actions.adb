@@ -13,18 +13,18 @@ with Libadalang;     use Libadalang;
 with Libadalang.Lexer;
 with LAL_Extensions; use LAL_Extensions;
 
-with LAL_UL.Common; use LAL_UL; use LAL_UL.Common;
-with ASIS_UL.Dbg_Out;
-with LAL_UL.Formatted_Output;
-with ASIS_UL.String_Utilities; use ASIS_UL.String_Utilities;
-with LAL_UL.Tool_Names;
+with Utils.Common; use Utils; use Utils.Common;
+with Utils.Dbg_Out;
+with Utils.Formatted_Output;
+with Utils.String_Utilities; use Utils.String_Utilities;
+with Utils.Tool_Names;
 
-with ASIS_UL.Debug; use ASIS_UL.Debug;
-with LAL_UL.Predefined_Symbols; use LAL_UL.Predefined_Symbols;
+with Utils_Debug; use Utils_Debug;
+with Utils.Predefined_Symbols; use Utils.Predefined_Symbols;
 
 pragma Warnings (Off);
-with LAL_UL.Projects;
-with LAL_UL.Drivers;
+with Utils.Projects;
+with Utils.Drivers;
 pragma Warnings (On);
 
 package body METRICS.Actions is
@@ -113,7 +113,7 @@ package body METRICS.Actions is
       Unit_Coupling_In       => True);
 
    function Image (X : Integer) return String
-     renames ASIS_UL.String_Utilities.Image;
+     renames Utils.String_Utilities.Image;
 
    pragma Warnings (Off);
    procedure Stop (Node : Ada_Node; S : W_Str);
@@ -121,7 +121,7 @@ package body METRICS.Actions is
 
    procedure Stop (Node : Ada_Node; S : W_Str) is
       P : constant Ada_Node_Array_Access := Parents (Node);
-      use ASIS_UL.Dbg_Out;
+      use Utils.Dbg_Out;
    begin
       if False then
          Put ("Node:\n");
@@ -142,27 +142,27 @@ package body METRICS.Actions is
    function Par (X : Ada_Node) return Ada_Node is (Parent (X));
 
    procedure knd (X : Ada_Node) is
-      use ASIS_UL.Dbg_Out;
+      use Utils.Dbg_Out;
    begin
       Put ("\1\n", Kind (X)'Img);
    end knd;
 
    procedure pp (X : Ada_Node) is
-      use ASIS_UL.Dbg_Out;
+      use Utils.Dbg_Out;
    begin
-      ASIS_UL.Dbg_Out.Output_Enabled := True;
+      Utils.Dbg_Out.Output_Enabled := True;
       Put ("\1\n", (if X = null then "null" else Short_Image (X)));
    end pp;
 
    procedure ppp (X : Ada_Node) is
-      use ASIS_UL.Dbg_Out;
+      use Utils.Dbg_Out;
    begin
       pp (X);
       Print (X);
    end ppp;
 
    procedure Put_Ada_Node_Array (X : Ada_Node_Array) is
-      use ASIS_UL.Dbg_Out;
+      use Utils.Dbg_Out;
    begin
       for N of X loop
          pp (N);
@@ -172,7 +172,7 @@ package body METRICS.Actions is
    pragma Warnings (On);
 
    procedure Put_Child_Record (C : Child_Record) is
-      use ASIS_UL.Dbg_Out;
+      use Utils.Dbg_Out;
    begin
       case C.Kind is
          when Child =>
@@ -190,7 +190,7 @@ package body METRICS.Actions is
    end Put_Child_Record;
 
    procedure Put_Children_Array (A : Children_Array) is
-      use ASIS_UL.Dbg_Out;
+      use Utils.Dbg_Out;
    begin
       for I in A'Range loop
          Put ("\1: ", Image (I));
@@ -208,7 +208,7 @@ package body METRICS.Actions is
      Metrics_String_Switches, Metrics_String_Seq_Switches;
    pragma Warnings (On);
 
-   use LAL_UL.Formatted_Output;
+   use Utils.Formatted_Output;
 
    Subunit_Sym : constant Symbol := Intern (" - subunit");
    Library_Item_Sym : constant Symbol := Intern (" - library item");
@@ -218,7 +218,7 @@ package body METRICS.Actions is
    type Metrix_Ref_Array is
      array (CU_Symbol_Index range <>) of aliased Metrix_Ref;
 
-   package CU_Metrix is new ASIS_UL.Vectors
+   package CU_Metrix is new Utils.Vectors
      (CU_Symbol_Index, Metrix_Ref, Metrix_Ref_Array);
    use CU_Metrix;
    Specs : CU_Metrix.Vector;
@@ -2777,7 +2777,7 @@ package body METRICS.Actions is
       type EC_Index is new Positive;
       type EC_Array is array (EC_Index range <>) of EC_Rec;
       package EC_Vectors is
-         new ASIS_UL.Vectors (EC_Index, EC_Rec, EC_Array);
+         new Utils.Vectors (EC_Index, EC_Rec, EC_Array);
       use EC_Vectors;
       EC_Stack : EC_Vectors.Vector; -- "essential complexity" stack
 

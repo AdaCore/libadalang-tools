@@ -1,5 +1,5 @@
-with LAL_UL.Command_Lines; use LAL_UL.Command_Lines;
-with LAL_UL.Common;        use LAL_UL.Common;
+with Utils.Command_Lines; use Utils.Command_Lines;
+with Utils.Common;        use Utils.Common;
 package METRICS.Command_Lines is
 
    use
@@ -22,7 +22,7 @@ package METRICS.Command_Lines is
      ((Output_Directory => +"-d", others => null));
    --  Note: gnatmetric allows -d to specify the directory. This must come
    --  before the Copy_Descriptor below. This shorthand is in addition to
-   --  --output-dir, as defined in LAL_UL.Common.
+   --  --output-dir, as defined in Utils.Common.
 
    package Freeze_Common is new Freeze_Descriptor (Common_Descriptor);
 

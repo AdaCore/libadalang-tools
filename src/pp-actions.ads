@@ -1,8 +1,8 @@
 with Libadalang.Analysis; use Libadalang.Analysis;
-with ASIS_UL.Char_Vectors; use ASIS_UL.Char_Vectors;
-use ASIS_UL.Char_Vectors.Char_Vectors;
-with LAL_UL.Command_Lines; use LAL_UL.Command_Lines;
-with LAL_UL.Tools; use LAL_UL.Tools;
+with Utils.Char_Vectors; use Utils.Char_Vectors;
+use Utils.Char_Vectors.Char_Vectors;
+with Utils.Command_Lines; use Utils.Command_Lines;
+with Utils.Tools; use Utils.Tools;
 
 package Pp.Actions is
 

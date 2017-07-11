@@ -23,7 +23,7 @@
 
 with Text_IO;
 
-with LAL_UL.Predefined_Symbols; use LAL_UL.Predefined_Symbols;
+with Utils.Predefined_Symbols; use Utils.Predefined_Symbols;
 
 package body Pp.Scanner is
    use Syms;

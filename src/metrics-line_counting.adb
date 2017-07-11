@@ -1,7 +1,7 @@
 with Libadalang; use Libadalang;
 with Libadalang.Lexer;    use Libadalang.Lexer;
 
-with ASIS_UL.Vectors;
+with Utils.Vectors;
 package body METRICS.Line_Counting is
 
    subtype Token_Data_Type is Libadalang.Analysis.Token_Data_Type;
@@ -30,7 +30,7 @@ package body METRICS.Line_Counting is
    --  Check some required properties of subsequent elements, and
    --  raise an exception if we find something wrong.
 
-   package Cumulative_Counts_Vectors is new ASIS_UL.Vectors
+   package Cumulative_Counts_Vectors is new Utils.Vectors
      (Line_Num, Cumulative_Counts, Cumulative_Counts_Array);
 
    function Get_Cumulative_Counts

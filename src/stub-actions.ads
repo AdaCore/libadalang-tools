@@ -1,6 +1,6 @@
 with Libadalang.Analysis; use Libadalang.Analysis;
-with LAL_UL.Command_Lines; use LAL_UL.Command_Lines;
-with LAL_UL.Tools; use LAL_UL.Tools;
+with Utils.Command_Lines; use Utils.Command_Lines;
+with Utils.Tools; use Utils.Tools;
 
 package Stub.Actions is
 

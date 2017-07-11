@@ -1,5 +1,5 @@
-with LAL_UL.Command_Lines; use LAL_UL.Command_Lines;
-with LAL_UL.Common;        use LAL_UL.Common;
+with Utils.Command_Lines; use Utils.Command_Lines;
+with Utils.Common;        use Utils.Common;
 package Stub.Command_Lines is
 
    package Freeze_Common is new Freeze_Descriptor (Common_Descriptor);
@@ -95,6 +95,6 @@ package Stub.Command_Lines is
      Stub_String_Switches,
      Stub_Nat_Switches;
 
-   subtype Cmd_Line is LAL_UL.Command_Lines.Command_Line;
+   subtype Cmd_Line is Utils.Command_Lines.Command_Line;
 
 end Stub.Command_Lines;

@@ -31,7 +31,7 @@ with LAL_Extensions; use LAL_Extensions;
 with Pp.Command_Lines; use Pp.Command_Lines;
 
 package body Pp.Formatting.Tree_Formatting is
-   use LAL_UL.Command_Lines;
+   use Utils.Command_Lines;
 
    pragma Style_Checks ("M85");
 

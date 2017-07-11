@@ -28,18 +28,18 @@ with Ada.Containers.Indefinite_Vectors;
 
 with Libadalang.Analysis;
 
-with ASIS_UL.Vectors;
-with ASIS_UL.Char_Vectors; use ASIS_UL.Char_Vectors;
-use ASIS_UL.Char_Vectors.WChar_Vectors;
-with LAL_UL.Symbols;
-with LAL_UL.Predefined_Symbols; use LAL_UL.Predefined_Symbols;
-with LAL_UL.Command_Lines;
+with Utils.Vectors;
+with Utils.Char_Vectors; use Utils.Char_Vectors;
+use Utils.Char_Vectors.WChar_Vectors;
+with Utils.Symbols;
+with Utils.Predefined_Symbols; use Utils.Predefined_Symbols;
+with Utils.Command_Lines;
 with Pp.Buffers; use Pp.Buffers; use Pp.Buffers.Marker_Vectors;
 with Pp.Scanner; use Pp.Scanner.Token_Vectors;
 
 package Pp.Formatting is
 
-   package Syms renames LAL_UL.Symbols;
+   package Syms renames Utils.Symbols;
 
    Token_Mismatch : exception;
    --  Raised by Tree_To_Ada if it detects a bug in itself that causes the
@@ -90,7 +90,7 @@ package Pp.Formatting is
 
    type Line_Break_Index is new Positive;
    type Line_Break_Array is array (Line_Break_Index range <>) of Line_Break;
-   package Line_Break_Vectors is new ASIS_UL.Vectors
+   package Line_Break_Vectors is new Utils.Vectors
      (Line_Break_Index,
       Line_Break,
       Line_Break_Array);
@@ -158,7 +158,7 @@ package Pp.Formatting is
 
    type Tab_Index is new Positive;
    type Tab_Array is array (Tab_Index range <>) of Tab_Rec;
-   package Tab_Vectors is new ASIS_UL.Vectors (Tab_Index, Tab_Rec, Tab_Array);
+   package Tab_Vectors is new Utils.Vectors (Tab_Index, Tab_Rec, Tab_Array);
    subtype Tab_Vector is Tab_Vectors.Vector;
 
    use Tab_Vectors;
@@ -271,7 +271,7 @@ package Pp.Formatting is
    procedure Do_Comments_Only
      (Lines_Data : in out Lines_Data_Rec;
       Src_Buf : in out Buffer;
-      Cmd : LAL_UL.Command_Lines.Command_Line);
+      Cmd : Utils.Command_Lines.Command_Line);
    --  Implement the --comments-only switch. This skips most of the usual
    --  pretty-printing passes, and just formats comments.
 
@@ -279,7 +279,7 @@ package Pp.Formatting is
      (Lines_Data : in out Lines_Data_Rec;
       Source_File_Name : String;
       Src_Buf : in out Buffer;
-      Cmd : LAL_UL.Command_Lines.Command_Line;
+      Cmd : Utils.Command_Lines.Command_Line;
       Partial : Boolean);
    --  The first pretty-printing pass walks the tree and produces text,
    --  along with various tables. This performs the remaining passes, which

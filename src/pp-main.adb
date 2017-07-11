@@ -1,5 +1,5 @@
-with LAL_UL.Command_Lines; use LAL_UL.Command_Lines;
-with LAL_UL.Drivers;
+with Utils.Command_Lines; use Utils.Command_Lines;
+with Utils.Drivers;
 
 with Pp.Actions;
 with Pp.Command_Lines;
@@ -25,7 +25,7 @@ procedure Pp.Main is
    Cmd : Command_Line (Pp.Command_Lines.Descriptor'Access);
 
 begin
-   LAL_UL.Drivers.Driver
+   Utils.Drivers.Driver
      (Cmd,
       Tool,
       Tool_Package_Name     => "pretty_printer",

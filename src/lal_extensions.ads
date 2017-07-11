@@ -3,15 +3,15 @@ with Langkit_Support.Text; use Langkit_Support.Text;
 with Libadalang; use Libadalang;
 with Libadalang.Analysis; use Libadalang.Analysis;
 
-with ASIS_UL.String_Utilities; use ASIS_UL.String_Utilities;
-with ASIS_UL.Vectors;
+with Utils.String_Utilities; use Utils.String_Utilities;
+with Utils.Vectors;
 
 package LAL_Extensions is
 
    --  ???Perhaps we should move (some of?) this stuff into package
    --  Libadalang.Analysis.
 
-   package Ada_Node_Vectors is new ASIS_UL.Vectors
+   package Ada_Node_Vectors is new Utils.Vectors
      (Index_Type => Positive,
       Element_Type => Ada_Node,
       Elements_Array => Ada_Node_Array);
@@ -119,7 +119,7 @@ package LAL_Extensions is
    --  the Construct_Nesting metric in gnatmetric.
 
    function Short_Image (Node : Ada_Node) return String is
-     (ASIS_UL.String_Utilities.To_UTF8
+     (Utils.String_Utilities.To_UTF8
        (Text_To_W_Str
          (Text_Type'(Short_Image (Node)))));
 

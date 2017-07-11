@@ -29,13 +29,13 @@ with Ada.Wide_Text_IO;
 with GNATCOLL.Paragraph_Filling;
 
 with LAL_Extensions;
-with LAL_UL.Symbols; use LAL_UL.Symbols;
+with Utils.Symbols; use Utils.Symbols;
 with Text_IO;
 
 with Pp.Command_Lines; use Pp.Command_Lines;
 
 package body Pp.Formatting is
-   use LAL_UL.Command_Lines;
+   use Utils.Command_Lines;
 
 --   use Common_Flag_Switches, Common_String_Switches,
 --     Common_String_Seq_Switches, Common_Nat_Switches;
@@ -101,7 +101,7 @@ package body Pp.Formatting is
 
    procedure Insert_Comment_Text
      (Lines_Data : in out Lines_Data_Rec;
-      Cmd : LAL_UL.Command_Lines.Command_Line;
+      Cmd : Utils.Command_Lines.Command_Line;
       Comment_Tok : Scanner.Token);
    --  Insert the text of the comment into Out_Buf, including the initial
    --  "--" and leading blanks.
@@ -215,11 +215,11 @@ package body Pp.Formatting is
    procedure Final_Check_Helper
      (Lines_Data : in out Lines_Data_Rec;
       Src_Buf : in out Buffer;
-      Cmd : LAL_UL.Command_Lines.Command_Line);
+      Cmd : Utils.Command_Lines.Command_Line);
    procedure Final_Check
      (Lines_Data : in out Lines_Data_Rec;
       Src_Buf : in out Buffer;
-      Cmd : LAL_UL.Command_Lines.Command_Line);
+      Cmd : Utils.Command_Lines.Command_Line);
    --  Final pass: check that we have not damaged the input source text.
    --  Parameters and Out_Buf are as for Insert_Comments_And_Blank_Lines,
    --  except that comments are now included in Out_[Tokens|Buf], and this
@@ -281,7 +281,7 @@ package body Pp.Formatting is
 
    procedure Insert_Comment_Text
      (Lines_Data : in out Lines_Data_Rec;
-      Cmd : LAL_UL.Command_Lines.Command_Line;
+      Cmd : Utils.Command_Lines.Command_Line;
       Comment_Tok : Scanner.Token)
    is
       Out_Buf : Buffer renames Lines_Data.Out_Buf;
@@ -357,7 +357,7 @@ package body Pp.Formatting is
    procedure Do_Comments_Only
      (Lines_Data : in out Lines_Data_Rec;
       Src_Buf : in out Buffer;
-      Cmd : LAL_UL.Command_Lines.Command_Line)
+      Cmd : Utils.Command_Lines.Command_Line)
    is
       Out_Buf : Buffer renames Lines_Data.Out_Buf;
       Cur_Indentation : Natural renames Lines_Data.Cur_Indentation;
@@ -387,7 +387,7 @@ package body Pp.Formatting is
          if Slice (Out_Buf, 2, Last_Position (Out_Buf)) /=
            To_W_Str (Src_Buf)
          then
-            ASIS_UL.Dbg_Out.Output_Enabled := True;
+            Utils.Dbg_Out.Output_Enabled := True;
             Text_IO.Put_Line ("Src_Buf:");
             Dump_Buf (Src_Buf);
             Text_IO.Put_Line ("Out_Buf:");
@@ -400,7 +400,7 @@ package body Pp.Formatting is
 
    begin
       Get_Tokens
-        (Src_Buf, Src_Toks, LAL_UL.Ada_Version, Pp_Off_On_Delimiters,
+        (Src_Buf, Src_Toks, Utils.Ada_Version, Pp_Off_On_Delimiters,
          Ignore_Single_Line_Breaks => False);
       Insert_NL (Out_Buf);
 
@@ -1372,7 +1372,7 @@ package body Pp.Formatting is
            (Format_Debug_Output
               (Lines_Data, "before Insert_Comments_And_Blank_Lines"));
          Get_Tokens
-           (Out_Buf, Out_Tokens, LAL_UL.Ada_Version, Pp_Off_On_Delimiters);
+           (Out_Buf, Out_Tokens, Utils.Ada_Version, Pp_Off_On_Delimiters);
          --  ???At this point, we might need another pass to insert hard line
          --  breaks after end-of-line comments, so they will be indented properly.
          --  Or better yet, insert the EOL comments, with tabs and soft line break
@@ -2097,7 +2097,7 @@ package body Pp.Formatting is
          Clear (Out_Buf_Line_Ends);
          Scanner.Get_Tokens
            (Out_Buf,
-            Out_Tokens, LAL_UL.Ada_Version, Pp_Off_On_Delimiters,
+            Out_Tokens, Utils.Ada_Version, Pp_Off_On_Delimiters,
             Ignore_Single_Line_Breaks => False,
             Line_Ends => Out_Buf_Line_Ends'Unchecked_Access);
 
@@ -2172,7 +2172,7 @@ package body Pp.Formatting is
 
             when Upper_Case =>
                Scanner.Get_Tokens
-                 (Out_Buf, Out_Tokens, LAL_UL.Ada_Version,
+                 (Out_Buf, Out_Tokens, Utils.Ada_Version,
                   Pp_Off_On_Delimiters);
                for Out_Index in 2 .. Last_Index (Out_Tokens) loop
                   Out_Tok := Out_Tokens (Out_Index);
@@ -2209,7 +2209,7 @@ package body Pp.Formatting is
          end if;
 
          Scanner.Get_Tokens
-           (Out_Buf, Out_Tokens, LAL_UL.Ada_Version, Pp_Off_On_Delimiters);
+           (Out_Buf, Out_Tokens, Utils.Ada_Version, Pp_Off_On_Delimiters);
          for Out_Index in 2 + 3 - 1 .. Last_Index (Out_Tokens) loop
             --  Skip sentinel and first 3 tokens
 
@@ -2326,10 +2326,10 @@ package body Pp.Formatting is
          --  the OFF appears. For an ON, we ignore the Prev_Tok.
 
          Get_Tokens
-           (Src_Buf, Src_Toks, LAL_UL.Ada_Version,
+           (Src_Buf, Src_Toks, Utils.Ada_Version,
             Pp_Off_On_Delimiters, Ignore_Single_Line_Breaks => False);
          Get_Tokens
-           (Out_Buf, Out_Tokens, LAL_UL.Ada_Version,
+           (Out_Buf, Out_Tokens, Utils.Ada_Version,
             Pp_Off_On_Delimiters, Ignore_Single_Line_Breaks => False);
          if Debug_Mode then
             Dbg_Out.Put ("Copy_Pp_Off_Regions: Src_Toks:\n");
@@ -2425,7 +2425,7 @@ package body Pp.Formatting is
             Last_Out_Index : constant Token_Index :=
               Token_Index'Min (Out_Index + Num_Toks, Last_Index (Out_Tokens));
          begin
-            ASIS_UL.Dbg_Out.Output_Enabled := True;
+            Utils.Dbg_Out.Output_Enabled := True;
             Text_IO.Put_Line ("Src_Buf:");
             Dump_Buf (Src_Buf);
             Text_IO.Put_Line ("Out_Buf:");
@@ -2474,7 +2474,7 @@ package body Pp.Formatting is
    procedure Final_Check_Helper
      (Lines_Data : in out Lines_Data_Rec;
       Src_Buf : in out Buffer;
-      Cmd : LAL_UL.Command_Lines.Command_Line)
+      Cmd : Utils.Command_Lines.Command_Line)
    is
       Out_Buf : Buffer renames Lines_Data.Out_Buf;
       Src_Tokens : Scanner.Token_Vector renames Lines_Data.Src_Tokens;
@@ -2656,7 +2656,7 @@ package body Pp.Formatting is
 
    begin
       Get_Tokens
-        (Out_Buf, Out_Tokens, LAL_UL.Ada_Version, Pp_Off_On_Delimiters);
+        (Out_Buf, Out_Tokens, Utils.Ada_Version, Pp_Off_On_Delimiters);
       pragma Assert (Cur (Out_Buf) = NL);
       Move_Forward (Out_Buf); -- skip sentinel
 
@@ -2821,7 +2821,7 @@ package body Pp.Formatting is
    procedure Final_Check
      (Lines_Data : in out Lines_Data_Rec;
       Src_Buf : in out Buffer;
-      Cmd : LAL_UL.Command_Lines.Command_Line)
+      Cmd : Utils.Command_Lines.Command_Line)
    is
       Out_Buf : Buffer renames Lines_Data.Out_Buf;
    begin

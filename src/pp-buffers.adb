@@ -1041,7 +1041,7 @@ package body Pp.Buffers is
 
    function Elements
      (Buf  : Buffer)
-      return ASIS_UL.Char_Vectors.WChar_Vectors.Big_Ptr
+      return Utils.Char_Vectors.WChar_Vectors.Big_Ptr
    is
    begin
       pragma Assert (Is_Empty (Buf.To) and then Buf.From_First = 1);

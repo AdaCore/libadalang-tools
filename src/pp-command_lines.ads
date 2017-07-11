@@ -1,5 +1,5 @@
-with LAL_UL.Command_Lines; use LAL_UL.Command_Lines;
-with LAL_UL.Common;        use LAL_UL.Common;
+with Utils.Command_Lines; use Utils.Command_Lines;
+with Utils.Common;        use Utils.Common;
 package Pp.Command_Lines is
 
    package Freeze_Common is new Freeze_Descriptor (Common_Descriptor);
@@ -372,7 +372,7 @@ package Pp.Command_Lines is
      Predicate => Lower_Upper_Mixed_PP_Casing
        in Lower_Case | Upper_Case | Mixed;
 
-   subtype Cmd_Line is LAL_UL.Command_Lines.Command_Line;
+   subtype Cmd_Line is Utils.Command_Lines.Command_Line;
 
    function PP_Attribute_Casing
      (Cmd : Cmd_Line) return Lower_Upper_Mixed_PP_Casing is

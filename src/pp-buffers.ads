@@ -22,10 +22,10 @@
 ------------------------------------------------------------------------------
 
 with System.WCh_Con;
-with ASIS_UL.Vectors;
-with ASIS_UL.Char_Vectors; use ASIS_UL.Char_Vectors;
-use ASIS_UL.Char_Vectors.WChar_Vectors;
---  use all type ASIS_UL.Char_Vectors.WChar_Vector;
+with Utils.Vectors;
+with Utils.Char_Vectors; use Utils.Char_Vectors;
+use Utils.Char_Vectors.WChar_Vectors;
+--  use all type Utils.Char_Vectors.WChar_Vector;
 
 private with Ada.Finalization;
 
@@ -71,7 +71,7 @@ package Pp.Buffers is
    type Marker_Index is new Positive;
 
    type Marker_Array is array (Marker_Index range <>) of Marker;
-   package Marker_Vectors is new ASIS_UL.Vectors
+   package Marker_Vectors is new Utils.Vectors
      (Marker_Index,
       Marker,
       Marker_Array);
@@ -117,7 +117,7 @@ package Pp.Buffers is
 
    function Elements
      (Buf  : Buffer)
-      return ASIS_UL.Char_Vectors.WChar_Vectors.Big_Ptr with
+      return Utils.Char_Vectors.WChar_Vectors.Big_Ptr with
       Pre => At_Beginning (Buf);
       --  'point' must be at the beginning of the buffer (e.g. after Reset).
       --  Returns the content of the buffer.
@@ -300,7 +300,7 @@ private
    end record;
 
    type Marker_Rec_Array is array (Marker range <>) of Marker_Rec;
-   package Marker_Rec_Vectors is new ASIS_UL.Vectors
+   package Marker_Rec_Vectors is new Utils.Vectors
      (Marker,
       Marker_Rec,
       Marker_Rec_Array);
