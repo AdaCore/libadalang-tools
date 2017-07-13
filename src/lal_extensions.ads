@@ -123,7 +123,6 @@ package LAL_Extensions is
        (Text_To_W_Str
          (Text_Type'(Short_Image (Node)))));
 
-   function P_Defining_Name (Node : access Basic_Decl_Type'Class) return Name;
    function P_Defining_Name
      (Node : access Basic_Decl_Type'Class) return Ada_Node is
       (Ada_Node (Name'(P_Defining_Name (Node))));

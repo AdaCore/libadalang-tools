@@ -596,8 +596,7 @@ package body Pp.Actions is
                 --  The "/" is to ignore the env_holder.
                 --  ???Not sure what it is, nor why it's syntactic.
            when Ada_Generic_Subp_Instantiation =>
-             L ("/?~~ ~! ! is new !?[@ (~,@ ~)]~", Aspects, "/"),
-               --  ???Not sure why this has TWO env_holders.
+             L ("/?~~ ~! ! is new !?[@ (~,@ ~)]~", Aspects),
            when Ada_Generic_Package_Decl =>
              L ("generic$",
                 "!",
