@@ -25,31 +25,195 @@
 
 with Ada.Directories; use Ada;
 with Ada.Exceptions;
+with Ada.Assertions;
 with GNAT.Byte_Order_Mark;
 with GNAT.Command_Line;
 with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 with GNAT.OS_Lib;
 
 with Utils.Environment;
-
-with Utils.Common;   use Utils.Common;
---  with Utils.Common.Post;
+with Utils.Formatted_Output;
+with Utils.Command_Lines.Common;   use Utils.Command_Lines.Common;
+--  with Utils.Command_Lines.Common.Post;
 with Utils.Projects; use Utils.Projects;
 --  with Utils.Check_Parameters;
 with Utils.String_Utilities; use Utils.String_Utilities;
 with Utils.Tool_Names;
 
+with Langkit_Support.Adalog;
 with Langkit_Support.Diagnostics;
+with Langkit_Support.Text;
 
 with Libadalang;     use Libadalang;
 with Libadalang.Analysis; use Libadalang.Analysis;
 
 package body Utils.Drivers is
 
-   use Common_Flag_Switches, Common_String_Switches,
+   use Common_Flag_Switches, Common_Boolean_Switches, Common_String_Switches,
      Common_String_Seq_Switches, Common_Nat_Switches;
 
    use Tools;
+
+   Name_Resolution_Failed : exception;
+
+   procedure Resolve_Node (N : Ada_Node; Quiet : Boolean);
+   --  Call P_Resolve_Names on N, which is a node for which Is_Xref_Entry_Point
+   --  is True.
+
+   procedure Name_Resolution (Unit : Analysis_Unit);
+   --  Resolve the entire unit, calling Resolve_Node on each relevant node.
+
+   procedure Resolve_Node (N : Ada_Node; Quiet : Boolean) is
+      function Safe_Image
+        (Node : access Ada_Node_Type'Class) return String is
+         (if Node = null then
+            "None"
+          else
+            Langkit_Support.Text.Image (Node.Short_Image));
+
+      function Is_Expr (N : Ada_Node) return Boolean is
+        (N.all in Expr_Type'Class);
+
+      OK : Boolean;
+
+      use Utils.Formatted_Output;
+   begin
+--      if Langkit_Support.Adalog.Debug.Debug then
+--         N.Assign_Names_To_Logic_Vars;
+--      end if;
+      --  ???For now, catch exceptions and try to continue.
+      begin
+         OK := N.P_Resolve_Names;
+      exception
+         when Property_Error =>
+            Put ("P_Resolve_Names raised Property_Error\n");
+            raise Name_Resolution_Failed;
+         when Langkit_Support.Adalog.Early_Binding_Error =>
+            Put ("P_Resolve_Names raised Early_Binding_Error\n");
+            raise Name_Resolution_Failed;
+         when Constraint_Error =>
+            Put ("P_Resolve_Names raised Constraint_Error\n");
+            raise Name_Resolution_Failed;
+         when Storage_Error =>
+            Put ("P_Resolve_Names raised Storage_Error\n");
+            raise Name_Resolution_Failed;
+      end;
+
+      if OK then
+         for Node of N.Find (Is_Expr'Access).Consume loop
+            declare
+               P_Ref  : Entity := Expr (Node).P_Ref_Val;
+               P_Type : Entity := Expr (Node).P_Type_Val;
+            begin
+               if not Quiet then
+                  Put ("Expr: \1, references \2, type is \3\n",
+                       Safe_Image (Node),
+                       Safe_Image (P_Ref.El),
+                       Safe_Image (P_Type.El));
+               end if;
+               Dec_Ref (P_Ref);
+               Dec_Ref (P_Type);
+            end;
+         end loop;
+      else
+         Put ("Resolution failed for node \1\n", Safe_Image (N));
+         raise Name_Resolution_Failed;
+      end if;
+   end Resolve_Node;
+
+   procedure Name_Resolution (Unit : Analysis_Unit) is
+      function Is_Xref_Entry_Point (N : Ada_Node) return Boolean is
+        (N.P_Xref_Entry_Point);
+      use Utils.Formatted_Output;
+   begin
+      --  ???Name resolution does not yet work, and is turned off by default
+      --  (see Syntax_Only switch; name resolution can be turned on via
+      --  --no-syntax-only).  For now, catch exceptions and try to continue
+      --  with the next file.
+      begin
+         Populate_Lexical_Env (Unit);
+      exception
+         when Property_Error =>
+            Put ("Populate_Lexical_Env raised Property_Error\n");
+            raise Name_Resolution_Failed;
+         when Ada.Assertions.Assertion_Error =>
+            Put ("Populate_Lexical_Env raised Assertion_Error\n");
+            raise Name_Resolution_Failed;
+         when Constraint_Error =>
+            Put ("Populate_Lexical_Env raised Constraint_Error\n");
+            raise Name_Resolution_Failed;
+         when Storage_Error =>
+            Put ("Populate_Lexical_Env raised Storage_Error\n");
+            raise Name_Resolution_Failed;
+      end;
+      for Node of Root (Unit).Find (Is_Xref_Entry_Point'Access).Consume loop
+         Resolve_Node (Node, Quiet => True);
+      end loop;
+   end Name_Resolution;
+
+   procedure Post_Cmd_Line_1 (Cmd : Command_Line);
+   --  This is called by Process_Command_Line after the first pass through
+   --  the command-line arguments.
+
+   function ASIS_Order_File_Names
+     (X : String_Ref_Array) return String_Ref_Array;
+   --  ????ASIS (or maybe just gnatmetric) seems to process files in a
+   --  strange order. First, all files with bodies, in alphabetical
+   --  order. Then all files without bodies, in alphabetical order.
+   --  We're temporarily mimicking that here.
+
+   procedure Post_Cmd_Line_1 (Cmd : Command_Line) is
+      --  ????See lal_ul-driver.adb
+      use Utils.Environment;
+   begin
+      for Dbg of Arg (Cmd, Debug) loop
+         Set_Debug_Options (Dbg.all);
+      end loop;
+
+      Tool_Current_Dir := new String'(Initial_Dir);
+      --  Leave Tool_Inner_Dir = null
+   end Post_Cmd_Line_1;
+
+   function ASIS_Order_File_Names
+     (X : String_Ref_Array) return String_Ref_Array
+   is
+      use String_Ref_Sets;
+      Bodies : String_Ref_Set;
+
+      function Has_Body (S : String_Ref) return Boolean;
+      function Has_Body (S : String_Ref) return Boolean is
+         Body_String : aliased constant String :=
+           S (1 .. S'Last - 1) & "b";
+      begin
+         return Contains (Bodies, Body_String'Unchecked_Access);
+      end Has_Body;
+
+      Result : String_Ref_Vector;
+      use String_Ref_Vectors;
+   begin
+      for S of X loop
+         if Has_Suffix (S.all, ".adb") then
+            Insert (Bodies, S);
+         end if;
+      end loop;
+
+      for S of X loop
+         if not Has_Suffix (S.all, ".ads") then
+            Append (Result, S);
+         end if;
+         if Has_Suffix (S.all, ".ads") and then Has_Body (S) then
+            Append (Result, S);
+         end if;
+      end loop;
+
+      for S of X loop
+         if Has_Suffix (S.all, ".ads") and then not Has_Body (S) then
+            Append (Result, S);
+         end if;
+      end loop;
+
+      return To_Array (Result);
+   end ASIS_Order_File_Names;
 
    procedure Driver
      (Cmd                   : in out Command_Line;
@@ -59,19 +223,15 @@ package body Utils.Drivers is
       Preprocessing_Allowed :        Boolean        := True;
       Callback              :        Parse_Callback := null)
    is
-      use String_Ref_Vectors;
-
       procedure Local_Callback
         (Phase : Parse_Phase;
          Swit  : Dynamically_Typed_Switch);
       --  This processes the Common switches, and then calls the tool-specific
       --  Callback passed in.
 
-      procedure Post_Cmd_Line_1 (Cmd : Command_Line);
-      --  This is called by Process_Command_Line after the first pass through
-      --  the command-line arguments.
-
       procedure Process_Files;
+
+      procedure Print_Help;
 
       procedure Local_Callback
         (Phase : Parse_Phase;
@@ -81,18 +241,6 @@ package body Utils.Drivers is
          Callback (Phase, Swit);
       end Local_Callback;
 
-      procedure Post_Cmd_Line_1 (Cmd : Command_Line) is
-         --  ????????????????See lal_ul-driver.adb
-         use Utils.Environment;
-      begin
-         for Dbg of Arg (Cmd, Debug) loop
-            Set_Debug_Options (Dbg.all);
-         end loop;
-
-         Tool_Current_Dir := new String'(Initial_Dir);
-         --  Leave Tool_Inner_Dir = null
-      end Post_Cmd_Line_1;
-
       Cmd_Text, Cmd_Cargs, Project_Switches_Text :
         GNAT.OS_Lib.Argument_List_Access;
       Global_Report_Dir               : String_Ref;
@@ -100,53 +248,6 @@ package body Utils.Drivers is
       Custom_RTS                      : GNAT.OS_Lib.String_Access;
       Individual_Source_Options       : String_String_List_Map;
       Result_Dirs                     : String_String_Map;
-
-      function ASIS_Order_File_Names
-        (X : String_Ref_Array) return String_Ref_Array;
-      --  ????ASIS (or maybe just gnatmetric) seems to process files in a
-      --  strange order. First, all files with bodies, in alphabetical
-      --  order. Then all files without bodies, in alphabetical order.
-      --  We're temporarily mimicking that here.
-
-      function ASIS_Order_File_Names
-        (X : String_Ref_Array) return String_Ref_Array
-      is
-         use String_Ref_Sets;
-         Bodies : String_Ref_Set;
-
-         function Has_Body (S : String_Ref) return Boolean;
-         function Has_Body (S : String_Ref) return Boolean is
-            Body_String : aliased constant String :=
-              S (1 .. S'Last - 1) & "b";
-         begin
-            return Contains (Bodies, Body_String'Unchecked_Access);
-         end Has_Body;
-
-         Result : String_Ref_Vector;
-      begin
-         for S of X loop
-            if Has_Suffix (S.all, ".adb") then
-               Insert (Bodies, S);
-            end if;
-         end loop;
-
-         for S of X loop
-            if not Has_Suffix (S.all, ".ads") then
-               Append (Result, S);
-            end if;
-            if Has_Suffix (S.all, ".ads") and then Has_Body (S) then
-               Append (Result, S);
-            end if;
-         end loop;
-
-         for S of X loop
-            if Has_Suffix (S.all, ".ads") and then not Has_Body (S) then
-               Append (Result, S);
-            end if;
-         end loop;
-
-         return To_Array (Result);
-      end ASIS_Order_File_Names;
 
       procedure Process_Files is
          Context : Analysis_Context :=
@@ -225,10 +326,23 @@ package body Utils.Drivers is
                   --  tree).
 
                   pragma Assert (Root (Unit) /= null);
+                  if not Arg (Cmd, Syntax_Only) then
+                     Name_Resolution (Unit);
+                  end if;
                   Per_File_Action (Tool, Cmd, F_Name.all, Inp, BOM_Seen, Unit);
-                  Remove (Context, F_Name.all);
+                  --  ???For now, catch exceptions and try to continue.
+                  begin
+                     Remove (Context, F_Name.all);
+                  exception
+                     when Constraint_Error =>
+                        Put ("Remove raised Constraint_Error\n");
+                        raise Name_Resolution_Failed;
+                  end;
                   Free (Input);
                end;
+            exception
+               when Name_Resolution_Failed =>
+                  Free (Input);
             end;
 
             <<Continue>>
@@ -237,7 +351,6 @@ package body Utils.Drivers is
          pragma Assert (Counter = 0);
       end Process_Files;
 
-      procedure Print_Help;
       procedure Print_Help is
       begin
          Tool_Help (Tool);
@@ -266,7 +379,7 @@ package body Utils.Drivers is
          Post_Cmd_Line_1_Action    => Post_Cmd_Line_1'Access,
          Tool_Temp_Dir             => Environment.Tool_Temp_Dir.all,
          Print_Help                => Print_Help'Access);
---      Utils.Common.Post.Postprocess_Common (Cmd);
+--      Utils.Command_Lines.Common.Post.Postprocess_Common (Cmd);
 
       if Debug_Flag_C then
          Dump_Cmd (Cmd);

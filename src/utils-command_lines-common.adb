@@ -1,5 +1,5 @@
 with GNATCOLL.Iconv;
-package body Utils.Common is
+package body Utils.Command_Lines.Common is
 
    function Wide_Character_Encoding (Cmd : Command_Line) return String is
       --  ???Libadalang doesn't support all the encodings we need.
@@ -38,4 +38,4 @@ package body Utils.Common is
            when others => raise Program_Error);
    end Wide_Character_Encoding;
 
-end Utils.Common;
+end Utils.Command_Lines.Common;

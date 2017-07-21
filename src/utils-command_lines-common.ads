@@ -1,7 +1,7 @@
 with Utils.Command_Lines; use Utils.Command_Lines;
 with System.WCh_Con;
 
-package Utils.Common is
+package Utils.Command_Lines.Common is
 
    Common_Descriptor : Command_Line_Descriptor;
 
@@ -43,6 +43,18 @@ package Utils.Common is
        Compute_Timing            => +"-t",
        Gnat2005                  => +"-gnat05", -- ignored
        Process_RTL_Units         => +"-a"));
+
+   type Common_Booleans is (Syntax_Only);
+
+   package Common_Boolean_Switches is new Boolean_Switches
+     (Common_Descriptor,
+      Common_Booleans);
+
+   package Common_Boolean_Defaults is new
+     Common_Boolean_Switches.Set_Defaults
+       ((Syntax_Only => True));
+   --  Default for Syntax_Only should be changed to False once name resolution
+   --  is working well.
 
    type Common_Strings is
      (Project_File,
@@ -226,4 +238,4 @@ package Utils.Common is
    --  and Mimic_gcc is True for the inner invocations. In nonincremental mode,
    --  both are False. They are never both True.
 
-end Utils.Common;
+end Utils.Command_Lines.Common;

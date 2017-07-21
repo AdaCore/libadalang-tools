@@ -1,5 +1,5 @@
 with Utils.Command_Lines; use Utils.Command_Lines;
-with Utils.Common;        use Utils.Common;
+with Utils.Command_Lines.Common;        use Utils.Command_Lines.Common;
 package Stub.Command_Lines is
 
    package Freeze_Common is new Freeze_Descriptor (Common_Descriptor);

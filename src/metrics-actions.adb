@@ -13,7 +13,7 @@ with Libadalang;     use Libadalang;
 with Libadalang.Lexer;
 with LAL_Extensions; use LAL_Extensions;
 
-with Utils.Common; use Utils; use Utils.Common;
+with Utils.Command_Lines.Common; use Utils; use Utils.Command_Lines.Common;
 with Utils.Dbg_Out;
 with Utils.Formatted_Output;
 with Utils.String_Utilities; use Utils.String_Utilities;

@@ -11,7 +11,7 @@ with GNATCOLL.VFS;      use GNATCOLL.VFS;
 with GNATCOLL.Projects.Aux;
 with GNATCOLL.Traces;
 
-with Utils.Common;     use Utils.Common;
+with Utils.Command_Lines.Common;     use Utils.Command_Lines.Common;
 with Utils.Environment;
 with Utils.Formatted_Output;
 with Utils.Tool_Names; use Utils.Tool_Names;

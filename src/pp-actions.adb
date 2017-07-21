@@ -23,7 +23,7 @@ with Langkit_Support.Slocs; use Langkit_Support;
 with Libadalang;     use Libadalang;
 with LAL_Extensions; use LAL_Extensions;
 
-with Utils.Common; use Utils.Common;
+with Utils.Command_Lines.Common; use Utils.Command_Lines.Common;
 with Utils.Dbg_Out;
 with Utils.Formatted_Output;
 with Utils.Tool_Names;
