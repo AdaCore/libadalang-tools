@@ -1,3 +1,4 @@
+with Text_IO;
 with Ada.Characters.Handling; use Ada.Characters.Handling;
 with Ada.Strings.UTF_Encoding;
 with System.WCh_Con;
@@ -931,8 +932,17 @@ package body Stub.Actions is
             end if;
          when Ada_Body_Node =>
             if not Arg (Cmd, Subunits) then
-               Cmd_Error ("input file looks like a body");
-               --  ????We should not print the "try --help" message.
+               declare
+                  use Text_IO;
+               begin
+                  Put (Standard_Error, Utils.Tool_Names.Tool_Name & ": ");
+                  Put_Line (Standard_Error, "input file looks like a body");
+                  Cmd_Error_No_Help
+                    ("output file name should be provided because " &
+                       File_Name &
+                       " does not follow GNAT naming rules for " &
+                       "spec files");
+               end;
             end if;
          when others => raise Program_Error;
       end case;
