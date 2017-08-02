@@ -231,6 +231,11 @@ package body Utils.Drivers is
 
       procedure Process_Files;
 
+      procedure Set_WCEM (Encoding : String);
+      --  Set the wide character encoding method as if the switch had appeared
+      --  on the command line (not in -cargs section). This is used when the
+      --  -cargs section is used, and when a BOM selects UTF-8.
+
       procedure Process_Cargs;
       --  Process arguments in the -cargs sections. This is questionable, given
       --  that lalpp does not call gcc, but we support at least "-cargs -Wx"
@@ -254,17 +259,17 @@ package body Utils.Drivers is
       Individual_Source_Options       : String_String_List_Map;
       Result_Dirs                     : String_String_Map;
 
+      procedure Set_WCEM (Encoding : String) is
+      begin
+         if Arg (Cmd, Wide_Character_Encoding) = null then
+            Set_Arg (Cmd, Wide_Character_Encoding, Encoding);
+         elsif Arg (Cmd, Wide_Character_Encoding).all /= Encoding then
+            Cmd_Error_No_Help
+              ("input and output wide character encodings conflict");
+         end if;
+      end Set_WCEM;
+
       procedure Process_Cargs is
-         procedure Set_WCEM (Encoding : String);
-         procedure Set_WCEM (Encoding : String) is
-         begin
-            if Arg (Cmd, Wide_Character_Encoding) = null then
-               Set_Arg (Cmd, Wide_Character_Encoding, Encoding);
-            elsif Arg (Cmd, Wide_Character_Encoding).all /= Encoding then
-               Cmd_Error
-                 ("input and output wide character encodings conflict");
-            end if;
-         end Set_WCEM;
       begin
          --  We actually only support -Ws, -W8, and -Wb.
          for Arg of Cmd_Cargs.all loop
@@ -287,9 +292,7 @@ package body Utils.Drivers is
       end Process_Cargs;
 
       procedure Process_Files is
-         Context : Analysis_Context :=
-           Create (Charset => Wide_Character_Encoding (Cmd));
-
+         Context : Analysis_Context;
          Num_File_Names : constant Natural := File_Names (Cmd)'Length;
          Counter : Natural := Num_File_Names;
          use Text_IO;
@@ -335,8 +338,19 @@ package body Utils.Drivers is
                if BOM = UTF8_All then
                   First := BOM_Len + 1; -- skip it
                   BOM_Seen := True;
+                  Set_WCEM ("8");
                else
                   pragma Assert (BOM = Unknown); -- no BOM found
+               end if;
+
+               --  We have to defer the Create call until after we've read the
+               --  first file, because it might set the Wide_Character_Encoding
+               --  via the BOM. This makes the somewhat questionable assumption
+               --  that all files have the same encoding (which is necessary
+               --  anyway if it's controlled by the command line).
+
+               if Counter = Num_File_Names - 1 then
+                  Context := Create (Charset => Wide_Character_Encoding (Cmd));
                end if;
 
                declare
@@ -511,7 +525,8 @@ package body Utils.Drivers is
          GNAT.Command_Line.Try_Help;
          Environment.Clean_Up;
          GNAT.OS_Lib.OS_Exit (1);
-      when Utils.Command_Lines.Command_Line_Error_No_Tool_Name =>
+      when Utils.Command_Lines.Command_Line_Error_No_Help |
+        Utils.Command_Lines.Command_Line_Error_No_Tool_Name =>
          --  Error message has already been printed.
          Environment.Clean_Up;
          GNAT.OS_Lib.OS_Exit (1);

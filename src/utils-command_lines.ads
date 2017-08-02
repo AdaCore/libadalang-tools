@@ -565,8 +565,10 @@ package Utils.Command_Lines is
    function "+" (S : String) return String_Ref is (new String'(S));
    --  Hack to get around the fact that Ada doesn't allow arrays of String
 
-   Command_Line_Error, Command_Line_Error_No_Tool_Name : exception;
-   --  Raised by Parse if there are errors. The tool should handle this,
+   Command_Line_Error,
+   Command_Line_Error_No_Help,
+   Command_Line_Error_No_Tool_Name : exception;
+   --  Raised by Parse if there are errors. The tool should handle these,
    --  print out the Exception_Message, and exit the process.
 
    function Error_Detected (Cmd : Command_Line) return Boolean;
@@ -576,6 +578,9 @@ package Utils.Command_Lines is
    --  Prints an error message, and raises Command_Line_Error. This is
    --  called by Parse to report errors, and may also be used by clients
    --  of Parse.
+
+   procedure Cmd_Error_No_Help (Message : String) with No_Return;
+   --  Same as Cmd_Error, but doesn't print the "try help" message
 
    procedure Cmd_Error_No_Tool_Name (Message : String) with No_Return;
    --  Same as Cmd_Error, but doesn't print the tool name, and raises

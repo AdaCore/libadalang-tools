@@ -27,6 +27,13 @@ package body Utils.Command_Lines is
       raise Command_Line_Error with Message;
    end Cmd_Error;
 
+   procedure Cmd_Error_No_Help (Message : String) is
+   begin
+      Put (Standard_Error, Utils.Tool_Names.Tool_Name & ": ");
+      Put_Line (Standard_Error, Message);
+      raise Command_Line_Error_No_Help with Message;
+   end Cmd_Error_No_Help;
+
    procedure Cmd_Error_No_Tool_Name (Message : String) is
    begin
       Put_Line (Standard_Error, Message);
