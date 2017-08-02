@@ -101,7 +101,7 @@ package Utils.Command_Lines.Common is
        Output_Directory           => null,
        Target                     => null,
        Subdirs                    => null,
-       Wide_Character_Encoding    => +"b"));
+       Wide_Character_Encoding    => null));
 
    package Common_String_Shorthands is new Common_String_Switches
      .Set_Shorthands

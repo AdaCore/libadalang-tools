@@ -231,6 +231,11 @@ package body Utils.Drivers is
 
       procedure Process_Files;
 
+      procedure Process_Cargs;
+      --  Process arguments in the -cargs sections. This is questionable, given
+      --  that lalpp does not call gcc, but we support at least "-cargs -Wx"
+      --  for compatibility, at least for now.
+
       procedure Print_Help;
 
       procedure Local_Callback
@@ -248,6 +253,38 @@ package body Utils.Drivers is
       Custom_RTS                      : GNAT.OS_Lib.String_Access;
       Individual_Source_Options       : String_String_List_Map;
       Result_Dirs                     : String_String_Map;
+
+      procedure Process_Cargs is
+         procedure Set_WCEM (Encoding : String);
+         procedure Set_WCEM (Encoding : String) is
+         begin
+            if Arg (Cmd, Wide_Character_Encoding) = null then
+               Set_Arg (Cmd, Wide_Character_Encoding, Encoding);
+            elsif Arg (Cmd, Wide_Character_Encoding).all /= Encoding then
+               Cmd_Error
+                 ("input and output wide character encodings conflict");
+            end if;
+         end Set_WCEM;
+      begin
+         --  We actually only support -Ws, -W8, and -Wb.
+         for Arg of Cmd_Cargs.all loop
+            if Arg.all = "-gnatWh" then
+               Set_WCEM ("h");
+            elsif Arg.all = "-gnatWu" then
+               Set_WCEM ("u");
+            elsif Arg.all = "-gnatWs" then
+               Set_WCEM ("s");
+            elsif Arg.all = "-gnatWE" then
+               Set_WCEM ("E");
+            elsif Arg.all = "-gnatW8" then
+               Set_WCEM ("8");
+            elsif Arg.all = "-gnatWb" then
+               Set_WCEM ("b");
+            else
+               null; -- Ignore all others
+            end if;
+         end loop;
+      end Process_Cargs;
 
       procedure Process_Files is
          Context : Analysis_Context :=
@@ -380,6 +417,7 @@ package body Utils.Drivers is
          Tool_Temp_Dir             => Environment.Tool_Temp_Dir.all,
          Print_Help                => Print_Help'Access);
 --      Utils.Command_Lines.Common.Post.Postprocess_Common (Cmd);
+      Process_Cargs;
 
       if Debug_Flag_C then
          Dump_Cmd (Cmd);

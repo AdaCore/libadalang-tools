@@ -370,6 +370,12 @@ package body Utils.Command_Lines is
          return Cmd.Sw (To_All (Switch)).String_Val;
       end Arg;
 
+      procedure Set_Arg
+        (Cmd : in out Command_Line; Switch : Switches; Val : String) is
+      begin
+         Cmd.Sw (To_All (Switch)).String_Val := new String'(Val);
+      end Set_Arg;
+
       Set_Shorthands_Instantiated : Boolean := False;
 
       package body Set_Syntax is

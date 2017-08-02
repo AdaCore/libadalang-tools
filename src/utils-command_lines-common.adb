@@ -1,15 +1,29 @@
 with GNATCOLL.Iconv;
 package body Utils.Command_Lines.Common is
 
-   function Wide_Character_Encoding (Cmd : Command_Line) return String is
-      --  ???Libadalang doesn't support all the encodings we need.
+   function WCEM (Cmd : Command_Line) return Character;
+   --  Return the single-character encoding letter
 
-      WCEM : constant String := Arg (Cmd, Wide_Character_Encoding).all;
-      pragma Assert (WCEM'Length = 1);
+   function WCEM (Cmd : Command_Line) return Character is
+      WCEM : constant String :=
+        (if Arg (Cmd, Wide_Character_Encoding) = null
+           then "b"
+           else Arg (Cmd, Wide_Character_Encoding).all);
       C : constant Character := WCEM (1);
    begin
+      --  We actually only support -Ws, -W8, and -Wb.
+
+      if WCEM'Length /= 1 or else C not in 's' | '8' | 'b' then
+         Cmd_Error ("unrecognized wide character encoding: """ & WCEM & """");
+      end if;
+
+      return C;
+   end WCEM;
+
+   function Wide_Character_Encoding (Cmd : Command_Line) return String is
+   begin
       return
-        (case C is
+        (case WCEM (Cmd) is
            when 'h'    => "Hex",
            when 'u'    => "Upper",
            when 's'    => "Shift_JIS",
@@ -22,13 +36,10 @@ package body Utils.Command_Lines.Common is
    function Wide_Character_Encoding
      (Cmd : Command_Line) return System.WCh_Con.WC_Encoding_Method
    is
-      WCEM : constant String := Arg (Cmd, Wide_Character_Encoding).all;
-      pragma Assert (WCEM'Length = 1);
-      C : constant Character := WCEM (1);
       use System.WCh_Con;
    begin
       return
-        (case C is
+        (case WCEM (Cmd) is
            when 'h'    => WCEM_Hex,
            when 'u'    => WCEM_Upper,
            when 's'    => WCEM_Shift_JIS,

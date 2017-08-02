@@ -291,6 +291,10 @@ package Utils.Command_Lines is
       --  specified, then null is returned, unless a default is set up
       --  (see below).
 
+      procedure Set_Arg
+        (Cmd : in out Command_Line; Switch : Switches; Val : String);
+      --  Set parameter of the given switch.
+
       type Switch_To_Syntax_Mapping is array (Switches) of Switch_Syntax;
       type Switch_To_String_Mapping is array (Switches) of String_Ref;
 
