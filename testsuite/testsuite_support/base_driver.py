@@ -180,7 +180,6 @@ class BaseDriver(TestDriver):
         Run a subprocess with `argv`
         """
         Run(argv, cwd=self.working_dir(),
-            parse_shebang=True,
             timeout=self.TIMEOUT,
             output=self.output_file,
             error=STDOUT)
@@ -192,17 +191,15 @@ class BaseDriver(TestDriver):
 
         In case of failure, the status is appended to the actual output
         """
-        program = argv[0]
 
         p = Run(argv, cwd=self.working_dir(),
-                parse_shebang=True,
                 timeout=self.TIMEOUT,
                 output=self.output_file,
                 error=STDOUT)
         self.result.actual_output += self.read_file(self.output_file)
         if p.status != 0:
-            self.result.actual_output += (
-                '{} returned status code {}\n'.format(program, p.status))
+            self.result.actual_output += \
+                '>>>program returned status code %s\n' % p.status
 
     #
     # Analysis helpers

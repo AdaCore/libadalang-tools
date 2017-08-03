@@ -1,4 +1,3 @@
-import sys
 import os
 
 from testsuite_support.base_driver import (
@@ -43,11 +42,8 @@ class ShellScriptDriver(BaseDriver):
         # We need to add "." to the PATH, because some tests run programs in
         # the current directory.
         os.environ['PATH'] = "%s:." % os.environ['PATH']
-        with open(os.path.join(self.working_dir(), 'test.sh')) as f1, \
-             open(os.path.join(self.working_dir(), '__test.sh'), 'w') as f2:
-            f2.write('#!/bin/sh\n' + f1.read())
-        os.chmod(os.path.join(self.working_dir(), '__test.sh'), 0755)
-        self.call_and_check(['./__test.sh'])
+        os.chmod(os.path.join(self.working_dir(), 'test.sh'), 0755)
+        self.call_and_check(['bash', './test.sh'])
         if self.diff:
             for diff_pair in self.diff:
                 self.call(['diff', '-r'] + diff_pair.split() +
