@@ -59,7 +59,10 @@ class BaseDriver(TestDriver):
     def tear_up(self):
         super(BaseDriver, self).tear_up()
         self.create_test_workspace()
-        self.register_path_subst(self.working_dir())
+
+        # Do a case insensitive subst, because gnatpp does not yet generate the
+        # correct case of identifiers. ???When that is fixed, change this.
+        self.register_path_subst(self.working_dir().lower())
 
         if 'description' not in self.test_env:
             raise SetupError('test.yaml: missing "description" field')
