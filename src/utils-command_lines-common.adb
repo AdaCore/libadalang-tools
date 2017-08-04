@@ -24,10 +24,10 @@ package body Utils.Command_Lines.Common is
    begin
       return
         (case WCEM (Cmd) is
-           when 'h'    => "Hex",
-           when 'u'    => "Upper",
-           when 's'    => "Shift_JIS",
-           when 'E'    => "EUC",
+           when 'h'    => "Hex", -- not supported by GNATCOLL.Iconv
+           when 'u'    => "Upper", -- not supported by GNATCOLL.Iconv
+           when 's'    => GNATCOLL.Iconv.SHIFT_JIS,
+           when 'E'    => "EUC", -- not supported by GNATCOLL.Iconv
            when '8'    => GNATCOLL.Iconv.UTF8,
            when 'b'    => GNATCOLL.Iconv.ISO_8859_1, -- BRACKETS
            when others => raise Program_Error);
