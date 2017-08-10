@@ -478,6 +478,7 @@ package body Pp.Actions is
    begin
       return
         (case Kind is
+           when Ada_Discrete_Subtype_Expr => null,
            when Ada_Unconstrained_Array_Index => null,
            when Ada_Contract_Case_Assoc => null,
            when Ada_Contract_Cases => null,
