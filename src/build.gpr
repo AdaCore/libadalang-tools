@@ -18,11 +18,25 @@ project Build is
       case Build_Mode is
          when "dev" =>
             for Default_Switches ("Ada") use
-              ("-gnatyg", "-gnatwae", "-gnatw.u", "-g", "-O0", "-gnata", "-gnatVa");
+              ("-gnatyg",
+               "-gnatwae",
+               "-gnatw.u", -- warn inappropriate use of unordered enums
+               "-g",
+               "-O0",
+               "-gnata",
+               "-gnatVa",
+               "-gnat2020");
 
          when "prod" =>
             for Default_Switches ("Ada") use
-              ("-gnatyg", "-gnatwae", "-gnatw.u", "-g", "-Ofast", "-gnatp", "-gnatn2");
+              ("-gnatyg",
+               "-gnatwae",
+               "-gnatw.u",
+               "-g",
+               "-Ofast",
+               "-gnatp",
+               "-gnatn2",
+               "-gnat2020");
       end case;
    end Compiler;
 
