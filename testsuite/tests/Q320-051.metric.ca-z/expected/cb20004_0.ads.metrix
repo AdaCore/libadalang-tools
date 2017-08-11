@@ -1,0 +1,57 @@
+Metrics computed for src/cb20004_0.ads
+containing package CB20004_0
+
+=== Code line metrics ===
+  all lines           : 72
+  code lines          : 18
+  comment lines       : 46
+  end-of-line comments: 1
+  comment percentage  : 73.43
+  blank lines         : 8
+
+CB20004_0 (package - library item at lines  48: 72)
+
+=== Code line metrics ===
+   all lines           : 25
+   code lines          : 18
+   comment lines       : 0
+   end-of-line comments: 1
+   comment percentage  : 5.55
+   blank lines         : 7
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 3
+   all type definitions     : 3
+   public subprograms       : 0
+   all statements           : 0
+   all declarations         : 14
+   logical SLOC             : 14
+   maximal unit nesting     : 2
+   maximal construct nesting: 1
+
+   Bounded_Buffer (protected type at lines  63: 70)
+
+   === Code line metrics ===
+      all lines           : 8
+      code lines          : 8
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 8
+      logical SLOC             : 8
+      maximal unit nesting     : 1
+      maximal construct nesting: 1

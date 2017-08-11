@@ -1,0 +1,78 @@
+Metrics computed for src/cc3230a.adb
+containing procedure body CC3230A
+
+=== Code line metrics ===
+  all lines           : 133
+  code lines          : 90
+  comment lines       : 30
+  end-of-line comments: 0
+  comment percentage  : 25.00
+  blank lines         : 13
+
+CC3230A (procedure body - library item at lines  35: 133)
+
+=== Code line metrics ===
+   all lines           : 99
+   code lines          : 89
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 10
+
+=== Element metrics ===
+   all type definitions     : 6
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 40
+   all declarations         : 27
+   logical SLOC             : 67
+   maximal unit nesting     : 1
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 15
+   expression complexity    : 2
+   cyclomatic complexity    : 17
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   P (generic package at lines  37: 42)
+
+   === Code line metrics ===
+      all lines           : 6
+      code lines          : 6
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 4
+      logical SLOC             : 4
+      maximal construct nesting: 1
+
+   LP (generic package at lines  44: 49)
+
+   === Code line metrics ===
+      all lines           : 6
+      code lines          : 6
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 4
+      logical SLOC             : 4
+      maximal construct nesting: 1
+
+=== Average complexity metrics ===
+      statement_complexity     :  15.00
+      expression_complexity    :  2.00
+      cyclomatic_complexity    :  17.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

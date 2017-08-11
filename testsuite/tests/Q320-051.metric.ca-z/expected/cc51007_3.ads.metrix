@@ -1,0 +1,57 @@
+Metrics computed for src/cc51007_3.ads
+containing generic package CC51007_3
+
+=== Code line metrics ===
+  all lines           : 49
+  code lines          : 27
+  comment lines       : 3
+  end-of-line comments: 10
+  comment percentage  : 43.33
+  blank lines         : 19
+
+CC51007_3 (generic package - library item at lines  7: 49)
+
+=== Code line metrics ===
+   all lines           : 43
+   code lines          : 26
+   comment lines       : 2
+   end-of-line comments: 10
+   comment percentage  : 42.85
+   blank lines         : 15
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 5
+   all type definitions     : 6
+   public subprograms       : 2
+   all statements           : 0
+   all declarations         : 19
+   logical SLOC             : 19
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Clear_Message (function at lines  12: 13)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Annotate_Alert (function at lines  26: 27)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0

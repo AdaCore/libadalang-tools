@@ -1,0 +1,44 @@
+Metrics computed for src/cxh3001.adb
+containing procedure body CXH3001
+
+=== Code line metrics ===
+  all lines           : 50
+  code lines          : 35
+  comment lines       : 5
+  end-of-line comments: 3
+  comment percentage  : 20.00
+  blank lines         : 10
+
+CXH3001 (procedure body - library item at lines  6: 50)
+
+=== Code line metrics ===
+   all lines           : 45
+   code lines          : 33
+   comment lines       : 4
+   end-of-line comments: 3
+   comment percentage  : 18.91
+   blank lines         : 8
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 17
+   all declarations         : 3
+   logical SLOC             : 20
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 4
+   expression complexity    : 0
+   cyclomatic complexity    : 4
+   essential complexity     : 1
+   maximum loop nesting     : 1
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  4.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  4.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  1.00

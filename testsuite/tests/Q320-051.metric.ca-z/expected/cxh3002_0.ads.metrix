@@ -1,0 +1,97 @@
+Metrics computed for src/cxh3002_0.ads
+containing package CXH3002_0
+
+=== Code line metrics ===
+  all lines           : 166
+  code lines          : 26
+  comment lines       : 123
+  end-of-line comments: 1
+  comment percentage  : 83.22
+  blank lines         : 17
+
+CXH3002_0 (package - library item at lines  127: 166)
+
+=== Code line metrics ===
+   all lines           : 40
+   code lines          : 25
+   comment lines       : 2
+   end-of-line comments: 1
+   comment percentage  : 11.11
+   blank lines         : 13
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 11
+   all type definitions     : 11
+   public subprograms       : 2
+   all statements           : 0
+   all declarations         : 27
+   logical SLOC             : 27
+   maximal unit nesting     : 2
+   maximal construct nesting: 1
+
+   Proc (procedure at lines  149: 149)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Func (function at lines  150: 150)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   PT (protected type at lines  152: 156)
+
+   === Code line metrics ===
+      all lines           : 5
+      code lines          : 5
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 4
+      logical SLOC             : 4
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+   TT (task type at lines  158: 160)
+
+   === Code line metrics ===
+      all lines           : 3
+      code lines          : 3
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 3
+      logical SLOC             : 3
+      maximal construct nesting: 1

@@ -1,0 +1,73 @@
+Metrics computed for src/cxb5002.adb
+containing procedure body CXB5002
+
+=== Code line metrics ===
+  all lines           : 334
+  code lines          : 183
+  comment lines       : 87
+  end-of-line comments: 1
+  comment percentage  : 32.59
+  blank lines         : 64
+
+CXB5002 (procedure body - library item at lines  83: 334)
+
+=== Code line metrics ===
+   all lines           : 252
+   code lines          : 176
+   comment lines       : 14
+   end-of-line comments: 0
+   comment percentage  : 7.36
+   blank lines         : 62
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 2
+   all statements           : 60
+   all declarations         : 41
+   logical SLOC             : 101
+   maximal unit nesting     : 1
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 22
+   expression complexity    : 0
+   cyclomatic complexity    : 22
+   essential complexity     : 1
+   maximum loop nesting     : 1
+   extra exit points        : 0
+
+   Check_Length (procedure body at lines  143: 153)
+
+   === Code line metrics ===
+      all lines           : 11
+      code lines          : 11
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 2
+      all declarations         : 4
+      logical SLOC             : 6
+      maximal construct nesting: 2
+      all parameters           : 3
+      IN parameters            : 3
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 2
+      expression complexity    : 0
+      cyclomatic complexity    : 2
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  12.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  12.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  1.00

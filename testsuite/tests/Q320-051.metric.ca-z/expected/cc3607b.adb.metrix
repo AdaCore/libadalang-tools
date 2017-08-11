@@ -1,0 +1,198 @@
+Metrics computed for src/cc3607b.adb
+containing procedure body CC3607B
+
+=== Code line metrics ===
+  all lines           : 79
+  code lines          : 39
+  comment lines       : 29
+  end-of-line comments: 0
+  comment percentage  : 42.64
+  blank lines         : 11
+
+CC3607B (procedure body - library item at lines  34: 79)
+
+=== Code line metrics ===
+   all lines           : 46
+   code lines          : 38
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 8
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 4
+   all statements           : 7
+   all declarations         : 12
+   logical SLOC             : 19
+   maximal unit nesting     : 3
+   maximal construct nesting: 5
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 1
+   expression complexity    : 0
+   cyclomatic complexity    : 1
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   PROC_PACK (package at lines  41: 49)
+
+   === Code line metrics ===
+      all lines           : 9
+      code lines          : 8
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 1
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 5
+      logical SLOC             : 5
+      maximal unit nesting     : 2
+      maximal construct nesting: 2
+
+      PROC (procedure at lines  42: 42)
+
+      === Element metrics ===
+         all parameters           : 0
+
+      GEN_PACK (generic package at lines  44: 48)
+
+      === Code line metrics ===
+         all lines           : 5
+         code lines          : 5
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 0
+         all declarations         : 3
+         logical SLOC             : 3
+         maximal unit nesting     : 1
+         maximal construct nesting: 1
+
+         DO_PROC (procedure at lines  47: 47)
+
+         === Element metrics ===
+            all parameters           : 0
+
+   PROC_PACK (package body at lines  52: 64)
+
+   === Code line metrics ===
+      all lines           : 13
+      code lines          : 12
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 1
+
+   === Element metrics ===
+      all statements           : 2
+      all declarations         : 4
+      logical SLOC             : 6
+      maximal unit nesting     : 2
+      maximal construct nesting: 3
+
+      PROC (procedure body at lines  53: 56)
+
+      === Code line metrics ===
+         all lines           : 4
+         code lines          : 4
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 1
+         all declarations         : 1
+         logical SLOC             : 2
+         maximal construct nesting: 1
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+      GEN_PACK (package body at lines  58: 63)
+
+      === Code line metrics ===
+         all lines           : 6
+         code lines          : 6
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 1
+         all declarations         : 2
+         logical SLOC             : 3
+         maximal unit nesting     : 1
+         maximal construct nesting: 2
+
+         DO_PROC (procedure body at lines  59: 62)
+
+         === Code line metrics ===
+            all lines           : 4
+            code lines          : 4
+            comment lines       : 0
+            end-of-line comments: 0
+            comment percentage  : 0.00
+            blank lines         : 0
+
+         === Element metrics ===
+            all statements           : 1
+            all declarations         : 1
+            logical SLOC             : 2
+            maximal construct nesting: 1
+            all parameters           : 0
+
+         === Complexity metrics ===
+            statement complexity     : 1
+            expression complexity    : 0
+            cyclomatic complexity    : 1
+            essential complexity     : 1
+            maximum loop nesting     : 0
+            extra exit points        : 0
+
+   PROC (procedure body at lines  66: 70)
+
+   === Code line metrics ===
+      all lines           : 5
+      code lines          : 5
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 1
+      logical SLOC             : 2
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

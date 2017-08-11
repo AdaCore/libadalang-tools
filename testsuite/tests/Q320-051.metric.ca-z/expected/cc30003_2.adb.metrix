@@ -1,0 +1,119 @@
+Metrics computed for src/cc30003_2.adb
+containing package body CC30003_2
+
+=== Code line metrics ===
+  all lines           : 28
+  code lines          : 22
+  comment lines       : 0
+  end-of-line comments: 5
+  comment percentage  : 22.72
+  blank lines         : 6
+
+CC30003_2 (package body - library item at lines  5: 28)
+
+=== Code line metrics ===
+   all lines           : 24
+   code lines          : 20
+   comment lines       : 0
+   end-of-line comments: 5
+   comment percentage  : 25.00
+   blank lines         : 4
+
+=== Element metrics ===
+   all subprogram bodies    : 3
+   all statements           : 9
+   all declarations         : 7
+   logical SLOC             : 16
+   maximal unit nesting     : 1
+   maximal construct nesting: 2
+
+   Area (function body at lines  7: 12)
+
+   === Code line metrics ===
+      all lines           : 6
+      code lines          : 6
+      comment lines       : 0
+      end-of-line comments: 2
+      comment percentage  : 33.33
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 3
+      all declarations         : 2
+      logical SLOC             : 5
+      maximal construct nesting: 1
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Hypotenuse (function body at lines  14: 19)
+
+   === Code line metrics ===
+      all lines           : 6
+      code lines          : 6
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 16.66
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 2
+      all declarations         : 2
+      logical SLOC             : 4
+      maximal construct nesting: 1
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Clear (procedure body at lines  21: 26)
+
+   === Code line metrics ===
+      all lines           : 6
+      code lines          : 6
+      comment lines       : 0
+      end-of-line comments: 2
+      comment percentage  : 33.33
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 4
+      all declarations         : 2
+      logical SLOC             : 6
+      maximal construct nesting: 1
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

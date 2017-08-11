@@ -1,0 +1,28 @@
+Metrics computed for src/ca5003b1.adb
+containing package body CA5003B1
+
+=== Code line metrics ===
+  all lines           : 8
+  code lines          : 4
+  comment lines       : 0
+  end-of-line comments: 0
+  comment percentage  : 0.00
+  blank lines         : 4
+
+CA5003B1 (package body - library item at lines  3: 8)
+
+=== Code line metrics ===
+   all lines           : 6
+   code lines          : 4
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 2
+
+=== Element metrics ===
+   all subprogram bodies    : 0
+   all statements           : 0
+   all declarations         : 3
+   logical SLOC             : 3
+   maximal unit nesting     : 1
+   maximal construct nesting: 1

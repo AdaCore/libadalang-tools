@@ -1,0 +1,69 @@
+Metrics computed for src/f552a00_bingo_balls.ads
+containing package F552A00_Bingo_Balls
+
+=== Code line metrics ===
+  all lines           : 89
+  code lines          : 54
+  comment lines       : 16
+  end-of-line comments: 0
+  comment percentage  : 22.85
+  blank lines         : 19
+
+F552A00_Bingo_Balls (package - library item at lines  5: 89)
+
+=== Code line metrics ===
+   all lines           : 85
+   code lines          : 52
+   comment lines       : 16
+   end-of-line comments: 0
+   comment percentage  : 23.52
+   blank lines         : 17
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 4
+   private types            : 3
+   all type definitions     : 4
+   public subprograms       : 3
+   all statements           : 0
+   all declarations         : 100
+   logical SLOC             : 100
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Has_Element (function at lines  36: 36)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Iterate (function at lines  42: 44)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Constant_Reference (function at lines  50: 52)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0

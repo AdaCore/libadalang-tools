@@ -1,0 +1,38 @@
+Metrics computed for src/cd5003i_pack3.ads
+containing package CD5003I_PACK3
+
+=== Code line metrics ===
+  all lines           : 38
+  code lines          : 4
+  comment lines       : 31
+  end-of-line comments: 0
+  comment percentage  : 88.57
+  blank lines         : 3
+
+CD5003I_PACK3 (package - library item at lines  35: 38)
+
+=== Code line metrics ===
+   all lines           : 4
+   code lines          : 4
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 0
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 2
+   logical SLOC             : 2
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   PROC2 (generic procedure at lines  36: 37)
+
+   === Contract metrics ===
+      contract complexity      : 1

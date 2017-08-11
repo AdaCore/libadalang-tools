@@ -1,0 +1,44 @@
+Metrics computed for src/ce2205a.adb
+containing procedure body CE2205A
+
+=== Code line metrics ===
+  all lines           : 151
+  code lines          : 90
+  comment lines       : 42
+  end-of-line comments: 0
+  comment percentage  : 31.81
+  blank lines         : 19
+
+CE2205A (procedure body - library item at lines  50: 151)
+
+=== Code line metrics ===
+   all lines           : 102
+   code lines          : 88
+   comment lines       : 1
+   end-of-line comments: 0
+   comment percentage  : 1.12
+   blank lines         : 13
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 42
+   all declarations         : 6
+   logical SLOC             : 48
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 4
+   expression complexity    : 0
+   cyclomatic complexity    : 4
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  4.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  4.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

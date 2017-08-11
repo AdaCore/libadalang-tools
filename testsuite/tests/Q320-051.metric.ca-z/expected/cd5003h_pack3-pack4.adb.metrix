@@ -1,0 +1,42 @@
+Metrics computed for src/cd5003h_pack3-pack4.adb
+containing package body subunit CD5003H_PACK3.PACK4
+
+=== Code line metrics ===
+  all lines           : 27
+  code lines          : 23
+  comment lines       : 0
+  end-of-line comments: 0
+  comment percentage  : 0.00
+  blank lines         : 4
+
+PACK4 (package body - subunit at lines  7: 27)
+
+=== Code line metrics ===
+   all lines           : 21
+   code lines          : 18
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 3
+
+=== Element metrics ===
+   all subprogram bodies    : 0
+   all statements           : 6
+   all declarations         : 2
+   logical SLOC             : 8
+   maximal construct nesting: 2
+
+=== Complexity metrics ===
+   statement complexity     : 3
+   expression complexity    : 0
+   cyclomatic complexity    : 3
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  3.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  3.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

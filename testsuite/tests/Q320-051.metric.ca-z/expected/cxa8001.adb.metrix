@@ -1,0 +1,45 @@
+Metrics computed for src/cxa8001.adb
+containing procedure body CXA8001
+
+=== Code line metrics ===
+  all lines           : 243
+  code lines          : 110
+  comment lines       : 91
+  end-of-line comments: 20
+  comment percentage  : 55.22
+  blank lines         : 42
+
+CXA8001 (procedure body - library item at lines  68: 243)
+
+=== Code line metrics ===
+   all lines           : 176
+   code lines          : 108
+   comment lines       : 28
+   end-of-line comments: 20
+   comment percentage  : 35.29
+   blank lines         : 40
+
+=== Element metrics ===
+   all type definitions     : 2
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 41
+   all declarations         : 14
+   logical SLOC             : 55
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 4
+   expression complexity    : 0
+   cyclomatic complexity    : 4
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  4.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  4.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

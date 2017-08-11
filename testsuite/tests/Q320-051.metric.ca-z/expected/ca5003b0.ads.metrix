@@ -1,0 +1,44 @@
+Metrics computed for src/ca5003b0.ads
+containing package CA5003B0
+
+=== Code line metrics ===
+  all lines           : 40
+  code lines          : 5
+  comment lines       : 27
+  end-of-line comments: 0
+  comment percentage  : 84.37
+  blank lines         : 8
+
+CA5003B0 (package - library item at lines  32: 40)
+
+=== Code line metrics ===
+   all lines           : 9
+   code lines          : 5
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 4
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 5
+   logical SLOC             : 5
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   SHOW_ELAB (function at lines  38: 38)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0

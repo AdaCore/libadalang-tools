@@ -1,0 +1,45 @@
+Metrics computed for src/cda201b.adb
+containing procedure body CDA201B
+
+=== Code line metrics ===
+  all lines           : 63
+  code lines          : 21
+  comment lines       : 30
+  end-of-line comments: 0
+  comment percentage  : 58.82
+  blank lines         : 12
+
+CDA201B (procedure body - library item at lines  36: 63)
+
+=== Code line metrics ===
+   all lines           : 28
+   code lines          : 19
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 9
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 7
+   all declarations         : 6
+   logical SLOC             : 13
+   maximal construct nesting: 2
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 3
+   expression complexity    : 0
+   cyclomatic complexity    : 3
+   essential complexity     : 1
+   maximum loop nesting     : 1
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  3.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  3.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  1.00

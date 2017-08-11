@@ -1,0 +1,44 @@
+Metrics computed for src/ce3804m.adb
+containing procedure body CE3804M
+
+=== Code line metrics ===
+  all lines           : 157
+  code lines          : 97
+  comment lines       : 36
+  end-of-line comments: 5
+  comment percentage  : 30.82
+  blank lines         : 24
+
+CE3804M (procedure body - library item at lines  44: 157)
+
+=== Code line metrics ===
+   all lines           : 114
+   code lines          : 95
+   comment lines       : 0
+   end-of-line comments: 5
+   comment percentage  : 5.26
+   blank lines         : 19
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 51
+   all declarations         : 5
+   logical SLOC             : 56
+   maximal construct nesting: 5
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 4
+   expression complexity    : 0
+   cyclomatic complexity    : 4
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  4.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  4.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

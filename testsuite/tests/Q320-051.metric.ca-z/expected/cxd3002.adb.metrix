@@ -1,0 +1,266 @@
+Metrics computed for src/cxd3002.adb
+containing procedure body CXD3002
+
+=== Code line metrics ===
+  all lines           : 224
+  code lines          : 85
+  comment lines       : 92
+  end-of-line comments: 6
+  comment percentage  : 55.36
+  blank lines         : 47
+
+CXD3002 (procedure body - library item at lines  74: 224)
+
+=== Code line metrics ===
+   all lines           : 151
+   code lines          : 82
+   comment lines       : 28
+   end-of-line comments: 6
+   comment percentage  : 30.90
+   blank lines         : 41
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : unknown
+   all subprogram bodies    : 3
+   all statements           : 22
+   all declarations         : 25
+   logical SLOC             : 47
+   maximal unit nesting     : 2
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 4
+   expression complexity    : 0
+   cyclomatic complexity    : 4
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   Protected_Object (protected object at lines  92: 100)
+
+   === Code line metrics ===
+      all lines           : 9
+      code lines          : 4
+      comment lines       : 2
+      end-of-line comments: 0
+      comment percentage  : 33.33
+      blank lines         : 3
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 4
+      logical SLOC             : 4
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      For_Ceiling_Check (procedure at lines  97: 97)
+
+      === Element metrics ===
+         all parameters           : 1
+         IN parameters            : 1
+         OUT parameters           : 0
+         IN OUT parameters        : 0
+
+      Verify_Calls (function at lines  98: 98)
+
+      === Element metrics ===
+         all parameters           : 0
+
+   Protected_Object (protected body at lines  103: 133)
+
+   === Code line metrics ===
+      all lines           : 31
+      code lines          : 16
+      comment lines       : 9
+      end-of-line comments: 0
+      comment percentage  : 36.00
+      blank lines         : 6
+
+   === Element metrics ===
+      all statements           : 4
+      all declarations         : 4
+      logical SLOC             : 8
+      maximal unit nesting     : 1
+      maximal construct nesting: 3
+
+      For_Ceiling_Check (procedure body at lines  105: 116)
+
+      === Code line metrics ===
+         all lines           : 12
+         code lines          : 4
+         comment lines       : 6
+         end-of-line comments: 0
+         comment percentage  : 60.00
+         blank lines         : 2
+
+      === Element metrics ===
+         all statements           : 1
+         all declarations         : 2
+         logical SLOC             : 3
+         maximal construct nesting: 1
+         all parameters           : 1
+         IN parameters            : 1
+         OUT parameters           : 0
+         IN OUT parameters        : 0
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+      Verify_Calls (function body at lines  118: 131)
+
+      === Code line metrics ===
+         all lines           : 14
+         code lines          : 10
+         comment lines       : 3
+         end-of-line comments: 0
+         comment percentage  : 23.07
+         blank lines         : 1
+
+      === Element metrics ===
+         all statements           : 3
+         all declarations         : 1
+         logical SLOC             : 4
+         maximal construct nesting: 2
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 2
+         expression complexity    : 0
+         cyclomatic complexity    : 2
+         essential complexity     : 2
+         maximum loop nesting     : 0
+         extra exit points        : 1
+
+   Task_of_1Q_Priority (task object at lines  142: 144)
+
+   === Code line metrics ===
+      all lines           : 3
+      code lines          : 3
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 1
+      logical SLOC             : 1
+      maximal construct nesting: 1
+
+   Task_of_Top_Priority (task object at lines  146: 148)
+
+   === Code line metrics ===
+      all lines           : 3
+      code lines          : 3
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 1
+      logical SLOC             : 1
+      maximal construct nesting: 1
+
+   Task_of_Int_Priority (task object at lines  150: 152)
+
+   === Code line metrics ===
+      all lines           : 3
+      code lines          : 3
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 1
+      logical SLOC             : 1
+      maximal construct nesting: 1
+
+   Task_of_1Q_Priority (task body at lines  158: 167)
+
+   === Code line metrics ===
+      all lines           : 10
+      code lines          : 8
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 12.50
+      blank lines         : 2
+
+   === Element metrics ===
+      all statements           : 2
+      all declarations         : 2
+      logical SLOC             : 4
+      maximal construct nesting: 1
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Task_of_Top_Priority (task body at lines  173: 182)
+
+   === Code line metrics ===
+      all lines           : 10
+      code lines          : 8
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 12.50
+      blank lines         : 2
+
+   === Element metrics ===
+      all statements           : 2
+      all declarations         : 2
+      logical SLOC             : 4
+      maximal construct nesting: 1
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Task_of_Int_Priority (task body at lines  189: 199)
+
+   === Code line metrics ===
+      all lines           : 11
+      code lines          : 11
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 9.09
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 4
+      all declarations         : 2
+      logical SLOC             : 6
+      maximal construct nesting: 1
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.66
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.66
+      essential_complexity     :  1.16
+      max_loop_nesting         :  0.00

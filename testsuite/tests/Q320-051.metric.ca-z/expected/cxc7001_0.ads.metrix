@@ -1,0 +1,56 @@
+Metrics computed for src/cxc7001_0.ads
+containing package CXC7001_0
+
+=== Code line metrics ===
+  all lines           : 75
+  code lines          : 9
+  comment lines       : 61
+  end-of-line comments: 0
+  comment percentage  : 87.14
+  blank lines         : 5
+
+CXC7001_0 (package - library item at lines  65: 75)
+
+=== Code line metrics ===
+   all lines           : 11
+   code lines          : 8
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 3
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 2
+   all type definitions     : 2
+   public subprograms       : 0
+   all statements           : 0
+   all declarations         : 8
+   logical SLOC             : 8
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Task_Type (task type at lines  67: 71)
+
+   === Code line metrics ===
+      all lines           : 5
+      code lines          : 5
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 6
+      logical SLOC             : 6
+      maximal construct nesting: 1

@@ -1,0 +1,47 @@
+Metrics computed for src/cxe2002_1.adb
+containing procedure body CXE2002_1
+
+=== Code line metrics ===
+  all lines           : 11
+  code lines          : 8
+  comment lines       : 2
+  end-of-line comments: 0
+  comment percentage  : 20.00
+  blank lines         : 1
+
+CXE2002_1 (procedure body - library item at lines  3: 11)
+
+=== Code line metrics ===
+   all lines           : 9
+   code lines          : 7
+   comment lines       : 2
+   end-of-line comments: 0
+   comment percentage  : 22.22
+   blank lines         : 0
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 2
+   all declarations         : 2
+   logical SLOC             : 4
+   maximal construct nesting: 2
+   all parameters           : 1
+   IN parameters            : 1
+   OUT parameters           : 0
+   IN OUT parameters        : 0
+
+=== Complexity metrics ===
+   statement complexity     : 2
+   expression complexity    : 0
+   cyclomatic complexity    : 2
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  2.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  2.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

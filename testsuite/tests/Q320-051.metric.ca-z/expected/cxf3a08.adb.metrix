@@ -1,0 +1,44 @@
+Metrics computed for src/cxf3a08.adb
+containing procedure body CXF3A08
+
+=== Code line metrics ===
+  all lines           : 289
+  code lines          : 136
+  comment lines       : 96
+  end-of-line comments: 17
+  comment percentage  : 48.70
+  blank lines         : 57
+
+CXF3A08 (procedure body - library item at lines  66: 289)
+
+=== Code line metrics ===
+   all lines           : 224
+   code lines          : 133
+   comment lines       : 36
+   end-of-line comments: 17
+   comment percentage  : 31.36
+   blank lines         : 55
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 40
+   all declarations         : 13
+   logical SLOC             : 53
+   maximal construct nesting: 5
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 5
+   expression complexity    : 0
+   cyclomatic complexity    : 5
+   essential complexity     : 1
+   maximum loop nesting     : 1
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  5.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  5.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  1.00

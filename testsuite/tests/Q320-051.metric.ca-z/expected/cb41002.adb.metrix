@@ -1,0 +1,143 @@
+Metrics computed for src/cb41002.adb
+containing procedure body CB41002
+
+=== Code line metrics ===
+  all lines           : 283
+  code lines          : 168
+  comment lines       : 73
+  end-of-line comments: 3
+  comment percentage  : 31.53
+  blank lines         : 42
+
+CB41002 (procedure body - library item at lines  59: 283)
+
+=== Code line metrics ===
+   all lines           : 225
+   code lines          : 166
+   comment lines       : 19
+   end-of-line comments: 3
+   comment percentage  : 11.89
+   blank lines         : 40
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : unknown
+   all subprogram bodies    : 3
+   all statements           : 57
+   all declarations         : 21
+   logical SLOC             : 78
+   maximal unit nesting     : 2
+   maximal construct nesting: 6
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 5
+   expression complexity    : 0
+   cyclomatic complexity    : 5
+   essential complexity     : 1
+   maximum loop nesting     : 1
+   extra exit points        : 0
+
+   Check_Exception_Information (procedure body at lines  93: 127)
+
+   === Code line metrics ===
+      all lines           : 35
+      code lines          : 25
+      comment lines       : 10
+      end-of-line comments: 0
+      comment percentage  : 28.57
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 7
+      all declarations         : 6
+      logical SLOC             : 13
+      maximal unit nesting     : 1
+      maximal construct nesting: 4
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 3
+      expression complexity    : 0
+      cyclomatic complexity    : 3
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+      Is_Substring_of (function body at lines  98: 109)
+
+      === Code line metrics ===
+         all lines           : 12
+         code lines          : 10
+         comment lines       : 2
+         end-of-line comments: 0
+         comment percentage  : 16.66
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 4
+         all declarations         : 3
+         logical SLOC             : 7
+         maximal construct nesting: 3
+         all parameters           : 2
+         IN parameters            : 2
+         OUT parameters           : 0
+         IN OUT parameters        : 0
+
+      === Complexity metrics ===
+         statement complexity     : 3
+         expression complexity    : 0
+         cyclomatic complexity    : 3
+         essential complexity     : 3
+         maximum loop nesting     : 1
+         extra exit points        : 1
+
+   Raise_An_Exception (task object at lines  237: 239)
+
+   === Code line metrics ===
+      all lines           : 3
+      code lines          : 3
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 33.33
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 2
+      logical SLOC             : 2
+      maximal construct nesting: 1
+
+   Raise_An_Exception (task body at lines  241: 259)
+
+   === Code line metrics ===
+      all lines           : 19
+      code lines          : 19
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 7
+      all declarations         : 2
+      logical SLOC             : 9
+      maximal construct nesting: 2
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  3.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  3.00
+      essential_complexity     :  1.50
+      max_loop_nesting         :  1.00

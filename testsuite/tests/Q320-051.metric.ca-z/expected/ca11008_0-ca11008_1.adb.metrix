@@ -1,0 +1,88 @@
+Metrics computed for src/ca11008_0-ca11008_1.adb
+containing package body CA11008_0.CA11008_1
+
+=== Code line metrics ===
+  all lines           : 27
+  code lines          : 21
+  comment lines       : 2
+  end-of-line comments: 8
+  comment percentage  : 43.47
+  blank lines         : 4
+
+CA11008_0.CA11008_1 (package body - library item at lines  4: 27)
+
+=== Code line metrics ===
+   all lines           : 24
+   code lines          : 21
+   comment lines       : 1
+   end-of-line comments: 8
+   comment percentage  : 40.90
+   blank lines         : 2
+
+=== Element metrics ===
+   all subprogram bodies    : 2
+   all statements           : 9
+   all declarations         : 6
+   logical SLOC             : 15
+   maximal unit nesting     : 1
+   maximal construct nesting: 2
+
+   Next_Available_File (function body at lines  6: 10)
+
+   === Code line metrics ===
+      all lines           : 5
+      code lines          : 5
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 2
+      all declarations         : 1
+      logical SLOC             : 3
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Initialize (function body at lines  12: 25)
+
+   === Code line metrics ===
+      all lines           : 14
+      code lines          : 14
+      comment lines       : 0
+      end-of-line comments: 6
+      comment percentage  : 42.85
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 7
+      all declarations         : 4
+      logical SLOC             : 11
+      maximal construct nesting: 1
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

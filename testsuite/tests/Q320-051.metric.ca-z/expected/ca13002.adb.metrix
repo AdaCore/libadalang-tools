@@ -1,0 +1,44 @@
+Metrics computed for src/ca13002.adb
+containing procedure body CA13002
+
+=== Code line metrics ===
+  all lines           : 43
+  code lines          : 25
+  comment lines       : 8
+  end-of-line comments: 5
+  comment percentage  : 39.39
+  blank lines         : 10
+
+CA13002 (procedure body - library item at lines  13: 43)
+
+=== Code line metrics ===
+   all lines           : 31
+   code lines          : 19
+   comment lines       : 5
+   end-of-line comments: 0
+   comment percentage  : 20.83
+   blank lines         : 7
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 8
+   all declarations         : 2
+   logical SLOC             : 10
+   maximal construct nesting: 2
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 2
+   expression complexity    : 0
+   cyclomatic complexity    : 2
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  2.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  2.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

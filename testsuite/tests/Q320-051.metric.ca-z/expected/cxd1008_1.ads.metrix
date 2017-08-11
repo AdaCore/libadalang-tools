@@ -1,0 +1,74 @@
+Metrics computed for src/cxd1008_1.ads
+containing package CXD1008_1
+
+=== Code line metrics ===
+  all lines           : 9
+  code lines          : 6
+  comment lines       : 1
+  end-of-line comments: 0
+  comment percentage  : 14.28
+  blank lines         : 2
+
+CXD1008_1 (package - library item at lines  4: 9)
+
+=== Code line metrics ===
+   all lines           : 6
+   code lines          : 6
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 0
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 4
+   all statements           : 0
+   all declarations         : 8
+   logical SLOC             : 8
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Do_Float (procedure at lines  5: 5)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Do_Exceptions (procedure at lines  6: 6)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Preemption (procedure at lines  7: 7)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Wait_Till_Done (procedure at lines  8: 8)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0

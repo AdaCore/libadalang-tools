@@ -1,0 +1,34 @@
+Metrics computed for src/cxa9002_0.ads
+containing package CXA9002_0
+
+=== Code line metrics ===
+  all lines           : 105
+  code lines          : 25
+  comment lines       : 72
+  end-of-line comments: 0
+  comment percentage  : 74.22
+  blank lines         : 8
+
+CXA9002_0 (package - library item at lines  74: 105)
+
+=== Code line metrics ===
+   all lines           : 32
+   code lines          : 25
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 7
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 7
+   all type definitions     : 7
+   public subprograms       : 0
+   all statements           : 0
+   all declarations         : 20
+   logical SLOC             : 20
+   maximal construct nesting: 1

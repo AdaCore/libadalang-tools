@@ -1,0 +1,44 @@
+Metrics computed for src/ce2104c.adb
+containing procedure body CE2104C
+
+=== Code line metrics ===
+  all lines           : 115
+  code lines          : 51
+  comment lines       : 41
+  end-of-line comments: 0
+  comment percentage  : 44.56
+  blank lines         : 23
+
+CE2104C (procedure body - library item at lines  47: 115)
+
+=== Code line metrics ===
+   all lines           : 69
+   code lines          : 49
+   comment lines       : 3
+   end-of-line comments: 0
+   comment percentage  : 5.76
+   blank lines         : 17
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 23
+   all declarations         : 5
+   logical SLOC             : 28
+   maximal construct nesting: 2
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 2
+   expression complexity    : 0
+   cyclomatic complexity    : 2
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  2.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  2.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

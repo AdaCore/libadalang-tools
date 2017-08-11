@@ -1,0 +1,46 @@
+Metrics computed for src/ca11016_0-ca11016_2.ads
+containing package CA11016_0.CA11016_2
+
+=== Code line metrics ===
+  all lines           : 28
+  code lines          : 14
+  comment lines       : 4
+  end-of-line comments: 2
+  comment percentage  : 33.33
+  blank lines         : 10
+
+CA11016_0.CA11016_2 (package - library item at lines  7: 28)
+
+=== Code line metrics ===
+   all lines           : 22
+   code lines          : 14
+   comment lines       : 2
+   end-of-line comments: 2
+   comment percentage  : 25.00
+   blank lines         : 6
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 3
+   all type definitions     : 3
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 15
+   logical SLOC             : 15
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Data_For_SDUGD (procedure at lines  24: 26)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 3
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 1

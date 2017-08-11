@@ -1,0 +1,73 @@
+Metrics computed for src/cb20a02.adb
+containing procedure body CB20A02
+
+=== Code line metrics ===
+  all lines           : 155
+  code lines          : 75
+  comment lines       : 57
+  end-of-line comments: 2
+  comment percentage  : 44.69
+  blank lines         : 23
+
+CB20A02 (procedure body - library item at lines  56: 155)
+
+=== Code line metrics ===
+   all lines           : 100
+   code lines          : 72
+   comment lines       : 7
+   end-of-line comments: 1
+   comment percentage  : 10.12
+   blank lines         : 21
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 2
+   all statements           : 27
+   all declarations         : 10
+   logical SLOC             : 37
+   maximal unit nesting     : 1
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 1
+   expression complexity    : 0
+   cyclomatic complexity    : 1
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   Random_Number_Generator (function body at lines  63: 87)
+
+   === Code line metrics ===
+      all lines           : 25
+      code lines          : 18
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 5.55
+      blank lines         : 7
+
+   === Element metrics ===
+      all statements           : 7
+      all declarations         : 4
+      logical SLOC             : 11
+      maximal construct nesting: 2
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 4
+      expression complexity    : 0
+      cyclomatic complexity    : 4
+      essential complexity     : 2
+      maximum loop nesting     : 0
+      extra exit points        : 3
+
+=== Average complexity metrics ===
+      statement_complexity     :  2.50
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  2.50
+      essential_complexity     :  1.50
+      max_loop_nesting         :  0.00

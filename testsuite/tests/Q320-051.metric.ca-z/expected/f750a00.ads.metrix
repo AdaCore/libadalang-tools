@@ -1,0 +1,154 @@
+Metrics computed for src/f750a00.ads
+containing package F750A00
+
+=== Code line metrics ===
+  all lines           : 127
+  code lines          : 51
+  comment lines       : 45
+  end-of-line comments: 0
+  comment percentage  : 46.87
+  blank lines         : 31
+
+F750A00 (package - library item at lines  48: 127)
+
+=== Code line metrics ===
+   all lines           : 80
+   code lines          : 51
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 29
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 7
+   all type definitions     : 7
+   public subprograms       : 11
+   all statements           : 0
+   all declarations         : 43
+   logical SLOC             : 43
+   maximal unit nesting     : 2
+   maximal construct nesting: 1
+
+   Func_Lim_Rec (function at lines  55: 55)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   Func_Lim_Array (function at lines  64: 64)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   Func_New_One (function at lines  75: 75)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   Func_Lim_Tagged (function at lines  83: 83)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Func_New_One (function at lines  85: 85)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   Func_Lim_Ext (function at lines  87: 87)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   Func_Lim_Ext_Access (function at lines  89: 89)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   Func_Lim_Tagged_Access (function at lines  103: 103)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Prot (protected type at lines  109: 114)
+
+   === Code line metrics ===
+      all lines           : 6
+      code lines          : 6
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 5
+      logical SLOC             : 5
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      Get (function at lines  110: 110)
+
+      === Contract metrics ===
+         contract complexity      : 1
+
+      === Element metrics ===
+         all parameters           : 0
+
+      Set (procedure at lines  111: 111)
+
+      === Contract metrics ===
+         contract complexity      : 1
+
+      === Element metrics ===
+         all parameters           : 1
+         IN parameters            : 1
+         OUT parameters           : 0
+         IN OUT parameters        : 0
+
+   Func_Lim_Comp (function at lines  121: 121)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0

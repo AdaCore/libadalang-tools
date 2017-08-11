@@ -1,0 +1,116 @@
+Metrics computed for src/cdb3a01.adb
+containing procedure body CDB3A01
+
+=== Code line metrics ===
+  all lines           : 170
+  code lines          : 95
+  comment lines       : 45
+  end-of-line comments: 1
+  comment percentage  : 32.85
+  blank lines         : 30
+
+CDB3A01 (procedure body - library item at lines  53: 170)
+
+=== Code line metrics ===
+   all lines           : 118
+   code lines          : 90
+   comment lines       : 0
+   end-of-line comments: 1
+   comment percentage  : 1.11
+   blank lines         : 28
+
+=== Element metrics ===
+   all type definitions     : 2
+   public subprograms       : unknown
+   all subprogram bodies    : 2
+   all statements           : 19
+   all declarations         : 28
+   logical SLOC             : 47
+   maximal unit nesting     : 2
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 2
+   expression complexity    : 0
+   cyclomatic complexity    : 2
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   P1 (generic package at lines  66: 81)
+
+   === Code line metrics ===
+      all lines           : 16
+      code lines          : 12
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 4
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 10
+      logical SLOC             : 10
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      Create (function at lines  71: 71)
+
+      === Element metrics ===
+         all parameters           : 2
+         IN parameters            : 2
+         OUT parameters           : 0
+         IN OUT parameters        : 0
+
+   P1 (package body at lines  83: 90)
+
+   === Code line metrics ===
+      all lines           : 8
+      code lines          : 8
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 2
+      all declarations         : 5
+      logical SLOC             : 7
+      maximal unit nesting     : 1
+      maximal construct nesting: 2
+
+      Create (function body at lines  84: 89)
+
+      === Code line metrics ===
+         all lines           : 6
+         code lines          : 6
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 2
+         all declarations         : 4
+         logical SLOC             : 6
+         maximal construct nesting: 1
+         all parameters           : 2
+         IN parameters            : 2
+         OUT parameters           : 0
+         IN OUT parameters        : 0
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.50
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.50
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

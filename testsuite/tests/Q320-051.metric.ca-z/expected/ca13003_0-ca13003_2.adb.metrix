@@ -1,0 +1,28 @@
+Metrics computed for src/ca13003_0-ca13003_2.adb
+containing package body subunit CA13003_0.CA13003_2
+
+=== Code line metrics ===
+  all lines           : 12
+  code lines          : 7
+  comment lines       : 1
+  end-of-line comments: 3
+  comment percentage  : 50.00
+  blank lines         : 4
+
+CA13003_2 (package body - subunit at lines  5: 12)
+
+=== Code line metrics ===
+   all lines           : 8
+   code lines          : 6
+   comment lines       : 0
+   end-of-line comments: 3
+   comment percentage  : 50.00
+   blank lines         : 2
+
+=== Element metrics ===
+   all subprogram bodies    : 0
+   all statements           : 0
+   all declarations         : 6
+   logical SLOC             : 6
+   maximal unit nesting     : 1
+   maximal construct nesting: 1

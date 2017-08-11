@@ -1,0 +1,283 @@
+Metrics computed for src/cxd6001_2.adb
+containing package body CXD6001_2
+
+=== Code line metrics ===
+  all lines           : 195
+  code lines          : 149
+  comment lines       : 16
+  end-of-line comments: 1
+  comment percentage  : 10.30
+  blank lines         : 30
+
+CXD6001_2 (package body - library item at lines  10: 195)
+
+=== Code line metrics ===
+   all lines           : 186
+   code lines          : 143
+   comment lines       : 15
+   end-of-line comments: 1
+   comment percentage  : 10.12
+   blank lines         : 28
+
+=== Element metrics ===
+   all type definitions     : 2
+   all subprogram bodies    : 5
+   all statements           : 62
+   all declarations         : 39
+   logical SLOC             : 101
+   maximal unit nesting     : 2
+   maximal construct nesting: 4
+
+   Check_Results (procedure body at lines  27: 63)
+
+   === Code line metrics ===
+      all lines           : 37
+      code lines          : 34
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 3
+
+   === Element metrics ===
+      all statements           : 18
+      all declarations         : 2
+      logical SLOC             : 20
+      maximal construct nesting: 3
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 10
+      expression complexity    : 0
+      cyclomatic complexity    : 10
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Server (task object at lines  67: 69)
+
+   === Code line metrics ===
+      all lines           : 3
+      code lines          : 3
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 2
+      logical SLOC             : 2
+      maximal construct nesting: 1
+
+   Server (task body at lines  71: 82)
+
+   === Code line metrics ===
+      all lines           : 12
+      code lines          : 12
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 5
+      all declarations         : 1
+      logical SLOC             : 6
+      maximal construct nesting: 3
+
+   === Complexity metrics ===
+      statement complexity     : 2
+      expression complexity    : 0
+      cyclomatic complexity    : 2
+      essential complexity     : 2
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Protected_Object (protected object at lines  85: 87)
+
+   === Code line metrics ===
+      all lines           : 3
+      code lines          : 3
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 2
+      logical SLOC             : 2
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      Service (procedure at lines  86: 86)
+
+      === Element metrics ===
+         all parameters           : 0
+
+   Protected_Object (protected body at lines  89: 96)
+
+   === Code line metrics ===
+      all lines           : 8
+      code lines          : 8
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 3
+      all declarations         : 2
+      logical SLOC             : 5
+      maximal unit nesting     : 1
+      maximal construct nesting: 2
+
+      Service (procedure body at lines  90: 95)
+
+      === Code line metrics ===
+         all lines           : 6
+         code lines          : 6
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 3
+         all declarations         : 1
+         logical SLOC             : 4
+         maximal construct nesting: 1
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+   Victim_Type (task type at lines  100: 103)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 5
+      logical SLOC             : 5
+      maximal construct nesting: 1
+
+   Victim_Type (task body at lines  105: 146)
+
+   === Code line metrics ===
+      all lines           : 42
+      code lines          : 35
+      comment lines       : 3
+      end-of-line comments: 1
+      comment percentage  : 10.52
+      blank lines         : 4
+
+   === Element metrics ===
+      all statements           : 21
+      all declarations         : 4
+      logical SLOC             : 25
+      maximal construct nesting: 3
+
+   === Complexity metrics ===
+      statement complexity     : 4
+      expression complexity    : 0
+      cyclomatic complexity    : 4
+      essential complexity     : 2
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Simple_Case (procedure body at lines  152: 162)
+
+   === Code line metrics ===
+      all lines           : 11
+      code lines          : 9
+      comment lines       : 2
+      end-of-line comments: 0
+      comment percentage  : 18.18
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 5
+      all declarations         : 2
+      logical SLOC             : 7
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   In_Rendezvous (procedure body at lines  168: 178)
+
+   === Code line metrics ===
+      all lines           : 11
+      code lines          : 9
+      comment lines       : 2
+      end-of-line comments: 0
+      comment percentage  : 18.18
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 5
+      all declarations         : 2
+      logical SLOC             : 7
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   In_Protected (procedure body at lines  184: 194)
+
+   === Code line metrics ===
+      all lines           : 11
+      code lines          : 9
+      comment lines       : 2
+      end-of-line comments: 0
+      comment percentage  : 18.18
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 5
+      all declarations         : 2
+      logical SLOC             : 7
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  2.85
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  2.85
+      essential_complexity     :  1.28
+      max_loop_nesting         :  0.00

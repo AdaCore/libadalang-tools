@@ -1,0 +1,44 @@
+Metrics computed for src/ce3602c.adb
+containing procedure body CE3602C
+
+=== Code line metrics ===
+  all lines           : 202
+  code lines          : 142
+  comment lines       : 36
+  end-of-line comments: 0
+  comment percentage  : 20.22
+  blank lines         : 24
+
+CE3602C (procedure body - library item at lines  46: 202)
+
+=== Code line metrics ===
+   all lines           : 157
+   code lines          : 138
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 19
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 62
+   all declarations         : 5
+   logical SLOC             : 67
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 1
+   expression complexity    : 0
+   cyclomatic complexity    : 1
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

@@ -1,0 +1,26 @@
+Metrics computed for src/ca11014_4.ads
+containing package instance CA11014_4
+
+=== Code line metrics ===
+  all lines           : 14
+  code lines          : 4
+  comment lines       : 5
+  end-of-line comments: 3
+  comment percentage  : 88.88
+  blank lines         : 5
+
+CA11014_4 (package instantiation - library item at lines  14: 14)
+
+=== Code line metrics ===
+   all lines           : 1
+   code lines          : 1
+   comment lines       : 0
+   end-of-line comments: 1
+   comment percentage  : 100.00
+   blank lines         : 0
+
+=== Element metrics ===
+   all statements           : 0
+   all declarations         : 1
+   logical SLOC             : 1
+   maximal construct nesting: 1

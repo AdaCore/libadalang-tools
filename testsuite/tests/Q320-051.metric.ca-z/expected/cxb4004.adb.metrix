@@ -1,0 +1,45 @@
+Metrics computed for src/cxb4004.adb
+containing procedure body CXB4004
+
+=== Code line metrics ===
+  all lines           : 443
+  code lines          : 286
+  comment lines       : 103
+  end-of-line comments: 6
+  comment percentage  : 28.02
+  blank lines         : 54
+
+CXB4004 (procedure body - library item at lines  86: 443)
+
+=== Code line metrics ===
+   all lines           : 358
+   code lines          : 283
+   comment lines       : 23
+   end-of-line comments: 5
+   comment percentage  : 9.15
+   blank lines         : 52
+
+=== Element metrics ===
+   all type definitions     : 4
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 77
+   all declarations         : 21
+   logical SLOC             : 98
+   maximal construct nesting: 5
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 25
+   expression complexity    : 0
+   cyclomatic complexity    : 25
+   essential complexity     : 1
+   maximum loop nesting     : 1
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  25.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  25.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  1.00

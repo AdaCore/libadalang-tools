@@ -1,0 +1,44 @@
+Metrics computed for src/cb20004.adb
+containing procedure body CB20004
+
+=== Code line metrics ===
+  all lines           : 89
+  code lines          : 58
+  comment lines       : 9
+  end-of-line comments: 11
+  comment percentage  : 29.85
+  blank lines         : 22
+
+CB20004 (procedure body - library item at lines  9: 89)
+
+=== Code line metrics ===
+   all lines           : 81
+   code lines          : 56
+   comment lines       : 8
+   end-of-line comments: 10
+   comment percentage  : 28.12
+   blank lines         : 17
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 22
+   all declarations         : 5
+   logical SLOC             : 27
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 2
+   expression complexity    : 0
+   cyclomatic complexity    : 2
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  2.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  2.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

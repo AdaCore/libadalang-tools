@@ -1,0 +1,59 @@
+Metrics computed for src/cxc7001_0.adb
+containing package body CXC7001_0
+
+=== Code line metrics ===
+  all lines           : 32
+  code lines          : 24
+  comment lines       : 1
+  end-of-line comments: 1
+  comment percentage  : 8.00
+  blank lines         : 7
+
+CXC7001_0 (package body - library item at lines  5: 32)
+
+=== Code line metrics ===
+   all lines           : 28
+   code lines          : 23
+   comment lines       : 0
+   end-of-line comments: 1
+   comment percentage  : 4.34
+   blank lines         : 5
+
+=== Element metrics ===
+   all subprogram bodies    : 0
+   all statements           : 9
+   all declarations         : 5
+   logical SLOC             : 14
+   maximal unit nesting     : 1
+   maximal construct nesting: 6
+
+   Task_Type (task body at lines  8: 30)
+
+   === Code line metrics ===
+      all lines           : 23
+      code lines          : 20
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 5.00
+      blank lines         : 3
+
+   === Element metrics ===
+      all statements           : 9
+      all declarations         : 4
+      logical SLOC             : 13
+      maximal construct nesting: 5
+
+   === Complexity metrics ===
+      statement complexity     : 5
+      expression complexity    : 0
+      cyclomatic complexity    : 5
+      essential complexity     : 3
+      maximum loop nesting     : 1
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  5.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  5.00
+      essential_complexity     :  3.00
+      max_loop_nesting         :  1.00

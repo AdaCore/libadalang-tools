@@ -1,0 +1,230 @@
+Metrics computed for src/cxg2002.adb
+containing procedure body CXG2002
+
+=== Code line metrics ===
+  all lines           : 468
+  code lines          : 329
+  comment lines       : 101
+  end-of-line comments: 0
+  comment percentage  : 23.48
+  blank lines         : 38
+
+CXG2002 (procedure body - library item at lines  75: 468)
+
+=== Code line metrics ===
+   all lines           : 394
+   code lines          : 325
+   comment lines       : 33
+   end-of-line comments: 0
+   comment percentage  : 9.21
+   blank lines         : 36
+
+=== Element metrics ===
+   all type definitions     : 2
+   public subprograms       : unknown
+   all subprogram bodies    : 5
+   all statements           : 153
+   all declarations         : 39
+   logical SLOC             : 192
+   maximal unit nesting     : 2
+   maximal construct nesting: 5
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 4
+   expression complexity    : 0
+   cyclomatic complexity    : 4
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   Generic_Check (generic package at lines  79: 83)
+
+   === Code line metrics ===
+      all lines           : 5
+      code lines          : 5
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 3
+      logical SLOC             : 3
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      Do_Test (procedure at lines  82: 82)
+
+      === Element metrics ===
+         all parameters           : 0
+
+   Generic_Check (package body at lines  85: 256)
+
+   === Code line metrics ===
+      all lines           : 172
+      code lines          : 146
+      comment lines       : 13
+      end-of-line comments: 0
+      comment percentage  : 8.17
+      blank lines         : 13
+
+   === Element metrics ===
+      all statements           : 71
+      all declarations         : 14
+      logical SLOC             : 85
+      maximal unit nesting     : 1
+      maximal construct nesting: 4
+
+      Check (procedure body at lines  90: 122)
+
+      === Code line metrics ===
+         all lines           : 33
+         code lines          : 29
+         comment lines       : 3
+         end-of-line comments: 0
+         comment percentage  : 9.37
+         blank lines         : 1
+
+      === Element metrics ===
+         all statements           : 10
+         all declarations         : 5
+         logical SLOC             : 15
+         maximal construct nesting: 3
+         all parameters           : 4
+         IN parameters            : 4
+         OUT parameters           : 0
+         IN OUT parameters        : 0
+
+      === Complexity metrics ===
+         statement complexity     : 5
+         expression complexity    : 0
+         cyclomatic complexity    : 5
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+      Do_Test (procedure body at lines  125: 255)
+
+      === Code line metrics ===
+         all lines           : 131
+         code lines          : 112
+         comment lines       : 10
+         end-of-line comments: 0
+         comment percentage  : 8.19
+         blank lines         : 9
+
+      === Element metrics ===
+         all statements           : 61
+         all declarations         : 7
+         logical SLOC             : 68
+         maximal construct nesting: 2
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+   Non_Generic_Check (package at lines  262: 265)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 3
+      logical SLOC             : 3
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      Do_Test (procedure at lines  264: 264)
+
+      === Element metrics ===
+         all parameters           : 0
+
+   Non_Generic_Check (package body at lines  267: 436)
+
+   === Code line metrics ===
+      all lines           : 170
+      code lines          : 144
+      comment lines       : 13
+      end-of-line comments: 0
+      comment percentage  : 8.28
+      blank lines         : 13
+
+   === Element metrics ===
+      all statements           : 71
+      all declarations         : 13
+      logical SLOC             : 84
+      maximal unit nesting     : 1
+      maximal construct nesting: 4
+
+      Check (procedure body at lines  270: 302)
+
+      === Code line metrics ===
+         all lines           : 33
+         code lines          : 29
+         comment lines       : 3
+         end-of-line comments: 0
+         comment percentage  : 9.37
+         blank lines         : 1
+
+      === Element metrics ===
+         all statements           : 10
+         all declarations         : 5
+         logical SLOC             : 15
+         maximal construct nesting: 3
+         all parameters           : 4
+         IN parameters            : 4
+         OUT parameters           : 0
+         IN OUT parameters        : 0
+
+      === Complexity metrics ===
+         statement complexity     : 5
+         expression complexity    : 0
+         cyclomatic complexity    : 5
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+      Do_Test (procedure body at lines  305: 435)
+
+      === Code line metrics ===
+         all lines           : 131
+         code lines          : 112
+         comment lines       : 10
+         end-of-line comments: 0
+         comment percentage  : 8.19
+         blank lines         : 9
+
+      === Element metrics ===
+         all statements           : 61
+         all declarations         : 7
+         logical SLOC             : 68
+         maximal construct nesting: 2
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  3.20
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  3.20
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

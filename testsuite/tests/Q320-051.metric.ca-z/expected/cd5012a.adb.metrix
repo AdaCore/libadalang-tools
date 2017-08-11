@@ -1,0 +1,71 @@
+Metrics computed for src/cd5012a.adb
+containing procedure body CD5012A
+
+=== Code line metrics ===
+  all lines           : 78
+  code lines          : 38
+  comment lines       : 29
+  end-of-line comments: 0
+  comment percentage  : 43.28
+  blank lines         : 11
+
+CD5012A (procedure body - library item at lines  36: 78)
+
+=== Code line metrics ===
+   all lines           : 43
+   code lines          : 35
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 8
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : unknown
+   all subprogram bodies    : 2
+   all statements           : 10
+   all declarations         : 11
+   logical SLOC             : 21
+   maximal unit nesting     : 1
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 1
+   expression complexity    : 0
+   cyclomatic complexity    : 1
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   GENPROC (procedure body at lines  54: 71)
+
+   === Code line metrics ===
+      all lines           : 18
+      code lines          : 17
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 1
+
+   === Element metrics ===
+      all statements           : 6
+      all declarations         : 2
+      logical SLOC             : 8
+      maximal construct nesting: 2
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 4
+      expression complexity    : 0
+      cyclomatic complexity    : 4
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  2.50
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  2.50
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

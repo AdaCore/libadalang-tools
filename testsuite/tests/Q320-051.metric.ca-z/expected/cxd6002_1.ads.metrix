@@ -1,0 +1,73 @@
+Metrics computed for src/cxd6002_1.ads
+containing package CXD6002_1
+
+=== Code line metrics ===
+  all lines           : 72
+  code lines          : 7
+  comment lines       : 64
+  end-of-line comments: 0
+  comment percentage  : 90.14
+  blank lines         : 1
+
+CXD6002_1 (package - library item at lines  66: 72)
+
+=== Code line metrics ===
+   all lines           : 7
+   code lines          : 7
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 0
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 5
+   all statements           : 0
+   all declarations         : 6
+   logical SLOC             : 6
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Simple_Case (procedure at lines  67: 67)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   In_Rendezvous (procedure at lines  68: 68)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   In_Protected (procedure at lines  69: 69)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   In_Protected_Requeue (procedure at lines  70: 70)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   Done (procedure at lines  71: 71)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0

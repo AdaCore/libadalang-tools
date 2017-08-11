@@ -1,0 +1,113 @@
+Metrics computed for src/cb2006a.adb
+containing procedure body CB2006A
+
+=== Code line metrics ===
+  all lines           : 70
+  code lines          : 33
+  comment lines       : 27
+  end-of-line comments: 0
+  comment percentage  : 45.00
+  blank lines         : 10
+
+CB2006A (procedure body - library item at lines  33: 70)
+
+=== Code line metrics ===
+   all lines           : 38
+   code lines          : 32
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 6
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 2
+   all statements           : 11
+   all declarations         : 9
+   logical SLOC             : 20
+   maximal unit nesting     : 1
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 1
+   expression complexity    : 0
+   cyclomatic complexity    : 1
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   P (package at lines  37: 39)
+
+   === Code line metrics ===
+      all lines           : 3
+      code lines          : 3
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 2
+      logical SLOC             : 2
+      maximal construct nesting: 1
+
+   PR (procedure body at lines  41: 49)
+
+   === Code line metrics ===
+      all lines           : 9
+      code lines          : 9
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 3
+      all declarations         : 3
+      logical SLOC             : 6
+      maximal construct nesting: 1
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   P (package body at lines  51: 66)
+
+   === Code line metrics ===
+      all lines           : 16
+      code lines          : 15
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 1
+
+   === Element metrics ===
+      all statements           : 7
+      all declarations         : 2
+      logical SLOC             : 9
+      maximal construct nesting: 2
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

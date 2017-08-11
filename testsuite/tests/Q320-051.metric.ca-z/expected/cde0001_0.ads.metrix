@@ -1,0 +1,99 @@
+Metrics computed for src/cde0001_0.ads
+containing package CDE0001_0
+
+=== Code line metrics ===
+  all lines           : 132
+  code lines          : 48
+  comment lines       : 60
+  end-of-line comments: 5
+  comment percentage  : 60.18
+  blank lines         : 24
+
+CDE0001_0 (package - library item at lines  57: 132)
+
+=== Code line metrics ===
+   all lines           : 76
+   code lines          : 48
+   comment lines       : 5
+   end-of-line comments: 5
+   comment percentage  : 18.86
+   blank lines         : 23
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 7
+   private types            : 3
+   all type definitions     : 7
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 40
+   logical SLOC             : 40
+   maximal unit nesting     : 2
+   maximal construct nesting: 2
+
+   CDE0001_1 (generic package at lines  86: 97)
+
+   === Code line metrics ===
+      all lines           : 12
+      code lines          : 9
+      comment lines       : 0
+      end-of-line comments: 5
+      comment percentage  : 55.55
+      blank lines         : 3
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 7
+      logical SLOC             : 7
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      Assign_Objects (procedure at lines  95: 95)
+
+      === Contract metrics ===
+         contract complexity      : 1
+
+      === Element metrics ===
+         all parameters           : 0
+
+   CDE0001_2 (generic package at lines  101: 122)
+
+   === Code line metrics ===
+      all lines           : 22
+      code lines          : 11
+      comment lines       : 4
+      end-of-line comments: 0
+      comment percentage  : 26.66
+      blank lines         : 7
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 11
+      logical SLOC             : 11
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      Assign_Arrays (procedure at lines  116: 117)
+
+      === Element metrics ===
+         all parameters           : 2
+         IN parameters            : 0
+         OUT parameters           : 2
+         IN OUT parameters        : 0
+
+      Assign_Access (procedure at lines  119: 120)
+
+      === Element metrics ===
+         all parameters           : 2
+         IN parameters            : 0
+         OUT parameters           : 2
+         IN OUT parameters        : 0

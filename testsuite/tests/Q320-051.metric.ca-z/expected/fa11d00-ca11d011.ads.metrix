@@ -1,0 +1,31 @@
+Metrics computed for src/fa11d00-ca11d011.ads
+containing procedure FA11D00.CA11D011
+
+=== Code line metrics ===
+  all lines           : 54
+  code lines          : 3
+  comment lines       : 47
+  end-of-line comments: 0
+  comment percentage  : 94.00
+  blank lines         : 4
+
+FA11D00.CA11D011 (procedure - library item at lines  53: 54)
+
+=== Code line metrics ===
+   all lines           : 2
+   code lines          : 2
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 0
+
+=== Element metrics ===
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 3
+   logical SLOC             : 3
+   maximal construct nesting: 1
+   all parameters           : 3
+   IN parameters            : 2
+   OUT parameters           : 1
+   IN OUT parameters        : 0

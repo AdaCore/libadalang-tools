@@ -1,0 +1,91 @@
+Metrics computed for src/ca11007_0-ca11007_1-ca11007_2.ads
+containing package CA11007_0.CA11007_1.CA11007_2
+
+=== Code line metrics ===
+  all lines           : 31
+  code lines          : 19
+  comment lines       : 1
+  end-of-line comments: 6
+  comment percentage  : 35.00
+  blank lines         : 11
+
+CA11007_0.CA11007_1.CA11007_2 (package - library item at lines  4: 31)
+
+=== Code line metrics ===
+   all lines           : 28
+   code lines          : 19
+   comment lines       : 0
+   end-of-line comments: 6
+   comment percentage  : 31.57
+   blank lines         : 9
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 1
+   private types            : 1
+   all type definitions     : 1
+   public subprograms       : 5
+   all statements           : 0
+   all declarations         : 18
+   logical SLOC             : 18
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Recording (procedure at lines  8: 8)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 1
+      IN OUT parameters        : 0
+
+   Convert (procedure at lines  10: 11)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 1
+      IN OUT parameters        : 0
+
+   Validate (function at lines  13: 13)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Valid_Conversion (function at lines  14: 14)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Valid_Initial (function at lines  15: 15)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0

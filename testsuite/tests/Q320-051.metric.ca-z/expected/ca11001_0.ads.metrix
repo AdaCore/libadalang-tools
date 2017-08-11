@@ -1,0 +1,80 @@
+Metrics computed for src/ca11001_0.ads
+containing package CA11001_0
+
+=== Code line metrics ===
+  all lines           : 83
+  code lines          : 20
+  comment lines       : 51
+  end-of-line comments: 3
+  comment percentage  : 76.05
+  blank lines         : 12
+
+CA11001_0 (package - library item at lines  50: 83)
+
+=== Code line metrics ===
+   all lines           : 34
+   code lines          : 20
+   comment lines       : 3
+   end-of-line comments: 3
+   comment percentage  : 26.08
+   blank lines         : 11
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 2
+   private types            : 1
+   all type definitions     : 2
+   public subprograms       : 4
+   all statements           : 0
+   all declarations         : 17
+   logical SLOC             : 17
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Cartesian_Assign (procedure at lines  63: 64)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 3
+      IN parameters            : 2
+      OUT parameters           : 1
+      IN OUT parameters        : 0
+
+   Cartesian_Real_Part (function at lines  66: 67)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Cartesian_Imag_Part (function at lines  69: 70)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Complex (function at lines  72: 73)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0

@@ -1,0 +1,28 @@
+Metrics computed for src/cc50a02_1.ads
+containing generic procedure CC50A02_1
+
+=== Code line metrics ===
+  all lines           : 16
+  code lines          : 5
+  comment lines       : 6
+  end-of-line comments: 2
+  comment percentage  : 72.72
+  blank lines         : 5
+
+CC50A02_1 (generic procedure - library item at lines  13: 16)
+
+=== Code line metrics ===
+   all lines           : 4
+   code lines          : 4
+   comment lines       : 0
+   end-of-line comments: 1
+   comment percentage  : 25.00
+   blank lines         : 0
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 5
+   logical SLOC             : 5
+   maximal construct nesting: 1

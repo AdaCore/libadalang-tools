@@ -1,0 +1,133 @@
+Metrics computed for src/ca2007a0m.adb
+containing procedure body CA2007A0M
+
+=== Code line metrics ===
+  all lines           : 77
+  code lines          : 28
+  comment lines       : 33
+  end-of-line comments: 0
+  comment percentage  : 54.09
+  blank lines         : 16
+
+CA2007A0M (procedure body - library item at lines  40: 77)
+
+=== Code line metrics ===
+   all lines           : 38
+   code lines          : 26
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 12
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 4
+   all declarations         : 11
+   logical SLOC             : 15
+   maximal unit nesting     : 1
+   maximal construct nesting: 2
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 2
+   expression complexity    : 0
+   cyclomatic complexity    : 2
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   CALL_TEST (package at lines  45: 46)
+
+   === Code line metrics ===
+      all lines           : 2
+      code lines          : 2
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 1
+      logical SLOC             : 1
+      maximal construct nesting: 1
+
+   CALL_TEST (package body at lines  48: 53)
+
+   === Code line metrics ===
+      all lines           : 6
+      code lines          : 6
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 1
+      logical SLOC             : 2
+      maximal construct nesting: 1
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   CA2007A3 (package at lines  55: 56)
+
+   === Code line metrics ===
+      all lines           : 2
+      code lines          : 2
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 1
+      logical SLOC             : 1
+      maximal construct nesting: 1
+
+   CA2007A2 (package at lines  60: 61)
+
+   === Code line metrics ===
+      all lines           : 2
+      code lines          : 2
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 1
+      logical SLOC             : 1
+      maximal construct nesting: 1
+
+   CA2007A1 (package at lines  65: 66)
+
+   === Code line metrics ===
+      all lines           : 2
+      code lines          : 2
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 1
+      logical SLOC             : 1
+      maximal construct nesting: 1
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.50
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.50
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

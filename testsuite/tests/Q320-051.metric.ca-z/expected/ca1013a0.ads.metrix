@@ -1,0 +1,42 @@
+Metrics computed for src/ca1013a0.ads
+containing generic package CA1013A0
+
+=== Code line metrics ===
+  all lines           : 37
+  code lines          : 6
+  comment lines       : 25
+  end-of-line comments: 0
+  comment percentage  : 80.64
+  blank lines         : 6
+
+CA1013A0 (generic package - library item at lines  29: 37)
+
+=== Code line metrics ===
+   all lines           : 9
+   code lines          : 6
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 3
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 4
+   logical SLOC             : 4
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   REQUIRE_BODY (procedure at lines  35: 35)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0

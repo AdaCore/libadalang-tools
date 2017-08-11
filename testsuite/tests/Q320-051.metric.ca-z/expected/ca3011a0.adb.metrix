@@ -1,0 +1,70 @@
+Metrics computed for src/ca3011a0.adb
+containing procedure body CA3011A0
+
+=== Code line metrics ===
+  all lines           : 32
+  code lines          : 21
+  comment lines       : 0
+  end-of-line comments: 0
+  comment percentage  : 0.00
+  blank lines         : 11
+
+CA3011A0 (procedure body - library item at lines  2: 32)
+
+=== Code line metrics ===
+   all lines           : 31
+   code lines          : 21
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 10
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 8
+   all declarations         : 9
+   logical SLOC             : 17
+   maximal unit nesting     : 2
+   maximal construct nesting: 2
+   all parameters           : 2
+   IN parameters            : 0
+   OUT parameters           : 2
+   IN OUT parameters        : 0
+
+=== Complexity metrics ===
+   statement complexity     : 4
+   expression complexity    : 0
+   cyclomatic complexity    : 4
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   CA3011A3 (package at lines  9: 11)
+
+   === Code line metrics ===
+      all lines           : 3
+      code lines          : 3
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 2
+      logical SLOC             : 2
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      CA3011A3F (function at lines  10: 10)
+
+      === Element metrics ===
+         all parameters           : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  4.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  4.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

@@ -1,5 +1,3 @@
-cd src
-gnatmetric -v --all -x -sfn *.ad? > stdout
-cat metrix.xml stdout *.metrix > ../actual
-cd ..
+gnatmetric -q --all -x -sfn src/*.ad? --output-dir=actual
+diff metrix.xml.expected metrix.xml | head
 diff expected actual | head

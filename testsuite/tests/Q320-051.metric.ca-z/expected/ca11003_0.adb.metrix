@@ -1,0 +1,85 @@
+Metrics computed for src/ca11003_0.adb
+containing package body CA11003_0
+
+=== Code line metrics ===
+  all lines           : 19
+  code lines          : 12
+  comment lines       : 2
+  end-of-line comments: 3
+  comment percentage  : 35.71
+  blank lines         : 5
+
+CA11003_0 (package body - library item at lines  4: 19)
+
+=== Code line metrics ===
+   all lines           : 16
+   code lines          : 12
+   comment lines       : 1
+   end-of-line comments: 3
+   comment percentage  : 30.76
+   blank lines         : 3
+
+=== Element metrics ===
+   all subprogram bodies    : 2
+   all statements           : 3
+   all declarations         : 4
+   logical SLOC             : 7
+   maximal unit nesting     : 1
+   maximal construct nesting: 2
+
+   Next_Available_File (function body at lines  8: 12)
+
+   === Code line metrics ===
+      all lines           : 5
+      code lines          : 5
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 2
+      all declarations         : 1
+      logical SLOC             : 3
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Reclaim_File_Descriptor (procedure body at lines  14: 17)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 25.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 1
+      logical SLOC             : 2
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

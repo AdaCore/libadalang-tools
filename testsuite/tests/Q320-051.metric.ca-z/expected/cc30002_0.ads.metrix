@@ -1,0 +1,46 @@
+Metrics computed for src/cc30002_0.ads
+containing package CC30002_0
+
+=== Code line metrics ===
+  all lines           : 96
+  code lines          : 9
+  comment lines       : 81
+  end-of-line comments: 0
+  comment percentage  : 90.00
+  blank lines         : 6
+
+CC30002_0 (package - library item at lines  81: 96)
+
+=== Code line metrics ===
+   all lines           : 16
+   code lines          : 9
+   comment lines       : 2
+   end-of-line comments: 0
+   comment percentage  : 18.18
+   blank lines         : 5
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 2
+   all type definitions     : 2
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 11
+   logical SLOC             : 11
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Focus (procedure at lines  92: 92)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1

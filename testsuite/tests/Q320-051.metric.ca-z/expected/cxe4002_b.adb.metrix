@@ -1,0 +1,44 @@
+Metrics computed for src/cxe4002_b.adb
+containing procedure body CXE4002_B
+
+=== Code line metrics ===
+  all lines           : 160
+  code lines          : 121
+  comment lines       : 20
+  end-of-line comments: 1
+  comment percentage  : 14.89
+  blank lines         : 19
+
+CXE4002_B (procedure body - library item at lines  8: 160)
+
+=== Code line metrics ===
+   all lines           : 153
+   code lines          : 117
+   comment lines       : 19
+   end-of-line comments: 1
+   comment percentage  : 14.70
+   blank lines         : 17
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 61
+   all declarations         : 20
+   logical SLOC             : 81
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 13
+   expression complexity    : 0
+   cyclomatic complexity    : 13
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  13.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  13.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

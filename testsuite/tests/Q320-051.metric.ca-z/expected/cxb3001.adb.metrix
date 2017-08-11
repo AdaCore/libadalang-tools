@@ -1,0 +1,70 @@
+Metrics computed for src/cxb3001.adb
+containing procedure body CXB3001
+
+=== Code line metrics ===
+  all lines           : 179
+  code lines          : 83
+  comment lines       : 55
+  end-of-line comments: 4
+  comment percentage  : 42.75
+  blank lines         : 41
+
+CXB3001 (procedure body - library item at lines  50: 179)
+
+=== Code line metrics ===
+   all lines           : 130
+   code lines          : 81
+   comment lines       : 10
+   end-of-line comments: 3
+   comment percentage  : 14.28
+   blank lines         : 39
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 2
+   all statements           : 29
+   all declarations         : 36
+   logical SLOC             : 65
+   maximal unit nesting     : 1
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 6
+   expression complexity    : 0
+   cyclomatic complexity    : 6
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   Collect_All_Calls (procedure body at lines  101: 147)
+
+   === Code line metrics ===
+      all lines           : 47
+      code lines          : 31
+      comment lines       : 4
+      end-of-line comments: 0
+      comment percentage  : 11.42
+      blank lines         : 12
+
+   === Element metrics ===
+      all statements           : 16
+      all declarations         : 13
+      logical SLOC             : 29
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 1
+
+=== Average complexity metrics ===
+      statement_complexity     :  3.50
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  3.50
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

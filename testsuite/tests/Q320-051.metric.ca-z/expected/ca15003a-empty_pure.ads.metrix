@@ -1,0 +1,32 @@
+Metrics computed for src/ca15003a-empty_pure.ads
+containing package CA15003A.Empty_Pure
+
+=== Code line metrics ===
+  all lines           : 5
+  code lines          : 4
+  comment lines       : 0
+  end-of-line comments: 0
+  comment percentage  : 0.00
+  blank lines         : 1
+
+CA15003A.Empty_Pure (package - library item at lines  2: 5)
+
+=== Code line metrics ===
+   all lines           : 4
+   code lines          : 4
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 0
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 0
+   all statements           : 0
+   all declarations         : 1
+   logical SLOC             : 1
+   maximal construct nesting: 1

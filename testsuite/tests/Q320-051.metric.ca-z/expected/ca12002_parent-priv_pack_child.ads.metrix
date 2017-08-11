@@ -1,0 +1,26 @@
+Metrics computed for src/ca12002_parent-priv_pack_child.ads
+containing private package CA12002_Parent.Priv_Pack_Child
+
+=== Code line metrics ===
+  all lines           : 7
+  code lines          : 5
+  comment lines       : 0
+  end-of-line comments: 0
+  comment percentage  : 0.00
+  blank lines         : 2
+
+CA12002_Parent.Priv_Pack_Child (package - library item at lines  5: 7)
+
+=== Code line metrics ===
+   all lines           : 3
+   code lines          : 3
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 0
+
+=== Element metrics ===
+   all statements           : 0
+   all declarations         : 2
+   logical SLOC             : 2
+   maximal construct nesting: 1

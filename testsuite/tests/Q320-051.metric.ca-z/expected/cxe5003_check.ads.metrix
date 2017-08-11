@@ -1,0 +1,32 @@
+Metrics computed for src/cxe5003_check.ads
+containing package CXE5003_Check
+
+=== Code line metrics ===
+  all lines           : 16
+  code lines          : 8
+  comment lines       : 6
+  end-of-line comments: 0
+  comment percentage  : 42.85
+  blank lines         : 2
+
+CXE5003_Check (package - library item at lines  4: 16)
+
+=== Code line metrics ===
+   all lines           : 13
+   code lines          : 8
+   comment lines       : 5
+   end-of-line comments: 0
+   comment percentage  : 38.46
+   blank lines         : 0
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 0
+   all statements           : 0
+   all declarations         : 7
+   logical SLOC             : 7
+   maximal construct nesting: 1

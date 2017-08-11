@@ -1,0 +1,35 @@
+Metrics computed for src/f3a1a00.ads
+containing package F3A1A00
+
+=== Code line metrics ===
+  all lines           : 70
+  code lines          : 14
+  comment lines       : 45
+  end-of-line comments: 0
+  comment percentage  : 76.27
+  blank lines         : 11
+
+F3A1A00 (package - library item at lines  47: 70)
+
+=== Code line metrics ===
+   all lines           : 24
+   code lines          : 14
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 10
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 6
+   private types            : 2
+   all type definitions     : 6
+   public subprograms       : 0
+   all statements           : 0
+   all declarations         : 10
+   logical SLOC             : 10
+   maximal construct nesting: 1

@@ -1,0 +1,34 @@
+Metrics computed for src/cc51004_0.ads
+containing package CC51004_0
+
+=== Code line metrics ===
+  all lines           : 80
+  code lines          : 12
+  comment lines       : 60
+  end-of-line comments: 1
+  comment percentage  : 84.72
+  blank lines         : 8
+
+CC51004_0 (package - library item at lines  62: 80)
+
+=== Code line metrics ===
+   all lines           : 19
+   code lines          : 12
+   comment lines       : 1
+   end-of-line comments: 1
+   comment percentage  : 15.38
+   blank lines         : 6
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 4
+   all type definitions     : 4
+   public subprograms       : 0
+   all statements           : 0
+   all declarations         : 11
+   logical SLOC             : 11
+   maximal construct nesting: 1

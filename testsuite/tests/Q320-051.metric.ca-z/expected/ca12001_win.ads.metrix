@@ -1,0 +1,146 @@
+Metrics computed for src/ca12001_win.ads
+containing package CA12001_Win
+
+=== Code line metrics ===
+  all lines           : 169
+  code lines          : 37
+  comment lines       : 115
+  end-of-line comments: 2
+  comment percentage  : 76.97
+  blank lines         : 17
+
+CA12001_Win (package - library item at lines  88: 169)
+
+=== Code line metrics ===
+   all lines           : 82
+   code lines          : 36
+   comment lines       : 30
+   end-of-line comments: 2
+   comment percentage  : 48.48
+   blank lines         : 16
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 2
+   private types            : 1
+   all type definitions     : 2
+   public subprograms       : 10
+   all statements           : 0
+   all declarations         : 43
+   logical SLOC             : 43
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Create (procedure at lines  101: 104)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 4
+      IN parameters            : 3
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Create (procedure at lines  108: 112)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 5
+      IN parameters            : 3
+      OUT parameters           : 0
+      IN OUT parameters        : 2
+
+   Destroy (procedure at lines  117: 117)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Id (function at lines  122: 122)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Height (function at lines  126: 126)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Width (function at lines  130: 130)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Resize (procedure at lines  134: 136)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 3
+      IN parameters            : 3
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Parent (function at lines  140: 140)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Child (function at lines  145: 145)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Sibling (function at lines  150: 150)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0

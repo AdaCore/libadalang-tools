@@ -1,0 +1,44 @@
+Metrics computed for src/cxc3003.adb
+containing procedure body CXC3003
+
+=== Code line metrics ===
+  all lines           : 98
+  code lines          : 43
+  comment lines       : 19
+  end-of-line comments: 2
+  comment percentage  : 33.87
+  blank lines         : 36
+
+CXC3003 (procedure body - library item at lines  13: 98)
+
+=== Code line metrics ===
+   all lines           : 86
+   code lines          : 38
+   comment lines       : 18
+   end-of-line comments: 2
+   comment percentage  : 35.71
+   blank lines         : 30
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 19
+   all declarations         : 3
+   logical SLOC             : 22
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 5
+   expression complexity    : 0
+   cyclomatic complexity    : 5
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  5.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  5.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

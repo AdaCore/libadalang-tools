@@ -1,0 +1,270 @@
+Metrics computed for src/cb4001a.adb
+containing procedure body CB4001A
+
+=== Code line metrics ===
+  all lines           : 151
+  code lines          : 96
+  comment lines       : 30
+  end-of-line comments: 4
+  comment percentage  : 26.98
+  blank lines         : 25
+
+CB4001A (procedure body - library item at lines  35: 151)
+
+=== Code line metrics ===
+   all lines           : 117
+   code lines          : 95
+   comment lines       : 0
+   end-of-line comments: 4
+   comment percentage  : 4.21
+   blank lines         : 22
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 9
+   all statements           : 39
+   all declarations         : 18
+   logical SLOC             : 57
+   maximal unit nesting     : 1
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 2
+   expression complexity    : 0
+   cyclomatic complexity    : 2
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   CALLEE1 (procedure at lines  53: 53)
+
+   === Element metrics ===
+      all parameters           : 0
+
+   CALLEE2 (procedure at lines  54: 54)
+
+   === Element metrics ===
+      all parameters           : 0
+
+   CALLEE3 (procedure at lines  55: 55)
+
+   === Element metrics ===
+      all parameters           : 0
+
+   R (procedure at lines  56: 56)
+
+   === Element metrics ===
+      all parameters           : 0
+
+   S (procedure at lines  57: 57)
+
+   === Element metrics ===
+      all parameters           : 0
+
+   CALLER1 (procedure body at lines  59: 67)
+
+   === Code line metrics ===
+      all lines           : 9
+      code lines          : 9
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 4
+      all declarations         : 1
+      logical SLOC             : 5
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   CALLER2 (procedure body at lines  69: 77)
+
+   === Code line metrics ===
+      all lines           : 9
+      code lines          : 9
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 4
+      all declarations         : 1
+      logical SLOC             : 5
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   CALLER3 (procedure body at lines  79: 87)
+
+   === Code line metrics ===
+      all lines           : 9
+      code lines          : 9
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 4
+      all declarations         : 1
+      logical SLOC             : 5
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   CALLEE1 (procedure body at lines  89: 94)
+
+   === Code line metrics ===
+      all lines           : 6
+      code lines          : 6
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 3
+      all declarations         : 1
+      logical SLOC             : 4
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   CALLEE2 (procedure body at lines  96: 104)
+
+   === Code line metrics ===
+      all lines           : 9
+      code lines          : 9
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 4
+      all declarations         : 1
+      logical SLOC             : 5
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 1
+
+   CALLEE3 (procedure body at lines  106: 111)
+
+   === Code line metrics ===
+      all lines           : 6
+      code lines          : 6
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 3
+      all declarations         : 1
+      logical SLOC             : 4
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   R (procedure body at lines  113: 122)
+
+   === Code line metrics ===
+      all lines           : 10
+      code lines          : 10
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 4
+      all declarations         : 2
+      logical SLOC             : 6
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   S (procedure body at lines  124: 129)
+
+   === Code line metrics ===
+      all lines           : 6
+      code lines          : 6
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 3
+      all declarations         : 1
+      logical SLOC             : 4
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 1
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.11
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.11
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

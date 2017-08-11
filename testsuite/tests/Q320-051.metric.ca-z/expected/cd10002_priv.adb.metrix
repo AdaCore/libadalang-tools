@@ -1,0 +1,27 @@
+Metrics computed for src/cd10002_priv.adb
+containing package body CD10002_Priv
+
+=== Code line metrics ===
+  all lines           : 24
+  code lines          : 20
+  comment lines       : 0
+  end-of-line comments: 0
+  comment percentage  : 0.00
+  blank lines         : 4
+
+CD10002_Priv (package body - library item at lines  3: 24)
+
+=== Code line metrics ===
+   all lines           : 22
+   code lines          : 20
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 2
+
+=== Element metrics ===
+   all subprogram bodies    : 0
+   all statements           : 0
+   all declarations         : 25
+   logical SLOC             : 25
+   maximal construct nesting: 1

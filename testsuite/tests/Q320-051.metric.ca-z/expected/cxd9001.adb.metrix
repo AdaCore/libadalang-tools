@@ -1,0 +1,143 @@
+Metrics computed for src/cxd9001.adb
+containing procedure body CXD9001
+
+=== Code line metrics ===
+  all lines           : 184
+  code lines          : 98
+  comment lines       : 53
+  end-of-line comments: 3
+  comment percentage  : 37.08
+  blank lines         : 33
+
+CXD9001 (procedure body - library item at lines  54: 184)
+
+=== Code line metrics ===
+   all lines           : 131
+   code lines          : 94
+   comment lines       : 7
+   end-of-line comments: 3
+   comment percentage  : 9.90
+   blank lines         : 30
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 44
+   all declarations         : 17
+   logical SLOC             : 61
+   maximal unit nesting     : 2
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 13
+   expression complexity    : 0
+   cyclomatic complexity    : 13
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   Protected_Object (protected object at lines  78: 80)
+
+   === Code line metrics ===
+      all lines           : 3
+      code lines          : 3
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 3
+      logical SLOC             : 3
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+   Protected_Object (protected body at lines  82: 87)
+
+   === Code line metrics ===
+      all lines           : 6
+      code lines          : 6
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 3
+      logical SLOC             : 4
+      maximal unit nesting     : 1
+      maximal construct nesting: 2
+
+      Available_Entry (entry body at lines  83: 86)
+
+      === Code line metrics ===
+         all lines           : 4
+         code lines          : 4
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 1
+         all declarations         : 2
+         logical SLOC             : 3
+         maximal construct nesting: 1
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+   Task_1 (task object at lines  91: 93)
+
+   === Code line metrics ===
+      all lines           : 3
+      code lines          : 3
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 3
+      logical SLOC             : 3
+      maximal construct nesting: 1
+
+   Task_1 (task body at lines  95: 103)
+
+   === Code line metrics ===
+      all lines           : 9
+      code lines          : 9
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 4
+      all declarations         : 3
+      logical SLOC             : 7
+      maximal construct nesting: 2
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  5.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  5.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

@@ -1,0 +1,45 @@
+Metrics computed for src/cxf3003.adb
+containing procedure body CXF3003
+
+=== Code line metrics ===
+  all lines           : 292
+  code lines          : 200
+  comment lines       : 50
+  end-of-line comments: 0
+  comment percentage  : 20.00
+  blank lines         : 42
+
+CXF3003 (procedure body - library item at lines  48: 292)
+
+=== Code line metrics ===
+   all lines           : 245
+   code lines          : 197
+   comment lines       : 8
+   end-of-line comments: 0
+   comment percentage  : 3.90
+   blank lines         : 40
+
+=== Element metrics ===
+   all type definitions     : 4
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 36
+   all declarations         : 30
+   logical SLOC             : 66
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 19
+   expression complexity    : 0
+   cyclomatic complexity    : 19
+   essential complexity     : 1
+   maximum loop nesting     : 1
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  19.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  19.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  1.00

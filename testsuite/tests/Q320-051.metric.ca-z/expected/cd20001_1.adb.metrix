@@ -1,0 +1,88 @@
+Metrics computed for src/cd20001_1.adb
+containing package body CD20001_1
+
+=== Code line metrics ===
+  all lines           : 85
+  code lines          : 62
+  comment lines       : 3
+  end-of-line comments: 1
+  comment percentage  : 6.15
+  blank lines         : 20
+
+CD20001_1 (package body - library item at lines  6: 85)
+
+=== Code line metrics ===
+   all lines           : 80
+   code lines          : 60
+   comment lines       : 2
+   end-of-line comments: 1
+   comment percentage  : 4.83
+   blank lines         : 18
+
+=== Element metrics ===
+   all subprogram bodies    : 2
+   all statements           : 26
+   all declarations         : 6
+   logical SLOC             : 32
+   maximal unit nesting     : 1
+   maximal construct nesting: 4
+
+   Next_Factor (function body at lines  8: 26)
+
+   === Code line metrics ===
+      all lines           : 19
+      code lines          : 17
+      comment lines       : 2
+      end-of-line comments: 1
+      comment percentage  : 15.78
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 7
+      all declarations         : 4
+      logical SLOC             : 11
+      maximal construct nesting: 3
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 4
+      expression complexity    : 0
+      cyclomatic complexity    : 4
+      essential complexity     : 2
+      maximum loop nesting     : 1
+      extra exit points        : 1
+
+   TC_Check_Values (procedure body at lines  28: 83)
+
+   === Code line metrics ===
+      all lines           : 56
+      code lines          : 41
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 15
+
+   === Element metrics ===
+      all statements           : 19
+      all declarations         : 1
+      logical SLOC             : 20
+      maximal construct nesting: 3
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 8
+      expression complexity    : 0
+      cyclomatic complexity    : 8
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  6.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  6.00
+      essential_complexity     :  1.50
+      max_loop_nesting         :  1.00

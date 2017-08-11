@@ -1,0 +1,45 @@
+Metrics computed for src/cd10002.adb
+containing procedure body CD10002
+
+=== Code line metrics ===
+  all lines           : 343
+  code lines          : 281
+  comment lines       : 2
+  end-of-line comments: 0
+  comment percentage  : 0.70
+  blank lines         : 60
+
+CD10002 (procedure body - library item at lines  13: 343)
+
+=== Code line metrics ===
+   all lines           : 331
+   code lines          : 271
+   comment lines       : 2
+   end-of-line comments: 0
+   comment percentage  : 0.73
+   blank lines         : 58
+
+=== Element metrics ===
+   all type definitions     : 8
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 148
+   all declarations         : 49
+   logical SLOC             : 197
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 26
+   expression complexity    : 0
+   cyclomatic complexity    : 26
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  26.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  26.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

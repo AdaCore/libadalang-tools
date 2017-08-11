@@ -1,0 +1,44 @@
+Metrics computed for src/cxa5a08.adb
+containing procedure body CXA5A08
+
+=== Code line metrics ===
+  all lines           : 474
+  code lines          : 308
+  comment lines       : 100
+  end-of-line comments: 6
+  comment percentage  : 25.98
+  blank lines         : 66
+
+CXA5A08 (procedure body - library item at lines  72: 474)
+
+=== Code line metrics ===
+   all lines           : 403
+   code lines          : 303
+   comment lines       : 36
+   end-of-line comments: 6
+   comment percentage  : 12.38
+   blank lines         : 64
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 107
+   all declarations         : 11
+   logical SLOC             : 118
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 12
+   expression complexity    : 0
+   cyclomatic complexity    : 12
+   essential complexity     : 1
+   maximum loop nesting     : 1
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  12.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  12.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  1.00

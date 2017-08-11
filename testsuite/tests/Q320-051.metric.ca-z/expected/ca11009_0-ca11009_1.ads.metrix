@@ -1,0 +1,44 @@
+Metrics computed for src/ca11009_0-ca11009_1.ads
+containing package CA11009_0.CA11009_1
+
+=== Code line metrics ===
+  all lines           : 14
+  code lines          : 4
+  comment lines       : 5
+  end-of-line comments: 2
+  comment percentage  : 77.77
+  blank lines         : 5
+
+CA11009_0.CA11009_1 (package - library item at lines  4: 14)
+
+=== Code line metrics ===
+   all lines           : 11
+   code lines          : 4
+   comment lines       : 4
+   end-of-line comments: 2
+   comment percentage  : 75.00
+   blank lines         : 3
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 4
+   logical SLOC             : 4
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Create_File (procedure at lines  11: 12)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 1
+      IN OUT parameters        : 0

@@ -1,0 +1,45 @@
+Metrics computed for src/cxg1001.adb
+containing procedure body CXG1001
+
+=== Code line metrics ===
+  all lines           : 276
+  code lines          : 134
+  comment lines       : 74
+  end-of-line comments: 0
+  comment percentage  : 35.57
+  blank lines         : 68
+
+CXG1001 (procedure body - library item at lines  54: 276)
+
+=== Code line metrics ===
+   all lines           : 223
+   code lines          : 132
+   comment lines       : 25
+   end-of-line comments: 0
+   comment percentage  : 15.92
+   blank lines         : 66
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 42
+   all declarations         : 22
+   logical SLOC             : 64
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 15
+   expression complexity    : 0
+   cyclomatic complexity    : 15
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  15.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  15.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

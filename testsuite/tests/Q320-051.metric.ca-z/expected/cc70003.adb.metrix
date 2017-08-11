@@ -1,0 +1,48 @@
+Metrics computed for src/cc70003.adb
+containing procedure body CC70003
+
+=== Code line metrics ===
+  all lines           : 41
+  code lines          : 24
+  comment lines       : 1
+  end-of-line comments: 3
+  comment percentage  : 16.00
+  blank lines         : 16
+
+CC70003 (procedure body - library item at lines  11: 41)
+
+=== Code line metrics ===
+   all lines           : 31
+   code lines          : 20
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 11
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 7
+   all declarations         : 10
+   logical SLOC             : 17
+   maximal construct nesting: 2
+   all parameters           : 1
+   IN parameters            : 1
+   OUT parameters           : 0
+   IN OUT parameters        : 0
+
+=== Complexity metrics ===
+   statement complexity     : 2
+   expression complexity    : 0
+   cyclomatic complexity    : 2
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  2.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  2.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

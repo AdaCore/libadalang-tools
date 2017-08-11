@@ -1,0 +1,47 @@
+Metrics computed for src/cc51002_1.adb
+containing function body CC51002_1
+
+=== Code line metrics ===
+  all lines           : 20
+  code lines          : 6
+  comment lines       : 7
+  end-of-line comments: 0
+  comment percentage  : 53.84
+  blank lines         : 7
+
+CC51002_1 (function body - library item at lines  6: 20)
+
+=== Code line metrics ===
+   all lines           : 15
+   code lines          : 6
+   comment lines       : 6
+   end-of-line comments: 0
+   comment percentage  : 50.00
+   blank lines         : 3
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 2
+   all declarations         : 3
+   logical SLOC             : 5
+   maximal construct nesting: 1
+   all parameters           : 1
+   IN parameters            : 1
+   OUT parameters           : 0
+   IN OUT parameters        : 0
+
+=== Complexity metrics ===
+   statement complexity     : 1
+   expression complexity    : 0
+   cyclomatic complexity    : 1
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

@@ -1,0 +1,94 @@
+Metrics computed for src/cc51b03_0.ads
+containing package CC51B03_0
+
+=== Code line metrics ===
+  all lines           : 112
+  code lines          : 14
+  comment lines       : 90
+  end-of-line comments: 5
+  comment percentage  : 91.34
+  blank lines         : 8
+
+CC51B03_0 (package - library item at lines  87: 112)
+
+=== Code line metrics ===
+   all lines           : 26
+   code lines          : 13
+   comment lines       : 6
+   end-of-line comments: 4
+   comment percentage  : 52.63
+   blank lines         : 7
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   all type definitions     : 2
+   public subprograms       : 2
+   all statements           : 0
+   all declarations         : 7
+   logical SLOC             : 7
+   maximal unit nesting     : 2
+   maximal construct nesting: 2
+
+   PrivateFormalUnknownDiscriminants (generic package at lines  93: 97)
+
+   === Code line metrics ===
+      all lines           : 5
+      code lines          : 5
+      comment lines       : 0
+      end-of-line comments: 2
+      comment percentage  : 40.00
+      blank lines         : 0
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 3
+      logical SLOC             : 3
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      Is_Definite (function at lines  96: 96)
+
+      === Contract metrics ===
+         contract complexity      : 1
+
+      === Element metrics ===
+         all parameters           : 0
+
+   TaggedAncestorUnknownDiscriminants (generic package at lines  104: 109)
+
+   === Code line metrics ===
+      all lines           : 6
+      code lines          : 6
+      comment lines       : 0
+      end-of-line comments: 2
+      comment percentage  : 33.33
+      blank lines         : 0
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 3
+      logical SLOC             : 3
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      Is_Definite (function at lines  108: 108)
+
+      === Contract metrics ===
+         contract complexity      : 1
+
+      === Element metrics ===
+         all parameters           : 0

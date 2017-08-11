@@ -1,0 +1,46 @@
+Metrics computed for src/cc51a01_1.ads
+containing package CC51A01_1
+
+=== Code line metrics ===
+  all lines           : 23
+  code lines          : 6
+  comment lines       : 9
+  end-of-line comments: 4
+  comment percentage  : 86.66
+  blank lines         : 8
+
+CC51A01_1 (package - library item at lines  7: 23)
+
+=== Code line metrics ===
+   all lines           : 17
+   code lines          : 5
+   comment lines       : 8
+   end-of-line comments: 3
+   comment percentage  : 84.61
+   blank lines         : 4
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 1
+   all type definitions     : 1
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 4
+   logical SLOC             : 4
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Numerator (function at lines  20: 21)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0

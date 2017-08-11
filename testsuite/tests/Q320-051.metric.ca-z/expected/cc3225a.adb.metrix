@@ -1,0 +1,118 @@
+Metrics computed for src/cc3225a.adb
+containing procedure body CC3225A
+
+=== Code line metrics ===
+  all lines           : 183
+  code lines          : 126
+  comment lines       : 30
+  end-of-line comments: 0
+  comment percentage  : 19.23
+  blank lines         : 27
+
+CC3225A (procedure body - library item at lines  35: 183)
+
+=== Code line metrics ===
+   all lines           : 149
+   code lines          : 125
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 24
+
+=== Element metrics ===
+   all type definitions     : 11
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 49
+   all declarations         : 30
+   logical SLOC             : 79
+   maximal unit nesting     : 1
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 18
+   expression complexity    : 0
+   cyclomatic complexity    : 18
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   P (generic package at lines  37: 43)
+
+   === Code line metrics ===
+      all lines           : 7
+      code lines          : 7
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 5
+      logical SLOC             : 5
+      maximal construct nesting: 1
+
+   TSK (task type at lines  113: 115)
+
+   === Code line metrics ===
+      all lines           : 3
+      code lines          : 3
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 2
+      logical SLOC             : 2
+      maximal construct nesting: 1
+
+   P (generic package at lines  117: 122)
+
+   === Code line metrics ===
+      all lines           : 6
+      code lines          : 6
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 4
+      logical SLOC             : 4
+      maximal construct nesting: 1
+
+   TSK (task body at lines  131: 136)
+
+   === Code line metrics ===
+      all lines           : 6
+      code lines          : 6
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 2
+      all declarations         : 1
+      logical SLOC             : 3
+      maximal construct nesting: 2
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  9.50
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  9.50
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

@@ -1,0 +1,94 @@
+Metrics computed for src/cc3224a.adb
+containing procedure body CC3224A
+
+=== Code line metrics ===
+  all lines           : 313
+  code lines          : 207
+  comment lines       : 31
+  end-of-line comments: 4
+  comment percentage  : 14.70
+  blank lines         : 75
+
+CC3224A (procedure body - library item at lines  37: 313)
+
+=== Code line metrics ===
+   all lines           : 277
+   code lines          : 206
+   comment lines       : 0
+   end-of-line comments: 4
+   comment percentage  : 1.94
+   blank lines         : 71
+
+=== Element metrics ===
+   all type definitions     : 14
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 65
+   all declarations         : 57
+   logical SLOC             : 122
+   maximal unit nesting     : 1
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 28
+   expression complexity    : 0
+   cyclomatic complexity    : 28
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   P (generic package at lines  46: 51)
+
+   === Code line metrics ===
+      all lines           : 6
+      code lines          : 6
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 4
+      logical SLOC             : 4
+      maximal construct nesting: 1
+
+   BOOL (generic package at lines  53: 57)
+
+   === Code line metrics ===
+      all lines           : 5
+      code lines          : 5
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 3
+      logical SLOC             : 3
+      maximal construct nesting: 1
+
+   TD_ARRAY_PACKAGE (generic package at lines  99: 113)
+
+   === Code line metrics ===
+      all lines           : 15
+      code lines          : 11
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 4
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 4
+      logical SLOC             : 4
+      maximal construct nesting: 1
+
+=== Average complexity metrics ===
+      statement_complexity     :  28.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  28.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

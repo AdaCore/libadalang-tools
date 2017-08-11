@@ -1,0 +1,45 @@
+Metrics computed for src/cxf2001.adb
+containing procedure body CXF2001
+
+=== Code line metrics ===
+  all lines           : 755
+  code lines          : 546
+  comment lines       : 103
+  end-of-line comments: 1
+  comment percentage  : 16.02
+  blank lines         : 106
+
+CXF2001 (procedure body - library item at lines  104: 755)
+
+=== Code line metrics ===
+   all lines           : 652
+   code lines          : 544
+   comment lines       : 4
+   end-of-line comments: 1
+   comment percentage  : 0.91
+   blank lines         : 104
+
+=== Element metrics ===
+   all type definitions     : 12
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 335
+   all declarations         : 67
+   logical SLOC             : 402
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 82
+   expression complexity    : 0
+   cyclomatic complexity    : 82
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  82.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  82.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

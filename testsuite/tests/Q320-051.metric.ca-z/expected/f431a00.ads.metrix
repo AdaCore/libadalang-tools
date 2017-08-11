@@ -1,0 +1,141 @@
+Metrics computed for src/f431a00.ads
+containing package F431A00
+
+=== Code line metrics ===
+  all lines           : 102
+  code lines          : 34
+  comment lines       : 53
+  end-of-line comments: 3
+  comment percentage  : 64.36
+  blank lines         : 15
+
+F431A00 (package - library item at lines  52: 102)
+
+=== Code line metrics ===
+   all lines           : 51
+   code lines          : 33
+   comment lines       : 4
+   end-of-line comments: 3
+   comment percentage  : 18.91
+   blank lines         : 14
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 7
+   all type definitions     : 7
+   public subprograms       : 6
+   all statements           : 0
+   all declarations         : 35
+   logical SLOC             : 35
+   maximal unit nesting     : 2
+   maximal construct nesting: 1
+
+   T_PO (protected type at lines  57: 62)
+
+   === Code line metrics ===
+      all lines           : 6
+      code lines          : 6
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 6
+      logical SLOC             : 6
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      Get (procedure at lines  59: 59)
+
+      === Contract metrics ===
+         contract complexity      : 1
+
+      === Element metrics ===
+         all parameters           : 1
+         IN parameters            : 0
+         OUT parameters           : 1
+         IN OUT parameters        : 0
+
+   T_Task (task type at lines  64: 67)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 5
+      logical SLOC             : 5
+      maximal construct nesting: 1
+
+   Reset_Init (procedure at lines  71: 71)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   Init_Func (function at lines  73: 73)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Check_Init_Count (procedure at lines  75: 76)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Check (procedure at lines  89: 90)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 3
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Initialize (procedure at lines  96: 96)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1

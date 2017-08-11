@@ -1,0 +1,31 @@
+Metrics computed for src/ca1005a_f.ads
+containing function CA1005A_F
+
+=== Code line metrics ===
+  all lines           : 31
+  code lines          : 1
+  comment lines       : 26
+  end-of-line comments: 0
+  comment percentage  : 96.29
+  blank lines         : 4
+
+CA1005A_F (function - library item at lines  31: 31)
+
+=== Code line metrics ===
+   all lines           : 1
+   code lines          : 1
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 0
+
+=== Element metrics ===
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 2
+   logical SLOC             : 2
+   maximal construct nesting: 1
+   all parameters           : 1
+   IN parameters            : 1
+   OUT parameters           : 0
+   IN OUT parameters        : 0

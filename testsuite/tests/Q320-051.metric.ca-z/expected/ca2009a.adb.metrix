@@ -1,0 +1,62 @@
+Metrics computed for src/ca2009a.adb
+containing procedure body CA2009A
+
+=== Code line metrics ===
+  all lines           : 70
+  code lines          : 27
+  comment lines       : 27
+  end-of-line comments: 0
+  comment percentage  : 50.00
+  blank lines         : 16
+
+CA2009A (procedure body - library item at lines  34: 70)
+
+=== Code line metrics ===
+   all lines           : 37
+   code lines          : 25
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 12
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 6
+   all declarations         : 11
+   logical SLOC             : 17
+   maximal unit nesting     : 1
+   maximal construct nesting: 2
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 3
+   expression complexity    : 0
+   cyclomatic complexity    : 3
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   PKG1 (generic package at lines  41: 46)
+
+   === Code line metrics ===
+      all lines           : 6
+      code lines          : 6
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 4
+      logical SLOC             : 4
+      maximal construct nesting: 1
+
+=== Average complexity metrics ===
+      statement_complexity     :  3.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  3.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

@@ -1,0 +1,100 @@
+Metrics computed for src/cxa5013.adb
+containing procedure body CXA5013
+
+=== Code line metrics ===
+  all lines           : 326
+  code lines          : 134
+  comment lines       : 124
+  end-of-line comments: 9
+  comment percentage  : 51.55
+  blank lines         : 68
+
+CXA5013 (procedure body - library item at lines  65: 326)
+
+=== Code line metrics ===
+   all lines           : 262
+   code lines          : 131
+   comment lines       : 65
+   end-of-line comments: 9
+   comment percentage  : 37.75
+   blank lines         : 66
+
+=== Element metrics ===
+   all type definitions     : 2
+   public subprograms       : unknown
+   all subprogram bodies    : 3
+   all statements           : 50
+   all declarations         : 36
+   logical SLOC             : 86
+   maximal unit nesting     : 2
+   maximal construct nesting: 7
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 5
+   expression complexity    : 0
+   cyclomatic complexity    : 5
+   essential complexity     : 1
+   maximum loop nesting     : 1
+   extra exit points        : 0
+
+   Random_Test (procedure body at lines  120: 244)
+
+   === Code line metrics ===
+      all lines           : 125
+      code lines          : 68
+      comment lines       : 32
+      end-of-line comments: 7
+      comment percentage  : 39.00
+      blank lines         : 25
+
+   === Element metrics ===
+      all statements           : 29
+      all declarations         : 13
+      logical SLOC             : 42
+      maximal unit nesting     : 1
+      maximal construct nesting: 5
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 1
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 8
+      expression complexity    : 0
+      cyclomatic complexity    : 8
+      essential complexity     : 3
+      maximum loop nesting     : 2
+      extra exit points        : 0
+
+      All_Values_Present (function body at lines  129: 139)
+
+      === Code line metrics ===
+         all lines           : 11
+         code lines          : 11
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 5
+         all declarations         : 3
+         logical SLOC             : 8
+         maximal construct nesting: 3
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 3
+         expression complexity    : 0
+         cyclomatic complexity    : 3
+         essential complexity     : 3
+         maximum loop nesting     : 1
+         extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  5.33
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  5.33
+      essential_complexity     :  2.33
+      max_loop_nesting         :  2.00

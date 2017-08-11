@@ -1,0 +1,28 @@
+Metrics computed for src/cc51003_1.ads
+containing generic procedure CC51003_1
+
+=== Code line metrics ===
+  all lines           : 12
+  code lines          : 4
+  comment lines       : 2
+  end-of-line comments: 4
+  comment percentage  : 100.00
+  blank lines         : 6
+
+CC51003_1 (generic procedure - library item at lines  10: 12)
+
+=== Code line metrics ===
+   all lines           : 3
+   code lines          : 3
+   comment lines       : 0
+   end-of-line comments: 3
+   comment percentage  : 100.00
+   blank lines         : 0
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 3
+   logical SLOC             : 3
+   maximal construct nesting: 1

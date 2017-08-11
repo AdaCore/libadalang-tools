@@ -1,0 +1,556 @@
+Metrics computed for src/cxg2008.adb
+containing procedure body CXG2008
+
+=== Code line metrics ===
+  all lines           : 862
+  code lines          : 725
+  comment lines       : 53
+  end-of-line comments: 21
+  comment percentage  : 9.51
+  blank lines         : 84
+
+CXG2008 (procedure body - library item at lines  9: 862)
+
+=== Code line metrics ===
+   all lines           : 854
+   code lines          : 720
+   comment lines       : 52
+   end-of-line comments: 21
+   comment percentage  : 9.45
+   blank lines         : 82
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : unknown
+   all subprogram bodies    : 16
+   all statements           : 266
+   all declarations         : 197
+   logical SLOC             : 463
+   maximal unit nesting     : 2
+   maximal construct nesting: 8
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 4
+   expression complexity    : 0
+   cyclomatic complexity    : 4
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   Float_Check (package at lines  12: 15)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 3
+      logical SLOC             : 3
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      Do_Test (procedure at lines  14: 14)
+
+      === Element metrics ===
+         all parameters           : 0
+
+   Float_Check (package body at lines  17: 281)
+
+   === Code line metrics ===
+      all lines           : 265
+      code lines          : 229
+      comment lines       : 15
+      end-of-line comments: 7
+      comment percentage  : 9.01
+      blank lines         : 21
+
+   === Element metrics ===
+      all statements           : 85
+      all declarations         : 62
+      logical SLOC             : 147
+      maximal unit nesting     : 1
+      maximal construct nesting: 7
+
+      Check (procedure body at lines  30: 85)
+
+      === Code line metrics ===
+         all lines           : 56
+         code lines          : 51
+         comment lines       : 3
+         end-of-line comments: 0
+         comment percentage  : 5.55
+         blank lines         : 2
+
+      === Element metrics ===
+         all statements           : 21
+         all declarations         : 7
+         logical SLOC             : 28
+         maximal construct nesting: 3
+         all parameters           : 4
+         IN parameters            : 4
+         OUT parameters           : 0
+         IN OUT parameters        : 0
+
+      === Complexity metrics ===
+         statement complexity     : 9
+         expression complexity    : 0
+         cyclomatic complexity    : 9
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+      Special_Values (procedure body at lines  88: 219)
+
+      === Code line metrics ===
+         all lines           : 132
+         code lines          : 117
+         comment lines       : 7
+         end-of-line comments: 2
+         comment percentage  : 7.25
+         blank lines         : 8
+
+      === Element metrics ===
+         all statements           : 41
+         all declarations         : 33
+         logical SLOC             : 74
+         maximal construct nesting: 3
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 3
+         expression complexity    : 0
+         cyclomatic complexity    : 3
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+      Do_Mult_Div (procedure body at lines  222: 239)
+
+      === Code line metrics ===
+         all lines           : 18
+         code lines          : 18
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 8
+         all declarations         : 4
+         logical SLOC             : 12
+         maximal construct nesting: 1
+         all parameters           : 2
+         IN parameters            : 2
+         OUT parameters           : 0
+         IN OUT parameters        : 0
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+      Mult_Div_Check (procedure body at lines  244: 273)
+
+      === Code line metrics ===
+         all lines           : 30
+         code lines          : 30
+         comment lines       : 0
+         end-of-line comments: 5
+         comment percentage  : 16.66
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 13
+         all declarations         : 12
+         logical SLOC             : 25
+         maximal construct nesting: 6
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 6
+         expression complexity    : 0
+         cyclomatic complexity    : 6
+         essential complexity     : 6
+         maximum loop nesting     : 4
+         extra exit points        : 1
+
+      Do_Test (procedure body at lines  276: 280)
+
+      === Code line metrics ===
+         all lines           : 5
+         code lines          : 5
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 2
+         all declarations         : 1
+         logical SLOC             : 3
+         maximal construct nesting: 1
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+   A_Long_Float_Check (package at lines  287: 291)
+
+   === Code line metrics ===
+      all lines           : 5
+      code lines          : 5
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 4
+      logical SLOC             : 4
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      Do_Test (procedure at lines  290: 290)
+
+      === Element metrics ===
+         all parameters           : 0
+
+   A_Long_Float_Check (package body at lines  293: 558)
+
+   === Code line metrics ===
+      all lines           : 266
+      code lines          : 229
+      comment lines       : 15
+      end-of-line comments: 7
+      comment percentage  : 9.01
+      blank lines         : 22
+
+   === Element metrics ===
+      all statements           : 85
+      all declarations         : 62
+      logical SLOC             : 147
+      maximal unit nesting     : 1
+      maximal construct nesting: 7
+
+      Check (procedure body at lines  307: 362)
+
+      === Code line metrics ===
+         all lines           : 56
+         code lines          : 51
+         comment lines       : 3
+         end-of-line comments: 0
+         comment percentage  : 5.55
+         blank lines         : 2
+
+      === Element metrics ===
+         all statements           : 21
+         all declarations         : 7
+         logical SLOC             : 28
+         maximal construct nesting: 3
+         all parameters           : 4
+         IN parameters            : 4
+         OUT parameters           : 0
+         IN OUT parameters        : 0
+
+      === Complexity metrics ===
+         statement complexity     : 9
+         expression complexity    : 0
+         cyclomatic complexity    : 9
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+      Special_Values (procedure body at lines  365: 496)
+
+      === Code line metrics ===
+         all lines           : 132
+         code lines          : 117
+         comment lines       : 7
+         end-of-line comments: 2
+         comment percentage  : 7.25
+         blank lines         : 8
+
+      === Element metrics ===
+         all statements           : 41
+         all declarations         : 33
+         logical SLOC             : 74
+         maximal construct nesting: 3
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 3
+         expression complexity    : 0
+         cyclomatic complexity    : 3
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+      Do_Mult_Div (procedure body at lines  499: 516)
+
+      === Code line metrics ===
+         all lines           : 18
+         code lines          : 18
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 8
+         all declarations         : 4
+         logical SLOC             : 12
+         maximal construct nesting: 1
+         all parameters           : 2
+         IN parameters            : 2
+         OUT parameters           : 0
+         IN OUT parameters        : 0
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+      Mult_Div_Check (procedure body at lines  521: 550)
+
+      === Code line metrics ===
+         all lines           : 30
+         code lines          : 30
+         comment lines       : 0
+         end-of-line comments: 5
+         comment percentage  : 16.66
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 13
+         all declarations         : 12
+         logical SLOC             : 25
+         maximal construct nesting: 6
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 6
+         expression complexity    : 0
+         cyclomatic complexity    : 6
+         essential complexity     : 6
+         maximum loop nesting     : 4
+         extra exit points        : 1
+
+      Do_Test (procedure body at lines  553: 557)
+
+      === Code line metrics ===
+         all lines           : 5
+         code lines          : 5
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 2
+         all declarations         : 1
+         logical SLOC             : 3
+         maximal construct nesting: 1
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+   Non_Generic_Check (package at lines  563: 566)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 3
+      logical SLOC             : 3
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      Do_Test (procedure at lines  565: 565)
+
+      === Element metrics ===
+         all parameters           : 0
+
+   Non_Generic_Check (package body at lines  568: 831)
+
+   === Code line metrics ===
+      all lines           : 264
+      code lines          : 227
+      comment lines       : 15
+      end-of-line comments: 7
+      comment percentage  : 9.09
+      blank lines         : 22
+
+   === Element metrics ===
+      all statements           : 85
+      all declarations         : 61
+      logical SLOC             : 146
+      maximal unit nesting     : 1
+      maximal construct nesting: 7
+
+      Check (procedure body at lines  580: 635)
+
+      === Code line metrics ===
+         all lines           : 56
+         code lines          : 51
+         comment lines       : 3
+         end-of-line comments: 0
+         comment percentage  : 5.55
+         blank lines         : 2
+
+      === Element metrics ===
+         all statements           : 21
+         all declarations         : 7
+         logical SLOC             : 28
+         maximal construct nesting: 3
+         all parameters           : 4
+         IN parameters            : 4
+         OUT parameters           : 0
+         IN OUT parameters        : 0
+
+      === Complexity metrics ===
+         statement complexity     : 9
+         expression complexity    : 0
+         cyclomatic complexity    : 9
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+      Special_Values (procedure body at lines  638: 769)
+
+      === Code line metrics ===
+         all lines           : 132
+         code lines          : 117
+         comment lines       : 7
+         end-of-line comments: 2
+         comment percentage  : 7.25
+         blank lines         : 8
+
+      === Element metrics ===
+         all statements           : 41
+         all declarations         : 33
+         logical SLOC             : 74
+         maximal construct nesting: 3
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 3
+         expression complexity    : 0
+         cyclomatic complexity    : 3
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+      Do_Mult_Div (procedure body at lines  772: 789)
+
+      === Code line metrics ===
+         all lines           : 18
+         code lines          : 18
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 8
+         all declarations         : 4
+         logical SLOC             : 12
+         maximal construct nesting: 1
+         all parameters           : 2
+         IN parameters            : 2
+         OUT parameters           : 0
+         IN OUT parameters        : 0
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+      Mult_Div_Check (procedure body at lines  794: 823)
+
+      === Code line metrics ===
+         all lines           : 30
+         code lines          : 30
+         comment lines       : 0
+         end-of-line comments: 5
+         comment percentage  : 16.66
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 13
+         all declarations         : 12
+         logical SLOC             : 25
+         maximal construct nesting: 6
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 6
+         expression complexity    : 0
+         cyclomatic complexity    : 6
+         essential complexity     : 6
+         maximum loop nesting     : 4
+         extra exit points        : 1
+
+      Do_Test (procedure body at lines  826: 830)
+
+      === Code line metrics ===
+         all lines           : 5
+         code lines          : 5
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 2
+         all declarations         : 1
+         logical SLOC             : 3
+         maximal construct nesting: 1
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  4.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  4.00
+      essential_complexity     :  1.93
+      max_loop_nesting         :  4.00

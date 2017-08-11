@@ -1,0 +1,32 @@
+Metrics computed for src/cc30003_4.ads
+containing package CC30003_4
+
+=== Code line metrics ===
+  all lines           : 9
+  code lines          : 5
+  comment lines       : 0
+  end-of-line comments: 0
+  comment percentage  : 0.00
+  blank lines         : 4
+
+CC30003_4 (package - library item at lines  5: 9)
+
+=== Code line metrics ===
+   all lines           : 5
+   code lines          : 3
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 2
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 0
+   all statements           : 0
+   all declarations         : 2
+   logical SLOC             : 2
+   maximal construct nesting: 1

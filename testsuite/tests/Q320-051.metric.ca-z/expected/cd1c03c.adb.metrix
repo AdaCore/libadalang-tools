@@ -1,0 +1,45 @@
+Metrics computed for src/cd1c03c.adb
+containing procedure body CD1C03C
+
+=== Code line metrics ===
+  all lines           : 71
+  code lines          : 26
+  comment lines       : 32
+  end-of-line comments: 0
+  comment percentage  : 55.17
+  blank lines         : 13
+
+CD1C03C (procedure body - library item at lines  37: 71)
+
+=== Code line metrics ===
+   all lines           : 35
+   code lines          : 25
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 10
+
+=== Element metrics ===
+   all type definitions     : 2
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 6
+   all declarations         : 4
+   logical SLOC             : 10
+   maximal construct nesting: 2
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 3
+   expression complexity    : 0
+   cyclomatic complexity    : 3
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  3.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  3.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

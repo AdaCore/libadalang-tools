@@ -1,0 +1,74 @@
+Metrics computed for src/cxaa011.adb
+containing procedure body CXAA011
+
+=== Code line metrics ===
+  all lines           : 266
+  code lines          : 147
+  comment lines       : 78
+  end-of-line comments: 14
+  comment percentage  : 40.88
+  blank lines         : 41
+
+CXAA011 (procedure body - library item at lines  59: 266)
+
+=== Code line metrics ===
+   all lines           : 208
+   code lines          : 145
+   comment lines       : 24
+   end-of-line comments: 14
+   comment percentage  : 22.48
+   blank lines         : 39
+
+=== Element metrics ===
+   all type definitions     : 4
+   public subprograms       : unknown
+   all subprogram bodies    : 2
+   all statements           : 56
+   all declarations         : 33
+   logical SLOC             : 89
+   maximal unit nesting     : 1
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 6
+   expression complexity    : 0
+   cyclomatic complexity    : 6
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   Record_Status (function body at lines  124: 139)
+
+   === Code line metrics ===
+      all lines           : 16
+      code lines          : 15
+      comment lines       : 1
+      end-of-line comments: 1
+      comment percentage  : 12.50
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 6
+      all declarations         : 2
+      logical SLOC             : 8
+      maximal construct nesting: 1
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  3.50
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  3.50
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

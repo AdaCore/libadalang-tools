@@ -1,0 +1,214 @@
+Metrics computed for src/cxaa016.adb
+containing procedure body CXAA016
+
+=== Code line metrics ===
+  all lines           : 390
+  code lines          : 246
+  comment lines       : 61
+  end-of-line comments: 11
+  comment percentage  : 23.45
+  blank lines         : 83
+
+CXAA016 (procedure body - library item at lines  8: 390)
+
+=== Code line metrics ===
+   all lines           : 383
+   code lines          : 242
+   comment lines       : 61
+   end-of-line comments: 11
+   comment percentage  : 23.76
+   blank lines         : 80
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : unknown
+   all subprogram bodies    : 7
+   all statements           : 103
+   all declarations         : 39
+   logical SLOC             : 142
+   maximal unit nesting     : 1
+   maximal construct nesting: 5
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 5
+   expression complexity    : 0
+   cyclomatic complexity    : 5
+   essential complexity     : 1
+   maximum loop nesting     : 1
+   extra exit points        : 0
+
+   Delete_File (procedure body at lines  14: 38)
+
+   === Code line metrics ===
+      all lines           : 25
+      code lines          : 25
+      comment lines       : 0
+      end-of-line comments: 2
+      comment percentage  : 8.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 10
+      all declarations         : 3
+      logical SLOC             : 13
+      maximal construct nesting: 2
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   === Complexity metrics ===
+      statement complexity     : 2
+      expression complexity    : 0
+      cyclomatic complexity    : 2
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   New_File (procedure body at lines  80: 91)
+
+   === Code line metrics ===
+      all lines           : 12
+      code lines          : 8
+      comment lines       : 4
+      end-of-line comments: 0
+      comment percentage  : 33.33
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 2
+      all declarations         : 4
+      logical SLOC             : 6
+      maximal construct nesting: 1
+      all parameters           : 3
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Check_Initial_Environment (procedure body at lines  95: 112)
+
+   === Code line metrics ===
+      all lines           : 18
+      code lines          : 15
+      comment lines       : 3
+      end-of-line comments: 0
+      comment percentage  : 16.66
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 2
+      all declarations         : 2
+      logical SLOC             : 4
+      maximal construct nesting: 2
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 2
+      expression complexity    : 0
+      cyclomatic complexity    : 2
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Load_Input_File (procedure body at lines  116: 126)
+
+   === Code line metrics ===
+      all lines           : 11
+      code lines          : 9
+      comment lines       : 2
+      end-of-line comments: 0
+      comment percentage  : 18.18
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 6
+      all declarations         : 2
+      logical SLOC             : 8
+      maximal construct nesting: 1
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Restore_Initial_Environment (procedure body at lines  130: 161)
+
+   === Code line metrics ===
+      all lines           : 32
+      code lines          : 17
+      comment lines       : 8
+      end-of-line comments: 0
+      comment percentage  : 32.00
+      blank lines         : 7
+
+   === Element metrics ===
+      all statements           : 6
+      all declarations         : 3
+      logical SLOC             : 9
+      maximal construct nesting: 3
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 2
+      expression complexity    : 0
+      cyclomatic complexity    : 2
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Verify_Files (procedure body at lines  165: 204)
+
+   === Code line metrics ===
+      all lines           : 40
+      code lines          : 30
+      comment lines       : 3
+      end-of-line comments: 8
+      comment percentage  : 33.33
+      blank lines         : 7
+
+   === Element metrics ===
+      all statements           : 14
+      all declarations         : 4
+      logical SLOC             : 18
+      maximal construct nesting: 2
+      all parameters           : 3
+      IN parameters            : 3
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 4
+      expression complexity    : 0
+      cyclomatic complexity    : 4
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  2.42
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  2.42
+      essential_complexity     :  1.00
+      max_loop_nesting         :  1.00

@@ -1,0 +1,73 @@
+Metrics computed for src/ca12002_parent-pub_pack_child_1.ads
+containing package CA12002_Parent.Pub_Pack_Child_1
+
+=== Code line metrics ===
+  all lines           : 21
+  code lines          : 19
+  comment lines       : 0
+  end-of-line comments: 0
+  comment percentage  : 0.00
+  blank lines         : 2
+
+CA12002_Parent.Pub_Pack_Child_1 (package - library item at lines  8: 21)
+
+=== Code line metrics ===
+   all lines           : 14
+   code lines          : 14
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 0
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 2
+   all statements           : 0
+   all declarations         : 11
+   logical SLOC             : 11
+   maximal unit nesting     : 1
+   maximal construct nesting: 2
+
+   P (procedure at lines  11: 11)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 1
+      IN OUT parameters        : 0
+
+   F (function at lines  12: 12)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   Nested (package at lines  13: 17)
+
+   === Code line metrics ===
+      all lines           : 5
+      code lines          : 5
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 3
+      logical SLOC             : 3
+      maximal construct nesting: 1

@@ -1,0 +1,62 @@
+Metrics computed for src/cd1009d.adb
+containing procedure body CD1009D
+
+=== Code line metrics ===
+  all lines           : 84
+  code lines          : 39
+  comment lines       : 31
+  end-of-line comments: 0
+  comment percentage  : 44.28
+  blank lines         : 14
+
+CD1009D (procedure body - library item at lines  36: 84)
+
+=== Code line metrics ===
+   all lines           : 49
+   code lines          : 38
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 11
+
+=== Element metrics ===
+   all type definitions     : 3
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 11
+   all declarations         : 8
+   logical SLOC             : 19
+   maximal unit nesting     : 1
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 5
+   expression complexity    : 0
+   cyclomatic complexity    : 5
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   PACK (package at lines  43: 55)
+
+   === Code line metrics ===
+      all lines           : 13
+      code lines          : 10
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 3
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 5
+      logical SLOC             : 5
+      maximal construct nesting: 1
+
+=== Average complexity metrics ===
+      statement_complexity     :  5.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  5.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

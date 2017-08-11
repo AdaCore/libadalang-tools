@@ -1,0 +1,44 @@
+Metrics computed for src/fb40a00-cb40a020_0.ads
+containing package FB40A00.CB40A020_0
+
+=== Code line metrics ===
+  all lines           : 51
+  code lines          : 3
+  comment lines       : 44
+  end-of-line comments: 1
+  comment percentage  : 95.74
+  blank lines         : 4
+
+FB40A00.CB40A020_0 (package - library item at lines  47: 51)
+
+=== Code line metrics ===
+   all lines           : 5
+   code lines          : 3
+   comment lines       : 0
+   end-of-line comments: 1
+   comment percentage  : 33.33
+   blank lines         : 2
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 3
+   logical SLOC             : 3
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Count_AlphaNumerics (function at lines  49: 49)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0

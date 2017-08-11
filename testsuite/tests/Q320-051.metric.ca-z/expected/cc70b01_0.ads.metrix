@@ -1,0 +1,28 @@
+Metrics computed for src/cc70b01_0.ads
+containing generic procedure CC70B01_0
+
+=== Code line metrics ===
+  all lines           : 80
+  code lines          : 6
+  comment lines       : 68
+  end-of-line comments: 4
+  comment percentage  : 97.29
+  blank lines         : 6
+
+CC70B01_0 (generic procedure - library item at lines  65: 80)
+
+=== Code line metrics ===
+   all lines           : 16
+   code lines          : 5
+   comment lines       : 7
+   end-of-line comments: 3
+   comment percentage  : 83.33
+   blank lines         : 4
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 4
+   logical SLOC             : 4
+   maximal construct nesting: 1

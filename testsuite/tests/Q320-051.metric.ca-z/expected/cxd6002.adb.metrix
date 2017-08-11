@@ -1,0 +1,44 @@
+Metrics computed for src/cxd6002.adb
+containing procedure body CXD6002
+
+=== Code line metrics ===
+  all lines           : 33
+  code lines          : 24
+  comment lines       : 4
+  end-of-line comments: 0
+  comment percentage  : 14.28
+  blank lines         : 5
+
+CXD6002 (procedure body - library item at lines  9: 33)
+
+=== Code line metrics ===
+   all lines           : 25
+   code lines          : 20
+   comment lines       : 2
+   end-of-line comments: 0
+   comment percentage  : 9.09
+   blank lines         : 3
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 12
+   all declarations         : 1
+   logical SLOC             : 13
+   maximal construct nesting: 2
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 2
+   expression complexity    : 0
+   cyclomatic complexity    : 2
+   essential complexity     : 2
+   maximum loop nesting     : 0
+   extra exit points        : 1
+
+=== Average complexity metrics ===
+      statement_complexity     :  2.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  2.00
+      essential_complexity     :  2.00
+      max_loop_nesting         :  0.00

@@ -1,0 +1,200 @@
+Metrics computed for src/cb40005_0.adb
+containing package body CB40005_0
+
+=== Code line metrics ===
+  all lines           : 86
+  code lines          : 70
+  comment lines       : 1
+  end-of-line comments: 2
+  comment percentage  : 4.22
+  blank lines         : 15
+
+CB40005_0 (package body - library item at lines  5: 86)
+
+=== Code line metrics ===
+   all lines           : 82
+   code lines          : 69
+   comment lines       : 0
+   end-of-line comments: 2
+   comment percentage  : 2.89
+   blank lines         : 13
+
+=== Element metrics ===
+   all type definitions     : 1
+   all subprogram bodies    : 6
+   all statements           : 22
+   all declarations         : 22
+   logical SLOC             : 44
+   maximal unit nesting     : 1
+   maximal construct nesting: 5
+
+   Store_Event (procedure at lines  12: 13)
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Fail_Soft_Call (procedure body at lines  15: 39)
+
+   === Code line metrics ===
+      all lines           : 25
+      code lines          : 23
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 4.34
+      blank lines         : 2
+
+   === Element metrics ===
+      all statements           : 10
+      all declarations         : 6
+      logical SLOC             : 16
+      maximal construct nesting: 4
+      all parameters           : 3
+      IN parameters            : 3
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 2
+      expression complexity    : 0
+      cyclomatic complexity    : 2
+      essential complexity     : 1
+      maximum loop nesting     : 1
+      extra exit points        : 0
+
+   Store_Event (procedure body at lines  45: 52)
+
+   === Code line metrics ===
+      all lines           : 8
+      code lines          : 8
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 2
+      all declarations         : 3
+      logical SLOC             : 5
+      maximal construct nesting: 1
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Top_Event_Exception (function body at lines  54: 61)
+
+   === Code line metrics ===
+      all lines           : 8
+      code lines          : 8
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 3
+      all declarations         : 1
+      logical SLOC             : 4
+      maximal construct nesting: 2
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 2
+      expression complexity    : 0
+      cyclomatic complexity    : 2
+      essential complexity     : 2
+      maximum loop nesting     : 0
+      extra exit points        : 1
+
+   Top_Event_Procedure (function body at lines  63: 70)
+
+   === Code line metrics ===
+      all lines           : 8
+      code lines          : 8
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 3
+      all declarations         : 1
+      logical SLOC             : 4
+      maximal construct nesting: 2
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 2
+      expression complexity    : 0
+      cyclomatic complexity    : 2
+      essential complexity     : 2
+      maximum loop nesting     : 0
+      extra exit points        : 1
+
+   Pop_Event (procedure body at lines  72: 79)
+
+   === Code line metrics ===
+      all lines           : 8
+      code lines          : 8
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 3
+      all declarations         : 1
+      logical SLOC             : 4
+      maximal construct nesting: 2
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 2
+      expression complexity    : 0
+      cyclomatic complexity    : 2
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Event_Stack_Size (function body at lines  81: 84)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 1
+      logical SLOC             : 2
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.66
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.66
+      essential_complexity     :  1.33
+      max_loop_nesting         :  1.00

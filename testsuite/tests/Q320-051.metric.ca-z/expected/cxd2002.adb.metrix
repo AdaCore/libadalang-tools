@@ -1,0 +1,366 @@
+Metrics computed for src/cxd2002.adb
+containing procedure body CXD2002
+
+=== Code line metrics ===
+  all lines           : 424
+  code lines          : 166
+  comment lines       : 166
+  end-of-line comments: 4
+  comment percentage  : 51.20
+  blank lines         : 92
+
+CXD2002 (procedure body - library item at lines  91: 424)
+
+=== Code line metrics ===
+   all lines           : 334
+   code lines          : 158
+   comment lines       : 92
+   end-of-line comments: 4
+   comment percentage  : 38.40
+   blank lines         : 84
+
+=== Element metrics ===
+   all type definitions     : 2
+   public subprograms       : unknown
+   all subprogram bodies    : 5
+   all statements           : 59
+   all declarations         : 49
+   logical SLOC             : 108
+   maximal unit nesting     : 2
+   maximal construct nesting: 7
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 5
+   expression complexity    : 0
+   cyclomatic complexity    : 5
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   Register (protected object at lines  127: 137)
+
+   === Code line metrics ===
+      all lines           : 11
+      code lines          : 11
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 10
+      logical SLOC             : 10
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      Running_Order (procedure at lines  128: 128)
+
+      === Element metrics ===
+         all parameters           : 1
+         IN parameters            : 1
+         OUT parameters           : 0
+         IN OUT parameters        : 0
+
+      Reset (procedure at lines  129: 129)
+
+      === Element metrics ===
+         all parameters           : 0
+
+      Delay_Complete (procedure at lines  130: 130)
+
+      === Element metrics ===
+         all parameters           : 0
+
+      Test_Complete (function at lines  131: 131)
+
+      === Element metrics ===
+         all parameters           : 0
+
+   Register (protected body at lines  139: 187)
+
+   === Code line metrics ===
+      all lines           : 49
+      code lines          : 35
+      comment lines       : 9
+      end-of-line comments: 0
+      comment percentage  : 20.45
+      blank lines         : 5
+
+   === Element metrics ===
+      all statements           : 15
+      all declarations         : 6
+      logical SLOC             : 21
+      maximal unit nesting     : 1
+      maximal construct nesting: 4
+
+      Running_Order (procedure body at lines  140: 161)
+
+      === Code line metrics ===
+         all lines           : 22
+         code lines          : 15
+         comment lines       : 7
+         end-of-line comments: 0
+         comment percentage  : 31.81
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 7
+         all declarations         : 2
+         logical SLOC             : 9
+         maximal construct nesting: 3
+         all parameters           : 1
+         IN parameters            : 1
+         OUT parameters           : 0
+         IN OUT parameters        : 0
+
+      === Complexity metrics ===
+         statement complexity     : 5
+         expression complexity    : 0
+         cyclomatic complexity    : 5
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+      Reset (procedure body at lines  164: 169)
+
+      === Code line metrics ===
+         all lines           : 6
+         code lines          : 6
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 3
+         all declarations         : 1
+         logical SLOC             : 4
+         maximal construct nesting: 1
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+      Delay_Complete (procedure body at lines  171: 179)
+
+      === Code line metrics ===
+         all lines           : 9
+         code lines          : 8
+         comment lines       : 1
+         end-of-line comments: 0
+         comment percentage  : 11.11
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 4
+         all declarations         : 1
+         logical SLOC             : 5
+         maximal construct nesting: 2
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 2
+         expression complexity    : 0
+         cyclomatic complexity    : 2
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+      Test_Complete (function body at lines  181: 184)
+
+      === Code line metrics ===
+         all lines           : 4
+         code lines          : 4
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 1
+         all declarations         : 1
+         logical SLOC             : 2
+         maximal construct nesting: 1
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+   Driver_Task (task object at lines  191: 193)
+
+   === Code line metrics ===
+      all lines           : 3
+      code lines          : 3
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 1
+      logical SLOC             : 1
+      maximal construct nesting: 1
+
+   Delay_Task (task object at lines  195: 199)
+
+   === Code line metrics ===
+      all lines           : 5
+      code lines          : 5
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 3
+      logical SLOC             : 3
+      maximal construct nesting: 1
+
+   Sub_Task (task type at lines  201: 204)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 2
+      logical SLOC             : 2
+      maximal construct nesting: 1
+
+   Low_Priority_Task (task object at lines  206: 209)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 2
+      logical SLOC             : 2
+      maximal construct nesting: 1
+
+   Sub_Task (task body at lines  213: 228)
+
+   === Code line metrics ===
+      all lines           : 16
+      code lines          : 9
+      comment lines       : 4
+      end-of-line comments: 0
+      comment percentage  : 30.76
+      blank lines         : 3
+
+   === Element metrics ===
+      all statements           : 3
+      all declarations         : 2
+      logical SLOC             : 5
+      maximal construct nesting: 2
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Low_Priority_Task (task body at lines  231: 248)
+
+   === Code line metrics ===
+      all lines           : 18
+      code lines          : 9
+      comment lines       : 4
+      end-of-line comments: 0
+      comment percentage  : 30.76
+      blank lines         : 5
+
+   === Element metrics ===
+      all statements           : 3
+      all declarations         : 2
+      logical SLOC             : 5
+      maximal construct nesting: 2
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Delay_Task (task body at lines  270: 330)
+
+   === Code line metrics ===
+      all lines           : 61
+      code lines          : 15
+      comment lines       : 32
+      end-of-line comments: 0
+      comment percentage  : 68.08
+      blank lines         : 14
+
+   === Element metrics ===
+      all statements           : 9
+      all declarations         : 2
+      logical SLOC             : 11
+      maximal construct nesting: 2
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Driver_Task (task body at lines  334: 400)
+
+   === Code line metrics ===
+      all lines           : 67
+      code lines          : 25
+      comment lines       : 26
+      end-of-line comments: 0
+      comment percentage  : 50.98
+      blank lines         : 16
+
+   === Element metrics ===
+      all statements           : 16
+      all declarations         : 2
+      logical SLOC             : 18
+      maximal construct nesting: 2
+
+   === Complexity metrics ===
+      statement complexity     : 5
+      expression complexity    : 0
+      cyclomatic complexity    : 5
+      essential complexity     : 1
+      maximum loop nesting     : 1
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  2.44
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  2.44
+      essential_complexity     :  1.00
+      max_loop_nesting         :  1.00

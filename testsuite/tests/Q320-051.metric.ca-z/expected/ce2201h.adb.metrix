@@ -1,0 +1,44 @@
+Metrics computed for src/ce2201h.adb
+containing procedure body CE2201H
+
+=== Code line metrics ===
+  all lines           : 105
+  code lines          : 56
+  comment lines       : 31
+  end-of-line comments: 0
+  comment percentage  : 35.63
+  blank lines         : 18
+
+CE2201H (procedure body - library item at lines  40: 105)
+
+=== Code line metrics ===
+   all lines           : 66
+   code lines          : 53
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 13
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 24
+   all declarations         : 6
+   logical SLOC             : 30
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 4
+   expression complexity    : 0
+   cyclomatic complexity    : 4
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  4.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  4.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

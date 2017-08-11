@@ -1,0 +1,130 @@
+Metrics computed for src/cxf3a03.adb
+containing procedure body CXF3A03
+
+=== Code line metrics ===
+  all lines           : 429
+  code lines          : 234
+  comment lines       : 124
+  end-of-line comments: 1
+  comment percentage  : 34.91
+  blank lines         : 71
+
+CXF3A03 (procedure body - library item at lines  63: 429)
+
+=== Code line metrics ===
+   all lines           : 367
+   code lines          : 231
+   comment lines       : 67
+   end-of-line comments: 1
+   comment percentage  : 22.81
+   blank lines         : 69
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : unknown
+   all subprogram bodies    : 4
+   all statements           : 65
+   all declarations         : 34
+   logical SLOC             : 99
+   maximal unit nesting     : 1
+   maximal construct nesting: 6
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 21
+   expression complexity    : 0
+   cyclomatic complexity    : 21
+   essential complexity     : 1
+   maximum loop nesting     : 1
+   extra exit points        : 0
+
+   Dollar_Sign_Present (function body at lines  98: 106)
+
+   === Code line metrics ===
+      all lines           : 9
+      code lines          : 9
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 4
+      all declarations         : 3
+      logical SLOC             : 7
+      maximal construct nesting: 3
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 3
+      expression complexity    : 0
+      cyclomatic complexity    : 3
+      essential complexity     : 3
+      maximum loop nesting     : 1
+      extra exit points        : 1
+
+   V_Present (function body at lines  108: 116)
+
+   === Code line metrics ===
+      all lines           : 9
+      code lines          : 9
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 4
+      all declarations         : 3
+      logical SLOC             : 7
+      maximal construct nesting: 3
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 3
+      expression complexity    : 0
+      cyclomatic complexity    : 3
+      essential complexity     : 3
+      maximum loop nesting     : 1
+      extra exit points        : 1
+
+   Accurate_Length (function body at lines  119: 156)
+
+   === Code line metrics ===
+      all lines           : 38
+      code lines          : 26
+      comment lines       : 6
+      end-of-line comments: 0
+      comment percentage  : 18.75
+      blank lines         : 6
+
+   === Element metrics ===
+      all statements           : 9
+      all declarations         : 7
+      logical SLOC             : 16
+      maximal construct nesting: 2
+      all parameters           : 3
+      IN parameters            : 3
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 4
+      expression complexity    : 0
+      cyclomatic complexity    : 4
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  7.75
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  7.75
+      essential_complexity     :  2.00
+      max_loop_nesting         :  1.00

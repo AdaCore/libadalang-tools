@@ -1,0 +1,42 @@
+Metrics computed for src/cd5003e-task2.adb
+containing task body subunit CD5003E.TASK2
+
+=== Code line metrics ===
+  all lines           : 32
+  code lines          : 26
+  comment lines       : 0
+  end-of-line comments: 0
+  comment percentage  : 0.00
+  blank lines         : 6
+
+TASK2 (task body - subunit at lines  7: 32)
+
+=== Code line metrics ===
+   all lines           : 26
+   code lines          : 21
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 5
+
+=== Element metrics ===
+   all subprogram bodies    : 0
+   all statements           : 8
+   all declarations         : 2
+   logical SLOC             : 10
+   maximal construct nesting: 3
+
+=== Complexity metrics ===
+   statement complexity     : 3
+   expression complexity    : 0
+   cyclomatic complexity    : 3
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  3.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  3.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

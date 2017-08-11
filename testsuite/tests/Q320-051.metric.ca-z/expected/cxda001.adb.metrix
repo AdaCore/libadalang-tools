@@ -1,0 +1,44 @@
+Metrics computed for src/cxda001.adb
+containing procedure body CXDA001
+
+=== Code line metrics ===
+  all lines           : 75
+  code lines          : 20
+  comment lines       : 42
+  end-of-line comments: 0
+  comment percentage  : 67.74
+  blank lines         : 13
+
+CXDA001 (procedure body - library item at lines  47: 75)
+
+=== Code line metrics ===
+   all lines           : 29
+   code lines          : 18
+   comment lines       : 1
+   end-of-line comments: 0
+   comment percentage  : 5.26
+   blank lines         : 10
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 10
+   all declarations         : 3
+   logical SLOC             : 13
+   maximal construct nesting: 2
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 4
+   expression complexity    : 0
+   cyclomatic complexity    : 4
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  4.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  4.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

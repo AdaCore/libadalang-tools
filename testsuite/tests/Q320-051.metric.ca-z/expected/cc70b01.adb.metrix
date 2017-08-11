@@ -1,0 +1,102 @@
+Metrics computed for src/cc70b01.adb
+containing procedure body CC70B01
+
+=== Code line metrics ===
+  all lines           : 77
+  code lines          : 49
+  comment lines       : 4
+  end-of-line comments: 11
+  comment percentage  : 28.30
+  blank lines         : 24
+
+CC70B01 (procedure body - library item at lines  10: 77)
+
+=== Code line metrics ===
+   all lines           : 68
+   code lines          : 46
+   comment lines       : 3
+   end-of-line comments: 9
+   comment percentage  : 24.48
+   blank lines         : 19
+
+=== Element metrics ===
+   all type definitions     : 2
+   public subprograms       : unknown
+   all subprogram bodies    : 3
+   all statements           : 16
+   all declarations         : 19
+   logical SLOC             : 35
+   maximal unit nesting     : 1
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 3
+   expression complexity    : 0
+   cyclomatic complexity    : 3
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   TC_Initialize_List (procedure body at lines  32: 37)
+
+   === Code line metrics ===
+      all lines           : 6
+      code lines          : 6
+      comment lines       : 0
+      end-of-line comments: 2
+      comment percentage  : 33.33
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 2
+      all declarations         : 3
+      logical SLOC             : 5
+      maximal construct nesting: 2
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   === Complexity metrics ===
+      statement complexity     : 2
+      expression complexity    : 0
+      cyclomatic complexity    : 2
+      essential complexity     : 1
+      maximum loop nesting     : 1
+      extra exit points        : 0
+
+   TC_Verify_List (procedure body at lines  40: 50)
+
+   === Code line metrics ===
+      all lines           : 11
+      code lines          : 11
+      comment lines       : 0
+      end-of-line comments: 2
+      comment percentage  : 18.18
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 4
+      all declarations         : 6
+      logical SLOC             : 10
+      maximal construct nesting: 2
+      all parameters           : 3
+      IN parameters            : 1
+      OUT parameters           : 1
+      IN OUT parameters        : 1
+
+   === Complexity metrics ===
+      statement complexity     : 2
+      expression complexity    : 0
+      cyclomatic complexity    : 2
+      essential complexity     : 1
+      maximum loop nesting     : 1
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  2.33
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  2.33
+      essential_complexity     :  1.00
+      max_loop_nesting         :  1.00

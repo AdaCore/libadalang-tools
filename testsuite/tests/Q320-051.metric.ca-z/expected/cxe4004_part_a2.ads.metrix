@@ -1,0 +1,57 @@
+Metrics computed for src/cxe4004_part_a2.ads
+containing package CXE4004_Part_A2
+
+=== Code line metrics ===
+  all lines           : 14
+  code lines          : 7
+  comment lines       : 2
+  end-of-line comments: 0
+  comment percentage  : 22.22
+  blank lines         : 5
+
+CXE4004_Part_A2 (package - library item at lines  5: 14)
+
+=== Code line metrics ===
+   all lines           : 10
+   code lines          : 6
+   comment lines       : 1
+   end-of-line comments: 0
+   comment percentage  : 14.28
+   blank lines         : 3
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 1
+   all type definitions     : 1
+   public subprograms       : 2
+   all statements           : 0
+   all declarations         : 7
+   logical SLOC             : 7
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Call_With_2 (procedure at lines  9: 9)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Call_With_3 (procedure at lines  10: 10)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0

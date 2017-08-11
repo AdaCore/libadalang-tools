@@ -1,0 +1,44 @@
+Metrics computed for src/cxa4026.adb
+containing procedure body CXA4026
+
+=== Code line metrics ===
+  all lines           : 424
+  code lines          : 300
+  comment lines       : 17
+  end-of-line comments: 4
+  comment percentage  : 6.62
+  blank lines         : 107
+
+CXA4026 (procedure body - library item at lines  10: 424)
+
+=== Code line metrics ===
+   all lines           : 415
+   code lines          : 294
+   comment lines       : 17
+   end-of-line comments: 4
+   comment percentage  : 6.75
+   blank lines         : 104
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 77
+   all declarations         : 17
+   logical SLOC             : 94
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 22
+   expression complexity    : 0
+   cyclomatic complexity    : 22
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  22.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  22.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

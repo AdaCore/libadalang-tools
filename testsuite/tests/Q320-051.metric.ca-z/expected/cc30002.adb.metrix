@@ -1,0 +1,44 @@
+Metrics computed for src/cc30002.adb
+containing procedure body CC30002
+
+=== Code line metrics ===
+  all lines           : 119
+  code lines          : 59
+  comment lines       : 21
+  end-of-line comments: 1
+  comment percentage  : 27.50
+  blank lines         : 39
+
+CC30002 (procedure body - library item at lines  12: 119)
+
+=== Code line metrics ===
+   all lines           : 108
+   code lines          : 54
+   comment lines       : 20
+   end-of-line comments: 0
+   comment percentage  : 27.02
+   blank lines         : 34
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 24
+   all declarations         : 6
+   logical SLOC             : 30
+   maximal construct nesting: 2
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 9
+   expression complexity    : 0
+   cyclomatic complexity    : 9
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  9.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  9.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

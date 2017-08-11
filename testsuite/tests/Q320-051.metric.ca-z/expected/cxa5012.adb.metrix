@@ -1,0 +1,45 @@
+Metrics computed for src/cxa5012.adb
+containing procedure body CXA5012
+
+=== Code line metrics ===
+  all lines           : 536
+  code lines          : 321
+  comment lines       : 129
+  end-of-line comments: 6
+  comment percentage  : 30.00
+  blank lines         : 86
+
+CXA5012 (procedure body - library item at lines  75: 536)
+
+=== Code line metrics ===
+   all lines           : 462
+   code lines          : 316
+   comment lines       : 63
+   end-of-line comments: 6
+   comment percentage  : 18.20
+   blank lines         : 83
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 148
+   all declarations         : 57
+   logical SLOC             : 205
+   maximal construct nesting: 5
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 32
+   expression complexity    : 0
+   cyclomatic complexity    : 32
+   essential complexity     : 13
+   maximum loop nesting     : 1
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  32.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  32.00
+      essential_complexity     :  13.00
+      max_loop_nesting         :  1.00

@@ -1,0 +1,65 @@
+Metrics computed for src/cxc3002_0.ads
+containing package CXC3002_0
+
+=== Code line metrics ===
+  all lines           : 73
+  code lines          : 9
+  comment lines       : 61
+  end-of-line comments: 0
+  comment percentage  : 87.14
+  blank lines         : 3
+
+CXC3002_0 (package - library item at lines  64: 73)
+
+=== Code line metrics ===
+   all lines           : 10
+   code lines          : 8
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 2
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 1
+   all type definitions     : 1
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 5
+   logical SLOC             : 5
+   maximal unit nesting     : 2
+   maximal construct nesting: 1
+
+   Handler_Type (protected type at lines  66: 71)
+
+   === Code line metrics ===
+      all lines           : 6
+      code lines          : 6
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 4
+      logical SLOC             : 4
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      Handle_Interrupt (procedure at lines  67: 67)
+
+      === Contract metrics ===
+         contract complexity      : 1
+
+      === Element metrics ===
+         all parameters           : 0

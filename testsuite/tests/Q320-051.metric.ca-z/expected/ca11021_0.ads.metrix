@@ -1,0 +1,80 @@
+Metrics computed for src/ca11021_0.ads
+containing generic package CA11021_0
+
+=== Code line metrics ===
+  all lines           : 87
+  code lines          : 20
+  comment lines       : 54
+  end-of-line comments: 2
+  comment percentage  : 75.67
+  blank lines         : 13
+
+CA11021_0 (generic package - library item at lines  52: 87)
+
+=== Code line metrics ===
+   all lines           : 36
+   code lines          : 20
+   comment lines       : 4
+   end-of-line comments: 2
+   comment percentage  : 25.00
+   blank lines         : 12
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 1
+   private types            : 1
+   all type definitions     : 2
+   public subprograms       : 4
+   all statements           : 0
+   all declarations         : 17
+   logical SLOC             : 17
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Real_Part (function at lines  64: 65)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Imag_Part (function at lines  67: 68)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Complex (function at lines  70: 71)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   "*" (function at lines  74: 75)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0

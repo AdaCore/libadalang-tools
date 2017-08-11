@@ -1,0 +1,34 @@
+Metrics computed for src/impdef-annex_h.ads
+containing package Impdef.Annex_H
+
+=== Code line metrics ===
+  all lines           : 102
+  code lines          : 20
+  comment lines       : 67
+  end-of-line comments: 0
+  comment percentage  : 77.01
+  blank lines         : 15
+
+Impdef.Annex_H (package - library item at lines  41: 102)
+
+=== Code line metrics ===
+   all lines           : 62
+   code lines          : 20
+   comment lines       : 28
+   end-of-line comments: 0
+   comment percentage  : 58.33
+   blank lines         : 14
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 2
+   all type definitions     : 2
+   public subprograms       : 0
+   all statements           : 0
+   all declarations         : 124
+   logical SLOC             : 124
+   maximal construct nesting: 1

@@ -1,0 +1,31 @@
+Metrics computed for src/cxa4027_0.ads
+containing function CXA4027_0
+
+=== Code line metrics ===
+  all lines           : 69
+  code lines          : 2
+  comment lines       : 64
+  end-of-line comments: 0
+  comment percentage  : 96.96
+  blank lines         : 3
+
+CXA4027_0 (function - library item at lines  69: 69)
+
+=== Code line metrics ===
+   all lines           : 1
+   code lines          : 1
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 0
+
+=== Element metrics ===
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 2
+   logical SLOC             : 2
+   maximal construct nesting: 1
+   all parameters           : 1
+   IN parameters            : 1
+   OUT parameters           : 0
+   IN OUT parameters        : 0

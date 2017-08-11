@@ -1,0 +1,44 @@
+Metrics computed for src/ce3103a.adb
+containing procedure body CE3103A
+
+=== Code line metrics ===
+  all lines           : 216
+  code lines          : 142
+  comment lines       : 38
+  end-of-line comments: 0
+  comment percentage  : 21.11
+  blank lines         : 36
+
+CE3103A (procedure body - library item at lines  48: 216)
+
+=== Code line metrics ===
+   all lines           : 169
+   code lines          : 138
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 31
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 77
+   all declarations         : 7
+   logical SLOC             : 84
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 15
+   expression complexity    : 0
+   cyclomatic complexity    : 15
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  15.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  15.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

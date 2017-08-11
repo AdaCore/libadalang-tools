@@ -1,0 +1,231 @@
+Metrics computed for src/cxe4005_part_a1.adb
+containing package body CXE4005_Part_A1
+
+=== Code line metrics ===
+  all lines           : 76
+  code lines          : 56
+  comment lines       : 7
+  end-of-line comments: 1
+  comment percentage  : 12.69
+  blank lines         : 13
+
+CXE4005_Part_A1 (package body - library item at lines  9: 76)
+
+=== Code line metrics ===
+   all lines           : 68
+   code lines          : 51
+   comment lines       : 6
+   end-of-line comments: 1
+   comment percentage  : 12.28
+   blank lines         : 11
+
+=== Element metrics ===
+   all type definitions     : 1
+   all subprogram bodies    : 5
+   all statements           : 15
+   all declarations         : 18
+   logical SLOC             : 33
+   maximal unit nesting     : 1
+   maximal construct nesting: 3
+
+=== Complexity metrics ===
+   statement complexity     : 1
+   expression complexity    : 0
+   cyclomatic complexity    : 1
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   Wait_For_Quit (task object at lines  18: 21)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 3
+      logical SLOC             : 3
+      maximal construct nesting: 1
+
+   Wait_For_Quit (task body at lines  23: 29)
+
+   === Code line metrics ===
+      all lines           : 7
+      code lines          : 6
+      comment lines       : 1
+      end-of-line comments: 1
+      comment percentage  : 28.57
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 3
+      all declarations         : 1
+      logical SLOC             : 4
+      maximal construct nesting: 2
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Can_Quit (procedure body at lines  31: 34)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 1
+      logical SLOC             : 2
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Quit (procedure body at lines  36: 39)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 1
+      logical SLOC             : 2
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Get_RACWT (function body at lines  42: 51)
+
+   === Code line metrics ===
+      all lines           : 10
+      code lines          : 10
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 5
+      all declarations         : 2
+      logical SLOC             : 7
+      maximal construct nesting: 2
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 4
+      expression complexity    : 0
+      cyclomatic complexity    : 4
+      essential complexity     : 2
+      maximum loop nesting     : 0
+      extra exit points        : 3
+
+   Takes_Class_Wide (procedure body at lines  53: 56)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 2
+      logical SLOC             : 3
+      maximal construct nesting: 1
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Nested (package at lines  58: 61)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 2
+      logical SLOC             : 2
+      maximal construct nesting: 1
+
+   Return_Open_Tagged_Type_Class (function body at lines  63: 69)
+
+   === Code line metrics ===
+      all lines           : 7
+      code lines          : 6
+      comment lines       : 1
+      end-of-line comments: 0
+      comment percentage  : 14.28
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 2
+      logical SLOC             : 3
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.42
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.42
+      essential_complexity     :  1.14
+      max_loop_nesting         :  0.00

@@ -1,0 +1,69 @@
+Metrics computed for src/cxb3008.adb
+containing procedure body CXB3008
+
+=== Code line metrics ===
+  all lines           : 226
+  code lines          : 91
+  comment lines       : 89
+  end-of-line comments: 3
+  comment percentage  : 51.11
+  blank lines         : 46
+
+CXB3008 (procedure body - library item at lines  74: 226)
+
+=== Code line metrics ===
+   all lines           : 153
+   code lines          : 86
+   comment lines       : 23
+   end-of-line comments: 1
+   comment percentage  : 22.01
+   blank lines         : 44
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 31
+   all declarations         : 18
+   logical SLOC             : 49
+   maximal unit nesting     : 1
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 9
+   expression complexity    : 0
+   cyclomatic complexity    : 9
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   String_Copy (procedure at lines  102: 103)
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 1
+      IN OUT parameters        : 0
+
+   String_Length (function at lines  109: 110)
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   String_To_Double (function at lines  118: 120)
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  9.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  9.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

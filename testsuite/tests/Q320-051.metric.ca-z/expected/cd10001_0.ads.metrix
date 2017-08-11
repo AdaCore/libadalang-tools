@@ -1,0 +1,43 @@
+Metrics computed for src/cd10001_0.ads
+containing package CD10001_0
+
+=== Code line metrics ===
+  all lines           : 230
+  code lines          : 49
+  comment lines       : 141
+  end-of-line comments: 21
+  comment percentage  : 85.26
+  blank lines         : 40
+
+CD10001_0 (package - library item at lines  108: 230)
+
+=== Code line metrics ===
+   all lines           : 123
+   code lines          : 45
+   comment lines       : 41
+   end-of-line comments: 21
+   comment percentage  : 72.09
+   blank lines         : 37
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 8
+   all type definitions     : 8
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 35
+   logical SLOC             : 35
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   TC_Check_Values (procedure at lines  228: 228)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0

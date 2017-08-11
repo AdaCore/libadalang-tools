@@ -1,0 +1,127 @@
+Metrics computed for src/cxc3006_0.adb
+containing package body CXC3006_0
+
+=== Code line metrics ===
+  all lines           : 25
+  code lines          : 16
+  comment lines       : 1
+  end-of-line comments: 0
+  comment percentage  : 5.88
+  blank lines         : 8
+
+CXC3006_0 (package body - library item at lines  6: 25)
+
+=== Code line metrics ===
+   all lines           : 20
+   code lines          : 16
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 4
+
+=== Element metrics ===
+   all subprogram bodies    : 3
+   all statements           : 3
+   all declarations         : 5
+   logical SLOC             : 8
+   maximal unit nesting     : 2
+   maximal construct nesting: 3
+
+   Dynamic (protected body at lines  8: 23)
+
+   === Code line metrics ===
+      all lines           : 16
+      code lines          : 14
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 2
+
+   === Element metrics ===
+      all statements           : 3
+      all declarations         : 4
+      logical SLOC             : 7
+      maximal unit nesting     : 1
+      maximal construct nesting: 2
+
+      Handler (procedure body at lines  9: 12)
+
+      === Code line metrics ===
+         all lines           : 4
+         code lines          : 4
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 1
+         all declarations         : 1
+         logical SLOC             : 2
+         maximal construct nesting: 1
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+      Reset (procedure body at lines  14: 17)
+
+      === Code line metrics ===
+         all lines           : 4
+         code lines          : 4
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 1
+         all declarations         : 1
+         logical SLOC             : 2
+         maximal construct nesting: 1
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+      Handled (function body at lines  19: 22)
+
+      === Code line metrics ===
+         all lines           : 4
+         code lines          : 4
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 1
+         all declarations         : 1
+         logical SLOC             : 2
+         maximal construct nesting: 1
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

@@ -1,0 +1,242 @@
+Metrics computed for src/cc3016c.adb
+containing procedure body CC3016C
+
+=== Code line metrics ===
+  all lines           : 192
+  code lines          : 124
+  comment lines       : 29
+  end-of-line comments: 7
+  comment percentage  : 23.52
+  blank lines         : 39
+
+CC3016C (procedure body - library item at lines  35: 192)
+
+=== Code line metrics ===
+   all lines           : 158
+   code lines          : 123
+   comment lines       : 0
+   end-of-line comments: 7
+   comment percentage  : 5.69
+   blank lines         : 35
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : unknown
+   all subprogram bodies    : 5
+   all statements           : 19
+   all declarations         : 51
+   logical SLOC             : 70
+   maximal unit nesting     : 2
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 2
+   expression complexity    : 0
+   cyclomatic complexity    : 2
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   OUTER (generic package at lines  37: 77)
+
+   === Code line metrics ===
+      all lines           : 41
+      code lines          : 33
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 8
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 34
+      logical SLOC             : 34
+      maximal unit nesting     : 1
+      maximal construct nesting: 2
+
+      INNER_VARIABLE (function at lines  59: 59)
+
+      === Element metrics ===
+         all parameters           : 0
+
+      INNER (generic package at lines  61: 75)
+
+      === Code line metrics ===
+         all lines           : 15
+         code lines          : 13
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 2
+
+      === Element metrics ===
+         all statements           : 0
+         all declarations         : 13
+         logical SLOC             : 13
+         maximal construct nesting: 1
+
+   OUTER (package body at lines  80: 135)
+
+   === Code line metrics ===
+      all lines           : 56
+      code lines          : 45
+      comment lines       : 0
+      end-of-line comments: 2
+      comment percentage  : 4.44
+      blank lines         : 11
+
+   === Element metrics ===
+      all statements           : 11
+      all declarations         : 6
+      logical SLOC             : 17
+      maximal unit nesting     : 1
+      maximal construct nesting: 3
+
+   === Complexity metrics ===
+      statement complexity     : 2
+      expression complexity    : 0
+      cyclomatic complexity    : 2
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+      INNER (package body at lines  84: 106)
+
+      === Code line metrics ===
+         all lines           : 23
+         code lines          : 20
+         comment lines       : 0
+         end-of-line comments: 1
+         comment percentage  : 5.00
+         blank lines         : 3
+
+      === Element metrics ===
+         all statements           : 6
+         all declarations         : 2
+         logical SLOC             : 8
+         maximal construct nesting: 2
+
+      === Complexity metrics ===
+         statement complexity     : 2
+         expression complexity    : 0
+         cyclomatic complexity    : 2
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+      INNER_VARIABLE (function body at lines  117: 120)
+
+      === Code line metrics ===
+         all lines           : 4
+         code lines          : 4
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 1
+         all declarations         : 1
+         logical SLOC             : 2
+         maximal construct nesting: 1
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+   DOUBLE (procedure body at lines  137: 141)
+
+   === Code line metrics ===
+      all lines           : 5
+      code lines          : 5
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 20.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 3
+      logical SLOC             : 4
+      maximal construct nesting: 1
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 1
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   ADD_20 (procedure body at lines  143: 147)
+
+   === Code line metrics ===
+      all lines           : 5
+      code lines          : 5
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 20.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 3
+      logical SLOC             : 4
+      maximal construct nesting: 1
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 1
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   TIMES_FIVE (procedure body at lines  149: 153)
+
+   === Code line metrics ===
+      all lines           : 5
+      code lines          : 5
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 20.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 3
+      logical SLOC             : 4
+      maximal construct nesting: 1
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 1
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.42
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.42
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

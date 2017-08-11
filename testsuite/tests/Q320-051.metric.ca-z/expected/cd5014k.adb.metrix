@@ -1,0 +1,86 @@
+Metrics computed for src/cd5014k.adb
+containing procedure body CD5014K
+
+=== Code line metrics ===
+  all lines           : 87
+  code lines          : 38
+  comment lines       : 33
+  end-of-line comments: 0
+  comment percentage  : 46.47
+  blank lines         : 16
+
+CD5014K (procedure body - library item at lines  42: 87)
+
+=== Code line metrics ===
+   all lines           : 46
+   code lines          : 35
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 11
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 10
+   all declarations         : 7
+   logical SLOC             : 17
+   maximal unit nesting     : 1
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 1
+   expression complexity    : 0
+   cyclomatic complexity    : 1
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   PKG (generic package at lines  55: 63)
+
+   === Code line metrics ===
+      all lines           : 9
+      code lines          : 9
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 4
+      logical SLOC             : 4
+      maximal construct nesting: 1
+
+   PKG (package body at lines  65: 78)
+
+   === Code line metrics ===
+      all lines           : 14
+      code lines          : 12
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 2
+
+   === Element metrics ===
+      all statements           : 6
+      all declarations         : 1
+      logical SLOC             : 7
+      maximal construct nesting: 2
+
+   === Complexity metrics ===
+      statement complexity     : 4
+      expression complexity    : 0
+      cyclomatic complexity    : 4
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  2.50
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  2.50
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

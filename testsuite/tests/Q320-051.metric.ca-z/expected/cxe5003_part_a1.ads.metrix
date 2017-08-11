@@ -1,0 +1,41 @@
+Metrics computed for src/cxe5003_part_a1.ads
+containing package CXE5003_Part_A1
+
+=== Code line metrics ===
+  all lines           : 109
+  code lines          : 5
+  comment lines       : 100
+  end-of-line comments: 0
+  comment percentage  : 95.23
+  blank lines         : 4
+
+CXE5003_Part_A1 (package - library item at lines  104: 109)
+
+=== Code line metrics ===
+   all lines           : 6
+   code lines          : 5
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 1
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 2
+   logical SLOC             : 2
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   A_Remote_Procedure (procedure at lines  108: 108)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0

@@ -1,0 +1,46 @@
+Metrics computed for src/cc51007_2.ads
+containing package CC51007_2
+
+=== Code line metrics ===
+  all lines           : 19
+  code lines          : 9
+  comment lines       : 2
+  end-of-line comments: 1
+  comment percentage  : 27.27
+  blank lines         : 8
+
+CC51007_2 (package - library item at lines  7: 19)
+
+=== Code line metrics ===
+   all lines           : 13
+   code lines          : 8
+   comment lines       : 1
+   end-of-line comments: 1
+   comment percentage  : 22.22
+   blank lines         : 4
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 2
+   all type definitions     : 2
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 10
+   logical SLOC             : 10
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Handle (procedure at lines  15: 15)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1

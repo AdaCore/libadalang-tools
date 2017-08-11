@@ -1,0 +1,77 @@
+Metrics computed for src/cxa40220.ads
+containing package CXA40220
+
+=== Code line metrics ===
+  all lines           : 84
+  code lines          : 10
+  comment lines       : 64
+  end-of-line comments: 0
+  comment percentage  : 86.48
+  blank lines         : 10
+
+CXA40220 (package - library item at lines  59: 84)
+
+=== Code line metrics ===
+   all lines           : 26
+   code lines          : 8
+   comment lines       : 10
+   end-of-line comments: 0
+   comment percentage  : 55.55
+   blank lines         : 8
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 4
+   all statements           : 0
+   all declarations         : 9
+   logical SLOC             : 9
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Equiv (function at lines  69: 69)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Equiv (function at lines  71: 71)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   AB_to_US_Mapping_Function (function at lines  78: 79)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   AB_to_Blank_Mapping_Function (function at lines  81: 82)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0

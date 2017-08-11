@@ -1,0 +1,117 @@
+Metrics computed for src/cxd6003_0.ads
+containing package CXD6003_0
+
+=== Code line metrics ===
+  all lines           : 92
+  code lines          : 25
+  comment lines       : 60
+  end-of-line comments: 0
+  comment percentage  : 70.58
+  blank lines         : 7
+
+CXD6003_0 (package - library item at lines  62: 92)
+
+=== Code line metrics ===
+   all lines           : 31
+   code lines          : 24
+   comment lines       : 1
+   end-of-line comments: 0
+   comment percentage  : 4.00
+   blank lines         : 6
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 2
+   all type definitions     : 2
+   public subprograms       : 6
+   all statements           : 0
+   all declarations         : 27
+   logical SLOC             : 27
+   maximal unit nesting     : 2
+   maximal construct nesting: 1
+
+   Initialize (procedure at lines  73: 73)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Finalize (procedure at lines  74: 74)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Adjust (procedure at lines  75: 75)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   State_Manager (protected object at lines  82: 90)
+
+   === Code line metrics ===
+      all lines           : 9
+      code lines          : 9
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 8
+      logical SLOC             : 8
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      Reset (procedure at lines  83: 83)
+
+      === Contract metrics ===
+         contract complexity      : 1
+
+      === Element metrics ===
+         all parameters           : 0
+
+      Set (procedure at lines  84: 84)
+
+      === Contract metrics ===
+         contract complexity      : 1
+
+      === Element metrics ===
+         all parameters           : 1
+         IN parameters            : 1
+         OUT parameters           : 0
+         IN OUT parameters        : 0
+
+      Current (function at lines  85: 85)
+
+      === Contract metrics ===
+         contract complexity      : 1
+
+      === Element metrics ===
+         all parameters           : 0

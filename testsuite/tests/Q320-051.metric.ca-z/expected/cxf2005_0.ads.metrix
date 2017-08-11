@@ -1,0 +1,56 @@
+Metrics computed for src/cxf2005_0.ads
+containing generic package CXF2005_0
+
+=== Code line metrics ===
+  all lines           : 58
+  code lines          : 8
+  comment lines       : 46
+  end-of-line comments: 0
+  comment percentage  : 85.18
+  blank lines         : 4
+
+CXF2005_0 (generic package - library item at lines  48: 58)
+
+=== Code line metrics ===
+   all lines           : 11
+   code lines          : 8
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 3
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : 2
+   all statements           : 0
+   all declarations         : 8
+   logical SLOC             : 8
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Multiply (function at lines  52: 53)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Divide (function at lines  55: 56)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0

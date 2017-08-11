@@ -1,0 +1,116 @@
+Metrics computed for src/cd3015i.adb
+containing procedure body CD3015I
+
+=== Code line metrics ===
+  all lines           : 144
+  code lines          : 82
+  comment lines       : 36
+  end-of-line comments: 0
+  comment percentage  : 30.50
+  blank lines         : 26
+
+CD3015I (procedure body - library item at lines  41: 144)
+
+=== Code line metrics ===
+   all lines           : 104
+   code lines          : 81
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 23
+
+=== Element metrics ===
+   all type definitions     : 6
+   public subprograms       : unknown
+   all subprogram bodies    : 2
+   all statements           : 21
+   all declarations         : 27
+   logical SLOC             : 48
+   maximal unit nesting     : 2
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 1
+   expression complexity    : 0
+   cyclomatic complexity    : 1
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   GENPACK (generic package at lines  54: 85)
+
+   === Code line metrics ===
+      all lines           : 32
+      code lines          : 25
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 7
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 19
+      logical SLOC             : 19
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+   GENPACK (package body at lines  87: 136)
+
+   === Code line metrics ===
+      all lines           : 50
+      code lines          : 41
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 9
+
+   === Element metrics ===
+      all statements           : 17
+      all declarations         : 6
+      logical SLOC             : 23
+      maximal unit nesting     : 1
+      maximal construct nesting: 2
+
+   === Complexity metrics ===
+      statement complexity     : 4
+      expression complexity    : 0
+      cyclomatic complexity    : 4
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+      CHANGE (procedure body at lines  89: 95)
+
+      === Code line metrics ===
+         all lines           : 7
+         code lines          : 7
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 3
+         all declarations         : 3
+         logical SLOC             : 6
+         maximal construct nesting: 1
+         all parameters           : 2
+         IN parameters            : 0
+         OUT parameters           : 0
+         IN OUT parameters        : 2
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  2.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  2.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

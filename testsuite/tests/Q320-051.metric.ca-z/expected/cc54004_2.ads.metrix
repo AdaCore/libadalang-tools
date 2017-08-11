@@ -1,0 +1,69 @@
+Metrics computed for src/cc54004_2.ads
+containing generic package CC54004_2
+
+=== Code line metrics ===
+  all lines           : 31
+  code lines          : 16
+  comment lines       : 2
+  end-of-line comments: 0
+  comment percentage  : 11.11
+  blank lines         : 13
+
+CC54004_2 (generic package - library item at lines  7: 31)
+
+=== Code line metrics ===
+   all lines           : 25
+   code lines          : 15
+   comment lines       : 1
+   end-of-line comments: 0
+   comment percentage  : 6.25
+   blank lines         : 9
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 1
+   private types            : 1
+   all type definitions     : 3
+   public subprograms       : 3
+   all statements           : 0
+   all declarations         : 15
+   logical SLOC             : 15
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Push (procedure at lines  14: 15)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Pop (procedure at lines  17: 18)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 0
+      OUT parameters           : 1
+      IN OUT parameters        : 1
+
+   Process_Stack (procedure at lines  20: 20)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1

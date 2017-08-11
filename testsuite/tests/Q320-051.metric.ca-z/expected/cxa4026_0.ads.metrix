@@ -1,0 +1,55 @@
+Metrics computed for src/cxa4026_0.ads
+containing package CXA4026_0
+
+=== Code line metrics ===
+  all lines           : 81
+  code lines          : 4
+  comment lines       : 69
+  end-of-line comments: 0
+  comment percentage  : 94.52
+  blank lines         : 8
+
+CXA4026_0 (package - library item at lines  65: 81)
+
+=== Code line metrics ===
+   all lines           : 17
+   code lines          : 4
+   comment lines       : 7
+   end-of-line comments: 0
+   comment percentage  : 63.63
+   blank lines         : 6
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 2
+   all statements           : 0
+   all declarations         : 5
+   logical SLOC             : 5
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Map_To_Lower_Case (function at lines  71: 71)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Map_To_Upper_Case (function at lines  79: 79)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0

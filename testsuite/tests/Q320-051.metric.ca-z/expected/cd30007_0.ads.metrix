@@ -1,0 +1,34 @@
+Metrics computed for src/cd30007_0.ads
+containing package CD30007_0
+
+=== Code line metrics ===
+  all lines           : 93
+  code lines          : 6
+  comment lines       : 81
+  end-of-line comments: 0
+  comment percentage  : 93.10
+  blank lines         : 6
+
+CD30007_0 (package - library item at lines  83: 93)
+
+=== Code line metrics ===
+   all lines           : 11
+   code lines          : 6
+   comment lines       : 1
+   end-of-line comments: 0
+   comment percentage  : 14.28
+   blank lines         : 4
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 2
+   all type definitions     : 2
+   public subprograms       : 0
+   all statements           : 0
+   all declarations         : 10
+   logical SLOC             : 10
+   maximal construct nesting: 1

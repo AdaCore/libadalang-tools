@@ -1,0 +1,44 @@
+Metrics computed for src/cxa5a03.adb
+containing procedure body CXA5A03
+
+=== Code line metrics ===
+  all lines           : 426
+  code lines          : 257
+  comment lines       : 94
+  end-of-line comments: 9
+  comment percentage  : 29.34
+  blank lines         : 75
+
+CXA5A03 (procedure body - library item at lines  65: 426)
+
+=== Code line metrics ===
+   all lines           : 362
+   code lines          : 253
+   comment lines       : 36
+   end-of-line comments: 9
+   comment percentage  : 15.57
+   blank lines         : 73
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 109
+   all declarations         : 7
+   logical SLOC             : 116
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 12
+   expression complexity    : 0
+   cyclomatic complexity    : 12
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  12.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  12.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

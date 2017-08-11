@@ -1,0 +1,74 @@
+Metrics computed for src/cxai032.adb
+containing procedure body CXAI032
+
+=== Code line metrics ===
+  all lines           : 244
+  code lines          : 161
+  comment lines       : 58
+  end-of-line comments: 9
+  comment percentage  : 30.59
+  blank lines         : 25
+
+CXAI032 (procedure body - library item at lines  56: 244)
+
+=== Code line metrics ===
+   all lines           : 189
+   code lines          : 158
+   comment lines       : 8
+   end-of-line comments: 9
+   comment percentage  : 10.24
+   blank lines         : 23
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : unknown
+   all subprogram bodies    : 2
+   all statements           : 89
+   all declarations         : 21
+   logical SLOC             : 110
+   maximal unit nesting     : 1
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 30
+   expression complexity    : 6
+   cyclomatic complexity    : 36
+   essential complexity     : 5
+   maximum loop nesting     : 1
+   extra exit points        : 0
+
+   Tamperer (procedure body at lines  71: 74)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 3
+      logical SLOC             : 4
+      maximal construct nesting: 1
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  15.50
+      expression_complexity    :  3.00
+      cyclomatic_complexity    :  18.50
+      essential_complexity     :  3.00
+      max_loop_nesting         :  1.00

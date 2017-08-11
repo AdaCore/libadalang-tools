@@ -1,0 +1,41 @@
+Metrics computed for src/ca5004b2.ads
+containing package CA5004B2
+
+=== Code line metrics ===
+  all lines           : 15
+  code lines          : 9
+  comment lines       : 1
+  end-of-line comments: 0
+  comment percentage  : 10.00
+  blank lines         : 5
+
+CA5004B2 (package - library item at lines  8: 15)
+
+=== Code line metrics ===
+   all lines           : 8
+   code lines          : 5
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 3
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 4
+   logical SLOC             : 4
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   REQUIRE_BODY (procedure at lines  13: 13)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0

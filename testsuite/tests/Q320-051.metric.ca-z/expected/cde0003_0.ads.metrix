@@ -1,0 +1,65 @@
+Metrics computed for src/cde0003_0.ads
+containing package CDE0003_0
+
+=== Code line metrics ===
+  all lines           : 71
+  code lines          : 10
+  comment lines       : 56
+  end-of-line comments: 0
+  comment percentage  : 84.84
+  blank lines         : 5
+
+CDE0003_0 (package - library item at lines  58: 71)
+
+=== Code line metrics ===
+   all lines           : 14
+   code lines          : 10
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 4
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : 0
+   all statements           : 0
+   all declarations         : 11
+   logical SLOC             : 11
+   maximal unit nesting     : 1
+   maximal construct nesting: 2
+
+   G (generic package at lines  60: 69)
+
+   === Code line metrics ===
+      all lines           : 10
+      code lines          : 8
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 2
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 10
+      logical SLOC             : 10
+      maximal construct nesting: 1
+
+      Call_F (function at lines  66: 66)
+
+      === Contract metrics ===
+         contract complexity      : 1
+
+      Call_P (procedure at lines  67: 67)
+
+      === Contract metrics ===
+         contract complexity      : 1

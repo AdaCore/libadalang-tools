@@ -1,0 +1,44 @@
+Metrics computed for src/cxaa004.adb
+containing procedure body CXAA004
+
+=== Code line metrics ===
+  all lines           : 260
+  code lines          : 128
+  comment lines       : 91
+  end-of-line comments: 21
+  comment percentage  : 51.14
+  blank lines         : 41
+
+CXAA004 (procedure body - library item at lines  63: 260)
+
+=== Code line metrics ===
+   all lines           : 198
+   code lines          : 126
+   comment lines       : 33
+   end-of-line comments: 21
+   comment percentage  : 33.96
+   blank lines         : 39
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 56
+   all declarations         : 13
+   logical SLOC             : 69
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 12
+   expression complexity    : 3
+   cyclomatic complexity    : 15
+   essential complexity     : 1
+   maximum loop nesting     : 1
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  12.00
+      expression_complexity    :  3.00
+      cyclomatic_complexity    :  15.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  1.00

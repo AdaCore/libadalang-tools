@@ -1,0 +1,52 @@
+Metrics computed for src/ca1108a_pkg.ads
+containing package CA1108A_PKG
+
+=== Code line metrics ===
+  all lines           : 11
+  code lines          : 8
+  comment lines       : 0
+  end-of-line comments: 0
+  comment percentage  : 0.00
+  blank lines         : 3
+
+CA1108A_PKG (package - library item at lines  5: 11)
+
+=== Code line metrics ===
+   all lines           : 7
+   code lines          : 5
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 2
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 2
+   all statements           : 0
+   all declarations         : 5
+   logical SLOC             : 5
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   PROC (procedure at lines  8: 8)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   CALL_SUBS (procedure at lines  9: 9)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 2

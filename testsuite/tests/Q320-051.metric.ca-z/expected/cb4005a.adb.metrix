@@ -1,0 +1,70 @@
+Metrics computed for src/cb4005a.adb
+containing procedure body CB4005A
+
+=== Code line metrics ===
+  all lines           : 66
+  code lines          : 29
+  comment lines       : 27
+  end-of-line comments: 0
+  comment percentage  : 48.21
+  blank lines         : 10
+
+CB4005A (procedure body - library item at lines  33: 66)
+
+=== Code line metrics ===
+   all lines           : 34
+   code lines          : 28
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 6
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 2
+   all statements           : 13
+   all declarations         : 4
+   logical SLOC             : 17
+   maximal unit nesting     : 1
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 1
+   expression complexity    : 0
+   cyclomatic complexity    : 1
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   P (procedure body at lines  39: 51)
+
+   === Code line metrics ===
+      all lines           : 13
+      code lines          : 13
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 6
+      all declarations         : 1
+      logical SLOC             : 7
+      maximal construct nesting: 2
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 1
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

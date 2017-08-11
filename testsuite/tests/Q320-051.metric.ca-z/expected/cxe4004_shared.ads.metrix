@@ -1,0 +1,50 @@
+Metrics computed for src/cxe4004_shared.ads
+containing package CXE4004_Shared
+
+=== Code line metrics ===
+  all lines           : 18
+  code lines          : 8
+  comment lines       : 7
+  end-of-line comments: 0
+  comment percentage  : 46.66
+  blank lines         : 3
+
+CXE4004_Shared (package - library item at lines  4: 18)
+
+=== Code line metrics ===
+   all lines           : 15
+   code lines          : 8
+   comment lines       : 6
+   end-of-line comments: 0
+   comment percentage  : 42.85
+   blank lines         : 1
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : 2
+   all statements           : 0
+   all declarations         : 7
+   logical SLOC             : 7
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Gen_Chk (generic procedure at lines  11: 15)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   Start_Test_Section (procedure at lines  17: 17)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0

@@ -1,0 +1,46 @@
+Metrics computed for src/ca2009f0m.adb
+containing procedure body CA2009F0M
+
+=== Code line metrics ===
+  all lines           : 120
+  code lines          : 54
+  comment lines       : 41
+  end-of-line comments: 0
+  comment percentage  : 43.15
+  blank lines         : 25
+
+CA2009F0M (procedure body - library item at lines  49: 120)
+
+=== Code line metrics ===
+   all lines           : 72
+   code lines          : 52
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 20
+
+=== Element metrics ===
+   all type definitions     : 4
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 12
+   all declarations         : 29
+   logical SLOC             : 41
+   maximal unit nesting     : 1
+   maximal construct nesting: 2
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 5
+   expression complexity    : 0
+   cyclomatic complexity    : 5
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  5.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  5.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

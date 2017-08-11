@@ -1,0 +1,119 @@
+Metrics computed for src/ca13001_1-ca13001_2-ca13001_4-family_transportation.adb
+containing protected body subunit CA13001_1.CA13001_2.CA13001_4.Family_Transportation
+
+=== Code line metrics ===
+  all lines           : 83
+  code lines          : 49
+  comment lines       : 18
+  end-of-line comments: 0
+  comment percentage  : 26.86
+  blank lines         : 16
+
+Family_Transportation (protected body - subunit at lines  5: 83)
+
+=== Code line metrics ===
+   all lines           : 79
+   code lines          : 48
+   comment lines       : 17
+   end-of-line comments: 0
+   comment percentage  : 26.15
+   blank lines         : 14
+
+=== Element metrics ===
+   all subprogram bodies    : 3
+   all statements           : 22
+   all declarations         : 8
+   logical SLOC             : 30
+   maximal unit nesting     : 1
+   maximal construct nesting: 5
+
+   Get_Vehicle (procedure body at lines  7: 64)
+
+   === Code line metrics ===
+      all lines           : 58
+      code lines          : 37
+      comment lines       : 14
+      end-of-line comments: 0
+      comment percentage  : 27.45
+      blank lines         : 7
+
+   === Element metrics ===
+      all statements           : 19
+      all declarations         : 3
+      logical SLOC             : 22
+      maximal construct nesting: 4
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 1
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 6
+      expression complexity    : 0
+      cyclomatic complexity    : 6
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Return_Vehicle (procedure body at lines  70: 74)
+
+   === Code line metrics ===
+      all lines           : 5
+      code lines          : 5
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 2
+      all declarations         : 2
+      logical SLOC             : 4
+      maximal construct nesting: 1
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   TC_Verify (function body at lines  78: 81)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 2
+      logical SLOC             : 3
+      maximal construct nesting: 1
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  2.66
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  2.66
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

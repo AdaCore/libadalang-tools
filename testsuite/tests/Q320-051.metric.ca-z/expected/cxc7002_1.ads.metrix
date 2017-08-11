@@ -1,0 +1,26 @@
+Metrics computed for src/cxc7002_1.ads
+containing package instance CXC7002_1
+
+=== Code line metrics ===
+  all lines           : 9
+  code lines          : 5
+  comment lines       : 1
+  end-of-line comments: 1
+  comment percentage  : 33.33
+  blank lines         : 3
+
+CXC7002_1 (package instantiation - library item at lines  7: 9)
+
+=== Code line metrics ===
+   all lines           : 3
+   code lines          : 3
+   comment lines       : 0
+   end-of-line comments: 1
+   comment percentage  : 33.33
+   blank lines         : 0
+
+=== Element metrics ===
+   all statements           : 0
+   all declarations         : 1
+   logical SLOC             : 1
+   maximal construct nesting: 1

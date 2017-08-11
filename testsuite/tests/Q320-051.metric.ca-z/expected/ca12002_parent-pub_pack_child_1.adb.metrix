@@ -1,0 +1,28 @@
+Metrics computed for src/ca12002_parent-pub_pack_child_1.adb
+containing package body CA12002_Parent.Pub_Pack_Child_1
+
+=== Code line metrics ===
+  all lines           : 6
+  code lines          : 4
+  comment lines       : 0
+  end-of-line comments: 0
+  comment percentage  : 0.00
+  blank lines         : 2
+
+CA12002_Parent.Pub_Pack_Child_1 (package body - library item at lines  3: 6)
+
+=== Code line metrics ===
+   all lines           : 4
+   code lines          : 4
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 0
+
+=== Element metrics ===
+   all subprogram bodies    : 0
+   all statements           : 0
+   all declarations         : 4
+   logical SLOC             : 4
+   maximal unit nesting     : 1
+   maximal construct nesting: 1

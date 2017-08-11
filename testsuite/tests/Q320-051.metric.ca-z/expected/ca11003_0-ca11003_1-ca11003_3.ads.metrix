@@ -1,0 +1,31 @@
+Metrics computed for src/ca11003_0-ca11003_1-ca11003_3.ads
+containing function CA11003_0.CA11003_1.CA11003_3
+
+=== Code line metrics ===
+  all lines           : 6
+  code lines          : 2
+  comment lines       : 2
+  end-of-line comments: 0
+  comment percentage  : 50.00
+  blank lines         : 2
+
+CA11003_0.CA11003_1.CA11003_3 (function - library item at lines  5: 6)
+
+=== Code line metrics ===
+   all lines           : 2
+   code lines          : 2
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 0
+
+=== Element metrics ===
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 2
+   logical SLOC             : 2
+   maximal construct nesting: 1
+   all parameters           : 1
+   IN parameters            : 1
+   OUT parameters           : 0
+   IN OUT parameters        : 0

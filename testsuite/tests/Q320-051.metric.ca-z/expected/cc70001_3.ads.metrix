@@ -1,0 +1,34 @@
+Metrics computed for src/cc70001_3.ads
+containing package CC70001_3
+
+=== Code line metrics ===
+  all lines           : 12
+  code lines          : 3
+  comment lines       : 2
+  end-of-line comments: 0
+  comment percentage  : 40.00
+  blank lines         : 7
+
+CC70001_3 (package - library item at lines  6: 12)
+
+=== Code line metrics ===
+   all lines           : 7
+   code lines          : 3
+   comment lines       : 1
+   end-of-line comments: 0
+   comment percentage  : 25.00
+   blank lines         : 3
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 1
+   all type definitions     : 1
+   public subprograms       : 0
+   all statements           : 0
+   all declarations         : 2
+   logical SLOC             : 2
+   maximal construct nesting: 1

@@ -1,0 +1,95 @@
+Metrics computed for src/cxe4003_part_b1.ads
+containing package CXE4003_Part_B1
+
+=== Code line metrics ===
+  all lines           : 125
+  code lines          : 10
+  comment lines       : 108
+  end-of-line comments: 0
+  comment percentage  : 91.52
+  blank lines         : 7
+
+CXE4003_Part_B1 (package - library item at lines  107: 125)
+
+=== Code line metrics ===
+   all lines           : 19
+   code lines          : 10
+   comment lines       : 4
+   end-of-line comments: 0
+   comment percentage  : 28.57
+   blank lines         : 5
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 7
+   all statements           : 0
+   all declarations         : 10
+   logical SLOC             : 10
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Test_Complete (procedure at lines  110: 110)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   Block_2 (procedure at lines  115: 115)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   Release_1 (procedure at lines  117: 117)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   Release_2 (procedure at lines  118: 118)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   Start_Cancellation_Test (procedure at lines  122: 122)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   May_Be_Cancelled (procedure at lines  123: 123)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   End_Cancellation_Test (procedure at lines  124: 124)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0

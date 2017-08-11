@@ -1,0 +1,79 @@
+Metrics computed for src/cdb4001_serializer_generic.ads
+containing generic package CDB4001_Serializer_Generic
+
+=== Code line metrics ===
+  all lines           : 68
+  code lines          : 13
+  comment lines       : 51
+  end-of-line comments: 0
+  comment percentage  : 79.68
+  blank lines         : 4
+
+CDB4001_Serializer_Generic (generic package - library item at lines  54: 68)
+
+=== Code line metrics ===
+   all lines           : 15
+   code lines          : 13
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 2
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 2
+   all type definitions     : 3
+   public subprograms       : 2
+   all statements           : 0
+   all declarations         : 12
+   logical SLOC             : 12
+   maximal unit nesting     : 2
+   maximal construct nesting: 1
+
+   Protected_State (protected type at lines  60: 67)
+
+   === Code line metrics ===
+      all lines           : 8
+      code lines          : 7
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 1
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 8
+      logical SLOC             : 8
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      Read (function at lines  61: 62)
+
+      === Contract metrics ===
+         contract complexity      : 1
+
+      === Element metrics ===
+         all parameters           : 2
+         IN parameters            : 2
+         OUT parameters           : 0
+         IN OUT parameters        : 0
+
+      Update (procedure at lines  64: 64)
+
+      === Contract metrics ===
+         contract complexity      : 1
+
+      === Element metrics ===
+         all parameters           : 2
+         IN parameters            : 1
+         OUT parameters           : 0
+         IN OUT parameters        : 1

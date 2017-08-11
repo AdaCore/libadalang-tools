@@ -1,0 +1,127 @@
+Metrics computed for src/cb20006_0.adb
+containing package body CB20006_0
+
+=== Code line metrics ===
+  all lines           : 68
+  code lines          : 51
+  comment lines       : 4
+  end-of-line comments: 10
+  comment percentage  : 25.45
+  blank lines         : 13
+
+CB20006_0 (package body - library item at lines  6: 68)
+
+=== Code line metrics ===
+   all lines           : 63
+   code lines          : 50
+   comment lines       : 3
+   end-of-line comments: 10
+   comment percentage  : 24.52
+   blank lines         : 10
+
+=== Element metrics ===
+   all subprogram bodies    : 3
+   all statements           : 21
+   all declarations         : 5
+   logical SLOC             : 26
+   maximal unit nesting     : 2
+   maximal construct nesting: 4
+
+   Counting_Semaphore (protected body at lines  8: 66)
+
+   === Code line metrics ===
+      all lines           : 59
+      code lines          : 48
+      comment lines       : 3
+      end-of-line comments: 9
+      comment percentage  : 23.52
+      blank lines         : 8
+
+   === Element metrics ===
+      all statements           : 21
+      all declarations         : 4
+      logical SLOC             : 25
+      maximal unit nesting     : 1
+      maximal construct nesting: 3
+
+      Secure (procedure body at lines  10: 26)
+
+      === Code line metrics ===
+         all lines           : 17
+         code lines          : 17
+         comment lines       : 0
+         end-of-line comments: 3
+         comment percentage  : 17.64
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 8
+         all declarations         : 1
+         logical SLOC             : 9
+         maximal construct nesting: 2
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 2
+         expression complexity    : 0
+         cyclomatic complexity    : 2
+         essential complexity     : 2
+         maximum loop nesting     : 0
+         extra exit points        : 1
+
+      Resource_Limit_Exceeded (function body at lines  29: 46)
+
+      === Code line metrics ===
+         all lines           : 18
+         code lines          : 17
+         comment lines       : 1
+         end-of-line comments: 2
+         comment percentage  : 16.66
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 7
+         all declarations         : 1
+         logical SLOC             : 8
+         maximal construct nesting: 2
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 2
+         expression complexity    : 0
+         cyclomatic complexity    : 2
+         essential complexity     : 2
+         maximum loop nesting     : 0
+         extra exit points        : 1
+
+      Release (procedure body at lines  49: 63)
+
+      === Code line metrics ===
+         all lines           : 15
+         code lines          : 12
+         comment lines       : 2
+         end-of-line comments: 4
+         comment percentage  : 42.85
+         blank lines         : 1
+
+      === Element metrics ===
+         all statements           : 6
+         all declarations         : 1
+         logical SLOC             : 7
+         maximal construct nesting: 2
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 2
+         expression complexity    : 0
+         cyclomatic complexity    : 2
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  2.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  2.00
+      essential_complexity     :  1.66
+      max_loop_nesting         :  0.00

@@ -1,0 +1,44 @@
+Metrics computed for src/cc70b02_1.ads
+containing generic package CC70B02_1
+
+=== Code line metrics ===
+  all lines           : 33
+  code lines          : 9
+  comment lines       : 13
+  end-of-line comments: 5
+  comment percentage  : 81.81
+  blank lines         : 11
+
+CC70B02_1 (generic package - library item at lines  8: 33)
+
+=== Code line metrics ===
+   all lines           : 26
+   code lines          : 7
+   comment lines       : 12
+   end-of-line comments: 3
+   comment percentage  : 78.94
+   blank lines         : 7
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 5
+   logical SLOC             : 5
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Double_List (procedure at lines  29: 29)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1

@@ -1,0 +1,67 @@
+Metrics computed for src/ca2004a0m.adb
+containing procedure body CA2004A0M
+
+=== Code line metrics ===
+  all lines           : 65
+  code lines          : 19
+  comment lines       : 34
+  end-of-line comments: 0
+  comment percentage  : 64.15
+  blank lines         : 12
+
+CA2004A0M (procedure body - library item at lines  41: 65)
+
+=== Code line metrics ===
+   all lines           : 25
+   code lines          : 17
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 8
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 4
+   all declarations         : 7
+   logical SLOC             : 11
+   maximal unit nesting     : 2
+   maximal construct nesting: 2
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 1
+   expression complexity    : 0
+   cyclomatic complexity    : 1
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   CA2004A1 (package at lines  45: 48)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 3
+      logical SLOC             : 3
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      CA2004A2 (procedure at lines  47: 47)
+
+      === Element metrics ===
+         all parameters           : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

@@ -1,0 +1,197 @@
+Metrics computed for src/cxai008.adb
+containing procedure body CXAI008
+
+=== Code line metrics ===
+  all lines           : 452
+  code lines          : 309
+  comment lines       : 89
+  end-of-line comments: 1
+  comment percentage  : 22.61
+  blank lines         : 54
+
+CXAI008 (procedure body - library item at lines  55: 452)
+
+=== Code line metrics ===
+   all lines           : 398
+   code lines          : 306
+   comment lines       : 40
+   end-of-line comments: 1
+   comment percentage  : 11.84
+   blank lines         : 52
+
+=== Element metrics ===
+   all type definitions     : 3
+   public subprograms       : unknown
+   all subprogram bodies    : 6
+   all statements           : 121
+   all declarations         : 68
+   logical SLOC             : 189
+   maximal unit nesting     : 2
+   maximal construct nesting: 8
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 7
+   expression complexity    : 0
+   cyclomatic complexity    : 7
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   Dom (package at lines  59: 100)
+
+   === Code line metrics ===
+      all lines           : 42
+      code lines          : 32
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 10
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 21
+      logical SLOC             : 21
+      maximal construct nesting: 1
+
+   Parse_Subtree (procedure body at lines  106: 384)
+
+   === Code line metrics ===
+      all lines           : 279
+      code lines          : 218
+      comment lines       : 38
+      end-of-line comments: 1
+      comment percentage  : 15.23
+      blank lines         : 23
+
+   === Element metrics ===
+      all statements           : 101
+      all declarations         : 35
+      logical SLOC             : 136
+      maximal unit nesting     : 1
+      maximal construct nesting: 7
+      all parameters           : 5
+      IN parameters            : 2
+      OUT parameters           : 1
+      IN OUT parameters        : 2
+
+   === Complexity metrics ===
+      statement complexity     : 18
+      expression complexity    : 1
+      cyclomatic complexity    : 19
+      essential complexity     : 10
+      maximum loop nesting     : 2
+      extra exit points        : 12
+
+      Absorb (procedure body at lines  124: 150)
+
+      === Code line metrics ===
+         all lines           : 27
+         code lines          : 22
+         comment lines       : 5
+         end-of-line comments: 0
+         comment percentage  : 18.51
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 10
+         all declarations         : 4
+         logical SLOC             : 14
+         maximal construct nesting: 5
+         all parameters           : 1
+         IN parameters            : 1
+         OUT parameters           : 0
+         IN OUT parameters        : 0
+
+      === Complexity metrics ===
+         statement complexity     : 5
+         expression complexity    : 2
+         cyclomatic complexity    : 7
+         essential complexity     : 4
+         maximum loop nesting     : 1
+         extra exit points        : 1
+
+      Parse_Name (function body at lines  152: 181)
+
+      === Code line metrics ===
+         all lines           : 30
+         code lines          : 28
+         comment lines       : 2
+         end-of-line comments: 0
+         comment percentage  : 6.66
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 12
+         all declarations         : 5
+         logical SLOC             : 17
+         maximal construct nesting: 4
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 6
+         expression complexity    : 0
+         cyclomatic complexity    : 6
+         essential complexity     : 3
+         maximum loop nesting     : 1
+         extra exit points        : 1
+
+      Parse_Text (function body at lines  183: 205)
+
+      === Code line metrics ===
+         all lines           : 23
+         code lines          : 20
+         comment lines       : 3
+         end-of-line comments: 0
+         comment percentage  : 13.04
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 8
+         all declarations         : 6
+         logical SLOC             : 14
+         maximal construct nesting: 3
+         all parameters           : 1
+         IN parameters            : 1
+         OUT parameters           : 0
+         IN OUT parameters        : 0
+
+      === Complexity metrics ===
+         statement complexity     : 3
+         expression complexity    : 0
+         cyclomatic complexity    : 3
+         essential complexity     : 2
+         maximum loop nesting     : 1
+         extra exit points        : 0
+
+      Parse_Attrib_Value (function body at lines  207: 236)
+
+      === Code line metrics ===
+         all lines           : 30
+         code lines          : 28
+         comment lines       : 2
+         end-of-line comments: 0
+         comment percentage  : 6.66
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 13
+         all declarations         : 3
+         logical SLOC             : 16
+         maximal construct nesting: 5
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 5
+         expression complexity    : 0
+         cyclomatic complexity    : 5
+         essential complexity     : 3
+         maximum loop nesting     : 1
+         extra exit points        : 3
+
+=== Average complexity metrics ===
+      statement_complexity     :  7.33
+      expression_complexity    :  0.50
+      cyclomatic_complexity    :  7.83
+      essential_complexity     :  3.83
+      max_loop_nesting         :  2.00

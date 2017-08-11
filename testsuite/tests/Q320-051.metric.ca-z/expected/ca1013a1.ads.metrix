@@ -1,0 +1,28 @@
+Metrics computed for src/ca1013a1.ads
+containing generic procedure CA1013A1
+
+=== Code line metrics ===
+  all lines           : 30
+  code lines          : 3
+  comment lines       : 24
+  end-of-line comments: 0
+  comment percentage  : 88.88
+  blank lines         : 3
+
+CA1013A1 (generic procedure - library item at lines  28: 30)
+
+=== Code line metrics ===
+   all lines           : 3
+   code lines          : 3
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 0
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 3
+   logical SLOC             : 3
+   maximal construct nesting: 1

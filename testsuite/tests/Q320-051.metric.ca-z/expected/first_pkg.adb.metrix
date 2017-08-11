@@ -1,0 +1,63 @@
+Metrics computed for src/first_pkg.adb
+containing package body FIRST_PKG
+
+=== Code line metrics ===
+  all lines           : 9
+  code lines          : 6
+  comment lines       : 0
+  end-of-line comments: 0
+  comment percentage  : 0.00
+  blank lines         : 3
+
+FIRST_PKG (package body - library item at lines  2: 9)
+
+=== Code line metrics ===
+   all lines           : 8
+   code lines          : 6
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 2
+
+=== Element metrics ===
+   all subprogram bodies    : 1
+   all statements           : 1
+   all declarations         : 3
+   logical SLOC             : 4
+   maximal unit nesting     : 1
+   maximal construct nesting: 2
+
+   F (function body at lines  4: 7)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 2
+      logical SLOC             : 3
+      maximal construct nesting: 1
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

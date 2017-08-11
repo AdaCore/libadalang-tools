@@ -1,0 +1,44 @@
+Metrics computed for src/ce3705e.adb
+containing procedure body CE3705E
+
+=== Code line metrics ===
+  all lines           : 124
+  code lines          : 72
+  comment lines       : 32
+  end-of-line comments: 0
+  comment percentage  : 30.76
+  blank lines         : 20
+
+CE3705E (procedure body - library item at lines  40: 124)
+
+=== Code line metrics ===
+   all lines           : 85
+   code lines          : 70
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 15
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 34
+   all declarations         : 5
+   logical SLOC             : 39
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 2
+   expression complexity    : 0
+   cyclomatic complexity    : 2
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  2.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  2.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

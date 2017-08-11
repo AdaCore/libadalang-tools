@@ -1,0 +1,34 @@
+Metrics computed for src/ca11022_0.ads
+containing package CA11022_0
+
+=== Code line metrics ===
+  all lines           : 62
+  code lines          : 9
+  comment lines       : 48
+  end-of-line comments: 1
+  comment percentage  : 85.96
+  blank lines         : 5
+
+CA11022_0 (package - library item at lines  48: 62)
+
+=== Code line metrics ===
+   all lines           : 15
+   code lines          : 9
+   comment lines       : 2
+   end-of-line comments: 1
+   comment percentage  : 27.27
+   blank lines         : 4
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 4
+   all type definitions     : 4
+   public subprograms       : 0
+   all statements           : 0
+   all declarations         : 8
+   logical SLOC             : 8
+   maximal construct nesting: 1

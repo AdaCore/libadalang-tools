@@ -1,0 +1,44 @@
+Metrics computed for src/cc51001.adb
+containing procedure body CC51001
+
+=== Code line metrics ===
+  all lines           : 54
+  code lines          : 36
+  comment lines       : 2
+  end-of-line comments: 6
+  comment percentage  : 21.05
+  blank lines         : 16
+
+CC51001 (procedure body - library item at lines  11: 54)
+
+=== Code line metrics ===
+   all lines           : 44
+   code lines          : 32
+   comment lines       : 1
+   end-of-line comments: 3
+   comment percentage  : 12.12
+   blank lines         : 11
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 8
+   all declarations         : 10
+   logical SLOC             : 18
+   maximal construct nesting: 2
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 4
+   expression complexity    : 0
+   cyclomatic complexity    : 4
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  4.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  4.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

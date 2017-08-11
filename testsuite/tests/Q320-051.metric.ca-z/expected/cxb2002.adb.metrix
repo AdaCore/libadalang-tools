@@ -1,0 +1,44 @@
+Metrics computed for src/cxb2002.adb
+containing procedure body CXB2002
+
+=== Code line metrics ===
+  all lines           : 259
+  code lines          : 148
+  comment lines       : 64
+  end-of-line comments: 6
+  comment percentage  : 33.01
+  blank lines         : 47
+
+CXB2002 (procedure body - library item at lines  54: 259)
+
+=== Code line metrics ===
+   all lines           : 206
+   code lines          : 145
+   comment lines       : 16
+   end-of-line comments: 6
+   comment percentage  : 13.66
+   blank lines         : 45
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 58
+   all declarations         : 4
+   logical SLOC             : 62
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 16
+   expression complexity    : 0
+   cyclomatic complexity    : 16
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  16.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  16.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

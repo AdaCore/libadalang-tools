@@ -1,0 +1,46 @@
+Metrics computed for src/cxe4006_normal.ads
+containing package CXE4006_Normal
+
+=== Code line metrics ===
+  all lines           : 13
+  code lines          : 9
+  comment lines       : 1
+  end-of-line comments: 0
+  comment percentage  : 10.00
+  blank lines         : 3
+
+CXE4006_Normal (package - library item at lines  5: 13)
+
+=== Code line metrics ===
+   all lines           : 9
+   code lines          : 8
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 1
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 1
+   all type definitions     : 1
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 6
+   logical SLOC             : 6
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Single_Controlling_Operand (procedure at lines  9: 12)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 3
+      IN parameters            : 1
+      OUT parameters           : 1
+      IN OUT parameters        : 1

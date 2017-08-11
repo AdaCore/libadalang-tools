@@ -1,0 +1,47 @@
+Metrics computed for src/cc50001_1.ads
+containing generic package CC50001_1
+
+=== Code line metrics ===
+  all lines           : 31
+  code lines          : 11
+  comment lines       : 6
+  end-of-line comments: 4
+  comment percentage  : 58.82
+  blank lines         : 14
+
+CC50001_1 (generic package - library item at lines  7: 31)
+
+=== Code line metrics ===
+   all lines           : 25
+   code lines          : 10
+   comment lines       : 5
+   end-of-line comments: 3
+   comment percentage  : 53.33
+   blank lines         : 10
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 1
+   private types            : 1
+   all type definitions     : 2
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 7
+   logical SLOC             : 7
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Push (procedure at lines  19: 19)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 1
+      IN OUT parameters        : 0

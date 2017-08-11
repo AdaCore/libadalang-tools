@@ -1,0 +1,45 @@
+Metrics computed for src/ce3801a.adb
+containing procedure body CE3801A
+
+=== Code line metrics ===
+  all lines           : 112
+  code lines          : 67
+  comment lines       : 32
+  end-of-line comments: 3
+  comment percentage  : 35.35
+  blank lines         : 13
+
+CE3801A (procedure body - library item at lines  41: 112)
+
+=== Code line metrics ===
+   all lines           : 72
+   code lines          : 63
+   comment lines       : 0
+   end-of-line comments: 3
+   comment percentage  : 4.76
+   blank lines         : 9
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 27
+   all declarations         : 5
+   logical SLOC             : 32
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 1
+   expression complexity    : 0
+   cyclomatic complexity    : 1
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

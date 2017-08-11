@@ -1,0 +1,44 @@
+Metrics computed for src/ca11001.adb
+containing procedure body CA11001
+
+=== Code line metrics ===
+  all lines           : 86
+  code lines          : 56
+  comment lines       : 14
+  end-of-line comments: 2
+  comment percentage  : 22.85
+  blank lines         : 16
+
+CA11001 (procedure body - library item at lines  7: 86)
+
+=== Code line metrics ===
+   all lines           : 80
+   code lines          : 54
+   comment lines       : 13
+   end-of-line comments: 1
+   comment percentage  : 20.89
+   blank lines         : 13
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 19
+   all declarations         : 4
+   logical SLOC             : 23
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 4
+   expression complexity    : 0
+   cyclomatic complexity    : 4
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  4.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  4.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

@@ -1,0 +1,44 @@
+Metrics computed for src/cxa4004.adb
+containing procedure body CXA4004
+
+=== Code line metrics ===
+  all lines           : 431
+  code lines          : 250
+  comment lines       : 88
+  end-of-line comments: 57
+  comment percentage  : 42.89
+  blank lines         : 93
+
+CXA4004 (procedure body - library item at lines  50: 431)
+
+=== Code line metrics ===
+   all lines           : 382
+   code lines          : 246
+   comment lines       : 45
+   end-of-line comments: 57
+   comment percentage  : 35.05
+   blank lines         : 91
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 79
+   all declarations         : 18
+   logical SLOC             : 97
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 23
+   expression complexity    : 0
+   cyclomatic complexity    : 23
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  23.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  23.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

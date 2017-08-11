@@ -1,0 +1,46 @@
+Metrics computed for src/ca13002_0.ads
+containing package CA13002_0
+
+=== Code line metrics ===
+  all lines           : 62
+  code lines          : 9
+  comment lines       : 49
+  end-of-line comments: 1
+  comment percentage  : 86.20
+  blank lines         : 4
+
+CA13002_0 (package - library item at lines  49: 62)
+
+=== Code line metrics ===
+   all lines           : 14
+   code lines          : 9
+   comment lines       : 2
+   end-of-line comments: 1
+   comment percentage  : 27.27
+   blank lines         : 3
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 3
+   all type definitions     : 3
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 16
+   logical SLOC             : 16
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Send_Control_Sequence (procedure at lines  59: 60)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0

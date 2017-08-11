@@ -1,0 +1,70 @@
+Metrics computed for src/ce3115a.adb
+containing procedure body CE3115A
+
+=== Code line metrics ===
+  all lines           : 232
+  code lines          : 140
+  comment lines       : 42
+  end-of-line comments: 11
+  comment percentage  : 29.12
+  blank lines         : 50
+
+CE3115A (procedure body - library item at lines  50: 232)
+
+=== Code line metrics ===
+   all lines           : 183
+   code lines          : 138
+   comment lines       : 1
+   end-of-line comments: 11
+   comment percentage  : 8.63
+   blank lines         : 44
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 2
+   all statements           : 68
+   all declarations         : 8
+   logical SLOC             : 76
+   maximal unit nesting     : 1
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 6
+   expression complexity    : 0
+   cyclomatic complexity    : 6
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   TXT_CLEANUP (procedure body at lines  67: 85)
+
+   === Code line metrics ===
+      all lines           : 19
+      code lines          : 19
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 7
+      all declarations         : 3
+      logical SLOC             : 10
+      maximal construct nesting: 2
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 4
+      expression complexity    : 0
+      cyclomatic complexity    : 4
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  5.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  5.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

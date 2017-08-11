@@ -1,0 +1,518 @@
+Metrics computed for src/cc1311a.adb
+containing procedure body CC1311A
+
+=== Code line metrics ===
+  all lines           : 480
+  code lines          : 349
+  comment lines       : 33
+  end-of-line comments: 17
+  comment percentage  : 13.08
+  blank lines         : 98
+
+CC1311A (procedure body - library item at lines  39: 480)
+
+=== Code line metrics ===
+   all lines           : 442
+   code lines          : 348
+   comment lines       : 0
+   end-of-line comments: 17
+   comment percentage  : 4.88
+   blank lines         : 94
+
+=== Element metrics ===
+   all type definitions     : 43
+   public subprograms       : unknown
+   all subprogram bodies    : 13
+   all statements           : 44
+   all declarations         : 157
+   logical SLOC             : 201
+   maximal unit nesting     : 1
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 5
+   expression complexity    : 0
+   cyclomatic complexity    : 5
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   PROC_WITH_3D_FUNC (procedure body at lines  94: 105)
+
+   === Code line metrics ===
+      all lines           : 12
+      code lines          : 9
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 11.11
+      blank lines         : 3
+
+   === Element metrics ===
+      all statements           : 2
+      all declarations         : 1
+      logical SLOC             : 3
+      maximal construct nesting: 2
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 2
+      expression complexity    : 0
+      cyclomatic complexity    : 2
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   PKG_WITH_3D_FUNC (generic package at lines  107: 124)
+
+   === Code line metrics ===
+      all lines           : 18
+      code lines          : 16
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 2
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 9
+      logical SLOC             : 9
+      maximal construct nesting: 1
+
+   PKG_WITH_3D_FUNC (package body at lines  126: 141)
+
+   === Code line metrics ===
+      all lines           : 16
+      code lines          : 13
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 7.69
+      blank lines         : 3
+
+   === Element metrics ===
+      all statements           : 3
+      all declarations         : 1
+      logical SLOC             : 4
+      maximal construct nesting: 2
+
+   === Complexity metrics ===
+      statement complexity     : 2
+      expression complexity    : 0
+      cyclomatic complexity    : 2
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   FUNC_WITH_3D_FUNC (function body at lines  161: 168)
+
+   === Code line metrics ===
+      all lines           : 8
+      code lines          : 6
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 16.66
+      blank lines         : 2
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 1
+      logical SLOC             : 2
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   PROC_WITH_3D_PROC (procedure body at lines  188: 203)
+
+   === Code line metrics ===
+      all lines           : 16
+      code lines          : 11
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 9.09
+      blank lines         : 5
+
+   === Element metrics ===
+      all statements           : 3
+      all declarations         : 2
+      logical SLOC             : 5
+      maximal construct nesting: 2
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 2
+      expression complexity    : 0
+      cyclomatic complexity    : 2
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   PKG_WITH_3D_PROC (generic package at lines  205: 222)
+
+   === Code line metrics ===
+      all lines           : 18
+      code lines          : 16
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 2
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 10
+      logical SLOC             : 10
+      maximal construct nesting: 1
+
+   PKG_WITH_3D_PROC (package body at lines  224: 239)
+
+   === Code line metrics ===
+      all lines           : 16
+      code lines          : 11
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 9.09
+      blank lines         : 5
+
+   === Element metrics ===
+      all statements           : 3
+      all declarations         : 2
+      logical SLOC             : 5
+      maximal construct nesting: 2
+
+   === Complexity metrics ===
+      statement complexity     : 2
+      expression complexity    : 0
+      cyclomatic complexity    : 2
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   FUNC_WITH_3D_PROC (function body at lines  259: 270)
+
+   === Code line metrics ===
+      all lines           : 12
+      code lines          : 8
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 12.50
+      blank lines         : 4
+
+   === Element metrics ===
+      all statements           : 2
+      all declarations         : 2
+      logical SLOC             : 4
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   FUNC1 (function body at lines  277: 280)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 25.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 1
+      logical SLOC             : 2
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   PKG1 (generic package at lines  282: 286)
+
+   === Code line metrics ===
+      all lines           : 5
+      code lines          : 5
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 4
+      logical SLOC             : 4
+      maximal construct nesting: 1
+
+   PKG1 (package body at lines  288: 294)
+
+   === Code line metrics ===
+      all lines           : 7
+      code lines          : 7
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 14.28
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 2
+      all declarations         : 1
+      logical SLOC             : 3
+      maximal construct nesting: 2
+
+   === Complexity metrics ===
+      statement complexity     : 2
+      expression complexity    : 0
+      cyclomatic complexity    : 2
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   PROC1 (procedure body at lines  300: 306)
+
+   === Code line metrics ===
+      all lines           : 7
+      code lines          : 7
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 14.28
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 2
+      all declarations         : 1
+      logical SLOC             : 3
+      maximal construct nesting: 2
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 2
+      expression complexity    : 0
+      cyclomatic complexity    : 2
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   FUNC2 (function body at lines  314: 319)
+
+   === Code line metrics ===
+      all lines           : 6
+      code lines          : 6
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 16.66
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 2
+      all declarations         : 2
+      logical SLOC             : 4
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   PKG2 (generic package at lines  321: 325)
+
+   === Code line metrics ===
+      all lines           : 5
+      code lines          : 5
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 5
+      logical SLOC             : 5
+      maximal construct nesting: 1
+
+   PKG2 (package body at lines  327: 335)
+
+   === Code line metrics ===
+      all lines           : 9
+      code lines          : 9
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 11.11
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 3
+      all declarations         : 2
+      logical SLOC             : 5
+      maximal construct nesting: 2
+
+   === Complexity metrics ===
+      statement complexity     : 2
+      expression complexity    : 0
+      cyclomatic complexity    : 2
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   PROC2 (procedure body at lines  342: 350)
+
+   === Code line metrics ===
+      all lines           : 9
+      code lines          : 9
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 11.11
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 3
+      all declarations         : 2
+      logical SLOC             : 5
+      maximal construct nesting: 2
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 2
+      expression complexity    : 0
+      cyclomatic complexity    : 2
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   F1 (function body at lines  352: 355)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 25.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 2
+      logical SLOC             : 3
+      maximal construct nesting: 1
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   P2 (procedure body at lines  357: 360)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 25.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 3
+      logical SLOC             : 4
+      maximal construct nesting: 1
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 1
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   TD_FUNC (function body at lines  362: 373)
+
+   === Code line metrics ===
+      all lines           : 12
+      code lines          : 9
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 11.11
+      blank lines         : 3
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 2
+      logical SLOC             : 3
+      maximal construct nesting: 1
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   TD_PROC (procedure body at lines  375: 385)
+
+   === Code line metrics ===
+      all lines           : 11
+      code lines          : 9
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 11.11
+      blank lines         : 2
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 3
+      logical SLOC             : 4
+      maximal construct nesting: 1
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 1
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.70
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.70
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

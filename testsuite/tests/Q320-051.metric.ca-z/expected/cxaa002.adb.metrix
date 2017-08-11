@@ -1,0 +1,70 @@
+Metrics computed for src/cxaa002.adb
+containing procedure body CXAA002
+
+=== Code line metrics ===
+  all lines           : 257
+  code lines          : 129
+  comment lines       : 88
+  end-of-line comments: 11
+  comment percentage  : 45.62
+  blank lines         : 40
+
+CXAA002 (procedure body - library item at lines  64: 257)
+
+=== Code line metrics ===
+   all lines           : 194
+   code lines          : 127
+   comment lines       : 30
+   end-of-line comments: 11
+   comment percentage  : 26.11
+   blank lines         : 37
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 2
+   all statements           : 54
+   all declarations         : 15
+   logical SLOC             : 69
+   maximal unit nesting     : 1
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 6
+   expression complexity    : 2
+   cyclomatic complexity    : 8
+   essential complexity     : 1
+   maximum loop nesting     : 1
+   extra exit points        : 0
+
+   Position_Appendix_Text (procedure body at lines  108: 153)
+
+   === Code line metrics ===
+      all lines           : 46
+      code lines          : 30
+      comment lines       : 9
+      end-of-line comments: 6
+      comment percentage  : 38.46
+      blank lines         : 7
+
+   === Element metrics ===
+      all statements           : 18
+      all declarations         : 1
+      logical SLOC             : 19
+      maximal construct nesting: 2
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 6
+      expression complexity    : 1
+      cyclomatic complexity    : 7
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  6.00
+      expression_complexity    :  1.50
+      cyclomatic_complexity    :  7.50
+      essential_complexity     :  1.00
+      max_loop_nesting         :  1.00

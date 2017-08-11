@@ -1,0 +1,44 @@
+Metrics computed for src/cxe4005_part_b.ads
+containing package CXE4005_Part_B
+
+=== Code line metrics ===
+  all lines           : 12
+  code lines          : 7
+  comment lines       : 2
+  end-of-line comments: 0
+  comment percentage  : 22.22
+  blank lines         : 3
+
+CXE4005_Part_B (package - library item at lines  6: 12)
+
+=== Code line metrics ===
+   all lines           : 7
+   code lines          : 5
+   comment lines       : 1
+   end-of-line comments: 0
+   comment percentage  : 16.66
+   blank lines         : 1
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 3
+   logical SLOC             : 3
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Get_RACWT (function at lines  10: 11)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0

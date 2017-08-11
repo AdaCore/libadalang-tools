@@ -1,0 +1,44 @@
+Metrics computed for src/ce2111b.adb
+containing procedure body CE2111B
+
+=== Code line metrics ===
+  all lines           : 183
+  code lines          : 101
+  comment lines       : 46
+  end-of-line comments: 0
+  comment percentage  : 31.29
+  blank lines         : 36
+
+CE2111B (procedure body - library item at lines  42: 183)
+
+=== Code line metrics ===
+   all lines           : 142
+   code lines          : 99
+   comment lines       : 12
+   end-of-line comments: 0
+   comment percentage  : 10.81
+   blank lines         : 31
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 56
+   all declarations         : 5
+   logical SLOC             : 61
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 7
+   expression complexity    : 0
+   cyclomatic complexity    : 7
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  7.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  7.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

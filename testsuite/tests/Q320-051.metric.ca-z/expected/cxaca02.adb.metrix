@@ -1,0 +1,190 @@
+Metrics computed for src/cxaca02.adb
+containing procedure body CXACA02
+
+=== Code line metrics ===
+  all lines           : 360
+  code lines          : 196
+  comment lines       : 89
+  end-of-line comments: 20
+  comment percentage  : 38.24
+  blank lines         : 75
+
+CXACA02 (procedure body - library item at lines  57: 360)
+
+=== Code line metrics ===
+   all lines           : 304
+   code lines          : 194
+   comment lines       : 37
+   end-of-line comments: 20
+   comment percentage  : 24.67
+   blank lines         : 73
+
+=== Element metrics ===
+   all type definitions     : 3
+   public subprograms       : unknown
+   all subprogram bodies    : 5
+   all statements           : 70
+   all declarations         : 55
+   logical SLOC             : 125
+   maximal unit nesting     : 1
+   maximal construct nesting: 5
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 10
+   expression complexity    : 0
+   cyclomatic complexity    : 10
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   Product_Read (procedure at lines  114: 116)
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 1
+      IN OUT parameters        : 0
+
+   Product_Write (procedure at lines  118: 120)
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Sales_Read (procedure at lines  122: 124)
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 1
+      IN OUT parameters        : 0
+
+   Sales_Write (procedure at lines  126: 128)
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Product_Read (procedure body at lines  175: 189)
+
+   === Code line metrics ===
+      all lines           : 15
+      code lines          : 14
+      comment lines       : 0
+      end-of-line comments: 5
+      comment percentage  : 35.71
+      blank lines         : 1
+
+   === Element metrics ===
+      all statements           : 6
+      all declarations         : 3
+      logical SLOC             : 9
+      maximal construct nesting: 1
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 1
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Product_Write (procedure body at lines  192: 206)
+
+   === Code line metrics ===
+      all lines           : 15
+      code lines          : 14
+      comment lines       : 0
+      end-of-line comments: 5
+      comment percentage  : 35.71
+      blank lines         : 1
+
+   === Element metrics ===
+      all statements           : 6
+      all declarations         : 3
+      logical SLOC             : 9
+      maximal construct nesting: 1
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Sales_Read (procedure body at lines  209: 220)
+
+   === Code line metrics ===
+      all lines           : 12
+      code lines          : 11
+      comment lines       : 0
+      end-of-line comments: 5
+      comment percentage  : 45.45
+      blank lines         : 1
+
+   === Element metrics ===
+      all statements           : 6
+      all declarations         : 3
+      logical SLOC             : 9
+      maximal construct nesting: 1
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 1
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Sales_Write (procedure body at lines  223: 234)
+
+   === Code line metrics ===
+      all lines           : 12
+      code lines          : 11
+      comment lines       : 0
+      end-of-line comments: 5
+      comment percentage  : 45.45
+      blank lines         : 1
+
+   === Element metrics ===
+      all statements           : 6
+      all declarations         : 3
+      logical SLOC             : 9
+      maximal construct nesting: 1
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  2.79
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  2.79
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

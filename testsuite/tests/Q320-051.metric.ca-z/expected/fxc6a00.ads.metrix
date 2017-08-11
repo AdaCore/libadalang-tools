@@ -1,0 +1,125 @@
+Metrics computed for src/fxc6a00.ads
+containing package FXC6A00
+
+=== Code line metrics ===
+  all lines           : 126
+  code lines          : 54
+  comment lines       : 36
+  end-of-line comments: 16
+  comment percentage  : 57.77
+  blank lines         : 36
+
+FXC6A00 (package - library item at lines  37: 126)
+
+=== Code line metrics ===
+   all lines           : 90
+   code lines          : 54
+   comment lines       : 1
+   end-of-line comments: 16
+   comment percentage  : 30.90
+   blank lines         : 35
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 18
+   private types            : 2
+   all type definitions     : 18
+   public subprograms       : 3
+   all statements           : 0
+   all declarations         : 43
+   logical SLOC             : 43
+   maximal unit nesting     : 2
+   maximal construct nesting: 1
+
+   Task_Type (task type at lines  62: 64)
+
+   === Code line metrics ===
+      all lines           : 3
+      code lines          : 3
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 33.33
+      blank lines         : 0
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 3
+      logical SLOC             : 3
+      maximal construct nesting: 1
+
+   Protected_Type (protected type at lines  69: 73)
+
+   === Code line metrics ===
+      all lines           : 5
+      code lines          : 5
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 20.00
+      blank lines         : 0
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 3
+      logical SLOC             : 3
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      Op (procedure at lines  70: 70)
+
+      === Contract metrics ===
+         contract complexity      : 1
+
+      === Element metrics ===
+         all parameters           : 0
+
+   Volatile_Protected (protected type at lines  76: 83)
+
+   === Code line metrics ===
+      all lines           : 8
+      code lines          : 7
+      comment lines       : 0
+      end-of-line comments: 2
+      comment percentage  : 28.57
+      blank lines         : 1
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 4
+      logical SLOC             : 4
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      Handler (procedure at lines  77: 77)
+
+      === Contract metrics ===
+         contract complexity      : 1
+
+      === Element metrics ===
+         all parameters           : 0
+
+      Handled (function at lines  80: 80)
+
+      === Contract metrics ===
+         contract complexity      : 1
+
+      === Element metrics ===
+         all parameters           : 0

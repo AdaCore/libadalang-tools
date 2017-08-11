@@ -1,0 +1,102 @@
+Metrics computed for src/ca11019_0.ads
+containing package CA11019_0
+
+=== Code line metrics ===
+  all lines           : 90
+  code lines          : 26
+  comment lines       : 58
+  end-of-line comments: 0
+  comment percentage  : 69.04
+  blank lines         : 6
+
+CA11019_0 (package - library item at lines  53: 90)
+
+=== Code line metrics ===
+   all lines           : 38
+   code lines          : 26
+   comment lines       : 7
+   end-of-line comments: 0
+   comment percentage  : 21.21
+   blank lines         : 5
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 2
+   private types            : 2
+   all type definitions     : 2
+   public subprograms       : 6
+   all statements           : 0
+   all declarations         : 29
+   logical SLOC             : 29
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Add_1 (procedure at lines  61: 61)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Statistical_Op_1 (function at lines  62: 62)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Add_2 (procedure at lines  65: 65)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Statistical_Op_2 (function at lines  66: 66)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Add_3 (procedure at lines  69: 69)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Statistical_Op_3 (function at lines  70: 70)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0

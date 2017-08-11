@@ -1,0 +1,85 @@
+Metrics computed for src/ca2002a1.ads
+containing package CA2002A1
+
+=== Code line metrics ===
+  all lines           : 46
+  code lines          : 8
+  comment lines       : 31
+  end-of-line comments: 0
+  comment percentage  : 79.48
+  blank lines         : 7
+
+CA2002A1 (package - library item at lines  36: 46)
+
+=== Code line metrics ===
+   all lines           : 11
+   code lines          : 8
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 3
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 3
+   all statements           : 0
+   all declarations         : 8
+   logical SLOC             : 8
+   maximal unit nesting     : 2
+   maximal construct nesting: 2
+
+   PROC (procedure at lines  38: 38)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 1
+      IN OUT parameters        : 0
+
+   FUN (function at lines  39: 39)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   PKG (package at lines  41: 44)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 4
+      logical SLOC             : 4
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      PKG_PROC (procedure at lines  43: 43)
+
+      === Contract metrics ===
+         contract complexity      : 1
+
+      === Element metrics ===
+         all parameters           : 1
+         IN parameters            : 0
+         OUT parameters           : 0
+         IN OUT parameters        : 1
