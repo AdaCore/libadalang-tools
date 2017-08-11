@@ -592,7 +592,7 @@ package body Stub.Actions is
                declare
                   Empty_Vec, Pp_Out_Vec : Char_Vector;
                   Parms : constant Params :=
-                    F_Params (Entry_Decl (Decl));
+                    F_Params (F_Spec (Entry_Decl (Decl)));
                   Overrides : constant Ada_Overriding_Node :=
                      F_Overriding (Entry_Decl (Decl));
                begin

@@ -101,6 +101,9 @@ package body Pp.Actions is
    --  want to change its timestamp, causing real (code-generating) builds to
    --  do unnecessary recompiles.
 
+   Null_Kind : constant Ada_Node_Kind_Type := Ada_Abort_Absent;
+   --  ???We need a special value
+
    function Mimic_gcc (Cmd : Command_Line) return Boolean is
       (Arg (Cmd, Outer_Dir) /= null);
 
@@ -581,7 +584,9 @@ package body Pp.Actions is
                 "!",
                 "end !1/"),
            when Ada_Entry_Decl =>
-             L ("?~~ ~entry !?[@ (~~)]~?~~~", Aspects),
+             L ("?~~ ~entry !", Aspects),
+           when Ada_Entry_Spec =>
+             L ("!?[@ (~~)]~?~~~"),
            when Ada_Entry_Body =>
              L ("entry !?[@ (~~)]~?~~~[@ when !@ is]$",
                 --  ???Perhaps "@ is]" should be "@+1 is]" or "@ ]is".
@@ -1030,7 +1035,9 @@ package body Pp.Actions is
       use Utils.Dbg_Out;
    begin
       nn (X);
-      Print (X);
+      if X /= null then
+         Print (X);
+      end if;
    end ppp;
 
    procedure Put_Ada_Node_Array (X : Ada_Node_Array) is
@@ -1822,7 +1829,7 @@ package body Pp.Actions is
       --  popped at the beginning and end of Subtree_To_Ada.
 
       function Ancestor_Tree
-        (N    : Tree_Stack_Count)
+        (N : Tree_Stack_Count)
         return Ada_Tree;
       --  Returns the N'th ancestor of the current tree. Ancestor_Tree (0) is
       --  the current tree, Ancestor_Tree (1) is the parent of the current
@@ -1830,7 +1837,7 @@ package body Pp.Actions is
       --  on. Nil if the tree isn't deep enough.
 
       function Ancestor_Tree
-        (N    : Tree_Stack_Count)
+        (N : Tree_Stack_Count)
         return Ada_Tree is
       begin
          if Last_Index (Tree_Stack) <= N then
@@ -1841,6 +1848,24 @@ package body Pp.Actions is
       end Ancestor_Tree;
 
       function Parent_Tree return Ada_Tree is (Ancestor_Tree (1));
+
+      pragma Warnings (Off); -- for debugging
+      procedure Dump_Ancestors;
+      procedure Dump_Ancestors is
+         N : Tree_Stack_Count := 0;
+         Tree : Ada_Tree;
+         use Utils.Dbg_Out;
+      begin
+         Utils.Dbg_Out.Output_Enabled := True;
+         Put ("Ancestors:\n");
+         loop
+            Tree := Ancestor_Tree (N);
+            exit when Tree = null;
+            Put ("\1\t\2\n", Image (Integer (N)), Short_Image (Tree));
+            N := @ + 1;
+         end loop;
+      end Dump_Ancestors;
+      pragma Warnings (On);
 
       Label_Seen : Boolean := False;
       --  See the comments in Do_Label below for an explanation of this.
@@ -3442,7 +3467,7 @@ package body Pp.Actions is
          procedure Do_Params is
             Is_Function : constant Boolean :=
               (if Parent_Tree.Kind in
-                   Ada_Entry_Decl | Ada_Entry_Body |
+                   Ada_Entry_Spec | Ada_Entry_Body |
                    Ada_Accept_Stmt | Ada_Accept_Stmt_With_Stmts
                  then False
                  else Present (F_Subp_Returns (Subp_Spec (Parent_Tree))));
@@ -3504,8 +3529,8 @@ package body Pp.Actions is
             Params : constant Param_Spec_List :=
               (case Tree.Kind is
                  when Ada_Entry_Decl =>
-                   (if Present (F_Params (Entry_Decl (Tree)))
-                      then F_Params (F_Params (Entry_Decl (Tree)))
+                   (if Present (F_Params (F_Spec (Entry_Decl (Tree))))
+                      then F_Params (F_Params (F_Spec (Entry_Decl (Tree))))
                       else null),
                  when Ada_Entry_Body =>
                    (if Present (F_Params (Entry_Body (Tree)))
@@ -3645,6 +3670,9 @@ package body Pp.Actions is
          end Do_Type_Decl;
 
          procedure Do_Usage_Name is
+            P_Ref : Entity := Expr (Tree).P_Ref_Val;
+            K : constant Ada_Node_Kind_Type :=
+              (if P_Ref.El = null then Null_Kind else P_Ref.El.Kind);
          begin
 --            Put
 --              ("\1",
@@ -3657,7 +3685,7 @@ package body Pp.Actions is
               ("\1",
                Id_With_Casing
                  (W_Intern (Id_Name (Tree)),
-                  Kind => Ada_Abort_Stmt,
+                  Kind => K,
                   Is_Predef => False,
                   Use_Name_Casing_For_Nils => False));
          end Do_Usage_Name;
@@ -3811,13 +3839,12 @@ package body Pp.Actions is
 
       procedure Convert_Tree_To_Ada (Tree : Ada_Tree) is
       begin
-         --  Append first link break. The Kind here doesn't matter. We use
-         --  Ada_Abort_Stmt because there is no "null" kind.
+         --  Append first link break. The Kind here doesn't matter.
          Append_Line_Break
            (Hard     => True,
             Affects_Comments => True,
             Level    => 0,
-            Kind     => Ada_Abort_Stmt,
+            Kind     => Null_Kind,
             Template => Name_Empty);
 
          pragma Assert (Check_Whitespace);
@@ -3831,7 +3858,7 @@ package body Pp.Actions is
               (Hard     => True,
                Affects_Comments => True,
                Level    => 0,
-               Kind     => Ada_Abort_Stmt,
+               Kind     => Null_Kind,
                Template => Name_Empty);
          end if;
          pragma Debug (Assert_No_Trailing_Blanks (To_W_Str (Out_Buf)));

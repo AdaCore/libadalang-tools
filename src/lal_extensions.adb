@@ -230,7 +230,7 @@ package body LAL_Extensions is
                Result := F_Name (Protected_Body (Decl));
             when Ada_Entry_Decl =>
                Result :=
-                 Name (F_Entry_Id (Entry_Decl (Decl)));
+                 Name (F_Name (F_Spec (Entry_Decl (Decl))));
             when Ada_Entry_Body =>
                Result :=
                  Name (F_Entry_Name (Entry_Body (Decl)));
