@@ -6,7 +6,7 @@
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
---                     Copyright (C) 2012-2015, AdaCore                     --
+--                     Copyright (C) 2012-2017, AdaCore                     --
 --                                                                          --
 -- Gnat2xml is free software; you can redistribute it and/or modify it      --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -613,41 +613,30 @@ package body Utils.String_Utilities is
    procedure Move_File (Old_Name : String; New_Name : String) is
       Success, Delete_Success : Boolean;
    begin
-      --  There are two reasons for the following shenanigans:
+      --  There are three reasons for the following shenanigans:
       --
       --  Rename_File is nonportable; on some systems it fails if the New_Name
-      --  already exists, so we need to delete it first.
+      --  already exists.
       --
       --  If the New_Name is a (writable) file in a non-writable directory,
       --  we need to copy the file; deleting or renaming the file will fail.
       --
-      --  So we first try to rename. If that fails, we either delete and retry
-      --  the rename, or else we copy.
+      --  If the New_Name is on a different disk partition than Old_Name,
+      --  we need to copy the file.
+      --
+      --  So we first try to rename. If that fails, we copy to New_Name and
+      --  then delete Old_Name.
 
       Rename_File (Old_Name, New_Name, Success);
       if not Success then
-         if Is_Writable_File (Directories.Containing_Directory (New_Name)) then
-            if Is_Regular_File (New_Name) then
-               Delete_File (New_Name, Success);
-               if not Success then
-                  raise Program_Error with "unable to overwrite " & New_Name;
-               end if;
-            end if;
-            Rename_File (Old_Name, New_Name, Success);
-            if not Success then
-               raise Program_Error with
-                 "unable to move " & Old_Name & " to " & New_Name;
-            end if;
-         else
-            Copy_File (Old_Name, New_Name, Success, Mode => Overwrite);
-            Delete_File (Old_Name, Delete_Success);
-            if not Success then
-               raise Program_Error with
-                 "unable to copy " & Old_Name & " to " & New_Name;
-            end if;
-            if not Delete_Success then
-               raise Program_Error with "unable to delete " & Old_Name;
-            end if;
+         Copy_File (Old_Name, New_Name, Success, Mode => Overwrite);
+         Delete_File (Old_Name, Delete_Success);
+         if not Success then
+            raise Program_Error with
+              "unable to copy " & Old_Name & " to " & New_Name;
+         end if;
+         if not Delete_Success then
+            raise Program_Error with "unable to delete " & Old_Name;
          end if;
       end if;
    end Move_File;
