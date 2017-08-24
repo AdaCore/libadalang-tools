@@ -2,43 +2,18 @@
 --  gnat_util is needed only for the "with Gnatvsn;" in lal_ul-versions.adb,
 --  which is currently commented out.
 
-with "libadalang.gpr";
+with "lal_tools.gpr";
 project Build is
-
-   type Build_Mode_Type is ("dev", "prod");
-   Build_Mode : Build_Mode_Type := external ("BUILD_MODE", "dev");
 
    for Source_Dirs use (".");
    for Object_Dir use "../obj";
    for Exec_Dir use "../bin";
+   for Source_Files use
+     ("pp-main.adb", "metrics-main.adb", "stub-main.adb");
 
    for Main use ("pp-main.adb", "metrics-main.adb", "stub-main.adb");
 
-   package Compiler is
-      case Build_Mode is
-         when "dev" =>
-            for Default_Switches ("Ada") use
-              ("-gnatyg",
-               "-gnatwae",
-               "-gnatw.u", -- warn inappropriate use of unordered enums
-               "-g",
-               "-O0",
-               "-gnata",
-               "-gnatVa",
-               "-gnat2020");
-
-         when "prod" =>
-            for Default_Switches ("Ada") use
-              ("-gnatyg",
-               "-gnatwae",
-               "-gnatw.u",
-               "-g",
-               "-Ofast",
-               "-gnatp",
-               "-gnatn2",
-               "-gnat2020");
-      end case;
-   end Compiler;
+   package Compiler renames LAL_Tools.Compiler;
 
    package Builder is
       for Executable ("pp-main.adb") use "lalpp";
