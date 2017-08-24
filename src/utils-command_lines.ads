@@ -1,7 +1,3 @@
---  ????????????????
---  Perhaps we should use String_Access instead of String_Ref, so we can Free
---  them, and for compatibility with other code.
-
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
 with Utils.Vectors;
@@ -131,9 +127,12 @@ package Utils.Command_Lines is
    type Validator_Type is not null access procedure (Text : String);
    --  For internal use only
 
-   type String_Ref is access constant String with
-        Predicate => (if String_Ref /= null then String_Ref'First = 1);
+   subtype String_Ref is GNAT.OS_Lib.String_Access with
+     Predicate => (if String_Ref /= null then String_Ref'First = 1);
    type String_Ref_Array is array (Positive range <>) of String_Ref;
+
+   function Present (X : String_Ref) return Boolean is
+     (GNAT.OS_Lib."/=" (X, null));
 
    package String_Ref_Vectors is new Utils.Vectors
      (Positive,
@@ -175,6 +174,9 @@ package Utils.Command_Lines is
       --  Arg (Cmd, Verbose), where Verbose is one enumeral in
       --  Switches, returns True if "--verbose" appeared on the command
       --  line (or "-v" appeared, if that is a shorthand); False otherwise.
+
+      procedure Set_Arg (Cmd : in out Command_Line; Switch : Switches);
+      --  Set the given switch to True.
 
       type Switch_To_String_Mapping is array (Switches) of String_Ref;
 
@@ -220,6 +222,10 @@ package Utils.Command_Lines is
 
       function Arg (Cmd : Command_Line; Switch : Switches) return Boolean;
 
+      procedure Set_Arg
+        (Cmd : in out Command_Line; Switch : Switches; Val : Boolean := True);
+      --  Set the given switch to Val.
+
       type Switch_To_Boolean_Mapping is array (Switches) of Boolean;
       type Switch_To_String_Mapping is array (Switches) of String_Ref;
 
@@ -253,6 +259,9 @@ package Utils.Command_Lines is
 
       function Arg (Cmd : Command_Line) return Switches;
       --  Return the value corresponding to the last one Parsed
+
+      procedure Set_Arg (Cmd : in out Command_Line; Switch : Switches);
+      --  Set the given switch.
 
       type Switch_To_String_Mapping is array (Switches) of String_Ref;
 
@@ -345,6 +354,10 @@ package Utils.Command_Lines is
          Switch : Switches) return Natural with
          Post => Arg_Length'Result = Arg (Cmd, Switch)'Length;
 
+      procedure Set_Arg
+        (Cmd : in out Command_Line; Switch : Switches; Val : String_Ref_Array);
+      --  Set parameter of the given switch.
+
       type Switch_To_Syntax_Mapping is array (Switches) of Switch_Syntax;
       type Switch_To_String_Mapping is array (Switches) of String_Ref;
 
@@ -388,6 +401,10 @@ package Utils.Command_Lines is
       --  user is converted to the right type. Note that this does not raise
       --  an exception for malformed parameters; that happens earlier, when you
       --  call Parse.
+
+      procedure Set_Arg
+        (Cmd : in out Command_Line; Switch : Switches; Val : Arg_Type);
+      --  Set parameter of the given switch to Val.
 
       type Switch_To_Syntax_Mapping is array (Switches) of Switch_Syntax;
       type Switch_To_Arg_Type_Mapping is array (Switches) of Arg_Type;

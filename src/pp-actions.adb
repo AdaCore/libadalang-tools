@@ -300,7 +300,7 @@ package body Pp.Actions is
       Out_Buf   : in out Buffer;
       Cmd       : Utils.Command_Lines.Command_Line;
       Partial   : Boolean);
-   --  Partial is True if we're not processing an entire file.
+   --  Partial is True if we are not processing an entire file.
 
    --  Hard and soft line breaks:
    --
@@ -3852,7 +3852,7 @@ package body Pp.Actions is
          pragma Assert (Check_Whitespace);
          Subtree_To_Ada (Tree, Cur_Level => 0, Index_In_Parent => 1);
 
-         --  In Partial mode, we might need add a line break
+         --  In Partial mode, we might need to add a line break
 
          pragma Assert (At_End (Out_Buf));
          if Partial and then Cur (Out_Buf) /= NL then

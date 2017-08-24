@@ -4,6 +4,7 @@ with Ada.Exceptions;
 with Ada.Strings;             use Ada.Strings;
 with Ada.Strings.Fixed;       use Ada.Strings.Fixed;
 use Ada;
+with Unchecked_Deallocation;
 
 with GNAT.Command_Line;
 --  We don't use most of the facilities of GNAT.Command_Line.
@@ -14,6 +15,8 @@ with Utils.Strings; use Utils.Strings;
 
 package body Utils.Command_Lines is
    use Text_IO;
+
+   procedure Free is new Unchecked_Deallocation (String, String_Ref);
 
    procedure Raise_Cmd_Error (Message : String) is
    begin
@@ -163,6 +166,11 @@ package body Utils.Command_Lines is
          return Cmd.Sw (To_All (Switch)).Boolean_Val;
       end Arg;
 
+      procedure Set_Arg (Cmd : in out Command_Line; Switch : Switches) is
+      begin
+         Cmd.Sw (To_All (Switch)).Boolean_Val := True;
+      end Set_Arg;
+
       package body Set_Shorthands is
          pragma Assert (Descriptor.Allowed_Switches = null);
       begin
@@ -216,6 +224,13 @@ package body Utils.Command_Lines is
       begin
          return Cmd.Sw (To_All (Switch)).Boolean_Val;
       end Arg;
+
+      procedure Set_Arg
+        (Cmd : in out Command_Line; Switch : Switches; Val : Boolean := True)
+      is
+      begin
+         Cmd.Sw (To_All (Switch)).Boolean_Val := Val;
+      end Set_Arg;
 
       package body Set_Defaults is
          pragma Assert (Descriptor.Allowed_Switches = null);
@@ -322,6 +337,16 @@ package body Utils.Command_Lines is
             end loop;
          end return;
       end Arg;
+
+      procedure Set_Arg (Cmd : in out Command_Line; Switch : Switches) is
+         Current_Setting : constant Switches := Arg (Cmd);
+      begin
+         --  Set the Position to one more than the position of the current
+         --  switch setting. This will cause Arg (Cmd) to return Switch.
+
+         Cmd.Sw (To_All (Switch)).Position :=
+           Cmd.Sw (To_All (Current_Setting)).Position + 1;
+      end Set_Arg;
 
       package body Set_Shorthands is
          pragma Assert (Descriptor.Allowed_Switches = null);
@@ -463,6 +488,14 @@ package body Utils.Command_Lines is
          return To_Array (Cmd.Sw (To_All (Switch)).Seq_Val);
       end Arg;
 
+      procedure Set_Arg
+        (Cmd : in out Command_Line; Switch : Switches; Val : String_Ref_Array)
+      is
+      begin
+         Clear (Cmd.Sw (To_All (Switch)).Seq_Val);
+         Append (Cmd.Sw (To_All (Switch)).Seq_Val, Val);
+      end Set_Arg;
+
       function Arg_Length
         (Cmd    : Command_Line;
          Switch : Switches) return Natural
@@ -540,6 +573,18 @@ package body Utils.Command_Lines is
          --  If the ".all" blows up because of a null pointer, that's because
          --  the client forgot to instantiate Set_Defaults to set defaults.
       end Arg;
+
+      procedure Set_Arg
+        (Cmd : in out Command_Line; Switch : Switches; Val : Arg_Type) is
+         S : constant String := Image (Val);
+      begin
+         Free (Cmd.Sw (To_All (Switch)).String_Val);
+         if Cmd.Sw (To_All (Switch)).String_Val = null
+           or else Cmd.Sw (To_All (Switch)).String_Val.all /= S
+         then
+            Cmd.Sw (To_All (Switch)).String_Val := new String'(S);
+         end if;
+      end Set_Arg;
 
       Set_Shorthands_Instantiated : Boolean := False;
 
@@ -921,7 +966,7 @@ package body Utils.Command_Lines is
                            --  Raise_Cmd_Error if the switch parameter
                            --  is malformed; Raise_Cmd_Error raises.
 
-                           --  ????????????????Free (Dyn.String_Val);
+                           Free (Dyn.String_Val);
                            if Dyn.String_Val = null
                              or else Dyn.String_Val.all /= S
                            then

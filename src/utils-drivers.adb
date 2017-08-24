@@ -147,7 +147,7 @@ package body Utils.Drivers is
             raise Name_Resolution_Failed;
       end;
       for Node of Root (Unit).Find (Is_Xref_Entry_Point'Access).Consume loop
-         Resolve_Node (Node, Quiet => True);
+         Resolve_Node (Node, Quiet => not Debug_Flag_A);
       end loop;
    end Name_Resolution;
 
@@ -182,8 +182,7 @@ package body Utils.Drivers is
 
       function Has_Body (S : String_Ref) return Boolean;
       function Has_Body (S : String_Ref) return Boolean is
-         Body_String : aliased constant String :=
-           S (1 .. S'Last - 1) & "b";
+         Body_String : aliased String := S (1 .. S'Last - 1) & "b";
       begin
          return Contains (Bodies, Body_String'Unchecked_Access);
       end Has_Body;
@@ -261,7 +260,7 @@ package body Utils.Drivers is
 
       procedure Set_WCEM (Encoding : String) is
       begin
-         if Arg (Cmd, Wide_Character_Encoding) = null then
+         if not Present (Arg (Cmd, Wide_Character_Encoding)) then
             Set_Arg (Cmd, Wide_Character_Encoding, Encoding);
          elsif Arg (Cmd, Wide_Character_Encoding).all /= Encoding then
             Cmd_Error_No_Help
@@ -472,7 +471,7 @@ package body Utils.Drivers is
 
       --  Create output directory if necessary
 
-      if Arg (Cmd, Output_Directory) /= null then
+      if Present (Arg (Cmd, Output_Directory)) then
          declare
             Dir : constant String := Arg (Cmd, Output_Directory).all;
             Cannot_Create : constant String :=

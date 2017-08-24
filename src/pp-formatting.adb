@@ -2378,7 +2378,7 @@ package body Pp.Formatting is
       end Copy_Pp_Off_Regions;
 
    begin
-      --  ????????????????We probably want to do more, but this is for lalstub
+      --  ????We probably want to do more, but this is for lalstub
       --  for now.
       if Partial then
          return;
