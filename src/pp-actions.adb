@@ -736,7 +736,9 @@ package body Pp.Actions is
            when Ada_Real_Literal => null,
            when Ada_Int_Literal => null,
            when Ada_Qual_Expr =>
-             L ("!'[@(!)]"),
+             L ("!'[@!]"),
+               --  ???There are no parentheses here, because the subexpression
+               --  is either a parenthesized expression or an aggregate.
            when Ada_Quantified_Expr =>
              L ("for ! ! ^=>[@ !]"),
            when Ada_Raise_Expr =>
