@@ -175,7 +175,8 @@ package Utils.Command_Lines is
       --  Switches, returns True if "--verbose" appeared on the command
       --  line (or "-v" appeared, if that is a shorthand); False otherwise.
 
-      procedure Set_Arg (Cmd : in out Command_Line; Switch : Switches);
+      procedure Set_Arg
+        (Cmd : in out Command_Line; Switch : Switches; Val : Boolean := True);
       --  Set the given switch to True.
 
       type Switch_To_String_Mapping is array (Switches) of String_Ref;

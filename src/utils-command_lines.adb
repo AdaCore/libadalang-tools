@@ -166,9 +166,11 @@ package body Utils.Command_Lines is
          return Cmd.Sw (To_All (Switch)).Boolean_Val;
       end Arg;
 
-      procedure Set_Arg (Cmd : in out Command_Line; Switch : Switches) is
+      procedure Set_Arg
+        (Cmd : in out Command_Line; Switch : Switches; Val : Boolean := True)
+      is
       begin
-         Cmd.Sw (To_All (Switch)).Boolean_Val := True;
+         Cmd.Sw (To_All (Switch)).Boolean_Val := Val;
       end Set_Arg;
 
       package body Set_Shorthands is
