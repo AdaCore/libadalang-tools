@@ -1,0 +1,142 @@
+Metrics computed for src/c45274b.adb
+containing procedure body C45274B
+
+=== Code line metrics ===
+  all lines           : 229
+  code lines          : 122
+  comment lines       : 42
+  end-of-line comments: 0
+  comment percentage  : 25.60
+  blank lines         : 65
+
+C45274B (procedure body - library item at lines  41: 229)
+
+=== Code line metrics ===
+   all lines           : 189
+   code lines          : 120
+   comment lines       : 9
+   end-of-line comments: 0
+   comment percentage  : 6.97
+   blank lines         : 60
+
+=== Element metrics ===
+   all type definitions     : 5
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 36
+   all declarations         : 32
+   logical SLOC             : 68
+   maximal unit nesting     : 1
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 9
+   expression complexity    : 0
+   cyclomatic complexity    : 9
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   P (package at lines  97: 104)
+
+   === Code line metrics ===
+      all lines           : 8
+      code lines          : 8
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 6
+      logical SLOC             : 6
+      maximal construct nesting: 1
+
+   P (package body at lines  110: 113)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 1
+      logical SLOC             : 2
+      maximal construct nesting: 1
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   P (package at lines  142: 149)
+
+   === Code line metrics ===
+      all lines           : 8
+      code lines          : 8
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 6
+      logical SLOC             : 6
+      maximal construct nesting: 1
+
+   P (package body at lines  155: 158)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 1
+      logical SLOC             : 2
+      maximal construct nesting: 1
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   P (package at lines  186: 193)
+
+   === Code line metrics ===
+      all lines           : 8
+      code lines          : 8
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 6
+      logical SLOC             : 6
+      maximal construct nesting: 1
+
+=== Average complexity metrics ===
+      statement_complexity     :  3.66
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  3.66
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

@@ -1,0 +1,106 @@
+Metrics computed for src/c3a1001_0.ads
+containing package C3A1001_0
+
+=== Code line metrics ===
+  all lines           : 110
+  code lines          : 42
+  comment lines       : 48
+  end-of-line comments: 21
+  comment percentage  : 76.66
+  blank lines         : 20
+
+C3A1001_0 (package - library item at lines  48: 110)
+
+=== Code line metrics ===
+   all lines           : 63
+   code lines          : 42
+   comment lines       : 2
+   end-of-line comments: 21
+   comment percentage  : 52.27
+   blank lines         : 19
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 16
+   all type definitions     : 16
+   public subprograms       : 3
+   all statements           : 0
+   all declarations         : 35
+   logical SLOC             : 35
+   maximal unit nesting     : 2
+   maximal construct nesting: 1
+
+   Incomplete5 (protected type at lines  87: 92)
+
+   === Code line metrics ===
+      all lines           : 6
+      code lines          : 6
+      comment lines       : 0
+      end-of-line comments: 2
+      comment percentage  : 33.33
+      blank lines         : 0
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 4
+      logical SLOC             : 4
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      Get_Priv_Val (function at lines  89: 89)
+
+      === Contract metrics ===
+         contract complexity      : 1
+
+      === Element metrics ===
+         all parameters           : 0
+
+   Incomplete6 (protected type at lines  94: 99)
+
+   === Code line metrics ===
+      all lines           : 6
+      code lines          : 6
+      comment lines       : 0
+      end-of-line comments: 3
+      comment percentage  : 50.00
+      blank lines         : 0
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 4
+      logical SLOC             : 4
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      Get_Priv_Val (function at lines  96: 96)
+
+      === Contract metrics ===
+         contract complexity      : 1
+
+      === Element metrics ===
+         all parameters           : 0
+
+   Return_String (function at lines  108: 108)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0

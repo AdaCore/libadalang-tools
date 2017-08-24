@@ -1,0 +1,80 @@
+Metrics computed for src/c3900052.ads
+containing package C3900052
+
+=== Code line metrics ===
+  all lines           : 87
+  code lines          : 18
+  comment lines       : 53
+  end-of-line comments: 7
+  comment percentage  : 84.50
+  blank lines         : 16
+
+C3900052 (package - library item at lines  48: 87)
+
+=== Code line metrics ===
+   all lines           : 40
+   code lines          : 17
+   comment lines       : 8
+   end-of-line comments: 6
+   comment percentage  : 56.00
+   blank lines         : 15
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 2
+   private types            : 1
+   all type definitions     : 2
+   public subprograms       : 4
+   all statements           : 0
+   all declarations         : 18
+   logical SLOC             : 18
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Handle (procedure at lines  64: 64)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Assign_Officer (procedure at lines  67: 68)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Initial_Values_Okay (function at lines  74: 75)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Bad_Final_Values (function at lines  78: 79)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0

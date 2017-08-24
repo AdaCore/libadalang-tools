@@ -1,0 +1,47 @@
+Metrics computed for src/c83025c_pack-inner.adb
+containing procedure body subunit C83025C_PACK.INNER
+
+=== Code line metrics ===
+  all lines           : 36
+  code lines          : 29
+  comment lines       : 0
+  end-of-line comments: 0
+  comment percentage  : 0.00
+  blank lines         : 7
+
+INNER (procedure body - subunit at lines  3: 36)
+
+=== Code line metrics ===
+   all lines           : 34
+   code lines          : 28
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 6
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 15
+   all declarations         : 4
+   logical SLOC             : 19
+   maximal construct nesting: 2
+   all parameters           : 1
+   IN parameters            : 0
+   OUT parameters           : 0
+   IN OUT parameters        : 1
+
+=== Complexity metrics ===
+   statement complexity     : 8
+   expression complexity    : 0
+   cyclomatic complexity    : 8
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  8.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  8.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

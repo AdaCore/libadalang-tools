@@ -1,0 +1,114 @@
+Metrics computed for src/c410001_0.ads
+containing package C410001_0
+
+=== Code line metrics ===
+  all lines           : 85
+  code lines          : 17
+  comment lines       : 51
+  end-of-line comments: 0
+  comment percentage  : 75.00
+  blank lines         : 17
+
+C410001_0 (package - library item at lines  51: 85)
+
+=== Code line metrics ===
+   all lines           : 35
+   code lines          : 17
+   comment lines       : 3
+   end-of-line comments: 0
+   comment percentage  : 15.00
+   blank lines         : 15
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 6
+   all type definitions     : 6
+   public subprograms       : 6
+   all statements           : 0
+   all declarations         : 21
+   logical SLOC             : 21
+   maximal unit nesting     : 2
+   maximal construct nesting: 1
+
+   Proc (procedure at lines  72: 72)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   Func (function at lines  74: 74)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Proc_Para (procedure at lines  76: 76)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Func_Para (function at lines  78: 78)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Prot_Obj (protected object at lines  80: 83)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 3
+      logical SLOC             : 3
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      Prot_Proc (procedure at lines  81: 81)
+
+      === Contract metrics ===
+         contract complexity      : 1
+
+      === Element metrics ===
+         all parameters           : 0
+
+      Prot_Func (function at lines  82: 82)
+
+      === Contract metrics ===
+         contract complexity      : 1
+
+      === Element metrics ===
+         all parameters           : 0

@@ -1,0 +1,67 @@
+Metrics computed for src/f393b00-c393b14_1.ads
+containing package F393B00.C393B14_1
+
+=== Code line metrics ===
+  all lines           : 14
+  code lines          : 7
+  comment lines       : 3
+  end-of-line comments: 0
+  comment percentage  : 30.00
+  blank lines         : 4
+
+F393B00.C393B14_1 (package - library item at lines  5: 14)
+
+=== Code line metrics ===
+   all lines           : 10
+   code lines          : 7
+   comment lines       : 1
+   end-of-line comments: 0
+   comment percentage  : 12.50
+   blank lines         : 2
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 1
+   all type definitions     : 1
+   public subprograms       : 4
+   all statements           : 0
+   all declarations         : 8
+   logical SLOC             : 8
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Init (procedure at lines  9: 9)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   Modify (procedure at lines  10: 10)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   Check_Before (function at lines  11: 11)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   Check_After (function at lines  12: 12)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0

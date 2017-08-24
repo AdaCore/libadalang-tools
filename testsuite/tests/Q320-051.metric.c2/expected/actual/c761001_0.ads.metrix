@@ -1,0 +1,46 @@
+Metrics computed for src/c761001_0.ads
+containing package C761001_0
+
+=== Code line metrics ===
+  all lines           : 53
+  code lines          : 5
+  comment lines       : 45
+  end-of-line comments: 0
+  comment percentage  : 90.00
+  blank lines         : 3
+
+C761001_0 (package - library item at lines  48: 53)
+
+=== Code line metrics ===
+   all lines           : 6
+   code lines          : 4
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 2
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 1
+   all type definitions     : 1
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 4
+   logical SLOC             : 4
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Finalize (procedure at lines  51: 51)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1

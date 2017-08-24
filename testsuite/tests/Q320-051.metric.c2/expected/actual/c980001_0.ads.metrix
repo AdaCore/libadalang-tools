@@ -1,0 +1,125 @@
+Metrics computed for src/c980001_0.ads
+containing package C980001_0
+
+=== Code line metrics ===
+  all lines           : 104
+  code lines          : 33
+  comment lines       : 58
+  end-of-line comments: 0
+  comment percentage  : 63.73
+  blank lines         : 13
+
+C980001_0 (package - library item at lines  63: 104)
+
+=== Code line metrics ===
+   all lines           : 42
+   code lines          : 31
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 11
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 4
+   all type definitions     : 4
+   public subprograms       : 7
+   all statements           : 0
+   all declarations         : 28
+   logical SLOC             : 28
+   maximal unit nesting     : 2
+   maximal construct nesting: 1
+
+   TC_Unique (function at lines  69: 69)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   Initialize (procedure at lines  74: 74)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Adjust (procedure at lines  79: 79)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Finalize (procedure at lines  84: 84)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Sticker (protected type at lines  90: 96)
+
+   === Code line metrics ===
+      all lines           : 7
+      code lines          : 7
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 5
+      logical SLOC             : 5
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      Unlock (procedure at lines  92: 92)
+
+      === Contract metrics ===
+         contract complexity      : 1
+
+      === Element metrics ===
+         all parameters           : 0
+
+      Is_Locked (function at lines  93: 93)
+
+      === Contract metrics ===
+         contract complexity      : 1
+
+      === Element metrics ===
+         all parameters           : 0
+
+   Fail_And_Clear (procedure at lines  101: 101)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0

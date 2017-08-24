@@ -1,0 +1,90 @@
+Metrics computed for src/c974004_0.ads
+containing package C974004_0
+
+=== Code line metrics ===
+  all lines           : 98
+  code lines          : 22
+  comment lines       : 57
+  end-of-line comments: 2
+  comment percentage  : 74.68
+  blank lines         : 19
+
+C974004_0 (package - library item at lines  57: 98)
+
+=== Code line metrics ===
+   all lines           : 42
+   code lines          : 22
+   comment lines       : 2
+   end-of-line comments: 2
+   comment percentage  : 16.66
+   blank lines         : 18
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 5
+   private types            : 3
+   all type definitions     : 5
+   public subprograms       : 3
+   all statements           : 0
+   all declarations         : 25
+   logical SLOC             : 25
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   ATM_Keyboard_Task (task type at lines  77: 79)
+
+   === Code line metrics ===
+      all lines           : 3
+      code lines          : 3
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 2
+      logical SLOC             : 2
+      maximal construct nesting: 1
+
+   Read_Card (procedure at lines  82: 82)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Validate_Card (procedure at lines  84: 84)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Perform_Transaction (procedure at lines  86: 86)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0

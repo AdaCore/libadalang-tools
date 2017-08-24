@@ -1,0 +1,44 @@
+Metrics computed for src/c974005.adb
+containing procedure body C974005
+
+=== Code line metrics ===
+  all lines           : 76
+  code lines          : 40
+  comment lines       : 17
+  end-of-line comments: 6
+  comment percentage  : 40.35
+  blank lines         : 19
+
+C974005 (procedure body - library item at lines  11: 76)
+
+=== Code line metrics ===
+   all lines           : 66
+   code lines          : 37
+   comment lines       : 16
+   end-of-line comments: 5
+   comment percentage  : 39.62
+   blank lines         : 13
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 17
+   all declarations         : 3
+   logical SLOC             : 20
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 2
+   expression complexity    : 0
+   cyclomatic complexity    : 2
+   essential complexity     : 2
+   maximum loop nesting     : 0
+   extra exit points        : 1
+
+=== Average complexity metrics ===
+      statement_complexity     :  2.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  2.00
+      essential_complexity     :  2.00
+      max_loop_nesting         :  0.00

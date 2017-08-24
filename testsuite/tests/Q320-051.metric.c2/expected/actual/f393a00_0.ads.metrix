@@ -1,0 +1,55 @@
+Metrics computed for src/f393a00_0.ads
+containing package F393A00_0
+
+=== Code line metrics ===
+  all lines           : 48
+  code lines          : 4
+  comment lines       : 43
+  end-of-line comments: 0
+  comment percentage  : 91.48
+  blank lines         : 1
+
+F393A00_0 (package - library item at lines  45: 48)
+
+=== Code line metrics ===
+   all lines           : 4
+   code lines          : 4
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 0
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 2
+   all statements           : 0
+   all declarations         : 6
+   logical SLOC             : 6
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   TC_Touch (procedure at lines  46: 46)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   TC_Validate (procedure at lines  47: 47)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0

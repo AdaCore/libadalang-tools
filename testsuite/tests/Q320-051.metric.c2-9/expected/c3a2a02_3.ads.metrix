@@ -1,0 +1,26 @@
+Metrics computed for src/c3a2a02_3.ads
+containing package instance C3A2A02_3
+
+=== Code line metrics ===
+  all lines           : 11
+  code lines          : 4
+  comment lines       : 2
+  end-of-line comments: 0
+  comment percentage  : 33.33
+  blank lines         : 5
+
+C3A2A02_3 (package instantiation - library item at lines  11: 11)
+
+=== Code line metrics ===
+   all lines           : 1
+   code lines          : 1
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 0
+
+=== Element metrics ===
+   all statements           : 0
+   all declarations         : 1
+   logical SLOC             : 1
+   maximal construct nesting: 1

@@ -1,0 +1,27 @@
+Metrics computed for src/c230063proc.ads
+containing generic procedure C230063PROC
+
+=== Code line metrics ===
+  all lines           : 3
+  code lines          : 2
+  comment lines       : 0
+  end-of-line comments: 0
+  comment percentage  : 0.00
+  blank lines         : 1
+
+C230063PROC (generic procedure - library item at lines  2: 3)
+
+=== Code line metrics ===
+   all lines           : 2
+   code lines          : 2
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 0
+
+=== Element metrics ===
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 2
+   logical SLOC             : 2
+   maximal construct nesting: 1

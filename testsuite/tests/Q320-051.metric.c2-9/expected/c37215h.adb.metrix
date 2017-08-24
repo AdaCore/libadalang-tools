@@ -1,0 +1,45 @@
+Metrics computed for src/c37215h.adb
+containing procedure body C37215H
+
+=== Code line metrics ===
+  all lines           : 345
+  code lines          : 287
+  comment lines       : 38
+  end-of-line comments: 0
+  comment percentage  : 11.69
+  blank lines         : 20
+
+C37215H (procedure body - library item at lines  41: 345)
+
+=== Code line metrics ===
+   all lines           : 305
+   code lines          : 286
+   comment lines       : 2
+   end-of-line comments: 0
+   comment percentage  : 0.69
+   blank lines         : 17
+
+=== Element metrics ===
+   all type definitions     : 11
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 103
+   all declarations         : 36
+   logical SLOC             : 139
+   maximal construct nesting: 6
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 13
+   expression complexity    : 0
+   cyclomatic complexity    : 13
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  13.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  13.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

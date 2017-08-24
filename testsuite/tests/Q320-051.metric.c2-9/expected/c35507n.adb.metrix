@@ -1,0 +1,71 @@
+Metrics computed for src/c35507n.adb
+containing procedure body C35507N
+
+=== Code line metrics ===
+  all lines           : 108
+  code lines          : 61
+  comment lines       : 33
+  end-of-line comments: 0
+  comment percentage  : 35.10
+  blank lines         : 14
+
+C35507N (procedure body - library item at lines  39: 108)
+
+=== Code line metrics ===
+   all lines           : 70
+   code lines          : 60
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 10
+
+=== Element metrics ===
+   all type definitions     : 3
+   public subprograms       : unknown
+   all subprogram bodies    : 2
+   all statements           : 19
+   all declarations         : 17
+   logical SLOC             : 36
+   maximal unit nesting     : 1
+   maximal construct nesting: 5
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 1
+   expression complexity    : 0
+   cyclomatic complexity    : 1
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   P (procedure body at lines  61: 96)
+
+   === Code line metrics ===
+      all lines           : 36
+      code lines          : 34
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 2
+
+   === Element metrics ===
+      all statements           : 13
+      all declarations         : 5
+      logical SLOC             : 18
+      maximal construct nesting: 3
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 5
+      expression complexity    : 0
+      cyclomatic complexity    : 5
+      essential complexity     : 1
+      maximum loop nesting     : 1
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  3.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  3.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  1.00

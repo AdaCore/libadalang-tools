@@ -1,0 +1,45 @@
+Metrics computed for src/c45113a.adb
+containing procedure body C45113A
+
+=== Code line metrics ===
+  all lines           : 91
+  code lines          : 47
+  comment lines       : 26
+  end-of-line comments: 3
+  comment percentage  : 39.72
+  blank lines         : 18
+
+C45113A (procedure body - library item at lines  32: 91)
+
+=== Code line metrics ===
+   all lines           : 60
+   code lines          : 46
+   comment lines       : 0
+   end-of-line comments: 3
+   comment percentage  : 6.52
+   blank lines         : 14
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 21
+   all declarations         : 4
+   logical SLOC             : 25
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 4
+   expression complexity    : 0
+   cyclomatic complexity    : 4
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  4.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  4.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

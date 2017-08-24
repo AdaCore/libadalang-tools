@@ -1,0 +1,117 @@
+Metrics computed for src/c950001_0.ads
+containing package C950001_0
+
+=== Code line metrics ===
+  all lines           : 85
+  code lines          : 25
+  comment lines       : 54
+  end-of-line comments: 4
+  comment percentage  : 73.41
+  blank lines         : 6
+
+C950001_0 (package - library item at lines  56: 85)
+
+=== Code line metrics ===
+   all lines           : 30
+   code lines          : 25
+   comment lines       : 0
+   end-of-line comments: 4
+   comment percentage  : 16.00
+   blank lines         : 5
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 2
+   all type definitions     : 2
+   public subprograms       : 9
+   all statements           : 0
+   all declarations         : 23
+   logical SLOC             : 23
+   maximal unit nesting     : 2
+   maximal construct nesting: 1
+
+   Unlock (procedure at lines  59: 60)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   Lock (procedure at lines  61: 62)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   Try_Lock (procedure at lines  63: 64)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   Unlock_2 (procedure at lines  65: 66)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   Lock_2 (procedure at lines  67: 68)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   Lock_Type (protected type at lines  70: 77)
+
+   === Code line metrics ===
+      all lines           : 8
+      code lines          : 8
+      comment lines       : 0
+      end-of-line comments: 4
+      comment percentage  : 50.00
+      blank lines         : 0
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 6
+      logical SLOC             : 6
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      Unlock (procedure at lines  71: 71)
+
+      === Contract metrics ===
+         contract complexity      : 1
+
+      === Element metrics ===
+         all parameters           : 0
+
+      Unlock_2 (procedure at lines  72: 72)
+
+      === Contract metrics ===
+         contract complexity      : 1
+
+      === Element metrics ===
+         all parameters           : 0
+
+   Try_Lock (procedure at lines  79: 81)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 0
+      OUT parameters           : 1
+      IN OUT parameters        : 1
+
+   Get_Lock (function at lines  83: 83)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0

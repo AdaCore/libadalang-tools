@@ -1,0 +1,44 @@
+Metrics computed for src/c3a0007_2.ads
+containing package C3A0007_2
+
+=== Code line metrics ===
+  all lines           : 8
+  code lines          : 5
+  comment lines       : 0
+  end-of-line comments: 0
+  comment percentage  : 0.00
+  blank lines         : 3
+
+C3A0007_2 (package - library item at lines  3: 8)
+
+=== Code line metrics ===
+   all lines           : 6
+   code lines          : 4
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 2
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 4
+   logical SLOC             : 4
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Emergency (procedure at lines  7: 7)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1

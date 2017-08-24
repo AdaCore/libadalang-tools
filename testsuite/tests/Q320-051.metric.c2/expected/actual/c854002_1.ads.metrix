@@ -1,0 +1,32 @@
+Metrics computed for src/c854002_1.ads
+containing package C854002_1
+
+=== Code line metrics ===
+  all lines           : 51
+  code lines          : 3
+  comment lines       : 47
+  end-of-line comments: 0
+  comment percentage  : 94.00
+  blank lines         : 1
+
+C854002_1 (package - library item at lines  48: 51)
+
+=== Code line metrics ===
+   all lines           : 4
+   code lines          : 3
+   comment lines       : 1
+   end-of-line comments: 0
+   comment percentage  : 25.00
+   blank lines         : 0
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 0
+   all statements           : 0
+   all declarations         : 1
+   logical SLOC             : 1
+   maximal construct nesting: 1

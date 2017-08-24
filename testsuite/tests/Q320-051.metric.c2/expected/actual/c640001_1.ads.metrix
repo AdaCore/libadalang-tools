@@ -1,0 +1,44 @@
+Metrics computed for src/c640001_1.ads
+containing package C640001_1
+
+=== Code line metrics ===
+  all lines           : 11
+  code lines          : 4
+  comment lines       : 1
+  end-of-line comments: 1
+  comment percentage  : 40.00
+  blank lines         : 6
+
+C640001_1 (package - library item at lines  7: 11)
+
+=== Code line metrics ===
+   all lines           : 5
+   code lines          : 3
+   comment lines       : 0
+   end-of-line comments: 1
+   comment percentage  : 33.33
+   blank lines         : 2
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 3
+   logical SLOC             : 3
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Clear (procedure at lines  9: 9)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1

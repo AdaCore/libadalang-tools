@@ -1,0 +1,108 @@
+Metrics computed for src/c854001_0.ads
+containing package C854001_0
+
+=== Code line metrics ===
+  all lines           : 87
+  code lines          : 21
+  comment lines       : 54
+  end-of-line comments: 1
+  comment percentage  : 73.33
+  blank lines         : 12
+
+C854001_0 (package - library item at lines  54: 87)
+
+=== Code line metrics ===
+   all lines           : 34
+   code lines          : 21
+   comment lines       : 2
+   end-of-line comments: 1
+   comment percentage  : 13.04
+   blank lines         : 11
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 4
+   all type definitions     : 4
+   public subprograms       : 6
+   all statements           : 0
+   all declarations         : 24
+   logical SLOC             : 24
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Root_Proc (procedure at lines  62: 62)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Over_Proc (procedure at lines  63: 63)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Root_Func (function at lines  65: 65)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   Over_Func (function at lines  66: 66)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   "+" (function at lines  70: 70)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Name (function at lines  71: 71)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Predefined_Equal (function at lines  78: 79)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   "=" (function at lines  83: 84)
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0

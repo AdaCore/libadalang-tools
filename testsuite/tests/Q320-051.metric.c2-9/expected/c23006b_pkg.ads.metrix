@@ -1,0 +1,32 @@
+Metrics computed for src/c23006b_pkg.ads
+containing package C23006B_PKG
+
+=== Code line metrics ===
+  all lines           : 32
+  code lines          : 3
+  comment lines       : 26
+  end-of-line comments: 0
+  comment percentage  : 89.65
+  blank lines         : 3
+
+C23006B_PKG (package - library item at lines  30: 32)
+
+=== Code line metrics ===
+   all lines           : 3
+   code lines          : 3
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 0
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 0
+   all statements           : 0
+   all declarations         : 2
+   logical SLOC             : 2
+   maximal construct nesting: 1

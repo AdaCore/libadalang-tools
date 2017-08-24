@@ -1,0 +1,58 @@
+Metrics computed for src/c392d01_0-c392d01_1.ads
+containing package C392D01_0.C392D01_1
+
+=== Code line metrics ===
+  all lines           : 38
+  code lines          : 13
+  comment lines       : 10
+  end-of-line comments: 0
+  comment percentage  : 43.47
+  blank lines         : 15
+
+C392D01_0.C392D01_1 (package - library item at lines  7: 38)
+
+=== Code line metrics ===
+   all lines           : 32
+   code lines          : 12
+   comment lines       : 9
+   end-of-line comments: 0
+   comment percentage  : 42.85
+   blank lines         : 11
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 2
+   private types            : 2
+   all type definitions     : 2
+   public subprograms       : 2
+   all statements           : 0
+   all declarations         : 14
+   logical SLOC             : 14
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Set_Shutter_Speed (procedure at lines  15: 16)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Self_Test (procedure at lines  23: 23)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1

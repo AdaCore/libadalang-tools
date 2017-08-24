@@ -1,0 +1,34 @@
+Metrics computed for src/c391001_2.ads
+containing package C391001_2
+
+=== Code line metrics ===
+  all lines           : 28
+  code lines          : 22
+  comment lines       : 0
+  end-of-line comments: 4
+  comment percentage  : 18.18
+  blank lines         : 6
+
+C391001_2 (package - library item at lines  3: 28)
+
+=== Code line metrics ===
+   all lines           : 26
+   code lines          : 21
+   comment lines       : 0
+   end-of-line comments: 4
+   comment percentage  : 19.04
+   blank lines         : 5
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 4
+   all type definitions     : 4
+   public subprograms       : 0
+   all statements           : 0
+   all declarations         : 22
+   logical SLOC             : 22
+   maximal construct nesting: 1

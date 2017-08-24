@@ -1,0 +1,77 @@
+Metrics computed for src/c392005_0-c392005_1.ads
+containing package C392005_0.C392005_1
+
+=== Code line metrics ===
+  all lines           : 62
+  code lines          : 19
+  comment lines       : 20
+  end-of-line comments: 7
+  comment percentage  : 69.23
+  blank lines         : 23
+
+C392005_0.C392005_1 (package - library item at lines  5: 62)
+
+=== Code line metrics ===
+   all lines           : 58
+   code lines          : 19
+   comment lines       : 19
+   end-of-line comments: 7
+   comment percentage  : 68.42
+   blank lines         : 20
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 2
+   private types            : 2
+   all type definitions     : 2
+   public subprograms       : 3
+   all statements           : 0
+   all declarations         : 22
+   logical SLOC             : 22
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Set_Aperture (function at lines  20: 20)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Set_Shutter_Speed (procedure at lines  23: 24)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   TC_Get_Aper (function at lines  32: 32)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Focus (procedure at lines  50: 51)
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 1

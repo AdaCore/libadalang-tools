@@ -1,0 +1,27 @@
+Metrics computed for src/c854001_1.adb
+containing package body C854001_1
+
+=== Code line metrics ===
+  all lines           : 30
+  code lines          : 13
+  comment lines       : 7
+  end-of-line comments: 0
+  comment percentage  : 35.00
+  blank lines         : 10
+
+C854001_1 (package body - library item at lines  7: 30)
+
+=== Code line metrics ===
+   all lines           : 24
+   code lines          : 12
+   comment lines       : 6
+   end-of-line comments: 0
+   comment percentage  : 33.33
+   blank lines         : 6
+
+=== Element metrics ===
+   all subprogram bodies    : 0
+   all statements           : 0
+   all declarations         : 11
+   logical SLOC             : 11
+   maximal construct nesting: 1

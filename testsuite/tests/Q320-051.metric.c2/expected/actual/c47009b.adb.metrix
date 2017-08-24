@@ -1,0 +1,118 @@
+Metrics computed for src/c47009b.adb
+containing procedure body C47009B
+
+=== Code line metrics ===
+  all lines           : 282
+  code lines          : 199
+  comment lines       : 33
+  end-of-line comments: 0
+  comment percentage  : 14.22
+  blank lines         : 50
+
+C47009B (procedure body - library item at lines  38: 282)
+
+=== Code line metrics ===
+   all lines           : 245
+   code lines          : 198
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 47
+
+=== Element metrics ===
+   all type definitions     : 20
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 47
+   all declarations         : 64
+   logical SLOC             : 111
+   maximal unit nesting     : 1
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 1
+   expression complexity    : 0
+   cyclomatic complexity    : 1
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   PKG (package at lines  213: 222)
+
+   === Code line metrics ===
+      all lines           : 10
+      code lines          : 8
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 2
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 5
+      logical SLOC             : 5
+      maximal construct nesting: 1
+
+   PKG1 (package at lines  245: 253)
+
+   === Code line metrics ===
+      all lines           : 9
+      code lines          : 8
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 1
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 5
+      logical SLOC             : 5
+      maximal construct nesting: 1
+
+   PKG2 (package at lines  255: 255)
+
+   === Code line metrics ===
+      all lines           : 1
+      code lines          : 1
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 1
+      logical SLOC             : 1
+      maximal construct nesting: 1
+
+   PKG2 (package body at lines  257: 275)
+
+   === Code line metrics ===
+      all lines           : 19
+      code lines          : 17
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 2
+
+   === Element metrics ===
+      all statements           : 3
+      all declarations         : 6
+      logical SLOC             : 9
+      maximal construct nesting: 1
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

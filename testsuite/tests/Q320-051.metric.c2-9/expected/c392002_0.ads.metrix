@@ -1,0 +1,116 @@
+Metrics computed for src/c392002_0.ads
+containing generic package C392002_0
+
+=== Code line metrics ===
+  all lines           : 188
+  code lines          : 35
+  comment lines       : 134
+  end-of-line comments: 1
+  comment percentage  : 79.88
+  blank lines         : 19
+
+C392002_0 (generic package - library item at lines  124: 188)
+
+=== Code line metrics ===
+   all lines           : 65
+   code lines          : 35
+   comment lines       : 14
+   end-of-line comments: 1
+   comment percentage  : 30.61
+   blank lines         : 16
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 4
+   all type definitions     : 6
+   public subprograms       : 9
+   all statements           : 0
+   all declarations         : 31
+   logical SLOC             : 31
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Engine_Size (function at lines  145: 146)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   Catalytic_Converter (function at lines  147: 148)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   Emissions_Produced (function at lines  149: 150)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   Engine_Size (function at lines  160: 160)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Catalytic_Converter (function at lines  161: 161)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Emissions_Produced (function at lines  162: 162)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Catalytic_Converter (function at lines  173: 173)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Emissions_Produced (function at lines  174: 174)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Emissions_Produced (function at lines  186: 186)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0

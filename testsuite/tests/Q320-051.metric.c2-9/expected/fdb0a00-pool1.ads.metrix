@@ -1,0 +1,32 @@
+Metrics computed for src/fdb0a00-pool1.ads
+containing package FDB0A00.Pool1
+
+=== Code line metrics ===
+  all lines           : 64
+  code lines          : 3
+  comment lines       : 58
+  end-of-line comments: 0
+  comment percentage  : 95.08
+  blank lines         : 3
+
+FDB0A00.Pool1 (package - library item at lines  62: 64)
+
+=== Code line metrics ===
+   all lines           : 3
+   code lines          : 3
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 0
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 0
+   all statements           : 0
+   all declarations         : 2
+   logical SLOC             : 2
+   maximal construct nesting: 1

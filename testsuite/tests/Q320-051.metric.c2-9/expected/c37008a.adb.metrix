@@ -1,0 +1,45 @@
+Metrics computed for src/c37008a.adb
+containing procedure body C37008A
+
+=== Code line metrics ===
+  all lines           : 270
+  code lines          : 212
+  comment lines       : 29
+  end-of-line comments: 0
+  comment percentage  : 12.03
+  blank lines         : 29
+
+C37008A (procedure body - library item at lines  35: 270)
+
+=== Code line metrics ===
+   all lines           : 236
+   code lines          : 210
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 26
+
+=== Element metrics ===
+   all type definitions     : 27
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 67
+   all declarations         : 60
+   logical SLOC             : 127
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 1
+   expression complexity    : 0
+   cyclomatic complexity    : 1
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

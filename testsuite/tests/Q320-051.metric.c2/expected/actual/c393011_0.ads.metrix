@@ -1,0 +1,34 @@
+Metrics computed for src/c393011_0.ads
+containing package C393011_0
+
+=== Code line metrics ===
+  all lines           : 60
+  code lines          : 8
+  comment lines       : 47
+  end-of-line comments: 0
+  comment percentage  : 85.45
+  blank lines         : 5
+
+C393011_0 (package - library item at lines  48: 60)
+
+=== Code line metrics ===
+   all lines           : 13
+   code lines          : 8
+   comment lines       : 1
+   end-of-line comments: 0
+   comment percentage  : 11.11
+   blank lines         : 4
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 3
+   all type definitions     : 3
+   public subprograms       : 0
+   all statements           : 0
+   all declarations         : 15
+   logical SLOC             : 15
+   maximal construct nesting: 1

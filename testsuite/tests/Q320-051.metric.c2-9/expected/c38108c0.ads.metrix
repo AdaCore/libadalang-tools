@@ -1,0 +1,58 @@
+Metrics computed for src/c38108c0.ads
+containing package C38108C0
+
+=== Code line metrics ===
+  all lines           : 36
+  code lines          : 8
+  comment lines       : 25
+  end-of-line comments: 0
+  comment percentage  : 75.75
+  blank lines         : 3
+
+C38108C0 (package - library item at lines  29: 36)
+
+=== Code line metrics ===
+   all lines           : 8
+   code lines          : 8
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 0
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 1
+   private types            : 1
+   all type definitions     : 1
+   public subprograms       : 2
+   all statements           : 0
+   all declarations         : 10
+   logical SLOC             : 10
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   ASSIGN (procedure at lines  31: 31)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   "=" (function at lines  32: 32)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0

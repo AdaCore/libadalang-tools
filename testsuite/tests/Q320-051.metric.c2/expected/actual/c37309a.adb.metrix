@@ -1,0 +1,45 @@
+Metrics computed for src/c37309a.adb
+containing procedure body C37309A
+
+=== Code line metrics ===
+  all lines           : 74
+  code lines          : 35
+  comment lines       : 29
+  end-of-line comments: 0
+  comment percentage  : 45.31
+  blank lines         : 10
+
+C37309A (procedure body - library item at lines  34: 74)
+
+=== Code line metrics ===
+   all lines           : 41
+   code lines          : 34
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 7
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 9
+   all declarations         : 5
+   logical SLOC             : 14
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 3
+   expression complexity    : 0
+   cyclomatic complexity    : 3
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  3.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  3.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

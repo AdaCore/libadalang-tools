@@ -1,0 +1,79 @@
+Metrics computed for src/c974008_0.ads
+containing package C974008_0
+
+=== Code line metrics ===
+  all lines           : 85
+  code lines          : 21
+  comment lines       : 46
+  end-of-line comments: 2
+  comment percentage  : 71.64
+  blank lines         : 18
+
+C974008_0 (package - library item at lines  46: 85)
+
+=== Code line metrics ===
+   all lines           : 40
+   code lines          : 21
+   comment lines       : 2
+   end-of-line comments: 2
+   comment percentage  : 17.39
+   blank lines         : 17
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 5
+   private types            : 3
+   all type definitions     : 5
+   public subprograms       : 2
+   all statements           : 0
+   all declarations         : 23
+   logical SLOC             : 23
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   ATM_Keyboard_Task (task type at lines  65: 67)
+
+   === Code line metrics ===
+      all lines           : 3
+      code lines          : 3
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 2
+      logical SLOC             : 2
+      maximal construct nesting: 1
+
+   Read_Card (procedure at lines  70: 70)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Perform_Transaction (procedure at lines  73: 73)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0

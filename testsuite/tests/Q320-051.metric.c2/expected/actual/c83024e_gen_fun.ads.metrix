@@ -1,0 +1,28 @@
+Metrics computed for src/c83024e_gen_fun.ads
+containing generic function C83024E_GEN_FUN
+
+=== Code line metrics ===
+  all lines           : 41
+  code lines          : 4
+  comment lines       : 34
+  end-of-line comments: 0
+  comment percentage  : 89.47
+  blank lines         : 3
+
+C83024E_GEN_FUN (generic function - library item at lines  38: 41)
+
+=== Code line metrics ===
+   all lines           : 4
+   code lines          : 4
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 0
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 3
+   logical SLOC             : 3
+   maximal construct nesting: 1

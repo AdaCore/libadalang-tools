@@ -1,0 +1,147 @@
+Metrics computed for src/c641001_0.adb
+containing package body C641001_0
+
+=== Code line metrics ===
+  all lines           : 73
+  code lines          : 58
+  comment lines       : 5
+  end-of-line comments: 5
+  comment percentage  : 15.87
+  blank lines         : 10
+
+C641001_0 (package body - library item at lines  6: 73)
+
+=== Code line metrics ===
+   all lines           : 68
+   code lines          : 56
+   comment lines       : 4
+   end-of-line comments: 5
+   comment percentage  : 15.00
+   blank lines         : 8
+
+=== Element metrics ===
+   all subprogram bodies    : 4
+   all statements           : 21
+   all declarations         : 12
+   logical SLOC             : 33
+   maximal unit nesting     : 1
+   maximal construct nesting: 3
+
+   Check_String_10 (procedure body at lines  10: 18)
+
+   === Code line metrics ===
+      all lines           : 9
+      code lines          : 9
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 4
+      all declarations         : 3
+      logical SLOC             : 7
+      maximal construct nesting: 2
+      all parameters           : 3
+      IN parameters            : 2
+      OUT parameters           : 1
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 2
+      expression complexity    : 0
+      cyclomatic complexity    : 2
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Check_Illegal_Slice_Reference (procedure body at lines  20: 35)
+
+   === Code line metrics ===
+      all lines           : 16
+      code lines          : 14
+      comment lines       : 2
+      end-of-line comments: 1
+      comment percentage  : 18.75
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 5
+      all declarations         : 3
+      logical SLOC             : 8
+      maximal construct nesting: 2
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   === Complexity metrics ===
+      statement complexity     : 2
+      expression complexity    : 0
+      cyclomatic complexity    : 2
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Check_Tag_Slice (procedure body at lines  37: 65)
+
+   === Code line metrics ===
+      all lines           : 29
+      code lines          : 25
+      comment lines       : 2
+      end-of-line comments: 4
+      comment percentage  : 22.22
+      blank lines         : 2
+
+   === Element metrics ===
+      all statements           : 10
+      all declarations         : 2
+      logical SLOC             : 12
+      maximal construct nesting: 2
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Check_Out_Tagged_Data (procedure body at lines  67: 71)
+
+   === Code line metrics ===
+      all lines           : 5
+      code lines          : 5
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 2
+      all declarations         : 2
+      logical SLOC             : 4
+      maximal construct nesting: 1
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 1
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.50
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.50
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

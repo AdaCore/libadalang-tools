@@ -1,0 +1,62 @@
+Metrics computed for src/c93005c.adb
+containing procedure body C93005C
+
+=== Code line metrics ===
+  all lines           : 56
+  code lines          : 46
+  comment lines       : 1
+  end-of-line comments: 2
+  comment percentage  : 6.38
+  blank lines         : 9
+
+C93005C (procedure body - library item at lines  5: 56)
+
+=== Code line metrics ===
+   all lines           : 52
+   code lines          : 43
+   comment lines       : 1
+   end-of-line comments: 2
+   comment percentage  : 6.81
+   blank lines         : 8
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 15
+   all declarations         : 9
+   logical SLOC             : 24
+   maximal unit nesting     : 1
+   maximal construct nesting: 5
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 2
+   expression complexity    : 0
+   cyclomatic complexity    : 2
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   RAISES_EXCEPTION (package at lines  25: 30)
+
+   === Code line metrics ===
+      all lines           : 6
+      code lines          : 5
+      comment lines       : 1
+      end-of-line comments: 1
+      comment percentage  : 33.33
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 4
+      logical SLOC             : 4
+      maximal construct nesting: 1
+
+=== Average complexity metrics ===
+      statement_complexity     :  2.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  2.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

@@ -1,0 +1,26 @@
+Metrics computed for src/c390011_2.ads
+containing package instance C390011_2
+
+=== Code line metrics ===
+  all lines           : 5
+  code lines          : 2
+  comment lines       : 1
+  end-of-line comments: 0
+  comment percentage  : 33.33
+  blank lines         : 2
+
+C390011_2 (package instantiation - library item at lines  5: 5)
+
+=== Code line metrics ===
+   all lines           : 1
+   code lines          : 1
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 0
+
+=== Element metrics ===
+   all statements           : 0
+   all declarations         : 1
+   logical SLOC             : 1
+   maximal construct nesting: 1

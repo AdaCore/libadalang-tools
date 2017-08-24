@@ -1,0 +1,173 @@
+Metrics computed for src/c954a03.adb
+containing procedure body C954A03
+
+=== Code line metrics ===
+  all lines           : 151
+  code lines          : 65
+  comment lines       : 49
+  end-of-line comments: 16
+  comment percentage  : 57.01
+  blank lines         : 37
+
+C954A03 (procedure body - library item at lines  15: 151)
+
+=== Code line metrics ===
+   all lines           : 137
+   code lines          : 59
+   comment lines       : 48
+   end-of-line comments: 14
+   comment percentage  : 57.94
+   blank lines         : 30
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 2
+   all statements           : 22
+   all declarations         : 13
+   logical SLOC             : 35
+   maximal unit nesting     : 2
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 7
+   expression complexity    : 0
+   cyclomatic complexity    : 7
+   essential complexity     : 1
+   maximum loop nesting     : 1
+   extra exit points        : 0
+
+   Interlock (protected object at lines  24: 29)
+
+   === Code line metrics ===
+      all lines           : 6
+      code lines          : 6
+      comment lines       : 0
+      end-of-line comments: 3
+      comment percentage  : 50.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 4
+      logical SLOC             : 4
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      Release (procedure at lines  26: 26)
+
+      === Element metrics ===
+         all parameters           : 0
+
+   Interlock (protected body at lines  32: 45)
+
+   === Code line metrics ===
+      all lines           : 14
+      code lines          : 10
+      comment lines       : 1
+      end-of-line comments: 2
+      comment percentage  : 27.27
+      blank lines         : 3
+
+   === Element metrics ===
+      all statements           : 2
+      all declarations         : 3
+      logical SLOC             : 5
+      maximal unit nesting     : 1
+      maximal construct nesting: 2
+
+      Wait (entry body at lines  34: 38)
+
+      === Code line metrics ===
+         all lines           : 5
+         code lines          : 4
+         comment lines       : 1
+         end-of-line comments: 1
+         comment percentage  : 40.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 1
+         all declarations         : 1
+         logical SLOC             : 2
+         maximal construct nesting: 1
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+      Release (procedure body at lines  40: 43)
+
+      === Code line metrics ===
+         all lines           : 4
+         code lines          : 4
+         comment lines       : 0
+         end-of-line comments: 1
+         comment percentage  : 25.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 1
+         all declarations         : 1
+         logical SLOC             : 2
+         maximal construct nesting: 1
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+   Print_Request (task object at lines  49: 50)
+
+   === Code line metrics ===
+      all lines           : 2
+      code lines          : 2
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 50.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 1
+      logical SLOC             : 1
+      maximal construct nesting: 1
+
+   Print_Request (task body at lines  52: 60)
+
+   === Code line metrics ===
+      all lines           : 9
+      code lines          : 9
+      comment lines       : 0
+      end-of-line comments: 2
+      comment percentage  : 22.22
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 3
+      all declarations         : 2
+      logical SLOC             : 5
+      maximal construct nesting: 1
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  2.50
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  2.50
+      essential_complexity     :  1.00
+      max_loop_nesting         :  1.00

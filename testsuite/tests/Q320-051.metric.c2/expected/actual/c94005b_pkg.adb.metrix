@@ -1,0 +1,59 @@
+Metrics computed for src/c94005b_pkg.adb
+containing package body C94005B_PKG
+
+=== Code line metrics ===
+  all lines           : 17
+  code lines          : 11
+  comment lines       : 2
+  end-of-line comments: 1
+  comment percentage  : 23.07
+  blank lines         : 4
+
+C94005B_PKG (package body - library item at lines  3: 17)
+
+=== Code line metrics ===
+   all lines           : 15
+   code lines          : 11
+   comment lines       : 2
+   end-of-line comments: 1
+   comment percentage  : 23.07
+   blank lines         : 2
+
+=== Element metrics ===
+   all subprogram bodies    : 0
+   all statements           : 4
+   all declarations         : 4
+   logical SLOC             : 8
+   maximal unit nesting     : 1
+   maximal construct nesting: 3
+
+   TT (task body at lines  5: 15)
+
+   === Code line metrics ===
+      all lines           : 11
+      code lines          : 9
+      comment lines       : 2
+      end-of-line comments: 1
+      comment percentage  : 27.27
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 4
+      all declarations         : 3
+      logical SLOC             : 7
+      maximal construct nesting: 2
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

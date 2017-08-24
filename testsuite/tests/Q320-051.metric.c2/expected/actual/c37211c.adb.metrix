@@ -1,0 +1,202 @@
+Metrics computed for src/c37211c.adb
+containing procedure body C37211C
+
+=== Code line metrics ===
+  all lines           : 426
+  code lines          : 332
+  comment lines       : 32
+  end-of-line comments: 0
+  comment percentage  : 8.79
+  blank lines         : 62
+
+C37211C (procedure body - library item at lines  37: 426)
+
+=== Code line metrics ===
+   all lines           : 390
+   code lines          : 331
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 59
+
+=== Element metrics ===
+   all type definitions     : 14
+   public subprograms       : unknown
+   all subprogram bodies    : 2
+   all statements           : 76
+   all declarations         : 79
+   logical SLOC             : 155
+   maximal unit nesting     : 1
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 1
+   expression complexity    : 0
+   cyclomatic complexity    : 1
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   SWITCH (function body at lines  43: 47)
+
+   === Code line metrics ===
+      all lines           : 5
+      code lines          : 5
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 2
+      all declarations         : 2
+      logical SLOC             : 4
+      maximal construct nesting: 1
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   PP (package at lines  64: 75)
+
+   === Code line metrics ===
+      all lines           : 12
+      code lines          : 10
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 2
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 7
+      logical SLOC             : 7
+      maximal construct nesting: 1
+
+   PL (package at lines  109: 120)
+
+   === Code line metrics ===
+      all lines           : 12
+      code lines          : 10
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 2
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 7
+      logical SLOC             : 7
+      maximal construct nesting: 1
+
+   PP (package at lines  153: 165)
+
+   === Code line metrics ===
+      all lines           : 13
+      code lines          : 11
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 2
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 7
+      logical SLOC             : 7
+      maximal construct nesting: 1
+
+   PL (package at lines  198: 210)
+
+   === Code line metrics ===
+      all lines           : 13
+      code lines          : 11
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 2
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 7
+      logical SLOC             : 7
+      maximal construct nesting: 1
+
+   PP (package at lines  243: 258)
+
+   === Code line metrics ===
+      all lines           : 16
+      code lines          : 13
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 3
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 8
+      logical SLOC             : 8
+      maximal construct nesting: 1
+
+   PL (package at lines  291: 306)
+
+   === Code line metrics ===
+      all lines           : 16
+      code lines          : 13
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 3
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 8
+      logical SLOC             : 8
+      maximal construct nesting: 1
+
+   PP (package at lines  339: 350)
+
+   === Code line metrics ===
+      all lines           : 12
+      code lines          : 10
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 2
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 7
+      logical SLOC             : 7
+      maximal construct nesting: 1
+
+   PL (package at lines  384: 395)
+
+   === Code line metrics ===
+      all lines           : 12
+      code lines          : 10
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 2
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 7
+      logical SLOC             : 7
+      maximal construct nesting: 1
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

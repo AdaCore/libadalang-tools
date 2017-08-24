@@ -1,0 +1,47 @@
+Metrics computed for src/fa13a00_1-ca13a02_4-call_elevator.adb
+containing function body subunit FA13A00_1.CA13A02_4.Call_Elevator
+
+=== Code line metrics ===
+  all lines           : 75
+  code lines          : 46
+  comment lines       : 10
+  end-of-line comments: 16
+  comment percentage  : 46.42
+  blank lines         : 19
+
+Call_Elevator (function body - subunit at lines  8: 75)
+
+=== Code line metrics ===
+   all lines           : 68
+   code lines          : 45
+   comment lines       : 8
+   end-of-line comments: 16
+   comment percentage  : 45.28
+   blank lines         : 15
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 18
+   all declarations         : 3
+   logical SLOC             : 21
+   maximal construct nesting: 4
+   all parameters           : 1
+   IN parameters            : 1
+   OUT parameters           : 0
+   IN OUT parameters        : 0
+
+=== Complexity metrics ===
+   statement complexity     : 7
+   expression complexity    : 0
+   cyclomatic complexity    : 7
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  7.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  7.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

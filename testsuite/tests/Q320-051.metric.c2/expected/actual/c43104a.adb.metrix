@@ -1,0 +1,74 @@
+Metrics computed for src/c43104a.adb
+containing procedure body C43104A
+
+=== Code line metrics ===
+  all lines           : 86
+  code lines          : 42
+  comment lines       : 29
+  end-of-line comments: 0
+  comment percentage  : 40.84
+  blank lines         : 15
+
+C43104A (procedure body - library item at lines  34: 86)
+
+=== Code line metrics ===
+   all lines           : 53
+   code lines          : 41
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 12
+
+=== Element metrics ===
+   all type definitions     : 2
+   public subprograms       : unknown
+   all subprogram bodies    : 2
+   all statements           : 11
+   all declarations         : 10
+   logical SLOC             : 21
+   maximal unit nesting     : 1
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 1
+   expression complexity    : 0
+   cyclomatic complexity    : 1
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   CHECK (procedure body at lines  51: 61)
+
+   === Code line metrics ===
+      all lines           : 11
+      code lines          : 9
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 2
+
+   === Element metrics ===
+      all statements           : 3
+      all declarations         : 2
+      logical SLOC             : 5
+      maximal construct nesting: 2
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 2
+      expression complexity    : 0
+      cyclomatic complexity    : 2
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.50
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.50
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

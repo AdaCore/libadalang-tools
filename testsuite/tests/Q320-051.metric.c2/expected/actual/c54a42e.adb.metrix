@@ -1,0 +1,44 @@
+Metrics computed for src/c54a42e.adb
+containing procedure body C54A42E
+
+=== Code line metrics ===
+  all lines           : 125
+  code lines          : 73
+  comment lines       : 28
+  end-of-line comments: 0
+  comment percentage  : 27.72
+  blank lines         : 24
+
+C54A42E (procedure body - library item at lines  36: 125)
+
+=== Code line metrics ===
+   all lines           : 90
+   code lines          : 72
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 18
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 45
+   all declarations         : 6
+   logical SLOC             : 51
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 31
+   expression complexity    : 0
+   cyclomatic complexity    : 31
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  31.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  31.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

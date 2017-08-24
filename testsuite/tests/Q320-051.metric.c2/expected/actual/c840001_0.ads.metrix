@@ -1,0 +1,57 @@
+Metrics computed for src/c840001_0.ads
+containing package C840001_0
+
+=== Code line metrics ===
+  all lines           : 82
+  code lines          : 8
+  comment lines       : 67
+  end-of-line comments: 0
+  comment percentage  : 89.33
+  blank lines         : 7
+
+C840001_0 (package - library item at lines  62: 82)
+
+=== Code line metrics ===
+   all lines           : 21
+   code lines          : 8
+   comment lines       : 7
+   end-of-line comments: 0
+   comment percentage  : 46.66
+   blank lines         : 6
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 1
+   all type definitions     : 1
+   public subprograms       : 2
+   all statements           : 0
+   all declarations         : 8
+   logical SLOC             : 8
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   "**" (function at lines  70: 71)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   "+" (function at lines  74: 75)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0

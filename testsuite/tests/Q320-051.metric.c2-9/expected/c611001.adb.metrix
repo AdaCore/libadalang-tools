@@ -1,0 +1,45 @@
+Metrics computed for src/c611001.adb
+containing procedure body C611001
+
+=== Code line metrics ===
+  all lines           : 81
+  code lines          : 69
+  comment lines       : 0
+  end-of-line comments: 0
+  comment percentage  : 0.00
+  blank lines         : 12
+
+C611001 (procedure body - library item at lines  6: 81)
+
+=== Code line metrics ===
+   all lines           : 76
+   code lines          : 65
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 11
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 33
+   all declarations         : 10
+   logical SLOC             : 43
+   maximal construct nesting: 2
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 5
+   expression complexity    : 0
+   cyclomatic complexity    : 5
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  5.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  5.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

@@ -1,0 +1,43 @@
+Metrics computed for src/c460a02_1.ads
+containing generic package C460A02_1
+
+=== Code line metrics ===
+  all lines           : 17
+  code lines          : 11
+  comment lines       : 1
+  end-of-line comments: 1
+  comment percentage  : 16.66
+  blank lines         : 5
+
+C460A02_1 (generic package - library item at lines  7: 17)
+
+=== Code line metrics ===
+   all lines           : 11
+   code lines          : 10
+   comment lines       : 0
+   end-of-line comments: 1
+   comment percentage  : 10.00
+   blank lines         : 1
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 1
+   all type definitions     : 3
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 8
+   logical SLOC             : 8
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Dummy (procedure at lines  16: 16)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0

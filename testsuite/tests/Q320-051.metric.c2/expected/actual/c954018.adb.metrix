@@ -1,0 +1,379 @@
+Metrics computed for src/c954018.adb
+containing procedure body C954018
+
+=== Code line metrics ===
+  all lines           : 227
+  code lines          : 113
+  comment lines       : 69
+  end-of-line comments: 3
+  comment percentage  : 39.56
+  blank lines         : 45
+
+C954018 (procedure body - library item at lines  55: 227)
+
+=== Code line metrics ===
+   all lines           : 173
+   code lines          : 111
+   comment lines       : 21
+   end-of-line comments: 3
+   comment percentage  : 18.18
+   blank lines         : 41
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 7
+   all statements           : 38
+   all declarations         : 28
+   logical SLOC             : 66
+   maximal unit nesting     : 2
+   maximal construct nesting: 5
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 5
+   expression complexity    : 0
+   cyclomatic complexity    : 5
+   essential complexity     : 1
+   maximum loop nesting     : 1
+   extra exit points        : 0
+
+   TC_State (protected object at lines  60: 71)
+
+   === Code line metrics ===
+      all lines           : 12
+      code lines          : 12
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 10
+      logical SLOC             : 10
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      On_Entry_Queue (function at lines  61: 61)
+
+      === Element metrics ===
+         all parameters           : 0
+
+      Set_On_Entry_Queue (procedure at lines  62: 62)
+
+      === Element metrics ===
+         all parameters           : 0
+
+      Original_Caller_Complete (function at lines  63: 63)
+
+      === Element metrics ===
+         all parameters           : 0
+
+      Set_Original_Caller_Complete (procedure at lines  64: 64)
+
+      === Element metrics ===
+         all parameters           : 0
+
+      Intermediate_Complete (function at lines  65: 65)
+
+      === Element metrics ===
+         all parameters           : 0
+
+      Set_Intermediate_Complete (procedure at lines  66: 66)
+
+      === Element metrics ===
+         all parameters           : 0
+
+   TC_State (protected body at lines  74: 105)
+
+   === Code line metrics ===
+      all lines           : 32
+      code lines          : 26
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 6
+
+   === Element metrics ===
+      all statements           : 6
+      all declarations         : 7
+      logical SLOC             : 13
+      maximal unit nesting     : 1
+      maximal construct nesting: 2
+
+      On_Entry_Queue (function body at lines  75: 78)
+
+      === Code line metrics ===
+         all lines           : 4
+         code lines          : 4
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 1
+         all declarations         : 1
+         logical SLOC             : 2
+         maximal construct nesting: 1
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+      Set_On_Entry_Queue (procedure body at lines  80: 83)
+
+      === Code line metrics ===
+         all lines           : 4
+         code lines          : 4
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 1
+         all declarations         : 1
+         logical SLOC             : 2
+         maximal construct nesting: 1
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+      Original_Caller_Complete (function body at lines  85: 88)
+
+      === Code line metrics ===
+         all lines           : 4
+         code lines          : 4
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 1
+         all declarations         : 1
+         logical SLOC             : 2
+         maximal construct nesting: 1
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+      Set_Original_Caller_Complete (procedure body at lines  90: 93)
+
+      === Code line metrics ===
+         all lines           : 4
+         code lines          : 4
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 1
+         all declarations         : 1
+         logical SLOC             : 2
+         maximal construct nesting: 1
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+      Intermediate_Complete (function body at lines  95: 98)
+
+      === Code line metrics ===
+         all lines           : 4
+         code lines          : 4
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 1
+         all declarations         : 1
+         logical SLOC             : 2
+         maximal construct nesting: 1
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+      Set_Intermediate_Complete (procedure body at lines  100: 103)
+
+      === Code line metrics ===
+         all lines           : 4
+         code lines          : 4
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 1
+         all declarations         : 1
+         logical SLOC             : 2
+         maximal construct nesting: 1
+         all parameters           : 0
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+   Original_Caller (task object at lines  109: 111)
+
+   === Code line metrics ===
+      all lines           : 3
+      code lines          : 3
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 2
+      logical SLOC             : 2
+      maximal construct nesting: 1
+
+   Intermediate (task object at lines  113: 116)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 3
+      logical SLOC             : 3
+      maximal construct nesting: 1
+
+   Receiver (task object at lines  118: 120)
+
+   === Code line metrics ===
+      all lines           : 3
+      code lines          : 3
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 2
+      logical SLOC             : 2
+      maximal construct nesting: 1
+
+   Original_Caller (task body at lines  123: 135)
+
+   === Code line metrics ===
+      all lines           : 13
+      code lines          : 11
+      comment lines       : 0
+      end-of-line comments: 2
+      comment percentage  : 18.18
+      blank lines         : 2
+
+   === Element metrics ===
+      all statements           : 5
+      all declarations         : 1
+      logical SLOC             : 6
+      maximal construct nesting: 2
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Intermediate (task body at lines  138: 155)
+
+   === Code line metrics ===
+      all lines           : 18
+      code lines          : 13
+      comment lines       : 2
+      end-of-line comments: 0
+      comment percentage  : 13.33
+      blank lines         : 3
+
+   === Element metrics ===
+      all statements           : 7
+      all declarations         : 1
+      logical SLOC             : 8
+      maximal construct nesting: 2
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Receiver (task body at lines  158: 175)
+
+   === Code line metrics ===
+      all lines           : 18
+      code lines          : 16
+      comment lines       : 1
+      end-of-line comments: 1
+      comment percentage  : 11.76
+      blank lines         : 1
+
+   === Element metrics ===
+      all statements           : 6
+      all declarations         : 1
+      logical SLOC             : 7
+      maximal construct nesting: 4
+
+   === Complexity metrics ===
+      statement complexity     : 2
+      expression complexity    : 0
+      cyclomatic complexity    : 2
+      essential complexity     : 1
+      maximum loop nesting     : 1
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.50
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.50
+      essential_complexity     :  1.00
+      max_loop_nesting         :  1.00

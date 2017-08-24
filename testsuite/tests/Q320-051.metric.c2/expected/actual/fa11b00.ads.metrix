@@ -1,0 +1,46 @@
+Metrics computed for src/fa11b00.ads
+containing package FA11B00
+
+=== Code line metrics ===
+  all lines           : 76
+  code lines          : 26
+  comment lines       : 43
+  end-of-line comments: 3
+  comment percentage  : 66.66
+  blank lines         : 7
+
+FA11B00 (package - library item at lines  36: 76)
+
+=== Code line metrics ===
+   all lines           : 41
+   code lines          : 26
+   comment lines       : 9
+   end-of-line comments: 3
+   comment percentage  : 34.28
+   blank lines         : 6
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 6
+   all type definitions     : 6
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 25
+   logical SLOC             : 25
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   App1_Widget_Specific_Oper (procedure at lines  71: 74)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 4
+      IN parameters            : 3
+      OUT parameters           : 0
+      IN OUT parameters        : 1

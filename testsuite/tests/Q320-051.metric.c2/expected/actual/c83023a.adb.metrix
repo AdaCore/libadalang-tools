@@ -1,0 +1,191 @@
+Metrics computed for src/c83023a.adb
+containing procedure body C83023A
+
+=== Code line metrics ===
+  all lines           : 194
+  code lines          : 126
+  comment lines       : 32
+  end-of-line comments: 5
+  comment percentage  : 23.41
+  blank lines         : 36
+
+C83023A (procedure body - library item at lines  37: 194)
+
+=== Code line metrics ===
+   all lines           : 158
+   code lines          : 125
+   comment lines       : 0
+   end-of-line comments: 5
+   comment percentage  : 4.00
+   blank lines         : 33
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : unknown
+   all subprogram bodies    : 2
+   all statements           : 45
+   all declarations         : 33
+   logical SLOC             : 78
+   maximal unit nesting     : 1
+   maximal construct nesting: 5
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 4
+   expression complexity    : 0
+   cyclomatic complexity    : 4
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   GEN_FUN (function body at lines  44: 47)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 1
+      logical SLOC             : 2
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   INNER (task object at lines  59: 61)
+
+   === Code line metrics ===
+      all lines           : 3
+      code lines          : 3
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 3
+      logical SLOC             : 3
+      maximal construct nesting: 1
+
+   INNER (task body at lines  63: 98)
+
+   === Code line metrics ===
+      all lines           : 36
+      code lines          : 31
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 5
+
+   === Element metrics ===
+      all statements           : 14
+      all declarations         : 4
+      logical SLOC             : 18
+      maximal construct nesting: 3
+
+   === Complexity metrics ===
+      statement complexity     : 7
+      expression complexity    : 0
+      cyclomatic complexity    : 7
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   INNER (task object at lines  110: 112)
+
+   === Code line metrics ===
+      all lines           : 3
+      code lines          : 3
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 3
+      logical SLOC             : 3
+      maximal construct nesting: 1
+
+   INNER (task body at lines  118: 153)
+
+   === Code line metrics ===
+      all lines           : 36
+      code lines          : 31
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 5
+
+   === Element metrics ===
+      all statements           : 14
+      all declarations         : 4
+      logical SLOC             : 18
+      maximal construct nesting: 3
+
+   === Complexity metrics ===
+      statement complexity     : 7
+      expression complexity    : 0
+      cyclomatic complexity    : 7
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   INNER (task object at lines  171: 173)
+
+   === Code line metrics ===
+      all lines           : 3
+      code lines          : 3
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 3
+      logical SLOC             : 3
+      maximal construct nesting: 1
+
+   INNER (task body at lines  177: 183)
+
+   === Code line metrics ===
+      all lines           : 7
+      code lines          : 7
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 2
+      all declarations         : 3
+      logical SLOC             : 5
+      maximal construct nesting: 2
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  4.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  4.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

@@ -1,0 +1,63 @@
+Metrics computed for src/c340a02_0.adb
+containing package body C340A02_0
+
+=== Code line metrics ===
+  all lines           : 16
+  code lines          : 7
+  comment lines       : 1
+  end-of-line comments: 0
+  comment percentage  : 12.50
+  blank lines         : 8
+
+C340A02_0 (package body - library item at lines  6: 16)
+
+=== Code line metrics ===
+   all lines           : 11
+   code lines          : 7
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 4
+
+=== Element metrics ===
+   all subprogram bodies    : 1
+   all statements           : 1
+   all declarations         : 4
+   logical SLOC             : 5
+   maximal unit nesting     : 1
+   maximal construct nesting: 2
+
+   Update_Pages (procedure body at lines  9: 13)
+
+   === Code line metrics ===
+      all lines           : 5
+      code lines          : 5
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 3
+      logical SLOC             : 4
+      maximal construct nesting: 1
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

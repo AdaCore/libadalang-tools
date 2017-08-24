@@ -1,0 +1,45 @@
+Metrics computed for src/c45532j.adb
+containing procedure body C45532J
+
+=== Code line metrics ===
+  all lines           : 159
+  code lines          : 77
+  comment lines       : 55
+  end-of-line comments: 6
+  comment percentage  : 46.21
+  blank lines         : 27
+
+C45532J (procedure body - library item at lines  51: 159)
+
+=== Code line metrics ===
+   all lines           : 109
+   code lines          : 76
+   comment lines       : 11
+   end-of-line comments: 6
+   comment percentage  : 19.54
+   blank lines         : 22
+
+=== Element metrics ===
+   all type definitions     : 3
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 23
+   all declarations         : 26
+   logical SLOC             : 49
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 7
+   expression complexity    : 0
+   cyclomatic complexity    : 7
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  7.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  7.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

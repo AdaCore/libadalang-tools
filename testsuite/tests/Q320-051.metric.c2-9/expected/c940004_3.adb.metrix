@@ -1,0 +1,59 @@
+Metrics computed for src/c940004_3.adb
+containing package body C940004_3
+
+=== Code line metrics ===
+  all lines           : 54
+  code lines          : 33
+  comment lines       : 10
+  end-of-line comments: 3
+  comment percentage  : 30.23
+  blank lines         : 11
+
+C940004_3 (package body - library item at lines  8: 54)
+
+=== Code line metrics ===
+   all lines           : 47
+   code lines          : 30
+   comment lines       : 9
+   end-of-line comments: 1
+   comment percentage  : 25.64
+   blank lines         : 8
+
+=== Element metrics ===
+   all subprogram bodies    : 0
+   all statements           : 14
+   all declarations         : 5
+   logical SLOC             : 19
+   maximal unit nesting     : 1
+   maximal construct nesting: 5
+
+   User_Task_Type (task body at lines  11: 52)
+
+   === Code line metrics ===
+      all lines           : 42
+      code lines          : 28
+      comment lines       : 8
+      end-of-line comments: 0
+      comment percentage  : 22.22
+      blank lines         : 6
+
+   === Element metrics ===
+      all statements           : 14
+      all declarations         : 4
+      logical SLOC             : 18
+      maximal construct nesting: 4
+
+   === Complexity metrics ===
+      statement complexity     : 3
+      expression complexity    : 0
+      cyclomatic complexity    : 3
+      essential complexity     : 3
+      maximum loop nesting     : 1
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  3.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  3.00
+      essential_complexity     :  3.00
+      max_loop_nesting         :  1.00

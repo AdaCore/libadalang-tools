@@ -1,0 +1,58 @@
+Metrics computed for src/fa13a00_1.ads
+containing package FA13A00_1
+
+=== Code line metrics ===
+  all lines           : 22
+  code lines          : 12
+  comment lines       : 2
+  end-of-line comments: 1
+  comment percentage  : 21.42
+  blank lines         : 8
+
+FA13A00_1 (package - library item at lines  6: 22)
+
+=== Code line metrics ===
+   all lines           : 17
+   code lines          : 12
+   comment lines       : 0
+   end-of-line comments: 1
+   comment percentage  : 8.33
+   blank lines         : 5
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 3
+   private types            : 1
+   all type definitions     : 3
+   public subprograms       : 2
+   all statements           : 0
+   all declarations         : 18
+   logical SLOC             : 18
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Call (procedure at lines  15: 15)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Clear_Calls (procedure at lines  16: 16)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1

@@ -1,0 +1,57 @@
+Metrics computed for src/f650a00-s.ads
+containing package F650A00.S
+
+=== Code line metrics ===
+  all lines           : 17
+  code lines          : 10
+  comment lines       : 1
+  end-of-line comments: 0
+  comment percentage  : 9.09
+  blank lines         : 6
+
+F650A00.S (package - library item at lines  5: 17)
+
+=== Code line metrics ===
+   all lines           : 13
+   code lines          : 9
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 4
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 2
+   all type definitions     : 2
+   public subprograms       : 2
+   all statements           : 0
+   all declarations         : 12
+   logical SLOC             : 12
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Handle (procedure at lines  12: 13)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Make_Alert_for_Time (function at lines  15: 15)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0

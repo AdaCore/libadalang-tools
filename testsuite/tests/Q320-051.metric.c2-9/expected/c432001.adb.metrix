@@ -1,0 +1,44 @@
+Metrics computed for src/c432001.adb
+containing procedure body C432001
+
+=== Code line metrics ===
+  all lines           : 196
+  code lines          : 140
+  comment lines       : 14
+  end-of-line comments: 3
+  comment percentage  : 11.03
+  blank lines         : 42
+
+C432001 (procedure body - library item at lines  7: 196)
+
+=== Code line metrics ===
+   all lines           : 190
+   code lines          : 136
+   comment lines       : 14
+   end-of-line comments: 3
+   comment percentage  : 11.33
+   blank lines         : 40
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 34
+   all declarations         : 14
+   logical SLOC             : 48
+   maximal construct nesting: 2
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 16
+   expression complexity    : 0
+   cyclomatic complexity    : 16
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  16.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  16.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

@@ -1,0 +1,52 @@
+Metrics computed for src/impdef.ads
+containing package ImpDef
+
+=== Code line metrics ===
+  all lines           : 393
+  code lines          : 53
+  comment lines       : 243
+  end-of-line comments: 0
+  comment percentage  : 82.09
+  blank lines         : 97
+
+ImpDef (package - library item at lines  72: 393)
+
+=== Code line metrics ===
+   all lines           : 322
+   code lines          : 50
+   comment lines       : 177
+   end-of-line comments: 0
+   comment percentage  : 77.97
+   blank lines         : 95
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 2
+   all statements           : 0
+   all declarations         : 46
+   logical SLOC             : 46
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Exceed_Time_Slice (procedure at lines  173: 173)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   Cd30005_Proc (function at lines  201: 201)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0

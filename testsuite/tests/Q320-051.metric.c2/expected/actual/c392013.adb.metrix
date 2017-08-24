@@ -1,0 +1,137 @@
+Metrics computed for src/c392013.adb
+containing procedure body C392013
+
+=== Code line metrics ===
+  all lines           : 138
+  code lines          : 87
+  comment lines       : 38
+  end-of-line comments: 0
+  comment percentage  : 30.39
+  blank lines         : 13
+
+C392013 (procedure body - library item at lines  39: 138)
+
+=== Code line metrics ===
+   all lines           : 100
+   code lines          : 85
+   comment lines       : 2
+   end-of-line comments: 0
+   comment percentage  : 2.29
+   blank lines         : 13
+
+=== Element metrics ===
+   all type definitions     : 7
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 11
+   all declarations         : 36
+   logical SLOC             : 47
+   maximal unit nesting     : 2
+   maximal construct nesting: 5
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 7
+   expression complexity    : 0
+   cyclomatic complexity    : 7
+   essential complexity     : 1
+   maximum loop nesting     : 2
+   extra exit points        : 0
+
+   P1 (package at lines  41: 47)
+
+   === Code line metrics ===
+      all lines           : 7
+      code lines          : 7
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 5
+      logical SLOC             : 5
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      "=" (function at lines  46: 46)
+
+      === Element metrics ===
+         all parameters           : 2
+         IN parameters            : 2
+         OUT parameters           : 0
+         IN OUT parameters        : 0
+
+   P2 (package at lines  49: 58)
+
+   === Code line metrics ===
+      all lines           : 10
+      code lines          : 10
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 9
+      logical SLOC             : 9
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      Make (function at lines  51: 51)
+
+      === Element metrics ===
+         all parameters           : 2
+         IN parameters            : 2
+         OUT parameters           : 0
+         IN OUT parameters        : 0
+
+      "=" (function at lines  57: 57)
+
+      === Element metrics ===
+         all parameters           : 2
+         IN parameters            : 2
+         OUT parameters           : 0
+         IN OUT parameters        : 0
+
+   P3 (package at lines  60: 68)
+
+   === Code line metrics ===
+      all lines           : 9
+      code lines          : 9
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 8
+      logical SLOC             : 8
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      "=" (function at lines  66: 66)
+
+      === Element metrics ===
+         all parameters           : 2
+         IN parameters            : 2
+         OUT parameters           : 0
+         IN OUT parameters        : 0
+
+      Make (function at lines  67: 67)
+
+      === Element metrics ===
+         all parameters           : 2
+         IN parameters            : 2
+         OUT parameters           : 0
+         IN OUT parameters        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  7.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  7.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  2.00

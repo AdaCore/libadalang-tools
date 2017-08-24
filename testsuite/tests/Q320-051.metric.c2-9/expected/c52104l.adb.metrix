@@ -1,0 +1,45 @@
+Metrics computed for src/c52104l.adb
+containing procedure body C52104L
+
+=== Code line metrics ===
+  all lines           : 146
+  code lines          : 42
+  comment lines       : 54
+  end-of-line comments: 0
+  comment percentage  : 56.25
+  blank lines         : 50
+
+C52104L (procedure body - library item at lines  42: 146)
+
+=== Code line metrics ===
+   all lines           : 105
+   code lines          : 41
+   comment lines       : 18
+   end-of-line comments: 0
+   comment percentage  : 30.50
+   blank lines         : 46
+
+=== Element metrics ===
+   all type definitions     : 2
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 15
+   all declarations         : 6
+   logical SLOC             : 21
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 1
+   expression complexity    : 0
+   cyclomatic complexity    : 1
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

@@ -1,0 +1,62 @@
+Metrics computed for src/fxa5a00.ads
+containing package FXA5A00
+
+=== Code line metrics ===
+  all lines           : 85
+  code lines          : 26
+  comment lines       : 44
+  end-of-line comments: 0
+  comment percentage  : 62.85
+  blank lines         : 15
+
+FXA5A00 (package - library item at lines  45: 85)
+
+=== Code line metrics ===
+   all lines           : 41
+   code lines          : 24
+   comment lines       : 6
+   end-of-line comments: 0
+   comment percentage  : 20.00
+   blank lines         : 11
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 1
+   all type definitions     : 2
+   public subprograms       : 3
+   all statements           : 0
+   all declarations         : 25
+   logical SLOC             : 25
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Result_Within_Range (function at lines  66: 68)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 3
+      IN parameters            : 3
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Result_Within_Range (function at lines  70: 72)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 3
+      IN parameters            : 3
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Dont_Optimize (generic procedure at lines  80: 83)
+
+   === Contract metrics ===
+      contract complexity      : 1

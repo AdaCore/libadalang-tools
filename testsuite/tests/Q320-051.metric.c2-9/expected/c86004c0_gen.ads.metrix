@@ -1,0 +1,27 @@
+Metrics computed for src/c86004c0_gen.ads
+containing generic function C86004C0_GEN
+
+=== Code line metrics ===
+  all lines           : 33
+  code lines          : 3
+  comment lines       : 27
+  end-of-line comments: 0
+  comment percentage  : 90.00
+  blank lines         : 3
+
+C86004C0_GEN (generic function - library item at lines  32: 33)
+
+=== Code line metrics ===
+   all lines           : 2
+   code lines          : 2
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 0
+
+=== Element metrics ===
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 2
+   logical SLOC             : 2
+   maximal construct nesting: 1

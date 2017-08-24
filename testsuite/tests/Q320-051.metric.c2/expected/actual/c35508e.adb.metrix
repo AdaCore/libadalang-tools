@@ -1,0 +1,130 @@
+Metrics computed for src/c35508e.adb
+containing procedure body C35508E
+
+=== Code line metrics ===
+  all lines           : 192
+  code lines          : 129
+  comment lines       : 36
+  end-of-line comments: 0
+  comment percentage  : 21.81
+  blank lines         : 27
+
+C35508E (procedure body - library item at lines  40: 192)
+
+=== Code line metrics ===
+   all lines           : 153
+   code lines          : 128
+   comment lines       : 3
+   end-of-line comments: 0
+   comment percentage  : 2.29
+   blank lines         : 22
+
+=== Element metrics ===
+   all type definitions     : 5
+   public subprograms       : unknown
+   all subprogram bodies    : 4
+   all statements           : 44
+   all declarations         : 34
+   logical SLOC             : 78
+   maximal unit nesting     : 1
+   maximal construct nesting: 5
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 1
+   expression complexity    : 0
+   cyclomatic complexity    : 1
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   P (procedure body at lines  57: 76)
+
+   === Code line metrics ===
+      all lines           : 20
+      code lines          : 18
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 2
+
+   === Element metrics ===
+      all statements           : 8
+      all declarations         : 4
+      logical SLOC             : 12
+      maximal construct nesting: 2
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 5
+      expression complexity    : 0
+      cyclomatic complexity    : 5
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   P (procedure body at lines  97: 123)
+
+   === Code line metrics ===
+      all lines           : 27
+      code lines          : 26
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 1
+
+   === Element metrics ===
+      all statements           : 8
+      all declarations         : 4
+      logical SLOC             : 12
+      maximal construct nesting: 3
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 3
+      expression complexity    : 0
+      cyclomatic complexity    : 3
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   P (procedure body at lines  142: 182)
+
+   === Code line metrics ===
+      all lines           : 41
+      code lines          : 40
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 1
+
+   === Element metrics ===
+      all statements           : 12
+      all declarations         : 5
+      logical SLOC             : 17
+      maximal construct nesting: 3
+      all parameters           : 3
+      IN parameters            : 3
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 3
+      expression complexity    : 0
+      cyclomatic complexity    : 3
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  3.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  3.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

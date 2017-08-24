@@ -1,0 +1,67 @@
+Metrics computed for src/c393007_0.ads
+containing package C393007_0
+
+=== Code line metrics ===
+  all lines           : 67
+  code lines          : 13
+  comment lines       : 44
+  end-of-line comments: 0
+  comment percentage  : 77.19
+  blank lines         : 10
+
+C393007_0 (package - library item at lines  45: 67)
+
+=== Code line metrics ===
+   all lines           : 23
+   code lines          : 13
+   comment lines       : 1
+   end-of-line comments: 0
+   comment percentage  : 7.14
+   blank lines         : 9
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 3
+   all type definitions     : 3
+   public subprograms       : 4
+   all statements           : 0
+   all declarations         : 15
+   logical SLOC             : 15
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Handle (procedure at lines  56: 56)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   Log (procedure at lines  58: 59)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   Set_Time (procedure at lines  61: 61)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Correct_Time_Stamp (function at lines  63: 63)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0

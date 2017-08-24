@@ -1,0 +1,55 @@
+Metrics computed for src/c611001_0.ads
+containing generic package C611001_0
+
+=== Code line metrics ===
+  all lines           : 73
+  code lines          : 14
+  comment lines       : 53
+  end-of-line comments: 0
+  comment percentage  : 79.10
+  blank lines         : 6
+
+C611001_0 (generic package - library item at lines  55: 73)
+
+=== Code line metrics ===
+   all lines           : 19
+   code lines          : 14
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 5
+
+=== Contract metrics ===
+   contract                 : 2
+   post                     : 2
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 1
+   all type definitions     : 2
+   public subprograms       : 4
+   all statements           : 0
+   all declarations         : 12
+   logical SLOC             : 12
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Is_Empty (function at lines  62: 62)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   Is_Full (function at lines  63: 63)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   Push (procedure at lines  65: 67)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   Pop (function at lines  69: 71)
+
+   === Contract metrics ===
+      contract complexity      : 1

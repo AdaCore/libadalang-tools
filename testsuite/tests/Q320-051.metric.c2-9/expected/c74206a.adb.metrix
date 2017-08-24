@@ -1,0 +1,119 @@
+Metrics computed for src/c74206a.adb
+containing procedure body C74206A
+
+=== Code line metrics ===
+  all lines           : 144
+  code lines          : 78
+  comment lines       : 35
+  end-of-line comments: 14
+  comment percentage  : 43.36
+  blank lines         : 31
+
+C74206A (procedure body - library item at lines  41: 144)
+
+=== Code line metrics ===
+   all lines           : 104
+   code lines          : 77
+   comment lines       : 0
+   end-of-line comments: 14
+   comment percentage  : 18.18
+   blank lines         : 27
+
+=== Element metrics ===
+   all type definitions     : 6
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 16
+   all declarations         : 35
+   logical SLOC             : 51
+   maximal unit nesting     : 2
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 1
+   expression complexity    : 0
+   cyclomatic complexity    : 1
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   PACK1 (package at lines  56: 78)
+
+   === Code line metrics ===
+      all lines           : 23
+      code lines          : 21
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 2
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 15
+      logical SLOC             : 15
+      maximal unit nesting     : 1
+      maximal construct nesting: 2
+
+      PACK_LP (package at lines  60: 66)
+
+      === Code line metrics ===
+         all lines           : 7
+         code lines          : 7
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 0
+         all declarations         : 5
+         logical SLOC             : 5
+         maximal construct nesting: 1
+
+      PACK2 (package at lines  68: 74)
+
+      === Code line metrics ===
+         all lines           : 7
+         code lines          : 7
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 0
+         all declarations         : 5
+         logical SLOC             : 5
+         maximal construct nesting: 1
+
+   PACK1 (package body at lines  80: 134)
+
+   === Code line metrics ===
+      all lines           : 55
+      code lines          : 41
+      comment lines       : 0
+      end-of-line comments: 14
+      comment percentage  : 34.14
+      blank lines         : 14
+
+   === Element metrics ===
+      all statements           : 12
+      all declarations         : 19
+      logical SLOC             : 31
+      maximal construct nesting: 2
+
+   === Complexity metrics ===
+      statement complexity     : 7
+      expression complexity    : 0
+      cyclomatic complexity    : 7
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  4.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  4.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

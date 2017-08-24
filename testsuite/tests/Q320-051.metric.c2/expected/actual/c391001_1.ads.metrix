@@ -1,0 +1,80 @@
+Metrics computed for src/c391001_1.ads
+containing package C391001_1
+
+=== Code line metrics ===
+  all lines           : 66
+  code lines          : 14
+  comment lines       : 51
+  end-of-line comments: 2
+  comment percentage  : 81.53
+  blank lines         : 1
+
+C391001_1 (package - library item at lines  51: 66)
+
+=== Code line metrics ===
+   all lines           : 16
+   code lines          : 14
+   comment lines       : 2
+   end-of-line comments: 2
+   comment percentage  : 25.00
+   blank lines         : 0
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 1
+   private types            : 1
+   all type definitions     : 1
+   public subprograms       : 4
+   all statements           : 0
+   all declarations         : 15
+   logical SLOC             : 15
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Create (procedure at lines  54: 54)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   "=" (function at lines  56: 56)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   TC_Match (function at lines  57: 58)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Serial_Number (function at lines  59: 59)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0

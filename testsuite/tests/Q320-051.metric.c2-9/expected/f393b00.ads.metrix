@@ -1,0 +1,62 @@
+Metrics computed for src/f393b00.ads
+containing package F393B00
+
+=== Code line metrics ===
+  all lines           : 88
+  code lines          : 24
+  comment lines       : 46
+  end-of-line comments: 1
+  comment percentage  : 67.14
+  blank lines         : 18
+
+F393B00 (package - library item at lines  41: 88)
+
+=== Code line metrics ===
+   all lines           : 48
+   code lines          : 24
+   comment lines       : 7
+   end-of-line comments: 1
+   comment percentage  : 25.80
+   blank lines         : 17
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 7
+   private types            : 1
+   all type definitions     : 7
+   public subprograms       : 4
+   all statements           : 0
+   all declarations         : 32
+   logical SLOC             : 32
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Handle (procedure at lines  45: 45)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   Handle (procedure at lines  52: 52)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   Handle (procedure at lines  65: 65)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Handle (procedure at lines  77: 77)
+
+   === Contract metrics ===
+      contract complexity      : 1

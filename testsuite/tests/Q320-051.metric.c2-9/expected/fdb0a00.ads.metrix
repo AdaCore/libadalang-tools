@@ -1,0 +1,77 @@
+Metrics computed for src/fdb0a00.ads
+containing package FDB0A00
+
+=== Code line metrics ===
+  all lines           : 78
+  code lines          : 29
+  comment lines       : 37
+  end-of-line comments: 0
+  comment percentage  : 56.06
+  blank lines         : 12
+
+FDB0A00 (package - library item at lines  43: 78)
+
+=== Code line metrics ===
+   all lines           : 36
+   code lines          : 26
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 10
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 1
+   private types            : 1
+   all type definitions     : 1
+   public subprograms       : 4
+   all statements           : 0
+   all declarations         : 22
+   logical SLOC             : 22
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Allocate (procedure at lines  48: 52)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 4
+      IN parameters            : 2
+      OUT parameters           : 1
+      IN OUT parameters        : 1
+
+   Deallocate (procedure at lines  54: 58)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 4
+      IN parameters            : 3
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Storage_Size (function at lines  60: 61)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   TC_Largest_Request (function at lines  63: 63)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0

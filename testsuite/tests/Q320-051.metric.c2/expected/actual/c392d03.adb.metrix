@@ -1,0 +1,48 @@
+Metrics computed for src/c392d03.adb
+containing procedure body C392D03
+
+=== Code line metrics ===
+  all lines           : 104
+  code lines          : 51
+  comment lines       : 17
+  end-of-line comments: 0
+  comment percentage  : 25.00
+  blank lines         : 36
+
+C392D03 (procedure body - library item at lines  11: 104)
+
+=== Code line metrics ===
+   all lines           : 94
+   code lines          : 48
+   comment lines       : 16
+   end-of-line comments: 0
+   comment percentage  : 25.00
+   blank lines         : 30
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 20
+   all declarations         : 15
+   logical SLOC             : 35
+   maximal construct nesting: 2
+   all parameters           : 2
+   IN parameters            : 1
+   OUT parameters           : 0
+   IN OUT parameters        : 1
+
+=== Complexity metrics ===
+   statement complexity     : 7
+   expression complexity    : 0
+   cyclomatic complexity    : 7
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  7.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  7.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

@@ -1,0 +1,46 @@
+Metrics computed for src/c452001_3.ads
+containing package C452001_3
+
+=== Code line metrics ===
+  all lines           : 24
+  code lines          : 15
+  comment lines       : 2
+  end-of-line comments: 0
+  comment percentage  : 11.76
+  blank lines         : 7
+
+C452001_3 (package - library item at lines  2: 24)
+
+=== Code line metrics ===
+   all lines           : 23
+   code lines          : 15
+   comment lines       : 2
+   end-of-line comments: 0
+   comment percentage  : 11.76
+   blank lines         : 6
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 5
+   all type definitions     : 5
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 23
+   logical SLOC             : 23
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   "=" (function at lines  15: 15)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0

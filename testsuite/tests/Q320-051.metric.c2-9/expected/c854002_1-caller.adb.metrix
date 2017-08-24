@@ -1,0 +1,99 @@
+Metrics computed for src/c854002_1-caller.adb
+containing package body C854002_1.Caller
+
+=== Code line metrics ===
+  all lines           : 53
+  code lines          : 40
+  comment lines       : 8
+  end-of-line comments: 0
+  comment percentage  : 16.66
+  blank lines         : 5
+
+C854002_1.Caller (package body - library item at lines  4: 53)
+
+=== Code line metrics ===
+   all lines           : 50
+   code lines          : 38
+   comment lines       : 8
+   end-of-line comments: 0
+   comment percentage  : 17.39
+   blank lines         : 4
+
+=== Element metrics ===
+   all subprogram bodies    : 2
+   all statements           : 16
+   all declarations         : 6
+   logical SLOC             : 22
+   maximal unit nesting     : 1
+   maximal construct nesting: 4
+
+=== Complexity metrics ===
+   statement complexity     : 1
+   expression complexity    : 0
+   cyclomatic complexity    : 1
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   Call_Renamed_F (procedure body at lines  8: 29)
+
+   === Code line metrics ===
+      all lines           : 22
+      code lines          : 16
+      comment lines       : 6
+      end-of-line comments: 0
+      comment percentage  : 27.27
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 7
+      all declarations         : 2
+      logical SLOC             : 9
+      maximal construct nesting: 3
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 3
+      expression complexity    : 0
+      cyclomatic complexity    : 3
+      essential complexity     : 2
+      maximum loop nesting     : 0
+      extra exit points        : 1
+
+   Call_Renamed_G (procedure body at lines  31: 46)
+
+   === Code line metrics ===
+      all lines           : 16
+      code lines          : 16
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 7
+      all declarations         : 2
+      logical SLOC             : 9
+      maximal construct nesting: 3
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 3
+      expression complexity    : 0
+      cyclomatic complexity    : 3
+      essential complexity     : 2
+      maximum loop nesting     : 0
+      extra exit points        : 1
+
+=== Average complexity metrics ===
+      statement_complexity     :  2.33
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  2.33
+      essential_complexity     :  1.66
+      max_loop_nesting         :  0.00

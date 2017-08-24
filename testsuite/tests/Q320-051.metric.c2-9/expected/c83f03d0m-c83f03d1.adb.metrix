@@ -1,0 +1,93 @@
+Metrics computed for src/c83f03d0m-c83f03d1.adb
+containing package body subunit C83F03D0M.C83F03D1
+
+=== Code line metrics ===
+  all lines           : 82
+  code lines          : 38
+  comment lines       : 26
+  end-of-line comments: 0
+  comment percentage  : 40.62
+  blank lines         : 18
+
+C83F03D1 (package body - subunit at lines  34: 82)
+
+=== Code line metrics ===
+   all lines           : 49
+   code lines          : 37
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 12
+
+=== Element metrics ===
+   all type definitions     : 1
+   all subprogram bodies    : 1
+   all statements           : 36
+   all declarations         : 8
+   logical SLOC             : 44
+   maximal unit nesting     : 1
+   maximal construct nesting: 2
+
+=== Complexity metrics ===
+   statement complexity     : 1
+   expression complexity    : 0
+   cyclomatic complexity    : 1
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   BUMP (procedure body at lines  40: 43)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 1
+      logical SLOC             : 2
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   P (package body at lines  45: 76)
+
+   === Code line metrics ===
+      all lines           : 32
+      code lines          : 27
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 5
+
+   === Element metrics ===
+      all statements           : 34
+      all declarations         : 1
+      logical SLOC             : 35
+      maximal construct nesting: 1
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

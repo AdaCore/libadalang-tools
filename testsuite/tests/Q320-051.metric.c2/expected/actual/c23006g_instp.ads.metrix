@@ -1,0 +1,27 @@
+Metrics computed for src/c23006g_instp.ads
+containing procedure instance C23006G_INSTP
+
+=== Code line metrics ===
+  all lines           : 4
+  code lines          : 3
+  comment lines       : 0
+  end-of-line comments: 0
+  comment percentage  : 0.00
+  blank lines         : 1
+
+C23006G_INSTP (procedure instantiation - library item at lines  4: 4)
+
+=== Code line metrics ===
+   all lines           : 1
+   code lines          : 1
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 0
+
+=== Element metrics ===
+   all statements           : 0
+   all declarations         : 1
+   logical SLOC             : 1
+   maximal construct nesting: 1
+   all parameters           : 0

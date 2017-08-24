@@ -1,0 +1,98 @@
+Metrics computed for src/c43214e.adb
+containing procedure body C43214E
+
+=== Code line metrics ===
+  all lines           : 147
+  code lines          : 72
+  comment lines       : 34
+  end-of-line comments: 0
+  comment percentage  : 32.07
+  blank lines         : 41
+
+C43214E (procedure body - library item at lines  32: 147)
+
+=== Code line metrics ===
+   all lines           : 116
+   code lines          : 71
+   comment lines       : 8
+   end-of-line comments: 0
+   comment percentage  : 10.12
+   blank lines         : 37
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 3
+   all statements           : 26
+   all declarations         : 11
+   logical SLOC             : 37
+   maximal unit nesting     : 1
+   maximal construct nesting: 6
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 7
+   expression complexity    : 0
+   cyclomatic complexity    : 7
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   PROC1 (procedure body at lines  90: 101)
+
+   === Code line metrics ===
+      all lines           : 12
+      code lines          : 12
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 4
+      all declarations         : 2
+      logical SLOC             : 6
+      maximal construct nesting: 2
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 4
+      expression complexity    : 0
+      cyclomatic complexity    : 4
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   PROC1 (procedure body at lines  120: 131)
+
+   === Code line metrics ===
+      all lines           : 12
+      code lines          : 12
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 4
+      all declarations         : 1
+      logical SLOC             : 5
+      maximal construct nesting: 2
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 4
+      expression complexity    : 0
+      cyclomatic complexity    : 4
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  5.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  5.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

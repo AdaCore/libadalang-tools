@@ -1,0 +1,58 @@
+Metrics computed for src/c730001_3.ads
+containing package C730001_3
+
+=== Code line metrics ===
+  all lines           : 33
+  code lines          : 16
+  comment lines       : 4
+  end-of-line comments: 0
+  comment percentage  : 20.00
+  blank lines         : 13
+
+C730001_3 (package - library item at lines  10: 33)
+
+=== Code line metrics ===
+   all lines           : 24
+   code lines          : 13
+   comment lines       : 3
+   end-of-line comments: 0
+   comment percentage  : 18.75
+   blank lines         : 8
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 2
+   private types            : 2
+   all type definitions     : 2
+   public subprograms       : 2
+   all statements           : 0
+   all declarations         : 11
+   logical SLOC             : 11
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   TC_Get_Phone_Status (function at lines  18: 18)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   TC_Get_Indicator (function at lines  19: 19)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0

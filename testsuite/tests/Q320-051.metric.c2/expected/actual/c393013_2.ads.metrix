@@ -1,0 +1,34 @@
+Metrics computed for src/c393013_2.ads
+containing package C393013_2
+
+=== Code line metrics ===
+  all lines           : 7
+  code lines          : 4
+  comment lines       : 2
+  end-of-line comments: 0
+  comment percentage  : 33.33
+  blank lines         : 1
+
+C393013_2 (package - library item at lines  3: 7)
+
+=== Code line metrics ===
+   all lines           : 5
+   code lines          : 3
+   comment lines       : 2
+   end-of-line comments: 0
+   comment percentage  : 40.00
+   blank lines         : 0
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 1
+   all type definitions     : 1
+   public subprograms       : 0
+   all statements           : 0
+   all declarations         : 2
+   logical SLOC             : 2
+   maximal construct nesting: 1

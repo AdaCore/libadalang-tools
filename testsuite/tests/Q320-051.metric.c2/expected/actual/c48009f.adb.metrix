@@ -1,0 +1,45 @@
+Metrics computed for src/c48009f.adb
+containing procedure body C48009F
+
+=== Code line metrics ===
+  all lines           : 99
+  code lines          : 48
+  comment lines       : 32
+  end-of-line comments: 0
+  comment percentage  : 40.00
+  blank lines         : 19
+
+C48009F (procedure body - library item at lines  38: 99)
+
+=== Code line metrics ===
+   all lines           : 62
+   code lines          : 47
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 15
+
+=== Element metrics ===
+   all type definitions     : 9
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 18
+   all declarations         : 13
+   logical SLOC             : 31
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 1
+   expression complexity    : 0
+   cyclomatic complexity    : 1
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

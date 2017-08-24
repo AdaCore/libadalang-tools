@@ -1,0 +1,116 @@
+Metrics computed for src/c460006_0-c460006_1-c460006_2-c460006_3.adb
+containing package body C460006_0.C460006_1.C460006_2.C460006_3
+
+=== Code line metrics ===
+  all lines           : 28
+  code lines          : 17
+  comment lines       : 3
+  end-of-line comments: 1
+  comment percentage  : 20.00
+  blank lines         : 8
+
+C460006_0.C460006_1.C460006_2.C460006_3 (package body - library item at lines  6: 28)
+
+=== Code line metrics ===
+   all lines           : 23
+   code lines          : 17
+   comment lines       : 2
+   end-of-line comments: 1
+   comment percentage  : 15.78
+   blank lines         : 4
+
+=== Element metrics ===
+   all subprogram bodies    : 3
+   all statements           : 4
+   all declarations         : 8
+   logical SLOC             : 12
+   maximal unit nesting     : 1
+   maximal construct nesting: 2
+
+   Inner_Proc (procedure body at lines  8: 11)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 2
+      logical SLOC             : 3
+      maximal construct nesting: 1
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Outer_Proc (procedure body at lines  14: 18)
+
+   === Code line metrics ===
+      all lines           : 5
+      code lines          : 5
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 2
+      all declarations         : 2
+      logical SLOC             : 4
+      maximal construct nesting: 1
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   ClassWide_Func (function body at lines  21: 26)
+
+   === Code line metrics ===
+      all lines           : 6
+      code lines          : 6
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 16.66
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 3
+      logical SLOC             : 4
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

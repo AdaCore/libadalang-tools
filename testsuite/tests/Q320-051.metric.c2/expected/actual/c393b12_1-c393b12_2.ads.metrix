@@ -1,0 +1,26 @@
+Metrics computed for src/c393b12_1-c393b12_2.ads
+containing package instance C393B12_1.C393B12_2
+
+=== Code line metrics ===
+  all lines           : 8
+  code lines          : 4
+  comment lines       : 2
+  end-of-line comments: 0
+  comment percentage  : 33.33
+  blank lines         : 2
+
+C393B12_1.C393B12_2 (package instantiation - library item at lines  6: 8)
+
+=== Code line metrics ===
+   all lines           : 3
+   code lines          : 2
+   comment lines       : 1
+   end-of-line comments: 0
+   comment percentage  : 33.33
+   blank lines         : 0
+
+=== Element metrics ===
+   all statements           : 0
+   all declarations         : 1
+   logical SLOC             : 1
+   maximal construct nesting: 1

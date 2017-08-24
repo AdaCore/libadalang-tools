@@ -1,0 +1,125 @@
+Metrics computed for src/c9a011b.adb
+containing procedure body C9A011B
+
+=== Code line metrics ===
+  all lines           : 101
+  code lines          : 54
+  comment lines       : 29
+  end-of-line comments: 0
+  comment percentage  : 34.93
+  blank lines         : 18
+
+C9A011B (procedure body - library item at lines  35: 101)
+
+=== Code line metrics ===
+   all lines           : 67
+   code lines          : 52
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 15
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 22
+   all declarations         : 8
+   logical SLOC             : 30
+   maximal unit nesting     : 1
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 2
+   expression complexity    : 0
+   cyclomatic complexity    : 2
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   TIMED_ENTRY (task object at lines  37: 39)
+
+   === Code line metrics ===
+      all lines           : 3
+      code lines          : 3
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 2
+      logical SLOC             : 2
+      maximal construct nesting: 1
+
+   OWNER (task object at lines  41: 44)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 3
+      logical SLOC             : 3
+      maximal construct nesting: 1
+
+   TIMED_ENTRY (task body at lines  46: 62)
+
+   === Code line metrics ===
+      all lines           : 17
+      code lines          : 16
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 1
+
+   === Element metrics ===
+      all statements           : 8
+      all declarations         : 1
+      logical SLOC             : 9
+      maximal construct nesting: 2
+
+   === Complexity metrics ===
+      statement complexity     : 2
+      expression complexity    : 0
+      cyclomatic complexity    : 2
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   OWNER (task body at lines  64: 76)
+
+   === Code line metrics ===
+      all lines           : 13
+      code lines          : 10
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 3
+
+   === Element metrics ===
+      all statements           : 5
+      all declarations         : 1
+      logical SLOC             : 6
+      maximal construct nesting: 3
+
+   === Complexity metrics ===
+      statement complexity     : 2
+      expression complexity    : 0
+      cyclomatic complexity    : 2
+      essential complexity     : 1
+      maximum loop nesting     : 1
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  2.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  2.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  1.00

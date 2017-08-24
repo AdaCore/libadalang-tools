@@ -1,0 +1,26 @@
+Metrics computed for src/c730002_4.ads
+containing package instance C730002_4
+
+=== Code line metrics ===
+  all lines           : 7
+  code lines          : 4
+  comment lines       : 1
+  end-of-line comments: 0
+  comment percentage  : 20.00
+  blank lines         : 2
+
+C730002_4 (package instantiation - library item at lines  7: 7)
+
+=== Code line metrics ===
+   all lines           : 1
+   code lines          : 1
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 0
+
+=== Element metrics ===
+   all statements           : 0
+   all declarations         : 1
+   logical SLOC             : 1
+   maximal construct nesting: 1

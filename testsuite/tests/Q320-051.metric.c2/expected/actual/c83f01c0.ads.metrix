@@ -1,0 +1,62 @@
+Metrics computed for src/c83f01c0.ads
+containing package C83F01C0
+
+=== Code line metrics ===
+  all lines           : 55
+  code lines          : 12
+  comment lines       : 31
+  end-of-line comments: 0
+  comment percentage  : 72.09
+  blank lines         : 12
+
+C83F01C0 (package - library item at lines  38: 55)
+
+=== Code line metrics ===
+   all lines           : 18
+   code lines          : 12
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 6
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 10
+   logical SLOC             : 10
+   maximal unit nesting     : 1
+   maximal construct nesting: 2
+
+   P (package at lines  42: 51)
+
+   === Code line metrics ===
+      all lines           : 10
+      code lines          : 8
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 2
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 7
+      logical SLOC             : 7
+      maximal construct nesting: 1
+
+   REQUIRE_BODY (procedure at lines  53: 53)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0

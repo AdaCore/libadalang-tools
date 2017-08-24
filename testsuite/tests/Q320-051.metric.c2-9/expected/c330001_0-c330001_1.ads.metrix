@@ -1,0 +1,26 @@
+Metrics computed for src/c330001_0-c330001_1.ads
+containing private package C330001_0.C330001_1
+
+=== Code line metrics ===
+  all lines           : 28
+  code lines          : 11
+  comment lines       : 7
+  end-of-line comments: 1
+  comment percentage  : 44.44
+  blank lines         : 10
+
+C330001_0.C330001_1 (package - library item at lines  7: 28)
+
+=== Code line metrics ===
+   all lines           : 22
+   code lines          : 8
+   comment lines       : 6
+   end-of-line comments: 0
+   comment percentage  : 42.85
+   blank lines         : 8
+
+=== Element metrics ===
+   all statements           : 0
+   all declarations         : 6
+   logical SLOC             : 6
+   maximal construct nesting: 1

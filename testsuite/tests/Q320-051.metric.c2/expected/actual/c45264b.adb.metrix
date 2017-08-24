@@ -1,0 +1,45 @@
+Metrics computed for src/c45264b.adb
+containing procedure body C45264B
+
+=== Code line metrics ===
+  all lines           : 88
+  code lines          : 38
+  comment lines       : 28
+  end-of-line comments: 0
+  comment percentage  : 42.42
+  blank lines         : 22
+
+C45264B (procedure body - library item at lines  34: 88)
+
+=== Code line metrics ===
+   all lines           : 55
+   code lines          : 37
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 18
+
+=== Element metrics ===
+   all type definitions     : 2
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 17
+   all declarations         : 7
+   logical SLOC             : 24
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 6
+   expression complexity    : 0
+   cyclomatic complexity    : 6
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  6.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  6.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

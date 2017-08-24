@@ -1,0 +1,62 @@
+Metrics computed for src/c48009j.adb
+containing procedure body C48009J
+
+=== Code line metrics ===
+  all lines           : 132
+  code lines          : 80
+  comment lines       : 30
+  end-of-line comments: 0
+  comment percentage  : 27.27
+  blank lines         : 22
+
+C48009J (procedure body - library item at lines  36: 132)
+
+=== Code line metrics ===
+   all lines           : 97
+   code lines          : 79
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 18
+
+=== Element metrics ===
+   all type definitions     : 13
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 23
+   all declarations         : 26
+   logical SLOC             : 49
+   maximal unit nesting     : 1
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 1
+   expression complexity    : 0
+   cyclomatic complexity    : 1
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   P (package at lines  57: 69)
+
+   === Code line metrics ===
+      all lines           : 13
+      code lines          : 13
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 9
+      logical SLOC             : 9
+      maximal construct nesting: 1
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

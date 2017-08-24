@@ -1,0 +1,45 @@
+Metrics computed for src/c330002.adb
+containing procedure body C330002
+
+=== Code line metrics ===
+  all lines           : 191
+  code lines          : 129
+  comment lines       : 11
+  end-of-line comments: 24
+  comment percentage  : 25.00
+  blank lines         : 51
+
+C330002 (procedure body - library item at lines  8: 191)
+
+=== Code line metrics ===
+   all lines           : 184
+   code lines          : 126
+   comment lines       : 10
+   end-of-line comments: 24
+   comment percentage  : 25.00
+   blank lines         : 48
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 57
+   all declarations         : 16
+   logical SLOC             : 73
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 10
+   expression complexity    : 0
+   cyclomatic complexity    : 10
+   essential complexity     : 1
+   maximum loop nesting     : 1
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  10.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  10.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  1.00

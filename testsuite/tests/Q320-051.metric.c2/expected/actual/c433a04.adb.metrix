@@ -1,0 +1,45 @@
+Metrics computed for src/c433a04.adb
+containing procedure body C433A04
+
+=== Code line metrics ===
+  all lines           : 255
+  code lines          : 180
+  comment lines       : 61
+  end-of-line comments: 0
+  comment percentage  : 25.31
+  blank lines         : 14
+
+C433A04 (procedure body - library item at lines  52: 255)
+
+=== Code line metrics ===
+   all lines           : 204
+   code lines          : 176
+   comment lines       : 14
+   end-of-line comments: 0
+   comment percentage  : 7.36
+   blank lines         : 14
+
+=== Element metrics ===
+   all type definitions     : 7
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 84
+   all declarations         : 40
+   logical SLOC             : 124
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 23
+   expression complexity    : 0
+   cyclomatic complexity    : 23
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  23.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  23.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

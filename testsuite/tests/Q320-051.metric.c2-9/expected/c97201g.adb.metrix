@@ -1,0 +1,85 @@
+Metrics computed for src/c97201g.adb
+containing procedure body C97201G
+
+=== Code line metrics ===
+  all lines           : 133
+  code lines          : 60
+  comment lines       : 32
+  end-of-line comments: 4
+  comment percentage  : 39.13
+  blank lines         : 41
+
+C97201G (procedure body - library item at lines  36: 133)
+
+=== Code line metrics ===
+   all lines           : 98
+   code lines          : 59
+   comment lines       : 4
+   end-of-line comments: 4
+   comment percentage  : 12.69
+   blank lines         : 35
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 24
+   all declarations         : 11
+   logical SLOC             : 35
+   maximal unit nesting     : 1
+   maximal construct nesting: 5
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 5
+   expression complexity    : 0
+   cyclomatic complexity    : 5
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   T (task object at lines  58: 61)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 4
+      logical SLOC             : 4
+      maximal construct nesting: 1
+
+   T (task body at lines  64: 89)
+
+   === Code line metrics ===
+      all lines           : 26
+      code lines          : 19
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 5.26
+      blank lines         : 7
+
+   === Element metrics ===
+      all statements           : 8
+      all declarations         : 2
+      logical SLOC             : 10
+      maximal construct nesting: 3
+
+   === Complexity metrics ===
+      statement complexity     : 4
+      expression complexity    : 0
+      cyclomatic complexity    : 4
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  4.50
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  4.50
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

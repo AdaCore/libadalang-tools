@@ -1,0 +1,202 @@
+Metrics computed for src/c41328a.adb
+containing procedure body C41328A
+
+=== Code line metrics ===
+  all lines           : 100
+  code lines          : 57
+  comment lines       : 26
+  end-of-line comments: 0
+  comment percentage  : 31.32
+  blank lines         : 17
+
+C41328A (procedure body - library item at lines  31: 100)
+
+=== Code line metrics ===
+   all lines           : 70
+   code lines          : 56
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 14
+
+=== Element metrics ===
+   all type definitions     : 2
+   public subprograms       : unknown
+   all subprogram bodies    : 3
+   all statements           : 22
+   all declarations         : 19
+   logical SLOC             : 41
+   maximal unit nesting     : 3
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 5
+   expression complexity    : 0
+   cyclomatic complexity    : 5
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   P (package at lines  33: 40)
+
+   === Code line metrics ===
+      all lines           : 8
+      code lines          : 8
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 8
+      logical SLOC             : 8
+      maximal unit nesting     : 2
+      maximal construct nesting: 2
+
+      Q (package at lines  34: 38)
+
+      === Code line metrics ===
+         all lines           : 5
+         code lines          : 5
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 0
+         all declarations         : 6
+         logical SLOC             : 6
+         maximal unit nesting     : 1
+         maximal construct nesting: 1
+
+         INIT (function at lines  36: 36)
+
+         === Element metrics ===
+            all parameters           : 1
+            IN parameters            : 1
+            OUT parameters           : 0
+            IN OUT parameters        : 0
+
+         SWAP (procedure at lines  37: 37)
+
+         === Element metrics ===
+            all parameters           : 1
+            IN parameters            : 0
+            OUT parameters           : 0
+            IN OUT parameters        : 1
+
+   P (package body at lines  45: 71)
+
+   === Code line metrics ===
+      all lines           : 27
+      code lines          : 22
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 5
+
+   === Element metrics ===
+      all statements           : 8
+      all declarations         : 8
+      logical SLOC             : 16
+      maximal unit nesting     : 2
+      maximal construct nesting: 3
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+      Q (package body at lines  47: 67)
+
+      === Code line metrics ===
+         all lines           : 21
+         code lines          : 18
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 3
+
+      === Element metrics ===
+         all statements           : 7
+         all declarations         : 7
+         logical SLOC             : 14
+         maximal unit nesting     : 1
+         maximal construct nesting: 2
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+         INIT (function body at lines  49: 55)
+
+         === Code line metrics ===
+            all lines           : 7
+            code lines          : 7
+            comment lines       : 0
+            end-of-line comments: 0
+            comment percentage  : 0.00
+            blank lines         : 0
+
+         === Element metrics ===
+            all statements           : 3
+            all declarations         : 3
+            logical SLOC             : 6
+            maximal construct nesting: 1
+            all parameters           : 1
+            IN parameters            : 1
+            OUT parameters           : 0
+            IN OUT parameters        : 0
+
+         === Complexity metrics ===
+            statement complexity     : 1
+            expression complexity    : 0
+            cyclomatic complexity    : 1
+            essential complexity     : 1
+            maximum loop nesting     : 0
+            extra exit points        : 0
+
+         SWAP (procedure body at lines  57: 63)
+
+         === Code line metrics ===
+            all lines           : 7
+            code lines          : 7
+            comment lines       : 0
+            end-of-line comments: 0
+            comment percentage  : 0.00
+            blank lines         : 0
+
+         === Element metrics ===
+            all statements           : 3
+            all declarations         : 3
+            logical SLOC             : 6
+            maximal construct nesting: 1
+            all parameters           : 1
+            IN parameters            : 0
+            OUT parameters           : 0
+            IN OUT parameters        : 1
+
+         === Complexity metrics ===
+            statement complexity     : 1
+            expression complexity    : 0
+            cyclomatic complexity    : 1
+            essential complexity     : 1
+            maximum loop nesting     : 0
+            extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.79
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.79
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

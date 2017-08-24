@@ -1,0 +1,111 @@
+Metrics computed for src/c83027c.adb
+containing procedure body C83027C
+
+=== Code line metrics ===
+  all lines           : 157
+  code lines          : 97
+  comment lines       : 33
+  end-of-line comments: 1
+  comment percentage  : 26.15
+  blank lines         : 27
+
+C83027C (procedure body - library item at lines  38: 157)
+
+=== Code line metrics ===
+   all lines           : 120
+   code lines          : 96
+   comment lines       : 0
+   end-of-line comments: 1
+   comment percentage  : 1.04
+   blank lines         : 24
+
+=== Element metrics ===
+   all type definitions     : 6
+   public subprograms       : unknown
+   all subprogram bodies    : 2
+   all statements           : 31
+   all declarations         : 37
+   logical SLOC             : 68
+   maximal unit nesting     : 1
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 1
+   expression complexity    : 0
+   cyclomatic complexity    : 1
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   GEN_FUN (function body at lines  45: 48)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 1
+      logical SLOC             : 2
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   P_ONE (generic package at lines  70: 90)
+
+   === Code line metrics ===
+      all lines           : 21
+      code lines          : 21
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 21
+      logical SLOC             : 21
+      maximal construct nesting: 1
+
+   P_ONE (package body at lines  92: 148)
+
+   === Code line metrics ===
+      all lines           : 57
+      code lines          : 45
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 12
+
+   === Element metrics ===
+      all statements           : 26
+      all declarations         : 4
+      logical SLOC             : 30
+      maximal construct nesting: 2
+
+   === Complexity metrics ===
+      statement complexity     : 14
+      expression complexity    : 0
+      cyclomatic complexity    : 14
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  5.33
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  5.33
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

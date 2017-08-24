@@ -1,0 +1,68 @@
+Metrics computed for src/c730003_0-c730003_2.ads
+containing package C730003_0.C730003_2
+
+=== Code line metrics ===
+  all lines           : 21
+  code lines          : 11
+  comment lines       : 3
+  end-of-line comments: 0
+  comment percentage  : 21.42
+  blank lines         : 7
+
+C730003_0.C730003_2 (package - library item at lines  5: 21)
+
+=== Code line metrics ===
+   all lines           : 17
+   code lines          : 10
+   comment lines       : 2
+   end-of-line comments: 0
+   comment percentage  : 16.66
+   blank lines         : 5
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 1
+   all type definitions     : 1
+   public subprograms       : 3
+   all statements           : 0
+   all declarations         : 12
+   logical SLOC             : 12
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Get_View (function at lines  17: 17)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Update_View (procedure at lines  18: 18)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Hide_From_View (procedure at lines  19: 19)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1

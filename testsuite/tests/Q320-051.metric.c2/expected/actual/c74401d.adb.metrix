@@ -1,0 +1,228 @@
+Metrics computed for src/c74401d.adb
+containing procedure body C74401D
+
+=== Code line metrics ===
+  all lines           : 111
+  code lines          : 64
+  comment lines       : 29
+  end-of-line comments: 2
+  comment percentage  : 33.33
+  blank lines         : 18
+
+C74401D (procedure body - library item at lines  35: 111)
+
+=== Code line metrics ===
+   all lines           : 77
+   code lines          : 63
+   comment lines       : 0
+   end-of-line comments: 2
+   comment percentage  : 3.17
+   blank lines         : 14
+
+=== Element metrics ===
+   all type definitions     : 2
+   public subprograms       : unknown
+   all subprogram bodies    : 4
+   all statements           : 16
+   all declarations         : 35
+   logical SLOC             : 51
+   maximal unit nesting     : 2
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 4
+   expression complexity    : 0
+   cyclomatic complexity    : 4
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   P (package at lines  37: 48)
+
+   === Code line metrics ===
+      all lines           : 12
+      code lines          : 12
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 13
+      logical SLOC             : 13
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      P1 (procedure at lines  39: 39)
+
+      === Element metrics ===
+         all parameters           : 1
+         IN parameters            : 0
+         OUT parameters           : 1
+         IN OUT parameters        : 0
+
+      P2 (procedure at lines  40: 40)
+
+      === Element metrics ===
+         all parameters           : 1
+         IN parameters            : 0
+         OUT parameters           : 1
+         IN OUT parameters        : 0
+
+      EQ (function at lines  41: 41)
+
+      === Element metrics ===
+         all parameters           : 2
+         IN parameters            : 2
+         OUT parameters           : 0
+         IN OUT parameters        : 0
+
+   P (package body at lines  50: 65)
+
+   === Code line metrics ===
+      all lines           : 16
+      code lines          : 14
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 2
+
+   === Element metrics ===
+      all statements           : 3
+      all declarations         : 7
+      logical SLOC             : 10
+      maximal unit nesting     : 1
+      maximal construct nesting: 2
+
+      P1 (procedure body at lines  51: 54)
+
+      === Code line metrics ===
+         all lines           : 4
+         code lines          : 4
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 1
+         all declarations         : 2
+         logical SLOC             : 3
+         maximal construct nesting: 1
+         all parameters           : 1
+         IN parameters            : 0
+         OUT parameters           : 1
+         IN OUT parameters        : 0
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+      P2 (procedure body at lines  56: 59)
+
+      === Code line metrics ===
+         all lines           : 4
+         code lines          : 4
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 1
+         all declarations         : 2
+         logical SLOC             : 3
+         maximal construct nesting: 1
+         all parameters           : 1
+         IN parameters            : 0
+         OUT parameters           : 1
+         IN OUT parameters        : 0
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+      EQ (function body at lines  61: 64)
+
+      === Code line metrics ===
+         all lines           : 4
+         code lines          : 4
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 1
+         all declarations         : 2
+         logical SLOC             : 3
+         maximal construct nesting: 1
+         all parameters           : 2
+         IN parameters            : 2
+         OUT parameters           : 0
+         IN OUT parameters        : 0
+
+      === Complexity metrics ===
+         statement complexity     : 1
+         expression complexity    : 0
+         cyclomatic complexity    : 1
+         essential complexity     : 1
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+   GPACK (generic package at lines  67: 75)
+
+   === Code line metrics ===
+      all lines           : 9
+      code lines          : 9
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 11.11
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 10
+      logical SLOC             : 10
+      maximal construct nesting: 1
+
+   GPACK (package body at lines  77: 81)
+
+   === Code line metrics ===
+      all lines           : 5
+      code lines          : 5
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 2
+      all declarations         : 1
+      logical SLOC             : 3
+      maximal construct nesting: 1
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.60
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.60
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

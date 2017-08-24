@@ -1,0 +1,44 @@
+Metrics computed for src/fdb0a00-comparator.ads
+containing package FDB0A00.Comparator
+
+=== Code line metrics ===
+  all lines           : 10
+  code lines          : 5
+  comment lines       : 1
+  end-of-line comments: 0
+  comment percentage  : 16.66
+  blank lines         : 4
+
+FDB0A00.Comparator (package - library item at lines  5: 10)
+
+=== Code line metrics ===
+   all lines           : 6
+   code lines          : 4
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 2
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 3
+   logical SLOC             : 3
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   "=" (function at lines  7: 8)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0

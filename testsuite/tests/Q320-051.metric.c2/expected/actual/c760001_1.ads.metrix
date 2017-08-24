@@ -1,0 +1,101 @@
+Metrics computed for src/c760001_1.ads
+containing package C760001_1
+
+=== Code line metrics ===
+  all lines           : 27
+  code lines          : 18
+  comment lines       : 1
+  end-of-line comments: 0
+  comment percentage  : 5.26
+  blank lines         : 8
+
+C760001_1 (package - library item at lines  6: 27)
+
+=== Code line metrics ===
+   all lines           : 22
+   code lines          : 16
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 6
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 3
+   all type definitions     : 3
+   public subprograms       : 6
+   all statements           : 0
+   all declarations         : 23
+   logical SLOC             : 23
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Initialize (procedure at lines  14: 14)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Adjust (procedure at lines  15: 15)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Finalize (procedure at lines  16: 16)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Initialize (procedure at lines  23: 23)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Adjust (procedure at lines  24: 24)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Finalize (procedure at lines  25: 25)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1

@@ -1,0 +1,131 @@
+Metrics computed for src/c974011_0.ads
+containing package C974011_0
+
+=== Code line metrics ===
+  all lines           : 104
+  code lines          : 31
+  comment lines       : 51
+  end-of-line comments: 2
+  comment percentage  : 64.63
+  blank lines         : 22
+
+C974011_0 (package - library item at lines  53: 104)
+
+=== Code line metrics ===
+   all lines           : 52
+   code lines          : 30
+   comment lines       : 1
+   end-of-line comments: 2
+   comment percentage  : 9.67
+   blank lines         : 21
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 5
+   private types            : 3
+   all type definitions     : 5
+   public subprograms       : 5
+   all statements           : 0
+   all declarations         : 32
+   logical SLOC             : 32
+   maximal unit nesting     : 2
+   maximal construct nesting: 1
+
+   Key_PO (protected object at lines  59: 64)
+
+   === Code line metrics ===
+      all lines           : 6
+      code lines          : 6
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 5
+      logical SLOC             : 5
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      Set (procedure at lines  60: 60)
+
+      === Contract metrics ===
+         contract complexity      : 1
+
+      === Element metrics ===
+         all parameters           : 1
+         IN parameters            : 1
+         OUT parameters           : 0
+         IN OUT parameters        : 0
+
+      Value (function at lines  61: 61)
+
+      === Contract metrics ===
+         contract complexity      : 1
+
+      === Element metrics ===
+         all parameters           : 0
+
+   ATM_Keyboard_Task (task type at lines  84: 86)
+
+   === Code line metrics ===
+      all lines           : 3
+      code lines          : 3
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 2
+      logical SLOC             : 2
+      maximal construct nesting: 1
+
+   Read_Card (procedure at lines  88: 88)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Validate_Card (procedure at lines  90: 90)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Perform_Transaction (procedure at lines  92: 92)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0

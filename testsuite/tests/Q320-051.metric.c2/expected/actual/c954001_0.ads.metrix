@@ -1,0 +1,81 @@
+Metrics computed for src/c954001_0.ads
+containing package C954001_0
+
+=== Code line metrics ===
+  all lines           : 103
+  code lines          : 23
+  comment lines       : 61
+  end-of-line comments: 11
+  comment percentage  : 85.71
+  blank lines         : 19
+
+C954001_0 (package - library item at lines  52: 103)
+
+=== Code line metrics ===
+   all lines           : 52
+   code lines          : 23
+   comment lines       : 11
+   end-of-line comments: 11
+   comment percentage  : 64.70
+   blank lines         : 18
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 3
+   all type definitions     : 3
+   public subprograms       : 3
+   all statements           : 0
+   all declarations         : 21
+   logical SLOC             : 21
+   maximal unit nesting     : 2
+   maximal construct nesting: 1
+
+   Disk_Device (protected object at lines  78: 100)
+
+   === Code line metrics ===
+      all lines           : 23
+      code lines          : 13
+      comment lines       : 2
+      end-of-line comments: 10
+      comment percentage  : 80.00
+      blank lines         : 8
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 13
+      logical SLOC             : 13
+      maximal unit nesting     : 1
+      maximal construct nesting: 1
+
+      Disk_Interrupt (procedure at lines  83: 83)
+
+      === Contract metrics ===
+         contract complexity      : 1
+
+      === Element metrics ===
+         all parameters           : 0
+
+      TC_Track (function at lines  86: 86)
+
+      === Contract metrics ===
+         contract complexity      : 1
+
+      === Element metrics ===
+         all parameters           : 0
+
+      TC_Pending_Queued (function at lines  88: 88)
+
+      === Contract metrics ===
+         contract complexity      : 1
+
+      === Element metrics ===
+         all parameters           : 0

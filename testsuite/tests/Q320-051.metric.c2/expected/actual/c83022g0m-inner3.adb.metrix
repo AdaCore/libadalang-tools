@@ -1,0 +1,47 @@
+Metrics computed for src/c83022g0m-inner3.adb
+containing function body subunit C83022G0M.INNER3
+
+=== Code line metrics ===
+  all lines           : 32
+  code lines          : 26
+  comment lines       : 0
+  end-of-line comments: 0
+  comment percentage  : 0.00
+  blank lines         : 6
+
+INNER3 (function body - subunit at lines  3: 32)
+
+=== Code line metrics ===
+   all lines           : 30
+   code lines          : 25
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 5
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 13
+   all declarations         : 4
+   logical SLOC             : 17
+   maximal construct nesting: 2
+   all parameters           : 1
+   IN parameters            : 1
+   OUT parameters           : 0
+   IN OUT parameters        : 0
+
+=== Complexity metrics ===
+   statement complexity     : 7
+   expression complexity    : 0
+   cyclomatic complexity    : 7
+   essential complexity     : 2
+   maximum loop nesting     : 0
+   extra exit points        : 1
+
+=== Average complexity metrics ===
+      statement_complexity     :  7.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  7.00
+      essential_complexity     :  2.00
+      max_loop_nesting         :  0.00

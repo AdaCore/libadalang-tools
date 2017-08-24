@@ -1,0 +1,68 @@
+Metrics computed for src/c460005_0.ads
+containing package C460005_0
+
+=== Code line metrics ===
+  all lines           : 90
+  code lines          : 14
+  comment lines       : 66
+  end-of-line comments: 0
+  comment percentage  : 82.50
+  blank lines         : 10
+
+C460005_0 (package - library item at lines  68: 90)
+
+=== Code line metrics ===
+   all lines           : 23
+   code lines          : 14
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 9
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 3
+   all type definitions     : 3
+   public subprograms       : 3
+   all statements           : 0
+   all declarations         : 13
+   logical SLOC             : 13
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Proc (procedure at lines  74: 74)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Proc (procedure at lines  81: 81)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Proc (procedure at lines  88: 88)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1

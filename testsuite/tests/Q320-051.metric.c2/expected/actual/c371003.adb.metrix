@@ -1,0 +1,99 @@
+Metrics computed for src/c371003.adb
+containing procedure body C371003
+
+=== Code line metrics ===
+  all lines           : 474
+  code lines          : 332
+  comment lines       : 84
+  end-of-line comments: 36
+  comment percentage  : 28.84
+  blank lines         : 58
+
+C371003 (procedure body - library item at lines  54: 474)
+
+=== Code line metrics ===
+   all lines           : 421
+   code lines          : 331
+   comment lines       : 34
+   end-of-line comments: 36
+   comment percentage  : 19.17
+   blank lines         : 56
+
+=== Element metrics ===
+   all type definitions     : 15
+   public subprograms       : unknown
+   all subprogram bodies    : 3
+   all statements           : 101
+   all declarations         : 59
+   logical SLOC             : 160
+   maximal unit nesting     : 1
+   maximal construct nesting: 6
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 13
+   expression complexity    : 0
+   cyclomatic complexity    : 13
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   Chk (function body at lines  69: 78)
+
+   === Code line metrics ===
+      all lines           : 10
+      code lines          : 10
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 3
+      all declarations         : 4
+      logical SLOC             : 7
+      maximal construct nesting: 2
+      all parameters           : 3
+      IN parameters            : 3
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 2
+      expression complexity    : 0
+      cyclomatic complexity    : 2
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Func1 (function body at lines  81: 85)
+
+   === Code line metrics ===
+      all lines           : 5
+      code lines          : 5
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 2
+      all declarations         : 1
+      logical SLOC             : 3
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  5.33
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  5.33
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

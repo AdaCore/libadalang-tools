@@ -1,0 +1,44 @@
+Metrics computed for src/c3a0008.adb
+containing procedure body C3A0008
+
+=== Code line metrics ===
+  all lines           : 44
+  code lines          : 26
+  comment lines       : 1
+  end-of-line comments: 0
+  comment percentage  : 3.70
+  blank lines         : 17
+
+C3A0008 (procedure body - library item at lines  10: 44)
+
+=== Code line metrics ===
+   all lines           : 35
+   code lines          : 24
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 11
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 11
+   all declarations         : 2
+   logical SLOC             : 13
+   maximal construct nesting: 2
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 4
+   expression complexity    : 0
+   cyclomatic complexity    : 4
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  4.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  4.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

@@ -1,0 +1,46 @@
+Metrics computed for src/c390003_4.ads
+containing package C390003_4
+
+=== Code line metrics ===
+  all lines           : 17
+  code lines          : 11
+  comment lines       : 1
+  end-of-line comments: 1
+  comment percentage  : 16.66
+  blank lines         : 5
+
+C390003_4 (package - library item at lines  6: 17)
+
+=== Code line metrics ===
+   all lines           : 12
+   code lines          : 9
+   comment lines       : 0
+   end-of-line comments: 1
+   comment percentage  : 11.11
+   blank lines         : 3
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 1
+   all type definitions     : 1
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 9
+   logical SLOC             : 9
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   TC_Validate (procedure at lines  15: 15)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0

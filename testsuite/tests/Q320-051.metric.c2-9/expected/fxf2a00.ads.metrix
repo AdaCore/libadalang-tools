@@ -1,0 +1,40 @@
+Metrics computed for src/fxf2a00.ads
+containing package FXF2A00
+
+=== Code line metrics ===
+  all lines           : 70
+  code lines          : 17
+  comment lines       : 43
+  end-of-line comments: 6
+  comment percentage  : 81.66
+  blank lines         : 10
+
+FXF2A00 (package - library item at lines  45: 70)
+
+=== Code line metrics ===
+   all lines           : 26
+   code lines          : 17
+   comment lines       : 0
+   end-of-line comments: 6
+   comment percentage  : 35.29
+   blank lines         : 9
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 3
+   all type definitions     : 7
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 16
+   logical SLOC             : 16
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Operations_Loop (generic function at lines  56: 68)
+
+   === Contract metrics ===
+      contract complexity      : 1

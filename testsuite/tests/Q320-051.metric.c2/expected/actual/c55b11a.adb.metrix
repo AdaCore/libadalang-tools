@@ -1,0 +1,74 @@
+Metrics computed for src/c55b11a.adb
+containing procedure body C55B11A
+
+=== Code line metrics ===
+  all lines           : 104
+  code lines          : 59
+  comment lines       : 29
+  end-of-line comments: 0
+  comment percentage  : 32.95
+  blank lines         : 16
+
+C55B11A (procedure body - library item at lines  34: 104)
+
+=== Code line metrics ===
+   all lines           : 71
+   code lines          : 58
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 13
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : unknown
+   all subprogram bodies    : 2
+   all statements           : 23
+   all declarations         : 22
+   logical SLOC             : 45
+   maximal unit nesting     : 1
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 5
+   expression complexity    : 0
+   cyclomatic complexity    : 5
+   essential complexity     : 1
+   maximum loop nesting     : 1
+   extra exit points        : 0
+
+   CHECK_VAR (procedure body at lines  50: 78)
+
+   === Code line metrics ===
+      all lines           : 29
+      code lines          : 24
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 5
+
+   === Element metrics ===
+      all statements           : 11
+      all declarations         : 2
+      logical SLOC             : 13
+      maximal construct nesting: 3
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 9
+      expression complexity    : 0
+      cyclomatic complexity    : 9
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  7.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  7.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  1.00

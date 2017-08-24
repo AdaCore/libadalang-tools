@@ -1,0 +1,57 @@
+Metrics computed for src/c3a0010_0.ads
+containing generic package C3A0010_0
+
+=== Code line metrics ===
+  all lines           : 63
+  code lines          : 11
+  comment lines       : 46
+  end-of-line comments: 0
+  comment percentage  : 80.70
+  blank lines         : 6
+
+C3A0010_0 (generic package - library item at lines  47: 63)
+
+=== Code line metrics ===
+   all lines           : 17
+   code lines          : 11
+   comment lines       : 1
+   end-of-line comments: 0
+   comment percentage  : 8.33
+   blank lines         : 5
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 1
+   all type definitions     : 2
+   public subprograms       : 2
+   all statements           : 0
+   all declarations         : 11
+   logical SLOC             : 11
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Add (procedure at lines  57: 58)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 3
+      IN parameters            : 2
+      OUT parameters           : 1
+      IN OUT parameters        : 0
+
+   Subtract (procedure at lines  60: 61)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 3
+      IN parameters            : 2
+      OUT parameters           : 1
+      IN OUT parameters        : 0

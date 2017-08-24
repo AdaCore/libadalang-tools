@@ -1,0 +1,68 @@
+Metrics computed for src/c540001_1.ads
+containing package C540001_1
+
+=== Code line metrics ===
+  all lines           : 20
+  code lines          : 15
+  comment lines       : 1
+  end-of-line comments: 1
+  comment percentage  : 12.50
+  blank lines         : 4
+
+C540001_1 (package - library item at lines  5: 20)
+
+=== Code line metrics ===
+   all lines           : 16
+   code lines          : 14
+   comment lines       : 0
+   end-of-line comments: 1
+   comment percentage  : 7.14
+   blank lines         : 2
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 4
+   all type definitions     : 4
+   public subprograms       : 3
+   all statements           : 0
+   all declarations         : 22
+   logical SLOC             : 22
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Get_Small_Int (function at lines  10: 10)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Assign_Mixed (procedure at lines  11: 12)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 1
+      IN OUT parameters        : 0
+
+   Get_Tagged (function at lines  18: 18)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0

@@ -1,0 +1,74 @@
+Metrics computed for src/c64104k.adb
+containing procedure body C64104K
+
+=== Code line metrics ===
+  all lines           : 95
+  code lines          : 37
+  comment lines       : 40
+  end-of-line comments: 0
+  comment percentage  : 51.94
+  blank lines         : 18
+
+C64104K (procedure body - library item at lines  44: 95)
+
+=== Code line metrics ===
+   all lines           : 52
+   code lines          : 36
+   comment lines       : 2
+   end-of-line comments: 0
+   comment percentage  : 5.26
+   blank lines         : 14
+
+=== Element metrics ===
+   all type definitions     : 3
+   public subprograms       : unknown
+   all subprogram bodies    : 2
+   all statements           : 11
+   all declarations         : 11
+   logical SLOC             : 22
+   maximal unit nesting     : 1
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 1
+   expression complexity    : 0
+   cyclomatic complexity    : 1
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   P (procedure body at lines  68: 75)
+
+   === Code line metrics ===
+      all lines           : 8
+      code lines          : 8
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 3
+      all declarations         : 2
+      logical SLOC             : 5
+      maximal construct nesting: 1
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 1
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

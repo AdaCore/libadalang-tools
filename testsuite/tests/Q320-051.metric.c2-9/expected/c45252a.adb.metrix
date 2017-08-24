@@ -1,0 +1,45 @@
+Metrics computed for src/c45252a.adb
+containing procedure body C45252A
+
+=== Code line metrics ===
+  all lines           : 200
+  code lines          : 117
+  comment lines       : 53
+  end-of-line comments: 0
+  comment percentage  : 31.17
+  blank lines         : 30
+
+C45252A (procedure body - library item at lines  43: 200)
+
+=== Code line metrics ===
+   all lines           : 158
+   code lines          : 116
+   comment lines       : 17
+   end-of-line comments: 0
+   comment percentage  : 12.78
+   blank lines         : 25
+
+=== Element metrics ===
+   all type definitions     : 2
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 47
+   all declarations         : 3
+   logical SLOC             : 50
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 10
+   expression complexity    : 0
+   cyclomatic complexity    : 10
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  10.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  10.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

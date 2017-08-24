@@ -1,0 +1,93 @@
+Metrics computed for src/c93005c_pk1.ads
+containing package C93005C_PK1
+
+=== Code line metrics ===
+  all lines           : 88
+  code lines          : 18
+  comment lines       : 56
+  end-of-line comments: 0
+  comment percentage  : 75.67
+  blank lines         : 14
+
+C93005C_PK1 (package - library item at lines  41: 88)
+
+=== Code line metrics ===
+   all lines           : 48
+   code lines          : 15
+   comment lines       : 23
+   end-of-line comments: 0
+   comment percentage  : 60.52
+   blank lines         : 10
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 4
+   all type definitions     : 4
+   public subprograms       : 2
+   all statements           : 0
+   all declarations         : 10
+   logical SLOC             : 10
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   UNACTIVATED (task type at lines  44: 46)
+
+   === Code line metrics ===
+      all lines           : 3
+      code lines          : 3
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 2
+      logical SLOC             : 2
+      maximal construct nesting: 1
+
+   MNT_TASK (task type at lines  65: 66)
+
+   === Code line metrics ===
+      all lines           : 2
+      code lines          : 2
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Contract metrics ===
+      contract                 : 0
+      post                     : 0
+      contract complete        : nyi
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 1
+      logical SLOC             : 1
+      maximal construct nesting: 1
+
+   F (function at lines  68: 68)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   CHECK (procedure at lines  81: 81)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0

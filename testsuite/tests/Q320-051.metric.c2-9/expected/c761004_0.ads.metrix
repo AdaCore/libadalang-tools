@@ -1,0 +1,79 @@
+Metrics computed for src/c761004_0.ads
+containing package C761004_0
+
+=== Code line metrics ===
+  all lines           : 18
+  code lines          : 13
+  comment lines       : 1
+  end-of-line comments: 0
+  comment percentage  : 7.14
+  blank lines         : 4
+
+C761004_0 (package - library item at lines  5: 18)
+
+=== Code line metrics ===
+   all lines           : 14
+   code lines          : 12
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 2
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 2
+   all type definitions     : 2
+   public subprograms       : 4
+   all statements           : 0
+   all declarations         : 13
+   logical SLOC             : 13
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Initialize (procedure at lines  9: 9)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Finalize (procedure at lines  10: 10)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Initialize (procedure at lines  15: 15)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Finalize (procedure at lines  16: 16)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1

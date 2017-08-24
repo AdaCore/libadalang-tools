@@ -1,0 +1,45 @@
+Metrics computed for src/c35503o.adb
+containing procedure body C35503O
+
+=== Code line metrics ===
+  all lines           : 125
+  code lines          : 79
+  comment lines       : 29
+  end-of-line comments: 0
+  comment percentage  : 26.85
+  blank lines         : 17
+
+C35503O (procedure body - library item at lines  35: 125)
+
+=== Code line metrics ===
+   all lines           : 91
+   code lines          : 78
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 13
+
+=== Element metrics ===
+   all type definitions     : 2
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 39
+   all declarations         : 10
+   logical SLOC             : 49
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 19
+   expression complexity    : 0
+   cyclomatic complexity    : 19
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  19.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  19.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

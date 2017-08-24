@@ -1,0 +1,57 @@
+Metrics computed for src/c760009_2.ads
+containing package C760009_2
+
+=== Code line metrics ===
+  all lines           : 19
+  code lines          : 12
+  comment lines       : 1
+  end-of-line comments: 0
+  comment percentage  : 7.69
+  blank lines         : 6
+
+C760009_2 (package - library item at lines  6: 19)
+
+=== Code line metrics ===
+   all lines           : 14
+   code lines          : 10
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 4
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 1
+   all type definitions     : 1
+   public subprograms       : 2
+   all statements           : 0
+   all declarations         : 10
+   logical SLOC             : 10
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Initialize (procedure at lines  13: 13)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Finalize (procedure at lines  14: 14)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1

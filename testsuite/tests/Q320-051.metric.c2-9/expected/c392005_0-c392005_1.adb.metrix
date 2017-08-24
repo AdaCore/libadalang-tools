@@ -1,0 +1,147 @@
+Metrics computed for src/c392005_0-c392005_1.adb
+containing package body C392005_0.C392005_1
+
+=== Code line metrics ===
+  all lines           : 36
+  code lines          : 20
+  comment lines       : 7
+  end-of-line comments: 0
+  comment percentage  : 25.92
+  blank lines         : 9
+
+C392005_0.C392005_1 (package body - library item at lines  6: 36)
+
+=== Code line metrics ===
+   all lines           : 31
+   code lines          : 20
+   comment lines       : 6
+   end-of-line comments: 0
+   comment percentage  : 23.07
+   blank lines         : 5
+
+=== Element metrics ===
+   all subprogram bodies    : 4
+   all statements           : 4
+   all declarations         : 11
+   logical SLOC             : 15
+   maximal unit nesting     : 1
+   maximal construct nesting: 2
+
+   Focus (procedure body at lines  8: 13)
+
+   === Code line metrics ===
+      all lines           : 6
+      code lines          : 5
+      comment lines       : 1
+      end-of-line comments: 0
+      comment percentage  : 16.66
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 3
+      logical SLOC             : 4
+      maximal construct nesting: 1
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Set_Shutter_Speed (procedure body at lines  16: 21)
+
+   === Code line metrics ===
+      all lines           : 6
+      code lines          : 5
+      comment lines       : 1
+      end-of-line comments: 0
+      comment percentage  : 16.66
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 3
+      logical SLOC             : 4
+      maximal construct nesting: 1
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   Set_Aperture (function body at lines  24: 28)
+
+   === Code line metrics ===
+      all lines           : 5
+      code lines          : 4
+      comment lines       : 1
+      end-of-line comments: 0
+      comment percentage  : 20.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 2
+      logical SLOC             : 3
+      maximal construct nesting: 1
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   TC_Get_Aper (function body at lines  31: 34)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 2
+      logical SLOC             : 3
+      maximal construct nesting: 1
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

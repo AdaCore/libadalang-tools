@@ -1,0 +1,45 @@
+Metrics computed for src/c45531l.adb
+containing procedure body C45531L
+
+=== Code line metrics ===
+  all lines           : 154
+  code lines          : 75
+  comment lines       : 52
+  end-of-line comments: 3
+  comment percentage  : 43.30
+  blank lines         : 27
+
+C45531L (procedure body - library item at lines  51: 154)
+
+=== Code line metrics ===
+   all lines           : 104
+   code lines          : 74
+   comment lines       : 7
+   end-of-line comments: 3
+   comment percentage  : 12.34
+   blank lines         : 23
+
+=== Element metrics ===
+   all type definitions     : 3
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 23
+   all declarations         : 23
+   logical SLOC             : 46
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 7
+   expression complexity    : 0
+   cyclomatic complexity    : 7
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  7.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  7.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

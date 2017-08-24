@@ -1,0 +1,151 @@
+Metrics computed for src/c94008d.adb
+containing procedure body C94008D
+
+=== Code line metrics ===
+  all lines           : 92
+  code lines          : 69
+  comment lines       : 0
+  end-of-line comments: 0
+  comment percentage  : 0.00
+  blank lines         : 23
+
+C94008D (procedure body - library item at lines  6: 92)
+
+=== Code line metrics ===
+   all lines           : 87
+   code lines          : 65
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 22
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 2
+   all statements           : 27
+   all declarations         : 12
+   logical SLOC             : 39
+   maximal unit nesting     : 2
+   maximal construct nesting: 7
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 2
+   expression complexity    : 0
+   cyclomatic complexity    : 2
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   ENTER_TERMINATE (function body at lines  15: 19)
+
+   === Code line metrics ===
+      all lines           : 5
+      code lines          : 5
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 2
+      all declarations         : 1
+      logical SLOC             : 3
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   T1 (task object at lines  27: 29)
+
+   === Code line metrics ===
+      all lines           : 3
+      code lines          : 3
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 2
+      logical SLOC             : 2
+      maximal construct nesting: 1
+
+   T1 (task body at lines  31: 77)
+
+   === Code line metrics ===
+      all lines           : 47
+      code lines          : 36
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 11
+
+   === Element metrics ===
+      all statements           : 17
+      all declarations         : 4
+      logical SLOC             : 21
+      maximal unit nesting     : 1
+      maximal construct nesting: 5
+
+   === Complexity metrics ===
+      statement complexity     : 2
+      expression complexity    : 0
+      cyclomatic complexity    : 2
+      essential complexity     : 2
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+      T2 (task object at lines  35: 37)
+
+      === Code line metrics ===
+         all lines           : 3
+         code lines          : 3
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 0
+
+      === Element metrics ===
+         all statements           : 0
+         all declarations         : 2
+         logical SLOC             : 2
+         maximal construct nesting: 1
+
+      T2 (task body at lines  39: 63)
+
+      === Code line metrics ===
+         all lines           : 25
+         code lines          : 19
+         comment lines       : 0
+         end-of-line comments: 0
+         comment percentage  : 0.00
+         blank lines         : 6
+
+      === Element metrics ===
+         all statements           : 11
+         all declarations         : 1
+         logical SLOC             : 12
+         maximal construct nesting: 3
+
+      === Complexity metrics ===
+         statement complexity     : 5
+         expression complexity    : 0
+         cyclomatic complexity    : 5
+         essential complexity     : 2
+         maximum loop nesting     : 0
+         extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  2.50
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  2.50
+      essential_complexity     :  1.50
+      max_loop_nesting         :  0.00

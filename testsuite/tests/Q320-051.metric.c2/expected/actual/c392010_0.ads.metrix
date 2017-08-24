@@ -1,0 +1,109 @@
+Metrics computed for src/c392010_0.ads
+containing package C392010_0
+
+=== Code line metrics ===
+  all lines           : 98
+  code lines          : 19
+  comment lines       : 64
+  end-of-line comments: 2
+  comment percentage  : 79.51
+  blank lines         : 15
+
+C392010_0 (package - library item at lines  61: 98)
+
+=== Code line metrics ===
+   all lines           : 38
+   code lines          : 19
+   comment lines       : 7
+   end-of-line comments: 2
+   comment percentage  : 34.61
+   blank lines         : 12
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 2
+   all type definitions     : 2
+   public subprograms       : 7
+   all statements           : 0
+   all declarations         : 21
+   logical SLOC             : 21
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Proc_1 (procedure at lines  70: 70)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Proc_2 (procedure at lines  72: 72)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   A_Default_Value (function at lines  74: 74)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   Proc_w_Ap_and_Cp (procedure at lines  76: 77)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Proc_w_Ap_and_Cp_w_Def (procedure at lines  80: 82)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Proc_w_Cp_Ap (procedure at lines  88: 88)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Func_w_Cp_Ap_and_Cr (function at lines  91: 92)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0

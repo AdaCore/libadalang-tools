@@ -1,0 +1,44 @@
+Metrics computed for src/c86006i.adb
+containing procedure body C86006I
+
+=== Code line metrics ===
+  all lines           : 103
+  code lines          : 42
+  comment lines       : 37
+  end-of-line comments: 0
+  comment percentage  : 46.83
+  blank lines         : 24
+
+C86006I (procedure body - library item at lines  35: 103)
+
+=== Code line metrics ===
+   all lines           : 69
+   code lines          : 41
+   comment lines       : 7
+   end-of-line comments: 0
+   comment percentage  : 14.58
+   blank lines         : 21
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 20
+   all declarations         : 6
+   logical SLOC             : 26
+   maximal construct nesting: 2
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 10
+   expression complexity    : 0
+   cyclomatic complexity    : 10
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  10.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  10.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

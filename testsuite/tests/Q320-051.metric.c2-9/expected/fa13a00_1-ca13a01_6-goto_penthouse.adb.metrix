@@ -1,0 +1,44 @@
+Metrics computed for src/fa13a00_1-ca13a01_6-goto_penthouse.adb
+containing procedure body subunit FA13A00_1.CA13A01_6.GoTo_Penthouse
+
+=== Code line metrics ===
+  all lines           : 50
+  code lines          : 21
+  comment lines       : 12
+  end-of-line comments: 16
+  comment percentage  : 84.84
+  blank lines         : 17
+
+GoTo_Penthouse (procedure body - subunit at lines  8: 50)
+
+=== Code line metrics ===
+   all lines           : 43
+   code lines          : 20
+   comment lines       : 10
+   end-of-line comments: 16
+   comment percentage  : 86.66
+   blank lines         : 13
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 12
+   all declarations         : 1
+   logical SLOC             : 13
+   maximal construct nesting: 2
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 5
+   expression complexity    : 0
+   cyclomatic complexity    : 5
+   essential complexity     : 1
+   maximum loop nesting     : 1
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  5.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  5.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  1.00

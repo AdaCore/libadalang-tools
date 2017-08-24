@@ -1,0 +1,130 @@
+Metrics computed for src/c47002a.adb
+containing procedure body C47002A
+
+=== Code line metrics ===
+  all lines           : 107
+  code lines          : 55
+  comment lines       : 27
+  end-of-line comments: 2
+  comment percentage  : 35.36
+  blank lines         : 25
+
+C47002A (procedure body - library item at lines  32: 107)
+
+=== Code line metrics ===
+   all lines           : 76
+   code lines          : 54
+   comment lines       : 0
+   end-of-line comments: 2
+   comment percentage  : 3.70
+   blank lines         : 22
+
+=== Element metrics ===
+   all type definitions     : 8
+   public subprograms       : unknown
+   all subprogram bodies    : 4
+   all statements           : 21
+   all declarations         : 31
+   logical SLOC             : 52
+   maximal unit nesting     : 1
+   maximal construct nesting: 3
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 8
+   expression complexity    : 0
+   cyclomatic complexity    : 8
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   F (function body at lines  77: 80)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 2
+      logical SLOC             : 3
+      maximal construct nesting: 1
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   F (function body at lines  82: 85)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 2
+      logical SLOC             : 3
+      maximal construct nesting: 1
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   F (function body at lines  87: 90)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 2
+      logical SLOC             : 3
+      maximal construct nesting: 1
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  2.75
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  2.75
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

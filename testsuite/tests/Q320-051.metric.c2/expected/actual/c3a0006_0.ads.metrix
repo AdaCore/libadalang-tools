@@ -1,0 +1,68 @@
+Metrics computed for src/c3a0006_0.ads
+containing package C3A0006_0
+
+=== Code line metrics ===
+  all lines           : 66
+  code lines          : 13
+  comment lines       : 44
+  end-of-line comments: 0
+  comment percentage  : 77.19
+  blank lines         : 9
+
+C3A0006_0 (package - library item at lines  46: 66)
+
+=== Code line metrics ===
+   all lines           : 21
+   code lines          : 13
+   comment lines       : 1
+   end-of-line comments: 0
+   comment percentage  : 7.14
+   blank lines         : 7
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 1
+   all type definitions     : 1
+   public subprograms       : 3
+   all statements           : 0
+   all declarations         : 15
+   logical SLOC             : 15
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Sine (function at lines  60: 60)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Cos (function at lines  62: 62)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   Tan (function at lines  64: 64)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 0

@@ -1,0 +1,44 @@
+Metrics computed for src/c36301b.adb
+containing procedure body C36301B
+
+=== Code line metrics ===
+  all lines           : 55
+  code lines          : 17
+  comment lines       : 27
+  end-of-line comments: 0
+  comment percentage  : 61.36
+  blank lines         : 11
+
+C36301B (procedure body - library item at lines  33: 55)
+
+=== Code line metrics ===
+   all lines           : 23
+   code lines          : 16
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 7
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 8
+   all declarations         : 2
+   logical SLOC             : 10
+   maximal construct nesting: 2
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 4
+   expression complexity    : 0
+   cyclomatic complexity    : 4
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  4.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  4.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

@@ -1,0 +1,30 @@
+Metrics computed for src/fb40a00-cb40a020_0-cb40a020_1.ads
+containing private procedure FB40A00.CB40A020_0.CB40A020_1
+
+=== Code line metrics ===
+  all lines           : 8
+  code lines          : 2
+  comment lines       : 2
+  end-of-line comments: 0
+  comment percentage  : 50.00
+  blank lines         : 4
+
+FB40A00.CB40A020_0.CB40A020_1 (procedure - library item at lines  8: 8)
+
+=== Code line metrics ===
+   all lines           : 1
+   code lines          : 1
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 0
+
+=== Element metrics ===
+   all statements           : 0
+   all declarations         : 2
+   logical SLOC             : 2
+   maximal construct nesting: 1
+   all parameters           : 1
+   IN parameters            : 1
+   OUT parameters           : 0
+   IN OUT parameters        : 0

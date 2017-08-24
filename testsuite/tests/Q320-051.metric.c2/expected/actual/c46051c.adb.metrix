@@ -1,0 +1,45 @@
+Metrics computed for src/c46051c.adb
+containing procedure body C46051C
+
+=== Code line metrics ===
+  all lines           : 120
+  code lines          : 67
+  comment lines       : 31
+  end-of-line comments: 0
+  comment percentage  : 31.63
+  blank lines         : 22
+
+C46051C (procedure body - library item at lines  38: 120)
+
+=== Code line metrics ===
+   all lines           : 83
+   code lines          : 65
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 18
+
+=== Element metrics ===
+   all type definitions     : 5
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 20
+   all declarations         : 14
+   logical SLOC             : 34
+   maximal construct nesting: 2
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 9
+   expression complexity    : 0
+   cyclomatic complexity    : 9
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  9.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  9.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

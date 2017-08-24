@@ -1,0 +1,34 @@
+Metrics computed for src/c761006_1.ads
+containing package C761006_1
+
+=== Code line metrics ===
+  all lines           : 23
+  code lines          : 16
+  comment lines       : 1
+  end-of-line comments: 0
+  comment percentage  : 5.88
+  blank lines         : 6
+
+C761006_1 (package - library item at lines  6: 23)
+
+=== Code line metrics ===
+   all lines           : 18
+   code lines          : 14
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 4
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 3
+   all type definitions     : 3
+   public subprograms       : 0
+   all statements           : 0
+   all declarations         : 10
+   logical SLOC             : 10
+   maximal construct nesting: 1

@@ -1,0 +1,70 @@
+Metrics computed for src/c45220b.adb
+containing procedure body C45220B
+
+=== Code line metrics ===
+  all lines           : 191
+  code lines          : 105
+  comment lines       : 34
+  end-of-line comments: 0
+  comment percentage  : 24.46
+  blank lines         : 52
+
+C45220B (procedure body - library item at lines  37: 191)
+
+=== Code line metrics ===
+   all lines           : 155
+   code lines          : 104
+   comment lines       : 5
+   end-of-line comments: 0
+   comment percentage  : 4.58
+   blank lines         : 46
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 2
+   all statements           : 179
+   all declarations         : 11
+   logical SLOC             : 190
+   maximal unit nesting     : 1
+   maximal construct nesting: 2
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 69
+   expression complexity    : 0
+   cyclomatic complexity    : 69
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   BUMP (procedure body at lines  54: 57)
+
+   === Code line metrics ===
+      all lines           : 4
+      code lines          : 4
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 1
+      logical SLOC             : 2
+      maximal construct nesting: 1
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  35.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  35.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

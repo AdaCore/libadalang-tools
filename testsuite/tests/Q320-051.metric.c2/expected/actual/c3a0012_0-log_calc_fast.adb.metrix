@@ -1,0 +1,47 @@
+Metrics computed for src/c3a0012_0-log_calc_fast.adb
+containing procedure body subunit C3A0012_0.Log_Calc_Fast
+
+=== Code line metrics ===
+  all lines           : 51
+  code lines          : 7
+  comment lines       : 43
+  end-of-line comments: 0
+  comment percentage  : 86.00
+  blank lines         : 1
+
+Log_Calc_Fast (procedure body - subunit at lines  46: 51)
+
+=== Code line metrics ===
+   all lines           : 6
+   code lines          : 6
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 0
+
+=== Element metrics ===
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 2
+   all declarations         : 3
+   logical SLOC             : 5
+   maximal construct nesting: 1
+   all parameters           : 2
+   IN parameters            : 1
+   OUT parameters           : 1
+   IN OUT parameters        : 0
+
+=== Complexity metrics ===
+   statement complexity     : 1
+   expression complexity    : 0
+   cyclomatic complexity    : 1
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

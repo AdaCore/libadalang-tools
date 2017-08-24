@@ -1,0 +1,119 @@
+Metrics computed for src/c760010_0-check_formal_tagged.adb
+containing package body C760010_0.Check_Formal_Tagged
+
+=== Code line metrics ===
+  all lines           : 39
+  code lines          : 30
+  comment lines       : 1
+  end-of-line comments: 0
+  comment percentage  : 3.22
+  blank lines         : 8
+
+C760010_0.Check_Formal_Tagged (package body - library item at lines  6: 39)
+
+=== Code line metrics ===
+   all lines           : 34
+   code lines          : 29
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 5
+
+=== Element metrics ===
+   all subprogram bodies    : 3
+   all statements           : 15
+   all declarations         : 7
+   logical SLOC             : 22
+   maximal unit nesting     : 1
+   maximal construct nesting: 3
+
+   Initialize (procedure body at lines  9: 17)
+
+   === Code line metrics ===
+      all lines           : 9
+      code lines          : 9
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 5
+      all declarations         : 2
+      logical SLOC             : 7
+      maximal construct nesting: 2
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   === Complexity metrics ===
+      statement complexity     : 3
+      expression complexity    : 0
+      cyclomatic complexity    : 3
+      essential complexity     : 2
+      maximum loop nesting     : 0
+      extra exit points        : 2
+
+   Adjust (procedure body at lines  19: 27)
+
+   === Code line metrics ===
+      all lines           : 9
+      code lines          : 9
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 5
+      all declarations         : 2
+      logical SLOC             : 7
+      maximal construct nesting: 2
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   === Complexity metrics ===
+      statement complexity     : 3
+      expression complexity    : 0
+      cyclomatic complexity    : 3
+      essential complexity     : 2
+      maximum loop nesting     : 0
+      extra exit points        : 2
+
+   Finalize (procedure body at lines  29: 37)
+
+   === Code line metrics ===
+      all lines           : 9
+      code lines          : 9
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 5
+      all declarations         : 2
+      logical SLOC             : 7
+      maximal construct nesting: 2
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   === Complexity metrics ===
+      statement complexity     : 3
+      expression complexity    : 0
+      cyclomatic complexity    : 3
+      essential complexity     : 2
+      maximum loop nesting     : 0
+      extra exit points        : 2
+
+=== Average complexity metrics ===
+      statement_complexity     :  3.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  3.00
+      essential_complexity     :  2.00
+      max_loop_nesting         :  0.00

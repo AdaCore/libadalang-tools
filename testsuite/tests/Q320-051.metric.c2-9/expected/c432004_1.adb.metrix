@@ -1,0 +1,91 @@
+Metrics computed for src/c432004_1.adb
+containing package body C432004_1
+
+=== Code line metrics ===
+  all lines           : 20
+  code lines          : 13
+  comment lines       : 2
+  end-of-line comments: 0
+  comment percentage  : 13.33
+  blank lines         : 5
+
+C432004_1 (package body - library item at lines  4: 20)
+
+=== Code line metrics ===
+   all lines           : 17
+   code lines          : 13
+   comment lines       : 1
+   end-of-line comments: 0
+   comment percentage  : 7.14
+   blank lines         : 3
+
+=== Element metrics ===
+   all subprogram bodies    : 2
+   all statements           : 2
+   all declarations         : 8
+   logical SLOC             : 10
+   maximal unit nesting     : 1
+   maximal construct nesting: 2
+
+   TC_Correct_Result (function body at lines  6: 10)
+
+   === Code line metrics ===
+      all lines           : 5
+      code lines          : 5
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 3
+      logical SLOC             : 4
+      maximal construct nesting: 1
+      all parameters           : 2
+      IN parameters            : 2
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+   TC_Correct_Result (function body at lines  13: 18)
+
+   === Code line metrics ===
+      all lines           : 6
+      code lines          : 6
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 4
+      logical SLOC             : 5
+      maximal construct nesting: 1
+      all parameters           : 3
+      IN parameters            : 3
+      OUT parameters           : 0
+      IN OUT parameters        : 0
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

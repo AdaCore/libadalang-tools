@@ -1,0 +1,111 @@
+Metrics computed for src/c974013.adb
+containing procedure body C974013
+
+=== Code line metrics ===
+  all lines           : 167
+  code lines          : 63
+  comment lines       : 71
+  end-of-line comments: 10
+  comment percentage  : 60.44
+  blank lines         : 33
+
+C974013 (procedure body - library item at lines  60: 167)
+
+=== Code line metrics ===
+   all lines           : 108
+   code lines          : 60
+   comment lines       : 17
+   end-of-line comments: 10
+   comment percentage  : 35.06
+   blank lines         : 31
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : unknown
+   all subprogram bodies    : 2
+   all statements           : 22
+   all declarations         : 15
+   logical SLOC             : 37
+   maximal unit nesting     : 1
+   maximal construct nesting: 6
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 1
+   expression complexity    : 0
+   cyclomatic complexity    : 1
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   Lengthy_Calculation (procedure body at lines  73: 81)
+
+   === Code line metrics ===
+      all lines           : 9
+      code lines          : 8
+      comment lines       : 1
+      end-of-line comments: 3
+      comment percentage  : 44.44
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 4
+      all declarations         : 1
+      logical SLOC             : 5
+      maximal construct nesting: 2
+      all parameters           : 0
+
+   === Complexity metrics ===
+      statement complexity     : 2
+      expression complexity    : 0
+      cyclomatic complexity    : 2
+      essential complexity     : 2
+      maximum loop nesting     : 1
+      extra exit points        : 0
+
+   Timed_Calculation (task type at lines  87: 89)
+
+   === Code line metrics ===
+      all lines           : 3
+      code lines          : 3
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 3
+      logical SLOC             : 3
+      maximal construct nesting: 1
+
+   Timed_Calculation (task body at lines  92: 143)
+
+   === Code line metrics ===
+      all lines           : 52
+      code lines          : 30
+      comment lines       : 12
+      end-of-line comments: 4
+      comment percentage  : 38.09
+      blank lines         : 10
+
+   === Element metrics ===
+      all statements           : 13
+      all declarations         : 3
+      logical SLOC             : 16
+      maximal construct nesting: 5
+
+   === Complexity metrics ===
+      statement complexity     : 3
+      expression complexity    : 0
+      cyclomatic complexity    : 3
+      essential complexity     : 4
+      maximum loop nesting     : 1
+      extra exit points        : 1
+
+=== Average complexity metrics ===
+      statement_complexity     :  2.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  2.00
+      essential_complexity     :  2.33
+      max_loop_nesting         :  1.00

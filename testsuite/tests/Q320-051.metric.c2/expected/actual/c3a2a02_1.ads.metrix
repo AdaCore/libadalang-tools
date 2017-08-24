@@ -1,0 +1,41 @@
+Metrics computed for src/c3a2a02_1.ads
+containing generic package C3A2A02_1
+
+=== Code line metrics ===
+  all lines           : 11
+  code lines          : 6
+  comment lines       : 1
+  end-of-line comments: 1
+  comment percentage  : 28.57
+  blank lines         : 4
+
+C3A2A02_1 (generic package - library item at lines  7: 11)
+
+=== Code line metrics ===
+   all lines           : 5
+   code lines          : 5
+   comment lines       : 0
+   end-of-line comments: 1
+   comment percentage  : 20.00
+   blank lines         : 0
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 3
+   logical SLOC             : 3
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Dummy (procedure at lines  10: 10)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0

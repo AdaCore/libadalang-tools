@@ -1,0 +1,86 @@
+Metrics computed for src/c93004a.adb
+containing procedure body C93004A
+
+=== Code line metrics ===
+  all lines           : 67
+  code lines          : 32
+  comment lines       : 26
+  end-of-line comments: 1
+  comment percentage  : 46.55
+  blank lines         : 9
+
+C93004A (procedure body - library item at lines  32: 67)
+
+=== Code line metrics ===
+   all lines           : 36
+   code lines          : 30
+   comment lines       : 0
+   end-of-line comments: 1
+   comment percentage  : 3.33
+   blank lines         : 6
+
+=== Element metrics ===
+   all type definitions     : 1
+   public subprograms       : unknown
+   all subprogram bodies    : 1
+   all statements           : 11
+   all declarations         : 6
+   logical SLOC             : 17
+   maximal unit nesting     : 1
+   maximal construct nesting: 4
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 2
+   expression complexity    : 0
+   cyclomatic complexity    : 2
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+   T1 (task object at lines  41: 43)
+
+   === Code line metrics ===
+      all lines           : 3
+      code lines          : 3
+      comment lines       : 0
+      end-of-line comments: 0
+      comment percentage  : 0.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 0
+      all declarations         : 2
+      logical SLOC             : 2
+      maximal construct nesting: 1
+
+   T1 (task body at lines  45: 49)
+
+   === Code line metrics ===
+      all lines           : 5
+      code lines          : 5
+      comment lines       : 0
+      end-of-line comments: 1
+      comment percentage  : 20.00
+      blank lines         : 0
+
+   === Element metrics ===
+      all statements           : 1
+      all declarations         : 2
+      logical SLOC             : 3
+      maximal construct nesting: 2
+
+   === Complexity metrics ===
+      statement complexity     : 1
+      expression complexity    : 0
+      cyclomatic complexity    : 1
+      essential complexity     : 1
+      maximum loop nesting     : 0
+      extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.50
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.50
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00

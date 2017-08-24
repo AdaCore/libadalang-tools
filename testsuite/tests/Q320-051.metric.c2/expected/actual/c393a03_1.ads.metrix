@@ -1,0 +1,77 @@
+Metrics computed for src/c393a03_1.ads
+containing package C393A03_1
+
+=== Code line metrics ===
+  all lines           : 23
+  code lines          : 13
+  comment lines       : 3
+  end-of-line comments: 0
+  comment percentage  : 18.75
+  blank lines         : 7
+
+C393A03_1 (package - library item at lines  5: 23)
+
+=== Code line metrics ===
+   all lines           : 19
+   code lines          : 12
+   comment lines       : 2
+   end-of-line comments: 0
+   comment percentage  : 14.28
+   blank lines         : 5
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public types             : 1
+   private types            : 1
+   all type definitions     : 1
+   public subprograms       : 4
+   all statements           : 0
+   all declarations         : 12
+   logical SLOC             : 12
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Swap (procedure at lines  11: 11)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 2
+
+   Clear (procedure at lines  12: 12)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 1
+      IN parameters            : 0
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Set_Max (procedure at lines  13: 13)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 2
+      IN parameters            : 1
+      OUT parameters           : 0
+      IN OUT parameters        : 1
+
+   Create (function at lines  14: 14)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0

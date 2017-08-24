@@ -1,0 +1,97 @@
+Metrics computed for src/c330001_0-c330001_2.ads
+containing package C330001_0.C330001_2
+
+=== Code line metrics ===
+  all lines           : 39
+  code lines          : 18
+  comment lines       : 3
+  end-of-line comments: 1
+  comment percentage  : 19.04
+  blank lines         : 18
+
+C330001_0.C330001_2 (package - library item at lines  6: 39)
+
+=== Code line metrics ===
+   all lines           : 34
+   code lines          : 16
+   comment lines       : 2
+   end-of-line comments: 0
+   comment percentage  : 11.11
+   blank lines         : 16
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 8
+   all statements           : 0
+   all declarations         : 15
+   logical SLOC             : 15
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Assign_Private_Obj_3 (procedure at lines  20: 20)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   Raised_CE_PublicChild_Obj (function at lines  22: 22)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   Raised_CE_PrivateChild_Obj (function at lines  24: 24)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   Verify_Public_Obj_1 (function at lines  29: 29)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   Verify_Public_Obj_2 (function at lines  31: 31)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   Verify_Private_Obj_1 (function at lines  33: 33)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   Verify_Private_Obj_2 (function at lines  35: 35)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+
+   Verify_Private_Obj_3 (function at lines  37: 37)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
