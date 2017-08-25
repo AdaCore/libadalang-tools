@@ -201,12 +201,23 @@ package Utils.Fast_Vectors is
    --  But don't do Append (etc) while X still exists. Do not call these
    --  without the slicing.
 
+   type Subrange is record
+      First : Index_Type;
+      Last : Extended_Index;
+   end record;
+
+   function Full_Range (Container : Vector) return Subrange is
+     (1, Last_Index (Container));
+
    function Slice
      (Container : Vector;
       First     : Index_Type;
       Last      : Extended_Index)
       return      Elements_Array with
       Post => Slice'Result'First = Index_Type'First;
+
+   function Slice (Container : Vector; R : Subrange) return Elements_Array is
+     (Slice (Container, R.First, R.Last));
 
    function To_Array (Container : Vector) return Elements_Array with
       Post => To_Array'Result'First = Index_Type'First;

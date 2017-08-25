@@ -447,9 +447,11 @@ package body Pp.Formatting is
       Final_Check (Lines_Data, Src_Buf, Cmd);
    end Do_Comments_Only;
 
+   Post_Tree_Phases_Done : exception;
+
    procedure Post_Tree_Phases
      (Lines_Data : in out Lines_Data_Rec;
-      Source_File_Name : String;
+      Messages : out Scanner.Source_Message_Vector;
       Src_Buf : in out Buffer;
       Cmd : Command_Line;
       Partial : Boolean)
@@ -1217,6 +1219,12 @@ package body Pp.Formatting is
                return Line_Breaks (X).Indentation;
             end After_Indentation;
 
+            use Source_Message_Vectors;
+
+            Other_Sloc : constant String :=
+              Sloc_Image (Src_Tokens (Last_Pp_Off_On).Sloc);
+            Message : Source_Message := (Src_Tok.Sloc, others => <>);
+
          --  Start of processing for Insert_Whole_Line_Comment
 
          begin
@@ -1231,17 +1239,19 @@ package body Pp.Formatting is
                      Last_Pp_Off_On := Src_Index;
                      pragma Assert (Last_Pp_Off_On /= 1);
                   else
-                     Cmd_Error_No_Tool_Name
-                       (Message_Image (Source_File_Name, Src_Tok.Sloc) &
-                        ": pretty printing already disabled at " &
-                        Sloc_Image (Src_Tokens (Last_Pp_Off_On).Sloc));
+                     Utils.Char_Vectors.Char_Vectors.Append
+                       (Message.Text,
+                        "pretty printing already disabled at " & Other_Sloc);
+                     Append (Messages, Message);
+                     raise Post_Tree_Phases_Done;
                   end if;
                when Pp_On_Comment =>
                   if Pp_On then
-                     Cmd_Error_No_Tool_Name
-                       (Message_Image (Source_File_Name, Src_Tok.Sloc) &
-                        ": pretty printing already enabled at " &
-                        Sloc_Image (Src_Tokens (Last_Pp_Off_On).Sloc));
+                     Utils.Char_Vectors.Char_Vectors.Append
+                       (Message.Text,
+                        "pretty printing already enabled at " & Other_Sloc);
+                     Append (Messages, Message);
+                     raise Post_Tree_Phases_Done;
                   else
                      Pp_On := True;
                      Last_Pp_Off_On := Src_Index;
@@ -2398,6 +2408,9 @@ package body Pp.Formatting is
       --  code (with some allowed exceptions).
 
       Final_Check (Lines_Data, Src_Buf, Cmd);
+
+   exception
+      when Post_Tree_Phases_Done => null;
    end Post_Tree_Phases;
 
    procedure Raise_Token_Mismatch

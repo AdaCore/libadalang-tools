@@ -10,7 +10,6 @@ with Pp.Command_Lines; use Pp.Command_Lines;
 with Pp.Formatting; use Pp.Formatting;
 with Pp.Formatting.Dictionaries;
 with Pp.Formatting.Tree_Formatting;
-with Pp.Scanner;
 
 with Ada.Directories; use Ada.Directories;
 with Interfaces; use type Interfaces.Unsigned_16;
@@ -3901,11 +3900,16 @@ package body Pp.Actions is
 
    procedure Format_Vector
      (Cmd : Command_Line;
-      File_Name : String;
       Input : Char_Vector;
+      Node : Ada_Node;
+      In_Range : Char_Subrange;
       Output : out Char_Vector;
-      Node : Ada_Node)
+      Out_Range : out Char_Subrange;
+      Messages : out Pp.Scanner.Source_Message_Vector)
    is
+      pragma Unreferenced (In_Range, Out_Range);
+      --  ???These are not yet implemented.
+
       Partial : constant Boolean := Is_Empty (Input);
 
       use Utils.Formatted_Output;
@@ -4084,7 +4088,7 @@ package body Pp.Actions is
             --  text-based passes.
 
             Tree_To_Ada_2 (Node, Out_Buf, Cmd, Partial);
-            Post_Tree_Phases (Lines_Data, File_Name, Src_Buf, Cmd, Partial);
+            Post_Tree_Phases (Lines_Data, Messages, Src_Buf, Cmd, Partial);
          end if;
       end Tree_To_Ada;
 
@@ -4209,24 +4213,26 @@ package body Pp.Actions is
 
    begin
       Maybe_To_Ada (To_Ada => True);
-      declare
-         Out_Vec : constant WChar_Vector := Remove_Extra_Line_Breaks;
-         Out_Arr : W_Str renames Elems (Out_Vec) (2 .. Last_Index (Out_Vec));
-         --  2 to skip sentinel newline
+      if Scanner.Source_Message_Vectors.Is_Empty (Messages) then
+         declare
+            Out_Vec : constant WChar_Vector := Remove_Extra_Line_Breaks;
+            Out_Arr : W_Str renames Elems (Out_Vec) (2 .. Last_Index (Out_Vec));
+            --  2 to skip sentinel newline
 
-         procedure Append_One (C : Character);
-         procedure Append_One (C : Character) is
+            procedure Append_One (C : Character);
+            procedure Append_One (C : Character) is
+            begin
+               Append (Output, C);
+            end Append_One;
+            procedure Encode is new
+              System.WCh_Cnv.Wide_Char_To_Char_Sequence (Append_One);
          begin
-            Append (Output, C);
-         end Append_One;
-         procedure Encode is new
-           System.WCh_Cnv.Wide_Char_To_Char_Sequence (Append_One);
-      begin
-         Clear (Output);
-         for WC of Out_Arr loop
-            Encode (WC, Wide_Char_Encoding);
-         end loop;
-      end;
+            Clear (Output);
+            for WC of Out_Arr loop
+               Encode (WC, Wide_Char_Encoding);
+            end loop;
+         end;
+      end if;
    end Format_Vector;
 
    procedure Per_File_Action
@@ -4522,13 +4528,32 @@ package body Pp.Actions is
 
 --      pragma Assert (Is_Empty (Symtab));
       Append (In_Vec, Input);
-      Format_Vector (Cmd, File_Name, In_Vec, Out_Vec, Root (Unit));
+      declare
+         Messages : Scanner.Source_Message_Vector;
+         use Scanner.Source_Message_Vectors;
+         use type Ada.Containers.Count_Type;
+         In_Range : constant Char_Subrange :=
+           Utils.Char_Vectors.Char_Vectors.Full_Range (In_Vec);
+         Ignored_Out_Range : Char_Subrange;
+      begin
+         Format_Vector
+           (Cmd, In_Vec, Root (Unit), In_Range,
+            Out_Vec, Ignored_Out_Range, Messages);
 --        (CU, Cmd, Output_Name, Form_String,
 --         Do_Diff, Output_Written, To_Ada => True);
 --      --  We have to flush the cache here, because Unit_Id's get reused between
 --      --  runs of this.
 --      Flush_Cache;
 --      Clear (Symtab);
+
+         if not Is_Empty (Messages) then
+            pragma Assert (Length (Messages) = 1);
+            --  We only handle one message for now.
+            Cmd_Error_No_Tool_Name
+              (Scanner.Message_Image (File_Name, Messages (1).Sloc) &
+                           ": " & String (To_Array (Messages (1).Text)));
+         end if;
+      end;
 
       --  Finally, print out the result
 

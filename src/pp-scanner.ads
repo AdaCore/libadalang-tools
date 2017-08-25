@@ -21,6 +21,7 @@
 -- The gnat2xml tool was derived from the Avatox sources.                   --
 ------------------------------------------------------------------------------
 
+with Utils.Char_Vectors;
 with Utils.Vectors;
 with Utils.Symbols;
 
@@ -114,9 +115,21 @@ package Pp.Scanner is
      (Sloc : Source_Location) return String is
        (Image (Sloc.Line) & ":" & Image (Sloc.Col));
 
+   type Source_Message is record
+      --  Message attached to a particular source location.
+      Sloc : Source_Location; -- the location
+      Text : Char_Vectors.Char_Vector; -- the text of the message
+   end record;
+   type Source_Message_Array is array (Positive range <>) of Source_Message;
+
+   package Source_Message_Vectors is new Utils.Vectors
+     (Index_Type => Positive,
+      Element_Type => Source_Message,
+      Elements_Array => Source_Message_Array);
+   subtype Source_Message_Vector is Source_Message_Vectors.Vector;
+
    function Message_Image
      (File_Name : String; Sloc : Source_Location) return String is
-      --  Tree is the A_Compilation_Unit node
        (File_Name & ":" & Image (Sloc.Line) & ":" & Image (Sloc.Col));
 
    type Token is record

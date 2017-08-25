@@ -277,7 +277,7 @@ package Pp.Formatting is
 
    procedure Post_Tree_Phases
      (Lines_Data : in out Lines_Data_Rec;
-      Source_File_Name : String;
+      Messages : out Scanner.Source_Message_Vector;
       Src_Buf : in out Buffer;
       Cmd : Utils.Command_Lines.Command_Line;
       Partial : Boolean);

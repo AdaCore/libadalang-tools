@@ -33,8 +33,6 @@ package Pp.Command_Lines is
       Replace_No_Backup,
       Separate_Loop_Then,
       No_Separate_Loop_Then,
-      Insert_Blank_Lines,
-      Preserve_Blank_Lines,
       No_End_Labels, -- Not documented
       Xml_Help, -- Not documented
       L1, L2, L3, -- Not documented
@@ -68,8 +66,6 @@ package Pp.Command_Lines is
        Replace_No_Backup => +"-rnb",
        Separate_Loop_Then => null,
        No_Separate_Loop_Then => null,
-       Insert_Blank_Lines => null,
-       Preserve_Blank_Lines => null,
        No_End_Labels => +"-e", -- Not documented
        Xml_Help => +"-hx", -- Not documented
        L1 => +"-l1", L2 => +"-l2", L3 => +"-l3", -- Not documented
@@ -200,20 +196,25 @@ package Pp.Command_Lines is
       Use_On_New_Line,
       Split_Line_Before_Op,
       Rm_Style_Spacing,
+      Insert_Blank_Lines,
+      Preserve_Blank_Lines,
+      Preserve_Line_Breaks,
       Ff_After_Pragma_Page);
 
    package Pp_Boolean_Switches is new Boolean_Switches
      (Descriptor,
       Pp_Booleans);
 
-   package Pp_Boolean_Shorthands is new
-     Pp_Boolean_Switches.Set_Shorthands
-       ((End_Id => null,
-         Separate_Is => null,
-         Use_On_New_Line => null,
-         Split_Line_Before_Op => null,
-         Rm_Style_Spacing => +"--RM-style-spacing",
-         Ff_After_Pragma_Page => +"-ff"));
+   package Pp_Boolean_Shorthands is new Pp_Boolean_Switches.Set_Shorthands
+     ((End_Id => null,
+       Separate_Is => null,
+       Use_On_New_Line => null,
+       Split_Line_Before_Op => null,
+       Rm_Style_Spacing => +"--RM-style-spacing",
+       Insert_Blank_Lines => null,
+       Preserve_Blank_Lines => null,
+       Preserve_Line_Breaks => null,
+       Ff_After_Pragma_Page => +"-ff"));
 
    package Pp_Boolean_Defaults is new
      Pp_Boolean_Switches.Set_Defaults
@@ -222,6 +223,9 @@ package Pp.Command_Lines is
          Use_On_New_Line => False,
          Split_Line_Before_Op => False,
          Rm_Style_Spacing => False,
+         Insert_Blank_Lines => False,
+         Preserve_Blank_Lines => False,
+         Preserve_Line_Breaks => False,
          Ff_After_Pragma_Page => False));
 
    type Pp_Strings is

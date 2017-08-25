@@ -18,8 +18,6 @@ with Utils.Command_Lines.Common; use Utils.Command_Lines.Common;
 with Utils.Dbg_Out;
 with Utils.Formatted_Output;
 with Utils.Tool_Names;
-with Utils.Char_Vectors; use Utils.Char_Vectors;
-use Utils.Char_Vectors.Char_Vectors;
 with GNATCOLL.VFS;
 with GNATCOLL.Projects;
 with Utils.Generic_Formatted_Output;
@@ -32,6 +30,7 @@ with Pp.Actions;
 with Pp.Command_Lines;
 
 package body Stub.Actions is
+   use Utils.Char_Vectors.Char_Vectors;
 
    function Image (X : Integer) return String
      renames Utils.String_Utilities.Image;
@@ -42,6 +41,8 @@ package body Stub.Actions is
    use Stub_Flag_Switches,
      Stub_String_Switches,
      Stub_Nat_Switches;
+
+   use Scanner.Source_Message_Vectors;
 
    ----------
    -- Init --
@@ -570,10 +571,13 @@ package body Stub.Actions is
                begin
                   Pp.Actions.Format_Vector
                     (Pp_Cmd,
-                     File_Name => "",
                      Input => Empty_Vec,
+                     Node => Ada_Node (Spec),
+                     In_Range => (1, 0),
                      Output => Pp_Out_Vec,
-                     Node => Ada_Node (Spec));
+                     Out_Range => Tool.Ignored_Out_Range,
+                     Messages => Tool.Ignored_Messages);
+                  pragma Assert (Is_Empty (Tool.Ignored_Messages));
                   Put ("\1 \2 is\n",
                        (case Overrides is
                           when Ada_Overriding_Not_Overriding =>
@@ -599,10 +603,13 @@ package body Stub.Actions is
                   if Parms /= null then
                      Pp.Actions.Format_Vector
                        (Pp_Cmd,
-                        File_Name => "",
                         Input => Empty_Vec,
+                        Node => Ada_Node (Parms),
+                        In_Range => (1, 0),
                         Output => Pp_Out_Vec,
-                        Node => Ada_Node (Parms));
+                        Out_Range => Tool.Ignored_Out_Range,
+                        Messages => Tool.Ignored_Messages);
+                     pragma Assert (Is_Empty (Tool.Ignored_Messages));
                      Put ("\1entry \2(\3) when Standard.True is\n",
                           (case Overrides is
                              when Ada_Overriding_Not_Overriding =>
@@ -715,10 +722,13 @@ package body Stub.Actions is
          pragma Assert (Root (Out_Unit) /= null);
          Pp.Actions.Format_Vector
            (Pp_Cmd,
-            File_Name => "",
             Input => Out_Vec,
+            Node => Root (Out_Unit),
+            In_Range => (1, 0),
             Output => Pp_Out_Vec,
-            Node => Root (Out_Unit));
+            Out_Range => Tool.Ignored_Out_Range,
+            Messages => Tool.Ignored_Messages);
+         pragma Assert (Is_Empty (Tool.Ignored_Messages));
 
          Remove (Context, File_Name => "????");
          Destroy (Context);

@@ -32,4 +32,6 @@ package Utils.Char_Vectors is
      (Positive, Wide_Character, Wide_String);
    subtype WChar_Vector is WChar_Vectors.Vector;
 
+   subtype Char_Subrange is Char_Vectors.Subrange;
+
 end Utils.Char_Vectors;
