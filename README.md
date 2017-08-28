@@ -4,12 +4,12 @@ Libadalang-tools
 This repository hosts sources for several Libadalang-based development tools
 for Ada:
 
-* `lalpp`, a pretty-printer to reformat source code.
+* `gnatpp`, a pretty-printer to reformat source code.
 
-* `lalmetric`, which can compute various source code metrics, such as SLOC
+* `gnatmetric`, which can compute various source code metrics, such as SLOC
   count.
 
-* `lalstub`, which creates body stub (empty but compilable bodies) for library
+* `gnatstub`, which creates body stub (empty but compilable bodies) for library
   unit declarations.
 
 These are currently under development.
