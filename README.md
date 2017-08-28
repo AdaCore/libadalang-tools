@@ -42,3 +42,11 @@ testsuite/testsuite.py
 ```
 
 This will run all testcases and display a summary of passed/failed tests.
+
+
+License
+=======
+
+All source files in this repository are licensed under the terms of the GNU
+General Public License version 3 (GPLv3). See the [LICENSE](LICENSE) file for
+more information.
