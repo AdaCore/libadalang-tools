@@ -177,7 +177,6 @@ package Utils.String_Utilities is
    package String_Vectors is
       new Ada.Containers.Indefinite_Vectors (Positive, String);
    subtype String_Vector is String_Vectors.Vector;
-   use String_Vectors;
 
    ---------------------
    -- Bounded Strings --

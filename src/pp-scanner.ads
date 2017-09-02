@@ -223,12 +223,17 @@ package Pp.Scanner is
    Gen_Minus : constant Syms.Symbol := Syms.W_Intern ("--gen-");
    --  Strings to mark start and end of automatically generated code.
 
+   Token_Separator : constant W_Char := W_Char'Val (1);
+   --  In Preserve_Line_Breaks mode, this character is used instead of hard
+   --  line breaks, because otherwise things like "isbegin" can be run
+   --  together.
+
    procedure Get_Tokens
      (Input                     : in out Buffer;
       Result                    : out Token_Vectors.Vector;
       Ada_Version               : Ada_Version_Type;
       Pp_Off_On_Delimiters      : Pp_Off_On_Delimiters_Rec;
-      Ignore_Single_Line_Breaks : Boolean           := True;
+      Ignore_Single_Line_Breaks : Boolean;
       Max_Tokens                : Token_Index       := Token_Index'Last;
       Line_Ends                 : Marker_Vector_Ptr := null;
       Gen_Regions               : Token_Vector_Ptr  := null);

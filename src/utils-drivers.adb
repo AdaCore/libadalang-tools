@@ -49,8 +49,10 @@ with Libadalang.Analysis; use Libadalang.Analysis;
 
 package body Utils.Drivers is
 
+   pragma Warnings (Off);
    use Common_Flag_Switches, Common_Boolean_Switches, Common_String_Switches,
      Common_String_Seq_Switches, Common_Nat_Switches;
+   pragma Warnings (On);
 
    use Tools;
 
@@ -62,6 +64,7 @@ package body Utils.Drivers is
 
    procedure Name_Resolution (Unit : Analysis_Unit);
    --  Resolve the entire unit, calling Resolve_Node on each relevant node.
+   --  See libadalang_env/src/libadalang/ada/testsuite/ada/nameres.adb.
 
    procedure Resolve_Node (N : Ada_Node; Quiet : Boolean) is
       function Safe_Image
@@ -111,8 +114,6 @@ package body Utils.Drivers is
                        Safe_Image (P_Ref.El),
                        Safe_Image (P_Type.El));
                end if;
-               Dec_Ref (P_Ref);
-               Dec_Ref (P_Type);
             end;
          end loop;
       else

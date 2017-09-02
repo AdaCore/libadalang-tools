@@ -150,7 +150,6 @@ package Utils.Command_Lines is
 
    package String_Ref_Sets is new Ada.Containers.Hashed_Sets
      (String_Ref, Hash_String_Ref, String_Eq, String_Eq);
-   use String_Ref_Sets;
    subtype String_Ref_Set is String_Ref_Sets.Set;
 
    --  ???For each _Switches generic, specify:

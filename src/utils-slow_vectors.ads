@@ -44,7 +44,6 @@ package Utils.Slow_Vectors is
       "=");
 
    subtype Vector is Vectors.Vector;
-   use all type Vector;
 
    --  Renamings of things that "use all type" won't make visible:
 

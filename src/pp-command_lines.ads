@@ -7,8 +7,10 @@ package Pp.Command_Lines is
    Descriptor : aliased Command_Line_Descriptor :=
      Copy_Descriptor (Common_Descriptor);
 
+   pragma Warnings (Off);
    use Common_Flag_Switches, Common_String_Switches,
      Common_String_Seq_Switches, Common_Nat_Switches;
+   pragma Warnings (On);
 
    package Pp_Disable is new Disable_Switches
      (Descriptor, (1 => To_All (Rep_Clauses)));
@@ -321,6 +323,7 @@ package Pp.Command_Lines is
 
    package Freeze is new Freeze_Descriptor (Descriptor);
 
+   pragma Warnings (Off);
    use Pp_Flag_Switches,
      Pp_Boolean_Switches,
      Attribute_Casing_Switches,
@@ -333,6 +336,7 @@ package Pp.Command_Lines is
      Pp_String_Switches,
      Pp_Nat_Switches,
      Pp_String_Seq_Switches;
+   pragma Warnings (On);
 
    function Alignment_Enabled (Cmd : Command_Line) return Boolean is
      ((not Arg (Cmd, Rm_Style_Spacing))

@@ -21,8 +21,10 @@ with Utils.Versions;
 package body Utils.Projects is
    use Text_IO;
 
+   pragma Warnings (Off);
    use Common_Flag_Switches, Common_String_Switches,
      Common_String_Seq_Switches, Common_Nat_Switches;
+   pragma Warnings (On);
 
    My_Project : aliased Project_Tree;
 
@@ -1274,7 +1276,7 @@ package body Utils.Projects is
    ------------------------
 
    procedure Print_Command_Line (Incremental_Mode, Mimic_gcc : Boolean) is
-      use Ada.Command_Line, Ada.Directories, Utils;
+      use Ada.Command_Line, Ada.Directories;
    begin
       if Incremental_Mode then
          Formatted_Output.Put ("(outer)\n  ");

@@ -40,6 +40,7 @@ package body Pp.Formatting is
 --   use Common_Flag_Switches, Common_String_Switches,
 --     Common_String_Seq_Switches, Common_Nat_Switches;
 
+   pragma Warnings (Off);
    use Pp_Flag_Switches,
      Pp_Boolean_Switches,
      Attribute_Casing_Switches,
@@ -52,6 +53,7 @@ package body Pp.Formatting is
      Pp_String_Switches,
      Pp_Nat_Switches,
      Pp_String_Seq_Switches;
+   pragma Warnings (On);
 
    subtype Symbol is Syms.Symbol;
    function "=" (X, Y : Symbol) return Boolean renames Syms."=";
@@ -638,6 +640,9 @@ package body Pp.Formatting is
       --  Start of processing for Split_Lines
 
       begin
+         if Arg (Cmd, Preserve_Line_Breaks) then
+            return;
+         end if;
          pragma Debug
            (Format_Debug_Output
               (Lines_Data, "before Split_Lines " & Again));
@@ -989,7 +994,7 @@ package body Pp.Formatting is
          begin
             pragma Assert
               (Point (Out_Buf) <=
-               Position (Out_Buf, Line_Breaks (Cur_Line).Mark));
+                 Position (Out_Buf, Line_Breaks (Cur_Line).Mark));
 
             --  Step past Line_Breaks at the current position
 
@@ -1014,6 +1019,8 @@ package body Pp.Formatting is
 
          procedure Move_Past_Out_Tok is
          begin
+            pragma Assert
+              (Point (Out_Buf) <= Position (Out_Buf, Out_Tok.Sloc.Lastx));
             loop
                Move_Past_Char;
                exit when At_Point (Out_Buf, Out_Tok.Sloc.Lastx);
@@ -1036,6 +1043,10 @@ package body Pp.Formatting is
                        and then LB.Enabled
                        and then At_Point (Out_Buf, LB.Mark)
                      then
+                        if Cur (Out_Buf) = Token_Separator then
+                           pragma Assert (Arg (Cmd, Preserve_Line_Breaks));
+                           Move_Past_Char;
+                        end if;
                         pragma Assert (Cur (Out_Buf) = ' ');
                         Move_Past_Char;
                         pragma Assert (To_Lower (Cur (Out_Buf)) = 'r');
@@ -1117,7 +1128,9 @@ package body Pp.Formatting is
             if not At_Point (Out_Buf, EOL_Line_Breaks (EOL_Cur_Line).Mark) then
                pragma Assert (Cur (Out_Buf) /= NL);
                Cur_Indentation := Indentation;
-               Append_Temp_Line_Break (Lines_Data);
+               if not Arg (Cmd, Preserve_Line_Breaks) then
+                  Append_Temp_Line_Break (Lines_Data);
+               end if;
                Cur_Indentation := 0;
             end if;
             Src_Index := Src_Index + 1;
@@ -1289,7 +1302,9 @@ package body Pp.Formatting is
             if Src_Tokens (Src_Index - 1).Kind = Blank_Line
               or else Lookback (Out_Buf) /= NL
             then
-               Append_Temp_Line_Break (Lines_Data);
+               if not Arg (Cmd, Preserve_Line_Breaks) then
+                  Append_Temp_Line_Break (Lines_Data);
+               end if;
             end if;
 
             loop
@@ -1299,7 +1314,9 @@ package body Pp.Formatting is
                Src_Tok   := Src_Tokens (Src_Index);
                exit when Src_Tok.Kind not in Other_Whole_Line_Comment;
                Set_Cur_Indent;
-               Append_Temp_Line_Break (Lines_Data);
+               if not Arg (Cmd, Preserve_Line_Breaks) then
+                  Append_Temp_Line_Break (Lines_Data);
+               end if;
             end loop;
 
             --  If we don't have an enabled line break here, we need to add one.
@@ -1327,7 +1344,9 @@ package body Pp.Formatting is
                   null;
                else
                   Cur_Indentation := Indentation;
-                  Append_Temp_Line_Break (Lines_Data);
+                  if not Arg (Cmd, Preserve_Line_Breaks) then
+                     Append_Temp_Line_Break (Lines_Data);
+                  end if;
                end if;
             end;
 
@@ -1354,7 +1373,9 @@ package body Pp.Formatting is
                pragma Assert (False);
             end if;
 
-            Append_Temp_Line_Break (Lines_Data);
+            if not Arg (Cmd, Preserve_Line_Breaks) then
+               Append_Temp_Line_Break (Lines_Data);
+            end if;
             Insert (Out_Buf, "private");
             Cur_Indentation := 0;
 
@@ -1382,7 +1403,9 @@ package body Pp.Formatting is
            (Format_Debug_Output
               (Lines_Data, "before Insert_Comments_And_Blank_Lines"));
          Get_Tokens
-           (Out_Buf, Out_Tokens, Utils.Ada_Version, Pp_Off_On_Delimiters);
+           (Out_Buf, Out_Tokens, Utils.Ada_Version, Pp_Off_On_Delimiters,
+--            Ignore_Single_Line_Breaks => not Arg (Cmd, Preserve_Line_Breaks));
+            Ignore_Single_Line_Breaks => True);
          --  ???At this point, we might need another pass to insert hard line
          --  breaks after end-of-line comments, so they will be indented properly.
          --  Or better yet, insert the EOL comments, with tabs and soft line break
@@ -1448,7 +1471,7 @@ package body Pp.Formatting is
             --  Whole_Line_Comments must be handled after blank lines, because
             --  the blank line should precede the comment.
 
-            if Src_Tok.Kind /= Blank_Line
+            if Src_Tok.Kind not in End_Of_Line | Blank_Line
               and then
               (Match (Src_Tok, Out_Tok)
                or else
@@ -1564,12 +1587,19 @@ package body Pp.Formatting is
                elsif Src_Tok.Kind = End_Of_Line_Comment then
                   Insert_End_Of_Line_Comment;
 
-               --  If the source has a blank line at this point, send it to
-               --  the output (unless Insert_Blank_Lines is True, in which
-               --  case we want to ignore blank lines in the input, since a
-               --  previous phase inserted them in the "right" place). But
-               --  avoid multiple blank lines (unless Preserve_Blank_Lines
-               --  is True) and blank lines just before End_Of_Input.
+               elsif Src_Tok.Kind = End_Of_Line then
+                  pragma Assert (Arg (Cmd, Preserve_Line_Breaks));
+                  Src_Index := Src_Index + 1;
+                  Src_Tok   := Src_Tokens (Src_Index);
+                  Append_Temp_Line_Break (Lines_Data);
+
+               --  If the source has a blank line at this point, send it to the
+               --  output (unless Insert_Blank_Lines is True, in which case we
+               --  want to ignore blank lines in the input, since a previous
+               --  phase inserted them in the "right" place). But avoid
+               --  multiple blank lines (unless either Preserve_Line_Breaks or
+               --  Preserve_Blank_Lines is True) and blank lines just before
+               --  End_Of_Input.
 
                elsif Src_Tok.Kind = Blank_Line then
                   declare
@@ -1580,6 +1610,7 @@ package body Pp.Formatting is
                         Src_Index := Src_Index + 1;
                         Src_Tok   := Src_Tokens (Src_Index);
                         exit when Src_Tok.Kind /= Blank_Line
+                          or else Arg (Cmd, Preserve_Line_Breaks)
                           or else Preserve_Blank_Lines (Cmd);
                      end loop;
                      declare
@@ -1588,7 +1619,8 @@ package body Pp.Formatting is
                              then Src_Tokens (Src_Index + 1).Kind
                              else Nil);
                      begin
-                        if Preserve_Blank_Lines (Cmd)
+                        if Arg (Cmd, Preserve_Line_Breaks)
+                          or else Preserve_Blank_Lines (Cmd)
                           or else (not Insert_Blank_Lines (Cmd)
                                      and then Src_Tok.Kind /= End_Of_Input)
                           or else Prev_Tok_Kind in Comment_Kind
@@ -1602,9 +1634,10 @@ package body Pp.Formatting is
                elsif Src_Tok.Kind in Whole_Line_Comment then
                   Insert_Whole_Line_Comment;
 
-               elsif Out_Tok.Kind = Blank_Line then
+               elsif Out_Tok.Kind in End_Of_Line | Blank_Line then
                   Move_Past_Out_Tok;
                   Out_Index := Out_Index + 1;
+                  Out_Tok   := Out_Tokens (Out_Index);
 
                --  Else print out debugging information and crash. This
                --  avoids damaging the source code in case of bugs. However,
@@ -1633,6 +1666,11 @@ package body Pp.Formatting is
 
          if Last_Pp_Off_On > 1 then
             Pp_Off_Present := True;
+         end if;
+
+         if Cur (Out_Buf) = Token_Separator then
+            pragma Assert (Arg (Cmd, Preserve_Line_Breaks));
+            Move_Past_Char;
          end if;
 
          pragma Assert (Point (Out_Buf) = Last_Position (Out_Buf));
@@ -2182,8 +2220,8 @@ package body Pp.Formatting is
 
             when Upper_Case =>
                Scanner.Get_Tokens
-                 (Out_Buf, Out_Tokens, Utils.Ada_Version,
-                  Pp_Off_On_Delimiters);
+                 (Out_Buf, Out_Tokens, Utils.Ada_Version, Pp_Off_On_Delimiters,
+                  Ignore_Single_Line_Breaks => True);
                for Out_Index in 2 .. Last_Index (Out_Tokens) loop
                   Out_Tok := Out_Tokens (Out_Index);
                   loop
@@ -2219,7 +2257,8 @@ package body Pp.Formatting is
          end if;
 
          Scanner.Get_Tokens
-           (Out_Buf, Out_Tokens, Utils.Ada_Version, Pp_Off_On_Delimiters);
+           (Out_Buf, Out_Tokens, Utils.Ada_Version, Pp_Off_On_Delimiters,
+            Ignore_Single_Line_Breaks => True);
          for Out_Index in 2 + 3 - 1 .. Last_Index (Out_Tokens) loop
             --  Skip sentinel and first 3 tokens
 
@@ -2319,8 +2358,8 @@ package body Pp.Formatting is
          Src_Tok, Out_Tok, Prev_Tok : Token;
 
          Src_Toks : Token_Vector;
-         --  Note that we don't use Src_Tokens (the one in Ada_Trees.Formatting).
-         --  We don't want to destroy that one with Ignore_Single_Line_Breaks =>
+         --  Note that we don't use Src_Tokens (the one in Lines_Data). We
+         --  don't want to destroy that one with Ignore_Single_Line_Breaks =>
          --  False.
 
       --  Start of processing for Copy_Pp_Off_Regions
@@ -2612,6 +2651,8 @@ package body Pp.Formatting is
          --  ???Make sure we're not moving past multiple tokens here. Move past
          --  whitespace, then assert we're at token start, then move to end. Or
          --  something like that.
+         pragma Assert
+           (Point (Out_Buf) <= Position (Out_Buf, Out_Tok.Sloc.Lastx));
          loop
             Move_Past_Char;
             exit when At_Point (Out_Buf, Out_Tok.Sloc.Lastx);
@@ -2669,7 +2710,8 @@ package body Pp.Formatting is
 
    begin
       Get_Tokens
-        (Out_Buf, Out_Tokens, Utils.Ada_Version, Pp_Off_On_Delimiters);
+        (Out_Buf, Out_Tokens, Utils.Ada_Version, Pp_Off_On_Delimiters,
+         Ignore_Single_Line_Breaks => not Arg (Cmd, Preserve_Line_Breaks));
       pragma Assert (Cur (Out_Buf) = NL);
       Move_Forward (Out_Buf); -- skip sentinel
 
@@ -2684,7 +2726,7 @@ package body Pp.Formatting is
                Src_Index, Out_Index, Src_Tok, Out_Tok);
          end if;
 
-         if Src_Tok.Kind /= Blank_Line
+         if Src_Tok.Kind not in End_Of_Line | Blank_Line
            and then
            (Match (Src_Tok, Out_Tok)
             or else
@@ -2791,11 +2833,11 @@ package body Pp.Formatting is
             then
                Src_Index := Src_Index + 1;
 
-            elsif Src_Tok.Kind = Blank_Line then
+            elsif Src_Tok.Kind in End_Of_Line | Blank_Line then
                Src_Index := Src_Index + 1;
                Src_Tok   := Src_Tokens (Src_Index);
 
-            elsif Out_Tok.Kind = Blank_Line then
+            elsif Out_Tok.Kind in End_Of_Line | Blank_Line then
                Move_Past_Out_Tok;
                Out_Index := Out_Index + 1;
 

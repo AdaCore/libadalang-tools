@@ -12,8 +12,10 @@ procedure Pp.Main is
 
    procedure Callback (Phase : Parse_Phase; Swit : Dynamically_Typed_Switch) is
       pragma Unreferenced (Swit);
+      pragma Warnings (Off); -- ???
       use Pp.Command_Lines;
       use String_Ref_Vectors;
+      pragma Warnings (On);
    begin
       if Phase = Cmd_Line_1 then
 

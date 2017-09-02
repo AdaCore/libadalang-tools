@@ -2,11 +2,12 @@ with Utils.Command_Lines; use Utils.Command_Lines;
 with Utils.Command_Lines.Common;        use Utils.Command_Lines.Common;
 package METRICS.Command_Lines is
 
-   use
-     Common_Flag_Switches,
+   pragma Warnings (Off);
+   use Common_Flag_Switches,
      Common_String_Switches,
      Common_String_Seq_Switches,
      Common_Nat_Switches;
+   pragma Warnings (On);
 
    package Metrics_Disable is new Disable_Switches
      (Common_Descriptor,
@@ -292,11 +293,12 @@ package METRICS.Command_Lines is
 
    package Freeze is new Freeze_Descriptor (Descriptor);
 
-   use
-     Metrics_Flag_Switches,
+   pragma Warnings (Off);
+   use Metrics_Flag_Switches,
      Metrics_Boolean_Switches,
      Metrics_String_Switches,
      Metrics_String_Seq_Switches;
+   pragma Warnings (On);
 
    ----------------
 

@@ -42,6 +42,7 @@ package body Pp.Actions is
    function Image (X : Integer) return String
      renames Utils.String_Utilities.Image;
 
+   pragma Warnings (Off);
    use Common_Flag_Switches, Common_String_Switches,
      Common_String_Seq_Switches, Common_Nat_Switches;
 
@@ -57,6 +58,7 @@ package body Pp.Actions is
      Pp_String_Switches,
      Pp_Nat_Switches,
      Pp_String_Seq_Switches;
+   pragma Warnings (On);
 
    File_Name_File_Name : String_Access;
    --  There is a "file name file"; this is its name. ASIS_Processing writes
@@ -279,7 +281,7 @@ package body Pp.Actions is
    ----------------
 
    use Line_Break_Vectors;
-   use Tab_Vectors, Tab_In_Line_Vectors, Tab_In_Line_Vector_Vectors;
+   use Tab_Vectors;
    Lines_Data : Lines_Data_Rec;
 
    Out_Buf : Buffer renames Lines_Data.Out_Buf;
@@ -1508,6 +1510,8 @@ package body Pp.Actions is
 
          if Hard then
             Buffered_Output.Put_Char (NL);
+         elsif Arg (Cmd, Preserve_Line_Breaks) then
+            Buffered_Output.Put_Char (Scanner.Token_Separator);
          end if;
       end Append_Line_Break;
 
@@ -2445,7 +2449,7 @@ package body Pp.Actions is
 
                   when '$' | '%' =>
                      Append_Line_Break
-                       (Hard     => True,
+                       (Hard     => not Arg (Cmd, Preserve_Line_Breaks),
                         Affects_Comments => C = '$',
                         Level    => Cur_Level,
                         Kind     => Kind,
@@ -3854,7 +3858,9 @@ package body Pp.Actions is
          --  In Partial mode, we might need to add a line break
 
          pragma Assert (At_End (Out_Buf));
-         if Partial and then Cur (Out_Buf) /= NL then
+         if (Partial or else Arg (Cmd, Preserve_Line_Breaks))
+           and then Cur (Out_Buf) /= NL
+         then
             Append_Line_Break
               (Hard     => True,
                Affects_Comments => True,
@@ -3912,8 +3918,6 @@ package body Pp.Actions is
 
       Partial : constant Boolean := Is_Empty (Input);
 
-      use Utils.Formatted_Output;
-
       Src_Buf : Buffer;
       --  Buffer containing the text of the original source file
 
@@ -3959,7 +3963,6 @@ package body Pp.Actions is
       --  Initialize Pp_Off_On_Delimiters
 
       procedure Init_Pp_Off_And_On is
-         use Scanner;
       begin
          pragma Assert (not Pp_Off_On_Delimiters_Initialized);
          Pp_Off_On_Delimiters_Initialized := True;
@@ -4070,7 +4073,9 @@ package body Pp.Actions is
          Clear (All_Line_Breaks);
          Clear (Tabs);
 
-         Get_Tokens (Src_Buf, Src_Tokens, Utils.Ada_Version, Pp_Off_On_Delimiters);
+         Get_Tokens
+           (Src_Buf, Src_Tokens, Utils.Ada_Version, Pp_Off_On_Delimiters,
+            Ignore_Single_Line_Breaks => not Arg (Cmd, Preserve_Line_Breaks));
          if Debug_Mode then
             Dbg_Out.Put ("Src_Tokens:\n");
             Put_Tokens (Src_Tokens);
@@ -4229,7 +4234,9 @@ package body Pp.Actions is
          begin
             Clear (Output);
             for WC of Out_Arr loop
-               Encode (WC, Wide_Char_Encoding);
+               if WC /= Scanner.Token_Separator then
+                  Encode (WC, Wide_Char_Encoding);
+               end if;
             end loop;
          end;
       end if;
@@ -4244,7 +4251,6 @@ package body Pp.Actions is
       Unit : Analysis_Unit)
    is
       pragma Unreferenced (Tool);
-      use Utils.Formatted_Output;
 
       Output_Mode : constant Output_Modes := Get_Output_Mode (Cmd);
       Do_Diff : constant Boolean := Output_Mode in Replace_Modes;

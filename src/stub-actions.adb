@@ -35,8 +35,10 @@ package body Stub.Actions is
    function Image (X : Integer) return String
      renames Utils.String_Utilities.Image;
 
+   pragma Warnings (Off);
    use Common_Flag_Switches, Common_String_Switches,
      Common_String_Seq_Switches, Common_Nat_Switches;
+   pragma Warnings (On);
 
    use Stub_Flag_Switches,
      Stub_String_Switches,

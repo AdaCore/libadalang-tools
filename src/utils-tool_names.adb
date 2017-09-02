@@ -8,8 +8,6 @@ package body Utils.Tool_Names is
    -------------------
 
    function Target return String is
-      use GNAT.Directory_Operations;
-
       Tgt_Last : constant Natural := Index (Tool_Name, "-", Backward);
       AAMP_Idx : constant Natural := Index (Tool_Name, "gnaamp");
    begin

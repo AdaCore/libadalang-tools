@@ -155,8 +155,10 @@ package Utils.Command_Lines.Common is
    package Common_Nat_Shorthands is new Common_Nat_Switches.Set_Shorthands
      ((Jobs => +"-j"));
 
+   pragma Warnings (Off);
    use Common_Flag_Switches, Common_String_Switches,
      Common_String_Seq_Switches, Common_Nat_Switches;
+   pragma Warnings (On);
 
    Incremental_Switches : constant Switch_Array :=
      (To_All (Incremental),

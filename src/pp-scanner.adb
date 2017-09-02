@@ -51,7 +51,7 @@ package body Pp.Scanner is
       Result                    : out Token_Vectors.Vector;
       Ada_Version               : Ada_Version_Type;
       Pp_Off_On_Delimiters      : Pp_Off_On_Delimiters_Rec;
-      Ignore_Single_Line_Breaks : Boolean           := True;
+      Ignore_Single_Line_Breaks : Boolean;
       Max_Tokens                : Token_Index       := Token_Index'Last;
       Line_Ends                 : Marker_Vector_Ptr := null;
       Gen_Regions               : Token_Vector_Ptr  := null)
@@ -201,6 +201,7 @@ package body Pp.Scanner is
          procedure Skip_To_EOL is
          begin
             while not Is_Line_Terminator (Cur (Input))
+              and then Cur (Input) /= Token_Separator
               and then Cur (Input) /= W_NUL
             loop
                Get;
@@ -274,7 +275,9 @@ package body Pp.Scanner is
 
       procedure Get_Token (Tok : out Token) is
       begin
-         while Is_Space (Cur (Input)) loop
+         while Is_Space (Cur (Input))
+           or else Cur (Input) = Token_Separator
+         loop
             Get;
          end loop;
 
