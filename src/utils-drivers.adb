@@ -105,8 +105,8 @@ package body Utils.Drivers is
       if OK then
          for Node of N.Find (Is_Expr'Access).Consume loop
             declare
-               P_Ref  : Entity := Expr (Node).P_Ref_Val;
-               P_Type : Entity := Expr (Node).P_Type_Val;
+               P_Ref  : constant Entity := Expr (Node).P_Ref_Val;
+               P_Type : constant Entity := Expr (Node).P_Type_Val;
             begin
                if not Quiet then
                   Put ("Expr: \1, references \2, type is \3\n",
