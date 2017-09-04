@@ -6,11 +6,12 @@ How to run the testsuite
 
 First of all, make sure you have:
 
-* built Libadalang-tools (see the top-level Makefile);
-* added the resulting programs to your $PATH;
+* built Libadalang-tools (see the top-level ``Makefile``);
+* added the resulting programs to your ``$PATH``;
 * installed its runtime dependencies (Libadalang, GNATcoll) in your
   environment;
-* installed the GNATpython package, required by the testsuite itself.
+* installed the `GNATpython <https://github.com/Nikokrock/gnatpython>`_
+  package, required by the testsuite itself.
 
 Then, in the ``testsuite/`` directory, run:
 
@@ -64,9 +65,9 @@ Currently, you only have to define two fields, that are mandatory:
   hand, testcases provide data the driver uses to run the test and decide
   whether it passed or not.
 
-  Currently the only available driver is: ``contract_coverage``. See
-  the main docstring in ``testsuite/testsuite_support/contract_coverage.py`` to
-  learn more about it: how it works, how to use it.
+  There are currently three available drivers: look for the docstrings of
+  ``BaseDriver`` subclasses in ``testsuite_support/*.py`` to learn more about
+  them: how they work, how to use them.
 
 Here's an example for a minimal ``test.yaml``:
 
@@ -100,6 +101,6 @@ a message that describes the situation. For instance:
         foobarbaz is a nasty error case, deep implication in our
         implementation, will be fixed some day under XXX-XXX.
 
-Next time you run this testcase, either it fails, in which case it will be flagged as
-XFAIL (eXpected FAILure), or it succeeds, then it will be flagged as UOK
-(Unexpected OK).
+Next time you run this testcase, either it fails, in which case it will be
+flagged as XFAIL (eXpected FAILure), or it succeeds, then it will be flagged as
+UOK (Unexpected OK).

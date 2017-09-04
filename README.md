@@ -41,7 +41,8 @@ Then run:
 testsuite/testsuite.py
 ```
 
-This will run all testcases and display a summary of passed/failed tests.
+This will run all testcases and display a summary of passed/failed tests. See
+[testsuite/README.rst](the testsuite README) for more detailed instructions.
 
 
 License
