@@ -125,6 +125,6 @@ package LAL_Extensions is
 
    function P_Defining_Name
      (Node : access Basic_Decl_Type'Class) return Ada_Node is
-      (Ada_Node (Name'(P_Defining_Name (Node))));
+      (Ada_Node (P_Defining_Name (Node).El));
 
 end LAL_Extensions;

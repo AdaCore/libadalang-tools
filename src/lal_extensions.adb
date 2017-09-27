@@ -250,12 +250,12 @@ package body LAL_Extensions is
          if Decl.all in Basic_Decl_Type then
             --  Should Subp_Decl_Type be in Basic_Decl_Type????
             declare
-               D : constant Name_Array_Access :=
+               D : constant Entity_Name_Array_Access :=
                  P_Defining_Names (Basic_Decl (Decl));
                --  ????Free
             begin
                pragma Assert (D.N = 1);
-               pragma Assert (Result = D.Items (1));
+               pragma Assert (Result = D.Items (1).El);
             end;
          end if;
       end return;
