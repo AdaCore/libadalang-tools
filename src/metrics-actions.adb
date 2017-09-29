@@ -3074,9 +3074,12 @@ package body METRICS.Actions is
                case Child_Count (F_Args (Pragma_Node (Node))) is
                   when 0 => ON := True; pragma Assert (False);
                   when 1 =>
-                     ON := L_Name
-                       (P_Assoc_Expr (Item (F_Args (Pragma_Node (Node)), 1)))
-                       = "on";
+                     declare
+                        I : constant Base_Assoc :=
+                           Item (F_Args (Pragma_Node (Node)), 1);
+                     begin
+                        ON := L_Name (P_Assoc_Expr (I).El) = "on";
+                     end;
                   when others => raise Program_Error;
                end case;
             end if;
