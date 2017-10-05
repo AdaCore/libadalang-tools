@@ -302,10 +302,11 @@ package body Stub.Actions is
    begin
       if Parent_Body_Of_Subunit = null then
          return "";
-      elsif Parent (Parent_Body_Of_Subunit).Kind in Ada_Subunit then
+      elsif Ada_Node'(Parent (Parent_Body_Of_Subunit)).Kind = Ada_Subunit then
          declare
             Parent_Parent : constant W_Str :=
-              Full_Name (F_Name (Subunit (Parent (Parent_Body_Of_Subunit))));
+              Full_Name (F_Name (Subunit
+                (Ada_Node'(Parent (Parent_Body_Of_Subunit)))));
             Parent_Simple : constant W_Str :=
               Id_Name (Get_Def_Name (Parent_Body_Of_Subunit));
          begin

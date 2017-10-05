@@ -3641,8 +3641,9 @@ package body METRICS.Actions is
             end if;
          end if;
 
-         if Parents (Node).Items'Length > 2 and then False then
-            --  ???See P907-045
+         if Ada_Node_Array_Access'(Parents (Node)).Items'Length > 2
+           and then False -- ???See P907-045
+         then
             pragma Assert
               (Parents (Node).Items (3) =
                  Element (Node_Stack, Last_Index (Node_Stack) - 2));

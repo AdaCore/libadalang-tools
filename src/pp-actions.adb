@@ -486,6 +486,7 @@ package body Pp.Actions is
            when Ada_Unconstrained_Array_Index => null,
            when Ada_Contract_Case_Assoc => null,
            when Ada_Contract_Cases => null,
+           when Ada_Primitives_Env_Holder => null,
            when Ada_Env_Holder => L (""),
             --  ???Not sure what those are.
 
@@ -1144,15 +1145,13 @@ package body Pp.Actions is
                  Ada_Generic_Package_Decl | Ada_Generic_Subp_Decl
                then
                   if P.Kind = Ada_Generic_Package_Decl then
-                     Formals :=
-                       F_Formal_Part
+                     Formals := F_Formal_Part
                        (Generic_Package_Decl (P)).all'Access;
                   else
-                     Formals :=
-                       F_Formal_Part
+                     Formals := F_Formal_Part
                        (Generic_Subp_Decl (P)).all'Access;
                   end if;
-                  for Formal of Formals.Children loop
+                  for Formal of Ada_Node_Array'(Formals.Children) loop
                      if Tree = Formal then
                         Result := True;
                         exit;
@@ -2939,7 +2938,7 @@ package body Pp.Actions is
 
          procedure Do_Handled_Stmts is
          begin
-            case Parent (Tree).Kind is
+            case Ada_Node'(Parent (Tree)).Kind is
                when Ada_Entry_Body |
                  Ada_Package_Body |
                  Ada_Subp_Body |
@@ -3200,7 +3199,7 @@ package body Pp.Actions is
 
          procedure Do_For_Loop_Spec is
          begin
-            case Parent (Tree).Kind is
+            case Ada_Node'(Parent (Tree)).Kind is
                when Ada_For_Loop_Stmt =>
                   Interpret_Template ("for ! !? ~~~ !");
                when Ada_Quantified_Expr =>
@@ -3641,7 +3640,7 @@ package body Pp.Actions is
             --  is an Ada_Task_Type_Decl or Ada_Single_Task_Decl.
             Subs : constant Ada_Tree_Array :=
               Subtrees (Tree)(1 .. Subtree_Count (Tree) - 1) &
-                P_Defining_Name (Basic_Decl (Parent (Tree)));
+                P_Defining_Name (Basic_Decl (Ada_Node'(Parent (Tree))));
          begin
             Interpret_Template (Subtrees => Subs);
          end Do_Task_Def;
