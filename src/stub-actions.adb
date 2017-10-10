@@ -99,7 +99,7 @@ package body Stub.Actions is
       use Utils.Dbg_Out;
    begin
       Utils.Dbg_Out.Output_Enabled := True;
-      Put ("\1\n", (if X = null then "null" else Short_Image (X)));
+      Put ("\1\n", (if X.Is_Null then "null" else Short_Image (X)));
    end nn;
 
    procedure ppp (X : Ada_Node) is
@@ -300,13 +300,12 @@ package body Stub.Actions is
 
    function Get_Parent_Name (Parent_Body_Of_Subunit : Ada_Node) return W_Str is
    begin
-      if Parent_Body_Of_Subunit = null then
+      if Parent_Body_Of_Subunit.Is_Null then
          return "";
       elsif Ada_Node'(Parent (Parent_Body_Of_Subunit)).Kind = Ada_Subunit then
          declare
             Parent_Parent : constant W_Str :=
-              Full_Name (F_Name (Subunit
-                (Ada_Node'(Parent (Parent_Body_Of_Subunit)))));
+              Full_Name (Parent_Body_Of_Subunit.Parent.As_Subunit.F_Name);
             Parent_Simple : constant W_Str :=
               Id_Name (Get_Def_Name (Parent_Body_Of_Subunit));
          begin
@@ -331,7 +330,8 @@ package body Stub.Actions is
         and then Root_Node.Kind not in Ada_Body_Stub;
       Parent_Name : constant W_Str := Get_Parent_Name (Parent_Body_Of_Subunit);
       Root_Node_Name : constant W_Str :=
-        (if Parent_Body_Of_Subunit /= null then Parent_Name & "." else "") &
+        (if not Parent_Body_Of_Subunit.Is_Null
+         then Parent_Name & "." else "") &
         Full_Name (Get_Def_Name (Root_Node));
       UC_Root_Node_Name : constant W_Str := To_Upper (Root_Node_Name);
       LC_Root_Node_Name : constant W_Str := To_Lower (Root_Node_Name);
@@ -478,7 +478,7 @@ package body Stub.Actions is
 
       procedure Generate_Subunit_Start is
       begin
-         if Parent_Body_Of_Subunit /= null then
+         if not Parent_Body_Of_Subunit.Is_Null then
             Put ("separate (\1)\n", Parent_Name);
          end if;
       end Generate_Subunit_Start;
@@ -568,9 +568,10 @@ package body Stub.Actions is
                   Spec : constant Subp_Spec := Get_Subp_Spec (Decl);
                   Overrides : constant Ada_Overriding_Node :=
                     (if Decl.Kind in Ada_Classic_Subp_Decl
-                       then F_Overriding (Classic_Subp_Decl (Decl))
+                       then Decl.As_Classic_Subp_Decl.F_Overriding
                        else Ada_Overriding_Unspecified);
-                  Returns : constant Boolean := F_Subp_Returns (Spec) /= null;
+                  Returns : constant Boolean :=
+                    not F_Subp_Returns (Spec).Is_Null;
                begin
                   Pp.Actions.Format_Vector
                     (Pp_Cmd,
@@ -599,11 +600,11 @@ package body Stub.Actions is
                declare
                   Empty_Vec, Pp_Out_Vec : Char_Vector;
                   Parms : constant Params :=
-                    F_Params (F_Spec (Entry_Decl (Decl)));
+                    Decl.As_Entry_Decl.F_Spec.F_Params;
                   Overrides : constant Ada_Overriding_Node :=
-                     F_Overriding (Entry_Decl (Decl));
+                    Decl.As_Entry_Decl.F_Overriding;
                begin
-                  if Parms /= null then
+                  if not Parms.Is_Null then
                      Pp.Actions.Format_Vector
                        (Pp_Cmd,
                         Input => Empty_Vec,
@@ -650,11 +651,11 @@ package body Stub.Actions is
          case Decl.Kind is
             when Ada_Package_Decl | Ada_Generic_Package_Decl |
               Ada_Single_Protected_Decl | Ada_Protected_Type_Decl =>
-               if Vis_Part (Decl) /= null then
+               if not Vis_Part (Decl).Is_Null then
                   Collect_Local_Decls (F_Decls (Vis_Part (Decl)));
                end if;
 
-               if Priv_Part (Decl) /= null then
+               if not Priv_Part (Decl).Is_Null then
                   Collect_Local_Decls (F_Decls (Priv_Part (Decl)));
                end if;
             when Ada_Subp_Body | Ada_Package_Body | Ada_Task_Body |
@@ -722,7 +723,7 @@ package body Stub.Actions is
             With_Trivia => True);
       begin
          pragma Assert (not Has_Diagnostics (Out_Unit));
-         pragma Assert (Root (Out_Unit) /= null);
+         pragma Assert (not Root (Out_Unit).Is_Null);
          Pp.Actions.Format_Vector
            (Pp_Cmd,
             Input => Out_Vec,
@@ -919,13 +920,13 @@ package body Stub.Actions is
       Unit : Analysis_Unit)
    is
       Lib_Item_Or_Subunit : constant Ada_Node :=
-        F_Body (Compilation_Unit (Root (Unit)));
+        Root (Unit).As_Compilation_Unit.F_Body;
       Root_Node : constant Ada_Node :=
         (case Lib_Item_Or_Subunit.Kind is
            when Ada_Library_Item =>
-             Ada_Node (F_Item (Library_Item (Lib_Item_Or_Subunit))),
+             Lib_Item_Or_Subunit.As_Library_Item.F_Item.As_Ada_Node,
            when Ada_Subunit =>
-             Ada_Node (F_Body (Subunit (Lib_Item_Or_Subunit))),
+             Lib_Item_Or_Subunit.As_Subunit.F_Body.As_Ada_Node,
          when others => raise Program_Error);
 
    --  Start of processing for Per_File_Action
@@ -961,7 +962,7 @@ package body Stub.Actions is
       end case;
 
       Generate (Tool, Cmd, File_Name, Input, BOM_Seen, Root_Node,
-                Parent_Body_Of_Subunit => null);
+                Parent_Body_Of_Subunit => No_Ada_Node);
    end Per_File_Action;
 
    ---------------

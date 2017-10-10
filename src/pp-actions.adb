@@ -406,19 +406,19 @@ package body Pp.Actions is
    subtype Ada_Tree_Base is Ada_Node;
    subtype Ada_Tree is Ada_Node;
    subtype Ada_Tree_Array is Ada_Node_Array;
-   function Is_Nil (T : access Ada_Node_Type'Class) return Boolean is
-     (T = null);
-   function Present (T : access Ada_Node_Type'Class) return Boolean is
+   function Is_Nil (T : Ada_Node'Class) return Boolean is
+     (T.Is_Null);
+   function Present (T : Ada_Node'Class) return Boolean is
      (not Is_Nil (T));
    function Subtree_Count
-     (T : access Ada_Node_Type'Class) return Query_Count is
+     (T : Ada_Node'Class) return Query_Count is
        (if Is_Nil (T) then 0 else Last_Child_Index (T));
    function Empty_Tree_Array return Ada_Node_Array is
      ((1 .. 0 => <>));
-   function Subtrees (T : access Ada_Node_Type'Class) return Ada_Tree_Array is
+   function Subtrees (T : Ada_Node'Class) return Ada_Tree_Array is
      (if Is_Nil (T) then Empty_Tree_Array else Children (T));
    function Subtree
-     (T : access Ada_Node_Type'Class; X : Query_Index) return Ada_Tree is
+     (T : Ada_Node'Class; X : Query_Index) return Ada_Tree is
        (Child (T, X));
 
    function Template_For_Kind (Kind : Ada_Tree_Kind) return Ada_Template_Ptr;
@@ -486,8 +486,6 @@ package body Pp.Actions is
            when Ada_Unconstrained_Array_Index => null,
            when Ada_Contract_Case_Assoc => null,
            when Ada_Contract_Cases => null,
-           when Ada_Primitives_Env_Holder => null,
-           when Ada_Env_Holder => L (""),
             --  ???Not sure what those are.
 
            when Ada_Ada_List => null,
@@ -600,11 +598,9 @@ package body Pp.Actions is
            when Ada_Exception_Decl =>
                  L ("?~,@ ~~ ^: exception!", Aspects),
            when Ada_Generic_Package_Instantiation =>
-             L ("/package ! is new !?[@ (~,@ ~)]~", Aspects),
-                --  The "/" is to ignore the env_holder.
-                --  ???Not sure what it is, nor why it's syntactic.
+             L ("package ! is new !?[@ (~,@ ~)]~", Aspects),
            when Ada_Generic_Subp_Instantiation =>
-             L ("/?~~ ~! ! is new !?[@ (~,@ ~)]~", Aspects),
+             L ("?~~ ~! ! is new !?[@ (~,@ ~)]~", Aspects),
            when Ada_Generic_Package_Decl =>
              L ("generic$",
                 "!",
@@ -1032,14 +1028,14 @@ package body Pp.Actions is
       use Utils.Dbg_Out;
    begin
       Utils.Dbg_Out.Output_Enabled := True;
-      Put ("\1\n", (if X = null then "null" else Short_Image (X)));
+      Put ("\1\n", (if Is_Nil (X) then "null" else Short_Image (X)));
    end nn;
 
    procedure ppp (X : Ada_Node) is
       use Utils.Dbg_Out;
    begin
       nn (X);
-      if X /= null then
+      if Present (X) then
          Print (X);
       end if;
    end ppp;
@@ -1145,13 +1141,13 @@ package body Pp.Actions is
                  Ada_Generic_Package_Decl | Ada_Generic_Subp_Decl
                then
                   if P.Kind = Ada_Generic_Package_Decl then
-                     Formals := F_Formal_Part
-                       (Generic_Package_Decl (P)).all'Access;
+                     Formals :=
+                       P.As_Generic_Package_Decl.F_Formal_Part.As_Ada_Node;
                   else
-                     Formals := F_Formal_Part
-                       (Generic_Subp_Decl (P)).all'Access;
+                     Formals :=
+                       P.As_Generic_Subp_Decl.F_Formal_Part.As_Ada_Node;
                   end if;
-                  for Formal of Ada_Node_Array'(Formals.Children) loop
+                  for Formal of Formals.Children loop
                      if Tree = Formal then
                         Result := True;
                         exit;
@@ -1845,7 +1841,7 @@ package body Pp.Actions is
         return Ada_Tree is
       begin
          if Last_Index (Tree_Stack) <= N then
-            return null;
+            return No_Ada_Node;
          else
             return Tree_Stack (Last_Index (Tree_Stack) - N);
          end if;
@@ -1864,7 +1860,7 @@ package body Pp.Actions is
          Put ("Ancestors:\n");
          loop
             Tree := Ancestor_Tree (N);
-            exit when Tree = null;
+            exit when Tree.Is_Null;
             Put ("\1\t\2\n", Image (Integer (N)), Short_Image (Tree));
             N := @ + 1;
          end loop;
@@ -2091,11 +2087,11 @@ package body Pp.Actions is
             end if;
 
             if Present (Tree) and then Tree.Kind = Ada_With_Clause then
-               if not F_Has_Limited (With_Clause (Tree))
-                 and then not F_Has_Private (With_Clause (Tree))
+               if not Tree.As_With_Clause.F_Has_Limited
+                 and then not Tree.As_With_Clause.F_Has_Private
                then
-                  Pa   := null;
-                  Tr   := null;
+                  Pa   := No_Ada_Node;
+                  Tr   := No_Ada_Node;
                   Text := Name_With;
                else
                   return; -- ignore "limited with" and "private with"
@@ -2258,7 +2254,7 @@ package body Pp.Actions is
             pragma Debug (Check_Between);
 
             pragma Assert (Tree.Kind in Ada_Ada_List);
-            Prev_With : With_Clause := null;
+            Prev_With : With_Clause := No_With_Clause;
             --  See Use_Same_Line below
 
          --  Start of processing for Subtrees_To_Ada
@@ -2287,10 +2283,9 @@ package body Pp.Actions is
                      --  I.e. if Y is a prefix of X.
 
                   function Has_Prefix (X, Y : Ada_Tree) return Boolean is
-                     subtype Name is Analysis.Name;
                   begin
                      return Has_Prefix
-                       (L_Full_Name (Name (X)), L_Full_Name (Name (Y)));
+                       (L_Full_Name (X.As_Name), L_Full_Name (Y.As_Name));
                   end Has_Prefix;
 
                   function Use_Same_Line return Boolean is
@@ -2314,7 +2309,7 @@ package body Pp.Actions is
                         if Next_Subtree.Kind = Ada_Use_Package_Clause then
                            declare
                               Use_Names : constant Name_List :=
-                                F_Packages (Use_Package_Clause (Next_Subtree));
+                                Next_Subtree.As_Use_Package_Clause.F_Packages;
                            begin
                               if Subtree_Count (With_Names) = 1
                                 and then Subtree_Count (Use_Names) = 1
@@ -2349,18 +2344,18 @@ package body Pp.Actions is
                   if Present (Subt) then
                      case Subt.Kind is
                         when Ada_With_Clause =>
-                           if not F_Has_Limited (With_Clause (Subt))
-                             and then not F_Has_Private (With_Clause (Subt))
+                           if not Subt.As_With_Clause.F_Has_Limited
+                             and then not Subt.As_With_Clause.F_Has_Private
                            then
-                              Prev_With := With_Clause (Subt);
+                              Prev_With := Subt.As_With_Clause;
                            else
                               --  ignore "limited with" and "private with"
-                              Prev_With := null;
+                              Prev_With := No_With_Clause;
                            end if;
                         when Ada_Use_Package_Clause =>
                            null; -- Leave Prev_With alone
                         when others =>
-                           Prev_With := null;
+                           Prev_With := No_With_Clause;
                      end case;
 
                      if Index < Subtree_Count (Tree) then
@@ -2379,8 +2374,8 @@ package body Pp.Actions is
                              (Tween, Subtrees => Empty_Tree_Array);
                            if Same_Line then
                               Append_Tab
-                                (Parent        => null,
-                                 Tree          => null,
+                                (Parent        => No_Ada_Node,
+                                 Tree          => No_Ada_Node,
                                  T             => "",
                                  Token_Text    => Name_Use,
                                  Index_In_Line => 2,
@@ -2835,10 +2830,10 @@ package body Pp.Actions is
                   Single_Name : constant Boolean :=
                     (if Tree.Kind = Ada_Discriminant_Assoc
                        then Subtree_Count
-                         (F_Ids (Discriminant_Assoc (Tree))) = 1
+                         (Tree.As_Discriminant_Assoc.F_Ids) = 1
                      elsif Tree.Kind = Ada_Aggregate_Assoc
                        then Subtree_Count
-                        (F_Designators (Aggregate_Assoc (Tree))) = 1
+                        (Tree.As_Aggregate_Assoc.F_Designators) = 1
                      else True);
                begin
                   --  This is needed because the "[]" is not properly nested with
@@ -2858,7 +2853,7 @@ package body Pp.Actions is
             --  ???Not clear why we're putting a line break in one case but not
             --  the other. The normal template in the table should suffice.
 
-            case F_Stmt (Named_Stmt (Tree)).Kind is
+            case F_Stmt (Tree.As_Named_Stmt).Kind is
                when Ada_Begin_Block | Ada_Decl_Block =>
                   Interpret_Template ("! : ! !1");
                when Ada_Loop_Stmt | Ada_For_Loop_Stmt | Ada_While_Loop_Stmt =>
@@ -2912,10 +2907,10 @@ package body Pp.Actions is
             --     Thing_2 at 0 range 128 .. 1023;
 
             pragma Assert
-              (F_Op (Bin_Op (F_Range (Range_Spec (Subtree (Tree, 3))))) =
+              (Subtree (Tree, 3).As_Range_Spec.F_Range.As_Bin_Op.F_Op =
                  Ada_Op_Double_Dot);
             R : constant Ada_Tree :=
-              Ada_Tree (F_Range (Range_Spec (Subtree (Tree, 3))));
+              Subtree (Tree, 3).As_Range_Spec.F_Range.As_Ada_Node;
             Subts : constant Ada_Tree_Array :=
               Subtrees (Tree) (1 .. 2) & Subtrees (R);
             pragma Assert (Subts'Last = 5);
@@ -2956,7 +2951,7 @@ package body Pp.Actions is
          begin
             --  If there are no statements or exception handlers, use short form
 
-            if Is_Nil (F_Stmts (Extended_Return_Stmt (Tree))) then
+            if Is_Nil (Tree.As_Extended_Return_Stmt.F_Stmts) then
                Interpret_Template (Extended_Return_Stmt_Alt_Templ);
             else
                Interpret_Template;
@@ -2999,7 +2994,7 @@ package body Pp.Actions is
          begin
             case Expr.Kind is
                when Ada_Bin_Op | Ada_Relation_Op =>
-                  case F_Op (Bin_Op (Expr)) is
+                  case Expr.As_Bin_Op.F_Op is
                      when Ada_Op_In | Ada_Op_Not_In =>
                         raise Program_Error;
 --  ???Don't treat membership tests as operators, for now
@@ -3044,7 +3039,7 @@ package body Pp.Actions is
          end Precedence;
 
          procedure Do_Un_Op (Tree : Ada_Tree) is
-            Expr : constant Un_Op := Un_Op (Tree);
+            Expr : constant Un_Op := Tree.As_Un_Op;
          begin
             --  First we have a special case for the Depends and
             --  Refined_Depends aspect specifications. We want to pretend that
@@ -3090,12 +3085,12 @@ package body Pp.Actions is
             Is_Right  : Boolean;
             Cur_Level : Nesting_Level)
          is
-            Expr : constant Bin_Op := Bin_Op (Tree);
+            Expr : constant Bin_Op := Tree.As_Bin_Op;
             Oper : constant Ada_Op := F_Op (Expr);
             Is_Short_C : constant Boolean :=
               Oper in Ada_Op_And_Then | Ada_Op_Or_Else;
-            Arg1 : constant Ada_Tree := Ada_Tree (F_Left (Expr));
-            Arg2 : constant Ada_Tree := Ada_Tree (F_Right (Expr));
+            Arg1 : constant Ada_Tree := F_Left (Expr).As_Ada_Node;
+            Arg2 : constant Ada_Tree := F_Right (Expr).As_Ada_Node;
 
             --  The arguments can't have lower precedence than the expression as
             --  a whole; that's what precedence means -- you need parens to put
@@ -3439,7 +3434,7 @@ package body Pp.Actions is
          begin
             Put
               ("pragma \1",
-               Id_With_Casing (W_Intern (Id_Name (F_Id (Pragma_Node (Tree)))),
+               Id_With_Casing (W_Intern (Id_Name (Tree.As_Pragma_Node.F_Id)),
                                Tree.Kind, Is_Predef => False));
             Interpret_Template (Pragma_Alt_Templ);
          end Do_Pragma;
@@ -3474,9 +3469,9 @@ package body Pp.Actions is
                    Ada_Entry_Spec | Ada_Entry_Body |
                    Ada_Accept_Stmt | Ada_Accept_Stmt_With_Stmts
                  then False
-                 else Present (F_Subp_Returns (Subp_Spec (Parent_Tree))));
+                 else Present (Parent_Tree.As_Subp_Spec.F_Subp_Returns));
             Param_Count : Query_Count :=
-              Subtree_Count (F_Params (Params (Tree)));
+              Subtree_Count (Tree.As_Params.F_Params);
          begin
             if Is_Function then
                Param_Count := Param_Count + 1; -- Add one extra for function result
@@ -3496,11 +3491,11 @@ package body Pp.Actions is
 
          procedure Do_Subp_Spec is
             Params : constant Param_Spec_List :=
-              (if Present (F_Subp_Params (Subp_Spec (Tree)))
-                 then F_Params (F_Subp_Params (Subp_Spec (Tree)))
-                 else null);
+              (if Present (Tree.As_Subp_Spec.F_Subp_Params)
+                 then F_Params (Tree.As_Subp_Spec.F_Subp_Params)
+                 else No_Param_Spec_List);
             Is_Function : constant Boolean :=
-              Present (F_Subp_Returns (Subp_Spec (Tree)));
+              Present (Tree.As_Subp_Spec.F_Subp_Returns);
             Param_Count : Query_Count := Subtree_Count (Params);
          begin
             if Is_Function then
@@ -3527,23 +3522,23 @@ package body Pp.Actions is
 
             Spec : constant Subp_Spec :=
               (case Tree.Kind is
-                 when Ada_Entry_Decl | Ada_Entry_Body => null,
+                 when Ada_Entry_Decl | Ada_Entry_Body => No_Subp_Spec,
                  when others => Get_Subp_Spec (Tree));
 
             Params : constant Param_Spec_List :=
               (case Tree.Kind is
                  when Ada_Entry_Decl =>
-                   (if Present (F_Params (F_Spec (Entry_Decl (Tree))))
-                      then F_Params (F_Params (F_Spec (Entry_Decl (Tree))))
-                      else null),
+                   (if Present (Tree.As_Entry_Decl.F_Spec.F_Params)
+                      then Tree.As_Entry_Decl.F_Spec.F_Params.F_Params
+                      else No_Param_Spec_List),
                  when Ada_Entry_Body =>
-                   (if Present (F_Params (Entry_Body (Tree)))
-                      then F_Params (F_Params (Entry_Body (Tree)))
-                      else null),
+                   (if Present (Tree.As_Entry_Body.F_Params)
+                      then Tree.As_Entry_Body.F_Params.F_Params
+                      else No_Param_Spec_List),
                  when others =>
                    (if Present (F_Subp_Params (Spec))
                       then F_Params (F_Subp_Params (Spec))
-                      else null));
+                      else No_Param_Spec_List));
 
             Is_Body : constant Boolean :=
               (case Tree.Kind is
@@ -3569,7 +3564,7 @@ package body Pp.Actions is
 --              Boolean'Pos (Is_Function); -- Add one extra for function result
             Is_Function : Boolean;
             Param_Count : Query_Count :=
-              (if Params = null then 0 else Subtree_Count (Params));
+              (if Params.Is_Null then 0 else Subtree_Count (Params));
          begin
             if Tree.Kind in Ada_Entry_Decl | Ada_Entry_Body then
                Is_Function := False;
@@ -3584,7 +3579,7 @@ package body Pp.Actions is
                Subs : constant Ada_Tree_Array :=
                  (if Tree.Kind = Ada_Subp_Body
                     then Subtrees (Tree)(1 .. Subtree_Count (Tree) - 1) &
-                         P_Defining_Name (Subp_Body (Tree))
+                         Tree.As_Subp_Body.P_Defining_Name.As_Ada_Node
                     else Subtrees (Tree));
             begin
                if (Arg (Cmd, Par_Threshold) = 0 and then Arg (Cmd, Separate_Is))
@@ -3609,7 +3604,7 @@ package body Pp.Actions is
             --  True if there are more parameter associations than the threshold,
             --  and at least one of them is named.
          begin
-            if Past_Call_Threshold (F_Suffix (Call_Expr (Tree))) then
+            if Past_Call_Threshold (Tree.As_Call_Expr.F_Suffix) then
                Interpret_Template ("!?[%(~,%~)]~");
                --  We use % instead of $ here, so that the indentation of these
                --  will not affect following comments.
@@ -3640,19 +3635,19 @@ package body Pp.Actions is
             --  is an Ada_Task_Type_Decl or Ada_Single_Task_Decl.
             Subs : constant Ada_Tree_Array :=
               Subtrees (Tree)(1 .. Subtree_Count (Tree) - 1) &
-                P_Defining_Name (Basic_Decl (Ada_Node'(Parent (Tree))));
+                Tree.Parent.As_Basic_Decl.P_Defining_Name.As_Ada_Node;
          begin
             Interpret_Template (Subtrees => Subs);
          end Do_Task_Def;
 
          procedure Do_Type_Decl is
-            Def : constant Type_Def := F_Type_Def (Type_Decl (Tree));
+            Def : constant Type_Def := Tree.As_Type_Decl.F_Type_Def;
          begin
             if Def.Kind = Ada_Record_Type_Def
               or else (Def.Kind = Ada_Derived_Type_Def
-                and then Present (F_Record_Extension (Derived_Type_Def (Def))))
+                and then Present (Def.As_Derived_Type_Def.F_Record_Extension))
             then
-               if Is_Nil (F_Aspects (Type_Decl (Tree))) then
+               if Is_Nil (Tree.As_Type_Decl.F_Aspects) then
                   Interpret_Template ("type !! is ![" & Aspects & "]");
                   --  Otherwise, we could have a line break just before the
                   --  last semicolon.
@@ -3662,7 +3657,7 @@ package body Pp.Actions is
             elsif Def.Kind = Ada_Access_To_Subp_Def then
                Interpret_Template ("type !! is !" & Aspects);
                --  gnatpp doesn't put a line break after "is" in this case.
-            elsif F_Type_Def (Type_Decl (Tree)).Kind =
+            elsif Tree.As_Type_Decl.F_Type_Def.Kind =
               Ada_Private_Type_Def
             then
                Interpret_Template ("type !! is[@ !]" & Aspects);
@@ -3674,9 +3669,9 @@ package body Pp.Actions is
          end Do_Type_Decl;
 
          procedure Do_Usage_Name is
-            P_Ref : Entity := Expr (Tree).P_Ref_Val;
+            P_Ref : constant Ada_Node := Tree.As_Expr.P_Ref_Val;
             K : constant Ada_Node_Kind_Type :=
-              (if P_Ref.El = null then Null_Kind else P_Ref.El.Kind);
+              (if P_Ref.Is_Null then Null_Kind else P_Ref.Kind);
          begin
 --            Put
 --              ("\1",
@@ -3764,7 +3759,7 @@ package body Pp.Actions is
             when Ada_Object_Decl =>
                if Is_Generic_Formal_Object_Decl (Tree) then
                   Do_Parameter_Specification;
-               elsif Present (F_Renaming_Clause (Object_Decl (Tree))) then
+               elsif Present (Tree.As_Object_Decl.F_Renaming_Clause) then
                   Interpret_Template
                     ("?~,@ ~~ :[@? ~~~? ~~~? ~~~ !? :=[@ ~~]~!]" & Aspects);
                   --  ???This kludgery is to match gnatpp, which doesn't tab
@@ -3783,16 +3778,16 @@ package body Pp.Actions is
             when Ada_Constrained_Array_Indices =>
                declare
                   SI : constant Ada_Tree :=
-                    Subtree (F_List (Constrained_Array_Indices (Tree)), 1);
+                    Subtree (Tree.As_Constrained_Array_Indices.F_List, 1);
                begin
                   if Kind (SI) = Ada_Subtype_Indication then
                      declare
                         C : constant Constraint :=
-                          F_Constraint (Subtype_Indication (SI));
+                          SI.As_Subtype_Indication.F_Constraint;
                      begin
                         if Present (C)
                           and then Kind (C) = Ada_Range_Constraint
-                          and then Kind (F_Range (Range_Constraint (C))) =
+                          and then Kind (C.As_Range_Constraint.F_Range) =
                             Ada_Box_Expr
                         then
                            Interpret_Template ("(?~,@ ~~)");
@@ -3872,7 +3867,9 @@ package body Pp.Actions is
          Append
            (Tabs,
             Tab_Rec'
-              (Parent | Tree => null, Mark => Mark (Out_Buf, '$'), others => <>));
+              (Parent | Tree => No_Ada_Node,
+               Mark => Mark (Out_Buf, '$'),
+               others => <>));
          --  Append a sentinel tab, whose Position is greater than any actual
          --  position. This ensures that as we step through Tabs, there is
          --  always one more.

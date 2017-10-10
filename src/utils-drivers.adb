@@ -46,6 +46,7 @@ with Langkit_Support.Text;
 
 with Libadalang;     use Libadalang;
 with Libadalang.Analysis; use Libadalang.Analysis;
+with Libadalang.Iterators; use Libadalang.Iterators;
 
 package body Utils.Drivers is
 
@@ -68,14 +69,14 @@ package body Utils.Drivers is
 
    procedure Resolve_Node (N : Ada_Node; Quiet : Boolean) is
       function Safe_Image
-        (Node : access Ada_Node_Type'Class) return String is
-         (if Node = null then
+        (Node : Ada_Node'Class) return String is
+         (if Node.Is_Null then
             "None"
           else
             Langkit_Support.Text.Image (Node.Short_Image));
 
       function Is_Expr (N : Ada_Node) return Boolean is
-        (N.all in Expr_Type'Class);
+        (N.Kind in Ada_Expr);
 
       OK : Boolean;
 
@@ -103,16 +104,16 @@ package body Utils.Drivers is
       end;
 
       if OK then
-         for Node of N.Find (Is_Expr'Access).Consume loop
+         for Node of Find (N, Is_Expr'Access).Consume loop
             declare
-               P_Ref  : constant Entity := Expr (Node).P_Ref_Val;
-               P_Type : constant Entity := Expr (Node).P_Type_Val;
+               P_Ref  : constant Ada_Node := Node.As_Expr.P_Ref_Val;
+               P_Type : constant Ada_Node := Node.As_Expr.P_Type_Val;
             begin
                if not Quiet then
                   Put ("Expr: \1, references \2, type is \3\n",
                        Safe_Image (Node),
-                       Safe_Image (P_Ref.El),
-                       Safe_Image (P_Type.El));
+                       Safe_Image (P_Ref),
+                       Safe_Image (P_Type));
                end if;
             end;
          end loop;
@@ -147,7 +148,7 @@ package body Utils.Drivers is
             Put ("Populate_Lexical_Env raised Storage_Error\n");
             raise Name_Resolution_Failed;
       end;
-      for Node of Root (Unit).Find (Is_Xref_Entry_Point'Access).Consume loop
+      for Node of Find (Root (Unit), Is_Xref_Entry_Point'Access).Consume loop
          Resolve_Node (Node, Quiet => not Debug_Flag_A);
       end loop;
    end Name_Resolution;
@@ -368,7 +369,7 @@ package body Utils.Drivers is
                         --  To stderr????
                      end loop;
 
-                     if Root (Unit) = null then
+                     if Root (Unit).Is_Null then
                         goto Continue;
                      end if;
                   end if;
@@ -376,7 +377,7 @@ package body Utils.Drivers is
                   --  We continue even in the presence of errors (if we have a
                   --  tree).
 
-                  pragma Assert (Root (Unit) /= null);
+                  pragma Assert (not Root (Unit).Is_Null);
                   if not Arg (Cmd, Syntax_Only) then
                      Name_Resolution (Unit);
                   end if;

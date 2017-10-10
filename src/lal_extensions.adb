@@ -6,7 +6,7 @@ package body LAL_Extensions is
    use Ada_Node_Vectors;
 
    function Childx
-     (Node  : access Ada_Node_Type'Class;
+     (Node  : Ada_Node'Class;
       Index : Positive) return Ada_Node
    is
    begin
@@ -14,18 +14,18 @@ package body LAL_Extensions is
    end Childx;
 
    procedure Find_Iter
-     (Node      : access Ada_Node_Type'Class;
+     (Node      : Ada_Node'Class;
       Predicate : not null access function
-        (Node : access Ada_Node_Type'Class) return Boolean;
+        (Node : Ada_Node'Class) return Boolean;
       Visit     : not null access procedure
-        (Node : access Ada_Node_Type'Class))
+        (Node : Ada_Node'Class))
    is
 
       function Visit_If_Predicate
-        (Node : access Ada_Node_Type'Class) return Visit_Status;
+        (Node : Ada_Node'Class) return Visit_Status;
 
       function Visit_If_Predicate
-        (Node : access Ada_Node_Type'Class) return Visit_Status is
+        (Node : Ada_Node'Class) return Visit_Status is
       begin
          if Predicate (Node) then
             Visit (Node);
@@ -38,33 +38,33 @@ package body LAL_Extensions is
    end Find_Iter;
 
    procedure Find_Iter
-     (Node      : access Ada_Node_Type'Class;
+     (Node      : Ada_Node'Class;
       Node_Kind : Ada_Node_Kind_Type;
       Visit     : not null access procedure
-        (Node : access Ada_Node_Type'Class))
+        (Node : Ada_Node'Class))
    is
 
       function Kind_Equal
-        (Node : access Ada_Node_Type'Class) return Boolean is
+        (Node : Ada_Node'Class) return Boolean is
         (Kind (Node) = Node_Kind);
    begin
       Find_Iter (Node, Kind_Equal'Access, Visit);
    end Find_Iter;
 
    function Find_All
-     (Node      : access Ada_Node_Type'Class;
+     (Node      : Ada_Node'Class;
       Predicate : not null access function
-        (Node : access Ada_Node_Type'Class) return Boolean)
+        (Node : Ada_Node'Class) return Boolean)
       return Ada_Node_Array
    is
 
       Result_Vector : Ada_Node_Vector;
 
-      procedure Append (Node : access Ada_Node_Type'Class);
+      procedure Append (Node : Ada_Node'Class);
 
-      procedure Append (Node : access Ada_Node_Type'Class) is
+      procedure Append (Node : Ada_Node'Class) is
       begin
-         Append (Result_Vector, Node);
+         Append (Result_Vector, Node.As_Ada_Node);
       end Append;
    begin
       Find_Iter (Node, Predicate, Append'Access);
@@ -73,17 +73,17 @@ package body LAL_Extensions is
    end Find_All;
 
    function Find_All
-     (Node      : access Ada_Node_Type'Class;
+     (Node      : Ada_Node'Class;
       Node_Kind : Ada_Node_Kind_Type) return Ada_Node_Array
    is
 
       Result_Vector : Ada_Node_Vector;
 
-      procedure Append (Node : access Ada_Node_Type'Class);
+      procedure Append (Node : Ada_Node'Class);
 
-      procedure Append (Node : access Ada_Node_Type'Class) is
+      procedure Append (Node : Ada_Node'Class) is
       begin
-         Append (Result_Vector, Node);
+         Append (Result_Vector, Node.As_Ada_Node);
       end Append;
    begin
       Find_Iter (Node, Node_Kind, Append'Access);
@@ -103,15 +103,15 @@ package body LAL_Extensions is
    end L_Token_Text;
 
    function Id_Name
-     (Nm : access Ada_Node_Type'Class)
+     (Nm : Ada_Node'Class)
      return W_Str
    is
    begin
-      return Text_To_W_Str (Text (F_Tok (Single_Tok_Node (Nm))));
+      return Text_To_W_Str (Text (F_Tok (Nm.As_Single_Tok_Node)));
    end Id_Name;
 
    function L_Name
-     (Nm : access Ada_Node_Type'Class)
+     (Nm : Ada_Node'Class)
      return W_Str
    is
       use Ada.Wide_Characters.Handling;
@@ -120,25 +120,25 @@ package body LAL_Extensions is
    end L_Name;
 
    function Label_Name
-     (L : access Ada_Node_Type'Class)
+     (L : Ada_Node'Class)
      return W_Str
    is
    begin
-      return Text_To_W_Str (Text (F_Name (F_Decl (Label (L)))));
+      return Text_To_W_Str (Text (F_Name (F_Decl (L.As_Label))));
    end Label_Name;
 
    function Full_Name (Nm : Name) return W_Str is
    begin
       case Kind (Nm) is
          when Ada_Dotted_Name =>
-            return Full_Name (F_Prefix (Dotted_Name (Nm))) &
-              "." & Full_Name (Name (F_Suffix (Dotted_Name (Nm))));
+            return Full_Name (Nm.As_Dotted_Name.F_Prefix) &
+              "." & Full_Name (Nm.As_Dotted_Name.F_Suffix.As_Name);
          when Ada_Identifier | Ada_String_Literal =>
             return Id_Name (Nm);
 
          when others =>
             raise Program_Error with
-              "Full_Name of " & Short_Image (Ada_Node (Nm));
+              "Full_Name of " & Short_Image (Nm.As_Ada_Node);
       end case;
    end Full_Name;
 
@@ -148,55 +148,55 @@ package body LAL_Extensions is
       return To_Lower (Full_Name (Nm));
    end L_Full_Name;
 
-   function Get_Def_Name (Decl : Ada_Node) return Name is
+   function Get_Def_Name (Decl : Ada_Node'Class) return Name is
    begin
       return Result : Name do
          case Kind (Decl) is
             when Ada_Compilation_Unit =>
                Result :=
-                 Get_Def_Name (F_Body (Compilation_Unit (Decl)));
+                 Get_Def_Name (Decl.As_Compilation_Unit.F_Body);
             when Ada_Library_Item =>
                Result :=
-                 Get_Def_Name (Ada_Node (F_Item (Library_Item (Decl))));
+                 Get_Def_Name (Decl.As_Library_Item.F_Item);
             when Ada_Subunit =>
                Result :=
-                 Get_Def_Name (Ada_Node (F_Body (Subunit (Decl))));
+                 Get_Def_Name (Decl.As_Subunit.F_Body);
 
             when Ada_Generic_Subp_Instantiation =>
                Result :=
-                 F_Subp_Name (Generic_Subp_Instantiation (Decl));
+                 Decl.As_Generic_Subp_Instantiation.F_Subp_Name;
             when Ada_Generic_Package_Instantiation =>
                Result :=
-                 F_Name (Generic_Package_Instantiation (Decl));
+                 Decl.As_Generic_Package_Instantiation.F_Name;
             when Ada_Generic_Package_Renaming_Decl =>
                Result :=
-                 F_Name (Generic_Package_Renaming_Decl (Decl));
+                 Decl.As_Generic_Package_Renaming_Decl.F_Name;
             when Ada_Generic_Subp_Renaming_Decl =>
                Result :=
-                 F_Name (Generic_Subp_Renaming_Decl (Decl));
+                 Decl.As_Generic_Subp_Renaming_Decl.F_Name;
             when Ada_Package_Body_Stub =>
                Result :=
-                 F_Name (Package_Body_Stub (Decl));
+                 Decl.As_Package_Body_Stub.F_Name;
             when Ada_Subp_Body_Stub =>
                Result :=
                  F_Subp_Name (Get_Subp_Spec (Decl));
             when Ada_Task_Body_Stub =>
                Result :=
-                 F_Name (Task_Body_Stub (Decl));
+                 Decl.As_Task_Body_Stub.F_Name;
             when Ada_Protected_Body_Stub =>
                Result :=
-                 F_Name (Protected_Body_Stub (Decl));
+                 Decl.As_Protected_Body_Stub.F_Name;
             when Ada_Package_Renaming_Decl =>
                Result :=
-                 F_Name (Package_Renaming_Decl (Decl));
+                 Decl.As_Package_Renaming_Decl.F_Name;
             when Ada_Accept_Stmt =>
                Result :=
-                 Name (F_Name (Accept_Stmt (Decl)));
+                 Decl.As_Accept_Stmt.F_Name.As_Name;
             when Ada_Accept_Stmt_With_Stmts =>
                Result :=
-                 Name (F_Name (Accept_Stmt_With_Stmts (Decl)));
+                 Decl.As_Accept_Stmt_With_Stmts.F_Name.As_Name;
             when Ada_Named_Stmt_Decl =>
-               Result := Name (F_Name (Named_Stmt_Decl (Decl)));
+               Result := Decl.As_Named_Stmt_Decl.F_Name.As_Name;
             when Ada_Abstract_Subp_Decl |
               Ada_Expr_Function |
               Ada_Null_Subp_Decl |
@@ -206,56 +206,54 @@ package body LAL_Extensions is
                  F_Subp_Name (Get_Subp_Spec (Decl));
             when Ada_Package_Decl =>
                Result :=
-                 F_Package_Name (Base_Package_Decl (Decl));
+                 Decl.As_Base_Package_Decl.F_Package_Name;
             when Ada_Generic_Package_Decl =>
                Result :=
-                 F_Package_Name
-                 (F_Package_Decl (Generic_Package_Decl (Decl)));
+                 Decl.As_Generic_Package_Decl.F_Package_Decl.F_Package_Name;
             when Ada_Generic_Subp_Decl =>
                Result :=
                  F_Subp_Name (Get_Subp_Spec (Decl));
             when Ada_Package_Body =>
                Result :=
-                 F_Package_Name (Package_Body (Decl));
+                 Decl.As_Package_Body.F_Package_Name;
             when Ada_Subp_Body =>
                Result :=
                  F_Subp_Name (Get_Subp_Spec (Decl));
             when Ada_Single_Protected_Decl =>
                Result :=
-                 Name (F_Protected_Name (Single_Protected_Decl (Decl)));
+                 Decl.As_Single_Protected_Decl.F_Protected_Name.As_Name;
             when Ada_Protected_Type_Decl =>
                Result :=
-                 Name (F_Protected_Type_Name (Protected_Type_Decl (Decl)));
+                 Decl.As_Protected_Type_Decl.F_Protected_Type_Name.As_Name;
             when Ada_Protected_Body =>
-               Result := F_Name (Protected_Body (Decl));
+               Result := Decl.As_Protected_Body.F_Name;
             when Ada_Entry_Decl =>
                Result :=
-                 Name (F_Name (F_Spec (Entry_Decl (Decl))));
+                 Decl.As_Entry_Decl.F_Spec.F_Name.As_Name;
             when Ada_Entry_Body =>
                Result :=
-                 Name (F_Entry_Name (Entry_Body (Decl)));
+                 Decl.As_Entry_Body.F_Entry_Name.As_Name;
             when Ada_Single_Task_Decl =>
                Result :=
-                 Name (F_Type_Id (F_Task_Type (Single_Task_Decl (Decl))));
+                 Decl.As_Single_Task_Decl.F_Task_Type.F_Type_Id.As_Name;
             when Ada_Task_Type_Decl =>
                Result :=
-                 Name (F_Type_Id (Task_Type_Decl (Decl)));
+                 Decl.As_Task_Type_Decl.F_Type_Id.As_Name;
             when Ada_Task_Body =>
-               Result := F_Name (Task_Body (Decl));
+               Result := Decl.As_Task_Body.F_Name;
             when others =>
                raise Program_Error with
                  "Get_Def_Name of " & Short_Image (Decl);
          end case;
 
-         if Decl.all in Basic_Decl_Type then
+         if Decl.Kind in Ada_Basic_Decl then
             --  Should Subp_Decl_Type be in Basic_Decl_Type????
             declare
-               D : constant Entity_Name_Array_Access :=
-                 P_Defining_Names (Basic_Decl (Decl));
-               --  ????Free
+               D : constant Name_Array :=
+                 Decl.As_Basic_Decl.P_Defining_Names;
             begin
-               pragma Assert (D.N = 1);
-               pragma Assert (Result = D.Items (1).El);
+               pragma Assert (D'Length = 1);
+               pragma Assert (Result = D (1));
             end;
          end if;
       end return;
@@ -265,60 +263,60 @@ package body LAL_Extensions is
    begin
       return (case Kind (Decl) is
          when Ada_Base_Package_Decl =>
-            F_Aspects (Base_Package_Decl (Decl)),
+            Decl.As_Base_Package_Decl.F_Aspects,
          when Ada_Abstract_Subp_Decl =>
-            F_Aspects (Abstract_Subp_Decl (Decl)),
+            Decl.As_Abstract_Subp_Decl.F_Aspects,
          when Ada_Expr_Function =>
-            F_Aspects (Expr_Function (Decl)),
+            Decl.As_Expr_Function.F_Aspects,
          when Ada_Null_Subp_Decl =>
-            F_Aspects (Null_Subp_Decl (Decl)),
+            Decl.As_Null_Subp_Decl.F_Aspects,
          when Ada_Subp_Renaming_Decl =>
-            F_Aspects (Subp_Renaming_Decl (Decl)),
+            Decl.As_Subp_Renaming_Decl.F_Aspects,
          when Ada_Subp_Decl =>
-            F_Aspects (Subp_Decl (Decl)),
+            Decl.As_Subp_Decl.F_Aspects,
          when Ada_Package_Body_Stub =>
-            F_Aspects (Package_Body_Stub (Decl)),
+            Decl.As_Package_Body_Stub.F_Aspects,
          when Ada_Subp_Body_Stub =>
-            F_Aspects (Subp_Body_Stub (Decl)),
+            Decl.As_Subp_Body_Stub.F_Aspects,
          when Ada_Task_Body_Stub =>
-            F_Aspects (Task_Body_Stub (Decl)),
+            Decl.As_Task_Body_Stub.F_Aspects,
          when Ada_Package_Body =>
-            F_Aspects (Package_Body (Decl)),
+            Decl.As_Package_Body.F_Aspects,
          when Ada_Protected_Body =>
-            F_Aspects (Protected_Body (Decl)),
+            Decl.As_Protected_Body.F_Aspects,
          when Ada_Subp_Body =>
-            F_Aspects (Subp_Body (Decl)),
+            Decl.As_Subp_Body.F_Aspects,
          when Ada_Task_Body =>
-            F_Aspects (Task_Body (Decl)),
+            Decl.As_Task_Body.F_Aspects,
          when Ada_Exception_Decl =>
-            F_Aspects (Exception_Decl (Decl)),
+            Decl.As_Exception_Decl.F_Aspects,
          when Ada_Generic_Subp_Instantiation =>
-            F_Aspects (Generic_Subp_Instantiation (Decl)),
+            Decl.As_Generic_Subp_Instantiation.F_Aspects,
          when Ada_Generic_Package_Instantiation =>
-            F_Aspects (Generic_Package_Instantiation (Decl)),
+            Decl.As_Generic_Package_Instantiation.F_Aspects,
          when Ada_Generic_Package_Renaming_Decl =>
-            F_Aspects (Generic_Package_Renaming_Decl (Decl)),
+            Decl.As_Generic_Package_Renaming_Decl.F_Aspects,
          when Ada_Generic_Subp_Renaming_Decl =>
-            F_Aspects (Generic_Subp_Renaming_Decl (Decl)),
+            Decl.As_Generic_Subp_Renaming_Decl.F_Aspects,
          when Ada_Generic_Subp_Decl =>
-            F_Aspects (F_Subp_Decl (Generic_Subp_Decl (Decl))),
+            Decl.As_Generic_Subp_Decl.F_Subp_Decl.F_Aspects,
          when Ada_Object_Decl =>
-            F_Aspects (Object_Decl (Decl)),
+            Decl.As_Object_Decl.F_Aspects,
          when Ada_Package_Renaming_Decl =>
-            F_Aspects (Package_Renaming_Decl (Decl)),
+            Decl.As_Package_Renaming_Decl.F_Aspects,
          when Ada_Single_Protected_Decl =>
-            F_Aspects (Single_Protected_Decl (Decl)),
+            Decl.As_Single_Protected_Decl.F_Aspects,
          when Ada_Protected_Type_Decl =>
-            F_Aspects (Protected_Type_Decl (Decl)),
+            Decl.As_Protected_Type_Decl.F_Aspects,
          when Ada_Single_Task_Decl =>
-            F_Aspects (F_Task_Type (Single_Task_Decl (Decl))),
+            Decl.As_Single_Task_Decl.F_Task_Type.F_Aspects,
             --  The aspects are on the anonymous task type.
          when Ada_Task_Type_Decl =>
-            F_Aspects (Task_Type_Decl (Decl)),
+            Decl.As_Task_Type_Decl.F_Aspects,
          when Ada_Type_Decl =>
-            F_Aspects (Type_Decl (Decl)),
+            Decl.As_Type_Decl.F_Aspects,
          when Ada_Subtype_Decl =>
-            F_Aspects (Subtype_Decl (Decl)),
+            Decl.As_Subtype_Decl.F_Aspects,
 --  See P415-048:
 --         when ada_Component_Decl =>
 --            F_Aspects (Component_Decl (Decl)),
@@ -330,80 +328,80 @@ package body LAL_Extensions is
    end Get_Aspects;
 
    function G_Formal_Part
-     (Node : access Ada_Node_Type'Class) return Generic_Formal_Part is
+     (Node : Ada_Node'Class) return Generic_Formal_Part is
    begin
       case Kind (Node) is
          when Ada_Generic_Package_Decl =>
-            return F_Formal_Part (Generic_Package_Decl (Node));
+            return Node.As_Generic_Package_Decl.F_Formal_Part;
          when Ada_Generic_Subp_Decl =>
-            return F_Formal_Part (Generic_Subp_Decl (Node));
+            return Node.As_Generic_Subp_Decl.F_Formal_Part;
          when others => raise Program_Error;
       end case;
    end G_Formal_Part;
 
    function Vis_Part
-     (Node : access Ada_Node_Type'Class) return Public_Part
+     (Node : Ada_Node'Class) return Public_Part
    is
       --  I'm confused about Base_Package_Decl
    begin
       case Kind (Node) is
          when Ada_Package_Decl =>
-            return F_Public_Part (Base_Package_Decl (Node));
+            return Node.As_Base_Package_Decl.F_Public_Part;
          when Ada_Generic_Package_Decl =>
             return
-              F_Public_Part (F_Package_Decl (Generic_Package_Decl (Node)));
+              Node.As_Generic_Package_Decl.F_Package_Decl.F_Public_Part;
          when Ada_Task_Def =>
-            return F_Public_Part (Task_Def (Node));
+            return Node.As_Task_Def.F_Public_Part;
          when Ada_Protected_Def =>
-            return F_Public_Part (Protected_Def (Node));
+            return Node.As_Protected_Def.F_Public_Part;
          when Ada_Single_Task_Decl => -- This will recurse 2 levels!
-            return Vis_Part (F_Task_Type (Single_Task_Decl (Node)));
+            return Vis_Part (Node.As_Single_Task_Decl.F_Task_Type);
          when Ada_Task_Type_Decl =>
-            return Vis_Part (F_Definition (Task_Type_Decl (Node)));
+            return Vis_Part (Node.As_Task_Type_Decl.F_Definition);
          when Ada_Single_Protected_Decl => -- This will recurse 2 levels!
-            return Vis_Part (F_Definition (Single_Protected_Decl (Node)));
+            return Vis_Part (Node.As_Single_Protected_Decl.F_Definition);
             --  Why doesn't this parallel tasks???
          when Ada_Protected_Type_Decl =>
-            return Vis_Part (F_Definition (Protected_Type_Decl (Node)));
+            return Vis_Part (Node.As_Protected_Type_Decl.F_Definition);
          when others => raise Program_Error;
       end case;
    end Vis_Part;
 
    function Priv_Part
-     (Node : access Ada_Node_Type'Class) return Private_Part is
+     (Node : Ada_Node'Class) return Private_Part is
    begin
       case Kind (Node) is
          when Ada_Package_Decl =>
-            return F_Private_Part (Base_Package_Decl (Node));
+            return Node.As_Base_Package_Decl.F_Private_Part;
          when Ada_Generic_Package_Decl =>
             return
-              F_Private_Part (F_Package_Decl (Generic_Package_Decl (Node)));
+              Node.As_Generic_Package_Decl.F_Package_Decl.F_Private_Part;
          when Ada_Task_Def =>
-            return F_Private_Part (Task_Def (Node));
+            return Node.As_Task_Def.F_Private_Part;
          when Ada_Protected_Def =>
-            return F_Private_Part (Protected_Def (Node));
+            return Node.As_Protected_Def.F_Private_Part;
          when Ada_Single_Task_Decl => -- This will recurse 2 levels!
-            return Priv_Part (F_Task_Type (Single_Task_Decl (Node)));
+            return Priv_Part (Node.As_Single_Task_Decl.F_Task_Type);
          when Ada_Task_Type_Decl =>
-            return Priv_Part (F_Definition (Task_Type_Decl (Node)));
+            return Priv_Part (Node.As_Task_Type_Decl.F_Definition);
          when Ada_Single_Protected_Decl => -- This will recurse 2 levels!
-            return Priv_Part (F_Definition (Single_Protected_Decl (Node)));
+            return Priv_Part (Node.As_Single_Protected_Decl.F_Definition);
             --  Why doesn't this parallel tasks???
          when Ada_Protected_Type_Decl =>
-            return Priv_Part (F_Definition (Protected_Type_Decl (Node)));
+            return Priv_Part (Node.As_Protected_Type_Decl.F_Definition);
          when others => raise Program_Error;
       end case;
    end Priv_Part;
 
    function Body_Decls
-     (Node : access Ada_Node_Type'Class) return Declarative_Part is
+     (Node : Ada_Node'Class) return Declarative_Part is
    begin
       case Kind (Node) is
-         when Ada_Entry_Body => return F_Decls (Entry_Body (Node));
-         when Ada_Package_Body => return F_Decls (Package_Body (Node));
-         when Ada_Protected_Body => return F_Decls (Protected_Body (Node));
-         when Ada_Subp_Body => return F_Decls (Subp_Body (Node));
-         when Ada_Task_Body => return F_Decls (Task_Body (Node));
+         when Ada_Entry_Body => return Node.As_Entry_Body.F_Decls;
+         when Ada_Package_Body => return Node.As_Package_Body.F_Decls;
+         when Ada_Protected_Body => return Node.As_Protected_Body.F_Decls;
+         when Ada_Subp_Body => return Node.As_Subp_Body.F_Decls;
+         when Ada_Task_Body => return Node.As_Task_Body.F_Decls;
          when others => raise Program_Error;
       end case;
    end Body_Decls;
@@ -439,19 +437,19 @@ package body LAL_Extensions is
       end case;
    end Is_Program_Unit;
 
-   function Get_Subp_Spec (Node : Ada_Node) return Subp_Spec is
+   function Get_Subp_Spec (Node : Ada_Node'Class) return Subp_Spec is
    begin
       case Kind (Node) is
          when Ada_Classic_Subp_Decl =>
-            return F_Subp_Spec (Classic_Subp_Decl (Node));
+            return Node.As_Classic_Subp_Decl.F_Subp_Spec;
          when Ada_Generic_Subp_Decl =>
-            return F_Subp_Spec (F_Subp_Decl (Generic_Subp_Decl (Node)));
+            return Node.As_Generic_Subp_Decl.F_Subp_Decl.F_Subp_Spec;
          when Ada_Subp_Body_Stub =>
-            return F_Subp_Spec (Subp_Body_Stub (Node));
+            return Node.As_Subp_Body_Stub.F_Subp_Spec;
          when Ada_Subp_Body =>
-            return F_Subp_Spec (Subp_Body (Node));
+            return Node.As_Subp_Body.F_Subp_Spec;
          when Ada_Access_To_Subp_Def =>
-            return F_Subp_Spec (Access_To_Subp_Def (Node));
+            return Node.As_Access_To_Subp_Def.F_Subp_Spec;
          when others => raise Program_Error;
       end case;
    end Get_Subp_Spec;

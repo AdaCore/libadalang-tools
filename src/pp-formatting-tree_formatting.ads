@@ -23,9 +23,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Libadalang;          use Libadalang;
-with Libadalang.Analysis; use Libadalang.Analysis;
-
 package Pp.Formatting.Tree_Formatting is
 
    pragma Elaborate_Body;

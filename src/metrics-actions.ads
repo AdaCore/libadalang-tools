@@ -124,7 +124,7 @@ private
    --  components like Kind and Sloc, below.
 
    type Metrix (Kind : Ada_Node_Kind_Type) is record
-      Node : Ada_Node := null;
+      Node : Ada_Node := No_Ada_Node;
       --  Node to which the metrics are associated, except for Metrix_Stack[1],
       --  which has Node = null. Node is used only while gathering metrics; it
       --  is not used while printing metrics.

@@ -61,7 +61,7 @@ package body Pp.Formatting is
 
    subtype Ada_Node is Libadalang.Analysis.Ada_Node;
    use type Ada_Node;
-   function Is_Null (Tree : Ada_Node) return Boolean is (Tree = null);
+   function Is_Null (Tree : Ada_Node) return Boolean is (Tree.Is_Null);
    function T_Img (Tree : Ada_Node) return String is
      (LAL_Extensions.Short_Image (Tree));
 

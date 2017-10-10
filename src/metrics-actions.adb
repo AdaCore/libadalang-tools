@@ -120,16 +120,16 @@ package body METRICS.Actions is
    --  For setting breakpoints in gdb
 
    procedure Stop (Node : Ada_Node; S : W_Str) is
-      P : constant Ada_Node_Array_Access := Parents (Node);
+      P : constant Ada_Node_Array := Parents (Node);
       use Utils.Dbg_Out;
    begin
       if False then
          Put ("Node:\n");
          Print (Node);
          if False then
-            for X in P.Items'Range loop
+            for X in P'Range loop
                Put ("Parent \1:\n", Image (X));
-               Print (P.Items (X));
+               Print (P (X));
             end loop;
          end if;
       end if;
@@ -151,7 +151,7 @@ package body METRICS.Actions is
       use Utils.Dbg_Out;
    begin
       Utils.Dbg_Out.Output_Enabled := True;
-      Put ("\1\n", (if X = null then "null" else Short_Image (X)));
+      Put ("\1\n", (if X.Is_Null then "null" else Short_Image (X)));
    end pp;
 
    procedure ppp (X : Ada_Node) is
@@ -227,7 +227,7 @@ package body METRICS.Actions is
    --  spec and body of that compilation unit. Used for coupling metrics.
 
    function Pragma_Name (Node : Ada_Node) return W_Str is
-     (L_Name (F_Id (Pragma_Node (Node))));
+     (L_Name (Node.As_Pragma_Node.F_Id));
    --  Name of a pragma node, in lower case
 
    function Get_CU_Access
@@ -307,7 +307,7 @@ package body METRICS.Actions is
       Source_File_Name : String_Ref := null)
      return Metrix_Ref with
      Pre => (Source_File_Name /= null) =
-            (Node /= null and then Kind (Node) = Ada_Compilation_Unit);
+            (not Node.Is_Null and then Kind (Node) = Ada_Compilation_Unit);
    --  Pushes a new Metrix onto the Metrix_Stack, and returns it
 
    function Get_Outer_Unit (Node : Ada_Node) return Ada_Node with
@@ -450,7 +450,7 @@ package body METRICS.Actions is
      return Metrix_Ref
    is
       K : constant Ada_Node_Kind_Type :=
-        (if Node = null then Null_Kind else Kind (Node));
+        (if Node.Is_Null then Null_Kind else Kind (Node));
 
       procedure Set_CU_Metrix
         (M : Metrix_Ref;
@@ -540,13 +540,13 @@ package body METRICS.Actions is
 
          Result.Node := Node;
          Result.Knd := Get_Fine_Kind (Node);
-         Result.Sloc := (if Node = null
+         Result.Sloc := (if Node.Is_Null
                            then Slocs.No_Source_Location_Range
                            else Sloc_Range (Node));
          Result.Is_Private_Lib_Unit := Is_Private (Node);
          Result.Has_Complexity_Metrics := Has_Complexity_Metrics (Node);
 
-         if Node /= null then
+         if not Node.Is_Null then
             Result.Comp_Unit := Element (Tool.Metrix_Stack, 2);
 
             declare
@@ -568,11 +568,8 @@ package body METRICS.Actions is
                   begin
                      Result.Subunit_Parent :=
                        (if Is_Subunit
-                          then W_Intern
-                            (Full_Name
-                              (F_Name
-                                (Subunit
-                                  (F_Body (Compilation_Unit (Node))))))
+                          then W_Intern (Full_Name (Node.As_Compilation_Unit
+                                                    .F_Body.As_Subunit.F_Name))
                           else Empty_CU_Sym);
                      Result.Text_Name :=
                        Intern (Sub_Str & Str (Result.Subunit_Parent).S & Dot &
@@ -599,29 +596,26 @@ package body METRICS.Actions is
             Result.Source_File_Name := Source_File_Name;
          end if;
 
-         if Node /= null
+         if not Node.Is_Null
            and then Kind (Node) = Ada_Package_Body
-           and then F_Stmts (Package_Body (Node)) /= null
+           and then not Node.As_Package_Body.F_Stmts.Is_Null
          then
             Result.Statements_Sloc :=
-              Sloc_Range
-                (Ada_Node
-                   (F_Stmts
-                      (F_Stmts (Package_Body (Node)))));
+              Node.As_Package_Body.F_Stmts.F_Stmts.Sloc_Range;
          end if;
       end return;
    end Push_New_Metrix;
 
    function Get_Outer_Unit (Node : Ada_Node) return Ada_Node is
       Lib_Item_Or_Subunit : constant Ada_Node :=
-        F_Body (Compilation_Unit (Node));
+        Node.As_Compilation_Unit.F_Body;
    begin
       return
         (case Kind (Lib_Item_Or_Subunit) is
            when Ada_Library_Item =>
-              Ada_Node (F_Item (Library_Item (Lib_Item_Or_Subunit))),
+              Lib_Item_Or_Subunit.As_Library_Item.F_Item.As_Ada_Node,
            when Ada_Subunit =>
-              Ada_Node (F_Body (Subunit (Lib_Item_Or_Subunit))),
+              Lib_Item_Or_Subunit.As_Subunit.F_Body.As_Ada_Node,
            when others => raise Program_Error);
    end Get_Outer_Unit;
 
@@ -639,7 +633,7 @@ package body METRICS.Actions is
 
          when Ada_Aspect_Assoc =>
             declare
-               Id : constant Expr := F_Id (Aspect_Assoc (Node));
+               Id : constant Expr := Node.As_Aspect_Assoc.F_Id;
             begin
                case Kind (Id) is
                   when Ada_Identifier =>
@@ -658,9 +652,9 @@ package body METRICS.Actions is
                   when Ada_Attribute_Ref =>
                      declare
                         Prefix : constant W_Str :=
-                          L_Name (F_Prefix (Attribute_Ref (Id)));
+                          L_Name (Id.As_Attribute_Ref.F_Prefix);
                         Attr : constant W_Str :=
-                          L_Name (F_Attribute (Attribute_Ref (Id)));
+                          L_Name (Id.As_Attribute_Ref.F_Attribute);
                      begin
                         if Attr = Class then
                            if Prefix = Pre then
@@ -682,7 +676,7 @@ package body METRICS.Actions is
 
    function Has_Complexity_Metrics (Node : Ada_Node) return Boolean is
    begin
-      if Node = null then
+      if Node.Is_Null then
          return False;
       end if;
 
@@ -709,7 +703,7 @@ package body METRICS.Actions is
          when Ada_Package_Body =>
             --  Apparently, gnatmetric doesn't do nested package bodies if
             --  there are no statements.
-            return F_Stmts (Package_Body (Node)) /= null;
+            return not Node.As_Package_Body.F_Stmts.Is_Null;
 
          when others =>
             return False;
@@ -718,7 +712,7 @@ package body METRICS.Actions is
 
    function Get_Fine_Kind (Node : Ada_Node) return Fine_Kind is
    begin
-      if Node = null then
+      if Node.Is_Null then
          return No_Such_Knd;
       end if;
 
@@ -746,7 +740,7 @@ package body METRICS.Actions is
                  F_Subp_Returns (Get_Subp_Spec (Node));
             begin
                return
-                 (if R = null then Procedure_Body_Knd else Function_Body_Knd);
+                 (if R.Is_Null then Procedure_Body_Knd else Function_Body_Knd);
             end;
          when Ada_Task_Body =>
             return Task_Body_Knd;
@@ -762,7 +756,7 @@ package body METRICS.Actions is
          when Ada_Generic_Subp_Instantiation =>
             return
               (case Ada_Subp_Kind'
-                 (Kind (F_Kind (Generic_Subp_Instantiation (Node))))
+                 (Kind (Node.As_Generic_Subp_Instantiation.F_Kind))
                is
                  when Ada_Subp_Kind_Function =>
                     Function_Instantiation_Knd,
@@ -775,7 +769,7 @@ package body METRICS.Actions is
                --  ???R is null here even for functions
             begin
                return
-                 (if R = null
+                 (if R.Is_Null
                     then Generic_Procedure_Knd
                     else Generic_Function_Knd);
             end;
@@ -789,7 +783,7 @@ package body METRICS.Actions is
                R : constant Type_Expr :=
                  F_Subp_Returns (Get_Subp_Spec (Node));
             begin
-               return (if R = null then Procedure_Knd else Function_Knd);
+               return (if R.Is_Null then Procedure_Knd else Function_Knd);
             end;
 
          when Ada_Expr_Function =>
@@ -823,7 +817,7 @@ package body METRICS.Actions is
 
    function Is_Private (Node : Ada_Node) return Boolean is
    begin
-      if Node = null or else Kind (Node) = Ada_Compilation_Unit then
+      if Node.Is_Null or else Kind (Node) = Ada_Compilation_Unit then
          return False;
       end if;
 
@@ -831,7 +825,7 @@ package body METRICS.Actions is
          P : constant Ada_Node := Parent (Node);
       begin
          return Kind (P) = Ada_Library_Item
-           and then F_Has_Private (Library_Item (P));
+           and then P.As_Library_Item.F_Has_Private;
       end;
    end Is_Private;
 
@@ -1182,7 +1176,7 @@ package body METRICS.Actions is
       M : Metrix;
       Depth : Positive)
    is
-      pragma Assert (M.Node = null);
+      pragma Assert (M.Node.Is_Null);
 
       Doing_Coupling_Metrics : constant Boolean :=
         (Metrics_To_Compute and not Coupling_Only) = Empty_Metrics_Set;
@@ -1470,7 +1464,7 @@ package body METRICS.Actions is
       M : Metrix;
       Depth : Positive)
    is
-      pragma Assert (M.Node = null);
+      pragma Assert (M.Node.Is_Null);
 
       To_Print_First : constant Metrics_Set :=
         Metrics_To_Compute and
@@ -1797,7 +1791,8 @@ package body METRICS.Actions is
 
       Metrics_To_Compute : Metrics_Set renames Tool.Metrics_To_Compute;
 
-      Ignored : constant Metrix_Ref := Push_New_Metrix (Tool, Node => null);
+      Ignored : constant Metrix_Ref :=
+         Push_New_Metrix (Tool, Node => No_Ada_Node);
 
    --  Start of processing for Init
 
@@ -2229,7 +2224,7 @@ package body METRICS.Actions is
       --  We're done with Metrix_Stack at this point. Printing uses the tree
       --  formed by Submetrix.
 
-      Global_M.Node := null;
+      Global_M.Node := No_Ada_Node;
       Pop (Metrix_Stack);
       Clear (Metrix_Stack);
 
@@ -2381,7 +2376,7 @@ package body METRICS.Actions is
    is
       pragma Unreferenced (Cmd, Input, BOM_Seen);
       CU_List : constant Ada_Node := Root (Unit);
-      pragma Assert (CU_List /= null);
+      pragma Assert (not CU_List.Is_Null);
 --      pragma Assert (Kind (CU_List) = List_Kind);
 --    pragma Assert (Child_Count (CU_List) = 1);
       --  libadalang supports multiple compilation units per file,
@@ -2464,7 +2459,7 @@ package body METRICS.Actions is
       --  Number of bodies we are nested within, except package bodies
       --  don't count.
 
-      Prev_Subp_Decl : Ada_Node := null;
+      Prev_Subp_Decl : Ada_Node := No_Ada_Node;
       --  When we're walking a pragma, this is the most recently seen
       --  subprogram declaration, if any. Used in the implementation of pragma
       --  SPARK_Mode, which can immediately follow a subprogram declaration.
@@ -2697,16 +2692,16 @@ package body METRICS.Actions is
 
             when Ada_Case_Stmt =>
                Inc_Cyc (Complexity_Statement,
-                 By => Child_Count (F_Case_Alts (Case_Stmt (Node))) - 1);
+                 By => Node.As_Case_Stmt.F_Case_Alts.Child_Count - 1);
 
             when Ada_Exit_Stmt =>
-               if F_Condition (Exit_Stmt (Node)) /= null then
+               if not Node.As_Exit_Stmt.F_Condition.Is_Null then
                   Inc_Cyc (Complexity_Statement);
                end if;
 
             when Ada_Select_Stmt =>
                declare
-                  S : constant Select_Stmt := Select_Stmt (Node);
+                  S : constant Select_Stmt := Node.As_Select_Stmt;
                   Num_Alts : constant Metric_Nat := Child_Count (F_Guards (S));
                   Num_Else : constant Metric_Nat :=
                     (if Child_Count (F_Else_Stmts (S)) = 0 then 0 else 1);
@@ -2721,7 +2716,7 @@ package body METRICS.Actions is
                null; -- It's already set to 1
 
             when Ada_Bin_Op =>
-               if F_Op (Bin_Op (Node)) in Ada_Op_Or_Else | Ada_Op_And_Then then
+               if Node.As_Bin_Op.F_Op in Ada_Op_Or_Else | Ada_Op_And_Then then
                   Inc_Cyc (Complexity_Expression);
                end if;
 
@@ -2730,7 +2725,7 @@ package body METRICS.Actions is
 
             when Ada_Case_Expr =>
                Inc_Cyc (Complexity_Expression,
-                        By => Child_Count (F_Cases (Case_Expr (Node))) - 1);
+                        By => Node.As_Case_Expr.F_Cases.Child_Count - 1);
 
             when Ada_Quantified_Expr =>
                Inc_Cyc (Complexity_Expression, By => 2);
@@ -2872,7 +2867,7 @@ package body METRICS.Actions is
          begin
             case Kind (Node) is
                when Ada_Package_Body =>
-                  return F_Stmts (Package_Body (Node)) /= null;
+                  return not Node.As_Package_Body.F_Stmts.Is_Null;
                when Ada_Entry_Body | Ada_Subp_Body | Ada_Task_Body =>
                   return True;
                when others =>
@@ -2982,7 +2977,7 @@ package body METRICS.Actions is
          --  subprogram declaration, we return that declaration.
 
          function Find_Pragma
-           (L : access Ada_Node_List_Type'Class) return Boolean;
+           (L : Ada_Node_List'Class) return Boolean;
          --  True if L contains Node at the start (preceded only by other
          --  pragmas). Node must be a pragma SPARK_Mode.
 
@@ -3010,9 +3005,9 @@ package body METRICS.Actions is
                   if Kind (Node) = Ada_Package_Body
                     and then
                       Find_Pragma
-                        (F_Stmts (F_Stmts (Package_Body (P))))
+                        (P.As_Package_Body.F_Stmts.F_Stmts)
                   then
-                     return Ada_Node (F_Stmts (Package_Body (P)));
+                     return P.As_Package_Body.F_Stmts.As_Ada_Node;
                   elsif Find_Pragma (F_Decls (Body_Decls (P))) then
                      return P;
                   end if;
@@ -3024,12 +3019,12 @@ package body METRICS.Actions is
             --  so it must be immediately following a subprogram declaration
             --  (preceded only by other pragmas).
 
-            pragma Assert (Prev_Subp_Decl /= null);
+            pragma Assert (not Prev_Subp_Decl.Is_Null);
             return Prev_Subp_Decl;
          end Find_Section;
 
          function Find_Pragma
-           (L : access Ada_Node_List_Type'Class) return Boolean is
+           (L : Ada_Node_List'Class) return Boolean is
          begin
             for C in 1 .. Child_Count (L) loop
                if Kind (Childx (L, C)) /= Ada_Pragma_Node then
@@ -3062,23 +3057,23 @@ package body METRICS.Actions is
             when Ada_Pragma_Node =>
                null; -- Leave Prev_Subp_Decl alone
             when others =>
-               Prev_Subp_Decl := null;
+               Prev_Subp_Decl := No_Ada_Node;
          end case;
 
          if Kind (Node) = Ada_Pragma_Node
            and then Pragma_Name (Node) = Spark_Mode
          then
-            if F_Args (Pragma_Node (Node)) = null then
+            if Node.As_Pragma_Node.F_Args.Is_Null then
                ON := True;
             else
-               case Child_Count (F_Args (Pragma_Node (Node))) is
+               case Node.As_Pragma_Node.F_Args.Child_Count is
                   when 0 => ON := True; pragma Assert (False);
                   when 1 =>
                      declare
                         I : constant Base_Assoc :=
-                           Item (F_Args (Pragma_Node (Node)), 1);
+                           Node.As_Pragma_Node.F_Args.Child (1).As_Base_Assoc;
                      begin
-                        ON := L_Name (P_Assoc_Expr (I).El) = "on";
+                        ON := L_Name (I.P_Assoc_Expr) = "on";
                      end;
                   when others => raise Program_Error;
                end case;
@@ -3086,14 +3081,14 @@ package body METRICS.Actions is
             Section := Find_Section;
 
          elsif Kind (Node) = Ada_Aspect_Assoc
-           and then Kind (F_Id (Aspect_Assoc (Node))) = Ada_Identifier
-           and then L_Name (F_Id (Aspect_Assoc (Node))) = Spark_Mode
+           and then Kind (Node.As_Aspect_Assoc.F_Id) = Ada_Identifier
+           and then L_Name (Node.As_Aspect_Assoc.F_Id) = Spark_Mode
          then
-            if F_Expr (Aspect_Assoc (Node)) = null then
+            if Node.As_Aspect_Assoc.F_Expr.Is_Null then
                ON := True;
             else
                ON :=
-                 L_Name (Identifier (F_Expr (Aspect_Assoc (Node)))) = On_Str;
+                 L_Name (Node.As_Aspect_Assoc.F_Expr.As_Identifier) = On_Str;
             end if;
             Section := M.Node;
 
@@ -3172,7 +3167,7 @@ package body METRICS.Actions is
             Has_Contracts, Has_Post : out Boolean)
          is
             Aspects : constant Aspect_Spec :=
-              Get_Aspects (Basic_Decl (Subp_Decl));
+              Get_Aspects (Subp_Decl.As_Basic_Decl);
          begin
             Has_Contracts := False;
             Has_Post := False;
@@ -3183,7 +3178,7 @@ package body METRICS.Actions is
                Has_Contracts := True;
                Has_Post := True;
 
-            elsif Aspects /= null then
+            elsif not Aspects.Is_Null then
                declare
                   Assocs : constant Aspect_Assoc_List :=
                     F_Aspect_Assocs (Aspects);
@@ -3206,13 +3201,13 @@ package body METRICS.Actions is
       --  Start of processing for Gather_Contract_Metrics
 
       begin
-         if Vis_Decls /= null then -- Shouldn't it be empty list???
+         if not Vis_Decls.Is_Null then -- Shouldn't it be empty list???
             for I in 1 .. Child_Count (Vis_Decls) loop
                declare
                   Decl : constant Ada_Node := Childx (Vis_Decls, I);
                   Has_Contracts, Has_Post : Boolean;
                begin
-                  if Decl.all in Basic_Subp_Decl_Type'Class then
+                  if Decl.Kind in Ada_Basic_Subp_Decl then
                      Search_Aspects (Decl, Has_Contracts, Has_Post);
 
                      if Has_Contracts then
@@ -3266,10 +3261,10 @@ package body METRICS.Actions is
          --  libadalang, but they are not actually statements, so shouldn't be
          --  counted in the metric.
 
-         if Node.all in Stmt_Type'Class
-           and then Node.all not in Label_Type'Class
-           and then Node.all not in Terminate_Alternative_Type'Class
-           and then Node.all not in Named_Stmt_Type'Class
+         if Node.Kind in Ada_Stmt
+           and then Node.Kind not in Ada_Label
+           and then Node.Kind not in Ada_Terminate_Alternative
+           and then Node.Kind not in Ada_Named_Stmt
          then
             if Debug_Flag_W then
                Put ("Statement: \1\n", Short_Image (Node));
@@ -3300,7 +3295,7 @@ package body METRICS.Actions is
             Inc_All (Logical_Source_Lines);
          end if;
          if Kind (Node) = Ada_Exception_Handler
-           and then F_Exc_Name (Exception_Handler (Node)) /= null
+           and then not Node.As_Exception_Handler.F_Exc_Name.Is_Null
          then
             Inc_All (Declarations);
             Inc_All (Logical_Source_Lines);
@@ -3319,12 +3314,12 @@ package body METRICS.Actions is
 
                if Kind (Node) = Ada_Type_Decl then
                   declare
-                     Def : constant Type_Def := F_Type_Def (Type_Decl (Node));
+                     Def : constant Type_Def := Node.As_Type_Decl.F_Type_Def;
                   begin
                      if Kind (Def) = Ada_Private_Type_Def
                        or else
                        (Kind (Def) = Ada_Derived_Type_Def
-                          and then F_Has_With_Private (Derived_Type_Def (Def)))
+                          and then Def.As_Derived_Type_Def.F_Has_With_Private)
                      then
                         Inc_All (Private_Types);
                      end if;
@@ -3409,7 +3404,7 @@ package body METRICS.Actions is
 
          if Kind (Node) = Ada_Param_Spec then
             declare
-               N : constant Param_Spec := Param_Spec (Node);
+               N : constant Param_Spec := Node.As_Param_Spec;
                Num : constant Metric_Nat :=
                  Metric_Nat (Child_Count (F_Ids (N)));
             begin
@@ -3436,17 +3431,17 @@ package body METRICS.Actions is
             when Ada_With_Clause =>
                declare
                   Names : constant Name_List :=
-                    F_Packages (With_Clause (Node));
+                    Node.As_With_Clause.F_Packages;
                begin
                   for I in 1 .. Child_Count (Names) loop
-                     if F_Has_Limited (With_Clause (Node)) then
+                     if Node.As_With_Clause.F_Has_Limited then
                         Include
                           (File_M.Limited_Depends_On,
-                           W_Intern (Full_Name (Name (Childx (Names, I)))));
+                           W_Intern (Full_Name (Childx (Names, I).As_Name)));
                      else
                         Include
                           (File_M.Depends_On,
-                           W_Intern (Full_Name (Name (Childx (Names, I)))));
+                           W_Intern (Full_Name (Childx (Names, I).As_Name)));
                      end if;
                   end loop;
                end;
@@ -3470,7 +3465,7 @@ package body METRICS.Actions is
                      Include
                        (File_M.Depends_On,
                         W_Intern
-                          (Full_Name (F_Prefix (Dotted_Name (Def_Name)))));
+                          (Full_Name (Def_Name.As_Dotted_Name.F_Prefix)));
                   end if;
                end;
 
@@ -3485,16 +3480,16 @@ package body METRICS.Actions is
             when Ada_Incomplete_Tagged_Type_Decl =>
                File_M.Has_Tagged_Type := True;
             when Ada_Private_Type_Def =>
-               if F_Has_Tagged (Private_Type_Def (Node)) then
+               if Node.As_Private_Type_Def.F_Has_Tagged then
                   File_M.Has_Tagged_Type := True;
                end if;
             when Ada_Record_Type_Def =>
-               if F_Has_Tagged (Record_Type_Def (Node)) then
+               if Node.As_Record_Type_Def.F_Has_Tagged then
                   File_M.Has_Tagged_Type := True;
                end if;
             when Ada_Derived_Type_Def =>
-               if F_Record_Extension (Derived_Type_Def (Node)) /= null
-                 or else F_Has_With_Private (Derived_Type_Def (Node))
+               if not Node.As_Derived_Type_Def.F_Record_Extension.Is_Null
+                 or else Node.As_Derived_Type_Def.F_Has_With_Private
                then
                   File_M.Has_Tagged_Type := True;
                end if;
@@ -3570,7 +3565,7 @@ package body METRICS.Actions is
                   Dec (M.Vals (Extra_Exit_Points));
                end if;
                Validate (M.all);
-               M.Node := null;
+               M.Node := No_Ada_Node;
                Pop (Metrix_Stack);
                Loop_Count := Saved_Loop_Count;
             end;
@@ -3612,6 +3607,7 @@ package body METRICS.Actions is
            Element (Metrix_Stack, Last_Index (Metrix_Stack)).all;
 
          With_Trivia : constant Children_Array := Children_With_Trivia (Node);
+         B           : Boolean;
 
          use type Lexer.Token_Kind;
 
@@ -3641,11 +3637,12 @@ package body METRICS.Actions is
             end if;
          end if;
 
-         if Ada_Node_Array_Access'(Parents (Node)).Items'Length > 2
+         B := Node.Parents'Length > 2;
+         if B
            and then False -- ???See P907-045
          then
             pragma Assert
-              (Parents (Node).Items (3) =
+              (Node.Parents (3) =
                  Element (Node_Stack, Last_Index (Node_Stack) - 2));
          end if;
          if not In_Assertion then
@@ -3681,13 +3678,13 @@ package body METRICS.Actions is
                Cur_Child : constant Ada_Node := Child (Node, I);
                In_Generic_Formal_Part_Set : Boolean := False;
             begin
-               if Cur_Child /= null then
+               if not Cur_Child.Is_Null then
                   if Kind (Node) in
                     Ada_Generic_Package_Decl | Ada_Generic_Subp_Decl
                   then
                      pragma Assert
                        ((I = 1) =
-                        (Cur_Child = Ada_Node (G_Formal_Part (Node))));
+                        (Cur_Child = G_Formal_Part (Node).As_Ada_Node));
                      pragma Assert (not In_Generic_Formal_Part);
                      if I = 1 then
                         In_Generic_Formal_Part := True;
@@ -3760,7 +3757,7 @@ package body METRICS.Actions is
          Inc (Global_M.Vals (Computed_All_Subprograms));
       end if;
 
-      File_M.Node := null;
+      File_M.Node := No_Ada_Node;
       Pop (Metrix_Stack);
       Pop (Node_Stack);
       pragma Assert (Length (Metrix_Stack) = 1);
