@@ -486,6 +486,7 @@ package body Pp.Actions is
            when Ada_Unconstrained_Array_Index => null,
            when Ada_Contract_Case_Assoc => null,
            when Ada_Contract_Cases => null,
+           when Ada_Target_Name => null,
             --  ???Not sure what those are.
 
            when Ada_Ada_List => null,
