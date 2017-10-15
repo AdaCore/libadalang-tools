@@ -323,7 +323,7 @@ package body Pp.Actions is
    --           (see Line_Break.Affects_Comments)
    --      { -- indent
    --      } -- outdent
-   --      @ -- insert a soft line break. May be followed by 1, 2, etc,
+   --      # -- insert a soft line break. May be followed by 1, 2, etc,
    --           to indicate additional nesting depth. Also +1, +2, etc
    --           (see below).
    --      [ -- continuation-line indent
@@ -352,21 +352,21 @@ package body Pp.Actions is
    --  are placed before and after, and the second must be empty, except if
    --  it's Not_An_Element, nothing is printed.
    --
-   --  Normally, the soft line breaks inserted by @ have a priority based on
+   --  Normally, the soft line breaks inserted by # have a priority based on
    --  the syntactic nesting depth. Less-nested breaks are enabled in favor of
-   --  more deeply nested ones. However, if @ is followed by a digit, that
+   --  more deeply nested ones. However, if # is followed by a digit, that
    --  indicates an additional nesting depth not reflected in the syntax. For
-   --  example, if we have "blah @blah @1blah", then the @1 is considered more
-   --  nested than the @, so if the line is too long, we first enable the @,
-   --  and only enable the @1 if the line is still too long.
-   --  @ may also be followed by "+" and a digit, as in "@+1".
-   --  The difference is that for "@1", all subtrees start out deeper than the
-   --  deepest of the outer ones, whereas for "@+1", the subtrees are just one
+   --  example, if we have "blah #blah #1blah", then the #1 is considered more
+   --  nested than the #, so if the line is too long, we first enable the #,
+   --  and only enable the #1 if the line is still too long.
+   --  # may also be followed by "+" and a digit, as in "#+1".
+   --  The difference is that for "#1", all subtrees start out deeper than the
+   --  deepest of the outer ones, whereas for "#+1", the subtrees are just one
    --  level deeper than the outer tree. So for example, suppose we have a tree
    --  T at depth 5. Its immediate subtrees will normally be at depth 6.
-   --  However, if there is a "@1" in the template for T, the immediate
-   --  subtrees will be at depth 7. But if we change "@1" to "@+1", then the
-   --  immediate subtrees will normally be at depth 6. Thus, "@+1" allows a
+   --  However, if there is a "#1" in the template for T, the immediate
+   --  subtrees will be at depth 7. But if we change "#1" to "#+1", then the
+   --  immediate subtrees will normally be at depth 6. Thus, "#+1" allows a
    --  given soft line break to be of equal depth to those of subtrees.
    --
    --  Examples:
@@ -486,7 +486,6 @@ package body Pp.Actions is
            when Ada_Unconstrained_Array_Index => null,
            when Ada_Contract_Case_Assoc => null,
            when Ada_Contract_Cases => null,
-           when Ada_Target_Name => null,
             --  ???Not sure what those are.
 
            when Ada_Ada_List => null,
@@ -497,7 +496,7 @@ package body Pp.Actions is
            when Ada_Constrained_Array_Indices =>
              L ("(?~, ~~)"),
            when Ada_Unconstrained_Array_Indices => null,
-               --  ???L ("(?~ range <>,@ ~ range <>~)"),
+               --  ???L ("(?~ range <>,# ~ range <>~)"),
            when Ada_Aspect_Assoc =>
              L ("!? ^=> ~~~"),
            when Ada_At_Clause =>
@@ -513,24 +512,24 @@ package body Pp.Actions is
            when Ada_Aspect_Spec =>
              L ("? with$" & "{~,$~}~"),
              --  ???We could try something like the following:
-             --  "? with[@1 ~,@1 ~]~"
+             --  "? with[#1 ~,#1 ~]~"
            when Ada_Component_Decl =>
-             L ("?~,@ ~~ ^: !? ^2:=[@ ~~]~", Aspects),
+             L ("?~,# ~~ ^: !? ^2:=[# ~~]~", Aspects),
            when Ada_Discriminant_Spec =>
-             L ("?~,@ ~~ ^: !? ^2:=[@ ~~]~"),
+             L ("?~,# ~~ ^: !? ^2:=[# ~~]~"),
            when Ada_Params => null,
            when Ada_Param_Spec => null,
            when Ada_Base_Package_Decl =>
-             L ("package !@",
+             L ("package !#",
                 Aspects,
-                "@ is$",
+                "# is$",
                 "!",
                 "!",
                 "end !1/"),
            when Ada_Abstract_Subp_Decl =>
              L ("?~~ ~!", " is abstract", Aspects),
            when Ada_Expr_Function =>
-             L ("?~~ ~!", " is[@ !]", Aspects),
+             L ("?~~ ~!", " is[# !]", Aspects),
            when Ada_Null_Subp_Decl =>
              L ("?~~ ~!", " is null", Aspects),
            when Ada_Subp_Renaming_Decl =>
@@ -554,9 +553,9 @@ package body Pp.Actions is
            when Ada_Task_Body_Stub =>
              L ("task body ! is separate", Aspects),
            when Ada_Package_Body =>
-             L ("package body ![@",
+             L ("package body ![#",
                 Aspects,
-                "]@ is$",
+                "]# is$",
                 "!",
                 "!",
                 "end !1/"),
@@ -565,11 +564,11 @@ package body Pp.Actions is
            when Ada_Subp_Body =>
              L ("?~~ ~!",
                 Aspects,
-                "@+1 is$",
+                "#+1 is$",
                 "!",
                 "!",
                 "end !"),
-               --  We increase the level of the @ before " is", so it will be
+               --  We increase the level of the # before " is", so it will be
                --  equal to that of the formal parameters, so if the "is" goes
                --  on a new line, the parameters will be split as well.
                --
@@ -587,21 +586,21 @@ package body Pp.Actions is
            when Ada_Entry_Decl =>
              L ("?~~ ~entry !", Aspects),
            when Ada_Entry_Spec =>
-             L ("!?[@ (~~)]~?~~~"),
+             L ("!?[# (~~)]~?~~~"),
            when Ada_Entry_Body =>
-             L ("entry !?[@ (~~)]~?~~~[@ when !@ is]$",
-                --  ???Perhaps "@ is]" should be "@+1 is]" or "@ ]is".
+             L ("entry !?[# (~~)]~?~~~[# when !# is]$",
+                --  ???Perhaps "# is]" should be "#+1 is]" or "# ]is".
                 "!",
                 "!",
                 "end !1/"),
            when Ada_Enum_Literal_Decl =>
              L ("!"),
            when Ada_Exception_Decl =>
-                 L ("?~,@ ~~ ^: exception!", Aspects),
+                 L ("?~,# ~~ ^: exception!", Aspects),
            when Ada_Generic_Package_Instantiation =>
-             L ("package ! is new !?[@ (~,@ ~)]~", Aspects),
+             L ("package ! is new !?[# (~,# ~)]~", Aspects),
            when Ada_Generic_Subp_Instantiation =>
-             L ("?~~ ~! ! is new !?[@ (~,@ ~)]~", Aspects),
+             L ("?~~ ~! ! is new !?[# (~,# ~)]~", Aspects),
            when Ada_Generic_Package_Decl =>
              L ("generic$",
                 "!",
@@ -622,10 +621,10 @@ package body Pp.Actions is
            when Ada_Generic_Subp_Internal =>
              L ("!", Aspects),
            when Ada_Number_Decl =>
-             L ("?~,@ ~~ ^: constant ^2:=[@ !]"),
+             L ("?~,# ~~ ^: constant ^2:=[# !]"),
            when Ada_Object_Decl |
                Ada_Extended_Return_Stmt_Object_Decl =>
-             L ("?~,@ ~~ ^:? ~~~? ~~~? ~~~ !? ^2:=[@ ~~]~!", Aspects),
+             L ("?~,# ~~ ^:? ~~~? ~~~? ~~~ !? ^2:=[# ~~]~!", Aspects),
            when Ada_Package_Renaming_Decl =>
              L ("package !!", Aspects),
            when Ada_Single_Protected_Decl =>
@@ -664,7 +663,7 @@ package body Pp.Actions is
              --  because the name of the task is buried in a subtree.
 
            when Ada_Enum_Type_Decl =>
-             L ("type ! is", "[ @(?~,@1 ~~)", Aspects, "]"),
+             L ("type ! is", "[ #(?~,#1 ~~)", Aspects, "]"),
            when Ada_Type_Decl => null,
            when Ada_Incomplete_Type_Decl =>
              L ("type !!"), -- Aspects?
@@ -674,7 +673,7 @@ package body Pp.Actions is
                --  Abstract_Absent.
            when Ada_Classwide_Type_Decl => null,
            when Ada_Subtype_Decl =>
-             L ("subtype ! is[@ !", Aspects, "]"),
+             L ("subtype ! is[# !", Aspects, "]"),
            when Ada_Compilation_Unit => null,
            when Ada_Component_Def =>
              L ("?~~ ~!"),
@@ -684,7 +683,7 @@ package body Pp.Actions is
              L ("digits !? ~~~"),
            when Ada_Discriminant_Assoc => null,
            when Ada_Discriminant_Constraint | Ada_Index_Constraint =>
-             L ("?[@(~,@ ~)]~"),
+             L ("?[#(~,# ~)]~"),
            when Ada_Range_Constraint =>
              L ("!"),
            when Ada_Declarative_Part =>
@@ -694,39 +693,39 @@ package body Pp.Actions is
            when Ada_Public_Part =>
              L ("?{~;$~};$~"),
            when Ada_Elsif_Expr_Part =>
-             L ("elsif[@ !]@ then[@ !]"),
+             L ("elsif[# !]# then[# !]"),
            when Ada_Entry_Index_Spec =>
-             L ("for ! in[@ !]"),
+             L ("for ! in[# !]"),
            when Ada_Exception_Handler =>
-             L ("when[? ~~ :~ ?~ ^|@ ~~] ^=>$", "{?~;$~;$~}"),
+             L ("when[? ~~ :~ ?~ ^|# ~~] ^=>$", "{?~;$~;$~}"),
            when Ada_Explicit_Deref =>
              L ("!.all"),
            when Ada_Aggregate =>
-             L ("@(?~~ with @~", "?~,@ ~~)"),
+             L ("#(?~~ with #~", "?~,# ~~)"),
            when Ada_Null_Record_Aggregate =>
-             L ("@(?~~ with @~" & "null record/)"),
+             L ("#(?~~ with #~" & "null record/)"),
            when Ada_Allocator =>
-             L ("new? @(~~)~ !"),
+             L ("new? #(~~)~ !"),
            when Ada_Attribute_Ref =>
-             L ("!'[@1!?@ (~,@ ~)~]"),
+             L ("!'[#1!?# (~,# ~)~]"),
              --  ???This includes function calls to attributes, such as
              --  T'Max(X, Y), which isn't really right.
            when Ada_Update_Attribute_Ref =>
-             L ("!'[@1!@ !]"),
+             L ("!'[#1!# !]"),
            when Ada_Bin_Op |  Ada_Relation_Op => null,
            when Ada_Call_Expr => null,
            when Ada_Case_Expr =>
-             L ("case ! is[@ ?@~,@ ~~]"),
+             L ("case ! is[# ?#~,# ~~]"),
            when Ada_Case_Expr_Alternative =>
-             L ("when[ ?~ |@ ~~] ^=>[@ !]"),
+             L ("when[ ?~ |# ~~] ^=>[# !]"),
            when Ada_Box_Expr =>
              L ("<>"),
            when Ada_If_Expr =>
-             L ("if[@1 !]@1 then[@1 !]", "? @~ @~~", "?@ else[ ~~]~"),
+             L ("if[#1 !]#1 then[#1 !]", "? #~ #~~", "?# else[ ~~]~"),
            when Ada_Membership_Expr =>
-             L ("! ![@ ?[@~ |@ ~]~]"),
+             L ("! ![# ?[#~ |# ~]~]"),
            when Ada_Dotted_Name =>
-             L ("![@.!]"),
+             L ("![#.!]"),
            when Ada_Char_Literal => null,
            when Ada_Identifier => null,
            when Ada_String_Literal => null,
@@ -735,13 +734,13 @@ package body Pp.Actions is
            when Ada_Real_Literal => null,
            when Ada_Int_Literal => null,
            when Ada_Qual_Expr =>
-             L ("!'[@!]"),
+             L ("!'[#!]"),
                --  ???There are no parentheses here, because the subexpression
                --  is either a parenthesized expression or an aggregate.
            when Ada_Quantified_Expr =>
-             L ("for ! ! ^=>[@ !]"),
+             L ("for ! ! ^=>[# !]"),
            when Ada_Raise_Expr =>
-             L ("raise !?[@ with ~~]~"),
+             L ("raise !?[# with ~~]~"),
            when Ada_Un_Op => null,
            when Ada_Handled_Stmts => null,
            when Ada_Library_Item =>
@@ -755,7 +754,7 @@ package body Pp.Actions is
            when Ada_Pragma_Node => null,
            when Ada_Component_Clause => null, -- ?
            when Ada_Renaming_Clause =>
-             L ("? renames[@ ~~]~"),
+             L ("? renames[# ~~]~"),
            when Ada_Select_Stmt =>
              L ("select",
                 "!",
@@ -764,9 +763,9 @@ package body Pp.Actions is
                 "end select"),
            when Ada_Select_When_Part => null,
            when Ada_Accept_Stmt =>
-             L ("accept !? @(~~)~?~~~"),
+             L ("accept !? #(~~)~?~~~"),
            when Ada_Accept_Stmt_With_Stmts =>
-             L ("accept !? @(~~)~?~~~",
+             L ("accept !? #(~~)~?~~~",
                 "!",
                 "end !1/"),
            when Ada_Null_Record_Def =>
@@ -780,24 +779,24 @@ package body Pp.Actions is
            when Ada_Component_List =>
              L ("{?~;$~;$~}", "{?~~;$~}"),
            when Ada_Variant =>
-             L ("when[ ?~ ^|@ ~~] ^=>$", "!"),
+             L ("when[ ?~ ^|# ~~] ^=>$", "!"),
            when Ada_Case_Stmt_Alternative =>
-             L ("when[ ?~ ^|@ ~~] ^=>$", "{?~;$~;$~}"),
+             L ("when[ ?~ ^|# ~~] ^=>$", "{?~;$~;$~}"),
            when Ada_Case_Stmt | Ada_Variant_Part =>
-             L ("case !@ is$", "{!}", "end case"),
+             L ("case !# is$", "{!}", "end case"),
            when Ada_Extended_Return_Stmt =>
-             L ("return[@ !]",
+             L ("return[# !]",
                 "!",
                 "end return"),
            when Ada_If_Stmt =>
-             L ("if[ !]@ then$",
+             L ("if[ !]# then$",
                 "{?~;$~;$~}",
                 "?~~~",
                 "?else$",
                 "{~;$~;$}~",
                 "end if"),
            when Ada_Elsif_Stmt_Part =>
-             L ("elsif[ !]@ then$", "{?~;$~;$~}"),
+             L ("elsif[ !]# then$", "{?~;$~;$~}"),
            when Ada_Named_Stmt =>
              L ("! : ! !1"),
            when Ada_Named_Stmt_Decl =>
@@ -811,7 +810,7 @@ package body Pp.Actions is
                 "!",
                 "end/"),
            when Ada_Loop_Stmt | Ada_For_Loop_Stmt | Ada_While_Loop_Stmt =>
-             L ("?~~@ ~loop$", "{?~;$~;$~}", "end loop/"),
+             L ("?~~# ~loop$", "{?~;$~;$~}", "end loop/"),
            when Ada_For_Loop_Spec => null,
            when Ada_For_Loop_Var_Decl =>
              L ("!? : ~~~"),
@@ -820,7 +819,9 @@ package body Pp.Actions is
            when Ada_Abort_Stmt =>
              L ("abort ?~, ~~"),
            when Ada_Assign_Stmt =>
-             L ("! ^:=[@ !]"),
+             L ("! ^:=[# !]"),
+           when Ada_Target_Name =>
+             L ("@"),
            when Ada_Call_Stmt =>
              L ("!"),
            when Ada_Delay_Stmt =>
@@ -834,7 +835,7 @@ package body Pp.Actions is
            when Ada_Null_Stmt =>
              L ("!"),
            when Ada_Raise_Stmt =>
-             L ("raise? ~~~?[@ with ~~]~"),
+             L ("raise? ~~~?[# with ~~]~"),
            when Ada_Requeue_Stmt =>
              L ("requeue !? ~~~"),
            when Ada_Return_Stmt =>
@@ -846,14 +847,14 @@ package body Pp.Actions is
            when Ada_Type_Access_Def =>
              L ("?~~ ~access? ~~~? ~~~ !? ~~~"),
            when Ada_Array_Type_Def =>
-             L ("array[@ !] of !"),
+             L ("array[# !] of !"),
            when Ada_Derived_Type_Def =>
-             L ("?~~ ~?~~ ~?~~ ~new !? and[@ ~ and@ ~]~? with@ ~~~? ~~~"),
+             L ("?~~ ~?~~ ~?~~ ~new !? and[# ~ and# ~]~? with# ~~~? ~~~"),
 
            when Ada_Formal_Discrete_Type_Def =>
-             L ("@(<>)"),
+             L ("#(<>)"),
            when Ada_Interface_Type_Def =>
-             L ("?~~ ~interface? and[@ ~ and@ ~]~"),
+             L ("?~~ ~interface? and[# ~ and# ~]~"),
            when Ada_Mod_Int_Type_Def =>
              L ("mod !"),
            when Ada_Private_Type_Def =>
@@ -870,9 +871,9 @@ package body Pp.Actions is
            when Ada_Signed_Int_Type_Def =>
              L ("!"),
            when Ada_Known_Discriminant_Part =>
-             L ("?[@ (~;@ ~)]~@"),
+             L ("?[# (~;# ~)]~#"),
            when Ada_Unknown_Discriminant_Part =>
-             L (" @(<>)"),
+             L (" #(<>)"),
            when Ada_Access_To_Subp_Def =>
              L ("?~~ ~access? ~~~ !"),
            when Ada_Anonymous_Type_Decl =>
@@ -884,16 +885,16 @@ package body Pp.Actions is
            when Ada_Anonymous_Type =>
              L ("!"),
            when Ada_Use_Package_Clause =>
-             L ("use[@ ?~,@ ~~]"),
+             L ("use[# ?~,# ~~]"),
            when Ada_Use_Type_Clause =>
-             L ("use? ~~~ type[@ ?~,@ ~~]"),
+             L ("use? ~~~ type[# ?~,# ~~]"),
            when Ada_With_Clause =>
              L ("?~~ ~?~~ ~with ^?~, ~~"),
                --  Note: the tab ('^') is ignored for limited/private 'with's
                --  (see Append_Tab).
 
            when Ada_Paren_Expr =>
-             L ("@(!)"),
+             L ("#(!)"),
            when Ada_Abort_Absent => null,
            when Ada_Abort_Present =>
              L ("with abort"),
@@ -1420,13 +1421,13 @@ package body Pp.Actions is
          Template : Symbol);
 
       function Max_Nesting_Increment (Temp : Ada_Template) return Nesting_Level;
-      --  If a digit occurs after '@', this is an additional "nesting increment"
+      --  If a digit occurs after '#', this is an additional "nesting increment"
       --  to be added to the nesting level when we recursively process the
       --  subtree. This is intended to allow some line breaks to have precedence
       --  over others. If no such digit occurs, the default is zero. This function
       --  returns the maximum such nesting increment in the template.
       --
-      --  Note that "@+1" is ignored by this function.
+      --  Note that "#+1" is ignored by this function.
 
       function New_Level
         (Tree          : Ada_Tree;
@@ -1490,7 +1491,7 @@ package body Pp.Actions is
          Append
            (Line_Breaks,
             Line_Break'
-              (Mark        => Mark (Out_Buf, Name => (if Hard then '$' else '@')),
+              (Mark        => Mark (Out_Buf, Name => (if Hard then '$' else '#')),
                Hard        => Hard,
                Affects_Comments => Affects_Comments,
                Enabled     => Hard,
@@ -1521,7 +1522,7 @@ package body Pp.Actions is
                C := Temp (J);
 
                case C is
-                  when '@' =>
+                  when '#' =>
                      declare
                         Digit     : W_Char;
                         Increment : Nesting_Level;
@@ -1618,7 +1619,7 @@ package body Pp.Actions is
          begin
             while X <= T'Last loop
                if Kind /= Ada_Enum_Type_Decl
-                 and then (Match (" (") or else Match (" @("))
+                 and then (Match (" (") or else Match (" #("))
                then
                   X := X + 1; -- skip ' ' before '('
                elsif Match (" ^:") and then not Match (" ^:=") then
@@ -1645,8 +1646,8 @@ package body Pp.Actions is
          --  Replacements for --no-separate-is
 
          if not Arg (Cmd, Separate_Is) then
-            Temp := Replace_All (Temp, "@ is", " is");
-            Temp := Replace_All (Temp, "@+1 is", " is");
+            Temp := Replace_All (Temp, "# is", " is");
+            Temp := Replace_All (Temp, "#+1 is", " is");
          end if;
 
          --  If the --no-end-id switch was given, do not insert names after "end"
@@ -1722,21 +1723,21 @@ package body Pp.Actions is
          --  "then" and "loop".
 
          if Arg (Cmd, Separate_Loop_Then) then
-            Replace_One (Ada_If_Stmt, "@ then$", "$then$");
-            Replace_One (Ada_Elsif_Stmt_Part, "@ then$", "$then$");
-            Replace_One (Ada_Loop_Stmt, "?~~@ ~loop$", "?~~$~loop$");
-            Replace_One (Ada_For_Loop_Stmt, "?~~@ ~loop$", "?~~$~loop$");
-            Replace_One (Ada_While_Loop_Stmt, "?~~@ ~loop$", "?~~$~loop$");
+            Replace_One (Ada_If_Stmt, "# then$", "$then$");
+            Replace_One (Ada_Elsif_Stmt_Part, "# then$", "$then$");
+            Replace_One (Ada_Loop_Stmt, "?~~# ~loop$", "?~~$~loop$");
+            Replace_One (Ada_For_Loop_Stmt, "?~~# ~loop$", "?~~$~loop$");
+            Replace_One (Ada_While_Loop_Stmt, "?~~# ~loop$", "?~~$~loop$");
 
          --  For No_Separate_Loop_Then, we remove the soft line break
          --  before "then" and "loop".
 
          elsif Arg (Cmd, No_Separate_Loop_Then) then
-            Replace_One (Ada_If_Stmt, "@ then$", " then$");
-            Replace_One (Ada_Elsif_Stmt_Part, "@ then$", " then$");
-            Replace_One (Ada_Loop_Stmt, "?~~@ ~loop$", "?~~ ~loop$");
-            Replace_One (Ada_For_Loop_Stmt, "?~~@ ~loop$", "?~~ ~loop$");
-            Replace_One (Ada_While_Loop_Stmt, "?~~@ ~loop$", "?~~ ~loop$");
+            Replace_One (Ada_If_Stmt, "# then$", " then$");
+            Replace_One (Ada_Elsif_Stmt_Part, "# then$", " then$");
+            Replace_One (Ada_Loop_Stmt, "?~~# ~loop$", "?~~ ~loop$");
+            Replace_One (Ada_For_Loop_Stmt, "?~~# ~loop$", "?~~ ~loop$");
+            Replace_One (Ada_While_Loop_Stmt, "?~~# ~loop$", "?~~ ~loop$");
          end if;
 
          --  Now do some validity checking on the templates
@@ -1884,11 +1885,11 @@ package body Pp.Actions is
          T : constant W_Str := W_Str (Template_Table (Tree.Kind).all);
          T2 : constant W_Str :=
            (if Is_Body and then Arg (Cmd, Separate_Is)
-             then Replace_All (T, "@ is$", "$is$")
+             then Replace_All (T, "# is$", "$is$")
              else T);
          T3 : constant W_Str :=
            (if Is_Body and then Arg (Cmd, Separate_Is)
-             then Replace_All (T2, "@+1 is$", "$is$")
+             then Replace_All (T2, "#+1 is$", "$is$")
              else T2);
       begin
          return Result : constant Ada_Template := Ada_Template (T3) do
@@ -1901,7 +1902,7 @@ package body Pp.Actions is
          --  Some templates that are used instead of the ones in Template_Table
 
          Pragma_Alt_Templ : constant Ada_Template :=
-           Munge_Template ("/?[ @(~,@ ~)]~", Ada_Pragma_Node);
+           Munge_Template ("/?[ #(~,# ~)]~", Ada_Pragma_Node);
 
          Parameter_Specification_Alt_Templ : constant Ada_Template :=
            Munge_Template (" ^: ", Ada_Param_Spec);
@@ -2366,9 +2367,9 @@ package body Pp.Actions is
                            Tween : constant Ada_Template :=
                              (if Same_Line then
                                 (if Ada_Tree (Prev_With) = Subtree (Tree, Index)
-                                   then ";@ "
+                                   then ";# "
                                    else ";$")
-                              else -- else ";@1 "???
+                              else -- else ";#1 "???
                               Between);
                         begin
                            Interpret_Template
@@ -2435,7 +2436,6 @@ package body Pp.Actions is
 
                   when '0' .. '9' |
                     '~'           |
-                    '#'           |
                     '*'           |
                     '_'           |
                     '"'           |
@@ -2449,8 +2449,8 @@ package body Pp.Actions is
                         Level    => Cur_Level,
                         Kind     => Kind,
                         Template => Debug_Template);
-                  when '@' =>
-                     --  "@+n" is treated the same as "@n" (where n is a
+                  when '#' =>
+                     --  "#+n" is treated the same as "#n" (where n is a
                      --  digit), except that Max_Nesting_Increment ignores
                      --  the former.
                      if J < T'Last and then T (J + 1) = '+' then
@@ -2839,11 +2839,11 @@ package body Pp.Actions is
                begin
                   --  This is needed because the "[]" is not properly nested with
                   --  the "?~~~".
-                  --  "! ^=>[@ !]" doesn't work for discrims.
+                  --  "! ^=>[# !]" doesn't work for discrims.
                   if Single_Name then
-                     Interpret_Template ("?~~ ^=>[@ ~!]");
+                     Interpret_Template ("?~~ ^=>[# ~!]");
                   else
-                     Interpret_Template ("?~ ^|@1 ~ ^=>[@ ~!]");
+                     Interpret_Template ("?~ ^|#1 ~ ^=>[# ~!]");
                   end if;
                end;
             end if;
@@ -2916,7 +2916,7 @@ package body Pp.Actions is
               Subtrees (Tree) (1 .. 2) & Subtrees (R);
             pragma Assert (Subts'Last = 5);
             Cc_Templ : constant Ada_Template :=
-              "! ^at &2! ^2range [@&3! ^3../[@ &4!^4]]";
+              "! ^at &2! ^2range [#&3! ^3../[# &4!^4]]";
             --  We need to ignore the ".." subtree, and put it explicitly in
             --  the template, because function Tab_Token checks for the ".".
          begin
@@ -2930,7 +2930,7 @@ package body Pp.Actions is
          Handled_Stmts_With_Begin : constant Ada_Template :=
            "?begin$" & Stmts_And_Handlers;
          Handled_Stmts_With_Do : constant Ada_Template :=
-           "@ ?do$" & Stmts_And_Handlers;
+           "# ?do$" & Stmts_And_Handlers;
 
          procedure Do_Handled_Stmts is
          begin
@@ -3115,13 +3115,13 @@ package body Pp.Actions is
                --  Old gnatpp did this separately from Do_Bin_Op.
                if Ancestor_Tree (3).Kind = Ada_Derived_Type_Def then
                   --  This is wrong formatting, but gnatpp has an extra level
-                  --  of indentation here. And it doesn't have "@1", which
+                  --  of indentation here. And it doesn't have "#1", which
                   --  actually would improve.???
-                  Interpret_Template ("[[@! ../[@ !]]]");
+                  Interpret_Template ("[[#! ../[# !]]]");
                elsif Parent_Tree.Kind = Ada_For_Loop_Spec then
-                  Interpret_Template ("[@! ../[@1 !]]");
+                  Interpret_Template ("[#! ../[#1 !]]");
                else
-                  Interpret_Template ("[@! ../[@ !]]");
+                  Interpret_Template ("[#! ../[# !]]");
                end if;
                return;
             end if;
@@ -3145,7 +3145,7 @@ package body Pp.Actions is
 
             if Arg1.Kind in Ada_Bin_Op | Ada_Relation_Op then
                if Is_Right and then Arg1_Higher then
-                  Interpret_Template ("[@", Empty_Tree_Array, Cur_Level);
+                  Interpret_Template ("[#", Empty_Tree_Array, Cur_Level);
                end if;
                Do_Bin_Op
                  (Arg1,
@@ -3167,18 +3167,18 @@ package body Pp.Actions is
             if (Is_Short_C or Arg (Cmd, Split_Line_Before_Op))
               and Oper /= Ada_Op_Pow
             then
-               Interpret_Template ("@", Empty_Tree_Array, Cur_Level);
+               Interpret_Template ("#", Empty_Tree_Array, Cur_Level);
             end if;
             Put ((if Oper = Ada_Op_Pow then "\1" else " \1 "),
                  Operator_Symbol (Oper)); -- no blanks for "**"
             if not (Is_Short_C or Arg (Cmd, Split_Line_Before_Op))
               and Oper /= Ada_Op_Pow
             then
-               Interpret_Template ("@", Empty_Tree_Array, Cur_Level);
+               Interpret_Template ("#", Empty_Tree_Array, Cur_Level);
             end if;
 
             if Arg2.Kind in Ada_Bin_Op | Ada_Relation_Op then
-               Interpret_Template ("[@", Empty_Tree_Array, Cur_Level + 1);
+               Interpret_Template ("[#", Empty_Tree_Array, Cur_Level + 1);
                Do_Bin_Op
                  (Arg2,
                   Is_Right  => True,
@@ -3201,7 +3201,7 @@ package body Pp.Actions is
                when Ada_Quantified_Expr =>
                   --  In this case, the quantfied_expression already printed
                   --  "for ".
-                  Interpret_Template ("! !? ~~~ !@");
+                  Interpret_Template ("! !? ~~~ !#");
                when others => raise Program_Error;
             end case;
          end Do_For_Loop_Spec;
@@ -3380,7 +3380,7 @@ package body Pp.Actions is
             Subtrees_To_Ada
               (Subtree (Tree, Index),
                Pre     => "",
-               Between => ",@ ",
+               Between => ",# ",
                Post    => "");
             Interpret_Template
               (Parameter_Specification_Alt_Templ,
@@ -3418,7 +3418,7 @@ package body Pp.Actions is
             Index := Index + 1;
             if Present (Subtree (Tree, Index)) then
                Interpret_Template
-                 (" ^4:=[@ !]",
+                 (" ^4:=[# !]",
                   Subtrees => (1 => Subtree (Tree, Index)));
             end if;
 
@@ -3445,7 +3445,7 @@ package body Pp.Actions is
             if Subtree (Tree, 2).Kind in
               Ada_Aggregate | Ada_Null_Record_Aggregate
             then
-               Interpret_Template ("!'[@!]");
+               Interpret_Template ("!'[#!]");
             --  If the thing after the ' is an aggregate, we leave out the
             --  parentheses here, because the aggregate will insert them. We
             --  want T'(X, Y, Z), not T'((X, Y, Z)).
@@ -3485,7 +3485,7 @@ package body Pp.Actions is
                   Tree.Kind));
             else
                Interpret_Template
-                 (Munge_Template ("?[@ (~;@ ~)]~",
+                 (Munge_Template ("?[# (~;# ~)]~",
                   Tree.Kind));
             end if;
          end Do_Params;
@@ -3510,7 +3510,7 @@ package body Pp.Actions is
                   Tree.Kind));
             else
                Interpret_Template
-                 (Munge_Template ("!? ~~~?~~~?[@+2 return] ~~~",
+                 (Munge_Template ("!? ~~~?~~~?[#+2 return] ~~~",
                   Tree.Kind));
                --  F_Name is optional for access-to-subp.
             end if;
@@ -3611,7 +3611,7 @@ package body Pp.Actions is
                --  will not affect following comments.
             else
                Interpret_Template
-                 (Munge_Template ("!?[@ (~,@ ~)]~", Ada_Call_Expr));
+                 (Munge_Template ("!?[# (~,# ~)]~", Ada_Call_Expr));
             end if;
          end Do_Call_Expr;
 
@@ -3653,7 +3653,7 @@ package body Pp.Actions is
                   --  Otherwise, we could have a line break just before the
                   --  last semicolon.
                else
-                  Interpret_Template ("type !! is ![@" & Aspects & "]");
+                  Interpret_Template ("type !! is ![#" & Aspects & "]");
                end if;
             elsif Def.Kind = Ada_Access_To_Subp_Def then
                Interpret_Template ("type !! is !" & Aspects);
@@ -3661,9 +3661,9 @@ package body Pp.Actions is
             elsif Tree.As_Type_Decl.F_Type_Def.Kind =
               Ada_Private_Type_Def
             then
-               Interpret_Template ("type !! is[@ !]" & Aspects);
+               Interpret_Template ("type !! is[# !]" & Aspects);
             else
-               Interpret_Template ("type !! is[@ !" & Aspects & "]");
+               Interpret_Template ("type !! is[# !" & Aspects & "]");
                --  ???To mimic gnatpp.  Better to use the same template as
                --  Ada_Private_Type_Def above.
             end if;
@@ -3762,7 +3762,7 @@ package body Pp.Actions is
                   Do_Parameter_Specification;
                elsif Present (Tree.As_Object_Decl.F_Renaming_Clause) then
                   Interpret_Template
-                    ("?~,@ ~~ :[@? ~~~? ~~~? ~~~ !? :=[@ ~~]~!]" & Aspects);
+                    ("?~,# ~~ :[#? ~~~? ~~~? ~~~ !? :=[# ~~]~!]" & Aspects);
                   --  ???This kludgery is to match gnatpp, which doesn't tab
                   --  for renamings. Probably should be removed.
                else
@@ -3791,7 +3791,7 @@ package body Pp.Actions is
                           and then Kind (C.As_Range_Constraint.F_Range) =
                             Ada_Box_Expr
                         then
-                           Interpret_Template ("(?~,@ ~~)");
+                           Interpret_Template ("(?~,# ~~)");
                            goto Done_Ada_Unconstrained_Array_Indices;
                         end if;
                      end;

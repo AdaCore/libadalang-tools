@@ -400,7 +400,8 @@ package body Pp.Scanner is
 
                --  One-character tokens
 
-               when '&' | '(' | ')' | '+' | ',' | ';' | '|' | '!' =>
+               when '&' | '(' | ')' | '+' | ',' | ';' | '|' | '!' | '@' =>
+                  --  '@' is for target_name (see RM-5.2.1, AI12-0125-3)
                   Tok.Kind := Lexeme;
                   Get;
 
