@@ -1056,10 +1056,10 @@ package body METRICS.Actions is
               (if Metric = Lines_Average
                 then Lines_Code_In_Bodies
                 else Metric);
-            --  Metric whose value is used as the numerator when
-            --  computing the average. For complexity metrics, that
-            --  the Metric itself, but for Lines_Average, we need to
-            --  divide Lines_Code_In_Bodies by something.
+            --  Metric whose value is used as the numerator when computing the
+            --  average. For complexity metrics, that is the Metric itself, but
+            --  for Lines_Average, we need to divide Lines_Code_In_Bodies by
+            --  something.
             Av : constant Float :=
               Float (M.Vals (Numerator_Metric) + Adjust) / Float (Num);
             Img : constant String := Fixed (Av)'Img;

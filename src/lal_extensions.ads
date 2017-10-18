@@ -118,9 +118,4 @@ package LAL_Extensions is
    --  True if Node should be counted as a nesting level for the purposes of
    --  the Construct_Nesting metric in gnatmetric.
 
-   function Short_Image (Node : Ada_Node'Class) return String is
-     (Utils.String_Utilities.To_UTF8
-       (Text_To_W_Str
-         (Text_Type'(Short_Image (Node)))));
-
 end LAL_Extensions;

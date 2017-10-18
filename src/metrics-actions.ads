@@ -249,7 +249,7 @@ private
 
    type Metrics_Tool is new Tool_State with record
       Metrics_To_Compute : Metrics_Set;
-      --  Metrics requested on via command line args
+      --  Metrics requested via command line args
 
       Metrix_Stack : Metrix_Vectors.Vector;
       --  Metrix_Stack[1] is the global Metrix (totals for all files).

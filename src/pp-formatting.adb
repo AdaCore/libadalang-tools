@@ -28,7 +28,6 @@ with Ada.Wide_Text_IO;
 
 with GNATCOLL.Paragraph_Filling;
 
-with LAL_Extensions;
 with Utils.Symbols; use Utils.Symbols;
 with Text_IO;
 
@@ -63,7 +62,7 @@ package body Pp.Formatting is
    use type Ada_Node;
    function Is_Null (Tree : Ada_Node) return Boolean is (Tree.Is_Null);
    function T_Img (Tree : Ada_Node) return String is
-     (LAL_Extensions.Short_Image (Tree));
+     (Libadalang.Analysis.Short_Image (Tree));
 
    Op_Sym_Table : constant array (Positive range <>) of Symbol :=
      (Name_Q_And,

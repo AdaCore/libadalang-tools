@@ -525,7 +525,7 @@ package body Utils.Drivers is
          --  Error message has already been printed.
          GNAT.Command_Line.Try_Help;
          Environment.Clean_Up;
-         GNAT.OS_Lib.OS_Exit (1);
+--         GNAT.OS_Lib.OS_Exit (1);
       when Utils.Command_Lines.Command_Line_Error_No_Help |
         Utils.Command_Lines.Command_Line_Error_No_Tool_Name =>
          --  Error message has already been printed.

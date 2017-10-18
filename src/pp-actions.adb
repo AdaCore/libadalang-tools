@@ -4376,13 +4376,11 @@ package body Pp.Actions is
                Do_Writes;
             end if;
          end if;
-      exception
-         pragma Warnings (Off);
-         when Lock_Error =>
+--      exception
+--         when Lock_Error =>
 --            Utils.Output.Error ("cannot create " & Lock_File_Name);
 --            Utils.Output.Error ("delete it by hand if stale");
-            raise;
-         pragma Warnings (On);
+--            raise;
       end Write_File_Name_File;
 
       procedure Write_Str (Out_Vec : Char_Vector);
