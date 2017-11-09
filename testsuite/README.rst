@@ -7,11 +7,13 @@ How to run the testsuite
 First of all, make sure you have:
 
 * built Libadalang-tools (see the top-level ``Makefile``);
-* added the resulting programs to your ``$PATH``;
+* added the libadalang-tools/bin directory to your ``$PATH``;
 * installed its runtime dependencies (Libadalang, GNATcoll) in your
   environment;
 * installed the `GNATpython <https://github.com/Nikokrock/gnatpython>`_
   package, required by the testsuite itself.
+
+Copy the ASIS-testsuite/tests directory into tests/asis-tests.
 
 Then, in the ``testsuite/`` directory, run:
 
@@ -24,9 +26,8 @@ put a report in the ``out/`` directory. Note that you can actually run the
 testsuite from whatever directory that suits you: in any case, it will create
 the ``out/`` report in the current directory.
 
-Depending on your needs, you may want to run only specific testcases. This is
-easy: just pass these testcases as arguments to the ``testsuite.py`` script.
-For instance:
+To run only specific testcases pass these testcases as arguments to the
+``testsuite.py`` script.  For instance:
 
 .. code-block:: text
 
