@@ -323,7 +323,7 @@ package body METRICS.Actions is
    type Assertion_Enum is (Postcondition, Other_Assertion, Not_An_Assertion);
 
    function Assertion_Kind (Node : Ada_Node) return Assertion_Enum;
-   --  Return what kind of assertion it it, if any. Postconditions have their
+   --  Return what kind of assertion it is, if any. Postconditions have their
    --  own metric, so we have to split that out.
 
    function Is_Assertion (Node : Ada_Node) return Boolean is

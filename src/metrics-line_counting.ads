@@ -45,7 +45,7 @@ private
 
    --  For each line, and for each of the Cumulative_Metrics, we store
    --  the number of lines of that kind that precede the line. Thus,
-   --  if C is the result of a call to Cumulative, then:
+   --  if C is the result of a call to Get_Cumulative_Counts, then:
    --
    --  C (N) (Lines_Code) = number of code lines preceding line N. A
    --  code line is one that contains at least one non-comment token.
