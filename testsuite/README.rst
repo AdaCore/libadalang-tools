@@ -7,13 +7,11 @@ How to run the testsuite
 First of all, make sure you have:
 
 * built Libadalang-tools (see the top-level ``Makefile``);
-* added the libadalang-tools/bin directory to your ``$PATH``;
+* added the ``libadalang-tools/bin`` directory to your ``$PATH``;
 * installed its runtime dependencies (Libadalang, GNATcoll) in your
   environment;
 * installed the `GNATpython <https://github.com/Nikokrock/gnatpython>`_
   package, required by the testsuite itself.
-
-Copy the ASIS-testsuite/tests directory into tests/asis-tests.
 
 Then, in the ``testsuite/`` directory, run:
 
