@@ -35,7 +35,7 @@ Testing
 
 The testsuite framework depends on
 [GNATpython](https://github.com/Nikokrock/gnatpython): please install it first.
-Put the bin subdirectory on your ``PATH``.  Then run:
+Put the `bin` subdirectory on your `PATH`.  Then run:
 
 ```sh
 testsuite/testsuite.py
