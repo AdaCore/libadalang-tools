@@ -3289,7 +3289,8 @@ package body METRICS.Actions is
              Ada_Generic_Package_Internal | Ada_Anonymous_Type_Decl |
              Ada_Named_Stmt_Decl | Ada_Label_Decl |
              Ada_Single_Task_Type_Decl |
-             Ada_Generic_Subp_Internal
+             Ada_Generic_Subp_Internal |
+             Ada_Exception_Handler
          then
             Inc_All (Declarations);
             Inc_All (Logical_Source_Lines);
