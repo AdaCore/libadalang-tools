@@ -3670,7 +3670,9 @@ package body Pp.Actions is
          end Do_Type_Decl;
 
          procedure Do_Usage_Name is
-            P_Ref : constant Ada_Node := Tree.As_Expr.P_Ref_Val;
+--            P_Ref : constant Basic_Decl := Tree.As_Expr.P_Referenced_Decl;
+            P_Ref : constant Basic_Decl := No_Basic_Decl;
+            --  ???P_Referenced_Decl raises Constraint_Error.
             K : constant Ada_Node_Kind_Type :=
               (if P_Ref.Is_Null then Null_Kind else P_Ref.Kind);
          begin

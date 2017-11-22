@@ -61,7 +61,8 @@ package body Utils.Drivers is
 
    procedure Resolve_Node (N : Ada_Node; Quiet : Boolean);
    --  Call P_Resolve_Names on N, which is a node for which Is_Xref_Entry_Point
-   --  is True.
+   --  is True. ????No need to call P_Resolve_Names anymore, see P610-018,
+   --  Tue, 21 Nov 2017 20:12:48 +0100.
 
    procedure Name_Resolution (Unit : Analysis_Unit);
    --  Resolve the entire unit, calling Resolve_Node on each relevant node.
@@ -106,8 +107,9 @@ package body Utils.Drivers is
       if OK then
          for Node of Find (N, Is_Expr'Access).Consume loop
             declare
-               P_Ref  : constant Ada_Node := Node.As_Expr.P_Ref_Val;
-               P_Type : constant Ada_Node := Node.As_Expr.P_Type_Val;
+               P_Ref  : constant Basic_Decl := Node.As_Expr.P_Referenced_Decl;
+               P_Type : constant Base_Type_Decl :=
+                 Node.As_Expr.P_Expression_Type;
             begin
                if not Quiet then
                   Put ("Expr: \1, references \2, type is \3\n",
