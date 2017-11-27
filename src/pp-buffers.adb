@@ -695,13 +695,24 @@ package body Pp.Buffers is
          and then Input (Ptr + 1) = '"'
          and then Input (Ptr + 2) in '0' .. '9' | 'a' .. 'f' | 'A' .. 'F');
 
-      type State_Enum is (In_Comment, In_String_Literal, Other);
+      type State_Enum is
+        (In_Comment, In_String_Literal, In_Obsolescent_String_Literal, Other);
       State : State_Enum := Other;
    --  We need to keep track of whether we're inside a comment, because
    --  brackets encoding is disabled in that case. We need to keep track of
    --  whether we're inside a string literal in order to keep track of whether
    --  we're inside a comment ('--' doesn't start a comment inside a string
    --  literal).
+   --
+   --  In_String_Literal is for normal string literals surrounded by double
+   --  quotes. In_Obsolescent_String_Literal is for string literals surrounded
+   --  by percent signs, as allowed by J.2(4). It is necessary to distinguish
+   --  these, because the surrounding characters have to match. That is, if we
+   --  see:
+   --
+   --     "Hello%world"
+   --
+   --  the percent doesn't end the string literal.
 
    begin
       while Ptr <= Input'Last loop
@@ -735,7 +746,11 @@ package body Pp.Buffers is
                   State := Other;
                end if;
             when In_String_Literal =>
-               if C in '"' | '%' then
+               if C in '"' then
+                  State := Other;
+               end if;
+            when In_Obsolescent_String_Literal =>
+               if C in '%' then
                   State := Other;
                end if;
             when Other =>
@@ -744,8 +759,10 @@ package body Pp.Buffers is
                  and then Input (Ptr) = '-'
                then
                   State := In_Comment;
-               elsif C in '"' | '%' then
+               elsif C in '"' then
                   State := In_String_Literal;
+               elsif C in '%' then
+                  State := In_Obsolescent_String_Literal;
                end if;
          end case;
 
