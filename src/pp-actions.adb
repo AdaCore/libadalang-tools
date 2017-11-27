@@ -662,8 +662,8 @@ package body Pp.Actions is
              --  replaces the F_End_Id (see Do_Task_Def). This is necessary
              --  because the name of the task is buried in a subtree.
 
-           when Ada_Enum_Type_Decl =>
-             L ("type ! is", "[ #(?~,#1 ~~)", Aspects, "]"),
+           when Ada_Enum_Type_Def =>
+             L ("(?~,#1 ~~)"),
            when Ada_Type_Decl => null,
            when Ada_Incomplete_Type_Decl =>
              L ("type !!"), -- Aspects?
@@ -845,7 +845,7 @@ package body Pp.Actions is
            when Ada_Subunit =>
              L ("separate (!)$", "!"),
            when Ada_Type_Access_Def =>
-             L ("?~~ ~access? ~~~? ~~~ !? ~~~"),
+             L ("?~~ ~access? ~~~? ~~~ !"),
            when Ada_Array_Type_Def =>
              L ("array[# !] of !"),
            when Ada_Derived_Type_Def =>
@@ -1618,9 +1618,7 @@ package body Pp.Actions is
               --  True if T contains S starting at X
          begin
             while X <= T'Last loop
-               if Kind /= Ada_Enum_Type_Decl
-                 and then (Match (" (") or else Match (" #("))
-               then
+               if Match (" (") or else Match (" #(") then
                   X := X + 1; -- skip ' ' before '('
                elsif Match (" ^:") and then not Match (" ^:=") then
                   X := X + 1; -- skip ' ' before ':'
@@ -2719,7 +2717,6 @@ package body Pp.Actions is
                  Ada_Entry_Body |
                  Ada_Generic_Subp_Decl |
                  Ada_Generic_Package_Decl |
-                 Ada_Enum_Type_Decl |
                  Ada_Loop_Stmt | Ada_For_Loop_Stmt | Ada_While_Loop_Stmt |
                  Ada_Block_Stmt |
                  Ada_Extended_Return_Stmt |
@@ -3529,8 +3526,8 @@ package body Pp.Actions is
             Params : constant Param_Spec_List :=
               (case Tree.Kind is
                  when Ada_Entry_Decl =>
-                   (if Present (Tree.As_Entry_Decl.F_Spec.F_Params)
-                      then Tree.As_Entry_Decl.F_Spec.F_Params.F_Params
+                   (if Present (Tree.As_Entry_Decl.F_Spec.F_Entry_Params)
+                      then Tree.As_Entry_Decl.F_Spec.F_Entry_Params.F_Params
                       else No_Param_Spec_List),
                  when Ada_Entry_Body =>
                    (if Present (Tree.As_Entry_Body.F_Params)

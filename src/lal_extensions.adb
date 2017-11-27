@@ -224,12 +224,12 @@ package body LAL_Extensions is
                  Decl.As_Single_Protected_Decl.F_Protected_Name.As_Name;
             when Ada_Protected_Type_Decl =>
                Result :=
-                 Decl.As_Protected_Type_Decl.F_Protected_Type_Name.As_Name;
+                 Decl.As_Protected_Type_Decl.F_Type_Id.As_Name;
             when Ada_Protected_Body =>
                Result := Decl.As_Protected_Body.F_Name;
             when Ada_Entry_Decl =>
                Result :=
-                 Decl.As_Entry_Decl.F_Spec.F_Name.As_Name;
+                 Decl.As_Entry_Decl.F_Spec.F_Entry_Name.As_Name;
             when Ada_Entry_Body =>
                Result :=
                  Decl.As_Entry_Body.F_Entry_Name.As_Name;

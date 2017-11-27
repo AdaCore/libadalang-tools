@@ -3306,7 +3306,7 @@ package body METRICS.Actions is
 
          if In_Visible_Part then
             if not M.Is_Private_Lib_Unit and not In_Generic_Formal_Part then
-               if Kind (Node) in Ada_Type_Decl | Ada_Enum_Type_Decl |
+               if Kind (Node) in Ada_Type_Decl |
                  Ada_Protected_Type_Decl | Ada_Task_Type_Decl |
                  Ada_Incomplete_Type_Decl | Ada_Incomplete_Tagged_Type_Decl
                then
@@ -3331,7 +3331,7 @@ package body METRICS.Actions is
 
          --  All_Types
 
-         if Kind (Node) in Ada_Type_Decl | Ada_Enum_Type_Decl |
+         if Kind (Node) in Ada_Type_Decl |
            Ada_Protected_Type_Decl | Ada_Task_Type_Decl |
            Ada_Incomplete_Type_Decl | Ada_Incomplete_Tagged_Type_Decl
          then
