@@ -4762,6 +4762,7 @@ package body Pp.Actions is
       Put ("            Wildcards are allowed\n");
       Put (" -files=filename - the name of a text file containing a list\n");
       Put ("                   of Ada source files to reformat\n");
+      Put (" --ignore=filename - do not process sources listed in filename\n");
       Put (" --eol=text_format - sets the format of the gnatpp output " &
         "file(s),\n");
       Put ("                    can not be used together with -pipe option\n");
