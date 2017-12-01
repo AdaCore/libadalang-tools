@@ -1171,10 +1171,7 @@ package body Utils.Projects is
          OS_Exit (0);
       end if;
 
-      if False and then -- ????????????????
-        --  I don't think gnatmetric does this.
-        Arg (Cmd, Verbose)
-      then
+      if Arg (Cmd, Verbose) then
          Versions.Print_Version_Info;
       end if;
 

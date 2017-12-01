@@ -23,31 +23,82 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
---  ???Version printing is currently commented out, to avoid a dependence on
---  Gnatvsn. See P912-011.
-
---  with Ada.Characters.Handling; use Ada.Characters.Handling;
---
---  with Gnatvsn;
---
---  with Utils.Tool_Names;
+with Ada.Characters.Handling; use Ada.Characters.Handling;
 with Utils.Formatted_Output; use Utils.Formatted_Output;
+with Utils.Tool_Names;
+with Libadalang;
 
 package body Utils.Versions is
+
+   --  ???The following are copied from gnatvsn.ads in the compiler sources.
+   --  At least the year, and perhaps the holder and the free software notice,
+   --  should be automatically generated.
+
+   Current_Year : constant String := "2017";
+   Copyright_Holder : constant String := "AdaCore.";
+
+   function Gnat_Free_Software return String;
+   --  Text to be displayed by the different GNAT tools when switch --version
+   --  is used. This text depends on the GNAT build type.
+
+   ------------------------
+   -- Gnat_Free_Software --
+   ------------------------
+
+   type Gnat_Build_Type is (Gnatpro, Gnatpro_Devel, FSF, GPL);
+   --  See Get_Gnat_Build_Type below for the meaning of these values
+
+   Build_Type : constant Gnat_Build_Type := Gnatpro;
+
+   function Gnat_Free_Software return String is
+   begin
+      case Build_Type is
+         when FSF
+            | GPL
+         =>
+            return
+              "This is free software; see the source for copying conditions." &
+              ASCII.LF &
+              "There is NO warranty; not even for MERCHANTABILITY or FITNESS" &
+              " FOR A PARTICULAR PURPOSE.";
+
+         when Gnatpro
+            | Gnatpro_Devel
+         =>
+            return
+              "This is free software; see the source for copying conditions." &
+               ASCII.LF &
+               "See your AdaCore support agreement for details of warranty" &
+               " and support." &
+               ASCII.LF &
+               "If you do not have a current support agreement, then there" &
+               " is absolutely" &
+               ASCII.LF &
+               "no warranty; not even for MERCHANTABILITY or FITNESS FOR" &
+               " A PARTICULAR" &
+               ASCII.LF &
+               "PURPOSE.";
+      end case;
+   end Gnat_Free_Software;
 
    ------------------------
    -- Print_Tool_Version --
    ------------------------
 
+   Pro : constant String := "Pro";
+
+   Initial_Year : constant String := "2004";
+   --  This is the first year in which any of the sources used by these tools
+   --  was written.
+
    procedure Print_Tool_Version is
    begin
-      Put ("???Print_Tool_Version\n");
---      Put ("\1 \2\n",
---           To_Upper (Tool_Names.Tool_Name), Gnatvsn.Gnat_Version_String);
---      Put ("Copyright (C) \1, \2\n",
---           Gnatvsn.Current_Year, Gnatvsn.Copyright_Holder);
---      Put ("\1", Gnatvsn.Gnat_Free_Software);
---      Put ("\n");
+      Put ("\1 \2 \3\n",
+           To_Upper (Tool_Names.Tool_Name), Pro, Libadalang.Version);
+      Put ("Copyright (C) \1-\2, \3\n",
+           Initial_Year, Current_Year, Copyright_Holder);
+      Put ("\1", Gnat_Free_Software);
+      Put ("\n");
    end Print_Tool_Version;
 
    ------------------------
@@ -56,10 +107,9 @@ package body Utils.Versions is
 
    procedure Print_Version_Info is
    begin
-      Put ("???Print_Version_Info\n");
---      Put ("\1 \2\n", Tool_Names.Tool_Name, Gnatvsn.Gnat_Version_String);
---      Put ("Copyright (C) \1, \2.\n",
---           Gnatvsn.Current_Year, "AdaCore");
+      Put ("\1 \2 \3\n", Tool_Names.Tool_Name, Pro, Libadalang.Version);
+      Put ("Copyright (C) \1-\2, \3\n",
+           Initial_Year, Current_Year, Copyright_Holder);
    end Print_Version_Info;
 
 end Utils.Versions;

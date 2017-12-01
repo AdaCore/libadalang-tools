@@ -1,7 +1,3 @@
---  ???with "gnat_util";
---  gnat_util is needed only for the "with Gnatvsn;" in lal_ul-versions.adb,
---  which is currently commented out.
-
 with "libadalang.gpr";
 project LAL_Tools is
 
