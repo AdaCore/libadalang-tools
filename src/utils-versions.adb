@@ -30,11 +30,8 @@ with Libadalang;
 
 package body Utils.Versions is
 
-   --  ???The following are copied from gnatvsn.ads in the compiler sources.
-   --  At least the year, and perhaps the holder and the free software notice,
-   --  should be automatically generated.
+   --  Much of the following is copied from gnatvsn.ads in the GNAT sources.
 
-   Current_Year : constant String := "2017";
    Copyright_Holder : constant String := "AdaCore.";
 
    function Gnat_Free_Software return String;
@@ -45,40 +42,21 @@ package body Utils.Versions is
    -- Gnat_Free_Software --
    ------------------------
 
-   type Gnat_Build_Type is (Gnatpro, Gnatpro_Devel, FSF, GPL);
-   --  See Get_Gnat_Build_Type below for the meaning of these values
-
-   Build_Type : constant Gnat_Build_Type := Gnatpro;
-
    function Gnat_Free_Software return String is
    begin
-      case Build_Type is
-         when FSF
-            | GPL
-         =>
-            return
-              "This is free software; see the source for copying conditions." &
-              ASCII.LF &
-              "There is NO warranty; not even for MERCHANTABILITY or FITNESS" &
-              " FOR A PARTICULAR PURPOSE.";
-
-         when Gnatpro
-            | Gnatpro_Devel
-         =>
-            return
-              "This is free software; see the source for copying conditions." &
-               ASCII.LF &
-               "See your AdaCore support agreement for details of warranty" &
-               " and support." &
-               ASCII.LF &
-               "If you do not have a current support agreement, then there" &
-               " is absolutely" &
-               ASCII.LF &
-               "no warranty; not even for MERCHANTABILITY or FITNESS FOR" &
-               " A PARTICULAR" &
-               ASCII.LF &
-               "PURPOSE.";
-      end case;
+      return
+        "This is free software; see the source for copying conditions." &
+         ASCII.LF &
+         "See your AdaCore support agreement for details of warranty" &
+         " and support." &
+         ASCII.LF &
+         "If you do not have a current support agreement, then there" &
+         " is absolutely" &
+         ASCII.LF &
+         "no warranty; not even for MERCHANTABILITY or FITNESS FOR" &
+         " A PARTICULAR" &
+         ASCII.LF &
+         "PURPOSE.";
    end Gnat_Free_Software;
 
    ------------------------
@@ -96,7 +74,7 @@ package body Utils.Versions is
       Put ("\1 \2 \3\n",
            To_Upper (Tool_Names.Tool_Name), Pro, Libadalang.Version);
       Put ("Copyright (C) \1-\2, \3\n",
-           Initial_Year, Current_Year, Copyright_Holder);
+           Initial_Year, Libadalang.Current_Year, Copyright_Holder);
       Put ("\1", Gnat_Free_Software);
       Put ("\n");
    end Print_Tool_Version;
@@ -109,7 +87,7 @@ package body Utils.Versions is
    begin
       Put ("\1 \2 \3\n", Tool_Names.Tool_Name, Pro, Libadalang.Version);
       Put ("Copyright (C) \1-\2, \3\n",
-           Initial_Year, Current_Year, Copyright_Holder);
+           Initial_Year, Libadalang.Current_Year, Copyright_Holder);
    end Print_Version_Info;
 
 end Utils.Versions;
