@@ -1255,7 +1255,6 @@ package body METRICS.Actions is
                end if;
             end loop;
             Outdent;
-            Put ("\n");
          end if;
       end if;
 
@@ -2090,8 +2089,9 @@ package body METRICS.Actions is
       Put ("=================\n");
       Indent;
 
-      for File_M of Units_For_Coupling loop
+      for Index in 1 .. Units_For_Coupling.Last_Index loop
          declare
+            File_M : Metrix renames Element (Units_For_Coupling, Index).all;
             Outer_Unit : Metrix renames Element (File_M.Submetrix, 1).all;
          begin
             if Should_Print_Any
@@ -2102,8 +2102,11 @@ package body METRICS.Actions is
                  (Cmd,
                   File_M.Source_File_Name.all,
                   Metrics_To_Compute,
-                  File_M.all,
+                  File_M,
                   Depth => 2);
+               if Index /= Units_For_Coupling.Last_Index then
+                  Put ("\n");
+               end if;
             end if;
          end;
       end loop;
