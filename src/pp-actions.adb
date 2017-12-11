@@ -501,12 +501,8 @@ package body Pp.Actions is
              L ("!? ^=> ~~~"),
            when Ada_At_Clause =>
              L ("for ! use at !"),
-           when Ada_Attribute_Def_Clause =>
+           when Ada_Attribute_Def_Clause | Ada_Enum_Rep_Clause =>
              L ("for ! use [!]"),
-           when Ada_Enum_Rep_Clause =>
-             L ("for ! use !"),
-             --  ???An enumeration representation clause is incorrectly parsed
-             --  as an attribute definition clause.
            when Ada_Record_Rep_Clause =>
              L ("for ! use record? at mod ~~;~$", "{?~;$~;$~}", "end record"),
            when Ada_Aspect_Spec =>
