@@ -719,8 +719,7 @@ package body Stub.Actions is
          Out_Str : String renames Elems (Out_Vec) (1 .. Last_Index (Out_Vec));
          Out_Unit : constant Analysis_Unit := Get_From_Buffer
            (Context, Filename => "????",
-            Buffer => Out_Str,
-            With_Trivia => True);
+            Buffer => Out_Str);
       begin
          pragma Assert (not Has_Diagnostics (Out_Unit));
          pragma Assert (not Root (Out_Unit).Is_Null);

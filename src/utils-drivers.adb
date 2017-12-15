@@ -360,8 +360,7 @@ package body Utils.Drivers is
                   Inp : String renames Input (First .. Input'Last);
                   Unit : constant Analysis_Unit := Get_From_Buffer
                     (Context, F_Name.all,
-                     Buffer => Inp,
-                     With_Trivia => True);
+                     Buffer => Inp);
                begin
                   if Has_Diagnostics (Unit) then
                      Put_Line ("Errors while parsing " & F_Name.all);
