@@ -917,16 +917,11 @@ package body Pp.Scanner is
    end Put_Token;
 
    procedure Put_Tokens
-     (Tokens    : Token_Vectors.Vector;
-      First     : Token_Index'Base := 1;
-      Last      : Token_Index'Base := Token_Index'Last;
+     (Tokens    : Token_Array;
       Highlight : Token_Index'Base := 0)
    is
    begin
-      for Index in
-        Token_Index'Max (First, 1) ..
-            Token_Index'Min (Last, Last_Index (Tokens))
-      loop
+      for Index in Tokens'Range loop
          if Index = Highlight then
             Text_IO.Put_Line (Text_IO.Standard_Output, "----------------");
          end if;
@@ -934,6 +929,30 @@ package body Pp.Scanner is
          Put_Token (Tokens (Index), Index);
       end loop;
    end Put_Tokens;
+
+   procedure Put_Tokens
+     (Tokens    : Token_Vector;
+      First     : Token_Index'Base := 1;
+      Last      : Token_Index'Base := Token_Index'Last;
+      Highlight : Token_Index'Base := 0)
+   is
+      A : Scanner.Token_Array renames
+        Elems (Tokens)
+         (Token_Index'Max (First, 1) ..
+          Token_Index'Min (Last, Last_Index (Tokens)));
+   begin
+      Put_Tokens (A, Highlight);
+   end Put_Tokens;
+
+   procedure Dump_Token (Tok : Token) is
+   begin
+      Put_Token (Tok);
+   end Dump_Token;
+
+   procedure Dump_Tokens (Tokens : Token_Array) is
+   begin
+      Put_Tokens (Tokens);
+   end Dump_Tokens;
 
    procedure Check_Same_Tokens (X, Y : Token_Vectors.Vector) is
       Xj, Yj : Token_Index := 1;

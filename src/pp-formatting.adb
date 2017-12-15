@@ -97,9 +97,6 @@ package body Pp.Formatting is
                (Tok.Normalized, Ada_Version => Ada_83));
    end Sname_83;
 
-   procedure Assert_No_Trailing_Blanks (S : W_Str);
-   --  Assert that there are no lines with trailing blanks in S.
-
    procedure Insert_Comment_Text
      (Lines_Data : in out Lines_Data_Rec;
       Cmd : Utils.Command_Lines.Command_Line;
@@ -639,7 +636,7 @@ package body Pp.Formatting is
       --  Start of processing for Split_Lines
 
       begin
-         if Arg (Cmd, Preserve_Line_Breaks) then
+         if not Arg (Cmd, Insert_Line_Breaks) then
             return;
          end if;
          pragma Debug
@@ -923,10 +920,11 @@ package body Pp.Formatting is
             return R : Boolean do
                if Tok1.Kind = Tok2.Kind then
                   case Tok1.Kind is
-                     when Nil | End_Of_Line | Comment_Kind =>
+                     when Nil | Comment_Kind =>
                         raise Program_Error;
 
-                     when Start_Of_Input | End_Of_Input | Blank_Line =>
+                     when Start_Of_Input | End_Of_Input |
+                       End_Of_Line | Blank_Line =>
                         pragma Assert (Tok1.Normalized = Tok2.Normalized);
                         R := True;
 
@@ -974,9 +972,51 @@ package body Pp.Formatting is
          end Match;
 
          Src_Index, Out_Index : Token_Index := 2;
-         --  Skip the first Start_Of_Input token, which is just a sentinel
+         --  Indices into Src_Tokens and Out_Tokens, respectively. Skip the
+         --  first Start_Of_Input token, which is just a sentinel.
 
          Src_Tok, Out_Tok : Token;
+
+         function L_Paren_Indentation_For_Preserve return Natural;
+         --  In --preserve-line-breaks mode, this is the amount of additional
+         --  indentation needed to make lines start just after a "(" on the
+         --  previous line. For example, if the input is:
+         --     X := Foo (Y,
+         --               Z);
+         --  we would normally put that all on one line. In
+         --  --preserve-line-breaks mode, we want a line break between
+         --  "," and "Z", and we want Z to line up after "(".
+
+         procedure Manage_Paren_Stack;
+         --  Paren_Stack (below) is a stack containing one entry for each left
+         --  parenthesis that has not yet been closed by a right parenthesis.
+         --  Index points to the L_Paren token in Out_Tokens. Indent is the
+         --  additional amount to indent to get to one past just under the "(".
+         --  ???This is currently used only for --preserve-line-breaks mode.
+         --  We could Consider using it also for the "extra" indent by 1
+         --  character mentioned in PP.Actions (see type Ada_Template), and
+         --  also for Qual_Nesting.
+
+         Line_Start_Out_Index : Token_Index := 2;
+         --  Used only in --preserve-line-breaks mode. Index in Out_Tokens of
+         --  the first token on the current line. Since Split_Lines has not yet
+         --  been run, there is no indentation present in Out_Buf. ???Perhaps
+         --  we should use Firstx/Lastx instead of First/Last in various
+         --  places.
+
+         type Paren_Stack_Index is new Positive;
+         type Paren_Stack_Element is record
+            Index : Token_Index; -- for debugging
+            Indent : Natural;
+         end record;
+         type Paren_Stack_Element_Array is
+           array (Paren_Stack_Index range <>) of Paren_Stack_Element;
+         package Paren_Vectors is new Utils.Vectors
+           (Paren_Stack_Index,
+            Paren_Stack_Element,
+            Paren_Stack_Element_Array);
+         Paren_Stack : Paren_Vectors.Vector;
+         use Paren_Vectors;
 
          Line_Breaks : Line_Break_Vector renames Syntax_Line_Breaks;
          --  Line breaks used for indenting whole-line comments
@@ -988,12 +1028,95 @@ package body Pp.Formatting is
 
          Cur_Line     : Line_Break_Index := 2;
          EOL_Cur_Line : Line_Break_Index := 2; -- for end-of-line comments
+         All_Cur_Line : Line_Break_Index := 2;
+
+         Prev_Out_Index : Token_Index := Token_Index'Last;
+         --  Used by Manage_Paren_Stack to avoid pushing/popping the same paren
+         --  twice.
+
+         Extra_Indent_For_Preserved_Line : Boolean := True;
+         --  True if a "preserved" line break should get extra indentation as a
+         --  line continuation, in addition to any "("-related indentation.
+         --  For example, we want extra here:
+         --     Foo
+         --       (X,
+         --        Y);
+         --  but not here:
+         --     Foo (X,
+         --          Y);
+
+         procedure Manage_Paren_Stack is
+         begin
+            if Out_Index = Prev_Out_Index then
+               return;
+            end if;
+
+            Prev_Out_Index := Out_Index;
+
+            --  We push the stack for "(" and pop for ")".
+
+            --  Normally, Extra_Indent_For_Preserved_Line is True, but we set
+            --  it False when we're inside an unclosed "(..." that is on the
+            --  same line as the previous Enabled line break. We're talking
+            --  about line breaks from previous phases, not "preserved" ones
+            --  added in this phase.
+
+            if Out_Tok.Text = Name_L_Paren then
+               if Is_Empty (Paren_Stack) then
+                  declare
+                     Last_En : Line_Break_Index := All_Cur_Line - 1;
+                     Enabled_Line_Start, This_Line_Start : Positive;
+                  begin
+                     while not All_Line_Breaks (Last_En).Enabled loop
+                        Last_En := @ - 1;
+                     end loop;
+
+                     Enabled_Line_Start :=
+                       Position (Out_Buf, All_Line_Breaks (Last_En).Mark) + 1;
+                     This_Line_Start :=
+                       Position
+                         (Out_Buf,
+                          Out_Tokens (Line_Start_Out_Index).Sloc.Firstx);
+                     if Enabled_Line_Start = This_Line_Start then
+                        Extra_Indent_For_Preserved_Line := False;
+                     end if;
+                  end;
+               end if;
+
+               Push
+                 (Paren_Stack,
+                  (Index => Out_Index,
+                   Indent =>
+                     Out_Tok.Sloc.First
+                   - Out_Tokens (Line_Start_Out_Index).Sloc.First + 1));
+
+            elsif Out_Tok.Text = Name_R_Paren then
+               Pop (Paren_Stack);
+
+               if Is_Empty (Paren_Stack) then
+                  Extra_Indent_For_Preserved_Line := True;
+               end if;
+            end if;
+         end Manage_Paren_Stack;
+
+         function L_Paren_Indentation_For_Preserve return Natural is
+         begin
+            if Is_Empty (Paren_Stack) then
+               return 0;
+            else
+               return Last_Element (Paren_Stack).Indent;
+            end if;
+         end L_Paren_Indentation_For_Preserve;
 
          procedure Move_Past_Char is
+            P : constant Positive := Point (Out_Buf);
          begin
             pragma Assert
-              (Point (Out_Buf) <=
-                 Position (Out_Buf, Line_Breaks (Cur_Line).Mark));
+              (P <= Position (Out_Buf, Line_Breaks (Cur_Line).Mark));
+            pragma Assert
+              (P <= Position (Out_Buf, EOL_Line_Breaks (EOL_Cur_Line).Mark));
+            pragma Assert
+              (P <= Position (Out_Buf, All_Line_Breaks (All_Cur_Line).Mark));
 
             --  Step past Line_Breaks at the current position
 
@@ -1009,6 +1132,14 @@ package body Pp.Formatting is
               and then At_Point (Out_Buf, EOL_Line_Breaks (EOL_Cur_Line).Mark)
             loop
                EOL_Cur_Line := EOL_Cur_Line + 1;
+            end loop;
+
+            --  Step past All_Line_Breaks at the current position
+
+            while All_Cur_Line <= Last_Index (All_Line_Breaks)
+              and then At_Point (Out_Buf, All_Line_Breaks (All_Cur_Line).Mark)
+            loop
+               All_Cur_Line := All_Cur_Line + 1;
             end loop;
 
             --  Step past character
@@ -1043,7 +1174,8 @@ package body Pp.Formatting is
                        and then At_Point (Out_Buf, LB.Mark)
                      then
                         if Cur (Out_Buf) = Token_Separator then
-                           pragma Assert (Arg (Cmd, Preserve_Line_Breaks));
+                           pragma Assert (False); -- Not yet implemented
+                           pragma Assert (not Arg (Cmd, Insert_Line_Breaks));
                            Move_Past_Char;
                         end if;
                         pragma Assert (Cur (Out_Buf) = ' ');
@@ -1127,7 +1259,7 @@ package body Pp.Formatting is
             if not At_Point (Out_Buf, EOL_Line_Breaks (EOL_Cur_Line).Mark) then
                pragma Assert (Cur (Out_Buf) /= NL);
                Cur_Indentation := Indentation;
-               if not Arg (Cmd, Preserve_Line_Breaks) then
+               if Arg (Cmd, Insert_Line_Breaks) then
                   Append_Temp_Line_Break (Lines_Data);
                end if;
                Cur_Indentation := 0;
@@ -1143,6 +1275,36 @@ package body Pp.Formatting is
          --  encountered Pp_Off_Comment or Pp_On_Comment. Used to check for
          --  errors; they must alternate, OFF, ON, OFF, ....
 
+         function Before_Indentation return Natural;
+         --  Same as "Line_Breaks (Cur_Line - 1).Indentation", except we skip
+         --  Line_Breaks with Affects_Comments = False. In other words, this is
+         --  the previous line-breaks indentation which should affect comments.
+         function After_Indentation return Natural;
+         --  Same as "Line_Breaks (Cur_Line).Indentation", except we skip
+         --  Line_Breaks with Affects_Comments = False. In other words, this is
+         --  the current/next line-breaks indentation which should affect
+         --  comments.
+
+         function Before_Indentation return Natural is
+            X : Line_Break_Index := Cur_Line - 1;
+         begin
+            while X > 1 and then not Line_Breaks (X).Affects_Comments loop
+               X := X - 1;
+            end loop;
+            return Line_Breaks (X).Indentation;
+         end Before_Indentation;
+
+         function After_Indentation return Natural is
+            X : Line_Break_Index := Cur_Line;
+         begin
+            while X < Last_Index (Line_Breaks)
+              and then not Line_Breaks (X).Affects_Comments
+            loop
+               X := X + 1;
+            end loop;
+            return Line_Breaks (X).Indentation;
+         end After_Indentation;
+
          procedure Insert_Whole_Line_Comment is
             function Look_Before return Boolean;
             --  True if we should look before the current location to determine
@@ -1152,16 +1314,6 @@ package body Pp.Formatting is
 
             procedure Set_Cur_Indent;
             --  Set Cur_Indentation as appropriate
-
-            function Before_Indentation return Natural;
-            --  Same as "Line_Breaks (Cur_Line - 1).Indentation", except we skip
-            --  Line_Breaks with Affects_Comments = False. In other words, this is
-            --  the previous line-breaks indentation which should affect comments.
-            function After_Indentation return Natural;
-            --  Same as "Line_Breaks (Cur_Line).Indentation", except we skip
-            --  Line_Breaks with Affects_Comments = False.In other words, this is
-            --  the current/next line-breaks indentation which should affect
-            --  comments.
 
             function Look_Before return Boolean is
             begin
@@ -1210,26 +1362,6 @@ package body Pp.Formatting is
                   end if;
                end if;
             end Set_Cur_Indent;
-
-            function Before_Indentation return Natural is
-               X : Line_Break_Index := Cur_Line - 1;
-            begin
-               while X > 1 and then not Line_Breaks (X).Affects_Comments loop
-                  X := X - 1;
-               end loop;
-               return Line_Breaks (X).Indentation;
-            end Before_Indentation;
-
-            function After_Indentation return Natural is
-               X : Line_Break_Index := Cur_Line;
-            begin
-               while X < Last_Index (Line_Breaks)
-                 and then not Line_Breaks (X).Affects_Comments
-               loop
-                  X := X + 1;
-               end loop;
-               return Line_Breaks (X).Indentation;
-            end After_Indentation;
 
             use Source_Message_Vectors;
 
@@ -1301,7 +1433,7 @@ package body Pp.Formatting is
             if Src_Tokens (Src_Index - 1).Kind = Blank_Line
               or else Lookback (Out_Buf) /= NL
             then
-               if not Arg (Cmd, Preserve_Line_Breaks) then
+               if Arg (Cmd, Insert_Line_Breaks) then
                   Append_Temp_Line_Break (Lines_Data);
                end if;
             end if;
@@ -1313,7 +1445,7 @@ package body Pp.Formatting is
                Src_Tok   := Src_Tokens (Src_Index);
                exit when Src_Tok.Kind not in Other_Whole_Line_Comment;
                Set_Cur_Indent;
-               if not Arg (Cmd, Preserve_Line_Breaks) then
+               if Arg (Cmd, Insert_Line_Breaks) then
                   Append_Temp_Line_Break (Lines_Data);
                end if;
             end loop;
@@ -1343,7 +1475,7 @@ package body Pp.Formatting is
                   null;
                else
                   Cur_Indentation := Indentation;
-                  if not Arg (Cmd, Preserve_Line_Breaks) then
+                  if Arg (Cmd, Insert_Line_Breaks) then
                      Append_Temp_Line_Break (Lines_Data);
                   end if;
                end if;
@@ -1372,7 +1504,7 @@ package body Pp.Formatting is
                pragma Assert (False);
             end if;
 
-            if not Arg (Cmd, Preserve_Line_Breaks) then
+            if Arg (Cmd, Insert_Line_Breaks) then
                Append_Temp_Line_Break (Lines_Data);
             end if;
             Insert (Out_Buf, "private");
@@ -1403,14 +1535,20 @@ package body Pp.Formatting is
               (Lines_Data, "before Insert_Comments_And_Blank_Lines"));
          Get_Tokens
            (Out_Buf, Out_Tokens, Utils.Ada_Version, Pp_Off_On_Delimiters,
---            Ignore_Single_Line_Breaks => not Arg (Cmd, Preserve_Line_Breaks));
-            Ignore_Single_Line_Breaks => True);
+            Ignore_Single_Line_Breaks => not Arg (Cmd, Preserve_Line_Breaks));
          --  ???At this point, we might need another pass to insert hard line
          --  breaks after end-of-line comments, so they will be indented properly.
          --  Or better yet, insert the EOL comments, with tabs and soft line break
          --  before, hard line break after.
          pragma Assert (Cur (Out_Buf) = NL);
          Move_Forward (Out_Buf); -- skip sentinel
+         if Arg (Cmd, Preserve_Line_Breaks) then
+            --  Skip initial End_Of_Line token
+            pragma Assert (Out_Tokens (Out_Index).Kind = End_Of_Line);
+            Out_Index := Out_Index + 1;
+            Line_Start_Out_Index := Out_Index;
+            pragma Assert (Src_Tokens (Src_Index).Kind /= End_Of_Line);
+         end if;
          Collect_Enabled_Line_Breaks (Lines_Data, Syntax_Also => True);
          Clear (Temp_Line_Breaks);
 
@@ -1470,7 +1608,7 @@ package body Pp.Formatting is
             --  Whole_Line_Comments must be handled after blank lines, because
             --  the blank line should precede the comment.
 
-            if Src_Tok.Kind not in End_Of_Line | Blank_Line
+            if Src_Tok.Kind /= Blank_Line
               and then
               (Match (Src_Tok, Out_Tok)
                or else
@@ -1488,6 +1626,10 @@ package body Pp.Formatting is
 
                Src_Index := Src_Index + 1;
                Out_Index := Out_Index + 1;
+
+               if Out_Tok.Kind in End_Of_Line | Blank_Line then
+                  Line_Start_Out_Index := Out_Index;
+               end if;
 
             else
                --  Check for "end;" --> "end Some_Name;" case
@@ -1586,11 +1728,40 @@ package body Pp.Formatting is
                elsif Src_Tok.Kind = End_Of_Line_Comment then
                   Insert_End_Of_Line_Comment;
 
+               --  For --preserve-line-breaks mode. Here, we see a line break
+               --  in the input that is not yet in the output, so we copy it
+               --  over. We set the indentation to take into account
+               --  surrounding indentation, plus line continuation if
+               --  appropriate, plus "("-related indentation. If the next
+               --  character in the output is already ' ', we subtract one from
+               --  the indentation to make up for that. (There can never be two
+               --  in a row.)
+
                elsif Src_Tok.Kind = End_Of_Line then
                   pragma Assert (Arg (Cmd, Preserve_Line_Breaks));
-                  Src_Index := Src_Index + 1;
-                  Src_Tok   := Src_Tokens (Src_Index);
-                  Append_Temp_Line_Break (Lines_Data);
+                  declare
+                     Indentation : Natural := Before_Indentation;
+                  begin
+                     Src_Index := Src_Index + 1;
+                     Src_Tok   := Src_Tokens (Src_Index);
+
+                     if Extra_Indent_For_Preserved_Line then
+                        --  See Manage_Paren_Stack
+                        Indentation := @ + PP_Indent_Continuation (Cmd);
+                     end if;
+
+                     if Cur (Out_Buf) = ' ' then
+                        pragma Assert (Lookahead (Out_Buf) /= ' ');
+                        Indentation := Indentation - 1;
+                     end if;
+
+                     Indentation := @ + L_Paren_Indentation_For_Preserve;
+                     Cur_Indentation := Indentation;
+                     Append_Temp_Line_Break (Lines_Data);
+                     Cur_Indentation := 0;
+                     pragma Assert (Out_Tok.Kind /= End_Of_Line);
+                     Line_Start_Out_Index := Out_Index;
+                  end;
 
                --  If the source has a blank line at this point, send it to the
                --  output (unless Insert_Blank_Lines is True, in which case we
@@ -1609,7 +1780,7 @@ package body Pp.Formatting is
                         Src_Index := Src_Index + 1;
                         Src_Tok   := Src_Tokens (Src_Index);
                         exit when Src_Tok.Kind /= Blank_Line
-                          or else Arg (Cmd, Preserve_Line_Breaks)
+                          or else not Arg (Cmd, Insert_Line_Breaks)
                           or else Preserve_Blank_Lines (Cmd);
                      end loop;
                      declare
@@ -1618,7 +1789,7 @@ package body Pp.Formatting is
                              then Src_Tokens (Src_Index + 1).Kind
                              else Nil);
                      begin
-                        if Arg (Cmd, Preserve_Line_Breaks)
+                        if not Arg (Cmd, Insert_Line_Breaks)
                           or else Preserve_Blank_Lines (Cmd)
                           or else (not Insert_Blank_Lines (Cmd)
                                      and then Src_Tok.Kind /= End_Of_Input)
@@ -1636,6 +1807,7 @@ package body Pp.Formatting is
                elsif Out_Tok.Kind in End_Of_Line | Blank_Line then
                   Move_Past_Out_Tok;
                   Out_Index := Out_Index + 1;
+                  Line_Start_Out_Index := Out_Index;
                   Out_Tok   := Out_Tokens (Out_Index);
 
                --  Else print out debugging information and crash. This
@@ -1661,6 +1833,8 @@ package body Pp.Formatting is
                      Src_Index, Out_Index, Src_Tok, Out_Tok);
                end if;
             end if;
+
+            Manage_Paren_Stack;
          end loop;
 
          if Last_Pp_Off_On > 1 then
@@ -1668,14 +1842,21 @@ package body Pp.Formatting is
          end if;
 
          if Cur (Out_Buf) = Token_Separator then
-            pragma Assert (Arg (Cmd, Preserve_Line_Breaks));
+            pragma Assert (False); -- Not yet implemented
+            pragma Assert (not Arg (Cmd, Insert_Line_Breaks));
             Move_Past_Char;
          end if;
 
-         pragma Assert (Point (Out_Buf) = Last_Position (Out_Buf));
-         pragma Assert (Cur (Out_Buf) = NL);
+         pragma Assert (Is_Empty (Paren_Stack));
+
+         if Arg (Cmd, Preserve_Line_Breaks) then
+            pragma Assert (Point (Out_Buf) = Last_Position (Out_Buf) + 1);
+         else
+            pragma Assert (Point (Out_Buf) = Last_Position (Out_Buf));
+            pragma Assert (Cur (Out_Buf) = NL);
+            Move_Past_Out_Tok;
+         end if;
          pragma Debug (Assert_No_Trailing_Blanks (To_W_Str (Out_Buf)));
-         Move_Past_Out_Tok;
 
          pragma Assert (Cur_Indentation = 0);
 
@@ -2563,10 +2744,11 @@ package body Pp.Formatting is
          return R : Boolean do
             if Tok1.Kind = Tok2.Kind then
                case Tok1.Kind is
-                  when Nil | End_Of_Line =>
+                  when Nil =>
                      raise Program_Error;
 
-                  when Start_Of_Input | End_Of_Input | Blank_Line =>
+                  when Start_Of_Input | End_Of_Input |
+                     End_Of_Line | Blank_Line =>
                      pragma Assert (Tok1.Normalized = Tok2.Normalized);
                      R := True;
 
@@ -2713,6 +2895,12 @@ package body Pp.Formatting is
          Ignore_Single_Line_Breaks => not Arg (Cmd, Preserve_Line_Breaks));
       pragma Assert (Cur (Out_Buf) = NL);
       Move_Forward (Out_Buf); -- skip sentinel
+      if Arg (Cmd, Preserve_Line_Breaks) then
+         --  Skip initial End_Of_Line token
+         pragma Assert (Out_Tokens (Out_Index).Kind = End_Of_Line);
+         Out_Index := Out_Index + 1;
+         pragma Assert (Src_Tokens (Src_Index).Kind /= End_Of_Line);
+      end if;
 
       loop
          Src_Tok := Src_Tokens (Src_Index);
@@ -2725,7 +2913,7 @@ package body Pp.Formatting is
                Src_Index, Out_Index, Src_Tok, Out_Tok);
          end if;
 
-         if Src_Tok.Kind not in End_Of_Line | Blank_Line
+         if Src_Tok.Kind /= Blank_Line
            and then
            (Match (Src_Tok, Out_Tok)
             or else

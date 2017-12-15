@@ -183,7 +183,7 @@ package Pp.Scanner is
       --  implies not Is_Fillable_Comment.
 
       Sloc : Source_Location;
-   end record;
+   end record; -- Token
 
    type Token_Index is new Positive;
    type Token_Array is array (Token_Index range <>) of Token;
@@ -224,7 +224,7 @@ package Pp.Scanner is
    --  Strings to mark start and end of automatically generated code.
 
    Token_Separator : constant W_Char := W_Char'Val (1);
-   --  In Preserve_Line_Breaks mode, this character is used instead of hard
+   --  If Insert_Line_Breaks is False, this character is used instead of hard
    --  line breaks, because otherwise things like "isbegin" can be run
    --  together.
 
@@ -285,7 +285,10 @@ package Pp.Scanner is
 
    procedure Put_Token (Tok : Token; Index : Token_Index := 1);
    procedure Put_Tokens
-     (Tokens    : Token_Vectors.Vector;
+     (Tokens    : Token_Array;
+      Highlight : Token_Index'Base := 0);
+   procedure Put_Tokens
+     (Tokens    : Token_Vector;
       First     : Token_Index'Base := 1;
       Last      : Token_Index'Base := Token_Index'Last;
       Highlight : Token_Index'Base := 0);
@@ -297,4 +300,6 @@ package Pp.Scanner is
    --  indicate a slice of Tokens, and we tolerate out-of-bounds indices.
    --  We draw a comment line before Highlight.
 
+   procedure Dump_Token (Tok : Token);
+   procedure Dump_Tokens (Tokens : Token_Array);
 end Pp.Scanner;

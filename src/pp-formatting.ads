@@ -245,7 +245,8 @@ package Pp.Formatting is
    procedure Collect_Enabled_Line_Breaks
      (Lines_Data : in out Lines_Data_Rec; Syntax_Also : Boolean);
    --  Collect all the enabled line breaks, and (if Syntax_Also is True) also
-   --  the syntax line breaks.
+   --  the syntax line breaks. This reads All_Line_Breaks, and writes
+   --  Enabled_Line_Breaks and Syntax_Line_Breaks.
 
    function Next_Enabled
      (Line_Breaks : Line_Break_Vector; F : Line_Break_Index)
@@ -284,6 +285,9 @@ package Pp.Formatting is
    --  The first pretty-printing pass walks the tree and produces text,
    --  along with various tables. This performs the remaining passes, which
    --  do not make use of the tree.
+
+   procedure Assert_No_Trailing_Blanks (S : W_Str);
+   --  Assert that there are no lines with trailing blanks in S.
 
    ----------------
 

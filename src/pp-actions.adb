@@ -1173,9 +1173,6 @@ package body Pp.Actions is
       --  is called, so that we can base the initialization in part on the
       --  command-line options.
 
-      procedure Assert_No_Trailing_Blanks (S : W_Str);
-      --  Assert that there are no lines with trailing blanks in S.
-
       function Id_With_Casing
         (Id                       : Symbol;
          Kind                     : Opt_ASIS_Elems;
@@ -1503,7 +1500,7 @@ package body Pp.Actions is
 
          if Hard then
             Buffered_Output.Put_Char (NL);
-         elsif Arg (Cmd, Preserve_Line_Breaks) then
+         elsif not Arg (Cmd, Insert_Line_Breaks) then
             Buffered_Output.Put_Char (Scanner.Token_Separator);
          end if;
       end Append_Line_Break;
@@ -2438,7 +2435,7 @@ package body Pp.Actions is
 
                   when '$' | '%' =>
                      Append_Line_Break
-                       (Hard     => not Arg (Cmd, Preserve_Line_Breaks),
+                       (Hard     => Arg (Cmd, Insert_Line_Breaks),
                         Affects_Comments => C = '$',
                         Level    => Cur_Level,
                         Kind     => Kind,
@@ -3848,7 +3845,7 @@ package body Pp.Actions is
          --  In Partial mode, we might need to add a line break
 
          pragma Assert (At_End (Out_Buf));
-         if (Partial or else Arg (Cmd, Preserve_Line_Breaks))
+         if (Partial or else not Arg (Cmd, Insert_Line_Breaks))
            and then Cur (Out_Buf) /= NL
          then
             Append_Line_Break
@@ -3873,18 +3870,6 @@ package body Pp.Actions is
          Reset (Out_Buf);
          pragma Assert (Cur_Indentation = 0);
       end Convert_Tree_To_Ada;
-
-      procedure Assert_No_Trailing_Blanks (S : W_Str) is
-      begin
-         pragma Assert (S'First = 1);
-         for X in 2 .. S'Last loop
-            pragma Assert (if S (X) /= ' ' then not Is_Space (S (X)));
-            if S (X) = NL then
-               pragma Assert (S (X - 1) /= ' ');
-            end if;
-         end loop;
-         pragma Assert (S (S'Last) = NL);
-      end Assert_No_Trailing_Blanks;
 
    --  Start of processing for Tree_To_Ada_2
 
