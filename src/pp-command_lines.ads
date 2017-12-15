@@ -200,8 +200,21 @@ package Pp.Command_Lines is
       Rm_Style_Spacing,
       Insert_Blank_Lines,
       Preserve_Blank_Lines,
+      Insert_Line_Breaks,
       Preserve_Line_Breaks,
-      Ff_After_Pragma_Page);
+      Ff_After_Pragma_Page,
+      Vertical_Enum_Types,
+      Vertical_Array_Types,
+      Vertical_Named_Aggregates,
+      Vertical_Case_Alternatives);
+   --  Insert_Line_Breaks tells gnatpp to insert line breaks where
+   --  appropriate. This is the default. Preserve_Line_Breaks tells
+   --  gnatpp to preserve line breaks found in the input (OFF by default).
+   --  The switch "--no-insert_line_breaks" doesn't make much sense by
+   --  itself, because that would put the whole program text on one line.
+   --  ???Or perhaps --no-insert_line_breaks should imply
+   --  --preserve_line_breaks. In any case, --no-insert_line_breaks
+   --  does not yet work.
 
    package Pp_Boolean_Switches is new Boolean_Switches
      (Descriptor,
@@ -215,8 +228,13 @@ package Pp.Command_Lines is
        Rm_Style_Spacing => +"--RM-style-spacing",
        Insert_Blank_Lines => null,
        Preserve_Blank_Lines => null,
+       Insert_Line_Breaks => null,
        Preserve_Line_Breaks => null,
-       Ff_After_Pragma_Page => +"-ff"));
+       Ff_After_Pragma_Page => +"-ff",
+       Vertical_Enum_Types => null,
+       Vertical_Array_Types => null,
+       Vertical_Named_Aggregates => null,
+       Vertical_Case_Alternatives => null));
 
    package Pp_Boolean_Defaults is new
      Pp_Boolean_Switches.Set_Defaults
@@ -227,8 +245,13 @@ package Pp.Command_Lines is
          Rm_Style_Spacing => False,
          Insert_Blank_Lines => False,
          Preserve_Blank_Lines => False,
+         Insert_Line_Breaks => True,
          Preserve_Line_Breaks => False,
-         Ff_After_Pragma_Page => False));
+         Ff_After_Pragma_Page => False,
+         Vertical_Enum_Types => False,
+         Vertical_Array_Types => False,
+         Vertical_Named_Aggregates => False,
+         Vertical_Case_Alternatives => False));
 
    type Pp_Strings is
      (File_Name_File,
