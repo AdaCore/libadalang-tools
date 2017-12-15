@@ -110,7 +110,7 @@ package Pp.Command_Lines is
        Keyword_Upper_Case => +"-kU"));
 
    type Name_Casing is
-     (Name_Default_Case, -- "default" --> "as declared"????????????????
+     (Name_Case_As_Declared,
       Name_Lower_Case,
       Name_Upper_Case,
       Name_Mixed_Case);
@@ -121,13 +121,13 @@ package Pp.Command_Lines is
 
    package Name_Casing_Shorthands is
       new Name_Casing_Switches.Set_Shorthands
-     ((Name_Default_Case => +"-nD",
+     ((Name_Case_As_Declared => +"-nD",
        Name_Lower_Case => +"-nL",
        Name_Upper_Case => +"-nU",
        Name_Mixed_Case => +"-nM"));
 
    type Enum_Casing is
-     (Enum_Default_Case,
+     (Enum_Case_As_Declared,
       Enum_Lower_Case,
       Enum_Upper_Case,
       Enum_Mixed_Case);
@@ -138,13 +138,13 @@ package Pp.Command_Lines is
 
    package Enum_Casing_Shorthands is
       new Enum_Casing_Switches.Set_Shorthands
-     ((Enum_Default_Case => +"-neD",
+     ((Enum_Case_As_Declared => +"-neD",
        Enum_Lower_Case => +"-neL",
        Enum_Upper_Case => +"-neU",
        Enum_Mixed_Case => +"-neM"));
 
    type Type_Casing is
-     (Type_Default_Case,
+     (Type_Case_As_Declared,
       Type_Lower_Case,
       Type_Upper_Case,
       Type_Mixed_Case);
@@ -155,13 +155,13 @@ package Pp.Command_Lines is
 
    package Type_Casing_Shorthands is
       new Type_Casing_Switches.Set_Shorthands
-     ((Type_Default_Case => +"-ntD",
+     ((Type_Case_As_Declared => +"-ntD",
        Type_Lower_Case => +"-ntL",
        Type_Upper_Case => +"-ntU",
        Type_Mixed_Case => +"-ntM"));
 
    type Number_Casing is
-     (Number_Default_Case,
+     (Number_Case_As_Declared,
       Number_Lower_Case,
       Number_Upper_Case,
       Number_Mixed_Case);
@@ -172,7 +172,7 @@ package Pp.Command_Lines is
 
    package Number_Casing_Shorthands is
       new Number_Casing_Switches.Set_Shorthands
-     ((Number_Default_Case => +"-nnD",
+     ((Number_Case_As_Declared => +"-nnD",
        Number_Lower_Case => +"-nnL",
        Number_Upper_Case => +"-nnU",
        Number_Mixed_Case => +"-nnM"));
@@ -430,7 +430,7 @@ package Pp.Command_Lines is
    function PP_Name_Casing
      (Cmd : Cmd_Line) return PP_Casing is
       (case Name_Casing'(Arg (Cmd)) is
-         when Name_Default_Case => As_Declared,
+         when Name_Case_As_Declared => As_Declared,
          when Name_Mixed_Case => Mixed,
          when Name_Lower_Case => Lower_Case,
          when Name_Upper_Case => Upper_Case);
@@ -440,7 +440,7 @@ package Pp.Command_Lines is
    function PP_Enum_Casing
      (Cmd : Cmd_Line) return PP_Casing is
       (case Enum_Casing'(Arg (Cmd)) is
-         when Enum_Default_Case => PP_Name_Casing (Cmd),
+         when Enum_Case_As_Declared => PP_Name_Casing (Cmd),
          when Enum_Mixed_Case => Mixed,
          when Enum_Lower_Case => Lower_Case,
          when Enum_Upper_Case => Upper_Case);
@@ -450,7 +450,7 @@ package Pp.Command_Lines is
    function PP_Type_Casing
      (Cmd : Cmd_Line) return PP_Casing is
       (case Type_Casing'(Arg (Cmd)) is
-         when Type_Default_Case => PP_Name_Casing (Cmd),
+         when Type_Case_As_Declared => PP_Name_Casing (Cmd),
          when Type_Mixed_Case => Mixed,
          when Type_Lower_Case => Lower_Case,
          when Type_Upper_Case => Upper_Case);
@@ -460,7 +460,7 @@ package Pp.Command_Lines is
    function PP_Number_Casing
      (Cmd : Cmd_Line) return PP_Casing is
       (case Number_Casing'(Arg (Cmd)) is
-         when Number_Default_Case => PP_Name_Casing (Cmd),
+         when Number_Case_As_Declared => PP_Name_Casing (Cmd),
          when Number_Mixed_Case => Mixed,
          when Number_Lower_Case => Lower_Case,
          when Number_Upper_Case => Upper_Case);
