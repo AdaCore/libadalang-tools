@@ -353,7 +353,9 @@ package body Utils.Drivers is
                --  anyway if it's controlled by the command line).
 
                if Counter = Num_File_Names - 1 then
-                  Context := Create (Charset => Wide_Character_Encoding (Cmd));
+                  Context := Create
+                    (Charset => Wide_Character_Encoding (Cmd),
+                     With_Trivia => True);
                end if;
 
                declare
