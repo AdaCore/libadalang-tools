@@ -1101,6 +1101,8 @@ package body METRICS.Actions is
    --  Used to indicate we should indent an extra level, and that we should
    --  put underscores in the metric name.
 
+   First_Printed_Range : Boolean := True;
+
    procedure Print_Range
      (Name : String;
       Metrics_To_Compute : Metrics_Set;
@@ -1108,6 +1110,7 @@ package body METRICS.Actions is
       M : Metrix;
       Depth : Positive)
    is
+      First_Printed_Metric : Boolean := True;
    begin
       if not Should_Print_Any
         (First, Last, Metrics_To_Compute, M, Depth, XML => False)
@@ -1116,6 +1119,12 @@ package body METRICS.Actions is
       end if;
 
       if Depth /= 1 then
+         Put ("\n");
+      end if;
+
+      if First_Printed_Range then
+         First_Printed_Range := False;
+      else
          Put ("\n");
       end if;
 
@@ -1152,12 +1161,17 @@ package body METRICS.Actions is
                      else 26);
                begin
                   Indent (Indentation_Amount);
+                  if First_Printed_Metric then
+                     First_Printed_Metric := False;
+                  else
+                     Put ("\n");
+                  end if;
                   if I = Lines_Average then -- gnatmetric puts extra line
                      Put ("\n");
                   end if;
                   Put ("\1", Metric_Name);
                   Tab_To_Column (Indentation + Tab);
-                  Put (": \1\n", Val_To_Print (I, M, XML => False));
+                  Put (": \1", Val_To_Print (I, M, XML => False));
                   Outdent (Indentation_Amount);
                end;
             end if;
@@ -1233,7 +1247,7 @@ package body METRICS.Actions is
               Fine_Kind_String_For_Header (Element (M.Submetrix, 1).all),
               Str (M.Text_Name).S);
       else
-         Put ("\n\1 (\2\3 at lines  \4)\n",
+         Put ("\n\n\1 (\2\3 at lines  \4)\n",
               Str (M.Text_Name).S,
               Fine_Kind_String (M.Knd), Str (M.LI_Sub).S,
               Lines_String (M.Sloc));
@@ -1259,6 +1273,8 @@ package body METRICS.Actions is
       end if;
 
       --  Print metrix for this unit
+
+      First_Printed_Range := True;
 
       Print_Range
         ("=== Code line metrics ===",
@@ -1464,6 +1480,7 @@ package body METRICS.Actions is
       Depth : Positive)
    is
       pragma Assert (M.Node.Is_Null);
+      pragma Assert (Cur_Column = 1);
 
       To_Print_First : constant Metrics_Set :=
         Metrics_To_Compute and
@@ -1610,6 +1627,7 @@ package body METRICS.Actions is
 
          Print_Metrix
            (Cmd, File_Name, Metrics_To_Compute, File_M, Depth => 2);
+         Formatted_Output.Put ("\n");
 
          if not Output_To_Standard_Output then
             Set_Output (Standard_Output);
@@ -1617,6 +1635,7 @@ package body METRICS.Actions is
          end if;
       end if;
 
+      pragma Assert (Indentation = 0);
       if Gen_XML (Cmd) then
          if not Output_To_Standard_Output then
             Set_Output (XML_File);
@@ -2085,7 +2104,7 @@ package body METRICS.Actions is
          return;
       end if;
 
-      Put ("\nCoupling metrics:\n");
+      Put ("\n\nCoupling metrics:\n");
       Put ("=================\n");
       Indent;
 
@@ -2127,6 +2146,7 @@ package body METRICS.Actions is
       Put ("<coupling>\n");
 
       for File_M of Units_For_Coupling loop
+         pragma Assert (Indentation = 3);
          declare
             Outer_Unit : Metrix renames Element (File_M.Submetrix, 1).all;
          begin
@@ -2210,8 +2230,8 @@ package body METRICS.Actions is
                  Val_To_Print (C_Metric, Global_M.all, XML => False));
 
             if Metric = Public_Types then
-               Put (" including\n");
-               Put ("    \1 private types\n",
+               Put ("\n including");
+               Put ("\n    \1 private types",
                     Val_To_Print (Private_Types, Global_M.all, XML => False));
             end if;
          end if;
@@ -2285,6 +2305,8 @@ package body METRICS.Actions is
             end if;
          end if;
 
+         First_Printed_Range := True;
+
          Print_Range
            ("Line metrics " & Summed,
             Metrics_To_Compute,
@@ -2302,16 +2324,16 @@ package body METRICS.Actions is
             Depth => 1);
 
          Print_Computed_Metric
-           ("\n \1 public types in \2 units\n",
+           ("\n\n \1 public types in \2 units",
             Public_Types, Computed_Public_Types);
          Print_Computed_Metric
-           ("\n \1 public subprograms in \2 units\n",
+           ("\n\n \1 public subprograms in \2 units",
             Public_Subprograms, Computed_Public_Subprograms);
          Print_Computed_Metric
-           ("\n \1 subprogram bodies in \2 units\n",
+           ("\n\n \1 subprogram bodies in \2 units",
             All_Subprograms, Computed_All_Subprograms);
          Print_Computed_Metric
-           ("\n \1 type declarations in \2 units\n",
+           ("\n\n \1 type declarations in \2 units",
             All_Types, Computed_All_Types);
 
          --  For Complexity_Average, the actual metric value is in
@@ -2322,7 +2344,22 @@ package body METRICS.Actions is
          if Metrics_To_Compute (Complexity_Average)
            and then Global_M.Num_With_Complexity > 0
          then
-            Put ("\nAverage cyclomatic complexity: \1\n",
+            declare
+               All_But_Complexity_Average : constant Metrics_Set :=
+                 (Complexity_Average => False, others => True);
+            begin
+               --  If Complexity_Average is the only one we're printing,
+               --  then suppress two NLs, so we don't get NLs at the beginning
+               --  of the output.
+
+               if (Metrics_To_Compute and All_But_Complexity_Average) /=
+                 Empty_Metrics_Set
+               then
+                  Put ("\n\n");
+               end if;
+            end;
+
+            Put ("Average cyclomatic complexity: \1",
                  Val_To_Print (Complexity_Cyclomatic,
                                Global_M.all, XML => True));
          end if;
