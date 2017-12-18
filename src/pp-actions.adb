@@ -1399,6 +1399,7 @@ package body Pp.Actions is
             pragma Assert (Point (Out_Buf) = Last_Position (Out_Buf) + 1);
             if Last_Position (Out_Buf) =
               Position (Out_Buf, Line_Breaks (Last (Line_Breaks)).Mark)
+              and then Line_Breaks (Last (Line_Breaks)).Hard
             then
    --  pragma Assert (At_Point (Out_Buf, Line_Breaks (Last (Line_Breaks)).Mark));
                Line_Breaks (Last (Line_Breaks)).Indentation := Cur_Indentation;

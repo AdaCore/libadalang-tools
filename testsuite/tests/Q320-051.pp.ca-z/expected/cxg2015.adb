@@ -429,7 +429,7 @@ procedure Cxg2015 is
          K : constant Integer :=
            Integer
              (Log (Real (Real'Machine_Radix)**Real'Machine_Mantissa, 10.0)) +
-      1;
+           1;
       begin
          Accuracy_Error_Reported := False;  -- reset
          for I in 1 .. Max_Samples loop
