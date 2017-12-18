@@ -501,7 +501,7 @@ procedure Cxg2015 is
          K : constant Integer :=
            Integer
              (Log (Real (Real'Machine_Radix)**Real'Machine_Mantissa, 10.0)) +
-      1;
+           1;
       begin
          if Real'Digits > 23 then
             -- constants in this section only accurate to 23 digits
