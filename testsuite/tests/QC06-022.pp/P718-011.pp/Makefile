@@ -2,7 +2,8 @@ GNATMAKE         = gnatmake
 GNATMAKEFLAGS    =-q
 GNATPP           = gnatpp
 
-GNATPPFLAGS      =--vertical-enum-types \
+GNATPPFLAGS      =--output=normalized_named_aggregate_affectation.adb.pp \
+    --vertical-enum-types \
     --vertical-array-types \
     --vertical-named-aggregates \
     --vertical-case-alternatives \

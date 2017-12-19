@@ -227,24 +227,20 @@ package body Pp.Actions is
       --  Creates the file with the name specified in 'o' option. If the
       --  file with the given name already exists, erases the old file and
       --  replaces it with the pretty-printed source.
-      Replace,
+      Replace_Backup,
       --  Replaces the argument source with the pretty-printed source. The
       --  original source is stored in the file <arg_source>.npp. If the file
       --  with such a name already exists, gnatpp gives up.
-      Replace_Force,
+      Replace_Force_Backup,
       --  Replaces the argument source with the pretty-printed source. The
       --  original source is stored in the file <arg_source>.npp. If the file
       --  with such a name already exists, gnatpp overrides it.
-      Replace_No_Backup,
+      Replace,
       --  Replaces the argument source with the pretty-printed source. The
       --  original source is not stored in any back-up file.
-      Default,
-      --  Put the result source into <arg_source>.pp, overriding the existing
-      --  file if any.
       Output_Directory);
       --  Put the result into <arg_source_simple_name> in directory Out_Dir.
 
-   PP_Suffix : constant String := ".pp";
    NPP_Suffix : constant String := ".npp";
    --  The suffixes for the file names for default result and backup copy
    --  files.
@@ -253,11 +249,13 @@ package body Pp.Actions is
      Predicate => Create_Modes in Output | Output_Force;
    pragma Unreferenced (Create_Modes);
    subtype Replace_Modes is Output_Modes with
-     Predicate => Replace_Modes in Replace | Replace_Force | Replace_No_Backup;
+     Predicate => Replace_Modes in Replace_Backup |
+                                   Replace_Force_Backup |
+                                   Replace;
 
    function Get_Output_Mode (Cmd : Command_Line) return Output_Modes;
    function Get_Output_Mode (Cmd : Command_Line) return Output_Modes is
-      Result : Output_Modes := Default;
+      Result : Output_Modes := Replace;
    begin
       if Arg (Cmd, Output_Directory) /= null then
          Result := Output_Directory;
@@ -265,14 +263,14 @@ package body Pp.Actions is
       if Arg (Cmd, Pipe) then
          Result := Pipe;
       end if;
+      if Arg (Cmd, Replace_Backup) then
+         Result := Replace_Backup;
+      end if;
+      if Arg (Cmd, Replace_Force_Backup) then
+         Result := Replace_Force_Backup;
+      end if;
       if Arg (Cmd, Replace) then
          Result := Replace;
-      end if;
-      if Arg (Cmd, Replace_Force) then
-         Result := Replace_Force;
-      end if;
-      if Arg (Cmd, Replace_No_Backup) then
-         Result := Replace_No_Backup;
       end if;
       if Arg (Cmd, Output) /= null then
          Result := Output;
@@ -4414,7 +4412,6 @@ package body Pp.Actions is
                                     Resolve_Links  => Resolve_Links,
                                     Case_Sensitive => True),
 
-           when Default => File_Name & PP_Suffix,
            when Output_Directory =>
              Compose (Arg (Cmd, Output_Directory).all,
                       Simple_Name (File_Name)));
@@ -4628,7 +4625,7 @@ package body Pp.Actions is
 --
 --      Set_Output_Encoding;
 --
---      if Output_Mode = Replace and then
+--      if Output_Mode = Replace_Backup and then
 --         Is_Regular_File (Source_Name (SF) & NPP_Suffix)
 --      then
 --         Put (Standard_Error, "gnatpp: file ");
@@ -4639,7 +4636,7 @@ package body Pp.Actions is
 --         return;
 --      end if;
 
-      if Output_Mode in Replace | Replace_Force then
+      if Output_Mode in Replace_Backup | Replace_Force_Backup then
 
 --         if Verbose_Mode then
 --            Put (Standard_Error, "gnatpp: creating the back-up copy ");

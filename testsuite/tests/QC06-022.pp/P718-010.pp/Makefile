@@ -2,7 +2,8 @@ GNATMAKE         = gnatmake
 GNATMAKEFLAGS    =-q -gnatws
 GNATPP           = gnatpp
 
-GNATPPFLAGS      =--vertical-enum-types \
+GNATPPFLAGS      =--output=normalized_preserve_existing_continuation_lines.adb.pp \
+    --vertical-enum-types \
     --vertical-array-types \
     --vertical-named-aggregates \
     --vertical-case-alternatives \

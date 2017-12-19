@@ -2,7 +2,8 @@ GNATMAKE         = gnatmake
 GNATMAKEFLAGS    =-q -gnatws
 GNATPP           = gnatpp
 
-GNATPPFLAGS      =--vertical-enum-types \
+GNATPPFLAGS      =--output=normalized_split_lines_before_vertical_bars.adb.pp \
+    --vertical-enum-types \
     --vertical-array-types \
     --vertical-named-aggregates \
     --vertical-case-alternatives \
