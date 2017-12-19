@@ -254,7 +254,7 @@ package Pp.Command_Lines is
          Vertical_Case_Alternatives => False));
 
    type Pp_Strings is
-     (File_Name_File,
+     (File_Name_File, -- Not documented
       Output,
       Output_Force,
       End_Of_Line,

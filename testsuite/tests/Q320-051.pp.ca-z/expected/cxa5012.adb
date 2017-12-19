@@ -179,10 +179,8 @@ begin
          Tc_Enum_Array : array
            (First_Row .. Second_Row, 1 .. Tc_Max_Values) of Suit_Of_Cards;
          Tc_Float_Array : array
-           (First_Row ..
-                Second_Row,
-              1 ..
-                Tc_Max_Values) of Float_Random.Uniformly_Distributed;
+           (First_Row .. Second_Row,
+            1 .. Tc_Max_Values) of Float_Random.Uniformly_Distributed;
       begin
 
          -- The state of the random number generators are saved to state

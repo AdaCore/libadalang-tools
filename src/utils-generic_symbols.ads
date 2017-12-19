@@ -108,6 +108,8 @@ package Utils.Generic_Symbols is
    --  Return a unique integer for the Symbol. This can be used to
    --  make arrays indexed by Symbol.
 
+   procedure Print_Statistics;
+
    --  Wide_Strings:
 
    function W_Intern (S : Wide_String) return Symbol is (Intern (To_UTF8 (S)));

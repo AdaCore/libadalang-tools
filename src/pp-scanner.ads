@@ -62,6 +62,12 @@ package Pp.Scanner is
       --  A whole-line comment that matches the --pp-off string
       Pp_On_Comment,
       --  A whole-line comment that matches the --pp-on string
+      Special_Comment,
+      --  A "special" comment; that is, one that should not be formatted in any
+      --  way. Special comments are not fillable.
+      Fillable_Comment,
+      --  A fillable whole-line comment; that is, one that should be
+      --  filled if filling is turned on.
       Other_Whole_Line_Comment,
    --  A comment that appears by itself on a line. Multiple comments that may
    --  be filled as a "paragraph" are combined into a single Whole_Line_Comment
@@ -74,8 +80,9 @@ package Pp.Scanner is
       Blank_Line); -- Second, third, ... in a series of one or more NLs.
 
    subtype Whole_Line_Comment is Token_Kind with
-     Static_Predicate => Whole_Line_Comment in
-       Pp_Off_Comment | Pp_On_Comment | Other_Whole_Line_Comment;
+     Predicate => Whole_Line_Comment in
+       Pp_Off_Comment | Pp_On_Comment | Special_Comment |
+       Fillable_Comment | Other_Whole_Line_Comment;
 
    subtype Comment_Kind is Token_Kind with
         Predicate => Comment_Kind in Whole_Line_Comment | End_Of_Line_Comment;
@@ -134,56 +141,56 @@ package Pp.Scanner is
 
    type Token is record
       Kind : Token_Kind := Nil;
-
       Text : Syms.Symbol;
-      --  The text of the token as it appears in the source, with these
-      --  exceptions and clarifications:
-      --
-      --  Start_Of_Input and End_Of_Input have Text = "".
-      --
-      --  For Blank_Line: does not include the text of the preceding
-      --  End_Of_Line or Blank_Line (i.e. it is usually just LF, but could
-      --  be CR/LF -- not LF,LF nor CR,LF,CR,LF).
-      --
-      --  For comments, the text of the comment excluding the initial "--"
-      --  and leading and trailing blanks, and followed by an extra NL. For
-      --  multi-line comment "paragraphs", used for filling, NL terminates each
-      --  line. The NL at the end isn't really part of the comment; the next
-      --  token in the stream will be End_Of_Line. The reason for the extra NL
-      --  is that GNATCOLL.Paragraph_Filling expects it, so it's simpler and
-      --  more efficient this way.
-
       Normalized : Syms.Symbol;
-      --  Same as Text, or converted to lower case, depending on the Kind.
-      --  Comments have Normalized = No_Name, so we can detect specific
-      --  reserved words. For example, the "BEGIN" reserved word will have Text
-      --  = "BEGIN" and Normalized = "begin". The comment "-- begin" will have
-      --  Text = "begin" and Normalized = No_Name.
-
       Leading_Blanks : Natural;
-      --  For comments, the number of leading blanks, which are blanks after
-      --  the initial "--" and before any nonblank characters. For other
-      --  tokens, zero.
-
       Width : Natural;
-      --  For most tokens, this is the width of the token, i.e. the same as
-      --  Sloc.Last-Sloc.First+1, and the same as the length of Text. For
-      --  multi-line comments, this is the width of the widest line. For all
-      --  comments, the initial "--" and any leading blanks are included, but
-      --  the NL's are not.
-
-      Is_Special_Comment : Boolean;
-      --  True if this is a "special" comment; that is, one that should not be
-      --  formatted in any way. False for other comments and for non-comments.
-
-      Is_Fillable_Comment : Boolean;
-      --  True if this is a fillable comment; that is, one that should be
-      --  filled if filling is turned on. False for other comments and for
-      --  non-comments. Special comments are not fillable; Is_Special_Comment
-      --  implies not Is_Fillable_Comment.
-
       Sloc : Source_Location;
-   end record; -- Token
+   end record;
+
+   --  We would like to make type Token private, but then we can't instantiate
+   --  Token_Vectors. But we use accessor functions, as if it were private:
+
+   function Kind (X : Token) return Token_Kind;
+
+   function Text (X : Token) return Syms.Symbol;
+   --  The text of the token as it appears in the source, with these
+   --  exceptions and clarifications:
+   --
+   --  Start_Of_Input and End_Of_Input have Text = "".
+   --
+   --  For Blank_Line: does not include the text of the preceding
+   --  End_Of_Line or Blank_Line (i.e. it is usually just LF, but could
+   --  be CR/LF -- not LF,LF nor CR,LF,CR,LF).
+   --
+   --  For comments, the text of the comment excluding the initial "--"
+   --  and leading and trailing blanks, and followed by an extra NL. For
+   --  multi-line comment "paragraphs", used for filling, NL terminates each
+   --  line. The NL at the end isn't really part of the comment; the next
+   --  token in the stream will be End_Of_Line. The reason for the extra NL
+   --  is that GNATCOLL.Paragraph_Filling expects it, so it's simpler and
+   --  more efficient this way.
+
+   function Normalized (X : Token) return Syms.Symbol;
+   --  Same as Text, or converted to lower case, depending on the Kind.
+   --  Comments have Normalized = No_Name, so we can detect specific
+   --  reserved words. For example, the "BEGIN" reserved word will have Text
+   --  = "BEGIN" and Normalized = "begin". The comment "-- begin" will have
+   --  Text = "begin" and Normalized = No_Name.
+
+   function Leading_Blanks (X : Token) return Natural;
+   --  For comments, the number of leading blanks, which are blanks after
+   --  the initial "--" and before any nonblank characters. For other
+   --  tokens, zero.
+
+   function Width (X : Token) return Natural;
+   --  For single-line Whole_Line_Comments, this is the width of the token,
+   --  i.e. the same as Sloc.Last-Sloc.First+1, and the same as the length of
+   --  Text. For multi-line comments, this is the width of the widest line.
+   --  The initial "--" and any leading blanks are included, but the NL's are
+   --  not.
+
+   function Sloc (X : Token) return Source_Location;
 
    type Token_Index is new Positive;
    type Token_Array is array (Token_Index range <>) of Token;
@@ -230,7 +237,7 @@ package Pp.Scanner is
 
    procedure Get_Tokens
      (Input                     : in out Buffer;
-      Result                    : out Token_Vectors.Vector;
+      Result                    : out Token_Vector;
       Ada_Version               : Ada_Version_Type;
       Pp_Off_On_Delimiters      : Pp_Off_On_Delimiters_Rec;
       Ignore_Single_Line_Breaks : Boolean;
@@ -256,13 +263,13 @@ package Pp.Scanner is
    --  Gen_Regions(3).Sloc..Gen_Regions(4).Sloc, and so on.
 
    function Next_Lexeme
-     (Tokens : Token_Vectors.Vector;
+     (Tokens : Token_Vector;
       Index  : Token_Index)
       return   Token;
    --  Returns the next token after Index that is not a blank line or comment
 
    function Prev_Lexeme
-     (Tokens : Token_Vectors.Vector;
+     (Tokens : Token_Vector;
       Index  : Token_Index)
       return   Token;
    --  Returns the previous token before Index that is not a blank line or
@@ -273,7 +280,7 @@ package Pp.Scanner is
      return Token;
    --  Get just one token, ignoring single line breaks
 
-   procedure Check_Same_Tokens (X, Y : Token_Vectors.Vector);
+   procedure Check_Same_Tokens (X, Y : Token_Vector);
    --  Checks that X and Y are the same except for Slocs and line breaks; raise
    --  an exception if not.
 
@@ -302,4 +309,12 @@ package Pp.Scanner is
 
    procedure Dump_Token (Tok : Token);
    procedure Dump_Tokens (Tokens : Token_Array);
+
+private
+
+   function Kind (X : Token) return Token_Kind is (X.Kind);
+   function Text (X : Token) return Syms.Symbol is (X.Text);
+   function Normalized (X : Token) return Syms.Symbol is (X.Normalized);
+   function Sloc (X : Token) return Source_Location is (X.Sloc);
+
 end Pp.Scanner;

@@ -170,7 +170,7 @@ package body Utils.Drivers is
       --  ????See lal_ul-driver.adb
       use Utils.Environment;
    begin
-      for Dbg of Arg (Cmd, Debug) loop
+      for Dbg of Arg (Cmd, Command_Lines.Common.Debug) loop
          Set_Debug_Options (Dbg.all);
       end loop;
 

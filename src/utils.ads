@@ -43,6 +43,7 @@ with Text_IO;
 pragma Warnings (On);
 
 package Utils is
+   pragma Elaborate_Body;
 
    type Opt_Ada_Version_Type is
      (Ada_83, Ada_95, Ada_2005, Ada_2012, No_Ada_Version);
@@ -50,6 +51,13 @@ package Utils is
    subtype Ada_Version_Type is Opt_Ada_Version_Type range
      Ada_83 .. Opt_Ada_Version_Type'Pred (No_Ada_Version);
    Ada_Version : Ada_Version_Type := Ada_Version_Type'Last;
+
+   package Debug renames Utils_Debug;
+   Debug_Mode : Boolean renames Debug.Debug_Flag_9;
+
+   Assert_Enabled : Boolean := False;
+   --  Set to True in body if assertions are enabled. This should really be a
+   --  constant, but there's no easy mechanism for that.
 
    Main_Done : Boolean := False;
    --  This is set True at the (successful) end of each main procedure. The

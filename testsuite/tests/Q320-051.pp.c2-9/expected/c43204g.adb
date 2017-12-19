@@ -40,18 +40,14 @@ procedure C43204g is
      array (Integer range -1 .. 1, Integer range -1 .. 1) of Integer;
    type Arr22 is
      array
-       (Ident_Int (-1) ..
-            Ident_Int (1),
-          Ident_Int (-1) ..
-            Ident_Int (1)) of Integer;
+       (Ident_Int (-1) .. Ident_Int (1),
+        Ident_Int (-1) .. Ident_Int (1)) of Integer;
    type Arr23 is
      array (Integer range -1 .. 1, Ident_Int (-1) .. Ident_Int (1)) of Integer;
    type Arr24 is
      array
-       (Ident_Int (1) ..
-            Ident_Int (-1),
-          Ident_Int (-1) ..
-            Ident_Int (1)) of Integer;
+       (Ident_Int (1) .. Ident_Int (-1),
+        Ident_Int (-1) .. Ident_Int (1)) of Integer;
 
    task T is
       entry E

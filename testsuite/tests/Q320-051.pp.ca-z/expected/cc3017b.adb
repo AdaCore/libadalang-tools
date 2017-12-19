@@ -80,11 +80,8 @@ begin
 
          type A1 is
            array
-             (Integer_Type range
-                Lower ..
-                  First, Integer_Type range
-                Lower ..
-                  Second) of Integer_Type;
+             (Integer_Type range Lower .. First,
+              Integer_Type range Lower .. Second) of Integer_Type;
 
          procedure Pa1 (A : A1 := ((Lower, Upper), (Upper, Upper))) is
          begin
@@ -262,9 +259,8 @@ begin
 
          type A1 is
            array
-             (Integer_Type range
-                F_Static_Value ..
-                  S_Static_Value, Integer_Type range
+             (Integer_Type range F_Static_Value .. S_Static_Value,
+              Integer_Type range
                 T_Static_Value ..
                   L_Static_Value) of Subinteger_Type;
 
@@ -336,9 +332,8 @@ begin
 
          type A1 is
            array
-             (Integer_Type range
-                F_Static_Value ..
-                  S_Static_Value, Integer_Type range
+             (Integer_Type range F_Static_Value .. S_Static_Value,
+              Integer_Type range
                 T_Static_Value ..
                   L_Static_Value) of Subinteger_Type;
 

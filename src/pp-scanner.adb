@@ -28,6 +28,18 @@ with Utils.Predefined_Symbols; use Utils.Predefined_Symbols;
 package body Pp.Scanner is
    use Syms;
 
+   function Leading_Blanks (X : Token) return Natural is
+   begin
+      pragma Assert (X.Kind in Comment_Kind);
+      return X.Leading_Blanks;
+   end Leading_Blanks;
+
+   function Width (X : Token) return Natural is
+   begin
+      pragma Assert (X.Kind in Whole_Line_Comment);
+      return X.Width;
+   end Width;
+
    function First_Pos
      (Input : Buffer;
       Sloc  : Source_Location)
@@ -48,7 +60,7 @@ package body Pp.Scanner is
 
    procedure Get_Tokens
      (Input                     : in out Buffer;
-      Result                    : out Token_Vectors.Vector;
+      Result                    : out Token_Vector;
       Ada_Version               : Ada_Version_Type;
       Pp_Off_On_Delimiters      : Pp_Off_On_Delimiters_Rec;
       Ignore_Single_Line_Breaks : Boolean;
@@ -56,6 +68,10 @@ package body Pp.Scanner is
       Line_Ends                 : Marker_Vector_Ptr := null;
       Gen_Regions               : Token_Vector_Ptr  := null)
    is
+      pragma Assert (Ada_Version = Ada_2012);
+      --  We are not currently taking any command-line switch to set the
+      --  Ada_Version.
+
       procedure Assert;
       --  Assert that Line_Ends is correct
 
@@ -74,7 +90,7 @@ package body Pp.Scanner is
       procedure Get;
       --  Move ahead one character in the input
 
-      procedure Get_Token (Tok : out Token);
+      procedure Get_Token (Tok : out Token; Allow_Short_Fillable : Boolean);
       --  Get one token from the input, and return it in Tok, except that
       --  Tok.Text and Tok.Normalized are not set. Here, Whole_Line_Comment
       --  represents a single comment line; multiple Whole_Line_Comments that
@@ -105,8 +121,14 @@ package body Pp.Scanner is
       --  character (either '"' or '%'), taking care of doubled quote
       --  characters.
 
-      procedure Scan_Comment (Tok : in out Token);
-      --  Cur (Input) is the first '-' of the start of the comment
+      procedure Scan_Comment
+        (Tok : in out Token; Allow_Short_Fillable : Boolean);
+      --  Cur (Input) is the first '-' of the start of the comment.
+      --  Allow_Short_Fillable indicates that we should allow a comment to be
+      --  fillable even if it is short. In the inner loop in Get_Tokens where
+      --  we are collecting fillable comments into a single comment paragraph,
+      --  we set Allow_Short_Fillable to False for the first comment line, and
+      --  True for subsequent lines, so only the first line can be "too short".
 
       procedure Append_Tok (Tok : Token) is
          Token_Text_First : constant Positive :=
@@ -173,20 +195,24 @@ package body Pp.Scanner is
         (Kind => Nil,
          Text | Normalized => No_Symbol,
          Leading_Blanks | Width => Natural'Last,
-         Is_Special_Comment | Is_Fillable_Comment => False,
          Sloc =>
            (Line | Col | First | Last => Integer'Last, Firstx | Lastx => <>));
       --  These record the preceding token, which is necessary to properly deal
       --  with single quotes and line breaks. Preceding_Lexeme doesn't count
       --  comments and line breaks; Preceding_Token does.
 
-      procedure Scan_Comment (Tok : in out Token) is
+      procedure Scan_Comment
+        (Tok : in out Token; Allow_Short_Fillable : Boolean) is
          function Count_Blanks return Natural;
          --  Skip to next non-blank character, and return the number of blanks
          --  skipped
 
          procedure Skip_To_EOL;
          --  Move to end of line
+
+         function Too_Short (Tok : Token) return Boolean;
+         --  The comment is too short to be considered as the start of a filled
+         --  comment block.
 
          function Count_Blanks return Natural is
          begin
@@ -208,6 +234,14 @@ package body Pp.Scanner is
             end loop;
          end Skip_To_EOL;
 
+         function Too_Short (Tok : Token) return Boolean is
+            Too_Short_Comment : constant Positive := 30;
+         begin
+            return Tok.Width < Too_Short_Comment;
+         end Too_Short;
+
+         Is_Fillable_Comment : Boolean;
+
       --  Start of processing for Scan_Comment
 
       begin
@@ -218,42 +252,43 @@ package body Pp.Scanner is
          end if;
          Get; -- skip '-'
          Get; -- skip '-'
-         Tok.Is_Special_Comment :=
-           not
-           (Is_Letter (Cur (Input))
-            or else Is_Digit (Cur (Input))
-            or else Is_Space (Cur (Input))
-            or else Is_Line_Terminator (Cur (Input))
-            or else Cur (Input) = '-');
-         --  ???For now, we don't consider "-----" to be special, because
-         --  otherwise various comments are messed up.
-         Tok.Is_Fillable_Comment :=
-           Tok.Kind = Other_Whole_Line_Comment and then
-           not Tok.Is_Special_Comment;
-         if not Is_Space (Cur (Input)) then
-            Tok.Is_Fillable_Comment := False;
-            --  ????For now, we don't fill comments unless there is at least
-            --  one leading blank, because otherwise some special character
-            --  like "#" could end up at the start of a line, causing it to
-            --  turn into a special comment, thus messing up the Final_Check.
-            --  Also, for comment lines starting with "----Blah", we fill as
-            --  if "--Blah" is the first word.
+
+         if Tok.Kind = Other_Whole_Line_Comment
+           and then not
+             (Is_Letter (Cur (Input))
+                or else Is_Digit (Cur (Input))
+                or else Is_Space (Cur (Input))
+                or else Is_Line_Terminator (Cur (Input))
+                or else Cur (Input) = '-')
+            --  ???For now, we don't consider "-----" to be special, because
+            --  otherwise various comments are messed up.
+         then
+            Tok.Kind := Special_Comment;
          end if;
+
+         Is_Fillable_Comment := Tok.Kind = Other_Whole_Line_Comment
+           and then Is_Space (Cur (Input));
+         --  We don't fill comments unless there is at least one leading blank,
+         --  because otherwise some special character like "#" could end up at
+         --  the start of a line, causing it to turn into a special comment,
+         --  thus messing up the Final_Check. Also, for comment lines starting
+         --  with "----Blah", we fill as if "--Blah" is the first word.
+
          Tok.Leading_Blanks := Count_Blanks;
          --  Don't fill if too many leading blanks
          if Tok.Leading_Blanks > 2 then
-            Tok.Is_Fillable_Comment := False;
+            Is_Fillable_Comment := False;
          end if;
          Skip_To_EOL;
          --  Don't fill if comment ends with "--" (like a typical copyright
          --  header). Note that this includes the case of an empty comment,
          --  where the initial "--" is immediately followed by NL.
          if Lookback (Input, 2) = '-' and then Lookback (Input, 1) = '-' then
-            Tok.Is_Fillable_Comment := False;
+            Is_Fillable_Comment := False;
          end if;
 
          --  Check for --pp-off/--pp-on comments
-         if Tok.Kind = Other_Whole_Line_Comment then
+         if Tok.Kind in Other_Whole_Line_Comment | Special_Comment then
             declare
                Comment_Text : constant W_Str :=
                  Slice (Input, Tok.Sloc.First, Cur_First - 1);
@@ -261,19 +296,30 @@ package body Pp.Scanner is
                if Has_Prefix
                  (Comment_Text, Prefix => Pp_Off_On_Delimiters.Off.all)
                then
-                  Tok.Is_Fillable_Comment := False;
+                  Is_Fillable_Comment := False;
                   Tok.Kind := Pp_Off_Comment;
                elsif Has_Prefix
                  (Comment_Text, Prefix => Pp_Off_On_Delimiters.On.all)
                then
-                  Tok.Is_Fillable_Comment := False;
+                  Is_Fillable_Comment := False;
                   Tok.Kind := Pp_On_Comment;
                end if;
             end;
          end if;
+
+         Tok.Width := Cur_First - Tok.Sloc.First;
+
+         if not Allow_Short_Fillable and then Too_Short (Tok) then
+            Is_Fillable_Comment := False;
+         end if;
+
+         if Is_Fillable_Comment then
+            pragma Assert (Tok.Kind = Other_Whole_Line_Comment);
+            Tok.Kind := Fillable_Comment;
+         end if;
       end Scan_Comment;
 
-      procedure Get_Token (Tok : out Token) is
+      procedure Get_Token (Tok : out Token; Allow_Short_Fillable : Boolean) is
       begin
          while Is_Space (Cur (Input))
            or else Cur (Input) = Token_Separator
@@ -282,8 +328,6 @@ package body Pp.Scanner is
          end loop;
 
          Tok.Leading_Blanks      := 0;
-         Tok.Is_Special_Comment  := False;
-         Tok.Is_Fillable_Comment := False;
          Tok.Sloc                :=
            (Line   => Cur_Line,
             Col    => Cur_Col,
@@ -327,7 +371,7 @@ package body Pp.Scanner is
 
                when '-' =>
                   if Lookahead (Input) = '-' then
-                     Scan_Comment (Tok);
+                     Scan_Comment (Tok, Allow_Short_Fillable);
                   else
                      Get;
                      Tok.Kind := Lexeme;
@@ -474,16 +518,10 @@ package body Pp.Scanner is
 
          Tok.Sloc.Lastx := Mark (Input, '>');
          Tok.Sloc.Last  := Cur_First - 1;
-         Tok.Width      := Tok.Sloc.Last - Tok.Sloc.First + 1;
+         pragma Assert (if Tok.Kind in Whole_Line_Comment then
+           Tok.Width = Tok.Sloc.Last - Tok.Sloc.First + 1);
 
          pragma Assert (Tok.Kind /= Nil);
-         pragma Assert
-           (if Tok.Is_Special_Comment then Tok.Kind in Comment_Kind);
-         pragma Assert
-           (if Tok.Is_Fillable_Comment
-              then Tok.Kind = Other_Whole_Line_Comment);
-         pragma Assert
-           (if Tok.Is_Special_Comment then not Tok.Is_Fillable_Comment);
       end Get_Token;
 
       procedure Finish_Token (Tok : in out Token) is
@@ -587,29 +625,20 @@ package body Pp.Scanner is
          end if;
       end Append_To_Result;
 
-      function Too_Short (Tok : Token) return Boolean;
-      --  The comment is too short to be considered as the start of a filled
-      --  comment block.
-
-      function Too_Short (Tok : Token) return Boolean is
-         Too_Short_Comment : constant Positive := 30;
-      begin
-         return Tok.Width < Too_Short_Comment;
-      end Too_Short;
-
-      Start_Mark  : constant Marker := Mark (Input, '!');
-      Start_Token : Token           :=
+      Start_Mark_F  : constant Marker := Mark (Input, '!');
+      Start_Mark_L  : constant Marker := Mark (Input, '>');
+      Start_Token : constant Token  :=
         (Start_Of_Input,
          Text | Normalized => Name_Empty,
          Leading_Blanks => 0,
          Width          => 0,
-         Is_Special_Comment | Is_Fillable_Comment => False,
          Sloc =>
            (Line  => Cur_Line,
             Col   => Cur_Col,
             First => Cur_First,
             Last  => 0,
-            Firstx | Lastx => Start_Mark));
+            Firstx => Start_Mark_F,
+            Lastx => Start_Mark_L));
 
       procedure Assert is
       begin
@@ -626,7 +655,6 @@ package body Pp.Scanner is
    begin
       pragma Assert (Point (Input) = 1);
       Clear (Result);
-      Start_Token.Sloc.Lastx := Mark (Input, '>');
       Append (Result, Start_Token);
 
       if Line_Ends /= null then
@@ -659,33 +687,26 @@ package body Pp.Scanner is
 
          declare
             Tok, Tok_EOL, Tok_2 : Token;
-         --  Tok is a token. If it is a Whole_Line_Comment, it might be the
+         --  Tok is a token. If it is a Fillable_Comment, it might be the
          --  first of a paragraph, and Tok_EOL is the End_Of_Line token that
          --  follows the comment, and Tok_2 is the token after that, which
          --  might need to be combined with Tok.
          begin
-            Get_Token (Tok);
+            Get_Token (Tok, Allow_Short_Fillable => False);
             if Tok.Kind in Comment_Kind then
-               if Too_Short (Tok) then
-                  Tok.Is_Fillable_Comment := False;
-               end if;
                Append_Tok (Tok);
-               if Tok.Kind = End_Of_Line_Comment
-                 or else not Tok.Is_Fillable_Comment
-               then
+               if Tok.Kind /= Fillable_Comment then
                   Tok.Text       := Intern (Name_Buffer);
                   Tok.Normalized := No_Symbol;
                   Append_To_Result (Tok);
                else
-                  pragma Assert (Tok.Kind in Whole_Line_Comment);
-
                   --  Loop, repeatedly getting Tok_2, and combining Tok_2 into
                   --  Tok until something ends the paragraph.
 
                   loop
-                     Get_Token (Tok_EOL);
+                     Get_Token (Tok_EOL, Allow_Short_Fillable => False);
                      pragma Assert (Tok_EOL.Kind = End_Of_Line);
-                     Get_Token (Tok_2);
+                     Get_Token (Tok_2, Allow_Short_Fillable => True);
 
                      if Tok_2.Kind in Whole_Line_Comment then
 
@@ -693,7 +714,7 @@ package body Pp.Scanner is
                         --  constructing Tok, send it to Result, followed by
                         --  Tok_2.
 
-                        if not Tok_2.Is_Fillable_Comment then
+                        if Tok_2.Kind /= Fillable_Comment then
                            Tok.Text       := Intern (Name_Buffer);
                            Tok.Normalized := No_Symbol;
                            Append_To_Result (Tok);
@@ -779,7 +800,7 @@ package body Pp.Scanner is
    end Get_Tokens;
 
    function Next_Lexeme
-     (Tokens : Token_Vectors.Vector;
+     (Tokens : Token_Vector;
       Index  : Token_Index)
       return   Token
    is
@@ -794,7 +815,7 @@ package body Pp.Scanner is
    end Next_Lexeme;
 
    function Prev_Lexeme
-     (Tokens : Token_Vectors.Vector;
+     (Tokens : Token_Vector;
       Index  : Token_Index)
       return   Token
    is
@@ -812,7 +833,7 @@ package body Pp.Scanner is
      (Input : W_Str; Ada_Version : Ada_Version_Type)
      return Token is
       pragma Assert (Assert_Enabled); -- This is called only for debugging
-      Tokens : Token_Vectors.Vector;
+      Tokens : Token_Vector;
       Buf    : Buffer := String_To_Buffer (Input);
    begin
       Get_Tokens
@@ -911,9 +932,7 @@ package body Pp.Scanner is
          " at " &
          Image (Tok.Sloc) &
          " width = " &
-         Image (Tok.Width) &
-         (if Tok.Is_Special_Comment then " special" else "") &
-         (if Tok.Is_Fillable_Comment then " fillable" else ""));
+         Image (Tok.Width));
    end Put_Token;
 
    procedure Put_Tokens
@@ -954,7 +973,7 @@ package body Pp.Scanner is
       Put_Tokens (Tokens);
    end Dump_Tokens;
 
-   procedure Check_Same_Tokens (X, Y : Token_Vectors.Vector) is
+   procedure Check_Same_Tokens (X, Y : Token_Vector) is
       Xj, Yj : Token_Index := 1;
 
    begin

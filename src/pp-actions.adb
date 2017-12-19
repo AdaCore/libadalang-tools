@@ -167,6 +167,11 @@ package body Pp.Actions is
       Ignored : Boolean;
       Count : Natural := 0; -- number of files moved
    begin
+      if Debug_Flag_1 then
+         Utils.Dbg_Out.Output_Enabled := True;
+         Utils.Symbols.Print_Statistics;
+      end if;
+
       if not Mimic_gcc (Cmd)
       --  and then not Nothing_To_Do
       then
@@ -329,6 +334,11 @@ package body Pp.Actions is
    --      [ -- continuation-line indent
    --      ] -- continuation-line outdent
    --      ( -- insert a "(", and add "extra" indent by 1 character
+   --      ???If a further indent ({ or [) is done without any
+   --      intervening line break we should negate the effect of the
+   --      "extra indent". See also Paren_Stack in PP.Formatting.
+   --      Currently, we are assuming that "(" appears at the start
+   --      of the line if indentation matters.
    --      ) -- insert a ")", and outdent the "extra"
    --      ^ -- tab based on following token. May be followed by 1, 2, etc,
    --           to indicate Index_In_Line.
@@ -486,17 +496,16 @@ package body Pp.Actions is
            when Ada_Unconstrained_Array_Index => null,
            when Ada_Contract_Case_Assoc => null,
            when Ada_Contract_Cases => null,
-            --  ???Not sure what those are.
+           when Ada_Multi_Dim_Array_Assoc => null,
+           when Ada_Unconstrained_Array_Indices => null,
+            --  ???The above are not used
 
            when Ada_Ada_List => null,
            when Ada_Subp_Spec => null,
-           when Ada_Multi_Dim_Array_Assoc => null,
            when Ada_Aggregate_Assoc => null,
 
            when Ada_Constrained_Array_Indices =>
-             L ("(?~, ~~)"),
-           when Ada_Unconstrained_Array_Indices => null,
-               --  ???L ("(?~ range <>,# ~ range <>~)"),
+             L ("(?~,# ~~)"),
            when Ada_Aspect_Assoc =>
              L ("!? ^=> ~~~"),
            when Ada_At_Clause =>
@@ -696,8 +705,7 @@ package body Pp.Actions is
              L ("when[? ~~ :~ ?~ ^|# ~~] ^=>$", "{?~;$~;$~}"),
            when Ada_Explicit_Deref =>
              L ("!.all"),
-           when Ada_Aggregate =>
-             L ("#(?~~ with #~", "?~,# ~~)"),
+           when Ada_Aggregate => null,
            when Ada_Null_Record_Aggregate =>
              L ("#(?~~ with #~" & "null record/)"),
            when Ada_Allocator =>
@@ -714,12 +722,13 @@ package body Pp.Actions is
              L ("case ! is[# ?#~,# ~~]"),
            when Ada_Case_Expr_Alternative =>
              L ("when[ ?~ |# ~~] ^=>[# !]"),
+               --  ???Ada_Case_Stmt_Alternative has a "^" just before the "|"
            when Ada_Box_Expr =>
              L ("<>"),
            when Ada_If_Expr =>
              L ("if[#1 !]#1 then[#1 !]", "? #~ #~~", "?# else[ ~~]~"),
            when Ada_Membership_Expr =>
-             L ("! ![# ?[#~ |# ~]~]"),
+             L ("! ![# ?[#~ ^|# ~]~]"),
            when Ada_Dotted_Name =>
              L ("![#.!]"),
            when Ada_Char_Literal => null,
@@ -1670,17 +1679,37 @@ package body Pp.Actions is
       procedure Free is new Unchecked_Deallocation
         (Ada_Template, Ada_Template_Ptr);
 
+      function Replace_One
+        (Kind : Ada_Tree_Kind; From, To : W_Str) return Ada_Template;
       procedure Replace_One (Kind : Ada_Tree_Kind; From, To : W_Str);
-      --  Replace From with To in the template for Kind
+      --  Replace From with To in the template for Kind. The function returns
+      --  the new template; the procedure replaces it in the table.
+      procedure Replace_Tmp (Kind : Ada_Tree_Kind; From, To : W_Str);
+      --  Same as Replace_One, but requires that the entire template be
+      --  replaced.
+
+      function Replace_One
+        (Kind : Ada_Tree_Kind; From, To : W_Str) return Ada_Template
+      is
+         pragma Assert (From /= To);
+         Temp : Ada_Template renames Template_Table (Kind).all;
+      begin
+         return Ada_Template (Must_Replace (W_Str (Temp), From, To));
+      end Replace_One;
 
       procedure Replace_One (Kind : Ada_Tree_Kind; From, To : W_Str) is
          Temp : Ada_Template_Ptr := Template_Table (Kind);
       begin
          Template_Table (Kind) :=
-           new Ada_Template'(Ada_Template
-             (Must_Replace (W_Str (Temp.all), From, To)));
+           new Ada_Template'(Replace_One (Kind, From, To));
          Free (Temp);
       end Replace_One;
+
+      procedure Replace_Tmp (Kind : Ada_Tree_Kind; From, To : W_Str) is
+      begin
+         pragma Assert (From = W_Str (Template_Table (Kind).all));
+         Replace_One (Kind, From, To);
+      end Replace_Tmp;
 
       procedure Init_Template_Table is
       begin
@@ -1732,6 +1761,51 @@ package body Pp.Actions is
             Replace_One (Ada_While_Loop_Stmt, "?~~# ~loop$", "?~~ ~loop$");
          end if;
 
+         --  Replacements for Vertical_Enum_Types
+
+         if Arg (Cmd, Vertical_Enum_Types) then
+            Replace_Tmp (Ada_Enum_Type_Def, "(?~,#1 ~~)", "(?~,$~~)");
+         end if;
+
+         --  Replacements for Vertical_Array_Types
+
+         if Arg (Cmd, Vertical_Array_Types) then
+            Replace_Tmp (Ada_Array_Type_Def, "array[# !] of !", "array!$of !");
+            Replace_Tmp
+              (Ada_Constrained_Array_Indices,
+               "(?~,# ~~)", "?{{ (~,# ~)}}~");
+            --  Note the double indentation. It just happens that 3 more
+            --  characters place us just after "array ". Perhaps we should
+            --  use the Paren_Stack mechanism in PP.Formatting.
+         end if;
+
+         --  Replacements for Vertical_Named_Aggregates
+
+         if Arg (Cmd, Vertical_Named_Aggregates) then
+            Replace_Tmp (Ada_Enum_Rep_Clause, "for ! use [!]", "for ! use$[!]");
+         end if;
+
+         --  Replacements for Vertical_Case_Alternatives
+
+         declare
+            subtype When_Kinds is Ada_Node_Kind_Type with
+              Predicate => When_Kinds in Ada_Case_Stmt_Alternative |
+--  ???                                  Ada_Case_Expr_Alternative |
+                                         Ada_Variant;
+            --  Things that start with "when" that we want to treat
+            --  alike here.
+         begin
+            if Arg (Cmd, Vertical_Case_Alternatives) then
+               for X in When_Kinds loop
+                  Replace_One (X, "when[ ?~ ^|# ~~]", "when{ ?~$| ~~}");
+                  --  Perhaps this should be unconditional, not just for
+                  --  Vertical_Case_Alternatives.
+               end loop;
+               Replace_One (Ada_Case_Expr_Alternative,
+                            "when[ ?~ |# ~~]", "when{ ?~$| ~~}");
+            end if;
+         end;
+
          --  Now do some validity checking on the templates
 
          for Kind in Ada_Tree_Kind loop
@@ -1765,7 +1839,13 @@ package body Pp.Actions is
                            when '{' =>
                               if Kind in Ada_Component_List |
                                 Ada_Public_Part |
-                                Ada_Generic_Formal_Part
+                                Ada_Generic_Formal_Part |
+                                Ada_Array_Type_Def |
+                                Ada_Constrained_Array_Indices |
+
+                                Ada_Case_Stmt_Alternative |
+                                Ada_Case_Expr_Alternative |
+                                Ada_Variant
                               then
                                  null;
                               else
@@ -2054,8 +2134,8 @@ package body Pp.Actions is
                   end case;
                   if Assert_Enabled then
                      Tok := Scanner.Get_Token (W_Str (T), Utils.Ada_Version);
-                     pragma Assert (Text = Tok.Normalized);
-                     pragma Assert (Tok.Sloc.First = 1);
+                     pragma Assert (Text = Scanner.Normalized (Tok));
+                     pragma Assert (Scanner.Sloc (Tok).First = 1);
                   end if;
                   <<Skip_Assertion>>
                end if;
@@ -2209,7 +2289,8 @@ package body Pp.Actions is
                     Ada_Select_When_Part |
                     Ada_Component_Clause |
                     Ada_Exception_Handler |
-                    Ada_Exception_Decl =>
+                    Ada_Exception_Decl |
+                    Ada_Membership_Expr =>
                      null;
 
                   when Ada_Pragma_Argument_Assoc |
@@ -2717,16 +2798,15 @@ package body Pp.Actions is
                  Ada_Accept_Stmt |
                  Ada_Accept_Stmt_With_Stmts |
                  Ada_Select_Stmt |
-                 Ada_If_Stmt | --???look up to If_Stmt, then up to list.
-                 --                  Ada_Else_Path |
-                 --                  Ada_Case_Path |
-                 Ada_Record_Rep_Clause
+                 Ada_If_Stmt |
+                 Ada_Record_Rep_Clause |
+                 Ada_Case_Stmt |
+                 Ada_Variant_Part
                  --           Ada_Exception_Handler |???
                  =>
                   declare
                      Parent : constant Ada_Tree := Parent_Tree;
                   begin
-                     null;
                      if Parent.Kind in Ada_Ada_List then
                         if Subtree (Parent, 1) /= Tree then
                            Insert_Blank_Line_Before := True;
@@ -2759,9 +2839,21 @@ package body Pp.Actions is
             end if;
          end Maybe_Blank_Line;
 
+         function Is_Vertical_Aggregate (X : Ada_Tree'Class) return Boolean;
+         --  True if X is an aggregate that should be formatted vertically. In
+         --  particular, this is true if the --vertical-named-aggregates switch
+         --  was given, and X is an aggregate, and all component associations
+         --  are in named notation, and the aggregate appears in an appropriate
+         --  context. An appropriate context is as the initial value of an
+         --  object declaration, as the aggregate in an enumeration
+         --  representation clause, or as the expression of a component
+         --  association of an outer aggregate that is itself in such a
+         --  context.
+
          --  Procedures for formatting the various kinds of node that are not
          --  fully covered by Template_Table:
 
+         procedure Do_Aggregate;
          procedure Do_Assoc;
          procedure Do_Named_Stmt;
          procedure Do_Compilation_Unit;
@@ -2800,6 +2892,43 @@ package body Pp.Actions is
 
          procedure Do_Others; -- anything not listed above
 
+         function Is_Vertical_Aggregate (X : Ada_Tree'Class) return Boolean is
+            function All_Named return Boolean is
+              (Present (Subtree (Subtree (F_Assocs (X.As_Aggregate), 1), 1)));
+            --  True if all component associations are named. We only need to
+            --  check the first one, because of the restriction in Ada that
+            --  positional associations can't follow named ones.
+         begin
+            return Result : Boolean := False do
+               if Arg (Cmd, Vertical_Named_Aggregates)
+                 and then Present (X)
+                 and then X.Kind = Ada_Aggregate
+                 and then All_Named
+               then
+                  if X.Parent.Kind in Ada_Object_Decl | Ada_Enum_Rep_Clause then
+                     Result := True;
+                  elsif X.Parent.Kind = Ada_Aggregate_Assoc then
+                     declare
+                        Agg : constant Ada_Tree := X.Parent.Parent.Parent;
+                        pragma Assert (Agg.Kind = Ada_Aggregate);
+                     begin
+                        Result := Is_Vertical_Aggregate (Agg);
+                        --  Recurse on outer aggregate
+                     end;
+                  end if;
+               end if;
+            end return;
+         end Is_Vertical_Aggregate;
+
+         procedure Do_Aggregate is
+         begin
+            if Is_Vertical_Aggregate (Tree) then
+               Interpret_Template ("(?~~ with #~?~,$~~)");
+            else
+               Interpret_Template ("#(?~~ with #~?~,# ~~)");
+            end if;
+         end Do_Aggregate;
+
          procedure Do_Assoc is
             --  Some have a single name before the "=>", and some have a list
             --  separated by "|".
@@ -2827,14 +2956,27 @@ package body Pp.Actions is
                        then Subtree_Count
                         (Tree.As_Aggregate_Assoc.F_Designators) = 1
                      else True);
+                  Vertical : constant Boolean :=
+                    Tree.Kind = Ada_Aggregate_Assoc
+                    and then
+                      Is_Vertical_Aggregate
+                        (Tree.As_Aggregate_Assoc.F_R_Expr);
                begin
-                  --  This is needed because the "[]" is not properly nested with
-                  --  the "?~~~".
+                  --  The Single_Name test is needed because the "[]" is not
+                  --  properly nested with the "?~~~".
                   --  "! ^=>[# !]" doesn't work for discrims.
                   if Single_Name then
-                     Interpret_Template ("?~~ ^=>[# ~!]");
+                     if Vertical then
+                        Interpret_Template ("?~~ ^=>[$~!]");
+                     else
+                        Interpret_Template ("?~~ ^=>[# ~!]");
+                     end if;
                   else
-                     Interpret_Template ("?~ ^|#1 ~ ^=>[# ~!]");
+                     if Vertical then
+                        Interpret_Template ("?~ ^|#1 ~ ^=>[$~!]");
+                     else
+                        Interpret_Template ("?~ ^|#1 ~ ^=>[# ~!]");
+                     end if;
                   end if;
                end;
             end if;
@@ -3653,6 +3795,10 @@ package body Pp.Actions is
               Ada_Private_Type_Def
             then
                Interpret_Template ("type !! is[# !]" & Aspects);
+            elsif Def.Kind in Ada_Enum_Type_Def | Ada_Array_Type_Def
+              and then Arg (Cmd, Vertical_Named_Aggregates)
+            then
+               Interpret_Template ("type !! is$[!" & Aspects & "]");
             else
                Interpret_Template ("type !! is[# !" & Aspects & "]");
                --  ???To mimic gnatpp.  Better to use the same template as
@@ -3695,6 +3841,15 @@ package body Pp.Actions is
          Maybe_Blank_Line;
 
          case Tree.Kind is
+            when Ada_Discrete_Subtype_Expr |
+              Ada_Unconstrained_Array_Index |
+              Ada_Contract_Case_Assoc |
+              Ada_Contract_Cases |
+              Ada_Multi_Dim_Array_Assoc |
+              Ada_Unconstrained_Array_Indices =>
+               raise Program_Error with Short_Image (Tree) & " encountered";
+               --  ???The above are not used
+
             when Ada_Compilation_Unit =>
                Do_Compilation_Unit;
 
@@ -3729,6 +3884,9 @@ package body Pp.Actions is
               Ada_Pragma_Argument_Assoc =>
                Do_Assoc;
 
+            when Ada_Aggregate =>
+               Do_Aggregate;
+
             when Ada_Named_Stmt =>
                Do_Named_Stmt;
 
@@ -3756,18 +3914,20 @@ package body Pp.Actions is
                elsif Present (Tree.As_Object_Decl.F_Renaming_Clause) then
                   Interpret_Template
                     ("?~,# ~~ :[#? ~~~? ~~~? ~~~ !? :=[# ~~]~!]" & Aspects);
-                  --  ???This kludgery is to match gnatpp, which doesn't tab
+                  --  ???This kludgery is to mimic gnatpp, which doesn't tab
                   --  for renamings. Probably should be removed.
+               elsif Is_Vertical_Aggregate
+                 (F_Default_Expr (Tree.As_Object_Decl))
+               then
+                  Interpret_Template
+                    (Replace_One
+                       (Tree.Kind, From => ":=[# ~~]~!", To => ":=[$~~]~!"));
                else
-                  Do_Others;
+                  Interpret_Template;
                end if;
 
             when Ada_Type_Decl =>
                Do_Type_Decl;
-
-            when Ada_Unconstrained_Array_Indices => raise Program_Error;
-               --  ???No longer used.  Seems to have been replaced
-               --  by Ada_Constrained_Array_Indices.
 
             when Ada_Constrained_Array_Indices =>
                declare
@@ -3785,14 +3945,14 @@ package body Pp.Actions is
                             Ada_Box_Expr
                         then
                            Interpret_Template ("(?~,# ~~)");
-                           goto Done_Ada_Unconstrained_Array_Indices;
+                           goto Done_Constrained_Array_Indices;
                         end if;
                      end;
                   end if;
                end;
                Interpret_Template;
 
-               <<Done_Ada_Unconstrained_Array_Indices>>
+               <<Done_Constrained_Array_Indices>>
 
             when Ada_Select_When_Part =>
                Do_Select_When_Part;

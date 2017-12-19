@@ -39,7 +39,8 @@ begin
 
    declare
       A1 : array
-        (Boolean, Integer range Ident_Int (1) .. Ident_Int (10)) of String
+        (Boolean,
+         Integer range Ident_Int (1) .. Ident_Int (10)) of String
         (Ident_Int (5) .. Ident_Int (7));
       type Ni is range -3 .. 3;
       N : Ni := Ni (Ident_Int (2));
@@ -52,10 +53,8 @@ begin
       subtype Ae_Type is Integer range A1 (True, 5)'Range;    -- RANGE 5..7
       A2 : Aa;
       A4 : array
-        (A1_1_1 ..
-             A1_1_2,
-           A1_2_1 ..
-             A1_2_2) of String (Ident_Int (1) .. Ident_Int (3));
+        (A1_1_1 .. A1_1_2,
+         A1_2_1 .. A1_2_2) of String (Ident_Int (1) .. Ident_Int (3));
 
       I : Integer;
       B : Boolean;

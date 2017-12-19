@@ -5,6 +5,8 @@ pragma Warnings (Off, "internal GNAT unit");
 with System.String_Hash;
 pragma Warnings (On, "internal GNAT unit");
 
+with Utils.Formatted_Output;
+
 package body Utils.Generic_Symbols is
 
    --  We don't worry about reclaiming storage here.  Once a Symbol is
@@ -16,8 +18,6 @@ package body Utils.Generic_Symbols is
    --  Trying to garbage collect this data structure would be a real pain.
    --  And this data structure is so simple and efficient, that we'll
    --  tolerate minor storage leaks.
-
-   Debug : constant Boolean := False;
 
    function Is_Proper_Symbol (S : Symbol) return Boolean is
    begin
@@ -294,26 +294,37 @@ package body Utils.Generic_Symbols is
 
    function Case_Sensitive_Equal (S1, S2 : Symbol) return Boolean is
       pragma Assert (Is_Proper_Symbol (S1) and Is_Proper_Symbol (S2));
-      Result : constant Boolean := S1 = S2;
    begin
-      if Debug then
-         pragma Assert (Result = (Str (S1).S = Str (S2).S));
-         null;
-      end if;
-      return Result;
+      return Result : constant Boolean := S1 = S2 do
+         declare
+            procedure Assertion;
+            procedure Assertion is
+            begin
+               pragma Assert (Result = (Str (S1).S = Str (S2).S));
+            end Assertion;
+         begin
+            pragma Debug (Assertion);
+         end;
+      end return;
    end Case_Sensitive_Equal;
 
    function Case_Insensitive_Equal (S1, S2 : Symbol) return Boolean is
       pragma Assert (Is_Proper_Symbol (S1) and Is_Proper_Symbol (S2));
-      Result : constant Boolean :=
-        S1.Same_Ignoring_Case = S2.Same_Ignoring_Case;
    begin
-      if Debug then
-         pragma Assert
-           (Result = (To_Lower (Str (S1).S) = To_Lower (Str (S2).S)));
-         null;
-      end if;
-      return Result;
+      return Result : constant Boolean :=
+        S1.Same_Ignoring_Case = S2.Same_Ignoring_Case
+      do
+         declare
+            procedure Assertion;
+            procedure Assertion is
+            begin
+               pragma Assert
+                 (Result = (To_Lower (Str (S1).S) = To_Lower (Str (S2).S)));
+            end Assertion;
+         begin
+            pragma Debug (Assertion);
+         end;
+      end return;
    end Case_Insensitive_Equal;
 
    function Symbols_Equal
@@ -358,15 +369,16 @@ package body Utils.Generic_Symbols is
       return Intern (S1 & Str (S2).S);
    end "&";
 
---    procedure Print_Stats_Method is
---        Stats: constant Statistics_Rec := Protector.Get_Statistics;
---    begin
---        Put_Line("Symbols statistics:");
---        Put_Line("  Symbols_Count = " & Image(Stats.Count));
---        Put_Line("  Symbols_Char_Count = " & Image(Stats.Char_Count));
---        Put_Line("  Symbols_Byte_Count = " & Image(Stats.Byte_Count));
---        Put_Line("  Symbols_Word_Count = " & Image(Stats.Word_Count));
---    end Print_Stats_Method;
+   procedure Print_Statistics is
+      Stats : constant Statistics_Rec := Protector.Get_Statistics;
+      use Formatted_Output;
+   begin
+      Put ("Symbols statistics:\n");
+      Put ("  Symbols_Count = \1\n", Image (Stats.Count));
+      Put ("  Symbols_Char_Count = \1\n", Image (Stats.Char_Count));
+      Put ("  Symbols_Byte_Count = \1\n", Image (Stats.Byte_Count));
+      Put ("  Symbols_Word_Count = \1\n", Image (Stats.Word_Count));
+   end Print_Statistics;
 
    function Last_Symbol return Symbol_Index'Base is
    begin
@@ -375,7 +387,7 @@ package body Utils.Generic_Symbols is
 
    function Get_Symbol_Index (S : Symbol) return Symbol_Index is
    begin
-      return Symbol_Index (S.Same_Ignoring_Case + 1);
+      return Symbol_Index (S.Same_Ignoring_Case) + 1;
    end Get_Symbol_Index;
 
 end Utils.Generic_Symbols;

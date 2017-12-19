@@ -212,11 +212,8 @@ begin
 
       type Ta21 is
         array
-          (Integer range
-             Ident_Int (1) ..
-               Ident_Int (5), Integer range
-             Ident_Int (0) ..
-               Ident_Int (7)) of Integer;
+          (Integer range Ident_Int (1) .. Ident_Int (5),
+           Integer range Ident_Int (0) .. Ident_Int (7)) of Integer;
 
       subtype Ta22 is Ta21;
 

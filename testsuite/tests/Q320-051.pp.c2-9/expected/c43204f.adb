@@ -40,18 +40,14 @@ procedure C43204f is
      array (Integer range -1 .. 1, Integer range -1 .. 1) of Integer;
    type Arr22 is
      array
-       (Ident_Int (-1) ..
-            Ident_Int (1),
-          Ident_Int (-1) ..
-            Ident_Int (1)) of Integer;
+       (Ident_Int (-1) .. Ident_Int (1),
+        Ident_Int (-1) .. Ident_Int (1)) of Integer;
    type Arr23 is
      array (Integer range -1 .. 1, Ident_Int (-1) .. Ident_Int (1)) of Integer;
    type Arr24 is
      array
-       (Ident_Int (1) ..
-            Ident_Int (-1),
-          Ident_Int (-1) ..
-            Ident_Int (1)) of Integer;
+       (Ident_Int (1) .. Ident_Int (-1),
+        Ident_Int (-1) .. Ident_Int (1)) of Integer;
 
    procedure Proc
      (Pa11 : Arr11 := (1, 1, 1, 1, 1, 1, others => Ident_Int (2));

@@ -40,18 +40,14 @@ procedure C43204c is
 
    type Arr20 is
      array
-       (Ident_Int (1) ..
-            Ident_Int (0),
-          Ident_Int (0) ..
-            Ident_Int (-1)) of Integer;
+       (Ident_Int (1) .. Ident_Int (0),
+        Ident_Int (0) .. Ident_Int (-1)) of Integer;
    type Arr21 is
      array (Integer range -1 .. 1, Integer range -1 .. 1) of Integer;
    type Arr22 is
      array
-       (Ident_Int (-1) ..
-            Ident_Int (1),
-          Ident_Int (-1) ..
-            Ident_Int (1)) of Integer;
+       (Ident_Int (-1) .. Ident_Int (1),
+        Ident_Int (-1) .. Ident_Int (1)) of Integer;
    type Arr23 is
      array (Integer'(-1) .. 1, Ident_Int (-1) .. Ident_Int (1)) of Integer;
 
