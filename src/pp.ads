@@ -34,6 +34,4 @@ pragma Warnings (On);
 
 package Pp is
    --  Root of pretty-printing utilities
-
-   pragma Elaborate_Body;
 end Pp;

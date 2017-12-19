@@ -23,8 +23,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
---  This package is a top of the GNAT Metrics Toolset hierarchy
-
 package METRICS is
-
+   --  Root of GNAT Metrics Toolset
 end METRICS;

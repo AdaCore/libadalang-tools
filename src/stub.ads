@@ -34,14 +34,4 @@ pragma Warnings (On);
 
 package Stub is
    --  Root of gnatstub utilities
-
-   pragma Elaborate_Body;
-
-   Debug_Mode : Boolean renames Utils_Debug.Debug_Flag_9;
-
-   Assert_Enabled : Boolean := False;
-   --  Set to True in body if assertions are enabled. This should really be a
-   --  constant, but there's no easy mechanism for that.
-
-   --  ????????????????Above variables are not used.
 end Stub;
