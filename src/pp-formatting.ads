@@ -35,7 +35,7 @@ with Utils.Symbols;
 with Utils.Predefined_Symbols; use Utils.Predefined_Symbols;
 with Utils.Command_Lines;
 with Pp.Buffers; use Pp.Buffers; use Pp.Buffers.Marker_Vectors;
-with Pp.Scanner; use Pp.Scanner.Token_Vectors;
+with Pp.Scanner.Seqs; use Pp.Scanner.Seqs.Token_Vectors;
 
 package Pp.Formatting is
 
@@ -225,7 +225,7 @@ package Pp.Formatting is
 
       Src_Tokens, -- from original source file (Src_Buf)
       Out_Tokens : -- from Out_Buf
-        Scanner.Token_Vector;
+        Scanner.Seqs.Token_Vector;
 
       Out_Buf_Line_Ends : aliased Marker_Vector;
 

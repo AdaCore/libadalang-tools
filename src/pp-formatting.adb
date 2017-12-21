@@ -398,7 +398,7 @@ package body Pp.Formatting is
       Pp_Off_On_Delimiters : Scanner.Pp_Off_On_Delimiters_Rec
         renames Lines_Data.Pp_Off_On_Delimiters;
 
-      use Scanner;
+      use Scanner, Scanner.Seqs;
       Src_Toks : Token_Vector;
       Cur_Token_Index : Token_Index := 2; -- skip sentinel
       function Cur_Tok return Token is (Src_Toks (Cur_Token_Index));
@@ -499,8 +499,8 @@ package body Pp.Formatting is
       Syntax_Line_Breaks : Line_Break_Vector
           renames Lines_Data.Syntax_Line_Breaks;
       Tabs : Tab_Vector renames Lines_Data.Tabs;
-      Src_Tokens : Scanner.Token_Vector renames Lines_Data.Src_Tokens;
-      Out_Tokens : Scanner.Token_Vector renames Lines_Data.Out_Tokens;
+      Src_Tokens : Scanner.Seqs.Token_Vector renames Lines_Data.Src_Tokens;
+      Out_Tokens : Scanner.Seqs.Token_Vector renames Lines_Data.Out_Tokens;
       Out_Buf_Line_Ends : Marker_Vector renames Lines_Data.Out_Buf_Line_Ends;
       Pp_Off_On_Delimiters : Scanner.Pp_Off_On_Delimiters_Rec
           renames Lines_Data.Pp_Off_On_Delimiters;
@@ -903,7 +903,7 @@ package body Pp.Formatting is
       --  Copy_Pp_Off_Regions pass as an optimization.
 
       procedure Insert_Comments_And_Blank_Lines is
-         use Scanner;
+         use Scanner, Scanner.Seqs;
          --  use all type Token_Vector;
 
          function Match (Src_Tok, Out_Tok : Token) return Boolean;
@@ -1905,15 +1905,15 @@ package body Pp.Formatting is
          pragma Assert (At_Beginning (Src_Buf));
       end Insert_Comments_And_Blank_Lines;
 
-      procedure Insert_Alignment (Tokens : Scanner.Token_Vector);
+      procedure Insert_Alignment (Tokens : Scanner.Seqs.Token_Vector);
       --  Expand tabs as necessary to align things
 
-      procedure Insert_Alignment (Tokens : Scanner.Token_Vector) is
+      procedure Insert_Alignment (Tokens : Scanner.Seqs.Token_Vector) is
 
          procedure Calculate_Num_Blanks;
 
          procedure Calculate_Num_Blanks is
-            use Scanner;
+            use Scanner, Scanner.Seqs;
             --  use all type Token_Vector;
 
             --  Note on Col and Num_Blanks components of Tab_Rec: Col is
@@ -2347,7 +2347,7 @@ package body Pp.Formatting is
          end if;
 
          Clear (Out_Buf_Line_Ends);
-         Scanner.Get_Tokens
+         Scanner.Seqs.Get_Tokens
            (Out_Buf,
             Out_Tokens, Utils.Ada_Version, Pp_Off_On_Delimiters,
             Ignore_Single_Line_Breaks => False,
@@ -2423,7 +2423,7 @@ package body Pp.Formatting is
                null;
 
             when Upper_Case =>
-               Scanner.Get_Tokens
+               Scanner.Seqs.Get_Tokens
                  (Out_Buf, Out_Tokens, Utils.Ada_Version, Pp_Off_On_Delimiters,
                   Ignore_Single_Line_Breaks => True);
                for Out_Index in 2 .. Last_Index (Out_Tokens) loop
@@ -2460,7 +2460,7 @@ package body Pp.Formatting is
             return;
          end if;
 
-         Scanner.Get_Tokens
+         Scanner.Seqs.Get_Tokens
            (Out_Buf, Out_Tokens, Utils.Ada_Version, Pp_Off_On_Delimiters,
             Ignore_Single_Line_Breaks => True);
          for Out_Index in 2 + 3 - 1 .. Last_Index (Out_Tokens) loop
@@ -2502,7 +2502,7 @@ package body Pp.Formatting is
          --  Pretty printing is ON between the beginning and the first OFF, then
          --  OFF until the next ON, and so on.
 
-         use Scanner;
+         use Scanner, Scanner.Seqs;
 
          New_Buf : Buffer;
          --  Buffers don't support deletion, so we need to build up a whole new
@@ -2664,12 +2664,12 @@ package body Pp.Formatting is
       Src_Tok, Out_Tok     : Scanner.Token)
    is
       Out_Buf : Buffer renames Lines_Data.Out_Buf;
-      Src_Tokens : Scanner.Token_Vector renames Lines_Data.Src_Tokens;
-      Out_Tokens : Scanner.Token_Vector renames Lines_Data.Out_Tokens;
+      Src_Tokens : Scanner.Seqs.Token_Vector renames Lines_Data.Src_Tokens;
+      Out_Tokens : Scanner.Seqs.Token_Vector renames Lines_Data.Out_Tokens;
    begin
       if Enable_Token_Mismatch then
          declare
-            use Scanner;
+            use Scanner, Scanner.Seqs;
             Num_Toks : constant Token_Index := 8;
             --  Number of tokens before and after the mismatch to print
             First_Src_Index : constant Token_Index :=
@@ -2733,12 +2733,12 @@ package body Pp.Formatting is
       Cmd : Utils.Command_Lines.Command_Line)
    is
       Out_Buf : Buffer renames Lines_Data.Out_Buf;
-      Src_Tokens : Scanner.Token_Vector renames Lines_Data.Src_Tokens;
-      Out_Tokens : Scanner.Token_Vector renames Lines_Data.Out_Tokens;
+      Src_Tokens : Scanner.Seqs.Token_Vector renames Lines_Data.Src_Tokens;
+      Out_Tokens : Scanner.Seqs.Token_Vector renames Lines_Data.Out_Tokens;
       Pp_Off_On_Delimiters : Scanner.Pp_Off_On_Delimiters_Rec
           renames Lines_Data.Pp_Off_On_Delimiters;
 
-      use Scanner;
+      use Scanner, Scanner.Seqs;
       --  use all type Token_Vector;
 
       function Match (Src_Tok, Out_Tok : Token) return Boolean;

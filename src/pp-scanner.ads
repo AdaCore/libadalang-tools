@@ -139,17 +139,9 @@ package Pp.Scanner is
      (File_Name : String; Sloc : Source_Location) return String is
        (File_Name & ":" & Image (Sloc.Line) & ":" & Image (Sloc.Col));
 
-   type Token is record
-      Kind : Token_Kind := Nil;
-      Text : Syms.Symbol;
-      Normalized : Syms.Symbol;
-      Leading_Blanks : Natural;
-      Width : Natural;
-      Sloc : Source_Location;
-   end record;
+   type Token is private;
 
-   --  We would like to make type Token private, but then we can't instantiate
-   --  Token_Vectors. But we use accessor functions, as if it were private:
+   --  Accessor functions
 
    function Kind (X : Token) return Token_Kind;
 
@@ -194,14 +186,6 @@ package Pp.Scanner is
 
    type Token_Index is new Positive;
    type Token_Array is array (Token_Index range <>) of Token;
-   package Token_Vectors is new Utils.Vectors
-     (Token_Index,
-      Token,
-      Token_Array);
-   subtype Token_Vector is Token_Vectors.Vector;
-   type Token_Vector_Ptr is access all Token_Vector;
-   use Token_Vectors;
-   --  use all type Token_Vector;
 
    function Line_Length
      (Input    : in out Buffer;
@@ -235,82 +219,16 @@ package Pp.Scanner is
    --  line breaks, because otherwise things like "isbegin" can be run
    --  together.
 
-   procedure Get_Tokens
-     (Input                     : in out Buffer;
-      Result                    : out Token_Vector;
-      Ada_Version               : Ada_Version_Type;
-      Pp_Off_On_Delimiters      : Pp_Off_On_Delimiters_Rec;
-      Ignore_Single_Line_Breaks : Boolean;
-      Max_Tokens                : Token_Index       := Token_Index'Last;
-      Line_Ends                 : Marker_Vector_Ptr := null;
-      Gen_Regions               : Token_Vector_Ptr  := null);
-   --  Return in Result the sequence of tokens in the Input string. The
-   --  first one is always Start_Of_Input, and the last one End_Of_Input.
-   --  Ignore_Single_Line_Breaks means we should skip any End_Of_Line tokens
-   --  (but not Blank_Lines). Max_Tokens places a limit on the number of tokens
-   --  (not counting Start_Of_Input); we quit before reaching end of input if
-   --  we've gotten that many.
-   --
-   --  If Line_Ends is non-null, we compute all the line endings in
-   --  Line_Ends.all, which is a mapping from line numbers to Markers in the
-   --  Input string. Each element points to a NL character in the corresponding
-   --  buffer.
-   --
-   --  Comments starting with Gen_Plus and Gen_Minus, and tokens in between, do
-   --  not appear in Result. If Gen_Regions is non-null, we use it to return
-   --  the sequence of Gen_Plus and Gen_Minus tokens.  The generated code is in
-   --  the slices Gen_Regions(1).Sloc..Gen_Regions(2).Sloc,
-   --  Gen_Regions(3).Sloc..Gen_Regions(4).Sloc, and so on.
-
-   function Next_Lexeme
-     (Tokens : Token_Vector;
-      Index  : Token_Index)
-      return   Token;
-   --  Returns the next token after Index that is not a blank line or comment
-
-   function Prev_Lexeme
-     (Tokens : Token_Vector;
-      Index  : Token_Index)
-      return   Token;
-   --  Returns the previous token before Index that is not a blank line or
-   --  comment
-
-   function Get_Token
-     (Input : W_Str; Ada_Version : Ada_Version_Type)
-     return Token;
-   --  Get just one token, ignoring single line breaks
-
-   procedure Check_Same_Tokens (X, Y : Token_Vector);
-   --  Checks that X and Y are the same except for Slocs and line breaks; raise
-   --  an exception if not.
-
-   function In_Gen_Regions
-     (Line : Positive; Gen_Regions : Token_Vector) return Boolean;
-   --  True if the line number is within one of the regions of Gen_Regions.
-   --  The comments are always on a line by themselves, so we don't have to
-   --  worry about column numbers.
-
-   procedure Put_Token (Tok : Token; Index : Token_Index := 1);
-   procedure Put_Tokens
-     (Tokens    : Token_Array;
-      Highlight : Token_Index'Base := 0);
-   procedure Put_Tokens
-     (Tokens    : Token_Vector;
-      First     : Token_Index'Base := 1;
-      Last      : Token_Index'Base := Token_Index'Last;
-      Highlight : Token_Index'Base := 0);
-   --  Put token(s) to standard output (even if Text_IO.Current_Output has been
-   --  redirected). The tokens come out in compilable form, one per line, with
-   --  the text of the token first, and the other information commented out.
-   --  This one-token-per line code can be used for testing the scanner -- it
-   --  should have identical semantics to the original Ada code. First and Last
-   --  indicate a slice of Tokens, and we tolerate out-of-bounds indices.
-   --  We draw a comment line before Highlight.
-
-   procedure Dump_Token (Tok : Token);
-   procedure Dump_Tokens (Tokens : Token_Array);
-
 private
+
+   type Token is record
+      Kind : Token_Kind := Nil;
+      Text : Syms.Symbol;
+      Normalized : Syms.Symbol;
+      Leading_Blanks : Natural;
+      Width : Natural;
+      Sloc : Source_Location;
+   end record;
 
    function Kind (X : Token) return Token_Kind is (X.Kind);
    function Text (X : Token) return Syms.Symbol is (X.Text);

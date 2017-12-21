@@ -10,6 +10,7 @@ with Pp.Command_Lines; use Pp.Command_Lines;
 with Pp.Formatting; use Pp.Formatting;
 with Pp.Formatting.Dictionaries;
 with Pp.Formatting.Tree_Formatting;
+with Pp.Scanner.Seqs;
 
 with Ada.Directories; use Ada.Directories;
 with Interfaces; use type Interfaces.Unsigned_16;
@@ -293,7 +294,7 @@ package body Pp.Actions is
        renames Lines_Data.Next_Line_Break_Unique_Id;
    All_Line_Breaks : Line_Break_Vector renames Lines_Data.All_Line_Breaks;
    Tabs : Tab_Vector renames Lines_Data.Tabs;
-   Src_Tokens : Scanner.Token_Vector renames Lines_Data.Src_Tokens;
+   Src_Tokens : Scanner.Seqs.Token_Vector renames Lines_Data.Src_Tokens;
    Pp_Off_On_Delimiters : Scanner.Pp_Off_On_Delimiters_Rec
        renames Lines_Data.Pp_Off_On_Delimiters;
    Pp_Off_On_Delimiters_Initialized : Boolean := False;
@@ -2131,7 +2132,7 @@ package body Pp.Actions is
                         pragma Assert (False);
                   end case;
                   if Assert_Enabled then
-                     Tok := Scanner.Get_Token (W_Str (T), Utils.Ada_Version);
+                     Tok := Scanner.Seqs.Get_Token (W_Str (T), Utils.Ada_Version);
                      pragma Assert (Text = Scanner.Normalized (Tok));
                      pragma Assert (Scanner.Sloc (Tok).First = 1);
                   end if;
@@ -4192,7 +4193,7 @@ package body Pp.Actions is
 
       procedure Tree_To_Ada;
       procedure Tree_To_Ada is
-         use Scanner;
+         use Scanner.Seqs;
       begin
          if Debug_Mode then
             Utils.Dbg_Out.Output_Enabled := True;
@@ -4256,9 +4257,9 @@ package body Pp.Actions is
 --         Output_Written : out Boolean;
          (To_Ada : Boolean)
       is
---         Src_Tokens : Scanner.Token_Vector;
---         Src_Gen_Regions : aliased Scanner.Token_Vector;
---         Gen_Regions : Scanner.Token_Vector_Ptr := null;
+--         Src_Tokens : Scanner.Seqs.Token_Vector;
+--         Src_Gen_Regions : aliased Scanner.Seqs.Token_Vector;
+--         Gen_Regions : Scanner.Seqs.Token_Vector_Ptr := null;
 --         --  Set to point to Src_Gen_Regions if necessary.
 --
 --         BOM_Seen : Boolean;
@@ -4319,7 +4320,7 @@ package body Pp.Actions is
 --                 Opt.Wide_Character_Encoding_Method = System.WCh_Con.WCEM_UTF8);
 --
 --            if Skip_Gen then
---               Scanner.Get_Tokens
+--               Scanner.Seqs.Get_Tokens
 --                 (Src_Buf, Src_Tokens, Utils.Ada_Version, Pp_Off_On_Delimiters,
 --                  Gen_Regions => Src_Gen_Regions'Unchecked_Access);
 --               Gen_Regions := Src_Gen_Regions'Unchecked_Access;
