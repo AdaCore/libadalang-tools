@@ -29,6 +29,9 @@ with Pp.Buffers; use Pp.Buffers;
 use Pp.Buffers.Marker_Vectors;
 --  use all type Pp.Buffers.Marker_Vector;
 
+with Utils.Predefined_Symbols;
+pragma Unreferenced (Utils.Predefined_Symbols);
+
 package Pp.Scanner is
 
    --  This package provides a simple lexical scanner for Ada tokens. There are
@@ -54,10 +57,9 @@ package Pp.Scanner is
       Start_Of_Input,
       End_Of_Input,
       Identifier,
-      Reserved_Word,
+      Character_Literal,
       String_Literal,
       Numeric_Literal,
-      Lexeme, -- misc lexemes as defined in the RM
       Pp_Off_Comment,
       --  A whole-line comment that matches the --pp-off string
       Pp_On_Comment,
@@ -71,13 +73,126 @@ package Pp.Scanner is
       Other_Whole_Line_Comment,
    --  A comment that appears by itself on a line. Multiple comments that may
    --  be filled as a "paragraph" are combined into a single Whole_Line_Comment
-   --  token. This comment is a Whole_Line_Comment.
+   --  token.
       End_Of_Line_Comment,
    --  A comment that appears at the end of a line, after some other
-   --  program text. The above comment starting "misc lexemes" is an
-   --  End_Of_Line_Comment.
+   --  program text.
       End_Of_Line, -- First in a series of one or more NLs.
-      Blank_Line); -- Second, third, ... in a series of one or more NLs.
+      Blank_Line, -- Second, third, ... in a series of one or more NLs.
+
+      '-', ''', '&', '(', ')', '+', ',', ';', '|', '!', '@',
+      '>', '.', '*', '=',
+      Arrow, --  =>
+      Dot_Dot, --  ..
+      Exp_Op, --  **
+      Not_Equal, --  /=
+      Greater_Or_Equal, --  >=
+      Right_Label_Bracket, --  >>
+      Less_Or_Equal, --  <=
+      Left_Label_Bracket, --  <<
+      Box, --  <>
+      Colon_Equal, --  :=
+
+      --  Ada 83 reserved words
+
+      Res_Abort,
+      Res_Abs,
+      Res_Accept,
+      Res_Access,
+      Res_And,
+      Res_All,
+      Res_Array,
+      Res_At,
+      Res_Begin,
+      Res_Body,
+      Res_Case,
+      Res_Constant,
+      Res_Declare,
+      Res_Delay,
+      Res_Delta,
+      Res_Digits,
+      Res_Do,
+      Res_Else,
+      Res_Elsif,
+      Res_End,
+      Res_Entry,
+      Res_Exception,
+      Res_Exit,
+      Res_For,
+      Res_Function,
+      Res_Generic,
+      Res_Goto,
+      Res_If,
+      Res_In,
+      Res_Is,
+      Res_Limited,
+      Res_Loop,
+      Res_Mod,
+      Res_New,
+      Res_Not,
+      Res_Null,
+      Res_Of,
+      Res_Or,
+      Res_Others,
+      Res_Out,
+      Res_Package,
+      Res_Pragma,
+      Res_Private,
+      Res_Procedure,
+      Res_Raise,
+      Res_Range,
+      Res_Record,
+      Res_Rem,
+      Res_Renames,
+      Res_Return,
+      Res_Reverse,
+      Res_Select,
+      Res_Separate,
+      Res_Subtype,
+      Res_Task,
+      Res_Terminate,
+      Res_Then,
+      Res_Type,
+      Res_Use,
+      Res_When,
+      Res_While,
+      Res_With,
+      Res_Xor,
+
+      --  Ada 95 reserved words
+
+      Res_Abstract,
+      Res_Aliased,
+      Res_Protected,
+      Res_Until,
+      Res_Requeue,
+      Res_Tagged,
+
+      --  Ada 2005 reserved words
+
+      Res_Interface,
+      Res_Overriding,
+      Res_Synchronized,
+
+      --  Ada 2012 reserved words
+
+      Res_Some
+     );
+
+   subtype Other_Lexeme is Token_Kind range '-' .. Colon_Equal;
+
+   subtype Reserved_Word is Token_Kind range Res_Abort .. Res_Some;
+   subtype Reserved_Word_Or_Id is Token_Kind with
+     Predicate => Reserved_Word_Or_Id in Identifier | Reserved_Word;
+   subtype Reserved_Word_83 is Token_Kind range Res_Abort .. Res_Xor;
+   subtype Reserved_Word_95 is Token_Kind range Res_Abort .. Res_Tagged;
+   subtype Reserved_Word_2005 is
+     Token_Kind range Res_Abort .. Res_Synchronized;
+   subtype Reserved_Word_2012 is Token_Kind range Res_Abort .. Res_Some;
+
+   subtype Same_Text is Token_Kind range '-' .. Res_Some;
+   --  These are the tokens that always have the same text associated with them
+   --  (case insenstively), so we don't need to store the text with each token.
 
    subtype Whole_Line_Comment is Token_Kind with
      Predicate => Whole_Line_Comment in
@@ -163,13 +278,6 @@ package Pp.Scanner is
    --  is that GNATCOLL.Paragraph_Filling expects it, so it's simpler and
    --  more efficient this way.
 
-   function Normalized (X : Token) return Syms.Symbol;
-   --  Same as Text, or converted to lower case, depending on the Kind.
-   --  Comments have Normalized = No_Name, so we can detect specific
-   --  reserved words. For example, the "BEGIN" reserved word will have Text
-   --  = "BEGIN" and Normalized = "begin". The comment "-- begin" will have
-   --  Text = "begin" and Normalized = No_Name.
-
    function Leading_Blanks (X : Token) return Natural;
    --  For comments, the number of leading blanks, which are blanks after
    --  the initial "--" and before any nonblank characters. For other
@@ -219,12 +327,127 @@ package Pp.Scanner is
    --  line breaks, because otherwise things like "isbegin" can be run
    --  together.
 
+   use Syms;
+
+   Token_To_Symbol_Map : constant array (Same_Text) of Symbol :=
+     ('-' => Intern ("-"),
+      ''' => Intern ("'"),
+      '&' => Intern ("&"),
+      '(' => Intern ("("),
+      ')' => Intern (")"),
+      '+' => Intern ("+"),
+      ',' => Intern (","),
+      ';' => Intern (";"),
+      '|' => Intern ("|"),
+      '!' => Intern ("!"),
+      '@' => Intern ("@"),
+      '>' => Intern (">"),
+      '.' => Intern ("."),
+      '*' => Intern ("*"),
+      '=' => Intern ("="),
+
+      Arrow => Intern ("=>"),
+      Dot_Dot => Intern (".."),
+      Exp_Op => Intern ("**"),
+      Not_Equal => Intern ("/="),
+      Greater_Or_Equal => Intern (">="),
+      Right_Label_Bracket => Intern (">>"),
+      Less_Or_Equal => Intern ("<="),
+      Left_Label_Bracket => Intern ("<<"),
+      Box => Intern ("<>"),
+      Colon_Equal => Intern (":="),
+
+      --  Ada 83 reserved words
+
+      Res_Abort => Intern ("abort"),
+      Res_Abs => Intern ("abs"),
+      Res_Accept => Intern ("accept"),
+      Res_Access => Intern ("access"),
+      Res_And => Intern ("and"),
+      Res_All => Intern ("all"),
+      Res_Array => Intern ("array"),
+      Res_At => Intern ("at"),
+      Res_Begin => Intern ("begin"),
+      Res_Body => Intern ("body"),
+      Res_Case => Intern ("case"),
+      Res_Constant => Intern ("constant"),
+      Res_Declare => Intern ("declare"),
+      Res_Delay => Intern ("delay"),
+      Res_Delta => Intern ("delta"),
+      Res_Digits => Intern ("digits"),
+      Res_Do => Intern ("do"),
+      Res_Else => Intern ("else"),
+      Res_Elsif => Intern ("elsif"),
+      Res_End => Intern ("end"),
+      Res_Entry => Intern ("entry"),
+      Res_Exception => Intern ("exception"),
+      Res_Exit => Intern ("exit"),
+      Res_For => Intern ("for"),
+      Res_Function => Intern ("function"),
+      Res_Generic => Intern ("generic"),
+      Res_Goto => Intern ("goto"),
+      Res_If => Intern ("if"),
+      Res_In => Intern ("in"),
+      Res_Is => Intern ("is"),
+      Res_Limited => Intern ("limited"),
+      Res_Loop => Intern ("loop"),
+      Res_Mod => Intern ("mod"),
+      Res_New => Intern ("new"),
+      Res_Not => Intern ("not"),
+      Res_Null => Intern ("null"),
+      Res_Of => Intern ("of"),
+      Res_Or => Intern ("or"),
+      Res_Others => Intern ("others"),
+      Res_Out => Intern ("out"),
+      Res_Package => Intern ("package"),
+      Res_Pragma => Intern ("pragma"),
+      Res_Private => Intern ("private"),
+      Res_Procedure => Intern ("procedure"),
+      Res_Raise => Intern ("raise"),
+      Res_Range => Intern ("range"),
+      Res_Record => Intern ("record"),
+      Res_Rem => Intern ("rem"),
+      Res_Renames => Intern ("renames"),
+      Res_Return => Intern ("return"),
+      Res_Reverse => Intern ("reverse"),
+      Res_Select => Intern ("select"),
+      Res_Separate => Intern ("separate"),
+      Res_Subtype => Intern ("subtype"),
+      Res_Task => Intern ("task"),
+      Res_Terminate => Intern ("terminate"),
+      Res_Then => Intern ("then"),
+      Res_Type => Intern ("type"),
+      Res_Use => Intern ("use"),
+      Res_When => Intern ("when"),
+      Res_While => Intern ("while"),
+      Res_With => Intern ("with"),
+      Res_Xor => Intern ("xor"),
+
+      --  Ada 95 reserved words
+
+      Res_Abstract => Intern ("abstract"),
+      Res_Aliased => Intern ("aliased"),
+      Res_Protected => Intern ("protected"),
+      Res_Until => Intern ("until"),
+      Res_Requeue => Intern ("requeue"),
+      Res_Tagged => Intern ("tagged"),
+
+      --  Ada 2005 reserved words
+
+      Res_Interface => Intern ("interface"),
+      Res_Overriding => Intern ("overriding"),
+      Res_Synchronized => Intern ("synchronized"),
+
+      --  Ada 2012 reserved words
+
+      Res_Some => Intern ("some")
+     ); -- Token_To_Symbol_Map
+
 private
 
    type Token is record
       Kind : Token_Kind := Nil;
       Text : Syms.Symbol;
-      Normalized : Syms.Symbol;
       Leading_Blanks : Natural;
       Width : Natural;
       Sloc : Source_Location;
@@ -232,7 +455,6 @@ private
 
    function Kind (X : Token) return Token_Kind is (X.Kind);
    function Text (X : Token) return Syms.Symbol is (X.Text);
-   function Normalized (X : Token) return Syms.Symbol is (X.Normalized);
    function Sloc (X : Token) return Source_Location is (X.Sloc);
 
 end Pp.Scanner;

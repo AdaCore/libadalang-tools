@@ -40,7 +40,7 @@ package Utils.Fast_Vectors is
    pragma Suppress (All_Checks);
 
    pragma Assert (Index_Type'First = 1);
-   pragma Assert (Index_Type'Last = 2**31 - 1);
+   pragma Assert (Index_Type'Last >= 2**24 - 1);
    --  These assumptions allow us to avoid a lot of horsing around. But we
    --  still inherit some such horsing from Ada.Containers.Vectors.
 

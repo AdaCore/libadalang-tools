@@ -38,7 +38,6 @@ private
    package CU_Symbols is new Utils.Generic_Symbols;
    use CU_Symbols;
    subtype CU_Symbol is CU_Symbols.Symbol;
-   subtype CU_Symbol_Index is CU_Symbols.Symbol_Index;
    --  The name of a compilation unit
 
    package CU_Symbol_Sets is new Ada.Containers.Hashed_Sets

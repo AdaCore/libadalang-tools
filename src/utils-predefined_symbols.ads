@@ -3,103 +3,109 @@ with Utils.String_Utilities;
 
 package Utils.Predefined_Symbols is
 
-   function R83 (S : String) return Symbol is
-     (Intern_Reserved_Word (S, Ada_Version => Ada_83));
-
-   function R95 (S : String) return Symbol is
-     (Intern_Reserved_Word (S, Ada_Version => Ada_95));
-
-   function R2005 (S : String) return Symbol is
-     (Intern_Reserved_Word (S, Ada_Version => Ada_2005));
-
-   function R2012 (S : String) return Symbol is
-     (Intern_Reserved_Word (S, Ada_Version => Ada_2012));
+   pragma Assert (Last_Symbol = No_Symbol);
+   --  We want this to be elaborated before any other elaboration code that
+   --  Interns symbols, so anything else that does so during elaboration should
+   --  "with" this. If not, this Assert will fail.
 
    --  Ada 83 reserved words
 
-   Name_Abort     : constant Symbol := R83 ("abort");
-   Name_Abs       : constant Symbol := R83 ("abs");
-   Name_Accept    : constant Symbol := R83 ("accept");
-   Name_Access    : constant Symbol := R83 ("access");
-   Name_And       : constant Symbol := R83 ("and");
-   Name_All       : constant Symbol := R83 ("all");
-   Name_Array     : constant Symbol := R83 ("array");
-   Name_At        : constant Symbol := R83 ("at");
-   Name_Begin     : constant Symbol := R83 ("begin");
-   Name_Body      : constant Symbol := R83 ("body");
-   Name_Case      : constant Symbol := R83 ("case");
-   Name_Constant  : constant Symbol := R83 ("constant");
-   Name_Declare   : constant Symbol := R83 ("declare");
-   Name_Delay     : constant Symbol := R83 ("delay");
-   Name_Delta     : constant Symbol := R83 ("delta");
-   Name_Digits    : constant Symbol := R83 ("digits");
-   Name_Do        : constant Symbol := R83 ("do");
-   Name_Else      : constant Symbol := R83 ("else");
-   Name_Elsif     : constant Symbol := R83 ("elsif");
-   Name_End       : constant Symbol := R83 ("end");
-   Name_Entry     : constant Symbol := R83 ("entry");
-   Name_Exception : constant Symbol := R83 ("exception");
-   Name_Exit      : constant Symbol := R83 ("exit");
-   Name_For       : constant Symbol := R83 ("for");
-   Name_Function  : constant Symbol := R83 ("function");
-   Name_Generic   : constant Symbol := R83 ("generic");
-   Name_Goto      : constant Symbol := R83 ("goto");
-   Name_If        : constant Symbol := R83 ("if");
-   Name_In        : constant Symbol := R83 ("in");
-   Name_Is        : constant Symbol := R83 ("is");
-   Name_Limited   : constant Symbol := R83 ("limited");
-   Name_Loop      : constant Symbol := R83 ("loop");
-   Name_Mod       : constant Symbol := R83 ("mod");
-   Name_New       : constant Symbol := R83 ("new");
-   Name_Not       : constant Symbol := R83 ("not");
-   Name_Null      : constant Symbol := R83 ("null");
-   Name_Of        : constant Symbol := R83 ("of");
-   Name_Or        : constant Symbol := R83 ("or");
-   Name_Others    : constant Symbol := R83 ("others");
-   Name_Out       : constant Symbol := R83 ("out");
-   Name_Package   : constant Symbol := R83 ("package");
-   Name_Pragma    : constant Symbol := R83 ("pragma");
-   Name_Private   : constant Symbol := R83 ("private");
-   Name_Procedure : constant Symbol := R83 ("procedure");
-   Name_Raise     : constant Symbol := R83 ("raise");
-   Name_Range     : constant Symbol := R83 ("range");
-   Name_Record    : constant Symbol := R83 ("record");
-   Name_Rem       : constant Symbol := R83 ("rem");
-   Name_Renames   : constant Symbol := R83 ("renames");
-   Name_Return    : constant Symbol := R83 ("return");
-   Name_Reverse   : constant Symbol := R83 ("reverse");
-   Name_Select    : constant Symbol := R83 ("select");
-   Name_Separate  : constant Symbol := R83 ("separate");
-   Name_Subtype   : constant Symbol := R83 ("subtype");
-   Name_Task      : constant Symbol := R83 ("task");
-   Name_Terminate : constant Symbol := R83 ("terminate");
-   Name_Then      : constant Symbol := R83 ("then");
-   Name_Type      : constant Symbol := R83 ("type");
-   Name_Use       : constant Symbol := R83 ("use");
-   Name_When      : constant Symbol := R83 ("when");
-   Name_While     : constant Symbol := R83 ("while");
-   Name_With      : constant Symbol := R83 ("with");
-   Name_Xor       : constant Symbol := R83 ("xor");
+   Name_Abort     : constant Symbol := Intern ("abort");
+   First_Reserved_Word_Sym : constant Symbol := Last_Symbol;
+   Name_Abs       : constant Symbol := Intern ("abs");
+   Name_Accept    : constant Symbol := Intern ("accept");
+   Name_Access    : constant Symbol := Intern ("access");
+   Name_And       : constant Symbol := Intern ("and");
+   Name_All       : constant Symbol := Intern ("all");
+   Name_Array     : constant Symbol := Intern ("array");
+   Name_At        : constant Symbol := Intern ("at");
+   Name_Begin     : constant Symbol := Intern ("begin");
+   Name_Body      : constant Symbol := Intern ("body");
+   Name_Case      : constant Symbol := Intern ("case");
+   Name_Constant  : constant Symbol := Intern ("constant");
+   Name_Declare   : constant Symbol := Intern ("declare");
+   Name_Delay     : constant Symbol := Intern ("delay");
+   Name_Delta     : constant Symbol := Intern ("delta");
+   Name_Digits    : constant Symbol := Intern ("digits");
+   Name_Do        : constant Symbol := Intern ("do");
+   Name_Else      : constant Symbol := Intern ("else");
+   Name_Elsif     : constant Symbol := Intern ("elsif");
+   Name_End       : constant Symbol := Intern ("end");
+   Name_Entry     : constant Symbol := Intern ("entry");
+   Name_Exception : constant Symbol := Intern ("exception");
+   Name_Exit      : constant Symbol := Intern ("exit");
+   Name_For       : constant Symbol := Intern ("for");
+   Name_Function  : constant Symbol := Intern ("function");
+   Name_Generic   : constant Symbol := Intern ("generic");
+   Name_Goto      : constant Symbol := Intern ("goto");
+   Name_If        : constant Symbol := Intern ("if");
+   Name_In        : constant Symbol := Intern ("in");
+   Name_Is        : constant Symbol := Intern ("is");
+   Name_Limited   : constant Symbol := Intern ("limited");
+   Name_Loop      : constant Symbol := Intern ("loop");
+   Name_Mod       : constant Symbol := Intern ("mod");
+   Name_New       : constant Symbol := Intern ("new");
+   Name_Not       : constant Symbol := Intern ("not");
+   Name_Null      : constant Symbol := Intern ("null");
+   Name_Of        : constant Symbol := Intern ("of");
+   Name_Or        : constant Symbol := Intern ("or");
+   Name_Others    : constant Symbol := Intern ("others");
+   Name_Out       : constant Symbol := Intern ("out");
+   Name_Package   : constant Symbol := Intern ("package");
+   Name_Pragma    : constant Symbol := Intern ("pragma");
+   Name_Private   : constant Symbol := Intern ("private");
+   Name_Procedure : constant Symbol := Intern ("procedure");
+   Name_Raise     : constant Symbol := Intern ("raise");
+   Name_Range     : constant Symbol := Intern ("range");
+   Name_Record    : constant Symbol := Intern ("record");
+   Name_Rem       : constant Symbol := Intern ("rem");
+   Name_Renames   : constant Symbol := Intern ("renames");
+   Name_Return    : constant Symbol := Intern ("return");
+   Name_Reverse   : constant Symbol := Intern ("reverse");
+   Name_Select    : constant Symbol := Intern ("select");
+   Name_Separate  : constant Symbol := Intern ("separate");
+   Name_Subtype   : constant Symbol := Intern ("subtype");
+   Name_Task      : constant Symbol := Intern ("task");
+   Name_Terminate : constant Symbol := Intern ("terminate");
+   Name_Then      : constant Symbol := Intern ("then");
+   Name_Type      : constant Symbol := Intern ("type");
+   Name_Use       : constant Symbol := Intern ("use");
+   Name_When      : constant Symbol := Intern ("when");
+   Name_While     : constant Symbol := Intern ("while");
+   Name_With      : constant Symbol := Intern ("with");
+   Name_Xor       : constant Symbol := Intern ("xor");
 
    --  Ada 95 reserved words
 
-   Name_Abstract  : constant Symbol := R95 ("abstract");
-   Name_Aliased   : constant Symbol := R95 ("aliased");
-   Name_Protected : constant Symbol := R95 ("protected");
-   Name_Until     : constant Symbol := R95 ("until");
-   Name_Requeue   : constant Symbol := R95 ("requeue");
-   Name_Tagged    : constant Symbol := R95 ("tagged");
+   Name_Abstract  : constant Symbol := Intern ("abstract");
+   Name_Aliased   : constant Symbol := Intern ("aliased");
+   Name_Protected : constant Symbol := Intern ("protected");
+   Name_Until     : constant Symbol := Intern ("until");
+   Name_Requeue   : constant Symbol := Intern ("requeue");
+   Name_Tagged    : constant Symbol := Intern ("tagged");
 
    --  Ada 2005 reserved words
 
-   Name_Interface    : constant Symbol := R2005 ("interface");
-   Name_Overriding   : constant Symbol := R2005 ("overriding");
-   Name_Synchronized : constant Symbol :=
-     R2005 ("synchronized");
+   Name_Interface    : constant Symbol := Intern ("interface");
+   Name_Overriding   : constant Symbol := Intern ("overriding");
+   Name_Synchronized : constant Symbol := Intern ("synchronized");
 
    --  Ada 2012 reserved words
 
-   Name_Some : constant Symbol := R2012 ("some");
+   Name_Some : constant Symbol := Intern ("some");
+
+   Last_Reserved_Word_Sym : constant Symbol := Last_Symbol;
+   subtype Potential_Reserved_Word_Sym is Symbol range
+     First_Reserved_Word_Sym .. Last_Reserved_Word_Sym;
+   --  Might include some non-reserved-word symbols, depending on the order in
+   --  which things get interned.
+
+   Last_Reserved_For_Ada_Version :
+     constant array (Ada_Version_Type) of Potential_Reserved_Word_Sym :=
+       (Ada_83 => Name_Xor,
+        Ada_95 => Name_Tagged,
+        Ada_2005 => Name_Synchronized,
+        Ada_2012 => Name_Some);
 
    --  Miscellaneous useful Symbols:
 

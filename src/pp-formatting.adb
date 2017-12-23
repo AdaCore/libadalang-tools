@@ -74,7 +74,7 @@ package body Pp.Formatting is
       Name_Q_Not);
 
    function Is_Op_Sym_With_Letters (N : Symbol) return Boolean is
-     (for some Op of Op_Sym_Table => N = Op);
+     (for some Op of Op_Sym_Table => Case_Insensitive_Equal (N, Op));
       --  True if N looks like a string literal that can be used as an operator
       --  symbol containing letters, so case might matter. N should be in all
       --  lower case.
@@ -90,11 +90,8 @@ package body Pp.Formatting is
    begin
       return Kind (Tok) in Identifier | String_Literal
         or else
-          (Kind (Tok) = Reserved_Word
-             and then Is_Reserved_Word
-               (Normalized (Tok), Ada_Version => Ada_2012)
-             and then not Is_Reserved_Word
-               (Normalized (Tok), Ada_Version => Ada_83));
+          (Kind (Tok) in Reserved_Word_2012
+             and then Kind (Tok) not in Reserved_Word_83);
    end Sname_83;
 
    procedure Insert_Comment_Text
@@ -960,21 +957,30 @@ package body Pp.Formatting is
                         raise Program_Error;
 
                      when Start_Of_Input | End_Of_Input |
-                       End_Of_Line | Blank_Line =>
-                        pragma Assert
-                          (Normalized (Src_Tok) = Normalized (Out_Tok));
+                       End_Of_Line | Blank_Line | Other_Lexeme =>
+                        pragma Assert (Text (Src_Tok) = Text (Out_Tok));
                         R := True;
 
-                     when Lexeme | Identifier | Reserved_Word =>
-                        R := Normalized (Src_Tok) = Normalized (Out_Tok);
+                     when Reserved_Word =>
+                        pragma Assert
+                          (Case_Insensitive_Equal
+                            (Text (Src_Tok), Text (Out_Tok)));
+                        R := True;
+
+                     when Identifier =>
+                        R := Case_Insensitive_Equal
+                          (Text (Src_Tok), Text (Out_Tok));
 
                      when Numeric_Literal =>
                         R := Num_Lits_Match (Src_Tok, Out_Tok, Cmd);
 
-                     when String_Literal =>
-                        if Is_Op_Sym_With_Letters (Normalized (Src_Tok)) then
-                           R := Normalized (Src_Tok) = Normalized (Out_Tok);
+                     when Character_Literal =>
+                        R := Text (Src_Tok) = Text (Out_Tok);
 
+                     when String_Literal =>
+                        if Is_Op_Sym_With_Letters (Text (Src_Tok)) then
+                           R := Case_Insensitive_Equal
+                             (Text (Src_Tok), Text (Out_Tok));
                         else
                            R := Text (Src_Tok) = Text (Out_Tok);
                         end if;
@@ -1079,7 +1085,7 @@ package body Pp.Formatting is
             --  about line breaks from previous phases, not "preserved" ones
             --  added in this phase.
 
-            if Text (Out_Tok) = Name_L_Paren then
+            if Kind (Out_Tok) = '(' then
                if Is_Empty (Paren_Stack) then
                   declare
                      Last_En : Line_Break_Index := All_Cur_Line - 1;
@@ -1108,7 +1114,7 @@ package body Pp.Formatting is
                      Sloc (Out_Tok).First
                    - Sloc (Out_Tokens (Line_Start_Out_Index)).First + 1));
 
-            elsif Text (Out_Tok) = Name_R_Paren then
+            elsif Kind (Out_Tok) = ')' then
                Pop (Paren_Stack);
 
                if Is_Empty (Paren_Stack) then
@@ -1177,7 +1183,7 @@ package body Pp.Formatting is
 
          function Extra_Blank_On_Return return Boolean is
          begin
-            if Normalized (Out_Tok) = Name_Return then
+            if Kind (Out_Tok) = Res_Return then
                declare
                   Paren : constant Token      := Out_Tokens (Out_Index - 1);
                   LB    : constant Line_Break := EOL_Line_Breaks (EOL_Cur_Line);
@@ -1186,7 +1192,7 @@ package body Pp.Formatting is
                   --  "return" of a return_statement, then there will be no ")",
                   --  and we won't do anything. If there is a comment between ")"
                   --  and "return", we do nothing.
-                  if Normalized (Paren) = Name_R_Paren then
+                  if Kind (Paren) = ')' then
                      if not LB.Hard -- will be hard if comment present
                        and then LB.Enabled
                        and then At_Point (Out_Buf, LB.Mark)
@@ -1340,11 +1346,8 @@ package body Pp.Formatting is
                end if;
 
                --  Should the following list include "exception"???
-               return not
-                 (Normalized (Out_Tok) = Name_Begin
-                  or else Normalized (Out_Tok) = Name_When
-                  or else Normalized (Out_Tok) = Name_Elsif
-                  or else Normalized (Out_Tok) = Name_Else);
+               return Kind (Out_Tok) not in
+                 Res_Begin | Res_Else | Res_Elsif | Res_When;
             end Look_Before;
 
             Indentation : Natural;
@@ -1597,9 +1600,6 @@ package body Pp.Formatting is
          --     have to do that, because ASIS provides no way to distinguish these
          --     two forms.
          --
-         --     We normalize "X : in T" to "X : T" (currently disabled to match
-         --     the old gnatpp).
-         --
          --     There is a mode in which we insert underscores in numeric
          --     literals, as in 12_345_678.
          --
@@ -1631,9 +1631,7 @@ package body Pp.Formatting is
             if Kind (Src_Tok) /= Blank_Line
               and then
               (Match (Src_Tok, Out_Tok)
-               or else
-               (Normalized (Src_Tok) = Name_Bang
-                and then Normalized (Out_Tok) = Name_Bar))
+               or else (Kind (Src_Tok) = '!' and then Kind (Out_Tok) = '|'))
             then
                exit when Kind (Src_Tok) = End_Of_Input;
                --  i.e. exit when both Src and Out are at end of input
@@ -1654,9 +1652,9 @@ package body Pp.Formatting is
             else
                --  Check for "end;" --> "end Some_Name;" case
 
-               if Text (Src_Tok) = Name_Semicolon
+               if Kind (Src_Tok) = ';'
                  and then
-                   Normalized (Prev_Lexeme (Src_Tokens, Src_Index)) = Name_End
+                   Kind (Prev_Lexeme (Src_Tokens, Src_Index)) = Res_End
                  and then Sname_83 (Out_Tok)
                then
                   loop -- could be "end A.B.C;"
@@ -1667,7 +1665,7 @@ package body Pp.Formatting is
                      --  procedure that sets it every time Out_Index changes,
                      --  or make Out_Tok a function.
 
-                     exit when Normalized (Out_Tok) /= Name_Dot;
+                     exit when Kind (Out_Tok) /= '.';
 
                      Move_Past_Out_Tok;
                      Out_Index := Out_Index + 1;
@@ -1675,18 +1673,16 @@ package body Pp.Formatting is
                      pragma Assert (Sname_83 (Out_Tok));
                   end loop;
                   pragma Assert
-                    (Disable_Final_Check
-                       or else Normalized (Src_Tok) = Name_Semicolon);
+                    (Disable_Final_Check or else Kind (Src_Tok) = ';');
 
                --  Check for "end Some_Name;" --> "end;" case. This only happens
                --  when the --no-end-id switch was given. Here, the name was
                --  present in the source, so we insert it.
 
                elsif not Arg (Cmd, End_Id)
-                 and then Text (Out_Tok) = Name_Semicolon
+                 and then Kind (Out_Tok) = ';'
                  and then
-                   Normalized (Prev_Lexeme (Out_Tokens, Out_Index)) =
-                   Name_End
+                   Kind (Prev_Lexeme (Out_Tokens, Out_Index)) = Res_End
                  and then Kind (Src_Tok) in Identifier | String_Literal
                then
                   Insert (Out_Buf, " ");
@@ -1695,7 +1691,7 @@ package body Pp.Formatting is
                      Src_Index := Src_Index + 1;
                      Src_Tok   := Src_Tokens (Src_Index);
 
-                     exit when Normalized (Src_Tok) /= Name_Dot;
+                     exit when Kind (Src_Tok) /= '.';
 
                      Insert (Out_Buf, To_W_Str (Text (Src_Tok)));
                      Src_Index := Src_Index + 1;
@@ -1704,49 +1700,35 @@ package body Pp.Formatting is
                        (Kind (Src_Tok) in Identifier | String_Literal);
                   end loop;
                   pragma Assert
-                    (Disable_Final_Check
-                       or else Normalized (Src_Tok) = Name_Semicolon);
+                    (Disable_Final_Check or else Kind (Src_Tok) = ';');
 
                --  Check for "private end" --> "end" case, with a possible
                --  comment between "private" and "end".
 
-               elsif Normalized (Src_Tok) = Name_Private
-                 and then Normalized (Out_Tok) = Name_End
+               elsif Kind (Src_Tok) = Res_Private
+                 and then Kind (Out_Tok) = Res_End
                then
                   pragma Assert
                     (Disable_Final_Check
                        or else
-                     Normalized (Next_Lexeme (Src_Tokens, Src_Index)) =
-                       Name_End);
+                     Kind (Next_Lexeme (Src_Tokens, Src_Index)) = Res_End);
                   Insert_Private;
 
                --  Check for "T'((X, Y, Z))" --> "T'(X, Y, Z)" case
 
-               elsif Text (Src_Tok) = Name_L_Paren
-                 and then Text (Prev_Lexeme (Src_Tokens, Src_Index)) =
-                   Name_L_Paren
+               elsif Kind (Src_Tok) = '('
+                 and then Kind (Prev_Lexeme (Src_Tokens, Src_Index)) = '('
                   --???Also check that the one before that is a tick!
                then
                   Qual_Nesting := Qual_Nesting + 1;
                   Insert (Out_Buf, '(');
                   Src_Index := Src_Index + 1;
                elsif Qual_Nesting > 0
-                 and then Text (Src_Tok) = Name_R_Paren
-                 and then Text (Prev_Lexeme (Src_Tokens, Src_Index)) =
-                   Name_R_Paren
+                 and then Kind (Src_Tok) = ')'
+                 and then Kind (Prev_Lexeme (Src_Tokens, Src_Index)) = ')'
                then
                   Qual_Nesting := Qual_Nesting - 1;
                   Insert (Out_Buf, ')');
-                  Src_Index := Src_Index + 1;
-
-               --  Check for "X : in T" --> "X : T" case
-
-               elsif False -- Deletion of "in" is currently disabled
-                 and then Normalized (Src_Tok) = Name_In
-                 and then Text (Prev_Lexeme (Src_Tokens, Src_Index)) =
-                   Name_Colon
-
-               then
                   Src_Index := Src_Index + 1;
 
                elsif Kind (Src_Tok) = End_Of_Line_Comment then
@@ -2429,7 +2411,7 @@ package body Pp.Formatting is
                for Out_Index in 2 .. Last_Index (Out_Tokens) loop
                   Out_Tok := Out_Tokens (Out_Index);
                   loop
-                     if Kind (Out_Tok) = Reserved_Word then
+                     if Kind (Out_Tok) in Reserved_Word then
                         Replace_Cur (Out_Buf, To_Upper (Cur (Out_Buf)));
                      end if;
                      Move_Forward (Out_Buf);
@@ -2474,9 +2456,10 @@ package body Pp.Formatting is
                exit when At_Point (Out_Buf, Sloc (Out_Tok).Lastx);
             end loop;
 
-            if Text (Out_Tok) = Name_Semicolon
-              and then Normalized (Prev_Tok) = Name_Page
-              and then Normalized (Prev_Prev_Tok) = Name_Pragma
+            if Kind (Out_Tok) = ';'
+              and then Kind (Prev_Tok) = Identifier
+              and then Case_Insensitive_Equal (Text (Prev_Tok), Name_Page)
+              and then Kind (Prev_Prev_Tok) = Res_Pragma
             then
                Insert_Any (Out_Buf, W_FF);
             end if;
@@ -2772,10 +2755,33 @@ package body Pp.Formatting is
                      raise Program_Error;
 
                   when Start_Of_Input | End_Of_Input |
-                     End_Of_Line | Blank_Line =>
-                     pragma Assert
-                       (Normalized (Src_Tok) = Normalized (Out_Tok));
+                    End_Of_Line | Blank_Line | Other_Lexeme =>
+                     pragma Assert (Text (Src_Tok) = Text (Out_Tok));
                      R := True;
+
+                  when Reserved_Word =>
+                     pragma Assert
+                       (Case_Insensitive_Equal
+                          (Text (Src_Tok), Text (Out_Tok)));
+                     R := True;
+
+                  when Identifier =>
+                     R := Case_Insensitive_Equal
+                       (Text (Src_Tok), Text (Out_Tok));
+
+                  when Numeric_Literal =>
+                     R := Num_Lits_Match (Src_Tok, Out_Tok, Cmd);
+
+                  when Character_Literal =>
+                     R := Text (Src_Tok) = Text (Out_Tok);
+
+                  when String_Literal =>
+                     if Is_Op_Sym_With_Letters (Text (Src_Tok)) then
+                        R := Case_Insensitive_Equal
+                          (Text (Src_Tok), Text (Out_Tok));
+                     else
+                        R := Text (Src_Tok) = Text (Out_Tok);
+                     end if;
 
                   when Comment_Kind =>
                      R :=
@@ -2783,19 +2789,6 @@ package body Pp.Formatting is
                         or else Leading_Blanks (Src_Tok) =
                                 Leading_Blanks (Out_Tok))
                        and then Text (Src_Tok) = Text (Out_Tok);
-
-                  when Lexeme | Identifier | Reserved_Word =>
-                     R := Normalized (Src_Tok) = Normalized (Out_Tok);
-
-                  when Numeric_Literal =>
-                     R := Num_Lits_Match (Src_Tok, Out_Tok, Cmd);
-
-                  when String_Literal =>
-                     if Is_Op_Sym_With_Letters (Normalized (Src_Tok)) then
-                        R := Normalized (Src_Tok) = Normalized (Out_Tok);
-                     else
-                        R := Text (Src_Tok) = Text (Out_Tok);
-                     end if;
                end case;
 
             elsif Kind (Src_Tok) = End_Of_Line_Comment
@@ -2921,9 +2914,7 @@ package body Pp.Formatting is
          if Kind (Src_Tok) /= Blank_Line
            and then
            (Match (Src_Tok, Out_Tok)
-            or else
-            (Normalized (Src_Tok) = Name_Bang
-             and then Normalized (Out_Tok) = Name_Bar))
+            or else (Kind (Src_Tok) = '!' and then Kind (Out_Tok) = '|'))
          then
             exit when Kind (Src_Tok) = End_Of_Input;
             --  i.e. exit when both Src and Out are at end of input
@@ -2984,10 +2975,9 @@ package body Pp.Formatting is
 
             --  Check for "end;" --> "end Some_Name;" case
 
-            elsif Text (Src_Tok) = Name_Semicolon
+            elsif Kind (Src_Tok) = ';'
               and then
-                Normalized (Prev_Lexeme (Src_Tokens, Src_Index)) =
-                Name_End
+                Kind (Prev_Lexeme (Src_Tokens, Src_Index)) = Res_End
               and then Sname_83 (Out_Tok)
             then
                loop -- could be "end A.B.C;"
@@ -2998,7 +2988,7 @@ package body Pp.Formatting is
                   --  procedure that sets it every time Out_Index changes,
                   --  or make Out_Tok a function.
 
-                  exit when Normalized (Out_Tok) /= Name_Dot;
+                  exit when Kind (Out_Tok) /= '.';
 
                   Move_Past_Out_Tok;
                   Out_Index := Out_Index + 1;
@@ -3009,21 +2999,11 @@ package body Pp.Formatting is
                         Src_Index, Out_Index, Src_Tok, Out_Tok);
                   end if;
                end loop;
-               if Normalized (Src_Tok) /= Name_Semicolon then
+               if Kind (Src_Tok) /= ';' then
                   Raise_Token_Mismatch
                     ("Final_Check 3", Lines_Data, Src_Buf,
                      Src_Index, Out_Index, Src_Tok, Out_Tok);
                end if;
-
-            --  Check for "X : in T" --> "X : T" case
-
-            elsif False -- Deletion of "in" is currently disabled
-              and then Normalized (Src_Tok) = Name_In
-              and then Text (Prev_Lexeme (Src_Tokens, Src_Index)) = Name_Colon
-               --???Check prev&next ids match???
-
-            then
-               Src_Index := Src_Index + 1;
 
             elsif Kind (Src_Tok) in End_Of_Line | Blank_Line then
                Src_Index := Src_Index + 1;

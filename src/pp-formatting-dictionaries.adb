@@ -31,6 +31,7 @@ package body Pp.Formatting.Dictionaries is
    package Syms renames Utils.Symbols;
 
    subtype Symbol is Syms.Symbol;
+   subtype Opt_Symbol is Syms.Opt_Symbol;
 
    package Name_Sets is new Ada.Containers.Hashed_Sets
      (Symbol, Syms.Hash_Symbol, Syms.Case_Insensitive_Equal, Syms."=");
@@ -53,9 +54,6 @@ package body Pp.Formatting.Dictionaries is
    -- Local subprograms --
    -----------------------
 
-   function Present (Id : Symbol) return Boolean;
-   --  Checks if the argument is not equal to No_String
-
    procedure Add_To_Dictionary
      (Name           : String;
       Exception_Kind : Casing_Exception_Kinds);
@@ -66,7 +64,7 @@ package body Pp.Formatting.Dictionaries is
    function Find_In_Dictionary
      (Name           : String;
       Exception_Kind : Casing_Exception_Kinds)
-      return           Symbol;
+      return           Opt_Symbol;
    --  Tries to find in the dictionary the entry which corresponds to Name
    --  without taking into account the character casing. (Exception_Kind
    --  is used to limit the search by the corresponding kind of dictionary
@@ -106,7 +104,7 @@ package body Pp.Formatting.Dictionaries is
       SW_End    : Integer          := Name_Last;
       --  Indexes of a subword in the Name
 
-      Dictionary_String : Symbol;
+      Dictionary_String : Opt_Symbol;
 
       procedure Set_Subword;
       --  Provided that Name has subwords, and that the current settings of
@@ -193,13 +191,13 @@ package body Pp.Formatting.Dictionaries is
       Dictionary_String :=
         Find_In_Dictionary (Name => Name, Exception_Kind => Whole_Word);
 
-      if not Present (Dictionary_String) then
+      if not Syms.Present (Dictionary_String) then
          --  May be we can apply the subword exception to the whole word
          Dictionary_String :=
            Find_In_Dictionary (Name => Name, Exception_Kind => Subword);
       end if;
 
-      if Present (Dictionary_String) then
+      if Syms.Present (Dictionary_String) then
          Name := Syms.Str (Dictionary_String).S;
       else
 
@@ -213,7 +211,7 @@ package body Pp.Formatting.Dictionaries is
                    (Name           => Name (SW_Start .. SW_End),
                     Exception_Kind => Subword);
 
-               if Present (Dictionary_String) then
+               if Syms.Present (Dictionary_String) then
                   Name (SW_Start .. SW_End) :=
                     Syms.Str (Dictionary_String).S;
                else
@@ -242,7 +240,7 @@ package body Pp.Formatting.Dictionaries is
    function Find_In_Dictionary
      (Name           : String;
       Exception_Kind : Casing_Exception_Kinds)
-      return           Symbol
+      return           Opt_Symbol
    is
       Id : constant Symbol := Syms.Intern (Name);
       C : constant Name_Sets.Cursor :=
@@ -254,16 +252,6 @@ package body Pp.Formatting.Dictionaries is
    begin
       return (if Has_Element (C) then Element (C) else Syms.No_Symbol);
    end Find_In_Dictionary;
-
-   -------------
-   -- Present --
-   -------------
-
-   function Present (Id : Symbol) return Boolean is
-      use type Symbol;
-   begin
-      return Id /= Syms.No_Symbol;
-   end Present;
 
    ----------------------
    -- Reset_Dictionary --

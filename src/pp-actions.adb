@@ -2133,7 +2133,8 @@ package body Pp.Actions is
                   end case;
                   if Assert_Enabled then
                      Tok := Scanner.Seqs.Get_Token (W_Str (T), Utils.Ada_Version);
-                     pragma Assert (Text = Scanner.Normalized (Tok));
+                     pragma Assert
+                       (Case_Insensitive_Equal (Text, Scanner.Text (Tok)));
                      pragma Assert (Scanner.Sloc (Tok).First = 1);
                   end if;
                   <<Skip_Assertion>>

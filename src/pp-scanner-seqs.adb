@@ -23,10 +23,50 @@
 
 with Text_IO;
 
-with Utils.Predefined_Symbols; use Utils.Predefined_Symbols;
-
 package body Pp.Scanner.Seqs is
-   use Syms;
+
+   use Utils.Predefined_Symbols;
+
+   type Symbol_To_Reserved_Word_Mapping is
+     array (Potential_Reserved_Word_Sym) of Reserved_Word_Or_Id;
+
+   function Init_Symbol_To_Reserved_Word_Map
+     return Symbol_To_Reserved_Word_Mapping;
+
+   function Init_Symbol_To_Reserved_Word_Map
+     return Symbol_To_Reserved_Word_Mapping
+   is
+   begin
+      return R : Symbol_To_Reserved_Word_Mapping := (others => Identifier) do
+         for Res in Reserved_Word loop
+            R (Token_To_Symbol_Map (Res)) := Res;
+         end loop;
+      end return;
+   end Init_Symbol_To_Reserved_Word_Map;
+
+   Symbol_To_Reserved_Word_Map : constant Symbol_To_Reserved_Word_Mapping :=
+     Init_Symbol_To_Reserved_Word_Map;
+
+   function Lookup_Reserved_Word
+     (Text : Symbol; Ada_Version : Ada_Version_Type)
+      return Reserved_Word_Or_Id;
+   --  If Text is a reserved word for the given Ada_Version, return that
+   --  Reserved_Word. Otherwise, return Identifier.
+
+   function Lookup_Reserved_Word
+     (Text : Symbol; Ada_Version : Ada_Version_Type)
+      return Reserved_Word_Or_Id
+   is
+      Normalized : constant Symbol := Same_Ignoring_Case (Text);
+   begin
+      if Normalized in Potential_Reserved_Word_Sym'First ..
+        Last_Reserved_For_Ada_Version (Ada_Version)
+      then
+         return Symbol_To_Reserved_Word_Map (Normalized);
+      else
+         return Identifier;
+      end if;
+   end Lookup_Reserved_Word;
 
    procedure Get_Tokens
      (Input                     : in out Buffer;
@@ -62,10 +102,9 @@ package body Pp.Scanner.Seqs is
 
       procedure Get_Token (Tok : out Token; Allow_Short_Fillable : Boolean);
       --  Get one token from the input, and return it in Tok, except that
-      --  Tok.Text and Tok.Normalized are not set. Here, Whole_Line_Comment
-      --  represents a single comment line; multiple Whole_Line_Comments that
-      --  may be filled are combined into a single Whole_Line_Comment after
-      --  Get_Token returns.
+      --  Tok.Text is not set. Here, Whole_Line_Comment represents a single
+      --  comment line; multiple Whole_Line_Comments that may be filled are
+      --  combined into a single Whole_Line_Comment after Get_Token returns.
 
       procedure Append_Tok (Tok : Token);
       --  Add the relevant text to the Name_Buffer. For everything but
@@ -74,8 +113,8 @@ package body Pp.Scanner.Seqs is
       --  added at the end.
 
       procedure Finish_Token (Tok : in out Token);
-      --  Finish constructing the Token by setting Text and Normalized. Also
-      --  check for reserved words.
+      --  Finish constructing the Token by setting Text and checking for
+      --  reserved words.
 
       procedure Append_To_Result (Tok : in out Token);
       --  Append the token onto Result, and set Preceding_Token and
@@ -163,7 +202,7 @@ package body Pp.Scanner.Seqs is
       Preceding_Lexeme,
       Preceding_Token : Token :=
         (Kind => Nil,
-         Text | Normalized => No_Symbol,
+         Text => Name_Empty,
          Leading_Blanks | Width => Natural'Last,
          Sloc =>
            (Line | Col | First | Last => Integer'Last, Firstx | Lastx => <>));
@@ -344,7 +383,7 @@ package body Pp.Scanner.Seqs is
                      Scan_Comment (Tok, Allow_Short_Fillable);
                   else
                      Get;
-                     Tok.Kind := Lexeme;
+                     Tok.Kind := '-';
                   end if;
 
                --  numeric literal
@@ -383,7 +422,6 @@ package body Pp.Scanner.Seqs is
                --  single quote or character literal
 
                when ''' =>
-                  Tok.Kind := Lexeme;
                   Get;
 
                   --  We distinguish a single quote token from a character
@@ -395,12 +433,12 @@ package body Pp.Scanner.Seqs is
                   --  character literal. The String_Literal case is really
                   --  for operator symbols, as in "+"'Address.
 
-                  if Preceding_Lexeme.Kind in Identifier | String_Literal
-                    or else Preceding_Lexeme.Normalized in
-                      Name_Access | Name_All | Name_R_Paren
+                  if Preceding_Lexeme.Kind in Identifier | String_Literal |
+                      Res_Access | Res_All | ')'
                   then
-                     null; -- it's a tick
+                     Tok.Kind := '''; -- it's a tick
                   else
+                     Tok.Kind := Character_Literal;
                      Get;
                      pragma Assert (Cur (Input) = ''');
                      Get;
@@ -414,68 +452,115 @@ package body Pp.Scanner.Seqs is
 
                --  One-character tokens
 
-               when '&' | '(' | ')' | '+' | ',' | ';' | '|' | '!' | '@' =>
+               when '&' =>
+                  Tok.Kind := '&';
+                  Get;
+               when '(' =>
+                  Tok.Kind := '(';
+                  Get;
+               when ')' =>
+                  Tok.Kind := ')';
+                  Get;
+               when '+' =>
+                  Tok.Kind := '+';
+                  Get;
+               when ',' =>
+                  Tok.Kind := ',';
+                  Get;
+               when ';' =>
+                  Tok.Kind := ';';
+                  Get;
+               when '|' =>
+                  Tok.Kind := '|';
+                  Get;
+               when '!' =>
+                  Tok.Kind := '!';
+                  Get;
+               when '@' =>
                   --  '@' is for target_name (see RM-5.2.1, AI12-0125-3)
-                  Tok.Kind := Lexeme;
+                  Tok.Kind := '@';
                   Get;
 
                --  Multiple-character tokens. We need to distinguish between
                --  "=" and "=>", and between "." and ".." and so forth.
 
                when '=' =>
-                  Tok.Kind := Lexeme;
                   Get;
 
                   if Cur (Input) = '>' then
+                     Tok.Kind := Arrow;
                      Get;
+                  else
+                     Tok.Kind := '>';
                   end if;
 
                when '.' =>
-                  Tok.Kind := Lexeme;
                   Get;
 
                   if Cur (Input) = '.' then
+                     Tok.Kind := Dot_Dot;
                      Get;
+                  else
+                     Tok.Kind := '.';
                   end if;
 
                when '*' =>
-                  Tok.Kind := Lexeme;
                   Get;
 
                   if Cur (Input) = '*' then
+                     Tok.Kind := Exp_Op;
                      Get;
+                  else
+                     Tok.Kind := '*';
                   end if;
 
                when '/' =>
-                  Tok.Kind := Lexeme;
                   Get;
 
                   if Cur (Input) = '=' then
+                     Tok.Kind := Not_Equal;
                      Get;
+                  else
+                     Tok.Kind := '=';
                   end if;
 
                when '>' =>
-                  Tok.Kind := Lexeme;
-                  Get;
-
-                  if Cur (Input) in '=' | '>' then
-                     Get;
-                  end if;
-
-               when '<' =>
-                  Tok.Kind := Lexeme;
-                  Get;
-
-                  if Cur (Input) in '=' | '<' | '>' then
-                     Get;
-                  end if;
-
-               when ':' =>
-                  Tok.Kind := Lexeme;
                   Get;
 
                   if Cur (Input) = '=' then
+                     Tok.Kind := Greater_Or_Equal;
                      Get;
+                  elsif Cur (Input) = '>' then
+                     Tok.Kind := Right_Label_Bracket;
+                     Get;
+                  else
+                     Tok.Kind := '>';
+                  end if;
+
+               when '<' =>
+                  Get;
+
+                  if Cur (Input) = '=' then
+                     Tok.Kind := Less_Or_Equal;
+                     Get;
+                  elsif Cur (Input) = '<' then
+                     Tok.Kind := Left_Label_Bracket;
+                     Get;
+                  elsif Cur (Input) = '>' then
+                     Tok.Kind := Box;
+                     Get;
+                  else
+                     Tok.Kind := '>';
+                  end if;
+
+               when ':' =>
+                  Get;
+
+                  if Cur (Input) = '=' then
+                     Tok.Kind := Colon_Equal;
+                     Get;
+                  else
+                     Tok.Kind := '=';
                   end if;
 
                when others =>
@@ -503,39 +588,17 @@ package body Pp.Scanner.Seqs is
             when Comment_Kind =>
                pragma Assert (False);
 
-            when End_Of_Line | Blank_Line =>
-               Tok.Normalized := Name_NL;
-
             when Identifier =>
-               Name_Buffer.Chars (1 .. Name_Len) :=
-                 To_UTF8 (To_Lower
-                            (From_UTF8 (Name_Buffer.Chars (1 .. Name_Len))));
-               Tok.Normalized := Intern (Name_Buffer);
-
                --  Check for reserved word. In T'Range, we consider "Range" to
-               --  be an identifier, not a keyword, and similarly for others.
+               --  be an identifier, not a reserved word, and similarly for
+               --  others.
 
-               if Is_Reserved_Word (Tok.Normalized, Ada_Version)
-                 and then Preceding_Lexeme.Normalized /= Name_Tick
-               then
-                  Tok.Kind := Reserved_Word;
-               end if;
-
-            when String_Literal =>
-               --  If it could be an operator symbol, we normalize to lower
-               --  case. No operator symbol is longer than 5 characters
-               --  including the quotes.
-
-               if Name_Len <= 5 then
-                  To_Lower (Name_Buffer.Chars (1 .. Name_Len));
-                  Tok.Normalized := Intern (Name_Buffer);
-               else
-                  Tok.Normalized := Tok.Text;
+               if Preceding_Lexeme.Kind /= ''' then
+                  Tok.Kind := Lookup_Reserved_Word (Tok.Text, Ada_Version);
                end if;
 
             when others =>
-               --  No need to normalize to lower case.
-               Tok.Normalized := Tok.Text;
+               null;
          end case;
       end Finish_Token;
 
@@ -599,7 +662,7 @@ package body Pp.Scanner.Seqs is
       Start_Mark_L  : constant Marker := Mark (Input, '>');
       Start_Token : constant Token  :=
         (Start_Of_Input,
-         Text | Normalized => Name_Empty,
+         Text => Name_Empty,
          Leading_Blanks => 0,
          Width          => 0,
          Sloc =>
@@ -666,8 +729,7 @@ package body Pp.Scanner.Seqs is
             if Tok.Kind in Comment_Kind then
                Append_Tok (Tok);
                if Tok.Kind /= Fillable_Comment then
-                  Tok.Text       := Intern (Name_Buffer);
-                  Tok.Normalized := No_Symbol;
+                  Tok.Text := Intern (Name_Buffer);
                   Append_To_Result (Tok);
                else
                   --  Loop, repeatedly getting Tok_2, and combining Tok_2 into
@@ -685,16 +747,14 @@ package body Pp.Scanner.Seqs is
                         --  Tok_2.
 
                         if Tok_2.Kind /= Fillable_Comment then
-                           Tok.Text       := Intern (Name_Buffer);
-                           Tok.Normalized := No_Symbol;
+                           Tok.Text := Intern (Name_Buffer);
                            Append_To_Result (Tok);
                            Name_Len := 0;
                            Finish_Token (Tok_EOL);
                            Append_To_Result (Tok_EOL);
                            Name_Len := 0;
                            Append_Tok (Tok_2);
-                           Tok_2.Text       := Intern (Name_Buffer);
-                           Tok_2.Normalized := No_Symbol;
+                           Tok_2.Text := Intern (Name_Buffer);
                            Append_To_Result (Tok_2);
                            exit;
 
@@ -715,8 +775,7 @@ package body Pp.Scanner.Seqs is
                         --  to Result, and use Tok_2 as the new Tok.
 
                         else
-                           Tok.Text       := Intern (Name_Buffer);
-                           Tok.Normalized := No_Symbol;
+                           Tok.Text := Intern (Name_Buffer);
                            Append_To_Result (Tok);
                            Name_Len := 0;
                            Finish_Token (Tok_EOL);
@@ -734,8 +793,7 @@ package body Pp.Scanner.Seqs is
 
                      else
                         pragma Assert (Tok_2.Kind not in Comment_Kind);
-                        Tok.Text       := Intern (Name_Buffer);
-                        Tok.Normalized := No_Symbol;
+                        Tok.Text := Intern (Name_Buffer);
                         Append_To_Result (Tok);
                         Name_Len := 0;
                         Finish_Token (Tok_EOL);

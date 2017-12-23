@@ -216,10 +216,10 @@ package body METRICS.Actions is
    Empty_CU_Sym : constant CU_Symbol := Intern ("");
 
    type Metrix_Ref_Array is
-     array (CU_Symbol_Index range <>) of aliased Metrix_Ref;
+     array (CU_Symbol range <>) of aliased Metrix_Ref;
 
    package CU_Metrix is new Utils.Vectors
-     (CU_Symbol_Index, Metrix_Ref, Metrix_Ref_Array);
+     (CU_Symbol, Metrix_Ref, Metrix_Ref_Array);
    use CU_Metrix;
    Specs : CU_Metrix.Vector;
    Bodies : CU_Metrix.Vector;
@@ -239,7 +239,7 @@ package body METRICS.Actions is
      (A : in out CU_Metrix.Vector; S : CU_Symbol)
      return CU_Metrix.Element_Access
    is
-      I : constant CU_Symbol_Index := Get_Symbol_Index (S);
+      I : constant CU_Symbol := Same_Ignoring_Case (S);
    begin
       --  If A is too short, append nulls until it's long enough
 
@@ -1881,8 +1881,8 @@ package body METRICS.Actions is
          --  Remove nonexistent units:
 
          for Sym of M.Depends_On loop
-            if Get_Symbol_Index (Sym) > Last_Index (Specs)
-              or else Specs (Get_Symbol_Index (Sym)) = null
+            if Same_Ignoring_Case (Sym) > Last_Index (Specs)
+              or else Specs (Same_Ignoring_Case (Sym)) = null
             then
                Insert (Nonexistent_Units, Sym);
             end if;
@@ -1909,7 +1909,7 @@ package body METRICS.Actions is
                --  the recursive Visit, which is going to modify it, so we
                --  can't be iterating over it directly.
 
-               Visit (Specs (Get_Symbol_Index (Sym)), M.Depends_On);
+               Visit (Specs (Same_Ignoring_Case (Sym)), M.Depends_On);
             end loop;
          end if;
 
@@ -1951,20 +1951,21 @@ package body METRICS.Actions is
          return M;
       elsif M.Subunit_Parent = Empty_CU_Sym then
          declare
-            Spec : constant Metrix_Ref := Specs (Get_Symbol_Index (M.CU_Name));
+            Spec : constant Metrix_Ref :=
+              Specs (Same_Ignoring_Case (M.CU_Name));
          begin
             return (if Spec = null then M else Spec);
          end;
       else
          declare
             Parent_Body : Metrix_Ref :=
-              Bodies (Get_Symbol_Index (M.Subunit_Parent));
+              Bodies (Same_Ignoring_Case (M.Subunit_Parent));
          begin
             --  The parent could be a body acting as spec, in which case it's
             --  in Specs, not Bodies.
 
             if Parent_Body = null then
-               Parent_Body := Specs (Get_Symbol_Index (M.Subunit_Parent));
+               Parent_Body := Specs (Same_Ignoring_Case (M.Subunit_Parent));
             end if;
 
             return (if Parent_Body = null then M else Get_Spec (Parent_Body));
@@ -2046,7 +2047,8 @@ package body METRICS.Actions is
 
             for Sym of Union (S.Depends_On, S.Limited_Depends_On) loop
                declare
-                  Dep : constant Metrix_Ref := Specs (Get_Symbol_Index (Sym));
+                  Dep : constant Metrix_Ref :=
+                    Specs (Same_Ignoring_Case (Sym));
                begin
                   if Dep /= null then
                      --  ???It shouldn't be null, because we removed
