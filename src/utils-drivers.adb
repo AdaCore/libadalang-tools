@@ -381,7 +381,9 @@ package body Utils.Drivers is
                   --  tree).
 
                   pragma Assert (not Root (Unit).Is_Null);
-                  if not Arg (Cmd, Syntax_Only) then
+                  if False and then
+                    not Arg (Cmd, Syntax_Only)
+                  then
                      Name_Resolution (Unit);
                   end if;
                   Per_File_Action (Tool, Cmd, F_Name.all, Inp, BOM_Seen, Unit);
