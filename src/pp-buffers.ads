@@ -258,7 +258,7 @@ package Pp.Buffers is
    procedure Dump_Marker (Buf : Buffer; Mark : Marker);
    --  For debugging
 
-   function Name (Buf : Buffer; Mark : Marker) return W_Char;
+   function Marker_Name (Buf : Buffer; Mark : Marker) return W_Char;
 
    procedure Validate (Buf : Buffer; Message : String);
 

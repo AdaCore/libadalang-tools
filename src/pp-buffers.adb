@@ -623,10 +623,10 @@ package body Pp.Buffers is
       return M;
    end Mark_Previous;
 
-   function Name (Buf : Buffer; Mark : Marker) return W_Char is
+   function Marker_Name (Buf : Buffer; Mark : Marker) return W_Char is
    begin
       return Buf.Markers (Mark).Name;
-   end Name;
+   end Marker_Name;
 
    function Point (Buf : Buffer) return Positive is
    begin
@@ -1012,7 +1012,7 @@ package body Pp.Buffers is
          if M_Index <= Marks'Last then
             pragma Assert (X <= Position (Buf, Marks (M_Index)));
             if X = Position (Buf, Marks (M_Index)) then
-               Append (Result, Name (Buf, Marks (M_Index)));
+               Append (Result, Marker_Name (Buf, Marks (M_Index)));
                M_Index := M_Index + 1;
             end if;
 
@@ -1020,7 +1020,7 @@ package body Pp.Buffers is
               and then X = Position (Buf, Marks (M_Index))
             loop
                Append (Result, "[duplicate]");
-               Append (Result, Name (Buf, Marks (M_Index)));
+               Append (Result, Marker_Name (Buf, Marks (M_Index)));
                M_Index := M_Index + 1;
             end loop;
          end if;
@@ -1030,7 +1030,7 @@ package body Pp.Buffers is
       --  Check for one last marker after the last character
 
       if M_Index = Marks'Last then
-         Append (Result, Name (Buf, Marks (M_Index)));
+         Append (Result, Marker_Name (Buf, Marks (M_Index)));
          M_Index := M_Index + 1;
       end if;
       pragma Assert (M_Index = Marks'Last + 1);
