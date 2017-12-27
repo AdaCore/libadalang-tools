@@ -1790,6 +1790,15 @@ package body Pp.Actions is
             end if;
          end;
 
+         --  Replacements for Split_Line_Before_Record
+
+         if Arg (Cmd, Split_Line_Before_Record) then
+            Replace_Tmp
+              (Ada_Record_Rep_Clause,
+               "for ! use record? at mod ~~;~${?~;$~;$~}end record",
+               "for ! use${record? at mod ~~;~${?~;$~;$~}end record}");
+         end if;
+
          --  Now do some validity checking on the templates
 
          for Kind in Ada_Tree_Kind loop
@@ -3781,9 +3790,13 @@ package body Pp.Actions is
                 and then Present (Def.As_Derived_Type_Def.F_Record_Extension))
             then
                if Is_Nil (Tree.As_Type_Decl.F_Aspects) then
-                  Interpret_Template ("type !! is ![" & Aspects & "]");
-                  --  Otherwise, we could have a line break just before the
-                  --  last semicolon.
+                  if Arg (Cmd, Split_Line_Before_Record) then
+                     Interpret_Template ("type !! is${!}[" & Aspects & "]");
+                  else
+                     Interpret_Template ("type !! is ![" & Aspects & "]");
+                     --  Otherwise, we could have a line break just before the
+                     --  last semicolon.
+                  end if;
                else
                   Interpret_Template ("type !! is ![#" & Aspects & "]");
                end if;
