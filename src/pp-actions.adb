@@ -45,7 +45,8 @@ package body Pp.Actions is
 
    pragma Warnings (Off);
    use Common_Flag_Switches, Common_String_Switches,
-     Common_String_Seq_Switches, Common_Nat_Switches;
+     Common_String_Seq_Switches, Common_Nat_Switches,
+     Common_Boolean_Switches;
 
    use Pp_Flag_Switches,
      Pp_Boolean_Switches,
@@ -359,7 +360,7 @@ package body Pp.Actions is
    --  elements, and the third after the list, except if the list is empty,
    --  nothing is printed. If it's not a list, the first and third arguments
    --  are placed before and after, and the second must be empty, except if
-   --  it's Not_An_Element, nothing is printed.
+   --  it's Null_Kind, nothing is printed.
    --
    --  Normally, the soft line breaks inserted by # have a priority based on
    --  the syntactic nesting depth. Less-nested breaks are enabled in favor of
@@ -1184,8 +1185,7 @@ package body Pp.Actions is
       function Id_With_Casing
         (Id                       : Symbol;
          Kind                     : Opt_ASIS_Elems;
-         Is_Predef                : Boolean;
-         Use_Name_Casing_For_Nils : Boolean := False)
+         Is_Predef                : Boolean)
          return                     W_Str;
       --  This handles casing of defining names and usage names, converting to
       --  the appropriate case based on command-line options. Kind is the kind of
@@ -1205,8 +1205,6 @@ package body Pp.Actions is
       --
       --  Is_Predef comes from the Is_Predef attribute of Usage_Names. It is
       --  always False for Def_Names and pragmas.
-      --
-      --  Use_Name_Casing_For_Nils is documented in Do_Usage_Name.
 
       function Init_Use_Dictionary return Boolean;
       function Init_Use_Dictionary return Boolean is
@@ -1288,43 +1286,38 @@ package body Pp.Actions is
       function Id_With_Casing
         (Id                       : Symbol;
          Kind                     : Opt_ASIS_Elems;
-         Is_Predef                : Boolean;
-         Use_Name_Casing_For_Nils : Boolean := False)
+         Is_Predef                : Boolean)
          return                     W_Str
       is
-         pragma Unreferenced (Use_Name_Casing_For_Nils);
-
-         Str : W_Str := To_W_Str (Id);
+         Src_Str : W_Str := To_W_Str (Id);
          --  This is the name as declared
-         pragma Assert (Str'First = 1);
+         pragma Assert (Src_Str'First = 1);
 
          --  If it's a character literal, we want As_Declared -- it would be
          --  unfortunate to turn 'a' into 'A'. Operators go by keyword casing.
          --  Operator symbols (quoted) do so also, which seems wrong, but we're
          --  going to mimic the old gnatpp for now. Note that some reserved
-         --  words can be an operator or an attribute name; hence the check
-         --  for Flat_Attribute_Reference_Kinds below. Predefined names use
-         --  As_Declared unless Use_Predefined_Casing is turned off. For
-         --  everything else, we use the appropriate option based on the Kind.
+         --  words can be an operator or an attribute name; hence the check for
+         --  Ada_Attribute_Ref below. Predefined names use As_Declared unless
+         --  Use_Predefined_Casing is turned off. For everything else, we use
+         --  the appropriate option based on the Kind.
 
          Casing : constant PP_Casing :=
-           (if Str (1) = ''' then As_Declared
+           (if Src_Str (1) = ''' then As_Declared
 --            elsif
---              Kind not in Flat_Attribute_Reference_Kinds
+--              Kind not in Ada_Attribute_Ref
 --              and then
---              (Str (1) = '"' -- operator symbol
+--              (Src_Str (1) = '"' -- operator symbol
 --               or else Is_Reserved_Word (Id, Utils.Ada_Version)
 --               or else Id = Name_And_Then
 --               or else Id = Name_Or_Else)
 --            then
 --              PP_Keyword_Casing (Cmd)
-            elsif
-              Is_Predef and then Use_Predefined_Casing
-            then
+            elsif Is_Predef and then Use_Predefined_Casing then
               As_Declared
             else
               (case Kind is
---                 when Flat_Attribute_Reference_Kinds =>
+--                 when Ada_Attribute_Ref =>
 --                   PP_Attribute_Casing (Cmd),
                  when Ada_Pragma_Node => PP_Pragma_Casing (Cmd),
 --                 when Ada_Enumeration_Literal_Specification =>
@@ -1338,39 +1331,33 @@ package body Pp.Actions is
 --                   PP_Type_Casing (Cmd),
 --                 when Ada_Flat_Number_Declaration => PP_Number_Casing (Cmd),
 --                 when Not_An_Element            =>
---                   (if Is_PP
---                      and then not Use_Name_Casing_For_Nils
---                      and then PP_Name_Casing (Cmd) = As_Declared
---                    then
---                      Mixed
+--                   (if PP_Name_Casing (Cmd) = As_Declared then Mixed
 --                    else PP_Name_Casing (Cmd)),
                  when others => PP_Name_Casing (Cmd)));
-         --  The Not_An_Element case is for identifiers specific to pragmas
-         --  and the like. But that only works if the Decl_Kind field is set,
-         --  which isn't true in xml2gnat, so we use PP_Name_Casing (which is
-         --  As_Declared) in that case.
+         --  The Null_Kind case is for identifiers specific to pragmas
+         --  and the like.
 
-         use Pp.Formatting.Dictionaries;
+         use Dictionaries;
       begin
          if Use_Dictionary then
-            Check_With_Dictionary (Ada_Name => Str, Casing => Casing);
-            return Str;
+            Check_With_Dictionary (Ada_Name => Src_Str, Casing => Casing);
+            return Src_Str;
          else
             case Casing is
                when Lower_Case =>
-                  return To_Lower (Str);
+                  return To_Lower (Src_Str);
 
                when Upper_Case =>
-                  return To_Upper (Str);
+                  return To_Upper (Src_Str);
 
                when Mixed =>
---                  if Kind in Flat_Attribute_Reference_Kinds | ada_pragma_node
+--                  if Kind in Ada_Attribute_Ref | ada_pragma_node
 --                  then
 --                     --  Handle pragma and attribute names that are special cases
 --                     --  (some portion should be in ALL CAPS).
 --
 --                     declare
---                        Lower : constant W_Str := To_Lower (Str);
+--                        Lower : constant W_Str := To_Lower (Src_Str);
 --                     begin
 --                        for Special of Special_Case_Names loop
 --                           if Lower = To_Lower (Special.all) then
@@ -1380,10 +1367,10 @@ package body Pp.Actions is
 --                     end;
 --                  end if;
 
-                  return Capitalize (Str);
+                  return Capitalize (Src_Str);
 
                when As_Declared =>
-                  return Str;
+                  return Src_Str;
             end case;
          end if;
       end Id_With_Casing;
@@ -3813,20 +3800,12 @@ package body Pp.Actions is
             K : constant Ada_Node_Kind_Type :=
               (if P_Ref.Is_Null then Null_Kind else P_Ref.Kind);
          begin
---            Put
---              ("\1",
---               Id_With_Casing
---                 (Tree.Ref_Name,
---                  Tree.Decl_Kind,
---                  Tree.Is_Predef,
---                  Use_Name_Casing_For_Nils => Elab_Spec_Seen));
             Put
               ("\1",
                Id_With_Casing
                  (W_Intern (Id_Name (Tree)),
                   Kind => K,
-                  Is_Predef => False,
-                  Use_Name_Casing_For_Nils => False));
+                  Is_Predef => False));
          end Do_Usage_Name;
 
       --  Start of processing for Subtree_To_Ada
@@ -3853,7 +3832,7 @@ package body Pp.Actions is
             when Ada_Compilation_Unit =>
                Do_Compilation_Unit;
 
-            when Ada_Identifier => -- Usage_Names =>
+            when Ada_Identifier =>
                Do_Usage_Name;
 
             when Ada_Int_Literal | Ada_Real_Literal |
@@ -3921,7 +3900,7 @@ package body Pp.Actions is
                then
                   Interpret_Template
                     (Replace_One
-                       (Tree.Kind, From => ":=[# ~~]~!", To => ":=[$~~]~!"));
+                      (Tree.Kind, From => ":=[# ~~]~!", To => ":=[$~~]~!"));
                else
                   Interpret_Template;
                end if;
