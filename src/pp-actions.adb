@@ -2841,6 +2841,7 @@ package body Pp.Actions is
          --  fully covered by Template_Table:
 
          procedure Do_Aggregate;
+         procedure Do_Assign_Stmt;
          procedure Do_Assoc;
          procedure Do_Named_Stmt;
          procedure Do_Compilation_Unit;
@@ -2892,7 +2893,10 @@ package body Pp.Actions is
                  and then X.Kind = Ada_Aggregate
                  and then All_Named
                then
-                  if X.Parent.Kind in Ada_Object_Decl | Ada_Enum_Rep_Clause then
+                  if X.Parent.Kind in Ada_Object_Decl |
+                    Ada_Assign_Stmt |
+                    Ada_Enum_Rep_Clause
+                  then
                      Result := True;
                   elsif X.Parent.Kind = Ada_Aggregate_Assoc then
                      declare
@@ -2915,6 +2919,16 @@ package body Pp.Actions is
                Interpret_Template ("#(?~~ with #~?~,# ~~)");
             end if;
          end Do_Aggregate;
+
+         procedure Do_Assign_Stmt is
+         begin
+            if Is_Vertical_Aggregate (F_Expr (Tree.As_Assign_Stmt)) then
+               Interpret_Template
+                 (Replace_One (Tree.Kind, From => ":=[# !]", To => ":=[$!]"));
+            else
+               Interpret_Template;
+            end if;
+         end Do_Assign_Stmt;
 
          procedure Do_Assoc is
             --  Some have a single name before the "=>", and some have a list
@@ -3782,8 +3796,10 @@ package body Pp.Actions is
               Ada_Private_Type_Def
             then
                Interpret_Template ("type !! is[# !]" & Aspects);
-            elsif Def.Kind in Ada_Enum_Type_Def | Ada_Array_Type_Def
-              and then Arg (Cmd, Vertical_Named_Aggregates)
+            elsif (Def.Kind = Ada_Enum_Type_Def
+                     and then Arg (Cmd, Vertical_Enum_Types))
+              or else (Def.Kind = Ada_Array_Type_Def
+                         and then Arg (Cmd, Vertical_Array_Types))
             then
                Interpret_Template ("type !! is$[!" & Aspects & "]");
             else
@@ -3856,6 +3872,9 @@ package body Pp.Actions is
 
             when Ada_Task_Def =>
                Do_Task_Def;
+
+            when Ada_Assign_Stmt =>
+               Do_Assign_Stmt;
 
             when Ada_Param_Assoc |
               Ada_Aggregate_Assoc |
