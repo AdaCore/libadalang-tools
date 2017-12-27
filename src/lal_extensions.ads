@@ -78,6 +78,9 @@ package LAL_Extensions is
    --  Returns the full expanded name. The L_Full_Name is converted to lower
    --  case.  ????????????????That comment is wrong.  So is the name.
 
+   function Is_Def_Name (Node : Base_Id'Class) return Boolean;
+   --  True if it's a defining name
+
    function Get_Def_Name (Decl : Ada_Node'Class) return Name;
    --  Returns the defining name of a declaration or body
 
