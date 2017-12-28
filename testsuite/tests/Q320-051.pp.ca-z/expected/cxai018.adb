@@ -59,7 +59,7 @@ procedure Cxai018 is
    My_Default_Value : constant := 999.0;
 
    type My_Float is new Float with
-        Default_Value => My_Default_Value;
+      Default_Value => My_Default_Value;
 
    package My_Vectors is new Ada.Containers.Vectors
      (Index_Type   => Natural,

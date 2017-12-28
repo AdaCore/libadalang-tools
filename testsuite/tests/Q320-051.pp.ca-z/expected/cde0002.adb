@@ -64,12 +64,12 @@ procedure Cde0002 is
       X : constant Integer;
 
       type A is new Natural with
-           Size => X; -- ANX-C RQMT; OK, doesn't freeze X
+         Size => X; -- ANX-C RQMT; OK, doesn't freeze X
 
       type B is record
          M, N : Integer;
       end record with
-           Size => 2 * A'Size;   -- ANX-C RQMT; OK, doesn't freeze A
+         Size => 2 * A'Size;   -- ANX-C RQMT; OK, doesn't freeze A
 
    private
       X : constant Integer := Integer'Size; -- OK not yet frozen

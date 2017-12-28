@@ -63,7 +63,7 @@ procedure Cxai030 is
    My_Default_Value : constant := 999.0;
 
    type My_Float is new Float with
-        Default_Value => My_Default_Value;
+      Default_Value => My_Default_Value;
 
    package My_Bounded_Ordered_Sets is new Ada.Containers.Bounded_Ordered_Sets
      (Element_Type => My_Float); -- Default < and Default =
@@ -101,7 +101,8 @@ procedure Cxai030 is
    procedure Tampering_Check
      (Container : in out My_Bounded_Ordered_Sets.Set;
       Where     : in     String) with
-      Pre => not Container.Is_Empty is
+      Pre => not Container.Is_Empty
+    is
 
       Program_Error_Raised : Boolean := False;
 

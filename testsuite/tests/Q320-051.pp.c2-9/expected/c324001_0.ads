@@ -63,7 +63,7 @@ package C324001_0 is
    pragma Assertion_Policy (Check);
 
    type Even is range 0 .. Integer'Last with
-        Dynamic_Predicate => (Even mod 2) = 0;
+      Dynamic_Predicate => (Even mod 2) = 0;
 
    type Color is (Red, Orange, Yellow, Green, Blue, Indigo, Violet);
    subtype Rgb is Color with

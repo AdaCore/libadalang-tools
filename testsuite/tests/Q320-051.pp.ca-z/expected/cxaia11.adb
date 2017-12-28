@@ -204,7 +204,8 @@ begin
          Expected  : in     String;
          New_Item  : in     String;
          Test_Case : in     String) with
-         Pre => Value'Length = New_Item'Length is
+         Pre => Value'Length = New_Item'Length
+       is
       begin
          Tampering_Check (Container => My_Map_1, Where => Test_Case);
          -- The tampering check here prevents the Value parameter to this

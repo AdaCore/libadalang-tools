@@ -61,7 +61,7 @@ private
 
    type Untagged_Partial_Untagged_Array_Full is
      array (1 .. 8) of Character with
-        Default_Component_Value => 'L';
+      Default_Component_Value => 'L';
       -- predefined equality checks that all components are equal
 
 --function "=" (L, R : in Untagged_Partial_Untagged_Array_Full) return Boolean;

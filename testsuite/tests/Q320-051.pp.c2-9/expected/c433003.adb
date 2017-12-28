@@ -48,13 +48,13 @@ with Ada.Finalization;
 procedure C433003 is
    type Color_Type is
      (Unknown, Red, Orange, Yellow, Green, Blue, Indigo, Violet) with
-        Default_Value => Unknown;
+      Default_Value => Unknown;
 
    type Default_To_Zero_Type is range -10_000 .. 10_000 with
-        Default_Value => 0;
+      Default_Value => 0;
 
    type Half_Type is digits 4 with
-        Default_Value => 0.5;
+      Default_Value => 0.5;
 
    type Ta is array (1 .. 3) of Color_Type;
    type Ta2 is array (1 .. 2, 1 .. 4) of Color_Type;

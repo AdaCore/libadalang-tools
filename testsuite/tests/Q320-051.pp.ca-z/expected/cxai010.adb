@@ -59,7 +59,7 @@ procedure Cxai010 is
    My_Default_Value : constant := 999.0;
 
    type My_Float is new Float with
-        Default_Value => My_Default_Value;
+      Default_Value => My_Default_Value;
 
    package My_Bounded_Vectors is new Ada.Containers.Bounded_Vectors
      (Index_Type   => Natural,
@@ -93,7 +93,8 @@ procedure Cxai010 is
    procedure Tampering_Check
      (Container : in out My_Bounded_Vectors.Vector;
       Where     : in     String) with
-      Pre => not Container.Is_Empty is
+      Pre => not Container.Is_Empty
+    is
 
       Program_Error_Raised : Boolean := False;
 

@@ -58,7 +58,8 @@
 --!
 with Ada.Streams.Stream_Io;
 package Cxac007_Logger with
-   Preelaborate is
+   Preelaborate
+ is
 
    procedure Log_Item (To : in String; Item : in String);
    -- Write an item to the log file named To. Note: We have to pass the file

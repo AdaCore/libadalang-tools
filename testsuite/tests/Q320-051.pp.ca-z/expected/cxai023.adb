@@ -62,7 +62,7 @@ procedure Cxai023 is
    My_Default_Value : constant := 999.0;
 
    type My_Float is new Float with
-        Default_Value => My_Default_Value;
+      Default_Value => My_Default_Value;
 
    package My_Ordered_Sets is new Ada.Containers.Ordered_Sets
      (Element_Type => My_Float); -- Default < and Default =

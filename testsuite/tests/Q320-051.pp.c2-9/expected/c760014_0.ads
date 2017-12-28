@@ -53,7 +53,8 @@
 --!
 with Ada.Finalization;
 package C760014_0 with
-   Pure is
+   Pure
+ is
 
    type Tc_Count is record
       Init_Count, Fin_Count : Natural := 0;

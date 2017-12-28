@@ -56,7 +56,7 @@ procedure Cxai007 is
    My_Default_Value : constant := 999.0;
 
    type My_Float is new Float with
-        Default_Value => My_Default_Value;
+      Default_Value => My_Default_Value;
 
    package My_Multiway_Trees is new Ada.Containers.Multiway_Trees
      (Element_Type => My_Float); -- Default =

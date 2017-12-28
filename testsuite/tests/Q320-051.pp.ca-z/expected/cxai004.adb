@@ -60,7 +60,7 @@ procedure Cxai004 is
    My_Default_Value : constant := 999.0;
 
    type My_Float is new Float with
-        Default_Value => My_Default_Value;
+      Default_Value => My_Default_Value;
 
    type My_Key_Type is new Integer;
 

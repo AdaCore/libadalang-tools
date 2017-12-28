@@ -92,18 +92,18 @@ package Cd30006_0 is
    subtype Storage_Element is System.Storage_Elements.Storage_Element;
 
    type Some_Stuff is array (1 .. S_Units_Per_Word) of Storage_Element with
-        Alignment => Impdef.Max_Default_Alignment;           -- ANX-C RQMT.
+      Alignment => Impdef.Max_Default_Alignment;           -- ANX-C RQMT.
 
    Library_Level_Object : Some_Stuff with
       Alignment => Impdef.Max_Linker_Alignment;            -- ANX-C RQMT.
 
    type Quarter is mod 4 -- two bits
    with
-        Alignment => Small_Alignment;                        -- ANX-C RQMT.
+      Alignment => Small_Alignment;                        -- ANX-C RQMT.
 
    type Half is mod 16 -- nibble
    with
-        Alignment => Multiple_Type_Alignment;                -- ANX-C RQMT.
+      Alignment => Multiple_Type_Alignment;                -- ANX-C RQMT.
 
    Multiple_Type_Alignment : constant :=
      Integer'Min (Impdef.Max_Default_Alignment, 2 * S_Units_Per_Word);

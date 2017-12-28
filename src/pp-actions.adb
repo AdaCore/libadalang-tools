@@ -446,6 +446,10 @@ package body Pp.Actions is
    --  lines.
 
    Aspects : constant Ada_Template := "?~~~";
+   Aspects_Is : constant Ada_Template := "?~~$~";
+   --  The "_Is" template is used when the aspect specifications are followed
+   --  by "is", which we want to put on a new line (if aspect specifications
+   --  are present).
 
    function L (T1 : Ada_Template) return Ada_Template_Ptr is
    begin
@@ -526,8 +530,8 @@ package body Pp.Actions is
            when Ada_Param_Spec => null,
            when Ada_Base_Package_Decl =>
              L ("package !#",
-                Aspects,
-                "# is$",
+                Aspects_Is,
+                " is$",
                 "!",
                 "!",
                 "end !1/"),
@@ -558,17 +562,17 @@ package body Pp.Actions is
            when Ada_Task_Body_Stub =>
              L ("task body ! is separate", Aspects),
            when Ada_Package_Body =>
-             L ("package body ![#",
-                Aspects,
-                "]# is$",
+             L ("package body !",
+                Aspects_Is,
+                " is$",
                 "!",
                 "!",
                 "end !1/"),
            when Ada_Protected_Body =>
-             L ("protected body !", Aspects, " is$", "!", "end !1/"),
+             L ("protected body !", Aspects_Is, " is$", "!", "end !1/"),
            when Ada_Subp_Body =>
              L ("?~~ ~!",
-                Aspects,
+                Aspects_Is,
                 "#+1 is$",
                 "!",
                 "!",
@@ -583,7 +587,7 @@ package body Pp.Actions is
 
            when Ada_Task_Body =>
              L ("task body !",
-                Aspects,
+                Aspects_Is,
                 " is$",
                 "!",
                 "!",
@@ -634,13 +638,13 @@ package body Pp.Actions is
              L ("package !!", Aspects),
            when Ada_Single_Protected_Decl =>
              L ("protected !",
-                Aspects,
+                Aspects_Is,
                 " is? new ~ and ~ with~$",
                 "!",
                 "end !1"),
            when Ada_Protected_Type_Decl =>
              L ("protected type !!",
-                Aspects,
+                Aspects_Is,
                 " is? new ~ and ~ with~$",
                 "!",
                 "end !1"),
@@ -653,10 +657,10 @@ package body Pp.Actions is
            when Ada_Single_Task_Decl =>
              L ("!"),
            when Ada_Single_Task_Type_Decl =>
-             L ("task !!", Aspects, "? is$~~~"),
+             L ("task !!", Aspects_Is, "? is$~~~"),
            when Ada_Task_Type_Decl =>
              L ("task type !!",
-                Aspects,
+                Aspects_Is,
                 "? is~~~"),
            when Ada_Task_Def =>
              L ("? new ~ and ~ with~$",
@@ -3780,32 +3784,26 @@ package body Pp.Actions is
             then
                if Is_Nil (Tree.As_Type_Decl.F_Aspects) then
                   if Arg (Cmd, Split_Line_Before_Record) then
-                     Interpret_Template ("type !! is${!}[" & Aspects & "]");
+                     Interpret_Template ("type !! is${!}" & Aspects);
                   else
-                     Interpret_Template ("type !! is ![" & Aspects & "]");
+                     Interpret_Template ("type !! is !" & Aspects);
                      --  Otherwise, we could have a line break just before the
                      --  last semicolon.
                   end if;
                else
-                  Interpret_Template ("type !! is ![#" & Aspects & "]");
+                  Interpret_Template ("type !! is !" & Aspects);
                end if;
             elsif Def.Kind = Ada_Access_To_Subp_Def then
                Interpret_Template ("type !! is !" & Aspects);
                --  gnatpp doesn't put a line break after "is" in this case.
-            elsif Tree.As_Type_Decl.F_Type_Def.Kind =
-              Ada_Private_Type_Def
-            then
-               Interpret_Template ("type !! is[# !]" & Aspects);
             elsif (Def.Kind = Ada_Enum_Type_Def
                      and then Arg (Cmd, Vertical_Enum_Types))
               or else (Def.Kind = Ada_Array_Type_Def
                          and then Arg (Cmd, Vertical_Array_Types))
             then
-               Interpret_Template ("type !! is$[!" & Aspects & "]");
+               Interpret_Template ("type !! is$[!]" & Aspects);
             else
-               Interpret_Template ("type !! is[# !" & Aspects & "]");
-               --  ???To mimic gnatpp.  Better to use the same template as
-               --  Ada_Private_Type_Def above.
+               Interpret_Template ("type !! is[# !]" & Aspects);
             end if;
          end Do_Type_Decl;
 

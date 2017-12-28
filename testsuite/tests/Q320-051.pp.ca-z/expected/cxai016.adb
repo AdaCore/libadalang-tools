@@ -60,7 +60,7 @@ procedure Cxai016 is
    My_Default_Value : constant := 999.0;
 
    type My_Float is new Float with
-        Default_Value => My_Default_Value;
+      Default_Value => My_Default_Value;
 
    package My_Bounded_Multiway_Trees is new Ada.Containers
      .Bounded_Multiway_Trees
@@ -98,7 +98,8 @@ procedure Cxai016 is
    procedure Tampering_Check
      (Container : in out My_Bounded_Multiway_Trees.Tree;
       Where     : in     String) with
-      Pre => not Container.Is_Empty is
+      Pre => not Container.Is_Empty
+    is
 
       My_Cursor : My_Bounded_Multiway_Trees.Cursor :=
         My_Bounded_Multiway_Trees.First_Child (Parent => Container.Root);

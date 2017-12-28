@@ -59,7 +59,7 @@ procedure Cxai019 is
    My_Default_Value : constant := 999.0;
 
    type My_Float is new Float with
-        Default_Value => My_Default_Value;
+      Default_Value => My_Default_Value;
 
    package My_Doubly_Linked_Lists is new Ada.Containers.Doubly_Linked_Lists
      (Element_Type => My_Float); -- Default =

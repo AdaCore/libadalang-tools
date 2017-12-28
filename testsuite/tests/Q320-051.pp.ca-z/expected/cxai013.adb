@@ -60,7 +60,7 @@ procedure Cxai013 is
    My_Default_Value : constant := 999.0;
 
    type My_Float is new Float with
-        Default_Value => My_Default_Value;
+      Default_Value => My_Default_Value;
 
    type My_Key_Type is new Integer;
 
@@ -91,7 +91,8 @@ procedure Cxai013 is
    procedure Tampering_Check
      (Container : in out My_Bounded_Ordered_Maps.Map;
       Where     : in     String) with
-      Pre => not Container.Is_Empty is
+      Pre => not Container.Is_Empty
+    is
 
       Program_Error_Raised : Boolean := False;
 

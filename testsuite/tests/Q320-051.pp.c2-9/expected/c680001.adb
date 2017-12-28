@@ -61,7 +61,7 @@ with Report;
 
 procedure C680001 is
    type Index is mod 11 with
-        Default_Value => 0;
+      Default_Value => 0;
    Index_Var : Index;
    type Vector is array (Index) of aliased Index;
    Vector_Var : Vector;

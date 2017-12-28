@@ -10,25 +10,25 @@ package Cd30007_1 is
    -- Contains types to check.
 
    type Check_Enum_Type is (Zero, One, Two) with
-        Size => Smallest_Unsigned_Enum_Size;            -- ANX-C RQMT.
+      Size => Smallest_Unsigned_Enum_Size;            -- ANX-C RQMT.
 
    type Check_Int_Type is range -63 .. 63 with
-        Size => Smallest_Signed_Int_Size;               -- ANX-C RQMT.
+      Size => Smallest_Signed_Int_Size;               -- ANX-C RQMT.
 
    type Check_Mod_Type is mod 256 with
-        Size => Smallest_Unsigned_Mod_Size;             -- ANX-C RQMT.
+      Size => Smallest_Unsigned_Mod_Size;             -- ANX-C RQMT.
 
    type Derived_Enum is new Cd30007_0.Basic_Enum with
-        Size => Cd30007_0.Specified_Enum_Size;          -- ANX-C RQMT.
+      Size => Cd30007_0.Specified_Enum_Size;          -- ANX-C RQMT.
 
    type Derived_Int is new Cd30007_0.Basic_Int with
-        Size => Cd30007_0.Specified_Int_Size;           -- ANX-C RQMT.
+      Size => Cd30007_0.Specified_Int_Size;           -- ANX-C RQMT.
 
    type Pack_Enum is (A1, B1, C1, D1, E1, F1, G1) with
-        Size => Cd30007_0.Specified_Enum_Size;          -- ANX-C RQMT.
+      Size => Cd30007_0.Specified_Enum_Size;          -- ANX-C RQMT.
 
    type Pack_Int is range -125 .. 125 with
-        Size => Cd30007_0.Specified_Int_Size;           -- ANX-C RQMT.
+      Size => Cd30007_0.Specified_Int_Size;           -- ANX-C RQMT.
 
    type Private_Enum is private;
 
@@ -47,12 +47,12 @@ package Cd30007_1 is
 private
 
    type Private_Enum is (A2, B2, C2, D2, E2, F2, G2) with
-        Size => Cd30007_0.Specified_Enum_Size;          -- ANX-C RQMT.
+      Size => Cd30007_0.Specified_Enum_Size;          -- ANX-C RQMT.
 
    Pe_Value : constant Private_Enum := D2;
 
    type Private_Int is range -125 .. 125 with
-        Size => Cd30007_0.Specified_Int_Size;           -- ANX-C RQMT.
+      Size => Cd30007_0.Specified_Int_Size;           -- ANX-C RQMT.
 
    Pi_Value : constant Private_Int := -87;
 

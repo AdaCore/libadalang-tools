@@ -42,7 +42,7 @@ procedure C433005 is
    type Color_Type is (Red, Orange, Yellow, Green, Blue, Indigo, Violet);
 
    type Default_To_Zero is range -10_000 .. 10_000 with
-        Default_Value => 0;
+      Default_Value => 0;
 
    function Ident_Int (Val : in Default_To_Zero) return Default_To_Zero is
      (Default_To_Zero (Report.Ident_Int (Integer (Val))));

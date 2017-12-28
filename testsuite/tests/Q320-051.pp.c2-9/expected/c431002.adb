@@ -46,13 +46,13 @@ procedure C431002 is
 
    type Color_Type is
      (Unknown, Red, Orange, Yellow, Green, Blue, Indigo, Violet) with
-        Default_Value => Unknown;
+      Default_Value => Unknown;
 
    type Default_To_Zero_Type is range -10_000 .. 10_000 with
-        Default_Value => 0;
+      Default_Value => 0;
 
    type Half_Type is digits 4 with
-        Default_Value => 0.5;
+      Default_Value => 0.5;
 
    type Null_Rec is null record;
 

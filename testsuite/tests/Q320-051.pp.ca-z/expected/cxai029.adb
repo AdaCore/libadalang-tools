@@ -62,7 +62,7 @@ procedure Cxai029 is
    My_Default_Value : constant := 999.0;
 
    type My_Float is new Float with
-        Default_Value => My_Default_Value;
+      Default_Value => My_Default_Value;
 
    use type Ada.Containers.Hash_Type;
 
@@ -139,7 +139,8 @@ procedure Cxai029 is
    procedure Tampering_Check
      (Container : in out My_Bounded_Hashed_Sets.Set;
       Where     : in     String) with
-      Pre => not Container.Is_Empty is
+      Pre => not Container.Is_Empty
+    is
 
       Program_Error_Raised : Boolean := False;
 

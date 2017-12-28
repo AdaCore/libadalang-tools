@@ -1,7 +1,8 @@
      --==================================================================--
 
 package Cxac007_Test with
-   Preelaborate is
+   Preelaborate
+ is
 
    procedure Do_Something (Log_Name : in String);
    -- A placeholder for the real application.
