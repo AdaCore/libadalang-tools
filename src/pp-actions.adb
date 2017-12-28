@@ -151,6 +151,9 @@ package body Pp.Actions is
                          Name => File_Name_File_Name.all);
          Text_IO.Close (File_Name_File);
       end if;
+
+      Dictionaries.Scan_Dictionaries
+        (Dictionary_File_Names => Arg (Cmd, Dictionary));
    end Init;
 
    -----------

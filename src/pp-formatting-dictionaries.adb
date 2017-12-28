@@ -71,6 +71,9 @@ package body Pp.Formatting.Dictionaries is
    --  entries). Return the Id of the corresponding dictionary entry, returns
    --  No_String if the dictionary does not contain such an entry.
 
+   procedure Scan_Dictionary (Dictionary_Name : String);
+   --  Scans the named dictionary file
+
    -----------------------
    -- Add_To_Dictionary --
    -----------------------
@@ -110,7 +113,7 @@ package body Pp.Formatting.Dictionaries is
       --  Provided that Name has subwords, and that the current settings of
       --  SW_Start and SW_End point to some subword, sets these indexes to
       --  point to the next subword. Set SW_Start and SW_End to 0 if there
-      --  is no subwords any more
+      --  are no more subwords.
 
       --  This procedure does not check if we have one more subword to move
       --  these indexes to.
@@ -121,7 +124,7 @@ package body Pp.Formatting.Dictionaries is
          return   String;
       --  Supposing that SW is a (sub)word having no '_' inside, returns
       --  the capitalized version of this subword according to the casing
-      --  represented by Casing
+      --  represented by Casing.
 
       -----------------
       -- Set_Subword --
@@ -253,15 +256,20 @@ package body Pp.Formatting.Dictionaries is
       return (if Has_Element (C) then Element (C) else Syms.No_Symbol);
    end Find_In_Dictionary;
 
-   ----------------------
-   -- Reset_Dictionary --
-   ----------------------
+   -----------------------
+   -- Scan_Dictionaries --
+   -----------------------
 
-   procedure Reset_Dictionary is
+   procedure Scan_Dictionaries (Dictionary_File_Names : String_Ref_Array) is
+      pragma Assert (Is_Empty (Whole_Word_Exceptions));
+      pragma Assert (Is_Empty (Subword_Exceptions));
    begin
-      Clear (Whole_Word_Exceptions);
-      Clear (Subword_Exceptions);
-   end Reset_Dictionary;
+      for D_Name of Dictionary_File_Names loop
+         if D_Name.all /= "-" then -- "--dictionary-" means no predef casing
+            Dictionaries.Scan_Dictionary (D_Name.all);
+         end if;
+      end loop;
+   end Scan_Dictionaries;
 
    ---------------------
    -- Scan_Dictionary --

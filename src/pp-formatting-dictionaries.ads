@@ -27,13 +27,11 @@
 --  dictionaries
 
 with Pp.Command_Lines; use Pp.Command_Lines;
+with Utils.Command_Lines; use Utils.Command_Lines;
 package Pp.Formatting.Dictionaries is
 
-   procedure Reset_Dictionary;
-   --  Resets the tables to empty
-
-   procedure Scan_Dictionary (Dictionary_Name : String);
-   --  Scans the dictionary file whose name is Dictionary_Name and stores all
+   procedure Scan_Dictionaries (Dictionary_File_Names : String_Ref_Array);
+   --  Scans the dictionary files given by command-line switches and stores all
    --  the casing exceptions in the exception tables.
 
    procedure Check_With_Dictionary
