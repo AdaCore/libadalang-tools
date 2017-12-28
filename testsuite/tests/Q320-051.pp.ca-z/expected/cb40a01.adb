@@ -11,7 +11,8 @@ procedure Cb40a01 is
 
 begin
 
-   Process_Block : begin
+   Process_Block :
+   begin
 
       Report.Test
         ("CB40A01",

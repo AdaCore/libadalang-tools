@@ -42,7 +42,8 @@ begin
 
    begin
 
-      Case_I : declare
+      Case_I :
+      declare
 
          subtype Stc is Integer range -2 .. 10;
          type Base is array (Stc range <>, Stc range <>) of Integer;

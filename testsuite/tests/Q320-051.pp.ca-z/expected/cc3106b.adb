@@ -42,7 +42,8 @@ begin  -- CC3106B
       "THE ACTUAL IN AN INSTANTIATION");
 
    Local_Block :
- declare
+
+   declare
 
       subtype Sm_Int is Integer range 0 .. 15;
       type Pck_Bol is array (5 .. 18) of Boolean;

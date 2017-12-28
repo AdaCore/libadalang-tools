@@ -6,7 +6,8 @@ package body Cb20001_0 is
    begin
       loop
 
-         Task_Block : begin
+         Task_Block :
+         begin
             select
                accept Contact (Location : in Location_Type) do
                   if Location > 1_000 then

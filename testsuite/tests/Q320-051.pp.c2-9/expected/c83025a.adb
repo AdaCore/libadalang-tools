@@ -54,7 +54,8 @@ begin
       "REGION OF A GENERIC SUBPROGRAM HIDES AN OUTER " &
       "DECLARATION OF A HOMOGRAPH");
 
-   One : declare                      -- SUBPROGRAM DECLARATIVE REGION.
+   One :
+   declare                      -- SUBPROGRAM DECLARATIVE REGION.
       A : Integer := Ident_Int (2);
       B : Integer := A;
 
@@ -102,7 +103,8 @@ begin
       end if;
    end One;
 
-   Two : declare               -- FORMAL PARAMETER OF GENERIC SUBPROGRAM.
+   Two :
+   declare               -- FORMAL PARAMETER OF GENERIC SUBPROGRAM.
       A   : Integer := Ident_Int (2);
       B   : Integer := A;
       Obj : Integer := Ident_Int (3);
@@ -150,7 +152,8 @@ begin
       end if;
    end Two;
 
-   Three : declare      -- AFTER THE SPECIFICATION OF GENERIC SUBPROGRAM.
+   Three :
+   declare      -- AFTER THE SPECIFICATION OF GENERIC SUBPROGRAM.
       generic
          A : Integer := Ident_Int (3);
       function Inner (X : Integer) return Integer;
@@ -197,7 +200,8 @@ begin
       end if;
    end Three;
 
-   Four : declare
+   Four :
+   declare
       A : Integer := Ident_Int (2);
 
       generic
@@ -245,7 +249,8 @@ begin
       end if;
    end Four;
 
-   Five : declare                 --  OVERLOADING OF FUNCTIONS.
+   Five :
+   declare                 --  OVERLOADING OF FUNCTIONS.
 
       Obj : Integer := 1;
       Flo : Float   := 5.0;

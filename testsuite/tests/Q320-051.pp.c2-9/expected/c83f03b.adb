@@ -126,7 +126,7 @@ begin
             Bump;
             goto T4;
             Bump;
-            <<LABEL_IN_OUTER>>
+            <<Label_In_Outer>>
             Bump;
             goto Label_In_Main;
             Bump;
@@ -142,26 +142,26 @@ begin
             Bump;
             goto Y3;
             Bump;
-            <<LABEL_IN_MAIN>>
+            <<Label_In_Main>>
             Bump;
             goto Ending;
             Bump;
 
-            <<ENDING>>
+            <<Ending>>
             null;
 
          end P;
 
       begin
 
-         <<LABEL_IN_OUTER>>
+         <<Label_In_Outer>>
          null;
 
       end Outer;
 
    begin
 
-      <<LABEL_IN_MAIN>>
+      <<Label_In_Main>>
 
       if Flow_Index /= 12 then
          Failed ("INCORRECT FLOW OF CONTROL");

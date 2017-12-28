@@ -67,7 +67,8 @@ begin
    --------------------------------------------------
 
    Integer_And_Proc :
- declare
+
+   declare
 
       -- (A) Integer actual, integer formal, generic procedure.
 
@@ -159,7 +160,8 @@ begin
    --------------------------------------------------
 
    Integer_And_Func :
- declare
+
+   declare
 
       -- (B) Integer actual, integer formal, generic function.
 
@@ -200,7 +202,8 @@ begin
    --------------------------------------------------
 
    Access_And_Proc :
- declare
+
+   declare
 
       -- (C) Access actual, access formal, generic procedure.
 
@@ -298,7 +301,8 @@ begin
    --------------------------------------------------
 
    Access_And_Func :
- declare
+
+   declare
 
       -- (D) Access actual, access formal, generic procedure.
 
@@ -350,7 +354,8 @@ begin
    --------------------------------------------------
 
    Float_And_Proc :
- declare
+
+   declare
 
       -- (E) Float actual, float formal, generic procedure.
 
@@ -429,7 +434,8 @@ begin
    --------------------------------------------------
 
    Float_And_Func :
- declare
+
+   declare
 
       -- (F) Float actual, float formal, generic function.
 
@@ -469,7 +475,8 @@ begin
    --------------------------------------------------
 
    Enum_And_Private_And_Proc :
- declare
+
+   declare
 
       -- (G) Enumeration actual, private formal, generic procedure.
 
@@ -554,7 +561,8 @@ begin
    --------------------------------------------------
 
    Enum_And_Private_And_Func :
- declare
+
+   declare
 
       -- (B) enumeration actual, enumeration formal, generic function.
 

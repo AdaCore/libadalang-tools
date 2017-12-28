@@ -39,12 +39,14 @@ begin
 
    begin
 
-      Case_D : begin
+      Case_D :
+      begin
 
 --             COMMENT ("CASE D1 : INITIALIZATION OF CONSTRAINED " &
 --                      "ARRAY CONSTANT");
 
-         Case_D1 : declare
+         Case_D1 :
+         declare
 
             D1 : constant String (11 .. 13) := "ABC";
 
@@ -64,7 +66,8 @@ begin
 --             COMMENT ("CASE D2 : INITIALIZATION OF CONSTRAINED " &
 --                      "ARRAY VARIABLE");
 
-         Case_D2 : declare
+         Case_D2 :
+         declare
 
             D2 : String (11 .. 13) := "ABC";
 
@@ -83,7 +86,8 @@ begin
 --             COMMENT ("CASE D3 : INITIALIZATION OF CONSTRAINED " &
 --                      "ARRAY FORMAL PARAMETER OF A SUBPROGRAM");
 
-         Case_D3 : declare
+         Case_D3 :
+         declare
 
             subtype Std3 is String (Ident_Int (5) .. 7);
 
@@ -107,7 +111,8 @@ begin
 --             COMMENT ("CASE D4 : INITIALIZATION OF CONSTRAINED " &
 --                      "ARRAY FORMAL PARAMETER OF A GENERIC UNIT");
 
-         Case_D4 : declare
+         Case_D4 :
+         declare
 
             subtype Std4 is String (5 .. 8);
 

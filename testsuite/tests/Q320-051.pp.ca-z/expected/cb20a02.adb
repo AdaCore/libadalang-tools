@@ -96,7 +96,8 @@ begin
       "scope where the exception is declared and " &
       "raised");
 
-   High_Seed : begin
+   High_Seed :
+   begin
       -- This seed value will result in the raising of a HighSeedError
       -- exception.
       Seed_Number   := 1_001;
@@ -114,7 +115,8 @@ begin
          end if;
    end High_Seed;
 
-   Mid_Seed : begin
+   Mid_Seed :
+   begin
       -- This seed value will generate a Mid_Seed_Error exception.
       Seed_Number   := 101;
       Random_Number := Random_Number_Generator (Seed_Number);
@@ -131,7 +133,8 @@ begin
          end if;
    end Mid_Seed;
 
-   Low_Seed : begin
+   Low_Seed :
+   begin
       -- This seed value will result in the raising of a
       -- L_o_w_S_e_e_d_E_r_r_o_r exception.
       Seed_Number   := 11;

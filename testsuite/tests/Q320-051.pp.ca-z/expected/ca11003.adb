@@ -17,9 +17,9 @@ begin
 
    File_Processing :         -- Validate all of the capabilities contained in
    -- the Menu package by exercising them on specific files. This will
-      -- demonstrate the use of child and grandchild functionality based on
-      -- components that have been declared in the parent/grandparent package.
-      declare
+   -- demonstrate the use of child and grandchild functionality based
+   -- on components that have been declared in the parent/grandparent package.
+   declare
 
       function Validate
         (File : Ca11003_0.Ca11003_1.Extended_File_Type) return Boolean renames

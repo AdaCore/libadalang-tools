@@ -152,7 +152,8 @@ begin  -- Main test procedure.
 
    Report.Test ("C354003", "Check Wide_String attributes of modular types");
 
-   Wide_Strings_Needed : declare
+   Wide_Strings_Needed :
+   declare
 
       Max_Bin_Mod_Div_3 : constant := Max_Binary'Modulus / 3;
       Max_Non_Mod_Div_4 : constant := Max_Nonbinary'Modulus / 4;

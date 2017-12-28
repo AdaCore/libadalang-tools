@@ -87,7 +87,8 @@ begin  -- Main test procedure.
 
 -- Check the tag generated for an aggregate.
 
-   Rentals : declare
+   Rentals :
+   declare
       Mikes_Rental : Vehicle.Object'Class :=
         Vehicle.Object'(3, (Good, Flat, Worn));
       Diannes_Car : Vehicle.Object'Class :=

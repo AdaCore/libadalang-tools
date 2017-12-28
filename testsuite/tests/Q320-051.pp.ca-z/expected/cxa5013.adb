@@ -72,7 +72,8 @@ begin
       "will yield each value in its result subtype " &
       "in a finite number of calls");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Ada.Numerics;
 

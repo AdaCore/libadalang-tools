@@ -19,7 +19,8 @@ begin
       "Check that an exception declared in a package " &
       "can be raised by a child of a child package");
 
-   Multiply_Complex_Subtest : declare
+   Multiply_Complex_Subtest :
+   declare
       Operand_1 : Complex_Array_Type :=
         (Complex
            (Int_Type (Report.Ident_Int (3)),
@@ -72,7 +73,8 @@ begin
 
    end Multiply_Complex_Subtest;
 
-   Add_Complex_Subtest : declare
+   Add_Complex_Subtest :
+   declare
       Operand_1 : Complex_Array_Type :=
         (Complex
            (Int_Type (Report.Ident_Int (2)),
@@ -123,7 +125,8 @@ begin
          -- in caller.
    end Add_Complex_Subtest;
 
-   Inverse_Complex_Subtest : declare
+   Inverse_Complex_Subtest :
+   declare
       Operand_1 : Complex_Array_Type :=
         (Complex
            (Int_Type (Report.Ident_Int (1)),

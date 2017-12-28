@@ -45,7 +45,8 @@ begin
 
    --------------------------------------------------
 
-   A : declare
+   A :
+   declare
 
       task T is
          entry E;
@@ -80,7 +81,8 @@ begin
 
    --------------------------------------------------
 
-   B : declare
+   B :
+   declare
 
       task T is
          entry E;

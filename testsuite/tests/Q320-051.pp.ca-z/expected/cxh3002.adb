@@ -45,7 +45,8 @@ begin  -- Main test procedure.
 
    Report.Test ("CXH3002", "Check pragma Inspection_Point");
 
-   Enclosure : declare
+   Enclosure :
+   declare
       Main_Final : Cxh3002_0.Cxh3002_1.Final;
       Xtra_Final : Cxh3002_0.Cxh3002_1.Final;
    begin

@@ -42,7 +42,8 @@ begin
 
    begin
 
-      Case_E : declare
+      Case_E :
+      declare
 
          subtype Ste is Integer range 2 .. 10;
 

@@ -25,7 +25,8 @@ begin
       "raise End_Error if the end of stream is reached before the " &
       "reading of a value is completed");
 
-   Read : declare
+   Read :
+   declare
       X : R (Ident_Int (13));
    begin
       Clear (S);
@@ -66,7 +67,8 @@ begin
 
    end Read;
 
-   Input : declare
+   Input :
+   declare
       X : R (Ident_Int (-11));
    begin
       Clear (S);

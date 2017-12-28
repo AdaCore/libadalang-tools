@@ -118,7 +118,8 @@ begin
       Report.Failed ("Wrong values for Incomplete4_Obj_1.ID");
    end if;
 
-   Test1 : declare
+   Test1 :
+   declare
 
       Incomplete8_Obj_1 : Incomplete8 (10);
 
@@ -137,7 +138,8 @@ begin
 
    end Test1;
 
-   Test2 : declare
+   Test2 :
+   declare
 
       Incomplete8_Obj_2 : Incomplete8 (5);
 

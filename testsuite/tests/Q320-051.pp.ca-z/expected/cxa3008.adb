@@ -120,7 +120,8 @@ begin
       "Wide_Wide_Strings defined in package Ada.Wide_Wide_Characters.Handling provide " &
       "correct results when given wide character/string input parameters");
 
-   Wide_Wide_Character_Block : declare
+   Wide_Wide_Character_Block :
+   declare
       Offset : constant Integer :=
         Wide_Wide_Character'Pos ('a') - Wide_Wide_Character'Pos ('A');
    begin
@@ -185,7 +186,8 @@ begin
 
    end Wide_Wide_Character_Block;
 
-   Greek_Wide_Wide_Character_Block : declare
+   Greek_Wide_Wide_Character_Block :
+   declare
       -- Small Alpha - Capital Alpha
       Offset : constant Integer := 16#3B1# - 16#0391#;
    begin
@@ -285,7 +287,8 @@ begin
 
    end Greek_Wide_Wide_Character_Block;
 
-   Wide_Wide_String_Block : declare
+   Wide_Wide_String_Block :
+   declare
 
       Lc_Wide_Wide_String_1 : constant Wide_Wide_String := "az";
 
@@ -310,7 +313,8 @@ begin
 
    end Wide_Wide_String_Block;
 
-   Greek_Wide_Wide_String_Block : declare
+   Greek_Wide_Wide_String_Block :
+   declare
 
       Lc_Wide_Wide_String_1 : constant Wide_Wide_String :=
         (Wide_Wide_Character'Val (16#03B1#),  -- Small Alpha

@@ -69,7 +69,8 @@ begin
       "the package Text_IO.Complex_IO " &
       "provide correct results");
 
-   Test_For_Text_Io_Support : declare
+   Test_For_Text_Io_Support :
+   declare
       use Ada;
 
       Data_File     : Ada.Text_Io.File_Type;
@@ -89,7 +90,8 @@ begin
          Mode => Ada.Text_Io.Out_File,
          Name => Data_Filename);
 
-      Test_Block : declare
+      Test_Block :
+      declare
 
          Tc_Verbose : Boolean := False;
 
@@ -355,7 +357,8 @@ begin
 
             -- Verify that Layout_Error is raised if the given string is too
             -- short to hold the formatted output.
-            Layout_Error_On_Put : declare
+            Layout_Error_On_Put :
+            declare
                Much_Too_Short : String (1 .. 2);
                Complex_Value  : Complex_Pack.Complex := (5.0, 0.0);
             begin

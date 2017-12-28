@@ -45,7 +45,8 @@ begin
       "Check that the type File_Access is available " &
       "in Ada.Text_IO, and that objects of this " &
       "type designate File_Type objects");
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Ada.Exceptions;
 
@@ -222,7 +223,8 @@ begin
       -- Reset the New_Input_File to mode In_File, to allow it to act as the
       -- current system input file.
 
-      Reset1 : begin
+      Reset1 :
+      begin
          Reset (New_Input_File, In_File);
       exception
          when Ada.Text_Io.Use_Error =>
@@ -275,7 +277,8 @@ begin
       -- Reset the first Error file to Append_File mode, and then set it to
       -- function as the current system error file.
 
-      Reset2 : begin
+      Reset2 :
+      begin
          Reset (New_Error_File_1, Append_File);
       exception
          when Ada.Text_Io.Use_Error =>
@@ -289,7 +292,8 @@ begin
       -- Reset the second Error file to In_File mode, then set it to become the
       -- current system input file.
 
-      Reset3 : begin
+      Reset3 :
+      begin
          Reset (New_Error_File_2, In_File);
       exception
          when Ada.Text_Io.Use_Error =>
@@ -323,7 +327,8 @@ begin
       --       its original state, and these user-defined files are no longer
       --       designated as current system files, allowing a Reset.
 
-      Reset4 : begin
+      Reset4 :
+      begin
          Reset (New_Error_File_1, In_File);
       exception
          when Ada.Text_Io.Use_Error =>
@@ -332,7 +337,8 @@ begin
             raise No_Reset;
       end Reset4;
 
-      Reset5 : begin
+      Reset5 :
+      begin
          Reset (New_Error_File_2, In_File);
       exception
          when Ada.Text_Io.Use_Error =>
@@ -341,7 +347,8 @@ begin
             raise No_Reset;
       end Reset5;
 
-      Reset6 : begin
+      Reset6 :
+      begin
          Reset (New_Output_File, In_File);
       exception
          when Ada.Text_Io.Use_Error =>
@@ -370,7 +377,8 @@ begin
             Exception_Name (The_Error));
    end Test_Block;
 
-   Delete_Block : begin
+   Delete_Block :
+   begin
       Delete_File (New_Input_File, 1);
       Delete_File (New_Output_File, 2);
       Delete_File (New_Error_File_1, 3);

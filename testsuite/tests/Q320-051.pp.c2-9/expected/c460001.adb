@@ -117,7 +117,8 @@ begin -- C460001
       C460001_0.P_E,
       "Allocator level 2, " & "level 1 access type");
 
-   Block_L2 : declare
+   Block_L2 :
+   declare
       X2 : aliased C460001_0.Desig;                               -- Level = 2.
       type Acc_L2 is access all C460001_0.Desig;                  -- Level = 2.
       Expr_L2 : Acc_L2 := X1'Access;

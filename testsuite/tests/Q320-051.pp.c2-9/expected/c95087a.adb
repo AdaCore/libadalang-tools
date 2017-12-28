@@ -126,7 +126,8 @@ begin
 
    ---------------------------------------------
 
-   B : declare  -- (B)
+   B :
+   declare  -- (B)
 
       package Pkg is
 
@@ -220,7 +221,8 @@ begin
 
    ---------------------------------------------
 
-   C : declare  -- (C)
+   C :
+   declare  -- (C)
 
       package Pkg is
 
@@ -312,7 +314,8 @@ begin
 
    ---------------------------------------------
 
-   D : declare  -- (D)
+   D :
+   declare  -- (D)
 
       type Atype is array (Integer range <>, Positive range <>) of Character;
 

@@ -43,7 +43,8 @@ begin
 
    begin
 
-      Case_E : declare
+      Case_E :
+      declare
 
          subtype Str_Range is Integer range 2 .. 10;
          type Str is array (Str_Range range <>) of Character;

@@ -19,7 +19,8 @@ begin
       "ability to store and retrieve objects of " &
       "tagged types from in-memory buffers");
 
-   Test_For_Direct_Io_Support : begin
+   Test_For_Direct_Io_Support :
+   begin
 
       -- The following Create does not have any bearing on the test scenario,
       -- but is included to check that the implementation supports Direct_IO
@@ -38,14 +39,16 @@ begin
 
    end Test_For_Direct_Io_Support;
 
-   Deletion : begin
+   Deletion :
+   begin
       Dir_Io.Delete (Test_File);
    exception
       when others =>
          Report.Failed ("Delete not properly implemented for Direct_IO");
    end Deletion;
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Cxa9002_0;
 
@@ -252,7 +255,8 @@ begin
          Chk_Dio.Delete (Chk_File);
          Sav_Dio.Delete (Sav_File);
 
-         Data_Verification_Block : begin
+         Data_Verification_Block :
+         begin
 
             if Account /= Tc_Account then
                Report.Failed ("Incorrect Account object reconstructed");
@@ -288,7 +292,8 @@ begin
          -- reconstruction are compared with tag values of objects stored
          -- prior to processing.
 
-         Tag_Verification_Block : begin
+         Tag_Verification_Block :
+         begin
 
             if Tc_Account_Type_Tag.all /=
               Ada.Tags.External_Tag (Account_Type'Class (Account)'Tag)

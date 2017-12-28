@@ -45,7 +45,8 @@ begin
 
    begin
 
-      Case_B : declare
+      Case_B :
+      declare
 
          subtype Stb is Integer range Ident_Int (-8) .. -5;
          type Tb is array (Stb range <>) of Integer;

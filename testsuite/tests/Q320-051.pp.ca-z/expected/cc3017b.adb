@@ -61,7 +61,8 @@ begin
    --------------------------------------------------
 
    Nonstat_Array_Parms :
- declare
+
+   declare
 
 --        (A) ARRAY PARAMETERS CONSTRAINED WITH NONSTATIC BOUNDS AND
 --            INITIALIZED WITH A STATIC AGGREGATE.
@@ -118,7 +119,8 @@ begin
    --------------------------------------------------
 
    Scalar_Non_Static :
- declare
+
+   declare
 
 --        (B) A SCALAR PARAMETER WITH NON-STATIC RANGE CONSTRAINTS
 --            INITIALIZED WITH A STATIC VALUE.
@@ -167,7 +169,8 @@ begin
    --------------------------------------------------
 
    Rec_Non_Stat_Comps :
- declare
+
+   declare
 
 --        (C) A RECORD PARAMETER WHOSE COMPONENTS HAVE NON-STATIC
 --            CONSTRAINTS INITIALIZED WITH A STATIC AGGREGATE.
@@ -231,7 +234,8 @@ begin
    --------------------------------------------------
 
    First_Static_Array :
- declare
+
+   declare
 
 --        (D) AN ARRAY PARAMETER CONSTRAINED WITH STATIC BOUNDS ON SUB-
 --            SCRIPTS AND NON-STATIC BOUNDS ON COMPONENTS, INITIALIZED
@@ -306,7 +310,8 @@ begin
    --------------------------------------------------
 
    Second_Static_Array :
- declare
+
+   declare
 
 --        (D) AN ARRAY PARAMETER CONSTRAINED WITH STATIC BOUNDS ON SUB-
 --            SCRIPTS AND NON-STATIC BOUNDS ON COMPONENTS, INITIALIZED
@@ -377,7 +382,8 @@ begin
    --------------------------------------------------
 
    Rec_Non_Static_Cons :
- declare
+
+   declare
 
 --        (E) A RECORD PARAMETER WITH A NON-STATIC CONSTRAINT
 --            INITIALIZED WITH A STATIC AGGREGATE.

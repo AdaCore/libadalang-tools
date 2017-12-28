@@ -93,7 +93,8 @@ begin
       "Check that the procedures To_COBOL and " &
       "To_Ada produce correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       package Bnd is new Ada.Strings.Bounded.Generic_Bounded_Length (10);
       package Unb renames Ada.Strings.Unbounded;

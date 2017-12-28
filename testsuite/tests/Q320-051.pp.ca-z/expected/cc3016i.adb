@@ -46,7 +46,8 @@ begin
       "CHECK THAT AN INSTANTIATED PACKAGE HAS THE " &
       "PROPERTIES REQUIRED OF A PACKAGE.");
 
-   Example_5a : declare
+   Example_5a :
+   declare
       generic
          type T5a (D : Positive) is private;
       package Gp5a is

@@ -90,7 +90,8 @@ begin
      ("C94001G",
       "TERMINATION WHEN ALL DEPENDENT TASKS " & "HAVE TERMINATED");
 
-   Block : declare
+   Block :
+   declare
 
       task type Tt1;
 

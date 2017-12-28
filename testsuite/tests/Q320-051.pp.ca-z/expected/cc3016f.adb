@@ -59,7 +59,8 @@ begin
       "TYPE IN THE INSTANCE ARE DETERMINED BY " &
       "THE ACTUAL TYPE DENOTED BY THE FORMAL " &
       "PARAMETER (AI-00398)");
-   Example_2 : declare
+   Example_2 :
+   declare
       generic
          type Priv is private;
       package Gp2 is
@@ -94,7 +95,8 @@ begin
 
    end Example_2;
 
-   Example_3 : declare
+   Example_3 :
+   declare
       generic
          type T3 is range <>;
       package Gp3 is
@@ -132,7 +134,8 @@ begin
       end if;
    end Example_3;
 
-   Example_4 : declare
+   Example_4 :
+   declare
       generic
          type T4 is limited private;
       package Gp4 is
@@ -150,7 +153,8 @@ begin
       end if;
    end Example_4;
 
-   Example_5 : declare
+   Example_5 :
+   declare
       generic
          type T5 (D : Positive) is private;
       package Gp5 is

@@ -67,7 +67,8 @@ begin
       "Ada.Strings.Maps are available and/or produce " &
       "correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       Midpoint_Letter : constant := 13;
       Last_Letter     : constant := 26;

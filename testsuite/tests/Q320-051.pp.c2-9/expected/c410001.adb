@@ -29,7 +29,8 @@ procedure C410001 is
       Some_Integer : Integer := 0;
    begin
       for Cases in Case_Numbers loop
-         Catch_Exception : begin
+         Catch_Exception :
+         begin
             case Cases is
                when 1 =>
                   Proc_Ref_Var.all;

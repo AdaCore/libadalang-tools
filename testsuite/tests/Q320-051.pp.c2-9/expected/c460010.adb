@@ -27,7 +27,8 @@ begin
       Target : Arr;
    begin
       ---=---=---=---=---=---=---
-      Case_1 : begin
+      Case_1 :
+      begin
          Target := (1 => (1 => 1, 2 => 2, 3 => 3));  -- Named associations.
 
          if not Equals (Target, Target) then
@@ -42,7 +43,8 @@ begin
 
       ---=---=---=---=---=---=---
 
-      Case_2 : begin
+      Case_2 :
+      begin
          Target := (1 => (5, 10, 15));  -- Positional associations.
 
          if not Equals (Target, Target) then
@@ -69,7 +71,8 @@ begin
       Target : Rec;
    begin
       ---=---=---=---=---=---=---
-      Case_3 : begin
+      Case_3 :
+      begin
          Target := (Disc => 4, Arr => (1 => 1, 2 => 2, 3 => 3));  -- Named.
 
          if not Equals (Target, Target) then
@@ -84,7 +87,8 @@ begin
 
       ---=---=---=---=---=---=---
 
-      Case_4 : begin
+      Case_4 :
+      begin
          Target := (Disc => 4, Arr => (1, 2, 3));    -- Positional.
 
          if not Equals (Target, Target) then
@@ -109,7 +113,8 @@ begin
       Target : Arr;
    begin
       ---=---=---=---=---=---=---
-      Case_5 : begin
+      Case_5 :
+      begin
          Target := (1 => (1 => 1, 2 => 2, 3 => 3));  -- Named associations.
 
          if not Equals (Target, Target) then
@@ -124,7 +129,8 @@ begin
 
       ---=---=---=---=---=---=---
 
-      Case_6 : begin
+      Case_6 :
+      begin
          Target := (1 => ((5, 10, 15)));  -- Positional associations.
 
          if not Equals (Target, Target) then
@@ -148,7 +154,8 @@ begin
       Target : Arr;
    begin
       ---=---=---=---=---=---=---
-      Case_7 : begin
+      Case_7 :
+      begin
          Target := (1 => (1 => True, 2 => True, 3 => False));  -- Named.
 
          if not Equals (Target, Target) then
@@ -163,7 +170,8 @@ begin
 
       ---=---=---=---=---=---=---
 
-      Case_8 : begin
+      Case_8 :
+      begin
          Target := (1 => ((False, False, True)));  -- Positional.
 
          if not Equals (Target, Target) then
@@ -188,7 +196,8 @@ begin
       Target : Arr;
    begin
       ---=---=---=---=---=---=---
-      Case_9 : begin
+      Case_9 :
+      begin
          Target := (1 => (1 => True, 2 => True, 3 => False));  -- Named.
 
          if not Equals (Target, Target) then
@@ -203,7 +212,8 @@ begin
 
       ---=---=---=---=---=---=---
 
-      Case_10 : begin
+      Case_10 :
+      begin
          Target := (1 => (False, False, True));      -- Positional.
 
          if not Equals (Target, Target) then

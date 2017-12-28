@@ -20,7 +20,8 @@ begin
 
    -- Successful cases - value matches corresponding discriminant value
 
-   Cd_Matched_Aggregate : begin
+   Cd_Matched_Aggregate :
+   begin
       declare
          Cd : C432002_0.Constrained_Discriminant_Extension :=
            (C432002_0.Discriminant'(L => 10, S1 => String_10) with
@@ -39,7 +40,8 @@ begin
             "discriminant");
    end Cd_Matched_Aggregate;
 
-   Cd_Matched_Variable : begin
+   Cd_Matched_Variable :
+   begin
       declare
          D : C432002_0.Discriminant (L => 10) :=
            C432002_0.Discriminant'(L => 10, S1 => String_10);
@@ -64,7 +66,8 @@ begin
    --                      discriminant. Constraint_Error should be
    --                      raised.
 
-   Cd_Unmatched_Aggregate : begin
+   Cd_Unmatched_Aggregate :
+   begin
       declare
          Cd : C432002_0.Constrained_Discriminant_Extension :=
            (C432002_0.Discriminant'(L => 5, S1 => String_5) with
@@ -84,7 +87,8 @@ begin
          null; -- raise of Constraint_Error is expected
    end Cd_Unmatched_Aggregate;
 
-   Cd_Unmatched_Variable : begin
+   Cd_Unmatched_Variable :
+   begin
       declare
          D : C432002_0.Discriminant (L => 5) :=
            C432002_0.Discriminant'(L => 5, S1 => String_5);
@@ -112,7 +116,8 @@ begin
 
    -- Successful cases - value matches corresponding discriminant value
 
-   Nd_Matched_Aggregate : begin
+   Nd_Matched_Aggregate :
+   begin
       declare
          Nd : C432002_0.New_Discriminant_Extension (N => 8) :=
            (C432002_0.Discriminant'(L => 8, S1 => String_8) with
@@ -132,7 +137,8 @@ begin
             "discriminant");
    end Nd_Matched_Aggregate;
 
-   Nd_Matched_Variable : begin
+   Nd_Matched_Variable :
+   begin
       declare
          D : C432002_0.Discriminant (L => 3) :=
            C432002_0.Discriminant'(L => 3, S1 => String_3);
@@ -157,7 +163,8 @@ begin
    --                      discriminant. Constraint_Error should be
    --                      raised.
 
-   Nd_Unmatched_Aggregate : begin
+   Nd_Unmatched_Aggregate :
+   begin
       declare
          Nd : C432002_0.New_Discriminant_Extension (N => 20) :=
            (C432002_0.Discriminant'(L => 11, S1 => String_11) with
@@ -178,7 +185,8 @@ begin
          null; -- raise is expected
    end Nd_Unmatched_Aggregate;
 
-   Nd_Unmatched_Variable : begin
+   Nd_Unmatched_Variable :
+   begin
       declare
          D : C432002_0.Discriminant (L => 5) :=
            C432002_0.Discriminant'(L => 5, S1 => String_5);
@@ -207,7 +215,8 @@ begin
 
    -- Successful cases - value matches corresponding discriminant value
 
-   Ce_Matched_Aggregate : begin
+   Ce_Matched_Aggregate :
+   begin
       declare
          Ce : C432002_0.Constrained_Extension_Extension :=
            (C432002_0.Discriminant'(L => 20, S1 => String_20) with
@@ -228,7 +237,8 @@ begin
             "discriminant");
    end Ce_Matched_Aggregate;
 
-   Ce_Matched_Variable : begin
+   Ce_Matched_Variable :
+   begin
       declare
          Nd : C432002_0.New_Discriminant_Extension (N => 20) :=
            C432002_0.New_Discriminant_Extension'
@@ -254,7 +264,8 @@ begin
    --                      discriminant. Constraint_Error should be
    --                      raised.
 
-   Ce_Unmatched_Aggregate : begin
+   Ce_Unmatched_Aggregate :
+   begin
       declare
          Ce : C432002_0.Constrained_Extension_Extension :=
            (C432002_0.New_Discriminant_Extension'
@@ -275,7 +286,8 @@ begin
          null; -- raise of Constraint_Error is expected
    end Ce_Unmatched_Aggregate;
 
-   Ce_Unmatched_Variable : begin
+   Ce_Unmatched_Variable :
+   begin
       declare
          D : C432002_0.Discriminant (L => 8) :=
            C432002_0.Discriminant'(L => 8, S1 => String_8);
@@ -304,7 +316,8 @@ begin
 
    -- Successful cases - value matches corresponding discriminant value
 
-   Ne_Matched_Aggregate : begin
+   Ne_Matched_Aggregate :
+   begin
       declare
          Ne : C432002_0.New_Extension_Extension (I => 8) :=
            (C432002_0.Discriminant'(L => 8, S1 => String_8) with
@@ -325,7 +338,8 @@ begin
             "discriminant");
    end Ne_Matched_Aggregate;
 
-   Ne_Matched_Variable : begin
+   Ne_Matched_Variable :
+   begin
       declare
          Nd : C432002_0.New_Discriminant_Extension (N => 3) :=
            C432002_0.New_Discriminant_Extension'
@@ -351,7 +365,8 @@ begin
    --                      discriminant. Constraint_Error should be
    --                      raised.
 
-   Ne_Unmatched_Aggregate : begin
+   Ne_Unmatched_Aggregate :
+   begin
       declare
          Ne : C432002_0.New_Extension_Extension (I => 8) :=
            (C432002_0.New_Discriminant_Extension'
@@ -375,7 +390,8 @@ begin
          null; -- raise is expected
    end Ne_Unmatched_Aggregate;
 
-   Ne_Unmatched_Variable : begin
+   Ne_Unmatched_Variable :
+   begin
       declare
          D : C432002_0.Discriminant (L => 5) :=
            C432002_0.Discriminant'(L => 5, S1 => String_5);
@@ -403,7 +419,8 @@ begin
 
    -- Successful case - value matches corresponding discriminant value
 
-   Tr_Matched_Variable : begin
+   Tr_Matched_Variable :
+   begin
       declare
          D : C432002_0.Discriminant (L => 10) :=
            C432002_0.Discriminant'(L => 10, S1 => String_10);
@@ -432,7 +449,8 @@ begin
    --                      discriminant. Constraint_Error should be
    --                      raised.
 
-   Tr_Unmatched_Variable : begin
+   Tr_Unmatched_Variable :
+   begin
       declare
          D : C432002_0.Discriminant (L => 5) :=
            C432002_0.Discriminant'(L => 5, S1 => String_5);
@@ -462,7 +480,8 @@ begin
 
    -- Successful case - value matches corresponding discriminant value
 
-   Md_Matched_Variable : begin
+   Md_Matched_Variable :
+   begin
       declare
          Md : C432002_0.Multiple_Discriminants (A => 10, B => 10) :=
            C432002_0.Multiple_Discriminants'
@@ -487,7 +506,8 @@ begin
    --                      discriminant. Constraint_Error should be
    --                      raised.
 
-   Md_Unmatched_Variable : begin
+   Md_Unmatched_Variable :
+   begin
       declare
          Md : C432002_0.Multiple_Discriminants (A => 10, B => 8) :=
            C432002_0.Multiple_Discriminants'

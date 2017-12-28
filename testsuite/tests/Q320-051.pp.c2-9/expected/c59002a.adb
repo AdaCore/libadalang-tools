@@ -51,12 +51,12 @@ begin
 
       Failed ("'GOTO' NOT OBEYED");
 
-      <<BACK_LABEL>>
+      <<Back_Label>>
       Flow  := Flow * 3**Expon;                    -- 1*5*9
       Expon := Expon + 1;
       goto Finish;
 
-      <<START>>
+      <<Start>>
       Flow  := Flow * 7**Expon;                    -- 1
       Expon := Expon + 1;
 
@@ -71,7 +71,7 @@ begin
 
       Failed ("INNER 'GOTO' NOT OBEYED  -  1");
 
-      <<FORWARD_LABEL>>
+      <<Forward_Label>>
       Flow  := Flow * 5**Expon;                    -- 1*5
       Expon := Expon + 1;
 
@@ -86,7 +86,7 @@ begin
 
       Failed ("INNER 'GOTO' NOT OBETED  -  2");
 
-      <<FINISH>>
+      <<Finish>>
       Flow := Flow * 2**Expon;                    -- 1*5*9*8
 
       if Flow /= 360 then

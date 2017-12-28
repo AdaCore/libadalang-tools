@@ -39,12 +39,14 @@ begin
 
    begin
 
-      Case_A : begin
+      Case_A :
+      begin
 
 --             COMMENT ("CASE A1 : SUBPROGRAM WITH CONSTRAINED " &
 --                      "ONE-DIMENSIONAL ARRAY FORMAL PARAMETER");
 
-         Case_A1 : declare
+         Case_A1 :
+         declare
 
             subtype Sta1 is String (Ident_Int (11) .. 15);
 
@@ -70,7 +72,8 @@ begin
 --             COMMENT ("CASE A2 : SUBPROGRAM WITH CONSTRAINED " &
 --                      "TWO-DIMENSIONAL ARRAY FORMAL PARAMETER");
 
-         Case_A2 : declare
+         Case_A2 :
+         declare
 
             type Ta is array (11 .. 12, 10 .. 11) of Character;
 

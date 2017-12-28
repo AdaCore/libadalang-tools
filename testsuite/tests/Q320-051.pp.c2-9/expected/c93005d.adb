@@ -11,11 +11,14 @@ begin
      ("SUBTEST 2: TASKS IN DECL PART OF A BLOCK AND A PACKAGE " & "SPEC");
    Comment ("  THE TASKS DEPEND ON THE DECLARATIVE PART");
    Comment ("  OTHER TASKS HAVE BEEN ENQUEUED ON THE TASKS' ENTRIES");
-   B21 : declare
+   B21 :
+   declare
       X : Mnt;
    begin
-      B22 : begin
-         B23 : declare
+      B22 :
+      begin
+         B23 :
+         declare
             type Acc_Mnt is access Mnt;
             T1 : Unactivated;
             Y  : Acc_Mnt := new Mnt;

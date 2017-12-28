@@ -43,7 +43,8 @@ begin
 
    ---------------------------------------------------
 
-   A_B : declare
+   A_B :
+   declare
 
       package Scalar_Pkg is
 
@@ -85,7 +86,8 @@ begin
 
    begin     -- A_B
 
-      A : declare
+      A :
+      declare
 
          I : T;
          E : exception;
@@ -162,7 +164,8 @@ begin
 
       ---------------------------------------------------
 
-      B : declare
+      B :
+      declare
 
          I, J : T;
 
@@ -192,7 +195,8 @@ begin
 
    ---------------------------------------------------
 
-   C_D : declare
+   C_D :
+   declare
 
       package Access_Pkg is
 
@@ -219,7 +223,8 @@ begin
 
    begin     -- C_D;
 
-      C : declare
+      C :
+      declare
 
          I : T;
          E : exception;
@@ -278,7 +283,8 @@ begin
 
       ---------------------------------------------------
 
-      D : declare
+      D :
+      declare
 
          I, J : T;
 

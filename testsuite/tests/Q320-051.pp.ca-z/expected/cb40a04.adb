@@ -17,7 +17,8 @@ begin
       "correctly propagated out of a public " &
       "child function to a client");
 
-   Process_Block : begin
+   Process_Block :
+   begin
 
       Number_Of_Alphanumeric_Characters :=       -- Provide slice of string
         Fb40a00.Cb40a04_0 (String_Var (5 .. 10));  -- to subprogram.

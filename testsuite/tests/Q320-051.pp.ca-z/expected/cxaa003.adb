@@ -77,7 +77,8 @@ begin
       "subprograms perform properly on text files " &
       "reset with mode Append_File");
 
-   Test_For_Text_Io_Support : begin
+   Test_For_Text_Io_Support :
+   begin
 
       -- An implementation that does not support Text_IO in a particular
       -- environment will raise Use_Error on calls to various Text_IO
@@ -96,7 +97,8 @@ begin
          raise Incomplete;
    end Test_For_Text_Io_Support;
 
-   Operational_Test_Block : declare
+   Operational_Test_Block :
+   declare
 
       Default_Position : constant Text_Io.Positive_Count := 1;
 
@@ -183,7 +185,8 @@ begin
       -- Note: The text file has been originally created in Out_File mode, and
       -- has subsequently been reset to Append_File mode.
 
-      Reset1 : begin
+      Reset1 :
+      begin
          -- Reset has effect of calling New_Page.
          Text_Io.Reset (Data_File, Text_Io.Append_File);
       exception
@@ -195,13 +198,15 @@ begin
 
       Position_Glossary_Text (The_File => Data_File);
 
-      Test_Verification_Block : declare
+      Test_Verification_Block :
+      declare
          Tc_Page, Tc_Line, Tc_Column : Text_Io.Positive_Count;
          Tc_Position                 : Natural          := 0;
          Blanks                      : constant String  := "               ";
          Tc_String                   : String (1 .. 15) := Blanks;
       begin
-         Reset2 : begin
+         Reset2 :
+         begin
             Text_Io.Reset (Data_File, Text_Io.In_File);
          exception
             when Text_Io.Use_Error =>
@@ -263,7 +268,8 @@ begin
 
    end Operational_Test_Block;
 
-   Final_Block : begin
+   Final_Block :
+   begin
       -- Delete the external file.
       if Text_Io.Is_Open (Data_File) then
          Text_Io.Delete (Data_File);

@@ -200,7 +200,8 @@ begin
             if G.A /= Ident_Int (2) then
                Failed ("INCORRECT RESULTS FROM EXPANDED " & "NAME - 13");
             end if;
-            Blk : declare
+            Blk :
+            declare
                B : Integer := 7;
             begin
                if T.Blk.B /= Ident_Int (7) then
@@ -220,7 +221,8 @@ begin
    end;
    -------------------------------------------------------------------
 
-   Swap : declare
+   Swap :
+   declare
       Var : Character := '*';
       Rename_Var : Character renames Var;
       New_Var : Character;
@@ -237,7 +239,7 @@ begin
             goto Swap.Lab1;
          end if;
          New_Var := Ident_Char ('+');
-         <<LAB1>>
+         <<Lab1>>
          New_Var := Ident_Char ('-');
       end loop Lp;
       if New_Var /= Ident_Char ('-') then

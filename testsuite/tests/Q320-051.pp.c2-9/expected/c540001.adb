@@ -21,7 +21,8 @@ begin
       "inherited function may be used as a case statement " &
       "expression");
 
-   Generic_Formal_Object_Subtest : begin
+   Generic_Formal_Object_Subtest :
+   begin
       declare
          One : Value := 1;
          package One_Pck is new C540001_2 (Value, One);
@@ -52,7 +53,8 @@ begin
 
    end Generic_Formal_Object_Subtest;
 
-   Instantiated_Generic_Function_Subtest : declare
+   Instantiated_Generic_Function_Subtest :
+   declare
       type New_Enum_Type is new C540001_1.Enum_Type;
 
       function Get_Enum_Value (P : C540001_1.Small_Num) return New_Enum_Type is
@@ -104,7 +106,8 @@ begin
    -- function is used in the case expressions, the choices of the case
    -- statement only need to cover the values in the result of the function.
 
-   Function_Call_Subtest : declare
+   Function_Call_Subtest :
+   declare
       Mobj : C540001_1.Mixed := 'B';
       Bobj : Boolean         := True;
       use type C540001_1.Mixed;
@@ -125,7 +128,8 @@ begin
 
    end Function_Call_Subtest;
 
-   Function_Renaming_Subtest : declare
+   Function_Renaming_Subtest :
+   declare
       use C540001_1;
       function Rename_Get_Small_Int (P : Boolean) return Small_Int renames
         Get_Small_Int;
@@ -148,7 +152,8 @@ begin
 
    end Function_Renaming_Subtest;
 
-   Call_To_Generic_Formal_Function_Subtest : declare
+   Call_To_Generic_Formal_Function_Subtest :
+   declare
       type New_Small_Int is new C540001_1.Small_Int;
 
       function Get_Int_Value return New_Small_Int is
@@ -173,7 +178,8 @@ begin
 
    end Call_To_Generic_Formal_Function_Subtest;
 
-   Call_To_Inherited_Function_Subtest : declare
+   Call_To_Inherited_Function_Subtest :
+   declare
       Ntobj1 : C540001_5.New_Tagged :=
         (C1 => C540001_1.Eh, C2 => C540001_1.'A');
       Ntobj2 : C540001_5.New_Tagged := (C540001_1.Dee, C540001_1.'C');

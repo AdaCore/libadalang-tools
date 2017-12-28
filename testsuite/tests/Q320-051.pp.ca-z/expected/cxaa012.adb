@@ -66,7 +66,8 @@ begin
       "predefined End_Of_File function on a " &
       "text file with mode Append_File");
 
-   Test_For_Text_Io_Support : begin
+   Test_For_Text_Io_Support :
+   begin
 
       -- Use_Error or Name_Error will be raised if Text_IO operations or
       -- external files are not supported.
@@ -86,14 +87,16 @@ begin
 
    Text_Io.Close (Text_File);
 
-   Operational_Test_Block : declare
+   Operational_Test_Block :
+   declare
       Tc_Number_Of_Forced_Mode_Errors : constant Natural := 2;
       Tc_Mode_Errors                  : Natural          := 0;
    begin
 
       Text_Io.Open (Text_File, Text_Io.Append_File, Text_Filename);
 
-      Test_For_Reading : declare
+      Test_For_Reading :
+      declare
          Tc_Data   : String (1 .. 80);
          Tc_Length : Natural := 0;
       begin
@@ -116,7 +119,8 @@ begin
             Report.Failed ("Exception in Get_Line processing");
       end Test_For_Reading;
 
-      Test_For_End_Of_File : declare
+      Test_For_End_Of_File :
+      declare
          Tc_End_Of_File : Boolean;
       begin
 

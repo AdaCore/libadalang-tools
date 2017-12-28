@@ -65,7 +65,8 @@ begin
 
    -- CASE A) THE OPERATOR *, A, B, AND A * B ALL MODEL NUMBERS.
 
-   A : declare
+   A :
+   declare
       A                        : Fx_0p5 := 0.0;
       B                        : Fx_2   := 0.0;
       Result_Value             : Fx_1   := 0.0;
@@ -92,7 +93,8 @@ begin
 
    -- CASE B) THE OPERATOR *, A, B MODEL NUMBERS A * B NOT.
 
-   B : declare
+   B :
+   declare
       A                        : Fx_0p5   := 0.0;
       B                        : Fx_1     := 0.0;
       Result_Value             : Fx_2     := 0.0;
@@ -121,7 +123,8 @@ begin
 
    -- CASE C) THE OPERATOR *, USING NO MODEL NUMBERS
 
-   C : declare
+   C :
+   declare
       A                        : Fx_1     := 0.0;
       B                        : Fx_1     := 0.0;
       Result_Value             : Fx_2     := 0.0;

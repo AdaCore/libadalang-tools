@@ -38,7 +38,8 @@ begin
       "PROPER VISIBILITY OF FREE IDENTIFIERS IN " &
       "GENERIC DECLARATIONS, BODIES AND INSTANTIATIONS");
 
-   Outer : declare
+   Outer :
+   declare
       Free : constant Integer := 5;
    begin
       declare

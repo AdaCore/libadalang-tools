@@ -75,7 +75,8 @@ begin
      ("CXA5A02",
       "Check that the functions Cos and Cosh provide " & "correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Ada.Numerics;
       use Fxa5a00;

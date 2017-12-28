@@ -20,7 +20,8 @@ begin
 -- Both input strings have the same size. Replace the first string by the
 -- second string.
 
-   Replace_Subtest : declare
+   Replace_Subtest :
+   declare
       The_First_String, The_Second_String : String_Rec (16);
       -- Parent's private type.
       The_Position : Positive := 1;
@@ -43,7 +44,8 @@ begin
 -- During processing, the application may erroneously attempt to replace
 -- strings of different size. This would result in the raising of an exception.
 
-   Exception_Subtest : declare
+   Exception_Subtest :
+   declare
       The_First_String : String_Rec (17);
       -- Parent's private type.
       The_Second_String : String_Rec (13);

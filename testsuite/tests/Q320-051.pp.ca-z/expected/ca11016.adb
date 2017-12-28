@@ -23,7 +23,8 @@ begin
 -- Simulate control information at coordinates 3 and 7 of the basic map for the
 -- SDUGD.
 
-   Water_Display_Subtest : begin
+   Water_Display_Subtest :
+   begin
       Tc_Packet.Lat  := 3;
       Tc_Packet.Long := 7;
 
@@ -43,7 +44,8 @@ begin
 -- Simulate control information at coordinates 2 and 1 of the basic map for the
 -- SDUGD.
 
-   Desert_Display_Subtest : begin
+   Desert_Display_Subtest :
+   begin
       Tc_Packet.Lat  := 9;
       Tc_Packet.Long := 2;
 
@@ -63,7 +65,8 @@ begin
 -- Simulate control information at coordinates 8 and 4 of the basic map for the
 -- SDUGD.
 
-   Forest_Display_Subtest : begin
+   Forest_Display_Subtest :
+   begin
       Tc_Packet.Lat  := 8;
       Tc_Packet.Long := 4;
 

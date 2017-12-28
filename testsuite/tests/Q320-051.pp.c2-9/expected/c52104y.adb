@@ -84,10 +84,12 @@ begin
    --        DEFINED USING THE "BOX" COMPOUND SYMBOL.
    --        (TWO-DIMENSIONAL ARRAYS OF BOOLEANS.)
 
-   Constr_Err : begin          -- THIS BLOCK CATCHES CONSTRAINT_ERROR IF IT IS
+   Constr_Err :
+   begin          -- THIS BLOCK CATCHES CONSTRAINT_ERROR IF IT IS
       -- RAISED BY THE SUBTYPE DECLARATION.
 
-      Dcl_Arr : declare
+      Dcl_Arr :
+      declare
 
          type Tabox5 is array (Integer range <>, Integer range <>) of Boolean;
          pragma Pack (Tabox5);
@@ -104,7 +106,8 @@ begin
             "WHEN ONE DIMENSION HAS INTEGER'LAST + 3 " &
             "COMPONENTS");
 
-         Obj_Dcl : declare   -- THIS BLOCK DECLARES ONE NULL ARRAY AND ONE
+         Obj_Dcl :
+         declare   -- THIS BLOCK DECLARES ONE NULL ARRAY AND ONE
             -- PACKED BOOLEAN ARRAY WITH INTEGER'LAST + 3 COMPONENTS; STORAGE
             -- ERROR MAY BE RAISED.
 

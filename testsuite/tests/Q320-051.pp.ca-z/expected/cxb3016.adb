@@ -98,7 +98,8 @@ begin
       "Copy_Terminated_Array, and Copy_Array " &
       "produce correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Ada.Exceptions;
       use Interfaces.C.Strings;

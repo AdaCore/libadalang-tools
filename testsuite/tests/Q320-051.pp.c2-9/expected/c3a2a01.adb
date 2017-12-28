@@ -14,7 +14,8 @@ begin -- C3A2A01.                                              -- [ Level = 1 ]
       "Run-time accessibility checks: instance " &
       "bodies. Type of X'Access is passed as actual to instance");
 
-   Subtest1 : declare                                                     -- [ Level = 2 ]
+   Subtest1 :
+   declare                                                     -- [ Level = 2 ]
       Result : F3a2a00.Tc_Result_Kind;
    begin -- SUBTEST1.
 
@@ -42,7 +43,8 @@ begin -- C3A2A01.                                              -- [ Level = 1 ]
 
    end Subtest1;
 
-   Subtest2 : declare                                                     -- [ Level = 2 ]
+   Subtest2 :
+   declare                                                     -- [ Level = 2 ]
       Result : F3a2a00.Tc_Result_Kind;
    begin -- SUBTEST2.
 
@@ -79,7 +81,8 @@ begin -- C3A2A01.                                              -- [ Level = 1 ]
             "during instantiation of generic");
    end Subtest2;
 
-   Subtest3 : declare                                                     -- [ Level = 2 ]
+   Subtest3 :
+   declare                                                     -- [ Level = 2 ]
       Result : F3a2a00.Tc_Result_Kind;
    begin -- SUBTEST3.
 
@@ -115,7 +118,8 @@ begin -- C3A2A01.                                              -- [ Level = 1 ]
             "during instantiation of generic");
    end Subtest3;
 
-   Subtest4 : declare                                                     -- [ Level = 2 ]
+   Subtest4 :
+   declare                                                     -- [ Level = 2 ]
       Result1 : F3a2a00.Tc_Result_Kind;
       Result2 : F3a2a00.Tc_Result_Kind;
    begin -- SUBTEST4.

@@ -64,7 +64,8 @@ begin
       "Ada.Strings.Wide_Fixed are available, and that " &
       "they produce correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       Tc_Total        : Natural        := 0;
       Number_Of_Lines : constant       := 3;

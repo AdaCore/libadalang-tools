@@ -112,7 +112,8 @@ begin
       "Check that the Divide procedure provides " &
       "correct results. Check that the Remainder " &
       "is calculated exactly");
-   Radix_10_Block : declare
+   Radix_10_Block :
+   declare
 
       -- Declare all types and variables used in the various blocks below for
       -- all Radix 10 evaluations.
@@ -523,7 +524,8 @@ begin
          Report.Failed ("Exception raised in Radix_10_Block");
    end Radix_10_Block;
 
-   Radix_2_Block : declare
+   Radix_2_Block :
+   declare
 
       -- Declare all types and variables used in the various blocks below for
       -- all Radix 2 evaluations.

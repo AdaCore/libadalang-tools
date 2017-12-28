@@ -90,7 +90,8 @@ begin
       "that they function correctly when used for " &
       "the input/output of Decimal types");
 
-   Test_For_Decimal_Io_Support : begin
+   Test_For_Decimal_Io_Support :
+   begin
 
       -- An implementation that does not support Text_IO creation or naming
       -- of external files in a particular environment will raise Use_Error
@@ -110,7 +111,8 @@ begin
 
    end Test_For_Decimal_Io_Support;
 
-   Taxation : declare
+   Taxation :
+   declare
 
       Id_Length           : constant        := 5;
       Price_String_Length : constant        := 5;
@@ -145,7 +147,8 @@ begin
 
    begin  -- Taxation
 
-      Assessors_Office : begin
+      Assessors_Office :
+      begin
 
          for Parcel in City_Block_Type'Range loop
             -- Note: All data in the file will be separated with a
@@ -179,7 +182,8 @@ begin
             Report.Failed ("Exception raised in Assessor's Office");
       end Assessors_Office;
 
-      Twice_A_Year : declare
+      Twice_A_Year :
+      declare
 
          procedure Collect_Tax
            (Index     : in     Integer;
@@ -252,7 +256,8 @@ begin
 
       -- Use Decimal_IO Get procedure to extract information from a string.
       -- Verify data against original values.
-      Validation_Block : declare
+      Validation_Block :
+      declare
          Tc_Id       : String (1 .. Id_Length);    -- 1..5
          Tc_Price    : Price_Type;
          Tc_Value    : Value_Type;

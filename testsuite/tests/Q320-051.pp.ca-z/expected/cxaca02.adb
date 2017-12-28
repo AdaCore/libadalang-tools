@@ -63,7 +63,8 @@ begin
       "override the default attributes 'Read and " &
       "'Write using attribute definition clauses");
 
-   Test_For_Stream_Io_Support : declare
+   Test_For_Stream_Io_Support :
+   declare
 
       Data_File    : Ada.Streams.Stream_Io.File_Type;
       Data_Stream  : Ada.Streams.Stream_Io.Stream_Access;
@@ -83,7 +84,8 @@ begin
          Ada.Streams.Stream_Io.Out_File,
          The_Filename);
 
-      Operational_Test_Block : declare
+      Operational_Test_Block :
+      declare
 
          type Origin_Type is (Foreign, Domestic);
          subtype String_Data_Type is String (1 .. 8);
@@ -258,7 +260,8 @@ begin
          -- Read data from the stream, and verify the use of the user specified
          -- attributes.
 
-         Verify_Data_Block : declare
+         Verify_Data_Block :
+         declare
 
             Tc_Product1, Tc_Product2 : Product_Type;
 

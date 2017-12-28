@@ -49,9 +49,11 @@ begin
 
    begin
 
-      Case_K : begin
+      Case_K :
+      begin
 
-         Case_K1 : declare
+         Case_K1 :
+         declare
 
             subtype Sk1 is Integer range 2 .. 6;
             type Base is array (Sk1 range <>) of Integer;
@@ -81,7 +83,8 @@ begin
 
          end Case_K1;
 
-         Case_K2 : declare
+         Case_K2 :
+         declare
 
             type Sk2 is range 2 .. 6;
             type Base is array (Sk2 range <>) of Integer;

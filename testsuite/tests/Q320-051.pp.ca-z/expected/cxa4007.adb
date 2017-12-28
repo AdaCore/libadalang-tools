@@ -60,7 +60,8 @@ begin
       "Ada.Strings.Bounded are available, and that " &
       "they produce correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       package Bs80 is new Ada.Strings.Bounded.Generic_Bounded_Length (80);
       use type Bs80.Bounded_String;

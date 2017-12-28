@@ -67,7 +67,8 @@ begin
       "Open are used to inappropriately operate " &
       "on files of mode Append_File");
 
-   Test_For_Text_Io_Support : begin
+   Test_For_Text_Io_Support :
+   begin
 
 -- An application creates a text file with mode Append_File. Use_Error will be
 -- raised if Text_IO operations or external files are not supported.
@@ -88,12 +89,14 @@ begin
       Text_Io.Put_Line (Text_File, "Data entered into the file");
    end loop;
 
-   Operational_Test_Block : declare
+   Operational_Test_Block :
+   declare
       Tc_Number_Of_Forced_Errors : constant Natural := 3;
       Tc_Errors                  : Natural          := 0;
    begin
 
-      Test_For_Create : begin
+      Test_For_Create :
+      begin
 
 -- During the course of its processing, the application may (erroneously)
 -- attempt to create the same file already in existence in Append_File mode.
@@ -112,7 +115,8 @@ begin
             Report.Failed ("Exception in Create processing");
       end Test_For_Create;
 
-      First_Test_For_Open : begin
+      First_Test_For_Open :
+      begin
 
 -- Again, during the course of its processing, the application incorrectly
 -- attempts to Open a file (in Append_File mode) that is already open.
@@ -135,7 +139,8 @@ begin
             Report.Failed ("Exception in Open processing - 1");
       end First_Test_For_Open;
 
-      Open_With_Wrong_Filename : declare
+      Open_With_Wrong_Filename :
+      declare
          Tc_Wrong_Filename : constant String := Report.Legal_File_Name (2);
       begin
 
@@ -145,7 +150,8 @@ begin
 -- sure the file doesn't exist. (If it did, then the check for open in append
 -- mode wouldn't work.)
 
-         Verify_No_File : begin
+         Verify_No_File :
+         begin
             Text_Io.Open (Text_File, Text_Io.In_File, Tc_Wrong_Filename);
          exception
             when Text_Io.Name_Error =>
@@ -154,7 +160,8 @@ begin
                Report.Failed ("Unexpected exception on Open check");
          end Verify_No_File;
 
-         Delete_No_File : begin
+         Delete_No_File :
+         begin
             if Text_Io.Is_Open (Text_File) then
                Text_Io.Delete (Text_File);
             end if;
@@ -182,7 +189,8 @@ begin
 
    end Operational_Test_Block;
 
-   Deletion : begin
+   Deletion :
+   begin
       -- Delete the external file.
       if Text_Io.Is_Open (Text_File) then
          Text_Io.Delete (Text_File);

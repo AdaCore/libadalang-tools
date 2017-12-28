@@ -16,7 +16,8 @@ begin
 
 -- An application creates a population map using an integer type.
 
-   Population_Map_Subtest : declare
+   Population_Map_Subtest :
+   declare
       type Population_Type is range 0 .. 10_000;
 
       -- Declare instance of the child generic map package for one particular
@@ -53,7 +54,8 @@ begin
 
 -- An application creates a weather map using an enumeration type.
 
-   Weather_Map_Subtest : declare
+   Weather_Map_Subtest :
+   declare
       type Weather_Type is (Hot, Cold, Mild);
 
       -- Declare instance of the child generic map package for one particular
@@ -92,7 +94,8 @@ begin
 -- density map on an unexplored area. This would result in the raising of
 -- an exception.
 
-   Density_Map_Subtest : declare
+   Density_Map_Subtest :
+   declare
       type Density_Type is (High, Medium, Low);
 
       -- Declare instance of the child generic map package for one particular

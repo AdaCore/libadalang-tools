@@ -92,7 +92,8 @@ begin
       "Check that procedures To_Fortran and To_Ada " &
       "produce correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       package Bnd is new Ada.Strings.Bounded.Generic_Bounded_Length (10);
       package Unb renames Ada.Strings.Unbounded;

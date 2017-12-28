@@ -76,7 +76,8 @@ begin
       "Check that the functions Arccos and Arccosh " &
       "provide correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Ada.Numerics;
       use Fxa5a00;

@@ -53,7 +53,8 @@ begin
       "FORMAL PART OR BODY HIDES AN OUTER " &
       "DECLARATION OF A HOMOGRAPH");
 
-   One : declare                      -- SUBPROGRAM DECLARATIVE REGION.
+   One :
+   declare                      -- SUBPROGRAM DECLARATIVE REGION.
       A : Integer := Ident_Int (2);
       B : Integer := A;
 
@@ -90,7 +91,8 @@ begin
       end if;
    end One;
 
-   Two : declare                     -- FORMAL PARAMETER OF SUBPROGRAM.
+   Two :
+   declare                     -- FORMAL PARAMETER OF SUBPROGRAM.
       A   : Integer := Ident_Int (2);
       B   : Integer := A;
       Obj : Integer := Ident_Int (3);
@@ -127,7 +129,8 @@ begin
       end if;
    end Two;
 
-   Three : declare            -- AFTER THE SPECIFICATION OF SUBPROGRAM.
+   Three :
+   declare            -- AFTER THE SPECIFICATION OF SUBPROGRAM.
       A : Integer := Ident_Int (2);
 
       function Inner (X : Integer) return Integer;
@@ -166,7 +169,8 @@ begin
       end if;
    end Three;
 
-   Four : declare                              -- RENAMING DECLARATION.
+   Four :
+   declare                              -- RENAMING DECLARATION.
       A : Integer := Ident_Int (2);
 
       procedure Template (X : in Integer := A; Y : in out Integer);
@@ -201,7 +205,8 @@ begin
       end if;
    end Four;
 
-   Five : declare                         -- GENERIC FORMAL SUBPROGRAM.
+   Five :
+   declare                         -- GENERIC FORMAL SUBPROGRAM.
       A : Integer := Ident_Int (2);
       B : Integer := A;
 
@@ -256,7 +261,8 @@ begin
       null;
    end Five;
 
-   Six : declare                              -- GENERIC INSTANTIATION.
+   Six :
+   declare                              -- GENERIC INSTANTIATION.
       A   : Integer := Ident_Int (2);
       B   : Integer := A;
       Obj : Integer := Ident_Int (3);
@@ -298,7 +304,8 @@ begin
       end if;
    end Six;
 
-   Seven : declare                 --  OVERLOADING OF FUNCTIONS.
+   Seven :
+   declare                 --  OVERLOADING OF FUNCTIONS.
 
       Obj : Integer := 1;
       Flo : Float   := 5.0;

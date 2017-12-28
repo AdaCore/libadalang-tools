@@ -100,7 +100,8 @@ procedure Cc1005b is
 
 begin
 
-   Block1 : declare
+   Block1 :
+   declare
       type Rec is record
          P : Integer := Ident_Int (0);
       end record;

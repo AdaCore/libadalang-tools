@@ -92,7 +92,8 @@ begin
       "placed following the last element currently " &
       "in the file");
 
-   Test_For_Sequential_Io_Support : begin
+   Test_For_Sequential_Io_Support :
+   begin
 
       -- An implementation that does not support Sequential_IO in a particular
       -- environment will raise Use_Error or Name_Error on calls to various
@@ -115,7 +116,8 @@ begin
 
    end Test_For_Sequential_Io_Support;
 
-   Operational_Test_Block : declare
+   Operational_Test_Block :
+   declare
       -- Assign values into the component fields of the data objects.
       Buyer_1 : constant Order_Type := ("John Smith", 3);
       Buyer_2 : constant Order_Type :=
@@ -164,7 +166,8 @@ begin
       -- to file.
       Order_Io.Close (File => Order_File);     -- Close file.
 
-      Test_Verification_Block : declare
+      Test_Verification_Block :
+      declare
          Tc_Order1, Tc_Order2, Tc_Order3 : Order_Type;
       begin
 
@@ -217,7 +220,8 @@ begin
 
    end Operational_Test_Block;
 
-   Deletion : begin
+   Deletion :
+   begin
       -- Check that file is open prior to deleting it.
       if Order_Io.Is_Open (Order_File) then
          Order_Io.Delete (Order_File);

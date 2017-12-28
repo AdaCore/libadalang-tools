@@ -49,7 +49,8 @@ begin
      ("C93008B",
       "USE OF RESULT AFTER CREATION OF " & "A TASK BY ALLOCATOR");
 
-   Block : declare
+   Block :
+   declare
 
       task type Tt1;
 

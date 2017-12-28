@@ -294,7 +294,8 @@ begin  -- CC3007B
       "SEE AI-00365/05-BI-WJ.");
 
    First_Block :
- declare
+
+   declare
 
       M1 : Month_Type := May;
       M2 : Month_Type := Jun;
@@ -331,7 +332,8 @@ begin  -- CC3007B
    end First_Block;
 
    Second_Block :
- declare
+
+   declare
 
       Save_Third_Date  : Date_Access := Third_Date;
       Save_Fourth_Date : Date_Access := Fourth_Date;

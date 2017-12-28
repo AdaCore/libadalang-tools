@@ -163,7 +163,8 @@ begin -- CC3016C
       "ELABORATION OF THE DECLARATIONS (IN SPEC AND IN BODY).");
 
    Local_Block :
- declare
+
+   declare
 
       package New_Outer is new Outer
         (Some_Type              => Integer,

@@ -89,9 +89,10 @@ begin
 
    Constr_Err :         -- THIS BLOCK CATCHES CONSTRAINT_ERROR
    -- FOR THE TYPE DECLARATION.
-      begin
+   begin
 
-      Dcl_Arr : declare   -- THIS BLOCK DECLARES THE ARRAY TYPE
+      Dcl_Arr :
+      declare   -- THIS BLOCK DECLARES THE ARRAY TYPE
 
          type Ta42 is
            array
@@ -109,7 +110,8 @@ begin
            ("NO CONSTRAINT_ERROR FOR TYPE " &
             "WITH 'LENGTH = INTEGER'LAST + 3");
 
-         Obj_Dcl : declare   -- THIS BLOCK DECLARES TWO BOOLEAN ARRAYS THAT
+         Obj_Dcl :
+         declare   -- THIS BLOCK DECLARES TWO BOOLEAN ARRAYS THAT
             -- HAVE INTEGER'LAST + 3 COMPONENTS; STORAGE_ERROR MAY BE RAISED.
             Arr41 : Ta41;
             Arr42 : Ta42;
@@ -126,7 +128,8 @@ begin
             -- ABORTED BEFORE THE LENGTH COMPARISON OF THE ARRAY ASSIGNMENT
             -- IS ATTEMPTED.
 
-            No_Excp : begin     -- NO EXCEPTION SHOULD OCCUR HERE.
+            No_Excp :
+            begin     -- NO EXCEPTION SHOULD OCCUR HERE.
                for I in Ident_Int (-2) .. Ident_Int (2) loop
                   Arr41 (I) := False;  -- VALUES ARE:: FTFFT
                end loop;
@@ -150,7 +153,8 @@ begin
 
             end No_Excp;
 
-            Do_Slice : begin
+            Do_Slice :
+            begin
                -- SLICE ASSIGNMENT:
 
                Arr42 (Ident_Int (-1) .. Ident_Int (Integer'Last)) :=
@@ -160,7 +164,8 @@ begin
 
                -- CHECKING THE VALUES AFTER THE SLICE ASSIGNMENT:
 
-               Chk_Slice : begin
+               Chk_Slice :
+               begin
                   for I in Ident_Int (-1) .. Ident_Int (2) loop
 
                      if Arr42 (I) /= False and I /= 0 then

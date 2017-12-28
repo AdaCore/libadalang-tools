@@ -15,7 +15,8 @@ begin
       "Check that subprograms defined in package " &
       "Ada.Strings.Wide_Bounded produce correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       package Acl1 renames Ada.Characters.Latin_1;
       package Bs1 is new Ada.Strings.Wide_Bounded.Generic_Bounded_Length (1);

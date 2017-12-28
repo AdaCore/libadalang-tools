@@ -24,7 +24,8 @@ begin
    -- Check conversion as prefix of selected component:
    --
 
-   Selected_Component_Subtest : declare
+   Selected_Component_Subtest :
+   declare
       use Root_Package, Parent_Package, Child_Package, Grandchild_Package;
 
       Var    : Grandchild_Type   := Grandchild_Value;
@@ -53,7 +54,8 @@ begin
    -- Check conversion in object renaming:
    --
 
-   Object_Renaming_Subtest : declare
+   Object_Renaming_Subtest :
+   declare
       use Root_Package, Parent_Package, Child_Package, Grandchild_Package;
 
       Var : Grandchild_Type := Grandchild_Value;
@@ -91,7 +93,8 @@ begin
    -- Check reading view conversion, and conversion as left side of assignment:
    --
 
-   View_Conversion_Subtest : declare
+   View_Conversion_Subtest :
+   declare
       use Root_Package, Parent_Package, Child_Package, Grandchild_Package;
 
       Var       : Grandchild_Type   := Grandchild_Value;

@@ -78,7 +78,8 @@ begin
       "and Radix_Mark, appropriate to foreign " &
       "currency representations");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Ada.Text_Io;
 

@@ -215,7 +215,8 @@ begin
       "and output attributes are used for a type extension, even " &
       "if the parent type's attribute is user-defined");
 
-   Test1 : declare
+   Test1 :
+   declare
       S  : aliased My_Stream (1_000);
       X1 : Derived1
         (D1 => Int (Ident_Int (2)),
@@ -322,7 +323,8 @@ begin
 
    end Test1;
 
-   Test2 : declare
+   Test2 :
+   declare
       S  : aliased My_Stream (1_000);
       X1 : Derived2 (D => Int (Ident_Int (7)));
       Y1 : Derived2 :=

@@ -62,7 +62,8 @@ begin
       "package Ada.Strings.Unbounded are available, " &
       "and that they produce correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       package Asunb renames Ada.Strings.Unbounded;
       use Ada.Strings;
@@ -249,7 +250,8 @@ begin
 
       -- Trim
 
-      Trim_Block : declare
+      Trim_Block :
+      declare
 
          Xyz_Set : Maps.Character_Set := Maps.To_Set ("xyz");
          Pqr_Set : Maps.Character_Set := Maps.To_Set ("pqr");
@@ -321,7 +323,8 @@ begin
 
       -- Constructors ("*")
 
-      Constructor_Block : declare
+      Constructor_Block :
+      declare
 
          Sos : Asunb.Unbounded_String;
 

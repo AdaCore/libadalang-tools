@@ -74,7 +74,8 @@ begin
       "particular decimal value, and the Picture " &
       "and Currency string parameters");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Ada.Text_Io;
       use Fxf3a00;
@@ -155,7 +156,8 @@ begin
 
    begin
 
-      Length_Block : begin
+      Length_Block :
+      begin
 
          -- The first 10 picture strings in the Valid_Strings array correspond
          -- to data values of a decimal type with delta 0.01. Note: The
@@ -264,7 +266,8 @@ begin
             Report.Failed ("Unexpected exception raised in Length_Block");
       end Length_Block;
 
-      Valid_Block : declare
+      Valid_Block :
+      declare
 
          -- This offset value is used to align picture string and decimal
          -- data values from package FXF3A00 for proper correspondence for

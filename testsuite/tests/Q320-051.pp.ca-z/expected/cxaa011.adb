@@ -72,7 +72,8 @@ begin
       "Text_IO.Enumeration_IO operate correctly for " &
       "files with mode Append_File");
 
-   Test_For_Text_Io_Support : begin
+   Test_For_Text_Io_Support :
+   begin
 
       -- An implementation that does not support Text_IO in a particular
       -- environment will raise Use_Error on calls to various Text_IO
@@ -93,7 +94,8 @@ begin
 
    end Test_For_Text_Io_Support;
 
-   Operational_Test_Block : declare
+   Operational_Test_Block :
+   declare
 
       type Days_In_Week is
         (Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday);
@@ -148,7 +150,8 @@ begin
       --    Unrelated/unknown file processing resumes.
       --    Reset/Append process is repeated.
 
-      Reset1 : begin
+      Reset1 :
+      begin
          Text_Io.Reset (Status_Log,                           -- Reset to
          Text_Io.Append_File);                 -- Append mode.
       exception
@@ -165,7 +168,8 @@ begin
          Report.Failed ("Exception occurred during data file update");
       end if;
 
-      Reset2 : begin
+      Reset2 :
+      begin
          Text_Io.Reset (Status_Log,                           -- Reset to
          Text_Io.Append_File);                 -- Append mode.
       exception
@@ -179,12 +183,14 @@ begin
          Report.Failed ("Exception occurred during data file update");
       end if;
 
-      Test_Verification_Block : declare
+      Test_Verification_Block :
+      declare
          Tc_Reading1 : Status_Record_Type;
          Tc_Reading2 : Status_Record_Type;
       begin
 
-         Reset3 : begin
+         Reset3 :
+         begin
             Text_Io.Reset (Status_Log, Text_Io.In_File);      -- Reset for
             -- reading.
          exception
@@ -235,7 +241,8 @@ begin
          Report.Failed ("Exception in Text_IO.Enumeration_IO processing");
    end Operational_Test_Block;
 
-   Final_Block : begin
+   Final_Block :
+   begin
       -- Delete the external file.
       if Text_Io.Is_Open (Status_Log) then
          Text_Io.Delete (Status_Log);

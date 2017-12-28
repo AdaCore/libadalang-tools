@@ -153,7 +153,8 @@ begin  -- Main test procedure.
 
    -- Check a few, correct, edge cases, for modular types.
 
-   Eye_Dew : declare
+   Eye_Dew :
+   declare
       Sense : Decim := 0.00;
 
       Little   : Unsigned_Edge_8;
@@ -171,7 +172,8 @@ begin  -- Main test procedure.
 
    end Eye_Dew;
 
-   Rounding : declare
+   Rounding :
+   declare
       Easy     : Decim := Identity (2.0);
       Simple   : Decim := Identity (2.1);
       Halfway  : Decim := Identity (2.5);

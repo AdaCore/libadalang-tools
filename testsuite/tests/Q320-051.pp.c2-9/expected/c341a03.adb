@@ -33,7 +33,8 @@ begin  -- C341A03
       "different type when the operation is embedded " &
       "in a generic unit");
 
-   Audit_Checking_Accounts : declare
+   Audit_Checking_Accounts :
+   declare
       Balance_In_Checking_Accounts : Bank.Dollar_Amount := 0.00;
       -- Instantiate with a specific extended type.
       function Checking_Audit is new C341a03_0 (Checking.Account);

@@ -15,7 +15,8 @@ begin
    -- Check that tags are preserved by parameter passing:
    --
 
-   Parameter_Passing_Subtest : declare
+   Parameter_Passing_Subtest :
+   declare
       Specific_A : C390007_0.C390007_1.C390007_2.Param_Derived_Type;
       Specific_B : C390007_0.C390007_1.C390007_2.Param_Derived_Type;
 
@@ -60,7 +61,8 @@ begin
    -- Check that tags are preserved by type conversion:
    --
 
-   Type_Conversion_Subtest : declare
+   Type_Conversion_Subtest :
+   declare
       Specific_A : C390007_0.C390007_3.C390007_4.Convert_Derived_Type;
       Specific_B : C390007_0.C390007_3.C390007_4.Convert_Derived_Type;
 
@@ -111,7 +113,8 @@ begin
    -- Check that tags are preserved by type conversion and parameter passing:
    --
 
-   Type_Conversion_And_Parameter_Passing_Subtest : declare
+   Type_Conversion_And_Parameter_Passing_Subtest :
+   declare
       Specific_A : C390007_0.C390007_1.C390007_2.Param_Derived_Type;
       Specific_B : C390007_0.C390007_1.C390007_2.Param_Derived_Type;
 

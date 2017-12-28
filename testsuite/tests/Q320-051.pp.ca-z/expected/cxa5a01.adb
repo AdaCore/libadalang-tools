@@ -65,7 +65,8 @@ begin
      ("CXA5A01",
       "Check that the functions Sin and Sinh provide " & "correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Ada.Numerics;
       use Fxa5a00;

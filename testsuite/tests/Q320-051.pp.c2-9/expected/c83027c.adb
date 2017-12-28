@@ -56,7 +56,8 @@ begin
       "FORMAL TYPE DECLARATION HIDES AN OUTER " &
       "DECLARATION OF A HOMOGRAPH");
 
-   One : declare
+   One :
+   declare
       A : Integer := Ident_Int (2);
 
       D : Integer := Ident_Int (2);

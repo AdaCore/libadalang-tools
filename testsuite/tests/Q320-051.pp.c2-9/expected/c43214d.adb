@@ -39,7 +39,8 @@ begin
 
    begin
 
-      Case_C : declare
+      Case_C :
+      declare
 
          type Tc is
            array (Integer range -1 .. 0, Ident_Int (7) .. 9) of Character;

@@ -15,7 +15,8 @@ begin
       " protected object finalizes the" &
       " protected object");
 
-   First_Check : declare
+   First_Check :
+   declare
       protected type Semaphore is
          entry Wait;
          procedure Signal;
@@ -72,7 +73,8 @@ begin
       end if;
    end First_Check;
 
-   Second_Check : declare
+   Second_Check :
+   declare
       -- here we want to check that the raising of Program_Error occurs before
       -- the other finalization actions.
       protected type Semaphore is

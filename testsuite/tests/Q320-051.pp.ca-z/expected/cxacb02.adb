@@ -62,7 +62,8 @@ begin
       "override the default attributes 'Input and " &
       "'Output using attribute definition clauses");
 
-   Test_For_Stream_Io_Support : declare
+   Test_For_Stream_Io_Support :
+   declare
 
       Util_File        : Ada.Streams.Stream_Io.File_Type;
       Util_Stream      : Ada.Streams.Stream_Io.Stream_Access;
@@ -82,7 +83,8 @@ begin
          Ada.Streams.Stream_Io.Out_File,
          Utility_Filename);
 
-      Operational_Test_Block : declare
+      Operational_Test_Block :
+      declare
 
          type Customer_Type is (Residence, Apartment, Commercial);
          type Electric_Usage_Type is range 0 .. 100_000;
@@ -290,7 +292,8 @@ begin
          -- Read data from the stream, and verify the use of the user specified
          -- attributes.
 
-         Verify_Data_Block : declare
+         Verify_Data_Block :
+         declare
 
             Tc_Residence  : Service_Type (Residence);
             Tc_Apartment  : Service_Type (Apartment);

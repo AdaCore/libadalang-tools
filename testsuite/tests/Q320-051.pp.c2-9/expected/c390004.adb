@@ -168,7 +168,8 @@ begin
 -- class-wide functions. The tag of a class-wide function result should be the
 -- tag appropriate to the actual value returned, not the tag of the ancestor
 -- type.
-   Function_Check : declare
+   Function_Check :
+   declare
       A_Vehicle     : V_Reference := new Dmv.Vehicle'(The_Vehicle);
       A_Car         : C_Reference := new Dmv.Car'(The_Car);
       A_Convertible : C_Reference := new Dmv.Convertible'(The_Convertible);

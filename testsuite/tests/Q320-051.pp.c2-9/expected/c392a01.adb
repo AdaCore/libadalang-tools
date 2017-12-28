@@ -177,7 +177,8 @@ begin  -- Main test procedure.
       "and extended types are declared in the same " &
       "package");
 
-   Bank_Account_Subtest : declare
+   Bank_Account_Subtest :
+   declare
       use Accounts;
    begin
       Accounts.Open (B_Account);
@@ -196,7 +197,8 @@ begin  -- Main test procedure.
 
    end Bank_Account_Subtest;
 
-   Savings_Account_Subtest : declare
+   Savings_Account_Subtest :
+   declare
       use Accounts;
    begin
       Accounts.Open (Acct => S_Account);
@@ -220,7 +222,8 @@ begin  -- Main test procedure.
 
    end Savings_Account_Subtest;
 
-   Preferred_Account_Subtest : declare
+   Preferred_Account_Subtest :
+   declare
       use Accounts;
    begin
       Accounts.Open (P_Account);

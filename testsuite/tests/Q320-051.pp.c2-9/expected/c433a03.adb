@@ -83,25 +83,29 @@ begin
 
    begin
 
-      Case_A : begin
+      Case_A :
+      begin
          F433a00.Reset_Init;
          A1 := T1'(4 .. 5 => <>, 6 .. 8 => <>, others => Org);
          F433a00.Check_Init_Count (Expected => 5, Message => "Subtest A");
       end Case_A;
 
-      Case_B : begin
+      Case_B :
+      begin
          F433a00.Reset_Init;
          A1 := T1'(1 | 4 .. 6 | 3 | 2 => <>, others => Org);
          F433a00.Check_Init_Count (Expected => 6, Message => "Subtest B");
       end Case_B;
 
-      Case_C : begin
+      Case_C :
+      begin
          F433a00.Reset_Init;
          A1 := T1'(1 | 3 | 5 | 7 .. 9 => Org, others => <>);
          F433a00.Check_Init_Count (Expected => 4, Message => "Subtest C");
       end Case_C;
 
-      Case_D : begin
+      Case_D :
+      begin
          F433a00.Reset_Init;
          A2 :=
            T2'
@@ -110,13 +114,15 @@ begin
          F433a00.Check_Init_Count (Expected => 12, Message => "Subtest D");
       end Case_D;
 
-      Case_E : begin
+      Case_E :
+      begin
          F433a00.Reset_Init;
          A3 := T3'(1 .. 2 => (2 | 4 | 6 .. 8 => <>, others => Org));
          F433a00.Check_Init_Count (Expected => 10, Message => "Subtest E");
       end Case_E;
 
-      Case_F : begin
+      Case_F :
+      begin
          F433a00.Reset_Init;
          A4 :=
            T4'
@@ -125,7 +131,8 @@ begin
          F433a00.Check_Init_Count (Expected => 30, Message => "Subtest F");
       end Case_F;
 
-      Case_G : begin
+      Case_G :
+      begin
          F433a00.Reset_Init;
          A4 :=
            T4'
@@ -141,7 +148,8 @@ begin
       type T2 is array (Integer range <>, Integer range <>) of Our_Rec;
    begin
 
-      Case_H1 : declare
+      Case_H1 :
+      declare
          H1 : T2 (8 .. 4, 5 .. 1);
       begin
          F433a00.Reset_Init;
@@ -152,7 +160,8 @@ begin
             Report.Failed ("Case H1 : Exception raised");
       end Case_H1;
 
-      Case_H2 : declare
+      Case_H2 :
+      declare
          H2 : T2 (8 .. 4, 5 .. 1);
       begin
          F433a00.Reset_Init;
@@ -165,7 +174,8 @@ begin
             Report.Failed ("Case H2 : Exception raised");
       end Case_H2;
 
-      Case_H3 : declare
+      Case_H3 :
+      declare
          H3 : T2 (3 .. 5, 1 .. 2);
       begin
          F433a00.Reset_Init;
@@ -176,7 +186,8 @@ begin
             Report.Failed ("Case H3 : Exception raised");
       end Case_H3;
 
-      Case_H4 : declare
+      Case_H4 :
+      declare
          H4 : T2 (1 .. 2, 5 .. 7);
       begin
          F433a00.Reset_Init;
@@ -189,7 +200,8 @@ begin
             Report.Failed ("Case H4 : Exception raised");
       end Case_H4;
 
-      Case_J1 : declare
+      Case_J1 :
+      declare
          J1 : array (4 .. 2) of T1 (1 .. 2);
       begin
          F433a00.Reset_Init;
@@ -200,7 +212,8 @@ begin
             Report.Failed ("Case J1 : Exception raised");
       end Case_J1;
 
-      Case_J2 : declare
+      Case_J2 :
+      declare
          J2 : array (4 .. 2) of T1 (1 .. 2);
       begin
          F433a00.Reset_Init;
@@ -213,7 +226,8 @@ begin
             Report.Failed ("Case J2 : Exception raised");
       end Case_J2;
 
-      Case_K1 : declare
+      Case_K1 :
+      declare
          K1 : array (2 .. 3) of T1 (1 .. 2);
       begin
          F433a00.Reset_Init;
@@ -225,7 +239,8 @@ begin
             Report.Failed ("Case K1 : Exception raised");
       end Case_K1;
 
-      Case_K2 : declare
+      Case_K2 :
+      declare
          K2 : array (2 .. 3) of T1 (9 .. 10);
       begin
          F433a00.Reset_Init;
@@ -238,7 +253,8 @@ begin
             Report.Failed ("Case K2 : Exception raised");
       end Case_K2;
 
-      Case_K3 : declare
+      Case_K3 :
+      declare
          K3 : array (2 .. 3) of T1 (2 .. 1);
       begin
          F433a00.Reset_Init;
@@ -250,7 +266,8 @@ begin
             Report.Failed ("Case K3 : Exception raised");
       end Case_K3;
 
-      Case_K4 : declare
+      Case_K4 :
+      declare
          K4 : array (2 .. 3) of T1 (2 .. 1);
       begin
          F433a00.Reset_Init;
@@ -263,7 +280,8 @@ begin
             Report.Failed ("Case K4 : Exception raised");
       end Case_K4;
 
-      Case_L1 : declare
+      Case_L1 :
+      declare
          L1 : array (4 .. 3, 3 .. 4) of T2 (2 .. 3, 1 .. 2);
       begin
          F433a00.Reset_Init;
@@ -278,7 +296,8 @@ begin
             Report.Failed ("Case L1 : Exception raised");
       end Case_L1;
 
-      Case_L2 : declare
+      Case_L2 :
+      declare
          L2 : array (3 .. 4, 4 .. 3) of T2 (2 .. 3, 1 .. 2);
       begin
          F433a00.Reset_Init;
@@ -293,7 +312,8 @@ begin
             Report.Failed ("Case L2 : Exception raised");
       end Case_L2;
 
-      Case_M1 : declare
+      Case_M1 :
+      declare
          M1 : array (2 .. 3, 1 .. 2) of T2 (1 .. 2, 9 .. 10);
       begin
          F433a00.Reset_Init;
@@ -308,7 +328,8 @@ begin
             Report.Failed ("Case M1 : Exception raised");
       end Case_M1;
 
-      Case_M2 : declare
+      Case_M2 :
+      declare
          M2 : array (2 .. 3, 1 .. 2) of T2 (1 .. 2, 9 .. 10);
       begin
          F433a00.Reset_Init;
@@ -323,7 +344,8 @@ begin
             Report.Failed ("Case M2 : Exception raised");
       end Case_M2;
 
-      Case_M3 : declare
+      Case_M3 :
+      declare
          M3 : array (2 .. 3, 1 .. 2) of T2 (1 .. 2, 2 .. 1);
       begin
          F433a00.Reset_Init;
@@ -338,7 +360,8 @@ begin
             Report.Failed ("Case M3 : Exception raised");
       end Case_M3;
 
-      Case_M4 : declare
+      Case_M4 :
+      declare
          M4 : array (2 .. 3, 1 .. 2) of T2 (2 .. 1, 1 .. 2);
       begin
          F433a00.Reset_Init;

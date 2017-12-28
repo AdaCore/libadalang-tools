@@ -107,7 +107,8 @@ begin  -- Main test procedure.
    Tctouch.Assert (Tag_Slices'First = 0, "Tag_Slices'First = 0");
    Tctouch.Assert (Tag_Slices'Last = 11, "Tag_Slices'Last = 11");
 
-   Check_Formal_Association_Check : begin
+   Check_Formal_Association_Check :
+   begin
       C641001_0.Check_String_10 (Slicable, 1, 10); -- catch length fault
       Report.Failed ("Exception not raised at Check_Formal_Association_Check");
    exception

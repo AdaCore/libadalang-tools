@@ -65,7 +65,8 @@ begin
       "the package Ada.Strings.Maps, and that " &
       "they produce correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Ada.Strings, Ada.Strings.Maps;
       use type Maps.Character_Set;  -- To allow logical set operator

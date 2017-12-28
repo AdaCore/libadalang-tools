@@ -87,7 +87,8 @@ begin
       "composition constraints defined for picture " &
       "strings");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Ada.Text_Io;
       use Fxf3a00;

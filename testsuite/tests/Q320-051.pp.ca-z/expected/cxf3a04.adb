@@ -70,7 +70,8 @@ begin
       "numerical data and picture formatting " &
       "parameters provided to the function");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Ada.Text_Io;
 
@@ -94,10 +95,10 @@ begin
    begin
 
       Two_Decimal_Place_Data :
-         -- Use a decimal fixed point type with delta 0.01 (two decimal places)
-         -- and valid picture strings. Evaluate the result of function Image
-         -- with the expected edited output result string.
-          declare
+      -- Use a decimal fixed point type with delta 0.01 (two decimal places)
+      -- and valid picture strings. Evaluate the result of function Image with
+      -- the expected edited output result string.
+      declare
 
          Tc_Loop_End : constant :=                                     -- 10
            Fxf3a00.Number_Of_2dp_Items - Fxf3a00.Number_Of_Foreign_Strings;
@@ -153,10 +154,10 @@ begin
       end Two_Decimal_Place_Data;
 
       No_Decimal_Place_Data :
-         -- Use a decimal fixed point type with delta 1.00 (no decimal places)
-         -- and valid picture strings. Evaluate the result of function Image
-         -- with the expected result string.
-          declare
+      -- Use a decimal fixed point type with delta 1.00 (no decimal places) and
+      -- valid picture strings. Evaluate the result of function Image with the
+      -- expected result string.
+      declare
 
          use Editing, Fxf3a00;
 
@@ -219,18 +220,17 @@ begin
       end No_Decimal_Place_Data;
 
       Exception_Block :
-         -- The following three calls of Function Image, using the specific
-         -- decimal values and picture strings provided, will cause a
-         -- Layout_Error to be raised. The first two evaluations use the
-         -- instantiation of Decimal_Output with a decimal type with delta
-         -- 0.01, while the last evaluation uses the instantiation with
-         -- decimal type with delta 1.0.
+      -- The following three calls of Function Image, using the specific
+      -- decimal values and picture strings provided, will cause a Layout_Error
+      -- to be raised. The first two evaluations use the instantiation of
+      -- Decimal_Output with a decimal type with delta 0.01, while the last
+      -- evaluation uses the instantiation with decimal type with delta 1.0.
 
-         -- Note: The data and the picture strings used in the following
-         --       evaluations are not themselves erroneous, but when used in
-         --       combination will cause Layout_Error to be raised.
+      -- Note: The data and the picture strings used in the following
+      --       evaluations are not themselves erroneous, but when used in
+      --       combination will cause Layout_Error to be raised.
 
- begin
+      begin
 
          for I in 1 .. Fxf3a00.Number_Of_Erroneous_Conditions loop    -- 1..3
             begin

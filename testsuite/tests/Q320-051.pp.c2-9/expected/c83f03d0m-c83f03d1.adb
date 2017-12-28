@@ -47,7 +47,7 @@ package body C83f03d1 is
       Bump;
       Bump;
 
-      <<LABEL_IN_MAIN>>
+      <<Label_In_Main>>
       Bump;
       goto T3;
       Bump;
@@ -71,7 +71,7 @@ package body C83f03d1 is
       Bump;
       goto T4;
       Bump;
-      <<LABEL_IN_OUTER>>
+      <<Label_In_Outer>>
       Bump;
       goto Ending;
       Bump;
@@ -88,14 +88,14 @@ package body C83f03d1 is
       goto Y3;
       Bump;
 
-      <<ENDING>>
+      <<Ending>>
       null;
 
    end P;
 
 begin
 
-   <<LABEL_IN_OUTER>>
+   <<Label_In_Outer>>
    null;
 
 end C83f03d1;

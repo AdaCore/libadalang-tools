@@ -45,7 +45,8 @@ begin
      (Expected => "iFfiFfiUffff",
       Message  => "Renames in subprogram");
 
-   Subtest_2 : declare
+   Subtest_2 :
+   declare
       X : Ctrl renames F;
       Y : Integer renames F.C;
       Z : User renames U;
@@ -71,7 +72,8 @@ begin
       Failed ("Outer object finalized too early - Outer3");
    end if;
 
-   Subtest_4 : declare
+   Subtest_4 :
+   declare
       X : Ctrl renames Outer;
    begin
       if X.Finalized or X.C /= Ident_Int (15) then

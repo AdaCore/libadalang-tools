@@ -260,7 +260,8 @@ begin  -- Main test procedure.
    -- having made it this far, the rest is downhill... check a few, correct,
    -- edge cases, and we're done
 
-   Eye_Dew : declare
+   Eye_Dew :
+   declare
       A_Float   : Float    := 0.0;
       Your_Time : Duration := 0.0;
       Number    : Integer  := 0;

@@ -74,7 +74,8 @@ begin
       "will transfer an object of a specific, " &
       "non-limited type to/from a stream");
 
-   Test_For_Stream_Io_Support : begin
+   Test_For_Stream_Io_Support :
+   begin
 
       -- If an implementation does not support Stream_IO in a particular
       -- environment, the exception Use_Error or Name_Error will be raised on
@@ -95,7 +96,8 @@ begin
 
    end Test_For_Stream_Io_Support;
 
-   Operational_Test_Block : declare
+   Operational_Test_Block :
+   declare
 
       The_Stream  : Strm_Pack.Stream_Access;
       Todays_Date : String (1 .. 6) := "271193";
@@ -173,14 +175,16 @@ begin
       Store_Data (The_Stream, Product_Information_1);
       Store_Data (The_Stream, Product_Information_2);
 
-      Test_Verification_Block : declare
+      Test_Verification_Block :
+      declare
          Product_Header_1 : Header_Type;
          Product_Header_2 : Header_Type;
          Product_Array_1  : Data_Array_Type (1 .. 3);
          Product_Array_2  : Data_Array_Type (1 .. 4);
       begin
 
-         Reset1 : begin
+         Reset1 :
+         begin
             Strm_Pack.Reset (The_File, Strm_Pack.In_File);
          exception
             when Ada.Streams.Stream_Io.Use_Error =>
@@ -263,7 +267,8 @@ begin
 
    end Operational_Test_Block;
 
-   Deletion : begin
+   Deletion :
+   begin
       -- Delete the file.
       if Strm_Pack.Is_Open (The_File) then
          Strm_Pack.Delete (The_File);

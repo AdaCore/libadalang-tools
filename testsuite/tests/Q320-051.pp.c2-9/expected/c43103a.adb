@@ -46,7 +46,8 @@ begin
       Comment
         ("CASE A : DISCRIMINANT THAT IS NOT USED INSIDE " & "THE RECORD");
 
-      Case_A : declare
+      Case_A :
+      declare
 
          type R1 (A : Integer) is record
             B : String (1 .. 2);
@@ -66,7 +67,8 @@ begin
       Comment
         ("CASE B : DISCRIMINANT THAT IS USED AS AN ARRAY " & "INDEX BOUND");
 
-      Case_B : declare
+      Case_B :
+      declare
 
          subtype Stb is Integer range 1 .. 10;
          type Tb is array (Stb range <>) of Integer;
@@ -91,7 +93,8 @@ begin
         ("CASE C : DISCRIMINANT THAT IS USED IN A " &
          "DISCRIMINANT CONSTRAINT");
 
-      Case_C : declare
+      Case_C :
+      declare
 
          subtype Stc is Integer range 1 .. 10;
          type Tc is array (Stc range <>) of Integer;

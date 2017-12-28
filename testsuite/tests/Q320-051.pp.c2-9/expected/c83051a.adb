@@ -41,7 +41,8 @@ begin
       "PART OF A PACKAGE NESTED WITHIN THE VISIBLE " &
       "PART OF A PACKAGE ARE VISIBLE BY SELECTION " &
       "FROM OUTSIDE THE OUTERMOST PACKAGE");
-   A_Block : declare
+   A_Block :
+   declare
       package Apack is
          package Bpack is
             type T1 is (Red, Green);
@@ -209,7 +210,8 @@ begin
 
    end A_Block;
 
-   B_Block : declare
+   B_Block :
+   declare
       generic
          type T1 is (<>);
       package Genpack is

@@ -46,7 +46,8 @@ begin
    declare   -- A
    begin
 
-      B1 : declare
+      B1 :
+      declare
 
          type Variant_Rec (Discr : Boolean := True) is record
             A, B : Integer;

@@ -70,7 +70,8 @@ begin
       "increment line numbers when used with " &
       "unbounded text files of mode Append_File");
 
-   Test_For_Text_Io_Support : begin
+   Test_For_Text_Io_Support :
+   begin
 
       -- An application creates a text file in mode Out_File, with the
       -- intention of entering string data packets into the file as
@@ -89,7 +90,8 @@ begin
          raise Incomplete;
    end Test_For_Text_Io_Support;
 
-   Operational_Test_Block : declare
+   Operational_Test_Block :
+   declare
       subtype String_Sequence_Type is String (1 .. 20);
       type String_Pointer_Type is access String_Sequence_Type;
 
@@ -175,7 +177,8 @@ begin
 -- the data contained there. However, with the need to place more data into
 -- the file, the file can be reset to Append_File mode.
 
-      Reset1 : begin
+      Reset1 :
+      begin
          Ada.Text_Io.Reset
            (An_Unbounded_File,
             Tc_Mode_Selection (Report.Ident_Int (3)));
@@ -217,7 +220,8 @@ begin
          Report.Failed ("Incorrect Col position after 4th Put");
       end if;
 
-      Test_Verification_Block : declare
+      Test_Verification_Block :
+      declare
          File_Data : String (1 .. 80);
          Tc_Width  : Natural;
       begin
@@ -225,7 +229,8 @@ begin
 -- The application has the capability to reset the file to In_File mode to
 -- verify some of the data that is contained there.
 
-         Reset2 : begin
+         Reset2 :
+         begin
             Ada.Text_Io.Reset (An_Unbounded_File, Ada.Text_Io.In_File);
          exception
             when Ada.Text_Io.Use_Error =>
@@ -263,7 +268,8 @@ begin
          Report.Failed ("Exception in Text_IO processing");
    end Operational_Test_Block;
 
-   Final_Block : begin
+   Final_Block :
+   begin
       -- Delete the external file.
       if Ada.Text_Io.Is_Open (An_Unbounded_File) then
          Ada.Text_Io.Delete (An_Unbounded_File);

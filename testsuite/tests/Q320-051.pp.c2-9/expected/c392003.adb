@@ -378,7 +378,8 @@ begin  -- Main test procedure.
       "subsequent extended types are derived in " &
       "further nested packages");
 
-   Bank_Account_Subtest : begin
+   Bank_Account_Subtest :
+   begin
       Accounts.Open (B_Account);
 
       -- Demonstrate class-wide parameter allowing dispatch by a primitive
@@ -395,7 +396,8 @@ begin  -- Main test procedure.
 
    end Bank_Account_Subtest;
 
-   Savings_Account_Subtest : begin
+   Savings_Account_Subtest :
+   begin
       Accounts.S_And_L.Open (Acct => S_Account);
 
       -- Demonstrate class-wide parameter allowing dispatch by a primitive
@@ -412,7 +414,8 @@ begin  -- Main test procedure.
 
    end Savings_Account_Subtest;
 
-   Preferred_Account_Subtest : begin
+   Preferred_Account_Subtest :
+   begin
       Accounts.S_And_L.Premium.Open (P_Account);
 
       -- Verify that the correct implementation of Open (overridden) was used

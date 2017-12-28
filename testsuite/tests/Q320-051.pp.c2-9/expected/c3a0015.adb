@@ -110,7 +110,8 @@ begin
 
    Comment ("Access types using the standard storage pool");
 
-   Std : declare
+   Std :
+   declare
       procedure Check1 is new Check
         (Designated  => Float,
          Value       => 3.0,
@@ -140,7 +141,8 @@ begin
 
    Comment ("Access types using a user-defined storage pool");
 
-   User : declare
+   User :
+   declare
       procedure Check1 is new Check
         (Designated  => Integer,
          Value       => 17,

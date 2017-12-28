@@ -60,7 +60,8 @@ procedure C761006 is
       This_Object_Target : C761006_2.Adj_Check;
    begin
 
-      Check_Adjust_Due_To_Assignment : begin
+      Check_Adjust_Due_To_Assignment :
+      begin
          This_Object_Target := This_Object_Ok;
          Report.Failed ("Adjust did not propagate any exception");
       exception
@@ -74,7 +75,8 @@ procedure C761006 is
 
       C761006_Support.Events_Occurring := (True, False, False);
 
-      Check_Adjust_Due_To_Initial_Assignment : declare
+      Check_Adjust_Due_To_Initial_Assignment :
+      declare
          Another_Target : C761006_2.Adj_Check := This_Object_Ok;
       begin
          Report.Failed ("Adjust did not propagate any exception");
@@ -170,14 +172,16 @@ procedure C761006 is
 
    begin
 
-      Exception_In_Finalization : begin
+      Exception_In_Finalization :
+      begin
          Finalize_15;
       exception
          when Program_Error =>
             null; -- anticipated
       end Exception_In_Finalization;
 
-      Use_Of_Unchecked_Deallocation : begin
+      Use_Of_Unchecked_Deallocation :
+      begin
          Finalize_17_Outer;
       exception
          when Program_Error =>

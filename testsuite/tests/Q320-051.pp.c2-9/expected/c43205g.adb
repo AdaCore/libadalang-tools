@@ -46,9 +46,11 @@ begin
 
    begin
 
-      Case_G : begin
+      Case_G :
+      begin
 
-         Case_G1 : declare
+         Case_G1 :
+         declare
 
             type Ta is array (Ident_Int (11) .. 15) of Integer;
 
@@ -71,7 +73,8 @@ begin
 
          end Case_G1;
 
-         Case_G2 : declare
+         Case_G2 :
+         declare
 
             type Ta is array (11 .. 12, Ident_Int (10) .. 11) of Integer;
 

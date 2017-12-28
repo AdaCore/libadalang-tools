@@ -82,7 +82,8 @@ begin
       "Check that the functions Cot, Coth, and " &
       "Arccoth provide correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Ada.Exceptions;
       use Ada.Numerics;

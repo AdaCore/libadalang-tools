@@ -74,7 +74,8 @@ begin
       "Text_IO.Float_IO operate correctly for files " &
       "with mode Append_File");
 
-   Test_For_Text_Io_Support : begin
+   Test_For_Text_Io_Support :
+   begin
 
       -- An implementation that does not support Text_IO in a particular
       -- environment will raise Use_Error on calls to various Text_IO
@@ -96,7 +97,8 @@ begin
 
    end Test_For_Text_Io_Support;
 
-   Operational_Test_Block : declare
+   Operational_Test_Block :
+   declare
       Total_Loans_Outstanding : constant Natural := 3;
       Transaction_Status      : Boolean          := False;
 
@@ -197,14 +199,16 @@ begin
          Report.Failed ("Failure in update of first loan data");
       end if;
 
-      Test_Verification_Block : declare
+      Test_Verification_Block :
+      declare
          type Ledger_Type is
            array (1 .. Total_Loans_Outstanding) of Loan_Info_Type;
          Tc_Bank_Ledger : Ledger_Type;
          Tc_Item_Count  : Natural := 0;
       begin
 
-         Reset1 : begin
+         Reset1 :
+         begin
             Text_Io.Reset (Loan_File, Text_Io.In_File);       -- Reset for
             -- reading.
          exception
@@ -259,7 +263,8 @@ begin
          Report.Failed ("Exception in Text_IO.Float_IO processing");
    end Operational_Test_Block;
 
-   Final_Block : begin
+   Final_Block :
+   begin
       -- Delete the external file.
       if Text_Io.Is_Open (Loan_File) then
          Text_Io.Delete (Loan_File);

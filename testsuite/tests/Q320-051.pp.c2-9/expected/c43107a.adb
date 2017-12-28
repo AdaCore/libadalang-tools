@@ -43,7 +43,8 @@ begin
 
    begin
 
-      Case_A : declare
+      Case_A :
+      declare
 
          type T1 is array (1 .. 2) of Integer;
          type R1 is record
@@ -88,7 +89,8 @@ begin
 
       end Case_A;
 
-      Case_B : declare
+      Case_B :
+      declare
 
          type T2 is access Integer;
          type R2 is record

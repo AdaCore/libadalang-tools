@@ -16,7 +16,8 @@ begin
       "Ada.Strings.Wide_Maps and Ada.Strings.Wide_Fixed " &
       "produce correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       package Acl1 renames Ada.Characters.Latin_1;
 

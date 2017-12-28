@@ -6,7 +6,8 @@ with Report;
 procedure Cb20007 is
 begin
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       package Semaphore renames Cb20007_0;
 
@@ -23,7 +24,8 @@ begin
          "be directly propagated to the calling unit " &
          "by protected operations");
 
-      Allocate_Resources : declare
+      Allocate_Resources :
+      declare
          Loop_Count : Integer := Total_Resources_Available + 1;
       begin                                   -- Force exception.
          for I in 1 .. Loop_Count loop
@@ -40,7 +42,8 @@ begin
             Report.Failed ("Unknown exception during resource allocation");
       end Allocate_Resources;
 
-      Deallocate_Resources : declare
+      Deallocate_Resources :
+      declare
          Loop_Count : Integer := Total_Resources_Available + 1;
       begin                                   -- Force exception.
          for I in 1 .. Loop_Count loop

@@ -104,7 +104,8 @@ begin
       "subprograms in Package Interfaces.C.Pointers " &
       "produce correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Ada.Exceptions;
       use type Interfaces.C.Short;

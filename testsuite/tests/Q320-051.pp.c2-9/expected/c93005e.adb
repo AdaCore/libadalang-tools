@@ -9,11 +9,14 @@ begin
 
    Comment ("SUBTEST 3: TASK IN DECL PART OF PACKAGE SPEC");
    Comment ("  THE TASKS DON'T DEPEND ON THE DECLARATIVE PART");
-   B31 : declare
+   B31 :
+   declare
       X : Mnt;
    begin
-      B32 : begin
-         B33 : declare
+      B32 :
+      begin
+         B33 :
+         declare
             package Raises_Exception is
                type Acc_Mnt is access Mnt;
                Y   : Acc_Mnt     := new Mnt;

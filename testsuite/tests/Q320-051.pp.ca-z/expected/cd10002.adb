@@ -23,7 +23,8 @@ begin
       "Check that operational items are allowed in some contexts " &
       "where representation items are not");
 
-   Test_Priv : declare
+   Test_Priv :
+   declare
       X1 : Priv.T1;
       X2 : Priv.T2;
       use Cd10002_0;
@@ -58,7 +59,8 @@ begin
 
    end Test_Priv;
 
-   Test_Gen : declare
+   Test_Gen :
+   declare
 
       type Modular is mod System.Max_Binary_Modulus;
       type Decimal is delta 1.0 digits 1;
@@ -219,7 +221,8 @@ begin
       end if;
    end Test_Gen;
 
-   Test_Deriv : declare
+   Test_Deriv :
+   declare
       X1 : Deriv.Nt1 := Deriv.False;
       X2 : Deriv.Nt2 := (others => 0.0);
       X3 : Deriv.Nt3 := (others => 0.0);

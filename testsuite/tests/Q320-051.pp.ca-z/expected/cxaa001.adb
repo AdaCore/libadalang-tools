@@ -72,7 +72,8 @@ begin
       "modified using the procedures Set_Line_Length " &
       "and Set_Page_Length");
 
-   Test_For_Text_Io_Support : begin
+   Test_For_Text_Io_Support :
+   begin
 
       -- An implementation that does not support Text_IO in a particular
       -- environment will raise Use_Error on calls to various Text_IO
@@ -94,7 +95,8 @@ begin
 
    end Test_For_Text_Io_Support;
 
-   Operational_Test_Block : declare
+   Operational_Test_Block :
+   declare
 
       subtype Confidential_Data_Type is String (1 .. 10);
       subtype Secret_Data_Type is String (1 .. 20);
@@ -170,7 +172,8 @@ begin
       -- The following call simulates processing occurring after the reset of a
       -- Text_IO file with mode Append_File.
 
-      Reset1 : begin
+      Reset1 :
+      begin
          Text_Io.Reset (Data_File, Text_Io.Append_File); -- Reset to
          -- Append_File mode.
       exception
@@ -193,7 +196,8 @@ begin
 
       Write_Top_Secret_Data (Top_Secret_Item);
 
-      Test_Verification_Block : declare
+      Test_Verification_Block :
+      declare
          Tc_String1,
          Tc_String2,
          Tc_String3 : String (1 .. 80) :=
@@ -201,7 +205,8 @@ begin
          Tc_Length1, Tc_Length2, Tc_Length3 : Natural := 0;
       begin
 
-         Reset2 : begin
+         Reset2 :
+         begin
             Text_Io.Reset (Data_File, Text_Io.In_File); -- Reset for reading.
          exception
             when Text_Io.Use_Error =>
@@ -255,7 +260,8 @@ begin
 
    end Operational_Test_Block;
 
-   Deletion : begin
+   Deletion :
+   begin
       -- Check that the file is open prior to deleting it.
       if Text_Io.Is_Open (Data_File) then
          Text_Io.Delete (Data_File);

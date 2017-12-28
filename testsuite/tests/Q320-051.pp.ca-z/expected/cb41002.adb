@@ -70,7 +70,8 @@ begin
       "Exception_Occurrence object. Also check that " &
       "the Exception_Information function can be called");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       Number_Of_Exceptions : constant := 3;
 

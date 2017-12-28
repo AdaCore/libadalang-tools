@@ -75,7 +75,8 @@ begin
       "functionality defined in Package " &
       "Ada.Command_Line");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Ada.Exceptions;
 
@@ -104,7 +105,8 @@ begin
       -- Check that the result of Function Argument is Constraint_Error when
       -- the Number argument is outside the range of 1..Argument_Count.
 
-      Test_Function_Argument_1 : begin
+      Test_Function_Argument_1 :
+      begin
          declare
 
             -- Define a value that will be outside the range of
@@ -143,7 +145,8 @@ begin
 
       -- Check that Function Argument returns a string result.
 
-      Test_Function_Argument_2 : begin
+      Test_Function_Argument_2 :
+      begin
          if Ada.Command_Line.Argument_Count > 0 then
             Report.Comment
               ("Last argument is: " &

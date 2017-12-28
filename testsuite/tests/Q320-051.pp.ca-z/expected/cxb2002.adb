@@ -61,7 +61,8 @@ begin
       "produce correct results for values of signed and " &
       "modular integer types of 16 bits");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Ada.Exceptions;
       use Interfaces;

@@ -80,7 +80,8 @@ begin
       "Check that functions To_Decimal, To_Binary, and " &
       "To_Long_Binary produce the correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Interfaces.Cobol;
       use Ada.Exceptions;
@@ -163,7 +164,8 @@ begin
       --       instantiation of To_Binary/To_Long_Binary with a larger
       --       Num type as the generic formal.
 
-      Binary_Parameter : begin
+      Binary_Parameter :
+      begin
          Tc_Dec_1 := Pack_1.To_Decimal (Pack_2.To_Binary (123_456.78));
          Report.Failed
            ("Conversion_Error was not raised by function " &
@@ -185,7 +187,8 @@ begin
                "value Item was outside the range of type Num");
       end Binary_Parameter;
 
-      Long_Binary_Parameter : begin
+      Long_Binary_Parameter :
+      begin
          Tc_Dec_3 := Pack_3.To_Decimal (Pack_4.To_Long_Binary (Tc_Dec_4));
          Report.Failed
            ("Conversion_Error was not raised by function " &

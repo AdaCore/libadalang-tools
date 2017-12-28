@@ -62,7 +62,8 @@ begin
       "Raise_Exception procedure can raise an " &
       "exception that is specified through the " &
       "use of the 'Identity attribute");
-   Test_Block : declare
+   Test_Block :
+   declare
 
       Check_Points : constant := 5;
 
@@ -123,7 +124,8 @@ begin
 
    begin
 
-      User_Exception_Block : begin
+      User_Exception_Block :
+      begin
          -- Call procedure to raise, handle, and reraise a user defined
          -- exception.
          Propagate_User_Exception;
@@ -140,9 +142,11 @@ begin
               ("Unexpected exception handled in User_Exception_Block");
       end User_Exception_Block;
 
-      Predefined_Exception_Block : begin
+      Predefined_Exception_Block :
+      begin
 
-         Inner_Block : begin
+         Inner_Block :
+         begin
 
             begin
                -- Use the 'Identity attribute as an input parameter to the

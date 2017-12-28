@@ -19,7 +19,8 @@ begin
      ("CB20001",
       "Check that exceptions can be handled " & "in accept bodies");
 
-   Off_Screen_Block : begin
+   Off_Screen_Block :
+   begin
       Sonar_Contact := 1_500;
       Trident.Contact (Sonar_Contact);  -- Cause Off_Screen_Data exception
       -- to be raised and handled in a task accept body.
@@ -34,7 +35,8 @@ begin
            ("Exception handled unexpectedly in " & "Off_Screen_Block");
    end Off_Screen_Block;
 
-   Location_Error_Block : begin
+   Location_Error_Block :
+   begin
       Sonar_Contact := 700;
       Trident.Contact (Sonar_Contact);  -- Cause Location_Error exception
       -- to be raised in task accept body, propogated to a task block, and
@@ -48,7 +50,8 @@ begin
            ("Exception handled unexpectedly in " & "Location_Error_Block");
    end Location_Error_Block;
 
-   Incorrect_Data_Block : begin
+   Incorrect_Data_Block :
+   begin
       Sonar_Contact := 200;
       Trident.Contact (Sonar_Contact);  -- Cause Incorrect_Data exception
       -- to be raised in task accept body, propogated to calling procedure.

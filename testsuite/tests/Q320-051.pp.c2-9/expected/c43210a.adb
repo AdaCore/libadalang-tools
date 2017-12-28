@@ -78,7 +78,8 @@ begin
 
    begin
 
-      Case_A : begin
+      Case_A :
+      begin
 
          Cc := 0;
          A1 := T1'(4 .. 5 => Calc (2), 6 .. 8 => Calc (4), others => 5);
@@ -86,7 +87,8 @@ begin
 
       end Case_A;
 
-      Case_B : begin
+      Case_B :
+      begin
 
          Cc := 0;
          A1 := T1'(1 | 4 .. 6 | 3 | 2 => Calc (-1), others => -2);
@@ -94,7 +96,8 @@ begin
 
       end Case_B;
 
-      Case_C : begin
+      Case_C :
+      begin
 
          Cc := 0;
          A1 := T1'(1 | 3 | 5 | 7 .. 9 => -1, others => Calc (-2));
@@ -102,7 +105,8 @@ begin
 
       end Case_C;
 
-      Case_D : begin
+      Case_D :
+      begin
 
          Cc := 0;
          A2 :=
@@ -113,7 +117,8 @@ begin
 
       end Case_D;
 
-      Case_E : begin
+      Case_E :
+      begin
 
          Cc := 0;
          A3 := T3'(1 .. 2 => (2 | 4 | 6 .. 8 => Calc (-1), others => -2));
@@ -121,7 +126,8 @@ begin
 
       end Case_E;
 
-      Case_F : begin
+      Case_F :
+      begin
 
          Cc := 0;
          A4 :=
@@ -133,7 +139,8 @@ begin
 
       end Case_F;
 
-      Case_G : begin
+      Case_G :
+      begin
 
          Cc := 0;
          A4 :=

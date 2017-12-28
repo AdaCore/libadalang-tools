@@ -66,7 +66,8 @@ begin
       "End_Of_Page on a text file with mode " &
       "Append_File");
 
-   Test_For_Text_Io_Support : begin
+   Test_For_Text_Io_Support :
+   begin
 
 -- Use_Error will be raised if Text_IO operations or external files are not
 -- supported.
@@ -90,14 +91,16 @@ begin
 
    Text_Io.Close (Text_File);
 
-   Operational_Test_Block : declare
+   Operational_Test_Block :
+   declare
       Tc_Number_Of_Forced_Mode_Errors : constant Natural := 2;
       Tc_Mode_Errors                  : Natural          := 0;
    begin
 
       Text_Io.Open (Text_File, Text_Io.Append_File, Text_Filename);
 
-      Test_For_End_Of_Line : declare
+      Test_For_End_Of_Line :
+      declare
          Tc_End_Of_Line : Boolean;
       begin
 
@@ -119,7 +122,8 @@ begin
             Report.Failed ("Exception in End_Of_Line processing");
       end Test_For_End_Of_Line;
 
-      Test_For_End_Of_Page : declare
+      Test_For_End_Of_Page :
+      declare
          Tc_End_Of_Page : Boolean;
       begin
 
@@ -146,7 +150,8 @@ begin
 
    end Operational_Test_Block;
 
-   Deletion : begin
+   Deletion :
+   begin
       -- Delete the external file.
       if Text_Io.Is_Open (Text_File) then
          Text_Io.Delete (Text_File);

@@ -45,7 +45,8 @@ begin
 
    Test ("C94001F", "TASK COMPLETION BY EXCEPTION -- NO HANDLER");
 
-   Block : declare
+   Block :
+   declare
 
       task T1;
 

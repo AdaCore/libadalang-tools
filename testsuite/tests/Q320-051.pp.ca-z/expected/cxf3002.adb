@@ -70,7 +70,8 @@ begin
       "in package Ada.Wide_Text_IO.Editing is " &
       "available and produces correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Ada.Wide_Text_Io;
 

@@ -21,7 +21,8 @@ begin
       "Check that an exception declared in a package " &
       "can be raised by a client of a child of the package");
 
-   Multiply_Complex_Subtest : declare
+   Multiply_Complex_Subtest :
+   declare
       Operand_1 : Complex_Type :=
         Complex
           (Int_Type (Report.Ident_Int (3)),
@@ -56,7 +57,8 @@ begin
 
    end Multiply_Complex_Subtest;
 
-   Add_Complex_Subtest : declare
+   Add_Complex_Subtest :
+   declare
       Error_In_Client : exception renames Add_Error;
       -- Reference to exception in parent package.
       Operand_1 : Complex_Type :=

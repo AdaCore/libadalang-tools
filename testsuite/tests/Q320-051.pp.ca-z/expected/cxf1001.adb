@@ -65,7 +65,8 @@ begin
       "18; the value of Decimal.Min_Scale is at " &
       "most 0");
 
-   Attribute_Check_Block : declare
+   Attribute_Check_Block :
+   declare
 
       Del          : constant := 1.0 / 10**2;
       Const_Digits : constant := 3;
@@ -116,13 +117,13 @@ begin
    end Attribute_Check_Block;
 
    Radix_Block :
-      -- Premises:
+   -- Premises:
    --   1) Choose several numbers, from types using either decimal scaling or
-      --      binary scaling.
-      --   1) Repetitively add these numbers to themselves.
+   --      binary scaling.
+   --   1) Repetitively add these numbers to themselves.
    --   3) Validate that the result is the expected result, regardless of the
-      --      scaling used in the definition of the type.
-       declare
+   --      scaling used in the definition of the type.
+   declare
 
       Number_Of_Values : constant := 3;
       Loop_Count       : constant := 1_000;
@@ -223,9 +224,9 @@ begin
    end Radix_Block;
 
    Size_Block :
-      -- Check the implementation max/min values of constants declared in
-      -- package Ada.Decimal.
-       declare
+   -- Check the implementation max/min values of constants declared in package
+   -- Ada.Decimal.
+   declare
       Minimum_Required_Size : constant := 18;
       Maximum_Allowed_Size  : constant := 0;
    begin

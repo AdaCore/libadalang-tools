@@ -114,7 +114,8 @@ begin  -- Main test procedure.
    Subtest_1;
    Sup.Validate (Subtest_1_Expected_Inits, 1);
 
-   Subtest_2_Frame : begin
+   Subtest_2_Frame :
+   begin
       Sup.Inits_Called := 0;
       Subtest_2;
    exception

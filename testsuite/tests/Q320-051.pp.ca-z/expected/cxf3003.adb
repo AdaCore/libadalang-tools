@@ -54,7 +54,8 @@ begin
       "picture strings can be used to produce " &
       "correctly formatted edited output");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Ada.Exceptions;
       use Ada.Text_Io.Editing;

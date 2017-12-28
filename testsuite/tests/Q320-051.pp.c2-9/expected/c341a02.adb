@@ -119,7 +119,8 @@ begin
       "Check that class-wide objects can be " &
       "reassigned with objects from the same " &
       "specific type used to initialize them");
-   Night_Audit : declare
+   Night_Audit :
+   declare
       use type Bank.Dollar_Amount;
       Acct_Value : Bank.Dollar_Amount := 0.00;
    begin

@@ -23,7 +23,8 @@ begin
       "declarations and operations, including a formal " &
       "type of the parent");
 
-   Correct_Range_Test : declare
+   Correct_Range_Test :
+   declare
       My_Literal : Ca11012_2.My_Integer := -3;
 
    begin
@@ -43,7 +44,8 @@ begin
 
    ---------------------------------------------------------------
 
-   Out_Of_Range_Test : declare
+   Out_Of_Range_Test :
+   declare
       My_Vector : Ca11012_2.My_Integer;
 
    begin

@@ -58,7 +58,8 @@ begin
       "to raise Layout_Error under appropriate " &
       "conditions");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Ada.Exceptions;
       use Ada.Text_Io.Editing;
@@ -213,7 +214,8 @@ begin
       --       evaluations are not themselves erroneous, but when used in
       --       combination will cause Layout_Error to be raised.
 
-      Exception_Block_1 : declare
+      Exception_Block_1 :
+      declare
          Erroneous_Data_1    : Decimal_Data_Type := 12.34;
          Erroneous_Picture_1 : Picture           := To_Picture ("9.99");
          N : constant Natural  := Image_Io.Length (Erroneous_Picture_1);
@@ -234,7 +236,8 @@ begin
                Exception_Name (The_Error));
       end Exception_Block_1;
 
-      Exception_Block_2 : declare
+      Exception_Block_2 :
+      declare
          Erroneous_Data_2    : Decimal_Data_Type := -12.34;
          Erroneous_Picture_2 : Picture           := To_Picture ("99.99");
          N : constant Natural  := Image_Io.Length (Erroneous_Picture_2);

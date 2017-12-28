@@ -69,7 +69,8 @@ begin
       "Exception_Occurrence using the procedure " &
       "Save_Occurrence");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Ada.Exceptions;
 
@@ -86,7 +87,8 @@ begin
 
    begin
 
-      Raise_And_Save_Block_1 : begin
+      Raise_And_Save_Block_1 :
+      begin
 
          -- This nested exception structure is designed to ensure that the
          -- appropriate exception occurrence is saved using the Save_Occurrence
@@ -127,7 +129,8 @@ begin
 
       end Raise_And_Save_Block_1;
 
-      Reraise_And_Handle_Saved_Exception_1 : begin
+      Reraise_And_Handle_Saved_Exception_1 :
+      begin
          -- Reraise the exception that was saved in the previous block.
 
          Reraise_Occurrence (X => Saved_Occurrence);
@@ -154,7 +157,8 @@ begin
               ("Incorrect exception raised by Reraise_Occurrence - 1");
       end Reraise_And_Handle_Saved_Exception_1;
 
-      Raise_And_Save_Block_2 : begin
+      Raise_And_Save_Block_2 :
+      begin
 
          Raise_Exception (User_Exception_2'Identity, User_Message);
          Report.Failed ("User_Exception_2 not raised");
@@ -173,7 +177,8 @@ begin
                "User_Exception_2");
       end Raise_And_Save_Block_2;
 
-      Reraise_And_Handle_Saved_Exception_2 : begin
+      Reraise_And_Handle_Saved_Exception_2 :
+      begin
          -- Reraise the exception that was saved in the previous block.
          -- Dereference the access object for use as input parameter.
 
@@ -205,7 +210,8 @@ begin
       -- demonstrated in the following block, where the ability to save
       -- an occurrence into a data structure, for later processing, is modeled.
 
-      Store_And_Handle_Block : declare
+      Store_And_Handle_Block :
+      declare
 
          Exc_Number : constant := 3;
          Exception_1, Exception_2, Exception_3 : exception;
@@ -216,9 +222,11 @@ begin
 
       begin
 
-         Outer_Block : begin
+         Outer_Block :
+         begin
 
-            Inner_Block : begin
+            Inner_Block :
+            begin
 
                for I in 1 .. Exc_Number loop
                   begin
@@ -299,7 +307,8 @@ begin
             Report.Failed ("Unexpected exception in Store_And_Handle_Block");
       end Store_And_Handle_Block;
 
-      Reraise_Out_Of_Scope : declare
+      Reraise_Out_Of_Scope :
+      declare
 
          Tc_Value : constant := 5;
          The_Exception : exception;

@@ -96,7 +96,8 @@ begin -- C460002.
    Res := Target_Is_Level_1_Same (X1'Access);
    Display_Results (Res, Ok, "Target_L1_Same, level 1 actual");
 
-   Block_L2 : declare
+   Block_L2 :
+   declare
       X2 : aliased Desig := (C => (others => Ident_Int (3)));
       type Acc_L2 is access all Desig;                            -- Level = 2.
       Expr_L2 : Acc_L2 := X2'Access;

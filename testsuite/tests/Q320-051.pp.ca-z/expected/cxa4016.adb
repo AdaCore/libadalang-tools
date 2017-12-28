@@ -84,7 +84,8 @@ begin
       "package Ada.Strings.Wide_Fixed are available, " &
       "and that they produce correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       package Asw renames Ada.Strings.Wide_Fixed;
       package Wide_Maps renames Ada.Strings.Wide_Maps;

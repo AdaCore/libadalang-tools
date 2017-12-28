@@ -71,7 +71,8 @@ begin
       "Ada.Strings.Bounded are available, and that " &
       "they produce correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       Characters_Per_Line : constant Positive := 40;
       Lines_Per_Page      : constant Natural  := 4;

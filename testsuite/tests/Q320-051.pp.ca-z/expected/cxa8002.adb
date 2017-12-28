@@ -81,7 +81,8 @@ begin
       "elements to the file starting after the " &
       "last element in the file");
 
-   Test_For_Sequential_Io_Support : begin
+   Test_For_Sequential_Io_Support :
+   begin
 
       -- An implementation that does not support Sequential_IO in a particular
       -- environment will raise Use_Error or Name_Error on calls to various
@@ -107,7 +108,8 @@ begin
            ("Sequential files not supported - Create as Append_File");
          raise Incomplete;
    end Test_For_Sequential_Io_Support;
-   Operational_Test_Block : declare
+   Operational_Test_Block :
+   declare
       Blank_Data : constant Employee_Data := "           ";
       Employee_1 : constant Employee_Data := "123-45-6789";
       Employee_2 : Employee_Data          := "987-65-4321";
@@ -215,7 +217,8 @@ begin
 
       Data_Io.Close (Employee_Data_File);
 
-      Test_Verification_Block : begin
+      Test_Verification_Block :
+      begin
 
          Data_Io.Open
            (File => Employee_Data_File, -- Reopen file, using
@@ -270,7 +273,8 @@ begin
 
    end Operational_Test_Block;
 
-   Final_Block : begin
+   Final_Block :
+   begin
       -- Check that file is open prior to deleting it.
       if Data_Io.Is_Open (Employee_Data_File) then
          Data_Io.Delete (Employee_Data_File);

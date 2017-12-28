@@ -41,7 +41,8 @@ begin
 
    Comment ("VALUE OF SYSTEM.MAX_MANTISSA IS" & Positive'Image (Max_Mantissa));
 
-   A : declare
+   A :
+   declare
 
       Rs : constant := 2.0;
 
@@ -77,7 +78,8 @@ begin
 
    end A;
 
-   B : declare
+   B :
+   declare
 
       Ls : constant := 2.0**(-(Max_Mantissa + 1));
 

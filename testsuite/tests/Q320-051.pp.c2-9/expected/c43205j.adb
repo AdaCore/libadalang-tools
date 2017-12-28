@@ -44,9 +44,11 @@ begin
 
    begin
 
-      Case_J : begin
+      Case_J :
+      begin
 
-         Case_J1 : declare
+         Case_J1 :
+         declare
 
             type Td1 is array (Ident_Int (11) .. 13) of Integer;
 
@@ -66,7 +68,8 @@ begin
 
          end Case_J1;
 
-         Case_J2 : declare
+         Case_J2 :
+         declare
 
             type Td2 is array (Integer range -13 .. -11) of Integer;
             D2 : Td2 := (3, 2, 1);
@@ -83,7 +86,8 @@ begin
 
          end Case_J2;
 
-         Case_J3 : declare
+         Case_J3 :
+         declare
 
             type Td3 is array (Ident_Int (5) .. 7) of Integer;
 
@@ -104,7 +108,8 @@ begin
 
          end Case_J3;
 
-         Case_J4 : declare
+         Case_J4 :
+         declare
 
             type Td4 is array (5 .. 8) of Integer;
 

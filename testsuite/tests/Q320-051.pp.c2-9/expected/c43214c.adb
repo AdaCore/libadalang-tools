@@ -39,7 +39,8 @@ begin
 
    begin
 
-      Case_B : declare
+      Case_B :
+      declare
 
          subtype Stb is String (5 .. 8);
 

@@ -61,7 +61,8 @@ begin
 
    -------------------------------------------------------------------
 
-   A : declare
+   A :
+   declare
       type Like_Duration_M23 is delta 0.020 range -86_400.0 .. 86_400.0;
 
       Non_Model_Const : constant          := 2.0 / 3;
@@ -167,7 +168,8 @@ begin
 
    -------------------------------------------------------------------
 
-   B : declare
+   B :
+   declare
       type Decimal_M4 is delta 100.0 range -1_000.0 .. 1_000.0;
 
       Non_Model_Const : constant   := 2.0 / 3;

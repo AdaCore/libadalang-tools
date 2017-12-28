@@ -66,7 +66,8 @@ begin
 
    begin
 
-      Case_B : declare
+      Case_B :
+      declare
          procedure Check (A : T0; M : String) is
          begin
             if (A'First (1) /= 1) or
@@ -79,7 +80,8 @@ begin
          end Check;
       begin
 
-         Case_B1 : begin
+         Case_B1 :
+         begin
             Check ((1 .. 9 => (6 .. 5 => 2)), "1");
             Failed ("CASE B1 : CONSTRAINT_ERROR NOT RAISED");
          exception
@@ -89,7 +91,8 @@ begin
                Failed ("CASE B1 : EXCEPTION RAISED");
          end Case_B1;
 
-         Case_B2 : begin
+         Case_B2 :
+         begin
             Check ((Calc (F, 1) .. Calc (G, 9) => (6 .. 5 => 2)), "2");
             Failed ("CASE B2 : CONSTRAINT_ERROR NOT RAISED");
          exception
@@ -99,7 +102,8 @@ begin
                Failed ("CASE B2 : EXCEPTION RAISED");
          end Case_B2;
 
-         Case_B3 : begin
+         Case_B3 :
+         begin
             Check ((1 .. 9 => (Calc (H, 6) .. Calc (I, 5) => 2)), "3");
             Failed ("CASE B3 : CONSTRAINT_ERROR NOT RAISED");
          exception

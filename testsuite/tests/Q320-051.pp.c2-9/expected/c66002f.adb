@@ -49,7 +49,8 @@ begin
    -- PART, AND ONE HAS ONE MORE PARAMETER (WITH A DEFAULT VALUE) THAN THE
    -- OTHER.
 
-   Bf : declare
+   Bf :
+   declare
       S : String (1 .. 3) := "123";
 
       procedure P (I1, I2, I3 : Integer := 1) is

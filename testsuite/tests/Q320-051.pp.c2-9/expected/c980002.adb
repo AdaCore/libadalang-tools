@@ -140,7 +140,8 @@ begin
          Checkpoint.Got_Here (7);
       end select;
 
-      Check_The_Results : declare
+      Check_The_Results :
+      declare
          Chk      : constant Points_Array := Checkpoint.Results;
          Expected : constant Points_Array := (1 .. 6 => True, 7 => False);
       begin

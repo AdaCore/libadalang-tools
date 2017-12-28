@@ -65,7 +65,8 @@ begin
       "Skip_Line and Skip_Page procedures on " &
       "a text file with mode Append_File");
 
-   Test_For_Text_Io_Support : begin
+   Test_For_Text_Io_Support :
+   begin
 
 -- An application creates a text file with mode Append_File. Use_Error will be
 -- raised if Text_IO operations or external files are not supported.
@@ -85,12 +86,14 @@ begin
 
    Text_Io.Put_Line (Text_File, "Data entered into the file");
 
-   Operational_Test_Block : declare
+   Operational_Test_Block :
+   declare
       Tc_Number_Of_Forced_Mode_Errors : constant Natural := 2;
       Tc_Mode_Errors                  : Natural          := 0;
    begin
 
-      Test_For_Skip_Line : declare
+      Test_For_Skip_Line :
+      declare
          Tc_Spacing : constant Text_Io.Count := 3;
       begin
 
@@ -112,7 +115,8 @@ begin
             Report.Failed ("Exception in Skip_Line processing");
       end Test_For_Skip_Line;
 
-      Test_For_Skip_Page : begin
+      Test_For_Skip_Page :
+      begin
 
 -- Again, during the course of its processing, the application incorrectly
 -- assumes that the file mode is In_File, this time attempting to call the
@@ -137,7 +141,8 @@ begin
 
    end Operational_Test_Block;
 
-   Deletion : begin
+   Deletion :
+   begin
       -- Delete the external file.
       if Text_Io.Is_Open (Text_File) then
          Text_Io.Delete (Text_File);

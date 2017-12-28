@@ -73,7 +73,7 @@ begin
       "CHECK THE RECOGNITION OF LABELS IN NESTED" &
       " PACKAGES SEPARATELY COMPILED AS SUBUNITS");
 
-   <<LABEL_IN_MAIN>>
+   <<Label_In_Main>>
 
    if Flow_Index /= 10 then
       Failed ("INCORRECT FLOW OF CONTROL");

@@ -85,7 +85,8 @@ begin
       "New_Chars_Array, and New_String produce " &
       "correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       package Ic renames Interfaces.C;
       package Ics renames Interfaces.C.Strings;

@@ -103,7 +103,8 @@ begin
       "available, and that they produce correct " &
       "results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       package Asw renames Ada.Strings.Wide_Unbounded;
       use type Asw.Unbounded_Wide_String;

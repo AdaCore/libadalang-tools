@@ -51,7 +51,8 @@ begin
      ("C94002D",
       "DEPENDENCY IS INDEPENDENT OF WHERE ACCESS " & "VARIABLE IS DECLARED");
 
-   Block1 : declare
+   Block1 :
+   declare
       Pointer_Tt1 : Att1 := new Tt1;
    begin
       Outer_Tt1 := Pointer_Tt1;

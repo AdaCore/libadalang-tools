@@ -13,7 +13,8 @@ begin
       "Ada.Strings.Wide_Fixed are available, and that " &
       "they produce correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       Number_Of_Info_Strings : constant Natural     := 3;
       Db_Size                : constant Natural     := Number_Of_Info_Strings;

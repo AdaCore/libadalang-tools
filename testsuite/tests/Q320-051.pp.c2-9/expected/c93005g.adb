@@ -9,10 +9,12 @@ begin
 
    Comment ("SUBTEST 5: TASK IN STATEMENT PART OF BLOCK");
    Comment ("  THE TASKS DON'T DEPEND ON THE DECLARATIVE PART");
-   B51 : declare
+   B51 :
+   declare
       X : Mnt;
    begin
-      B52 : declare
+      B52 :
+      declare
          Y   : Mnt;
          Ptr : Acc_Bad_Rec;
       begin

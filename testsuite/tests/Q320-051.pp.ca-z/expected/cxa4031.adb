@@ -63,7 +63,8 @@ begin
       "package Ada.Strings.Unbounded are available, " &
       "and that they produce correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       package Unb renames Ada.Strings.Unbounded;
       use Unb;

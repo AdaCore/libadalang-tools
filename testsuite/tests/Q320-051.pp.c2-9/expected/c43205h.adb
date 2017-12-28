@@ -43,7 +43,8 @@ begin
 
    begin
 
-      Case_H : declare
+      Case_H :
+      declare
 
          subtype Sth is Integer range -10 .. 0;
          type Base is array (Sth range <>) of Integer;

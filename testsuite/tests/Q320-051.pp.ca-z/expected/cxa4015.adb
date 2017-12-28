@@ -13,7 +13,8 @@ begin
       "package Ada.Strings.Wide_Fixed are available, " &
       "and that they produce correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Cxa40150;
 

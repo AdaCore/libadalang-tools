@@ -11,7 +11,8 @@ procedure Cxac007 is
 begin
    Report.Test ("CXAC007", "Check that Stream_IO is preelaborated");
 
-   Test_For_Stream_Io_Support : declare
+   Test_For_Stream_Io_Support :
+   declare
       Test_File : Ada.Streams.Stream_Io.File_Type;
    begin
       -- If an implementation does not support Stream_IO in a particular

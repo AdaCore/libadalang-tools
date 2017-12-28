@@ -21,7 +21,8 @@ begin
       "Look_Ahead and Get_Immediate are available " &
       "and produce correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       User_Input_Ptr : File_Access := User_Defined_Input_File'Access;
 
@@ -148,7 +149,8 @@ begin
       -- The file will then be reset to In_File mode to properly function as a
       -- source of input.
 
-      Reset1 : begin
+      Reset1 :
+      begin
          Reset (User_Defined_Input_File, In_File);
       exception
          when Ada.Text_Io.Use_Error =>
@@ -297,7 +299,8 @@ begin
             "were processed");
       end if;
 
-      Deletion : begin
+      Deletion :
+      begin
          -- Delete the user defined file.
 
          if Is_Open (User_Defined_Input_File) then

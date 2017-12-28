@@ -803,7 +803,7 @@ package body Pp.Actions is
            when Ada_Elsif_Stmt_Part =>
              L ("elsif[ !]# then$", "{?~;$~;$~}"),
            when Ada_Named_Stmt =>
-             L ("! : ! !1"),
+             L ("! :$! !1"),
            when Ada_Named_Stmt_Decl =>
              L ("!"),
            when Ada_Begin_Block =>
@@ -814,6 +814,8 @@ package body Pp.Actions is
                 "~~~",
                 "!",
                 "end/"),
+               --  For Ada_Begin_Block and Ada_Decl_Block, the "begin" comes
+               --  from Do_Handled_Stmts.
            when Ada_Loop_Stmt | Ada_For_Loop_Stmt | Ada_While_Loop_Stmt =>
              L ("?~~# ~loop$", "{?~;$~;$~}", "end loop/"),
            when Ada_For_Loop_Spec => null,
@@ -1797,6 +1799,12 @@ package body Pp.Actions is
               (Ada_Record_Rep_Clause,
                "for ! use record? at mod ~~;~${?~;$~;$~}end record",
                "for ! use${record? at mod ~~;~${?~;$~;$~}end record}");
+         end if;
+
+         --  Replacements for Indent_Named_Statements
+
+         if Arg (Cmd, Indent_Named_Statements) then
+            Replace_Tmp (Ada_Named_Stmt, "! :$! !1", "! :${! !1}");
          end if;
 
          --  Now do some validity checking on the templates
@@ -2850,7 +2858,6 @@ package body Pp.Actions is
          procedure Do_Aggregate;
          procedure Do_Assign_Stmt;
          procedure Do_Assoc;
-         procedure Do_Named_Stmt;
          procedure Do_Compilation_Unit;
          procedure Do_Component_Clause;
          procedure Do_Handled_Stmts;
@@ -2989,20 +2996,6 @@ package body Pp.Actions is
                end;
             end if;
          end Do_Assoc;
-
-         procedure Do_Named_Stmt is
-         begin
-            --  ???Not clear why we're putting a line break in one case but not
-            --  the other. The normal template in the table should suffice.
-
-            case F_Stmt (Tree.As_Named_Stmt).Kind is
-               when Ada_Begin_Block | Ada_Decl_Block =>
-                  Interpret_Template ("! : ! !1");
-               when Ada_Loop_Stmt | Ada_For_Loop_Stmt | Ada_While_Loop_Stmt =>
-                  Interpret_Template ("! :$! !1");
-               when others => raise Program_Error;
-            end case;
-         end Do_Named_Stmt;
 
          use Buffered_Output;
 
@@ -3340,7 +3333,7 @@ package body Pp.Actions is
                when Ada_For_Loop_Stmt =>
                   Interpret_Template ("for ! !? ~~~ !");
                when Ada_Quantified_Expr =>
-                  --  In this case, the quantfied_expression already printed
+                  --  In this case, the quantified_expression already printed
                   --  "for ".
                   Interpret_Template ("! !? ~~~ !#");
                when others => raise Program_Error;
@@ -3495,11 +3488,7 @@ package body Pp.Actions is
             --  follows statements.
 
             Label_Seen := True;
-            if False then -- ????The template should suffice.
-               Interpret_Template ("<<!>>");
-            else
-               Put ("<<\1>>", Label_Name (Tree));
-            end if;
+            Interpret_Template ("<<!>>");
          end Do_Label;
 
          procedure Do_Others is
@@ -3895,9 +3884,6 @@ package body Pp.Actions is
 
             when Ada_Aggregate =>
                Do_Aggregate;
-
-            when Ada_Named_Stmt =>
-               Do_Named_Stmt;
 
             when Ada_Subtype_Indication =>
                Do_Subtype_Indication;

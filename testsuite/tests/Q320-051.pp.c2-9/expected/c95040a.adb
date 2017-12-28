@@ -34,7 +34,8 @@ begin
 
    Test ("C95040A", "ENTRY CALL OF COMPLETED TASK");
 
-   Block1 : declare
+   Block1 :
+   declare
       task T1 is
          entry E1;
       end T1;

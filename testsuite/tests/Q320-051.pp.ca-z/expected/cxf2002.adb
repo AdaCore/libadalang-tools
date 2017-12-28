@@ -19,12 +19,14 @@ begin
 
    ---=---=---=---=---=---=---=---=---=---=---
 
-   Radix_2_Subtests : declare
+   Radix_2_Subtests :
+   declare
       package Radix_2 is new Cxf2002_0 (Cxf2002_1.Money_Radix2);
       use type Cxf2002_1.Money_Radix2;
    begin
 
-      Radix_2_Multiplication : declare
+      Radix_2_Multiplication :
+      declare
          Rate   : constant Cxf2002_1.Money_Radix2 := 0.12;
          Period : constant Integer                := 12;
          Factor : Cxf2002_1.Money_Radix2          := Rate / Period;
@@ -62,7 +64,8 @@ begin
          ---=---=---=---=---=---=---
       end Radix_2_Multiplication;
 
-      Radix_2_Division : declare
+      Radix_2_Division :
+      declare
          Rate    : constant Cxf2002_1.Money_Radix2 := 0.25;
          Period  : constant Integer                := 12;
          Factor  : Cxf2002_1.Money_Radix2          := Rate / Period;
@@ -105,12 +108,14 @@ begin
 
    ---=---=---=---=---=---=---=---=---=---=---
 
-   Radix_10_Subtests : declare
+   Radix_10_Subtests :
+   declare
       package Radix_10 is new Cxf2002_0 (Cxf2002_1.Money_Radix10);
       use type Cxf2002_1.Money_Radix10;
    begin
 
-      Radix_10_Multiplication : declare
+      Radix_10_Multiplication :
+      declare
          Rate   : constant Cxf2002_1.Money_Radix10 := 0.37;
          Period : constant Integer                 := 12;
          Factor : Cxf2002_1.Money_Radix10          := Rate / Period;
@@ -148,7 +153,8 @@ begin
          ---=---=---=---=---=---=---
       end Radix_10_Multiplication;
 
-      Radix_10_Division : declare
+      Radix_10_Division :
+      declare
          Rate    : constant Cxf2002_1.Money_Radix10 := 0.15;
          Period  : constant Integer                 := 12;
          Factor  : Cxf2002_1.Money_Radix10          := Rate / Period;

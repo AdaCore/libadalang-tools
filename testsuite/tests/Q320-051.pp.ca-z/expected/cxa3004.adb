@@ -64,7 +64,8 @@ begin
       "when given the appropriate Character " &
       "and String inputs");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       package Ach renames Ada.Characters.Handling;
 

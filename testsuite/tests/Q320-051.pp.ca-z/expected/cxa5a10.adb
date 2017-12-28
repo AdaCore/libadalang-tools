@@ -72,7 +72,8 @@ begin
       "Check that Exp, Sqrt, and the ""**"" operator " &
       "provide correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Fxa5a00, Ada.Numerics;
       use Ada.Exceptions;

@@ -27,8 +27,8 @@ begin
    Report.Test ("CXC7006", "Test Ada.Task_Termination");
 
    Test_1 :
-      -- Test fallback handler.
-       declare
+   -- Test fallback handler.
+   declare
       Raise_Code : constant String := "first";
    begin
       declare
@@ -83,9 +83,9 @@ begin
    end Test_1;
 
    Test_2 :
-      -- Test fallback handler set up by a task that is not the direct master
-      -- of the tasks that are terminating.
-       declare
+   -- Test fallback handler set up by a task that is not the direct master of
+   -- the tasks that are terminating.
+   declare
       Raise_Code : constant String := "second";
    begin
       declare
@@ -179,9 +179,9 @@ begin
    end Test_2;
 
    Test_3 :
-      -- Test fallback handler when fallback handlers are set up by multiple
-      -- "ancestors" of a task; make sure the correct handler is called.
-       declare
+   -- Test fallback handler when fallback handlers are set up by multiple
+   -- "ancestors" of a task; make sure the correct handler is called.
+   declare
       Raise_Code : constant String := "third";
    begin
       declare
@@ -281,8 +281,8 @@ begin
    end Test_3;
 
    Test_4 :
-      -- Test Set_Specific_Handler.
-       declare
+   -- Test Set_Specific_Handler.
+   declare
       Raise_Code : constant String := "fourth";
    begin
       declare
@@ -423,16 +423,15 @@ begin
    end Test_4;
 
    Test_5 :
-      -- Make sure behavior is correct when tasks that terminate also have
-      -- controlled local variables. Make sure that (1) local variables
-      -- are finalized before the termination handler is called; (2) if the
-      -- task terminates normally but finalization raises an exception, the
-      -- termination handler is still called with Cause=Unhandled_Exception;
-      -- (3) if the task terminates because of an unhandled exception, and the
-      -- finalization then raises the exception, the termination handler is
-      -- called with an Exception_Occurrence that identifies Program_Error
-      -- (AI05-0202).
-       declare
+   -- Make sure behavior is correct when tasks that terminate also have
+   -- controlled local variables. Make sure that (1) local variables are
+   -- finalized before the termination handler is called; (2) if the task
+   -- terminates normally but finalization raises an exception, the termination
+   -- handler is still called with Cause=Unhandled_Exception; (3) if the
+   -- task terminates because of an unhandled exception, and the finalization
+   -- then raises the exception, the termination handler is called with an
+   -- Exception_Occurrence that identifies Program_Error (AI05-0202).
+   declare
       Raise_Code : constant String := "fifth";
    begin
       declare
@@ -502,9 +501,9 @@ begin
    end Test_5;
 
    Test_6 :
-      -- Make sure behavior is correct when a task propagates an exception
-      -- during elaboration.
-       declare
+   -- Make sure behavior is correct when a task propagates an exception during
+   -- elaboration.
+   declare
       Raise_Code : constant String := "sixth";
    begin
       Cxc7006_1.Start_Test ("Test_6");

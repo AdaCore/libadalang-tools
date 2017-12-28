@@ -87,7 +87,8 @@ begin
       "package Ada.Strings.Fixed are available, " &
       "and that they produce correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       package Asf renames Ada.Strings.Fixed;
       package Maps renames Ada.Strings.Maps;

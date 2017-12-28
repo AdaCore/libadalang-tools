@@ -45,7 +45,8 @@ begin
 
    begin
 
-      Case_D : declare
+      Case_D :
+      declare
 
          subtype Std is Integer range Ident_Int (11) .. 13;
          type Td is array (Std range <>) of Integer;

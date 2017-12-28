@@ -80,7 +80,8 @@ begin
       "Check the effect of Function Reset on the " &
       "state of random number generators");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Ada.Exceptions;
       use Ada.Numerics;
@@ -328,9 +329,9 @@ begin
    begin
 
       Sub_Test_1 :
-         -- Check that two objects of type Generator are initialized to the
-         -- same state.
-          begin
+      -- Check that two objects of type Generator are initialized to the same
+      -- state.
+      begin
 
          -- Since the discrete and float random generators are in the initial
          -- state, using Procedure Save to save the states of the generator
@@ -368,10 +369,10 @@ begin
       end Sub_Test_1;
 
       Sub_Test_3 :
-         -- Check that when the Function Reset uses the same integer initiator
-         -- to reset two generators to the same state, the resulting random
-         -- values and the state from each generator are identical.
-          declare
+      -- Check that when the Function Reset uses the same integer initiator to
+      -- reset two generators to the same state, the resulting random values
+      -- and the state from each generator are identical.
+      declare
          use Discrete_Package, Float_Random;
       begin
 
@@ -420,10 +421,10 @@ begin
       end Sub_Test_3;
 
       Sub_Test_4 :
-         -- Check that when the Function Reset uses different integer initiator
-         -- values to reset two generators, the resulting random numbers and
-         -- states are different.
-          begin
+      -- Check that when the Function Reset uses different integer initiator
+      -- values to reset two generators, the resulting random numbers and
+      -- states are different.
+      begin
 
          -- Reset the generators to different states.
 

@@ -76,7 +76,8 @@ begin
       "Ada.Text_IO.Text_Streams allows a text file to " &
       "be processed with the functionality of streams");
 
-   Test_For_Io_Support : begin
+   Test_For_Io_Support :
+   begin
 
       -- Check for Text_IO support in creating the data file. If the
       -- implementation does not support external files, Name_Error or
@@ -94,7 +95,8 @@ begin
 
    end Test_For_Io_Support;
 
-   Test_Block : declare
+   Test_Block :
+   declare
       use Ada.Characters.Latin_1, Ada.Strings.Unbounded;
       Tc_Items : constant := 3;
 
@@ -183,7 +185,8 @@ begin
       -- Reset the data file to mode In_File. The data file will now serve as
       -- the source of data which will be compared to the original data written
       -- to the file above.
-      Reset1 : begin
+      Reset1 :
+      begin
          Ada.Text_Io.Reset (File => Data_File, Mode => Ada.Text_Io.In_File);
       exception
          when Ada.Text_Io.Use_Error =>
@@ -275,7 +278,8 @@ begin
          Report.Failed ("Exception raised in Test_Block");
    end Test_Block;
 
-   Deletion : begin
+   Deletion :
+   begin
       -- Delete the data file.
       if not Ada.Text_Io.Is_Open (Data_File) then
          Ada.Text_Io.Open (Data_File, Ada.Text_Io.In_File, Data_Filename);

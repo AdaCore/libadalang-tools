@@ -78,7 +78,8 @@ begin
       "Check that the functions Arcsin and Arcsinh " &
       "provide correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Ada.Numerics;
       use Fxa5a00;

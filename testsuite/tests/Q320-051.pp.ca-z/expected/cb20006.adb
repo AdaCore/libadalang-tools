@@ -12,7 +12,8 @@ begin
       "handled / reraised and propagated " &
       "correctly by protected operations");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       package Semaphore renames Cb20006_0;
 
@@ -23,7 +24,8 @@ begin
 
    begin
 
-      Allocate_Resources : declare
+      Allocate_Resources :
+      declare
          Loop_Count : Integer := Total_Resources_Available + 1;
       begin
          for I in 1 .. Loop_Count loop -- Force exception
@@ -38,7 +40,8 @@ begin
             Semaphore.Handled_In_Procedure_Caller := False;
       end Allocate_Resources;
 
-      Deallocate_Resources : declare
+      Deallocate_Resources :
+      declare
          Loop_Count : Integer := Total_Resources_Available + 1;
       begin
          for I in 1 .. Loop_Count loop -- Force exception

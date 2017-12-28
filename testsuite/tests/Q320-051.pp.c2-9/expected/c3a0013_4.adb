@@ -76,7 +76,8 @@ package body C3a0013_4 is
 
       --  general access type may reference aliased objects
 
-      Construction : declare
+      Construction :
+      declare
          type Speed_List is array (Commuters'Range) of Natural;
          Accelerations : constant Speed_List := (2, 6, 12, 20);
       begin

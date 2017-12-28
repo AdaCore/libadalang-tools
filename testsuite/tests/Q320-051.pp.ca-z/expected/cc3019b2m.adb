@@ -180,7 +180,8 @@ begin  -- CC3019B2M
    end if;
 
    Underflow_Exception_Test :
- begin  -- UNDERFLOW_EXCEPTION_TEST
+
+   begin  -- UNDERFLOW_EXCEPTION_TEST
 
       Date_Stack.Clear (This_Stack => Third_Date_Stack);
       Date_Stack.Pop
@@ -200,7 +201,8 @@ begin  -- CC3019B2M
    end Underflow_Exception_Test;
 
    Overflow_Exception_Test :
- begin  -- OVERFLOW_EXCEPTION_TEST
+
+   begin  -- OVERFLOW_EXCEPTION_TEST
 
       Date_Stack.Clear (This_Stack => Third_Date_Stack);
       for Index in 1 .. 10 loop
@@ -226,7 +228,8 @@ begin  -- CC3019B2M
    end Overflow_Exception_Test;
 
    Local_Block :
- declare
+
+   declare
 
       type Date_Table is array (Positive range 1 .. 10) of Date;
 

@@ -17,7 +17,8 @@ begin
       "of the clause, even if explicit operators with the same " &
       "names as the type's operators are declared for the subtype");
 
-   Use_Type_Precision_Pos_Float : declare
+   Use_Type_Precision_Pos_Float :
+   declare
       Tc_Operand : C840001_0.Precision_Float :=
         C840001_0.Precision_Float (-2.0);
       Tc_Positive_Operand : C840001_1.Precision_Pos_Float := 6.0;
@@ -49,7 +50,8 @@ begin
 
    end Use_Type_Precision_Pos_Float;
 
-   Use_Type_Precision_Float : declare
+   Use_Type_Precision_Float :
+   declare
       Tc_Operand : C840001_0.Precision_Float :=
         C840001_0.Precision_Float (4.0);
       Tc_Positive_Operand : C840001_1.Precision_Pos_Float := 7.0;

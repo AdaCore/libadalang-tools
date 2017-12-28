@@ -57,7 +57,8 @@ begin
         ("CASE A : CHECK THAT IF A USE CLAUSE NAMES AN " &
          "ENCLOSING PACKAGE, THE USE CLAUSE HAS NO EFFECT");
 
-      Case_A : declare
+      Case_A :
+      declare
 
          package P1 is
             X : Float := 1.5;
@@ -93,9 +94,11 @@ begin
          "AND IS NOT IN THE SET OF POTENTIALLY VISIBLE " &
          "DECLARATIONS, IT REMAINS DIRECTLY VISIBLE");
 
-      Case_B : begin
+      Case_B :
+      begin
 
-         Case_B1 : declare
+         Case_B1 :
+         declare
 
             package P1 is
                Y : Float := 1.5;
@@ -126,7 +129,8 @@ begin
 
          end Case_B1;
 
-         Case_B2 : declare
+         Case_B2 :
+         declare
 
             procedure Proc1 (X : String) is
             begin
@@ -151,7 +155,8 @@ begin
 
          end Case_B2;
 
-         Case_B3 : declare
+         Case_B3 :
+         declare
 
             procedure Proc1 (X : String) is
             begin
@@ -184,9 +189,11 @@ begin
          "A USE CLAUSE, THE POTENTIALLY VISIBLE ENTITY " &
          "IS NO LONGER VISIBLE");
 
-      Case_C : begin
+      Case_C :
+      begin
 
-         Case_C1 : declare
+         Case_C1 :
+         declare
 
             package P1 is
                procedure Proc1 (X : Float);
@@ -228,7 +235,8 @@ begin
 
          end Case_C1;
 
-         Case_C2 : declare
+         Case_C2 :
+         declare
 
             package P1 is
                X : Integer := 15;

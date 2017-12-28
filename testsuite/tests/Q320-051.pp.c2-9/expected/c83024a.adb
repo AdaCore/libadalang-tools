@@ -54,7 +54,8 @@ begin
       "REGION FOR A GENERIC PACKAGE HIDES AN OUTER " &
       "DECLARATION OF A HOMOGRAPH");
 
-   One : declare
+   One :
+   declare
       A   : Integer := Ident_Int (2);
       B   : Integer := A;
       Obj : Integer := Ident_Int (3);
@@ -103,7 +104,8 @@ begin
       end if;
    end One;
 
-   Two : declare            -- AFTER THE SPECIFICATION OF PACKAGE.
+   Two :
+   declare            -- AFTER THE SPECIFICATION OF PACKAGE.
       A : Integer := Ident_Int (2);
 
       generic
@@ -152,7 +154,8 @@ begin
       end if;
    end Two;
 
-   Three : declare                 --  OVERLOADING OF FUNCTIONS.
+   Three :
+   declare                 --  OVERLOADING OF FUNCTIONS.
 
       Obj : Integer := 1;
       Flo : Float   := 6.25;

@@ -58,7 +58,8 @@ begin
       "PARALLEL WITH ACTIVATION OF A TASK CREATED " &
       "BY AN OBJECT DECLARATION");
 
-   Block : declare
+   Block :
+   declare
 
       task type Tt1;
 

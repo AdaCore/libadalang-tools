@@ -51,7 +51,8 @@ begin
 
    begin
 
-      Case_A : declare
+      Case_A :
+      declare
 
          Lower_Bound : constant := Max_Int - 3;
          Upper_Bound : constant := Max_Int - 1;
@@ -94,7 +95,8 @@ begin
 
       end Case_A;
 
-      Case_B : declare
+      Case_B :
+      declare
 
          type Enum is (A, B, C, D);
 

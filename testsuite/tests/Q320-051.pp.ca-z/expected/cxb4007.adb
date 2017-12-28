@@ -85,7 +85,8 @@ begin
       "and To_Binary specific to Byte_Array and " &
       "Binary_Format parameters produce correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Interfaces.Cobol;
       use Ada.Exceptions;

@@ -65,7 +65,8 @@ begin
       "parameter combinations of type String and " &
       "Bounded_String, produce correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Ada.Exceptions;
       use Ada.Strings;

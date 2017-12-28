@@ -340,7 +340,8 @@ begin  -- CC3019C2M
    end if;
 
    Underflow_Exception_Test :
- begin  -- UNDERFLOW_EXCEPTION_TEST
+
+   begin  -- UNDERFLOW_EXCEPTION_TEST
 
       Person_Stack.Clear (This_Stack => Third_Person_Stack);
       Person_Stack.Pop
@@ -360,7 +361,8 @@ begin  -- CC3019C2M
    end Underflow_Exception_Test;
 
    Overflow_Exception_Test :
- begin  -- OVERFLOW_EXCEPTION_TEST
+
+   begin  -- OVERFLOW_EXCEPTION_TEST
 
       Person_Stack.Clear (This_Stack => Third_Person_Stack);
       for Index in 1 .. 10 loop
@@ -386,7 +388,8 @@ begin  -- CC3019C2M
    end Overflow_Exception_Test;
 
    Local_Block :
- declare
+
+   declare
 
       type Person_Table is array (Positive range 1 .. 10) of Person;
 

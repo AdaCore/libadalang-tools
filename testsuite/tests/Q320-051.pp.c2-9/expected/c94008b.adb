@@ -34,7 +34,8 @@ procedure C94008b is
 begin
    Test ("C94008B", "TERMINATION WHILE WAITING AT AN OPEN TERMINATE");
 
-   Block1 : declare
+   Block1 :
+   declare
 
       task type Tt1 is
          entry E1;

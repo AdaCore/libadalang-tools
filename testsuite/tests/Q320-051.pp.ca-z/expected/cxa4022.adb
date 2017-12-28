@@ -14,7 +14,8 @@ begin
       "available, and that they produce correct " &
       "results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Cxa40220;
 

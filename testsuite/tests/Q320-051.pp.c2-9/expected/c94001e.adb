@@ -46,7 +46,8 @@ begin
 
    Test ("C94001E", "TASK COMPLETION BY EXCEPTION");
 
-   Block : declare
+   Block :
+   declare
 
       task T1;
 

@@ -17,7 +17,8 @@ begin
       "aliased view of an object with an unconstrained " &
       "nominal subtype.");
 
-   Non_Pointer_Block : begin
+   Non_Pointer_Block :
+   begin
 
       begin
          Obj0 := (3, "Bye");              -- OK: Obj0 not constrained.
@@ -82,7 +83,8 @@ begin
          Report.Failed ("Unexpected exception: Non_Pointer_Block");
    end Non_Pointer_Block;
 
-   Pointer_Block : begin
+   Pointer_Block :
+   begin
 
       begin
          Ptr1.all := (3, "Bye");        -- C_E: Ptr1.all is constrained (D=>5).
@@ -121,7 +123,8 @@ begin
          Report.Failed ("Unexpected exception: Pointer_Block");
    end Pointer_Block;
 
-   Subprogram_Block : declare
+   Subprogram_Block :
+   declare
       Is_Constrained : Boolean;
    begin
 
@@ -218,7 +221,8 @@ begin
          Report.Failed ("Exception raised in Subprogram_Block");
    end Subprogram_Block;
 
-   Generic_Block : declare
+   Generic_Block :
+   declare
 
       type Nuc is new Uc;
 

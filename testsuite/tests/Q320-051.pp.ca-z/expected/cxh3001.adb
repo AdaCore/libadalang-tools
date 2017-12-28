@@ -8,7 +8,8 @@ begin
      ("CXH3001",
       "Check pragma Reviewable as a configuration pragma");
 
-   Block : declare
+   Block :
+   declare
       A_Truth : Boolean;
       Message : String := Report.Ident_Str ("Bad value encountered");
    begin

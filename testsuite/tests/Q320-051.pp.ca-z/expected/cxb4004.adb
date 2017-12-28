@@ -91,7 +91,8 @@ begin
       "Check that the functions Length, To_Decimal, " &
       "and To_Display produce correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Interfaces;
       use Ada.Exceptions;

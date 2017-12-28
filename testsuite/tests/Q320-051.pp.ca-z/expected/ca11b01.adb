@@ -22,7 +22,8 @@ begin
       "Check that a type derived in a public " &
       "child inherits primitive operations from parent");
 
-   Application_One_Subtest : declare
+   Application_One_Subtest :
+   declare
       White_Widget : App1_Widget;
 
    begin
@@ -42,7 +43,8 @@ begin
 
    end Application_One_Subtest;
    ---------------------------------------------------------------
-   Application_Two_Subtest : declare
+   Application_Two_Subtest :
+   declare
       Amber_Widget : App2_Widget;
 
    begin
@@ -68,7 +70,8 @@ begin
 
    end Application_Two_Subtest;
    ---------------------------------------------------------------
-   Application_Three_Subtest : declare
+   Application_Three_Subtest :
+   declare
       Green_Widget : App3_Widget;
 
    begin

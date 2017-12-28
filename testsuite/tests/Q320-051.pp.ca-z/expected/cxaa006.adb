@@ -82,7 +82,8 @@ begin
       "output string items to a bounded line " &
       "length text file of mode Append_File");
 
-   Test_For_Text_Io_Support : begin
+   Test_For_Text_Io_Support :
+   begin
 
 -- An application creates a text file in mode Append_File, with the intention
 -- of using the procedure Put to compress variable length string data into the
@@ -99,7 +100,8 @@ begin
          raise Incomplete;
    end Test_For_Text_Io_Support;
 
-   Operational_Test_Block : declare
+   Operational_Test_Block :
+   declare
       Twelve_Characters   : constant String := "12Characters";
       Nineteen_Characters : constant String := "Nineteen_Characters";
       Tc_Line             : Natural         := 0;
@@ -159,7 +161,8 @@ begin
 
       -- Reset to Append mode; call outputs page terminator and resets line
       -- length to Unbounded.
-      Reset1 : begin
+      Reset1 :
+      begin
          Ada.Text_Io.Reset
            (A_Bounded_File,
             Tc_Mode_Selection (Report.Ident_Int (3)));
@@ -190,7 +193,8 @@ begin
          Report.Failed ("Incorrect position after 3rd Put");
       end if;
 
-      Test_Verification_Block : declare
+      Test_Verification_Block :
+      declare
          First_String  : String (1 .. 80);
          Second_String : String (1 .. 80);
          Third_String  : String (1 .. 80);
@@ -204,7 +208,8 @@ begin
 -- The application has the capability to reset the file to In_File mode to
 -- verify some or all of the data that is contained there.
 
-         Reset2 : begin
+         Reset2 :
+         begin
             Ada.Text_Io.Reset (A_Bounded_File, Ada.Text_Io.In_File);
          exception
             when others =>
@@ -250,7 +255,8 @@ begin
 
    end Operational_Test_Block;
 
-   Final_Block : begin
+   Final_Block :
+   begin
       -- Delete the external file.
       if Ada.Text_Io.Is_Open (A_Bounded_File) then
          Ada.Text_Io.Delete (A_Bounded_File);

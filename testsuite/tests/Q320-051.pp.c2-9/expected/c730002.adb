@@ -18,7 +18,8 @@ begin
       "type through a series of types produced by " &
       "generic instantiations");
 
-   Test_Block : declare
+   Test_Block :
+   declare
       Nuclear_Drive : Nuclear_Series;
       Warp_Drive    : Nuclear_Series;
    begin

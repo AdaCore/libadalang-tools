@@ -61,7 +61,8 @@ begin
       "the package Ada.Numerics.Generic_Complex_Types " &
       "provide correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       type Real_Type is new Float;
 

@@ -60,7 +60,8 @@ begin
 
    begin
 
-      Case_1 : declare
+      Case_1 :
+      declare
 
          type T is array (Integer range <>, Integer range <>) of Integer;
 
@@ -91,7 +92,8 @@ begin
 
       end Case_1;
 
-      Case_1a : declare
+      Case_1a :
+      declare
 
          type T is array (Integer range <>, Integer range <>) of Integer;
 
@@ -123,7 +125,8 @@ begin
 
       end Case_1a;
 
-      Case_2 : declare
+      Case_2 :
+      declare
 
          type T is array (Integer range <>, Integer range <>) of Integer;
 

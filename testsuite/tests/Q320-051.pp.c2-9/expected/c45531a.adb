@@ -69,7 +69,8 @@ begin
 
    -- CASE A) INTEGER * FIXED WHEN ALL VALUES ARE MODEL NUMBERS.
 
-   A : declare
+   A :
+   declare
       A                        : Integer := 0;
       B                        : Fx_0p5  := 0.0;
       Result_Value             : Fx_0p5  := 0.0;
@@ -97,7 +98,8 @@ begin
 
    -- CASE B) FIXED * INTEGER WHEN ALL VALUES ARE MODEL NUMBERS.
 
-   B : declare
+   B :
+   declare
       A                        : Fx_1    := 0.0;
       B                        : Integer := 0;
       Result_Value             : Fx_1    := 0.0;
@@ -125,7 +127,8 @@ begin
 
    -- CASE C) INTEGER * FIXED FOR NON-MODEL NUMBERS.
 
-   C : declare
+   C :
+   declare
       A                        : Integer  := 0;
       B                        : Fx_2     := 0.0;
       Result_Value             : Fx_2     := 0.0;
@@ -155,7 +158,8 @@ begin
 
    -- CASE D) FIXED * INTEGER FOR NON-MODEL NUMBERS.
 
-   D : declare
+   D :
+   declare
       A                        : Fx_2     := 0.0;
       B                        : Integer  := 0;
       Result_Value             : Fx_2     := 0.0;

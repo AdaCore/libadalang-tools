@@ -56,7 +56,8 @@ begin
 
    -------------------------------------------------------------------
 
-   A : declare
+   A :
+   declare
       Small, Max, Min, Zero : F := 0.5;
       X                     : F := 0.0;
    begin
@@ -150,7 +151,8 @@ begin
 
    -------------------------------------------------------------------
 
-   B : declare
+   B :
+   declare
       Non_Model_Const : constant := 2.0 / 3;
       Non_Model_Var   : F        := 0.0;
 
@@ -224,7 +226,8 @@ begin
 
    -------------------------------------------------------------------
 
-   C : declare
+   C :
+   declare
       A_Small, A_Max, A_Min : St_F1 := 0.0;
       B_Small, B_Max, B_Min : St_F2 := 0.0;
       X                     : F;

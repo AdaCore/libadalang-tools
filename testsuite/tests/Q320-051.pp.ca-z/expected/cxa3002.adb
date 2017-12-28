@@ -63,7 +63,8 @@ begin
       "results when given character/string input " &
       "parameters");
 
-   Character_Block : declare
+   Character_Block :
+   declare
       Offset : constant Integer := Character'Pos ('a') - Character'Pos ('A');
    begin
 
@@ -183,7 +184,8 @@ begin
          Report.Failed ("Exception raised in Character_Block");
    end Character_Block;
 
-   String_Block : declare
+   String_Block :
+   declare
 
       Lc_String : constant String :=
         "az" & Ac.Latin_1.Lc_A_Grave & Ac.Latin_1.Lc_C_Cedilla;

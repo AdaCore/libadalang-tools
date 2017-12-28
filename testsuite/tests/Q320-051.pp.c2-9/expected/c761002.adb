@@ -96,7 +96,7 @@ procedure C761002 is
             V2 := V1;
          end if;
          V3 := V2;
-         <<check>>
+         <<Check>>
          Tctouch.Validate ("S", "goto past master end");
       end With_Goto;
 
@@ -128,7 +128,8 @@ procedure C761002 is
       end Alley;
 
    begin
-      Catch : begin
+      Catch :
+      begin
          Alley (Report.Ident_Int (1));
       exception
          when Oops =>

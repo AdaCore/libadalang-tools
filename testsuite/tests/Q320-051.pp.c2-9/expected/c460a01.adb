@@ -15,7 +15,8 @@ begin -- C460A01.                                              -- [ Level = 1 ]
       "bodies. Operand type of access type conversion is " &
       "passed as actual to instance");
 
-   Subtest1 : declare                                                     -- [ Level = 2 ]
+   Subtest1 :
+   declare                                                     -- [ Level = 2 ]
       type Acctag_L2 is access all F460a00.Tagged_Type;
       Operand : Acctag_L2 := new F460a00.Tagged_Type;
 
@@ -56,7 +57,8 @@ begin -- C460A01.                                              -- [ Level = 1 ]
          Report.Failed ("SUBTEST #1: Unexpected exception raised");
    end Subtest1;
 
-   Subtest2 : declare                                                     -- [ Level = 2 ]
+   Subtest2 :
+   declare                                                     -- [ Level = 2 ]
       type Acctag_L2 is access all F460a00.Tagged_Type;
       Operand : Acctag_L2 := new F460a00.Tagged_Type;
 
@@ -106,7 +108,8 @@ begin -- C460A01.                                              -- [ Level = 1 ]
          Report.Failed ("SUBTEST #2: Unexpected exception raised");
    end Subtest2;
 
-   Subtest3 : declare                                                     -- [ Level = 2 ]
+   Subtest3 :
+   declare                                                     -- [ Level = 2 ]
       type Acctag_L2 is access all F460a00.Tagged_Type;
       Target : Acctag_L2;
 
@@ -156,7 +159,8 @@ begin -- C460A01.                                              -- [ Level = 1 ]
          Report.Failed ("SUBTEST #3: Unexpected exception raised");
    end Subtest3;
 
-   Subtest4 : declare                                                     -- [ Level = 2 ]
+   Subtest4 :
+   declare                                                     -- [ Level = 2 ]
       Result : F460a00.Tc_Result_Kind := F460a00.Un_Init;
    begin -- SUBTEST4.
 
@@ -190,7 +194,8 @@ begin -- C460A01.                                              -- [ Level = 1 ]
          Report.Failed ("SUBTEST #4: Unexpected exception raised");
    end Subtest4;
 
-   Subtest5 : declare                                                     -- [ Level = 2 ]
+   Subtest5 :
+   declare                                                     -- [ Level = 2 ]
       Result : F460a00.Tc_Result_Kind := F460a00.Un_Init;
    begin -- SUBTEST5.
 

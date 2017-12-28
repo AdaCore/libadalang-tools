@@ -63,7 +63,8 @@ begin
       "the package Text_IO.Modular_IO provide " &
       "correct results");
 
-   Test_For_Text_Io_Support : declare
+   Test_For_Text_Io_Support :
+   declare
       Data_File     : Ada.Text_Io.File_Type;
       Data_Filename : constant String := Report.Legal_File_Name;
    begin
@@ -80,7 +81,8 @@ begin
          Mode => Ada.Text_Io.Out_File,
          Name => Data_Filename);
 
-      Test_Block : declare
+      Test_Block :
+      declare
 
          type Mod_Type is mod System.Max_Binary_Modulus;
          -- Max_Binary_Modulus must be at least 2**16, which would result in
@@ -191,7 +193,8 @@ begin
 
          -- Verify versions of Modular_IO procedures Put and Get for Strings.
 
-         Modular_Io_In_Strings : declare
+         Modular_Io_In_Strings :
+         declare
             Tc_String_Array : array
               (1 .. Number_Of_Modular_Items) of String (1 .. 30) :=
               (others => (others => ' '));

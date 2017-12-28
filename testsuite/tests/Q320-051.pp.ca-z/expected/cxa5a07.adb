@@ -74,7 +74,8 @@ begin
      ("CXA5A07",
       "Check that the Arctan function provides " & "correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Ada.Numerics;
       use Fxa5a00;

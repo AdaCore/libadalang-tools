@@ -73,7 +73,8 @@ begin
       "Text_IO.Fixed_IO operate correctly for files " &
       "with mode Append_File");
 
-   Test_For_Text_Io_Support : begin
+   Test_For_Text_Io_Support :
+   begin
 
       -- An implementation that does not support Text_IO in a particular
       -- environment will raise Use_Error on calls to various Text_IO
@@ -93,7 +94,8 @@ begin
          raise Incomplete;
    end Test_For_Text_Io_Support;
 
-   Operational_Test_Block : declare
+   Operational_Test_Block :
+   declare
 
       Daily_Orders_Received : constant Natural := 4;
 
@@ -166,7 +168,8 @@ begin
       -- Data is taken from an inventory list and entered into the file, in
       -- specific format.
 
-      Reset1 : begin                                                -- Reset to
+      Reset1 :
+      begin                                                -- Reset to
          Text_Io.Reset
            (Inventory_File,                    -- Append mode.
             Tc_Mode_Selection (Report.Ident_Int (3)));
@@ -182,14 +185,16 @@ begin
          raise Incomplete;
       end if;
 
-      Test_Verification_Block : declare
+      Test_Verification_Block :
+      declare
          Tc_Item       : Item_Type;
          Tc_Cost       : Cost_Type;
          Tc_Markup     : Profit_Type;
          Tc_Item_Count : Natural := 0;
       begin
 
-         Reset2 : begin
+         Reset2 :
+         begin
             Text_Io.Reset (Inventory_File, Text_Io.In_File);  -- Reset for
             -- reading.
          exception
@@ -244,7 +249,8 @@ begin
          Report.Failed ("Exception in Text_IO.Fixed_IO processing");
    end Operational_Test_Block;
 
-   Final_Block : begin
+   Final_Block :
+   begin
       -- Delete the external file.
       if Text_Io.Is_Open (Inventory_File) then
          Text_Io.Delete (Inventory_File);

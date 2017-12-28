@@ -85,7 +85,8 @@ begin
       "Packed_Decimal parameters produce correct " &
       "results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Interfaces.Cobol;
       use Ada.Exceptions;

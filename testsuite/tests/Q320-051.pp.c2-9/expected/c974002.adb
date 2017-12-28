@@ -140,7 +140,8 @@ begin  -- Main program.
    Triggering_Alternative_Executed := False;
 
    No_Delay_Subtest :
- declare
+
+   declare
       -- Set Expiry to a time which has already passed
       Expiry : constant Ada.Calendar.Time := Start_Time;
       Timed  : Timed_Calculation_Task;
@@ -168,7 +169,8 @@ begin  -- Main program.
    Triggering_Alternative_Executed := False;
 
    Long_Delay_Subtest :
- declare
+
+   declare
 
       -- Quick_Calculation should finish before expiry.
       Expiry : constant Ada.Calendar.Time := Ada.Calendar.Clock + Minute;

@@ -9,7 +9,8 @@ begin
 
    Comment ("SUBTEST 6: TASK IN STATEMENT PART OF PACKAGE");
    Comment ("  THE TASKS DON'T DEPEND ON THE DECLARATIVE PART");
-   B61 : declare
+   B61 :
+   declare
       X : Mnt;
 
       package P is

@@ -43,7 +43,8 @@ begin
 
    begin
 
-      Case_C : declare
+      Case_C :
+      declare
 
          subtype Stc1 is Integer range -2 .. 3;
          subtype Stc2 is Integer range 7 .. 20;

@@ -14,7 +14,8 @@ begin  -- Main test procedure.
      ("CD90001",
       "Check that Unchecked_Conversion is supported " &
       "and is reversible in appropriate cases");
-   Eight_Bit_Case : begin
+   Eight_Bit_Case :
+   begin
       if Cd90001_0.User_Enums'Size /= Cd90001_0.Eight_Bits'Size then
          Report.Comment
            ("The sizes of the 8 bit types used in this test " &
@@ -38,7 +39,8 @@ begin  -- Main test procedure.
          Report.Failed ("Unexpected exception raised in 8 bit case");
    end Eight_Bit_Case;
 
-   Sixteen_Bit_Case : begin
+   Sixteen_Bit_Case :
+   begin
       if Cd90001_0.Signed_16'Size /= Cd90001_0.Bits_16'Size then
          Report.Comment
            ("The sizes of the 16 bit types used in this test " &

@@ -41,8 +41,10 @@ begin
    Test
      ("C39008B",
       "PROGRAM_ERROR AFTER ATTEMPT OF ACTIVATION " & "BEFORE ELABORATION");
-   Block1 : begin
-      Block2 : declare
+   Block1 :
+   begin
+      Block2 :
+      declare
          task type Tt1;
 
          type Att1 is access Tt1;

@@ -548,7 +548,8 @@ begin -- C36204D
       "VALUES WITHIN GENERIC PROGRAM UNITS.");
 
    Local_Block :
- declare
+
+   declare
 
       Dummy : Boolean := False;
 

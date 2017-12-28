@@ -9,7 +9,8 @@ begin
       "master if a transfer of control or exception occurs prior to " &
       "performing its normal finalization");
 
-   Excep : begin
+   Excep :
+   begin
 
       declare
          I : Integer := Create.C1; -- Raises Constraint_Error
@@ -39,7 +40,8 @@ begin
             Exception_Information (E));
    end Excep;
 
-   Transfer : declare
+   Transfer :
+   declare
       Finalize_Was_Called_Before_Leaving_Exit : Boolean;
    begin
 

@@ -42,7 +42,8 @@ begin
       "results, especially under conditions where " &
       "truncation of the result is required");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Cxa40190;
 

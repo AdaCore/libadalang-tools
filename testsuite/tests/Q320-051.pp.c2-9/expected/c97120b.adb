@@ -59,7 +59,8 @@ begin
             delay 1.0;
          end loop;
 
-         A : begin
+         A :
+         begin
             select when Ident_Bool (True) =>
                accept E;
             or
@@ -76,7 +77,8 @@ begin
             delay 1.0;
          end loop;
 
-         B : begin
+         B :
+         begin
             select
                accept E;
             or

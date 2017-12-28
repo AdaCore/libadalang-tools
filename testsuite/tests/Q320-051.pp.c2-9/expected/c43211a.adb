@@ -54,7 +54,8 @@ begin
 
    begin
 
-      Case_A : begin
+      Case_A :
+      begin
 
          A := (6 .. 8 => (4 .. 6 => 0));
          if A /= (6 .. 8 => (4 .. 6 => 0)) then
@@ -68,7 +69,8 @@ begin
 
       end Case_A;
 
-      Case_B : begin
+      Case_B :
+      begin
 
          A := (6 .. Ident_Int (8) => (Ident_Int (4) .. 6 => 1));
          if A /= (6 .. Ident_Int (8) => (Ident_Int (4) .. 6 => 1)) then
@@ -82,7 +84,8 @@ begin
 
       end Case_B;
 
-      Case_C : begin
+      Case_C :
+      begin
 
          A := (7 .. 9 => (5 .. 7 => Ident_Int (2)));
          Failed
@@ -99,7 +102,8 @@ begin
 
       end Case_C;
 
-      Case_D : begin
+      Case_D :
+      begin
 
          A := (5 .. 7 => (3 .. 5 => Ident_Int (3)));
          Failed
@@ -116,7 +120,8 @@ begin
 
       end Case_D;
 
-      Case_E : begin
+      Case_E :
+      begin
 
          A := (7 .. Ident_Int (9) => (5 .. 7 => Ident_Int (4)));
          Failed
@@ -133,7 +138,8 @@ begin
 
       end Case_E;
 
-      Case_F : begin
+      Case_F :
+      begin
 
          A := (5 .. 7 => (Ident_Int (3) .. 5 => Ident_Int (5)));
          Failed
@@ -150,7 +156,8 @@ begin
 
       end Case_F;
 
-      Case_G : begin
+      Case_G :
+      begin
 
          A :=
            (7 .. 8 => (5 .. 7 => Ident_Int (6)),

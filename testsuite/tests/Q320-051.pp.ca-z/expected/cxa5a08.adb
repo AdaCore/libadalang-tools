@@ -76,7 +76,8 @@ begin
      ("CXA5A08",
       "Check that the Arccot function provides " & "correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Ada.Exceptions;
       use Ada.Numerics;

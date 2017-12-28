@@ -80,7 +80,8 @@ begin
       "C language predefined libraries can be " &
       "called from an Ada program");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       package Ic renames Interfaces.C;
       package Ics renames Interfaces.C.Strings;

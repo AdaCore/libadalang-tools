@@ -10,11 +10,14 @@ begin
    Comment
      ("SUBTEST 1: TASKS IN DECL PART OF A BLOCK AND A PACKAGE " & "SPEC");
    Comment ("  THE TASKS DEPEND ON THE DECLARATIVE PART");
-   B1 : declare
+   B1 :
+   declare
       X : Mnt;
    begin
-      B2 : begin
-         B3 : declare
+      B2 :
+      begin
+         B3 :
+         declare
             type Acc_Mnt is access Mnt;
             T1 : Unactivated;
             M2 : Acc_Mnt := new Mnt;

@@ -66,7 +66,8 @@ begin
       "for strings that conform to the composition " &
       "constraints defined for picture strings");
 
-   Test_Block : declare
+   Test_Block :
+   declare
       use Fxf3a00;
       use Ada.Text_Io;
    begin

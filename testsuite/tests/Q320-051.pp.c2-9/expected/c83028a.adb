@@ -52,7 +52,8 @@ begin
       "STATEMENT HIDES AN OUTER " &
       "DECLARATION OF A HOMOGRAPH");
 
-   One : declare
+   One :
+   declare
       A : Integer := Ident_Int (2);
       B : Integer := A;
 
@@ -87,7 +88,8 @@ begin
       end if;
    end One;
 
-   Two : declare
+   Two :
+   declare
       A   : Integer := Ident_Int (2);
       B   : Integer := A;
       Obj : Integer := Ident_Int (3);
@@ -130,7 +132,8 @@ begin
       end if;
    end Two;
 
-   Three : declare                 --  OVERLOADING OF FUNCTIONS.
+   Three :
+   declare                 --  OVERLOADING OF FUNCTIONS.
 
       Obj : Integer := 1;
       Flo : Float   := 5.0;

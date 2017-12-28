@@ -55,7 +55,8 @@ begin
       "(UNLESS THE SUBPROGRAM IS A HOMOGRAPH OF THE " &
       "GENERIC SUBPROGRAM)");
 
-   One : declare
+   One :
+   declare
       generic
       procedure P;
 
@@ -88,7 +89,8 @@ begin
       end if;
    end One;
 
-   Two : declare
+   Two :
+   declare
       Global : Integer := Ident_Int (Integer'First);
       Switch : Boolean := True;
 
@@ -123,7 +125,8 @@ begin
       end if;
    end Two;
 
-   Three : declare
+   Three :
+   declare
       Switch : Boolean := True;
 
       function F return Integer is
@@ -173,7 +176,8 @@ begin
       end;
    end Three;
 
-   Four : declare
+   Four :
+   declare
       Switch : Boolean := True;
 
       function F return Integer is

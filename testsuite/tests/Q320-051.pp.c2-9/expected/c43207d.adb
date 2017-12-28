@@ -63,9 +63,11 @@ begin
 
    begin
 
-      Case_D : begin
+      Case_D :
+      begin
 
-         Case_D1 : declare
+         Case_D1 :
+         declare
             D1 : T0 (8 .. 4, 5 .. 1);
          begin
             Cntr := (Choice_Index => 0);
@@ -82,7 +84,8 @@ begin
                Failed ("CASE D1 : EXCEPTION RAISED");
          end Case_D1;
 
-         Case_D2 : declare
+         Case_D2 :
+         declare
             D2 : T0 (8 .. 4, 5 .. 1);
          begin
             Cntr := (Choice_Index => 0);
@@ -101,7 +104,8 @@ begin
                Failed ("CASE D2 : EXCEPTION RAISED");
          end Case_D2;
 
-         Case_D3 : declare
+         Case_D3 :
+         declare
             D3 : T0 (3 .. 5, 1 .. 2);
          begin
             Cntr := (Choice_Index => 0);
@@ -118,7 +122,8 @@ begin
                Failed ("CASE D3 : EXCEPTION RAISED");
          end Case_D3;
 
-         Case_D4 : declare
+         Case_D4 :
+         declare
             D4 : T0 (1 .. 2, 5 .. 7);
          begin
             Cntr := (Choice_Index => 0);

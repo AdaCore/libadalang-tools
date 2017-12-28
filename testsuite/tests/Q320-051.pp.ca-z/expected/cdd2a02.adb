@@ -208,7 +208,8 @@ begin
       "Check that the Read, Write, Input, and Output " &
       "attributes are inherited for untagged derived types");
 
-   Test1 : declare
+   Test1 :
+   declare
       type Derived1 is new Parent;
       S  : aliased My_Stream (1_000);
       X1 : Derived1
@@ -303,7 +304,8 @@ begin
       end;
    end Test1;
 
-   Test2 : declare
+   Test2 :
+   declare
       type Derived2 (D : Int) is new Parent (D1 => D, D2 => D, B => False);
       S  : aliased My_Stream (1_000);
       X1 : Derived2 (D => Int (Ident_Int (7)));

@@ -18,7 +18,8 @@ begin
       "subtypes.  Check for cases of tagged record and generic " &
       "formal types");
 
-   Tagobj_Block : declare
+   Tagobj_Block :
+   declare
       Tobj_Byagg : Tag_Type := (5, "Hello");    -- Initial assignment is
       -- aggregate.
       Tobj_Byobj : Tag_Type := Tobj_Byagg;      -- Initial assignment is
@@ -95,7 +96,8 @@ begin
 
    end Tagobj_Block;
 
-   Arrobj_Block : declare
+   Arrobj_Block :
+   declare
       Arr_Const : constant Array_Type := (9, 7, 6, 8);
       Arr_Byagg : Array_Type                  -- Initial assignment is
       := (10, 11, 12);               -- aggregate.
@@ -156,7 +158,8 @@ begin
 
    end Arrobj_Block;
 
-   Genericobj_Block : declare
+   Genericobj_Block :
+   declare
       type Rec (Disc : Small_Num) is record
          S : Small_Num := Disc;
       end record;

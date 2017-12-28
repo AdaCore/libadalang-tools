@@ -113,7 +113,8 @@ begin  -- CC3224A
       "CORRESPONDING OPERATIONS OF THE ACTUAL TYPE");
 
    One_Dimensional :
- declare
+
+   declare
 
       package P1 is new P (Arr);
 
@@ -187,7 +188,8 @@ begin  -- CC3224A
    end One_Dimensional;
 
    Boolean_One_Dimensional :
- declare
+
+   declare
 
       package B1 is new Bool (B_Arr);
 
@@ -220,7 +222,8 @@ begin  -- CC3224A
    end Boolean_One_Dimensional;
 
    Three_Dimensional_Test :
- declare
+
+   declare
 
       package Td is new Td_Array_Package (Cube => Three_Dimensional);
 

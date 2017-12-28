@@ -74,7 +74,8 @@ begin
       "if the output string exceeds the length " &
       "of the out String parameter");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Ada.Text_Io;
 

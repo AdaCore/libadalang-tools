@@ -70,9 +70,11 @@ begin
 
    begin
 
-      Case_A : begin
+      Case_A :
+      begin
 
-         Case_A1 : declare
+         Case_A1 :
+         declare
             A1 : array (4 .. 3, 3 .. 4) of T1 (2 .. 3, 1 .. 2);
          begin
             Cntr := (Choice_Index => 0);
@@ -101,7 +103,8 @@ begin
                Failed ("CASE A1 : Exception raised");
          end Case_A1;
 
-         Case_A2 : declare
+         Case_A2 :
+         declare
             A2 : array (3 .. 4, 4 .. 3) of T1 (2 .. 3, 1 .. 2);
          begin
             Cntr := (Choice_Index => 0);
@@ -132,9 +135,11 @@ begin
 
       end Case_A;
 
-      Case_B : begin
+      Case_B :
+      begin
 
-         Case_B1 : declare
+         Case_B1 :
+         declare
             B1 : array (2 .. 3, 1 .. 2) of T1 (1 .. 2, 9 .. 10);
          begin
             Cntr := (Choice_Index => 0);
@@ -165,7 +170,8 @@ begin
                Failed ("CASE B1 : Exception raised");
          end Case_B1;
 
-         Case_B2 : declare
+         Case_B2 :
+         declare
             B2 : array (2 .. 3, 1 .. 2) of T1 (1 .. 2, 9 .. 10);
          begin
             Cntr := (Choice_Index => 0);
@@ -196,7 +202,8 @@ begin
                Failed ("CASE B2 : Exception raised");
          end Case_B2;
 
-         Case_B3 : declare
+         Case_B3 :
+         declare
             B3 : array (2 .. 3, 1 .. 2) of T1 (1 .. 2, 2 .. 1);
          begin
             Cntr := (Choice_Index => 0);
@@ -225,7 +232,8 @@ begin
                Failed ("CASE B3 : Exception raised");
          end Case_B3;
 
-         Case_B4 : declare
+         Case_B4 :
+         declare
             B4 : array (2 .. 3, 1 .. 2) of T1 (2 .. 1, 1 .. 2);
          begin
             Cntr := (Choice_Index => 0);

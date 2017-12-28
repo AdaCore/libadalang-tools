@@ -101,7 +101,7 @@ begin
          goto Ending;
          Bump;
 
-         <<ENDING>>
+         <<Ending>>
          null;
 
       end P;

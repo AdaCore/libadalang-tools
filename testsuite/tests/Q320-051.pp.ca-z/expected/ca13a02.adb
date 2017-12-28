@@ -17,7 +17,8 @@ begin
 
 -- Going from floor one to penthouse.
 
-   Going_To_Penthouse : declare
+   Going_To_Penthouse :
+   declare
       -- Declare instance of the child generic elevator package for penthouse.
 
       package Call_Elevator_Pkg is new Fa13a00_1.Ca13a02_4
@@ -39,7 +40,8 @@ begin
 
 -- Going from penthouse to basement.
 
-   Going_To_Basement : declare
+   Going_To_Basement :
+   declare
       -- Declare instance of the child generic elevator package for basement.
 
       package Call_Elevator_Pkg is new Fa13a00_1.Ca13a02_4
@@ -61,7 +63,8 @@ begin
 
 -- Going from basement to floor three.
 
-   Going_To_Floor3 : declare
+   Going_To_Floor3 :
+   declare
       -- Declare instance of the child generic elevator package for floor
       -- three.
 
@@ -83,7 +86,8 @@ begin
 
 -- Going from floor three to floor two.
 
-   Going_To_Floor2 : declare
+   Going_To_Floor2 :
+   declare
       -- Declare instance of the child generic elevator package for floor two.
 
       package Call_Elevator_Pkg is new Fa13a00_1.Ca13a02_4 (Fa13a00_1.Floor2);
@@ -104,7 +108,8 @@ begin
 
 -- Going to floor one.
 
-   Going_To_Floor1 : declare
+   Going_To_Floor1 :
+   declare
       -- Declare instance of the child generic elevator package for floor one.
 
       package Call_Elevator_Pkg is new Fa13a00_1.Ca13a02_4 (Fa13a00_1.Floor1);

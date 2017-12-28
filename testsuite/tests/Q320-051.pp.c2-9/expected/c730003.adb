@@ -15,7 +15,8 @@ begin
       "defined by the partial view of the private " &
       "extension");
 
-   Check_Your_Cards : declare
+   Check_Your_Cards :
+   declare
       use C730003_0;
       use C730003_0.C730003_2;
 

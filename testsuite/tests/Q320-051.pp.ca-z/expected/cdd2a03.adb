@@ -276,7 +276,8 @@ begin
       "non-limited or have user-defined attributes; check that such " &
       "limited type extension attributes are callable");
 
-   Test1 : declare
+   Test1 :
+   declare
       S  : aliased My_Stream (1_000);
       X1 : Derived1
         (D1 => Int (Ident_Int (2)),
@@ -316,7 +317,8 @@ begin
       end if;
    end Test1;
 
-   Test2 : declare
+   Test2 :
+   declare
       S  : aliased My_Stream (1_000);
       X1 : Derived2 (D => Int (Ident_Int (7)));
       X2 : Derived2 (D => Int (Ident_Int (7)));

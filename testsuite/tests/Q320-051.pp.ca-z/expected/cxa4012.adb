@@ -17,7 +17,8 @@ begin
       "Ada.Strings.Wide_Maps are available and " &
       "produce correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use type Wide_Maps.Wide_Character_Set;
 

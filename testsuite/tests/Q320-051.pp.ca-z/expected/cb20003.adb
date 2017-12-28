@@ -19,11 +19,11 @@ begin
 
    Default_Response_Processing :                 -- The exception
    -- Handled_With_Others is to
-      -- be caught with an others
-      -- handler in Default_Resp.,
-      -- reraised, and handled with
-      -- a specific handler here.
-      begin
+   -- be caught with an others
+   -- handler in Default_Resp.,
+   -- reraised, and handled with
+   -- a specific handler here.
+   begin
 
       Push_Buttons.Push (Console_Button,        -- Raise exception that will
       Report.Ident_Int (2));  -- be handled in procedure.
@@ -38,7 +38,8 @@ begin
            ("Exception handled in " & " Default_Response_Processing block");
    end Default_Response_Processing;
 
-   Alert_Response_Processing : begin
+   Alert_Response_Processing :
+   begin
 
       Push_Buttons.Set_Response
         (Console_Button,
@@ -63,7 +64,8 @@ begin
            ("Exception handled in " & " Alert_Response_Processing block");
    end Alert_Response_Processing;
 
-   Emergency_Response_Processing : begin
+   Emergency_Response_Processing :
+   begin
 
       Push_Buttons.Set_Response
         (Console_Button,

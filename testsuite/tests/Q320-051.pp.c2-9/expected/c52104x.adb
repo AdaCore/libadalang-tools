@@ -87,9 +87,10 @@ begin
 
    Constr_Err :         -- THIS BLOCK CATCHES CONSTRAINT_ERROR
    -- FOR THE SUBTYPE DECLARATION.
-      begin
+   begin
 
-      Dcl_Arr : declare        -- THIS BLOCK DECLARES THE ARRAY SUBTYPE.
+      Dcl_Arr :
+      declare        -- THIS BLOCK DECLARES THE ARRAY SUBTYPE.
 
          type Tabox5 is array (Integer range <>) of Boolean;
          pragma Pack (Tabox5);
@@ -104,7 +105,8 @@ begin
            ("NO CONSTRAINT_ERROR FOR TYPE " &
             "WITH 'LENGTH = INTEGER'LAST + 3");
 
-         Obj_Dcl : declare   -- THIS BLOCK DECLARES TWO BOOLEAN ARRAYS THAT
+         Obj_Dcl :
+         declare   -- THIS BLOCK DECLARES TWO BOOLEAN ARRAYS THAT
             -- HAVE INTEGER'LAST + 3 COMPONENTS; STORAGE_ERROR MAY BE RAISED.
             Arrx51 : Tabox51;
             Arrx52 : Tabox5 (Ident_Int (-2) .. Ident_Int (Integer'Last));
@@ -118,7 +120,8 @@ begin
 
             -- INITIALIZATION OF LHS ARRAY:
 
-            No_Excp : begin          -- NO EXCEPTION SHOULD OCCUR IN THIS BLOCK
+            No_Excp :
+            begin          -- NO EXCEPTION SHOULD OCCUR IN THIS BLOCK
                for I in Ident_Int (-2) .. Ident_Int (9) loop
                   Arrx52 (I) := False;
                end loop;
@@ -145,7 +148,8 @@ begin
 
             end No_Excp;
 
-            Do_Slice : begin
+            Do_Slice :
+            begin
                -- SLICE ASSIGNMENT:
 
                Arrx52 (Ident_Int (-1) .. Ident_Int (Integer'Last)) :=

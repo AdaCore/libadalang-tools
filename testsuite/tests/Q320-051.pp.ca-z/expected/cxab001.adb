@@ -65,7 +65,8 @@ begin
       "Wide_Text_IO allow for the input/output of " &
       "Wide_Character and Wide_String data");
 
-   Test_For_Wide_Text_Io_Support : begin
+   Test_For_Wide_Text_Io_Support :
+   begin
 
       -- An implementation that does not support Wide_Text_IO in a particular
       -- environment will raise Use_Error on calls to various Wide_Text_IO
@@ -87,7 +88,8 @@ begin
 
    end Test_For_Wide_Text_Io_Support;
 
-   Operational_Test_Block : declare
+   Operational_Test_Block :
+   declare
 
       First_String  : constant Wide_String := "Somewhere ";
       Second_String : constant Wide_String := "Over The ";
@@ -96,7 +98,8 @@ begin
 
    begin
 
-      Enter_Data_In_File : declare
+      Enter_Data_In_File :
+      declare
          Pos                 : Natural := 1;
          Bad_Character_Found : Boolean := False;
       begin
@@ -112,7 +115,8 @@ begin
 
          -- Reset to In_File mode and read file contents, using the Get
          -- procedure defined for Wide_Character data.
-         Reset1 : begin
+         Reset1 :
+         begin
             Ada.Wide_Text_Io.Reset (Filter_File,                      -- Reset.
             Ada.Wide_Text_Io.In_File);
          exception
@@ -142,7 +146,8 @@ begin
          -- to transfer the Second_String, followed by a call to New_Line. The
          -- Put_Line procedure defined for Wide_String data is used to transfer
          -- the Third_String.
-         Reset2 : begin
+         Reset2 :
+         begin
             Ada.Wide_Text_Io.Reset (Filter_File,                   -- Reset.
             Ada.Wide_Text_Io.Append_File);
 
@@ -172,7 +177,8 @@ begin
 
       ---
 
-      Filter_Block : declare
+      Filter_Block :
+      declare
 
          Pos        : Positive := 1;
          Tc_String2 : Wide_String (1 .. Second_String'Length);
@@ -236,7 +242,8 @@ begin
 
    end Operational_Test_Block;
 
-   Deletion : begin
+   Deletion :
+   begin
       if Ada.Wide_Text_Io.Is_Open (Filter_File) then            -- Is_Open.
          Ada.Wide_Text_Io.Delete (Filter_File);                 -- Delete.
       else

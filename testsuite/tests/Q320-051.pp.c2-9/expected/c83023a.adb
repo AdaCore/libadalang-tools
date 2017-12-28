@@ -53,7 +53,8 @@ begin
       "REGION OF A TASK HIDES AN OUTER " &
       "DECLARATION OF A HOMOGRAPH");
 
-   One : declare                      -- DECLARATIVE REGION.
+   One :
+   declare                      -- DECLARATIVE REGION.
       A : Integer := Ident_Int (2);
       B : Integer := A;
 
@@ -102,7 +103,8 @@ begin
       end if;
    end One;
 
-   Two : declare            -- AFTER THE SPECIFICATION OF TASK.
+   Two :
+   declare            -- AFTER THE SPECIFICATION OF TASK.
       task Inner is
          entry Here (X : in out Integer);
       end Inner;
@@ -152,7 +154,8 @@ begin
       end if;
    end Two;
 
-   Three : declare                 --  OVERLOADING OF FUNCTIONS.
+   Three :
+   declare                 --  OVERLOADING OF FUNCTIONS.
 
       Obj : Integer := 1;
       Flo : Float   := 5.0;

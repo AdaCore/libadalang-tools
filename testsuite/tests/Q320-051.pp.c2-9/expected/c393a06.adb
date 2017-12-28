@@ -36,7 +36,8 @@ begin  -- Main test procedure.
 
    Tagger.Tc_Validate ("CaCaCaCa", "Initialization sequence");
 
-   Oh_My : begin
+   Oh_My :
+   begin
       Darwin.Swap (Lion, Darwin.Organism (Bear));
       Darwin.Swap (Lion, Tigerlily);
       Report.Failed ("Exception not raised");

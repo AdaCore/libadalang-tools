@@ -48,7 +48,8 @@ begin  -- Main test procedure.
    end if;
    Tracer.Tc_Validate ("BB", "Finding Afternoon Grind");
 
-   Sunset : declare
+   Sunset :
+   declare
       Evening : Coffee.Grinder'Class := Coffee.Create;
    begin
       Tracer.Tc_Validate ("hDa", "Creating Evening Coffee");

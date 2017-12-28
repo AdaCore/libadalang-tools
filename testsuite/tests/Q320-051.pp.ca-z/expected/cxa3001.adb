@@ -63,7 +63,8 @@ begin
       "correct results when provided constant " &
       "arguments from package Ada.Characters.Latin_1");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       package Ac renames Ada.Characters;
       package Ach renames Ada.Characters.Handling;

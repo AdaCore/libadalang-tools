@@ -46,9 +46,11 @@ begin
 
    begin
 
-      Case_A : begin
+      Case_A :
+      begin
 
-         Case_A1 : declare
+         Case_A1 :
+         declare
 
             subtype Sta is Integer range 11 .. 15;
             type Ta is array (Sta range <>) of Integer;
@@ -78,7 +80,8 @@ begin
            ("CASE A2 : SUBPROGRAM WITH UNCONSTRAINED " &
             "TWO-DIMENSIONAL ARRAY FORMAL PARAMETER");
 
-         Case_A2 : declare
+         Case_A2 :
+         declare
 
             subtype Sta1 is Integer range 11 .. Ident_Int (12);
             subtype Sta2 is Integer range 10 .. 11;

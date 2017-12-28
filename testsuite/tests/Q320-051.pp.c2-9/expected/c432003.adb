@@ -15,7 +15,8 @@ begin
       "discriminant in the derived type definition " &
       "for some ancestor of the type of the aggregate");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       -- Variety of string object declarations.
       String2  : String (1 .. 2)  := Report.Ident_Str ("12");

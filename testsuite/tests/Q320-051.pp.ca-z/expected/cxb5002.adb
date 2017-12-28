@@ -88,7 +88,8 @@ begin
       "Check that functions To_Fortran and To_Ada " &
       "produce correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       package Acl renames Ada.Characters.Latin_1;
       package Bnd is new Ada.Strings.Bounded.Generic_Bounded_Length (10);

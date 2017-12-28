@@ -75,7 +75,8 @@ begin
       "Check that 'Write and 'Read work properly " &
       "when used with complex data types");
 
-   Test_For_Stream_Io_Support : declare
+   Test_For_Stream_Io_Support :
+   declare
 
       Info_File    : Ada.Streams.Stream_Io.File_Type;
       Info_Stream  : Ada.Streams.Stream_Io.Stream_Access;
@@ -95,7 +96,8 @@ begin
          Ada.Streams.Stream_Io.Out_File,
          The_Filename);
 
-      Operational_Test_Block : declare
+      Operational_Test_Block :
+      declare
 
       begin
 
@@ -104,7 +106,8 @@ begin
          -- Write all of the product information (record, integer, and array
          -- objects) defined in package FXACA00 into the stream.
 
-         Store_Data_Block : begin
+         Store_Data_Block :
+         begin
 
             -- Write information about first product to the stream.
             Fxaca00.Product_Type'Write (Info_Stream, Fxaca00.Product_01);
@@ -135,7 +138,8 @@ begin
 
          end Store_Data_Block;
 
-         Verify_Data_Block : declare
+         Verify_Data_Block :
+         declare
 
             use Fxaca00;   -- Used within this block only.
 

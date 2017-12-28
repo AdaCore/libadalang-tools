@@ -55,7 +55,8 @@ begin
 
    begin
 
-      Case_A : begin
+      Case_A :
+      begin
 
          if (6 .. Ident_Int (8) => "") = A then
             Failed ("CASE A : CONSTRAINT_ERROR NOT RAISED");
@@ -72,7 +73,8 @@ begin
 
       end Case_A;
 
-      Case_B : begin
+      Case_B :
+      begin
 
          A := (Ident_Int (3) .. 4 => "");
          Failed ("CASE B : CONSTRAINT_ERROR NOT RAISED");

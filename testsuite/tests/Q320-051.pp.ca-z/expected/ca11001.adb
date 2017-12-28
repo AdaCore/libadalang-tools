@@ -22,7 +22,8 @@ begin
       "on a private type in its parent package");
 
    Basic_View_Subtest :
- begin
+
+   begin
       -- Assign using Cartesian coordinates.
       Ca11001_0.Cartesian_Assign
         (Ca11001_0.Complex_Int (Report.Ident_Int (1)),
@@ -43,7 +44,8 @@ begin
 
    end Basic_View_Subtest;
    -------------------------------------------------------------
-   Alternate_View_Subtest : begin
+   Alternate_View_Subtest :
+   begin
       -- Assign using Polar coordinates.
       Ca11001_0.Ca11001_1.Polar_Assign
         (Int_2,
@@ -60,7 +62,8 @@ begin
       end if;
    end Alternate_View_Subtest;
    -------------------------------------------------------------
-   Other_Subtest : begin
+   Other_Subtest :
+   begin
       -- Assign using Polar coordinates.
       Ca11001_0.Ca11001_1.Polar_Assign
         (Ca11001_0.Complex_Int (Report.Ident_Int (0)),
@@ -73,7 +76,8 @@ begin
       end if;
    end Other_Subtest;
    -------------------------------------------------------------
-   Exception_Subtest : begin
+   Exception_Subtest :
+   begin
       -- Raised parent's exception.
       Ca11001_0.Ca11001_1.Polar_Assign
         (Ca11001_0.Complex_Int (Report.Ident_Int (0)),

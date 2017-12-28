@@ -67,7 +67,8 @@ begin
       "especially under conditions where " &
       "truncation of the result is required");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       package As renames Ada.Strings;
       package Asb renames Ada.Strings.Bounded;

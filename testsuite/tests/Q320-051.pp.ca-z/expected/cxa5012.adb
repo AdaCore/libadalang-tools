@@ -83,7 +83,8 @@ begin
       "from the Ada.Numerics.Discrete_Random " &
       "and Float_Random packages");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Ada.Numerics, Ada.Strings.Bounded;
 
@@ -164,11 +165,11 @@ begin
    begin
 
       Objective_1 :
-         -- Check that the procedures Save and Reset can be used to save the
-         -- specific state of a random number generator, and then restore
-         -- the specific state to the generator following some intermediate
-         -- generator activity.
-          declare
+      -- Check that the procedures Save and Reset can be used to save the
+      -- specific state of a random number generator, and then restore the
+      -- specific state to the generator following some intermediate generator
+      -- activity.
+      declare
 
          First_Row     : constant := 1;
          Second_Row    : constant := 2;
@@ -311,11 +312,11 @@ begin
       end Objective_1;
 
       Objective_2 :
-         -- Check that the Function Image can be used to obtain a string
-         -- representation of the state of a generator. Check that the Function
-         -- Value will transform a string representation of the state of a
-         -- random number generator into the actual state object.
-          begin
+      -- Check that the Function Image can be used to obtain a string
+      -- representation of the state of a generator. Check that the Function
+      -- Value will transform a string representation of the state of a random
+      -- number generator into the actual state object.
+      begin
 
          -- Use two discrete and float random number generators to generate
          -- a series of values (so that the generators are no longer in their
@@ -464,11 +465,11 @@ begin
       end Objective_2;
 
       Objective_3 :
-         -- Check that a call to Function Value, with a string value that is
-         -- not the image of any generator state, is a bounded error. This
-         -- error either raises Constraint_Error or Program_Error, or is
-         -- accepted. (See Technical Corrigendum 1).
-          declare
+      -- Check that a call to Function Value, with a string value that is
+      -- not the image of any generator state, is a bounded error. This error
+      -- either raises Constraint_Error or Program_Error, or is accepted. (See
+      -- Technical Corrigendum 1).
+      declare
          Not_A_State : constant String := Impdef.Non_State_String;
       begin
 

@@ -36,7 +36,8 @@ begin
      ("C94008A",
       "TERMINATION WHILE WAITING AT " & "AN OPEN TERMINATE ALTERNATIVE");
 
-   Block1 : declare
+   Block1 :
+   declare
       task T1 is
          entry E1;
       end T1;

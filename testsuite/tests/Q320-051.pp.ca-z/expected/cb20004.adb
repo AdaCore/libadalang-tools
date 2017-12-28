@@ -19,7 +19,8 @@ begin
       "Check that exceptions propagate correctly " &
       "from objects of protected types");
 
-   Initial_Data_Block : begin                                    -- Data causes Constraint_Error.
+   Initial_Data_Block :
+   begin                                    -- Data causes Constraint_Error.
       Data_Buffer.Put (Cb20004_0.Data_Item (Report.Ident_Int (51)));
 
    exception
@@ -34,7 +35,8 @@ begin
             "propagated to caller from Initial_Data_Block");
    end Initial_Data_Block;
 
-   Data_Entry_Block : begin
+   Data_Entry_Block :
+   begin
       -- Valid data. No exception.
       Data_Buffer.Put (Cb20004_0.Data_Item (Report.Ident_Int (3)));
 
@@ -56,7 +58,8 @@ begin
             "to caller from Data_Entry_Block");
    end Data_Entry_Block;
 
-   Data_Retrieval_Block : begin
+   Data_Retrieval_Block :
+   begin
 
       Data_Buffer.Get (Data);  -- Retrieval of buffer data, buffer now empty.
       -- Exception will be raised in entry body, with propagation to caller.

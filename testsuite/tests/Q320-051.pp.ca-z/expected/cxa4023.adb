@@ -14,7 +14,8 @@ begin
       "available, and that they produce correct " &
       "results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Cxa40230;
 
@@ -304,7 +305,8 @@ begin
 
       -- Trim
 
-      Trim_Block : declare
+      Trim_Block :
+      declare
 
          Xyz_Set : Wide_Maps.Wide_Character_Set :=
            Wide_Maps.To_Set (Equiv ("xyz"));
@@ -388,7 +390,8 @@ begin
 
       -- Constructors ("*")
 
-      Constructor_Block : declare
+      Constructor_Block :
+      declare
 
          Sos : Asw.Unbounded_Wide_String;
 

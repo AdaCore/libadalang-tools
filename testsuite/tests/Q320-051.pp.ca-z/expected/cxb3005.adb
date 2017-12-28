@@ -83,7 +83,8 @@ begin
      ("CXB3005",
       "Check that the procedures To_C and To_Ada " &
       "produce correct results");
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Interfaces, Interfaces.C;
       use Ada.Characters;

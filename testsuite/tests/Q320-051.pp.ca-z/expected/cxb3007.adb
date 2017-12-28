@@ -85,7 +85,8 @@ begin
      ("CXB3007",
       "Check that the procedures To_C and To_Ada " &
       "for wide strings produce correct results");
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Interfaces, Interfaces.C;
       use Ada.Characters, Ada.Characters.Handling;

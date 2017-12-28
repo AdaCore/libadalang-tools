@@ -42,12 +42,14 @@ begin
 
    begin
 
-      Case_E : begin
+      Case_E :
+      begin
 
 --             COMMENT ("CASE E1 : ARRAY COMPONENT EXPRESSION OF " &
 --                      "AN ENCLOSING ARRAY AGGREGATE");
 
-         Case_E1 : declare
+         Case_E1 :
+         declare
 
             type Te2 is array (1 .. 2) of String (Ident_Int (3) .. 5);
 
@@ -74,7 +76,8 @@ begin
 --             COMMENT ("CASE E2 : ARRAY COMPONENT EXPRESSION OF " &
 --                      "AN ENCLOSING RECORD AGGREGATE");
 
-         Case_E2 : declare
+         Case_E2 :
+         declare
 
             type Ter is record
                Rec : String (3 .. 5);
@@ -96,7 +99,8 @@ begin
 --             COMMENT ("CASE E3 : NULL LITERAL OF AN ENCLOSING " &
 --                      "ARRAY AGGREGATE");
 
-         Case_E3 : declare
+         Case_E3 :
+         declare
 
             type Te2 is array (1 .. 2) of String (3 .. Ident_Int (2));
 
@@ -125,7 +129,8 @@ begin
 --                      "DISCRIMINANT AND THE DISCRIMINANT DETER"   &
 --                      "MINES THE BOUNDS OF THE COMPONENT");
 
-         Case_E4 : declare
+         Case_E4 :
+         declare
 
             subtype Ten is Integer range 1 .. 10;
             type Ter (A : Ten) is record

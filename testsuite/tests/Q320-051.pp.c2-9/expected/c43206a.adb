@@ -68,9 +68,11 @@ begin
 
    begin
 
-      Case_A : begin
+      Case_A :
+      begin
 
-         Case_A1 : declare
+         Case_A1 :
+         declare
 
             procedure Proc1 (A : T1) is
             begin
@@ -90,7 +92,8 @@ begin
 
          end Case_A1;
 
-         Case_A2 : declare
+         Case_A2 :
+         declare
 
             procedure Proc1 (A : String) is
             begin
@@ -112,9 +115,11 @@ begin
 
       end Case_A;
 
-      Case_B : begin
+      Case_B :
+      begin
 
-         Case_B1 : declare
+         Case_B1 :
+         declare
 
             procedure Proc1 (A : T1; L, U : Integer) is
             begin
@@ -152,7 +157,8 @@ begin
 
          end Case_B1;
 
-         Case_B2 : declare
+         Case_B2 :
+         declare
 
             procedure Proc1 (A : String) is
             begin
@@ -174,9 +180,11 @@ begin
 
       end Case_B;
 
-      Case_C : begin
+      Case_C :
+      begin
 
-         Case_C1 : declare
+         Case_C1 :
+         declare
 
             procedure Proc1 (A : T2) is
             begin
@@ -207,7 +215,8 @@ begin
 
          end Case_C1;
 
-         Case_C2 : declare
+         Case_C2 :
+         declare
 
             procedure Proc1 (A : T2) is
             begin

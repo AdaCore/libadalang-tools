@@ -45,7 +45,8 @@ begin
       "IDENTIFIERS MAY BE USED PRIOR TO THEIR IMPLICIT " &
       "DECLARATION");
 
-   Outer : declare
+   Outer :
+   declare
 
       type Idn1 is new Integer;
       Idn2 : constant Integer := 2;
@@ -55,7 +56,8 @@ begin
 
       -----------------------------------------------
 
-      A : declare
+      A :
+      declare
 
          A1 : Idn1;
          A2 : constant Integer := Idn2;
@@ -65,7 +67,7 @@ begin
 
       begin     -- A
 
-         <<IDN1>>
+         <<Idn1>>
          Temp := 0;
 
          Idn2 :
@@ -73,7 +75,8 @@ begin
             Temp := A2;
          end loop Idn2;
 
-         Idn3 : begin
+         Idn3 :
+         begin
             null;
          end Idn3;
 
@@ -81,7 +84,8 @@ begin
 
       -----------------------------------------------
 
-      B : declare
+      B :
+      declare
 
          procedure P (Temp : out Integer) is
 
@@ -92,7 +96,7 @@ begin
          begin     -- P
 
             <<L>>
-            <<IDN1>>
+            <<Idn1>>
             Temp := 0;
 
             Idn2 :
@@ -100,7 +104,8 @@ begin
                Temp := 0;
             end loop Idn2;
 
-            Idn3 : declare
+            Idn3 :
+            declare
             begin
                null;
             end Idn3;
@@ -113,7 +118,8 @@ begin
 
       -----------------------------------------------
 
-      C : declare
+      C :
+      declare
 
          package Pkg is
          end Pkg;
@@ -128,7 +134,7 @@ begin
 
          begin
 
-            <<IDN1>>
+            <<Idn1>>
             Temp := 0;
 
             Idn2 :
@@ -137,7 +143,8 @@ begin
                exit;
             end loop Idn2;
 
-            Idn3 : begin
+            Idn3 :
+            begin
                null;
             end Idn3;
 
@@ -149,7 +156,8 @@ begin
 
       ---------------------------------------------------
 
-      D : declare
+      D :
+      declare
 
          generic
             type Q is (<>);
@@ -165,7 +173,7 @@ begin
 
          begin
 
-            <<IDN1>>
+            <<Idn1>>
             Temp := 0;
 
             Idn2 :
@@ -173,7 +181,8 @@ begin
                Temp := 0;
             end loop Idn2;
 
-            Idn3 : begin
+            Idn3 :
+            begin
                null;
             end Idn3;
 
@@ -187,7 +196,8 @@ begin
 
       -----------------------------------------------
 
-      E : declare
+      E :
+      declare
 
          generic
 
@@ -207,7 +217,7 @@ begin
 
          begin
 
-            <<IDN1>>
+            <<Idn1>>
             <<L>>
             Temp := Item;
 
@@ -216,7 +226,8 @@ begin
                Temp := Item;
             end loop Idn2;
 
-            Idn3 : declare
+            Idn3 :
+            declare
             begin
                null;
             end Idn3;
@@ -235,7 +246,8 @@ begin
 
       -----------------------------------------------
 
-      F : declare
+      F :
+      declare
 
          task T;
 
@@ -249,7 +261,7 @@ begin
 
          begin
 
-            <<IDN1>>
+            <<Idn1>>
             Temp := 1;
 
             Idn2 :
@@ -258,7 +270,8 @@ begin
                exit;
             end loop Idn2;
 
-            Idn3 : declare
+            Idn3 :
+            declare
             begin
                Temp := Temp + 1;
             end Idn3;

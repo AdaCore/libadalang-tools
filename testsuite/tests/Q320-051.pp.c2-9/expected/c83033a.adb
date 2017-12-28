@@ -70,7 +70,8 @@ begin
       "OF A DERIVED SUBPROGRAM DECLARED BY A DERIVED " &
       "TYPE DEFINITION");
 
-   B1 : declare
+   B1 :
+   declare
       type Stmt2 is new Base_P.A;
    begin
 
@@ -83,14 +84,15 @@ begin
          goto Red;              -- DEMONSTRATES USE OF STATEMENT LABEL.
          Failed ("STATEMENT LABEL - 1");
 
-         <<RED>>
+         <<Red>>
          if C /= D then
             Failed ("STATEMENT LABEL - 2");
          end if;
       end;
    end B1;
 
-   B2 : declare
+   B2 :
+   declare
       type Stmt2 is new Base_P.A;
    begin
 
@@ -110,7 +112,8 @@ begin
       end;
    end B2;
 
-   B4 : declare
+   B4 :
+   declare
       package P is
          Global : Integer := 1;
          type Enum is (Green, Blue);
@@ -131,7 +134,8 @@ begin
       end P;
       use P;
    begin
-      Green : declare
+      Green :
+      declare
          Color : Priv := C83033a.B4.P.Green;
       begin
          if Green.Color /= C83033a.B4.P.Green or else Global /= 3 then

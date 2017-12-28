@@ -70,7 +70,8 @@ begin
       "package Ada.Strings.Unbounded are available, " &
       "and that they produce correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       package Asunb renames Ada.Strings.Unbounded;
       use type Asunb.Unbounded_String;

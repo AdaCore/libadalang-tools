@@ -59,7 +59,8 @@ begin
       "Check that the string value returned by " &
       "Function Image is correct");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Ada.Text_Io;
 

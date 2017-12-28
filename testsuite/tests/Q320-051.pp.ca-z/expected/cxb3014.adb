@@ -84,7 +84,8 @@ begin
       "from package Interfaces.C.Pointers produce " &
       "correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use type Interfaces.C.Char, Interfaces.C.Size_T;
 

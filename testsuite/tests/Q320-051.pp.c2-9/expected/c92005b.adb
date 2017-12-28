@@ -36,7 +36,8 @@ procedure C92005b is
 begin
    Test ("C92005B", "TASK VALUE SET BY EXECUTION OF ALLOCATOR");
 
-   Block : declare
+   Block :
+   declare
       task type Tt1;
 
       type Att1 is access Tt1;

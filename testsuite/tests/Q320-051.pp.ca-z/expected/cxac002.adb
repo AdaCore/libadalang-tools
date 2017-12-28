@@ -16,7 +16,8 @@ begin
       "functionality");
 
    Test_For_Stream_Io_Support :
- begin
+
+   begin
 
       -- If an implementation does not support Stream_IO in a particular
       -- environment, the exception Use_Error or Name_Error will be raised on
@@ -39,7 +40,8 @@ begin
 
    end Test_For_Stream_Io_Support;
 
-   Operational_Test_Block : declare
+   Operational_Test_Block :
+   declare
 
       use Cxac002_0;
       use type Ada.Streams.Stream_Io.File_Mode;
@@ -81,7 +83,8 @@ begin
 
       ---
 
-      Enter_Data_In_Stream : declare
+      Enter_Data_In_Stream :
+      declare
          Pos                 : Natural := 1;
          Bad_Character_Found : Boolean := False;
       begin
@@ -99,7 +102,8 @@ begin
 
          Ada.Streams.Stream_Io.Flush (Filter_File);               -- Flush.
          -- Reset to In_File mode and read stream contents.
-         Reset1 : begin
+         Reset1 :
+         begin
             Ada.Streams.Stream_Io.Reset
               (Filter_File,                -- Reset.
                Ada.Streams.Stream_Io.In_File);
@@ -128,7 +132,8 @@ begin
          -- Following user stream/string processing, the stream file is
          -- appended to as follows:
 
-         Reset2 : begin
+         Reset2 :
+         begin
             Ada.Streams.Stream_Io.Reset
               (Filter_File,                -- Reset.
                Ada.Streams.Stream_Io.Append_File);
@@ -157,7 +162,8 @@ begin
          -- Record file statistics.
          File_Size := Ada.Streams.Stream_Io.Size (Filter_File); -- Size.
 
-         Index_Might_Not_Be_Supported : begin
+         Index_Might_Not_Be_Supported :
+         begin
             File_Index := Ada.Streams.Stream_Io.Index (Filter_File); -- Index.
          exception
             when Ada.Streams.Stream_Io.Use_Error =>
@@ -175,7 +181,8 @@ begin
 
       ---
 
-      Filter_Block : declare
+      Filter_Block :
+      declare
          Pos         : Positive        := 1;
          Full_String : constant String := First_String & Second_String;
 
@@ -192,7 +199,8 @@ begin
 
       begin
 
-         Reset3 : begin
+         Reset3 :
+         begin
             Ada.Streams.Stream_Io.Reset
               (Filter_File,                -- Reset.
                Ada.Streams.Stream_Io.In_File);
@@ -261,7 +269,8 @@ begin
 
       ---
 
-      Verification_Block : begin
+      Verification_Block :
+      begin
 
          -- Verify that the entire string was examined, and that the process of
          -- capitalizing the character data was successful.
@@ -283,7 +292,8 @@ begin
 
    end Operational_Test_Block;
 
-   Deletion : begin
+   Deletion :
+   begin
       if Ada.Streams.Stream_Io.Is_Open (Filter_File) then          -- Is_Open.
          Ada.Streams.Stream_Io.Delete (Filter_File);               -- Delete.
       else

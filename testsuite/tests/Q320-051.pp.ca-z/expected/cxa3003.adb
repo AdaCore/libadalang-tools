@@ -74,7 +74,8 @@ begin
       "produce the correct results with both " &
       "Character and String input values");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       -- ISO_646 Characters
 

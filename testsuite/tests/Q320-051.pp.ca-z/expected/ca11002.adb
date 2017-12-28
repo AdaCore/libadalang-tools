@@ -16,8 +16,8 @@ begin
 
    File_Creation :                   -- This processing block will demonstrate
    -- use of child package subroutine that takes advantage of components
-      -- declared in the parent package.
-      declare
+   -- declared in the parent package.
+   declare
       User_File : File_Type;
    begin
       Ca11002_0.Ca11002_1.Create_File (File => User_File); -- Default mode
@@ -34,10 +34,9 @@ begin
    --------------------------------------------------------------
    File_Mode_Conversion :            -- This processing block will demonstrate
    -- the occurrence of a (forced) exception being raised in a child
-      -- subprogram, and propagated to the caller. The exception is handled,
-      -- and the child subprogram is called again, this time to perform without
-      -- error.
-      declare
+   -- subprogram, and propagated to the caller. The exception is handled, and
+   -- the child subprogram is called again, this time to perform without error.
+   declare
       procedure Convert_File_Mode
         (File     : in out File_Type;
          New_Mode : in     File_Mode) renames

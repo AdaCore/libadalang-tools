@@ -22,7 +22,8 @@ begin
       "subprogram of the ancestor type, while the body " &
       "comes from that of the parent type");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       Alarm                : Alarm_Clock;
       Hot_Line             : Secure_Phone_Type;

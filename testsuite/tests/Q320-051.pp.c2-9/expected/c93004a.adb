@@ -33,7 +33,8 @@ begin
 
    Test ("C93004A", "TASK COMPLETION CAUSED BY EXCEPTION");
 
-   Block : declare
+   Block :
+   declare
       type I0 is range 0 .. 1;
 
       task T1 is

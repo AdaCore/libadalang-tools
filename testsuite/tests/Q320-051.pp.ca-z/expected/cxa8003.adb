@@ -59,7 +59,8 @@ begin
       "Check that Append_File mode has not " &
       "been added to package Direct_IO");
 
-   Test_For_Direct_Io_Support : declare
+   Test_For_Direct_Io_Support :
+   declare
 
       subtype String_Data_Type is String (1 .. 20);
       type Numeric_Data_Type is range 1 .. 512;
@@ -83,7 +84,8 @@ begin
 
       Dir_Io.Create (Data_File, Dir_Io.Out_File, Dir_Filename);
 
-      Change_File_Mode : declare
+      Change_File_Mode :
+      declare
 
          Tc_Append_Test_Executed : Boolean := False;
 
@@ -171,7 +173,8 @@ begin
 
       end Change_File_Mode;
 
-      Final_Block : begin
+      Final_Block :
+      begin
          if Dir_Io.Is_Open (Data_File) then
             Dir_Io.Delete (Data_File);
          else

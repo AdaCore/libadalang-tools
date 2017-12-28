@@ -80,7 +80,8 @@ begin
       "used in calls of the subprograms found in " &
       "package Ada.Exceptions");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Ada.Exceptions;
 

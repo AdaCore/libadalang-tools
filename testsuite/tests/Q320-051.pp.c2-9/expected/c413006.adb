@@ -66,7 +66,8 @@ begin
       "Check that if X denotes a task object, an " &
       "entry call of the form X.E is permitted");
 
-   Case_A : declare -- Stand-alone object
+   Case_A :
+   declare -- Stand-alone object
       X : Tsk (10);
    begin
       X.E;    -- Global set to 10.
@@ -75,7 +76,8 @@ begin
       end if;
    end Case_A;
 
-   Case_B : declare -- Array component
+   Case_B :
+   declare -- Array component
       X : array (1 .. 2) of Tsk (4);
    begin
       X (1).E;    -- Global set to 4.
@@ -89,7 +91,8 @@ begin
       end if;
    end Case_B;
 
-   Case_C : declare -- Record component
+   Case_C :
+   declare -- Record component
       type Rec is record
          X : Tsk (80);
       end record;
@@ -101,7 +104,8 @@ begin
       end if;
    end Case_C;
 
-   Case_D : declare -- Parameter
+   Case_D :
+   declare -- Parameter
       procedure Do_It (X : in out Tsk) is
       begin
          X.E;  -- Global set.
@@ -114,7 +118,8 @@ begin
       end if;
    end Case_D;
 
-   Case_E : declare -- Function
+   Case_E :
+   declare -- Function
       function F1 return Tsk is
       begin
          return T1 : Tsk (17);

@@ -72,7 +72,8 @@ begin
       "'Output work properly when used with objects " &
       "of record, natural, and array types");
 
-   Test_For_Stream_Io_Support : declare
+   Test_For_Stream_Io_Support :
+   declare
 
       Util_File                : Ada.Streams.Stream_Io.File_Type;
       Util_Stream              : Ada.Streams.Stream_Io.Stream_Access;
@@ -92,7 +93,8 @@ begin
          Ada.Streams.Stream_Io.Out_File,
          Utility_Service_Filename);
 
-      Operational_Test_Block : declare
+      Operational_Test_Block :
+      declare
 
          -- The following procedure will store all of the customer specific
          -- information into the stream.
@@ -129,7 +131,8 @@ begin
          -- Write all of the customer service information (record, numeric, and
          -- array objects) defined in package FXACB00 into the stream.
 
-         Data_Storage_Block : begin
+         Data_Storage_Block :
+         begin
 
             Store_Data_In_Stream
               (Customer => Fxacb00.Customer1,
@@ -147,7 +150,8 @@ begin
                Customer => Fxacb00.Customer3);
          end Data_Storage_Block;
 
-         Data_Verification_Block : declare
+         Data_Verification_Block :
+         declare
 
             Tc_Residence  : Fxacb00.Service_Type (Fxacb00.Residence);
             Tc_Apartment  : Fxacb00.Service_Type (Fxacb00.Apartment);

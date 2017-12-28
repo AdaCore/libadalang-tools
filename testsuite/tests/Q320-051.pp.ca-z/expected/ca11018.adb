@@ -19,7 +19,8 @@ begin
 
 -- Highlight the word "Alert" from the secret message.
 
-   Designated_Subtest : declare
+   Designated_Subtest :
+   declare
       The_Message : Message_Pkg.Designated_Msg;  -- Parent's private type.
 
       -- Instantiate the public child to copy words to the secret message.
@@ -44,7 +45,8 @@ begin
 
 -- Highlight the word "Push The Alarm" from the top secret message.
 
-   Particularly_Designated_Subtest : declare
+   Particularly_Designated_Subtest :
+   declare
       The_Message : Message_Pkg.Particularly_Designated_Msg;
       -- Parent's private type.
 

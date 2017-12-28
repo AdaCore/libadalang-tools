@@ -88,7 +88,8 @@ begin
       "Check that Ada.Text_IO.Editing.Put and " &
       "Ada.Text_IO.Put have the same effect");
 
-   Test_For_Text_Io_Support : declare
+   Test_For_Text_Io_Support :
+   declare
       Text_File     : Ada.Text_Io.File_Type;
       Text_Filename : constant String := Report.Legal_File_Name (1);
    begin
@@ -98,7 +99,8 @@ begin
 
       Text_Io.Create (Text_File, Text_Io.Out_File, Text_Filename);
 
-      Test_Block : declare
+      Test_Block :
+      declare
          use Ada.Text_Io;
 
          -- Instantiate the Decimal_Output generic package for two different

@@ -83,7 +83,8 @@ begin
       "Check that Procedure Free and versions of " &
       "Function Value produce correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       package Ic renames Interfaces.C;
       package Ics renames Interfaces.C.Strings;

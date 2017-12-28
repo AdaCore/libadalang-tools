@@ -69,7 +69,8 @@ begin
       "may include implicit levels of indirection in " &
       "their implementation, from an in-memory buffer");
 
-   Test_For_Direct_Io_Support : begin
+   Test_For_Direct_Io_Support :
+   begin
 
       -- The following Create does not have any bearing on the test scenario,
       -- but is included to check that the implementation supports Direct_IO
@@ -89,14 +90,16 @@ begin
 
    end Test_For_Direct_Io_Support;
 
-   Deletion1 : begin
+   Deletion1 :
+   begin
       Dir_Io.Delete (Test_File);
    exception
       when others =>
          Report.Failed ("Delete not properly implemented for Direct_IO - 1");
    end Deletion1;
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       The_Filename : constant String := Report.Legal_File_Name (2);
 

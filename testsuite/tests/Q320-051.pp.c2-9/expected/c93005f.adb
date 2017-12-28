@@ -9,10 +9,12 @@ begin
 
    Comment ("SUBTEST 4: TASK IN STATEMENT PART OF BLOCK");
    Comment ("  THE TASKS DEPEND ON THE DECLARATIVE PART");
-   B41 : declare
+   B41 :
+   declare
       X : Mnt;
    begin
-      B42 : declare
+      B42 :
+      declare
          type Local_Acc is access Bad_Rec;
          Y   : Mnt;
          Ptr : Local_Acc;

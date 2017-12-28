@@ -15,7 +15,8 @@ begin -- C460A02.                                              -- [ Level = 1 ]
       "bodies. Operand type of access type conversion is " &
       "declared inside instance or is anonymous");
 
-   Subtest1 : declare                                                     -- [ Level = 2 ]
+   Subtest1 :
+   declare                                                     -- [ Level = 2 ]
       type Acctag_L2 is access all F460a00.Tagged_Type;
       Ptag_L2    : Acctag_L2 := new F460a00.Tagged_Type;
       Operand_L2 : F460a00.Composite_Type (Ptag_L2);
@@ -49,7 +50,8 @@ begin -- C460A02.                                              -- [ Level = 1 ]
 
    end Subtest1;
 
-   Subtest2 : declare                                                     -- [ Level = 2 ]
+   Subtest2 :
+   declare                                                     -- [ Level = 2 ]
       type Acctag_L2 is access all F460a00.Tagged_Type;
       Ptag_L2 : Acctag_L2 := new F460a00.Tagged_Type;
 
@@ -83,7 +85,8 @@ begin -- C460A02.                                              -- [ Level = 1 ]
 
    end Subtest2;
 
-   Subtest3 : declare                                                     -- [ Level = 2 ]
+   Subtest3 :
+   declare                                                     -- [ Level = 2 ]
       Result : F460a00.Tc_Result_Kind := F460a00.Un_Init;
    begin -- SUBTEST3.
 
@@ -116,7 +119,8 @@ begin -- C460A02.                                              -- [ Level = 1 ]
          Report.Failed ("SUBTEST #3: Unexpected exception propagated");
    end Subtest3;
 
-   Subtest4 : declare                                                     -- [ Level = 2 ]
+   Subtest4 :
+   declare                                                     -- [ Level = 2 ]
       Result : F460a00.Tc_Result_Kind := F460a00.Un_Init;
    begin -- SUBTEST4.
 
@@ -147,7 +151,8 @@ begin -- C460A02.                                              -- [ Level = 1 ]
          Report.Failed ("SUBTEST #4: Unexpected exception raised");
    end Subtest4;
 
-   Subtest5 : declare                                                     -- [ Level = 2 ]
+   Subtest5 :
+   declare                                                     -- [ Level = 2 ]
       Result : F460a00.Tc_Result_Kind := F460a00.Un_Init;
    begin -- SUBTEST5.
 
@@ -176,7 +181,8 @@ begin -- C460A02.                                              -- [ Level = 1 ]
          Report.Failed ("SUBTEST #5: Unexpected exception raised");
    end Subtest5;
 
-   Subtest6 : declare                                                     -- [ Level = 2 ]
+   Subtest6 :
+   declare                                                     -- [ Level = 2 ]
       Result : F460a00.Tc_Result_Kind := F460a00.Un_Init;
    begin -- SUBTEST6.
 

@@ -51,7 +51,8 @@ begin
       "CHECK THAT A LOOP PARAMETER HIDES AN OUTER " &
       "DECLARATION OF A HOMOGRAPH");
 
-   One : declare
+   One :
+   declare
       A : Integer := Ident_Int (2);
       B : Integer := A;
       C : Integer;
@@ -87,7 +88,8 @@ begin
       end if;
    end One;
 
-   Two : declare                 --  OVERLOADING OF FUNCTIONS.
+   Two :
+   declare                 --  OVERLOADING OF FUNCTIONS.
 
       Obj : Integer := 1;
       Flo : Float   := 5.0;

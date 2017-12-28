@@ -60,7 +60,8 @@ begin
       "Shift_Right_Arithmetic, Rotate_Left, and Rotate_Right " &
       "are available and produce correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Interfaces;
       use Ada.Exceptions;

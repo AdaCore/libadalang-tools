@@ -75,7 +75,8 @@ begin
       "Ada.Strings.Fixed.Move have the same " &
       "effect in putting edited output results " &
       "into string variables");
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Ada.Text_Io;
 

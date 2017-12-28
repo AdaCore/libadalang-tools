@@ -66,7 +66,8 @@ begin
      ("CXA5A09",
       "Check that the Log function provides " & "correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       use Ada.Numerics;
       use Fxa5a00;

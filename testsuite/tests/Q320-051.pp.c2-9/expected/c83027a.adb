@@ -52,7 +52,8 @@ begin
       "DECLARATION HIDES AN OUTER DECLARATION OF " &
       "A HOMOGRAPH");
 
-   One : declare
+   One :
+   declare
       A   : Integer := Ident_Int (2);
       Obj : Integer := Ident_Int (3);
 
@@ -97,7 +98,8 @@ begin
       end if;
    end One;
 
-   Two : declare
+   Two :
+   declare
 
       generic
          A : Integer := Ident_Int (2);
@@ -138,7 +140,8 @@ begin
       null;
    end Two;
 
-   Three : declare
+   Three :
+   declare
       A   : Integer := Ident_Int (2);
       Obj : Integer := Ident_Int (3);
 

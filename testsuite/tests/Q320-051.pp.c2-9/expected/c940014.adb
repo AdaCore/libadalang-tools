@@ -15,7 +15,8 @@ begin
       " at the point of the entry call statement for" &
       " any tasks remaining on any entry queue");
 
-   First_Check : declare
+   First_Check :
+   declare
       -- example from ARM 9.4(20a-f);6.0 with minor mods
       task T is
          entry E;
@@ -53,7 +54,8 @@ begin
       end;
    end First_Check;
 
-   Second_Check : declare
+   Second_Check :
+   declare
       -- here we want to check that the raising of Program_Error occurs before
       -- the other finalization actions.
       task T is

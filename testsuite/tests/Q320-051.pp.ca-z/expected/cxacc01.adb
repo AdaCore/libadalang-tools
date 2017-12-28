@@ -69,7 +69,8 @@ begin
       "and 'Class'Input allow stream manipulation " &
       "of objects of non-limited class-wide types");
 
-   Test_For_Stream_Io_Support : begin
+   Test_For_Stream_Io_Support :
+   begin
 
       -- If an implementation does not support Stream_IO in a particular
       -- environment, the exception Use_Error or Name_Error will be raised on
@@ -93,7 +94,8 @@ begin
 
    end Test_For_Stream_Io_Support;
 
-   Operational_Test_Block : declare
+   Operational_Test_Block :
+   declare
 
       -- Store tag values associated with objects of tagged types.
 
@@ -140,7 +142,8 @@ begin
       -- extended type.
 
       -- Reset mode of stream to In_File prior to reading data from it.
-      Reset1 : begin
+      Reset1 :
+      begin
          Ada.Streams.Stream_Io.Reset
            (Order_File,
             Ada.Streams.Stream_Io.In_File);
@@ -151,7 +154,8 @@ begin
             raise Incomplete;
       end Reset1;
 
-      Process_Order_Block : declare
+      Process_Order_Block :
+      declare
 
          use Fxacc00;
 
@@ -251,7 +255,8 @@ begin
          Report.Failed ("Exception raised in Operational Test Block");
    end Operational_Test_Block;
 
-   Deletion : begin
+   Deletion :
+   begin
       if Ada.Streams.Stream_Io.Is_Open (Order_File) then
          Ada.Streams.Stream_Io.Delete (Order_File);
       else

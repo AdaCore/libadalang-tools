@@ -15,7 +15,8 @@ begin
       "Check that subprograms defined in the package " &
       "Ada.Strings.Wide_Unbounded produce correct results");
 
-   Test_Block : declare
+   Test_Block :
+   declare
 
       package Acl1 renames Ada.Characters.Latin_1;
       package Unb renames Ada.Strings.Wide_Unbounded;
