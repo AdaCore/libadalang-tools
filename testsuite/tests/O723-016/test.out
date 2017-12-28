@@ -1,0 +1,10 @@
+with Toto, Titi;
+
+function Foo (Profondeur : in Natural; B : Natural) return Float is
+   A : constant := 100000000000000;
+   C : constant := 2#10101010101010101#;
+begin
+   null;
+end Foo;
+gnatpp: file not found: –based-grouping=4
+>>>program returned status code 1
