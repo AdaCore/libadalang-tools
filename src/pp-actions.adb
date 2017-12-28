@@ -3904,11 +3904,6 @@ package body Pp.Actions is
             when Ada_Object_Decl =>
                if Is_Generic_Formal_Object_Decl (Tree) then
                   Do_Parameter_Specification;
-               elsif Present (Tree.As_Object_Decl.F_Renaming_Clause) then
-                  Interpret_Template
-                    ("?~,# ~~ :[#? ~~~? ~~~? ~~~ !? :=[# ~~]~!]" & Aspects);
-                  --  ???This kludgery is to mimic gnatpp, which doesn't tab
-                  --  for renamings. Probably should be removed.
                elsif Is_Vertical_Aggregate
                  (F_Default_Expr (Tree.As_Object_Decl))
                then

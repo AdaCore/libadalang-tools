@@ -58,7 +58,7 @@ begin
    declare
       use Root_Package, Parent_Package, Child_Package, Grandchild_Package;
 
-      Var : Grandchild_Type := Grandchild_Value;
+      Var  : Grandchild_Type := Grandchild_Value;
       Ren1 : Parent_Type renames Parent_Type (Var);
       Ren2 : Child_Type renames Child_Type (Var);
       Ren3 : Parent_Type'Class renames Parent_Type'Class (Var);

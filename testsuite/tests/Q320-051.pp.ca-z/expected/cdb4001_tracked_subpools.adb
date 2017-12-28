@@ -26,8 +26,8 @@ package body Cdb4001_Tracked_Subpools is
          end if;
       end Set_Result;
 
-      Ignored :
-        Null_Record renames Pool.Allocation_Map.Read (Set_Result'Access);
+      Ignored : Null_Record renames
+        Pool.Allocation_Map.Read (Set_Result'Access);
    begin
       return Result;
    end Enclosing_Subpool;

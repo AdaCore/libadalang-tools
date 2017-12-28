@@ -43,8 +43,8 @@ begin
    end;
 
    declare
-      Ren2 :
-        access function (X : Float) return Float renames Element1 (2).Comp2;
+      Ren2 : access function (X : Float) return Float renames
+        Element1 (2).Comp2;
    begin
       if Ren2.all (2.0) /= 4.0 then
          Report.Failed ("Wrong value (2)");
@@ -62,8 +62,8 @@ begin
    end;
 
    declare
-      Ren4 :
-        access function (X : Float) return Float renames Element2 (4).Comp2;
+      Ren4 : access function (X : Float) return Float renames
+        Element2 (4).Comp2;
    begin
       if Ren4.all (2.0) /= 4.0 then
          Report.Failed ("Wrong value (4)");
@@ -81,8 +81,8 @@ begin
    end;
 
    declare
-      Ren6 :
-        access function (X : Float) return Float renames Element3 (6).Comp2;
+      Ren6 : access function (X : Float) return Float renames
+        Element3 (6).Comp2;
    begin
       if Ren6.all (2.0) /= 4.0 then
          Report.Failed ("Wrong value (6)");

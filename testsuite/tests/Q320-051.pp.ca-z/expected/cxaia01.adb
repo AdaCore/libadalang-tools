@@ -61,8 +61,8 @@ procedure Cxaia01 is
 
    My_Default_Value : constant String := "zzz";
 
-   Value_In_Ptr_Array :
-     Fxaia00.Value_In_Ptr_Array_Type renames Fxaia00.Value_In_Ptr_Array;
+   Value_In_Ptr_Array : Fxaia00.Value_In_Ptr_Array_Type renames
+     Fxaia00.Value_In_Ptr_Array;
 
    package My_Indefinite_Vectors is new Ada.Containers.Indefinite_Vectors
      (Index_Type   => Natural,

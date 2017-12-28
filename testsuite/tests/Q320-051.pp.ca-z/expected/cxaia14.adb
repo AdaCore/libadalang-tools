@@ -71,8 +71,8 @@ procedure Cxaia14 is
 
    Root_1 : constant My_Indefinite_Multiway_Trees.Cursor := My_Tree_1.Root;
 
-   Value_In_Ptr_Array :
-     Fxaia00.Value_In_Ptr_Array_Type renames Fxaia00.Value_In_Ptr_Array;
+   Value_In_Ptr_Array : Fxaia00.Value_In_Ptr_Array_Type renames
+     Fxaia00.Value_In_Ptr_Array;
 
    My_Cursor_1 : My_Indefinite_Multiway_Trees.Cursor;
 

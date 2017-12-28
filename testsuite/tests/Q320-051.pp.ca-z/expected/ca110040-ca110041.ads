@@ -69,9 +69,8 @@ private
      (User_Id  => Next_Available_Id,                      -- Parent function.
      Privilege => System);                                -- User_ID has been
    -- set to 2.
-   Total_Authorized_Accounts :
-     System_Account_Capacity renames
-       Total_Accounts;                               -- Parent object.
+   Total_Authorized_Accounts : System_Account_Capacity renames
+     Total_Accounts;                               -- Parent object.
 
    Unauthorized_Account : exception renames
      Illegal_Account;                              -- Parent exception

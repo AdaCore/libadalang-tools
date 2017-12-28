@@ -223,9 +223,9 @@ begin
 
    Swap :
    declare
-      Var : Character := '*';
+      Var        : Character := '*';
       Rename_Var : Character renames Var;
-      New_Var : Character;
+      New_Var    : Character;
    begin
       if Equal (3, 3) then
          New_Var := Swap.Rename_Var;
