@@ -1,0 +1,31 @@
+project Debug is
+
+   for Languages use ("Ada");
+
+   for Source_Dirs use (".");
+   for Exec_Dir use ".";
+   for Main use ("test_main.adb");
+   
+   package Compiler is
+     
+      for Default_Switches ("ada") use ("-g");
+
+   end Compiler;
+
+   package Builder is
+
+      for Default_Switches ("ada") use ("-g");
+
+   end Builder;
+
+   package Pretty_Printer is
+      Name_Chasing := ("-nL", "-neU", "-ntM", "-nnM", "-pL");
+      Comments := ("-c0", "-N");
+      Layout := ("-l1");
+      Text_Control_Numbers := ("-i3", "-cl2", "-M127", "--based-grouping=3", "--decimal-grouping=3");
+      Special_Situations := ("--no-separate-loop-then", "--par_threshold=2",  "--call_threshold=2");
+      Output := ("-r");
+      for Default_Switches ("Ada") use Name_Chasing & Comments & Layout & Text_Control_Numbers & Special_Situations & Output;
+   end Pretty_Printer;
+   
+end Debug;
