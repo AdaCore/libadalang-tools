@@ -3512,6 +3512,7 @@ package body Pp.Actions is
 
          procedure Do_Parameter_Specification is
             Index : Query_Index := 1;
+            AM : constant Boolean := Arg (Cmd, Align_Modes);
          begin
             --  F_Ids:
             Subtrees_To_Ada
@@ -3541,11 +3542,15 @@ package body Pp.Actions is
             if Subtree (Tree, Index).Kind in Ada_Mode_In | Ada_Mode_In_Out then
                Put ("in ");
             end if;
-            Interpret_Template ("^2", Subtrees => Empty_Tree_Array);
+            if AM then
+               Interpret_Template ("^2", Subtrees => Empty_Tree_Array);
+            end if;
             if Subtree (Tree, Index).Kind in Ada_Mode_Out | Ada_Mode_In_Out then
                Put ("out ");
             end if;
-            Interpret_Template ("^3", Subtrees => Empty_Tree_Array);
+            if AM then
+               Interpret_Template ("^3", Subtrees => Empty_Tree_Array);
+            end if;
 
             --  F_Type_Expr:
             Index := Index + 1;
@@ -3555,7 +3560,7 @@ package body Pp.Actions is
             Index := Index + 1;
             if Present (Subtree (Tree, Index)) then
                Interpret_Template
-                 (" ^4:=[# !]",
+                 ((if AM then " ^4:=[# !]" else " :=[# !]"),
                   Subtrees => (1 => Subtree (Tree, Index)));
             end if;
 
