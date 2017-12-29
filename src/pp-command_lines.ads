@@ -193,7 +193,8 @@ package Pp.Command_Lines is
        Pragma_Mixed_Case => +"-pM"));
 
    type Pp_Booleans is
-     (End_Id,
+     (Align_Modes,
+      End_Id,
       Separate_Is,
       Use_On_New_Line,
       Split_Line_Before_Op,
@@ -223,7 +224,8 @@ package Pp.Command_Lines is
       Pp_Booleans);
 
    package Pp_Boolean_Shorthands is new Pp_Boolean_Switches.Set_Shorthands
-     ((End_Id => null,
+     ((Align_Modes => null,
+       End_Id => null,
        Separate_Is => null,
        Use_On_New_Line => null,
        Split_Line_Before_Op => null,
@@ -242,7 +244,8 @@ package Pp.Command_Lines is
 
    package Pp_Boolean_Defaults is new
      Pp_Boolean_Switches.Set_Defaults
-       ((End_Id => True,
+       ((Align_Modes => True,
+         End_Id => True,
          Separate_Is => True,
          Use_On_New_Line => False,
          Split_Line_Before_Op => False,
