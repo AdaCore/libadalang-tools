@@ -1,0 +1,13 @@
+project Pretty is
+
+   for Languages use ("Ada");
+
+   package Naming is
+      for Casing use "lowercase";
+   end Naming;
+
+   package Pretty_Printer is
+            for Default_Switches ("ada") use ("--eol=dos", "-c2", "-c3", "-c5", "-cl2", "-i4", "-l3", "-M105", "-N", "-nM", "--separate-stmt-name", "-T1", "-w", "-W8");
+   end Pretty_Printer;
+
+end Pretty;
