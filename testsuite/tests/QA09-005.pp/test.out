@@ -1,0 +1,271 @@
+PACKAGE ibusiness_unit IS
+
+   TYPE object IS ABSTRACT TAGGED PRIVATE;
+   TYPE reference IS ACCESS ALL object'class;
+   TYPE view IS ACCESS CONSTANT object'class;
+
+   nil : CONSTANT view := NULL;
+
+   PROCEDURE finalize (obj : IN OUT object'class) IS ABSTRACT;
+   --
+   -- Prepares the object to be destroyed.
+
+   FUNCTION is_running (dev : IN object'class) RETURN boolean;
+   --
+   -- Returns true if the device is running.
+
+PRIVATE
+
+   TYPE object IS ABSTRACT TAGGED RECORD
+      is_running : boolean := false;
+   END RECORD;
+
+END ibusiness_unit;
+
+PACKAGE BODY ibusiness_unit IS
+
+   FUNCTION is_running (dev : IN object'class) RETURN boolean IS
+   BEGIN
+      RETURN dev.is_running;
+   END is_running;
+
+END ibusiness_unit;
+
+PACKAGE ibusiness_unit.synthetic_target_manager IS
+
+   TYPE object IS NEW ibusiness_unit.object WITH PRIVATE;
+   TYPE reference IS ACCESS ALL object'class;
+   TYPE view IS ACCESS CONSTANT object'class;
+
+   nil : CONSTANT view := NULL;
+
+------------------------------------------------------------------------------
+-- Basic Methodes
+-------------------------------------------------------------------------------
+
+   FUNCTION create
+     (tracer_class_name        : IN string := "";
+      tracer_class_description : IN string := "") RETURN ibusiness_unit.reference;
+   --
+   -- Creates the object and initializes internal data structure.
+
+   PROCEDURE initialize
+     (obj                        : IN OUT object;
+      gunking_mode               : IN     string;
+      synthetic_target_container : IN     string;
+      setup_manager              : IN     string;
+      hmi_communication          : IN     string;
+      recording_manager          : IN     string);
+   --
+   -- Initializes the object
+
+   PROCEDURE finalize (ref : IN OUT reference);
+   --
+   -- Deallocates memory and deletes object instance.
+
+   PROCEDURE proceed (obj : IN OUT object);
+   --
+   -- Call for cyclic processing
+
+
+------------------------------------------------------------------------------
+-- Basic Methodes
+-------------------------------------------------------------------------------
+
+
+   FUNCTION is_running (obj : IN object) RETURN boolean;
+   --
+   -- Returns true, if a synthetic flight is running.
+
+
+PRIVATE
+
+   TYPE private_members;
+   TYPE access_private_members IS ACCESS private_members;
+   TYPE object IS NEW ibusiness_unit.object WITH RECORD
+      member : access_private_members;
+   END RECORD;
+
+END ibusiness_unit.synthetic_target_manager;
+
+WITH ada.unchecked_deallocation;
+
+PACKAGE BODY ibusiness_unit.synthetic_target_manager IS
+
+
+   TYPE private_members IS RECORD
+
+
+      is_initialized : boolean := false;
+      --
+      -- Object state elements
+
+
+   END RECORD;
+
+
+   ----------------------------------------------------------------------
+   -- Deallocation Methodes
+   ----------------------------------------------------------------------
+
+   PROCEDURE free IS NEW ada.unchecked_deallocation (object => object'class, name => reference);
+   PROCEDURE free IS NEW ada.unchecked_deallocation (private_members, access_private_members);
+
+   ----------------------------------------------------------------------
+   -- Interface Management Methodes
+   ----------------------------------------------------------------------
+
+   FUNCTION create
+     (tracer_class_name        : IN string := "";
+      tracer_class_description : IN string := "") RETURN ibusiness_unit.reference IS
+      myself : reference;
+
+   BEGIN
+      -- Create myself
+      --
+      myself        := NEW object;
+      myself.member := NEW private_members;
+
+      myself.is_running := true;
+
+      RETURN ibusiness_unit.reference (myself);
+
+   EXCEPTION
+      WHEN error : OTHERS =>
+         RETURN NULL;
+   END create;
+
+   PROCEDURE initialize
+     (obj                        : IN OUT object;
+      gunking_mode               : IN     string;
+      synthetic_target_container : IN     string;
+      setup_manager              : IN     string;
+      hmi_communication          : IN     string;
+      recording_manager          : IN     string) IS
+
+      pm : private_members RENAMES obj.member.ALL;
+
+   --  result : rec.register_result;
+
+   BEGIN
+
+      IF NOT pm.is_initialized THEN
+
+
+         pm.is_initialized := true;
+
+      END IF;
+
+
+   EXCEPTION
+      WHEN error : OTHERS =>
+         NULL;
+   END initialize;
+
+   PROCEDURE finalize (ref : IN OUT reference) IS
+   BEGIN
+
+
+
+      IF ref /= NULL THEN
+
+         -- Kill local member
+         --
+         free (ref.member);
+
+         -- Kill myself
+         --
+         free (ref);
+
+      END IF;
+
+
+
+   EXCEPTION
+      WHEN error : OTHERS =>
+         NULL;
+   END finalize;
+
+   ----------------------------------------------------------------------
+   -- Interface Proceed Methodes
+   ----------------------------------------------------------------------
+
+   PROCEDURE proceed (obj : IN OUT object) IS
+
+      pm : private_members RENAMES obj.member.ALL;
+
+   BEGIN
+
+      NULL;
+
+
+   EXCEPTION
+      WHEN error : OTHERS =>
+         NULL;
+   END proceed;
+
+   ------------------------------------------------------------------------------
+   -- Basic Methodes
+   -------------------------------------------------------------------------------
+
+   FUNCTION is_running (obj : IN object) RETURN boolean IS
+   BEGIN
+      RETURN true;
+   END is_running;
+
+END ibusiness_unit.synthetic_target_manager;
+WITH pp_reproducer;
+
+PROCEDURE main IS
+BEGIN
+
+   pp_reproducer.pp_reproducer_go;
+
+END main;
+
+
+
+WITH ibusiness_unit.synthetic_target_manager;
+
+PACKAGE pp_reproducer IS
+
+   PROCEDURE pp_reproducer_go;
+
+END pp_reproducer;
+
+
+
+WITH ibusiness_unit.synthetic_target_manager;
+
+PACKAGE BODY pp_reproducer IS
+
+   PROCEDURE pp_reproducer_go IS
+      synth_tar_manager_ref : ibusiness_unit.reference := NULL;
+   BEGIN
+      synth_tar_manager_ref :=
+        ibusiness_unit.synthetic_target_manager.create
+          (tracer_class_name        => "SYNTHMGR",
+           tracer_class_description => "Synthetic Target Manager");
+
+      ibusiness_unit.synthetic_target_manager.reference (synth_tar_manager_ref).initialize
+        (gunking_mode               => "gk_mode_manager",
+         synthetic_target_container => "synthetic_target_container",
+         setup_manager              => "setup_manager",
+         hmi_communication          => "hmi_communication_device",
+         recording_manager          => "recording_manager");
+
+      ibusiness_unit.synthetic_target_manager.initialize
+        (obj => ibusiness_unit.synthetic_target_manager.object (synth_tar_manager_ref.ALL),
+         gunking_mode               => "gk_mode_manager",
+         synthetic_target_container => "synthetic_target_container",
+         setup_manager              => "setup_manager",
+         hmi_communication          => "hmi_communication_device",
+         recording_manager          => "recording_manager");
+
+
+   END pp_reproducer_go;
+
+END pp_reproducer;
+
+
+
