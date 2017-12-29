@@ -1,4 +1,5 @@
 with Ada.Characters.Handling; use Ada.Characters.Handling;
+with Ada.Exceptions;
 with Ada.Finalization;
 with Ada.Strings.Fixed;
 with Ada.Strings.UTF_Encoding;
@@ -4702,15 +4703,26 @@ package body Pp.Actions is
       when Command_Line_Error | Command_Line_Error_No_Tool_Name =>
          raise;
 
-      when others =>
+      when X : others =>
          --  In order to avoid damaging the user's source code, if there is a bug
          --  (like a token mismatch in Final_Check), we avoid writing the output
          --  file in Do_Diff mode; otherwise, we write the input to the output
          --  unchanged. This happens only in production builds.
+         --
+         --  Raise_Token_Mismatch includes the file name and source location in
+         --  the message; include that if available.
 
-         Text_IO.Put_Line
-           (Text_IO.Standard_Error,
-            "gnatpp: pretty-printing failed; cannot format " & File_Name);
+         declare
+            use Ada.Exceptions;
+            Loc : constant String :=
+              (if Exception_Identity (X) = Token_Mismatch'Identity
+                 then Exception_Message (X) else "");
+         begin
+            Text_IO.Put_Line
+              (Text_IO.Standard_Error,
+               File_Name & ":" & Loc &
+                 ": pretty-printing failed; unable to format");
+         end;
 
          if Enable_Token_Mismatch then
             raise;

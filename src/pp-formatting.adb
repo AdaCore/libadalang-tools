@@ -6,7 +6,7 @@
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
---                    Copyright (C) 2001-2016, AdaCore                      --
+--                    Copyright (C) 2001-2017, AdaCore                      --
 --                                                                          --
 -- GNATPP  is free software; you can redistribute it and/or modify it under --
 -- terms  of  the  GNU  General  Public  License  as  published by the Free --
@@ -2619,6 +2619,8 @@ package body Pp.Formatting is
          Move (Target => Out_Buf, Source => New_Buf);
       end Copy_Pp_Off_Regions;
 
+   --  Start of processing for Post_Tree_Phases
+
    begin
       --  ????We probably want to do more, but this is for lalstub
       --  for now.
@@ -2713,7 +2715,8 @@ package body Pp.Formatting is
                       Lines => True));
          end;
       end if;
-      raise Token_Mismatch;
+
+      raise Token_Mismatch with Scanner.Sloc_Image (Scanner.Sloc (Src_Tok));
    end Raise_Token_Mismatch;
 
    procedure Final_Check_Helper
