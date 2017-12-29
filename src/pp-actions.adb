@@ -1115,13 +1115,8 @@ package body Pp.Actions is
             declare
                T : constant String :=
                  To_UTF8 (W_Str (Template_Table (Kind).all));
-
             begin
-               Put
-                 ("--  \1 => \2",
-                  Capitalize (Kind'Img),
-                  (if Template_Table (Kind) = null then "null"
-                   else """" & T & """"));
+               Put ("--  \1 => \2", Capitalize (Kind'Img), """" & T & """");
                if Count (T, "[") /= Count (T, "]") then
                   Put ("    MISMATCHED [...]");
                   raise Program_Error;
