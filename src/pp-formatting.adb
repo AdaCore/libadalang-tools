@@ -2408,6 +2408,7 @@ package body Pp.Formatting is
                Scanner.Seqs.Get_Tokens
                  (Out_Buf, Out_Tokens, Utils.Ada_Version, Pp_Off_On_Delimiters,
                   Ignore_Single_Line_Breaks => True);
+               Outer_Loop :
                for Out_Index in 2 .. Last_Index (Out_Tokens) loop
                   Out_Tok := Out_Tokens (Out_Index);
                   loop
@@ -2415,9 +2416,14 @@ package body Pp.Formatting is
                         Replace_Cur (Out_Buf, To_Upper (Cur (Out_Buf)));
                      end if;
                      Move_Forward (Out_Buf);
+
+                     exit Outer_Loop when At_End (Out_Buf);
+                     --  If there are extra blank lines at the end of file,
+                     --  then we need the At_End test.
+
                      exit when At_Point (Out_Buf, Sloc (Out_Tok).Lastx);
                   end loop;
-               end loop;
+               end loop Outer_Loop;
                Reset (Out_Buf);
          end case;
       end Keyword_Casing;
