@@ -76,7 +76,7 @@ package LAL_Extensions is
    function Full_Name (Nm : Name) return W_Str;
    function L_Full_Name (Nm : Name) return W_Str;
    --  Returns the full expanded name. The L_Full_Name is converted to lower
-   --  case.  ????????????????That comment is wrong.  So is the name.
+   --  case.  ???That comment is wrong.  So is the name.
 
    function Is_Def_Name (Node : Base_Id'Class) return Boolean;
    --  True if it's a defining name

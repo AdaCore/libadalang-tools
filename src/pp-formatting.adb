@@ -749,11 +749,10 @@ package body Pp.Formatting is
       end Split_Lines;
 
       procedure Enable_Line_Breaks_For_EOL_Comments;
-      --  ????????????????
+      --  For all end-of-line comments that occur at a soft line break, enable
+      --  the line break. Note that this does not modify the Out_Buf.
 
       procedure Enable_Line_Breaks_For_EOL_Comments is
-         Saved_Out_Buf : constant W_Str := To_W_Str (Out_Buf); -- ????????????
-
          use Scanner, Scanner.Seqs;
          --  use all type Token_Vector;
 
@@ -766,26 +765,9 @@ package body Pp.Formatting is
          procedure Move_Past_Char;
          procedure Move_Past_Out_Tok;
 
-         procedure Insert_End_Of_Line_Comment;
-         --  Found an End_Of_Line_Comment comment; copy it to the buffer. If it
-         --  is too long to fit on the line, turn it into a Whole_Line_Comment,
-         --  taking care to indent.
-
-         --  Note that the Subtree_To_Ada pass already inserted indentation, so we
-         --  mostly keep the indentation level at zero. The exception is comments,
-         --  which Subtree_To_Ada didn't see. For comments, we temporarily set the
-         --  indentation to that of the surrounding code.
-
-         procedure Insert_Whole_Line_Comment;
-         --  Found a Whole_Line_Comment; copy it to the buffer, taking care to
-         --  indent, except that if the comment starts in column 1, we assume
-         --  the user wants to keep it that way.
-
-         procedure Insert_Private;
-            --  If a private part has no declarations, the earlier passes
-            --  don't insert "private", whether or not it was in the source code.
-            --  If Do_Inserts is True, and there is a comment, this re-inserts
-            --  "private" before the comment, to avoid messing up the formatting.
+         procedure Do_End_Of_Line_Comment;
+         --  Found an End_Of_Line_Comment comment; enable line breaks as
+         --  appropriate.
 
          function Match (Src_Tok, Out_Tok : Token) return Boolean is
          begin
@@ -846,9 +828,6 @@ package body Pp.Formatting is
 
          Src_Tok, Out_Tok : Token;
 
-         Start_Line_Src_Tok : Token := Src_Tokens (1);
-         --  Token at the beginning of the previous line, but never a comment
-
          All_Cur_Line : Line_Break_Index := 2;
 
          procedure Move_Past_Char is
@@ -880,30 +859,16 @@ package body Pp.Formatting is
             end loop;
          end Move_Past_Out_Tok;
 
-         procedure Insert_End_Of_Line_Comment is
+         procedure Do_End_Of_Line_Comment is
          begin
-            --  In the usual case, the end-of-line comment is at a natural line
-            --  break, like this:
-            --      X := X + 1; -- Increment X
-            --  so we don't need another one. But if the original was:
-            --      X := -- Increment X
-            --        X + 1;
-            --  we need to add a line break after the comment.
+            --  If an end-of-line comment appears at a place where there is a
+            --  soft line break, we enable that line break. We also enable
+            --  previous line breaks that are at the same level, or that belong
+            --  to '('. We stop when we see a hard line break.
 
             if At_Point (Out_Buf, All_Line_Breaks (All_Cur_Line).Mark) then
---               pragma Assert (Cur (Out_Buf) /= NL);
---  ????????????????But why does the same assertion in
---  Insert_Comments_And_Blank_Lines work?
-
                for Break in reverse 1 .. All_Cur_Line loop
                   exit when All_Line_Breaks (Break).Hard;
-
---                  if All_Line_Breaks (Break).Level <=
---                    All_Line_Breaks (All_Cur_Line).Level
-                  --  ????????????????
---                  if All_Line_Breaks (Break).Level in
---                    All_Line_Breaks (All_Cur_Line).Level - 1 ..
---                    All_Line_Breaks (All_Cur_Line).Level
                   declare
                      LB : Line_Break renames All_Line_Breaks (All_Cur_Line);
                      Prev_LB : Line_Break renames All_Line_Breaks (Break);
@@ -924,39 +889,7 @@ package body Pp.Formatting is
                end loop;
             end if;
             Src_Index := Src_Index + 1;
-         end Insert_End_Of_Line_Comment;
-
-         procedure Insert_Whole_Line_Comment is
-         begin
-            --  Comments at the beginning are not indented. The "2" is to skip the
-            --  initial sentinel NL.
-
-            --  Make sure Indentation is a multiple of PP_Indentation; otherwise
-            --  style checking complains "(style) bad column".
-
-            loop
-               --  ???Handle blank lines here, too?
-               Src_Index := Src_Index + 1;
-               Src_Tok   := Src_Tokens (Src_Index);
-               exit when Kind (Src_Tok) not in
-                 Special_Comment | Fillable_Comment | Other_Whole_Line_Comment;
-            end loop;
-         end Insert_Whole_Line_Comment;
-
-         procedure Insert_Private is
-         begin
-            Src_Index := Src_Index + 1;
-         end Insert_Private;
-
-         function Line_Break_LT (X, Y : Line_Break) return Boolean;
-
-         function Line_Break_LT (X, Y : Line_Break) return Boolean is
-         begin
-            return Mark_LT (Out_Buf, X.Mark, Y.Mark);
-         end Line_Break_LT;
-
-         package Line_Break_Sorting is new Line_Break_Vectors.Generic_Sorting
-           ("<" => Line_Break_LT);
+         end Do_End_Of_Line_Comment;
 
          Qual_Nesting : Natural := 0;
       --  Count the nesting level of qualified expressions containing aggregates
@@ -971,10 +904,6 @@ package body Pp.Formatting is
          Get_Tokens
            (Out_Buf, Out_Tokens, Utils.Ada_Version, Pp_Off_On_Delimiters,
             Ignore_Single_Line_Breaks => not Arg (Cmd, Preserve_Line_Breaks));
-         --  ???At this point, we might need another pass to insert hard line
-         --  breaks after end-of-line comments, so they will be indented properly.
-         --  Or better yet, insert the EOL comments, with tabs and soft line break
-         --  before, hard line break after.
          pragma Assert (Cur (Out_Buf) = NL);
          Move_Forward (Out_Buf); -- skip sentinel
          if Arg (Cmd, Preserve_Line_Breaks) then
@@ -983,7 +912,6 @@ package body Pp.Formatting is
             Out_Index := Out_Index + 1;
             pragma Assert (Kind (Src_Tokens (Src_Index)) /= End_Of_Line);
          end if;
-         pragma Assert (Is_Empty (Temp_Line_Breaks));
 
          --  This loop is similar to the one in
          --  Insert_Comments_And_Blank_Lines; see that for commentary.
@@ -999,13 +927,6 @@ package body Pp.Formatting is
               (Kind (Prev_Lexeme (Out_Tokens, Out_Index)) not in
                  Blank_Line |
                    Comment_Kind);
-
-            --  The order of the if/elsif's below is important in some
-            --  cases. Blank lines must be handled late, even if they match.
-            --  End_Of_Line_Comments must be handled before blank lines,
-            --  because they need to appear at the end of the preceding line.
-            --  Whole_Line_Comments must be handled after blank lines, because
-            --  the blank line should precede the comment.
 
             if Kind (Src_Tok) /= Blank_Line
               and then
@@ -1079,7 +1000,7 @@ package body Pp.Formatting is
                     (Disable_Final_Check
                        or else
                      Kind (Next_Lexeme (Src_Tokens, Src_Index)) = Res_End);
-                  Insert_Private;
+                  Src_Index := Src_Index + 1;
 
                --  Check for "T'((X, Y, Z))" --> "T'(X, Y, Z)" case
 
@@ -1097,31 +1018,14 @@ package body Pp.Formatting is
                   Src_Index := Src_Index + 1;
 
                elsif Kind (Src_Tok) = End_Of_Line_Comment then
-                  Insert_End_Of_Line_Comment;
-
-               --  For --preserve-line-breaks mode. Here, we see a line break
-               --  in the input that is not yet in the output, so we copy it
-               --  over. We set the indentation to take into account
-               --  surrounding indentation, plus line continuation if
-               --  appropriate, plus "("-related indentation. If the next
-               --  character in the output is already ' ', we subtract one from
-               --  the indentation to make up for that. (There can never be two
-               --  in a row.)
+                  Do_End_Of_Line_Comment;
 
                elsif Kind (Src_Tok) = End_Of_Line then
                   pragma Assert (Arg (Cmd, Preserve_Line_Breaks));
                   Src_Index := Src_Index + 1;
-                  Src_Tok   := Src_Tokens (Src_Index); -- needed????????????
+                  Src_Tok   := Src_Tokens (Src_Index); -- needed???
 
                   pragma Assert (Kind (Out_Tok) /= End_Of_Line);
-
-               --  If the source has a blank line at this point, send it to the
-               --  output (unless Insert_Blank_Lines is True, in which case we
-               --  want to ignore blank lines in the input, since a previous
-               --  phase inserted them in the "right" place). But avoid
-               --  multiple blank lines (unless either Preserve_Line_Breaks or
-               --  Preserve_Blank_Lines is True) and blank lines just before
-               --  End_Of_Input.
 
                elsif Kind (Src_Tok) = Blank_Line then
                   loop
@@ -1133,18 +1037,13 @@ package body Pp.Formatting is
                   end loop;
 
                elsif Kind (Src_Tok) in Whole_Line_Comment then
-                  Insert_Whole_Line_Comment;
+                  Src_Index := Src_Index + 1;
+                  Src_Tok   := Src_Tokens (Src_Index);
 
                elsif Kind (Out_Tok) in End_Of_Line | Blank_Line then
                   Move_Past_Out_Tok;
                   Out_Index := Out_Index + 1;
                   Out_Tok   := Out_Tokens (Out_Index);
-
-               --  Else print out debugging information and crash. This
-               --  avoids damaging the source code in case of bugs. However,
-               --  if the Disable_Final_Check debug flag is set, try to
-               --  continue by skipping one source token, or one output
-               --  token.
 
                elsif Disable_Final_Check then
                   Src_Index := Src_Index + 1;
@@ -1162,12 +1061,6 @@ package body Pp.Formatting is
                     ("eol_comments", Lines_Data, Src_Buf,
                      Src_Index, Out_Index, Src_Tok, Out_Tok);
                end if;
-            end if;
-
-            if Kind (Src_Tok) not in Comment_Kind
-              and then Sloc (Src_Tok).Line /= Sloc (Start_Line_Src_Tok).Line
-            then
-               Start_Line_Src_Tok := Src_Tok;
             end if;
          end loop;
 
@@ -1192,12 +1085,8 @@ package body Pp.Formatting is
 
          <<Done>> null;
 
-         pragma Assert (Line_Break_Sorting.Is_Sorted (All_Line_Breaks));
-         pragma Assert (Is_Empty (Temp_Line_Breaks));
-         pragma Assert (Line_Break_Sorting.Is_Sorted (All_Line_Breaks));
          pragma Assert (Disable_Final_Check or else Qual_Nesting = 0);
          Reset (Out_Buf);
-         pragma Assert (To_W_Str (Out_Buf) = Saved_Out_Buf);
          Clear (Out_Tokens);
          pragma Assert (At_Beginning (Src_Buf));
       end Enable_Line_Breaks_For_EOL_Comments;
@@ -1735,7 +1624,6 @@ package body Pp.Formatting is
             --      X := -- Increment X
             --        X + 1;
             --  we need to add a line break after the comment.
-            --  Still needed????????????????
 
             if not At_Point (Out_Buf, EOL_Line_Breaks (EOL_Cur_Line).Mark) then
                pragma Assert (Cur (Out_Buf) /= NL);

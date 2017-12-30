@@ -337,19 +337,21 @@ package Pp.Formatting is
    --
    --     Subsequent passes work on the text in Out_Buf, and not the
    --     Ada_Tree. Therefore, if they need any syntactic/structural
-   --     information, it must be encoded in other data structures, such as the
-   --     Line_Breaks and Tabs tables.
-   --
-   --  ????????????????new phase
+   --     information, it must be encoded in other data structures, such
+   --     as the Line_Breaks and Tabs tables.
    --
    --  Split_Lines (first time)
    --     Determine which soft line breaks should be enabled.
+   --
+   --  Enable_Line_Breaks_For_EOL_Comments
+   --     For all end-of-line comments that occur at a soft line break, enable
+   --     the line break.
    --
    --  Insert_Comments_And_Blank_Lines
    --     Step through the source tokens and Out_Buf tokens. Copy comment and
    --     blank line tokens into Out_Buf as they are encountered.
    --
-   --  Split_Lines (again)needed????????????????
+   --  Split_Lines (again)
    --     We do this again because inserted end-of-line comments can cause
    --     lines to be too long. We don't want to split the line just before the
    --     comment; we want to split at some auspicious soft line break(s).
