@@ -37,7 +37,7 @@ package Fc51b00 is  -- Type definitions.
    subtype Size is Natural range 1 .. 4;
 
    type Matrix is array                                 -- Unconstrained array
-   (Size range <>, Size range <>) of Integer;         -- type.
+       (Size range <>, Size range <>) of Integer;         -- type.
 
    type Square (Side : Size) is record                  -- Unconstrained record
       Mat : Matrix (1 .. Side, 1 .. Side);              -- with undefaulted

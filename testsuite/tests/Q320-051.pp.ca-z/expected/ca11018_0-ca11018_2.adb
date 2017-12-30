@@ -11,7 +11,7 @@ package body Ca11018_0.Ca11018_2 is
 
    begin
       To_The_Message.The_Content        -- Parent's private type.
-      (1 .. From_The_Word'Length) := From_The_Word;
+        (1 .. From_The_Word'Length) := From_The_Word;
 
       To_The_Message.The_Length         -- Parent's private type.
       := From_The_Word'Length;

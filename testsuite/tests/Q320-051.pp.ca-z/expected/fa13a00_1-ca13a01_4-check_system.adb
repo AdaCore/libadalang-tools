@@ -15,7 +15,7 @@ begin
    -- Test elevator function.
 
    Fa13a00_1.Fa13a00_3.Move_Elevator      -- Reference public sibling of
-   (Penthouse, Call_Waiting);           -- the subunit parent's body.
+     (Penthouse, Call_Waiting);           -- the subunit parent's body.
 
    if not Call_Waiting (Penthouse) then   -- Reference private part of the
       Tc_Operation := False;              -- parent of the subunit package's

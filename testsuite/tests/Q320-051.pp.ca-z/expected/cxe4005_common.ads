@@ -114,13 +114,15 @@ package Cxe4005_Common is
 
    -- identification of where a type is declared and where an access type was
    -- evaluated that refers to an object of that type.
-   type Type_Selection is (Common_Spec,        --  xx1
-   Rt_Spec,            --  xx6
-   B_Body,             --  xx7
-   Normal_Spec);       --  xx8
-   type Access_Evaluation is (A1,              --  1xx
-   A2,              --  2xx
-   B);              --  3xx
+   type Type_Selection is
+     (Common_Spec,        --  xx1
+      Rt_Spec,            --  xx6
+      B_Body,             --  xx7
+      Normal_Spec);       --  xx8
+   type Access_Evaluation is
+     (A1,              --  1xx
+      A2,              --  2xx
+      B);              --  3xx
 
    -- root tagged type for remote access to class wide type test
    type Root_Tagged_Type is tagged limited private;

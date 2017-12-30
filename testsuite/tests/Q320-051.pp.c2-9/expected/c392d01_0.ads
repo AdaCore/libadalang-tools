@@ -123,8 +123,9 @@ private
    --                  Depth : in     Depth_Of_Field)            -- declared
    -- here.
 
-   procedure Focus (C : in out Zoom_Camera;                -- Overrides
-   Depth              : in     F392d00.Depth_Of_Field);    -- inherited op.
+   procedure Focus
+     (C     : in out Zoom_Camera;                -- Overrides
+      Depth : in     F392d00.Depth_Of_Field);    -- inherited op.
 
    -- For the remote zoom camera, perhaps the focusing algorithm is different
    -- in some way, so the original Focus operation is overridden here.

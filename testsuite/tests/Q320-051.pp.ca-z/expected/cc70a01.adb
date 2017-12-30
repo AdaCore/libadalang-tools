@@ -12,8 +12,9 @@ procedure Cc70a01 is
    package My_Complex_Package is new Fc70a00 (My_Integer);
    package My_Matrix_Package is new Cc70a01_0 (My_Complex_Package);
 
-   use My_Complex_Package,                                -- All user-defined
-   My_Matrix_Package;                                 -- operators directly
+   use
+     My_Complex_Package,                                -- All user-defined
+     My_Matrix_Package;                                 -- operators directly
    -- visible.
 
    subtype Matrix_2x2 is Complex_Matrix_Type (1 .. 2, 1 .. 2);

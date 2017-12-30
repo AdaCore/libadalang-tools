@@ -45,8 +45,9 @@ private
    -- function Set_Aperture (C : Auto_Speed) return Aperture; -- Implicitly
    -- declared.
 
-   procedure Focus (C : in out Auto_Speed;                -- Overrides
-   Depth              : in     Depth_Of_Field);           -- inherited op.
+   procedure Focus
+     (C     : in out Auto_Speed;                -- Overrides
+      Depth : in     Depth_Of_Field);           -- inherited op.
 
    -- For the improved remote camera, perhaps the focusing algorithm is
    -- different, so the original Focus operation is overridden here.

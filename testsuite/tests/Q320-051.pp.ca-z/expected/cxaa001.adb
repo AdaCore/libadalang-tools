@@ -124,10 +124,12 @@ begin
             Report.Failed ("Page not of unbounded length"); -- page length.
          end if;
 
-         Text_Io.Set_Line_Length (File => Data_File,    -- Set the line
-         To                            => Data_Size);   -- length.
-         Text_Io.Set_Page_Length (File => Data_File,    -- Set the page
-         To                            => Data_Size);   -- length.
+         Text_Io.Set_Line_Length
+           (File => Data_File,    -- Set the line
+            To   => Data_Size);   -- length.
+         Text_Io.Set_Page_Length
+           (File => Data_File,    -- Set the page
+            To   => Data_Size);   -- length.
          -- Verify the lengths set.
          if
            (Integer (Text_Io.Line_Length (Data_File)) /=
@@ -141,8 +143,9 @@ begin
             Report.Failed ("Page length not set to appropriate length");
          end if;
 
-         Text_Io.Put_Line (File => Data_File,           -- Write data to
-         Item                   => Data_Item);          -- file.
+         Text_Io.Put_Line
+           (File => Data_File,           -- Write data to
+            Item => Data_Item);          -- file.
 
       end Write_Data_To_File;
 
@@ -190,9 +193,10 @@ begin
       -- The following processing simulates processing occurring after the
       -- opening of an existing file with mode Append_File.
 
-      Text_Io.Open (Data_File,                        -- Open file in
-      Text_Io.Append_File,              -- Append_File mode.
-      Data_Filename);
+      Text_Io.Open
+        (Data_File,                        -- Open file in
+         Text_Io.Append_File,              -- Append_File mode.
+         Data_Filename);
 
       Write_Top_Secret_Data (Top_Secret_Item);
 

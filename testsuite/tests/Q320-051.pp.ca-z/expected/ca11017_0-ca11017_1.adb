@@ -35,7 +35,7 @@ package body Ca11017_0.Ca11017_1 is
    is
    begin
       To_The_String.The_Content        -- Parent's private type.
-      (1 .. From_The_Substring'Length) :=
+        (1 .. From_The_Substring'Length) :=
         From_The_Substring;
 
       To_The_String.The_Length         -- Parent's private type.

@@ -137,8 +137,9 @@ begin
    -- string variable.
    begin
 
-      Data_Io.Write (File => Employee_Data_File,   -- Write initial data
-      Item                => Employee_1);          -- entry to file.
+      Data_Io.Write
+        (File => Employee_Data_File,   -- Write initial data
+         Item => Employee_1);          -- entry to file.
 
       --
       -- The following portion of code demonstrates that a sequential file can
@@ -146,8 +147,9 @@ begin
       -- data to be added to the end of the file.
       --
       begin
-         Data_Io.Reset (File => Employee_Data_File,   -- Reset file with
-         Mode                => Data_Io.In_File);     -- mode In_File.
+         Data_Io.Reset
+           (File => Employee_Data_File,   -- Reset file with
+            Mode => Data_Io.In_File);     -- mode In_File.
       exception
          when Data_Io.Use_Error =>
             Report.Not_Applicable
@@ -163,8 +165,9 @@ begin
            Tc_Mode_Selection (1))
       then   -- Compare In_File mode
          -- Reset successful,
-         Data_Io.Read (File => Employee_Data_File, -- now verify file data.
-         Item               => Tc_Employee_Data);
+         Data_Io.Read
+           (File => Employee_Data_File, -- now verify file data.
+            Item => Tc_Employee_Data);
 
          if
            ((Tc_Employee_Data (1 .. 7) /= "123-45-") or
@@ -205,8 +208,9 @@ begin
               Tc_Mode_Selection (3))
          then   -- Compare to
             -- Append_File mode.
-            Data_Io.Write (File => Employee_Data_File, -- Write additional
-            Item                => Employee_2);        -- data to file.
+            Data_Io.Write
+              (File => Employee_Data_File, -- Write additional
+               Item => Employee_2);        -- data to file.
          else
             Report.Failed ("File mode not changed by Reset");
          end if;
@@ -226,8 +230,9 @@ begin
             Name => Employee_Filename); -- function Name.
 
          Tc_Employee_Data := Blank_Data;           -- Clear record field.
-         Data_Io.Read (Employee_Data_File,         -- Read first record,
-         Tc_Employee_Data);          -- check ordering of
+         Data_Io.Read
+           (Employee_Data_File,         -- Read first record,
+            Tc_Employee_Data);          -- check ordering of
          -- records.
 
          if not
@@ -238,8 +243,9 @@ begin
          end if;
 
          Tc_Employee_Data := Blank_Data;           -- Clear record field.
-         Data_Io.Read (Employee_Data_File,         -- Read second record,
-         Tc_Employee_Data);          -- check for ordering of
+         Data_Io.Read
+           (Employee_Data_File,         -- Read second record,
+            Tc_Employee_Data);          -- check for ordering of
          -- records.
 
          if

@@ -10,8 +10,9 @@ procedure Ca11012 is
 
    package My_Complex_Operation renames Ca11012_3.Ca11012_4;
 
-   use My_Complex_Pkg,                                -- All user-defined
-   My_Complex_Operation;                          -- operators directly
+   use
+     My_Complex_Pkg,                                -- All user-defined
+     My_Complex_Operation;                          -- operators directly
    -- visible.
    Complex_One, Complex_Two : Complex_Type;
 
@@ -35,7 +36,8 @@ begin
       -- child package.
 
       if Real_Part (Complex_Two) /= 12         -- Operation from the generic
-      or Imag_Part (Complex_Two) /= -21      -- child package.
+      or
+        Imag_Part (Complex_Two) /= -21      -- child package.
       then
          Report.Failed ("Incorrect results from complex operation");
       end if;

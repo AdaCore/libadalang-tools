@@ -329,11 +329,11 @@ begin
 
    begin
       Subtest_Check_1
-        ((5  => Report.Ident_Int (88),
-          8  => 89,
-          10 => 66,
-          -- 10 not in applicable index constraint
-        others => 93),
+        (
+         (5      => Report.Ident_Int (88),
+          8      => 89,
+          10     => 66, -- 10 not in applicable index constraint
+          others => 93),
          First_Component  => 88,
          Second_Component => 93,
          Last_Component   => 93,
@@ -348,8 +348,9 @@ begin
 
    begin
       Subtest_Check_2
-        ((Yellow => 23, -- Yellow not in applicable index constraint.
-        Blue     => 16, others => 77),
+        (
+         (Yellow => 23, -- Yellow not in applicable index constraint.
+          Blue   => 16, others => 77),
          First_Component  => 77,
          Second_Component => 16,
          Last_Component   => 77,
@@ -364,7 +365,8 @@ begin
 
    begin
       Subtest_Check_3
-        ((Orange => (0, others => 10),
+        (
+         (Orange => (0, others => 10),
           Blue   => (2, 3, others => 4), -- Blue not in applicable index cons.
           others => (1, 2, 3)),
          Test_Case => 'P');

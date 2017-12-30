@@ -24,7 +24,7 @@ begin
    -- Move elevator to Penthouse.
 
    Fa13a00_1.Fa13a00_3.Move_Elevator      -- Reference public sibling of the
-   (Penthouse, Call_Waiting);           -- subunit parent's body.
+     (Penthouse, Call_Waiting);           -- subunit parent's body.
 
    if Current_Floor /= Penthouse then     -- Reference type declared in the
       Tc_Operation := False;              -- parent of the subunit parent's

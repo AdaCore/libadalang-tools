@@ -79,8 +79,9 @@ package C3900010 is
    -- Inherits procedure Display from Alert. Inherits procedure Handle from
    -- Alert.
 
-   function Level_Of (La : in Low_Alert_Type)         -- To be inherited by
-   return Integer;                                  -- all derivatives.
+   function Level_Of
+     (La : in Low_Alert_Type)         -- To be inherited by
+      return Integer;                                  -- all derivatives.
 
    -- Declarations required for component Action_Officer;
 

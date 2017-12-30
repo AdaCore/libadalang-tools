@@ -179,12 +179,13 @@ begin
 
             The_Item.Item := String_Data_Type'Input (Data_Stream); -- Field 1.
             Natural'Read (Data_Stream, The_Item.Id);               -- Field 2.
-            Origin_Type'Read (Data_Stream,                         -- Field 3.
-            The_Item.Manufacture);
+            Origin_Type'Read
+              (Data_Stream,                         -- Field 3.
+               The_Item.Manufacture);
             The_Item.Distributor :=                               -- Field 4.
-            String_Data_Type'Input (Data_Stream);
+              String_Data_Type'Input (Data_Stream);
             The_Item.Importer :=                               -- Field 5.
-            String_Data_Type'Input (Data_Stream);
+              String_Data_Type'Input (Data_Stream);
          end Product_Read;
 
          procedure Product_Write
@@ -196,12 +197,15 @@ begin
 
             String_Data_Type'Output (Data_Stream, The_Item.Item);  -- Field 1.
             Natural'Write (Data_Stream, The_Item.Id);              -- Field 2.
-            Origin_Type'Write (Data_Stream,                        -- Field 3.
-            The_Item.Manufacture);
-            String_Data_Type'Output (Data_Stream,                  -- Field 4.
-            The_Item.Distributor);
-            String_Data_Type'Output (Data_Stream,                  -- Field 5.
-            The_Item.Importer);
+            Origin_Type'Write
+              (Data_Stream,                        -- Field 3.
+               The_Item.Manufacture);
+            String_Data_Type'Output
+              (Data_Stream,                  -- Field 4.
+               The_Item.Distributor);
+            String_Data_Type'Output
+              (Data_Stream,                  -- Field 5.
+               The_Item.Importer);
          end Product_Write;
 
          procedure Sales_Read

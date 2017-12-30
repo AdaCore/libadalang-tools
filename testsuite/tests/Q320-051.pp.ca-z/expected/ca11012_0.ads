@@ -58,14 +58,19 @@ package Ca11012_0 is
 
    Zero : constant Complex_Type;                      -- Real number (0,0).
 
-   function Complex (Real, Imag : Int_Type)           -- Create a complex
-   return Complex_Type;                             -- number.
+   function Complex
+     (Real,
+      Imag : Int_Type)           -- Create a complex
+      return Complex_Type;                             -- number.
 
-   function "-" (Right : Complex_Type)                -- Invert a complex
-   return Complex_Type;                             -- number.
+   function "-"
+     (Right : Complex_Type)                -- Invert a complex
+      return Complex_Type;                             -- number.
 
-   function "+" (Left, Right : Complex_Type)          -- Add two complex
-   return Complex_Type;                             -- numbers.
+   function "+"
+     (Left,
+      Right : Complex_Type)          -- Add two complex
+      return Complex_Type;                             -- numbers.
 
 private
    type Complex_Type is record

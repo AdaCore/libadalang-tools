@@ -55,7 +55,7 @@ package body Ca11018_0 is
       --------------------------------------------------------------
 
       if Designated_Pkg.Find_Word          -- Child's operation.
-      (The_Word, In_The_Message) > 0 then
+          (The_Word, In_The_Message) > 0 then
 
          -- Highlight all occurrences in lavender.
 
@@ -79,7 +79,7 @@ package body Ca11018_0 is
       --------------------------------------------------------------
 
       if Particularly_Designated_Pkg.Find_Word     -- Child's operation.
-      (The_Word, In_The_Message) >
+          (The_Word, In_The_Message) >
         0
       then
 

@@ -96,10 +96,11 @@ begin
 
    end Add_Complex_Subtest;
 
-   if not (Tc_Handled_In_Subtest_1 and   -- Check to see that all
-   Tc_Handled_In_Subtest_2)                -- exceptions were handled
-   -- in the proper location.
-      then
+   if not
+     (Tc_Handled_In_Subtest_1 and   -- Check to see that all
+     Tc_Handled_In_Subtest_2)                -- exceptions were handled
+      -- in the proper location.
+   then
       Report.Failed ("Exceptions handled in incorrect locations");
    end if;
 

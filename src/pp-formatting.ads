@@ -324,10 +324,9 @@ package Pp.Formatting is
 
    ----------------------------------------------------------------
    --
-   --  Formatting uses the following major passes. Convert_Tree_To_Ada has a
-   --  version based on ASIS and a version based on libadalang. (???Software
-   --  present tense!) Split_Lines through Final_Check are done by
-   --  Post_Tree_Phases above.
+   --  Formatting uses the following major passes. Convert_Tree_To_Ada is in
+   --  Pp.Actions. Split_Lines through Final_Check are done by Post_Tree_Phases
+   --  above.
    --
    --  Convert_Tree_To_Ada
    --     Walks the Ada_Tree, using Ada_Templates to convert the tree into
@@ -341,6 +340,8 @@ package Pp.Formatting is
    --     information, it must be encoded in other data structures, such as the
    --     Line_Breaks and Tabs tables.
    --
+   --  ????????????????new phase
+   --
    --  Split_Lines (first time)
    --     Determine which soft line breaks should be enabled.
    --
@@ -348,7 +349,7 @@ package Pp.Formatting is
    --     Step through the source tokens and Out_Buf tokens. Copy comment and
    --     blank line tokens into Out_Buf as they are encountered.
    --
-   --  Split_Lines (again)
+   --  Split_Lines (again)needed????????????????
    --     We do this again because inserted end-of-line comments can cause
    --     lines to be too long. We don't want to split the line just before the
    --     comment; we want to split at some auspicious soft line break(s).

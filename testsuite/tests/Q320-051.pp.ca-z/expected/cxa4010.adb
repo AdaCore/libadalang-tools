@@ -172,7 +172,8 @@ begin
          -- are less than or equal to the length of a string in the
          -- Camera_Ready_Copy_Type object.
 
-         Camera_Copy (1) :=                 -- Take characters 1-39,
+         Camera_Copy
+           (1) :=                 -- Take characters 1-39,
            Asunb.Slice
              (Document (1),        -- and append a blank space.
               1,
@@ -184,22 +185,27 @@ begin
                  Ada.Strings.Backward)) &
            ' ';
 
-         Camera_Copy (2) :=                 -- Take characters 40-79.
+         Camera_Copy
+           (2) :=                 -- Take characters 40-79.
            Asunb.Slice
-             (Document (1),
+             (Document
+                (1),
               40,
               (Asunb.Index_Non_Blank          -- Should return 79
                  (Asunb.To_Unbounded_String
-                    (Asunb.Slice (Document (1), -- Slice (40..79)
-                    40, 79)),
+                    (Asunb.Slice
+                       (Document (1), -- Slice (40..79)
+                        40, 79)),
                   Ada.Strings.Backward) +
                39)); -- Increment since
          -- this slice starts
          -- at 40.
 
-         Camera_Copy (3) (1 .. 9) :=
-           Asunb.Slice (Document (1), -- Characters 80-88
-           80, Asunb.Length (Document (1)));
+         Camera_Copy (3)
+           (1 .. 9) :=
+           Asunb.Slice
+             (Document (1), -- Characters 80-88
+              80, Asunb.Length (Document (1)));
 
          -- Break the second unbounded string into the appropriate length. It
          -- is only twelve characters in length, so the entire unbounded string

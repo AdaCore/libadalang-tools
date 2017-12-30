@@ -131,8 +131,9 @@ begin
         Bs80.To_Bounded_String
           (Bs40.To_String (Bstring_40) & Bs40.To_String (Bstring_40));
 
-      if not (Bstring_40 = String_40 and         -- (Bounded_String, String)
-      Bs80."=" (String_80, Bstring_80))   -- (String, Bounded_String)
+      if not
+        (Bstring_40 = String_40 and         -- (Bounded_String, String)
+        Bs80."=" (String_80, Bstring_80))   -- (String, Bounded_String)
       then
          Report.Failed
            ("Incorrect results from function ""="" with " &
@@ -141,8 +142,9 @@ begin
 
       -- Operator "<".
 
-      Bstring_1 := Bs1.To_Bounded_String ("cat",         -- string "c" only.
-      Drop => Ada.Strings.Right);
+      Bstring_1 := Bs1.To_Bounded_String
+          ("cat",         -- string "c" only.
+           Drop => Ada.Strings.Right);
       Bstring_20 := Bs20.To_Bounded_String ("Santa Claus");
 
       if Bstring_1 < "C" or               -- (Bounded_String, String)
@@ -256,9 +258,8 @@ begin
       Bstring_20 := Bs20.To_Bounded_String ("Sample string");
       Bs20.Head
         (Bstring_20,
-         Count => Bs20.Max_Length,
-                   -- Count > Source'Length
-      Pad => '*');
+         Count => Bs20.Max_Length,           -- Count > Source'Length
+         Pad   => '*');
 
       if Bstring_20 /= Bs20.To_Bounded_String ("Sample string*******") then
          Report.Failed
@@ -311,9 +312,8 @@ begin
       Bstring_20 := Bs20.To_Bounded_String ("Sample string");
       Bs20.Tail
         (Bstring_20,
-         Count => Bs20.Max_Length,
-                   -- Count > Source'Length
-      Pad => '*');
+         Count => Bs20.Max_Length,           -- Count > Source'Length
+         Pad   => '*');
 
       if Bstring_20 /= Bs20.To_Bounded_String ("*******Sample string") then
          Report.Failed

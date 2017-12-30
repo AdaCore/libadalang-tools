@@ -173,11 +173,13 @@ package C432003_0 is
    end record;
 
    -- Subtypes with constrained discriminants.
-   subtype Mult_Constr_Sub1 is Mult_Unconstr_Der (D1 => 15,  -- Disc. have
-   D2                                                => 20); -- diff values
+   subtype Mult_Constr_Sub1 is Mult_Unconstr_Der
+       (D1 => 15,  -- Disc. have
+        D2 => 20); -- diff values
 
-   subtype Mult_Constr_Sub2 is Mult_Unconstr_Der (D1 => 15,  -- Disc. have
-   D2                                                => 15); -- same value
+   subtype Mult_Constr_Sub2 is Mult_Unconstr_Der
+       (D1 => 15,  -- Disc. have
+        D2 => 15); -- same value
 
    type Mult_Nt_A1
      (D3 : Length)

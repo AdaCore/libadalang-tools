@@ -103,8 +103,9 @@ begin
              (Part3,                   -- Bnd Str & Bnd Str
               Bs80."&"
                 (Part4,          -- Char & Bnd Str
-                 Bs80."&" (Part5, -- Bnd Str & Bnd Str
-                 Bs80.To_Bounded_String (Part6)))));
+                 Bs80."&"
+                   (Part5, -- Bnd Str & Bnd Str
+                    Bs80.To_Bounded_String (Part6)))));
 
       Full_Catenate_String :=
         Part1 & Full_Catenate_String;             -- Str & Bnd Str
@@ -171,9 +172,8 @@ begin
       Drop_String :=
         Bs80.Replicate
           (Count => 6,
-           Item  => Abstr,
-                        -- "AAAAABBBBBBBBBB"
-        Drop => Ada.Strings.Right);
+           Item  => Abstr,              -- "AAAAABBBBBBBBBB"
+           Drop  => Ada.Strings.Right);
 
       if Bs80.Element (Drop_String, 1) /= 'A' or
         Bs80.Element (Drop_String, 6) /= 'B' or

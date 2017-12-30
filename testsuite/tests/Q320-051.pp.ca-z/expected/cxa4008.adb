@@ -284,12 +284,15 @@ begin
          Report.Failed ("Incorrect result from Index, non-Identity map - 3");
       end if;
 
-      if B10.Index (B10.To_Bounded_String ("abcd"),        -- Pattern = Source
-      "abcd") /= 1 or
-        B10.Index (B10.To_Bounded_String ("abc"),         -- Pattern < Source
-        "abcd") /= 0 or
-        B10.Index (B10.Null_Bounded_String,              -- Source = Null
-        "abc") /= 0
+      if B10.Index
+          (B10.To_Bounded_String ("abcd"),        -- Pattern = Source
+           "abcd") /= 1 or
+        B10.Index
+            (B10.To_Bounded_String ("abc"),         -- Pattern < Source
+             "abcd") /= 0 or
+        B10.Index
+            (B10.Null_Bounded_String,              -- Source = Null
+             "abc") /= 0
       then
          Report.Failed ("Incorrect result from Index with string patterns");
       end if;
@@ -345,14 +348,18 @@ begin
          Report.Failed ("Incorrect result from Index using Sets - 4");
       end if;
 
-      if B10.Index (B10.To_Bounded_String ("cd"),        -- Source = Set
-      Cd_Set) /= 1 or
-        B10.Index (B10.To_Bounded_String ("c"),         -- Source < Set
-        Cd_Set) /= 1 or
-        B10.Index (B10.Null_Bounded_String,            -- Source = Null
-        Cd_Set) /= 0 or
-        B10.Index (Atoe_Bnd_Str,                       -- "abcde"
-        Maps.Null_Set) /= 0 or -- Null set
+      if B10.Index
+          (B10.To_Bounded_String ("cd"),        -- Source = Set
+           Cd_Set) /= 1 or
+        B10.Index
+            (B10.To_Bounded_String ("c"),         -- Source < Set
+             Cd_Set) /= 1 or
+        B10.Index
+            (B10.Null_Bounded_String,            -- Source = Null
+             Cd_Set) /= 0 or
+        B10.Index
+            (Atoe_Bnd_Str,                       -- "abcde"
+             Maps.Null_Set) /= 0 or -- Null set
         B10.Index (Atoe_Bnd_Str, Maps.To_Set ('x')) /= 0    -- No match.
       then
          Report.Failed ("Incorrect result from Index using Sets - 5");
@@ -386,13 +393,19 @@ begin
              "AB",
              Maps.To_Mapping ("CD", "AB")) /=
           5 or
-        B10.Count (B10.To_Bounded_String ("aaaaaaaaaa"), "aaa") /= 3 or
-        B10.Count (B10.To_Bounded_String ("XX"),         -- Source < Pattern
-        "XXX", Maps.Identity) /= 0 or
-        B10.Count (Atoe_Bnd_Str,                        -- Source = Pattern
-        "abcde") /= 1 or
-        B10.Count (B10.Null_Bounded_String,             -- Source = Null
-        " ") /= 0
+        B10.Count
+            (B10.To_Bounded_String ("aaaaaaaaaa"),
+             "aaa") /= 3 or
+        B10.Count
+            (B10.To_Bounded_String ("XX"),         -- Source < Pattern
+             "XXX",
+             Maps.Identity) /= 0 or
+        B10.Count
+            (Atoe_Bnd_Str,                        -- Source = Pattern
+             "abcde") /= 1 or
+        B10.Count
+            (B10.Null_Bounded_String,             -- Source = Null
+             " ") /= 0
       then
          Report.Failed ("Incorrect result from function Count, w,w/o mapping");
       end if;
@@ -573,8 +586,9 @@ begin
 
       begin
          Result_String :=
-           B10.Insert (Source => Atoj_Bnd_Str,    -- "abcdefghij"
-           Before             => 2, New_Item => "xyz");
+           B10.Insert
+             (Source => Atoj_Bnd_Str,    -- "abcdefghij"
+              Before => 2, New_Item => "xyz");
          Report.Failed ("Length_Error not raised by Function Insert");
       exception
          when As.Length_Error =>

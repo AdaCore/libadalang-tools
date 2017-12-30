@@ -67,8 +67,9 @@ package Cc70a01_0 is
        of Complex_Package.Complex_Type;
    Dimension_Mismatch : exception;
 
-   function Identity_Matrix (Size : Positive)         -- Create identity matrix
-   return Complex_Matrix_Type;                      -- of specified size.
+   function Identity_Matrix
+     (Size : Positive)         -- Create identity matrix
+      return Complex_Matrix_Type;                      -- of specified size.
 
    function "*"
      (Left  : Complex_Matrix_Type;         -- Multiply two complex

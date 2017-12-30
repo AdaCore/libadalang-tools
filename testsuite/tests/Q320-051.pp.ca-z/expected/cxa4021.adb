@@ -207,7 +207,8 @@ begin
          -- are less than or equal to the length of a wide string in the
          -- Camera_Ready_Copy_Type object.
 
-         Camera_Copy (1) :=               -- Take characters 1-39,
+         Camera_Copy
+           (1) :=               -- Take characters 1-39,
            Asw.Slice
              (Document (1),        -- and append a blank space.
               1,
@@ -219,22 +220,27 @@ begin
                  Ada.Strings.Backward)) &
            Equiv (' ');
 
-         Camera_Copy (2) :=                 -- Take characters 40-79.
+         Camera_Copy
+           (2) :=                 -- Take characters 40-79.
            Asw.Slice
-             (Document (1),
+             (Document
+                (1),
               40,
               (Asw.Index_Non_Blank              -- Should return 79
                  (Asw.To_Unbounded_Wide_String
-                    (Asw.Slice (Document (1),     -- Slice (40..79)
-                    40, 79)),
+                    (Asw.Slice
+                       (Document (1),     -- Slice (40..79)
+                        40, 79)),
                   Ada.Strings.Backward) +
                39)); -- Increment since
          -- this slice starts
          -- at 40.
 
-         Camera_Copy (3) (1 .. 9) :=
-           Asw.Slice (Document (1), -- Characters 80-88
-           80, Asw.Length (Document (1)));
+         Camera_Copy (3)
+           (1 .. 9) :=
+           Asw.Slice
+             (Document (1), -- Characters 80-88
+              80, Asw.Length (Document (1)));
 
          -- Break the second unbounded wide string into the appropriate length.
          -- It is only twelve characters in length, so the entire unbounded

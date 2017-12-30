@@ -66,8 +66,9 @@ package C3900060 is  -- Alert system abstraction.
 
    type Alert_Type is tagged private;                 -- Root tagged type.
 
-   procedure Set_Display (A : in out Alert_Type;      -- To be inherited by
-   D                        : in     Device_Enum);    -- all derivatives.
+   procedure Set_Display
+     (A : in out Alert_Type;      -- To be inherited by
+      D : in     Device_Enum);    -- all derivatives.
 
    procedure Display (A : in Alert_Type);             -- To be inherited by
    -- all derivatives.

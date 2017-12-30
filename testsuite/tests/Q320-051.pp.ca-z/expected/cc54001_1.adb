@@ -12,8 +12,9 @@ package body Cc54001_1 is
         (Message_Stack,
          new Message'(Message_1));         -- Dynamic.
       Stack_Of_Messages.Push (Message_Stack, Message_2'Access); -- Static.
-      Stack_Of_Messages.Push (Message_Stack,                    -- Dynamic.
-      new Message'(Message_3));
+      Stack_Of_Messages.Push
+        (Message_Stack,                    -- Dynamic.
+         new Message'(Message_3));
    end Create_Message_Stack;
 
 end Cc54001_1;

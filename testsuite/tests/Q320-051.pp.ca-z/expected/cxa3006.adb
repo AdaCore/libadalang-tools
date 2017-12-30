@@ -314,11 +314,11 @@ begin
 
       Lc_Wide_String_1 : constant Wide_String :=
         (Wide_Character'Val (16#03B1#),  -- Small Alpha
-        Wide_Character'Val (16#03C9#)); -- Small Omega
+         Wide_Character'Val (16#03C9#)); -- Small Omega
 
       Uc_Wide_String_1 : constant Wide_String :=
         (Wide_Character'Val (16#0391#),  -- Capital Alpha
-        Wide_Character'Val (16#03A9#)); -- Capital Omega
+         Wide_Character'Val (16#03A9#)); -- Capital Omega
 
       Lc_Wide_String_2 : constant Wide_String :=
         (Wide_Character'Val (16#03B1#),  -- Small Alpha

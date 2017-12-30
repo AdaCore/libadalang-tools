@@ -61,8 +61,9 @@ begin
    -- Call re-dispatching operation:
    --
 
-   Table_Support.Process_Operand (C640001_0.Table (My_Table2),  -- View conv.
-   My_List, 3, 3);              -- Call 3rd op.
+   Table_Support.Process_Operand
+     (C640001_0.Table (My_Table2),  -- View conv.
+      My_List, 3, 3);              -- Call 3rd op.
 
    if not C640001_0.Is_True (My_Table2.Row1) then
       Report.Failed ("Wrong result after calling re-dispatching operation");

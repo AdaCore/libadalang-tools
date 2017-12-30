@@ -100,8 +100,9 @@ begin
              Ada.Strings.Forward,
              Map_To_Upper_Case_Ptr) /=
           3 or
-        Fixed.Index ("",  -- Null string.
-        "is", Mapping => Map_To_Lower_Case_Ptr) /= 0 or
+        Fixed.Index
+            ("",  -- Null string.
+             "is", Mapping => Map_To_Lower_Case_Ptr) /= 0 or
         Fixed.Index
             ("AAABBBaaabbb",
              "aabb",
@@ -186,13 +187,19 @@ begin
            Pattern => "aba",
            Mapping => Map_To_Lower_Case_Ptr) /=
         2 or
-        Fixed.Count ("ABABABA", "ABA", Map_To_Lower_Case_Ptr) /= 0 or
+        Fixed.Count
+            ("ABABABA",
+             "ABA",
+             Map_To_Lower_Case_Ptr) /= 0 or
         Fixed.Count
             ("This IS a MISmatched issue",
              "is",
              Map_To_Lower_Case_Ptr) /=
           4 or
-        Fixed.Count ("ABABABA", "ABA", Map_To_Upper_Case_Ptr) /= 2 or
+        Fixed.Count
+            ("ABABABA",
+             "ABA",
+             Map_To_Upper_Case_Ptr) /= 2 or
         Fixed.Count
             ("This IS a MISmatched issue",
              "is",
@@ -203,8 +210,9 @@ begin
              "s",
              Map_To_Lower_Case_Ptr) /=
           8 or
-        Fixed.Count ("",                       -- Null string.
-        "match", Map_To_Upper_Case_Ptr) /= 0
+        Fixed.Count
+            ("",                       -- Null string.
+             "match", Map_To_Upper_Case_Ptr) /= 0
       then
          Report.Failed
            ("Incorrect results from Function Count, using " &

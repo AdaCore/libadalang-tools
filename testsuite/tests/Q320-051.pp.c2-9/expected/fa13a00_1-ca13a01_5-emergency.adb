@@ -27,7 +27,7 @@ begin
    -- Move elevator to the basement.
 
    Fa13a00_1.Fa13a00_3.Move_Elevator      -- Reference public sibling of the
-   (Basement, Call_Waiting);            -- subunit parent's body.
+     (Basement, Call_Waiting);            -- subunit parent's body.
 
    if Current_Floor /= Basement then      -- Reference type declared in the
       Tc_Operation := False;              -- parent of the subunit parent's

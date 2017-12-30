@@ -28,7 +28,8 @@ begin
    -- Operation from the generic parent package.
 
    if My_Real_Part /= 6.0           -- Operation from the generic
-   or My_Imag_Part /= 9.0         -- parent package.
+   or
+     My_Imag_Part /= 9.0         -- parent package.
    then
       Report.Failed ("Incorrect results from complex operation");
    end if;

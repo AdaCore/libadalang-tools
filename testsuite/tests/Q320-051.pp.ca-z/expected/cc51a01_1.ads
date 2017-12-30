@@ -12,7 +12,8 @@ package Cc51a01_1 is
    -- Numerator from root type. Inherits Denominator from root type.
 
    -- Return absolute value of numerator as integer.
-   function Numerator (Frac : Pos_Fraction)            -- Overrides parent's
-   return Integer;                                   -- operation.
+   function Numerator
+     (Frac : Pos_Fraction)            -- Overrides parent's
+      return Integer;                                   -- operation.
 
 end Cc51a01_1;

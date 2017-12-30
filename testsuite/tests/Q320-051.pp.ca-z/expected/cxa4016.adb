@@ -419,9 +419,11 @@ begin
       Tc_Set_Name ("Overwrite");
 
       Overwrite_String :=
-        Tc_Check (Asw.Overwrite (Result_String,  -- 10 chars
-        1,              -- starting at pos=1
-        Source_String3 (1 .. 10)));
+        Tc_Check
+          (Asw.Overwrite
+             (Result_String,  -- 10 chars
+              1,              -- starting at pos=1
+              Source_String3 (1 .. 10)));
 
       if Overwrite_String /= Source_String3 (1 .. 10) then
          Report.Failed ("Incorrect result from Function Overwrite - 1");

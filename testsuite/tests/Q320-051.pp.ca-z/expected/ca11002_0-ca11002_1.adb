@@ -3,8 +3,9 @@
 with Report;
 package body Ca11002_0.Ca11002_1 is       -- Child package body OS.Operations.
 
-   function New_File_Validated (File : File_Type)        -- Ensure that a newly
-   return Boolean is                                   -- created file has
+   function New_File_Validated
+     (File : File_Type)        -- Ensure that a newly
+      return Boolean is                                   -- created file has
       Result : Boolean := False;                         -- appropriate values.
    begin
       if (File.Descriptor > System_File.Descriptor) and  -- Parent object.

@@ -152,8 +152,9 @@ begin
 
       Reset1 :
       begin
-         Text_Io.Reset (Status_Log,                           -- Reset to
-         Text_Io.Append_File);                 -- Append mode.
+         Text_Io.Reset
+           (Status_Log,                           -- Reset to
+            Text_Io.Append_File);                 -- Append mode.
       exception
          when Text_Io.Use_Error =>
             Report.Not_Applicable
@@ -170,8 +171,9 @@ begin
 
       Reset2 :
       begin
-         Text_Io.Reset (Status_Log,                           -- Reset to
-         Text_Io.Append_File);                 -- Append mode.
+         Text_Io.Reset
+           (Status_Log,                           -- Reset to
+            Text_Io.Append_File);                 -- Append mode.
       exception
          when Text_Io.Use_Error =>
             Report.Not_Applicable

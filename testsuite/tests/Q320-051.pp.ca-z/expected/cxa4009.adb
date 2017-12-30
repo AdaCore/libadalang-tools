@@ -124,8 +124,9 @@ begin
       -- Drop = Right
 
       Result_String :=
-        B10.Overwrite (Test_String,  -- "abcdefghij"
-        3, "xxxyyyzzz", Ada.Strings.Right);
+        B10.Overwrite
+          (Test_String,  -- "abcdefghij"
+           3, "xxxyyyzzz", Ada.Strings.Right);
 
       if B10.To_String (Result_String) /= "abxxxyyyzz" then -- one 'z' dropped
          Report.Failed
@@ -134,11 +135,14 @@ begin
 
       -- Additional cases of function Overwrite.
 
-      if B10.Overwrite (B10.To_Bounded_String ("a"),      -- Source length = 1
-      1, "  abc  ") /=
+      if B10.Overwrite
+          (B10.To_Bounded_String ("a"),      -- Source length = 1
+           1,
+           "  abc  ") /=
         B10.To_Bounded_String ("  abc  ") or
-        B10.Overwrite (B10.Null_Bounded_String,         -- Null source
-        1, "abcdefghij") /=
+        B10.Overwrite
+            (B10.Null_Bounded_String,         -- Null source
+             1, "abcdefghij") /=
           Atoj_Bnd_Str or
         B10.Overwrite
             (Atoe_Bnd_Str,
@@ -200,8 +204,9 @@ begin
       -- Drop = Right
 
       Test_String := Atoj_Bnd_Str;
-      B10.Overwrite (Test_String,  -- "abcdefghij"
-      3, "xxxyyyzzz", Ada.Strings.Right);
+      B10.Overwrite
+        (Test_String,  -- "abcdefghij"
+         3, "xxxyyyzzz", Ada.Strings.Right);
 
       if B10.To_String (Test_String) /= "abxxxyyyzz" then -- one 'z' dropped
          Report.Failed
@@ -210,8 +215,9 @@ begin
 
       -- Function Delete
 
-      if B10.Delete (Source => Atoj_Bnd_Str,   -- "abcdefghij"
-      From                  => 3, Through => 8) /=
+      if B10.Delete
+          (Source => Atoj_Bnd_Str,   -- "abcdefghij"
+           From   => 3, Through => 8) /=
         B10."&" (B10.Head (Atoj_Bnd_Str, 2), B10.Tail (Atoj_Bnd_Str, 2)) or
         B10.Delete (Atoj_Bnd_Str, 6, B10.Length (Atoj_Bnd_Str)) /=
           Atoe_Bnd_Str or
@@ -560,8 +566,9 @@ begin
       -- Function Replicate (#, String) with Truncation Drop = Error (Default).
 
       begin
-         Result_String := B10.Replicate (Count => 5,  -- result would be 15.
-         Item => "abc");
+         Result_String := B10.Replicate
+             (Count => 5,  -- result would be 15.
+              Item  => "abc");
          Report.Failed ("Length_Error not raised by Replicate for strings");
       exception
          when As.Length_Error =>

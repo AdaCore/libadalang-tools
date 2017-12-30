@@ -45,8 +45,9 @@ package body C332001_0 is
       Assert
         (Enp > Mtp,
          "ENP > MTP");                                   -- 3 > 1
-      Assert ((Fts < Mtl) or (Fts >= Mtl),  -- given FTS is impdef...
-      "(FTS < MTL) or (FTS >= MTL)");                 -- True
+      Assert
+        ((Fts < Mtl) or (Fts >= Mtl),  -- given FTS is impdef...
+         "(FTS < MTL) or (FTS >= MTL)");                 -- True
       Assert
         (Fts > Its,
          "FTS > ITS");                                   -- impdef > 3

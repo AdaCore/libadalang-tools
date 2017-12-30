@@ -117,8 +117,9 @@ begin
          -- procedure defined for Wide_Character data.
          Reset1 :
          begin
-            Ada.Wide_Text_Io.Reset (Filter_File,                      -- Reset.
-            Ada.Wide_Text_Io.In_File);
+            Ada.Wide_Text_Io.Reset
+              (Filter_File,                      -- Reset.
+               Ada.Wide_Text_Io.In_File);
          exception
             when Ada.Wide_Text_Io.Use_Error =>
                Report.Not_Applicable
@@ -148,8 +149,9 @@ begin
          -- the Third_String.
          Reset2 :
          begin
-            Ada.Wide_Text_Io.Reset (Filter_File,                   -- Reset.
-            Ada.Wide_Text_Io.Append_File);
+            Ada.Wide_Text_Io.Reset
+              (Filter_File,                   -- Reset.
+               Ada.Wide_Text_Io.Append_File);
 
          exception
             when Ada.Wide_Text_Io.Use_Error =>
@@ -211,8 +213,9 @@ begin
          -- file.
          Ada.Wide_Text_Io.Get (Filter_File, Tc_String2); -- Get.
          Ada.Wide_Text_Io.Skip_Line (Filter_File);             -- Skip_Line.
-         Ada.Wide_Text_Io.Get_Line (Filter_File,              -- Get_Line.
-         Tc_String3, Last);
+         Ada.Wide_Text_Io.Get_Line
+           (Filter_File,              -- Get_Line.
+            Tc_String3, Last);
 
          -- Verify data of second and third strings.
          if Tc_String2 /= Second_String then

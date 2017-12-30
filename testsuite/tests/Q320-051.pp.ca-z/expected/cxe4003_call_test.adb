@@ -61,28 +61,24 @@ package body Cxe4003_Call_Test is
          C2 : Client
            (200,
             299,
-            System.Priority'Last - 5,
-                                       --RT
-         2);
+            System.Priority'Last - 5,                            --RT
+            2);
          C3 : Client
            (300,
             399,
-            System.Priority'Last - 4,
-                                       --RT
-         3);
+            System.Priority'Last - 4,                            --RT
+            3);
          C4 : Client
            (400,
             499,
-            System.Priority'Last - 3,
-                                       --RT
-         4);
+            System.Priority'Last - 3,                            --RT
+            4);
          -- give the highest priority task the most to do
          C5 : Client
            (500,
             699,
-            System.Priority'Last - 2,
-                                       --RT
-         5);
+            System.Priority'Last - 2,                            --RT
+            5);
       begin
          null;  -- wait for the clients to finish
       end;

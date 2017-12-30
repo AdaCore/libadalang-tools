@@ -71,4 +71,4 @@ generic
    type Account_Type is new F341a00_0.Account with private; -- new Bank.Account
 function C341a03_0
   (The_Account : Account_Type'Class)       -- function Audit
-  return F341a00_0.Dollar_Amount;
+   return F341a00_0.Dollar_Amount;

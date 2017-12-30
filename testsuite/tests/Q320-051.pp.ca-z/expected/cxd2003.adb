@@ -97,9 +97,13 @@ procedure Cxd2003 is
    type Task_Identity is range 1 .. 9;
 
    Expected_Sequence : array (1 .. 9) of Task_Identity :=
-     (8, 5, 2,     -- the priority_3Q tasks in temporal order
-     7, 3, 1,     -- the priority_2Q
-     9, 6, 4);    -- the priority_1Q
+     (8,
+      5,
+      2,     -- the priority_3Q tasks in temporal order
+      7,
+      3,
+      1,     -- the priority_2Q
+      9, 6, 4);    -- the priority_1Q
    Actual_Sequence : array (1 .. 9) of Task_Identity;
 
 begin

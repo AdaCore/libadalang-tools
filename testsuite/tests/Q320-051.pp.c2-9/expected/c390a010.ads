@@ -55,8 +55,9 @@ package C390a010 is
    procedure Handle (La : in out Low_Alert_Type);       -- Override parent's
    -- primitive subprog.
 
-   function Level_Of (La : in Low_Alert_Type)           -- To be inherited by
-   return Integer;                                    -- all derivatives.
+   function Level_Of
+     (La : in Low_Alert_Type)           -- To be inherited by
+      return Integer;                                    -- all derivatives.
 
    -- Declarations required for component Action_Officer;
 

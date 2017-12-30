@@ -125,8 +125,9 @@ begin
       Buyer_3 : Order_Type := ("Mike Brown", 5);
 
    begin
-      Order_Io.Write (File => Order_File,      -- Write initial data item
-      Item                 => Buyer_1);        -- to file.
+      Order_Io.Write
+        (File => Order_File,      -- Write initial data item
+         Item => Buyer_1);        -- to file.
 
       Order_Io.Close (File => Order_File);     -- Close file.
 
@@ -134,9 +135,10 @@ begin
       -- Enter additional data records into the file. (Append to a file of
       -- previous mode Out_File).
       --
-      Order_Io.Open (Order_File,               -- Open Sequential_IO file
-      Order_Io.Append_File,     -- with mode Append_File.
-      Order_Filename);
+      Order_Io.Open
+        (Order_File,               -- Open Sequential_IO file
+         Order_Io.Append_File,     -- with mode Append_File.
+         Order_Filename);
 
       Order_Io.Write (Order_File, Buyer_2);    -- Write second data item
       -- to file.
@@ -158,9 +160,10 @@ begin
       -- has been previously appended to.
       --
 
-      Order_Io.Open (Order_File,               -- Open Sequential_IO file
-      Order_Io.Append_File,     -- with mode Append_File.
-      Order_Filename);
+      Order_Io.Open
+        (Order_File,               -- Open Sequential_IO file
+         Order_Io.Append_File,     -- with mode Append_File.
+         Order_Filename);
 
       Order_Io.Write (Order_File, Buyer_3);    -- Write third data item
       -- to file.
@@ -171,12 +174,14 @@ begin
          Tc_Order1, Tc_Order2, Tc_Order3 : Order_Type;
       begin
 
-         Order_Io.Open (Order_File,            -- Open Sequential_IO file
-         Order_Io.In_File,      -- with mode In_File.
-         Order_Filename);
+         Order_Io.Open
+           (Order_File,            -- Open Sequential_IO file
+            Order_Io.In_File,      -- with mode In_File.
+            Order_Filename);
 
-         Order_Io.Read (File => Order_File,    -- Read records from file.
-         Item                => Tc_Order1);
+         Order_Io.Read
+           (File => Order_File,    -- Read records from file.
+            Item => Tc_Order1);
          Order_Io.Read (Order_File, Tc_Order2);
          Order_Io.Read (Order_File, Tc_Order3);
 

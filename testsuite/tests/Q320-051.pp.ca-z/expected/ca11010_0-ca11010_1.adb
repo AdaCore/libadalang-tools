@@ -9,8 +9,10 @@ package body Ca11010_0.Ca11010_1 is  -- Package body OS.Internals
    end Next_Available_File;
    ----------------------------------------------------------------
    function Initialize
-     (File_Name : File_Name_Type := Get_File_Name; -- Parent priv. function
-      File_Mode : File_Mode_Type := Read_Write)    -- Parent priv. literal
+     (File_Name : File_Name_Type :=
+        Get_File_Name; -- Parent priv. function
+      File_Mode : File_Mode_Type :=
+        Read_Write)    -- Parent priv. literal
       return File_Descriptor_Type
    is                -- Parent type
       Number : File_Descriptor_Type;

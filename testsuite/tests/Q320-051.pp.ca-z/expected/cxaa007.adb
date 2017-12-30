@@ -112,8 +112,8 @@ begin
 
       Inventory_List : Inventory_Type :=
         ((1, 119, 87), -- Items received
-        (2, 206, 44), -- this order.
-        (3, -25, 126), (4, -18, 31));
+         (2, 206, 44), -- this order.
+         (3, -25, 126), (4, -18, 31));
 
       Daily_Order        : constant         := 1;
       Entry_Field_Width  : constant Natural := 1;
@@ -172,9 +172,8 @@ begin
       -- Item_IO
       Text_Io.Open
         (Inventory_File,
-         Text_Io.Append_File,
-                    -- Open in Append mode.
-      Inventory_Filename);
+         Text_Io.Append_File,            -- Open in Append mode.
+         Inventory_Filename);
       -- Enter items
       while (Items_Inventoried < Items_To_Inventory) loop -- 2-4 into the
          Items_Inventoried := Items_Inventoried + 1;     -- inventory file.

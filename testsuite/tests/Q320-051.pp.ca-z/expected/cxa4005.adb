@@ -148,9 +148,8 @@ begin
          Asf.Replace_Slice
            (Result_String (5 .. 10),
             5,
-            3,
-            -- should raise exception since < 'First - 1.
-         "xxxxxxx");
+            3, -- should raise exception since < 'First - 1.
+            "xxxxxxx");
          Report.Failed ("Index_Error not raised by Replace_Slice - 2");
       exception
          when Ada.Strings.Index_Error =>
@@ -419,9 +418,11 @@ begin
       Tc_Set_Name ("Overwrite");
 
       Overwrite_String :=
-        Tc_Check (Asf.Overwrite (Result_String,  -- 10 chars
-        1,              -- starting at pos=1
-        Source_String3 (1 .. 10)));
+        Tc_Check
+          (Asf.Overwrite
+             (Result_String,  -- 10 chars
+              1,              -- starting at pos=1
+              Source_String3 (1 .. 10)));
 
       if Overwrite_String /= Source_String3 (1 .. 10) then
          Report.Failed ("Incorrect result from Function Overwrite - 1");

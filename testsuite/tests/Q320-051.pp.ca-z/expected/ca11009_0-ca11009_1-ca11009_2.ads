@@ -11,7 +11,7 @@
    Initial_Permission : constant Permission_Type  := User;  -- Grandparent
    Initial_Status     : constant File_Status_Type := Open;  -- literals.
    Initial_Filename   : constant File_Name_Type   :=  -- Grandparent type.
-   Get_File_Name;                                   -- Grandparent function.
+     Get_File_Name;                                   -- Grandparent function.
 
    function Create
      (Mode : File_Mode_Type)

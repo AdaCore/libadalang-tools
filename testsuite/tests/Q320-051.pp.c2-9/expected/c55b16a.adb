@@ -55,8 +55,7 @@ begin
    for X in Enum loop
 
       if X /= Enum'Val (I1) or
-        Enum'Pos (X) /= I1
-                                    -- 0..8
+        Enum'Pos (X) /= I1                               -- 0..8
       then
          Failed ("LOOP_PARAMETER ASCENDING INCORRECTLY (1)");
       end if;
@@ -70,8 +69,7 @@ begin
    for X in Enum range D .. C loop
 
       if X /= Enum'Val (I1) or
-        Enum'Pos (X) /= I1
-                                    -- 6..8
+        Enum'Pos (X) /= I1                               -- 6..8
       then
          Failed ("LOOP_PARAMETER ASCENDING INCORRECTLY (2)");
       end if;
@@ -85,8 +83,7 @@ begin
    for X in reverse 'A' .. Enum'(Z) loop
 
       if X /= Enum'Val (I1) or
-        Enum'Pos (X) /= I1
-                                    -- 4..0
+        Enum'Pos (X) /= I1                               -- 4..0
       then
          Failed ("LOOP_PARAMETER DESCENDING INCORRECTLY (3)");
       end if;

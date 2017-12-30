@@ -17,7 +17,7 @@ begin
       case D is
          when Express =>
             Fa13a00_1.Fa13a00_3.Move_Elevator -- Reference public sibling of
-            (Penthouse, Call_Waiting);      -- the subunit parent's body.
+              (Penthouse, Call_Waiting);      -- the subunit parent's body.
 
             Elevator_Button := Express;
 
@@ -61,7 +61,8 @@ begin
             -- in the parent of the subunit parent's body.
       end case;
 
-      if not Call_Waiting (Current_Floor)     -- Reference private part of the
+      if not Call_Waiting
+          (Current_Floor)     -- Reference private part of the
       then                                    -- parent of the subunit parent's
          -- body.
          Tc_Operation := False;

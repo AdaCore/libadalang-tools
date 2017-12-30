@@ -254,8 +254,9 @@ begin
 
       -- Function Delete
 
-      if B10.Delete (Source => Atoj_Bnd_Str,   -- "abcdefghij"
-      From                  => 3, Through => 8) /=
+      if B10.Delete
+          (Source => Atoj_Bnd_Str,   -- "abcdefghij"
+           From   => 3, Through => 8) /=
         B10."&" (B10.Head (Atoj_Bnd_Str, 2), B10.Tail (Atoj_Bnd_Str, 2)) or
         B10.Delete (Atoj_Bnd_Str, 6, B10.Length (Atoj_Bnd_Str)) /=
           Atoe_Bnd_Str or
@@ -636,8 +637,9 @@ begin
 
       begin
          Result_String :=
-           B10.Replicate (Count => 5,  -- result would be 15.
-           Item                 => Translate ("abc"));
+           B10.Replicate
+             (Count => 5,  -- result would be 15.
+              Item  => Translate ("abc"));
          Report.Failed
            ("Length_Error not raised by Replicate for wide strings");
       exception

@@ -4710,12 +4710,12 @@ package body Pp.Actions is
             use Ada.Exceptions;
             Loc : constant String :=
               (if Exception_Identity (X) = Token_Mismatch'Identity
-                 then Exception_Message (X) else "");
+                 then ":" & Exception_Message (X) else "");
          begin
             Text_IO.Put_Line
               (Text_IO.Standard_Error,
-               File_Name & ":" & Loc &
-                 ": pretty-printing failed; unable to format");
+               File_Name & Loc &
+                 ": pretty printing failed; unable to format");
          end;
 
          if Enable_Token_Mismatch then

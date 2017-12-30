@@ -15,8 +15,9 @@ package C640001_2 is
 
    type Op_List is private;
 
-   procedure Add_Op (Op : in     Proc_Ptr;                -- Add operation to
-   List                 : in out Op_List);                -- to list of ops.
+   procedure Add_Op
+     (Op   : in     Proc_Ptr;                -- Add operation to
+      List : in out Op_List);                -- to list of ops.
 
    procedure Process_Operand
      (Operand  : in out Tag;        -- Execute a subset

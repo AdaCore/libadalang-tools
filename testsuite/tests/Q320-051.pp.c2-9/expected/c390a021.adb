@@ -35,8 +35,9 @@ package body C390a021 is
 
    function Bad_Final_Values (Ma : in Medium_Alert_Type) return Boolean is
    begin
-      return (Ma /= (Alert_Time, Console,                -- Check "/=" operator
-      2, Duty_Officer));         -- availability.
+      return (Ma /= (Alert_Time,
+          Console,                -- Check "/=" operator
+          2, Duty_Officer));         -- availability.
    end Bad_Final_Values;                                 -- Aggregate with
    -- positional assoc.
 

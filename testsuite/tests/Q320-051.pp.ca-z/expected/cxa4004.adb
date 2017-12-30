@@ -90,8 +90,9 @@ begin
 
       -- Justify = Left (default case)
 
-      Asf.Move (Source => Source_String1,       -- "abcde"
-      Target           => Result_String);
+      Asf.Move
+        (Source => Source_String1,       -- "abcde"
+         Target => Result_String);
 
       if Result_String /= "abcde     " then
          Report.Failed ("Incorrect result from Move with Justify = Left");
@@ -219,9 +220,10 @@ begin
       -- Check that Pattern_Error is raised when the pattern is the null
       -- string.
       begin
-         Location := Asf.Index (Source_String6,    -- "abcdefabcdef"
-         "",                -- null pattern string.
-         Ada.Strings.Forward);
+         Location := Asf.Index
+             (Source_String6,    -- "abcdefabcdef"
+              "",                -- null pattern string.
+              Ada.Strings.Forward);
          Report.Failed ("Pattern_Error not raised by Index");
       exception
          when Ada.Strings.Pattern_Error =>
@@ -234,9 +236,10 @@ begin
       -- Use the search direction "backward" to locate the particular pattern
       -- within the source string.
 
-      Location := Asf.Index (Source_String6,         -- "abcdefabcdef"
-      "de",                   -- slice 4..5, 10..11
-      Ada.Strings.Backward);  -- search from right end.
+      Location := Asf.Index
+          (Source_String6,         -- "abcdefabcdef"
+           "de",                   -- slice 4..5, 10..11
+           Ada.Strings.Backward);  -- search from right end.
 
       if Location /= 10 then
          Report.Failed ("Incorrect result from Index going Backward");
@@ -276,8 +279,11 @@ begin
 
       -- Additional interesting uses/combinations using Index for sets.
 
-      if Asf.Index ("cd",                               -- same size, str-set
-      Cd_Set, Ada.Strings.Inside, Ada.Strings.Forward) /=
+      if Asf.Index
+          ("cd",                               -- same size, str-set
+           Cd_Set,
+           Ada.Strings.Inside,
+           Ada.Strings.Forward) /=
         1 or  -- 'c' at position 1
         Asf.Index
             ("abcd",                             -- same size, str-set,
@@ -291,9 +297,12 @@ begin
              Ada.Strings.Inside,
              Ada.Strings.Backward) /=
           4 or  -- 'c' at position 4
-        Asf.Index ("abcde", Maps.Null_Set) /= 0 or
-        Asf.Index ("",                                 -- Null string.
-        Cd_Set) /= 0 or
+        Asf.Index
+            ("abcde",
+             Maps.Null_Set) /= 0 or
+        Asf.Index
+            ("",                                 -- Null string.
+             Cd_Set) /= 0 or
         Asf.Index
             ("abc ab",                           -- blank included
              Maps.To_Set ("e "),                  -- in string and set.
@@ -335,8 +344,9 @@ begin
       -- Determine the number of slices of Source that when mapped to a
       -- non-identity map, match the pattern string.
 
-      Slice_Count := Asf.Count (Source_String6, -- "abcdefabcdef"
-      "xy", Cd_To_Xy_Map);  -- maps 'c' to 'x', 'd' to 'y'
+      Slice_Count := Asf.Count
+          (Source_String6, -- "abcdefabcdef"
+           "xy", Cd_To_Xy_Map);  -- maps 'c' to 'x', 'd' to 'y'
 
       if Slice_Count /= 2 then  -- two slices "xy" in "mapped" Source_String6
          Report.Failed ("Incorrect result from Count with non-identity map");

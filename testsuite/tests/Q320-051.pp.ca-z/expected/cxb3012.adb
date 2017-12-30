@@ -181,9 +181,8 @@ begin
       Ics.Update
         (Tc_Chars_Ptr,
          0,
-         Ic.To_C (Tc_String_10),
-         -- Complete replacement of array.
-      Check => False);
+         Ic.To_C (Tc_String_10), -- Complete replacement of array.
+         Check => False);
 
       if Ics.Value (Tc_Chars_Ptr) /= Tc_String_10 then
          Report.Failed ("Incorrect result from Procedure Update - 4");

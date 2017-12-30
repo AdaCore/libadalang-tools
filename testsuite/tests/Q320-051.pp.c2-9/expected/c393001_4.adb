@@ -70,8 +70,9 @@ package body C393001_4 is
       end case;
    end Fail;
 
-   function Status_Of (The_Breaker : Special_Breaker) ----------------- n
-   return C393001_1.Status
+   function Status_Of
+     (The_Breaker : Special_Breaker) ----------------- n
+      return C393001_1.Status
    is
    begin
       Tctouch.Touch ('n');

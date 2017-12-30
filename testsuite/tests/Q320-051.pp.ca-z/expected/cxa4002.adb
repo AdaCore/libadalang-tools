@@ -157,7 +157,8 @@ begin
       for Line in 1 .. Number_Of_Lines loop
          for Word in Restricted_Words'Range loop
             Censor
-              (Text_Page (Line),
+              (Text_Page
+                 (Line),
                Ada.Strings.Fixed.Trim
                  (Restricted_Words (Word),   -- Trim
                   Ada.Strings.Both));

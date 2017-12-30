@@ -13,11 +13,11 @@ procedure C392010 is
 
    Item_0 : aliased C392010_0.Tagtype_Level_0 := (Ch_Item => 'k');  ------ k
    Item_1 : aliased C392010_1.Tagtype_Level_1 :=
-     (Ch_Item => 'm',    ------ m
-     Int_Item => 1);
+     (Ch_Item  => 'm',    ------ m
+      Int_Item => 1);
    Item_2 : aliased C392010_2.Tagtype_Level_2 :=
-     (Ch_Item => 'n',    ------ n
-     Int_Item => 1, Another_Int_Item => 1);
+     (Ch_Item  => 'n',    ------ n
+      Int_Item => 1, Another_Int_Item => 1);
 
    Z : Zero_Dispatch_List (1 .. 3) :=
      (Item_0'Access, Item_1'Access, Item_2'Access);
@@ -73,11 +73,11 @@ procedure C392010 is
    type One_Dispatch_List is array (Natural range <>) of Access_Class_1;
 
    Object_1 : aliased C392010_1.Tagtype_Level_1 :=
-     (Ch_Item => 'p',   ----- p
-     Int_Item => 1);
+     (Ch_Item  => 'p',   ----- p
+      Int_Item => 1);
    Object_2 : aliased C392010_2.Tagtype_Level_2 :=
-     (Ch_Item => 'q',   ----- q
-     Int_Item => 1, Another_Int_Item => 1);
+     (Ch_Item  => 'q',   ----- q
+      Int_Item => 1, Another_Int_Item => 1);
 
    D : One_Dispatch_List (1 .. 2) := (Object_1'Access, Object_2'Access);
 

@@ -100,8 +100,9 @@ begin
       subtype Rec16 is Rec1 (6);
       subtype Rec26 is Rec2 (6);
 
-      procedure Proc (P1 : in out Rec16;     -- 6.
-      P2                 : in out Rec26) is  -- 6.
+      procedure Proc
+        (P1 : in out Rec16;     -- 6.
+         P2 : in out Rec26) is  -- 6.
       begin
          if not (P1'Constrained and P2'Constrained) then  -- 6.
             Failed
@@ -157,8 +158,9 @@ begin
 ---------------------------------------------------------------
 
       begin
-         Obj3 := ((Disc => Ident_Int (7)),      -- 2.
-         (Disc => Ident_Int (7)));     -- 2.
+         Obj3 :=
+           ((Disc => Ident_Int (7)),      -- 2.
+            (Disc => Ident_Int (7)));     -- 2.
          Failed
            ("CONSTRAINT_ERROR NOT RAISED UPON " &
             "ATTEMPT TO CHANGE DISCRIMINANT OF " &

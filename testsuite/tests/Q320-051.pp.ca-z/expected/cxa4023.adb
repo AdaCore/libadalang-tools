@@ -232,8 +232,9 @@ begin
 
       Test_String := Asw.To_Unbounded_Wide_String (Equiv ("abABaABbaBAbba"));
 
-      Asw.Translate (Source => Test_String, -- change equivalent of 'a' and
-      Mapping               => Map_Ptr);    -- 'b' to ' '
+      Asw.Translate
+        (Source  => Test_String, -- change equivalent of 'a' and
+         Mapping => Map_Ptr);    -- 'b' to ' '
 
       if Test_String /=
         Asw.To_Unbounded_Wide_String (Equiv ("  AB AB  BA   "))
@@ -262,8 +263,7 @@ begin
       Asw.Translate (Source => Test_String, Mapping => Map_Ptr);
 
       if Test_String /=
-        Asw.To_Unbounded_Wide_String (Equiv ("xyzsypcc"))
-        -- no change
+        Asw.To_Unbounded_Wide_String (Equiv ("xyzsypcc"))   -- no change
       then
          Report.Failed
            ("Incorrect result from Proc Translate, w/ access value map - 3");
@@ -424,8 +424,9 @@ begin
          Sos :=
            Asw."&"
              (Sos,
-              Asw."&" (Asw."*" (Repeat, Dash),  -- "*"(#, W Str)
-              Asw."*" (Repeat, Dot))); -- "*"(#, W Unb Str)
+              Asw."&"
+                (Asw."*" (Repeat, Dash),  -- "*"(#, W Str)
+                 Asw."*" (Repeat, Dot))); -- "*"(#, W Unb Str)
 
          if Asw.Trim (Sos, Wide_Maps.Null_Set, Separator_Set) /= Distress then
             Report.Failed ("Incorrect results from Function ""*""");

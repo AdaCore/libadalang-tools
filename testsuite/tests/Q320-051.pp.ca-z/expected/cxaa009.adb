@@ -174,9 +174,10 @@ begin
       -- When subsequent data items are to be added to the file, the file is
       -- opened in Append_File mode.
 
-      Text_Io.Open (Loan_File,                            -- Open with
-      Text_Io.Append_File,                  -- Append mode.
-      Loan_Filename);
+      Text_Io.Open
+        (Loan_File,                            -- Open with
+         Text_Io.Append_File,                  -- Append mode.
+         Loan_Filename);
 
       Update_Loan_Info (Loan_File, Line_Of_Credit_Loan, Transaction_Status);
 
@@ -189,9 +190,10 @@ begin
       -- To add additional data to the file, the file is again opened in
       -- Append_File mode (appending to a file previously appended to).
 
-      Text_Io.Open (Loan_File,                            -- Open with
-      Text_Io.Append_File,                  -- Append mode.
-      Loan_Filename);
+      Text_Io.Open
+        (Loan_File,                            -- Open with
+         Text_Io.Append_File,                  -- Append mode.
+         Loan_Filename);
 
       Update_Loan_Info (Loan_File, Small_Business_Loan, Transaction_Status);
 

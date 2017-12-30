@@ -290,12 +290,15 @@ begin
          Report.Failed ("Incorrect result from Index, non-Identity map - 3");
       end if;
 
-      if B10.Index (B10.To_Bounded_Wide_String ("abcd"),   -- Pattern = Source
-      "abcd") /= 1 or
-        B10.Index (B10.To_Bounded_Wide_String ("abc"),    -- Pattern < Source
-        "abcd") /= 0 or
-        B10.Index (B10.Null_Bounded_Wide_String,         -- Source = Null
-        "abc") /= 0
+      if B10.Index
+          (B10.To_Bounded_Wide_String ("abcd"),   -- Pattern = Source
+           "abcd") /= 1 or
+        B10.Index
+            (B10.To_Bounded_Wide_String ("abc"),    -- Pattern < Source
+             "abcd") /= 0 or
+        B10.Index
+            (B10.Null_Bounded_Wide_String,         -- Source = Null
+             "abc") /= 0
       then
          Report.Failed ("Incorrect result from Index with string patterns");
       end if;
@@ -429,12 +432,15 @@ begin
          Report.Failed ("Incorrect result from Index using Sets - 4");
       end if;
 
-      if B10.Index (B10.To_Bounded_Wide_String ("cd"),   -- Source = Set
-      Cd_Set) /= 1 or
-        B10.Index (B10.To_Bounded_Wide_String ("c"),    -- Source < Set
-        Cd_Set) /= 1 or
-        B10.Index (B10.Null_Bounded_Wide_String,       -- Source = Null
-        Wide_Cd_Set) /= 0 or
+      if B10.Index
+          (B10.To_Bounded_Wide_String ("cd"),   -- Source = Set
+           Cd_Set) /= 1 or
+        B10.Index
+            (B10.To_Bounded_Wide_String ("c"),    -- Source < Set
+             Cd_Set) /= 1 or
+        B10.Index
+            (B10.Null_Bounded_Wide_String,       -- Source = Null
+             Wide_Cd_Set) /= 0 or
         B10.Index (Atoe_Bnd_Str, Maps.To_Set ('x')) /= 0    -- No match.
       then
          Report.Failed ("Incorrect result from Index using Sets - 5");
@@ -477,10 +483,12 @@ begin
              Equiv ("XXX"),
              Maps.Identity) /=
           0 or
-        B10.Count (Atoe_Bnd_Str,                        -- Source = Pattern
-        Equiv ("abcde")) /= 1 or
-        B10.Count (B10.Null_Bounded_Wide_String,        -- Source = Null
-        " ") /= 0
+        B10.Count
+            (Atoe_Bnd_Str,                        -- Source = Pattern
+             Equiv ("abcde")) /= 1 or
+        B10.Count
+            (B10.Null_Bounded_Wide_String,        -- Source = Null
+             " ") /= 0
       then
          Report.Failed ("Incorrect result from function Count, w,w/o mapping");
       end if;
@@ -498,9 +506,15 @@ begin
          Report.Failed ("Incorrect result from function Count, w/map ptr - 1");
       end if;
 
-      if B10.Count (B10.To_Bounded_Wide_String ("DdOoGgod"), "c", Map_Ptr) /=
+      if B10.Count
+          (B10.To_Bounded_Wide_String ("DdOoGgod"),
+           "c",
+           Map_Ptr) /=
         2 or
-        B10.Count (B10.To_Bounded_Wide_String ("dododododo"), "do", Map_Ptr) /=
+        B10.Count
+            (B10.To_Bounded_Wide_String ("dododododo"),
+             "do",
+             Map_Ptr) /=
           0 or
         B10.Count
             (B10.To_Bounded_Wide_String ("Dog or dog"),
@@ -512,13 +526,18 @@ begin
              "ccccc",
              Map_Ptr) /=
           2 or
-        B10.Count (B10.To_Bounded_Wide_String ("do"),    -- Source < Pattern
-        "cat", Map_Ptr) /= 0 or
-        B10.Count (B10.To_Bounded_Wide_String (" dog "), -- Source = Pattern
-        " cat ", Map_Ptr) /=
+        B10.Count
+            (B10.To_Bounded_Wide_String ("do"),    -- Source < Pattern
+             "cat",
+             Map_Ptr) /= 0 or
+        B10.Count
+            (B10.To_Bounded_Wide_String (" dog "), -- Source = Pattern
+             " cat ",
+             Map_Ptr) /=
           1 or
-        B10.Count (B10.Null_Bounded_Wide_String,        -- Source = Null
-        " ", Map_Ptr) /= 0
+        B10.Count
+            (B10.Null_Bounded_Wide_String,        -- Source = Null
+             " ", Map_Ptr) /= 0
       then
          Report.Failed ("Incorrect result from function Count, w/map ptr - 2");
       end if;
@@ -808,8 +827,7 @@ begin
          Drop   => Ada.Strings.Left);
 
       if Test_String /=
-        B10.To_Bounded_Wide_String (Equiv ("cdefxxxxxj"))
-      -- drop a,b
+        B10.To_Bounded_Wide_String (Equiv ("cdefxxxxxj")) -- drop a,b
       then
          Report.Failed
            ("Incorrect result from Procedure Replace Slice, Drop = Left");
@@ -826,8 +844,7 @@ begin
          Drop   => Ada.Strings.Right);
 
       if Test_String /=
-        B10.To_Bounded_Wide_String (Equiv ("xxxxdefghi"))
-       -- drop j
+        B10.To_Bounded_Wide_String (Equiv ("xxxxdefghi"))  -- drop j
       then
          Report.Failed
            ("Incorrect result from Procedure Replace Slice, Drop = Right");

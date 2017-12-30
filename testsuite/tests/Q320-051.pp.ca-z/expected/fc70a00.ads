@@ -44,20 +44,28 @@ package Fc70a00 is
    Zero : constant Complex_Type;                      -- (0,0).
    One  : constant Complex_Type;                      -- (1,0).
 
-   function "-" (Right : Complex_Type)                -- Invert a complex
-   return Complex_Type;                             -- integer.
+   function "-"
+     (Right : Complex_Type)                -- Invert a complex
+      return Complex_Type;                             -- integer.
 
-   function "+" (Left, Right : Complex_Type)          -- Add two complex
-   return Complex_Type;                             -- integers.
+   function "+"
+     (Left,
+      Right : Complex_Type)          -- Add two complex
+      return Complex_Type;                             -- integers.
 
-   function "*" (Left, Right : Complex_Type)          -- Multiply two complex
-   return Complex_Type;                             -- integers.
+   function "*"
+     (Left,
+      Right : Complex_Type)          -- Multiply two complex
+      return Complex_Type;                             -- integers.
 
-   function Reciprocal (Right : Complex_Type)         -- Return the reciprocal
-   return Complex_Type;                             -- of a complex integer.
+   function Reciprocal
+     (Right : Complex_Type)         -- Return the reciprocal
+      return Complex_Type;                             -- of a complex integer.
 
-   function Complex (Real, Imag : Int_Type)           -- Create a complex
-   return Complex_Type;                             -- integer.
+   function Complex
+     (Real,
+      Imag : Int_Type)           -- Create a complex
+      return Complex_Type;                             -- integer.
 
 private
 

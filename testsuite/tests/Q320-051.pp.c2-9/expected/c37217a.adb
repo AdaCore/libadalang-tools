@@ -100,7 +100,7 @@ begin  --C37217A BODY
       begin
          Comment ("OPTIONAL COMBATIBILITY CHECK NOT PERFORMED " & "- UPPER");
          Y := new Rec'(Ident_Int (11),     -- MANDATORY EXCEPTION.
-         Int => (others => Ident_Int (0)));
+              Int => (others => Ident_Int (0)));
          Failed ("CONSTRAINT ERROR NOT RAISED");
 
          if Ident_Int (Y.Int (Ident_Int (1))) /= 11 then

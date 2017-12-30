@@ -32,19 +32,19 @@ procedure C431001 is
    -- Positional component associations
    Album1 : C431001_0.Vinyl :=
      ("Hammer              ", -- Artist
-     C431001_0.Rap,          -- Category
-     46.2,                   -- Length
-     9,                      -- Selections
-     C431001_0.Lp_33);       -- Speed
+      C431001_0.Rap,          -- Category
+      46.2,                   -- Length
+      9,                      -- Selections
+      C431001_0.Lp_33);       -- Speed
 
    -- Mixed positional and named component associations Named component
    -- associations out of order
    Album2 : C431001_0.Vinyl :=
      ("Balinese Gamelan    ", -- Artist
-     C431001_0.World,        -- Category
-     42.6,                   -- Length
-     14,                     -- Selections
-     C431001_0.Lp_33);       -- Speed
+      C431001_0.World,        -- Category
+      42.6,                   -- Length
+      14,                     -- Selections
+      C431001_0.Lp_33);       -- Speed
 
    -- Type extension, parent is also type extension Named notation, components
    -- out of order
@@ -131,7 +131,8 @@ begin
      (C431001_0.Catalog_Entry
         (Tc_Type => C431001_0.Tc_Vinyl,
          R       =>
-           C431001_0.Vinyl'
+           C431001_0
+             .Vinyl'
              ("Davis, Miles        ",  -- Artist
               C431001_0.Jazz,         -- Category
               50.4,                   -- Length
@@ -144,7 +145,8 @@ begin
      (C431001_0.Catalog_Entry
         (Tc_Type => C431001_0.Tc_Vinyl,
          R       =>
-           C431001_0.Vinyl'
+           C431001_0
+             .Vinyl'
              ("Zamfir              ",    -- Artist
               C431001_0.World,          -- Category
               Speed      => C431001_0.Lp_33,

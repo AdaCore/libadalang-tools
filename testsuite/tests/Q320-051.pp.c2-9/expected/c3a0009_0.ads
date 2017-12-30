@@ -61,8 +61,9 @@ package C3a0009_0 is -- Push_Buttons
 
    procedure Push (B : in out Button);               -- to be inherited
 
-   procedure Set_Response (B : in out Button;        -- to be inherited
-   R                         : in     Button_Response_Ptr);
+   procedure Set_Response
+     (B : in out Button;        -- to be inherited
+      R : in     Button_Response_Ptr);
 
    procedure Default_Response (B : in out Button);  -- to be inherited
 

@@ -113,8 +113,9 @@ begin
 
       -- Attach a different handler:
 
-      Ai.Attach_Handler (Old_Handler, -- Designates Dynamic1.Handler.
-      Impdef.Annex_C.Interrupt_To_Generate);
+      Ai.Attach_Handler
+        (Old_Handler, -- Designates Dynamic1.Handler.
+         Impdef.Annex_C.Interrupt_To_Generate);
 
       -- Attach yet a different user handler:
 

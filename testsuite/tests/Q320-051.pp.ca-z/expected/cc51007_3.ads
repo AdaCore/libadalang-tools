@@ -6,8 +6,9 @@ generic
    Initial_State : in Alert_Type;
 package Cc51007_3 is
 
-   function Clear_Message (A : Alert_Type)                -- Function returning
-   return Alert_Type;                                  -- formal type.
+   function Clear_Message
+     (A : Alert_Type)                -- Function returning
+      return Alert_Type;                                  -- formal type.
 
    Max_Note : Natural := 10;
    type Note is new String (1 .. Max_Note);
@@ -19,8 +20,9 @@ package Cc51007_3 is
    -- In instance, inherits version of Handle from actual corresponding to
    -- formal type.
 
-   function Annotate_Alert (A : in Alert_Type'Class)      -- Function returning
-   return Extended_Alert;                              -- derived type.
+   function Annotate_Alert
+     (A : in Alert_Type'Class)      -- Function returning
+      return Extended_Alert;                              -- derived type.
 
    Init_Ext_Alert : constant Extended_Alert :=       -- Object declaration.
      (Initial_State with Addendum => "----------");      -- Aggregate.

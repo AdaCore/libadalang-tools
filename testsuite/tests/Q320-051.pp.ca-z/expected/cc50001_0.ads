@@ -62,8 +62,10 @@ package Cc50001_0 is
       Count : Integer := 0;                             -- tagged type.
    end record;
 
-   function "=" (Left, Right : Count_Type)               -- User-defined
-   return Boolean;                                    -- equality operator.
+   function "="
+     (Left,
+      Right : Count_Type)               -- User-defined
+      return Boolean;                                    -- equality operator.
 
    subtype Str_Len is Natural range 0 .. 100;
    subtype Stu_Id is String (1 .. 5);
@@ -88,8 +90,10 @@ package Cc50001_0 is
       end case;
    end record;
 
-   function "=" (Left, Right : Person_Type)              -- User-defined
-   return Boolean;                                    -- equality operator.
+   function "="
+     (Left,
+      Right : Person_Type)              -- User-defined
+      return Boolean;                                    -- equality operator.
 
    -- Testing entities: ------------------------------------------------
 

@@ -65,8 +65,10 @@ package Ca11013_0 is
       Imag : Real_Type;
    end record;
 
-   function Make (Real, Imag : Real_Type)           -- Create a complex
-   return Complex_Type;                           -- number.
+   function Make
+     (Real,
+      Imag : Real_Type)           -- Create a complex
+      return Complex_Type;                           -- number.
 
    procedure Components
      (Complex_No           : in     Complex_Type;

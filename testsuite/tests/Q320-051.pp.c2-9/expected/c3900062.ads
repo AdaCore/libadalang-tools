@@ -76,7 +76,8 @@ package C3900062 is  -- Further extended alert system abstraction.
      return Boolean;                                    -- Override parent's
    -- primitive subprog.
 
-   function Bad_Final_Values (Ma : in Medium_Alert_Type) -- Override parent's
-   return Boolean;                                    -- primitive subprog.
+   function Bad_Final_Values
+     (Ma : in Medium_Alert_Type) -- Override parent's
+      return Boolean;                                    -- primitive subprog.
 
 end C3900062;

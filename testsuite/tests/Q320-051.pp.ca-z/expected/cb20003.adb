@@ -25,8 +25,9 @@ begin
    -- a specific handler here.
    begin
 
-      Push_Buttons.Push (Console_Button,        -- Raise exception that will
-      Report.Ident_Int (2));  -- be handled in procedure.
+      Push_Buttons.Push
+        (Console_Button,        -- Raise exception that will
+         Report.Ident_Int (2));  -- be handled in procedure.
    exception
       when Push_Buttons.Non_Default_Priority =>
          if not Push_Buttons.Handled_With_Others then   -- Not reraised in
@@ -45,8 +46,9 @@ begin
         (Console_Button,
          Push_Buttons.Alert_Response'Access);
 
-      Push_Buttons.Push (Console_Button,        -- Raise exception that will
-      Report.Ident_Int (4));  -- be handled in procedure,
+      Push_Buttons.Push
+        (Console_Button,        -- Raise exception that will
+         Report.Ident_Int (4));  -- be handled in procedure,
       -- reraised, and propagated
       -- to caller.
       Report.Failed
@@ -71,8 +73,9 @@ begin
         (Console_Button,
          Push_Buttons.Emergency_Response'Access);
 
-      Push_Buttons.Push (Console_Button,        -- Raise exception that will
-      Report.Ident_Int (6));  -- be propagated directly to
+      Push_Buttons.Push
+        (Console_Button,        -- Raise exception that will
+         Report.Ident_Int (6));  -- be propagated directly to
       -- caller.
       Report.Failed
         ("Exception not propagated to caller " &

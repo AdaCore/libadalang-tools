@@ -57,8 +57,9 @@ package C3900051 is  -- Extended alert system abstraction.
    procedure Handle (La : in out Low_Alert_Type);       -- Override parent's
    -- primitive subprog.
 
-   procedure Set_Level (La : in out Low_Alert_Type;     -- To be inherited by
-   L                       : in     Integer);           -- all derivatives.
+   procedure Set_Level
+     (La : in out Low_Alert_Type;     -- To be inherited by
+      L  : in     Integer);           -- all derivatives.
 
    -- The following functions are needed to verify the values of the
    -- extension's private components.
@@ -70,8 +71,9 @@ package C3900051 is  -- Extended alert system abstraction.
      return Boolean;                                    -- Override parent's
    -- primitive subprog.
 
-   function Bad_Final_Values (La : in Low_Alert_Type)   -- Override parent's
-   return Boolean;                                    -- primitive subprog.
+   function Bad_Final_Values
+     (La : in Low_Alert_Type)   -- Override parent's
+      return Boolean;                                    -- primitive subprog.
 
 private
 

@@ -53,36 +53,36 @@ package Report is
    procedure Test           -- THIS ROUTINE MUST BE INVOKED AT THE
    -- START OF A TEST, BEFORE ANY OF THE OTHER REPORT ROUTINES ARE INVOKED. IT
    -- SAVES THE TEST NAME AND OUTPUTS THE NAME AND DESCRIPTION.
-   (Name : String;      -- TEST NAME, E.G., "C23001A-AB".
-   Descr : String      -- BRIEF DESCRIPTION OF TEST, E.G.,
-   -- "UPPER/LOWER CASE EQUIVALENCE IN " & "IDENTIFIERS".
+     (Name  : String;      -- TEST NAME, E.G., "C23001A-AB".
+      Descr : String      -- BRIEF DESCRIPTION OF TEST, E.G.,
+      -- "UPPER/LOWER CASE EQUIVALENCE IN " & "IDENTIFIERS".
    );
 
    procedure Failed         -- OUTPUT A FAILURE MESSAGE.  SHOULD BE
    -- INVOKED SEPARATELY TO REPORT THE FAILURE OF EACH SUBTEST WITHIN A TEST.
-   (Descr : String      -- BRIEF DESCRIPTION OF WHAT FAILED.
-   -- SHOULD BE PHRASED AS:
+     (Descr : String      -- BRIEF DESCRIPTION OF WHAT FAILED.
+     -- SHOULD BE PHRASED AS:
    -- "(FAILED BECAUSE) ...REASON...".
    );
 
    procedure Not_Applicable -- OUTPUT A NOT-APPLICABLE MESSAGE.
    -- SHOULD BE INVOKED SEPARATELY TO REPORT THE NON-APPLICABILITY OF EACH
    -- SUBTEST WITHIN A TEST.
-   (Descr : String      -- BRIEF DESCRIPTION OF WHAT IS
-   -- NOT-APPLICABLE. SHOULD BE PHRASED AS: "(NOT-APPLICABLE
+     (Descr : String      -- BRIEF DESCRIPTION OF WHAT IS
+     -- NOT-APPLICABLE. SHOULD BE PHRASED AS: "(NOT-APPLICABLE
    -- BECAUSE)...REASON...".
    );
 
    procedure Special_Action -- OUTPUT A MESSAGE DESCRIBING SPECIAL
    -- ACTIONS TO BE TAKEN.
    -- SHOULD BE INVOKED SEPARATELY TO GIVE EACH SPECIAL ACTION.
-   (Descr : String      -- BRIEF DESCRIPTION OF ACTION TO BE
-   -- TAKEN.
+     (Descr : String      -- BRIEF DESCRIPTION OF ACTION TO BE
+     -- TAKEN.
    );
 
    procedure Comment        -- OUTPUT A COMMENT MESSAGE.
-   (Descr : String      -- THE MESSAGE.
-   );
+     (Descr : String      -- THE MESSAGE.
+     );
 
    procedure Result;        -- THIS ROUTINE MUST BE INVOKED AT THE
    -- END OF A TEST. IT OUTPUTS A MESSAGE INDICATING WHETHER THE TEST AS A
@@ -94,35 +94,35 @@ package Report is
    -- EVEN WITH STATIC ARGUMENTS, THESE FUNCTIONS WILL HAVE DYNAMIC RESULTS.
 
    function Ident_Int       -- AN IDENTITY FUNCTION FOR TYPE INTEGER.
-   (X : Integer         -- THE ARGUMENT.
-   ) return Integer;     -- X.
+     (X : Integer         -- THE ARGUMENT.
+     ) return Integer;     -- X.
 
    function Ident_Char      -- AN IDENTITY FUNCTION FOR TYPE
    -- CHARACTER.
-   (X : Character       -- THE ARGUMENT.
-   ) return Character;   -- X.
+     (X : Character       -- THE ARGUMENT.
+     ) return Character;   -- X.
 
    function Ident_Wide_Char -- AN IDENTITY FUNCTION FOR TYPE
    -- WIDE_CHARACTER.
-   (X : Wide_Character  -- THE ARGUMENT.
-   ) return Wide_Character; -- X.
+     (X : Wide_Character  -- THE ARGUMENT.
+     ) return Wide_Character; -- X.
 
    function Ident_Bool      -- AN IDENTITY FUNCTION FOR TYPE BOOLEAN.
-   (X : Boolean         -- THE ARGUMENT.
-   ) return Boolean;     -- X.
+     (X : Boolean         -- THE ARGUMENT.
+     ) return Boolean;     -- X.
 
    function Ident_Str       -- AN IDENTITY FUNCTION FOR TYPE STRING.
-   (X : String          -- THE ARGUMENT.
-   ) return String;      -- X.
+     (X : String          -- THE ARGUMENT.
+     ) return String;      -- X.
 
    function Ident_Wide_Str  -- AN IDENTITY FUNCTION FOR TYPE WIDE_STRING.
-   (X : Wide_String     -- THE ARGUMENT.
-   ) return Wide_String; -- X.
+     (X : Wide_String     -- THE ARGUMENT.
+     ) return Wide_String; -- X.
 
    function Equal           -- A RECURSIVE EQUALITY FUNCTION FOR TYPE
    -- INTEGER.
-   (X, Y : Integer      -- THE ARGUMENTS.
-   ) return Boolean;     -- X = Y.
+     (X, Y : Integer      -- THE ARGUMENTS.
+     ) return Boolean;     -- X = Y.
 
 -- OTHER UTILITY ROUTINES.
 
@@ -134,6 +134,6 @@ package Report is
 
    function Time_Stamp      -- A FUNCTION TO GENERATE THE TIME AND
    -- DATE TO PLACE IN THE OUTPUT OF AN ACVC TEST.
-   return String;      -- THE TIME AND DATE.
+     return String;      -- THE TIME AND DATE.
 
 end Report;

@@ -48,10 +48,13 @@
 
 package Fa11d00.Ca11d010 is     -- Add_Subtract_Complex
 
-   procedure Add (Left, Right : in     Complex_Type;   -- Add two complex
-   C                          :    out Complex_Type);  -- numbers.
+   procedure Add
+     (Left, Right : in     Complex_Type;   -- Add two complex
+      C           :    out Complex_Type);  -- numbers.
 
-   function Subtract (Left, Right : Complex_Type)      -- Subtract two
-   return Complex_Type;                              -- complex numbers.
+   function Subtract
+     (Left,
+      Right : Complex_Type)      -- Subtract two
+      return Complex_Type;                              -- complex numbers.
 
 end Fa11d00.Ca11d010;     -- Add_Subtract_Complex

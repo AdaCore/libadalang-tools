@@ -158,8 +158,9 @@ begin
             (Asw.To_Unbounded_Wide_String (Equiv ("abc")),  -- Pat < Src
              Equiv ("abcd")) /=
           0 or
-        Asw.Index (Asw.Null_Unbounded_Wide_String,       -- Src = Null
-        Equiv ("abc")) /= 0
+        Asw.Index
+            (Asw.Null_Unbounded_Wide_String,       -- Src = Null
+             Equiv ("abc")) /= 0
       then
          Report.Failed
            ("Incorrect result from Index with wide string patterns");
@@ -216,14 +217,15 @@ begin
       -- Default direction (forward) and mapping (identity).
 
       if Asw.Index
-          (Asw.To_Unbounded_Wide_String (Equiv ("cd")),
-           -- Source = Set
-      Cd_Set) /=
+          (Asw.To_Unbounded_Wide_String (Equiv ("cd")), -- Source = Set
+           Cd_Set) /=
         1 or
-        Asw.Index (Asw.To_Unbounded_Wide_String (Equiv ("c")), -- Source < Set
-        Cd_Set) /= 1 or
-        Asw.Index (Asw.Null_Unbounded_Wide_String,           -- Source = Null
-        Cd_Set) /= 0 or
+        Asw.Index
+            (Asw.To_Unbounded_Wide_String (Equiv ("c")), -- Source < Set
+             Cd_Set) /= 1 or
+        Asw.Index
+            (Asw.Null_Unbounded_Wide_String,           -- Source = Null
+             Cd_Set) /= 0 or
         Asw.Index (Atoe_Str, Wide_Maps.Null_Set) /= 0 or       -- Null set
         Asw.Index (Atoe_Str, Wide_Maps.To_Set (Equiv ('x'))) /=
           0   -- No match.
@@ -349,10 +351,12 @@ begin
              Equiv ("XXX"),
              Wide_Maps.Identity) /=
           0 or
-        Asw.Count (Atoe_Str,                              -- Source = Pattern
-        Equiv ("abcde")) /= 1 or
-        Asw.Count (Asw.Null_Unbounded_Wide_String,        -- Source = Null
-        Equiv (" ")) /= 0
+        Asw.Count
+            (Atoe_Str,                              -- Source = Pattern
+             Equiv ("abcde")) /= 1 or
+        Asw.Count
+            (Asw.Null_Unbounded_Wide_String,        -- Source = Null
+             Equiv (" ")) /= 0
       then
          Report.Failed ("Incorrect result from function Count, w,w/o mapping");
       end if;
@@ -397,8 +401,9 @@ begin
              Equiv ("XX "),
              Map_Ptr) /=
           0 or
-        Asw.Count (Atoe_Str,               -- Source'Length = Pattern'Length
-        Equiv ("  cde"), Map_Ptr) /= 1
+        Asw.Count
+            (Atoe_Str,               -- Source'Length = Pattern'Length
+             Equiv ("  cde"), Map_Ptr) /= 1
       then
          Report.Failed
            ("Incorrect result from function Count, access value map - 3");

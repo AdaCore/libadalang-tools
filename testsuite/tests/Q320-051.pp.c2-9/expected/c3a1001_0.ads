@@ -87,14 +87,14 @@ package C3a1001_0 is
    -- inherited discriminant
 
    protected type Incomplete5                      -- unknown discriminant/
-   (Disc : Enu_Type) is                          -- explicit discriminant
+     (Disc : Enu_Type) is                          -- explicit discriminant
       function Get_Priv_Val return Enu_Type;
    private
       Enu_Obj : Enu_Type := Disc;
    end Incomplete5;
 
    protected type Incomplete6                      -- no discriminant/
-   (Disc : Small_Int := 1) is                    -- explicit discriminant
+     (Disc : Small_Int := 1) is                    -- explicit discriminant
       function Get_Priv_Val return Small_Int;    -- with default
    private
       Num : Small_Int := Disc;

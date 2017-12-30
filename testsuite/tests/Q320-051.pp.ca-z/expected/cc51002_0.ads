@@ -57,8 +57,9 @@ package Cc51002_0 is  -- Root message type and operations.
       Text : String (1 .. 10);                                -- class.
    end record;
 
-   function Send (Msg : in Msg_Type;                          -- Primitive
-   To                 :    Recipients := Local) return Boolean;  -- subprogram.
+   function Send
+     (Msg : in Msg_Type;                          -- Primitive
+      To  :    Recipients := Local) return Boolean;  -- subprogram.
 
    -- ...Other message operations.
 

@@ -162,7 +162,7 @@ begin
          Result :=
            Storage_Item.Unit_Array'Last +           -- 5 +
            Storage_Item.Unit_Array                  -- 9
-           (Storage_Item.Unit_Array'First)
+             (Storage_Item.Unit_Array'First)
              .String_Value'
              Length;
 
@@ -221,7 +221,7 @@ begin
          Result :=
            Storage_Item.Unit_Array'Last +           -- 5 +
            Storage_Item.Unit_Array                  -- 9
-           (Storage_Item.Unit_Array'First)
+             (Storage_Item.Unit_Array'First)
              .String_Value'
              Length;
 

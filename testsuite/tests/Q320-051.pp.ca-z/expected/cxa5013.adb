@@ -265,8 +265,9 @@ begin
       Tc_Success  := False;
       while Tc_Test_Run < Tc_Finite_Number_Of_Tests and not Tc_Success loop
          Tc_Test_Run := Tc_Test_Run + 1;            -- Increment test counter.
-         Discrete_Random_Test (Tc_Trials_Per_Test,  -- Perform test.
-         Tc_Success);
+         Discrete_Random_Test
+           (Tc_Trials_Per_Test,  -- Perform test.
+            Tc_Success);
          -- Increment the number of trials that will be performed in the next
          -- test by 50%.
          Tc_Trials_Per_Test := Tc_Trials_Per_Test + Tc_Trials_Per_Test / 2;

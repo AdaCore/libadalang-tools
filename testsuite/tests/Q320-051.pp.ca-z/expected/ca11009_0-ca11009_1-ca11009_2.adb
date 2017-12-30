@@ -11,8 +11,9 @@
       return (File_Descriptor_Type (File_Counter));
    end Next_Available_File;
    -------------------------------------------------------------------------
-   function Create (Mode : File_Mode_Type)           -- Grandparent literal.
-   return File_Descriptor_Type is
+   function Create
+     (Mode : File_Mode_Type)           -- Grandparent literal.
+      return File_Descriptor_Type is
       Number : File_Descriptor_Type;                 -- Grandparent type.
    begin
       Number                             := Next_Available_File;

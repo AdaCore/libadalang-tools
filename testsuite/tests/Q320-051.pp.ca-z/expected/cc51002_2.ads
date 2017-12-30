@@ -12,8 +12,9 @@ package Cc51002_2 is  -- Extended message type and operations.
    -- Note: this overriding version of Send has different parameter names from
    -- the root type's function. It also has no default expression.
 
-   function Send (M : Who_Msg_Type;                          -- Overrides
-   R                : Cc51002_0.Recipients) return Boolean;  -- root type's
+   function Send
+     (M : Who_Msg_Type;                          -- Overrides
+      R : Cc51002_0.Recipients) return Boolean;  -- root type's
    -- operation.
    -- ...Other extended message operations.
 

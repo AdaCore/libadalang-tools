@@ -17,8 +17,9 @@ package C393011_1 is
    end record;
    -- Alert_Type is an abstract type with two operations to be overridden
 
-   procedure Set_Status (A : in out Alert_Type;          -- not abstract
-   To                      :        Definitions.Status_Enum);
+   procedure Set_Status
+     (A  : in out Alert_Type;          -- not abstract
+      To :        Definitions.Status_Enum);
 
    procedure Set_Serial (A : in out Alert_Type) is abstract;
    procedure Display (A : Alert_Type) is abstract;

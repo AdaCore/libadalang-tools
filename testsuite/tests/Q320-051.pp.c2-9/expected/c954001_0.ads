@@ -76,8 +76,9 @@ package C954001_0 is  -- Disk management abstraction.
 
    protected Disk_Device is
 
-      entry Read (Where :     Disk_Address;            -- Read data from disk
-      Data              : out Disk_Buffer);            -- track.
+      entry Read
+        (Where :     Disk_Address;            -- Read data from disk
+         Data  : out Disk_Buffer);            -- track.
 
       procedure Disk_Interrupt;                        -- Handle interrupt
       -- from disk.
@@ -89,8 +90,9 @@ package C954001_0 is  -- Disk management abstraction.
 
    private
 
-      entry Pending_Read (Where :     Disk_Address;    -- Wait for head to
-      Data                      : out Disk_Buffer);    -- move then read data.
+      entry Pending_Read
+        (Where :     Disk_Address;    -- Wait for head to
+         Data  : out Disk_Buffer);    -- move then read data.
 
       Current_Track     : Disk_Track := Initial_Track; -- Current disk track.
       Operation_Pending : Boolean    := False;         -- Vis.  entry barrier.

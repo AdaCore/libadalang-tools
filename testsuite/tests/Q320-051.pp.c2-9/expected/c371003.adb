@@ -197,7 +197,7 @@ begin
       begin
          declare
             subtype Subtype_Vrec is             -- No Constraint_Error raised.
-            Vrec_Of_Vrec_01 (Report.Ident_Int (1));
+              Vrec_Of_Vrec_01 (Report.Ident_Int (1));
          begin
             declare
                Vobj_4 : Subtype_Vrec;           -- Constraint_Error raised.

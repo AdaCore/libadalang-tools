@@ -62,12 +62,12 @@ private
    end record;
 
    System_Account : User_Account :=
-     (User_Id  => Administrator_Account.User_Id,          -- Parent constant.
-     Privilege => System);                                -- User_ID has been
+     (User_Id   => Administrator_Account.User_Id,          -- Parent constant.
+      Privilege => System);                                -- User_ID has been
    -- set to 1.
    Auditor_Account : User_Account :=
-     (User_Id  => Next_Available_Id,                      -- Parent function.
-     Privilege => System);                                -- User_ID has been
+     (User_Id   => Next_Available_Id,                      -- Parent function.
+      Privilege => System);                                -- User_ID has been
    -- set to 2.
    Total_Authorized_Accounts : System_Account_Capacity renames
      Total_Accounts;                               -- Parent object.

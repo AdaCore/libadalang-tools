@@ -31,7 +31,7 @@ package body C3900060 is
    function Initial_Values_Okay (A : in Alert_Type) return Boolean is
    begin
       return (A = (Arrival_Time => Default_Time,         -- Check "=" operator
-      Display_On                => Null_Device));        -- availability.
+          Display_On            => Null_Device));        -- availability.
    end Initial_Values_Okay;                              -- Aggregate with
    -- named associations.
 

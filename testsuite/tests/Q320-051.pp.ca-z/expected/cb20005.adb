@@ -52,7 +52,7 @@ begin
          when Semaphore.Resource_Overflow =>
             Semaphore.Handled_In_Function := False; -- Exception not handled
             Report.Failed                        -- in prot. operation.
-            ("Resource overflow not handled by function");
+              ("Resource overflow not handled by function");
          when others =>
             Report.Failed ("Exception raised during resource deallocation");
       end Deallocate_Resources;

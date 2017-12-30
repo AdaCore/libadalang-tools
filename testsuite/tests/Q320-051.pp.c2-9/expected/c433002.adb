@@ -307,11 +307,11 @@ begin
 
    begin
       Subtest_Check_1
-        ((5  => Ident_Int (88),
-          8  => <>,
-          10 => <>,
-          -- 10 not in applicable index constraint
-        others => <>),
+        (
+         (5      => Ident_Int (88),
+          8      => <>,
+          10     => <>, -- 10 not in applicable index constraint
+          others => <>),
          First_Component  => 88,
          Second_Component => 0,
          Last_Component   => 0,
@@ -326,8 +326,9 @@ begin
 
    begin
       Subtest_Check_2
-        ((Yellow => <>, -- Yellow not in applicable index constraint.
-        Blue     => <>, others => 77),
+        (
+         (Yellow => <>, -- Yellow not in applicable index constraint.
+          Blue   => <>, others => 77),
          First_Component  => 77,
          Second_Component => 0,
          Last_Component   => 77,
@@ -342,7 +343,8 @@ begin
 
    begin
       Subtest_Check_3
-        ((Orange => (0, others => <>),
+        (
+         (Orange => (0, others => <>),
           Blue   => (2, 3, others => <>), -- Blue not in applicable index cons.
           others => (1, 2, 3)),
          Test_Case => 'P');

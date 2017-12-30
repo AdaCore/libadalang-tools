@@ -105,8 +105,9 @@ package C392d03_0 is
 
 private
 
-   procedure Focus (C : in out Auto_Focus;              -- Overrides
-   Depth              : in     F392d00.Depth_Of_Field); -- parent's op.
+   procedure Focus
+     (C     : in out Auto_Focus;              -- Overrides
+      Depth : in     F392d00.Depth_Of_Field); -- parent's op.
 
    -- For the improved remote camera, focus is set automatically, so it is
    -- declared as a private operation.
