@@ -1001,6 +1001,9 @@ package body Pp.Formatting is
 
          Src_Tok, Out_Tok : Token;
 
+         Start_Line_Src_Tok : Token := Src_Tokens (1);
+         --  Token at the beginning of the previous line, but never a comment
+
          function L_Paren_Indentation_For_Preserve return Natural;
          --  In --preserve-line-breaks mode, this is the amount of additional
          --  indentation needed to make lines start just after a "(" on the
@@ -1342,6 +1345,18 @@ package body Pp.Formatting is
             function Look_Before return Boolean is
             begin
                if Kind (Out_Tok) = End_Of_Input then
+                  return True;
+               end if;
+
+               --  If we have a comment lined up with the preceding line, with
+               --  no blank lines in between, then we try to keep it lined up,
+               --  even if "begin" (etc) follows.
+
+               pragma Assert
+                 (Sloc (Start_Line_Src_Tok).Line < Sloc (Src_Tok).Line);
+               if Sloc (Start_Line_Src_Tok).Line = Sloc (Src_Tok).Line - 1
+                 and then Sloc (Start_Line_Src_Tok).Col = Sloc (Src_Tok).Col
+               then
                   return True;
                end if;
 
@@ -1838,6 +1853,12 @@ package body Pp.Formatting is
                     ("Inserting", Lines_Data, Src_Buf,
                      Src_Index, Out_Index, Src_Tok, Out_Tok);
                end if;
+            end if;
+
+            if Kind (Src_Tok) not in Comment_Kind
+              and then Sloc (Src_Tok).Line /= Sloc (Start_Line_Src_Tok).Line
+            then
+               Start_Line_Src_Tok := Src_Tok;
             end if;
 
             Manage_Paren_Stack;

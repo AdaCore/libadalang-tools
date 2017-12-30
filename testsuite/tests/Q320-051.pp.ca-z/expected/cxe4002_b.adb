@@ -49,7 +49,7 @@ begin
       Cxe4002_Part_A1.Decr (A, B, C);
       if A = 5 and B = 1.0 and C = -2 then
          null;
-      -- Report.Comment ("finished simple parameter passing");
+         -- Report.Comment ("finished simple parameter passing");
       else
          Report.Failed ("IN OUT parameters not returned properly");
       end if;
@@ -89,7 +89,7 @@ begin
       Result := (Twos + Ones) + Twos;
       if Result = Fives then
          null;
-      -- Report.Comment ("array parameter and function result");
+         -- Report.Comment ("array parameter and function result");
       else
          Report.Failed
            ("incorrect array parameters and/or" & " array function results");

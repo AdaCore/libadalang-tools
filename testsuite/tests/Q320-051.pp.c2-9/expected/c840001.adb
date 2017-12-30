@@ -27,8 +27,8 @@ begin
       Tc_Actual_Subtype : C840001_1.Precision_Pos_Float;
 
       use type C840001_1.Precision_Pos_Float;
-   -- Both calls to "**" should return 68.0 (that is, Precision_Float's
-   -- operation should be called).
+      -- Both calls to "**" should return 68.0 (that is, Precision_Float's
+      -- operation should be called).
 
    begin
 
@@ -60,7 +60,7 @@ begin
       Tc_Actual_Subtype : C840001_1.Precision_Pos_Float;
 
       use type C840001_0.Precision_Float;
-   -- Again, both calls to "**" should return 68.0.
+      -- Again, both calls to "**" should return 68.0.
 
    begin
 

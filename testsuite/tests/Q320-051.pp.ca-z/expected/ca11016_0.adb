@@ -29,7 +29,7 @@ package body Ca11016_0 is
    begin
       return (Map (Lat, Long));
    end Get_Physical_Feature;
---------------------------------------------------------
+   --------------------------------------------------------
 
 begin
    -- Initialize a basic map.

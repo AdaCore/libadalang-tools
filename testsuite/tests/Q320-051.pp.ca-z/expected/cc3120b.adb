@@ -81,9 +81,9 @@ begin
       package body P is
          procedure Updt (Tparm : in T; I : in out Integer) is
             V : Integer := I;
-         -- UPDT.I => V
-         -- T1.I => UPDT.I
-         -- V => T1.I
+            -- UPDT.I => V
+            -- T1.I => UPDT.I
+            -- V => T1.I
          begin
             Tparm.C.Get (I);
             Tparm.C.Put (V);

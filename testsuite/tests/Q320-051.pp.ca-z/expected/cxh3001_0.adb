@@ -5,8 +5,8 @@ package body Cxh3001_0 is
 
    procedure P (R : Root) is
       Warnable : Positive := 0; -- (7)                      -- OPTIONAL WARNING
-   -- this would raise Constraint_Error if P were ever called, however this
-   -- test never calls P.
+      -- this would raise Constraint_Error if P were ever called, however this
+      -- test never calls P.
    begin
       case R.Disc is
          when Item =>

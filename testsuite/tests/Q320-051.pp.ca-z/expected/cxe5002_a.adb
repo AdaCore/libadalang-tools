@@ -40,7 +40,7 @@ begin
    end;
    if Cxe5002_State.Remote_Call_Occurred then
       null;
-   -- Report.Comment ("Remote call went through System.RPC");
+      -- Report.Comment ("Remote call went through System.RPC");
    else
       Report.Failed ("Remote call did not go through System.RPC");
    end if;
@@ -59,7 +59,7 @@ begin
    end;
    if Cxe5002_State.Remote_Call_Occurred then
       null;
-   -- Report.Comment ("Remote async call went through System.RPC");
+      -- Report.Comment ("Remote async call went through System.RPC");
    else
       Report.Failed ("Remote async call did not go through System.RPC");
    end if;
@@ -80,7 +80,7 @@ begin
    end;
    if Cxe5002_State.Remote_Call_Occurred then
       null;
-   -- Report.Comment ("Local remote call went through System.RPC");
+      -- Report.Comment ("Local remote call went through System.RPC");
    else
       Report.Failed ("Local remote call did not go through System.RPC");
    end if;

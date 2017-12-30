@@ -95,8 +95,8 @@ package body Cxe4003_Part_B1 is
          when 1 =>
             -- this is the desired result
             null;
-         -- Report.Comment ("all aborted remote calls were cancelled for " &
-         --                 Name & " test");
+            -- Report.Comment ("all aborted remote calls were cancelled for " &
+            --                 Name & " test");
          when 11 =>
             -- undesirable but not illegal.
             Report.Comment

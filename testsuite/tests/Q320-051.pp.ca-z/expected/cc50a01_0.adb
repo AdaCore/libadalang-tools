@@ -26,7 +26,7 @@ package body Cc50a01_0 is
    begin
       if S.Top = null then                          -- Stack is empty.
          null;
-      -- Raise exception.
+         -- Raise exception.
       else
          S.Top  := S.Top.Next;
          S.Size := S.Size - 1;
@@ -50,7 +50,7 @@ package body Cc50a01_0 is
    begin
       if S.Top = null then                          -- Stack is empty.
          return Tc_Default_Value;                   -- Testing artifice.
-      -- Raise exception.
+         -- Raise exception.
       else
          return Item (S.Top.all);                    -- Type conversion.
       end if;

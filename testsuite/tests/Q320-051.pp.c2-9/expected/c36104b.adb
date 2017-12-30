@@ -78,7 +78,7 @@ begin
    begin
       declare
          type A is array (I_5 range 0 .. 6) of I_5;
-      -- ABOVE DECLARATION RAISES CONSTRAINT_ERROR.
+         -- ABOVE DECLARATION RAISES CONSTRAINT_ERROR.
       begin
          declare
             -- DEFINE AN OBJECT OF TYPE A AND USE IT TO AVOID OPTIMIZATION OF
@@ -121,7 +121,7 @@ begin
    begin
       declare
          type P is access I_5_Array (0 .. 6);
-      -- ABOVE DECLARATION RAISES CONSTRAINT_ERROR.
+         -- ABOVE DECLARATION RAISES CONSTRAINT_ERROR.
       begin
          declare
             type Pa is new P;
@@ -188,7 +188,7 @@ begin
    begin
       declare
          W : Week_Array (Mid_Week range Mon .. Fri);
-      -- ELABORATION OF ABOVE RAISES CONSTRAINT_ERROR.
+         -- ELABORATION OF ABOVE RAISES CONSTRAINT_ERROR.
       begin
          W (Wed) := Thu;        -- OK.
          Failed
@@ -205,7 +205,7 @@ begin
    begin
       declare
          type W is new Week_Array (Mid_Week range Sun .. Wed);
-      -- RAISES CONSTRAINT_ERROR.
+         -- RAISES CONSTRAINT_ERROR.
       begin
          declare
             X : W;              -- OK.
@@ -229,7 +229,7 @@ begin
    begin
       declare
          subtype W is Week_Array (Mid_Week range Mon .. Thu);
-      -- RAISES CONSTRAINT_ERROR.
+         -- RAISES CONSTRAINT_ERROR.
       begin
          declare
             T : W;               -- OK.

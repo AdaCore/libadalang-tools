@@ -63,8 +63,8 @@ procedure C760011 is
             Report.Failed ("Subtest_1_Local_3 Optimization Foil: Bad Data!");
          end if;
       end Subtest_1_Local_3;
-   -- Only controlled components of An_Object must be finalized; it is an error
-   -- to call Finalize for An_Object
+      -- Only controlled components of An_Object must be finalized; it is an
+      -- error to call Finalize for An_Object
 
    begin
       Subtest_1_Local_1;

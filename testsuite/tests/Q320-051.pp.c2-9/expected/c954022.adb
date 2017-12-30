@@ -255,7 +255,7 @@ begin
             if Segment.Seg_Sequence_No = Next_Needed then
                if Segment.Eom then
                   Next_Needed := Header;  -- reset for next message
-               -- :: other resets not shown
+                  -- :: other resets not shown
                else
                   Next_Needed := Next_Needed + 1;
                end if;

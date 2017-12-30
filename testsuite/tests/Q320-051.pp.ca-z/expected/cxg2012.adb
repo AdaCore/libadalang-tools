@@ -227,11 +227,11 @@ procedure Cxg2012 is
          A : constant Real := 1.0 / Real (Real'Machine_Radix);
          B : constant Real := 1.0;
          X : Real;
-      -- In the cases below where the expected result is inexact we allow an
-      -- additional error amount of 1.0 * Model_Epsilon to account for that
-      -- error. This is accomplished by the factor of 1.25 times the computed
-      -- error bound (which is > 4.0) thus increasing the error bound by at
-      -- least 1.0 * Model_Epsilon
+         -- In the cases below where the expected result is inexact we allow
+         -- an additional error amount of 1.0 * Model_Epsilon to account for
+         -- that error. This is accomplished by the factor of 1.25 times the
+         -- computed error bound (which is > 4.0) thus increasing the error
+         -- bound by at least 1.0 * Model_Epsilon
       begin
          Accuracy_Error_Reported := False;  -- reset
          for I in 0 .. Max_Samples loop

@@ -88,8 +88,8 @@ procedure Cxd1001 is
    --         ......     and so on
    --         ......     to
    App_Priority_1 : App_Priority := App_Priority'First + 29;
--- Note: too small a range in System.Priority will cause Constraint_Error
--- during elaboration
+   -- Note: too small a range in System.Priority will cause Constraint_Error
+   -- during elaboration
 
 begin
 
