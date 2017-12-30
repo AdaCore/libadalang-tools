@@ -10,7 +10,6 @@ with Pp.Buffers; use Pp.Buffers;
 with Pp.Command_Lines; use Pp.Command_Lines;
 with Pp.Formatting; use Pp.Formatting;
 with Pp.Formatting.Dictionaries;
-with Pp.Formatting.Tree_Formatting;
 with Pp.Scanner.Seqs;
 
 with Ada.Directories; use Ada.Directories;
