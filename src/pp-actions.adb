@@ -25,7 +25,6 @@ with LAL_Extensions; use LAL_Extensions;
 with Utils.Command_Lines.Common; use Utils.Command_Lines.Common;
 with Utils.Dbg_Out;
 with Utils.Formatted_Output;
-with Utils.Tool_Names;
 with Utils.Generic_Formatted_Output;
 
 with Utils_Debug; use Utils_Debug;
@@ -4741,93 +4740,85 @@ package body Pp.Actions is
    begin
       pragma Style_Checks ("M200"); -- Allow long lines
 
-      Put ("usage: gnatpp [options] {filename} {-files filename} " &
-            "[-cargs gcc_switches]\n");
+      Put ("usage: gnatpp [options] {filename} {-files filename}\n");
       Put (" options:\n");
       Put (" --version - Display version and exit\n");
       Put (" --help    - Display usage and exit\n");
       Put ("\n");
-      Put (" -Pproject     - Use project file project. Only one such switch can be used.\n");
+      Put (" -Pproject     - use project file project\n");
       Put (" -U            - process all sources of the argument project\n");
       Put (" -U main       - process the closure of units rooted at unit main\n");
       Put (" -Xname=value  - specify an external reference for argument project file\n");
       Put (" -eL           - follow all symbolic links when processing project files\n");
 
-      Put (" other options (in alphabetic order):\n");
+      Put ("\n");
+      Put (" --alignment -- alignment ON (default)\n");
+      Put (" --no-alignment -- alignment OFF\n");
+      Put (" --align-modes -- alignment of parameter modes ON (default)\n");
+      Put (" --no-align-modes -- alignment of parameter modes OFF\n");
 
-      Put (" -A(0|1) - set alignment\n");
-      Put ("   0 - set alignment OFF\n");
-      Put ("   1 - set alignment ON (set as default)\n");
+      Put ("casing switches:\n");
+      Put (" --name-case-as-declared - usage names as declared (default)\n");
+      Put (" --name-lower-case - names in lower case\n");
+      Put (" --name-upper-case - names in upper case\n");
+      Put (" --name-mixed-case - names in mixed case\n");
 
-      Put (" -a(L|U|M) - set attribute casing\n");
-      Put ("   L - lower case\n");
-      Put ("   U - upper case\n");
-      Put ("   M - mixed case (set as default)\n");
+      Put ("attribute casing:\n");
+      Put (" --attribute-lower-case\n");
+      Put (" --attribute-upper-case\n");
+      Put (" --attribute-mixed-case (default)\n");
+
+      Put ("reserved word casing:\n");
+      Put (" --keyword-lower-case (default)\n");
+      Put (" --keyword-upper-case\n");
+
+      Put ("enumeration literal casing:\n");
+      Put (" --enum-case-as-declared\n");
+      Put (" --enum-lower-case\n");
+      Put (" --enum-upper-case\n");
+      Put (" --enum-mixed-case\n");
+
+      Put ("type and subtype casing:\n");
+      Put (" --type-case-as-declared\n");
+      Put (" --type-lower-case\n");
+      Put (" --type-upper-case\n");
+      Put (" --type-mixed-case\n");
+
+      Put ("named number casing:\n");
+      Put (" --number-case-as-declared\n");
+      Put (" --number-lower-case\n");
+      Put (" --number-upper-case\n");
+      Put (" --number-mixed-case\n");
+
+      Put ("pragma casing:\n");
+      Put (" --pragma-mixed-case\n");
+      Put (" --pragma-lower-case\n");
+      Put (" --pragma-upper-case\n");
+      Put ("\n");
 
       Put (" --based-grouping=n  - underscores in based literals every n characters\n");
 
-      Put (" -c(0|1|3|4|5) - comments layout\n");
-      Put ("   0 - do not format comments\n");
-      Put ("   1 - GNAT style comment line indentation (set as default)\n");
-      Put ("   3 - GNAT style comment beginning\n");
-      Put ("   4 - fill comment blocks\n");
-      Put ("   5 - do not change comments with a special character " &
+      Put (" --comments-unchanged - do not format comments\n");
+      Put (" --comments-gnat-indentation - GNAT style comment line indentation (default)\n");
+      Put (" --comments-gnat-beginning - GNAT style comment beginning\n");
+      Put (" --comments-fill - fill comment blocks\n");
+      Put (" --comments-special - do not change comments with a special character " &
             "just after --\n");
       Put (" --comments-only - format just the comments\n");
 
-      Put (" -clnnn - indentation level for continuation lines, " &
-            "nnn from 1 .. 9\n");
+      Put (" --indentation=n - indentation level, n from 1 .. 9 (default 3)\n");
+      Put (" --indent-continuation - indentation level for continuation lines (default one less than --indentation)\n");
 
-      Put (" -D<file> - set <file> as the dictionary file defining casing " &
+      Put (" --dictionary=<file> - set <file> as the dictionary file defining casing " &
             "exceptions\n");
-      Put (" -D-      - do not use RM-defined casing for predefined " &
-            "names, use casing \n");
-      Put ("            defined by -n parameter and dictionary file(s) " &
-            "instead\n");
+      Put (" --dictionary=-      - do not use RM-defined casing for predefined " &
+            "names\n");
 
       Put (" --decimal-grouping=n  - underscores in decimal literals every n characters\n");
 
-      Put (" -ff - put Form Feed after a pragma Page\n");
-      Put (" -gnatec<path> - the same as GNAT -gnatec option\n");
-      Put (" -innn - indentation level, nnn from 1 .. 9, " &
-            "the default value is 3\n");
+      Put (" --ff-after-pragma-page - put Form Feed after a pragma Page\n");
 
-      Put (" -I<dir> - the same as gcc -I option\n");
-
-      Put (" -I-     - the same as gcc -I- option\n");
-
-      Put (" -k(L|U) - set keyword casing\n");
-      Put ("   L - lower case (set as default)\n");
-      Put ("   U - upper case\n");
-
-      Put (" -Mnnn - set maximum line length, nnn from 32 .. 256, " &
-            "the default value is 79\n");
-
-      Put (" -n(D|U|L|M) - set name casing (for both defining and usage " &
-            "occurrences)\n");
-      Put ("   D - as declared (set as default)\n");
-      Put ("   U - all in upper case\n");
-      Put ("   L - all in lower case\n");
-      Put ("   M - mixed\n");
-
-      Put (" -ne(D|U|L|M) - set enumeration literal casing (for both defining and usage\n");
-      Put ("                occurrences), parameters have the same meaning as for -n option\n");
-      Put ("                if not set, -n is used to define enumeration literal casing\n");
-
-      Put (" -nt(D|U|L|M) - set casing for names introduced by type and subtype\n");
-      Put ("                declarations (both defining and usage occurrences), parameters\n");
-      Put ("                have the same meaning as for -n option. If not set, -n is used\n");
-
-      Put (" -nn(D|U|L|M) - set casing for names introduced by number declarations (both\n");
-      Put ("                (defining and usage occurrences), parameters have the same\n");
-      Put ("                meaning as for -n option. If not set, -n is used\n");
-
-      Put (" -N - no tabulation in comments\n");
-
-      Put (" -p(L|U|M) - set pragma casing\n");
-      Put ("   L - lower case\n");
-      Put ("   U - upper case\n");
-      Put ("   M - mixed case (set as default)\n");
+      Put (" --max-line-length=nnn - set maximum line length (default 79)\n");
 
       Put (" --pp-off=xxx - Use ""--xxx"" as the comment string to disable\n");
       Put ("                pretty printing instead of the default " &
@@ -4838,7 +4829,7 @@ package body Pp.Actions is
 
       Put (" --RTS=<dir> - the same as gcc --RTS option\n");
 
-      Put (" -q  - quiet mode\n");
+      Put (" --quiet / -q  - quiet mode\n");
 
       Put (" --no-separate-is        - try not to place 'IS' on a separate " &
             " line in\n");
@@ -4858,54 +4849,61 @@ package body Pp.Actions is
 
       Put (" --preserve-blank-lines  - preserve blank lines in the input\n");
 
+      Put (" --insert-line-breaks    - insert line breaks where appropriate (default)\n");
+      Put (" --no-insert-line-breaks    - do not insert line breaks\n");
+
       Put (" --split-line-before-op  - operator on next line\n");
+      Put (" --split-line-before-record  - ""record"" on next line\n");
+      Put (" --indent-named-statements - named statements indented more than name\n");
 
       Put (" --RM-style-spacing      - no extra space before " &
             "'(' and ':'\n");
 
-      Put (" --par_threshold=nnn     - if the number of parameter specifications is greater\n");
+      Put (" --par-threshold=nnn     - if the number of parameter specifications is greater\n");
       Put ("                           than nnn, each specification starts from a new line\n");
 
-      Put (" --call_threshold=nnn    - if the number of parameter associations in a call is\n");
+      Put (" --call-threshold=nnn    - if the number of parameter associations in a call is\n");
       Put ("                           greater than nnn and there is at least one named\n");
       Put ("                           association, each association starts from a new line\n");
 
+      Put (" --vertical-enum-types - multi-line enumeration types\n");
+      Put (" --vertical-array-types - multi-line array types\n");
+      Put (" --vertical-named-aggregates - multi-line named aggregates\n");
+      Put (" --vertical-case-alternatives -multi-line case alternatives\n");
+
       Put (" --incremental -- incremental processing on a per-file basis\n");
       Put (" -jn - n is the maximal number of processes to carry out\n");
-      Put (" -t  - display execution time\n");
 
-      Put (" -v  - verbose mode\n");
+      Put (" --syntax-only  - do not run semantic analysis (default)\n");
+      Put (" --no-syntax-only  - run semantic analysis\n");
+
+      Put (" --verbose / -v  - verbose mode\n");
 
       Put (" -dd - progress indicator verbose mode\n");
       Put ("\n");
 
       Put ("Output file control:\n");
-      Put (" -pipe - send the output into Stdout\n");
-      Put (" -o output_file - write the output into output_file. Give up " &
+      Put (" --replace - replace the argument source with the pretty-printed " &
+            "source (default)\n");
+      Put (" --output-dir=dir / --dir=dir -- create output files in dir\n");
+      Put (" --replace-backup  - replace the argument source with the pretty-printed " &
+            "source and copy the\n");
+      Put ("        argument source into filename.npp");
+      Put (" --replace-force-backup   - same as --replace-backup, but overwrites " &
+            " an existing filename.npp\n");
+      Put (" --pipe - send the output to standard output\n");
+      Put (" --output=output_file - write the output into output_file. Give up " &
             "if output_file\n");
       Put ("                  already exists\n");
-      Put (" -of output_file - write the output into output_file, " &
+      Put (" --output-force=output_file - write the output into output_file, " &
             "overriding the existing \n");
       Put ("                   file\n");
-      Put (" --output-dir=dir -- create output files in dir\n");
-      Put (" -r   - replace the argument source with the pretty-printed" &
-            " source and copy the\n");
-      Put ("        argument source into filename.npp" &
-            ". Give up if filename.npp\n");
-      Put ("        already exists\n");
-      Put (" -rf  - replace the argument source with the pretty-printed " &
-            "source and copy the\n");
-      Put ("        argument source into filename.npp" &
-            ", overriding the existing file\n");
 
-      Put (" -rnb - replace the argument source with the pretty-printed " &
-            "source and do not\n");
-      Put ("        create the back-up copy of the argument source\n");
       Put ("\n");
 
       Put (" filename - the name of the Ada source file to be reformatted. \n");
       Put ("            Wildcards are allowed\n");
-      Put (" -files=filename - the name of a text file containing a list\n");
+      Put (" --files=filename - the name of a text file containing a list\n");
       Put ("                   of Ada source files to reformat\n");
       Put (" --ignore=filename - do not process sources listed in filename\n");
       Put (" --eol=text_format - sets the format of the gnatpp output " &
@@ -4916,18 +4914,11 @@ package body Pp.Actions is
       Put ("                          - 'dos'  or 'crlf' - lines end with " &
         "CRLF characters\n");
 
-      Put (" -W(h|u|s|e|8|b) - sets the wide character encoding of the " &
-        "result file\n");
-      Put ("    h - Hex ESC encoding\n");
-      Put ("    u - Upper half encoding\n");
-      Put ("    s - Shift-JIS encoding\n");
-      Put ("    e - EUC Encoding\n");
+      Put (" --wide-character-encoding=(8|b) - set the wide " &
+        "character encoding of the result file\n");
       Put ("    8 - UTF-8 encoding\n");
-      Put ("    b - Brackets encoding (this is the default)\n");
+      Put ("    b - Brackets encoding (default)\n");
       Put ("\n");
-
-      Put (" gcc_switches - switches to be passed to gcc called by \1\n",
-           Tool_Names.Tool_Name); -- ???
 
       Put ("\n\nReport bugs to report@adacore.com\n");
 
