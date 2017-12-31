@@ -49,7 +49,9 @@ package Pp.Formatting is
    -- Line Breaking --
    -------------------
 
-   type Nesting_Level is new Natural;
+   type Nesting_Level is new Positive;
+   subtype Nesting_Level_Increment is
+     Nesting_Level'Base range 0 .. Nesting_Level'Last;
 
    type Line_Break is record
       Mark : Marker;
@@ -98,6 +100,16 @@ package Pp.Formatting is
 
    use Line_Break_Vectors;
    --  use all type Line_Break_Vector;
+
+   type Line_Break_Index_Index is new Positive;
+   type Line_Break_Index_Array is
+     array (Line_Break_Index_Index range <>) of Line_Break_Index;
+   package Line_Break_Index_Vectors is new Utils.Vectors
+     (Line_Break_Index_Index,
+      Line_Break_Index,
+      Line_Break_Index_Array);
+   subtype Line_Break_Index_Vector is Line_Break_Index_Vectors.Vector;
+   use Line_Break_Index_Vectors;
 
    ------------------------
    -- Tabs and Alignment --

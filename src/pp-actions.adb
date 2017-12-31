@@ -20,7 +20,6 @@ with GNAT.Lock_Files;
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
 with Langkit_Support.Slocs; use Langkit_Support;
-with Libadalang;     use Libadalang;
 with LAL_Extensions; use LAL_Extensions;
 
 with Utils.Command_Lines.Common; use Utils.Command_Lines.Common;
@@ -1411,7 +1410,8 @@ package body Pp.Actions is
          Kind     : Ada_Tree_Kind;
          Template : Symbol);
 
-      function Max_Nesting_Increment (Temp : Ada_Template) return Nesting_Level;
+      function Max_Nesting_Increment
+        (Temp : Ada_Template) return Nesting_Level_Increment;
       --  If a digit occurs after '#', this is an additional "nesting increment"
       --  to be added to the nesting level when we recursively process the
       --  subtree. This is intended to allow some line breaks to have precedence
@@ -1503,12 +1503,14 @@ package body Pp.Actions is
          end if;
       end Append_Line_Break;
 
-      function Max_Nesting_Increment (Temp : Ada_Template) return Nesting_Level is
+      function Max_Nesting_Increment
+        (Temp : Ada_Template) return Nesting_Level_Increment
+      is
          J : Positive := Temp'First;
          C : W_Char;
 
       begin
-         return Result : Nesting_Level := 0 do
+         return Result : Nesting_Level_Increment := 0 do
             while J <= Temp'Last loop
                C := Temp (J);
 
@@ -1516,7 +1518,7 @@ package body Pp.Actions is
                   when '#' =>
                      declare
                         Digit     : W_Char;
-                        Increment : Nesting_Level;
+                        Increment : Nesting_Level_Increment;
 
                      begin
                         if J < Temp'Last and then Temp (J + 1) in '0' .. '9' then
@@ -2497,7 +2499,7 @@ package body Pp.Actions is
                end if;
             end Debug_Template;
 
-            Nesting_Increment : Nesting_Level;
+            Nesting_Increment : Nesting_Level_Increment;
 
          --  Start of processing for Interpret_Template
 
@@ -2837,7 +2839,7 @@ package body Pp.Actions is
                Append_Line_Break
                  (Hard     => True,
                   Affects_Comments => False,
-                  Level    => 0,
+                  Level    => 1,
                   Kind     => Tree.Kind,
                   Template => Intern ("Maybe_Blank_Line"));
             end if;
@@ -3748,7 +3750,7 @@ package body Pp.Actions is
                --  will not affect following comments.
             else
                Interpret_Template
-                 (Munge_Template ("!?[# (~,# ~)]~", Ada_Call_Expr));
+                 (Munge_Template ("!?[# (~,#1 ~)]~", Ada_Call_Expr));
             end if;
          end Do_Call_Expr;
 
@@ -3987,12 +3989,12 @@ package body Pp.Actions is
          Append_Line_Break
            (Hard     => True,
             Affects_Comments => True,
-            Level    => 0,
+            Level    => 1,
             Kind     => Null_Kind,
             Template => Name_Empty);
 
          pragma Assert (Check_Whitespace);
-         Subtree_To_Ada (Tree, Cur_Level => 0, Index_In_Parent => 1);
+         Subtree_To_Ada (Tree, Cur_Level => 1, Index_In_Parent => 1);
 
          --  In Partial mode, we might need to add a line break
 
@@ -4003,7 +4005,7 @@ package body Pp.Actions is
             Append_Line_Break
               (Hard     => True,
                Affects_Comments => True,
-               Level    => 0,
+               Level    => 1,
                Kind     => Null_Kind,
                Template => Name_Empty);
          end if;

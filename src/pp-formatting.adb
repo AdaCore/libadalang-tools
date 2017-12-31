@@ -300,7 +300,7 @@ package body Pp.Formatting is
             Hard        => True,
             Affects_Comments => False,
             Enabled     => True,
-            Level       => 0,
+            Level       => 1,
             Indentation => Cur_Indentation,
             Length      => <>,
 --            Kind        => Not_An_Element,
@@ -513,7 +513,7 @@ package body Pp.Formatting is
 
          function Line_Length (F, L : Line_Break_Index) return Natural;
          --  F and L are the first and last index forming a line; returns the
-         --  length of the line, not counting new-lines. F and L must be enabled.
+         --  length of the line, not counting new-lines. F must be enabled.
 
          function Worthwhile_Line_Break (X : Line_Break_Index) return Boolean;
          --  Called for the first so-far-disabled line break on a line. Returning
@@ -579,6 +579,7 @@ package body Pp.Formatting is
          end Remove_Duplicates;
 
          function Line_Length (F, L : Line_Break_Index) return Natural is
+            pragma Assert (Line_Breaks (F).Enabled);
             First : constant Line_Break := Line_Breaks (F);
             Last  : constant Line_Break := Line_Breaks (L);
             F_Pos : constant Natural := Position (Out_Buf, First.Mark);
@@ -665,6 +666,19 @@ package body Pp.Formatting is
          Again : constant String :=
            (if First_Time then "first time" else "again");
 
+         LB : Line_Break_Index_Vector;
+         --  All line breaks for a given line that are at the same level,
+         --  plus an extra one at the end that is already enabled.
+
+         Greedy : constant Boolean := True;
+         --  True if we are using the "greedy" algorithm, which packs as many
+         --  subtrees on the same line as possible. This seems to look much
+         --  better, but we're using this flag in case people complain, so we
+         --  can add a switch to go back to the old algorithm. The old
+         --  algorithm was: if we enable a soft line break at a certain level,
+         --  we enable all soft line breaks at the same level (within a line we
+         --  are splitting).
+
       --  Start of processing for Split_Lines
 
       begin
@@ -684,8 +698,8 @@ package body Pp.Formatting is
             return;
          end if;
 
-         while F /= Last_Index (Line_Breaks) loop
-            Level       := 0;
+         while F /= Last_Index (Line_Breaks) loop -- through line breaks
+            Level       := 1;
             More_Levels := True;
 
             loop -- through levels
@@ -695,48 +709,56 @@ package body Pp.Formatting is
                exit when not More_Levels; -- no more line breaks to enable
 
                More_Levels := False;
+               Clear (LB);
+
+               --  Collect line breaks at current level into LB, along with an
+               --  additional one so we can always do LB (X + 1) below.
 
                for X in F + 1 .. L - 1 loop
                   if Line_Breaks (X).Level > Level then
                      More_Levels := True;
-
                   elsif Line_Breaks (X).Level = Level then
                      Inner_Loop_Count := Inner_Loop_Count + 1;
+                     Append (LB, X);
+                  end if;
+               end loop;
+               Append (LB, L);
+
+               declare
+                  FF : Line_Break_Index := F;
+                  LL : Line_Break_Index;
+               begin
+                  --  Loop through line breaks at current level
+
+                  for X in 1 .. Last_Index (LB) - 1 loop
+                     LL := LB (X);
+                     pragma Assert (Line_Breaks (LL).Level = Level);
 
                      --  Don't enable the first one, unless it's "worthwhile"
                      --  according to the heuristic.
-                     if X = F + 1 and then not Worthwhile_Line_Break (X) then
+
+                     if LL = F + 1 and then not Worthwhile_Line_Break (LL) then
                         null;
-
-                     --  We don't want soft line breaks to form blank lines, so
-                     --  don't enable this one if the previous one is already
-                     --  enabled.
-
                      else
-                        pragma Assert
-                          (not Line_Breaks (X - 1).Enabled
-                           or else
-                             not Is_Empty_Line (Out_Buf, Line_Breaks, X - 1, X));
-                        pragma Assert
-                          (if
-                             Line_Breaks (X - 1).Enabled
-                           then
-                             Line_Breaks (X - 1).Mark /= Line_Breaks (X).Mark);
-                        if True -- ????
-                          or else L = Last_Index (Line_Breaks)
-                          or else
-                            Line_Length (F, L + 1) >= Arg (Cmd, Max_Line_Length)
+                        if not Greedy
+                          or else Line_Length (FF, LB (X + 1)) >
+                             Arg (Cmd, Max_Line_Length)
                         then
-                           Line_Breaks (X).Enabled := True;
+                           pragma Assert (not Line_Breaks (LL).Enabled);
+                           Line_Breaks (LL).Enabled := True;
+                           FF := LL;
                         end if;
                      end if;
-                  end if;
-               end loop;
+                  end loop; -- through line breaks at current level
+               end;
 
                Level := Level + 1;
             end loop; -- through levels
 
             Line_Breaks (F).Length := Len;
+            pragma Assert
+              (Line_Breaks (F).Length =
+                 Line_Length (F, Next_Enabled (All_Line_Breaks, F)));
             F                      := L;
          end loop; -- through line breaks
 
