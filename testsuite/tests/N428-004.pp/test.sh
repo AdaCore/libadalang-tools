@@ -1,0 +1,1 @@
+gnatpp ors.adb --pipe
