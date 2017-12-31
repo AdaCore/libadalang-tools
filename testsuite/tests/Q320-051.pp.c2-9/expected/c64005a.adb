@@ -55,8 +55,7 @@ begin
    if I1 /= 4 or I2 /= 30 then
       Failed
         ("RECURSIVE PROCEDURE INVOCATIONS " &
-         "WITH GLOBAL DATA ACCESS NOT PERFORMED " &
-         "CORRECTLY");
+         "WITH GLOBAL DATA ACCESS NOT PERFORMED " & "CORRECTLY");
    end if;
 
    Result;

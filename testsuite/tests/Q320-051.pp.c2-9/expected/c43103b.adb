@@ -51,8 +51,7 @@ begin
    Test
      ("C43103B",
       "CHECK THAT IF A DISCRIMINANT DOES NOT GOVERN " &
-      "A VARIANT PART, ITS VALUE CAN BE GIVEN BY A " &
-      "NONSTATIC EXPRESSION");
+      "A VARIANT PART, ITS VALUE CAN BE GIVEN BY A " & "NONSTATIC EXPRESSION");
 
 -- SIMPLE DECLARATIONS
 
@@ -65,25 +64,16 @@ begin
          M : Rec (Ident_Int (3), Ident_Int (4));
 
       begin
-         if L.U'First (1) /= Ident_Int (1) or
-           L.U'Last (1) /= Ident_Int (2) or
-           L.U'First (2) /= Ident_Int (2) or
-           L.U'Last (2) /= Ident_Int (3)
-         then
+         if L.U'First (1) /= Ident_Int (1) or L.U'Last (1) /= Ident_Int (2) or
+           L.U'First (2) /= Ident_Int (2) or L.U'Last (2) /= Ident_Int (3) then
             Failed ("1.1 - INCORRECT BOUNDS");
          end if;
-         if K.U'First (1) /= Ident_Int (1) or
-           K.U'Last (1) /= Ident_Int (0) or
-           K.U'First (2) /= Ident_Int (1) or
-           K.U'Last (2) /= Ident_Int (3)
-         then
+         if K.U'First (1) /= Ident_Int (1) or K.U'Last (1) /= Ident_Int (0) or
+           K.U'First (2) /= Ident_Int (1) or K.U'Last (2) /= Ident_Int (3) then
             Failed ("1.2 - INCORRECT BOUNDS");
          end if;
-         if M.U'First (1) /= Ident_Int (1) or
-           M.U'Last (1) /= Ident_Int (3) or
-           M.U'First (2) /= Ident_Int (4) or
-           M.U'Last (2) /= Ident_Int (3)
-         then
+         if M.U'First (1) /= Ident_Int (1) or M.U'Last (1) /= Ident_Int (3) or
+           M.U'First (2) /= Ident_Int (4) or M.U'Last (2) /= Ident_Int (3) then
             Failed ("1.3 - INCORRECT BOUNDS");
          end if;
          if M.U'Length (1) /= 3 or M.U'Length (2) /= 0 then
@@ -104,15 +94,11 @@ begin
 
       declare
          O : constant Rec :=
-           (Ident_Int (2),
-            Ident_Int (2),
+           (Ident_Int (2), Ident_Int (2),
             ((1, Ident_Int (2)), (Ident_Int (2), 3)));
       begin
-         if O.U'First (1) /= Ident_Int (1) or
-           O.U'Last (1) /= Ident_Int (2) or
-           O.U'First (2) /= Ident_Int (2) or
-           O.U'Last (2) /= Ident_Int (3)
-         then
+         if O.U'First (1) /= Ident_Int (1) or O.U'Last (1) /= Ident_Int (2) or
+           O.U'First (2) /= Ident_Int (2) or O.U'Last (2) /= Ident_Int (3) then
             Failed ("2.1 - INCORRECT BOUNDS");
          end if;
       end;
@@ -129,8 +115,7 @@ begin
 
       declare
          P : constant Rec :=
-           (Ident_Int (0),
-            Ident_Int (2),
+           (Ident_Int (0), Ident_Int (2),
             (Ident_Int (3) .. Ident_Int (0) => (Ident_Int (2), 3)));
       begin
          null;
@@ -150,8 +135,7 @@ begin
 
       declare
          P : constant Rec :=
-           (Ident_Int (0),
-            Ident_Int (2),
+           (Ident_Int (0), Ident_Int (2),
             (Ident_Int (3) .. Ident_Int (0) => (others => Ident_Int (2))));
       begin
          null;
@@ -172,8 +156,7 @@ begin
 
       declare
          P : constant Rec :=
-           (Ident_Int (0),
-            Ident_Int (2),
+           (Ident_Int (0), Ident_Int (2),
             (Ident_Int (1) .. Ident_Int (0) =>
                (Ident_Int (1) .. Ident_Int (2) => 1)));
       begin

@@ -69,13 +69,8 @@ package C980003_0 is
    procedure Adjust (Object : in out Is_Controlled);
 
    type States is
-     (Unknown,
-      Start_Init,
-      Finished_Init,
-      Start_Adjust,
-      Finished_Adjust,
-      Start_Final,
-      Finished_Final);
+     (Unknown, Start_Init, Finished_Init, Start_Adjust, Finished_Adjust,
+      Start_Final, Finished_Final);
 
    protected State_Manager is
       procedure Reset;

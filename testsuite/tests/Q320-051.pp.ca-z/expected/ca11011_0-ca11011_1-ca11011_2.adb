@@ -3,12 +3,11 @@
    -- Package Body OS.File_Manager.Internals
    package body Ca11011_0.Ca11011_1.Ca11011_2 is
 
-   procedure Create
-     (Key         : in File_Descriptor_Type;
-      File_Name   : in File_Name_Type   := Get_File_Name;
-      File_Mode   : in File_Mode_Type   := Init_Mode;
-      File_Access : in Permission_Type  := Init_Permission;
-      File_Status : in File_Status_Type := Init_Status)
+   procedure Create (Key : in File_Descriptor_Type;
+      File_Name          : in File_Name_Type   := Get_File_Name;
+      File_Mode          : in File_Mode_Type   := Init_Mode;
+      File_Access        : in Permission_Type  := Init_Permission;
+      File_Status        : in File_Status_Type := Init_Status)
    is
    begin
       Private_File_Counter            := Private_File_Counter + 1;

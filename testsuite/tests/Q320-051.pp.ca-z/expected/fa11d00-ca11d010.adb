@@ -8,11 +8,8 @@ package body Fa11d00.Ca11d010 is     -- Add_Subtract_Complex
    begin
       -- Zero is declared in parent package.
 
-      if Left.Real < Zero.Real
-        or else Right.Real < Zero.Real
-        or else Left.Imag < Zero.Imag
-        or else Right.Imag < Zero.Imag
-      then
+      if Left.Real < Zero.Real or else Right.Real < Zero.Real
+        or else Left.Imag < Zero.Imag or else Right.Imag < Zero.Imag then
          raise Add_Error;     -- Reference to exception in parent package.
          Report.Failed
            ("Program control not transferred by raise in " & "procedure Add");
@@ -36,19 +33,15 @@ package body Fa11d00.Ca11d010 is     -- Add_Subtract_Complex
    function Subtract (Left, Right : Complex_Type) return Complex_Type is
    begin
       -- Zero is declared in parent package.
-      if Left.Real < Zero.Real or
-        Right.Real < Zero.Real or
-        Left.Imag < Zero.Imag or
-        Right.Imag < Zero.Imag
-      then
+      if Left.Real < Zero.Real or Right.Real < Zero.Real or
+        Left.Imag < Zero.Imag or Right.Imag < Zero.Imag then
          raise Subtract_Error;    -- Reference to exception in parent package.
          Report.Failed
            ("Program control not transferred by raise in " &
             "function Subtract");
       else
-         return
-           (Real => (Left.Real - Right.Real),
-            Imag => (Left.Imag - Right.Imag));
+         return (Real => (Left.Real - Right.Real),
+            Imag      => (Left.Imag - Right.Imag));
       end if;
 
    exception

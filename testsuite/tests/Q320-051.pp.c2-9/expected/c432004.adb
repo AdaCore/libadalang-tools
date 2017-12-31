@@ -29,10 +29,8 @@ procedure C432004 is
 
    -- Default value from SampleType_F (Era => Mesozoic).
    Sample_I1 : Sampletype_I :=
-     (C432004_0.Sampletype_F with
-      Period         => Tertiary,
-      Loc            => new C432004_0.Drawers'(Building => 9),
-      Sample_On_Loan => False);
+     (C432004_0.Sampletype_F with Period => Tertiary,
+      Loc => new C432004_0.Drawers'(Building => 9), Sample_On_Loan => False);
 
    -- Default values from SampleType_F and SampleType_G (Era => Mesozoic,
    -- Period => Jurassic, Loc => null).
@@ -60,29 +58,23 @@ begin
 
    -------------------
    if Sample_D1 /=
-     (Era            => C432004_0.Cenozoic,
-      Loc            => null,
-      Period         => Cambrian,
+     (Era            => C432004_0.Cenozoic, Loc => null, Period => Cambrian,
       Sample_On_Loan => True)
    then
       Report.Failed
         ("Object 1 of record extension of record extension, " &
-         "of abstract ancestor, SampleType_D, failed content " &
-         "check");
+         "of abstract ancestor, SampleType_D, failed content " & "check");
    end if;
 
    -------------------
    if Sample_D2 /= (C432004_0.Cenozoic, null, Quaternary, True) then
       Report.Failed
         ("Object 2 of record extension of record extension, " &
-         "of abstract ancestor, SampleType_D, failed content " &
-         "check");
+         "of abstract ancestor, SampleType_D, failed content " & "check");
    end if;
    -------------------
-   if Sample_E.Era /= C432004_0.Cenozoic or
-     Sample_E.Loc /= null or
-     not Tc_Correct_Result (Sample_E, Quaternary)
-   then
+   if Sample_E.Era /= C432004_0.Cenozoic or Sample_E.Loc /= null or
+     not Tc_Correct_Result (Sample_E, Quaternary) then
       Report.Failed
         ("Object of record extension of abstract private " &
          "extension of abstract ancestor, SampleType_E, " &
@@ -91,10 +83,8 @@ begin
 
    -------------------
    if not C432004_0.Tc_Correct_Result (Sample_I1, C432004_0.Mesozoic) or
-     Sample_I1.Period /= Tertiary or
-     Sample_I1.Loc.Building /= 9 or
-     Sample_I1.Sample_On_Loan /= False
-   then
+     Sample_I1.Period /= Tertiary or Sample_I1.Loc.Building /= 9 or
+     Sample_I1.Sample_On_Loan /= False then
       Report.Failed
         ("Object 1 of record extension of abstract record " &
          "extension of abstract private ancestor, " &
@@ -103,10 +93,8 @@ begin
 
    -------------------
    if not C432004_0.Tc_Correct_Result (Sample_I2, C432004_0.Mesozoic) or
-     Sample_I2.Period /= Jurassic or
-     Sample_I2.Loc /= null or
-     Sample_I2.Sample_On_Loan /= False
-   then
+     Sample_I2.Period /= Jurassic or Sample_I2.Loc /= null or
+     Sample_I2.Sample_On_Loan /= False then
       Report.Failed
         ("Object 2 of record extension of abstract record " &
          "extension of abstract private ancestor, " &
@@ -115,8 +103,7 @@ begin
 
    -------------------
    if not Tc_Correct_Result (Sample_J, Jurassic, C432004_0.Mesozoic) or
-     Sample_J.Sample_On_Loan /= False
-   then
+     Sample_J.Sample_On_Loan /= False then
       Report.Failed
         ("Object of record extension of private extension " &
          "of abstract private ancestor, SampleType_J, " &

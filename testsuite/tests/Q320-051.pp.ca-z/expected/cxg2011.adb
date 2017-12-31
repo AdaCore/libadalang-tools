@@ -135,14 +135,9 @@ procedure Cxg2011 is
          if abs (Actual - Expected) > Max_Error then
             Accuracy_Error_Reported := True;
             Report.Failed
-              (Test_Name &
-               " actual: " &
-               Real'Image (Actual) &
-               " expected: " &
-               Real'Image (Expected) &
-               " difference: " &
-               Real'Image (Actual - Expected) &
-               " max err:" &
+              (Test_Name & " actual: " & Real'Image (Actual) & " expected: " &
+               Real'Image (Expected) & " difference: " &
+               Real'Image (Actual - Expected) & " max err:" &
                Real'Image (Max_Error));
          elsif Verbose then
             if Actual = Expected then
@@ -162,9 +157,7 @@ procedure Cxg2011 is
          begin
             Y := Log (1.0);
             Check
-              (Y,
-               0.0,
-               "special value test 1 -- log(1)",
+              (Y, 0.0, "special value test 1 -- log(1)",
                0.0);  -- no error allowed
          exception
             when Constraint_Error =>
@@ -239,13 +232,9 @@ procedure Cxg2011 is
 
             Actual := Log (X);
             Check
-              (Actual,
-               Expected,
-               "Taylor Series Test -" &
-               Integer'Image (I) &
-               " log (" &
-               Real'Image (X) &
-               ")",
+              (Actual, Expected,
+               "Taylor Series Test -" & Integer'Image (I) & " log (" &
+               Real'Image (X) & ")",
                4.0);
             if Accuracy_Error_Reported then
                -- only report the first error in this test in order to keep
@@ -281,13 +270,9 @@ procedure Cxg2011 is
 
             Actual := Log (X);
             Check
-              (Actual,
-               Expected,
-               "Log Difference Identity -" &
-               Integer'Image (I) &
-               " log (" &
-               Real'Image (X) &
-               ")",
+              (Actual, Expected,
+               "Log Difference Identity -" & Integer'Image (I) & " log (" &
+               Real'Image (X) & ")",
                4.0);
 
             if Accuracy_Error_Reported then
@@ -324,13 +309,9 @@ procedure Cxg2011 is
 
             Actual := Log (X * X);
             Check
-              (Actual,
-               Expected,
-               "Log Product Identity -" &
-               Integer'Image (I) &
-               " log (" &
-               Real'Image (X) &
-               ")",
+              (Actual, Expected,
+               "Log Product Identity -" & Integer'Image (I) & " log (" &
+               Real'Image (X) & ")",
                4.0);
             if Accuracy_Error_Reported then
                -- only report the first error in this test in order to keep
@@ -365,19 +346,14 @@ procedure Cxg2011 is
             X := (B - A) * Real (I) / Real (Max_Samples) + A;
 
             Expected :=
-              Log (X + X / 10.0, 10.0) -
-              3.77060_15822_50407_5E-4 -
+              Log (X + X / 10.0, 10.0) - 3.77060_15822_50407_5E-4 -
               21.0 / 512.0;
 
             Actual := Log (X, 10.0);
             Check
-              (Actual,
-               Expected,
-               "Log 10 Test -" &
-               Integer'Image (I) &
-               " log (" &
-               Real'Image (X) &
-               ")",
+              (Actual, Expected,
+               "Log 10 Test -" & Integer'Image (I) & " log (" &
+               Real'Image (X) & ")",
                4.0);
 
             -- only report the first error in this test in order to keep lots
@@ -493,8 +469,7 @@ begin
 
    if Verbose then
       Report.Comment
-        ("checking a digits" &
-         Integer'Image (System.Max_Digits) &
+        ("checking a digits" & Integer'Image (System.Max_Digits) &
          " floating point type");
    end if;
 

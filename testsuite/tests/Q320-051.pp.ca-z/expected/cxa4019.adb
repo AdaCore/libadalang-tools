@@ -112,8 +112,7 @@ begin
 
       Test_String :=
         B10.To_Bounded_Wide_String
-          (Source => Equiv ("abcdefghijklmn"),
-           Drop   => Ada.Strings.Left);
+          (Source => Equiv ("abcdefghijklmn"), Drop => Ada.Strings.Left);
 
       if Test_String /= B10.To_Bounded_Wide_String (Equiv ("efghijklmn")) then
          Report.Failed
@@ -124,8 +123,7 @@ begin
 
       Test_String :=
         B10.To_Bounded_Wide_String
-          (Source => Equiv ("abcdefghijklmn"),
-           Drop   => Ada.Strings.Right);
+          (Source => Equiv ("abcdefghijklmn"), Drop => Ada.Strings.Right);
 
       if not (Test_String = Atoj_Bnd_Str) then
          Report.Failed
@@ -156,8 +154,7 @@ begin
          Result_String :=
            B10.Append
              (B10.To_Wide_String (Atoe_Bnd_Str),
-              B10.To_Bounded_Wide_String (Equiv ("fghijk")),
-              As.Error);
+              B10.To_Bounded_Wide_String (Equiv ("fghijk")), As.Error);
          Report.Failed ("Length_Error not raised by Append - 2");
       exception
          when As.Length_Error =>
@@ -196,9 +193,7 @@ begin
       -- Append (Bnd Str, Str)
       Result_String :=
         B10.Append
-          (B10.To_Bounded_Wide_String ("abcdefghij"),
-           "xyz",
-           Ada.Strings.Left);
+          (B10.To_Bounded_Wide_String ("abcdefghij"), "xyz", Ada.Strings.Left);
 
       if Result_String /= B10.To_Bounded_Wide_String ("defghijxyz") then
          Report.Failed ("Incorrect truncation performed by Append - 5");
@@ -208,12 +203,10 @@ begin
 
       Result_String :=
         B10.Append
-          (Equiv ('A'),
-           B10.To_Bounded_Wide_String (Equiv ("abcdefghij")),
+          (Equiv ('A'), B10.To_Bounded_Wide_String (Equiv ("abcdefghij")),
            Ada.Strings.Left);
 
-      if Result_String /=
-        B10.To_Bounded_Wide_String (Equiv ("abcdefghij"))
+      if Result_String /= B10.To_Bounded_Wide_String (Equiv ("abcdefghij"))
       then
          Report.Failed ("Incorrect truncation performed by Append - 6");
       end if;
@@ -224,8 +217,7 @@ begin
       Result_String :=
         B10.Append (Ftoj_Bnd_Str, Atoj_Bnd_Str, Ada.Strings.Right);
 
-      if Result_String /=
-        B10.To_Bounded_Wide_String (Equiv ("fghijabcde"))
+      if Result_String /= B10.To_Bounded_Wide_String (Equiv ("fghijabcde"))
       then
          Report.Failed ("Incorrect truncation performed by Append - 7");
       end if;
@@ -233,12 +225,9 @@ begin
       -- Append (Str, Bnd Str)
       Result_String :=
         B10.Append
-          (B10.To_Wide_String (Atoe_Bnd_Str),
-           Atoj_Bnd_Str,
-           Ada.Strings.Right);
+          (B10.To_Wide_String (Atoe_Bnd_Str), Atoj_Bnd_Str, Ada.Strings.Right);
 
-      if Result_String /=
-        B10.To_Bounded_Wide_String (Equiv ("abcdeabcde"))
+      if Result_String /= B10.To_Bounded_Wide_String (Equiv ("abcdeabcde"))
       then
          Report.Failed ("Incorrect truncation performed by Append - 8");
       end if;
@@ -247,8 +236,7 @@ begin
       Result_String :=
         B10.Append (Equiv ('A'), Atoj_Bnd_Str, Ada.Strings.Right);
 
-      if Result_String /=
-        B10.To_Bounded_Wide_String (Equiv ("Aabcdefghi"))
+      if Result_String /= B10.To_Bounded_Wide_String (Equiv ("Aabcdefghi"))
       then
          Report.Failed ("Incorrect truncation performed by Append - 9");
       end if;
@@ -260,8 +248,7 @@ begin
       Location :=
         B10.Index
           (Source  => B10.To_Bounded_Wide_String ("foxy fox 2"),
-           Pattern => "FOX",
-           Going   => Ada.Strings.Backward,
+           Pattern => "FOX", Going => Ada.Strings.Backward,
            Mapping => Aswc.Upper_Case_Map);
 
       if Location /= 6 then
@@ -270,8 +257,7 @@ begin
 
       Location :=
         B10.Index
-          (B10.To_Bounded_Wide_String ("THE QUICK "),
-           "quick",
+          (B10.To_Bounded_Wide_String ("THE QUICK "), "quick",
            Ada.Strings.Forward,
            Ada.Strings.Wide_Maps.Wide_Constants.Lower_Case_Map);
 
@@ -281,10 +267,8 @@ begin
 
       Location :=
         B10.Index
-          (Source  => B10.To_Bounded_Wide_String ("The the"),
-           Pattern => "the",
-           Going   => Ada.Strings.Forward,
-           Mapping => Aswc.Lower_Case_Map);
+          (Source => B10.To_Bounded_Wide_String ("The the"), Pattern => "the",
+           Going  => Ada.Strings.Forward, Mapping => Aswc.Lower_Case_Map);
 
       if Location /= 1 then
          Report.Failed ("Incorrect result from Index, non-Identity map - 3");
@@ -298,8 +282,7 @@ begin
              "abcd") /= 0 or
         B10.Index
             (B10.Null_Bounded_Wide_String,         -- Source = Null
-             "abc") /= 0
-      then
+             "abc") /= 0 then
          Report.Failed ("Incorrect result from Index with string patterns");
       end if;
 
@@ -309,8 +292,7 @@ begin
 
       Location :=
         B10.Index
-          (Source  => B10.To_Bounded_Wide_String ("My dog"),
-           Pattern => "cat",
+          (Source  => B10.To_Bounded_Wide_String ("My dog"), Pattern => "cat",
            Going   => Ada.Strings.Forward,
            Mapping => Map_Ptr);  -- change "dog" to "cat"
 
@@ -320,10 +302,8 @@ begin
 
       Location :=
         B10.Index
-          (B10.To_Bounded_Wide_String ("cat or dog"),
-           "cat",
-           Ada.Strings.Backward,
-           Map_Ptr);
+          (B10.To_Bounded_Wide_String ("cat or dog"), "cat",
+           Ada.Strings.Backward, Map_Ptr);
 
       if Location /= 8 then
          Report.Failed ("Incorrect result from Index, w/map ptr - 2");
@@ -343,39 +323,28 @@ begin
           0 or
         B10.Index
             (B10.Null_Bounded_Wide_String,         -- Source = Null
-             "cat",
-             Ada.Strings.Forward,
+             "cat", Ada.Strings.Forward,
              Map_Ptr) /=
           0 or
         B10.Index
-            (B10.To_Bounded_Wide_String ("hot dog"),
-             "dog",
-             Ada.Strings.Backward,
-             Map_Ptr) /=
+            (B10.To_Bounded_Wide_String ("hot dog"), "dog",
+             Ada.Strings.Backward, Map_Ptr) /=
           0 or
         B10.Index
-            (B10.To_Bounded_Wide_String (" cat dog "),
-             " cat",
-             Ada.Strings.Backward,
-             Map_Ptr) /=
+            (B10.To_Bounded_Wide_String (" cat dog "), " cat",
+             Ada.Strings.Backward, Map_Ptr) /=
           5 or
         B10.Index
-            (B10.To_Bounded_Wide_String ("dog CatDog"),
-             "cat",
-             Ada.Strings.Backward,
-             Map_Ptr) /=
+            (B10.To_Bounded_Wide_String ("dog CatDog"), "cat",
+             Ada.Strings.Backward, Map_Ptr) /=
           1 or
         B10.Index
-            (B10.To_Bounded_Wide_String ("CatandDog"),
-             "cat",
-             Ada.Strings.Forward,
-             Map_Ptr) /=
+            (B10.To_Bounded_Wide_String ("CatandDog"), "cat",
+             Ada.Strings.Forward, Map_Ptr) /=
           0 or
         B10.Index
-            (B10.To_Bounded_Wide_String ("dddd"),
-             "ccccc",
-             Ada.Strings.Backward,
-             Map_Ptr) /=
+            (B10.To_Bounded_Wide_String ("dddd"), "ccccc",
+             Ada.Strings.Backward, Map_Ptr) /=
           0
       then
          Report.Failed ("Incorrect result from Index w/map ptr - 3");
@@ -388,8 +357,7 @@ begin
       Location :=
         B10.Index
           (Source => B10.To_Bounded_Wide_String (Equiv ("abcdeabcde")),
-           Set    => Wide_Cd_Set,
-           Test   => Ada.Strings.Inside,
+           Set    => Wide_Cd_Set, Test => Ada.Strings.Inside,
            Going  => Ada.Strings.Forward);
 
       if not (Location = 3) then -- position of first 'c' equivalent in source.
@@ -399,10 +367,8 @@ begin
       -- Test = Inside, Going = Backward.
       Location :=
         B10.Index
-          (Source => B10."&" (Atoe_Bnd_Str, Atoe_Bnd_Str),
-           Set    => Wide_Cd_Set,
-           Test   => Ada.Strings.Inside,
-           Going  => Ada.Strings.Backward);
+          (Source => B10."&" (Atoe_Bnd_Str, Atoe_Bnd_Str), Set => Wide_Cd_Set,
+           Test   => Ada.Strings.Inside, Going => Ada.Strings.Backward);
 
       if not (Location = 9) then   -- position of last 'd' in source.
          Report.Failed ("Incorrect result from Index using Sets - 2");
@@ -411,10 +377,8 @@ begin
       -- Test = Outside, Going = Forward.
       Location :=
         B10.Index
-          (B10.To_Bounded_Wide_String ("deddacd"),
-           Cd_Set,
-           Test  => Ada.Strings.Outside,
-           Going => Ada.Strings.Forward);
+          (B10.To_Bounded_Wide_String ("deddacd"), Cd_Set,
+           Test => Ada.Strings.Outside, Going => Ada.Strings.Forward);
 
       if Location /= 2 then  -- position of 'e' in source.
          Report.Failed ("Incorrect result from Index using Sets - 3");
@@ -423,10 +387,8 @@ begin
       -- Test = Outside, Going = Backward.
       Location :=
         B10.Index
-          (B10.To_Bounded_Wide_String (Equiv ("deddacd")),
-           Wide_Cd_Set,
-           Ada.Strings.Outside,
-           Ada.Strings.Backward);
+          (B10.To_Bounded_Wide_String (Equiv ("deddacd")), Wide_Cd_Set,
+           Ada.Strings.Outside, Ada.Strings.Backward);
 
       if Location /= 5 then    -- position of 'a', correct.
          Report.Failed ("Incorrect result from Index using Sets - 4");
@@ -454,8 +416,7 @@ begin
       Total_Count :=
         B10.Count
           (Source  => B10.To_Bounded_Wide_String ("THE THE TH"),
-           Pattern => "th",
-           Mapping => Aswc.Lower_Case_Map);
+           Pattern => "th", Mapping => Aswc.Lower_Case_Map);
 
       if Total_Count /= 3 then
          Report.Failed
@@ -488,8 +449,7 @@ begin
              Equiv ("abcde")) /= 1 or
         B10.Count
             (B10.Null_Bounded_Wide_String,        -- Source = Null
-             " ") /= 0
-      then
+             " ") /= 0 then
          Report.Failed ("Incorrect result from function Count, w,w/o mapping");
       end if;
 
@@ -498,8 +458,7 @@ begin
 
       Total_Count :=
         B10.Count
-          (Source  => B10.To_Bounded_Wide_String ("dogdogdo"),
-           Pattern => "ca",
+          (Source  => B10.To_Bounded_Wide_String ("dogdogdo"), Pattern => "ca",
            Mapping => Map_Ptr);
 
       if Total_Count /= 3 then
@@ -537,8 +496,7 @@ begin
           1 or
         B10.Count
             (B10.Null_Bounded_Wide_String,        -- Source = Null
-             " ", Map_Ptr) /= 0
-      then
+             " ", Map_Ptr) /= 0 then
          Report.Failed ("Incorrect result from function Count, w/map ptr - 2");
       end if;
 
@@ -648,15 +606,13 @@ begin
       if B10.Translate
           (Source  => B10.To_Bounded_Wide_String ("cateatdog"),
            Mapping => Map_Ptr) /=
-        B10.To_Bounded_Wide_String ("cateatcat")
-      then
+        B10.To_Bounded_Wide_String ("cateatcat") then
          Report.Failed
            ("Incorrect result from function Translate w/map ptr - 1");
       end if;
 
       if B10.Translate (B10.To_Bounded_Wide_String ("cadogtac"), Map_Ptr) /=
-        B10.To_Bounded_Wide_String ("cacattac")
-      then
+        B10.To_Bounded_Wide_String ("cacattac") then
          Report.Failed
            ("Incorrect result from function Translate w/map ptr - 2");
       end if;
@@ -666,8 +622,7 @@ begin
       if B10.Translate
           (Source  => B10.To_Bounded_Wide_String ("dogodggdo"),
            Mapping => Map_Ptr) /=
-        B10.To_Bounded_Wide_String ("catacttca")
-      then
+        B10.To_Bounded_Wide_String ("catacttca") then
          Report.Failed
            ("Incorrect result from function Translate w/map ptr- 3");
       end if;
@@ -677,8 +632,7 @@ begin
       if B10.Translate
           (Source  => B10.To_Bounded_Wide_String (" DOG cat "),
            Mapping => Map_Ptr) /=
-        B10.To_Bounded_Wide_String (" DOG cat ")
-      then
+        B10.To_Bounded_Wide_String (" DOG cat ") then
          Report.Failed
            ("Incorrect result from function Translate w/map ptr - 4");
       end if;
@@ -699,10 +653,8 @@ begin
       end if;
 
       if B10.Translate
-          (Source  => B10.Null_Bounded_Wide_String,
-           Mapping => Map_Ptr) /=
-        B10.To_Bounded_Wide_String ("")
-      then
+          (Source => B10.Null_Bounded_Wide_String, Mapping => Map_Ptr) /=
+        B10.To_Bounded_Wide_String ("") then
          Report.Failed
            ("Incorrect result from function Translate w/map ptr - 6");
       end if;
@@ -766,13 +718,10 @@ begin
       -- Low = High = Source'Last, "By" length = 1.
 
       if B10.Replace_Slice
-          (Atoe_Bnd_Str,
-           B10.To_Wide_String (Atoe_Bnd_Str)'Last,
-           B10.To_Wide_String (Atoe_Bnd_Str)'Last,
-           Equiv ("X"),
+          (Atoe_Bnd_Str, B10.To_Wide_String (Atoe_Bnd_Str)'Last,
+           B10.To_Wide_String (Atoe_Bnd_Str)'Last, Equiv ("X"),
            Ada.Strings.Error) /=
-        B10.To_Bounded_Wide_String (Equiv ("abcdX"))
-      then
+        B10.To_Bounded_Wide_String (Equiv ("abcdX")) then
          Report.Failed ("Incorrect result from Function Replace_Slice");
       end if;
 
@@ -780,10 +729,8 @@ begin
       begin
          Test_String :=
            B10.Replace_Slice
-             (Atoe_Bnd_Str,
-              B10.To_Wide_String (Atoe_Bnd_Str)'First,
-              B10.To_Wide_String (Atoe_Bnd_Str)'First - 2,
-              Equiv ("hijklm"));
+             (Atoe_Bnd_Str, B10.To_Wide_String (Atoe_Bnd_Str)'First,
+              B10.To_Wide_String (Atoe_Bnd_Str)'First - 2, Equiv ("hijklm"));
          Report.Failed ("Index_Error not raised by Function Replace_Slice");
       exception
          when As.Index_Error =>
@@ -869,9 +816,8 @@ begin
       begin
          Result_String :=
            B10.Insert
-             (Source   => Atoj_Bnd_Str,    -- "abcdefghij"
-              Before   => 2,
-              New_Item => Equiv ("xyz"));
+             (Source => Atoj_Bnd_Str,    -- "abcdefghij"
+              Before => 2, New_Item => Equiv ("xyz"));
          Report.Failed ("Length_Error not raised by Function Insert");
       exception
          when As.Length_Error =>
@@ -924,10 +870,8 @@ begin
       begin
          Test_String := Atoj_Bnd_Str;
          B10.Insert
-           (Source   => Test_String,
-            Before   => 9,
-            New_Item => Equiv ("wxyz"),
-            Drop     => Ada.Strings.Error);
+           (Source => Test_String, Before => 9, New_Item => Equiv ("wxyz"),
+            Drop   => Ada.Strings.Error);
          Report.Failed ("Length_Error not raised by Procedure Insert");
       exception
          when As.Length_Error =>

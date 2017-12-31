@@ -29,8 +29,7 @@ begin
    Report.Special_Action
      ("Partition ID of SECOND Partition is: " &
       Hold_Partition_Id'Image (P_Id) &
-      ".  Check that this is different from that " &
-      "of the FIRST partition");
+      ".  Check that this is different from that " & "of the FIRST partition");
 
    Report.Result;
 

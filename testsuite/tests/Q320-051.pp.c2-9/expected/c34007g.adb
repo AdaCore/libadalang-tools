@@ -46,19 +46,15 @@ procedure C34007g is
    type Designated is array (Natural range <>, Natural range <>) of Component;
 
    subtype Subdesignated is
-     Designated
-       (Ident_Int (4) .. Ident_Int (5),
+     Designated (Ident_Int (4) .. Ident_Int (5),
         Ident_Int (6) .. Ident_Int (8));
 
    package Pkg is
 
       type Parent is access Designated;
 
-      function Create
-        (F1, L1 : Natural;
-         F2, L2 : Natural;
-         C      : Component;
-         Dummy  : Parent   -- TO RESOLVE OVERLOADING.
+      function Create (F1, L1 : Natural; F2, L2 : Natural; C : Component;
+         Dummy                : Parent   -- TO RESOLVE OVERLOADING.
          ) return Parent;
 
    end Pkg;
@@ -66,8 +62,7 @@ procedure C34007g is
    use Pkg;
 
    type T is
-     new Parent
-       (Ident_Int (4) .. Ident_Int (5),
+     new Parent (Ident_Int (4) .. Ident_Int (5),
         Ident_Int (6) .. Ident_Int (8));
 
    X : T         := new Subdesignated'(others => (others => 2));
@@ -88,11 +83,8 @@ procedure C34007g is
 
    package body Pkg is
 
-      function Create
-        (F1, L1 : Natural;
-         F2, L2 : Natural;
-         C      : Component;
-         Dummy  : Parent) return Parent
+      function Create (F1, L1 : Natural; F2, L2 : Natural; C : Component;
+         Dummy                : Parent) return Parent
       is
          A : Parent    := new Designated (F1 .. L1, F2 .. L2);
          B : Component := C;
@@ -166,15 +158,13 @@ begin
 
    X := Ident (new Subdesignated'((1, 2, 3), (4, 5, 6)));
    if (X = null or else X = Y or else X.all /= ((1, 2, 3), (4, 5, 6))) or
-     X = new Designated'((1, 2), (3, 4), (5, 6))
-   then
+     X = new Designated'((1, 2), (3, 4), (5, 6)) then
       Failed ("INCORRECT ALLOCATOR");
    end if;
 
    X := Ident (Y);
    if X.all /= ((1, 2, 3), (4, 5, 6)) or
-     Create (6, 9, 2, 3, 4, X).all /= ((4, 5), (6, 7), (8, 9), (10, 11))
-   then
+     Create (6, 9, 2, 3, 4, X).all /= ((4, 5), (6, 7), (8, 9), (10, 11)) then
       Failed ("INCORRECT .ALL (VALUE)");
    end if;
 
@@ -208,8 +198,7 @@ begin
 
    X := Ident (Y);
    if X (Ident_Int (4), Ident_Int (6)) /= 1 or
-     Create (6, 9, 2, 3, 4, X) (9, 3) /= 11
-   then
+     Create (6, 9, 2, 3, 4, X) (9, 3) /= 11 then
       Failed ("INCORRECT INDEX (VALUE)");
    end if;
 
@@ -227,11 +216,8 @@ begin
          Failed ("EXCEPTION FOR INDEX (ASSIGNMENT)");
    end;
 
-   if X = null or
-     X = new Subdesignated or
-     not (X = Y) or
-     X = Create (6, 9, 2, 3, 4, X)
-   then
+   if X = null or X = new Subdesignated or not (X = Y) or
+     X = Create (6, 9, 2, 3, 4, X) then
       Failed ("INCORRECT =");
    end if;
 

@@ -17,9 +17,8 @@ package body C391001_1 is
         (Left_Plaque.Serial_Number /= 0);
    end "=";
 
-   function Tc_Match
-     (Left_Plaque   : Object;
-      Right_Natural : Natural) return Boolean
+   function Tc_Match (Left_Plaque : Object;
+      Right_Natural               : Natural) return Boolean
    is
    begin
       return (Left_Plaque.Serial_Number = Right_Natural);

@@ -65,8 +65,7 @@ begin
      ("C41402A",
       "CHECK THAT CONSTRAINT_ERROR IS NOT RAISED IF " &
       "THE PREFIX OF 'ADDRESS, 'SIZE, " &
-      "'FIRST_BIT, 'LAST_BIT, AND 'POSITION HAS THE " &
-      "VALUE NULL");
+      "'FIRST_BIT, 'LAST_BIT, AND 'POSITION HAS THE " & "VALUE NULL");
 
    begin
       Proc (Ptr_Ara'Address);

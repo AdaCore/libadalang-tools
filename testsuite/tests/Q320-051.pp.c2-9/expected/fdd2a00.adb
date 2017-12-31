@@ -6,10 +6,8 @@ package body Fdd2a00 is
       Stream.Last  := 0;
    end Clear;
 
-   procedure Read
-     (Stream : in out My_Stream;
-      Item   :    out Stream_Element_Array;
-      Last   :    out Stream_Element_Offset)
+   procedure Read (Stream : in out My_Stream; Item : out Stream_Element_Array;
+      Last                :    out Stream_Element_Offset)
    is
    begin
       if Item'Length >= Stream.Last - Stream.First + 1 then

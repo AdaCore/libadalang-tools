@@ -77,8 +77,7 @@ procedure Cxaia14 is
    My_Cursor_1 : My_Indefinite_Multiway_Trees.Cursor;
 
    procedure Tampering_Check
-     (Container : in out My_Indefinite_Multiway_Trees.Tree;
-      Where     : in     String)
+     (Container : in out My_Indefinite_Multiway_Trees.Tree; Where : in String)
    is
 
       Program_Error_Raised : Boolean := False;
@@ -89,8 +88,7 @@ procedure Cxaia14 is
       begin
 
          Container.Append_Child
-           (Parent   => Root_1,
-            New_Item => Value_In_Ptr_Array (1).all);
+           (Parent => Root_1, New_Item => Value_In_Ptr_Array (1).all);
 
       exception
 
@@ -124,8 +122,7 @@ begin
    My_Tree_1.Clear;
 
    My_Tree_1.Append_Child
-     (Parent   => Root_1,
-      New_Item => Value_In_Ptr_Array (1).all);
+     (Parent => Root_1, New_Item => Value_In_Ptr_Array (1).all);
 
    declare
 
@@ -159,10 +156,8 @@ begin
    -- -- in a way that corresponds to likely usage.
 
    declare
-      procedure Test
-        (Value     : in String;
-         Expected  : in String;
-         Test_Case : in String)
+      procedure Test (Value : in String; Expected : in String;
+         Test_Case          : in String)
       is
       begin
          Tampering_Check (Container => My_Tree_1, Where => Test_Case);
@@ -175,11 +170,8 @@ begin
          end if;
       end Test;
 
-      procedure Test_And_Mod
-        (Value     : in out String;
-         Expected  : in     String;
-         New_Item  : in     String;
-         Test_Case : in     String)
+      procedure Test_And_Mod (Value : in out String; Expected : in String;
+         New_Item                   : in     String; Test_Case : in String)
       is
       begin
          Tampering_Check (Container => My_Tree_1, Where => Test_Case);
@@ -201,8 +193,7 @@ begin
       Test
         (Value =>
            My_Indefinite_Multiway_Trees.Constant_Reference
-             (My_Tree_1,
-              Position => My_Cursor_1)
+             (My_Tree_1, Position => My_Cursor_1)
              .Element.all,
          Expected  => "00", -- Value_In_Ptr_Array (I).all
          Test_Case => "Constant_Reference normal cursor");
@@ -210,24 +201,20 @@ begin
       Test_And_Mod
         (Value =>
            My_Indefinite_Multiway_Trees.Reference
-             (My_Tree_1,
-              Position => My_Cursor_1)
+             (My_Tree_1, Position => My_Cursor_1)
              .Element.all,
-         Expected  => "00",
-         New_Item  => "37",
+         Expected  => "00", New_Item => "37",
          Test_Case => "Reference normal cursor");
 
       -- Prefix call with all components explicit:
       Test
         (Value =>
            My_Tree_1.Constant_Reference (Position => My_Cursor_1).Element.all,
-         Expected  => "37",
-         Test_Case => "Constant_Reference prefix cursor");
+         Expected => "37", Test_Case => "Constant_Reference prefix cursor");
 
       Test_And_Mod
         (Value => My_Tree_1.Reference (Position => My_Cursor_1).Element.all,
-         Expected  => "37",
-         New_Item  => "64",
+         Expected  => "37", New_Item => "64",
          Test_Case => "Reference prefix cursor");
 
       -- Prefix call using a generalized reference (implicit dereference):
@@ -238,8 +225,7 @@ begin
 
       Test_And_Mod
         (Value     => My_Tree_1.Reference (Position => My_Cursor_1),
-         Expected  => "64",
-         New_Item  => "91",
+         Expected  => "64", New_Item => "91",
          Test_Case => "Reference generalized cursor");
 
       -- Object indexing, everything implicit.
@@ -250,8 +236,7 @@ begin
 
       Test_And_Mod
         (Value     => My_Tree_1 (My_Cursor_1), -- Variable_Indexing
-         Expected  => "91",
-         New_Item  => "00",
+         Expected  => "91", New_Item => "00",
          Test_Case => "Object indexing by cursor");
 
    end;
@@ -278,8 +263,7 @@ begin
       for I in Fxaia00.Array_Bounds_Type loop
 
          My_Tree_1.Append_Child
-           (Parent   => Root_1,
-            New_Item => Value_In_Ptr_Array (I).all);
+           (Parent => Root_1, New_Item => Value_In_Ptr_Array (I).all);
 
          Pos_Of_First_Char := Character'Pos (Value_In_Ptr_Array (I).all (1));
 
@@ -351,8 +335,7 @@ begin
       for C in My_Indefinite_Multiway_Trees.Iterate_Subtree (Root_1) loop
 
          Tampering_Check
-           (Container => My_Tree_1,
-            Where     => "reading in loop subtree");
+           (Container => My_Tree_1, Where => "reading in loop subtree");
 
          Pos_Of_First_Char := Character'Pos (My_Tree_1 (C) (1));
 
@@ -385,8 +368,7 @@ begin
       for C in My_Tree_1.Iterate_Children (Parent => Root_1) loop
 
          Tampering_Check
-           (Container => My_Tree_1,
-            Where     => "reading child in loop");
+           (Container => My_Tree_1, Where => "reading child in loop");
 
          Pos_Of_First_Char := Character'Pos (My_Tree_1 (C) (1));
 
@@ -413,8 +395,7 @@ begin
       for C in reverse My_Tree_1.Iterate_Children (Parent => Root_1) loop
 
          Tampering_Check
-           (Container => My_Tree_1,
-            Where     => "reading child in loop");
+           (Container => My_Tree_1, Where => "reading child in loop");
 
          Pos_Of_First_Char := Character'Pos (My_Tree_1 (C) (1));
 
@@ -506,8 +487,7 @@ begin
       for I in Fxaia00.Array_Bounds_Type loop
 
          if My_Indefinite_Multiway_Trees.Element (Position => My_Cursor_1) /=
-           My_Default_Value
-         then
+           My_Default_Value then
 
             Report.Failed ("Data set by of loop not as expected");
 

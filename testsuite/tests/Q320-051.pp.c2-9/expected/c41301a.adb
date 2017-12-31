@@ -98,11 +98,8 @@ begin
          return X3;
       end F2;
 
-      procedure P1
-        (X : in     Boolean;
-         Y : in out Integer;
-         Z :    out Boolean;
-         W :        String)
+      procedure P1 (X : in Boolean; Y : in out Integer; Z : out Boolean;
+         W            :    String)
       is
       begin
          if X /= True then

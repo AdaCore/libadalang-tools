@@ -7,13 +7,7 @@ package body Cd90001_0 is
      (1, 2, 4, 8, 16, 32, 64, 128);
 
    Check_Enum : constant array (1 .. 8) of User_Enums :=
-     (One,
-      Two,
-      Four,
-      Eight,
-      Sixteen,
-      Thirty_Two,
-      Sixty_Four,
+     (One, Two, Four, Eight, Sixteen, Thirty_Two, Sixty_Four,
       One_Twenty_Eight);
 
    procedure Tc_Check_Case_1 is

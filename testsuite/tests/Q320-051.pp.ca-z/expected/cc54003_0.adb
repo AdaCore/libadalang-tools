@@ -12,9 +12,8 @@ package body Cc54003_0 is
    -- Initial_Input. For succeeding calls, pass the result of the previous
    -- call.
 
-   function Execute_Stack
-     (Stack         : Stack_Type;
-      Initial_Input : Item_Ptr) return Item_Ptr
+   function Execute_Stack (Stack : Stack_Type;
+      Initial_Input              : Item_Ptr) return Item_Ptr
    is
       Result : Item_Ptr := Initial_Input;
    begin

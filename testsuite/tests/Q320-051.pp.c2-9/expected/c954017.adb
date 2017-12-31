@@ -167,8 +167,7 @@ begin
    end loop;
 
    if not
-     (Tc_Original_Caller_Complete and
-      Tc_Intermediate_Complete and
+     (Tc_Original_Caller_Complete and Tc_Intermediate_Complete and
       Tc_Receiver_Complete)
    then
       Report.Failed ("Proper paths not traversed");

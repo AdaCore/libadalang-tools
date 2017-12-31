@@ -38,8 +38,7 @@ begin
    Test
      ("C35503O",
       "CHECK THAT 'FIRST' AND 'LAST' YIELD THE " &
-      "CORRECT RESULTS WHEN THE PREFIX IS AN " &
-      "INTEGER TYPE");
+      "CORRECT RESULTS WHEN THE PREFIX IS AN " & "INTEGER TYPE");
 
    declare
       subtype Sinteger is Integer;

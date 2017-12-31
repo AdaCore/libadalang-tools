@@ -83,8 +83,7 @@ begin
      ("C420001",
       "Check that if the index subtype of a string type is a " &
       "modular subtype whose lower bound is zero, then the " &
-      "evaluation of a null string_literal raises " &
-      "Constraint_Error. ");
+      "evaluation of a null string_literal raises " & "Constraint_Error. ");
    declare
       type M1 is mod 1;
       package Test_M1 is new Mod_Test (M1);

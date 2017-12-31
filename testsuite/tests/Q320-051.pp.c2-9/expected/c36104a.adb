@@ -350,23 +350,14 @@ begin
    -- NULL MEMBERSHIP RANGES, EXCEPTION NOT RAISED.
 
    begin
-      if Sun in Sat .. Sun or
-        Sat in Fri .. Wed or
-        Wed in Thu .. Tue or
-        Thu in Mon .. Sun or
-        Fri in Sat .. Fri or
-        Wed in Fri .. Mon
-      then
+      if Sun in Sat .. Sun or Sat in Fri .. Wed or Wed in Thu .. Tue or
+        Thu in Mon .. Sun or Fri in Sat .. Fri or Wed in Fri .. Mon then
          Failed ("INCORRECT 'IN' EVALUATION 1");
       end if;
 
-      if Integer'(0) in 10 .. -10 or
-        Integer'(0) in 10 .. 9 or
-        Integer'(0) in -10 .. -11 or
-        Integer'(0) in -10 .. -20 or
-        Integer'(0) in 6 .. 5 or
-        Integer'(0) in 5 .. 3 or
-        Integer'(0) in 7 .. 3
+      if Integer'(0) in 10 .. -10 or Integer'(0) in 10 .. 9 or
+        Integer'(0) in -10 .. -11 or Integer'(0) in -10 .. -20 or
+        Integer'(0) in 6 .. 5 or Integer'(0) in 5 .. 3 or Integer'(0) in 7 .. 3
       then
          Failed ("INCORRECT 'IN' EVALUATION 2");
       end if;

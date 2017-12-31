@@ -59,15 +59,13 @@ procedure Check_File (File : in out File_Type; Contents : String) is
          Get (File, X);
          if X /= ' ' then
             Failed
-              ("FROM CHECK_FILE: END OF LINE EXPECTED - " &
-               X &
+              ("FROM CHECK_FILE: END OF LINE EXPECTED - " & X &
                " ENCOUNTERED");
             raise Stop_Processing;
          else
             if not Trailing_Blanks_Msg_Written then
                Comment
-                 ("FROM CHECK_FILE: " &
-                  "THIS IMPLEMENTATION PADS " &
+                 ("FROM CHECK_FILE: " & "THIS IMPLEMENTATION PADS " &
                   "LINES WITH BLANKS");
                Trailing_Blanks_Msg_Written := True;
             end if;
@@ -76,10 +74,8 @@ procedure Check_File (File : in out File_Type; Contents : String) is
 
       if Line_Count /= Line (File) then
          Failed
-           ("FROM CHECK_FILE: " &
-            "LINE COUNT INCORRECT - EXPECTED " &
-            Positive_Count'Image (Line_Count) &
-            " GOT FROM FILE " &
+           ("FROM CHECK_FILE: " & "LINE COUNT INCORRECT - EXPECTED " &
+            Positive_Count'Image (Line_Count) & " GOT FROM FILE " &
             Positive_Count'Image (Line (File)));
       end if;
 
@@ -106,10 +102,8 @@ procedure Check_File (File : in out File_Type; Contents : String) is
       else
          if Page_Count /= Page (File) then
             Failed
-              ("FROM CHECK_FILE: " &
-               "PAGE COUNT INCORRECT - EXPECTED " &
-               Positive_Count'Image (Page_Count) &
-               " GOT FROM FILE " &
+              ("FROM CHECK_FILE: " & "PAGE COUNT INCORRECT - EXPECTED " &
+               Positive_Count'Image (Page_Count) & " GOT FROM FILE " &
                Positive_Count'Image (Page (File)));
          end if;
 
@@ -142,34 +136,25 @@ begin
             when others =>
                if Col_Count /= Col (File) then
                   Failed
-                    ("FROM CHECK_FILE: " &
-                     "COL COUNT INCORRECT - " &
-                     "EXPECTED " &
-                     Positive_Count'Image (Col_Count) &
-                     " GOT FROM " &
-                     "FILE " &
+                    ("FROM CHECK_FILE: " & "COL COUNT INCORRECT - " &
+                     "EXPECTED " & Positive_Count'Image (Col_Count) &
+                     " GOT FROM " & "FILE " &
                      Positive_Count'Image (Col (File)));
                end if;
                Get (File, X);
                Col_Count := Col_Count + 1;
                if X /= Contents (I) then
                   Failed
-                    ("FROM CHECK_FILE: " &
-                     "FILE DOES NOT CONTAIN CORRECT " &
-                     "OUTPUT - EXPECTED " &
-                     Contents (I) &
-                     " - GOT " &
-                     X);
+                    ("FROM CHECK_FILE: " & "FILE DOES NOT CONTAIN CORRECT " &
+                     "OUTPUT - EXPECTED " & Contents (I) & " - GOT " & X);
                   raise Stop_Processing;
                end if;
          end case;
       exception
          when Stop_Processing =>
             Comment
-              ("FROM CHECK_FILE: " &
-               "LAST CHARACTER IN FOLLOWING STRING " &
-               "REVEALED ERROR: " &
-               Contents (1 .. I));
+              ("FROM CHECK_FILE: " & "LAST CHARACTER IN FOLLOWING STRING " &
+               "REVEALED ERROR: " & Contents (1 .. I));
             exit;
       end;
 

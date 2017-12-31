@@ -14,8 +14,7 @@ begin
       "object is unconstrained. Check that the " &
       "attribute A'Constrained returns False if A is a " &
       "formal out or in out parameter and A denotes an " &
-      "aliased view of an object with an unconstrained " &
-      "nominal subtype.");
+      "aliased view of an object with an unconstrained " & "nominal subtype.");
 
    Non_Pointer_Block :
    begin

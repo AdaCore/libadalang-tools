@@ -110,8 +110,7 @@ begin
    Report.Test
      ("CXF2001",
       "Check that the Divide procedure provides " &
-      "correct results. Check that the Remainder " &
-      "is calculated exactly");
+      "correct results. Check that the Remainder " & "is calculated exactly");
    Radix_10_Block :
    declare
 
@@ -142,11 +141,9 @@ begin
    begin
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dividend_Type  => Dt_0_01,
-            Divisor_Type   => Dt_0_1,
-            Quotient_Type  => Dt_0_1,
-            Remainder_Type => Dt_0_01);
+         procedure Div is new Ada.Decimal.Divide (Dividend_Type => Dt_0_01,
+            Divisor_Type => Dt_0_1, Quotient_Type => Dt_0_1,
+            Remainder_Type                                      => Dt_0_01);
       begin
          if Tc_Verbose then
             Report.Comment ("Case 1");
@@ -160,10 +157,7 @@ begin
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_01,
-            Dt_0_1,
-            Dt_0_1,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_01, Dt_0_1, Dt_0_1,
             Dt_0_1);
       begin
          if Tc_Verbose then
@@ -178,10 +172,7 @@ begin
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_01,
-            Dt_0_1,
-            Dt_0_01,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_01, Dt_0_1, Dt_0_01,
             Dt_0_001);
       begin
          if Tc_Verbose then
@@ -196,10 +187,7 @@ begin
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_01,
-            Dt_0_1,
-            Dt_0_01,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_01, Dt_0_1, Dt_0_01,
             Dt_0_01);
       begin
          if Tc_Verbose then
@@ -214,10 +202,7 @@ begin
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_01,
-            Dt_0_1,
-            Dt_0_001,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_01, Dt_0_1, Dt_0_001,
             Dt_0_0001);
       begin
          if Tc_Verbose then
@@ -226,18 +211,14 @@ begin
          Dd_0_01 := Dt_0_01 (0.05);
          Dv_0_1  := Dt_0_1 (0.3);
          Div (Dd_0_01, Dv_0_1, Quot_0_001, Rem_0_0001);
-         if Quot_0_001 /= Dt_0_001 (0.166) or
-           Rem_0_0001 /= Dt_0_0001 (0.000_2)
+         if Quot_0_001 /= Dt_0_001 (0.166) or Rem_0_0001 /= Dt_0_0001 (0.000_2)
          then
             Report.Failed ("Incorrect values returned, Case 5");
          end if;
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_01,
-            Dt_1,
-            Dt_0_01,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_01, Dt_1, Dt_0_01,
             Dt_0_0001);
       begin
          if Tc_Verbose then
@@ -246,18 +227,14 @@ begin
          Dd_0_01 := Dt_0_01 (0.15);
          Dv_1    := Dt_1 (20);
          Div (Dd_0_01, Dv_1, Quot_0_01, Rem_0_0001);
-         if Quot_0_01 /= Dt_0_01 (0.0) or
-           Rem_0_0001 /= Dt_0_0001 (0.150_0)
+         if Quot_0_01 /= Dt_0_01 (0.0) or Rem_0_0001 /= Dt_0_0001 (0.150_0)
          then
             Report.Failed ("Incorrect values returned, Case 6");
          end if;
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_01,
-            Dt_1,
-            Dt_0_01,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_01, Dt_1, Dt_0_01,
             Dt_0_001);
       begin
          if Tc_Verbose then
@@ -272,10 +249,7 @@ begin
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_01,
-            Dt_1,
-            Dt_0_01,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_01, Dt_1, Dt_0_01,
             Dt_0_01);
       begin
          if Tc_Verbose then
@@ -290,10 +264,7 @@ begin
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_01,
-            Dt_1,
-            Dt_0_001,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_01, Dt_1, Dt_0_001,
             Dt_0_001);
       begin
          if Tc_Verbose then
@@ -308,10 +279,7 @@ begin
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_01,
-            Dt_1,
-            Dt_0_001,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_01, Dt_1, Dt_0_001,
             Dt_0_01);
       begin
          if Tc_Verbose then
@@ -326,10 +294,7 @@ begin
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_01,
-            Dt_1,
-            Dt_0_0001,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_01, Dt_1, Dt_0_0001,
             Dt_0_0001);
       begin
          if Tc_Verbose then
@@ -338,19 +303,15 @@ begin
          Dd_0_01 := Dt_0_01 (0.15);
          Dv_1    := Dt_1 (20);
          Div (Dd_0_01, Dv_1, Quot_0_0001, Rem_0_0001);
-         if Quot_0_0001 /= Dt_0_0001 (0.007_5) or
-           Rem_0_0001 /= Dt_0_0001 (0.0)
+         if Quot_0_0001 /= Dt_0_0001 (0.007_5) or Rem_0_0001 /= Dt_0_0001 (0.0)
          then
             Report.Failed ("Incorrect values returned, Case 11");
          end if;
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_00001,
-            Dt_0_1,
-            Dt_0_0001,
-            Dt_0_0001);
+         procedure Div is new Ada.Decimal.Divide (Dt_0_00001, Dt_0_1,
+            Dt_0_0001, Dt_0_0001);
       begin
          if Tc_Verbose then
             Report.Comment ("Case 12");
@@ -358,18 +319,14 @@ begin
          Dd_0_00001 := Dt_0_00001 (0.031_25);
          Dv_0_1     := Dt_0_1 (0.5);
          Div (Dd_0_00001, Dv_0_1, Quot_0_0001, Rem_0_0001);
-         if Quot_0_0001 /= Dt_0_0001 (0.062_5) or
-           Rem_0_0001 /= Dt_0_0001 (0.0)
+         if Quot_0_0001 /= Dt_0_0001 (0.062_5) or Rem_0_0001 /= Dt_0_0001 (0.0)
          then
             Report.Failed ("Incorrect values returned, Case 12");
          end if;
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_00001,
-            Dt_0_1,
-            Dt_0_001,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_00001, Dt_0_1, Dt_0_001,
             Dt_0_00001);
       begin
          if Tc_Verbose then
@@ -379,17 +336,13 @@ begin
          Dv_0_1     := Dt_0_1 (0.5);
          Div (Dd_0_00001, Dv_0_1, Quot_0_001, Rem_0_00001);
          if Quot_0_001 /= Dt_0_001 (0.062) or
-           Rem_0_00001 /= Dt_0_00001 (0.000_25)
-         then
+           Rem_0_00001 /= Dt_0_00001 (0.000_25) then
             Report.Failed ("Incorrect values returned, Case 13");
          end if;
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_00001,
-            Dt_0_1,
-            Dt_0_001,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_00001, Dt_0_1, Dt_0_001,
             Dt_0_0001);
       begin
          if Tc_Verbose then
@@ -398,18 +351,14 @@ begin
          Dd_0_00001 := Dt_0_00001 (0.031_25);
          Dv_0_1     := Dt_0_1 (0.5);
          Div (Dd_0_00001, Dv_0_1, Quot_0_001, Rem_0_0001);
-         if Quot_0_001 /= Dt_0_001 (0.062) or
-           Rem_0_0001 /= Dt_0_0001 (0.000_2)
+         if Quot_0_001 /= Dt_0_001 (0.062) or Rem_0_0001 /= Dt_0_0001 (0.000_2)
          then
             Report.Failed ("Incorrect values returned, Case 14");
          end if;
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_00001,
-            Dt_0_1,
-            Dt_0_001,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_00001, Dt_0_1, Dt_0_001,
             Dt_0_001);
       begin
          if Tc_Verbose then
@@ -418,18 +367,14 @@ begin
          Dd_0_00001 := Dt_0_00001 (0.031_25);
          Dv_0_1     := Dt_0_1 (0.5);
          Div (Dd_0_00001, Dv_0_1, Quot_0_001, Rem_0_001);
-         if Quot_0_001 /= Dt_0_001 (0.062) or
-           Rem_0_001 /= Dt_0_001 (0.000)
+         if Quot_0_001 /= Dt_0_001 (0.062) or Rem_0_001 /= Dt_0_001 (0.000)
          then
             Report.Failed ("Incorrect values returned, Case 15");
          end if;
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_00001,
-            Dt_0_1,
-            Dt_0_001,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_00001, Dt_0_1, Dt_0_001,
             Dt_0_01);
       begin
          if Tc_Verbose then
@@ -444,10 +389,7 @@ begin
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_00001,
-            Dt_0_1,
-            Dt_0_01,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_00001, Dt_0_1, Dt_0_01,
             Dt_0_00001);
       begin
          if Tc_Verbose then
@@ -456,18 +398,14 @@ begin
          Dd_0_00001 := Dt_0_00001 (0.031_25);
          Dv_0_1     := Dt_0_1 (0.5);
          Div (Dd_0_00001, Dv_0_1, Quot_0_01, Rem_0_00001);
-         if Quot_0_01 /= Dt_0_01 (0.06) or
-           Rem_0_00001 /= Dt_0_00001 (0.001_25)
+         if Quot_0_01 /= Dt_0_01 (0.06) or Rem_0_00001 /= Dt_0_00001 (0.001_25)
          then
             Report.Failed ("Incorrect values returned, Case 17");
          end if;
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_00001,
-            Dt_0_1,
-            Dt_0_01,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_00001, Dt_0_1, Dt_0_01,
             Dt_0_0001);
       begin
          if Tc_Verbose then
@@ -476,18 +414,14 @@ begin
          Dd_0_00001 := Dt_0_00001 (0.031_25);
          Dv_0_1     := Dt_0_1 (0.5);
          Div (Dd_0_00001, Dv_0_1, Quot_0_01, Rem_0_0001);
-         if Quot_0_01 /= Dt_0_01 (0.06) or
-           Rem_0_0001 /= Dt_0_0001 (0.001_2)
+         if Quot_0_01 /= Dt_0_01 (0.06) or Rem_0_0001 /= Dt_0_0001 (0.001_2)
          then
             Report.Failed ("Incorrect values returned, Case 18");
          end if;
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_00001,
-            Dt_0_1,
-            Dt_0_01,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_00001, Dt_0_1, Dt_0_01,
             Dt_0_001);
       begin
          if Tc_Verbose then
@@ -502,10 +436,7 @@ begin
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_00001,
-            Dt_0_1,
-            Dt_0_01,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_00001, Dt_0_1, Dt_0_01,
             Dt_0_01);
       begin
          if Tc_Verbose then
@@ -554,11 +485,9 @@ begin
    begin
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dividend_Type  => Dt_0_01,
-            Divisor_Type   => Dt_0_1,
-            Quotient_Type  => Dt_0_1,
-            Remainder_Type => Dt_0_01);
+         procedure Div is new Ada.Decimal.Divide (Dividend_Type => Dt_0_01,
+            Divisor_Type => Dt_0_1, Quotient_Type => Dt_0_1,
+            Remainder_Type                                      => Dt_0_01);
       begin
          if Tc_Verbose then
             Report.Comment ("Case 21");
@@ -572,10 +501,7 @@ begin
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_01,
-            Dt_0_1,
-            Dt_0_1,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_01, Dt_0_1, Dt_0_1,
             Dt_0_1);
       begin
          if Tc_Verbose then
@@ -590,10 +516,7 @@ begin
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_01,
-            Dt_0_1,
-            Dt_0_01,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_01, Dt_0_1, Dt_0_01,
             Dt_0_001);
       begin
          if Tc_Verbose then
@@ -608,10 +531,7 @@ begin
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_01,
-            Dt_0_1,
-            Dt_0_01,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_01, Dt_0_1, Dt_0_01,
             Dt_0_01);
       begin
          if Tc_Verbose then
@@ -626,10 +546,7 @@ begin
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_01,
-            Dt_0_1,
-            Dt_0_001,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_01, Dt_0_1, Dt_0_001,
             Dt_0_0001);
       begin
          if Tc_Verbose then
@@ -638,18 +555,14 @@ begin
          Dd_0_01 := Dt_0_01 (0.05);
          Dv_0_1  := Dt_0_1 (0.3);
          Div (Dd_0_01, Dv_0_1, Quot_0_001, Rem_0_0001);
-         if Quot_0_001 /= Dt_0_001 (0.166) or
-           Rem_0_0001 /= Dt_0_0001 (0.000_2)
+         if Quot_0_001 /= Dt_0_001 (0.166) or Rem_0_0001 /= Dt_0_0001 (0.000_2)
          then
             Report.Failed ("Incorrect values returned, Case 25");
          end if;
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_01,
-            Dt_1,
-            Dt_0_01,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_01, Dt_1, Dt_0_01,
             Dt_0_0001);
       begin
          if Tc_Verbose then
@@ -658,18 +571,14 @@ begin
          Dd_0_01 := Dt_0_01 (0.15);
          Dv_1    := Dt_1 (20);
          Div (Dd_0_01, Dv_1, Quot_0_01, Rem_0_0001);
-         if Quot_0_01 /= Dt_0_01 (0.0) or
-           Rem_0_0001 /= Dt_0_0001 (0.150_0)
+         if Quot_0_01 /= Dt_0_01 (0.0) or Rem_0_0001 /= Dt_0_0001 (0.150_0)
          then
             Report.Failed ("Incorrect values returned, Case 26");
          end if;
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_01,
-            Dt_1,
-            Dt_0_01,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_01, Dt_1, Dt_0_01,
             Dt_0_001);
       begin
          if Tc_Verbose then
@@ -684,10 +593,7 @@ begin
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_01,
-            Dt_1,
-            Dt_0_01,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_01, Dt_1, Dt_0_01,
             Dt_0_01);
       begin
          if Tc_Verbose then
@@ -702,10 +608,7 @@ begin
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_01,
-            Dt_1,
-            Dt_0_001,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_01, Dt_1, Dt_0_001,
             Dt_0_001);
       begin
          if Tc_Verbose then
@@ -720,10 +623,7 @@ begin
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_01,
-            Dt_1,
-            Dt_0_001,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_01, Dt_1, Dt_0_001,
             Dt_0_01);
       begin
          if Tc_Verbose then
@@ -738,10 +638,7 @@ begin
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_01,
-            Dt_1,
-            Dt_0_0001,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_01, Dt_1, Dt_0_0001,
             Dt_0_0001);
       begin
          if Tc_Verbose then
@@ -750,19 +647,15 @@ begin
          Dd_0_01 := Dt_0_01 (0.15);
          Dv_1    := Dt_1 (20);
          Div (Dd_0_01, Dv_1, Quot_0_0001, Rem_0_0001);
-         if Quot_0_0001 /= Dt_0_0001 (0.007_5) or
-           Rem_0_0001 /= Dt_0_0001 (0.0)
+         if Quot_0_0001 /= Dt_0_0001 (0.007_5) or Rem_0_0001 /= Dt_0_0001 (0.0)
          then
             Report.Failed ("Incorrect values returned, Case 31");
          end if;
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_00001,
-            Dt_0_1,
-            Dt_0_0001,
-            Dt_0_0001);
+         procedure Div is new Ada.Decimal.Divide (Dt_0_00001, Dt_0_1,
+            Dt_0_0001, Dt_0_0001);
       begin
          if Tc_Verbose then
             Report.Comment ("Case 32");
@@ -770,18 +663,14 @@ begin
          Dd_0_00001 := Dt_0_00001 (0.031_25);
          Dv_0_1     := Dt_0_1 (0.5);
          Div (Dd_0_00001, Dv_0_1, Quot_0_0001, Rem_0_0001);
-         if Quot_0_0001 /= Dt_0_0001 (0.062_5) or
-           Rem_0_0001 /= Dt_0_0001 (0.0)
+         if Quot_0_0001 /= Dt_0_0001 (0.062_5) or Rem_0_0001 /= Dt_0_0001 (0.0)
          then
             Report.Failed ("Incorrect values returned, Case 32");
          end if;
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_00001,
-            Dt_0_1,
-            Dt_0_001,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_00001, Dt_0_1, Dt_0_001,
             Dt_0_00001);
       begin
          if Tc_Verbose then
@@ -791,17 +680,13 @@ begin
          Dv_0_1     := Dt_0_1 (0.5);
          Div (Dd_0_00001, Dv_0_1, Quot_0_001, Rem_0_00001);
          if Quot_0_001 /= Dt_0_001 (0.062) or
-           Rem_0_00001 /= Dt_0_00001 (0.000_25)
-         then
+           Rem_0_00001 /= Dt_0_00001 (0.000_25) then
             Report.Failed ("Incorrect values returned, Case 33");
          end if;
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_00001,
-            Dt_0_1,
-            Dt_0_001,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_00001, Dt_0_1, Dt_0_001,
             Dt_0_0001);
       begin
          if Tc_Verbose then
@@ -810,18 +695,14 @@ begin
          Dd_0_00001 := Dt_0_00001 (0.031_25);
          Dv_0_1     := Dt_0_1 (0.5);
          Div (Dd_0_00001, Dv_0_1, Quot_0_001, Rem_0_0001);
-         if Quot_0_001 /= Dt_0_001 (0.062) or
-           Rem_0_0001 /= Dt_0_0001 (0.000_2)
+         if Quot_0_001 /= Dt_0_001 (0.062) or Rem_0_0001 /= Dt_0_0001 (0.000_2)
          then
             Report.Failed ("Incorrect values returned, Case 34");
          end if;
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_00001,
-            Dt_0_1,
-            Dt_0_001,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_00001, Dt_0_1, Dt_0_001,
             Dt_0_001);
       begin
          if Tc_Verbose then
@@ -830,18 +711,14 @@ begin
          Dd_0_00001 := Dt_0_00001 (0.031_25);
          Dv_0_1     := Dt_0_1 (0.5);
          Div (Dd_0_00001, Dv_0_1, Quot_0_001, Rem_0_001);
-         if Quot_0_001 /= Dt_0_001 (0.062) or
-           Rem_0_001 /= Dt_0_001 (0.000)
+         if Quot_0_001 /= Dt_0_001 (0.062) or Rem_0_001 /= Dt_0_001 (0.000)
          then
             Report.Failed ("Incorrect values returned, Case 35");
          end if;
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_00001,
-            Dt_0_1,
-            Dt_0_001,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_00001, Dt_0_1, Dt_0_001,
             Dt_0_01);
       begin
          if Tc_Verbose then
@@ -856,10 +733,7 @@ begin
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_00001,
-            Dt_0_1,
-            Dt_0_01,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_00001, Dt_0_1, Dt_0_01,
             Dt_0_00001);
       begin
          if Tc_Verbose then
@@ -868,18 +742,14 @@ begin
          Dd_0_00001 := Dt_0_00001 (0.031_25);
          Dv_0_1     := Dt_0_1 (0.5);
          Div (Dd_0_00001, Dv_0_1, Quot_0_01, Rem_0_00001);
-         if Quot_0_01 /= Dt_0_01 (0.06) or
-           Rem_0_00001 /= Dt_0_00001 (0.001_25)
+         if Quot_0_01 /= Dt_0_01 (0.06) or Rem_0_00001 /= Dt_0_00001 (0.001_25)
          then
             Report.Failed ("Incorrect values returned, Case 37");
          end if;
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_00001,
-            Dt_0_1,
-            Dt_0_01,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_00001, Dt_0_1, Dt_0_01,
             Dt_0_0001);
       begin
          if Tc_Verbose then
@@ -888,18 +758,14 @@ begin
          Dd_0_00001 := Dt_0_00001 (0.031_25);
          Dv_0_1     := Dt_0_1 (0.5);
          Div (Dd_0_00001, Dv_0_1, Quot_0_01, Rem_0_0001);
-         if Quot_0_01 /= Dt_0_01 (0.06) or
-           Rem_0_0001 /= Dt_0_0001 (0.001_2)
+         if Quot_0_01 /= Dt_0_01 (0.06) or Rem_0_0001 /= Dt_0_0001 (0.001_2)
          then
             Report.Failed ("Incorrect values returned, Case 38");
          end if;
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_00001,
-            Dt_0_1,
-            Dt_0_01,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_00001, Dt_0_1, Dt_0_01,
             Dt_0_001);
       begin
          if Tc_Verbose then
@@ -914,10 +780,7 @@ begin
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_00001,
-            Dt_0_1,
-            Dt_0_01,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_00001, Dt_0_1, Dt_0_01,
             Dt_0_01);
       begin
          if Tc_Verbose then
@@ -932,10 +795,7 @@ begin
       end;
 
       declare
-         procedure Div is new Ada.Decimal.Divide
-           (Dt_0_0001,
-            Dt_1,
-            Dt_0_0001,
+         procedure Div is new Ada.Decimal.Divide (Dt_0_0001, Dt_1, Dt_0_0001,
             Dt_0_0001);
       begin
          if Tc_Verbose then

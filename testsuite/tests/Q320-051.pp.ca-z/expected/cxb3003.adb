@@ -48,11 +48,8 @@ with Interfaces.C.Pointers;                                   -- N/A => ERROR
 procedure Cxb3003 is
    package C renames Interfaces.C;
 
-   package Test_Ptrs is new C.Pointers
-     (Index              => C.Size_T,
-      Element            => C.Char,
-      Element_Array      => C.Char_Array,
-      Default_Terminator => C.Nul);
+   package Test_Ptrs is new C.Pointers (Index => C.Size_T, Element => C.Char,
+      Element_Array => C.Char_Array, Default_Terminator => C.Nul);
 
 begin
 
@@ -134,15 +131,10 @@ begin
          Test_Ptrs.Copy_Terminated_Array (Tst_Pointer, Tst_Pointer_2);
 
          Test_Ptrs.Copy_Terminated_Array
-           (Tst_Pointer,
-            Tst_Pointer_2,
-            Tst_Index);
+           (Tst_Pointer, Tst_Pointer_2, Tst_Index);
 
          Test_Ptrs.Copy_Terminated_Array
-           (Tst_Pointer,
-            Tst_Pointer_2,
-            Tst_Index,
-            Tst_Element);
+           (Tst_Pointer, Tst_Pointer_2, Tst_Index, Tst_Element);
 
          --    procedure Copy_Array
          --      (Source  : in Pointer;

@@ -52,10 +52,8 @@ begin
    Arr_Var (A1'Range) := (1, 2, 3, 4, 5);
 
    if not
-     (Equal (Arr_Var (1), 1) and
-      Equal (Arr_Var (2), 2) and
-      Equal (Arr_Var (3), 3) and
-      Equal (Arr_Var (4), 4) and
+     (Equal (Arr_Var (1), 1) and Equal (Arr_Var (2), 2) and
+      Equal (Arr_Var (3), 3) and Equal (Arr_Var (4), 4) and
       Equal (Arr_Var (5), 5))
    then
       Failed
@@ -66,10 +64,8 @@ begin
    Arr_Var (A2'Range) := (6, 7, 8, 9, 10);
 
    if
-     (not Equal (Arr_Var (1), 6) or
-      not Equal (Arr_Var (2), 7) or
-      not Equal (Arr_Var (3), 8) or
-      not Equal (Arr_Var (4), 9) or
+     (not Equal (Arr_Var (1), 6) or not Equal (Arr_Var (2), 7) or
+      not Equal (Arr_Var (3), 8) or not Equal (Arr_Var (4), 9) or
       not Equal (Arr_Var (5), 10))
    then
       Failed

@@ -36,8 +36,7 @@ begin
       begin
          if Val /= 321 then
             Report.Failed
-              ("Check_It - initial value was" &
-               Integer'Image (Val) &
+              ("Check_It - initial value was" & Integer'Image (Val) &
                " expected 321");
          elsif Verbose then
             Report.Comment ("Check_It - initial value ok");
@@ -53,8 +52,7 @@ begin
               ("Check_It - initial ATA value" &
                Cxc7002_0.Small_Integer'Image (Handle (1)) &
                Cxc7002_0.Small_Integer'Image (Handle (2)) &
-               Cxc7002_0.Small_Integer'Image (Handle (3)) &
-               " expected 3 2 1");
+               Cxc7002_0.Small_Integer'Image (Handle (3)) & " expected 3 2 1");
          end if;
          Handle.all := (2, 4, 6);
 

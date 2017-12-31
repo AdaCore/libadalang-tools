@@ -118,8 +118,7 @@ begin  -- main
      ("C631001",
       "Check that if different forms of a name are " &
       "used in the default expression of a discriminant part, " &
-      "the selector may be an operator symbol or a character " &
-      "literal");
+      "the selector may be an operator symbol or a character " & "literal");
 
    C631001_0.Int_Proc (P2 => Int_Obj);
 

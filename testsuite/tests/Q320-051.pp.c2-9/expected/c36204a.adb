@@ -59,19 +59,13 @@ begin
       I : Integer;
       B : Boolean;
    begin
-      if A4'First /= Ident_Bool (False) or
-        A4'Last /= Ident_Bool (True) or
-        A4'First (2) /= Integer'(1) or
-        A4'Last (2) /= Integer'(10)
-      then
+      if A4'First /= Ident_Bool (False) or A4'Last /= Ident_Bool (True) or
+        A4'First (2) /= Integer'(1) or A4'Last (2) /= Integer'(10) then
          Failed ("INCORRECT 'FIRST OR 'LAST  - 1");
       end if;
 
-      if A4'Length /= Integer'(2) or
-        A4'Length /= Ni'(2) or
-        A4'Length (1) /= N or
-        A4'Length (2) /= A4'Last (2)
-      then
+      if A4'Length /= Integer'(2) or A4'Length /= Ni'(2) or
+        A4'Length (1) /= N or A4'Length (2) /= A4'Last (2) then
          Failed ("INCORRECT 'LENGTH - 1");
       end if;
 
@@ -82,53 +76,37 @@ begin
          end loop;
       end loop;
 
-      if Aa'First (1) /= Ni'(-3) or
-        Aa'Last (1) /= N + 1 or
-        Aa'First (2) /= -N or
-        Aa'Last (2) /= N or
-        Aa'First (3) /= Ident_Bool (False) or
-        Aa'Last (3) /= Ident_Bool (True)
+      if Aa'First (1) /= Ni'(-3) or Aa'Last (1) /= N + 1 or
+        Aa'First (2) /= -N or Aa'Last (2) /= N or
+        Aa'First (3) /= Ident_Bool (False) or Aa'Last (3) /= Ident_Bool (True)
       then
          Failed ("INCORRECT 'FIRST OR 'LAST - 2");
       end if;
 
-      if N not in Aa'Range (2) or
-        Ident_Bool (False) not in Aa'Range (3) or
-        N + 1 not in Aa'Range or
-        N + 1 in Aa'Range (2)
-      then
+      if N not in Aa'Range (2) or Ident_Bool (False) not in Aa'Range (3) or
+        N + 1 not in Aa'Range or N + 1 in Aa'Range (2) then
          Failed ("INCORRECT 'RANGE - 1");
       end if;
 
-      if Aa'Length /= Integer'(7) or
-        Aa'Length (2) - 3 /= N or
-        Aa'Length (3) /= 2
-      then
+      if Aa'Length /= Integer'(7) or Aa'Length (2) - 3 /= N or
+        Aa'Length (3) /= 2 then
          Failed ("INCORRECT 'LENGTH - 2");
       end if;
 
-      if A2'First (1) /= Ni'(-3) or
-        A2'Last (1) /= N + 1 or
-        A2'First (2) /= -N or
-        A2'Last (2) /= N or
-        A2'First (3) /= Ident_Bool (False) or
-        A2'Last (3) /= Ident_Bool (True)
+      if A2'First (1) /= Ni'(-3) or A2'Last (1) /= N + 1 or
+        A2'First (2) /= -N or A2'Last (2) /= N or
+        A2'First (3) /= Ident_Bool (False) or A2'Last (3) /= Ident_Bool (True)
       then
          Failed ("INCORRECT 'FIRST OR 'LAST - 3");
       end if;
 
-      if N not in A2'Range (2) or
-        Ident_Bool (False) not in A2'Range (3) or
-        N + 1 not in A2'Range or
-        N + 1 in A2'Range (2)
-      then
+      if N not in A2'Range (2) or Ident_Bool (False) not in A2'Range (3) or
+        N + 1 not in A2'Range or N + 1 in A2'Range (2) then
          Failed ("INCORRECT 'RANGE - 2");
       end if;
 
-      if A2'Length /= Integer'(7) or
-        A2'Length (2) - 3 /= Integer (N) or
-        A2'Length (3) /= 2
-      then
+      if A2'Length /= Integer'(7) or A2'Length (2) - 3 /= Integer (N) or
+        A2'Length (3) /= 2 then
          Failed ("INCORRECT 'LENGTH - 3");
       end if;
 

@@ -115,8 +115,7 @@ begin
       Home_Refinance_Loan : Loan_Info_Type := (14_500.00, 135_000.00, 6.875);
       Line_Of_Credit_Loan : Loan_Info_Type := (5_490.00, -3_000.00, 13.75);
       Small_Business_Loan : Loan_Info_Type :=
-        (Account_Balance    => 45_000.00,
-         Loan_Balance       => 10_500.00,
+        (Account_Balance    => 45_000.00, Loan_Balance => 10_500.00,
          Loan_Interest_Rate => 5.875);
 
       package Acct_Io is new Text_Io.Float_Io (Account_Balance_Type);
@@ -128,20 +127,15 @@ begin
       -- entry was successful, False otherwise. This demonstrates use of
       -- Float_IO using a variety of data formats.
 
-      procedure Update_Loan_Info
-        (The_File : in out Text_Io.File_Type;
-         The_Loan : in     Loan_Info_Type;
-         Status   :    out Boolean)
+      procedure Update_Loan_Info (The_File : in out Text_Io.File_Type;
+         The_Loan : in     Loan_Info_Type; Status : out Boolean)
       is
       begin
          Acct_Io.Put (The_File, The_Loan.Account_Balance);
          Loan_Io.Put (The_File, The_Loan.Loan_Balance, 15, 2, 0);
          Rate_Io.Put
-           (File => The_File,
-            Item => The_Loan.Loan_Interest_Rate,
-            Fore => 6,
-            Aft  => 3,
-            Exp  => 0);
+           (File => The_File, Item => The_Loan.Loan_Interest_Rate, Fore => 6,
+            Aft  => 3, Exp => 0);
          Text_Io.New_Line (The_File);
          Status := True;
       exception
@@ -223,12 +217,9 @@ begin
          while not Text_Io.End_Of_File (Loan_File) loop
             Tc_Item_Count := Tc_Item_Count + 1;
             Acct_Io.Get
-              (Loan_File,
-               Tc_Bank_Ledger (Tc_Item_Count).Account_Balance);
+              (Loan_File, Tc_Bank_Ledger (Tc_Item_Count).Account_Balance);
             Loan_Io.Get
-              (Loan_File,
-               Tc_Bank_Ledger (Tc_Item_Count).Loan_Balance,
-               0);
+              (Loan_File, Tc_Bank_Ledger (Tc_Item_Count).Loan_Balance, 0);
             Rate_Io.Get
               (File  => Loan_File,
                Item  => Tc_Bank_Ledger (Tc_Item_Count).Loan_Interest_Rate,
@@ -242,8 +233,7 @@ begin
 
          if (Tc_Bank_Ledger (1) /= Home_Refinance_Loan) or
            (Tc_Bank_Ledger (2) /= Line_Of_Credit_Loan) or
-           (Tc_Bank_Ledger (3) /= Small_Business_Loan)
-         then
+           (Tc_Bank_Ledger (3) /= Small_Business_Loan) then
             Report.Failed ("Error in data read from file");
          end if;
 

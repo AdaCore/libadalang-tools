@@ -37,8 +37,7 @@ package body C3900051 is  -- Extended alert system abstraction.
       use type Ada.Calendar.Time;
    begin
       return
-        (Get_Time (La) /= Alert_Time or
-         Get_Display (La) /= Teletype or
+        (Get_Time (La) /= Alert_Time or Get_Display (La) /= Teletype or
          La.Level /= 1);
    end Bad_Final_Values;
 

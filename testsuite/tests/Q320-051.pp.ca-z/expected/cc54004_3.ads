@@ -7,9 +7,8 @@ pragma Elaborate (Cc54004_2);
 
 package Cc54004_3 is
 
-   package Alert_Stacks is new Cc54004_2
-     (Element_Type => Cc54004_0.Alert,
-      Element_Ptr  => Cc54004_0.Alert_Ptr);
+   package Alert_Stacks is new Cc54004_2 (Element_Type => Cc54004_0.Alert,
+      Element_Ptr                                      => Cc54004_0.Alert_Ptr);
 
    -- All overriding versions of Handle visible at the point of instantiation.
 

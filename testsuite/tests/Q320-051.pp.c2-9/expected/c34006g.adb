@@ -190,9 +190,7 @@ begin
       Failed ("INCORRECT 'POSITION");
    end if;
 
-   if X'Size < T'Size or
-     X.C'Size < Component'Size or
-     X.B'Size < Boolean'Size
+   if X'Size < T'Size or X.C'Size < Component'Size or X.B'Size < Boolean'Size
    then
       Failed ("INCORRECT OBJECT'SIZE");
    end if;

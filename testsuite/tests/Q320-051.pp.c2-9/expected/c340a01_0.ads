@@ -71,13 +71,11 @@ package C340a01_0 is  -- Raw data to be used in creating book elements.
    type Data_List is array (Number_Of_Books) of F340a001.Text_Ptr;
 
    Title_List : Data_List :=
-     (new String'("Wuthering Heights"),
-      new String'("Heart of Darkness"),
+     (new String'("Wuthering Heights"), new String'("Heart of Darkness"),
       new String'("Ulysses"));
 
    Author_List : Data_List :=
-     (new String'("Bronte, Emily"),
-      new String'("Conrad, Joseph"),
+     (new String'("Bronte, Emily"), new String'("Conrad, Joseph"),
       new String'("Joyce, James"));
 
 end C340a01_0;

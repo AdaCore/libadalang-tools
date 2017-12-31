@@ -80,8 +80,7 @@ begin
                         raise Constraint_Error;
                      when others =>
                         Failed
-                          ("UNEXPECTED EXCEPTION " &
-                           "RAISED IN PROPAGATE " &
+                          ("UNEXPECTED EXCEPTION " & "RAISED IN PROPAGATE " &
                            "PACKAGE");
                   end Propagate;
 

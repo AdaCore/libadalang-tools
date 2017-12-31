@@ -127,14 +127,9 @@ procedure Cxg2012 is
          if abs (Actual - Expected) > Max_Error then
             Accuracy_Error_Reported := True;
             Report.Failed
-              (Test_Name &
-               " actual: " &
-               Real'Image (Actual) &
-               " expected: " &
-               Real'Image (Expected) &
-               " difference: " &
-               Real'Image (Actual - Expected) &
-               " max err:" &
+              (Test_Name & " actual: " & Real'Image (Actual) & " expected: " &
+               Real'Image (Expected) & " difference: " &
+               Real'Image (Actual - Expected) & " max err:" &
                Real'Image (Max_Error));
          elsif Verbose then
             if Actual = Expected then
@@ -147,11 +142,8 @@ procedure Cxg2012 is
 
       -- the following version of Check computes the allowed error bound using
       -- the operands
-      procedure Check
-        (Actual, Expected : Real;
-         Left, Right      : Real;
-         Test_Name        : String;
-         Mre_Factor       : Real := 1.0)
+      procedure Check (Actual, Expected : Real; Left, Right : Real;
+         Test_Name                      : String; Mre_Factor : Real := 1.0)
       is
          Mre : Real;
       begin
@@ -170,10 +162,7 @@ procedure Cxg2012 is
          -- the following tests use only model numbers so the result is
          -- expected to be exact.
          Ic : constant Int_Checks :=
-           ((2.0, 5, 32.0),
-            (-2.0, 5, -32.0),
-            (0.5, -5, 32.0),
-            (2.0, 0, 1.0),
+           ((2.0, 5, 32.0), (-2.0, 5, -32.0), (0.5, -5, 32.0), (2.0, 0, 1.0),
             (0.0, 0, 1.0));
       begin
          for I in Ic'Range loop
@@ -182,11 +171,8 @@ procedure Cxg2012 is
             begin
                Y := Ic (I).Left**Ic (I).Right;
                Check
-                 (Y,
-                  Ic (I).Expected,
-                  "real to integer test" &
-                  Real'Image (Ic (I).Left) &
-                  " ** " &
+                 (Y, Ic (I).Expected,
+                  "real to integer test" & Real'Image (Ic (I).Left) & " ** " &
                   Integer'Image (Ic (I).Right),
                   0.0);  -- no error allowed
             exception
@@ -240,46 +226,25 @@ procedure Cxg2012 is
             Check
               (X**1.0,
                X,  -- exact result required
-               "Small range" &
-               Integer'Image (I) &
-               ": " &
-               Real'Image (X) &
+               "Small range" & Integer'Image (I) & ": " & Real'Image (X) &
                " ** 1.0",
                0.0);
 
             Check
-              ((X * X)**1.5,
-               X**3,
-               X * X,
-               1.5,
-               "Small range" &
-               Integer'Image (I) &
-               ": " &
-               Real'Image (X * X) &
+              ((X * X)**1.5, X**3, X * X, 1.5,
+               "Small range" & Integer'Image (I) & ": " & Real'Image (X * X) &
                " ** 1.5",
                1.25);
 
             Check
-              (X**13.5,
-               1.0 / (X**(-13.5)),
-               X,
-               13.5,
-               "Small range" &
-               Integer'Image (I) &
-               ": " &
-               Real'Image (X) &
+              (X**13.5, 1.0 / (X**(-13.5)), X, 13.5,
+               "Small range" & Integer'Image (I) & ": " & Real'Image (X) &
                " ** 13.5",
                2.0);   -- 2 ** computations
 
             Check
-              ((X * X)**1.25,
-               X**(2.5),
-               X * X,
-               1.25,
-               "Small range" &
-               Integer'Image (I) &
-               ": " &
-               Real'Image (X * X) &
+              ((X * X)**1.25, X**(2.5), X * X, 1.25,
+               "Small range" & Integer'Image (I) & ": " & Real'Image (X * X) &
                " ** 1.25",
                2.0);   -- 2 ** computations
 
@@ -319,36 +284,21 @@ procedure Cxg2012 is
             Check
               (X**1.0,
                X,  -- exact result required
-               "Large range" &
-               Integer'Image (I) &
-               ": " &
-               Real'Image (X) &
+               "Large range" & Integer'Image (I) & ": " & Real'Image (X) &
                " ** 1.0",
                0.0);
 
             Subtest := 'B';
             Check
-              ((X * X)**1.5,
-               X**3,
-               X * X,
-               1.5,
-               "Large range" &
-               Integer'Image (I) &
-               ": " &
-               Real'Image (X * X) &
+              ((X * X)**1.5, X**3, X * X, 1.5,
+               "Large range" & Integer'Image (I) & ": " & Real'Image (X * X) &
                " ** 1.5",
                1.25);   -- inexact expected result
 
             Subtest := 'C';
             Check
-              ((X * X)**1.25,
-               X**(2.5),
-               X * X,
-               1.25,
-               "Large range" &
-               Integer'Image (I) &
-               ": " &
-               Real'Image (X * X) &
+              ((X * X)**1.25, X**(2.5), X * X, 1.25,
+               "Large range" & Integer'Image (I) & ": " & Real'Image (X * X) &
                " ** 1.25",
                2.0);   -- two ** operators
 
@@ -363,12 +313,10 @@ procedure Cxg2012 is
          when Constraint_Error =>
             Report.Failed
               ("Constraint_Error raised in Large Range Test" &
-               Integer'Image (Iteration) &
-               Subtest);
+               Integer'Image (Iteration) & Subtest);
          when others =>
             Report.Failed
-              ("exception in Large Range Test" &
-               Integer'Image (Iteration) &
+              ("exception in Large Range Test" & Integer'Image (Iteration) &
                Subtest);
       end Large_Range_Test;
 
@@ -469,8 +417,7 @@ begin
 
    if Verbose then
       Report.Comment
-        ("checking a digits" &
-         Integer'Image (System.Max_Digits) &
+        ("checking a digits" & Integer'Image (System.Max_Digits) &
          " floating point type");
    end if;
 

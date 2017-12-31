@@ -40,8 +40,7 @@ begin
       "CONVERSION TO AN UNCONSTRAINED ARRAY TYPE " &
       "IF, FOR A NON-NULL DIMENSION OF THE OPERAND " &
       "TYPE, ONE BOUND DOES NOT BELONG TO THE " &
-      "CORRESPONDING INDEX SUBTYPE OF THE TARGET " &
-      "TYPE");
+      "CORRESPONDING INDEX SUBTYPE OF THE TARGET " & "TYPE");
 
    declare
       type Arr1 is array (Integer range <>) of Integer;
@@ -66,8 +65,7 @@ begin
 
    declare
       type Arr1 is array (Integer range <>, Integer range <>) of Integer;
-      A1 : Arr1
-        (Ident_Int (1) .. Ident_Int (10),
+      A1 : Arr1 (Ident_Int (1) .. Ident_Int (10),
          Ident_Int (1) .. Ident_Int (1));
 
       type Arr2 is array (Subint range <>, Integer range <>) of Integer;
@@ -89,8 +87,7 @@ begin
 
    declare
       type Arr1 is array (Integer range <>, Integer range <>) of Integer;
-      A1 : Arr1
-        (Ident_Int (1) .. Ident_Int (10),
+      A1 : Arr1 (Ident_Int (1) .. Ident_Int (10),
          Ident_Int (1) .. Ident_Int (0));
 
       type Arr2 is array (Subint range <>, Integer range <>) of Integer;
@@ -112,8 +109,7 @@ begin
 
    declare
       type Arr1 is array (Integer range <>, Integer range <>) of Integer;
-      A1 : Arr1
-        (Ident_Int (1) .. Ident_Int (10),
+      A1 : Arr1 (Ident_Int (1) .. Ident_Int (10),
          Ident_Int (1) .. Ident_Int (0));
 
       subtype Noint is Integer range Ident_Int (1) .. Ident_Int (0);

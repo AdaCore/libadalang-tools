@@ -76,10 +76,7 @@ begin
 
             if Se'Val (Position) /= E1 then
                Failed
-                 ("INCORRECT " &
-                  Str &
-                  "'VAL (" &
-                  Integer'Image (Position) &
+                 ("INCORRECT " & Str & "'VAL (" & Integer'Image (Position) &
                   ")");
             end if;
 

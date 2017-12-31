@@ -25,8 +25,7 @@ begin
       Bag_Of_Integers.Add (I, My_Bag);
    end loop;
 
-   if Bag_Of_Integers.Bag_Image (My_Bag) /=
-     " 1, 2, 3, 4, 5, 6, 7, 8, 9, 10"
+   if Bag_Of_Integers.Bag_Image (My_Bag) /= " 1, 2, 3, 4, 5, 6, 7, 8, 9, 10"
    then
       Report.Failed ("Incorrect results");
    end if;

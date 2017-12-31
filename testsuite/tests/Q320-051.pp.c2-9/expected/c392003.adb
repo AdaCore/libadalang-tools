@@ -375,8 +375,7 @@ begin  -- Main test procedure.
       "Check that the use of a class-wide parameter " &
       "allows for proper dispatching where root type " &
       "is declared in a nested package, and " &
-      "subsequent extended types are derived in " &
-      "further nested packages");
+      "subsequent extended types are derived in " & "further nested packages");
 
    Bank_Account_Subtest :
    begin
@@ -388,8 +387,7 @@ begin  -- Main test procedure.
       Tabulate_Account (B_Account);
 
       if (Bank_Reserve /= Opening_Balance) or
-        (Number_Of_Accounts (Bank) /= 1) or
-        (Number_Of_Accounts (Total) /= 1)
+        (Number_Of_Accounts (Bank) /= 1) or (Number_Of_Accounts (Total) /= 1)
       then
          Report.Failed ("Failed in Bank_Account_Subtest");
       end if;
@@ -407,8 +405,7 @@ begin  -- Main test procedure.
 
       if (Daily_Representative /= Manager) or
         (Number_Of_Accounts (Savings) /= 1) or
-        (Number_Of_Accounts (Total) /= 2)
-      then
+        (Number_Of_Accounts (Total) /= 2) then
          Report.Failed ("Failed in Savings_Account_Subtest");
       end if;
 
@@ -433,10 +430,8 @@ begin  -- Main test procedure.
       -- operation was overridden by its parent type as well).
       Tabulate_Account (P_Account);
 
-      if Bank_Reserve /= 1_100.00 or
-        Number_Of_Accounts (Preferred) /= 1 or
-        Number_Of_Accounts (Total) /= 3
-      then
+      if Bank_Reserve /= 1_100.00 or Number_Of_Accounts (Preferred) /= 1 or
+        Number_Of_Accounts (Total) /= 3 then
          Report.Failed ("Failed in Preferred_Account_Subtest");
       end if;
 

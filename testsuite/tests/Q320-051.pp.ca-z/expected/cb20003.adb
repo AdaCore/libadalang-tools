@@ -43,8 +43,7 @@ begin
    begin
 
       Push_Buttons.Set_Response
-        (Console_Button,
-         Push_Buttons.Alert_Response'Access);
+        (Console_Button, Push_Buttons.Alert_Response'Access);
 
       Push_Buttons.Push
         (Console_Button,        -- Raise exception that will
@@ -70,8 +69,7 @@ begin
    begin
 
       Push_Buttons.Set_Response
-        (Console_Button,
-         Push_Buttons.Emergency_Response'Access);
+        (Console_Button, Push_Buttons.Emergency_Response'Access);
 
       Push_Buttons.Push
         (Console_Button,        -- Raise exception that will
@@ -91,8 +89,7 @@ begin
 
    if not
      (Push_Buttons.Handled_With_Others and
-      Push_Buttons.Reraised_In_Subprogram and
-      Push_Buttons.Handled_In_Caller)
+      Push_Buttons.Reraised_In_Subprogram and Push_Buttons.Handled_In_Caller)
    then
       Report.Failed ("Incorrect exception handling in referenced subprograms");
    end if;

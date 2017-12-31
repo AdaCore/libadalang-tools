@@ -233,8 +233,7 @@ begin
      ("CXD2007",
       "Check that when a high priority task is eligible to" &
       " run it is given the processor and that the preempted" &
-      " task stays at the head of the ready queue for its " &
-      " priority");
+      " task stays at the head of the ready queue for its " & " priority");
 
    if Impdef.Annex_D.Processor /= Impdef.Annex_D.Uni_Processor then
       Report.Not_Applicable ("Multi-Processor configuration");
@@ -272,8 +271,7 @@ begin
    -- continuing the held task should not give anyone else a chance to run
    Atc.Continue (Task_Ids (High));
    Check
-     ((False, False, False),
-      "continue should not be a blocking operation");
+     ((False, False, False), "continue should not be a blocking operation");
 
    -- make sure the continued task now runs
    delay Impdef.Clear_Ready_Queue;

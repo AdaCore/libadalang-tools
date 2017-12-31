@@ -48,31 +48,25 @@ begin
      ("C85013A",
       "CHECK THAT A SUBPROGRAM CAN BE RENAMED AND " &
       "THAT THE NEW NAMES/DEFAULTS ARE USED WITH " &
-      "THE CONSTRAINTS ASSOCIATED WITH THE RENAMED" &
-      " ENTITY");
+      "THE CONSTRAINTS ASSOCIATED WITH THE RENAMED" & " ENTITY");
 
    declare
 
       type Ta is array (1 .. 5) of Integer;
 
-      function Proc1
-        (A : Integer := 1;
-         B : Ta      := (1 .. 5 => 1)) return Integer;
-      function Proca
-        (C : Integer := 1;
-         D : Ta      := (1 .. 5 => 1)) return Integer renames
+      function Proc1 (A : Integer := 1;
+         B              : Ta      := (1 .. 5 => 1)) return Integer;
+      function Proca (C : Integer := 1;
+         D              : Ta      := (1 .. 5 => 1)) return Integer renames
         Proc1;
-      function Procb
-        (B : Integer := 1;
-         A : Ta      := (1 .. 5 => 1)) return Integer renames
+      function Procb (B : Integer := 1;
+         A              : Ta      := (1 .. 5 => 1)) return Integer renames
         Proc1;
-      function Procc
-        (A : Integer := 2;
-         B : Ta      := (1, 2, 3, 4, 5)) return Integer renames
+      function Procc (A : Integer := 2;
+         B              : Ta      := (1, 2, 3, 4, 5)) return Integer renames
         Proc1;
-      function Procd
-        (C : Integer := 2;
-         D : Ta      := (1, 2, 3, 4, 5)) return Integer renames
+      function Procd (C : Integer := 2;
+         D              : Ta      := (1, 2, 3, 4, 5)) return Integer renames
         Proc1;
 
       function Proc1 (A : Integer := 1; B : Ta := (1 .. 5 => 1)) return Integer

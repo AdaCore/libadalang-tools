@@ -20,8 +20,7 @@ begin
    Report.Test
      ("CA11008",
       "Check that a private child package can use " &
-      "entities declared in the visible part of its " &
-      "parent unit");
+      "entities declared in the visible part of its " & "parent unit");
 
    -- Check initial conditions of the first entry in the file table. These are
    -- all default values provided in the declaration of the type File_Type.
@@ -33,8 +32,7 @@ begin
      or else
      (File_Table (1).Acct_Access /= (Default_Permission) or
       (File_Table (1).Mode /= Default_Mode))
-     or else (File_Table (1).Current_Status /= Default_Status)
-   then
+     or else (File_Table (1).Current_Status /= Default_Status) then
       Report.Failed ("Initial condition failure");
    end if;
 

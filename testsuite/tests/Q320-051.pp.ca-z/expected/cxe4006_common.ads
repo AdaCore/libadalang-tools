@@ -114,22 +114,15 @@ package Cxe4006_Common is
    -- routine that received the dispatching call.
 
    type Type_Decl_Location is
-     (Common_Spec,
-      Part_A1_1_Spec,
-      Part_A1_2_Spec,
-      Part_A2_Spec,
-      Part_B_Spec,
-      Part_B_Body,
-      Normal_Spec);
+     (Common_Spec, Part_A1_1_Spec, Part_A1_2_Spec, Part_A2_Spec, Part_B_Spec,
+      Part_B_Body, Normal_Spec);
 
    -- root tagged type for remote access to class wide type test
    type Root_Tagged_Type is tagged record
       Common_Record_Field : Integer := 1_234;
    end record;
 
-   procedure Single_Controlling_Operand
-     (Rtt         : in out Root_Tagged_Type;
-      Test_Number : in     Integer;
-      Callee      :    out Type_Decl_Location);
+   procedure Single_Controlling_Operand (Rtt : in out Root_Tagged_Type;
+      Test_Number : in     Integer; Callee : out Type_Decl_Location);
 
 end Cxe4006_Common;

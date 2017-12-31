@@ -82,13 +82,11 @@ procedure C460011 is
    generic
       type Source is delta <> digits <>;
       type Target is mod <>;
-   procedure Decimal_Conversion_Check
-     (For_The_Value : Source;
-      Message       : String);
+   procedure Decimal_Conversion_Check (For_The_Value : Source;
+      Message                                        : String);
 
-   procedure Decimal_Conversion_Check
-     (For_The_Value : Source;
-      Message       : String)
+   procedure Decimal_Conversion_Check (For_The_Value : Source;
+      Message                                        : String)
    is
 
       Item : Target;
@@ -104,16 +102,13 @@ procedure C460011 is
          Report.Failed ("Deci raised wrong exception " & Message);
    end Decimal_Conversion_Check;
 
-   procedure Decim_To_Short is new Decimal_Conversion_Check
-     (Decim,
+   procedure Decim_To_Short is new Decimal_Conversion_Check (Decim,
       Unsigned_Edge_8);
 
-   procedure Decim_To_Eight is new Decimal_Conversion_Check
-     (Decim,
+   procedure Decim_To_Eight is new Decimal_Conversion_Check (Decim,
       Unsigned_8_Bit);
 
-   procedure Decim_To_Wide is new Decimal_Conversion_Check
-     (Decim,
+   procedure Decim_To_Wide is new Decimal_Conversion_Check (Decim,
       Unsigned_Over_8);
 
    function Identity (Launder : Decim) return Decim is
@@ -134,8 +129,7 @@ begin  -- Main test procedure.
      ("C460011",
       "Check that conversion to " &
       "a modular type raises Constraint_Error when " &
-      "the operand value is outside the base range " &
-      "of the modular type");
+      "the operand value is outside the base range " & "of the modular type");
 
    -- Decimal Error cases
 

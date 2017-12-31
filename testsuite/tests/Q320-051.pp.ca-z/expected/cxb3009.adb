@@ -82,8 +82,7 @@ begin
    Report.Test
      ("CXB3009",
       "Check that functions To_Chars_Ptr, " &
-      "New_Chars_Array, and New_String produce " &
-      "correct results");
+      "New_Chars_Array, and New_String produce " & "correct results");
 
    Test_Block :
    declare
@@ -121,13 +120,11 @@ begin
       -- the parameter Item is null.
 
       if Ics.To_Chars_Ptr
-          (Item      => Null_Char_Array_Access,
-           Nul_Check => False) /=
+          (Item => Null_Char_Array_Access, Nul_Check => False) /=
         Ics.Null_Ptr or
         Ics.To_Chars_Ptr (Null_Char_Array_Access, Nul_Check => True) /=
           Ics.Null_Ptr or
-        Ics.To_Chars_Ptr (Null_Char_Array_Access) /= Ics.Null_Ptr
-      then
+        Ics.To_Chars_Ptr (Null_Char_Array_Access) /= Ics.Null_Ptr then
          Report.Failed
            ("Incorrect result from function To_Chars_Ptr " &
             "with parameter Item being a null value");
@@ -143,8 +140,7 @@ begin
            Ics.To_Chars_Ptr (Item => Char_Array_W_Nul_Ptr, Nul_Check => True);
 
          if Ics.Value (Tc_Chars_Ptr) /= String_With_Nul or
-           Ics.Value (Tc_Chars_Ptr) /= Char_Array_With_Nul
-         then
+           Ics.Value (Tc_Chars_Ptr) /= Char_Array_With_Nul then
             Report.Failed
               ("Incorrect result from function To_Chars_Ptr " &
                "with parameter Item being non-null and " &
@@ -192,16 +188,13 @@ begin
       begin
          Tc_Chars_Ptr :=
            Ics.To_Chars_Ptr
-             (Item      => Char_Array_Wo_Nul_Ptr,
-              Nul_Check => False);
+             (Item => Char_Array_Wo_Nul_Ptr, Nul_Check => False);
 
          if Ics.Value (Tc_Chars_Ptr, 6) /= String_Without_Nul or
-           Ics.Value (Tc_Chars_Ptr, 6) /= Char_Array_Without_Nul
-         then
+           Ics.Value (Tc_Chars_Ptr, 6) /= Char_Array_Without_Nul then
             Report.Failed
               ("Incorrect result from function To_Chars_Ptr " &
-               "with parameter Item being non-null and " &
-               "Nul_Check False");
+               "with parameter Item being non-null and " & "Nul_Check False");
          end if;
       exception
          when Ic.Terminator_Error =>
@@ -237,8 +230,7 @@ begin
       -- nul terminated. Contents of array are validated using Value.
 
       if Ics.Value (Tc_Chars_Ptr, Length => 7) /= Char_Array_With_Nul or
-        Ics.Strlen (Item => Tc_Chars_Ptr) /= 6
-      then
+        Ics.Strlen (Item => Tc_Chars_Ptr) /= 6 then
          Report.Failed
            ("Incorrect length of allocated char_array resulting " &
             "from call of New_Char_Array with a non-null " &
@@ -264,8 +256,7 @@ begin
 
       if Ics.Value (Item => Tc_Chars_Ptr, Length => 6) /=
         Char_Array_Without_Nul or
-        Ics.Strlen (Item => Tc_Chars_Ptr) /= 6
-      then
+        Ics.Strlen (Item => Tc_Chars_Ptr) /= 6 then
          Report.Failed
            ("Incorrect length of allocated char_array " &
             "resulting from call of New_Char_Array with " &
@@ -310,8 +301,7 @@ begin
    exception
       when The_Error : others =>
          Report.Failed
-           ("The following exception was raised in the " &
-            "Test_Block: " &
+           ("The following exception was raised in the " & "Test_Block: " &
             Exception_Name (The_Error));
    end Test_Block;
 

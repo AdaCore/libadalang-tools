@@ -72,15 +72,13 @@ begin
          if Rec1.C.D1 /= 2 then
             Failed
               ("UNABLE TO CORRECTLY READ DISCRIMINANT " &
-               "OF THE SUBCOMPONENT OF A RENAMED OUT " &
-               "PARAMETER");
+               "OF THE SUBCOMPONENT OF A RENAMED OUT " & "PARAMETER");
          end if;
 
          if Rec2.D1 /= 2 then
             Failed
               ("UNABLE TO CORRECTLY READ DISCRIMINANT " &
-               "OF A RENAMED SUBCOMPONENT OF AN OUT " &
-               "PARAMETER");
+               "OF A RENAMED SUBCOMPONENT OF AN OUT " & "PARAMETER");
          end if;
 
          if Rec3.D2 /= 5 then
@@ -99,8 +97,7 @@ begin
          if Rec4.D1 /= 2 then
             Failed
               ("UNABLE TO CORRECTLY READ DISCRIMINANT " &
-               "OF A RENAMED SUBCOMPONENT OF A RENAMED" &
-               " OUT PARAMETER");
+               "OF A RENAMED SUBCOMPONENT OF A RENAMED" & " OUT PARAMETER");
          end if;
 
          if Rec5.D1 /= 2 then

@@ -73,15 +73,9 @@ package Fxaia00 is
      array (Array_Bounds_Type) of Value_In_Ptr_Type;
 
    Value_In_Ptr_Array : constant Value_In_Ptr_Array_Type :=
-     (Value_In_1'Access,
-      Value_In_2'Access,
-      Value_In_3'Access,
-      Value_In_4'Access,
-      Value_In_5'Access,
-      Value_In_6'Access,
-      Value_In_7'Access,
-      Value_In_8'Access,
-      Value_In_9'Access,
+     (Value_In_1'Access, Value_In_2'Access, Value_In_3'Access,
+      Value_In_4'Access, Value_In_5'Access, Value_In_6'Access,
+      Value_In_7'Access, Value_In_8'Access, Value_In_9'Access,
       Value_In_10'Access);
 
 end Fxaia00;

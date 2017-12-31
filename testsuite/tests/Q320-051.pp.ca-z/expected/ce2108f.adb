@@ -53,8 +53,7 @@ begin
      ("CE2108F",
       "CHECK THAT AN EXTERNAL SEQUENTIAL FILE " &
       "SPECIFIED BY A NON-NULL STRING NAME IS " &
-      "ACCESSIBLE AFTER THE COMPLETION OF THE MAIN " &
-      "PROGRAM");
+      "ACCESSIBLE AFTER THE COMPLETION OF THE MAIN " & "PROGRAM");
 
    -- TEST FOR SEQUENTIAL FILE SUPPORT.
 
@@ -89,8 +88,7 @@ begin
    exception
       when Use_Error =>
          Not_Applicable
-           ("USE_ERROR RAISED ON OPEN FOR " &
-            "SEQUENTIAL FILE WITH IN_FILE " &
+           ("USE_ERROR RAISED ON OPEN FOR " & "SEQUENTIAL FILE WITH IN_FILE " &
             "MODE");
          raise Incomplete;
    end;

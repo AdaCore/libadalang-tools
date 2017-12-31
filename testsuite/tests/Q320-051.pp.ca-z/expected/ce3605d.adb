@@ -101,15 +101,13 @@ begin
 
       if Line (Ft) /= 2 then
          Failed
-           ("LINE COUNT WRONG - 2; WAS" &
-            Count'Image (Line (Ft)) &
+           ("LINE COUNT WRONG - 2; WAS" & Count'Image (Line (Ft)) &
             " INSTEAD OF 2");
       end if;
 
       if Col (Ft) /= 5 then
          Failed
-           ("COL COUNT WRONG - 2; WAS" &
-            Count'Image (Col (Ft)) &
+           ("COL COUNT WRONG - 2; WAS" & Count'Image (Col (Ft)) &
             " INSTEAD OF 5");
       end if;
 
@@ -118,15 +116,13 @@ begin
          if Line (Ft) /= 3 then
             Failed
               ("PUT STRING WHEN IN MIDDLE OF " &
-               "LINE DOES NOT HAVE EFFECT OF " &
-               "NEW_LINE; LINE COUNT IS" &
+               "LINE DOES NOT HAVE EFFECT OF " & "NEW_LINE; LINE COUNT IS" &
                Count'Image (Line (Ft)));
          end if;
 
          if Col (Ft) /= 3 then
             Failed
-              ("COL COUNT WRONG - 3; WAS" &
-               Count'Image (Col (Ft)) &
+              ("COL COUNT WRONG - 3; WAS" & Count'Image (Col (Ft)) &
                " INSTEAD OF 3");
          end if;
 
@@ -141,15 +137,13 @@ begin
 
       if Line (Ft) /= 3 then
          Failed
-           ("LINE COUNT WRONG - 3; WAS" &
-            Count'Image (Line (Ft)) &
+           ("LINE COUNT WRONG - 3; WAS" & Count'Image (Line (Ft)) &
             " INSTEAD OF 3");
       end if;
 
       if Col (Ft) /= 6 then
          Failed
-           ("COL COUNT WRONG - 3;  WAS" &
-            Count'Image (Col (Ft)) &
+           ("COL COUNT WRONG - 3;  WAS" & Count'Image (Col (Ft)) &
             " INSTEAD OF 6");
       end if;
 
@@ -158,15 +152,13 @@ begin
 
          if Line (Ft) /= 3 then
             Failed
-              ("LINE COUNT WRONG - 3; WAS" &
-               Count'Image (Line (Ft)) &
+              ("LINE COUNT WRONG - 3; WAS" & Count'Image (Line (Ft)) &
                " INSTEAD OF 3");
          end if;
 
          if Col (Ft) /= 6 then
             Failed
-              ("COL COUNT WRONG - 3;  WAS" &
-               Count'Image (Col (Ft)) &
+              ("COL COUNT WRONG - 3;  WAS" & Count'Image (Col (Ft)) &
                " INSTEAD OF 6");
          end if;
 

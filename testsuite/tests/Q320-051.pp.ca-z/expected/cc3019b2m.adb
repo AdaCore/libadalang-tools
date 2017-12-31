@@ -57,29 +57,24 @@ procedure Cc3019b2m is
 
    Wall_Date : Date := (Month => Nov, Day => 9, Year => 1_989);
 
-   procedure Assign
-     (The_Value_Of_This_Date : in out Date;
-      To_This_Date           : in out Date);
+   procedure Assign (The_Value_Of_This_Date : in out Date;
+      To_This_Date                          : in out Date);
 
    function Is_Equal (Left : in Date; Right : in Date) return Boolean;
 
-   package Date_Stack is new Cc3019b1_Stack_Class
-     (Element => Date,
-      Assign  => Assign,
-      "="     => Is_Equal);
+   package Date_Stack is new Cc3019b1_Stack_Class (Element => Date,
+      Assign => Assign, "=" => Is_Equal);
 
    First_Date_Stack  : Date_Stack.Stack;
    Second_Date_Stack : Date_Stack.Stack;
    Third_Date_Stack  : Date_Stack.Stack;
 
-   function "="
-     (Left  : in Date_Stack.Stack;
-      Right : in Date_Stack.Stack) return Boolean renames
+   function "=" (Left : in Date_Stack.Stack;
+      Right           : in Date_Stack.Stack) return Boolean renames
      Date_Stack."=";
 
-   procedure Assign
-     (The_Value_Of_This_Date : in out Date;
-      To_This_Date           : in out Date)
+   procedure Assign (The_Value_Of_This_Date : in out Date;
+      To_This_Date                          : in out Date)
    is
 
    begin -- ASSIGN
@@ -92,8 +87,7 @@ procedure Cc3019b2m is
 
    begin -- IS_EQUAL
 
-      return (Left.Month = Right.Month) and
-        (Left.Day = Right.Day) and
+      return (Left.Month = Right.Month) and (Left.Day = Right.Day) and
         (Left.Year = Right.Year);
 
    end Is_Equal;
@@ -108,44 +102,35 @@ begin  -- CC3019B2M
       "2 IS SUPPORTED FOR GENERICS.");
 
    Date_Stack.Clear (This_Stack => First_Date_Stack);
-   if Date_Stack.Number_Of_Elements (On_This_Stack => First_Date_Stack) /=
-     0
+   if Date_Stack.Number_Of_Elements (On_This_Stack => First_Date_Stack) /= 0
    then
       Report.Failed ("IMPROPER VALUE RETURNED FROM NUMBER_OF_ELEMENTS - 1");
    end if;
 
    Date_Stack.Push
-     (This_Element     => Today,
-      On_To_This_Stack => First_Date_Stack);
-   if Date_Stack.Number_Of_Elements (On_This_Stack => First_Date_Stack) /=
-     1
+     (This_Element => Today, On_To_This_Stack => First_Date_Stack);
+   if Date_Stack.Number_Of_Elements (On_This_Stack => First_Date_Stack) /= 1
    then
       Report.Failed ("IMPROPER VALUE RETURNED FROM NUMBER_OF_ELEMENTS - 2");
    end if;
 
    Date_Stack.Push
-     (This_Element     => First_Date,
-      On_To_This_Stack => First_Date_Stack);
-   if Date_Stack.Number_Of_Elements (On_This_Stack => First_Date_Stack) /=
-     2
+     (This_Element => First_Date, On_To_This_Stack => First_Date_Stack);
+   if Date_Stack.Number_Of_Elements (On_This_Stack => First_Date_Stack) /= 2
    then
       Report.Failed ("IMPROPER VALUE RETURNED FROM NUMBER_OF_ELEMENTS - 3");
    end if;
 
    Date_Stack.Push
-     (This_Element     => Birth_Date,
-      On_To_This_Stack => First_Date_Stack);
-   if Date_Stack.Number_Of_Elements (On_This_Stack => First_Date_Stack) /=
-     3
+     (This_Element => Birth_Date, On_To_This_Stack => First_Date_Stack);
+   if Date_Stack.Number_Of_Elements (On_This_Stack => First_Date_Stack) /= 3
    then
       Report.Failed ("IMPROPER VALUE RETURNED FROM NUMBER_OF_ELEMENTS - 4");
    end if;
 
    Date_Stack.Pop
-     (This_Element   => Store_Date,
-      Off_This_Stack => First_Date_Stack);
-   if Date_Stack.Number_Of_Elements (On_This_Stack => First_Date_Stack) /=
-     2
+     (This_Element => Store_Date, Off_This_Stack => First_Date_Stack);
+   if Date_Stack.Number_Of_Elements (On_This_Stack => First_Date_Stack) /= 2
    then
       Report.Failed ("IMPROPER VALUE RETURNED FROM NUMBER_OF_ELEMENTS - 5");
    end if;
@@ -155,26 +140,22 @@ begin  -- CC3019B2M
    end if;
 
    Date_Stack.Clear (This_Stack => Second_Date_Stack);
-   if Date_Stack.Number_Of_Elements (On_This_Stack => Second_Date_Stack) /=
-     0
+   if Date_Stack.Number_Of_Elements (On_This_Stack => Second_Date_Stack) /= 0
    then
       Report.Failed ("IMPROPER VALUE RETURNED FROM NUMBER_OF_ELEMENTS - 6");
    end if;
 
    Date_Stack.Copy
-     (This_Stack    => First_Date_Stack,
-      To_This_Stack => Second_Date_Stack);
+     (This_Stack => First_Date_Stack, To_This_Stack => Second_Date_Stack);
 
    if First_Date_Stack /= Second_Date_Stack then
       Report.Failed ("PROBLEMS WITH COPY OR TEST FOR EQUALITY");
    end if;
 
    Date_Stack.Pop
-     (This_Element   => Store_Date,
-      Off_This_Stack => Second_Date_Stack);
+     (This_Element => Store_Date, Off_This_Stack => Second_Date_Stack);
    Date_Stack.Push
-     (This_Element     => Wall_Date,
-      On_To_This_Stack => Second_Date_Stack);
+     (This_Element => Wall_Date, On_To_This_Stack => Second_Date_Stack);
    if First_Date_Stack = Second_Date_Stack then
       Report.Failed ("PROBLEMS WITH POP OR TEST FOR EQUALITY");
    end if;
@@ -185,8 +166,7 @@ begin  -- CC3019B2M
 
       Date_Stack.Clear (This_Stack => Third_Date_Stack);
       Date_Stack.Pop
-        (This_Element   => Store_Date,
-         Off_This_Stack => Third_Date_Stack);
+        (This_Element => Store_Date, Off_This_Stack => Third_Date_Stack);
       Report.Failed ("UNDERFLOW EXCEPTION NOT RAISED");
 
    exception
@@ -207,13 +187,11 @@ begin  -- CC3019B2M
       Date_Stack.Clear (This_Stack => Third_Date_Stack);
       for Index in 1 .. 10 loop
          Date_Stack.Push
-           (This_Element     => Today,
-            On_To_This_Stack => Third_Date_Stack);
+           (This_Element => Today, On_To_This_Stack => Third_Date_Stack);
       end loop;
 
       Date_Stack.Push
-        (This_Element     => Today,
-         On_To_This_Stack => Third_Date_Stack);
+        (This_Element => Today, On_To_This_Stack => Third_Date_Stack);
       Report.Failed ("OVERFLOW EXCEPTION NOT RAISED");
 
    exception
@@ -278,15 +256,13 @@ begin  -- CC3019B2M
 
       Store_Date_Iterate (Over_This_Stack => First_Date_Stack);
       if (First_Date_Table (1) /= Today) or
-        (First_Date_Table (2) /= First_Date)
-      then
+        (First_Date_Table (2) /= First_Date) then
          Report.Failed ("PROBLEMS WITH ITERATION - 1");
       end if;
 
       Table_Index := 1;
       Store_Date_Iterate (Over_This_Stack => Second_Date_Stack);
-      if (First_Date_Table (1) /= Today) or
-        (First_Date_Table (2) /= Wall_Date)
+      if (First_Date_Table (1) /= Today) or (First_Date_Table (2) /= Wall_Date)
       then
          Report.Failed ("PROBLEMS WITH ITERATION - 2");
       end if;

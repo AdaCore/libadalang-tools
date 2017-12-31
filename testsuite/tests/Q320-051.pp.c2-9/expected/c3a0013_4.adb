@@ -23,9 +23,8 @@ package body C3a0013_4 is
       Root.Tc_Validate (Ptr.all, Char);
    end Tc_Dispatch;
 
-   procedure Tc_Check_Formal_Access
-     (Item : in out Root.Vehicle'Class;
-      Char :        Character)
+   procedure Tc_Check_Formal_Access (Item : in out Root.Vehicle'Class;
+      Char                                :        Character)
    is
    begin
       Tc_Dispatch (Item'Unchecked_Access, Char);

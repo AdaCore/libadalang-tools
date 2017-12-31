@@ -61,8 +61,7 @@ begin
          Report.Failed ("Wrong area (RTC)");
       end if;
       Tctouch.Validate
-        ("tatcta",
-         "Unexpected calls in right triangle calculations");
+        ("tatcta", "Unexpected calls in right triangle calculations");
 
       Clear (T); -- Note: Original Clear overridden by generic one.
       Bump (T);
@@ -88,8 +87,7 @@ begin
       end if;
 
       Tctouch.Validate
-        ("DBBDsbBsbBcc",
-         "Unexpected calls in dynamic count calculations");
+        ("DBBDsbBsbBcc", "Unexpected calls in dynamic count calculations");
    end;
 
    -- Dynamically bound calls here:
@@ -105,10 +103,7 @@ begin
           (X_Coord => 5.0, Y_Coord => 5.0, A => 3.0, B => 4.0, Count => 0);
       List (Report.Ident_Int (4)) :=
         new Counted_Rectangle_Inst.Counted_Type'
-          (X_Coord => 5.0,
-           Y_Coord => 5.0,
-           Height  => 2.0,
-           Width   => 2.5,
+          (X_Coord => 5.0, Y_Coord => 5.0, Height => 2.0, Width => 2.5,
            Count   => 0);
       Make_Square (Counted_Square (List (2).all), Side => 3.0);
       Tctouch.Validate ("smC", "2nd Sqr initialization bad");
@@ -119,24 +114,20 @@ begin
       Bump (Counted_Rectangle_Inst.Counted_Type'Class (List (4).all));
       Bump (Counted_Rectangle_Inst.Counted_Type'Class (List (4).all));
       Bump (Counted_Rectangle_Inst.Counted_Type'Class (List (4).all));
-      if Count (Counted_Rectangle_Inst.Counted_Type'Class (List (2).all)) /=
-        1
+      if Count (Counted_Rectangle_Inst.Counted_Type'Class (List (2).all)) /= 1
       then
          Report.Failed ("Wrong count (L2)");
       end if;
-      if Count (Counted_Triangle_Inst.Counted_Type'Class (List (3).all)) /=
-        2
+      if Count (Counted_Triangle_Inst.Counted_Type'Class (List (3).all)) /= 2
       then
          Report.Failed ("Wrong count (L3)");
       end if;
-      if Count (Counted_Rectangle_Inst.Counted_Type'Class (List (4).all)) /=
-        3
+      if Count (Counted_Rectangle_Inst.Counted_Type'Class (List (4).all)) /= 3
       then
          Report.Failed ("Wrong count (L4)");
       end if;
       Tctouch.Validate
-        ("sbBBBBBBccc",
-         "Unexpected calls dispatching count calculations");
+        ("sbBBBBBBccc", "Unexpected calls dispatching count calculations");
 
       if Total_Area (List) /= (6.0 + 9.0 + 6.0 + 5.0) then
          Report.Failed ("Wrong total area");

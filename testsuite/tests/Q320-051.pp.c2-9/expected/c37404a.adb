@@ -150,17 +150,10 @@ begin
         ("'CONSTRAINED NOT TRUE FOR DEFAULT CONSTANT, " & "UNCONSTRAINED");
    end if;
 
-   if Ident_Int (T.I) /= 1 or
-     Ident_Int (C.I) /= 1 or
-     Ident_Int (D.I) /= 1 or
-     Ident_Int (W.A) /= 5 or
-     Ident_Int (X.A) /= 5 or
-     Ident_Int (Y.A) /= 5 or
-     Ident_Int (Z.I) /= 1 or
-     Ident_Int (A.I) /= 1 or
-     Ident_Int (B.I) /= 1 or
-     Ident_Bool (R.I /= 1)
-   then
+   if Ident_Int (T.I) /= 1 or Ident_Int (C.I) /= 1 or Ident_Int (D.I) /= 1 or
+     Ident_Int (W.A) /= 5 or Ident_Int (X.A) /= 5 or Ident_Int (Y.A) /= 5 or
+     Ident_Int (Z.I) /= 1 or Ident_Int (A.I) /= 1 or Ident_Int (B.I) /= 1 or
+     Ident_Bool (R.I /= 1) then
       Failed ("INCORRECT INITIALIZATION VALUES");
    end if;
 

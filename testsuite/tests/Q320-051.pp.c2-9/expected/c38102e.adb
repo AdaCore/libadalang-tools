@@ -140,8 +140,7 @@ procedure C38102e is
    use Pkg;
 begin
    Test
-     ("C38102E",
-      "INCOMPLETE TYPES CAN BE DERIVED GENERIC " & "FORMAL TYPES");
+     ("C38102E", "INCOMPLETE TYPES CAN BE DERIVED GENERIC " & "FORMAL TYPES");
 
    if not Discrete then
       Failed ("INTEGER AND ENUMERATED TYPES NOT DERIVED");

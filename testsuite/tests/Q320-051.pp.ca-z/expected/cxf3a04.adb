@@ -117,32 +117,25 @@ begin
 
             -- Use the default parameters for this loop evaluation of Image.
             if Pack_2dp.Image (Fxf3a00.Data_With_2dp (I), Tc_Picture) /=
-              Fxf3a00.Edited_Output (I).all
-            then
+              Fxf3a00.Edited_Output (I).all then
                Report.Failed
                  ("Incorrect result from Function Image, " &
                   "when used with a decimal type with delta " &
-                  "0.01, picture string " &
-                  Fxf3a00.Valid_Strings (I).all &
+                  "0.01, picture string " & Fxf3a00.Valid_Strings (I).all &
                   ", and the default parameters of Image");
             end if;
 
             -- Use user-provided parameters for this loop evaluation of Image.
 
             if Pack_2dp.Image
-                (Item       => Fxf3a00.Data_With_2dp (I),
-                 Pic        => Tc_Picture,
-                 Currency   => Tc_Currency,
-                 Fill       => Tc_Fill,
-                 Separator  => Tc_Separator,
-                 Radix_Mark => Tc_Radix_Mark) /=
-              Fxf3a00.Edited_Output (I).all
-            then
+                (Item      => Fxf3a00.Data_With_2dp (I), Pic => Tc_Picture,
+                 Currency  => Tc_Currency, Fill => Tc_Fill,
+                 Separator => Tc_Separator, Radix_Mark => Tc_Radix_Mark) /=
+              Fxf3a00.Edited_Output (I).all then
                Report.Failed
                  ("Incorrect result from Function Image, " &
                   "when used with a decimal type with delta " &
-                  "0.01, picture string " &
-                  Fxf3a00.Valid_Strings (I).all &
+                  "0.01, picture string " & Fxf3a00.Valid_Strings (I).all &
                   ", and user-provided parameters");
             end if;
 
@@ -189,26 +182,20 @@ begin
                Report.Failed
                  ("Incorrect result from Function Image, " &
                   "when used with a decimal type with delta " &
-                  "1.0, picture string " &
-                  Valid_Strings (I).all &
+                  "1.0, picture string " & Valid_Strings (I).all &
                   ", and the default parameters of Image");
             end if;
 
             -- Use user-provided parameters for this loop evaluation of Image.
             if Pack_Ndp.Image
-                (Item       => Data_With_Ndp (I - Tc_Offset),
-                 Pic        => Tc_Picture,
-                 Currency   => Tc_Currency,
-                 Fill       => Tc_Fill,
-                 Separator  => Tc_Separator,
-                 Radix_Mark => Tc_Radix_Mark) /=
-              Edited_Output (Tc_Offset + I).all
-            then
+                (Item      => Data_With_Ndp (I - Tc_Offset), Pic => Tc_Picture,
+                 Currency  => Tc_Currency, Fill => Tc_Fill,
+                 Separator => Tc_Separator, Radix_Mark => Tc_Radix_Mark) /=
+              Edited_Output (Tc_Offset + I).all then
                Report.Failed
                  ("Incorrect result from Function Image, " &
                   "when used with a decimal type with delta " &
-                  "1.0, picture string " &
-                  Valid_Strings (I).all &
+                  "1.0, picture string " & Valid_Strings (I).all &
                   ", and user-provided parameters");
             end if;
 
@@ -259,19 +246,15 @@ begin
                      Tc_String :=
                        Pack_Ndp.Image
                          (Item       => Decimal_Type_Ndp (Erroneous_Data (I)),
-                          Pic        => Tc_Picture,
-                          Currency   => Tc_Currency,
-                          Fill       => Tc_Fill,
-                          Separator  => Tc_Separator,
+                          Pic        => Tc_Picture, Currency => Tc_Currency,
+                          Fill       => Tc_Fill, Separator => Tc_Separator,
                           Radix_Mark => Tc_Radix_Mark);
                   end;
                end if;
 
                Report.Failed
-                 ("Layout_Error not raised by combination " &
-                  "# " &
-                  Integer'Image (I) &
-                  " " &
+                 ("Layout_Error not raised by combination " & "# " &
+                  Integer'Image (I) & " " &
                   "of decimal data and picture string");
 
             exception
@@ -279,10 +262,8 @@ begin
                   null;    -- Expected exception.
                when others =>
                   Report.Failed
-                    ("Incorrect exception raised by combination " &
-                     "# " &
-                     Integer'Image (I) &
-                     " " &
+                    ("Incorrect exception raised by combination " & "# " &
+                     Integer'Image (I) & " " &
                      "of decimal data and picture string");
             end;
          end loop;

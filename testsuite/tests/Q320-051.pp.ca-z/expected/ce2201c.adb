@@ -48,8 +48,7 @@ begin
 
    Test
      ("CE2201C",
-      "CHECK THAT READ, WRITE, AND " &
-      "END_OF_FILE ARE SUPPORTED FOR " &
+      "CHECK THAT READ, WRITE, AND " & "END_OF_FILE ARE SUPPORTED FOR " &
       "SEQUENTIAL FILES - FLOAT");
 
    declare

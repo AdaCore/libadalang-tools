@@ -23,23 +23,18 @@ begin
    declare
       Operand_1 : Complex_Array_Type :=
         (Complex
-           (Int_Type (Report.Ident_Int (3)),
-            Int_Type (Report.Ident_Int (5))),
+           (Int_Type (Report.Ident_Int (3)), Int_Type (Report.Ident_Int (5))),
          Complex
-           (Int_Type (Report.Ident_Int (2)),
-            Int_Type (Report.Ident_Int (8))));
+           (Int_Type (Report.Ident_Int (2)), Int_Type (Report.Ident_Int (8))));
       Operand_2 : Complex_Array_Type :=
         (Complex
-           (Int_Type (Report.Ident_Int (1)),
-            Int_Type (Report.Ident_Int (2))),
+           (Int_Type (Report.Ident_Int (1)), Int_Type (Report.Ident_Int (2))),
          Complex
-           (Int_Type (Report.Ident_Int (3)),
-            Int_Type (Report.Ident_Int (6))));
+           (Int_Type (Report.Ident_Int (3)), Int_Type (Report.Ident_Int (6))));
       Operand_3  : Complex_Array_Type := (Zero, Zero);
       Mul_Result : Complex_Array_Type :=
         (Complex
-           (Int_Type (Report.Ident_Int (3)),
-            Int_Type (Report.Ident_Int (10))),
+           (Int_Type (Report.Ident_Int (3)), Int_Type (Report.Ident_Int (10))),
          Complex
            (Int_Type (Report.Ident_Int (6)),
             Int_Type (Report.Ident_Int (48))));
@@ -77,23 +72,18 @@ begin
    declare
       Operand_1 : Complex_Array_Type :=
         (Complex
-           (Int_Type (Report.Ident_Int (2)),
-            Int_Type (Report.Ident_Int (7))),
+           (Int_Type (Report.Ident_Int (2)), Int_Type (Report.Ident_Int (7))),
          Complex
-           (Int_Type (Report.Ident_Int (5)),
-            Int_Type (Report.Ident_Int (8))));
+           (Int_Type (Report.Ident_Int (5)), Int_Type (Report.Ident_Int (8))));
       Operand_2 : Complex_Array_Type :=
         (Complex
-           (Int_Type (Report.Ident_Int (4)),
-            Int_Type (Report.Ident_Int (1))),
+           (Int_Type (Report.Ident_Int (4)), Int_Type (Report.Ident_Int (1))),
          Complex
-           (Int_Type (Report.Ident_Int (2)),
-            Int_Type (Report.Ident_Int (3))));
+           (Int_Type (Report.Ident_Int (2)), Int_Type (Report.Ident_Int (3))));
       Operand_3  : Complex_Array_Type := (Zero, Zero);
       Add_Result : Complex_Array_Type :=
         (Complex
-           (Int_Type (Report.Ident_Int (6)),
-            Int_Type (Report.Ident_Int (8))),
+           (Int_Type (Report.Ident_Int (6)), Int_Type (Report.Ident_Int (8))),
          Complex
            (Int_Type (Report.Ident_Int (7)),
             Int_Type (Report.Ident_Int (11))));
@@ -129,16 +119,14 @@ begin
    declare
       Operand_1 : Complex_Array_Type :=
         (Complex
-           (Int_Type (Report.Ident_Int (1)),
-            Int_Type (Report.Ident_Int (5))),
+           (Int_Type (Report.Ident_Int (1)), Int_Type (Report.Ident_Int (5))),
          Complex
            (Int_Type (Report.Ident_Int (3)),
             Int_Type (Report.Ident_Int (11))));
       Operand_3 : Complex_Array_Type :=
         (Zero,
          Complex
-           (Int_Type (Report.Ident_Int (3)),
-            Int_Type (Report.Ident_Int (6))));
+           (Int_Type (Report.Ident_Int (3)), Int_Type (Report.Ident_Int (6))));
       Inv_Result : Complex_Array_Type :=
         (Complex
            (Int_Type (Report.Ident_Int (-1)),
@@ -180,7 +168,7 @@ begin
 
    if not
      (Tc_Handled_In_Caller and   -- Check to see that all
-      Tc_Handled_In_Grandchild_Pkg_Proc and   -- exceptions were handled
+     Tc_Handled_In_Grandchild_Pkg_Proc and   -- exceptions were handled
       Tc_Handled_In_Grandchild_Pkg_Func and   -- in proper location.
       Tc_Propagated_To_Caller)
    then

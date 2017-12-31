@@ -6,9 +6,8 @@ package body C390a021 is
 
    use C390a020;  -- Extended alert abstraction.
 
-   procedure Assign_Officer
-     (Ma : in out Medium_Alert_Type;
-      To : in     Person_Enum)
+   procedure Assign_Officer (Ma : in out Medium_Alert_Type;
+      To                        : in     Person_Enum)
    is
    begin
       Ma.Action_Officer := To;

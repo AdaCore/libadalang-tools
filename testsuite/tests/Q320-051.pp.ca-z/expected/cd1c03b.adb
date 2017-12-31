@@ -55,21 +55,18 @@ begin
    if Parent_Type'Size = Ident_Int (Normal_Type'Size) then
       Comment
         ("PRAGMA PACK HAD NO EFFECT ON THE SIZE OF " &
-         "PARENT_TYPE, WHICH IS" &
-         Integer'Image (Parent_Type'Size));
+         "PARENT_TYPE, WHICH IS" & Integer'Image (Parent_Type'Size));
    elsif Parent_Type'Size > Ident_Int (Normal_Type'Size) then
       Failed
         ("PARENT_TYPE'SIZE SHOULD NOT BE GREATER THAN" &
-         Integer'Image (Normal_Type'Size) &
-         ".  ACTUAL SIZE IS" &
+         Integer'Image (Normal_Type'Size) & ".  ACTUAL SIZE IS" &
          Integer'Image (Parent_Type'Size));
    end if;
 
    if Derived_Type'Size > Ident_Int (Parent_Type'Size) then
       Failed
         ("DERIVED_TYPE'SIZE SHOULD NOT BE GREATER THAN" &
-         Integer'Image (Parent_Type'Size) &
-         ".  ACTUAL SIZE IS" &
+         Integer'Image (Parent_Type'Size) & ".  ACTUAL SIZE IS" &
          Integer'Image (Derived_Type'Size));
    end if;
 

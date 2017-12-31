@@ -89,12 +89,10 @@ begin
 
    Report.Test
      ("CB20A02",
-      "Check that the name " &
-      "of a user defined exception is available " &
+      "Check that the name " & "of a user defined exception is available " &
       "to an enclosing program unit even when the " &
       "enclosing unit has no visibility into the " &
-      "scope where the exception is declared and " &
-      "raised");
+      "scope where the exception is declared and " & "raised");
 
    High_Seed :
    begin
@@ -106,9 +104,7 @@ begin
    exception
       when Error : others =>
          if not Fb20a00.Find
-             (Ada.Exceptions.Exception_Name (Error),
-              "HighSeedError")
-         then
+             (Ada.Exceptions.Exception_Name (Error), "HighSeedError") then
             Report.Failed
               ("Expected HighSeedError, but found " &
                Ada.Exceptions.Exception_Name (Error));
@@ -124,9 +120,7 @@ begin
    exception
       when Error : others =>
          if not Fb20a00.Find
-             (Ada.Exceptions.Exception_Name (Error),
-              "Mid_Seed_Error")
-         then
+             (Ada.Exceptions.Exception_Name (Error), "Mid_Seed_Error") then
             Report.Failed
               ("Expected Mid_Seed_Error, but found " &
                Ada.Exceptions.Exception_Name (Error));
@@ -143,8 +137,7 @@ begin
    exception
       when Error : others =>
          if not Fb20a00.Find
-             (Ada.Exceptions.Exception_Name (Error),
-              "L_o_w_S_e_e_d_E_r_r_o_r")
+             (Ada.Exceptions.Exception_Name (Error), "L_o_w_S_e_e_d_E_r_r_o_r")
          then
             Report.Failed
               ("Expected L_o_w_S_e_e_d_E_r_r_o_r but found " &

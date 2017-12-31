@@ -22,8 +22,7 @@ package body Cxc7004_0 is
          -- Is_Callable fails. In a real application, this would be an
          -- unconditional, infinite loop.
          select
-            accept Operation
-              (Caller_Id : out Ada.Task_Identification.Task_Id)
+            accept Operation (Caller_Id : out Ada.Task_Identification.Task_Id)
             do
                Caller_Id              := Operation'Caller;
                Any_Calls_Of_Operation := True;
@@ -70,8 +69,7 @@ package body Cxc7004_0 is
 
    protected body Could_Have_Been_A_Lock is
       entry Get_Lock (Caller_Id : out Ada.Task_Identification.Task_Id)
-        when True
-        is
+        when True is
       begin
          Caller_Id := Get_Lock'Caller;
       end Get_Lock;

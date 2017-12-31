@@ -46,8 +46,7 @@ begin
    Test
      ("C58005B",
       "CHECK THAT EXCEPTIONS ARE RAISED BY A RETURN" &
-      " STATEMENT IF AND ONLY IF THE CONSTRAINTS ARE" &
-      " VIOLATED");
+      " STATEMENT IF AND ONLY IF THE CONSTRAINTS ARE" & " VIOLATED");
 
    declare
       subtype I1 is Integer range -10 .. 90;

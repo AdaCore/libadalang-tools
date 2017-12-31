@@ -46,8 +46,7 @@ begin
    Test
      ("CB3003A",
       "CHECK THAT THE NON-SPECIFIC RAISE STATEMENT" &
-      " PROPAGATES THE ERROR FOR FURTHER HANDLING IN ANOTHER" &
-      " HANDLER");
+      " PROPAGATES THE ERROR FOR FURTHER HANDLING IN ANOTHER" & " HANDLER");
 
    -------------------------------------------------------
 

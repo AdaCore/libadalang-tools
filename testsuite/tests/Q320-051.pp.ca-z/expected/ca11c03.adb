@@ -83,8 +83,7 @@ procedure Ca11c03 is
 
    --
 
-   function Format_Primate_Data
-     (Name : String := Blank_Name_String;
+   function Format_Primate_Data (Name : String := Blank_Name_String;
       Hair : String := Blank_Hair_Color) return Data_String_Type
    is
 
@@ -113,8 +112,7 @@ begin
       "visibility is obtained to all ancestor units " &
       "named in the expanded name of the WITHED child " &
       "unit. Check that when the parent unit is USED, " &
-      "the simple name of a WITHED child unit is made " &
-      "directly visible");
+      "the simple name of a WITHED child unit is made " & "directly visible");
 
    declare
       use Fa11c00_0.Fa11c00_1;    -- This "use" clause will allow direct
@@ -123,10 +121,8 @@ begin
       -- "withed" by the main program.
 
       Tarsier : Fa11c00_2.Primate :=
-        (Common_Name => "East-Indian Tarsier ",
-         Weight      => 7,
-         Hair_Color  => Brown,
-         Habitat     => Fa11c00_2.Arboreal);
+        (Common_Name => "East-Indian Tarsier ", Weight => 7,
+         Hair_Color  => Brown, Habitat => Fa11c00_2.Arboreal);
 
    -- Demonstrates visibility of package FA11C00_0.FA11C00_1.FA11C00_2.
    --

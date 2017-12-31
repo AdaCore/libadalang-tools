@@ -45,8 +45,7 @@ with Report; use Report;
 procedure C840002 is
 begin
    Report.Test
-     ("C840002",
-      "Check that 'use all type' is correctly implemented");
+     ("C840002", "Check that 'use all type' is correctly implemented");
 
    declare
       package Pkg_1 is

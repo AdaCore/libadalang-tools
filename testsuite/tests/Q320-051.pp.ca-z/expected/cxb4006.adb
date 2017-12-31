@@ -82,8 +82,7 @@ begin
      ("CXB4006",
       "Check that the functions Valid, Length, " &
       "To_Decimal, and To_Packed specific to " &
-      "Packed_Decimal parameters produce correct " &
-      "results");
+      "Packed_Decimal parameters produce correct " & "results");
 
    Test_Block :
    declare
@@ -139,9 +138,7 @@ begin
 
       Tc_Dec_3 := 1_234_567.890;
       if not Pack_3.Valid
-          (Pack_3.To_Packed (Tc_Dec_3, Packed_Unsigned),
-           Packed_Unsigned)
-      then
+          (Pack_3.To_Packed (Tc_Dec_3, Packed_Unsigned), Packed_Unsigned) then
          Report.Failed ("Incorrect result from function Valid - 3");
       end if;
 
@@ -206,8 +203,7 @@ begin
          if Pack_1.To_Decimal
              (Item   => Pack_1.To_Packed (Tc_Dec_1, Packed_Unsigned),
               Format => Packed_Unsigned) /=
-           Tc_Dec_1
-         then
+           Tc_Dec_1 then
             Report.Failed ("Incorrect result from function To_Decimal - 1");
          end if;
       exception
@@ -223,8 +219,7 @@ begin
          if Pack_2.To_Decimal
              (Pack_2.To_Packed (Tc_Dec_2, Packed_Signed),
               Format => Packed_Signed) /=
-           Tc_Dec_2
-         then
+           Tc_Dec_2 then
             Report.Failed ("Incorrect result from function To_Decimal - 2");
          end if;
       exception
@@ -238,10 +233,8 @@ begin
       begin
          Tc_Dec_3 := 1_234_567.809;
          if Pack_3.To_Decimal
-             (Pack_3.To_Packed (Tc_Dec_3, Packed_Unsigned),
-              Packed_Unsigned) /=
-           Tc_Dec_3
-         then
+             (Pack_3.To_Packed (Tc_Dec_3, Packed_Unsigned), Packed_Unsigned) /=
+           Tc_Dec_3 then
             Report.Failed ("Incorrect result from function To_Decimal - 3");
          end if;
       exception
@@ -257,8 +250,7 @@ begin
          if Pack_4.To_Decimal
              (Item   => Pack_4.To_Packed (Tc_Dec_4, Packed_Signed),
               Format => Packed_Signed) /=
-           Tc_Dec_4
-         then
+           Tc_Dec_4 then
             Report.Failed ("Incorrect result from function To_Decimal - 4");
          end if;
       exception
@@ -274,20 +266,17 @@ begin
       -- decimal parameter under conditions of the Packed_Format parameter.
 
       if Pack_1.To_Packed (Item => 123.4, Format => Packed_Unsigned) =
-        Pack_1.To_Packed (Item => -123.4, Format => Packed_Signed)
-      then
+        Pack_1.To_Packed (Item => -123.4, Format => Packed_Signed) then
          Report.Failed ("Incorrect result from function To_Packed - 1");
       end if;
 
       if Pack_2.To_Packed (123.45, Format => Packed_Unsigned) =
-        Pack_2.To_Packed (-123.45, Format => Packed_Signed)
-      then
+        Pack_2.To_Packed (-123.45, Format => Packed_Signed) then
          Report.Failed ("Incorrect result from function To_Packed - 2");
       end if;
 
       if Pack_3.To_Packed (Item => 123.456, Format => Packed_Unsigned) =
-        Pack_3.To_Packed (Item => -123.456, Format => Packed_Signed)
-      then
+        Pack_3.To_Packed (Item => -123.456, Format => Packed_Signed) then
          Report.Failed ("Incorrect result from function To_Packed - 3");
       end if;
 
@@ -308,8 +297,7 @@ begin
 
       begin
          if Pack_1.To_Packed (Item => -12.3, Format => Packed_Unsigned) =
-           Pack_1.To_Packed (Item => 12.3, Format => Packed_Signed)
-         then
+           Pack_1.To_Packed (Item => 12.3, Format => Packed_Signed) then
             Report.Comment ("Should never be printed");
          end if;
          Report.Failed
@@ -321,8 +309,7 @@ begin
             null;  -- OK, expected exception.
          when The_Error : others =>
             Report.Failed
-              (Exception_Name (The_Error) &
-               " was incorrectly " &
+              (Exception_Name (The_Error) & " was incorrectly " &
                "raised following call to function To_Packed " &
                "with a negative parameter Item and " &
                "Packed_Format parameter Packed_Unsigned");
@@ -331,8 +318,7 @@ begin
    exception
       when The_Error : others =>
          Report.Failed
-           ("The following exception was raised in the " &
-            "Test_Block: " &
+           ("The following exception was raised in the " & "Test_Block: " &
             Exception_Name (The_Error));
    end Test_Block;
 

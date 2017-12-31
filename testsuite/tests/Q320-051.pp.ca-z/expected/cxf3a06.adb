@@ -112,10 +112,8 @@ begin
 
          package Pack_Ndp is          -- Uses decimal type with delta 1.0.
          new Editing.Decimal_Output
-           (Num                => Fxf3a00.Decimal_Type_Ndp,
-            Default_Currency   => "$",
-            Default_Fill       => '*',
-            Default_Separator  => ',',
+           (Num => Fxf3a00.Decimal_Type_Ndp, Default_Currency => "$",
+            Default_Fill       => '*', Default_Separator => ',',
             Default_Radix_Mark => '.');
 
          Tc_Picture    : Editing.Picture;
@@ -148,8 +146,7 @@ begin
             Text_Io.Put
               (Text_File,
                Pack_2dp.Image
-                 (Item => Fxf3a00.Data_With_2dp (I),
-                  Pic  => Tc_Picture));
+                 (Item => Fxf3a00.Data_With_2dp (I), Pic => Tc_Picture));
             Text_Io.New_Line (Text_File);
 
             -- Use the version of Put from the instantiation of Decimal_Output
@@ -158,8 +155,7 @@ begin
             -- Separator, and Radix_Mark.
 
             Pack_2dp.Put
-              (File => Text_File,
-               Item => Fxf3a00.Data_With_2dp (I),
+              (File => Text_File, Item => Fxf3a00.Data_With_2dp (I),
                Pic  => Tc_Picture);
             Text_Io.New_Line (Text_File);
 
@@ -188,8 +184,7 @@ begin
                Report.Failed
                  ("Failed comparison of two edited output " &
                   "strings from data with two decimal points " &
-                  ", loop number = " &
-                  Integer'Image (I));
+                  ", loop number = " & Integer'Image (I));
             end if;
          end loop;
 
@@ -219,11 +214,8 @@ begin
             Text_Io.Put
               (Text_File,
                Pack_Ndp.Image
-                 (Item       => Fxf3a00.Data_With_Ndp (I),
-                  Pic        => Tc_Picture,
-                  Currency   => "$",
-                  Fill       => '*',
-                  Separator  => ',',
+                 (Item       => Fxf3a00.Data_With_Ndp (I), Pic => Tc_Picture,
+                  Currency   => "$", Fill => '*', Separator => ',',
                   Radix_Mark => '.'));
             Text_Io.New_Line (Text_File);
 
@@ -233,13 +225,9 @@ begin
             -- Separator, and Radix_Mark.
 
             Pack_Ndp.Put
-              (File       => Text_File,
-               Item       => Fxf3a00.Data_With_Ndp (I),
-               Pic        => Tc_Picture,
-               Currency   => "$",
-               Fill       => '*',
-               Separator  => ',',
-               Radix_Mark => '.');
+              (File      => Text_File, Item => Fxf3a00.Data_With_Ndp (I),
+               Pic       => Tc_Picture, Currency => "$", Fill => '*',
+               Separator => ',', Radix_Mark => '.');
             Text_Io.New_Line (Text_File);
 
          end loop;
@@ -277,8 +265,7 @@ begin
                Report.Failed
                  ("Failed comparison of two edited output " &
                   "strings from data with no decimal points " &
-                  ", loop number = " &
-                  Integer'Image (I));
+                  ", loop number = " & Integer'Image (I));
             end if;
 
          end loop;

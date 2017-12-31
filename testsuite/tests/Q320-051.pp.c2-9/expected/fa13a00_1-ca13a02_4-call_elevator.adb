@@ -35,8 +35,7 @@ begin
             -- Call elevator.
 
             Call
-              (Current_Floor,
-               Call_Waiting);  -- Reference subprogram declared
+              (Current_Floor, Call_Waiting);  -- Reference subprogram declared
             -- in the parent of the subunit parent's body.
             Elevator_Button := Up;
 
@@ -56,8 +55,7 @@ begin
             -- Call elevator.
 
             Call
-              (Current_Floor,
-               Call_Waiting);  -- Reference subprogram declared
+              (Current_Floor, Call_Waiting);  -- Reference subprogram declared
             -- in the parent of the subunit parent's body.
       end case;
 

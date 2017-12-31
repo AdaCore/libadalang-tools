@@ -33,9 +33,8 @@ begin -- C460A02.                                              -- [ Level = 1 ]
             -- object) is also 2. Therefore, the access type conversion
             -- in Pack_OK does not raise an exception upon instantiation:
 
-            package Pack_Ok is new C460a02_0
-              (Target_Type => Acctag_L2,
-               Fobj        => Operand_L2);
+            package Pack_Ok is new C460a02_0 (Target_Type => Acctag_L2,
+               Fobj                                       => Operand_L2);
          begin
             Result := F460a00.Ok;                           -- Expected result.
          end;
@@ -102,10 +101,8 @@ begin -- C460A02.                                              -- [ Level = 1 ]
          -- is handled within the instance:
 
          package Pack_Ok is new C460a02_1
-           (Designated_Type => F460a00.Array_Type,
-            Target_Type     => Accarr_L3,
-            Fobj            => Target,
-            Fres            => Result);
+           (Designated_Type => F460a00.Array_Type, Target_Type => Accarr_L3,
+            Fobj            => Target, Fres => Result);
       begin
          null;
       end;
@@ -135,9 +132,7 @@ begin -- C460A02.                                              -- [ Level = 1 ]
 
          package Pack_Pe is new C460a02_1
            (Designated_Type => F460a00.Array_Type,
-            Target_Type     => F460a00.Accarr_L0,
-            Fobj            => Target,
-            Fres            => Result);
+            Target_Type => F460a00.Accarr_L0, Fobj => Target, Fres => Result);
       begin
          null;
       end;
@@ -159,8 +154,7 @@ begin -- C460A02.                                              -- [ Level = 1 ]
       declare                                                  -- [ Level = 3 ]
          -- The instantiation of C460A02_2 should NOT result in any exceptions.
 
-         procedure Proc is new C460a02_2
-           (F460a00.Tagged_Type,
+         procedure Proc is new C460a02_2 (F460a00.Tagged_Type,
             F460a00.Acctag_L0);
       begin
          -- The accessibility level of the actual passed to Proc is 0. The
@@ -189,8 +183,7 @@ begin -- C460A02.                                              -- [ Level = 1 ]
       declare                                                  -- [ Level = 3 ]
          -- The instantiation of C460A02_2 should NOT result in any exceptions.
 
-         procedure Proc is new C460a02_2
-           (F460a00.Tagged_Type,
+         procedure Proc is new C460a02_2 (F460a00.Tagged_Type,
             F460a00.Acctag_L0);
       begin
          -- In the call to (instantiated) procedure Proc, the first actual

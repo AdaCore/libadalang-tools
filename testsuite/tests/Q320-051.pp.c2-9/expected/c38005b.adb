@@ -76,8 +76,7 @@ begin
       for I in 1 .. 5 loop
          if Ary (I) /= null then
             Failed
-              ("ARRAY COMPONENT " &
-               Integer'Image (I) &
+              ("ARRAY COMPONENT " & Integer'Image (I) &
                " NOT INITIALIZED TO NULL");
          end if;
       end loop;
@@ -89,8 +88,7 @@ begin
       for I in 1 .. 5 loop
          if Rec.B (I) /= null then
             Failed
-              ("RECORD SUBCOMPONENT " &
-               Integer'Image (I) &
+              ("RECORD SUBCOMPONENT " & Integer'Image (I) &
                " NOT INITIALIZED TO NULL");
          end if;
       end loop;

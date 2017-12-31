@@ -76,10 +76,8 @@ package C760012_0 is
    type List is access all List_Item;
 
    package Firsts is  -- distinguish first from second
-      type Constrained_First
-        (Container : access List_Item)
-      is new Ada.Finalization.Limited_Controlled with
-      null record;
+      type Constrained_First (Container : access List_Item)
+      is new Ada.Finalization.Limited_Controlled with null record;
       procedure Initialize (T : in out Constrained_First);
       procedure Finalize (T : in out Constrained_First);
 
@@ -91,10 +89,8 @@ package C760012_0 is
 
    end Firsts;
 
-   type Constrained_Second
-     (Container : access List_Item)
-   is new Ada.Finalization.Limited_Controlled with
-   null record;
+   type Constrained_Second (Container : access List_Item)
+   is new Ada.Finalization.Limited_Controlled with null record;
    procedure Initialize (T : in out Constrained_Second);
    procedure Finalize (T : in out Constrained_Second);
 

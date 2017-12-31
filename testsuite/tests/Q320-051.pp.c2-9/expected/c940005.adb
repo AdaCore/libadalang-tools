@@ -61,9 +61,8 @@ begin
 
    declare  -- encapsulate the test
 
-      function "+"
-        (Left  : Ada.Calendar.Time;
-         Right : Duration) return Ada.Calendar.Time renames
+      function "+" (Left : Ada.Calendar.Time;
+         Right           : Duration) return Ada.Calendar.Time renames
         Ada.Calendar."+";
 
       -- Weighted load given to each potential problem area and accumulated

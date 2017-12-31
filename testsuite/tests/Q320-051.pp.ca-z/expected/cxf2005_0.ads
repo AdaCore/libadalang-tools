@@ -49,12 +49,10 @@ generic
    type Decimal_Fixed is delta <> digits <>;
 package Cxf2005_0 is
 
-   function Multiply
-     (Operand  : Decimal_Fixed;
-      Interval : Integer) return Decimal_Fixed;
+   function Multiply (Operand : Decimal_Fixed;
+      Interval                : Integer) return Decimal_Fixed;
 
-   function Divide
-     (Operand  : Decimal_Fixed;
-      Interval : Integer) return Decimal_Fixed;
+   function Divide (Operand : Decimal_Fixed;
+      Interval              : Integer) return Decimal_Fixed;
 
 end Cxf2005_0;

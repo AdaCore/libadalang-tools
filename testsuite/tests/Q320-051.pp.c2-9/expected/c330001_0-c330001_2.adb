@@ -64,8 +64,7 @@ package body C330001_0.C330001_2 is
    function Verify_Public_Obj_2 return Boolean is
    begin
       return
-        (Publicchild_Obj_02.D = 5 and
-         Publicchild_Obj_02.C1 = "Hello" and
+        (Publicchild_Obj_02.D = 5 and Publicchild_Obj_02.C1 = "Hello" and
          Publicchild_Obj_02.S = 4);
 
    end Verify_Public_Obj_2;

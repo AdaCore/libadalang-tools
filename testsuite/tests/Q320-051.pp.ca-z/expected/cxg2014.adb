@@ -116,14 +116,9 @@ procedure Cxg2014 is
          if abs (Actual - Expected) > Max_Error then
             Accuracy_Error_Reported := True;
             Report.Failed
-              (Test_Name &
-               " actual: " &
-               Real'Image (Actual) &
-               " expected: " &
-               Real'Image (Expected) &
-               " difference: " &
-               Real'Image (Actual - Expected) &
-               " max err:" &
+              (Test_Name & " actual: " & Real'Image (Actual) & " expected: " &
+               Real'Image (Expected) & " difference: " &
+               Real'Image (Actual - Expected) & " max err:" &
                Real'Image (Max_Error));
          elsif Verbose then
             if Actual = Expected then
@@ -143,14 +138,10 @@ procedure Cxg2014 is
          Check (Sinh (1.0), (E - 1.0 / E) / 2.0, "sinh(1)", Minimum_Error);
          Check (Cosh (1.0), Cosh1, "cosh(1)", Minimum_Error);
          Check
-           (Sinh (2.0),
-            (E * E - (1.0 / (E * E))) / 2.0,
-            "sinh(2)",
+           (Sinh (2.0), (E * E - (1.0 / (E * E))) / 2.0, "sinh(2)",
             Minimum_Error);
          Check
-           (Cosh (2.0),
-            (E * E + (1.0 / (E * E))) / 2.0,
-            "cosh(2)",
+           (Cosh (2.0), (E * E + (1.0 / (E * E))) / 2.0, "cosh(2)",
             Minimum_Error);
          Check (Sinh (-1.0), (1.0 / E - E) / 2.0, "sinh(-1)", Minimum_Error);
       exception
@@ -209,26 +200,18 @@ procedure Cxg2014 is
             Actual2 := C * (Sinh (X_Plus_1) + Sinh (X_Minus_1));
 
             Check
-              (Actual1,
-               Actual2,
-               "Identity_1_Test " &
-               Integer'Image (I) &
-               ": sinh(" &
-               Real'Image (X) &
-               ") ",
+              (Actual1, Actual2,
+               "Identity_1_Test " & Integer'Image (I) & ": sinh(" &
+               Real'Image (X) & ") ",
                16.0);
 
             -- Cosh(x) = C * (Cosh(x+1) + Cosh(x-1))
             Actual1 := Cosh (X);
             Actual2 := C * (Cosh (X_Plus_1) + Cosh (X_Minus_1));
             Check
-              (Actual1,
-               Actual2,
-               "Identity_1_Test " &
-               Integer'Image (I) &
-               ": cosh(" &
-               Real'Image (X) &
-               ") ",
+              (Actual1, Actual2,
+               "Identity_1_Test " & Integer'Image (I) & ": cosh(" &
+               Real'Image (X) & ") ",
                16.0);
 
             if Accuracy_Error_Reported then
@@ -242,8 +225,7 @@ procedure Cxg2014 is
       exception
          when Constraint_Error =>
             Report.Failed
-              ("Constraint_Error raised in Identity_1_Test" &
-               " for X=" &
+              ("Constraint_Error raised in Identity_1_Test" & " for X=" &
                Real'Image (X));
          when others =>
             Report.Failed
@@ -295,13 +277,9 @@ procedure Cxg2014 is
                              (1.0 + (X_Squared / 156.0)))))));
 
             Check
-              (Actual,
-               Expected,
-               "Subtraction_Error_Test " &
-               Integer'Image (I) &
-               ": sinh(" &
-               Real'Image (X) &
-               ") ",
+              (Actual, Expected,
+               "Subtraction_Error_Test " & Integer'Image (I) & ": sinh(" &
+               Real'Image (X) & ") ",
                15.0);
 
             if Accuracy_Error_Reported then
@@ -378,8 +356,7 @@ procedure Cxg2014 is
 
 begin
    Report.Test
-     ("CXG2014",
-      "Check the accuracy of the SINH and COSH functions");
+     ("CXG2014", "Check the accuracy of the SINH and COSH functions");
 
    if Verbose then
       Report.Comment ("checking Standard.Float");
@@ -389,8 +366,7 @@ begin
 
    if Verbose then
       Report.Comment
-        ("checking a digits" &
-         Integer'Image (System.Max_Digits) &
+        ("checking a digits" & Integer'Image (System.Max_Digits) &
          " floating point type");
    end if;
 

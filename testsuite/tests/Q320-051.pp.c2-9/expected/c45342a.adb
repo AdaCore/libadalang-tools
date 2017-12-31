@@ -64,8 +64,7 @@ begin
       end if;
 
       A := (8, 7, 6, 5, 4, 3, 2, 1);
-      if F (A (2 .. 3), A (2 .. 4), A (2 .. 4)) /=
-        (8, 7, 8, 7, 6, 8, 7, 6)
+      if F (A (2 .. 3), A (2 .. 4), A (2 .. 4)) /= (8, 7, 8, 7, 6, 8, 7, 6)
       then
          Failed ("INCORRECT CATENATION RESULT - 2");
       end if;
@@ -88,8 +87,7 @@ begin
 
       A := (8, 7, 6, 5, 4, 3, 2, 1);
       if F (A (Dyn2 .. Dyn6), A (Dyn2 .. Dyn3), A (Dyn2 .. Dyn2)) /=
-        (8, 7, 6, 5, 4, 8, 7, 8)
-      then
+        (8, 7, 6, 5, 4, 8, 7, 8) then
          Failed ("INCORRECT CATENATION RESULT - 5");
       end if;
 

@@ -22,10 +22,8 @@ package F552a00_Sparse_Arrays is
       Default_Iterator  => Iterate,
       Iterator_Element  => Element_Type;
 
-   procedure Append
-     (Container : in out Sparse_Array;
-      Index     :        Sparse_Array_Index;
-      New_Item  :        Element_Type) with
+   procedure Append (Container : in out Sparse_Array;
+      Index :        Sparse_Array_Index; New_Item : Element_Type) with
       Pre => Container.Length < Container.Max_Elements
       and then not Has_Element (Container, Index);
       --  Duplicate indexes are not allowed.
@@ -37,37 +35,32 @@ package F552a00_Sparse_Arrays is
 
    function Has_Element (Position : Cursor) return Boolean;
 
-   function Has_Element
-     (Container : Sparse_Array;
-      Index     : Sparse_Array_Index) return Boolean;
+   function Has_Element (Container : Sparse_Array;
+      Index                        : Sparse_Array_Index) return Boolean;
 
    function Index_Of (Position : Cursor) return Sparse_Array_Index;
    --  Returns the array index assosiated with Position.
 
    package Sparse_Array_Iterator_Interfaces is new Ada.Iterator_Interfaces
-     (Cursor,
-      Has_Element);
+     (Cursor, Has_Element);
 
    function Iterate
      (Container : aliased in Sparse_Array)
       return Sparse_Array_Iterator_Interfaces.Reversible_Iterator'Class;
 
    type Constant_Reference_Type
-     (Element : not null access constant Element_Type)
-   is
+     (Element : not null access constant Element_Type) is
      private with
       Implicit_Dereference => Element;
 
    type Reference_Type (Element : not null access Element_Type) is private with
       Implicit_Dereference => Element;
 
-   function Constant_Reference
-     (Container : aliased Sparse_Array;
-      Position  :         Cursor) return Constant_Reference_Type;
+   function Constant_Reference (Container : aliased Sparse_Array;
+      Position :         Cursor) return Constant_Reference_Type;
 
-   function Reference
-     (Container : aliased in out Sparse_Array;
-      Position  :                Cursor) return Reference_Type;
+   function Reference (Container : aliased in out Sparse_Array;
+      Position                   :            Cursor) return Reference_Type;
 
    Tc_Call_History : Strings.Unbounded.Unbounded_String;
    --
@@ -119,8 +112,7 @@ private
      (Position.Container.all.Data (Position.Index).Index);
 
    type Constant_Reference_Type
-     (Element : not null access constant Element_Type)
-   is null record;
+     (Element : not null access constant Element_Type) is null record;
 
    type Reference_Type (Element : not null access Element_Type) is null record;
 

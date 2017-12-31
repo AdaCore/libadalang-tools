@@ -79,43 +79,26 @@ begin
 
       function "/" (X, Y : Integer) return Citrus renames F1;
 
-      procedure P1
-        (I1 : Integer := F1 (0, 0);
-         W1 : Whole   := F1 (0, 0);
-         C1 : Citrus  := F1 (0, 0);
-         H1 : Hue     := F1 (0, 0);
-         I2 : Integer := "/" (0, 0);
-         W2 : Whole   := "/" (0, 0);
-         C2 : Citrus  := "/" (0, 0);
-         H2 : Hue     := "/" (0, 0);
-         I3 : Integer := (0 / 0);
-         W3 : Whole   := (0 / 0);
-         C3 : Citrus  := (0 / 0);
-         H3 : Hue     := (0 / 0);
-         C4 : Citrus  := Orange;
-         H4 : Hue     := Orange)
+      procedure P1 (I1 : Integer := F1 (0, 0); W1 : Whole := F1 (0, 0);
+         C1            : Citrus  := F1 (0, 0); H1 : Hue := F1 (0, 0);
+         I2            : Integer := "/" (0, 0); W2 : Whole := "/" (0, 0);
+         C2            : Citrus  := "/" (0, 0); H2 : Hue := "/" (0, 0);
+         I3            : Integer := (0 / 0); W3 : Whole := (0 / 0);
+         C3 : Citrus  := (0 / 0); H3 : Hue := (0 / 0); C4 : Citrus := Orange;
+         H4            : Hue     := Orange)
       is
       begin
-         if I1 /= -1 or
-           W1 /= 0 or
-           Citrus'Pos (C1) /= 2 or
-           Hue'Pos (H1) /= 1
+         if I1 /= -1 or W1 /= 0 or Citrus'Pos (C1) /= 2 or Hue'Pos (H1) /= 1
          then
             Failed ("(A): RESOLUTION INCORRECT - FUNCTION CALL");
          end if;
 
-         if I2 /= -1 or
-           W2 /= 0 or
-           Citrus'Pos (C2) /= 2 or
-           Hue'Pos (H2) /= 1
+         if I2 /= -1 or W2 /= 0 or Citrus'Pos (C2) /= 2 or Hue'Pos (H2) /= 1
          then
             Failed ("(B): RESOLUTION INCORRECT " & "- OPERATOR SYMBOL");
          end if;
 
-         if I3 /= -1 or
-           W3 /= 0 or
-           Citrus'Pos (C3) /= 2 or
-           Hue'Pos (H3) /= 1
+         if I3 /= -1 or W3 /= 0 or Citrus'Pos (C3) /= 2 or Hue'Pos (H3) /= 1
          then
             Failed ("(C): RESOLUTION INCORRECT - INFIX OPERATOR");
          end if;

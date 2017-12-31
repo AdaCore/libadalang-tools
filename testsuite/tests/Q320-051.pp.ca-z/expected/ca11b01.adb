@@ -29,15 +29,12 @@ begin
    begin
       -- perform an App1_Widget specific operation.
       App1_Widget_Specific_Oper
-        (C          => White,
-         L          => "Line Editor    ",
-         The_Widget => White_Widget,
-         I          => 10);
+        (C => White, L => "Line Editor    ", The_Widget => White_Widget,
+         I => 10);
 
       if White_Widget.Color /= White or
         White_Widget.Id /= Widget_Id (Report.Ident_Int (10)) or
-        White_Widget.Label /= "Line Editor    "
-      then
+        White_Widget.Label /= "Line Editor    " then
          Report.Failed ("Incorrect result for White_Widget");
       end if;
 
@@ -49,22 +46,17 @@ begin
 
    begin
       App1_Widget_Specific_Oper
-        (Amber_Widget,
-         I => 11,
-         C => Amber,
-         L => "Alarm_Clock    ");
+        (Amber_Widget, I => 11, C => Amber, L => "Alarm_Clock    ");
       -- Inherited from Application_One_Widget.
 
       -- perform an App2_Widget specific operation.
       App2_Widget_Specific_Oper
-        (The_Widget => Amber_Widget,
-         Loc        => (380, 512));
+        (The_Widget => Amber_Widget, Loc => (380, 512));
 
       if Amber_Widget.Color /= Amber or
         Amber_Widget.Id /= Widget_Id (Report.Ident_Int (11)) or
         Amber_Widget.Label /= "Alarm_Clock    " or
-        Amber_Widget.Location /= (380, 512)
-      then
+        Amber_Widget.Location /= (380, 512) then
          Report.Failed ("Incorrect result for Amber_Widget");
       end if;
 
@@ -80,8 +72,7 @@ begin
 
       -- perform an App2_Widget specific operation.
       App2_Widget_Specific_Oper
-        (Loc        => (1_024, 760),
-         The_Widget => Green_Widget);
+        (Loc => (1_024, 760), The_Widget => Green_Widget);
       -- Inherited from App_1_Widget.
 
       -- perform an App3_Widget specific operation.
@@ -91,8 +82,7 @@ begin
         Green_Widget.Id /= Widget_Id (Report.Ident_Int (100)) or
         Green_Widget.Label /= "Screen Editor  " or
         Green_Widget.Location /= (1_024, 760) or
-        Green_Widget.Size /= (100, 100)
-      then
+        Green_Widget.Size /= (100, 100) then
          Report.Failed ("Incorrect result for Green_Widget");
       end if;
 

@@ -179,8 +179,7 @@ begin
       end if;
 
       if (abs F1 & F2) /= (1 .. 3 => 6.5) or
-        (F1 mod F2 <= F5) /= (1 .. 3 => 5.5)
-      then
+        (F1 mod F2 <= F5) /= (1 .. 3 => 5.5) then
          Failed ("INCORRECT RESULT - 6");
       end if;
    end;

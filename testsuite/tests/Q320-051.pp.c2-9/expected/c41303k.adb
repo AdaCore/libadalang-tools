@@ -67,8 +67,7 @@ begin
      ("C41303K",
       "CHECK THAT IF  A  IS AN IDENTIFIER DENOTING" &
       " AN ACCESS OBJECT WHICH IN TURN DESIGNATES" &
-      " AN ACCESS OBJECT,  THE FORM  A.ALL.ALL  IS" &
-      " ACCEPTED");
+      " AN ACCESS OBJECT,  THE FORM  A.ALL.ALL  IS" & " ACCEPTED");
 
    -------------------------------------------------------------------
    ---------------  ACCESS TO ACCESS TO SCALAR  ----------------------

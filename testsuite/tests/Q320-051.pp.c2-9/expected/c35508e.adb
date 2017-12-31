@@ -144,15 +144,11 @@ begin
          begin
             if Bool'Value (Str1) = B then
                Failed
-                 ("NO EXCEPTION RAISED - " &
-                  "BOOL'VALUE WITH " &
-                  Str2 &
+                 ("NO EXCEPTION RAISED - " & "BOOL'VALUE WITH " & Str2 &
                   "- EQUAL ");
             else
                Failed
-                 ("NO EXCEPTION RAISED - " &
-                  "BOOL'VALUE WITH " &
-                  Str2 &
+                 ("NO EXCEPTION RAISED - " & "BOOL'VALUE WITH " & Str2 &
                   " - NOT EQUAL");
             end if;
          exception
@@ -165,15 +161,11 @@ begin
          begin
             if Subbool'Value (Str1) /= B then
                Failed
-                 ("NO EXCEPTION RAISED - " &
-                  "SUBBOOL'VALUE WITH " &
-                  Str2 &
+                 ("NO EXCEPTION RAISED - " & "SUBBOOL'VALUE WITH " & Str2 &
                   " - EQUAL");
             else
                Failed
-                 ("NO EXCEPTION RAISED - " &
-                  "SUBBOOL'VALUE WITH " &
-                  Str2 &
+                 ("NO EXCEPTION RAISED - " & "SUBBOOL'VALUE WITH " & Str2 &
                   " - NOT EQUAL");
             end if;
          exception

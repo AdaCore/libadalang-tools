@@ -50,8 +50,7 @@ begin
       subtype Distant is Orb range Sun .. Mars;
 
    begin
-      if Distant'Pos (Distant'First) /= 0 or
-        Passing'Pos (Passing'First) /= 0
+      if Distant'Pos (Distant'First) /= 0 or Passing'Pos (Passing'First) /= 0
       then
          Failed
            ("RESOLUTION INCORRECT FOR OVERLOADED " & " ENUMERATION LITERALS");

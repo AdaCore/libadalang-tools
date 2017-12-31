@@ -97,9 +97,7 @@ begin
       Put (F2, "OUTPUT STRING");
       if Col /= Col (F2) and Col (F2) /= 14 then
          Failed
-           ("COL INCORRECT SUBTEST 2; WAS " &
-            Count'Image (Col) &
-            " VS. " &
+           ("COL INCORRECT SUBTEST 2; WAS " & Count'Image (Col) & " VS. " &
             Count'Image (Col (F2)));
       end if;
 

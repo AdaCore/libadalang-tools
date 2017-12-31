@@ -80,8 +80,7 @@ package C854001_0 is
 
 private
    function "="
-     (P1,
-      P2 : Tag_Type)
+     (P1, P2 : Tag_Type)
      return Boolean;                   -- Overrides predefined operator "=".
 
 end C854001_0;

@@ -118,8 +118,7 @@ package Cd10001_0 is
 
    Nonstatic_Entity : constant System.Address :=                  -- Non-static
      System.Storage_Elements."+"
-       (Spprt13.Variable_Address,
-        System.Storage_Elements.Storage_Offset'(0));
+       (Spprt13.Variable_Address, System.Storage_Elements.Storage_Offset'(0));
 
    Tag_String : constant String := Impdef.External_Tag_Value;     -- Static
    -- Check to ensure that Tag_String is static
@@ -197,11 +196,9 @@ package Cd10001_0 is
       Bit_1 : Boolean;
    end record;
    for Record_To_Layout use record                           -- N/A => ERROR.
-      Bit_0 at Zero range
-        Zero ..
+      Bit_0 at Zero range Zero ..
           Zero;                         -- N/A => ERROR.
-      Bit_1 at Zero range
-        Four ..
+      Bit_1 at Zero range Four ..
           Four;                         -- N/A => ERROR.
    end record;                                               -- N/A => ERROR.
 

@@ -87,9 +87,8 @@ procedure Cxai021 is
 
    My_Inserted : Boolean;
 
-   procedure Tampering_Check
-     (Container : in out My_Ordered_Maps.Map;
-      Where     : in     String)
+   procedure Tampering_Check (Container : in out My_Ordered_Maps.Map;
+      Where                             : in     String)
    is
 
       Program_Error_Raised : Boolean := False;
@@ -102,8 +101,7 @@ procedure Cxai021 is
          -- Use a key not already in map
 
          Container.Insert
-           (Key      => Num_Tests + 1,
-            New_Item => Value_In_Array (1));
+           (Key => Num_Tests + 1, New_Item => Value_In_Array (1));
 
       exception
 
@@ -146,8 +144,7 @@ begin
    begin
 
       Tampering_Check
-        (Container => My_Map_1,
-         Where     => "Constant_Reference (key form)");
+        (Container => My_Map_1, Where => "Constant_Reference (key form)");
 
    end;
 
@@ -170,8 +167,7 @@ begin
    begin
 
       Tampering_Check
-        (Container => My_Map_1,
-         Where     => "Constant_Reference (cursor form)");
+        (Container => My_Map_1, Where => "Constant_Reference (cursor form)");
 
    end;
 
@@ -183,8 +179,7 @@ begin
    begin
 
       Tampering_Check
-        (Container => My_Map_1,
-         Where     => "Reference (cursor form)");
+        (Container => My_Map_1, Where => "Reference (cursor form)");
 
    end;
 
@@ -193,10 +188,8 @@ begin
    -- -- in a way that corresponds to likely usage.
 
    declare
-      procedure Test
-        (Value     : in My_Float;
-         Expected  : in My_Float;
-         Test_Case : in String)
+      procedure Test (Value : in My_Float; Expected : in My_Float;
+         Test_Case          : in String)
       is
       begin
          Tampering_Check (Container => My_Map_1, Where => Test_Case);
@@ -209,11 +202,8 @@ begin
          end if;
       end Test;
 
-      procedure Test_And_Mod
-        (Value     : in out My_Float;
-         Expected  : in     My_Float;
-         New_Item  : in     My_Float;
-         Test_Case : in     String)
+      procedure Test_And_Mod (Value : in out My_Float; Expected : in My_Float;
+         New_Item                   : in     My_Float; Test_Case : in String)
       is
       begin
          Tampering_Check (Container => My_Map_1, Where => Test_Case);
@@ -233,8 +223,7 @@ begin
       Test
         (Value =>
            My_Ordered_Maps.Constant_Reference
-             (My_Map_1,
-              Key => My_Key_Type (1))
+             (My_Map_1, Key => My_Key_Type (1))
              .Element.all,
          Expected  => Value_In_Array (1),
          Test_Case => "Constant_Reference normal key");
@@ -243,15 +232,13 @@ begin
         (Value =>
            My_Ordered_Maps.Reference (My_Map_1, Key => My_Key_Type (1))
              .Element.all,
-         Expected  => Value_In_Array (1),
-         New_Item  => Value_In_Array (2),
+         Expected  => Value_In_Array (1), New_Item => Value_In_Array (2),
          Test_Case => "Reference normal key");
 
       Test
         (Value =>
            My_Ordered_Maps.Constant_Reference
-             (My_Map_1,
-              Position => My_Cursor_1)
+             (My_Map_1, Position => My_Cursor_1)
              .Element.all,
          Expected  => Value_In_Array (2),
          Test_Case => "Constant_Reference normal cursor");
@@ -260,8 +247,7 @@ begin
         (Value =>
            My_Ordered_Maps.Reference (My_Map_1, Position => My_Cursor_1)
              .Element.all,
-         Expected  => Value_In_Array (2),
-         New_Item  => Value_In_Array (3),
+         Expected  => Value_In_Array (2), New_Item => Value_In_Array (3),
          Test_Case => "Reference normal cursor");
 
       -- Prefix call with all components explicit:
@@ -273,8 +259,7 @@ begin
 
       Test_And_Mod
         (Value     => My_Map_1.Reference (Key => My_Key_Type (1)).Element.all,
-         Expected  => Value_In_Array (3),
-         New_Item  => Value_In_Array (4),
+         Expected  => Value_In_Array (3), New_Item => Value_In_Array (4),
          Test_Case => "Reference prefix key");
 
       Test
@@ -285,8 +270,7 @@ begin
 
       Test_And_Mod
         (Value     => My_Map_1.Reference (Position => My_Cursor_1).Element.all,
-         Expected  => Value_In_Array (4),
-         New_Item  => Value_In_Array (5),
+         Expected  => Value_In_Array (4), New_Item => Value_In_Array (5),
          Test_Case => "Reference prefix cursor");
 
       -- Prefix call using a generalized reference (implicit dereference):
@@ -297,8 +281,7 @@ begin
 
       Test_And_Mod
         (Value     => My_Map_1.Reference (Key => My_Key_Type (1)),
-         Expected  => Value_In_Array (5),
-         New_Item  => Value_In_Array (6),
+         Expected  => Value_In_Array (5), New_Item => Value_In_Array (6),
          Test_Case => "Reference generalized key");
 
       Test
@@ -308,8 +291,7 @@ begin
 
       Test_And_Mod
         (Value     => My_Map_1.Reference (Position => My_Cursor_1),
-         Expected  => Value_In_Array (6),
-         New_Item  => Value_In_Array (7),
+         Expected  => Value_In_Array (6), New_Item => Value_In_Array (7),
          Test_Case => "Reference generalized cursor");
 
       -- Object indexing, everything implicit.
@@ -360,8 +342,7 @@ begin
       for I in Array_Bounds_Type loop
 
          My_Map_1.Insert
-           (Key      => My_Key_Type (I),
-            New_Item => Value_In_Array (I));
+           (Key => My_Key_Type (I), New_Item => Value_In_Array (I));
 
          Total_In := Total_In + Value_In_Array (I);
 
@@ -385,8 +366,7 @@ begin
       for E of My_Map_1 loop
 
          Tampering_Check
-           (Container => My_Map_1,
-            Where     => "reading forward of loop");
+           (Container => My_Map_1, Where => "reading forward of loop");
 
          Total_Out := Total_Out + E;
 
@@ -412,8 +392,7 @@ begin
       for E of reverse My_Map_1 loop
 
          Tampering_Check
-           (Container => My_Map_1,
-            Where     => "reading reverse of loop");
+           (Container => My_Map_1, Where => "reading reverse of loop");
 
          Total_Out := Total_Out + E;
 
@@ -439,8 +418,7 @@ begin
       for C in My_Map_1.Iterate loop
 
          Tampering_Check
-           (Container => My_Map_1,
-            Where     => "reading forward in loop");
+           (Container => My_Map_1, Where => "reading forward in loop");
 
          Total_Out := Total_Out + My_Map_1 (C);
 
@@ -466,8 +444,7 @@ begin
       for C in reverse My_Map_1.Iterate loop
 
          Tampering_Check
-           (Container => My_Map_1,
-            Where     => "reading reverse in loop");
+           (Container => My_Map_1, Where => "reading reverse in loop");
 
          Total_Out := Total_Out + My_Map_1 (C);
 
@@ -495,8 +472,7 @@ begin
       for C in My_Map_1.Iterate (My_Cursor_1) loop
 
          Tampering_Check
-           (Container => My_Map_1,
-            Where     => "reading partial forward in loop");
+           (Container => My_Map_1, Where => "reading partial forward in loop");
 
          Upper_Total_Out := Upper_Total_Out + My_Map_1 (C);
 
@@ -524,8 +500,7 @@ begin
       for C in reverse My_Map_1.Iterate (My_Cursor_1) loop
 
          Tampering_Check
-           (Container => My_Map_1,
-            Where     => "reading partial reverse in loop");
+           (Container => My_Map_1, Where => "reading partial reverse in loop");
 
          Lower_Total_Out := Lower_Total_Out + My_Map_1 (C);
 

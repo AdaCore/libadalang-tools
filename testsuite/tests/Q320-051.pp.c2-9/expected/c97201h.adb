@@ -44,8 +44,7 @@ begin
      ("C97201H",
       "CHECK THAT NO RENDEZVOUS REQUESTED BY" &
       " A CONDITIONAL_ENTRY_CALL CAN EVER OCCUR" &
-      " IF THE CORRESPONDING ACCEPT_STATEMENT IS" &
-      " CLOSED");
+      " IF THE CORRESPONDING ACCEPT_STATEMENT IS" & " CLOSED");
 
    -------------------------------------------------------------------
 

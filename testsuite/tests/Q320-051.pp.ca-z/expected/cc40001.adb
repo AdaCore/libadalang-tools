@@ -56,16 +56,12 @@ procedure Cc40001 is
       Object_1 : Cc40001_0.Cc40001_1.Object_In_Time ('t');
 
       package Subtest_2_1 is -- generic formal object is discriminated private
-      new Cc40001_0.Cc40001_3
-        (Cc40001_0.Simple_Object,
-         Object_0,
-         Not_Adjusted);
+      new Cc40001_0.Cc40001_3 (Cc40001_0.Simple_Object,
+         Object_0, Not_Adjusted);
 
       package Subtest_2_2 is -- generic formal object is discriminated private
       new Cc40001_0.Cc40001_3
-        (Cc40001_0.Cc40001_1.Object_In_Time,
-         Object_1,
-         Not_Adjusted);
+        (Cc40001_0.Cc40001_1.Object_In_Time, Object_1, Not_Adjusted);
 
    begin
       Tctouch.Flush;  -- clear out all "A" and "T" entries
@@ -88,16 +84,12 @@ procedure Cc40001 is
       Object_1 : Cc40001_0.Cc40001_1.Object_In_Time ('t');
 
       package Subtest_3_1 is -- generic formal object is discriminated tagged
-      new Cc40001_0.Cc40001_4
-        (Cc40001_0.Simple_Object,
-         Object_0,
-         Not_Adjusted);
+      new Cc40001_0.Cc40001_4 (Cc40001_0.Simple_Object,
+         Object_0, Not_Adjusted);
 
       package Subtest_3_2 is -- generic formal object is discriminated tagged
       new Cc40001_0.Cc40001_4
-        (Cc40001_0.Cc40001_1.Object_In_Time,
-         Object_1,
-         Not_Adjusted);
+        (Cc40001_0.Cc40001_1.Object_In_Time, Object_1, Not_Adjusted);
    begin
       Tctouch.Flush;  -- clear out all "A" and "T" entries
 

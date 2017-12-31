@@ -14,8 +14,7 @@ begin
    Report.Test
      ("CB40A04",
       "Check that a predefined exception is " &
-      "correctly propagated out of a public " &
-      "child function to a client");
+      "correctly propagated out of a public " & "child function to a client");
 
    Process_Block :
    begin

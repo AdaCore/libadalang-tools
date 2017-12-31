@@ -79,8 +79,7 @@ begin
                if (Pi.all /= 9) then
                   Failed
                     ("ASSIGNMENT TO COMPONENT OF " &
-                     "INTEGER ACCESS PARAMETER " &
-                     "FAILED");
+                     "INTEGER ACCESS PARAMETER " & "FAILED");
                end if;
             end;
          end Ea;
@@ -213,8 +212,7 @@ begin
                if (Pr.all /= (2, 7, 9)) then
                   Failed
                     ("ASSIGNMENT TO COMPONENT OF " &
-                     "RECORD ACCESS PARAMETER " &
-                     "FAILED");
+                     "RECORD ACCESS PARAMETER " & "FAILED");
                end if;
             end;
          end Ec;

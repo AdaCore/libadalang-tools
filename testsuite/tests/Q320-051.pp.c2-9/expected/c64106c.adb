@@ -65,32 +65,24 @@ begin
          Rec91, Rec92, Rec93 : Rectype (9);
          Rec_Oops            : Rectype (4);
 
-         procedure P
-           (Rec1 : in     Rectype;
-            Rec2 : in out Rectype;
-            Rec3 :    out Rectype);
+         procedure P (Rec1 : in     Rectype; Rec2 : in out Rectype;
+            Rec3           :    out Rectype);
       end Pkg;
 
       package body Pkg is
 
-         procedure P
-           (Rec1 : in     Rectype;
-            Rec2 : in out Rectype;
-            Rec3 :    out Rectype)
+         procedure P (Rec1 : in     Rectype; Rec2 : in out Rectype;
+            Rec3           :    out Rectype)
          is
 
-            procedure P1
-              (Rec11 : in     Rectype;
-               Rec12 : in out Rectype;
-               Rec13 :    out Rectype)
+            procedure P1 (Rec11 : in     Rectype; Rec12 : in out Rectype;
+               Rec13            :    out Rectype)
             is
             begin
                if (not Rec11'Constrained) or
-                 (Rec11.Constraint /= Ident_Int (9))
-               then
+                 (Rec11.Constraint /= Ident_Int (9)) then
                   Failed
-                    ("CONSTRAINT ON RECORD " &
-                     "TYPE IN PARAMETER " &
+                    ("CONSTRAINT ON RECORD " & "TYPE IN PARAMETER " &
                      "NOT RECOGNIZED");
                end if;
 
@@ -145,10 +137,8 @@ begin
 
          type Rectype (Constraint : Intrange := 15) is private;
 
-         procedure P
-           (Rec1 : in     Rectype;
-            Rec2 : in out Rectype;
-            Rec3 :    out Rectype);
+         procedure P (Rec1 : in     Rectype; Rec2 : in out Rectype;
+            Rec3           :    out Rectype);
 
       private
 
@@ -163,24 +153,18 @@ begin
 
       package body Pkg is
 
-         procedure P
-           (Rec1 : in     Rectype;
-            Rec2 : in out Rectype;
-            Rec3 :    out Rectype)
+         procedure P (Rec1 : in     Rectype; Rec2 : in out Rectype;
+            Rec3           :    out Rectype)
          is
 
-            procedure P1
-              (Rec11 : in     Rectype;
-               Rec12 : in out Rectype;
-               Rec13 :    out Rectype)
+            procedure P1 (Rec11 : in     Rectype; Rec12 : in out Rectype;
+               Rec13            :    out Rectype)
             is
             begin
                if (not Rec11'Constrained) or
-                 (Rec11.Constraint /= Ident_Int (9))
-               then
+                 (Rec11.Constraint /= Ident_Int (9)) then
                   Failed
-                    ("CONSTRAINT ON PRIVATE " &
-                     "TYPE IN PARAMETER " &
+                    ("CONSTRAINT ON PRIVATE " & "TYPE IN PARAMETER " &
                      "NOT RECOGNIZED");
                end if;
 
@@ -235,10 +219,8 @@ begin
 
          type Rectype (Constraint : Intrange := 15) is limited private;
 
-         procedure P
-           (Rec1 : in     Rectype;
-            Rec2 : in out Rectype;
-            Rec3 :    out Rectype);
+         procedure P (Rec1 : in     Rectype; Rec2 : in out Rectype;
+            Rec3           :    out Rectype);
 
       private
 
@@ -253,22 +235,17 @@ begin
 
       package body Pkg is
 
-         procedure P
-           (Rec1 : in     Rectype;
-            Rec2 : in out Rectype;
-            Rec3 :    out Rectype)
+         procedure P (Rec1 : in     Rectype; Rec2 : in out Rectype;
+            Rec3           :    out Rectype)
          is
 
-            procedure P1
-              (Rec11 : in     Rectype;
-               Rec12 : in out Rectype;
-               Rec13 :    out Rectype)
+            procedure P1 (Rec11 : in     Rectype; Rec12 : in out Rectype;
+               Rec13            :    out Rectype)
             is
             begin
                if (not Rec11'Constrained) or (Rec11.Constraint /= 9) then
                   Failed
-                    ("CONSTRAINT ON LIMITED PRIVATE " &
-                     "TYPE IN PARAMETER " &
+                    ("CONSTRAINT ON LIMITED PRIVATE " & "TYPE IN PARAMETER " &
                      "NOT RECOGNIZED");
                end if;
 

@@ -51,8 +51,7 @@ begin
      ("CE3606B",
       "CHECK THAT PUT_LINE WILL OUTPUT A LINE " &
       "ON MORE THAN ONE LINE WHEN THE LINE " &
-      "LENGTH IS BOUNDED, IF THE STRING IS " &
-      "GREATER THAN THE LINE LENGTH");
+      "LENGTH IS BOUNDED, IF THE STRING IS " & "GREATER THAN THE LINE LENGTH");
 
    declare
       Ft        : File_Type;
@@ -68,8 +67,7 @@ begin
          when Use_Error =>
             Not_Applicable
               ("USE_ERROR RAISED; TEXT CREATE " &
-               "FOR TEMP FILES WITH OUT_FILE " &
-               "MODE");
+               "FOR TEMP FILES WITH OUT_FILE " & "MODE");
             raise Incomplete;
       end;
 
@@ -80,17 +78,9 @@ begin
 
       Check_File
         (Ft,
-         "THIS LINE #" &
-         "IS A LONG #" &
-         "LINE WHICH#" &
-         " WHEN OUTP#" &
-         "UT SHOULD #" &
-         "SPAN OVER #" &
-         "SEVERAL LI#" &
-         "NES IN THE#" &
-         " OUTPUT FI#" &
-         "LE#" &
-         "AA#@%");
+         "THIS LINE #" & "IS A LONG #" & "LINE WHICH#" & " WHEN OUTP#" &
+         "UT SHOULD #" & "SPAN OVER #" & "SEVERAL LI#" & "NES IN THE#" &
+         " OUTPUT FI#" & "LE#" & "AA#@%");
 
       Close (Ft);
    exception

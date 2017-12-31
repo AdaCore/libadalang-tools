@@ -71,15 +71,13 @@ begin
 
       if X'Size < Specified_Size then
          Failed
-           ("OBJECT SIZE IS TOO SMALL -- " &
-            "VALUE IS" &
+           ("OBJECT SIZE IS TOO SMALL -- " & "VALUE IS" &
             Integer'Image (Integer (X)));
       end if;
 
       if Y'Size < Specified_Size then
          Failed
-           ("OBJECT SIZE IS TOO SMALL -- " &
-            "VALUE IS" &
+           ("OBJECT SIZE IS TOO SMALL -- " & "VALUE IS" &
             Integer'Image (Integer (Y)));
       end if;
 

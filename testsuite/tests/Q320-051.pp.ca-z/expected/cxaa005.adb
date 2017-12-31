@@ -81,8 +81,7 @@ begin
       -- to produce a Not_Applicable result.
 
       Ada.Text_Io.Create
-        (File => An_Unbounded_File,
-         Mode => Ada.Text_Io.Out_File,
+        (File => An_Unbounded_File, Mode => Ada.Text_Io.Out_File,
          Name => Unbounded_File_Name);
    exception
       when Ada.Text_Io.Use_Error | Ada.Text_Io.Name_Error =>
@@ -152,8 +151,7 @@ begin
 -- file, so the application opens the file in Append_File mode.
 
       Ada.Text_Io.Open
-        (File => An_Unbounded_File,
-         Mode => Ada.Text_Io.Append_File,
+        (File => An_Unbounded_File, Mode => Ada.Text_Io.Append_File,
          Name => Unbounded_File_Name);
 
       -- Test control code.
@@ -167,8 +165,7 @@ begin
 
       -- Test control code.
       if (Natural (Ada.Text_Io.Col (An_Unbounded_File)) /= (Tc_Col + 20)) or
-        (Natural (Ada.Text_Io.Line (An_Unbounded_File)) /= Tc_Line)
-      then
+        (Natural (Ada.Text_Io.Line (An_Unbounded_File)) /= Tc_Line) then
          Report.Failed ("Incorrect Col position after 2nd Put");
       end if;
 
@@ -180,8 +177,7 @@ begin
       Reset1 :
       begin
          Ada.Text_Io.Reset
-           (An_Unbounded_File,
-            Tc_Mode_Selection (Report.Ident_Int (3)));
+           (An_Unbounded_File, Tc_Mode_Selection (Report.Ident_Int (3)));
       exception
          when Ada.Text_Io.Use_Error =>
             Report.Not_Applicable
@@ -204,8 +200,7 @@ begin
       -- Test control code.
       -- There should be no change following the Put above.
       if (Natural (Ada.Text_Io.Col (An_Unbounded_File)) /= Tc_Col) or
-        (Natural (Ada.Text_Io.Line (An_Unbounded_File)) /= Tc_Line)
-      then
+        (Natural (Ada.Text_Io.Line (An_Unbounded_File)) /= Tc_Line) then
          Report.Failed ("Incorrect Col position after 3rd Put");
       end if;
 
@@ -215,8 +210,7 @@ begin
 
       -- Test control code.
       if (Natural (Ada.Text_Io.Col (An_Unbounded_File)) /= (Tc_Col + 20)) or
-        (Integer (Ada.Text_Io.Line (An_Unbounded_File)) /= Tc_Line)
-      then
+        (Integer (Ada.Text_Io.Line (An_Unbounded_File)) /= Tc_Line) then
          Report.Failed ("Incorrect Col position after 4th Put");
       end if;
 
@@ -248,8 +242,7 @@ begin
          -- item written to the file was not overwritten by any subsequent
          -- call to Put.
 
-         if (File_Data (File_Data'First) /= 'O') or
-           (File_Data (20) /= '1')
+         if (File_Data (File_Data'First) /= 'O') or (File_Data (20) /= '1')
          then
             Report.Failed ("Data placed incorrectly in file");
          end if;
@@ -275,9 +268,7 @@ begin
          Ada.Text_Io.Delete (An_Unbounded_File);
       else
          Ada.Text_Io.Open
-           (An_Unbounded_File,
-            Ada.Text_Io.In_File,
-            Unbounded_File_Name);
+           (An_Unbounded_File, Ada.Text_Io.In_File, Unbounded_File_Name);
          Ada.Text_Io.Delete (An_Unbounded_File);
       end if;
    exception

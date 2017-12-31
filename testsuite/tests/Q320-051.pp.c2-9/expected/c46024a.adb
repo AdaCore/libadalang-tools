@@ -57,60 +57,51 @@ begin
    Test
      ("C46024A",
       "CHECK FLOATING POINT CONVERSIONS WHEN THE " &
-      "TARGET TYPE IS A FIXED POINT TYPE, FOR " &
-      "5-DIGIT PRECISION");
+      "TARGET TYPE IS A FIXED POINT TYPE, FOR " & "5-DIGIT PRECISION");
 
    if Fix1 (Float5'(2#0.1000_0000_0000_0000_00#E-1)) /= Ident1 (2#0.01#) then
       Failed ("INCORRECT RESULT FROM CONVERSION (1)");
    end if;
 
-   if Fix1 (Float5'(-2#0.1111_1110_0000_0000_00#E5)) /=
-     Ident1 (-2#1_1111.11#)
+   if Fix1 (Float5'(-2#0.1111_1110_0000_0000_00#E5)) /= Ident1 (-2#1_1111.11#)
    then
       Failed ("INCORRECT RESULT FROM CONVERSION (2)");
    end if;
 
    if Fix1 (Float5'(-2#0.1010_0111_1111_1111_11#E4)) < Ident1 (-2#1010.10#) or
-     Fix1 (Float5'(-2#0.1010_0111_1111_1111_11#E4)) > Ident1 (-2#1010.01#)
-   then
+     Fix1 (Float5'(-2#0.1010_0111_1111_1111_11#E4)) > Ident1 (-2#1010.01#) then
       Failed ("INCORRECT RESULT FROM CONVERSION (3)");
    end if;
 
-   if Fix2 (Float5'(-2#0.1000_0000_0000_0000_00#E-3)) /=
-     Ident2 (-2#0.0001#)
+   if Fix2 (Float5'(-2#0.1000_0000_0000_0000_00#E-3)) /= Ident2 (-2#0.0001#)
    then
       Failed ("INCORRECT RESULT FROM CONVERSION (4)");
    end if;
 
    if Fix2 (Float5'(2#0.1111_1111_1110_0000_00#E7)) /=
-     Ident2 (2#111_1111.1111#)
-   then
+     Ident2 (2#111_1111.1111#) then
       Failed ("INCORRECT RESULT FROM CONVERSION (5)");
    end if;
 
    F5 := 2#0.1010_1010_1010_1010_10#E5;
    if Fix2 (F5) < Ident2 (2#1_0101.0101#) or
-     Fix2 (F5) > Ident2 (2#1_0101.0110#)
-   then
+     Fix2 (F5) > Ident2 (2#1_0101.0110#) then
       Failed ("INCORRECT RESULT FROM CONVERSION (6)");
    end if;
 
-   if Fix3 (Float5'(2#0.1000_0000_0000_0000_00#E-5)) /=
-     Ident3 (2#0.0000_01#)
+   if Fix3 (Float5'(2#0.1000_0000_0000_0000_00#E-5)) /= Ident3 (2#0.0000_01#)
    then
       Failed ("INCORRECT RESULT FROM CONVERSION (7)");
    end if;
 
    if Fix3 (Float5'(-2#0.1111_1111_1111_1110_00#E9)) /=
-     Ident3 (-2#1_1111_1111.1111_11#)
-   then
+     Ident3 (-2#1_1111_1111.1111_11#) then
       Failed ("INCORRECT RESULT FROM CONVERSION (8)");
    end if;
 
    F5 := -2#0.1010_1010_1010_1010_10#E8;
    if Fix3 (F5) < Ident3 (-2#1010_1010.1010_11#) or
-     Fix3 (F5) > Ident3 (-2#1010_1010.1010_10#)
-   then
+     Fix3 (F5) > Ident3 (-2#1010_1010.1010_10#) then
       Failed ("INCORRECT RESULT FROM CONVERSION (9)");
    end if;
 
@@ -120,24 +111,19 @@ begin
    if Fix1 (F5a) = Ident1 (2#1010.11#) and
      Fix1 (-F5a) = Ident1 (-2#1010.11#) and
      Fix1 (F5b) = Ident1 (2#1_0101.01#) and
-     Fix1 (-F5b) = Ident1 (-2#1_0101.01#)
-   then
+     Fix1 (-F5b) = Ident1 (-2#1_0101.01#) then
       Comment ("CONVERSION ROUNDS TO NEAREST");
    elsif Fix1 (F5a) = Ident1 (2#1010.10#) and
-     Fix1 (-F5b) = Ident1 (-2#1_0101.10#)
-   then
+     Fix1 (-F5b) = Ident1 (-2#1_0101.10#) then
       Comment ("CONVERSION ROUNDS TO LEAST FIXED-POINT VALUE");
    elsif Fix1 (F5b) = Ident1 (2#1_0101.10#) and
-     Fix1 (-F5a) = Ident1 (-2#1010.10#)
-   then
+     Fix1 (-F5a) = Ident1 (-2#1010.10#) then
       Comment ("CONVERSION ROUNDS TO GREATEST FIXED-POINT VALUE");
    elsif Fix1 (F5a) = Ident1 (2#1010.10#) and
-     Fix1 (-F5a) = Ident1 (-2#1010.10#)
-   then
+     Fix1 (-F5a) = Ident1 (-2#1010.10#) then
       Comment ("CONVERSION ROUNDS TOWARD ZERO");
    elsif Fix1 (F5b) = Ident1 (2#1_0101.10#) and
-     Fix1 (-F5b) = Ident1 (-2#1_0101.10#)
-   then
+     Fix1 (-F5b) = Ident1 (-2#1_0101.10#) then
       Comment ("CONVERSION ROUNDS AWAY FROM ZERO");
    else
       Comment ("UNABLE TO DETERMINE CONVERSION PATTERN");

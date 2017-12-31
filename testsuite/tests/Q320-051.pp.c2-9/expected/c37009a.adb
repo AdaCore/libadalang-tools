@@ -97,8 +97,7 @@ begin
      ("C37009A",
       "CHECK THAT AN UNCONSTRAINED RECORD TYPE CAN " &
       "BE USED TO DECLARE A RECORD COMPONENT THAT " &
-      "CAN BE INITIALIZED WITH AN APPROPRIATE " &
-      "EXPLICIT OR DEFAULT VALUE");
+      "CAN BE INITIALIZED WITH AN APPROPRIATE " & "EXPLICIT OR DEFAULT VALUE");
 
    if Rec_Def.T.I /= Ident_Int (1) then
       Failed ("INCORRECT DEFAULT INITIALIZATION OF INTEGER");
@@ -119,8 +118,7 @@ begin
    for I in 1 .. 2 loop
       if Rec_Def.U.A (I) /= Ident_Flt (1.25) then
          Failed
-           ("INCORRECT DEFAULT INITIALIZATION OF ARRAY " &
-            "POSITION " &
+           ("INCORRECT DEFAULT INITIALIZATION OF ARRAY " & "POSITION " &
             Integer'Image (I));
       end if;
    end loop;
@@ -164,8 +162,7 @@ begin
    for I in 1 .. 3 loop
       if Rec.U.A (I) /= Ident_Flt (2.25) then
          Failed
-           ("INCORRECT EXPLICIT INITIALIZATION OF ARRAY " &
-            "POSITION " &
+           ("INCORRECT EXPLICIT INITIALIZATION OF ARRAY " & "POSITION " &
             Integer'Image (I));
       end if;
    end loop;

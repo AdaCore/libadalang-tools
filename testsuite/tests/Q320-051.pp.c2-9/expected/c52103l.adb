@@ -74,8 +74,7 @@ begin
       -- CHECKING THE VALUES AFTER THE ASSIGNMENT:
 
       if Arrx31 /= "QUINC" or
-        Arrx31 (Ident_Int (11) .. Ident_Int (15)) /= "QUINC"
-      then
+        Arrx31 (Ident_Int (11) .. Ident_Int (15)) /= "QUINC" then
          Failed ("ARRAY ASSIGNMENT NOT CORRECT (13)");
       end if;
 
@@ -114,8 +113,7 @@ begin
       -- CHECKING THE VALUES AFTER THE SLICE ASSIGNMENT:
 
       if Arr61 /= "QUINC" or
-        Arr61 (Ident_Int (11) .. Ident_Int (15)) /= "QUINC"
-      then
+        Arr61 (Ident_Int (11) .. Ident_Int (15)) /= "QUINC" then
          Failed ("SLICE ASSIGNMENT NOT CORRECT (6)");
       end if;
 

@@ -80,10 +80,8 @@ procedure Cxg2003 is
       -- The default Maximum Relative Error is the value specified in the LRM.
       Default_Mre : constant Real := 2.0;
 
-      procedure Check
-        (Actual, Expected : Real;
-         Test_Name        : String;
-         Mre              : Real := Default_Mre)
+      procedure Check (Actual, Expected : Real; Test_Name : String;
+         Mre                            : Real := Default_Mre)
       is
          Rel_Error : Real;
          Abs_Error : Real;
@@ -102,14 +100,9 @@ procedure Cxg2003 is
 
          if abs (Actual - Expected) > Max_Error then
             Report.Failed
-              (Test_Name &
-               " actual: " &
-               Real'Image (Actual) &
-               " expected: " &
-               Real'Image (Expected) &
-               " difference: " &
-               Real'Image (Actual - Expected) &
-               " mre:" &
+              (Test_Name & " actual: " & Real'Image (Actual) & " expected: " &
+               Real'Image (Expected) & " difference: " &
+               Real'Image (Actual - Expected) & " mre:" &
                Real'Image (Max_Error));
          elsif Verbose then
             if Actual = Expected then
@@ -138,12 +131,8 @@ procedure Cxg2003 is
             -- note that since the expected value is computed, we must take the
             -- error in that computation into account.
             Check
-              (Y,
-               Expected,
-               "test " &
-               Test &
-               " -" &
-               Integer'Image (I) &
+              (Y, Expected,
+               "test " & Test & " -" & Integer'Image (I) &
                " of argument range",
                3.0);
          end loop;
@@ -197,10 +186,7 @@ procedure Cxg2003 is
          begin
             Y := Sqrt (X);
             Check
-              (Y,
-               Expected,
-               "test 3 -- sqrt(1.0)",
-               0.0);   -- no error allowed
+              (Y, Expected, "test 3 -- sqrt(1.0)", 0.0);   -- no error allowed
          exception
             when Constraint_Error =>
                Report.Failed ("Constraint_Error raised in test 3");
@@ -216,10 +202,7 @@ procedure Cxg2003 is
          begin
             Y := Sqrt (X);
             Check
-              (Y,
-               Expected,
-               "test 4 -- sqrt(0.0)",
-               0.0);   -- no error allowed
+              (Y, Expected, "test 4 -- sqrt(0.0)", 0.0);   -- no error allowed
          exception
             when Constraint_Error =>
                Report.Failed ("Constraint_Error raised in test 4");
@@ -265,9 +248,7 @@ procedure Cxg2003 is
 
          --- test 7 & 8 ---
          Argument_Range_Check
-           (1.0 / Sqrt (Real (Real'Machine_Radix)),
-            1.0,
-            "7");
+           (1.0 / Sqrt (Real (Real'Machine_Radix)), 1.0, "7");
          Argument_Range_Check (1.0, Sqrt (Real (Real'Machine_Radix)), "8");
       end Do_Test;
    end Float_Check;
@@ -293,10 +274,8 @@ procedure Cxg2003 is
       -- The default Maximum Relative Error is the value specified in the LRM.
       Default_Mre : constant Real := 2.0;
 
-      procedure Check
-        (Actual, Expected : Real;
-         Test_Name        : String;
-         Mre              : Real := Default_Mre)
+      procedure Check (Actual, Expected : Real; Test_Name : String;
+         Mre                            : Real := Default_Mre)
       is
          Rel_Error : Real;
          Abs_Error : Real;
@@ -315,14 +294,9 @@ procedure Cxg2003 is
 
          if abs (Actual - Expected) > Max_Error then
             Report.Failed
-              (Test_Name &
-               " actual: " &
-               Real'Image (Actual) &
-               " expected: " &
-               Real'Image (Expected) &
-               " difference: " &
-               Real'Image (Actual - Expected) &
-               " mre:" &
+              (Test_Name & " actual: " & Real'Image (Actual) & " expected: " &
+               Real'Image (Expected) & " difference: " &
+               Real'Image (Actual - Expected) & " mre:" &
                Real'Image (Max_Error));
          elsif Verbose then
             if Actual = Expected then
@@ -351,12 +325,8 @@ procedure Cxg2003 is
             -- note that since the expected value is computed, we must take the
             -- error in that computation into account.
             Check
-              (Y,
-               Expected,
-               "test " &
-               Test &
-               " -" &
-               Integer'Image (I) &
+              (Y, Expected,
+               "test " & Test & " -" & Integer'Image (I) &
                " of argument range",
                3.0);
          end loop;
@@ -410,10 +380,7 @@ procedure Cxg2003 is
          begin
             Y := Sqrt (X);
             Check
-              (Y,
-               Expected,
-               "test 3 -- sqrt(1.0)",
-               0.0);   -- no error allowed
+              (Y, Expected, "test 3 -- sqrt(1.0)", 0.0);   -- no error allowed
          exception
             when Constraint_Error =>
                Report.Failed ("Constraint_Error raised in test 3");
@@ -429,10 +396,7 @@ procedure Cxg2003 is
          begin
             Y := Sqrt (X);
             Check
-              (Y,
-               Expected,
-               "test 4 -- sqrt(0.0)",
-               0.0);   -- no error allowed
+              (Y, Expected, "test 4 -- sqrt(0.0)", 0.0);   -- no error allowed
          exception
             when Constraint_Error =>
                Report.Failed ("Constraint_Error raised in test 4");
@@ -478,9 +442,7 @@ procedure Cxg2003 is
 
          --- test 7 & 8 ---
          Argument_Range_Check
-           (1.0 / Sqrt (Real (Real'Machine_Radix)),
-            1.0,
-            "7");
+           (1.0 / Sqrt (Real (Real'Machine_Radix)), 1.0, "7");
          Argument_Range_Check (1.0, Sqrt (Real (Real'Machine_Radix)), "8");
       end Do_Test;
    end A_Long_Float_Check;
@@ -499,10 +461,8 @@ procedure Cxg2003 is
       -- The default Maximum Relative Error is the value specified in the LRM.
       Default_Mre : constant Real := 2.0;
 
-      procedure Check
-        (Actual, Expected : Real;
-         Test_Name        : String;
-         Mre              : Real := Default_Mre)
+      procedure Check (Actual, Expected : Real; Test_Name : String;
+         Mre                            : Real := Default_Mre)
       is
          Rel_Error : Real;
          Abs_Error : Real;
@@ -521,14 +481,9 @@ procedure Cxg2003 is
 
          if abs (Actual - Expected) > Max_Error then
             Report.Failed
-              (Test_Name &
-               " actual: " &
-               Real'Image (Actual) &
-               " expected: " &
-               Real'Image (Expected) &
-               " difference: " &
-               Real'Image (Actual - Expected) &
-               " mre:" &
+              (Test_Name & " actual: " & Real'Image (Actual) & " expected: " &
+               Real'Image (Expected) & " difference: " &
+               Real'Image (Actual - Expected) & " mre:" &
                Real'Image (Max_Error));
          elsif Verbose then
             if Actual = Expected then
@@ -557,12 +512,8 @@ procedure Cxg2003 is
             -- note that since the expected value is computed, we must take the
             -- error in that computation into account.
             Check
-              (Y,
-               Expected,
-               "test " &
-               Test &
-               " -" &
-               Integer'Image (I) &
+              (Y, Expected,
+               "test " & Test & " -" & Integer'Image (I) &
                " of argument range",
                3.0);
          end loop;
@@ -616,10 +567,7 @@ procedure Cxg2003 is
          begin
             Y := Ef.Sqrt (X);
             Check
-              (Y,
-               Expected,
-               "test 3 -- sqrt(1.0)",
-               0.0);   -- no error allowed
+              (Y, Expected, "test 3 -- sqrt(1.0)", 0.0);   -- no error allowed
          exception
             when Constraint_Error =>
                Report.Failed ("Constraint_Error raised in test 3");
@@ -635,10 +583,7 @@ procedure Cxg2003 is
          begin
             Y := Ef.Sqrt (X);
             Check
-              (Y,
-               Expected,
-               "test 4 -- sqrt(0.0)",
-               0.0);   -- no error allowed
+              (Y, Expected, "test 4 -- sqrt(0.0)", 0.0);   -- no error allowed
          exception
             when Constraint_Error =>
                Report.Failed ("Constraint_Error raised in test 4");
@@ -684,13 +629,9 @@ procedure Cxg2003 is
 
          --- test 7 & 8 ---
          Argument_Range_Check
-           (1.0 / Ef.Sqrt (Float (Float'Machine_Radix)),
-            1.0,
-            "7");
+           (1.0 / Ef.Sqrt (Float (Float'Machine_Radix)), 1.0, "7");
          Argument_Range_Check
-           (1.0,
-            Ef.Sqrt (Float (Float'Machine_Radix)),
-            "8");
+           (1.0, Ef.Sqrt (Float (Float'Machine_Radix)), "8");
       end Do_Test;
    end Non_Generic_Check;
 
@@ -708,8 +649,7 @@ begin
 
    if Verbose then
       Report.Comment
-        ("checking a digits" &
-         Integer'Image (System.Max_Digits) &
+        ("checking a digits" & Integer'Image (System.Max_Digits) &
          " floating point type");
    end if;
 

@@ -78,8 +78,7 @@ procedure Cxaia06 is
    end My_Key;
 
    package My_Keys is new My_Indefinite_Ordered_Sets.Generic_Keys
-     (Key_Type => My_Key_Type,
-      Key      => My_Key); -- Predefined <
+     (Key_Type => My_Key_Type, Key => My_Key); -- Predefined <
 
    My_Set_1 : My_Indefinite_Ordered_Sets.Set;
    My_Set_2 : My_Indefinite_Ordered_Sets.Set;
@@ -92,8 +91,7 @@ procedure Cxaia06 is
    My_Inserted : Boolean;
 
    procedure Tampering_Check
-     (Container : in out My_Indefinite_Ordered_Sets.Set;
-      Where     : in     String)
+     (Container : in out My_Indefinite_Ordered_Sets.Set; Where : in String)
    is
 
       Program_Error_Raised : Boolean := False;
@@ -192,8 +190,7 @@ begin
       begin
 
          if My_Indefinite_Ordered_Sets.Element (Position => My_Cursor_1) /=
-           Value_In_Ptr_Array (I).all
-         then
+           Value_In_Ptr_Array (I).all then
 
             Report.Failed
               ("Mismatch between element and what was inserted #2");
@@ -211,8 +208,7 @@ begin
          end if;
 
          My_Indefinite_Ordered_Sets.Query_Element
-           (Position => My_Cursor_1,
-            Process  => My_Query'Access);
+           (Position => My_Cursor_1, Process => My_Query'Access);
 
       end;
 
@@ -232,8 +228,7 @@ begin
    end loop;
 
    if My_Set_1.First_Element /=
-     Value_In_Ptr_Array (Value_In_Ptr_Array'First).all
-   then
+     Value_In_Ptr_Array (Value_In_Ptr_Array'First).all then
 
       Report.Failed ("Mismatch between first element and first inserted");
 
@@ -258,8 +253,7 @@ begin
    for I in reverse Fxaia00.Array_Bounds_Type loop
 
       if My_Indefinite_Ordered_Sets.Element (Position => My_Cursor_2) /=
-        Value_In_Ptr_Array (I).all
-      then
+        Value_In_Ptr_Array (I).all then
 
          Report.Failed ("Mismatch between element and what was inserted #3");
 
@@ -280,8 +274,7 @@ begin
 
    end loop;
 
-   if My_Set_2.Last_Element /=
-     Value_In_Ptr_Array (Value_In_Ptr_Array'Last).all
+   if My_Set_2.Last_Element /= Value_In_Ptr_Array (Value_In_Ptr_Array'Last).all
    then
 
       Report.Failed ("Mismatch between last element and last inserted");
@@ -297,9 +290,7 @@ begin
    end if;
 
    if not My_Indefinite_Ordered_Sets.Equivalent_Sets
-       (Left  => My_Set_1,
-        Right => My_Set_2)
-   then
+       (Left => My_Set_1, Right => My_Set_2) then
 
       Report.Failed ("Indefinite_Ordered_Sets not equivalent");
 
@@ -319,8 +310,7 @@ begin
          Tampering_Check (Container => My_Set_3, Where => "Iterate");
 
          if My_Indefinite_Ordered_Sets.Element (Position) /=
-           Value_In_Ptr_Array (I).all
-         then
+           Value_In_Ptr_Array (I).all then
 
             Report.Failed ("Iterate hasn't found the expected value");
 
@@ -340,8 +330,7 @@ begin
       begin
 
          if My_Indefinite_Ordered_Sets.Element (Position) /=
-           Value_In_Ptr_Array (I).all
-         then
+           Value_In_Ptr_Array (I).all then
 
             Report.Failed ("Reverse_Iterate hasn't found the expected value");
 
@@ -446,8 +435,7 @@ begin
    for I in Fxaia00.Array_Bounds_Type loop
 
       if My_Indefinite_Ordered_Sets.Element (Position => My_Cursor_1) /=
-        Value_In_Ptr_Array (I).all
-      then
+        Value_In_Ptr_Array (I).all then
 
          Report.Failed ("Target Set not as expected after move");
 
@@ -619,8 +607,7 @@ begin
    My_Cursor_2 := My_Set_2.First;
 
    if My_Indefinite_Ordered_Sets.Element (Position => My_Cursor_2) /=
-     Value_In_Ptr_Array (1).all
-   then
+     Value_In_Ptr_Array (1).all then
 
       Report.Failed ("Inserted value not as expected #1");
 
@@ -630,8 +617,7 @@ begin
 
    -- Check = Default_Value
    if My_Indefinite_Ordered_Sets.Element (Position => My_Cursor_2) /=
-     Value_In_Ptr_Array (2).all
-   then
+     Value_In_Ptr_Array (2).all then
 
       Report.Failed ("Inserted value not as expected #2");
 
@@ -640,8 +626,7 @@ begin
    My_Indefinite_Ordered_Sets.Next (Position => My_Cursor_2);
 
    if My_Indefinite_Ordered_Sets.Element (Position => My_Cursor_2) /=
-     Value_In_Ptr_Array (7).all
-   then
+     Value_In_Ptr_Array (7).all then
 
       Report.Failed ("Inserted value not as expected #3");
 
@@ -650,8 +635,7 @@ begin
    My_Indefinite_Ordered_Sets.Next (Position => My_Cursor_2);
 
    if My_Indefinite_Ordered_Sets.Element (Position => My_Cursor_2) /=
-     Value_In_Ptr_Array (9).all
-   then
+     Value_In_Ptr_Array (9).all then
 
       Report.Failed ("Inserted value not as expected #4");
 
@@ -660,8 +644,7 @@ begin
    My_Indefinite_Ordered_Sets.Next (Position => My_Cursor_2);
 
    if My_Indefinite_Ordered_Sets.Element (Position => My_Cursor_2) /=
-     My_Default_Value
-   then
+     My_Default_Value then
 
       Report.Failed ("Inserted value not as expected #5");
 
@@ -669,8 +652,7 @@ begin
 
    My_Indefinite_Ordered_Sets.Next (Position => My_Cursor_2);
 
-   if My_Indefinite_Ordered_Sets.Element (Position => My_Cursor_2) /=
-     "{{{"
+   if My_Indefinite_Ordered_Sets.Element (Position => My_Cursor_2) /= "{{{"
    then
 
       Report.Failed ("Inserted value not as expected #6");
@@ -713,8 +695,7 @@ begin
    end if;
 
    if My_Indefinite_Ordered_Sets.Element (My_Set_2.First) /=
-     Value_In_Ptr_Array (2).all
-   then
+     Value_In_Ptr_Array (2).all then
 
       Report.Failed ("Remaining value not as expected");
 
@@ -728,8 +709,7 @@ begin
    My_Cursor_1 := My_Set_1.Find (Item => Value_In_Ptr_Array (9).all);
 
    if My_Indefinite_Ordered_Sets.Element (Position => My_Cursor_1) /=
-     Value_In_Ptr_Array (9).all
-   then
+     Value_In_Ptr_Array (9).all then
 
       Report.Failed ("Found value not as expected");
 
@@ -738,8 +718,7 @@ begin
    My_Cursor_2 := My_Set_1.Floor (Item => Value_In_Ptr_Array (8).all);
 
    if My_Indefinite_Ordered_Sets.Element (Position => My_Cursor_2) /=
-     Value_In_Ptr_Array (8).all
-   then
+     Value_In_Ptr_Array (8).all then
 
       Report.Failed ("Floor (element form) value not as expected");
 
@@ -760,8 +739,7 @@ begin
    My_Cursor_1 := My_Set_1.Ceiling (Item => Value_In_Ptr_Array (10).all);
 
    if My_Indefinite_Ordered_Sets.Element (Position => My_Cursor_1) /=
-     Value_In_Ptr_Array (10).all
-   then
+     Value_In_Ptr_Array (10).all then
 
       Report.Failed ("Ceiling (element form) value not as expected");
 
@@ -791,8 +769,7 @@ begin
 
    if My_Indefinite_Ordered_Sets.Element
        (My_Indefinite_Ordered_Sets.Previous (My_Cursor_1)) >
-     My_Cursor_1
-   then
+     My_Cursor_1 then
 
       Report.Failed ("> of cursor and element not as expected");
 
@@ -840,9 +817,7 @@ begin
 
    My_Set_3.Insert (New_Item => My_Default_Value);
 
-   if My_Indefinite_Ordered_Sets.Overlap
-       (Left  => My_Set_3,
-        Right => My_Set_2)
+   if My_Indefinite_Ordered_Sets.Overlap (Left => My_Set_3, Right => My_Set_2)
    then
 
       Report.Failed ("Erroneously thinks has overlap");
@@ -850,18 +825,14 @@ begin
    end if;
 
    if not My_Indefinite_Ordered_Sets.Is_Subset
-       (Subset => My_Set_2,
-        Of_Set => My_Set_1)
-   then
+       (Subset => My_Set_2, Of_Set => My_Set_1) then
 
       Report.Failed ("Erroneously doesn't think is subset");
 
    end if;
 
    if My_Indefinite_Ordered_Sets.Is_Subset
-       (Subset => My_Set_3,
-        Of_Set => My_Set_1)
-   then
+       (Subset => My_Set_3, Of_Set => My_Set_1) then
 
       Report.Failed ("Erroneously thinks is subset");
 
@@ -881,8 +852,7 @@ begin
    My_Cursor_3 := My_Set_3.First;
 
    if My_Indefinite_Ordered_Sets.Element (Position => My_Cursor_3) /=
-     Value_In_Ptr_Array (2).all
-   then
+     Value_In_Ptr_Array (2).all then
 
       Report.Failed ("Element not as expected after Union #1");
 
@@ -891,17 +861,14 @@ begin
    My_Indefinite_Ordered_Sets.Next (Position => My_Cursor_3);
 
    if My_Indefinite_Ordered_Sets.Element (Position => My_Cursor_3) /=
-     My_Default_Value
-   then
+     My_Default_Value then
 
       Report.Failed ("Element not as expected after Union #2");
 
    end if;
 
    if not My_Indefinite_Ordered_Sets.Overlap
-       (Left  => My_Set_1,
-        Right => My_Set_2)
-   then
+       (Left => My_Set_1, Right => My_Set_2) then
 
       Report.Failed ("Erroneously doesn't think has overlap");
 
@@ -923,8 +890,7 @@ begin
    for I in Fxaia00.Array_Bounds_Type loop
 
       if My_Indefinite_Ordered_Sets.Element (Position => My_Cursor_3) /=
-        Value_In_Ptr_Array (I).all
-      then
+        Value_In_Ptr_Array (I).all then
 
          Report.Failed ("Element not as expected after Union #3");
 
@@ -949,8 +915,7 @@ begin
    for I in Fxaia00.Array_Bounds_Type loop
 
       if My_Indefinite_Ordered_Sets.Element (Position => My_Cursor_3) /=
-        Value_In_Ptr_Array (I).all
-      then
+        Value_In_Ptr_Array (I).all then
 
          Report.Failed ("Element not as expected after Union #4");
 
@@ -979,8 +944,7 @@ begin
 
    My_Set_3 :=
      My_Indefinite_Ordered_Sets.Intersection
-       (Left  => My_Set_1,
-        Right => My_Set_2);
+       (Left => My_Set_1, Right => My_Set_2);
 
    -- My_Set_3 should contain Value_In_Ptr_Array (2).all
 
@@ -993,8 +957,7 @@ begin
    My_Cursor_3 := My_Set_3.First;
 
    if My_Indefinite_Ordered_Sets.Element (Position => My_Cursor_3) /=
-     Value_In_Ptr_Array (2).all
-   then
+     Value_In_Ptr_Array (2).all then
 
       Report.Failed ("Element not as expected after Intersection #1");
 
@@ -1013,8 +976,7 @@ begin
    My_Cursor_3 := My_Set_3.First;
 
    if My_Indefinite_Ordered_Sets.Element (Position => My_Cursor_3) /=
-     Value_In_Ptr_Array (2).all
-   then
+     Value_In_Ptr_Array (2).all then
 
       Report.Failed ("Element not as expected after Intersection #2");
 
@@ -1042,8 +1004,7 @@ begin
    My_Cursor_3 := My_Set_3.First;
 
    if My_Indefinite_Ordered_Sets.Element (Position => My_Cursor_3) /=
-     My_Default_Value
-   then
+     My_Default_Value then
 
       Report.Failed ("Element not as expected after Difference #1");
 
@@ -1051,8 +1012,7 @@ begin
 
    My_Set_3 :=
      My_Indefinite_Ordered_Sets.Difference
-       (Left  => My_Set_1,
-        Right => My_Set_2);
+       (Left => My_Set_1, Right => My_Set_2);
 
    -- My_Set_3 should contain the test values (in forward order) except for
    -- Value_In_Ptr_Array (2).all
@@ -1097,8 +1057,7 @@ begin
    My_Cursor_3 := My_Set_3.First;
 
    if My_Indefinite_Ordered_Sets.Element (Position => My_Cursor_3) /=
-     Value_In_Ptr_Array (2).all
-   then
+     Value_In_Ptr_Array (2).all then
 
       Report.Failed ("Element not as expected after Symmetric_Difference #1");
 
@@ -1107,8 +1066,7 @@ begin
    My_Indefinite_Ordered_Sets.Next (Position => My_Cursor_3);
 
    if My_Indefinite_Ordered_Sets.Element (Position => My_Cursor_3) /=
-     My_Default_Value
-   then
+     My_Default_Value then
 
       Report.Failed ("Element not as expected after Symmetric_Difference #2");
 
@@ -1116,8 +1074,7 @@ begin
 
    My_Set_3 :=
      My_Indefinite_Ordered_Sets.Symmetric_Difference
-       (Left  => My_Set_1,
-        Right => My_Set_3);
+       (Left => My_Set_1, Right => My_Set_3);
 
    -- My_Set_3 should contain the test values (in forward order) except for
    -- Value_In_Ptr_Array (2).all, followed by Default_Value
@@ -1149,8 +1106,7 @@ begin
    My_Cursor_3 := My_Set_3.First;
 
    if My_Keys.Key (Position => My_Cursor_3) /=
-     My_Key_Type (Character'Pos (Value_In_Ptr_Array (1).all (1)))
-   then
+     My_Key_Type (Character'Pos (Value_In_Ptr_Array (1).all (1))) then
 
       Report.Failed ("Wrong key for cursor");
 
@@ -1159,8 +1115,7 @@ begin
    if My_Keys.Element
        (Container => My_Set_3,
         Key => My_Key_Type (Character'Pos (Value_In_Ptr_Array (1).all (1)))) /=
-     Value_In_Ptr_Array (1).all
-   then
+     Value_In_Ptr_Array (1).all then
 
       Report.Failed ("Wrong element for key");
 
@@ -1238,8 +1193,7 @@ begin
         Key => My_Key_Type (Character'Pos (Value_In_Ptr_Array (9).all (1))));
 
    if My_Indefinite_Ordered_Sets.Element (Position => My_Cursor_3) /=
-     Value_In_Ptr_Array (9).all
-   then
+     Value_In_Ptr_Array (9).all then
 
       Report.Failed ("Found (key form) value not as expected");
 
@@ -1279,15 +1233,13 @@ begin
    begin
 
       My_Keys.Update_Element_Preserving_Key
-        (Container => My_Set_3,
-         Position  => My_Cursor_3,
+        (Container => My_Set_3, Position => My_Cursor_3,
          Process   => My_Update'Access);
 
    end;
 
    if My_Indefinite_Ordered_Sets.Element (Position => My_Cursor_3) (1) /=
-     Value_In_Ptr_Array (9).all (1)
-   then
+     Value_In_Ptr_Array (9).all (1) then
 
       Report.Failed ("Updated element not as expected");
 
@@ -1308,8 +1260,7 @@ begin
         Key => My_Key_Type (Character'Pos (Value_In_Ptr_Array (8).all (1))));
 
    if My_Indefinite_Ordered_Sets.Element (Position => My_Cursor_3) /=
-     Value_In_Ptr_Array (8).all
-   then
+     Value_In_Ptr_Array (8).all then
 
       Report.Failed ("Floor (key Form) value not as expected");
 
@@ -1321,8 +1272,7 @@ begin
         Key => My_Key_Type (Character'Pos (Value_In_Ptr_Array (10).all (1))));
 
    if My_Indefinite_Ordered_Sets.Element (Position => My_Cursor_3) /=
-     Value_In_Ptr_Array (10).all
-   then
+     Value_In_Ptr_Array (10).all then
 
       Report.Failed ("Ceiling (key Form) value not as expected");
 

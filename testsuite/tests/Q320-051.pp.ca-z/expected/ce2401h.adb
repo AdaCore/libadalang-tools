@@ -77,10 +77,8 @@ begin
       exception
          when Use_Error | Name_Error =>
             Not_Applicable
-              ("CREATE WITH INOUT_FILE MODE " &
-               "NOT SUPPORTED FOR " &
-               "UNCONSTRAINED RECORDS WITH " &
-               "DEFAULT DISCRIMINATES");
+              ("CREATE WITH INOUT_FILE MODE " & "NOT SUPPORTED FOR " &
+               "UNCONSTRAINED RECORDS WITH " & "DEFAULT DISCRIMINATES");
             raise End_Subtest;
          when others =>
             Failed ("UNEXPECTED EXCEPTION RAISED ON DIRECT " & "CREATE");

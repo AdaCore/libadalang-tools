@@ -45,8 +45,7 @@ begin
    Test
      ("CE2204C",
       "CHECK THAT MODE_ERROR IS RAISED BY WRITE " &
-      "WHEN THE MODE IS INFILE AND THE FILE IS " &
-      "A TEMPORARY FILE");
+      "WHEN THE MODE IS INFILE AND THE FILE IS " & "A TEMPORARY FILE");
    declare
       package Seq_Io is new Sequential_Io (Integer);
       use Seq_Io;

@@ -41,9 +41,7 @@ procedure C36174a is
 
    type A4 is
      array
-       (Integer range <>,
-        Integer range <>,
-        Integer range <>,
+       (Integer range <>, Integer range <>, Integer range <>,
         Integer range <>) of String (1 .. 0);
    C4 : constant A4 :=
      (-6 .. -4 => (4 .. 5 => (-4 .. -5 => (1_000 .. 2_000 => S9))));
@@ -62,15 +60,8 @@ procedure C36174a is
 begin
    Test ("C36174A", "INDEX_CONSTRAINTS MAY BE OMITTED FOR CONSTANTS");
 
-   if S0'First /= 1 or
-     S0'Last /= 0 or
-     S1'First /= 1 or
-     S1'Last /= 0 or
-     S2'First /= 1 or
-     S2'Last /= 0 or
-     S3'First /= 1 or
-     S3'Last /= 3
-   then
+   if S0'First /= 1 or S0'Last /= 0 or S1'First /= 1 or S1'Last /= 0 or
+     S2'First /= 1 or S2'Last /= 0 or S3'First /= 1 or S3'Last /= 3 then
       Failed ("INVALID STRING CONSTANT BOUNDS 1");
    end if;
 
@@ -82,15 +73,9 @@ begin
       Failed ("INVALID STRING CONSTANT BOUNDS 3");
    end if;
 
-   if C4'First (1) /= -6 or
-     C4'Last (1) /= -4 or
-     C4'First (2) /= 4 or
-     C4'Last (2) /= 5 or
-     C4'First (3) /= -4 or
-     C4'Last (3) /= -5 or
-     C4'First (4) /= 1_000 or
-     C4'Last (4) /= 2_000
-   then
+   if C4'First (1) /= -6 or C4'Last (1) /= -4 or C4'First (2) /= 4 or
+     C4'Last (2) /= 5 or C4'First (3) /= -4 or C4'Last (3) /= -5 or
+     C4'First (4) /= 1_000 or C4'Last (4) /= 2_000 then
       Failed ("INVALID ARRAY CONSTANT BOUNDS");
    end if;
 
@@ -98,19 +83,13 @@ begin
       Failed ("INVALID STRING CONSTANT BOUNDS 10");
    end if;
 
-   if A12'First /= 11 or
-     A12'Last /= 12 or
-     A12'First (2) /= 10 or
-     A12'Last (2) /= 10
-   then
+   if A12'First /= 11 or A12'Last /= 12 or A12'First (2) /= 10 or
+     A12'Last (2) /= 10 then
       Failed ("INVALID ARRAY CONSTANT BOUNDS 2");
    end if;
 
-   if B12'First /= 10 or
-     B12'Last /= 11 or
-     B12'First (2) /= 10 or
-     B12'Last (2) /= 12
-   then
+   if B12'First /= 10 or B12'Last /= 11 or B12'First (2) /= 10 or
+     B12'Last (2) /= 12 then
       Failed ("INVALID ARRAY CONSTANT BOUNDS 3");
    end if;
 

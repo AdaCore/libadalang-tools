@@ -40,8 +40,7 @@ begin
      ("C35503P",
       "CHECK THAT 'FIRST' AND 'LAST' YIELD THE " &
       "CORRECT RESULTS WHEN THE PREFIX IS A " &
-      "GENERIC FORMAL DISCRETE TYPE WHOSE ARGUMENT " &
-      "IS AN INTEGER TYPE");
+      "GENERIC FORMAL DISCRETE TYPE WHOSE ARGUMENT " & "IS AN INTEGER TYPE");
 
    declare
 
@@ -97,10 +96,8 @@ begin
 
       procedure P1 is new P (I => Int, F => -6, L => 6);
       procedure P2 is new P (I => Sint, F => -4, L => 4);
-      procedure Q1 is new Q
-        (I => Integer,
-         F => Integer'First,
-         L => Integer'Last);
+      procedure Q1 is new Q (I => Integer, F => Integer'First,
+         L                     => Integer'Last);
       procedure R1 is new R (I => Noint);
 
    begin

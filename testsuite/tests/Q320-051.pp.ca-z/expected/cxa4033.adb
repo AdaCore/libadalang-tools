@@ -38,28 +38,16 @@ begin
       -- subprograms.
       New_Character_String : Wide_String (1 .. 10) :=
         Handling.To_Wide_String
-          (Acl1.Lc_A_Grave &
-           Acl1.Lc_A_Ring &
-           Acl1.Lc_Ae_Diphthong &
-           Acl1.Lc_C_Cedilla &
-           Acl1.Lc_E_Acute &
-           Acl1.Lc_I_Circumflex &
-           Acl1.Lc_Icelandic_Eth &
-           Acl1.Lc_N_Tilde &
-           Acl1.Lc_O_Oblique_Stroke &
+          (Acl1.Lc_A_Grave & Acl1.Lc_A_Ring & Acl1.Lc_Ae_Diphthong &
+           Acl1.Lc_C_Cedilla & Acl1.Lc_E_Acute & Acl1.Lc_I_Circumflex &
+           Acl1.Lc_Icelandic_Eth & Acl1.Lc_N_Tilde & Acl1.Lc_O_Oblique_Stroke &
            Acl1.Lc_Icelandic_Thorn);
 
       Tc_New_Character_String : Wide_String (1 .. 10) :=
         Handling.To_Wide_String
-          (Acl1.Uc_A_Grave &
-           Acl1.Uc_A_Ring &
-           Acl1.Uc_Ae_Diphthong &
-           Acl1.Uc_C_Cedilla &
-           Acl1.Uc_E_Acute &
-           Acl1.Uc_I_Circumflex &
-           Acl1.Uc_Icelandic_Eth &
-           Acl1.Uc_N_Tilde &
-           Acl1.Uc_O_Oblique_Stroke &
+          (Acl1.Uc_A_Grave & Acl1.Uc_A_Ring & Acl1.Uc_Ae_Diphthong &
+           Acl1.Uc_C_Cedilla & Acl1.Uc_E_Acute & Acl1.Uc_I_Circumflex &
+           Acl1.Uc_Icelandic_Eth & Acl1.Uc_N_Tilde & Acl1.Uc_O_Oblique_Stroke &
            Acl1.Uc_Icelandic_Thorn);
 
       New_Ub_Character_String : Unbounded_Wide_String :=
@@ -81,15 +69,12 @@ begin
       -- Function Index.
 
       if Index
-          (To_Unbounded_Wide_String ("AAABBBaaabbb"),
-           "aabb",
+          (To_Unbounded_Wide_String ("AAABBBaaabbb"), "aabb",
            Mapping => Map_To_Lower_Case_Ptr) /=
         2 or
         Index
-            (To_Unbounded_Wide_String ("Case of a Mixed Case String"),
-             "case",
-             Ada.Strings.Backward,
-             Map_To_Lower_Case_Ptr) /=
+            (To_Unbounded_Wide_String ("Case of a Mixed Case String"), "case",
+             Ada.Strings.Backward, Map_To_Lower_Case_Ptr) /=
           17
       then
          Report.Failed
@@ -99,8 +84,7 @@ begin
 
       -- Function Count.
       if Count
-          (Source  => To_Unbounded_Wide_String ("ABABABA"),
-           Pattern => "aba",
+          (Source  => To_Unbounded_Wide_String ("ABABABA"), Pattern => "aba",
            Mapping => Map_To_Lower_Case_Ptr) /=
         2 or
         Count (Null_Unbounded_Wide_String, "mat", Map_To_Upper_Case_Ptr) /= 0
@@ -144,8 +128,7 @@ begin
       if Length (To_Unbounded_Wide_String (Length => 10)) /= 10 or
         Length (To_Unbounded_Wide_String (0)) /= 0 or
         Length
-            (To_Unbounded_Wide_String (10) &
-             To_Unbounded_Wide_String (1) &
+            (To_Unbounded_Wide_String (10) & To_Unbounded_Wide_String (1) &
              To_Unbounded_Wide_String (0)) /=
           10 + 1 + 0
       then
@@ -157,10 +140,8 @@ begin
       -- Procedure Append (Wide_Unbounded - Wide_Unbounded)
       Tc_Unb_String := Null_Unbounded_Wide_String;
       Append
-        (Tc_Unb_String,
-         To_Unbounded_Wide_String ("New Unbounded String"));
-      if Tc_Unb_String /=
-        To_Unbounded_Wide_String ("New Unbounded String")
+        (Tc_Unb_String, To_Unbounded_Wide_String ("New Unbounded String"));
+      if Tc_Unb_String /= To_Unbounded_Wide_String ("New Unbounded String")
       then
          Report.Failed
            ("Incorrect results from Procedure Append with " &
@@ -221,8 +202,7 @@ begin
       -- Function "<="
       Tc_Unb_String := To_Unbounded_Wide_String ("Sample string");
       if Tc_Unb_String <= "Sample strin" or
-        not ("Sample string" <= Tc_Unb_String)
-      then
+        not ("Sample string" <= Tc_Unb_String) then
          Report.Failed
            ("Incorrect results from Function ""<="" with " &
             "wide string - unbounded wide string parameters");
@@ -310,8 +290,7 @@ begin
       Tc_Unb_String :=
         To_Unbounded_Wide_String ("    Spaces   on  both  ends     ");
       Trim (Tc_Unb_String, Ada.Strings.Both);
-      if Tc_Unb_String /=
-        To_Unbounded_Wide_String ("Spaces   on  both  ends")
+      if Tc_Unb_String /= To_Unbounded_Wide_String ("Spaces   on  both  ends")
       then
          Report.Failed ("Incorrect results from Procedure Trim - 2");
       end if;

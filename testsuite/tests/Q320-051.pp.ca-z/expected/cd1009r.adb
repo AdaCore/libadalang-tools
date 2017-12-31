@@ -40,8 +40,7 @@ begin
       "A 'STORAGE_SIZE' CLAUSE MAY BE GIVEN IN THE " &
       "PRIVATE PART OF A PACKAGE FOR AN INCOMPLETE " &
       "TYPE, WHOSE FULL TYPE DECLARATION IS AN " &
-      "ACCESS TYPE, DECLARED IN THE VISIBLE PART OF " &
-      "THE SAME PACKAGE");
+      "ACCESS TYPE, DECLARED IN THE VISIBLE PART OF " & "THE SAME PACKAGE");
    declare
       package Pack is
          Specified_Size : constant := Integer'Size * 10;

@@ -140,54 +140,40 @@ begin
       -- To_COBOL.
 
       Cobol.To_Cobol
-        (Item   => Tc_String_1,
-         Target => Alphanumeric_1,
-         Last   => Tc_Natural);
+        (Item => Tc_String_1, Target => Alphanumeric_1, Last => Tc_Natural);
 
       if Alphanumeric_1 /= Tc_Alphanumeric_1 or
-        Tc_Natural /= Tc_Alphanumeric_1'Length or
-        Tc_Natural /= 1
-      then
+        Tc_Natural /= Tc_Alphanumeric_1'Length or Tc_Natural /= 1 then
          Report.Failed ("Incorrect result from procedure To_COBOL - 1");
       end if;
 
       Cobol.To_Cobol
-        (To_String (Tc_Unb_String),
-         Target => Alphanumeric_5,
-         Last   => Tc_Natural);
+        (To_String (Tc_Unb_String), Target => Alphanumeric_5,
+         Last                              => Tc_Natural);
 
       if Alphanumeric_5 /= Tc_Alphanumeric_5 or
-        Tc_Natural /= Tc_Alphanumeric_5'Length or
-        Tc_Natural /= 5
-      then
+        Tc_Natural /= Tc_Alphanumeric_5'Length or Tc_Natural /= 5 then
          Report.Failed ("Incorrect result from procedure To_COBOL - 2");
       end if;
 
       Cobol.To_Cobol
-        (To_String (Tc_Bnd_String),
-         Alphanumeric_10,
-         Last => Tc_Natural);
+        (To_String (Tc_Bnd_String), Alphanumeric_10, Last => Tc_Natural);
 
       if Alphanumeric_10 /= Tc_Alphanumeric_10 or
-        Tc_Natural /= Tc_Alphanumeric_10'Length or
-        Tc_Natural /= 10
-      then
+        Tc_Natural /= Tc_Alphanumeric_10'Length or Tc_Natural /= 10 then
          Report.Failed ("Incorrect result from procedure To_COBOL - 3");
       end if;
 
       Cobol.To_Cobol (Tc_String_20, Alphanumeric_20, Tc_Natural);
 
       if Alphanumeric_20 /= Tc_Alphanumeric_20 or
-        Tc_Natural /= Tc_Alphanumeric_20'Length or
-        Tc_Natural /= 20
-      then
+        Tc_Natural /= Tc_Alphanumeric_20'Length or Tc_Natural /= 20 then
          Report.Failed ("Incorrect result from procedure To_COBOL - 4");
       end if;
 
       Cobol.To_Cobol
         (Item   => Tc_String,     -- null string
-         Target => Alphanumeric_1,
-         Last   => Tc_Natural);
+         Target => Alphanumeric_1, Last => Tc_Natural);
 
       if Tc_Natural /= 0 then
          Report.Failed
@@ -203,9 +189,8 @@ begin
       begin
 
          Cobol.To_Cobol
-           (Item   => Tc_String_20,
-            Target => Alphanumeric_10,
-            Last   => Tc_Natural);
+           (Item => Tc_String_20, Target => Alphanumeric_10,
+            Last => Tc_Natural);
          Report.Failed
            ("Constraint_Error not raised by procedure To_COBOL " &
             "when Item'Length exceeds Target'Length");
@@ -225,48 +210,37 @@ begin
       -- of the last element of parameter Target that was assigned by To_Ada.
 
       Cobol.To_Ada
-        (Item   => Tc_Alphanumeric_1,
-         Target => String_1,
-         Last   => Tc_Natural);
+        (Item => Tc_Alphanumeric_1, Target => String_1, Last => Tc_Natural);
 
-      if String_1 /= Tc_String_1 or
-        Tc_Natural /= Tc_String_1'Length or
-        Tc_Natural /= 1
-      then
+      if String_1 /= Tc_String_1 or Tc_Natural /= Tc_String_1'Length or
+        Tc_Natural /= 1 then
          Report.Failed ("Incorrect result from procedure To_Ada - 1");
       end if;
 
       Cobol.To_Ada (Tc_Alphanumeric_5, Target => String_5, Last => Tc_Natural);
 
       if String_5 /= To_String (Tc_Unb_String) or
-        Tc_Natural /= Length (Tc_Unb_String) or
-        Tc_Natural /= 5
-      then
+        Tc_Natural /= Length (Tc_Unb_String) or Tc_Natural /= 5 then
          Report.Failed ("Incorrect result from procedure To_Ada - 2");
       end if;
 
       Cobol.To_Ada (Tc_Alphanumeric_10, String_10, Last => Tc_Natural);
 
       if String_10 /= To_String (Tc_Bnd_String) or
-        Tc_Natural /= Length (Tc_Bnd_String) or
-        Tc_Natural /= 10
-      then
+        Tc_Natural /= Length (Tc_Bnd_String) or Tc_Natural /= 10 then
          Report.Failed ("Incorrect result from procedure To_Ada - 3");
       end if;
 
       Cobol.To_Ada (Tc_Alphanumeric_20, String_20, Tc_Natural);
 
-      if String_20 /= Tc_String_20 or
-        Tc_Natural /= Tc_String_20'Length or
-        Tc_Natural /= 20
-      then
+      if String_20 /= Tc_String_20 or Tc_Natural /= Tc_String_20'Length or
+        Tc_Natural /= 20 then
          Report.Failed ("Incorrect result from procedure To_Ada - 4");
       end if;
 
       Cobol.To_Ada
         (Item   => Tc_Alphanumeric,  -- null array.
-         Target => String_20,
-         Last   => Tc_Natural);
+         Target => String_20, Last => Tc_Natural);
 
       if Tc_Natural /= 0 then
          Report.Failed
@@ -282,9 +256,8 @@ begin
       begin
 
          Cobol.To_Ada
-           (Item   => Tc_Alphanumeric_10,
-            Target => String_5,
-            Last   => Tc_Natural);
+           (Item => Tc_Alphanumeric_10, Target => String_5,
+            Last => Tc_Natural);
          Report.Failed
            ("Constraint_Error not raised by procedure To_Ada " &
             "when Item'Length exceeds Target'Length");

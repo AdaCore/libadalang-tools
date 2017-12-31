@@ -37,8 +37,7 @@ begin
    Test
      ("C97201B",
       "CHECK THAT A CONDITIONAL ENTRY CALL IS NOT " &
-      "ACCEPTED IF THERE IS ANOTHER TASK QUEUED " &
-      "FOR THE ENTRY");
+      "ACCEPTED IF THERE IS ANOTHER TASK QUEUED " & "FOR THE ENTRY");
 
    declare
 
@@ -65,8 +64,7 @@ begin
                if E'Count /= 1 then
                   Failed
                     (Natural'Image (E'Count) &
-                     " CALLS WERE QUEUED FOR ENTRY " &
-                     "E OF TASK T");
+                     " CALLS WERE QUEUED FOR ENTRY " & "E OF TASK T");
                end if;
             end Done;
          or

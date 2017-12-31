@@ -39,8 +39,7 @@ begin
      ("C43210A",
       "CHECK THAT A NON-AGGREGATE IN A NAMED " &
       "COMPONENT ASSOCIATION IS EVALUATED ONCE " &
-      "FOR EACH COMPONENT SPECIFIED BY THE " &
-      "ASSOCIATION");
+      "FOR EACH COMPONENT SPECIFIED BY THE " & "ASSOCIATION");
 
    declare
 
@@ -65,14 +64,9 @@ begin
       begin
          if Cc /= B then
             Failed
-              ("CASE " &
-               A &
-               " : INCORRECT NUMBER OF " &
-               "EVALUATIONS. NUMBER OF EVALUATIONS " &
-               "SHOULD BE " &
-               Integer'Image (B) &
-               ", BUT IS " &
-               Integer'Image (Cc));
+              ("CASE " & A & " : INCORRECT NUMBER OF " &
+               "EVALUATIONS. NUMBER OF EVALUATIONS " & "SHOULD BE " &
+               Integer'Image (B) & ", BUT IS " & Integer'Image (Cc));
          end if;
       end Check;
 

@@ -84,9 +84,7 @@ procedure Cxaia03 is
 
    package My_Indefinite_Hashed_Maps is new Ada.Containers
      .Indefinite_Hashed_Maps
-     (Key_Type        => My_Key_Type,
-      Element_Type    => String,
-      Hash            => My_Hash,
+     (Key_Type        => My_Key_Type, Element_Type => String, Hash => My_Hash,
       Equivalent_Keys => My_Equivalent_Keys); -- Default =
 
    My_Map_1 : My_Indefinite_Hashed_Maps.Map;
@@ -97,9 +95,8 @@ procedure Cxaia03 is
 
    My_Inserted : Boolean;
 
-   procedure Tampering_Check
-     (Container : in out My_Indefinite_Hashed_Maps.Map;
-      Where     : in     String)
+   procedure Tampering_Check (Container : in out My_Indefinite_Hashed_Maps.Map;
+      Where                             : in     String)
    is
 
       Program_Error_Raised : Boolean := False;
@@ -180,8 +177,7 @@ begin
    for I in Fxaia00.Array_Bounds_Type loop
 
       My_Map_1.Insert
-        (Key      => My_Key_Type (I),
-         New_Item => Value_In_Ptr_Array (I).all);
+        (Key => My_Key_Type (I), New_Item => Value_In_Ptr_Array (I).all);
 
       if My_Map_1.Length /= I then
 
@@ -216,16 +212,14 @@ begin
       begin
 
          if My_Map_1.Element (Key => My_Key_Type (I)) /=
-           Value_In_Ptr_Array (I).all
-         then
+           Value_In_Ptr_Array (I).all then
 
             Report.Failed ("Mismatch between element and what was inserted");
 
          end if;
 
          My_Indefinite_Hashed_Maps.Query_Element
-           (Position => My_Cursor_1,
-            Process  => My_Query'Access);
+           (Position => My_Cursor_1, Process => My_Query'Access);
 
       end;
 
@@ -251,8 +245,7 @@ begin
       -- Insert the "Keyth" string of the test data
 
       My_Map_2.Insert
-        (Key      => My_Key_Type (I),
-         New_Item => Value_In_Ptr_Array (I).all);
+        (Key => My_Key_Type (I), New_Item => Value_In_Ptr_Array (I).all);
 
       if My_Map_2.Length /= Fxaia00.Num_Tests - I + 1 then
 
@@ -346,12 +339,10 @@ begin
          New_String (2) := Character'Succ (New_String (2));
 
          My_Map_1.Replace_Element
-           (Position => My_Cursor_1,
-            New_Item => New_String);
+           (Position => My_Cursor_1, New_Item => New_String);
 
          My_Map_2.Update_Element
-           (Position => My_Cursor_2,
-            Process  => My_Update'Access);
+           (Position => My_Cursor_2, Process => My_Update'Access);
 
       end;
 
@@ -379,8 +370,7 @@ begin
    for I in Fxaia00.Array_Bounds_Type loop
 
       My_Map_1.Insert
-        (Key      => My_Key_Type (I),
-         New_Item => Value_In_Ptr_Array (I).all);
+        (Key => My_Key_Type (I), New_Item => Value_In_Ptr_Array (I).all);
 
    end loop;
 
@@ -399,8 +389,7 @@ begin
    for I in Fxaia00.Array_Bounds_Type loop
 
       My_Map_2.Insert
-        (Key      => My_Key_Type (I),
-         New_Item => Value_In_Ptr_Array (I).all);
+        (Key => My_Key_Type (I), New_Item => Value_In_Ptr_Array (I).all);
 
    end loop;
 
@@ -417,8 +406,7 @@ begin
    for I in Fxaia00.Array_Bounds_Type loop
 
       if My_Map_1.Element (Key => My_Key_Type (I)) /=
-        Value_In_Ptr_Array (I).all
-      then
+        Value_In_Ptr_Array (I).all then
 
          Report.Failed ("Target Map not as expected after move");
 
@@ -665,8 +653,7 @@ begin
    end if;
 
    -- Check = Default_Value
-   if My_Indefinite_Hashed_Maps.Element (My_Map_2.First) /=
-     My_Default_Value
+   if My_Indefinite_Hashed_Maps.Element (My_Map_2.First) /= My_Default_Value
    then
 
       Report.Failed ("Remaining value not as expected");
@@ -681,8 +668,7 @@ begin
    My_Cursor_1 := My_Map_1.Find (Key => 10);
 
    if My_Indefinite_Hashed_Maps.Element (Position => My_Cursor_1) /=
-     Value_In_Ptr_Array (10).all
-   then
+     Value_In_Ptr_Array (10).all then
 
       Report.Failed ("Found value not as expected");
 

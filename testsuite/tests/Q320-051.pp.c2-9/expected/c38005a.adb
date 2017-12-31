@@ -63,11 +63,9 @@ procedure C38005a is
    N_Acc_Rec2 : Acc_Rec2;
    N_Arr      : array (1 .. 2) of Vector (1 .. 2);
    Q          : Rec2 :=
-     (C1 => new Rec,
-      C2 => new Vector'(new Rec, new Rec'(N_Rec)),
+     (C1 => new Rec, C2 => new Vector'(new Rec, new Rec'(N_Rec)),
       C3 => (1 | 2 => (Vect => (3 | 4 => new Rec, 5 => N_Acc_Rec))),
-      C4 => N_Rec2.C4,
-      C5 => new Rec2'(N_Rec2));
+      C4 => N_Rec2.C4, C5 => new Rec2'(N_Rec2));
 
 begin
    Test ("C38005A", "DEFAULT VALUE FOR ACCESS OBJECTS IS NULL");
@@ -121,8 +119,7 @@ begin
    end if;
 
    if Q.C3 (2).Vect /=
-     (3 => Q.C3 (2).Vect (3), 4 => Q.C3 (2).Vect (4), 5 => null)
-   then
+     (3 => Q.C3 (2).Vect (3), 4 => Q.C3 (2).Vect (4), 5 => null) then
       Failed ("INCORRECT ACCESS TYPE INITIALIZATION - 13");
    end if;
 

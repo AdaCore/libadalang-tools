@@ -60,32 +60,22 @@ procedure C990001 is
    type Enum is (A, B, C, D);
 
    Tc_Error_Names : constant array (Enum) of String (1 .. 17) :=
-     (A => "Before Activation",
-      B => "During Activation",
-      C => "During Execution ",
-      D => "After Execution  ");
+     (A => "Before Activation", B => "During Activation",
+      C => "During Execution ", D => "After Execution  ");
 
-   function Check
-     (S                  : String;
-      Call, B1, Term, B2 : Boolean;
-      E                  : Enum) return Boolean
+   function Check (S : String; Call, B1, Term, B2 : Boolean;
+      E              : Enum) return Boolean
    is
    begin
       if Call /= B1 then
          Report.Failed
-           ("Incorrect value for " &
-            S &
-            "'Callable " &
-            Tc_Error_Names (E) &
+           ("Incorrect value for " & S & "'Callable " & Tc_Error_Names (E) &
             " of task");
       end if;
 
       if Term /= B2 then
          Report.Failed
-           ("Incorrect value for " &
-            S &
-            "'Terminated " &
-            Tc_Error_Names (E) &
+           ("Incorrect value for " & S & "'Terminated " & Tc_Error_Names (E) &
             " of task");
       end if;
 
@@ -196,8 +186,7 @@ begin
          accept Go_On;
          I := Report.Ident_Int (5);      -- Constraint_Error raised.
          Report.Failed
-           ("Constraint_Error not raised in task " &
-            "Tsk " &
+           ("Constraint_Error not raised in task " & "Tsk " &
             Integer'Image (I));
       exception
          when Constraint_Error =>
@@ -266,12 +255,7 @@ begin
            Check ("FA", Fa'Callable, True, Fa'Terminated, False, A);
          A2 : Boolean :=
            Check
-             ("FN.all",
-              Fn.all'Callable,
-              True,
-              Fn.all'Terminated,
-              False,
-              A);
+             ("FN.all", Fn.all'Callable, True, Fn.all'Terminated, False, A);
          A3 : Boolean :=
            Check ("Obj1", Obj1'Callable, True, Obj1'Terminated, False, A);
          A4 : Boolean :=
@@ -285,12 +269,7 @@ begin
       task body Tt is
          B1 : Boolean :=
            Check
-             ("FA.all",
-              Fa.all'Callable,
-              True,
-              Fa.all'Terminated,
-              False,
-              B);
+             ("FA.all", Fa.all'Callable, True, Fa.all'Terminated, False, B);
          B2 : Boolean :=
            Check ("FN", Fn'Callable, True, Fn'Terminated, False, B);
          B3 : Boolean :=
@@ -306,19 +285,11 @@ begin
          Consume (Check ("FN", Fn'Callable, True, Fn'Terminated, False, C));
          Consume
            (Check
-              ("Obj1.all",
-               Obj1.all'Callable,
-               True,
-               Obj1.all'Terminated,
-               False,
+              ("Obj1.all", Obj1.all'Callable, True, Obj1.all'Terminated, False,
                C));
          Consume
            (Check
-              ("Obj2.all",
-               Obj2.all'Callable,
-               True,
-               Obj2.all'Terminated,
-               False,
+              ("Obj2.all", Obj2.all'Callable, True, Obj2.all'Terminated, False,
                C));
          Main_Task.E (1);
          Main_Task.E (2);

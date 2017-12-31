@@ -72,8 +72,7 @@ begin
    Report.Test
      ("CXAF001",
       "Check that an implementation supports the " &
-      "functionality defined in Package " &
-      "Ada.Command_Line");
+      "functionality defined in Package " & "Ada.Command_Line");
 
    Test_Block :
    declare
@@ -128,8 +127,7 @@ begin
          begin
             Report.Failed
               ("Constraint_Error not raised by Function " &
-               "Argument when provided a Number argument " &
-               "out of range");
+               "Argument when provided a Number argument " & "out of range");
          end;
       exception
          when Constraint_Error =>
@@ -193,8 +191,7 @@ begin
    exception
       when The_Error : others =>
          Report.Failed
-           ("The following exception was raised in the " &
-            "Test_Block: " &
+           ("The following exception was raised in the " & "Test_Block: " &
             Exception_Name (The_Error));
    end Test_Block;
 

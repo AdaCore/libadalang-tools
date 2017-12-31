@@ -71,31 +71,23 @@ begin
 
       R1 : Check_Type_1;
    begin
-      if R1.I1'First_Bit /= 0 or
-        R1.I1'Last_Bit /= Integer'Size - 1 or
-        R1.I1'Position /= 0
-      then
+      if R1.I1'First_Bit /= 0 or R1.I1'Last_Bit /= Integer'Size - 1 or
+        R1.I1'Position /= 0 then
          Failed ("INCORRECT REPRESENTATION FOR R1.I1");
       end if;
 
-      if R1.B1'First_Bit /= 0 or
-        R1.B1'Last_Bit /= Boolean'Size - 1 or
-        R1.B1'Position /= 1 * Units_Per_Integer
-      then
+      if R1.B1'First_Bit /= 0 or R1.B1'Last_Bit /= Boolean'Size - 1 or
+        R1.B1'Position /= 1 * Units_Per_Integer then
          Failed ("INCORRECT REPRESENTATION FOR R1.B1");
       end if;
 
-      if R1.B2'First_Bit /= 0 or
-        R1.B2'Last_Bit /= Boolean'Size - 1 or
-        R1.B2'Position /= 2 * Units_Per_Integer
-      then
+      if R1.B2'First_Bit /= 0 or R1.B2'Last_Bit /= Boolean'Size - 1 or
+        R1.B2'Position /= 2 * Units_Per_Integer then
          Failed ("INCORRECT REPRESENTATION FOR R1.B2");
       end if;
 
-      if R1.I2'First_Bit /= 0 or
-        R1.I2'Last_Bit /= Integer'Size - 1 or
-        R1.I2'Position /= 3 * Units_Per_Integer
-      then
+      if R1.I2'First_Bit /= 0 or R1.I2'Last_Bit /= Integer'Size - 1 or
+        R1.I2'Position /= 3 * Units_Per_Integer then
          Failed ("INCORRECT REPRESENTATION FOR R1.I2");
       end if;
    end;

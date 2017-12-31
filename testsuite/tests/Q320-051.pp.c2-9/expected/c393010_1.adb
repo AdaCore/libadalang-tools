@@ -26,34 +26,23 @@ package body C393010_1 is
 
    Num : Natural := 1_000;
 
-   function Issue
-     (Service : Service_Classes;
-      Flight  : Natural;
-      Seat    : String;
-      Meal    : Menu := Fowl) return Passenger_Ticket
+   function Issue (Service : Service_Classes; Flight : Natural; Seat : String;
+      Meal                 : Menu := Fowl) return Passenger_Ticket
    is
    begin
       Num := Num + 1;
       case Service is
          when First =>
             return Passenger_Ticket'
-                (Service       => First,
-                 Flight        => Flight,
-                 Row_Seat      => Seat,
-                 Meal          => Meal,
-                 Serial_Number => Num);
+                (Service => First, Flight => Flight, Row_Seat => Seat,
+                 Meal    => Meal, Serial_Number => Num);
          when Business =>
             return Passenger_Ticket'
-                (Service       => Business,
-                 Flight        => Flight,
-                 Row_Seat      => Seat,
-                 Meal          => Meal,
-                 Serial_Number => Num);
+                (Service => Business, Flight => Flight, Row_Seat => Seat,
+                 Meal    => Meal, Serial_Number => Num);
          when Coach =>
             return Passenger_Ticket'
-                (Service       => Coach,
-                 Flight        => Flight,
-                 Row_Seat      => Seat,
+                (Service       => Coach, Flight => Flight, Row_Seat => Seat,
                  Serial_Number => Num);
       end case;
    end Issue;

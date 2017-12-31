@@ -98,11 +98,7 @@ begin
       exception
          when others =>
             Failed
-              ("EXCEPTION RAISED - " &
-               Str1 &
-               "'VALUE " &
-               "FOR """ &
-               Str2 &
+              ("EXCEPTION RAISED - " & Str1 & "'VALUE " & "FOR """ & Str2 &
                """");
       end P;
 

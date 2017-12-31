@@ -25,8 +25,7 @@ package body Cd5003g_Pack2 is
          "BE GIVEN FOR A GENERIC PROCEDURE BODY " &
          "CONTAINING AN ADDRESS CLAUSE AS LONG AS " &
          "A 'WITH' CLAUSE IS GIVEN FOR THE UNIT " &
-         "CONTAINING THE GENERIC PROCEDURE " &
-         "SPECIFICATION");
+         "CONTAINING THE GENERIC PROCEDURE " & "SPECIFICATION");
 
       Test_Var := Ident_Fixd (3.3);
 

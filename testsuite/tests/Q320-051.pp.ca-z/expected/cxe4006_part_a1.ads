@@ -13,24 +13,18 @@ package Cxe4006_Part_A1 is
       A1_1_Component : Character := ' ';
    end record;
 
-   procedure Single_Controlling_Operand
-     (Rtt         : in out A1_Tagged_Type_1;
-      Test_Number : in     Integer;
-      Callee      :    out Type_Decl_Location);
+   procedure Single_Controlling_Operand (Rtt : in out A1_Tagged_Type_1;
+      Test_Number : in     Integer; Callee : out Type_Decl_Location);
 
    type A1_Tagged_Type_2 is new A1_Tagged_Type_1 with record
       A1_2_Component : Float;
    end record;
 
-   procedure Single_Controlling_Operand
-     (Rtt         : in out A1_Tagged_Type_2;
-      Test_Number : in     Integer;
-      Callee      :    out Type_Decl_Location);
+   procedure Single_Controlling_Operand (Rtt : in out A1_Tagged_Type_2;
+      Test_Number : in     Integer; Callee : out Type_Decl_Location);
 
    ----------
 
-   procedure Make_Dispatching_Call_With
-     (X           : in out Root_Tagged_Type'Class;
-      Test_Number : in     Integer;
-      Callee      :    out Type_Decl_Location);
+   procedure Make_Dispatching_Call_With (X : in out Root_Tagged_Type'Class;
+      Test_Number : in     Integer; Callee : out Type_Decl_Location);
 end Cxe4006_Part_A1;

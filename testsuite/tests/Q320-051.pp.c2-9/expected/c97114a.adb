@@ -163,10 +163,8 @@ begin
 
 -- CHECK THAT GUARDS ARE ALWAYS EVALUATED BEFORE DELAY EXPRESSIONS
 
-   if Pos_Of ('F') > Pos_Of ('A') or
-     Pos_Of ('G') > Pos_Of ('B') or
-     Pos_Of ('H') > Pos_Of ('C')
-   then
+   if Pos_Of ('F') > Pos_Of ('A') or Pos_Of ('G') > Pos_Of ('B') or
+     Pos_Of ('H') > Pos_Of ('C') then
       Failed ("A DELAY EXPRESSION WAS EVALUATED BEFORE ITS " & "GUARD");
    end if;
 

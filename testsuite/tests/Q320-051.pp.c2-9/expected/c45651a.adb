@@ -56,8 +56,7 @@ begin
    Test
      ("C45651A",
       "CHECK THAT, FOR FIXED POINT TYPES, THE ABS " &
-      "OPERATOR PRODUCES CORRECT RESULTS - BASIC " &
-      "TYPES");
+      "OPERATOR PRODUCES CORRECT RESULTS - BASIC " & "TYPES");
 
    -------------------------------------------------------------------
 
@@ -138,8 +137,7 @@ begin
       then
          Failed
            ("ABS (LIKE_DURATION_M23'LAST - " &
-            "LIKE_DURATION_M23'SMALL / 2) NOT IN CORRECT " &
-            "RANGE");
+            "LIKE_DURATION_M23'SMALL / 2) NOT IN CORRECT " & "RANGE");
       end if;
 
       -- (D)
@@ -161,8 +159,7 @@ begin
       then
          Failed
            ("ABS (LIKE_DURATION_M23'FIRST +" &
-            "LIKE_DURATION_M23'SMALL / 2) NOT IN CORRECT " &
-            "RANGE");
+            "LIKE_DURATION_M23'SMALL / 2) NOT IN CORRECT " & "RANGE");
       end if;
    end A;
 
@@ -216,8 +213,7 @@ begin
 
       -- (C)
       if abs Non_Model_Var not in 0.0 .. 64.0 or
-        abs Decimal_M4'(Non_Model_Const) not in 0.0 .. 64.0
-      then
+        abs Decimal_M4'(Non_Model_Const) not in 0.0 .. 64.0 then
          Failed ("ABS (2.0 / 3) NOT IN CORRECT RANGE - B");
       end if;
       if Equal (3, 3) then
@@ -232,8 +228,7 @@ begin
          X := -Non_Model_Const;
       end if;
       if abs X not in 0.0 .. 64.0 or
-        abs (-Decimal_M4'(Non_Model_Const)) not in 0.0 .. 64.0
-      then
+        abs (-Decimal_M4'(Non_Model_Const)) not in 0.0 .. 64.0 then
          Failed ("ABS -(2.0 / 3) NOT IN CORRECT RANGE - B");
       end if;
       if Equal (3, 3) then

@@ -12,14 +12,10 @@ package Cxe4006_Part_A2 is
       A2_Component : String_20;
    end record;
 
-   procedure Single_Controlling_Operand
-     (Rtt         : in out A2_Tagged_Type;
-      Test_Number : in     Integer;
-      Callee      :    out Type_Decl_Location);
+   procedure Single_Controlling_Operand (Rtt : in out A2_Tagged_Type;
+      Test_Number : in     Integer; Callee : out Type_Decl_Location);
 
    -- pass thru procedure
-   procedure Call_B
-     (X           : in out Root_Tagged_Type'Class;
-      Test_Number : in     Integer;
-      Callee      :    out Type_Decl_Location);
+   procedure Call_B (X : in out Root_Tagged_Type'Class;
+      Test_Number      : in     Integer; Callee : out Type_Decl_Location);
 end Cxe4006_Part_A2;

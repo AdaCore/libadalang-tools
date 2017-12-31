@@ -69,16 +69,13 @@ begin
          for Ch in Chtype loop
             if Subch'Pos (Ch) /= Position then
                Failed
-                 ("INCORRECT VALUE FOR " &
-                  Str &
-                  "'POS OF " &
+                 ("INCORRECT VALUE FOR " & Str & "'POS OF " &
                   Chtype'Image (Ch));
             end if;
 
             if Subch'Val (Position) /= Ch then
                Failed
-                 ("INCORRECT VALUE FOR " &
-                  Str &
+                 ("INCORRECT VALUE FOR " & Str &
                   "'VAL OF CHARACTER IN POSITION - " &
                   Integer'Image (Position));
             end if;

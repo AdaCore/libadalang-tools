@@ -42,8 +42,7 @@ begin
      ("CC3603A",
       "CHECK THAT ENUMERATION LITERALS (BOTH " &
       "IDENTIFIERS AND CHARACTER LITERALS) MAY " &
-      "BE PASSED AS ACTUALS CORRESPONDING TO " &
-      "GENERIC FORMAL SUBPROGRAMS");
+      "BE PASSED AS ACTUALS CORRESPONDING TO " & "GENERIC FORMAL SUBPROGRAMS");
 
    declare
 
@@ -65,8 +64,7 @@ begin
       exception
          when others =>
             Failed
-              ("EXCEPTION RAISED INSIDE OF P WITH " &
-               E'Image (E1) &
+              ("EXCEPTION RAISED INSIDE OF P WITH " & E'Image (E1) &
                " AS ACTUAL PARAMETER");
       end P;
 

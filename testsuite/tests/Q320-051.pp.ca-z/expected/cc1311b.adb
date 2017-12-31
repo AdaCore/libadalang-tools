@@ -121,13 +121,11 @@ begin
       begin
          if F (X1) = X1 then
             Failed
-              ("NO EXCEPTION RAISED WITH " &
-               "FUNCTION 'F' AND PACKAGE " &
+              ("NO EXCEPTION RAISED WITH " & "FUNCTION 'F' AND PACKAGE " &
                "'PKG' - 1");
          else
             Failed
-              ("NO EXCEPTION RAISED WITH " &
-               "FUNCTION 'F' AND PACKAGE " &
+              ("NO EXCEPTION RAISED WITH " & "FUNCTION 'F' AND PACKAGE " &
                "'PKG' - 2");
          end if;
       exception
@@ -169,25 +167,21 @@ begin
       begin
          if F = V1 then
             Comment
-              ("NO EXCEPTION RAISED WITH " &
-               "FUNCTION 'F' AND PROCEDURE " &
+              ("NO EXCEPTION RAISED WITH " & "FUNCTION 'F' AND PROCEDURE " &
                "'PROC' - 1");
          else
             Comment
-              ("NO EXCEPTION RAISED WITH " &
-               "FUNCTION 'F' AND PROCEDURE " &
+              ("NO EXCEPTION RAISED WITH " & "FUNCTION 'F' AND PROCEDURE " &
                "'PROC' - 2");
          end if;
       exception
          when Constraint_Error =>
             Failed
               ("CONSTRAINT_ERROR RAISED WITH " &
-               "FUNCTION 'F' AND PROCEDURE " &
-               "'PROC'");
+               "FUNCTION 'F' AND PROCEDURE " & "'PROC'");
          when others =>
             Failed
-              ("WRONG EXCEPTION RAISED WITH " &
-               "FUNCTION 'F' AND PROCEDURE " &
+              ("WRONG EXCEPTION RAISED WITH " & "FUNCTION 'F' AND PROCEDURE " &
                "'PROC'");
       end Proc;
 
@@ -254,9 +248,8 @@ begin
       end Psub;
 
       generic
-         with procedure P
-           (Results : out Float1;
-            X       :     Float1 := -0.062_5) is Psub;
+         with procedure P (Results : out Float1;
+            X                      :     Float1 := -0.062_5) is Psub;
       package Pkg is
       end Pkg;
 
@@ -266,13 +259,11 @@ begin
          P (Results);
          if Results = 1.0 then
             Failed
-              ("NO EXCEPTION RAISED WITH " &
-               "PROCEDURE 'P' AND PACKAGE " &
+              ("NO EXCEPTION RAISED WITH " & "PROCEDURE 'P' AND PACKAGE " &
                "'PKG' - 1");
          else
             Failed
-              ("NO EXCEPTION RAISED WITH " &
-               "PROCEDURE 'P' AND PACKAGE " &
+              ("NO EXCEPTION RAISED WITH " & "PROCEDURE 'P' AND PACKAGE " &
                "'PKG' - 2");
          end if;
       exception
@@ -315,13 +306,11 @@ begin
          P (Results, F1);
          if Results = 0.0 then
             Failed
-              ("NO EXCEPTION RAISED WITH " &
-               "PROCEDURE 'P' AND PROCEDURE " &
+              ("NO EXCEPTION RAISED WITH " & "PROCEDURE 'P' AND PROCEDURE " &
                "'PROC' - 1");
          else
             Failed
-              ("NO EXCEPTION RAISED WITH " &
-               "PROCEDURE 'P' AND PROCEDURE " &
+              ("NO EXCEPTION RAISED WITH " & "PROCEDURE 'P' AND PROCEDURE " &
                "'PROC' - 2");
          end if;
       exception
@@ -330,8 +319,7 @@ begin
          when others =>
             Failed
               ("WRONG EXCEPTION RAISED WITH " &
-               "PROCEDURE 'P' AND PROCEDURE " &
-               "'PROC'");
+               "PROCEDURE 'P' AND PROCEDURE " & "'PROC'");
       end Proc;
 
       procedure Nproc is new Proc (Fixed2, 0.125);

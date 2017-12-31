@@ -28,8 +28,7 @@ begin
      ("C392014",
       "Check that objects designated by X'Access " &
       "(where X is of a class-wide type) and New T'Class'(...) " &
-      "are dynamically tagged and can be used in dispatching " &
-      "calls");
+      "are dynamically tagged and can be used in dispatching " & "calls");
 
    C392014_0.P (X0'Access);
    Tc_Check ("X0'Access", Ident_Int (29));

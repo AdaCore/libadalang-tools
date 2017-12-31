@@ -144,14 +144,9 @@ procedure Cxg2004 is
          elsif abs (Actual - Expected) > Max_Error then
             Accuracy_Error_Reported := True;
             Report.Failed
-              (Test_Name &
-               " actual: " &
-               Real'Image (Actual) &
-               " expected: " &
-               Real'Image (Expected) &
-               " difference: " &
-               Real'Image (Actual - Expected) &
-               " mre:" &
+              (Test_Name & " actual: " & Real'Image (Actual) & " expected: " &
+               Real'Image (Expected) & " difference: " &
+               Real'Image (Actual - Expected) & " mre:" &
                Real'Image (Max_Error));
          elsif Verbose then
             if Actual = Expected then
@@ -188,8 +183,7 @@ procedure Cxg2004 is
             -- page 44.
             X := (B - A) * Ran + A;
             Y :=
-              Real'Leading_Part
-                (X / 3.0,
+              Real'Leading_Part (X / 3.0,
                  Real'Machine_Mantissa - Real'Exponent (3.0));
             X := Y * 3.0;
 
@@ -203,10 +197,8 @@ procedure Cxg2004 is
             Mre := 4.0;
 
             Check
-              (Actual,
-               Expected,
-               "sin test of range" & Arg_Range & Integer'Image (I),
-               Mre);
+              (Actual, Expected,
+               "sin test of range" & Arg_Range & Integer'Image (I), Mre);
             exit when Accuracy_Error_Reported;
          end loop;
       exception
@@ -242,8 +234,7 @@ procedure Cxg2004 is
             -- page 44.
             X := (B - A) * Ran + A;
             Y :=
-              Real'Leading_Part
-                (X / 3.0,
+              Real'Leading_Part (X / 3.0,
                  Real'Machine_Mantissa - Real'Exponent (3.0));
             X := Y * 3.0;
 
@@ -257,10 +248,8 @@ procedure Cxg2004 is
             Mre := 6.0;
 
             Check
-              (Actual,
-               Expected,
-               "cos test of range" & Arg_Range & Integer'Image (I),
-               Mre);
+              (Actual, Expected,
+               "cos test of range" & Arg_Range & Integer'Image (I), Mre);
             exit when Accuracy_Error_Reported;
          end loop;
       exception
@@ -312,29 +301,13 @@ procedure Cxg2004 is
             (330.0, 11.0 * Pi / 6.0, -0.5, Sqrt3 / 2.0, False, True),    -- 12
             (360.0, 2.0 * Pi, 0.0, 1.0, False, False),    -- 13
             (45.0, Pi / 4.0, Sqrt2 / 2.0, Sqrt2 / 2.0, True, True),    -- 14
-            (135.0,
-             3.0 * Pi / 4.0,
-             Sqrt2 / 2.0,
-             -Sqrt2 / 2.0,
-             True,
+            (135.0, 3.0 * Pi / 4.0, Sqrt2 / 2.0, -Sqrt2 / 2.0, True,
              True),    -- 15
-            (225.0,
-             5.0 * Pi / 4.0,
-             -Sqrt2 / 2.0,
-             -Sqrt2 / 2.0,
-             True,
+            (225.0, 5.0 * Pi / 4.0, -Sqrt2 / 2.0, -Sqrt2 / 2.0, True,
              True),    -- 16
-            (315.0,
-             7.0 * Pi / 4.0,
-             -Sqrt2 / 2.0,
-             Sqrt2 / 2.0,
-             True,
+            (315.0, 7.0 * Pi / 4.0, -Sqrt2 / 2.0, Sqrt2 / 2.0, True,
              True),    -- 17
-            (405.0,
-             9.0 * Pi / 4.0,
-             Sqrt2 / 2.0,
-             Sqrt2 / 2.0,
-             True,
+            (405.0, 9.0 * Pi / 4.0, Sqrt2 / 2.0, Sqrt2 / 2.0, True,
              True));  -- 18
 
          Y                                                        : Real;
@@ -361,26 +334,20 @@ procedure Cxg2004 is
 
             Y := Sin (Test_Data (I).Radians);
             Check
-              (Y,
-               Test_Data (I).Sine,
-               "test" & Integer'Image (I) & " sin(r)",
+              (Y, Test_Data (I).Sine, "test" & Integer'Image (I) & " sin(r)",
                2.0 + Sin_Arg_Err + Sin_Result_Err);
             Y := Cos (Test_Data (I).Radians);
             Check
-              (Y,
-               Test_Data (I).Cosine,
-               "test" & Integer'Image (I) & " cos(r)",
+              (Y, Test_Data (I).Cosine, "test" & Integer'Image (I) & " cos(r)",
                2.0 + Cos_Arg_Err + Cos_Result_Err);
             Y := Sin (Test_Data (I).Degrees, 360.0);
             Check
-              (Y,
-               Test_Data (I).Sine,
+              (Y, Test_Data (I).Sine,
                "test" & Integer'Image (I) & " sin(d,360)",
                2.0 + Sin_Result_Err);
             Y := Cos (Test_Data (I).Degrees, 360.0);
             Check
-              (Y,
-               Test_Data (I).Cosine,
+              (Y, Test_Data (I).Cosine,
                "test" & Integer'Image (I) & " cos(d,360)",
                2.0 + Cos_Result_Err);
 --pwb-math            Y := Sin (Test_Data (I).Radians, 2.0*Pi);
@@ -427,10 +394,8 @@ procedure Cxg2004 is
             if Y /= Test_Data (I).Sine then
                Report.Failed
                  ("exact result for sin(" &
-                  Real'Image (Test_Data (I).Degrees) &
-                  ", 360.0) is not" &
-                  Real'Image (Test_Data (I).Sine) &
-                  "  Difference is " &
+                  Real'Image (Test_Data (I).Degrees) & ", 360.0) is not" &
+                  Real'Image (Test_Data (I).Sine) & "  Difference is " &
                   Real'Image (Y - Test_Data (I).Sine));
             end if;
 
@@ -438,10 +403,8 @@ procedure Cxg2004 is
             if Y /= Test_Data (I).Cosine then
                Report.Failed
                  ("exact result for cos(" &
-                  Real'Image (Test_Data (I).Degrees) &
-                  ", 360.0) is not" &
-                  Real'Image (Test_Data (I).Cosine) &
-                  "  Difference is " &
+                  Real'Image (Test_Data (I).Degrees) & ", 360.0) is not" &
+                  Real'Image (Test_Data (I).Cosine) & "  Difference is " &
                   Real'Image (Y - Test_Data (I).Cosine));
             end if;
          end loop;
@@ -485,8 +448,7 @@ begin
 
    if Verbose then
       Report.Comment
-        ("checking a digits" &
-         Integer'Image (System.Max_Digits) &
+        ("checking a digits" & Integer'Image (System.Max_Digits) &
          " floating point type");
    end if;
 

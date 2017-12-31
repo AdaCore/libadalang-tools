@@ -257,8 +257,7 @@ begin
          when others =>
             Failed
               ("WRONG EXCEPTION RAISED FOR DISC " &
-               "VALUES DIFFERENT FROM THOSE OF TYPE " &
-               "ACC6");
+               "VALUES DIFFERENT FROM THOSE OF TYPE " & "ACC6");
       end Pkg2;
 
    begin

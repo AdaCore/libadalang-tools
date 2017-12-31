@@ -14,9 +14,8 @@ package body C391002_1 is
       end if;
    end Create;
 
-   function Tc_Match
-     (Left_Plaque   : Object;
-      Right_Natural : Natural) return Boolean
+   function Tc_Match (Left_Plaque : Object;
+      Right_Natural               : Natural) return Boolean
    is
    begin
       return (Left_Plaque.Serial_Number = Right_Natural);

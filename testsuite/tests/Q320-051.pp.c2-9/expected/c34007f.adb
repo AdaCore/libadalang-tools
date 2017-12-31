@@ -48,10 +48,8 @@ procedure C34007f is
 
       type Parent is access Designated;
 
-      function Create
-        (F, L  : Natural;
-         C     : Component;
-         Dummy : Parent   -- TO RESOLVE OVERLOADING.
+      function Create (F, L : Natural; C : Component;
+         Dummy              : Parent   -- TO RESOLVE OVERLOADING.
          ) return Parent;
 
    end Pkg;
@@ -69,10 +67,8 @@ procedure C34007f is
 
    package body Pkg is
 
-      function Create
-        (F, L  : Natural;
-         C     : Component;
-         Dummy : Parent) return Parent
+      function Create (F, L : Natural; C : Component;
+         Dummy              : Parent) return Parent
       is
          A : Parent    := new Designated (F .. L);
          B : Component := C;
@@ -100,8 +96,7 @@ begin
 
    -- CHECK THAT BASE TYPE VALUES NOT IN THE SUBTYPE ARE PRESENT.
 
-   if Create (2, 3, 4, X).all /= (4, 5) or
-     Create (2, 3, 4, Y).all /= (4, 5)
+   if Create (2, 3, 4, X).all /= (4, 5) or Create (2, 3, 4, Y).all /= (4, 5)
    then
       Failed ("CAN'T CREATE BASE TYPE VALUES OUTSIDE THE SUBTYPE");
    end if;

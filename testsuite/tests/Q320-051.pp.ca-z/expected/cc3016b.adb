@@ -64,18 +64,9 @@ procedure Cc3016b is
 
    type Due_Dates is array (Month_Type range Jan .. Dec) of Date;
    Report_Dates : Due_Dates :=
-     ((Jan, 23, 1_990),
-      (Feb, 23, 1_990),
-      (Mar, 23, 1_990),
-      (Apr, 23, 1_990),
-      (May, 23, 1_990),
-      (Jun, 22, 1_990),
-      (Jul, 23, 1_990),
-      (Aug, 23, 1_990),
-      (Sep, 24, 1_990),
-      (Oct, 23, 1_990),
-      (Nov, 23, 1_990),
-      (Dec, 20, 1_990));
+     ((Jan, 23, 1_990), (Feb, 23, 1_990), (Mar, 23, 1_990), (Apr, 23, 1_990),
+      (May, 23, 1_990), (Jun, 22, 1_990), (Jul, 23, 1_990), (Aug, 23, 1_990),
+      (Sep, 24, 1_990), (Oct, 23, 1_990), (Nov, 23, 1_990), (Dec, 20, 1_990));
 
    type List_Index is range 1 .. 16;
    type List is array (List_Index) of Natural;
@@ -182,85 +173,43 @@ procedure Cc3016b is
 
    end Order_Package;
 
-   function Bool is new Name
-     (Return_Type  => Boolean,
-      Return_Value => True_Value,
-      Position     => 1,
-      Offset       => 8,
-      When_Elab    => When_Elaborated,
-      Index        => List_Index,
-      List         => List,
-      Order_List   => Order_List);
+   function Bool is new Name (Return_Type => Boolean,
+      Return_Value => True_Value, Position => 1, Offset => 8,
+      When_Elab => When_Elaborated, Index => List_Index, List => List,
+      Order_List                          => Order_List);
 
-   function Int is new Name
-     (Return_Type  => Year_Type,
-      Return_Value => This_Year,
-      Position     => 2,
-      Offset       => 8,
-      When_Elab    => When_Elaborated,
-      Index        => List_Index,
-      List         => List,
-      Order_List   => Order_List);
+   function Int is new Name (Return_Type => Year_Type,
+      Return_Value => This_Year, Position => 2, Offset => 8,
+      When_Elab => When_Elaborated, Index => List_Index, List => List,
+      Order_List                         => Order_List);
 
-   function Float is new Name
-     (Return_Type  => Real,
-      Return_Value => Real_Value,
-      Position     => 3,
-      Offset       => 8,
-      When_Elab    => When_Elaborated,
-      Index        => List_Index,
-      List         => List,
-      Order_List   => Order_List);
+   function Float is new Name (Return_Type => Real, Return_Value => Real_Value,
+      Position => 3, Offset => 8, When_Elab => When_Elaborated,
+      Index => List_Index, List => List, Order_List => Order_List);
 
-   function Char is new Name
-     (Return_Type  => Character,
-      Return_Value => Character_Value,
-      Position     => 4,
-      Offset       => 8,
-      When_Elab    => When_Elaborated,
-      Index        => List_Index,
-      List         => List,
-      Order_List   => Order_List);
+   function Char is new Name (Return_Type => Character,
+      Return_Value => Character_Value, Position => 4, Offset => 8,
+      When_Elab => When_Elaborated, Index => List_Index, List => List,
+      Order_List                          => Order_List);
 
-   function Enum is new Name
-     (Return_Type  => Month_Type,
-      Return_Value => This_Month,
-      Position     => 5,
-      Offset       => 8,
-      When_Elab    => When_Elaborated,
-      Index        => List_Index,
-      List         => List,
-      Order_List   => Order_List);
+   function Enum is new Name (Return_Type => Month_Type,
+      Return_Value => This_Month, Position => 5, Offset => 8,
+      When_Elab => When_Elaborated, Index => List_Index, List => List,
+      Order_List                          => Order_List);
 
-   function Arry is new Name
-     (Return_Type  => Due_Dates,
-      Return_Value => Report_Dates,
-      Position     => 6,
-      Offset       => 8,
-      When_Elab    => When_Elaborated,
-      Index        => List_Index,
-      List         => List,
-      Order_List   => Order_List);
+   function Arry is new Name (Return_Type => Due_Dates,
+      Return_Value => Report_Dates, Position => 6, Offset => 8,
+      When_Elab => When_Elaborated, Index => List_Index, List => List,
+      Order_List                          => Order_List);
 
-   function Rcrd is new Name
-     (Return_Type  => Date,
-      Return_Value => Today,
-      Position     => 7,
-      Offset       => 8,
-      When_Elab    => When_Elaborated,
-      Index        => List_Index,
-      List         => List,
-      Order_List   => Order_List);
+   function Rcrd is new Name (Return_Type => Date, Return_Value => Today,
+      Position => 7, Offset => 8, When_Elab => When_Elaborated,
+      Index => List_Index, List => List, Order_List => Order_List);
 
-   function Acss is new Name
-     (Return_Type  => Date_Access,
-      Return_Value => First_Date,
-      Position     => 8,
-      Offset       => 8,
-      When_Elab    => When_Elaborated,
-      Index        => List_Index,
-      List         => List,
-      Order_List   => Order_List);
+   function Acss is new Name (Return_Type => Date_Access,
+      Return_Value => First_Date, Position => 8, Offset => 8,
+      When_Elab => When_Elaborated, Index => List_Index, List => List,
+      Order_List                          => Order_List);
 
    package Elaboration_Order is new Order_Package
      (First_Type       => Boolean,
@@ -271,45 +220,19 @@ procedure Cc3016b is
       Third_Value      => 3,
       Second_Type      => Year_Type,    -- ORDERING OF PARAMETERS
       Second           => Int,          -- IS DELIBERATE.
-      Second_Value     => 2,
-      Fourth_Type      => Character,
-      Fourth           => Char,
-      Fourth_Value     => 4,
-      Fifth_Type       => Month_Type,
-      Fifth            => Enum,
-      Fifth_Value      => 5,
-      Sixth_Type       => Due_Dates,
-      Sixth            => Arry,
-      Sixth_Value      => 6,
-      Seventh_Type     => Date,
-      Seventh          => Rcrd,
-      Seventh_Value    => 7,
-      Eighth_Type      => Date_Access,
-      Eighth           => Acss,
-      Eighth_Value     => 8,
-      Ninth_Type       => Boolean,
-      Ninth            => Bool,
-      Ninth_Value      => 9,
-      Tenth_Type       => Year_Type,
-      Tenth            => Int,
-      Tenth_Value      => 10,
-      Eleventh_Type    => Real,
-      Eleventh         => Float,
-      Eleventh_Value   => 11,
-      Twelfth_Type     => Character,
-      Twelfth          => Char,
-      Twelfth_Value    => 12,
-      Thirteenth_Type  => Month_Type,
-      Thirteenth       => Enum,
-      Thirteenth_Value => 13,
-      Fourteenth_Type  => Due_Dates,
-      Fourteenth       => Arry,
-      Fourteenth_Value => 14,
-      Fifteenth_Type   => Date,
-      Fifteenth        => Rcrd,
-      Fifteenth_Value  => 15,
-      Sixteenth_Type   => Date_Access,
-      Sixteenth        => Acss,
+      Second_Value     => 2, Fourth_Type => Character, Fourth => Char,
+      Fourth_Value     => 4, Fifth_Type => Month_Type, Fifth => Enum,
+      Fifth_Value      => 5, Sixth_Type => Due_Dates, Sixth => Arry,
+      Sixth_Value      => 6, Seventh_Type => Date, Seventh => Rcrd,
+      Seventh_Value    => 7, Eighth_Type => Date_Access, Eighth => Acss,
+      Eighth_Value     => 8, Ninth_Type => Boolean, Ninth => Bool,
+      Ninth_Value      => 9, Tenth_Type => Year_Type, Tenth => Int,
+      Tenth_Value      => 10, Eleventh_Type => Real, Eleventh => Float,
+      Eleventh_Value   => 11, Twelfth_Type => Character, Twelfth => Char,
+      Twelfth_Value => 12, Thirteenth_Type => Month_Type, Thirteenth => Enum,
+      Thirteenth_Value => 13, Fourteenth_Type => Due_Dates, Fourteenth => Arry,
+      Fourteenth_Value => 14, Fifteenth_Type => Date, Fifteenth => Rcrd,
+      Fifteenth_Value  => 15, Sixteenth_Type => Date_Access, Sixteenth => Acss,
       Sixteenth_Value  => 16);
 
 begin
@@ -318,8 +241,7 @@ begin
       "CHECK THAT AN INSTANCE OF A GENERIC " &
       "PACKAGE MUST DECLARE A PACKAGE. CHECK THAT THE " &
       "DECLARATIVE ITEMS IN AN INSTANTIATION OF A GENERIC " &
-      "PACKAGE SPECIFICATION ARE ELABORATED IN THE ORDER " &
-      "DECLARED.");
+      "PACKAGE SPECIFICATION ARE ELABORATED IN THE ORDER " & "DECLARED.");
 
    if Order_List (1) /= Report.Ident_Int (1) then
       Report.Failed ("BOOLEAN 1 ELABORATED OUT OF ORDER");

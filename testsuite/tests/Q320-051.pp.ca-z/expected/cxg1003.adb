@@ -66,8 +66,7 @@ begin
    Report.Test
      ("CXG1003",
       "Check that the subprograms defined in " &
-      "the package Text_IO.Complex_IO " &
-      "provide correct results");
+      "the package Text_IO.Complex_IO " & "provide correct results");
 
    Test_For_Text_Io_Support :
    declare
@@ -86,8 +85,7 @@ begin
       -- will be handled to produce a Not_Applicable result.
 
       Text_Io.Create
-        (File => Data_File,
-         Mode => Ada.Text_Io.Out_File,
+        (File => Data_File, Mode => Ada.Text_Io.Out_File,
          Name => Data_Filename);
 
       Test_Block :
@@ -113,11 +111,7 @@ begin
 
          Complex_Array : array
            (1 .. Number_Of_Complex_Items) of Complex_Pack.Complex :=
-           ((3.0, 9.0),
-            (4.0, 7.0),
-            (5.0, 6.0),
-            (6.0, 3.0),
-            (2.0, 5.0),
+           ((3.0, 9.0), (4.0, 7.0), (5.0, 6.0), (6.0, 3.0), (2.0, 5.0),
             (3.0, 7.0));
 
          procedure Load_Data_File (The_File : in out Text_Io.File_Type) is
@@ -154,11 +148,8 @@ begin
 
             for I in 1 .. Number_Of_Complex_Items loop
                C_Io.Put
-                 (File => The_File,
-                  Item => Complex_Array (I),
-                  Fore => 1,
-                  Aft  => 1,
-                  Exp  => 0);
+                 (File => The_File, Item => Complex_Array (I), Fore => 1,
+                  Aft  => 1, Exp => 0);
             end loop;
 
             if Tc_Verbose then
@@ -188,8 +179,7 @@ begin
                if Tc_Complex /= Complex_Array (I) then
                   Report.Failed
                     ("Incorrect complex data read from file " &
-                     "when using Text_IO procedure Get, " &
-                     "data item #" &
+                     "when using Text_IO procedure Get, " & "data item #" &
                      Integer'Image (I));
                end if;
             end loop;
@@ -214,8 +204,7 @@ begin
                if Tc_Complex /= Complex_Array (I) then
                   Report.Failed
                     ("Incorrect complex data read from file " &
-                     "when using Complex_IO procedure Get, " &
-                     "data item #" &
+                     "when using Complex_IO procedure Get, " & "data item #" &
                      Integer'Image (I));
                end if;
             end loop;
@@ -296,10 +285,8 @@ begin
 
             for I in 1 .. Number_Of_Complex_Items loop
                C_Io.Put
-                 (To   => Tc_String_Array (I),
-                  Item => Complex_Array (I),
-                  Aft  => 1,
-                  Exp  => 0);
+                 (To  => Tc_String_Array (I), Item => Complex_Array (I),
+                  Aft => 1, Exp => 0);
             end loop;
 
             if Tc_Verbose then
@@ -318,13 +305,11 @@ begin
               Tc_String_Array (3) /= "(5.0,      6.0)" or
               Tc_String_Array (4) /= "(6.0,      3.0)" or
               Tc_String_Array (5) /= "(2.0,      5.0)" or
-              Tc_String_Array (6) /= "(3.0,      7.0)"
-            then
+              Tc_String_Array (6) /= "(3.0,      7.0)" then
                Report.Failed
                  ("Incorrect format for complex values that " &
                   "have been placed into string variables " &
-                  "using the Complex_IO.Put procedure for " &
-                  "strings");
+                  "using the Complex_IO.Put procedure for " & "strings");
             end if;
 
             if Tc_Verbose then
@@ -337,16 +322,14 @@ begin
             for I in 1 .. Number_Of_Complex_Items loop
 
                C_Io.Get
-                 (From => Tc_String_Array (I),
-                  Item => Tc_Complex,
+                 (From => Tc_String_Array (I), Item => Tc_Complex,
                   Last => Tc_Last_Character_Read);
 
                if Tc_Complex /= Complex_Array (I) then
                   Report.Failed
                     ("Incorrect complex data value obtained " &
                      "from String following use of Procedures " &
-                     "Put and Get from Strings, Complex_Array " &
-                     "item #" &
+                     "Put and Get from Strings, Complex_Array " & "item #" &
                      Integer'Image (I));
                end if;
             end loop;
@@ -396,10 +379,8 @@ begin
 
             Tc_Complex_String_Array : array
               (1 .. Number_Of_Complex_Items) of String_Ptr :=
-              (new String'("(3.0, 9.0  )"),
-               new String'("+4.0  +7.0"),
-               new String'("(5.0 6.0)"),
-               new String'("6.0, 3.0"),
+              (new String'("(3.0, 9.0  )"), new String'("+4.0  +7.0"),
+               new String'("(5.0 6.0)"), new String'("6.0, 3.0"),
                new String'("  (   2.0   , 5.0  )  "),
                new String'("(3.0              7.0)"));
 
@@ -419,8 +400,7 @@ begin
             for I in 1 .. Number_Of_Complex_Items loop
 
                C_Io.Get
-                 (Tc_Complex_String_Array (I).all,
-                  Tc_Complex,
+                 (Tc_Complex_String_Array (I).all, Tc_Complex,
                   Tc_Last_Character_Read);
 
                if Tc_Complex /= Complex_Array (I) then
@@ -434,8 +414,7 @@ begin
                   Report.Failed
                     ("Incorrect value returned as the last character of " &
                      "the input string processed by Procedure Get, " &
-                     "string value : " &
-                     Tc_Complex_String_Array (I).all &
+                     "string value : " & Tc_Complex_String_Array (I).all &
                      "  expected last character value read : " &
                      Positive'Image (Tc_Last_Char_Array (I)) &
                      "  last character value read : " &

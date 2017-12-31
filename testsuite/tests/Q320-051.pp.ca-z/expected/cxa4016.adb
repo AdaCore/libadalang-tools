@@ -63,9 +63,7 @@ procedure Cxa4016 is
    begin
       if S'First /= 1 then
          Report.Failed
-           ("Lower bound of result of function " &
-            Name.all &
-            " is" &
+           ("Lower bound of result of function " & Name.all & " is" &
             Integer'Image (S'First));
       end if;
       return S;
@@ -90,10 +88,7 @@ begin
       package Asw renames Ada.Strings.Wide_Fixed;
       package Wide_Maps renames Ada.Strings.Wide_Maps;
 
-      Result_String,
-      Delete_String,
-      Insert_String,
-      Trim_String,
+      Result_String, Delete_String, Insert_String, Trim_String,
       Overwrite_String : Wide_String (1 .. 10) :=
         (others => Ada.Strings.Wide_Space);
       Replace_String : Wide_String (10 .. 30) :=
@@ -164,9 +159,7 @@ begin
       Result_String := "XXXXXXXXXX";
 
       Asw.Replace_Slice
-        (Source => Result_String,
-         Low    => 1,
-         High   => 10,
+        (Source => Result_String, Low => 1, High => 10,
          By     => Source_String1);   -- "abcde"
 
       if Result_String /= "abcde     " then
@@ -195,8 +188,7 @@ begin
          1,
          Result_String'Last,
          Source_String1,      -- "abcde"
-         Ada.Strings.Error,
-         Ada.Strings.Center,
+         Ada.Strings.Error, Ada.Strings.Center,
          'x');                -- non-default padding.
 
       if Result_String /= "xxabcdexxx" then  -- Unequal padding added right
@@ -209,8 +201,7 @@ begin
          1,
          Result_String'Last,
          Source_String2,        -- "abcdef"
-         Ada.Strings.Error,
-         Ada.Strings.Center);
+         Ada.Strings.Error, Ada.Strings.Center);
 
       if Result_String /= "  abcdef  " then    -- Equal padding added on L/R.
          Report.Failed
@@ -261,8 +252,7 @@ begin
          1,
          Result_String'Last,
          Source_String4,               -- "abcdefghij  "
-         Drop    => Ada.Strings.Error,
-         Justify => Ada.Strings.Left);
+         Drop => Ada.Strings.Error, Justify => Ada.Strings.Left);
 
       if not (Result_String = "abcdefghij") then  -- leftmost 10 characters
          Report.Failed ("Incorrect result, Replace_Slice - Drop = Error - 1");
@@ -312,8 +302,7 @@ begin
         Tc_Check (Asw.Replace_Slice ("abcd", 4, 1, "xy")) /=
           "abcxyd" or -- High < Low
         Tc_Check (Asw.Replace_Slice ("abc", 2, 3, "x")) /= "ax" or
-        Tc_Check (Asw.Replace_Slice ("a", 1, 1, "z")) /= "z"
-      then
+        Tc_Check (Asw.Replace_Slice ("a", 1, 1, "z")) /= "z" then
          Report.Failed ("Incorrect result from Function Replace_Slice - 1");
       end if;
 
@@ -323,8 +312,7 @@ begin
           "xyz" or  -- High > Low
         Tc_Check (Asw.Replace_Slice ("abc", 3, 2, "xy")) /=
           "abxyc" or  -- insert
-        Tc_Check (Asw.Replace_Slice ("a", 1, 1, "xyz")) /= "xyz"
-      then
+        Tc_Check (Asw.Replace_Slice ("a", 1, 1, "xyz")) /= "xyz" then
          Report.Failed ("Incorrect result from Function Replace_Slice - 2");
       end if;
 
@@ -347,8 +335,7 @@ begin
 
       if Tc_Check (Asw.Insert ("a", 1, "z")) /= "za" or
         Tc_Check (Asw.Insert ("abc", 3, "")) /= "abc" or
-        Tc_Check (Asw.Insert ("abc", 4, "z")) /= "abcz"
-      then
+        Tc_Check (Asw.Insert ("abc", 4, "z")) /= "abcz" then
          Report.Failed ("Incorrect result from Function Insert - 2");
       end if;
 
@@ -359,8 +346,7 @@ begin
                  Before   => Report.Ident_Int (7),
                  New_Item => Source_String2))         -- "abcdef"
                  /=
-           "babcdefcde"
-         then
+           "babcdefcde" then
             Report.Failed ("Index_Error not raised by Insert - 3A");
          else
             Report.Failed ("Index_Error not raised by Insert - 3B");
@@ -404,8 +390,7 @@ begin
          Asw.Insert
            (Source   => Result_String,       -- 10 chars
             Before   => Result_String'Last,
-            New_Item => "abcdefghijk",
-            Drop     => Ada.Strings.Error);
+            New_Item => "abcdefghijk", Drop => Ada.Strings.Error);
          Report.Failed ("Exception not raised by Procedure Insert");
       exception
          when Ada.Strings.Length_Error =>
@@ -433,8 +418,7 @@ begin
         Tc_Check (Asw.Overwrite ("a", 1, "xyz")) /= "xyz" or  -- chars appended
         Tc_Check (Asw.Overwrite ("abc", 3, "   ")) /=
           "ab   " or  -- blanks appended
-        Tc_Check (Asw.Overwrite ("abcde", 1, "z")) /= "zbcde"
-      then
+        Tc_Check (Asw.Overwrite ("abcde", 1, "z")) /= "zbcde" then
          Report.Failed ("Incorrect result from Function Overwrite - 2");
       end if;
 
@@ -520,9 +504,7 @@ begin
       Delete_String := Source_String3 (1 .. 10);  -- Initialize to "abcdefghij"
 
       Asw.Delete
-        (Source  => Delete_String,
-         From    => 6,
-         Through => Delete_String'Last,
+        (Source  => Delete_String, From => 6, Through => Delete_String'Last,
          Justify => Ada.Strings.Left,
          Pad     => 'x');              -- pad with char 'x'
 
@@ -546,11 +528,8 @@ begin
       -- Justify = Center
 
       Asw.Delete
-        (Source  => Delete_String,
-         From    => 1,
-         Through => 5,
-         Justify => Ada.Strings.Center,
-         Pad     => 'z');
+        (Source  => Delete_String, From => 1, Through => 5,
+         Justify => Ada.Strings.Center, Pad => 'z');
 
       if Delete_String /= "zzabcdezzz" then  -- extra pad char on right side.
          Report.Failed ("Incorrect result from Delete - Justify = Center");
@@ -570,9 +549,7 @@ begin
          New_String : constant Wide_String :=
            Tc_Check
              (Asw.Trim
-                (Source => Trim_String,
-                 Left   => Cd_Set,
-                 Right  => Cd_Set));
+                (Source => Trim_String, Left => Cd_Set, Right => Cd_Set));
       begin
          if New_String /= Source_String2 then    -- string "abcdef"
             Report.Failed
@@ -582,8 +559,7 @@ begin
 
       if Tc_Check
           (Asw.Trim ("abcdef", Wide_Maps.Null_Set, Wide_Maps.Null_Set)) /=
-        "abcdef"
-      then
+        "abcdef" then
          Report.Failed ("Incorrect result from Trim with Null sets");
       end if;
 
@@ -596,11 +572,8 @@ begin
       -- Justify = Right
 
       Asw.Trim
-        (Source  => Trim_String,
-         Left    => Cd_Set,
-         Right   => Cd_Set,
-         Justify => Ada.Strings.Right,
-         Pad     => 'x');
+        (Source  => Trim_String, Left => Cd_Set, Right => Cd_Set,
+         Justify => Ada.Strings.Right, Pad => 'x');
 
       if Trim_String /= "xxxxabcdef" then
          Report.Failed ("Incorrect result from Trim with Justify = Right");
@@ -609,11 +582,8 @@ begin
       -- Justify = Left
 
       Asw.Trim
-        (Source  => Trim_String,
-         Left    => X_Set,
-         Right   => Wide_Maps.Null_Set,
-         Justify => Ada.Strings.Left,
-         Pad     => ' ');
+        (Source  => Trim_String, Left => X_Set, Right => Wide_Maps.Null_Set,
+         Justify => Ada.Strings.Left, Pad => ' ');
 
       if Trim_String /= "abcdef    " then  -- Padded with 4 blanks on right.
          Report.Failed ("Incorrect result from Trim with Justify = Left");
@@ -622,11 +592,8 @@ begin
       -- Justify = Center
 
       Asw.Trim
-        (Source  => Trim_String,
-         Left    => Abcd_Set,
-         Right   => Cd_Set,
-         Justify => Ada.Strings.Center,
-         Pad     => 'x');
+        (Source  => Trim_String, Left => Abcd_Set, Right => Cd_Set,
+         Justify => Ada.Strings.Center, Pad => 'x');
 
       if Trim_String /= "xxef    xx" then  -- Padded with 4 pad chars on L/R
          Report.Failed ("Incorrect result from Trim with Justify = Center");
@@ -684,8 +651,7 @@ begin
       if Tc_Check (Asw."*" (3, Source_String1)) /= "abcdeabcdeabcde" or
         Tc_Check (Asw."*" (2, Source_String2)) /= Source_String6 or
         Tc_Check (Asw."*" (4, Source_String1 (1 .. 2))) /= "abababab" or
-        Tc_Check (Asw."*" (0, Source_String1)) /= ""
-      then
+        Tc_Check (Asw."*" (0, Source_String1)) /= "" then
          Report.Failed
            ("Incorrect result from Function ""*"" with wide strings");
       end if;

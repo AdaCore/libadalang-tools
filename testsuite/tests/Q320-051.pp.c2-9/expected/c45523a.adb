@@ -68,8 +68,7 @@ begin
       "OVERFLOWS IS TRUE AND EITHER THE RESULT OF " &
       "MULTIPLICATION LIES OUTSIDE THE RANGE OF THE " &
       "BASE TYPE, OR AN ATTEMPT IS MADE TO DIVIDE BY " &
-      "ZERO, THEN CONSTRAINT_ERROR IS RAISED." &
-      "THIS TESTS DIGITS 5");
+      "ZERO, THEN CONSTRAINT_ERROR IS RAISED." & "THIS TESTS DIGITS 5");
 
    if Flt'Machine_Overflows then
       begin
@@ -84,8 +83,7 @@ begin
          when others =>
             Failed
               ("AN EXCEPTION OTHER THAN " &
-               "CONSTRAINT_ERROR WAS RAISED FOR " &
-               "MULTIPLICATION");
+               "CONSTRAINT_ERROR WAS RAISED FOR " & "MULTIPLICATION");
       end;
       begin
          F := (Flt'Last) / Ident_Flt (0.0);

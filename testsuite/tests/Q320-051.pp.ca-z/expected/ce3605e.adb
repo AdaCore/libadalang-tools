@@ -66,8 +66,7 @@ begin
          when Use_Error =>
             Not_Applicable
               ("USE_ERROR RAISED ON TEXT CREATE " &
-               "FOR TEMPORARY FILE WITH " &
-               "OUT_FILE MODE");
+               "FOR TEMPORARY FILE WITH " & "OUT_FILE MODE");
             raise Incomplete;
       end;
 

@@ -51,8 +51,7 @@ begin
    Test
      ("CE2407B",
       "CHECK THAT WRITE RAISES MODE_ERROR WHEN THE " &
-      "CURRENT MODE IS IN_FILE AND THE FILE IS " &
-      "A TEMPORARY FILE");
+      "CURRENT MODE IS IN_FILE AND THE FILE IS " & "A TEMPORARY FILE");
    begin
       Create (File2, Out_File);
    exception

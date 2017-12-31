@@ -49,8 +49,7 @@ package body Cd10001_0 is
          "Object size not specified value");
 
       Assert
-        (Tenths'Small = 1.0 / Two**Five,
-         "Tenths small not specified value");
+        (Tenths'Small = 1.0 / Two**Five, "Tenths small not specified value");
 
       Assert
         (Reference'Storage_Size in

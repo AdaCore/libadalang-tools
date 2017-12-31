@@ -76,8 +76,7 @@ begin
    if not (Db_Rec1 = Db_Rec2) then
       Report.Failed
         ("Nonlimited tagged record: " &
-         "User-defined equality did not override predefined " &
-         "equality");
+         "User-defined equality did not override predefined " & "equality");
    end if;
 
    if Db_Rec1 /= Db_Rec2 then
@@ -113,15 +112,13 @@ begin
    if Dated_Rec2 = Dated_Rec3 then
       Report.Failed
         ("Nonlimited tagged record: " &
-         "Record equality was not extended with component " &
-         "equality");
+         "Record equality was not extended with component " & "equality");
    end if;
 
    if not (Dated_Rec2 /= Dated_Rec3) then
       Report.Failed
         ("Nonlimited tagged record: " &
-         "Record inequality was not extended with component " &
-         "equality");
+         "Record inequality was not extended with component " & "equality");
    end if;
 
    ---------------------------------------------------------------------
@@ -223,8 +220,7 @@ begin
    if not (Current = Last) then
       Report.Failed
         ("Variant record          : " &
-         "User-defined equality did not override predefined " &
-         "equality");
+         "User-defined equality did not override predefined " & "equality");
    end if;
 
    if Current /= Last then
@@ -241,15 +237,13 @@ begin
    if not (Approval1 /= Approval2) then
       Report.Failed
         ("Variant record          : " &
-         "Inequality was not extended with component " &
-         "inequality");
+         "Inequality was not extended with component " & "inequality");
    end if;
 
    if Approval1 = Approval2 then
       Report.Failed
         ("Variant record          : " &
-         "Equality was not extended with component " &
-         "equality");
+         "Equality was not extended with component " & "equality");
    end if;
 
    ---------------------------------------------------------------------

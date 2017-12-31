@@ -138,9 +138,8 @@ begin  -- Main test procedure.
 
    -- check that Order_Meaningful => False is exactly that
    Tctouch.Validate
-     ("ZzAa",
-      "Order should not count, " &          -- No output
-      "this message is a true fail",
+     ("ZzAa", "Order should not count, " &          -- No output
+     "this message is a true fail",
       False);
 
    -- check that touch overflow happens at the right time.

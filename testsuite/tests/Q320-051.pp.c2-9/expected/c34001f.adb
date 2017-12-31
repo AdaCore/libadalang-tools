@@ -40,8 +40,7 @@ procedure C34001f is
    subtype Parent is Boolean;
 
    type T is
-     new Parent range
-       Parent'Val (Ident_Int (Parent'Pos (False))) ..
+     new Parent range Parent'Val (Ident_Int (Parent'Pos (False))) ..
          Parent'Val (Ident_Int (Parent'Pos (False)));
 
    subtype Subparent is Parent range True .. True;
@@ -59,33 +58,23 @@ begin
       "WHEN THE DERIVED TYPE DEFINITION IS " &
       "CONSTRAINED.  ALSO CHECK THAT ANY CONSTRAINT " &
       "IMPOSED ON THE PARENT SUBTYPE IS ALSO IMPOSED " &
-      "ON THE DERIVED SUBTYPE.  CHECK FOR DERIVED " &
-      "BOOLEAN TYPES");
+      "ON THE DERIVED SUBTYPE.  CHECK FOR DERIVED " & "BOOLEAN TYPES");
 
    -- CHECK THAT BASE TYPE VALUES NOT IN THE SUBTYPE ARE PRESENT.
 
-   if T'Base'First /= False or
-     T'Base'Last /= True or
-     S'Base'First /= False or
-     S'Base'Last /= True
-   then
+   if T'Base'First /= False or T'Base'Last /= True or S'Base'First /= False or
+     S'Base'Last /= True then
       Failed ("INCORRECT 'BASE'FIRST OR 'BASE'LAST");
    end if;
 
-   if T'Pred (True) /= False or
-     T'Succ (False) /= True or
-     S'Pred (True) /= False or
-     S'Succ (False) /= True
-   then
+   if T'Pred (True) /= False or T'Succ (False) /= True or
+     S'Pred (True) /= False or S'Succ (False) /= True then
       Failed ("INCORRECT 'PRED OR 'SUCC");
    end if;
 
    -- CHECK THE DERIVED SUBTYPE CONSTRAINT.
 
-   if T'First /= False or
-     T'Last /= False or
-     S'First /= True or
-     S'Last /= True
+   if T'First /= False or T'Last /= False or S'First /= True or S'Last /= True
    then
       Failed ("INCORRECT 'FIRST OR 'LAST");
    end if;

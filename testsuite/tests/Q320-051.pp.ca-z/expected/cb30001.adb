@@ -60,13 +60,11 @@ begin
 
    Report.Test
      ("CB30001",
-      "Check that the optional message string in a " &
-      "raise statement is " &
+      "Check that the optional message string in a " & "raise statement is " &
       "associated with the raised exception " &
       "occurrence, and that the message string can " &
       "be obtained using the Exception_Message " &
-      "function with the associated " &
-      "Exception_Occurrence object");
+      "function with the associated " & "Exception_Occurrence object");
 
    Test_Block :
    declare
@@ -112,8 +110,7 @@ begin
 
             Report.Failed
               ("Exception not raised by raise statement " &
-               "for User_Exception #" &
-               Integer'Image (I));
+               "for User_Exception #" & Integer'Image (I));
 
          exception
             when Excptn : others =>
@@ -124,13 +121,11 @@ begin
                   -- function.
 
                   if User_Messages (I).all /=
-                    Ada.Exceptions.Exception_Message (Excptn)
-                  then
+                    Ada.Exceptions.Exception_Message (Excptn) then
                      Report.Failed
                        ("Message captured from exception is not the " &
                         "message provided when the exception was raised, " &
-                        "User_Exception #" &
-                        Integer'Image (I));
+                        "User_Exception #" & Integer'Image (I));
                   end if;
                end;
          end;
@@ -150,8 +145,7 @@ begin
          when Excptn : User_Exception_1 =>
 
             if User_Messages (1).all /=
-              Ada.Exceptions.Exception_Message (Excptn)
-            then
+              Ada.Exceptions.Exception_Message (Excptn) then
                Report.Failed ("User_Message_1 not found");
             end if;
 
@@ -179,8 +173,7 @@ begin
          when Excptn : User_Exception_2 =>
 
             if User_Messages (4).all /=
-              Ada.Exceptions.Exception_Message (Excptn)
-            then
+              Ada.Exceptions.Exception_Message (Excptn) then
                Report.Failed ("User_Message_4 not found");
             end if;
 
@@ -205,8 +198,7 @@ begin
          exception
             when Excptn : User_Exception_3 =>
                if User_Messages (2).all /=
-                 Ada.Exceptions.Exception_Message (Excptn)
-               then
+                 Ada.Exceptions.Exception_Message (Excptn) then
                   Report.Failed
                     ("User_Message_2 not returned inside task body");
                end if;
@@ -220,8 +212,7 @@ begin
       exception
          when Excptn : User_Exception_3 =>
             if User_Messages (2).all /=
-              Ada.Exceptions.Exception_Message (Excptn)
-            then
+              Ada.Exceptions.Exception_Message (Excptn) then
                Report.Failed ("User_Message_3 not returned to caller of task");
             end if;
          when others =>

@@ -45,8 +45,7 @@ begin
      ("C43208A",
       "CHECK THAT THE EVALUATION OF A ONE-" &
       "DIMENSIONAL AGGREGATE OF THE FORM " &
-      "(F..G => (H..I = J)) IS PERFORMED " &
-      "CORRECTLY");
+      "(F..G => (H..I = J)) IS PERFORMED " & "CORRECTLY");
 
    declare
 

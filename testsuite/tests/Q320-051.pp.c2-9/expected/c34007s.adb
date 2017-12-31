@@ -50,13 +50,8 @@ procedure C34007s is
 
       type Designated (B : Boolean := True; L : Length := 1) is private;
 
-      function Create
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         C : Component;
-         F : Float) return Designated;
+      function Create (B : Boolean; L : Length; I : Integer; S : String;
+         C               : Component; F : Float) return Designated;
 
    private
 
@@ -81,14 +76,8 @@ procedure C34007s is
 
       type Parent is access Designated;
 
-      function Create
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         C : Component;
-         F : Float;
-         X : Parent  -- TO RESOLVE OVERLOADING.
+      function Create (B : Boolean; L : Length; I : Integer; S : String;
+         C : Component; F : Float; X : Parent  -- TO RESOLVE OVERLOADING.
          ) return Parent;
 
    end Pkg_P;
@@ -109,13 +98,8 @@ procedure C34007s is
 
    package body Pkg_D is
 
-      function Create
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         C : Component;
-         F : Float) return Designated
+      function Create (B : Boolean; L : Length; I : Integer; S : String;
+         C               : Component; F : Float) return Designated
       is
       begin
          case B is
@@ -130,14 +114,8 @@ procedure C34007s is
 
    package body Pkg_P is
 
-      function Create
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         C : Component;
-         F : Float;
-         X : Parent) return Parent
+      function Create (B : Boolean; L : Length; I : Integer; S : String;
+         C               : Component; F : Float; X : Parent) return Parent
       is
       begin
          return new Designated'(Create (B, L, I, S, C, F));
@@ -183,19 +161,15 @@ begin
       W := new Designated'(Create (True, 3, 1, "ABC", 4, 1.0));
    end if;
    X := T (W);
-   if X = null
-     or else X = Y
-     or else X.all /= Create (True, 3, 1, "ABC", 4, 2.0)
-   then
+   if X = null or else X = Y
+     or else X.all /= Create (True, 3, 1, "ABC", 4, 2.0) then
       Failed ("INCORRECT CONVERSION FROM PARENT");
    end if;
 
    X := Ident (Y);
    W := Parent (X);
-   if W = null
-     or else W.all /= Create (True, 3, 1, "ABC", 4, 2.0)
-     or else T (W) /= Y
-   then
+   if W = null or else W.all /= Create (True, 3, 1, "ABC", 4, 2.0)
+     or else T (W) /= Y then
       Failed ("INCORRECT CONVERSION TO PARENT - 1");
    end if;
 
@@ -210,20 +184,16 @@ begin
 
    X := Ident (new Designated'(Create (True, 3, 1, "ABC", 4, 1.0)));
    if
-     (X = null
-      or else X = Y
+     (X = null or else X = Y
       or else X.all /= Create (True, 3, 1, "ABC", 4, 2.0)) or
-     X = new Designated'(Create (False, 3, 1, "XXX", 5, 4.0))
-   then
+     X = new Designated'(Create (False, 3, 1, "XXX", 5, 4.0)) then
       Failed ("INCORRECT ALLOCATOR");
    end if;
 
    X := Ident (Y);
-   if X.B /= True or
-     X.L /= 3 or
+   if X.B /= True or X.L /= 3 or
      Create (False, 2, 3, "XX", 5, 6.0, X).B /= False or
-     Create (False, 2, 3, "XX", 5, 6.0, X).L /= 2
-   then
+     Create (False, 2, 3, "XX", 5, 6.0, X).L /= 2 then
       Failed ("INCORRECT SELECTION (DISCRIMINANT)");
    end if;
 
@@ -263,18 +233,13 @@ begin
    end;
 
    X := Ident (Y);
-   if X = null or
-     X = new Subdesignated or
-     not (X = Y) or
-     X = Create (False, 2, 3, "XX", 5, 6.0, X)
-   then
+   if X = null or X = new Subdesignated or not (X = Y) or
+     X = Create (False, 2, 3, "XX", 5, 6.0, X) then
       Failed ("INCORRECT =");
    end if;
 
-   if X /= Y or
-     not (X /= null) or
-     not (X /= Create (False, 2, 3, "XX", 5, 6.0, X))
-   then
+   if X /= Y or not (X /= null) or
+     not (X /= Create (False, 2, 3, "XX", 5, 6.0, X)) then
       Failed ("INCORRECT /=");
    end if;
 

@@ -74,13 +74,11 @@ package Cc70c02_0 is           -- Additional list operations.
    End_Of_List_Reached : exception;
 
    -- Read from current element and advance "current" pointer.
-   procedure Read_Element
-     (L : in out Lists.List_Type;
-      E :    out Lists.Element_Type);
+   procedure Read_Element (L : in out Lists.List_Type;
+      E                      :    out Lists.Element_Type);
 
    -- Add element to end of list.
-   procedure Add_Element
-     (L : in out Lists.List_Type;
-      E : in     Lists.Element_Type);
+   procedure Add_Element (L : in out Lists.List_Type;
+      E                     : in     Lists.Element_Type);
 
 end Cc70c02_0;

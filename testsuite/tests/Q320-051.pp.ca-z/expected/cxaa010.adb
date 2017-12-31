@@ -135,10 +135,8 @@ begin
       type Tax_Bill_Array_Type is array (1 .. 4) of Tax_Bill_Type;
 
       Neighborhood : City_Block_Type :=
-        (("X9254", 123.0, 135.00),
-         ("X3569", 345.0, 140.50),
-         ("X3434", 234.0, 179.50),
-         ("X8838", 456.0, 158.00));
+        (("X9254", 123.0, 135.00), ("X3569", 345.0, 140.50),
+         ("X3434", 234.0, 179.50), ("X8838", 456.0, 158.00));
 
       Neighborhood_Taxes : Tax_Bill_Array_Type;
 
@@ -159,19 +157,13 @@ begin
             -- Use Decimal_IO.Put with non-default format parameters to place
             -- decimal data into file.
             Price_Io.Put
-              (Tax_Roll,
-               Neighborhood (Parcel).Purchase_Price,
-               Fore => 3,
-               Aft  => 1,
-               Exp  => 0);
+              (Tax_Roll, Neighborhood (Parcel).Purchase_Price, Fore => 3,
+               Aft => 1, Exp => 0);
             Ada.Text_Io.Put (Tax_Roll, Spacer);
 
             Value_Io.Put
-              (Tax_Roll,
-               Neighborhood (Parcel).Assessed_Value,
-               Fore => 3,
-               Aft  => 2,
-               Exp  => 0);
+              (Tax_Roll, Neighborhood (Parcel).Assessed_Value, Fore => 3,
+               Aft => 2, Exp => 0);
             Ada.Text_Io.New_Line (Tax_Roll);
          end loop;
 
@@ -185,9 +177,8 @@ begin
       Twice_A_Year :
       declare
 
-         procedure Collect_Tax
-           (Index     : in     Integer;
-            Tax_Array : in out Tax_Bill_Array_Type)
+         procedure Collect_Tax (Index : in     Integer;
+            Tax_Array                 : in out Tax_Bill_Array_Type)
          is
             Id           : String (1 .. Id_Length);
             Price        : Price_Type := 0.0;
@@ -282,23 +273,20 @@ begin
             Front := Rear + 3;                                 --  8
             Rear  := Front + Price_String_Length - 1;          -- 12
             Price_Io.Get
-              (Neighborhood_Taxes (Parcel) (Front .. Rear),
-               Item => Tc_Price,
-               Last => Length);
+              (Neighborhood_Taxes (Parcel) (Front .. Rear), Item => Tc_Price,
+               Last                                              => Length);
 
             -- Extract next decimal value from slice of string, based on length
             -- of preceding strings read from string array element.
             Front := Rear + 3;                                 -- 15
             Rear  := Total_String_Length;                      -- 20
             Value_Io.Get
-              (Neighborhood_Taxes (Parcel) (Front .. Rear),
-               Item => Tc_Value,
-               Last => Length);
+              (Neighborhood_Taxes (Parcel) (Front .. Rear), Item => Tc_Value,
+               Last                                              => Length);
 
             if Tc_Id /= Neighborhood (Parcel).Parcel_Id or
               Tc_Price /= Neighborhood (Parcel).Purchase_Price or
-              Tc_Value /= Neighborhood (Parcel).Assessed_Value
-            then
+              Tc_Value /= Neighborhood (Parcel).Assessed_Value then
                Report.Failed ("Incorrect data validation");
             end if;
 

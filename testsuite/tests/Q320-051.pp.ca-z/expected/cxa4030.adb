@@ -90,28 +90,18 @@ begin
 
       New_Character_String : Unb.Unbounded_String :=
         Unb.To_Unbounded_String
-          (Latin_1.Lc_A_Grave &
-           Latin_1.Lc_A_Ring &
-           Latin_1.Lc_Ae_Diphthong &
-           Latin_1.Lc_C_Cedilla &
-           Latin_1.Lc_E_Acute &
-           Latin_1.Lc_I_Circumflex &
-           Latin_1.Lc_Icelandic_Eth &
-           Latin_1.Lc_N_Tilde &
-           Latin_1.Lc_O_Oblique_Stroke &
+          (Latin_1.Lc_A_Grave & Latin_1.Lc_A_Ring & Latin_1.Lc_Ae_Diphthong &
+           Latin_1.Lc_C_Cedilla & Latin_1.Lc_E_Acute &
+           Latin_1.Lc_I_Circumflex & Latin_1.Lc_Icelandic_Eth &
+           Latin_1.Lc_N_Tilde & Latin_1.Lc_O_Oblique_Stroke &
            Latin_1.Lc_Icelandic_Thorn);
 
       Tc_New_Character_String : Unb.Unbounded_String :=
         Unb.To_Unbounded_String
-          (Latin_1.Uc_A_Grave &
-           Latin_1.Uc_A_Ring &
-           Latin_1.Uc_Ae_Diphthong &
-           Latin_1.Uc_C_Cedilla &
-           Latin_1.Uc_E_Acute &
-           Latin_1.Uc_I_Circumflex &
-           Latin_1.Uc_Icelandic_Eth &
-           Latin_1.Uc_N_Tilde &
-           Latin_1.Uc_O_Oblique_Stroke &
+          (Latin_1.Uc_A_Grave & Latin_1.Uc_A_Ring & Latin_1.Uc_Ae_Diphthong &
+           Latin_1.Uc_C_Cedilla & Latin_1.Uc_E_Acute &
+           Latin_1.Uc_I_Circumflex & Latin_1.Uc_Icelandic_Eth &
+           Latin_1.Uc_N_Tilde & Latin_1.Uc_O_Oblique_Stroke &
            Latin_1.Uc_Icelandic_Thorn);
 
       -- In this test, access objects are defined to refer to two functions
@@ -136,54 +126,44 @@ begin
       if Unb.Index
           (Source =>
              Unb.To_Unbounded_String ("The library package Strings.Unbounded"),
-           Pattern => "unb",
-           Going   => Ada.Strings.Forward,
+           Pattern => "unb", Going => Ada.Strings.Forward,
            Mapping => Map_To_Lower_Case_Ptr) /=
         29 or
 
         Unb.Index
             (Unb.To_Unbounded_String
                ("THE RAIN IN SPAIN FALLS MAINLY ON THE PLAIN"),
-             "ain",
-             Mapping => Map_To_Lower_Case_Ptr) /=
+             "ain", Mapping => Map_To_Lower_Case_Ptr) /=
           6 or
 
         Unb.Index
-            (Unb.To_Unbounded_String ("maximum number"),
-             "um",
-             Ada.Strings.Forward,
-             Handling.To_Lower'Access) /=
+            (Unb.To_Unbounded_String ("maximum number"), "um",
+             Ada.Strings.Forward, Handling.To_Lower'Access) /=
           6 or
 
         Unb.Index
             (Unb.To_Unbounded_String ("CoMpLeTeLy MiXeD CaSe StRiNg"),
-             "MIXED CASE STRING",
-             Ada.Strings.Forward,
+             "MIXED CASE STRING", Ada.Strings.Forward,
              Map_To_Upper_Case_Ptr) /=
           12 or
 
         Unb.Index
             (Unb.To_Unbounded_String ("STRING WITH NO MATCHING PATTERNS"),
-             "WITH",
-             Mapping => Map_To_Lower_Case_Ptr) /=
+             "WITH", Mapping => Map_To_Lower_Case_Ptr) /=
           0 or
 
         Unb.Index
-            (Unb.To_Unbounded_String ("THIS STRING IS IN UPPER CASE"),
-             "IS",
-             Ada.Strings.Forward,
-             Handling.To_Upper'Access) /=
+            (Unb.To_Unbounded_String ("THIS STRING IS IN UPPER CASE"), "IS",
+             Ada.Strings.Forward, Handling.To_Upper'Access) /=
           3 or
 
         Unb.Index
-            (Unb.Null_Unbounded_String,
-             "is",
+            (Unb.Null_Unbounded_String, "is",
              Mapping => Map_To_Lower_Case_Ptr) /=
           0 or
 
         Unb.Index
-            (Unb.To_Unbounded_String ("AAABBBaaabbb"),
-             "aabb",
+            (Unb.To_Unbounded_String ("AAABBBaaabbb"), "aabb",
              Mapping => Handling.To_Lower'Access) /=
           2
       then
@@ -196,38 +176,29 @@ begin
       -- Function Index, Backward direction search.
 
       if Unb.Index
-          (Unb.To_Unbounded_String ("Case of a Mixed Case String"),
-           "case",
-           Ada.Strings.Backward,
-           Map_To_Lower_Case_Ptr) /=
+          (Unb.To_Unbounded_String ("Case of a Mixed Case String"), "case",
+           Ada.Strings.Backward, Map_To_Lower_Case_Ptr) /=
         17 or
 
         Unb.Index
-            (Unb.To_Unbounded_String ("Case of a Mixed Case String"),
-             "CASE",
-             Ada.Strings.Backward,
-             Mapping => Map_To_Upper_Case_Ptr) /=
+            (Unb.To_Unbounded_String ("Case of a Mixed Case String"), "CASE",
+             Ada.Strings.Backward, Mapping => Map_To_Upper_Case_Ptr) /=
           17 or
 
         Unb.Index
-            (Unb.To_Unbounded_String ("rain, Rain, and more RAIN"),
-             "rain",
-             Ada.Strings.Backward,
-             Handling.To_Lower'Access) /=
+            (Unb.To_Unbounded_String ("rain, Rain, and more RAIN"), "rain",
+             Ada.Strings.Backward, Handling.To_Lower'Access) /=
           22 or
 
         Unb.Index
-            (Unb.To_Unbounded_String ("RIGHT place, right time"),
-             "RIGHT",
-             Ada.Strings.Backward,
-             Handling.To_Upper'Access) /=
+            (Unb.To_Unbounded_String ("RIGHT place, right time"), "RIGHT",
+             Ada.Strings.Backward, Handling.To_Upper'Access) /=
           14 or
 
         Unb.Index
             (Unb.To_Unbounded_String ("WOULD MATCH BUT FOR THE CASE"),
-             "WOULD MATCH BUT FOR THE CASE",
-             Going   => Ada.Strings.Backward,
-             Mapping => Map_To_Lower_Case_Ptr) /=
+             "WOULD MATCH BUT FOR THE CASE", Going => Ada.Strings.Backward,
+             Mapping                               => Map_To_Lower_Case_Ptr) /=
           0
       then
          Report.Failed
@@ -245,8 +216,7 @@ begin
       begin
          Tc_Natural :=
            Index
-             (To_Unbounded_String ("A Valid Unbounded String"),
-              Null_String,
+             (To_Unbounded_String ("A Valid Unbounded String"), Null_String,
               Going   => Ada.Strings.Forward,
               Mapping => Handling.To_Lower'Access);
          Report.Failed
@@ -265,45 +235,37 @@ begin
       -- Function Count.
 
       if Unb.Count
-          (Source  => Unb.To_Unbounded_String ("ABABABA"),
-           Pattern => "aba",
+          (Source  => Unb.To_Unbounded_String ("ABABABA"), Pattern => "aba",
            Mapping => Map_To_Lower_Case_Ptr) /=
         2 or
 
         Unb.Count
-            (Unb.To_Unbounded_String ("ABABABA"),
-             "ABA",
+            (Unb.To_Unbounded_String ("ABABABA"), "ABA",
              Mapping => Map_To_Lower_Case_Ptr) /=
           0 or
 
         Unb.Count
-            (Unb.To_Unbounded_String ("This IS a MISmatched issue"),
-             "is",
+            (Unb.To_Unbounded_String ("This IS a MISmatched issue"), "is",
              Handling.To_Lower'Access) /=
           4 or
 
         Unb.Count
-            (Unb.To_Unbounded_String ("ABABABA"),
-             "ABA",
+            (Unb.To_Unbounded_String ("ABABABA"), "ABA",
              Map_To_Upper_Case_Ptr) /=
           2 or
 
         Unb.Count
-            (Unb.To_Unbounded_String ("This IS a MISmatched issue"),
-             "is",
+            (Unb.To_Unbounded_String ("This IS a MISmatched issue"), "is",
              Mapping => Map_To_Upper_Case_Ptr) /=
           0 or
 
         Unb.Count
             (Unb.To_Unbounded_String ("She sells sea shells by the sea shore"),
-             "s",
-             Handling.To_Lower'Access) /=
+             "s", Handling.To_Lower'Access) /=
           8 or
 
         Unb.Count
-            (Unb.Null_Unbounded_String,
-             "match",
-             Map_To_Upper_Case_Ptr) /=
+            (Unb.Null_Unbounded_String, "match", Map_To_Upper_Case_Ptr) /=
           0
       then
          Report.Failed
@@ -320,8 +282,7 @@ begin
       begin
          Tc_Natural :=
            Count
-             (To_Unbounded_String ("A Valid String"),
-              Null_Pattern_String,
+             (To_Unbounded_String ("A Valid String"), Null_Pattern_String,
               Map_To_Lower_Case_Ptr);
          Report.Failed
            ("Pattern_Error not raised by Function Count using " &
@@ -431,8 +392,7 @@ begin
 
          Translate (Str_3, To_Upper'Access);
 
-         if Str_3 /=
-           To_Unbounded_String ("A STRING WITH LOWER CASE LETTERS")
+         if Str_3 /= To_Unbounded_String ("A STRING WITH LOWER CASE LETTERS")
          then
             Report.Failed ("Incorrect result from Procedure Translate - 6");
          end if;

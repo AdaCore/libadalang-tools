@@ -359,10 +359,8 @@ begin
       for I in 1 .. 5 loop
          if Nibbles (I) /= Small_Num'Last - Small_Num (I) then
             Report.Failed
-              ("nibble array final value bad at index" &
-               Integer'Image (I) &
-               " value is" &
-               Small_Num'Image (Nibbles (I)));
+              ("nibble array final value bad at index" & Integer'Image (I) &
+               " value is" & Small_Num'Image (Nibbles (I)));
          end if;
       end loop;
       if Counter.Value > 0 then
@@ -379,8 +377,7 @@ begin
       if Counter.Value > 0 then
          Report.Failed
            ("atomic value corrupted by multiple tasks" &
-            Integer'Image (Counter.Value) &
-            " times");
+            Integer'Image (Counter.Value) & " times");
       elsif Verbose then
          Report.Comment ("atomic value not corrupted by multiple tasks");
       end if;

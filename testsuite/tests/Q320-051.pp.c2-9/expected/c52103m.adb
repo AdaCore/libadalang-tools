@@ -106,8 +106,7 @@ begin
 
       -- CHECKING THE VALUES AFTER THE SLICE ASSIGNMENT:
 
-      if Arr82 /= "QBCDE" or
-        Arr82 (Ident_Int (5) .. Ident_Int (9)) /= "QBCDE"
+      if Arr82 /= "QBCDE" or Arr82 (Ident_Int (5) .. Ident_Int (9)) /= "QBCDE"
       then
          Failed ("SLICE ASSIGNMENT NOT CORRECT (8)");
       end if;
@@ -147,8 +146,7 @@ begin
 
       -- CHECKING THE VALUES AFTER THE SLICE ASSIGNMENT:
 
-      if Arr92 /= "QBCDE" or
-        Arr92 (Ident_Int (5) .. Ident_Int (9)) /= "QBCDE"
+      if Arr92 /= "QBCDE" or Arr92 (Ident_Int (5) .. Ident_Int (9)) /= "QBCDE"
       then
          Failed ("SLICE ASSIGNMENT NOT CORRECT (9)");
       end if;

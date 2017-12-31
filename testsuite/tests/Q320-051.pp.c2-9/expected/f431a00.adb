@@ -41,19 +41,13 @@ package body F431a00 is
    begin
       if Expected /= Init_Count then
          Report.Failed
-           ("Init count wrong, expected" &
-            Natural'Image (Expected) &
-            ", but observed" &
-            Natural'Image (Init_Count) &
-            " for " &
-            Message);
+           ("Init count wrong, expected" & Natural'Image (Expected) &
+            ", but observed" & Natural'Image (Init_Count) & " for " & Message);
       end if;
    end Check_Init_Count;
 
-   procedure Check
-     (Item    : in out My_Rec;
-      Value   : in     Integer;
-      Message : in     String)
+   procedure Check (Item : in out My_Rec; Value : in Integer;
+      Message            : in     String)
    is
       Val : Integer;
    begin

@@ -69,8 +69,7 @@ begin
 
       if S /= "AB" then
          Failed
-           ("FUNCTIONS DIFFERING ONLY IN " &
-            "BASE TYPE OF RETURNED VALUE " &
+           ("FUNCTIONS DIFFERING ONLY IN " & "BASE TYPE OF RETURNED VALUE " &
             "CAUSED CONFUSION");
       end if;
    end;

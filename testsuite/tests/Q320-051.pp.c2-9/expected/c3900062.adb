@@ -10,9 +10,8 @@ package body C3900062 is
    use C3900060;  -- Enumeration values directly visible.
    use C3900061;  -- Extended alert system abstraction.
 
-   procedure Assign_Officer
-     (Ma : in out Medium_Alert_Type;
-      To : in     Person_Enum)
+   procedure Assign_Officer (Ma : in out Medium_Alert_Type;
+      To                        : in     Person_Enum)
    is
    begin
       Ma.Action_Officer := To;
@@ -39,10 +38,8 @@ package body C3900062 is
       use type Ada.Calendar.Time;
    begin
       return
-        (Get_Time (Ma) /= Alert_Time or
-         Get_Display (Ma) /= Console or
-         Get_Level (Ma) /= 2 or
-         Ma.Action_Officer /= Duty_Officer);
+        (Get_Time (Ma) /= Alert_Time or Get_Display (Ma) /= Console or
+         Get_Level (Ma) /= 2 or Ma.Action_Officer /= Duty_Officer);
    end Bad_Final_Values;
 
 end C3900062;

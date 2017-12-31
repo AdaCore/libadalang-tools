@@ -63,10 +63,8 @@ begin
 
    Test
      ("C4A012B",
-      "CHECK THAT CONSTRAINT_ERROR " &
-      "IS RAISED FOR " &
-      "0.0 ** (-1) (OR ANY OTHER NEGATIVE EXPONENT " &
-      "VALUE)");
+      "CHECK THAT CONSTRAINT_ERROR " & "IS RAISED FOR " &
+      "0.0 ** (-1) (OR ANY OTHER NEGATIVE EXPONENT " & "VALUE)");
 
    if Float'Machine_Overflows = False then
       Report.Not_Applicable ("Float'Machine_Overflows = False");
@@ -108,8 +106,7 @@ begin
          F := 0.0**(Integer'Pos (Ident_Int (-1)));
          Failed
            ("THE EXPRESSION '0.0 ** " &
-            "(INTEGER'POS (IDENT_INT (-1)))' DID " &
-            "NOT RAISE AN EXCEPTION");
+            "(INTEGER'POS (IDENT_INT (-1)))' DID " & "NOT RAISE AN EXCEPTION");
          if Equal (Integer (F), Integer (F)) then
             Comment ("SHOULDN'T BE HERE!");
          end if;

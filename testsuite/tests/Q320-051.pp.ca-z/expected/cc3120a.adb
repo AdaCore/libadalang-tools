@@ -144,9 +144,7 @@ begin
                null;
          end;
          declare
-            procedure Pr is new Gp
-              (Character,
-               A3 (Ident_Int (2)),
+            procedure Pr is new Gp (Character, A3 (Ident_Int (2)),
                A3 (Ident_Int (3)));
          begin
             A3 (3) := A3 (2);
@@ -158,9 +156,7 @@ begin
          end;
 
          declare
-            procedure Pr is new Gp
-              (Boolean,
-               B_Arr (Ident_Int (2)),
+            procedure Pr is new Gp (Boolean, B_Arr (Ident_Int (2)),
                B_Arr (Ident_Int (3)));
          begin
             B_Arr (3) := B_Arr (2);
@@ -172,13 +168,8 @@ begin
          end;
       end;
 
-      if S1 = S2 or
-        A1 = A2 or
-        R1 = R2 or
-        P1 = P2 or
-        A3 (2) = A3 (3) or
-        B_Arr (2) = B_Arr (3)
-      then
+      if S1 = S2 or A1 = A2 or R1 = R2 or P1 = P2 or A3 (2) = A3 (3) or
+        B_Arr (2) = B_Arr (3) then
          Failed ("ASSIGNMENT FAILED 2");
       end if;
    end;

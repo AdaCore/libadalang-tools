@@ -81,9 +81,7 @@ procedure Cxai003 is
    end My_Equivalent_Keys;
 
    package My_Hashed_Maps is new Ada.Containers.Hashed_Maps
-     (Key_Type        => My_Key_Type,
-      Element_Type    => My_Float,
-      Hash            => My_Hash,
+     (Key_Type => My_Key_Type, Element_Type => My_Float, Hash => My_Hash,
       Equivalent_Keys => My_Equivalent_Keys); -- Default =
 
    My_Map_1 : My_Hashed_Maps.Map;
@@ -103,9 +101,8 @@ procedure Cxai003 is
 
    My_Inserted : Boolean;
 
-   procedure Tampering_Check
-     (Container : in out My_Hashed_Maps.Map;
-      Where     : in     String)
+   procedure Tampering_Check (Container : in out My_Hashed_Maps.Map;
+      Where                             : in     String)
    is
 
       Program_Error_Raised : Boolean := False;
@@ -118,8 +115,7 @@ procedure Cxai003 is
          -- Use a key not already in map
 
          Container.Insert
-           (Key      => Num_Tests + 1,
-            New_Item => Value_In_Array (1));
+           (Key => Num_Tests + 1, New_Item => Value_In_Array (1));
 
       exception
 
@@ -219,8 +215,7 @@ begin
 
       begin
 
-         if My_Map_1.Element (Key => My_Key_Type (I)) /=
-           Value_In_Array (I)
+         if My_Map_1.Element (Key => My_Key_Type (I)) /= Value_In_Array (I)
          then
 
             Report.Failed ("Mismatch between element and what was inserted");
@@ -228,8 +223,7 @@ begin
          end if;
 
          My_Hashed_Maps.Query_Element
-           (Position => My_Cursor_1,
-            Process  => My_Query'Access);
+           (Position => My_Cursor_1, Process => My_Query'Access);
 
       end;
 
@@ -338,8 +332,7 @@ begin
               My_Hashed_Maps.Element (Position => My_Cursor_1) * 2.0);
 
          My_Map_2.Update_Element
-           (Position => My_Cursor_2,
-            Process  => My_Update'Access);
+           (Position => My_Cursor_2, Process => My_Update'Access);
 
       end;
 
@@ -657,8 +650,7 @@ begin
 
    My_Cursor_1 := My_Map_1.Find (Key => 10);
 
-   if My_Hashed_Maps.Element (Position => My_Cursor_1) /=
-     Value_In_Array (10)
+   if My_Hashed_Maps.Element (Position => My_Cursor_1) /= Value_In_Array (10)
    then
 
       Report.Failed ("Found value not as expected");
@@ -734,8 +726,7 @@ begin
    -- Test Equivalent_Keys (three forms)
 
    if My_Hashed_Maps.Equivalent_Keys
-       (Left  => My_Map_1.First,
-        Right => My_Hashed_Maps.Next (My_Map_1.First))
+       (Left => My_Map_1.First, Right => My_Hashed_Maps.Next (My_Map_1.First))
    then
 
       Report.Failed ("Incorrect Equivalent_Keys (cursors form)");
@@ -752,8 +743,7 @@ begin
    end if;
 
    if not My_Hashed_Maps.Equivalent_Keys
-       (Left  => My_Map_1.First,
-        Right => My_Hashed_Maps.Key (My_Map_1.First))
+       (Left => My_Map_1.First, Right => My_Hashed_Maps.Key (My_Map_1.First))
    then
 
       Report.Failed ("Incorrect Equivalent_Keys (cursor, key form) #2");
@@ -770,8 +760,7 @@ begin
    end if;
 
    if not My_Hashed_Maps.Equivalent_Keys
-       (Left  => My_Hashed_Maps.Key (My_Map_1.First),
-        Right => My_Map_1.First)
+       (Left => My_Hashed_Maps.Key (My_Map_1.First), Right => My_Map_1.First)
    then
 
       Report.Failed ("Incorrect Equivalent_Keys (cursor, key form) #1");

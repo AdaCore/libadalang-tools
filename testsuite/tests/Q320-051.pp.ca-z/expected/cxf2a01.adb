@@ -34,9 +34,7 @@ begin
 
    Micro_Actual :=
      Data.Test_Micro_Ops
-       (0.0,
-        Data.Micro_Optr_Table_Cancel,
-        Data.Micro_Opnd_Table_Cancel);
+       (0.0, Data.Micro_Optr_Table_Cancel, Data.Micro_Opnd_Table_Cancel);
 
    if Micro_Actual /= Micro_Cancel_Expected then
       Report.Failed ("Wrong cancellation result for type Micro");
@@ -46,9 +44,7 @@ begin
 
    Micro_Actual :=
      Data.Test_Micro_Ops
-       (0.0,
-        Data.Micro_Optr_Table_Cumul,
-        Data.Micro_Opnd_Table_Cumul);
+       (0.0, Data.Micro_Optr_Table_Cumul, Data.Micro_Opnd_Table_Cumul);
 
    if Micro_Actual /= Micro_Cumul_Expected then
       Report.Failed ("Wrong cumulation result for type Micro");
@@ -58,9 +54,7 @@ begin
 
    Money_Actual :=
      Data.Test_Money_Ops
-       (0.0,
-        Data.Money_Optr_Table_Cancel,
-        Data.Money_Opnd_Table_Cancel);
+       (0.0, Data.Money_Optr_Table_Cancel, Data.Money_Opnd_Table_Cancel);
 
    if Money_Actual /= Money_Cancel_Expected then
       Report.Failed ("Wrong cancellation result for type Money");
@@ -70,9 +64,7 @@ begin
 
    Money_Actual :=
      Data.Test_Money_Ops
-       (0.0,
-        Data.Money_Optr_Table_Cumul,
-        Data.Money_Opnd_Table_Cumul);
+       (0.0, Data.Money_Optr_Table_Cumul, Data.Money_Opnd_Table_Cumul);
 
    if Money_Actual /= Money_Cumul_Expected then
       Report.Failed ("Wrong cumulation result for type Money");
@@ -82,9 +74,7 @@ begin
 
    Cash_Actual :=
      Data.Test_Cash_Ops
-       (0.0,
-        Data.Cash_Optr_Table_Cancel,
-        Data.Cash_Opnd_Table_Cancel);
+       (0.0, Data.Cash_Optr_Table_Cancel, Data.Cash_Opnd_Table_Cancel);
 
    if Cash_Actual /= Cash_Cancel_Expected then
       Report.Failed ("Wrong cancellation result for type Cash");
@@ -94,9 +84,7 @@ begin
 
    Cash_Actual :=
      Data.Test_Cash_Ops
-       (0.0,
-        Data.Cash_Optr_Table_Cumul,
-        Data.Cash_Opnd_Table_Cumul);
+       (0.0, Data.Cash_Optr_Table_Cumul, Data.Cash_Opnd_Table_Cumul);
 
    if Cash_Actual /= Cash_Cumul_Expected then
       Report.Failed ("Wrong cumulation result for type Cash");
@@ -106,9 +94,7 @@ begin
 
    Broad_Actual :=
      Data.Test_Broad_Ops
-       (0.0,
-        Data.Broad_Optr_Table_Cancel,
-        Data.Broad_Opnd_Table_Cancel);
+       (0.0, Data.Broad_Optr_Table_Cancel, Data.Broad_Opnd_Table_Cancel);
 
    if Broad_Actual /= Broad_Cancel_Expected then
       Report.Failed ("Wrong cancellation result for type Broad");
@@ -118,9 +104,7 @@ begin
 
    Broad_Actual :=
      Data.Test_Broad_Ops
-       (0.0,
-        Data.Broad_Optr_Table_Cumul,
-        Data.Broad_Opnd_Table_Cumul);
+       (0.0, Data.Broad_Optr_Table_Cumul, Data.Broad_Opnd_Table_Cumul);
 
    if Broad_Actual /= Broad_Cumul_Expected then
       Report.Failed ("Wrong cumulation result for type Broad");

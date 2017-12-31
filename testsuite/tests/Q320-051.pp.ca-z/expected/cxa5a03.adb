@@ -241,8 +241,7 @@ begin
 
       -- Check prescribed result from Tan function with Cycle parameter.
 
-      if Gef.Tan (0.0, 360.0) /= 0.0 or
-        Ef.Tan (0.0, Cycle => 360.0) /= 0.0
+      if Gef.Tan (0.0, 360.0) /= 0.0 or Ef.Tan (0.0, Cycle => 360.0) /= 0.0
       then
          Report.Failed
            ("Incorrect result from Tan function with cycle " &
@@ -257,12 +256,10 @@ begin
         not Result_Within_Range (Gef.Tan (115.0, 360.0), -2.145, 0.001) or
         not Result_Within_Range (Ef.Tan (299.0, 360.0), -1.804, 0.001) or
         not Result_Within_Range (Gef.Tan (390.0, 360.0), 0.577, 0.001) or
-        not Result_Within_Range (Ef.Tan (520.0, 360.0), -0.364, 0.001)
-      then
+        not Result_Within_Range (Ef.Tan (520.0, 360.0), -0.364, 0.001) then
          Report.Failed
            ("Incorrect result from the Tan function with " &
-            "cycle parameter, with various input parameter " &
-            "values");
+            "cycle parameter, with various input parameter " & "values");
       end if;
 
       -- Testing of Tanh Function, both instantiated and pre-instantiated

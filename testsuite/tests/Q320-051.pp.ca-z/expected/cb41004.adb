@@ -77,8 +77,7 @@ begin
      ("CB41004",
       "Check that Null_Id and Null_Occurrence actual " &
       "parameters have the appropriate effect when " &
-      "used in calls of the subprograms found in " &
-      "package Ada.Exceptions");
+      "used in calls of the subprograms found in " & "package Ada.Exceptions");
 
    Test_Block :
    declare
@@ -117,8 +116,7 @@ begin
       if not Tc_Flag then
          Report.Failed
            ("Incorrect processing following the call to " &
-            "Reraise_Occurrence with a Null_Occurrence " &
-            "actual parameter");
+            "Reraise_Occurrence with a Null_Occurrence " & "actual parameter");
       end if;
 
       -- Verify that function Exception_Message raises Constraint_Error for a

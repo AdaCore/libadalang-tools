@@ -235,8 +235,7 @@ procedure C74302b is
          "CHECK THAT WHEN THE FULL DECLARATION OF " &
          "A DEFERRED CONSTANT IS GIVEN AS A " &
          "MULTIPLE DECLARATION, THE INITIALIZATION " &
-         "EXPRESSION IS EVALUATED ONCE FOR EACH " &
-         "DEFERRED CONSTANT");
+         "EXPRESSION IS EVALUATED ONCE FOR EACH " & "DEFERRED CONSTANT");
 
       if not Equal (Bump, 36) then
          Failed
@@ -244,81 +243,58 @@ procedure C74302b is
             "DEFERRED CONSTANTS IN A MULIPLE DECLARATION");
       end if;
 
-      if not Int_Equal (I1, 1) or
-        not Int_Equal (I2, 2) or
-        not Int_Equal (I3, 3) or
-        not Int_Equal (I4, 4)
-      then
+      if not Int_Equal (I1, 1) or not Int_Equal (I2, 2) or
+        not Int_Equal (I3, 3) or not Int_Equal (I4, 4) then
          Failed
            ("IMPROPER RESULTS FROM INITIALIZATION OF " &
             "DEFERRED INTEGER CONSTANTS");
       end if;
 
-      if not Enum_Equal (E1, Six) or
-        not Enum_Equal (E2, Seven) or
-        not Enum_Equal (E3, Eight) or
-        not Enum_Equal (E4, Nine)
-      then
+      if not Enum_Equal (E1, Six) or not Enum_Equal (E2, Seven) or
+        not Enum_Equal (E3, Eight) or not Enum_Equal (E4, Nine) then
          Failed
            ("IMPROPER RESULTS FROM INITIALIZATION OF " &
             "DEFERRED ENUMERATION CONSTANTS");
       end if;
 
-      if not Fix_Equal (Fi1, 9.0) or
-        not Fix_Equal (Fi2, 10.0) or
-        not Fix_Equal (Fi3, 11.0) or
-        not Fix_Equal (Fi4, 12.0)
-      then
+      if not Fix_Equal (Fi1, 9.0) or not Fix_Equal (Fi2, 10.0) or
+        not Fix_Equal (Fi3, 11.0) or not Fix_Equal (Fi4, 12.0) then
          Failed
            ("IMPROPER RESULTS FROM INITIALIZATION OF " &
             "DEFERRED FIXED POINT CONSTANTS");
       end if;
 
-      if not Flt_Equal (Fl1, 13.0) or
-        not Flt_Equal (Fl2, 14.0) or
-        not Flt_Equal (Fl3, 15.0) or
-        not Flt_Equal (Fl4, 16.0)
-      then
+      if not Flt_Equal (Fl1, 13.0) or not Flt_Equal (Fl2, 14.0) or
+        not Flt_Equal (Fl3, 15.0) or not Flt_Equal (Fl4, 16.0) then
          Failed
            ("IMPROPER RESULTS FROM INITIALIZATION OF " &
             "DEFERRED FLOATING POINT CONSTANTS");
       end if;
 
-      if not Arr_Equal (Ca1, (17, 16)) or
-        not Arr_Equal (Ca2, (18, 17)) or
-        not Arr_Equal (Ca3, (19, 18)) or
-        not Arr_Equal (Ca4, (20, 19))
-      then
+      if not Arr_Equal (Ca1, (17, 16)) or not Arr_Equal (Ca2, (18, 17)) or
+        not Arr_Equal (Ca3, (19, 18)) or not Arr_Equal (Ca4, (20, 19)) then
          Failed
            ("IMPROPER RESULTS FROM INITIALIZATION OF " &
             "DEFERRED ARRAY CONSTANTS");
       end if;
 
-      if not Rec_Equal (R1, Rec_Obj) or
-        not Rec_Equal (R2, Rec_Obj) or
-        not Rec_Equal (R3, Rec_Obj) or
-        not Rec_Equal (R4, Rec_Obj)
-      then
+      if not Rec_Equal (R1, Rec_Obj) or not Rec_Equal (R2, Rec_Obj) or
+        not Rec_Equal (R3, Rec_Obj) or not Rec_Equal (R4, Rec_Obj) then
          Failed
            ("IMPROPER RESULTS FROM INITIALIZATION OF " &
             "DEFERRED RECORD CONSTANTS");
       end if;
 
-      if not Rec1_Equal (R1a, Rec1_Obj) or
-        not Rec1_Equal (R2a, Rec1_Obj) or
-        not Rec1_Equal (R3a, Rec1_Obj) or
-        not Rec1_Equal (R4a, Rec1_Obj)
-      then
+      if not Rec1_Equal (R1a, Rec1_Obj) or not Rec1_Equal (R2a, Rec1_Obj) or
+        not Rec1_Equal (R3a, Rec1_Obj) or not Rec1_Equal (R4a, Rec1_Obj) then
          Failed
            ("IMPROPER RESULTS FROM INITIALIZATION OF " &
-            "DEFERRED RECORD CONSTANTS WITH DEFAULT " &
-            "EXPRESSIONS");
+            "DEFERRED RECORD CONSTANTS WITH DEFAULT " & "EXPRESSIONS");
       end if;
 
       if not Acc_Equal (A1.all, Avar1.all) or
         not Acc_Equal (A2.all, Avar2.all) or
-        not Acc_Equal (A3.all, Avar3.all) or
-        not Acc_Equal (A4.all, Avar4.all)
+        not Acc_Equal (A3.all, Avar3.all) or not Acc_Equal (A4.all, Avar4.all)
       then
          Failed
            ("IMPROPER RESULTS FROM INITIALIZATION OF " &
@@ -327,8 +303,7 @@ procedure C74302b is
 
       if not Priv_Equal (Pr1, Priv (Cons)) or
         not Priv_Equal (Pr2, Priv (Cons)) or
-        not Priv_Equal (Pr3, Priv (Cons)) or
-        not Priv_Equal (Pr4, Priv (Cons))
+        not Priv_Equal (Pr3, Priv (Cons)) or not Priv_Equal (Pr4, Priv (Cons))
       then
          Failed
            ("IMPROPER RESULTS FROM INITIALIZATION OF " &

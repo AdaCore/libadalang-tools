@@ -88,8 +88,7 @@ begin -- CXD5001
    begin
 
       Report.Test
-        ("CXD5001",
-         "Dynamic Priorities.  " & "Terminated or Null tasks");
+        ("CXD5001", "Dynamic Priorities.  " & "Terminated or Null tasks");
 
       Target_Task.Get_Id (Target_Task_Id);
 

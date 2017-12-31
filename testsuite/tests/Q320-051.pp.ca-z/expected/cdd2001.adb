@@ -56,12 +56,8 @@ begin
             null;
          when E : others =>
             Failed
-              ("Wrong Exception " &
-               Exception_Name (E) &
-               " - " &
-               Exception_Information (E) &
-               " - " &
-               Exception_Message (E) &
+              ("Wrong Exception " & Exception_Name (E) & " - " &
+               Exception_Information (E) & " - " & Exception_Message (E) &
                " - 1");
       end;
 
@@ -100,11 +96,8 @@ begin
             null;
          when E : others =>
             Failed
-              ("Wrong exception " &
-               Exception_Name (E) &
-               " - " &
-               Exception_Message (E) &
-               " - 2");
+              ("Wrong exception " & Exception_Name (E) & " - " &
+               Exception_Message (E) & " - 2");
       end;
 
    end Input;

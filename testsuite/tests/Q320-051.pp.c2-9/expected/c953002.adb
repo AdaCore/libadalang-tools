@@ -110,8 +110,7 @@ begin
          end Start_Protected_Operation;
 
          entry All_Present
-           when E0'Count + E1'Count + E2'Count + E3'Count = Max_Tasks / 2
-           is
+           when E0'Count + E1'Count + E2'Count + E3'Count = Max_Tasks / 2 is
          begin
             null;   -- all tasks are waiting
          end All_Present;
@@ -229,9 +228,7 @@ begin
    if Verbose then
       for I in 1 .. Max_Tasks loop
          Report.Comment
-           ("order" &
-            Integer'Image (I) &
-            " is" &
+           ("order" & Integer'Image (I) & " is" &
             Integer'Image (Note_Order (I)));
       end loop;
    end if;

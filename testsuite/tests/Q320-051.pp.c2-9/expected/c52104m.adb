@@ -110,8 +110,7 @@ begin
          -- CHECKING THE VALUES AFTER THE SLICE ASSIGNMENT:
 
          if Arr82 /= "QBCDE" or
-           Arr82 (Ident_Int (5) .. Ident_Int (9)) /= "QBCDE"
-         then
+           Arr82 (Ident_Int (5) .. Ident_Int (9)) /= "QBCDE" then
             Failed ("LHS ARRAY ALTERED  (8)");
          end if;
 
@@ -154,8 +153,7 @@ begin
          -- CHECKING THE VALUES AFTER THE SLICE ASSIGNMENT:
 
          if Arr92 /= "QUINC" or
-           Arr92 (Ident_Int (5) .. Ident_Int (9)) /= "QUINC"
-         then
+           Arr92 (Ident_Int (5) .. Ident_Int (9)) /= "QUINC" then
             Failed ("LHS VALUE ALTERED  (9)");
          end if;
 

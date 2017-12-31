@@ -61,8 +61,7 @@ begin
       -- 01a function "<" (Left, Right: Time_Span) Return Boolean;
       if not Art."<" (Art.Time_Span_First, Art.Time_Span_Last) or
         Art."<" (Art.Time_Span_First, Art.Time_Span_First) or
-        Art."<" (Art.Time_Span_Last, Art.Time_Span_First)
-      then
+        Art."<" (Art.Time_Span_Last, Art.Time_Span_First) then
 
          Report.Failed ("Test 01a failed");
       else
@@ -72,8 +71,7 @@ begin
       -- 01b function "<=" (Left, Right: Time_Span) Return Boolean;
       if not Art."<=" (Art.Time_Span_First, Art.Time_Span_First) or
         not Art."<=" (Art.Time_Span_First, Art.Time_Span_Last) or
-        Art."<=" (Art.Time_Span_Last, Art.Time_Span_First)
-      then
+        Art."<=" (Art.Time_Span_Last, Art.Time_Span_First) then
 
          Report.Failed ("Test 01b failed");
       else
@@ -83,8 +81,7 @@ begin
       -- 01c function ">" (Left, Right: Time_Span) Return Boolean;
       if not Art.">" (Art.Time_Span_Last, Art.Time_Span_First) or
         Art.">" (Art.Time_Span_Last, Art.Time_Span_Last) or
-        Art.">" (Art.Time_Span_First, Art.Time_Span_Last)
-      then
+        Art.">" (Art.Time_Span_First, Art.Time_Span_Last) then
 
          Report.Failed ("Test 01c failed");
       else
@@ -94,8 +91,7 @@ begin
       -- 01d function ">=" (Left, Right: Time_Span) Return Boolean;
       if not Art.">=" (Art.Time_Span_Last, Art.Time_Span_Last) or
         not Art.">=" (Art.Time_Span_Last, Art.Time_Span_First) or
-        Art.">=" (Art.Time_Span_First, Art.Time_Span_Last)
-      then
+        Art.">=" (Art.Time_Span_First, Art.Time_Span_Last) then
 
          Report.Failed ("Test 01d failed");
       else
@@ -116,8 +112,7 @@ begin
       -- 02a function "<" (Left, Right: Time) Return Boolean;
       if not Art."<" (Art.Time_First, Art.Time_Last) or
         Art."<" (Art.Time_First, Art.Time_First) or
-        Art."<" (Art.Time_Last, Art.Time_First)
-      then
+        Art."<" (Art.Time_Last, Art.Time_First) then
 
          Report.Failed ("Test 02a failed");
       else
@@ -127,8 +122,7 @@ begin
       -- 02b function "<=" (Left, Right: Time) Return Boolean;
       if not Art."<=" (Art.Time_First, Art.Time_First) or
         not Art."<=" (Art.Time_First, Art.Time_Last) or
-        Art."<=" (Art.Time_Last, Art.Time_First)
-      then
+        Art."<=" (Art.Time_Last, Art.Time_First) then
 
          Report.Failed ("Test 02b failed");
       else
@@ -138,8 +132,7 @@ begin
       -- 02c function ">" (Left, Right: Time) Return Boolean;
       if not Art.">" (Art.Time_Last, Art.Time_First) or
         Art.">" (Art.Time_Last, Art.Time_Last) or
-        Art.">" (Art.Time_First, Art.Time_Last)
-      then
+        Art.">" (Art.Time_First, Art.Time_Last) then
 
          Report.Failed ("Test 02c failed");
       else
@@ -149,8 +142,7 @@ begin
       -- 02d function ">=" (Left, Right: Time) Return Boolean;
       if not Art.">=" (Art.Time_Last, Art.Time_Last) or
         not Art.">=" (Art.Time_Last, Art.Time_First) or
-        Art.">=" (Art.Time_First, Art.Time_Last)
-      then
+        Art.">=" (Art.Time_First, Art.Time_Last) then
 
          Report.Failed ("Test 02d failed");
       else

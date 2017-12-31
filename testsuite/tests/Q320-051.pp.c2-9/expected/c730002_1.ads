@@ -12,9 +12,8 @@ package C730002_1 is
 
    type Diesel_Series is new T with private;
 
-   procedure Routine_Maintenance
-     (Eng      : in out Diesel_Series;
-      Spec_Req : in     Specialist_Id := Jack);
+   procedure Routine_Maintenance (Eng : in out Diesel_Series;
+      Spec_Req                        : in     Specialist_Id := Jack);
 
    -- Other diesel specific operations... (not required in this test).
 

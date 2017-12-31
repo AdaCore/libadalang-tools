@@ -255,8 +255,7 @@ begin
               Compose_From_Cartesian (-1.0, +0.0);
             Minus_One_With_Neg_Zero_Im_Component : Complex :=
               Compose_From_Cartesian
-                (-1.0,
-                 Real_Type (Impdef.Annex_G.Negative_Zero));
+                (-1.0, Real_Type (Impdef.Annex_G.Negative_Zero));
          begin
 
             if Sqrt (Minus_One_With_Pos_Zero_Im_Component) /= Plus_I then
@@ -283,8 +282,7 @@ begin
          if Sqrt (Minus_One) /= Plus_I then
             Report.Failed
               ("Incorrect result from Function Sqrt, when " &
-               "input value is minus one, Signed_Zeros being " &
-               "False");
+               "input value is minus one, Signed_Zeros being " & "False");
          end if;
 
       end if;
@@ -331,12 +329,10 @@ begin
       -- Check that exponentiation by a zero exponent yields the value one.
 
       if "**"
-          (Left  => Compose_From_Cartesian (5.0, 3.0),
-           Right => Complex_Zero) /=
+          (Left => Compose_From_Cartesian (5.0, 3.0), Right => Complex_Zero) /=
         Plus_One or
         Complex_Negative_Real**0.0 /= Plus_One or
-        15.0**Complex_Zero /= Plus_One
-      then
+        15.0**Complex_Zero /= Plus_One then
          Report.Failed
            ("Incorrect result from exponentiation with a zero " & "exponent");
       end if;
@@ -347,8 +343,7 @@ begin
 
       if "**" (Complex_Negative_Real, Plus_One) /= Complex_Negative_Real or
         Complex_Negative_Imaginary**Plus_One /= Complex_Negative_Imaginary or
-        4.0**Plus_One /= Compose_From_Cartesian (4.0, 0.0)
-      then
+        4.0**Plus_One /= Compose_From_Cartesian (4.0, 0.0) then
          Report.Failed
            ("Incorrect result from exponentiation with a unit " & "exponent");
       end if;
@@ -356,8 +351,7 @@ begin
       -- Check that exponentiation of the value one yields the value one.
 
       if "**" (Plus_One, Complex_Negative_Imaginary) /= Plus_One or
-        Plus_One**9.0 /= Plus_One or
-        1.0**Complex_Negative_Real /= Plus_One
+        Plus_One**9.0 /= Plus_One or 1.0**Complex_Negative_Real /= Plus_One
       then
          Report.Failed
            ("Incorrect result from exponentiation of the value " & "One");
@@ -368,8 +362,7 @@ begin
          if not A_Zero_Result
              ("**" (Complex_Zero, Complex_Positive_Imaginary)) or
            not A_Zero_Result (Complex_Zero**4.0) or
-           not A_Zero_Result (0.0**Complex_Positive_Real)
-         then
+           not A_Zero_Result (0.0**Complex_Positive_Real) then
             Report.Failed
               ("Incorrect result from exponentiation of the " & "value zero");
          end if;

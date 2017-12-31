@@ -33,11 +33,9 @@ begin
       when Constraint_Error =>
          Report.Comment ("Ancestor expression is an aggregate");
          Report.Failed
-           ("Aggregate of extension " &
-            "with discriminant constrained: " &
+           ("Aggregate of extension " & "with discriminant constrained: " &
             "Constraint_Error was incorrectly raised " &
-            "for value that matches corresponding " &
-            "discriminant");
+            "for value that matches corresponding " & "discriminant");
    end Cd_Matched_Aggregate;
 
    Cd_Matched_Variable :
@@ -55,11 +53,9 @@ begin
       when Constraint_Error =>
          Report.Comment ("Ancestor expression is a variable");
          Report.Failed
-           ("Aggregate of extension " &
-            "with discriminant constrained: " &
+           ("Aggregate of extension " & "with discriminant constrained: " &
             "Constraint_Error was incorrectly raised " &
-            "for value that matches corresponding " &
-            "discriminant");
+            "for value that matches corresponding " & "discriminant");
    end Cd_Matched_Variable;
 
    -- Unsuccessful cases - value does not match value of corresponding
@@ -75,8 +71,7 @@ begin
       begin
          Report.Comment ("Ancestor expression is an aggregate");
          Report.Failed
-           ("Aggregate of extension " &
-            "with discriminant constrained: " &
+           ("Aggregate of extension " & "with discriminant constrained: " &
             "Constraint_Error was not raised " &
             "for discriminant value that does not match " &
             "corresponding discriminant");
@@ -98,8 +93,7 @@ begin
       begin
          Report.Comment ("Ancestor expression is an variable");
          Report.Failed
-           ("Aggregate of extension " &
-            "with discriminant constrained: " &
+           ("Aggregate of extension " & "with discriminant constrained: " &
             "Constraint_Error was not raised " &
             "for discriminant value that does not match " &
             "corresponding discriminant");
@@ -120,8 +114,7 @@ begin
    begin
       declare
          Nd : C432002_0.New_Discriminant_Extension (N => 8) :=
-           (C432002_0.Discriminant'(L => 8, S1 => String_8) with
-            N  => 8,
+           (C432002_0.Discriminant'(L => 8, S1 => String_8) with N => 8,
             S2 => String_8);
       begin
          C432002_0.Do_Something (Nd); -- success
@@ -130,11 +123,9 @@ begin
       when Constraint_Error =>
          Report.Comment ("Ancestor expression is an aggregate");
          Report.Failed
-           ("Aggregate of extension " &
-            "with new discriminant: " &
+           ("Aggregate of extension " & "with new discriminant: " &
             "Constraint_Error was incorrectly raised " &
-            "for value that matches corresponding " &
-            "discriminant");
+            "for value that matches corresponding " & "discriminant");
    end Nd_Matched_Aggregate;
 
    Nd_Matched_Variable :
@@ -152,11 +143,9 @@ begin
       when Constraint_Error =>
          Report.Comment ("Ancestor expression is an variable");
          Report.Failed
-           ("Aggregate of extension " &
-            "with new discriminant: " &
+           ("Aggregate of extension " & "with new discriminant: " &
             "Constraint_Error was incorrectly raised " &
-            "for value that matches corresponding " &
-            "discriminant");
+            "for value that matches corresponding " & "discriminant");
    end Nd_Matched_Variable;
 
    -- Unsuccessful cases - value does not match value of corresponding
@@ -167,14 +156,12 @@ begin
    begin
       declare
          Nd : C432002_0.New_Discriminant_Extension (N => 20) :=
-           (C432002_0.Discriminant'(L => 11, S1 => String_11) with
-            N  => 20,
+           (C432002_0.Discriminant'(L => 11, S1 => String_11) with N => 20,
             S2 => String_20);
       begin
          Report.Comment ("Ancestor expression is an aggregate");
          Report.Failed
-           ("Aggregate of extension " &
-            "with new discriminant: " &
+           ("Aggregate of extension " & "with new discriminant: " &
             "Constraint_Error was not raised " &
             "for discriminant value that does not match " &
             "corresponding discriminant");
@@ -196,8 +183,7 @@ begin
       begin
          Report.Comment ("Ancestor expression is an variable");
          Report.Failed
-           ("Aggregate of extension " &
-            "with new discriminant: " &
+           ("Aggregate of extension " & "with new discriminant: " &
             "Constraint_Error was not raised " &
             "for discriminant value that does not match " &
             "corresponding discriminant");
@@ -219,10 +205,8 @@ begin
    begin
       declare
          Ce : C432002_0.Constrained_Extension_Extension :=
-           (C432002_0.Discriminant'(L => 20, S1 => String_20) with
-            N  => 20,
-            S2 => String_20,
-            S3 => String_5);
+           (C432002_0.Discriminant'(L => 20, S1 => String_20) with N => 20,
+            S2 => String_20, S3 => String_5);
       begin
          C432002_0.Do_Something (Ce); -- success
       end;
@@ -233,8 +217,7 @@ begin
            ("Aggregate of extension (of extension) " &
             "with discriminant constrained: " &
             "Constraint_Error was incorrectly raised " &
-            "for value that matches corresponding " &
-            "discriminant");
+            "for value that matches corresponding " & "discriminant");
    end Ce_Matched_Aggregate;
 
    Ce_Matched_Variable :
@@ -256,8 +239,7 @@ begin
            ("Aggregate of extension (of extension) " &
             "with discriminant constrained: " &
             "Constraint_Error was incorrectly raised " &
-            "for value that matches corresponding " &
-            "discriminant");
+            "for value that matches corresponding " & "discriminant");
    end Ce_Matched_Variable;
 
    -- Unsuccessful cases - value does not match value of corresponding
@@ -320,10 +302,8 @@ begin
    begin
       declare
          Ne : C432002_0.New_Extension_Extension (I => 8) :=
-           (C432002_0.Discriminant'(L => 8, S1 => String_8) with
-            I  => 8,
-            S2 => String_8,
-            S3 => String_8);
+           (C432002_0.Discriminant'(L => 8, S1 => String_8) with I => 8,
+            S2 => String_8, S3 => String_8);
       begin
          C432002_0.Do_Something (Ne); -- success
       end;
@@ -334,8 +314,7 @@ begin
            ("Aggregate of extension (of extension) " &
             "with new discriminant: " &
             "Constraint_Error was incorrectly raised " &
-            "for value that matches corresponding " &
-            "discriminant");
+            "for value that matches corresponding " & "discriminant");
    end Ne_Matched_Aggregate;
 
    Ne_Matched_Variable :
@@ -357,8 +336,7 @@ begin
            ("Aggregate of extension (of extension) " &
             "with new discriminant: " &
             "Constraint_Error was incorrectly raised " &
-            "for value that matches corresponding " &
-            "discriminant");
+            "for value that matches corresponding " & "discriminant");
    end Ne_Matched_Variable;
 
    -- Unsuccessful cases - value does not match value of corresponding
@@ -370,17 +348,14 @@ begin
       declare
          Ne : C432002_0.New_Extension_Extension (I => 8) :=
            (C432002_0.New_Discriminant_Extension'
-              (C432002_0.Discriminant'(L => 11, S1 => String_11) with
-               N  => 11,
+              (C432002_0.Discriminant'(L => 11, S1 => String_11) with N => 11,
                S2 => String_11) with
-            I  => 8,
-            S3 => String_8);
+            I => 8, S3 => String_8);
       begin
          Report.Comment ("Ancestor expression is an extension aggregate");
          Report.Failed
            ("Aggregate of extension (of extension) " &
-            "with new discriminant: " &
-            "Constraint_Error was not raised " &
+            "with new discriminant: " & "Constraint_Error was not raised " &
             "for discriminant value that does not match " &
             "corresponding discriminant");
          C432002_0.Do_Something (Ne); -- disallow unused var optimization
@@ -402,8 +377,7 @@ begin
          Report.Comment ("Ancestor expression is a variable");
          Report.Failed
            ("Aggregate of extension (of extension) " &
-            "with new discriminant: " &
-            "Constraint_Error was not raised " &
+            "with new discriminant: " & "Constraint_Error was not raised " &
             "for discriminant value that does not match " &
             "corresponding discriminant");
          C432002_0.Do_Something (Ne); -- disallow unused var optimization
@@ -441,8 +415,7 @@ begin
            ("Aggregate of far-removed extension " &
             "with discriminant constrained: " &
             "Constraint_Error was incorrectly raised " &
-            "for value that matches corresponding " &
-            "discriminant");
+            "for value that matches corresponding " & "discriminant");
    end Tr_Matched_Variable;
 
    -- Unsuccessful case - value does not match value of corresponding
@@ -495,11 +468,9 @@ begin
    exception
       when Constraint_Error =>
          Report.Failed
-           ("Aggregate of extension " &
-            "of multiply-discriminated parent: " &
+           ("Aggregate of extension " & "of multiply-discriminated parent: " &
             "Constraint_Error was incorrectly raised " &
-            "for value that matches corresponding " &
-            "discriminant");
+            "for value that matches corresponding " & "discriminant");
    end Md_Matched_Variable;
 
    -- Unsuccessful case - value does not match value of corresponding
@@ -517,8 +488,7 @@ begin
 
       begin
          Report.Failed
-           ("Aggregate of extension " &
-            "of multiply-discriminated parent: " &
+           ("Aggregate of extension " & "of multiply-discriminated parent: " &
             "Constraint_Error was not raised " &
             "for discriminant value that does not match " &
             "corresponding discriminant");

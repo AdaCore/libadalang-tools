@@ -38,8 +38,7 @@ begin
    Test
      ("C43107A",
       "CHECK THAT AN EXPRESSION WITH MORE THAN ONE " &
-      "RECORD COMPONENT IS EVALUATED ONCE FOR EACH " &
-      "ASSOCIATED COMPONENT");
+      "RECORD COMPONENT IS EVALUATED ONCE FOR EACH " & "ASSOCIATED COMPONENT");
 
    begin
 
@@ -78,12 +77,8 @@ begin
               ("CASE A : INCORRECT NUMBER OF EVALUATIONS" &
                " OF RECORD ASSOCIATED COMPONENTS");
          end if;
-         if A1.A /= (-1, -2) or
-           A1.C /= (-1, -2) or
-           A1.B /= -2 or
-           A1.D /= -2 or
-           A1.E /= -2
-         then
+         if A1.A /= (-1, -2) or A1.C /= (-1, -2) or A1.B /= -2 or A1.D /= -2 or
+           A1.E /= -2 then
             Failed ("CASE A : INCORRECT VALUES IN RECORD");
          end if;
 
@@ -118,13 +113,8 @@ begin
               ("CASE B : INCORRECT NUMBER OF EVALUATION" &
                " OF RECORD ASSOCIATED COMPONENTS");
          end if;
-         if B1.B /= 2 or
-           B1.D /= 2 or
-           B1.E /= 2 or
-           B1.A = null or
-           B1.C = null or
-           B1.A = B1.C
-         then
+         if B1.B /= 2 or B1.D /= 2 or B1.E /= 2 or B1.A = null or
+           B1.C = null or B1.A = B1.C then
             Failed ("CASE B : INCORRECT VALUES IN RECORD");
          end if;
 

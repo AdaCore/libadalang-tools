@@ -73,8 +73,7 @@ begin
       "CHECK THAT A TASK THAT IS DECLARED IN A " &
       "NON-LIBRARY PACKAGE (SPECIFICATION OR BODY) " &
       "DOES NOT ""DEPEND"" ON THE PACKAGE, BUT ON " &
-      "THE INNERMOST ENCLOSING BLOCK, SUBPROGRAM " &
-      "BODY, OR TASK BODY");
+      "THE INNERMOST ENCLOSING BLOCK, SUBPROGRAM " & "BODY, OR TASK BODY");
 
    --------------------------------------------------
 

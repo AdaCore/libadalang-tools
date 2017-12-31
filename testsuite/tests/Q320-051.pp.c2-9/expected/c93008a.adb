@@ -100,8 +100,7 @@ begin
       else
          Failed
            ("TASKS NOT ACTIVATED PROPERLY - SPYNUMB HAS " &
-            "ACTUAL VALUE OF: " &
-            Integer'Image (Spynumb));
+            "ACTUAL VALUE OF: " & Integer'Image (Spynumb));
       end if;
    end Block;
 

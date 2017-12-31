@@ -98,8 +98,7 @@ begin
             when others =>
                Failed
                  ("WRONG EXCEPTION RAISED; WIDTH " &
-                  "GREATER THAN FIELD'LAST + 1 " &
-                  "- DEFAULT");
+                  "GREATER THAN FIELD'LAST + 1 " & "- DEFAULT");
          end;
 
       end if;

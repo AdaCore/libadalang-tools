@@ -71,11 +71,8 @@ begin
          null;
       when E : others =>
          Failed
-           ("Exception " &
-            Exception_Name (E) &
-            " raised - " &
-            Exception_Information (E) &
-            " - 1");
+           ("Exception " & Exception_Name (E) & " raised - " &
+            Exception_Information (E) & " - 1");
    end;
 
    declare
@@ -91,11 +88,8 @@ begin
          null;
       when E : others =>
          Failed
-           ("Exception " &
-            Exception_Name (E) &
-            " raised - " &
-            Exception_Information (E) &
-            " - 2");
+           ("Exception " & Exception_Name (E) & " raised - " &
+            Exception_Information (E) & " - 2");
    end;
 
    begin
@@ -111,11 +105,8 @@ begin
          null;
       when E : others =>
          Failed
-           ("Exception " &
-            Exception_Name (E) &
-            " raised - " &
-            Exception_Information (E) &
-            " - 3");
+           ("Exception " & Exception_Name (E) & " raised - " &
+            Exception_Information (E) & " - 3");
    end;
 
    declare
@@ -131,11 +122,8 @@ begin
          null;
       when E : others =>
          Failed
-           ("Exception " &
-            Exception_Name (E) &
-            " raised - " &
-            Exception_Information (E) &
-            " - 4");
+           ("Exception " & Exception_Name (E) & " raised - " &
+            Exception_Information (E) & " - 4");
    end;
 
    Result;

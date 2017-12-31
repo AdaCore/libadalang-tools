@@ -102,8 +102,7 @@ package C3a1002_0 is
       entry Read_Disc (P : out Enu_Type);        -- explicit discriminant
    end Incomplete5;
 
-   task type Incomplete6
-     (D6 : Small_Int := 4)
+   task type Incomplete6 (D6 : Small_Int := 4)
    is                    -- unknown discriminant/
       entry Read_Int (P : out Small_Int);        -- explicit discriminant
    end Incomplete6;

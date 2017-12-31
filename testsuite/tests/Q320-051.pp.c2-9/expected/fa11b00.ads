@@ -55,8 +55,7 @@ package Fa11b00 is          -- Application_One_Widget
    end record;
 
    -- NOTE : not a tagged record.
-   type App1_Widget
-     (Maximum_Size : Pixels := Pixels'Last)
+   type App1_Widget (Maximum_Size : Pixels := Pixels'Last)
    is record          -- Parent type
       Size     : Widget_Size       := (Maximum_Size, Maximum_Size);
       Id       : Widget_Id         := 1;
@@ -67,10 +66,7 @@ package Fa11b00 is          -- Application_One_Widget
 
    -- Primitive operation of type Widget. To be inherited by its children
    -- derivatives.
-   procedure App1_Widget_Specific_Oper
-     (The_Widget : in out App1_Widget;
-      I          : in     Widget_Id;
-      C          : in     Widget_Color_Enum;
-      L          : in     Widget_Label_Str);
+   procedure App1_Widget_Specific_Oper (The_Widget : in out App1_Widget;
+      I : in     Widget_Id; C : in Widget_Color_Enum; L : in Widget_Label_Str);
 
 end Fa11b00;                -- Application_One_Widget

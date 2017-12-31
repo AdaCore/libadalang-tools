@@ -62,8 +62,7 @@ begin
          when Use_Error =>
             Not_Applicable
               ("USE_ERROR RAISED; TEXT CREATE " &
-               "FOR TEMP FILE WITH OUT_FILE " &
-               "MODE");
+               "FOR TEMP FILE WITH OUT_FILE " & "MODE");
             raise Incomplete;
          when others =>
             Failed ("UNEXPECTED EXCEPTION RAISED; TEXT CREATE");

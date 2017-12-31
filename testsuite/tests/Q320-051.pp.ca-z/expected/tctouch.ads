@@ -109,19 +109,12 @@ package Tctouch is
    procedure Assert_Not (Sb_False : Boolean; Message : String);
 
    procedure Touch (A_Tag : Character);
-   procedure Validate
-     (Expected         : String;
-      Message          : String;
-      Order_Meaningful : Boolean := True);
+   procedure Validate (Expected : String; Message : String;
+      Order_Meaningful          : Boolean := True);
 
-   procedure Validate_One_Of
-     (Expected_1 : String;
-      Expected_2 : String;
-      Expected_3 : String := "";
-      Expected_4 : String := "";
-      Expected_5 : String := "";
-      Expected_6 : String := "";
-      Message    : String);
+   procedure Validate_One_Of (Expected_1 : String; Expected_2 : String;
+      Expected_3 : String := ""; Expected_4 : String := "";
+      Expected_5 : String := ""; Expected_6 : String := ""; Message : String);
    -- OK if any of the expected strings is found. If the null string is a
    -- legitimate result, it must be given first.
 
@@ -130,9 +123,8 @@ package Tctouch is
    type Special_Needs_Annexes is
      (Annex_C, Annex_D, Annex_E, Annex_F, Annex_G, Annex_H);
 
-   procedure Implementation_Check
-     (Message : in String;
-      Annex   : in Special_Needs_Annexes := Annex_C);
+   procedure Implementation_Check (Message : in String;
+      Annex : in Special_Needs_Annexes := Annex_C);
    -- If Impdef.Validating_Annex_<Annex> is true, will call Report.Failed
    -- otherwise will call Report.Not_Applicable. This is to allow tests
    -- which are driven by wording in the core of the language, yet have their

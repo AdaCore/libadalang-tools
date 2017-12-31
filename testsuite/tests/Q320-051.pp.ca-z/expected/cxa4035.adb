@@ -241,9 +241,7 @@ begin
 
    -- Check matching strings of same length
 
-   if not Ada.Strings.Fixed.Equal_Case_Insensitive
-       (Lc_String_1,
-        Tc_String_1)
+   if not Ada.Strings.Fixed.Equal_Case_Insensitive (Lc_String_1, Tc_String_1)
    then
 
       Report.Failed
@@ -252,9 +250,7 @@ begin
 
    end if;
 
-   if not Ada.Strings.Fixed.Equal_Case_Insensitive
-       (Lc_String_1,
-        Uc_String_1)
+   if not Ada.Strings.Fixed.Equal_Case_Insensitive (Lc_String_1, Uc_String_1)
    then
 
       Report.Failed
@@ -263,9 +259,7 @@ begin
 
    end if;
 
-   if not Ada.Strings.Fixed.Equal_Case_Insensitive
-       (Tc_String_1,
-        Uc_String_1)
+   if not Ada.Strings.Fixed.Equal_Case_Insensitive (Tc_String_1, Uc_String_1)
    then
 
       Report.Failed
@@ -331,9 +325,7 @@ begin
    -- Check matching strings of same length
 
    if not Bounded_6_Equal_Case_Insensitive
-       (Lc_Bounded_String_1,
-        Tc_Bounded_String_1)
-   then
+       (Lc_Bounded_String_1, Tc_Bounded_String_1) then
 
       Report.Failed
         ("Incorrect operation of function Bounded.Equal_Case_Insensitive LC" &
@@ -342,9 +334,7 @@ begin
    end if;
 
    if not Bounded_6_Equal_Case_Insensitive
-       (Lc_Bounded_String_1,
-        Uc_Bounded_String_1)
-   then
+       (Lc_Bounded_String_1, Uc_Bounded_String_1) then
 
       Report.Failed
         ("Incorrect operation of function Bounded.Equal_Case_Insensitive LC" &
@@ -353,9 +343,7 @@ begin
    end if;
 
    if not Bounded_6_Equal_Case_Insensitive
-       (Tc_Bounded_String_1,
-        Uc_Bounded_String_1)
-   then
+       (Tc_Bounded_String_1, Uc_Bounded_String_1) then
 
       Report.Failed
         ("Incorrect operation of function Bounded.Equal_Case_Insensitive TC" &
@@ -366,9 +354,7 @@ begin
    -- Check non-matching strings of same length
 
    if Bounded_6_Equal_Case_Insensitive
-       (Lc_Bounded_String_1,
-        Lc_Bounded_String_2)
-   then
+       (Lc_Bounded_String_1, Lc_Bounded_String_2) then
 
       Report.Failed
         ("Incorrect operation of function Bounded.Equal_Case_Insensitive LC" &
@@ -377,9 +363,7 @@ begin
    end if;
 
    if Bounded_6_Equal_Case_Insensitive
-       (Tc_Bounded_String_1,
-        Tc_Bounded_String_2)
-   then
+       (Tc_Bounded_String_1, Tc_Bounded_String_2) then
 
       Report.Failed
         ("Incorrect operation of function Bounded.Equal_Case_Insensitive TC" &
@@ -388,9 +372,7 @@ begin
    end if;
 
    if Bounded_6_Equal_Case_Insensitive
-       (Uc_Bounded_String_1,
-        Uc_Bounded_String_2)
-   then
+       (Uc_Bounded_String_1, Uc_Bounded_String_2) then
 
       Report.Failed
         ("Incorrect operation of function Bounded.Equal_Case_Insensitive UC" &
@@ -401,9 +383,7 @@ begin
    -- Check part-matching strings of different lengths
 
    if Bounded_6_Equal_Case_Insensitive
-       (Lc_Bounded_String_1,
-        Lc_Bounded_String_3)
-   then
+       (Lc_Bounded_String_1, Lc_Bounded_String_3) then
 
       Report.Failed
         ("Incorrect operation of function Bounded.Equal_Case_Insensitive LC" &
@@ -412,9 +392,7 @@ begin
    end if;
 
    if Bounded_6_Equal_Case_Insensitive
-       (Tc_Bounded_String_1,
-        Tc_Bounded_String_3)
-   then
+       (Tc_Bounded_String_1, Tc_Bounded_String_3) then
 
       Report.Failed
         ("Incorrect operation of function Bounded.Equal_Case_Insensitive TC" &
@@ -423,9 +401,7 @@ begin
    end if;
 
    if Bounded_6_Equal_Case_Insensitive
-       (Uc_Bounded_String_1,
-        Uc_Bounded_String_3)
-   then
+       (Uc_Bounded_String_1, Uc_Bounded_String_3) then
 
       Report.Failed
         ("Incorrect operation of function Bounded.Equal_Case_Insensitive UC" &
@@ -438,9 +414,7 @@ begin
    -- Check matching strings of same length
 
    if not Ada.Strings.Unbounded.Equal_Case_Insensitive
-       (Lc_Unbounded_String_1,
-        Tc_Unbounded_String_1)
-   then
+       (Lc_Unbounded_String_1, Tc_Unbounded_String_1) then
 
       Report.Failed
         ("Incorrect operation of function Unbounded.Equal_Case_Insensitive LC" &
@@ -449,9 +423,7 @@ begin
    end if;
 
    if not Ada.Strings.Unbounded.Equal_Case_Insensitive
-       (Lc_Unbounded_String_1,
-        Uc_Unbounded_String_1)
-   then
+       (Lc_Unbounded_String_1, Uc_Unbounded_String_1) then
 
       Report.Failed
         ("Incorrect operation of function Unbounded.Equal_Case_Insensitive LC" &
@@ -460,9 +432,7 @@ begin
    end if;
 
    if not Ada.Strings.Unbounded.Equal_Case_Insensitive
-       (Tc_Unbounded_String_1,
-        Uc_Unbounded_String_1)
-   then
+       (Tc_Unbounded_String_1, Uc_Unbounded_String_1) then
 
       Report.Failed
         ("Incorrect operation of function Unbounded.Equal_Case_Insensitive TC" &
@@ -473,9 +443,7 @@ begin
    -- Check non-matching strings of same length
 
    if Ada.Strings.Unbounded.Equal_Case_Insensitive
-       (Lc_Unbounded_String_1,
-        Lc_Unbounded_String_2)
-   then
+       (Lc_Unbounded_String_1, Lc_Unbounded_String_2) then
 
       Report.Failed
         ("Incorrect operation of function Unbounded.Equal_Case_Insensitive LC" &
@@ -484,9 +452,7 @@ begin
    end if;
 
    if Ada.Strings.Unbounded.Equal_Case_Insensitive
-       (Tc_Unbounded_String_1,
-        Tc_Unbounded_String_2)
-   then
+       (Tc_Unbounded_String_1, Tc_Unbounded_String_2) then
 
       Report.Failed
         ("Incorrect operation of function Unbounded.Equal_Case_Insensitive TC" &
@@ -495,9 +461,7 @@ begin
    end if;
 
    if Ada.Strings.Unbounded.Equal_Case_Insensitive
-       (Uc_Unbounded_String_1,
-        Uc_Unbounded_String_2)
-   then
+       (Uc_Unbounded_String_1, Uc_Unbounded_String_2) then
 
       Report.Failed
         ("Incorrect operation of function Unbounded.Equal_Case_Insensitive UC" &
@@ -508,9 +472,7 @@ begin
    -- Check part-matching strings of different lengths
 
    if Ada.Strings.Unbounded.Equal_Case_Insensitive
-       (Lc_Unbounded_String_1,
-        Lc_Unbounded_String_3)
-   then
+       (Lc_Unbounded_String_1, Lc_Unbounded_String_3) then
 
       Report.Failed
         ("Incorrect operation of function Unbounded.Equal_Case_Insensitive LC" &
@@ -519,9 +481,7 @@ begin
    end if;
 
    if Ada.Strings.Unbounded.Equal_Case_Insensitive
-       (Tc_Unbounded_String_1,
-        Tc_Unbounded_String_3)
-   then
+       (Tc_Unbounded_String_1, Tc_Unbounded_String_3) then
 
       Report.Failed
         ("Incorrect operation of function Unbounded.Equal_Case_Insensitive TC" &
@@ -530,9 +490,7 @@ begin
    end if;
 
    if Ada.Strings.Unbounded.Equal_Case_Insensitive
-       (Uc_Unbounded_String_1,
-        Uc_Unbounded_String_3)
-   then
+       (Uc_Unbounded_String_1, Uc_Unbounded_String_3) then
 
       Report.Failed
         ("Incorrect operation of function Unbounded.Equal_Case_Insensitive UC" &
@@ -652,9 +610,7 @@ begin
 
    -- Check non-matching strings of same length
 
-   if not Ada.Strings.Fixed.Less_Case_Insensitive
-       (Lc_String_1,
-        Lc_String_2)
+   if not Ada.Strings.Fixed.Less_Case_Insensitive (Lc_String_1, Lc_String_2)
    then
 
       Report.Failed
@@ -663,9 +619,7 @@ begin
 
    end if;
 
-   if not Ada.Strings.Fixed.Less_Case_Insensitive
-       (Tc_String_1,
-        Tc_String_2)
+   if not Ada.Strings.Fixed.Less_Case_Insensitive (Tc_String_1, Tc_String_2)
    then
 
       Report.Failed
@@ -674,9 +628,7 @@ begin
 
    end if;
 
-   if not Ada.Strings.Fixed.Less_Case_Insensitive
-       (Uc_String_1,
-        Uc_String_2)
+   if not Ada.Strings.Fixed.Less_Case_Insensitive (Uc_String_1, Uc_String_2)
    then
 
       Report.Failed
@@ -687,9 +639,7 @@ begin
 
    -- Check part-matching strings of different lengths
 
-   if not Ada.Strings.Fixed.Less_Case_Insensitive
-       (Lc_String_1,
-        Lc_String_3)
+   if not Ada.Strings.Fixed.Less_Case_Insensitive (Lc_String_1, Lc_String_3)
    then
 
       Report.Failed
@@ -698,9 +648,7 @@ begin
 
    end if;
 
-   if not Ada.Strings.Fixed.Less_Case_Insensitive
-       (Tc_String_1,
-        Tc_String_3)
+   if not Ada.Strings.Fixed.Less_Case_Insensitive (Tc_String_1, Tc_String_3)
    then
 
       Report.Failed
@@ -709,9 +657,7 @@ begin
 
    end if;
 
-   if not Ada.Strings.Fixed.Less_Case_Insensitive
-       (Uc_String_1,
-        Uc_String_3)
+   if not Ada.Strings.Fixed.Less_Case_Insensitive (Uc_String_1, Uc_String_3)
    then
 
       Report.Failed
@@ -725,9 +671,7 @@ begin
    -- Check matching strings of same length
 
    if Bounded_6_Less_Case_Insensitive
-       (Lc_Bounded_String_1,
-        Tc_Bounded_String_1)
-   then
+       (Lc_Bounded_String_1, Tc_Bounded_String_1) then
 
       Report.Failed
         ("Incorrect operation of function Bounded.Less_Case_Insensitive LC" &
@@ -736,9 +680,7 @@ begin
    end if;
 
    if Bounded_6_Less_Case_Insensitive
-       (Lc_Bounded_String_1,
-        Uc_Bounded_String_1)
-   then
+       (Lc_Bounded_String_1, Uc_Bounded_String_1) then
 
       Report.Failed
         ("Incorrect operation of function Bounded.Less_Case_Insensitive LC" &
@@ -747,9 +689,7 @@ begin
    end if;
 
    if Bounded_6_Less_Case_Insensitive
-       (Tc_Bounded_String_1,
-        Uc_Bounded_String_1)
-   then
+       (Tc_Bounded_String_1, Uc_Bounded_String_1) then
 
       Report.Failed
         ("Incorrect operation of function Bounded.Less_Case_Insensitive TC" &
@@ -760,9 +700,7 @@ begin
    -- Check non-matching strings of same length
 
    if not Bounded_6_Less_Case_Insensitive
-       (Lc_Bounded_String_1,
-        Lc_Bounded_String_2)
-   then
+       (Lc_Bounded_String_1, Lc_Bounded_String_2) then
 
       Report.Failed
         ("Incorrect operation of function Bounded.Less_Case_Insensitive LC" &
@@ -771,9 +709,7 @@ begin
    end if;
 
    if not Bounded_6_Less_Case_Insensitive
-       (Tc_Bounded_String_1,
-        Tc_Bounded_String_2)
-   then
+       (Tc_Bounded_String_1, Tc_Bounded_String_2) then
 
       Report.Failed
         ("Incorrect operation of function Bounded.Less_Case_Insensitive TC" &
@@ -782,9 +718,7 @@ begin
    end if;
 
    if not Bounded_6_Less_Case_Insensitive
-       (Uc_Bounded_String_1,
-        Uc_Bounded_String_2)
-   then
+       (Uc_Bounded_String_1, Uc_Bounded_String_2) then
 
       Report.Failed
         ("Incorrect operation of function Bounded.Less_Case_Insensitive UC" &
@@ -795,9 +729,7 @@ begin
    -- Check part-matching strings of different lengths
 
    if not Bounded_6_Less_Case_Insensitive
-       (Lc_Bounded_String_1,
-        Lc_Bounded_String_3)
-   then
+       (Lc_Bounded_String_1, Lc_Bounded_String_3) then
 
       Report.Failed
         ("Incorrect operation of function Bounded.Less_Case_Insensitive LC" &
@@ -806,9 +738,7 @@ begin
    end if;
 
    if not Bounded_6_Less_Case_Insensitive
-       (Tc_Bounded_String_1,
-        Tc_Bounded_String_3)
-   then
+       (Tc_Bounded_String_1, Tc_Bounded_String_3) then
 
       Report.Failed
         ("Incorrect operation of function Bounded.Less_Case_Insensitive TC" &
@@ -817,9 +747,7 @@ begin
    end if;
 
    if not Bounded_6_Less_Case_Insensitive
-       (Uc_Bounded_String_1,
-        Uc_Bounded_String_3)
-   then
+       (Uc_Bounded_String_1, Uc_Bounded_String_3) then
 
       Report.Failed
         ("Incorrect operation of function Bounded.Less_Case_Insensitive UC" &
@@ -832,9 +760,7 @@ begin
    -- Check matching strings of same length
 
    if Ada.Strings.Unbounded.Less_Case_Insensitive
-       (Lc_Unbounded_String_1,
-        Tc_Unbounded_String_1)
-   then
+       (Lc_Unbounded_String_1, Tc_Unbounded_String_1) then
 
       Report.Failed
         ("Incorrect operation of function Unbounded.Less_Case_Insensitive LC" &
@@ -843,9 +769,7 @@ begin
    end if;
 
    if Ada.Strings.Unbounded.Less_Case_Insensitive
-       (Lc_Unbounded_String_1,
-        Uc_Unbounded_String_1)
-   then
+       (Lc_Unbounded_String_1, Uc_Unbounded_String_1) then
 
       Report.Failed
         ("Incorrect operation of function Unbounded.Less_Case_Insensitive LC" &
@@ -854,9 +778,7 @@ begin
    end if;
 
    if Ada.Strings.Unbounded.Less_Case_Insensitive
-       (Tc_Unbounded_String_1,
-        Uc_Unbounded_String_1)
-   then
+       (Tc_Unbounded_String_1, Uc_Unbounded_String_1) then
 
       Report.Failed
         ("Incorrect operation of function Unbounded.Less_Case_Insensitive TC" &
@@ -867,9 +789,7 @@ begin
    -- Check non-matching strings of same length
 
    if not Ada.Strings.Unbounded.Less_Case_Insensitive
-       (Lc_Unbounded_String_1,
-        Lc_Unbounded_String_2)
-   then
+       (Lc_Unbounded_String_1, Lc_Unbounded_String_2) then
 
       Report.Failed
         ("Incorrect operation of function Unbounded.Less_Case_Insensitive LC" &
@@ -878,9 +798,7 @@ begin
    end if;
 
    if not Ada.Strings.Unbounded.Less_Case_Insensitive
-       (Tc_Unbounded_String_1,
-        Tc_Unbounded_String_2)
-   then
+       (Tc_Unbounded_String_1, Tc_Unbounded_String_2) then
 
       Report.Failed
         ("Incorrect operation of function Bounded.Less_Case_Insensitive TC" &
@@ -889,9 +807,7 @@ begin
    end if;
 
    if not Ada.Strings.Unbounded.Less_Case_Insensitive
-       (Uc_Unbounded_String_1,
-        Uc_Unbounded_String_2)
-   then
+       (Uc_Unbounded_String_1, Uc_Unbounded_String_2) then
 
       Report.Failed
         ("Incorrect operation of function Unbounded.Less_Case_Insensitive UC" &
@@ -902,9 +818,7 @@ begin
    -- Check part-matching strings of different lengths
 
    if not Ada.Strings.Unbounded.Less_Case_Insensitive
-       (Lc_Unbounded_String_1,
-        Lc_Unbounded_String_3)
-   then
+       (Lc_Unbounded_String_1, Lc_Unbounded_String_3) then
 
       Report.Failed
         ("Incorrect operation of function Unbounded.Less_Case_Insensitive LC" &
@@ -913,9 +827,7 @@ begin
    end if;
 
    if not Ada.Strings.Unbounded.Less_Case_Insensitive
-       (Tc_Unbounded_String_1,
-        Tc_Unbounded_String_3)
-   then
+       (Tc_Unbounded_String_1, Tc_Unbounded_String_3) then
 
       Report.Failed
         ("Incorrect operation of function Unbounded.Less_Case_Insensitive TC" &
@@ -924,9 +836,7 @@ begin
    end if;
 
    if not Ada.Strings.Unbounded.Less_Case_Insensitive
-       (Uc_Unbounded_String_1,
-        Uc_Unbounded_String_3)
-   then
+       (Uc_Unbounded_String_1, Uc_Unbounded_String_3) then
 
       Report.Failed
         ("Incorrect operation of function Unbounded.Less_Case_Insensitive UC" &

@@ -8,9 +8,7 @@ package C340001_2 is
 
    function "=" (L, R : in Transaction) return Boolean;
 
-   type Authorization
-     (Kind : Media)
-   is new Transaction (Medium => Kind) with
+   type Authorization (Kind : Media) is new Transaction (Medium => Kind) with
    record
       case Kind is
          when Paper =>

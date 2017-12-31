@@ -61,15 +61,11 @@ package Cc54002_0 is -- Generic list of pointers.
       Next     : Index := 1;    -- Next available "slot" in list.
    end record;
 
-   procedure Put
-     (List     : in out List_Type;
-      Elem_Ptr : in     Element_Ptr;
-      Location : in     Index);
+   procedure Put (List : in out List_Type; Elem_Ptr : in Element_Ptr;
+      Location         : in     Index);
 
-   procedure Get
-     (List     : in out List_Type;
-      Elem_Ptr :    out Element_Ptr;
-      Location : in     Index);
+   procedure Get (List : in out List_Type; Elem_Ptr : out Element_Ptr;
+      Location         : in     Index);
 
    -- ... Other operations.
 

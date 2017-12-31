@@ -49,8 +49,7 @@ begin
    Test
      ("C83027A",
       "CHECK THAT A DECLARATION IN A RECORD " &
-      "DECLARATION HIDES AN OUTER DECLARATION OF " &
-      "A HOMOGRAPH");
+      "DECLARATION HIDES AN OUTER DECLARATION OF " & "A HOMOGRAPH");
 
    One :
    declare
@@ -145,11 +144,8 @@ begin
       A   : Integer := Ident_Int (2);
       Obj : Integer := Ident_Int (3);
 
-      type Inner4
-        (C : Integer := A;
-         A : Integer := Ident_Int (3);
-         X : Integer := Three.A)
-      is record
+      type Inner4 (C : Integer := A; A : Integer := Ident_Int (3);
+         X           : Integer := Three.A) is record
          D : Integer := A;
       end record;
 

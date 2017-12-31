@@ -81,8 +81,7 @@ begin
    Report.Test
      ("CXAC003",
       "Check that the correct exceptions are " &
-      "raised when improperly manipulating stream " &
-      "file objects");
+      "raised when improperly manipulating stream " & "file objects");
 
    Test_For_Stream_Io_Support :
    begin
@@ -94,9 +93,7 @@ begin
       -- Not_Applicable result.
 
       Ada.Streams.Stream_Io.Create
-        (Stream_File_Object,
-         Ada.Streams.Stream_Io.Out_File,
-         Stream_Filename);
+        (Stream_File_Object, Ada.Streams.Stream_Io.Out_File, Stream_Filename);
 
    exception
 
@@ -118,8 +115,7 @@ begin
          Ada.Streams.Stream_Io.Close (Stream_File_Object);
          -- Attempt to reset a file that is closed.
          Ada.Streams.Stream_Io.Reset
-           (Stream_File_Object,
-            Ada.Streams.Stream_Io.Out_File);
+           (Stream_File_Object, Ada.Streams.Stream_Io.Out_File);
          Report.Failed ("Exception not raised on Reset of closed file");
       exception
          when Ada.Streams.Stream_Io.Status_Error =>
@@ -156,13 +152,11 @@ begin
          -- Ensure that the file is open.
          if not Ada.Streams.Stream_Io.Is_Open (Stream_File_Object) then
             Ada.Streams.Stream_Io.Open
-              (Stream_File_Object,
-               Ada.Streams.Stream_Io.In_File,
+              (Stream_File_Object, Ada.Streams.Stream_Io.In_File,
                Stream_Filename);
          end if;
          Ada.Streams.Stream_Io.Open
-           (Stream_File_Object,
-            Ada.Streams.Stream_Io.In_File,
+           (Stream_File_Object, Ada.Streams.Stream_Io.In_File,
             Stream_Filename);
          Report.Failed ("Exception not raised on Open of open file");
       exception
@@ -184,8 +178,7 @@ begin
          Reset1 :
          begin
             Ada.Streams.Stream_Io.Reset
-              (Stream_File_Object,
-               Ada.Streams.Stream_Io.Out_File);
+              (Stream_File_Object, Ada.Streams.Stream_Io.Out_File);
          exception
             when Ada.Streams.Stream_Io.Use_Error =>
                Report.Not_Applicable
@@ -210,8 +203,7 @@ begin
                Reset2 :
                begin
                   Ada.Streams.Stream_Io.Reset
-                    (Stream_File_Object,
-                     Ada.Streams.Stream_Io.Append_File);
+                    (Stream_File_Object, Ada.Streams.Stream_Io.Append_File);
                exception
                   when Ada.Streams.Stream_Io.Use_Error =>
                      Report.Not_Applicable
@@ -248,8 +240,7 @@ begin
          Reset3 :
          begin
             Ada.Streams.Stream_Io.Reset
-              (Stream_File_Object,
-               Ada.Streams.Stream_Io.Out_File);
+              (Stream_File_Object, Ada.Streams.Stream_Io.Out_File);
          exception
             when Ada.Streams.Stream_Io.Use_Error =>
                Report.Not_Applicable
@@ -270,8 +261,7 @@ begin
                Reset4 :
                begin
                   Ada.Streams.Stream_Io.Reset
-                    (Stream_File_Object,
-                     Ada.Streams.Stream_Io.Append_File);
+                    (Stream_File_Object, Ada.Streams.Stream_Io.Append_File);
                exception
                   when Ada.Streams.Stream_Io.Use_Error =>
                      Report.Not_Applicable
@@ -304,8 +294,7 @@ begin
          Reset5 :
          begin
             Ada.Streams.Stream_Io.Reset
-              (Stream_File_Object,
-               Ada.Streams.Stream_Io.In_File);
+              (Stream_File_Object, Ada.Streams.Stream_Io.In_File);
          exception
             when Ada.Streams.Stream_Io.Use_Error =>
                Report.Not_Applicable
@@ -338,8 +327,7 @@ begin
          -- with an internal file object, resulting in the raising of the
          -- exception Name_Error.
          Ada.Streams.Stream_Io.Open
-           (File => Stream_File_Object,
-            Mode => Ada.Streams.Stream_Io.Out_File,
+           (File => Stream_File_Object, Mode => Ada.Streams.Stream_Io.Out_File,
             Name => Report.Legal_File_Name (2));
          Report.Failed ("Exception not raised by bad filename on Open");
       exception
@@ -363,8 +351,7 @@ begin
          Ada.Streams.Stream_Io.Delete (Stream_File_Object);
       else
          Ada.Streams.Stream_Io.Open
-           (Stream_File_Object,
-            Ada.Streams.Stream_Io.Out_File,
+           (Stream_File_Object, Ada.Streams.Stream_Io.Out_File,
             Stream_Filename);
          Ada.Streams.Stream_Io.Delete (Stream_File_Object);
       end if;

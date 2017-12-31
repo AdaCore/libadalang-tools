@@ -123,9 +123,8 @@ begin
       Product_Information_2 : Data_Array_Type (1 .. 4) :=
         ((5, Xlarge), (27, Small), (79, Medium), (93, Xlarge));
 
-      procedure Store_Data
-        (The_Stream : in Strm_Pack.Stream_Access;
-         The_Array  : in Data_Array_Type)
+      procedure Store_Data (The_Stream : in Strm_Pack.Stream_Access;
+         The_Array                     : in Data_Array_Type)
       is
          Header : Header_Type;
       begin
@@ -144,10 +143,8 @@ begin
 
       end Store_Data;
 
-      procedure Retrieve_Data
-        (The_Stream : in     Strm_Pack.Stream_Access;
-         The_Header :    out Header_Type;
-         The_Array  :    out Data_Array_Type)
+      procedure Retrieve_Data (The_Stream : in     Strm_Pack.Stream_Access;
+         The_Header :    out Header_Type; The_Array : out Data_Array_Type)
       is
       begin
 
@@ -201,8 +198,7 @@ begin
 
          -- Validate a field in the header.
          if (Product_Header_1.Origination_Date /= Todays_Date) or
-           (Product_Header_1.Number_Of_Elements /= 3)
-         then
+           (Product_Header_1.Number_Of_Elements /= 3) then
             Report.Failed ("Incorrect Header_1 info read from stream");
          end if;
 
@@ -210,8 +206,7 @@ begin
          for I in 1 .. Product_Header_1.Number_Of_Elements loop
             if (Product_Array_1 (I) /= Product_Information_1 (I)) then
                Report.Failed
-                 ("Incorrect Product 1 info read from" &
-                  " record: " &
+                 ("Incorrect Product 1 info read from" & " record: " &
                   Integer'Image (I));
             end if;
          end loop;
@@ -222,16 +217,14 @@ begin
          Retrieve_Data (The_Stream, Product_Header_2, Product_Array_2);
 
          if (Product_Header_2.Origination_Date /= Todays_Date) or
-           (Product_Header_2.Number_Of_Elements /= 4)
-         then
+           (Product_Header_2.Number_Of_Elements /= 4) then
             Report.Failed ("Incorrect Header_2 info read from stream");
          end if;
 
          for I in 1 .. Product_Header_2.Number_Of_Elements loop
             if (Product_Array_2 (I) /= Product_Information_2 (I)) then
                Report.Failed
-                 ("Incorrect Product_2 info read from" &
-                  " record: " &
+                 ("Incorrect Product_2 info read from" & " record: " &
                   Integer'Image (I));
             end if;
          end loop;

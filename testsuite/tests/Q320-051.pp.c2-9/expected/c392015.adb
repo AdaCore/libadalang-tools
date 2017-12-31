@@ -40,21 +40,15 @@ begin
       C392015_1.Pc (C392015_1.T1'Class (C392015_2.Fc2)); -- One default, Fa.
       -- Both Fa and Pc are dispatching (for T2).
       Tctouch.Validate_One_Of
-        ("Fc2Fa2Pc1",
-         "Fa2Fc2Pc1",
-         Message => "Subtest 9");
+        ("Fc2Fa2Pc1", "Fa2Fc2Pc1", Message => "Subtest 9");
       C392015_2.Pc (C392015_2.Fc2); -- One default, Fa. Both Fa and Pc are
       -- dispatching (for T2).
       Tctouch.Validate_One_Of
-        ("Fc2Fa2Pc1",
-         "Fa2Fc2Pc1",
-         Message => "Subtest 10");
+        ("Fc2Fa2Pc1", "Fa2Fc2Pc1", Message => "Subtest 10");
       C392015_1.Pc (C392015_1.Fc1); -- One default, Fa. Both Fa and Pc are
       -- dispatching (for T1).
       Tctouch.Validate_One_Of
-        ("Fc1Fa1Pc1",
-         "Fa1Fc1Pc1",
-         Message => "Subtest 11");
+        ("Fc1Fa1Pc1", "Fa1Fc1Pc1", Message => "Subtest 11");
    end;
 
    declare
@@ -69,14 +63,10 @@ begin
       -- Results same no matter what order the parameters are evaluated in.
       C392015_2.Pd (C392015_2.Fc2); -- Default is Fa0 (not controlling).
       Tctouch.Validate_One_Of
-        ("Fc2Fa0Pd1",
-         "Fa0Fc2Pd1",
-         Message => "Subtest 16");
+        ("Fc2Fa0Pd1", "Fa0Fc2Pd1", Message => "Subtest 16");
       C392015_1.Pd (C392015_1.Fc1); -- Default is Fa0 (not controlling).
       Tctouch.Validate_One_Of
-        ("Fc1Fa0Pd1",
-         "Fa0Fc1Pd1",
-         Message => "Subtest 17");
+        ("Fc1Fa0Pd1", "Fa0Fc1Pd1", Message => "Subtest 17");
    end;
 
    C392015_1.Pb (C392015_1.Fe); -- The default is Fa1. Pb is dispatching.
@@ -100,37 +90,27 @@ begin
    C392015_0.Pc (C392015_2.Fd, C392015_0.Fa); -- Default is Fa2;
    -- Pc and Fa are dispatching.
    Tctouch.Validate_One_Of
-     ("Fa2Fd2Fa2Pc1",
-      "Fa2Fa2Fd2Pc1",
-      Message => "Subtest 24");
+     ("Fa2Fd2Fa2Pc1", "Fa2Fa2Fd2Pc1", Message => "Subtest 24");
 
    C392015_0.Pc (C392015_1.Fd, C392015_0.Fa); -- Default is Fa1;
    -- Pc and Fa are dispatching.
    Tctouch.Validate_One_Of
-     ("Fa1Fd1Fa1Pc1",
-      "Fa1Fa1Fd1Pc1",
-      Message => "Subtest 25");
+     ("Fa1Fd1Fa1Pc1", "Fa1Fa1Fd1Pc1", Message => "Subtest 25");
 
    C392015_0.Pc (C392015_0.Fd, C392015_0.Fa); -- Default is Fa0;
    -- Pc and Fa are dispatching.
    Tctouch.Validate_One_Of
-     ("Fa0Fd0Fa0Pc0",
-      "Fa0Fa0Fd0Pc0",
-      Message => "Subtest 26");
+     ("Fa0Fd0Fa0Pc0", "Fa0Fa0Fd0Pc0", Message => "Subtest 26");
 
    C392015_1.Pc (C392015_1.Fe, C392015_1.Fa); -- Default is Fa1;
    -- Pc and Fa are dispatching.
    Tctouch.Validate_One_Of
-     ("Fa1Fe1Fa1Pc1",
-      "Fa1Fa1Fe1Pc1",
-      Message => "Subtest 27");
+     ("Fa1Fe1Fa1Pc1", "Fa1Fa1Fe1Pc1", Message => "Subtest 27");
 
    C392015_1.Pc (C392015_2.Fe, C392015_1.Fa); -- Default is Fa2;
    -- Pc and Fa are dispatching.
    Tctouch.Validate_One_Of
-     ("Fa2Fe1Fa2Pc1",
-      "Fa2Fa2Fe1Pc1",
-      Message => "Subtest 28");
+     ("Fa2Fe1Fa2Pc1", "Fa2Fa2Fe1Pc1", Message => "Subtest 28");
 
    Report.Result;
 

@@ -64,8 +64,7 @@ begin
      ("C974014",
       "ATC: When abortable part completes before " &
       "a triggering delay, check that the delay " &
-      "is cancelled & optional statements " &
-      "are not performed");
+      "is cancelled & optional statements " & "are not performed");
 
    declare  -- encapsulate test code
 

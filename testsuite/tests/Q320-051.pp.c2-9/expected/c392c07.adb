@@ -100,10 +100,8 @@ begin  -- Main test procedure.
    Tctouch.Validate ("BABGBABKGBA", "Dynamic Allocated");
 
 -- Double check execution correctness
-   if Switch.Off (Lamps (1).all) or
-     Switch.Off (Lamps (2).all) or
-     Switch.Off (Lamps (3).all)
-   then
+   if Switch.Off (Lamps (1).all) or Switch.Off (Lamps (2).all) or
+     Switch.Off (Lamps (3).all) then
       Report.Failed ("Bad Value");
    end if;
    Tctouch.Validate ("CCC", "Class-wide");

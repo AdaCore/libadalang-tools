@@ -111,11 +111,8 @@ package Cxe4004_Common is
       end case;
    end record;
 
-   type Another_Discriminated_Record
-     (Disc      : Boolean;
-      Disc_Low  : Integer;
-      Disc_High : Integer)
-   is record
+   type Another_Discriminated_Record (Disc : Boolean; Disc_Low : Integer;
+      Disc_High                            : Integer) is record
       Common_Component : Integer := 18;
       case Disc is
          when True =>

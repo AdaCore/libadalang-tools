@@ -24,8 +24,7 @@ procedure Cc51d02 is
 
    package Id_Class_Lists is new Fc51d00 (Blind_Id_Type'Class);
 
-   procedure Update_And_Write is new Cc51d02_1
-     (Blind_Id_Type'Class,
+   procedure Update_And_Write is new Cc51d02_1 (Blind_Id_Type'Class,
       Id_Class_Lists);
 
    Blind_List  : Id_Class_Lists.List_Type;

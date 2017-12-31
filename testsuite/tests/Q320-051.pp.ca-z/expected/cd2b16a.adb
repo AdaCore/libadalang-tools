@@ -71,15 +71,13 @@ begin
       if Link'Storage_Size /= Newlink1'Storage_Size then
          Failed
            ("STORAGE_SIZE OF THE FIRST DERIVED TYPE" &
-            "IS NOT THE SAME SIZE AS THAT OF THE " &
-            "PARENT");
+            "IS NOT THE SAME SIZE AS THAT OF THE " & "PARENT");
       end if;
 
       if Link'Storage_Size /= Newlink2'Storage_Size then
          Failed
            ("STORAGE_SIZE OF THE SECOND DERIVED TYPE" &
-            "IS NOT THE SAME SIZE AS THAT OF THE " &
-            "PARENT");
+            "IS NOT THE SAME SIZE AS THAT OF THE " & "PARENT");
       end if;
 
    end;    --ACTIVE DECLARE

@@ -177,8 +177,7 @@ begin
    Test
      ("C95092A",
       "CHECK THAT FOR ENTRIES OF TASKS, DEFAULT " &
-      "VALUES OF ALL TYPES CAN BE GIVEN FOR A FORMAL " &
-      "PARAMETER");
+      "VALUES OF ALL TYPES CAN BE GIVEN FOR A FORMAL " & "PARAMETER");
 
    Test_Defaults.Bool;
    Test_Defaults.Integr;

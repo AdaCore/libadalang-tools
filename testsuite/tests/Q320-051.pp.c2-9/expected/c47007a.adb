@@ -46,8 +46,7 @@ begin
       "WHEN THE TYPE MARK IN A QUALIFIED EXPRESSION " &
       "DENOTES A CONSTRAINED ARRAY TYPE, CHECK THAT " &
       "CONSTRAINT_ERROR IS RAISED WHEN THE BOUNDS " &
-      "OF THE OPERAND ARE NOT THE SAME AS THE " &
-      "BOUNDS OF THE TYPE MARK");
+      "OF THE OPERAND ARE NOT THE SAME AS THE " & "BOUNDS OF THE TYPE MARK");
 
    declare
 
@@ -90,8 +89,7 @@ begin
 
       subtype Starr is
         Tarr (Ident_Int (1) .. Ident_Int (1), Ident_Int (1) .. Ident_Int (5));
-      A : Tarr
-        (Ident_Int (2) .. Ident_Int (6),
+      A : Tarr (Ident_Int (2) .. Ident_Int (6),
          Ident_Int (1) .. Ident_Int (1));
    begin
       A := Starr'(A'Range => (A'Range (2) => 0));
@@ -112,8 +110,7 @@ begin
       subtype Nullt is
         Tarr (Ident_Int (1) .. Ident_Int (5), Ident_Int (1) .. Ident_Int (0));
 
-      A : Tarr
-        (Ident_Int (1) .. Ident_Int (5),
+      A : Tarr (Ident_Int (1) .. Ident_Int (5),
          Ident_Int (2) .. Ident_Int (1));
    begin
       A := Nullt'(A'First .. A'Last => (A'First (2) .. A'Last (2) => 0));
@@ -172,8 +169,7 @@ begin
       subtype Sntarr is
         Ntarr (Ident_Int (1) .. Ident_Int (1), Ident_Int (1) .. Ident_Int (5));
 
-      A : Ntarr
-        (Ident_Int (2) .. Ident_Int (2),
+      A : Ntarr (Ident_Int (2) .. Ident_Int (2),
          Ident_Int (1) .. Ident_Int (5));
    begin
       A := Sntarr'(A'Range => (A'Range (2) => 0));
@@ -194,8 +190,7 @@ begin
       subtype Nullnt is
         Ntarr (Ident_Int (1) .. Ident_Int (5), Ident_Int (1) .. Ident_Int (0));
 
-      A : Ntarr
-        (Ident_Int (1) .. Ident_Int (5),
+      A : Ntarr (Ident_Int (1) .. Ident_Int (5),
          Ident_Int (1) .. Ident_Int (1));
    begin
       A := Nullnt'(A'Range => (A'Range (2) => 0));

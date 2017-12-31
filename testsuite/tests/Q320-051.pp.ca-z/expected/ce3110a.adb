@@ -47,8 +47,7 @@ begin
    Test
      ("CE3110A",
       "CHECK THAT AN EXTERNAL FILE CAN BE CREATED " &
-      "AFTER AN EXTERNAL FILE WITH SAME NAME HAS BEEN" &
-      " DELETED");
+      "AFTER AN EXTERNAL FILE WITH SAME NAME HAS BEEN" & " DELETED");
    declare
       Fl1      : File_Type;
       Fl2      : File_Type;

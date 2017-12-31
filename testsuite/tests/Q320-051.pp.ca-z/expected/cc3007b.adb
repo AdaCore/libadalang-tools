@@ -81,18 +81,9 @@ procedure Cc3007b is
 
    type Due_Dates is array (Month_Type range Jan .. Dec) of Date;
    Report_Dates : Due_Dates :=
-     ((Jan, 23, 1_990),
-      (Feb, 23, 1_990),
-      (Mar, 23, 1_990),
-      (Apr, 23, 1_990),
-      (May, 23, 1_990),
-      (Jun, 22, 1_990),
-      (Jul, 23, 1_990),
-      (Aug, 23, 1_990),
-      (Sep, 24, 1_990),
-      (Oct, 23, 1_990),
-      (Nov, 23, 1_990),
-      (Dec, 20, 1_990));
+     ((Jan, 23, 1_990), (Feb, 23, 1_990), (Mar, 23, 1_990), (Apr, 23, 1_990),
+      (May, 23, 1_990), (Jun, 22, 1_990), (Jul, 23, 1_990), (Aug, 23, 1_990),
+      (Sep, 24, 1_990), (Oct, 23, 1_990), (Nov, 23, 1_990), (Dec, 20, 1_990));
 
    generic
 
@@ -200,8 +191,7 @@ procedure Cc3007b is
 
          if ((Incremented_Value / 2) * 2) /= Incremented_Value then
             if (First_Array_Element.Month /= May) or
-              (Second_Array_Element.Day /= 22)
-            then
+              (Second_Array_Element.Day /= 22) then
                Report.Failed ("PROBLEM WITH ARRAY ELEMENTS " & "- 1");
             else
                Store                := First_Array_Element;
@@ -210,8 +200,7 @@ procedure Cc3007b is
             end if;
          else
             if (First_Array_Element.Month /= Jun) or
-              (Second_Array_Element.Day /= 23)
-            then
+              (Second_Array_Element.Day /= 23) then
                Report.Failed ("PROBLEM WITH ARRAY ELEMENTS " & "- 2");
             else
                Store                := First_Array_Element;
@@ -251,8 +240,7 @@ procedure Cc3007b is
 
          if ((Incremented_Value / 2) * 2) /= Incremented_Value then
             if (Pointer_Test /= Date'(Oct, 3, 1_949)) or
-              (Another_Pointer_Test /= Date'(Dec, 25, 1_948))
-            then
+              (Another_Pointer_Test /= Date'(Dec, 25, 1_948)) then
                Report.Failed ("PROBLEM WITH POINTER TEST " & "- 1");
             else
                Store                := Pointer_Test;
@@ -261,8 +249,7 @@ procedure Cc3007b is
             end if;
          else
             if (Pointer_Test /= Date'(Dec, 25, 1_948)) or
-              (Another_Pointer_Test /= Date'(Oct, 3, 1_949))
-            then
+              (Another_Pointer_Test /= Date'(Oct, 3, 1_949)) then
                Report.Failed ("PROBLEM WITH POINTER TEST " & "- 2");
             else
                Store                := Pointer_Test;
@@ -290,8 +277,7 @@ begin  -- CC3007B
       "BOUND) AT THE TEXTUAL POINT OF THE INSTANTIATION" &
       ", AND ARE BOUND BEFORE BEING SUBSTITUTED FOR " &
       "THE CORRESPONDING GENERIC FORMAL PARAMETERS IN " &
-      "THE SPECIFICATION AND BODY TEMPLATES.  " &
-      "SEE AI-00365/05-BI-WJ.");
+      "THE SPECIFICATION AND BODY TEMPLATES.  " & "SEE AI-00365/05-BI-WJ.");
 
    First_Block :
 
@@ -301,17 +287,12 @@ begin  -- CC3007B
       M2 : Month_Type := Jun;
 
       package New_Test_Actual_Parameters is new Test_Actual_Parameters
-        (Naturally            => Inc,
-         First_Record         => Today,
-         Second_Record        => Christmas,
-         Record_Pointer       => Date_Access,
-         Pointer              => Second_Date,
-         Array_Type           => Due_Dates,
-         This_Array           => Report_Dates,
+        (Naturally => Inc, First_Record => Today, Second_Record => Christmas,
+         Record_Pointer       => Date_Access, Pointer => Second_Date,
+         Array_Type           => Due_Dates, This_Array => Report_Dates,
          First_Array_Element  => Report_Dates (M1),
          Second_Array_Element => Report_Dates (M2),
-         Index_Element        => This_Month,
-         Pointer_Test         => Third_Date.all,
+         Index_Element        => This_Month, Pointer_Test => Third_Date.all,
          Another_Pointer_Test => Fourth_Date.all);
 
    begin  -- FIRST_BLOCK
@@ -339,17 +320,12 @@ begin  -- CC3007B
       Save_Fourth_Date : Date_Access := Fourth_Date;
 
       package New_Test_Actual_Parameters is new Test_Actual_Parameters
-        (Naturally            => Inc,
-         First_Record         => Today,
-         Second_Record        => Christmas,
-         Record_Pointer       => Date_Access,
-         Pointer              => Second_Date,
-         Array_Type           => Due_Dates,
-         This_Array           => Report_Dates,
+        (Naturally => Inc, First_Record => Today, Second_Record => Christmas,
+         Record_Pointer       => Date_Access, Pointer => Second_Date,
+         Array_Type           => Due_Dates, This_Array => Report_Dates,
          First_Array_Element  => Report_Dates (May),
          Second_Array_Element => Report_Dates (Jun),
-         Index_Element        => This_Month,
-         Pointer_Test         => Third_Date.all,
+         Index_Element        => This_Month, Pointer_Test => Third_Date.all,
          Another_Pointer_Test => Fourth_Date.all);
 
    begin  -- SECOND_BLOCK

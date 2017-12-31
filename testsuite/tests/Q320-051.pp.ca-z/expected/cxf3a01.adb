@@ -79,26 +79,22 @@ begin
 
       for I in 1 .. Fxf3a00.Number_Of_Valid_Strings loop
 
-         if not Editing.Valid
-             (Pic_String => Fxf3a00.Valid_Strings (I).all)
+         if not Editing.Valid (Pic_String => Fxf3a00.Valid_Strings (I).all)
          then
             Report.Failed
               ("Incorrect result from Function Valid using " &
-               "Valid_String = " &
-               Fxf3a00.Valid_Strings (I).all);
+               "Valid_String = " & Fxf3a00.Valid_Strings (I).all);
          end if;
 
       end loop;
 
       for I in 1 .. Fxf3a00.Number_Of_Foreign_Strings loop
 
-         if not Editing.Valid
-             (Pic_String => Fxf3a00.Foreign_Strings (I).all)
+         if not Editing.Valid (Pic_String => Fxf3a00.Foreign_Strings (I).all)
          then
             Report.Failed
               ("Incorrect result from Function Valid using " &
-               "Foreign_String = " &
-               Fxf3a00.Foreign_Strings (I).all);
+               "Foreign_String = " & Fxf3a00.Foreign_Strings (I).all);
          end if;
 
       end loop;
@@ -114,8 +110,7 @@ begin
          if Editing.Valid (Pic_String => Fxf3a00.Invalid_Strings (I).all) then
             Report.Failed
               ("Incorrect result from Function Valid using " &
-               "Invalid_String = " &
-               Fxf3a00.Invalid_Strings (I).all);
+               "Invalid_String = " & Fxf3a00.Invalid_Strings (I).all);
          end if;
 
       end loop;
@@ -134,8 +129,7 @@ begin
       if Editing.Valid (Valid_Strings (1).all, Blank_When_Zero => True) or
         Editing.Valid (Valid_Strings (2).all, Blank_When_Zero => True) or
         Editing.Valid (Valid_Strings (25).all, Blank_When_Zero => True) or
-        Editing.Valid (Valid_Strings (36).all, Blank_When_Zero => True)
-      then
+        Editing.Valid (Valid_Strings (36).all, Blank_When_Zero => True) then
          Report.Failed
            ("Incorrect result from Function Valid when setting " &
             "the value of the Blank_When_Zero parameter to True, " &
@@ -148,8 +142,7 @@ begin
       for I in 3 .. 24 loop
 
          if not Editing.Valid
-             (Pic_String      => Valid_Strings (I).all,
-              Blank_When_Zero => True)
+             (Pic_String => Valid_Strings (I).all, Blank_When_Zero => True)
          then
             Report.Failed
               ("Incorrect result from Function Valid when " &

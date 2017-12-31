@@ -58,8 +58,7 @@ begin
    Report.Test
      ("CXA3001",
       "Check that the character classification " &
-      "functions defined in package " &
-      "Ada.Characters.Handling produce " &
+      "functions defined in package " & "Ada.Characters.Handling produce " &
       "correct results when provided constant " &
       "arguments from package Ada.Characters.Latin_1");
 
@@ -142,10 +141,8 @@ begin
       end if;
 
       if
-        (Ach.Is_Graphic (Ac.Latin_1.Is4) or
-         Ach.Is_Graphic (Ac.Latin_1.Is3) or
-         Ach.Is_Graphic (Ac.Latin_1.Is2) or
-         Ach.Is_Graphic (Ac.Latin_1.Is1)) or
+        (Ach.Is_Graphic (Ac.Latin_1.Is4) or Ach.Is_Graphic (Ac.Latin_1.Is3) or
+         Ach.Is_Graphic (Ac.Latin_1.Is2) or Ach.Is_Graphic (Ac.Latin_1.Is1)) or
         not
         (Ach.Is_Graphic (Ac.Latin_1.Nbsp) and
          Ach.Is_Graphic (Ac.Latin_1.Paragraph_Sign) and
@@ -236,13 +233,10 @@ begin
          end if;
       end loop;
 
-      if Ach.Is_Lower ('A') or
-        Ach.Is_Lower (Ac.Latin_1.Uc_Icelandic_Eth) or
+      if Ach.Is_Lower ('A') or Ach.Is_Lower (Ac.Latin_1.Uc_Icelandic_Eth) or
         Ach.Is_Lower (Ac.Latin_1.Number_Sign) or
-        Ach.Is_Lower (Ac.Latin_1.Cedilla) or
-        Ach.Is_Lower (Ac.Latin_1.Syn) or
-        Ach.Is_Lower (Ac.Latin_1.Esa)
-      then
+        Ach.Is_Lower (Ac.Latin_1.Cedilla) or Ach.Is_Lower (Ac.Latin_1.Syn) or
+        Ach.Is_Lower (Ac.Latin_1.Esa) then
          Report.Failed ("Incorrect Is_Lower result - 4");
       end if;
 
@@ -272,13 +266,10 @@ begin
          end if;
       end loop;
 
-      if Ach.Is_Upper ('8') or
-        Ach.Is_Upper (Ac.Latin_1.Lc_A_Ring) or
+      if Ach.Is_Upper ('8') or Ach.Is_Upper (Ac.Latin_1.Lc_A_Ring) or
         Ach.Is_Upper (Ac.Latin_1.Dollar_Sign) or
         Ach.Is_Upper (Ac.Latin_1.Broken_Bar) or
-        Ach.Is_Upper (Ac.Latin_1.Etb) or
-        Ach.Is_Upper (Ac.Latin_1.Vts)
-      then
+        Ach.Is_Upper (Ac.Latin_1.Etb) or Ach.Is_Upper (Ac.Latin_1.Vts) then
          Report.Failed ("Incorrect Is_Upper result - 4");
       end if;
 
@@ -321,10 +312,8 @@ begin
       if Ach.Is_Basic (Ac.Latin_1.Uc_A_Tilde) or
         Ach.Is_Basic (Ac.Latin_1.Lc_A_Grave) or
         Ach.Is_Basic (Ac.Latin_1.Ampersand) or
-        Ach.Is_Basic (Ac.Latin_1.Yen_Sign) or
-        Ach.Is_Basic (Ac.Latin_1.Nak) or
-        Ach.Is_Basic (Ac.Latin_1.Ss2)
-      then
+        Ach.Is_Basic (Ac.Latin_1.Yen_Sign) or Ach.Is_Basic (Ac.Latin_1.Nak) or
+        Ach.Is_Basic (Ac.Latin_1.Ss2) then
          Report.Failed ("Incorrect Is_Basic result - 4");
       end if;
 
@@ -343,9 +332,7 @@ begin
       if not (Ach.Is_Digit ('0') and Ach.Is_Decimal_Digit ('9')) or
         Ach.Is_Digit ('a') or     -- Hex digits.
         Ach.Is_Decimal_Digit ('f') or
-        Ach.Is_Decimal_Digit ('A') or
-        Ach.Is_Digit ('F')
-      then
+        Ach.Is_Decimal_Digit ('A') or Ach.Is_Digit ('F') then
          Report.Failed ("Incorrect Is_Digit/Is_Decimal_Digit result - 1");
       end if;
 
@@ -353,8 +340,7 @@ begin
         Ach.Is_Decimal_Digit (Ac.Latin_1.Dollar_Sign) or
         Ach.Is_Digit (Ac.Latin_1.Number_Sign) or
         Ach.Is_Decimal_Digit (Ac.Latin_1.Left_Parenthesis) or
-        Ach.Is_Digit (Ac.Latin_1.Right_Parenthesis)
-      then
+        Ach.Is_Digit (Ac.Latin_1.Right_Parenthesis) then
          Report.Failed ("Incorrect Is_Digit/Is_Decimal_Digit result - 2");
       end if;
 
@@ -387,8 +373,7 @@ begin
         Ach.Is_Hexadecimal_Digit (Ac.Latin_1.Lc_Z) or
         Ach.Is_Hexadecimal_Digit ('G') or
         Ach.Is_Hexadecimal_Digit (Ac.Latin_1.Cent_Sign) or
-        Ach.Is_Hexadecimal_Digit (Ac.Latin_1.Pound_Sign)
-      then
+        Ach.Is_Hexadecimal_Digit (Ac.Latin_1.Pound_Sign) then
          Report.Failed ("Incorrect Is_HexaDecimal_Digit result - 4");
       end if;
 

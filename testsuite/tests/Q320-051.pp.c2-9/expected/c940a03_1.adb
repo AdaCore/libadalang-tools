@@ -8,8 +8,7 @@ package body C940a03_1 is
    protected body Login_Semaphore_Type is
 
       entry Request_Login (Resource_Key : in out Login_Record_Type)
-        when Logins_Avail > 0
-        is
+        when Logins_Avail > 0 is
       begin
          Next_Key := Next_Key + 1;        -- login process returns a key
          Resource_Key.Key := Next_Key;     -- to the requesting user

@@ -64,16 +64,11 @@ package Fxacb00 is
    Customer1 : Service_Type (Residence) :=
      (Residence, "1221 Morningstar Lane", 44, False);
    Customer2 : Service_Type (Apartment) :=
-     (Customer          => Apartment,
-      Account_Id        => 67,
-      Name              => "15 South Front St. #8",
+     (Customer => Apartment, Account_Id => 67, Name => "15 South Front St. #8",
       Low_Income_Credit => True);
    Customer3 : Service_Type (Commercial) :=
-     (Commercial,
-      "12442 Central Avenue ",
-      100,
-      Baseline_Allowance => 938,
-      Quantity_Discount  => True);
+     (Commercial, "12442 Central Avenue ", 100, Baseline_Allowance => 938,
+      Quantity_Discount                                            => True);
 
    --
 
@@ -83,8 +78,7 @@ package Fxacb00 is
 
    --
 
-   C1_Service_History : Service_History_Type
-     (Quarterly_Period_Type,
+   C1_Service_History : Service_History_Type (Quarterly_Period_Type,
       Month_In_Quarter_Type) :=
      (Spring => (1 => 35, 2 => 39, 3 => 32),
       Summer => (1 => 34, 2 => 33, 3 => 39),
@@ -92,12 +86,10 @@ package Fxacb00 is
       Winter => (1 => 53, 2 => 0, 3 => 0));
 
    C2_Service_History : Service_History_Type
-     (Quarterly_Period_Type range Spring .. Summer,
-      Month_In_Quarter_Type) :=
+     (Quarterly_Period_Type range Spring .. Summer, Month_In_Quarter_Type) :=
      (Spring => (23, 22, 0), Summer => (0, 0, 0));
 
-   C3_Service_History : Service_History_Type
-     (Quarterly_Period_Type,
+   C3_Service_History : Service_History_Type (Quarterly_Period_Type,
       Month_In_Quarter_Type) :=
      (others => (others => 200));
 

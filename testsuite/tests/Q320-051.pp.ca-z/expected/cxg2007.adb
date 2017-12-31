@@ -88,11 +88,8 @@ procedure Cxg2007 is
 
       Maximum_Relative_Error : constant Real := 3.0;
 
-      procedure Check
-        (Actual, Expected : Real;
-         Test_Name        : String;
-         Mre              : Real;
-         Arg_Error        : Real)
+      procedure Check (Actual, Expected : Real; Test_Name : String; Mre : Real;
+         Arg_Error                      : Real)
       is
          -- Arg_Error is additional absolute error that is allowed beyond the
          -- MRE to account for error in the result that can be attributed to
@@ -115,14 +112,9 @@ procedure Cxg2007 is
 
          if abs (Actual - Expected) > Max_Error then
             Report.Failed
-              (Test_Name &
-               " actual: " &
-               Real'Image (Actual) &
-               " expected: " &
-               Real'Image (Expected) &
-               " difference: " &
-               Real'Image (Actual - Expected) &
-               " max err:" &
+              (Test_Name & " actual: " & Real'Image (Actual) & " expected: " &
+               Real'Image (Expected) & " difference: " &
+               Real'Image (Actual - Expected) & " max err:" &
                Real'Image (Max_Error));
          elsif Verbose then
             if Actual = Expected then
@@ -133,27 +125,17 @@ procedure Cxg2007 is
          end if;
       end Check;
 
-      procedure Check
-        (Actual, Expected : Complex;
-         Test_Name        : String;
-         Mre              : Real;
-         Arg_Error        : Real)
+      procedure Check (Actual, Expected : Complex; Test_Name : String;
+         Mre                            : Real; Arg_Error : Real)
       is
       -- Arg_Error is additional absolute error that is allowed beyond the MRE
       -- to account for error in the result that can be attributed to error in
       -- the arguments.
       begin
          Check
-           (Actual.Re,
-            Expected.Re,
-            Test_Name & " real part",
-            Mre,
-            Arg_Error);
+           (Actual.Re, Expected.Re, Test_Name & " real part", Mre, Arg_Error);
          Check
-           (Actual.Im,
-            Expected.Im,
-            Test_Name & " imaginary part",
-            Mre,
+           (Actual.Im, Expected.Im, Test_Name & " imaginary part", Mre,
             Arg_Error);
       end Check;
 
@@ -201,14 +183,11 @@ procedure Cxg2007 is
 
                Z :=
                  Compose_From_Polar
-                   (Test_Data (I).Modulus,
-                    Test_Data (I).Radians);
+                   (Test_Data (I).Modulus, Test_Data (I).Radians);
                Check
-                 (Z,
-                  Exp,
+                 (Z, Exp,
                   "test" & Integer'Image (I) & " compose_from_polar(m,r)",
-                  Maximum_Relative_Error,
-                  Test_Data (I).Arg_Error);
+                  Maximum_Relative_Error, Test_Data (I).Arg_Error);
 
 --pwb-math               Z := Compose_From_Polar (Test_Data (I).Modulus,
 --pwb-math                                      Test_Data (I).Radians,
@@ -219,15 +198,11 @@ procedure Cxg2007 is
 
                Z :=
                  Compose_From_Polar
-                   (Test_Data (I).Modulus,
-                    Test_Data (I).Degrees,
-                    360.0);
+                   (Test_Data (I).Modulus, Test_Data (I).Degrees, 360.0);
                Check
-                 (Z,
-                  Exp,
+                 (Z, Exp,
                   "test" & Integer'Image (I) & " compose_from_polar(m,d,360)",
-                  Maximum_Relative_Error,
-                  Test_Data (I).Arg_Error);
+                  Maximum_Relative_Error, Test_Data (I).Arg_Error);
 
             exception
                when Constraint_Error =>
@@ -286,8 +261,7 @@ procedure Cxg2007 is
    package Chk_A_Long_Float is new Generic_Check (A_Long_Float);
 begin
    Report.Test
-     ("CXG2007",
-      "Check the accuracy of the Compose_From_Polar" & " function");
+     ("CXG2007", "Check the accuracy of the Compose_From_Polar" & " function");
 
    if Verbose then
       Report.Comment ("checking Standard.Float");
@@ -296,8 +270,7 @@ begin
 
    if Verbose then
       Report.Comment
-        ("checking a digits" &
-         Integer'Image (System.Max_Digits) &
+        ("checking a digits" & Integer'Image (System.Max_Digits) &
          " floating point type");
    end if;
    Chk_A_Long_Float.Do_Test;

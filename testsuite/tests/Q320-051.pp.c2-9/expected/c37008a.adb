@@ -36,8 +36,7 @@ begin
    Test
      ("C37008A",
       "CHECK THAT INVALID DEFAULT RECORD" &
-      " COMPONENT INITIALIZATIONS RAISE" &
-      " CONSTRAINT_ERROR");
+      " COMPONENT INITIALIZATIONS RAISE" & " CONSTRAINT_ERROR");
 
    begin
       declare

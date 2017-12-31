@@ -48,8 +48,7 @@ procedure C34004c is
    type Parent is delta 0.01 range -100.0 .. 100.0;
 
    type T is
-     new Parent delta 0.1 range
-       Ident_Int (1) * (-30.0) ..
+     new Parent delta 0.1 range Ident_Int (1) * (-30.0) ..
          Ident_Int (1) * (30.0);
 
    subtype Subparent is Parent delta 0.1 range -30.0 .. 30.0;
@@ -91,8 +90,7 @@ begin
       "WHEN THE DERIVED TYPE DEFINITION IS " &
       "CONSTRAINED.  ALSO CHECK THAT ANY CONSTRAINT " &
       "IMPOSED ON THE PARENT SUBTYPE IS ALSO IMPOSED " &
-      "ON THE DERIVED SUBTYPE.  CHECK FOR DERIVED " &
-      "FIXED POINT TYPES");
+      "ON THE DERIVED SUBTYPE.  CHECK FOR DERIVED " & "FIXED POINT TYPES");
 
    -- CHECK THAT BASE TYPE VALUES NOT IN THE SUBTYPE ARE PRESENT.
 
@@ -111,16 +109,12 @@ begin
       if 98.0 + T'(1.0) + N * 0.007_812_5 /= 99.062_5 or
         98.0 + S'(1.0) + 8 * 0.007_812_5 /= 99.062_5 or
         -98.0 - T'(1.0) - N * 0.007_812_5 /= -99.062_5 or
-        -98.0 - S'(1.0) - 8 * 0.007_812_5 /= -99.062_5
-      then
+        -98.0 - S'(1.0) - 8 * 0.007_812_5 /= -99.062_5 then
          Failed ("INCORRECT + OR -");
       end if;
    end;
 
-   if T'First /= -30.0 or
-     T'Last /= 30.0 or
-     S'First /= -30.0 or
-     S'Last /= 30.0
+   if T'First /= -30.0 or T'Last /= 30.0 or S'First /= -30.0 or S'Last /= 30.0
    then
       Failed ("INCORRECT 'FIRST OR 'LAST");
    end if;

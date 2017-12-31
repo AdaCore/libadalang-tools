@@ -40,8 +40,7 @@ procedure C43205b is
 begin
 
    Test
-     ("C43205B",
-      "CASE B : UNCONSTRAINED ARRAY FORMAL GENERIC " & "PARAMETER");
+     ("C43205B", "CASE B : UNCONSTRAINED ARRAY FORMAL GENERIC " & "PARAMETER");
 
    begin
 

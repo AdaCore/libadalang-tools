@@ -70,10 +70,8 @@ package Fxacc00 is
       Rank : Vip_Status_Type;
    end record;
 
-   type Last_Minute_Request
-     (Special_Consideration : Boolean)
-   is new Vip_Request with
-   record
+   type Last_Minute_Request (Special_Consideration : Boolean)
+   is new Vip_Request with record
       Time_Of_Request : Ada.Calendar.Time;
       case Special_Consideration is
          when True =>
@@ -95,11 +93,8 @@ package Fxacc00 is
      (Location => Backstage, Number_Of_Tickets => 6, Rank => Mayor);
 
    Late_Request : Last_Minute_Request (Show_Of_Appreciation) :=
-     (Special_Consideration => Show_Of_Appreciation,
-      Location              => Orchestra,
-      Number_Of_Tickets     => 2,
-      Rank                  => City_Council,
-      Time_Of_Request       => Ada.Calendar.Clock,
-      Donation              => To_Charity);
+     (Special_Consideration => Show_Of_Appreciation, Location => Orchestra,
+      Number_Of_Tickets     => 2, Rank => City_Council,
+      Time_Of_Request       => Ada.Calendar.Clock, Donation => To_Charity);
 
 end Fxacc00;

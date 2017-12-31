@@ -111,8 +111,7 @@ begin  -- Main test procedure.
 
    Report.Test
      ("CD72A01",
-      "Check package " &
-      "System.Address_To_Access_Conversions " &
+      "Check package " & "System.Address_To_Access_Conversions " &
       "for simple types");
 
    -- take several pointer objects, convert them to addresses, and store the
@@ -130,14 +129,12 @@ begin  -- Main test procedure.
    -- even the cleverest of optimizers
 
    if Number_Atac.To_Pointer (Hex_To_Address (The_Strings (Addr_Type))).all /=
-     Number'First
-   then
+     Number'First then
       Report.Failed ("Number reconversion");
    end if;
 
    if Data_Atac.To_Pointer (Hex_To_Address (The_Strings (Record_Type))).all /=
-     (Number'First, Number'Last)
-   then
+     (Number'First, Number'Last) then
       Report.Failed ("Data reconversion");
    end if;
 
@@ -145,14 +142,12 @@ begin  -- Main test procedure.
    -- value
 
    if Number_Atac.To_Pointer (Hex_To_Address (The_Strings (Addr_Type))) /=
-     My_Number'Unchecked_Access
-   then
+     My_Number'Unchecked_Access then
       Report.Failed ("Number Unchecked_Access");
    end if;
 
    if Data_Atac.To_Pointer (Hex_To_Address (The_Strings (Record_Type))) /=
-     My_Data'Unchecked_Access
-   then
+     My_Data'Unchecked_Access then
       Report.Failed ("Data Unchecked_Access");
    end if;
 

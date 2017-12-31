@@ -36,15 +36,13 @@ begin
    Test
      ("CD7007B",
       "THE SUBTYPE 'PRIORITY' IS DECLARED WITHIN " &
-      "THE PACKAGE SYSTEM AND IT IS A SUBTYPE OF " &
-      "'INTEGER'");
+      "THE PACKAGE SYSTEM AND IT IS A SUBTYPE OF " & "'INTEGER'");
 
    declare
       Check_Var : System.Priority;
    begin
       if System.Priority'First not in Integer'First .. Integer'Last and
-        System.Priority'Last not in Integer'First .. Integer'Last
-      then
+        System.Priority'Last not in Integer'First .. Integer'Last then
          Failed ("'SYSTEM.PRIORITY' IS NOT AN INTEGER SUBTYPE");
       end if;
    end;

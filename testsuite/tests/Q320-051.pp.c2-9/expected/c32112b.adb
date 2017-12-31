@@ -158,8 +158,7 @@ begin
 
    begin
       declare
-         A : Arr2
-           (Ident_Int (1) .. Ident_Int (2),
+         A : Arr2 (Ident_Int (1) .. Ident_Int (2),
             Ident_Int (0) .. Ident_Int (1));
          N2a : constant Narr2 := (A'Range => (A'Range (2) => 0));
       begin
@@ -178,8 +177,7 @@ begin
 
    begin
       declare
-         A : Arr2
-           (Ident_Int (1) .. Ident_Int (2),
+         A : Arr2 (Ident_Int (1) .. Ident_Int (2),
             Ident_Int (0) .. Ident_Int (1));
          N2b : Narr2 := (A'Range => (A'Range (2) => 0));
       begin
@@ -198,8 +196,7 @@ begin
 
    begin
       declare
-         A : Arr2
-           (Ident_Int (1) .. Ident_Int (3),
+         A : Arr2 (Ident_Int (1) .. Ident_Int (3),
             Ident_Int (1) .. Ident_Int (1));
          N2c : constant Narr2 := (A'Range => (A'Range (2) => 0));
       begin
@@ -218,8 +215,7 @@ begin
 
    begin
       declare
-         A : Arr2
-           (Ident_Int (1) .. Ident_Int (3),
+         A : Arr2 (Ident_Int (1) .. Ident_Int (3),
             Ident_Int (1) .. Ident_Int (1));
          N2d : Narr2 := (A'Range => (A'Range (2) => 0));
       begin
@@ -238,11 +234,9 @@ begin
 
    begin
       declare
-         A : Arr2
-           (Ident_Int (1) .. Ident_Int (1),
+         A : Arr2 (Ident_Int (1) .. Ident_Int (1),
             Ident_Int (1) .. Ident_Int (1));
-         N2e : constant Arr2
-           (Ident_Int (2) .. Ident_Int (1),
+         N2e : constant Arr2 (Ident_Int (2) .. Ident_Int (1),
             Ident_Int (1) .. Ident_Int (1)) :=
            (A'Range => (A'Range (2) => 0));
       begin
@@ -261,11 +255,9 @@ begin
 
    begin
       declare
-         A : Arr2
-           (Ident_Int (1) .. Ident_Int (1),
+         A : Arr2 (Ident_Int (1) .. Ident_Int (1),
             Ident_Int (1) .. Ident_Int (1));
-         N2f : Arr2
-           (Ident_Int (2) .. Ident_Int (1),
+         N2f : Arr2 (Ident_Int (2) .. Ident_Int (1),
             Ident_Int (1) .. Ident_Int (1)) :=
            (A'Range => (A'Range (2) => 0));
       begin

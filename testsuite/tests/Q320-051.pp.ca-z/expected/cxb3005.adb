@@ -117,10 +117,9 @@ begin
       Tc_String (1 .. 6) := "abcdef";
 
       To_C
-        (Item       => Tc_String (1 .. 6),  -- Source slice of length 6.
-         Target     => Tc_Char_Array,    -- Length 8 will accommodate nul.
-         Count      => Tc_Size_T_Count,
-         Append_Nul => True);
+        (Item   => Tc_String (1 .. 6),  -- Source slice of length 6.
+         Target => Tc_Char_Array,    -- Length 8 will accommodate nul.
+         Count  => Tc_Size_T_Count, Append_Nul => True);
 
       -- Check that the out parameter Count is set to the appropriate value for
       -- the nul terminated case.
@@ -133,13 +132,11 @@ begin
 
       for I in 1 .. Tc_Size_T_Count - 1 loop
          if Char_To_Character (Tc_Char_Array (I - 1)) /=
-           Tc_String (Integer (I))
-         then
+           Tc_String (Integer (I)) then
             Report.Failed
               ("Incorrect result from Procedure To_C when " &
                "checking individual char values, case of " &
-               "Append_Nul => True; " &
-               "char position = " &
+               "Append_Nul => True; " & "char position = " &
                Integer'Image (Integer (I)));
          end if;
       end loop;
@@ -163,10 +160,9 @@ begin
       Tc_String (1 .. 4) := "WXYZ";
 
       To_C
-        (Item       => Tc_String (1 .. 4),  -- Source slice of length 4.
-         Target     => Tc_Char_Array,
-         Count      => Tc_Size_T_Count,
-         Append_Nul => False);
+        (Item   => Tc_String (1 .. 4),  -- Source slice of length 4.
+         Target => Tc_Char_Array,
+         Count  => Tc_Size_T_Count, Append_Nul => False);
 
       -- Check that the out parameter Count is set to the appropriate value for
       -- the non-nul terminated case.
@@ -179,13 +175,11 @@ begin
 
       for I in 1 .. Tc_Size_T_Count loop
          if Char_To_Character (Tc_Char_Array (I - 1)) /=
-           Tc_String (Integer (I))
-         then
+           Tc_String (Integer (I)) then
             Report.Failed
               ("Incorrect result from Procedure To_C when " &
                "checking individual char values, case of " &
-               "Append_Nul => False; " &
-               "char position = " &
+               "Append_Nul => False; " & "char position = " &
                Integer'Image (Integer (I)));
          end if;
       end loop;
@@ -209,9 +203,7 @@ begin
 
       begin
          To_C
-           ("A string too long",
-            Tc_Char_Array,
-            Tc_Size_T_Count,
+           ("A string too long", Tc_Char_Array, Tc_Size_T_Count,
             Append_Nul => True);
 
          Report.Failed
@@ -242,9 +234,7 @@ begin
       Tc_String     := (others => '*');                      -- Reinitialize.
 
       To_Ada
-        (Item     => Tc_Char_Array,
-         Target   => Tc_String,
-         Count    => Tc_Natural_Count,
+        (Item => Tc_Char_Array, Target => Tc_String, Count => Tc_Natural_Count,
          Trim_Nul => False);
 
       if Tc_Natural_Count /= 8 then
@@ -254,15 +244,13 @@ begin
       end if;
 
       for I in 1 .. Tc_Natural_Count loop
-         if Character_To_Char (Tc_String (I)) /=
-           Tc_Char_Array (Size_T (I - 1))
+         if Character_To_Char (Tc_String (I)) /= Tc_Char_Array (Size_T (I - 1))
          then
             Report.Failed
               ("Incorrect result from Procedure To_Ada when " &
                "checking individual char values, case of " &
                "Trim_Nul => False, when a nul is present in " &
-               "the char_array input parameter; " &
-               "position = " &
+               "the char_array input parameter; " & "position = " &
                Integer'Image (Integer (I)));
          end if;
       end loop;
@@ -279,9 +267,7 @@ begin
       Tc_String              := (others => '*');                  -- Reinit.
 
       To_Ada
-        (Item     => Tc_Char_Array,
-         Target   => Tc_String,
-         Count    => Tc_Natural_Count,
+        (Item => Tc_Char_Array, Target => Tc_String, Count => Tc_Natural_Count,
          Trim_Nul => True);
 
       if Tc_Natural_Count /= 3 then
@@ -291,15 +277,13 @@ begin
       end if;
 
       for I in 1 .. Tc_Natural_Count loop
-         if Character_To_Char (Tc_String (I)) /=
-           Tc_Char_Array (Size_T (I - 1))
+         if Character_To_Char (Tc_String (I)) /= Tc_Char_Array (Size_T (I - 1))
          then
             Report.Failed
               ("Incorrect result from Procedure To_Ada when " &
                "checking individual char values, case of " &
                "Trim_Nul => True, when a nul is present in " &
-               "the char_array input parameter; " &
-               "position = " &
+               "the char_array input parameter; " & "position = " &
                Integer'Image (Integer (I)));
          end if;
       end loop;
@@ -317,10 +301,8 @@ begin
       if Tc_String (Tc_Natural_Count + 1) /= '*' then
          Report.Failed
            ("Incorrect modification to TC_String at position " &
-            Integer'Image (Tc_Natural_Count + 1) &
-            " expected = " &
-            "*, found = " &
-            Tc_String (Tc_Natural_Count + 1));
+            Integer'Image (Tc_Natural_Count + 1) & " expected = " &
+            "*, found = " & Tc_String (Tc_Natural_Count + 1));
       end if;
 
       -- Case of no nul char being present in the char_array argument.
@@ -329,9 +311,7 @@ begin
       Tc_String     := (others => '*');                  -- Reinitialize.
 
       To_Ada
-        (Item     => Tc_Char_Array,
-         Target   => Tc_String,
-         Count    => Tc_Natural_Count,
+        (Item => Tc_Char_Array, Target => Tc_String, Count => Tc_Natural_Count,
          Trim_Nul => False);
 
       if Tc_Natural_Count /= 8 then
@@ -342,15 +322,13 @@ begin
       end if;
 
       for I in 1 .. Tc_Natural_Count loop
-         if Character_To_Char (Tc_String (I)) /=
-           Tc_Char_Array (Size_T (I - 1))
+         if Character_To_Char (Tc_String (I)) /= Tc_Char_Array (Size_T (I - 1))
          then
             Report.Failed
               ("Incorrect result from Procedure To_Ada when " &
                "checking individual char values, case of " &
                "Trim_Nul => False, when a nul is not present " &
-               "in the char_array input parameter; " &
-               "position = " &
+               "in the char_array input parameter; " & "position = " &
                Integer'Image (Integer (I)));
          end if;
       end loop;
@@ -372,10 +350,8 @@ begin
          Tc_String     := (others => '*');
 
          To_Ada
-           (Tc_Char_Array,
-            Tc_String,
-            Count    => Tc_Natural_Count,
-            Trim_Nul => True);
+           (Tc_Char_Array, Tc_String, Count => Tc_Natural_Count,
+            Trim_Nul                        => True);
 
          Report.Failed
            ("Terminator_Error not raised when Item " &
@@ -389,8 +365,7 @@ begin
             Report.Failed
               ("Incorrect exception raised by Procedure " &
                "To_Ada when the Item parameter does not " &
-               "contain the nul char, but parameter " &
-               "Trim_Nul => True");
+               "contain the nul char, but parameter " & "Trim_Nul => True");
       end;
 
       -- Check that Constraint_Error is propagated by procedure To_Ada if
@@ -424,8 +399,7 @@ begin
    exception
       when The_Error : others =>
          Report.Failed
-           ("The following exception was raised in the " &
-            "Test_Block: " &
+           ("The following exception was raised in the " & "Test_Block: " &
             Exception_Name (The_Error));
    end Test_Block;
 

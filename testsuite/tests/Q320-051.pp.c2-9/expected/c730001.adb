@@ -79,8 +79,7 @@ begin
          -- from either of the parent versions of Answer.
 
          if Tc_Get_Indicator (Hot_Line) /= Light or
-           Tc_Get_Indicator (Teleconference_Phone) /= Light
-         then
+           Tc_Get_Indicator (Teleconference_Phone) /= Light then
             Report.Failed
               ("Default expression from ancestor operation " &
                "not used in dispatching case");

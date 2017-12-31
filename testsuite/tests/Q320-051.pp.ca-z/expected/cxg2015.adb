@@ -173,14 +173,9 @@ procedure Cxg2015 is
          if abs (Actual - Expected) > Max_Error then
             Accuracy_Error_Reported := True;
             Report.Failed
-              (Test_Name &
-               " actual: " &
-               Real'Image (Actual) &
-               " expected: " &
-               Real'Image (Expected) &
-               " difference: " &
-               Real'Image (Actual - Expected) &
-               " max err:" &
+              (Test_Name & " actual: " & Real'Image (Actual) & " expected: " &
+               Real'Image (Expected) & " difference: " &
+               Real'Image (Actual - Expected) & " max err:" &
                Real'Image (Max_Error));
          elsif Verbose then
             if Actual = Expected then
@@ -252,11 +247,8 @@ procedure Cxg2015 is
             Check
               (Arcsin (Arcsin_Test_Data (I).Argument),
                Arcsin_Test_Data (I).Radians,
-               "test" &
-               Integer'Image (I) &
-               " arcsin(" &
-               Real'Image (Arcsin_Test_Data (I).Argument) &
-               ")",
+               "test" & Integer'Image (I) & " arcsin(" &
+               Real'Image (Arcsin_Test_Data (I).Argument) & ")",
                Radian_Error);
 --pwb-math            Check (Arcsin (Arcsin_Test_Data (I).Argument, 2.0 * Pi),
 --pwb-math                   Arcsin_Test_Data (I).Radians,
@@ -268,11 +260,8 @@ procedure Cxg2015 is
             Check
               (Arcsin (Arcsin_Test_Data (I).Argument, 360.0),
                Arcsin_Test_Data (I).Degrees,
-               "test" &
-               Integer'Image (I) &
-               " arcsin(" &
-               Real'Image (Arcsin_Test_Data (I).Argument) &
-               ", 360)",
+               "test" & Integer'Image (I) & " arcsin(" &
+               Real'Image (Arcsin_Test_Data (I).Argument) & ", 360)",
                Cycle_Error);
          end loop;
 
@@ -291,11 +280,8 @@ procedure Cxg2015 is
             Check
               (Arccos (Arccos_Test_Data (I).Argument),
                Arccos_Test_Data (I).Radians,
-               "test" &
-               Integer'Image (I) &
-               " arccos(" &
-               Real'Image (Arccos_Test_Data (I).Argument) &
-               ")",
+               "test" & Integer'Image (I) & " arccos(" &
+               Real'Image (Arccos_Test_Data (I).Argument) & ")",
                Radian_Error);
 --pwb-math            Check (Arccos (Arccos_Test_Data (I).Argument, 2.0 * Pi),
 --pwb-math                   Arccos_Test_Data (I).Radians,
@@ -307,11 +293,8 @@ procedure Cxg2015 is
             Check
               (Arccos (Arccos_Test_Data (I).Argument, 360.0),
                Arccos_Test_Data (I).Degrees,
-               "test" &
-               Integer'Image (I) &
-               " arccos(" &
-               Real'Image (Arccos_Test_Data (I).Argument) &
-               ", 360)",
+               "test" & Integer'Image (I) & " arccos(" &
+               Real'Image (Arccos_Test_Data (I).Argument) & ", 360)",
                Cycle_Error);
          end loop;
 
@@ -322,9 +305,8 @@ procedure Cxg2015 is
             Report.Failed ("exception in special value test");
       end Special_Value_Test;
 
-      procedure Check_Exact
-        (Actual, Expected_Low, Expected_High : Real;
-         Test_Name                           : String)
+      procedure Check_Exact (Actual, Expected_Low, Expected_High : Real;
+         Test_Name                                               : String)
       is
          -- If the expected result is not a model number, then Expected_Low
          -- is the first machine number less than the (exact) expected result,
@@ -351,26 +333,16 @@ procedure Cxg2015 is
             Accuracy_Error_Reported := True;
             if Actual < Model_Expected_Low then
                Report.Failed
-                 (Test_Name &
-                  " actual: " &
-                  Real'Image (Actual) &
-                  " expected low: " &
-                  Real'Image (Model_Expected_Low) &
-                  " expected high: " &
-                  Real'Image (Model_Expected_High) &
-                  " difference: " &
-                  Real'Image (Actual - Expected_Low));
+                 (Test_Name & " actual: " & Real'Image (Actual) &
+                  " expected low: " & Real'Image (Model_Expected_Low) &
+                  " expected high: " & Real'Image (Model_Expected_High) &
+                  " difference: " & Real'Image (Actual - Expected_Low));
             else
                Report.Failed
-                 (Test_Name &
-                  " actual: " &
-                  Real'Image (Actual) &
-                  " expected low: " &
-                  Real'Image (Model_Expected_Low) &
-                  " expected high: " &
-                  Real'Image (Model_Expected_High) &
-                  " difference: " &
-                  Real'Image (Expected_High - Actual));
+                 (Test_Name & " actual: " & Real'Image (Actual) &
+                  " expected low: " & Real'Image (Model_Expected_Low) &
+                  " expected high: " & Real'Image (Model_Expected_High) &
+                  " difference: " & Real'Image (Expected_High - Actual));
             end if;
          elsif Verbose then
             Report.Comment (Test_Name & "  passed");
@@ -392,10 +364,7 @@ procedure Cxg2015 is
          Check_Exact (Arcsin (1.0, 360.0), 90.0, 90.0, "arcsin(1,360)");
 
          Check_Exact
-           (Arcsin (-1.0),
-            -Half_Pi_High,
-            -Half_Pi_Low,
-            "arcsin(-1)");
+           (Arcsin (-1.0), -Half_Pi_High, -Half_Pi_Low, "arcsin(-1)");
          Check_Exact (Arcsin (-1.0, 360.0), -90.0, -90.0, "arcsin(-1,360)");
 
          Check_Exact (Arccos (0.0), Half_Pi_Low, Half_Pi_High, "arccos(0)");
@@ -453,13 +422,9 @@ procedure Cxg2015 is
             end if;
 
             Check
-              (Actual,
-               Arcsin (X),
-               "Taylor Series test" &
-               Integer'Image (I) &
-               ": arcsin(" &
-               Real'Image (X) &
-               ") ",
+              (Actual, Arcsin (X),
+               "Taylor Series test" & Integer'Image (I) & ": arcsin(" &
+               Real'Image (X) & ") ",
                Minimum_Error);
 
             if Accuracy_Error_Reported then
@@ -474,12 +439,10 @@ procedure Cxg2015 is
          when Constraint_Error =>
             Report.Failed
               ("Constraint_Error raised in Arcsin_Taylor_Series_Test" &
-               " for X=" &
-               Real'Image (X));
+               " for X=" & Real'Image (X));
          when others =>
             Report.Failed
-              ("exception in Arcsin_Taylor_Series_Test" &
-               " for X=" &
+              ("exception in Arcsin_Taylor_Series_Test" & " for X=" &
                Real'Image (X));
       end Arcsin_Taylor_Series_Test;
 
@@ -551,13 +514,9 @@ procedure Cxg2015 is
             end if;
 
             Check
-              (Actual,
-               Arccos (X),
-               "Taylor Series test" &
-               Integer'Image (I) &
-               ": arccos(" &
-               Real'Image (X) &
-               ") ",
+              (Actual, Arccos (X),
+               "Taylor Series test" & Integer'Image (I) & ": arccos(" &
+               Real'Image (X) & ") ",
                Minimum_Error);
 
             -- only report the first error in this test in order to keep lots
@@ -569,12 +528,10 @@ procedure Cxg2015 is
          when Constraint_Error =>
             Report.Failed
               ("Constraint_Error raised in Arccos_Taylor_Series_Test" &
-               " for X=" &
-               Real'Image (X));
+               " for X=" & Real'Image (X));
          when others =>
             Report.Failed
-              ("exception in Arccos_Taylor_Series_Test" &
-               " for X=" &
+              ("exception in Arccos_Taylor_Series_Test" & " for X=" &
                Real'Image (X));
       end Arccos_Taylor_Series_Test;
 
@@ -591,13 +548,9 @@ procedure Cxg2015 is
             X := (B - A) * Real (I) / Real (Max_Samples) + A;
 
             Check
-              (Arcsin (-X),
-               -Arcsin (X),
-               "Identity test" &
-               Integer'Image (I) &
-               ": arcsin(" &
-               Real'Image (X) &
-               ") ",
+              (Arcsin (-X), -Arcsin (X),
+               "Identity test" & Integer'Image (I) & ": arcsin(" &
+               Real'Image (X) & ") ",
                8.0);   -- 2 arcsin evaluations => twice the error bound
 
             if Accuracy_Error_Reported then
@@ -666,12 +619,9 @@ procedure Cxg2015 is
    Float_Half_Pi_High : constant := Float'Adjacent (Pi / 2.0, 10.0);
    Float_Pi_Low       : constant := Float'Adjacent (Pi, 0.0);
    Float_Pi_High      : constant := Float'Adjacent (Pi, 10.0);
-   package Float_Check is new Generic_Check
-     (Float,
-      Half_Pi_Low  => Float_Half_Pi_Low,
-      Half_Pi_High => Float_Half_Pi_High,
-      Pi_Low       => Float_Pi_Low,
-      Pi_High      => Float_Pi_High);
+   package Float_Check is new Generic_Check (Float,
+      Half_Pi_Low => Float_Half_Pi_Low, Half_Pi_High => Float_Half_Pi_High,
+      Pi_Low      => Float_Pi_Low, Pi_High => Float_Pi_High);
 
    -- check the floating point type with the most digits
    type A_Long_Float is digits System.Max_Digits;
@@ -681,11 +631,9 @@ procedure Cxg2015 is
      A_Long_Float'Adjacent (Pi / 2.0, 10.0);
    A_Long_Float_Pi_Low  : constant := A_Long_Float'Adjacent (Pi, 0.0);
    A_Long_Float_Pi_High : constant := A_Long_Float'Adjacent (Pi, 10.0);
-   package A_Long_Float_Check is new Generic_Check
-     (A_Long_Float,
+   package A_Long_Float_Check is new Generic_Check (A_Long_Float,
       Half_Pi_Low  => A_Long_Float_Half_Pi_Low,
-      Half_Pi_High => A_Long_Float_Half_Pi_High,
-      Pi_Low       => A_Long_Float_Pi_Low,
+      Half_Pi_High => A_Long_Float_Half_Pi_High, Pi_Low => A_Long_Float_Pi_Low,
       Pi_High      => A_Long_Float_Pi_High);
 
 -----------------------------------------------------------------------
@@ -693,8 +641,7 @@ procedure Cxg2015 is
 
 begin
    Report.Test
-     ("CXG2015",
-      "Check the accuracy of the ARCSIN and ARCCOS functions");
+     ("CXG2015", "Check the accuracy of the ARCSIN and ARCCOS functions");
 
    if Verbose then
       Report.Comment ("checking Standard.Float");
@@ -704,8 +651,7 @@ begin
 
    if Verbose then
       Report.Comment
-        ("checking a digits" &
-         Integer'Image (System.Max_Digits) &
+        ("checking a digits" & Integer'Image (System.Max_Digits) &
          " floating point type");
    end if;
 

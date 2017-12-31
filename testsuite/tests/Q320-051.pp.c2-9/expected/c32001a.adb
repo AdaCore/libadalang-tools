@@ -57,9 +57,8 @@ begin
    declare
 
       type Day is (Mon, Tues, Wed, Thurs, Fri);
-      D1, D2 : Day range Mon .. Day'Val (F (1)) := Day'Val (F (1) - 1);
-      Cd1,
-      Cd2 : constant Day range Mon .. Day'Val (F (2)) :=
+      D1, D2   : Day range Mon .. Day'Val (F (1)) := Day'Val (F (1) - 1);
+      Cd1, Cd2 : constant Day range Mon .. Day'Val (F (2)) :=
         Day'Val (F (2) - 1);
 
       I1, I2   : Integer range 0 .. F (3)          := F (3) - 1;

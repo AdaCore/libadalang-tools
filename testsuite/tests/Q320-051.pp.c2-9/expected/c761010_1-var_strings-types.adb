@@ -12,10 +12,8 @@ package body C761010_1.Var_Strings.Types is
       else
          for I in 1 .. X.N_Strings loop
             if X.Ptrs.Ptrs (I) /= Y.Ptrs.Ptrs (I) then
-               if X.Ptrs.Ptrs (I) = null
-                 or else Y.Ptrs.Ptrs (I) = null
-                 or else X.Ptrs.Ptrs (I).all /= Y.Ptrs.Ptrs (I).all
-               then
+               if X.Ptrs.Ptrs (I) = null or else Y.Ptrs.Ptrs (I) = null
+                 or else X.Ptrs.Ptrs (I).all /= Y.Ptrs.Ptrs (I).all then
                   Failed ("Records should be equal (2)");
                end if;
             end if;
@@ -26,36 +24,26 @@ package body C761010_1.Var_Strings.Types is
       end if;
    end Check_Equal;
 
-   procedure My_Check_Equal
-     (X : Rec := Rec_Var;
-      Y : Rec :=
+   procedure My_Check_Equal (X : Rec := Rec_Var;
+      Y                        : Rec :=
         (N_Strings => 2,
          Ptrs      =>
            (2,
             (1 .. 1 => null,
              2      =>
                new Var_String'
-                 (Finalization.Controlled with
-                  Length => 2,
-                  Comp_1 => new String'("abcdefghij"),
-                  Comp_2 => null,
-                  Comp_3 => (2 .. 2 => ' '),
-                  Tc_Lab => 'M'))),
+                 (Finalization.Controlled with Length => 2,
+                  Comp_1 => new String'("abcdefghij"), Comp_2 => null,
+                  Comp_3 => (2 .. 2 => ' '), Tc_Lab => 'M'))),
          Strings =>
            (1 =>
-              (Finalization.Controlled with
-               Length => 2,
-               Comp_1 => new String'("abcdefghij"),
-               Comp_2 => null,
-               Comp_3 => (2 .. 2 => ' '),
-               Tc_Lab => 'N'),
+              (Finalization.Controlled with Length => 2,
+               Comp_1 => new String'("abcdefghij"), Comp_2 => null,
+               Comp_3 => (2 .. 2 => ' '), Tc_Lab => 'N'),
             others =>
-              (Finalization.Controlled with
-               Length => 2,
-               Comp_1 => new String'("abcdefghij"),
-               Comp_2 => null,
-               Comp_3 => (2 .. 2 => ' '),
-               Tc_Lab => 'O')))) renames
+              (Finalization.Controlled with Length => 2,
+               Comp_1 => new String'("abcdefghij"), Comp_2 => null,
+               Comp_3 => (2 .. 2 => ' '), Tc_Lab => 'O')))) renames
      Check_Equal;
 begin
 
@@ -69,27 +57,18 @@ begin
           (1 .. 1 => null,
            2      =>
              new Var_String'
-               (Finalization.Controlled with
-                Length => 2,
-                Comp_1 => new String'("abcdefghij"),
-                Comp_2 => null,
-                Comp_3 => (2 .. 2 => ' '),
-                Tc_Lab => 'P'))),
+               (Finalization.Controlled with Length => 2,
+                Comp_1 => new String'("abcdefghij"), Comp_2 => null,
+                Comp_3 => (2 .. 2 => ' '), Tc_Lab => 'P'))),
        Strings =>
          (1 =>
-            (Finalization.Controlled with
-             Length => 2,
-             Comp_1 => new String'("abcdefghij"),
-             Comp_2 => null,
-             Comp_3 => (2 .. 2 => ' '),
-             Tc_Lab => 'Q'),
+            (Finalization.Controlled with Length => 2,
+             Comp_1 => new String'("abcdefghij"), Comp_2 => null,
+             Comp_3 => (2 .. 2 => ' '), Tc_Lab => 'Q'),
           others =>
-            (Finalization.Controlled with
-             Length => 2,
-             Comp_1 => new String'("abcdefghij"),
-             Comp_2 => null,
-             Comp_3 => (2 .. 2 => ' '),
-             Tc_Lab => 'R'))));
+            (Finalization.Controlled with Length => 2,
+             Comp_1 => new String'("abcdefghij"), Comp_2 => null,
+             Comp_3 => (2 .. 2 => ' '), Tc_Lab => 'R'))));
 
    -- Use the objects to avoid optimizations.
 

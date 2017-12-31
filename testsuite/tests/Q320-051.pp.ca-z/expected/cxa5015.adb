@@ -76,8 +76,7 @@ begin
    Report.Test
      ("CXA5015",
       "Check that certain representation-oriented " &
-      "attributes are available and that they " &
-      "produce correct results");
+      "attributes are available and that they " & "produce correct results");
 
    -- New Representation-Oriented Attributes.
    --
@@ -105,8 +104,7 @@ begin
    Tc_Dfloat_2 := 2.65;
 
    if Float'Exponent (Tc_Float) > Float_Subtype'Exponent (Tc_Sfloat) or
-     Float'Exponent (Tc_Float) > 2
-   then
+     Float'Exponent (Tc_Float) > 2 then
       Report.Failed ("Incorrect result from the 'Exponent attribute");
    end if;
 
@@ -122,8 +120,7 @@ begin
 
    if Float'Fraction (Tc_Float) <
      (1.0 / Float (Float'Machine_Radix)) - Tc_Tolerance or
-     Float'Fraction (Tc_Float) >= 1.0 - Tc_Tolerance
-   then
+     Float'Fraction (Tc_Float) >= 1.0 - Tc_Tolerance then
       Report.Failed ("Incorrect result from the 'Fraction attribute - 2");
    end if;
 
@@ -141,8 +138,7 @@ begin
    -- Check the S'Scaling attribute.
 
    if Not_Equal
-       (Float'Scaling (Tc_Float, 2),
-        Tc_Float * Float (Float'Machine_Radix)**2,
+       (Float'Scaling (Tc_Float, 2), Tc_Float * Float (Float'Machine_Radix)**2,
         Tc_Tolerance)
    then
       Report.Failed ("Incorrect result from the 'Scaling attribute");
@@ -158,8 +154,7 @@ begin
    if Float'Floor (Tc_Float) /= 0.0 or
      Float_Subtype'Floor (Tc_Sfloat) /= 1.0 or
      Derived_Float_1'Floor (Tc_Dfloat_1) /= 2.0 or
-     Derived_Float_2'Floor (Tc_Dfloat_2) /= -3.0
-   then
+     Derived_Float_2'Floor (Tc_Dfloat_2) /= -3.0 then
       Report.Failed ("Incorrect result from the 'Floor attribute");
    end if;
 
@@ -173,8 +168,7 @@ begin
    if Float'Ceiling (Tc_Float) /= 1.0 or
      Float_Subtype'Ceiling (Tc_Sfloat) /= 1.0 or
      Derived_Float_1'Ceiling (Tc_Dfloat_1) /= 3.0 or
-     Derived_Float_2'Ceiling (Tc_Dfloat_2) /= -2.0
-   then
+     Derived_Float_2'Ceiling (Tc_Dfloat_2) /= -2.0 then
       Report.Failed ("Incorrect result from the 'Ceiling attribute");
    end if;
 
@@ -188,8 +182,7 @@ begin
    if Float'Rounding (Tc_Float) /= 0.0 or
      Float_Subtype'Rounding (Tc_Sfloat) /= 1.0 or
      Derived_Float_1'Rounding (Tc_Dfloat_1) /= 3.0 or
-     Derived_Float_2'Rounding (Tc_Dfloat_2) /= -3.0
-   then
+     Derived_Float_2'Rounding (Tc_Dfloat_2) /= -3.0 then
       Report.Failed ("Incorrect result from the 'Rounding attribute");
    end if;
 
@@ -203,8 +196,7 @@ begin
    if Float'Unbiased_Rounding (Tc_Float) /= 0.0 or
      Float_Subtype'Unbiased_Rounding (Tc_Sfloat) /= 2.0 or
      Derived_Float_1'Unbiased_Rounding (Tc_Dfloat_1) /= 2.0 or
-     Derived_Float_2'Unbiased_Rounding (Tc_Dfloat_2) /= -2.0
-   then
+     Derived_Float_2'Unbiased_Rounding (Tc_Dfloat_2) /= -2.0 then
       Report.Failed
         ("Incorrect result from the 'Unbiased_Rounding " & "attribute");
    end if;
@@ -219,8 +211,7 @@ begin
    if Float'Truncation (Tc_Float) /= 0.0 or
      Float_Subtype'Truncation (Tc_Sfloat) /= 1.0 or
      Derived_Float_1'Truncation (Tc_Dfloat_1) /= 2.0 or
-     Derived_Float_2'Truncation (Tc_Dfloat_2) /= -2.0
-   then
+     Derived_Float_2'Truncation (Tc_Dfloat_2) /= -2.0 then
       Report.Failed ("Incorrect result from the 'Truncation attribute");
    end if;
 
@@ -234,8 +225,7 @@ begin
    if Float'Remainder (Tc_Float, 2.0) /= 1.0 or
      Float_Subtype'Remainder (Tc_Sfloat, 3.0) /= 1.5 or
      Derived_Float_1'Remainder (Tc_Dfloat_1, 2.0) /= 1.0 or
-     Derived_Float_2'Remainder (Tc_Dfloat_2, 4.0) /= 0.0
-   then
+     Derived_Float_2'Remainder (Tc_Dfloat_2, 4.0) /= 0.0 then
       Report.Failed ("Incorrect result from the 'Remainder attribute");
    end if;
 
@@ -245,8 +235,7 @@ begin
    Tc_Sfloat := -1.0;
 
    if Float'Adjacent (Tc_Float, Tc_Float) /= Tc_Float or
-     Float_Subtype'Adjacent (Tc_Sfloat, -1.0) /= Tc_Sfloat
-   then
+     Float_Subtype'Adjacent (Tc_Sfloat, -1.0) /= Tc_Sfloat then
       Report.Failed ("Incorrect result from the 'Adjacent attribute");
    end if;
 
@@ -260,8 +249,7 @@ begin
    if Float'Copy_Sign (Tc_Float, -2.0) /= 0.0 or
      Float_Subtype'Copy_Sign (Tc_Sfloat, 4.0) /= 1.0 or
      Derived_Float_1'Copy_Sign (Tc_Dfloat_1, -2.0) /= -5.0 or
-     Derived_Float_2'Copy_Sign (Tc_Dfloat_2, -2.0) /= -2.5
-   then
+     Derived_Float_2'Copy_Sign (Tc_Dfloat_2, -2.0) /= -2.5 then
       Report.Failed ("Incorrect result from the 'Copy_Sign attribute");
    end if;
 
@@ -283,8 +271,7 @@ begin
    if Float'Leading_Part (Tc_Float, 2) /= Tc_Float or
      Float_Subtype'Leading_Part (Tc_Sfloat, 2) /= Tc_Sfloat or
      Derived_Float_1'Leading_Part (Tc_Dfloat_1, 2) /= Tc_Dfloat_1 or
-     Derived_Float_2'Leading_Part (Tc_Dfloat_2, 2) /= Tc_Dfloat_2
-   then
+     Derived_Float_2'Leading_Part (Tc_Dfloat_2, 2) /= Tc_Dfloat_2 then
       Report.Failed ("Incorrect result from the 'Leading_Part attribute");
    end if;
 
@@ -306,8 +293,7 @@ begin
    if Float'Machine (Tc_Float) /= Tc_Float or
      Float_Subtype'Machine (Tc_Sfloat) /= Tc_Sfloat or
      Derived_Float_1'Machine (Tc_Dfloat_1) /= Tc_Dfloat_1 or
-     Derived_Float_2'Machine (Tc_Dfloat_2) /= Tc_Dfloat_2
-   then
+     Derived_Float_2'Machine (Tc_Dfloat_2) /= Tc_Dfloat_2 then
       Report.Failed ("Incorrect result from the 'Machine attribute");
    end if;
 
@@ -316,8 +302,7 @@ begin
    -- Check the S'Model_Small attribute.
 
    if Not_Equal
-       (Float'Model_Small,
-        Float (Float'Machine_Radix)**(Float'Model_Emin - 1),
+       (Float'Model_Small, Float (Float'Machine_Radix)**(Float'Model_Emin - 1),
         Tc_Tolerance)
    then
       Report.Failed ("Incorrect result from the 'Model_Small attribute");

@@ -30,27 +30,22 @@ procedure Cxc3001 is
 
                  --===--===--===--===--===--===--===--===--===--
 
-   procedure Check_Attachments
-     (Isreserved     : in Interrupt_Array;
-      Expected_Value : in Boolean)
+   procedure Check_Attachments (Isreserved : in Interrupt_Array;
+      Expected_Value                       : in Boolean)
    is
       Fail_Count : Natural := 0;
    begin
       for Interrupt in Isreserved'Range loop
          if not Isreserved (Interrupt)
-           and then Ai.Is_Attached (Interrupt) /= Expected_Value
-         then
+           and then Ai.Is_Attached (Interrupt) /= Expected_Value then
             Fail_Count := Fail_Count + 1;
          end if;
       end loop;
 
       if Fail_Count /= 0 then
          Report.Failed
-           ("Wrong result from Is_Attached for" &
-            Natural'Image (Fail_Count) &
-            " of" &
-            Natural'Image (Isreserved'Length) &
-            " interrupt IDs");
+           ("Wrong result from Is_Attached for" & Natural'Image (Fail_Count) &
+            " of" & Natural'Image (Isreserved'Length) & " interrupt IDs");
       end if;
    end Check_Attachments;
 
@@ -149,8 +144,7 @@ procedure Cxc3001 is
          Report.Failed ("Bad handle count before Exchange_Handler");
       else
          Ai.Exchange_Handler
-           (Old,
-            Cxc3001_0.Good.Handler'Access,
+           (Old, Cxc3001_0.Good.Handler'Access,
             Impdef.Annex_C.Interrupt_To_Generate);
 
          Impdef.Annex_C.Generate_Interrupt;
@@ -161,8 +155,7 @@ procedure Cxc3001 is
          else
             begin
                Ai.Exchange_Handler
-                 (Old,
-                  Cxc3001_0.Bad.Handler'Access,
+                 (Old, Cxc3001_0.Bad.Handler'Access,
                   Impdef.Annex_C.Interrupt_To_Generate);
                Report.Failed ("Program_Error not raised by Exchange_Handler");
             exception
@@ -219,8 +212,7 @@ begin
    end if;
 
    Check_Attachments
-     (Isreserved     => Reserved_Interrupt,
-      Expected_Value => False);
+     (Isreserved => Reserved_Interrupt, Expected_Value => False);
 
 -- Attach a user-defined handler to each non-reserved interrupt:
    Attach_Handlers (Reserved_Interrupt);
@@ -232,8 +224,7 @@ begin
    end if;
 
    Check_Attachments
-     (Isreserved     => Reserved_Interrupt,
-      Expected_Value => True);
+     (Isreserved => Reserved_Interrupt, Expected_Value => True);
 
 -- Detach user-defined handlers from each non-reserved interrupt:
    Detach_Handlers (Reserved_Interrupt);
@@ -245,8 +236,7 @@ begin
    end if;
 
    Check_Attachments
-     (Isreserved     => Reserved_Interrupt,
-      Expected_Value => False);
+     (Isreserved => Reserved_Interrupt, Expected_Value => False);
 
 -- Verify that P_E is raised if Attach_Handler uses an invalid handler:
    Test_Attach_Handler;

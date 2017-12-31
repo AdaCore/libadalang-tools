@@ -118,13 +118,9 @@ procedure Cxg2005 is
 
                if Z /= Eps * Bn + Eps * Bn then
                   Report.Failed
-                    ("addition check failed.  K=" &
-                     Integer'Image (K) &
-                     "  N=" &
-                     Integer'Image (N) &
-                     "  difference=" &
-                     Real'Image (Z - 2.0 * Eps * Bn) &
-                     "  Eps*BN=" &
+                    ("addition check failed.  K=" & Integer'Image (K) &
+                     "  N=" & Integer'Image (N) & "  difference=" &
+                     Real'Image (Z - 2.0 * Eps * Bn) & "  Eps*BN=" &
                      Real'Image (Eps * Bn));
                   Failure_Count := Failure_Count + 1;
                   exit when Failure_Count >
@@ -197,8 +193,7 @@ begin
 
    if Verbose then
       Report.Comment
-        ("checking a digits" &
-         Integer'Image (System.Max_Digits) &
+        ("checking a digits" & Integer'Image (System.Max_Digits) &
          " floating point type");
    end if;
    Chk_A_Long_Float.Do_Test;

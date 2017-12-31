@@ -26,15 +26,11 @@ begin
       "public child inherits primitive operations from parent");
 
    App1_Widget_Specific_Oper
-     (C          => White,
-      L          => "Line Editor    ",
-      The_Widget => White_Widget,
-      I          => 10);
+     (C => White, L => "Line Editor    ", The_Widget => White_Widget, I => 10);
    -- Inherited from Application_One_Widget.
    if White_Widget.Color /= White or
      White_Widget.Id /= Widget_Id (Report.Ident_Int (10)) or
-     White_Widget.Label /= "Line Editor    "
-   then
+     White_Widget.Label /= "Line Editor    " then
       Report.Failed ("Incorrect result for White_Widget");
    end if;
 
@@ -42,8 +38,7 @@ begin
 
    App2_Widget_Specific_Op1 (White_Widget, S => (100, 200));
 
-   if White_Widget.Size.X_Length /= 100 or
-     White_Widget.Size.Y_Length /= 200
+   if White_Widget.Size.X_Length /= 100 or White_Widget.Size.Y_Length /= 200
    then
       Report.Failed ("Incorrect size for White_Widget");
    end if;
@@ -61,8 +56,7 @@ begin
      Amber_Widget.Label /= "Screen Editor  " or
      Amber_Widget.Size /= (1_024, 100) or
      Amber_Widget.Location.X_Location /= 1_024 or
-     Amber_Widget.Location.Y_Location /= 760
-   then
+     Amber_Widget.Location.Y_Location /= 760 then
       Report.Failed ("Incorrect result for Amber_Widget");
    end if;
 

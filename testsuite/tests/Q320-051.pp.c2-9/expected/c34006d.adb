@@ -58,14 +58,8 @@ procedure C34006d is
          end case;
       end record;
 
-      function Create
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         C : Component;
-         F : Float;
-         X : Parent  -- TO RESOLVE OVERLOADING.
+      function Create (B : Boolean; L : Length; I : Integer; S : String;
+         C : Component; F : Float; X : Parent  -- TO RESOLVE OVERLOADING.
          ) return Parent;
 
    end Pkg;
@@ -86,14 +80,8 @@ procedure C34006d is
 
    package body Pkg is
 
-      function Create
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         C : Component;
-         F : Float;
-         X : Parent) return Parent
+      function Create (B : Boolean; L : Length; I : Integer; S : String;
+         C               : Component; F : Float; X : Parent) return Parent
       is
       begin
          case B is
@@ -156,17 +144,14 @@ begin
    end;
 
    if Ident ((True, 3, 1, "ABC", 4)) /= (True, 3, 1, "ABC", 4) or
-     X = (False, 3, 1, 4.0)
-   then
+     X = (False, 3, 1, 4.0) then
       Failed ("INCORRECT AGGREGATE");
    end if;
 
    begin
-      if X.B /= True or
-        X.L /= 3 or
+      if X.B /= True or X.L /= 3 or
         Create (False, 2, 3, "XX", 5, 6.0, X).B /= False or
-        Create (False, 2, 3, "XX", 5, 6.0, X).L /= 2
-      then
+        Create (False, 2, 3, "XX", 5, 6.0, X).L /= 2 then
          Failed ("INCORRECT SELECTION (DISCRIMINANT)");
       end if;
    exception
@@ -177,12 +162,9 @@ begin
    end;
 
    begin
-      if X.I /= 1 or
-        X.S /= "ABC" or
-        X.C /= 4 or
+      if X.I /= 1 or X.S /= "ABC" or X.C /= 4 or
         Create (False, 2, 3, "XX", 5, 6.0, X).I /= 3 or
-        Create (False, 2, 3, "XX", 5, 6.0, X).F /= 6.0
-      then
+        Create (False, 2, 3, "XX", 5, 6.0, X).F /= 6.0 then
          Failed ("INCORRECT SELECTION (VALUE)");
       end if;
    exception

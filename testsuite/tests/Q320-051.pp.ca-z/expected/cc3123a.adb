@@ -34,8 +34,7 @@ begin
    Test
      ("CC3123A",
       "CHECK THAT DEFAULT EXPRESSIONS FOR GENERIC IN " &
-      "PARAMETERS ARE ONLY EVALUATED IF THERE ARE " &
-      "NO ACTUAL PARAMETERS");
+      "PARAMETERS ARE ONLY EVALUATED IF THERE ARE " & "NO ACTUAL PARAMETERS");
    declare
       type Enum is (I, Ii, Iii);
       Obj_Int  : Integer := 1;

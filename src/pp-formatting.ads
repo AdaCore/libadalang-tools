@@ -381,8 +381,8 @@ package Pp.Formatting is
    --     command-line options.
    --
    --  Insert_Form_Feeds
-   --     Implement the -ff switch, by inserting FF characters after
-   --     "pragma Page;".
+   --     Implement the --ff-after-pragma-page switch, by inserting FF
+   --     characters after "pragma Page;".
    --
    --  Copy_Pp_Off_Regions
    --     Regions where pretty printing should be turned off have been

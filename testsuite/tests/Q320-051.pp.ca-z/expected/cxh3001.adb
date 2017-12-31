@@ -5,8 +5,7 @@ with Cxh3001_0;
 procedure Cxh3001 is
 begin
    Report.Test
-     ("CXH3001",
-      "Check pragma Reviewable as a configuration pragma");
+     ("CXH3001", "Check pragma Reviewable as a configuration pragma");
 
    Block :
    declare
@@ -41,10 +40,8 @@ begin
          delay 1.0; -- wait for TT to become non-callable
       end loop;
 
-      if not Cxh3001_0.Pt.Enquire or
-        not Cxh3001_0.Global_Variable or
-        Cxh3001_0.Tt'Callable
-      then
+      if not Cxh3001_0.Pt.Enquire or not Cxh3001_0.Global_Variable or
+        Cxh3001_0.Tt'Callable then
          Report.Failed (Message);
       end if;
 

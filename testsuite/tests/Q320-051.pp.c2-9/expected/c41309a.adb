@@ -34,8 +34,7 @@ begin
    Test
      ("C41309A",
       "CHECK THAT AN EXPANDED NAME IS ALLOWED EVEN " &
-      "IF A USE CLAUSE MAKES THE EXPANDED NAME " &
-      "UNNECESSARY");
+      "IF A USE CLAUSE MAKES THE EXPANDED NAME " & "UNNECESSARY");
    declare
       package P is
          package Q is

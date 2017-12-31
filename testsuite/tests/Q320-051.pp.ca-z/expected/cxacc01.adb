@@ -80,9 +80,7 @@ begin
       -- Not_Applicable result.
 
       Ada.Streams.Stream_Io.Create
-        (Order_File,
-         Ada.Streams.Stream_Io.Out_File,
-         Order_Filename);
+        (Order_File, Ada.Streams.Stream_Io.Out_File, Order_Filename);
 
    exception
 
@@ -145,8 +143,7 @@ begin
       Reset1 :
       begin
          Ada.Streams.Stream_Io.Reset
-           (Order_File,
-            Ada.Streams.Stream_Io.In_File);
+           (Order_File, Ada.Streams.Stream_Io.In_File);
       exception
          when Ada.Streams.Stream_Io.Use_Error =>
             Report.Not_Applicable
@@ -202,8 +199,7 @@ begin
          if Vip_Order.Location /= Mayoral_Ticket_Request.Location or
            Vip_Order.Number_Of_Tickets /=
              Mayoral_Ticket_Request.Number_Of_Tickets or
-           Vip_Order.Rank /= Mayoral_Ticket_Request.Rank
-         then
+           Vip_Order.Rank /= Mayoral_Ticket_Request.Rank then
             Report.Failed ("VIP_Request object validation failure");
          end if;
 
@@ -213,8 +209,7 @@ begin
            Last_Minute_Order.Rank /= Late_Request.Rank or
            Last_Minute_Order.Special_Consideration /=
              Late_Request.Special_Consideration or
-           Last_Minute_Order.Donation /= Late_Request.Donation
-         then
+           Last_Minute_Order.Donation /= Late_Request.Donation then
             Report.Failed ("Last_Minute_Request object validation failure");
          end if;
 
@@ -261,9 +256,7 @@ begin
          Ada.Streams.Stream_Io.Delete (Order_File);
       else
          Ada.Streams.Stream_Io.Open
-           (Order_File,
-            Ada.Streams.Stream_Io.Out_File,
-            Order_Filename);
+           (Order_File, Ada.Streams.Stream_Io.Out_File, Order_Filename);
          Ada.Streams.Stream_Io.Delete (Order_File);
       end if;
    exception

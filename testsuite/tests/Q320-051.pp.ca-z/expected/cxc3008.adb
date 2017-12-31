@@ -39,8 +39,7 @@ begin
       delay Impdef.Annex_C.Wait_For_Interrupt;
 
       if Cxc3008_0.Dynamic1.Handle_Count /= 0 or
-        Cxc3008_0.Dynamic2.Handle_Count /= 1
-      then
+        Cxc3008_0.Dynamic2.Handle_Count /= 1 then
          Report.Failed ("Wrong handler counts after 1st interrupt");
       end if;
 
@@ -49,8 +48,7 @@ begin
       -- Exchange handlers:
 
       Ai.Exchange_Handler
-        (Old_Handler,
-         Cxc3008_0.Dynamic1.Handler'Access,
+        (Old_Handler, Cxc3008_0.Dynamic1.Handler'Access,
          Impdef.Annex_C.Interrupt_To_Generate);
 
       -- Old_Handler now designates Dynamic2.Handler.
@@ -59,8 +57,7 @@ begin
       delay Impdef.Annex_C.Wait_For_Interrupt;
 
       if Cxc3008_0.Dynamic1.Handle_Count /= 1 or
-        Cxc3008_0.Dynamic2.Handle_Count /= 1
-      then
+        Cxc3008_0.Dynamic2.Handle_Count /= 1 then
          Report.Failed ("Wrong handler counts after 2nd interrupt");
       end if;
 
@@ -77,10 +74,8 @@ begin
          Impdef.Annex_C.Generate_Interrupt;
          delay Impdef.Annex_C.Wait_For_Interrupt;
 
-         if Static.Handle_Count /= 1 or
-           Cxc3008_0.Dynamic1.Handle_Count /= 1 or
-           Cxc3008_0.Dynamic2.Handle_Count /= 1
-         then
+         if Static.Handle_Count /= 1 or Cxc3008_0.Dynamic1.Handle_Count /= 1 or
+           Cxc3008_0.Dynamic2.Handle_Count /= 1 then
             Report.Failed ("Wrong handler counts after 3rd interrupt");
          end if;
 
@@ -104,8 +99,7 @@ begin
       delay Impdef.Annex_C.Wait_For_Interrupt;
 
       if Cxc3008_0.Dynamic1.Handle_Count /= 1 or
-        Cxc3008_0.Dynamic2.Handle_Count /= 2
-      then
+        Cxc3008_0.Dynamic2.Handle_Count /= 2 then
          Report.Failed ("Wrong handler counts after 4th interrupt");
       end if;
 
@@ -131,8 +125,7 @@ begin
       delay Impdef.Annex_C.Wait_For_Interrupt;
 
       if Cxc3008_0.Dynamic1.Handle_Count /= 2 or
-        Cxc3008_0.Dynamic2.Handle_Count /= 2
-      then
+        Cxc3008_0.Dynamic2.Handle_Count /= 2 then
          Report.Failed ("Wrong handler counts after 5th interrupt");
       end if;
 
@@ -155,8 +148,7 @@ begin
       delay Impdef.Annex_C.Wait_For_Interrupt;
 
       if Cxc3008_0.Dynamic1.Handle_Count /= 3 or
-        Cxc3008_0.Dynamic2.Handle_Count /= 2
-      then
+        Cxc3008_0.Dynamic2.Handle_Count /= 2 then
          Report.Failed ("Wrong handler counts after 6th interrupt");
       end if;
 

@@ -86,12 +86,10 @@ begin
       Result_Value := A * B;
 
       if (Result_Value < Lowest_Acceptable_Value) or
-        (Result_Value > Highest_Acceptable_Value)
-      then
+        (Result_Value > Highest_Acceptable_Value) then
          Failed
            ("RESULT OF ""*"" OUTSIDE RESULT MODEL INTERVAL " &
-            "FOR INTEGER * FIXED " &
-            "WHEN ALL VALUES ARE MODEL NUMBERS");
+            "FOR INTEGER * FIXED " & "WHEN ALL VALUES ARE MODEL NUMBERS");
       end if;
    end A;
 
@@ -115,12 +113,10 @@ begin
       Result_Value := A * B;
 
       if (Result_Value < Lowest_Acceptable_Value) or
-        (Result_Value > Highest_Acceptable_Value)
-      then
+        (Result_Value > Highest_Acceptable_Value) then
          Failed
            ("RESULT OF ""*"" OUTSIDE RESULT MODEL INTERVAL " &
-            "FOR FIXED * INTEGER " &
-            "WHEN ALL VALUES ARE MODEL NUMBERS");
+            "FOR FIXED * INTEGER " & "WHEN ALL VALUES ARE MODEL NUMBERS");
       end if;
    end B;
 
@@ -146,8 +142,7 @@ begin
       Result_Value := A * B;
 
       if (Result_Value < Lowest_Acceptable_Value) or
-        (Result_Value > Highest_Acceptable_Value)
-      then
+        (Result_Value > Highest_Acceptable_Value) then
          Failed
            ("RESULT OF ""*"" OUTSIDE RESULT MODEL INTERVAL " &
             "FOR INTEGER * FIXED FOR NON-MODEL NUMBERS");
@@ -177,8 +172,7 @@ begin
       Result_Value := A * B;
 
       if (Result_Value < Lowest_Acceptable_Value) or
-        (Result_Value > Highest_Acceptable_Value)
-      then
+        (Result_Value > Highest_Acceptable_Value) then
          Failed
            ("RESULT OF ""*"" OUTSIDE RESULT MODEL INTERVAL " &
             "FOR FIXED * INTEGER FOR NON-MODEL NUMBERS");

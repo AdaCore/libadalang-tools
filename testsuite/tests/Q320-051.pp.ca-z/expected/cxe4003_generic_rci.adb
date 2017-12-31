@@ -13,8 +13,7 @@ package body Cxe4003_Generic_Rci is
       if X /= Last_Call + 1 then
          Report.Failed
            ("call out of sequence.  Expected " &
-            Integer'Image (Last_Call + 1) &
-            "  Received: " &
+            Integer'Image (Last_Call + 1) & "  Received: " &
             Integer'Image (X));
       end if;
       Last_Call := X;
@@ -26,9 +25,7 @@ package body Cxe4003_Generic_Rci is
       if Last_Call /= High then
          Report.Failed
            ("not all the remote calls completed, only" &
-            Integer'Image (Last_Call) &
-            " of" &
-            Integer'Image (High));
+            Integer'Image (Last_Call) & " of" & Integer'Image (High));
       end if;
    end Done;
 end Cxe4003_Generic_Rci;

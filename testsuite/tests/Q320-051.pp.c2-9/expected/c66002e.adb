@@ -73,10 +73,8 @@ begin
 
          if S /= "AB" then
             Failed
-              ("PROCEDURES IN " &
-               "ENCLOSING-ENCLOSED SCOPES " &
-               "DIFFERING ONLY IN PARAMETER " &
-               "TYPE ORDER CAUSED CONFUSION");
+              ("PROCEDURES IN " & "ENCLOSING-ENCLOSED SCOPES " &
+               "DIFFERING ONLY IN PARAMETER " & "TYPE ORDER CAUSED CONFUSION");
          end if;
       end;
    end;

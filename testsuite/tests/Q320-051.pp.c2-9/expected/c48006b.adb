@@ -42,8 +42,7 @@ begin
 
    Test
      ("C48006B",
-      "CHECK THAT THE FORM 'NEW T'(X)' " &
-      "ALLOCATES A NEW OBJECT " &
+      "CHECK THAT THE FORM 'NEW T'(X)' " & "ALLOCATES A NEW OBJECT " &
       "AND THAT IF T IS A RECORD, ARRAY, OR PRIVATE " &
       "TYPE, THE ALLOCATED OBJECT HAS THE VALUE (X)");
 
@@ -71,8 +70,7 @@ begin
 
       Vb1 := new Tb'(2, 3, 5);
       if
-        (Vb1.A /= Ident_Int (2) or
-         Vb1.B /= Ident_Int (3) or
+        (Vb1.A /= Ident_Int (2) or Vb1.B /= Ident_Int (3) or
          Vb1.C /= Ident_Int (5))
       then
          Failed ("WRONG VALUES  -  B1 1");
@@ -80,11 +78,7 @@ begin
 
       Vb2 := new Tb'(Ident_Int (2), Ident_Int (3), Ident_Int (6));
       if
-        (Vb2.A /= 2 or
-         Vb2.B /= 3 or
-         Vb2.C /= 6 or
-         Vb1.A /= 2 or
-         Vb1.B /= 3 or
+        (Vb2.A /= 2 or Vb2.B /= 3 or Vb2.C /= 6 or Vb1.A /= 2 or Vb1.B /= 3 or
          Vb1.C /= 5)
       then
          Failed ("WRONG VALUES  -  B1 2");
@@ -92,8 +86,7 @@ begin
 
       Vb01 := new Tb0'(1, 2, 3);
       if
-        (Vb01.A /= Ident_Int (1) or
-         Vb01.B /= Ident_Int (2) or
+        (Vb01.A /= Ident_Int (1) or Vb01.B /= Ident_Int (2) or
          Vb01.C /= Ident_Int (3))
       then
          Failed ("WRONG VALUES  -  B2 1");
@@ -101,22 +94,17 @@ begin
 
       Vb02 := new Tb0'(Ident_Int (4), Ident_Int (5), Ident_Int (6));
       if
-        (Vb02.A /= Ident_Int (4) or
-         Vb02.B /= Ident_Int (5) or
-         Vb02.C /= Ident_Int (6) or
-         Vb01.A /= Ident_Int (1) or
-         Vb01.B /= Ident_Int (2) or
-         Vb01.C /= Ident_Int (3))
+        (Vb02.A /= Ident_Int (4) or Vb02.B /= Ident_Int (5) or
+         Vb02.C /= Ident_Int (6) or Vb01.A /= Ident_Int (1) or
+         Vb01.B /= Ident_Int (2) or Vb01.C /= Ident_Int (3))
       then
          Failed ("WRONG VALUES  -  B2 2");
       end if;
 
       Varr1 := new Arr'(5, 6, 7, 8);
       if
-        (Varr1 (1) /= Ident_Int (5) or
-         Varr1 (2) /= Ident_Int (6) or
-         Varr1 (3) /= Ident_Int (7) or
-         Varr1 (4) /= Ident_Int (8))
+        (Varr1 (1) /= Ident_Int (5) or Varr1 (2) /= Ident_Int (6) or
+         Varr1 (3) /= Ident_Int (7) or Varr1 (4) /= Ident_Int (8))
       then
          Failed ("WRONG VALUES  -  B3 1");
       end if;
@@ -124,14 +112,9 @@ begin
       Varr2 :=
         new Arr'(Ident_Int (1), Ident_Int (2), Ident_Int (3), Ident_Int (4));
       if
-        (Varr2 (1) /= 1 or
-         Varr2 (2) /= 2 or
-         Varr2 (3) /= 3 or
-         Varr2 (4) /= 4 or
-         Varr1 (1) /= 5 or
-         Varr1 (2) /= 6 or
-         Varr1 (3) /= 7 or
-         Varr1 (4) /= 8)
+        (Varr2 (1) /= 1 or Varr2 (2) /= 2 or Varr2 (3) /= 3 or
+         Varr2 (4) /= 4 or Varr1 (1) /= 5 or Varr1 (2) /= 6 or
+         Varr1 (3) /= 7 or Varr1 (4) /= 8)
       then
          Failed ("WRONG VALUES  -  B3 2");
       end if;
@@ -153,10 +136,8 @@ begin
 
       Varr02 := new Arr0'(1 => Ident_Int (14), 2 => Ident_Int (15));
       if
-        (Varr02 (1) /= 14 or
-         Varr02 (2) /= 15 or
-         Varr01 (Integer'First) /= 11 or
-         Varr01 (Integer'First + 1) /= 12 or
+        (Varr02 (1) /= 14 or Varr02 (2) /= 15 or
+         Varr01 (Integer'First) /= 11 or Varr01 (Integer'First + 1) /= 12 or
          Varr01 (Integer'First + 2) /= 13)
       then
          Failed ("WRONG VALUES -  B4 3");
@@ -217,8 +198,7 @@ begin
          procedure Check3 (X : A_Up) is
          begin
             if
-              (X.A /= Ident_Int (7) or
-               X.B /= Ident_Int (8) or
+              (X.A /= Ident_Int (7) or X.B /= Ident_Int (8) or
                X.C /= Ident_Int (9))
             then
                Failed ("WRONG VALUES - UP1");
@@ -227,11 +207,7 @@ begin
          procedure Check4 (X, Y : A_Up) is
          begin
             if
-              (X.A /= 7 or
-               X.B /= 8 or
-               X.C /= 9 or
-               Y.A /= 10 or
-               Y.B /= 11 or
+              (X.A /= 7 or X.B /= 8 or X.C /= 9 or Y.A /= 10 or Y.B /= 11 or
                Y.C /= 12)
             then
                Failed ("WRONG VALUES - UP2");

@@ -90,8 +90,7 @@ package Cxh1001_0 is
    type Num is range 0 .. 2**Imp_H.Scalar_To_Normalize'Size - 1;
    for Num'Size use Imp_H.Scalar_To_Normalize'Size;
 
-   function Stn_2_Num is new Unchecked_Conversion
-     (Imp_H.Scalar_To_Normalize,
+   function Stn_2_Num is new Unchecked_Conversion (Imp_H.Scalar_To_Normalize,
       Num);
 
    Small_Last : constant Integer := Integer (Imp_H.Small_Number'Last);

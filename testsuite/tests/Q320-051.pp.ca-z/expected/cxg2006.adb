@@ -116,14 +116,9 @@ procedure Cxg2006 is
 
          if abs (Actual - Expected) > Max_Error then
             Report.Failed
-              (Test_Name &
-               " actual: " &
-               Real'Image (Actual) &
-               " expected: " &
-               Real'Image (Expected) &
-               " difference: " &
-               Real'Image (Actual - Expected) &
-               " mre:" &
+              (Test_Name & " actual: " & Real'Image (Actual) & " expected: " &
+               Real'Image (Expected) & " difference: " &
+               Real'Image (Actual - Expected) & " mre:" &
                Real'Image (Max_Error));
          elsif Verbose then
             if Actual = Expected then
@@ -175,8 +170,7 @@ procedure Cxg2006 is
                Z := (Test_Data (I).Re, Test_Data (I).Im);
                X := Argument (Z);
                Check
-                 (X,
-                  Test_Data (I).Radians,
+                 (X, Test_Data (I).Radians,
                   "test" & Integer'Image (I) & " argument(z)",
                   Test_Data (I).Error_Bound);
 --pwb-math               X := Argument (Z, 2.0*Pi);
@@ -185,8 +179,7 @@ procedure Cxg2006 is
 --pwb-math                   Test_Data (I).Error_Bound);
                X := Argument (Z, 360.0);
                Check
-                 (X,
-                  Test_Data (I).Degrees,
+                 (X, Test_Data (I).Degrees,
                   "test" & Integer'Image (I) & " argument(z, 360)",
                   Test_Data (I).Error_Bound);
 
@@ -256,8 +249,7 @@ procedure Cxg2006 is
    package Chk_A_Long_Float is new Generic_Check (A_Long_Float);
 begin
    Report.Test
-     ("CXG2006",
-      "Check the accuracy of the complex argument" & " function");
+     ("CXG2006", "Check the accuracy of the complex argument" & " function");
 
    if Verbose then
       Report.Comment ("checking Standard.Float");
@@ -267,8 +259,7 @@ begin
 
    if Verbose then
       Report.Comment
-        ("checking a digits" &
-         Integer'Image (System.Max_Digits) &
+        ("checking a digits" & Integer'Image (System.Max_Digits) &
          " floating point type");
    end if;
 

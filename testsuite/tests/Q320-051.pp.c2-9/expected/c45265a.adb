@@ -86,8 +86,7 @@ begin
    Test
      ("C45265A",
       "CHECK THAT MEMBERSHIP TESTS YIELD THE CORRECT " &
-      "RESULTS FOR ONE DIMENSIONAL AND MULTI-" &
-      "DIMENSIONAL ARRAY TYPES");
+      "RESULTS FOR ONE DIMENSIONAL AND MULTI-" & "DIMENSIONAL ARRAY TYPES");
 
    Array1 := (Array1'Range => 1);
    Array2 := (Array2'Range => 2);

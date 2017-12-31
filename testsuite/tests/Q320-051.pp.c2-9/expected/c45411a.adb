@@ -42,8 +42,7 @@ begin
    Test
      ("C45411A",
       "CHECK THAT UNARY ""+"" AND ""-"" YIELD " &
-      "CORRECT RESULTS FOR PREDEFINED INTEGER " &
-      "OPERANDS");
+      "CORRECT RESULTS FOR PREDEFINED INTEGER " & "OPERANDS");
 
    for I in (1 - 2) .. Integer (1) loop
       if "-" (Right => I1) /= Ident_Int (I) then

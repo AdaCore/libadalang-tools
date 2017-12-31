@@ -49,11 +49,8 @@ procedure C34005o is
 
       type Parent is array (Index range <>, Index range <>) of Component;
 
-      function Create
-        (F1, L1 : Index;
-         F2, L2 : Index;
-         C      : Component;
-         Dummy  : Parent   -- TO RESOLVE OVERLOADING.
+      function Create (F1, L1 : Index; F2, L2 : Index; C : Component;
+         Dummy                : Parent   -- TO RESOLVE OVERLOADING.
          ) return Parent;
 
    end Pkg;
@@ -61,8 +58,7 @@ procedure C34005o is
    use Pkg;
 
    type T is
-     new Parent
-       (Ident_Int (4) .. Ident_Int (5),
+     new Parent (Ident_Int (4) .. Ident_Int (5),
         Ident_Int (6) .. Ident_Int (8));
 
    subtype Subparent is Parent (4 .. 5, 6 .. 8);
@@ -74,11 +70,8 @@ procedure C34005o is
 
    package body Pkg is
 
-      function Create
-        (F1, L1 : Index;
-         F2, L2 : Index;
-         C      : Component;
-         Dummy  : Parent) return Parent
+      function Create (F1, L1 : Index; F2, L2 : Index; C : Component;
+         Dummy                : Parent) return Parent
       is
          A : Parent (F1 .. L1, F2 .. L2);
          B : Component := C;
@@ -110,8 +103,7 @@ begin
 
    begin
       if Create (6, 9, 2, 3, 1, X) /= ((1, 2), (3, 4), (5, 6), (7, 8)) or
-        Create (6, 9, 2, 3, 1, Y) /= ((1, 2), (3, 4), (5, 6), (7, 8))
-      then
+        Create (6, 9, 2, 3, 1, Y) /= ((1, 2), (3, 4), (5, 6), (7, 8)) then
          Failed ("CAN'T CREATE BASE TYPE VALUES OUTSIDE THE " & "SUBTYPE");
       end if;
    exception
@@ -122,21 +114,14 @@ begin
    end;
 
    if ((1, 2), (3, 4), (5, 6), (7, 8)) in T or
-     ((1, 2), (3, 4), (5, 6), (7, 8)) in S
-   then
+     ((1, 2), (3, 4), (5, 6), (7, 8)) in S then
       Failed ("INCORRECT ""IN""");
    end if;
 
    -- CHECK THE DERIVED SUBTYPE CONSTRAINT.
 
-   if T'First /= 4 or
-     T'Last /= 5 or
-     S'First /= 4 or
-     S'Last /= 5 or
-     T'First (2) /= 6 or
-     T'Last (2) /= 8 or
-     S'First (2) /= 6 or
-     S'Last (2) /= 8
+   if T'First /= 4 or T'Last /= 5 or S'First /= 4 or S'Last /= 5 or
+     T'First (2) /= 6 or T'Last (2) /= 8 or S'First (2) /= 6 or S'Last (2) /= 8
    then
       Failed ("INCORRECT 'FIRST OR 'LAST");
    end if;

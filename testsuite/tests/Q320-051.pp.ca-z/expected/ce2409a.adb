@@ -58,8 +58,7 @@ begin
    Test
      ("CE2409A",
       "CHECK THAT WRITE POSITION AND " &
-      "SIZE ARE INCREMENTED CORRECTLY FOR " &
-      "DIR FILES OF MODE INOUT_FILE");
+      "SIZE ARE INCREMENTED CORRECTLY FOR " & "DIR FILES OF MODE INOUT_FILE");
 
    begin
       Create (File1, Inout_File, Legal_File_Name);

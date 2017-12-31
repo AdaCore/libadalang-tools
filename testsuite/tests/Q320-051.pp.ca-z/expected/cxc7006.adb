@@ -163,10 +163,7 @@ begin
          Cxc7006_1.Set_Task_Ids (Id_Array);
 
          Expected_Cause :=
-           (Att.Normal,
-            Att.Normal,
-            Att.Normal,
-            Att.Abnormal,
+           (Att.Normal, Att.Normal, Att.Normal, Att.Abnormal,
             Att.Unhandled_Exception);
          Cxc7006_1.Set_Expected_Causes (Expected_Cause);
 
@@ -262,10 +259,7 @@ begin
          Cxc7006_1.Set_Task_Ids (Id_Array);
 
          Expected_Cause :=
-           (Att.Normal,
-            Att.Normal,
-            Att.Normal,
-            Att.Abnormal,
+           (Att.Normal, Att.Normal, Att.Normal, Att.Abnormal,
             Att.Unhandled_Exception);
          Cxc7006_1.Set_Expected_Causes (Expected_Cause);
 
@@ -399,13 +393,7 @@ begin
          Att.Set_Specific_Handler (Id_Array (11), Cxc7006_1.The_Handler (3));
          Att.Set_Specific_Handler (Id_Array (13), Cxc7006_1.The_Handler (2));
          Expected_Handler :=
-           (1      => 1,
-            3      => 2,
-            5      => 3,
-            7      => 2,
-            9      => 1,
-            11     => 3,
-            13     => 2,
+           (1      => 1, 3 => 2, 5 => 3, 7 => 2, 9 => 1, 11 => 3, 13 => 2,
             others => 0);
          Cxc7006_1.Set_Expected_Handlers (Expected_Handler);
 
@@ -478,8 +466,7 @@ begin
          Expected_Cause := (others => Att.Unhandled_Exception);
          Cxc7006_1.Set_Expected_Causes (Expected_Cause);
          Expected_Exceptions :=
-           (Exception_2'Identity,
-            Program_Error'Identity,
+           (Exception_2'Identity, Program_Error'Identity,
             Program_Error'Identity);
          Cxc7006_1.Set_Expected_Exceptions (Expected_Exceptions);
 

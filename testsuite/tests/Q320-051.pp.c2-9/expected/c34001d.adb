@@ -35,13 +35,11 @@ procedure C34001d is
    subtype Parent is Boolean;
 
    subtype Subparent is
-     Parent range
-       Parent'Val (Ident_Int (Parent'Pos (False))) ..
+     Parent range Parent'Val (Ident_Int (Parent'Pos (False))) ..
          Parent'Val (Ident_Int (Parent'Pos (True)));
 
    type T is
-     new Subparent range
-       Parent'Val (Ident_Int (Parent'Pos (True))) ..
+     new Subparent range Parent'Val (Ident_Int (Parent'Pos (True))) ..
          Parent'Val (Ident_Int (Parent'Pos (True)));
 
    X : T       := True;
@@ -65,8 +63,7 @@ begin
    Test
      ("C34001D",
       "CHECK THAT THE REQUIRED PREDEFINED OPERATIONS " &
-      "ARE DECLARED (IMPLICITLY) FOR DERIVED " &
-      "BOOLEAN TYPES");
+      "ARE DECLARED (IMPLICITLY) FOR DERIVED " & "BOOLEAN TYPES");
 
    X := Ident (True);
    if X /= True then

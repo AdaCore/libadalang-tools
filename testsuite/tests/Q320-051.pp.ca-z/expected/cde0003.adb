@@ -9,8 +9,7 @@ begin
      ("CDE0003",
       "Check that actuals for generic formal " &
       "types and for formal subprograms with formal untagged " &
-      "incomplete parameters do not need to be frozen at " &
-      "instantiation.");
+      "incomplete parameters do not need to be frozen at " & "instantiation.");
 
    if Cde0003_1.Pkg.Call_F (Cde0003_1.Z) /= Cde0003_1.F (Cde0003_1.Z)
      or else Cde0003_1.Pkg.Call_F (Cde0003_1.C) /= Cde0003_1.F (Cde0003_1.C)

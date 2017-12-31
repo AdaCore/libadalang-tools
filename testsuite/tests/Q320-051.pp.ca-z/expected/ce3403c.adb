@@ -55,8 +55,7 @@ begin
    Test
      ("CE3403C",
       "CHECK THAT SKIP_LINE SETS THE CURRENT " &
-      "COLUMN NUMBER TO ONE, AND THAT IT IS " &
-      "PERFORMED SPACING TIMES");
+      "COLUMN NUMBER TO ONE, AND THAT IT IS " & "PERFORMED SPACING TIMES");
 
    begin
       Create (File, Out_File, Legal_File_Name);

@@ -47,10 +47,8 @@ procedure C34005a is
 
       type Parent is array (Index range <>) of Component;
 
-      function Create
-        (F, L  : Index;
-         C     : Component;
-         Dummy : Parent   -- TO RESOLVE OVERLOADING.
+      function Create (F, L : Index; C : Component;
+         Dummy              : Parent   -- TO RESOLVE OVERLOADING.
          ) return Parent;
 
    end Pkg;
@@ -81,10 +79,8 @@ procedure C34005a is
 
    package body Pkg is
 
-      function Create
-        (F, L  : Index;
-         C     : Component;
-         Dummy : Parent) return Parent
+      function Create (F, L : Index; C : Component;
+         Dummy              : Parent) return Parent
       is
          A : Parent (F .. L);
          B : Component := C;
@@ -136,8 +132,7 @@ begin
 
    begin
       if Parent (X) /= (1.0, 2.0, 3.0) or
-        Parent (Create (2, 3, 4.0, X)) /= (4.0, 5.0)
-      then
+        Parent (Create (2, 3, 4.0, X)) /= (4.0, 5.0) then
          Failed ("INCORRECT CONVERSION TO PARENT");
       end if;
    exception
@@ -156,8 +151,7 @@ begin
 
    begin
       if Arr (X) /= (1.0, 2.0, 3.0) or
-        Arrt (Create (1, 2, 3.0, X)) /= (3.0, 4.0)
-      then
+        Arrt (Create (1, 2, 3.0, X)) /= (3.0, 4.0) then
          Failed ("INCORRECT CONVERSION TO ARRAY");
       end if;
    exception
@@ -190,8 +184,7 @@ begin
    begin
       X := Ident ((1.0, 2.0, 3.0));
       if X (Ident_Int (6) .. Ident_Int (7)) /= (2.0, 3.0) or
-        Create (1, 4, 4.0, X) (1 .. 3) /= (4.0, 5.0, 6.0)
-      then
+        Create (1, 4, 4.0, X) (1 .. 3) /= (4.0, 5.0, 6.0) then
          Failed ("INCORRECT SLICE (VALUE)");
       end if;
    exception
@@ -225,8 +218,7 @@ begin
 
    begin
       if X & (4.0, 5.0, 6.0) /= (1.0, 2.0, 3.0, 4.0, 5.0, 6.0) or
-        Create (2, 3, 2.0, X) & (4.0, 5.0) /= (2.0, 3.0, 4.0, 5.0)
-      then
+        Create (2, 3, 2.0, X) & (4.0, 5.0) /= (2.0, 3.0, 4.0, 5.0) then
          Failed ("INCORRECT & (ARRAY, ARRAY)");
       end if;
    exception
@@ -238,8 +230,7 @@ begin
 
    begin
       if X & 4.0 /= (1.0, 2.0, 3.0, 4.0) or
-        Create (2, 3, 2.0, X) & 4.0 /= (2.0, 3.0, 4.0)
-      then
+        Create (2, 3, 2.0, X) & 4.0 /= (2.0, 3.0, 4.0) then
          Failed ("INCORRECT & (ARRAY, COMPONENT)");
       end if;
    exception
@@ -251,8 +242,7 @@ begin
 
    begin
       if 4.0 & X /= (4.0, 1.0, 2.0, 3.0) or
-        2.0 & Create (2, 3, 3.0, X) /= (2.0, 3.0, 4.0)
-      then
+        2.0 & Create (2, 3, 3.0, X) /= (2.0, 3.0, 4.0) then
          Failed ("INCORRECT & (COMPONENT, ARRAY)");
       end if;
    exception

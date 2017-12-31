@@ -63,14 +63,8 @@ procedure C34007p is
 
       type Parent is access Designated;
 
-      function Create
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         C : Component;
-         F : Float;
-         X : Parent  -- TO RESOLVE OVERLOADING.
+      function Create (B : Boolean; L : Length; I : Integer; S : String;
+         C : Component; F : Float; X : Parent  -- TO RESOLVE OVERLOADING.
          ) return Parent;
 
    end Pkg;
@@ -92,14 +86,8 @@ procedure C34007p is
 
    package body Pkg is
 
-      function Create
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         C : Component;
-         F : Float;
-         X : Parent) return Parent
+      function Create (B : Boolean; L : Length; I : Integer; S : String;
+         C               : Component; F : Float; X : Parent) return Parent
       is
       begin
          case B is
@@ -170,26 +158,20 @@ begin
 
    X := Ident (new Designated'(True, 3, 1, "ABC", 4));
    if (X = null or else X = Y or else X.all /= (True, 3, 1, "ABC", 4)) or
-     X = new Designated'(False, 3, 1, 4.0)
-   then
+     X = new Designated'(False, 3, 1, 4.0) then
       Failed ("INCORRECT ALLOCATOR");
    end if;
 
    X := Ident (Y);
-   if X.B /= True or
-     X.L /= 3 or
+   if X.B /= True or X.L /= 3 or
      Create (False, 2, 3, "XX", 5, 6.0, X).B /= False or
-     Create (False, 2, 3, "XX", 5, 6.0, X).L /= 2
-   then
+     Create (False, 2, 3, "XX", 5, 6.0, X).L /= 2 then
       Failed ("INCORRECT SELECTION (DISCRIMINANT)");
    end if;
 
-   if X.I /= 1 or
-     X.S /= "ABC" or
-     X.C /= 4 or
+   if X.I /= 1 or X.S /= "ABC" or X.C /= 4 or
      Create (False, 2, 3, "XX", 5, 6.0, X).I /= 3 or
-     Create (False, 2, 3, "XX", 5, 6.0, X).F /= 6.0
-   then
+     Create (False, 2, 3, "XX", 5, 6.0, X).F /= 6.0 then
       Failed ("INCORRECT SELECTION (VALUE)");
    end if;
 
@@ -211,8 +193,7 @@ begin
    end;
 
    if X.all /= (True, 3, 1, "ABC", 4) or
-     Create (False, 2, 3, "XX", 5, 6.0, X).all /= (False, 2, 3, 6.0)
-   then
+     Create (False, 2, 3, "XX", 5, 6.0, X).all /= (False, 2, 3, 6.0) then
       Failed ("INCORRECT .ALL (VALUE)");
    end if;
 
@@ -244,18 +225,13 @@ begin
    end;
 
    X := Ident (Y);
-   if X = null or
-     X = new Subdesignated or
-     not (X = Y) or
-     X = Create (False, 2, 3, "XX", 5, 6.0, X)
-   then
+   if X = null or X = new Subdesignated or not (X = Y) or
+     X = Create (False, 2, 3, "XX", 5, 6.0, X) then
       Failed ("INCORRECT =");
    end if;
 
-   if X /= Y or
-     not (X /= null) or
-     not (X /= Create (False, 2, 3, "XX", 5, 6.0, X))
-   then
+   if X /= Y or not (X /= null) or
+     not (X /= Create (False, 2, 3, "XX", 5, 6.0, X)) then
       Failed ("INCORRECT /=");
    end if;
 

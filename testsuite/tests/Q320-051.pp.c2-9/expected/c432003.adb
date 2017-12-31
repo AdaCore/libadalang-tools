@@ -34,12 +34,8 @@ begin
               (C432003_0.Root with D2 => 5, Str1 => "cdefg", S2 => String5);
          begin
             C432003_0.Avoid_Optimization (A);
-            if A.Acc /= 356 or
-              A.Str1 /= "cdefg" or
-              A.S2 /= String5 or
-              A.D2 /= 5 or
-              A.S1 /= C432003_0.Default_String (1 .. 5)
-            then
+            if A.Acc /= 356 or A.Str1 /= "cdefg" or A.S2 /= String5 or
+              A.D2 /= 5 or A.S1 /= C432003_0.Default_String (1 .. 5) then
                Report.Failed ("Incorrect object values for Object A");
             end if;
          end;
@@ -54,11 +50,8 @@ begin
               (C432003_0.Constrained_Subtype with D2 => 10, S2 => String10);
          begin
             C432003_0.Avoid_Optimization (C);
-            if C.D2 /= 10 or
-              C.Acc /= 356 or
-              C.Str1 /= "abcde" or
-              C.S2 /= String10 or
-              C.S1 /= C432003_0.Default_String (1 .. 10)
+            if C.D2 /= 10 or C.Acc /= 356 or C.Str1 /= "abcde" or
+              C.S2 /= String10 or C.S1 /= C432003_0.Default_String (1 .. 10)
             then
                Report.Failed ("Incorrect object values for Object C");
             end if;
@@ -71,9 +64,8 @@ begin
       begin
          declare
             D : C432003_0.Nt_A1 :=                                  -- C_E
-              (C432003_0.Constrained_Subtype with
-               D2 => Report.Ident_Int (5),
-               S2 => String5);
+              (C432003_0.Constrained_Subtype with D2 => Report.Ident_Int (5),
+               S2                                    => String5);
          begin
             C432003_0.Avoid_Optimization (D);
             Report.Failed ("Constraint_Error not raised for Object D");
@@ -86,19 +78,13 @@ begin
       begin
          declare
             E : C432003_0.Nt_A2 :=                                   -- OK
-              (C432003_0.Constrained_Subtype with
-               D3 => 10,
-               S2 => String10,
-               S3 => String10);
+              (C432003_0.Constrained_Subtype with D3 => 10, S2 => String10,
+               S3                                    => String10);
          begin
             C432003_0.Avoid_Optimization (E);
-            if E.D3 /= 10 or
-              E.Acc /= 356 or
-              E.Str1 /= "abcde" or
-              E.S2 /= String10 or
-              E.S3 /= String10 or
-              E.S1 /= C432003_0.Default_String (1 .. 10)
-            then
+            if E.D3 /= 10 or E.Acc /= 356 or E.Str1 /= "abcde" or
+              E.S2 /= String10 or E.S3 /= String10 or
+              E.S1 /= C432003_0.Default_String (1 .. 10) then
                Report.Failed ("Incorrect object values for Object E");
             end if;
          end;
@@ -110,10 +96,8 @@ begin
       begin
          declare
             F : C432003_0.Nt_A2 :=                                  -- C_E
-              (C432003_0.Constrained_Subtype with
-               D3 => Report.Ident_Int (5),
-               S2 => String5,
-               S3 => String5);
+              (C432003_0.Constrained_Subtype with D3 => Report.Ident_Int (5),
+               S2 => String5, S3 => String5);
          begin
             C432003_0.Avoid_Optimization (F);
             Report.Failed ("Constraint_Error not raised for Object F");
@@ -126,20 +110,13 @@ begin
       begin
          declare
             G : C432003_0.Nt_B2 :=                                  -- OK
-              (C432003_0.Root with
-               D3   => 5,
-               Str1 => "cdefg",
-               S2   => String10,
-               S3   => String5);
+              (C432003_0.Root with D3 => 5, Str1 => "cdefg", S2 => String10,
+               S3                     => String5);
          begin
             C432003_0.Avoid_Optimization (G);
-            if G.D3 /= 5 or
-              G.Acc /= 356 or
-              G.Str1 /= "cdefg" or
-              G.S2 /= String10 or
-              G.S3 /= String5 or
-              G.S1 /= C432003_0.Default_String (1 .. 5)
-            then
+            if G.D3 /= 5 or G.Acc /= 356 or G.Str1 /= "cdefg" or
+              G.S2 /= String10 or G.S3 /= String5 or
+              G.S1 /= C432003_0.Default_String (1 .. 5) then
                Report.Failed ("Incorrect object values for Object G");
             end if;
          end;
@@ -154,11 +131,8 @@ begin
               (C432003_0.Unconstrained_Der with D2 => 5, S2 => String5);
          begin
             C432003_0.Avoid_Optimization (H);
-            if H.D2 /= 5 or
-              H.Acc /= 356 or
-              H.Str1 /= "abcde" or
-              H.S2 /= String5 or
-              H.S1 /= C432003_0.Default_String (1 .. 10)
+            if H.D2 /= 5 or H.Acc /= 356 or H.Str1 /= "abcde" or
+              H.S2 /= String5 or H.S1 /= C432003_0.Default_String (1 .. 10)
             then
                Report.Failed ("Incorrect object values for Object H");
             end if;
@@ -171,9 +145,8 @@ begin
       begin
          declare
             I : C432003_0.Nt_B1 :=                                  -- C_E
-              (C432003_0.Constrained_Subtype with
-               D2 => Report.Ident_Int (10),
-               S2 => String10);
+              (C432003_0.Constrained_Subtype with D2 => Report.Ident_Int (10),
+               S2                                    => String10);
          begin
             C432003_0.Avoid_Optimization (I);
             Report.Failed ("Constraint_Error not raised for Object I");
@@ -186,10 +159,8 @@ begin
       begin
          declare
             J : C432003_0.Nt_B2 :=                                  -- C_E
-              (C432003_0.Constrained_Subtype with
-               D3 => Report.Ident_Int (10),
-               S2 => String10,
-               S3 => String10);
+              (C432003_0.Constrained_Subtype with D3 => Report.Ident_Int (10),
+               S2 => String10, S3 => String10);
          begin
             C432003_0.Avoid_Optimization (J);
             Report.Failed ("Constraint_Error not raised by Object J");
@@ -205,11 +176,8 @@ begin
               (C432003_0.Constrained_Subtype with D2 => 5, S2 => String5);
          begin
             C432003_0.Avoid_Optimization (K);
-            if K.D2 /= 5 or
-              K.Acc /= 356 or
-              K.Str1 /= "abcde" or
-              K.S2 /= String5 or
-              K.S1 /= C432003_0.Default_String (1 .. 10)
+            if K.D2 /= 5 or K.Acc /= 356 or K.Str1 /= "abcde" or
+              K.S2 /= String5 or K.S1 /= C432003_0.Default_String (1 .. 10)
             then
                Report.Failed ("Incorrect object values for Object K");
             end if;
@@ -222,20 +190,13 @@ begin
       begin
          declare
             M : C432003_0.Nt_C2 :=                                   -- OK
-              (C432003_0.Root with
-               D2   => 10,
-               Str1 => "cdefg",
-               Str2 => String5,
-               S2   => String10);
+              (C432003_0.Root with D2 => 10, Str1 => "cdefg", Str2 => String5,
+               S2                     => String10);
          begin
             C432003_0.Avoid_Optimization (M);
-            if M.D2 /= 10 or
-              M.Acc /= 356 or
-              M.Str1 /= "cdefg" or
-              M.S2 /= String10 or
-              M.Str2 /= String5 or
-              M.S1 /= C432003_0.Default_String (1 .. 5)
-            then
+            if M.D2 /= 10 or M.Acc /= 356 or M.Str1 /= "cdefg" or
+              M.S2 /= String10 or M.Str2 /= String5 or
+              M.S1 /= C432003_0.Default_String (1 .. 5) then
                Report.Failed ("Incorrect object values for Object M");
             end if;
          end;
@@ -261,10 +222,8 @@ begin
       begin
          declare
             P : C432003_0.Nt_C2 :=                                  -- C_E
-              (C432003_0.Constrained_Subtype with
-               D2   => Report.Ident_Int (10),
-               Str2 => String5,
-               S2   => String10);
+              (C432003_0.Constrained_Subtype with D2 => Report.Ident_Int (10),
+               Str2 => String5, S2 => String10);
          begin
             C432003_0.Avoid_Optimization (P);
             Report.Failed ("Constraint_Error not raised by Object P");
@@ -280,12 +239,8 @@ begin
               (C432003_0.Constrained_Subtype with Str2 => String5);  -- OK
          begin
             C432003_0.Avoid_Optimization (Q);
-            if Q.Str2 /= String5 or
-              Q.Acc /= 356 or
-              Q.Str1 /= "abcde" or
-              Q.D1 /= 10 or
-              Q.S1 /= C432003_0.Default_String (1 .. 10)
-            then
+            if Q.Str2 /= String5 or Q.Acc /= 356 or Q.Str1 /= "abcde" or
+              Q.D1 /= 10 or Q.S1 /= C432003_0.Default_String (1 .. 10) then
                Report.Failed ("Incorrect object values for Object Q");
             end if;
          end;
@@ -305,10 +260,8 @@ begin
             C432003_0.Avoid_Optimization (S);
             if S.S1 /= C432003_0.Default_String (1 .. 15) or
               S.Str1 /= String8 or
-              S.S2 /= C432003_0.Another_String (1 .. 15) or
-              S.S3 /= String15 or
-              S.D3 /= 15
-            then
+              S.S2 /= C432003_0.Another_String (1 .. 15) or S.S3 /= String15 or
+              S.D3 /= 15 then
                Report.Failed ("Incorrect object values for Object S");
             end if;
          end;
@@ -320,9 +273,8 @@ begin
       begin
          declare
             U : C432003_0.Mult_Nt_A1 :=                             -- C_E
-              (C432003_0.Mult_Constr_Sub1 with
-               D3 => Report.Ident_Int (15),
-               S3 => String15);
+              (C432003_0.Mult_Constr_Sub1 with D3 => Report.Ident_Int (15),
+               S3                                 => String15);
          begin
             C432003_0.Avoid_Optimization (U);
             Report.Failed ("Constraint_Error not raised for Object U");
@@ -338,12 +290,9 @@ begin
               (C432003_0.Mult_Constr_Sub2 with D3 => 15, S3 => String15);
          begin
             C432003_0.Avoid_Optimization (V);
-            if V.D3 /= 15 or
-              V.Str1 /= String8 or
-              V.S3 /= String15 or
+            if V.D3 /= 15 or V.Str1 /= String8 or V.S3 /= String15 or
               V.S1 /= C432003_0.Default_String (1 .. 15) or
-              V.S2 /= C432003_0.Another_String (1 .. 15)
-            then
+              V.S2 /= C432003_0.Another_String (1 .. 15) then
                Report.Failed ("Incorrect object values for Object V");
             end if;
          end;

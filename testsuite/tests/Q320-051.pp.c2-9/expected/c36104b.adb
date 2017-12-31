@@ -411,29 +411,19 @@ begin
    -- NULL MEMBERSHIP RANGES, EXCEPTION NOT RAISED.
 
    begin
-      if F (Sun) in Sat .. Sun or
-        Sat in Fri .. Wed or
-        F (Wed) in Thu .. Tue or
-        Thu in Mon .. Sun or
-        F (Fri) in Sat .. Fri or
-        Wed in Fri .. Mon
-      then
+      if F (Sun) in Sat .. Sun or Sat in Fri .. Wed or F (Wed) in Thu .. Tue or
+        Thu in Mon .. Sun or F (Fri) in Sat .. Fri or Wed in Fri .. Mon then
          Failed ("INCORRECT 'IN' EVALUATION 1");
       end if;
 
-      if Ident_Int (0) in 10 .. Ident_Int (-10) or
-        0 in Ident_Int (10) .. 9 or
+      if Ident_Int (0) in 10 .. Ident_Int (-10) or 0 in Ident_Int (10) .. 9 or
         Ident_Int (0) in Ident_Int (-10) .. -11 or
-        0 in -10 .. Ident_Int (-20) or
-        Ident_Int (0) in 6 .. Ident_Int (5) or
-        0 in 5 .. Ident_Int (3) or
-        Ident_Int (0) in 7 .. Ident_Int (3)
-      then
+        0 in -10 .. Ident_Int (-20) or Ident_Int (0) in 6 .. Ident_Int (5) or
+        0 in 5 .. Ident_Int (3) or Ident_Int (0) in 7 .. Ident_Int (3) then
          Failed ("INCORRECT 'IN' EVALUATION 2");
       end if;
 
-      if F (Wed) not in Thu .. Tue and
-        Ident_Int (0) not in Ident_Int (4) .. -4
+      if F (Wed) not in Thu .. Tue and Ident_Int (0) not in Ident_Int (4) .. -4
       then
          null;
       else

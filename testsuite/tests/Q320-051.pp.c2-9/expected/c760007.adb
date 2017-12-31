@@ -4,10 +4,8 @@ with Report;
 with C760007_0;
 procedure C760007 is
 
-   procedure Check_Adjust_Count
-     (Message : String;
-      Min     : Natural := 1;
-      Max     : Natural := 2)
+   procedure Check_Adjust_Count (Message : String; Min : Natural := 1;
+      Max                                : Natural := 2)
    is
    begin
 
@@ -24,10 +22,8 @@ procedure C760007 is
       C760007_0.Adjust_Count := 0;
    end Check_Adjust_Count;
 
-   procedure Check_Child_Adjust_Count
-     (Message : String;
-      Min     : Natural := 1;
-      Max     : Natural := 2)
+   procedure Check_Child_Adjust_Count (Message : String; Min : Natural := 1;
+      Max                                      : Natural := 2)
    is
    begin
       -- ditto above
@@ -112,9 +108,7 @@ procedure C760007 is
       procedure Examine (Thing : in C760007_0.Child) is
       begin
          Check_Adjust_Count
-           ("Extension aggregate as parameter (ancestor)",
-            0,
-            2);
+           ("Extension aggregate as parameter (ancestor)", 0, 2);
          Check_Child_Adjust_Count ("Extension aggregate as parameter", 0, 4);
       end Examine;
 
@@ -148,12 +142,10 @@ begin  -- Main test procedure.
       "function returning a result containing a " &
       "controlled type.  Check that Adjust is " &
       "called when evaluating an aggregate " &
-      "component association for a controlled " &
-      "component.  " &
+      "component association for a controlled " & "component.  " &
       "Check that Adjust is called for the " &
       "assignment of the ancestor expression of an " &
-      "extension aggregate when the type of the " &
-      "aggregate is controlled");
+      "extension aggregate when the type of the " & "aggregate is controlled");
 
    Subtest_1;
    Subtest_2;

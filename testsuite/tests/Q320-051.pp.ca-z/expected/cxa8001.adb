@@ -89,8 +89,7 @@ begin
      ("CXA8001",
       "Check that all elements to be transferred to a " &
       "sequential file of mode Append_File will be " &
-      "placed following the last element currently " &
-      "in the file");
+      "placed following the last element currently " & "in the file");
 
    Test_For_Sequential_Io_Support :
    begin
@@ -190,8 +189,7 @@ begin
          -- in the appropriate order, then fail.
 
          if
-           ((Tc_Order1 /= Buyer_1) or
-            (Tc_Order2.Name /= Buyer_2.Name) or
+           ((Tc_Order1 /= Buyer_1) or (Tc_Order2.Name /= Buyer_2.Name) or
             (Tc_Order2.No_Of_Tickets /= Buyer_2.No_Of_Tickets) or
             not
             ((Tc_Order3.Name = "Mike Brown") and

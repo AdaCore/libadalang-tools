@@ -33,8 +33,7 @@ begin
       "Check that a protected record can be used to " &
       "control access to resources");
 
-   if (Task_Pkg.Counter.Number /= 0) or
-     (Semaphores.Resource.Available /= 2)
+   if (Task_Pkg.Counter.Number /= 0) or (Semaphores.Resource.Available /= 2)
    then
       Report.Failed ("Wrong initial conditions");
    end if;
@@ -45,8 +44,7 @@ begin
 
    -- Task 1 waiting for call to Done One resource assigned to task 1 One
    -- resource still available
-   if (Task_Pkg.Counter.Number /= 1) or
-     (Semaphores.Resource.Available /= 1)
+   if (Task_Pkg.Counter.Number /= 1) or (Semaphores.Resource.Available /= 1)
    then
       Report.Failed ("Resource not assigned to task 1");
    end if;
@@ -57,8 +55,7 @@ begin
 
    -- Task 1 waiting for call to Done Task 2 waiting for call to Done Resources
    -- held by tasks 1 and 2 No resources available
-   if (Task_Pkg.Counter.Number /= 2) or
-     (Semaphores.Resource.Available /= 0)
+   if (Task_Pkg.Counter.Number /= 2) or (Semaphores.Resource.Available /= 0)
    then
       Report.Failed ("Resource not assigned to task 2");
    end if;
@@ -74,8 +71,7 @@ begin
    -- Task 1 holds no resource
    -- One resource still assigned to task 2 One resource assigned to task 3 No
    -- resources available
-   if (Task_Pkg.Counter.Number /= 2) or
-     (Semaphores.Resource.Available /= 0)
+   if (Task_Pkg.Counter.Number /= 2) or (Semaphores.Resource.Available /= 0)
    then
       Report.Failed ("Resource not properly released/assigned to task 3");
    end if;
@@ -85,8 +81,7 @@ begin
 
    -- Tasks 1 and 2 hold no resources One resource assigned to task 3 One
    -- resource available
-   if (Task_Pkg.Counter.Number /= 1) or
-     (Semaphores.Resource.Available /= 1)
+   if (Task_Pkg.Counter.Number /= 1) or (Semaphores.Resource.Available /= 1)
    then
       Report.Failed ("Resource not properly released from task 2");
    end if;
@@ -95,8 +90,7 @@ begin
 
    -- All resources released
    -- All tasks terminated (or close) Two resources available
-   if (Task_Pkg.Counter.Number /= 0) or
-     (Semaphores.Resource.Available /= 2)
+   if (Task_Pkg.Counter.Number /= 0) or (Semaphores.Resource.Available /= 2)
    then
       Report.Failed ("Resource not properly released from task 3");
    end if;

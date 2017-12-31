@@ -5,8 +5,7 @@ package body P3 is
    function "=" (L, R : T) return Boolean is
    begin
       return P2."=" (P2.T (L), P2.T (R))
-        and then
-          Ada.Characters.Handling.To_Upper (L.C3) =
+        and then Ada.Characters.Handling.To_Upper (L.C3) =
           Ada.Characters.Handling.To_Upper (R.C3);
    end "=";
 

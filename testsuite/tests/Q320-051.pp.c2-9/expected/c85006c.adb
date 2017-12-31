@@ -199,27 +199,16 @@ begin
 
    declare
       task Main_Task is
-         entry Start
-           (Rec : in out Rec_Type;
-            Ai1 : in out Arr_Int;
-            Aa1 : in out Arr_Arr;
-            Ar1 : in out Arr_Rec;
-            Ap1 : in out Arr_Ptr;
-            Av1 : in out Arr_Pvt;
-            At1 : in out Arr_Tsk);
+         entry Start (Rec : in out Rec_Type; Ai1 : in out Arr_Int;
+            Aa1 : in out Arr_Arr; Ar1 : in out Arr_Rec; Ap1 : in out Arr_Ptr;
+            Av1           : in out Arr_Pvt; At1 : in out Arr_Tsk);
       end Main_Task;
 
       task body Main_Task is
       begin
-         accept Start
-           (Rec : in out Rec_Type;
-            Ai1 : in out Arr_Int;
-            Aa1 : in out Arr_Arr;
-            Ar1 : in out Arr_Rec;
-            Ap1 : in out Arr_Ptr;
-            Av1 : in out Arr_Pvt;
-            At1 : in out Arr_Tsk)
-         do
+         accept Start (Rec : in out Rec_Type; Ai1 : in out Arr_Int;
+            Aa1 : in out Arr_Arr; Ar1 : in out Arr_Rec; Ap1 : in out Arr_Ptr;
+            Av1            : in out Arr_Pvt; At1 : in out Arr_Tsk) do
             declare
                Xri1 : Integer renames Rec.Ri1;
                Xra1 : Array1 renames Rec.Ra1;
@@ -235,39 +224,24 @@ begin
                Xat1 : Arr_Tsk renames At1 (6 .. 8);
 
                task type Task2 is
-                  entry Entry1
-                    (Tri1 :    out Integer;
-                     Tra1 :    out Array1;
-                     Trr1 :    out Record1;
-                     Trp1 : in out Pointer1;
-                     Trv1 : in out Pack1.Privy;
-                     Trt1 : in out Task1;
-                     Tai1 :    out Arr_Int;
-                     Taa1 :    out Arr_Arr;
-                     Tar1 :    out Arr_Rec;
-                     Tap1 : in out Arr_Ptr;
-                     Tav1 : in out Arr_Pvt;
-                     Tat1 : in out Arr_Tsk);
+                  entry Entry1 (Tri1 :    out Integer; Tra1 : out Array1;
+                     Trr1            :    out Record1; Trp1 : in out Pointer1;
+                     Trv1            : in out Pack1.Privy; Trt1 : in out Task1;
+                     Tai1            :    out Arr_Int; Taa1 : out Arr_Arr;
+                     Tar1            :    out Arr_Rec; Tap1 : in out Arr_Ptr;
+                     Tav1            : in out Arr_Pvt; Tat1 : in out Arr_Tsk);
                end Task2;
 
                Chk_Task : Task2;
 
                task body Task2 is
                begin
-                  accept Entry1
-                    (Tri1 :    out Integer;
-                     Tra1 :    out Array1;
-                     Trr1 :    out Record1;
-                     Trp1 : in out Pointer1;
-                     Trv1 : in out Pack1.Privy;
-                     Trt1 : in out Task1;
-                     Tai1 :    out Arr_Int;
-                     Taa1 :    out Arr_Arr;
-                     Tar1 :    out Arr_Rec;
-                     Tap1 : in out Arr_Ptr;
-                     Tav1 : in out Arr_Pvt;
-                     Tat1 : in out Arr_Tsk)
-                  do
+                  accept Entry1 (Tri1 :    out Integer; Tra1 : out Array1;
+                     Trr1             :    out Record1; Trp1 : in out Pointer1;
+                     Trv1 : in out Pack1.Privy; Trt1 : in out Task1;
+                     Tai1             :    out Arr_Int; Taa1 : out Arr_Arr;
+                     Tar1             :    out Arr_Rec; Tap1 : in out Arr_Ptr;
+                     Tav1 : in out Arr_Pvt; Tat1 : in out Arr_Tsk) do
                      Tri1 := Rec.Ri1 + 1;
                      Tra1 :=
                        (Rec.Ra1 (1) + 1, Rec.Ra1 (2) + 1, Rec.Ra1 (3) + 1);
@@ -291,19 +265,12 @@ begin
                   end Entry1;
                end Task2;
 
-               procedure Proc1
-                 (Pri1 : in out Integer;
-                  Pra1 : in out Array1;
-                  Prr1 : in out Record1;
-                  Prp1 :    out Pointer1;
-                  Prv1 :    out Pack1.Privy;
-                  Prt1 : in out Task1;
-                  Pai1 : in out Arr_Int;
-                  Paa1 : in out Arr_Arr;
-                  Par1 : in out Arr_Rec;
-                  Pap1 :    out Arr_Ptr;
-                  Pav1 :    out Arr_Pvt;
-                  Pat1 : in out Arr_Tsk)
+               procedure Proc1 (Pri1 : in out Integer; Pra1 : in out Array1;
+                  Prr1               : in out Record1; Prp1 : out Pointer1;
+                  Prv1               :    out Pack1.Privy; Prt1 : in out Task1;
+                  Pai1               : in out Arr_Int; Paa1 : in out Arr_Arr;
+                  Par1               : in out Arr_Rec; Pap1 : out Arr_Ptr;
+                  Pav1               :    out Arr_Pvt; Pat1 : in out Arr_Tsk)
                is
                begin
                   Pri1 := Pri1 + 1;
@@ -326,19 +293,8 @@ begin
                   end loop;
                end Proc1;
 
-               package Genpack2 is new Generic1
-                 (Xri1,
-                  Xra1,
-                  Xrr1,
-                  Xrp1,
-                  Xrv1,
-                  Xrt1,
-                  Xai1,
-                  Xaa1,
-                  Xar1,
-                  Xap1,
-                  Xav1,
-                  Xat1);
+               package Genpack2 is new Generic1 (Xri1, Xra1, Xrr1, Xrp1, Xrv1,
+                  Xrt1, Xai1, Xaa1, Xar1, Xap1, Xav1, Xat1);
 
             begin
                if Xri1 /= Ident_Int (1) then
@@ -369,19 +325,16 @@ begin
                for J in Xai1'Range loop
                   if Xai1 (J) /= Ident_Int (1) then
                      Failed
-                       ("INCORRECT VALUE OF XAI1(" &
-                        Integer'Image (J) &
+                       ("INCORRECT VALUE OF XAI1(" & Integer'Image (J) &
                         ") (1)");
                   end if;
                end loop;
 
                for J in Xaa1'Range loop
-                  if Xaa1 (J) /=
-                    (Ident_Int (1), Ident_Int (1), Ident_Int (1))
+                  if Xaa1 (J) /= (Ident_Int (1), Ident_Int (1), Ident_Int (1))
                   then
                      Failed
-                       ("INCORRECT VALUE OF XAA1(" &
-                        Integer'Image (J) &
+                       ("INCORRECT VALUE OF XAA1(" & Integer'Image (J) &
                         ") (1)");
                   end if;
                end loop;
@@ -389,19 +342,16 @@ begin
                for J in Xar1'Range loop
                   if Xar1 (J) /= (D => 1, Field1 => Ident_Int (1)) then
                      Failed
-                       ("INCORRECT VALUE OF XAR1(" &
-                        Integer'Image (J) &
+                       ("INCORRECT VALUE OF XAR1(" & Integer'Image (J) &
                         ") (1)");
                   end if;
                end loop;
 
                for J in Xap1'Range loop
                   if Xap1 (J) /= Ident (Ap1 (J)) or
-                    Xap1 (J).all /= Ident_Int (1)
-                  then
+                    Xap1 (J).all /= Ident_Int (1) then
                      Failed
-                       ("INCORRECT VALUE OF XAP1(" &
-                        Integer'Image (J) &
+                       ("INCORRECT VALUE OF XAP1(" & Integer'Image (J) &
                         ") (1)");
                   end if;
                end loop;
@@ -409,8 +359,7 @@ begin
                for J in Xav1'Range loop
                   if Pack1."/=" (Xav1 (J), Pack1.Ident (Pack1.One)) then
                      Failed
-                       ("INCORRECT VALUE OF XAV1(" &
-                        Integer'Image (J) &
+                       ("INCORRECT VALUE OF XAV1(" & Integer'Image (J) &
                         ") (1)");
                   end if;
                end loop;
@@ -419,26 +368,14 @@ begin
                   Xat1 (J).Valu (I);
                   if I /= Ident_Int (1) then
                      Failed
-                       ("INCORRECT RETURN VALUE " &
-                        "FROM XAT1(" &
-                        Integer'Image (J) &
-                        ").VALU (1)");
+                       ("INCORRECT RETURN VALUE " & "FROM XAT1(" &
+                        Integer'Image (J) & ").VALU (1)");
                   end if;
                end loop;
 
                Proc1
-                 (Xri1,
-                  Xra1,
-                  Xrr1,
-                  Xrp1,
-                  Xrv1,
-                  Xrt1,
-                  Xai1,
-                  Xaa1,
-                  Xar1,
-                  Xap1,
-                  Xav1,
-                  Xat1);
+                 (Xri1, Xra1, Xrr1, Xrp1, Xrv1, Xrt1, Xai1, Xaa1, Xar1, Xap1,
+                  Xav1, Xat1);
 
                if Xri1 /= Ident_Int (2) then
                   Failed ("INCORRECT VALUE OF XRI1 (2)");
@@ -468,19 +405,16 @@ begin
                for J in Xai1'Range loop
                   if Xai1 (J) /= Ident_Int (2) then
                      Failed
-                       ("INCORRECT VALUE OF XAI1(" &
-                        Integer'Image (J) &
+                       ("INCORRECT VALUE OF XAI1(" & Integer'Image (J) &
                         ") (2)");
                   end if;
                end loop;
 
                for J in Xaa1'Range loop
-                  if Xaa1 (J) /=
-                    (Ident_Int (2), Ident_Int (2), Ident_Int (2))
+                  if Xaa1 (J) /= (Ident_Int (2), Ident_Int (2), Ident_Int (2))
                   then
                      Failed
-                       ("INCORRECT VALUE OF XAA1(" &
-                        Integer'Image (J) &
+                       ("INCORRECT VALUE OF XAA1(" & Integer'Image (J) &
                         ") (2)");
                   end if;
                end loop;
@@ -488,19 +422,16 @@ begin
                for J in Xar1'Range loop
                   if Xar1 (J) /= (D => 1, Field1 => Ident_Int (2)) then
                      Failed
-                       ("INCORRECT VALUE OF XAR1(" &
-                        Integer'Image (J) &
+                       ("INCORRECT VALUE OF XAR1(" & Integer'Image (J) &
                         ") (2)");
                   end if;
                end loop;
 
                for J in Xap1'Range loop
                   if Xap1 (J) /= Ident (Ap1 (J)) or
-                    Xap1 (J).all /= Ident_Int (2)
-                  then
+                    Xap1 (J).all /= Ident_Int (2) then
                      Failed
-                       ("INCORRECT VALUE OF XAP1(" &
-                        Integer'Image (J) &
+                       ("INCORRECT VALUE OF XAP1(" & Integer'Image (J) &
                         ") (2)");
                   end if;
                end loop;
@@ -508,8 +439,7 @@ begin
                for J in Xav1'Range loop
                   if Pack1."/=" (Xav1 (J), Pack1.Ident (Pack1.Two)) then
                      Failed
-                       ("INCORRECT VALUE OF XAV1(" &
-                        Integer'Image (J) &
+                       ("INCORRECT VALUE OF XAV1(" & Integer'Image (J) &
                         ") (2)");
                   end if;
                end loop;
@@ -518,26 +448,14 @@ begin
                   Xat1 (J).Valu (I);
                   if I /= Ident_Int (2) then
                      Failed
-                       ("INCORRECT RETURN VALUE " &
-                        "FROM XAT1(" &
-                        Integer'Image (J) &
-                        ").VALU (2)");
+                       ("INCORRECT RETURN VALUE " & "FROM XAT1(" &
+                        Integer'Image (J) & ").VALU (2)");
                   end if;
                end loop;
 
                Chk_Task.Entry1
-                 (Xri1,
-                  Xra1,
-                  Xrr1,
-                  Xrp1,
-                  Xrv1,
-                  Xrt1,
-                  Xai1,
-                  Xaa1,
-                  Xar1,
-                  Xap1,
-                  Xav1,
-                  Xat1);
+                 (Xri1, Xra1, Xrr1, Xrp1, Xrv1, Xrt1, Xai1, Xaa1, Xar1, Xap1,
+                  Xav1, Xat1);
 
                if Xri1 /= Ident_Int (3) then
                   Failed ("INCORRECT VALUE OF XRI1 (3)");
@@ -567,19 +485,16 @@ begin
                for J in Xai1'Range loop
                   if Xai1 (J) /= Ident_Int (3) then
                      Failed
-                       ("INCORRECT VALUE OF XAI1(" &
-                        Integer'Image (J) &
+                       ("INCORRECT VALUE OF XAI1(" & Integer'Image (J) &
                         ") (3)");
                   end if;
                end loop;
 
                for J in Xaa1'Range loop
-                  if Xaa1 (J) /=
-                    (Ident_Int (3), Ident_Int (3), Ident_Int (3))
+                  if Xaa1 (J) /= (Ident_Int (3), Ident_Int (3), Ident_Int (3))
                   then
                      Failed
-                       ("INCORRECT VALUE OF XAA1(" &
-                        Integer'Image (J) &
+                       ("INCORRECT VALUE OF XAA1(" & Integer'Image (J) &
                         ") (3)");
                   end if;
                end loop;
@@ -587,19 +502,16 @@ begin
                for J in Xar1'Range loop
                   if Xar1 (J) /= (D => 1, Field1 => Ident_Int (3)) then
                      Failed
-                       ("INCORRECT VALUE OF XAR1(" &
-                        Integer'Image (J) &
+                       ("INCORRECT VALUE OF XAR1(" & Integer'Image (J) &
                         ") (3)");
                   end if;
                end loop;
 
                for J in Xap1'Range loop
                   if Xap1 (J) /= Ident (Ap1 (J)) or
-                    Xap1 (J).all /= Ident_Int (3)
-                  then
+                    Xap1 (J).all /= Ident_Int (3) then
                      Failed
-                       ("INCORRECT VALUE OF XAP1(" &
-                        Integer'Image (J) &
+                       ("INCORRECT VALUE OF XAP1(" & Integer'Image (J) &
                         ") (3)");
                   end if;
                end loop;
@@ -607,8 +519,7 @@ begin
                for J in Xav1'Range loop
                   if Pack1."/=" (Xav1 (J), Pack1.Ident (Pack1.Three)) then
                      Failed
-                       ("INCORRECT VALUE OF XAV1(" &
-                        Integer'Image (J) &
+                       ("INCORRECT VALUE OF XAV1(" & Integer'Image (J) &
                         ") (3)");
                   end if;
                end loop;
@@ -617,10 +528,8 @@ begin
                   Xat1 (J).Valu (I);
                   if I /= Ident_Int (3) then
                      Failed
-                       ("INCORRECT RETURN VALUE " &
-                        "FROM XAT1(" &
-                        Integer'Image (J) &
-                        ").VALU (3)");
+                       ("INCORRECT RETURN VALUE " & "FROM XAT1(" &
+                        Integer'Image (J) & ").VALU (3)");
                   end if;
                end loop;
 
@@ -671,19 +580,16 @@ begin
                for J in Xai1'Range loop
                   if Xai1 (J) /= Ident_Int (4) then
                      Failed
-                       ("INCORRECT VALUE OF XAI1(" &
-                        Integer'Image (J) &
+                       ("INCORRECT VALUE OF XAI1(" & Integer'Image (J) &
                         ") (4)");
                   end if;
                end loop;
 
                for J in Xaa1'Range loop
-                  if Xaa1 (J) /=
-                    (Ident_Int (4), Ident_Int (4), Ident_Int (4))
+                  if Xaa1 (J) /= (Ident_Int (4), Ident_Int (4), Ident_Int (4))
                   then
                      Failed
-                       ("INCORRECT VALUE OF XAA1(" &
-                        Integer'Image (J) &
+                       ("INCORRECT VALUE OF XAA1(" & Integer'Image (J) &
                         ") (4)");
                   end if;
                end loop;
@@ -691,19 +597,16 @@ begin
                for J in Xar1'Range loop
                   if Xar1 (J) /= (D => 1, Field1 => Ident_Int (4)) then
                      Failed
-                       ("INCORRECT VALUE OF XAR1(" &
-                        Integer'Image (J) &
+                       ("INCORRECT VALUE OF XAR1(" & Integer'Image (J) &
                         ") (4)");
                   end if;
                end loop;
 
                for J in Xap1'Range loop
                   if Xap1 (J) /= Ident (Ap1 (J)) or
-                    Xap1 (J).all /= Ident_Int (4)
-                  then
+                    Xap1 (J).all /= Ident_Int (4) then
                      Failed
-                       ("INCORRECT VALUE OF XAP1(" &
-                        Integer'Image (J) &
+                       ("INCORRECT VALUE OF XAP1(" & Integer'Image (J) &
                         ") (4)");
                   end if;
                end loop;
@@ -711,8 +614,7 @@ begin
                for J in Xav1'Range loop
                   if Pack1."/=" (Xav1 (J), Pack1.Ident (Pack1.Four)) then
                      Failed
-                       ("INCORRECT VALUE OF XAV1(" &
-                        Integer'Image (J) &
+                       ("INCORRECT VALUE OF XAV1(" & Integer'Image (J) &
                         ") (4)");
                   end if;
                end loop;
@@ -721,10 +623,8 @@ begin
                   Xat1 (J).Valu (I);
                   if I /= Ident_Int (4) then
                      Failed
-                       ("INCORRECT RETURN VALUE " &
-                        "FROM XAT1(" &
-                        Integer'Image (J) &
-                        ").VALU (4)");
+                       ("INCORRECT RETURN VALUE " & "FROM XAT1(" &
+                        Integer'Image (J) & ").VALU (4)");
                   end if;
                end loop;
 
@@ -776,19 +676,16 @@ begin
                for J in Xai1'Range loop
                   if Xai1 (J) /= Ident_Int (5) then
                      Failed
-                       ("INCORRECT VALUE OF XAI1(" &
-                        Integer'Image (J) &
+                       ("INCORRECT VALUE OF XAI1(" & Integer'Image (J) &
                         ") (5)");
                   end if;
                end loop;
 
                for J in Xaa1'Range loop
-                  if Xaa1 (J) /=
-                    (Ident_Int (5), Ident_Int (5), Ident_Int (5))
+                  if Xaa1 (J) /= (Ident_Int (5), Ident_Int (5), Ident_Int (5))
                   then
                      Failed
-                       ("INCORRECT VALUE OF XAA1(" &
-                        Integer'Image (J) &
+                       ("INCORRECT VALUE OF XAA1(" & Integer'Image (J) &
                         ") (5)");
                   end if;
                end loop;
@@ -796,19 +693,16 @@ begin
                for J in Xar1'Range loop
                   if Xar1 (J) /= (D => 1, Field1 => Ident_Int (5)) then
                      Failed
-                       ("INCORRECT VALUE OF XAR1(" &
-                        Integer'Image (J) &
+                       ("INCORRECT VALUE OF XAR1(" & Integer'Image (J) &
                         ") (5)");
                   end if;
                end loop;
 
                for J in Xap1'Range loop
                   if Xap1 (J) /= Ident (Ap1 (J)) or
-                    Xap1 (J).all /= Ident_Int (5)
-                  then
+                    Xap1 (J).all /= Ident_Int (5) then
                      Failed
-                       ("INCORRECT VALUE OF XAP1(" &
-                        Integer'Image (J) &
+                       ("INCORRECT VALUE OF XAP1(" & Integer'Image (J) &
                         ") (5)");
                   end if;
                end loop;
@@ -816,8 +710,7 @@ begin
                for J in Xav1'Range loop
                   if Pack1."/=" (Xav1 (J), Pack1.Ident (Pack1.Five)) then
                      Failed
-                       ("INCORRECT VALUE OF XAV1(" &
-                        Integer'Image (J) &
+                       ("INCORRECT VALUE OF XAV1(" & Integer'Image (J) &
                         ") (5)");
                   end if;
                end loop;
@@ -826,10 +719,8 @@ begin
                   Xat1 (J).Valu (I);
                   if I /= Ident_Int (5) then
                      Failed
-                       ("INCORRECT RETURN VALUE " &
-                        "FROM XAT1(" &
-                        Integer'Image (J) &
-                        ").VALU (5)");
+                       ("INCORRECT RETURN VALUE " & "FROM XAT1(" &
+                        Integer'Image (J) & ").VALU (5)");
                   end if;
                end loop;
             end;

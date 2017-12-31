@@ -40,8 +40,7 @@ begin
      ("C36172B",
       "CHECK THAT CONSTRAINT_ERROR IS RAISED FOR A " &
       "NON-NULL DIMENSION OF A NULL MULTIDIMENSIONAL " &
-      "INDEX CONSTRAINT IF A BOUND LIES OUTSIDE THE " &
-      "INDEX SUBTYPE");
+      "INDEX CONSTRAINT IF A BOUND LIES OUTSIDE THE " & "INDEX SUBTYPE");
 
    begin
       declare
@@ -50,8 +49,7 @@ begin
          Failed
            ("EXCEPTION NOT RAISED WHEN NON-NULL RANGE OF " &
             "NULL INDEX CONSTRAINT HAS A BOUND OUTSIDE " &
-            "THE INDEX SUBTYPE (13) " &
-            Integer'Image (V'First));
+            "THE INDEX SUBTYPE (13) " & Integer'Image (V'First));
       end;
    exception
       when Constraint_Error =>
@@ -67,8 +65,7 @@ begin
          Failed
            ("EXCEPTION NOT RAISED WHEN NON-NULL RANGE OF " &
             "NULL INDEX CONSTRAINT HAS A BOUND OUTSIDE " &
-            "THE INDEX SUBTYPE (14) " &
-            Integer'Image (V'First));
+            "THE INDEX SUBTYPE (14) " & Integer'Image (V'First));
       end;
    exception
       when Constraint_Error =>
@@ -84,8 +81,7 @@ begin
          Failed
            ("EXCEPTION NOT RAISED WHEN NON-NULL RANGE OF " &
             "NULL INDEX CONSTRAINT HAS A BOUND OUTSIDE " &
-            "THE INDEX SUBTYPE (15) " &
-            Integer'Image (V'First));
+            "THE INDEX SUBTYPE (15) " & Integer'Image (V'First));
       end;
    exception
       when Constraint_Error =>
@@ -101,8 +97,7 @@ begin
          Failed
            ("EXCEPTION NOT RAISED WHEN NON-NULL RANGE OF " &
             "NULL INDEX CONSTRAINT HAS A BOUND OUTSIDE " &
-            "THE INDEX SUBTYPE (16) " &
-            Integer'Image (V'First));
+            "THE INDEX SUBTYPE (16) " & Integer'Image (V'First));
       end;
    exception
       when Constraint_Error =>
@@ -118,8 +113,7 @@ begin
          Failed
            ("EXCEPTION NOT RAISED WHEN NON-NULL RANGE OF " &
             "NULL INDEX CONSTRAINT HAS A BOUND OUTSIDE " &
-            "THE INDEX SUBTYPE (17) " &
-            Integer'Image (V'First));
+            "THE INDEX SUBTYPE (17) " & Integer'Image (V'First));
       end;
    exception
       when Constraint_Error =>
@@ -135,8 +129,7 @@ begin
          Failed
            ("EXCEPTION NOT RAISED WHEN NON-NULL RANGE OF " &
             "NULL INDEX CONSTRAINT HAS A BOUND OUTSIDE " &
-            "THE INDEX SUBTYPE (18) " &
-            Integer'Image (V'First));
+            "THE INDEX SUBTYPE (18) " & Integer'Image (V'First));
       end;
    exception
       when Constraint_Error =>

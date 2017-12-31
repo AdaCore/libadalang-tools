@@ -177,8 +177,7 @@ begin
       begin
          New_Float_Result :=
            Gef.Arctan
-             (New_Float (-Fxa5a00.Large),
-              X => New_Float (Fxa5a00.Small));
+             (New_Float (-Fxa5a00.Large), X => New_Float (Fxa5a00.Small));
          Dont_Optimize_New_Float (New_Float_Result, 7);
       exception
          when others =>
@@ -218,8 +217,7 @@ begin
       if Gef.Arctan (Y => 0.0) /= 0.0 or -- Default X value
         Ef.Arctan (Y => 0.0, X => Fxa5a00.Large) /= 0.0 or
 --pwb-math: Next line: changed 2.0*Pi to 360.0
-        Gef.Arctan (0.0, 360.0) /= 0.0 or
-        Ef.Arctan (0.0, Fxa5a00.Small) /= 0.0
+        Gef.Arctan (0.0, 360.0) /= 0.0 or Ef.Arctan (0.0, Fxa5a00.Small) /= 0.0
       then
          Report.Failed
            ("Incorrect results from the Arctan function when " &
@@ -235,8 +233,7 @@ begin
         not Fxa5a00.Result_Within_Range (Gef.Arctan (1.0), 0.785, 0.001) or
         not Fxa5a00.Result_Within_Range (Ef.Arctan (-1.0), -0.785, 0.001) or
         not Fxa5a00.Result_Within_Range (Gef.Arctan (0.25), 0.245, 0.001) or
-        not Fxa5a00.Result_Within_Range (Ef.Arctan (0.92), 0.744, 0.001)
-      then
+        not Fxa5a00.Result_Within_Range (Ef.Arctan (0.92), 0.744, 0.001) then
          Report.Failed
            ("Incorrect results from the Arctan function when " &
             "provided a variety of Y parameter values");
@@ -278,8 +275,7 @@ begin
          when others =>
             Report.Failed
               ("Incorrect exception raised by the Arctan " &
-               "function when provided a 0.0 cycle parameter " &
-               "value");
+               "function when provided a 0.0 cycle parameter " & "value");
       end;
 
       begin
@@ -311,8 +307,7 @@ begin
          when others =>
             Report.Failed
               ("Incorrect exception raised by the Arctan " &
-               "function when provided a -Pi cycle parameter " &
-               "value");
+               "function when provided a -Pi cycle parameter " & "value");
       end;
 
       -- Check that no exception is raised by the Arctan function with
@@ -322,10 +317,9 @@ begin
       begin
          Float_Result :=
            Ef.Arctan
-             (Y => -Fxa5a00.Large,
-              X => -Fxa5a00.Large,
+             (Y => -Fxa5a00.Large, X => -Fxa5a00.Large,
 --pwb-math: Next line: changed 2.0*Pi to 360.0
-              Cycle => 360.0);
+          Cycle => 360.0);
          Dont_Optimize_Float (Float_Result, 14);
       exception
          when others =>
@@ -338,8 +332,7 @@ begin
       begin
          New_Float_Result :=
            Gef.Arctan
-             (New_Float (Fxa5a00.Large),
-              X => New_Float (-Fxa5a00.Small),
+             (New_Float (Fxa5a00.Large), X => New_Float (-Fxa5a00.Small),
 --pwb-math: Next line: changed 2.0*Pi to 360.0
               Cycle => 360.0);
          Dont_Optimize_New_Float (New_Float_Result, 15);
@@ -355,10 +348,9 @@ begin
       begin
          Float_Result :=
            Ef.Arctan
-             (Y => -Fxa5a00.Small,
-              X => -Fxa5a00.Large,
+             (Y => -Fxa5a00.Small, X => -Fxa5a00.Large,
 --pwb-math: Next line: changed 2.0*Pi to 360.0
-              Cycle => 360.0);
+          Cycle => 360.0);
          Dont_Optimize_Float (Float_Result, 16);
       exception
          when others =>
@@ -372,10 +364,9 @@ begin
       begin
          New_Float_Result :=
            Gef.Arctan
-             (New_Float (Fxa5a00.Small),
-              New_Float (Fxa5a00.Large),
+             (New_Float (Fxa5a00.Small), New_Float (Fxa5a00.Large),
 --pwb-math: Next line: changed 2.0*Pi to 360.0
-              360.0);
+          360.0);
          Dont_Optimize_New_Float (New_Float_Result, 17);
       exception
          when others =>
@@ -413,21 +404,13 @@ begin
 
 --pwb-math  Next 12 lines are replacements for 21 commented lines above
       if not Fxa5a00.Result_Within_Range
-          (Gef.Arctan (1.0, Cycle => 2.0 * 180.0),
-           45.0,
-           0.001) or
+          (Gef.Arctan (1.0, Cycle => 2.0 * 180.0), 45.0, 0.001) or
         not Fxa5a00.Result_Within_Range
-          (Ef.Arctan (-1.0, Cycle => 2.0 * 180.0),
-           -45.0,
-           0.001) or
+          (Ef.Arctan (-1.0, Cycle => 2.0 * 180.0), -45.0, 0.001) or
         not Fxa5a00.Result_Within_Range
-          (Ef.Arctan (1.0, Cycle => 360.0),
-           45.0,
-           0.1) or
+          (Ef.Arctan (1.0, Cycle => 360.0), 45.0, 0.1) or
         not Fxa5a00.Result_Within_Range
-          (Gef.Arctan (1.0, Cycle => 100.0),
-           12.5,
-           0.1)
+          (Gef.Arctan (1.0, Cycle => 100.0), 12.5, 0.1)
       then
          Report.Failed
            ("Incorrect results from the Arctan function with " &

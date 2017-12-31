@@ -12,8 +12,7 @@ begin  -- Main test procedure.
       "Check that representation items containing " &
       "nonstatic expressions are supported in the " &
       "case that the representation item is a name " &
-      "that statically denotes a constant declared " &
-      "before the entity");
+      "that statically denotes a constant declared " & "before the entity");
 
    Cd10001_0.Tc_Check_Values;
 

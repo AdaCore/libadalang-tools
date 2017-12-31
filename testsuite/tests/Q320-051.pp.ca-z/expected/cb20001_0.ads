@@ -51,11 +51,8 @@ package Cb20001_0 is
 
    Incorrect_Data, Location_Error, Off_Screen_Data : exception;
 
-   Tc_Handled_In_Accept,
-   Tc_Reraised_In_Accept,
-   Tc_Handled_In_Task_Block,
-   Tc_Handled_In_Caller : Boolean :=
-     False;
+   Tc_Handled_In_Accept, Tc_Reraised_In_Accept, Tc_Handled_In_Task_Block,
+   Tc_Handled_In_Caller : Boolean := False;
 
    type Location_Type is range 0 .. 2_000;
 

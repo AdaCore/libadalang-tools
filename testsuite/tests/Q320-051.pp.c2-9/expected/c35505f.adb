@@ -114,13 +114,11 @@ begin
    begin
       if Character'Pred (Ident_Char (Character'Base'First)) = 'A' then
          Failed
-           ("NO EXCEPTION RAISED " &
-            "FOR CHARACTER'PRED " &
+           ("NO EXCEPTION RAISED " & "FOR CHARACTER'PRED " &
             "(IDENT_CHAR (CHARACTER'BASE'FIRST)) - 1");
       else
          Failed
-           ("NO EXCEPTION RAISED " &
-            "FOR CHARACTER'PRED " &
+           ("NO EXCEPTION RAISED " & "FOR CHARACTER'PRED " &
             "(IDENT_CHAR (CHARACTER'BASE'FIRST)) - 2");
       end if;
    exception
@@ -128,21 +126,18 @@ begin
          null;
       when others =>
          Failed
-           ("WRONG EXCEPTION RAISED " &
-            "FOR CHARACTER'PRED " &
+           ("WRONG EXCEPTION RAISED " & "FOR CHARACTER'PRED " &
             "(IDENT_CHAR (CHARACTER'BASE'FIRST))");
    end;
 
    begin
       if Character'Succ (Ident_Char (Character'Base'Last)) = 'Z' then
          Failed
-           ("NO EXCEPTION RAISED " &
-            "FOR CHARACTER'SUCC " &
+           ("NO EXCEPTION RAISED " & "FOR CHARACTER'SUCC " &
             "(IDENT_CHAR (CHARACTER'BASE'LAST)) - 1");
       else
          Failed
-           ("NO EXCEPTION RAISED " &
-            "FOR CHARACTER'SUCC " &
+           ("NO EXCEPTION RAISED " & "FOR CHARACTER'SUCC " &
             "(IDENT_CHAR (CHARACTER'BASE'LAST)) - 2");
       end if;
    exception
@@ -150,8 +145,7 @@ begin
          null;
       when others =>
          Failed
-           ("WRONG EXCEPTION RAISED " &
-            "FOR CHARACTER'SUCC " &
+           ("WRONG EXCEPTION RAISED " & "FOR CHARACTER'SUCC " &
             "(IDENT_CHAR (CHARACTER'BASE'LAST))");
    end;
 

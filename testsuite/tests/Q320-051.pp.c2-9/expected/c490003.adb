@@ -73,8 +73,7 @@ begin
 
       Left : constant :=
         6.0 +
-        0.312_5 *
-          ((Full * 0.375) + (Half / 2.4) - ((Quarter + 36.0) / 3.0)) /
+        0.312_5 * ((Full * 0.375) + (Half / 2.4) - ((Quarter + 36.0) / 3.0)) /
           10.0;            -- 11.25
       Right : constant :=
         (Pi / 3.0) * 1.2 * (15.0 / 96.0);                -- Pi/16
@@ -84,8 +83,7 @@ begin
       end if;
 
       if ((Pi * Rad_To_Deg) * 2.0 + 4.0 * Quarter) / 16.0 /=
-        Rad_To_Deg * (Pi / 4.0)
-      then
+        Rad_To_Deg * (Pi / 4.0) then
          Report.Failed ("Static expressions not evaluated exactly: #2");
       end if;
    end;

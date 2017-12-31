@@ -79,9 +79,8 @@ package C392d02_0 is
       Fstop : Aperture;
    end record;
 
-   procedure Set_Shutter_Speed
-     (C     : in out Auto_Speed;
-      Speed : in     F392d00.Shutter_Speed);
+   procedure Set_Shutter_Speed (C : in out Auto_Speed;
+      Speed                       : in     F392d00.Shutter_Speed);
    -- Does NOT override.
 
    -- This version of Set_Shutter_Speed does NOT override the operation

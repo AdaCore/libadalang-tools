@@ -13,8 +13,7 @@ begin
       "type is properly initialized/constrained by an initial " &
       "value assignment that is a) an aggregate, b) a function, " &
       "or c) an object.  Check that objects of the above types " &
-      "do not need explicit constraints if they have initial " &
-      "values");
+      "do not need explicit constraints if they have initial " & "values");
 
    -- Verify values of public child objects.
 
@@ -31,10 +30,8 @@ begin
       Report.Failed ("Wrong values for PublicChild_Obj_05");
    end if;
 
-   if Publicchild_Obj_06.Nd /= 6 or
-     Publicchild_Obj_06.C2 /= 9 or
-     Publicchild_Obj_06.C1
-   then
+   if Publicchild_Obj_06.Nd /= 6 or Publicchild_Obj_06.C2 /= 9 or
+     Publicchild_Obj_06.C1 then
       Report.Failed ("Wrong values for PublicChild_Obj_06");
    end if;
 
@@ -45,10 +42,8 @@ begin
 
    -- Verify values of private child objects.
 
-   if not Verify_Private_Obj_1 or
-     not Verify_Private_Obj_2 or
-     not Verify_Private_Obj_3
-   then
+   if not Verify_Private_Obj_1 or not Verify_Private_Obj_2 or
+     not Verify_Private_Obj_3 then
       Report.Failed
         ("Wrong values for PrivateChild_Obj_01 or " &
          "PrivateChild_Obj_02 or PrivateChild_Obj_03");

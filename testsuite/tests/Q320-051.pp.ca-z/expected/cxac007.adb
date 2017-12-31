@@ -23,9 +23,7 @@ begin
       -- Not_Applicable result.
 
       Ada.Streams.Stream_Io.Create
-        (Test_File,
-         Ada.Streams.Stream_Io.Out_File,
-         Log_File_Name);
+        (Test_File, Ada.Streams.Stream_Io.Out_File, Log_File_Name);
 
       Ada.Streams.Stream_Io.Close (Test_File);
 
@@ -58,9 +56,7 @@ begin
          use type Ada.Streams.Stream_Element;
       begin
          Ada.Streams.Stream_Io.Read
-           (Log_File,
-            Buffer (1 .. Data'Length + 2),
-            Last);
+           (Log_File, Buffer (1 .. Data'Length + 2), Last);
          if Last /= Data'Length + 2 then
             Report.Failed
               ("Wrong length read, premature end of file for " & Data);
@@ -74,8 +70,7 @@ begin
          for I in Data'Range loop
             if Buffer
                 (Ada.Streams.Stream_Element_Offset (I - Data'First) + 1) /=
-              Ada.Streams.Stream_Element (Character'Pos (Data (I)))
-            then
+              Ada.Streams.Stream_Element (Character'Pos (Data (I))) then
                Report.Failed ("Wrong character for " & Data);
                exit;
             end if;
@@ -85,9 +80,7 @@ begin
 
    begin
       Ada.Streams.Stream_Io.Open
-        (Log_File,
-         Ada.Streams.Stream_Io.In_File,
-         Log_File_Name);
+        (Log_File, Ada.Streams.Stream_Io.In_File, Log_File_Name);
 
       Check ("Start");
 

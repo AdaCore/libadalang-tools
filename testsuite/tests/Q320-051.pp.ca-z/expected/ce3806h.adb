@@ -45,8 +45,7 @@ procedure Ce3806h is
 begin
 
    Test
-     ("CE3806H",
-      "CHECK THAT FIXED_IO PUT RAISES " & "LAYOUT_ERROR CORRECTLY");
+     ("CE3806H", "CHECK THAT FIXED_IO PUT RAISES " & "LAYOUT_ERROR CORRECTLY");
 
    declare
       Ft : File_Type;

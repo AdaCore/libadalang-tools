@@ -61,20 +61,16 @@ begin
          Rec3 : Rectype := (1, 1, "A");
          Rec4 : Rectype;  -- 80
 
-         procedure Chk_Rectype1
-           (Rec1 : in     Rectype := (2, 0, "AB");
-            Rec2 :    out Rectype;
-            Rec3 : in out Rectype);
+         procedure Chk_Rectype1 (Rec1 : in     Rectype := (2, 0, "AB");
+            Rec2                      :    out Rectype; Rec3 : in out Rectype);
 
          procedure Chk_Rectype2 (Rec : out Rectype);
       end Pkg;
 
       package body Pkg is
 
-         procedure Chk_Rectype1
-           (Rec1 : in     Rectype := (2, 0, "AB");
-            Rec2 :    out Rectype;
-            Rec3 : in out Rectype)
+         procedure Chk_Rectype1 (Rec1 : in     Rectype := (2, 0, "AB");
+            Rec2                      :    out Rectype; Rec3 : in out Rectype)
          is
          begin
             if (Rec1.Constraint /= Ident_Int (10)) then
@@ -99,8 +95,7 @@ begin
          begin
             if (Rec.Constraint /= Ident_Int (80)) then
                Failed
-                 ("RECORD TYPE OUT PARAMETER DID " &
-                  "NOT USE CONSTRAINT OF " &
+                 ("RECORD TYPE OUT PARAMETER DID " & "NOT USE CONSTRAINT OF " &
                   "UNINITIALIZED ACTUAL");
             end if;
             Rec := (10, 10, "9876543210");
@@ -125,10 +120,8 @@ begin
 
          type Rectype (Constraint : Int := 80) is private;
 
-         procedure Chk_Rectype1
-           (Rec1 : in     Rectype;
-            Rec2 :    out Rectype;
-            Rec3 : in out Rectype);
+         procedure Chk_Rectype1 (Rec1 : in     Rectype; Rec2 : out Rectype;
+            Rec3                      : in out Rectype);
 
          procedure Chk_Rectype2 (Rec : out Rectype);
 
@@ -146,10 +139,8 @@ begin
 
       package body Pkg is
 
-         procedure Chk_Rectype1
-           (Rec1 : in     Rectype;
-            Rec2 :    out Rectype;
-            Rec3 : in out Rectype)
+         procedure Chk_Rectype1 (Rec1 : in     Rectype; Rec2 : out Rectype;
+            Rec3                      : in out Rectype)
          is
          begin
             if (Rec1.Constraint /= Ident_Int (10)) then
@@ -175,8 +166,7 @@ begin
             if (Rec.Constraint /= Ident_Int (10)) then
                Failed
                  ("PRIVATE TYPE OUT PARAMETER DID " &
-                  "NOT USE CONSTRAINT OF " &
-                  "UNINITIALIZED ACTUAL");
+                  "NOT USE CONSTRAINT OF " & "UNINITIALIZED ACTUAL");
             end if;
             Rec := (10, 10, "9876543210");
          end Chk_Rectype2;
@@ -206,10 +196,8 @@ begin
 
          type Rectype (Constraint : Int := 80) is limited private;
 
-         procedure Chk_Rectype1
-           (Rec1 : in     Rectype;
-            Rec2 :    out Rectype;
-            Rec3 : in out Rectype);
+         procedure Chk_Rectype1 (Rec1 : in     Rectype; Rec2 : out Rectype;
+            Rec3                      : in out Rectype);
 
          procedure Chk_Rectype2 (Rec : out Rectype);
 
@@ -227,28 +215,23 @@ begin
 
       package body Pkg is
 
-         procedure Chk_Rectype1
-           (Rec1 : in     Rectype;
-            Rec2 :    out Rectype;
-            Rec3 : in out Rectype)
+         procedure Chk_Rectype1 (Rec1 : in     Rectype; Rec2 : out Rectype;
+            Rec3                      : in out Rectype)
          is
          begin
             if (Rec1.Constraint /= Ident_Int (10)) then
                Failed
                  ("LIMITED PRIVATE TYPE IN PARAMETER " &
-                  "DID NOT USE CONSTRAINT OF " &
-                  "ACTUAL");
+                  "DID NOT USE CONSTRAINT OF " & "ACTUAL");
             end if;
             if (Rec2.Constraint /= Ident_Int (17)) then
                Failed
                  ("LIMITED PRIVATE TYPE OUT PARAMETER " &
-                  "DID NOT USE CONSTRAINT OF " &
-                  "ACTUAL");
+                  "DID NOT USE CONSTRAINT OF " & "ACTUAL");
             end if;
             if (Rec3.Constraint /= Ident_Int (1)) then
                Failed
-                 ("LIMITED PRIVATE TYPE IN OUT " &
-                  "PARAMETER DID NOT USE " &
+                 ("LIMITED PRIVATE TYPE IN OUT " & "PARAMETER DID NOT USE " &
                   "CONSTRAINT OF ACTUAL");
             end if;
             Rec2 := C.Rec2;
@@ -258,8 +241,7 @@ begin
          begin
             if (Rec.Constraint /= Ident_Int (80)) then
                Failed
-                 ("LIMITED PRIVATE TYPE OUT " &
-                  "PARAMETER DID NOT USE " &
+                 ("LIMITED PRIVATE TYPE OUT " & "PARAMETER DID NOT USE " &
                   "CONSTRAINT OF UNINITIALIZED ACTUAL");
             end if;
             Rec := (10, 10, "9876543210");
@@ -285,9 +267,7 @@ begin
 
       type Atype is array (Integer range <>, Positive range <>) of Character;
 
-      A1,
-      A2,
-      A3 : Atype (-1 .. 1, 4 .. 5) :=
+      A1, A2, A3 : Atype (-1 .. 1, 4 .. 5) :=
         (('A', 'B'), ('C', 'D'), ('E', 'F'));
 
       A4 : Atype (-1 .. 1, 4 .. 5);
@@ -299,17 +279,14 @@ begin
       S2 : String (-5 .. -7)           := "";
       S3 : String (1 .. 0)             := "";
 
-      procedure Chk_Array1
-        (A1 : in     Atype := Ca1;
-         A2 :    out Atype;
-         A3 : in out Atype)
+      procedure Chk_Array1 (A1 : in     Atype := Ca1; A2 : out Atype;
+         A3                    : in out Atype)
       is
       begin
          if
            ((A1'First (1) /= Ident_Int (-1)) or
             (A1'Last (1) /= Ident_Int (1)) or
-            (A1'First (2) /= Ident_Int (4)) or
-            (A1'Last (2) /= Ident_Int (5)))
+            (A1'First (2) /= Ident_Int (4)) or (A1'Last (2) /= Ident_Int (5)))
          then
             Failed
               ("ARRAY TYPE IN PARAMETER DID NOT " &
@@ -318,8 +295,7 @@ begin
          if
            ((A2'First (1) /= Ident_Int (-1)) or
             (A2'Last (1) /= Ident_Int (1)) or
-            (A2'First (2) /= Ident_Int (4)) or
-            (A2'Last (2) /= Ident_Int (5)))
+            (A2'First (2) /= Ident_Int (4)) or (A2'Last (2) /= Ident_Int (5)))
          then
             Failed
               ("ARRAY TYPE OUT PARAMETER DID NOT USE" &
@@ -328,8 +304,7 @@ begin
          if
            ((A3'First (1) /= Ident_Int (-1)) or
             (A3'Last (1) /= Ident_Int (1)) or
-            (A3'First (2) /= Ident_Int (4)) or
-            (A3'Last (2) /= Ident_Int (5)))
+            (A3'First (2) /= Ident_Int (4)) or (A3'Last (2) /= Ident_Int (5)))
          then
             Failed
               ("ARRAY TYPE IN OUT PARAMETER DID NOT " &
@@ -343,21 +318,17 @@ begin
          if
            ((A4'First (1) /= Ident_Int (-1)) or
             (A4'Last (1) /= Ident_Int (1)) or
-            (A4'First (2) /= Ident_Int (4)) or
-            (A4'Last (2) /= Ident_Int (5)))
+            (A4'First (2) /= Ident_Int (4)) or (A4'Last (2) /= Ident_Int (5)))
          then
             Failed
               ("ARRAY TYPE OUT PARAMETER DID NOT " &
-               "USE CONSTRAINTS OF UNINITIALIZED " &
-               "ACTUAL");
+               "USE CONSTRAINTS OF UNINITIALIZED " & "ACTUAL");
          end if;
          A4 := A2;
       end Chk_Array2;
 
-      procedure Chk_String
-        (S1 : in     String;
-         S2 : in out String;
-         S3 :    out String)
+      procedure Chk_String (S1 : in     String; S2 : in out String;
+         S3                    :    out String)
       is
       begin
          if
@@ -366,8 +337,7 @@ begin
          then
             Failed
               ("STRING TYPE IN PARAMETER DID NOT " &
-               "USE CONSTRAINTS OF ACTUAL NULL " &
-               "STRING");
+               "USE CONSTRAINTS OF ACTUAL NULL " & "STRING");
          end if;
          if ((S2'First /= Ident_Int (-5)) or (S2'Last /= Ident_Int (-7))) then
             Failed

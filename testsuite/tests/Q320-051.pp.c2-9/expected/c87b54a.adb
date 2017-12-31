@@ -80,8 +80,7 @@ begin
       if Err then
          Failed
            ("DELAY STATEMENT TAKES AN ARGUMENT OF " &
-            "THE PREDEFINED FIXED POINT TYPE " &
-            "DURATION");
+            "THE PREDEFINED FIXED POINT TYPE " & "DURATION");
       end if;
    end;
 

@@ -57,8 +57,7 @@ begin
       end Deallocate_Resources;
 
       if not
-        (Semaphore.Reraised_In_Procedure and
-         Semaphore.Reraised_In_Function and
+        (Semaphore.Reraised_In_Procedure and Semaphore.Reraised_In_Function and
          Semaphore.Handled_In_Procedure_Caller and
          Semaphore.Handled_In_Function_Caller)
       then                                       -- Incorrect excpt. handling

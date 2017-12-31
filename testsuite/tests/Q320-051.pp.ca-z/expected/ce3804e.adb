@@ -50,8 +50,7 @@ procedure Ce3804e is
 begin
 
    Test
-     ("CE3804E",
-      "FIXED_IO GET RAISES DATA_ERROR FOR " & "OUT-OF-RANGE DATA");
+     ("CE3804E", "FIXED_IO GET RAISES DATA_ERROR FOR " & "OUT-OF-RANGE DATA");
 
    declare
       Ft : File_Type;

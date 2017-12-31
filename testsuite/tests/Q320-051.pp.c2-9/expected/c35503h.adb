@@ -40,8 +40,7 @@ begin
      ("C35503H",
       "CHECK THAT 'PRED' AND 'SUCC' YIELD THE " &
       "CORRECT RESULT WHEN THE PREFIX IS A GENERIC " &
-      "FORMAL DISCRETE TYPE WHOSE ACTUAL PARAMETER " &
-      "IS AN INTEGER TYPE");
+      "FORMAL DISCRETE TYPE WHOSE ACTUAL PARAMETER " & "IS AN INTEGER TYPE");
 
    declare
       type Intrange is range -6 .. 6;
@@ -62,9 +61,7 @@ begin
             exception
                when others =>
                   Failed
-                    ("EXCEPTION RAISED FOR " &
-                     Str &
-                     "'PRED OF " &
+                    ("EXCEPTION RAISED FOR " & Str & "'PRED OF " &
                      Int'Image (I));
             end;
             begin
@@ -74,9 +71,7 @@ begin
             exception
                when others =>
                   Failed
-                    ("EXCEPTION RAISED FOR " &
-                     Str &
-                     "'SUCC OF " &
+                    ("EXCEPTION RAISED FOR " & Str & "'SUCC OF " &
                      Int'Image (I));
             end;
          end loop;

@@ -96,8 +96,7 @@ begin
 
          --=====================================================--
 
-         Obj : C371001_0
-           .Rec
+         Obj : C371001_0.Rec
            (Report.Ident_Int (0));  -- Constraint_Error raised.
 
       begin

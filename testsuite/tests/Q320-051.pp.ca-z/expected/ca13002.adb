@@ -11,10 +11,8 @@ use Ca13002_0;                         -- All primitive subprograms directly
 
 procedure Ca13002 is
    Expected_Calls : constant Ca13002_0.Tc_Calls_Arr :=
-     ((True, False, False, False),
-      (False, True, False, False),
-      (False, False, True, False),
-      (False, False, False, True));
+     ((True, False, False, False), (False, True, False, False),
+      (False, False, True, False), (False, False, False, True));
 begin
    Report.Test
      ("CA13002",

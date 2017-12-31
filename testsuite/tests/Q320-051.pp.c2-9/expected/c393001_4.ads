@@ -5,9 +5,8 @@ package C393001_4 is
 
    type Special_Breaker is new C393001_2.Basic_Breaker with private;
 
-   function Construct
-     (Voltage  : C393001_2.Voltages;
-      Amperage : C393001_2.Amps) return Special_Breaker;
+   function Construct (Voltage : C393001_2.Voltages;
+      Amperage                 : C393001_2.Amps) return Special_Breaker;
 
    procedure Flip (The_Breaker : in out Special_Breaker);
    procedure Trip (The_Breaker : in out Special_Breaker);

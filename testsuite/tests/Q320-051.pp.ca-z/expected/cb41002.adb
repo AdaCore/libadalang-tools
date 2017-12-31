@@ -121,17 +121,13 @@ begin
          -- We don't particular care if the implementation advice is followed,
          -- but we make these checks to insure that a compiler cannot optimize
          -- away Info or the rest of this routine.
-         if not Is_Substring_Of
-             (Info,
-              Ada.Exceptions.Exception_Name (Occur))
+         if not Is_Substring_Of (Info, Ada.Exceptions.Exception_Name (Occur))
          then
             Report.Comment
               ("Exception_Information does not contain " &
                "Exception_Name - see 11.4.1(19)");
          elsif not Is_Substring_Of
-             (Info,
-              Ada.Exceptions.Exception_Message (Occur))
-         then
+             (Info, Ada.Exceptions.Exception_Message (Occur)) then
             Report.Comment
               ("Exception_Information does not contain " &
                "Exception_Message - see 11.4.1(19)");
@@ -147,24 +143,20 @@ begin
             case I is
                when 1 =>
                   Ada.Exceptions.Raise_Exception
-                    (User_Exception_1'Identity,
-                     User_Messages (I).all);
+                    (User_Exception_1'Identity, User_Messages (I).all);
                when 2 =>
                   Ada.Exceptions.Raise_Exception
-                    (User_Exception_2'Identity,
-                     User_Messages (I).all);
+                    (User_Exception_2'Identity, User_Messages (I).all);
                when 3 =>
                   Ada.Exceptions.Raise_Exception
-                    (User_Exception_3'Identity,
-                     User_Messages (I).all);
+                    (User_Exception_3'Identity, User_Messages (I).all);
                when others =>
                   Report.Failed ("Incorrect result from Case statement");
             end case;
 
             Report.Failed
               ("Exception not raised by procedure Exception_With_Message " &
-               "for User_Exception #" &
-               Integer'Image (I));
+               "for User_Exception #" & Integer'Image (I));
 
          exception
             when Excptn : others =>
@@ -175,13 +167,11 @@ begin
                   -- function.
 
                   if User_Messages (I).all /=
-                    Ada.Exceptions.Exception_Message (Excptn)
-                  then
+                    Ada.Exceptions.Exception_Message (Excptn) then
                      Report.Failed
                        ("Message captured from exception is not the " &
                         "message provided when the exception was raised, " &
-                        "User_Exception #" &
-                        Integer'Image (I));
+                        "User_Exception #" & Integer'Image (I));
                   end if;
 
                   Check_Exception_Information (Excptn);
@@ -196,8 +186,7 @@ begin
 
          begin
             Ada.Exceptions.Raise_Exception
-              (User_Exception_1'Identity,
-               User_Messages (1).all);
+              (User_Exception_1'Identity, User_Messages (1).all);
             Report.Failed ("User_Exception_1 not raised");
          end;
          Report.Failed ("User_Exception_1 not propagated");
@@ -205,8 +194,7 @@ begin
          when Excptn : User_Exception_1 =>
 
             if User_Messages (1).all /=
-              Ada.Exceptions.Exception_Message (Excptn)
-            then
+              Ada.Exceptions.Exception_Message (Excptn) then
                Report.Failed ("User_Message_1 not found");
             end if;
             Check_Exception_Information (Excptn);
@@ -219,8 +207,7 @@ begin
 
          begin
             Ada.Exceptions.Raise_Exception
-              (User_Exception_2'Identity,
-               User_Messages (2).all);
+              (User_Exception_2'Identity, User_Messages (2).all);
             Report.Failed ("User_Exception_2 not raised");
          exception
             when Exc : User_Exception_2 =>
@@ -237,8 +224,7 @@ begin
          when Excptn : User_Exception_2 =>
 
             if User_Messages (2).all /=
-              Ada.Exceptions.Exception_Message (Excptn)
-            then
+              Ada.Exceptions.Exception_Message (Excptn) then
                Report.Failed ("User_Message_2 not found");
             end if;
             Check_Exception_Information (Excptn);
@@ -259,15 +245,13 @@ begin
          begin
             accept Raise_It do
                Ada.Exceptions.Raise_Exception
-                 (User_Exception_3'Identity,
-                  User_Messages (3).all);
+                 (User_Exception_3'Identity, User_Messages (3).all);
             end Raise_It;
             Report.Failed ("User_Exception_3 not raised");
          exception
             when Excptn : User_Exception_3 =>
                if User_Messages (3).all /=
-                 Ada.Exceptions.Exception_Message (Excptn)
-               then
+                 Ada.Exceptions.Exception_Message (Excptn) then
                   Report.Failed
                     ("User_Message_3 not returned inside task body");
                end if;
@@ -282,8 +266,7 @@ begin
       exception
          when Excptn : User_Exception_3 =>
             if User_Messages (3).all /=
-              Ada.Exceptions.Exception_Message (Excptn)
-            then
+              Ada.Exceptions.Exception_Message (Excptn) then
                Report.Failed ("User_Message_3 not returned to caller of task");
             end if;
             Check_Exception_Information (Excptn);

@@ -17,9 +17,7 @@ package Cc54002_1 is
    -- variable type.
 
    package District_Subscription_Lists is new Cc54002_0
-     (Element_Type => Subscriber,
-      Element_Ptr  => Subscriber_Ptr,
-      Size         => 100);
+     (Element_Type => Subscriber, Element_Ptr => Subscriber_Ptr, Size => 100);
 
    District_01_Subscribers : District_Subscription_Lists.List_Type;
 

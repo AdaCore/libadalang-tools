@@ -36,8 +36,7 @@ begin
    Test
      ("C25001B",
       "CHECK THAT EACH CHARACTER IN THE LOWER CASE " &
-      "LETTERS AND THE OTHER SPECIAL CHARACTERS CAN " &
-      "BE WRITTEN");
+      "LETTERS AND THE OTHER SPECIAL CHARACTERS CAN " & "BE WRITTEN");
 
    if Character'Pos ('a') /= 97 then
       Failed ("INCORRECT POSITION NUMBER FOR 'a'");

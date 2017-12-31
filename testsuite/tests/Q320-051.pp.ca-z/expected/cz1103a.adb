@@ -134,8 +134,7 @@ begin
       end loop;
       Check_File
         (File_With_Trailing_Blanks,
-         "LINE WITH TRAILING" &
-         " BLANKS#LINE WITH TRAILING BLANKS#LINE" &
+         "LINE WITH TRAILING" & " BLANKS#LINE WITH TRAILING BLANKS#LINE" &
          " WITH TRAILING BLANKS#@%");
       Close (File_With_Trailing_Blanks);
    exception
@@ -150,13 +149,11 @@ begin
       Create (File_Without_Trailing_Blanks, Out_File);
       for I in 1 .. 3 loop
          Put_Line
-           (File_Without_Trailing_Blanks,
-            "LINE WITHOUT TRAILING BLANKS");
+           (File_Without_Trailing_Blanks, "LINE WITHOUT TRAILING BLANKS");
       end loop;
       Check_File
         (File_Without_Trailing_Blanks,
-         "LINE WITHOUT " &
-         "TRAILING BLANKS#LINE WITHOUT TRAILING BLANKS#" &
+         "LINE WITHOUT " & "TRAILING BLANKS#LINE WITHOUT TRAILING BLANKS#" &
          "LINE WITHOUT TRAILING BLANKS#@%");
       Close (File_Without_Trailing_Blanks);
    exception

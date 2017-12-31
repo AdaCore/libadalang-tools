@@ -58,8 +58,7 @@ begin
    Test
      ("C35A07A",
       "CHECK THAT FOR FIXED POINT TYPES THE FIRST " &
-      "AND LAST ATTRIBUTES YIELD CORRECT VALUES - " &
-      "BASIC TYPES");
+      "AND LAST ATTRIBUTES YIELD CORRECT VALUES - " & "BASIC TYPES");
 
    -------------------------------------------------------------------
 

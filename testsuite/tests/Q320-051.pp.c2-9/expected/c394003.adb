@@ -338,8 +338,7 @@ begin
      ("C394003",
       "Check that an interface inherits primitive " &
       "subprograms from each progenitor. Case 2A: " &
-      "Non-limited interfaces, simple primitive " &
-      "subprograms");
+      "Non-limited interfaces, simple primitive " & "subprograms");
 
    --  ----------------------------------------------------------------------
    Display_Msg ("test 1");

@@ -9,9 +9,8 @@ package body F392d00 is
    end Focus;
 
    -----------------------------------------------------------
-   procedure Set_Shutter_Speed
-     (C     : in out Remote_Camera;
-      Speed : in     Shutter_Speed)
+   procedure Set_Shutter_Speed (C : in out Remote_Camera;
+      Speed                       : in     Shutter_Speed)
    is
    begin
       -- Artificial for testing purposes.

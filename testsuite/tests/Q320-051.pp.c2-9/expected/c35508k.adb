@@ -38,8 +38,7 @@ begin
    Test
      ("C35508K",
       "CHECK THAT 'POS' AND 'VAL' YIELD THE " &
-      "CORRECT RESULTS  WHEN THE PREFIX IS A " &
-      "BOOLEAN TYPE");
+      "CORRECT RESULTS  WHEN THE PREFIX IS A " & "BOOLEAN TYPE");
 
    begin
       if Boolean'Pos (Ident_Bool (False)) /= 0 then

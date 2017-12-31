@@ -119,8 +119,7 @@ begin
       if not (Gef.Sin (Ada.Numerics.Pi / 4.0) < 1.0) or
         not (Ef.Sin (Ada.Numerics.Pi / 4.0) < 1.0) or
         not Fxa5a00.Result_Within_Range (Gef.Sin (0.35), 0.343, 0.001) or
-        not Fxa5a00.Result_Within_Range (Ef.Sin (1.18), 0.924, 0.001)
-      then
+        not Fxa5a00.Result_Within_Range (Ef.Sin (1.18), 0.924, 0.001) then
          Report.Failed
            ("Incorrect value returned from Sin function when " &
             "the expected result is between 0.0 and 1.0");
@@ -131,8 +130,7 @@ begin
       if not (Gef.Sin (-Ada.Numerics.Pi / 4.0) > -1.0) or
         not (Ef.Sin (-Ada.Numerics.Pi / 4.0) > -1.0) or
         not Fxa5a00.Result_Within_Range (Gef.Sin (-0.24), -0.238, 0.001) or
-        not Fxa5a00.Result_Within_Range (Ef.Sin (-1.00), -0.841, 0.001)
-      then
+        not Fxa5a00.Result_Within_Range (Ef.Sin (-1.00), -0.841, 0.001) then
          Report.Failed
            ("Incorrect value returned from Sin function when " &
             "the expected result is between -1.0 and 0.0");
@@ -239,13 +237,9 @@ begin
 
       -- Tests of Sin function with Cycle parameter for prescribed results.
 
-      if Gef.Sin (0.0, 360.0) /= 0.0 or
-        Ef.Sin (180.0, 360.0) /= 0.0 or
-        Gef.Sin (90.0, 360.0) /= 1.0 or
-        Ef.Sin (450.0, 360.0) /= 1.0 or
-        Gef.Sin (270.0, 360.0) /= -1.0 or
-        Ef.Sin (630.0, 360.0) /= -1.0
-      then
+      if Gef.Sin (0.0, 360.0) /= 0.0 or Ef.Sin (180.0, 360.0) /= 0.0 or
+        Gef.Sin (90.0, 360.0) /= 1.0 or Ef.Sin (450.0, 360.0) /= 1.0 or
+        Gef.Sin (270.0, 360.0) /= -1.0 or Ef.Sin (630.0, 360.0) /= -1.0 then
          Report.Failed
            ("Incorrect result from the Sin function with " &
             "various cycle values for prescribed results");
@@ -334,8 +328,7 @@ begin
       if not Fxa5a00.Result_Within_Range (Gef.Sinh (0.01), 0.010, 0.001) or
         not Fxa5a00.Result_Within_Range (Ef.Sinh (0.61), 0.649, 0.001) or
         not Fxa5a00.Result_Within_Range (Gef.Sinh (1.70), 2.65, 0.01) or
-        not Fxa5a00.Result_Within_Range (Ef.Sinh (3.15), 11.65, 0.01)
-      then
+        not Fxa5a00.Result_Within_Range (Ef.Sinh (3.15), 11.65, 0.01) then
          Report.Failed
            ("Incorrect result returned from Sinh function " &
             "with various input parameters");

@@ -8,17 +8,13 @@ package C761005_0 is
    Inits_Order  : String (1 .. 255);
    Inits_Called : Natural := 0;
 private
-   type Final_Root
-     (Tag : Character)
-   is new Ada.Finalization.Controlled with
+   type Final_Root (Tag : Character) is new Ada.Finalization.Controlled with
    null record;
    procedure Initialize (It : in out Final_Root);
    procedure Finalize (It : in out Final_Root);
 
-   type Ltd_Final_Root
-     (Tag : Character)
-   is new Ada.Finalization.Limited_Controlled with
-   null record;
+   type Ltd_Final_Root (Tag : Character)
+   is new Ada.Finalization.Limited_Controlled with null record;
    procedure Initialize (It : in out Ltd_Final_Root);
    procedure Finalize (It : in out Ltd_Final_Root);
 end C761005_0;

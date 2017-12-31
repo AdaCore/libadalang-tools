@@ -5,10 +5,8 @@ begin
       Pos := Pos + 1;
       if Pos > Text'Last then
          raise Completed_Text_Processing;
-      elsif (Text (Pos) in 'A' .. 'Z') or
-        (Text (Pos) in 'a' .. 'z') or
-        (Text (Pos) in '0' .. '9')
-      then
+      elsif (Text (Pos) in 'A' .. 'Z') or (Text (Pos) in 'a' .. 'z') or
+        (Text (Pos) in '0' .. '9') then
          Increment_Alphanumeric_Count;
       else
          Increment_Non_Alphanumeric_Count;

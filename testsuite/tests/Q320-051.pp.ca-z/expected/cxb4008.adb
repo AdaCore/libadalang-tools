@@ -110,8 +110,7 @@ begin
       -- the corresponding value of the decimal type Num.
 
       if Pack_1.To_Decimal (Item => Pack_1.To_Binary (Tc_Dec_1)) /= Tc_Dec_1 or
-        Pack_2.To_Decimal (Pack_2.To_Binary (Tc_Dec_2)) /= Tc_Dec_2
-      then
+        Pack_2.To_Decimal (Pack_2.To_Binary (Tc_Dec_2)) /= Tc_Dec_2 then
          Report.Failed
            ("Incorrect result from function To_Decimal with " &
             "Binary parameter - 1");
@@ -135,15 +134,13 @@ begin
 
       if Pack_3.To_Decimal (Item => Pack_3.To_Long_Binary (Tc_Dec_3)) /=
         Tc_Dec_3 or
-        Pack_4.To_Decimal (Pack_4.To_Long_Binary (Tc_Dec_4)) /= Tc_Dec_4
-      then
+        Pack_4.To_Decimal (Pack_4.To_Long_Binary (Tc_Dec_4)) /= Tc_Dec_4 then
          Report.Failed
            ("Incorrect result from function To_Decimal with " &
             "Long_Binary parameter - 1");
       end if;
 
-      if Pack_3.To_Decimal (Pack_3.To_Long_Binary (1_234_567.0)) /=
-        1_234_567.0
+      if Pack_3.To_Decimal (Pack_3.To_Long_Binary (1_234_567.0)) /= 1_234_567.0
       then
          Report.Failed
            ("Incorrect result from function To_Decimal with " &
@@ -170,8 +167,7 @@ begin
          Report.Failed
            ("Conversion_Error was not raised by function " &
             "To_Decimal with Binary parameter, when the " &
-            "converted value Item was outside the range " &
-            "of type Num");
+            "converted value Item was outside the range " & "of type Num");
          if Tc_Dec_1 = 12_345.6 then  -- Avoid dead assignment optimization.
             Report.Comment ("Should never be printed");
          end if;
@@ -180,8 +176,7 @@ begin
             null;  -- OK, expected exception.
          when The_Error : others =>
             Report.Failed
-              (Ada.Exceptions.Exception_Name (The_Error) &
-               " " &
+              (Ada.Exceptions.Exception_Name (The_Error) & " " &
                "was incorrectly raised by function To_Decimal " &
                "with Binary parameter, when the converted " &
                "value Item was outside the range of type Num");
@@ -193,8 +188,7 @@ begin
          Report.Failed
            ("Conversion_Error was not raised by function " &
             "To_Decimal with Long_Binary parameter, when " &
-            "the converted value Item was outside the range " &
-            "of type Num");
+            "the converted value Item was outside the range " & "of type Num");
          if Tc_Dec_3 = 123_456.78 then  -- Avoid dead assignment optimization.
             Report.Comment ("Should never be printed");
          end if;
@@ -203,8 +197,7 @@ begin
             null;  -- OK, expected exception.
          when The_Error : others =>
             Report.Failed
-              (Ada.Exceptions.Exception_Name (The_Error) &
-               " " &
+              (Ada.Exceptions.Exception_Name (The_Error) & " " &
                "was incorrectly raised by function To_Decimal " &
                "with Long_Binary parameter, when the converted " &
                "value Item was outside the range of type Num");
@@ -216,14 +209,12 @@ begin
       Tc_Dec_1 := 123.4;
       Tc_Dec_2 := 9.99;
       if Pack_1.To_Binary (Tc_Dec_1) = Pack_1.To_Binary (-Tc_Dec_1) or
-        Pack_2.To_Binary (Tc_Dec_2) = Pack_2.To_Binary (-Tc_Dec_2)
-      then
+        Pack_2.To_Binary (Tc_Dec_2) = Pack_2.To_Binary (-Tc_Dec_2) then
          Report.Failed ("Incorrect result from function To_Binary - 1");
       end if;
 
       if Pack_1.To_Binary (1.1) = Pack_1.To_Binary (-1.1) or
-        Pack_2.To_Binary (9_999.99) = Pack_2.To_Binary (-9_999.99)
-      then
+        Pack_2.To_Binary (9_999.99) = Pack_2.To_Binary (-9_999.99) then
          Report.Failed ("Incorrect result from function To_Binary - 2");
       end if;
 
@@ -249,8 +240,7 @@ begin
    exception
       when The_Error : others =>
          Report.Failed
-           ("The following exception was raised in the " &
-            "Test_Block: " &
+           ("The following exception was raised in the " & "Test_Block: " &
             Exception_Name (The_Error));
    end Test_Block;
 

@@ -24,10 +24,8 @@ procedure Cxg2008 is
       Mult_Mbe   : constant Real := 5.0;
       Divide_Mbe : constant Real := 13.0;
 
-      procedure Check
-        (Actual, Expected : Complex;
-         Test_Name        : String;
-         Mbe              : Real)
+      procedure Check (Actual, Expected : Complex; Test_Name : String;
+         Mbe                            : Real)
       is
          Rel_Error : Real;
          Abs_Error : Real;
@@ -47,15 +45,10 @@ procedure Cxg2008 is
          if abs (Actual.Re - Expected.Re) > Max_Error then
             Failure_Detected := True;
             Report.Failed
-              (Test_Name &
-               " actual.re: " &
-               Real'Image (Actual.Re) &
-               " expected.re: " &
-               Real'Image (Expected.Re) &
-               " difference.re " &
-               Real'Image (Actual.Re - Expected.Re) &
-               " mre:" &
-               Real'Image (Max_Error));
+              (Test_Name & " actual.re: " & Real'Image (Actual.Re) &
+               " expected.re: " & Real'Image (Expected.Re) &
+               " difference.re " & Real'Image (Actual.Re - Expected.Re) &
+               " mre:" & Real'Image (Max_Error));
          elsif Verbose then
             if Actual = Expected then
                Report.Comment (Test_Name & " exact result for real part");
@@ -73,15 +66,10 @@ procedure Cxg2008 is
          if abs (Actual.Im - Expected.Im) > Max_Error then
             Failure_Detected := True;
             Report.Failed
-              (Test_Name &
-               " actual.im: " &
-               Real'Image (Actual.Im) &
-               " expected.im: " &
-               Real'Image (Expected.Im) &
-               " difference.im " &
-               Real'Image (Actual.Im - Expected.Im) &
-               " mre:" &
-               Real'Image (Max_Error));
+              (Test_Name & " actual.im: " & Real'Image (Actual.Im) &
+               " expected.im: " & Real'Image (Expected.Im) &
+               " difference.im " & Real'Image (Actual.Im - Expected.Im) &
+               " mre:" & Real'Image (Max_Error));
          elsif Verbose then
             if Actual = Expected then
                Report.Comment (Test_Name & " exact result for imaginary part");
@@ -180,9 +168,7 @@ procedure Cxg2008 is
          begin
             Z := X * X;
             Check
-              (Z,
-               Expected,
-               "test 5 -- (sqrt2,sqrt2) * (sqrt2,sqrt2)",
+              (Z, Expected, "test 5 -- (sqrt2,sqrt2) * (sqrt2,sqrt2)",
                Mult_Mbe);
          exception
             when Constraint_Error =>
@@ -199,9 +185,7 @@ procedure Cxg2008 is
          begin
             Z := X * X;
             Check
-              (Z,
-               Expected,
-               "test 6 -- (sqrt3,-sqrt3) * (sqrt3,-sqrt3)",
+              (Z, Expected, "test 6 -- (sqrt3,-sqrt3) * (sqrt3,-sqrt3)",
                Mult_Mbe);
          exception
             when Constraint_Error =>
@@ -219,9 +203,7 @@ procedure Cxg2008 is
          begin
             Z := X / Y;
             Check
-              (Z,
-               Expected,
-               "test 7 -- (sqrt2,sqrt2) / (sqrt2,-sqrt2)",
+              (Z, Expected, "test 7 -- (sqrt2,sqrt2) / (sqrt2,-sqrt2)",
                Divide_Mbe);
          exception
             when Constraint_Error =>
@@ -234,16 +216,8 @@ procedure Cxg2008 is
       procedure Do_Mult_Div (X, Y : Complex) is
          Z    : Complex;
          Args : constant String :=
-           "X=(" &
-           Real'Image (X.Re) &
-           "," &
-           Real'Image (X.Im) &
-           ") " &
-           "Y=(" &
-           Real'Image (Y.Re) &
-           "," &
-           Real'Image (Y.Im) &
-           ") ";
+           "X=(" & Real'Image (X.Re) & "," & Real'Image (X.Im) & ") " & "Y=(" &
+           Real'Image (Y.Re) & "," & Real'Image (Y.Im) & ") ";
       begin
          Z := (X * X) / X;
          Check (Z, X, "X*X/X " & Args, Mult_Mbe + Divide_Mbe);
@@ -321,10 +295,8 @@ procedure Cxg2008 is
       Mult_Mbe   : constant Real := 5.0;
       Divide_Mbe : constant Real := 13.0;
 
-      procedure Check
-        (Actual, Expected : Complex;
-         Test_Name        : String;
-         Mbe              : Real)
+      procedure Check (Actual, Expected : Complex; Test_Name : String;
+         Mbe                            : Real)
       is
          Rel_Error : Real;
          Abs_Error : Real;
@@ -344,15 +316,10 @@ procedure Cxg2008 is
          if abs (Actual.Re - Expected.Re) > Max_Error then
             Failure_Detected := True;
             Report.Failed
-              (Test_Name &
-               " actual.re: " &
-               Real'Image (Actual.Re) &
-               " expected.re: " &
-               Real'Image (Expected.Re) &
-               " difference.re " &
-               Real'Image (Actual.Re - Expected.Re) &
-               " mre:" &
-               Real'Image (Max_Error));
+              (Test_Name & " actual.re: " & Real'Image (Actual.Re) &
+               " expected.re: " & Real'Image (Expected.Re) &
+               " difference.re " & Real'Image (Actual.Re - Expected.Re) &
+               " mre:" & Real'Image (Max_Error));
          elsif Verbose then
             if Actual = Expected then
                Report.Comment (Test_Name & " exact result for real part");
@@ -370,15 +337,10 @@ procedure Cxg2008 is
          if abs (Actual.Im - Expected.Im) > Max_Error then
             Failure_Detected := True;
             Report.Failed
-              (Test_Name &
-               " actual.im: " &
-               Real'Image (Actual.Im) &
-               " expected.im: " &
-               Real'Image (Expected.Im) &
-               " difference.im " &
-               Real'Image (Actual.Im - Expected.Im) &
-               " mre:" &
-               Real'Image (Max_Error));
+              (Test_Name & " actual.im: " & Real'Image (Actual.Im) &
+               " expected.im: " & Real'Image (Expected.Im) &
+               " difference.im " & Real'Image (Actual.Im - Expected.Im) &
+               " mre:" & Real'Image (Max_Error));
          elsif Verbose then
             if Actual = Expected then
                Report.Comment (Test_Name & " exact result for imaginary part");
@@ -477,9 +439,7 @@ procedure Cxg2008 is
          begin
             Z := X * X;
             Check
-              (Z,
-               Expected,
-               "test 5 -- (sqrt2,sqrt2) * (sqrt2,sqrt2)",
+              (Z, Expected, "test 5 -- (sqrt2,sqrt2) * (sqrt2,sqrt2)",
                Mult_Mbe);
          exception
             when Constraint_Error =>
@@ -496,9 +456,7 @@ procedure Cxg2008 is
          begin
             Z := X * X;
             Check
-              (Z,
-               Expected,
-               "test 6 -- (sqrt3,-sqrt3) * (sqrt3,-sqrt3)",
+              (Z, Expected, "test 6 -- (sqrt3,-sqrt3) * (sqrt3,-sqrt3)",
                Mult_Mbe);
          exception
             when Constraint_Error =>
@@ -516,9 +474,7 @@ procedure Cxg2008 is
          begin
             Z := X / Y;
             Check
-              (Z,
-               Expected,
-               "test 7 -- (sqrt2,sqrt2) / (sqrt2,-sqrt2)",
+              (Z, Expected, "test 7 -- (sqrt2,sqrt2) / (sqrt2,-sqrt2)",
                Divide_Mbe);
          exception
             when Constraint_Error =>
@@ -531,16 +487,8 @@ procedure Cxg2008 is
       procedure Do_Mult_Div (X, Y : Complex) is
          Z    : Complex;
          Args : constant String :=
-           "X=(" &
-           Real'Image (X.Re) &
-           "," &
-           Real'Image (X.Im) &
-           ") " &
-           "Y=(" &
-           Real'Image (Y.Re) &
-           "," &
-           Real'Image (Y.Im) &
-           ") ";
+           "X=(" & Real'Image (X.Re) & "," & Real'Image (X.Im) & ") " & "Y=(" &
+           Real'Image (Y.Re) & "," & Real'Image (Y.Im) & ") ";
       begin
          Z := (X * X) / X;
          Check (Z, X, "X*X/X " & Args, Mult_Mbe + Divide_Mbe);
@@ -615,10 +563,8 @@ procedure Cxg2008 is
       Mult_Mbe   : constant Real := 5.0;
       Divide_Mbe : constant Real := 13.0;
 
-      procedure Check
-        (Actual, Expected : Complex;
-         Test_Name        : String;
-         Mbe              : Real)
+      procedure Check (Actual, Expected : Complex; Test_Name : String;
+         Mbe                            : Real)
       is
          Rel_Error : Real;
          Abs_Error : Real;
@@ -638,15 +584,10 @@ procedure Cxg2008 is
          if abs (Actual.Re - Expected.Re) > Max_Error then
             Failure_Detected := True;
             Report.Failed
-              (Test_Name &
-               " actual.re: " &
-               Real'Image (Actual.Re) &
-               " expected.re: " &
-               Real'Image (Expected.Re) &
-               " difference.re " &
-               Real'Image (Actual.Re - Expected.Re) &
-               " mre:" &
-               Real'Image (Max_Error));
+              (Test_Name & " actual.re: " & Real'Image (Actual.Re) &
+               " expected.re: " & Real'Image (Expected.Re) &
+               " difference.re " & Real'Image (Actual.Re - Expected.Re) &
+               " mre:" & Real'Image (Max_Error));
          elsif Verbose then
             if Actual = Expected then
                Report.Comment (Test_Name & " exact result for real part");
@@ -664,15 +605,10 @@ procedure Cxg2008 is
          if abs (Actual.Im - Expected.Im) > Max_Error then
             Failure_Detected := True;
             Report.Failed
-              (Test_Name &
-               " actual.im: " &
-               Real'Image (Actual.Im) &
-               " expected.im: " &
-               Real'Image (Expected.Im) &
-               " difference.im " &
-               Real'Image (Actual.Im - Expected.Im) &
-               " mre:" &
-               Real'Image (Max_Error));
+              (Test_Name & " actual.im: " & Real'Image (Actual.Im) &
+               " expected.im: " & Real'Image (Expected.Im) &
+               " difference.im " & Real'Image (Actual.Im - Expected.Im) &
+               " mre:" & Real'Image (Max_Error));
          elsif Verbose then
             if Actual = Expected then
                Report.Comment (Test_Name & " exact result for imaginary part");
@@ -771,9 +707,7 @@ procedure Cxg2008 is
          begin
             Z := X * X;
             Check
-              (Z,
-               Expected,
-               "test 5 -- (sqrt2,sqrt2) * (sqrt2,sqrt2)",
+              (Z, Expected, "test 5 -- (sqrt2,sqrt2) * (sqrt2,sqrt2)",
                Mult_Mbe);
          exception
             when Constraint_Error =>
@@ -790,9 +724,7 @@ procedure Cxg2008 is
          begin
             Z := X * X;
             Check
-              (Z,
-               Expected,
-               "test 6 -- (sqrt3,-sqrt3) * (sqrt3,-sqrt3)",
+              (Z, Expected, "test 6 -- (sqrt3,-sqrt3) * (sqrt3,-sqrt3)",
                Mult_Mbe);
          exception
             when Constraint_Error =>
@@ -810,9 +742,7 @@ procedure Cxg2008 is
          begin
             Z := X / Y;
             Check
-              (Z,
-               Expected,
-               "test 7 -- (sqrt2,sqrt2) / (sqrt2,-sqrt2)",
+              (Z, Expected, "test 7 -- (sqrt2,sqrt2) / (sqrt2,-sqrt2)",
                Divide_Mbe);
          exception
             when Constraint_Error =>
@@ -825,16 +755,8 @@ procedure Cxg2008 is
       procedure Do_Mult_Div (X, Y : Complex) is
          Z    : Complex;
          Args : constant String :=
-           "X=(" &
-           Real'Image (X.Re) &
-           "," &
-           Real'Image (X.Im) &
-           ") " &
-           "Y=(" &
-           Real'Image (Y.Re) &
-           "," &
-           Real'Image (Y.Im) &
-           ") ";
+           "X=(" & Real'Image (X.Re) & "," & Real'Image (X.Im) & ") " & "Y=(" &
+           Real'Image (Y.Re) & "," & Real'Image (Y.Im) & ") ";
       begin
          Z := (X * X) / X;
          Check (Z, X, "X*X/X " & Args, Mult_Mbe + Divide_Mbe);
@@ -907,8 +829,7 @@ begin
 
    if Verbose then
       Report.Comment
-        ("checking a digits" &
-         Integer'Image (System.Max_Digits) &
+        ("checking a digits" & Integer'Image (System.Max_Digits) &
          " floating point type");
    end if;
 

@@ -55,9 +55,8 @@ package Ca11011_0 is               -- Package OS.
    Default_Descriptor : constant File_Descriptor_Type;
    First_File         : constant File_Descriptor_Type;
 
-   procedure Verify_Initial_Conditions
-     (Key    : in     File_Descriptor_Type;
-      Status :    out Boolean);
+   procedure Verify_Initial_Conditions (Key : in     File_Descriptor_Type;
+      Status                                :    out Boolean);
 
    function Final_Conditions_Valid (Key : File_Descriptor_Type) return Boolean;
 

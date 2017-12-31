@@ -79,8 +79,7 @@ begin
          if (Pi /= Tmp) then
             Failed
               ("Assignement to scalar out " &
-               "parameter changes the value of " &
-               "input parameter");
+               "parameter changes the value of " & "input parameter");
             Tmp := Pi;     -- Reset Tmp for next case.
          end if;
 
@@ -88,8 +87,7 @@ begin
          if (Pi /= Tmp) then
             Failed
               ("Assignment to scalar in out " &
-               "parameter changes the value of " &
-               "inputparameter");
+               "parameter changes the value of " & "inputparameter");
             Tmp := Pi;     -- Reset Tmp for next case.
          end if;
 
@@ -97,8 +95,7 @@ begin
          if (Pi /= Tmp) then
             Failed
               ("Assignment to scalar actual " &
-               "parameter changes the value of " &
-               "input parameter");
+               "parameter changes the value of " & "input parameter");
          end if;
 
          raise E;  -- Check exception handling.
@@ -122,8 +119,7 @@ begin
                when 111 =>
                   Failed
                     ("Out and in out actual scalar " &
-                     "parameters changed global " &
-                     "value");
+                     "parameters changed global " & "value");
                when others =>
                   Failed ("Uundetermined change to global " & "value");
             end case;
@@ -148,8 +144,7 @@ begin
          if (Fi /= Tmp) then
             Failed
               ("Assignment to scalar actual function " &
-               "parameter changes the value of " &
-               "input parameter");
+               "parameter changes the value of " & "input parameter");
          end if;
 
          return (100);
@@ -182,8 +177,7 @@ begin
          if (Pi /= Tmp) then
             Failed
               ("Assignment to access actual " &
-               "parameter changes the value of " &
-               "input parameter");
+               "parameter changes the value of " & "input parameter");
             Tmp := Pi;     -- Reset Tmp for next case.
          end if;
 
@@ -191,8 +185,7 @@ begin
          if (Pi /= Tmp) then
             Failed
               ("Assignment to access out " &
-               "parameter changes the value of " &
-               "input parameter");
+               "parameter changes the value of " & "input parameter");
             Tmp := Pi;     -- Reset Tmp for next case.
          end if;
 
@@ -200,8 +193,7 @@ begin
          if (Pi /= Tmp) then
             Failed
               ("Assignment to access in out " &
-               "parameter changes the value of " &
-               "input parameter");
+               "parameter changes the value of " & "input parameter");
          end if;
 
          raise E;  -- Check exception handling.
@@ -216,8 +208,7 @@ begin
          if (Arr (I).all /= 101) then
             Failed
               ("Out or in out actual procedure " &
-               "parameter value changed despite " &
-               "raised exception");
+               "parameter value changed despite " & "raised exception");
          end if;
       when others =>
          Failed ("Wrong exception raised - C");
@@ -241,8 +232,7 @@ begin
          if (Fi /= Tmp) then
             Failed
               ("Assignment to access actual function " &
-               "parameter changes the value of " &
-               "Input parameter");
+               "parameter changes the value of " & "Input parameter");
          end if;
 
          return null;
@@ -273,8 +263,7 @@ begin
          if (Pi /= Tmp) then
             Failed
               ("Assignement to float out " &
-               "parameter changes the value of " &
-               "input parameter");
+               "parameter changes the value of " & "input parameter");
             Tmp := Pi;     -- Reset Tmp for next case.
          end if;
 
@@ -282,8 +271,7 @@ begin
          if (Pi /= Tmp) then
             Failed
               ("Assignment to float in out " &
-               "parameter changes the value of " &
-               "inputparameter");
+               "parameter changes the value of " & "inputparameter");
             Tmp := Pi;     -- Reset Tmp for next case.
          end if;
 
@@ -291,8 +279,7 @@ begin
          if (Pi /= Tmp) then
             Failed
               ("Assignment to float actual " &
-               "parameter changes the value of " &
-               "input parameter");
+               "parameter changes the value of " & "input parameter");
          end if;
 
          raise E;  -- Check exception handling.
@@ -307,8 +294,7 @@ begin
          if (Arr (I) /= 1.0) then
             Failed
               ("Out or in out actual procedure " &
-               "parameter value changed despite " &
-               "raised exception");
+               "parameter value changed despite " & "raised exception");
          end if;
       when others =>
          Failed ("Wrong exception raised - E");
@@ -330,8 +316,7 @@ begin
          if (Fi /= Tmp) then
             Failed
               ("Assignment to float actual function " &
-               "parameter changes the value of " &
-               "input parameter");
+               "parameter changes the value of " & "input parameter");
          end if;
 
          return 100.0;

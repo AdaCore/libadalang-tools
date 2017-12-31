@@ -293,8 +293,7 @@ begin
             if R = null or else R.Disc /= 4 then
                Failed
                  ("ERROR IN EVALUATION/ASSIGNMENT " &
-                  "OF ACCESS VALUE - RECORD," &
-                  "FUNCTION -GENERIC");
+                  "OF ACCESS VALUE - RECORD," & "FUNCTION -GENERIC");
             end if;
       end;
 
@@ -313,8 +312,7 @@ begin
             if R = null or else R.Disc /= 4 then
                Failed
                  ("ERROR IN EVALUATION/ASSIGNMENT " &
-                  "OF ACCESS VALUE - RECORD," &
-                  "PROCEDURE -GENERIC");
+                  "OF ACCESS VALUE - RECORD," & "PROCEDURE -GENERIC");
             end if;
       end;
 
@@ -333,8 +331,7 @@ begin
             if A = null or else A (4) /= 6 then
                Failed
                  ("ERROR IN EVALUATION/ASSIGNMENT " &
-                  "OF ACCESS VALUE - ARRAY," &
-                  "FUNCTION -GENERIC");
+                  "OF ACCESS VALUE - ARRAY," & "FUNCTION -GENERIC");
             end if;
       end;
 
@@ -353,8 +350,7 @@ begin
             if A = null or else A (4) /= 6 then
                Failed
                  ("ERROR IN EVALUATION/ASSIGNMENT " &
-                  "OF ACCESS VALUE - ARRAY," &
-                  "PROCEDURE -GENERIC");
+                  "OF ACCESS VALUE - ARRAY," & "PROCEDURE -GENERIC");
             end if;
       end;
    end;
@@ -427,8 +423,7 @@ begin
             if R /= 9 then
                Failed
                  ("ERROR IN EVALUATION/ASSIGNMENT " &
-                  "OF ACCESS VALUE - PROCEDURE, " &
-                  "GENERIC");
+                  "OF ACCESS VALUE - PROCEDURE, " & "GENERIC");
             end if;
       end;
    end;

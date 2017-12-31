@@ -52,8 +52,7 @@ begin
      ("CE2108E",
       "CHECK THAT AN EXTERNAL SEQUENTIAL FILE " &
       "SPECIFIED BY A NON-NULL STRING NAME IS " &
-      "ACCESSIBLE AFTER THE COMPLETION OF THE MAIN " &
-      "PROGRAM");
+      "ACCESSIBLE AFTER THE COMPLETION OF THE MAIN " & "PROGRAM");
    begin
       begin
          Seq.Create (File_Name, Seq.Out_File, Legal_File_Name);

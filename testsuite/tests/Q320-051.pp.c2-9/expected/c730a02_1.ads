@@ -11,13 +11,11 @@ package C730a02_1 is  -- Raw data to be used in creating book elements.
    type Page_Counts is array (Number_Of_Books) of Natural;
 
    Title_List : Data_List :=
-     (new String'("Wuthering Heights"),
-      new String'("Heart of Darkness"),
+     (new String'("Wuthering Heights"), new String'("Heart of Darkness"),
       new String'("Ulysses"));
 
    Author_List : Data_List :=
-     (new String'("Bronte, Emily"),
-      new String'("Conrad, Joseph"),
+     (new String'("Bronte, Emily"), new String'("Conrad, Joseph"),
       new String'("Joyce, James"));
 
    Page_List : Page_Counts := (237, 215, 456);

@@ -83,8 +83,7 @@ begin
          exit;
       end loop;
       Comment
-        ("(B) - NEGATIVE DELAY LAPSED FOR " &
-         Int'Image (Int (Lapse * 1_000)) &
+        ("(B) - NEGATIVE DELAY LAPSED FOR " & Int'Image (Int (Lapse * 1_000)) &
          " MILLISECONDS");
    exception
       when others =>
@@ -105,8 +104,7 @@ begin
          exit;
       end loop;
       Comment
-        ("(C) - ZERO DELAY LAPSED FOR " &
-         Int'Image (Int (Lapse * 1_000)) &
+        ("(C) - ZERO DELAY LAPSED FOR " & Int'Image (Int (Lapse * 1_000)) &
          " MILLISECONDS");
    exception
       when others =>

@@ -7,8 +7,7 @@ procedure Ca1005a is
 
 begin
    Test
-     ("CA1005A",
-      "SUBPROGRAM DECLARATIONS AND BODIES " & "SUBMITTED TOGETHER");
+     ("CA1005A", "SUBPROGRAM DECLARATIONS AND BODIES " & "SUBMITTED TOGETHER");
 
    if Ca1005a_F (Ident_Int (2)) /= 3 then
       Failed ("FUNCTION NOT EXECUTED");

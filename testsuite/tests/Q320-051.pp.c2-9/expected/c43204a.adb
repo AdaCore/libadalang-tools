@@ -59,20 +59,16 @@ procedure C43204a is
 
    procedure Proc11 (A : Arr11; C : Integer) is
    begin
-      if A'Length /= Ident_Int (7) or
-        A'First /= Ident_Int (-3) or
-        A'Last /= Ident_Int (3)
-      then
+      if A'Length /= Ident_Int (7) or A'First /= Ident_Int (-3) or
+        A'Last /= Ident_Int (3) then
          Failed ("INCORRECT LENGTH IN PROC11 CALL NUMBER" & Integer'Image (C));
       end if;
 
       for I in Ident_Int (-3) .. Ident_Int (3) loop
          if Ident_Int (A (I)) /= C then
             Failed
-              ("INCORRECT VALUE OF COMPONENT " &
-               Integer'Image (I) &
-               ", PROC11 CALL NUMBER" &
-               Integer'Image (C));
+              ("INCORRECT VALUE OF COMPONENT " & Integer'Image (I) &
+               ", PROC11 CALL NUMBER" & Integer'Image (C));
          end if;
       end loop;
    end Proc11;
@@ -86,8 +82,7 @@ procedure C43204a is
       for I in Ident_Int (-3) .. Ident_Int (3) loop
          if Ident_Int (A (I)) /= 3 then
             Failed
-              ("INCORRECT VALUE OF COMPONENT " &
-               Integer'Image (I) &
+              ("INCORRECT VALUE OF COMPONENT " & Integer'Image (I) &
                ", PROC12");
          end if;
       end loop;
@@ -106,12 +101,8 @@ procedure C43204a is
          for J in Integer'(-1) .. 1 loop
             if Ident_Int (A (I, J)) /= C then
                Failed
-                 ("INCORRECT VALUE OF COMPONENT (" &
-                  Integer'Image (I) &
-                  "," &
-                  Integer'Image (J) &
-                  "), PROC21 CALL " &
-                  "NUMBER" &
+                 ("INCORRECT VALUE OF COMPONENT (" & Integer'Image (I) & "," &
+                  Integer'Image (J) & "), PROC21 CALL " & "NUMBER" &
                   Integer'Image (C));
             end if;
          end loop;
@@ -124,11 +115,8 @@ procedure C43204a is
          for J in Integer'(-1) .. 1 loop
             if Ident_Int (A (I, J)) /= 5 then
                Failed
-                 ("INCORRECT VALUE OF COMPONENT (" &
-                  Integer'Image (I) &
-                  "," &
-                  Integer'Image (J) &
-                  "), PROC22");
+                 ("INCORRECT VALUE OF COMPONENT (" & Integer'Image (I) & "," &
+                  Integer'Image (J) & "), PROC22");
             end if;
          end loop;
       end loop;
@@ -140,11 +128,8 @@ procedure C43204a is
          for J in Integer'(-1) .. 1 loop
             if Ident_Int (A (I, J)) /= 7 then
                Failed
-                 ("INCORRECT VALUE OF COMPONENT (" &
-                  Integer'Image (I) &
-                  "," &
-                  Integer'Image (J) &
-                  "), PROC23");
+                 ("INCORRECT VALUE OF COMPONENT (" & Integer'Image (I) & "," &
+                  Integer'Image (J) & "), PROC23");
             end if;
          end loop;
       end loop;
@@ -156,8 +141,7 @@ begin
       "CHECK THAT AN ARRAY AGGREGATE WITH AN OTHERS " &
       "CHOICE CAN APPEAR (AND BOUNDS ARE DETERMINED " &
       "CORRECTLY) AS AN ACTUAL PARAMETER OF A " &
-      "SUBPROGRAM CALL WHEN THE FORMAL PARAMETER IS " &
-      "CONSTRAINED");
+      "SUBPROGRAM CALL WHEN THE FORMAL PARAMETER IS " & "CONSTRAINED");
 
    Proc11 ((1, 1, 1, others => 1), 1);
    Proc11 ((2 => 2, 3 => 2, others => 2), 2);

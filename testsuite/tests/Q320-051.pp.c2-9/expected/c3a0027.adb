@@ -439,8 +439,7 @@ begin
          return
            Result : not null access protected function
              (X : Float) return Float :=
-             Po.Double'Access
-         do
+             Po.Double'Access do
             Result := F;
          end return;
       end Func_2;

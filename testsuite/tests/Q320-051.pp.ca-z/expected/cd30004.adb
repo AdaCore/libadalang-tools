@@ -15,8 +15,7 @@ begin  -- Main test procedure.
       "using an unbiased representation, where space for a sign " &
       "bit is provided only in the event the subtype contains " &
       "negative values.  Check that for first subtypes " &
-      "specified Sizes are supported reflecting this " &
-      "representation.");
+      "specified Sizes are supported reflecting this " & "representation.");
 
    Cd30004_0.Tc_Check_Values;
 

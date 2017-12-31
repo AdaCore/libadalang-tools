@@ -87,22 +87,16 @@ begin
          end if;
 
          if not
-           ((I1 < Ident (0)) and
-            (Ident (I3) > Ident (I2)) and
-            (I2 <= Ident (0)) and
-            (Ident (100) = I3))
+           ((I1 < Ident (0)) and (Ident (I3) > Ident (I2)) and
+            (I2 <= Ident (0)) and (Ident (100) = I3))
          then
             Failed ("INCORRECT RESULTS FOR RELATIONAL " & "OPERATORS");
          end if;
 
          if not
-           (((I1 + I3) = I2) and
-            ((I2 - I3) = I1) and
-            ((I3 * I2) = I2) and
-            ((I2 / I1) = I2) and
-            ((I1**1) = I1) and
-            ((I1 rem 9) = Ident (-1)) and
-            ((I3 mod 9) = Ident (1)))
+           (((I1 + I3) = I2) and ((I2 - I3) = I1) and ((I3 * I2) = I2) and
+            ((I2 / I1) = I2) and ((I1**1) = I1) and
+            ((I1 rem 9) = Ident (-1)) and ((I3 mod 9) = Ident (1)))
          then
             Failed ("INCORRECT RESULTS FOR BINARY ARITHMETIC " & "OPERATORS");
          end if;
@@ -111,10 +105,8 @@ begin
             Failed ("INCORRECT VALUE FOR INT'LAST");
          end if;
 
-         if Int'Val (-100) /= Ident (I1) or
-           Int'Val (0) /= Ident (I2) or
-           Int'Val (100) /= Ident (I3)
-         then
+         if Int'Val (-100) /= Ident (I1) or Int'Val (0) /= Ident (I2) or
+           Int'Val (100) /= Ident (I3) then
             Failed ("INCORRECT VALUE FOR INT'VAL");
          end if;
 
@@ -123,8 +115,7 @@ begin
          end if;
 
          if Int'Value ("-100") /= Ident (I1) or
-           Int'Value (" 0") /= Ident (I2) or
-           Int'Value (" 100") /= Ident (I3)
+           Int'Value (" 0") /= Ident (I2) or Int'Value (" 100") /= Ident (I3)
          then
             Failed ("INCORRECT VALUE FOR INT'VALUE");
          end if;

@@ -149,13 +149,9 @@ procedure C85005b is
       end loop;
    end Task1;
 
-   procedure Proc
-     (Pi1 : in out Integer;
-      Pa1 : in out Array1;
-      Pr1 : in out Record1;
-      Pp1 : in out Pointer1;
-      Pv1 : in out Pack1.Privy;
-      Pt1 : in out Task1)
+   procedure Proc (Pi1 : in out Integer; Pa1 : in out Array1;
+      Pr1 : in out Record1; Pp1 : in out Pointer1; Pv1 : in out Pack1.Privy;
+      Pt1              : in out Task1)
    is
       Xpi1 : Integer renames Pi1;
       Xpa1 : Array1 renames Pa1;
@@ -165,24 +161,16 @@ procedure C85005b is
       Xpt1 : Task1 renames Pt1;
 
       task type Task2 is
-         entry Entry1
-           (Ti1 :    out Integer;
-            Ta1 :    out Array1;
-            Tr1 :    out Record1;
-            Tp1 : in out Pointer1;
-            Tv1 : in out Pack1.Privy;
-            Tt1 : in out Task1);
+         entry Entry1 (Ti1 : out Integer; Ta1 : out Array1; Tr1 : out Record1;
+            Tp1            : in out Pointer1; Tv1 : in out Pack1.Privy;
+            Tt1            : in out Task1);
       end Task2;
 
       Chk_Task : Task2;
 
-      procedure Proc1
-        (Ppi1 : in out Integer;
-         Ppa1 : in out Array1;
-         Ppr1 : in out Record1;
-         Ppp1 :    out Pointer1;
-         Ppv1 :    out Pack1.Privy;
-         Ppt1 : in out Task1)
+      procedure Proc1 (Ppi1 : in out Integer; Ppa1 : in out Array1;
+         Ppr1 : in out Record1; Ppp1 : out Pointer1; Ppv1 : out Pack1.Privy;
+         Ppt1               : in out Task1)
       is
       begin
          Ppi1 := Ppi1 + 1;
@@ -195,14 +183,9 @@ procedure C85005b is
 
       task body Task2 is
       begin
-         accept Entry1
-           (Ti1 :    out Integer;
-            Ta1 :    out Array1;
-            Tr1 :    out Record1;
-            Tp1 : in out Pointer1;
-            Tv1 : in out Pack1.Privy;
-            Tt1 : in out Task1)
-         do
+         accept Entry1 (Ti1 : out Integer; Ta1 : out Array1; Tr1 : out Record1;
+            Tp1             : in out Pointer1; Tv1 : in out Pack1.Privy;
+            Tt1             : in out Task1) do
             Ti1 := Pi1 + 1;
             Ta1 := (Pa1 (1) + 1, Pa1 (2) + 1, Pa1 (3) + 1);
             Tr1 := (D => 1, Field1 => Pr1.Field1 + 1);
@@ -370,8 +353,7 @@ begin
       "ENTRY 'IN OUT' OR 'OUT' PARAMETER, AND AS AN " &
       "ACTUAL GENERIC 'IN OUT' PARAMETER, AND THAT " &
       "WHEN THE VALUE OF THE RENAMED VARIABLE IS " &
-      "CHANGED, THE NEW VALUE IS REFLECTED BY THE " &
-      "VALUE OF THE NEW NAME");
+      "CHANGED, THE NEW VALUE IS REFLECTED BY THE " & "VALUE OF THE NEW NAME");
 
    Proc (Di1, Da1, Dr1, Dp1, Dv1, Dt1);
 

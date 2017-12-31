@@ -32,9 +32,8 @@ generic
 
    type Element is limited private;
 
-   with procedure Assign
-     (Source      : in out Element;
-      Destination : in out Element);
+   with procedure Assign (Source : in out Element;
+      Destination                : in out Element);
 
    with function "=" (Left : in Element; Right : in Element) return Boolean;
 
@@ -47,9 +46,8 @@ package Cc3019b0_List_Class is
 
    procedure Add (This_Element : in out Element; To_This_List : in out List);
 
-   procedure Delete
-     (This_Element   : in out Element;
-      From_This_List : in out List);
+   procedure Delete (This_Element : in out Element;
+      From_This_List              : in out List);
 
    procedure Copy (This_List : in out List; To_This_List : in out List);
 
@@ -57,9 +55,8 @@ package Cc3019b0_List_Class is
 
    generic
 
-      with procedure Process
-        (This_Element : in     Element;
-         Continue     :    out Boolean);
+      with procedure Process (This_Element : in     Element;
+         Continue                          :    out Boolean);
 
    procedure Iterate (Over_This_List : in List);
 

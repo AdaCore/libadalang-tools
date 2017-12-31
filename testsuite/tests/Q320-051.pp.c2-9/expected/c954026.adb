@@ -67,8 +67,7 @@ begin
      ("C954026",
       "Check that if the original entry" &
       " call was a conditional or timed entry call," &
-      " the expiration time for a requeue with" &
-      " abort to a protected" &
+      " the expiration time for a requeue with" & " abort to a protected" &
       " entry is the original expiration time");
    declare
 

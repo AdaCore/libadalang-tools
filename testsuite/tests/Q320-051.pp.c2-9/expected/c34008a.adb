@@ -91,17 +91,10 @@ procedure C34008a is
                      delay 5.0;
                   end loop;
                   accept H (2) do
-                     if E'Count /= 0 or
-                       F (1)'Count /= 0 or
-                       F (2)'Count /= 0 or
-                       F (3)'Count /= 0 or
-                       G'Count /= 0 or
-                       H (1)'Count /= 0 or
-                       H (2)'Count /= 1 or
-                       H (3)'Count /= 0 or
-                       R'Count /= 0 or
-                       W'Count /= 0
-                     then
+                     if E'Count /= 0 or F (1)'Count /= 0 or F (2)'Count /= 0 or
+                       F (3)'Count /= 0 or G'Count /= 0 or H (1)'Count /= 0 or
+                       H (2)'Count /= 1 or H (3)'Count /= 0 or R'Count /= 0 or
+                       W'Count /= 0 then
                         Failed ("INCORRECT 'COUNT");
                      end if;
                   end H;
@@ -139,8 +132,7 @@ begin
    Test
      ("C34008A",
       "CHECK THAT THE REQUIRED PREDEFINED OPERATIONS " &
-      "ARE DECLARED (IMPLICITLY) FOR DERIVED TASK " &
-      "TYPES");
+      "ARE DECLARED (IMPLICITLY) FOR DERIVED TASK " & "TYPES");
 
    X.W (Ident_Int (2));
    if Id (X) /= 2 then

@@ -100,9 +100,8 @@ procedure C974012 is
    -- Routine to find the most cost effective grid path for this particular
    -- deficiency at this particular time
    --
-   procedure Path_Negotiation
-     (Requirement : in     Deficiency;
-      Best_Path   :    out Grid_Path)
+   procedure Path_Negotiation (Requirement : in     Deficiency;
+      Best_Path                            :    out Grid_Path)
    is
 
       Dummy_Path : Grid_Path  := "NYC.425_NY.227_NH.132";
@@ -132,8 +131,7 @@ begin
    Report.Test
      ("C974012",
       "Asynchronous Select: Trigger is queued on a " &
-      "protected entry and completes before the " &
-      "abortable part");
+      "protected entry and completes before the " & "abortable part");
 
    -- ::::::::: Fragment of code
 
@@ -152,8 +150,7 @@ begin
    end select;
    -- :::::::::
 
-   if not Tc_Terminate_Negotiation_Executed
-     or else not Tc_Trigger_Completed
+   if not Tc_Terminate_Negotiation_Executed or else not Tc_Trigger_Completed
    then
       Report.Failed ("Unexpected test path taken");
    end if;

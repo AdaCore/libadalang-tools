@@ -12,24 +12,19 @@ procedure Cc50a01 is
    package Count_Stacks renames Cc50a01_2;
    package Person_Stacks renames Cc50a01_3;
 
-   procedure Tc_Count_Test is new Cc50a01_1
-     (Fc50a00.Count_Type,
-      Fc50a00.Tc_Default_Count,
-      Count_Stacks);
+   procedure Tc_Count_Test is new Cc50a01_1 (Fc50a00.Count_Type,
+      Fc50a00.Tc_Default_Count, Count_Stacks);
    Count_Stack : Count_Stacks.Stack;
 
-   procedure Tc_Person_Test is new Cc50a01_1
-     (Fc50a00.Person_Type,
-      Fc50a00.Tc_Default_Person,
-      Person_Stacks);
+   procedure Tc_Person_Test is new Cc50a01_1 (Fc50a00.Person_Type,
+      Fc50a00.Tc_Default_Person, Person_Stacks);
    Person_Stack : Person_Stacks.Stack;
 
 begin
    Report.Test
      ("CC50A01",
       "Check that a formal parameter of a " &
-      "library-level generic unit may be a formal tagged " &
-      "private type");
+      "library-level generic unit may be a formal tagged " & "private type");
 
    Report.Comment ("Testing definite tagged type..");
    Tc_Count_Test (Count_Stack, Fc50a00.Tc_Count_Item);

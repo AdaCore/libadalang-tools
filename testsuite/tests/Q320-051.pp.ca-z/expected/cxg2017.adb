@@ -127,14 +127,9 @@ procedure Cxg2017 is
          if abs (Actual - Expected) > Max_Error then
             Accuracy_Error_Reported := True;
             Report.Failed
-              (Test_Name &
-               " actual: " &
-               Real'Image (Actual) &
-               " expected: " &
-               Real'Image (Expected) &
-               " difference: " &
-               Real'Image (Actual - Expected) &
-               " max err:" &
+              (Test_Name & " actual: " & Real'Image (Actual) & " expected: " &
+               Real'Image (Expected) & " difference: " &
+               Real'Image (Actual - Expected) & " max err:" &
                Real'Image (Max_Error));
          elsif Verbose then
             if Actual = Expected then
@@ -153,14 +148,10 @@ procedure Cxg2017 is
          E2            : constant := E * E;
       begin
          Check
-           (Tanh (1.0),
-            (E - 1.0 / E) / (E + 1.0 / E),
-            "tanh(1)",
+           (Tanh (1.0), (E - 1.0 / E) / (E + 1.0 / E), "tanh(1)",
             Minimum_Error);
          Check
-           (Tanh (2.0),
-            (E2 - 1.0 / E2) / (E2 + 1.0 / E2),
-            "tanh(2)",
+           (Tanh (2.0), (E2 - 1.0 / E2) / (E2 + 1.0 / E2), "tanh(2)",
             Minimum_Error);
       exception
          when Constraint_Error =>
@@ -215,25 +206,17 @@ procedure Cxg2017 is
             Actual2 := (Tanh (Y) + C) / (1.0 + Tanh (Y) * C);
 
             Check
-              (Actual1,
-               Actual2,
-               "Identity_1_Test " &
-               Integer'Image (I) &
-               ": tanh(" &
-               Real'Image (X) &
-               ") ",
+              (Actual1, Actual2,
+               "Identity_1_Test " & Integer'Image (I) & ": tanh(" &
+               Real'Image (X) & ") ",
                16.0);
 
             -- TANH(-x) = -TANH(X)
             Actual2 := Tanh (-X);
             Check
-              (-Actual1,
-               Actual2,
-               "Identity_2_Test " &
-               Integer'Image (I) &
-               ": tanh(" &
-               Real'Image (X) &
-               ") ",
+              (-Actual1, Actual2,
+               "Identity_2_Test " & Integer'Image (I) & ": tanh(" &
+               Real'Image (X) & ") ",
                16.0);
 
             if Accuracy_Error_Reported then
@@ -247,8 +230,7 @@ procedure Cxg2017 is
       exception
          when Constraint_Error =>
             Report.Failed
-              ("Constraint_Error raised in Identity_Test" &
-               " for X=" &
+              ("Constraint_Error raised in Identity_Test" & " for X=" &
                Real'Image (X));
          when others =>
             Report.Failed
@@ -286,8 +268,7 @@ begin
 
    if Verbose then
       Report.Comment
-        ("checking a digits" &
-         Integer'Image (System.Max_Digits) &
+        ("checking a digits" & Integer'Image (System.Max_Digits) &
          " floating point type");
    end if;
 

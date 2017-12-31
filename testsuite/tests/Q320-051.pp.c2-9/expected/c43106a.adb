@@ -44,21 +44,8 @@ procedure C43106a is
       T, U, V, W, X, Y, Z : Boolean;
    end record;
    Agg : Rec :=
-     (12,
-      'A',
-      True,
-      1,
-      2,
-      3,
-      4,
-      'B',
-      'C',
-      'D',
-      'E',
-      P | R => "ABC",
-      S | Q => "DEF",
-      L | X | O | U => True,
-      others => False);
+     (12, 'A', True, 1, 2, 3, 4, 'B', 'C', 'D', 'E', P | R => "ABC",
+      S | Q => "DEF", L | X | O | U => True, others => False);
 
    function Ident_Char (X : Character) return Character is
    begin
@@ -75,28 +62,18 @@ begin
       "CHECK THAT BOTH NAMED AND POSITIONAL NOTATIONS " &
       "ARE PERMITTED WITHIN THE SAME RECORD " &
       "AGGREGATE, (PROVIDED THAT ALL POSITIONAL " &
-      "ASSOCIATIONS APPEAR BEFORE ANY NAMED " &
-      "ASSOCIATION)");
+      "ASSOCIATIONS APPEAR BEFORE ANY NAMED " & "ASSOCIATION)");
 
-   if not Ident_Bool (Agg.C) or
-     not Ident_Bool (Agg.L) or
-     not Ident_Bool (Agg.X) or
-     not Ident_Bool (Agg.O) or
-     not Ident_Bool (Agg.U) or
-     Ident_Bool (Agg.M) or
-     Ident_Bool (Agg.N) or
-     Ident_Bool (Agg.T) or
-     Ident_Bool (Agg.V) or
-     Ident_Bool (Agg.W) or
-     Ident_Bool (Agg.Y) or
-     Ident_Bool (Agg.Z)
-   then
+   if not Ident_Bool (Agg.C) or not Ident_Bool (Agg.L) or
+     not Ident_Bool (Agg.X) or not Ident_Bool (Agg.O) or
+     not Ident_Bool (Agg.U) or Ident_Bool (Agg.M) or Ident_Bool (Agg.N) or
+     Ident_Bool (Agg.T) or Ident_Bool (Agg.V) or Ident_Bool (Agg.W) or
+     Ident_Bool (Agg.Y) or Ident_Bool (Agg.Z) then
       Failed ("BOOLEANS NOT INITIALIZED TO AGGREGATE VALUES");
    end if;
 
    if Ident_Str (Agg.P) /= Ident_Str (Agg.R) or
-     Ident_Str (Agg.Q) /= Ident_Str (Agg.S)
-   then
+     Ident_Str (Agg.Q) /= Ident_Str (Agg.S) then
       Failed ("STRINGS NOT INITIALIZED CORRECTLY");
    end if;
 
@@ -104,8 +81,7 @@ begin
      Ident_Char (Agg.H) /= Ident_Char ('B') or
      Ident_Char (Agg.I) /= Ident_Char ('C') or
      Ident_Char (Agg.J) /= Ident_Char ('D') or
-     Ident_Char (Agg.K) /= Ident_Char ('E')
-   then
+     Ident_Char (Agg.K) /= Ident_Char ('E') then
       Failed ("CHARACTERS NOT INITIALIZED CORRECTLY");
    end if;
 

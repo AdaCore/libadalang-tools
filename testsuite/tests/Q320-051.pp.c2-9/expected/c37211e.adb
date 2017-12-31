@@ -58,8 +58,7 @@ begin
          begin
             Failed
               ("NO EXCEPTION RAISED AT THE " &
-               "ELABORATION OF SUBTYPE SUBACC " &
-               Integer'Image (Sa.D));
+               "ELABORATION OF SUBTYPE SUBACC " & Integer'Image (Sa.D));
          end;
       exception
          when others =>
@@ -82,8 +81,7 @@ begin
             Ar : Arr;
          begin
             Failed
-              ("NO EXCEPTION RAISED AT THE " &
-               "ELABORATION OF TYPE ARR " &
+              ("NO EXCEPTION RAISED AT THE " & "ELABORATION OF TYPE ARR " &
                Integer'Image (Ar (1).D));
          end;
       exception
@@ -109,8 +107,7 @@ begin
             R1 : Rec1;
          begin
             Failed
-              ("NO EXCEPTION RAISED AT THE " &
-               "ELABORATION OF TYPE REC1 " &
+              ("NO EXCEPTION RAISED AT THE " & "ELABORATION OF TYPE REC1 " &
                Integer'Image (R1.X.D));
          end;
       exception
@@ -133,8 +130,7 @@ begin
             Aca : Acca;
          begin
             Failed
-              ("NO EXCEPTION RAISED AT THE " &
-               "ELABORATION OF TYPE ACCA " &
+              ("NO EXCEPTION RAISED AT THE " & "ELABORATION OF TYPE ACCA " &
                Integer'Image (Aca.all.D));
          end;
       exception
@@ -157,8 +153,7 @@ begin
             Na : Newacc;
          begin
             Failed
-              ("NO EXCEPTION RAISED AT THE " &
-               "ELABORATION OF TYPE NEWACC " &
+              ("NO EXCEPTION RAISED AT THE " & "ELABORATION OF TYPE NEWACC " &
                Integer'Image (Na.D));
          end;
       exception
@@ -178,8 +173,7 @@ begin
          A : Acc (Ident_Int (-1));
       begin
          Failed
-           ("NO EXCEPTION RAISED AT THE DECLARATION OF " &
-            "A " &
+           ("NO EXCEPTION RAISED AT THE DECLARATION OF " & "A " &
             Integer'Image (A.D));
       exception
          when others =>
@@ -203,8 +197,7 @@ begin
             Bac : Bad_Acc;
          begin
             Failed
-              ("NO EXCEPTION RAISED AT THE " &
-               "DECLARATION OF OBJECT BAC " &
+              ("NO EXCEPTION RAISED AT THE " & "DECLARATION OF OBJECT BAC " &
                Integer'Image (Bac.D));
          exception
             when others =>

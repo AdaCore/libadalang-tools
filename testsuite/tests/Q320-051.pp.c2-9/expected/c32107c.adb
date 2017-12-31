@@ -67,8 +67,7 @@ begin
       "OCCURRENCE, I.E., THAT EXPRESSIONS " &
       "ASSOCIATED WITH ONE DECLARATION (INCLUDING " &
       "DEFAULT EXPRESSIONS) ARE EVALUATED BEFORE " &
-      "ANY EXPRESSION BELONGING TO THE NEXT " &
-      "DECLARATION");
+      "ANY EXPRESSION BELONGING TO THE NEXT " & "DECLARATION");
 
    declare -- (A).
       type Rec (D : Integer := F) is record
@@ -93,16 +92,13 @@ begin
 
       begin
          Order_Check :=
-           T'Pos (P1.D) +
-           T'Pos (P2.D) +
-           (Get_A (P1) * 10) +
+           T'Pos (P1.D) + T'Pos (P2.D) + (Get_A (P1) * 10) +
            (Get_A (P2) * 1_000);
          if Order_Check /= 4_321 then
             Failed
               ("OBJECTS NOT ELABORATED IN PROPER " &
                "ORDER VALUE OF ORDER_CHECK SHOULD BE " &
-               "4321 -- ACTUAL VALUE IS " &
-               Integer'Image (Order_Check) &
+               "4321 -- ACTUAL VALUE IS " & Integer'Image (Order_Check) &
                " - (A)");
          end if;
       end P;
@@ -138,30 +134,22 @@ begin
 
       begin
          Order_Check :=
-           T'Pos (P1.D1) +
-           T'Pos (P1.D2) +
-           T'Pos (P2.D1) +
-           T'Pos (P2.D2) +
+           T'Pos (P1.D1) + T'Pos (P1.D2) + T'Pos (P2.D1) + T'Pos (P2.D2) +
            (Get_A (P1) * 100);
          if (Get_A (P2) = 6) and
-           (Order_Check = 12_345 or
-            Order_Check = 21_345 or
-            Order_Check = 21_354 or
-            Order_Check = 12_354)
+           (Order_Check = 12_345 or Order_Check = 21_345 or
+            Order_Check = 21_354 or Order_Check = 12_354)
          then
             Comment
-              ("ORDER_CHECK HAS VALUE " &
-               Integer'Image (Order_Check) &
+              ("ORDER_CHECK HAS VALUE " & Integer'Image (Order_Check) &
                " - (B)");
          else
             Failed
               ("OBJECTS NOT ELABORATED IN PROPER " &
                "ORDER VALUE OF ORDER_CHECK SHOULD BE " &
                "6 12345, 6 21345, 6 21354, OR " &
-               "6 12354 -- ACTUAL VALUE IS " &
-               Integer'Image (Get_A (P2)) &
-               Integer'Image (Order_Check) &
-               " - (B)");
+               "6 12354 -- ACTUAL VALUE IS " & Integer'Image (Get_A (P2)) &
+               Integer'Image (Order_Check) & " - (B)");
          end if;
 
       end P;

@@ -51,8 +51,7 @@ begin
 
       O3 : T30 := (T20 with P30 => <>, T30 => <>);
       O4 : T30 :=
-        (T20'(A => Report.Ident_Int (4), P20 => <>, T20 => <>) with
-         P30 => <>,
+        (T20'(A => Report.Ident_Int (4), P20 => <>, T20 => <>) with P30 => <>,
          T30 => <>);
    begin
       if O1.A /= 999 then

@@ -73,12 +73,10 @@ begin
 
       type Decimal_Data_Type is delta 0.01 digits 16;
 
-      package Image_Io is new Decimal_Output
-        (Num                => Decimal_Data_Type,
-         Default_Currency   => Def_Cur,
-         Default_Fill       => '*',
-         Default_Separator  => Default_Separator,
-         Default_Radix_Mark => Def_Radix);
+      package Image_Io is new Decimal_Output (Num => Decimal_Data_Type,
+         Default_Currency => Def_Cur, Default_Fill => '*',
+         Default_Separator                        => Default_Separator,
+         Default_Radix_Mark                       => Def_Radix);
 
       type Decimal_Data_Array_Type is
         array (Integer range <>) of Decimal_Data_Type;
@@ -103,31 +101,23 @@ begin
       Picture_15 : Picture := To_Picture ("$$9.99");
 
       Picture_1_Output : Edited_Output_Array_Type (1 .. 5) :=
-        (1 => new String'(" $1,357.99"),
-         2 => new String'("-$9,029.01"),
-         3 => new String'("     $0.00"),
-         4 => new String'("     $0.20"),
+        (1 => new String'(" $1,357.99"), 2 => new String'("-$9,029.01"),
+         3 => new String'("     $0.00"), 4 => new String'("     $0.20"),
          5 => new String'("     $3.45"));
 
       Picture_2_Output : Edited_Output_Array_Type (1 .. 5) :=
-        (1 => new String'(" $1,357.99"),
-         2 => new String'("-$9,029.01"),
-         3 => new String'("          "),
-         4 => new String'("      $.20"),
+        (1 => new String'(" $1,357.99"), 2 => new String'("-$9,029.01"),
+         3 => new String'("          "), 4 => new String'("      $.20"),
          5 => new String'("     $3.45"));
 
       Picture_3_Output : Edited_Output_Array_Type (1 .. 5) :=
-        (1 => new String'(" 1357.99"),
-         2 => new String'("-9029.01"),
-         3 => new String'("        "),
-         4 => new String'("     .20"),
+        (1 => new String'(" 1357.99"), 2 => new String'("-9029.01"),
+         3 => new String'("        "), 4 => new String'("     .20"),
          5 => new String'("    3.45"));
 
       Picture_5_Output : Edited_Output_Array_Type (1 .. 5) :=
-        (1 => new String'("  $1,357.99"),
-         2 => new String'("- $9,029.01"),
-         3 => new String'("   $ 000.00"),
-         4 => new String'("   $ 000.20"),
+        (1 => new String'("  $1,357.99"), 2 => new String'("- $9,029.01"),
+         3 => new String'("   $ 000.00"), 4 => new String'("   $ 000.20"),
          5 => new String'("   $ 003.45"));
 
    begin
@@ -151,155 +141,96 @@ begin
 
       for I in 1 .. 5 loop
          if Image_Io.Image (Item => Decimal_Data (I), Pic => Picture_1) /=
-           Picture_1_Output (I).all
-         then
+           Picture_1_Output (I).all then
             Report.Failed
               ("Incorrect result from function Image with " &
-               "decimal data item #" &
-               Integer'Image (I) &
-               ", " &
-               "combined with Picture_1 picture string." &
-               "Expected: " &
-               Picture_1_Output (I).all &
-               ", " &
-               "Found: " &
+               "decimal data item #" & Integer'Image (I) & ", " &
+               "combined with Picture_1 picture string." & "Expected: " &
+               Picture_1_Output (I).all & ", " & "Found: " &
                Image_Io.Image (Decimal_Data (I), Picture_1));
          end if;
 
          if Image_Io.Image (Decimal_Data (I), Pic => Picture_2) /=
-           Picture_2_Output (I).all
-         then
+           Picture_2_Output (I).all then
             Report.Failed
               ("Incorrect result from function Image with " &
-               "decimal data item #" &
-               Integer'Image (I) &
-               ", " &
-               "combined with Picture_2 picture string." &
-               "Expected: " &
-               Picture_2_Output (I).all &
-               ", " &
-               "Found: " &
+               "decimal data item #" & Integer'Image (I) & ", " &
+               "combined with Picture_2 picture string." & "Expected: " &
+               Picture_2_Output (I).all & ", " & "Found: " &
                Image_Io.Image (Decimal_Data (I), Picture_2));
          end if;
 
          if Image_Io.Image (Decimal_Data (I), Picture_3) /=
-           Picture_3_Output (I).all
-         then
+           Picture_3_Output (I).all then
             Report.Failed
               ("Incorrect result from function Image with " &
-               "decimal data item #" &
-               Integer'Image (I) &
-               ", " &
-               "combined with Picture_3 picture string." &
-               "Expected: " &
-               Picture_3_Output (I).all &
-               ", " &
-               "Found: " &
+               "decimal data item #" & Integer'Image (I) & ", " &
+               "combined with Picture_3 picture string." & "Expected: " &
+               Picture_3_Output (I).all & ", " & "Found: " &
                Image_Io.Image (Decimal_Data (I), Picture_3));
          end if;
 
          if Image_Io.Image (Decimal_Data (I), Picture_5) /=
-           Picture_5_Output (I).all
-         then
+           Picture_5_Output (I).all then
             Report.Failed
               ("Incorrect result from function Image with " &
-               "decimal data item #" &
-               Integer'Image (I) &
-               ", " &
-               "combined with Picture_5 picture string." &
-               "Expected: " &
-               Picture_5_Output (I).all &
-               ", " &
-               "Found: " &
+               "decimal data item #" & Integer'Image (I) & ", " &
+               "combined with Picture_5 picture string." & "Expected: " &
+               Picture_5_Output (I).all & ", " & "Found: " &
                Image_Io.Image (Decimal_Data (I), Picture_5));
          end if;
       end loop;
 
       if Image_Io.Image
-          (Item       => 123_456.78,
-           Pic        => Picture_6,
-           Currency   => "$",
-           Fill       => Def_Fill,
-           Separator  => Def_Sep,
-           Radix_Mark => Def_Radix) /=
-        "   $***123,456.78"
-      then
+          (Item => 123_456.78, Pic => Picture_6, Currency => "$",
+           Fill => Def_Fill, Separator => Def_Sep, Radix_Mark => Def_Radix) /=
+        "   $***123,456.78" then
          Report.Failed ("Incorrect result from Fn. Image using Picture_6");
       end if;
 
       if Image_Io.Image
-          (123_456.78,
-           Pic        => Picture_7,
-           Currency   => Def_Cur,
-           Fill       => '*',
-           Separator  => Def_Sep,
-           Radix_Mark => Def_Radix) /=
-        " $***123,456.78"
-      then
+          (123_456.78, Pic => Picture_7, Currency => Def_Cur, Fill => '*',
+           Separator       => Def_Sep, Radix_Mark => Def_Radix) /=
+        " $***123,456.78" then
          Report.Failed ("Incorrect result from Fn. Image using Picture_7");
       end if;
 
       if Image_Io.Image
-          (0.0,
-           Picture_8,
-           Currency   => "$",
-           Fill       => '*',
-           Separator  => Def_Sep,
-           Radix_Mark => Def_Radix) /=
-        "          "
-      then
+          (0.0, Picture_8, Currency => "$", Fill => '*', Separator => Def_Sep,
+           Radix_Mark               => Def_Radix) /=
+        "          " then
          Report.Failed ("Incorrect result from Fn. Image using Picture_8");
       end if;
 
       if Image_Io.Image
-          (0.20,
-           Picture_9,
-           Def_Cur,
-           Fill       => Def_Fill,
-           Separator  => Default_Separator,
-           Radix_Mark => Default_Radix_Mark) /=
-        "      $.20"
-      then
+          (0.20, Picture_9, Def_Cur, Fill => Def_Fill,
+           Separator => Default_Separator, Radix_Mark => Default_Radix_Mark) /=
+        "      $.20" then
          Report.Failed ("Incorrect result from Fn. Image using Picture_9");
       end if;
 
       if Image_Io.Image
-          (123_456.00,
-           Picture_10,
-           "$",
-           '*',
-           Separator  => Def_Sep,
-           Radix_Mark => Def_Radix) /=
-        "+      123,456.00"
-      then
+          (123_456.00, Picture_10, "$", '*', Separator => Def_Sep,
+           Radix_Mark                                  => Def_Radix) /=
+        "+      123,456.00" then
          Report.Failed ("Incorrect result from Fn. Image using Picture_10");
       end if;
 
       if Image_Io.Image
-          (-123_456.78,
-           Picture_11,
-           Default_Currency,
-           Default_Fill,
-           Default_Separator,
-           Radix_Mark => Def_Radix) /=
-        "      -123,457"
-      then
+          (-123_456.78, Picture_11, Default_Currency, Default_Fill,
+           Default_Separator, Radix_Mark => Def_Radix) /=
+        "      -123,457" then
          Report.Failed ("Incorrect result from Fn. Image using Picture_11");
       end if;
 
       if Image_Io.Image (123_456.78, Picture_12, "$", '*', ',', '.') /=
-        "      $123,456.78"
-      then
+        "      $123,456.78" then
          Report.Failed ("Incorrect result from Fn. Image using Picture_12");
       end if;
 
       if Image_Io.Image
-          (1.23,
-           Picture_14,
-           Currency => Def_Cur,
-           Fill     => Def_Fill) /=
-        "   $1.23"
-      then
+          (1.23, Picture_14, Currency => Def_Cur, Fill => Def_Fill) /=
+        "   $1.23" then
          Report.Failed ("Incorrect result from Fn. Image using Picture_14");
       end if;
 
@@ -310,8 +241,7 @@ begin
    exception
       when The_Error : others =>
          Report.Failed
-           ("The following exception was raised in the " &
-            "Test_Block: " &
+           ("The following exception was raised in the " & "Test_Block: " &
             Exception_Name (The_Error));
    end Test_Block;
 

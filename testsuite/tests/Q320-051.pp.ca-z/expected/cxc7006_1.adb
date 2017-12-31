@@ -79,10 +79,8 @@ package body Cxc7006_1 is
       Expected_Exceptions := new Exception_Array'(Ids);
    end Set_Expected_Exceptions;
 
-   procedure Set_Handler_Test
-     (Index     : in Integer;
-      Test_Proc : in Handler_Test_Procedure;
-      Param     : in Integer)
+   procedure Set_Handler_Test (Index : in Integer;
+      Test_Proc : in Handler_Test_Procedure; Param : in Integer)
    is
    begin
       if Index in Test_Procs'Range then
@@ -126,11 +124,10 @@ package body Cxc7006_1 is
 
    protected body Pt is
 
-      procedure Handler
-        (Id    : in Handler_Id;
-         Cause : in Ada.Task_Termination.Cause_Of_Termination;
-         T     : in Ada.Task_Identification.Task_Id;
-         X     : in Ada.Exceptions.Exception_Occurrence)
+      procedure Handler (Id : in Handler_Id;
+         Cause              : in Ada.Task_Termination.Cause_Of_Termination;
+         T                  : in Ada.Task_Identification.Task_Id;
+         X                  : in Ada.Exceptions.Exception_Occurrence)
       is
          use type Att.Cause_Of_Termination;
          use type Ati.Task_Id;
@@ -162,8 +159,7 @@ package body Cxc7006_1 is
                      and then Ae.Exception_Identity (X) /= Expected_Exception)
                     or else
                     (Expected_Exceptions /= null
-                     and then
-                       Ae.Exception_Identity (X) /=
+                     and then Ae.Exception_Identity (X) /=
                        Expected_Exceptions (I))
                   then
                      Report.Failed
@@ -245,10 +241,8 @@ package body Cxc7006_1 is
             end if;
          elsif Which_Handler (I) /= Expected_Handler (I) then
             Report.Failed
-              (Test_Name.all &
-               ": Wrong handler called: expected " &
-               Integer'Image (Expected_Handler (I)) &
-               ", got " &
+              (Test_Name.all & ": Wrong handler called: expected " &
+               Integer'Image (Expected_Handler (I)) & ", got " &
                Integer'Image (Which_Handler (I)));
          end if;
       end loop;

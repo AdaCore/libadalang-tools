@@ -62,8 +62,7 @@ begin
       "subtype.  Check that the value of " &
       "Decimal.Max_Decimal_Digits is at least 18; " &
       "the value of Decimal.Max_Scale is at least " &
-      "18; the value of Decimal.Min_Scale is at " &
-      "most 0");
+      "18; the value of Decimal.Min_Scale is at " & "most 0");
 
    Attribute_Check_Block :
    declare
@@ -99,15 +98,13 @@ begin
 
       if Radix_2_Type_1'Machine_Radix /= 2
         or else Radix_2_Type_2'Machine_Radix /= 2
-        or else Radix_2_Type_3'Machine_Radix /= 2
-      then
+        or else Radix_2_Type_3'Machine_Radix /= 2 then
          Report.Failed ("Incorrect radix value returned, 2 expected");
       end if;
 
       if Radix_10_Type_1'Machine_Radix /= 10
         or else Radix_10_Type_2'Machine_Radix /= 10
-        or else Radix_10_Type_3'Machine_Radix /= 10
-      then
+        or else Radix_10_Type_3'Machine_Radix /= 10 then
          Report.Failed ("Incorrect radix value returned, 10 expected");
       end if;
 

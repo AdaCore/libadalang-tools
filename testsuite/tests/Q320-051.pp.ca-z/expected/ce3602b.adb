@@ -130,8 +130,7 @@ begin
       if Cn /= 2 then
          Failed
            ("COLUMN NUMBER NOT SET CORRECTLY " &
-            "- GET CHARACTER.  COL NUMBER IS" &
-            Count'Image (Cn));
+            "- GET CHARACTER.  COL NUMBER IS" & Count'Image (Cn));
       end if;
 
 -- TEST COLUMN NUMBER FOR STRING
@@ -141,8 +140,7 @@ begin
       if Cn /= 7 then
          Failed
            ("COLUMN NUMBER NOT SET CORRECTLY " &
-            "- GET STRING.  COL NUMBER IS" &
-            Count'Image (Cn));
+            "- GET STRING.  COL NUMBER IS" & Count'Image (Cn));
       end if;
 
 -- POSITION CURRENT INDEX TO END OF LINE
@@ -165,8 +163,7 @@ begin
       if Ln /= 2 then
          Failed
            ("LINE NUMBER NOT SET CORRECTLY " &
-            "- GET CHARACTER.  LINE NUMBER IS" &
-            Count'Image (Ln));
+            "- GET CHARACTER.  LINE NUMBER IS" & Count'Image (Ln));
       end if;
       if Page (File1) /= Positive_Count (Ident_Int (1)) then
          Failed
@@ -188,14 +185,12 @@ begin
       if Cn /= 6 then
          Failed
            ("COLUMN NUMBER NOT SET CORRECTLY " &
-            "- GET STRING.  COL NUMBER IS" &
-            Count'Image (Cn));
+            "- GET STRING.  COL NUMBER IS" & Count'Image (Cn));
       end if;
       if Ln /= 1 then
          Failed
            ("LINE NUMBER NOT SET CORRECTLY " &
-            "- GET STRING.  LINE NUMBER IS" &
-            Count'Image (Ln));
+            "- GET STRING.  LINE NUMBER IS" & Count'Image (Ln));
       end if;
       if Page (File1) /= Positive_Count (Ident_Int (2)) then
          Failed

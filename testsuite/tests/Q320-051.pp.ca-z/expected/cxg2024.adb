@@ -64,8 +64,7 @@ procedure Cxg2024 is
       type Dollars is delta 1.0 digits Num_Digits;
 
       type Signed_Sixteenths is
-        delta 0.062_5 range
-          -2.0**(System.Max_Mantissa - 5) ..
+        delta 0.062_5 range -2.0**(System.Max_Mantissa - 5) ..
             2.0**(System.Max_Mantissa - 5) - 1.0;
       type Unsigned_Sixteenths is
         delta 0.062_5 range 0.0 .. 2.0**(System.Max_Mantissa - 4) - 1.0;

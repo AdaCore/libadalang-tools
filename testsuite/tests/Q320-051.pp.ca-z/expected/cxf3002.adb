@@ -94,10 +94,8 @@ begin
       type Decimal_Data_Type is delta 0.01 digits 16;
 
       package Wide_Ed_Out is new Editing.Decimal_Output
-        (Num                => Decimal_Data_Type,
-         Default_Currency   => Def_Cur,
-         Default_Fill       => Def_Fill,
-         Default_Separator  => Def_Sep,
+        (Num                => Decimal_Data_Type, Default_Currency => Def_Cur,
+         Default_Fill       => Def_Fill, Default_Separator => Def_Sep,
          Default_Radix_Mark => Def_Radix);
 
       -- Define types for the arrays of data that will hold the decimal data
@@ -119,10 +117,8 @@ begin
 
       Picture_Strings : Picture_String_Array_Type
         (1 .. Number_Of_Picture_Strings) :=
-        (1 => new String'("-$$_$$9.99"),
-         2 => new String'("-$$_$$$.$$"),
-         3 => new String'("-ZZZZ.ZZ"),
-         4 => new String'("-$$$_999.99"));
+        (1 => new String'("-$$_$$9.99"), 2 => new String'("-$$_$$$.$$"),
+         3 => new String'("-ZZZZ.ZZ"), 4 => new String'("-$$$_999.99"));
 
       Edited_Output : Edited_Output_Results_Array_Type
         (1 .. Number_Of_Expected_Results) :=
@@ -178,21 +174,17 @@ begin
                   Report.Failed
                     ("Incorrect result from function Valid " &
                      "when examining the picture string that " &
-                     "was produced from string " &
-                     Integer'Image (J) &
-                     " in conjunction with " &
-                     "decimal data item # " &
+                     "was produced from string " & Integer'Image (J) &
+                     " in conjunction with " & "decimal data item # " &
                      Integer'Image (I));
                end if;
 
                -- Check results of function Editing.Pic_String.
-               if Editing.Pic_String (Tc_Picture) /=
-                 Picture_Strings (J).all
+               if Editing.Pic_String (Tc_Picture) /= Picture_Strings (J).all
                then
                   Report.Failed
                     ("Incorrect result from To_Picture/" &
-                     "Pic_String conversion for picture " &
-                     "string # " &
+                     "Pic_String conversion for picture " & "string # " &
                      Integer'Image (J));
                end if;
 
@@ -200,20 +192,17 @@ begin
                -- the expected result.
 
                if Wide_Ed_Out.Image (Decimal_Data (I), Tc_Picture) /=
-                 Edited_Output (Tc_Loop_Count).all
-               then
+                 Edited_Output (Tc_Loop_Count).all then
                   Report.Failed
                     ("Incorrect result from Function Image, " &
                      "when used with decimal data item # " &
-                     Integer'Image (I) &
-                     " and picture string # " &
+                     Integer'Image (I) & " and picture string # " &
                      Integer'Image (J));
                end if;
 
             else
                Report.Failed
-                 ("Picture String # " &
-                  Integer'Image (J) &
+                 ("Picture String # " & Integer'Image (J) &
                   "reported as being invalid");
             end if;
 

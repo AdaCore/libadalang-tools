@@ -100,28 +100,15 @@ procedure C64005c is
 
                   -- G := CATENATE ALL V, L, C;
                   G :=
-                    C64005c.V &
-                    C64005c.L &
-                    C64005ca.V &
-                    C64005ca.L &
-                    C64005ca.C &
-                    C64005cb.V &
-                    C64005cb.L &
-                    C64005cb.C &
-                    C64005cc.V &
-                    C64005cc.L &
-                    C64005cc.C;
+                    C64005c.V & C64005c.L & C64005ca.V & C64005ca.L &
+                    C64005ca.C & C64005cb.V & C64005cb.L & C64005cb.C &
+                    C64005cc.V & C64005cc.L & C64005cc.C;
             end case;
 
             -- APPEND ALL L AND C TO T IN REVERSE ORDER.
             T.S (T.E + 1 .. T.E + N) :=
-              C64005cc.L &
-              C64005cc.C &
-              C64005cb.L &
-              C64005cb.C &
-              C64005ca.L &
-              C64005ca.C &
-              C64005c.L;
+              C64005cc.L & C64005cc.C & C64005cb.L & C64005cb.C & C64005ca.L &
+              C64005ca.C & C64005c.L;
             T.E := T.E + N;
 
          end C64005cc;
@@ -206,8 +193,7 @@ begin
 
    declare
       subtype Lc_Level is
-        Character range
-          Ascii.Lc_A ..
+        Character range Ascii.Lc_A ..
             Character'Val (Character'Pos (Ascii.Lc_A) + Max_Lev - 1);
 
       Ct : Trace;
@@ -319,8 +305,7 @@ begin
          for I in Level loop
             Cg (E + 1) :=
               Lc_Level'Val
-                (Level'Pos (I) -
-                 Level'Pos (Level'First) +
+                (Level'Pos (I) - Level'Pos (Level'First) +
                  Lc_Level'Pos (Lc_Level'First));
             Cg (E + 2) := '3';
             Cg (E + 3) := I;

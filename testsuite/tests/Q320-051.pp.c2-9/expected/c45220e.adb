@@ -38,8 +38,7 @@ begin
    Test
      ("C45220E",
       "CHECK THE PROPER OPERATION OF THE MEMBERSHIP" &
-      " OPERATORS  'IN'  AND  'NOT IN'  FOR" &
-      " BOOLEAN TYPES");
+      " OPERATORS  'IN'  AND  'NOT IN'  FOR" & " BOOLEAN TYPES");
 
    declare
 
@@ -54,10 +53,8 @@ begin
          Failed ("WRONG VALUES FOR 'IN SUBBOOL'");
       end if;
 
-      if False in True .. False or
-        Var not in False .. True or
-        Con in True .. True
-      then
+      if False in True .. False or Var not in False .. True or
+        Con in True .. True then
          Failed ("WRONG VALUES FOR 'IN AAA..BBB'");
       end if;
 

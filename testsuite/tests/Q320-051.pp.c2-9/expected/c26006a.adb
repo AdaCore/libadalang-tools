@@ -37,8 +37,7 @@ procedure C26006a is
 
 begin
    Test
-     ("C26006A",
-      "ALL ASCII CHARACTERS CAN APPEAR IN MIDDLE " & "OF STRINGS");
+     ("C26006A", "ALL ASCII CHARACTERS CAN APPEAR IN MIDDLE " & "OF STRINGS");
 
    for C in Character'First .. Character'Last loop
       S1 (2) := C;

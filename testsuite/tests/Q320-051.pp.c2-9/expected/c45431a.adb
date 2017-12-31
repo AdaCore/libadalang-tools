@@ -38,8 +38,7 @@ begin
    Test
      ("C45431A",
       "CHECK THAT FOR FIXED POINT TYPES +A = A AND " &
-      "THAT, FOR MODEL NUMBERS, -(-A) = A " &
-      "-- BASIC TYPES");
+      "THAT, FOR MODEL NUMBERS, -(-A) = A " & "-- BASIC TYPES");
 
    -------------------------------------------------------------------
 
@@ -119,13 +118,11 @@ begin
 
       -- CHECK "+" AND "-" FOR NON-MODEL NUMBER:
       if +Like_Duration'(Non_Model_Const) not in 0.656_25 .. 0.671_875 or
-        +Non_Model_Var not in 0.656_25 .. 0.671_875
-      then
+        +Non_Model_Var not in 0.656_25 .. 0.671_875 then
          Failed ("+LIKE_DURATION'(2.0 / 3) NOT IN 0.656_25 .. " & "0.671_875");
       end if;
       if -Like_Duration'(Non_Model_Const) not in -0.671_875 .. -0.656_25 or
-        -Non_Model_Var not in -0.671_875 .. -0.656_25
-      then
+        -Non_Model_Var not in -0.671_875 .. -0.656_25 then
          Failed
            ("-LIKE_DURATION'(2.0 / 3) NOT IN -0.671_875 " & ".. -0.656_25");
       end if;
@@ -193,13 +190,11 @@ begin
 
       -- CHECK "+" AND "-" FOR NON-MODEL NUMBER:
       if +Decimal_M4'(Non_Model_Const) not in 0.0 .. 64.0 or
-        +Non_Model_Var not in 0.0 .. 64.0
-      then
+        +Non_Model_Var not in 0.0 .. 64.0 then
          Failed ("+DECIMAL_M4'(2.0 / 3) NOT IN 0.0 .. 64.0");
       end if;
       if -Decimal_M4'(Non_Model_Const) not in -64.0 .. 0.0 or
-        -Non_Model_Var not in -64.0 .. 0.0
-      then
+        -Non_Model_Var not in -64.0 .. 0.0 then
          Failed ("-DECIMAL_M4'(2.0 / 3) NOT IN -64.0 .. 0.0");
       end if;
 

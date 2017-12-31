@@ -49,10 +49,8 @@ begin
          end if;
          if Finalization_Order (I) /= I then
             Report.Failed
-              ("Finalization occurred out of order" &
-               " expected:" &
-               Ids'Image (I) &
-               " actual:" &
+              ("Finalization occurred out of order" & " expected:" &
+               Ids'Image (I) & " actual:" &
                Ids'Image (Finalization_Order (I)));
          end if;
       end loop;

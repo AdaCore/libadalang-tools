@@ -15,8 +15,7 @@ procedure Cdb4001 is
    type Index is range 1 .. 4;
 
    type Object_Id_Or_Nil is
-     new Integer range
-       0 ..
+     new Integer range 0 ..
          Integer (Subpool_Id'Last) *
          Integer (Index'Last + ((Index'Last * (Index'Last + 1)) / 2));
    --
@@ -62,10 +61,8 @@ procedure Cdb4001 is
    end Assert;
 
    package Pkg is
-      type Object
-        (Id : Object_Id := Next)
-      is new Ada.Finalization.Limited_Controlled with
-      null record;
+      type Object (Id : Object_Id := Next)
+      is new Ada.Finalization.Limited_Controlled with null record;
 
       overriding procedure Finalize (X : in out Object);
    end Pkg;
@@ -163,14 +160,12 @@ procedure Cdb4001 is
          for Idx in Index loop
             Assert
               (Cdb4001_Tracked_Subpools.Enclosing_Subpool
-                 (The_Pool,
-                  Obj_Refs (Idx, Subp).all'Address) =
+                 (The_Pool, Obj_Refs (Idx, Subp).all'Address) =
                Subpools (Subp),
                "wrong enclosing subpool for Obj_Refs element");
             Assert
               (Cdb4001_Tracked_Subpools.Enclosing_Subpool
-                 (The_Pool,
-                  Vec_Refs (Idx, Subp).all'Address) =
+                 (The_Pool, Vec_Refs (Idx, Subp).all'Address) =
                Subpools (Subp),
                "wrong enclosing subpool for Vec_Refs element");
          end loop;
@@ -179,8 +174,7 @@ procedure Cdb4001 is
       Report.Comment ("Enclosing_Subpool checking complete");
 
       declare
-         procedure Free is new Ada.Unchecked_Deallocation
-           (Pkg.Object,
+         procedure Free is new Ada.Unchecked_Deallocation (Pkg.Object,
             Obj_Ref);
          procedure Free is new Ada.Unchecked_Deallocation (Vec, Vec_Ref);
 
@@ -236,8 +230,7 @@ procedure Cdb4001 is
    end Test;
 begin
    Report.Test
-     ("CDB4001",
-      "Allocation and deallocation of objects using subpools");
+     ("CDB4001", "Allocation and deallocation of objects using subpools");
    begin
       Test;
       Assert

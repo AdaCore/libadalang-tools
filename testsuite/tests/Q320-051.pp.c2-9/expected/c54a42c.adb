@@ -39,8 +39,7 @@ begin
    Test
      ("C54A42C",
       "TEST THAT A  CASE_STATEMENT HANDLES CORRECTLY" &
-      " A SPARSE SET OF POTENTIAL VALUES IN A LARGE" &
-      " RANGE");
+      " A SPARSE SET OF POTENTIAL VALUES IN A LARGE" & " RANGE");
 
    declare
 

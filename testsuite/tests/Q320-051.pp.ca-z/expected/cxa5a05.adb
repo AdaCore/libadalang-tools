@@ -147,8 +147,7 @@ begin
         not Result_Within_Range (Gef.Arcsin (0.01), 0.010, 0.001) or
         not Result_Within_Range (Ef.Arcsin (-0.29), -0.294, 0.001) or
         not Result_Within_Range (Gef.Arcsin (-0.50), -0.524, 0.001) or
-        not Result_Within_Range (Ef.Arcsin (-1.0), -1.571, 0.001)
-      then
+        not Result_Within_Range (Ef.Arcsin (-1.0), -1.571, 0.001) then
          Report.Failed
            ("Incorrect result from Function Arcsin with " &
             "various input parameters");
@@ -332,8 +331,7 @@ begin
         not Result_Within_Range (Ef.Arcsinh (Pi), 1.862, 0.001) or
         not Result_Within_Range (Ef.Arcsinh (-Pi), -1.862, 0.001) or
         not Result_Within_Range (Gef.Arcsinh (-1.0), -0.881, 0.001) or
-        not Result_Within_Range (Ef.Arcsinh (-5.5), -2.406, 0.001)
-      then
+        not Result_Within_Range (Ef.Arcsinh (-5.5), -2.406, 0.001) then
          Report.Failed
            ("Incorrect result from Function Arcsin with " &
             "various input parameters");

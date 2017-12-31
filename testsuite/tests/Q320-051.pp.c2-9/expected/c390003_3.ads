@@ -15,7 +15,6 @@ package C390003_3 is -- Special_Trucks
    end record;
    procedure Tc_Validate (It : Auto_Carrier; Key : Vehicle.Tc_Keys);
    procedure Load (The_Car : in Motivators.Car; Onto : in out Auto_Carrier);
-   procedure Unload
-     (The_Car :    out Motivators.Car;
-      Off_Of  : in out Auto_Carrier);
+   procedure Unload (The_Car :    out Motivators.Car;
+      Off_Of                 : in out Auto_Carrier);
 end C390003_3;

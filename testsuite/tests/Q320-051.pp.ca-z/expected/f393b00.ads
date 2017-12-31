@@ -65,9 +65,7 @@ package F393b00 is
 
    type Device is (Teletype, Console, Big_Screen);
 
-   type Special_Alert
-     (Age : Integer)
-   is abstract new Practice_Alert with
+   type Special_Alert (Age : Integer) is abstract new Practice_Alert with
    record
       Display : Device;
    end record;

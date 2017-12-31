@@ -66,20 +66,16 @@ generic
    type Decimal_Fixed is delta <> digits <>;
 package Cxf2002_0 is
 
-   procedure Multiply_And_Truncate
-     (Balance : in out Decimal_Fixed;
-      Factor  : in     Decimal_Fixed);
+   procedure Multiply_And_Truncate (Balance : in out Decimal_Fixed;
+      Factor                                : in     Decimal_Fixed);
 
-   procedure Divide_And_Truncate
-     (Balance : in out Decimal_Fixed;
-      Divisor : in     Decimal_Fixed);
+   procedure Divide_And_Truncate (Balance : in out Decimal_Fixed;
+      Divisor                             : in     Decimal_Fixed);
 
-   procedure Multiply_And_Round
-     (Balance : in out Decimal_Fixed;
-      Factor  : in     Decimal_Fixed);
+   procedure Multiply_And_Round (Balance : in out Decimal_Fixed;
+      Factor                             : in     Decimal_Fixed);
 
-   procedure Divide_And_Round
-     (Balance : in out Decimal_Fixed;
-      Divisor : in     Decimal_Fixed);
+   procedure Divide_And_Round (Balance : in out Decimal_Fixed;
+      Divisor                          : in     Decimal_Fixed);
 
 end Cxf2002_0;

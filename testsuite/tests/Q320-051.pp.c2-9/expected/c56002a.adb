@@ -54,14 +54,8 @@ begin
 
    begin
 
-      if First /= 1 or
-        Second /= 2 or
-        Third /= 3 or
-        Fourth /= 4 or
-        Fifth /= 5 or
-        Tenth /= 10 or
-        Zeroth /= 0
-      then
+      if First /= 1 or Second /= 2 or Third /= 3 or Fourth /= 4 or
+        Fifth /= 5 or Tenth /= 10 or Zeroth /= 0 then
          Failed ("WRONG VALUES  -  1");
       end if;
 
@@ -85,21 +79,14 @@ begin
            Fourth /= Enum'Val (Ident_Int (4)) or
            Fifth /= Enum'Val (Ident_Int (5)) or
            Tenth /= Enum'Val (Ident_Int (10)) or
-           Zeroth /= Enum'Val (Ident_Int (0))
-         then
+           Zeroth /= Enum'Val (Ident_Int (0)) then
             Failed ("WRONG VALUES  -  2");
          end if;
 
       end;
 
-      if First /= 1 or
-        Second /= 2 or
-        Third /= 3 or
-        Fourth /= 4 or
-        Fifth /= 5 or
-        Tenth /= 10 or
-        Zeroth /= 0
-      then
+      if First /= 1 or Second /= 2 or Third /= 3 or Fourth /= 4 or
+        Fifth /= 5 or Tenth /= 10 or Zeroth /= 0 then
          Failed ("WRONG VALUES  -  3");
       end if;
 
@@ -115,27 +102,17 @@ begin
 
       begin
 
-         if First /= Ident_Char ('A') or
-           Second /= Ident_Char ('B') or
-           Third /= Ident_Char ('C') or
-           Fourth /= Ident_Char ('D') or
-           Fifth /= Ident_Char ('E') or
-           Tenth /= Ident_Char ('J') or
-           Zeroth /= Ident_Char ('0')
-         then
+         if First /= Ident_Char ('A') or Second /= Ident_Char ('B') or
+           Third /= Ident_Char ('C') or Fourth /= Ident_Char ('D') or
+           Fifth /= Ident_Char ('E') or Tenth /= Ident_Char ('J') or
+           Zeroth /= Ident_Char ('0') then
             Failed ("WRONG VALUES  -  4");
          end if;
 
       end;
 
-      if First /= 1 or
-        Second /= 2 or
-        Third /= 3 or
-        Fourth /= 4 or
-        Fifth /= 5 or
-        Tenth /= 10 or
-        Zeroth /= 0
-      then
+      if First /= 1 or Second /= 2 or Third /= 3 or Fourth /= 4 or
+        Fifth /= 5 or Tenth /= 10 or Zeroth /= 0 then
          Failed ("WRONG VALUES  -  5");
       end if;
 

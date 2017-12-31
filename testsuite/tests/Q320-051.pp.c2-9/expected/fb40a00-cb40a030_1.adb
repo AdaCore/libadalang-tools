@@ -7,10 +7,8 @@ package body Fb40a00.Cb40a030_1 is
    begin
       for Pos in 1 .. Loop_Count loop          -- Process string, force the
          -- raise of Constraint_Error.
-         if (Text (Pos) in 'a' .. 'z') or
-           (Text (Pos) in 'A' .. 'Z') or
-           (Text (Pos) in '0' .. '9')
-         then
+         if (Text (Pos) in 'a' .. 'z') or (Text (Pos) in 'A' .. 'Z') or
+           (Text (Pos) in '0' .. '9') then
             Increment_Alphanumeric_Count;
          else
             Increment_Non_Alphanumeric_Count;

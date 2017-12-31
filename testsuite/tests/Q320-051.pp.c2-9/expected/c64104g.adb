@@ -50,10 +50,7 @@ begin
 
    declare
       subtype Int is Integer range 0 .. 10;
-      type T
-        (C : Character := 'A';
-         B : Boolean   := False;
-         I : Int       := 0)
+      type T (C : Character := 'A'; B : Boolean := False; I : Int := 0)
       is record
          J : Integer;
          case B is

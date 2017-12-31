@@ -26,9 +26,8 @@ package body C393a06_0 is
       return Widget;
    end Create;
 
-   procedure Initialize
-     (The_Entity     : in out Organism;
-      In_The_Kingdom :        Kingdoms)
+   procedure Initialize (The_Entity : in out Organism;
+      In_The_Kingdom                :        Kingdoms)
    is
    begin
       F393a00_0.Tc_Touch ('C'); ------------------------------------------- C
@@ -42,10 +41,8 @@ package body C393a06_0 is
       return Of_The_Entity.In_Kingdom;
    end Kingdom;
 
-   procedure Tc_Check
-     (An_Entity   : Organism'Class;
-      In_Kingdom  : Kingdoms;
-      Initialized : Boolean)
+   procedure Tc_Check (An_Entity : Organism'Class; In_Kingdom : Kingdoms;
+      Initialized                : Boolean)
    is
    begin
       if F393a00_1.Initialized (An_Entity) /= Initialized then

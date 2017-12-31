@@ -59,19 +59,15 @@ begin
       "CHECK THAT THE RECORD SIZE AND THE COMPONENT " &
       "POSITIONS AND SIZES OF A DERIVED RECORD " &
       "TYPE ARE INHERITED FROM THE PARENT IF THOSE " &
-      "ASPECTS OF THE PARENT WERE DETERMINED BY " &
-      "THE PRAGMA PACK");
+      "ASPECTS OF THE PARENT WERE DETERMINED BY " & "THE PRAGMA PACK");
 
    if Derived_Type'Size /= Parent_Type'Size then
       Failed ("DERIVED_TYPE'SIZE WAS NOT INHERITED FROM " & "PARENT_TYPE");
    end if;
 
-   if Rec.I'Size /= P_Rec.I'Size or
-     Rec.C'Size /= P_Rec.C'Size or
-     Rec.B1'Size /= P_Rec.B1'Size or
-     Rec.B2'Size /= P_Rec.B2'Size or
-     Rec.E'Size /= P_Rec.E'Size
-   then
+   if Rec.I'Size /= P_Rec.I'Size or Rec.C'Size /= P_Rec.C'Size or
+     Rec.B1'Size /= P_Rec.B1'Size or Rec.B2'Size /= P_Rec.B2'Size or
+     Rec.E'Size /= P_Rec.E'Size then
       Failed
         ("THE SIZES OF DERIVED_TYPE ELEMENTS WERE NOT " &
          "INHERITED FROM PARENT_TYPE");
@@ -79,20 +75,15 @@ begin
 
    Rec := (False, 12, 'T', True, Red);
 
-   if (Rec.I /= 12) or
-     (Rec.C /= 'T') or
-     Rec.B1 or
-     (not Rec.B2) or
-     (Rec.E /= Red)
-   then
+   if (Rec.I /= 12) or (Rec.C /= 'T') or Rec.B1 or (not Rec.B2) or
+     (Rec.E /= Red) then
       Failed ("THE VALUES OF DERIVED_TYPE COMPONENTS WERE " & "INCORRECT");
    end if;
 
    if Rec.I'Position /= P_Rec.I'Position or
      Rec.C'Position /= P_Rec.C'Position or
      Rec.B1'Position /= P_Rec.B1'Position or
-     Rec.B2'Position /= P_Rec.B2'Position or
-     Rec.E'Position /= P_Rec.E'Position
+     Rec.B2'Position /= P_Rec.B2'Position or Rec.E'Position /= P_Rec.E'Position
    then
       Failed
         ("THE POSITIONS OF DERIVED_TYPE COMPONENTS WERE " &
@@ -103,8 +94,7 @@ begin
      Rec.C'First_Bit /= P_Rec.C'First_Bit or
      Rec.B1'First_Bit /= P_Rec.B1'First_Bit or
      Rec.B2'First_Bit /= P_Rec.B2'First_Bit or
-     Rec.E'First_Bit /= P_Rec.E'First_Bit
-   then
+     Rec.E'First_Bit /= P_Rec.E'First_Bit then
       Failed
         ("THE FIRST_BITS OF DERIVED_TYPE COMPONENTS WERE " &
          "NOT INHERITED FROM PARENT_TYPE");
@@ -113,8 +103,7 @@ begin
    if Rec.I'Last_Bit /= P_Rec.I'Last_Bit or
      Rec.C'Last_Bit /= P_Rec.C'Last_Bit or
      Rec.B1'Last_Bit /= P_Rec.B1'Last_Bit or
-     Rec.B2'Last_Bit /= P_Rec.B2'Last_Bit or
-     Rec.E'Last_Bit /= P_Rec.E'Last_Bit
+     Rec.B2'Last_Bit /= P_Rec.B2'Last_Bit or Rec.E'Last_Bit /= P_Rec.E'Last_Bit
    then
       Failed
         ("THE LAST_BITS OF DERIVED_TYPE COMPONENTS WERE " &

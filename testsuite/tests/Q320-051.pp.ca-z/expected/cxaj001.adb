@@ -66,8 +66,7 @@ begin
    begin
       Country := Ada.Locales.Country;
       Report.Comment ("Current country code is " & Country (1) & Country (2));
-      if Country (1) not in 'A' .. 'Z'
-        or else Country (2) not in 'A' .. 'Z'
+      if Country (1) not in 'A' .. 'Z' or else Country (2) not in 'A' .. 'Z'
       then
          Report.Failed ("Country code not in expected range");
          --else OK
@@ -82,14 +81,10 @@ begin
    begin
       Language := Ada.Locales.Language;
       Report.Comment
-        ("Current language code is " &
-         Language (1) &
-         Language (2) &
+        ("Current language code is " & Language (1) & Language (2) &
          Language (3));
-      if Language (1) not in 'a' .. 'z'
-        or else Language (2) not in 'a' .. 'z'
-        or else Language (3) not in 'a' .. 'z'
-      then
+      if Language (1) not in 'a' .. 'z' or else Language (2) not in 'a' .. 'z'
+        or else Language (3) not in 'a' .. 'z' then
          Report.Failed ("Language code not in expected range");
          --else OK
       end if;

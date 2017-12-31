@@ -11,15 +11,13 @@ procedure C452001 is
      (Name           => "Mars           ",
       Representation =>
         (Center => (Report.Ident_Int (20), Report.Ident_Int (0)),
-         Radius => Report.Ident_Int (4),
-         Color  => C452001_0.Red));
+         Radius => Report.Ident_Int (4), Color => C452001_0.Red));
 
    Mars_Perihelion : C452001_1.Planet :=
      (Name           => "Mars           ",
       Representation =>
         (Center => (Report.Ident_Int (-20), Report.Ident_Int (0)),
-         Radius => Report.Ident_Int (4),
-         Color  => C452001_0.Red));
+         Radius => Report.Ident_Int (4), Color => C452001_0.Red));
    -- Mars_Perihelion = Mars_Aphelion if user-defined equality from the tagged
    -- type Colored_Circle was incorporated into predefined equality for the
    -- tagged type Planet. User-defined equality for Colored_Circle checks
@@ -29,8 +27,7 @@ procedure C452001 is
      (Name           => "Mars           ",
       Representation =>
         (Center => (Report.Ident_Int (10), Report.Ident_Int (10)),
-         Radius => Report.Ident_Int (4),
-         Color  => C452001_0.Blue));
+         Radius => Report.Ident_Int (4), Color => C452001_0.Blue));
 
    -- Blue_Mars should equal Mars_Perihelion, because Names and Radii are equal
    -- (all other components are not).
@@ -39,8 +36,7 @@ procedure C452001 is
      (Name           => "Mars           ",
       Representation =>
         (Center => (Report.Ident_Int (10), Report.Ident_Int (10)),
-         Radius => Report.Ident_Int (4),
-         Color  => C452001_0.Green));
+         Radius => Report.Ident_Int (4), Color => C452001_0.Green));
    -- Blue_Mars should equal Green_Mars. They differ only in the Color
    -- component. All user-defined equality operations return True, but
    -- records are not equal by predefined equality.
@@ -50,25 +46,19 @@ procedure C452001 is
 
    Moon_Craters : C452001_1.Craters :=
      ((Center => (Report.Ident_Int (9), Report.Ident_Int (11)),
-       Radius => Report.Ident_Int (1),
-       Color  => C452001_0.Black),
+       Radius => Report.Ident_Int (1), Color => C452001_0.Black),
       (Center => (Report.Ident_Int (10), Report.Ident_Int (10)),
-       Radius => Report.Ident_Int (1),
-       Color  => C452001_0.Black),
+       Radius => Report.Ident_Int (1), Color => C452001_0.Black),
       (Center => (Report.Ident_Int (11), Report.Ident_Int (9)),
-       Radius => Report.Ident_Int (1),
-       Color  => C452001_0.Black));
+       Radius => Report.Ident_Int (1), Color => C452001_0.Black));
 
    Alternate_Moon_Craters : C452001_1.Craters :=
      ((Center => (Report.Ident_Int (9), Report.Ident_Int (9)),
-       Radius => Report.Ident_Int (1),
-       Color  => C452001_0.Yellow),
+       Radius => Report.Ident_Int (1), Color => C452001_0.Yellow),
       (Center => (Report.Ident_Int (10), Report.Ident_Int (10)),
-       Radius => Report.Ident_Int (1),
-       Color  => C452001_0.Purple),
+       Radius => Report.Ident_Int (1), Color => C452001_0.Purple),
       (Center => (Report.Ident_Int (11), Report.Ident_Int (11)),
-       Radius => Report.Ident_Int (1),
-       Color  => C452001_0.Purple));
+       Radius => Report.Ident_Int (1), Color => C452001_0.Purple));
    -- Moon_Craters = Alternate_Moon_Craters if user-defined equality from the
    -- tagged type Colored_Circle was incorporated into predefined equality for
    -- the untagged type Craters. User-defined equality checks only that the
@@ -78,16 +68,14 @@ procedure C452001 is
      (Name           => "Moon           ",
       Representation =>
         (Center => (Report.Ident_Int (10), Report.Ident_Int (8)),
-         Radius => Report.Ident_Int (3),
-         Color  => C452001_0.Black),
+         Radius => Report.Ident_Int (3), Color => C452001_0.Black),
       Crater => Moon_Craters);
 
    Full_Moon : C452001_1.Moon :=
      (Name           => "Moon           ",
       Representation =>
         (Center => (Report.Ident_Int (10), Report.Ident_Int (8)),
-         Radius => Report.Ident_Int (3),
-         Color  => C452001_0.Black),
+         Radius => Report.Ident_Int (3), Color => C452001_0.Black),
       Crater => Alternate_Moon_Craters);
    -- New_Moon = Full_Moon if user-defined equality from the tagged type
    -- Colored_Circle was incorporated into predefined equality for the untagged
@@ -100,28 +88,23 @@ procedure C452001 is
      (Name           => "Phobos         ",
       Representation =>
         (Center => (Report.Ident_Int (10), Report.Ident_Int (8)),
-         Radius => Report.Ident_Int (3),
-         Color  => C452001_0.Black),
+         Radius => Report.Ident_Int (3), Color => C452001_0.Black),
       Crater => Alternate_Moon_Craters);
    -- Mars_Moon /= Full_Moon since the Names differ.
 
    Alternate_Moon_Craters_2 : C452001_1.Craters :=
      ((Center => (Report.Ident_Int (10), Report.Ident_Int (10)),
-       Radius => Report.Ident_Int (1),
-       Color  => C452001_0.Red),
+       Radius => Report.Ident_Int (1), Color => C452001_0.Red),
       (Center => (Report.Ident_Int (9), Report.Ident_Int (9)),
-       Radius => Report.Ident_Int (1),
-       Color  => C452001_0.Red),
+       Radius => Report.Ident_Int (1), Color => C452001_0.Red),
       (Center => (Report.Ident_Int (10), Report.Ident_Int (9)),
-       Radius => Report.Ident_Int (1),
-       Color  => C452001_0.Red));
+       Radius => Report.Ident_Int (1), Color => C452001_0.Red));
 
    Harvest_Moon : C452001_1.Moon :=
      (Name           => "Moon           ",
       Representation =>
         (Center => (Report.Ident_Int (11), Report.Ident_Int (7)),
-         Radius => Report.Ident_Int (4),
-         Color  => C452001_0.Orange),
+         Radius => Report.Ident_Int (4), Color => C452001_0.Orange),
       Crater => Alternate_Moon_Craters_2);
    -- For Harvest_Moon, only the fields that are employed by the user-defined
    -- equality operators are the same. Everything else differs. Equality should
@@ -178,8 +161,7 @@ procedure C452001 is
         (Class => C452001_3.Normal, Color => C452001_3.Yellow, Planets => 0),
       2 => (Class => C452001_3.Normal, Color => C452001_3.White, Planets => 0),
       3 =>
-        (Class   => C452001_3.Supergiant,
-         Color   => C452001_3.White,
+        (Class   => C452001_3.Supergiant, Color => C452001_3.White,
          Planets => 3));
 
    Ursa_Minor : C452001_3.Constellation (1 .. 3) :=
@@ -187,8 +169,7 @@ procedure C452001 is
         (Class => C452001_3.Normal, Color => C452001_3.Yellow, Planets => 1),
       2 => (Class => C452001_3.Normal, Color => C452001_3.White, Planets => 0),
       3 =>
-        (Class   => C452001_3.Supergiant,
-         Color   => C452001_3.White,
+        (Class   => C452001_3.Supergiant, Color => C452001_3.White,
          Planets => 4));
    -- Little_Dipper /= Ursa_Minor if predefined equality from the untagged
    -- record type Star is used for equality of matching components in type
@@ -388,16 +369,14 @@ begin
    if Viking_1_Orbiter = Viking_1_Lander then
       Report.Failed
         ("User-defined equality for untagged array " &
-         "component was incorporated into predefined " &
-         "equality for " &
+         "component was incorporated into predefined " & "equality for " &
          "untagged record type");
    end if;
 
    if not (Viking_1_Orbiter /= Viking_1_Lander) then
       Report.Failed
         ("User-defined equality for untagged array " &
-         "component was incorporated into predefined " &
-         "inequality for " &
+         "component was incorporated into predefined " & "inequality for " &
          "untagged record type");
    end if;
 
@@ -406,16 +385,14 @@ begin
    if Voyagers = Jupiter_Craft then
       Report.Failed
         ("User-defined equality for untagged array " &
-         "component was incorporated into predefined " &
-         "equality for " &
+         "component was incorporated into predefined " & "equality for " &
          "array type");
    end if;
 
    if not (Voyagers /= Jupiter_Craft) then
       Report.Failed
         ("User-defined equality for untagged array " &
-         "component was incorporated into predefined " &
-         "inequality for " &
+         "component was incorporated into predefined " & "inequality for " &
          "array type");
    end if;
 
@@ -444,8 +421,7 @@ begin
    if not (Little_Dipper = Ursa_Minor) then
       Report.Failed
         ("User-defined equality for untagged record component " &
-         "was not incorporated into predefined equality " &
-         "for array type");
+         "was not incorporated into predefined equality " & "for array type");
    end if;
 
    if Little_Dipper /= Ursa_Minor then
@@ -474,16 +450,14 @@ begin
    if not (Tptf_1 = Tptf_2) then
       Report.Failed
         ("Predefined equality for full type " &
-         "was used to determine equality of " &
-         "tagged private type " &
+         "was used to determine equality of " & "tagged private type " &
          "instead of user-defined (primitive) equality");
    end if;
 
    if Tptf_1 /= Tptf_2 then
       Report.Failed
         ("Predefined equality for full type " &
-         "was used to determine inequality of " &
-         "tagged private type " &
+         "was used to determine inequality of " & "tagged private type " &
          "instead of user-defined (primitive) equality");
    end if;
 
@@ -495,8 +469,7 @@ begin
       Report.Failed
         ("Predefined equality for full type " &
          "was used to determine equality of " &
-         "private type (untagged partial view, " &
-         "tagged full view) " &
+         "private type (untagged partial view, " & "tagged full view) " &
          "instead of user-defined (primitive) equality");
    end if;
 
@@ -504,8 +477,7 @@ begin
       Report.Failed
         ("Predefined equality for full type " &
          "was used to determine inequality of " &
-         "private type (untagged partial view, " &
-         "tagged full view) " &
+         "private type (untagged partial view, " & "tagged full view) " &
          "instead of user-defined (primitive) equality");
    end if;
 

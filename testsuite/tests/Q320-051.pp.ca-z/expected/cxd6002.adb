@@ -11,8 +11,7 @@ begin
    Report.Test
      ("CXD6002",
       "Check that an asynchronous transfer of control" &
-      " takes place as soon" &
-      " as the aborted statement is no longer in an" &
+      " takes place as soon" & " as the aborted statement is no longer in an" &
       " abort-deferred region.");
 
    -- the requirements on the abort being immediate are only placed upon

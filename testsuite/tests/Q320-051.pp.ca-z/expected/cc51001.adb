@@ -17,9 +17,7 @@ procedure Cc51001 is
    Fmsg : Cc51001_1.From_Msg_Type :=
      (Text => "This is message #002", Slen => 2, From => "Me");
    Tfmsg : Cc51001_1.To_From_Msg_Type :=
-     (Text => "This is message #003",
-      From => "You       ",
-      Dlen => 4,
+     (Text => "This is message #003", From => "You       ", Dlen => 4,
       To   => "Them");
 
    Expected_Msg   : constant String := "This is message #001";

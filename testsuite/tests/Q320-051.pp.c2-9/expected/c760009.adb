@@ -25,58 +25,46 @@ procedure C760009 is
    procedure Fail (Which : String; Expect, Got : Natural) is
    begin
       Report.Failed
-        (Which &
-         " Expected" &
-         Natural'Image (Expect) &
-         " got" &
+        (Which & " Expected" & Natural'Image (Expect) & " got" &
          Natural'Image (Got));
    end Fail;
 
-   procedure Master_Assertion
-     (Layer_2_Inits   : Natural;
-      Layer_2_Finals  : Natural;
-      Layer_1_Inits   : Natural;
-      Layer_1_Adjs    : Natural;
-      Layer_1_Finals  : Natural;
-      Failing_Message : String)
+   procedure Master_Assertion (Layer_2_Inits : Natural;
+      Layer_2_Finals : Natural; Layer_1_Inits : Natural;
+      Layer_1_Adjs : Natural; Layer_1_Finals : Natural;
+      Failing_Message                        : String)
    is
 
    begin
 
       if C760009_2.Initialized /= Layer_2_Inits then
          Fail
-           ("C760009_2.Initialize " & Failing_Message,
-            Layer_2_Inits,
+           ("C760009_2.Initialize " & Failing_Message, Layer_2_Inits,
             C760009_2.Initialized);
       end if;
 
       if C760009_2.Finalized not in Layer_2_Finals .. Layer_2_Finals * 2 then
          Fail
-           ("C760009_2.Finalize " & Failing_Message,
-            Layer_2_Finals,
+           ("C760009_2.Finalize " & Failing_Message, Layer_2_Finals,
             C760009_2.Finalized);
       end if;
 
       if C760009_1.Initialize_Called /= Layer_1_Inits then
          Fail
-           ("C760009_1.Initialize " & Failing_Message,
-            Layer_1_Inits,
+           ("C760009_1.Initialize " & Failing_Message, Layer_1_Inits,
             C760009_1.Initialize_Called);
       end if;
 
       if C760009_1.Adjust_Called not in Layer_1_Adjs .. Layer_1_Adjs * 2 then
          Fail
-           ("C760009_1.Adjust " & Failing_Message,
-            Layer_1_Adjs,
+           ("C760009_1.Adjust " & Failing_Message, Layer_1_Adjs,
             C760009_1.Adjust_Called);
       end if;
 
-      if C760009_1.Finalize_Called not in
-          Layer_1_Finals .. Layer_1_Finals * 2
+      if C760009_1.Finalize_Called not in Layer_1_Finals .. Layer_1_Finals * 2
       then
          Fail
-           ("C760009_1.Finalize " & Failing_Message,
-            Layer_1_Finals,
+           ("C760009_1.Finalize " & Failing_Message, Layer_1_Finals,
             C760009_1.Finalize_Called);
       end if;
 
@@ -86,52 +74,42 @@ procedure C760009 is
 
    end Master_Assertion;
 
-   procedure Lesser_Assertion
-     (Layer_2_Inits   : Natural;
-      Layer_2_Finals  : Natural;
-      Layer_1_Inits   : Natural;
-      Layer_1_Adjs    : Natural;
-      Layer_1_Finals  : Natural;
-      Failing_Message : String)
+   procedure Lesser_Assertion (Layer_2_Inits : Natural;
+      Layer_2_Finals : Natural; Layer_1_Inits : Natural;
+      Layer_1_Adjs : Natural; Layer_1_Finals : Natural;
+      Failing_Message                        : String)
    is
    begin
 
       if C760009_2.Initialized > Layer_2_Inits then
          Fail
-           ("C760009_2.Initialize " & Failing_Message,
-            Layer_2_Inits,
+           ("C760009_2.Initialize " & Failing_Message, Layer_2_Inits,
             C760009_2.Initialized);
       end if;
 
       if C760009_2.Finalized < Layer_2_Inits or
-        C760009_2.Finalized > Layer_2_Finals * 2
-      then
+        C760009_2.Finalized > Layer_2_Finals * 2 then
          Fail
-           ("C760009_2.Finalize " & Failing_Message,
-            Layer_2_Finals,
+           ("C760009_2.Finalize " & Failing_Message, Layer_2_Finals,
             C760009_2.Finalized);
       end if;
 
       if C760009_1.Initialize_Called > Layer_1_Inits then
          Fail
-           ("C760009_1.Initialize " & Failing_Message,
-            Layer_1_Inits,
+           ("C760009_1.Initialize " & Failing_Message, Layer_1_Inits,
             C760009_1.Initialize_Called);
       end if;
 
       if C760009_1.Adjust_Called > Layer_1_Adjs * 2 then
          Fail
-           ("C760009_1.Adjust " & Failing_Message,
-            Layer_1_Adjs,
+           ("C760009_1.Adjust " & Failing_Message, Layer_1_Adjs,
             C760009_1.Adjust_Called);
       end if;
 
       if C760009_1.Finalize_Called < Layer_1_Inits or
-        C760009_1.Finalize_Called > Layer_1_Finals * 2
-      then
+        C760009_1.Finalize_Called > Layer_1_Finals * 2 then
          Fail
-           ("C760009_1.Finalize " & Failing_Message,
-            Layer_1_Finals,
+           ("C760009_1.Finalize " & Failing_Message, Layer_1_Finals,
             C760009_1.Finalize_Called);
       end if;
 

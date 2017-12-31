@@ -85,8 +85,7 @@ begin
       -- exception will be handled to produce a Not_Applicable result.
 
       Text_Io.Create
-        (File => Data_File,
-         Mode => Text_Io.Append_File,
+        (File => Data_File, Mode => Text_Io.Append_File,
          Name => Data_Filename);
 
    exception
@@ -126,8 +125,7 @@ begin
          -- Simulated usage code.
          -- Set new page/line positions.
          Text_Io.Put_Line
-           (Data_File,
-            "Add some optional data to the file here");
+           (Data_File, "Add some optional data to the file here");
          Text_Io.New_Page (Data_File);
          Text_Io.New_Line (File => Data_File, Spacing => 2);
 
@@ -147,8 +145,7 @@ begin
 
          -- Test control code.
          if (Integer (Text_Io.Line (Data_File)) /= Report.Ident_Int (5)) or
-           (Integer (Text_Io.Col (Data_File)) /= Report.Ident_Int (8))
-         then
+           (Integer (Text_Io.Col (Data_File)) /= Report.Ident_Int (8)) then
             Report.Failed ("Incorrect results from line/column positioning");
          end if;
 
@@ -196,11 +193,9 @@ begin
             Text_Io.Get_Line (Data_File, Tc_String, Tc_Position);
          end loop;
 
-         if (Tc_Position /= 16)
-           or else          -- Verify the title line.
-           (Tc_String (1 .. 4) /= "VII.")
-           or else (Tc_String (3 .. 16) /= ("I.  " & Appendix_Title))
-         then
+         if (Tc_Position /= 16) or else          -- Verify the title line.
+         (Tc_String (1 .. 4) /= "VII.")
+           or else (Tc_String (3 .. 16) /= ("I.  " & Appendix_Title)) then
             Report.Failed ("Incorrect positioning of title line");
          end if;
 
@@ -211,7 +206,7 @@ begin
          end loop;
 
          if (Tc_Position /= 10) or               -- Verify the contents.
-           (Tc_String (8 .. 10) /= Appendix_Content)
+         (Tc_String (8 .. 10) /= Appendix_Content)
          then
             Report.Failed ("Incorrect positioning of contents line");
          end if;

@@ -40,8 +40,7 @@ procedure C34001c is
    type Parent is (E1, E2, E3, 'A', E4, E5, E6);
 
    type T is
-     new Parent range
-       Parent'Val (Ident_Int (Parent'Pos (E3))) ..
+     new Parent range Parent'Val (Ident_Int (Parent'Pos (E3))) ..
          Parent'Val (Ident_Int (Parent'Pos (E4)));
 
    subtype Subparent is Parent range E3 .. E4;
@@ -64,19 +63,13 @@ begin
 
    -- CHECK THAT BASE TYPE VALUES NOT IN THE SUBTYPE ARE PRESENT.
 
-   if T'Base'First /= E1 or
-     T'Base'Last /= E6 or
-     S'Base'First /= E1 or
-     S'Base'Last /= E6
-   then
+   if T'Base'First /= E1 or T'Base'Last /= E6 or S'Base'First /= E1 or
+     S'Base'Last /= E6 then
       Failed ("INCORRECT 'BASE'FIRST OR 'BASE'LAST");
    end if;
 
-   if T'Pred (E2) /= E1 or
-     T'Succ (E1) /= E2 or
-     S'Pred (E2) /= E1 or
-     S'Succ (E1) /= E2
-   then
+   if T'Pred (E2) /= E1 or T'Succ (E1) /= E2 or S'Pred (E2) /= E1 or
+     S'Succ (E1) /= E2 then
       Failed ("INCORRECT 'PRED OR 'SUCC");
    end if;
 

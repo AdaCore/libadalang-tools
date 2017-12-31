@@ -8,8 +8,7 @@ with Cxe4003_Call_Test;
 procedure Cxe4003_A is
 begin
    Report.Test
-     ("CXE4003_A",
-      "Check the blocking properties of " & "remote calls");
+     ("CXE4003_A", "Check the blocking properties of " & "remote calls");
    -- Check that the task executing a remote subprogram call blocks until the
    -- subprogram in the called partition returns.
    Cxe4003_Blocking_Test.Do_Test;

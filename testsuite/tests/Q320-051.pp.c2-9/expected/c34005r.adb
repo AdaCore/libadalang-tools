@@ -86,10 +86,8 @@ procedure C34005r is
 
       type Parent is array (Index range <>) of Component;
 
-      function Create
-        (F, L  : Index;
-         C     : Component;
-         Dummy : Parent   -- TO RESOLVE OVERLOADING.
+      function Create (F, L : Index; C : Component;
+         Dummy              : Parent   -- TO RESOLVE OVERLOADING.
          ) return Parent;
 
       function Equal (X, Y : Parent) return Boolean;
@@ -137,10 +135,8 @@ procedure C34005r is
 
    package body Pkg_P is
 
-      function Create
-        (F, L  : Index;
-         C     : Component;
-         Dummy : Parent) return Parent
+      function Create (F, L : Index; C : Component;
+         Dummy              : Parent) return Parent
       is
          B : Component;
       begin

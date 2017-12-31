@@ -25,9 +25,8 @@ package body C413003q is
       X.Value := 3.0 * Value;
    end Class_Wide_Proc;
 
-   function Class_Wide_Func
-     (X     : access constant Tq'Class;
-      Value : Float) return Float
+   function Class_Wide_Func (X : access constant Tq'Class;
+      Value                    : Float) return Float
    is
    begin
       return 3.0 * Value;
@@ -54,9 +53,8 @@ package body C413003q is
          return 102;
       end Prim_Func;
 
-      function Prim_Func
-        (X     : access constant Tpp;
-         Value : Integer) return Integer
+      function Prim_Func (X : access constant Tpp;
+         Value              : Integer) return Integer
       is
       begin
          return 4 * Value;

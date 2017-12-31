@@ -16,8 +16,7 @@ is                             -- private child
 
    function New_File_Validated
      (File : File_Type :=
-        (Descriptor => First_File,
-         Mode       => Active_Mode,
+        (Descriptor => First_File, Mode => Active_Mode,
          Name       => System_File_Name))
       return Boolean;
 

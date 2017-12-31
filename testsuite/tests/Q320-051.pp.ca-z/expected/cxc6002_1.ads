@@ -71,18 +71,14 @@ package Cxc6002_1 is
 
    pragma Volatile (Hoover);
 
-   procedure Check_Copy_Semantics
-     (Unit : in out Generator;
-      Copy : in     Generator);
+   procedure Check_Copy_Semantics (Unit : in out Generator;
+      Copy                              : in     Generator);
 
    ------------ Subtest 2, Volatile Copy Semantics, Component
 
    Grid : array (1 .. 5) of Generator :=
-     (Hoover,
-      ("Hydroelectric  ", 1_936),
-      ("Fossil Fuel Oil", 1_932),
-      ("Wind Turbine   ", 1_987),
-      ("Geothermal     ", 1_956));
+     (Hoover, ("Hydroelectric  ", 1_936), ("Fossil Fuel Oil", 1_932),
+      ("Wind Turbine   ", 1_987), ("Geothermal     ", 1_956));
 
    pragma Volatile_Components (Grid);
 

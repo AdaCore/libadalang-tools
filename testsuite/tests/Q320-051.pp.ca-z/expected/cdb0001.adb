@@ -58,8 +58,7 @@ procedure Cdb0001 is
 
    type Acc_Array_Type is
      array
-       (Integer range
-          1 ..
+       (Integer range 1 ..
             (Check_Type'Storage_Size / Units_Per_Integer) + 1) of Check_Type;
    Acc_Array : Acc_Array_Type;
 
@@ -71,8 +70,7 @@ begin
      ("CDB0001",
       "If Storage_Size is specified for an access " &
       "type, check that Storage_Error is raised by " &
-      "an allocator when insufficient storage is " &
-      "available");
+      "an allocator when insufficient storage is " & "available");
 
    if Check_Type'Storage_Size < Ident_Int (Specified_Size) then
       Report.Failed

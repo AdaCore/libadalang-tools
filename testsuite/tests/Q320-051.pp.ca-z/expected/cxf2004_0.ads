@@ -71,20 +71,16 @@ generic
    type Ordinary_Fixed is delta <>;
 package Cxf2004_0 is
 
-   procedure Multiply_And_Truncate
-     (Balance : in out Decimal_Fixed;
-      Factor  : in     Ordinary_Fixed);
+   procedure Multiply_And_Truncate (Balance : in out Decimal_Fixed;
+      Factor                                : in     Ordinary_Fixed);
 
-   procedure Divide_And_Truncate
-     (Balance : in out Decimal_Fixed;
-      Divisor : in     Ordinary_Fixed);
+   procedure Divide_And_Truncate (Balance : in out Decimal_Fixed;
+      Divisor                             : in     Ordinary_Fixed);
 
-   procedure Multiply_And_Round
-     (Balance : in out Decimal_Fixed;
-      Factor  : in     Ordinary_Fixed);
+   procedure Multiply_And_Round (Balance : in out Decimal_Fixed;
+      Factor                             : in     Ordinary_Fixed);
 
-   procedure Divide_And_Round
-     (Balance : in out Decimal_Fixed;
-      Divisor : in     Ordinary_Fixed);
+   procedure Divide_And_Round (Balance : in out Decimal_Fixed;
+      Divisor                          : in     Ordinary_Fixed);
 
 end Cxf2004_0;

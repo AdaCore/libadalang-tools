@@ -47,28 +47,15 @@ procedure C34009l is
 
       type Parent (B : Boolean := True; L : Length := 3) is limited private;
 
-      function Create
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         J : Integer;
-         F : Float;
-         X : Parent  -- TO RESOLVE OVERLOADING.
+      function Create (B : Boolean; L : Length; I : Integer; S : String;
+         J : Integer; F : Float; X : Parent  -- TO RESOLVE OVERLOADING.
          ) return Parent;
 
-      function Con
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         J : Integer) return Parent;
+      function Con (B : Boolean; L : Length; I : Integer; S : String;
+         J            : Integer) return Parent;
 
-      function Con
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         F : Float) return Parent;
+      function Con (B : Boolean; L : Length; I : Integer;
+         F            : Float) return Parent;
 
       function Equal (X, Y : Parent) return Boolean;
 
@@ -102,14 +89,8 @@ procedure C34009l is
 
    package body Pkg is
 
-      function Create
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         J : Integer;
-         F : Float;
-         X : Parent) return Parent
+      function Create (B : Boolean; L : Length; I : Integer; S : String;
+         J               : Integer; F : Float; X : Parent) return Parent
       is
       begin
          case B is
@@ -120,22 +101,15 @@ procedure C34009l is
          end case;
       end Create;
 
-      function Con
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         J : Integer) return Parent
+      function Con (B : Boolean; L : Length; I : Integer; S : String;
+         J            : Integer) return Parent
       is
       begin
          return (True, L, I, S, J);
       end Con;
 
-      function Con
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         F : Float) return Parent
+      function Con (B : Boolean; L : Length; I : Integer;
+         F            : Float) return Parent
       is
       begin
          return (False, L, I, F);
@@ -167,16 +141,14 @@ begin
    -- CHECK THAT BASE TYPE VALUES NOT IN THE SUBTYPE ARE PRESENT.
 
    if not Equal
-       (Create (False, 2, 3, "ZZ", 5, 6.0, X),
-        Con (False, 2, 3, 6.0)) or
+       (Create (False, 2, 3, "ZZ", 5, 6.0, X), Con (False, 2, 3, 6.0)) or
      not Equal (Create (False, 2, 3, "ZZ", 5, 6.0, Y), Con (False, 2, 3, 6.0))
    then
       Failed ("CAN'T CREATE BASE TYPE VALUES OUTSIDE THE SUBTYPE");
    end if;
 
    if Create (False, 2, 3, "ZZ", 5, 6.0, X) in T or
-     Create (False, 2, 3, "ZZ", 5, 6.0, Y) in S
-   then
+     Create (False, 2, 3, "ZZ", 5, 6.0, Y) in S then
       Failed ("INCORRECT ""IN""");
    end if;
 

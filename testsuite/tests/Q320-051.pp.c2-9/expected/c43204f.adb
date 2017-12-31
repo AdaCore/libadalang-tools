@@ -49,13 +49,12 @@ procedure C43204f is
        (Ident_Int (1) .. Ident_Int (-1),
         Ident_Int (-1) .. Ident_Int (1)) of Integer;
 
-   procedure Proc
-     (Pa11 : Arr11 := (1, 1, 1, 1, 1, 1, others => Ident_Int (2));
-      Pa12 : Arr12 := (others => Ident_Int (2));
-      Pa13 : Arr13 := (others => Ident_Int (2));
+   procedure Proc (Pa11 : Arr11 := (1, 1, 1, 1, 1, 1, others => Ident_Int (2));
+      Pa12              : Arr12 := (others => Ident_Int (2));
+      Pa13              : Arr13 := (others => Ident_Int (2));
       Pa21 : Arr21 := ((1, 1, 1), (1, 1, 1), (1, others => Ident_Int (2)));
       Pa22 : Arr22 := ((1, 1, 1), (1, 1, 1), (others => Ident_Int (2)));
-      Pa23 : Arr23 :=
+      Pa23              : Arr23 :=
         ((1, 1, 1), (1, 1, 1), (1, 1, 1), others => (others => Ident_Int (2)));
       Pa24 : Arr24 := (others => (others => Ident_Int (2))))
    is

@@ -51,8 +51,7 @@ procedure C87b18b is
       if Stat = Fail then
          Failed
            ("DISCRIMINANT ASSOCIATION EXPRESSION MUST " &
-            "MATCH THE TYPE OF THE CORRESPONDING " &
-            "DISCRIMINANT");
+            "MATCH THE TYPE OF THE CORRESPONDING " & "DISCRIMINANT");
       end if;
       return Arg;
    end F1;

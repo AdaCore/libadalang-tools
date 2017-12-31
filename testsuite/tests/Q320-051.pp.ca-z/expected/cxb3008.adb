@@ -85,11 +85,9 @@ begin
 
       package Ic renames Interfaces.C;
       package Ics renames Interfaces.C.Strings;
-      package Icp is new Interfaces.C.Pointers
-        (Index              => Ic.Size_T,
-         Element            => Ic.Char,
-         Element_Array      => Ic.Char_Array,
-         Default_Terminator => Ic.Nul);
+      package Icp is new Interfaces.C.Pointers (Index => Ic.Size_T,
+         Element => Ic.Char, Element_Array => Ic.Char_Array,
+         Default_Terminator                           => Ic.Nul);
       use Ada.Exceptions;
 
       use type Ic.Char;
@@ -101,9 +99,8 @@ begin
       -- including the terminating nul char, into the char_array pointed to
       -- by Target.
 
-      procedure String_Copy
-        (Target :    out Ic.Char_Array;
-         Source : in     Ic.Char_Array);
+      procedure String_Copy (Target :    out Ic.Char_Array;
+         Source                     : in     Ic.Char_Array);
 
       -- The String_Length function returns the length of the nul-terminated
       -- string pointed to by The_String. The nul is not included in the count.
@@ -116,9 +113,8 @@ begin
       -- value returned is zero.
 
 --      type Acc_ptr is access IC.char_array;
-      function String_To_Double
-        (The_String : in Ic.Char_Array;
-         End_Ptr    :    Icp.Pointer := null) return Ic.Double;
+      function String_To_Double (The_String : in Ic.Char_Array;
+         End_Ptr :    Icp.Pointer := null) return Ic.Double;
 
       -- Use the <string.h> strcpy function as a completion to the procedure
       -- specification. Note that the Ada interface to this C function is in
@@ -216,8 +212,7 @@ begin
    exception
       when The_Error : others =>
          Report.Failed
-           ("The following exception was raised in the " &
-            "Test_Block: " &
+           ("The following exception was raised in the " & "Test_Block: " &
             Exception_Name (The_Error));
    end Test_Block;
 

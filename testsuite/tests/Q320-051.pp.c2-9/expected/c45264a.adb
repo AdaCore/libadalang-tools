@@ -40,8 +40,7 @@ begin
    Test
      ("C45264A",
       "CHECK THAT EQUALITY COMPARISONS YIELD CORRECT " &
-      "RESULTS FOR ONE DIMENSIONAL AND MULTI-" &
-      "DIMENSIONAL ARRAY TYPES");
+      "RESULTS FOR ONE DIMENSIONAL AND MULTI-" & "DIMENSIONAL ARRAY TYPES");
 
    declare
 
@@ -50,8 +49,7 @@ begin
    begin
 
       if A1'(1 .. Ident_Int (2) => Ident_Int (1)) /=
-        A1'(Ident_Int (2) .. 3 => Ident_Int (1))
-      then
+        A1'(Ident_Int (2) .. 3 => Ident_Int (1)) then
          Failed ("A1 - ARRAYS NOT EQUAL");
       end if;
 

@@ -5,8 +5,7 @@ package body C954001_0 is  -- Disk management abstraction.
    protected body Disk_Device is
 
       entry Read (Where : Disk_Address; Data : out Disk_Buffer)
-        when not Operation_Pending
-        is
+        when not Operation_Pending is
       begin
          if (Where.Track = Current_Track) then      -- If the head is over the
             -- Read data from disk... -- requested track, read
@@ -35,8 +34,7 @@ package body C954001_0 is  -- Disk management abstraction.
       end Tc_Track;
 
       entry Pending_Read (Where : Disk_Address; Data : out Disk_Buffer)
-        when Disk_Interrupted
-        is
+        when Disk_Interrupted is
       begin
          Current_Track := Where.Track;              -- Head is now over the
          -- Read data from disk... -- correct track; read

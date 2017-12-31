@@ -7,8 +7,7 @@ begin
    Test
      ("C38108B",
       "CHECK THAT INCOMPLETE TYPE CAN BE DECLARED IN " &
-      "PRIVATE PART WITHOUT FULL DECLARATION - " &
-      "LIBRARY PACKAGE");
+      "PRIVATE PART WITHOUT FULL DECLARATION - " & "LIBRARY PACKAGE");
 
    Assign (2, Val_1);
    Assign (2, Val_2);

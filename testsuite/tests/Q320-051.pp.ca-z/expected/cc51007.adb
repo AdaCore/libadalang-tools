@@ -17,13 +17,11 @@ procedure Cc51007 is
 
    Tc_Low_Expected : constant Alert_Support.Extended_Alert :=
      (Time_Of_Arrival => Ada.Calendar.Time_Of (1_984, 1, 1),
-      Message         => "Low Alert!",
-      Addendum        => "No comment");
+      Message         => "Low Alert!", Addendum => "No comment");
 
    Tc_Med_Expected : constant Alert_Support.Extended_Alert :=
      (Time_Of_Arrival => Ada.Calendar.Time_Of (2_001, 1, 1),
-      Message         => "Med Alert!",
-      Addendum        => "No comment");
+      Message         => "Med Alert!", Addendum => "No comment");
 
    Tc_Ext_Expected : constant Alert_Support.Extended_Alert := Tc_Low_Expected;
 
@@ -39,8 +37,7 @@ begin
       "allocators of, aggregates of, and nonabstract functions " &
       "returning these types are legal. Check that calls to the " &
       "abstract primitive subprograms of the ancestor dispatch " &
-      "to the bodies corresponding to the tag of the actual " &
-      "parameters");
+      "to the bodies corresponding to the tag of the actual " & "parameters");
 
    Tc_Result := Alert_Support.Annotate_Alert (Cc51007_1.Low);  -- Dispatching
    -- call.

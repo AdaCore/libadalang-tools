@@ -9,16 +9,13 @@ procedure Cxaa016 is
    No_Reset              : exception;
    Not_Applicable_System : Boolean := False;
 
-   procedure Delete_File
-     (A_File : in out Ada.Text_Io.File_Type;
-      Id_Num : in     Integer)
+   procedure Delete_File (A_File : in out Ada.Text_Io.File_Type;
+      Id_Num                     : in     Integer)
    is
    begin
       if not Ada.Text_Io.Is_Open (A_File) then
          Ada.Text_Io.Open
-           (A_File,
-            Ada.Text_Io.In_File,
-            Report.Legal_File_Name (Id_Num));
+           (A_File, Ada.Text_Io.In_File, Report.Legal_File_Name (Id_Num));
       end if;
       Ada.Text_Io.Delete (A_File);
    exception
@@ -56,12 +53,8 @@ begin
       -- functions.
 
       Initial_Environment : System_File_Array_Type (1 .. 6) :=
-        (Standard_Input,
-         Standard_Output,
-         Standard_Error,
-         Current_Input,
-         Current_Output,
-         Current_Error);
+        (Standard_Input, Standard_Output, Standard_Error, Current_Input,
+         Current_Output, Current_Error);
 
       New_Input_Ptr  : File_Access := New_Input_File'Access;
       New_Output_Ptr : File_Access := New_Output_File'Access;
@@ -77,10 +70,8 @@ begin
       Line_5 : constant String := "This is the first line in Error file 2";
       Line_6 : constant String := "This is the next line in Error file 2";
 
-      procedure New_File
-        (The_File : in out File_Type;
-         Mode     : in     File_Mode;
-         Next     : in     Integer)
+      procedure New_File (The_File : in out File_Type; Mode : in File_Mode;
+         Next                      : in     Integer)
       is
       begin
          Create (The_File, Mode, Report.Legal_File_Name (Next));
@@ -99,18 +90,14 @@ begin
          -- destinations for input/output/error, and that the six
          -- functions returning File_Access values are available.
          if not
-           (Env (1) = Standard_Input and
-            Env (2) = Standard_Output and
-            Env (3) = Standard_Error and
-            Env (4) = Current_Input and
-            Env (5) = Current_Output and
-            Env (6) = Current_Error)
+           (Env (1) = Standard_Input and Env (2) = Standard_Output and
+            Env (3) = Standard_Error and Env (4) = Current_Input and
+            Env (5) = Current_Output and Env (6) = Current_Error)
          then
             Report.Failed
               ("At the start of the test, the Standard and " &
                "Current File_Access values associated with " &
-               "system Input, Output, and Error files do " &
-               "not correspond");
+               "system Input, Output, and Error files do " & "not correspond");
          end if;
       end Check_Initial_Environment;
 
@@ -146,12 +133,8 @@ begin
             -- Capture the state of the current environment.
 
             Current_Env : System_File_Array_Type (1 .. 6) :=
-              (Standard_Input,
-               Standard_Output,
-               Standard_Error,
-               Current_Input,
-               Current_Output,
-               Current_Error);
+              (Standard_Input, Standard_Output, Standard_Error, Current_Input,
+               Current_Output, Current_Error);
          begin
 
             -- Compare the current environment with that of the saved initial
@@ -185,11 +168,8 @@ begin
          Get_Line (E_File_1, Str_5, Len_5);  -- then had two additional lines
          Get_Line (E_File_1, Str_6, Len_6);  -- appended from the second error
          -- file.
-         if Str_3 (1 .. Len_3) /= Line_3 or
-           Str_4 (1 .. Len_4) /= Line_4 or
-           Str_5 (1 .. Len_5) /= Line_5 or
-           Str_6 (1 .. Len_6) /= Line_6
-         then
+         if Str_3 (1 .. Len_3) /= Line_3 or Str_4 (1 .. Len_4) /= Line_4 or
+           Str_5 (1 .. Len_5) /= Line_5 or Str_6 (1 .. Len_6) /= Line_6 then
             Report.Failed ("Incorrect results from first Error file");
          end if;
 
@@ -372,8 +352,7 @@ begin
          Not_Applicable_System := True;
       when The_Error : others =>
          Report.Failed
-           ("The following exception was raised in the " &
-            "Test_Block: " &
+           ("The following exception was raised in the " & "Test_Block: " &
             Exception_Name (The_Error));
    end Test_Block;
 

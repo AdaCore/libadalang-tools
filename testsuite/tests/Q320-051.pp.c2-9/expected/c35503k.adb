@@ -40,8 +40,7 @@ begin
    Test
      ("C35503K",
       "CHECK THAT 'POS' AND 'VAL' YIELD THE " &
-      "CORRECT RESULTS WHEN THE PREFIX IS AN " &
-      "INTEGER TYPE");
+      "CORRECT RESULTS WHEN THE PREFIX IS AN " & "INTEGER TYPE");
 
    declare
       type Int is range -6 .. 6;

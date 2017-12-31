@@ -39,9 +39,8 @@ package body Cc70a01_0 is  -- Generic complex matrix operations.
 
                --==============================================--
 
-   function "*"
-     (Left  : Complex_Matrix_Type;
-      Right : Complex_Matrix_Type) return Complex_Matrix_Type
+   function "*" (Left : Complex_Matrix_Type;
+      Right           : Complex_Matrix_Type) return Complex_Matrix_Type
    is
 
       subtype Rows is Positive range Left'Range (1);
@@ -49,8 +48,7 @@ package body Cc70a01_0 is  -- Generic complex matrix operations.
 
       Result : Complex_Matrix_Type (Rows, Columns);
    begin
-      if Left'Length (2) /=
-        Right'Length (1)
+      if Left'Length (2) /= Right'Length (1)
       then       -- # columns of Left must
          -- match # rows of Right.
          raise Dimension_Mismatch;

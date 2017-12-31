@@ -17,9 +17,8 @@ package body C390a010 is
       Display (La);                      -- Call inherited operation.
    end Handle;
 
-   procedure Assign_Officer
-     (Ma : in out Medium_Alert_Type;
-      To : in     Person_Enum)
+   procedure Assign_Officer (Ma : in out Medium_Alert_Type;
+      To                        : in     Person_Enum)
    is
    begin
       Ma.Action_Officer := To;

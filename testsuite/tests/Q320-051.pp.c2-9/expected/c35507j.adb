@@ -65,9 +65,7 @@ begin
          for Ch in Subch'Val (I1 + 1) .. Subch'Val (I2) loop
             if Subch'Pred (Ch) /= Subch'Val (Subch'Pos (Ch) - 1) then
                Failed
-                 ("INCORRECT VALUE FOR " &
-                  Str &
-                  "'PRED OF " &
+                 ("INCORRECT VALUE FOR " & Str & "'PRED OF " &
                   Subch'Image (Ch));
             end if;
          end loop;
@@ -75,9 +73,7 @@ begin
          for Ch in Subch'Val (I1) .. Subch'Val (I2 - 1) loop
             if Subch'Succ (Ch) /= Subch'Val (Subch'Pos (Ch) + 1) then
                Failed
-                 ("INCORRECT VALUE FOR " &
-                  Str &
-                  "'SUCC OF " &
+                 ("INCORRECT VALUE FOR " & Str & "'SUCC OF " &
                   Subch'Image (Ch));
             end if;
          end loop;

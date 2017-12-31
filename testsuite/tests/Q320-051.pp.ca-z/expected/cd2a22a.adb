@@ -69,38 +69,31 @@ procedure Cd2a22a is
       end if;
    end Ident;
 
-   procedure Proc
-     (Ci0, Ci2   :        Check_Type;
-      Cio1, Cio2 : in out Check_Type;
-      Co2        :    out Check_Type)
+   procedure Proc (Ci0, Ci2 :     Check_Type; Cio1, Cio2 : in out Check_Type;
+      Co2                   : out Check_Type)
    is
    begin
       if not
-        ((Ci0 < Ident (One)) and
-         (Ident (Ci2) > Ident (Cio1)) and
-         (Cio1 <= Ident (One)) and
-         (Ident (Two) = Ci2))
+        ((Ci0 < Ident (One)) and (Ident (Ci2) > Ident (Cio1)) and
+         (Cio1 <= Ident (One)) and (Ident (Two) = Ci2))
       then
          Failed ("INCORRECT RESULTS FOR RELATIONAL OPERATORS " & "- 1");
       end if;
 
       if Check_Type'Pos (Ci0) /= Ident_Int (0) or
         Check_Type'Pos (Cio1) /= Ident_Int (1) or
-        Check_Type'Pos (Ci2) /= Ident_Int (2)
-      then
+        Check_Type'Pos (Ci2) /= Ident_Int (2) then
          Failed ("INCORRECT VALUE FOR CHECK_TYPE'POS - 1");
       end if;
 
       if Check_Type'Succ (Ci0) /= Ident (Cio1) or
-        Check_Type'Succ (Cio1) /= Ident (Ci2)
-      then
+        Check_Type'Succ (Cio1) /= Ident (Ci2) then
          Failed ("INCORRECT VALUE FOR CHECK_TYPE'SUCC - 1");
       end if;
 
       if Check_Type'Image (Ci0) /= Ident_Str ("ZERO") or
         Check_Type'Image (Cio1) /= Ident_Str ("ONE") or
-        Check_Type'Image (Ci2) /= Ident_Str ("TWO")
-      then
+        Check_Type'Image (Ci2) /= Ident_Str ("TWO") then
          Failed ("INCORRECT VALUE FOR CHECK_TYPE'IMAGE - 1");
       end if;
 
@@ -136,23 +129,19 @@ begin
       Failed ("INCORRECT VALUE FOR CHECK_TYPE'FIRST - 2");
    end if;
 
-   if Check_Type'Val (0) /= Ident (C0) or
-     Check_Type'Val (1) /= Ident (C1) or
-     Check_Type'Val (2) /= Ident (C2)
-   then
+   if Check_Type'Val (0) /= Ident (C0) or Check_Type'Val (1) /= Ident (C1) or
+     Check_Type'Val (2) /= Ident (C2) then
       Failed ("INCORRECT VALUE FOR CHECK_TYPE'VAL - 2");
    end if;
 
-   if Check_Type'Pred (C1) /= Ident (C0) or
-     Check_Type'Pred (C2) /= Ident (C1)
+   if Check_Type'Pred (C1) /= Ident (C0) or Check_Type'Pred (C2) /= Ident (C1)
    then
       Failed ("INCORRECT VALUE FOR CHECK_TYPE'PRED - 2");
    end if;
 
    if Check_Type'Value ("ZERO") /= Ident (C0) or
      Check_Type'Value ("ONE") /= Ident (C1) or
-     Check_Type'Value ("TWO") /= Ident (C2)
-   then
+     Check_Type'Value ("TWO") /= Ident (C2) then
       Failed ("INCORRECT VALUE FOR CHECK_TYPE'VALUE - 2");
    end if;
 
@@ -163,8 +152,7 @@ begin
    if not
      ((Charray (0) < Ident (One)) and
       (Ident (Charray (2)) > Ident (Charray (1))) and
-      (Charray (1) <= Ident (One)) and
-      (Ident (Two) = Charray (2)))
+      (Charray (1) <= Ident (One)) and (Ident (Two) = Charray (2)))
    then
       Failed ("INCORRECT RESULTS FOR RELATIONAL OPERATORS - 3");
    end if;
@@ -178,21 +166,18 @@ begin
 
    if Check_Type'Pos (Charray (0)) /= Ident_Int (0) or
      Check_Type'Pos (Charray (1)) /= Ident_Int (1) or
-     Check_Type'Pos (Charray (2)) /= Ident_Int (2)
-   then
+     Check_Type'Pos (Charray (2)) /= Ident_Int (2) then
       Failed ("INCORRECT VALUE FOR CHECK_TYPE'POS - 3");
    end if;
 
    if Check_Type'Succ (Charray (0)) /= Ident (Charray (1)) or
-     Check_Type'Succ (Charray (1)) /= Ident (Charray (2))
-   then
+     Check_Type'Succ (Charray (1)) /= Ident (Charray (2)) then
       Failed ("INCORRECT VALUE FOR CHECK_TYPE'SUCC - 3");
    end if;
 
    if Check_Type'Image (Charray (0)) /= Ident_Str ("ZERO") or
      Check_Type'Image (Charray (1)) /= Ident_Str ("ONE") or
-     Check_Type'Image (Charray (2)) /= Ident_Str ("TWO")
-   then
+     Check_Type'Image (Charray (2)) /= Ident_Str ("TWO") then
       Failed ("INCORRECT VALUE FOR CHECK_TYPE'IMAGE - 3");
    end if;
 
@@ -203,8 +188,7 @@ begin
    if not
      ((Chrec.Comp0 < Ident (One)) and
       (Ident (Chrec.Comp2) > Ident (Chrec.Comp1)) and
-      (Chrec.Comp1 <= Ident (One)) and
-      (Ident (Two) = Chrec.Comp2))
+      (Chrec.Comp1 <= Ident (One)) and (Ident (Two) = Chrec.Comp2))
    then
       Failed ("INCORRECT RESULTS FOR RELATIONAL OPERATORS - 4");
    end if;
@@ -218,21 +202,18 @@ begin
 
    if Check_Type'Val (0) /= Ident (Chrec.Comp0) or
      Check_Type'Val (1) /= Ident (Chrec.Comp1) or
-     Check_Type'Val (2) /= Ident (Chrec.Comp2)
-   then
+     Check_Type'Val (2) /= Ident (Chrec.Comp2) then
       Failed ("INCORRECT VALUE FOR CHECK_TYPE'VAL - 4");
    end if;
 
    if Check_Type'Pred (Chrec.Comp1) /= Ident (Chrec.Comp0) or
-     Check_Type'Pred (Chrec.Comp2) /= Ident (Chrec.Comp1)
-   then
+     Check_Type'Pred (Chrec.Comp2) /= Ident (Chrec.Comp1) then
       Failed ("INCORRECT VALUE FOR CHECK_TYPE'PRED - 4");
    end if;
 
    if Check_Type'Value ("ZERO") /= Ident (Chrec.Comp0) or
      Check_Type'Value ("ONE") /= Ident (Chrec.Comp1) or
-     Check_Type'Value ("TWO") /= Ident (Chrec.Comp2)
-   then
+     Check_Type'Value ("TWO") /= Ident (Chrec.Comp2) then
       Failed ("INCORRECT VALUE FOR CHECK_TYPE'VALUE - 4");
    end if;
 

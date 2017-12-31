@@ -120,8 +120,7 @@ begin
                   Read (File1, Int_Item1);
                   if Index (File1) /= Positive_Count (Ident_Int (6)) then
                      Failed
-                       ("INDEX VALUE NOT " &
-                        "INCREMENTED WHEN " &
+                       ("INDEX VALUE NOT " & "INCREMENTED WHEN " &
                         "LAST - 10");
                   elsif Int_Item1 /= Ident_Int (18) then
                      Failed ("READ INCORRECT " & "IN_FILE VALUE - 11");
@@ -164,8 +163,7 @@ begin
                   Read (File1, Int_Item2);
                   if Index (File1) /= Positive_Count (Ident_Int (6)) then
                      Failed
-                       ("INDEX VALUE NOT " &
-                        "INCREMENTED WHEN " &
+                       ("INDEX VALUE NOT " & "INCREMENTED WHEN " &
                         "LAST - INOUT_FILE - 19");
                   elsif Int_Item2 /= Ident_Int (18) then
                      Failed ("READ INCORRECT " & "INOUT_FILE VALUE - 20");

@@ -46,8 +46,7 @@ procedure C93008b is
 begin
 
    Test
-     ("C93008B",
-      "USE OF RESULT AFTER CREATION OF " & "A TASK BY ALLOCATOR");
+     ("C93008B", "USE OF RESULT AFTER CREATION OF " & "A TASK BY ALLOCATOR");
 
    Block :
    declare
@@ -84,12 +83,8 @@ begin
       My_Array (Finit_Pos (3)) := Pointer_Tt1;
 
       if Spynumb /= 123 then
-         if Spynumb = 132 or
-           Spynumb = 13 or
-           Spynumb = 12 or
-           Spynumb = 1 or
-           Spynumb = 0
-         then
+         if Spynumb = 132 or Spynumb = 13 or Spynumb = 12 or Spynumb = 1 or
+           Spynumb = 0 then
             Failed ("TASK ACTIVATION RIGHT IN TIME, " & "BUT OTHER ERROR");
          else
             Failed

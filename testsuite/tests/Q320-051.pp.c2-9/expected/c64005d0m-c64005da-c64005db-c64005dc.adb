@@ -58,28 +58,15 @@ begin
 
          -- G := CATENATE ALL V, L, C;
          G :=
-           C64005d0m.V &
-           C64005d0m.L &
-           C64005da.V &
-           C64005da.L &
-           C64005da.C &
-           C64005db.V &
-           C64005db.L &
-           C64005db.C &
-           C64005dc.V &
-           C64005dc.L &
+           C64005d0m.V & C64005d0m.L & C64005da.V & C64005da.L & C64005da.C &
+           C64005db.V & C64005db.L & C64005db.C & C64005dc.V & C64005dc.L &
            C64005dc.C;
    end case;
 
    -- APPEND ALL L AND C TO T IN REVERSE ORDER.
    T.S (T.E + 1 .. T.E + N) :=
-     C64005dc.L &
-     C64005dc.C &
-     C64005db.L &
-     C64005db.C &
-     C64005da.L &
-     C64005da.C &
-     C64005d0m.L;
+     C64005dc.L & C64005dc.C & C64005db.L & C64005db.C & C64005da.L &
+     C64005da.C & C64005d0m.L;
    T.E := T.E + N;
 
 end C64005dc;

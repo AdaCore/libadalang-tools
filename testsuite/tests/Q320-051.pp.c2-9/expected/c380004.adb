@@ -43,10 +43,8 @@ procedure C380004 is
 
    F1_Poe : Integer;
 
-   function Chk
-     (Poe     : Integer;
-      Value   : Integer;
-      Message : String) return Boolean
+   function Chk (Poe : Integer; Value : Integer;
+      Message        : String) return Boolean
    is
    begin
       if Poe /= Value then
@@ -63,11 +61,8 @@ procedure C380004 is
 
    generic
       type T is limited private;
-      with function Is_Ok
-        (X      : T;
-         Param1 : Integer;
-         Param2 : Integer;
-         Param3 : Integer) return Boolean;
+      with function Is_Ok (X : T; Param1 : Integer; Param2 : Integer;
+         Param3              : Integer) return Boolean;
    procedure Check;
 
    procedure Check is
@@ -133,12 +128,10 @@ procedure C380004 is
             X : Arr;
          begin
             if Is_Ok (T (X (1)), 11, 11, 17)
-              and then Is_Ok (T (X (2)), 10, 10, 17)
-            then
+              and then Is_Ok (T (X (2)), 10, 10, 17) then
                null;
             elsif Is_Ok (T (X (2)), 11, 11, 17)
-              and then Is_Ok (T (X (1)), 10, 10, 17)
-            then
+              and then Is_Ok (T (X (1)), 10, 10, 17) then
                null;
             else
                Failed ("Discriminant values not correct - 4");
@@ -154,13 +147,11 @@ procedure C380004 is
             end record;
             X : Nrec;
          begin
-            if Is_Ok (T (X.C1), 8, 8, 17)
-              and then Is_Ok (T (X.C2), 9, 9, 17)
+            if Is_Ok (T (X.C1), 8, 8, 17) and then Is_Ok (T (X.C2), 9, 9, 17)
             then
                null;
             elsif Is_Ok (T (X.C2), 8, 8, 17)
-              and then Is_Ok (T (X.C1), 9, 9, 17)
-            then
+              and then Is_Ok (T (X.C1), 9, 9, 17) then
                null;
             else
                Failed ("Discriminant values not correct - 5");
@@ -199,22 +190,15 @@ begin
    declare
       task type Poe (D3 : Positive := F1) is
          entry E (D3 .. F1);    -- F1 evaluated
-         entry Is_Ok
-           (D3      :     Integer;
-            E_First :     Integer;
-            E_Last  :     Integer;
-            Ok      : out Boolean);
+         entry Is_Ok (D3 :     Integer; E_First : Integer; E_Last : Integer;
+            Ok           : out Boolean);
       end Poe;
       task body Poe is
       begin
          loop
             select
-               accept Is_Ok
-                 (D3      :     Integer;
-                  E_First :     Integer;
-                  E_Last  :     Integer;
-                  Ok      : out Boolean)
-               do
+               accept Is_Ok (D3 : Integer; E_First : Integer; E_Last : Integer;
+                  Ok            : out Boolean) do
                   declare
                      Cnt : Natural;
                   begin
@@ -264,11 +248,8 @@ begin
          end loop;
       end Poe;
 
-      function Is_Ok
-        (C       : Poe;
-         D3      : Integer;
-         E_First : Integer;
-         E_Last  : Integer) return Boolean
+      function Is_Ok (C : Poe; D3 : Integer; E_First : Integer;
+         E_Last         : Integer) return Boolean
       is
          Ok : Boolean;
       begin
@@ -289,20 +270,16 @@ begin
    declare
       protected type Poe (D3 : Integer := F1) is
          entry E (D3 .. F1);    -- F1 evaluated
-         function Is_Ok
-           (D3      : Integer;
-            E_First : Integer;
-            E_Last  : Integer) return Boolean;
+         function Is_Ok (D3 : Integer; E_First : Integer;
+            E_Last          : Integer) return Boolean;
       end Poe;
       protected body Poe is
          entry E (for I in D3 .. F1) when True is
          begin
             null;
          end E;
-         function Is_Ok
-           (D3      : Integer;
-            E_First : Integer;
-            E_Last  : Integer) return Boolean
+         function Is_Ok (D3 : Integer; E_First : Integer;
+            E_Last          : Integer) return Boolean
          is
             Cnt : Natural;
          begin
@@ -341,11 +318,8 @@ begin
          end Is_Ok;
       end Poe;
 
-      function Is_Ok
-        (C       : Poe;
-         D3      : Integer;
-         E_First : Integer;
-         E_Last  : Integer) return Boolean
+      function Is_Ok (C : Poe; D3 : Integer; E_First : Integer;
+         E_Last         : Integer) return Boolean
       is
       begin
          return C.Is_Ok (D3, E_First, E_Last);
@@ -379,11 +353,8 @@ begin
          end C1_D2;
       end Poe;
 
-      function Is_Ok
-        (C     : Poe;
-         D3    : Integer;
-         C1_D1 : Integer;
-         C1_D2 : Integer) return Boolean
+      function Is_Ok (C : Poe; D3 : Integer; C1_D1 : Integer;
+         C1_D2          : Integer) return Boolean
       is
       begin
          return C.D3 = D3 and C.C1_D1 = C1_D1 and C.C1_D2 = C1_D2;

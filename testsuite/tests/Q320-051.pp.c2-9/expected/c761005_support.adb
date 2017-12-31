@@ -32,8 +32,7 @@ package body C761005_Support is
          Report.Failed ("Wrong number of inits, Subtest " & Number);
       else
          Tctouch.Validate
-           (Invert (Inits_Order (1 .. Inits_Called)),
-            "Subtest " & Number,
+           (Invert (Inits_Order (1 .. Inits_Called)), "Subtest " & Number,
             True);
       end if;
       Inits_Called := 0;

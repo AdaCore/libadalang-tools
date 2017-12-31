@@ -40,8 +40,7 @@ begin
    Test
      ("C54A07A",
       "CHECK THAT A VARIABLE USED AS A CASE" &
-      " EXPRESSION IS NOT CONSIDERED LOCAL TO" &
-      " THE CASE STATEMENT");
+      " EXPRESSION IS NOT CONSIDERED LOCAL TO" & " THE CASE STATEMENT");
 
    declare   -- A
    begin

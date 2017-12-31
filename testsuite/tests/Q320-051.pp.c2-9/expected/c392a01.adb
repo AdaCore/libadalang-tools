@@ -174,8 +174,7 @@ begin  -- Main test procedure.
      ("C392A01",
       "Check that the use of a class-wide parameter " &
       "allows for proper dispatching where root type " &
-      "and extended types are declared in the same " &
-      "package");
+      "and extended types are declared in the same " & "package");
 
    Bank_Account_Subtest :
    declare
@@ -190,8 +189,7 @@ begin  -- Main test procedure.
 
       if (Accounts.Bank_Reserve /= Accounts.Opening_Balance) or
         (Accounts.Number_Of_Accounts (Bank) /= 1) or
-        (Accounts.Number_Of_Accounts (Total) /= 1)
-      then
+        (Accounts.Number_Of_Accounts (Total) /= 1) then
          Report.Failed ("Failed in Bank_Account_Subtest");
       end if;
 
@@ -215,8 +213,7 @@ begin  -- Main test procedure.
       if Accounts.Bank_Reserve /= (3.0 * Accounts.Opening_Balance) or
         Accounts.Daily_Representative /= Accounts.Manager or
         Accounts.Number_Of_Accounts (Savings) /= 1 or
-        Accounts.Number_Of_Accounts (Total) /= 2
-      then
+        Accounts.Number_Of_Accounts (Total) /= 2 then
          Report.Failed ("Failed in Savings_Account_Subtest");
       end if;
 
@@ -245,8 +242,7 @@ begin  -- Main test procedure.
 
       if Accounts.Bank_Reserve /= 1_300.00 or
         Accounts.Number_Of_Accounts (Preferred) /= 1 or
-        Accounts.Number_Of_Accounts (Total) /= 3
-      then
+        Accounts.Number_Of_Accounts (Total) /= 3 then
          Report.Failed ("Failed in Preferred_Account_Subtest");
       end if;
 

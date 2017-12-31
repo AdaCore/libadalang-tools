@@ -100,26 +100,17 @@ begin
 
       package body P is
       begin
-         if I1 /= -1 or
-           W1 /= 0 or
-           Citrus'Pos (C1) /= 2 or
-           Hue'Pos (H1) /= 1
+         if I1 /= -1 or W1 /= 0 or Citrus'Pos (C1) /= 2 or Hue'Pos (H1) /= 1
          then
             Failed ("(A): RESOLUTION INCORRECT - FUNCTION CALL");
          end if;
 
-         if I2 /= -1 or
-           W2 /= 0 or
-           Citrus'Pos (C2) /= 2 or
-           Hue'Pos (H2) /= 1
+         if I2 /= -1 or W2 /= 0 or Citrus'Pos (C2) /= 2 or Hue'Pos (H2) /= 1
          then
             Failed ("(B): RESOLUTION INCORRECT " & "- OPERATOR SYMBOL");
          end if;
 
-         if I3 /= -1 or
-           W3 /= 0 or
-           Citrus'Pos (C3) /= 2 or
-           Hue'Pos (H3) /= 1
+         if I3 /= -1 or W3 /= 0 or Citrus'Pos (C3) /= 2 or Hue'Pos (H3) /= 1
          then
             Failed ("(C): RESOLUTION INCORRECT - INFIX OPERATOR");
          end if;

@@ -36,8 +36,7 @@ begin
    Test
      ("CE3002D",
       "CHECK THAT NUMBER_BASE IS A SUBTYPE " &
-      "OF INTEGER WITH NUMBER_BASE'FIRST = 2 " &
-      "AND NUMBER_BASE'LAST = 16");
+      "OF INTEGER WITH NUMBER_BASE'FIRST = 2 " & "AND NUMBER_BASE'LAST = 16");
 
    declare
       X : Integer;

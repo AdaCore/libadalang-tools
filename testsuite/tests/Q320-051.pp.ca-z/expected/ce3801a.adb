@@ -43,8 +43,7 @@ begin
      ("CE3801A",
       "CHECK THAT EACH FLOAT_IO AND FIXED_IO " &
       "OPERATION RAISES STATUS_ERROR WHEN CALLED " &
-      "WITH A FILE PARAMETER DESIGNATING AN " &
-      "UN-OPEN FILE");
+      "WITH A FILE PARAMETER DESIGNATING AN " & "UN-OPEN FILE");
 
    declare
       type Flt is new Float range 1.0 .. 10.0;

@@ -49,10 +49,8 @@ procedure C34005l is
 
       type Parent is array (Index range <>) of Component;
 
-      function Create
-        (F, L  : Index;
-         C     : Component;
-         Dummy : Parent   -- TO RESOLVE OVERLOADING.
+      function Create (F, L : Index; C : Component;
+         Dummy              : Parent   -- TO RESOLVE OVERLOADING.
          ) return Parent;
 
    end Pkg;
@@ -70,10 +68,8 @@ procedure C34005l is
 
    package body Pkg is
 
-      function Create
-        (F, L  : Index;
-         C     : Component;
-         Dummy : Parent) return Parent
+      function Create (F, L : Index; C : Component;
+         Dummy              : Parent) return Parent
       is
          A : Parent (F .. L);
          B : Component := C;
@@ -103,8 +99,7 @@ begin
 
    begin
       if Create (2, 3, False, X) /= (False, True) or
-        Create (2, 3, False, Y) /= (False, True)
-      then
+        Create (2, 3, False, Y) /= (False, True) then
          Failed ("CAN'T CREATE BASE TYPE VALUES OUTSIDE THE " & "SUBTYPE");
       end if;
    exception
@@ -115,8 +110,7 @@ begin
    end;
 
    if X & (False, True) /= (True, True, True, False, True) or
-     Y & (False, True) /= (True, True, True, False, True)
-   then
+     Y & (False, True) /= (True, True, True, False, True) then
       Failed ("INCORRECT &");
    end if;
 

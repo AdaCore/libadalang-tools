@@ -82,10 +82,7 @@ begin
       Alphabet      : Maps.Character_Sequence (1 .. Last_Letter);
       Half_Alphabet : Maps.Character_Sequence (1 .. Midpoint_Letter);
 
-      Alphabet_Set,
-      Consonant_Set,
-      Vowel_Set,
-      First_Half_Set,
+      Alphabet_Set, Consonant_Set, Vowel_Set, First_Half_Set,
       Second_Half_Set : Maps.Character_Set;
 
    begin
@@ -140,9 +137,7 @@ begin
          Tc_Range_X_To_Z : Maps.Character_Range := (Low => 'X', High => 'Z');
 
          Tc_Ranges : Maps.Character_Ranges (1 .. 4) :=
-           (1 => Tc_Range_A_To_C,
-            2 => Tc_Range_J,
-            3 => Tc_Range_M_To_P,
+           (1 => Tc_Range_A_To_C, 2 => Tc_Range_J, 3 => Tc_Range_M_To_P,
             4 => Tc_Range_X_To_Z);
 
       begin
@@ -174,8 +169,7 @@ begin
               Ranges_Result (3).High /= Tc_Ranges (3).High or
               Ranges_Result (4) /= Tc_Range_X_To_Z or
               Ranges_Result (4).Low /= Tc_Ranges (4).Low or
-              Ranges_Result (4).High /= Tc_Ranges (4).High
-            then
+              Ranges_Result (4).High /= Tc_Ranges (4).High then
                Report.Failed
                  ("Incorrect structure or components in " &
                   "Character_Ranges constant");
@@ -261,10 +255,8 @@ begin
             -- The lower bound on the returned Character_Sequence value from
             -- To_Domain must be 1.
 
-            if Tc_Domain_1'First /= 1 or
-              Tc_Domain_2'First /= 1 or
-              Tc_Domain_3'First /= 1
-            then
+            if Tc_Domain_1'First /= 1 or Tc_Domain_2'First /= 1 or
+              Tc_Domain_3'First /= 1 then
                Report.Failed ("Incorrect lower bound returned from To_Domain");
             end if;
 
@@ -293,10 +285,8 @@ begin
             -- The lower bound on the returned Character_Sequence value must be
             -- 1.
 
-            if Tc_Range_1'First /= 1 or
-              Tc_Range_2'First /= 1 or
-              Tc_Range_3'First /= 1
-            then
+            if Tc_Range_1'First /= 1 or Tc_Range_2'First /= 1 or
+              Tc_Range_3'First /= 1 then
                Report.Failed ("Incorrect lower bound returned from To_Range");
             end if;
 
@@ -305,8 +295,7 @@ begin
 
             if Tc_Range_1'Last /= Tc_Lower_Case_Sequence'Length or
               Tc_Range_2'Last /= Tc_Upper_Case_Sequence'Length or
-              Tc_Range_3'Last /= Tc_Unordered_Sequence'Length
-            then
+              Tc_Range_3'Last /= Tc_Unordered_Sequence'Length then
                Report.Failed ("Incorrect upper bound returned from To_Range");
             end if;
 
@@ -318,15 +307,13 @@ begin
          if Maps.To_Domain (Maps.Identity) /= Null_Sequence then
             Report.Failed
               ("Function To_Domain did not return the null " &
-               "string when provided the Identity map as " &
-               "input");
+               "string when provided the Identity map as " & "input");
          end if;
 
          if Maps.To_Range (Maps.Identity) /= Null_Sequence then
             Report.Failed
               ("Function To_Range did not return the null " &
-               "string when provided the Identity map as " &
-               "input");
+               "string when provided the Identity map as " & "input");
          end if;
 
       exception

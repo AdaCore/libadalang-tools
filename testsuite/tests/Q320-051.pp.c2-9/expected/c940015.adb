@@ -78,8 +78,7 @@ begin
    Report.Test
      ("C940015",
       "Check that the component_declarations of a" &
-      " protected object are elaborated in the" &
-      " proper order");
+      " protected object are elaborated in the" & " proper order");
    declare
       -- an unprotected queue type
       type Storage is array (Index range <>) of Integer;

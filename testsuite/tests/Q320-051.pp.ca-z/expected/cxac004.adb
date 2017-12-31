@@ -140,11 +140,9 @@ begin
       Tc_Str_Array_1, Tc_Str_Array_2 : Str_Array_Type := (others => "    ");
 
       Ustr_Array : Unb_Str_Array_Type :=
-        (To_Unbounded_String ("cat"),
-         To_Unbounded_String ("testing"),
+        (To_Unbounded_String ("cat"), To_Unbounded_String ("testing"),
          To_Unbounded_String ("ACVC"));
-      Tc_Ustr_Array_1,
-      Tc_Ustr_Array_2 : Unb_Str_Array_Type :=
+      Tc_Ustr_Array_1, Tc_Ustr_Array_2 : Unb_Str_Array_Type :=
         (others => Null_Unbounded_String);
 
       -- Create a stream access object pointing to the data file.

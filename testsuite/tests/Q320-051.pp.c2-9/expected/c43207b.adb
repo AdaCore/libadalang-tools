@@ -45,8 +45,7 @@ begin
      ("C43207B",
       "CHECK THAT THE EVALUATION OF A MULTI" &
       "DIMENSIONAL AGGREGATE OF THE FORM " &
-      "(F..G => (H..I = J)) IS PERFORMED " &
-      "CORRECTLY");
+      "(F..G => (H..I = J)) IS PERFORMED " & "CORRECTLY");
 
    declare
 
@@ -70,11 +69,8 @@ begin
       declare
          procedure Check (A : T0; M : String) is
          begin
-            if (A'First (1) /= 1) or
-              (A'Last (1) /= 9) or
-              (A'First (2) /= 6) or
-              (A'Last (2) /= 5)
-            then
+            if (A'First (1) /= 1) or (A'Last (1) /= 9) or (A'First (2) /= 6) or
+              (A'Last (2) /= 5) then
                Failed ("CASE B" & M & " : ARRAY NOT " & "BOUNDED CORRECTLY");
             end if;
          end Check;
@@ -117,23 +113,18 @@ begin
 
       if Cntr (F) /= 1 then
          Failed
-           ("CASE B2 : F WAS NOT EVALUATED " &
-            "ONCE.  F WAS EVALUATED" &
-            Integer'Image (Cntr (F)) &
-            " TIMES");
+           ("CASE B2 : F WAS NOT EVALUATED " & "ONCE.  F WAS EVALUATED" &
+            Integer'Image (Cntr (F)) & " TIMES");
       end if;
       if Cntr (G) /= 1 then
          Failed
-           ("CASE B2 : G WAS NOT EVALUATED " &
-            "ONCE.  G WAS EVALUATED" &
-            Integer'Image (Cntr (G)) &
-            " TIMES");
+           ("CASE B2 : G WAS NOT EVALUATED " & "ONCE.  G WAS EVALUATED" &
+            Integer'Image (Cntr (G)) & " TIMES");
       end if;
 
       if Cntr (H) /= 0 and Cntr (I) /= 0 then
          Comment
-           ("CASE B3 : ALL CHOICES " &
-            "EVALUATED BEFORE CHECKING " &
+           ("CASE B3 : ALL CHOICES " & "EVALUATED BEFORE CHECKING " &
             "INDEX SUBTYPE");
       elsif Cntr (H) = 0 and Cntr (I) = 0 then
          Comment
@@ -143,16 +134,14 @@ begin
       if Cntr (H) > 1 then
          Failed
            ("CASE B3 : H WAS NOT EVALUATED " &
-            "AT MOST ONCE. H WAS EVALUATED" &
-            Integer'Image (Cntr (H)) &
+            "AT MOST ONCE. H WAS EVALUATED" & Integer'Image (Cntr (H)) &
             " TIMES");
       end if;
 
       if Cntr (I) > 1 then
          Failed
            ("CASE B3 : I WAS NOT EVALUATED " &
-            "AT MOST ONCE. I WAS EVALUATED" &
-            Integer'Image (Cntr (I)) &
+            "AT MOST ONCE. I WAS EVALUATED" & Integer'Image (Cntr (I)) &
             " TIMES");
       end if;
 

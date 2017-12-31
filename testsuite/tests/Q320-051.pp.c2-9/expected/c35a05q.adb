@@ -85,23 +85,18 @@ procedure C35a05q is
 
    -------------------------------------------------------------------
 
-   procedure Check_Attributes
-     (Name                                  : String;
+   procedure Check_Attributes (Name         : String;
       Actual_Attributes, Correct_Attributes : Fore_And_Aft)
    is
    begin
       if Actual_Attributes.Fore /= Correct_Attributes.Fore then
          Failed
-           ("GENERIC 'FORE FOR " &
-            Name &
-            " =" &
+           ("GENERIC 'FORE FOR " & Name & " =" &
             Integer'Image (Actual_Attributes.Fore));
       end if;
       if Actual_Attributes.Aft /= Correct_Attributes.Aft then
          Failed
-           ("GENERIC 'AFT  FOR " &
-            Name &
-            " =" &
+           ("GENERIC 'AFT  FOR " & Name & " =" &
             Integer'Image (Actual_Attributes.Aft));
       end if;
    end Check_Attributes;
@@ -135,9 +130,7 @@ begin
       "TYPICAL TYPES, GENERICS");
 
    Check_Attributes
-     ("MICRO_ANGLE_ERROR_M15",
-      Fa_Micro_Angle_Error_M15,
-      (7, 1));
+     ("MICRO_ANGLE_ERROR_M15", Fa_Micro_Angle_Error_M15, (7, 1));
 
    Check_Attributes ("TRACK_RANGE_M15", Fa_Track_Range_M15, (5, 1));
 
@@ -158,23 +151,17 @@ begin
    Check_Attributes ("NATURAL_DEGREES_M15", Fa_Natural_Degrees_M15, (4, 2));
 
    Check_Attributes
-     ("SYMMETRIC_RADIANS_M16",
-      Fa_Symmetric_Radians_M16,
-      (2, 5));
+     ("SYMMETRIC_RADIANS_M16", Fa_Symmetric_Radians_M16, (2, 5));
 
    Check_Attributes ("NATURAL_RADIANS_M8", Fa_Natural_Radians_M8, (2, 2));
 
    Check_Attributes ("ST_MILES_M8", Fa_St_Miles_M8, (3, 2));
 
    Check_Attributes
-     ("ST_NATURAL_DEGREES_M11",
-      Fa_St_Natural_Degrees_M11,
-      (4, 1));
+     ("ST_NATURAL_DEGREES_M11", Fa_St_Natural_Degrees_M11, (4, 1));
 
    Check_Attributes
-     ("ST_SYMMETRIC_RADIANS_M8",
-      Fa_St_Symmetric_Radians_M8,
-      (2, 2));
+     ("ST_SYMMETRIC_RADIANS_M8", Fa_St_Symmetric_Radians_M8, (2, 2));
 
    Result;
 

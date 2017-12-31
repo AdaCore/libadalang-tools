@@ -12,8 +12,7 @@ begin  -- Main test procedure.
       "number declaration may be of any numeric type. " &
       "Check that the type of the named number is " &
       "universal_integer of universal_real regardless " &
-      "of the type of the static expression that " &
-      "provides its value");
+      "of the type of the static expression that " & "provides its value");
 
    C332001_0.Check_Values;
 

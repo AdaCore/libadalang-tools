@@ -8,14 +8,12 @@ package body Cb40005_0 is
       Procedure_Called : Proc_Pointer;
    end record;
 
-   procedure Store_Event
-     (Proc_Called : Proc_Pointer;
-      Error       : Ada.Exceptions.Exception_Occurrence);
+   procedure Store_Event (Proc_Called : Proc_Pointer;
+      Error                           : Ada.Exceptions.Exception_Occurrence);
 
-   procedure Fail_Soft_Call
-     (Proc_To_Call              : Proc_Pointer;
-      Proc_To_Call_On_Exception : Proc_Pointer := null;
-      Retry_Routine             : Func_Pointer := null)
+   procedure Fail_Soft_Call (Proc_To_Call : Proc_Pointer;
+      Proc_To_Call_On_Exception           : Proc_Pointer := null;
+      Retry_Routine                       : Func_Pointer := null)
    is
 
       Current_Proc_To_Call : Proc_Pointer := Proc_To_Call;
@@ -45,9 +43,8 @@ package body Cb40005_0 is
 
    Stack_Top : Natural := 0;
 
-   procedure Store_Event
-     (Proc_Called : Proc_Pointer;
-      Error       : Ada.Exceptions.Exception_Occurrence)
+   procedure Store_Event (Proc_Called : Proc_Pointer;
+      Error                           : Ada.Exceptions.Exception_Occurrence)
    is
    begin
       Stack_Top         := Stack_Top + 1;
@@ -55,8 +52,7 @@ package body Cb40005_0 is
         (Ada.Exceptions.Save_Occurrence (Error), Proc_Called);
    end Store_Event;
 
-   function Top_Event_Exception
-     return Ada.Exceptions
+   function Top_Event_Exception return Ada.Exceptions
      .Exception_Occurrence_Access
    is
    begin

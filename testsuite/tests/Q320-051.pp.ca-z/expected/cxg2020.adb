@@ -125,14 +125,9 @@ procedure Cxg2020 is
          if abs (Actual - Expected) > Max_Error then
             Accuracy_Error_Reported := True;
             Report.Failed
-              (Test_Name &
-               " actual: " &
-               Real'Image (Actual) &
-               " expected: " &
-               Real'Image (Expected) &
-               " difference: " &
-               Real'Image (Actual - Expected) &
-               " max err:" &
+              (Test_Name & " actual: " & Real'Image (Actual) & " expected: " &
+               Real'Image (Expected) & " difference: " &
+               Real'Image (Actual - Expected) & " max err:" &
                Real'Image (Max_Error));
          elsif Verbose then
             if Actual = Expected then
@@ -143,10 +138,8 @@ procedure Cxg2020 is
          end if;
       end Check;
 
-      procedure Check
-        (Actual, Expected : Complex;
-         Test_Name        : String;
-         Mre              : Real)
+      procedure Check (Actual, Expected : Complex; Test_Name : String;
+         Mre                            : Real)
       is
       begin
          Check (Actual.Re, Expected.Re, Test_Name & " real part", Mre);
@@ -165,14 +158,10 @@ procedure Cxg2020 is
          Z1, Z2        : Complex;
       begin
          Check
-           (Sqrt (9.0 + 0.0 * I) + I,
-            3.0 + 1.0 * I,
-            "sqrt(9+0i)+i",
+           (Sqrt (9.0 + 0.0 * I) + I, 3.0 + 1.0 * I, "sqrt(9+0i)+i",
             Minimum_Error);
          Check
-           (Sqrt (-2.0 + 0.0 * I) + 1.0,
-            1.0 + Sqrt2 * I,
-            "sqrt(-2)+1 ",
+           (Sqrt (-2.0 + 0.0 * I) + 1.0, 1.0 + Sqrt2 * I, "sqrt(-2)+1 ",
             Minimum_Error);
 
          -- make sure no exception occurs when taking the sqrt of very large
@@ -182,9 +171,7 @@ procedure Cxg2020 is
          Z2 := Sqrt (Z1);
          begin
             Check
-              (Z2 * Z2,
-               Z1,
-               "sqrt((big,big))",
+              (Z2 * Z2, Z1, "sqrt((big,big))",
                Minimum_Error + 5.0);  -- +5 for multiply
          exception
             when others =>
@@ -195,9 +182,7 @@ procedure Cxg2020 is
          Z2 := Sqrt (Z1);
          begin
             Check
-              (Z2 * Z2,
-               Z1,
-               "sqrt((little,little))",
+              (Z2 * Z2, Z1, "sqrt((little,little))",
                Minimum_Error + 5.0);  -- +5 for multiply
          exception
             when others =>
@@ -227,10 +212,7 @@ procedure Cxg2020 is
          -- G.1.2(40);6.0
          if Real'Signed_Zeros then
             Check
-              (Sqrt (-1.0 - 0.0 * I),
-               0.0 - 1.0 * I,
-               "sqrt(-1-0i)",
-               No_Error);
+              (Sqrt (-1.0 - 0.0 * I), 0.0 - 1.0 * I, "sqrt(-1-0i)", No_Error);
          end if;
       exception
          when Constraint_Error =>
@@ -279,15 +261,9 @@ procedure Cxg2020 is
                Actual := Sqrt (Cx);
 
                Check
-                 (Actual,
-                  Expected,
-                  "Identity_1_Test " &
-                  Integer'Image (Ii) &
-                  Integer'Image (J) &
-                  ": Sqrt((" &
-                  Real'Image (Cx.Re) &
-                  ", " &
-                  Real'Image (Cx.Im) &
+                 (Actual, Expected,
+                  "Identity_1_Test " & Integer'Image (Ii) & Integer'Image (J) &
+                  ": Sqrt((" & Real'Image (Cx.Re) & ", " & Real'Image (Cx.Im) &
                   ")) ",
                   8.5);   -- 6.0 from sqrt, 2.5 from argument.
                -- See Cody pg 7-8 for analysis of additional error amount.
@@ -303,20 +279,12 @@ procedure Cxg2020 is
       exception
          when Constraint_Error =>
             Report.Failed
-              ("Constraint_Error raised in Identity_Test" &
-               " for X=(" &
-               Real'Image (X) &
-               ", " &
-               Real'Image (X) &
-               ")");
+              ("Constraint_Error raised in Identity_Test" & " for X=(" &
+               Real'Image (X) & ", " & Real'Image (X) & ")");
          when others =>
             Report.Failed
-              ("exception in Identity_Test" &
-               " for X=(" &
-               Real'Image (X) &
-               ", " &
-               Real'Image (X) &
-               ")");
+              ("exception in Identity_Test" & " for X=(" & Real'Image (X) &
+               ", " & Real'Image (X) & ")");
       end Identity_Test;
 
       procedure Do_Test is
@@ -351,8 +319,7 @@ begin
 
    if Verbose then
       Report.Comment
-        ("checking a digits" &
-         Integer'Image (System.Max_Digits) &
+        ("checking a digits" & Integer'Image (System.Max_Digits) &
          " floating point type");
    end if;
 

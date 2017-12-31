@@ -111,10 +111,8 @@ procedure Cxg2016 is
 
       function Arctan (Y : Real; X : Real := 1.0) return Real renames
         Elementary_Functions.Arctan;
-      function Arctan
-        (Y     : Real;
-         X     : Real := 1.0;
-         Cycle : Real) return Real renames
+      function Arctan (Y : Real; X : Real := 1.0;
+         Cycle           : Real) return Real renames
         Elementary_Functions.Arctan;
 
       -- flag used to terminate some tests early
@@ -152,14 +150,9 @@ procedure Cxg2016 is
          if abs (Actual - Expected) > Max_Error then
             Accuracy_Error_Reported := True;
             Report.Failed
-              (Test_Name &
-               " actual: " &
-               Real'Image (Actual) &
-               " expected: " &
-               Real'Image (Expected) &
-               " difference: " &
-               Real'Image (Actual - Expected) &
-               " max err:" &
+              (Test_Name & " actual: " & Real'Image (Actual) & " expected: " &
+               Real'Image (Expected) & " difference: " &
+               Real'Image (Actual - Expected) & " max err:" &
                Real'Image (Max_Error));
          elsif Verbose then
             if Actual = Expected then
@@ -203,22 +196,15 @@ procedure Cxg2016 is
       begin
          for I in Test_Data'Range loop
             Check
-              (Arctan (Test_Data (I).Tangent),
-               Test_Data (I).Radians,
-               "special value test" &
-               Integer'Image (I) &
-               " arctan(" &
-               Real'Image (Test_Data (I).Tangent) &
-               ")",
+              (Arctan (Test_Data (I).Tangent), Test_Data (I).Radians,
+               "special value test" & Integer'Image (I) & " arctan(" &
+               Real'Image (Test_Data (I).Tangent) & ")",
                Test_Data (I).Allowed_Error);
             Check
               (Arctan (Test_Data (I).Tangent, Cycle => 360.0),
                Test_Data (I).Degrees,
-               "special value test" &
-               Integer'Image (I) &
-               " arctan(" &
-               Real'Image (Test_Data (I).Tangent) &
-               ", cycle=>360)",
+               "special value test" & Integer'Image (I) & " arctan(" &
+               Real'Image (Test_Data (I).Tangent) & ", cycle=>360)",
                Test_Data (I).Allowed_Error);
          end loop;
 
@@ -229,9 +215,8 @@ procedure Cxg2016 is
             Report.Failed ("exception in special value test");
       end Special_Value_Test;
 
-      procedure Check_Exact
-        (Actual, Expected_Low, Expected_High : Real;
-         Test_Name                           : String)
+      procedure Check_Exact (Actual, Expected_Low, Expected_High : Real;
+         Test_Name                                               : String)
       is
          -- If the expected result is not a model number, then Expected_Low
          -- is the first machine number less than the (exact) expected result,
@@ -258,26 +243,16 @@ procedure Cxg2016 is
             Accuracy_Error_Reported := True;
             if Actual < Model_Expected_Low then
                Report.Failed
-                 (Test_Name &
-                  " actual: " &
-                  Real'Image (Actual) &
-                  " expected low: " &
-                  Real'Image (Model_Expected_Low) &
-                  " expected high: " &
-                  Real'Image (Model_Expected_High) &
-                  " difference: " &
-                  Real'Image (Actual - Expected_Low));
+                 (Test_Name & " actual: " & Real'Image (Actual) &
+                  " expected low: " & Real'Image (Model_Expected_Low) &
+                  " expected high: " & Real'Image (Model_Expected_High) &
+                  " difference: " & Real'Image (Actual - Expected_Low));
             else
                Report.Failed
-                 (Test_Name &
-                  " actual: " &
-                  Real'Image (Actual) &
-                  " expected low: " &
-                  Real'Image (Model_Expected_Low) &
-                  " expected high: " &
-                  Real'Image (Model_Expected_High) &
-                  " difference: " &
-                  Real'Image (Expected_High - Actual));
+                 (Test_Name & " actual: " & Real'Image (Actual) &
+                  " expected low: " & Real'Image (Model_Expected_Low) &
+                  " expected high: " & Real'Image (Model_Expected_High) &
+                  " difference: " & Real'Image (Expected_High - Actual));
             end if;
          elsif Verbose then
             Report.Comment (Test_Name & "  passed");
@@ -293,47 +268,28 @@ procedure Cxg2016 is
          --  G.2.4(11-13);6.0
 
          Check_Exact
-           (Arctan (1.0, 0.0),
-            Half_Pi_Low,
-            Half_Pi_High,
-            "arctan(1,0)");
+           (Arctan (1.0, 0.0), Half_Pi_Low, Half_Pi_High, "arctan(1,0)");
          Check_Exact (Arctan (1.0, 0.0, 360.0), 90.0, 90.0, "arctan(1,0,360)");
 
          Check_Exact
-           (Arctan (-1.0, 0.0),
-            -Half_Pi_High,
-            -Half_Pi_Low,
-            "arctan(-1,0)");
+           (Arctan (-1.0, 0.0), -Half_Pi_High, -Half_Pi_Low, "arctan(-1,0)");
          Check_Exact
-           (Arctan (-1.0, 0.0, 360.0),
-            -90.0,
-            -90.0,
-            "arctan(-1,0,360)");
+           (Arctan (-1.0, 0.0, 360.0), -90.0, -90.0, "arctan(-1,0,360)");
 
          if Real'Signed_Zeros then
             Check_Exact (Arctan (0.0, -1.0), Pi_Low, Pi_High, "arctan(+0,-1)");
             Check_Exact
-              (Arctan (0.0, -1.0, 360.0),
-               180.0,
-               180.0,
-               "arctan(+0,-1,360)");
+              (Arctan (0.0, -1.0, 360.0), 180.0, 180.0, "arctan(+0,-1,360)");
             Check_Exact
-              (Arctan (Real (Impdef.Annex_G.Negative_Zero), -1.0),
-               -Pi_High,
-               -Pi_Low,
-               "arctan(-0,-1)");
+              (Arctan (Real (Impdef.Annex_G.Negative_Zero), -1.0), -Pi_High,
+               -Pi_Low, "arctan(-0,-1)");
             Check_Exact
               (Arctan (Real (Impdef.Annex_G.Negative_Zero), -1.0, 360.0),
-               -180.0,
-               -180.0,
-               "arctan(-0,-1,360)");
+               -180.0, -180.0, "arctan(-0,-1,360)");
          else
             Check_Exact (Arctan (0.0, -1.0), Pi_Low, Pi_High, "arctan(0,-1)");
             Check_Exact
-              (Arctan (0.0, -1.0, 360.0),
-               180.0,
-               180.0,
-               "arctan(0,-1,360)");
+              (Arctan (0.0, -1.0, 360.0), 180.0, 180.0, "arctan(0,-1,360)");
          end if;
       exception
          when Constraint_Error =>
@@ -387,13 +343,9 @@ procedure Cxg2016 is
             Actual := Arctan (X);
 
             Check
-              (Actual,
-               Expected,
-               "Taylor_Series_Test " &
-               Integer'Image (I) &
-               ": arctan(" &
-               Real'Image (X) &
-               ") ",
+              (Actual, Expected,
+               "Taylor_Series_Test " & Integer'Image (I) & ": arctan(" &
+               Real'Image (X) & ") ",
                6.0);
 
             if Accuracy_Error_Reported then
@@ -470,12 +422,9 @@ procedure Cxg2016 is
    Float_Half_Pi_High : constant := Float'Adjacent (Pi / 2.0, 10.0);
    Float_Pi_Low       : constant := Float'Adjacent (Pi, 0.0);
    Float_Pi_High      : constant := Float'Adjacent (Pi, 10.0);
-   package Float_Check is new Generic_Check
-     (Float,
-      Half_Pi_Low  => Float_Half_Pi_Low,
-      Half_Pi_High => Float_Half_Pi_High,
-      Pi_Low       => Float_Pi_Low,
-      Pi_High      => Float_Pi_High);
+   package Float_Check is new Generic_Check (Float,
+      Half_Pi_Low => Float_Half_Pi_Low, Half_Pi_High => Float_Half_Pi_High,
+      Pi_Low      => Float_Pi_Low, Pi_High => Float_Pi_High);
 
    -- check the Floating point type with the most digits
    type A_Long_Float is digits System.Max_Digits;
@@ -485,11 +434,9 @@ procedure Cxg2016 is
      A_Long_Float'Adjacent (Pi / 2.0, 10.0);
    A_Long_Float_Pi_Low  : constant := A_Long_Float'Adjacent (Pi, 0.0);
    A_Long_Float_Pi_High : constant := A_Long_Float'Adjacent (Pi, 10.0);
-   package A_Long_Float_Check is new Generic_Check
-     (A_Long_Float,
+   package A_Long_Float_Check is new Generic_Check (A_Long_Float,
       Half_Pi_Low  => A_Long_Float_Half_Pi_Low,
-      Half_Pi_High => A_Long_Float_Half_Pi_High,
-      Pi_Low       => A_Long_Float_Pi_Low,
+      Half_Pi_High => A_Long_Float_Half_Pi_High, Pi_Low => A_Long_Float_Pi_Low,
       Pi_High      => A_Long_Float_Pi_High);
 
 -----------------------------------------------------------------------
@@ -506,8 +453,7 @@ begin
 
    if Verbose then
       Report.Comment
-        ("checking a digits" &
-         Integer'Image (System.Max_Digits) &
+        ("checking a digits" & Integer'Image (System.Max_Digits) &
          " floating point type");
    end if;
 

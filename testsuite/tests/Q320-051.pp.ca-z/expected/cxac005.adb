@@ -52,17 +52,12 @@ procedure Cxac005 is
 
       type File_Type (Max_Size : Stream_Element_Count) is limited private;
 
-      procedure Create
-        (File : in out File_Type;
-         Mode : in     Stream_Io.File_Mode := Stream_Io.Out_File;
-         Name : in     String              := "";
-         Form : in     String              := "");
+      procedure Create (File : in out File_Type;
+         Mode                : in Stream_Io.File_Mode := Stream_Io.Out_File;
+         Name                : in     String := ""; Form : in String := "");
 
-      procedure Open
-        (File : in out File_Type;
-         Mode : in     Stream_Io.File_Mode;
-         Name : in     String;
-         Form : in     String := "");
+      procedure Open (File : in out File_Type; Mode : in Stream_Io.File_Mode;
+         Name              : in     String; Form : in String := "");
 
       procedure Close (File : in out File_Type);
       procedure Delete (File : in out File_Type);
@@ -70,37 +65,27 @@ procedure Cxac005 is
       procedure Reset (File : in out File_Type; Mode : in Stream_Io.File_Mode);
       procedure Reset (File : in out File_Type);
 
-      procedure Read
-        (File : in out File_Type;
-         Item :    out Stream_Element_Array;
-         Last :    out Stream_Element_Offset;
-         From : in     Stream_Io.Positive_Count);
+      procedure Read (File : in out File_Type; Item : out Stream_Element_Array;
+         Last : out Stream_Element_Offset; From : in Stream_Io.Positive_Count);
 
-      procedure Read
-        (File : in out File_Type;
-         Item :    out Stream_Element_Array;
-         Last :    out Stream_Element_Offset);
+      procedure Read (File : in out File_Type; Item : out Stream_Element_Array;
+         Last              :    out Stream_Element_Offset);
 
-      procedure Write
-        (File : in out File_Type;
-         Item : in     Stream_Element_Array;
-         To   : in     Stream_Io.Positive_Count);
+      procedure Write (File : in out File_Type; Item : in Stream_Element_Array;
+         To                 : in     Stream_Io.Positive_Count);
 
-      procedure Write
-        (File : in out File_Type;
-         Item : in     Stream_Element_Array);
+      procedure Write (File : in out File_Type;
+         Item               : in     Stream_Element_Array);
 
-      procedure Set_Index
-        (File : in out File_Type;
-         To   : in     Stream_Io.Positive_Count);
+      procedure Set_Index (File : in out File_Type;
+         To                     : in     Stream_Io.Positive_Count);
 
       function Index (File : in File_Type) return Stream_Io.Positive_Count;
 
       function Size (File : in File_Type) return Stream_Io.Count;
 
-      procedure Set_Mode
-        (File : in out File_Type;
-         Mode : in     Stream_Io.File_Mode);
+      procedure Set_Mode (File : in out File_Type;
+         Mode                  : in     Stream_Io.File_Mode);
 
    private
       type File_Type (Max_Size : Stream_Element_Count) is record
@@ -115,11 +100,9 @@ procedure Cxac005 is
 
       use Stream_Io;
 
-      procedure Create
-        (File : in out File_Type;
-         Mode : in     Stream_Io.File_Mode := Stream_Io.Out_File;
-         Name : in     String              := "";
-         Form : in     String              := "")
+      procedure Create (File : in out File_Type;
+         Mode                : in Stream_Io.File_Mode := Stream_Io.Out_File;
+         Name                : in     String := ""; Form : in String := "")
       is
       begin
          Stream_Io.Create (File.File, Mode, Name, Form);
@@ -135,11 +118,8 @@ procedure Cxac005 is
          end if;
       end Create;
 
-      procedure Open
-        (File : in out File_Type;
-         Mode : in     Stream_Io.File_Mode;
-         Name : in     String;
-         Form : in     String := "")
+      procedure Open (File : in out File_Type; Mode : in Stream_Io.File_Mode;
+         Name              : in     String; Form : in String := "")
       is
       begin
          Stream_Io.Open (File.File, Mode, Name, Form);
@@ -186,21 +166,16 @@ procedure Cxac005 is
          Reset (File, Stream_Io.Mode (File.File));
       end Reset;
 
-      procedure Read
-        (File : in out File_Type;
-         Item :    out Stream_Element_Array;
-         Last :    out Stream_Element_Offset;
-         From : in     Stream_Io.Positive_Count)
+      procedure Read (File : in out File_Type; Item : out Stream_Element_Array;
+         Last : out Stream_Element_Offset; From : in Stream_Io.Positive_Count)
       is
       begin
          Set_Index (File, From);
          Read (File, Item, Last);
       end Read;
 
-      procedure Read
-        (File : in out File_Type;
-         Item :    out Stream_Element_Array;
-         Last :    out Stream_Element_Offset)
+      procedure Read (File : in out File_Type; Item : out Stream_Element_Array;
+         Last              :    out Stream_Element_Offset)
       is
          Index : constant Stream_Element_Offset :=
            Stream_Element_Offset (File.Index);
@@ -223,10 +198,8 @@ procedure Cxac005 is
          end if;
       end Read;
 
-      procedure Write
-        (File : in out File_Type;
-         Item : in     Stream_Element_Array;
-         To   : in     Stream_Io.Positive_Count)
+      procedure Write (File : in out File_Type; Item : in Stream_Element_Array;
+         To                 : in     Stream_Io.Positive_Count)
       is
       begin
          Set_Index (File, To);
@@ -246,9 +219,8 @@ procedure Cxac005 is
             "Write failed to move the index");
       end Write;
 
-      procedure Set_Index
-        (File : in out File_Type;
-         To   : in     Stream_Io.Positive_Count)
+      procedure Set_Index (File : in out File_Type;
+         To                     : in     Stream_Io.Positive_Count)
       is
       begin
          Stream_Io.Set_Index (File.File, To);
@@ -270,9 +242,8 @@ procedure Cxac005 is
          return New_Size;
       end Size;
 
-      procedure Set_Mode
-        (File : in out File_Type;
-         Mode : in     Stream_Io.File_Mode)
+      procedure Set_Mode (File : in out File_Type;
+         Mode                  : in     Stream_Io.File_Mode)
       is
          Old_Index : constant Count := File.Index;
       begin
@@ -298,8 +269,7 @@ procedure Cxac005 is
 begin
 
    Report.Test
-     ("CXAC005",
-      "Check that stream file positioning work as specified");
+     ("CXAC005", "Check that stream file positioning work as specified");
 
    declare
       Name : constant String := Legal_File_Name;
@@ -366,9 +336,7 @@ exception
       Report.Result;
    when E : others =>
       Report.Failed
-        ("Unexpected exception raised - " &
-         Exception_Name (E) &
-         " - " &
+        ("Unexpected exception raised - " & Exception_Name (E) & " - " &
          Exception_Message (E));
       Report.Result;
 

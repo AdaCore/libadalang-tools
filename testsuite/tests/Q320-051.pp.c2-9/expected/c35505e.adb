@@ -95,17 +95,11 @@ begin
          begin
             if Subch'Pred (Ident (Subch'Base'First)) = Subch'Val (I1) then
                Failed
-                 ("NO EXCEPTION RAISED " &
-                  "FOR " &
-                  Str &
-                  "'PRED " &
+                 ("NO EXCEPTION RAISED " & "FOR " & Str & "'PRED " &
                   "(IDENT (SUBCH'BASE'FIRST)) - 1");
             else
                Failed
-                 ("NO EXCEPTION RAISED " &
-                  "FOR " &
-                  Str &
-                  "'PRED " &
+                 ("NO EXCEPTION RAISED " & "FOR " & Str & "'PRED " &
                   "(IDENT (SUBCH'BASE'FIRST)) - 2");
             end if;
          exception
@@ -113,27 +107,18 @@ begin
                null;
             when others =>
                Failed
-                 ("WRONG EXCEPTION RAISED " &
-                  "FOR " &
-                  Str &
-                  "'PRED " &
+                 ("WRONG EXCEPTION RAISED " & "FOR " & Str & "'PRED " &
                   "(IDENT (SUBCH'BASE'FIRST))");
          end;
 
          begin
             if Subch'Succ (Ident (Subch'Base'Last)) = Subch'Val (I2) then
                Failed
-                 ("NO EXCEPTION RAISED " &
-                  "FOR " &
-                  Str &
-                  "'SUCC " &
+                 ("NO EXCEPTION RAISED " & "FOR " & Str & "'SUCC " &
                   "(IDENT (SUBCH'BASE'LAST)) - 1");
             else
                Failed
-                 ("NO EXCEPTION RAISED " &
-                  "FOR " &
-                  Str &
-                  "'SUCC " &
+                 ("NO EXCEPTION RAISED " & "FOR " & Str & "'SUCC " &
                   "(IDENT (SUBCH'BASE'LAST)) - 2");
             end if;
          exception
@@ -141,10 +126,7 @@ begin
                null;
             when others =>
                Failed
-                 ("WRONG EXCEPTION RAISED " &
-                  "FOR " &
-                  Str &
-                  "'SUCC " &
+                 ("WRONG EXCEPTION RAISED " & "FOR " & Str & "'SUCC " &
                   "(IDENT (SUBCH'BASE'LAST))");
          end;
       end P;

@@ -51,15 +51,12 @@ package C3a0010_0 is
 
    -- Type accesses to any math procedure
    type Math_Procedure_Ptr is access procedure
-     (First_Num, Second_Num : in     Real_Num;
-      Result_Num            :    out Real_Num);
+     (First_Num, Second_Num : in Real_Num; Result_Num : out Real_Num);
 
-   procedure Add
-     (First_Num, Second_Num : in     Real_Num;
-      Result_Num            :    out Real_Num);
+   procedure Add (First_Num, Second_Num : in     Real_Num;
+      Result_Num                        :    out Real_Num);
 
-   procedure Subtract
-     (First_Num, Second_Num : in     Real_Num;
-      Result_Num            :    out Real_Num);
+   procedure Subtract (First_Num, Second_Num : in     Real_Num;
+      Result_Num                             :    out Real_Num);
 
 end C3a0010_0;

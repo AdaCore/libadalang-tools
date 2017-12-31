@@ -15,9 +15,8 @@ procedure C340a01 is
 
           --========================================================--
 
-   procedure Create_List
-     (Title, Author : in     C340a01_0.Data_List;
-      Head          : in out Node_Ptr)
+   procedure Create_List (Title, Author : in     C340a01_0.Data_List;
+      Head                              : in out Node_Ptr)
    is
 
       Book     : Node_Type;  -- Object of extended type.

@@ -20,9 +20,8 @@ procedure C393a03 is
       C393a03_0.Bump (It); -- dispatch to non-abstract procedure
    end Bump;
 
-   procedure Set_Max
-     (It  : in out C393a03_1.Modular_Object'Class;
-      Val :        Natural)
+   procedure Set_Max (It : in out C393a03_1.Modular_Object'Class;
+      Val                :        Natural)
    is
    begin
       C393a03_1.Set_Max (It, Val); -- dispatch to non-abstract procedure
@@ -46,8 +45,7 @@ begin  -- Main test procedure.
       "of an abstract type can be called as a " &
       "dispatching operation and that the body of this " &
       "subprogram can make a dispatching call to an " &
-      "abstract operation of the corresponding " &
-      "abstract type");
+      "abstract operation of the corresponding " & "abstract type");
 
    A_Thing := C393a03_1.Create; -- Max_Value = Natural'Last
    F393a00_0.Tc_Validate ("4", "Overridden primitive layer 2");

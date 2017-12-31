@@ -33,10 +33,8 @@ procedure Cc70b02 is
       end loop;
    end Tc_Initialize_List;
 
-   procedure Tc_Verify_List
-     (L        : in out Lists_Of_Points.List_Type;
-      Expected : in     Tc_Score_Array;
-      Ok       :    out Boolean)
+   procedure Tc_Verify_List (L : in out Lists_Of_Points.List_Type;
+      Expected                 : in     Tc_Score_Array; Ok : out Boolean)
    is
       Actual : Tc_Score_Array;
    begin                                  -- Verify that all scores have been

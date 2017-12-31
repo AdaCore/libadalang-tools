@@ -12,20 +12,16 @@ generic          -- Mathematical 2D matrix addition group.
    -- artificial in the context of this "application," the passing of types,
    -- objects, and subprograms as actuals to a formal package is not.
 
-   with package Math_Sig is new Cc70002_0
-     (Group_Type => Matrix_Ops.Matrix_2d,
-      Identity   => Matrix_Ops.Add_Ident,
-      Operation  => Matrix_Ops."+");
+   with package Math_Sig is new Cc70002_0 (Group_Type => Matrix_Ops.Matrix_2d,
+      Identity => Matrix_Ops.Add_Ident, Operation => Matrix_Ops."+");
 
 package Cc70002_2 is
 
    -- Add two matrices that are to be multiplied by coefficients: [ ] = CA*[ ]
    -- + CB*[ ].
 
-   function Add_Matrices_With_Coefficients
-     (A  : Matrix_Ops.Matrix_2d;
-      Ca : Integer;
-      B  : Matrix_Ops.Matrix_2d;
+   function Add_Matrices_With_Coefficients (A : Matrix_Ops.Matrix_2d;
+      Ca : Integer; B : Matrix_Ops.Matrix_2d;
       Cb : Integer) return Matrix_Ops.Matrix_2d;
 
    -- ...Other operations.

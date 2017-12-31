@@ -46,13 +46,11 @@ procedure C34007a is
    type Designated is range -100 .. 100;
 
    subtype Subdesignated is
-     Designated range
-       Designated'Val (Ident_Int (-50)) ..
+     Designated range Designated'Val (Ident_Int (-50)) ..
          Designated'Val (Ident_Int (50));
 
    type Parent is
-     access Subdesignated range
-       Designated'Val (Ident_Int (-30)) ..
+     access Subdesignated range Designated'Val (Ident_Int (-30)) ..
          Designated'Val (Ident_Int (30));
 
    type T is new Parent;
@@ -70,8 +68,7 @@ procedure C34007a is
    function Ident (X : T) return T is
    begin
       if X = null
-        or else Equal (Designated'Pos (X.all), Designated'Pos (X.all))
-      then
+        or else Equal (Designated'Pos (X.all), Designated'Pos (X.all)) then
          return X;                          -- ALWAYS EXECUTED.
       end if;
       return new Designated;

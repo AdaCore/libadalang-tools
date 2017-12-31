@@ -34,8 +34,7 @@ procedure C32108b is
    begin
       if Number /= 0 then
          Failed
-           ("SUBCOMPONENT DEFAULT EXPRESSIONS ARE " &
-            "EVALUATED -" &
+           ("SUBCOMPONENT DEFAULT EXPRESSIONS ARE " & "EVALUATED -" &
             Integer'Image (Number));
       end if;
       return (1);
@@ -46,8 +45,7 @@ begin
      ("C32108B",
       "CHECK THAT IF A DEFAULT EXPRESSION IS " &
       "EVALUATED FOR A COMPONENT, NO DEFAULT " &
-      "EXPRESSIONS ARE EVALUATED FOR ANY " &
-      "SUBCOMPONENTS");
+      "EXPRESSIONS ARE EVALUATED FOR ANY " & "SUBCOMPONENTS");
 
    declare     -- (A)
 

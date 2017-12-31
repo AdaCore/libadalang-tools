@@ -150,15 +150,13 @@ begin
             Get (Ft, X, Field'Last + Ident_Int (1));
             Failed
               ("CONSTRAINT_ERROR NOT RAISED - " &
-               "FIELD'LAST + 1 WIDTH WITH " &
-               "EXTERNAL FILE");
+               "FIELD'LAST + 1 WIDTH WITH " & "EXTERNAL FILE");
          exception
             when Constraint_Error =>
                null;
             when others =>
                Failed
-                 ("WRONG EXCEPTION RAISED - " &
-                  "FIELD'LAST + 1 WIDTH WITH " &
+                 ("WRONG EXCEPTION RAISED - " & "FIELD'LAST + 1 WIDTH WITH " &
                   "EXTERNAL FILE");
          end;
       end if;

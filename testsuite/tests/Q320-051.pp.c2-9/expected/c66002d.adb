@@ -70,8 +70,7 @@ begin
 
       if S /= "AB" then
          Failed
-           ("PROCEDURES DIFFERING ONLY BY " &
-            "THE BASE TYPE OF A PARAMETER " &
+           ("PROCEDURES DIFFERING ONLY BY " & "THE BASE TYPE OF A PARAMETER " &
             "CAUSED CONFUSION");
       end if;
    end;

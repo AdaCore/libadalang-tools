@@ -14,10 +14,7 @@ procedure C413005 is
       Set (Count);
       if Get /= Count then
          Report.Failed
-           (Message &
-            " - value wrong:" &
-            Integer'Image (Get) &
-            " should be" &
+           (Message & " - value wrong:" & Integer'Image (Get) & " should be" &
             Integer'Image (Count));
       end if;
       Count := Count + 2;
@@ -104,12 +101,10 @@ begin
          end if;
       end;
       declare
-         procedure Check1 is new Check
-           (Obj1.Class_Wide_Get,
+         procedure Check1 is new Check (Obj1.Class_Wide_Get,
             Obj1.Class_Wide_Set);
          procedure Check2 is new Check (Obj2.Get, Obj2.Set);
-         procedure Check3 is new Check
-           (Func.Class_Wide_Get,
+         procedure Check3 is new Check (Func.Class_Wide_Get,
             Func.Class_Wide_Set);
       begin
          Check1 ("Generic Obj1, try 1");

@@ -39,8 +39,7 @@ begin
      ("CE3801B",
       "CHECK THAT EACH FIXED_IO " &
       "OPERATION RAISES STATUS_ERROR WHEN CALLED " &
-      "WITH A FILE PARAMETER DESIGNATING AN " &
-      "UN-OPEN FILE");
+      "WITH A FILE PARAMETER DESIGNATING AN " & "UN-OPEN FILE");
 
    declare
       type Fix is delta 0.1 range 1.0 .. 10.0;

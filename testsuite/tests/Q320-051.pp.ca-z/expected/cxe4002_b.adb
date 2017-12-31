@@ -8,9 +8,7 @@ procedure Cxe4002_B is
    function "=" (L, R : Cxe4002_Common.Integer_Vector) return Boolean renames
      Cxe4002_Common."=";
    function "+"
-     (L,
-      R : Cxe4002_Common.Integer_Vector)
-      return Cxe4002_Common
+     (L, R : Cxe4002_Common.Integer_Vector) return Cxe4002_Common
      .Integer_Vector renames
      Cxe4002_Part_A1."+";
    function "=" (L, R : Cxe4002_Common.Little_Number) return Boolean renames

@@ -25,10 +25,8 @@
 -- BHS 7/20/84
 -- JBG 5/23/85
 
-procedure Ca1011a0
-  (X : in out Integer;
-   Y : in     Integer := -1;
-   Z : in     Integer := 2)
+procedure Ca1011a0 (X : in out Integer; Y : in Integer := -1;
+   Z                  : in     Integer := 2)
 is
 
 begin

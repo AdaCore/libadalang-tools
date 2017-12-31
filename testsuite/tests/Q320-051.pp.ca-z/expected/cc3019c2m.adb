@@ -79,53 +79,44 @@ procedure Cc3019c2m is
      (Birth_Date => Birth_Date, Gender => Male, Name => "ED        ");
 
    Friend : Person :=
-     (Birth_Date => Date'(Dec, 27, 1_949),
-      Gender     => Male,
+     (Birth_Date => Date'(Dec, 27, 1_949), Gender => Male,
       Name       => "DENNIS    ");
 
    Father : Person :=
-     (Birth_Date => Date'(Jul, 5, 1_925),
-      Gender     => Male,
+     (Birth_Date => Date'(Jul, 5, 1_925), Gender => Male,
       Name       => "EDWARD    ");
 
    Daughter : Person :=
-     (Birth_Date => Date'(Dec, 10, 1_980),
-      Gender     => Female,
+     (Birth_Date => Date'(Dec, 10, 1_980), Gender => Female,
       Name       => "CHRISSY   ");
 
-   procedure Assign
-     (The_Value_Of_This_Date : in out Date;
-      To_This_Date           : in out Date);
+   procedure Assign (The_Value_Of_This_Date : in out Date;
+      To_This_Date                          : in out Date);
 
    function Is_Equal (Left : in Date; Right : in Date) return Boolean;
 
-   procedure Assign
-     (The_Value_Of_This_Person : in out Person;
-      To_This_Person           : in out Person);
+   procedure Assign (The_Value_Of_This_Person : in out Person;
+      To_This_Person                          : in out Person);
 
    function Is_Equal (Left : in Person; Right : in Person) return Boolean;
 
 --  INSTANTIATE OUTER GENERIC PACKAGE
 
    package New_Nested_Generics is new Cc3019c1_Nested_Generics
-     (Element => Date,
-      Assign  => Assign,
-      "="     => Is_Equal);
+     (Element => Date, Assign => Assign, "=" => Is_Equal);
 
    First_Nng  : New_Nested_Generics.Nested_Generics_Type;
    Second_Nng : New_Nested_Generics.Nested_Generics_Type;
 
-   function "="
-     (Left  : in New_Nested_Generics.Nested_Generics_Type;
-      Right : in New_Nested_Generics.Nested_Generics_Type)
+   function "=" (Left : in New_Nested_Generics.Nested_Generics_Type;
+      Right           : in New_Nested_Generics.Nested_Generics_Type)
       return Boolean renames
      New_Nested_Generics."=";
 
 --  INSTANTIATE NESTED TASK PACKAGE
 
    package New_Generic_Task is new New_Nested_Generics.Generic_Task
-     (Element => Person,
-      Assign  => Assign);
+     (Element => Person, Assign => Assign);
 
    First_Generic_Task  : New_Generic_Task.Protected_Area;
    Second_Generic_Task : New_Generic_Task.Protected_Area;
@@ -133,22 +124,18 @@ procedure Cc3019c2m is
 --  INSTANTIATE NESTED STACK PACKAGE
 
    package Person_Stack is new New_Nested_Generics.Stack_Class
-     (Element => Person,
-      Assign  => Assign,
-      "="     => Is_Equal);
+     (Element => Person, Assign => Assign, "=" => Is_Equal);
 
    First_Person_Stack  : Person_Stack.Stack;
    Second_Person_Stack : Person_Stack.Stack;
    Third_Person_Stack  : Person_Stack.Stack;
 
-   function "="
-     (Left  : in Person_Stack.Stack;
-      Right : in Person_Stack.Stack) return Boolean renames
+   function "=" (Left : in Person_Stack.Stack;
+      Right           : in Person_Stack.Stack) return Boolean renames
      Person_Stack."=";
 
-   procedure Assign
-     (The_Value_Of_This_Date : in out Date;
-      To_This_Date           : in out Date)
+   procedure Assign (The_Value_Of_This_Date : in out Date;
+      To_This_Date                          : in out Date)
    is
 
    begin -- ASSIGN
@@ -161,10 +148,8 @@ procedure Cc3019c2m is
 
    begin -- IS_EQUAL
 
-      if (Left.Month = Right.Month) and
-        (Left.Day = Right.Day) and
-        (Left.Year = Right.Year)
-      then
+      if (Left.Month = Right.Month) and (Left.Day = Right.Day) and
+        (Left.Year = Right.Year) then
          return True;
       else
          return False;
@@ -172,9 +157,8 @@ procedure Cc3019c2m is
 
    end Is_Equal;
 
-   procedure Assign
-     (The_Value_Of_This_Person : in out Person;
-      To_This_Person           : in out Person)
+   procedure Assign (The_Value_Of_This_Person : in out Person;
+      To_This_Person                          : in out Person)
    is
 
    begin -- ASSIGN
@@ -188,9 +172,7 @@ procedure Cc3019c2m is
    begin -- IS_EQUAL
 
       if (Left.Birth_Date = Right.Birth_Date) and
-        (Left.Gender = Right.Gender) and
-        (Left.Name = Right.Name)
-      then
+        (Left.Gender = Right.Gender) and (Left.Name = Right.Name) then
          return True;
       else
          return False;
@@ -210,18 +192,14 @@ begin  -- CC3019C2M
 -- CHECK THE OUTERMOST GENERIC (NEW_NESTED_GENERICS)
 
    New_Nested_Generics.Set_Element
-     (For_This_Ngt_Object => First_Nng,
-      To_This_Element     => Today);
+     (For_This_Ngt_Object => First_Nng, To_This_Element => Today);
    New_Nested_Generics.Set_Number
-     (For_This_Ngt_Object => First_Nng,
-      To_This_Number      => 1);
+     (For_This_Ngt_Object => First_Nng, To_This_Number => 1);
 
    New_Nested_Generics.Set_Element
-     (For_This_Ngt_Object => Second_Nng,
-      To_This_Element     => First_Date);
+     (For_This_Ngt_Object => Second_Nng, To_This_Element => First_Date);
    New_Nested_Generics.Set_Number
-     (For_This_Ngt_Object => Second_Nng,
-      To_This_Number      => 2);
+     (For_This_Ngt_Object => Second_Nng, To_This_Number => 2);
 
    if First_Nng = Second_Nng then
       Report.Failed
@@ -239,8 +217,7 @@ begin  -- CC3019C2M
    end if;
 
    if (New_Nested_Generics.Number_Of (This_Ngt_Object => First_Nng) /= 1) or
-     (New_Nested_Generics.Number_Of (This_Ngt_Object => Second_Nng) /= 2)
-   then
+     (New_Nested_Generics.Number_Of (This_Ngt_Object => Second_Nng) /= 2) then
       Report.Failed
         ("PROBLEMS WITH EXTRACTING NUMBERS IN " & "OUTERMOST GENERIC");
    end if;
@@ -269,44 +246,35 @@ begin  -- CC3019C2M
 
    Person_Stack.Clear (This_Stack => First_Person_Stack);
    if Person_Stack.Number_Of_Elements (On_This_Stack => First_Person_Stack) /=
-     0
-   then
+     0 then
       Report.Failed ("IMPROPER VALUE RETURNED FROM NUMBER_OF_ELEMENTS - 1");
    end if;
 
    Person_Stack.Push
-     (This_Element     => Myself,
-      On_To_This_Stack => First_Person_Stack);
+     (This_Element => Myself, On_To_This_Stack => First_Person_Stack);
    if Person_Stack.Number_Of_Elements (On_This_Stack => First_Person_Stack) /=
-     1
-   then
+     1 then
       Report.Failed ("IMPROPER VALUE RETURNED FROM NUMBER_OF_ELEMENTS - 2");
    end if;
 
    Person_Stack.Push
-     (This_Element     => Friend,
-      On_To_This_Stack => First_Person_Stack);
+     (This_Element => Friend, On_To_This_Stack => First_Person_Stack);
    if Person_Stack.Number_Of_Elements (On_This_Stack => First_Person_Stack) /=
-     2
-   then
+     2 then
       Report.Failed ("IMPROPER VALUE RETURNED FROM NUMBER_OF_ELEMENTS - 3");
    end if;
 
    Person_Stack.Push
-     (This_Element     => Father,
-      On_To_This_Stack => First_Person_Stack);
+     (This_Element => Father, On_To_This_Stack => First_Person_Stack);
    if Person_Stack.Number_Of_Elements (On_This_Stack => First_Person_Stack) /=
-     3
-   then
+     3 then
       Report.Failed ("IMPROPER VALUE RETURNED FROM NUMBER_OF_ELEMENTS - 4");
    end if;
 
    Person_Stack.Pop
-     (This_Element   => First_Person,
-      Off_This_Stack => First_Person_Stack);
+     (This_Element => First_Person, Off_This_Stack => First_Person_Stack);
    if Person_Stack.Number_Of_Elements (On_This_Stack => First_Person_Stack) /=
-     2
-   then
+     2 then
       Report.Failed ("IMPROPER VALUE RETURNED FROM NUMBER_OF_ELEMENTS - 5");
    end if;
 
@@ -316,25 +284,21 @@ begin  -- CC3019C2M
 
    Person_Stack.Clear (This_Stack => Second_Person_Stack);
    if Person_Stack.Number_Of_Elements (On_This_Stack => Second_Person_Stack) /=
-     0
-   then
+     0 then
       Report.Failed ("IMPROPER VALUE RETURNED FROM NUMBER_OF_ELEMENTS - 6");
    end if;
 
    Person_Stack.Copy
-     (This_Stack    => First_Person_Stack,
-      To_This_Stack => Second_Person_Stack);
+     (This_Stack => First_Person_Stack, To_This_Stack => Second_Person_Stack);
 
    if First_Person_Stack /= Second_Person_Stack then
       Report.Failed ("PROBLEMS WITH COPY OR TEST FOR EQUALITY (STACK)");
    end if;
 
    Person_Stack.Pop
-     (This_Element   => First_Person,
-      Off_This_Stack => Second_Person_Stack);
+     (This_Element => First_Person, Off_This_Stack => Second_Person_Stack);
    Person_Stack.Push
-     (This_Element     => Daughter,
-      On_To_This_Stack => Second_Person_Stack);
+     (This_Element => Daughter, On_To_This_Stack => Second_Person_Stack);
    if First_Person_Stack = Second_Person_Stack then
       Report.Failed ("PROBLEMS WITH POP OR TEST FOR EQUALITY (STACK)");
    end if;
@@ -345,8 +309,7 @@ begin  -- CC3019C2M
 
       Person_Stack.Clear (This_Stack => Third_Person_Stack);
       Person_Stack.Pop
-        (This_Element   => First_Person,
-         Off_This_Stack => Third_Person_Stack);
+        (This_Element => First_Person, Off_This_Stack => Third_Person_Stack);
       Report.Failed ("UNDERFLOW EXCEPTION NOT RAISED");
 
    exception
@@ -367,13 +330,11 @@ begin  -- CC3019C2M
       Person_Stack.Clear (This_Stack => Third_Person_Stack);
       for Index in 1 .. 10 loop
          Person_Stack.Push
-           (This_Element     => Myself,
-            On_To_This_Stack => Third_Person_Stack);
+           (This_Element => Myself, On_To_This_Stack => Third_Person_Stack);
       end loop;
 
       Person_Stack.Push
-        (This_Element     => Myself,
-         On_To_This_Stack => Third_Person_Stack);
+        (This_Element => Myself, On_To_This_Stack => Third_Person_Stack);
       Report.Failed ("OVERFLOW EXCEPTION NOT RAISED");
 
    exception
@@ -397,9 +358,8 @@ begin  -- CC3019C2M
 
       Table_Index : Positive := 1;
 
-      procedure Gather_People
-        (This_Person : in     Person;
-         Continue    :    out Boolean);
+      procedure Gather_People (This_Person : in     Person;
+         Continue                          :    out Boolean);
 
       procedure Show_People (This_Person : in Person; Continue : out Boolean);
 
@@ -450,16 +410,14 @@ begin  -- CC3019C2M
 
       Gather_Person_Iterate (Over_This_Stack => First_Person_Stack);
       if (First_Person_Table (1) /= Myself) or
-        (First_Person_Table (2) /= Friend)
-      then
+        (First_Person_Table (2) /= Friend) then
          Report.Failed ("PROBLEMS WITH ITERATION - 1");
       end if;
 
       Table_Index := 1;
       Gather_Person_Iterate (Over_This_Stack => Second_Person_Stack);
       if (First_Person_Table (1) /= Myself) or
-        (First_Person_Table (2) /= Daughter)
-      then
+        (First_Person_Table (2) /= Daughter) then
          Report.Failed ("PROBLEMS WITH ITERATION - 2");
       end if;
 

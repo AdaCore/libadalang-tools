@@ -36,8 +36,7 @@ begin
    Test
      ("C45631A",
       "CHECK THAT FOR TYPE INTEGER 'ABS A' " &
-      "EQUALS A IF A IS POSITIVE AND EQUALS -A IF " &
-      "A IS NEGATIVE");
+      "EQUALS A IF A IS POSITIVE AND EQUALS -A IF " & "A IS NEGATIVE");
 
    declare
 

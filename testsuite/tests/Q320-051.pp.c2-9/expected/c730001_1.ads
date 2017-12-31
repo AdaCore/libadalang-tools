@@ -20,13 +20,11 @@ package C730001_1 is
    -- The Set_Display procedure for type Wall_Clock improves upon the basic
    -- Set_Display procedure of type Clock.
 
-   procedure Set_Display
-     (Wc : in out Wall_Clock;
-      D  : in     Display_Kind := Analog);
+   procedure Set_Display (Wc : in out Wall_Clock;
+      D                      : in     Display_Kind := Analog);
 
-   procedure Answer
-     (Op : in out Office_Phone;
-      Oi : in     Indicator_Type := Buzzer);
+   procedure Answer (Op : in out Office_Phone;
+      Oi                : in     Indicator_Type := Buzzer);
 
    -- ...Other wall clock and/or Office_Phone operations (not specified in this
    -- test scenario).

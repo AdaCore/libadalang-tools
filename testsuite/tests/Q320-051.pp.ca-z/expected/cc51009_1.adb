@@ -4,11 +4,8 @@ package body Cc51009_1 is
 
    package body Set_Processing is
 
-      procedure Test
-        (Set_1 : in out Set_Type;
-         Set_2 :        Set_Type;
-         Set_3 :        Set_Type;
-         Elt   :        Element)
+      procedure Test (Set_1 : in out Set_Type; Set_2 : Set_Type;
+         Set_3              :        Set_Type; Elt : Element)
       is
       begin
          Set_1 := Intersection (Set_1, Set_2);

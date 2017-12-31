@@ -18,9 +18,8 @@ procedure C460001 is
    use type C460001_0.Result_Kind;
 
    -----------------------------------------------
-   procedure Target_Is_Level_1
-     (X :     access C460001_0.Desig;
-      R : out C460001_0.Result_Kind)
+   procedure Target_Is_Level_1 (X :     access C460001_0.Desig;
+      R                           : out C460001_0.Result_Kind)
    is
    begin
       -- The accessibility level of type Acc_L1 is 1.
@@ -34,10 +33,8 @@ procedure C460001 is
    end Target_Is_Level_1;
 
    -----------------------------------------------
-   procedure Display_Results
-     (Result   : in C460001_0.Result_Kind;
-      Expected : in C460001_0.Result_Kind;
-      Message  : in String)
+   procedure Display_Results (Result : in C460001_0.Result_Kind;
+      Expected : in C460001_0.Result_Kind; Message : in String)
    is
    begin
       if Result /= Expected then
@@ -101,21 +98,15 @@ begin -- C460001
 
    C460001_0.Never_Fails (new C460001_0.Desig, Res);
    Display_Results
-     (Res,
-      C460001_0.Ok,
-      "Allocator level 2, " & "local access type");
+     (Res, C460001_0.Ok, "Allocator level 2, " & "local access type");
 
    C460001_0.Target_Is_Level_0 (new C460001_0.Desig, Res);
    Display_Results
-     (Res,
-      C460001_0.P_E,
-      "Allocator level 2, " & "level 0 access type");
+     (Res, C460001_0.P_E, "Allocator level 2, " & "level 0 access type");
 
    Target_Is_Level_1 (new C460001_0.Desig, Res);
    Display_Results
-     (Res,
-      C460001_0.P_E,
-      "Allocator level 2, " & "level 1 access type");
+     (Res, C460001_0.P_E, "Allocator level 2, " & "level 1 access type");
 
    Block_L2 :
    declare
@@ -144,15 +135,11 @@ begin -- C460001
 
       C460001_0.Never_Fails (new C460001_0.Desig, Res);
       Display_Results
-        (Res,
-         C460001_0.Ok,
-         "Allocator level 3, " & "local access type");
+        (Res, C460001_0.Ok, "Allocator level 3, " & "local access type");
 
       Target_Is_Level_1 (new C460001_0.Desig, Res);
       Display_Results
-        (Res,
-         C460001_0.P_E,
-         "Allocator level 3, " & "level 1 access type");
+        (Res, C460001_0.P_E, "Allocator level 3, " & "level 1 access type");
 
    end Block_L2;
 

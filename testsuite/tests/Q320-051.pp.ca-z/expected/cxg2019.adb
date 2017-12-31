@@ -117,14 +117,9 @@ procedure Cxg2019 is
          if abs (Actual - Expected) > Max_Error then
             Accuracy_Error_Reported := True;
             Report.Failed
-              (Test_Name &
-               " actual: " &
-               Real'Image (Actual) &
-               " expected: " &
-               Real'Image (Expected) &
-               " difference: " &
-               Real'Image (Actual - Expected) &
-               " max err:" &
+              (Test_Name & " actual: " & Real'Image (Actual) & " expected: " &
+               Real'Image (Expected) & " difference: " &
+               Real'Image (Actual - Expected) & " max err:" &
                Real'Image (Max_Error));
          elsif Verbose then
             if Actual = Expected then
@@ -135,10 +130,8 @@ procedure Cxg2019 is
          end if;
       end Check;
 
-      procedure Check
-        (Actual, Expected : Complex;
-         Test_Name        : String;
-         Mre              : Real)
+      procedure Check (Actual, Expected : Complex; Test_Name : String;
+         Mre                            : Real)
       is
       begin
          Check (Actual.Re, Expected.Re, Test_Name & " real part", Mre);
@@ -160,14 +153,10 @@ procedure Cxg2019 is
          Minimum_Error : constant := 13.0;
       begin
          Check
-           (1.0 + Log (0.0 + I),
-            1.0 + Pi / 2.0 * I,
-            "1+log(0+i)",
+           (1.0 + Log (0.0 + I), 1.0 + Pi / 2.0 * I, "1+log(0+i)",
             Minimum_Error + 1.0);
          Check
-           (1.0 + Log ((-1.0, 0.0)),
-            1.0 + (Pi * I),
-            "log(-1+0i)+1 ",
+           (1.0 + Log ((-1.0, 0.0)), 1.0 + (Pi * I), "log(-1+0i)+1 ",
             Minimum_Error + 1.0);
       exception
          when Constraint_Error =>
@@ -229,15 +218,9 @@ procedure Cxg2019 is
                Actual2 := Log (Cy) * 0.5;
 
                Check
-                 (Actual1,
-                  Actual2,
-                  "Identity_1_Test " &
-                  Integer'Image (Ii) &
-                  Integer'Image (J) &
-                  ": Log((" &
-                  Real'Image (Cx.Re) &
-                  ", " &
-                  Real'Image (Cx.Im) &
+                 (Actual1, Actual2,
+                  "Identity_1_Test " & Integer'Image (Ii) & Integer'Image (J) &
+                  ": Log((" & Real'Image (Cx.Re) & ", " & Real'Image (Cx.Im) &
                   ")) ",
                   26.0);   -- 2 logs = 2*13.  no error from this multiply
 
@@ -252,20 +235,12 @@ procedure Cxg2019 is
       exception
          when Constraint_Error =>
             Report.Failed
-              ("Constraint_Error raised in Identity_Test" &
-               " for X=(" &
-               Real'Image (X) &
-               ", " &
-               Real'Image (X) &
-               ")");
+              ("Constraint_Error raised in Identity_Test" & " for X=(" &
+               Real'Image (X) & ", " & Real'Image (X) & ")");
          when others =>
             Report.Failed
-              ("exception in Identity_Test" &
-               " for X=(" &
-               Real'Image (X) &
-               ", " &
-               Real'Image (X) &
-               ")");
+              ("exception in Identity_Test" & " for X=(" & Real'Image (X) &
+               ", " & Real'Image (X) & ")");
       end Identity_Test;
 
       procedure Exception_Test is
@@ -329,8 +304,7 @@ begin
 
    if Verbose then
       Report.Comment
-        ("checking a digits" &
-         Integer'Image (System.Max_Digits) &
+        ("checking a digits" & Integer'Image (System.Max_Digits) &
          " floating point type");
    end if;
 

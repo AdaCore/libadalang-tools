@@ -19,9 +19,8 @@ procedure C392002 is
 
    -- Instantiate generic package for 1970 simulation.
 
-   package Sim_1970 is new C392002_0
-     (Cubic_Inches                    => Engine_Size,
-      Emission_Measure                => Vehicle_Emissions,
+   package Sim_1970 is new C392002_0 (Cubic_Inches => Engine_Size,
+      Emission_Measure                             => Vehicle_Emissions,
       Emissions_Per_Engine_Cubic_Inch => Engine_Emission_Factor (C1970));
 
    -- Declare and initialize vehicle objects.
@@ -32,11 +31,8 @@ procedure C392002 is
    Auto_1970 : Sim_1970.Automobile := (2_000, 4, 500, 5);
 
    Truck_1970 : Sim_1970.Truck :=
-     (Weight             => 5_000,
-      Wheels             => 18,
-      Size_Of_Engine     => 1_000,
-      Passenger_Capacity => 2,
-      Hauling_Capacity   => Five_Tons);
+     (Weight             => 5_000, Wheels => 18, Size_Of_Engine => 1_000,
+      Passenger_Capacity => 2, Hauling_Capacity => Five_Tons);
 
    -- Function Get_Engine_Size performs a dispatching call on a primitive
    -- operation that has been defined for an ancestor type and inherited
@@ -79,20 +75,17 @@ begin  -- Main test procedure.
      ("C392002",
       "Check that the use of a class-wide parameter " &
       "allows for proper dispatching where root type " &
-      "and extended types are declared in the same " &
-      "generic package");
+      "and extended types are declared in the same " & "generic package");
 
    if (Get_Engine_Size (Cycle_1970) /= 100) or
      (Get_Engine_Size (Auto_1970) /= 500) or
-     (Get_Engine_Size (Truck_1970) /= 1_000)
-   then
+     (Get_Engine_Size (Truck_1970) /= 1_000) then
       Report.Failed ("Failed dispatch to Get_Engine_Size");
    end if;
 
    if Catalytic_Converter_Present (Cycle_1970) or
      not Catalytic_Converter_Present (Auto_1970) or
-     not Catalytic_Converter_Present (Truck_1970)
-   then
+     not Catalytic_Converter_Present (Truck_1970) then
       Report.Failed ("Failed dispatch to Catalytic_Converter_Present");
    end if;
 

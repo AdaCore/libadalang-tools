@@ -83,15 +83,8 @@ begin
       O7 : R7 (A)         := (D => A);
       O8 : R8 (2)         := (D => 2);
    begin
-      if O1.D /= A or
-        O2.D /= 3 or
-        not O3.D or
-        O4.D in 'A' .. 'Z' or
-        O5.D /= 'A' or
-        O6.D /= 'A' or
-        O7.D /= A or
-        O8.D /= 2
-      then
+      if O1.D /= A or O2.D /= 3 or not O3.D or O4.D in 'A' .. 'Z' or
+        O5.D /= 'A' or O6.D /= 'A' or O7.D /= A or O8.D /= 2 then
          Failed ("WRONG DISCRIMINANT VALUE");
       end if;
    end;

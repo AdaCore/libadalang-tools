@@ -91,9 +91,8 @@ begin
 
          type Mode_Selection_Type is (A, I, Io, O);
 
-         procedure Change_Mode
-           (File : in out Dir_Io.File_Type;
-            To   : in     Mode_Selection_Type)
+         procedure Change_Mode (File : in out Dir_Io.File_Type;
+            To                       : in     Mode_Selection_Type)
          is
          begin
             case To is
@@ -112,8 +111,7 @@ begin
                when Io =>
                   begin
                      Dir_Io.Reset
-                       (File,
-                        Dir_Io.File_Mode'Value ("Inout_File"));
+                       (File, Dir_Io.File_Mode'Value ("Inout_File"));
                   exception
                      when Dir_Io.Use_Error =>
                         Report.Not_Applicable

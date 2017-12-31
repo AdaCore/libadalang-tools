@@ -86,9 +86,8 @@ procedure Cxai007 is
    My_Cursor_2               : My_Multiway_Trees.Cursor;
    Second_Child_Cursor_1     : My_Multiway_Trees.Cursor;
 
-   procedure Tampering_Check
-     (Container : in out My_Multiway_Trees.Tree;
-      Where     : in     String)
+   procedure Tampering_Check (Container : in out My_Multiway_Trees.Tree;
+      Where                             : in     String)
    is
 
       Program_Error_Raised : Boolean := False;
@@ -99,8 +98,7 @@ procedure Cxai007 is
       begin
 
          Container.Append_Child
-           (Parent   => Root_1,
-            New_Item => Value_In_Array (1));
+           (Parent => Root_1, New_Item => Value_In_Array (1));
 
       exception
 
@@ -155,8 +153,7 @@ begin
    for I in Array_Bounds_Type loop
 
       My_Tree_1.Append_Child
-        (Parent   => Root_1,
-         New_Item => Value_In_Array (I));
+        (Parent => Root_1, New_Item => Value_In_Array (I));
 
       if My_Tree_1.Node_Count /= I + 1 then -- Add 1 for root node
 
@@ -232,8 +229,7 @@ begin
       begin
 
          if My_Multiway_Trees.Element (Position => My_Cursor_1) /=
-           Value_In_Array (I)
-         then
+           Value_In_Array (I) then
 
             Report.Failed
               ("Mismatch between element and what was appended #2");
@@ -241,8 +237,7 @@ begin
          end if;
 
          My_Multiway_Trees.Query_Element
-           (Position => My_Cursor_1,
-            Process  => My_Query'Access);
+           (Position => My_Cursor_1, Process => My_Query'Access);
 
       end;
 
@@ -261,8 +256,7 @@ begin
    end loop;
 
    if My_Multiway_Trees.First_Child_Element (Parent => Root_1) /=
-     Value_In_Array (Value_In_Array'First)
-   then
+     Value_In_Array (Value_In_Array'First) then
 
       Report.Failed ("Mismatch between first element and first appended");
 
@@ -274,8 +268,7 @@ begin
    for I in reverse Array_Bounds_Type loop
 
       My_Tree_2.Prepend_Child
-        (Parent   => Root_2,
-         New_Item => Value_In_Array (I));
+        (Parent => Root_2, New_Item => Value_In_Array (I));
 
       -- Add an extra one for root node
       if My_Tree_2.Node_Count /= Num_Tests - I + 2 then
@@ -283,8 +276,7 @@ begin
 
       end if;
 
-      if My_Multiway_Trees.Child_Count (Parent => Root_2) /=
-        Num_Tests - I + 1
+      if My_Multiway_Trees.Child_Count (Parent => Root_2) /= Num_Tests - I + 1
       then
          -- Excludes parent and grandchildren
 
@@ -299,8 +291,7 @@ begin
    for I in reverse Array_Bounds_Type loop
 
       if My_Multiway_Trees.Element (Position => My_Cursor_2) /=
-        Value_In_Array (I)
-      then
+        Value_In_Array (I) then
 
          Report.Failed ("Mismatch between element and what was prepended");
 
@@ -322,8 +313,7 @@ begin
    end loop;
 
    if My_Multiway_Trees.Last_Child_Element (Parent => Root_1) /=
-     Value_In_Array (Value_In_Array'Last)
-   then
+     Value_In_Array (Value_In_Array'Last) then
 
       Report.Failed ("Mismatch between last element and last prepended");
 
@@ -388,8 +378,7 @@ begin
       My_Tree_3.Iterate (Process => My_Process'Access);
 
       My_Multiway_Trees.Reverse_Iterate_Children
-        (Parent  => My_Tree_3.Root,
-         Process => My_Reverse_Process'Access);
+        (Parent => My_Tree_3.Root, Process => My_Reverse_Process'Access);
 
    end;
 
@@ -409,8 +398,7 @@ begin
          begin
 
             Tampering_Check
-              (Container => My_Tree_2,
-               Where     => "Update_Element");
+              (Container => My_Tree_2, Where => "Update_Element");
 
             Element := Element * 2.0;
 
@@ -419,12 +407,10 @@ begin
       begin
 
          My_Tree_1.Replace_Element
-           (Position => My_Cursor_1,
-            New_Item => Value_In_Array (I) * 2.0);
+           (Position => My_Cursor_1, New_Item => Value_In_Array (I) * 2.0);
 
          My_Tree_2.Update_Element
-           (Position => My_Cursor_2,
-            Process  => My_Update'Access);
+           (Position => My_Cursor_2, Process => My_Update'Access);
 
       end;
 
@@ -454,8 +440,7 @@ begin
    for I in Array_Bounds_Type loop
 
       My_Tree_1.Prepend_Child
-        (Parent   => Root_1,
-         New_Item => Value_In_Array (I));
+        (Parent => Root_1, New_Item => Value_In_Array (I));
 
    end loop;
 
@@ -473,8 +458,7 @@ begin
    for I in Array_Bounds_Type loop
 
       My_Tree_2.Append_Child
-        (Parent   => Root_2,
-         New_Item => Value_In_Array (I));
+        (Parent => Root_2, New_Item => Value_In_Array (I));
 
    end loop;
 
@@ -491,8 +475,7 @@ begin
    for I in Array_Bounds_Type loop
 
       if My_Multiway_Trees.Element (Position => My_Cursor_1) /=
-        Value_In_Array (I)
-      then
+        Value_In_Array (I) then
 
          Report.Failed ("Target tree not as expected after move");
 
@@ -548,8 +531,7 @@ begin
    My_Cursor_2 := My_Multiway_Trees.First_Child (Parent => Root_2);
 
    -- Check = Default_Value
-   if My_Multiway_Trees.Element (Position => My_Cursor_2) /=
-     Value_In_Array (1)
+   if My_Multiway_Trees.Element (Position => My_Cursor_2) /= Value_In_Array (1)
    then
 
       Report.Failed ("Inserted value not as expected #1");
@@ -558,8 +540,7 @@ begin
 
    My_Multiway_Trees.Next_Sibling (Position => My_Cursor_2);
 
-   if My_Multiway_Trees.Element (Position => My_Cursor_2) /=
-     My_Default_Value
+   if My_Multiway_Trees.Element (Position => My_Cursor_2) /= My_Default_Value
    then
 
       Report.Failed ("Inserted value not as expected #2");
@@ -569,8 +550,7 @@ begin
    My_Multiway_Trees.Next_Sibling (Position => My_Cursor_2);
 
    -- Check = Default_Value
-   if My_Multiway_Trees.Element (Position => My_Cursor_2) /=
-     My_Default_Value
+   if My_Multiway_Trees.Element (Position => My_Cursor_2) /= My_Default_Value
    then
 
       Report.Failed ("Inserted value not as expected #3");
@@ -579,8 +559,7 @@ begin
 
    My_Multiway_Trees.Next_Sibling (Position => My_Cursor_2);
 
-   if My_Multiway_Trees.Element (Position => My_Cursor_2) /=
-     Value_In_Array (2)
+   if My_Multiway_Trees.Element (Position => My_Cursor_2) /= Value_In_Array (2)
    then
 
       Report.Failed ("Inserted value not as expected #4");
@@ -589,8 +568,7 @@ begin
 
    My_Multiway_Trees.Next_Sibling (Position => My_Cursor_2);
 
-   if My_Multiway_Trees.Element (Position => My_Cursor_2) /=
-     Value_In_Array (2)
+   if My_Multiway_Trees.Element (Position => My_Cursor_2) /= Value_In_Array (2)
    then
 
       Report.Failed ("Inserted value not as expected #5");
@@ -600,8 +578,7 @@ begin
    My_Multiway_Trees.Next_Sibling (Position => My_Cursor_2);
 
    -- Check = Default_Value
-   if My_Multiway_Trees.Element (Position => My_Cursor_2) /=
-     My_Default_Value
+   if My_Multiway_Trees.Element (Position => My_Cursor_2) /= My_Default_Value
    then
 
       Report.Failed ("Inserted value not as expected #6");
@@ -612,8 +589,7 @@ begin
    -- stay pointing to the same element even if the order has changed, e.g.
    -- by insertions earlier in the tree
 
-   if My_Multiway_Trees.Element (Position => My_Cursor_1) /=
-     Value_In_Array (1)
+   if My_Multiway_Trees.Element (Position => My_Cursor_1) /= Value_In_Array (1)
    then
 
       Report.Failed
@@ -652,8 +628,7 @@ begin
    -- Check = Default_Value
    if My_Multiway_Trees.Element
        (My_Multiway_Trees.First_Child (Parent => Root_2)) /=
-     My_Default_Value
-   then
+     My_Default_Value then
 
       Report.Failed ("Remaining value not as expected");
 
@@ -667,9 +642,7 @@ begin
    My_Cursor_1 := My_Tree_1.Find (Item => Value_In_Array (3));
 
    My_Tree_1.Splice_Children
-     (Target_Parent => Root_1,
-      Before        => My_Cursor_1,
-      Source        => My_Tree_2,
+     (Target_Parent => Root_1, Before => My_Cursor_1, Source => My_Tree_2,
       Source_Parent => Root_2); -- Copies all under Root_2
 
    -- The order should now be Value_In_Array (1), Value_In_Array (2),
@@ -682,8 +655,7 @@ begin
    for I in Array_Bounds_Type loop
 
       My_Tree_2.Append_Child
-        (Parent   => Root_2,
-         New_Item => Value_In_Array (I));
+        (Parent => Root_2, New_Item => Value_In_Array (I));
 
    end loop;
 
@@ -694,8 +666,7 @@ begin
    -- Copies what's beneath My_Cursor_2, i.e. nothing
 
    My_Tree_1.Splice_Children
-     (Target_Parent => Root_1,
-      Before        => My_Cursor_1,
+     (Target_Parent => Root_1, Before => My_Cursor_1,
       Source_Parent => My_Cursor_2);
 
    -- The order should still be Value_In_Array (1), Value_In_Array (2),
@@ -705,8 +676,7 @@ begin
 
    My_Cursor_1 := My_Multiway_Trees.First_Child (Parent => Root_1);
 
-   if My_Multiway_Trees.Element (Position => My_Cursor_1) /=
-     Value_In_Array (1)
+   if My_Multiway_Trees.Element (Position => My_Cursor_1) /= Value_In_Array (1)
    then
 
       Report.Failed ("Spliced value not as expected #1");
@@ -715,8 +685,7 @@ begin
 
    My_Multiway_Trees.Next_Sibling (Position => My_Cursor_1);
 
-   if My_Multiway_Trees.Element (Position => My_Cursor_1) /=
-     Value_In_Array (2)
+   if My_Multiway_Trees.Element (Position => My_Cursor_1) /= Value_In_Array (2)
    then
 
       Report.Failed ("Spliced value not as expected #2");
@@ -726,8 +695,7 @@ begin
    My_Multiway_Trees.Next_Sibling (Position => My_Cursor_1);
 
    -- Check = Default_Value
-   if My_Multiway_Trees.Element (Position => My_Cursor_1) /=
-     My_Default_Value
+   if My_Multiway_Trees.Element (Position => My_Cursor_1) /= My_Default_Value
    then
 
       Report.Failed ("Spliced value not as expected #3");
@@ -736,8 +704,7 @@ begin
 
    My_Multiway_Trees.Next_Sibling (Position => My_Cursor_1);
 
-   if My_Multiway_Trees.Element (Position => My_Cursor_1) /=
-     Value_In_Array (3)
+   if My_Multiway_Trees.Element (Position => My_Cursor_1) /= Value_In_Array (3)
    then
 
       Report.Failed ("Spliced value not as expected #4");
@@ -746,8 +713,7 @@ begin
 
    My_Multiway_Trees.Next_Sibling (Position => My_Cursor_1);
 
-   if My_Multiway_Trees.Element (Position => My_Cursor_1) /=
-     Value_In_Array (4)
+   if My_Multiway_Trees.Element (Position => My_Cursor_1) /= Value_In_Array (4)
    then
 
       Report.Failed ("Spliced value not as expected #5");
@@ -756,8 +722,7 @@ begin
 
    My_Multiway_Trees.Next_Sibling (Position => My_Cursor_1);
 
-   if My_Multiway_Trees.Element (Position => My_Cursor_1) /=
-     Value_In_Array (5)
+   if My_Multiway_Trees.Element (Position => My_Cursor_1) /= Value_In_Array (5)
    then
 
       Report.Failed ("Spliced value not as expected #6");
@@ -766,8 +731,7 @@ begin
 
    My_Multiway_Trees.Next_Sibling (Position => My_Cursor_1);
 
-   if My_Multiway_Trees.Element (Position => My_Cursor_1) /=
-     Value_In_Array (6)
+   if My_Multiway_Trees.Element (Position => My_Cursor_1) /= Value_In_Array (6)
    then
 
       Report.Failed ("Spliced value not as expected #7");
@@ -776,8 +740,7 @@ begin
 
    My_Multiway_Trees.Next_Sibling (Position => My_Cursor_1);
 
-   if My_Multiway_Trees.Element (Position => My_Cursor_1) /=
-     Value_In_Array (7)
+   if My_Multiway_Trees.Element (Position => My_Cursor_1) /= Value_In_Array (7)
    then
 
       Report.Failed ("Spliced value not as expected #8");
@@ -786,8 +749,7 @@ begin
 
    My_Multiway_Trees.Next_Sibling (Position => My_Cursor_1);
 
-   if My_Multiway_Trees.Element (Position => My_Cursor_1) /=
-     Value_In_Array (8)
+   if My_Multiway_Trees.Element (Position => My_Cursor_1) /= Value_In_Array (8)
    then
 
       Report.Failed ("Spliced value not as expected #9");
@@ -796,8 +758,7 @@ begin
 
    My_Multiway_Trees.Next_Sibling (Position => My_Cursor_1);
 
-   if My_Multiway_Trees.Element (Position => My_Cursor_1) /=
-     Value_In_Array (9)
+   if My_Multiway_Trees.Element (Position => My_Cursor_1) /= Value_In_Array (9)
    then
 
       Report.Failed ("Spliced value not as expected #10");
@@ -807,8 +768,7 @@ begin
    My_Multiway_Trees.Next_Sibling (Position => My_Cursor_1);
 
    if My_Multiway_Trees.Element (Position => My_Cursor_1) /=
-     Value_In_Array (10)
-   then
+     Value_In_Array (10) then
 
       Report.Failed ("Spliced value not as expected #11");
 
@@ -899,20 +859,16 @@ begin
    First_Child_Cursor_1 := My_Multiway_Trees.First_Child (Parent => Root_1);
 
    My_Tree_1.Insert_Child
-     (Parent   => First_Child_Cursor_1,
-      Before   => My_Multiway_Trees.No_Element,
-      New_Item => Value_In_Array (2),
-      Position => First_Grandchild_Cursor_1);
+     (Parent   => First_Child_Cursor_1, Before => My_Multiway_Trees.No_Element,
+      New_Item => Value_In_Array (2), Position => First_Grandchild_Cursor_1);
 
    My_Tree_1.Insert_Child
-     (Parent   => First_Child_Cursor_1,
-      Before   => My_Multiway_Trees.No_Element,
+     (Parent   => First_Child_Cursor_1, Before => My_Multiway_Trees.No_Element,
       New_Item => Value_In_Array (8));
 
    My_Tree_1.Insert_Child
-     (Parent   => First_Grandchild_Cursor_1,
-      Before   => My_Multiway_Trees.No_Element,
-      New_Item => Value_In_Array (9));
+     (Parent => First_Grandchild_Cursor_1,
+      Before => My_Multiway_Trees.No_Element, New_Item => Value_In_Array (9));
 
    if My_Tree_1.Node_Count /= Num_Tests + 5 then -- Remember one for root node
 
@@ -924,8 +880,7 @@ begin
 
    if My_Multiway_Trees.Subtree_Node_Count
        (Position => First_Child_Cursor_1) /=
-     4
-   then
+     4 then
       -- Includes parent and grandchildren
 
       Report.Failed ("Wrong subtree node count after subtree inserted");
@@ -960,20 +915,16 @@ begin
    -- Test Child_Depth
 
    if My_Multiway_Trees.Child_Depth
-       (Parent => First_Child_Cursor_1,
-        Child  => First_Grandchild_Cursor_1) /=
-     1
-   then
+       (Parent => First_Child_Cursor_1, Child => First_Grandchild_Cursor_1) /=
+     1 then
 
       Report.Failed ("Wrong child depth #1");
 
    end if;
 
    if My_Multiway_Trees.Child_Depth
-       (Parent => Root_1,
-        Child  => First_Grandchild_Cursor_1) /=
-     2
-   then
+       (Parent => Root_1, Child => First_Grandchild_Cursor_1) /=
+     2 then
 
       Report.Failed ("Wrong child depth #2");
 
@@ -983,8 +934,7 @@ begin
      My_Multiway_Trees.Next_Sibling (Position => First_Child_Cursor_1);
 
    My_Tree_1.Insert_Child
-     (Parent   => Second_Child_Cursor_1,
-      Before   => My_Multiway_Trees.No_Element,
+     (Parent => Second_Child_Cursor_1, Before => My_Multiway_Trees.No_Element,
       New_Item => Value_In_Array (9));
 
    -- Root
@@ -1000,8 +950,7 @@ begin
 
    if My_Multiway_Trees.Subtree_Node_Count
        (Position => First_Child_Cursor_1) /=
-     4
-   then
+     4 then
       -- Includes parent and grandchildren
 
       Report.Failed ("Wrong subtree node count after subtree inserted");
@@ -1027,8 +976,7 @@ begin
    end if;
 
    if My_Multiway_Trees.Equal_Subtree
-       (Left_Position  => Root_1,
-        Right_Position => First_Grandchild_Cursor_1)
+       (Left_Position => Root_1, Right_Position => First_Grandchild_Cursor_1)
    then
 
       Report.Failed ("Thinks unequal subtrees are");
@@ -1039,12 +987,10 @@ begin
 
    Greatgrandchild_Cursor_1 :=
      My_Multiway_Trees.Find_In_Subtree
-       (Position => First_Grandchild_Cursor_1,
-        Item     => Value_In_Array (9));
+       (Position => First_Grandchild_Cursor_1, Item => Value_In_Array (9));
 
    if Greatgrandchild_Cursor_1 /=
-     My_Multiway_Trees.First_Child (Parent => First_Grandchild_Cursor_1)
-   then
+     My_Multiway_Trees.First_Child (Parent => First_Grandchild_Cursor_1) then
 
       Report.Failed ("Has found wrong child in subtree");
 
@@ -1053,30 +999,24 @@ begin
    -- Test Ancestor_Find
 
    if My_Multiway_Trees.Ancestor_Find
-       (Position => Greatgrandchild_Cursor_1,
-        Item     => Value_In_Array (2)) /=
-     First_Grandchild_Cursor_1
-   then
+       (Position => Greatgrandchild_Cursor_1, Item => Value_In_Array (2)) /=
+     First_Grandchild_Cursor_1 then
 
       Report.Failed ("Failed to find ancestor");
 
    end if;
 
    if My_Multiway_Trees.Find_In_Subtree
-       (Position => First_Grandchild_Cursor_1,
-        Item     => Value_In_Array (7)) /=
-     My_Multiway_Trees.No_Element
-   then
+       (Position => First_Grandchild_Cursor_1, Item => Value_In_Array (7)) /=
+     My_Multiway_Trees.No_Element then
 
       Report.Failed ("Has found child in subtree when shouldn't have");
 
    end if;
 
    if My_Multiway_Trees.Ancestor_Find
-       (Position => First_Grandchild_Cursor_1,
-        Item     => Value_In_Array (7)) /=
-     My_Multiway_Trees.No_Element
-   then
+       (Position => First_Grandchild_Cursor_1, Item => Value_In_Array (7)) /=
+     My_Multiway_Trees.No_Element then
 
       Report.Failed ("Has found ancestor when shouldn't have");
 
@@ -1097,8 +1037,7 @@ begin
 
             when 1 =>
 
-               if My_Multiway_Trees.Element (Position) /=
-                 Value_In_Array (1)
+               if My_Multiway_Trees.Element (Position) /= Value_In_Array (1)
                then
 
                   Report.Failed ("Iterate hasn't found the expected value #1");
@@ -1107,8 +1046,7 @@ begin
 
             when 2 =>
 
-               if My_Multiway_Trees.Element (Position) /=
-                 Value_In_Array (2)
+               if My_Multiway_Trees.Element (Position) /= Value_In_Array (2)
                then
 
                   Report.Failed ("Iterate hasn't found the expected value #2");
@@ -1117,8 +1055,7 @@ begin
 
             when 3 =>
 
-               if My_Multiway_Trees.Element (Position) /=
-                 Value_In_Array (9)
+               if My_Multiway_Trees.Element (Position) /= Value_In_Array (9)
                then
 
                   Report.Failed ("Iterate hasn't found the expected value #3");
@@ -1127,8 +1064,7 @@ begin
 
             when 4 =>
 
-               if My_Multiway_Trees.Element (Position) /=
-                 Value_In_Array (8)
+               if My_Multiway_Trees.Element (Position) /= Value_In_Array (8)
                then
 
                   Report.Failed ("Iterate hasn't found the expected value #4");
@@ -1168,8 +1104,7 @@ begin
 
             when 1 =>
 
-               if My_Multiway_Trees.Element (Position) /=
-                 Value_In_Array (2)
+               if My_Multiway_Trees.Element (Position) /= Value_In_Array (2)
                then
 
                   Report.Failed
@@ -1179,8 +1114,7 @@ begin
 
             when 2 =>
 
-               if My_Multiway_Trees.Element (Position) /=
-                 Value_In_Array (8)
+               if My_Multiway_Trees.Element (Position) /= Value_In_Array (8)
                then
 
                   Report.Failed
@@ -1227,8 +1161,7 @@ begin
 
    if My_Multiway_Trees.Subtree_Node_Count
        (Position => First_Child_Cursor_1) /=
-     6
-   then
+     6 then
       -- Includes parent and grandchildren
 
       Report.Failed ("Wrong subtree node count after Copy_Subtree");
@@ -1249,10 +1182,8 @@ begin
    Last_Child_Cursor_1 := My_Multiway_Trees.Last_Child (Parent => Root_1);
 
    My_Tree_1.Splice_Subtree
-     (Parent   => Last_Child_Cursor_1,
-      Before   => My_Multiway_Trees.No_Element,
-      Source   => My_Tree_2,
-      Position => My_Cursor_2);
+     (Parent => Last_Child_Cursor_1, Before => My_Multiway_Trees.No_Element,
+      Source => My_Tree_2, Position => My_Cursor_2);
 
    -- Root
    -- |
@@ -1289,8 +1220,7 @@ begin
    -- one child beneath it)
 
    if My_Multiway_Trees.Subtree_Node_Count (Position => Last_Child_Cursor_1) /=
-     2
-   then
+     2 then
       -- Includes parent and grandchildren
 
       Report.Failed
@@ -1311,8 +1241,7 @@ begin
    -- Test Splice_Subtree (second form)
 
    My_Tree_1.Splice_Subtree
-     (Parent   => Last_Child_Cursor_1,
-      Before   => My_Multiway_Trees.No_Element,
+     (Parent   => Last_Child_Cursor_1, Before => My_Multiway_Trees.No_Element,
       Position => First_Grandchild_Cursor_1);
 
    -- Root
@@ -1333,8 +1262,7 @@ begin
    -- Check that My_Tree_1's last child is a subtree that has gained two nodes
 
    if My_Multiway_Trees.Subtree_Node_Count (Position => Last_Child_Cursor_1) /=
-     4
-   then
+     4 then
       -- Includes parent and grandchildren
 
       Report.Failed
@@ -1346,8 +1274,7 @@ begin
 
    if My_Multiway_Trees.Subtree_Node_Count
        (Position => First_Child_Cursor_1) /=
-     4
-   then
+     4 then
       -- Includes parent and grandchildren
 
       Report.Failed

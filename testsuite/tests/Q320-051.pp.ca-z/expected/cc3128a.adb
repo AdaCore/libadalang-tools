@@ -43,8 +43,7 @@ begin
       "AN ACCESS TYPE, CONSTRAINT_ERROR IS RAISED " &
       "IF AND ONLY IF THE ACTUAL PARAMETER IS NOT " &
       "NULL AND THE OBJECT DESIGNATED BY THE ACTUAL " &
-      "PARAMETER DOES NOT SATISFY FORMAL PARAMETER'S " &
-      "CONSTRAINTS");
+      "PARAMETER DOES NOT SATISFY FORMAL PARAMETER'S " & "CONSTRAINTS");
 
    declare
       type Rec (D : Integer := 10) is record
@@ -125,8 +124,7 @@ begin
             when others =>
                Failed
                  ("EXCEPTION RAISED AT INSTANTIATION " &
-                  "OF PACKAGE P1 WITH NULL ACCESS " &
-                  "VALUE");
+                  "OF PACKAGE P1 WITH NULL ACCESS " & "VALUE");
          end;
 
          begin
@@ -277,8 +275,7 @@ begin
             when others =>
                Failed
                  ("EXCEPTION RAISED AT INSTANTIATION " &
-                  "OF PACKAGE P2 WITH NULL ACCESS " &
-                  "VALUE");
+                  "OF PACKAGE P2 WITH NULL ACCESS " & "VALUE");
          end;
 
          begin

@@ -43,8 +43,7 @@ begin
      ("C35502K",
       "CHECK THAT 'POS' AND 'VAL' YIELD THE " &
       "CORRECT RESULTS WHEN THE PREFIX IS AN " &
-      "ENUMERATION TYPE OTHER THAN A CHARACTER " &
-      "OR A BOOLEAN TYPE");
+      "ENUMERATION TYPE OTHER THAN A CHARACTER " & "OR A BOOLEAN TYPE");
 
    declare
       Position : Integer;

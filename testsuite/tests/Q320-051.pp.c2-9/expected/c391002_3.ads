@@ -12,10 +12,8 @@ package C391002_3 is -- package Modules
    type Command_Formats is
      (Set_Compression_Code, Set_Data_Rate, Set_Power_State);
 
-   type Electronics_Module
-     (Eband       : Boards.Data_Formats;
-      The_Command : Command_Formats)
-   is new Boards.Transceiver (Eband) with
+   type Electronics_Module (Eband : Boards.Data_Formats;
+      The_Command : Command_Formats) is new Boards.Transceiver (Eband) with
    record
       case The_Command is
          when Set_Compression_Code =>

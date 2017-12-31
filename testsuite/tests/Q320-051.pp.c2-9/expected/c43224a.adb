@@ -59,8 +59,7 @@ procedure C43224a is
         (Arr2'Range (1) =>
            (Arry'Range (2) => (Arry'Range (3) => Ident_Int (7))));
 
-      if Arry (Ident_Int (1), Ident_Int (2), Ident_Int (1)) /=
-        Ident_Int (7)
+      if Arry (Ident_Int (1), Ident_Int (2), Ident_Int (1)) /= Ident_Int (7)
       then
          Failed ("RANGE NOT INITIALIZED - 2");
       end if;

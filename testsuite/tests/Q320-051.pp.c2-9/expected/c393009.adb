@@ -68,9 +68,8 @@ procedure C393009 is
       procedure Handle (A : in out Alert_Type) is abstract;
       -- abstract operation - must be overridden after instantiation
 
-      procedure Display
-        (A  : Alert_Type;
-         On : Display_Devices.Display_Device_Enum);
+      procedure Display (A : Alert_Type;
+         On                : Display_Devices.Display_Device_Enum);
       -- primitive operation of Alert_Type not required to be overridden
 
       function Get_Serial_Number (A : Alert_Type) return Serial_Type;
@@ -82,9 +81,8 @@ procedure C393009 is
 
    package body Alert_System is
 
-      procedure Display
-        (A  : in Alert_Type;
-         On :    Display_Devices.Display_Device_Enum)
+      procedure Display (A : in Alert_Type;
+         On                :    Display_Devices.Display_Device_Enum)
       is
       begin
          Display_Devices.Display := On;
@@ -110,10 +108,8 @@ procedure C393009 is
 
       package Alert_Pkg is new Alert_System (Status_Kind, Serial_Number_Type);
 
-      type New_Alert_Type
-        (Serial : Serial_Number_Type)
-      is new Alert_Pkg.Alert_Type (Serial) with
-      record
+      type New_Alert_Type (Serial : Serial_Number_Type)
+      is new Alert_Pkg.Alert_Type (Serial) with record
          Message : Msg_Str;
       end record;
 
@@ -156,19 +152,15 @@ begin
       "Check that an extended type can be derived " & "from an abstract type");
 
    Init (Na);
-   if (Get_Serial_Number (Na) /= 1) or
-     (Na.Status /= Green) or
-     (Display_Devices.Display /= Display_Devices.None)
-   then
+   if (Get_Serial_Number (Na) /= 1) or (Na.Status /= Green) or
+     (Display_Devices.Display /= Display_Devices.None) then
       Report.Failed ("Wrong Initialization");
    end if;
 
    Handle (Na);
-   if (Get_Serial_Number (Na) /= 1) or
-     (Na.Status /= Green) or
+   if (Get_Serial_Number (Na) /= 1) or (Na.Status /= Green) or
      (Na.Message /= Alert_Msg) or
-     (Display_Devices.Display /= Display_Devices.Tty)
-   then
+     (Display_Devices.Display /= Display_Devices.Tty) then
       Report.Failed ("Wrong results from Handle");
    end if;
 

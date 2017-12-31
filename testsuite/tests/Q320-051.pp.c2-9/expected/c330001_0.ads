@@ -72,10 +72,8 @@ package C330001_0 is
       C1 : Boolean := False;
    end record;
 
-   type Indefinite_New_W_Disc
-     (Nd : Sub_Type)
-   is new Indefinite_Tag_W_Disc (Nd) with
-   record
+   type Indefinite_New_W_Disc (Nd : Sub_Type)
+   is new Indefinite_Tag_W_Disc (Nd) with record
       C2 : Integer := 9;
    end record;
 

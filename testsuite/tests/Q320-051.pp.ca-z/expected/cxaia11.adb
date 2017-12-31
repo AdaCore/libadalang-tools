@@ -76,8 +76,7 @@ procedure Cxaia11 is
    My_Cursor_1 : My_Indefinite_Ordered_Maps.Cursor;
 
    procedure Tampering_Check
-     (Container : in out My_Indefinite_Ordered_Maps.Map;
-      Where     : in     String)
+     (Container : in out My_Indefinite_Ordered_Maps.Map; Where : in String)
    is
 
       Program_Error_Raised : Boolean := False;
@@ -123,8 +122,7 @@ begin
    My_Map_1.Clear;
 
    My_Map_1.Insert
-     (Key      => My_Key_Type (1),
-      New_Item => Value_In_Ptr_Array (1).all);
+     (Key => My_Key_Type (1), New_Item => Value_In_Ptr_Array (1).all);
 
    declare
 
@@ -135,8 +133,7 @@ begin
    begin
 
       Tampering_Check
-        (Container => My_Map_1,
-         Where     => "Constant_Reference (key form)");
+        (Container => My_Map_1, Where => "Constant_Reference (key form)");
 
    end;
 
@@ -160,8 +157,7 @@ begin
    begin
 
       Tampering_Check
-        (Container => My_Map_1,
-         Where     => "Constant_Reference (cursor form)");
+        (Container => My_Map_1, Where => "Constant_Reference (cursor form)");
 
    end;
 
@@ -173,8 +169,7 @@ begin
    begin
 
       Tampering_Check
-        (Container => My_Map_1,
-         Where     => "Reference (cursor form)");
+        (Container => My_Map_1, Where => "Reference (cursor form)");
 
    end;
 
@@ -183,10 +178,8 @@ begin
    -- -- in a way that corresponds to likely usage.
 
    declare
-      procedure Test
-        (Value     : in String;
-         Expected  : in String;
-         Test_Case : in String)
+      procedure Test (Value : in String; Expected : in String;
+         Test_Case          : in String)
       is
       begin
          Tampering_Check (Container => My_Map_1, Where => Test_Case);
@@ -199,11 +192,8 @@ begin
          end if;
       end Test;
 
-      procedure Test_And_Mod
-        (Value     : in out String;
-         Expected  : in     String;
-         New_Item  : in     String;
-         Test_Case : in     String) with
+      procedure Test_And_Mod (Value : in out String; Expected : in String;
+         New_Item                   : in String; Test_Case : in String) with
          Pre => Value'Length = New_Item'Length
        is
       begin
@@ -224,8 +214,7 @@ begin
       Test
         (Value =>
            My_Indefinite_Ordered_Maps.Constant_Reference
-             (My_Map_1,
-              Key => My_Key_Type (1))
+             (My_Map_1, Key => My_Key_Type (1))
              .Element.all,
          Expected  => "00", -- Value_In_Ptr_Array (1).all
          Test_Case => "Constant_Reference normal key");
@@ -233,67 +222,55 @@ begin
       Test_And_Mod
         (Value =>
            My_Indefinite_Ordered_Maps.Reference
-             (My_Map_1,
-              Key => My_Key_Type (1))
+             (My_Map_1, Key => My_Key_Type (1))
              .Element.all,
-         Expected  => "00",
-         New_Item  => "AA",
+         Expected  => "00", New_Item => "AA",
          Test_Case => "Reference normal key");
 
       Test
         (Value =>
            My_Indefinite_Ordered_Maps.Constant_Reference
-             (My_Map_1,
-              Position => My_Cursor_1)
+             (My_Map_1, Position => My_Cursor_1)
              .Element.all,
-         Expected  => "AA",
-         Test_Case => "Constant_Reference normal cursor");
+         Expected => "AA", Test_Case => "Constant_Reference normal cursor");
 
       Test_And_Mod
         (Value =>
            My_Indefinite_Ordered_Maps.Reference
-             (My_Map_1,
-              Position => My_Cursor_1)
+             (My_Map_1, Position => My_Cursor_1)
              .Element.all,
-         Expected  => "AA",
-         New_Item  => "CC",
+         Expected  => "AA", New_Item => "CC",
          Test_Case => "Reference normal cursor");
 
       -- Prefix call with all components explicit:
       Test
         (Value =>
            My_Map_1.Constant_Reference (Key => My_Key_Type (1)).Element.all,
-         Expected  => "CC",
-         Test_Case => "Constant_Reference prefix key");
+         Expected => "CC", Test_Case => "Constant_Reference prefix key");
 
       Test_And_Mod
         (Value     => My_Map_1.Reference (Key => My_Key_Type (1)).Element.all,
-         Expected  => "CC",
-         New_Item  => "EE",
+         Expected  => "CC", New_Item => "EE",
          Test_Case => "Reference prefix key");
 
       Test
         (Value =>
            My_Map_1.Constant_Reference (Position => My_Cursor_1).Element.all,
-         Expected  => "EE",
-         Test_Case => "Constant_Reference prefix cursor");
+         Expected => "EE", Test_Case => "Constant_Reference prefix cursor");
 
       Test_And_Mod
         (Value     => My_Map_1.Reference (Position => My_Cursor_1).Element.all,
-         Expected  => "EE",
-         New_Item  => "GG",
+         Expected  => "EE", New_Item => "GG",
          Test_Case => "Reference prefix cursor");
 
       -- Prefix call using a generalized reference (implicit dereference):
       Test
-        (Value     => My_Map_1.Constant_Reference (Key => My_Key_Type (1)),
-         Expected  => "GG",
-         Test_Case => "Constant_Reference generalized key");
+        (Value    => My_Map_1.Constant_Reference (Key => My_Key_Type (1)),
+         Expected => "GG", Test_Case => "Constant_Reference generalized key");
 
       Test_And_Mod
         (Value     => My_Map_1.Reference (Key => My_Key_Type (1)),
-         Expected  => "GG",
-         New_Item  => "JJ",
+         Expected  => "GG", New_Item => "JJ",
          Test_Case => "Reference generalized key");
 
       Test
@@ -303,8 +280,7 @@ begin
 
       Test_And_Mod
         (Value     => My_Map_1.Reference (Position => My_Cursor_1),
-         Expected  => "JJ",
-         New_Item  => "MM",
+         Expected  => "JJ", New_Item => "MM",
          Test_Case => "Reference generalized cursor");
 
       -- Object indexing, everything implicit.
@@ -314,10 +290,9 @@ begin
          Test_Case => "Constant object indexing by key");
 
       Test_And_Mod
-        (Value     => My_Map_1 (My_Key_Type (1)), -- Variable_Indexing
-         Expected  => "MM",
-         New_Item  => "PP",
-         Test_Case => "Object indexing by key");
+        (Value    => My_Map_1 (My_Key_Type (1)), -- Variable_Indexing
+         Expected => "MM",
+         New_Item => "PP", Test_Case => "Object indexing by key");
 
       Test
         (Value     => My_Map_1 (My_Cursor_1), -- Constant_Indexing
@@ -326,8 +301,7 @@ begin
 
       Test_And_Mod
         (Value     => My_Map_1 (My_Cursor_1), -- Variable_Indexing
-         Expected  => "PP",
-         New_Item  => "00",
+         Expected  => "PP", New_Item => "00",
          Test_Case => "Object indexing by cursor");
 
    end;
@@ -356,8 +330,7 @@ begin
       for I in Fxaia00.Array_Bounds_Type loop
 
          My_Map_1.Insert
-           (Key      => My_Key_Type (I),
-            New_Item => Value_In_Ptr_Array (I).all);
+           (Key => My_Key_Type (I), New_Item => Value_In_Ptr_Array (I).all);
 
          Pos_Of_First_Char := Character'Pos (Value_In_Ptr_Array (I).all (1));
 
@@ -383,8 +356,7 @@ begin
       for E of My_Map_1 loop
 
          Tampering_Check
-           (Container => My_Map_1,
-            Where     => "reading forward of loop");
+           (Container => My_Map_1, Where => "reading forward of loop");
 
          Pos_Of_First_Char := Character'Pos (E (1));
 
@@ -412,8 +384,7 @@ begin
       for E of reverse My_Map_1 loop
 
          Tampering_Check
-           (Container => My_Map_1,
-            Where     => "reading reverse of loop");
+           (Container => My_Map_1, Where => "reading reverse of loop");
 
          Pos_Of_First_Char := Character'Pos (E (1));
 
@@ -441,8 +412,7 @@ begin
       for C in My_Map_1.Iterate loop
 
          Tampering_Check
-           (Container => My_Map_1,
-            Where     => "reading forward in loop");
+           (Container => My_Map_1, Where => "reading forward in loop");
 
          Pos_Of_First_Char := Character'Pos (My_Map_1 (C) (1));
 
@@ -470,8 +440,7 @@ begin
       for C in reverse My_Map_1.Iterate loop
 
          Tampering_Check
-           (Container => My_Map_1,
-            Where     => "reading reverse in loop");
+           (Container => My_Map_1, Where => "reading reverse in loop");
 
          Pos_Of_First_Char := Character'Pos (My_Map_1 (C) (1));
 
@@ -501,8 +470,7 @@ begin
       for C in My_Map_1.Iterate (My_Cursor_1) loop
 
          Tampering_Check
-           (Container => My_Map_1,
-            Where     => "reading partial forward in loop");
+           (Container => My_Map_1, Where => "reading partial forward in loop");
 
          Pos_Of_First_Char := Character'Pos (My_Map_1 (C) (1));
 
@@ -532,8 +500,7 @@ begin
       for C in reverse My_Map_1.Iterate (My_Cursor_1) loop
 
          Tampering_Check
-           (Container => My_Map_1,
-            Where     => "reading partial reverse in loop");
+           (Container => My_Map_1, Where => "reading partial reverse in loop");
 
          Pos_Of_First_Char := Character'Pos (My_Map_1 (C) (1));
 
@@ -624,8 +591,7 @@ begin
       for I in Fxaia00.Array_Bounds_Type loop
 
          if My_Indefinite_Ordered_Maps.Element (Position => My_Cursor_1) /=
-           My_Default_Value
-         then
+           My_Default_Value then
 
             Report.Failed ("Data set by of loop not as expected");
 

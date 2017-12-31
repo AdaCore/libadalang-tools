@@ -10,9 +10,8 @@ package C730002_3 is
 
    type Electric_Series is new T with private;
 
-   procedure Routine_Maintenance
-     (E  : in out Electric_Series;
-      Sr : in     Specialist_Id := Curly);
+   procedure Routine_Maintenance (E : in out Electric_Series;
+      Sr                            : in     Specialist_Id := Curly);
 
    -- Other electric specific operations... (not required in this test).
 

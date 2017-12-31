@@ -101,8 +101,7 @@ begin
 
       begin
 
-         if (1 .. 2 => (Ident_Int (3) .. Ident_Int (4) => 0), 3 => (1, 2)) =
-           A1
+         if (1 .. 2 => (Ident_Int (3) .. Ident_Int (4) => 0), 3 => (1, 2)) = A1
          then
             begin
                Comment

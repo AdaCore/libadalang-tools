@@ -39,8 +39,7 @@ procedure C34003a is
      Parent range Parent (Ident_Int (-50)) .. Parent (Ident_Int (50));
 
    type T is
-     new Subparent digits 4 range
-       Parent (Ident_Int (-30)) ..
+     new Subparent digits 4 range Parent (Ident_Int (-30)) ..
          Parent (Ident_Int (30));
 
    type Fixed is delta 0.1 range -1_000.0 .. 1_000.0;
@@ -72,8 +71,7 @@ begin
    Test
      ("C34003A",
       "CHECK THAT THE REQUIRED PREDEFINED OPERATIONS " &
-      "ARE DECLARED (IMPLICITLY) FOR DERIVED " &
-      "FLOATING POINT TYPES");
+      "ARE DECLARED (IMPLICITLY) FOR DERIVED " & "FLOATING POINT TYPES");
 
    X := Ident (30.0);
    if X /= 30.0 then
@@ -231,8 +229,7 @@ begin
       Failed ("INCORRECT 'MACHINE_EMIN");
    end if;
 
-   if T'Machine_Mantissa < 1 or
-     T'Base'Machine_Mantissa /= T'Machine_Mantissa
+   if T'Machine_Mantissa < 1 or T'Base'Machine_Mantissa /= T'Machine_Mantissa
    then
       Failed ("INCORRECT 'MACHINE_MANTISSA");
    end if;

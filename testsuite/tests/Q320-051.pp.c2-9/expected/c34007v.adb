@@ -48,10 +48,8 @@ procedure C34007v is
 
       type Parent is access Designated;
 
-      function Create
-        (F, L  : Natural;
-         C     : Component;
-         Dummy : Parent   -- TO RESOLVE OVERLOADING.
+      function Create (F, L : Natural; C : Component;
+         Dummy              : Parent   -- TO RESOLVE OVERLOADING.
          ) return Parent;
 
    end Pkg;
@@ -74,10 +72,8 @@ procedure C34007v is
 
    package body Pkg is
 
-      function Create
-        (F, L  : Natural;
-         C     : Component;
-         Dummy : Parent) return Parent
+      function Create (F, L : Natural; C : Component;
+         Dummy              : Parent) return Parent
       is
          A : Parent    := new Designated (F .. L);
          B : Component := C;
@@ -147,8 +143,7 @@ begin
    end;
 
    if X (Ident_Int (6) .. Ident_Int (7)) /= (2, 3) or
-     Create (1, 4, 4, X) (1 .. 3) /= (4, 5, 6)
-   then
+     Create (1, 4, 4, X) (1 .. 3) /= (4, 5, 6) then
       Failed ("INCORRECT SLICE (VALUE)");
    end if;
 
@@ -161,11 +156,8 @@ begin
          Failed ("EXCEPTION FOR SLICE (ASSIGNMENT)");
    end;
 
-   if X = null or
-     X = new Subdesignated or
-     not (X = Y) or
-     X = Create (2, 3, 4, X)
-   then
+   if X = null or X = new Subdesignated or not (X = Y) or
+     X = Create (2, 3, 4, X) then
       Failed ("INCORRECT =");
    end if;
 

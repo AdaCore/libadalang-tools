@@ -88,8 +88,7 @@ begin
 
    declare
       subtype Lc_Level is
-        Character range
-          Ascii.Lc_A ..
+        Character range Ascii.Lc_A ..
             Character'Val (Character'Pos (Ascii.Lc_A) + Max_Lev - 1);
 
       Ct : Trace;
@@ -201,8 +200,7 @@ begin
          for I in Level loop
             Cg (E + 1) :=
               Lc_Level'Val
-                (Level'Pos (I) -
-                 Level'Pos (Level'First) +
+                (Level'Pos (I) - Level'Pos (Level'First) +
                  Lc_Level'Pos (Lc_Level'First));
             Cg (E + 2) := '3';
             Cg (E + 3) := I;

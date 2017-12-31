@@ -67,8 +67,7 @@ procedure Cb1004a is
 
 begin
    Test
-     ("CB1004A",
-      "CHECK THAT EXCEPTIONS ARE NOT RECURSIVELY " & "REPLICATED");
+     ("CB1004A", "CHECK THAT EXCEPTIONS ARE NOT RECURSIVELY " & "REPLICATED");
 
    Flow_Count := Flow_Count + 1;   -- 1
    P1 (1);

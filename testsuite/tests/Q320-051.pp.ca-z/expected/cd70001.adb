@@ -90,8 +90,7 @@ procedure Cd70001 is
       end if;
 
       if An_Address'Address > An_Other_Address and
-        An_Address'Address < An_Other_Address
-      then
+        An_Address'Address < An_Other_Address then
          Report.Failed ("Address is both greater and less!");
       end if;
 
@@ -171,15 +170,13 @@ procedure Cd70001 is
          Report.Failed ("Storage arithmetic non-linear A-O");
       end if;
 
-      if
-        (Storehouse_2'Address mod abs (House_Offset) > abs (House_Offset))
+      if (Storehouse_2'Address mod abs (House_Offset) > abs (House_Offset))
       then
          -- "mod"( Address, Storage_Offset)
          Report.Failed ("Mod arithmetic");
       end if;
 
-      if Storehouse_1'Address /=
-        To_Address (To_Integer (Storehouse_1'Address))
+      if Storehouse_1'Address /= To_Address (To_Integer (Storehouse_1'Address))
       then
          Report.Failed ("To_Address, To_Integer not symmetric");
       end if;

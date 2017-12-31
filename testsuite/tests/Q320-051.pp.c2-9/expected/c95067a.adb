@@ -49,25 +49,14 @@ procedure C95067a is
 
       task T2 is
 
-         entry Look_In_Vr
-           (X : in Vrtype;
-            C :    Integer;
-            I :    Integer;
-            S :    String;
-            M :    String);
+         entry Look_In_Vr (X : in Vrtype; C : Integer; I : Integer; S : String;
+            M                :    String);
 
-         entry Look_Inout_Vr
-           (X : in out Vrtype;
-            C :        Integer;
-            I :        Integer;
-            S :        String;
-            M :        String);
+         entry Look_Inout_Vr (X : in out Vrtype; C : Integer; I : Integer;
+            S                   :        String; M : String);
 
-         entry Set_Vr
-           (X : in out Vrtype;
-            C :        Integer;
-            I :        Integer;
-            S :        String);
+         entry Set_Vr (X : in out Vrtype; C : Integer; I : Integer;
+            S            :        String);
 
       end T2;
 
@@ -113,10 +102,7 @@ procedure C95067a is
                   end if;
                end Look_In_I;
             or
-               accept Look_Inout_I
-                 (X : in out Itype;
-                  V :        Integer;
-                  M :        String)
+               accept Look_Inout_I (X : in out Itype; V : Integer; M : String)
                do
                   if Integer (X) /= V then
                      Failed ("WRONG SCALAR VALUE - " & M);
@@ -136,36 +122,22 @@ procedure C95067a is
       begin
          loop
             select
-               accept Look_In_Vr
-                 (X : in Vrtype;
-                  C :    Integer;
-                  I :    Integer;
-                  S :    String;
-                  M :    String)
-               do
+               accept Look_In_Vr (X : in Vrtype; C : Integer; I : Integer;
+                  S                 :    String; M : String) do
                   if (X.C /= C or X.I /= I) or else X.S /= S then
                      Failed ("WRONG COMPOSITE VALUE - " & M);
                   end if;
                end Look_In_Vr;
             or
-               accept Look_Inout_Vr
-                 (X : in out Vrtype;
-                  C :        Integer;
-                  I :        Integer;
-                  S :        String;
-                  M :        String)
-               do
+               accept Look_Inout_Vr (X : in out Vrtype; C : Integer;
+                  I                    :    Integer; S : String; M : String) do
                   if (X.C /= C or X.I /= I) or else X.S /= S then
                      Failed ("WRONG COMPOSITE VALUE - " & M);
                   end if;
                end Look_Inout_Vr;
             or
-               accept Set_Vr
-                 (X : in out Vrtype;
-                  C :        Integer;
-                  I :        Integer;
-                  S :        String)
-               do
+               accept Set_Vr (X : in out Vrtype; C : Integer; I : Integer;
+                  S             :        String) do
                   X := (Ident_Int (C), Ident_Int (I), Ident_Str (S));
                end Set_Vr;
             or
@@ -190,56 +162,26 @@ procedure C95067a is
    task T3 is
       entry Check_In_I (X : in Itype; V : Integer; M : String);
 
-      entry Check_Inout_I
-        (X  : in out Itype;
-         Ov :        Integer;
-         Nv :        Integer;
-         M  :        String);
+      entry Check_Inout_I (X : in out Itype; Ov : Integer; Nv : Integer;
+         M                   :        String);
 
       entry Check_In_A (X : in Atype; V : Integer; M : String);
 
-      entry Check_Inout_A
-        (X  : in out Atype;
-         Ov :        Integer;
-         Nv :        Integer;
-         M  :        String);
+      entry Check_Inout_A (X : in out Atype; Ov : Integer; Nv : Integer;
+         M                   :        String);
 
-      entry Check_In_Vr
-        (X : in Vrtype;
-         C :    Integer;
-         I :    Integer;
-         S :    String;
-         M :    String);
+      entry Check_In_Vr (X : in Vrtype; C : Integer; I : Integer; S : String;
+         M                 :    String);
 
-      entry Check_Inout_Vr
-        (X  : in out Vrtype;
-         Oc :        Integer;
-         Oi :        Integer;
-         Os :        String;
-         Nc :        Integer;
-         Ni :        Integer;
-         Ns :        String;
-         M  :        String);
+      entry Check_Inout_Vr (X : in out Vrtype; Oc : Integer; Oi : Integer;
+         Os :    String; Nc : Integer; Ni : Integer; Ns : String; M : String);
 
-      entry Check_In_R
-        (X : in Rtype;
-         J :    Integer;
-         C :    Integer;
-         I :    Integer;
-         S :    String;
-         M :    String);
+      entry Check_In_R (X : in Rtype; J : Integer; C : Integer; I : Integer;
+         S                :    String; M : String);
 
-      entry Check_Inout_R
-        (X  : in out Rtype;
-         Oj :        Integer;
-         Oc :        Integer;
-         Oi :        Integer;
-         Os :        String;
-         Nj :        Integer;
-         Nc :        Integer;
-         Ni :        Integer;
-         Ns :        String;
-         M  :        String);
+      entry Check_Inout_R (X : in out Rtype; Oj : Integer; Oc : Integer;
+         Oi : Integer; Os : String; Nj : Integer; Nc : Integer; Ni : Integer;
+         Ns                  :        String; M : String);
    end T3;
 
    task body T3 is
@@ -248,12 +190,8 @@ procedure C95067a is
          T1.Look_In_I (X, V, M);
       end Check_In_I;
 
-      accept Check_Inout_I
-        (X  : in out Itype;
-         Ov :        Integer;
-         Nv :        Integer;
-         M  :        String)
-      do
+      accept Check_Inout_I (X : in out Itype; Ov : Integer; Nv : Integer;
+         M                    :        String) do
          T1.Look_Inout_I (X, Ov, M & " - A");
          T1.Set_I (X, Nv);
          T1.Look_Inout_I (X, Nv, M & " - B");
@@ -266,12 +204,8 @@ procedure C95067a is
          end loop;
       end Check_In_A;
 
-      accept Check_Inout_A
-        (X  : in out Atype;
-         Ov :        Integer;
-         Nv :        Integer;
-         M  :        String)
-      do
+      accept Check_Inout_A (X : in out Atype; Ov : Integer; Nv : Integer;
+         M                    :        String) do
          for I in X'Range loop
             T1.Look_Inout_I (X (I), Ov + I, M & " - A" & Integer'Image (I));
             T1.Set_I (X (I), Nv + I);
@@ -280,56 +214,28 @@ procedure C95067a is
          end loop;
       end Check_Inout_A;
 
-      accept Check_In_Vr
-        (X : in Vrtype;
-         C :    Integer;
-         I :    Integer;
-         S :    String;
-         M :    String)
-      do
+      accept Check_In_Vr (X : in Vrtype; C : Integer; I : Integer; S : String;
+         M                  :    String) do
          T2.Look_In_Vr (X, C, I, S, M);
       end Check_In_Vr;
 
-      accept Check_Inout_Vr
-        (X  : in out Vrtype;
-         Oc :        Integer;
-         Oi :        Integer;
-         Os :        String;
-         Nc :        Integer;
-         Ni :        Integer;
-         Ns :        String;
-         M  :        String)
-      do
+      accept Check_Inout_Vr (X : in out Vrtype; Oc : Integer; Oi : Integer;
+         Os : String; Nc : Integer; Ni : Integer; Ns : String; M : String) do
          T2.Look_Inout_Vr (X, Oc, Oi, Os, M & " - A");
          T2.Set_Vr (X, Nc, Ni, Ns);
          T2.Look_Inout_Vr (X, Nc, Ni, Ns, M & " - B");
          T2.Look_In_Vr (X, Nc, Ni, Ns, M & " - C");
       end Check_Inout_Vr;
 
-      accept Check_In_R
-        (X : in Rtype;
-         J :    Integer;
-         C :    Integer;
-         I :    Integer;
-         S :    String;
-         M :    String)
-      do
+      accept Check_In_R (X : in Rtype; J : Integer; C : Integer; I : Integer;
+         S                 :    String; M : String) do
          T1.Look_In_I (X.J, J, M & " - A");
          T2.Look_In_Vr (X.R, C, I, S, M & " - B");
       end Check_In_R;
 
-      accept Check_Inout_R
-        (X  : in out Rtype;
-         Oj :        Integer;
-         Oc :        Integer;
-         Oi :        Integer;
-         Os :        String;
-         Nj :        Integer;
-         Nc :        Integer;
-         Ni :        Integer;
-         Ns :        String;
-         M  :        String)
-      do
+      accept Check_Inout_R (X : in out Rtype; Oj : Integer; Oc : Integer;
+         Oi : Integer; Os : String; Nj : Integer; Nc : Integer; Ni : Integer;
+         Ns                   :        String; M : String) do
          T1.Look_Inout_I (X.J, Oj, M & " - A");
          T2.Look_Inout_Vr (X.R, Oc, Oi, Os, M & " - B");
          T1.Set_I (X.J, Nj);
@@ -362,16 +268,7 @@ begin
    T3.Check_In_R (R1, 6, D, 19, "ABCDEFGHIJ", "IN R");
 
    T3.Check_Inout_R
-     (R1,
-      6,
-      D,
-      19,
-      "ABCDEFGHIJ",
-      13,
-      D,
-      5,
-      "ZYXWVUTSRQ",
-      "INOUT R");
+     (R1, 6, D, 19, "ABCDEFGHIJ", 13, D, 5, "ZYXWVUTSRQ", "INOUT R");
 
    Result;
 end C95067a;

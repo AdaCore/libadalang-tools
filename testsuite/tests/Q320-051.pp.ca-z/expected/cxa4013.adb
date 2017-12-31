@@ -79,22 +79,13 @@ begin
         array (1 .. 10) of Wide_String (1 .. 10);
 
       Restricted_Words : Restricted_Words_Array_Type :=
-        ("   platoon",
-         " marines  ",
-         "  Marines ",
-         "north     ",
-         "south     ",
-         "      east",
-         "  beach   ",
-         "   airport",
-         "airfield  ",
-         "     road ");
+        ("   platoon", " marines  ", "  Marines ", "north     ", "south     ",
+         "      east", "  beach   ", "   airport", "airfield  ", "     road ");
 
       type Page_Of_Text_Type is array (1 .. Number_Of_Lines) of Ws;
 
       Text_Page : Page_Of_Text_Type :=
-        ("The platoon of Marines   ",
-         "moved south on the south ",
+        ("The platoon of Marines   ", "moved south on the south ",
          "road to the airfield.    ");
 
       Tc_Revised_Line_1 : constant Wide_String := "The XXXXXXX of XXXXXXX   ";
@@ -115,9 +106,8 @@ begin
 
       ---
 
-      procedure Censor
-        (Source_String  : in out Wide_String;
-         Pattern_String : in     Wide_String)
+      procedure Censor (Source_String : in out Wide_String;
+         Pattern_String               : in     Wide_String)
       is
 
          use Ada.Strings.Wide_Fixed; -- allows infix notation of "*" below.
@@ -139,25 +129,20 @@ begin
          Tc_Total :=
            Tc_Total +
            Ada.Strings.Wide_Fixed.Count                  -- Count
-             (Source  => Source_String,
-              Pattern => Pattern_String,
+             (Source  => Source_String, Pattern => Pattern_String,
               Mapping => Ada.Strings.Wide_Maps.Identity);
          loop
 
             Index :=
               Ada.Strings.Wide_Fixed.Index                   -- Index
                 (Source_String (Start_Pos .. Source_String'Last),
-                 Pattern_String,
-                 Going,
-                 Ada.Strings.Wide_Maps.Identity);
+                 Pattern_String, Going, Ada.Strings.Wide_Maps.Identity);
 
             exit when Index = 0;   -- No matches, exit loop.
 
             -- if a match was found, modify the substring.
             Ada.Strings.Wide_Fixed.Replace_Slice              -- Replace_Slice
-              (Source_String,
-               Index,
-               Index + Pattern_String'Length - 1,
+              (Source_String, Index, Index + Pattern_String'Length - 1,
                Replacement);
             Start_Pos := Index + Pattern_String'Length;
 
@@ -177,8 +162,7 @@ begin
             Censor
               (Text_Page (Line),                                 -- Trim
                Ada.Strings.Wide_Fixed.Trim
-                 (Restricted_Words (Word),
-                  Ada.Strings.Both));
+                 (Restricted_Words (Word), Ada.Strings.Both));
          end loop;
       end loop;
 

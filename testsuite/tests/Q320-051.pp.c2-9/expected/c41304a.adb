@@ -48,8 +48,7 @@ begin
    Test
      ("C41304A",
       "CONSTRAINT_ERROR WHEN L IN L.R DENOTES A NULL " &
-      "ACCESS OBJECT OR A FUNCTION CALL DELIVERING " &
-      "NULL");
+      "ACCESS OBJECT OR A FUNCTION CALL DELIVERING " & "NULL");
 
    --------------------------------------------------
 

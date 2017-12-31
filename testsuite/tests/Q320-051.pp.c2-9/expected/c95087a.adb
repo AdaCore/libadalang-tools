@@ -59,10 +59,8 @@ begin
          Rec4 : Rectype;  -- 80.
 
          task T1 is
-            entry E1
-              (Rec1 : in     Rectype := (2, 0, "AB");
-               Rec2 :    out Rectype;
-               Rec3 : in out Rectype);
+            entry E1 (Rec1 : in Rectype := (2, 0, "AB"); Rec2 : out Rectype;
+               Rec3        : in out Rectype);
          end T1;
 
          task T2 is
@@ -74,28 +72,22 @@ begin
 
          task body T1 is
          begin
-            accept E1
-              (Rec1 : in     Rectype := (2, 0, "AB");
-               Rec2 :    out Rectype;
-               Rec3 : in out Rectype)
-            do
+            accept E1 (Rec1 : in Rectype := (2, 0, "AB"); Rec2 : out Rectype;
+               Rec3         : in out Rectype) do
 
                if Rec1.Constraint /= Ident_Int (10) then
                   Failed
-                    ("RECORD TYPE IN PARAMETER " &
-                     "DID NOT USE CONSTRAINT " &
+                    ("RECORD TYPE IN PARAMETER " & "DID NOT USE CONSTRAINT " &
                      "OF ACTUAL");
                end if;
                if Rec2.Constraint /= Ident_Int (17) then
                   Failed
-                    ("RECORD TYPE OUT " &
-                     "PARAMETER DID NOT USE " &
+                    ("RECORD TYPE OUT " & "PARAMETER DID NOT USE " &
                      "CONSTRAINT OF ACTUAL");
                end if;
                if Rec3.Constraint /= Ident_Int (1) then
                   Failed
-                    ("RECORD TYPE IN OUT " &
-                     "PARAMETER DID NOT USE " &
+                    ("RECORD TYPE IN OUT " & "PARAMETER DID NOT USE " &
                      "CONSTRAINT OF ACTUAL");
                end if;
                Rec2 := Pkg.Rec2;
@@ -107,10 +99,8 @@ begin
             accept E2 (Rec : out Rectype) do
                if Rec.Constraint /= Ident_Int (80) then
                   Failed
-                    ("RECORD TYPE OUT " &
-                     "PARAMETER DID " &
-                     "NOT USE CONSTRAINT OF " &
-                     "UNINITIALIZED ACTUAL");
+                    ("RECORD TYPE OUT " & "PARAMETER DID " &
+                     "NOT USE CONSTRAINT OF " & "UNINITIALIZED ACTUAL");
                end if;
                Rec := (10, 10, "9876543210");
             end E2;
@@ -136,10 +126,8 @@ begin
          type Rectype (Constraint : Int := 80) is private;
 
          task T1 is
-            entry E1
-              (Rec1 : in     Rectype;
-               Rec2 :    out Rectype;
-               Rec3 : in out Rectype);
+            entry E1 (Rec1 : in     Rectype; Rec2 : out Rectype;
+               Rec3        : in out Rectype);
          end T1;
 
          task T2 is
@@ -162,31 +150,22 @@ begin
 
          task body T1 is
          begin
-            accept E1
-              (Rec1 : in     Rectype;
-               Rec2 :    out Rectype;
-               Rec3 : in out Rectype)
-            do
+            accept E1 (Rec1 : in     Rectype; Rec2 : out Rectype;
+               Rec3         : in out Rectype) do
                if Rec1.Constraint /= Ident_Int (10) then
                   Failed
-                    ("PRIVATE TYPE IN " &
-                     "PARAMETER DID " &
-                     "NOT USE CONSTRAINT OF " &
-                     "ACTUAL");
+                    ("PRIVATE TYPE IN " & "PARAMETER DID " &
+                     "NOT USE CONSTRAINT OF " & "ACTUAL");
                end if;
                if Rec2.Constraint /= Ident_Int (17) then
                   Failed
-                    ("PRIVATE TYPE OUT " &
-                     "PARAMETER DID " &
-                     "NOT USE CONSTRAINT OF " &
-                     "ACTUAL");
+                    ("PRIVATE TYPE OUT " & "PARAMETER DID " &
+                     "NOT USE CONSTRAINT OF " & "ACTUAL");
                end if;
                if Rec3.Constraint /= Ident_Int (1) then
                   Failed
-                    ("PRIVATE TYPE IN OUT " &
-                     "PARAMETER DID " &
-                     "NOT USE CONSTRAINT OF " &
-                     "ACTUAL");
+                    ("PRIVATE TYPE IN OUT " & "PARAMETER DID " &
+                     "NOT USE CONSTRAINT OF " & "ACTUAL");
                end if;
                Rec2 := B.Rec2;
             end E1;
@@ -197,10 +176,8 @@ begin
             accept E2 (Rec : out Rectype) do
                if Rec.Constraint /= Ident_Int (10) then
                   Failed
-                    ("PRIVATE TYPE OUT " &
-                     "PARAMETER DID " &
-                     "NOT USE CONSTRAINT OF " &
-                     "UNINITIALIZED ACTUAL");
+                    ("PRIVATE TYPE OUT " & "PARAMETER DID " &
+                     "NOT USE CONSTRAINT OF " & "UNINITIALIZED ACTUAL");
                end if;
                Rec := (10, 10, "9876543210");
             end E2;
@@ -231,10 +208,8 @@ begin
          type Rectype (Constraint : Int := 80) is limited private;
 
          task T1 is
-            entry E1
-              (Rec1 : in     Rectype;
-               Rec2 :    out Rectype;
-               Rec3 : in out Rectype);
+            entry E1 (Rec1 : in     Rectype; Rec2 : out Rectype;
+               Rec3        : in out Rectype);
          end T1;
 
          task T2 is
@@ -257,28 +232,21 @@ begin
 
          task body T1 is
          begin
-            accept E1
-              (Rec1 : in     Rectype;
-               Rec2 :    out Rectype;
-               Rec3 : in out Rectype)
-            do
+            accept E1 (Rec1 : in     Rectype; Rec2 : out Rectype;
+               Rec3         : in out Rectype) do
                if Rec1.Constraint /= Ident_Int (10) then
                   Failed
-                    ("LIMITED PRIVATE TYPE IN " &
-                     "PARAMETER DID NOT USE " &
+                    ("LIMITED PRIVATE TYPE IN " & "PARAMETER DID NOT USE " &
                      "CONSTRAINT OF ACTUAL");
                end if;
                if Rec2.Constraint /= Ident_Int (17) then
                   Failed
-                    ("LIMITED PRIVATE TYPE OUT " &
-                     "PARAMETER DID NOT USE " &
-                     "CONSTRAINT OF " &
-                     "ACTUAL");
+                    ("LIMITED PRIVATE TYPE OUT " & "PARAMETER DID NOT USE " &
+                     "CONSTRAINT OF " & "ACTUAL");
                end if;
                if Rec3.Constraint /= Ident_Int (1) then
                   Failed
-                    ("LIMITED PRIVATE TYPE IN " &
-                     "OUT PARAMETER DID NOT " &
+                    ("LIMITED PRIVATE TYPE IN " & "OUT PARAMETER DID NOT " &
                      "USE CONSTRAINT OF ACTUAL");
                end if;
                Rec2 := C.Rec2;
@@ -290,10 +258,8 @@ begin
             accept E2 (Rec : out Rectype) do
                if Rec.Constraint /= Ident_Int (80) then
                   Failed
-                    ("LIMITED PRIVATE TYPE OUT " &
-                     "PARAMETER DID NOT USE " &
-                     "CONSTRAINT OF UNINITIALIZED " &
-                     "ACTUAL");
+                    ("LIMITED PRIVATE TYPE OUT " & "PARAMETER DID NOT USE " &
+                     "CONSTRAINT OF UNINITIALIZED " & "ACTUAL");
                end if;
                Rec := (10, 10, "9876543210");
             end E2;
@@ -319,9 +285,7 @@ begin
 
       type Atype is array (Integer range <>, Positive range <>) of Character;
 
-      A1,
-      A2,
-      A3 : Atype (-1 .. 1, 4 .. 5) :=
+      A1, A2, A3 : Atype (-1 .. 1, 4 .. 5) :=
         (('A', 'B'), ('C', 'D'), ('E', 'F'));
 
       A4 : Atype (-1 .. 1, 4 .. 5);
@@ -349,32 +313,25 @@ begin
       begin
          accept E1 (A1 : in Atype := Ca1; A2 : out Atype; A3 : in out Atype) do
             if A1'First (1) /= Ident_Int (-1) or
-              A1'Last (1) /= Ident_Int (1) or
-              A1'First (2) /= Ident_Int (4) or
-              A1'Last (2) /= Ident_Int (5)
-            then
+              A1'Last (1) /= Ident_Int (1) or A1'First (2) /= Ident_Int (4) or
+              A1'Last (2) /= Ident_Int (5) then
                Failed
                  ("ARRAY TYPE IN PARAMETER DID " &
                   "NOT USE CONSTRAINTS OF ACTUAL");
             end if;
             if A2'First (1) /= Ident_Int (-1) or
-              A2'Last (1) /= Ident_Int (1) or
-              A2'First (2) /= Ident_Int (4) or
-              A2'Last (2) /= Ident_Int (5)
-            then
+              A2'Last (1) /= Ident_Int (1) or A2'First (2) /= Ident_Int (4) or
+              A2'Last (2) /= Ident_Int (5) then
                Failed
                  ("ARRAY TYPE OUT PARAMETER DID " &
                   "NOT USE CONSTRAINTS OF ACTUAL");
             end if;
             if A3'First (1) /= Ident_Int (-1) or
-              A3'Last (1) /= Ident_Int (1) or
-              A3'First (2) /= Ident_Int (4) or
-              A3'Last (2) /= Ident_Int (5)
-            then
+              A3'Last (1) /= Ident_Int (1) or A3'First (2) /= Ident_Int (4) or
+              A3'Last (2) /= Ident_Int (5) then
                Failed
                  ("ARRAY TYPE IN OUT PARAMETER " &
-                  "DID NOT USE CONSTRAINTS OF " &
-                  "ACTUAL");
+                  "DID NOT USE CONSTRAINTS OF " & "ACTUAL");
             end if;
             A2 := D.A2;
          end E1;
@@ -384,13 +341,10 @@ begin
       begin
          accept E2 (A4 : out Atype) do
             if A4'First (1) /= Ident_Int (-1) or
-              A4'Last (1) /= Ident_Int (1) or
-              A4'First (2) /= Ident_Int (4) or
-              A4'Last (2) /= Ident_Int (5)
-            then
+              A4'Last (1) /= Ident_Int (1) or A4'First (2) /= Ident_Int (4) or
+              A4'Last (2) /= Ident_Int (5) then
                Failed
-                 ("ARRAY TYPE OUT PARAMETER DID " &
-                  "NOT USE CONSTRAINTS OF " &
+                 ("ARRAY TYPE OUT PARAMETER DID " & "NOT USE CONSTRAINTS OF " &
                   "UNINITIALIZED ACTUAL");
             end if;
             A4 := A2;
@@ -401,24 +355,20 @@ begin
       begin
          accept E3 (S1 : in String; S2 : in out String; S3 : out String) do
             if S1'First /= Ident_Int (1) or
-              S1'Last /= Ident_Int (Integer'First)
-            then
+              S1'Last /= Ident_Int (Integer'First) then
                Failed
                  ("STRING TYPE IN PARAMETER DID " &
-                  "NOT USE CONSTRAINTS OF ACTUAL " &
-                  "NULL STRING");
+                  "NOT USE CONSTRAINTS OF ACTUAL " & "NULL STRING");
             end if;
             if S2'First /= Ident_Int (-5) or S2'Last /= Ident_Int (-7) then
                Failed
                  ("STRING TYPE IN OUT PARAMETER " &
-                  "DID NOT USE CONSTRAINTS OF " &
-                  "ACTUAL NULL STRING");
+                  "DID NOT USE CONSTRAINTS OF " & "ACTUAL NULL STRING");
             end if;
             if S3'First /= Ident_Int (1) or S3'Last /= Ident_Int (0) then
                Failed
                  ("STRING TYPE OUT PARAMETER DID NOT " &
-                  "USE CONSTRAINTS OF ACTUAL NULL " &
-                  "STRING");
+                  "USE CONSTRAINTS OF ACTUAL NULL " & "STRING");
             end if;
             S3 := "";
          end E3;

@@ -96,9 +96,7 @@ begin
 
          if T'(F) /= F then
             Failed
-              ("INCORRECT RESULTS FOR QUALIFICATION " &
-               "WITH TYPE - " &
-               Str &
+              ("INCORRECT RESULTS FOR QUALIFICATION " & "WITH TYPE - " & Str &
                " - 1");
          end if;
 
@@ -106,9 +104,7 @@ begin
             null;
          else
             Failed
-              ("INCORRECT RESULTS FOR QUALIFICATION " &
-               "WITH TYPE - " &
-               Str &
+              ("INCORRECT RESULTS FOR QUALIFICATION " & "WITH TYPE - " & Str &
                " - 2");
          end if;
 
@@ -157,109 +153,91 @@ begin
       begin
          if T0 + 1.0 /= 1.0 then
             Failed
-              ("INCORRECT RESULTS FOR IMPLICIT " &
-               "CONVERSION WITH TYPE " &
-               Str &
-               " - 1");
+              ("INCORRECT RESULTS FOR IMPLICIT " & "CONVERSION WITH TYPE " &
+               Str & " - 1");
          end if;
 
          if T2 + 1.0 /= 3.0 then
             Failed
-              ("INCORRECT RESULTS FOR IMPLICIT " &
-               "CONVERSION WITH TYPE " &
-               Str &
-               " - 2");
+              ("INCORRECT RESULTS FOR IMPLICIT " & "CONVERSION WITH TYPE " &
+               Str & " - 2");
          end if;
 
          if Tn2 + 1.0 /= -1.0 then
             Failed
-              ("INCORRECT RESULTS FOR IMPLICIT " &
-               "CONVERSION WITH TYPE " &
-               Str &
-               " - 3");
+              ("INCORRECT RESULTS FOR IMPLICIT " & "CONVERSION WITH TYPE " &
+               Str & " - 3");
          end if;
 
          if T (Fi0) /= T0 then
             Failed
-              ("INCORRECT CONVERSION FROM " &
-               "FIXED VALUE 0.0 WITH TYPE " &
+              ("INCORRECT CONVERSION FROM " & "FIXED VALUE 0.0 WITH TYPE " &
                Str);
          end if;
 
          if T (Fi2) /= Ident (T2) then
             Failed
-              ("INCORRECT CONVERSION FROM " &
-               "FIXED VALUE 2.0 WITH TYPE " &
+              ("INCORRECT CONVERSION FROM " & "FIXED VALUE 2.0 WITH TYPE " &
                Str);
          end if;
 
          if T (Fin2) /= Tn2 then
             Failed
-              ("INCORRECT CONVERSION FROM " &
-               "FIXED VALUE -2.0 WITH TYPE " &
+              ("INCORRECT CONVERSION FROM " & "FIXED VALUE -2.0 WITH TYPE " &
                Str);
          end if;
 
          if T (I0) /= Ident (T0) then
             Failed
-              ("INCORRECT CONVERSION FROM " &
-               "INTEGER VALUE 0 WITH TYPE " &
+              ("INCORRECT CONVERSION FROM " & "INTEGER VALUE 0 WITH TYPE " &
                Str);
          end if;
 
          if T (I2) /= T2 then
             Failed
-              ("INCORRECT CONVERSION FROM " &
-               "INTEGER VALUE 2 WITH TYPE " &
+              ("INCORRECT CONVERSION FROM " & "INTEGER VALUE 2 WITH TYPE " &
                Str);
          end if;
 
          if T (In2) /= Ident (Tn2) then
             Failed
-              ("INCORRECT CONVERSION FROM " &
-               "INTEGER VALUE -2 WITH TYPE " &
+              ("INCORRECT CONVERSION FROM " & "INTEGER VALUE -2 WITH TYPE " &
                Str);
          end if;
 
          if Fixed (T0) /= Fi0 then
             Failed
-              ("INCORRECT CONVERSION TO " &
-               "FIXED VALUE 0.0 WITH TYPE " &
+              ("INCORRECT CONVERSION TO " & "FIXED VALUE 0.0 WITH TYPE " &
                Str);
          end if;
 
          if Fixed (Ident (T2)) /= Fi2 then
             Failed
-              ("INCORRECT CONVERSION TO " &
-               "FIXED VALUE 2.0 WITH TYPE " &
+              ("INCORRECT CONVERSION TO " & "FIXED VALUE 2.0 WITH TYPE " &
                Str);
          end if;
 
          if Fixed (Tn2) /= Fin2 then
             Failed
-              ("INCORRECT CONVERSION TO " &
-               "FIXED VALUE -2.0 WITH TYPE " &
+              ("INCORRECT CONVERSION TO " & "FIXED VALUE -2.0 WITH TYPE " &
                Str);
          end if;
 
          if Integer (Ident (T0)) /= I0 then
             Failed
-              ("INCORRECT CONVERSION TO " &
-               "INTEGER VALUE 0 WITH TYPE " &
+              ("INCORRECT CONVERSION TO " & "INTEGER VALUE 0 WITH TYPE " &
                Str);
          end if;
 
          if Integer (T2) /= I2 then
             Failed
-              ("INCORRECT CONVERSION TO " &
-               "INTEGER VALUE 2 WITH TYPE " &
+              ("INCORRECT CONVERSION TO " & "INTEGER VALUE 2 WITH TYPE " &
                Str);
          end if;
 
          if Integer (Ident (Tn2)) /= In2 then
             Failed
-              ("INCORRECT CONVERSION TO " &
-               "INTEGER VALUE -2 WITH TYPE " &
+              ("INCORRECT CONVERSION TO " & "INTEGER VALUE -2 WITH TYPE " &
                Str);
          end if;
 

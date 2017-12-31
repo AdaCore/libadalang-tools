@@ -82,9 +82,7 @@ begin
 
    begin
       Text_Io.Open
-        (File_Name,
-         Text_Io.In_File,
-         Legal_File_Name (1, "CE3112C"));
+        (File_Name, Text_Io.In_File, Legal_File_Name (1, "CE3112C"));
    exception
       when Text_Io.Use_Error =>
          Not_Applicable

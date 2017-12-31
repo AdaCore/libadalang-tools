@@ -49,11 +49,8 @@ begin
 
    begin
 
-      if G1'First /= G1 (G2'First) or
-        G1'Last /= G1 (G2'Last) or
-        G2'First /= G2 (F'First) or
-        G2'Last /= G2 (F'Last)
-      then
+      if G1'First /= G1 (G2'First) or G1'Last /= G1 (G2'Last) or
+        G2'First /= G2 (F'First) or G2'Last /= G2 (F'Last) then
          Failed ("USING DIFF FLOATING POINT TYPES " & "FROM SAME PARENT");
 
       end if;

@@ -22,9 +22,8 @@ begin
    Report.Comment
      ("Indirect function call and renaming test " & "(local subprograms)");
    declare
-      function Evaluate
-        (Fn : access function (X : Float) return Float;
-         X  : Float) return Float
+      function Evaluate (Fn : access function (X : Float) return Float;
+         X                  : Float) return Float
       is
          Ren_F : access function (F : Float) return Float renames Fn;
       begin

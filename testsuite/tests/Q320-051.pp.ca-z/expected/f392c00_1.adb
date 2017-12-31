@@ -17,10 +17,8 @@ package body F392c00_1 is
    begin
       Tctouch.Touch ('3');  ------------------------------------------------ 3
       return Auto_Dimmer'
-          (On        => True,
-           Intensity => 25,
-           Cutout_Threshold | Cutin_Threshold => 50,
-           Auto_Engaged => True);
+          (On => True, Intensity => 25,
+           Cutout_Threshold | Cutin_Threshold => 50, Auto_Engaged => True);
    end Create;
 
    procedure Flip (It : in out Toggle) is
@@ -147,8 +145,7 @@ package body F392c00_1 is
             return Dimmer'(On => True, Intensity => 75);
          when 'A' | 'a' =>
             return Auto_Dimmer'
-                (On        => True,
-                 Intensity => 25,
+                (On => True, Intensity => 25,
                  Cutout_Threshold | Cutin_Threshold => 50,
                  Auto_Engaged => True);
          when others =>

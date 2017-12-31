@@ -90,8 +90,7 @@ begin
 -- file in the most efficient manner possible.
 
       Ada.Text_Io.Create
-        (File => A_Bounded_File,
-         Mode => Ada.Text_Io.Append_File,
+        (File => A_Bounded_File, Mode => Ada.Text_Io.Append_File,
          Name => Bounded_File_Name);
    exception
       when Ada.Text_Io.Use_Error | Ada.Text_Io.Name_Error =>
@@ -164,8 +163,7 @@ begin
       Reset1 :
       begin
          Ada.Text_Io.Reset
-           (A_Bounded_File,
-            Tc_Mode_Selection (Report.Ident_Int (3)));
+           (A_Bounded_File, Tc_Mode_Selection (Report.Ident_Int (3)));
       exception
          when Ada.Text_Io.Use_Error =>
             Report.Not_Applicable
@@ -227,8 +225,7 @@ begin
          if (First_String (1 .. Tc_Width1) /= Nineteen_Characters & "1") or
            (Second_String (1 .. Tc_Width2) /= "2Characters") or
            (Third_String (1 .. Tc_Width3) /= Nineteen_Characters (1 .. 15)) or
-           (Fourth_String (1 .. Tc_Width4) /= "ters")
-         then
+           (Fourth_String (1 .. Tc_Width4) /= "ters") then
             Report.Failed ("Data placed incorrectly in file");
          end if;
 
@@ -262,9 +259,7 @@ begin
          Ada.Text_Io.Delete (A_Bounded_File);
       else
          Ada.Text_Io.Open
-           (A_Bounded_File,
-            Ada.Text_Io.In_File,
-            Bounded_File_Name);
+           (A_Bounded_File, Ada.Text_Io.In_File, Bounded_File_Name);
          Ada.Text_Io.Delete (A_Bounded_File);
       end if;
 

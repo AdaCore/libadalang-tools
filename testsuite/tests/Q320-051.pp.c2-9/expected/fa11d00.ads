@@ -54,14 +54,10 @@ package Fa11d00 is  -- Complex_Definition_Pkg
    Divide_Error   : exception;
    Multiply_Error : exception;
 
-   Tc_Handled_In_Caller,
-   Tc_Handled_In_Child_Pkg_Proc,
-   Tc_Handled_In_Child_Pkg_Func,
-   Tc_Handled_In_Grandchild_Pkg_Proc,
-   Tc_Handled_In_Grandchild_Pkg_Func,
-   Tc_Handled_In_Child_Sub,
-   Tc_Propagated_To_Caller : Boolean :=
-     False;
+   Tc_Handled_In_Caller, Tc_Handled_In_Child_Pkg_Proc,
+   Tc_Handled_In_Child_Pkg_Func, Tc_Handled_In_Grandchild_Pkg_Proc,
+   Tc_Handled_In_Grandchild_Pkg_Func, Tc_Handled_In_Child_Sub,
+   Tc_Propagated_To_Caller : Boolean := False;
 
    function Complex (Real, Imag : Int_Type) return Complex_Type;
 

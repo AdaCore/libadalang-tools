@@ -74,8 +74,7 @@ begin
       end if;
 
       if not A2 /=
-        Arr2'(1 | 14 .. 18 | 30 .. 33 | 35 .. 37 => False, others => True)
-      then
+        Arr2'(1 | 14 .. 18 | 30 .. 33 | 35 .. 37 => False, others => True) then
          Failed ("WRONG RESULT WHEN 'NOT' APPLIED " & "TO LARGE ARRAY");
       end if;
 
@@ -84,8 +83,7 @@ begin
       end if;
 
       if not A5 /=
-        Arr5'(1 | 14 .. 18 | 30 .. 33 | 35 .. 37 => False, others => True)
-      then
+        Arr5'(1 | 14 .. 18 | 30 .. 33 | 35 .. 37 => False, others => True) then
          Failed ("WRONG RESULT WHEN 'NOT' APPLIED " & "TO LARGE PACKED ARRAY");
       end if;
 
@@ -96,8 +94,7 @@ begin
       end if;
 
       if "NOT" (Right => A5) /=
-        Arr5'(1 | 14 .. 18 | 30 .. 33 | 35 .. 37 => False, others => True)
-      then
+        Arr5'(1 | 14 .. 18 | 30 .. 33 | 35 .. 37 => False, others => True) then
          Failed
            ("WRONG RESULT WHEN 'NOT' APPLIED TO LARGE " &
             "PACKED ARRAY USING NAMED NOTATION");

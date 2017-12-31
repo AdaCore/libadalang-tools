@@ -67,8 +67,7 @@ begin
      ("C41303N",
       "CHECK THAT  L.ALL  , WHERE  L  IS THE NAME OF" &
       " AN ACCESS OBJECT DESIGNATING A RECORD, AN" &
-      " ARRAY, OR A SCALAR,  IS ALLOWED AS" &
-      " ACTUAL PARAMETER OF ANY MODE");
+      " ARRAY, OR A SCALAR,  IS ALLOWED AS" & " ACTUAL PARAMETER OF ANY MODE");
 
    -------------------------------------------------------------------
    --------------------  ACCESS TO ARRAY  ----------------------------

@@ -48,10 +48,8 @@ begin
      ("CD2A32I",
       "CHECK THAT WHEN A SIZE SPECIFICATION " &
       "OF THE SMALLEST APPROPRIATE SIGNED SIZE " &
-      "IS GIVEN FOR AN INTEGER TYPE, " &
-      "THE TYPE " &
-      "CAN BE PASSED AS AN ACTUAL PARAMETER TO " &
-      "GENERIC PROCEDURES");
+      "IS GIVEN FOR AN INTEGER TYPE, " & "THE TYPE " &
+      "CAN BE PASSED AS AN ACTUAL PARAMETER TO " & "GENERIC PROCEDURES");
 
    declare -- TYPE DECLARATION WITHIN GENERIC PROCEDURE.
 
@@ -100,10 +98,8 @@ begin
             Failed ("INCORRECT VALUE FOR INT'LAST");
          end if;
 
-         if Int'Val (-63) /= Ident (I1) or
-           Int'Val (0) /= Ident (I2) or
-           Int'Val (63) /= Ident (I3)
-         then
+         if Int'Val (-63) /= Ident (I1) or Int'Val (0) /= Ident (I2) or
+           Int'Val (63) /= Ident (I3) then
             Failed ("INCORRECT VALUE FOR INT'VAL");
          end if;
 
@@ -112,8 +108,7 @@ begin
          end if;
 
          if Int'Value ("-63") /= Ident (I1) or
-           Int'Value (" 0") /= Ident (I2) or
-           Int'Value (" 63") /= Ident (I3)
+           Int'Value (" 0") /= Ident (I2) or Int'Value (" 63") /= Ident (I3)
          then
             Failed ("INCORRECT VALUE FOR INT'VALUE");
          end if;

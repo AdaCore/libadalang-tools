@@ -49,8 +49,7 @@ begin
      ("C45632A",
       "CHECK THAT FOR PREDEFINED TYPE INTEGER " &
       "CONSTRAINT_ERROR IS RAISED " &
-      "FOR ABS (INTEGER'FIRST) IF -INTEGER'LAST > " &
-      "INTEGER'FIRST");
+      "FOR ABS (INTEGER'FIRST) IF -INTEGER'LAST > " & "INTEGER'FIRST");
 
    begin
       if -Integer'Last > Integer'First then

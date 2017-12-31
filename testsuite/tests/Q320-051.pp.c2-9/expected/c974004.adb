@@ -14,8 +14,7 @@ begin  -- Main program.
    Report.Test
      ("C974004",
       "Asynchronous Select: Trigger is queued on a " &
-      "task entry and is completed first by an " &
-      "exception");
+      "task entry and is completed first by an " & "exception");
 
    Read_Card (Card_Data);
 

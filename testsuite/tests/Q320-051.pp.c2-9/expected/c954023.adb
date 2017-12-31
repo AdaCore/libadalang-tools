@@ -247,8 +247,7 @@ begin
          -- This is a family of entry queues indexed by App_Priority
          entry Wait_For_Underload
            (for Ap in App_Priority) (Transaction : Acc_Transaction_Record)
-           when Release (Ap)
-           is
+           when Release (Ap) is
          begin
             requeue Credit_Computation.Input with abort;
             if Wait_For_Underload (Ap)'Count = 0 then
@@ -376,16 +375,14 @@ begin
 
          if This_Transaction.Code = Credit then
             if This_Transaction.Return_Value /= Credit_Return or
-              not This_Transaction.Tc_Thru_Distrib
-            then
+              not This_Transaction.Tc_Thru_Distrib then
                Report.Failed ("Expected path not traversed - Credit");
             end if;
             Tc_Po.Increment_Tasks_Completed_Count;
          else
             if This_Transaction.Return_Value /= Debit_Return or
               This_Transaction.Tc_Message_Count /= 1 or
-              not This_Transaction.Tc_Thru_Distrib
-            then
+              not This_Transaction.Tc_Thru_Distrib then
                Report.Failed ("Expected path not traversed - Debit");
             end if;
             Tc_Debit_Message_Complete := True;
@@ -529,8 +526,7 @@ begin
    end; -- declare (test encapsulation)
 
    if (Tc_Po.Tasks_Completed_Count /= Tc_Credit_Messages_Expected) and
-     not Tc_Debit_Message_Complete
-   then
+     not Tc_Debit_Message_Complete then
       Report.Failed ("Incorrect number of Message Tasks completed");
    end if;
 

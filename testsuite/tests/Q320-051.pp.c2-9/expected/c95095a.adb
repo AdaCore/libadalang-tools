@@ -34,8 +34,7 @@ procedure C95095a is
 
 begin
    Test
-     ("C95095A",
-      "SUBPROGRAM/ENTRY OVERLOADING WITH " & "MINIMAL DIFFERENCES");
+     ("C95095A", "SUBPROGRAM/ENTRY OVERLOADING WITH " & "MINIMAL DIFFERENCES");
 
    --------------------------------------------------
 
@@ -85,8 +84,7 @@ begin
 
       if S /= "AB" then
          Failed
-           ("PARAMETERIZED OVERLOADED " &
-            "SUBPROGRAM AND ENTRY " &
+           ("PARAMETERIZED OVERLOADED " & "SUBPROGRAM AND ENTRY " &
             "CAUSED CONFUSION");
       end if;
 
@@ -96,8 +94,7 @@ begin
 
       if S /= "CD" then
          Failed
-           ("PARAMETERLESS OVERLOADED " &
-            "SUBPROGRAM AND ENTRY " &
+           ("PARAMETERLESS OVERLOADED " & "SUBPROGRAM AND ENTRY " &
             "CAUSED CONFUSION");
       end if;
    end;

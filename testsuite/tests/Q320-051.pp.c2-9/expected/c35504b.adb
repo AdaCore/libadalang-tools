@@ -39,8 +39,7 @@ begin
      ("C35504B",
       "CONSTRAINT_ERROR IS NOT RAISED FOR" &
       " INTEGER SUBTYPE ATTRIBUTES 'SUCC, 'PRED, 'POS, 'VAL," &
-      " 'IMAGE, AND 'VALUE WHOSE ARGUMENTS ARE OUTSIDE THE" &
-      " SUBTYPE");
+      " 'IMAGE, AND 'VALUE WHOSE ARGUMENTS ARE OUTSIDE THE" & " SUBTYPE");
 
    begin
       if I'Succ (-1) /= I'Pred (1) then

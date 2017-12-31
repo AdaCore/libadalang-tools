@@ -85,8 +85,7 @@ procedure Cxaia05 is
 
    package My_Indefinite_Hashed_Sets is new Ada.Containers
      .Indefinite_Hashed_Sets
-     (Element_Type        => String,
-      Hash                => My_Element_Hash,
+     (Element_Type        => String, Hash => My_Element_Hash,
       Equivalent_Elements => My_Equivalent_Elements); -- Default =
 
    type My_Key_Type is new Integer;
@@ -113,9 +112,7 @@ procedure Cxaia05 is
    end My_Equivalent_Keys;
 
    package My_Keys is new My_Indefinite_Hashed_Sets.Generic_Keys
-     (Key_Type        => My_Key_Type,
-      Key             => My_Key,
-      Hash            => My_Key_Hash,
+     (Key_Type        => My_Key_Type, Key => My_Key, Hash => My_Key_Hash,
       Equivalent_Keys => My_Equivalent_Keys); -- Predefined <
 
    My_Set_1 : My_Indefinite_Hashed_Sets.Set;
@@ -128,9 +125,8 @@ procedure Cxaia05 is
 
    My_Inserted : Boolean;
 
-   procedure Tampering_Check
-     (Container : in out My_Indefinite_Hashed_Sets.Set;
-      Where     : in     String)
+   procedure Tampering_Check (Container : in out My_Indefinite_Hashed_Sets.Set;
+      Where                             : in     String)
    is
 
       Program_Error_Raised : Boolean := False;
@@ -236,8 +232,7 @@ begin
       begin
 
          My_Indefinite_Hashed_Sets.Query_Element
-           (Position => My_Cursor_1,
-            Process  => My_Query'Access);
+           (Position => My_Cursor_1, Process => My_Query'Access);
 
       end;
 
@@ -287,9 +282,7 @@ begin
    end if;
 
    if not My_Indefinite_Hashed_Sets.Equivalent_Sets
-       (Left  => My_Set_1,
-        Right => My_Set_2)
-   then
+       (Left => My_Set_1, Right => My_Set_2) then
 
       Report.Failed ("Indefinite_Hashed_Sets not equivalent");
 
@@ -607,8 +600,7 @@ begin
 
    end if;
 
-   if My_Indefinite_Hashed_Sets.Element (My_Set_2.First) /=
-     My_Default_Value
+   if My_Indefinite_Hashed_Sets.Element (My_Set_2.First) /= My_Default_Value
    then
 
       Report.Failed ("Remaining value not as expected");
@@ -622,8 +614,7 @@ begin
    My_Cursor_1 := My_Set_1.Find (Item => Value_In_Ptr_Array (9).all);
 
    if My_Indefinite_Hashed_Sets.Element (Position => My_Cursor_1) /=
-     Value_In_Ptr_Array (9).all
-   then
+     Value_In_Ptr_Array (9).all then
 
       Report.Failed ("Found value not as expected");
 
@@ -632,8 +623,7 @@ begin
    My_Cursor_2 := My_Set_1.Find (Item => Value_In_Ptr_Array (8).all);
 
    if My_Indefinite_Hashed_Sets.Element (Position => My_Cursor_2) /=
-     Value_In_Ptr_Array (8).all
-   then
+     Value_In_Ptr_Array (8).all then
 
       Report.Failed ("Found (element form) value not as expected");
 
@@ -642,8 +632,7 @@ begin
    My_Cursor_1 := My_Set_1.Find (Item => Value_In_Ptr_Array (10).all);
 
    if My_Indefinite_Hashed_Sets.Element (Position => My_Cursor_1) /=
-     Value_In_Ptr_Array (10).all
-   then
+     Value_In_Ptr_Array (10).all then
 
       Report.Failed ("Found (element form) value not as expected");
 
@@ -698,9 +687,7 @@ begin
 
    My_Set_3.Insert (New_Item => My_Default_Value);
 
-   if My_Indefinite_Hashed_Sets.Overlap
-       (Left  => My_Set_3,
-        Right => My_Set_2)
+   if My_Indefinite_Hashed_Sets.Overlap (Left => My_Set_3, Right => My_Set_2)
    then
 
       Report.Failed ("Erroneously thinks has overlap");
@@ -708,18 +695,14 @@ begin
    end if;
 
    if not My_Indefinite_Hashed_Sets.Is_Subset
-       (Subset => My_Set_2,
-        Of_Set => My_Set_1)
-   then
+       (Subset => My_Set_2, Of_Set => My_Set_1) then
 
       Report.Failed ("Erroneously doesn't think is subset");
 
    end if;
 
    if My_Indefinite_Hashed_Sets.Is_Subset
-       (Subset => My_Set_3,
-        Of_Set => My_Set_1)
-   then
+       (Subset => My_Set_3, Of_Set => My_Set_1) then
 
       Report.Failed ("Erroneously thinks is subset");
 
@@ -738,9 +721,7 @@ begin
    -- Hashed sets are not ordered so could be read out in any order
 
    if not My_Indefinite_Hashed_Sets.Overlap
-       (Left  => My_Set_1,
-        Right => My_Set_2)
-   then
+       (Left => My_Set_1, Right => My_Set_2) then
 
       Report.Failed ("Erroneously doesn't think has overlap");
 
@@ -790,8 +771,7 @@ begin
 
    My_Set_3 :=
      My_Indefinite_Hashed_Sets.Intersection
-       (Left  => My_Set_1,
-        Right => My_Set_2);
+       (Left => My_Set_1, Right => My_Set_2);
 
    -- My_Set_3 should contain Value_In_Ptr_Array (2).all
 
@@ -804,8 +784,7 @@ begin
    My_Cursor_3 := My_Set_3.First;
 
    if My_Indefinite_Hashed_Sets.Element (Position => My_Cursor_3) /=
-     Value_In_Ptr_Array (2).all
-   then
+     Value_In_Ptr_Array (2).all then
 
       Report.Failed ("Element not as expected after Intersection #1");
 
@@ -824,8 +803,7 @@ begin
    My_Cursor_3 := My_Set_3.First;
 
    if My_Indefinite_Hashed_Sets.Element (Position => My_Cursor_3) /=
-     Value_In_Ptr_Array (2).all
-   then
+     Value_In_Ptr_Array (2).all then
 
       Report.Failed ("Element not as expected after Intersection #2");
 
@@ -853,8 +831,7 @@ begin
    My_Cursor_3 := My_Set_3.First;
 
    if My_Indefinite_Hashed_Sets.Element (Position => My_Cursor_3) /=
-     My_Default_Value
-   then
+     My_Default_Value then
 
       Report.Failed ("Element not as expected after Difference #1");
 
@@ -862,8 +839,7 @@ begin
 
    My_Set_3 :=
      My_Indefinite_Hashed_Sets.Difference
-       (Left  => My_Set_1,
-        Right => My_Set_2);
+       (Left => My_Set_1, Right => My_Set_2);
 
    -- My_Set_3 should contain the test values except for Value_In_Ptr_Array
    -- (2).all
@@ -908,8 +884,7 @@ begin
 
    My_Set_3 :=
      My_Indefinite_Hashed_Sets.Symmetric_Difference
-       (Left  => My_Set_1,
-        Right => My_Set_3);
+       (Left => My_Set_1, Right => My_Set_3);
 
    -- My_Set_3 should contain the test values except for Value_In_Ptr_Array
    -- (2).all, plus Default_Value
@@ -944,8 +919,7 @@ begin
    -- to
 
    if My_Keys.Key (Position => My_Cursor_2) /=
-     My_Key_Type (Character'Pos (Value_In_Ptr_Array (2).all (1)))
-   then
+     My_Key_Type (Character'Pos (Value_In_Ptr_Array (2).all (1))) then
 
       Report.Failed ("Wrong key for cursor");
 
@@ -954,8 +928,7 @@ begin
    if My_Keys.Element
        (Container => My_Set_3,
         Key => My_Key_Type (Character'Pos (Value_In_Ptr_Array (1).all (1)))) /=
-     Value_In_Ptr_Array (1).all
-   then
+     Value_In_Ptr_Array (1).all then
 
       Report.Failed ("Wrong element for key");
 
@@ -1033,8 +1006,7 @@ begin
         Key => My_Key_Type (Character'Pos (Value_In_Ptr_Array (9).all (1))));
 
    if My_Indefinite_Hashed_Sets.Element (Position => My_Cursor_3) /=
-     Value_In_Ptr_Array (9).all
-   then
+     Value_In_Ptr_Array (9).all then
 
       Report.Failed ("Found (key form) value not as expected");
 
@@ -1063,8 +1035,7 @@ begin
       begin
 
          Tampering_Check
-           (Container => My_Set_3,
-            Where     => "Update_Element_Preserving_Key");
+           (Container => My_Set_3, Where => "Update_Element_Preserving_Key");
 
          -- Increment the second character of the string. Doesn't change key
 
@@ -1076,15 +1047,13 @@ begin
    begin
 
       My_Keys.Update_Element_Preserving_Key
-        (Container => My_Set_3,
-         Position  => My_Cursor_3,
+        (Container => My_Set_3, Position => My_Cursor_3,
          Process   => My_Update'Access);
 
    end;
 
    if My_Indefinite_Hashed_Sets.Element (Position => My_Cursor_3) (1) /=
-     Value_In_Ptr_Array (9).all (1)
-   then
+     Value_In_Ptr_Array (9).all (1) then
 
       Report.Failed ("Updated element not as expected");
 

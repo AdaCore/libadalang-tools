@@ -131,24 +131,19 @@ begin
       Tc_Character   : Character          := Character'First;
 
       Null_Character_Set : Character_Set := To_Fortran (Acl.Nul);
-      Tc_Character_Set,
-      Tc_Low_Character_Set,
-      Tc_High_Character_Set : Character_Set :=
-        Character_Set'First;
+      Tc_Character_Set, Tc_Low_Character_Set,
+      Tc_High_Character_Set : Character_Set := Character_Set'First;
 
       -- The following procedure checks the results of function To_Ada.
 
-      procedure Check_Length
-        (Str : in String;
-         Ftn : in Fortran_Character;
-         Num : in Natural)
+      procedure Check_Length (Str : in String; Ftn : in Fortran_Character;
+         Num                      : in Natural)
       is
       begin
          if Str'Length /= Ftn'Length or Str'Length /= Num then
             Report.Failed
               ("Incorrect result from Function To_Ada " &
-               "with string length " &
-               Integer'Image (Num));
+               "with string length " & Integer'Image (Num));
          end if;
       end Check_Length;
 
@@ -156,12 +151,10 @@ begin
       -- following functions have been instantiated.
 
       function Character_To_Character_Set is new Ada.Unchecked_Conversion
-        (Character,
-         Character_Set);
+        (Character, Character_Set);
 
       function Character_Set_To_Character is new Ada.Unchecked_Conversion
-        (Character_Set,
-         Character);
+        (Character_Set, Character);
 
    begin
 
@@ -170,8 +163,7 @@ begin
 
       for Tc_Character in Acl.Lc_A .. Acl.Lc_Z loop
          if To_Fortran (Item => Tc_Character) /=
-           Character_To_Character_Set (Tc_Character)
-         then
+           Character_To_Character_Set (Tc_Character) then
             Report.Failed
               ("Incorrect result from To_Fortran with lower " &
                "case alphabetic character input");
@@ -180,8 +172,7 @@ begin
 
       for Tc_Character in Character_A .. Character_Z loop
          if To_Fortran (Tc_Character) /=
-           Character_To_Character_Set (Tc_Character)
-         then
+           Character_To_Character_Set (Tc_Character) then
             Report.Failed
               ("Incorrect result from To_Fortran with upper " &
                "case alphabetic character input");
@@ -189,8 +180,7 @@ begin
       end loop;
 
       if To_Fortran (Null_Character) /=
-        Character_To_Character_Set (Null_Character)
-      then
+        Character_To_Character_Set (Null_Character) then
          Report.Failed
            ("Incorrect result from To_Fortran with null character input");
       end if;
@@ -203,8 +193,7 @@ begin
       for Tc_Character_Set in Tc_Low_Character_Set .. Tc_High_Character_Set
       loop
          if To_Ada (Item => Tc_Character_Set) /=
-           Character_Set_To_Character (Tc_Character_Set)
-         then
+           Character_Set_To_Character (Tc_Character_Set) then
             Report.Failed
               ("Incorrect result from To_Ada with lower case " &
                "alphabetic Character_Set input");
@@ -216,16 +205,14 @@ begin
       for Tc_Character_Set in Tc_Low_Character_Set .. Tc_High_Character_Set
       loop
          if To_Ada (Tc_Character_Set) /=
-           Character_Set_To_Character (Tc_Character_Set)
-         then
+           Character_Set_To_Character (Tc_Character_Set) then
             Report.Failed
               ("Incorrect result from To_Ada with upper case " &
                "alphabetic Character_Set input");
          end if;
       end loop;
 
-      if To_Ada (Character_To_Character_Set (Null_Character)) /=
-        Null_Character
+      if To_Ada (Character_To_Character_Set (Null_Character)) /= Null_Character
       then
          Report.Failed
            ("Incorrect result from To_Ada with a null " &
@@ -275,9 +262,7 @@ begin
       end if;
 
       Check_Length
-        (To_Ada (Tc_Fortran_Character_1),
-         Tc_Fortran_Character_1,
-         Num => 1);
+        (To_Ada (Tc_Fortran_Character_1), Tc_Fortran_Character_1, Num => 1);
 
       Unb_String := Unb.To_Unbounded_String (To_Ada (Tc_Fortran_Character_5));
 
@@ -286,9 +271,7 @@ begin
       end if;
 
       Check_Length
-        (To_Ada (Tc_Fortran_Character_5),
-         Tc_Fortran_Character_5,
-         Num => 5);
+        (To_Ada (Tc_Fortran_Character_5), Tc_Fortran_Character_5, Num => 5);
 
       Bnd_String := Bnd.To_Bounded_String (To_Ada (Tc_Fortran_Character_10));
 
@@ -297,9 +280,7 @@ begin
       end if;
 
       Check_Length
-        (To_Ada (Tc_Fortran_Character_10),
-         Tc_Fortran_Character_10,
-         Num => 10);
+        (To_Ada (Tc_Fortran_Character_10), Tc_Fortran_Character_10, Num => 10);
 
       String_20 := To_Ada (Tc_Fortran_Character_20);
 
@@ -308,9 +289,7 @@ begin
       end if;
 
       Check_Length
-        (To_Ada (Tc_Fortran_Character_20),
-         Tc_Fortran_Character_20,
-         Num => 20);
+        (To_Ada (Tc_Fortran_Character_20), Tc_Fortran_Character_20, Num => 20);
 
       if To_Ada (Null_Character_Set) /= Null_Character then
          Report.Failed ("Incorrect value returned from function To_Ada - 5");
@@ -330,8 +309,7 @@ begin
    exception
       when The_Error : others =>
          Report.Failed
-           ("The following exception was raised in the " &
-            "Test_Block: " &
+           ("The following exception was raised in the " & "Test_Block: " &
             Exception_Name (The_Error));
    end Test_Block;
 

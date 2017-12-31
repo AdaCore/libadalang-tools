@@ -53,8 +53,7 @@ procedure Ce3806e is
 begin
 
    Test
-     ("CE3806E",
-      "CHECK THAT FLOAT_IO PUT RAISES " & "LAYOUT_ERROR CORRECTLY");
+     ("CE3806E", "CHECK THAT FLOAT_IO PUT RAISES " & "LAYOUT_ERROR CORRECTLY");
 
    declare
       type Fl is digits 3 range 100.0 .. 200.0;

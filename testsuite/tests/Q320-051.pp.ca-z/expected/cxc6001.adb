@@ -8,8 +8,7 @@ procedure Cxc6001 is
 begin  -- Main test procedure.
 
    Report.Test
-     ("CXC6001",
-      "Check semantics for atomic and volatile " & "types");
+     ("CXC6001", "Check semantics for atomic and volatile " & "types");
 
    ------------ Subtest 1, Atomic Reference Semantics, Object
 

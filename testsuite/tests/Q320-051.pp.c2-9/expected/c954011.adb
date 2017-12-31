@@ -219,16 +219,14 @@ procedure C954011 is
       if This_Transaction.Code = Credit then
          if This_Transaction.Return_Value /= Credit_Return or
            This_Transaction.Tc_Message_Count /= 1 or
-           not This_Transaction.Tc_Thru_Distrib
-         then
+           not This_Transaction.Tc_Thru_Distrib then
             Report.Failed ("Expected path not traversed");
          end if;
          Tc_Credit_Message.Mark_Complete;
       else
          if This_Transaction.Return_Value /= Debit_Return or
            This_Transaction.Tc_Message_Count /= 1 or
-           not This_Transaction.Tc_Thru_Distrib
-         then
+           not This_Transaction.Tc_Thru_Distrib then
             Report.Failed ("Expected path not traversed");
          end if;
          Tc_Debit_Message.Mark_Complete;

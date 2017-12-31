@@ -149,9 +149,7 @@ begin
 
             if R.Value /= J then
                Failed
-                 (S &
-                  ".VALUE HAS AN INCORRECT " &
-                  "VALUE OF " &
+                 (S & ".VALUE HAS AN INCORRECT " & "VALUE OF " &
                   Integer'Image (R.Value));
             end if;
          end Check3;
@@ -167,9 +165,7 @@ begin
          begin
             if V'Last /= 1 then
                Failed
-                 (S &
-                  " HAS AN INCORRECT UPPER BOUND " &
-                  "OF " &
+                 (S & " HAS AN INCORRECT UPPER BOUND " & "OF " &
                   Integer'Image (V'Last));
             end if;
 
@@ -182,19 +178,12 @@ begin
          begin
             if V'Last /= 3 then
                Failed
-                 (S &
-                  " HAS AN INCORRECT UPPER BOUND " &
-                  "OF " &
+                 (S & " HAS AN INCORRECT UPPER BOUND " & "OF " &
                   Integer'Image (V'Last));
             end if;
 
-            if V.all = (4, 5, 6) or
-              V.all = (5, 4, 6) or
-              V.all = (4, 6, 5) or
-              V.all = (6, 4, 5) or
-              V.all = (5, 6, 4) or
-              V.all = (6, 5, 4)
-            then
+            if V.all = (4, 5, 6) or V.all = (5, 4, 6) or V.all = (4, 6, 5) or
+              V.all = (6, 4, 5) or V.all = (5, 6, 4) or V.all = (6, 5, 4) then
                null;
             else
                Failed (S & " HAS AN INCORRECT COMPONENT " & "VALUE");

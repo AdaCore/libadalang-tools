@@ -159,17 +159,11 @@ begin
       begin
          if Subch'Value (Str2) = Subch'Val (0) then
             Failed
-              ("NO EXCEPTION RAISED FOR " &
-               Str1 &
-               "'VALUE (" &
-               Str2 &
+              ("NO EXCEPTION RAISED FOR " & Str1 & "'VALUE (" & Str2 &
                ") - 1");
          else
             Failed
-              ("NO EXCEPTION RAISED FOR " &
-               Str1 &
-               "'VALUE (" &
-               Str2 &
+              ("NO EXCEPTION RAISED FOR " & Str1 & "'VALUE (" & Str2 &
                ") - 2");
          end if;
       exception
@@ -177,11 +171,7 @@ begin
             null;
          when others =>
             Failed
-              ("WRONG EXCEPTION RAISED " &
-               "FOR " &
-               Str1 &
-               "'VALUE (" &
-               Str2 &
+              ("WRONG EXCEPTION RAISED " & "FOR " & Str1 & "'VALUE (" & Str2 &
                ")");
       end P;
 

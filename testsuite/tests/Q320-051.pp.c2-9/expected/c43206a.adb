@@ -55,8 +55,7 @@ begin
    Test
      ("C43206A",
       "CHECK THAT THE BOUNDS OF A NULL ARRAY ARE " &
-      "DETERMINED BY THE BOUNDS SPECIFIED BY THE " &
-      "CHOICES");
+      "DETERMINED BY THE BOUNDS SPECIFIED BY THE " & "CHOICES");
 
    declare
 
@@ -188,10 +187,8 @@ begin
 
             procedure Proc1 (A : T2) is
             begin
-               if A'First (1) /= 5 or
-                 A'Last (1) /= 3 or
-                 A'First (2) /= Integer'Last - 1 or
-                 A'Last (2) /= Integer'Last
+               if A'First (1) /= 5 or A'Last (1) /= 3 or
+                 A'First (2) /= Integer'Last - 1 or A'Last (2) /= Integer'Last
                then
                   Failed ("CASE C1 : INCORRECT BOUNDS");
                end if;
@@ -221,10 +218,8 @@ begin
             procedure Proc1 (A : T2) is
             begin
                if A'First (1) /= Integer'First or
-                 A'Last (1) /= Integer'First + 1 or
-                 A'First (2) /= 14 or
-                 A'Last (2) /= 11
-               then
+                 A'Last (1) /= Integer'First + 1 or A'First (2) /= 14 or
+                 A'Last (2) /= 11 then
                   Failed ("CASE C2 : INCORRECT BOUNDS");
                end if;
             end Proc1;

@@ -46,13 +46,8 @@ procedure C34007u is
 
       type Designated (B : Boolean := True; L : Length := 1) is private;
 
-      function Create
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         C : Component;
-         F : Float) return Designated;
+      function Create (B : Boolean; L : Length; I : Integer; S : String;
+         C               : Component; F : Float) return Designated;
 
    private
 
@@ -75,14 +70,8 @@ procedure C34007u is
 
       type Parent is access Designated;
 
-      function Create
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         C : Component;
-         F : Float;
-         X : Parent  -- TO RESOLVE OVERLOADING.
+      function Create (B : Boolean; L : Length; I : Integer; S : String;
+         C : Component; F : Float; X : Parent  -- TO RESOLVE OVERLOADING.
          ) return Parent;
 
    end Pkg_P;
@@ -100,13 +89,8 @@ procedure C34007u is
 
    package body Pkg_D is
 
-      function Create
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         C : Component;
-         F : Float) return Designated
+      function Create (B : Boolean; L : Length; I : Integer; S : String;
+         C               : Component; F : Float) return Designated
       is
       begin
          case B is
@@ -121,14 +105,8 @@ procedure C34007u is
 
    package body Pkg_P is
 
-      function Create
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         C : Component;
-         F : Float;
-         X : Parent) return Parent
+      function Create (B : Boolean; L : Length; I : Integer; S : String;
+         C               : Component; F : Float; X : Parent) return Parent
       is
       begin
          return new Designated'(Create (B, L, I, S, C, F));
@@ -159,8 +137,7 @@ begin
    end if;
 
    if Create (False, 2, 3, "ZZ", 5, 6.0, X) in T or
-     Create (False, 2, 3, "ZZ", 5, 6.0, Y) in S
-   then
+     Create (False, 2, 3, "ZZ", 5, 6.0, Y) in S then
       Failed ("INCORRECT ""IN""");
    end if;
 
@@ -185,15 +162,12 @@ begin
    begin
       X := new Designated'(Create (False, 3, 2, "ZZZ", 5, 6.0));
       Failed
-        ("CONSTRAINT_ERROR NOT RAISED -- " &
-         "X := NEW DESIGNATED'" &
+        ("CONSTRAINT_ERROR NOT RAISED -- " & "X := NEW DESIGNATED'" &
          "(CREATE (FALSE, 3, 2, ""ZZZ"", 5, 6.0))");
-      if X = null
-        or else X.all = Create (False, 3, 2, "ZZZ", 5, 6.0)
+      if X = null or else X.all = Create (False, 3, 2, "ZZZ", 5, 6.0)
       then  -- USE X.
          Comment
-           ("X ALTERED -- " &
-            "X := NEW DESIGNATED'" &
+           ("X ALTERED -- " & "X := NEW DESIGNATED'" &
             "(CREATE (FALSE, 3, 2, ""ZZZ"", 5, 6.0))");
       end if;
    exception
@@ -201,23 +175,19 @@ begin
          null;
       when others =>
          Failed
-           ("WRONG EXCEPTION RAISED -- " &
-            "X := NEW DESIGNATED'" &
+           ("WRONG EXCEPTION RAISED -- " & "X := NEW DESIGNATED'" &
             "(CREATE (FALSE, 3, 2, ""ZZZ"", 5, 6.0))");
    end;
 
    begin
       X := new Designated'(Create (True, 4, 2, "ZZZZ", 6, 7.0));
       Failed
-        ("CONSTRAINT_ERROR NOT RAISED -- " &
-         "X := NEW DESIGNATED'" &
+        ("CONSTRAINT_ERROR NOT RAISED -- " & "X := NEW DESIGNATED'" &
          "(CREATE (TRUE, 4, 2, ""ZZZZ"", 6, 7.0))");
-      if X = null
-        or else X.all = Create (True, 4, 2, "ZZZZ", 6, 7.0)
+      if X = null or else X.all = Create (True, 4, 2, "ZZZZ", 6, 7.0)
       then  -- USE X.
          Comment
-           ("X ALTERED -- " &
-            "X := NEW DESIGNATED'" &
+           ("X ALTERED -- " & "X := NEW DESIGNATED'" &
             "(CREATE (TRUE, 4, 2, ""ZZZZ"", 6, 7.0))");
       end if;
    exception
@@ -225,23 +195,19 @@ begin
          null;
       when others =>
          Failed
-           ("WRONG EXCEPTION RAISED -- " &
-            "X := NEW DESIGNATED'" &
+           ("WRONG EXCEPTION RAISED -- " & "X := NEW DESIGNATED'" &
             "(CREATE (TRUE, 4, 2, ""ZZZZ"", 6, 7.0))");
    end;
 
    begin
       Y := new Designated'(Create (False, 3, 2, "ZZZ", 5, 6.0));
       Failed
-        ("CONSTRAINT_ERROR NOT RAISED -- " &
-         "Y := NEW DESIGNATED'" &
+        ("CONSTRAINT_ERROR NOT RAISED -- " & "Y := NEW DESIGNATED'" &
          "(CREATE (FALSE, 3, 2, ""ZZZ"", 5, 6.0))");
-      if Y = null
-        or else Y.all = Create (False, 3, 2, "ZZZ", 5, 6.0)
+      if Y = null or else Y.all = Create (False, 3, 2, "ZZZ", 5, 6.0)
       then  -- USE Y.
          Comment
-           ("Y ALTERED -- " &
-            "Y := NEW DESIGNATED'" &
+           ("Y ALTERED -- " & "Y := NEW DESIGNATED'" &
             "(CREATE (FALSE, 3, 2, ""ZZZ"", 5, 6.0))");
       end if;
    exception
@@ -249,23 +215,19 @@ begin
          null;
       when others =>
          Failed
-           ("WRONG EXCEPTION RAISED -- " &
-            "Y := NEW DESIGNATED'" &
+           ("WRONG EXCEPTION RAISED -- " & "Y := NEW DESIGNATED'" &
             "(CREATE (FALSE, 3, 2, ""ZZZ"", 5, 6.0))");
    end;
 
    begin
       Y := new Designated'(Create (True, 4, 2, "ZZZZ", 6, 7.0));
       Failed
-        ("CONSTRAINT_ERROR NOT RAISED -- " &
-         "Y := NEW DESIGNATED'" &
+        ("CONSTRAINT_ERROR NOT RAISED -- " & "Y := NEW DESIGNATED'" &
          "(CREATE (TRUE, 4, 2, ""ZZZZ"", 6, 7.0))");
-      if Y = null
-        or else Y.all = Create (True, 4, 2, "ZZZZ", 6, 7.0)
+      if Y = null or else Y.all = Create (True, 4, 2, "ZZZZ", 6, 7.0)
       then  -- USE Y.
          Comment
-           ("Y ALTERED -- " &
-            "Y := NEW DESIGNATED'" &
+           ("Y ALTERED -- " & "Y := NEW DESIGNATED'" &
             "(CREATE (TRUE, 4, 2, ""ZZZZ"", 6, 7.0))");
       end if;
    exception
@@ -273,8 +235,7 @@ begin
          null;
       when others =>
          Failed
-           ("WRONG EXCEPTION RAISED -- " &
-            "Y := NEW DESIGNATED'" &
+           ("WRONG EXCEPTION RAISED -- " & "Y := NEW DESIGNATED'" &
             "(CREATE (TRUE, 4, 2, ""ZZZZ"", 6, 7.0))");
    end;
 

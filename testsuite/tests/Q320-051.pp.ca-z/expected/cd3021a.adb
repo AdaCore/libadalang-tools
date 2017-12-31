@@ -55,13 +55,11 @@ begin
       "CHECK THAT THE AGGREGATE IN AN ENUMERATION " &
       "REPRESENTATION CLAUSE IS NOT AMBIGUOUS EVEN " &
       "IF THERE ARE SEVERAL ONE-DIMENSIONAL ARRAY " &
-      "TYPES WITH THE ENUMERATION TYPE AS THE INDEX " &
-      "SUBTYPE");
+      "TYPES WITH THE ENUMERATION TYPE AS THE INDEX " & "SUBTYPE");
 
    if (A1 /= (Ident_Int (5), Ident_Int (6), Ident_Int (13))) or
      (A2 /= (Ident_Int (1), Ident_Int (2), Ident_Int (3))) or
-     (A3 /= (Ident_Int (0), Ident_Int (1), Ident_Int (2)))
-   then
+     (A3 /= (Ident_Int (0), Ident_Int (1), Ident_Int (2))) then
       Failed ("INCORRECT VALUES FOR ARRAYS");
    end if;
 

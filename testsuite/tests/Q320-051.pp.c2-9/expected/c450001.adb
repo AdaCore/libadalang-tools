@@ -60,8 +60,7 @@ begin  -- Main test procedure. C450001
      ((Id (Short_8_A) and Id (Short_8_B)) = 2#0000_0101#,
       "8 short and 1" & Br);
    Is_T
-     ((Id (Short_8_A) or Id (Short_8_B)) = 2#0000_0000#,
-      "8 short  or 1" & Br);
+     ((Id (Short_8_A) or Id (Short_8_B)) = 2#0000_0000#, "8 short  or 1" & Br);
    Is_T
      ((Id (Short_8_A) xor Id (Short_8_B)) = 2#1111_1010#,
       "8 short xor 1" & Br);
@@ -73,8 +72,7 @@ begin  -- Main test procedure. C450001
      ((Id (Short_8_A) and Id (Short_8_B)) = 2#1111_0000#,
       "8 short and 2" & Br);
    Is_T
-     ((Id (Short_8_A) or Id (Short_8_B)) = 2#1111_1110#,
-      "8 short  or 2" & Br);
+     ((Id (Short_8_A) or Id (Short_8_B)) = 2#1111_1110#, "8 short  or 2" & Br);
    Is_T
      ((Id (Short_8_A) xor Id (Short_8_B)) = 2#0000_1110#,
       "8 short xor 2" & Br);
@@ -86,8 +84,7 @@ begin  -- Main test procedure. C450001
      ((Id (Short_8_A) and Id (Short_8_B)) = 2#0000_0000#,
       "8 short and 3" & Br);
    Is_T
-     ((Id (Short_8_A) or Id (Short_8_B)) = 2#0000_0000#,
-      "8 short  or 3" & Br);
+     ((Id (Short_8_A) or Id (Short_8_B)) = 2#0000_0000#, "8 short  or 3" & Br);
    Is_T
      ((Id (Short_8_A) xor Id (Short_8_B)) = 2#0000_0000#,
       "8 short xor 3" & Br);
@@ -99,8 +96,7 @@ begin  -- Main test procedure. C450001
      ((Id (Short_8_A) and Id (Short_8_B)) = 2#1010_1010#,
       "8 short and 4" & Br);
    Is_T
-     ((Id (Short_8_A) or Id (Short_8_B)) = 2#1111_1110#,
-      "8 short  or 4" & Br);
+     ((Id (Short_8_A) or Id (Short_8_B)) = 2#1111_1110#, "8 short  or 4" & Br);
    Is_T
      ((Id (Short_8_A) xor Id (Short_8_B)) = 2#0101_0100#,
       "8 short xor 4" & Br);
@@ -114,23 +110,19 @@ begin  -- Main test procedure. C450001
    Over_8_B := 2#0_1111_1111#;
 
    Is_T
-     ((Id (Over_8_A) and Id (Over_8_B)) = 2#0_0000_0000#,
-      "8 over and" & Br);
+     ((Id (Over_8_A) and Id (Over_8_B)) = 2#0_0000_0000#, "8 over and" & Br);
    Is_T ((Id (Over_8_A) or Id (Over_8_B)) = 2#0_1111_1101#, "8 over  or" & Br);
    Is_T
-     ((Id (Over_8_A) xor Id (Over_8_B)) = 2#0_1111_1101#,
-      "8 over xor" & Br);
+     ((Id (Over_8_A) xor Id (Over_8_B)) = 2#0_1111_1101#, "8 over xor" & Br);
 
    Over_8_A := 2#1_0000_0001#;
    Over_8_B := 2#0_1111_1111#;
 
    Is_T
-     ((Id (Over_8_A) and Id (Over_8_B)) = 2#0_0000_0001#,
-      "8 over and" & Br);
+     ((Id (Over_8_A) and Id (Over_8_B)) = 2#0_0000_0001#, "8 over and" & Br);
    Is_T ((Id (Over_8_A) or Id (Over_8_B)) = 2#0_1111_1101#, "8 over  or" & Br);
    Is_T
-     ((Id (Over_8_A) xor Id (Over_8_B)) = 2#0_1111_1100#,
-      "8 over xor" & Br);
+     ((Id (Over_8_A) xor Id (Over_8_B)) = 2#0_1111_1100#, "8 over xor" & Br);
 
    Whole_8_A := 128;
    Whole_8_B := 255;

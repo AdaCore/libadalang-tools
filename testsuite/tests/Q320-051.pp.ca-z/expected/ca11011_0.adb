@@ -7,9 +7,8 @@ package body Ca11011_0 is          -- Package body OS.
       return (An_Ada_File_Name);
    end Get_File_Name;
    ---------------------------------------------------------------------
-   procedure Verify_Initial_Conditions
-     (Key    : in     File_Descriptor_Type;
-      Status :    out Boolean)
+   procedure Verify_Initial_Conditions (Key : in     File_Descriptor_Type;
+      Status                                :    out Boolean)
    is
    begin
       Status := False;
@@ -17,8 +16,7 @@ package body Ca11011_0 is          -- Package body OS.
         and then (File_Table (Key).Name = Default_Filename)
         and then (File_Table (Key).Acct_Access = Default_Permission)
         and then (File_Table (Key).Mode = Default_Mode)
-        and then (File_Table (Key).Current_Status = Default_Status)
-      then
+        and then (File_Table (Key).Current_Status = Default_Status) then
          Status := True;
       end if;
    end Verify_Initial_Conditions;

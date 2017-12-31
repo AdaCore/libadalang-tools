@@ -34,13 +34,11 @@ begin
             Report.Failed
               ("expected task priority to be" &
                System.Any_Priority'Image (System.Default_Priority + 5) &
-               " but the priority was" &
-               System.Any_Priority'Image (P));
+               " but the priority was" & System.Any_Priority'Image (P));
          else
             if Verbose then
                Report.Comment
-                 ("Check_1 priority is" &
-                  System.Any_Priority'Image (P) &
+                 ("Check_1 priority is" & System.Any_Priority'Image (P) &
                   " which is System.Default_Priority + 5");
             end if;
          end if;

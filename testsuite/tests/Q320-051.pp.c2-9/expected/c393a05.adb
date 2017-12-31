@@ -23,8 +23,7 @@ begin  -- Main test procedure.
      ("C393A05",
       "Check that nonabstract private extensions, " &
       "inherited abstract subprograms overridden " &
-      "in the private part can be dispatched from " &
-      "outside the package");
+      "in the private part can be dispatched from " & "outside the package");
 
    Tracer.Tc_Validate ("hh", "Declarations");
 
@@ -42,8 +41,7 @@ begin  -- Main test procedure.
    Tracer.Tc_Validate ("C", "Dispatching Swapping Coffees");
 
    if Gritty /= Coffee.Grind (Afternoon) or
-     Coffee.Grind (Afternoon) /= Coffee.Fine
-   then
+     Coffee.Grind (Afternoon) /= Coffee.Fine then
       Report.Failed ("Result of Swap");
    end if;
    Tracer.Tc_Validate ("BB", "Finding Afternoon Grind");

@@ -54,8 +54,7 @@ begin
      ("CE3115A",
       "CHECK THAT RESETTING ONE OF A MULTIPLE OF " &
       "INTERNAL FILES ASSOCIATED WITH THE SAME " &
-      "EXTERNAL FILE HAS NO EFFECT ON ANY OF THE " &
-      "OTHER INTERNAL FILES");
+      "EXTERNAL FILE HAS NO EFFECT ON ANY OF THE " & "OTHER INTERNAL FILES");
 
    declare
       Txt_File_One : Text_Io.File_Type;
@@ -94,14 +93,12 @@ begin
       exception
          when Text_Io.Use_Error =>
             Not_Applicable
-              ("USE_ERROR RAISED; CREATE OF " &
-               "EXTERNAL FILENAME IS NOT " &
+              ("USE_ERROR RAISED; CREATE OF " & "EXTERNAL FILENAME IS NOT " &
                "SUPPORTED - 2");
             raise Incomplete;
          when Text_Io.Name_Error =>
             Not_Applicable
-              ("NAME_ERROR RAISED; CREATE OF " &
-               "EXTERNAL FILENAME IS NOT " &
+              ("NAME_ERROR RAISED; CREATE OF " & "EXTERNAL FILENAME IS NOT " &
                "SUPPORTED - 3");
             raise Incomplete;
 
@@ -117,8 +114,7 @@ begin
             Not_Applicable
               ("MULTIPLE INTERNAL FILES ARE NOT " &
                "SUPPORTED WHEN ONE IS MODE " &
-               "OUT_FILE AND THE OTHER IS MODE " &
-               "IN_FILE - 4" &
+               "OUT_FILE AND THE OTHER IS MODE " & "IN_FILE - 4" &
                " - USE_ERROR RAISED ");
             Txt_Cleanup;
             raise Incomplete;
@@ -127,8 +123,7 @@ begin
             Not_Applicable
               ("MULTIPLE INTERNAL FILES ARE NOT " &
                "SUPPORTED WHEN ONE IS MODE " &
-               "OUT_FILE AND THE OTHER IS MODE " &
-               "IN_FILE - 4" &
+               "OUT_FILE AND THE OTHER IS MODE " & "IN_FILE - 4" &
                " - NAME_ERROR RAISED ");
             Txt_Cleanup;
             raise Incomplete;
@@ -158,8 +153,7 @@ begin
 
          when Text_Io.Use_Error =>
             Not_Applicable
-              ("RESETTING OF EXTERNAL FILE FOR " &
-               "OUT_FILE MODE IS " &
+              ("RESETTING OF EXTERNAL FILE FOR " & "OUT_FILE MODE IS " &
                " NOT SUPPORTED - 8");
             Txt_Cleanup;
             raise Incomplete;
@@ -179,8 +173,7 @@ begin
          when Use_Error =>
             Not_Applicable
               ("MULTIPLE INTERNAL FILES NOT " &
-               "SUPPORTED WHEN BOTH FILES HAVE " &
-               "IN_FILE MODE - 9");
+               "SUPPORTED WHEN BOTH FILES HAVE " & "IN_FILE MODE - 9");
             raise Incomplete;
       end;
 

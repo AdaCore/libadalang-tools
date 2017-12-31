@@ -17,8 +17,7 @@ begin
       Report.Test
         ("CB40A01",
          "Check that a user defined exception " &
-         "is correctly propagated out of a " &
-         "public child package");
+         "is correctly propagated out of a " & "public child package");
 
       Fb40a00.Cb40a01_0.Process_Text (String_Pointer);
 

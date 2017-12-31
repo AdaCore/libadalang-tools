@@ -52,8 +52,7 @@ begin
    Test
      ("CE2102B",
       "CHECK THAT STATUS_ERROR IS RAISED WHEN " &
-      "PERFORMING ILLEGAL OPERATIONS ON FILES " &
-      "OF TYPE DIRECT_IO");
+      "PERFORMING ILLEGAL OPERATIONS ON FILES " & "OF TYPE DIRECT_IO");
 
    begin
       Create (Test_File_One, Out_File, Legal_File_Name);

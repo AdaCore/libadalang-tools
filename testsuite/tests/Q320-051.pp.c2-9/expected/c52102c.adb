@@ -82,30 +82,16 @@ begin
 
    begin
       A :=
-        (-Id_I (4),
-         -Id_I (3),
-         -Id_I (2),
-         -Id_I (1),
-         Id_I (100),
-         Id_I (1),
-         Id_I (2),
-         Id_I (3),
-         Id_I (4));
+        (-Id_I (4), -Id_I (3), -Id_I (2), -Id_I (1), Id_I (100), Id_I (1),
+         Id_I (2), Id_I (3), Id_I (4));
       A (-4 .. 0) := A (0 .. 4);
       if A /= (100, 1, 2, 3, 4, 1, 2, 3, 4) then
          Failed ("WRONG VALUES  -  I3");
       end if;
 
       A :=
-        (-Id_I (4),
-         -Id_I (3),
-         -Id_I (2),
-         -Id_I (1),
-         Id_I (100),
-         Id_I (1),
-         Id_I (2),
-         Id_I (3),
-         Id_I (4));
+        (-Id_I (4), -Id_I (3), -Id_I (2), -Id_I (1), Id_I (100), Id_I (1),
+         Id_I (2), Id_I (3), Id_I (4));
       A (0 .. 4) := A (-4 .. 0);
       if A /= (-4, -3, -2, -1, -4, -3, -2, -1, 100) then
          Failed ("WRONG VALUES  -  I4");
@@ -119,32 +105,16 @@ begin
 
    begin
       A :=
-        (Id_I (1),
-         Id_I (2),
-         Id_I (3),
-         Id_I (4),
-         Id_I (5),
-         Id_I (6),
-         Id_I (7),
-         Id_I (8),
-         Id_I (9),
-         Id_I (10));
+        (Id_I (1), Id_I (2), Id_I (3), Id_I (4), Id_I (5), Id_I (6), Id_I (7),
+         Id_I (8), Id_I (9), Id_I (10));
       A := 0 & A (1 .. 2) & A (1 .. 2) & A (1 .. 5);
       if A /= (0, 1, 2, 1, 2, 1, 2, 3, 4, 5) then
          Failed ("WRONG VALUES  -  I5");
       end if;
 
       A :=
-        (Id_I (1),
-         Id_I (2),
-         Id_I (3),
-         Id_I (4),
-         Id_I (5),
-         Id_I (6),
-         Id_I (7),
-         Id_I (8),
-         Id_I (9),
-         Id_I (10));
+        (Id_I (1), Id_I (2), Id_I (3), Id_I (4), Id_I (5), Id_I (6), Id_I (7),
+         Id_I (8), Id_I (9), Id_I (10));
       A := A (6 .. 9) & A (8 .. 9) & A (8 .. 9) & 0 & 0;
       if A /= (6, 7, 8, 9, 8, 9, 8, 9, 0, 0) then
          Failed ("WRONG VALUES  -  I6");
@@ -178,33 +148,18 @@ begin
 
    begin
       A :=
-        (Id_B (False),
-         Id_B (False),
-         Id_B (False),
-         Id_B (False),
-         Id_B (False),
-         Id_B (True),
-         Id_B (True),
-         Id_B (True),
-         Id_B (True));
+        (Id_B (False), Id_B (False), Id_B (False), Id_B (False), Id_B (False),
+         Id_B (True), Id_B (True), Id_B (True), Id_B (True));
       A (-4 .. 0) := A (0 .. 4);
       if A /= (False, True, True, True, True, True, True, True, True) then
          Failed ("WRONG VALUES  -  B3");
       end if;
 
       A :=
-        (Id_B (False),
-         Id_B (False),
-         Id_B (False),
-         Id_B (False),
-         Id_B (True),
-         Id_B (True),
-         Id_B (True),
-         Id_B (True),
-         Id_B (True));
+        (Id_B (False), Id_B (False), Id_B (False), Id_B (False), Id_B (True),
+         Id_B (True), Id_B (True), Id_B (True), Id_B (True));
       A (0 .. 4) := A (-4 .. 0);
-      if A /=
-        (False, False, False, False, False, False, False, False, True)
+      if A /= (False, False, False, False, False, False, False, False, True)
       then
          Failed ("WRONG VALUES  -  B4");
       end if;
@@ -217,37 +172,19 @@ begin
 
    begin
       A :=
-        (Id_B (True),
-         Id_B (False),
-         Id_B (True),
-         Id_B (False),
-         Id_B (True),
-         Id_B (False),
-         Id_B (True),
-         Id_B (False),
-         Id_B (True),
-         Id_B (False));
+        (Id_B (True), Id_B (False), Id_B (True), Id_B (False), Id_B (True),
+         Id_B (False), Id_B (True), Id_B (False), Id_B (True), Id_B (False));
       A := False & A (1 .. 2) & A (1 .. 2) & A (1 .. 5);
-      if A /=
-        (False, True, False, True, False, True, False, True, False, True)
+      if A /= (False, True, False, True, False, True, False, True, False, True)
       then
          Failed ("WRONG VALUES  -  B5");
       end if;
 
       A :=
-        (Id_B (True),
-         Id_B (False),
-         Id_B (True),
-         Id_B (False),
-         Id_B (True),
-         Id_B (False),
-         Id_B (True),
-         Id_B (False),
-         Id_B (True),
-         Id_B (False));
+        (Id_B (True), Id_B (False), Id_B (True), Id_B (False), Id_B (True),
+         Id_B (False), Id_B (True), Id_B (False), Id_B (True), Id_B (False));
       A := A (6 .. 9) & A (8 .. 9) & A (8 .. 9) & False & True;
-      if A /=
-        (False, True, False, True, False, True, False, True, False, True)
+      if A /= (False, True, False, True, False, True, False, True, False, True)
       then
          Failed ("WRONG VALUES  -  B6");
       end if;

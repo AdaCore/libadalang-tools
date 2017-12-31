@@ -11,10 +11,8 @@ package body Cxe4002_Part_A1 is
      Cxe4002_Common."=";
 
    -- simple integer and float tests
-   procedure Check_In
-     (Little : in Little_Number;
-      Real   : in Float;
-      Int    : in Integer)
+   procedure Check_In (Little : in Little_Number; Real : in Float;
+      Int                     : in Integer)
    is
    begin
       if Little /= 1 or Real /= 2.0 or Int /= 3 then
@@ -25,10 +23,8 @@ package body Cxe4002_Part_A1 is
       end if;
    end Check_In;
 
-   procedure Set_Out
-     (Little : out Little_Number;
-      Real   : out Float;
-      Int    : out Integer)
+   procedure Set_Out (Little : out Little_Number; Real : out Float;
+      Int                    : out Integer)
    is
    begin
       Little := 4;
@@ -36,10 +32,8 @@ package body Cxe4002_Part_A1 is
       Int    := -789;
    end Set_Out;
 
-   procedure Decr
-     (Little : in out Little_Number;
-      Real   : in out Float;
-      Int    : in out Integer)
+   procedure Decr (Little : in out Little_Number; Real : in out Float;
+      Int                 : in out Integer)
    is
    begin
       if Little /= 6 or Real /= 2.0 or Int /= -1 then
@@ -62,9 +56,8 @@ package body Cxe4002_Part_A1 is
       return (1, 198.0, Name);
    end Current_Record;
 
-   procedure Update_Record
-     (Old_Data : in     Record_Data;
-      New_Data :    out Record_Data)
+   procedure Update_Record (Old_Data : in     Record_Data;
+      New_Data                       :    out Record_Data)
    is
    begin
       New_Data.Part_No := Old_Data.Part_No + 2;

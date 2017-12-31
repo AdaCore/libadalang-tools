@@ -152,8 +152,7 @@ begin
       Terminator_Array : Static_Constrained_Array_Type :=
         (others => Short_Terminator);
 
-      Ch_Array : Interfaces.C
-        .Char_Array
+      Ch_Array : Interfaces.C.Char_Array
         (0 .. Interfaces.C.Size_T (Alphabet'Length)) :=
         Interfaces.C.To_C (Alphabet, True);
 
@@ -161,21 +160,16 @@ begin
         (Min_Array_Size .. Max_Array_Size);
 
       package Short_Pointers is new Interfaces.C.Pointers
-        (Index              => Interfaces.C.Size_T,
-         Element            => Interfaces.C.Short,
+        (Index => Interfaces.C.Size_T, Element => Interfaces.C.Short,
          Element_Array      => Short_Array_Type,
          Default_Terminator => Short_Terminator);
 
-      package Char_Pointers is new Interfaces.C.Pointers
-        (Interfaces.C.Size_T,
-         Interfaces.C.Char,
-         Element_Array      => Interfaces.C.Char_Array,
-         Default_Terminator => Interfaces.C.Nul);
+      package Char_Pointers is new Interfaces.C.Pointers (Interfaces.C.Size_T,
+         Interfaces.C.Char, Element_Array => Interfaces.C.Char_Array,
+         Default_Terminator               => Interfaces.C.Nul);
 
-      package Array_Pointers is new Interfaces.C.Pointers
-        (Interfaces.C.Size_T,
-         Static_Constrained_Array_Type,
-         Array_Of_Arrays_Type,
+      package Array_Pointers is new Interfaces.C.Pointers (Interfaces.C.Size_T,
+         Static_Constrained_Array_Type, Array_Of_Arrays_Type,
          Terminator_Array);
 
       use Short_Pointers, Char_Pointers, Array_Pointers;
@@ -210,10 +204,8 @@ begin
 
       -- Check starting pointer positions.
 
-      if Short_Ptr.all /= 0 or
-        Char_Ptr.all /= Ch_Array (0) or
-        Array_Ptr.all /= Array_Of_Arrays (0)
-      then
+      if Short_Ptr.all /= 0 or Char_Ptr.all /= Ch_Array (0) or
+        Array_Ptr.all /= Array_Of_Arrays (0) then
          Report.Failed
            ("Incorrect initial value for the first " &
             "Short_Array, Ch_Array, or Array_of_Array values");
@@ -236,8 +228,7 @@ begin
          if Short_Ptr.all /= Short_Array (I) then
             Report.Failed
               ("Incorrect value returned following use " &
-               "of the function +, incrementing by 1, " &
-               "array position : " &
+               "of the function +, incrementing by 1, " & "array position : " &
                Integer'Image (Integer (I)));
             if not Tc_Verbose then
                exit;
@@ -262,13 +253,11 @@ begin
          end if;
 
          if Array_Ptr.all /=
-           Array_Of_Arrays (Tc_Count + Interfaces.C.Size_T (Tc_Increment))
-         then
+           Array_Of_Arrays (Tc_Count + Interfaces.C.Size_T (Tc_Increment)) then
             Report.Failed
               ("Incorrect value returned following use " &
                "of the function +, incrementing by " &
-               Integer'Image (Integer (Tc_Increment)) &
-               ", array position : " &
+               Integer'Image (Integer (Tc_Increment)) & ", array position : " &
                Integer'Image (Integer (Tc_Count) + Integer (Tc_Increment)));
             if not Tc_Verbose then
                exit;
@@ -304,8 +293,7 @@ begin
             Report.Failed
               ("Incorrect value returned following use " &
                "of the function '-' with char element values, " &
-               "array position : " &
-               Integer'Image (Integer (I - 1)));
+               "array position : " & Integer'Image (Integer (I - 1)));
             if not Tc_Verbose then
                exit;
             end if;
@@ -321,13 +309,11 @@ begin
          Array_Ptr := Array_Pointers."-" (Array_Ptr, Right => 3);
 
          if Array_Ptr.all /=
-           Array_Of_Arrays (Tc_Count - Interfaces.C.Size_T (Tc_Increment))
-         then
+           Array_Of_Arrays (Tc_Count - Interfaces.C.Size_T (Tc_Increment)) then
             Report.Failed
               ("Incorrect value returned following use " &
                "of the function -, decrementing by " &
-               Integer'Image (Integer (Tc_Increment)) &
-               ", array position : " &
+               Integer'Image (Integer (Tc_Increment)) & ", array position : " &
                Integer'Image (Integer (Tc_Count - 3)));
             if not Tc_Verbose then
                exit;
@@ -343,8 +329,7 @@ begin
 
       Tc_Ptrdiff_T := 9;
       if Char_Pointers."-" (Left => End_Char_Ptr, Right => Start_Char_Ptr) /=
-        Tc_Ptrdiff_T
-      then
+        Tc_Ptrdiff_T then
          Report.Failed
            ("Incorrect result from pointer-pointer " & "subtraction - 1");
       end if;
@@ -354,15 +339,13 @@ begin
 
       Tc_Ptrdiff_T := 24;
       if Char_Pointers."-" (End_Char_Ptr, Right => Start_Char_Ptr) /=
-        Tc_Ptrdiff_T
-      then
+        Tc_Ptrdiff_T then
          Report.Failed
            ("Incorrect result from pointer-pointer " & "subtraction - 2");
       end if;
 
       Tc_Ptrdiff_T := 9;
-      if Array_Pointers."-" (End_Array_Ptr, Start_Array_Ptr) /=
-        Tc_Ptrdiff_T
+      if Array_Pointers."-" (End_Array_Ptr, Start_Array_Ptr) /= Tc_Ptrdiff_T
       then
          Report.Failed
            ("Incorrect result from pointer-pointer " & "subtraction - 3");
@@ -412,8 +395,7 @@ begin
             Report.Failed
               ("Incorrect value returned following use " &
                "of the Procedure Increment on an array of " &
-               "arrays, array position : " &
-               Integer'Image (Integer (I)));
+               "arrays, array position : " & Integer'Image (Integer (I)));
             if not Tc_Verbose then
                exit;
             end if;
@@ -453,8 +435,7 @@ begin
             Report.Failed
               ("Incorrect value returned following use " &
                "of the Procedure Decrement on an array of " &
-               "arrays, array position : " &
-               Integer'Image (Integer (I)));
+               "arrays, array position : " & Integer'Image (Integer (I)));
             if not Tc_Verbose then
                exit;
             end if;
@@ -521,8 +502,7 @@ begin
    exception
       when The_Error : others =>
          Report.Failed
-           ("The following exception was raised in the " &
-            "Test_Block: " &
+           ("The following exception was raised in the " & "Test_Block: " &
             Exception_Name (The_Error));
    end Test_Block;
 

@@ -35,17 +35,7 @@ with Report; use Report;
 procedure C91007a is
 
    type Enum is
-     (Teresa,
-      Brian,
-      Phil,
-      Joleen,
-      Lynn,
-      Doug,
-      Jodie,
-      Vince,
-      Tom,
-      Dave,
-      John,
+     (Teresa, Brian, Phil, Joleen, Lynn, Doug, Jodie, Vince, Tom, Dave, John,
       Rosa);
    subtype Enum_Sub is Enum range Brian .. Lynn;
 

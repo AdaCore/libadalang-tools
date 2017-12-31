@@ -15,9 +15,7 @@ private
 
 package Ca11016_0.Ca11016_1 is
 
-   function Get_Display_Value
-     (Lat  : Latitude;
-      Long : Longitude;
-      Map  : Map_Type) return Display_Value;
+   function Get_Display_Value (Lat : Latitude; Long : Longitude;
+      Map                          : Map_Type) return Display_Value;
 
 end Ca11016_0.Ca11016_1;

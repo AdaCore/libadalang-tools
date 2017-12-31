@@ -17,8 +17,7 @@ procedure C940004 is
    Task2 : User_Task_Pkg.User_Task_Type (2);
    Task3 : User_Task_Pkg.User_Task_Type (3);
 
-   User_Rec_1,
-   User_Rec_2,
+   User_Rec_1, User_Rec_2,
    User_Rec_3 : Printer_Mgr_Pkg.Instantiation.User_Rec_Type;
 
 begin
@@ -32,8 +31,7 @@ begin
      (User_Task_Pkg.Tc_Times_Released /= 0) or
      Printer_Mgr_Pkg.Instantiation.Has_Access (User_Rec_1) or
      Printer_Mgr_Pkg.Instantiation.Has_Access (User_Rec_2) or
-     Printer_Mgr_Pkg.Instantiation.Has_Access (User_Rec_3)
-   then
+     Printer_Mgr_Pkg.Instantiation.Has_Access (User_Rec_3) then
       Report.Failed ("Wrong initial conditions");
    end if;
 
@@ -43,8 +41,7 @@ begin
 
    if (User_Task_Pkg.Tc_Times_Obtained /= 1) or
      (User_Task_Pkg.Tc_Times_Released /= 0) or
-     not Printer_Mgr_Pkg.Instantiation.Has_Access (User_Rec_1)
-   then
+     not Printer_Mgr_Pkg.Instantiation.Has_Access (User_Rec_1) then
       Report.Failed ("Resource not assigned to task 1");
    end if;
 
@@ -62,8 +59,7 @@ begin
    end loop;
 
    if (User_Task_Pkg.Tc_Times_Obtained /= 1) or
-     (User_Task_Pkg.Tc_Times_Released /= 0)
-   then
+     (User_Task_Pkg.Tc_Times_Released /= 0) then
       Report.Failed ("Resource assigned to task 2");
    end if;
 
@@ -82,8 +78,7 @@ begin
    if (User_Task_Pkg.Tc_Times_Obtained /= 2) or
      (User_Task_Pkg.Tc_Times_Released /= 1) or
      Printer_Mgr_Pkg.Instantiation.Has_Access (User_Rec_1) or
-     not Printer_Mgr_Pkg.Instantiation.Has_Access (User_Rec_2)
-   then
+     not Printer_Mgr_Pkg.Instantiation.Has_Access (User_Rec_2) then
       Report.Failed ("Resource not properly released/assigned" & " to task 2");
       if Verbose then
          Report.Comment
@@ -112,8 +107,7 @@ begin
    if (User_Task_Pkg.Tc_Times_Obtained /= 3) or
      (User_Task_Pkg.Tc_Times_Released /= 2) or
      Printer_Mgr_Pkg.Instantiation.Has_Access (User_Rec_2) or
-     not Printer_Mgr_Pkg.Instantiation.Has_Access (User_Rec_3)
-   then
+     not Printer_Mgr_Pkg.Instantiation.Has_Access (User_Rec_3) then
       Report.Failed ("Resource not properly released/assigned " & "to task 3");
       if Verbose then
          Report.Comment
@@ -141,8 +135,7 @@ begin
 
    if (User_Task_Pkg.Tc_Times_Obtained /= 3) or
      (User_Task_Pkg.Tc_Times_Released /= 3) or
-     Printer_Mgr_Pkg.Instantiation.Has_Access (User_Rec_3)
-   then
+     Printer_Mgr_Pkg.Instantiation.Has_Access (User_Rec_3) then
       Report.Failed ("Resource not properly released by task 3");
       if Verbose then
          Report.Comment

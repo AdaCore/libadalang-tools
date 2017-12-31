@@ -154,14 +154,11 @@ begin
 
    Comment ("GUARD AND INDEX FUNCTIONS WERE CALLED IN ORDER " & Eval_Order);
    Comment
-     ("GUARD AND INDEX EXPRESSIONS WERE EVALUATED IN THE " &
-      "ORDER " &
+     ("GUARD AND INDEX EXPRESSIONS WERE EVALUATED IN THE " & "ORDER " &
       Eval_Ord);
 
-   if Pos_Of ('F') > Pos_Of ('A') or
-     Pos_Of ('G') > Pos_Of ('B') or
-     Pos_Of ('H') > Pos_Of ('C')
-   then
+   if Pos_Of ('F') > Pos_Of ('A') or Pos_Of ('G') > Pos_Of ('B') or
+     Pos_Of ('H') > Pos_Of ('C') then
       Failed ("AN INDEX EXPRESSION WAS EVALUATED TOO EARLY");
    end if;
 

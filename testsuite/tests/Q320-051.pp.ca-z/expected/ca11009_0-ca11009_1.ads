@@ -7,8 +7,7 @@ package Ca11009_0.Ca11009_1 is     -- Child Package OS.File_Manager
    -- routines of private child package Internals, which is "withed" by the
    -- body of this package.
 
-   procedure Create_File
-     (Mode     : in     File_Mode_Type;
-      File_Key :    out File_Descriptor_Type);
+   procedure Create_File (Mode : in     File_Mode_Type;
+      File_Key                 :    out File_Descriptor_Type);
 
 end Ca11009_0.Ca11009_1;           -- Child Package OS.File_Manager

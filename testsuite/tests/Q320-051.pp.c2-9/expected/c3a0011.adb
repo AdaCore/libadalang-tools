@@ -29,12 +29,9 @@ begin
 
    -- Build the action sequence
    Action_Sequence :=
-     (C3a0011_0.Rotate_Left'Access,
-      C3a0011_0.Center'Access,
-      C3a0011_0.Rotate_Right'Access,
-      Ia.Rotate_Front'Access,
-      C3a0011_0.Center'Access,
-      Ia.Rotate_Back'Access);
+     (C3a0011_0.Rotate_Left'Access, C3a0011_0.Center'Access,
+      C3a0011_0.Rotate_Right'Access, Ia.Rotate_Front'Access,
+      C3a0011_0.Center'Access, Ia.Rotate_Back'Access);
 
    -- Build the expected result
    Action_Results := (270, 0, 90, 95, 0, 355);
@@ -44,10 +41,8 @@ begin
       Action_Sequence (I).all;
       if C3a0011_0."/=" (C3a0011_0.Heading, Action_Results (I)) then
          Report.Failed
-           ("Expecting " &
-            C3a0011_0.Compass_Point'Image (Action_Results (I)) &
-            " Got" &
-            C3a0011_0.Compass_Point'Image (C3a0011_0.Heading));
+           ("Expecting " & C3a0011_0.Compass_Point'Image (Action_Results (I)) &
+            " Got" & C3a0011_0.Compass_Point'Image (C3a0011_0.Heading));
       end if;
    end loop;
 

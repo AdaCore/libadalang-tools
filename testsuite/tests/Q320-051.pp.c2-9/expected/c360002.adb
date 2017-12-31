@@ -163,8 +163,7 @@ procedure C360002 is
       for Index in Checked_Item'Range loop
          if (Checked_Item (Index) /= (Low_Sb + Integer (Index) - 1)) then
             Fail
-              ("unaliased 1..10",
-               Checked_Item (Index),
+              ("unaliased 1..10", Checked_Item (Index),
                (Low_Sb + Integer (Index) - 1));
          end if;
       end loop;
@@ -176,8 +175,7 @@ procedure C360002 is
       for Index in Checked_Item'Range loop
          if (Checked_Item (Index) /= (Low_Sb + Integer (Index) - 11)) then
             Fail
-              ("unaliased 11..20",
-               Checked_Item (Index),
+              ("unaliased 11..20", Checked_Item (Index),
                (Low_Sb + Integer (Index) - 11));
          end if;
       end loop;
@@ -203,8 +201,7 @@ begin  -- Main test procedure.
       "each component of the array is aliased.  Check " &
       "that references to aliased array objects " &
       "produce correct results, and that out of bound " &
-      "references to aliased objects correctly " &
-      "produce Constraint_Error");
+      "references to aliased objects correctly " & "produce Constraint_Error");
    -- start with checks that the Filler assignments produced the expected
    -- result. This is a "case 0" test to check that nothing REALLY surprising
    -- is happening
@@ -226,11 +223,9 @@ begin  -- Main test procedure.
    -- works
 
    Check_Array_01_10
-     (Unconstrained_Array (Aliased_Array_Aliased_Item_01_10),
-      60);
+     (Unconstrained_Array (Aliased_Array_Aliased_Item_01_10), 60);
    Check_Array_11_20
-     (Unconstrained_Array (Aliased_Array_Aliased_Item_11_20),
-      70);
+     (Unconstrained_Array (Aliased_Array_Aliased_Item_11_20), 70);
 
    -- check that the bounds will slide
 
@@ -242,16 +237,12 @@ begin  -- Main test procedure.
    An_Integer_Access := Array_Aliased_Item_01_10 (5)'Access;
 
    Check_Single_Integer
-     (An_Integer_Access.all,
-      24,
-      "Aliased component 'Access");
+     (An_Integer_Access.all, 24, "Aliased component 'Access");
 
    An_Integer_Access := Aliased_Array_Aliased_Item_01_10 (7)'Access;
 
    Check_Single_Integer
-     (An_Integer_Access.all,
-      66,
-      "Aliased Aliased component 'Access");
+     (An_Integer_Access.all, 66, "Aliased Aliased component 'Access");
 
    -- check some assignments
 
@@ -264,8 +255,7 @@ begin  -- Main test procedure.
    Aliased_Array_Aliased_Item_11_20 (11 .. 20) :=
      Aliased_Array_Aliased_Item_01_10;
    Check_Array_11_20
-     (Unconstrained_Array (Aliased_Array_Aliased_Item_11_20),
-      60);
+     (Unconstrained_Array (Aliased_Array_Aliased_Item_11_20), 60);
 
    Report.Result;
 

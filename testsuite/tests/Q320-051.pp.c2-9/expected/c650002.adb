@@ -79,8 +79,7 @@ procedure C650002 is
 
    protected body Sentry is
       entry Start_Job (Job : in Natural; Previously_Started : out Boolean)
-        when True
-        is
+        when True is
       begin
          for I in Data'First .. Num_Started_Jobs loop
             if Job = Data (I).Job then
@@ -118,16 +117,13 @@ procedure C650002 is
    begin
       loop
          select
-            accept Start_Job
-              (Job                   : in Natural;
-               Tc_Previously_Started : in Boolean)
-            do
+            accept Start_Job (Job    : in Natural;
+               Tc_Previously_Started : in Boolean) do
                Sentry.Start_Job (Job, Previously_Started);
                if Previously_Started then
                   if not Tc_Previously_Started then
                      Report.Failed
-                       ("Job # " &
-                        Natural'Image (Job) &
+                       ("Job # " & Natural'Image (Job) &
                         " incorrectly reported as previously started");
                   end if;
                   return; -- Nothing to do.
@@ -137,13 +133,11 @@ procedure C650002 is
                if Tc_Previously_Started then
                   if Previously_Started then
                      Report.Failed
-                       ("Job # " &
-                        Natural'Image (Job) &
+                       ("Job # " & Natural'Image (Job) &
                         " - return statement ignored");
                   else
                      Report.Failed
-                       ("Job # " &
-                        Natural'Image (Job) &
+                       ("Job # " & Natural'Image (Job) &
                         " previously started, but processing again anyway");
                   end if;
                end if;
@@ -151,8 +145,7 @@ procedure C650002 is
             delay 0.5; -- Simulate expensive job processing.
             begin
                Sentry.Record_Job_Result
-                 (Job    => Our_Job,
-                  Result => Float (Our_Job) * 3.5);
+                 (Job => Our_Job, Result => Float (Our_Job) * 3.5);
             exception
                when Program_Error =>
                   Report.Failed
@@ -180,32 +173,27 @@ begin
    Work2.Start_Job (Job => 4, Tc_Previously_Started => True); -- A repeat job.
    Work1.Start_Job (Job => 15, Tc_Previously_Started => False);
    Work2.Start_Job
-     (Job                   => 66,
-      Tc_Previously_Started => True); -- Another repeat job.
+     (Job => 66, Tc_Previously_Started => True); -- Another repeat job.
 
    -- Check the data results:
    if Data (1).Job /= 4 then
       Report.Failed
-        ("First job processed wrong: was #" &
-         Natural'Image (Data (1).Job) &
+        ("First job processed wrong: was #" & Natural'Image (Data (1).Job) &
          " should be # 4");
    end if;
    if Data (2).Job /= 92 then
       Report.Failed
-        ("Second job processed wrong: was #" &
-         Natural'Image (Data (2).Job) &
+        ("Second job processed wrong: was #" & Natural'Image (Data (2).Job) &
          " should be # 92");
    end if;
    if Data (3).Job /= 66 then
       Report.Failed
-        ("Third job processed wrong: was #" &
-         Natural'Image (Data (3).Job) &
+        ("Third job processed wrong: was #" & Natural'Image (Data (3).Job) &
          " should be # 66");
    end if;
    if Data (4).Job /= 15 then
       Report.Failed
-        ("Fourth job processed wrong: was #" &
-         Natural'Image (Data (4).Job) &
+        ("Fourth job processed wrong: was #" & Natural'Image (Data (4).Job) &
          " should be # 15");
    end if;
 

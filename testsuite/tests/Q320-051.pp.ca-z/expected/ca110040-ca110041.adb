@@ -16,8 +16,7 @@
       Result : Boolean := False;
    begin
       if (Acct.User_Id /= System_Account.User_Id) and
-        (Acct.User_Id /= Auditor_Account.User_Id)
-      then
+        (Acct.User_Id /= Auditor_Account.User_Id) then
          Result := True;
       end if;
       return (Result);

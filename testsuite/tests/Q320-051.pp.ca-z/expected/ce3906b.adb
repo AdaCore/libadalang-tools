@@ -49,8 +49,7 @@ begin
    Test
      ("CE3906B",
       "CHECK THAT PUT FOR ENUMERATION TYPES RAISES " &
-      "MODE_ERROR WHEN APPLIED TO FILES OF MODE " &
-      "IN_FILE");
+      "MODE_ERROR WHEN APPLIED TO FILES OF MODE " & "IN_FILE");
 
    declare
       Ft : File_Type;

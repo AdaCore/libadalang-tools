@@ -19,10 +19,7 @@ private
    procedure Label (T : Charter);
 
    -- an example of a required function the users shouldn't see:
-   function Issue
-     (Service : C393010_1.Service_Classes;
-      Flight  : Natural;
-      Seat    : String;
-      Meal    : C393010_1.Menu) return Charter;
+   function Issue (Service : C393010_1.Service_Classes; Flight : Natural;
+      Seat                 : String; Meal : C393010_1.Menu) return Charter;
 
 end C393010_2;

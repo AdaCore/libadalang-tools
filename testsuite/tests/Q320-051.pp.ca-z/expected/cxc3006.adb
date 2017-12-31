@@ -87,8 +87,7 @@ begin
       Old_Handler : Ada.Interrupts.Parameterless_Handler;
    begin
       Ada.Interrupts.Exchange_Handler
-        (Old_Handler,
-         Cxc3006_0.Dynamic.Handler'Access,
+        (Old_Handler, Cxc3006_0.Dynamic.Handler'Access,
          Impdef.Annex_C.Interrupt_To_Generate);
       Report.Failed ("Exchange_Handler: Program_Error was not raised");
    exception

@@ -157,10 +157,8 @@ begin
          Report.Failed ("C.signed_char'Size is incorrect");
       end if;
 
-      if C.Unsigned_Char'First /= 0 or
-        C.Unsigned_Char'Last /= C.Uchar_Max or
-        C.Unsigned_Char'Size /= C.Char_Bit
-      then
+      if C.Unsigned_Char'First /= 0 or C.Unsigned_Char'Last /= C.Uchar_Max or
+        C.Unsigned_Char'Size /= C.Char_Bit then
 
          Report.Failed ("unsigned_char is incorrectly defined");
 

@@ -14,16 +14,14 @@ begin  -- Main test procedure.
       "controlling result is itself a controlling " &
       "operand of an enclosing call on a dispatching " &
       "operation, then its controlling tag value is " &
-      "determined by the controlling tag value of " &
-      "the enclosing call");
+      "determined by the controlling tag value of " & "the enclosing call");
 
    C392011_2.C392011_3.Build_List;
    Tctouch.Validate ("A" & "AC" & "ACE" & "AC" & "ACE", "Build List");
 
    C392011_2.C392011_3.Traverse_List;
    Tctouch.Validate
-     ("ACEFACEF" & "ACDACD" & "ACEFACEF" & "ACDACD" & "ABAB",
-      "Traverse List");
+     ("ACEFACEF" & "ACDACD" & "ACEFACEF" & "ACDACD" & "ABAB", "Traverse List");
 
    Report.Result;
 

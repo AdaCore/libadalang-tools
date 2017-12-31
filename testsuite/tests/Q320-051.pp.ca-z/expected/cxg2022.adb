@@ -57,12 +57,10 @@ procedure Cxg2022 is
 
    procedure Check_Signed is
       type Pairs is
-        delta 2.0 range
-          -2.0**(System.Max_Mantissa) ..
+        delta 2.0 range -2.0**(System.Max_Mantissa) ..
             2.0**(System.Max_Mantissa) - 1.0;
       type Halves is
-        delta 0.5 range
-          -2.0**(System.Max_Mantissa - 2) ..
+        delta 0.5 range -2.0**(System.Max_Mantissa - 2) ..
             2.0**(System.Max_Mantissa - 2) - 1.0;
       P1, P2, P3, P4 : Pairs;
       H1, H2, H3, H4 : Halves;
@@ -121,18 +119,14 @@ procedure Cxg2022 is
          null;   -- Allowed variation
       else
          Report.Failed
-           ("Pairs'Small =" &
-            Pairs'Image (Pairs'Small) &
-            " and 100.5/-0.5 = " &
-            Pairs'Image (P4));
+           ("Pairs'Small =" & Pairs'Image (Pairs'Small) &
+            " and 100.5/-0.5 = " & Pairs'Image (P4));
       end if;
 
       H4 := H1 * H2;   --  -0.5 * Halves'First
       if H4 /= Halves (2.0**(System.Max_Mantissa - 3)) then
          Report.Failed
-           ("-0.5 * Halves'First =" &
-            Halves'Image (H4) &
-            " instead of " &
+           ("-0.5 * Halves'First =" & Halves'Image (H4) & " instead of " &
             Halves'Image (Halves (2.0**(System.Max_Mantissa - 3))));
       end if;
 
@@ -204,8 +198,7 @@ procedure Cxg2022 is
       H4 := H2 * 2;   --  2**(max_mantissa-6) * 2
       if H4 /= Halves (2.0**(System.Max_Mantissa - 5)) then
          Report.Failed
-           ("2**(System.Max_Mantissa-6) * 2=" &
-            Halves'Image (H4) &
+           ("2**(System.Max_Mantissa-6) * 2=" & Halves'Image (H4) &
             " instead of " &
             Halves'Image (Halves (2.0**(System.Max_Mantissa - 5))));
       end if;
@@ -217,8 +210,7 @@ procedure Cxg2022 is
 
    procedure Check_Mixed is
       type Pairs is
-        delta 2.0 range
-          -2.0**(System.Max_Mantissa) ..
+        delta 2.0 range -2.0**(System.Max_Mantissa) ..
             2.0**(System.Max_Mantissa) - 1.0;
       type Halves is
         delta 0.5 range 0.0 .. 2.0**(System.Max_Mantissa - 1) - 1.0;
@@ -274,10 +266,8 @@ procedure Cxg2022 is
          null;    -- Allowed deviation
       else
          Report.Failed
-           ("Pairs'Small =" &
-            Pairs'Image (Pairs'Small) &
-            "and 12.0 * 0.25 = " &
-            Pairs'Image (P4));
+           ("Pairs'Small =" & Pairs'Image (Pairs'Small) &
+            "and 12.0 * 0.25 = " & Pairs'Image (P4));
       end if;
 
       P4 := 100.5 / H1;   -- 100.5 / 10.5    = 9.571...
@@ -287,17 +277,14 @@ procedure Cxg2022 is
          null;    -- Allowed values
       else
          Report.Failed
-           ("Pairs'Small =" &
-            Pairs'Image (Pairs'Small) &
-            "and 100.5/10.5 = " &
+           ("Pairs'Small =" & Pairs'Image (Pairs'Small) & "and 100.5/10.5 = " &
             Pairs'Image (P4));
       end if;
 
       H4 := H2 * 2;   --  2**(max_mantissa-6) * 2
       if H4 /= Halves (2.0**(System.Max_Mantissa - 5)) then
          Report.Failed
-           ("2**(System.Max_Mantissa-6) * 2=" &
-            Halves'Image (H4) &
+           ("2**(System.Max_Mantissa-6) * 2=" & Halves'Image (H4) &
             " instead of " &
             Halves'Image (Halves (2.0**(System.Max_Mantissa - 5))));
       end if;

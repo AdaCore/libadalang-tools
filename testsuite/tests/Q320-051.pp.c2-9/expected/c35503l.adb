@@ -65,28 +65,19 @@ begin
             exception
                when others =>
                   Failed
-                    ("EXCEPTION RAISED FOR " &
-                     Str &
-                     "'POS " &
-                     "OF " &
+                    ("EXCEPTION RAISED FOR " & Str & "'POS " & "OF " &
                      Int'Image (S));
             end;
             begin
                if Sint'Val (I) /= S then
                   Failed
-                    ("WRONG VALUE FOR " &
-                     Str &
-                     "'VAL " &
-                     "OF " &
+                    ("WRONG VALUE FOR " & Str & "'VAL " & "OF " &
                      Int'Image (S));
                end if;
             exception
                when others =>
                   Failed
-                    ("EXCEPTION RAISED FOR " &
-                     Str &
-                     "'VAL " &
-                     "OF " &
+                    ("EXCEPTION RAISED FOR " & Str & "'VAL " & "OF " &
                      Int'Image (S));
             end;
             I := I + 1;

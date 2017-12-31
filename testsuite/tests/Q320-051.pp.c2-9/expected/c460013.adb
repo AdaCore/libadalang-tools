@@ -124,10 +124,8 @@ begin
       exception
          when A : others =>
             Failed
-              ("Unexpected exception " &
-               Exception_Name (A) &
-               " raised (1A) - " &
-               Exception_Message (A));
+              ("Unexpected exception " & Exception_Name (A) &
+               " raised (1A) - " & Exception_Message (A));
       end;
       Ptr := null;
       begin
@@ -139,10 +137,8 @@ begin
             null;
          when B : others =>
             Failed
-              ("Unexpected exception " &
-               Exception_Name (B) &
-               " raised (1B) - " &
-               Exception_Message (B));
+              ("Unexpected exception " & Exception_Name (B) &
+               " raised (1B) - " & Exception_Message (B));
       end;
    end;
 
@@ -154,10 +150,8 @@ begin
       exception
          when C : others =>
             Failed
-              ("Unexpected exception " &
-               Exception_Name (C) &
-               " raised (2A) - " &
-               Exception_Message (C));
+              ("Unexpected exception " & Exception_Name (C) &
+               " raised (2A) - " & Exception_Message (C));
       end;
       Ptr := null;
       begin
@@ -168,10 +162,8 @@ begin
             null;
          when D : others =>
             Failed
-              ("Unexpected exception " &
-               Exception_Name (D) &
-               " raised (2B) - " &
-               Exception_Message (D));
+              ("Unexpected exception " & Exception_Name (D) &
+               " raised (2B) - " & Exception_Message (D));
       end;
    end;
 
@@ -183,10 +175,8 @@ begin
       exception
          when E : others =>
             Failed
-              ("Unexpected exception " &
-               Exception_Name (E) &
-               " raised (3A) - " &
-               Exception_Message (E));
+              ("Unexpected exception " & Exception_Name (E) &
+               " raised (3A) - " & Exception_Message (E));
       end;
       Ptr := null;
       begin
@@ -197,10 +187,8 @@ begin
          -- This is Ada 95 semantics.
          when F : others =>
             Failed
-              ("Unexpected exception " &
-               Exception_Name (F) &
-               " raised (3B) - " &
-               Exception_Message (F));
+              ("Unexpected exception " & Exception_Name (F) &
+               " raised (3B) - " & Exception_Message (F));
       end;
    end;
 

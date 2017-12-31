@@ -11,8 +11,7 @@ begin
      ("CXA4022",
       "Check that the subprograms defined in " &
       "package Ada.Strings.Wide_Unbounded are " &
-      "available, and that they produce correct " &
-      "results");
+      "available, and that they produce correct " & "results");
 
    Test_Block :
    declare
@@ -77,8 +76,7 @@ begin
 
       if Asw."<" (Incomplete_String, Complete_String) or
         Asw.">" (Incomplete_String, Complete_String) or
-        Incomplete_String /= Complete_String
-      then
+        Incomplete_String /= Complete_String then
          Report.Failed ("Incorrect result from use of ""&"" operator");
       end if;
 
@@ -86,8 +84,7 @@ begin
 
       -- Last element of the unbounded wide string should be a 'g'.
       if Asw.Element (Incomplete_String, Asw.Length (Incomplete_String)) /=
-        A_Small_G
-      then
+        A_Small_G then
          Report.Failed ("Incorrect result from use of Function Element - 1");
       end if;
 
@@ -107,18 +104,14 @@ begin
       Asw.Replace_Element (Incorrect_Spelling, 2, Equiv ('o'));
 
       Asw.Replace_Element
-        (Incorrect_Spelling,
-         Asw.Index (Incorrect_Spelling, B_Set),
-         A_Small_D);
+        (Incorrect_Spelling, Asw.Index (Incorrect_Spelling, B_Set), A_Small_D);
 
       Asw.Replace_Element
         (Source => Incorrect_Spelling,
-         Index  => Asw.Length (Incorrect_Spelling),
-         By     => Equiv ('y'));
+         Index  => Asw.Length (Incorrect_Spelling), By => Equiv ('y'));
 
       if Incorrect_Spelling /=
-        Asw.To_Unbounded_Wide_String (Equiv ("Good Day"))
-      then
+        Asw.To_Unbounded_Wide_String (Equiv ("Good Day")) then
          Report.Failed ("Incorrect result from Procedure Replace_Element");
       end if;
 
@@ -129,8 +122,7 @@ begin
       Location :=
         Asw.Index
           (Source  => Asw.To_Unbounded_Wide_String (Equiv ("abcdefghij")),
-           Pattern => Equiv ("xy"),
-           Going   => Ada.Strings.Forward,
+           Pattern => Equiv ("xy"), Going => Ada.Strings.Forward,
            Mapping => Cd_To_Xy_Map);  -- change "cd" to "xy"
 
       if Location /= 3 then
@@ -139,10 +131,8 @@ begin
 
       Location :=
         Asw.Index
-          (Asw.To_Unbounded_Wide_String (Equiv ("abcdabcdab")),
-           Equiv ("yz"),
-           Ada.Strings.Backward,
-           Ab_To_Yz_Map);    -- change all "ab" to "yz"
+          (Asw.To_Unbounded_Wide_String (Equiv ("abcdabcdab")), Equiv ("yz"),
+           Ada.Strings.Backward, Ab_To_Yz_Map);    -- change all "ab" to "yz"
 
       if Location /= 9 then
          Report.Failed ("Incorrect result from Index, non-Identity map - 2");
@@ -160,8 +150,7 @@ begin
           0 or
         Asw.Index
             (Asw.Null_Unbounded_Wide_String,       -- Src = Null
-             Equiv ("abc")) /= 0
-      then
+             Equiv ("abc")) /= 0 then
          Report.Failed
            ("Incorrect result from Index with wide string patterns");
       end if;
@@ -184,8 +173,7 @@ begin
         Asw.Index
           (Source => Asw."&" (Atoe_Str, Atoe_Str),
            Set    => Cd_Set,  -- set containing 'c' and 'd'
-           Test   => Ada.Strings.Inside,
-           Going  => Ada.Strings.Backward);
+           Test   => Ada.Strings.Inside, Going => Ada.Strings.Backward);
 
       if not (Location = 9) then   -- position of last 'd' in source.
          Report.Failed ("Incorrect result from Index using Sets - 2");
@@ -194,21 +182,17 @@ begin
       -- Test = Outside, Going = Forward, Backward
       if Asw.Index
           (Asw.To_Unbounded_Wide_String (Equiv ("deddacd")),
-           Wide_Maps.To_Set (Equiv ("xydcgf")),
-           Test  => Ada.Strings.Outside,
-           Going => Ada.Strings.Forward) /=
+           Wide_Maps.To_Set (Equiv ("xydcgf")), Test => Ada.Strings.Outside,
+           Going                                     => Ada.Strings.Forward) /=
         2 or
         Asw.Index
             (Asw.To_Unbounded_Wide_String (Equiv ("deddacd")),
-             Wide_Maps.To_Set (Equiv ("xydcgf")),
-             Test  => Ada.Strings.Outside,
+             Wide_Maps.To_Set (Equiv ("xydcgf")), Test => Ada.Strings.Outside,
              Going => Ada.Strings.Backward) /=
           5 or
         Asw.Index
-            (Asw.To_Unbounded_Wide_String (Equiv ("deddacd")),
-             Cd_Set,
-             Ada.Strings.Outside,
-             Ada.Strings.Backward) /=
+            (Asw.To_Unbounded_Wide_String (Equiv ("deddacd")), Cd_Set,
+             Ada.Strings.Outside, Ada.Strings.Backward) /=
           5
       then
          Report.Failed ("Incorrect result from Index using Sets - 3");
@@ -243,8 +227,7 @@ begin
         Asw.Index
           (Source =>
              Asw.To_Unbounded_Wide_String (Equiv ("xAxabbxax xaax _cx")),
-           Pattern => Equiv ("_x"),
-           Going   => Ada.Strings.Forward,
+           Pattern => Equiv ("_x"), Going => Ada.Strings.Forward,
            Mapping => Map_Ptr);  -- change 'a'or 'b' to '_'
 
       if Location /= 6 then   -- location of "bx" substring
@@ -256,8 +239,7 @@ begin
       Location :=
         Asw.Index
           (Asw.To_Unbounded_Wide_String (Equiv ("ccacdcbbcdacc")),
-           Equiv ("cd "),
-           Ada.Strings.Backward,
+           Equiv ("cd "), Ada.Strings.Backward,
            Map_Ptr);      -- change 'a' or 'b' to ' '
 
       if Location /= 9 then
@@ -273,8 +255,7 @@ begin
         Asw.Index
             (Asw.To_Unbounded_Wide_String (Equiv ("abc")),
              Equiv ("  c "),                               -- No match
-             Ada.Strings.Backward,
-             Map_Ptr) /=
+             Ada.Strings.Backward, Map_Ptr) /=
           0
       then
          Report.Failed ("Incorrect result from Index, access value map - 3");
@@ -298,8 +279,7 @@ begin
       if Asw.Count (Magic_String, Equiv ("ab")) /=
         (Asw.Count (Magic_String, Equiv ("ac")) +
          Asw.Count (Magic_String, Equiv ("ad"))) or
-        Asw.Count (Magic_String, Equiv ("ab")) /= 2
-      then
+        Asw.Count (Magic_String, Equiv ("ab")) /= 2 then
          Report.Failed
            ("Incorrect result from Function Count, wide string parameter");
       end if;
@@ -312,8 +292,7 @@ begin
       Total_Count :=
         Asw.Count
           (Asw.To_Unbounded_Wide_String (Equiv ("abbabbabbabba")),
-           Pattern => Equiv ("yz"),
-           Mapping => Ab_To_Yz_Map);
+           Pattern => Equiv ("yz"), Mapping => Ab_To_Yz_Map);
 
       if Total_Count /= 4 then
          Report.Failed
@@ -321,14 +300,12 @@ begin
       end if;
 
       if Asw.Count
-          (Asw.To_Unbounded_Wide_String (Equiv ("ADCBADABCD")),
-           Equiv ("AB"),
+          (Asw.To_Unbounded_Wide_String (Equiv ("ADCBADABCD")), Equiv ("AB"),
            Wide_Maps.To_Mapping (Equiv ("CD"), Equiv ("AB"))) /=
         5 or
         Asw.Count
             (Asw.To_Unbounded_Wide_String (Equiv ("dcccddcdccdddccccd")),
-             Equiv ("xxy"),
-             Cd_To_Xy_Map) /=
+             Equiv ("xxy"), Cd_To_Xy_Map) /=
           3
       then
          Report.Failed
@@ -356,8 +333,7 @@ begin
              Equiv ("abcde")) /= 1 or
         Asw.Count
             (Asw.Null_Unbounded_Wide_String,        -- Source = Null
-             Equiv (" ")) /= 0
-      then
+             Equiv (" ")) /= 0 then
          Report.Failed ("Incorrect result from function Count, w,w/o mapping");
       end if;
 
@@ -403,8 +379,7 @@ begin
           0 or
         Asw.Count
             (Atoe_Str,               -- Source'Length = Pattern'Length
-             Equiv ("  cde"), Map_Ptr) /= 1
-      then
+             Equiv ("  cde"), Map_Ptr) /= 1 then
          Report.Failed
            ("Incorrect result from function Count, access value map - 3");
       end if;

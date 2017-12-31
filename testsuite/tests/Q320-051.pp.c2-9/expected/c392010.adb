@@ -49,8 +49,7 @@ procedure C392010 is
          end case;
 
          C392010_0.Proc_W_Ap_And_Cp_W_Def   -- override defaults
-           (C392010_0.Proc_1'Access,
-            Items (I).all);
+           (C392010_0.Proc_1'Access, Items (I).all);
          -- DAk, HAm, HAn
 
          C392010_0.Proc_W_Cp_Ap (Items (I));
@@ -106,8 +105,7 @@ begin  -- Main test procedure.
       "with a controlling access parameter. " &
       "Check that a subprogram dispatches correctly " &
       "when it has access parameters that are not " &
-      "controlling. Check with and without default " &
-      "expressions");
+      "controlling. Check with and without default " & "expressions");
 
    Subtest_1 (Z);
 

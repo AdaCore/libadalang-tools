@@ -52,32 +52,20 @@ procedure C36304a is
    begin
       if S'First /= First then
          Failed
-           ("'FIRST IS " &
-            Integer'Image (S'First) &
-            " INSTEAD OF " &
-            Integer'Image (First) &
-            " FOR " &
-            Id);
+           ("'FIRST IS " & Integer'Image (S'First) & " INSTEAD OF " &
+            Integer'Image (First) & " FOR " & Id);
       end if;
 
       if S'Last /= Last then
          Failed
-           ("'LAST IS " &
-            Integer'Image (S'Last) &
-            " INSTEAD OF " &
-            Integer'Image (Last) &
-            " FOR " &
-            Id);
+           ("'LAST IS " & Integer'Image (S'Last) & " INSTEAD OF " &
+            Integer'Image (Last) & " FOR " & Id);
       end if;
 
       if S'Length /= Length then
          Failed
-           ("'LENGTH IS " &
-            Integer'Image (S'Length) &
-            " INSTEAD OF " &
-            Integer'Image (Length) &
-            " FOR " &
-            Id);
+           ("'LENGTH IS " & Integer'Image (S'Length) & " INSTEAD OF " &
+            Integer'Image (Length) & " FOR " & Id);
       end if;
    end C;
 

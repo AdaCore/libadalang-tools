@@ -24,8 +24,7 @@ begin
       "the formal parameter names and default expressions for " &
       "a primitive subprogram in an instance are determined by " &
       "the primitive subprogram of the ancestor type, but that " &
-      "the primitive subprogram body executed is that of the" &
-      "actual type");
+      "the primitive subprogram body executed is that of the" & "actual type");
 
    Tc_Okay_Mstatus := Send_Msg (Mess);
    if not Tc_Okay_Mstatus then

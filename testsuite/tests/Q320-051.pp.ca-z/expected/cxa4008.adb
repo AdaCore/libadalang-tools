@@ -117,8 +117,7 @@ begin
 
       Test_String :=
         B10.To_Bounded_String
-          (Source => "abcdefghijklmn",
-           Drop   => Ada.Strings.Left);
+          (Source => "abcdefghijklmn", Drop => Ada.Strings.Left);
 
       if Test_String /= B10.To_Bounded_String ("efghijklmn") then
          Report.Failed
@@ -129,8 +128,7 @@ begin
 
       Test_String :=
         B10.To_Bounded_String
-          (Source => "abcdefghijklmn",
-           Drop   => Ada.Strings.Right);
+          (Source => "abcdefghijklmn", Drop => Ada.Strings.Right);
 
       if not (Test_String = Atoj_Bnd_Str) then
          Report.Failed
@@ -160,8 +158,7 @@ begin
          -- Append (Str, Bnd Str);
          Result_String :=
            B10.Append
-             (B10.To_String (Atoe_Bnd_Str),
-              B10.To_Bounded_String ("fghijk"),
+             (B10.To_String (Atoe_Bnd_Str), B10.To_Bounded_String ("fghijk"),
               As.Error);
          Report.Failed ("Length_Error not raised by Append - 2");
       exception
@@ -199,9 +196,7 @@ begin
       -- Append (Bnd Str, Str)
       Result_String :=
         B10.Append
-          (B10.To_Bounded_String ("abcdefghij"),
-           "xyz",
-           Ada.Strings.Left);
+          (B10.To_Bounded_String ("abcdefghij"), "xyz", Ada.Strings.Left);
 
       if Result_String /= B10.To_Bounded_String ("defghijxyz") then
          Report.Failed ("Incorrect truncation performed by Append - 5");
@@ -211,9 +206,7 @@ begin
 
       Result_String :=
         B10.Append
-          ('A',
-           B10.To_Bounded_String ("abcdefghij"),
-           Ada.Strings.Left);
+          ('A', B10.To_Bounded_String ("abcdefghij"), Ada.Strings.Left);
 
       if Result_String /= B10.To_Bounded_String ("abcdefghij") then
          Report.Failed ("Incorrect truncation performed by Append - 6");
@@ -232,9 +225,7 @@ begin
       -- Append (Str, Bnd Str)
       Result_String :=
         B10.Append
-          (B10.To_String (Atoe_Bnd_Str),
-           Atoj_Bnd_Str,
-           Ada.Strings.Right);
+          (B10.To_String (Atoe_Bnd_Str), Atoj_Bnd_Str, Ada.Strings.Right);
 
       if Result_String /= B10.To_Bounded_String ("abcdeabcde") then
          Report.Failed ("Incorrect truncation performed by Append - 8");
@@ -264,9 +255,7 @@ begin
 
       Location :=
         B10.Index
-          (B10.To_Bounded_String ("AND IF MAN"),
-           "an",
-           Ada.Strings.Backward,
+          (B10.To_Bounded_String ("AND IF MAN"), "an", Ada.Strings.Backward,
            Asc.Lower_Case_Map);
 
       if Location /= 9 then
@@ -275,10 +264,8 @@ begin
 
       Location :=
         B10.Index
-          (Source  => B10.To_Bounded_String ("The the"),
-           Pattern => "the",
-           Going   => Ada.Strings.Forward,
-           Mapping => Asc.Lower_Case_Map);
+          (Source => B10.To_Bounded_String ("The the"), Pattern => "the",
+           Going  => Ada.Strings.Forward, Mapping => Asc.Lower_Case_Map);
 
       if Location /= 1 then
          Report.Failed ("Incorrect result from Index, non-Identity map - 3");
@@ -292,8 +279,7 @@ begin
              "abcd") /= 0 or
         B10.Index
             (B10.Null_Bounded_String,              -- Source = Null
-             "abc") /= 0
-      then
+             "abc") /= 0 then
          Report.Failed ("Incorrect result from Index with string patterns");
       end if;
 
@@ -305,8 +291,7 @@ begin
         B10.Index
           (Source => B10.To_Bounded_String ("abcdeabcde"),
            Set    => Cd_Set,  -- set containing 'c' and 'd'
-           Test   => Ada.Strings.Inside,
-           Going  => Ada.Strings.Forward);
+           Test   => Ada.Strings.Inside, Going => Ada.Strings.Forward);
 
       if not (Location = 3) then     -- position of first 'c' in source.
          Report.Failed ("Incorrect result from Index using Sets - 1");
@@ -317,8 +302,7 @@ begin
         B10.Index
           (Source => B10."&" (Atoe_Bnd_Str, Atoe_Bnd_Str),
            Set    => Cd_Set,  -- set containing 'c' and 'd'
-           Test   => Ada.Strings.Inside,
-           Going  => Ada.Strings.Backward);
+           Test   => Ada.Strings.Inside, Going => Ada.Strings.Backward);
 
       if not (Location = 9) then   -- position of last 'd' in source.
          Report.Failed ("Incorrect result from Index using Sets - 2");
@@ -327,10 +311,8 @@ begin
       -- Test = Outside, Going = Forward.
       Location :=
         B10.Index
-          (B10.To_Bounded_String ("deddacd"),
-           Cd_Set,
-           Test  => Ada.Strings.Outside,
-           Going => Ada.Strings.Forward);
+          (B10.To_Bounded_String ("deddacd"), Cd_Set,
+           Test => Ada.Strings.Outside, Going => Ada.Strings.Forward);
 
       if Location /= 2 then  -- position of 'e' in source.
          Report.Failed ("Incorrect result from Index using Sets - 3");
@@ -339,9 +321,7 @@ begin
       -- Test = Outside, Going = Backward.
       Location :=
         B10.Index
-          (B10.To_Bounded_String ("deddacd"),
-           Cd_Set,
-           Ada.Strings.Outside,
+          (B10.To_Bounded_String ("deddacd"), Cd_Set, Ada.Strings.Outside,
            Ada.Strings.Backward);
 
       if Location /= 5 then                      -- correct position of 'a'.
@@ -372,8 +352,7 @@ begin
 
       Total_Count :=
         B10.Count
-          (Source  => B10.To_Bounded_String ("abbabaabab"),
-           Pattern => "yz",
+          (Source  => B10.To_Bounded_String ("abbabaabab"), Pattern => "yz",
            Mapping => Ab_To_Yz_Map);
 
       if Total_Count /= 4 then
@@ -405,8 +384,7 @@ begin
              "abcde") /= 1 or
         B10.Count
             (B10.Null_Bounded_String,             -- Source = Null
-             " ") /= 0
-      then
+             " ") /= 0 then
          Report.Failed ("Incorrect result from function Count, w,w/o mapping");
       end if;
 
@@ -507,13 +485,9 @@ begin
       -- Low = High = Source'Last, "By" length = 1.
 
       if B10.Replace_Slice
-          (Atoe_Bnd_Str,
-           B10.To_String (Atoe_Bnd_Str)'Last,
-           B10.To_String (Atoe_Bnd_Str)'Last,
-           "X",
-           Ada.Strings.Error) /=
-        B10.To_Bounded_String ("abcdX")
-      then
+          (Atoe_Bnd_Str, B10.To_String (Atoe_Bnd_Str)'Last,
+           B10.To_String (Atoe_Bnd_Str)'Last, "X", Ada.Strings.Error) /=
+        B10.To_Bounded_String ("abcdX") then
          Report.Failed ("Incorrect result from Function Replace_Slice");
       end if;
 
@@ -640,10 +614,9 @@ begin
       begin
          Test_String := Atoj_Bnd_Str;
          B10.Insert
-           (Source   => Test_String,    -- "abcdefghij"
-            Before   => 9,
-            New_Item => "wxyz",
-            Drop     => Ada.Strings.Error);
+           (Source => Test_String,    -- "abcdefghij"
+            Before => 9, New_Item => "wxyz",
+            Drop   => Ada.Strings.Error);
          Report.Failed ("Length_Error not raised by Procedure Insert");
       exception
          when As.Length_Error =>

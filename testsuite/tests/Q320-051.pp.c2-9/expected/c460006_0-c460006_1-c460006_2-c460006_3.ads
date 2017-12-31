@@ -12,10 +12,7 @@ package C460006_0.C460006_1.C460006_2.C460006_3 is
    function Classwide_Func return Parent_Type'Class;
 
    Grandchild_Value : constant Grandchild_Type :=
-     (First_Call  => None,
-      Second_Call => None,
-      C1          => 15,
-      C2          => "Hello",
-      C3          => "World");
+     (First_Call => None, Second_Call => None, C1 => 15, C2 => "Hello",
+      C3         => "World");
 
 end C460006_0.C460006_1.C460006_2.C460006_3;

@@ -87,8 +87,7 @@ procedure C94001g is
 
 begin
    Test
-     ("C94001G",
-      "TERMINATION WHEN ALL DEPENDENT TASKS " & "HAVE TERMINATED");
+     ("C94001G", "TERMINATION WHEN ALL DEPENDENT TASKS " & "HAVE TERMINATED");
 
    Block :
    declare

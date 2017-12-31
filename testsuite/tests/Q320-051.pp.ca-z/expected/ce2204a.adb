@@ -52,8 +52,7 @@ begin
    Test
      ("CE2204A",
       "CHECK THAT MODE_ERROR IS RAISED BY WRITE " &
-      "WHEN THE MODE IS IN_FILE AND THE FILE " &
-      "IS A NON-TEMPORARY FILE");
+      "WHEN THE MODE IS IN_FILE AND THE FILE " & "IS A NON-TEMPORARY FILE");
    declare
       package Seq_Io is new Sequential_Io (Integer);
       use Seq_Io;
@@ -81,8 +80,7 @@ begin
       exception
          when Use_Error =>
             Not_Applicable
-              ("USE_ERROR  RAISED ON THE " &
-               "OPENING OF A SEQUENTIAL " &
+              ("USE_ERROR  RAISED ON THE " & "OPENING OF A SEQUENTIAL " &
                "NON-TEMPORARY FILE");
             raise Incomplete;
       end;

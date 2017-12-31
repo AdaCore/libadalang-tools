@@ -113,9 +113,7 @@ begin
 
    elsif Item_Char /= 'G' then
       Failed
-        ("SET_COL DOESN'T SKIP LINE MARKS; " &
-         "ACTUALLY READ '" &
-         Item_Char &
+        ("SET_COL DOESN'T SKIP LINE MARKS; " & "ACTUALLY READ '" & Item_Char &
          "'");
    else
       begin
@@ -124,10 +122,8 @@ begin
 
          if Item_Char /= 'L' then
             Failed
-              ("SET_COL DOESN'T SKIP PAGE MARKS; " &
-               "ACTUALLY READ '" &
-               Item_Char &
-               "'");
+              ("SET_COL DOESN'T SKIP PAGE MARKS; " & "ACTUALLY READ '" &
+               Item_Char & "'");
          end if;
       end;
    end if;

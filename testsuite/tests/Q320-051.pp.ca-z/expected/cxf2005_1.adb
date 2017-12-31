@@ -4,9 +4,8 @@ package body Cxf2005_1 is
 
    ---=---=---=---=---=---=---=---=---=---=---
 
-   function Factor
-     (Rate     : Interest_Rate;
-      Interval : Integer) return Money_Radix2
+   function Factor (Rate : Interest_Rate;
+      Interval           : Integer) return Money_Radix2
    is
    begin
       return Money_Radix2 (Rate / Interval);
@@ -14,9 +13,8 @@ package body Cxf2005_1 is
 
    ---=---=---=---=---=---=---=---=---=---=---
 
-   function Factor
-     (Rate     : Interest_Rate;
-      Interval : Integer) return Money_Radix10
+   function Factor (Rate : Interest_Rate;
+      Interval           : Integer) return Money_Radix10
    is
    begin
       return Money_Radix10 (Rate / Interval);

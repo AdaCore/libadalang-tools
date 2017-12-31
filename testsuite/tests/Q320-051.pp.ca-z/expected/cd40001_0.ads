@@ -86,16 +86,13 @@ package Cd40001_0 is
 
    procedure Tc_Check_Minus;
 
-   function Tc_Compare_Press is new Ada.Unchecked_Conversion
-     (Press_The_Bounds,
+   function Tc_Compare_Press is new Ada.Unchecked_Conversion (Press_The_Bounds,
       Tc_Integer);
 
-   function Tc_Compare_Add is new Ada.Unchecked_Conversion
-     (Add_The_Bounds,
+   function Tc_Compare_Add is new Ada.Unchecked_Conversion (Add_The_Bounds,
       Tc_Integer);
 
-   function Tc_Compare_Minus is new Ada.Unchecked_Conversion
-     (Minus_The_Bounds,
+   function Tc_Compare_Minus is new Ada.Unchecked_Conversion (Minus_The_Bounds,
       Tc_Integer);
 
 end Cd40001_0;

@@ -75,9 +75,8 @@ begin
 
    if not
      (Buffer.Handled_In_Body and    -- Validate proper exception
-      Buffer.Propagated_To_Caller and    -- handling in entry bodies.
-      Buffer.Handled_In_Caller and
-      Handled_In_Caller)
+     Buffer.Propagated_To_Caller and    -- handling in entry bodies.
+      Buffer.Handled_In_Caller and Handled_In_Caller)
    then
       Report.Failed ("Improper exception handling by entry bodies");
    end if;

@@ -61,19 +61,16 @@ package Ca13003_0 is
       Id   : File_Id;
    end record;
 
-   procedure Initialize_File_Rec
-     (Name_In : in     File_Name;
-      Id_In   : in     File_Id;
-      File_In :    out File_Rec);
+   procedure Initialize_File_Rec (Name_In : in File_Name; Id_In : in File_Id;
+      File_In                             :    out File_Rec);
 
    ----------------------------------------------------------------------
 
    package Ca13003_1 is    -- File processing
 
       procedure Ca13003_3;                             -- Open files
-      function Ca13003_4
-        (Id_In   : File_Id;
-         File_In : File_Rec)
+      function Ca13003_4 (Id_In : File_Id;
+         File_In                : File_Rec)
         return File_Name;                              -- Process files
       package Ca13003_5 is                             -- Generate report
          procedure Generate_Report;
@@ -86,9 +83,8 @@ package Ca13003_0 is
    package Ca13003_2 is    -- File auditing
 
       procedure Ca13003_3;                             -- Open files
-      function Ca13003_4
-        (Id_In   : File_Id;
-         File_In : File_Rec)
+      function Ca13003_4 (Id_In : File_Id;
+         File_In                : File_Rec)
         return File_Name;                              -- Process files
       package Ca13003_5 is                             -- Generate report
          procedure Generate_Report;

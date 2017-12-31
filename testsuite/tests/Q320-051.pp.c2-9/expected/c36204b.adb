@@ -38,8 +38,7 @@ begin
    Test
      ("C36204B",
       "ARRAY ATTRIBUTES RETURN CORRECT VALUES " &
-      "FOR ACCESS VALUES AND FUNCTION CALLS AS " &
-      "PREFIXES");
+      "FOR ACCESS VALUES AND FUNCTION CALLS AS " & "PREFIXES");
    declare
       type Arr1 is
         array (Integer range Ident_Int (1) .. Ident_Int (10)) of Integer;
@@ -121,8 +120,7 @@ begin
       end Fun;
 
       function Fun2 (Lo, Hi : Integer) return Uncon2 is
-         Ar2 : Uncon2
-           (Ident_Int (Lo) .. Ident_Int (Hi),
+         Ar2 : Uncon2 (Ident_Int (Lo) .. Ident_Int (Hi),
             Ident_Int (Lo) .. Ident_Int (Hi));
       begin
          Ar2 := (Ar2'Range (1) => (Ar2'Range (2) => 0));
@@ -135,64 +133,55 @@ begin
       if Fun (F, L)'First /= Ident_Int (1) then
          Failed
            ("INCORRECT ATTRIBUTE VALUE FOR ONE-DIM " &
-            "ARRAY USING FUNCTION RESULTS AS " &
-            "PREFIXES 1");
+            "ARRAY USING FUNCTION RESULTS AS " & "PREFIXES 1");
       end if;
 
       if Fun2 (F, L)'First (2) /= Ident_Int (1) then
          Failed
            ("INCORRECT ATTRIBUTE VALUE FOR TWO-DIM " &
-            "ARRAY USING FUNCTION RESULTS AS " &
-            "PREFIXES 1");
+            "ARRAY USING FUNCTION RESULTS AS " & "PREFIXES 1");
       end if;
 
       if "&" (Ary1, "XX")'First /= Ident_Int (5) then
          Failed
            ("INCORRECT ATTRIBUTE VALUE FOR ONE-DIM " &
-            "ARRAY USING FUNCTION RESULTS AS " &
-            "PREFIXES 2");
+            "ARRAY USING FUNCTION RESULTS AS " & "PREFIXES 2");
       end if;
 
       if Fun (F, L)'Last /= Ident_Int (3) then
          Failed
            ("INCORRECT ATTRIBUTE VALUE FOR ONE-DIM " &
-            "ARRAY USING FUNCTION RESULTS AS " &
-            "PREFIXES 3");
+            "ARRAY USING FUNCTION RESULTS AS " & "PREFIXES 3");
       end if;
 
       if Fun2 (F, L)'Last (2) /= Ident_Int (3) then
          Failed
            ("INCORRECT ATTRIBUTE VALUE FOR TWO-DIM " &
-            "ARRAY USING FUNCTION RESULTS AS " &
-            "PREFIXES 2");
+            "ARRAY USING FUNCTION RESULTS AS " & "PREFIXES 2");
       end if;
 
       if "&" (Ary1, "YY")'Last /= Ident_Int (10) then
          Failed
            ("INCORRECT ATTRIBUTE VALUE FOR ONE-DIM " &
-            "ARRAY USING FUNCTION RESULTS AS " &
-            "PREFIXES 4");
+            "ARRAY USING FUNCTION RESULTS AS " & "PREFIXES 4");
       end if;
 
       if Fun (F, L)'Length /= Ident_Int (3) then
          Failed
            ("INCORRECT ATTRIBUTE VALUE FOR ONE-DIM " &
-            "ARRAY USING FUNCTION RESULTS AS " &
-            "PREFIXES 5");
+            "ARRAY USING FUNCTION RESULTS AS " & "PREFIXES 5");
       end if;
 
       if Fun2 (F, L)'Length (2) /= Ident_Int (3) then
          Failed
            ("INCORRECT ATTRIBUTE VALUE FOR TWO-DIM " &
-            "ARRAY USING FUNCTION RESULTS AS " &
-            "PREFIXES 3");
+            "ARRAY USING FUNCTION RESULTS AS " & "PREFIXES 3");
       end if;
 
       if "&" (Ary1, "XX")'Length /= Ident_Int (6) then
          Failed
            ("INCORRECT ATTRIBUTE VALUE FOR ONE-DIM " &
-            "ARRAY USING FUNCTION RESULTS AS " &
-            "PREFIXES 6");
+            "ARRAY USING FUNCTION RESULTS AS " & "PREFIXES 6");
       end if;
 
       declare
@@ -205,43 +194,37 @@ begin
          if Smin'First /= Ident_Int (1) then
             Failed
               ("INCORRECT ATTRIBUTE VALUE FOR " &
-               "ONE-DIM ARRAY USING FUNCTION " &
-               "RESULTS AS PREFIXES 7");
+               "ONE-DIM ARRAY USING FUNCTION " & "RESULTS AS PREFIXES 7");
          end if;
 
          if Smin2'First /= Ident_Int (1) then
             Failed
               ("INCORRECT ATTRIBUTE VALUE FOR " &
-               "TWO-DIM ARRAY USING FUNCTION " &
-               "RESULTS AS PREFIXES 4");
+               "TWO-DIM ARRAY USING FUNCTION " & "RESULTS AS PREFIXES 4");
          end if;
 
          if Smin3'First /= Ident_Int (5) then
             Failed
               ("INCORRECT ATTRIBUTE VALUE FOR " &
-               "ONE-DIM ARRAY USING FUNCTION " &
-               "RESULTS AS PREFIXES 8");
+               "ONE-DIM ARRAY USING FUNCTION " & "RESULTS AS PREFIXES 8");
          end if;
 
          if Smin'Last /= Ident_Int (3) then
             Failed
               ("INCORRECT ATTRIBUTE VALUE FOR " &
-               "ONE-DIM ARRAY USING FUNCTION " &
-               "RESULTS AS PREFIXES 9");
+               "ONE-DIM ARRAY USING FUNCTION " & "RESULTS AS PREFIXES 9");
          end if;
 
          if Smin2'Last /= Ident_Int (3) then
             Failed
               ("INCORRECT ATTRIBUTE VALUE FOR " &
-               "TWO-DIM ARRAY USING FUNCTION " &
-               "RESULTS AS PREFIXES 5");
+               "TWO-DIM ARRAY USING FUNCTION " & "RESULTS AS PREFIXES 5");
          end if;
 
          if Smin3'Last /= Ident_Int (10) then
             Failed
               ("INCORRECT ATTRIBUTE VALUE FOR " &
-               "ONE-DIM ARRAY USING FUNCTION " &
-               "RESULTS AS PREFIXES 10");
+               "ONE-DIM ARRAY USING FUNCTION " & "RESULTS AS PREFIXES 10");
          end if;
 
       end;

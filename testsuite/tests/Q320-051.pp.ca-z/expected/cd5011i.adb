@@ -47,10 +47,8 @@ procedure Cd5011i is
    begin
       Test
         ("CD5011I",
-         "AN ADDRESS CLAUSE CAN BE " &
-         "GIVEN FOR A VARIABLE OF AN ARRAY " &
-         "TYPE IN THE DECLARATIVE PART OF A " &
-         "PACKAGE BODY");
+         "AN ADDRESS CLAUSE CAN BE " & "GIVEN FOR A VARIABLE OF AN ARRAY " &
+         "TYPE IN THE DECLARATIVE PART OF A " & "PACKAGE BODY");
 
       for I in Int'Range loop
          Int (I) := Ident_Int (I);

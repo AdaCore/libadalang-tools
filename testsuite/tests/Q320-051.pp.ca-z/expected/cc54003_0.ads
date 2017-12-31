@@ -70,9 +70,8 @@ package Cc54003_0 is -- Generic stack of pointers.
 
    procedure Push (Stack : in out Stack_Type; Func_Ptr : in Function_Ptr);
 
-   function Execute_Stack
-     (Stack         : Stack_Type;
-      Initial_Input : Item_Ptr) return Item_Ptr;
+   function Execute_Stack (Stack : Stack_Type;
+      Initial_Input              : Item_Ptr) return Item_Ptr;
 
    -- ... Other operations.
 

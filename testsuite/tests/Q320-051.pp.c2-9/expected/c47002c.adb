@@ -85,28 +85,24 @@ begin
       end if;
 
       if F (Narr2'(others => 0))'First /= 2 or
-        F (Narr2'(others => 0))'Last /= 2
-      then
+        F (Narr2'(others => 0))'Last /= 2 then
          Failed ("INCORRECT RESULTS FOR SUBTYPE NARR2");
       end if;
 
       if F (Tarr15'(others => (others => 0)))'Last /= 1 or
-        F (Tarr15'(others => (others => 0)))'Last (2) /= 5
-      then
+        F (Tarr15'(others => (others => 0)))'Last (2) /= 5 then
          Failed ("INCORRECT RESULTS FOR SUBTYPE TARR15");
       end if;
 
       if F (Tarr51'(others => (others => 0)))'Last /= 5 or
-        F (Tarr51'(others => (others => 0)))'Last (2) /= 1
-      then
+        F (Tarr51'(others => (others => 0)))'Last (2) /= 1 then
          Failed ("INCORRECT RESULTS FOR SUBTYPE TARR51");
       end if;
 
       if F (Ntarr26'(others => (others => 0)))'First /= 2 or
         F (Ntarr26'(others => (others => 0)))'Last /= 6 or
         F (Ntarr26'(others => (others => 0)))'First (2) /= 2 or
-        F (Ntarr26'(others => (others => 0)))'Last (2) /= 6
-      then
+        F (Ntarr26'(others => (others => 0)))'Last (2) /= 6 then
          Failed ("INCORRECT RESULTS FOR SUBTYPE NTARR26");
       end if;
 

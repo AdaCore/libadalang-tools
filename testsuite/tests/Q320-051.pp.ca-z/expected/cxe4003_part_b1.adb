@@ -79,8 +79,7 @@ package body Cxe4003_Part_B1 is
    begin
       if Cancellation_Test_Start_Count /= 11 then
          Report.Failed
-           ("Remote procedure in cancellation test " &
-            "was called" &
+           ("Remote procedure in cancellation test " & "was called" &
             Integer'Image (Cancellation_Test_Start_Count) &
             " times instead of 11 times");
       else
@@ -101,17 +100,13 @@ package body Cxe4003_Part_B1 is
             -- undesirable but not illegal.
             Report.Comment
               ("none of the aborted remote calls were " &
-               "actually cancelled for " &
-               Name &
-               " test");
+               "actually cancelled for " & Name & " test");
          when others =>
             -- some, but not all, of the calls were cancelled. this is
             -- undesirable but not illegal.
             Report.Comment
               (Integer'Image (11 - Cancellation_Test_Finish_Count) &
-               " remote calls out of 10 were cancelled for " &
-               Name &
-               " test");
+               " remote calls out of 10 were cancelled for " & Name & " test");
       end case;
 
    end End_Cancellation_Test;

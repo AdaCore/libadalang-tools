@@ -147,14 +147,12 @@ begin
       type Tabox0 is array (Integer range <>, Integer range <>) of Integer;
 
       subtype Tabox01 is
-        Tabox0
-          (Ident_Int (1) .. Ident_Int (1),
+        Tabox0 (Ident_Int (1) .. Ident_Int (1),
            Ident_Int (0) .. Ident_Int (7));
       subtype Tabox02 is Tabox0;
 
       Arrx01 : Tabox01;
-      Arrx02 : Tabox02
-        (Ident_Int (1) .. Ident_Int (0),
+      Arrx02 : Tabox02 (Ident_Int (1) .. Ident_Int (0),
          Ident_Int (0) .. Ident_Int (7));
 
    begin
@@ -260,12 +258,8 @@ begin
       when Constraint_Error =>
 
          -- CHECKING THE VALUES AFTER THE SLICE ASSIGNMENT:
-         if Arrx52 (5) /= True or
-           Arrx52 (6) /= False or
-           Arrx52 (7) /= True or
-           Arrx52 (8) /= True or
-           Arrx52 (9) /= False
-         then
+         if Arrx52 (5) /= True or Arrx52 (6) /= False or Arrx52 (7) /= True or
+           Arrx52 (8) /= True or Arrx52 (9) /= False then
             Failed ("LHS ARRAY ALTERED  (12)");
          end if;
 

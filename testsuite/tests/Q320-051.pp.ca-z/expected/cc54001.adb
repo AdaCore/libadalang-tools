@@ -23,11 +23,9 @@ begin
    Messages.Pop (Cc54001_1.Message_Stack, Msg1);  -- were pushed.
    Messages.Pop (Cc54001_1.Message_Stack, Msg0);
 
-   if Msg0.all /= Cc54001_1.Message_0
-     or else Msg1.all /= Cc54001_1.Message_1
+   if Msg0.all /= Cc54001_1.Message_0 or else Msg1.all /= Cc54001_1.Message_1
      or else Msg2.all /= Cc54001_1.Message_2
-     or else Msg3.all /= Cc54001_1.Message_3
-   then
+     or else Msg3.all /= Cc54001_1.Message_3 then
       Report.Failed ("Items popped off of stack do not match those pushed");
    end if;
 

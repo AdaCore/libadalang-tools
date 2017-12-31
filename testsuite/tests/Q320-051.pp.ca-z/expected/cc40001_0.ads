@@ -72,9 +72,7 @@ package Cc40001_0 is
 
    type States is (Erroneous, Defaulted, Initialized, Reset, Adjusted);
 
-   type Simple_Object
-     (Id : Character)
-   is new Ada.Finalization.Controlled with
+   type Simple_Object (Id : Character) is new Ada.Finalization.Controlled with
    record
       Tc_Current_State : States := Defaulted;
       Name             : Ada.Strings.Unbounded.Unbounded_String;

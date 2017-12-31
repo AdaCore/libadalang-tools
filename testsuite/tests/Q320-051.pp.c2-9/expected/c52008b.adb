@@ -79,14 +79,8 @@ begin
       R1a := (Ident_Int (3), 5, "XYZ");
 
       R :=
-        (Ident_Int (2),
-         Ident_Int (3),
-         Ident_Int (5),
-         Ident_Int (6),
-         "AB",
-         Str,
-         (1 .. 6 => R1a),
-         R1c);
+        (Ident_Int (2), Ident_Int (3), Ident_Int (5), Ident_Int (6), "AB", Str,
+         (1 .. 6 => R1a), R1c);
 
       Temp    := R;
       Q       := Temp;

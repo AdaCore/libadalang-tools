@@ -25,8 +25,7 @@ begin
      ("C392D01",
       "Dispatching for overridden and non-overridden " &
       "primitive subprograms: private extension declared in child " &
-      "unit, parent is tagged private whose full view is derived  " &
-      "type");
+      "unit, parent is tagged private whose full view is derived  " & "type");
 
 -- Call the class-wide operation (Self_Test) for Zoom_Camera'Class, which
 -- itself calls the class-wide operation for Remote_Camera'Class, which in
@@ -40,10 +39,7 @@ begin
    C392d01_0.Self_Test (Zooming_Camera);
 
    if not C392d01_0.Tc_Correct_Result
-       (Zooming_Camera,
-        Tc_Expected_Zoom_Depth,
-        Tc_Expected_Zoom_Speed)
-   then
+       (Zooming_Camera, Tc_Expected_Zoom_Depth, Tc_Expected_Zoom_Speed) then
       Report.Failed ("Calls dispatched incorrectly for tagged private type");
    end if;
 
@@ -55,10 +51,7 @@ begin
    C392d01_0.Self_Test (Auto_Camera1);
 
    if not C392d01_0.C392d01_1.Tc_Correct_Result
-       (Auto_Camera1,
-        Tc_Expected_Auto_Depth,
-        Tc_Expected_Auto_Speed)
-   then
+       (Auto_Camera1, Tc_Expected_Auto_Depth, Tc_Expected_Auto_Speed) then
       Report.Failed ("Calls dispatched incorrectly for private extension");
    end if;
 
@@ -70,10 +63,7 @@ begin
    C392d01_0.C392d01_1.Self_Test (Auto_Camera2);
 
    if not C392d01_0.C392d01_1.Tc_Correct_Result
-       (Auto_Camera2,
-        Tc_Expected_Depth,
-        Tc_Expected_Speed)
-   then
+       (Auto_Camera2, Tc_Expected_Depth, Tc_Expected_Speed) then
       Report.Failed ("Call to explicit subprogram executed the wrong body");
    end if;
 

@@ -153,8 +153,7 @@ begin
         (F760a00.Lim_Tagged'
            (R  => (A => Report.Ident_Int (8), B => False, Tc => <>),
             Tc => <>) with
-         G   => Report.Ident_Int (20),
-         Tc2 => <>);
+         G => Report.Ident_Int (20), Tc2 => <>);
    begin
       F760a00.Child.Check_Init (My_Ext, "Lim_Ext ext agg init");
       F760a00.Child.Use_It (My_Ext);
@@ -171,8 +170,7 @@ begin
       F760a00.Use_It (My_Arr);
    end;
    F760a00.Check_Fin_Lim_Array
-     (Length  => 2,
-      Message => "Lim_Array pos agg init");
+     (Length => 2, Message => "Lim_Array pos agg init");
 
    -- The expression of an initialized allocator:
    declare

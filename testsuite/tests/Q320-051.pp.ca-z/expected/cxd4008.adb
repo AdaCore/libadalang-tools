@@ -134,11 +134,8 @@ procedure Cxd4008 is
       end E5;
 
       entry Open_The_Gates
-        when E1'Count = 1 and
-        E2'Count = 1 and
-        E3'Count = 1 and
-        E4'Count = 1 and
-        E5'Count = 1
+        when E1'Count = 1 and E2'Count = 1 and E3'Count = 1 and
+        E4'Count = 1 and E5'Count = 1
         is
       begin
          Gate := True;
@@ -222,11 +219,8 @@ procedure Cxd4008 is
             end E5;
          or
             -- allow test to start once everyone is here
-             when E1'Count = 1 and
-         E2'Count = 1 and
-         E3'Count = 1 and
-         E4'Count = 1 and
-         E5'Count = 1 =>
+             when E1'Count = 1 and E2'Count = 1 and E3'Count = 1 and
+         E4'Count = 1 and E5'Count = 1 =>
             accept Open_The_Gates;
             Gate := True;
          or
@@ -240,9 +234,7 @@ procedure Cxd4008 is
 
          if Verbose then
             Report.Comment
-              ("Have Checked" &
-               Integer'Image (Checked) &
-               "  Last_Accepted" &
+              ("Have Checked" & Integer'Image (Checked) & "  Last_Accepted" &
                Integer'Image (Last_Accepted));
          end if;
 
@@ -307,11 +299,8 @@ procedure Cxd4008 is
             end E1;
          or
             -- allow test to start once everyone is here
-             when E1'Count = 1 and
-         E2'Count = 1 and
-         E3'Count = 1 and
-         E4'Count = 1 and
-         E5'Count = 1 =>
+             when E1'Count = 1 and E2'Count = 1 and E3'Count = 1 and
+         E4'Count = 1 and E5'Count = 1 =>
             accept Open_The_Gates;
             Gate := True;
          or
@@ -325,9 +314,7 @@ procedure Cxd4008 is
 
          if Verbose then
             Report.Comment
-              ("Have Checked" &
-               Integer'Image (Checked) &
-               "  Last_Accepted" &
+              ("Have Checked" & Integer'Image (Checked) & "  Last_Accepted" &
                Integer'Image (Last_Accepted));
          end if;
 
@@ -396,9 +383,7 @@ begin
       for I in Failed'Range loop
          if Failed (I) then
             Report.Failed
-              ("entry" &
-               Integer'Image (I) &
-               " processed out of order after" &
+              ("entry" & Integer'Image (I) & " processed out of order after" &
                Integer'Image (Predecessor (I)));
          end if;
       end loop;

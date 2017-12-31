@@ -141,26 +141,17 @@ package body Report is
    begin
       Time_Now := Calendar.Clock;
       Split
-        (Time_Now,
-         Year_Number (Year),
-         Month_Number (Month),
-         Day_Number (Day),
+        (Time_Now, Year_Number (Year), Month_Number (Month), Day_Number (Day),
          Day_Duration (Second));
       Hour   := Second / 3_600;
       Second := Second mod 3_600;
       Minute := Second / 60;
       Second := Second mod 60;
       return
-        (Convert (Time_Integer (Year)) &
-         "-" &
-         Convert (Time_Integer (Month)) &
-         "-" &
-         Convert (Time_Integer (Day)) &
-         " " &
-         Convert (Time_Integer (Hour)) &
-         ":" &
-         Convert (Time_Integer (Minute)) &
-         ":" &
+        (Convert (Time_Integer (Year)) & "-" & Convert (Time_Integer (Month)) &
+         "-" & Convert (Time_Integer (Day)) & " " &
+         Convert (Time_Integer (Hour)) & ":" &
+         Convert (Time_Integer (Minute)) & ":" &
          Convert (Time_Integer (Second)));
    end Time_Stamp;
 
@@ -177,13 +168,8 @@ package body Report is
 
       Put_Msg ("");
       Put_Msg
-        (",.,. " &
-         Test_Name (1 .. Test_Name_Len) &
-         " " &
-         "ACATS " &
-         Acats_Version &
-         " " &
-         Time_Stamp);
+        (",.,. " & Test_Name (1 .. Test_Name_Len) & " " & "ACATS " &
+         Acats_Version & " " & Time_Stamp);
       Put_Msg ("---- " & Test_Name (1 .. Test_Name_Len) & " " & Descr & ".");
    end Test;
 
@@ -219,27 +205,22 @@ package body Report is
       case Test_Status is
          when Pass =>
             Put_Msg
-              ("==== " &
-               Test_Name (1 .. Test_Name_Len) &
+              ("==== " & Test_Name (1 .. Test_Name_Len) &
                " PASSED ============================.");
          when Does_Not_Apply =>
             Put_Msg
-              ("++++ " &
-               Test_Name (1 .. Test_Name_Len) &
+              ("++++ " & Test_Name (1 .. Test_Name_Len) &
                " NOT-APPLICABLE ++++++++++++++++++++.");
          when Action_Required =>
             Put_Msg
-              ("!!!! " &
-               Test_Name (1 .. Test_Name_Len) &
+              ("!!!! " & Test_Name (1 .. Test_Name_Len) &
                " TENTATIVELY PASSED !!!!!!!!!!!!!!!!.");
             Put_Msg
-              ("!!!! " &
-               (1 .. Test_Name_Len => ' ') &
+              ("!!!! " & (1 .. Test_Name_Len => ' ') &
                " SEE '!' COMMENTS FOR SPECIAL NOTES!!");
          when others =>
             Put_Msg
-              ("**** " &
-               Test_Name (1 .. Test_Name_Len) &
+              ("**** " & Test_Name (1 .. Test_Name_Len) &
                " FAILED ****************************.");
       end case;
       Test_Status                    := Fail;
@@ -322,9 +303,8 @@ package body Report is
          return X = Y;
    end Equal;
 
-   function Legal_File_Name
-     (X   : File_Num := 1;
-      Nam : String   := "") return String
+   function Legal_File_Name (X : File_Num := 1;
+      Nam                      : String   := "") return String
    is
       Suffix : String (2 .. 6);
    begin

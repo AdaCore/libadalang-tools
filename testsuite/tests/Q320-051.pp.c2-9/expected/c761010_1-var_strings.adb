@@ -32,20 +32,16 @@ package body C761010_1.Var_Strings is
       end if;
       if X.Comp_1 /= Y.Comp_1 then
          -- Still OK if the values are the same.
-         if X.Comp_1 = null
-           or else Y.Comp_1 = null
-           or else X.Comp_1.all /= Y.Comp_1.all
-         then
+         if X.Comp_1 = null or else Y.Comp_1 = null
+           or else X.Comp_1.all /= Y.Comp_1.all then
             return False;
             --else OK.
          end if;
       end if;
       if X.Comp_2 /= Y.Comp_2 then
          -- Still OK if the values are the same.
-         if X.Comp_2 = null
-           or else Y.Comp_2 = null
-           or else X.Comp_2.all /= Y.Comp_2.all
-         then
+         if X.Comp_2 = null or else Y.Comp_2 = null
+           or else X.Comp_2.all /= Y.Comp_2.all then
             return False;
          end if;
       end if;

@@ -77,10 +77,8 @@ procedure Cd2a32g is
 
       if Gen_Check_Int'Size /= Minimum_Size then
          Failed
-           ("GEN_CHECK_INT'SIZE SHOULD NOT BE GREATER " &
-            "THAN" &
-            Integer'Image (Minimum_Size) &
-            ".  ACTUAL SIZE IS" &
+           ("GEN_CHECK_INT'SIZE SHOULD NOT BE GREATER " & "THAN" &
+            Integer'Image (Minimum_Size) & ".  ACTUAL SIZE IS" &
             Integer'Image (Gen_Check_Int'Size));
       end if;
    end Genproc;
@@ -94,8 +92,7 @@ begin
       "CHECK THAT SIZE SPECIFICATIONS OF THE SMALLEST " &
       "APPROPRIATE UNSIGNED SIZE CAN BE GIVEN " &
       "IN THE VISIBLE OR PRIVATE PART OF PACKAGE FOR " &
-      "AN INTEGER TYPE DECLARED IN VISIBLE PART, " &
-      "FOR DERIVED INTEGER " &
+      "AN INTEGER TYPE DECLARED IN VISIBLE PART, " & "FOR DERIVED INTEGER " &
       "TYPES AND DERIVED PRIVATE TYPES WHOSE FULL " &
       "DECLARATION IS AS AN INTEGER TYPE AND FOR AN " &
       "INTEGER TYPE GIVEN IN A GENERIC UNIT");
@@ -103,33 +100,28 @@ begin
    if Derived_Int'Size /= Minimum_Size then
       Failed
         ("DERIVED_INT'SIZE SHOULD NOT BE GREATER THAN" &
-         Integer'Image (Minimum_Size) &
-         ".  ACTUAL SIZE IS" &
+         Integer'Image (Minimum_Size) & ".  ACTUAL SIZE IS" &
          Integer'Image (Derived_Int'Size));
    end if;
 
    if Int_In_P'Size /= Minimum_Size then
       Failed
         ("INT_IN_P'SIZE SHOULD NOT BE GREATER THAN" &
-         Integer'Image (Minimum_Size) &
-         ".  ACTUAL SIZE IS" &
+         Integer'Image (Minimum_Size) & ".  ACTUAL SIZE IS" &
          Integer'Image (Int_In_P'Size));
    end if;
 
    if Alt_Int_In_P'Size /= Minimum_Size then
       Failed
         ("ALT_INT_IN_P'SIZE SHOULD NOT BE GREATER THAN" &
-         Integer'Image (Minimum_Size) &
-         ".  ACTUAL SIZE IS" &
+         Integer'Image (Minimum_Size) & ".  ACTUAL SIZE IS" &
          Integer'Image (Alt_Int_In_P'Size));
    end if;
 
    if Derived_Private_Int'Size /= Minimum_Size then
       Failed
-        ("DERIVED_PRIVATE_INT'SIZE SHOULD NOT BE GREATER " &
-         "THAN" &
-         Integer'Image (Minimum_Size) &
-         ".  ACTUAL SIZE IS" &
+        ("DERIVED_PRIVATE_INT'SIZE SHOULD NOT BE GREATER " & "THAN" &
+         Integer'Image (Minimum_Size) & ".  ACTUAL SIZE IS" &
          Integer'Image (Derived_Private_Int'Size));
    end if;
 

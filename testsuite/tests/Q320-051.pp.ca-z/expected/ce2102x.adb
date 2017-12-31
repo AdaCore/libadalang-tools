@@ -55,14 +55,12 @@ begin
          when Use_Error =>
             Not_Applicable
               ("USE_ERROR RAISED ON CREATE OF " &
-               "SEQUENTIAL FILE WITH OUT_FILE " &
-               "MODE");
+               "SEQUENTIAL FILE WITH OUT_FILE " & "MODE");
             raise Incomplete;
          when Name_Error =>
             Not_Applicable
               ("NAME_ERROR RAISED ON CREATE OF " &
-               "SEQUENTIAL FILE WITH OUT_FILE " &
-               "MODE");
+               "SEQUENTIAL FILE WITH OUT_FILE " & "MODE");
             raise Incomplete;
       end;
 

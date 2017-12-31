@@ -22,8 +22,7 @@ begin
    Report.Test
      ("CA11010",
       "Check that a private child package can use " &
-      "entities declared in the private part of its " &
-      "parent unit");
+      "entities declared in the private part of its " & "parent unit");
 
    -- Check initial conditions of the first entry in the file table. These are
    -- all default values provided in the declaration of the type File_Type.

@@ -137,8 +137,7 @@ procedure C74305a is
             "CHECK THAT A DEFERRED CONSTANT CAN " &
             "BE USED AS A DEFAULT INITIALIZATION " &
             "FOR A PARAMETER OR AS A DEFAULT " &
-            "INITIALIZATION FOR A COMPONENT (NON " &
-            "GENERIC CASE)");
+            "INITIALIZATION FOR A COMPONENT (NON " & "GENERIC CASE)");
 
          if (R11.C /= 1) then
             Failed ("RECORD R11 NOT PROPERLY INITIALIZED");

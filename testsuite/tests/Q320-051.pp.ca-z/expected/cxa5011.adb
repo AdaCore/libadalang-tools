@@ -120,18 +120,15 @@ begin
       -- match before the test is considered to fail.
       --
 
-      procedure Check_Float_State
-        (Gen_1, Gen_2        : Float_Random.Generator;
-         Sub_Test            : Integer;
-         States_Should_Match : Boolean)
+      procedure Check_Float_State (Gen_1, Gen_2 : Float_Random.Generator;
+         Sub_Test : Integer; States_Should_Match : Boolean)
       is
 
          use type Float_Random.State;
 
          State_1, State_2 : Float_Random.State;
 
-         State_String_1,
-         State_String_2 : Float_String_Pack.Bounded_String :=
+         State_String_1, State_String_2 : Float_String_Pack.Bounded_String :=
            Float_String_Pack.Null_Bounded_String;
       begin
 
@@ -149,30 +146,26 @@ begin
             when True =>
                if State_1 /= State_2 then
                   Report.Failed
-                    ("Subtest #" &
-                     Integer'Image (Sub_Test) &
+                    ("Subtest #" & Integer'Image (Sub_Test) &
                      "   State values from Float generators " &
                      "are not the same");
                end if;
                if State_String_1 /= State_String_2 then
                   Report.Failed
-                    ("Subtest #" &
-                     Integer'Image (Sub_Test) &
+                    ("Subtest #" & Integer'Image (Sub_Test) &
                      "   State strings from Float generators " &
                      "are not the same");
                end if;
             when False =>
                if State_1 = State_2 then
                   Report.Failed
-                    ("Subtest #" &
-                     Integer'Image (Sub_Test) &
+                    ("Subtest #" & Integer'Image (Sub_Test) &
                      "   State values from Float generators " &
                      "are the same");
                end if;
                if State_String_1 = State_String_2 then
                   Report.Failed
-                    ("Subtest #" &
-                     Integer'Image (Sub_Test) &
+                    ("Subtest #" & Integer'Image (Sub_Test) &
                      "   State strings from Float generators " &
                      "are the same");
                end if;
@@ -180,8 +173,7 @@ begin
       end Check_Float_State;
 
       procedure Check_Discrete_State
-        (Gen_1, Gen_2        : Discrete_Package.Generator;
-         Sub_Test            : Integer;
+        (Gen_1, Gen_2        : Discrete_Package.Generator; Sub_Test : Integer;
          States_Should_Match : Boolean)
       is
 
@@ -209,40 +201,34 @@ begin
             when True =>
                if State_1 /= State_2 then
                   Report.Failed
-                    ("Subtest #" &
-                     Integer'Image (Sub_Test) &
+                    ("Subtest #" & Integer'Image (Sub_Test) &
                      "   State values from Discrete " &
                      "generators are not the same");
                end if;
                if State_String_1 /= State_String_2 then
                   Report.Failed
-                    ("Subtest #" &
-                     Integer'Image (Sub_Test) &
+                    ("Subtest #" & Integer'Image (Sub_Test) &
                      "   State strings from Discrete " &
                      "generators are not the same");
                end if;
             when False =>
                if State_1 = State_2 then
                   Report.Failed
-                    ("Subtest #" &
-                     Integer'Image (Sub_Test) &
+                    ("Subtest #" & Integer'Image (Sub_Test) &
                      "   State values from Discrete " &
                      "generators are the same");
                end if;
                if State_String_1 = State_String_2 then
                   Report.Failed
-                    ("Subtest #" &
-                     Integer'Image (Sub_Test) &
+                    ("Subtest #" & Integer'Image (Sub_Test) &
                      "   State strings from Discrete " &
                      "generators are the same");
                end if;
          end case;
       end Check_Discrete_State;
 
-      procedure Check_Float_Values
-        (Gen_1, Gen_2        : Float_Random.Generator;
-         Sub_Test            : Integer;
-         Values_Should_Match : Boolean)
+      procedure Check_Float_Values (Gen_1, Gen_2 : Float_Random.Generator;
+         Sub_Test : Integer; Values_Should_Match : Boolean)
       is
          Matches      : Natural := 0;
          Check_Failed : Boolean := False;
@@ -250,8 +236,7 @@ begin
          case Values_Should_Match is
             when True =>
                for I in 1 .. Tc_Max_Loop_Count loop
-                  if Float_Random.Random (Gen_1) /=
-                    Float_Random.Random (Gen_2)
+                  if Float_Random.Random (Gen_1) /= Float_Random.Random (Gen_2)
                   then
                      Check_Failed := True;
                      exit;
@@ -259,15 +244,13 @@ begin
                end loop;
                if Check_Failed then
                   Report.Failed
-                    ("Sub_Test # " &
-                     Integer'Image (Sub_Test) &
+                    ("Sub_Test # " & Integer'Image (Sub_Test) &
                      "   Random numbers from Float generators " &
                      "Failed check");
                end if;
             when False =>
                for I in 1 .. Tc_Max_Loop_Count loop
-                  if Float_Random.Random (Gen_1) =
-                    Float_Random.Random (Gen_2)
+                  if Float_Random.Random (Gen_1) = Float_Random.Random (Gen_2)
                   then
                      Matches := Matches + 1;
                   end if;
@@ -275,20 +258,16 @@ begin
          end case;
 
          if (Values_Should_Match and Check_Failed) or
-           (not Values_Should_Match and Matches > Allowed_Matches)
-         then
+           (not Values_Should_Match and Matches > Allowed_Matches) then
             Report.Failed
-              ("Sub_Test # " &
-               Integer'Image (Sub_Test) &
-               "   Random numbers from Float generators " &
-               "Failed check");
+              ("Sub_Test # " & Integer'Image (Sub_Test) &
+               "   Random numbers from Float generators " & "Failed check");
          end if;
 
       end Check_Float_Values;
 
       procedure Check_Discrete_Values
-        (Gen_1, Gen_2        : Discrete_Package.Generator;
-         Sub_Test            : Integer;
+        (Gen_1, Gen_2        : Discrete_Package.Generator; Sub_Test : Integer;
          Values_Should_Match : Boolean)
       is
          Matches      : Natural := 0;
@@ -298,8 +277,7 @@ begin
             when True =>
                for I in 1 .. Tc_Max_Loop_Count loop
                   if Discrete_Package.Random (Gen_1) /=
-                    Discrete_Package.Random (Gen_2)
-                  then
+                    Discrete_Package.Random (Gen_2) then
                      Check_Failed := True;
                      exit;
                   end if;
@@ -307,21 +285,17 @@ begin
             when False =>
                for I in 1 .. Tc_Max_Loop_Count loop
                   if Discrete_Package.Random (Gen_1) =
-                    Discrete_Package.Random (Gen_2)
-                  then
+                    Discrete_Package.Random (Gen_2) then
                      Matches := Matches + 1;
                   end if;
                end loop;
          end case;
 
          if (Values_Should_Match and Check_Failed) or
-           (not Values_Should_Match and Matches > Allowed_Matches)
-         then
+           (not Values_Should_Match and Matches > Allowed_Matches) then
             Report.Failed
-              ("Sub_Test # " &
-               Integer'Image (Sub_Test) &
-               "   Random numbers from Discrete generators " &
-               "Failed check");
+              ("Sub_Test # " & Integer'Image (Sub_Test) &
+               "   Random numbers from Discrete generators " & "Failed check");
          end if;
 
       end Check_Discrete_Values;
@@ -339,32 +313,24 @@ begin
          -- Image, should yield identical strings.
 
          Check_Discrete_State
-           (Discrete_Generator_1,
-            Discrete_Generator_2,
-            Sub_Test            => 1,
-            States_Should_Match => True);
+           (Discrete_Generator_1, Discrete_Generator_2, Sub_Test => 1,
+            States_Should_Match                                  => True);
 
          Check_Float_State
-           (Float_Generator_1,
-            Float_Generator_2,
-            Sub_Test            => 1,
-            States_Should_Match => True);
+           (Float_Generator_1, Float_Generator_2, Sub_Test => 1,
+            States_Should_Match                            => True);
 
          -- Since the two random generator objects are in their initial state,
          -- the values produced from each (upon calls to Random) should be
          -- identical.
 
          Check_Discrete_Values
-           (Discrete_Generator_1,
-            Discrete_Generator_2,
-            Sub_Test            => 1,
-            Values_Should_Match => True);
+           (Discrete_Generator_1, Discrete_Generator_2, Sub_Test => 1,
+            Values_Should_Match                                  => True);
 
          Check_Float_Values
-           (Float_Generator_1,
-            Float_Generator_2,
-            Sub_Test            => 1,
-            Values_Should_Match => True);
+           (Float_Generator_1, Float_Generator_2, Sub_Test => 1,
+            Values_Should_Match                            => True);
 
       end Sub_Test_1;
 
@@ -391,32 +357,24 @@ begin
          -- strings.
 
          Check_Discrete_State
-           (Discrete_Generator_1,
-            Discrete_Generator_2,
-            Sub_Test            => 3,
-            States_Should_Match => True);
+           (Discrete_Generator_1, Discrete_Generator_2, Sub_Test => 3,
+            States_Should_Match                                  => True);
 
          Check_Float_State
-           (Float_Generator_1,
-            Float_Generator_2,
-            Sub_Test            => 3,
-            States_Should_Match => True);
+           (Float_Generator_1, Float_Generator_2, Sub_Test => 3,
+            States_Should_Match                            => True);
 
          -- Since the random generators have been reset to identical states,
          -- the values produced from each (upon calls to Random) should be
          -- identical.
 
          Check_Discrete_Values
-           (Discrete_Generator_1,
-            Discrete_Generator_2,
-            Sub_Test            => 3,
-            Values_Should_Match => True);
+           (Discrete_Generator_1, Discrete_Generator_2, Sub_Test => 3,
+            Values_Should_Match                                  => True);
 
          Check_Float_Values
-           (Float_Generator_1,
-            Float_Generator_2,
-            Sub_Test            => 3,
-            Values_Should_Match => True);
+           (Float_Generator_1, Float_Generator_2, Sub_Test => 3,
+            Values_Should_Match                            => True);
 
       end Sub_Test_3;
 
@@ -431,8 +389,7 @@ begin
          Tc_Seed := Integer (Discrete_Package.Random (Discrete_Generator_1));
 
          Discrete_Package.Reset
-           (Gen       => Discrete_Generator_1,
-            Initiator => Tc_Seed);
+           (Gen => Discrete_Generator_1, Initiator => Tc_Seed);
 
          -- Set the seed value to a different value for the second call to
          -- Reset. Note: A second call to Random could be made, as above,
@@ -447,8 +404,7 @@ begin
          end if;
 
          Discrete_Package.Reset
-           (Gen       => Discrete_Generator_2,
-            Initiator => Tc_Seed);
+           (Gen => Discrete_Generator_2, Initiator => Tc_Seed);
 
          Float_Random.Reset (Float_Generator_1, 16#FF#);             -- 255
          Float_Random.Reset (Float_Generator_2, 2#1110_0000#);       -- 224
@@ -457,40 +413,31 @@ begin
          -- bounded string images depicting their states should differ.
 
          Check_Discrete_State
-           (Discrete_Generator_1,
-            Discrete_Generator_2,
-            Sub_Test            => 4,
-            States_Should_Match => False);
+           (Discrete_Generator_1, Discrete_Generator_2, Sub_Test => 4,
+            States_Should_Match                                  => False);
 
          Check_Float_State
-           (Float_Generator_1,
-            Float_Generator_2,
-            Sub_Test            => 4,
-            States_Should_Match => False);
+           (Float_Generator_1, Float_Generator_2, Sub_Test => 4,
+            States_Should_Match                            => False);
 
          -- Since the two discrete random generator objects were reset to
          -- different states, the values produced from each (upon calls to
          -- Random) should differ.
 
          Check_Discrete_Values
-           (Discrete_Generator_1,
-            Discrete_Generator_2,
-            Sub_Test            => 4,
-            Values_Should_Match => False);
+           (Discrete_Generator_1, Discrete_Generator_2, Sub_Test => 4,
+            Values_Should_Match                                  => False);
 
          Check_Float_Values
-           (Float_Generator_1,
-            Float_Generator_2,
-            Sub_Test            => 4,
-            Values_Should_Match => False);
+           (Float_Generator_1, Float_Generator_2, Sub_Test => 4,
+            Values_Should_Match                            => False);
 
       end Sub_Test_4;
 
    exception
       when The_Error : others =>
          Report.Failed
-           ("The following exception was raised in the " &
-            "Test_Block: " &
+           ("The following exception was raised in the " & "Test_Block: " &
             Exception_Name (The_Error));
    end Test_Block;
 

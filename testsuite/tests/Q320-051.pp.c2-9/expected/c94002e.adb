@@ -59,8 +59,7 @@ begin
      ("C94002E",
       "CHECK THAT A NON-MASTER UNIT, WHICH ALLOCATES " &
       "TASKS OF A GLOBAL ACCESS TYPE, MUST TERMINATE " &
-      "WITHOUT WAITING FOR THE ALLOCATED TASKS TO " &
-      "TERMINATE");
+      "WITHOUT WAITING FOR THE ALLOCATED TASKS TO " & "TERMINATE");
 
    --------------------------------------------------
 

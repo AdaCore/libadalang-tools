@@ -33,10 +33,7 @@ procedure C95082g is
    Y1, Y2, Y3 : Integer := 0;
 
    task T is
-      entry E
-        (I1         :     Integer;
-         I2         :     Integer := 2;
-         I3         :     Integer := 3;
+      entry E (I1   :     Integer; I2 : Integer := 2; I3 : Integer := 3;
          O1, O2, O3 : out Integer);
    end T;
 
@@ -44,12 +41,8 @@ procedure C95082g is
    begin
       loop
          select
-            accept E
-              (I1         :     Integer;
-               I2         :     Integer := 2;
-               I3         :     Integer := 3;
-               O1, O2, O3 : out Integer)
-            do
+            accept E (I1  :     Integer; I2 : Integer := 2; I3 : Integer := 3;
+               O1, O2, O3 : out Integer) do
                O1 := I1;
                O2 := I2;
                O3 := I3;

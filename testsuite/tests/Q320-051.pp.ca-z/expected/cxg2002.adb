@@ -84,10 +84,8 @@ procedure Cxg2002 is
       package Complex_Types is new Ada.Numerics.Generic_Complex_Types (Real);
       use Complex_Types;
 
-      procedure Check
-        (Actual, Expected : Real;
-         Test_Name        : String;
-         Mre              : Real := Maximum_Relative_Error)
+      procedure Check (Actual, Expected : Real; Test_Name : String;
+         Mre                            : Real := Maximum_Relative_Error)
       is
          Rel_Error, Abs_Error, Max_Error : Real;
       begin
@@ -104,14 +102,9 @@ procedure Cxg2002 is
 
          if abs (Actual - Expected) > Max_Error then
             Report.Failed
-              (Test_Name &
-               " actual: " &
-               Real'Image (Actual) &
-               " expected: " &
-               Real'Image (Expected) &
-               " difference: " &
-               Real'Image (Expected - Actual) &
-               " max_err:" &
+              (Test_Name & " actual: " & Real'Image (Actual) & " expected: " &
+               Real'Image (Expected) & " difference: " &
+               Real'Image (Expected - Actual) & " max_err:" &
                Real'Image (Max_Error));
          elsif Verbose then
             if Actual = Expected then
@@ -174,9 +167,7 @@ procedure Cxg2002 is
             Z := 3.0 * S + 4.0 * S * I;
             X := abs Z;
             Check
-              (X,
-               5.0 * S,
-               "test 4 -- abs(3S + 4S*i) for large S",
+              (X, 5.0 * S, "test 4 -- abs(3S + 4S*i) for large S",
                5.0 * Real'Model_Epsilon);
          exception
             when Constraint_Error =>
@@ -219,9 +210,7 @@ procedure Cxg2002 is
             Z := 3.0 * S + 4.0 * S * I;
             X := abs Z;
             Check
-              (X,
-               5.0 * S,
-               "test 7 -- abs(3S + 4S*i) for small S",
+              (X, 5.0 * S, "test 7 -- abs(3S + 4S*i) for small S",
                5.0 * Real'Model_Epsilon);
          exception
             when Constraint_Error =>
@@ -273,10 +262,8 @@ procedure Cxg2002 is
    package body Non_Generic_Check is
       use Ada.Numerics.Complex_Types;
 
-      procedure Check
-        (Actual, Expected : Real;
-         Test_Name        : String;
-         Mre              : Real := Maximum_Relative_Error)
+      procedure Check (Actual, Expected : Real; Test_Name : String;
+         Mre                            : Real := Maximum_Relative_Error)
       is
          Rel_Error, Abs_Error, Max_Error : Real;
       begin
@@ -293,14 +280,9 @@ procedure Cxg2002 is
 
          if abs (Actual - Expected) > Max_Error then
             Report.Failed
-              (Test_Name &
-               " actual: " &
-               Real'Image (Actual) &
-               " expected: " &
-               Real'Image (Expected) &
-               " difference: " &
-               Real'Image (Expected - Actual) &
-               " max_err:" &
+              (Test_Name & " actual: " & Real'Image (Actual) & " expected: " &
+               Real'Image (Expected) & " difference: " &
+               Real'Image (Expected - Actual) & " max_err:" &
                Real'Image (Max_Error));
          elsif Verbose then
             if Actual = Expected then
@@ -363,9 +345,7 @@ procedure Cxg2002 is
             Z := 3.0 * S + 4.0 * S * I;
             X := abs Z;
             Check
-              (X,
-               5.0 * S,
-               "test 4 -- abs(3S + 4S*i) for large S",
+              (X, 5.0 * S, "test 4 -- abs(3S + 4S*i) for large S",
                5.0 * Real'Model_Epsilon);
          exception
             when Constraint_Error =>
@@ -408,9 +388,7 @@ procedure Cxg2002 is
             Z := 3.0 * S + 4.0 * S * I;
             X := abs Z;
             Check
-              (X,
-               5.0 * S,
-               "test 7 -- abs(3S + 4S*i) for small S",
+              (X, 5.0 * S, "test 7 -- abs(3S + 4S*i) for small S",
                5.0 * Real'Model_Epsilon);
          exception
             when Constraint_Error =>
@@ -460,8 +438,7 @@ procedure Cxg2002 is
    package Chk_A_Long_Float is new Generic_Check (A_Long_Float);
 begin
    Report.Test
-     ("CXG2002",
-      "Check the accuracy of the complex modulus" & " function");
+     ("CXG2002", "Check the accuracy of the complex modulus" & " function");
 
    if Verbose then
       Report.Comment ("checking Standard.Float");
@@ -470,8 +447,7 @@ begin
 
    if Verbose then
       Report.Comment
-        ("checking a digits" &
-         Integer'Image (System.Max_Digits) &
+        ("checking a digits" & Integer'Image (System.Max_Digits) &
          " floating point type");
    end if;
    Chk_A_Long_Float.Do_Test;

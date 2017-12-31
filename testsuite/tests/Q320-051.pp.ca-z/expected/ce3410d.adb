@@ -100,9 +100,7 @@ begin
 
    if Item_Char /= 'G' then
       Failed
-        ("SET_LINE DOESN'T SKIP PAGE MARKS; " &
-         "ACTUALLY READ '" &
-         Item_Char &
+        ("SET_LINE DOESN'T SKIP PAGE MARKS; " & "ACTUALLY READ '" & Item_Char &
          "'");
    end if;
 

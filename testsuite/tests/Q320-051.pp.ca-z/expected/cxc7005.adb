@@ -95,28 +95,19 @@ procedure Cxc7005 is
    begin
       if Value /= Expected then
          Failed
-           (Attribute &
-            " is " &
-            Boolean'Image (Value) &
-            " but " &
-            Boolean'Image (Expected) &
-            " was expected");
+           (Attribute & " is " & Boolean'Image (Value) & " but " &
+            Boolean'Image (Expected) & " was expected");
       end if;
    end Check_Value;
 
-   procedure Check_Id
-     (Id, Expected : Ada.Task_Identification.Task_Id;
-      Task_Name    : String)
+   procedure Check_Id (Id, Expected : Ada.Task_Identification.Task_Id;
+      Task_Name                     : String)
    is
    begin
       if Id /= Expected then
          Failed
-           (Task_Name &
-            " is " &
-            Ada.Task_Identification.Image (Id) &
-            " but " &
-            Ada.Task_Identification.Image (Expected) &
-            " was expected");
+           (Task_Name & " is " & Ada.Task_Identification.Image (Id) & " but " &
+            Ada.Task_Identification.Image (Expected) & " was expected");
       end if;
    end Check_Id;
 
@@ -127,29 +118,23 @@ procedure Cxc7005 is
    begin
       delay Impdef.Switch_To_New_Task;
       Check_Id
-        (Id        => Obj'Identity,
-         Expected  => Obj_Id,
-         Task_Name => "Stop_Task");
+        (Id => Obj'Identity, Expected => Obj_Id, Task_Name => "Stop_Task");
       Check_Value
-        (Value     => Ada.Task_Identification.Is_Callable (Obj'Identity),
-         Expected  => True,
-         Attribute => "Is_Callable");
+        (Value    => Ada.Task_Identification.Is_Callable (Obj'Identity),
+         Expected => True, Attribute => "Is_Callable");
       Check_Value
-        (Value     => Ada.Task_Identification.Is_Terminated (Obj'Identity),
-         Expected  => False,
-         Attribute => "Is_Terminated");
+        (Value    => Ada.Task_Identification.Is_Terminated (Obj'Identity),
+         Expected => False, Attribute => "Is_Terminated");
 
       Comment ("  Stop task");
       Obj.Stop;
 
       delay Impdef.Minimum_Task_Switch;
       Check_Value
-        (Value     => Ada.Task_Identification.Is_Callable (Obj'Identity),
-         Expected  => False,
-         Attribute => "Is_Callable");
+        (Value    => Ada.Task_Identification.Is_Callable (Obj'Identity),
+         Expected => False, Attribute => "Is_Callable");
       Check_Value
-        (Value     => Obj'Terminated,
-         Expected  => True,
+        (Value     => Obj'Terminated, Expected => True,
          Attribute => "Is_Terminated");
 
    end Check_Attributes_And_Stop;
@@ -161,30 +146,24 @@ procedure Cxc7005 is
    begin
       delay Impdef.Switch_To_New_Task;
       Check_Id
-        (Id        => Obj'Identity,
-         Expected  => Obj_Id,
-         Task_Name => "Abort_Task");
+        (Id => Obj'Identity, Expected => Obj_Id, Task_Name => "Abort_Task");
       Check_Value
-        (Value     => Ada.Task_Identification.Is_Callable (Obj'Identity),
-         Expected  => True,
-         Attribute => "Is_Callable");
+        (Value    => Ada.Task_Identification.Is_Callable (Obj'Identity),
+         Expected => True, Attribute => "Is_Callable");
       Check_Value
-        (Value     => Ada.Task_Identification.Is_Terminated (Obj'Identity),
-         Expected  => False,
-         Attribute => "Is_Terminated");
+        (Value    => Ada.Task_Identification.Is_Terminated (Obj'Identity),
+         Expected => False, Attribute => "Is_Terminated");
 
       Comment ("  Abort task");
       abort Obj;
 
       delay Impdef.Minimum_Task_Switch;
       Check_Value
-        (Value     => Ada.Task_Identification.Is_Callable (Obj'Identity),
-         Expected  => False,
-         Attribute => "Is_Callable");
+        (Value    => Ada.Task_Identification.Is_Callable (Obj'Identity),
+         Expected => False, Attribute => "Is_Callable");
       Check_Value
-        (Value     => Ada.Task_Identification.Is_Terminated (Obj'Identity),
-         Expected  => True,
-         Attribute => "Is_Terminated");
+        (Value    => Ada.Task_Identification.Is_Terminated (Obj'Identity),
+         Expected => True, Attribute => "Is_Terminated");
    end Check_Attributes_And_Abort;
 
    --  Local variables

@@ -88,8 +88,7 @@ begin
       "WHEN SLICING FUNCTION RESULTS, TYPE OF " &
       "RESULT IS USED FOR OVERLOADING RESOLUTION");
 
-   if F (1 .. 3) /=
-     F (Ident_Int (2) .. Ident_Int (4))
+   if F (1 .. 3) /= F (Ident_Int (2) .. Ident_Int (4))
    then -- NUMBER OF DIMENSIONS.
       Failed ("WRONG VALUE - 1");
    end if;

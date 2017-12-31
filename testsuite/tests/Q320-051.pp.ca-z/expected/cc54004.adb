@@ -33,8 +33,7 @@ begin
    -- Verify results:
 
    if Tc_Low_Ptr.all not in Cc54004_1.Low_Alert
-     or else Tc_Med_Ptr.all not in Cc54004_1.Medium_Alert
-   then
+     or else Tc_Med_Ptr.all not in Cc54004_1.Medium_Alert then
       Report.Failed ("Class-wide objects do not have expected tags");
 
    -- The explicit dereference of the "Pop"ed pointers results in views of
@@ -43,8 +42,7 @@ begin
    -- converted to a specific type possessing that component.
 
    elsif Cc54004_1.Low_Alert (Tc_Low_Ptr.all).Tc_Code /= Cc54004_0.Low or
-     Cc54004_1.Medium_Alert (Tc_Med_Ptr.all).Tc_Code /= Cc54004_0.Medium
-   then
+     Cc54004_1.Medium_Alert (Tc_Med_Ptr.all).Tc_Code /= Cc54004_0.Medium then
       Report.Failed ("Calls did not dispatch to expected operations");
    end if;
 

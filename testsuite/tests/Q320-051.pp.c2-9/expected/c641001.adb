@@ -34,9 +34,8 @@ procedure C641001 is
          Report.Failed ("Exception in Check_Out_Sliding");
    end Check_Out_Sliding;
 
-   procedure Check_Dynamic_Subtype_Cases
-     (F_Lower, F_Upper : Natural;
-      A_Lower, A_Upper : Natural)
+   procedure Check_Dynamic_Subtype_Cases (F_Lower, F_Upper : Natural;
+      A_Lower, A_Upper                                     : Natural)
    is
 
       subtype Dyn_String is String (F_Lower .. F_Upper);
@@ -121,8 +120,7 @@ begin  -- Main test procedure.
    -- check for constrained actual, unconstrained formal
    C641001_0.Check_Out_Tagged_Data (Tag_Slices (5));
    Tctouch.Assert
-     (Tag_Slices (5).Data_Item = "!****",
-      "formal out returned bad result");
+     (Tag_Slices (5).Data_Item = "!****", "formal out returned bad result");
 
    -- additional checks for out mode formal parameters, dynamic subtypes
 
@@ -131,21 +129,15 @@ begin  -- Main test procedure.
    Check_Out_Sliding (21, 25, 6, 10);
 
    Check_Dynamic_Subtype_Cases
-     (F_Lower => Ii (1),
-      F_Upper => Ii (10),
-      A_Lower => Ii (1),
+     (F_Lower => Ii (1), F_Upper => Ii (10), A_Lower => Ii (1),
       A_Upper => Ii (10));
 
    Check_Dynamic_Subtype_Cases
-     (F_Lower => Ii (21),
-      F_Upper => Ii (30),
-      A_Lower => Ii (1),
+     (F_Lower => Ii (21), F_Upper => Ii (30), A_Lower => Ii (1),
       A_Upper => Ii (10));
 
    Check_Dynamic_Subtype_Cases
-     (F_Lower => Ii (1),
-      F_Upper => Ii (10),
-      A_Lower => Ii (21),
+     (F_Lower => Ii (1), F_Upper => Ii (10), A_Lower => Ii (21),
       A_Upper => Ii (30));
 
    Report.Result;

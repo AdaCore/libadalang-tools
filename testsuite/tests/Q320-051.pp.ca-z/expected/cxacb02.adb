@@ -79,9 +79,7 @@ begin
       -- Not_Applicable result.
 
       Ada.Streams.Stream_Io.Create
-        (Util_File,
-         Ada.Streams.Stream_Io.Out_File,
-         Utility_Filename);
+        (Util_File, Ada.Streams.Stream_Io.Out_File, Utility_Filename);
 
       Operational_Test_Block :
       declare
@@ -141,19 +139,13 @@ begin
          Customer1 : Service_Type (Residence) :=
            (Residence, "1221 Morningstar Lane", 44, False);
          Customer2 : Service_Type (Apartment) :=
-           (Customer          => Apartment,
-            Account_Id        => 67,
-            Name              => "15 South Front St. #8",
-            Low_Income_Credit => True);
+           (Customer => Apartment, Account_Id => 67,
+            Name     => "15 South Front St. #8", Low_Income_Credit => True);
          Customer3 : Service_Type (Commercial) :=
-           (Commercial,
-            "12442 Central Avenue ",
-            100,
-            Baseline_Allowance => 938,
-            Quantity_Discount  => True);
+           (Commercial, "12442 Central Avenue ", 100,
+            Baseline_Allowance => 938, Quantity_Discount => True);
 
-         C1_Service_History : Service_History_Type
-           (Quarterly_Period_Type,
+         C1_Service_History : Service_History_Type (Quarterly_Period_Type,
             Month_In_Quarter_Type) :=
            (Spring => (1 => 35, 2 => 39, 3 => 32),
             Summer => (1 => 34, 2 => 33, 3 => 39),
@@ -165,8 +157,7 @@ begin
             Month_In_Quarter_Type) :=
            (Spring => (23, 22, 0), Summer => (0, 0, 0));
 
-         C3_Service_History : Service_History_Type
-           (Quarterly_Period_Type,
+         C3_Service_History : Service_History_Type (Quarterly_Period_Type,
             Month_In_Quarter_Type) :=
            (others => (others => 200));
 
@@ -244,11 +235,9 @@ begin
 
             declare
                Service_History_Array : Service_History_Type
-                 (Quarterly_Period_Type range
-                    Quarter_Bound_Low ..
+                 (Quarterly_Period_Type range Quarter_Bound_Low ..
                       Quarter_Bound_High,
-                  Month_In_Quarter_Type range
-                    Month_Bound_Low ..
+                  Month_In_Quarter_Type range Month_Bound_Low ..
                       Month_Bound_High);
             begin
                Service_History_Type'Read (Stream, Service_History_Array);
@@ -299,8 +288,7 @@ begin
             Tc_Apartment  : Service_Type (Apartment);
             Tc_Commercial : Service_Type (Commercial);
 
-            Tc_History1 : Service_History_Type
-              (Quarterly_Period_Type,
+            Tc_History1 : Service_History_Type (Quarterly_Period_Type,
                Month_In_Quarter_Type) :=
               (others => (others => Electric_Usage_Type'First));
 
@@ -309,8 +297,7 @@ begin
                Month_In_Quarter_Type) :=
               (others => (others => Electric_Usage_Type'First));
 
-            Tc_History3 : Service_History_Type
-              (Quarterly_Period_Type,
+            Tc_History3 : Service_History_Type (Quarterly_Period_Type,
                Month_In_Quarter_Type) :=
               (others => (others => Electric_Usage_Type'First));
 
@@ -319,8 +306,7 @@ begin
             -- Reset Stream file to mode In_File.
 
             Ada.Streams.Stream_Io.Reset
-              (Util_File,
-               Ada.Streams.Stream_Io.In_File);
+              (Util_File, Ada.Streams.Stream_Io.In_File);
 
             -- Read data from the stream.
 
@@ -341,8 +327,7 @@ begin
               (Tc_History1'Last (1) /= C1_Service_History'Last (1)) or
               (Tc_History1'First (1) /= C1_Service_History'First (1)) or
               (Tc_History1'Last (2) /= C1_Service_History'Last (2)) or
-              (Tc_History1'First (2) /= C1_Service_History'First (2))
-            then
+              (Tc_History1'First (2) /= C1_Service_History'First (2)) then
                Report.Failed ("Incorrect data from stream - 1");
             end if;
 
@@ -352,8 +337,7 @@ begin
               (Tc_History2'Last (1) /= C2_Service_History'Last (1)) or
               (Tc_History2'First (1) /= C2_Service_History'First (1)) or
               (Tc_History2'Last (2) /= C2_Service_History'Last (2)) or
-              (Tc_History2'First (2) /= C2_Service_History'First (2))
-            then
+              (Tc_History2'First (2) /= C2_Service_History'First (2)) then
                Report.Failed ("Incorrect data from stream - 2");
             end if;
 
@@ -363,8 +347,7 @@ begin
               (Tc_History3'Last (1) /= C3_Service_History'Last (1)) or
               (Tc_History3'First (1) /= C3_Service_History'First (1)) or
               (Tc_History3'Last (2) /= C3_Service_History'Last (2)) or
-              (Tc_History3'First (2) /= C3_Service_History'First (2))
-            then
+              (Tc_History3'First (2) /= C3_Service_History'First (2)) then
                Report.Failed ("Incorrect data from stream - 3");
             end if;
 
@@ -389,9 +372,7 @@ begin
          Ada.Streams.Stream_Io.Delete (Util_File);
       else
          Ada.Streams.Stream_Io.Open
-           (Util_File,
-            Ada.Streams.Stream_Io.Out_File,
-            Utility_Filename);
+           (Util_File, Ada.Streams.Stream_Io.Out_File, Utility_Filename);
          Ada.Streams.Stream_Io.Delete (Util_File);
       end if;
 

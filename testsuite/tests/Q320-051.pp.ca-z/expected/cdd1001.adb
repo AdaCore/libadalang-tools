@@ -69,8 +69,7 @@ procedure Cdd1001 is
    B : array (A'Range) of Acc;
 begin
    Test
-     ("CDD1001",
-      "Check that components of Stream_Element_Array are aliased");
+     ("CDD1001", "Check that components of Stream_Element_Array are aliased");
 
    for I in A'Range loop
       A (I) := Stream_Element (Ident_Int (Integer (I)) * Ident_Int (3));
@@ -81,8 +80,7 @@ begin
    end loop;
 
    for I in B'Range loop
-      if B (I).all /=
-        Stream_Element (Ident_Int (Integer (I)) * Ident_Int (3))
+      if B (I).all /= Stream_Element (Ident_Int (Integer (I)) * Ident_Int (3))
       then
          Failed
            ("Unable to build access values desginating elements " &

@@ -87,8 +87,7 @@ begin
       "Check that Constraint_Error is raised when a " &
       "null access value is converted to a null " &
       "excluding subtype of a named access type. " &
-      "Case C: null_exclusion given in a general " &
-      "access type definition");
+      "Case C: null_exclusion given in a general " & "access type definition");
 
    --  Object declaration tests --------------------------------------------
 

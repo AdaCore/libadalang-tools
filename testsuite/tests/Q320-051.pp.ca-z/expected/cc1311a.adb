@@ -322,9 +322,8 @@ procedure Cc1311a is
 
    generic
       type T is (<>);
-      with procedure P
-        (Results : out T;
-         X       :     T := T'Val (Report.Ident_Int (0)));
+      with procedure P (Results : out T;
+         X                      :     T := T'Val (Report.Ident_Int (0)));
    package Pkg2 is
    end Pkg2;
 
@@ -393,58 +392,34 @@ procedure Cc1311a is
    end Td_Proc;
 
    procedure New_Proc_With_3d_Func is new Proc_With_3d_Func
-     (First_Index    => Really_Short,
-      Second_Index   => First_Half,
-      Third_Index    => First_Five,
-      Component_Type => Date,
-      Default_Value  => Today,
-      Cube           => Three_Dimensional,
-      Fun            => Td_Func);
+     (First_Index   => Really_Short, Second_Index => First_Half,
+      Third_Index   => First_Five, Component_Type => Date,
+      Default_Value => Today, Cube => Three_Dimensional, Fun => Td_Func);
 
    package New_Pkg_With_3d_Func is new Pkg_With_3d_Func
-     (First_Index    => Really_Short,
-      Second_Index   => First_Half,
-      Third_Index    => First_Five,
-      Component_Type => Date,
-      Default_Value  => Today,
-      Cube           => Three_Dimensional,
-      Fun            => Td_Func);
+     (First_Index   => Really_Short, Second_Index => First_Half,
+      Third_Index   => First_Five, Component_Type => Date,
+      Default_Value => Today, Cube => Three_Dimensional, Fun => Td_Func);
 
    function New_Func_With_3d_Func is new Func_With_3d_Func
-     (First_Index    => Really_Short,
-      Second_Index   => First_Half,
-      Third_Index    => First_Five,
-      Component_Type => Date,
-      Default_Value  => Today,
-      Cube           => Three_Dimensional,
-      Fun            => Td_Func);
+     (First_Index   => Really_Short, Second_Index => First_Half,
+      Third_Index   => First_Five, Component_Type => Date,
+      Default_Value => Today, Cube => Three_Dimensional, Fun => Td_Func);
 
    procedure New_Proc_With_3d_Proc is new Proc_With_3d_Proc
-     (First_Index    => Really_Short,
-      Second_Index   => First_Half,
-      Third_Index    => First_Five,
-      Component_Type => Date,
-      Default_Value  => Today,
-      Cube           => Three_Dimensional,
-      Proc           => Td_Proc);
+     (First_Index   => Really_Short, Second_Index => First_Half,
+      Third_Index   => First_Five, Component_Type => Date,
+      Default_Value => Today, Cube => Three_Dimensional, Proc => Td_Proc);
 
    package New_Pkg_With_3d_Proc is new Pkg_With_3d_Proc
-     (First_Index    => Really_Short,
-      Second_Index   => First_Half,
-      Third_Index    => First_Five,
-      Component_Type => Date,
-      Default_Value  => Today,
-      Cube           => Three_Dimensional,
-      Proc           => Td_Proc);
+     (First_Index   => Really_Short, Second_Index => First_Half,
+      Third_Index   => First_Five, Component_Type => Date,
+      Default_Value => Today, Cube => Three_Dimensional, Proc => Td_Proc);
 
    function New_Func_With_3d_Proc is new Func_With_3d_Proc
-     (First_Index    => Really_Short,
-      Second_Index   => First_Half,
-      Third_Index    => First_Five,
-      Component_Type => Date,
-      Default_Value  => Today,
-      Cube           => Three_Dimensional,
-      Proc           => Td_Proc);
+     (First_Index   => Really_Short, Second_Index => First_Half,
+      Third_Index   => First_Five, Component_Type => Date,
+      Default_Value => Today, Cube => Three_Dimensional, Proc => Td_Proc);
 
    function Nfunc1 is new Func1 (Numbers, F1);
    package Npkg1 is new Pkg1 (Numbers, F1);

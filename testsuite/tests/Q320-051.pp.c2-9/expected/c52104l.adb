@@ -81,8 +81,7 @@ begin
          -- CHECKING THE VALUES AFTER THE ASSIGNMENT:
 
          if Arrx31 /= "QUINC" or
-           Arrx31 (Ident_Int (2) .. Ident_Int (6)) /= "QUINC"
-         then
+           Arrx31 (Ident_Int (2) .. Ident_Int (6)) /= "QUINC" then
             Failed ("LHS ARRAY ALTERED  (13)");
          end if;
 
@@ -123,8 +122,7 @@ begin
          -- CHECKING THE VALUES AFTER THE ASSIGNMENT:
 
          if Arrx42 /= "QUINC" or
-           Arrx42 (Ident_Int (5) .. Ident_Int (9)) /= "QUINC"
-         then
+           Arrx42 (Ident_Int (5) .. Ident_Int (9)) /= "QUINC" then
             Failed ("LHS ARRAY ALTERED  (14)");
          end if;
 

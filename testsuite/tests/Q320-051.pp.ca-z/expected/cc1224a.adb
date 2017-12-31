@@ -100,9 +100,8 @@ procedure Cc1224a is
    type Arre is array (Subint) of Date;
    A6 : Arre := (A1'Range => Today);
 
-   function "="
-     (Left  : in System.Address;
-      Right : in System.Address) return Boolean renames
+   function "=" (Left : in System.Address;
+      Right           : in System.Address) return Boolean renames
      System."=";
 
    generic
@@ -141,26 +140,14 @@ procedure Cc1224a is
       type Unconstrained_Array is
         array (First_Index range <>, Second_Index range <>) of Date;
 
-   procedure Test_Procedure
-     (First   : in Unconstrained_Array;
-      Ffifs   : in First_Index;
-      Ffils   : in First_Index;
-      Fsifs   : in Second_Index;
-      Fsils   : in Second_Index;
-      Fflen   : in Natural;
-      Fslen   : in Natural;
-      Ffirt   : in First_Index;
-      Fsirt   : in Second_Index;
-      Second  : in Unconstrained_Array;
-      Sfifs   : in First_Index;
-      Sfils   : in First_Index;
-      Ssifs   : in Second_Index;
-      Ssils   : in Second_Index;
-      Sflen   : in Natural;
-      Sslen   : in Natural;
-      Sfirt   : in First_Index;
-      Ssirt   : in Second_Index;
-      Remarks : in String);
+   procedure Test_Procedure (First : in Unconstrained_Array;
+      Ffifs : in First_Index; Ffils : in First_Index; Fsifs : in Second_Index;
+      Fsils : in Second_Index; Fflen : in Natural; Fslen : in Natural;
+      Ffirt                        : in First_Index; Fsirt : in Second_Index;
+      Second : in Unconstrained_Array; Sfifs : in First_Index;
+      Sfils : in First_Index; Ssifs : in Second_Index; Ssils : in Second_Index;
+      Sflen : in Natural; Sslen : in Natural; Sfirt : in First_Index;
+      Ssirt                        : in Second_Index; Remarks : in String);
    generic
 
       type First_Index is (<>);
@@ -169,14 +156,10 @@ procedure Cc1224a is
       type Constrained_Array is
         array (First_Index, Second_Index) of Component_Type;
 
-   procedure Ctest_Procedure
-     (First   : in Constrained_Array;
-      Ffirt   : in First_Index;
-      Fsirt   : in Second_Index;
-      Second  : in Constrained_Array;
-      Sfirt   : in First_Index;
-      Ssirt   : in Second_Index;
-      Remarks : in String);
+   procedure Ctest_Procedure (First : in Constrained_Array;
+      Ffirt                         : in First_Index; Fsirt : in Second_Index;
+      Second : in Constrained_Array; Sfirt : in First_Index;
+      Ssirt                         : in Second_Index; Remarks : in String);
 
    procedure P is
 
@@ -359,80 +342,48 @@ procedure Cc1224a is
 
    end P;
 
-   procedure Test_Procedure
-     (First   : in Unconstrained_Array;
-      Ffifs   : in First_Index;
-      Ffils   : in First_Index;
-      Fsifs   : in Second_Index;
-      Fsils   : in Second_Index;
-      Fflen   : in Natural;
-      Fslen   : in Natural;
-      Ffirt   : in First_Index;
-      Fsirt   : in Second_Index;
-      Second  : in Unconstrained_Array;
-      Sfifs   : in First_Index;
-      Sfils   : in First_Index;
-      Ssifs   : in Second_Index;
-      Ssils   : in Second_Index;
-      Sflen   : in Natural;
-      Sslen   : in Natural;
-      Sfirt   : in First_Index;
-      Ssirt   : in Second_Index;
-      Remarks : in String)
+   procedure Test_Procedure (First : in Unconstrained_Array;
+      Ffifs : in First_Index; Ffils : in First_Index; Fsifs : in Second_Index;
+      Fsils : in Second_Index; Fflen : in Natural; Fslen : in Natural;
+      Ffirt                        : in First_Index; Fsirt : in Second_Index;
+      Second : in Unconstrained_Array; Sfifs : in First_Index;
+      Sfils : in First_Index; Ssifs : in Second_Index; Ssils : in Second_Index;
+      Sflen : in Natural; Sslen : in Natural; Sfirt : in First_Index;
+      Ssirt                        : in Second_Index; Remarks : in String)
    is
 
    begin -- TEST_PROCEDURE
 
-      if (First'First /= Ffifs) or
-        (First'First (1) /= Ffifs) or
-        (First'First (2) /= Fsifs) or
-        (Second'First /= Sfifs) or
-        (Second'First (1) /= Sfifs) or
-        (Second'First (2) /= Ssifs)
-      then
+      if (First'First /= Ffifs) or (First'First (1) /= Ffifs) or
+        (First'First (2) /= Fsifs) or (Second'First /= Sfifs) or
+        (Second'First (1) /= Sfifs) or (Second'First (2) /= Ssifs) then
          Report.Failed ("PROBLEMS WITH 'FIRST. " & Remarks);
       end if;
 
-      if (First'Last /= Ffils) or
-        (First'Last (1) /= Ffils) or
-        (First'Last (2) /= Fsils) or
-        (Second'Last /= Sfils) or
-        (Second'Last (1) /= Sfils) or
-        (Second'Last (2) /= Ssils)
-      then
+      if (First'Last /= Ffils) or (First'Last (1) /= Ffils) or
+        (First'Last (2) /= Fsils) or (Second'Last /= Sfils) or
+        (Second'Last (1) /= Sfils) or (Second'Last (2) /= Ssils) then
          Report.Failed ("PROBLEMS WITH 'LAST. " & Remarks);
       end if;
 
-      if (First'Length /= Fflen) or
-        (First'Length (1) /= Fflen) or
-        (First'Length (2) /= Fslen) or
-        (Second'Length /= Sflen) or
-        (Second'Length (1) /= Sflen) or
-        (Second'Length (2) /= Sslen)
-      then
+      if (First'Length /= Fflen) or (First'Length (1) /= Fflen) or
+        (First'Length (2) /= Fslen) or (Second'Length /= Sflen) or
+        (Second'Length (1) /= Sflen) or (Second'Length (2) /= Sslen) then
          Report.Failed ("PROBLEMS WITH 'LENGTH. " & Remarks);
       end if;
 
-      if (Ffirt not in First'Range (1)) or
-        (Ffirt not in First'Range) or
-        (Sfirt not in Second'Range (1)) or
-        (Sfirt not in Second'Range) or
-        (Fsirt not in First'Range (2)) or
-        (Ssirt not in Second'Range (2))
-      then
+      if (Ffirt not in First'Range (1)) or (Ffirt not in First'Range) or
+        (Sfirt not in Second'Range (1)) or (Sfirt not in Second'Range) or
+        (Fsirt not in First'Range (2)) or (Ssirt not in Second'Range (2)) then
          Report.Failed ("INCORRECT HANDLING OF 'RANGE ATTRIBUE. " & Remarks);
       end if;
 
    end Test_Procedure;
 
-   procedure Ctest_Procedure
-     (First   : in Constrained_Array;
-      Ffirt   : in First_Index;
-      Fsirt   : in Second_Index;
-      Second  : in Constrained_Array;
-      Sfirt   : in First_Index;
-      Ssirt   : in Second_Index;
-      Remarks : in String)
+   procedure Ctest_Procedure (First : in Constrained_Array;
+      Ffirt                         : in First_Index; Fsirt : in Second_Index;
+      Second : in Constrained_Array; Sfirt : in First_Index;
+      Ssirt                         : in Second_Index; Remarks : in String)
    is
 
    begin -- CTEST_PROCEDURE
@@ -442,8 +393,7 @@ procedure Cc1224a is
         (First'First (2) /= Second_Index'First) or
         (Second'First /= First_Index'First) or
         (Second'First (1) /= First_Index'First) or
-        (Second'First (2) /= Second_Index'First)
-      then
+        (Second'First (2) /= Second_Index'First) then
          Report.Failed ("PROBLEMS WITH 'FIRST. " & Remarks);
       end if;
 
@@ -452,47 +402,36 @@ procedure Cc1224a is
         (First'Last (2) /= Second_Index'Last) or
         (Second'Last /= First_Index'Last) or
         (Second'Last (1) /= First_Index'Last) or
-        (Second'Last (2) /= Second_Index'Last)
-      then
+        (Second'Last (2) /= Second_Index'Last) then
          Report.Failed ("PROBLEMS WITH 'LAST. " & Remarks);
       end if;
 
       if
         (First'Length /=
          First_Index'Pos (First_Index'Last) -
-           First_Index'Pos (First_Index'First) +
-           1) or
+           First_Index'Pos (First_Index'First) + 1) or
         (First'Length (1) /=
          First_Index'Pos (First_Index'Last) -
-           First_Index'Pos (First_Index'First) +
-           1) or
+           First_Index'Pos (First_Index'First) + 1) or
         (First'Length (2) /=
          Second_Index'Pos (Second_Index'Last) -
-           Second_Index'Pos (Second_Index'First) +
-           1) or
+           Second_Index'Pos (Second_Index'First) + 1) or
         (Second'Length /=
          First_Index'Pos (First_Index'Last) -
-           First_Index'Pos (First_Index'First) +
-           1) or
+           First_Index'Pos (First_Index'First) + 1) or
         (Second'Length (1) /=
          First_Index'Pos (First_Index'Last) -
-           First_Index'Pos (First_Index'First) +
-           1) or
+           First_Index'Pos (First_Index'First) + 1) or
         (Second'Length (2) /=
          Second_Index'Pos (Second_Index'Last) -
-           Second_Index'Pos (Second_Index'First) +
-           1)
+           Second_Index'Pos (Second_Index'First) + 1)
       then
          Report.Failed ("PROBLEMS WITH 'LENGTH. " & Remarks);
       end if;
 
-      if (Ffirt not in First'Range (1)) or
-        (Ffirt not in First'Range) or
-        (Sfirt not in Second'Range (1)) or
-        (Sfirt not in Second'Range) or
-        (Fsirt not in First'Range (2)) or
-        (Ssirt not in Second'Range (2))
-      then
+      if (Ffirt not in First'Range (1)) or (Ffirt not in First'Range) or
+        (Sfirt not in Second'Range (1)) or (Sfirt not in Second'Range) or
+        (Fsirt not in First'Range (2)) or (Ssirt not in Second'Range (2)) then
          Report.Failed ("INCORRECT HANDLING OF 'RANGE ATTRIBUE. " & Remarks);
       end if;
 
@@ -507,34 +446,15 @@ procedure Cc1224a is
    end Ctest_Procedure;
 
    procedure First_Test_Procedure is new Test_Procedure
-     (First_Index         => Short_Range,
-      Second_Index        => Medium_Range,
+     (First_Index         => Short_Range, Second_Index => Medium_Range,
       Unconstrained_Array => First_Template);
 
    procedure New_Ctest_Procedure is new Ctest_Procedure
-     (First_Index       => Short_Range,
-      Second_Index      => Medium_Range,
-      Component_Type    => Date,
-      Constrained_Array => Second_Template);
+     (First_Index    => Short_Range, Second_Index => Medium_Range,
+      Component_Type => Date, Constrained_Array => Second_Template);
 
-   procedure Np is new P
-     (Subint,
-      Date,
-      Today,
-      Arra,
-      A1,
-      Arra,
-      A2,
-      Arrb,
-      A3,
-      Arrc,
-      A4,
-      Arrd,
-      A5,
-      Arre,
-      A6,
-      Arre,
-      A6);
+   procedure Np is new P (Subint, Date, Today, Arra, A1, Arra, A2, Arrb, A3,
+      Arrc, A4, Arrd, A5, Arre, A6, Arre, A6);
 
 begin  -- CC1224A
 
@@ -556,34 +476,14 @@ begin  -- CC1224A
    Np;
 
    First_Test_Procedure
-     (First   => First_Array,
-      Ffifs   => -10,
-      Ffils   => 10,
-      Fsifs   => 6,
-      Fsils   => 10,
-      Fflen   => 21,
-      Fslen   => 5,
-      Ffirt   => 0,
-      Fsirt   => 8,
-      Second  => Second_Array,
-      Sfifs   => 0,
-      Sfils   => 7,
-      Ssifs   => 1,
-      Ssils   => 15,
-      Sflen   => 8,
-      Sslen   => 15,
-      Sfirt   => 5,
-      Ssirt   => 13,
-      Remarks => "FIRST_TEST_PROCEDURE");
+     (First => First_Array, Ffifs => -10, Ffils => 10, Fsifs => 6, Fsils => 10,
+      Fflen => 21, Fslen => 5, Ffirt => 0, Fsirt => 8, Second => Second_Array,
+      Sfifs => 0, Sfils => 7, Ssifs => 1, Ssils => 15, Sflen => 8, Sslen => 15,
+      Sfirt => 5, Ssirt => 13, Remarks => "FIRST_TEST_PROCEDURE");
 
    New_Ctest_Procedure
-     (First   => Third_Array,
-      Ffirt   => -5,
-      Fsirt   => 11,
-      Second  => Fourth_Array,
-      Sfirt   => 0,
-      Ssirt   => 14,
-      Remarks => "NEW_CTEST_PROCEDURE");
+     (First => Third_Array, Ffirt => -5, Fsirt => 11, Second => Fourth_Array,
+      Sfirt => 0, Ssirt => 14, Remarks => "NEW_CTEST_PROCEDURE");
 
    Report.Result;
 

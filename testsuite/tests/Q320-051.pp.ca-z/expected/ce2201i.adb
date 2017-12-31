@@ -42,8 +42,7 @@ begin
 
    Test
      ("CE2201I",
-      "CHECK THAT READ, WRITE, AND " &
-      "END_OF_FILE ARE SUPPORTED FOR " &
+      "CHECK THAT READ, WRITE, AND " & "END_OF_FILE ARE SUPPORTED FOR " &
       "SEQUENTIAL FILES - BOOLEAN TYPE");
 
    declare

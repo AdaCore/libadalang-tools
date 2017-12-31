@@ -55,8 +55,7 @@ begin
       "ALLOWS A STRING TO SPAN OVER MORE THAN ONE " &
       "LINE, SKIPPING INTERVENING LINE AND PAGE " &
       "TERMINATORS.  ALSO CHECK THAT GET ACCEPTS " &
-      "A NULL STRING ACTUAL PARAMETER AND A STRING " &
-      "SLICE");
+      "A NULL STRING ACTUAL PARAMETER AND A STRING " & "SLICE");
 
    declare
       File1                : File_Type;
@@ -137,8 +136,7 @@ begin
             Failed ("GET FOR STRING INCORRECT");
          end if;
 
-         if Str (1 .. 40) /=
-           "THIS LINE SHALL SPAN OVER SEVERAL " & "LINES."
+         if Str (1 .. 40) /= "THIS LINE SHALL SPAN OVER SEVERAL " & "LINES."
          then
             Failed ("INCORRECT VALUE READ");
          end if;

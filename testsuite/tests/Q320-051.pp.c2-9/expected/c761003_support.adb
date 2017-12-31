@@ -25,26 +25,19 @@ package body C761003_Support is
       return T;
    end Invert;
 
-   procedure Validate
-     (Initcount   : Natural;
-      Testnumber  : Natural;
-      Check_Order : Boolean := True)
+   procedure Validate (Initcount : Natural; Testnumber : Natural;
+      Check_Order                : Boolean := True)
    is
       Number : constant String := Natural'Image (Testnumber);
    begin
       if Inits_Called /= Initcount then
          Report.Failed
-           ("Got" &
-            Natural'Image (Inits_Called) &
-            " inits, expected" &
-            Natural'Image (Initcount) &
-            ", Subtest " &
-            Number);
+           ("Got" & Natural'Image (Inits_Called) & " inits, expected" &
+            Natural'Image (Initcount) & ", Subtest " & Number);
          Tctouch.Flush;
       else
          Tctouch.Validate
-           (Invert (Inits_Order (1 .. Inits_Called)),
-            "Subtest " & Number,
+           (Invert (Inits_Order (1 .. Inits_Called)), "Subtest " & Number,
             Order_Meaningful => Check_Order);
       end if;
       Inits_Called := 0;  -- reset for the next batch

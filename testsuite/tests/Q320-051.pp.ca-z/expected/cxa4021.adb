@@ -100,8 +100,7 @@ begin
      ("CXA4021",
       "Check that the subprograms defined in " &
       "package Ada.Strings.Wide_Unbounded are " &
-      "available, and that they produce correct " &
-      "results");
+      "available, and that they produce correct " & "results");
 
    Test_Block :
    declare
@@ -147,11 +146,10 @@ begin
          -- Insert the word "programming" prior to "language".
          Document (1) :=
            Asw.Insert
-             (Document (1),
-              Asw.Index (Document (1), Equiv ("language")),
+             (Document (1), Asw.Index (Document (1), Equiv ("language")),
               Asw.To_Wide_String
                 (Equiv ("progra") &       -- Wd Str &
-                 Asw."*" (2, Equiv ('m')) & -- Wd Unbd &
+                Asw."*" (2, Equiv ('m')) & -- Wd Unbd &
                  Equiv ("ing ")));        -- Wd Str
 
          -- Overwrite the word "language" with "language" + additional text.
@@ -167,10 +165,8 @@ begin
          -- Replace the word "lifed" with "lived".
          Document (1) :=
            Asw.Replace_Slice
-             (Document (1),
-              Asw.Index (Document (1), Equiv ("lifed")),
-              Asw.Length (Document (1)),
-              Equiv ("lived"));
+             (Document (1), Asw.Index (Document (1), Equiv ("lifed")),
+              Asw.Length (Document (1)), Equiv ("lived"));
 
          -- Overwrite the word "lived" with "lived" + additional text.
          Document (1) :=
@@ -186,18 +182,15 @@ begin
          -- unbounded wide string.
 
          Document (2) :=
-           Equiv ('G') &
-           Asw.To_Unbounded_Wide_String (Equiv ("o ")) &
-           Asw.To_Unbounded_Wide_String (Equiv ("with")) &
-           Equiv (' ') &
+           Equiv ('G') & Asw.To_Unbounded_Wide_String (Equiv ("o ")) &
+           Asw.To_Unbounded_Wide_String (Equiv ("with")) & Equiv (' ') &
            Equiv ("Ada!");
 
       end Enter_Text_Into_Document;
 
       -----
 
-      procedure Create_Camera_Ready_Copy
-        (Document    : in     Document_Type;
+      procedure Create_Camera_Ready_Copy (Document : in     Document_Type;
          Camera_Copy :    out Camera_Ready_Copy_Type)
       is
       begin
@@ -216,16 +209,14 @@ begin
                 (Asw.To_Unbounded_Wide_String
                    (Asw.Slice (Document (1), 1, Line_Length)),
                  Ada.Strings.Wide_Maps.To_Set (Equiv (' ')),
-                 Ada.Strings.Inside,
-                 Ada.Strings.Backward)) &
+                 Ada.Strings.Inside, Ada.Strings.Backward)) &
            Equiv (' ');
 
          Camera_Copy
            (2) :=                 -- Take characters 40-79.
            Asw.Slice
              (Document
-                (1),
-              40,
+                (1), 40,
               (Asw.Index_Non_Blank              -- Should return 79
                  (Asw.To_Unbounded_Wide_String
                     (Asw.Slice
@@ -290,15 +281,12 @@ begin
       -- Reformat the unbounded wide strings into fixed wide string format.
 
       Create_Camera_Ready_Copy
-        (Document    => Pamphlet,
-         Camera_Copy => Camera_Ready_Copy);
+        (Document => Pamphlet, Camera_Copy => Camera_Ready_Copy);
 
       -- Verify the conversion process.
 
       if not Valid_Proofread
-          (Draft  => Camera_Ready_Copy,
-           Master => Tc_Finished_Product)
-      then
+          (Draft => Camera_Ready_Copy, Master => Tc_Finished_Product) then
          Report.Failed ("Incorrect unbounded wide string processing result");
       end if;
 

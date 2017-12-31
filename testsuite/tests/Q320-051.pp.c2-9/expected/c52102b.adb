@@ -104,9 +104,7 @@ begin
    begin
       A := (1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
       A :=
-        0 &
-        A (Ident_Int_1 .. Ident_Int_2) &
-        A (Ident_Int_1 .. Ident_Int_2) &
+        0 & A (Ident_Int_1 .. Ident_Int_2) & A (Ident_Int_1 .. Ident_Int_2) &
         A (Ident_Int_1 .. Ident_Int_5);
       if A /= (0, 1, 2, 1, 2, 1, 2, 3, 4, 5) then
          Failed ("WRONG VALUES  -  I5");
@@ -114,11 +112,8 @@ begin
 
       A := (1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
       A :=
-        A (Ident_Int_6 .. Ident_Int_9) &
-        A (Ident_Int_8 .. Ident_Int_9) &
-        A (Ident_Int_8 .. Ident_Int_9) &
-        0 &
-        0;
+        A (Ident_Int_6 .. Ident_Int_9) & A (Ident_Int_8 .. Ident_Int_9) &
+        A (Ident_Int_8 .. Ident_Int_9) & 0 & 0;
       if A /= (6, 7, 8, 9, 8, 9, 8, 9, 0, 0) then
          Failed ("WRONG VALUES  -  I6");
       end if;
@@ -158,8 +153,7 @@ begin
 
       A := (False, False, False, False, True, True, True, True, True);
       A (Ident_Int_0 .. 4) := A (-4 .. Ident_Int_0);
-      if A /=
-        (False, False, False, False, False, False, False, False, True)
+      if A /= (False, False, False, False, False, False, False, False, True)
       then
          Failed ("WRONG VALUES  -  B4");
       end if;
@@ -173,25 +167,18 @@ begin
    begin
       A := (True, False, True, False, True, False, True, False, True, False);
       A :=
-        False &
-        A (Ident_Int_1 .. Ident_Int_2) &
-        A (Ident_Int_1 .. Ident_Int_2) &
-        A (Ident_Int_1 .. Ident_Int_5);
-      if A /=
-        (False, True, False, True, False, True, False, True, False, True)
+        False & A (Ident_Int_1 .. Ident_Int_2) &
+        A (Ident_Int_1 .. Ident_Int_2) & A (Ident_Int_1 .. Ident_Int_5);
+      if A /= (False, True, False, True, False, True, False, True, False, True)
       then
          Failed ("WRONG VALUES  -  B5");
       end if;
 
       A := (True, False, True, False, True, False, True, False, True, False);
       A :=
-        A (Ident_Int_6 .. Ident_Int_9) &
-        A (Ident_Int_8 .. Ident_Int_9) &
-        A (Ident_Int_8 .. Ident_Int_9) &
-        False &
-        True;
-      if A /=
-        (False, True, False, True, False, True, False, True, False, True)
+        A (Ident_Int_6 .. Ident_Int_9) & A (Ident_Int_8 .. Ident_Int_9) &
+        A (Ident_Int_8 .. Ident_Int_9) & False & True;
+      if A /= (False, True, False, True, False, True, False, True, False, True)
       then
          Failed ("WRONG VALUES  -  B6");
       end if;
@@ -246,9 +233,7 @@ begin
    begin
       A := "CAMBRIDGE";
       A :=
-        'S' &
-        A (Ident_Int_1 .. Ident_Int_2) &
-        A (Ident_Int_1 .. Ident_Int_2) &
+        'S' & A (Ident_Int_1 .. Ident_Int_2) & A (Ident_Int_1 .. Ident_Int_2) &
         A (Ident_Int_1 .. Ident_Int_4);
       if A /= "SCACACAMB" then
          Failed ("WRONG VALUES  -  C5");
@@ -256,10 +241,8 @@ begin
 
       A := "CAMBRIDGE";
       A :=
-        A (Ident_Int_8 .. Ident_Int_8) &
-        A (Ident_Int_6 .. Ident_Int_8) &
-        A (Ident_Int_6 .. Ident_Int_8) &
-        "EA";
+        A (Ident_Int_8 .. Ident_Int_8) & A (Ident_Int_6 .. Ident_Int_8) &
+        A (Ident_Int_6 .. Ident_Int_8) & "EA";
       if A /= "GIDGIDGEA" then
          Failed ("WRONG VALUES  -  C6");
       end if;

@@ -55,14 +55,9 @@ procedure C87b07e is
 begin
    Test ("C87B07E", "OVERLOADED OPERANDS TO THE IMAGE ATTRIBUTE");
 
-   if Integer'Image (+12) &
-     Integer'Image (-12) &
-     New_Int'Image (+12) &
-     New_Int'Image (-12) &
-     Number'Image (+12) &
-     Number'Image (-12) /=
-     " 12-12-12-12 12 12"
-   then
+   if Integer'Image (+12) & Integer'Image (-12) & New_Int'Image (+12) &
+     New_Int'Image (-12) & Number'Image (+12) & Number'Image (-12) /=
+     " 12-12-12-12 12 12" then
       Failed ("RESOLUTION INCORRECT FOR THE 'IMAGE' ATTRIBUTE");
    end if;
 

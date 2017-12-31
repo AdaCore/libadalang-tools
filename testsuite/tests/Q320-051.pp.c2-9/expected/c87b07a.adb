@@ -45,20 +45,15 @@ procedure C87b07a is
 begin
    Test ("C87B07A", "OVERLOADED OPERANDS TO THE 'POS' ATTRIBUTE");
 
-   if Natural'Pos (1 + 1) /= 1 or
-     Color'Pos (Brown) /= 0 or
-     Whole'Pos (1 + 1) /= 0 or
-     School'Pos (Brown) /= 1 or
-     Integer'Pos (1 + 1) /= 2 or
-     Sugar'Pos (Brown) /= 2
-   then
+   if Natural'Pos (1 + 1) /= 1 or Color'Pos (Brown) /= 0 or
+     Whole'Pos (1 + 1) /= 0 or School'Pos (Brown) /= 1 or
+     Integer'Pos (1 + 1) /= 2 or Sugar'Pos (Brown) /= 2 then
       Failed ("RESOLUTION INCORRECT FOR OPERAND TO 'POS' ATTRIBUTE");
    end if;
 
    if Natural'Pos (3 + 3) + 1 /= 10 or    -- SECOND "+" IS UNIVERSAL.
-     Whole'Pos (3 + 3) + 1 /= 1 or    -- SECOND "+" IS UNIVERSAL.
-     Integer'Pos (3 + 3) + 1 /= 7
-   then  -- SECOND "+" IS UNIVERSAL.
+   Whole'Pos (3 + 3) + 1 /= 1 or    -- SECOND "+" IS UNIVERSAL.
+     Integer'Pos (3 + 3) + 1 /= 7 then  -- SECOND "+" IS UNIVERSAL.
       Failed
         ("RESOLUTION INCORRECT - 'POS' ATTRIBUTE RETURNS " &
          "A UNIVERSAL_INTEGER VALUE");

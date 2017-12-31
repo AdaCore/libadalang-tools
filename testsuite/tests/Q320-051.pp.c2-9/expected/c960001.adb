@@ -55,9 +55,8 @@ begin
 
    declare  -- To get the Report.Result after all has completed
 
-      function "+"
-        (Left  : Ada.Calendar.Time;
-         Right : Duration) return Ada.Calendar.Time renames
+      function "+" (Left : Ada.Calendar.Time;
+         Right           : Duration) return Ada.Calendar.Time renames
         Ada.Calendar."+";
       function "<" (Left, Right : Ada.Calendar.Time) return Boolean renames
         Ada.Calendar."<";

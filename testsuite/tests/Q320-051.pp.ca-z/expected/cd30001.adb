@@ -9,8 +9,7 @@ begin  -- Main test procedure.
    Report.Test
      ("CD30001",
       "Check that X'Address produces a useful result when X is " &
-      "an aliased object, or an entity whose Address has been " &
-      "specified");
+      "an aliased object, or an entity whose Address has been " & "specified");
 
 --      Check that X'Address produces a useful result when X is an aliased
 --      object.

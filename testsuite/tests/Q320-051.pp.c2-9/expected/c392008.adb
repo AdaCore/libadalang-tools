@@ -59,10 +59,8 @@ begin
    New_Account (C_Acct);
    New_Account (Ic_Acct);
 
-   if (B_Acct.Current_Balance /= 10_00) or
-     (C_Acct.Current_Balance /= 20_00) or
-     (Ic_Acct.Current_Balance /= 30_00)
-   then
+   if (B_Acct.Current_Balance /= 10_00) or (C_Acct.Current_Balance /= 20_00) or
+     (Ic_Acct.Current_Balance /= 30_00) then
       Report.Failed ("Failed dispatch to multiply overridden prim. oper.");
    end if;
 
@@ -71,10 +69,8 @@ begin
    Annual_Interest (Ic_Acct); -- Check the dispatch to primitive operation
    -- overridden from a parent type which inherited the operation from the root
    -- type.
-   if (B_Acct.Current_Balance /= 10_00) or
-     (C_Acct.Current_Balance /= 20_00) or
-     (Ic_Acct.Current_Balance /= 90_00)
-   then
+   if (B_Acct.Current_Balance /= 10_00) or (C_Acct.Current_Balance /= 20_00) or
+     (Ic_Acct.Current_Balance /= 90_00) then
       Report.Failed ("Failed dispatch to overridden primitive operation");
    end if;
 
@@ -84,10 +80,8 @@ begin
    -- primitive operation twice
    -- inherited from the root
    -- tagged type.
-   if (B_Acct.Current_Balance /= 5_00) or
-     (C_Acct.Current_Balance /= 15_00) or
-     (Ic_Acct.Current_Balance /= 85_00)
-   then
+   if (B_Acct.Current_Balance /= 5_00) or (C_Acct.Current_Balance /= 15_00) or
+     (Ic_Acct.Current_Balance /= 85_00) then
       Report.Failed ("Failed dispatch to Apply_Service_Charge");
    end if;
 

@@ -78,79 +78,63 @@ begin
       "A DERIVED TYPE, A DERIVED PRIVATE TYPE, AND " &
       "A DERIVED LIMITED PRIVATE TYPE EVEN IF THE " &
       "SIZE IS INHERITED FROM THE PARENT, AND THAT " &
-      "THE SIZE CLAUSES FOR THE DERIVED TYPES " &
-      "OVERRIDE THE PARENTS'");
+      "THE SIZE CLAUSES FOR THE DERIVED TYPES " & "OVERRIDE THE PARENTS'");
 
    if Parent_Type'Size /= Ident_Int (Integer'Size) then
       Failed
-        ("PARENT_TYPE'SIZE SHOULD BE " &
-         Integer'Image (Integer'Size) &
-         ".  ACTUAL SIZE IS" &
-         Integer'Image (Parent_Type'Size));
+        ("PARENT_TYPE'SIZE SHOULD BE " & Integer'Image (Integer'Size) &
+         ".  ACTUAL SIZE IS" & Integer'Image (Parent_Type'Size));
    end if;
 
    if Derived_Type'Size /= Ident_Int (Specified_Size) then
       Failed
-        ("DERIVED_TYPE'SIZE SHOULD BE " &
-         Integer'Image (Specified_Size) &
-         ".  ACTUAL SIZE IS" &
-         Integer'Image (Derived_Type'Size));
+        ("DERIVED_TYPE'SIZE SHOULD BE " & Integer'Image (Specified_Size) &
+         ".  ACTUAL SIZE IS" & Integer'Image (Derived_Type'Size));
    end if;
 
    if Dt'Size < Ident_Int (Specified_Size) then
       Failed
-        ("DT'SIZE SHOULD NOT BE LESS THAN" &
-         Integer'Image (Specified_Size) &
-         ".  ACTUAL SIZE IS" &
-         Integer'Image (Dt'Size));
+        ("DT'SIZE SHOULD NOT BE LESS THAN" & Integer'Image (Specified_Size) &
+         ".  ACTUAL SIZE IS" & Integer'Image (Dt'Size));
    end if;
 
    if Private_Parent'Size < Ident_Int (Integer'Size) then
       Failed
         ("PRIVATE_PARENT'SIZE SHOULD NOT BE LESS THAN" &
-         Integer'Image (Integer'Size) &
-         ".  ACTUAL SIZE IS" &
+         Integer'Image (Integer'Size) & ".  ACTUAL SIZE IS" &
          Integer'Image (Private_Parent'Size));
    end if;
 
    if Derived_Private_Type'Size /= Ident_Int (Specified_Size) then
       Failed
         ("DERIVED_PRIVATE_TYPE'SIZE SHOULD BE " &
-         Integer'Image (Specified_Size) &
-         ".  ACTUAL SIZE IS" &
+         Integer'Image (Specified_Size) & ".  ACTUAL SIZE IS" &
          Integer'Image (Derived_Private_Type'Size));
    end if;
 
    if Dpt'Size < Ident_Int (Specified_Size) then
       Failed
-        ("DPT'SIZE SHOULD NOT BE LESS THAN" &
-         Integer'Image (Specified_Size) &
-         ".  ACTUAL SIZE IS" &
-         Integer'Image (Dpt'Size));
+        ("DPT'SIZE SHOULD NOT BE LESS THAN" & Integer'Image (Specified_Size) &
+         ".  ACTUAL SIZE IS" & Integer'Image (Dpt'Size));
    end if;
 
    if Lim_Priv_Parent'Size /= Ident_Int (Integer'Size) then
       Failed
-        ("LIM_PRIV_PARENT'SIZE SHOULD BE" &
-         Integer'Image (Integer'Size) &
-         ".  ACTUAL SIZE IS" &
-         Integer'Image (Lim_Priv_Parent'Size));
+        ("LIM_PRIV_PARENT'SIZE SHOULD BE" & Integer'Image (Integer'Size) &
+         ".  ACTUAL SIZE IS" & Integer'Image (Lim_Priv_Parent'Size));
    end if;
 
    if Derived_Lim_Priv_Type'Size /= Ident_Int (Specified_Size) then
       Failed
         ("DERIVED_LIM_PRIV_TYPE'SIZE SHOULD BE " &
-         Integer'Image (Specified_Size) &
-         ".  ACTUAL SIZE IS" &
+         Integer'Image (Specified_Size) & ".  ACTUAL SIZE IS" &
          Integer'Image (Derived_Lim_Priv_Type'Size));
    end if;
 
    if Dlpt'Size < Ident_Int (Specified_Size) then
       Failed
-        ("DLPT'SIZE SHOULD NOT BE LESS THAN" &
-         Integer'Image (Specified_Size) &
-         ".  ACTUAL SIZE IS" &
-         Integer'Image (Dlpt'Size));
+        ("DLPT'SIZE SHOULD NOT BE LESS THAN" & Integer'Image (Specified_Size) &
+         ".  ACTUAL SIZE IS" & Integer'Image (Dlpt'Size));
    end if;
 
    Result;

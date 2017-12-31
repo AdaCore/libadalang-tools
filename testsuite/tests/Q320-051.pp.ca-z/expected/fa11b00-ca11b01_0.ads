@@ -66,8 +66,7 @@
 
    -- Primitive operation of type App2_Widget. To be inherited by its children
    -- derivatives.
-   procedure App2_Widget_Specific_Oper
-     (The_Widget : in out App2_Widget;
-      Loc        : in     Widget_Location);
+   procedure App2_Widget_Specific_Oper (The_Widget : in out App2_Widget;
+      Loc                                          : in     Widget_Location);
 
 end Fa11b00.Ca11b01_0;                -- Application_Two_Widget

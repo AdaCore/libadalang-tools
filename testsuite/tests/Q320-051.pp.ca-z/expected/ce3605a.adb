@@ -52,8 +52,7 @@ begin
      ("CE3605A",
       "CHECK THAT PUT FOR CHARACTER AND STRING " &
       "PARAMETERS DOES NOT UPDATE THE LINE NUMBER " &
-      "WHEN THE LINE LENGTH IS UNBOUNDED, ONLY THE " &
-      "COLUMN NUMBER");
+      "WHEN THE LINE LENGTH IS UNBOUNDED, ONLY THE " & "COLUMN NUMBER");
 
    declare
       File1 : File_Type;
@@ -66,8 +65,7 @@ begin
          when Use_Error =>
             Not_Applicable
               ("USE_ERROR RAISED ON TEXT CREATE " &
-               "FOR TEMPORARY FILES WITH " &
-               "OUT_FILE MODE");
+               "FOR TEMPORARY FILES WITH " & "OUT_FILE MODE");
             raise Incomplete;
       end;
 

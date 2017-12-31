@@ -14,8 +14,7 @@ begin -- CXC3005.
      ("CXC3005",
       "Check that Program_Error is raised if the " &
       "interrupt passed to Is_Attached, Current_Handler, " &
-      "Attach_Handler, Exchange_Handler, or Detach_Handler " &
-      "is reserved");
+      "Attach_Handler, Exchange_Handler, or Detach_Handler " & "is reserved");
 
    if Cxc3005_1.Reserved_Interrupt_Found then
 

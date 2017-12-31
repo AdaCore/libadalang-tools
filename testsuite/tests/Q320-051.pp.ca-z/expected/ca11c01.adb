@@ -78,15 +78,12 @@ procedure Ca11c01 is
      (Common_Name => "Chinook Salmon      ", Weight => 10);
 
    Platypus : Mammal_Package.Mammal :=
-     (Common_Name => "Tasmanian Platypus  ",
-      Weight      => 13,
+     (Common_Name => "Tasmanian Platypus  ", Weight => 13,
       Hair_Color  => Mammal_Package.Brown);
 
    Orangutan : Primate_Package.Primate :=
-     (Common_Name => "Sumatran Orangutan  ",
-      Weight      => 220,
-      Hair_Color  => Mammal_Package.Red,
-      Habitat     => Primate_Package.Arboreal);
+     (Common_Name => "Sumatran Orangutan  ", Weight => 220,
+      Hair_Color  => Mammal_Package.Red, Habitat => Primate_Package.Arboreal);
 begin
 
    Report.Test
@@ -126,8 +123,7 @@ begin
 
       if not (Zoo_Data_Base (1) (1 .. 6) = "      ")
         or else (Zoo_Data_Base (2) (1 .. 6) /= "      ")
-        or else (Zoo_Data_Base (3) (1 .. 6) /= "      ")
-      then
+        or else (Zoo_Data_Base (3) (1 .. 6) /= "      ") then
          Report.Failed ("Initial condition failure");
       end if;
 
@@ -141,14 +137,12 @@ begin
       -- for entering the specific data.
 
       if Zoo_Data_Base (1) (1 .. 6) /= "Animal"
-        or else Zoo_Data_Base (1) (26 .. 31) /= "Salmon"
-      then
+        or else Zoo_Data_Base (1) (26 .. 31) /= "Salmon" then
          Report.Failed ("Incorrect version of Image for parent type");
       end if;
 
       if (Zoo_Data_Base (2) (1 .. 6) /= "Mammal") or
-        (Zoo_Data_Base (2) (28 .. 35) /= "Platypus")
-      then
+        (Zoo_Data_Base (2) (28 .. 35) /= "Platypus") then
          Report.Failed ("Incorrect version of Image for child type");
       end if;
 

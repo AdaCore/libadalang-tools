@@ -83,8 +83,7 @@ procedure Cxai029 is
    end My_Equivalent_Elements;
 
    package My_Bounded_Hashed_Sets is new Ada.Containers.Bounded_Hashed_Sets
-     (Element_Type        => My_Float,
-      Hash                => My_Element_Hash,
+     (Element_Type        => My_Float, Hash => My_Element_Hash,
       Equivalent_Elements => My_Equivalent_Elements); -- Default =
 
    type My_Key_Type is new Integer;
@@ -111,19 +110,15 @@ procedure Cxai029 is
    end My_Equivalent_Keys;
 
    package My_Keys is new My_Bounded_Hashed_Sets.Generic_Keys
-     (Key_Type        => My_Key_Type,
-      Key             => My_Key,
-      Hash            => My_Key_Hash,
+     (Key_Type        => My_Key_Type, Key => My_Key, Hash => My_Key_Hash,
       Equivalent_Keys => My_Equivalent_Keys); -- Predefined <
 
    Num_Tests : constant := 10;
 
    Capacity_Reqd : constant := Num_Tests + 1;
 
-   My_Set_1 : My_Bounded_Hashed_Sets
-     .Set
-     (Capacity => Capacity_Reqd,
-      Modulus  =>
+   My_Set_1 : My_Bounded_Hashed_Sets.Set (Capacity => Capacity_Reqd,
+      Modulus =>
         My_Bounded_Hashed_Sets.Default_Modulus (Capacity => Capacity_Reqd));
 
    subtype Array_Bounds_Type is Ada.Containers.Count_Type range 1 .. Num_Tests;
@@ -136,9 +131,8 @@ procedure Cxai029 is
 
    My_Cursor_1 : My_Bounded_Hashed_Sets.Cursor;
 
-   procedure Tampering_Check
-     (Container : in out My_Bounded_Hashed_Sets.Set;
-      Where     : in     String) with
+   procedure Tampering_Check (Container : in out My_Bounded_Hashed_Sets.Set;
+      Where                             : in     String) with
       Pre => not Container.Is_Empty
     is
 
@@ -195,8 +189,7 @@ begin
    begin
 
       Tampering_Check
-        (Container => My_Set_1,
-         Where     => "Constant_Reference (cursor form)");
+        (Container => My_Set_1, Where => "Constant_Reference (cursor form)");
 
    end;
 
@@ -204,14 +197,12 @@ begin
 
       My_Constant_Reference : My_Bounded_Hashed_Sets.Constant_Reference_Type :=
         My_Keys.Constant_Reference
-          (Container => My_Set_1,
-           Key       => My_Key_Type (Value_In_Array (1)));
+          (Container => My_Set_1, Key => My_Key_Type (Value_In_Array (1)));
 
    begin
 
       Tampering_Check
-        (Container => My_Set_1,
-         Where     => "Constant_Reference (key form)");
+        (Container => My_Set_1, Where => "Constant_Reference (key form)");
 
    end;
 
@@ -220,8 +211,7 @@ begin
 
          My_Reference : My_Keys.Reference_Type :=
            My_Keys.Reference_Preserving_Key
-             (Container => My_Set_1,
-              Position  => My_Set_1.First);
+             (Container => My_Set_1, Position => My_Set_1.First);
 
       begin
 
@@ -244,8 +234,7 @@ begin
 
          My_Reference : My_Keys.Reference_Type :=
            My_Keys.Reference_Preserving_Key
-             (Container => My_Set_1,
-              Key       => My_Key_Type (Value_In_Array (1)));
+             (Container => My_Set_1, Key => My_Key_Type (Value_In_Array (1)));
 
       begin
 
@@ -268,10 +257,8 @@ begin
    -- Variable_Indexing here) -- in a way that corresponds to likely usage.
 
    declare
-      procedure Test
-        (Value     : in My_Float;
-         Expected  : in My_Float;
-         Test_Case : in String)
+      procedure Test (Value : in My_Float; Expected : in My_Float;
+         Test_Case          : in String)
       is
       begin
          Tampering_Check (Container => My_Set_1, Where => Test_Case);
@@ -284,11 +271,8 @@ begin
          end if;
       end Test;
 
-      procedure Test_And_Mod
-        (Value     : in out My_Float;
-         Expected  : in     My_Float;
-         New_Item  : in     My_Float;
-         Test_Case : in     String)
+      procedure Test_And_Mod (Value : in out My_Float; Expected : in My_Float;
+         New_Item                   : in     My_Float; Test_Case : in String)
       is
       begin
          Tampering_Check (Container => My_Set_1, Where => Test_Case);
@@ -308,8 +292,7 @@ begin
       Test
         (Value =>
            My_Keys.Constant_Reference
-             (My_Set_1,
-              Key => My_Key_Type (Value_In_Array (1)))
+             (My_Set_1, Key => My_Key_Type (Value_In_Array (1)))
              .Element.all,
          Expected  => Value_In_Array (1),
          Test_Case => "Constant_Reference normal key");
@@ -317,8 +300,7 @@ begin
       Test_And_Mod
         (Value =>
            My_Keys.Reference_Preserving_Key
-             (My_Set_1,
-              Key => My_Key_Type (Value_In_Array (1)))
+             (My_Set_1, Key => My_Key_Type (Value_In_Array (1)))
              .Element.all,
          Expected  => Value_In_Array (1),
          New_Item  => Value_In_Array (1) + 0.125, -- Can't change Key.
@@ -327,8 +309,7 @@ begin
       Test
         (Value =>
            My_Bounded_Hashed_Sets.Constant_Reference
-             (My_Set_1,
-              Position => My_Cursor_1)
+             (My_Set_1, Position => My_Cursor_1)
              .Element.all,
          Expected  => Value_In_Array (1) + 0.125,
          Test_Case => "Constant_Reference normal cursor");
@@ -345,16 +326,14 @@ begin
       Test
         (Value =>
            My_Keys.Constant_Reference
-             (My_Set_1,
-              Key => My_Key_Type (Value_In_Array (1))),
+             (My_Set_1, Key => My_Key_Type (Value_In_Array (1))),
          Expected  => Value_In_Array (1),
          Test_Case => "Constant_Reference normal generalized key");
 
       Test_And_Mod
         (Value =>
            My_Keys.Reference_Preserving_Key
-             (My_Set_1,
-              Key => My_Key_Type (Value_In_Array (1))),
+             (My_Set_1, Key => My_Key_Type (Value_In_Array (1))),
          Expected  => Value_In_Array (1),
          New_Item  => Value_In_Array (1) + 0.25, -- Can't change Key.
          Test_Case => "Reference normal generalized key");
@@ -362,18 +341,15 @@ begin
       Test
         (Value =>
            My_Bounded_Hashed_Sets.Constant_Reference
-             (My_Set_1,
-              Position => My_Cursor_1),
+             (My_Set_1, Position => My_Cursor_1),
          Expected  => Value_In_Array (1) + 0.25,
          Test_Case => "Constant_Reference normal generalized cursor");
 
       Test_And_Mod
         (Value =>
            My_Keys.Reference_Preserving_Key
-             (My_Set_1,
-              Position => My_Cursor_1),
-         Expected  => Value_In_Array (1) + 0.25,
-         New_Item  => Value_In_Array (1),
+             (My_Set_1, Position => My_Cursor_1),
+         Expected => Value_In_Array (1) + 0.25, New_Item => Value_In_Array (1),
          Test_Case => "Reference normal generalized cursor");
 
       -- Prefix call with all components explicit (only possible for cursor
@@ -401,8 +377,7 @@ begin
          Test_And_Mod
            (Value =>
               My_Keys.Reference_Preserving_Key
-                (My_Set_1,
-                 Key => My_Key_Type (Value_In_Array (1)))
+                (My_Set_1, Key => My_Key_Type (Value_In_Array (1)))
                 .Element.all,
             Expected  => Value_In_Array (1),
             New_Item  => Value_In_Array (3), -- Changes Key.

@@ -57,14 +57,8 @@ procedure C34006f is
          end case;
       end record;
 
-      function Create
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         C : Component;
-         F : Float;
-         X : Parent  -- TO RESOLVE OVERLOADING.
+      function Create (B : Boolean; L : Length; I : Integer; S : String;
+         C : Component; F : Float; X : Parent  -- TO RESOLVE OVERLOADING.
          ) return Parent;
 
    end Pkg;
@@ -82,14 +76,8 @@ procedure C34006f is
 
    package body Pkg is
 
-      function Create
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         C : Component;
-         F : Float;
-         X : Parent) return Parent
+      function Create (B : Boolean; L : Length; I : Integer; S : String;
+         C               : Component; F : Float; X : Parent) return Parent
       is
       begin
          case B is
@@ -118,8 +106,7 @@ begin
 
    begin
       if Create (False, 2, 3, "ZZ", 5, 6.0, X) /= (False, 2, 3, 6.0) or
-        Create (False, 2, 3, "ZZ", 5, 6.0, Y) /= (False, 2, 3, 6.0)
-      then
+        Create (False, 2, 3, "ZZ", 5, 6.0, Y) /= (False, 2, 3, 6.0) then
          Failed ("CAN'T CREATE BASE TYPE VALUES OUTSIDE THE " & "SUBTYPE");
       end if;
    exception
@@ -131,8 +118,7 @@ begin
 
    begin
       if Create (False, 2, 3, "ZZ", 5, 6.0, X) in T or
-        Create (False, 2, 3, "ZZ", 5, 6.0, Y) in S
-      then
+        Create (False, 2, 3, "ZZ", 5, 6.0, Y) in S then
          Failed ("INCORRECT ""IN""");
       end if;
    exception

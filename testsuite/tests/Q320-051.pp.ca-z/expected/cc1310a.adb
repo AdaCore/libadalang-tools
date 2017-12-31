@@ -32,8 +32,7 @@ with Report; use Report;
 procedure Cc1310a is
 begin
    Test
-     ("CC1310A",
-      "DEFAULT GENERIC SUBPROGRAM PARAMETERS MAY BE" & " ENTRIES");
+     ("CC1310A", "DEFAULT GENERIC SUBPROGRAM PARAMETERS MAY BE" & " ENTRIES");
 
    declare
       task T is

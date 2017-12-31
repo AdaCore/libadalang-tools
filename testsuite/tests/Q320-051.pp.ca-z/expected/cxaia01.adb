@@ -65,8 +65,7 @@ procedure Cxaia01 is
      Fxaia00.Value_In_Ptr_Array;
 
    package My_Indefinite_Vectors is new Ada.Containers.Indefinite_Vectors
-     (Index_Type   => Natural,
-      Element_Type => String); -- Default =
+     (Index_Type => Natural, Element_Type => String); -- Default =
 
    package My_Sorting is new My_Indefinite_Vectors.Generic_Sorting
      ("<" => ">");
@@ -82,9 +81,8 @@ procedure Cxaia01 is
 
    My_Index_1 : Natural;
 
-   procedure Tampering_Check
-     (Container : in out My_Indefinite_Vectors.Vector;
-      Where     : in     String)
+   procedure Tampering_Check (Container : in out My_Indefinite_Vectors.Vector;
+      Where                             : in     String)
    is
 
       Program_Error_Raised : Boolean := False;
@@ -186,8 +184,7 @@ begin
          begin
 
             Tampering_Check
-              (Container => My_Vector_1,
-               Where     => "Query_Element");
+              (Container => My_Vector_1, Where => "Query_Element");
 
             if Element /= Value_In_Ptr_Array (I).all then
 
@@ -201,8 +198,7 @@ begin
       begin
 
          if My_Indefinite_Vectors.Element (Position => My_Cursor_1) /=
-           Value_In_Ptr_Array (I).all
-         then
+           Value_In_Ptr_Array (I).all then
 
             Report.Failed
               ("Mismatch between element and what was appended #2");
@@ -214,14 +210,12 @@ begin
          if I mod 2 = 0 then
 
             My_Indefinite_Vectors.Query_Element
-              (Position => My_Cursor_1,
-               Process  => My_Query'Access);
+              (Position => My_Cursor_1, Process => My_Query'Access);
 
          else
 
             My_Vector_1.Query_Element
-              (Index   => Natural (I) - 1,
-               Process => My_Query'Access);
+              (Index => Natural (I) - 1, Process => My_Query'Access);
 
          end if;
 
@@ -242,8 +236,7 @@ begin
    end loop;
 
    if My_Vector_1.First_Element /=
-     Value_In_Ptr_Array (Value_In_Ptr_Array'First).all
-   then
+     Value_In_Ptr_Array (Value_In_Ptr_Array'First).all then
 
       Report.Failed ("Mismatch between first element and first appended");
 
@@ -267,16 +260,14 @@ begin
    -- Test To_Cursor and To_Index
 
    if My_Vector_1.To_Cursor (Index => My_Vector_1.First_Index) /=
-     My_Vector_1.First
-   then
+     My_Vector_1.First then
 
       Report.Failed ("To_Cursor failed");
 
    end if;
 
    if My_Indefinite_Vectors.To_Index (My_Vector_1.First) /=
-     My_Vector_1.First_Index
-   then
+     My_Vector_1.First_Index then
 
       Report.Failed ("To_Index failed");
 
@@ -303,8 +294,7 @@ begin
    for I in reverse Fxaia00.Array_Bounds_Type loop
 
       if My_Indefinite_Vectors.Element (Position => My_Cursor_2) /=
-        Value_In_Ptr_Array (I).all
-      then
+        Value_In_Ptr_Array (I).all then
 
          Report.Failed ("Mismatch between element and what was prepended");
 
@@ -326,8 +316,7 @@ begin
    end loop;
 
    if My_Vector_2.Last_Element /=
-     Value_In_Ptr_Array (Value_In_Ptr_Array'Last).all
-   then
+     Value_In_Ptr_Array (Value_In_Ptr_Array'Last).all then
 
       Report.Failed ("Mismatch between last element and last prepended");
 
@@ -363,8 +352,7 @@ begin
          Tampering_Check (Container => My_Vector_3, Where => "Iterate");
 
          if My_Indefinite_Vectors.Element (Position) /=
-           Value_In_Ptr_Array (I).all
-         then
+           Value_In_Ptr_Array (I).all then
 
             Report.Failed ("Iterate hasn't found the expected value");
 
@@ -383,12 +371,10 @@ begin
       begin
 
          Tampering_Check
-           (Container => My_Vector_3,
-            Where     => "Reverse_Iterate");
+           (Container => My_Vector_3, Where => "Reverse_Iterate");
 
          if My_Indefinite_Vectors.Element (Position) /=
-           Value_In_Ptr_Array (I).all
-         then
+           Value_In_Ptr_Array (I).all then
 
             Report.Failed ("Reverse_Iterate hasn't found the expected value");
 
@@ -428,8 +414,7 @@ begin
          begin
 
             Tampering_Check
-              (Container => My_Vector_2,
-               Where     => "Update_Element");
+              (Container => My_Vector_2, Where => "Update_Element");
 
             -- Note that can only perform writes that don't change the
             -- length of the element otherwise will fail length check,
@@ -457,14 +442,12 @@ begin
             -- second character incremented
 
             My_Vector_1.Replace_Element
-              (Position => My_Cursor_1,
-               New_Item => New_String);
+              (Position => My_Cursor_1, New_Item => New_String);
 
          else
 
             My_Vector_1.Replace_Element
-              (Index    => Natural (I) - 1,
-               New_Item => New_String);
+              (Index => Natural (I) - 1, New_Item => New_String);
 
          end if;
 
@@ -474,14 +457,12 @@ begin
          if I mod 3 = 0 then
 
             My_Vector_2.Update_Element
-              (Position => My_Cursor_2,
-               Process  => My_Update'Access);
+              (Position => My_Cursor_2, Process => My_Update'Access);
 
          else
 
             My_Vector_2.Update_Element
-              (Index   => Natural (I) - 1,
-               Process => My_Update'Access);
+              (Index => Natural (I) - 1, Process => My_Update'Access);
 
          end if;
 
@@ -521,8 +502,7 @@ begin
    for I in Fxaia00.Array_Bounds_Type loop
 
       if My_Indefinite_Vectors.Element (Position => My_Cursor_1) /=
-        Value_In_Ptr_Array (Fxaia00.Num_Tests - I + 1).all
-      then
+        Value_In_Ptr_Array (Fxaia00.Num_Tests - I + 1).all then
 
          Report.Failed ("Reversed array not as expected");
 
@@ -562,8 +542,7 @@ begin
    for I in Fxaia00.Array_Bounds_Type loop
 
       if My_Indefinite_Vectors.Element (Position => My_Cursor_1) /=
-        Value_In_Ptr_Array (I).all
-      then
+        Value_In_Ptr_Array (I).all then
 
          Report.Failed ("Target vector not as expected after move");
 
@@ -601,8 +580,7 @@ begin
    -- Value_In_Ptr_Array (2).all
 
    My_Vector_2.Swap
-     (I => My_Vector_2.First,
-      J => My_Cursor_2); -- First of added elements
+     (I => My_Vector_2.First, J => My_Cursor_2); -- First of added elements
 
    -- The order should now be Default_Value, Value_In_Ptr_Array
    -- (1).all, Default_Value, Default_Value, Value_In_Ptr_Array
@@ -612,7 +590,7 @@ begin
      (I => My_Vector_2.Last_Index,
    -- Much easier decrementing an index than repeated calls of Previous of a
    -- cursor
-      J => My_Vector_2.Last_Index - 2);
+    J => My_Vector_2.Last_Index - 2);
 
    -- The order should now be Default_Value, Value_In_Ptr_Array (1).all,
    -- Default_Value, Value_In_Ptr_Array (2).all, Value_In_Ptr_Array (2).all,
@@ -622,8 +600,7 @@ begin
 
    -- Check = Default_Value
    if My_Indefinite_Vectors.Element (Position => My_Cursor_2) /=
-     My_Default_Value
-   then
+     My_Default_Value then
 
       Report.Failed ("Inserted value not as expected #1");
 
@@ -632,8 +609,7 @@ begin
    My_Indefinite_Vectors.Next (Position => My_Cursor_2);
 
    if My_Indefinite_Vectors.Element (Position => My_Cursor_2) /=
-     Value_In_Ptr_Array (1).all
-   then
+     Value_In_Ptr_Array (1).all then
 
       Report.Failed ("Inserted value not as expected #2");
 
@@ -643,8 +619,7 @@ begin
 
    -- Check = Default_Value
    if My_Indefinite_Vectors.Element (Position => My_Cursor_2) /=
-     My_Default_Value
-   then
+     My_Default_Value then
 
       Report.Failed ("Inserted value not as expected #3");
 
@@ -653,8 +628,7 @@ begin
    My_Indefinite_Vectors.Next (Position => My_Cursor_2);
 
    if My_Indefinite_Vectors.Element (Position => My_Cursor_2) /=
-     Value_In_Ptr_Array (2).all
-   then
+     Value_In_Ptr_Array (2).all then
 
       Report.Failed ("Inserted value not as expected #4");
 
@@ -663,8 +637,7 @@ begin
    My_Indefinite_Vectors.Next (Position => My_Cursor_2);
 
    if My_Indefinite_Vectors.Element (Position => My_Cursor_2) /=
-     Value_In_Ptr_Array (2).all
-   then
+     Value_In_Ptr_Array (2).all then
 
       Report.Failed ("Inserted value not as expected #5");
 
@@ -674,8 +647,7 @@ begin
 
    -- Check = Default_Value
    if My_Indefinite_Vectors.Element (Position => My_Cursor_2) /=
-     My_Default_Value
-   then
+     My_Default_Value then
 
       Report.Failed ("Inserted value not as expected #6");
 
@@ -751,8 +723,7 @@ begin
    end if;
 
    -- Check = Default_Value
-   if My_Indefinite_Vectors.Element (My_Vector_2.First) /=
-     My_Default_Value
+   if My_Indefinite_Vectors.Element (My_Vector_2.First) /= My_Default_Value
    then
 
       Report.Failed ("Remaining value not as expected");
@@ -767,8 +738,7 @@ begin
    My_Cursor_1 := My_Vector_1.Find (Item => Value_In_Ptr_Array (3).all);
 
    My_Vector_1.Insert
-     (Before   => My_Cursor_1,
-      New_Item => My_Vector_2.First_Element);
+     (Before => My_Cursor_1, New_Item => My_Vector_2.First_Element);
 
    My_Vector_2.Delete_First;
 
@@ -832,8 +802,7 @@ begin
    My_Cursor_1 := My_Vector_1.First;
 
    if My_Indefinite_Vectors.Element (Position => My_Cursor_1) /=
-     Value_In_Ptr_Array (1).all
-   then
+     Value_In_Ptr_Array (1).all then
 
       Report.Failed ("Value not as expected #1");
 
@@ -842,8 +811,7 @@ begin
    My_Indefinite_Vectors.Next (Position => My_Cursor_1);
 
    if My_Indefinite_Vectors.Element (Position => My_Cursor_1) /=
-     Value_In_Ptr_Array (9).all
-   then
+     Value_In_Ptr_Array (9).all then
 
       Report.Failed ("Value not as expected #2");
 
@@ -852,8 +820,7 @@ begin
    My_Indefinite_Vectors.Next (Position => My_Cursor_1);
 
    if My_Indefinite_Vectors.Element (Position => My_Cursor_1) /=
-     Value_In_Ptr_Array (2).all
-   then
+     Value_In_Ptr_Array (2).all then
 
       Report.Failed ("Value not as expected #3");
 
@@ -863,8 +830,7 @@ begin
 
    -- Check = Default_Value
    if My_Indefinite_Vectors.Element (Position => My_Cursor_1) /=
-     My_Default_Value
-   then
+     My_Default_Value then
 
       Report.Failed ("Value not as expected #4");
 
@@ -873,8 +839,7 @@ begin
    My_Indefinite_Vectors.Next (Position => My_Cursor_1);
 
    if My_Indefinite_Vectors.Element (Position => My_Cursor_1) /=
-     Value_In_Ptr_Array (3).all
-   then
+     Value_In_Ptr_Array (3).all then
 
       Report.Failed ("Value not as expected #5");
 
@@ -883,8 +848,7 @@ begin
    My_Indefinite_Vectors.Next (Position => My_Cursor_1);
 
    if My_Indefinite_Vectors.Element (Position => My_Cursor_1) /=
-     Value_In_Ptr_Array (4).all
-   then
+     Value_In_Ptr_Array (4).all then
 
       Report.Failed ("Value not as expected #6");
 
@@ -893,8 +857,7 @@ begin
    My_Indefinite_Vectors.Next (Position => My_Cursor_1);
 
    if My_Indefinite_Vectors.Element (Position => My_Cursor_1) /=
-     Value_In_Ptr_Array (7).all
-   then
+     Value_In_Ptr_Array (7).all then
 
       Report.Failed ("Value not as expected #7");
 
@@ -903,8 +866,7 @@ begin
    My_Indefinite_Vectors.Next (Position => My_Cursor_1);
 
    if My_Indefinite_Vectors.Element (Position => My_Cursor_1) /=
-     Value_In_Ptr_Array (5).all
-   then
+     Value_In_Ptr_Array (5).all then
 
       Report.Failed ("Value not as expected #8");
 
@@ -913,8 +875,7 @@ begin
    My_Indefinite_Vectors.Next (Position => My_Cursor_1);
 
    if My_Indefinite_Vectors.Element (Position => My_Cursor_1) /=
-     Value_In_Ptr_Array (6).all
-   then
+     Value_In_Ptr_Array (6).all then
 
       Report.Failed ("Value not as expected #9");
 
@@ -923,8 +884,7 @@ begin
    My_Indefinite_Vectors.Next (Position => My_Cursor_1);
 
    if My_Indefinite_Vectors.Element (Position => My_Cursor_1) /=
-     Value_In_Ptr_Array (7).all
-   then
+     Value_In_Ptr_Array (7).all then
 
       Report.Failed ("Value not as expected #10");
 
@@ -933,8 +893,7 @@ begin
    My_Indefinite_Vectors.Next (Position => My_Cursor_1);
 
    if My_Indefinite_Vectors.Element (Position => My_Cursor_1) /=
-     Value_In_Ptr_Array (8).all
-   then
+     Value_In_Ptr_Array (8).all then
 
       Report.Failed ("Value not as expected #11");
 
@@ -943,8 +902,7 @@ begin
    My_Indefinite_Vectors.Next (Position => My_Cursor_1);
 
    if My_Indefinite_Vectors.Element (Position => My_Cursor_1) /=
-     Value_In_Ptr_Array (10).all
-   then
+     Value_In_Ptr_Array (10).all then
 
       Report.Failed ("Value not as expected #12");
 
@@ -1052,13 +1010,11 @@ begin
 
    My_Vector_1 :=
      My_Indefinite_Vectors.To_Vector
-       (New_Item => My_Default_Value,
-        Length   => Fxaia00.Num_Tests);
+       (New_Item => My_Default_Value, Length => Fxaia00.Num_Tests);
 
    for I in Fxaia00.Array_Bounds_Type loop
 
-      if My_Vector_1.Element (Index => Natural (I) - 1) /=
-        My_Default_Value
+      if My_Vector_1.Element (Index => Natural (I) - 1) /= My_Default_Value
       then
 
          Report.Failed ("To_Vector didn't create vector of given value");
@@ -1080,8 +1036,7 @@ begin
    -- Test Insert_Space (two forms)
 
    My_Vector_1.Insert_Space
-     (Before => My_Vector_1.Last_Index,
-      Count  => Fxaia00.Num_Tests);
+     (Before => My_Vector_1.Last_Index, Count => Fxaia00.Num_Tests);
 
    if My_Vector_1.Length /= Fxaia00.Num_Tests * 3 then
 
@@ -1142,8 +1097,7 @@ begin
    for I in 0 .. 7 loop
 
       if My_Vector_3.Element (Index => I) /=
-        Value_In_Ptr_Array (Ada.Containers.Count_Type (I) + 1).all
-      then
+        Value_In_Ptr_Array (Ada.Containers.Count_Type (I) + 1).all then
 
          Report.Failed ("Value after & not as expected");
 

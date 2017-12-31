@@ -41,9 +41,7 @@ begin -- C3A2A02.                                              -- [ Level = 1 ]
       end;
 
       F3a2a00.Tc_Display_Results
-        (Result1,
-         F3a2a00.Ok,
-         "SUBTEST #1 (same level)");
+        (Result1, F3a2a00.Ok, "SUBTEST #1 (same level)");
 
       declare                                                  -- [ Level = 3 ]
          -- The instantiation of C3A2A02_0 should NOT result in any exceptions.
@@ -66,9 +64,7 @@ begin -- C3A2A02.                                              -- [ Level = 1 ]
       end;
 
       F3a2a00.Tc_Display_Results
-        (Result2,
-         F3a2a00.P_E,
-         "SUBTEST #1: deeper level");
+        (Result2, F3a2a00.P_E, "SUBTEST #1: deeper level");
 
    exception
       when Program_Error =>
@@ -108,9 +104,7 @@ begin -- C3A2A02.                                              -- [ Level = 1 ]
       end;
 
       F3a2a00.Tc_Display_Results
-        (Result1,
-         F3a2a00.P_E,
-         "SUBTEST #2: deeper level");
+        (Result1, F3a2a00.P_E, "SUBTEST #2: deeper level");
 
       begin                                                    -- [ Level = 3 ]
          declare                                               -- [ Level = 4 ]
@@ -132,9 +126,7 @@ begin -- C3A2A02.                                              -- [ Level = 1 ]
       end;
 
       F3a2a00.Tc_Display_Results
-        (Result2,
-         F3a2a00.Ok,
-         "SUBTEST #2: same level");
+        (Result2, F3a2a00.Ok, "SUBTEST #2: same level");
 
    end Subtest2;
 
@@ -168,9 +160,7 @@ begin -- C3A2A02.                                              -- [ Level = 1 ]
       end;
 
       F3a2a00.Tc_Display_Results
-        (Result1,
-         F3a2a00.Ok,
-         "SUBTEST #3: 1st okay case");
+        (Result1, F3a2a00.Ok, "SUBTEST #3: 1st okay case");
 
       declare                                                  -- [ Level = 3 ]
          type My_Array is new F3a2a00.Array_Type;
@@ -196,9 +186,7 @@ begin -- C3A2A02.                                              -- [ Level = 1 ]
       end;
 
       F3a2a00.Tc_Display_Results
-        (Result2,
-         F3a2a00.Ok,
-         "SUBTEST #3: 2nd okay case");
+        (Result2, F3a2a00.Ok, "SUBTEST #3: 2nd okay case");
 
    end Subtest3;
 

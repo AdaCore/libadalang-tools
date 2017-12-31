@@ -96,8 +96,7 @@ begin
          Result_String :=
            B10.Overwrite
              (Source   => Test_String, -- "abcdefghij"
-              Position => 9,
-              New_Item => "xyz",
+              Position => 9, New_Item => "xyz",
               Drop     => As.Error);
          Report.Failed ("Exception not raised by Function Overwrite");
       exception
@@ -113,8 +112,7 @@ begin
         B10.Overwrite
           (Source   => Test_String,  -- "abcdefghij"
            Position => B10.Length (Test_String), -- 10
-           New_Item => "xyz",
-           Drop     => Ada.Strings.Left);
+           New_Item => "xyz", Drop => Ada.Strings.Left);
 
       if B10.To_String (Result_String) /= "cdefghixyz" then   -- drop a,b
          Report.Failed
@@ -139,14 +137,14 @@ begin
           (B10.To_Bounded_String ("a"),      -- Source length = 1
            1,
            "  abc  ") /=
-        B10.To_Bounded_String ("  abc  ") or
+        B10.To_Bounded_String
+          ("  abc  ") or
         B10.Overwrite
             (B10.Null_Bounded_String,         -- Null source
              1, "abcdefghij") /=
           Atoj_Bnd_Str or
         B10.Overwrite
-            (Atoe_Bnd_Str,
-             B10.To_String (Atoe_Bnd_Str)'First,
+            (Atoe_Bnd_Str, B10.To_String (Atoe_Bnd_Str)'First,
              " ") /=      -- New_Item = 1
           B10.To_Bounded_String (" bcde")
       then
@@ -176,8 +174,7 @@ begin
          Test_String := Atoj_Bnd_Str;
          B10.Overwrite
            (Source   => Test_String, -- "abcdefghij"
-            Position => 8,
-            New_Item => "uvwxyz");
+            Position => 8, New_Item => "uvwxyz");
          Report.Failed ("Exception not raised by Procedure Overwrite");
       exception
          when As.Length_Error =>
@@ -193,8 +190,7 @@ begin
       B10.Overwrite
         (Source   => Test_String,  -- "abcdefghij"
          Position => B10.Length (Test_String) - 2, -- 8
-         New_Item => "uvwxyz",
-         Drop     => Ada.Strings.Left);
+         New_Item => "uvwxyz", Drop => Ada.Strings.Left);
 
       if B10.To_String (Test_String) /= "defguvwxyz" then   -- drop a-c
          Report.Failed
@@ -233,8 +229,7 @@ begin
         B10.Delete (Atoe_Bnd_Str, 5, B10.To_String (Atoe_Bnd_Str)'First) /=
           Atoe_Bnd_Str or
         B10.Delete
-            (Atoe_Bnd_Str,
-             B10.To_String (Atoe_Bnd_Str)'Last,
+            (Atoe_Bnd_Str, B10.To_String (Atoe_Bnd_Str)'Last,
              B10.To_String (Atoe_Bnd_Str)'Last) /=
           B10.To_Bounded_String ("abcd")
       then
@@ -259,15 +254,13 @@ begin
          for I in Bnd_Array_Type'Range loop
             case I is
                when 4 =>
-                  if B10.Trim (Bnd_Array (I), As.Both) /=
-                    Bnd_Array (I)
+                  if B10.Trim (Bnd_Array (I), As.Both) /= Bnd_Array (I)
                   then  -- no change
                      Report.Failed ("Incorrect result from Function Trim - 4");
                   end if;
                when 5 =>
                   if B10.Trim (Bnd_Array (I), As.Both) /=
-                    B10."&" (Text, B10."&" (' ', Text))
-                  then
+                    B10."&" (Text, B10."&" (' ', Text)) then
                      Report.Failed ("Incorrect result from Function Trim - 5");
                   end if;
                when others =>
@@ -285,11 +278,9 @@ begin
 
       -- Trim characters in sets from both sides of the bounded string.
       if B10.Trim
-          (Source => B10.To_Bounded_String ("ddabbaxx"),
-           Left   => Cd_Set,
+          (Source => B10.To_Bounded_String ("ddabbaxx"), Left => Cd_Set,
            Right  => Xy_Set) /=
-        B10.To_Bounded_String ("abba")
-      then
+        B10.To_Bounded_String ("abba") then
          Report.Failed
            ("Incorrect result from Fn Trim - Sets, Left & Right side - 1");
       end if;
@@ -300,8 +291,7 @@ begin
       -- side, and only "xy" trimmed from right side.
 
       if B10.Trim (B10.To_Bounded_String ("cdxyabcdxy"), Cd_Set, Xy_Set) /=
-        B10.To_Bounded_String ("xyabcd")
-      then
+        B10.To_Bounded_String ("xyabcd") then
          Report.Failed
            ("Incorrect result from Fn Trim - Sets, Left & Right side - 2");
       end if;
@@ -310,8 +300,7 @@ begin
       -- "interior" of the bounded string, just the appropriate ends.
 
       if B10.Trim (B10.To_Bounded_String ("cdabdxabxy"), Cd_Set, Xy_Set) /=
-        B10.To_Bounded_String ("abdxab")
-      then
+        B10.To_Bounded_String ("abdxab") then
          Report.Failed
            ("Incorrect result from Fn Trim - Sets, Left & Right side - 3");
       end if;
@@ -319,8 +308,7 @@ begin
       -- Trim characters in set from right side only. No change to Left side.
 
       if B10.Trim (B10.To_Bounded_String ("abxyzddcd"), Xy_Set, Cd_Set) /=
-        B10.To_Bounded_String ("abxyz")
-      then
+        B10.To_Bounded_String ("abxyz") then
          Report.Failed ("Incorrect result from Fn Trim - Sets, Right side");
       end if;
 
@@ -419,10 +407,7 @@ begin
 
       Result_String :=
         B10.Head
-          (B10.To_Bounded_String ("ABCDEFGHIJ"),
-           15,
-           'x',
-           Ada.Strings.Left);
+          (B10.To_Bounded_String ("ABCDEFGHIJ"), 15, 'x', Ada.Strings.Left);
 
       if Result_String /= B10.To_Bounded_String ("FGHIJxxxxx") then
          Report.Failed ("Incorrect result from Function Head, Drop = Left");
@@ -438,10 +423,7 @@ begin
 
       Result_String :=
         B10.Head
-          (B10.To_Bounded_String ("ABCDEFGHI"),
-           15,
-           'x',
-           Ada.Strings.Right);
+          (B10.To_Bounded_String ("ABCDEFGHI"), 15, 'x', Ada.Strings.Right);
 
       if Result_String /= B10.To_Bounded_String ("ABCDEFGHIx") then
          Report.Failed ("Incorrect result from Function Head, Drop = Right");
@@ -451,8 +433,7 @@ begin
 
       if B10.Head (B10.Null_Bounded_String, 5) /=
         B10.To_Bounded_String ("     ") or
-        B10.Head (Atoe_Bnd_Str, B10.Length (Atoe_Bnd_Str)) /= Atoe_Bnd_Str
-      then
+        B10.Head (Atoe_Bnd_Str, B10.Length (Atoe_Bnd_Str)) /= Atoe_Bnd_Str then
          Report.Failed ("Incorrect result from Function Head");
       end if;
 
@@ -463,8 +444,7 @@ begin
            B10.Tail
              (Source => Atoj_Bnd_Str,   -- max length
               Count  => B10.Length (Atoj_Bnd_Str) + 1,
-              Pad    => Ada.Strings.Space,
-              Drop   => Ada.Strings.Error);
+              Pad    => Ada.Strings.Space, Drop => Ada.Strings.Error);
          Report.Failed ("Length_Error not raised by Function Tail");
       exception
          when As.Length_Error =>
@@ -483,9 +463,7 @@ begin
       Result_String :=
         B10.Tail
           (B10.To_Bounded_String ("ABCDEFGH"), -- 8 ch
-           13,
-           'x',
-           Ada.Strings.Left);
+           13, 'x', Ada.Strings.Left);
 
       if Result_String /= B10.To_Bounded_String ("xxABCDEFGH") then
          Report.Failed ("Incorrect result from Function Tail, Drop = Left");
@@ -499,10 +477,7 @@ begin
 
       Result_String :=
         B10.Tail
-          (B10.To_Bounded_String ("ABCDEFGHIJ"),
-           13,
-           'x',
-           Ada.Strings.Right);
+          (B10.To_Bounded_String ("ABCDEFGHIJ"), 13, 'x', Ada.Strings.Right);
 
       if Result_String /= B10.To_Bounded_String ("xxxABCDEFG") then
          Report.Failed ("Incorrect result from Function Tail, Drop = Right");
@@ -523,9 +498,7 @@ begin
       begin
          Result_String :=
            B10.Replicate
-             (Count => B10.Max_Length + 5,
-              Item  => 'A',
-              Drop  => As.Error);
+             (Count => B10.Max_Length + 5, Item => 'A', Drop => As.Error);
          Report.Failed ("Length_Error not raised by Replicate for characters");
       exception
          when As.Length_Error =>
@@ -542,24 +515,21 @@ begin
       -- characters.
 
       if B10.Replicate (Count => 20, Item => 'A', Drop => Ada.Strings.Left) /=
-        B10.Replicate (15, 'A', Ada.Strings.Right)
-      then
+        B10.Replicate (15, 'A', Ada.Strings.Right) then
          Report.Failed ("Incorrect result from Replicate for characters - 1");
       end if;
 
       -- Blank-filled 10 character bounded strings.
 
       if B10.Replicate (B10.Max_Length + 1, ' ', Drop => Ada.Strings.Left) /=
-        B10.Replicate (B10.Max_Length, Ada.Strings.Space)
-      then
+        B10.Replicate (B10.Max_Length, Ada.Strings.Space) then
          Report.Failed ("Incorrect result from Replicate for characters - 2");
       end if;
 
       -- Additional cases.
 
       if B10.Replicate (0, 'a') /= B10.Null_Bounded_String or
-        B10.Replicate (1, 'a') /= B10.To_Bounded_String ("a")
-      then
+        B10.Replicate (1, 'a') /= B10.To_Bounded_String ("a") then
          Report.Failed ("Incorrect result from Replicate for characters - 3");
       end if;
 
@@ -600,8 +570,7 @@ begin
 
       if B10.Replicate (10, "X") /= B10.To_Bounded_String ("XXXXXXXXXX") or
         B10.Replicate (10, "") /= B10.Null_Bounded_String or
-        B10.Replicate (0, "ab") /= B10.Null_Bounded_String
-      then
+        B10.Replicate (0, "ab") /= B10.Null_Bounded_String then
          Report.Failed ("Incorrect result from Replicate for strings");
       end if;
 

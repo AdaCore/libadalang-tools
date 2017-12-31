@@ -42,8 +42,7 @@ begin
    Test
      ("CE3401A",
       "CHECK THAT THE FORMAL PARAMETERS OF EACH " &
-      "COLUMN, LINE, AND PAGE OPERATION ARE NAMED " &
-      "CORRECTLY");
+      "COLUMN, LINE, AND PAGE OPERATION ARE NAMED " & "CORRECTLY");
 
    begin
       Create (Fout, Out_File, Legal_File_Name);

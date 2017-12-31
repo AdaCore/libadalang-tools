@@ -69,17 +69,15 @@ procedure C457003 is
       return X;
    end Evaluation_Check;
 
-   function Do_Case
-     (Selector         : Small_Type;
-      Invalid_Selector : Boolean := False) return Natural
+   function Do_Case (Selector : Small_Type;
+      Invalid_Selector        : Boolean := False) return Natural
    is
       Expression_Value : Natural := 0;
    begin
       Expression_Value :=
-        (case Selector is
-           when 1     => Evaluation_Check (99),
-           when 2 | 3 => Evaluation_Check (87),
-           when 4     => Evaluation_Check (66));
+        (case Selector is when 1 => Evaluation_Check (99),
+           when 2 | 3            => Evaluation_Check (87),
+           when 4                => Evaluation_Check (66));
       if Invalid_Selector then
          Report.Failed
            ("Invalid selecting expression should have raised " &

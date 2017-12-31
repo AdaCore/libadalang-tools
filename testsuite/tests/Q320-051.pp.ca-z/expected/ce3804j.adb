@@ -47,8 +47,7 @@ begin
      ("CE3804J",
       "CHECK THAT FIXED_IO GET OPERATES ON " &
       "IN_FILE FILE AND WHEN NO FILE IS " &
-      "SPECIFIED THE CURRENT DEFAULT INPUT " &
-      "FILE IS USED");
+      "SPECIFIED THE CURRENT DEFAULT INPUT " & "FILE IS USED");
 
    declare
       Ft1, Ft2 : File_Type;

@@ -66,38 +66,15 @@ procedure Cd92001 is
    type Sparse_Enumerated is
      (Help, Home, Page_Up, Del, Endk, Page_Down, Up, Left, Down, Right);
 
-   for Sparse_Enumerated use
-     (Help      => 2,
-      Home      => 4,
-      Page_Up   => 8,
-      Del       => 16,
-      Endk      => 32,
-      Page_Down => 64,
-      Up        => 128,
-      Left      => 256,
-      Down      => 512,
-      Right     => 1_024);
+   for Sparse_Enumerated use (Help => 2, Home => 4, Page_Up => 8, Del => 16,
+      Endk => 32, Page_Down => 64, Up => 128, Left => 256, Down => 512,
+      Right                        => 1_024);
 
    type Mod_10 is mod 10;
 
    type Default_Enumerated is
-     (Zero,
-      One,
-      Two,
-      Three,
-      Four,
-      Five,
-      Six,
-      Seven,
-      Eight,
-      Nine,
-      Clear,
-      '=',
-      '/',
-      '*',
-      '-',
-      '+',
-      Enter);
+     (Zero, One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Clear, '=',
+      '/', '*', '-', '+', Enter);
    for Default_Enumerated'Size use 8;
 
    Default_Enumerated_Count : constant := 17;
@@ -141,11 +118,9 @@ procedure Cd92001 is
      Component_Size use Default_Component_Size;  -- N/A => ERROR.
 
    function Uc_Sparse_Mod_Enum is new Ada.Unchecked_Conversion
-     (Sparse_Mod_Table,
-      Sparse_Enum_Table);
+     (Sparse_Mod_Table, Sparse_Enum_Table);
 
-   function Uc_Def_Mod_Enum is new Ada.Unchecked_Conversion
-     (Default_Mod_Table,
+   function Uc_Def_Mod_Enum is new Ada.Unchecked_Conversion (Default_Mod_Table,
       Def_Enum_Table);
 
    Valid_Sparse_Values : Sparse_Enum_Table;
@@ -177,8 +152,7 @@ procedure Cd92001 is
          if K mod 2 = 0 then  -- oops, that would be a valid value
             K := K + 1;
          end if;
-         if P = Mod_Same_Size_As_Def_Enum'Last or
-           P < Default_Enumerated_Count
+         if P = Mod_Same_Size_As_Def_Enum'Last or P < Default_Enumerated_Count
          then -- that would be valid
             P := Default_Enumerated_Count + 1;
          else
@@ -218,20 +192,16 @@ procedure Cd92001 is
       for K in Test_Width loop
          if Valid_Sparse_Values (K)'Valid /= Expect_Valid then
             Report.Failed
-              ("Expected 'Valid =" &
-               Boolean'Image (Expect_Valid) &
-               " for Sparse item " &
-               Integer'Image (K));
+              ("Expected 'Valid =" & Boolean'Image (Expect_Valid) &
+               " for Sparse item " & Integer'Image (K));
          end if;
       end loop;
 
       for P in Test_Width loop
          if Valid_Def_Values (P)'Valid /= Expect_Valid then
             Report.Failed
-              ("Expected 'Valid =" &
-               Boolean'Image (Expect_Valid) &
-               " for Default item " &
-               Integer'Image (P));
+              ("Expected 'Valid =" & Boolean'Image (Expect_Valid) &
+               " for Default item " & Integer'Image (P));
          end if;
       end loop;
 

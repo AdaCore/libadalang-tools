@@ -75,8 +75,7 @@ begin
       "Check that Function Image produces " &
       "correct results when provided non-default " &
       "parameters for Currency, Fill, Separator, " &
-      "and Radix_Mark, appropriate to foreign " &
-      "currency representations");
+      "and Radix_Mark, appropriate to foreign " & "currency representations");
 
    Test_Block :
    declare
@@ -91,26 +90,17 @@ begin
       new Editing.Decimal_Output
         (Fxf3a00.Decimal_Type_2dp);
 
-      package Pack_Ff is new Editing.Decimal_Output
-        (Fxf3a00.Decimal_Type_2dp,
-         Default_Currency   => "FF",
-         Default_Fill       => '*',
-         Default_Separator  => '.',
-         Default_Radix_Mark => ',');
+      package Pack_Ff is new Editing.Decimal_Output (Fxf3a00.Decimal_Type_2dp,
+         Default_Currency  => "FF", Default_Fill => '*',
+         Default_Separator => '.', Default_Radix_Mark => ',');
 
-      package Pack_Dm is new Editing.Decimal_Output
-        (Fxf3a00.Decimal_Type_2dp,
-         Default_Currency   => "DM",
-         Default_Fill       => '*',
-         Default_Separator  => ',',
-         Default_Radix_Mark => '.');
+      package Pack_Dm is new Editing.Decimal_Output (Fxf3a00.Decimal_Type_2dp,
+         Default_Currency  => "DM", Default_Fill => '*',
+         Default_Separator => ',', Default_Radix_Mark => '.');
 
-      package Pack_Chf is new Editing.Decimal_Output
-        (Fxf3a00.Decimal_Type_2dp,
-         Default_Currency   => "CHF",
-         Default_Fill       => '*',
-         Default_Separator  => ',',
-         Default_Radix_Mark => '.');
+      package Pack_Chf is new Editing.Decimal_Output (Fxf3a00.Decimal_Type_2dp,
+         Default_Currency  => "CHF", Default_Fill => '*',
+         Default_Separator => ',', Default_Radix_Mark => '.');
 
       Tc_Picture    : Editing.Picture;
       Tc_Start_Loop : constant := 11;
@@ -151,10 +141,8 @@ begin
             -- in the call of Image.
 
             if Pack_Ff.Image
-                (Item => Fxf3a00.Data_With_2dp (I),
-                 Pic  => Tc_Picture) /=
-              Fxf3a00.Edited_Output (I).all
-            then
+                (Item => Fxf3a00.Data_With_2dp (I), Pic => Tc_Picture) /=
+              Fxf3a00.Edited_Output (I).all then
                Report.Failed
                  ("Incorrect output from Function Image " &
                   "from package instantiated with FF " &
@@ -168,14 +156,10 @@ begin
             -- parameters are provided in the call of Image.
 
             if Pack_Def.Image
-                (Item       => Fxf3a00.Data_With_2dp (I),
-                 Pic        => Tc_Picture,
-                 Currency   => "FF",
-                 Fill       => '*',
-                 Separator  => '.',
+                (Item       => Fxf3a00.Data_With_2dp (I), Pic => Tc_Picture,
+                 Currency   => "FF", Fill => '*', Separator => '.',
                  Radix_Mark => ',') /=
-              Fxf3a00.Edited_Output (I).all
-            then
+              Fxf3a00.Edited_Output (I).all then
                Report.Failed
                  ("Incorrect output from Function Image " &
                   "from package instantiated with default " &
@@ -186,7 +170,7 @@ begin
 
          elsif I <
            Tc_Start_Loop +                                -- (15-19)
-             Fxf3a00.Number_Of_Ff_Strings +
+           Fxf3a00.Number_Of_Ff_Strings +
              Fxf3a00.Number_Of_Dm_Strings
          then
             -- Process the DM picture strings.
@@ -195,10 +179,8 @@ begin
             -- parameters.
 
             if Pack_Dm.Image
-                (Item => Fxf3a00.Data_With_2dp (I),
-                 Pic  => Tc_Picture) /=
-              Fxf3a00.Edited_Output (I).all
-            then
+                (Item => Fxf3a00.Data_With_2dp (I), Pic => Tc_Picture) /=
+              Fxf3a00.Edited_Output (I).all then
                Report.Failed
                  ("Incorrect output from Function Image " &
                   "from package instantiated with DM " &
@@ -210,14 +192,10 @@ begin
             -- parameters.
 
             if Pack_Def.Image
-                (Item       => Fxf3a00.Data_With_2dp (I),
-                 Pic        => Tc_Picture,
-                 Currency   => "DM",
-                 Fill       => '*',
-                 Separator  => ',',
+                (Item       => Fxf3a00.Data_With_2dp (I), Pic => Tc_Picture,
+                 Currency   => "DM", Fill => '*', Separator => ',',
                  Radix_Mark => '.') /=
-              Fxf3a00.Edited_Output (I).all
-            then
+              Fxf3a00.Edited_Output (I).all then
                Report.Failed
                  ("Incorrect output from Function Image " &
                   "from package instantiated with default " &
@@ -233,8 +211,7 @@ begin
             -- parameters.
 
             if Pack_Chf.Image (Fxf3a00.Data_With_2dp (I), Tc_Picture) /=
-              Fxf3a00.Edited_Output (I).all
-            then
+              Fxf3a00.Edited_Output (I).all then
                Report.Failed
                  ("Incorrect output from Function Image " &
                   "from package instantiated with CHF " &
@@ -246,14 +223,9 @@ begin
             -- parameters.
 
             if Pack_Def.Image
-                (Fxf3a00.Data_With_2dp (I),
-                 Tc_Picture,
-                 "CHF",
-                 '*',
-                 ',',
+                (Fxf3a00.Data_With_2dp (I), Tc_Picture, "CHF", '*', ',',
                  '.') /=
-              Fxf3a00.Edited_Output (I).all
-            then
+              Fxf3a00.Edited_Output (I).all then
                Report.Failed
                  ("Incorrect output from Function Image " &
                   "from package instantiated with default " &

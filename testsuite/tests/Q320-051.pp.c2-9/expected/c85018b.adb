@@ -46,8 +46,7 @@ begin
       "CHECK THAT WHEN AN ENTRY FAMILY MEMBER IS " &
       "RENAMED THE FORMAL PARAMETER CONSTRAINTS " &
       "FOR THE NEW NAME ARE IGNORED IN FAVOR OF " &
-      "THE CONSTRAINTS ASSOCIATED WITH THE RENAMED " &
-      "ENTITY");
+      "THE CONSTRAINTS ASSOCIATED WITH THE RENAMED " & "ENTITY");
 
    declare
       type Int is range 1 .. 10;
@@ -122,8 +121,7 @@ begin
                accept Ent1 (10) (A : Real1; Ok : Boolean) do
                   if not Ok then
                      Failed
-                       ("WRONG CALL EXECUTED " &
-                        "WITH FLOATING POINT " &
+                       ("WRONG CALL EXECUTED " & "WITH FLOATING POINT " &
                         "TYPE");
                   end if;
                end Ent1;
@@ -141,8 +139,7 @@ begin
               ("CONSTRAINT_ERROR RAISED WITH " & "FLOATING POINT " & "TYPE");
          when others =>
             Failed
-              ("OTHER EXCEPTION RAISED WITH " &
-               "FLOATING POINT " &
+              ("OTHER EXCEPTION RAISED WITH " & "FLOATING POINT " &
                "TYPE - 1");
       end;
 
@@ -153,8 +150,7 @@ begin
             null;
          when others =>
             Failed
-              ("OTHER EXCEPTION RAISED WITH " &
-               "FLOATING POINT " &
+              ("OTHER EXCEPTION RAISED WITH " & "FLOATING POINT " &
                "TYPE - 2");
       end;
    end;
@@ -233,8 +229,7 @@ begin
                accept Ent1 (False) (A : Sta1; Ok : Boolean) do
                   if not Ok then
                      Failed
-                       ("WRONG CALL EXECUTED " &
-                        "WITH CONSTRAINED " &
+                       ("WRONG CALL EXECUTED " & "WITH CONSTRAINED " &
                         "ARRAY");
                   end if;
                end Ent1;

@@ -44,25 +44,20 @@ begin
 
    declare
       X : Multi_Array :=
-        ((('A', 'B', 'C', 'D', 'E', 'F'),
-          ('G', 'H', 'I', 'J', 'K', 'L'),
+        ((('A', 'B', 'C', 'D', 'E', 'F'), ('G', 'H', 'I', 'J', 'K', 'L'),
           ('M', 'N', 'O', 'P', 'Q', 'R')),
-         (('S', 'T', 'U', 'V', 'W', 'X'),
-          ('W', 'Z', 'A', 'B', 'C', 'D'),
+         (('S', 'T', 'U', 'V', 'W', 'X'), ('W', 'Z', 'A', 'B', 'C', 'D'),
           "WHOZAT"));
 
       Y : Multi_Array :=
-        (("WHOZAT",
-          ('A', 'B', 'C', 'D', 'E', 'F'),
+        (("WHOZAT", ('A', 'B', 'C', 'D', 'E', 'F'),
           ('G', 'H', 'I', 'J', 'K', 'L')),
-         (('M', 'N', 'O', 'P', 'Q', 'R'),
-          ('S', 'T', 'U', 'V', 'W', 'X'),
+         (('M', 'N', 'O', 'P', 'Q', 'R'), ('S', 'T', 'U', 'V', 'W', 'X'),
           ('W', 'Z', 'A', 'B', 'C', 'D')));
 
    begin
       if X (Ident_Int (2), Ident_Int (3), Ident_Int (6)) /=
-        Y (Ident_Int (1), Ident_Int (1), Ident_Int (6))
-      then
+        Y (Ident_Int (1), Ident_Int (1), Ident_Int (6)) then
          Failed ("INITIALIZATION FAILURE");
       end if;
    end;
@@ -71,19 +66,15 @@ begin
       procedure Fix_Agg (T : Multi_Array) is
       begin
          if T (Ident_Int (2), Ident_Int (2), Ident_Int (5)) /=
-           T (Ident_Int (1), Ident_Int (1), Ident_Int (1))
-         then
+           T (Ident_Int (1), Ident_Int (1), Ident_Int (1)) then
             Failed ("SUBPROGRAM FAILURE");
          end if;
       end Fix_Agg;
    begin
       Fix_Agg
-        ((
-          ("WHOZAT",
-           ('A', 'B', 'C', 'D', 'E', 'F'),
+        ((("WHOZAT", ('A', 'B', 'C', 'D', 'E', 'F'),
            ('G', 'H', 'I', 'J', 'K', 'L')),
-          (('M', 'N', 'O', 'P', 'Q', 'R'),
-           ('S', 'T', 'U', 'V', 'W', 'X'),
+          (('M', 'N', 'O', 'P', 'Q', 'R'), ('S', 'T', 'U', 'V', 'W', 'X'),
            ('W', 'Z', 'A', 'B', 'C', 'D'))));
 
    end;
@@ -91,17 +82,14 @@ begin
    declare
 
       Y : constant Multi_Array :=
-        (("WHOZAT",
-          ('A', 'B', 'C', 'D', 'E', 'F'),
+        (("WHOZAT", ('A', 'B', 'C', 'D', 'E', 'F'),
           ('G', 'H', 'I', 'J', 'K', 'L')),
-         (('M', 'N', 'O', 'P', 'Q', 'R'),
-          ('S', 'T', 'U', 'V', 'W', 'X'),
+         (('M', 'N', 'O', 'P', 'Q', 'R'), ('S', 'T', 'U', 'V', 'W', 'X'),
           ('W', 'Z', 'A', 'B', 'C', 'D')));
 
    begin
       if Y (Ident_Int (2), Ident_Int (2), Ident_Int (5)) /=
-        Y (Ident_Int (1), Ident_Int (1), Ident_Int (1))
-      then
+        Y (Ident_Int (1), Ident_Int (1), Ident_Int (1)) then
          Failed ("CONSTANT FAILURE");
       end if;
    end;
@@ -110,17 +98,14 @@ begin
    begin
       if Multi_Array'
           ((1 =>
-              (('A', 'B', 'C', 'D', 'E', 'F'),
-               ('G', 'H', 'I', 'J', 'K', 'L'),
+              (('A', 'B', 'C', 'D', 'E', 'F'), ('G', 'H', 'I', 'J', 'K', 'L'),
                ('M', 'N', 'O', 'P', 'Q', 'R')),
             2 =>
-              (('S', 'T', 'U', 'V', 'W', 'X'),
-               ('W', 'Z', 'A', 'B', 'C', 'D'),
+              (('S', 'T', 'U', 'V', 'W', 'X'), ('W', 'Z', 'A', 'B', 'C', 'D'),
                "WHOZAT"))) =
         Multi_Array'
           ((1 =>
-              (1 => "WHOZAT",
-               2 => ('A', 'B', 'C', 'D', 'E', 'F'),
+              (1 => "WHOZAT", 2 => ('A', 'B', 'C', 'D', 'E', 'F'),
                3 => ('G', 'H', 'I', 'J', 'K', 'L')),
             2 =>
               (1 => ('M', 'N', 'O', 'P', 'Q', 'R'),

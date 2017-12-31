@@ -57,8 +57,7 @@ begin
      ("C45534B",
       "CHECK THAT CONSTRAINT_ERROR IS RAISED WHEN " &
       "A FIXED POINT VALUE IS " &
-      "DIVIDED BY ZERO (EITHER AN INTEGER ZERO OR A " &
-      "FIXED POINT ZERO)");
+      "DIVIDED BY ZERO (EITHER AN INTEGER ZERO OR A " & "FIXED POINT ZERO)");
 
    begin
       B := A / Ident_Int (0);

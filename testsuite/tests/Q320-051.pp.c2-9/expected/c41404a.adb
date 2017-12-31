@@ -97,40 +97,32 @@ begin
       if Four_Var'First /= 1 or Four_Var'Last /= 4 or Four_Var'Length /= 4 then
          Failed
            ("FOUR_VAR ATTRIBUTES INCORRECT.  FIRST IS" &
-            Integer'Image (Four_Var'First) &
-            ".  LAST IS" &
-            Integer'Image (Four_Var'Last) &
-            ".  LENGTH IS" &
+            Integer'Image (Four_Var'First) & ".  LAST IS" &
+            Integer'Image (Four_Var'Last) & ".  LENGTH IS" &
             Integer'Image (Four_Var'Length));
       end if;
 
       if C_Var'First /= 1 or C_Var'Last /= 3 or C_Var'Length /= 3 then
          Failed
            ("C_VAR ATTRIBUTES INCORRECT.  FIRST IS" &
-            Integer'Image (C_Var'First) &
-            ".  LAST IS" &
-            Integer'Image (C_Var'Last) &
-            ".  LENGTH IS" &
+            Integer'Image (C_Var'First) & ".  LAST IS" &
+            Integer'Image (C_Var'Last) & ".  LENGTH IS" &
             Integer'Image (C_Var'Length));
       end if;
 
       if Var_101'First /= 1 or Var_101'Last /= 4 or Var_101'Length /= 4 then
          Failed
            ("VAR_101 ATTRIBUTES INCORRECT.  FIRST IS" &
-            Integer'Image (Var_101'First) &
-            ".  LAST IS" &
-            Integer'Image (Var_101'Last) &
-            ".  LENGTH IS" &
+            Integer'Image (Var_101'First) & ".  LAST IS" &
+            Integer'Image (Var_101'Last) & ".  LENGTH IS" &
             Integer'Image (Var_101'Length));
       end if;
 
       if Char_Var'First /= 1 or Char_Var'Last /= 3 or Char_Var'Length /= 3 then
          Failed
            ("CHAR_VAR ATTRIBUTES INCORRECT.  FIRST IS" &
-            Integer'Image (Char_Var'First) &
-            ".  LAST IS" &
-            Integer'Image (Char_Var'Last) &
-            ".  LENGTH IS" &
+            Integer'Image (Char_Var'First) & ".  LAST IS" &
+            Integer'Image (Char_Var'Last) & ".  LENGTH IS" &
             Integer'Image (Char_Var'Length));
       end if;
 

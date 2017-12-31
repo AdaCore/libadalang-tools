@@ -38,8 +38,7 @@ begin
    Test
      ("C35508O",
       "CHECK THAT 'FIRST' AND 'LAST' YIELD THE " &
-      "CORRECT RESULTS WHEN THE PREFIX IS A " &
-      "BOOLEAN TYPE");
+      "CORRECT RESULTS WHEN THE PREFIX IS A " & "BOOLEAN TYPE");
 
    declare
       subtype Tbool is Boolean range Ident_Bool (True) .. Ident_Bool (True);

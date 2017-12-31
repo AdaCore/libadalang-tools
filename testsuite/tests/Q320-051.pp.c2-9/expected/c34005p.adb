@@ -88,10 +88,8 @@ procedure C34005p is
 
       type Parent is array (Index range <>) of Component;
 
-      function Create
-        (F, L  : Index;
-         C     : Component;
-         Dummy : Parent   -- TO RESOLVE OVERLOADING.
+      function Create (F, L : Index; C : Component;
+         Dummy              : Parent   -- TO RESOLVE OVERLOADING.
          ) return Parent;
 
       function Equal (X, Y : Parent) return Boolean;
@@ -152,10 +150,8 @@ procedure C34005p is
 
    package body Pkg_P is
 
-      function Create
-        (F, L  : Index;
-         C     : Component;
-         Dummy : Parent) return Parent
+      function Create (F, L : Index; C : Component;
+         Dummy              : Parent) return Parent
       is
          B : Component;
       begin
@@ -252,8 +248,7 @@ begin
 
    begin
       if not Equal (X (Ident_Int (6) .. Ident_Int (7)), Aggr (C2, C3)) or
-        not Equal (Create (1, 4, C4, X) (1 .. 3), Aggr (C4, C5, C6))
-      then
+        not Equal (Create (1, 4, C4, X) (1 .. 3), Aggr (C4, C5, C6)) then
          Failed ("INCORRECT SLICE (VALUE)");
       end if;
    exception

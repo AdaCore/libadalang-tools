@@ -51,9 +51,7 @@ package F393b00.C393b13_0 is
    Max_Msg_Length : constant Msg_Length_Range := 80;
    Message        : String                    := "Test Passed";
 
-   type Child_Alert
-     (Length : Msg_Length_Range)
-   is new Alert with
+   type Child_Alert (Length : Msg_Length_Range) is new Alert with
    record        -- abstract type is in parent package
       Times_Handled : Natural := 0;
       Msg           : String (1 .. Length);

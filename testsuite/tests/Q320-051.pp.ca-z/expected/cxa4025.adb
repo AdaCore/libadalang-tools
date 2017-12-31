@@ -43,17 +43,10 @@ begin
       -- subprograms.
       New_Character_String : Wide_String (1 .. 12) :=
         Handling.To_Wide_String
-          (Acl1.Lc_A_Grave &
-           Acl1.Lc_A_Ring &
-           Acl1.Lc_Ae_Diphthong &
-           Acl1.Lc_C_Cedilla &
-           Acl1.Lc_E_Acute &
-           Acl1.Lc_I_Circumflex &
-           Acl1.Lc_Icelandic_Eth &
-           Acl1.Lc_N_Tilde &
-           Acl1.Lc_O_Oblique_Stroke &
-           Acl1.Lc_Icelandic_Thorn &
-           Acl1.Lc_German_Sharp_S &
+          (Acl1.Lc_A_Grave & Acl1.Lc_A_Ring & Acl1.Lc_Ae_Diphthong &
+           Acl1.Lc_C_Cedilla & Acl1.Lc_E_Acute & Acl1.Lc_I_Circumflex &
+           Acl1.Lc_Icelandic_Eth & Acl1.Lc_N_Tilde & Acl1.Lc_O_Oblique_Stroke &
+           Acl1.Lc_Icelandic_Thorn & Acl1.Lc_German_Sharp_S &
            Acl1.Lc_Y_Diaeresis);
 
       -- Note that there is no upper case version of the last two characters
@@ -61,17 +54,10 @@ begin
 
       Tc_New_Character_String : Wide_String (1 .. 12) :=
         Handling.To_Wide_String
-          (Acl1.Uc_A_Grave &
-           Acl1.Uc_A_Ring &
-           Acl1.Uc_Ae_Diphthong &
-           Acl1.Uc_C_Cedilla &
-           Acl1.Uc_E_Acute &
-           Acl1.Uc_I_Circumflex &
-           Acl1.Uc_Icelandic_Eth &
-           Acl1.Uc_N_Tilde &
-           Acl1.Uc_O_Oblique_Stroke &
-           Acl1.Uc_Icelandic_Thorn &
-           Acl1.Lc_German_Sharp_S &
+          (Acl1.Uc_A_Grave & Acl1.Uc_A_Ring & Acl1.Uc_Ae_Diphthong &
+           Acl1.Uc_C_Cedilla & Acl1.Uc_E_Acute & Acl1.Uc_I_Circumflex &
+           Acl1.Uc_Icelandic_Eth & Acl1.Uc_N_Tilde & Acl1.Uc_O_Oblique_Stroke &
+           Acl1.Uc_Icelandic_Thorn & Acl1.Lc_German_Sharp_S &
            Acl1.Lc_Y_Diaeresis);
 
       -- Access objects that will be provided as parameters to the subprograms.
@@ -159,8 +145,7 @@ begin
          -- Both function To_Domain and To_Range return the null string when
          -- provided the Identity character map as an input parameter.
          if Wide_Maps.To_Domain (Wide_Maps.Identity) /= Null_Sequence or
-           Wide_Maps.To_Range (Wide_Maps.Identity) /= Null_Sequence
-         then
+           Wide_Maps.To_Range (Wide_Maps.Identity) /= Null_Sequence then
             Report.Failed
               ("Null sequence not returned from To_Domain or " &
                "To_Range when provided the Identity map as input");
@@ -177,15 +162,11 @@ begin
       -- Function Index, Forward direction search.
 
       if Wide_Fixed.Index
-          ("CoMpLeTeLy MiXeD CaSe StRiNg",
-           "MIXED CASE STRING",
-           Ada.Strings.Forward,
-           Map_To_Upper_Case_Ptr) /=
+          ("CoMpLeTeLy MiXeD CaSe StRiNg", "MIXED CASE STRING",
+           Ada.Strings.Forward, Map_To_Upper_Case_Ptr) /=
         12 or
         Wide_Fixed.Index
-            ("STRING WITH NO MATCHING PATTERNS",
-             "WITH",
-             Ada.Strings.Forward,
+            ("STRING WITH NO MATCHING PATTERNS", "WITH", Ada.Strings.Forward,
              Map_To_Lower_Case_Ptr) /=
           0
       then
@@ -197,16 +178,12 @@ begin
 
       -- Function Index, Backward direction search.
       if Wide_Fixed.Index
-          ("Case of a Mixed Case String",
-           "case",
-           Ada.Strings.Backward,
+          ("Case of a Mixed Case String", "case", Ada.Strings.Backward,
            Map_To_Lower_Case_Ptr) /=
         17 or
         Wide_Fixed.Index
-            ("WOULD MATCH BUT FOR THE CASE",
-             "WOULD MATCH BUT FOR THE CASE",
-             Ada.Strings.Backward,
-             Map_To_Lower_Case_Ptr) /=
+            ("WOULD MATCH BUT FOR THE CASE", "WOULD MATCH BUT FOR THE CASE",
+             Ada.Strings.Backward, Map_To_Lower_Case_Ptr) /=
           0
       then
          Report.Failed
@@ -217,8 +194,7 @@ begin
 
       -- Function Count.
       if Wide_Fixed.Count ("ABABABA", "ABA", Map_To_Upper_Case_Ptr) /= 2 or
-        Wide_Fixed.Count ("", "match", Map_To_Lower_Case_Ptr) /= 0
-      then
+        Wide_Fixed.Count ("", "match", Map_To_Lower_Case_Ptr) /= 0 then
          Report.Failed
            ("Incorrect results from Function Count, using " &
             "a Character Mapping Function parameter");
@@ -279,10 +255,8 @@ begin
          Fixed_String : Wide_String (1 .. 20) := "A sample test string";
       begin
          Wide_Fixed.Head
-           (Source  => Fixed_String,
-            Count   => 14,
-            Justify => Ada.Strings.Center,
-            Pad     => '$');
+           (Source => Fixed_String, Count => 14, Justify => Ada.Strings.Center,
+            Pad    => '$');
          if Fixed_String /= "$$$A sample test $$$" then
             Report.Failed
               ("Incorrect result from Procedure Head, " &
@@ -321,8 +295,7 @@ begin
    exception
       when The_Error : others =>
          Report.Failed
-           ("The following exception was raised in the " &
-            "Test_Block: " &
+           ("The following exception was raised in the " & "Test_Block: " &
             Exception_Name (The_Error));
    end Test_Block;
 

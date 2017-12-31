@@ -51,8 +51,7 @@ begin
    Test
      ("C45331A",
       "CHECK THAT FOR FIXED POINT TYPES THE " &
-      "OPERATORS ""+"" AND ""-"" PRODUCE CORRECT " &
-      "RESULTS - BASIC TYPES");
+      "OPERATORS ""+"" AND ""-"" PRODUCE CORRECT " & "RESULTS - BASIC TYPES");
 
    -------------------------------------------------------------------
 
@@ -71,13 +70,11 @@ begin
       end if;
 
       -- CHECK SMALL + OR - ZERO = SMALL:
-      if "+" (Left => Small, Right => Zero) /= Small or
-        0.0 + Small /= Small
+      if "+" (Left => Small, Right => Zero) /= Small or 0.0 + Small /= Small
       then
          Failed ("F'SMALL + 0.0 /= F'SMALL");
       end if;
-      if "-" (Left => Small, Right => Zero) /= Small or
-        Small - 0.0 /= Small
+      if "-" (Left => Small, Right => Zero) /= Small or Small - 0.0 /= Small
       then
          Failed ("F'SMALL - 0.0 /= F'SMALL");
       end if;
@@ -94,9 +91,7 @@ begin
       if Equal (3, 3) then
          X := Small;
       end if;
-      if Small - X /= 0.0 or
-        Small - Small /= 0.0 or
-        F'Small - F'Small /= 0.0
+      if Small - X /= 0.0 or Small - Small /= 0.0 or F'Small - F'Small /= 0.0
       then
          Failed ("F'SMALL - F'SMALL /= 0.0");
       end if;
@@ -130,8 +125,7 @@ begin
       if Equal (3, 3) then
          X := 100.75;
       end if;
-      if (X + Small) /= (Small + X) or
-        (X + Small) > (X + 0.25)
+      if (X + Small) /= (Small + X) or (X + Small) > (X + 0.25)
       then -- X + SMALL SB <= X + DELTA
          Failed ("X + SMALL DELIVERED BAD RESULT");
       end if;
@@ -176,13 +170,11 @@ begin
 
       -- CHECK NON-MODEL VALUE + OR - ZERO:
       if Non_Model_Var + Zero not in 0.5 .. 0.75 or
-        F'(0.0) + Non_Model_Const not in 0.5 .. 0.75
-      then
+        F'(0.0) + Non_Model_Const not in 0.5 .. 0.75 then
          Failed ("(2.0 / 3) + 0.0 NOT IN 0.5 .. 0.75");
       end if;
       if Non_Model_Var - Zero not in 0.5 .. 0.75 or
-        Non_Model_Const - F'(0.0) not in 0.5 .. 0.75
-      then
+        Non_Model_Const - F'(0.0) not in 0.5 .. 0.75 then
          Failed ("(2.0 / 3) - 0.0 NOT IN 0.5 .. 0.75");
       end if;
 
@@ -197,13 +189,11 @@ begin
 
       -- CHECK ADDITION AND SUBTRACTION OF NON-MODEL NEAR MIN AND MAX:
       if Min + Non_Model_Var not in -999.5 .. -999.25 or
-        Non_Model_Const + F'First not in -999.5 .. -999.25
-      then
+        Non_Model_Const + F'First not in -999.5 .. -999.25 then
          Failed ("-1000.0 + (2.0 / 3) NOT IN -999.5 .. -999.25");
       end if;
       if Max - Non_Model_Var not in 999.25 .. 999.5 or
-        F'Last - Non_Model_Const not in 999.25 .. 999.5
-      then
+        F'Last - Non_Model_Const not in 999.25 .. 999.5 then
          Failed ("1000.0 - (2.0 / 3) NOT IN 999.25 .. 999.5");
       end if;
 

@@ -1,19 +1,16 @@
 package C452001_4 is
 
    type Tagged_Partial_Tagged_Full is tagged private;
-   procedure Change
-     (Object : in out Tagged_Partial_Tagged_Full;
-      Value  : in     Boolean);
+   procedure Change (Object : in out Tagged_Partial_Tagged_Full;
+      Value                 : in     Boolean);
 
    type Untagged_Partial_Tagged_Full is private;
-   procedure Change
-     (Object : in out Untagged_Partial_Tagged_Full;
-      Value  : in     Integer);
+   procedure Change (Object : in out Untagged_Partial_Tagged_Full;
+      Value                 : in     Integer);
 
    type Untagged_Partial_Untagged_Record_Full is private;
-   procedure Change
-     (Object : in out Untagged_Partial_Untagged_Record_Full;
-      Value  : in     Duration);
+   procedure Change (Object : in out Untagged_Partial_Untagged_Record_Full;
+      Value                 : in     Duration);
 
    function "="
      (L, R : in Untagged_Partial_Untagged_Record_Full) return Boolean;
@@ -21,9 +18,8 @@ package C452001_4 is
    -- has to be visible to avoid violating 4.5.2(9.7/3).
 
    type Untagged_Partial_Untagged_Array_Full is private;
-   procedure Change
-     (Object : in out Untagged_Partial_Untagged_Array_Full;
-      Value  : in     Character);
+   procedure Change (Object : in out Untagged_Partial_Untagged_Array_Full;
+      Value                 : in     Character);
 
    function "="
      (L, R : in Untagged_Partial_Untagged_Array_Full) return Boolean;

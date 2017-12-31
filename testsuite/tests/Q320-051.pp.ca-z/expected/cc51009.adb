@@ -10,10 +10,8 @@ procedure Cc51009 is
 
    use Integer_Sets;
 
-   package Integer_Set_Processing is new Cc51009_1.Set_Processing
-     (Integer,
-      Set,
-      The_Set_Signature);
+   package Integer_Set_Processing is new Cc51009_1.Set_Processing (Integer,
+      Set, The_Set_Signature);
 
    Elt_Value : constant Integer := 17;
 

@@ -49,8 +49,7 @@ begin
          --       Item : out Ada.Streams.Stream_Element_Array;
          --       Last : out Ada.Streams.Stream_Element_Offset);
          Rpc.Read
-           (Tst_Params_Stream_Type,
-            Tc_Stream_Element_Array,
+           (Tst_Params_Stream_Type, Tc_Stream_Element_Array,
             Tc_Stream_Element_Offset);
 
          --    procedure Write(

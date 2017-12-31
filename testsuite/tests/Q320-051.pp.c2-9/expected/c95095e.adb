@@ -73,10 +73,8 @@ begin
 
       if S /= "CBA" then
          Failed
-           ("PROCEDURES/ENTRIES DIFFERING " &
-            "ONLY IN EXISTENCE OF ONE " &
-            "DEFAULT-VALUED PARAMETER CAUSED " &
-            "CONFUSION");
+           ("PROCEDURES/ENTRIES DIFFERING " & "ONLY IN EXISTENCE OF ONE " &
+            "DEFAULT-VALUED PARAMETER CAUSED " & "CONFUSION");
       end if;
 
    end;

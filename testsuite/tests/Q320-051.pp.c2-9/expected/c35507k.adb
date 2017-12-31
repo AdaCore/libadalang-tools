@@ -46,38 +46,11 @@ procedure C35507k is
    Position : Integer;
 
    Nongraph : array (0 .. 31) of Character :=
-     (Ascii.Nul,
-      Ascii.Soh,
-      Ascii.Stx,
-      Ascii.Etx,
-      Ascii.Eot,
-      Ascii.Enq,
-      Ascii.Ack,
-      Ascii.Bel,
-      Ascii.Bs,
-      Ascii.Ht,
-      Ascii.Lf,
-      Ascii.Vt,
-      Ascii.Ff,
-      Ascii.Cr,
-      Ascii.So,
-      Ascii.Si,
-      Ascii.Dle,
-      Ascii.Dc1,
-      Ascii.Dc2,
-      Ascii.Dc3,
-      Ascii.Dc4,
-      Ascii.Nak,
-      Ascii.Syn,
-      Ascii.Etb,
-      Ascii.Can,
-      Ascii.Em,
-      Ascii.Sub,
-      Ascii.Esc,
-      Ascii.Fs,
-      Ascii.Gs,
-      Ascii.Rs,
-      Ascii.Us);
+     (Ascii.Nul, Ascii.Soh, Ascii.Stx, Ascii.Etx, Ascii.Eot, Ascii.Enq,
+      Ascii.Ack, Ascii.Bel, Ascii.Bs, Ascii.Ht, Ascii.Lf, Ascii.Vt, Ascii.Ff,
+      Ascii.Cr, Ascii.So, Ascii.Si, Ascii.Dle, Ascii.Dc1, Ascii.Dc2, Ascii.Dc3,
+      Ascii.Dc4, Ascii.Nak, Ascii.Syn, Ascii.Etb, Ascii.Can, Ascii.Em,
+      Ascii.Sub, Ascii.Esc, Ascii.Fs, Ascii.Gs, Ascii.Rs, Ascii.Us);
 
    function Ident (Ch : Char) return Char is
    begin
@@ -200,8 +173,7 @@ begin
       if Character'Val (Position) /= Nongraph (Position) then
          Failed
            ("INCORRECT VALUE FOR CHARACTER'VAL OF " &
-            "NONGRAPHIC CHARACTER IN POSITION - " &
-            Integer'Image (Position));
+            "NONGRAPHIC CHARACTER IN POSITION - " & Integer'Image (Position));
       end if;
    end loop;
 
@@ -211,8 +183,7 @@ begin
       if Schar'Val (Position) /= Ch then
          Failed
            ("INCORRECT VALUE FOR SCHAR'VAL OF " &
-            "GRAPHIC CHARACTER IN POSITION - " &
-            Integer'Image (Position));
+            "GRAPHIC CHARACTER IN POSITION - " & Integer'Image (Position));
       end if;
 
       Position := Position + 1;

@@ -64,10 +64,8 @@ package Cc70003_0 is  -- This package simulates a generic list abstraction.
 
    function View_Element (I : List_Size; L : List_Type) return Element_Type;
 
-   procedure Write_Element
-     (I : in     List_Size;
-      L : in out List_Type;
-      E : in     Element_Type);
+   procedure Write_Element (I : in List_Size; L : in out List_Type;
+      E                       : in Element_Type);
 
    -- ... Other list operations for Element_Type.
 

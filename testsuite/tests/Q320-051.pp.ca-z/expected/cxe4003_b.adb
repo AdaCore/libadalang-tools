@@ -9,8 +9,7 @@ with Report;
 procedure Cxe4003_B is
 begin
    Report.Test
-     ("CXE4003_B",
-      "Check the blocking properties of " & "remote calls");
+     ("CXE4003_B", "Check the blocking properties of " & "remote calls");
 
    -- the call to Report.Result is made by the task in CXE4003_Part_B1 when
    -- partition A is finished.

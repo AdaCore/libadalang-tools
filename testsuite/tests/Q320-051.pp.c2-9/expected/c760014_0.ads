@@ -64,10 +64,8 @@ package C760014_0 with
 
 private
 
-   type Test_Type
-     (Tc_Data : access Tc_Count)
-   is new Ada.Finalization.Limited_Controlled with
-   record
+   type Test_Type (Tc_Data : access Tc_Count)
+   is new Ada.Finalization.Limited_Controlled with record
       Dummy : Natural := 0;
    end record;
 

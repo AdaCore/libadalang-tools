@@ -25,9 +25,8 @@ procedure C390003 is
 
    -- Check compatibility with the corresponding class wide type.
 
-   procedure Vehicle_Shop
-     (It  : in out Vehicle.Object'Class;
-      Key : in     Vehicle.Tc_Keys)
+   procedure Vehicle_Shop (It : in out Vehicle.Object'Class;
+      Key                     : in     Vehicle.Tc_Keys)
    is
 
       -- Check that Subtype'Class is defined for tagged subtypes.
@@ -121,8 +120,7 @@ begin  -- Main test procedure.
    Vehicle.Tc_Validate (Vehicle.Object (Ms_Limo), Motivators.Car'Tag);
    Vehicle.Tc_Validate (Motivators.Bicycle (Weekender), Motivators.Tandem'Tag);
    Vehicle.Tc_Validate
-     (Motivators.Bicycle (Gen_Ii.Bike_Part),
-      Motivators.Motorcycle'Tag);
+     (Motivators.Bicycle (Gen_Ii.Bike_Part), Motivators.Motorcycle'Tag);
 
    Report.Result;
 

@@ -115,20 +115,16 @@ procedure C354003 is
 
       Tctouch.Assert (Non_Static'First = Medium (The_Toe), "Non_Static'First");
       Tctouch.Assert
-        (Non_Static'Last = Non_Static (The_Cap),
-         "Non_Static'Last");
+        (Non_Static'Last = Non_Static (The_Cap), "Non_Static'Last");
       Tctouch.Assert
-        (Non_Static (The_Cap / 2) in Non_Static'Range,
-         "Non_Static'Range");
+        (Non_Static (The_Cap / 2) in Non_Static'Range, "Non_Static'Range");
       Tctouch.Assert
-        (Non_Static'Min
-           (Medium (Report.Ident_Int (100)),
+        (Non_Static'Min (Medium (Report.Ident_Int (100)),
             Medium (Report.Ident_Int (200))) =
          100,
          "Non_Static'Min");
       Tctouch.Assert
-        (Non_Static'Max
-           (Medium (Report.Ident_Int (100)),
+        (Non_Static'Max (Medium (Report.Ident_Int (100)),
             Medium (Report.Ident_Int (200))) =
          200,
          "Non_Static'Max");
@@ -195,14 +191,12 @@ begin  -- Main test procedure.
          "Medium_Plus'Wide_Value");
 
       Tctouch.Assert
-        (Medium_Minus'Wide_Value ("+1_4 ") = 14,
-         "Medium_Minus'Wide_Value");
+        (Medium_Minus'Wide_Value ("+1_4 ") = 14, "Medium_Minus'Wide_Value");
 
       Tctouch.Assert (Small'Wide_Value ("+1") = 1, "Small'Wide_Value");
 
       Tctouch.Assert
-        (Midrange'Wide_Value (Id ("333")) = 333,
-         "Midrange'Wide_Value");
+        (Midrange'Wide_Value (Id ("333")) = 333, "Midrange'Wide_Value");
 
       Tctouch.Assert
         (Midrange'Wide_Value (Id ("1E3")) = 1_000,

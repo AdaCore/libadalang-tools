@@ -155,8 +155,7 @@ begin
       end loop;
 
       if Subchar'Value (Character'Image (Character'Val (127))) /=
-        Character'Val (127)
-      then
+        Character'Val (127) then
          Failed ("INCORRECT SUBCHAR'VALUE FOR " & "CHARACTER'VAL (127)");
       end if;
    end;
@@ -219,13 +218,11 @@ begin
    begin
       if Character'Value (Ident_Char (Ascii.Ht) & "'A'") = 'A' then
          Failed
-           ("NO EXCEPTION RAISED FOR " &
-            "CHARACTER'VALUE " &
+           ("NO EXCEPTION RAISED FOR " & "CHARACTER'VALUE " &
             "(IDENT_CHAR (ASCII.HT) & ""'A'"") - 1");
       else
          Failed
-           ("NO EXCEPTION RAISED FOR " &
-            "CHARACTER'VALUE " &
+           ("NO EXCEPTION RAISED FOR " & "CHARACTER'VALUE " &
             "(IDENT_CHAR (ASCII.HT) & ""'A'"") - 2");
       end if;
    exception
@@ -233,21 +230,18 @@ begin
          null;
       when others =>
          Failed
-           ("WRONG EXCEPTION RAISED " &
-            "FOR CHARACTER'VALUE " &
+           ("WRONG EXCEPTION RAISED " & "FOR CHARACTER'VALUE " &
             "(IDENT_CHAR (ASCII.HT) & ""'A'"")");
    end;
 
    begin
       if Character'Value ("'B'" & Ident_Char (Ascii.Ht)) = 'B' then
          Failed
-           ("NO EXCEPTION RAISED FOR " &
-            "CHARACTER'VALUE (""'B'"" & " &
+           ("NO EXCEPTION RAISED FOR " & "CHARACTER'VALUE (""'B'"" & " &
             "IDENT_CHAR (ASCII.HT)) - 1");
       else
          Failed
-           ("NO EXCEPTION RAISED FOR " &
-            "CHARACTER'VALUE (""'B'"" & " &
+           ("NO EXCEPTION RAISED FOR " & "CHARACTER'VALUE (""'B'"" & " &
             "IDENT_CHAR (ASCII.HT)) - 2");
       end if;
    exception
@@ -255,21 +249,18 @@ begin
          null;
       when others =>
          Failed
-           ("WRONG EXCEPTION RAISED " &
-            "FOR CHARACTER'VALUE (""'B'"" & " &
+           ("WRONG EXCEPTION RAISED " & "FOR CHARACTER'VALUE (""'B'"" & " &
             "IDENT_CHAR (ASCII.HT)) ");
    end;
 
    begin
       if Character'Value ("'C'" & Ident_Char (Ascii.Bel)) = 'C' then
          Failed
-           ("NO EXCEPTION RAISED FOR " &
-            "CHARACTER'VALUE (""'C'"" & " &
+           ("NO EXCEPTION RAISED FOR " & "CHARACTER'VALUE (""'C'"" & " &
             "IDENT_CHAR (ASCII.BEL)) - 1");
       else
          Failed
-           ("NO EXCEPTION RAISED FOR " &
-            "CHARACTER'VALUE (""'C'"" & " &
+           ("NO EXCEPTION RAISED FOR " & "CHARACTER'VALUE (""'C'"" & " &
             "IDENT_CHAR (ASCII.BEL)) - 2");
       end if;
    exception
@@ -277,8 +268,7 @@ begin
          null;
       when others =>
          Failed
-           ("WRONG EXCEPTION RAISED " &
-            "FOR CHARACTER'VALUE (""'C'"" & " &
+           ("WRONG EXCEPTION RAISED " & "FOR CHARACTER'VALUE (""'C'"" & " &
             "IDENT_CHAR (ASCII.BEL))");
    end;
 

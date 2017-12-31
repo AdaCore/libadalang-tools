@@ -109,8 +109,7 @@ begin
    end if;
    --
    if System.Default_Priority /=
-     (System.Priority'First + System.Priority'Last) / 2
-   then
+     (System.Priority'First + System.Priority'Last) / 2 then
       Report.Failed ("Default_Priority is not correct");
    end if;
 

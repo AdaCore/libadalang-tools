@@ -63,8 +63,7 @@ procedure Cxai025 is
       Default_Value => My_Default_Value;
 
    package My_Bounded_Vectors is new Ada.Containers.Bounded_Vectors
-     (Index_Type   => Natural,
-      Element_Type => My_Float); -- Default =
+     (Index_Type => Natural, Element_Type => My_Float); -- Default =
 
    package My_Sorting is new My_Bounded_Vectors.Generic_Sorting ("<" => ">");
    -- Sort in reverse order to check is using what specified not simply <
@@ -88,9 +87,8 @@ procedure Cxai025 is
 
    My_Index_1 : Natural;
 
-   procedure Tampering_Check
-     (Container : in out My_Bounded_Vectors.Vector;
-      Where     : in     String) with
+   procedure Tampering_Check (Container : in out My_Bounded_Vectors.Vector;
+      Where                             : in     String) with
       Pre => not Container.Is_Empty
     is
 
@@ -151,8 +149,7 @@ begin
    begin
 
       Tampering_Check
-        (Container => My_Vector_1,
-         Where     => "Constant_Reference (index form)");
+        (Container => My_Vector_1, Where => "Constant_Reference (index form)");
 
    end;
 
@@ -168,8 +165,7 @@ begin
    begin
 
       Tampering_Check
-        (Container => My_Vector_1,
-         Where     => "Reference (index form)");
+        (Container => My_Vector_1, Where => "Reference (index form)");
 
    end;
 
@@ -202,8 +198,7 @@ begin
    begin
 
       Tampering_Check
-        (Container => My_Vector_1,
-         Where     => "Reference (cursor form)");
+        (Container => My_Vector_1, Where => "Reference (cursor form)");
 
    end;
 
@@ -216,10 +211,8 @@ begin
    -- -- in a way that corresponds to likely usage.
 
    declare
-      procedure Test
-        (Value     : in My_Float;
-         Expected  : in My_Float;
-         Test_Case : in String)
+      procedure Test (Value : in My_Float; Expected : in My_Float;
+         Test_Case          : in String)
       is
       begin
          Tampering_Check (Container => My_Vector_1, Where => Test_Case);
@@ -232,11 +225,8 @@ begin
          end if;
       end Test;
 
-      procedure Test_And_Mod
-        (Value     : in out My_Float;
-         Expected  : in     My_Float;
-         New_Item  : in     My_Float;
-         Test_Case : in     String)
+      procedure Test_And_Mod (Value : in out My_Float; Expected : in My_Float;
+         New_Item                   : in     My_Float; Test_Case : in String)
       is
       begin
          Tampering_Check (Container => My_Vector_1, Where => Test_Case);
@@ -257,8 +247,7 @@ begin
       Test
         (Value =>
            My_Bounded_Vectors.Constant_Reference
-             (My_Vector_1,
-              Index => My_Index_1)
+             (My_Vector_1, Index => My_Index_1)
              .Element.all,
          Expected  => Value_In_Array (1),
          Test_Case => "Constant_Reference normal indexing");
@@ -267,15 +256,13 @@ begin
         (Value =>
            My_Bounded_Vectors.Reference (My_Vector_1, Index => My_Index_1)
              .Element.all,
-         Expected  => Value_In_Array (1),
-         New_Item  => Value_In_Array (2),
+         Expected  => Value_In_Array (1), New_Item => Value_In_Array (2),
          Test_Case => "Reference normal indexing");
 
       Test
         (Value =>
            My_Bounded_Vectors.Constant_Reference
-             (My_Vector_1,
-              Position => My_Cursor_1)
+             (My_Vector_1, Position => My_Cursor_1)
              .Element.all,
          Expected  => Value_In_Array (2),
          Test_Case => "Constant_Reference normal cursor");
@@ -284,8 +271,7 @@ begin
         (Value =>
            My_Bounded_Vectors.Reference (My_Vector_1, Position => My_Cursor_1)
              .Element.all,
-         Expected  => Value_In_Array (2),
-         New_Item  => Value_In_Array (3),
+         Expected  => Value_In_Array (2), New_Item => Value_In_Array (3),
          Test_Case => "Reference normal cursor");
 
       -- Prefix call with all components explicit:
@@ -297,8 +283,7 @@ begin
 
       Test_And_Mod
         (Value     => My_Vector_1.Reference (Index => My_Index_1).Element.all,
-         Expected  => Value_In_Array (3),
-         New_Item  => Value_In_Array (4),
+         Expected  => Value_In_Array (3), New_Item => Value_In_Array (4),
          Test_Case => "Reference prefix indexing");
 
       Test
@@ -310,8 +295,7 @@ begin
 
       Test_And_Mod
         (Value => My_Vector_1.Reference (Position => My_Cursor_1).Element.all,
-         Expected  => Value_In_Array (4),
-         New_Item  => Value_In_Array (5),
+         Expected  => Value_In_Array (4), New_Item => Value_In_Array (5),
          Test_Case => "Reference prefix cursor");
 
       -- Prefix call using a generalized reference (implicit dereference):
@@ -322,8 +306,7 @@ begin
 
       Test_And_Mod
         (Value     => My_Vector_1.Reference (Index => My_Index_1),
-         Expected  => Value_In_Array (5),
-         New_Item  => Value_In_Array (6),
+         Expected  => Value_In_Array (5), New_Item => Value_In_Array (6),
          Test_Case => "Reference generalized indexing");
 
       Test
@@ -333,8 +316,7 @@ begin
 
       Test_And_Mod
         (Value     => My_Vector_1.Reference (Position => My_Cursor_1),
-         Expected  => Value_In_Array (6),
-         New_Item  => Value_In_Array (7),
+         Expected  => Value_In_Array (6), New_Item => Value_In_Array (7),
          Test_Case => "Reference generalized cursor");
 
       -- Object indexing, everything implicit.
@@ -408,8 +390,7 @@ begin
       for E of My_Vector_1 loop
 
          Tampering_Check
-           (Container => My_Vector_1,
-            Where     => "reading forward of loop");
+           (Container => My_Vector_1, Where => "reading forward of loop");
 
          Total_Out := Total_Out + E;
 
@@ -435,8 +416,7 @@ begin
       for E of reverse My_Vector_1 loop
 
          Tampering_Check
-           (Container => My_Vector_1,
-            Where     => "reading reverse of loop");
+           (Container => My_Vector_1, Where => "reading reverse of loop");
 
          Total_Out := Total_Out + E;
 
@@ -462,8 +442,7 @@ begin
       for C in My_Vector_1.Iterate loop
 
          Tampering_Check
-           (Container => My_Vector_1,
-            Where     => "reading forward in loop");
+           (Container => My_Vector_1, Where => "reading forward in loop");
 
          Total_Out := Total_Out + My_Vector_1 (C);
 
@@ -489,8 +468,7 @@ begin
       for C in reverse My_Vector_1.Iterate loop
 
          Tampering_Check
-           (Container => My_Vector_1,
-            Where     => "reading reverse in loop");
+           (Container => My_Vector_1, Where => "reading reverse in loop");
 
          Total_Out := Total_Out + My_Vector_1 (C);
 
@@ -606,8 +584,7 @@ begin
       for E of My_Vector_1 loop
 
          Tampering_Check
-           (Container => My_Vector_1,
-            Where     => "writing of loop");
+           (Container => My_Vector_1, Where => "writing of loop");
 
          E := 0.0;
 

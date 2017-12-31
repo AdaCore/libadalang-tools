@@ -152,10 +152,8 @@ begin
    -- -- in a way that corresponds to likely usage.
 
    declare
-      procedure Test
-        (Value     : in String;
-         Expected  : in String;
-         Test_Case : in String)
+      procedure Test (Value : in String; Expected : in String;
+         Test_Case          : in String)
       is
       begin
          Tampering_Check (Container => My_List_1, Where => Test_Case);
@@ -168,11 +166,8 @@ begin
          end if;
       end Test;
 
-      procedure Test_And_Mod
-        (Value     : in out String;
-         Expected  : in     String;
-         New_Item  : in     String;
-         Test_Case : in     String) with
+      procedure Test_And_Mod (Value : in out String; Expected : in String;
+         New_Item                   : in String; Test_Case : in String) with
          Pre => Value'Length = New_Item'Length
        is
       begin
@@ -193,8 +188,7 @@ begin
       Test
         (Value =>
            My_Indefinite_Doubly_Linked_Lists.Constant_Reference
-             (My_List_1,
-              Position => My_Cursor_1)
+             (My_List_1, Position => My_Cursor_1)
              .Element.all,
          Expected  => "00", -- Value_In_Ptr_Array (1).all
          Test_Case => "Constant_Reference normal cursor");
@@ -202,24 +196,20 @@ begin
       Test_And_Mod
         (Value =>
            My_Indefinite_Doubly_Linked_Lists.Reference
-             (My_List_1,
-              Position => My_Cursor_1)
+             (My_List_1, Position => My_Cursor_1)
              .Element.all,
-         Expected  => "00",
-         New_Item  => "23",
+         Expected  => "00", New_Item => "23",
          Test_Case => "Reference normal cursor");
 
       -- Prefix call with all components explicit:
       Test
         (Value =>
            My_List_1.Constant_Reference (Position => My_Cursor_1).Element.all,
-         Expected  => "23",
-         Test_Case => "Constant_Reference prefix cursor");
+         Expected => "23", Test_Case => "Constant_Reference prefix cursor");
 
       Test_And_Mod
         (Value => My_List_1.Reference (Position => My_Cursor_1).Element.all,
-         Expected  => "23",
-         New_Item  => "46",
+         Expected  => "23", New_Item => "46",
          Test_Case => "Reference prefix cursor");
 
       -- Prefix call using a generalized reference (implicit dereference):
@@ -230,8 +220,7 @@ begin
 
       Test_And_Mod
         (Value     => My_List_1.Reference (Position => My_Cursor_1),
-         Expected  => "46",
-         New_Item  => "69",
+         Expected  => "46", New_Item => "69",
          Test_Case => "Reference generalized cursor");
 
       -- Object indexing, everything implicit.
@@ -297,8 +286,7 @@ begin
       for E of My_List_1 loop
 
          Tampering_Check
-           (Container => My_List_1,
-            Where     => "reading forward of loop");
+           (Container => My_List_1, Where => "reading forward of loop");
 
          Pos_Of_First_Char := Character'Pos (E (1));
 
@@ -326,8 +314,7 @@ begin
       for E of reverse My_List_1 loop
 
          Tampering_Check
-           (Container => My_List_1,
-            Where     => "reading reverse of loop");
+           (Container => My_List_1, Where => "reading reverse of loop");
 
          Pos_Of_First_Char := Character'Pos (E (1));
 
@@ -355,8 +342,7 @@ begin
       for C in My_List_1.Iterate loop
 
          Tampering_Check
-           (Container => My_List_1,
-            Where     => "reading forward in loop");
+           (Container => My_List_1, Where => "reading forward in loop");
 
          Pos_Of_First_Char := Character'Pos (My_List_1 (C) (1));
 
@@ -384,8 +370,7 @@ begin
       for C in reverse My_List_1.Iterate loop
 
          Tampering_Check
-           (Container => My_List_1,
-            Where     => "reading reverse in loop");
+           (Container => My_List_1, Where => "reading reverse in loop");
 
          Pos_Of_First_Char := Character'Pos (My_List_1 (C) (1));
 
@@ -543,8 +528,7 @@ begin
 
          if My_Indefinite_Doubly_Linked_Lists.Element
              (Position => My_Cursor_1) /=
-           My_Default_Value
-         then
+           My_Default_Value then
 
             Report.Failed ("Data set by of loop not as expected");
 

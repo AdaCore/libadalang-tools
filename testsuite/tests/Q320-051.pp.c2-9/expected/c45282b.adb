@@ -138,8 +138,7 @@ begin
      ("C45282B",
       "CHECK THAT IN AND NOT IN ARE EVALUATED FOR " &
       "ACCESS TYPES TO RECORD TYPES, PRIVATE TYPES, " &
-      "LIMITED PRIVATE TYPES WITH DISCRIMINANTS, AND " &
-      "TASK TYPES");
+      "LIMITED PRIVATE TYPES WITH DISCRIMINANTS, AND " & "TASK TYPES");
 
 -- CASE D
 ------------------------------------------------------------------------

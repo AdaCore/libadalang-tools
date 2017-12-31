@@ -15,68 +15,49 @@ private
 
    Ptr_Const : constant Ptr :=
      new Var_String'
-       (Finalization.Controlled with
-        Length => 1,
-        Comp_1 => null,
-        Comp_2 => null,
-        Comp_3 => (others => ' '),
-        Tc_Lab => 'C');
+       (Finalization.Controlled with Length => 1, Comp_1 => null,
+        Comp_2 => null, Comp_3 => (others => ' '), Tc_Lab => 'C');
 
    Ptr_Arr_Const : constant Ptr_Arr :=
      (1 =>
         new Var_String'
-          (Finalization.Controlled with
-           Length => 1,
-           Comp_1 => new String'("abcdefghij"),
-           Comp_2 => null,
-           Comp_3 => (2 .. 2 => ' '),
-           Tc_Lab => 'D'));
+          (Finalization.Controlled with Length => 1,
+           Comp_1 => new String'("abcdefghij"), Comp_2 => null,
+           Comp_3 => (2 .. 2 => ' '), Tc_Lab => 'D'));
 
    Ptr_Rec_Var : Ptr_Rec :=
      (3,
       (1 .. 2 => null,
        3      =>
          new Var_String'
-           (Finalization.Controlled with
-            Length => 2,
-            Comp_1 => new String'("abcdefghij"),
-            Comp_2 => null,
-            Comp_3 => (2 .. 2 => ' '),
-            Tc_Lab => 'E')));
+           (Finalization.Controlled with Length => 2,
+            Comp_1 => new String'("abcdefghij"), Comp_2 => null,
+            Comp_3 => (2 .. 2 => ' '), Tc_Lab => 'E')));
 
    Ptr_Rec_Const : constant Ptr_Rec :=
      (3,
       (1 .. 2 => null,
        3      =>
          new Var_String'
-           (Finalization.Controlled with
-            Length => 2,
-            Comp_1 => new String'("abcdefghij"),
-            Comp_2 => null,
-            Comp_3 => (2 .. 2 => ' '),
-            Tc_Lab => 'F')));
+           (Finalization.Controlled with Length => 2,
+            Comp_1 => new String'("abcdefghij"), Comp_2 => null,
+            Comp_3 => (2 .. 2 => ' '), Tc_Lab => 'F')));
 
    type Arr is array (Positive range <>) of Var_String (Length => 2);
 
    Arr_Var : Arr :=
      (1 =>
-        (Finalization.Controlled with
-         Length => 2,
-         Comp_1 => new String'("abcdefghij"),
-         Comp_2 => null,
-         Comp_3 => (2 .. 2 => ' '),
-         Tc_Lab => 'G'));
+        (Finalization.Controlled with Length => 2,
+         Comp_1 => new String'("abcdefghij"), Comp_2 => null,
+         Comp_3 => (2 .. 2 => ' '), Tc_Lab => 'G'));
 
    type Rec (N_Strings : Natural) is record
       Ptrs    : Ptr_Rec (N_Strings);
       Strings : Arr (1 .. N_Strings) :=
         (others =>
-           (Finalization.Controlled with
-            Length => 2,
-            Comp_1 => new String'("abcdefghij"),
-            Comp_2 => null,
-            Comp_3 => (2 .. 2 => ' '),
-            Tc_Lab => 'H'));
+           (Finalization.Controlled with Length => 2,
+            Comp_1 => new String'("abcdefghij"), Comp_2 => null,
+            Comp_3 => (2 .. 2 => ' '), Tc_Lab => 'H'));
    end record;
 
    Default_Init_Rec_Var       : Rec (N_Strings => 10);
@@ -89,27 +70,18 @@ private
          (1 .. 1 => null,
           2      =>
             new Var_String'
-              (Finalization.Controlled with
-               Length => 2,
-               Comp_1 => new String'("abcdefghij"),
-               Comp_2 => null,
-               Comp_3 => (2 .. 2 => ' '),
-               Tc_Lab => 'J'))),
+              (Finalization.Controlled with Length => 2,
+               Comp_1 => new String'("abcdefghij"), Comp_2 => null,
+               Comp_3 => (2 .. 2 => ' '), Tc_Lab => 'J'))),
       Strings =>
         (1 =>
-           (Finalization.Controlled with
-            Length => 2,
-            Comp_1 => new String'("abcdefghij"),
-            Comp_2 => null,
-            Comp_3 => (2 .. 2 => ' '),
-            Tc_Lab => 'K'),
+           (Finalization.Controlled with Length => 2,
+            Comp_1 => new String'("abcdefghij"), Comp_2 => null,
+            Comp_3 => (2 .. 2 => ' '), Tc_Lab => 'K'),
          others =>
-           (Finalization.Controlled with
-            Length => 2,
-            Comp_1 => new String'("abcdefghij"),
-            Comp_2 => null,
-            Comp_3 => (2 .. 2 => ' '),
-            Tc_Lab => 'L')));
+           (Finalization.Controlled with Length => 2,
+            Comp_1 => new String'("abcdefghij"), Comp_2 => null,
+            Comp_3 => (2 .. 2 => ' '), Tc_Lab => 'L')));
 
    procedure Check_Equal (X, Y : Rec);
 

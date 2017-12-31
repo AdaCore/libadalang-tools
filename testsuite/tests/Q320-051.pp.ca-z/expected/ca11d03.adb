@@ -25,17 +25,14 @@ begin
    declare
       Operand_1 : Complex_Type :=
         Complex
-          (Int_Type (Report.Ident_Int (3)),
-           Int_Type (Report.Ident_Int (2)));
+          (Int_Type (Report.Ident_Int (3)), Int_Type (Report.Ident_Int (2)));
       -- Referenced to function in parent package.
       Operand_2 : Complex_Type :=
         Complex
-          (Int_Type (Report.Ident_Int (10)),
-           Int_Type (Report.Ident_Int (8)));
+          (Int_Type (Report.Ident_Int (10)), Int_Type (Report.Ident_Int (8)));
       Mul_Res : Complex_Type :=
         Complex
-          (Int_Type (Report.Ident_Int (30)),
-           Int_Type (Report.Ident_Int (16)));
+          (Int_Type (Report.Ident_Int (30)), Int_Type (Report.Ident_Int (16)));
       Complex_No : Complex_Type :=
         Zero;  -- Zero is declared in parent package.
    begin
@@ -63,16 +60,13 @@ begin
       -- Reference to exception in parent package.
       Operand_1 : Complex_Type :=
         Complex
-          (Int_Type (Report.Ident_Int (2)),
-           Int_Type (Report.Ident_Int (7)));
+          (Int_Type (Report.Ident_Int (2)), Int_Type (Report.Ident_Int (7)));
       Operand_2 : Complex_Type :=
         Complex
-          (Int_Type (Report.Ident_Int (-4)),
-           Int_Type (Report.Ident_Int (1)));
+          (Int_Type (Report.Ident_Int (-4)), Int_Type (Report.Ident_Int (1)));
       Add_Res : Complex_Type :=
         Complex
-          (Int_Type (Report.Ident_Int (-2)),
-           Int_Type (Report.Ident_Int (8)));
+          (Int_Type (Report.Ident_Int (-2)), Int_Type (Report.Ident_Int (8)));
       Complex_No : Complex_Type := One;   -- One is declared in parent
    -- package.
    begin

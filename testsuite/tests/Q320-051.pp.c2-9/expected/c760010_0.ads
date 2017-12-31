@@ -73,12 +73,8 @@ package C760010_0 is
    User_Defined_Exception : exception;
 
    type Actions is
-     (No_Action,
-      Init_Raise_User_Defined,
-      Init_Raise_Standard,
-      Adj_Raise_User_Defined,
-      Adj_Raise_Standard,
-      Fin_Raise_User_Defined,
+     (No_Action, Init_Raise_User_Defined, Init_Raise_Standard,
+      Adj_Raise_User_Defined, Adj_Raise_Standard, Fin_Raise_User_Defined,
       Fin_Raise_Standard);
 
    Action : Actions := No_Action;

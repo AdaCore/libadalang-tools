@@ -15,14 +15,12 @@ protected body Family_Transportation is
                -- Reference type declared in the private parent of the subunit
                -- parent's body. Reference type declared in the visible part of
                -- the subunit parent's body.
-               if not Vehicles (New_Car).In_Use and
-                 Fuel (New_Car)
+               if not Vehicles (New_Car).In_Use and Fuel (New_Car)
 
                   -- Reference type declared in the public sibling of the
                   -- subunit parent's body.
                    and
-                 not Ca13001_1.Ca13001_2.Ca13001_3.Flat_Tire (New_Car)
-               then
+                 not Ca13001_1.Ca13001_2.Ca13001_3.Flat_Tire (New_Car) then
                   Vehicles (New_Car).In_Use := True;
 
                   -- Reference type declared in the private part of the
@@ -37,10 +35,8 @@ protected body Family_Transportation is
 
             -- Drive clunker to other destinations.
             else
-               if not Vehicles (Clunker).In_Use and
-                 Fuel (Clunker) and
-                 not Ca13001_1.Ca13001_2.Ca13001_3.Flat_Tire (Clunker)
-               then
+               if not Vehicles (Clunker).In_Use and Fuel (Clunker) and
+                 not Ca13001_1.Ca13001_2.Ca13001_3.Flat_Tire (Clunker) then
                   Vehicles (Clunker).In_Use := True;
                   Keys (Clunker).Available  := False;
                   Key                       := Transportation'Pos (Clunker);
@@ -52,10 +48,8 @@ protected body Family_Transportation is
 
          -- Similar for Teen.
          when Teen =>
-            if not Vehicles (Clunker).In_Use and
-              Fuel (Clunker) and
-              not Ca13001_1.Ca13001_2.Ca13001_3.Flat_Tire (Clunker)
-            then
+            if not Vehicles (Clunker).In_Use and Fuel (Clunker) and
+              not Ca13001_1.Ca13001_2.Ca13001_3.Flat_Tire (Clunker) then
                Vehicles (Clunker).In_Use := True;
                Keys (Clunker).Available  := False;
                Key                       := Transportation'Pos (Clunker);

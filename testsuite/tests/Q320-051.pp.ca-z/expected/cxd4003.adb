@@ -95,9 +95,8 @@ begin
       Message_3_Numb : Message_Number := 102;   -- High priority
 
       task type Message_Task is
-         entry Start
-           (Numb          : in Message_Number;
-            Task_Priority : in System.Priority);
+         entry Start (Numb : in Message_Number;
+            Task_Priority  : in System.Priority);
       end Message_Task;
 
       task Distributor is
@@ -109,10 +108,8 @@ begin
       task body Message_Task is
          This_Message_Number : Message_Number;
       begin
-         accept Start
-           (Numb          : in Message_Number;
-            Task_Priority : in System.Priority)
-         do
+         accept Start (Numb : in Message_Number;
+            Task_Priority   : in System.Priority) do
 
             -- Set the priority of the task (uses the default
             --          Ada.Task_Identification.Current_Task)

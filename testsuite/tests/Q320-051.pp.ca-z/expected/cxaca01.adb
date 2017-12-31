@@ -92,9 +92,7 @@ begin
       -- Not_Applicable result.
 
       Ada.Streams.Stream_Io.Create
-        (Info_File,
-         Ada.Streams.Stream_Io.Out_File,
-         The_Filename);
+        (Info_File, Ada.Streams.Stream_Io.Out_File, The_Filename);
 
       Operational_Test_Block :
       declare
@@ -114,16 +112,14 @@ begin
             Integer'Write (Info_Stream, Fxaca00.Sale_Count_01);
             Fxaca00.Sales_Record_Type'Write (Info_Stream, Fxaca00.Sale_Rec_01);
             Fxaca00.Sales_Record_Type'Write (Info_Stream, Fxaca00.Sale_Rec_02);
-            Fxaca00.Sales_Statistics_Type'Write
-              (Info_Stream,
+            Fxaca00.Sales_Statistics_Type'Write (Info_Stream,
                Fxaca00.Product_01_Stats);
 
             -- Write information about second product to the stream. Note: No
             -- Sales_Record_Type objects.
             Fxaca00.Product_Type'Write (Info_Stream, Fxaca00.Product_02);
             Integer'Write (Info_Stream, Fxaca00.Sale_Count_02);
-            Fxaca00.Sales_Statistics_Type'Write
-              (Info_Stream,
+            Fxaca00.Sales_Statistics_Type'Write (Info_Stream,
                Fxaca00.Product_02_Stats);
 
             -- Write information about third product to the stream.
@@ -132,8 +128,7 @@ begin
             Fxaca00.Sales_Record_Type'Write (Info_Stream, Fxaca00.Sale_Rec_03);
             Fxaca00.Sales_Record_Type'Write (Info_Stream, Fxaca00.Sale_Rec_04);
             Fxaca00.Sales_Record_Type'Write (Info_Stream, Fxaca00.Sale_Rec_05);
-            Fxaca00.Sales_Statistics_Type'Write
-              (Info_Stream,
+            Fxaca00.Sales_Statistics_Type'Write (Info_Stream,
                Fxaca00.Product_03_Stats);
 
          end Store_Data_Block;
@@ -155,21 +150,16 @@ begin
             Tc_Product1              : Product_Type;
             Tc_Product2, Tc_Product3 : Product_Type (Foreign);
 
-            Tc_Count1,
-            Tc_Count2,
-            Tc_Count3 : Integer :=
+            Tc_Count1, Tc_Count2, Tc_Count3 : Integer :=
               -10;  -- Initialized to dummy value.
 
-            Tc_Stat1,
-            Tc_Stat2,
-            Tc_Stat3 : Sales_Statistics_Type :=
+            Tc_Stat1, Tc_Stat2, Tc_Stat3 : Sales_Statistics_Type :=
               (others => 500);
 
          begin
 
             Ada.Streams.Stream_Io.Reset
-              (Info_File,
-               Ada.Streams.Stream_Io.In_File);
+              (Info_File, Ada.Streams.Stream_Io.In_File);
 
             -- Read all of the data that is contained in the stream. Compare
             -- all data with the original data in package FXACA00 that was
@@ -234,8 +224,7 @@ begin
 
             -- Verify the information of the second product.
             if not
-              ((Product_02 = Tc_Product2)
-               and then (Sale_Count_02 = Tc_Count2)
+              ((Product_02 = Tc_Product2) and then (Sale_Count_02 = Tc_Count2)
                and then (Product_02_Stats = Tc_Stat2))
             then
                Report.Failed ("Product 2 information incorrect");
@@ -270,9 +259,7 @@ begin
          Ada.Streams.Stream_Io.Delete (Info_File);
       else
          Ada.Streams.Stream_Io.Open
-           (Info_File,
-            Ada.Streams.Stream_Io.In_File,
-            The_Filename);
+           (Info_File, Ada.Streams.Stream_Io.In_File, The_Filename);
          Ada.Streams.Stream_Io.Delete (Info_File);
       end if;
 

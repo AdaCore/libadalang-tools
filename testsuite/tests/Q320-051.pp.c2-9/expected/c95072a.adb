@@ -60,8 +60,7 @@ begin
             if Ei /= Tmp then
                Failed
                  ("ASSIGNMENT TO SCALAR OUT " &
-                  "PARAMETER CHANGES THE VALUE OF " &
-                  "INPUT PARAMETER");
+                  "PARAMETER CHANGES THE VALUE OF " & "INPUT PARAMETER");
                Tmp := Ei;     -- RESET TMP FOR NEXT CASE.
             end if;
 
@@ -69,8 +68,7 @@ begin
             if Ei /= Tmp then
                Failed
                  ("ASSIGNMENT TO SCALAR IN OUT " &
-                  "PARAMETER CHANGES THE VALUE OF " &
-                  "INPUT PARAMETER");
+                  "PARAMETER CHANGES THE VALUE OF " & "INPUT PARAMETER");
                Tmp := Ei;     -- RESET TMP FOR NEXT CASE.
             end if;
 
@@ -78,8 +76,7 @@ begin
             if Ei /= Tmp then
                Failed
                  ("ASSIGNMENT TO SCALAR ACTUAL " &
-                  "PARAMETER CHANGES THE VALUE OF " &
-                  "INPUT PARAMETER");
+                  "PARAMETER CHANGES THE VALUE OF " & "INPUT PARAMETER");
             end if;
 
             raise E;            -- CHECK EXCEPTION HANDLING.
@@ -110,8 +107,7 @@ begin
                when 111 =>
                   Failed
                     ("OUT AND IN OUT ACTUAL SCALAR " &
-                     "PARAMETERS CHANGED GLOBAL " &
-                     "VALUE");
+                     "PARAMETERS CHANGED GLOBAL " & "VALUE");
                when others =>
                   Failed ("UNDETERMINED CHANGE TO GLOBAL " & "VALUE");
             end case;
@@ -147,8 +143,7 @@ begin
             if Ei /= Tmp then
                Failed
                  ("ASSIGNMENT TO ACCESS ACTUAL " &
-                  "PARAMETER CHANGES THE VALUE OF " &
-                  "INPUT PARAMETER");
+                  "PARAMETER CHANGES THE VALUE OF " & "INPUT PARAMETER");
                Tmp := Ei;     -- RESET TMP FOR NEXT CASE.
             end if;
 
@@ -156,8 +151,7 @@ begin
             if Ei /= Tmp then
                Failed
                  ("ASSIGNMENT TO ACCESS OUT " &
-                  "PARAMETER CHANGES THE VALUE OF " &
-                  "INPUT PARAMETER");
+                  "PARAMETER CHANGES THE VALUE OF " & "INPUT PARAMETER");
                Tmp := Ei;     -- RESET TMP FOR NEXT CASE.
             end if;
 
@@ -165,8 +159,7 @@ begin
             if Ei /= Tmp then
                Failed
                  ("ASSIGNMENT TO ACCESS IN OUT " &
-                  "PARAMETER CHANGES THE VALUE OF " &
-                  "INPUT PARAMETER");
+                  "PARAMETER CHANGES THE VALUE OF " & "INPUT PARAMETER");
             end if;
 
             raise E;            -- CHECK EXCEPTION HANDLING.
@@ -188,8 +181,7 @@ begin
          if I.all /= 101 then
             Failed
               ("OUT OR IN OUT ACTUAL ENTRY " &
-               "PARAMETER VALUE CHANGED DESPITE " &
-               "RAISED EXCEPTION");
+               "PARAMETER VALUE CHANGED DESPITE " & "RAISED EXCEPTION");
          end if;
       when others =>
          Failed ("WRONG EXCEPTION RAISED - B");

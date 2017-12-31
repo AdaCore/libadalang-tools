@@ -88,8 +88,7 @@ begin
             when others =>
                Failed
                  ("DID NOT RAISE CONSTRAINT_ERROR" &
-                  " AT PROPER PLACE - BOOL " &
-                  T'Image (T1));   --USE T1);
+                  " AT PROPER PLACE - BOOL " & T'Image (T1));   --USE T1);
          end;
 
          Failed ("EXCEPTION NOT RAISED - BOOL");
@@ -145,8 +144,7 @@ begin
             T1 : T := T (Ident_Int (0));
          begin
             Failed
-              ("DID NOT RAISE CONSTRAINT_ERROR" &
-               " AT PROPER PLACE " &
+              ("DID NOT RAISE CONSTRAINT_ERROR" & " AT PROPER PLACE " &
                T'Image (T1)); --USE T1
 
          exception
@@ -176,8 +174,7 @@ begin
             T1 : T := T (Ident_Int (2));
          begin
             Failed
-              ("DID NOT RAISE CONSTRAINT_ERROR" &
-               " AT PROPER PLACE " &
+              ("DID NOT RAISE CONSTRAINT_ERROR" & " AT PROPER PLACE " &
                T'Image (T1));  -- USE T1
          exception
             when others =>
@@ -206,8 +203,7 @@ begin
             T1 : T := (others => Ident_Int (3));
          begin
             Failed
-              ("DID NOT RAISE CONSTRAINT_ERROR " &
-               "AT PROPER PLACE " &
+              ("DID NOT RAISE CONSTRAINT_ERROR " & "AT PROPER PLACE " &
                Integer'Image (T1 (1))); --USE T1
          exception
             when others =>
@@ -239,8 +235,7 @@ begin
          exception
             when others =>
                Failed
-                 ("DID NOT RAISE CONSTRAINT_ERROR " &
-                  "AT PROPER PLACE " &
+                 ("DID NOT RAISE CONSTRAINT_ERROR " & "AT PROPER PLACE " &
                   Integer'Image (T1.D)); --USE T1
          end;
          Failed ("EXCEPTION NOT RAISED - REC ");
@@ -269,8 +264,7 @@ begin
          exception
             when others =>
                Failed
-                 ("DID NOT RAISE CONSTRAINT_ERROR " &
-                  "AT PROPER PLACE " &
+                 ("DID NOT RAISE CONSTRAINT_ERROR " & "AT PROPER PLACE " &
                   Integer'Image (T1.D)); --USE T1
          end;
          Failed ("EXCEPTION NOT RAISED - PRIV ");
@@ -299,8 +293,7 @@ begin
          exception
             when others =>
                Failed
-                 ("DID NOT RAISE CONSTRAINT_ERROR " &
-                  "AT PROPER PLACE " &
+                 ("DID NOT RAISE CONSTRAINT_ERROR " & "AT PROPER PLACE " &
                   Integer'Image (T1 (1))); --USE T1
          end;
          Failed ("EXCEPTION NOT RAISED - ACC_ARR ");
@@ -329,8 +322,7 @@ begin
          exception
             when others =>
                Failed
-                 ("DID NOT RAISE CONSTRAINT_ERROR " &
-                  "AT PROPER PLACE " &
+                 ("DID NOT RAISE CONSTRAINT_ERROR " & "AT PROPER PLACE " &
                   Integer'Image (T1.D)); --USE T1
          end;
          Failed ("EXCEPTION NOT RAISED - ACC_REC ");

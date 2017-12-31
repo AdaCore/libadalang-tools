@@ -47,10 +47,8 @@ begin
       Obj2 : R2 (Ident_Bool (False), Ident_Bool (True));
       Obj3 : R3 (1, 2, 3, 4, 'A', 'B', 'C', Ident_Char ('D'));
    begin
-      if Obj1 = (D => (False)) or
-        Obj2 /= (False, (True)) or
-        Obj3 /= (1, 2, 3, 4, 'A', 'B', 'C', ('D'))
-      then
+      if Obj1 = (D => (False)) or Obj2 /= (False, (True)) or
+        Obj3 /= (1, 2, 3, 4, 'A', 'B', 'C', ('D')) then
          Failed ("DISCRIMINANT-ONLY RECORDS DON'T WORK");
       end if;
    end;

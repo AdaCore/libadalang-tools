@@ -81,8 +81,7 @@ procedure Cxai014 is
    end My_Equivalent_Elements;
 
    package My_Bounded_Hashed_Sets is new Ada.Containers.Bounded_Hashed_Sets
-     (Element_Type        => My_Float,
-      Hash                => My_Element_Hash,
+     (Element_Type        => My_Float, Hash => My_Element_Hash,
       Equivalent_Elements => My_Equivalent_Elements); -- Default =
 
    type My_Key_Type is new Integer;
@@ -109,34 +108,24 @@ procedure Cxai014 is
    end My_Equivalent_Keys;
 
    package My_Keys is new My_Bounded_Hashed_Sets.Generic_Keys
-     (Key_Type        => My_Key_Type,
-      Key             => My_Key,
-      Hash            => My_Key_Hash,
+     (Key_Type        => My_Key_Type, Key => My_Key, Hash => My_Key_Hash,
       Equivalent_Keys => My_Equivalent_Keys); -- Predefined <
 
    Num_Tests : constant := 10;
 
    Capacity_Reqd : constant := Num_Tests + 1;
 
-   My_Set_1 : My_Bounded_Hashed_Sets
-     .Set
-     (Capacity => Capacity_Reqd,
-      Modulus  =>
+   My_Set_1 : My_Bounded_Hashed_Sets.Set (Capacity => Capacity_Reqd,
+      Modulus =>
         My_Bounded_Hashed_Sets.Default_Modulus (Capacity => Capacity_Reqd));
-   My_Set_2 : My_Bounded_Hashed_Sets
-     .Set
-     (Capacity => Capacity_Reqd,
-      Modulus  =>
+   My_Set_2 : My_Bounded_Hashed_Sets.Set (Capacity => Capacity_Reqd,
+      Modulus =>
         My_Bounded_Hashed_Sets.Default_Modulus (Capacity => Capacity_Reqd));
-   My_Set_3 : My_Bounded_Hashed_Sets
-     .Set
-     (Capacity => Capacity_Reqd,
-      Modulus  =>
+   My_Set_3 : My_Bounded_Hashed_Sets.Set (Capacity => Capacity_Reqd,
+      Modulus =>
         My_Bounded_Hashed_Sets.Default_Modulus (Capacity => Capacity_Reqd));
-   Big_Set : My_Bounded_Hashed_Sets
-     .Set
-     (Capacity => Capacity_Reqd,
-      Modulus  =>
+   Big_Set : My_Bounded_Hashed_Sets.Set (Capacity => Capacity_Reqd,
+      Modulus =>
         My_Bounded_Hashed_Sets.Default_Modulus (Capacity => Capacity_Reqd));
 
    subtype Array_Bounds_Type is Ada.Containers.Count_Type range 1 .. Num_Tests;
@@ -153,9 +142,8 @@ procedure Cxai014 is
 
    My_Inserted : Boolean;
 
-   procedure Tampering_Check
-     (Container : in out My_Bounded_Hashed_Sets.Set;
-      Where     : in     String) with
+   procedure Tampering_Check (Container : in out My_Bounded_Hashed_Sets.Set;
+      Where                             : in     String) with
       Pre => not Container.Is_Empty
     is
 
@@ -323,8 +311,7 @@ begin
       begin
 
          My_Bounded_Hashed_Sets.Query_Element
-           (Position => My_Cursor_1,
-            Process  => My_Query'Access);
+           (Position => My_Cursor_1, Process => My_Query'Access);
 
       end;
 
@@ -373,9 +360,7 @@ begin
    end if;
 
    if not My_Bounded_Hashed_Sets.Equivalent_Sets
-       (Left  => My_Set_1,
-        Right => My_Set_2)
-   then
+       (Left => My_Set_1, Right => My_Set_2) then
 
       Report.Failed ("Bounded_Hashed_Sets not equivalent");
 
@@ -705,8 +690,7 @@ begin
    My_Cursor_1 := My_Set_1.Find (Item => Value_In_Array (9));
 
    if My_Bounded_Hashed_Sets.Element (Position => My_Cursor_1) /=
-     Value_In_Array (9)
-   then
+     Value_In_Array (9) then
 
       Report.Failed ("Found value not as expected");
 
@@ -715,8 +699,7 @@ begin
    My_Cursor_2 := My_Set_1.Find (Item => Value_In_Array (8));
 
    if My_Bounded_Hashed_Sets.Element (Position => My_Cursor_2) /=
-     Value_In_Array (8)
-   then
+     Value_In_Array (8) then
 
       Report.Failed ("Found (element form) value not as expected");
 
@@ -725,8 +708,7 @@ begin
    My_Cursor_1 := My_Set_1.Find (Item => Value_In_Array (10));
 
    if My_Bounded_Hashed_Sets.Element (Position => My_Cursor_1) /=
-     Value_In_Array (10)
-   then
+     Value_In_Array (10) then
 
       Report.Failed ("Found (element form) value not as expected");
 
@@ -788,17 +770,13 @@ begin
    end if;
 
    if not My_Bounded_Hashed_Sets.Is_Subset
-       (Subset => My_Set_2,
-        Of_Set => My_Set_1)
-   then
+       (Subset => My_Set_2, Of_Set => My_Set_1) then
 
       Report.Failed ("Erroneously doesn't think is subset");
 
    end if;
 
-   if My_Bounded_Hashed_Sets.Is_Subset
-       (Subset => My_Set_3,
-        Of_Set => My_Set_1)
+   if My_Bounded_Hashed_Sets.Is_Subset (Subset => My_Set_3, Of_Set => My_Set_1)
    then
 
       Report.Failed ("Erroneously thinks is subset");
@@ -817,9 +795,7 @@ begin
 
    -- Hashed sets are not ordered so could be read out in any order
 
-   if not My_Bounded_Hashed_Sets.Overlap
-       (Left  => My_Set_1,
-        Right => My_Set_2)
+   if not My_Bounded_Hashed_Sets.Overlap (Left => My_Set_1, Right => My_Set_2)
    then
 
       Report.Failed ("Erroneously doesn't think has overlap");
@@ -844,8 +820,7 @@ begin
 
    My_Set_3 :=
      My_Bounded_Hashed_Sets.Copy
-       (Source   => My_Set_1 or My_Set_2,
-        Capacity => Capacity_Reqd);
+       (Source => My_Set_1 or My_Set_2, Capacity => Capacity_Reqd);
 
    -- My_Set_3 should contain the test values
 
@@ -878,8 +853,7 @@ begin
      My_Bounded_Hashed_Sets.Copy
        (Source =>
           My_Bounded_Hashed_Sets.Intersection
-            (Left  => My_Set_1,
-             Right => My_Set_2),
+            (Left => My_Set_1, Right => My_Set_2),
         Capacity => Capacity_Reqd);
 
    -- My_Set_3 should contain Value_In_Array (2)
@@ -893,8 +867,7 @@ begin
    My_Cursor_3 := My_Set_3.First;
 
    if My_Bounded_Hashed_Sets.Element (Position => My_Cursor_3) /=
-     Value_In_Array (2)
-   then
+     Value_In_Array (2) then
 
       Report.Failed ("Element not as expected after Intersection #1");
 
@@ -902,8 +875,7 @@ begin
 
    My_Set_3 :=
      My_Bounded_Hashed_Sets.Copy
-       (Source   => My_Set_1 and My_Set_2,
-        Capacity => Capacity_Reqd);
+       (Source => My_Set_1 and My_Set_2, Capacity => Capacity_Reqd);
 
    -- My_Set_3 should contain Value_In_Array (2)
 
@@ -916,8 +888,7 @@ begin
    My_Cursor_3 := My_Set_3.First;
 
    if My_Bounded_Hashed_Sets.Element (Position => My_Cursor_3) /=
-     Value_In_Array (2)
-   then
+     Value_In_Array (2) then
 
       Report.Failed ("Element not as expected after Intersection #2");
 
@@ -945,8 +916,7 @@ begin
    My_Cursor_3 := My_Set_3.First;
 
    if My_Bounded_Hashed_Sets.Element (Position => My_Cursor_3) /=
-     My_Default_Value
-   then
+     My_Default_Value then
 
       Report.Failed ("Element not as expected after Difference #1");
 
@@ -956,8 +926,7 @@ begin
      My_Bounded_Hashed_Sets.Copy
        (Source =>
           My_Bounded_Hashed_Sets.Difference
-            (Left  => My_Set_1,
-             Right => My_Set_2),
+            (Left => My_Set_1, Right => My_Set_2),
         Capacity => Capacity_Reqd);
 
    -- My_Set_3 should contain the test values except for Value_In_Array (2)
@@ -970,8 +939,7 @@ begin
 
    My_Set_3 :=
      My_Bounded_Hashed_Sets.Copy
-       (Source   => My_Set_1 - My_Set_2,
-        Capacity => Capacity_Reqd);
+       (Source => My_Set_1 - My_Set_2, Capacity => Capacity_Reqd);
 
    -- My_Set_3 should contain the test values except for Value_In_Array (2)
 
@@ -1006,8 +974,7 @@ begin
      My_Bounded_Hashed_Sets.Copy
        (Source =>
           My_Bounded_Hashed_Sets.Symmetric_Difference
-            (Left  => My_Set_1,
-             Right => My_Set_3),
+            (Left => My_Set_1, Right => My_Set_3),
         Capacity => Capacity_Reqd);
 
    -- My_Set_3 should contain the test values except for Value_In_Array (2),
@@ -1021,8 +988,7 @@ begin
 
    My_Set_3 :=
      My_Bounded_Hashed_Sets.Copy
-       (Source   => My_Set_3 xor My_Set_2,
-        Capacity => Capacity_Reqd);
+       (Source => My_Set_3 xor My_Set_2, Capacity => Capacity_Reqd);
 
    -- My_Set_3 should contain the test values, plus Default_Value
 
@@ -1112,8 +1078,7 @@ begin
 
          My_Set_3 :=
            My_Bounded_Hashed_Sets.Copy
-             (Source   => My_Set_3 xor Big_Set,
-              Capacity => Capacity_Reqd);
+             (Source => My_Set_3 xor Big_Set, Capacity => Capacity_Reqd);
 
       exception
 
@@ -1144,8 +1109,7 @@ begin
          Big_Set.Insert
            (New_Item =>
               My_Float (2) * Value_In_Array (3), -- A value in the set.
-            Position => A_Cursor,
-            Inserted => Inserted);
+            Position => A_Cursor, Inserted => Inserted);
 
          if Inserted then
             Report.Failed
@@ -1168,8 +1132,7 @@ begin
 
          Big_Set.Insert
            (New_Item => 555.0, -- A value not in the Set.
-            Position => A_Cursor,
-            Inserted => Inserted);
+            Position => A_Cursor, Inserted => Inserted);
 
          if Inserted then
             Report.Failed
@@ -1201,8 +1164,7 @@ begin
    -- should still contain a single element so we know which the cursor points
    -- to
 
-   if My_Keys.Key (Position => My_Cursor_2) /=
-     My_Key_Type (Value_In_Array (2))
+   if My_Keys.Key (Position => My_Cursor_2) /= My_Key_Type (Value_In_Array (2))
    then
 
       Report.Failed ("Wrong key for cursor");
@@ -1210,10 +1172,8 @@ begin
    end if;
 
    if My_Keys.Element
-       (Container => My_Set_3,
-        Key       => My_Key_Type (Value_In_Array (1))) /=
-     Value_In_Array (1)
-   then
+       (Container => My_Set_3, Key => My_Key_Type (Value_In_Array (1))) /=
+     Value_In_Array (1) then
 
       Report.Failed ("Wrong element for key");
 
@@ -1223,8 +1183,7 @@ begin
    begin
 
       My_Keys.Replace
-        (Container => My_Set_3,
-         Key       => My_Key_Type (Value_In_Array (4)),
+        (Container => My_Set_3, Key => My_Key_Type (Value_In_Array (4)),
          New_Item  => Value_In_Array (4));
 
    exception
@@ -1243,8 +1202,7 @@ begin
    end if;
 
    My_Keys.Exclude
-     (Container => My_Set_3,
-      Key       => My_Key_Type (Value_In_Array (4)));
+     (Container => My_Set_3, Key => My_Key_Type (Value_In_Array (4)));
 
    if My_Set_3.Length /= Num_Tests then
 
@@ -1256,8 +1214,7 @@ begin
    begin
 
       My_Keys.Exclude
-        (Container => My_Set_3,
-         Key       => My_Key_Type (Value_In_Array (4)));
+        (Container => My_Set_3, Key => My_Key_Type (Value_In_Array (4)));
 
    exception
 
@@ -1276,8 +1233,7 @@ begin
    end if;
 
    My_Keys.Delete
-     (Container => My_Set_3,
-      Key       => My_Key_Type (Value_In_Array (3)));
+     (Container => My_Set_3, Key => My_Key_Type (Value_In_Array (3)));
 
    if My_Set_3.Length /= Num_Tests - 1 then
 
@@ -1287,21 +1243,17 @@ begin
 
    My_Cursor_3 :=
      My_Keys.Find
-       (Container => My_Set_3,
-        Key       => My_Key_Type (Value_In_Array (9)));
+       (Container => My_Set_3, Key => My_Key_Type (Value_In_Array (9)));
 
    if My_Bounded_Hashed_Sets.Element (Position => My_Cursor_3) /=
-     Value_In_Array (9)
-   then
+     Value_In_Array (9) then
 
       Report.Failed ("Found (key form) value not as expected");
 
    end if;
 
    if not My_Keys.Contains
-       (Container => My_Set_3,
-        Key       => My_Key_Type (Value_In_Array (2)))
-   then
+       (Container => My_Set_3, Key => My_Key_Type (Value_In_Array (2))) then
 
       Report.Failed ("Contains (key form) failed to find");
 
@@ -1321,8 +1273,7 @@ begin
       begin
 
          Tampering_Check
-           (Container => My_Set_3,
-            Where     => "Update_Element_Preserving_Key");
+           (Container => My_Set_3, Where => "Update_Element_Preserving_Key");
 
          Element := Element + 0.1; -- Some small amount that doesn't change key
 
@@ -1331,8 +1282,7 @@ begin
    begin
 
       My_Keys.Update_Element_Preserving_Key
-        (Container => My_Set_3,
-         Position  => My_Cursor_3,
+        (Container => My_Set_3, Position => My_Cursor_3,
          Process   => My_Update'Access);
 
    end;
@@ -1368,8 +1318,7 @@ begin
 
    My_Set_2 :=
      My_Bounded_Hashed_Sets.Copy
-       (Source   => My_Set_1,
-        Capacity => Capacity_Reqd);
+       (Source => My_Set_1, Capacity => Capacity_Reqd);
 
    if My_Set_2.Length /= Num_Tests then
 

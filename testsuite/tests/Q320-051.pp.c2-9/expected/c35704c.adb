@@ -49,14 +49,10 @@ begin
 
    begin
 
-      if G1'First /= G1 (F'First) or
-        G1'First /= G1 (G2'First) or
-        G1'First /= G1 (F1'First) or
-        G1'Last /= G1 (F'Last) or
-        G1'Last /= G1 (G2'Last) or
-        G1'Last /= G1 (F1'Last)
-
-      then
+      if G1'First /= G1 (F'First) or G1'First /= G1 (G2'First) or
+        G1'First /= G1 (F1'First) or G1'Last /= G1 (F'Last) or
+        G1'Last /= G1 (G2'Last) or G1'Last /= G1 (F1'Last)
+ then
          Failed ("USING FLOAT FROM DIFF PARENTS");
 
       end if;

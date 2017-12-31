@@ -111,20 +111,16 @@ begin
          -- lower lines on the page, and blank out the last line.
          for I in 1 .. Lines_Per_Page - 1 loop
             if Bs_40.Length (Page (I)) + Bs_40.Length (Page (I + 1)) <=
-              Bs_40.Max_Length
-            then
+              Bs_40.Max_Length then
                Page (I) :=
                  Bs_40."&"
-                   (Page (I),
-                    Page (I + 1));       -- "&" (bounded, bounded)
+                   (Page (I), Page (I + 1));       -- "&" (bounded, bounded)
 
                for J in I + 1 .. Lines_Per_Page - 1 loop
                   Page (J) :=
                     Bs_40.To_Bounded_String
                       (Bs_40.Slice
-                         (Page (J + 1),
-                          1,
-                          Bs_40.Length (Page (J + 1))));
+                         (Page (J + 1), 1, Bs_40.Length (Page (J + 1))));
                   Clear_Line := J + 1;
                end loop;
                Page (Clear_Line) := Bs_40.Null_Bounded_String;
@@ -145,8 +141,7 @@ begin
          -- Add a period to the end of the last line.
          while Line >= Page_Type'First and not Finished loop
             if Page (Line) /= Bs_40.Null_Bounded_String and
-              Bs_40.Length (Page (Line)) <= Bs_40.Max_Length
-            then
+              Bs_40.Length (Page (Line)) <= Bs_40.Max_Length then
                Page (Line) := Bs_40.Append (Page (Line), '.');
                Finished    := True;
             end if;
@@ -159,16 +154,14 @@ begin
             while not Finished loop
                Char_Pos :=
                  Bs_40.Index
-                   (Source  => Page (Line),
-                    Pattern => Bs_40.To_String (Sm_Ada),
-                    Going   => Ada.Strings.Backward);
+                   (Source => Page (Line), Pattern => Bs_40.To_String (Sm_Ada),
+                    Going  => Ada.Strings.Backward);
                -- A zero is returned by function Index if no occurrences of the
                -- pattern string are found.
                Finished := (Char_Pos = 0);
                if not Finished then
                   Bs_40.Replace_Slice
-                    (Source => Page (Line),
-                     Low    => Char_Pos,
+                    (Source => Page (Line), Low => Char_Pos,
                      High   => Char_Pos + Bs_40.Length (Sm_Ada) - 1,
                      By     => Cap_Ada);
                end if;
@@ -211,19 +204,16 @@ begin
                    (Page (Line),
                     Bs_40.To_String
                       (Bs_40.Trim
-                         (Dictionary (1) (Incorrect),
-                          Ada.Strings.Both)),
+                         (Dictionary (1) (Incorrect), Ada.Strings.Both)),
                     Ada.Strings.Forward);
                Finished := (Pos = 0);
                if not Finished then
                   Page (Line) :=
                     Bs_40.Overwrite
-                      (Page (Line),
-                       Pos,
+                      (Page (Line), Pos,
                        Bs_40.To_String
                          (Bs_40.Trim
-                            (Dictionary (1) (Correct),
-                             Ada.Strings.Both)));
+                            (Dictionary (1) (Correct), Ada.Strings.Both)));
                end if;
             end loop;
 
@@ -239,31 +229,26 @@ begin
                    (Page (Line),
                     Bs_40.To_String
                       (Bs_40.Trim
-                         (Dictionary (2) (Incorrect),
-                          Ada.Strings.Both)),
+                         (Dictionary (2) (Incorrect), Ada.Strings.Both)),
                     Ada.Strings.Forward);
 
                Finished := (Pos = 0);
 
                if not Finished then
                   Bs_40.Delete
-                    (Page (Line),
-                     Pos,
+                    (Page (Line), Pos,
                      Pos +
                      Bs_40.To_String
                        (Bs_40.Trim
-                          (Dictionary (2) (Incorrect),
-                           Ada.Strings.Both))'
+                          (Dictionary (2) (Incorrect), Ada.Strings.Both))'
                        Length -
                      1);
                   Page (Line) :=
                     Bs_40.Insert
-                      (Page (Line),
-                       Pos,
+                      (Page (Line), Pos,
                        Bs_40.To_String
                          (Bs_40.Trim
-                            (Dictionary (2) (Correct),
-                             Ada.Strings.Both)));
+                            (Dictionary (2) (Correct), Ada.Strings.Both)));
                end if;
             end loop;
 
@@ -294,15 +279,12 @@ begin
                if not Finished then
 
                   Bs_40.Overwrite
-                    (Page (Line),
-                     Pos,
+                    (Page (Line), Pos,
                      Bs_40.To_String
                        (Bs_40.Translate
                           (Bs_40.To_Bounded_String
                              (Bs_40.Slice
-                                (Page (Line),
-                                 Pos,
-                                 Pos + Key_Word'Length - 1)),
+                                (Page (Line), Pos, Pos + Key_Word'Length - 1)),
                            Bold_Mapping)));
 
                end if;
@@ -321,8 +303,7 @@ begin
       for I in 1 .. Lines_Per_Page loop
          if Bs_40.To_String (Page (I)) /=
            Bs_40.To_String (Finished_Page (I)) or
-           Bs_40.Length (Page (I)) /= Bs_40.Length (Finished_Page (I))
-         then
+           Bs_40.Length (Page (I)) /= Bs_40.Length (Finished_Page (I)) then
             Report.Failed
               ("Incorrect modification of Page, Line " & Integer'Image (I));
          end if;

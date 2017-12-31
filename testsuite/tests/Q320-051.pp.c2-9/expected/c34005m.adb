@@ -47,11 +47,8 @@ procedure C34005m is
 
       type Parent is array (Index range <>, Index range <>) of Component;
 
-      function Create
-        (F1, L1 : Index;
-         F2, L2 : Index;
-         C      : Component;
-         Dummy  : Parent   -- TO RESOLVE OVERLOADING.
+      function Create (F1, L1 : Index; F2, L2 : Index; C : Component;
+         Dummy                : Parent   -- TO RESOLVE OVERLOADING.
          ) return Parent;
 
    end Pkg;
@@ -59,8 +56,7 @@ procedure C34005m is
    use Pkg;
 
    type T is
-     new Parent
-       (Ident_Int (4) .. Ident_Int (5),
+     new Parent (Ident_Int (4) .. Ident_Int (5),
         Ident_Int (6) .. Ident_Int (8));
 
    type Arrt is array (Integer range <>, Integer range <>) of Component;
@@ -86,11 +82,8 @@ procedure C34005m is
 
    package body Pkg is
 
-      function Create
-        (F1, L1 : Index;
-         F2, L2 : Index;
-         C      : Component;
-         Dummy  : Parent) return Parent
+      function Create (F1, L1 : Index; F2, L2 : Index; C : Component;
+         Dummy                : Parent) return Parent
       is
          A : Parent (F1 .. L1, F2 .. L2);
          B : Component := C;
@@ -178,15 +171,13 @@ begin
    end;
 
    if Ident (((1, 2, 3), (4, 5, 6))) /= ((1, 2, 3), (4, 5, 6)) or
-     X = ((1, 2), (3, 4), (5, 6))
-   then
+     X = ((1, 2), (3, 4), (5, 6)) then
       Failed ("INCORRECT AGGREGATE");
    end if;
 
    begin
       if X (Ident_Int (4), Ident_Int (6)) /= 1 or
-        Create (6, 9, 2, 3, 4, X) (9, 3) /= 11
-      then
+        Create (6, 9, 2, 3, 4, X) (9, 3) /= 11 then
          Failed ("INCORRECT INDEX (VALUE)");
       end if;
    exception
@@ -207,8 +198,7 @@ begin
    end if;
 
    if X /= Ident (((1, 2, 3), (4, 5, 6))) or
-     not (X /= ((1, 2, 3), (4, 5, 6), (7, 8, 9)))
-   then
+     not (X /= ((1, 2, 3), (4, 5, 6), (7, 8, 9))) then
       Failed ("INCORRECT /=");
    end if;
 

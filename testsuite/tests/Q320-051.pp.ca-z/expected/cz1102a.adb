@@ -41,16 +41,10 @@ begin
       "CHECK THAT THE DYNAMIC VALUE ROUTINES OF " &
       "THE REPORT PACKAGE WORK CORRECTLY");
 
-   if not Equal (0, 0) or
-     Equal (0, 1) or
-     not Equal (1, 1) or
-     not Equal (3, 3) or
-     not Equal (4, 4) or
-     not Equal (-1, -1) or
+   if not Equal (0, 0) or Equal (0, 1) or not Equal (1, 1) or
+     not Equal (3, 3) or not Equal (4, 4) or not Equal (-1, -1) or
      not Equal (Integer'First, Integer'First) or
-     not Equal (Integer'Last, Integer'Last) or
-     Equal (-1, 0)
-   then
+     not Equal (Integer'Last, Integer'Last) or Equal (-1, 0) then
       Failed ("'EQUAL' NOT WORKING");
    end if;
 
@@ -66,10 +60,8 @@ begin
       Failed ("'IDENT_BOOL' NOT WORKING");
    end if;
 
-   if Ident_Str ("") /= "" or
-     Ident_Str ("K") /= "K" or
-     Ident_Str ("PQRS") /= "PQRS"
-   then
+   if Ident_Str ("") /= "" or Ident_Str ("K") /= "K" or
+     Ident_Str ("PQRS") /= "PQRS" then
       Failed ("'IDENT_STR' NOT WORKING");
    end if;
 

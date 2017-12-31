@@ -2,9 +2,8 @@
 
 package body C730002_0 is
 
-   procedure Routine_Maintenance
-     (Engine     : in out Engine_Type;
-      Specialist : in     Specialist_Id := Moe)
+   procedure Routine_Maintenance (Engine : in out Engine_Type;
+      Specialist                         : in     Specialist_Id := Moe)
    is
    begin
       Engine.Ave_Repair_Time    := 3;

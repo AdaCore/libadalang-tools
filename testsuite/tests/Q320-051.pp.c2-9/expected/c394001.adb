@@ -98,12 +98,8 @@ procedure C394001 is
    begin
       if Value /= Expected then
          Failed
-           (Attribute &
-            " is " &
-            Boolean'Image (Value) &
-            " but " &
-            Boolean'Image (Expected) &
-            " was expected");
+           (Attribute & " is " & Boolean'Image (Value) & " but " &
+            Boolean'Image (Expected) & " was expected");
       end if;
    end Check_Value;
 
@@ -113,12 +109,9 @@ procedure C394001 is
    begin
       delay Impdef.Switch_To_New_Task;
       Check_Value
-        (Value     => Obj'Callable,
-         Expected  => True,
-         Attribute => "Callable");
+        (Value => Obj'Callable, Expected => True, Attribute => "Callable");
       Check_Value
-        (Value     => Obj'Terminated,
-         Expected  => False,
+        (Value     => Obj'Terminated, Expected => False,
          Attribute => "Terminated");
 
       Comment ("  Stop task");
@@ -126,13 +119,9 @@ procedure C394001 is
 
       delay Impdef.Minimum_Task_Switch;
       Check_Value
-        (Value     => Obj'Callable,
-         Expected  => False,
-         Attribute => "Callable");
+        (Value => Obj'Callable, Expected => False, Attribute => "Callable");
       Check_Value
-        (Value     => Obj'Terminated,
-         Expected  => True,
-         Attribute => "Terminated");
+        (Value => Obj'Terminated, Expected => True, Attribute => "Terminated");
 
    end Check_Attributes_And_Stop;
 
@@ -142,12 +131,9 @@ procedure C394001 is
    begin
       delay Impdef.Switch_To_New_Task;
       Check_Value
-        (Value     => Obj'Callable,
-         Expected  => True,
-         Attribute => "Callable");
+        (Value => Obj'Callable, Expected => True, Attribute => "Callable");
       Check_Value
-        (Value     => Obj'Terminated,
-         Expected  => False,
+        (Value     => Obj'Terminated, Expected => False,
          Attribute => "Terminated");
 
       Comment ("  Abort task");
@@ -155,13 +141,9 @@ procedure C394001 is
 
       delay Impdef.Minimum_Task_Switch;
       Check_Value
-        (Value     => Obj'Callable,
-         Expected  => False,
-         Attribute => "Callable");
+        (Value => Obj'Callable, Expected => False, Attribute => "Callable");
       Check_Value
-        (Value     => Obj'Terminated,
-         Expected  => True,
-         Attribute => "Terminated");
+        (Value => Obj'Terminated, Expected => True, Attribute => "Terminated");
    end Check_Attributes_And_Abort;
 
    --  Local variables

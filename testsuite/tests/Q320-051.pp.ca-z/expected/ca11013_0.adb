@@ -7,9 +7,8 @@ package body Ca11013_0 is
       return (Real, Imag);
    end Make;
    -------------------------------------------------------------
-   procedure Components
-     (Complex_No           : in     Complex_Type;
-      Real_Part, Imag_Part :    out Real_Type)
+   procedure Components (Complex_No : in     Complex_Type;
+      Real_Part, Imag_Part          :    out Real_Type)
    is
    begin
       Real_Part := Complex_No.Real;

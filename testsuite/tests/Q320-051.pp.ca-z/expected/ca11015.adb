@@ -34,16 +34,11 @@ begin
 
    begin
       Population.Set_Feature_Val
-        (Population_Map_Latitude,
-         Population_Map_Longitude,
-         Pop,
-         Pop_Map);
+        (Population_Map_Latitude, Population_Map_Longitude, Pop, Pop_Map);
 
       if not
         ((Population.Get_Feature_Val
-            (Population_Map_Latitude,
-             Population_Map_Longitude,
-             Pop_Map) =
+            (Population_Map_Latitude, Population_Map_Longitude, Pop_Map) =
           Pop) or
          (Population.Check_Page (Pop_Map, 1)))
       then
@@ -72,16 +67,11 @@ begin
 
    begin
       Weather_Pkg.Set_Feature_Val
-        (Weather_Map_Latitude,
-         Weather_Map_Longitude,
-         Weather,
-         Weather_Map);
+        (Weather_Map_Latitude, Weather_Map_Longitude, Weather, Weather_Map);
 
       if
         ((Weather_Pkg.Get_Feature_Val
-            (Weather_Map_Latitude,
-             Weather_Map_Longitude,
-             Weather_Map) /=
+            (Weather_Map_Latitude, Weather_Map_Longitude, Weather_Map) /=
           Weather) or
          not (Weather_Pkg.Check_Page (Weather_Map, 2)))
       then
@@ -112,10 +102,7 @@ begin
 
    begin
       Density_Pkg.Set_Feature_Val
-        (Density_Map_Latitude,
-         Density_Map_Longitude,
-         Density,
-         Density_Map);
+        (Density_Map_Latitude, Density_Map_Longitude, Density, Density_Map);
 
       Report.Failed ("Exception not raised in child generic package");
 

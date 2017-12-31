@@ -77,8 +77,7 @@ begin
 
       Outer_Proc (Convert_Parent_Type (Specific_A));
       if (Specific_A.First_Call /= Parent_Outer) or
-        (Specific_A.Second_Call /= Derived_Inner)
-      then
+        (Specific_A.Second_Call /= Derived_Inner) then
          Report.Failed
            ("Type conversion: tag not preserved in call to " &
             "primitive operation with specific operand");
@@ -86,8 +85,7 @@ begin
 
       Outer_Proc (Classwide_A);
       if (Classwide_A.First_Call /= Derived_Outer) or
-        (Classwide_A.Second_Call /= Derived_Inner)
-      then
+        (Classwide_A.Second_Call /= Derived_Inner) then
          Report.Failed
            ("Type conversion: tag not preserved in call to " &
             "primitive operation with class-wide operand");

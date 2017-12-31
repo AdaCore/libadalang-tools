@@ -75,11 +75,8 @@ begin
       Failed ("DERIVED_TYPE'SIZE WAS NOT INHERITED FROM " & "PARENT_TYPE");
    end if;
 
-   if Rec.I'Size /= P_Rec.I'Size or
-     Rec.C'Size /= P_Rec.C'Size or
-     Rec.B'Size /= P_Rec.B'Size or
-     Rec.E'Size /= P_Rec.E'Size
-   then
+   if Rec.I'Size /= P_Rec.I'Size or Rec.C'Size /= P_Rec.C'Size or
+     Rec.B'Size /= P_Rec.B'Size or Rec.E'Size /= P_Rec.E'Size then
       Failed
         ("THE SIZES OF DERIVED_TYPE ELEMENTS WERE NOT " &
          "INHERITED FROM PARENT_TYPE");
@@ -93,8 +90,7 @@ begin
 
    if Rec.I'Position /= P_Rec.I'Position or
      Rec.C'Position /= P_Rec.C'Position or
-     Rec.B'Position /= P_Rec.B'Position or
-     Rec.E'Position /= P_Rec.E'Position
+     Rec.B'Position /= P_Rec.B'Position or Rec.E'Position /= P_Rec.E'Position
    then
       Failed
         ("THE POSITIONS OF DERIVED_TYPE COMPONENTS WERE " &
@@ -104,8 +100,7 @@ begin
    if Rec.I'First_Bit /= P_Rec.I'First_Bit or
      Rec.C'First_Bit /= P_Rec.C'First_Bit or
      Rec.B'First_Bit /= P_Rec.B'First_Bit or
-     Rec.E'First_Bit /= P_Rec.E'First_Bit
-   then
+     Rec.E'First_Bit /= P_Rec.E'First_Bit then
       Failed
         ("THE FIRST_BITS OF DERIVED_TYPE COMPONENTS WERE " &
          "NOT INHERITED FROM PARENT_TYPE");
@@ -113,8 +108,7 @@ begin
 
    if Rec.I'Last_Bit /= P_Rec.I'Last_Bit or
      Rec.C'Last_Bit /= P_Rec.C'Last_Bit or
-     Rec.B'Last_Bit /= P_Rec.B'Last_Bit or
-     Rec.E'Last_Bit /= P_Rec.E'Last_Bit
+     Rec.B'Last_Bit /= P_Rec.B'Last_Bit or Rec.E'Last_Bit /= P_Rec.E'Last_Bit
    then
       Failed
         ("THE LAST_BITS OF DERIVED_TYPE COMPONENTS WERE " &

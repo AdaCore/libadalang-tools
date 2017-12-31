@@ -71,12 +71,8 @@ begin
             accept Start_Check;
             if Dtt.Ca /= Char1 or Dtt.Cb /= Character'Succ (Char1) then
                Report.Failed
-                 ("character check failed.  Expected: '" &
-                  Char1 &
-                  Character'Succ (Char1) &
-                  "' but found '" &
-                  Dtt.Ca &
-                  Dtt.Cb &
+                 ("character check failed.  Expected: '" & Char1 &
+                  Character'Succ (Char1) & "' but found '" & Dtt.Ca & Dtt.Cb &
                   "'");
             elsif Verbose then
                Report.Comment ("char check for " & Char1);
@@ -94,10 +90,8 @@ begin
                Report.Failed
                  ("integer check failed.  Expected:" &
                   Integer'Image (Check_Ints.First) &
-                  Integer'Image (First + 1) &
-                  " but found" &
-                  Integer'Image (Dtt.Ia) &
-                  Integer'Image (Ib));
+                  Integer'Image (First + 1) & " but found" &
+                  Integer'Image (Dtt.Ia) & Integer'Image (Ib));
             elsif Verbose then
                Report.Comment ("int check for" & Integer'Image (First));
             end if;
@@ -124,10 +118,8 @@ begin
          -- do one test here too
          if Dtt.Ia /= Int1 then
             Report.Failed
-              ("DTT check failed.  Expected:" &
-               Integer'Image (Int1) &
-               " but found:" &
-               Integer'Image (Dtt.Ia));
+              ("DTT check failed.  Expected:" & Integer'Image (Int1) &
+               " but found:" & Integer'Image (Dtt.Ia));
          elsif Verbose then
             Report.Comment ("DTT check for" & Integer'Image (Int1));
          end if;

@@ -94,8 +94,7 @@ with F552a00_Bingo_Balls;
 procedure C552a02 is
 
    package Sparse_Integer_Arrays is new F552a00_Sparse_Arrays
-     (Sparse_Array_Index => Natural,
-      Element_Type       => Integer);
+     (Sparse_Array_Index => Natural, Element_Type => Integer);
 
    Sparse_Data : Sparse_Integer_Arrays.Sparse_Array (Max_Elements => 10);
 
@@ -108,8 +107,7 @@ procedure C552a02 is
    is
    begin
       Ada.Strings.Unbounded.Append
-        (Sparse_Integer_Arrays.Tc_Call_History,
-         "G");
+        (Sparse_Integer_Arrays.Tc_Call_History, "G");
       return Sparse_Data;
    end Get_Constant_Sparse_Data;
 
@@ -136,14 +134,12 @@ procedure C552a02 is
 
 begin
    Report.Test
-     ("C552A02",
-      "Check correct operation of container element iterators");
+     ("C552A02", "Check correct operation of container element iterators");
 
    --  Forward only container. Objectives (B).
    for Item of Bingo_Game loop
       Ada.Strings.Unbounded.Append
-        (Result,
-         ' ' & F552a00_Bingo_Balls.Bingo_Call'Image (Item));
+        (Result, ' ' & F552a00_Bingo_Balls.Bingo_Call'Image (Item));
    end loop;
 
    if not F552a00_Bingo_Balls.Tc_Used_Constant_Indexing then
@@ -194,8 +190,7 @@ begin
    --  Objectives (C).
    for Item of Bingo_Game loop
       Ada.Strings.Unbounded.Append
-        (Result,
-         ' ' & F552a00_Bingo_Balls.Bingo_Call'Image (Item));
+        (Result, ' ' & F552a00_Bingo_Balls.Bingo_Call'Image (Item));
       exit;
    end loop;
 
@@ -228,13 +223,11 @@ begin
       Item := Item + 2;
 
       Ada.Strings.Unbounded.Append
-        (Result,
-         " Value = " & Integer'Image (Item));
+        (Result, " Value = " & Integer'Image (Item));
    end loop;
 
    if Sparse_Integer_Arrays.Tc_Constant_Indexing_Use_Count /= 0
-     or else Sparse_Integer_Arrays.Tc_Variable_Indexing_Use_Count /= 0
-   then
+     or else Sparse_Integer_Arrays.Tc_Variable_Indexing_Use_Count /= 0 then
 
       Report.Failed
         (Descr =>
@@ -270,13 +263,11 @@ begin
       Item := Item + 2;
 
       Ada.Strings.Unbounded.Append
-        (Result,
-         " Value = " & Integer'Image (Item));
+        (Result, " Value = " & Integer'Image (Item));
    end loop;
 
    if Sparse_Integer_Arrays.Tc_Constant_Indexing_Use_Count /= 0
-     or else Sparse_Integer_Arrays.Tc_Variable_Indexing_Use_Count /= 0
-   then
+     or else Sparse_Integer_Arrays.Tc_Variable_Indexing_Use_Count /= 0 then
 
       Report.Failed
         (Descr =>
@@ -315,13 +306,11 @@ begin
       Item := Item + 2;
 
       Ada.Strings.Unbounded.Append
-        (Result,
-         " Value = " & Integer'Image (Item));
+        (Result, " Value = " & Integer'Image (Item));
    end loop;
 
    if Sparse_Integer_Arrays.Tc_Constant_Indexing_Use_Count /= 0
-     or else Sparse_Integer_Arrays.Tc_Variable_Indexing_Use_Count /= 2
-   then
+     or else Sparse_Integer_Arrays.Tc_Variable_Indexing_Use_Count /= 2 then
 
       Report.Failed
         (Descr =>
@@ -342,8 +331,7 @@ begin
    end if;
 
    if Sparse_Integer_Arrays.Tc_Call_History /=
-     "I1H:T( 1)N( 2)H:T( 2)N( 3)H:F( 3)"
-   then
+     "I1H:T( 1)N( 2)H:T( 2)N( 3)H:F( 3)" then
       Report.Failed
         (Descr =>
            "5) Unexpected sequence of calls, " &
@@ -372,8 +360,7 @@ begin
    end if;
 
    if Sparse_Integer_Arrays.Tc_Constant_Indexing_Use_Count /= 0
-     or else Sparse_Integer_Arrays.Tc_Variable_Indexing_Use_Count /= 1
-   then
+     or else Sparse_Integer_Arrays.Tc_Variable_Indexing_Use_Count /= 1 then
 
       Report.Failed
         (Descr =>
@@ -402,13 +389,11 @@ begin
       Item := Item + 2;
 
       Ada.Strings.Unbounded.Append
-        (Result,
-         " Value = " & Integer'Image (Item));
+        (Result, " Value = " & Integer'Image (Item));
    end loop;
 
    if Sparse_Integer_Arrays.Tc_Constant_Indexing_Use_Count /= 0
-     or else Sparse_Integer_Arrays.Tc_Variable_Indexing_Use_Count /= 2
-   then
+     or else Sparse_Integer_Arrays.Tc_Variable_Indexing_Use_Count /= 2 then
 
       Report.Failed
         (Descr =>
@@ -429,8 +414,7 @@ begin
    end if;
 
    if Sparse_Integer_Arrays.Tc_Call_History /=
-     "ILH:T( 2)P( 1)H:T( 1)P( 0)H:F( 0)"
-   then
+     "ILH:T( 2)P( 1)H:T( 1)P( 0)H:F( 0)" then
       Report.Failed
         (Descr =>
            "7) Unexpected sequence of calls, " &
@@ -459,8 +443,7 @@ begin
    end if;
 
    if Sparse_Integer_Arrays.Tc_Constant_Indexing_Use_Count /= 0
-     or else Sparse_Integer_Arrays.Tc_Variable_Indexing_Use_Count /= 1
-   then
+     or else Sparse_Integer_Arrays.Tc_Variable_Indexing_Use_Count /= 1 then
 
       Report.Failed
         (Descr =>
@@ -489,13 +472,11 @@ begin
    for Item of Get_Constant_Sparse_Data loop
 
       Ada.Strings.Unbounded.Append
-        (Result,
-         " Value = " & Integer'Image (Item));
+        (Result, " Value = " & Integer'Image (Item));
    end loop;
 
    if Sparse_Integer_Arrays.Tc_Constant_Indexing_Use_Count /= 2
-     or else Sparse_Integer_Arrays.Tc_Variable_Indexing_Use_Count /= 0
-   then
+     or else Sparse_Integer_Arrays.Tc_Variable_Indexing_Use_Count /= 0 then
 
       Report.Failed
         (Descr =>
@@ -516,8 +497,7 @@ begin
    end if;
 
    if Sparse_Integer_Arrays.Tc_Call_History /=
-     "GI1H:T( 1)N( 2)H:T( 2)N( 3)H:F( 3)"
-   then
+     "GI1H:T( 1)N( 2)H:T( 2)N( 3)H:F( 3)" then
       Report.Failed
         (Descr =>
            "9) Unexpected sequence of calls, " &
@@ -532,13 +512,11 @@ begin
    for Item of reverse Get_Constant_Sparse_Data loop
 
       Ada.Strings.Unbounded.Append
-        (Result,
-         " Value = " & Integer'Image (Item));
+        (Result, " Value = " & Integer'Image (Item));
    end loop;
 
    if Sparse_Integer_Arrays.Tc_Constant_Indexing_Use_Count /= 2
-     or else Sparse_Integer_Arrays.Tc_Variable_Indexing_Use_Count /= 0
-   then
+     or else Sparse_Integer_Arrays.Tc_Variable_Indexing_Use_Count /= 0 then
 
       Report.Failed
         (Descr =>
@@ -559,8 +537,7 @@ begin
    end if;
 
    if Sparse_Integer_Arrays.Tc_Call_History /=
-     "GILH:T( 2)P( 1)H:T( 1)P( 0)H:F( 0)"
-   then
+     "GILH:T( 2)P( 1)H:T( 1)P( 0)H:F( 0)" then
       Report.Failed
         (Descr =>
            "A) Unexpected sequence of calls, " &
@@ -574,13 +551,11 @@ begin
    --  (J) (L).
    for Item of Empty_Constant_Sparse_Data loop
       Ada.Strings.Unbounded.Append
-        (Result,
-         " Value = " & Integer'Image (Item));
+        (Result, " Value = " & Integer'Image (Item));
    end loop;
 
    if Sparse_Integer_Arrays.Tc_Constant_Indexing_Use_Count /= 0
-     or else Sparse_Integer_Arrays.Tc_Variable_Indexing_Use_Count /= 0
-   then
+     or else Sparse_Integer_Arrays.Tc_Variable_Indexing_Use_Count /= 0 then
 
       Report.Failed
         (Descr =>
@@ -614,13 +589,11 @@ begin
    --  (L).
    for Item of reverse Empty_Constant_Sparse_Data loop
       Ada.Strings.Unbounded.Append
-        (Result,
-         " Value = " & Integer'Image (Item));
+        (Result, " Value = " & Integer'Image (Item));
    end loop;
 
    if Sparse_Integer_Arrays.Tc_Constant_Indexing_Use_Count /= 0
-     or else Sparse_Integer_Arrays.Tc_Variable_Indexing_Use_Count /= 0
-   then
+     or else Sparse_Integer_Arrays.Tc_Variable_Indexing_Use_Count /= 0 then
 
       Report.Failed
         (Descr =>

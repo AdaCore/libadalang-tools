@@ -48,11 +48,8 @@ procedure C34007i is
 
       type Parent is access Designated;
 
-      function Create
-        (F1, L1 : Natural;
-         F2, L2 : Natural;
-         C      : Component;
-         Dummy  : Parent   -- TO RESOLVE OVERLOADING.
+      function Create (F1, L1 : Natural; F2, L2 : Natural; C : Component;
+         Dummy                : Parent   -- TO RESOLVE OVERLOADING.
          ) return Parent;
 
    end Pkg;
@@ -60,8 +57,7 @@ procedure C34007i is
    use Pkg;
 
    type T is
-     new Parent
-       (Ident_Int (4) .. Ident_Int (5),
+     new Parent (Ident_Int (4) .. Ident_Int (5),
         Ident_Int (6) .. Ident_Int (8));
 
    subtype Subparent is Parent (4 .. 5, 6 .. 8);
@@ -73,11 +69,8 @@ procedure C34007i is
 
    package body Pkg is
 
-      function Create
-        (F1, L1 : Natural;
-         F2, L2 : Natural;
-         C      : Component;
-         Dummy  : Parent) return Parent
+      function Create (F1, L1 : Natural; F2, L2 : Natural; C : Component;
+         Dummy                : Parent) return Parent
       is
          A : Parent    := new Designated (F1 .. L1, F2 .. L2);
          B : Component := C;
@@ -108,8 +101,7 @@ begin
    -- CHECK THAT BASE TYPE VALUES NOT IN THE SUBTYPE ARE PRESENT.
 
    if Create (6, 9, 2, 3, 1, X).all /= ((1, 2), (3, 4), (5, 6), (7, 8)) or
-     Create (6, 9, 2, 3, 1, Y).all /= ((1, 2), (3, 4), (5, 6), (7, 8))
-   then
+     Create (6, 9, 2, 3, 1, Y).all /= ((1, 2), (3, 4), (5, 6), (7, 8)) then
       Failed ("CAN'T CREATE BASE TYPE VALUES OUTSIDE THE SUBTYPE");
    end if;
 
@@ -119,14 +111,8 @@ begin
 
    -- CHECK THE DERIVED SUBTYPE CONSTRAINT.
 
-   if X'First /= 4 or
-     X'Last /= 5 or
-     Y'First /= 4 or
-     Y'Last /= 5 or
-     X'First (2) /= 6 or
-     X'Last (2) /= 8 or
-     Y'First (2) /= 6 or
-     Y'Last (2) /= 8
+   if X'First /= 4 or X'Last /= 5 or Y'First /= 4 or Y'Last /= 5 or
+     X'First (2) /= 6 or X'Last (2) /= 8 or Y'First (2) /= 6 or Y'Last (2) /= 8
    then
       Failed ("INCORRECT 'FIRST OR 'LAST");
    end if;
@@ -150,8 +136,7 @@ begin
          "X := NEW DESIGNATED'(5 .. 6 => (6 .. 8 => 0))");
       if X = null or else X.all = ((0, 0, 0), (0, 0, 0)) then  -- USE X.
          Comment
-           ("X ALTERED -- " &
-            "X := NEW DESIGNATED'(5 .. 6 => " &
+           ("X ALTERED -- " & "X := NEW DESIGNATED'(5 .. 6 => " &
             "(6 .. 8 => 0))");
       end if;
    exception
@@ -170,8 +155,7 @@ begin
          "X := NEW DESIGNATED'(4 .. 5 => (5 .. 7 => 0))");
       if X = null or else X.all = ((0, 0, 0), (0, 0, 0)) then  -- USE X.
          Comment
-           ("X ALTERED -- " &
-            "X := NEW DESIGNATED'(4 .. 5 => " &
+           ("X ALTERED -- " & "X := NEW DESIGNATED'(4 .. 5 => " &
             "(5 .. 7 => 0))");
       end if;
    exception
@@ -190,8 +174,7 @@ begin
          "Y := NEW DESIGNATED'(5 .. 6 => (6 .. 8 => 0))");
       if Y = null or else Y.all = ((0, 0, 0), (0, 0, 0)) then  -- USE Y.
          Comment
-           ("Y ALTERED -- " &
-            "Y := NEW DESIGNATED'(5 .. 6 => " &
+           ("Y ALTERED -- " & "Y := NEW DESIGNATED'(5 .. 6 => " &
             "(6 .. 8 => 0))");
       end if;
    exception
@@ -210,8 +193,7 @@ begin
          "Y := NEW DESIGNATED'(4 .. 5 => (5 .. 7 => 0))");
       if Y = null or else Y.all = ((0, 0, 0), (0, 0, 0)) then  -- USE Y.
          Comment
-           ("Y ALTERED -- " &
-            "Y := NEW DESIGNATED'(4 .. 5 => " &
+           ("Y ALTERED -- " & "Y := NEW DESIGNATED'(4 .. 5 => " &
             "(5 .. 7 => 0))");
       end if;
    exception

@@ -101,10 +101,9 @@ begin
       -- Justify = Right
 
       Asf.Move
-        (Source  => Source_String2,      -- "abcdef"
-         Target  => Result_String,
-         Drop    => Ada.Strings.Error,
-         Justify => Ada.Strings.Right);
+        (Source => Source_String2,      -- "abcdef"
+         Target => Result_String,
+         Drop   => Ada.Strings.Error, Justify => Ada.Strings.Right);
 
       if Result_String /= "    abcdef" then
          Report.Failed ("Incorrect result from Move with Justify = Right");
@@ -114,9 +113,7 @@ begin
 
       Asf.Move
         (Source_String1,                 -- "abcde"
-         Result_String,
-         Ada.Strings.Error,
-         Ada.Strings.Center,
+         Result_String, Ada.Strings.Error, Ada.Strings.Center,
          'x');                           -- non-default padding.
 
       if Result_String /= "xxabcdexxx" then  -- Unequal padding added right
@@ -125,9 +122,7 @@ begin
 
       Asf.Move
         (Source_String2,                 -- "abcdef"
-         Result_String,
-         Ada.Strings.Error,
-         Ada.Strings.Center);
+         Result_String, Ada.Strings.Error, Ada.Strings.Center);
 
       if Result_String /= "  abcdef  " then  -- Equal padding added on L/R.
          Report.Failed ("Incorrect result from Move with Justify = Center-2");
@@ -164,10 +159,9 @@ begin
       -- Drop = Error, Justify = Left, right overflow characters are pad.
 
       Asf.Move
-        (Source  => Source_String4,      -- "abcdefghij  "
-         Target  => Result_String,
-         Drop    => Ada.Strings.Error,
-         Justify => Ada.Strings.Left);
+        (Source => Source_String4,      -- "abcdefghij  "
+         Target => Result_String,
+         Drop   => Ada.Strings.Error, Justify => Ada.Strings.Left);
 
       if not (Result_String = "abcdefghij") then  -- leftmost 10 characters
          Report.Failed ("Incorrect result from Move with Drop = Error - 1");
@@ -177,9 +171,7 @@ begin
 
       Asf.Move
         (Source_String5,                 -- "  cdefghijkl"
-         Result_String,
-         Ada.Strings.Error,
-         Ada.Strings.Right);
+         Result_String, Ada.Strings.Error, Ada.Strings.Right);
 
       if Result_String /= "cdefghijkl" then  -- rightmost 10 characters
          Report.Failed ("Incorrect result from Move with Drop = Error - 2");
@@ -263,14 +255,11 @@ begin
           12 or   -- 'f' at position 12
         Asf.Index
             (Source_String6,                -- "abcdefabcdef"
-             Cd_Set,
-             Ada.Strings.Inside,
+             Cd_Set, Ada.Strings.Inside,
              Ada.Strings.Backward) /=
           10 or  -- 'd' at position 10
         Asf.Index
-            ("cdcdcdcdacdcdcdcd",
-             Cd_Set,
-             Ada.Strings.Outside,
+            ("cdcdcdcdacdcdcdcd", Cd_Set, Ada.Strings.Outside,
              Ada.Strings.Forward) /=
           9      -- 'a' at position 9
       then
@@ -323,8 +312,7 @@ begin
         Asf.Index_Non_Blank ("abc def ghi jkl  ", Ada.Strings.Backward) /=
           15 or
         Asf.Index_Non_Blank ("  abcdef") /= 3 or
-        Asf.Index_Non_Blank ("        ") /= 0
-      then
+        Asf.Index_Non_Blank ("        ") /= 0 then
          Report.Failed ("Incorrect result from Index_Non_Blank");
       end if;
 
@@ -336,8 +324,7 @@ begin
         Asf.Count ("babababa", "ab") /= 3 or
         Asf.Count ("abaabaaba", "aba") /= 3 or
         Asf.Count ("xxxxxxxxxxxxxxxxxxxy", "xy") /= 1 or
-        Asf.Count ("xxxxxxxxxxxxxxxxxxxx", "x") /= 20
-      then
+        Asf.Count ("xxxxxxxxxxxxxxxxxxxx", "x") /= 20 then
          Report.Failed ("Incorrect result from Function Count");
       end if;
 
@@ -381,8 +368,7 @@ begin
         (Source => Source_String6,      -- First slice with no
          Set    => Abcd_Set,            -- 'a', 'b', 'c', or 'd'
          Test   => Ada.Strings.Outside, -- is "ef" at 5..6.
-         First  => Slice_Start,
-         Last   => Slice_End);
+         First  => Slice_Start, Last => Slice_End);
 
       if Slice_Start /= 5 or Slice_End /= 6 then
          Report.Failed ("Incorrect result from Find_Token - 1");
@@ -406,10 +392,7 @@ begin
       -- Additional testing of Find_Token.
 
       Asf.Find_Token
-        ("eabcdabcddcab",
-         Abcd_Set,
-         Ada.Strings.Inside,
-         Slice_Start,
+        ("eabcdabcddcab", Abcd_Set, Ada.Strings.Inside, Slice_Start,
          Slice_End);
 
       if Slice_Start /= 2 or Slice_End /= 13 then
@@ -417,10 +400,7 @@ begin
       end if;
 
       Asf.Find_Token
-        ("efghijklabcdabcd",
-         Abcd_Set,
-         Ada.Strings.Outside,
-         Slice_Start,
+        ("efghijklabcdabcd", Abcd_Set, Ada.Strings.Outside, Slice_Start,
          Slice_End);
 
       if Slice_Start /= 1 or Slice_End /= 8 then
@@ -428,10 +408,7 @@ begin
       end if;
 
       Asf.Find_Token
-        ("abcdefgabcdabcd",
-         Abcd_Set,
-         Ada.Strings.Outside,
-         Slice_Start,
+        ("abcdefgabcdabcd", Abcd_Set, Ada.Strings.Outside, Slice_Start,
          Slice_End);
 
       if Slice_Start /= 5 or Slice_End /= 7 then
@@ -439,10 +416,7 @@ begin
       end if;
 
       Asf.Find_Token
-        ("abcdcbabcdcba",
-         Abcd_Set,
-         Ada.Strings.Inside,
-         Slice_Start,
+        ("abcdcbabcdcba", Abcd_Set, Ada.Strings.Inside, Slice_Start,
          Slice_End);
 
       if Slice_Start /= 1 or Slice_End /= 13 then

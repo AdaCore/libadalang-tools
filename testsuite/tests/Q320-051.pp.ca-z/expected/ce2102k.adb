@@ -42,8 +42,7 @@ begin
    Test
      ("CE2102K",
       "CHECK THAT USE_ERROR IS RAISED IF AN " &
-      "IMPLEMENTATION DOES NOT SUPPORT RESET FOR " &
-      "DIRECT_IO");
+      "IMPLEMENTATION DOES NOT SUPPORT RESET FOR " & "DIRECT_IO");
    declare
       package Dir is new Direct_Io (Integer);
       use Dir;

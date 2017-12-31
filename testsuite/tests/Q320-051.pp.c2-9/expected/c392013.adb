@@ -94,15 +94,8 @@ procedure C392013 is
    type Truth_Table is array (Positive range <>, Positive range <>) of Truth;
 
    Equality : constant Truth_Table (A'Range, A'Range) :=
-     ("TFFTFFFFF",
-      "FTTFTFFFF",
-      "FTTFFFFFF",
-      "TFFTFFFFF",
-      "FTFFTFFFF",
-      "FFFFFTFFF",
-      "FFFFFFTTF",
-      "FFFFFFTTF",
-      "FFFFFFFFT");
+     ("TFFTFFFFF", "FTTFTFFFF", "FTTFFFFFF", "TFFTFFFFF", "FTFFTFFFF",
+      "FFFFFTFFF", "FFFFFFTTF", "FFFFFFTTF", "FFFFFFFFT");
 
 begin
    Test
@@ -115,32 +108,23 @@ begin
       for J in A'Range loop
          -- Test identity:
          if P1."=" (A (I).all, A (J).all) /=
-           (not P1."/=" (A (I).all, A (J).all))
-         then
+           (not P1."/=" (A (I).all, A (J).all)) then
             Failed
-              ("Incorrect identity comparing objects" &
-               Positive'Image (I) &
-               " and" &
-               Positive'Image (J));
+              ("Incorrect identity comparing objects" & Positive'Image (I) &
+               " and" & Positive'Image (J));
          end if;
          -- Test the result of "/=":
          if Equality (I, J) = 'T' then
             if P1."/=" (A (I).all, A (J).all) then
                Failed
-                 ("Incorrect result comparing objects" &
-                  Positive'Image (I) &
-                  " and" &
-                  Positive'Image (J) &
-                  " - T");
+                 ("Incorrect result comparing objects" & Positive'Image (I) &
+                  " and" & Positive'Image (J) & " - T");
             end if;
          else
             if not P1."/=" (A (I).all, A (J).all) then
                Failed
-                 ("Incorrect result comparing objects" &
-                  Positive'Image (I) &
-                  " and" &
-                  Positive'Image (J) &
-                  " - F");
+                 ("Incorrect result comparing objects" & Positive'Image (I) &
+                  " and" & Positive'Image (J) & " - F");
             end if;
          end if;
       end loop;

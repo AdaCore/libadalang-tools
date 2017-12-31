@@ -10,9 +10,8 @@ package F393a00_2 is
 
    function Create return Windmill;
 
-   procedure Add_Spin
-     (To_Mill : in out Windmill;
-      Rpms    : in     Rotational_Measurement);
+   procedure Add_Spin (To_Mill : in out Windmill;
+      Rpms                     : in     Rotational_Measurement);
 
    procedure Stop (Mill : in out Windmill);
 

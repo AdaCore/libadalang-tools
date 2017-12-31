@@ -121,11 +121,8 @@ procedure Cxg2009 is
          return Inf_N * Sqrt (Sum_Squares);
       end Two_Norm;
 
-      procedure Check
-        (Actual, Expected : Real;
-         Test_Name        : String;
-         Mre              : Real;
-         Vector_Length    : Integer)
+      procedure Check (Actual, Expected : Real; Test_Name : String; Mre : Real;
+         Vector_Length                  : Integer)
       is
          Rel_Error : Real;
          Abs_Error : Real;
@@ -144,16 +141,10 @@ procedure Cxg2009 is
 
          if abs (Actual - Expected) > Max_Error then
             Report.Failed
-              (Test_Name &
-               "  VectLength:" &
-               Integer'Image (Vector_Length) &
-               " actual: " &
-               Real'Image (Actual) &
-               " expected: " &
-               Real'Image (Expected) &
-               " difference: " &
-               Real'Image (Actual - Expected) &
-               " mre:" &
+              (Test_Name & "  VectLength:" & Integer'Image (Vector_Length) &
+               " actual: " & Real'Image (Actual) & " expected: " &
+               Real'Image (Expected) & " difference: " &
+               Real'Image (Actual - Expected) & " mre:" &
                Real'Image (Max_Error));
          elsif Verbose then
             Report.Comment
@@ -175,30 +166,15 @@ procedure Cxg2009 is
                   V     := (1 .. Vector_Length => 0.0);
                   V (J) := 1.0;
                   Check
-                    (One_Norm (V),
-                     1.0,
-                     "one_norm (010)",
-                     0.0,
-                     Vector_Length);
+                    (One_Norm (V), 1.0, "one_norm (010)", 0.0, Vector_Length);
                   Check
-                    (Inf_Norm (V),
-                     1.0,
-                     "inf_norm (010)",
-                     0.0,
-                     Vector_Length);
+                    (Inf_Norm (V), 1.0, "inf_norm (010)", 0.0, Vector_Length);
                   Check
-                    (Two_Norm (V),
-                     1.0,
-                     "two_norm (010)",
-                     0.0,
-                     Vector_Length);
+                    (Two_Norm (V), 1.0, "two_norm (010)", 0.0, Vector_Length);
                end loop;
 
                Check
-                 (One_Norm (V1),
-                  Real (Vector_Length),
-                  "one_norm (1)",
-                  0.0,
+                 (One_Norm (V1), Real (Vector_Length), "one_norm (1)", 0.0,
                   Vector_Length);
                Check (Inf_Norm (V1), 1.0, "inf_norm (1)", 0.0, Vector_Length);
 
@@ -215,11 +191,8 @@ procedure Cxg2009 is
                -- This gives (2 + 2 * (N + N + (N-1)) ) * ME which simplifies
                -- to (2 + 2N + 2N + 2N - 2) * ME or 6*N*ME
                Check
-                 (Two_Norm (V1),
-                  Sqrt (Real (Vector_Length)),
-                  "two_norm (1)",
-                  (Real (6 * Vector_Length)),
-                  Vector_Length);
+                 (Two_Norm (V1), Sqrt (Real (Vector_Length)), "two_norm (1)",
+                  (Real (6 * Vector_Length)), Vector_Length);
             exception
                when others =>
                   Report.Failed
@@ -285,11 +258,8 @@ procedure Cxg2009 is
          return Inf_N * Sqrt (Sum_Squares);
       end Two_Norm;
 
-      procedure Check
-        (Actual, Expected : Real;
-         Test_Name        : String;
-         Mre              : Real;
-         Vector_Length    : Integer)
+      procedure Check (Actual, Expected : Real; Test_Name : String; Mre : Real;
+         Vector_Length                  : Integer)
       is
          Rel_Error : Real;
          Abs_Error : Real;
@@ -308,16 +278,10 @@ procedure Cxg2009 is
 
          if abs (Actual - Expected) > Max_Error then
             Report.Failed
-              (Test_Name &
-               "  VectLength:" &
-               Integer'Image (Vector_Length) &
-               " actual: " &
-               Real'Image (Actual) &
-               " expected: " &
-               Real'Image (Expected) &
-               " difference: " &
-               Real'Image (Actual - Expected) &
-               " mre:" &
+              (Test_Name & "  VectLength:" & Integer'Image (Vector_Length) &
+               " actual: " & Real'Image (Actual) & " expected: " &
+               Real'Image (Expected) & " difference: " &
+               Real'Image (Actual - Expected) & " mre:" &
                Real'Image (Max_Error));
          elsif Verbose then
             Report.Comment
@@ -342,41 +306,17 @@ procedure Cxg2009 is
                   X (J).Re := 1.0;
                   Y (J).Im := 1.0;
                   Check
-                    (One_Norm (X),
-                     1.0,
-                     "one_norm (0x0)",
-                     0.0,
-                     Vector_Length);
+                    (One_Norm (X), 1.0, "one_norm (0x0)", 0.0, Vector_Length);
                   Check
-                    (Inf_Norm (X),
-                     1.0,
-                     "inf_norm (0x0)",
-                     0.0,
-                     Vector_Length);
+                    (Inf_Norm (X), 1.0, "inf_norm (0x0)", 0.0, Vector_Length);
                   Check
-                    (Two_Norm (X),
-                     1.0,
-                     "two_norm (0x0)",
-                     0.0,
-                     Vector_Length);
+                    (Two_Norm (X), 1.0, "two_norm (0x0)", 0.0, Vector_Length);
                   Check
-                    (One_Norm (Y),
-                     1.0,
-                     "one_norm (0y0)",
-                     0.0,
-                     Vector_Length);
+                    (One_Norm (Y), 1.0, "one_norm (0y0)", 0.0, Vector_Length);
                   Check
-                    (Inf_Norm (Y),
-                     1.0,
-                     "inf_norm (0y0)",
-                     0.0,
-                     Vector_Length);
+                    (Inf_Norm (Y), 1.0, "inf_norm (0y0)", 0.0, Vector_Length);
                   Check
-                    (Two_Norm (Y),
-                     1.0,
-                     "two_norm (0y0)",
-                     0.0,
-                     Vector_Length);
+                    (Two_Norm (Y), 1.0, "two_norm (0y0)", 0.0, Vector_Length);
                end loop;
 
                V := (1 .. Vector_Length => (3.0, 4.0));
@@ -385,19 +325,12 @@ procedure Cxg2009 is
                --  (N-1)*ME for the additions
                -- which gives (4N-1) * ME
                Check
-                 (One_Norm (V),
-                  5.0 * Real (Vector_Length),
-                  "one_norm ((3,4))",
-                  Real (4 * Vector_Length - 1),
-                  Vector_Length);
+                 (One_Norm (V), 5.0 * Real (Vector_Length), "one_norm ((3,4))",
+                  Real (4 * Vector_Length - 1), Vector_Length);
 
                -- error in Inf_Norm is from abs of single element (3ME)
                Check
-                 (Inf_Norm (V),
-                  5.0,
-                  "inf_norm ((3,4))",
-                  3.0,
-                  Vector_Length);
+                 (Inf_Norm (V), 5.0, "inf_norm ((3,4))", 3.0, Vector_Length);
 
                -- error in following comes from:
                --   2ME in sqrt of expected result
@@ -410,16 +343,13 @@ procedure Cxg2009 is
                --       (N-1)ME for sum
                -- this results in [2 + 3 + 2(6N-1) ] * ME or (12N + 3)ME
                Check
-                 (Two_Norm (V),
-                  5.0 * Sqrt (Real (Vector_Length)),
-                  "two_norm ((3,4))",
-                  (12.0 * Real (Vector_Length) + 3.0),
+                 (Two_Norm (V), 5.0 * Sqrt (Real (Vector_Length)),
+                  "two_norm ((3,4))", (12.0 * Real (Vector_Length) + 3.0),
                   Vector_Length);
             exception
                when others =>
                   Report.Failed
-                    ("exception for complex " &
-                     "vector length" &
+                    ("exception for complex " & "vector length" &
                      Integer'Image (Vector_Length));
             end;
          end loop;
@@ -469,8 +399,7 @@ begin
 
    if Verbose then
       Report.Comment
-        ("checking a digits" &
-         Integer'Image (System.Max_Digits) &
+        ("checking a digits" & Integer'Image (System.Max_Digits) &
          " floating point type");
    end if;
 

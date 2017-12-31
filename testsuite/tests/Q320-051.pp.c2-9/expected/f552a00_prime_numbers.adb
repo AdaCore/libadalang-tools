@@ -13,8 +13,7 @@ package body F552a00_Prime_Numbers is
       --  set does not contain a prime number.
 
       Ada.Strings.Unbounded.Append
-        (Source   => Tc_Call_History,
-         New_Item => '1');
+        (Source => Tc_Call_History, New_Item => '1');
       return (if Object.Max_Value >= 3 then 3 else Object.Max_Value);
    end First;
 
@@ -64,10 +63,8 @@ package body F552a00_Prime_Numbers is
          Ada.Strings.Unbounded.Append
            (Source   => Tc_Call_History,
             New_Item =>
-              "H:" &
-              (if Value > 2 then "T(" else "F(") &
-              Integer'Image (Value) &
-              ')');
+              "H:" & (if Value > 2 then "T(" else "F(") &
+              Integer'Image (Value) & ')');
       end if;
 
       return (Value > 2);
@@ -79,8 +76,7 @@ package body F552a00_Prime_Numbers is
    is
    begin
       Ada.Strings.Unbounded.Append
-        (Source   => Tc_Call_History,
-         New_Item => 'I');
+        (Source => Tc_Call_History, New_Item => 'I');
       return Result : Prime_Number_Set (Set.Max_Value) do
          null;
       end return;

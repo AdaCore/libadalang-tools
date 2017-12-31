@@ -37,10 +37,8 @@ procedure C3a2003 is
 
    ------------------------------------------------------------------
 
-   procedure Display_Results
-     (Result   : in Result_Kind;
-      Expected : in Result_Kind;
-      Msg      : in String)
+   procedure Display_Results (Result : in Result_Kind;
+      Expected                       : in Result_Kind; Msg : in String)
    is
    begin
       if Result /= Expected then
@@ -62,8 +60,7 @@ begin -- C3A2003
       "Check that, for X'Access of general access " &
       "type A, Program_Error is raised if the accessibility " &
       "level of X is deeper than that of A: X is an access " &
-      "parameter; corresponding actual is another access " &
-      "parameter");
+      "parameter; corresponding actual is another access " & "parameter");
 
    -- Accessibility level of actual is 0 (actual is X'Access):
 

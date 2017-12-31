@@ -30,8 +30,7 @@ procedure C760011 is
       -- initialize An_Object
       begin
          if C760011_0.Controlled_Type (An_Object) =
-           C760011_0.Controlled_Type'(Afc with 'A', "ONE*")
-         then
+           C760011_0.Controlled_Type'(Afc with 'A', "ONE*") then
             Report.Failed ("Comparison bad");  -- A = X !!!
          end if;
       end Subtest_1_Local_1;
@@ -54,8 +53,7 @@ procedure C760011 is
          An_Object : C760011_0.Non_Controlled ('C');
       begin
          Tctouch.Assert_Not
-           (C760011_0.Finalized ('C'),
-            "Non_Controlled declaration C");
+           (C760011_0.Finalized ('C'), "Non_Controlled declaration C");
          An_Object :=
            C760011_0.Non_Controlled'
              ('C', Controlled_Component => (Afc with 'C', "TEE!"));
@@ -99,9 +97,7 @@ procedure C760011 is
    begin
       if Con.Tag not in 'F' .. 'G' then
          Report.Failed
-           ("Bad value passed to subtest 3 " &
-            Con.Tag &
-            ' ' &
+           ("Bad value passed to subtest 3 " & Con.Tag & ' ' &
             Report.Ident_Str (Con.Tc_Component));
       end if;
    end Subtest_3;
@@ -110,9 +106,7 @@ procedure C760011 is
    begin
       if Non.Tag not in 'H' .. 'I' then
          Report.Failed
-           ("Bad value passed to subtest 4 " &
-            Non.Tag &
-            ' ' &
+           ("Bad value passed to subtest 4 " & Non.Tag & ' ' &
             Report.Ident_Str (Non.Controlled_Component.Tc_Component));
       end if;
    end Subtest_4;
@@ -124,8 +118,7 @@ begin  -- Main test procedure.
       "Check that anonymous objects of controlled " &
       "types or types containing controlled types " &
       "are finalized no later than the end of the " &
-      "innermost enclosing declarative_item or " &
-      "statement");
+      "innermost enclosing declarative_item or " & "statement");
 
    Subtest_1;
 

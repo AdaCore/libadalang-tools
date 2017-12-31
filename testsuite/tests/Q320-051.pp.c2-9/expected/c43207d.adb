@@ -42,8 +42,7 @@ begin
      ("C43207D",
       "CHECK THAT THE EVALUATION OF A MULTI" &
       "DIMENSIONAL AGGREGATE OF THE FORM " &
-      "(F..G => (H..I = J)) IS PERFORMED " &
-      "CORRECTLY");
+      "(F..G => (H..I = J)) IS PERFORMED " & "CORRECTLY");
 
    declare
 
@@ -75,8 +74,7 @@ begin
             if Cntr (J) /= 0 then
                Failed
                  ("CASE D1 : INCORRECT NUMBER " &
-                  "OF EVALUATIONS. J EVALUATED" &
-                  Integer'Image (Cntr (J)) &
+                  "OF EVALUATIONS. J EVALUATED" & Integer'Image (Cntr (J)) &
                   " TIMES");
             end if;
          exception
@@ -95,8 +93,7 @@ begin
             if Cntr (J) /= 0 then
                Failed
                  ("CASE D2 : INCORRECT NUMBER " &
-                  "OF EVALUATIONS. J EVALUATED" &
-                  Integer'Image (Cntr (J)) &
+                  "OF EVALUATIONS. J EVALUATED" & Integer'Image (Cntr (J)) &
                   " TIMES");
             end if;
          exception
@@ -113,8 +110,7 @@ begin
             if Cntr (J) /= 6 then
                Failed
                  ("CASE D3 : INCORRECT NUMBER " &
-                  "OF EVALUATIONS. J EVALUATED" &
-                  Integer'Image (Cntr (J)) &
+                  "OF EVALUATIONS. J EVALUATED" & Integer'Image (Cntr (J)) &
                   " TIMES");
             end if;
          exception
@@ -133,8 +129,7 @@ begin
             if Cntr (J) /= 6 then
                Failed
                  ("CASE D4 : INCORRECT NUMBER " &
-                  "OF EVALUATIONS. J EVALUATED" &
-                  Integer'Image (Cntr (J)) &
+                  "OF EVALUATIONS. J EVALUATED" & Integer'Image (Cntr (J)) &
                   " TIMES");
             end if;
          exception

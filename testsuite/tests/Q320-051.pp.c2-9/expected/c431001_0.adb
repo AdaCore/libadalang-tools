@@ -10,13 +10,8 @@ package body C431001_0 is
            ("Did not dispatch on tag for tagged parent " & "type Recording");
       end if;
 
-      return R.Artist (1 .. 10) &
-        ' ' &
-        Genre'Image (R.Category) (1 .. 2) &
-        ' ' &
-        Duration'Image (R.Length) &
-        ' ' &
-        Integer'Image (R.Selections);
+      return R.Artist (1 .. 10) & ' ' & Genre'Image (R.Category) (1 .. 2) &
+        ' ' & Duration'Image (R.Length) & ' ' & Integer'Image (R.Selections);
 
    end Summary;
 
@@ -27,8 +22,7 @@ package body C431001_0 is
          Report.Failed ("Did not dispatch on tag for type extension " & "CD");
       end if;
 
-      return Summary (Recording (Disc), Tc_Type => Tc_Recording) &
-        ' ' &
+      return Summary (Recording (Disc), Tc_Type => Tc_Recording) & ' ' &
         Recording_Method'Image (Disc.Recorded) (1) &
         Recording_Method'Image (Disc.Mastered) (1);
 
@@ -62,20 +56,16 @@ package body C431001_0 is
       if Tc_Type /= Tc_Cd_Rom then
          Report.Failed
            ("Did not dispatch on tag for type extension " &
-            "CD_ROM. This is an extension of the type " &
-            "extension CD");
+            "CD_ROM. This is an extension of the type " & "extension CD");
       end if;
 
-      return Summary (Recording (Disk), Tc_Type => Tc_Recording) &
-        ' ' &
-        Integer'Image (Disk.Storage) &
-        'K';
+      return Summary (Recording (Disk), Tc_Type => Tc_Recording) & ' ' &
+        Integer'Image (Disk.Storage) & 'K';
 
    end Summary;
 
-   function Catalog_Entry
-     (R       : in Recording'Class;
-      Tc_Type : in Tc_Type_Id) return String
+   function Catalog_Entry (R : in Recording'Class;
+      Tc_Type                : in Tc_Type_Id) return String
    is
    begin
       return Summary (R, Tc_Type); -- dispatched call
@@ -114,9 +104,8 @@ package body C431001_0 is
       end if;
    end Tc_Check;
 
-   procedure Tc_Check
-     (N       : in Null_Extension_Of_Nonnull;
-      Tc_Type : in Tc_N_Type_Id)
+   procedure Tc_Check (N : in Null_Extension_Of_Nonnull;
+      Tc_Type            : in Tc_N_Type_Id)
    is
    begin
       if Tc_Type /= Tc_Null_Extension_Of_Nonnull then

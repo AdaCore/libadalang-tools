@@ -44,8 +44,7 @@ procedure Cxh1001 is
              (Imp_H.Default_For_Scalar_To_Normalize)
          then
             Report.Failed
-              (Message &
-               ": Implicit initial value for object " &
+              (Message & ": Implicit initial value for object " &
                "is not the predicted value");
          end if;
       elsif V'Valid
@@ -53,8 +52,7 @@ procedure Cxh1001 is
           0 .. Imp_H.Scalar_To_Normalize'Pos (Imp_H.Scalar_To_Normalize'Last)
       then
          Report.Failed
-           (Message &
-            ": Implicit initial value for object " &
+           (Message & ": Implicit initial value for object " &
             "is a value of the type");
       end if;
 
@@ -71,8 +69,7 @@ begin  -- Main test procedure.
       "affected.  Check for uninitialized scalar " &
       "objects that are subcomponents of composite " &
       "objects, unassigned out parameters, have been " &
-      "allocated without an initial value, and are " &
-      "stand alone.");
+      "allocated without an initial value, and are " & "stand alone.");
 
    Cxh1001_0.Package_Check;
 

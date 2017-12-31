@@ -134,14 +134,9 @@ procedure Cxg2018 is
          if abs (Actual - Expected) > Max_Error then
             Accuracy_Error_Reported := True;
             Report.Failed
-              (Test_Name &
-               " actual: " &
-               Real'Image (Actual) &
-               " expected: " &
-               Real'Image (Expected) &
-               " difference: " &
-               Real'Image (Actual - Expected) &
-               " max err:" &
+              (Test_Name & " actual: " & Real'Image (Actual) & " expected: " &
+               Real'Image (Expected) & " difference: " &
+               Real'Image (Actual - Expected) & " max err:" &
                Real'Image (Max_Error));
          elsif Verbose then
             if Actual = Expected then
@@ -152,10 +147,8 @@ procedure Cxg2018 is
          end if;
       end Check;
 
-      procedure Check
-        (Actual, Expected : Complex;
-         Test_Name        : String;
-         Mre              : Real)
+      procedure Check (Actual, Expected : Complex; Test_Name : String;
+         Mre                            : Real)
       is
       begin
          Check (Actual.Re, Expected.Re, Test_Name & " real part", Mre);
@@ -247,15 +240,9 @@ procedure Cxg2018 is
                Actual2 := Actual2 + Actual2 * C;
 
                Check
-                 (Actual1,
-                  Actual2,
-                  "Identity_1_Test " &
-                  Integer'Image (Ii) &
-                  Integer'Image (J) &
-                  ": Exp((" &
-                  Real'Image (X.Re) &
-                  ", " &
-                  Real'Image (X.Im) &
+                 (Actual1, Actual2,
+                  "Identity_1_Test " & Integer'Image (Ii) & Integer'Image (J) &
+                  ": Exp((" & Real'Image (X.Re) & ", " & Real'Image (X.Im) &
                   ")) ",
                   20.0);   -- 2 exp and 1 multiply and 1 add = 2*7+1*5+1
                -- Note: The above is not strictly correct, as multiply has
@@ -266,15 +253,9 @@ procedure Cxg2018 is
                -- reasonable relative error in the imaginary part
                Actual2 := (Actual1 * Exp (-X)) + I;
                Check
-                 (Actual2,
-                  (1.0, 1.0),
-                  "Identity_2_Test " &
-                  Integer'Image (Ii) &
-                  Integer'Image (J) &
-                  ": Exp((" &
-                  Real'Image (X.Re) &
-                  ", " &
-                  Real'Image (X.Im) &
+                 (Actual2, (1.0, 1.0),
+                  "Identity_2_Test " & Integer'Image (Ii) & Integer'Image (J) &
+                  ": Exp((" & Real'Image (X.Re) & ", " & Real'Image (X.Im) &
                   ")) ",
                   20.0);   -- 2 exp and 1 multiply and one add = 2*7+1*5+1
 
@@ -289,20 +270,12 @@ procedure Cxg2018 is
       exception
          when Constraint_Error =>
             Report.Failed
-              ("Constraint_Error raised in Identity_Test" &
-               " for X=(" &
-               Real'Image (X.Re) &
-               ", " &
-               Real'Image (X.Im) &
-               ")");
+              ("Constraint_Error raised in Identity_Test" & " for X=(" &
+               Real'Image (X.Re) & ", " & Real'Image (X.Im) & ")");
          when others =>
             Report.Failed
-              ("exception in Identity_Test" &
-               " for X=(" &
-               Real'Image (X.Re) &
-               ", " &
-               Real'Image (X.Im) &
-               ")");
+              ("exception in Identity_Test" & " for X=(" & Real'Image (X.Re) &
+               ", " & Real'Image (X.Im) & ")");
       end Identity_Test;
 
       procedure Do_Test is
@@ -339,8 +312,7 @@ begin
 
    if Verbose then
       Report.Comment
-        ("checking a digits" &
-         Integer'Image (System.Max_Digits) &
+        ("checking a digits" & Integer'Image (System.Max_Digits) &
          " floating point type");
    end if;
 

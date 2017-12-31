@@ -44,8 +44,7 @@ begin
      ("C45304A",
       "CHECK THAT CONSTRAINT_ERROR " &
       "IS RAISED BY ""+"" AND ""-"" FOR PREDEFINED " &
-      "INTEGER WHEN THE RESULT IS OUTSIDE THE RANGE " &
-      "OF THE BASE TYPE");
+      "INTEGER WHEN THE RESULT IS OUTSIDE THE RANGE " & "OF THE BASE TYPE");
 
    declare
       B : Integer := Integer'Last;

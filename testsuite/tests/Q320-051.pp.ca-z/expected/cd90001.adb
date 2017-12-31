@@ -21,8 +21,7 @@ begin  -- Main test procedure.
            ("The sizes of the 8 bit types used in this test " &
             "do not match");
          Eight_Na := True;
-      elsif Cd90001_0.User_Enums'Alignment /=
-        Cd90001_0.Eight_Bits'Alignment
+      elsif Cd90001_0.User_Enums'Alignment /= Cd90001_0.Eight_Bits'Alignment
       then
          Report.Comment
            ("The alignments of the 8 bit types used in this " &

@@ -49,11 +49,8 @@
 
 package Cb20006_0 is               -- Package Semaphore.
 
-   Reraised_In_Function,
-   Reraised_In_Procedure,
-   Handled_In_Function_Caller,
-   Handled_In_Procedure_Caller : Boolean :=
-     False;
+   Reraised_In_Function, Reraised_In_Procedure, Handled_In_Function_Caller,
+   Handled_In_Procedure_Caller : Boolean := False;
 
    Resource_Overflow, Resource_Underflow : exception;
 

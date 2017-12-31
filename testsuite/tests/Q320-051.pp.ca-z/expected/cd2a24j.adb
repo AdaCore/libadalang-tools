@@ -82,8 +82,7 @@ begin
             Failed ("INCORRECT VALUE FOR C0'SIZE");
          end if;
 
-         if not
-           ((Ident (C1) in C1 .. C2) and (C0 not in Ident (C1) .. C2))
+         if not ((Ident (C1) in C1 .. C2) and (C0 not in Ident (C1) .. C2))
          then
             Failed ("INCORRECT RESULTS FOR MEMBERSHIP " & "OPERATORS");
          end if;
@@ -93,22 +92,19 @@ begin
          end if;
 
          if Check_Type'Val (0) /= Ident (C0) or
-           Check_Type'Val (1) /= Ident (C1) or
-           Check_Type'Val (2) /= Ident (C2)
+           Check_Type'Val (1) /= Ident (C1) or Check_Type'Val (2) /= Ident (C2)
          then
             Failed ("INCORRECT VALUE FOR CHECK_TYPE'VAL");
          end if;
 
          if Check_Type'Pred (C1) /= Ident (C0) or
-           Check_Type'Pred (C2) /= Ident (C1)
-         then
+           Check_Type'Pred (C2) /= Ident (C1) then
             Failed ("INCORRECT VALUE FOR CHECK_TYPE'PRED");
          end if;
 
          if Check_Type'Value ("ZERO") /= Ident (C0) or
            Check_Type'Value ("ONE") /= Ident (C1) or
-           Check_Type'Value ("TWO") /= Ident (C2)
-         then
+           Check_Type'Value ("TWO") /= Ident (C2) then
             Failed ("INCORRECT VALUE FOR CHECK_TYPE'VALUE");
          end if;
 

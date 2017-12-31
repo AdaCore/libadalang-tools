@@ -40,8 +40,7 @@ procedure C4a005b is
 begin
    Test
      ("C4A005B",
-      "CHECK CONSTRAINT_ERROR FOR " &
-      "NONSTATIC UNIVERSAL " &
+      "CHECK CONSTRAINT_ERROR FOR " & "NONSTATIC UNIVERSAL " &
       "INTEGER EXPRESSIONS - DIVISION BY ZERO");
    begin
       declare

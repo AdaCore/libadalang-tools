@@ -13,9 +13,8 @@ package body Ca11003_0.Ca11003_1.Ca11003_2 is
       end if;
    end News;
    --------------------------------------------------
-   procedure Copy
-     (Original  : in     Extended_File_Type;
-      Duplicate :    out Extended_File_Type)
+   procedure Copy (Original : in     Extended_File_Type;
+      Duplicate             :    out Extended_File_Type)
    is
    begin
       Duplicate_File (Original, Duplicate);               -- Parent subprogram.

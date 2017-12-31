@@ -97,8 +97,7 @@ package C3900010 is
 
    -- Inherits function Level_Of from Low_Alert_Type.
 
-   procedure Assign_Officer
-     (Ma : in out Medium_Alert_Type;
-      To : in     Person_Enum);
+   procedure Assign_Officer (Ma : in out Medium_Alert_Type;
+      To                        : in     Person_Enum);
 
 end C3900010;

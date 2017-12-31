@@ -49,9 +49,7 @@ begin
       for X in E loop
          if (X /= A and then S'Succ (S'Pred (X)) /= X) or
            (X /= Xyz and then S'Pred (S'Succ (X)) /= X) or
-           S'Val (S'Pos (X)) /= X or
-           S'Value (S'Image (X)) /= X
-         then
+           S'Val (S'Pos (X)) /= X or S'Value (S'Image (X)) /= X then
             Failed ("WRONG ATTRIBUTE VALUE");
          end if;
       end loop;

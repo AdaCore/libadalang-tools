@@ -183,8 +183,7 @@ begin
       begin
          New_Float_Result :=
            Gef.Arccot
-             (New_Float (-Fxa5a00.Large),
-              Y => New_Float (Fxa5a00.Small));
+             (New_Float (-Fxa5a00.Large), Y => New_Float (Fxa5a00.Small));
          Dont_Optimize_New_Float (New_Float_Result, 7);
       exception
          when others =>
@@ -226,8 +225,7 @@ begin
         Ef.Arccot (Fxa5a00.Small, 0.0) /= 0.0 or
         Ef.Arccot (X => Fxa5a00.Large, Y => 0.0, Cycle => 360.0) /= 0.0 or
         Gef.Arccot (2.0 * Pi, Y => 0.0, Cycle => 360.0) /= 0.0 or
-        Ef.Arccot (Fxa5a00.Small, 0.0, Cycle => 360.0) /= 0.0
-      then
+        Ef.Arccot (Fxa5a00.Small, 0.0, Cycle => 360.0) /= 0.0 then
          Report.Failed
            ("Incorrect results from the Arccot function when " &
             "provided a Y parameter value of 0.0 and various " &
@@ -239,8 +237,7 @@ begin
 
       if not Result_Within_Range (Ef.Arccot (1.0), Pi / 4.0, 0.001) or
         not Result_Within_Range (Gef.Arccot (0.0), Pi / 2.0, 0.001) or
-        not Result_Within_Range (Ef.Arccot (-1.0), 3.0 * Pi / 4.0, 0.001)
-      then
+        not Result_Within_Range (Ef.Arccot (-1.0), 3.0 * Pi / 4.0, 0.001) then
          Report.Failed
            ("Incorrect results from the Arccot function when " &
             "provided a variety of Y parameter values");
@@ -282,8 +279,7 @@ begin
          when others =>
             Report.Failed
               ("Incorrect exception raised by the Arccot " &
-               "function when provided a 0.0 cycle parameter " &
-               "value");
+               "function when provided a 0.0 cycle parameter " & "value");
       end;
 
       begin
@@ -315,8 +311,7 @@ begin
          when others =>
             Report.Failed
               ("Incorrect exception raised by the Arccot " &
-               "function when provided a -Pi cycle parameter " &
-               "value");
+               "function when provided a -Pi cycle parameter " & "value");
       end;
 
       -- Check that no exception is raised by the Arccot function with
@@ -326,10 +321,9 @@ begin
       begin
          Float_Result :=
            Ef.Arccot
-             (X => -Fxa5a00.Large,
-              Y => -Fxa5a00.Large,
+             (X => -Fxa5a00.Large, Y => -Fxa5a00.Large,
 --pwb-math  Next line: changed 2.0*Pi to 360.0
-              Cycle => 360.0);
+          Cycle => 360.0);
          Dont_Optimize_Float (Float_Result, 14);
       exception
          when others =>
@@ -342,8 +336,7 @@ begin
       begin
          New_Float_Result :=
            Gef.Arccot
-             (New_Float (Fxa5a00.Large),
-              Y => New_Float (-Fxa5a00.Small),
+             (New_Float (Fxa5a00.Large), Y => New_Float (-Fxa5a00.Small),
 --pwb-math  Next line: changed 2.0*Pi to 360.0
               Cycle => 360.0);
          Dont_Optimize_New_Float (New_Float_Result, 15);
@@ -359,10 +352,9 @@ begin
       begin
          Float_Result :=
            Ef.Arccot
-             (X => -Fxa5a00.Small,
-              Y => -Fxa5a00.Large,
+             (X => -Fxa5a00.Small, Y => -Fxa5a00.Large,
 --pwb-math  Next line: changed 2.0*Pi to 360.0
-              Cycle => 360.0);
+          Cycle => 360.0);
          Dont_Optimize_Float (Float_Result, 16);
       exception
          when others =>
@@ -376,10 +368,9 @@ begin
       begin
          New_Float_Result :=
            Gef.Arccot
-             (New_Float (Fxa5a00.Small),
-              New_Float (Fxa5a00.Large),
+             (New_Float (Fxa5a00.Small), New_Float (Fxa5a00.Large),
 --pwb-math  Next line: changed 2.0*Pi to 360.0
-              360.0);
+          360.0);
          Dont_Optimize_New_Float (New_Float_Result, 17);
       exception
          when others =>
@@ -394,29 +385,17 @@ begin
       -- correct results when provided a variety of X parameter input values.
 
       if not Fxa5a00.Result_Within_Range
-          (Gef.Arccot (0.0, Cycle => 360.0),
-           90.0,
-           0.001) or
+          (Gef.Arccot (0.0, Cycle => 360.0), 90.0, 0.001) or
         not Fxa5a00.Result_Within_Range
-          (Ef.Arccot (0.0, Cycle => 100.0),
-           25.0,
-           0.001) or
+          (Ef.Arccot (0.0, Cycle => 100.0), 25.0, 0.001) or
         not Fxa5a00.Result_Within_Range
-          (Gef.Arccot (1.0, Cycle => 360.0),
-           45.0,
-           0.001) or
+          (Gef.Arccot (1.0, Cycle => 360.0), 45.0, 0.001) or
         not Fxa5a00.Result_Within_Range
-          (Ef.Arccot (1.0, Cycle => 100.0),
-           12.5,
-           0.001) or
+          (Ef.Arccot (1.0, Cycle => 100.0), 12.5, 0.001) or
         not Fxa5a00.Result_Within_Range
-          (Gef.Arccot (-1.0, Cycle => 360.0),
-           135.0,
-           0.001) or
+          (Gef.Arccot (-1.0, Cycle => 360.0), 135.0, 0.001) or
         not Fxa5a00.Result_Within_Range
-          (Ef.Arccot (-1.0, Cycle => 100.0),
-           37.5,
-           0.001)
+          (Ef.Arccot (-1.0, Cycle => 100.0), 37.5, 0.001)
       then
          Report.Failed
            ("Incorrect results from the Arccot function with " &
@@ -425,13 +404,9 @@ begin
       end if;
 
       if not Fxa5a00.Result_Within_Range
-          (Ef.Arccot (0.242_535_5, 0.970_142_0),
-           Ef.Arccot (0.25),
-           0.01) or
+          (Ef.Arccot (0.242_535_5, 0.970_142_0), Ef.Arccot (0.25), 0.01) or
         not Fxa5a00.Result_Within_Range
-          (Ef.Arccot (0.316_227_7, 0.948_683_1),
-           Ef.Arccot (0.33),
-           0.01)
+          (Ef.Arccot (0.316_227_7, 0.948_683_1), Ef.Arccot (0.33), 0.01)
       then
          Report.Failed
            ("Incorrect results from the Arccot function with " &
@@ -439,13 +414,9 @@ begin
       end if;
 
       if not Fxa5a00.Result_Within_Range
-          (Ef.Cot (Ef.Arccot (0.447_213_5, 0.894_427_0)),
-           0.5,
-           0.01) or
+          (Ef.Cot (Ef.Arccot (0.447_213_5, 0.894_427_0)), 0.5, 0.01) or
         not Fxa5a00.Result_Within_Range
-          (Ef.Cot (Ef.Arccot (0.998_738_0, 0.049_936_9)),
-           20.0,
-           0.1)
+          (Ef.Cot (Ef.Arccot (0.998_738_0, 0.049_936_9)), 20.0, 0.1)
       then
          Report.Failed
            ("Incorrect results from the Arccot function when " &
@@ -456,10 +427,7 @@ begin
 
       Angle := 0.001;
       while Angle < Pi and not Incorrect_Inverse loop
-         if not Result_Within_Range
-             (Ef.Arccot (Ef.Cot (Angle)),
-              Angle,
-              0.001)
+         if not Result_Within_Range (Ef.Arccot (Ef.Cot (Angle)), Angle, 0.001)
          then
             Incorrect_Inverse := True;
          end if;
@@ -469,8 +437,7 @@ begin
       if Incorrect_Inverse then
          Report.Failed
            ("Incorrect results returned from the Inverse " &
-            "comparison of Cot and Arccot using the default " &
-            "cycle value");
+            "comparison of Cot and Arccot using the default " & "cycle value");
          Incorrect_Inverse := False;
       end if;
 
@@ -482,14 +449,12 @@ begin
              (Ef.Arccot
                 (Ef.Cot (Float (New_Float_Angle), Cycle => 360.0),
                  Cycle => 360.0),
-              Float (New_Float_Angle),
-              0.01) or
+              Float (New_Float_Angle), 0.01) or
            not Result_Within_Range
              (Gef.Arccot
                 (New_Float (Gef.Cot (New_Float_Angle, Cycle => 360.0)),
                  Cycle => 360.0),
-              Float (New_Float_Angle),
-              0.01)
+              Float (New_Float_Angle), 0.01)
          then
             Incorrect_Inverse := True;
          end if;
@@ -499,15 +464,13 @@ begin
       if Incorrect_Inverse then
          Report.Failed
            ("Incorrect results returned from the Inverse " &
-            "comparison of Cot and Arccot using non-default " &
-            "cycle value");
+            "comparison of Cot and Arccot using non-default " & "cycle value");
       end if;
 
    exception
       when The_Error : others =>
          Report.Failed
-           ("The following exception was raised in the " &
-            "Test_Block: " &
+           ("The following exception was raised in the " & "Test_Block: " &
             Exception_Name (The_Error));
    end Test_Block;
 

@@ -43,19 +43,14 @@ PACKAGE ibusiness_unit.synthetic_target_manager IS
 -- Basic Methodes
 -------------------------------------------------------------------------------
 
-   FUNCTION create
-     (tracer_class_name        : IN string := "";
-      tracer_class_description : IN string := "") RETURN ibusiness_unit.reference;
+   FUNCTION create (tracer_class_name : IN string := "";
+      tracer_class_description        : IN string := "") RETURN ibusiness_unit.reference;
    --
    -- Creates the object and initializes internal data structure.
 
-   PROCEDURE initialize
-     (obj                        : IN OUT object;
-      gunking_mode               : IN     string;
-      synthetic_target_container : IN     string;
-      setup_manager              : IN     string;
-      hmi_communication          : IN     string;
-      recording_manager          : IN     string);
+   PROCEDURE initialize (obj     : IN OUT object; gunking_mode : IN string;
+      synthetic_target_container : IN     string; setup_manager : IN string;
+      hmi_communication          : IN     string; recording_manager : IN string);
    --
    -- Initializes the object
 
@@ -115,9 +110,8 @@ PACKAGE BODY ibusiness_unit.synthetic_target_manager IS
    -- Interface Management Methodes
    ----------------------------------------------------------------------
 
-   FUNCTION create
-     (tracer_class_name        : IN string := "";
-      tracer_class_description : IN string := "") RETURN ibusiness_unit.reference IS
+   FUNCTION create (tracer_class_name : IN string := "";
+      tracer_class_description        : IN string := "") RETURN ibusiness_unit.reference IS
       myself : reference;
 
    BEGIN
@@ -135,13 +129,9 @@ PACKAGE BODY ibusiness_unit.synthetic_target_manager IS
          RETURN NULL;
    END create;
 
-   PROCEDURE initialize
-     (obj                        : IN OUT object;
-      gunking_mode               : IN     string;
-      synthetic_target_container : IN     string;
-      setup_manager              : IN     string;
-      hmi_communication          : IN     string;
-      recording_manager          : IN     string) IS
+   PROCEDURE initialize (obj     : IN OUT object; gunking_mode : IN string;
+      synthetic_target_container : IN     string; setup_manager : IN string;
+      hmi_communication          : IN     string; recording_manager : IN string) IS
 
       pm : private_members RENAMES obj.member.ALL;
 
@@ -244,22 +234,19 @@ PACKAGE BODY pp_reproducer IS
    BEGIN
       synth_tar_manager_ref :=
         ibusiness_unit.synthetic_target_manager.create
-          (tracer_class_name        => "SYNTHMGR",
-           tracer_class_description => "Synthetic Target Manager");
+          (tracer_class_name => "SYNTHMGR", tracer_class_description => "Synthetic Target Manager");
 
       ibusiness_unit.synthetic_target_manager.reference (synth_tar_manager_ref).initialize
         (gunking_mode               => "gk_mode_manager",
          synthetic_target_container => "synthetic_target_container",
-         setup_manager              => "setup_manager",
-         hmi_communication          => "hmi_communication_device",
+         setup_manager => "setup_manager", hmi_communication => "hmi_communication_device",
          recording_manager          => "recording_manager");
 
       ibusiness_unit.synthetic_target_manager.initialize
         (obj => ibusiness_unit.synthetic_target_manager.object (synth_tar_manager_ref.ALL),
          gunking_mode               => "gk_mode_manager",
          synthetic_target_container => "synthetic_target_container",
-         setup_manager              => "setup_manager",
-         hmi_communication          => "hmi_communication_device",
+         setup_manager => "setup_manager", hmi_communication => "hmi_communication_device",
          recording_manager          => "recording_manager");
 
 

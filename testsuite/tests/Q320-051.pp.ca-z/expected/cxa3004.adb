@@ -61,8 +61,7 @@ begin
       "Ada.Characters.Handling for classification " &
       "of and conversion between Wide_Character and " &
       "Character values produce correct results " &
-      "when given the appropriate Character " &
-      "and String inputs");
+      "when given the appropriate Character " & "and String inputs");
 
    Test_Block :
    declare
@@ -85,20 +84,15 @@ begin
 
       A_String      : String (1 .. 3)      := First_Char & 'X' & Last_Char;
       A_Wide_String : Wide_String (1 .. 3) :=
-        First_Wide_Char &
-        Ach.To_Wide_Character ('X') &
+        First_Wide_Char & Ach.To_Wide_Character ('X') &
         Ach.To_Wide_Character (Last_Char);
 
       Unique_Wide_String : Wide_String (1 .. 2) :=
         First_Unique_Wide_Char & Last_Wide_Char;
 
       Mixed_Wide_String : Wide_String (1 .. 6) :=
-        Ach.To_Wide_Character ('A') &
-        First_Wide_Char &
-        Last_Non_Wide_Char &
-        First_Unique_Wide_Char &
-        Last_Wide_Char &
-        Ach.To_Wide_Character ('Z');
+        Ach.To_Wide_Character ('A') & First_Wide_Char & Last_Non_Wide_Char &
+        First_Unique_Wide_Char & Last_Wide_Char & Ach.To_Wide_Character ('Z');
 
       Basic_Char        : Character            := 'A';
       Basic_Wide_Char   : Wide_Character       := 'A';
@@ -114,8 +108,7 @@ begin
       end if;
 
       if Ach.Is_Character (First_Unique_Wide_Char) or
-        Ach.Is_Character (Last_Wide_Char)
-      then
+        Ach.Is_Character (Last_Wide_Char) then
          Report.Failed ("Incorrect result from Is_Character - 2");
       end if;
 
@@ -126,8 +119,7 @@ begin
       end if;
 
       if Ach.Is_String (Unique_Wide_String) or
-        Ach.Is_String (Mixed_Wide_String)
-      then
+        Ach.Is_String (Mixed_Wide_String) then
          Report.Failed ("Incorrect result from Is_String - 2");
       end if;
 
@@ -136,8 +128,7 @@ begin
       -- Use default substitution character in call of To_Character.
 
       if Ach.To_Character (First_Wide_Char) /= First_Char or
-        Ach.To_Character (Last_Non_Wide_Char) /= Last_Char
-      then
+        Ach.To_Character (Last_Non_Wide_Char) /= Last_Char then
          Report.Failed ("Incorrect result from To_Character - 1");
       end if;
 
@@ -188,23 +179,19 @@ begin
       -- Functions Used In Combination
 
       if not Ach.Is_Character
-          (Ach.To_Wide_Character (Ach.To_Character (First_Wide_Char)))
-      then
+          (Ach.To_Wide_Character (Ach.To_Character (First_Wide_Char))) then
          Report.Failed ("Incorrect result from functions in combination - 1");
       end if;
 
-      if not Ach.Is_String
-          (Ach.To_Wide_String (Ach.To_String (A_Wide_String)))
+      if not Ach.Is_String (Ach.To_Wide_String (Ach.To_String (A_Wide_String)))
       then
          Report.Failed ("Incorrect result from functions in combination - 2");
       end if;
 
       if Ach.To_String
-          (Ach.To_Wide_Character ('A') &
-           Ach.To_Wide_Character (F_Char) &
+          (Ach.To_Wide_Character ('A') & Ach.To_Wide_Character (F_Char) &
            Ach.To_Wide_Character ('Z')) /=
-        "AFZ"
-      then
+        "AFZ" then
          Report.Failed ("Incorrect result from functions in combination - 3");
       end if;
 

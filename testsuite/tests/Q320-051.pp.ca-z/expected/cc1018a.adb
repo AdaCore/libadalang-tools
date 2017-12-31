@@ -70,12 +70,7 @@ procedure Cc1018a is
       end loop;
    end Gen_Proc;
 
-   procedure Test_Lp is new Gen_Proc
-     (Int,
-      Arr,
-      Int_Obj,
-      Arr_Obj,
-      Get_Values,
+   procedure Test_Lp is new Gen_Proc (Int, Arr, Int_Obj, Arr_Obj, Get_Values,
       Same_Value);
 
 begin

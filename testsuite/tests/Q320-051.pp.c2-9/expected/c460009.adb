@@ -90,8 +90,7 @@ begin
    declare
 
       type Arr_Int2 is array (Int range <>, Int range <>) of Integer;
-      Arr_Obj2 : Arr_Int2
-        (1 .. Report.Ident_Int (2),
+      Arr_Obj2 : Arr_Int2 (1 .. Report.Ident_Int (2),
          Report.Ident_Int (3) .. Report.Ident_Int (2));
    -- null array object
    begin
@@ -120,8 +119,7 @@ begin
    declare
 
       type Arr_Int3 is array (Int range <>, Int range <>) of Integer;
-      Arr_Obj3 : Arr_Int3
-        (1 .. Report.Ident_Int (2),
+      Arr_Obj3 : Arr_Int3 (1 .. Report.Ident_Int (2),
          Report.Ident_Int (3) .. Report.Ident_Int (2));
    -- null array object
 
@@ -154,8 +152,7 @@ begin
 
       type Arr_Int4 is
         array (Int range <>, Int range <>, Int range <>) of Integer;
-      Arr_Obj4 : Arr_Int4
-        (1 .. Report.Ident_Int (2),
+      Arr_Obj4 : Arr_Int4 (1 .. Report.Ident_Int (2),
          Report.Ident_Int (1) .. Report.Ident_Int (3),
          Report.Ident_Int (3) .. Report.Ident_Int (2));
    -- null array object
@@ -240,8 +237,7 @@ begin
       type Arr_Char5 is array (Int range <>, Int range <>) of Character;
       subtype Formal is
         Arr_Char5 (Report.Ident_Int (2) .. 0, 1 .. Report.Ident_Int (3));
-      Arr_Obj5 : Arr_Char5
-        (Report.Ident_Int (2) .. Report.Ident_Int (1),
+      Arr_Obj5 : Arr_Char5 (Report.Ident_Int (2) .. Report.Ident_Int (1),
          Report.Ident_Int (1) .. Report.Ident_Int (2)) :=
         (Report.Ident_Int (2) .. Report.Ident_Int (1) =>
            (Report.Ident_Int (1) .. Report.Ident_Int (2) => ' '));
@@ -371,8 +367,7 @@ begin
       type Arr_Char8 is array (Int range <>, Int range <>) of Character;
       subtype Formal is
         Arr_Char8 (Report.Ident_Int (2) .. 0, 1 .. Report.Ident_Int (3));
-      Arr_Obj8 : Arr_Char8
-        (Report.Ident_Int (2) .. Report.Ident_Int (1),
+      Arr_Obj8 : Arr_Char8 (Report.Ident_Int (2) .. Report.Ident_Int (1),
          Report.Ident_Int (1) .. Report.Ident_Int (2));
 
       procedure Proc8 (P : out Formal) is

@@ -111,8 +111,7 @@ begin
          when others =>
             Report.Failed
               ("Unexpected exception raised by the Arccos " &
-               "function when the input parameter is greater " &
-               "than 1.0");
+               "function when the input parameter is greater " & "than 1.0");
       end;
 
       begin
@@ -148,12 +147,10 @@ begin
         not Result_Within_Range (Ef.Arccos (-0.11), 1.68, 0.01) or
         not Result_Within_Range (Gef.Arccos (-0.67), 2.31, 0.01) or
         not Result_Within_Range (Ef.Arccos (-0.94), 2.79, 0.01) or
-        not Result_Within_Range (Gef.Arccos (-1.0), Pi, 0.01)
-      then
+        not Result_Within_Range (Gef.Arccos (-1.0), Pi, 0.01) then
          Report.Failed
            ("Incorrect result returned from the Arccos " &
-            "function when provided a variety of input " &
-            "parameters");
+            "function when provided a variety of input " & "parameters");
       end if;
 
       -- Testing of the Arccos function with specified Cycle parameter.
@@ -241,8 +238,7 @@ begin
 
 --pwb-math: Next two lines: Changed 2.0*Pi to 360.0
       if Gef.Arccos (X => 1.0, Cycle => 360.0) /= 0.0 or
-        Ef.Arccos (1.0, 360.0) /= 0.0
-      then
+        Ef.Arccos (1.0, 360.0) /= 0.0 then
          Report.Failed
            ("Incorrect result from the Arccos function with " &
             "specified Cycle parameter, when the input " &
@@ -259,8 +255,7 @@ begin
          not Result_Within_Range (Gef.Arccos (-1.0, 360.0), 180.0, 0.1) or
         not Result_Within_Range (Gef.Arccos (-1.0, 100.0), 50.0, 0.1) or
         not Result_Within_Range (Gef.Arccos (0.0, 360.0), 90.0, 0.1) or
-        not Result_Within_Range (Gef.Arccos (0.0, 100.0), 25.0, 0.1)
-      then
+        not Result_Within_Range (Gef.Arccos (0.0, 100.0), 25.0, 0.1) then
          Report.Failed
            ("Incorrect result returned from the Arccos " &
             "function with specified Cycle parameter, " &
@@ -285,8 +280,7 @@ begin
          when others =>
             Report.Failed
               ("Unexpected exception raised by the Arccosh " &
-               "function when given a parameter value less " &
-               "than 1.0");
+               "function when given a parameter value less " & "than 1.0");
       end;
 
       begin
@@ -316,8 +310,7 @@ begin
          when others =>
             Report.Failed
               ("Unexpected exception raised by the Arccosh " &
-               "function when given a large negative parameter " &
-               "value");
+               "function when given a large negative parameter " & "value");
       end;
 
       -- Check the prescribed results of the Arccosh function.
@@ -337,12 +330,10 @@ begin
         not Result_Within_Range (Ef.Arccosh (1.77), 1.17, 0.01) or
         not Result_Within_Range (Gef.Arccosh (2.00), 1.32, 0.01) or
         not Result_Within_Range (Ef.Arccosh (4.30), 2.14, 0.01) or
-        not Result_Within_Range (Gef.Arccosh (6.90), 2.62, 0.01)
-      then
+        not Result_Within_Range (Gef.Arccosh (6.90), 2.62, 0.01) then
          Report.Failed
            ("Incorrect result returned from the Arccosh " &
-            "function when provided a variety of input " &
-            "parameters");
+            "function when provided a variety of input " & "parameters");
       end if;
 
    exception

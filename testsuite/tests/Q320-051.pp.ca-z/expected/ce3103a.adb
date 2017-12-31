@@ -56,8 +56,7 @@ begin
 
    Test
      ("CE3103A",
-      "CHECK THAT PAGE AND LINE LENGTH " &
-      "ARE SET TO ZERO AFTER CREATE, " &
+      "CHECK THAT PAGE AND LINE LENGTH " & "ARE SET TO ZERO AFTER CREATE, " &
       "OPEN, OR RESET");
 
    begin

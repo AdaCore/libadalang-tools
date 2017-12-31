@@ -79,8 +79,7 @@ begin
       if S /= "AB" then
          Failed
            ("PROCEDURES DIFFERING ONLY IN " &
-            "NUMBER OF PARAMETERS (NO DEFAULTS) " &
-            "CAUSED CONFUSION");
+            "NUMBER OF PARAMETERS (NO DEFAULTS) " & "CAUSED CONFUSION");
       end if;
 
       S := "12";
@@ -90,8 +89,7 @@ begin
       if S /= "C2" then
          Failed
            ("PROCEDURES DIFFERING ONLY IN " &
-            "EXISTENCE OF ONE PARAMETER (WITH " &
-            "DEFAULT) CAUSED CONFUSION");
+            "EXISTENCE OF ONE PARAMETER (WITH " & "DEFAULT) CAUSED CONFUSION");
       end if;
    end;
 

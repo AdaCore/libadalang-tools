@@ -63,9 +63,8 @@ package C3900052 is  -- Further extended alert system abstraction.
    procedure Handle (Ma : in out Medium_Alert_Type);    -- Override parent's
    -- primitive subprog.
 
-   procedure Assign_Officer
-     (Ma : in out Medium_Alert_Type;
-      To : in     Person_Enum);
+   procedure Assign_Officer (Ma : in out Medium_Alert_Type;
+      To                        : in     Person_Enum);
 
    -- The following functions are needed to verify the values of the
    -- extension's private components.

@@ -112,8 +112,7 @@ begin
       -- CHECKING THE VALUES AFTER THE SLICE ASSIGNMENT:
 
       if Arrx42 /= "QUINC" or
-        Arrx42 (Ident_Int (11) .. Ident_Int (15)) /= "QUINC"
-      then
+        Arrx42 (Ident_Int (11) .. Ident_Int (15)) /= "QUINC" then
          Failed ("SLICE ASSIGNMENT NOT CORRECT (14)");
       end if;
 

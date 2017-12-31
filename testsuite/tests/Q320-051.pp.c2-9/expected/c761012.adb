@@ -34,9 +34,7 @@ begin
          end if;
       when E : others =>
          Failed
-           ("Exception " &
-            Exception_Name (E) &
-            " raised - " &
+           ("Exception " & Exception_Name (E) & " raised - " &
             Exception_Information (E));
    end Excep;
 
@@ -56,8 +54,7 @@ begin
       end;
 
       if not Finalize_Was_Called
-        and then not Finalize_Was_Called_Before_Leaving_Exit
-      then
+        and then not Finalize_Was_Called_Before_Leaving_Exit then
          Failed
            ("Finalize wasn't called when the master was left " &
             "- transfer of control");

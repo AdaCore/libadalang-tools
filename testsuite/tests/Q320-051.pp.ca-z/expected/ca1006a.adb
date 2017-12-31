@@ -39,8 +39,7 @@ procedure Ca1006a is
    package body Call_Test is
    begin
       Test
-        ("CA1006A",
-         "A LIBRARY UNIT AND ITS SUBUNITS " & "SUBMITTED TOGETHER");
+        ("CA1006A", "A LIBRARY UNIT AND ITS SUBUNITS " & "SUBMITTED TOGETHER");
    end Call_Test;
 
    function F (I : Integer) return Integer is separate;

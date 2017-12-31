@@ -11,8 +11,7 @@
    -- Inherits procedure App2_Widget_Specific_Oper from App2_Widget.
 
    -- Primitive operation of type App3_Widget.
-   procedure App3_Widget_Specific_Oper
-     (The_Widget : in out App3_Widget;
-      S          : in     Widget_Size);
+   procedure App3_Widget_Specific_Oper (The_Widget : in out App3_Widget;
+      S                                            : in     Widget_Size);
 
 end Fa11b00.Ca11b01_0.Ca11b01_1;           -- Application_Three_Widget

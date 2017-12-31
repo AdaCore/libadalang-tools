@@ -74,8 +74,7 @@ procedure Cxai006 is
    end My_Key;
 
    package My_Keys is new My_Ordered_Sets.Generic_Keys
-     (Key_Type => My_Key_Type,
-      Key      => My_Key); -- Predefined <
+     (Key_Type => My_Key_Type, Key => My_Key); -- Predefined <
 
    My_Set_1 : My_Ordered_Sets.Set;
    My_Set_2 : My_Ordered_Sets.Set;
@@ -97,9 +96,8 @@ procedure Cxai006 is
 
    My_Inserted : Boolean;
 
-   procedure Tampering_Check
-     (Container : in out My_Ordered_Sets.Set;
-      Where     : in     String)
+   procedure Tampering_Check (Container : in out My_Ordered_Sets.Set;
+      Where                             : in     String)
    is
 
       Program_Error_Raised : Boolean := False;
@@ -198,8 +196,7 @@ begin
       begin
 
          if My_Ordered_Sets.Element (Position => My_Cursor_1) /=
-           Value_In_Array (I)
-         then
+           Value_In_Array (I) then
 
             Report.Failed
               ("Mismatch between element and what was inserted #2");
@@ -216,8 +213,7 @@ begin
          end if;
 
          My_Ordered_Sets.Query_Element
-           (Position => My_Cursor_1,
-            Process  => My_Query'Access);
+           (Position => My_Cursor_1, Process => My_Query'Access);
 
       end;
 
@@ -260,8 +256,7 @@ begin
    for I in reverse Array_Bounds_Type loop
 
       if My_Ordered_Sets.Element (Position => My_Cursor_2) /=
-        Value_In_Array (I)
-      then
+        Value_In_Array (I) then
 
          Report.Failed ("Mismatch between element and what was inserted #3");
 
@@ -295,9 +290,7 @@ begin
 
    end if;
 
-   if not My_Ordered_Sets.Equivalent_Sets
-       (Left  => My_Set_1,
-        Right => My_Set_2)
+   if not My_Ordered_Sets.Equivalent_Sets (Left => My_Set_1, Right => My_Set_2)
    then
 
       Report.Failed ("Ordered_Sets not equivalent");
@@ -367,12 +360,10 @@ begin
    for I in Array_Bounds_Type loop
 
       My_Set_1.Replace_Element
-        (Position => My_Cursor_1,
-         New_Item => Value_In_Array (I) + 1.0);
+        (Position => My_Cursor_1, New_Item => Value_In_Array (I) + 1.0);
 
       My_Set_2.Replace_Element
-        (Position => My_Cursor_2,
-         New_Item => Value_In_Array (I) + 1.0);
+        (Position => My_Cursor_2, New_Item => Value_In_Array (I) + 1.0);
 
       My_Ordered_Sets.Next (Position => My_Cursor_1);
       My_Ordered_Sets.Next (Position => My_Cursor_2);
@@ -431,8 +422,7 @@ begin
    for I in Array_Bounds_Type loop
 
       if My_Ordered_Sets.Element (Position => My_Cursor_1) /=
-        Value_In_Array (I)
-      then
+        Value_In_Array (I) then
 
          Report.Failed ("Target Set not as expected after move");
 
@@ -604,8 +594,7 @@ begin
 
    My_Cursor_2 := My_Set_2.First;
 
-   if My_Ordered_Sets.Element (Position => My_Cursor_2) /=
-     Value_In_Array (1)
+   if My_Ordered_Sets.Element (Position => My_Cursor_2) /= Value_In_Array (1)
    then
 
       Report.Failed ("Inserted value not as expected #1");
@@ -615,8 +604,7 @@ begin
    My_Ordered_Sets.Next (Position => My_Cursor_2);
 
    -- Check = Default_Value
-   if My_Ordered_Sets.Element (Position => My_Cursor_2) /=
-     Value_In_Array (2)
+   if My_Ordered_Sets.Element (Position => My_Cursor_2) /= Value_In_Array (2)
    then
 
       Report.Failed ("Inserted value not as expected #2");
@@ -625,8 +613,7 @@ begin
 
    My_Ordered_Sets.Next (Position => My_Cursor_2);
 
-   if My_Ordered_Sets.Element (Position => My_Cursor_2) /=
-     Value_In_Array (7)
+   if My_Ordered_Sets.Element (Position => My_Cursor_2) /= Value_In_Array (7)
    then
 
       Report.Failed ("Inserted value not as expected #3");
@@ -635,8 +622,7 @@ begin
 
    My_Ordered_Sets.Next (Position => My_Cursor_2);
 
-   if My_Ordered_Sets.Element (Position => My_Cursor_2) /=
-     Value_In_Array (9)
+   if My_Ordered_Sets.Element (Position => My_Cursor_2) /= Value_In_Array (9)
    then
 
       Report.Failed ("Inserted value not as expected #4");
@@ -645,8 +631,7 @@ begin
 
    My_Ordered_Sets.Next (Position => My_Cursor_2);
 
-   if My_Ordered_Sets.Element (Position => My_Cursor_2) /=
-     My_Default_Value
+   if My_Ordered_Sets.Element (Position => My_Cursor_2) /= My_Default_Value
    then
 
       Report.Failed ("Inserted value not as expected #5");
@@ -656,8 +641,7 @@ begin
    My_Ordered_Sets.Next (Position => My_Cursor_2);
 
    if My_Ordered_Sets.Element (Position => My_Cursor_2) /=
-     My_Default_Value * 2.0
-   then
+     My_Default_Value * 2.0 then
 
       Report.Failed ("Inserted value not as expected #6");
 
@@ -711,8 +695,7 @@ begin
 
    My_Cursor_1 := My_Set_1.Find (Item => Value_In_Array (9));
 
-   if My_Ordered_Sets.Element (Position => My_Cursor_1) /=
-     Value_In_Array (9)
+   if My_Ordered_Sets.Element (Position => My_Cursor_1) /= Value_In_Array (9)
    then
 
       Report.Failed ("Found value not as expected");
@@ -721,8 +704,7 @@ begin
 
    My_Cursor_2 := My_Set_1.Floor (Item => Value_In_Array (8));
 
-   if My_Ordered_Sets.Element (Position => My_Cursor_2) /=
-     Value_In_Array (8)
+   if My_Ordered_Sets.Element (Position => My_Cursor_2) /= Value_In_Array (8)
    then
 
       Report.Failed ("Floor (element form) value not as expected");
@@ -743,8 +725,7 @@ begin
 
    My_Cursor_1 := My_Set_1.Ceiling (Item => Value_In_Array (10));
 
-   if My_Ordered_Sets.Element (Position => My_Cursor_1) /=
-     Value_In_Array (10)
+   if My_Ordered_Sets.Element (Position => My_Cursor_1) /= Value_In_Array (10)
    then
 
       Report.Failed ("Ceiling (element form) value not as expected");
@@ -773,8 +754,7 @@ begin
    end if;
 
    if My_Ordered_Sets.Element (My_Ordered_Sets.Previous (My_Cursor_1)) >
-     My_Cursor_1
-   then
+     My_Cursor_1 then
 
       Report.Failed ("> of cursor and element not as expected");
 
@@ -828,9 +808,7 @@ begin
 
    end if;
 
-   if not My_Ordered_Sets.Is_Subset
-       (Subset => My_Set_2,
-        Of_Set => My_Set_1)
+   if not My_Ordered_Sets.Is_Subset (Subset => My_Set_2, Of_Set => My_Set_1)
    then
 
       Report.Failed ("Erroneously doesn't think is subset");
@@ -855,8 +833,7 @@ begin
 
    My_Cursor_3 := My_Set_3.First;
 
-   if My_Ordered_Sets.Element (Position => My_Cursor_3) /=
-     Value_In_Array (2)
+   if My_Ordered_Sets.Element (Position => My_Cursor_3) /= Value_In_Array (2)
    then
 
       Report.Failed ("Element not as expected after Union #1");
@@ -865,8 +842,7 @@ begin
 
    My_Ordered_Sets.Next (Position => My_Cursor_3);
 
-   if My_Ordered_Sets.Element (Position => My_Cursor_3) /=
-     My_Default_Value
+   if My_Ordered_Sets.Element (Position => My_Cursor_3) /= My_Default_Value
    then
 
       Report.Failed ("Element not as expected after Union #2");
@@ -894,8 +870,7 @@ begin
    for I in Array_Bounds_Type loop
 
       if My_Ordered_Sets.Element (Position => My_Cursor_3) /=
-        Value_In_Array (I)
-      then
+        Value_In_Array (I) then
 
          Report.Failed ("Element not as expected after Union #3");
 
@@ -920,8 +895,7 @@ begin
    for I in Array_Bounds_Type loop
 
       if My_Ordered_Sets.Element (Position => My_Cursor_3) /=
-        Value_In_Array (I)
-      then
+        Value_In_Array (I) then
 
          Report.Failed ("Element not as expected after Union #4");
 
@@ -961,8 +935,7 @@ begin
 
    My_Cursor_3 := My_Set_3.First;
 
-   if My_Ordered_Sets.Element (Position => My_Cursor_3) /=
-     Value_In_Array (2)
+   if My_Ordered_Sets.Element (Position => My_Cursor_3) /= Value_In_Array (2)
    then
 
       Report.Failed ("Element not as expected after Intersection #1");
@@ -981,8 +954,7 @@ begin
 
    My_Cursor_3 := My_Set_3.First;
 
-   if My_Ordered_Sets.Element (Position => My_Cursor_3) /=
-     Value_In_Array (2)
+   if My_Ordered_Sets.Element (Position => My_Cursor_3) /= Value_In_Array (2)
    then
 
       Report.Failed ("Element not as expected after Intersection #2");
@@ -1010,8 +982,7 @@ begin
 
    My_Cursor_3 := My_Set_3.First;
 
-   if My_Ordered_Sets.Element (Position => My_Cursor_3) /=
-     My_Default_Value
+   if My_Ordered_Sets.Element (Position => My_Cursor_3) /= My_Default_Value
    then
 
       Report.Failed ("Element not as expected after Difference #1");
@@ -1062,8 +1033,7 @@ begin
 
    My_Cursor_3 := My_Set_3.First;
 
-   if My_Ordered_Sets.Element (Position => My_Cursor_3) /=
-     Value_In_Array (2)
+   if My_Ordered_Sets.Element (Position => My_Cursor_3) /= Value_In_Array (2)
    then
 
       Report.Failed ("Element not as expected after Symmetric_Difference #1");
@@ -1072,8 +1042,7 @@ begin
 
    My_Ordered_Sets.Next (Position => My_Cursor_3);
 
-   if My_Ordered_Sets.Element (Position => My_Cursor_3) /=
-     My_Default_Value
+   if My_Ordered_Sets.Element (Position => My_Cursor_3) /= My_Default_Value
    then
 
       Report.Failed ("Element not as expected after Symmetric_Difference #2");
@@ -1082,8 +1051,7 @@ begin
 
    My_Set_3 :=
      My_Ordered_Sets.Symmetric_Difference
-       (Left  => My_Set_1,
-        Right => My_Set_3);
+       (Left => My_Set_1, Right => My_Set_3);
 
    -- My_Set_3 should contain the test values (in forward order) except for
    -- Value_In_Array (2), followed by Default_Value
@@ -1114,8 +1082,7 @@ begin
 
    My_Cursor_3 := My_Set_3.First;
 
-   if My_Keys.Key (Position => My_Cursor_3) /=
-     My_Key_Type (Value_In_Array (1))
+   if My_Keys.Key (Position => My_Cursor_3) /= My_Key_Type (Value_In_Array (1))
    then
 
       Report.Failed ("Wrong key for cursor");
@@ -1123,10 +1090,8 @@ begin
    end if;
 
    if My_Keys.Element
-       (Container => My_Set_3,
-        Key       => My_Key_Type (Value_In_Array (1))) /=
-     Value_In_Array (1)
-   then
+       (Container => My_Set_3, Key => My_Key_Type (Value_In_Array (1))) /=
+     Value_In_Array (1) then
 
       Report.Failed ("Wrong element for key");
 
@@ -1136,8 +1101,7 @@ begin
    begin
 
       My_Keys.Replace
-        (Container => My_Set_3,
-         Key       => My_Key_Type (Value_In_Array (4)),
+        (Container => My_Set_3, Key => My_Key_Type (Value_In_Array (4)),
          New_Item  => Value_In_Array (4));
 
    exception
@@ -1156,8 +1120,7 @@ begin
    end if;
 
    My_Keys.Exclude
-     (Container => My_Set_3,
-      Key       => My_Key_Type (Value_In_Array (4)));
+     (Container => My_Set_3, Key => My_Key_Type (Value_In_Array (4)));
 
    if My_Set_3.Length /= Num_Tests then
 
@@ -1169,8 +1132,7 @@ begin
    begin
 
       My_Keys.Exclude
-        (Container => My_Set_3,
-         Key       => My_Key_Type (Value_In_Array (4)));
+        (Container => My_Set_3, Key => My_Key_Type (Value_In_Array (4)));
 
    exception
 
@@ -1189,8 +1151,7 @@ begin
    end if;
 
    My_Keys.Delete
-     (Container => My_Set_3,
-      Key       => My_Key_Type (Value_In_Array (3)));
+     (Container => My_Set_3, Key => My_Key_Type (Value_In_Array (3)));
 
    if My_Set_3.Length /= Num_Tests - 1 then
 
@@ -1200,11 +1161,9 @@ begin
 
    My_Cursor_3 :=
      My_Keys.Find
-       (Container => My_Set_3,
-        Key       => My_Key_Type (Value_In_Array (9)));
+       (Container => My_Set_3, Key => My_Key_Type (Value_In_Array (9)));
 
-   if My_Ordered_Sets.Element (Position => My_Cursor_3) /=
-     Value_In_Array (9)
+   if My_Ordered_Sets.Element (Position => My_Cursor_3) /= Value_In_Array (9)
    then
 
       Report.Failed ("Found (key form) value not as expected");
@@ -1212,9 +1171,7 @@ begin
    end if;
 
    if not My_Keys.Contains
-       (Container => My_Set_3,
-        Key       => My_Key_Type (Value_In_Array (2)))
-   then
+       (Container => My_Set_3, Key => My_Key_Type (Value_In_Array (2))) then
 
       Report.Failed ("Contains (key form) failed to find");
 
@@ -1242,8 +1199,7 @@ begin
    begin
 
       My_Keys.Update_Element_Preserving_Key
-        (Container => My_Set_3,
-         Position  => My_Cursor_3,
+        (Container => My_Set_3, Position => My_Cursor_3,
          Process   => My_Update'Access);
 
    end;
@@ -1271,11 +1227,9 @@ begin
 
    My_Cursor_3 :=
      My_Keys.Floor
-       (Container => My_Set_3,
-        Key       => My_Key_Type (Value_In_Array (8)));
+       (Container => My_Set_3, Key => My_Key_Type (Value_In_Array (8)));
 
-   if My_Ordered_Sets.Element (Position => My_Cursor_3) /=
-     Value_In_Array (8)
+   if My_Ordered_Sets.Element (Position => My_Cursor_3) /= Value_In_Array (8)
    then
 
       Report.Failed ("Floor (key Form) value not as expected");
@@ -1284,11 +1238,9 @@ begin
 
    My_Cursor_3 :=
      My_Keys.Ceiling
-       (Container => My_Set_3,
-        Key       => My_Key_Type (Value_In_Array (10)));
+       (Container => My_Set_3, Key => My_Key_Type (Value_In_Array (10)));
 
-   if My_Ordered_Sets.Element (Position => My_Cursor_3) /=
-     Value_In_Array (10)
+   if My_Ordered_Sets.Element (Position => My_Cursor_3) /= Value_In_Array (10)
    then
 
       Report.Failed ("Ceiling (key Form) value not as expected");

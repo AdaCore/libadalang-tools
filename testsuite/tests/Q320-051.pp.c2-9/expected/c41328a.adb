@@ -75,8 +75,7 @@ begin
      ("C41328A",
       "CHECK THAT IMPLICITLY DECLARED DERIVED " &
       "SUBPROGRAMS CAN BE SELECTED FROM OUTSIDE A " &
-      "PACKAGE USING AN EXPANDED NAME, FOR A DERIVED " &
-      "TYPE");
+      "PACKAGE USING AN EXPANDED NAME, FOR A DERIVED " & "TYPE");
 
    Var_1 := P.Init (Ident_Int (1));
    if P."/=" (Var_1, P.Couple'(1 => 1, 2 => 2)) then

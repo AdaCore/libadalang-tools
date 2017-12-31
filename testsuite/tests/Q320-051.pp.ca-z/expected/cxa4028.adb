@@ -78,10 +78,7 @@ begin
       package Bs40 is new Ada.Strings.Bounded.Generic_Bounded_Length (40);
       package Bs80 is new Ada.Strings.Bounded.Generic_Bounded_Length (80);
 
-      use type
-        Bs1.Bounded_String,
-        Bs20.Bounded_String,
-        Bs40.Bounded_String,
+      use type Bs1.Bounded_String, Bs20.Bounded_String, Bs40.Bounded_String,
         Bs80.Bounded_String;
 
       String_1  : String (1 .. 1)  := "A";
@@ -344,8 +341,7 @@ begin
    exception
       when The_Error : others =>
          Report.Failed
-           ("The following exception was raised in the " &
-            "Test_Block: " &
+           ("The following exception was raised in the " & "Test_Block: " &
             Exception_Name (The_Error));
    end Test_Block;
 

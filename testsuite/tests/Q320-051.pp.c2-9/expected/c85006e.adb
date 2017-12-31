@@ -218,37 +218,21 @@ begin
       Xat1 : Arr_Tsk renames At1 (6 .. 8);
 
       task type Task2 is
-         entry Entry1
-           (Tri1 :    out Integer;
-            Tra1 :    out Array1;
-            Trr1 :    out Record1;
-            Trp1 : in out Pointer1;
-            Trv1 : in out Pack1.Privy;
-            Trt1 : in out Task1;
-            Tai1 :    out Arr_Int;
-            Taa1 :    out Arr_Arr;
-            Tar1 :    out Arr_Rec;
-            Tap1 : in out Arr_Ptr;
-            Tav1 : in out Arr_Pvt;
-            Tat1 : in out Arr_Tsk);
+         entry Entry1 (Tri1 :    out Integer; Tra1 : out Array1;
+            Trr1            :    out Record1; Trp1 : in out Pointer1;
+            Trv1 : in out Pack1.Privy; Trt1 : in out Task1; Tai1 : out Arr_Int;
+            Taa1 :    out Arr_Arr; Tar1 : out Arr_Rec; Tap1 : in out Arr_Ptr;
+            Tav1            : in out Arr_Pvt; Tat1 : in out Arr_Tsk);
       end Task2;
 
       I        : Integer;
       Chk_Task : Task2;
 
-      procedure Proc1
-        (Pri1 : in out Integer;
-         Pra1 : in out Array1;
-         Prr1 : in out Record1;
-         Prp1 :    out Pointer1;
-         Prv1 :    out Pack1.Privy;
-         Prt1 : in out Task1;
-         Pai1 : in out Arr_Int;
-         Paa1 : in out Arr_Arr;
-         Par1 : in out Arr_Rec;
-         Pap1 :    out Arr_Ptr;
-         Pav1 :    out Arr_Pvt;
-         Pat1 : in out Arr_Tsk)
+      procedure Proc1 (Pri1 : in out Integer; Pra1 : in out Array1;
+         Prr1 : in out Record1; Prp1 : out Pointer1; Prv1 : out Pack1.Privy;
+         Prt1 : in out Task1; Pai1 : in out Arr_Int; Paa1 : in out Arr_Arr;
+         Par1 : in out Arr_Rec; Pap1 : out Arr_Ptr; Pav1 : out Arr_Pvt;
+         Pat1               : in out Arr_Tsk)
       is
       begin
          Pri1 := Pri1 + 1;
@@ -272,20 +256,11 @@ begin
 
       task body Task2 is
       begin
-         accept Entry1
-           (Tri1 :    out Integer;
-            Tra1 :    out Array1;
-            Trr1 :    out Record1;
-            Trp1 : in out Pointer1;
-            Trv1 : in out Pack1.Privy;
-            Trt1 : in out Task1;
-            Tai1 :    out Arr_Int;
-            Taa1 :    out Arr_Arr;
-            Tar1 :    out Arr_Rec;
-            Tap1 : in out Arr_Ptr;
-            Tav1 : in out Arr_Pvt;
-            Tat1 : in out Arr_Tsk)
-         do
+         accept Entry1 (Tri1 :    out Integer; Tra1 : out Array1;
+            Trr1             :    out Record1; Trp1 : in out Pointer1;
+            Trv1 : in out Pack1.Privy; Trt1 : in out Task1; Tai1 : out Arr_Int;
+            Taa1 :    out Arr_Arr; Tar1 : out Arr_Rec; Tap1 : in out Arr_Ptr;
+            Tav1             : in out Arr_Pvt; Tat1 : in out Arr_Tsk) do
             Tri1 := Arec.Ri1 + 1;
             Tra1 := (Arec.Ra1 (1) + 1, Arec.Ra1 (2) + 1, Arec.Ra1 (3) + 1);
             Trr1 := (D => 1, Field1 => Arec.Rr1.Field1 + 1);
@@ -306,19 +281,8 @@ begin
          end Entry1;
       end Task2;
 
-      package Genpack2 is new Generic1
-        (Xri1,
-         Xra1,
-         Xrr1,
-         Xrp1,
-         Xrv1,
-         Xrt1,
-         Xai1,
-         Xaa1,
-         Xar1,
-         Xap1,
-         Xav1,
-         Xat1);
+      package Genpack2 is new Generic1 (Xri1, Xra1, Xrr1, Xrp1, Xrv1, Xrt1,
+         Xai1, Xaa1, Xar1, Xap1, Xav1, Xat1);
    begin
       if Xri1 /= Ident_Int (1) then
          Failed ("INCORRECT VALUE OF XRI1 (1)");
@@ -379,24 +343,13 @@ begin
          Xat1 (J).Valu (I);
          if I /= Ident_Int (1) then
             Failed
-              ("INCORRECT RETURN VALUE FROM XAT1(" &
-               Integer'Image (J) &
+              ("INCORRECT RETURN VALUE FROM XAT1(" & Integer'Image (J) &
                ").VALU (1)");
          end if;
       end loop;
 
       Proc1
-        (Xri1,
-         Xra1,
-         Xrr1,
-         Xrp1,
-         Xrv1,
-         Xrt1,
-         Xai1,
-         Xaa1,
-         Xar1,
-         Xap1,
-         Xav1,
+        (Xri1, Xra1, Xrr1, Xrp1, Xrv1, Xrt1, Xai1, Xaa1, Xar1, Xap1, Xav1,
          Xat1);
 
       if Xri1 /= Ident_Int (2) then
@@ -458,24 +411,13 @@ begin
          Xat1 (J).Valu (I);
          if I /= Ident_Int (2) then
             Failed
-              ("INCORRECT RETURN VALUE FROM XAT1(" &
-               Integer'Image (J) &
+              ("INCORRECT RETURN VALUE FROM XAT1(" & Integer'Image (J) &
                ").VALU (2)");
          end if;
       end loop;
 
       Chk_Task.Entry1
-        (Xri1,
-         Xra1,
-         Xrr1,
-         Xrp1,
-         Xrv1,
-         Xrt1,
-         Xai1,
-         Xaa1,
-         Xar1,
-         Xap1,
-         Xav1,
+        (Xri1, Xra1, Xrr1, Xrp1, Xrv1, Xrt1, Xai1, Xaa1, Xar1, Xap1, Xav1,
          Xat1);
 
       if Xri1 /= Ident_Int (3) then
@@ -537,8 +479,7 @@ begin
          Xat1 (J).Valu (I);
          if I /= Ident_Int (3) then
             Failed
-              ("INCORRECT RETURN VALUE FROM XAT1(" &
-               Integer'Image (J) &
+              ("INCORRECT RETURN VALUE FROM XAT1(" & Integer'Image (J) &
                ").VALU (3)");
          end if;
       end loop;
@@ -619,8 +560,7 @@ begin
          Xat1 (J).Valu (I);
          if I /= Ident_Int (4) then
             Failed
-              ("INCORRECT RETURN VALUE FROM XAT1(" &
-               Integer'Image (J) &
+              ("INCORRECT RETURN VALUE FROM XAT1(" & Integer'Image (J) &
                ").VALU (4)");
          end if;
       end loop;
@@ -702,8 +642,7 @@ begin
          Xat1 (J).Valu (I);
          if I /= Ident_Int (5) then
             Failed
-              ("INCORRECT RETURN VALUE FROM XAT1(" &
-               Integer'Image (J) &
+              ("INCORRECT RETURN VALUE FROM XAT1(" & Integer'Image (J) &
                ").VALU (5)");
          end if;
       end loop;

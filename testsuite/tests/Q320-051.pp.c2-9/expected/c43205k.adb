@@ -67,9 +67,7 @@ begin
             E1 := (1 .. 2 => (3, 2, 1));
             if (E1'First /= 1 or E1'Last /= 2)
               or else
-              (E1 (1)'First /= 3 or
-               E1 (1)'Last /= 5 or
-               E1 (2)'First /= 3 or
+              (E1 (1)'First /= 3 or E1 (1)'Last /= 5 or E1 (2)'First /= 3 or
                E1 (2)'Last /= 5)
             then
                Failed ("CASE K1 : INCORRECT BOUNDS");

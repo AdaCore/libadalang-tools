@@ -39,12 +39,10 @@ procedure Cc3016c is
       First_Initial_Value : in Some_Type;
       Second_Initial_Value : in Some_Type;
       with procedure Change (First : in Some_Type; Result : out Some_Type);
-      with procedure Second_Change
-        (First  : in     Some_Type;
-         Result :    out Some_Type);
-      with procedure Third_Change
-        (First  : in     Some_Type;
-         Result :    out Some_Type);
+      with procedure Second_Change (First : in     Some_Type;
+         Result                           :    out Some_Type);
+      with procedure Third_Change (First : in     Some_Type;
+         Result                          :    out Some_Type);
       First_Expected_Result : in Some_Type;
       Second_Expected_Result : in Some_Type;
       Third_Expected_Result : in Some_Type;
@@ -62,9 +60,8 @@ procedure Cc3016c is
 
          Initial_Value : in Some_Type;
          with procedure Change (First : in Some_Type; Result : out Some_Type);
-         with procedure Second_Change
-           (First  : in     Some_Type;
-            Result :    out Some_Type);
+         with procedure Second_Change (First : in     Some_Type;
+            Result                           :    out Some_Type);
          First_Expected_Result : in Some_Type;
          Second_Expected_Result : in Some_Type;
          Third_Expected_Result : in Some_Type;
@@ -87,30 +84,25 @@ procedure Cc3016c is
          Change (First => Variable, Result => Variable);
          Change (First => Another_Variable, Result => Another_Variable);
          Outer.Second_Change
-           (First  => Outer.Variable,
-            Result => Outer.Variable);
+           (First => Outer.Variable, Result => Outer.Variable);
          Outer.Change
-           (First  => Outer.Another_Variable,
-            Result => Outer.Another_Variable);
+           (First => Outer.Another_Variable, Result => Outer.Another_Variable);
 
          if (Variable /= First_Expected_Result) or
            (Another_Variable /= Second_Expected_Result) or
            (Outer.Variable /= Third_Expected_Result) or
-           (Outer.Another_Variable /= Fourth_Expected_Result)
-         then
+           (Outer.Another_Variable /= Fourth_Expected_Result) then
             Report.Failed ("ASSIGNED VALUES INCORRECT - BODY OF INNER");
          end if;
 
       end Inner;
 
-      package New_Inner is new Inner
-        (Initial_Value          => Second_Initial_Value,
-         Change                 => Change,
-         Second_Change          => Third_Change,
-         First_Expected_Result  => First_Expected_Result,
-         Second_Expected_Result => Second_Expected_Result,
-         Third_Expected_Result  => Third_Expected_Result,
-         Fourth_Expected_Result => Fourth_Expected_Result);
+      package New_Inner is new Inner (Initial_Value => Second_Initial_Value,
+         Change => Change, Second_Change => Third_Change,
+         First_Expected_Result                      => First_Expected_Result,
+         Second_Expected_Result                     => Second_Expected_Result,
+         Third_Expected_Result                      => Third_Expected_Result,
+         Fourth_Expected_Result                     => Fourth_Expected_Result);
 
       function Inner_Variable return Some_Type is
       begin
@@ -124,8 +116,7 @@ procedure Cc3016c is
 
       if (Variable /= Fifth_Expected_Result) or
         (Another_Variable /= Sixth_Expected_Result) or
-        (New_Inner.Variable /= First_Expected_Result)
-      then
+        (New_Inner.Variable /= First_Expected_Result) then
          Report.Failed ("ASSIGNED VALUES INCORRECT - BODY OF OUTER");
       end if;
 
@@ -137,17 +128,15 @@ procedure Cc3016c is
       Giving_This_Result := 2 * This_Value;
    end Double;
 
-   procedure Add_20
-     (To_This_Value      : in     Integer;
-      Giving_This_Result :    out Integer)
+   procedure Add_20 (To_This_Value : in     Integer;
+      Giving_This_Result           :    out Integer)
    is
    begin -- ADD_20
       Giving_This_Result := To_This_Value + 20;
    end Add_20;
 
-   procedure Times_Five
-     (This_Value         : in     Integer;
-      Giving_This_Result :    out Integer)
+   procedure Times_Five (This_Value : in     Integer;
+      Giving_This_Result            :    out Integer)
    is
    begin -- TIMES_FIVE
       Giving_This_Result := 5 * This_Value;
@@ -166,19 +155,12 @@ begin -- CC3016C
 
    declare
 
-      package New_Outer is new Outer
-        (Some_Type              => Integer,
-         First_Initial_Value    => 7,
-         Second_Initial_Value   => 11,
-         Change                 => Double,
-         Second_Change          => Add_20,
-         Third_Change           => Times_Five,
-         First_Expected_Result  => 22,
-         Second_Expected_Result => 22,
-         Third_Expected_Result  => 27,
-         Fourth_Expected_Result => 14,
-         Fifth_Expected_Result  => 47,
-         Sixth_Expected_Result  => 34);
+      package New_Outer is new Outer (Some_Type => Integer,
+         First_Initial_Value => 7, Second_Initial_Value => 11,
+         Change => Double, Second_Change => Add_20, Third_Change => Times_Five,
+         First_Expected_Result => 22, Second_Expected_Result => 22,
+         Third_Expected_Result => 27, Fourth_Expected_Result => 14,
+         Fifth_Expected_Result => 47, Sixth_Expected_Result => 34);
 
    begin  -- LOCAL_BLOCK
 

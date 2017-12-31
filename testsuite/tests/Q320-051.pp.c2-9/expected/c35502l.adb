@@ -44,8 +44,7 @@ begin
       "CHECK THAT 'POS' AND 'VAL' YIELD THE " &
       "CORRECT RESULTS WHEN THE PREFIX IS A " &
       "FORMAL DISCRETE TYPE WHOSE ACTUAL ARGUMENT " &
-      "IS AN ENUMERATION TYPE OTHER THAN A " &
-      "CHARACTER OR A BOOLEAN TYPE");
+      "IS AN ENUMERATION TYPE OTHER THAN A " & "CHARACTER OR A BOOLEAN TYPE");
 
    declare
 
@@ -68,10 +67,7 @@ begin
 
             if Se'Val (Position) /= E1 then
                Failed
-                 ("INCORRECT " &
-                  Str &
-                  "'VAL (" &
-                  Integer'Image (Position) &
+                 ("INCORRECT " & Str & "'VAL (" & Integer'Image (Position) &
                   ")");
             end if;
 

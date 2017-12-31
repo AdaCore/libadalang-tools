@@ -45,8 +45,7 @@ begin
    Test
      ("C48009A",
       "FOR ALLOCATORS OF THE FORM 'NEW T'(X)', CHECK" &
-      " THAT CONSTRAINT_ERROR IS RAISED WHEN" &
-      " APPROPRIATE - SCALAR TYPES");
+      " THAT CONSTRAINT_ERROR IS RAISED WHEN" & " APPROPRIATE - SCALAR TYPES");
    declare        -- A1
 
       subtype Ta is Integer range 1 .. 7;

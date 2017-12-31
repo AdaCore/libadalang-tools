@@ -43,8 +43,7 @@ begin
    Test
      ("CD7002A",
       "CHECK THAT A VARIABLE OF TYPE ADDRESS CAN BE " &
-      "DECLARED IN A UNIT WHICH HAS A WITH CLAUSE " &
-      "NAMING SYSTEM");
+      "DECLARED IN A UNIT WHICH HAS A WITH CLAUSE " & "NAMING SYSTEM");
 
    if not Ident_Bool (Object in My_Address) then
       Failed ("INCORRECT RESULT");

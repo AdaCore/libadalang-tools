@@ -47,9 +47,8 @@ procedure Cdd2a01 is
    type Int is range 1 .. 1_000;
    type Str is array (Int range <>) of Character;
 
-   procedure Read
-     (Stream :     access Root_Stream_Type'Class;
-      Item   : out Int'Base);
+   procedure Read (Stream :     access Root_Stream_Type'Class;
+      Item                : out Int'Base);
    procedure Write (Stream : access Root_Stream_Type'Class; Item : Int'Base);
    function Input (Stream : access Root_Stream_Type'Class) return Int'Base;
    procedure Output (Stream : access Root_Stream_Type'Class; Item : Int'Base);
@@ -79,9 +78,8 @@ procedure Cdd2a01 is
    for Parent'Input use Input;
    for Parent'Output use Output;
 
-   procedure Actual_Read
-     (Stream :     access Root_Stream_Type'Class;
-      Item   : out Int)
+   procedure Actual_Read (Stream :     access Root_Stream_Type'Class;
+      Item                       : out Int)
    is
    begin
       Integer'Read (Stream, Integer (Item));
@@ -104,9 +102,8 @@ procedure Cdd2a01 is
       Integer'Output (Stream, Integer (Item));
    end Actual_Output;
 
-   procedure Actual_Read
-     (Stream :     access Root_Stream_Type'Class;
-      Item   : out Parent)
+   procedure Actual_Read (Stream :     access Root_Stream_Type'Class;
+      Item                       : out Parent)
    is
    begin
       case Item.B is
@@ -118,9 +115,8 @@ procedure Cdd2a01 is
       Str'Read (Stream, Item.S);
    end Actual_Read;
 
-   procedure Actual_Write
-     (Stream : access Root_Stream_Type'Class;
-      Item   : Parent)
+   procedure Actual_Write (Stream : access Root_Stream_Type'Class;
+      Item                        : Parent)
    is
    begin
       case Item.B is
@@ -140,67 +136,52 @@ procedure Cdd2a01 is
       return X;
    end Actual_Input;
 
-   procedure Actual_Output
-     (Stream : access Root_Stream_Type'Class;
-      Item   : Parent)
+   procedure Actual_Output (Stream : access Root_Stream_Type'Class;
+      Item                         : Parent)
    is
    begin
       raise Input_Output_Error;
    end Actual_Output;
 
-   package Int_Ops is new Counting_Stream_Ops
-     (T             => Int'Base,
-      Actual_Write  => Actual_Write,
-      Actual_Input  => Actual_Input,
-      Actual_Read   => Actual_Read,
-      Actual_Output => Actual_Output);
+   package Int_Ops is new Counting_Stream_Ops (T => Int'Base,
+      Actual_Write => Actual_Write, Actual_Input => Actual_Input,
+      Actual_Read => Actual_Read, Actual_Output => Actual_Output);
 
-   package Parent_Ops is new Counting_Stream_Ops
-     (T             => Parent,
-      Actual_Write  => Actual_Write,
-      Actual_Input  => Actual_Input,
-      Actual_Read   => Actual_Read,
-      Actual_Output => Actual_Output);
+   package Parent_Ops is new Counting_Stream_Ops (T => Parent,
+      Actual_Write => Actual_Write, Actual_Input => Actual_Input,
+      Actual_Read => Actual_Read, Actual_Output => Actual_Output);
 
-   procedure Read
-     (Stream :     access Root_Stream_Type'Class;
-      Item   : out Int'Base) renames
+   procedure Read (Stream :     access Root_Stream_Type'Class;
+      Item                : out Int'Base) renames
      Int_Ops.Read;
-   procedure Write
-     (Stream : access Root_Stream_Type'Class;
-      Item   : Int'Base) renames
+   procedure Write (Stream : access Root_Stream_Type'Class;
+      Item                 : Int'Base) renames
      Int_Ops.Write;
    function Input
      (Stream : access Root_Stream_Type'Class) return Int'Base renames
      Int_Ops.Input;
-   procedure Output
-     (Stream : access Root_Stream_Type'Class;
-      Item   : Int'Base) renames
+   procedure Output (Stream : access Root_Stream_Type'Class;
+      Item                  : Int'Base) renames
      Int_Ops.Output;
 
-   procedure Read
-     (Stream :     access Root_Stream_Type'Class;
-      Item   : out Parent) renames
+   procedure Read (Stream :     access Root_Stream_Type'Class;
+      Item                : out Parent) renames
      Parent_Ops.Read;
-   procedure Write
-     (Stream : access Root_Stream_Type'Class;
-      Item   : Parent) renames
+   procedure Write (Stream : access Root_Stream_Type'Class;
+      Item                 : Parent) renames
      Parent_Ops.Write;
    function Input
      (Stream : access Root_Stream_Type'Class) return Parent renames
      Parent_Ops.Input;
-   procedure Output
-     (Stream : access Root_Stream_Type'Class;
-      Item   : Parent) renames
+   procedure Output (Stream : access Root_Stream_Type'Class;
+      Item                  : Parent) renames
      Parent_Ops.Output;
 
    type Derived1 is new Parent with record
       C3 : Int;
    end record;
 
-   type Derived2
-     (D : Int)
-   is new Parent (D1 => D, D2 => D, B => False) with
+   type Derived2 (D : Int) is new Parent (D1 => D, D2 => D, B => False) with
    record
       C3 : Int;
    end record;
@@ -218,57 +199,41 @@ begin
    Test1 :
    declare
       S  : aliased My_Stream (1_000);
-      X1 : Derived1
-        (D1 => Int (Ident_Int (2)),
-         D2 => Int (Ident_Int (5)),
-         B  => Ident_Bool (True));
+      X1 : Derived1 (D1 => Int (Ident_Int (2)), D2 => Int (Ident_Int (5)),
+         B => Ident_Bool (True));
       Y1 : Derived1 :=
-        (D1 => 3,
-         D2 => 6,
-         B  => False,
-         S  => Str (Ident_Str ("3456")),
-         C1 => Ident_Int (100),
-         C3 => Int (Ident_Int (88)));
-      X2 : Derived1
-        (D1 => Int (Ident_Int (2)),
-         D2 => Int (Ident_Int (5)),
-         B  => Ident_Bool (True));
+        (D1 => 3, D2 => 6, B => False, S => Str (Ident_Str ("3456")),
+         C1 => Ident_Int (100), C3 => Int (Ident_Int (88)));
+      X2 : Derived1 (D1 => Int (Ident_Int (2)), D2 => Int (Ident_Int (5)),
+         B => Ident_Bool (True));
    begin
       X1.S  := Str (Ident_Str ("bcde"));
       X1.C2 := Float (Ident_Int (4));
       X1.C3 := Int (Ident_Int (99));
 
       Derived1'Write (S'Access, X1);
-      if Int_Ops.Get_Counts /=
-        (Read => 0, Write => 1, Input => 0, Output => 0)
+      if Int_Ops.Get_Counts /= (Read => 0, Write => 1, Input => 0, Output => 0)
       then
          Failed ("Error writing extension components - 1");
       end if;
       if Parent_Ops.Get_Counts /=
-        (Read => 0, Write => 1, Input => 0, Output => 0)
-      then
+        (Read => 0, Write => 1, Input => 0, Output => 0) then
          Failed ("Didn't call parent type's Write - 1");
       end if;
 
       Derived1'Read (S'Access, X2);
-      if Int_Ops.Get_Counts /=
-        (Read => 1, Write => 1, Input => 0, Output => 0)
+      if Int_Ops.Get_Counts /= (Read => 1, Write => 1, Input => 0, Output => 0)
       then
          Failed ("Error reading extension components - 1");
       end if;
       if Parent_Ops.Get_Counts /=
-        (Read => 1, Write => 1, Input => 0, Output => 0)
-      then
+        (Read => 1, Write => 1, Input => 0, Output => 0) then
          Failed ("Didn't call inherited Read - 1");
       end if;
 
       if X2 /=
-        (D1 => 2,
-         D2 => 5,
-         B  => True,
-         S  => Str (Ident_Str ("bcde")),
-         C2 => Float (Ident_Int (4)),
-         C3 => Int (Ident_Int (99)))
+        (D1 => 2, D2 => 5, B => True, S => Str (Ident_Str ("bcde")),
+         C2 => Float (Ident_Int (4)), C3 => Int (Ident_Int (99)))
       then
          Failed
            ("Inherited Read and Write are not inverses of each other - 1");
@@ -277,13 +242,11 @@ begin
       begin
          Derived1'Output (S'Access, Y1);
          if Int_Ops.Get_Counts /=
-           (Read => 1, Write => 4, Input => 0, Output => 0)
-         then
+           (Read => 1, Write => 4, Input => 0, Output => 0) then
             Failed ("Error writing extension components - 2");
          end if;
          if Parent_Ops.Get_Counts /=
-           (Read => 1, Write => 2, Input => 0, Output => 0)
-         then
+           (Read => 1, Write => 2, Input => 0, Output => 0) then
             Failed ("Didn't call inherited Write - 2");
          end if;
       exception
@@ -296,22 +259,16 @@ begin
             Y2 : Derived1 := Derived1'Input (S'Access);
          begin
             if Int_Ops.Get_Counts /=
-              (Read => 4, Write => 4, Input => 0, Output => 0)
-            then
+              (Read => 4, Write => 4, Input => 0, Output => 0) then
                Failed ("Error reading extension components - 2");
             end if;
             if Parent_Ops.Get_Counts /=
-              (Read => 2, Write => 2, Input => 0, Output => 0)
-            then
+              (Read => 2, Write => 2, Input => 0, Output => 0) then
                Failed ("Didn't call inherited Read - 2");
             end if;
             if Y2 /=
-              (D1 => 3,
-               D2 => 6,
-               B  => False,
-               S  => Str (Ident_Str ("3456")),
-               C1 => Ident_Int (7),
-               C3 => Int (Ident_Int (88)))
+              (D1 => 3, D2 => 6, B => False, S => Str (Ident_Str ("3456")),
+               C1 => Ident_Int (7), C3 => Int (Ident_Int (88)))
             then
                Failed ("Input and Output are not inverses of each other - 2");
             end if;
@@ -328,9 +285,7 @@ begin
       S  : aliased My_Stream (1_000);
       X1 : Derived2 (D => Int (Ident_Int (7)));
       Y1 : Derived2 :=
-        (D  => 8,
-         S  => Str (Ident_Str ("8")),
-         C1 => Ident_Int (200),
+        (D  => 8, S => Str (Ident_Str ("8")), C1 => Ident_Int (200),
          C3 => Int (Ident_Int (77)));
       X2 : Derived2 (D => Int (Ident_Int (7)));
    begin
@@ -339,33 +294,27 @@ begin
       X1.C3 := Int (Ident_Int (666));
 
       Derived2'Write (S'Access, X1);
-      if Int_Ops.Get_Counts /=
-        (Read => 4, Write => 5, Input => 0, Output => 0)
+      if Int_Ops.Get_Counts /= (Read => 4, Write => 5, Input => 0, Output => 0)
       then
          Failed ("Error writing extension components - 3");
       end if;
       if Parent_Ops.Get_Counts /=
-        (Read => 2, Write => 3, Input => 0, Output => 0)
-      then
+        (Read => 2, Write => 3, Input => 0, Output => 0) then
          Failed ("Didn't call inherited Write - 3");
       end if;
 
       Derived2'Read (S'Access, X2);
-      if Int_Ops.Get_Counts /=
-        (Read => 5, Write => 5, Input => 0, Output => 0)
+      if Int_Ops.Get_Counts /= (Read => 5, Write => 5, Input => 0, Output => 0)
       then
          Failed ("Error reading extension components - 3");
       end if;
       if Parent_Ops.Get_Counts /=
-        (Read => 3, Write => 3, Input => 0, Output => 0)
-      then
+        (Read => 3, Write => 3, Input => 0, Output => 0) then
          Failed ("Didn't call inherited Read - 3");
       end if;
 
       if X2 /=
-        (D  => 7,
-         S  => Str (Ident_Str ("g")),
-         C1 => Ident_Int (7),
+        (D  => 7, S => Str (Ident_Str ("g")), C1 => Ident_Int (7),
          C3 => Int (Ident_Int (666)))
       then
          Failed ("Read and Write are not inverses of each other - 3");
@@ -374,13 +323,11 @@ begin
       begin
          Derived2'Output (S'Access, Y1);
          if Int_Ops.Get_Counts /=
-           (Read => 5, Write => 7, Input => 0, Output => 0)
-         then
+           (Read => 5, Write => 7, Input => 0, Output => 0) then
             Failed ("Error writing extension components - 4");
          end if;
          if Parent_Ops.Get_Counts /=
-           (Read => 3, Write => 4, Input => 0, Output => 0)
-         then
+           (Read => 3, Write => 4, Input => 0, Output => 0) then
             Failed ("Didn't call inherited Write - 4");
          end if;
       exception
@@ -393,19 +340,15 @@ begin
             Y2 : Derived2 := Derived2'Input (S'Access);
          begin
             if Int_Ops.Get_Counts /=
-              (Read => 7, Write => 7, Input => 0, Output => 0)
-            then
+              (Read => 7, Write => 7, Input => 0, Output => 0) then
                Failed ("Error reading extension components - 4");
             end if;
             if Parent_Ops.Get_Counts /=
-              (Read => 4, Write => 4, Input => 0, Output => 0)
-            then
+              (Read => 4, Write => 4, Input => 0, Output => 0) then
                Failed ("Didn't call inherited Read - 4");
             end if;
             if Y2 /=
-              (D  => 8,
-               S  => Str (Ident_Str ("8")),
-               C1 => Ident_Int (7),
+              (D  => 8, S => Str (Ident_Str ("8")), C1 => Ident_Int (7),
                C3 => Int (Ident_Int (77)))
             then
                Failed ("Input and Output are not inverses of each other - 4");

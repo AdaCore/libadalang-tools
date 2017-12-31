@@ -91,8 +91,7 @@ begin
       if B (I) /= False then
          Failed
            ("RESOLUTION OR OPERATIONS INCORRECT FOR " &
-            "UNIVERSAL EXPRESSIONS - " &
-            Integer'Image (I));
+            "UNIVERSAL EXPRESSIONS - " & Integer'Image (I));
       end if;
    end loop;
 

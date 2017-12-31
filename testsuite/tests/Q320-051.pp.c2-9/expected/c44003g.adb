@@ -38,8 +38,7 @@ begin
      ("C44003G",
       "CHECK FOR CORRECT PRECEDENCE OF PRE-DEFINED " &
       "AND OVERLOADED OPERATIONS ON BOOLEAN TYPES " &
-      "AND ONE-DIMENSIONAL ARRAYS WITH COMPONENTS OF " &
-      "TYPE BOOLEAN");
+      "AND ONE-DIMENSIONAL ARRAYS WITH COMPONENTS OF " & "TYPE BOOLEAN");
 
 ----- PREDEFINED BOOLEAN:
 
@@ -78,13 +77,8 @@ begin
       end "**";
 
    begin
-      if not (+T = F) or
-        T /= +F or
-        (True and False**True) or
-        not (+T < F) or
-        not (T - F * T) or
-        (not T - F xor +F - F)
-      then
+      if not (+T = F) or T /= +F or (True and False**True) or not (+T < F) or
+        not (T - F * T) or (not T - F xor +F - F) then
          Failed ("INCORRECT RESULT - 1");
       end if;
 

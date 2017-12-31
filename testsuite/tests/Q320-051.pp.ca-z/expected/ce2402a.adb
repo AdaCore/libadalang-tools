@@ -54,10 +54,8 @@ procedure Ce2402a is
 begin
    Test
      ("CE2402A",
-      "CHECK THAT READ, WRITE, INDEX, " &
-      "SET_INDEX, SIZE, AND END_OF_FILE " &
-      "RAISE STATUS_ERROR WHEN APPLIED " &
-      "A NON-OPEN DIRECT FILE");
+      "CHECK THAT READ, WRITE, INDEX, " & "SET_INDEX, SIZE, AND END_OF_FILE " &
+      "RAISE STATUS_ERROR WHEN APPLIED " & "A NON-OPEN DIRECT FILE");
    begin
       Write (File1, Cnst);
       Failed ("STATUS_ERROR WAS NOT RAISED ON WRITE - 1");

@@ -241,9 +241,7 @@ begin
       E := (Sdint (Ident_Int (1)), 2, 3, 4, 7);
       -- CONSTRAINT_ERROR BY AGGREGATE WITH DERIVED INTEGER COMPONENTS.
       Failed ("CONSTRAINT_ERROR WAS NOT RAISED - 5");
-      if not Equal
-          (Integer (E (Ident_Int (1))),
-           Integer (E (Ident_Int (1))))
+      if not Equal (Integer (E (Ident_Int (1))), Integer (E (Ident_Int (1))))
       then
          Comment ("DON'T OPTIMIZE E");
       end if;

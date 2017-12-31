@@ -72,30 +72,18 @@ begin
       generic
          type Inner3 (G : Integer) is private;
       package P_One is
-         type Inner
-           (X : Integer := A;
-            A : Integer := Ident_Int (3);
-            C : Integer := One.A)
-         is
+         type Inner (X : Integer := A; A : Integer := Ident_Int (3);
+            C          : Integer := One.A) is
            private;
-         type Inner2
-           (Y : Integer := D;
-            D : Integer := Ident_Int (3);
-            F : Integer := One.D)
-         ;
-         type Inner2
-           (Y : Integer := D;
-            D : Integer := Ident_Int (3);
-            F : Integer := One.D)
-         is record
+         type Inner2 (Y : Integer := D; D : Integer := Ident_Int (3);
+            F           : Integer := One.D);
+         type Inner2 (Y : Integer := D; D : Integer := Ident_Int (3);
+            F           : Integer := One.D) is record
             E : Integer := D;
          end record;
       private
-         type Inner
-           (X : Integer := A;
-            A : Integer := Ident_Int (3);
-            C : Integer := One.A)
-         is record
+         type Inner (X : Integer := A; A : Integer := Ident_Int (3);
+            C          : Integer := One.A) is record
             B : Integer := A;
          end record;
       end P_One;

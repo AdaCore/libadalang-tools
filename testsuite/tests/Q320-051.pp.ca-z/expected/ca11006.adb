@@ -16,8 +16,7 @@ begin
    Report.Test
      ("CA11006",
       "Check that the private part of a child " &
-      "library unit can utilize its parent " &
-      "unit's private definition");
+      "library unit can utilize its parent " & "unit's private definition");
 
    File_Ops.Create_File (Validation_File_Mode, Validation_File);
 

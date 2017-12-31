@@ -94,8 +94,7 @@ begin
      ("C94002A",
       "CHECK THAT A UNIT WITH DEPENDENT TASKS " &
       "CREATED BY (LOCAL) ALLOCATORS DOES NOT " &
-      "TERMINATE UNTIL ALL DEPENDENT TASKS " &
-      "ARE TERMINATED");
+      "TERMINATE UNTIL ALL DEPENDENT TASKS " & "ARE TERMINATED");
 
    --------------------------------------------------
    Global := Ident_Int (0);

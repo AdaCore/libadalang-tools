@@ -80,8 +80,7 @@ begin
      ("CXA5012",
       "Check the effect of Procedures Save and " &
       "Reset, and Functions Image and Value " &
-      "from the Ada.Numerics.Discrete_Random " &
-      "and Float_Random packages");
+      "from the Ada.Numerics.Discrete_Random " & "and Float_Random packages");
 
    Test_Block :
    declare
@@ -93,20 +92,8 @@ begin
 
       subtype Discrete_Range is Integer range 1 .. 10_000;
       type Suit_Of_Cards is
-        (Ace,
-         One,
-         Two,
-         Three,
-         Four,
-         Five,
-         Six,
-         Seven,
-         Eight,
-         Nine,
-         Ten,
-         Jack,
-         Queen,
-         King);
+        (Ace, One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack,
+         Queen, King);
       package Discrete_Pack is new Discrete_Random (Discrete_Range);
       package Card_Pack is new Discrete_Random (Suit_Of_Cards);
 
@@ -143,24 +130,19 @@ begin
 
       use Dstring_Pack, Estring_Pack, Fstring_Pack;
 
-      Dstring_1,
-      Dstring_2 : Dstring_Pack.Bounded_String :=
+      Dstring_1, Dstring_2 : Dstring_Pack.Bounded_String :=
         Dstring_Pack.Null_Bounded_String;
-      Estring_1,
-      Estring_2 : Estring_Pack.Bounded_String :=
+      Estring_1, Estring_2 : Estring_Pack.Bounded_String :=
         Estring_Pack.Null_Bounded_String;
-      Fstring_1,
-      Fstring_2 : Fstring_Pack.Bounded_String :=
+      Fstring_1, Fstring_2 : Fstring_Pack.Bounded_String :=
         Fstring_Pack.Null_Bounded_String;
 
       -- Test variables.
 
       Tc_Count : Natural;
-      Tc_Discrete_Check_Failed,
-      Tc_Enum_Check_Failed,
-      Tc_Float_Check_Failed : Boolean :=
-        False;
-      Tc_Seed : Integer;
+      Tc_Discrete_Check_Failed, Tc_Enum_Check_Failed,
+      Tc_Float_Check_Failed : Boolean := False;
+      Tc_Seed               : Integer;
 
    begin
 
@@ -262,16 +244,14 @@ begin
 
          for I in 1 .. Tc_Max_Values loop
             if Tc_Discrete_Array (First_Row, I) /=
-              Tc_Discrete_Array (Second_Row, I)
-            then
+              Tc_Discrete_Array (Second_Row, I) then
                Tc_Discrete_Check_Failed := True;
                exit;
             end if;
          end loop;
 
          for I in 1 .. Tc_Max_Values loop
-            if Tc_Enum_Array (First_Row, I) /=
-              Tc_Enum_Array (Second_Row, I)
+            if Tc_Enum_Array (First_Row, I) /= Tc_Enum_Array (Second_Row, I)
             then
                Tc_Enum_Check_Failed := True;
                exit;
@@ -279,8 +259,7 @@ begin
          end loop;
 
          for I in 1 .. Tc_Max_Values loop
-            if Tc_Float_Array (First_Row, I) /=
-              Tc_Float_Array (Second_Row, I)
+            if Tc_Float_Array (First_Row, I) /= Tc_Float_Array (Second_Row, I)
             then
                Tc_Float_Check_Failed := True;
                exit;
@@ -297,8 +276,7 @@ begin
          if Tc_Enum_Check_Failed then
             Report.Failed
               ("Enumeration random values generated following " &
-               "use of procedures Save and Reset were not the " &
-               "same");
+               "use of procedures Save and Reset were not the " & "same");
             Tc_Enum_Check_Failed := False;
          end if;
 
@@ -379,8 +357,7 @@ begin
          if Estring_1 /= Estring_2 then
             Report.Failed
               ("String values returned from Function Image " &
-               "depict different states of Enumeration " &
-               "generators");
+               "depict different states of Enumeration " & "generators");
          end if;
          if Fstring_1 /= Fstring_2 then
             Report.Failed
@@ -419,8 +396,7 @@ begin
          -- values they produce should be the same.
 
          for I in 1 .. 1_000 loop
-            if Discrete_Pack.Random (Dgen_1) /=
-              Discrete_Pack.Random (Dgen_2)
+            if Discrete_Pack.Random (Dgen_1) /= Discrete_Pack.Random (Dgen_2)
             then
                Tc_Discrete_Check_Failed := True;
                exit;
@@ -435,8 +411,7 @@ begin
          end loop;
 
          for I in 1 .. 1_000 loop
-            if Float_Random.Random (Fgen_1) /=
-              Float_Random.Random (Fgen_2)
+            if Float_Random.Random (Fgen_1) /= Float_Random.Random (Fgen_2)
             then
                Tc_Float_Check_Failed := True;
                exit;
@@ -480,8 +455,7 @@ begin
                  ("Exception not raised by Function " &
                   "Ada.Numerics.Discrete_Random.Value when " &
                   "provided a string input that does not " &
-                  "represent the state of a random number " &
-                  "generator");
+                  "represent the state of a random number " & "generator");
             else
                Report.Comment
                  ("All strings represent states for Function " &
@@ -495,22 +469,19 @@ begin
                  ("Constraint_Error raised by Function " &
                   "Ada.Numerics.Discrete_Random.Value when " &
                   "provided a string input that does not " &
-                  "represent the state of a random number " &
-                  "generator");
+                  "represent the state of a random number " & "generator");
             when Program_Error => -- OK, expected exception.
                Report.Comment
                  ("Program_Error raised by Function " &
                   "Ada.Numerics.Discrete_Random.Value when " &
                   "provided a string input that does not " &
-                  "represent the state of a random number " &
-                  "generator");
+                  "represent the state of a random number " & "generator");
             when others =>
                Report.Failed
                  ("Unexpected exception raised by Function " &
                   "Ada.Numerics.Discrete_Random.Value when " &
                   "provided a string input that does not " &
-                  "represent the state of a random number " &
-                  "generator");
+                  "represent the state of a random number " & "generator");
          end;
 
          begin
@@ -546,12 +517,10 @@ begin
             Fstate_1 := Float_Random.Value (Not_A_State);
             if Not_A_State /= "**NONE**" then
                Report.Failed
-                 ("Exception not raised by an " &
-                  "instantiated version of " &
+                 ("Exception not raised by an " & "instantiated version of " &
                   "Ada.Numerics.Float_Random.Value when " &
                   "provided a string input that does not " &
-                  "represent the state of a random number " &
-                  "generator");
+                  "represent the state of a random number " & "generator");
             else
                Report.Comment
                  ("All strings represent states for Function " &
@@ -569,8 +538,7 @@ begin
                   "instantiated version of " &
                   "Ada.Numerics.Float_Random.Value when " &
                   "provided a string input that does not " &
-                  "represent the state of a random number " &
-                  "generator");
+                  "represent the state of a random number " & "generator");
          end;
 
       end Objective_3;

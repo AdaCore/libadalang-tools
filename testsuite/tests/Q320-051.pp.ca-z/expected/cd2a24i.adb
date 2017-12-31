@@ -84,10 +84,8 @@ begin
          end if;
 
          if not
-           ((C0 < Ident (C1)) and
-            (Ident (C2) > Ident (C1)) and
-            (C1 <= Ident (C1)) and
-            (Ident (C2) = C2))
+           ((C0 < Ident (C1)) and (Ident (C2) > Ident (C1)) and
+            (C1 <= Ident (C1)) and (Ident (C2) = C2))
          then
             Failed ("INCORRECT RESULTS FOR RELATIONAL " & "OPERATORS");
          end if;
@@ -98,21 +96,18 @@ begin
 
          if Check_Type'Pos (C0) /= Ident_Int (0) or
            Check_Type'Pos (C1) /= Ident_Int (1) or
-           Check_Type'Pos (C2) /= Ident_Int (2)
-         then
+           Check_Type'Pos (C2) /= Ident_Int (2) then
             Failed ("INCORRECT VALUE FOR CHECK_TYPE'POS");
          end if;
 
          if Check_Type'Succ (C0) /= Ident (C1) or
-           Check_Type'Succ (C1) /= Ident (C2)
-         then
+           Check_Type'Succ (C1) /= Ident (C2) then
             Failed ("INCORRECT VALUE FOR CHECK_TYPE'SUCC");
          end if;
 
          if Check_Type'Image (C0) /= Ident_Str ("ZERO") or
            Check_Type'Image (C1) /= Ident_Str ("ONE") or
-           Check_Type'Image (C2) /= Ident_Str ("TWO")
-         then
+           Check_Type'Image (C2) /= Ident_Str ("TWO") then
             Failed ("INCORRECT VALUE FOR CHECK_TYPE'IMAGE");
          end if;
 

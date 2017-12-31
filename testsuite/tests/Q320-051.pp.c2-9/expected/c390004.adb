@@ -20,10 +20,8 @@ procedure C390004 is
       Dmv.Park (It);
    end Valet;
 
-   procedure Tc_Match
-     (Object : Dmv.Vehicle'Class;
-      Taglet : Ada.Tags.Tag;
-      Where  : String)
+   procedure Tc_Match (Object : Dmv.Vehicle'Class; Taglet : Ada.Tags.Tag;
+      Where                   : String)
    is
       use Ada.Tags;
    begin
@@ -48,30 +46,22 @@ procedure C390004 is
 
    procedure Parking_Validation (It : Dmv.Convertible; Tc_Message : String) is
    begin
-      if Dmv.Wheels (It) /= 3 or
-        Dmv.Passengers (It) /= 0 or
-        not Dmv.Top_Up (It) or
-        not It.Parked
-      then
+      if Dmv.Wheels (It) /= 3 or Dmv.Passengers (It) /= 0 or
+        not Dmv.Top_Up (It) or not It.Parked then
          Report.Failed ("Failed Convertible " & Tc_Message);
       end if;
    end Parking_Validation;
 
    procedure Parking_Validation (It : Dmv.Jeep; Tc_Message : String) is
    begin
-      if Dmv.Wheels (It) /= 4 or
-        Dmv.Passengers (It) /= 0 or
-        not Dmv.Top_Up (It) or
-        not Dmv.Windshield_Up (It) or
-        not It.Parked
-      then
+      if Dmv.Wheels (It) /= 4 or Dmv.Passengers (It) /= 0 or
+        not Dmv.Top_Up (It) or not Dmv.Windshield_Up (It) or not It.Parked then
          Report.Failed ("Failed Jeep " & Tc_Message);
       end if;
    end Parking_Validation;
 
-   function Wash
-     (It        : V_Reference;
-      Tc_Expect : Ada.Tags.Tag) return Dmv.Vehicle'Class
+   function Wash (It : V_Reference;
+      Tc_Expect      : Ada.Tags.Tag) return Dmv.Vehicle'Class
    is
       This_Machine : Dmv.Vehicle'Class := It.all;
    begin
@@ -80,9 +70,8 @@ procedure C390004 is
       return This_Machine;
    end Wash;
 
-   function Wash
-     (It        : C_Reference;
-      Tc_Expect : Ada.Tags.Tag) return Dmv.Car'Class
+   function Wash (It : C_Reference;
+      Tc_Expect      : Ada.Tags.Tag) return Dmv.Car'Class
    is
       This_Machine : Dmv.Car'Class := It.all;
    begin
@@ -188,8 +177,7 @@ begin
       end if;
 
       if Dmv.Wheels (Wash (A_Convertible, Dmv.Convertible'Tag)) /= 3 or
-        Storage /= 3
-      then
+        Storage /= 3 then
          Report.Failed ("Did not correctly wash Convertible");
       end if;
 
@@ -197,8 +185,7 @@ begin
          Report.Failed ("Did not correctly wash Car");
       end if;
 
-      if Dmv.Wheels (Wash (A_Vehicle, Dmv.Vehicle'Tag)) /= 1 or
-        Storage /= 1
+      if Dmv.Wheels (Wash (A_Vehicle, Dmv.Vehicle'Tag)) /= 1 or Storage /= 1
       then
          Report.Failed ("Did not correctly wash Vehicle");
       end if;

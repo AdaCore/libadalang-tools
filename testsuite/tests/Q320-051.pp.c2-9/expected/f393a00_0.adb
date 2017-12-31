@@ -13,10 +13,7 @@ package body F393a00_0 is
    begin
       if Expectation (1 .. Finger) /= Expected then
          Report.Failed
-           (Message &
-            " Expecting: " &
-            Expected &
-            " Got: " &
+           (Message & " Expecting: " & Expected & " Got: " &
             Expectation (1 .. Finger));
       end if;
       Finger := 0;

@@ -50,17 +50,11 @@ begin
       subtype List3 is List (1 + 1 .. 2);
 
    begin
-      if List1'First /= 1 or
-        List1'Last /= 1 or
-        List2'First /= 1 or
-        List2'Last /= 9 or
-        List3'First /= 1 or
-        List3'Last /= 2
-      then
+      if List1'First /= 1 or List1'Last /= 1 or List2'First /= 1 or
+        List2'Last /= 9 or List3'First /= 1 or List3'Last /= 2 then
          Failed
            ("RESOLUTION INCORRECT - IMPLICIT CONVERSION " &
-            "OF UNIVERSAL_INTEGER TYPE TO INDEX CONSTRAINT " &
-            "BASE TYPE");
+            "OF UNIVERSAL_INTEGER TYPE TO INDEX CONSTRAINT " & "BASE TYPE");
       end if;
    end;
 

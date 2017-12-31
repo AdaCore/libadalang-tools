@@ -40,8 +40,7 @@ procedure C34002c is
    type Parent is range -100 .. 100;
 
    type T is
-     new Parent range
-       Parent'Val (Ident_Int (-30)) ..
+     new Parent range Parent'Val (Ident_Int (-30)) ..
          Parent'Val (Ident_Int (30));
 
    subtype Subparent is Parent range -30 .. 30;
@@ -59,24 +58,19 @@ begin
       "WHEN THE DERIVED TYPE DEFINITION IS " &
       "CONSTRAINED.  ALSO CHECK THAT ANY CONSTRAINT " &
       "IMPOSED ON THE PARENT SUBTYPE IS ALSO IMPOSED " &
-      "ON THE DERIVED SUBTYPE.  CHECK FOR DERIVED " &
-      "INTEGER TYPES");
+      "ON THE DERIVED SUBTYPE.  CHECK FOR DERIVED " & "INTEGER TYPES");
 
    -- CHECK THAT BASE TYPE VALUES NOT IN THE SUBTYPE ARE PRESENT.
 
    if T'Pos (T'Base'First) /= Parent'Pos (Parent'Base'First) or
      S'Pos (S'Base'First) /= Parent'Pos (Parent'Base'First) or
      T'Pos (T'Base'Last) /= Parent'Pos (Parent'Base'Last) or
-     S'Pos (S'Base'Last) /= Parent'Pos (Parent'Base'Last)
-   then
+     S'Pos (S'Base'Last) /= Parent'Pos (Parent'Base'Last) then
       Failed ("INCORRECT 'BASE'FIRST OR 'BASE'LAST");
    end if;
 
-   if T'Pred (100) /= 99 or
-     T'Succ (99) /= 100 or
-     S'Pred (100) /= 99 or
-     S'Succ (99) /= 100
-   then
+   if T'Pred (100) /= 99 or T'Succ (99) /= 100 or S'Pred (100) /= 99 or
+     S'Succ (99) /= 100 then
       Failed ("INCORRECT 'PRED OR 'SUCC");
    end if;
 

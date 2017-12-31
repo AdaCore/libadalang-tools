@@ -59,10 +59,8 @@ procedure C371002 is
    Func1_Cons : Integer := 0;
 
    ---------------------------------------------------------
-   function Chk
-     (Cons    : Integer;
-      Value   : Integer;
-      Message : String) return Boolean
+   function Chk (Cons : Integer; Value : Integer;
+      Message         : String) return Boolean
    is
    begin
       if Cons /= Value then
@@ -103,16 +101,12 @@ begin
       if Obj1 /=
         (D3 => 1,
          C1 =>
-           (Disc1 => 1,
-            Disc2 => 1,
-            Str1  => (others => '*'),
+           (Disc1 => 1, Disc2 => 1, Str1 => (others => '*'),
             Str2  => (others => '*'))) or
         Obj2 /=
           (D3 => 2,
            C1 =>
-             (Disc1 => 2,
-              Disc2 => 1,
-              Str1  => (others => '*'),
+             (Disc1 => 2, Disc2 => 1, Str1 => (others => '*'),
               Str2  => (others => '*')))
       then
          Report.Failed ("Obj1 & Obj2 - Discriminant values not correct");
@@ -172,9 +166,7 @@ begin
                if Obj4 /=
                  (D3 => 1,
                   C1 =>
-                    (Disc1 => 1,
-                     Disc2 => 1,
-                     Str1  => (others => '*'),
+                    (Disc1 => 1, Disc2 => 1, Str1 => (others => '*'),
                      Str2  => (others => '*')))
                then
                   Report.Comment ("Obj4 - Shouldn't get here");
@@ -206,8 +198,7 @@ begin
                Obj5 : Arr;                   -- Constraint_Error raised.
             begin
                Report.Failed ("Obj5 - Constraint_Error should be raised");
-               if Obj5 /=
-                 (1 .. 5 => (1, (1, 1, others => (others => '*'))))
+               if Obj5 /= (1 .. 5 => (1, (1, 1, others => (others => '*'))))
                then
                   Report.Comment ("Obj5 - Shouldn't get here");
                end if;
@@ -304,9 +295,7 @@ begin
                if Obj8.all /=
                  (D3 => 1,
                   C1 =>
-                    (Disc1 => 1,
-                     Disc2 => 1,
-                     Str1  => (others => '*'),
+                    (Disc1 => 1, Disc2 => 1, Str1 => (others => '*'),
                      Str2  => (others => '*')))
                then
                   Report.Comment ("Obj8 - Shouldn't get here");

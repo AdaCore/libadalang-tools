@@ -91,11 +91,8 @@ begin
          null; -- Expected exception.
       when E : others =>
          Failed
-           ("Exception raised - " &
-            Exception_Name (E) &
-            " - " &
-            Exception_Message (E) &
-            " - 1");
+           ("Exception raised - " & Exception_Name (E) & " - " &
+            Exception_Message (E) & " - 1");
    end;
 
    begin
@@ -113,11 +110,8 @@ begin
          null; -- Expected exception.
       when E : others =>
          Failed
-           ("Exception raised - " &
-            Exception_Name (E) &
-            " - " &
-            Exception_Message (E) &
-            " - 2");
+           ("Exception raised - " & Exception_Name (E) & " - " &
+            Exception_Message (E) & " - 2");
    end;
 
    begin
@@ -132,11 +126,8 @@ begin
    exception
       when E : others =>
          Failed
-           ("Exception raised - " &
-            Exception_Name (E) &
-            " - " &
-            Exception_Message (E) &
-            " - 3");
+           ("Exception raised - " & Exception_Name (E) & " - " &
+            Exception_Message (E) & " - 3");
    end;
 
    begin
@@ -154,11 +145,8 @@ begin
          null; -- Expected exception.
       when E : others =>
          Failed
-           ("Exception raised - " &
-            Exception_Name (E) &
-            " - " &
-            Exception_Message (E) &
-            " - 4");
+           ("Exception raised - " & Exception_Name (E) & " - " &
+            Exception_Message (E) & " - 4");
    end;
 
    begin
@@ -173,11 +161,8 @@ begin
    exception
       when E : others =>
          Failed
-           ("Exception raised - " &
-            Exception_Name (E) &
-            " - " &
-            Exception_Message (E) &
-            " - 5");
+           ("Exception raised - " & Exception_Name (E) & " - " &
+            Exception_Message (E) & " - 5");
    end;
 
    begin
@@ -192,11 +177,8 @@ begin
    exception
       when E : others =>
          Failed
-           ("Exception raised - " &
-            Exception_Name (E) &
-            " - " &
-            Exception_Message (E) &
-            " - 6");
+           ("Exception raised - " & Exception_Name (E) & " - " &
+            Exception_Message (E) & " - 6");
    end;
 
    Wx := Wbs.To_Bounded_Wide_String (Wide_Source);
@@ -216,11 +198,8 @@ begin
          null; -- Expected exception.
       when E : others =>
          Failed
-           ("Exception raised - " &
-            Exception_Name (E) &
-            " - " &
-            Exception_Message (E) &
-            " - 7");
+           ("Exception raised - " & Exception_Name (E) & " - " &
+            Exception_Message (E) & " - 7");
    end;
 
    begin
@@ -238,11 +217,8 @@ begin
          null; -- Expected exception.
       when E : others =>
          Failed
-           ("Exception raised - " &
-            Exception_Name (E) &
-            " - " &
-            Exception_Message (E) &
-            " - 8");
+           ("Exception raised - " & Exception_Name (E) & " - " &
+            Exception_Message (E) & " - 8");
    end;
 
    begin
@@ -257,11 +233,8 @@ begin
    exception
       when E : others =>
          Failed
-           ("Exception raised - " &
-            Exception_Name (E) &
-            " - " &
-            Exception_Message (E) &
-            " - 9");
+           ("Exception raised - " & Exception_Name (E) & " - " &
+            Exception_Message (E) & " - 9");
    end;
 
    begin
@@ -279,11 +252,8 @@ begin
          null; -- Expected exception.
       when E : others =>
          Failed
-           ("Exception raised - " &
-            Exception_Name (E) &
-            " - " &
-            Exception_Message (E) &
-            " - 10");
+           ("Exception raised - " & Exception_Name (E) & " - " &
+            Exception_Message (E) & " - 10");
    end;
 
    begin
@@ -298,11 +268,8 @@ begin
    exception
       when E : others =>
          Failed
-           ("Exception raised - " &
-            Exception_Name (E) &
-            " - " &
-            Exception_Message (E) &
-            " - 11");
+           ("Exception raised - " & Exception_Name (E) & " - " &
+            Exception_Message (E) & " - 11");
    end;
 
    begin
@@ -317,11 +284,8 @@ begin
    exception
       when E : others =>
          Failed
-           ("Exception raised - " &
-            Exception_Name (E) &
-            " - " &
-            Exception_Message (E) &
-            " - 12");
+           ("Exception raised - " & Exception_Name (E) & " - " &
+            Exception_Message (E) & " - 12");
    end;
 
    Result;

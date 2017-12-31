@@ -68,11 +68,8 @@ begin
                Failed ("WRONG VALUE FOR A2'LENGTH");
             end if;
 
-            if (1 not in A2'Range) or
-              (10 not in A2'Range) or
-              (0 in A2'Range) or
-              (11 in A2'Range)
-            then
+            if (1 not in A2'Range) or (10 not in A2'Range) or
+              (0 in A2'Range) or (11 in A2'Range) then
                Failed ("WRONG VALUE FOR A2'RANGE");
             end if;
 
@@ -88,11 +85,8 @@ begin
                Failed ("WRONG VALUE FOR R2.A'LENGTH");
             end if;
 
-            if (1 not in R2.A'Range) or
-              (10 not in R2.A'Range) or
-              (0 in R2.A'Range) or
-              (11 in R2.A'Range)
-            then
+            if (1 not in R2.A'Range) or (10 not in R2.A'Range) or
+              (0 in R2.A'Range) or (11 in R2.A'Range) then
                Failed ("WRONG VALUE FOR R2.A'RANGE");
             end if;
          end E;

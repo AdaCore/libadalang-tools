@@ -42,8 +42,7 @@ begin
      ("C35502G",
       "CHECK THAT 'PRED' AND 'SUCC' YIELD THE " &
       "CORRECT RESULTS WHEN THE PREFIX IS AN " &
-      "ENUMERATION TYPE OTHER THAN A CHARACTER " &
-      "OR A BOOLEAN TYPE");
+      "ENUMERATION TYPE OTHER THAN A CHARACTER " & "OR A BOOLEAN TYPE");
 
    begin
       for I in Enum'Val (1) .. Enum'Val (4) loop

@@ -66,8 +66,7 @@ begin
             Failed
               ("TARGET RECORD VALUE ALTERED BY " &
                "ASSIGNMENT WITH A DIFFERENT " &
-               "DISCRIMINANT VALUE EVEN AFTER " &
-               "CONSTRAINT_ERROR RAISED");
+               "DISCRIMINANT VALUE EVEN AFTER " & "CONSTRAINT_ERROR RAISED");
          end if;
       when others =>
          Failed ("WRONG EXCEPTION");

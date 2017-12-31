@@ -56,26 +56,16 @@ begin
          type Main is (Red, Blue, Yellow, 'R', 'B', 'Y');
 
          type Hue is new Main;
-         for Hue use
-           (Red    => 8,
-            Blue   => 9,
-            Yellow => 10,
-            'R'    => 11,
-            'B'    => 12,
-            'Y'    => 13);
+         for Hue use (Red => 8, Blue => 9, Yellow => 10, 'R' => 11, 'B' => 12,
+            'Y'           => 13);
 
          type Base is array (Hue) of Integer;
          Color, Basic : Hue;
          Barray       : Base;
 
          type Hue1 is new Main;
-         for Hue1 use
-           (Red    => 10,
-            Blue   => 14,
-            Yellow => 16,
-            'R'    => 19,
-            'B'    => 41,
-            'Y'    => 46);
+         for Hue1 use (Red => 10, Blue => 14, Yellow => 16, 'R' => 19,
+            'B'            => 41, 'Y' => 46);
 
          type Base1 is array (Hue1) of Integer;
          Color1, Basic1 : Hue1;
@@ -107,9 +97,7 @@ begin
          Color1 := Hue1'Succ (Basic1);
          if (Color < Basic or Basic >= 'R' or 'Y' <= Color or Color > 'B') or
            not
-           (Color1 >= Basic1 and
-            Basic1 < 'R' and
-            'Y' > Color1 and
+           (Color1 >= Basic1 and Basic1 < 'R' and 'Y' > Color1 and
             Color1 <= 'B')
          then
             Failed ("ORDERING RELATIONS ARE INCORRECT");
@@ -125,35 +113,20 @@ begin
          end if;
 
          Barray :=
-           (Ident_Int (1),
-            Ident_Int (2),
-            Ident_Int (3),
-            Ident_Int (4),
-            Ident_Int (5),
-            Ident_Int (6));
+           (Ident_Int (1), Ident_Int (2), Ident_Int (3), Ident_Int (4),
+            Ident_Int (5), Ident_Int (6));
 
          Barray1 :=
-           (Ident_Int (1),
-            Ident_Int (2),
-            Ident_Int (3),
-            Ident_Int (4),
-            Ident_Int (5),
-            Ident_Int (6));
+           (Ident_Int (1), Ident_Int (2), Ident_Int (3), Ident_Int (4),
+            Ident_Int (5), Ident_Int (6));
 
          if
-           (Barray (Red) /= 1 or
-            Barray (Blue) /= 2 or
-            Barray (Yellow) /= 3 or
-            Barray ('R') /= 4 or
-            Barray ('B') /= 5 or
-            Barray ('Y') /= 6) or
+           (Barray (Red) /= 1 or Barray (Blue) /= 2 or Barray (Yellow) /= 3 or
+            Barray ('R') /= 4 or Barray ('B') /= 5 or Barray ('Y') /= 6) or
            not
-           (Barray1 (Red) = 1 and
-            Barray1 (Blue) = 2 and
-            Barray1 (Yellow) = 3 and
-            Barray1 ('R') = 4 and
-            Barray1 ('B') = 5 and
-            Barray1 ('Y') = 6)
+           (Barray1 (Red) = 1 and Barray1 (Blue) = 2 and
+            Barray1 (Yellow) = 3 and Barray1 ('R') = 4 and
+            Barray1 ('B') = 5 and Barray1 ('Y') = 6)
          then
             Failed ("INDEXING ARRAY FAILURE");
          end if;

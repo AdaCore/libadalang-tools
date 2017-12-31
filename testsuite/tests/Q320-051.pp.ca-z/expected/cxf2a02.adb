@@ -29,9 +29,7 @@ begin
    Micro_Actual := 0.0;
    Micro_Actual :=
      Data.Test_Micro_Ops
-       (1.0,
-        Data.Micro_Mult_Operator_Table,
-        Data.Micro_Mult_Operand_Table);
+       (1.0, Data.Micro_Mult_Operator_Table, Data.Micro_Mult_Operand_Table);
 
    if Micro_Actual /= Micro_Expected then
       Report.Failed ("Wrong result for type Micro multiplication");
@@ -40,9 +38,7 @@ begin
    Micro_Actual := 0.0;
    Micro_Actual :=
      Data.Test_Micro_Ops
-       (1.0,
-        Data.Micro_Div_Operator_Table,
-        Data.Micro_Div_Operand_Table);
+       (1.0, Data.Micro_Div_Operator_Table, Data.Micro_Div_Operand_Table);
 
    if Micro_Actual /= Micro_Expected then
       Report.Failed ("Wrong result for type Micro division");
@@ -53,9 +49,7 @@ begin
    Basic_Actual := 0.0;
    Basic_Actual :=
      Data.Test_Basic_Ops
-       (1.0,
-        Data.Basic_Mult_Operator_Table,
-        Data.Basic_Mult_Operand_Table);
+       (1.0, Data.Basic_Mult_Operator_Table, Data.Basic_Mult_Operand_Table);
 
    if Basic_Actual /= Basic_Expected then
       Report.Failed ("Wrong result for type Basic multiplication");
@@ -64,9 +58,7 @@ begin
    Basic_Actual := 0.0;
    Basic_Actual :=
      Data.Test_Basic_Ops
-       (1.0,
-        Data.Basic_Div_Operator_Table,
-        Data.Basic_Div_Operand_Table);
+       (1.0, Data.Basic_Div_Operator_Table, Data.Basic_Div_Operand_Table);
 
    if Basic_Actual /= Basic_Expected then
       Report.Failed ("Wrong result for type Basic division");
@@ -77,9 +69,7 @@ begin
    Broad_Actual := 0.0;
    Broad_Actual :=
      Data.Test_Broad_Ops
-       (1.0,
-        Data.Broad_Mult_Operator_Table,
-        Data.Broad_Mult_Operand_Table);
+       (1.0, Data.Broad_Mult_Operator_Table, Data.Broad_Mult_Operand_Table);
 
    if Broad_Actual /= Broad_Expected then
       Report.Failed ("Wrong result for type Broad multiplication");
@@ -88,9 +78,7 @@ begin
    Broad_Actual := 0.0;
    Broad_Actual :=
      Data.Test_Broad_Ops
-       (1.0,
-        Data.Broad_Div_Operator_Table,
-        Data.Broad_Div_Operand_Table);
+       (1.0, Data.Broad_Div_Operator_Table, Data.Broad_Div_Operand_Table);
 
    if Broad_Actual /= Broad_Expected then
       Report.Failed ("Wrong result for type Broad division");

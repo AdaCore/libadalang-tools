@@ -12,17 +12,14 @@ procedure C391001 is
 
    type Azimuth is range 0 .. 359;
 
-   type Ground_Antenna
-     (The_Band           : Boards.Data_Formats;
-      The_Command_Format : Modules.Command_Formats)
-   is record
+   type Ground_Antenna (The_Band : Boards.Data_Formats;
+      The_Command_Format         : Modules.Command_Formats) is record
       Id          : Plaque.Object;
       Electronics : Modules.Electronics_Module (The_Band, The_Command_Format);
       Pointing    : Azimuth;
    end record;
 
-   type Space_Antenna
-     (The_Band    : Boards.Data_Formats     := Boards.Ku_Band;
+   type Space_Antenna (The_Band : Boards.Data_Formats     := Boards.Ku_Band;
       The_Command : Modules.Command_Formats := Modules.Set_Power_State)
    is record
       Id          : Plaque.Object;
@@ -31,8 +28,7 @@ procedure C391001 is
 
    The_Ground_Antenna : Ground_Antenna (Boards.S_Band, Modules.Set_Data_Rate);
    The_Space_Antenna     : Space_Antenna;
-   Space_Station_Antenna : Space_Antenna
-     (Boards.S_Band,
+   Space_Station_Antenna : Space_Antenna (Boards.S_Band,
       Modules.Set_Compression_Code);
 
    procedure Validate (Condition : Boolean; Message : String) is
@@ -44,8 +40,7 @@ procedure C391001 is
 
 begin
    Report.Test
-     ("C391001",
-      "Check nested tagged discriminated " & "record structures");
+     ("C391001", "Check nested tagged discriminated " & "record structures");
 
    Plaque.Create (The_Ground_Antenna.Id);               -- 1
    Plaque.Create (The_Ground_Antenna.Electronics.Id);   -- 2
@@ -78,14 +73,12 @@ begin
      (The_Ground_Antenna.Electronics.The_Link.Tc_S = 300,
       "TGA comp 2.inher.2.1");
    Validate
-     (The_Ground_Antenna.Electronics.Tc_S_Band_Data = 1,
-      "TGA comp 2.inher.3");
+     (The_Ground_Antenna.Electronics.Tc_S_Band_Data = 1, "TGA comp 2.inher.3");
    Validate (The_Ground_Antenna.Pointing = 180, "TGA comp 3");
 
    Validate (The_Space_Antenna.The_Band = Boards.Ku_Band, "TSA discr 1");
    Validate
-     (The_Space_Antenna.The_Command = Modules.Set_Power_State,
-      "TSA discr 2");
+     (The_Space_Antenna.The_Command = Modules.Set_Power_State, "TSA discr 2");
    Validate (Plaque.Tc_Match (The_Space_Antenna.Id, 3), "TSA comp 1");
    Validate
      (The_Space_Antenna.Electronics.Eband = Boards.Ku_Band,
@@ -104,8 +97,7 @@ begin
      (The_Space_Antenna.Electronics.The_Link.Tc_S = 300,
       "TSA comp 2.inher.2.1");
    Validate
-     (The_Space_Antenna.Electronics.Tc_Ku_Band_Data = 2,
-      "TSA comp 2.inher.3");
+     (The_Space_Antenna.Electronics.Tc_Ku_Band_Data = 2, "TSA comp 2.inher.3");
    Validate (The_Space_Antenna.Electronics.Tc_Sps = 30, "TSA comp 2.1");
 
    Validate (Space_Station_Antenna.The_Band = Boards.S_Band, "SSA discr 1");
@@ -161,8 +153,7 @@ begin
    end;
 
    Validate
-     (The_Ground_Antenna.Electronics.Tc_Sdr = 1_001,
-      "assigned value 1");
+     (The_Ground_Antenna.Electronics.Tc_Sdr = 1_001, "assigned value 1");
    Validate
      (The_Ground_Antenna.Electronics.The_Link.Mode = Boards.Transmitting,
       "assigned value 2.1");
@@ -195,8 +186,7 @@ begin
      (Space_Station_Antenna.Electronics.Tc_S_Band_Data = 222,
       "assigned value 9");
    Validate
-     (Space_Station_Antenna.Electronics.Tc_Scc = 333,
-      "assigned value 10");
+     (Space_Station_Antenna.Electronics.Tc_Scc = 333, "assigned value 10");
 
    Report.Result;
 

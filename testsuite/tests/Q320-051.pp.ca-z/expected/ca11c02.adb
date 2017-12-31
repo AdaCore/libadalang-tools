@@ -79,15 +79,12 @@ procedure Ca11c02 is
      (Common_Name => "Scarlet Macaw       ", Weight => 2);
 
    Manatee : Mammal_Package.Mammal :=
-     (Common_Name => "Southern Manatee    ",
-      Weight      => 230,
+     (Common_Name => "Southern Manatee    ", Weight => 230,
       Hair_Color  => Mammal_Package.Brown);
 
    Lemur : Primate_Package.Primate :=
-     (Common_Name => "Ring-Tailed Lemur   ",
-      Weight      => 5,
-      Hair_Color  => Mammal_Package.Black,
-      Habitat     => Primate_Package.Arboreal);
+     (Common_Name => "Ring-Tailed Lemur   ", Weight => 5,
+      Hair_Color => Mammal_Package.Black, Habitat => Primate_Package.Arboreal);
 begin
 
    Report.Test
@@ -116,8 +113,7 @@ begin
 
       if not (Zoo_Data_Base (1) (1 .. 6) = "      ") or
         not (Zoo_Data_Base (2) (1 .. 6) = "      ") or
-        not (Zoo_Data_Base (3) (1 .. 6) = "      ")
-      then
+        not (Zoo_Data_Base (3) (1 .. 6) = "      ") then
          Report.Failed ("Initial condition failure");
       end if;
 
@@ -131,8 +127,7 @@ begin
       -- for entering the specific data.
 
       if not (Zoo_Data_Base (1) (1 .. 6) = "Animal") or
-        not (Zoo_Data_Base (1) (26 .. 30) = "Macaw")
-      then
+        not (Zoo_Data_Base (1) (26 .. 30) = "Macaw") then
          Report.Failed ("Incorrect version of Image for parent type");
       end if;
 

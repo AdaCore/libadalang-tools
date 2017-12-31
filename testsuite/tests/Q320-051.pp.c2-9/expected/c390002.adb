@@ -101,10 +101,8 @@ procedure C390002 is
       Report.Comment ("This message intentionally blank.");
    end Tc_Id_Tag;
 
-   procedure Check_Tags
-     (Machine       : in Vehicle.Object'Class;
-      Expected_Name : in String;
-      External_Tag  : in String)
+   procedure Check_Tags (Machine : in Vehicle.Object'Class;
+      Expected_Name              : in String; External_Tag : in String)
    is
       The_Tag : constant Ada.Tags.Tag := Machine'Tag;
       use type Ada.Tags.Tag;
@@ -152,17 +150,14 @@ begin  -- Main test procedure.
    Create (Eighteen_Wheeler, 18);
 
    Check_Tags
-     (Machine       => Two_Wheeler,
-      Expected_Name => "C390002.MOTIVATORS.BICYCLE",
-      External_Tag  => Bicycle'External_Tag);
+     (Machine => Two_Wheeler, Expected_Name => "C390002.MOTIVATORS.BICYCLE",
+      External_Tag => Bicycle'External_Tag);
    Check_Tags
-     (Machine       => Four_Wheeler,
-      Expected_Name => "C390002.MOTIVATORS.CAR",
-      External_Tag  => Car'External_Tag);
+     (Machine      => Four_Wheeler, Expected_Name => "C390002.MOTIVATORS.CAR",
+      External_Tag => Car'External_Tag);
    Check_Tags
-     (Machine       => Eighteen_Wheeler,
-      Expected_Name => "C390002.MOTIVATORS.TRUCK",
-      External_Tag  => Truck'External_Tag);
+     (Machine => Eighteen_Wheeler, Expected_Name => "C390002.MOTIVATORS.TRUCK",
+      External_Tag => Truck'External_Tag);
 
    Check_Exception;
 

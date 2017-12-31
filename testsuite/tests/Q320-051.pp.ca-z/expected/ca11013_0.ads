@@ -70,8 +70,7 @@ package Ca11013_0 is
       Imag : Real_Type)           -- Create a complex
       return Complex_Type;                           -- number.
 
-   procedure Components
-     (Complex_No           : in     Complex_Type;
-      Real_Part, Imag_Part :    out Real_Type);
+   procedure Components (Complex_No : in     Complex_Type;
+      Real_Part, Imag_Part          :    out Real_Type);
 
 end Ca11013_0;

@@ -64,8 +64,7 @@ begin
 
       if X'Size < Specified_Size then
          Failed
-           ("OBJECT SIZE TOO SMALL -- CHECK_TYPE_1.  " &
-            "FIRST VALUE IS" &
+           ("OBJECT SIZE TOO SMALL -- CHECK_TYPE_1.  " & "FIRST VALUE IS" &
             Integer'Image (X (Ident_Int (1))));
       end if;
 
@@ -75,8 +74,7 @@ begin
 
       if Y'Size < Specified_Size then
          Failed
-           ("OBJECT SIZE TOO SMALL -- CHECK_TYPE_2.  " &
-            "FIRST VALUE IS" &
+           ("OBJECT SIZE TOO SMALL -- CHECK_TYPE_2.  " & "FIRST VALUE IS" &
             Integer'Image (Y (Ident_Int (1))));
       end if;
    end;

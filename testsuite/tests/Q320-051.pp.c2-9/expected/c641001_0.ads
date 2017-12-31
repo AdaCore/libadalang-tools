@@ -52,9 +52,8 @@ package C641001_0 is
 
    procedure Check_String_10 (S : out String_10; Start, Stop : Natural);
 
-   procedure Check_Illegal_Slice_Reference
-     (Slice_Passed : in out String;
-      Index        :        Natural);
+   procedure Check_Illegal_Slice_Reference (Slice_Passed : in out String;
+      Index                                              :        Natural);
 
    type Tagged_Data (Bound : Natural) is tagged record
       Data_Item : String (1 .. Bound) := (others => '*');

@@ -35,13 +35,11 @@ procedure C34001a is
    type Parent is (E1, E2, E3, 'A', E4, E5, E6);
 
    subtype Subparent is
-     Parent range
-       Parent'Val (Ident_Int (Parent'Pos (E2))) ..
+     Parent range Parent'Val (Ident_Int (Parent'Pos (E2))) ..
          Parent'Val (Ident_Int (Parent'Pos (E5)));
 
    type T is
-     new Subparent range
-       Parent'Val (Ident_Int (Parent'Pos (E3))) ..
+     new Subparent range Parent'Val (Ident_Int (Parent'Pos (E3))) ..
          Parent'Val (Ident_Int (Parent'Pos (E4)));
 
    X : T       := E3;

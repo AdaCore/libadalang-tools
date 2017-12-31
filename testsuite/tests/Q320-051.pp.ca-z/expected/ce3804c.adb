@@ -61,8 +61,7 @@ begin
          when Use_Error =>
             Not_Applicable
               ("USE_ERROR RAISED; TEXT CREATE " &
-               "FOR TEMP FILES WITH OUT_FILE " &
-               "MODE - 1");
+               "FOR TEMP FILES WITH OUT_FILE " & "MODE - 1");
             raise Incomplete;
       end;
 

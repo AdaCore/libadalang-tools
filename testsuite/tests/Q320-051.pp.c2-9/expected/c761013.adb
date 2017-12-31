@@ -42,8 +42,7 @@ begin
    Subtest_1;
 
    Tctouch.Validate
-     (Expected => "iFfiFfiUffff",
-      Message  => "Renames in subprogram");
+     (Expected => "iFfiFfiUffff", Message => "Renames in subprogram");
 
    Subtest_2 :
    declare
@@ -63,8 +62,7 @@ begin
    end Subtest_2;
 
    Tctouch.Validate
-     (Expected => "iFfiFfiUffff",
-      Message  => "Renames in block");
+     (Expected => "iFfiFfiUffff", Message => "Renames in block");
 
    Subtest_3;
 

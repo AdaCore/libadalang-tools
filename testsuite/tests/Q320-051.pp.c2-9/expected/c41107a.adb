@@ -53,11 +53,8 @@ procedure C41107a is
    V2 : Integer := Ident_Int (2);
    V3 : Integer := Ident_Int (3);
 
-   procedure P1
-     (X : in     Integer;
-      Y : in out Integer;
-      Z :    out Integer;
-      W :        String)
+   procedure P1 (X : in Integer; Y : in out Integer; Z : out Integer;
+      W            :    String)
    is
    begin
       if X /= 1 then
@@ -124,8 +121,7 @@ begin
       Failed ("WRONG TARGET FOR ASSIGNMENT - C");
    end if;
    C := "ABCDEFG";
-   P2 (C (3 .. 6) (V3 + V1),
-      C (3 .. 6) (V3 * V2),
+   P2 (C (3 .. 6) (V3 + V1), C (3 .. 6) (V3 * V2),
       C (3 .. 6) ((V1 + V2) * V1));
    if C /= "ABZDEYG" then
       Failed ("WRONG TARGET FOR (IN) OUT PARAMETER - C");

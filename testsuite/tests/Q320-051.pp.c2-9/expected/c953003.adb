@@ -178,9 +178,7 @@ begin
    if Verbose or Order_Error then
       for I in 1 .. Max_Tasks * Max_Entries loop
          Report.Comment
-           ("order" &
-            Integer'Image (I) &
-            " is" &
+           ("order" & Integer'Image (I) & " is" &
             Integer'Image (Note_Order (I)));
       end loop;
    end if;

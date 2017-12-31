@@ -8,10 +8,8 @@ package body Cxe4004_Part_B is
    begin
       if T /= Expected then
          Report.Failed
-           ("expected 4 4s but received:" &
-            Integer'Image (T (T'First)) &
-            " length:" &
-            Integer'Image (T'Length));
+           ("expected 4 4s but received:" & Integer'Image (T (T'First)) &
+            " length:" & Integer'Image (T'Length));
       end if;
    end Call_With_4;
 

@@ -114,8 +114,7 @@ begin
             Failed
               ("CONSTRAINT_ERROR NOT RAISED UPON " &
                "ATTEMPT TO CHANGE DISCRIMINANT OF " &
-               "CONSTRAINED FORMAL PARAMETER " &
-               Integer'Image (P1.Disc));
+               "CONSTRAINED FORMAL PARAMETER " & Integer'Image (P1.Disc));
          exception
             when Constraint_Error =>
                null;
@@ -127,8 +126,7 @@ begin
             Failed
               ("CONSTRAINT_ERROR NOT RAISED UPON " &
                "ATTEMPT TO CHANGE DISCRIMINANT OF " &
-               "CONSTRAINED FORMAL PARAMETER " &
-               Integer'Image (P2.Disc));
+               "CONSTRAINED FORMAL PARAMETER " & Integer'Image (P2.Disc));
          exception
             when Constraint_Error =>
                null;
@@ -143,8 +141,7 @@ begin
          Obj1 := (Disc => Ident_Int (7));           -- 1.
          Failed
            ("CONSTRAINT_ERROR NOT RAISED UPON " &
-            "ATTEMPT TO CHANGE DISCRIMINANT OF " &
-            "CONSTRAINED OBJECT");
+            "ATTEMPT TO CHANGE DISCRIMINANT OF " & "CONSTRAINED OBJECT");
          if Obj1 = (Disc => 7) then
             Comment ("PREVENTING DEAD VARIABLE OPTIMIZATION");
          end if;
@@ -199,8 +196,7 @@ begin
          Acc1 := new Rec1 (Disc => Ident_Int (7));   -- 4.
          Failed
            ("CONSTRAINT_ERROR NOT RAISED UPON " &
-            "ATTEMPT TO ASSIGN INCOMPATIBLE OBJECT " &
-            "TO ACCESS VARIABLE");
+            "ATTEMPT TO ASSIGN INCOMPATIBLE OBJECT " & "TO ACCESS VARIABLE");
          if Acc1 = new Rec1 (Disc => 7) then
             Comment ("PREVENTING DEAD VARIABLE OPTIMIZATION");
          end if;
@@ -219,8 +215,7 @@ begin
          Acc1.all := Badobj1;           -- 5.
          Failed
            ("CONSTRAINT_ERROR NOT RAISED UPON " &
-            "ATTEMPT TO ASSIGN INCOMPATIBLE OBJECT " &
-            "TO ACCESSED OBJECT");
+            "ATTEMPT TO ASSIGN INCOMPATIBLE OBJECT " & "TO ACCESSED OBJECT");
          if Acc1.all = Badobj1 then
             Comment ("PREVENT DEAD VARIABLE OPTIMIZATION");
          end if;
@@ -240,8 +235,7 @@ begin
          Failed
            ("CONSTRAINT_ERROR NOT RAISED UPON " &
             "PASSING OF CONSTRAINED ACTUAL " &
-            "PARAMETERS TO DIFFERENTLY CONSTRAINED " &
-            "FORMAL PARAMETERS");
+            "PARAMETERS TO DIFFERENTLY CONSTRAINED " & "FORMAL PARAMETERS");
       exception
          when Constraint_Error =>
             null;

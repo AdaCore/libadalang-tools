@@ -62,10 +62,8 @@ procedure C36205k is
       end if;
 
       if (Las not in A'Range and Las >= Fir) or
-        (Fir not in A'Range and Las >= Fir) or
-        Fir - 1 in A'Range or
-        Las + 1 in A'Range (1)
-      then
+        (Fir not in A'Range and Las >= Fir) or Fir - 1 in A'Range or
+        Las + 1 in A'Range (1) then
          Failed ("'RANGE IS WRONG " & S);
       end if;
 
@@ -85,11 +83,8 @@ procedure C36205k is
          Failed ("'LENGTH(1) IS WRONG " & S);
       end if;
 
-      if F1 - 1 in A'Range or
-        (F1 not in A'Range and F1 <= L1) or
-        (L1 not in A'Range (1) and F1 <= L1) or
-        L1 + 1 in A'Range (1)
-      then
+      if F1 - 1 in A'Range or (F1 not in A'Range and F1 <= L1) or
+        (L1 not in A'Range (1) and F1 <= L1) or L1 + 1 in A'Range (1) then
          Failed ("'RANGE(1) IS WRONG " & S);
       end if;
 
@@ -107,8 +102,7 @@ procedure C36205k is
 
       if F2 - 1 in A'Range (2) or
         (F2 not in A'Range (2) and A'Length (2) > 0) or
-        (L2 not in A'Range (2) and A'Length (2) /= 0) or
-        L2 + 1 in A'Range (2)
+        (L2 not in A'Range (2) and A'Length (2) /= 0) or L2 + 1 in A'Range (2)
       then
          Failed ("'RANGE(2) IS WRONG " & S);
       end if;
@@ -130,13 +124,9 @@ procedure C36205k is
 
       if
         (F <= L and
-         (F not in S'Range or
-          L not in S'Range or
-          F not in S'Range (1) or
+         (F not in S'Range or L not in S'Range or F not in S'Range (1) or
           L not in S'Range (1))) or
-        F - 1 in S'Range or
-        L + 1 in S'Range (1)
-      then
+        F - 1 in S'Range or L + 1 in S'Range (1) then
          Failed ("STRING 'RANGE IS WRONG " & Mess);
       end if;
    end S1;

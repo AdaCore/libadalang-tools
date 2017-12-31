@@ -89,9 +89,7 @@ begin
       -- Not_Applicable result.
 
       Ada.Streams.Stream_Io.Create
-        (Util_File,
-         Ada.Streams.Stream_Io.Out_File,
-         Utility_Service_Filename);
+        (Util_File, Ada.Streams.Stream_Io.Out_File, Utility_Service_Filename);
 
       Operational_Test_Block :
       declare
@@ -99,10 +97,9 @@ begin
          -- The following procedure will store all of the customer specific
          -- information into the stream.
 
-         procedure Store_Data_In_Stream
-           (Customer : in Fxacb00.Service_Type;
-            Months   : in Fxacb00.Months_In_Service_Type;
-            History  : in Fxacb00.Service_History_Type)
+         procedure Store_Data_In_Stream (Customer : in Fxacb00.Service_Type;
+            Months : in Fxacb00.Months_In_Service_Type;
+            History : in Fxacb00.Service_History_Type)
          is
          begin
             Fxacb00.Service_Type'Output (Util_Stream, Customer);
@@ -135,13 +132,11 @@ begin
          begin
 
             Store_Data_In_Stream
-              (Customer => Fxacb00.Customer1,
-               Months   => Fxacb00.C1_Months,
+              (Customer => Fxacb00.Customer1, Months => Fxacb00.C1_Months,
                History  => Fxacb00.C1_Service_History);
 
             Store_Data_In_Stream
-              (Fxacb00.Customer2,
-               Fxacb00.C2_Months,
+              (Fxacb00.Customer2, Fxacb00.C2_Months,
                History => Fxacb00.C2_Service_History);
 
             Store_Data_In_Stream
@@ -157,35 +152,28 @@ begin
             Tc_Apartment  : Fxacb00.Service_Type (Fxacb00.Apartment);
             Tc_Commercial : Fxacb00.Service_Type (Fxacb00.Commercial);
 
-            Tc_Months1,
-            Tc_Months2,
+            Tc_Months1, Tc_Months2,
             Tc_Months3 : Fxacb00.Months_In_Service_Type :=
               Fxacb00.Months_In_Service_Type'First;
 
-            Tc_History1 : Fxacb00
-              .Service_History_Type
-              (Fxacb00.Quarterly_Period_Type,
-               Fxacb00.Month_In_Quarter_Type) :=
+            Tc_History1 : Fxacb00.Service_History_Type
+              (Fxacb00.Quarterly_Period_Type, Fxacb00.Month_In_Quarter_Type) :=
               (others => (others => Fxacb00.Electric_Usage_Type'Last));
 
-            Tc_History2 : Fxacb00
-              .Service_History_Type
+            Tc_History2 : Fxacb00.Service_History_Type
               (Fxacb00
                  .Quarterly_Period_Type range Fxacb00.Spring .. Fxacb00.Summer,
                Fxacb00.Month_In_Quarter_Type) :=
               (others => (others => Fxacb00.Electric_Usage_Type'Last));
 
-            Tc_History3 : Fxacb00
-              .Service_History_Type
-              (Fxacb00.Quarterly_Period_Type,
-               Fxacb00.Month_In_Quarter_Type) :=
+            Tc_History3 : Fxacb00.Service_History_Type
+              (Fxacb00.Quarterly_Period_Type, Fxacb00.Month_In_Quarter_Type) :=
               (others => (others => Fxacb00.Electric_Usage_Type'Last));
 
          begin
 
             Ada.Streams.Stream_Io.Reset
-              (Util_File,
-               Ada.Streams.Stream_Io.In_File);
+              (Util_File, Ada.Streams.Stream_Io.In_File);
 
             -- Input all of the data that is contained in the stream. Compare
             -- all data with the original data in package FXACB00 that was
@@ -194,8 +182,7 @@ begin
             Retrieve_Data_From_Stream (Tc_Residence, Tc_Months1, Tc_History1);
             Retrieve_Data_From_Stream (Tc_Apartment, Tc_Months2, Tc_History2);
             Retrieve_Data_From_Stream
-              (Customer => Tc_Commercial,
-               Months   => Tc_Months3,
+              (Customer => Tc_Commercial, Months => Tc_Months3,
                History  => Tc_History3);
 
             -- After all the data has been correctly extracted, the file should
@@ -246,8 +233,7 @@ begin
          Ada.Streams.Stream_Io.Delete (Util_File);
       else
          Ada.Streams.Stream_Io.Open
-           (Util_File,
-            Ada.Streams.Stream_Io.Out_File,
+           (Util_File, Ada.Streams.Stream_Io.Out_File,
             Utility_Service_Filename);
          Ada.Streams.Stream_Io.Delete (Util_File);
       end if;

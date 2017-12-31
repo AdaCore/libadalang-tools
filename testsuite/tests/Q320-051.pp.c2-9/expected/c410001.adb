@@ -72,8 +72,7 @@ begin  -- Main test procedure.
       "Check that evaluating an access to subprogram " &
       "variable containing the value null causes the " &
       "exception Constraint_Error. Check that the " &
-      "default value for objects of access to " &
-      "subprogram types is null");
+      "default value for objects of access to " & "subprogram types is null");
 
    -- check that the default values are null
    declare
@@ -125,8 +124,7 @@ begin  -- Main test procedure.
    Proc_Para_Ref_Var (null);
 
    Tctouch.Assert
-     (Func_Para_Ref_Var (null) = 1_995,
-      "Func_Para_Ref_Var( null )");
+     (Func_Para_Ref_Var (null) = 1_995, "Func_Para_Ref_Var( null )");
 
    -- assign the null value to the objects
 

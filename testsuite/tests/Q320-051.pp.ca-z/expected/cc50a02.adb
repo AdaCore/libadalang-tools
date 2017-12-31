@@ -20,8 +20,7 @@ procedure Cc50a02 is
    --
 
    package Person_Stacks is new Cc50a02_0 (Fc50a00.Person_Type);
-   procedure Tc_Person_Test is new Cc50a02_1
-     (Fc50a00.Person_Type,
+   procedure Tc_Person_Test is new Cc50a02_1 (Fc50a00.Person_Type,
       Person_Stacks);
    Person_Stack : Person_Stacks.Stack;
 
@@ -30,8 +29,7 @@ procedure Cc50a02 is
    --
 
    package People_Stacks is new Cc50a02_0 (Fc50a00.Person_Type'Class);
-   procedure Tc_People_Test is new Cc50a02_1
-     (Fc50a00.Person_Type'Class,
+   procedure Tc_People_Test is new Cc50a02_1 (Fc50a00.Person_Type'Class,
       People_Stacks);
    People_Stack : People_Stacks.Stack;
 

@@ -66,8 +66,7 @@ begin
      ("C93003A",
       "CHECK THAT ACTIVATION OF TASKS CREATED BY " &
       "ALLOCATORS PRESENT IN A DECLARATIVE PART " &
-      "TAKES PLACE DURING ELABORATION OF THE " &
-      "CORRESPONDING DECLARATION");
+      "TAKES PLACE DURING ELABORATION OF THE " & "CORRESPONDING DECLARATION");
 
    --------------------------------------------------
 
@@ -216,22 +215,19 @@ begin
          if R1.M.G /= Good or R1.N.all /= 0 then
             Failed
               ("NON-TASK COMPONENTS OF RECORD R1 NOT " &
-               "INITIALIZED BEFORE TASK ACTIVATED " &
-               "- (C2)");
+               "INITIALIZED BEFORE TASK ACTIVATED " & "- (C2)");
          end if;
 
          if R2.M.G /= Good or R2.N.all /= 0 then
             Failed
               ("NON-TASK COMPONENTS OF RECORD R2 NOT " &
-               "INITIALIZED BEFORE TASK ACTIVATED " &
-               "- (C2)");
+               "INITIALIZED BEFORE TASK ACTIVATED " & "- (C2)");
          end if;
 
          if I1 /= 1 or I2 /= 1 then
             Failed
               ("A RECORD OF TASK ALLOCATOR IN A PACKAGE " &
-               "SPECIFICATION WAS ACTIVATED TOO LATE " &
-               "- (C2)");
+               "SPECIFICATION WAS ACTIVATED TOO LATE " & "- (C2)");
          end if;
       end Q;
 
@@ -273,22 +269,19 @@ begin
          if Ra1.M (1) /= 0 or Ra1.N (1) /= 0 then
             Failed
               ("NON-TASK COMPONENTS OF RECORD RA1 NOT " &
-               "INITIALIZED BEFORE TASK ACTIVATED " &
-               "- (D)");
+               "INITIALIZED BEFORE TASK ACTIVATED " & "- (D)");
          end if;
 
          if Ra2.M (1) /= 0 or Ra2.N (1) /= 0 then
             Failed
               ("NON-TASK COMPONENTS OF RECORD RA2 NOT " &
-               "INITIALIZED BEFORE TASK ACTIVATED " &
-               "- (D)");
+               "INITIALIZED BEFORE TASK ACTIVATED " & "- (D)");
          end if;
 
          if I1 /= 1 or I2 /= 1 then
             Failed
               ("A RECORD OF ARRAY OF TASK ALLOCATOR IN " &
-               "A PACKAGE BODY WAS ACTIVATED " &
-               "TOO LATE - (D)");
+               "A PACKAGE BODY WAS ACTIVATED " & "TOO LATE - (D)");
          end if;
       end P;
 
@@ -328,15 +321,13 @@ begin
          if Ar1.all (1).M /= False or Ar1.all (1).N /= Ascii.Nul then
             Failed
               ("NON-TASK COMPONENTS OF RECORD AR1 NOT " &
-               "INITIALIZED BEFORE TASK ACTIVATED " &
-               "- (E)");
+               "INITIALIZED BEFORE TASK ACTIVATED " & "- (E)");
          end if;
 
          if Ar2.all (1).M /= False or Ar2.all (1).N /= Ascii.Nul then
             Failed
               ("NON-TASK COMPONENTS OF RECORD AR2 NOT " &
-               "INITIALIZED BEFORE TASK ACTIVATED " &
-               "- (E)");
+               "INITIALIZED BEFORE TASK ACTIVATED " & "- (E)");
          end if;
 
          if I1 /= 1 or I2 /= 1 then

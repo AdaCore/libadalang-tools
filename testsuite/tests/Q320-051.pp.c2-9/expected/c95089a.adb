@@ -68,11 +68,8 @@ procedure C95089a is
    begin
       loop
          select
-            accept E2
-              (C1 : in     Character;
-               C2 : in out Character;
-               C3 :    out Character)
-            do
+            accept E2 (C1 : in     Character; C2 : in out Character;
+               C3         :    out Character) do
                C3 := C2;
                C2 := C1;
             end E2;
@@ -124,8 +121,7 @@ begin
    S1 := "AAA";
    S2 := "BBB";
    T1.E1
-     (S1 (1 .. Ident_Int (2)),
-      S2 (1 .. 2),
+     (S1 (1 .. Ident_Int (2)), S2 (1 .. 2),
       S3 (Ident_Int (1) .. Ident_Int (2)));
    if S2 /= "AAB" or S3 /= "BBC" then
       Failed ("SLICE AS AN ACTUAL PARAMETER NOT WORKING");
@@ -168,8 +164,7 @@ begin
    Ptrtbl (2) := new String'("BBB");
    Ptrtbl (3) := new String'("CCC");
    T1.E1
-     (F1 (1) (2 .. 3),
-      F1 (2) (Ident_Int (2) .. 3),
+     (F1 (1) (2 .. 3), F1 (2) (Ident_Int (2) .. 3),
       F1 (3) (2 .. Ident_Int (3)));
    if Ptrtbl (2).all /= "BAA" or Ptrtbl (3).all /= "CBB" then
       Failed

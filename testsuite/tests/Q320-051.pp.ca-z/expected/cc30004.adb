@@ -81,15 +81,11 @@ begin
 
          type Integer_Item is range <>;
 
-      procedure P
-        (P_In     : in     Integer_Item;
-         P_Out    :    out Integer_Item;
-         P_In_Out : in out Integer_Item);
+      procedure P (P_In : in     Integer_Item; P_Out : out Integer_Item;
+         P_In_Out       : in out Integer_Item);
 
-      procedure P
-        (P_In     : in     Integer_Item;
-         P_Out    :    out Integer_Item;
-         P_In_Out : in out Integer_Item)
+      procedure P (P_In : in     Integer_Item; P_Out : out Integer_Item;
+         P_In_Out       : in out Integer_Item)
       is
 
          Store : Integer_Item;
@@ -102,8 +98,7 @@ begin
          if (P_In /= Store) then
             Report.Failed
               ("Assignment to integer out " &
-               "parameter changes the value of " &
-               "input parameter");
+               "parameter changes the value of " & "input parameter");
             Store := P_In;     -- Reset Store for next case.
          end if;
 
@@ -111,16 +106,14 @@ begin
          if (P_In /= Store) then
             Report.Failed
               ("Assignment to integer in out " &
-               "parameter changes the value of " &
-               "input parameter");
+               "parameter changes the value of " & "input parameter");
             Store := P_In;     -- Reset Store for next case.
          end if;
 
          Arr (K) := Arr (I) + 1;
          if (P_In /= Store) then
             Report.Failed
-              ("Assignment to integer global " &
-               "changes the value of " &
+              ("Assignment to integer global " & "changes the value of " &
                "input parameter");
          end if;
 
@@ -146,8 +139,7 @@ begin
                      "parameter changed global value");
                when 111 =>
                   Report.Failed
-                    ("Out and in out actual " &
-                     "Integer parameters changed " &
+                    ("Out and in out actual " & "Integer parameters changed " &
                      "global value");
                when others =>
                   Report.Failed ("Undetermined change to " & "global value");
@@ -184,8 +176,7 @@ begin
          First := First + 1;
          if (F_In /= Store) then
             Report.Failed
-              ("Assignment to integer global " &
-               "changes the value of " &
+              ("Assignment to integer global " & "changes the value of " &
                "input parameter");
          end if;
 
@@ -231,15 +222,11 @@ begin
          type Item is private;
          type Access_Item is access Item;
 
-      procedure P
-        (P_In     : in     Access_Item;
-         P_Out    :    out Access_Item;
-         P_In_Out : in out Access_Item);
+      procedure P (P_In : in     Access_Item; P_Out : out Access_Item;
+         P_In_Out       : in out Access_Item);
 
-      procedure P
-        (P_In     : in     Access_Item;
-         P_Out    :    out Access_Item;
-         P_In_Out : in out Access_Item)
+      procedure P (P_In : in     Access_Item; P_Out : out Access_Item;
+         P_In_Out       : in out Access_Item)
       is
 
          Store : Access_Item;
@@ -251,8 +238,7 @@ begin
          Date_Array (I) := new Date'(Year => 1_990, Day => 7, Month => Aug);
          if (P_In /= Store) then
             Report.Failed
-              ("Assignment to access global " &
-               "changes the value of " &
+              ("Assignment to access global " & "changes the value of " &
                "input parameter");
             Store := P_In;     -- Reset Store for next case.
          end if;
@@ -261,8 +247,7 @@ begin
          if (P_In /= Store) then
             Report.Failed
               ("Assignment to access out " &
-               "parameter changes the value of " &
-               "input parameter");
+               "parameter changes the value of " & "input parameter");
             Store := P_In;     -- Reset Store for next case.
          end if;
 
@@ -270,8 +255,7 @@ begin
          if (P_In /= Store) then
             Report.Failed
               ("Assignment to access in out " &
-               "parameter changes the value of " &
-               "input parameter");
+               "parameter changes the value of " & "input parameter");
          end if;
 
          raise E;  -- Check exception handling.
@@ -281,8 +265,7 @@ begin
 
    begin  -- Access_and_Proc
       New_P
-        (P_In     => Date_Array (I),
-         P_Out    => Date_Array (J),
+        (P_In     => Date_Array (I), P_Out => Date_Array (J),
          P_In_Out => Date_Array (K));
 
       Report.Failed ("Exception not raised - access and procedure");
@@ -336,8 +319,7 @@ begin
          Date_Pointer := new Date'(Year => 1_990, Day => 7, Month => Aug);
          if (F_In /= Store) then
             Report.Failed
-              ("Assignment to access global " &
-               "changes the value of " &
+              ("Assignment to access global " & "changes the value of " &
                "input parameter");
          end if;
 
@@ -367,15 +349,11 @@ begin
 
          type Float_Item is digits <>;
 
-      procedure P
-        (P_In     : in     Float_Item;
-         P_Out    :    out Float_Item;
-         P_In_Out : in out Float_Item);
+      procedure P (P_In : in     Float_Item; P_Out : out Float_Item;
+         P_In_Out       : in out Float_Item);
 
-      procedure P
-        (P_In     : in     Float_Item;
-         P_Out    :    out Float_Item;
-         P_In_Out : in out Float_Item)
+      procedure P (P_In : in     Float_Item; P_Out : out Float_Item;
+         P_In_Out       : in out Float_Item)
       is
 
          Store : Float_Item;
@@ -387,8 +365,7 @@ begin
          P_Out := 10.5;
          if (P_In /= Store) then
             Report.Failed
-              ("Assignment to Float out " &
-               "parameter changes the value of " &
+              ("Assignment to Float out " & "parameter changes the value of " &
                "input parameter");
             Store := P_In;     -- Reset Store for next case.
          end if;
@@ -397,16 +374,14 @@ begin
          if (P_In /= Store) then
             Report.Failed
               ("Assignment to Float in out " &
-               "parameter changes the value of " &
-               "input parameter");
+               "parameter changes the value of " & "input parameter");
             Store := P_In;     -- Reset Store for next case.
          end if;
 
          Arr (J) := Arr (K) + 1.0;
          if (P_In /= Store) then
             Report.Failed
-              ("Assignment to Float global " &
-               "changes the value of " &
+              ("Assignment to Float global " & "changes the value of " &
                "input parameter");
          end if;
 
@@ -457,8 +432,7 @@ begin
          First := First + 1.0;
          if (F_In /= Store) then
             Report.Failed
-              ("Assignment to Float global " &
-               "changes the value of " &
+              ("Assignment to Float global " & "changes the value of " &
                "input parameter");
          end if;
 
@@ -491,15 +465,11 @@ begin
          Cnst1 : in Private_Item;
          Cnst2 : in Private_Item;
 
-      procedure P
-        (P_In     : in     Private_Item;
-         P_Out    :    out Private_Item;
-         P_In_Out : in out Private_Item);
+      procedure P (P_In : in     Private_Item; P_Out : out Private_Item;
+         P_In_Out       : in out Private_Item);
 
-      procedure P
-        (P_In     : in     Private_Item;
-         P_Out    :    out Private_Item;
-         P_In_Out : in out Private_Item)
+      procedure P (P_In : in     Private_Item; P_Out : out Private_Item;
+         P_In_Out       : in out Private_Item)
       is
 
          Store : Private_Item;
@@ -512,8 +482,7 @@ begin
          if (P_In /= Store) then
             Report.Failed
               ("Assignment to enumeration out " &
-               "parameter changes the value of " &
-               "input parameter");
+               "parameter changes the value of " & "input parameter");
             Store := P_In;     -- Reset Store for next case.
          end if;
 
@@ -521,26 +490,22 @@ begin
          if (P_In /= Store) then
             Report.Failed
               ("Assignment to enumeration in out " &
-               "parameter changes the value of " &
-               "input parameter");
+               "parameter changes the value of " & "input parameter");
             Store := P_In;     -- Reset Store for next case.
          end if;
 
          Arr (I) := Blue;
          if (P_In /= Store) then
             Report.Failed
-              ("Assignment to enumeration global " &
-               "changes the value of " &
+              ("Assignment to enumeration global " & "changes the value of " &
                "input parameter");
          end if;
 
          raise E;  -- Check exception handling.
       end P;
 
-      procedure New_P is new P
-        (Private_Item => Color,
-         Cnst1        => Red,
-         Cnst2        => Violet);
+      procedure New_P is new P (Private_Item => Color, Cnst1 => Red,
+         Cnst2                               => Violet);
 
    begin  -- Enum_and_Private_and_Proc
       New_P (P_In => Arr (I), P_Out => Arr (J), P_In_Out => Arr (K));
@@ -586,8 +551,7 @@ begin
          First := Yellow;
          if (F_In /= Store) then
             Report.Failed
-              ("Assignment to enumeration global " &
-               "changes the value of " &
+              ("Assignment to enumeration global " & "changes the value of " &
                "input parameter");
          end if;
 

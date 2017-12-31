@@ -46,8 +46,7 @@ begin
       "THE ACTUAL SUBPROGRAM'S PARAMETERS ARE USED " &
       "IN PLACE OF THOSE ASSOCIATED WITH THE " &
       "FORMAL SUBPROGRAM'S PARAMETERS (INCLUDING " &
-      "PARAMETERS SPECIFIED WITH A FORMAL GENERIC " &
-      "TYPE)");
+      "PARAMETERS SPECIFIED WITH A FORMAL GENERIC " & "TYPE)");
    declare
       generic
          Brian : in out Integer;
@@ -84,18 +83,8 @@ begin
    end;
    declare
       type Enum is
-        (Dayton,
-         Beavercreek,
-         Centerville,
-         Englewood,
-         Fairborn,
-         Huber_Heights,
-         Kettering,
-         Miamisburg,
-         Oakwood,
-         Riverside,
-         Trotwood,
-         West_Carrollton,
+        (Dayton, Beavercreek, Centerville, Englewood, Fairborn, Huber_Heights,
+         Kettering, Miamisburg, Oakwood, Riverside, Trotwood, West_Carrollton,
          Vandalia);
       subtype Sub_Enum is Enum range Centerville .. Fairborn;
 

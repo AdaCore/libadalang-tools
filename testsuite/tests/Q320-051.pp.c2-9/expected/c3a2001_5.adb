@@ -3,12 +3,7 @@ with Report;
 with Tctouch;
 with C3a2001_1, C3a2001_2, C3a2001_3, C3a2001_4;
 
-pragma Elaborate_All
-  (Report,
-   Tctouch,
-   C3a2001_1,
-   C3a2001_2,
-   C3a2001_3,
+pragma Elaborate_All (Report, Tctouch, C3a2001_1, C3a2001_2, C3a2001_3,
    C3a2001_4);
 
 package body C3a2001_5 is

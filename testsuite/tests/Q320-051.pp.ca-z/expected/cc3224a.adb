@@ -202,20 +202,17 @@ begin  -- CC3224A
       R        := (True, True, True);
 
       if (New_T'((True, True, True)) xor Obj_Newt) /=
-        New_T'((False, False, False))
-      then
+        New_T'((False, False, False)) then
          Report.Failed ("XOR REPORT.FAILED - BOOLEAN");
       end if;
 
       if (New_T'((False, False, True)) and Obj_Newt) /=
-        New_T'((False, False, True))
-      then
+        New_T'((False, False, True)) then
          Report.Failed ("AND REPORT.FAILED - BOOLEAN");
       end if;
 
       if (New_T'((False, False, False)) or Obj_Newt) /=
-        New_T'((True, True, True))
-      then
+        New_T'((True, True, True)) then
          Report.Failed ("OR REPORT.FAILED - BOOLEAN");
       end if;
 
@@ -235,8 +232,7 @@ begin  -- CC3224A
       if (New_Cube'First /= Three_Dimensional'First) or
         (New_Cube'First (1) /= Three_Dimensional'First) or
         (New_Cube'First (2) /= Three_Dimensional'First (2)) or
-        (New_Cube'First (3) /= Three_Dimensional'First (3))
-      then
+        (New_Cube'First (3) /= Three_Dimensional'First (3)) then
          Report.Failed
            ("PROBLEMS WITH 'FIRST FOR MULTI-" & "DIMENSIONAL ARRAYS.");
       end if;
@@ -244,17 +240,13 @@ begin  -- CC3224A
       if (New_Cube'Last /= Three_Dimensional'Last) or
         (New_Cube'Last (1) /= Three_Dimensional'Last) or
         (New_Cube'Last (2) /= Three_Dimensional'Last (2)) or
-        (New_Cube'Last (3) /= Three_Dimensional'Last (3))
-      then
+        (New_Cube'Last (3) /= Three_Dimensional'Last (3)) then
          Report.Failed
            ("PROBLEMS WITH 'LAST FOR MULTI-" & "DIMENSIONAL ARRAYS.");
       end if;
 
-      if (-5 not in New_Cube'Range) or
-        (-3 not in New_Cube'Range (1)) or
-        (Feb not in New_Cube'Range (2)) or
-        ('C' not in New_Cube'Range (3))
-      then
+      if (-5 not in New_Cube'Range) or (-3 not in New_Cube'Range (1)) or
+        (Feb not in New_Cube'Range (2)) or ('C' not in New_Cube'Range (3)) then
          Report.Failed
            ("PROBLEMS WITH 'RANGE FOR MULTI-" & "DIMENSIONAL ARRAYS.");
       end if;
@@ -262,8 +254,7 @@ begin  -- CC3224A
       if (New_Cube'Length /= Three_Dimensional'Length) or
         (New_Cube'Length (1) /= Three_Dimensional'Length) or
         (New_Cube'Length (2) /= Three_Dimensional'Length (2)) or
-        (New_Cube'Length (3) /= Three_Dimensional'Length (3))
-      then
+        (New_Cube'Length (3) /= Three_Dimensional'Length (3)) then
          Report.Failed
            ("PROBLEMS WITH 'LENGTH FOR MULTI-" & "DIMENSIONAL ARRAYS.");
       end if;
@@ -279,8 +270,7 @@ begin  -- CC3224A
       if New_Cube'
           (New_Cube'Range =>
              (New_Cube'Range (2) => (New_Cube'Range (3) => Wall_Date))) not in
-          New_Cube
-      then
+          New_Cube then
          Report.Failed
            ("QUALIFIED EXPRESSION FOR MULTI-" & "DIMENSIONAL ARRAYS FAILED.");
       end if;

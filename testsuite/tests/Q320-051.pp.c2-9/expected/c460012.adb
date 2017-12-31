@@ -73,9 +73,7 @@ procedure C460012 is
          null;
       when E : others =>
          Failed
-           ("Wrong exception " &
-            Exception_Name (E) &
-            " raised - " &
+           ("Wrong exception " & Exception_Name (E) & " raised - " &
             Exception_Message (E));
    end P;
 

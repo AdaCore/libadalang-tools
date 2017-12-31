@@ -60,8 +60,7 @@ begin
    end if;
 
    if (Check_Rec.Check_Int'Last_Bit - Check_Rec.Check_Int'First_Bit + 1) <
-     Integer'Size
-   then
+     Integer'Size then
       Failed ("INCORRECT SIZE FOR CHECK_INT");
    end if;
 
@@ -79,8 +78,7 @@ begin
    end if;
 
    if (Check_Rec.Check_Bool'Last_Bit - Check_Rec.Check_Bool'First_Bit + 1) <
-     Boolean'Size
-   then
+     Boolean'Size then
       Failed ("INCORRECT SIZE FOR CHECK_BOOL");
    end if;
 

@@ -41,8 +41,7 @@ begin
       "CHECK FOR CORRECT PRECEDENCE OF PRE-DEFINED " &
       "AND OVERLOADED OPERATIONS ON ENUMERATION " &
       "TYPES OTHER THAN BOOLEAN OR CHARACTER AND " &
-      "ONE-DIMENSIONAL ARRAYS WITH COMPONENTS OF " &
-      "SUCH TYPES");
+      "ONE-DIMENSIONAL ARRAYS WITH COMPONENTS OF " & "SUCH TYPES");
 
 ----- ENUMERATION TYPE:
 
@@ -133,8 +132,7 @@ begin
       end if;
 
       if (E5**E1 & E2) /= (Four, Four, Four, Two, Two, Two) or
-        (E1 mod E2 <= E5) /= (1 .. 3 => Three)
-      then
+        (E1 mod E2 <= E5) /= (1 .. 3 => Three) then
          Failed ("INCORRECT RESULT - 4");
       end if;
    end;

@@ -65,9 +65,8 @@ procedure Cxai009 is
    Animal_2 : constant String := "Monkey";
    Animal_3 : constant String := "Ostrich";
 
-   procedure Tampering_Check
-     (Container : in out My_Indefinite_Holders.Holder;
-      Where     : in     String)
+   procedure Tampering_Check (Container : in out My_Indefinite_Holders.Holder;
+      Where                             : in     String)
    is
 
       Program_Error_Raised : Boolean := False;
@@ -265,10 +264,8 @@ begin
    -- possible use.
 
    declare
-      procedure Test
-        (Value     : in String;
-         Expected  : in String;
-         Test_Case : in String)
+      procedure Test (Value : in String; Expected : in String;
+         Test_Case          : in String)
       is
       begin
          Tampering_Check (Container => My_Holder_1, Where => Test_Case);
@@ -286,35 +283,29 @@ begin
       Test
         (Value =>
            My_Indefinite_Holders.Constant_Reference (My_Holder_1).Element.all,
-         Expected  => Animal_1,
-         Test_Case => "Constant_Reference normal");
+         Expected => Animal_1, Test_Case => "Constant_Reference normal");
 
       Test
-        (Value => My_Indefinite_Holders.Reference (My_Holder_1).Element.all,
-         Expected  => Animal_1,
-         Test_Case => "Reference normal");
+        (Value    => My_Indefinite_Holders.Reference (My_Holder_1).Element.all,
+         Expected => Animal_1, Test_Case => "Reference normal");
 
       -- Prefix call with all components explicit:
       Test
-        (Value     => My_Holder_1.Constant_Reference.Element.all,
-         Expected  => Animal_1,
-         Test_Case => "Constant_Reference prefix");
+        (Value    => My_Holder_1.Constant_Reference.Element.all,
+         Expected => Animal_1, Test_Case => "Constant_Reference prefix");
 
       Test
-        (Value     => My_Holder_1.Reference.Element.all,
-         Expected  => Animal_1,
+        (Value     => My_Holder_1.Reference.Element.all, Expected => Animal_1,
          Test_Case => "Reference prefix");
 
       -- Using generalized reference:
 
       Test
-        (Value     => My_Holder_1.Constant_Reference,
-         Expected  => Animal_1,
+        (Value     => My_Holder_1.Constant_Reference, Expected => Animal_1,
          Test_Case => "Constant_Reference generalized");
 
       Test
-        (Value     => My_Holder_1.Reference,
-         Expected  => Animal_1,
+        (Value     => My_Holder_1.Reference, Expected => Animal_1,
          Test_Case => "Reference generalized");
       -- This case is the way that we expect that a holder reference will be
       -- used.

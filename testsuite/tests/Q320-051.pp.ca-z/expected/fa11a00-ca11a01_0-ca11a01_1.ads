@@ -15,19 +15,15 @@ package Fa11a00.Ca11a01_0.Ca11a01_1 is     -- Label_Widget_Pkg
    -- Set_Color from Color_Widget. Inherits procedure Set_Color_Widget from
    -- Color_Widget.
 
-   procedure Set_Label_Widget
-     (The_Widget : in out Label_Widget;
-      The_Width  : in     Widget_Length;
-      The_Height : in     Widget_Length;
-      The_Color  : in     Widget_Color_Enum;
-      The_Label  : in     Widget_Label_Str);
+   procedure Set_Label_Widget (The_Widget : in out Label_Widget;
+      The_Width : in     Widget_Length; The_Height : in Widget_Length;
+      The_Color : in     Widget_Color_Enum; The_Label : in Widget_Label_Str);
 
    -- The following function is needed to verify the value of the extension's
    -- private component.
 
-   function Verify_Label
-     (The_Widget : in Label_Widget;
-      The_Label  : in Widget_Label_Str) return Boolean;
+   function Verify_Label (The_Widget : in Label_Widget;
+      The_Label                      : in Widget_Label_Str) return Boolean;
 
 private
    type Label_Widget is new Color_Widget with record

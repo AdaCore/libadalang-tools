@@ -30,8 +30,7 @@ begin  -- C341A03
      ("C341A03",
       "Check that an object of one class-wide type " &
       "can initialize a class-wide object of a " &
-      "different type when the operation is embedded " &
-      "in a generic unit");
+      "different type when the operation is embedded " & "in a generic unit");
 
    Audit_Checking_Accounts :
    declare

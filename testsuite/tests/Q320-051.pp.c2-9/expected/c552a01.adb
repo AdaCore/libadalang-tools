@@ -75,11 +75,9 @@ with F552a00_Sparse_Arrays;
 procedure C552a01 is
 
    package Sparse_Integer_Arrays is new F552a00_Sparse_Arrays
-     (Sparse_Array_Index => Natural,
-      Element_Type       => Integer);
+     (Sparse_Array_Index => Natural, Element_Type => Integer);
 
-   Sparse_Data : aliased Sparse_Integer_Arrays
-     .Sparse_Array
+   Sparse_Data : aliased Sparse_Integer_Arrays.Sparse_Array
      (Max_Elements => 10);
 
    No_Primes : F552a00_Prime_Numbers.Prime_Number_Set (Max_Value => 2);
@@ -182,10 +180,8 @@ begin
 
       Ada.Strings.Unbounded.Append
         (Result,
-         " Index=" &
-         Natural'Image (Sparse_Integer_Arrays.Index_Of (Item)) &
-         ", Value =" &
-         Integer'Image (Sparse_Data (Item)));
+         " Index=" & Natural'Image (Sparse_Integer_Arrays.Index_Of (Item)) &
+         ", Value =" & Integer'Image (Sparse_Data (Item)));
 
    end loop;
 
@@ -212,10 +208,8 @@ begin
 
       Ada.Strings.Unbounded.Append
         (Result,
-         " Index=" &
-         Natural'Image (Sparse_Integer_Arrays.Index_Of (Item)) &
-         ", Value =" &
-         Integer'Image (Sparse_Data (Item)));
+         " Index=" & Natural'Image (Sparse_Integer_Arrays.Index_Of (Item)) &
+         ", Value =" & Integer'Image (Sparse_Data (Item)));
 
    end loop;
 
@@ -245,10 +239,8 @@ begin
 
       Ada.Strings.Unbounded.Append
         (Result,
-         " Index=" &
-         Natural'Image (Sparse_Integer_Arrays.Index_Of (Item)) &
-         ", Value =" &
-         Integer'Image (Sparse_Data (Item)));
+         " Index=" & Natural'Image (Sparse_Integer_Arrays.Index_Of (Item)) &
+         ", Value =" & Integer'Image (Sparse_Data (Item)));
 
    end loop;
 
@@ -260,8 +252,7 @@ begin
    end if;
 
    if Sparse_Integer_Arrays.Tc_Call_History /=
-     "I1H:T( 1)N( 2)H:T( 2)N( 3)H:F( 3)"
-   then
+     "I1H:T( 1)N( 2)H:T( 2)N( 3)H:F( 3)" then
       Report.Failed
         (Descr =>
            "5) Unexpected sequence of calls, " &
@@ -278,10 +269,8 @@ begin
 
       Ada.Strings.Unbounded.Append
         (Result,
-         " Index=" &
-         Natural'Image (Sparse_Integer_Arrays.Index_Of (Item)) &
-         ", Value =" &
-         Integer'Image (Sparse_Data (Item)));
+         " Index=" & Natural'Image (Sparse_Integer_Arrays.Index_Of (Item)) &
+         ", Value =" & Integer'Image (Sparse_Data (Item)));
 
       exit;
 
@@ -311,10 +300,8 @@ begin
 
       Ada.Strings.Unbounded.Append
         (Result,
-         " Index=" &
-         Natural'Image (Sparse_Integer_Arrays.Index_Of (Item)) &
-         ", Value =" &
-         Integer'Image (Sparse_Data (Item)));
+         " Index=" & Natural'Image (Sparse_Integer_Arrays.Index_Of (Item)) &
+         ", Value =" & Integer'Image (Sparse_Data (Item)));
 
    end loop;
 
@@ -326,8 +313,7 @@ begin
    end if;
 
    if Sparse_Integer_Arrays.Tc_Call_History /=
-     "ILH:T( 2)P( 1)H:T( 1)P( 0)H:F( 0)"
-   then
+     "ILH:T( 2)P( 1)H:T( 1)P( 0)H:F( 0)" then
 
       Report.Failed
         (Descr =>
@@ -345,10 +331,8 @@ begin
 
       Ada.Strings.Unbounded.Append
         (Result,
-         " Index=" &
-         Natural'Image (Sparse_Integer_Arrays.Index_Of (Item)) &
-         ", Value =" &
-         Integer'Image (Sparse_Data (Item)));
+         " Index=" & Natural'Image (Sparse_Integer_Arrays.Index_Of (Item)) &
+         ", Value =" & Integer'Image (Sparse_Data (Item)));
 
       exit;
 

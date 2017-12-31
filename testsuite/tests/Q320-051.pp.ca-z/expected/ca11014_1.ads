@@ -10,18 +10,15 @@ generic
 package Ca11014_1 is
 
    -- Write to current element and advance "current" pointer.
-   procedure Write_Element
-     (L : in out List_Mgr.List_Type;
-      E : in     List_Mgr.Element_Type);
+   procedure Write_Element (L : in out List_Mgr.List_Type;
+      E                       : in     List_Mgr.Element_Type);
 
    -- Read from current element and advance "current" pointer.
-   procedure Read_Element
-     (L : in out List_Mgr.List_Type;
-      E :    out List_Mgr.Element_Type);
+   procedure Read_Element (L : in out List_Mgr.List_Type;
+      E                      :    out List_Mgr.Element_Type);
 
    -- Add element to end of list.
-   procedure Add_Element
-     (L : in out List_Mgr.List_Type;
-      E : in     List_Mgr.Element_Type);
+   procedure Add_Element (L : in out List_Mgr.List_Type;
+      E                     : in     List_Mgr.Element_Type);
 
 end Ca11014_1;

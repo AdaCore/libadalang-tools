@@ -11,13 +11,11 @@ procedure Ca13003 is
    Expected_Name    : Ca13003_0.File_Name := "          ";
    Student_File     : Ca13003_0.File_Rec;
 
-   function Process_Input_Files
-     (Id_In   : Ca13003_0.File_Id;
+   function Process_Input_Files (Id_In : Ca13003_0.File_Id;
       File_In : Ca13003_0.File_Rec) return Ca13003_0.File_Name renames
      Ca13003_0.Ca13003_1.Ca13003_4;
 
-   function Process_Audit_Files
-     (Id_In   : Ca13003_0.File_Id;
+   function Process_Audit_Files (Id_In : Ca13003_0.File_Id;
       File_In : Ca13003_0.File_Rec) return Ca13003_0.File_Name renames
      Ca13003_0.Ca13003_2.Ca13003_4;
 begin
@@ -36,26 +34,21 @@ begin
    Ca13003_0.Ca13003_1.Ca13003_5.Generate_Report;
 
    if not Ca13003_0.Tc_Open_For_Process or
-     not Ca13003_0.Tc_Report_From_Process or
-     Expected_Name /= First_File_Name
+     not Ca13003_0.Tc_Report_From_Process or Expected_Name /= First_File_Name
    then
       Report.Failed ("Unexpected results in processing file");
    end if;
 
    Ca13003_0.Initialize_File_Rec
-     (Second_File_Name,
-      Second_File_Id,
-      Student_File);
+     (Second_File_Name, Second_File_Id, Student_File);
 
    -- Generate report from file auditing.
    Ca13003_0.Ca13003_2.Ca13003_3;
    Expected_Name := Process_Audit_Files (Second_File_Id, Student_File);
    Ca13003_0.Ca13003_2.Ca13003_5.Generate_Report;
 
-   if not Ca13003_0.Tc_Open_For_Audit or
-     not Ca13003_0.Tc_Report_From_Audit or
-     Expected_Name /= Second_File_Name
-   then
+   if not Ca13003_0.Tc_Open_For_Audit or not Ca13003_0.Tc_Report_From_Audit or
+     Expected_Name /= Second_File_Name then
       Report.Failed ("Unexpected results in auditing file");
    end if;
 

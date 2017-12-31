@@ -11,12 +11,9 @@ package Ca13001_1.Ca13001_5 is
    -- out concurrently, then return them at the same time. For the purposes of
    -- the test, family transportation happens sequentially.
 
-   procedure Provide_Transportation
-     (Who     : in     Family;
-      Get_Key :    out Key_Type;
-      Get_Veh :    out Boolean);
-   procedure Return_Transportation
-     (What   : in     Transportation;
-      Rt_Veh :    out Boolean);
+   procedure Provide_Transportation (Who : in Family; Get_Key : out Key_Type;
+      Get_Veh                            :    out Boolean);
+   procedure Return_Transportation (What : in     Transportation;
+      Rt_Veh                             :    out Boolean);
 
 end Ca13001_1.Ca13001_5;

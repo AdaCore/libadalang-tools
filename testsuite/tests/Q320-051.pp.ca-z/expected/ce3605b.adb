@@ -51,8 +51,7 @@ begin
    Test
      ("CE3605B",
       "CHECK THAT PUT PROPERLY MAINTAINS THE " &
-      "LINE NUMBER AND COLUMN NUMBER WHEN THE " &
-      "LINE LENGTH IS BOUNDED");
+      "LINE NUMBER AND COLUMN NUMBER WHEN THE " & "LINE LENGTH IS BOUNDED");
 
    declare
       File1  : File_Type;
@@ -84,30 +83,26 @@ begin
 
       if Col (File1) /= 6 then
          Failed
-           ("COLUMN NUMBER NOT INCREMENTED - PUT; " &
-            "VALUE WAS" &
+           ("COLUMN NUMBER NOT INCREMENTED - PUT; " & "VALUE WAS" &
             Count'Image (Col (File1)));
       end if;
 
       if Line (File1) /= Ln_Cnt then
          Failed
-           ("LINE COUNT MODIFIED - PUT CHARACTER; " &
-            "VALUE WAS" &
+           ("LINE COUNT MODIFIED - PUT CHARACTER; " & "VALUE WAS" &
             Count'Image (Line (File1)));
       end if;
 
       Put (File1, 'X');
       if Col (File1) /= 2 then
          Failed
-           ("COLUMN NUMBER NOT RESET - PUT CHARACTER; " &
-            "VALUE WAS" &
+           ("COLUMN NUMBER NOT RESET - PUT CHARACTER; " & "VALUE WAS" &
             Count'Image (Col (File1)));
       end if;
 
       if Line (File1) /= Ln_Cnt + 1 then
          Failed
-           ("LINE NUMBER NOT INCREMENTED - PUT CHARACTER; " &
-            "VALUE WAS" &
+           ("LINE NUMBER NOT INCREMENTED - PUT CHARACTER; " & "VALUE WAS" &
             Count'Image (Line (File1)));
       end if;
 
@@ -120,15 +115,13 @@ begin
 
       if Col (File1) /= 5 then
          Failed
-           ("COLUMN NUMBER NOT INCREMENTED - PUT STRING; " &
-            "VALUE WAS" &
+           ("COLUMN NUMBER NOT INCREMENTED - PUT STRING; " & "VALUE WAS" &
             Count'Image (Col (File1)));
       end if;
 
       if Line (File1) /= Ln_Cnt then
          Failed
-           ("LINE NUMBER INCREMENTED - PUT STRING; " &
-            "VALUE WAS" &
+           ("LINE NUMBER INCREMENTED - PUT STRING; " & "VALUE WAS" &
             Count'Image (Line (File1)));
       end if;
 
@@ -136,15 +129,13 @@ begin
 
       if Col (File1) /= 4 then
          Failed
-           ("COLUMN NUMBER NOT SET CORRECTLY - PUT" &
-            "STRING; VALUE WAS" &
+           ("COLUMN NUMBER NOT SET CORRECTLY - PUT" & "STRING; VALUE WAS" &
             Count'Image (Col (File1)));
       end if;
 
       if Line (File1) /= Ln_Cnt + 1 then
          Failed
-           ("LINE NUMBER NOT INCREMENTED - PUT STRING; " &
-            "VALUE WAS" &
+           ("LINE NUMBER NOT INCREMENTED - PUT STRING; " & "VALUE WAS" &
             Count'Image (Line (File1)));
       end if;
 

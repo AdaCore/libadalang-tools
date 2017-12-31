@@ -48,8 +48,7 @@ procedure C39006c0m is
          "CHECK THAT PROGRAM_ERROR IS RAISED IF " &
          "THE SUBPROGRAM WHOSE BODY HAS NOT BEEN " &
          "ELABORATED IS CALLED DURING " &
-         "ELABORATION OF AN OPTIONAL PACKAGE " &
-         "BODY SUBUNIT");
+         "ELABORATION OF AN OPTIONAL PACKAGE " & "BODY SUBUNIT");
    end Call_Test_First;
 
    procedure Add1 (A : in out Integer);

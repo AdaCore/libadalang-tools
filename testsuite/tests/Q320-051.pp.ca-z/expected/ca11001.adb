@@ -26,9 +26,7 @@ begin
    begin
       -- Assign using Cartesian coordinates.
       Ca11001_0.Cartesian_Assign
-        (Ca11001_0.Complex_Int (Report.Ident_Int (1)),
-         Int_2,
-         Complex_No);
+        (Ca11001_0.Complex_Int (Report.Ident_Int (1)), Int_2, Complex_No);
 
       -- Read back in Polar coordinates. Polar values are surrogates used in
       -- checking for correct subprogram calls.
@@ -48,16 +46,13 @@ begin
    begin
       -- Assign using Polar coordinates.
       Ca11001_0.Ca11001_1.Polar_Assign
-        (Int_2,
-         Ca11001_0.Complex_Int (Report.Ident_Int (3)),
-         Complex_No);
+        (Int_2, Ca11001_0.Complex_Int (Report.Ident_Int (3)), Complex_No);
 
       -- Read back in Cartesian coordinates.
       if Ca11001_0."/="
           (Ca11001_0.Cartesian_Real_Part (Complex_No),
            Ca11001_0.Complex_Int (Report.Ident_Int (12))) or
-        Ca11001_0."/=" (Ca11001_0.Cartesian_Imag_Part (Complex_No), Int_2)
-      then
+        Ca11001_0."/=" (Ca11001_0.Cartesian_Imag_Part (Complex_No), Int_2) then
          Report.Failed ("Incorrect Polar result");
       end if;
    end Alternate_View_Subtest;
@@ -66,9 +61,7 @@ begin
    begin
       -- Assign using Polar coordinates.
       Ca11001_0.Ca11001_1.Polar_Assign
-        (Ca11001_0.Complex_Int (Report.Ident_Int (0)),
-         Int_2,
-         Complex_No);
+        (Ca11001_0.Complex_Int (Report.Ident_Int (0)), Int_2, Complex_No);
 
       -- Compare with Complex_Num in CA11001_0.
       if not Ca11001_0.Ca11001_1.Equals_Const (Complex_No) then
@@ -81,8 +74,7 @@ begin
       -- Raised parent's exception.
       Ca11001_0.Ca11001_1.Polar_Assign
         (Ca11001_0.Complex_Int (Report.Ident_Int (0)),
-         Ca11001_0.Complex_Int (Report.Ident_Int (0)),
-         Complex_No);
+         Ca11001_0.Complex_Int (Report.Ident_Int (0)), Complex_No);
       Report.Failed ("Exception was not raised");
    exception
       when Ca11001_0.Complex_Error =>

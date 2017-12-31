@@ -174,8 +174,7 @@ begin
             when End_Error =>
                if Last /= 8 then
                   Failed
-                    ("LAST MODIFIED BY GET_LINE " &
-                     "ON END_ERROR.  LAST IS" &
+                    ("LAST MODIFIED BY GET_LINE " & "ON END_ERROR.  LAST IS" &
                      Integer'Image (Last));
                end if;
             when others =>

@@ -31,8 +31,7 @@ begin
 
    Radix_2_Subtests :
    declare
-      package Radix_2 is new Cxf2004_0
-        (Cxf2004_1.Money_Radix2,
+      package Radix_2 is new Cxf2004_0 (Cxf2004_1.Money_Radix2,
          Cxf2004_1.Interest_Rate);
       use type Cxf2004_1.Money_Radix2;
       use type Cxf2004_1.Interest_Rate;
@@ -198,8 +197,7 @@ begin
 
    Radix_10_Subtests :
    declare
-      package Radix_10 is new Cxf2004_0
-        (Cxf2004_1.Money_Radix10,
+      package Radix_10 is new Cxf2004_0 (Cxf2004_1.Money_Radix10,
          Cxf2004_1.Interest_Rate);
       use type Cxf2004_1.Money_Radix10;
       use type Cxf2004_1.Interest_Rate;

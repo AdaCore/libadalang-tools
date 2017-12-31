@@ -15,9 +15,8 @@ procedure C730a01 is
 
           --========================================================--
 
-   procedure Create_List
-     (Title, Author : in     C730a01_0.Data_List;
-      Head          : in out Priv_Node_Ptr)
+   procedure Create_List (Title, Author : in     C730a01_0.Data_List;
+      Head                              : in out Priv_Node_Ptr)
    is
 
       Book     : Priv_Node_Type;  -- Object of extended type.

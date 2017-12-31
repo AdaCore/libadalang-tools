@@ -34,8 +34,7 @@ begin
    Test
      ("C45503A",
       "CHECK THAT 'REM' AND 'MOD' YIELD CORRECT " &
-      "RESULTS WHEN THE OPERANDS ARE OF PREDEFINED " &
-      "TYPE INTEGER");
+      "RESULTS WHEN THE OPERANDS ARE OF PREDEFINED " & "TYPE INTEGER");
 
    declare
       I0  : Integer := 0;

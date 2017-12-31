@@ -65,8 +65,6 @@
 
 with Ada.Text_Io;
 package Cxaa016_0 is
-   New_Input_File,
-   New_Output_File,
-   New_Error_File_1,
+   New_Input_File, New_Output_File, New_Error_File_1,
    New_Error_File_2 : aliased Ada.Text_Io.File_Type;
 end Cxaa016_0;

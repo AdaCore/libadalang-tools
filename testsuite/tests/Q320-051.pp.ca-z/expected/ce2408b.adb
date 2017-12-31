@@ -51,8 +51,7 @@ begin
      ("CE2408B",
       "FOR FILES OF MODE INOUT_FILE, CHECK THAT " &
       "WRITE DOES NOT CAUSE AN EXCEPTION WHEN THE " &
-      """TO"" PARAMETER IS GREATER THAN THE END " &
-      "POSITION");
+      """TO"" PARAMETER IS GREATER THAN THE END " & "POSITION");
    begin
       Create (Dir_File, Inout_File, Legal_File_Name);
    exception

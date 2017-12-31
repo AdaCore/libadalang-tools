@@ -14,14 +14,11 @@ begin
       declare
          Obj1 : Ctrl          := Create (Ident_Int (1));
          Obj2 : constant Ctrl :=
-           (Ada.Finalization.Controlled with
-            D         => False,
-            Finalized => Ident_Bool (False),
-            C1        => Ident_Int (2));
+           (Ada.Finalization.Controlled with D => False,
+            Finalized => Ident_Bool (False), C1 => Ident_Int (2));
          Obj3 : Ctrl :=
-           (Ada.Finalization.Controlled with
-            D         => True,
-            Finalized => Ident_Bool (False),
+           (Ada.Finalization.Controlled with D => True,
+            Finalized                          => Ident_Bool (False),
             C2 => 2.0 * Float (Ident_Int (3))); -- Finalization: User_Error
          Obj4 : Ctrl := Create (Ident_Int (4));
       begin
@@ -36,37 +33,29 @@ begin
       when Program_Error =>
          if not Was_Finalized (Ident_Int (1)) or
            not Was_Finalized (Ident_Int (2)) or
-           not Was_Finalized (Ident_Int (4))
-         then
+           not Was_Finalized (Ident_Int (4)) then
             Failed ("Missing finalizations - 1");
          end if;
       when E : others =>
          Failed
-           ("Exception " &
-            Exception_Name (E) &
-            " raised - " &
-            Exception_Message (E) &
-            " - 1");
+           ("Exception " & Exception_Name (E) & " raised - " &
+            Exception_Message (E) & " - 1");
    end Normal;
 
    Anon : -- Case 2
    begin
       declare
          Obj1 : Ctrl :=
-           (Ada.Finalization.Controlled with
-            D         => True,
-            Finalized => Ident_Bool (False),
-            C2        => 2.0 * Float (Ident_Int (5)));
+           (Ada.Finalization.Controlled with D => True,
+            Finalized                          => Ident_Bool (False),
+            C2                                 => 2.0 * Float (Ident_Int (5)));
          Obj2 : constant Ctrl :=
-           (Ada.Finalization.Controlled with
-            D         => False,
-            Finalized => Ident_Bool (False),
-            C1        => Ident_Int (6));
+           (Ada.Finalization.Controlled with D => False,
+            Finalized => Ident_Bool (False), C1 => Ident_Int (6));
          Obj3 : Ctrl :=
-           (Ada.Finalization.Controlled with
-            D         => True,
-            Finalized => Ident_Bool (False),
-            C2        => 2.0 * Float (Ident_Int (7)));
+           (Ada.Finalization.Controlled with D => True,
+            Finalized                          => Ident_Bool (False),
+            C2                                 => 2.0 * Float (Ident_Int (7)));
          Obj4 : Ctrl := Create (Ident_Int (8));
       begin
          Comment ("Finalization of anonymous object");
@@ -92,17 +81,13 @@ begin
          if not Was_Finalized (Ident_Int (5)) or
            not Was_Finalized (Ident_Int (6)) or
            not Was_Finalized (Ident_Int (7)) or
-           not Was_Finalized (Ident_Int (8))
-         then
+           not Was_Finalized (Ident_Int (8)) then
             Failed ("Missing finalizations - 2");
          end if;
       when E : others =>
          Failed
-           ("Exception " &
-            Exception_Name (E) &
-            " raised - " &
-            Exception_Message (E) &
-            " - 2");
+           ("Exception " & Exception_Name (E) & " raised - " &
+            Exception_Message (E) & " - 2");
    end Anon;
 
    An_Exit : -- Case 3
@@ -111,14 +96,11 @@ begin
          declare
             Obj1 : Ctrl          := Create (Ident_Int (11));
             Obj2 : constant Ctrl :=
-              (Ada.Finalization.Controlled with
-               D         => False,
-               Finalized => Ident_Bool (False),
-               C1        => Ident_Int (12));
+              (Ada.Finalization.Controlled with D => False,
+               Finalized => Ident_Bool (False), C1 => Ident_Int (12));
             Obj3 : Ctrl :=
-              (Ada.Finalization.Controlled with
-               D         => True,
-               Finalized => Ident_Bool (False),
+              (Ada.Finalization.Controlled with D => True,
+               Finalized                          => Ident_Bool (False),
                C2 => 2.0 * Float (Ident_Int (13))); -- Finalization: User_Error
             Obj4 : Ctrl := Create (Ident_Int (14));
          begin
@@ -139,17 +121,13 @@ begin
       when Program_Error =>
          if not Was_Finalized (Ident_Int (11)) or
            not Was_Finalized (Ident_Int (12)) or
-           not Was_Finalized (Ident_Int (14))
-         then
+           not Was_Finalized (Ident_Int (14)) then
             Failed ("Missing finalizations - 3");
          end if;
       when E : others =>
          Failed
-           ("Exception " &
-            Exception_Name (E) &
-            " raised - " &
-            Exception_Message (E) &
-            " - 3");
+           ("Exception " & Exception_Name (E) & " raised - " &
+            Exception_Message (E) & " - 3");
    end An_Exit;
 
    A_Goto : -- Case 4
@@ -157,17 +135,14 @@ begin
       declare
          Obj1 : Ctrl          := Create (Ident_Int (15));
          Obj2 : constant Ctrl :=
-           (Ada.Finalization.Controlled with
-            D         => False,
-            Finalized => Ident_Bool (False),
-            C1        => Ident_Int (0));
+           (Ada.Finalization.Controlled with D => False,
+            Finalized => Ident_Bool (False), C1 => Ident_Int (0));
          -- Finalization: Tasking_Error
          Obj3 : Ctrl := Create (Ident_Int (16));
          Obj4 : Ctrl :=
-           (Ada.Finalization.Controlled with
-            D         => True,
-            Finalized => Ident_Bool (False),
-            C2        => 2.0 * Float (Ident_Int (17)));
+           (Ada.Finalization.Controlled with D => True,
+            Finalized                          => Ident_Bool (False),
+            C2 => 2.0 * Float (Ident_Int (17)));
       begin
          Comment ("Finalization because of goto statement");
 
@@ -188,17 +163,13 @@ begin
       when Program_Error =>
          if not Was_Finalized (Ident_Int (15)) or
            not Was_Finalized (Ident_Int (16)) or
-           not Was_Finalized (Ident_Int (17))
-         then
+           not Was_Finalized (Ident_Int (17)) then
             Failed ("Missing finalizations - 4");
          end if;
       when E : others =>
          Failed
-           ("Exception " &
-            Exception_Name (E) &
-            " raised - " &
-            Exception_Message (E) &
-            " - 4");
+           ("Exception " & Exception_Name (E) & " raised - " &
+            Exception_Message (E) & " - 4");
    end A_Goto;
 
    A_Return : -- Case 5
@@ -206,15 +177,12 @@ begin
       procedure Do_Something is
          Obj1 : Ctrl := Create (Ident_Int (18));
          Obj2 : Ctrl :=
-           (Ada.Finalization.Controlled with
-            D         => True,
-            Finalized => Ident_Bool (False),
-            C2        => 2.0 * Float (Ident_Int (19)));
+           (Ada.Finalization.Controlled with D => True,
+            Finalized                          => Ident_Bool (False),
+            C2 => 2.0 * Float (Ident_Int (19)));
          Obj3 : constant Ctrl :=
-           (Ada.Finalization.Controlled with
-            D         => False,
-            Finalized => Ident_Bool (False),
-            C1        => Ident_Int (20));
+           (Ada.Finalization.Controlled with D => False,
+            Finalized => Ident_Bool (False), C1 => Ident_Int (20));
       -- Finalization: Tasking_Error
       begin
          Comment ("Finalization because of return statement");
@@ -235,17 +203,13 @@ begin
    exception
       when Program_Error =>
          if not Was_Finalized (Ident_Int (18)) or
-           not Was_Finalized (Ident_Int (19))
-         then
+           not Was_Finalized (Ident_Int (19)) then
             Failed ("Missing finalizations - 5");
          end if;
       when E : others =>
          Failed
-           ("Exception " &
-            Exception_Name (E) &
-            " raised - " &
-            Exception_Message (E) &
-            " - 5");
+           ("Exception " & Exception_Name (E) & " raised - " &
+            Exception_Message (E) & " - 5");
    end A_Return;
 
    Except : -- Case 6
@@ -254,17 +218,14 @@ begin
 
       procedure Do_Something is
          Obj1 : Ctrl :=
-           (Ada.Finalization.Controlled with
-            D         => True,
-            Finalized => Ident_Bool (False),
+           (Ada.Finalization.Controlled with D => True,
+            Finalized                          => Ident_Bool (False),
             C2 => 2.0 * Float (Ident_Int (23))); -- Finalization: User_Error
          Obj2 : Ctrl          := Create (Ident_Int (24));
          Obj3 : Ctrl          := Create (Ident_Int (25));
          Obj4 : constant Ctrl :=
-           (Ada.Finalization.Controlled with
-            D         => False,
-            Finalized => Ident_Bool (False),
-            C1        => Ident_Int (26));
+           (Ada.Finalization.Controlled with D => False,
+            Finalized => Ident_Bool (False), C1 => Ident_Int (26));
       begin
          Comment ("Finalization because of exception propagation");
 
@@ -287,8 +248,7 @@ begin
       when Program_Error =>
          if not Was_Finalized (Ident_Int (24)) or
            not Was_Finalized (Ident_Int (25)) or
-           not Was_Finalized (Ident_Int (26))
-         then
+           not Was_Finalized (Ident_Int (26)) then
             Failed ("Missing finalizations - 6");
          end if;
       when Funky_Error =>
@@ -296,11 +256,8 @@ begin
       -- Should be Program_Error (7.6.1(19)).
       when E : others =>
          Failed
-           ("Exception " &
-            Exception_Name (E) &
-            " raised - " &
-            Exception_Message (E) &
-            " - 6");
+           ("Exception " & Exception_Name (E) & " raised - " &
+            Exception_Message (E) & " - 6");
    end Except;
 
    Result;

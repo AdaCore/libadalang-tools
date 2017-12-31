@@ -35,14 +35,12 @@ begin  -- Main test procedure.
 
    Tctouch.Assert
      (Fdb0a00.Comparator."="
-        (Fdb0a00.Pool1.User_Pool,
-         Cdb0a01_2.User_Pool_Tree'Storage_Pool),
+        (Fdb0a00.Pool1.User_Pool, Cdb0a01_2.User_Pool_Tree'Storage_Pool),
       "'Storage_Pool not correct for CDB0A01_2.User_Pool_Tree");
 
    Tctouch.Assert_Not
      (Fdb0a00.Comparator."="
-        (Fdb0a00.Pool1.User_Pool,
-         Cdb0a01_3.System_Pool_Tree'Storage_Pool),
+        (Fdb0a00.Pool1.User_Pool, Cdb0a01_3.System_Pool_Tree'Storage_Pool),
       "'Storage_Pool not correct for CDB0A01_3.System_Pool_Tree");
 
 --      Check that storage is allocated by calling Allocate.

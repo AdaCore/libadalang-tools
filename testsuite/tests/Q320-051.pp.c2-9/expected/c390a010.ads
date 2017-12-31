@@ -74,8 +74,7 @@ package C390a010 is
    procedure Handle (Ma : in out Medium_Alert_Type);    -- Override parent's
    -- primitive subprog.
 
-   procedure Assign_Officer
-     (Ma : in out Medium_Alert_Type;
-      To : in     Person_Enum);
+   procedure Assign_Officer (Ma : in out Medium_Alert_Type;
+      To                        : in     Person_Enum);
 
 end C390a010;

@@ -99,41 +99,29 @@ begin
          begin
             Y := T'Succ (Ident (T'Base'Last));
             Failed
-              ("NO EXCEPTION RAISED FOR " &
-               Str &
-               "'SUCC (IDENT (" &
-               Str &
+              ("NO EXCEPTION RAISED FOR " & Str & "'SUCC (IDENT (" & Str &
                "'BASE'LAST))");
          exception
             when Constraint_Error =>
                null;
             when others =>
                Failed
-                 ("WRONG EXCEPTION RAISED FOR " &
-                  Str &
-                  "'SUCC (IDENT (" &
-                  Str &
-                  "'BASE'LAST))");
+                 ("WRONG EXCEPTION RAISED FOR " & Str & "'SUCC (IDENT (" &
+                  Str & "'BASE'LAST))");
          end;
 
          begin
             Y := T'Pred (Ident (T'Base'First));
             Failed
-              ("NO EXCEPTION RAISED FOR " &
-               Str &
-               "'PRED (IDENT (" &
-               Str &
+              ("NO EXCEPTION RAISED FOR " & Str & "'PRED (IDENT (" & Str &
                "'BASE'FIRST))");
          exception
             when Constraint_Error =>
                null;
             when others =>
                Failed
-                 ("WRONG EXCEPTION RAISED FOR " &
-                  Str &
-                  "'PRED (IDENT (" &
-                  Str &
-                  "'BASE'FIRST))");
+                 ("WRONG EXCEPTION RAISED FOR " & Str & "'PRED (IDENT (" &
+                  Str & "'BASE'FIRST))");
          end;
 
       end P;
@@ -162,9 +150,7 @@ begin
          begin
             if T'Image (Va) /= Im then
                Failed
-                 ("INCORRECT RESULTS FOR " &
-                  Str &
-                  "'IMAGE OF " &
+                 ("INCORRECT RESULTS FOR " & Str & "'IMAGE OF " &
                   Integer'Image (Integer (Va)));
             end if;
          end P;

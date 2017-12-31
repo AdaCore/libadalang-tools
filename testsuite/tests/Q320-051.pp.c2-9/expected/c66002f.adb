@@ -73,11 +73,9 @@ begin
 
          if S /= "CBA" then
             Failed
-              ("PROCEDURES IN ENCLOSING-" &
-               "ENCLOSED SCOPES DIFFERING " &
+              ("PROCEDURES IN ENCLOSING-" & "ENCLOSED SCOPES DIFFERING " &
                "ONLY IN EXISTENCE OF ONE " &
-               "DEFAULT-VALUED PARAMETER CAUSED " &
-               "CONFUSION");
+               "DEFAULT-VALUED PARAMETER CAUSED " & "CONFUSION");
          end if;
       end Enclose;
 

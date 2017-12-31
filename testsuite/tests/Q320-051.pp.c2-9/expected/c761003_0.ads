@@ -3,9 +3,7 @@
 with Ada.Finalization;
 package C761003_0 is
 
-   type Global
-     (Tag : Character)
-   is new Ada.Finalization.Controlled with
+   type Global (Tag : Character) is new Ada.Finalization.Controlled with
    null record;
 
    procedure Initialize (It : in out Global);
@@ -13,10 +11,8 @@ package C761003_0 is
 
    Null_Global : Global ('1') := (Ada.Finalization.Controlled with Tag => '1');
 
-   type Second
-     (Tag : Character)
-   is new Ada.Finalization.Limited_Controlled with
-   null record;
+   type Second (Tag : Character)
+   is new Ada.Finalization.Limited_Controlled with null record;
 
    procedure Initialize (It : in out Second);
    procedure Finalize (It : in out Second);

@@ -35,9 +35,8 @@ generic
 
    type Element is private;
 
-   with procedure Assign
-     (Source      : in out Element;
-      Destination : in out Element);
+   with procedure Assign (Source : in out Element;
+      Destination                : in out Element);
 
    with function "=" (Left : in Element; Right : in Element) return Boolean;
 
@@ -45,21 +44,17 @@ package Cc3019c1_Nested_Generics is
 
    type Nested_Generics_Type is limited private;
 
-   procedure Copy
-     (Source      : in out Nested_Generics_Type;
-      Destination : in out Nested_Generics_Type);
+   procedure Copy (Source : in out Nested_Generics_Type;
+      Destination         : in out Nested_Generics_Type);
 
-   procedure Set_Element
-     (For_This_Ngt_Object : in out Nested_Generics_Type;
-      To_This_Element     : in out Element);
+   procedure Set_Element (For_This_Ngt_Object : in out Nested_Generics_Type;
+      To_This_Element                         : in out Element);
 
-   procedure Set_Number
-     (For_This_Ngt_Object : in out Nested_Generics_Type;
-      To_This_Number      : in     Natural);
+   procedure Set_Number (For_This_Ngt_Object : in out Nested_Generics_Type;
+      To_This_Number                         : in     Natural);
 
-   function "="
-     (Left  : in Nested_Generics_Type;
-      Right : in Nested_Generics_Type) return Boolean;
+   function "=" (Left : in Nested_Generics_Type;
+      Right           : in Nested_Generics_Type) return Boolean;
 
    function Element_Of
      (This_Ngt_Object : in Nested_Generics_Type) return Element;
@@ -71,9 +66,8 @@ package Cc3019c1_Nested_Generics is
 
       type Element is limited private;
 
-      with procedure Assign
-        (Source      : in out Element;
-         Destination : in out Element);
+      with procedure Assign (Source : in out Element;
+         Destination                : in out Element);
 
    package Generic_Task is
 
@@ -90,9 +84,8 @@ package Cc3019c1_Nested_Generics is
 
       type Element is limited private;
 
-      with procedure Assign
-        (Source      : in out Element;
-         Destination : in out Element);
+      with procedure Assign (Source : in out Element;
+         Destination                : in out Element);
 
       with function "=" (Left : in Element; Right : in Element) return Boolean;
 
@@ -103,13 +96,11 @@ package Cc3019c1_Nested_Generics is
       Overflow  : exception;
       Underflow : exception;
 
-      procedure Push
-        (This_Element     : in out Element;
-         On_To_This_Stack : in out Stack);
+      procedure Push (This_Element : in out Element;
+         On_To_This_Stack          : in out Stack);
 
-      procedure Pop
-        (This_Element   : in out Element;
-         Off_This_Stack : in out Stack);
+      procedure Pop (This_Element : in out Element;
+         Off_This_Stack           : in out Stack);
 
       procedure Copy (This_Stack : in out Stack; To_This_Stack : in out Stack);
 
@@ -117,9 +108,8 @@ package Cc3019c1_Nested_Generics is
 
       generic
 
-         with procedure Process
-           (This_Element : in     Element;
-            Continue     :    out Boolean);
+         with procedure Process (This_Element : in     Element;
+            Continue                          :    out Boolean);
 
       procedure Iterate (Over_This_Stack : in Stack);
 
@@ -129,10 +119,8 @@ package Cc3019c1_Nested_Generics is
 
    private
 
-      package New_List_Class is new Cc3019c0_List_Class
-        (Element => Element,
-         Assign  => Assign,
-         "="     => "=");
+      package New_List_Class is new Cc3019c0_List_Class (Element => Element,
+         Assign => Assign, "=" => "=");
 
       type Stack is new New_List_Class.List;
 

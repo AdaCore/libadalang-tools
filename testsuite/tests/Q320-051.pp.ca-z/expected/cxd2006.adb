@@ -214,8 +214,7 @@ begin
    Report.Test
      ("CXD2006",
       "Check that priority ceases to be inherited" &
-      " as soon as the conditions for inheritance" &
-      " no longer exist");
+      " as soon as the conditions for inheritance" & " no longer exist");
 
    declare  -- encapsulation
       Hi    : Hi_Priority_Task;

@@ -81,18 +81,14 @@ begin
    begin
 
       Proc1 (A1, A2, A3);
-      if A1 /= Ident_Int (-1) or
-        A2 /= (1 .. 3 => Ident_Int (-2)) or
-        A3 /= (1, (2, 3, 4), Ident_Int (5))
-      then
+      if A1 /= Ident_Int (-1) or A2 /= (1 .. 3 => Ident_Int (-2)) or
+        A3 /= (1, (2, 3, 4), Ident_Int (5)) then
          Failed ("CASE 1 : ERROR IN ASSIGNMENT");
       end if;
 
       Proc2 (B2, B1, B3);
-      if B1 /= Ident_Int (-1) or
-        B2 /= (1 .. 3 => Ident_Int (-2)) or
-        B3 /= (1, (2, 3, 4), Ident_Int (5))
-      then
+      if B1 /= Ident_Int (-1) or B2 /= (1 .. 3 => Ident_Int (-2)) or
+        B3 /= (1, (2, 3, 4), Ident_Int (5)) then
          Failed ("CASE 2 : ERROR IN ASSIGNMENT");
       end if;
 

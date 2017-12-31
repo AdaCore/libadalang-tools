@@ -39,8 +39,7 @@ begin
    Test
      ("CD7101D",
       "CHECK THAT FOR MIN_INT AND MAX_INT IN PACKAGE " &
-      "SYSTEM, INTEGER'FIRST >= MIN_INT AND INTEGER'" &
-      "LAST <= MAX_INT");
+      "SYSTEM, INTEGER'FIRST >= MIN_INT AND INTEGER'" & "LAST <= MAX_INT");
 
    if Integer'Pos (Integer'First) < System.Min_Int then
       Failed ("INCORRECT VALUE FOR SYSTEM.MIN_INT");

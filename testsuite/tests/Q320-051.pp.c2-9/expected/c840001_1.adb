@@ -2,9 +2,8 @@
 
 package body C840001_1 is
 
-   function "**"
-     (Left  : Precision_Pos_Float;
-      Right : Natural'Base) return Precision_Pos_Float
+   function "**" (Left : Precision_Pos_Float;
+      Right            : Natural'Base) return Precision_Pos_Float
    is
    begin
       -- ... Utilize some other algorithms.

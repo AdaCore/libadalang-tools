@@ -52,8 +52,7 @@ begin
    Test
      ("CE2401A",
       "CHECK THAT READ, WRITE, SET_INDEX " &
-      "INDEX, SIZE AND END_OF_FILE ARE " &
-      "SUPPORTED FOR DIRECT FILES");
+      "INDEX, SIZE AND END_OF_FILE ARE " & "SUPPORTED FOR DIRECT FILES");
 
    declare
       subtype Str_Type is String (1 .. 12);

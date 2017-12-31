@@ -144,8 +144,7 @@ begin
       subtype Acc7a is
         Acc7 (Ident_Int (1) .. Ident_Int (5), Ident_Int (1) .. Ident_Int (1));
       subtype Acc7b is
-        Acc7
-          (Ident_Int (1) .. Ident_Int (15),
+        Acc7 (Ident_Int (1) .. Ident_Int (15),
            Ident_Int (1) .. Ident_Int (10));
       A : Acc7a;
       B : Acc7b;

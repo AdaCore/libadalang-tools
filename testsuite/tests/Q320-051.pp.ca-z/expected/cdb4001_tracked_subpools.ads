@@ -21,16 +21,14 @@ package Cdb4001_Tracked_Subpools is
    type Tracked_Subpool_Handle is access all Tracked_Subpool'Class;
    for Tracked_Subpool_Handle'Storage_Size use 0;
 
-   function Enclosing_Subpool
-     (Pool            : Tracked_Pool;
+   function Enclosing_Subpool (Pool : Tracked_Pool;
       Storage_Address : System.Address) return Tracked_Subpool_Handle;
    -- If the given address points into a block of storage that was returned by
    -- a previous call to this Pool type's Allocate (and was not subsequently
    -- freed), then return a reference to the enclosing subpool. Otherwise, the
    -- result is undefined.
 
-   function Enclosing_Subpool
-     (Pool            : Tracked_Pool;
+   function Enclosing_Subpool (Pool : Tracked_Pool;
       Storage_Address : System.Address) return Subpools.Subpool_Handle is
      (Subpools.Subpool_Handle
         (Tracked_Subpool_Handle'(Enclosing_Subpool (Pool, Storage_Address))));
@@ -45,15 +43,12 @@ package Cdb4001_Tracked_Subpools is
 private
    overriding function Storage_Size (Pool : Tracked_Pool) return Storage_Count;
 
-   overriding procedure Allocate_From_Subpool
-     (Pool                     : in out Tracked_Pool;
-      Storage_Address          :    out System.Address;
-      Size_In_Storage_Elements :        Storage_Count;
-      Alignment                :        Storage_Count;
-      Subpool                  :        not null Subpools.Subpool_Handle);
+   overriding procedure Allocate_From_Subpool (Pool : in out Tracked_Pool;
+      Storage_Address                               :    out System.Address;
+      Size_In_Storage_Elements :    Storage_Count; Alignment : Storage_Count;
+      Subpool :        not null Subpools.Subpool_Handle);
 
-   overriding procedure Deallocate_Subpool
-     (Pool    : in out Tracked_Pool;
+   overriding procedure Deallocate_Subpool (Pool : in out Tracked_Pool;
       Subpool : in out Subpools.Subpool_Handle);
 
    use Ada.Containers;
@@ -65,18 +60,14 @@ private
       Subpool                  : Tracked_Subpool_Handle;
    end record;
 
-   package Allocator_Info_Maps is new Ordered_Maps
-     (Key_Type     => Address,
-      Element_Type => Allocator_Info,
-      "<"          => "<",
-      "="          => "=");
+   package Allocator_Info_Maps is new Ordered_Maps (Key_Type => Address,
+      Element_Type => Allocator_Info, "<" => "<", "=" => "=");
 
    function Empty_Map return Allocator_Info_Maps.Map is
      (Allocator_Info_Maps.Empty_Map);
 
    package Serialized_Allocator_Info_Maps is new Cdb4001_Serializer_Generic
-     (Allocator_Info_Maps.Map,
-      Initial_Value => Empty_Map);
+     (Allocator_Info_Maps.Map, Initial_Value => Empty_Map);
 
    type Tracked_Pool is new Subpools.Root_Storage_Pool_With_Subpools with
    record
@@ -94,8 +85,7 @@ private
    function Nil return Allocated_Storage_Ref is (null);
 
    package Serialized_Allocated_Storage_Refs is new Cdb4001_Serializer_Generic
-     (Allocated_Storage_Ref,
-      Initial_Value => Nil);
+     (Allocated_Storage_Ref, Initial_Value => Nil);
 
    type Tracked_Subpool is new Subpools.Root_Subpool with record
       First_In_Subpool : Serialized_Allocated_Storage_Refs.Protected_State;

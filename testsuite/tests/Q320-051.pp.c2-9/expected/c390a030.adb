@@ -33,9 +33,8 @@ package body C390a030 is
    end Bad_Final_Values;                                 -- Aggregate with
    -- positional assoc.
 
-   procedure Assign_Officer
-     (Ma : in out Medium_Alert_Type;
-      To : in     Person_Enum)
+   procedure Assign_Officer (Ma : in out Medium_Alert_Type;
+      To                        : in     Person_Enum)
    is
    begin
       Ma.Action_Officer := To;

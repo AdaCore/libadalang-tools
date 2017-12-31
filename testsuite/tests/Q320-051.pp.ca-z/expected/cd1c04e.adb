@@ -77,8 +77,7 @@ begin
       "CAN BE GIVEN FOR A DERIVED RECORD TYPE EVEN " &
       "IF THE REPRESENTATION IS INHERITED FROM " &
       "THE PARENT, AND THAT THE REPRESENTATION " &
-      "CLAUSE FOR THE DERIVED TYPE OVERRIDES THAT " &
-      "OF THE PARENT TYPE");
+      "CLAUSE FOR THE DERIVED TYPE OVERRIDES THAT " & "OF THE PARENT TYPE");
 
    if Derived_Type'Size = Ident_Int (Parent_Type'Size) then
       Failed ("DERIVED_TYPE'SIZE WAS INHERITED FROM " & "PARENT_TYPE");
@@ -90,10 +89,8 @@ begin
       Failed ("THE VALUES OF DERIVED_TYPE COMPONENTS WERE " & "INCORRECT");
    end if;
 
-   if Rec.I'Position = P_Rec.I'Position or
-     Rec.C'Position = P_Rec.C'Position or
-     Rec.B'Position = P_Rec.B'Position or
-     Rec.E'Position = P_Rec.E'Position
+   if Rec.I'Position = P_Rec.I'Position or Rec.C'Position = P_Rec.C'Position or
+     Rec.B'Position = P_Rec.B'Position or Rec.E'Position = P_Rec.E'Position
    then
       Failed
         ("THE POSITIONS OF DERIVED_TYPE COMPONENTS WERE " &
@@ -102,18 +99,15 @@ begin
 
    if Rec.I'First_Bit = P_Rec.I'First_Bit or
      Rec.C'First_Bit = P_Rec.C'First_Bit or
-     Rec.B'First_Bit = P_Rec.B'First_Bit or
-     Rec.E'First_Bit = P_Rec.E'First_Bit
+     Rec.B'First_Bit = P_Rec.B'First_Bit or Rec.E'First_Bit = P_Rec.E'First_Bit
    then
       Failed
         ("THE FIRST_BITS OF DERIVED_TYPE COMPONENTS WERE " &
          "INHERITED FROM PARENT_TYPE");
    end if;
 
-   if Rec.I'Last_Bit = P_Rec.I'Last_Bit or
-     Rec.C'Last_Bit = P_Rec.C'Last_Bit or
-     Rec.B'Last_Bit = P_Rec.B'Last_Bit or
-     Rec.E'Last_Bit = P_Rec.E'Last_Bit
+   if Rec.I'Last_Bit = P_Rec.I'Last_Bit or Rec.C'Last_Bit = P_Rec.C'Last_Bit or
+     Rec.B'Last_Bit = P_Rec.B'Last_Bit or Rec.E'Last_Bit = P_Rec.E'Last_Bit
    then
       Failed
         ("THE LAST_BITS OF DERIVED_TYPE COMPONENTS WERE " &

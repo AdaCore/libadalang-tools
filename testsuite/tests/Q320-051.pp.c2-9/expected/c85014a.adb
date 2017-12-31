@@ -105,8 +105,7 @@ begin
    Test
      ("C85014A",
       "CHECK THAT THE NUMBER OF FORMAL PARAMETERS IS " &
-      "USED TO DETERMINE WHICH SUBPROGRAM OR ENTRY " &
-      "IS BEING RENAMED");
+      "USED TO DETERMINE WHICH SUBPROGRAM OR ENTRY " & "IS BEING RENAMED");
 
    declare
       procedure Proc1 (J1 : in out Integer) renames Proc;

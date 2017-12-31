@@ -79,11 +79,9 @@ begin
 
       -- ISO_646 Characters
 
-      Char_1,
-      Tc_Char_1 : Character :=
+      Char_1, Tc_Char_1 : Character :=
         Ada.Characters.Latin_1.Nul;    -- Control Char
-      Char_2,
-      Tc_Char_2 : Character :=
+      Char_2, Tc_Char_2 : Character :=
         Ada.Characters.Latin_1.Colon;  -- Graphic Char
       Char_3, Tc_Char_3 : Character := '4';
       Char_4, Tc_Char_4 : Character := 'Z';
@@ -94,10 +92,8 @@ begin
       -- Non-ISO_646 Characters
 
       Char_Array : array (6 .. 10) of Character :=
-        (Ada.Characters.Latin_1.Ssa,
-         Ada.Characters.Latin_1.Cent_Sign,
-         Ada.Characters.Latin_1.Cedilla,
-         Ada.Characters.Latin_1.Uc_A_Ring,
+        (Ada.Characters.Latin_1.Ssa, Ada.Characters.Latin_1.Cent_Sign,
+         Ada.Characters.Latin_1.Cedilla, Ada.Characters.Latin_1.Uc_A_Ring,
          Ada.Characters.Latin_1.Lc_A_Ring);
 
       Tc_Char : constant Character := '*';
@@ -118,8 +114,7 @@ begin
       Tc_Str_4 : String (1 .. 7) := "abc*efg";
 
       Str_5 : String (1 .. 3) :=
-        Ada.Characters.Latin_1.Lc_E_Grave &
-        Ada.Characters.Latin_1.Lc_T &
+        Ada.Characters.Latin_1.Lc_E_Grave & Ada.Characters.Latin_1.Lc_T &
         Ada.Characters.Latin_1.Lc_E_Acute;
       Tc_Str_5 : String (1 .. 3) := "*t*";
 
@@ -163,8 +158,7 @@ begin
 
          if not Ada.Characters.Handling.Is_Iso_646 (Str) then
             return Ada.Characters.Handling.To_Iso_646
-                (Item       => Str,
-                 Substitute => New_Iso_646_Char);
+                (Item => Str, Substitute => New_Iso_646_Char);
          else
             return Str;
          end if;
@@ -187,12 +181,8 @@ begin
       Validate_Character (Char_4);
       Validate_Character (Char_5);
 
-      if Char_1 /= Tc_Char_1 or
-        Char_2 /= Tc_Char_2 or
-        Char_3 /= Tc_Char_3 or
-        Char_4 /= Tc_Char_4 or
-        Char_5 /= Tc_Char_5
-      then
+      if Char_1 /= Tc_Char_1 or Char_2 /= Tc_Char_2 or Char_3 /= Tc_Char_3 or
+        Char_4 /= Tc_Char_4 or Char_5 /= Tc_Char_5 then
          Report.Failed ("Incorrect ISO_646 character substitution");
       end if;
 
@@ -205,8 +195,7 @@ begin
       for I in 6 .. 10 loop
          if Char_Array (I) /= Tc_Char then
             Report.Failed
-              ("Character position " &
-               Integer'Image (I) &
+              ("Character position " & Integer'Image (I) &
                " not replaced correctly");
          end if;
       end loop;
@@ -222,12 +211,8 @@ begin
       Str_4 := Validate_String (Str_4);
       Str_5 := Validate_String (Str_5);
 
-      if Str_1 /= Tc_Str_1 or
-        Str_2 /= Tc_Str_2 or
-        Str_3 /= Tc_Str_3 or
-        Str_4 /= Tc_Str_4 or
-        Str_5 /= Tc_Str_5
-      then
+      if Str_1 /= Tc_Str_1 or Str_2 /= Tc_Str_2 or Str_3 /= Tc_Str_3 or
+        Str_4 /= Tc_Str_4 or Str_5 /= Tc_Str_5 then
          Report.Failed ("Incorrect ISO_646 character substitution in string");
       end if;
 

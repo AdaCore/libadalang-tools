@@ -9,8 +9,7 @@ package body Cc54001_1 is
    begin
       Stack_Of_Messages.Push (Message_Stack, Message_0'Access); -- Static.
       Stack_Of_Messages.Push
-        (Message_Stack,
-         new Message'(Message_1));         -- Dynamic.
+        (Message_Stack, new Message'(Message_1));         -- Dynamic.
       Stack_Of_Messages.Push (Message_Stack, Message_2'Access); -- Static.
       Stack_Of_Messages.Push
         (Message_Stack,                    -- Dynamic.

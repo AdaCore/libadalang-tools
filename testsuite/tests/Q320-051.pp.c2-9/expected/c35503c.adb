@@ -53,8 +53,7 @@ begin
    Test
      ("C35503C",
       "THE ATTIBUTES 'IMAGE' AND 'VALUE' YIELD THE " &
-      "CORRECT RESULTS WHEN THE PREFIX IS AN " &
-      "INTEGER TYPE");
+      "CORRECT RESULTS WHEN THE PREFIX IS AN " & "INTEGER TYPE");
 -- PART (A).
 
    begin

@@ -41,8 +41,7 @@ begin
       "A 'SIZE' CLAUSE MAY BE GIVEN IN THE PRIVATE " &
       "PART OF A PACKAGE FOR AN INCOMPLETE TYPE, " &
       "WHOSE FULL DECLARATION IS AN INTEGER " &
-      "TYPE, DECLARED IN THE VISIBLE PART OF THE " &
-      "SAME PACKAGE");
+      "TYPE, DECLARED IN THE VISIBLE PART OF THE " & "SAME PACKAGE");
    declare
       package Pack is
          Specified_Size : constant := Integer'Size / 2;
@@ -67,8 +66,7 @@ begin
 
       if X'Size < Specified_Size then
          Failed
-           ("OBJECT SIZE TOO SMALL -- CHECK_TYPE_1.  " &
-            "VALUE IS" &
+           ("OBJECT SIZE TOO SMALL -- CHECK_TYPE_1.  " & "VALUE IS" &
             Check_Type_1'Image (X));
       end if;
 

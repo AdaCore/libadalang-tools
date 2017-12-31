@@ -71,9 +71,7 @@ begin
       N2 : A3                        := new A1'(1, 2, 3, 4);
       N3 : array (1 .. 7) of Integer := (1, 2, 3, 4, 5, 6, 7);
       N4 : A4                        :=
-        (1 => (1, 2, 3, 4),
-         2 => (5, 6, 7, 8),
-         3 => (9, 10, 11, 12),
+        (1 => (1, 2, 3, 4), 2 => (5, 6, 7, 8), 3 => (9, 10, 11, 12),
          4 => (13, 14, 15, 16));
       N5 : R (4) := (Length => 4, S => "ABCD");
 
@@ -87,11 +85,8 @@ begin
          return N2;
       end F2;
 
-      procedure P1
-        (X : in     Integer;
-         Y : in out Integer;
-         Z :    out Integer;
-         W : in     String)
+      procedure P1 (X : in Integer; Y : in out Integer; Z : out Integer;
+         W            : in String)
       is
       begin
          if X /= 2 then
@@ -200,19 +195,15 @@ begin
          Failed ("WRONG VALUE FOR EXPRESSION - N4");
       end if;
       N4 (3) (1) := 20;
-      if N4 /=
-        ((1, 2, 3, 4), (5, 6, 7, 8), (20, 10, 11, 12), (13, 14, 15, 16))
+      if N4 /= ((1, 2, 3, 4), (5, 6, 7, 8), (20, 10, 11, 12), (13, 14, 15, 16))
       then
          Failed ("WRONG TARGET FOR ASSIGNMENT - N4");
       end if;
       N4 :=
-        (1 => (0, 6, 4, 2),
-         2 => (10, 11, 12, 13),
-         3 => (14, 15, 16, 17),
+        (1 => (0, 6, 4, 2), 2 => (10, 11, 12, 13), 3 => (14, 15, 16, 17),
          4 => (7, 5, 3, 1));
       P1 (N4 (1) (4), N4 (4) (3), N4 (2) (1), "N4");
-      if N4 /=
-        ((0, 6, 4, 2), (9, 11, 12, 13), (14, 15, 16, 17), (7, 5, 8, 1))
+      if N4 /= ((0, 6, 4, 2), (9, 11, 12, 13), (14, 15, 16, 17), (7, 5, 8, 1))
       then
          Failed ("WRONG TARGET FOR (IN) OUT PARAMETER - N4");
       end if;

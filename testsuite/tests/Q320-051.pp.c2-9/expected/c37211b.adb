@@ -61,8 +61,7 @@ begin
       "IN THE RANGE OF THE DISCRIMINANT WHERE THE " &
       "TYPE MARK DENOTES A PRIVATE OR LIMITED " &
       "PRIVATE TYPE, AND THE DISCRIMINANT " &
-      "CONSTRAINT OCCURS AFTER THE FULL " &
-      "DECLARATION OF THE TYPE");
+      "CONSTRAINT OCCURS AFTER THE FULL " & "DECLARATION OF THE TYPE");
 
    begin
       declare
@@ -73,8 +72,7 @@ begin
          begin
             Failed
               ("NO EXCEPTION RAISED AT THE " &
-               "ELABORATION OF SUBTYPE SUBPRIV " &
-               Boolean'Image (Sp.L));
+               "ELABORATION OF SUBTYPE SUBPRIV " & Boolean'Image (Sp.L));
          end;
       exception
          when others =>
@@ -98,8 +96,7 @@ begin
          begin
             Failed
               ("NO EXCEPTION RAISED AT THE " &
-               "ELABORATION OF SUBTYPE SUBLIM" &
-               Boolean'Image (Sl.L));
+               "ELABORATION OF SUBTYPE SUBLIM" & Boolean'Image (Sl.L));
          end;
       exception
          when others =>
@@ -122,8 +119,7 @@ begin
             Par : Parr;
          begin
             Failed
-              ("NO EXCEPTION RAISED AT THE " &
-               "ELABORATION OF TYPE PARR " &
+              ("NO EXCEPTION RAISED AT THE " & "ELABORATION OF TYPE PARR " &
                Boolean'Image (Par (1).L));
          end;
       exception
@@ -146,8 +142,7 @@ begin
             Lar : Larr;
          begin
             Failed
-              ("NO EXCEPTION RAISED AT THE " &
-               "ELABORATION OF TYPE LARR " &
+              ("NO EXCEPTION RAISED AT THE " & "ELABORATION OF TYPE LARR " &
                Boolean'Image (Lar (1).L));
          end;
       exception
@@ -173,8 +168,7 @@ begin
             P1 : Priv1;
          begin
             Failed
-              ("NO EXCEPTION RAISED AT THE " &
-               "ELABORATION OF TYPE PRIV1 " &
+              ("NO EXCEPTION RAISED AT THE " & "ELABORATION OF TYPE PRIV1 " &
                Boolean'Image (P1.X.L));
          end;
       exception
@@ -200,8 +194,7 @@ begin
             L1 : Lim1;
          begin
             Failed
-              ("NO EXCEPTION RAISED AT THE " &
-               "ELABORATION OF TYPE LIM1 " &
+              ("NO EXCEPTION RAISED AT THE " & "ELABORATION OF TYPE LIM1 " &
                Boolean'Image (L1.X.L));
          end;
       exception
@@ -224,8 +217,7 @@ begin
             Acp : Accpriv;
          begin
             Failed
-              ("NO EXCEPTION RAISED AT THE " &
-               "ELABORATION OF TYPE ACCPRIV " &
+              ("NO EXCEPTION RAISED AT THE " & "ELABORATION OF TYPE ACCPRIV " &
                Boolean'Image (Acp.L));
          end;
       exception
@@ -248,8 +240,7 @@ begin
             Acl : Acclim;
          begin
             Failed
-              ("NO EXCEPTION RAISED AT THE " &
-               "ELABORATION OF TYPE ACCLIM " &
+              ("NO EXCEPTION RAISED AT THE " & "ELABORATION OF TYPE ACCLIM " &
                Boolean'Image (Acl.L));
          end;
       exception
@@ -272,8 +263,7 @@ begin
             Np : Newpriv;
          begin
             Failed
-              ("NO EXCEPTION RAISED AT THE " &
-               "ELABORATION OF TYPE NEWPRIV " &
+              ("NO EXCEPTION RAISED AT THE " & "ELABORATION OF TYPE NEWPRIV " &
                Boolean'Image (Np.L));
          end;
       exception
@@ -296,8 +286,7 @@ begin
             Nl : Newlim;
          begin
             Failed
-              ("NO EXCEPTION RAISED AT THE " &
-               "ELABORATION OF TYPE NEWLIM " &
+              ("NO EXCEPTION RAISED AT THE " & "ELABORATION OF TYPE NEWLIM " &
                Boolean'Image (Nl.L));
          end;
       exception
@@ -317,8 +306,7 @@ begin
          P : Priv (Ident_Bool (True));
       begin
          Failed
-           ("NO EXCEPTION RAISED AT THE DECLARATION OF " &
-            "P " &
+           ("NO EXCEPTION RAISED AT THE DECLARATION OF " & "P " &
             Boolean'Image (P.L));
       exception
          when others =>
@@ -337,8 +325,7 @@ begin
          L : Lim (Ident_Bool (True));
       begin
          Failed
-           ("NO EXCEPTION RAISED AT THE DECLARATION OF " &
-            "L " &
+           ("NO EXCEPTION RAISED AT THE DECLARATION OF " & "L " &
             Boolean'Image (L.L));
       exception
          when others =>
@@ -360,8 +347,7 @@ begin
             Pn : Priv_Name := new Priv (Ident_Bool (True));
          begin
             Failed
-              ("NO EXCEPTION RAISED AT THE " &
-               "DECLARATION OF OBJECT PN " &
+              ("NO EXCEPTION RAISED AT THE " & "DECLARATION OF OBJECT PN " &
                Boolean'Image (Pn.L));
          exception
             when others =>
@@ -386,8 +372,7 @@ begin
             Ln : Lim_Name := new Lim (Ident_Bool (True));
          begin
             Failed
-              ("NO EXCEPTION RAISED AT THE " &
-               "DECLARATION OF OBJECT LN " &
+              ("NO EXCEPTION RAISED AT THE " & "DECLARATION OF OBJECT LN " &
                Boolean'Image (Ln.L));
          exception
             when others =>
@@ -420,8 +405,7 @@ begin
             Bp : Bad_Priv;
          begin
             Failed
-              ("NO EXCEPTION RAISED AT THE " &
-               "DECLARATION OF OBJECT BP " &
+              ("NO EXCEPTION RAISED AT THE " & "DECLARATION OF OBJECT BP " &
                Boolean'Image (Bp.D));
          exception
             when others =>
@@ -454,8 +438,7 @@ begin
             Bl : Bad_Lim;
          begin
             Failed
-              ("NO EXCEPTION RAISED AT THE " &
-               "DECLARATION OF OBJECT BL " &
+              ("NO EXCEPTION RAISED AT THE " & "DECLARATION OF OBJECT BL " &
                Boolean'Image (Bl.D));
          exception
             when others =>

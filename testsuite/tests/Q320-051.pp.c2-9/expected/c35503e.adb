@@ -56,8 +56,7 @@ begin
 
       procedure P (I1 : Int; Str : String) is
          subtype Subint is
-           Int range
-             Int'Val (Ident_Int (-1_000)) ..
+           Int range Int'Val (Ident_Int (-1_000)) ..
                Int'Val (Ident_Int (1_000));
       begin
 
@@ -151,15 +150,11 @@ begin
          begin
             if Int'Value (Str1) = I1 then
                Failed
-                 ("NO EXCEPTION RAISED - INT'VALUE " &
-                  "WITH " &
-                  Str2 &
+                 ("NO EXCEPTION RAISED - INT'VALUE " & "WITH " & Str2 &
                   " - EQUAL");
             else
                Failed
-                 ("NO EXCEPTION RAISED " &
-                  "- INT'VALUE WITH " &
-                  Str2 &
+                 ("NO EXCEPTION RAISED " & "- INT'VALUE WITH " & Str2 &
                   " - NOT EQUAL");
             end if;
          exception
@@ -171,15 +166,11 @@ begin
          begin
             if Subint'Value (Str1) = I1 then
                Failed
-                 ("NO EXCEPTION RAISED - " &
-                  "SUBINT'VALUE WITH " &
-                  Str2 &
+                 ("NO EXCEPTION RAISED - " & "SUBINT'VALUE WITH " & Str2 &
                   " - EQUAL");
             else
                Failed
-                 ("NO EXCEPTION RAISED - " &
-                  "SUBINT'VALUE WITH " &
-                  Str2 &
+                 ("NO EXCEPTION RAISED - " & "SUBINT'VALUE WITH " & Str2 &
                   " - NOT EQUAL");
             end if;
          exception

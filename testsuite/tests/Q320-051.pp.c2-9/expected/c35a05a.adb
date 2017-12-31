@@ -61,12 +61,8 @@ procedure C35a05a is
 
    -------------------------------------------------------------------
 
-   procedure Check_Fore_And_Aft
-     (Name         : String;
-      Actual_Fore  : Integer;
-      Correct_Fore : Positive;
-      Actual_Aft   : Integer;
-      Correct_Aft  : Positive)
+   procedure Check_Fore_And_Aft (Name : String; Actual_Fore : Integer;
+      Correct_Fore : Positive; Actual_Aft : Integer; Correct_Aft : Positive)
    is
    begin
       if Actual_Fore /= Ident_Int (Correct_Fore) then
@@ -82,31 +78,18 @@ begin
    Test
      ("C35A05A",
       "CHECK THAT FOR FIXED POINT TYPES THE FORE AND " &
-      "AFT ATTRIBUTES YIELD THE CORRECT VALUES - " &
-      "BASIC TYPES");
+      "AFT ATTRIBUTES YIELD THE CORRECT VALUES - " & "BASIC TYPES");
 
    Check_Fore_And_Aft ("LEFT_OUT_M1", Left_Out_M1'Fore, 2, Left_Out_M1'Aft, 1);
 
    Check_Fore_And_Aft
-     ("LEFT_EDGE_M1",
-      Left_Edge_M1'Fore,
-      2,
-      Left_Edge_M1'Aft,
-      1);
+     ("LEFT_EDGE_M1", Left_Edge_M1'Fore, 2, Left_Edge_M1'Aft, 1);
 
    Check_Fore_And_Aft
-     ("RIGHT_EDGE_M1",
-      Right_Edge_M1'Fore,
-      2,
-      Right_Edge_M1'Aft,
-      1);
+     ("RIGHT_EDGE_M1", Right_Edge_M1'Fore, 2, Right_Edge_M1'Aft, 1);
 
    Check_Fore_And_Aft
-     ("RIGHT_OUT_M1",
-      Right_Out_M1'Fore,
-      2,
-      Right_Out_M1'Aft,
-      1);
+     ("RIGHT_OUT_M1", Right_Out_M1'Fore, 2, Right_Out_M1'Aft, 1);
 
    Check_Fore_And_Aft ("MIDDLE_M2", Middle_M2'Fore, 2, Middle_M2'Aft, 1);
 
@@ -117,10 +100,7 @@ begin
    Check_Fore_And_Aft ("MIDDLE_M16", Middle_M16'Fore, 5, Middle_M16'Aft, 2);
 
    Check_Fore_And_Aft
-     ("LIKE_DURATION_M23",
-      Like_Duration_M23'Fore,
-      6,
-      Like_Duration_M23'Aft,
+     ("LIKE_DURATION_M23", Like_Duration_M23'Fore, 6, Like_Duration_M23'Aft,
       2);
 
    Check_Fore_And_Aft ("DECIMAL_M18", Decimal_M18'Fore, 6, Decimal_M18'Aft, 1);
@@ -135,53 +115,25 @@ begin
    Check_Fore_And_Aft ("DECIMAL_M11", Decimal_M11'Fore, 4, Decimal_M11'Aft, 2);
 
    Check_Fore_And_Aft
-     ("DECIMAL2_M18",
-      Decimal2_M18'Fore,
-      5,
-      Decimal2_M18'Aft,
-      1);
+     ("DECIMAL2_M18", Decimal2_M18'Fore, 5, Decimal2_M18'Aft, 1);
 
    Check_Fore_And_Aft
-     ("ST_LEFT_EDGE_M6",
-      St_Left_Edge_M6'Fore,
-      2,
-      St_Left_Edge_M6'Aft,
-      2);
+     ("ST_LEFT_EDGE_M6", St_Left_Edge_M6'Fore, 2, St_Left_Edge_M6'Aft, 2);
 
    Check_Fore_And_Aft
-     ("ST_MIDDLE_M14",
-      St_Middle_M14'Fore,
-      4,
-      St_Middle_M14'Aft,
-      2);
+     ("ST_MIDDLE_M14", St_Middle_M14'Fore, 4, St_Middle_M14'Aft, 2);
 
    Check_Fore_And_Aft
-     ("ST_MIDDLE_M2",
-      St_Middle_M2'Fore,
-      2,
-      St_Middle_M2'Aft,
-      1);
+     ("ST_MIDDLE_M2", St_Middle_M2'Fore, 2, St_Middle_M2'Aft, 1);
 
    Check_Fore_And_Aft
-     ("ST_MIDDLE_M3",
-      St_Middle_M3'Fore,
-      2,
-      St_Middle_M3'Aft,
-      1);
+     ("ST_MIDDLE_M3", St_Middle_M3'Fore, 2, St_Middle_M3'Aft, 1);
 
    Check_Fore_And_Aft
-     ("ST_DECIMAL_M7",
-      St_Decimal_M7'Fore,
-      5,
-      St_Decimal_M7'Aft,
-      1);
+     ("ST_DECIMAL_M7", St_Decimal_M7'Fore, 5, St_Decimal_M7'Aft, 1);
 
    Check_Fore_And_Aft
-     ("ST_DECIMAL_M3",
-      St_Decimal_M3'Fore,
-      4,
-      St_Decimal_M3'Aft,
-      1);
+     ("ST_DECIMAL_M3", St_Decimal_M3'Fore, 4, St_Decimal_M3'Aft, 1);
 
    Result;
 

@@ -71,8 +71,7 @@ procedure C43204e is
       Ra12 : Arr12 := (others => Ident_Int (2));
       Ra13 : Arr13 := (others => Ident_Int (2));
       Ra21 : Arr21 :=
-        ((1, 1, 1),
-         (1, 1, 1),
+        ((1, 1, 1), (1, 1, 1),
          others => (Ident_Int (2), Ident_Int (2), Ident_Int (2)));
       Ra22 : Arr22 := (others => (others => Ident_Int (2)));
       Ra23 : Arr23 :=

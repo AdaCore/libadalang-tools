@@ -73,12 +73,8 @@ begin
       Part5 : Bs80.Bounded_String := Bs80.To_Bounded_String ("tilt");
       Part6 : String (1 .. 3)     := "ski";
 
-      Full_Catenate_String,
-      Full_Append_String,
-      Constructed_String,
-      Drop_String,
-      Replicated_String,
-      Token_String : Bs80.Bounded_String;
+      Full_Catenate_String, Full_Append_String, Constructed_String,
+      Drop_String, Replicated_String, Token_String : Bs80.Bounded_String;
 
       Chara : Character := 'A';
       Charb : Character := 'B';
@@ -157,8 +153,7 @@ begin
         (2 * Strb) &                           -- "AABBBB"
         (3 * Bs80."*" (2, Charc)) &              -- "AABBBBCCCCCC"
         Bs80.Replicate
-          (3,
-           Bs80.Replicate (2, Chard)) &  -- "AABBBBCCCCCCDDDDDD"
+          (3, Bs80.Replicate (2, Chard)) &  -- "AABBBBCCCCCCDDDDDD"
         Bs80.Replicate (2, Stre) &               -- "AABBBBCCCCCCDDDDDDEEEE"
         Bs80.Replicate (2, Charf);               -- "AABBBBCCCCCCDDDDDDEEEEFF"
 
@@ -178,8 +173,7 @@ begin
       if Bs80.Element (Drop_String, 1) /= 'A' or
         Bs80.Element (Drop_String, 6) /= 'B' or
         Bs80.Element (Drop_String, 76) /= 'A' or
-        Bs80.Element (Drop_String, 80) /= 'A'
-      then
+        Bs80.Element (Drop_String, 80) /= 'A' then
          Report.Failed ("Incorrect result from Replicate with Drop");
       end if;
 
@@ -253,9 +247,7 @@ begin
 
          Bs80.Find_Token
            (Bs80.Head (Token_String, 10),  -- Default pad.
-            A_Set,
-            Ada.Strings.Inside,
-            Start,
+            A_Set, Ada.Strings.Inside, Start,
             Stop);
 
          if Start /= 1 and Stop /= 1 then
@@ -268,9 +260,7 @@ begin
          Bs80.Find_Token
            (Bs80.Head (Token_String, 5),            -- "ABCDE"
             Ada.Strings.Maps."OR" (A_Set, B_Set),   -- Set (AB)
-            Ada.Strings.Outside,
-            Start,
-            Stop);
+            Ada.Strings.Outside, Start, Stop);
 
          if Start /= 3 and Stop /= 5 then
             Report.Failed ("Incorrect result from Find_Token - 2");
@@ -283,12 +273,9 @@ begin
 
          Bs80.Find_Token
            (Bs80.Tail
-              (Token_String,
-               8,
-               Ada.Strings.Space),         -- "  ABCDEF"
+              (Token_String, 8, Ada.Strings.Space),         -- "  ABCDEF"
             Ada.Strings.Maps."OR" (C_Set, D_Set),  -- Set (CD)
-            Ada.Strings.Inside,
-            Start,
+            Ada.Strings.Inside, Start,
             Stop);
 
          if Start /= 5 and Stop /= 6 then
@@ -300,23 +287,18 @@ begin
          -- Token_String = "ABCDEF"
 
          Bs80.Replace_Element
-           (Token_String,
-            3,
-            Bs80.Element (Token_String, 4));
+           (Token_String, 3, Bs80.Element (Token_String, 4));
 
          -- Token_String = "ABDDEF"
 
          Bs80.Replace_Element
-           (Source => Token_String,
-            Index  => 2,
+           (Source => Token_String, Index => 2,
             By     => Bs80.Element (Token_String, 5));
 
          -- Token_String = "AEDDEF"
 
          Bs80.Replace_Element
-           (Token_String,
-            1,
-            Bs80.Element (Bs80.Tail (Token_String, 2), 2));
+           (Token_String, 1, Bs80.Element (Bs80.Tail (Token_String, 2), 2));
 
          -- Token_String = "FEDDEF"
          -- Evaluate this result.
@@ -327,8 +309,7 @@ begin
              Bs80.Count (Token_String, E_Set) or
            Bs80.Index_Non_Blank (Bs80.Head (Token_String, 6)) /=
              Bs80.Index_Non_Blank (Bs80.Tail (Token_String, 6)) or
-           Bs80.Head (Token_String, 1) /= Bs80.Tail (Token_String, 1)
-         then
+           Bs80.Head (Token_String, 1) /= Bs80.Tail (Token_String, 1) then
             Report.Failed ("Incorrect result from operations in combination");
          end if;
 

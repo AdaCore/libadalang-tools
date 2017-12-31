@@ -53,10 +53,8 @@ begin
 
    Test
      ("CE2201M",
-      "CHECK THAT READ, WRITE, AND " &
-      "END_OF_FILE ARE SUPPORTED FOR " &
-      "SEQUENTIAL FILES - RECORD WITHOUT " &
-      "DISCRIMINANTS");
+      "CHECK THAT READ, WRITE, AND " & "END_OF_FILE ARE SUPPORTED FOR " &
+      "SEQUENTIAL FILES - RECORD WITHOUT " & "DISCRIMINANTS");
 
    declare
       type Rec is record

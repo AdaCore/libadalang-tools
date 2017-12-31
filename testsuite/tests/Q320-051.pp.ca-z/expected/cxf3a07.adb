@@ -73,8 +73,7 @@ begin
      ("CXF3A07",
       "Check that Ada.Text_IO.Editing.Put and " &
       "Ada.Strings.Fixed.Move have the same " &
-      "effect in putting edited output results " &
-      "into string variables");
+      "effect in putting edited output results " & "into string variables");
    Test_Block :
    declare
 
@@ -89,10 +88,8 @@ begin
 
       package Pack_Ndp is          -- Uses decimal type with delta 1.0.
       new Editing.Decimal_Output
-        (Num                => Fxf3a00.Decimal_Type_Ndp,
-         Default_Currency   => "$",
-         Default_Fill       => '*',
-         Default_Separator  => ',',
+        (Num => Fxf3a00.Decimal_Type_Ndp, Default_Currency => "$",
+         Default_Fill       => '*', Default_Separator => ',',
          Default_Radix_Mark => '.');
 
       Tc_Picture    : Editing.Picture;
@@ -129,8 +126,7 @@ begin
 
          Tc_Picture :=
            Editing.To_Picture
-             (Fxf3a00.Valid_Strings (I).all,
-              Blank_When_Zero => False);
+             (Fxf3a00.Valid_Strings (I).all, Blank_When_Zero => False);
 
          -- Determine the actual length of the edited output string that is
          -- expected from Put and Image.
@@ -152,27 +148,18 @@ begin
             -- the two different methods (Put and Move).
 
             Pack_2dp.Put
-              (To         => Tc_Put_String_20,
-               Item       => Fxf3a00.Data_With_2dp (I),
-               Pic        => Tc_Picture,
-               Currency   => "$",
-               Fill       => '*',
-               Separator  => ',',
-               Radix_Mark => '.');
+              (To => Tc_Put_String_20, Item => Fxf3a00.Data_With_2dp (I),
+               Pic       => Tc_Picture, Currency => "$", Fill => '*',
+               Separator => ',', Radix_Mark => '.');
 
             Ada.Strings.Fixed.Move
               (Source =>
                  Pack_2dp.Image
-                   (Item       => Fxf3a00.Data_With_2dp (I),
-                    Pic        => Tc_Picture,
-                    Currency   => "$",
-                    Fill       => '*',
-                    Separator  => ',',
+                   (Item       => Fxf3a00.Data_With_2dp (I), Pic => Tc_Picture,
+                    Currency   => "$", Fill => '*', Separator => ',',
                     Radix_Mark => '.'),
-               Target  => Tc_Move_String_20,
-               Drop    => Ada.Strings.Error,
-               Justify => Ada.Strings.Right,
-               Pad     => Ada.Strings.Space);
+               Target  => Tc_Move_String_20, Drop => Ada.Strings.Error,
+               Justify => Ada.Strings.Right, Pad => Ada.Strings.Space);
 
             -- Each receiving string object is now filled with the edited
             -- output result, right justified. Compare these two string objects
@@ -189,8 +176,7 @@ begin
                Report.Failed
                  ("Failed case where the output string is " &
                   "longer than the length of the edited " &
-                  "output result, loop #" &
-                  Integer'Image (I));
+                  "output result, loop #" & Integer'Image (I));
             end if;
 
          exception
@@ -198,14 +184,12 @@ begin
                Report.Failed
                  ("Layout_Error raised when the output string " &
                   "is longer than the length of the edited " &
-                  "output result, loop #" &
-                  Integer'Image (I));
+                  "output result, loop #" & Integer'Image (I));
             when others =>
                Report.Failed
                  ("Exception raised when the output string is " &
                   "longer than the length of the edited " &
-                  "output result, loop #" &
-                  Integer'Image (I));
+                  "output result, loop #" & Integer'Image (I));
          end;
       end loop;
 
@@ -229,15 +213,13 @@ begin
                -- parameters in the various calls where possible.
 
                Pack_2dp.Put
-                 (To   => Tc_Put_String_17,
-                  Item => Fxf3a00.Data_With_2dp (I),
-                  Pic  => Tc_Picture);
+                 (To  => Tc_Put_String_17, Item => Fxf3a00.Data_With_2dp (I),
+                  Pic => Tc_Picture);
 
                Ada.Strings.Fixed.Move
                  (Source =>
                     Pack_2dp.Image
-                      (Item => Fxf3a00.Data_With_2dp (I),
-                       Pic  => Tc_Picture),
+                      (Item => Fxf3a00.Data_With_2dp (I), Pic => Tc_Picture),
                   Target => Tc_Move_String_17);
 
                -- Each receiving string object is now filled with the edited
@@ -245,13 +227,11 @@ begin
                -- expected edited output value.
 
                if Fxf3a00.Edited_Output (I).all /= Tc_Put_String_17 or
-                 Fxf3a00.Edited_Output (I).all /= Tc_Move_String_17
-               then
+                 Fxf3a00.Edited_Output (I).all /= Tc_Move_String_17 then
                   Report.Failed
                     ("Failed case where the output string is " &
                      "the exact length of the edited output " &
-                     "result, loop #" &
-                     Integer'Image (I));
+                     "result, loop #" & Integer'Image (I));
                end if;
 
             when others =>
@@ -286,15 +266,12 @@ begin
          -- two different methods (Put and Move).
 
          Pack_Ndp.Put
-           (Tc_Put_String_8,
-            Fxf3a00.Data_With_Ndp (I - Tc_Offset),
+           (Tc_Put_String_8, Fxf3a00.Data_With_Ndp (I - Tc_Offset),
             Tc_Picture);
 
          Ada.Strings.Fixed.Move
            (Pack_Ndp.Image (Fxf3a00.Data_With_Ndp (I - Tc_Offset), Tc_Picture),
-            Tc_Move_String_8,
-            Ada.Strings.Error,
-            Ada.Strings.Right,
+            Tc_Move_String_8, Ada.Strings.Error, Ada.Strings.Right,
             Ada.Strings.Space);
 
          -- Determine if there is a difference in length between the receiving
@@ -326,8 +303,7 @@ begin
                   Report.Failed
                     ("Failed case where the output string is " &
                      "longer than the length of the edited " &
-                     "output result, loop #" &
-                     Integer'Image (I) &
+                     "output result, loop #" & Integer'Image (I) &
                      ", using data with no decimal places");
                end if;
             end;
@@ -343,10 +319,8 @@ begin
             then
                Report.Failed
                  ("Failed case where the output string is " &
-                  "the same length as the edited output " &
-                  "result, loop #" &
-                  Integer'Image (I) &
-                  ", using data with no decimal places");
+                  "the same length as the edited output " & "result, loop #" &
+                  Integer'Image (I) & ", using data with no decimal places");
             end if;
          end if;
       end loop;

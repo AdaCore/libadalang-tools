@@ -48,11 +48,7 @@ procedure C380002 is
 
    type R1;
 
-   type R2
-     (D0 : Integer;
-      D1 : access R1;
-      D2 : Integer;
-      D3 : Integer)
+   type R2 (D0 : Integer; D1 : access R1; D2 : Integer; D3 : Integer)
    is limited null record;
 
    type R1 is limited record

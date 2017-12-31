@@ -12,14 +12,12 @@ package body Ca11018_0 is
    -- Instantiate the public child for the secret message.
 
    package Designated_Pkg is new Ca11018_0.Ca11018_1
-     (Msg_Type => Designated_Msg,
-      Count    => Designated_Num);
+     (Msg_Type => Designated_Msg, Count => Designated_Num);
 
    -- Instantiate the public child for the top secret message.
 
    package Particularly_Designated_Pkg is new Ca11018_0.Ca11018_1
-     (Particularly_Designated_Msg,
-      Particularly_Designated_Num);
+     (Particularly_Designated_Msg, Particularly_Designated_Num);
 
    -- End instantiations. -----------------------------
 
@@ -40,9 +38,8 @@ package body Ca11018_0 is
    -- Calls functions from public child to search for a key word. If the word
    -- appears more than once in each message, highlight all of them.
 
-   procedure Highlight_Designated
-     (The_Word       : in     Message;
-      In_The_Message : in out Designated_Msg)
+   procedure Highlight_Designated (The_Word : in     Message;
+      In_The_Message                        : in out Designated_Msg)
    is
 
    -- Not a real highlight procedure. Real application can use graphic device
@@ -64,8 +61,7 @@ package body Ca11018_0 is
 
    end Highlight_Designated;
    --------------------------------------------------------------
-   procedure Highlight_Particularly_Designated
-     (The_Word       : in     Message;
+   procedure Highlight_Particularly_Designated (The_Word : in     Message;
       In_The_Message : in out Particularly_Designated_Msg)
    is
 
@@ -79,8 +75,7 @@ package body Ca11018_0 is
       --------------------------------------------------------------
 
       if Particularly_Designated_Pkg.Find_Word     -- Child's operation.
-          (The_Word, In_The_Message) >
-        0
+          (The_Word, In_The_Message) > 0
       then
 
          -- Highlight all occurrences in chartreuse. Do other more secret

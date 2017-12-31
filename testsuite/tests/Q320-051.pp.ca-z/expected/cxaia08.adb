@@ -63,8 +63,7 @@ procedure Cxaia08 is
      Fxaia00.Value_In_Ptr_Array;
 
    package My_Indefinite_Vectors is new Ada.Containers.Indefinite_Vectors
-     (Index_Type   => Natural,
-      Element_Type => String); -- Default =
+     (Index_Type => Natural, Element_Type => String); -- Default =
 
    package My_Sorting is new My_Indefinite_Vectors.Generic_Sorting
      ("<" => ">");
@@ -76,9 +75,8 @@ procedure Cxaia08 is
 
    My_Index_1 : Natural;
 
-   procedure Tampering_Check
-     (Container : in out My_Indefinite_Vectors.Vector;
-      Where     : in     String)
+   procedure Tampering_Check (Container : in out My_Indefinite_Vectors.Vector;
+      Where                             : in     String)
    is
 
       Program_Error_Raised : Boolean := False;
@@ -131,8 +129,7 @@ begin
    begin
 
       Tampering_Check
-        (Container => My_Vector_1,
-         Where     => "Constant_Reference (index form)");
+        (Container => My_Vector_1, Where => "Constant_Reference (index form)");
 
    end;
 
@@ -144,8 +141,7 @@ begin
    begin
 
       Tampering_Check
-        (Container => My_Vector_1,
-         Where     => "Reference (index form)");
+        (Container => My_Vector_1, Where => "Reference (index form)");
 
    end;
 
@@ -170,8 +166,7 @@ begin
    begin
 
       Tampering_Check
-        (Container => My_Vector_1,
-         Where     => "Reference (cursor form)");
+        (Container => My_Vector_1, Where => "Reference (cursor form)");
 
    end;
 
@@ -180,10 +175,8 @@ begin
    -- -- in a way that corresponds to likely usage.
 
    declare
-      procedure Test
-        (Value     : in String;
-         Expected  : in String;
-         Test_Case : in String)
+      procedure Test (Value : in String; Expected : in String;
+         Test_Case          : in String)
       is
       begin
          Tampering_Check (Container => My_Vector_1, Where => Test_Case);
@@ -196,11 +189,8 @@ begin
          end if;
       end Test;
 
-      procedure Test_And_Mod
-        (Value     : in out String;
-         Expected  : in     String;
-         New_Item  : in     String;
-         Test_Case : in     String) with
+      procedure Test_And_Mod (Value : in out String; Expected : in String;
+         New_Item                   : in String; Test_Case : in String) with
          Pre => Value'Length = New_Item'Length
        is
       begin
@@ -222,8 +212,7 @@ begin
       Test
         (Value =>
            My_Indefinite_Vectors.Constant_Reference
-             (My_Vector_1,
-              Index => My_Index_1)
+             (My_Vector_1, Index => My_Index_1)
              .Element.all,
          Expected  => "00", -- Value_In_Ptr_Array (1).all
          Test_Case => "Constant_Reference normal indexing");
@@ -232,53 +221,44 @@ begin
         (Value =>
            My_Indefinite_Vectors.Reference (My_Vector_1, Index => My_Index_1)
              .Element.all,
-         Expected  => "00",
-         New_Item  => "12",
+         Expected  => "00", New_Item => "12",
          Test_Case => "Reference normal indexing");
 
       Test
         (Value =>
            My_Indefinite_Vectors.Constant_Reference
-             (My_Vector_1,
-              Position => My_Cursor_1)
+             (My_Vector_1, Position => My_Cursor_1)
              .Element.all,
-         Expected  => "12",
-         Test_Case => "Constant_Reference normal cursor");
+         Expected => "12", Test_Case => "Constant_Reference normal cursor");
 
       Test_And_Mod
         (Value =>
            My_Indefinite_Vectors.Reference
-             (My_Vector_1,
-              Position => My_Cursor_1)
+             (My_Vector_1, Position => My_Cursor_1)
              .Element.all,
-         Expected  => "12",
-         New_Item  => "35",
+         Expected  => "12", New_Item => "35",
          Test_Case => "Reference normal cursor");
 
       -- Prefix call with all components explicit:
       Test
         (Value =>
            My_Vector_1.Constant_Reference (Index => My_Index_1).Element.all,
-         Expected  => "35",
-         Test_Case => "Constant_Reference prefix indexing");
+         Expected => "35", Test_Case => "Constant_Reference prefix indexing");
 
       Test_And_Mod
         (Value     => My_Vector_1.Reference (Index => My_Index_1).Element.all,
-         Expected  => "35",
-         New_Item  => "58",
+         Expected  => "35", New_Item => "58",
          Test_Case => "Reference prefix indexing");
 
       Test
         (Value =>
            My_Vector_1.Constant_Reference (Position => My_Cursor_1)
              .Element.all,
-         Expected  => "58",
-         Test_Case => "Constant_Reference prefix cursor");
+         Expected => "58", Test_Case => "Constant_Reference prefix cursor");
 
       Test_And_Mod
         (Value => My_Vector_1.Reference (Position => My_Cursor_1).Element.all,
-         Expected  => "58",
-         New_Item  => "7B",
+         Expected  => "58", New_Item => "7B",
          Test_Case => "Reference prefix cursor");
 
       -- Prefix call using a generalized reference (implicit dereference):
@@ -289,8 +269,7 @@ begin
 
       Test_And_Mod
         (Value     => My_Vector_1.Reference (Index => My_Index_1),
-         Expected  => "7B",
-         New_Item  => "9E",
+         Expected  => "7B", New_Item => "9E",
          Test_Case => "Reference generalized indexing");
 
       Test
@@ -300,8 +279,7 @@ begin
 
       Test_And_Mod
         (Value     => My_Vector_1.Reference (Position => My_Cursor_1),
-         Expected  => "9E",
-         New_Item  => "C2",
+         Expected  => "9E", New_Item => "C2",
          Test_Case => "Reference generalized cursor");
 
       -- Object indexing, everything implicit.
@@ -312,8 +290,7 @@ begin
 
       Test_And_Mod
         (Value     => My_Vector_1 (My_Index_1), -- Variable_Indexing
-         Expected  => "C2",
-         New_Item  => "D5",
+         Expected  => "C2", New_Item => "D5",
          Test_Case => "Object indexing by index");
 
       Test
@@ -378,8 +355,7 @@ begin
       for E of My_Vector_1 loop
 
          Tampering_Check
-           (Container => My_Vector_1,
-            Where     => "reading forward of loop");
+           (Container => My_Vector_1, Where => "reading forward of loop");
 
          Pos_Of_First_Char := Character'Pos (E (1));
 
@@ -407,8 +383,7 @@ begin
       for E of reverse My_Vector_1 loop
 
          Tampering_Check
-           (Container => My_Vector_1,
-            Where     => "reading reverse of loop");
+           (Container => My_Vector_1, Where => "reading reverse of loop");
 
          Pos_Of_First_Char := Character'Pos (E (1));
 
@@ -436,8 +411,7 @@ begin
       for C in My_Vector_1.Iterate loop
 
          Tampering_Check
-           (Container => My_Vector_1,
-            Where     => "reading forward in loop");
+           (Container => My_Vector_1, Where => "reading forward in loop");
 
          Pos_Of_First_Char := Character'Pos (My_Vector_1 (C) (1));
 
@@ -465,8 +439,7 @@ begin
       for C in reverse My_Vector_1.Iterate loop
 
          Tampering_Check
-           (Container => My_Vector_1,
-            Where     => "reading reverse in loop");
+           (Container => My_Vector_1, Where => "reading reverse in loop");
 
          Pos_Of_First_Char := Character'Pos (My_Vector_1 (C) (1));
 
@@ -607,8 +580,7 @@ begin
       for E of My_Vector_1 loop
 
          Tampering_Check
-           (Container => My_Vector_1,
-            Where     => "writing of loop");
+           (Container => My_Vector_1, Where => "writing of loop");
 
          -- Note that have to write something of the same length as
          -- the existing element otherwise will fail length check,
@@ -625,8 +597,7 @@ begin
       for I in Fxaia00.Array_Bounds_Type loop
 
          if My_Indefinite_Vectors.Element (Position => My_Cursor_1) /=
-           My_Default_Value
-         then
+           My_Default_Value then
 
             Report.Failed ("Data set by of loop not as expected");
 

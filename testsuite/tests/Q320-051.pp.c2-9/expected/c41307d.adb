@@ -37,8 +37,7 @@ begin
       "CHECK THAT L.R IS ALLOWED INSIDE A PACKAGE, " &
       "GENERIC PACKAGE, SUBPROGRAM, GENERIC " &
       "SUBPROGRAM, TASK, BLOCK, LOOP, OR AN ACCEPT " &
-      "STATEMENT NAMED L, IF R IS DECLARED INSIDE " &
-      "THE UNIT");
+      "STATEMENT NAMED L, IF R IS DECLARED INSIDE " & "THE UNIT");
    declare
       package L is
          R : Integer := 5;
@@ -62,9 +61,7 @@ begin
       package body M is
          Y : Integer := M.S + 1;
       begin
-         if Ident_Int (X) /= 2 or
-           Ident_Int (Y) /= 3 or
-           Ident_Int (M.X) /= 2
+         if Ident_Int (X) /= 2 or Ident_Int (Y) /= 3 or Ident_Int (M.X) /= 2
          then
             Failed ("INCORRECT RESULTS FROM EXPANDED NAME - 2");
          end if;

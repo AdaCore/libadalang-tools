@@ -62,8 +62,7 @@ procedure Cxai010 is
       Default_Value => My_Default_Value;
 
    package My_Bounded_Vectors is new Ada.Containers.Bounded_Vectors
-     (Index_Type   => Natural,
-      Element_Type => My_Float); -- Default =
+     (Index_Type => Natural, Element_Type => My_Float); -- Default =
 
    package My_Sorting is new My_Bounded_Vectors.Generic_Sorting ("<" => ">");
    -- Sort in reverse order to check is using what specified not simply <
@@ -90,9 +89,8 @@ procedure Cxai010 is
 
    My_Index_1 : Natural;
 
-   procedure Tampering_Check
-     (Container : in out My_Bounded_Vectors.Vector;
-      Where     : in     String) with
+   procedure Tampering_Check (Container : in out My_Bounded_Vectors.Vector;
+      Where                             : in     String) with
       Pre => not Container.Is_Empty
     is
 
@@ -255,8 +253,7 @@ begin
          begin
 
             Tampering_Check
-              (Container => My_Vector_1,
-               Where     => "Query_Element");
+              (Container => My_Vector_1, Where => "Query_Element");
 
             if Element /= Value_In_Array (I) then
 
@@ -270,8 +267,7 @@ begin
       begin
 
          if My_Bounded_Vectors.Element (Position => My_Cursor_1) /=
-           Value_In_Array (I)
-         then
+           Value_In_Array (I) then
 
             Report.Failed
               ("Mismatch between element and what was appended #2");
@@ -283,14 +279,12 @@ begin
          if I mod 2 = 0 then
 
             My_Bounded_Vectors.Query_Element
-              (Position => My_Cursor_1,
-               Process  => My_Query'Access);
+              (Position => My_Cursor_1, Process => My_Query'Access);
 
          else
 
             My_Vector_1.Query_Element
-              (Index   => Natural (I) - 1,
-               Process => My_Query'Access);
+              (Index => Natural (I) - 1, Process => My_Query'Access);
 
          end if;
 
@@ -334,16 +328,14 @@ begin
    -- Test To_Cursor and To_Index
 
    if My_Vector_1.To_Cursor (Index => My_Vector_1.First_Index) /=
-     My_Vector_1.First
-   then
+     My_Vector_1.First then
 
       Report.Failed ("To_Cursor failed");
 
    end if;
 
    if My_Bounded_Vectors.To_Index (My_Vector_1.First) /=
-     My_Vector_1.First_Index
-   then
+     My_Vector_1.First_Index then
 
       Report.Failed ("To_Index failed");
 
@@ -368,8 +360,7 @@ begin
    for I in reverse Array_Bounds_Type loop
 
       if My_Bounded_Vectors.Element (Position => My_Cursor_2) /=
-        Value_In_Array (I)
-      then
+        Value_In_Array (I) then
 
          Report.Failed ("Mismatch between element and what was prepended");
 
@@ -434,8 +425,7 @@ begin
       begin
 
          Tampering_Check
-           (Container => My_Vector_3,
-            Where     => "Reverse_Iterate");
+           (Container => My_Vector_3, Where => "Reverse_Iterate");
 
          if My_Bounded_Vectors.Element (Position) /= Value_In_Array (I) then
 
@@ -475,8 +465,7 @@ begin
          begin
 
             Tampering_Check
-              (Container => My_Vector_2,
-               Where     => "Update_Element");
+              (Container => My_Vector_2, Where => "Update_Element");
 
             Element := Element * 2.0;
 
@@ -489,14 +478,12 @@ begin
          if I mod 2 = 0 then
 
             My_Vector_1.Replace_Element
-              (Position => My_Cursor_1,
-               New_Item => Value_In_Array (I) * 2.0);
+              (Position => My_Cursor_1, New_Item => Value_In_Array (I) * 2.0);
 
          else
 
             My_Vector_1.Replace_Element
-              (Index    => Natural (I) - 1,
-               New_Item => Value_In_Array (I) * 2.0);
+              (Index => Natural (I) - 1, New_Item => Value_In_Array (I) * 2.0);
 
          end if;
 
@@ -506,14 +493,12 @@ begin
          if I mod 3 = 0 then
 
             My_Vector_2.Update_Element
-              (Position => My_Cursor_2,
-               Process  => My_Update'Access);
+              (Position => My_Cursor_2, Process => My_Update'Access);
 
          else
 
             My_Vector_2.Update_Element
-              (Index   => Natural (I) - 1,
-               Process => My_Update'Access);
+              (Index => Natural (I) - 1, Process => My_Update'Access);
 
          end if;
 
@@ -553,8 +538,7 @@ begin
    for I in Array_Bounds_Type loop
 
       if My_Bounded_Vectors.Element (Position => My_Cursor_1) /=
-        Value_In_Array (Num_Tests - I + 1)
-      then
+        Value_In_Array (Num_Tests - I + 1) then
 
          Report.Failed ("Reversed array not as expected");
 
@@ -594,8 +578,7 @@ begin
    for I in Array_Bounds_Type loop
 
       if My_Bounded_Vectors.Element (Position => My_Cursor_1) /=
-        Value_In_Array (I)
-      then
+        Value_In_Array (I) then
 
          Report.Failed ("Target vector not as expected after move");
 
@@ -664,8 +647,7 @@ begin
    -- Default_Value, Value_In_Array (2), Value_In_Array (2)
 
    My_Vector_2.Swap
-     (I => My_Vector_2.First,
-      J => My_Cursor_2); -- First of added elements
+     (I => My_Vector_2.First, J => My_Cursor_2); -- First of added elements
 
    -- The order should now be Default_Value, Value_In_Array (1), Default_Value,
    -- Default_Value, Value_In_Array (2), Value_In_Array (2)
@@ -674,7 +656,7 @@ begin
      (I => My_Vector_2.Last_Index,
    -- Much easier decrementing an index than repeated calls of Previous of a
    -- cursor
-      J => My_Vector_2.Last_Index - 2);
+    J => My_Vector_2.Last_Index - 2);
 
    -- The order should now be Default_Value, Value_In_Array (1), Default_Value,
    -- Value_In_Array (2), Value_In_Array (2), Default_Value
@@ -682,8 +664,7 @@ begin
    My_Cursor_2 := My_Vector_2.First;
 
    -- Check = Default_Value
-   if My_Bounded_Vectors.Element (Position => My_Cursor_2) /=
-     My_Default_Value
+   if My_Bounded_Vectors.Element (Position => My_Cursor_2) /= My_Default_Value
    then
 
       Report.Failed ("Inserted value not as expected #1");
@@ -693,8 +674,7 @@ begin
    My_Bounded_Vectors.Next (Position => My_Cursor_2);
 
    if My_Bounded_Vectors.Element (Position => My_Cursor_2) /=
-     Value_In_Array (1)
-   then
+     Value_In_Array (1) then
 
       Report.Failed ("Inserted value not as expected #2");
 
@@ -703,8 +683,7 @@ begin
    My_Bounded_Vectors.Next (Position => My_Cursor_2);
 
    -- Check = Default_Value
-   if My_Bounded_Vectors.Element (Position => My_Cursor_2) /=
-     My_Default_Value
+   if My_Bounded_Vectors.Element (Position => My_Cursor_2) /= My_Default_Value
    then
 
       Report.Failed ("Inserted value not as expected #3");
@@ -714,8 +693,7 @@ begin
    My_Bounded_Vectors.Next (Position => My_Cursor_2);
 
    if My_Bounded_Vectors.Element (Position => My_Cursor_2) /=
-     Value_In_Array (2)
-   then
+     Value_In_Array (2) then
 
       Report.Failed ("Inserted value not as expected #4");
 
@@ -724,8 +702,7 @@ begin
    My_Bounded_Vectors.Next (Position => My_Cursor_2);
 
    if My_Bounded_Vectors.Element (Position => My_Cursor_2) /=
-     Value_In_Array (2)
-   then
+     Value_In_Array (2) then
 
       Report.Failed ("Inserted value not as expected #5");
 
@@ -734,8 +711,7 @@ begin
    My_Bounded_Vectors.Next (Position => My_Cursor_2);
 
    -- Check = Default_Value
-   if My_Bounded_Vectors.Element (Position => My_Cursor_2) /=
-     My_Default_Value
+   if My_Bounded_Vectors.Element (Position => My_Cursor_2) /= My_Default_Value
    then
 
       Report.Failed ("Inserted value not as expected #6");
@@ -1017,8 +993,7 @@ begin
 
          Big_Vector.Insert
            (Before   => Big_Vector.Find (Item => Value_In_Array (7)),
-            New_Item => Value_In_Array (1),
-            Count    => 5);
+            New_Item => Value_In_Array (1), Count => 5);
 
       exception
 
@@ -1062,9 +1037,7 @@ begin
       begin
 
          Big_Vector.Insert
-           (Before   => 14,
-            New_Item => Value_In_Array (1),
-            Count    => 6);
+           (Before => 14, New_Item => Value_In_Array (1), Count => 6);
 
       exception
 
@@ -1174,8 +1147,7 @@ begin
    My_Cursor_1 := My_Vector_1.Find (Item => Value_In_Array (3));
 
    My_Vector_1.Insert
-     (Before   => My_Cursor_1,
-      New_Item => My_Vector_2.First_Element);
+     (Before => My_Cursor_1, New_Item => My_Vector_2.First_Element);
 
    My_Vector_2.Delete_First;
 
@@ -1233,8 +1205,7 @@ begin
    My_Cursor_1 := My_Vector_1.First;
 
    if My_Bounded_Vectors.Element (Position => My_Cursor_1) /=
-     Value_In_Array (1)
-   then
+     Value_In_Array (1) then
 
       Report.Failed ("Value not as expected #1");
 
@@ -1243,8 +1214,7 @@ begin
    My_Bounded_Vectors.Next (Position => My_Cursor_1);
 
    if My_Bounded_Vectors.Element (Position => My_Cursor_1) /=
-     Value_In_Array (9)
-   then
+     Value_In_Array (9) then
 
       Report.Failed ("Value not as expected #2");
 
@@ -1253,8 +1223,7 @@ begin
    My_Bounded_Vectors.Next (Position => My_Cursor_1);
 
    if My_Bounded_Vectors.Element (Position => My_Cursor_1) /=
-     Value_In_Array (2)
-   then
+     Value_In_Array (2) then
 
       Report.Failed ("Value not as expected #3");
 
@@ -1263,8 +1232,7 @@ begin
    My_Bounded_Vectors.Next (Position => My_Cursor_1);
 
    -- Check = Default_Value
-   if My_Bounded_Vectors.Element (Position => My_Cursor_1) /=
-     My_Default_Value
+   if My_Bounded_Vectors.Element (Position => My_Cursor_1) /= My_Default_Value
    then
 
       Report.Failed ("Value not as expected #4");
@@ -1274,8 +1242,7 @@ begin
    My_Bounded_Vectors.Next (Position => My_Cursor_1);
 
    if My_Bounded_Vectors.Element (Position => My_Cursor_1) /=
-     Value_In_Array (3)
-   then
+     Value_In_Array (3) then
 
       Report.Failed ("Value not as expected #5");
 
@@ -1284,8 +1251,7 @@ begin
    My_Bounded_Vectors.Next (Position => My_Cursor_1);
 
    if My_Bounded_Vectors.Element (Position => My_Cursor_1) /=
-     Value_In_Array (4)
-   then
+     Value_In_Array (4) then
 
       Report.Failed ("Value not as expected #6");
 
@@ -1294,8 +1260,7 @@ begin
    My_Bounded_Vectors.Next (Position => My_Cursor_1);
 
    if My_Bounded_Vectors.Element (Position => My_Cursor_1) /=
-     Value_In_Array (7)
-   then
+     Value_In_Array (7) then
 
       Report.Failed ("Value not as expected #7");
 
@@ -1304,8 +1269,7 @@ begin
    My_Bounded_Vectors.Next (Position => My_Cursor_1);
 
    if My_Bounded_Vectors.Element (Position => My_Cursor_1) /=
-     Value_In_Array (5)
-   then
+     Value_In_Array (5) then
 
       Report.Failed ("Value not as expected #8");
 
@@ -1314,8 +1278,7 @@ begin
    My_Bounded_Vectors.Next (Position => My_Cursor_1);
 
    if My_Bounded_Vectors.Element (Position => My_Cursor_1) /=
-     Value_In_Array (6)
-   then
+     Value_In_Array (6) then
 
       Report.Failed ("Value not as expected #9");
 
@@ -1324,8 +1287,7 @@ begin
    My_Bounded_Vectors.Next (Position => My_Cursor_1);
 
    if My_Bounded_Vectors.Element (Position => My_Cursor_1) /=
-     Value_In_Array (7)
-   then
+     Value_In_Array (7) then
 
       Report.Failed ("Value not as expected #10");
 
@@ -1334,8 +1296,7 @@ begin
    My_Bounded_Vectors.Next (Position => My_Cursor_1);
 
    if My_Bounded_Vectors.Element (Position => My_Cursor_1) /=
-     Value_In_Array (8)
-   then
+     Value_In_Array (8) then
 
       Report.Failed ("Value not as expected #11");
 
@@ -1344,8 +1305,7 @@ begin
    My_Bounded_Vectors.Next (Position => My_Cursor_1);
 
    if My_Bounded_Vectors.Element (Position => My_Cursor_1) /=
-     Value_In_Array (10)
-   then
+     Value_In_Array (10) then
 
       Report.Failed ("Value not as expected #12");
 
@@ -1488,13 +1448,11 @@ begin
 
    My_Vector_1 :=
      My_Bounded_Vectors.To_Vector
-       (New_Item => My_Default_Value,
-        Length   => Capacity_Reqd);
+       (New_Item => My_Default_Value, Length => Capacity_Reqd);
 
    for I in Array_Bounds_Type loop
 
-      if My_Vector_1.Element (Index => Natural (I) - 1) /=
-        My_Default_Value
+      if My_Vector_1.Element (Index => Natural (I) - 1) /= My_Default_Value
       then
 
          Report.Failed ("To_Vector didn't create vector of given value");
@@ -1534,8 +1492,7 @@ begin
       begin
 
          My_Vector_1.Insert_Space
-           (Before => My_Vector_1.Last_Index,
-            Count  => Capacity_Reqd);
+           (Before => My_Vector_1.Last_Index, Count => Capacity_Reqd);
 
       exception
 
@@ -1621,24 +1578,21 @@ begin
 
    My_Vector_3 :=
      My_Bounded_Vectors.Copy
-       (Source   => My_Vector_1 & My_Vector_2,
-        Capacity => Capacity_Reqd);
+       (Source => My_Vector_1 & My_Vector_2, Capacity => Capacity_Reqd);
 
    -- My Vector_3 should now contain Value_In_Array (2), Value_In_Array (3),
    -- Value_In_Array (4), Value_In_Array (5)
 
    My_Vector_3 :=
      My_Bounded_Vectors.Copy
-       (Source   => My_Vector_3 & Value_In_Array (6),
-        Capacity => Capacity_Reqd);
+       (Source => My_Vector_3 & Value_In_Array (6), Capacity => Capacity_Reqd);
 
    -- My Vector_3 should now contain Value_In_Array (2), Value_In_Array (3),
    -- Value_In_Array (4), Value_In_Array (5), Value_In_Array (6)
 
    My_Vector_3 :=
      My_Bounded_Vectors.Copy
-       (Source   => Value_In_Array (1) & My_Vector_3,
-        Capacity => Capacity_Reqd);
+       (Source => Value_In_Array (1) & My_Vector_3, Capacity => Capacity_Reqd);
 
    -- My Vector_3 should now contain Value_In_Array (1), Value_In_Array
    -- (2), Value_In_Array (3), Value_In_Array (4), Value_In_Array (5),
@@ -1658,8 +1612,7 @@ begin
    for I in 0 .. 7 loop
 
       if My_Vector_3.Element (Index => I) /=
-        Value_In_Array (Ada.Containers.Count_Type (I) + 1)
-      then
+        Value_In_Array (Ada.Containers.Count_Type (I) + 1) then
 
          Report.Failed ("Value after & not as expected");
 

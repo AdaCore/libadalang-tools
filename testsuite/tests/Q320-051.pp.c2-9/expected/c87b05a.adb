@@ -64,8 +64,7 @@ begin
       if Err then
          Failed
            ("RESOLUTION INCORRECT - INTEGER TYPE " &
-            "DEFINITIONS MUST HAVE INTEGER TYPE " &
-            "RANGE BOUNDS");
+            "DEFINITIONS MUST HAVE INTEGER TYPE " & "RANGE BOUNDS");
       end if;
    end;
 

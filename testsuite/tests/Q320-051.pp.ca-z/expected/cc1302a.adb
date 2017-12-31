@@ -99,8 +99,7 @@ begin
 
 -- CHECK VAL ATTRIBUTE
             begin
-               if T'Val (T'Pos (T'Succ (T'Last))) /=
-                 T'Val (T'Pos (T'Last) + 1)
+               if T'Val (T'Pos (T'Succ (T'Last))) /= T'Val (T'Pos (T'Last) + 1)
                then
                   Failed
                     ("VAL OR POS ATTRIBUTE HAS " & "INCONSISTENT RESULTS");
@@ -116,8 +115,7 @@ begin
 -- CHECK VAL FUNCTION
             begin
                if Tt'Val (Tt'Pos (Tt'Succ (Tt'Last))) /=
-                 Tt'Val (Tt'Pos (Tt'Last) + 1)
-               then
+                 Tt'Val (Tt'Pos (Tt'Last) + 1) then
                   Failed ("VAL FUNCTION GIVES INCORRECT " & "RESULTS");
                end if;
             exception

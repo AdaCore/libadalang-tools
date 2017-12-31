@@ -35,8 +35,7 @@ begin
      ("C45344A",
       "CHECK THAT THE CORRECT RESULT IS PRODUCED " &
       "WHEN A FUNCTION RETURNS THE RESULT OF A " &
-      "CATENATION WHOSE BOUNDS ARE NOT DEFINED " &
-      "STATICALLY");
+      "CATENATION WHOSE BOUNDS ARE NOT DEFINED " & "STATICALLY");
 
    declare
       subtype Int is Integer range Ident_Int (1) .. Ident_Int (30);

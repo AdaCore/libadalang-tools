@@ -33,8 +33,7 @@ begin
    Test
      ("C74207B",
       "AFTER THE FULL DECLARATION OF A PRIVATE " &
-      "TYPE DERIVED FROM A PRIVATE TYPE, " &
-      "'CONSTRAINED MAY BE APPLIED");
+      "TYPE DERIVED FROM A PRIVATE TYPE, " & "'CONSTRAINED MAY BE APPLIED");
 
    declare
       package P1 is

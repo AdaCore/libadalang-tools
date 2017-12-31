@@ -63,10 +63,7 @@ procedure C910001 is
 
    -- This table is used to create the messages and to check them
    Tc_Table : array (1 .. Tc_Number_Of_Messages'Last) of Tc_Rec :=
-     ((10, 6, False),
-      (20, 2, False),
-      (30, 9, False),
-      (40, 1, False),
+     ((10, 6, False), (20, 2, False), (30, 9, False), (40, 1, False),
       (50, Default_Priority, False));
 
 begin -- C910001
@@ -85,10 +82,8 @@ begin -- C910001
       --
       type Acc_Transaction_Record is access Transaction_Record;
 
-      task type Message_Task
-        (In_Message  : Acc_Transaction_Record := null;
-         In_Priority : App_Priority           := Default_Priority)
-      is
+      task type Message_Task (In_Message : Acc_Transaction_Record := null;
+         In_Priority                     : App_Priority := Default_Priority) is
          entry Start;
       end Message_Task;
       type Acc_Message_Task is access Message_Task;

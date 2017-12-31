@@ -53,8 +53,7 @@ begin
    Report.Test
      ("CXD1006",
       "Check the priority of a task containing" &
-      " an Interrupt_Priority pragma without the" &
-      " optional expression");
+      " an Interrupt_Priority pragma without the" & " optional expression");
    declare
       task Check_It is
          pragma Interrupt_Priority; -- N/A => Error.
@@ -68,13 +67,11 @@ begin
             Report.Failed
               ("expected task priority to be" &
                System.Any_Priority'Image (System.Interrupt_Priority'Last) &
-               " but the priority was" &
-               System.Any_Priority'Image (P));
+               " but the priority was" & System.Any_Priority'Image (P));
          else
             if Verbose then
                Report.Comment
-                 ("priority is" &
-                  System.Any_Priority'Image (P) &
+                 ("priority is" & System.Any_Priority'Image (P) &
                   " which is System.Interrupt_Priority'Last");
             end if;
          end if;

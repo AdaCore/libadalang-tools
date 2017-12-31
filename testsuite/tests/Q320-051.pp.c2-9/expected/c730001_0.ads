@@ -106,9 +106,8 @@ package C730001_0 is
 
    -- The Answer procedure for type Phone implements a phone status change
    -- operation.
-   procedure Answer
-     (The_Phone : in out Phone;
-      Ind       : in     Indicator_Type := Light);
+   procedure Answer (The_Phone : in out Phone;
+      Ind                      : in     Indicator_Type := Light);
    -- ...Other general clock and/or phone operations (not specified in this
    -- test scenario).
 

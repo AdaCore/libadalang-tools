@@ -50,8 +50,7 @@ begin
    Test
      ("C83023A",
       "CHECK THAT A DECLARATION IN A DECLARATIVE " &
-      "REGION OF A TASK HIDES AN OUTER " &
-      "DECLARATION OF A HOMOGRAPH");
+      "REGION OF A TASK HIDES AN OUTER " & "DECLARATION OF A HOMOGRAPH");
 
    One :
    declare                      -- DECLARATIVE REGION.

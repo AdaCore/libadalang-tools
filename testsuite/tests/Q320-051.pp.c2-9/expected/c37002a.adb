@@ -36,8 +36,7 @@ begin
      ("C37002A",
       "CHECK THAT INDEX CONSTRAINTS WITH " &
       "NON-STATIC EXPRESSIONS CAN BE USED TO " &
-      "CONSTRAIN RECORD COMPONENTS HAVING AN " &
-      "ARRAY TYPE");
+      "CONSTRAIN RECORD COMPONENTS HAVING AN " & "ARRAY TYPE");
 
    declare
       X : Integer := Ident_Int (5);
@@ -64,16 +63,9 @@ begin
       Rr : R;
 
    begin
-      if Rr.A'Last /= 5 or
-        Rr.B'First /= 5 or
-        Rr.C'Last /= 5 or
-        Rr.D'First /= 5 or
-        Rr.E'Last /= 5 or
-        Rr.F'First /= 5 or
-        Rr.G'Last /= 5 or
-        Rr.H'First /= 5 or
-        Rr.I'Last /= 5 or
-        Rr.J'First /= 5
+      if Rr.A'Last /= 5 or Rr.B'First /= 5 or Rr.C'Last /= 5 or
+        Rr.D'First /= 5 or Rr.E'Last /= 5 or Rr.F'First /= 5 or
+        Rr.G'Last /= 5 or Rr.H'First /= 5 or Rr.I'Last /= 5 or Rr.J'First /= 5
       then
 
          Failed ("WRONG VALUE FOR NON-STATIC BOUND");

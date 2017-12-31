@@ -85,8 +85,7 @@ begin
       -- exception will be handled to produce a Not_Applicable result.
 
       Text_Io.Create
-        (File => Inventory_File,
-         Mode => Text_Io.Append_File,
+        (File => Inventory_File, Mode => Text_Io.Append_File,
          Name => Inventory_Filename);
    exception
       when Text_Io.Use_Error | Text_Io.Name_Error =>
@@ -137,10 +136,8 @@ begin
          Item_Io.Put (Inventory_File, The_Item.Item_Number);
          Text_Io.Put (Inventory_File, Spacer);
          Bar_Code_Io.Put
-           (File  => Inventory_File,
-            Item  => The_Item.Bar_Code,
-            Width => 13,
-            Base  => 2);
+           (File => Inventory_File, Item => The_Item.Bar_Code, Width => 13,
+            Base => 2);
          Text_Io.New_Line (Inventory_File);
       end Update_Inventory;
 
@@ -207,8 +204,7 @@ begin
             Tc_Item_Count := Tc_Item_Count + 1;
 
             if (Tc_Item /= Inventory_List (Tc_Entry).Item_Number) or
-              (Tc_Bar_Code /= Inventory_List (Tc_Entry).Bar_Code)
-            then
+              (Tc_Bar_Code /= Inventory_List (Tc_Entry).Bar_Code) then
                Report.Failed ("Error in integer data read from file");
             end if;
          end loop;

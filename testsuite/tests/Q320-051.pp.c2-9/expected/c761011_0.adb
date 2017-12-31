@@ -48,9 +48,7 @@ package body C761011_0 is
       case Obj.D is
          when True =>
             if not Equal
-                (Boolean'Pos (Obj.Finalized),
-                 Boolean'Pos (Obj.Finalized))
-            then
+                (Boolean'Pos (Obj.Finalized), Boolean'Pos (Obj.Finalized)) then
                Failed ("Identity check - 1");
             end if;
          when False =>

@@ -41,8 +41,7 @@ package body Fb20a00 is
          Pos := Pos + 1;
       end loop;
 
-      if
-        (Pos > New_Str'Last - New_Sub'Length + 1)
+      if (Pos > New_Str'Last - New_Sub'Length + 1)
       then  -- Substring not found.
          return (False);
       else

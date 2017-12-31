@@ -86,8 +86,7 @@ procedure Cc1226b is
       Test
         ("CC1226B",
          "CHECK, FOR A FORMAL NONLIMITED PRIVATE " &
-         "TYPE THAT ALL ALLOWABLE OPERATIONS ARE " &
-         "IMPLICITLY DECLARED");
+         "TYPE THAT ALL ALLOWABLE OPERATIONS ARE " & "IMPLICITLY DECLARED");
 
       Initialize (Ndvar);
 
@@ -165,11 +164,7 @@ procedure Cc1226b is
       return 3;
    end Initialize_Other;
 
-   package Pack is new P
-     (Integer,
-      Discrec,
-      Initialize,
-      Initialize,
+   package Pack is new P (Integer, Discrec, Initialize, Initialize,
       Initialize_Other);
 
 begin

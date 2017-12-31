@@ -82,8 +82,7 @@ begin
       -- exception will be handled to produce a Not_Applicable result.
 
       Text_Io.Create
-        (File => Data_File,
-         Mode => Text_Io.Append_File,
+        (File => Data_File, Mode => Text_Io.Append_File,
          Name => Data_Filename);
 
    exception
@@ -202,9 +201,7 @@ begin
 
       Test_Verification_Block :
       declare
-         Tc_String1,
-         Tc_String2,
-         Tc_String3 : String (1 .. 80) :=
+         Tc_String1, Tc_String2, Tc_String3 : String (1 .. 80) :=
            (others => ' ');
          Tc_Length1, Tc_Length2, Tc_Length3 : Natural := 0;
       begin
@@ -239,8 +236,7 @@ begin
 
          if (Tc_String1 (1 .. Tc_Length1) /= Confidential_Item)
            or else (Tc_String2 (1 .. Tc_Length2) /= Secret_Item)
-           or else (Tc_String3 (1 .. Tc_Length3) /= Top_Secret_Item)
-         then
+           or else (Tc_String3 (1 .. Tc_Length3) /= Top_Secret_Item) then
             Report.Failed ("Corrupted data items read from file");
          end if;
 

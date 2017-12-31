@@ -66,8 +66,7 @@ begin
      ("C45253A",
       "CHECK THAT FOR FIXED POINT TYPES ""A IN T"" " &
       "AND ""A NOT IN T"" GIVE APPROPRIATE RESULTS, " &
-      "EVEN WHEN USER-DEFINED ORDERING OPERATORS " &
-      "EXIST FOR T");
+      "EVEN WHEN USER-DEFINED ORDERING OPERATORS " & "EXIST FOR T");
 
    if Ident_Int (1) * 0.0 not in T then
       Failed ("0.0 NOT IN T");

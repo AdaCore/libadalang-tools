@@ -265,8 +265,7 @@ begin
          end if;
       when others =>
          Not_Applicable
-           ("MAX_DIGITS OUT OF RANGE OF TEST.  " &
-            "MAX_DIGITS = " &
+           ("MAX_DIGITS OUT OF RANGE OF TEST.  " & "MAX_DIGITS = " &
             Integer'Image (Max_Digits));
    end case;
 

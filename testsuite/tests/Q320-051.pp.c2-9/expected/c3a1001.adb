@@ -42,20 +42,17 @@ begin
 
    -- Check the initial values.
 
-   if (Incomplete2_Obj_1.Disc /= 8) or
-     (Incomplete2_Obj_1.Id /= "Plymouth")
+   if (Incomplete2_Obj_1.Disc /= 8) or (Incomplete2_Obj_1.Id /= "Plymouth")
    then
       Report.Failed ("Wrong initial values for Incomplete2_Obj_1");
    end if;
 
-   if (Incomplete4_Obj_1.Disc /= 8) or
-     (Incomplete4_Obj_1.Id /= "Plymouth")
+   if (Incomplete4_Obj_1.Disc /= 8) or (Incomplete4_Obj_1.Id /= "Plymouth")
    then
       Report.Failed ("Wrong initial values for Incomplete4_Obj_1");
    end if;
 
-   if (Incomplete6_Obj_1.Disc /= 1) or
-     (Incomplete6_Obj_1.Get_Priv_Val /= 1)
+   if (Incomplete6_Obj_1.Disc /= 1) or (Incomplete6_Obj_1.Get_Priv_Val /= 1)
    then
       Report.Failed ("Wrong initial value for Incomplete6_Obj_1");
    end if;
@@ -66,14 +63,12 @@ begin
       Report.Failed ("Wrong values for Incomplete1_Obj_1");
    end if;
 
-   if (Incomplete5_Obj_1.Disc /= M) or
-     (Incomplete5_Obj_1.Get_Priv_Val /= M)
+   if (Incomplete5_Obj_1.Disc /= M) or (Incomplete5_Obj_1.Get_Priv_Val /= M)
    then
       Report.Failed ("Wrong value for Incomplete5_Obj_1");
    end if;
 
-   if (Incomplete6_Obj_2.Disc /= 2) or
-     (Incomplete6_Obj_2.Get_Priv_Val /= 2)
+   if (Incomplete6_Obj_2.Disc /= 2) or (Incomplete6_Obj_2.Get_Priv_Val /= 2)
    then
       Report.Failed ("Wrong value for Incomplete6_Obj_2");
    end if;

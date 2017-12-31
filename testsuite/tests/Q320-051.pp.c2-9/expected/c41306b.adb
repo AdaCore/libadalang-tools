@@ -45,8 +45,7 @@ begin
       "CHECK THAT IF  F  IS A FUNCTION RETURNING" &
       " AN ACCESS VALUE DESIGNATING" &
       " A TASK OF A TYPE HAVING AN ENTRY  E ,  AN" &
-      " ENTRY CALL OF THE FORM  F.ALL.E  IS" &
-      " PERMITTED");
+      " ENTRY CALL OF THE FORM  F.ALL.E  IS" & " PERMITTED");
 
    -------------------------------------------------------------------
 

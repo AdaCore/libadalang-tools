@@ -12,8 +12,7 @@ package body Fb40a00.Cb40a01_0 is
          if Pos > Text.all'Last then
             raise Completed_Text_Processing;
          elsif (Text.all (Pos) in 'A' .. 'Z') or
-           (Text.all (Pos) in 'a' .. 'z') or
-           (Text.all (Pos) in '0' .. '9')
+           (Text.all (Pos) in 'a' .. 'z') or (Text.all (Pos) in '0' .. '9')
          then
             Increment_Alphanumeric_Count;
          else

@@ -21,10 +21,8 @@ package body C390011_0 is
    begin  -- prepend the tag information to the list
       The_List :=
         new List_Item'
-          (The_Tag  => T,
-           Exp_Name => new String'(X_Name),
-           Ext_Tag  => new String'(X_Tag),
-           Next     => The_List);
+          (The_Tag => T, Exp_Name => new String'(X_Name),
+           Ext_Tag => new String'(X_Tag), Next => The_List);
    end Add_Tag_To_List;
 
    procedure Check_List_For_Duplicates is

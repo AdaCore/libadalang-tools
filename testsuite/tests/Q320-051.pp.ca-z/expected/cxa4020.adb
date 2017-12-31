@@ -129,8 +129,7 @@ begin
            B10.Overwrite
              (Source   => Test_String, -- "abcdefghij"
               Position => 9,
-              New_Item => Translate ("xyz"),
-              Drop     => As.Error);
+              New_Item => Translate ("xyz"), Drop => As.Error);
          Report.Failed ("Exception not raised by Function Overwrite");
       exception
          when As.Length_Error =>
@@ -145,11 +144,9 @@ begin
         B10.Overwrite
           (Source   => Test_String,  -- "abcdefghij"
            Position => B10.Length (Test_String), -- 10
-           New_Item => Translate ("xyz"),
-           Drop     => Ada.Strings.Left);
+           New_Item => Translate ("xyz"), Drop => Ada.Strings.Left);
 
-      if B10.To_Wide_String (Result_String) /=
-        Translate ("cdefghixyz")
+      if B10.To_Wide_String (Result_String) /= Translate ("cdefghixyz")
       then   -- drop a,b
          Report.Failed
            ("Incorrect result from Function Overwrite, Drop = Left");
@@ -160,9 +157,7 @@ begin
       Result_String :=
         B10.Overwrite
           (Test_String,  -- "abcdefghij"
-           3,
-           Translate ("xxxyyyzzz"),
-           Ada.Strings.Right);
+           3, Translate ("xxxyyyzzz"), Ada.Strings.Right);
 
       if B10.To_Wide_String (Result_String) /= Translate ("abxxxyyyzz") then
          Report.Failed
@@ -175,15 +170,14 @@ begin
           (B10.To_Bounded_Wide_String (Translate ("a")),
            1,                                 -- Source length = 1
            Translate ("  abc  ")) /=
-        B10.To_Bounded_Wide_String (Translate ("  abc  ")) or
+        B10.To_Bounded_Wide_String
+          (Translate ("  abc  ")) or
         B10.Overwrite
             (B10.Null_Bounded_Wide_String,      -- Null source
-             1,
-             Translate ("abcdefghij")) /=
+             1, Translate ("abcdefghij")) /=
           Atoj_Bnd_Str or
         B10.Overwrite
-            (Atoe_Bnd_Str,
-             B10.To_Wide_String (Atoe_Bnd_Str)'First,
+            (Atoe_Bnd_Str, B10.To_Wide_String (Atoe_Bnd_Str)'First,
              Translate (" ")) /=  -- New_Item = 1
           B10.To_Bounded_Wide_String (Translate (" bcde"))
       then
@@ -230,8 +224,7 @@ begin
       B10.Overwrite
         (Source   => Test_String,  -- "abcdefghij"
          Position => B10.Length (Test_String) - 2, -- 8
-         New_Item => Translate ("uvwxyz"),
-         Drop     => Ada.Strings.Left);
+         New_Item => Translate ("uvwxyz"), Drop => Ada.Strings.Left);
 
       if B10.To_Wide_String (Test_String) /= Translate ("defguvwxyz") then
          Report.Failed
@@ -243,9 +236,7 @@ begin
       Test_String := Atoj_Bnd_Str;
       B10.Overwrite
         (Test_String,  -- "abcdefghij"
-         3,
-         Translate ("xxxyyyzzz"),
-         Ada.Strings.Right);
+         3, Translate ("xxxyyyzzz"), Ada.Strings.Right);
 
       if B10.To_Wide_String (Test_String) /= Translate ("abxxxyyyzz") then
          Report.Failed
@@ -260,21 +251,17 @@ begin
         B10."&" (B10.Head (Atoj_Bnd_Str, 2), B10.Tail (Atoj_Bnd_Str, 2)) or
         B10.Delete (Atoj_Bnd_Str, 6, B10.Length (Atoj_Bnd_Str)) /=
           Atoe_Bnd_Str or
-        B10.Delete (Atoj_Bnd_Str, 1, 5) /= Ftoj_Bnd_Str
-      then
+        B10.Delete (Atoj_Bnd_Str, 1, 5) /= Ftoj_Bnd_Str then
          Report.Failed ("Incorrect result from Function Delete - 1");
       end if;
 
       if B10.Delete (B10.To_Bounded_Wide_String (Translate ("a")), 1, 1) /=
         B10.Null_Bounded_Wide_String or
         B10.Delete
-            (Atoe_Bnd_Str,
-             5,
-             B10.To_Wide_String (Atoe_Bnd_Str)'First) /=
+            (Atoe_Bnd_Str, 5, B10.To_Wide_String (Atoe_Bnd_Str)'First) /=
           Atoe_Bnd_Str or
         B10.Delete
-            (Atoe_Bnd_Str,
-             B10.To_Wide_String (Atoe_Bnd_Str)'Last,
+            (Atoe_Bnd_Str, B10.To_Wide_String (Atoe_Bnd_Str)'Last,
              B10.To_Wide_String (Atoe_Bnd_Str)'Last) /=
           B10.To_Bounded_Wide_String (Translate ("abcd"))
       then
@@ -300,15 +287,13 @@ begin
          for I in Bnd_Array_Type'Range loop
             case I is
                when 4 =>
-                  if B10.Trim (Bnd_Array (I), As.Both) /=
-                    Bnd_Array (I)
+                  if B10.Trim (Bnd_Array (I), As.Both) /= Bnd_Array (I)
                   then  -- no change
                      Report.Failed ("Incorrect result from Function Trim - 4");
                   end if;
                when 5 =>
                   if B10.Trim (Bnd_Array (I), As.Both) /=
-                    B10."&" (Text, B10."&" (Translate (' '), Text))
-                  then
+                    B10."&" (Text, B10."&" (Translate (' '), Text)) then
                      Report.Failed ("Incorrect result from Function Trim - 5");
                   end if;
                when others =>
@@ -327,10 +312,8 @@ begin
       -- Trim characters in sets from both sides of the bounded wide string.
       if B10.Trim
           (Source => B10.To_Bounded_Wide_String (Translate ("ddabbaxx")),
-           Left   => Cd_Set,
-           Right  => Xy_Set) /=
-        B10.To_Bounded_Wide_String (Translate ("abba"))
-      then
+           Left   => Cd_Set, Right => Xy_Set) /=
+        B10.To_Bounded_Wide_String (Translate ("abba")) then
          Report.Failed
            ("Incorrect result from Fn Trim - Sets, Left & Right side - 1");
       end if;
@@ -341,11 +324,9 @@ begin
       -- side, and only "xy" trimmed from right side.
 
       if B10.Trim
-          (B10.To_Bounded_Wide_String (Translate ("cdxyabcdxy")),
-           Cd_Set,
+          (B10.To_Bounded_Wide_String (Translate ("cdxyabcdxy")), Cd_Set,
            Xy_Set) /=
-        B10.To_Bounded_Wide_String (Translate ("xyabcd"))
-      then
+        B10.To_Bounded_Wide_String (Translate ("xyabcd")) then
          Report.Failed
            ("Incorrect result from Fn Trim - Sets, Left & Right side - 2");
       end if;
@@ -354,11 +335,9 @@ begin
       -- "interior" of the bounded wide string, just the appropriate ends.
 
       if B10.Trim
-          (B10.To_Bounded_Wide_String (Translate ("cdabdxabxy")),
-           Cd_Set,
+          (B10.To_Bounded_Wide_String (Translate ("cdabdxabxy")), Cd_Set,
            Xy_Set) /=
-        B10.To_Bounded_Wide_String (Translate ("abdxab"))
-      then
+        B10.To_Bounded_Wide_String (Translate ("abdxab")) then
          Report.Failed
            ("Incorrect result from Fn Trim - Sets, Left & Right side - 3");
       end if;
@@ -366,11 +345,9 @@ begin
       -- Trim characters in set from right side only. No change to Left side.
 
       if B10.Trim
-          (B10.To_Bounded_Wide_String (Translate ("abxyzddcd")),
-           Xy_Set,
+          (B10.To_Bounded_Wide_String (Translate ("abxyzddcd")), Xy_Set,
            Cd_Set) /=
-        B10.To_Bounded_Wide_String (Translate ("abxyz"))
-      then
+        B10.To_Bounded_Wide_String (Translate ("abxyz")) then
          Report.Failed ("Incorrect result from Fn Trim - Sets, Right side");
       end if;
 
@@ -384,8 +361,7 @@ begin
       if B10.Trim (Atoe_Bnd_Str, Maps.Null_Set, Maps.Null_Set) /=
         Atoe_Bnd_Str or
         B10.Trim
-            (B10.To_Bounded_Wide_String (Translate ("dcddcxyyxx")),
-             Cd_Set,
+            (B10.To_Bounded_Wide_String (Translate ("dcddcxyyxx")), Cd_Set,
              Xy_Set) /=
           B10.Null_Bounded_Wide_String
       then
@@ -423,8 +399,7 @@ begin
       Test_String := B10.To_Bounded_Wide_String (Translate ("cdabdxabxy"));
       B10.Trim (Test_String, Cd_Set, Xy_Set);
 
-      if not
-        (Test_String = B10.To_Bounded_Wide_String (Translate ("abdxab")))
+      if not (Test_String = B10.To_Bounded_Wide_String (Translate ("abdxab")))
       then
          Report.Failed
            ("Incorrect result from Proc Trim - Sets, Left & Right side - 3");
@@ -474,13 +449,10 @@ begin
 
       Result_String :=
         B10.Head
-          (B10.To_Bounded_Wide_String (Translate ("ABCDEFGHIJ")),
-           15,
-           Translate ('x'),
-           Ada.Strings.Left);
+          (B10.To_Bounded_Wide_String (Translate ("ABCDEFGHIJ")), 15,
+           Translate ('x'), Ada.Strings.Left);
 
-      if Result_String /=
-        B10.To_Bounded_Wide_String (Translate ("FGHIJxxxxx"))
+      if Result_String /= B10.To_Bounded_Wide_String (Translate ("FGHIJxxxxx"))
       then
          Report.Failed ("Incorrect result from Function Head, Drop = Left");
       end if;
@@ -495,13 +467,10 @@ begin
 
       Result_String :=
         B10.Head
-          (B10.To_Bounded_Wide_String (Translate ("ABCDEFGHI")),
-           15,
-           Translate ('x'),
-           Ada.Strings.Right);
+          (B10.To_Bounded_Wide_String (Translate ("ABCDEFGHI")), 15,
+           Translate ('x'), Ada.Strings.Right);
 
-      if Result_String /=
-        B10.To_Bounded_Wide_String (Translate ("ABCDEFGHIx"))
+      if Result_String /= B10.To_Bounded_Wide_String (Translate ("ABCDEFGHIx"))
       then
          Report.Failed ("Incorrect result from Function Head, Drop = Right");
       end if;
@@ -510,8 +479,7 @@ begin
 
       if B10.Head (B10.Null_Bounded_Wide_String, 5, Translate ('a')) /=
         B10.To_Bounded_Wide_String (Translate ("aaaaa")) or
-        B10.Head (Atoe_Bnd_Str, B10.Length (Atoe_Bnd_Str)) /= Atoe_Bnd_Str
-      then
+        B10.Head (Atoe_Bnd_Str, B10.Length (Atoe_Bnd_Str)) /= Atoe_Bnd_Str then
          Report.Failed ("Incorrect result from Function Head");
       end if;
 
@@ -522,8 +490,7 @@ begin
            B10.Tail
              (Source => Atoj_Bnd_Str,   -- max length
               Count  => B10.Length (Atoj_Bnd_Str) + 1,
-              Pad    => Ada.Strings.Wide_Space,
-              Drop   => Ada.Strings.Error);
+              Pad    => Ada.Strings.Wide_Space, Drop => Ada.Strings.Error);
          Report.Failed ("Length_Error not raised by Function Tail");
       exception
          when As.Length_Error =>
@@ -541,13 +508,10 @@ begin
 
       Result_String :=
         B10.Tail
-          (B10.To_Bounded_Wide_String (Translate ("ABCDEFGH")),
-           13,
-           Translate ('x'),
-           Ada.Strings.Left);
+          (B10.To_Bounded_Wide_String (Translate ("ABCDEFGH")), 13,
+           Translate ('x'), Ada.Strings.Left);
 
-      if Result_String /=
-        B10.To_Bounded_Wide_String (Translate ("xxABCDEFGH"))
+      if Result_String /= B10.To_Bounded_Wide_String (Translate ("xxABCDEFGH"))
       then
          Report.Failed ("Incorrect result from Function Tail, Drop = Left");
       end if;
@@ -560,13 +524,10 @@ begin
 
       Result_String :=
         B10.Tail
-          (B10.To_Bounded_Wide_String (Translate ("ABCDEFGHIJ")),
-           13,
-           Translate ('x'),
-           Ada.Strings.Right);
+          (B10.To_Bounded_Wide_String (Translate ("ABCDEFGHIJ")), 13,
+           Translate ('x'), Ada.Strings.Right);
 
-      if Result_String /=
-        B10.To_Bounded_Wide_String (Translate ("xxxABCDEFG"))
+      if Result_String /= B10.To_Bounded_Wide_String (Translate ("xxxABCDEFG"))
       then
          Report.Failed ("Incorrect result from Function Tail, Drop = Right");
       end if;
@@ -586,8 +547,7 @@ begin
       begin
          Result_String :=
            B10.Replicate
-             (Count => B10.Max_Length + 5,
-              Item  => Translate ('A'),
+             (Count => B10.Max_Length + 5, Item => Translate ('A'),
               Drop  => As.Error);
          Report.Failed ("Length_Error not raised by Replicate for characters");
       exception
@@ -605,22 +565,16 @@ begin
       -- "Item" wide characters.
 
       if B10.Replicate
-          (Count => 20,
-           Item  => Translate ('A'),
-           Drop  => Ada.Strings.Left) /=
-        B10.Replicate (15, Translate ('A'), Ada.Strings.Right)
-      then
+          (Count => 20, Item => Translate ('A'), Drop => Ada.Strings.Left) /=
+        B10.Replicate (15, Translate ('A'), Ada.Strings.Right) then
          Report.Failed ("Incorrect result from Replicate for characters - 1");
       end if;
 
       -- Blank-filled, 10 character bounded wide strings.
 
       if B10.Replicate
-          (B10.Max_Length + 1,
-           Translate (' '),
-           Drop => Ada.Strings.Left) /=
-        B10.Replicate (B10.Max_Length, Ada.Strings.Wide_Space)
-      then
+          (B10.Max_Length + 1, Translate (' '), Drop => Ada.Strings.Left) /=
+        B10.Replicate (B10.Max_Length, Ada.Strings.Wide_Space) then
          Report.Failed ("Incorrect result from Replicate for characters - 2");
       end if;
 
@@ -654,8 +608,7 @@ begin
 
       Result_String := B10.Replicate (3, Translate ("abcd"), Ada.Strings.Left);
 
-      if Result_String /=
-        B10.To_Bounded_Wide_String (Translate ("cdabcdabcd"))
+      if Result_String /= B10.To_Bounded_Wide_String (Translate ("cdabcdabcd"))
       then
          Report.Failed
            ("Incorrect result from Replicate for wide strings, Drop = Left");
@@ -666,8 +619,7 @@ begin
       Result_String :=
         B10.Replicate (3, Translate ("abcd"), Ada.Strings.Right);
 
-      if Result_String /=
-        B10.To_Bounded_Wide_String (Translate ("abcdabcdab"))
+      if Result_String /= B10.To_Bounded_Wide_String (Translate ("abcdabcdab"))
       then
          Report.Failed
            ("Incorrect result from Replicate for wide strings, Drop = Right");

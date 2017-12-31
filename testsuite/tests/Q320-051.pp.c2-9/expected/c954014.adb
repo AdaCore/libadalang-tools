@@ -290,8 +290,7 @@ procedure C954014 is
       else
          if This_Transaction.Return_Value /= Debit_Return or
            This_Transaction.Tc_Message_Count /= 1 or
-           not This_Transaction.Tc_Thru_Distrib
-         then
+           not This_Transaction.Tc_Thru_Distrib then
             Report.Failed ("Expected path not traversed");
          end if;
          Tc_Debit_Message_Complete.Set_True;
@@ -449,8 +448,7 @@ procedure C954014 is
 
 begin -- c954014
    Report.Test
-     ("C954014",
-      "Abort a task that has a call" & " requeued_without_abort");
+     ("C954014", "Abort a task that has a call" & " requeued_without_abort");
 
    Line_Driver.Start;   -- Start the test
 
@@ -458,9 +456,8 @@ begin -- c954014
    --
    while not
      (Tc_Handshake_F.Value                  -- abort not effective?
+     and Tc_Debit_Message_Complete.Value   -- Distributor affected?
      and
-      Tc_Debit_Message_Complete.Value   -- Distributor affected?
-      and
       Tc_Handshake_E.Value)
    loop       -- accept not completed?
       delay Impdef.Minimum_Task_Switch;

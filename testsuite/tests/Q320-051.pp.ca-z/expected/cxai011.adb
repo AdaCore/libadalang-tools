@@ -190,8 +190,7 @@ begin
       begin
 
          if My_Bounded_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-           Value_In_Array (I)
-         then
+           Value_In_Array (I) then
 
             Report.Failed
               ("Mismatch between element and what was appended #2");
@@ -199,8 +198,7 @@ begin
          end if;
 
          My_Bounded_Doubly_Linked_Lists.Query_Element
-           (Position => My_Cursor_1,
-            Process  => My_Query'Access);
+           (Position => My_Cursor_1, Process => My_Query'Access);
 
       end;
 
@@ -243,8 +241,7 @@ begin
    for I in reverse Array_Bounds_Type loop
 
       if My_Bounded_Doubly_Linked_Lists.Element (Position => My_Cursor_2) /=
-        Value_In_Array (I)
-      then
+        Value_In_Array (I) then
 
          Report.Failed ("Mismatch between element and what was prepended");
 
@@ -295,8 +292,7 @@ begin
          Tampering_Check (Container => My_List_3, Where => "Iterate");
 
          if My_Bounded_Doubly_Linked_Lists.Element (Position) /=
-           Value_In_Array (I)
-         then
+           Value_In_Array (I) then
 
             Report.Failed ("Iterate hasn't found the expected value");
 
@@ -318,8 +314,7 @@ begin
          Tampering_Check (Container => My_List_3, Where => "Reverse_Iterate");
 
          if My_Bounded_Doubly_Linked_Lists.Element (Position) /=
-           Value_In_Array (I)
-         then
+           Value_In_Array (I) then
 
             Report.Failed ("Reverse_Iterate hasn't found the expected value");
 
@@ -357,8 +352,7 @@ begin
          begin
 
             Tampering_Check
-              (Container => My_List_2,
-               Where     => "Update_Element");
+              (Container => My_List_2, Where => "Update_Element");
 
             Element := Element * 2.0;
 
@@ -367,12 +361,10 @@ begin
       begin
 
          My_List_1.Replace_Element
-           (Position => My_Cursor_1,
-            New_Item => Value_In_Array (I) * 2.0);
+           (Position => My_Cursor_1, New_Item => Value_In_Array (I) * 2.0);
 
          My_List_2.Update_Element
-           (Position => My_Cursor_2,
-            Process  => My_Update'Access);
+           (Position => My_Cursor_2, Process => My_Update'Access);
 
       end;
 
@@ -410,8 +402,7 @@ begin
    for I in Array_Bounds_Type loop
 
       if My_Bounded_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-        Value_In_Array (Num_Tests - I + 1)
-      then
+        Value_In_Array (Num_Tests - I + 1) then
 
          Report.Failed ("Reversed array not as expected");
 
@@ -451,8 +442,7 @@ begin
    for I in Array_Bounds_Type loop
 
       if My_Bounded_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-        Value_In_Array (I)
-      then
+        Value_In_Array (I) then
 
          Report.Failed ("Target list not as expected after move");
 
@@ -535,8 +525,7 @@ begin
 
    -- This swaps the order of the elements
    My_List_2.Swap_Links
-     (I => My_List_2.First,
-      J => My_Cursor_3); -- First of added elements
+     (I => My_List_2.First, J => My_Cursor_3); -- First of added elements
 
    -- The order should now be Default_Value, Value_In_Array (1), Default_Value,
    -- Default_Value, Value_In_Array (2), Value_In_Array (2)
@@ -555,32 +544,28 @@ begin
 
    -- Check = Default_Value
    if My_Bounded_Doubly_Linked_Lists.Element (Position => My_Cursor_2) /=
-     My_Default_Value
-   then
+     My_Default_Value then
 
       Report.Failed ("Inserted value not as expected #1");
       Report.Comment
         ("Value =" &
          My_Float'Image
            (My_Bounded_Doubly_Linked_Lists.Element (Position => My_Cursor_2)) &
-         " expected=" &
-         My_Float'Image (My_Default_Value));
+         " expected=" & My_Float'Image (My_Default_Value));
 
    end if;
 
    My_Bounded_Doubly_Linked_Lists.Next (My_Cursor_2);
 
    if My_Bounded_Doubly_Linked_Lists.Element (Position => My_Cursor_2) /=
-     Value_In_Array (1)
-   then
+     Value_In_Array (1) then
 
       Report.Failed ("Inserted value not as expected #2");
       Report.Comment
         ("Value =" &
          My_Float'Image
            (My_Bounded_Doubly_Linked_Lists.Element (Position => My_Cursor_2)) &
-         " expected=" &
-         My_Float'Image (Value_In_Array (1)));
+         " expected=" & My_Float'Image (Value_In_Array (1)));
 
    end if;
 
@@ -588,48 +573,42 @@ begin
 
    -- Check = Default_Value
    if My_Bounded_Doubly_Linked_Lists.Element (Position => My_Cursor_2) /=
-     My_Default_Value
-   then
+     My_Default_Value then
 
       Report.Failed ("Inserted value not as expected #3");
       Report.Comment
         ("Value =" &
          My_Float'Image
            (My_Bounded_Doubly_Linked_Lists.Element (Position => My_Cursor_2)) &
-         " expected=" &
-         My_Float'Image (My_Default_Value));
+         " expected=" & My_Float'Image (My_Default_Value));
 
    end if;
 
    My_Bounded_Doubly_Linked_Lists.Next (My_Cursor_2);
 
    if My_Bounded_Doubly_Linked_Lists.Element (Position => My_Cursor_2) /=
-     Value_In_Array (2)
-   then
+     Value_In_Array (2) then
 
       Report.Failed ("Inserted value not as expected #4");
       Report.Comment
         ("Value =" &
          My_Float'Image
            (My_Bounded_Doubly_Linked_Lists.Element (Position => My_Cursor_2)) &
-         " expected=" &
-         My_Float'Image (Value_In_Array (2)));
+         " expected=" & My_Float'Image (Value_In_Array (2)));
 
    end if;
 
    My_Bounded_Doubly_Linked_Lists.Next (My_Cursor_2);
 
    if My_Bounded_Doubly_Linked_Lists.Element (Position => My_Cursor_2) /=
-     Value_In_Array (2)
-   then
+     Value_In_Array (2) then
 
       Report.Failed ("Inserted value not as expected #5");
       Report.Comment
         ("Value =" &
          My_Float'Image
            (My_Bounded_Doubly_Linked_Lists.Element (Position => My_Cursor_2)) &
-         " expected=" &
-         My_Float'Image (Value_In_Array (2)));
+         " expected=" & My_Float'Image (Value_In_Array (2)));
 
    end if;
 
@@ -637,16 +616,14 @@ begin
 
    -- Check = Default_Value
    if My_Bounded_Doubly_Linked_Lists.Element (Position => My_Cursor_2) /=
-     My_Default_Value
-   then
+     My_Default_Value then
 
       Report.Failed ("Inserted value not as expected #6");
       Report.Comment
         ("Value =" &
          My_Float'Image
            (My_Bounded_Doubly_Linked_Lists.Element (Position => My_Cursor_2)) &
-         " expected=" &
-         My_Float'Image (My_Default_Value));
+         " expected=" & My_Float'Image (My_Default_Value));
 
    end if;
 
@@ -655,8 +632,7 @@ begin
    -- e.g. by insertions earlier in the list or swapping
 
    if My_Bounded_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Array (1)
-   then
+     Value_In_Array (1) then
 
       Report.Failed
         ("Cursor no longer pointing to same element after shuffling about");
@@ -682,8 +658,7 @@ begin
 
    -- Check = Default_Value
    if My_Bounded_Doubly_Linked_Lists.Element (My_List_2.First) /=
-     My_Default_Value
-   then
+     My_Default_Value then
 
       Report.Failed ("Remaining value not as expected");
 
@@ -938,8 +913,7 @@ begin
 
          Big_List.Insert
            (Before   => Big_List.Find (Item => Value_In_Array (7)),
-            New_Item => Value_In_Array (1),
-            Count    => 5);
+            New_Item => Value_In_Array (1), Count => 5);
 
       exception
 
@@ -1017,9 +991,7 @@ begin
    My_Cursor_2 := My_List_2.Find (Item => Value_In_Array (7));
 
    My_List_1.Splice
-     (Before   => My_Cursor_1,
-      Source   => My_List_2,
-      Position => My_Cursor_2);
+     (Before => My_Cursor_1, Source => My_List_2, Position => My_Cursor_2);
 
    -- The order should now be Value_In_Array (1), Value_In_Array (2),
    -- Default_Value, Value_In_Array (3), Value_In_Array (4), Value_In_Array
@@ -1037,9 +1009,8 @@ begin
         Big_List.Find (Item => Value_In_Array ((I mod Num_Tests) + 1));
 
       My_List_1.Splice
-        (Before   => My_Bounded_Doubly_Linked_Lists.No_Element, -- At end
-         Source   => Big_List,
-         Position => My_Cursor_2);
+        (Before => My_Bounded_Doubly_Linked_Lists.No_Element, -- At end
+         Source => Big_List, Position => My_Cursor_2);
 
    end loop;
 
@@ -1058,9 +1029,8 @@ begin
          My_Cursor_2 := Big_List.Find (Item => Value_In_Array (1));
 
          My_List_1.Splice
-           (Before   => My_Bounded_Doubly_Linked_Lists.No_Element, -- At end
-            Source   => Big_List,
-            Position => My_Cursor_2);
+           (Before => My_Bounded_Doubly_Linked_Lists.No_Element, -- At end
+            Source => Big_List, Position => My_Cursor_2);
 
       exception
 
@@ -1100,8 +1070,7 @@ begin
    My_Cursor_1 := My_List_1.First;
 
    if My_Bounded_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Array (1)
-   then
+     Value_In_Array (1) then
 
       Report.Failed ("Spliced value not as expected #1");
 
@@ -1110,8 +1079,7 @@ begin
    My_Bounded_Doubly_Linked_Lists.Next (My_Cursor_1);
 
    if My_Bounded_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Array (9)
-   then
+     Value_In_Array (9) then
 
       Report.Failed ("Spliced value not as expected #2");
 
@@ -1120,8 +1088,7 @@ begin
    My_Bounded_Doubly_Linked_Lists.Next (My_Cursor_1);
 
    if My_Bounded_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Array (2)
-   then
+     Value_In_Array (2) then
 
       Report.Failed ("Spliced value not as expected #3");
 
@@ -1131,8 +1098,7 @@ begin
 
    -- Check = Default_Value
    if My_Bounded_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     My_Default_Value
-   then
+     My_Default_Value then
 
       Report.Failed ("Spliced value not as expected #4");
 
@@ -1141,8 +1107,7 @@ begin
    My_Bounded_Doubly_Linked_Lists.Next (My_Cursor_1);
 
    if My_Bounded_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Array (3)
-   then
+     Value_In_Array (3) then
 
       Report.Failed ("Spliced value not as expected #5");
 
@@ -1151,8 +1116,7 @@ begin
    My_Bounded_Doubly_Linked_Lists.Next (My_Cursor_1);
 
    if My_Bounded_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Array (4)
-   then
+     Value_In_Array (4) then
 
       Report.Failed ("Spliced value not as expected #6");
 
@@ -1161,8 +1125,7 @@ begin
    My_Bounded_Doubly_Linked_Lists.Next (My_Cursor_1);
 
    if My_Bounded_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Array (7)
-   then
+     Value_In_Array (7) then
 
       Report.Failed ("Spliced value not as expected #7");
 
@@ -1171,8 +1134,7 @@ begin
    My_Bounded_Doubly_Linked_Lists.Next (My_Cursor_1);
 
    if My_Bounded_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Array (5)
-   then
+     Value_In_Array (5) then
 
       Report.Failed ("Spliced value not as expected #8");
 
@@ -1181,8 +1143,7 @@ begin
    My_Bounded_Doubly_Linked_Lists.Next (My_Cursor_1);
 
    if My_Bounded_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Array (6)
-   then
+     Value_In_Array (6) then
 
       Report.Failed ("Spliced value not as expected #9");
 
@@ -1191,8 +1152,7 @@ begin
    My_Bounded_Doubly_Linked_Lists.Next (My_Cursor_1);
 
    if My_Bounded_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Array (7)
-   then
+     Value_In_Array (7) then
 
       Report.Failed ("Spliced value not as expected #10");
 
@@ -1201,8 +1161,7 @@ begin
    My_Bounded_Doubly_Linked_Lists.Next (My_Cursor_1);
 
    if My_Bounded_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Array (8)
-   then
+     Value_In_Array (8) then
 
       Report.Failed ("Spliced value not as expected #11");
 
@@ -1211,8 +1170,7 @@ begin
    My_Bounded_Doubly_Linked_Lists.Next (My_Cursor_1);
 
    if My_Bounded_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Array (10)
-   then
+     Value_In_Array (10) then
 
       Report.Failed ("Spliced value not as expected #12");
 
@@ -1236,8 +1194,7 @@ begin
 
    -- My_Cursor_1 should still be pointing to the last element
 
-   if not My_Bounded_Doubly_Linked_Lists.Has_Element
-       (Position => My_Cursor_1)
+   if not My_Bounded_Doubly_Linked_Lists.Has_Element (Position => My_Cursor_1)
    then
 
       Report.Failed ("Has_Element failed to find");

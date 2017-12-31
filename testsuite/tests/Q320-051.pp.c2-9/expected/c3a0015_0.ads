@@ -36,22 +36,18 @@ with System.Storage_Elements; use System.Storage_Elements;
 with System.Storage_Pools;    use System.Storage_Pools;
 package C3a0015_0 is
 
-   type Pool
-     (Storage_Size : Storage_Count)
-   is new Root_Storage_Pool with
+   type Pool (Storage_Size : Storage_Count) is new Root_Storage_Pool with
    record
       First_Free : Storage_Count := 1;
       Contents   : Storage_Array (1 .. Storage_Size);
    end record;
 
-   procedure Allocate
-     (Pool                     : in out C3a0015_0.Pool;
+   procedure Allocate (Pool    : in out C3a0015_0.Pool;
       Storage_Address          :    out System.Address;
       Size_In_Storage_Elements : in     Storage_Count;
       Alignment                : in     Storage_Count);
 
-   procedure Deallocate
-     (Pool                     : in out C3a0015_0.Pool;
+   procedure Deallocate (Pool  : in out C3a0015_0.Pool;
       Storage_Address          : in     System.Address;
       Size_In_Storage_Elements : in     Storage_Count;
       Alignment                : in     Storage_Count);

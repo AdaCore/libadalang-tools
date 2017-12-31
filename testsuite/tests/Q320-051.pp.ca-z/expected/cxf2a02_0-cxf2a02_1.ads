@@ -21,10 +21,8 @@ package Cxf2a02_0.Cxf2a02_1 is
      (0.587_39, 4.900_12, 0.087_65, 0.715_77, 5.537_68);
 
    function Test_Micro_Ops is new Fxf2a00.Operations_Loop
-     (Decimal_Fixed  => Micro,
-      Operator_Ptr   => Micro_Optr_Ptr,
-      Operator_Table => Micro_Ops,
-      Operand_Table  => Micro_Opnds);
+     (Decimal_Fixed  => Micro, Operator_Ptr => Micro_Optr_Ptr,
+      Operator_Table => Micro_Ops, Operand_Table => Micro_Opnds);
 
    ---=---=---=---=---=---=---=---=---=---=---
 
@@ -42,10 +40,8 @@ package Cxf2a02_0.Cxf2a02_1 is
    Basic_Div_Operand_Table : Basic_Opnds := (0.03, 0.08, 23.57, 0.11, 159.11);
 
    function Test_Basic_Ops is new Fxf2a00.Operations_Loop
-     (Decimal_Fixed  => Basic,
-      Operator_Ptr   => Basic_Optr_Ptr,
-      Operator_Table => Basic_Ops,
-      Operand_Table  => Basic_Opnds);
+     (Decimal_Fixed  => Basic, Operator_Ptr => Basic_Optr_Ptr,
+      Operator_Table => Basic_Ops, Operand_Table => Basic_Opnds);
 
    ---=---=---=---=---=---=---=---=---=---=---
 
@@ -65,10 +61,8 @@ package Cxf2a02_0.Cxf2a02_1 is
      (0.008, 0.793, 9.092, 214.300, 0.080);
 
    function Test_Broad_Ops is new Fxf2a00.Operations_Loop
-     (Decimal_Fixed  => Broad,
-      Operator_Ptr   => Broad_Optr_Ptr,
-      Operator_Table => Broad_Ops,
-      Operand_Table  => Broad_Opnds);
+     (Decimal_Fixed  => Broad, Operator_Ptr => Broad_Optr_Ptr,
+      Operator_Table => Broad_Ops, Operand_Table => Broad_Opnds);
 
    ---=---=---=---=---=---=---=---=---=---=---
 

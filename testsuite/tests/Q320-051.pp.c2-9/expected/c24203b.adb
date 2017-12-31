@@ -44,14 +44,12 @@ begin
       "2 THROUGH 16 ALL YIELD CORRECT VALUES");
 
    if 2#0.0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_1# /=
-     2.0**(-61)
-   then
+     2.0**(-61) then
       Failed ("INCORRECT VALUE FOR BASE 2 REAL LITERAL");
    end if;
 
    if 3#0.0000_0000_001# < ((2.0**(-18)) + (251_558.0 * (2.0**(-37)))) or
-     3#0.0000_0000_001# > ((2.0**(-18)) + (251_559.0 * (2.0**(-37))))
-   then
+     3#0.0000_0000_001# > ((2.0**(-18)) + (251_559.0 * (2.0**(-37)))) then
       Failed ("INCORRECT VALUE FOR BASE 3 REAL LITERAL");
    end if;
 
@@ -60,8 +58,7 @@ begin
    end if;
 
    if 5#202_1444.4241_121# < 32_749.906_25 or
-     5#202_1444.4241_121# > 32_749.921_875
-   then
+     5#202_1444.4241_121# > 32_749.921_875 then
       Failed ("INCORRECT VALUE FOR BASE 5 REAL LITERAL");
    end if;
 
@@ -69,8 +66,7 @@ begin
       Failed ("INCORRECT VALUE FOR BASE 6 REAL LITERAL");
    end if;
 
-   if 7#16_4366.6253_44# < 32_780.906_25 or
-     7#16_4366.6253_44# > 32_780.937_5
+   if 7#16_4366.6253_44# < 32_780.906_25 or 7#16_4366.6253_44# > 32_780.937_5
    then
       Failed ("INCORRECT VALUE FOR BASE 7 REAL LITERAL");
    end if;
@@ -79,8 +75,7 @@ begin
       Failed ("INCORRECT VALUE FOR BASE 8 REAL LITERAL");
    end if;
 
-   if 9#4_8888.8203_14# < 32_804.906_25 or
-     9#4_8888.8203_14# > 32_804.937_5
+   if 9#4_8888.8203_14# < 32_804.906_25 or 9#4_8888.8203_14# > 32_804.937_5
    then
       Failed ("INCORRECT VALUE FOR BASE 9 REAL LITERAL");
    end if;
@@ -89,8 +84,7 @@ begin
       Failed ("INCORRECT VALUE FOR BASE 10 REAL LITERAL");
    end if;
 
-   if 11#2_267A.A066_82# < 32_757.906_25 or
-     11#2_267A.A066_82# > 32_757.921_875
+   if 11#2_267A.A066_82# < 32_757.906_25 or 11#2_267A.A066_82# > 32_757.921_875
    then
       Failed ("INCORRECT VALUE FOR BASE 11 REAL LITERAL");
    end if;
@@ -99,8 +93,7 @@ begin
       Failed ("INCORRECT VALUE FOR BASE 12 REAL LITERAL");
    end if;
 
-   if 13#1_1B9C.BB61_6# < 32_746.906_25 or
-     13#1_1B9C.BB61_6# > 32_746.921_875
+   if 13#1_1B9C.BB61_6# < 32_746.906_25 or 13#1_1B9C.BB61_6# > 32_746.921_875
    then
       Failed ("INCORRECT VALUE FOR BASE 13 REAL LITERAL");
    end if;

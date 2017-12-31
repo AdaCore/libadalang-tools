@@ -81,8 +81,7 @@ begin
    Report.Test
      ("CXB4003",
       "Check that function Valid, with various " &
-      "Display_Format parameters, produces correct " &
-      "results");
+      "Display_Format parameters, produces correct " & "results");
 
    Test_Block :
    declare
@@ -106,102 +105,64 @@ begin
 
       Valid_Unsigned_Items : Numeric_Items_Type
         (1 .. Number_Of_Valid_Unsigned_Items) :=
-        (new Cobol.Numeric'("0"),
-         new Cobol.Numeric'("1"),
+        (new Cobol.Numeric'("0"), new Cobol.Numeric'("1"),
          new Cobol.Numeric'("0000000001"),
-         new Cobol.Numeric'("1234567890123456"),
-         new Cobol.Numeric'("0000"));
+         new Cobol.Numeric'("1234567890123456"), new Cobol.Numeric'("0000"));
 
       Invalid_Unsigned_Items : Numeric_Items_Type
         (1 .. Number_Of_Invalid_Unsigned_Items) :=
-        (new Cobol.Numeric'(" 12345"),
-         new Cobol.Numeric'("    12345"),
+        (new Cobol.Numeric'(" 12345"), new Cobol.Numeric'("    12345"),
          new Cobol.Numeric'("1234567890 "),
-         new Cobol.Numeric'("1234567890   "),
-         new Cobol.Numeric'("1.01"),
-         new Cobol.Numeric'(".0000000001"),
-         new Cobol.Numeric'("12345 6"),
-         new Cobol.Numeric'("MCXVIII"),
-         new Cobol.Numeric'("15F"),
-         new Cobol.Numeric'("+12345"),
-         new Cobol.Numeric'("$12.30"),
-         new Cobol.Numeric'("1234-"),
-         new Cobol.Numeric'("12--"),
-         new Cobol.Numeric'("+12-"),
-         new Cobol.Numeric'("++99--"),
-         new Cobol.Numeric'("-1.01"),
-         new Cobol.Numeric'("(1.01)"),
-         new Cobol.Numeric'("123,456"),
-         new Cobol.Numeric'("101."),
-         new Cobol.Numeric'(""),
-         new Cobol.Numeric'("1.0000"));
+         new Cobol.Numeric'("1234567890   "), new Cobol.Numeric'("1.01"),
+         new Cobol.Numeric'(".0000000001"), new Cobol.Numeric'("12345 6"),
+         new Cobol.Numeric'("MCXVIII"), new Cobol.Numeric'("15F"),
+         new Cobol.Numeric'("+12345"), new Cobol.Numeric'("$12.30"),
+         new Cobol.Numeric'("1234-"), new Cobol.Numeric'("12--"),
+         new Cobol.Numeric'("+12-"), new Cobol.Numeric'("++99--"),
+         new Cobol.Numeric'("-1.01"), new Cobol.Numeric'("(1.01)"),
+         new Cobol.Numeric'("123,456"), new Cobol.Numeric'("101."),
+         new Cobol.Numeric'(""), new Cobol.Numeric'("1.0000"));
 
       Valid_Leading_Separate_Items : Numeric_Items_Type
         (1 .. Number_Of_Valid_Leading_Separate_Items) :=
-        (new Cobol.Numeric'("+1000"),
-         new Cobol.Numeric'("-1"),
+        (new Cobol.Numeric'("+1000"), new Cobol.Numeric'("-1"),
          new Cobol.Numeric'("-0000000001"),
-         new Cobol.Numeric'("+1234567890123456"),
-         new Cobol.Numeric'("-0000"));
+         new Cobol.Numeric'("+1234567890123456"), new Cobol.Numeric'("-0000"));
 
       Invalid_Leading_Separate_Items : Numeric_Items_Type
         (1 .. Number_Of_Invalid_Leading_Separate_Items) :=
-        (new Cobol.Numeric'("123456"),
-         new Cobol.Numeric'(" +12345"),
-         new Cobol.Numeric'("    +12345"),
-         new Cobol.Numeric'("- 0000000001"),
+        (new Cobol.Numeric'("123456"), new Cobol.Numeric'(" +12345"),
+         new Cobol.Numeric'("    +12345"), new Cobol.Numeric'("- 0000000001"),
          new Cobol.Numeric'("1234567890- "),
-         new Cobol.Numeric'("1234567890+   "),
-         new Cobol.Numeric'("123-456"),
-         new Cobol.Numeric'("+15F"),
-         new Cobol.Numeric'("++123"),
-         new Cobol.Numeric'("12--"),
-         new Cobol.Numeric'("+12-"),
-         new Cobol.Numeric'("+/-12"),
-         new Cobol.Numeric'("++99--"),
-         new Cobol.Numeric'("1.01"),
-         new Cobol.Numeric'("(1.01)"),
-         new Cobol.Numeric'("+123,456"),
-         new Cobol.Numeric'("+15FF"),
-         new Cobol.Numeric'("- 123"),
-         new Cobol.Numeric'("+$123"),
-         new Cobol.Numeric'(""),
-         new Cobol.Numeric'("-"),
-         new Cobol.Numeric'("-1.01"),
-         new Cobol.Numeric'("1.0000+"));
+         new Cobol.Numeric'("1234567890+   "), new Cobol.Numeric'("123-456"),
+         new Cobol.Numeric'("+15F"), new Cobol.Numeric'("++123"),
+         new Cobol.Numeric'("12--"), new Cobol.Numeric'("+12-"),
+         new Cobol.Numeric'("+/-12"), new Cobol.Numeric'("++99--"),
+         new Cobol.Numeric'("1.01"), new Cobol.Numeric'("(1.01)"),
+         new Cobol.Numeric'("+123,456"), new Cobol.Numeric'("+15FF"),
+         new Cobol.Numeric'("- 123"), new Cobol.Numeric'("+$123"),
+         new Cobol.Numeric'(""), new Cobol.Numeric'("-"),
+         new Cobol.Numeric'("-1.01"), new Cobol.Numeric'("1.0000+"));
 
       Valid_Trailing_Separate_Items : Numeric_Items_Type
         (1 .. Number_Of_Valid_Trailing_Separate_Items) :=
-        (new Cobol.Numeric'("1001-"),
-         new Cobol.Numeric'("1+"),
+        (new Cobol.Numeric'("1001-"), new Cobol.Numeric'("1+"),
          new Cobol.Numeric'("0000000001+"),
-         new Cobol.Numeric'("1234567890123456-"),
-         new Cobol.Numeric'("0000-"));
+         new Cobol.Numeric'("1234567890123456-"), new Cobol.Numeric'("0000-"));
 
       Invalid_Trailing_Separate_Items : Numeric_Items_Type
         (1 .. Number_Of_Invalid_Trailing_Separate_Items) :=
-        (new Cobol.Numeric'("123456"),
-         new Cobol.Numeric'("+12345"),
-         new Cobol.Numeric'("12345 "),
-         new Cobol.Numeric'("123- "),
-         new Cobol.Numeric'("123-   "),
-         new Cobol.Numeric'("12345 +"),
-         new Cobol.Numeric'("12345+   "),
-         new Cobol.Numeric'("-0000000001"),
-         new Cobol.Numeric'("123-456"),
-         new Cobol.Numeric'("12--"),
-         new Cobol.Numeric'("+12-"),
-         new Cobol.Numeric'("99+-"),
-         new Cobol.Numeric'("12+/-"),
-         new Cobol.Numeric'("12.01-"),
-         new Cobol.Numeric'("$12.01+"),
-         new Cobol.Numeric'("(1.01)"),
-         new Cobol.Numeric'("DM12-"),
-         new Cobol.Numeric'("123,456+"),
-         new Cobol.Numeric'(""),
-         new Cobol.Numeric'("-"),
-         new Cobol.Numeric'("1.01-"),
-         new Cobol.Numeric'("+1.0000"));
+        (new Cobol.Numeric'("123456"), new Cobol.Numeric'("+12345"),
+         new Cobol.Numeric'("12345 "), new Cobol.Numeric'("123- "),
+         new Cobol.Numeric'("123-   "), new Cobol.Numeric'("12345 +"),
+         new Cobol.Numeric'("12345+   "), new Cobol.Numeric'("-0000000001"),
+         new Cobol.Numeric'("123-456"), new Cobol.Numeric'("12--"),
+         new Cobol.Numeric'("+12-"), new Cobol.Numeric'("99+-"),
+         new Cobol.Numeric'("12+/-"), new Cobol.Numeric'("12.01-"),
+         new Cobol.Numeric'("$12.01+"), new Cobol.Numeric'("(1.01)"),
+         new Cobol.Numeric'("DM12-"), new Cobol.Numeric'("123,456+"),
+         new Cobol.Numeric'(""), new Cobol.Numeric'("-"),
+         new Cobol.Numeric'("1.01-"), new Cobol.Numeric'("+1.0000"));
 
    begin
 
@@ -213,28 +174,24 @@ begin
       for I in 1 .. Number_Of_Valid_Unsigned_Items loop
          -- Fail if the Item parameter is _NOT_ considered Valid.
          if not Display_Format.Valid
-             (Item   => Valid_Unsigned_Items (I).all,
-              Format => Cobol.Unsigned)
+             (Item => Valid_Unsigned_Items (I).all, Format => Cobol.Unsigned)
          then
             Report.Failed
               ("Incorrect result from function Valid, with " &
                "Format parameter set to Unsigned, for valid " &
-               "format item number " &
-               Integer'Image (I));
+               "format item number " & Integer'Image (I));
          end if;
       end loop;
 
       for I in 1 .. Number_Of_Invalid_Unsigned_Items loop
          -- Fail if the Item parameter _IS_ considered Valid.
          if Display_Format.Valid
-             (Item   => Invalid_Unsigned_Items (I).all,
-              Format => Cobol.Unsigned)
+             (Item => Invalid_Unsigned_Items (I).all, Format => Cobol.Unsigned)
          then
             Report.Failed
               ("Incorrect result from function Valid, with " &
                "Format parameter set to Unsigned, for invalid " &
-               "format item number " &
-               Integer'Image (I));
+               "format item number " & Integer'Image (I));
          end if;
       end loop;
 
@@ -253,8 +210,7 @@ begin
             Report.Failed
               ("Incorrect result from function Valid, with " &
                "Format parameter set to Leading_Separate, " &
-               "for valid format item number " &
-               Integer'Image (I));
+               "for valid format item number " & Integer'Image (I));
          end if;
       end loop;
 
@@ -267,8 +223,7 @@ begin
             Report.Failed
               ("Incorrect result from function Valid, with " &
                "Format parameter set to Leading_Separate, " &
-               "for invalid format item number " &
-               Integer'Image (I));
+               "for invalid format item number " & Integer'Image (I));
          end if;
       end loop;
 
@@ -281,36 +236,31 @@ begin
       for I in 1 .. Number_Of_Valid_Trailing_Separate_Items loop
          -- Fail if the Item parameter is _NOT_ considered Valid.
          if not Display_Format.Valid
-             (Valid_Trailing_Separate_Items (I).all,
-              Cobol.Trailing_Separate)
+             (Valid_Trailing_Separate_Items (I).all, Cobol.Trailing_Separate)
          then
             Report.Failed
               ("Incorrect result from function Valid, with " &
                "Format parameter set to Trailing_Separate, " &
-               "for valid format item number " &
-               Integer'Image (I));
+               "for valid format item number " & Integer'Image (I));
          end if;
       end loop;
 
       for I in 1 .. Number_Of_Invalid_Trailing_Separate_Items loop
          -- Fail if the Item parameter _IS_ considered Valid.
          if Display_Format.Valid
-             (Invalid_Trailing_Separate_Items (I).all,
-              Cobol.Trailing_Separate)
+             (Invalid_Trailing_Separate_Items (I).all, Cobol.Trailing_Separate)
          then
             Report.Failed
               ("Incorrect result from function Valid, with " &
                "Format parameter set to Trailing_Separate, " &
-               "for invalid format item number " &
-               Integer'Image (I));
+               "for invalid format item number " & Integer'Image (I));
          end if;
       end loop;
 
    exception
       when The_Error : others =>
          Report.Failed
-           ("The following exception was raised in the " &
-            "Test_Block: " &
+           ("The following exception was raised in the " & "Test_Block: " &
             Exception_Name (The_Error));
    end Test_Block;
 

@@ -125,10 +125,7 @@ begin
 
       end Q;
 
-      procedure P1 is new P
-        (Integer,
-         Integer'First,
-         Integer'Last,
+      procedure P1 is new P (Integer, Integer'First, Integer'Last,
          Integer'Width);
       procedure P2 is new P (Subint, -100, 100, 4);
       procedure P3 is new P (Newint, Newint'First, Newint'Last, Newint'Width);

@@ -63,10 +63,7 @@ begin
                   N1    := 0; -- THIS VALUE IS IRRELEVENT.
                end E;
             or
-               accept E
-                 (I1 :        Integer;
-                  N1 :    out Integer;
-                  I2 : in out Integer)
+               accept E (I1 : Integer; N1 : out Integer; I2 : in out Integer)
                do
                   S (2) := 'B';
                   N1    := 0; -- THIS VALUE IS IRRELEVENT.
@@ -83,8 +80,7 @@ begin
 
       if S /= "AB" then
          Failed
-           ("ENTRIES DIFFERING ONLY BY " &
-            "THE BASE TYPE OF A PARAMETER " &
+           ("ENTRIES DIFFERING ONLY BY " & "THE BASE TYPE OF A PARAMETER " &
             "CAUSED CONFUSION");
       end if;
    end;

@@ -66,8 +66,7 @@ begin
      ("CB41003",
       "Check that an exception occurrence can " &
       "be saved into an object of type " &
-      "Exception_Occurrence using the procedure " &
-      "Save_Occurrence");
+      "Exception_Occurrence using the procedure " & "Save_Occurrence");
 
    Test_Block :
    declare
@@ -235,16 +234,13 @@ begin
                         -- Exceptions all raised in a deep scope.
                         if I = 1 then
                            Raise_Exception
-                             (Exception_1'Identity,
-                              Messages (I));
+                             (Exception_1'Identity, Messages (I));
                         elsif I = 2 then
                            Raise_Exception
-                             (Exception_2'Identity,
-                              Messages (I));
+                             (Exception_2'Identity, Messages (I));
                         elsif I = 3 then
                            Raise_Exception
-                             (Exception_3'Identity,
-                              Messages (I));
+                             (Exception_3'Identity, Messages (I));
                         end if;
                         Report.Failed
                           ("Exception not raised on loop #" &
@@ -272,8 +268,7 @@ begin
             begin
                Reraise_Occurrence (Exception_Storage (I));
                Report.Failed
-                 ("No exception reraised for " &
-                  "exception #" &
+                 ("No exception reraised for " & "exception #" &
                   Integer'Image (I));
             exception
                when Exc : others =>
@@ -296,8 +291,7 @@ begin
 
                   if Exception_Message (Exc) /= Messages (I) then
                      Report.Failed
-                       ("Incorrect message associated with " &
-                        "exception #" &
+                       ("Incorrect message associated with " & "exception #" &
                         Integer'Image (I));
                   end if;
             end;
@@ -345,8 +339,7 @@ begin
                      Report.Failed ("Saved Exception was not raised");
                   exception
                      when Exc_2 : others =>
-                        if Exception_Identity (Exc_2) /=
-                          The_Exception'Identity
+                        if Exception_Identity (Exc_2) /= The_Exception'Identity
                         then
                            Report.Failed
                              ("Incorrect exception occurrence reraised");

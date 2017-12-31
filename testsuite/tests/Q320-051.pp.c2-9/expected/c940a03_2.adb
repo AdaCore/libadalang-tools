@@ -42,8 +42,7 @@ package body C940a03_2 is
             exit;
 
          or
-            accept Get_Status
-              (User_Record : out Semaphores.Login_Record_Type)
+            accept Get_Status (User_Record : out Semaphores.Login_Record_Type)
             do
                User_Record := Rec;
             end Get_Status;

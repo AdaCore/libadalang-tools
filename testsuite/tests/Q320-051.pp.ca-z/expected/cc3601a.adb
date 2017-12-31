@@ -86,8 +86,7 @@ begin
    Test
      ("CC3601A",
       "CHECK THAT PREDEFINED OPERATORS MAY BE " &
-      "PASSED AS ACTUAL GENERIC SUBPROGRAM " &
-      "PARAMETERS");
+      "PASSED AS ACTUAL GENERIC SUBPROGRAM " & "PARAMETERS");
 
    begin -- CHECKS WITH RELATIONAL OPERATORS AND LOGICAL OPERATORS AS
       -- ACTUAL PARAMETERS.
@@ -96,28 +95,16 @@ begin
 
          for I2 in Boolean loop
             Comment
-              ("B1 = " &
-               Boolean'Image (I1) &
-               " AND " &
-               "B2 = " &
+              ("B1 = " & Boolean'Image (I1) & " AND " & "B2 = " &
                Boolean'Image (I2));
             declare
                B1 : Boolean := Ident_Bool (I1);
                B2 : Boolean := Ident_Bool (I2);
 
-               package P1 is new Gp1
-                 (Boolean,
-                  not B2,
-                  B2,
-                  """NOT"" - 1",
+               package P1 is new Gp1 (Boolean, not B2, B2, """NOT"" - 1",
                   "NOT");
                package P2 is new Gp2 (Boolean, B1 or B2, B1, B2, "OR", "OR");
-               package P3 is new Gp2
-                 (Boolean,
-                  B1 and B2,
-                  B2,
-                  B1,
-                  "AND",
+               package P3 is new Gp2 (Boolean, B1 and B2, B2, B1, "AND",
                   "AND");
                package P4 is new Gp2 (Boolean, B1 /= B2, B1, B2, "XOR", "XOR");
                package P5 is new Gp2 (Boolean, B1 < B2, B1, B2, "<", "<");
@@ -135,18 +122,9 @@ begin
 
                package P9 is new Gp1 (Ab, Ab1, not Ab1, """NOT"" - 2", "NOT");
                package P10 is new Gp1 (Ab, T, F, """NOT"" - 3", "NOT");
-               package P11 is new Gp1
-                 (Ab,
-                  Vb2,
-                  (B2 => not B1),
-                  """NOT"" - 4",
+               package P11 is new Gp1 (Ab, Vb2, (B2 => not B1), """NOT"" - 4",
                   "NOT");
-               package P12 is new Gp2
-                 (Ab,
-                  Ab1 and Ab2,
-                  Ab1,
-                  Ab2,
-                  "AND",
+               package P12 is new Gp2 (Ab, Ab1 and Ab2, Ab1, Ab2, "AND",
                   "AND");
             begin
                null;
@@ -180,21 +158,11 @@ begin
       type Str is array (Subint range <>) of Character;
       Vstr : Str (0 .. 1) := "AB";
 
-      package P13 is new Gp2
-        (Str,
-         Vstr (0 .. 0) & Vstr (1 .. 1),
-         Vstr (0 .. 0),
-         Vstr (1 .. 1),
-         """&"" - 1",
-         "&");
+      package P13 is new Gp2 (Str, Vstr (0 .. 0) & Vstr (1 .. 1),
+         Vstr (0 .. 0), Vstr (1 .. 1), """&"" - 1", "&");
 
-      package P14 is new Gp2
-        (Str,
-         Vstr (1 .. 1) & Vstr (0 .. 0),
-         Vstr (1 .. 1),
-         Vstr (0 .. 0),
-         """&"" - 2",
-         "&");
+      package P14 is new Gp2 (Str, Vstr (1 .. 1) & Vstr (0 .. 0),
+         Vstr (1 .. 1), Vstr (0 .. 0), """&"" - 2", "&");
 
       package P15 is new Gp2 (Integer, 0, -1, 0, """*"" - 1", "*");
 
@@ -228,20 +196,10 @@ begin
 
       package P2 is new Gp1 (Weekday, Tues, Mon, "WEEKDAY'PRED", Weekday'Pred);
 
-      package P3 is new Gp3
-        (Weekday,
-         String,
-         Thur,
-         "THUR",
-         "WEEKDAY'IMAGE",
+      package P3 is new Gp3 (Weekday, String, Thur, "THUR", "WEEKDAY'IMAGE",
          Weekday'Image);
 
-      package P4 is new Gp3
-        (String,
-         Weekday,
-         "FRI",
-         Fri,
-         "WEEKDAY'VALUE",
+      package P4 is new Gp3 (String, Weekday, "FRI", Fri, "WEEKDAY'VALUE",
          Weekday'Value);
    begin
       null;

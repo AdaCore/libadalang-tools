@@ -44,20 +44,16 @@ with System.Storage_Pools;
 with System.Storage_Elements;
 package Fdb3a00 is
 
-   type Stack_Heap
-     (Water_Line : System.Storage_Elements.Storage_Count;
-      Tc_Id      : Character)
-   is
+   type Stack_Heap (Water_Line : System.Storage_Elements.Storage_Count;
+      Tc_Id                    : Character) is
      new System.Storage_Pools.Root_Storage_Pool with private;
 
-   procedure Allocate
-     (Pool                     : in out Stack_Heap;
+   procedure Allocate (Pool    : in out Stack_Heap;
       Storage_Address          :    out System.Address;
       Size_In_Storage_Elements : in     System.Storage_Elements.Storage_Count;
       Alignment                : in     System.Storage_Elements.Storage_Count);
 
-   procedure Deallocate
-     (Pool                     : in out Stack_Heap;
+   procedure Deallocate (Pool  : in out Stack_Heap;
       Storage_Address          : in     System.Address;
       Size_In_Storage_Elements : in     System.Storage_Elements.Storage_Count;
       Alignment                : in     System.Storage_Elements.Storage_Count);
@@ -74,13 +70,10 @@ private
    type Data_Array is
      array
        (System.Storage_Elements
-          .Storage_Count range <>) of System.Storage_Elements
-       .Storage_Element;
+          .Storage_Count range <>) of System.Storage_Elements.Storage_Element;
 
-   type Stack_Heap
-     (Water_Line : System.Storage_Elements.Storage_Count;
-      Tc_Id      : Character)
-   is new System.Storage_Pools.Root_Storage_Pool with
+   type Stack_Heap (Water_Line : System.Storage_Elements.Storage_Count;
+      Tc_Id : Character) is new System.Storage_Pools.Root_Storage_Pool with
    record
       Data  : Data_Array (1 .. Water_Line);
       Avail : System.Storage_Elements.Storage_Count := 1;

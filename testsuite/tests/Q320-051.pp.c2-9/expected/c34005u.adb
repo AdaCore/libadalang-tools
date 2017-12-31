@@ -90,11 +90,8 @@ procedure C34005u is
 
       type Parent is array (Index range <>, Index range <>) of Component;
 
-      function Create
-        (F1, L1 : Index;
-         F2, L2 : Index;
-         C      : Component;
-         Dummy  : Parent   -- TO RESOLVE OVERLOADING.
+      function Create (F1, L1 : Index; F2, L2 : Index; C : Component;
+         Dummy                : Parent   -- TO RESOLVE OVERLOADING.
          ) return Parent;
 
       function Equal (X, Y : Parent) return Boolean;
@@ -106,8 +103,7 @@ procedure C34005u is
    use Pkg_P;
 
    type T is
-     new Parent
-       (Ident_Int (4) .. Ident_Int (5),
+     new Parent (Ident_Int (4) .. Ident_Int (5),
         Ident_Int (6) .. Ident_Int (8));
 
    subtype Subparent is Parent (4 .. 5, 6 .. 8);
@@ -143,11 +139,8 @@ procedure C34005u is
 
    package body Pkg_P is
 
-      function Create
-        (F1, L1 : Index;
-         F2, L2 : Index;
-         C      : Component;
-         Dummy  : Parent) return Parent
+      function Create (F1, L1 : Index; F2, L2 : Index; C : Component;
+         Dummy                : Parent) return Parent
       is
          B : Component;
       begin
@@ -185,8 +178,7 @@ procedure C34005u is
       function Aggr (A, B, C, D, E, F, G, H : Component) return Parent is
       begin
          return
-           X : Parent
-             (Index'First .. Index'First + 3,
+           X : Parent (Index'First .. Index'First + 3,
               Index'First .. Index'First + 1)
          do
             Assign (X (Index'First, Index'First), A);
@@ -245,8 +237,7 @@ begin
           (Create (6, 9, 2, 3, C1, X),
            Aggr (C1, C2, C3, C4, C5, C6, C7, C8)) or
         not Equal
-          (Create (6, 9, 2, 3, C1, Y),
-           Aggr (C1, C2, C3, C4, C5, C6, C7, C8))
+          (Create (6, 9, 2, 3, C1, Y), Aggr (C1, C2, C3, C4, C5, C6, C7, C8))
       then
          Failed ("CAN'T CREATE BASE TYPE VALUES OUTSIDE THE " & "SUBTYPE");
       end if;
@@ -262,21 +253,14 @@ begin
    end;
 
    if Aggr (C1, C2, C3, C4, C5, C6, C7, C8) in T or
-     Aggr (C1, C2, C3, C4, C5, C6, C7, C8) in S
-   then
+     Aggr (C1, C2, C3, C4, C5, C6, C7, C8) in S then
       Failed ("INCORRECT ""IN""");
    end if;
 
    -- CHECK THE DERIVED SUBTYPE CONSTRAINT.
 
-   if T'First /= 4 or
-     T'Last /= 5 or
-     S'First /= 4 or
-     S'Last /= 5 or
-     T'First (2) /= 6 or
-     T'Last (2) /= 8 or
-     S'First (2) /= 6 or
-     S'Last (2) /= 8
+   if T'First /= 4 or T'Last /= 5 or S'First /= 4 or S'Last /= 5 or
+     T'First (2) /= 6 or T'Last (2) /= 8 or S'First (2) /= 6 or S'Last (2) /= 8
    then
       Failed ("INCORRECT 'FIRST OR 'LAST");
    end if;

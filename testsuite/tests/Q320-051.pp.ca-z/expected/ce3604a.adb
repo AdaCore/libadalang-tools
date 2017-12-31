@@ -47,8 +47,7 @@ begin
    Test
      ("CE3604A",
       "CHECK THAT GET_LINE READS LINES APPROPRIATELY " &
-      "AND CHECK THAT LAST RETURNS THE CORRECT INDEX " &
-      "VALUE");
+      "AND CHECK THAT LAST RETURNS THE CORRECT INDEX " & "VALUE");
 
    declare
       File  : File_Type;

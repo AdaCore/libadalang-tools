@@ -48,8 +48,7 @@ begin
 
    Test
      ("CE2201A",
-      "CHECK THAT READ, WRITE, AND " &
-      "END_OF_FILE ARE SUPPORTED FOR " &
+      "CHECK THAT READ, WRITE, AND " & "END_OF_FILE ARE SUPPORTED FOR " &
       "SEQUENTIAL FILES - STRING TYPE");
 
    declare

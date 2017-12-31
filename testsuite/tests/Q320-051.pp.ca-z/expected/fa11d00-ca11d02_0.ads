@@ -64,13 +64,11 @@
 package Fa11d00.Ca11d02_0 is     -- Basic_Complex
 
    function "+"
-     (Left,
-      Right : Complex_Type)
+     (Left, Right : Complex_Type)
      return Complex_Type;                   -- Add two complex numbers.
 
    function "*"
-     (Left,
-      Right : Complex_Type)
+     (Left, Right : Complex_Type)
      return Complex_Type;                   -- Multiply two complex numbers.
 
 end Fa11d00.Ca11d02_0;     -- Basic_Complex

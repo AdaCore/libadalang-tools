@@ -70,23 +70,18 @@ procedure Cxai017 is
 
    type My_Array_Type is array (Natural range <>) of My_Float;
 
-   package My_Vectors is new Ada.Containers.Vectors
-     (Index_Type   => Natural,
+   package My_Vectors is new Ada.Containers.Vectors (Index_Type => Natural,
       Element_Type => My_Float); -- Default =
 
    procedure My_Constrained_Array_Sort is new Ada.Containers
      .Generic_Constrained_Array_Sort
-     (Index_Type   => Constrained_Array_Bounds_Type,
-      Element_Type => My_Float,
-      Array_Type   => My_Constrained_Array_Type,
-      "<"          => ">");
+     (Index_Type => Constrained_Array_Bounds_Type, Element_Type => My_Float,
+      Array_Type => My_Constrained_Array_Type, "<" => ">");
    -- Sort in reverse order to check is using what specified not simply <
 
    procedure My_Array_Sort_1 is new Ada.Containers.Generic_Array_Sort
-     (Index_Type   => Natural,
-      Element_Type => My_Float,
-      Array_Type   => My_Array_Type,
-      "<"          => ">");
+     (Index_Type => Natural, Element_Type => My_Float,
+      Array_Type => My_Array_Type, "<" => ">");
    -- Sort in reverse order to check is using what specified not simply <
 
    -- No fractional parts so that can compare values for equality
@@ -144,13 +139,10 @@ procedure Cxai017 is
    end My_Vector_Swap;
 
    procedure My_Array_Sort_2 is new Ada.Containers.Generic_Sort
-     (Index_Type => Natural,
-      Before     => My_Array_Before,
-      Swap       => My_Array_Swap);
+     (Index_Type => Natural, Before => My_Array_Before, Swap => My_Array_Swap);
 
    procedure My_Vector_Sort is new Ada.Containers.Generic_Sort
-     (Index_Type => Natural,
-      Before     => My_Vector_Before,
+     (Index_Type => Natural, Before => My_Vector_Before,
       Swap       => My_Vector_Swap);
 
    use type My_Vectors.Vector;
@@ -210,8 +202,7 @@ begin
    Value_Vector := Unsorted_Vector;
 
    My_Vector_Sort
-     (First => Value_Vector.First_Index,
-      Last  => Value_Vector.Last_Index);
+     (First => Value_Vector.First_Index, Last => Value_Vector.Last_Index);
 
    if Value_Vector /= Sorted_Vector then
 

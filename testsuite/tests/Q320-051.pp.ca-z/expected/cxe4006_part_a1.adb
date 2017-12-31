@@ -35,10 +35,8 @@ package body Cxe4006_Part_A1 is
 
    ----------
 
-   procedure Single_Controlling_Operand
-     (Rtt         : in out A1_Tagged_Type_1;
-      Test_Number : in     Integer;
-      Callee      :    out Type_Decl_Location)
+   procedure Single_Controlling_Operand (Rtt : in out A1_Tagged_Type_1;
+      Test_Number : in     Integer; Callee : out Type_Decl_Location)
    is
       Expected : Integer := 0;
    begin
@@ -55,22 +53,17 @@ package body Cxe4006_Part_A1 is
 
       if Rtt.Common_Record_Field /= Expected then
          Report.Failed
-           ("CXE4006_Part_A1(1) expected" &
-            Integer'Image (Expected) &
-            " but received" &
-            Integer'Image (Rtt.Common_Record_Field) &
-            " in test" &
-            Integer'Image (Test_Number));
+           ("CXE4006_Part_A1(1) expected" & Integer'Image (Expected) &
+            " but received" & Integer'Image (Rtt.Common_Record_Field) &
+            " in test" & Integer'Image (Test_Number));
       end if;
 
       Rtt.Common_Record_Field := Expected + 6;
       Callee                  := Part_A1_1_Spec;
    end Single_Controlling_Operand;
 
-   procedure Single_Controlling_Operand
-     (Rtt         : in out A1_Tagged_Type_2;
-      Test_Number : in     Integer;
-      Callee      :    out Type_Decl_Location)
+   procedure Single_Controlling_Operand (Rtt : in out A1_Tagged_Type_2;
+      Test_Number : in     Integer; Callee : out Type_Decl_Location)
    is
       Expected : Integer := 0;
    begin
@@ -87,12 +80,9 @@ package body Cxe4006_Part_A1 is
 
       if Rtt.Common_Record_Field /= Expected then
          Report.Failed
-           ("CXE4006_Part_A1(2) expected" &
-            Integer'Image (Expected) &
-            " but received" &
-            Integer'Image (Rtt.Common_Record_Field) &
-            " in test" &
-            Integer'Image (Test_Number));
+           ("CXE4006_Part_A1(2) expected" & Integer'Image (Expected) &
+            " but received" & Integer'Image (Rtt.Common_Record_Field) &
+            " in test" & Integer'Image (Test_Number));
       end if;
 
       Rtt.Common_Record_Field := Expected + 7;
@@ -101,10 +91,8 @@ package body Cxe4006_Part_A1 is
 
    ----------
 
-   procedure Make_Dispatching_Call_With
-     (X           : in out Root_Tagged_Type'Class;
-      Test_Number : in     Integer;
-      Callee      :    out Type_Decl_Location)
+   procedure Make_Dispatching_Call_With (X : in out Root_Tagged_Type'Class;
+      Test_Number : in     Integer; Callee : out Type_Decl_Location)
    is
    begin
       Single_Controlling_Operand (X, Test_Number, Callee);

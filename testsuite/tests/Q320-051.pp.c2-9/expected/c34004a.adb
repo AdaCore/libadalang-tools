@@ -48,8 +48,7 @@ procedure C34004a is
      Parent range Ident_Int (1) * (-50.0) .. Ident_Int (1) * (50.0);
 
    type T is
-     new Subparent delta 2.0**(-4) range
-       Ident_Int (1) * (-30.0) ..
+     new Subparent delta 2.0**(-4) range Ident_Int (1) * (-30.0) ..
          Ident_Int (1) * (30.0);
 
    type Fixed is delta 2.0**(-4) range -1_000.0 .. 1_000.0;
@@ -200,8 +199,7 @@ begin
          Failed ("INCORRECT ABS");
       end if;
 
-      if T (X * Ident (-1.0)) /= -30.0 or
-        T (Ident (2.0) * (Z + 15.0)) /= 30.0
+      if T (X * Ident (-1.0)) /= -30.0 or T (Ident (2.0) * (Z + 15.0)) /= 30.0
       then
          Failed ("INCORRECT * (FIXED, FIXED)");
       end if;

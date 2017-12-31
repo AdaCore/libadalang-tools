@@ -295,16 +295,14 @@ procedure C954012 is
 
       if This_Transaction.Code = Credit then
          if This_Transaction.Return_Value /= Credit_Return or
-           This_Transaction.Time_Stamp = Base_Time
-         then
+           This_Transaction.Time_Stamp = Base_Time then
             Report.Failed ("Expected path not traversed");
          end if;
          Tc_Tasks_Completed.Increment;
       else
          if This_Transaction.Return_Value /= Debit_Return or
            This_Transaction.Message_Count /= 1 or
-           This_Transaction.Time_Stamp = Base_Time
-         then
+           This_Transaction.Time_Stamp = Base_Time then
             Report.Failed ("Expected path not traversed");
          end if;
          Tc_Debit_Message_Complete.Set_True;
@@ -334,8 +332,7 @@ procedure C954012 is
                -- conditions
                case Transaction.Code is
                   when Credit =>
-                     if Credit_Overloaded.Value and
-                       Transaction.Priority = Low
+                     if Credit_Overloaded.Value and Transaction.Priority = Low
                      then
                         requeue Wait_For_Underload with abort;
                      else

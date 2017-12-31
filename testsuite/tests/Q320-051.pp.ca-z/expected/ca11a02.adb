@@ -13,20 +13,16 @@ procedure Ca11a02 is
 
    use Widget_Pkg;              -- All user-defined operators directly visible.
 
-   procedure Set_Label
-     (The_Widget : in out Ca11a02_1.Label_Widget;
-      L          : in     String)
+   procedure Set_Label (The_Widget : in out Ca11a02_1.Label_Widget;
+      L                            : in     String)
    is
    begin
       The_Widget.Label := L;
    end Set_Label;
    ---------------------------------------------------------
-   procedure Set_Widget
-     (The_Widget : in out Ca11a02_1.Label_Widget;
-      The_Width  : in     Widget_Length;
-      The_Height : in     Widget_Length;
-      The_Color  : in     Color_Widget_Pkg.Widget_Color_Enum;
-      The_Label  : in     String)
+   procedure Set_Widget (The_Widget : in out Ca11a02_1.Label_Widget;
+      The_Width : in     Widget_Length; The_Height : in Widget_Length;
+      The_Color : in Color_Widget_Pkg.Widget_Color_Enum; The_Label : in String)
    is
    begin
       Ca11a02_1.Set_Width (The_Widget, The_Width);    -- Twice inherited.
@@ -49,8 +45,7 @@ begin
    if White_Widget.Width /= Widget_Length (Report.Ident_Int (15)) or
      White_Widget.Height /= Widget_Length (Report.Ident_Int (21)) or
      Color_Widget_Pkg."/=" (White_Widget.Color, Color_Widget_Pkg.White) or
-     White_Widget.Label /= "Alarm_Clock"
-   then
+     White_Widget.Label /= "Alarm_Clock" then
       Report.Failed ("Incorrect result for White_Widget");
    end if;
 

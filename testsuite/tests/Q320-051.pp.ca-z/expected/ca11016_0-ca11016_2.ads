@@ -18,9 +18,7 @@ package Ca11016_0.Ca11016_2 is
       Intensity : Display_Val;
    end record;
 
-   procedure Data_For_Sdugd
-     (Lat           : in     Latitude;
-      Long          : in     Longitude;
-      Output_Packet : in out Io_Packet);
+   procedure Data_For_Sdugd (Lat : in     Latitude; Long : in Longitude;
+      Output_Packet              : in out Io_Packet);
 
 end Ca11016_0.Ca11016_2;

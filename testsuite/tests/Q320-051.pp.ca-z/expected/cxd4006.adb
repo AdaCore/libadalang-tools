@@ -133,10 +133,8 @@ begin
          (Priority_2q, 203));
 
       task type Message_Task is
-         entry Start
-           (Numb          : in     Message_Number;
-            Task_Priority : in     System.Priority;
-            Task_Id       :    out Ati.Task_Id);
+         entry Start (Numb : in Message_Number;
+            Task_Priority  : in System.Priority; Task_Id : out Ati.Task_Id);
       end Message_Task;
       type Acc_Message_Task is access Message_Task;
 
@@ -186,9 +184,7 @@ begin
                   -- Start the task and present it with the required priority
                   -- and Message_Number
                   Next_Message_Task.Start
-                    (Next_Number,
-                     Next_Priority,
-                     Next_Task_Id);
+                    (Next_Number, Next_Priority, Next_Task_Id);
 
                   -- Later, we will want to set the base priority of one of the
                   -- Message_Tasks. This one is the one who's Message_Number is
@@ -217,11 +213,8 @@ begin
       task body Message_Task is
          This_Message_Number : Message_Number;
       begin
-         accept Start
-           (Numb          : in     Message_Number;
-            Task_Priority : in     System.Priority;
-            Task_Id       :    out Ati.Task_Id)
-         do
+         accept Start (Numb : in Message_Number;
+            Task_Priority   : in System.Priority; Task_Id : out Ati.Task_Id) do
 
             -- Set the priority of the task (uses the default
             --          Ada.Task_Identification.Current_Task)
@@ -274,13 +267,10 @@ begin
                --
                if Numb /= Expected_Order (Next_Expected) then
                   Report.Failed
-                    ("Messages out of sequence" &
-                     " position:" &
-                     Integer'Image (Next_Expected) &
-                     " expected:" &
+                    ("Messages out of sequence" & " position:" &
+                     Integer'Image (Next_Expected) & " expected:" &
                      Message_Number'Image (Expected_Order (Next_Expected)) &
-                     " actual:" &
-                     Message_Number'Image (Numb));
+                     " actual:" & Message_Number'Image (Numb));
                end if;
             end Input;
 

@@ -73,8 +73,7 @@ begin
       "CHECK ARRAY CONVERSIONS WHEN THE TARGET " &
       "TYPE IS A CONSTRAINED ARRAY TYPE AND THE " &
       "OPERAND TYPE HAS BOUNDS THAT DO NOT " &
-      "BELONG TO THE BASE TYPE OF THE TARGET " &
-      "TYPE'S INDEX SUBTYPE");
+      "BELONG TO THE BASE TYPE OF THE TARGET " & "TYPE'S INDEX SUBTYPE");
 
    declare
 
@@ -105,11 +104,8 @@ begin
 
       procedure Check (A : Unarr2; Str : String) is
       begin
-         if A'First (1) /= 1 or
-           A'Last /= 10 or
-           A'First (2) /= Mon or
-           A'Last (2) /= Tue
-         then
+         if A'First (1) /= 1 or A'Last /= 10 or A'First (2) /= Mon or
+           A'Last (2) /= Tue then
             Failed ("INCORRECT CONVERSION OF UNARR2 (A" & Str & ")");
          end if;
       end Check;

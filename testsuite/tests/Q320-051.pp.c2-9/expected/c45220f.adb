@@ -49,10 +49,8 @@ begin
          Failed ("WRONG VALUES FOR 'IN NEWBOOL'");
       end if;
 
-      if Newbool'(False) in True .. False or
-        Var not in False .. True or
-        Con in True .. True
-      then
+      if Newbool'(False) in True .. False or Var not in False .. True or
+        Con in True .. True then
          Failed ("WRONG VALUES FOR 'IN AAA..BBB'");
       end if;
 

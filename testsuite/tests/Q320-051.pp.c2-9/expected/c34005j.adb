@@ -48,10 +48,8 @@ procedure C34005j is
 
       type Parent is array (Index range <>) of Component;
 
-      function Create
-        (F, L  : Index;
-         C     : Component;
-         Dummy : Parent   -- TO RESOLVE OVERLOADING.
+      function Create (F, L : Index; C : Component;
+         Dummy              : Parent   -- TO RESOLVE OVERLOADING.
          ) return Parent;
 
    end Pkg;
@@ -82,10 +80,8 @@ procedure C34005j is
 
    package body Pkg is
 
-      function Create
-        (F, L  : Index;
-         C     : Component;
-         Dummy : Parent) return Parent
+      function Create (F, L : Index; C : Component;
+         Dummy              : Parent) return Parent
       is
          A : Parent (F .. L);
          B : Component := C;
@@ -137,8 +133,7 @@ begin
 
    begin
       if Parent (X) /= (True, False, True) or
-        Parent (Create (2, 3, False, X)) /= (False, True)
-      then
+        Parent (Create (2, 3, False, X)) /= (False, True) then
          Failed ("INCORRECT CONVERSION TO PARENT");
       end if;
    exception
@@ -157,8 +152,7 @@ begin
 
    begin
       if Arr (X) /= (True, False, True) or
-        Arrt (Create (1, 2, True, X)) /= (True, False)
-      then
+        Arrt (Create (1, 2, True, X)) /= (True, False) then
          Failed ("INCORRECT CONVERSION TO ARRAY");
       end if;
    exception
@@ -168,8 +162,7 @@ begin
          Failed ("CALL TO CREATE RAISED EXCEPTION - 2");
    end;
 
-   if Ident ((True, False, True)) /= (True, False, True) or
-     X = (True, False)
+   if Ident ((True, False, True)) /= (True, False, True) or X = (True, False)
    then
       Failed ("INCORRECT AGGREGATE");
    end if;
@@ -193,8 +186,7 @@ begin
    begin
       X := Ident ((True, False, True));
       if X (Ident_Int (6) .. Ident_Int (7)) /= (False, True) or
-        Create (1, 4, False, X) (1 .. 3) /= (False, True, False)
-      then
+        Create (1, 4, False, X) (1 .. 3) /= (False, True, False) then
          Failed ("INCORRECT SLICE (VALUE)");
       end if;
    exception
@@ -212,8 +204,7 @@ begin
    begin
       X := Ident ((True, False, True));
       if not X /= (False, True, False) or
-        not Create (2, 3, False, X) /= (True, False)
-      then
+        not Create (2, 3, False, X) /= (True, False) then
          Failed ("INCORRECT ""NOT""");
       end if;
    exception
@@ -312,8 +303,7 @@ begin
 
    begin
       if X & False /= (True, False, True, False) or
-        Create (2, 3, False, X) & False /= (False, True, False)
-      then
+        Create (2, 3, False, X) & False /= (False, True, False) then
          Failed ("INCORRECT & (ARRAY, COMPONENT)");
       end if;
    exception
@@ -325,8 +315,7 @@ begin
 
    begin
       if False & X /= (False, True, False, True) or
-        False & Create (2, 3, True, X) /= (False, True, False)
-      then
+        False & Create (2, 3, True, X) /= (False, True, False) then
          Failed ("INCORRECT & (COMPONENT, ARRAY)");
       end if;
    exception

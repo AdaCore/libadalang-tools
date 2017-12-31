@@ -62,8 +62,7 @@ begin
       "Check that the specified exceptions are " &
       "raised by the subprograms defined in package " &
       "Ada.Numerics.Generic_Complex_Elementary_" &
-      "Functions given the prescribed input " &
-      "parameter values");
+      "Functions given the prescribed input " & "parameter values");
 
    Test_Block :
    declare
@@ -246,8 +245,7 @@ begin
             Report.Failed
               ("Constraint_Error not raised when the " &
                "exponentiation operator left operand is " &
-               "complex zero, and the real exponent is " &
-               "negative");
+               "complex zero, and the real exponent is " & "negative");
             No_Optimize (Tc_Complex);
          exception
             when Constraint_Error =>
@@ -256,8 +254,7 @@ begin
                Report.Failed
                  ("Incorrect exception raised when the " &
                   "exponentiation operator left operand is " &
-                  "complex zero, and the real exponent is " &
-                  "negative");
+                  "complex zero, and the real exponent is " & "negative");
          end;
 
          -- Raised by Arctan, when the value of the parameter is +i.

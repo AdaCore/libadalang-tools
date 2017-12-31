@@ -79,8 +79,7 @@ procedure Cxaia04 is
    My_Inserted : Boolean;
 
    procedure Tampering_Check
-     (Container : in out My_Indefinite_Ordered_Maps.Map;
-      Where     : in     String)
+     (Container : in out My_Indefinite_Ordered_Maps.Map; Where : in String)
    is
 
       Program_Error_Raised : Boolean := False;
@@ -147,8 +146,7 @@ begin
    for I in Fxaia00.Array_Bounds_Type loop
 
       My_Map_1.Insert
-        (Key      => My_Key_Type (I),
-         New_Item => Value_In_Ptr_Array (I).all);
+        (Key => My_Key_Type (I), New_Item => Value_In_Ptr_Array (I).all);
 
       if My_Map_1.Length /= I then
 
@@ -187,8 +185,7 @@ begin
       begin
 
          if My_Indefinite_Ordered_Maps.Element (Position => My_Cursor_1) /=
-           Value_In_Ptr_Array (I).all
-         then
+           Value_In_Ptr_Array (I).all then
 
             Report.Failed
               ("Mismatch between element and what was inserted #2");
@@ -196,8 +193,7 @@ begin
          end if;
 
          if My_Map_1.Element (Key => My_Key_Type (I)) /=
-           Value_In_Ptr_Array (I).all
-         then
+           Value_In_Ptr_Array (I).all then
 
             Report.Failed
               ("Mismatch between element and what was inserted #3");
@@ -205,8 +201,7 @@ begin
          end if;
 
          if My_Indefinite_Ordered_Maps.Key (Position => My_Cursor_1) /=
-           My_Key_Type (I)
-         then
+           My_Key_Type (I) then
 
             Report.Failed ("Key not as expected");
 
@@ -222,8 +217,7 @@ begin
          end if;
 
          My_Indefinite_Ordered_Maps.Query_Element
-           (Position => My_Cursor_1,
-            Process  => My_Query'Access);
+           (Position => My_Cursor_1, Process => My_Query'Access);
 
       end;
 
@@ -243,8 +237,7 @@ begin
    end loop;
 
    if My_Map_1.First_Element /=
-     Value_In_Ptr_Array (Value_In_Ptr_Array'First).all
-   then
+     Value_In_Ptr_Array (Value_In_Ptr_Array'First).all then
 
       Report.Failed ("Mismatch between first element and first inserted");
 
@@ -264,8 +257,7 @@ begin
       -- Insert the "Ith" string of the test data
 
       My_Map_2.Insert
-        (Key      => My_Key_Type (I),
-         New_Item => Value_In_Ptr_Array (I).all);
+        (Key => My_Key_Type (I), New_Item => Value_In_Ptr_Array (I).all);
 
       if My_Map_2.Length /= Fxaia00.Num_Tests - I + 1 then
 
@@ -280,8 +272,7 @@ begin
    for I in reverse Fxaia00.Array_Bounds_Type loop
 
       if My_Indefinite_Ordered_Maps.Element (Position => My_Cursor_2) /=
-        Value_In_Ptr_Array (I).all
-      then
+        Value_In_Ptr_Array (I).all then
 
          Report.Failed ("Mismatch between element and what was inserted #4");
 
@@ -302,8 +293,7 @@ begin
 
    end loop;
 
-   if My_Map_2.Last_Element /=
-     Value_In_Ptr_Array (Value_In_Ptr_Array'Last).all
+   if My_Map_2.Last_Element /= Value_In_Ptr_Array (Value_In_Ptr_Array'Last).all
    then
 
       Report.Failed ("Mismatch between last element and last inserted");
@@ -338,8 +328,7 @@ begin
          Tampering_Check (Container => My_Map_3, Where => "Iterate");
 
          if My_Indefinite_Ordered_Maps.Element (Position) /=
-           Value_In_Ptr_Array (I).all
-         then
+           Value_In_Ptr_Array (I).all then
 
             Report.Failed ("Iterate hasn't found the expected value");
 
@@ -359,8 +348,7 @@ begin
       begin
 
          if My_Indefinite_Ordered_Maps.Element (Position) /=
-           Value_In_Ptr_Array (I).all
-         then
+           Value_In_Ptr_Array (I).all then
 
             Report.Failed ("Reverse_Iterate hasn't found the expected value");
 
@@ -416,12 +404,10 @@ begin
          New_String (2) := Character'Succ (New_String (2));
 
          My_Map_1.Replace_Element
-           (Position => My_Cursor_1,
-            New_Item => New_String);
+           (Position => My_Cursor_1, New_Item => New_String);
 
          My_Map_2.Update_Element
-           (Position => My_Cursor_2,
-            Process  => My_Update'Access);
+           (Position => My_Cursor_2, Process => My_Update'Access);
 
       end;
 
@@ -449,8 +435,7 @@ begin
    for I in Fxaia00.Array_Bounds_Type loop
 
       My_Map_1.Insert
-        (Key      => My_Key_Type (I),
-         New_Item => Value_In_Ptr_Array (I).all);
+        (Key => My_Key_Type (I), New_Item => Value_In_Ptr_Array (I).all);
 
    end loop;
 
@@ -468,8 +453,7 @@ begin
    for I in Fxaia00.Array_Bounds_Type loop
 
       My_Map_2.Insert
-        (Key      => My_Key_Type (I),
-         New_Item => Value_In_Ptr_Array (I).all);
+        (Key => My_Key_Type (I), New_Item => Value_In_Ptr_Array (I).all);
 
    end loop;
 
@@ -486,8 +470,7 @@ begin
    for I in Fxaia00.Array_Bounds_Type loop
 
       if My_Indefinite_Ordered_Maps.Element (Position => My_Cursor_1) /=
-        Value_In_Ptr_Array (I).all
-      then
+        Value_In_Ptr_Array (I).all then
 
          Report.Failed ("Target Map not as expected after move");
 
@@ -667,8 +650,7 @@ begin
    My_Cursor_2 := My_Map_2.First;
 
    if My_Indefinite_Ordered_Maps.Element (Position => My_Cursor_2) /=
-     Value_In_Ptr_Array (2).all
-   then
+     Value_In_Ptr_Array (2).all then
 
       Report.Failed ("Inserted value not as expected #1");
 
@@ -678,8 +660,7 @@ begin
 
    -- Check = Default_Value
    if My_Indefinite_Ordered_Maps.Element (Position => My_Cursor_2) /=
-     My_Default_Value
-   then
+     My_Default_Value then
 
       Report.Failed ("Inserted value not as expected #2");
 
@@ -688,8 +669,7 @@ begin
    My_Indefinite_Ordered_Maps.Next (Position => My_Cursor_2);
 
    if My_Indefinite_Ordered_Maps.Element (Position => My_Cursor_2) /=
-     Value_In_Ptr_Array (1).all
-   then
+     Value_In_Ptr_Array (1).all then
 
       Report.Failed ("Inserted value not as expected #3");
 
@@ -698,8 +678,7 @@ begin
    My_Indefinite_Ordered_Maps.Next (Position => My_Cursor_2);
 
    if My_Indefinite_Ordered_Maps.Element (Position => My_Cursor_2) /=
-     Value_In_Ptr_Array (1).all
-   then
+     Value_In_Ptr_Array (1).all then
 
       Report.Failed ("Inserted value not as expected #4");
 
@@ -708,8 +687,7 @@ begin
    My_Indefinite_Ordered_Maps.Next (Position => My_Cursor_2);
 
    if My_Indefinite_Ordered_Maps.Element (Position => My_Cursor_2) /=
-     My_Default_Value
-   then
+     My_Default_Value then
 
       Report.Failed ("Inserted value not as expected #5");
 
@@ -718,8 +696,7 @@ begin
    My_Indefinite_Ordered_Maps.Next (Position => My_Cursor_2);
 
    if My_Indefinite_Ordered_Maps.Element (Position => My_Cursor_2) /=
-     Value_In_Ptr_Array (2).all
-   then
+     Value_In_Ptr_Array (2).all then
 
       Report.Failed ("Inserted value not as expected #6");
 
@@ -760,8 +737,7 @@ begin
    end if;
 
    -- Check = Default_Value
-   if My_Indefinite_Ordered_Maps.Element (My_Map_2.First) /=
-     My_Default_Value
+   if My_Indefinite_Ordered_Maps.Element (My_Map_2.First) /= My_Default_Value
    then
 
       Report.Failed ("Remaining value not as expected");
@@ -775,8 +751,7 @@ begin
    My_Cursor_1 := My_Map_1.Find (Key => 9);
 
    if My_Indefinite_Ordered_Maps.Element (Position => My_Cursor_1) /=
-     Value_In_Ptr_Array (9).all
-   then
+     Value_In_Ptr_Array (9).all then
 
       Report.Failed ("Found value not as expected");
 
@@ -785,8 +760,7 @@ begin
    My_Cursor_2 := My_Map_1.Floor (Key => 8);
 
    if My_Indefinite_Ordered_Maps.Element (Position => My_Cursor_2) /=
-     Value_In_Ptr_Array (8).all
-   then
+     Value_In_Ptr_Array (8).all then
 
       Report.Failed ("Floor value not as expected");
 
@@ -807,8 +781,7 @@ begin
    My_Cursor_1 := My_Map_1.Ceiling (Key => 10);
 
    if My_Indefinite_Ordered_Maps.Element (Position => My_Cursor_1) /=
-     Value_In_Ptr_Array (10).all
-   then
+     Value_In_Ptr_Array (10).all then
 
       Report.Failed ("Ceiling value not as expected");
 

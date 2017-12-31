@@ -102,11 +102,8 @@ procedure C34005v is
 
       type Parent is array (Index range <>, Index range <>) of Component;
 
-      function Create
-        (F1, L1 : Index;
-         F2, L2 : Index;
-         C      : Component;
-         Dummy  : Parent   -- TO RESOLVE OVERLOADING.
+      function Create (F1, L1 : Index; F2, L2 : Index; C : Component;
+         Dummy                : Parent   -- TO RESOLVE OVERLOADING.
          ) return Parent;
 
       function Equal (X, Y : Parent) return Boolean;
@@ -124,8 +121,7 @@ procedure C34005v is
    use Pkg_P;
 
    type T is
-     new Parent
-       (Ident_Int (4) .. Ident_Int (5),
+     new Parent (Ident_Int (4) .. Ident_Int (5),
         Ident_Int (6) .. Ident_Int (8));
 
    X : T;
@@ -176,11 +172,8 @@ procedure C34005v is
 
    package body Pkg_P is
 
-      function Create
-        (F1, L1 : Index;
-         F2, L2 : Index;
-         C      : Component;
-         Dummy  : Parent) return Parent
+      function Create (F1, L1 : Index; F2, L2 : Index; C : Component;
+         Dummy                : Parent) return Parent
       is
          B : Component;
       begin
@@ -218,8 +211,7 @@ procedure C34005v is
       function Aggr (A, B, C, D : Component) return Parent is
       begin
          return
-           X : Parent
-             (Index'First .. Index'First + 1,
+           X : Parent (Index'First .. Index'First + 1,
               Index'First .. Index'First + 1)
          do
             Assign (X (Index'First, Index'First), A);
@@ -232,8 +224,7 @@ procedure C34005v is
       function Aggr (A, B, C, D, E, F : Component) return Parent is
       begin
          return
-           X : Parent
-             (Index'First .. Index'First + 1,
+           X : Parent (Index'First .. Index'First + 1,
               Index'First .. Index'First + 2)
          do
             Assign (X (Index'First, Index'First), A);
@@ -248,8 +239,7 @@ procedure C34005v is
       function Aggr (A, B, C, D, E, F, G, H : Component) return Parent is
       begin
          return
-           X : Parent
-             (Index'First .. Index'First + 3,
+           X : Parent (Index'First .. Index'First + 3,
               Index'First .. Index'First + 1)
          do
             Assign (X (Index'First, Index'First), A);
@@ -266,8 +256,7 @@ procedure C34005v is
       function Aggr (A, B, C, D, E, F, G, H, I : Component) return Parent is
       begin
          return
-           X : Parent
-             (Index'First .. Index'First + 2,
+           X : Parent (Index'First .. Index'First + 2,
               Index'First .. Index'First + 2)
          do
             Assign (X (Index'First, Index'First), A);
@@ -341,8 +330,7 @@ begin
       Failed ("INCORRECT ""IN""");
    end if;
 
-   if X not in T or
-     not (Aggr (C1, C2, C3, C4, C5, C6, C7, C8, C9) not in T)
+   if X not in T or not (Aggr (C1, C2, C3, C4, C5, C6, C7, C8, C9) not in T)
    then
       Failed ("INCORRECT ""NOT IN""");
    end if;

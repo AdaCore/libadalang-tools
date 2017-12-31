@@ -38,8 +38,7 @@ begin
    Test
      ("C35503G",
       "CHECK THAT 'PRED' AND 'SUCC' YIELD THE " &
-      "CORRECT RESULT WHEN THE PREFIX IS AN " &
-      "INTEGER TYPE");
+      "CORRECT RESULT WHEN THE PREFIX IS AN " & "INTEGER TYPE");
 
    declare
       type Int is range -6 .. 6;
@@ -86,8 +85,7 @@ begin
          exception
             when others =>
                Failed
-                 ("EXCEPTION RAISED FOR " &
-                  "SINTEGER'PRED OF " &
+                 ("EXCEPTION RAISED FOR " & "SINTEGER'PRED OF " &
                   Integer'Image (I));
          end;
          begin
@@ -97,8 +95,7 @@ begin
          exception
             when others =>
                Failed
-                 ("EXCEPTION RAISED FOR " &
-                  "SINTEGER'SUCC OF " &
+                 ("EXCEPTION RAISED FOR " & "SINTEGER'SUCC OF " &
                   Integer'Image (I));
          end;
       end loop;

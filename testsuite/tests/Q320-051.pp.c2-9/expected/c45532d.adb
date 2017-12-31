@@ -62,8 +62,7 @@ procedure C45532d is
 
 begin
    Test
-     ("C45532D",
-      "FIXED POINT OPERATOR ""/"" " & "FOR DELTA <, =, AND > 1.0");
+     ("C45532D", "FIXED POINT OPERATOR ""/"" " & "FOR DELTA <, =, AND > 1.0");
 
    --------------------------------------------------
 
@@ -85,8 +84,7 @@ begin
       Result_Value := Fx_0p5 (A / B);
 
       if (Result_Value < Lowest_Acceptable_Value) or
-        (Result_Value > Highest_Acceptable_Value)
-      then
+        (Result_Value > Highest_Acceptable_Value) then
          Failed
            ("RESULT OF ""/"" OUTSIDE RESULT MODEL INTERVAL " &
             "WHEN A, B, AND A / B ARE ALL MODEL NUMBERS");
@@ -113,8 +111,7 @@ begin
       Result_Value := Fx_0p5 (A / B);
 
       if (Result_Value < Lowest_Acceptable_Value) or
-        (Result_Value > Highest_Acceptable_Value)
-      then
+        (Result_Value > Highest_Acceptable_Value) then
          Failed
            ("RESULT OF ""/"" OUTSIDE RESULT MODEL INTERVAL " &
             "WHEN A, B MODEL NUMBERS A / B NOT");
@@ -141,8 +138,7 @@ begin
       Result_Value := Fx_1 (A / B);
 
       if (Result_Value < Lowest_Acceptable_Value) or
-        (Result_Value > Highest_Acceptable_Value)
-      then
+        (Result_Value > Highest_Acceptable_Value) then
          Failed
            ("RESULT OF ""/"" OUTSIDE RESULT MODEL INTERVAL " &
             "WHEN USING NO MODEL NUMBERS");

@@ -276,8 +276,7 @@ begin
 
    begin
       declare
-         type Rec
-           (D : not null access function (X : Float) return Float)
+         type Rec (D : not null access function (X : Float) return Float)
          is record
             Dummy : Integer := 0;
          end record;
@@ -418,8 +417,7 @@ begin
       begin
          return
            Result : not null access function (X : Float) return Float :=
-             Double'Access
-         do
+             Double'Access do
             Result := F;
          end return;
       end Func_2;

@@ -55,17 +55,10 @@ begin
 
    Comment ("ACTUAL ELABORATION ORDER WAS " & Order);
 
-   if Order /= "12345" and
-     Order /= "12435" and
-     Order /= "21345" and
-     Order /= "21435" and
-     Order /= "23145" and
-     Order /= "24135" and
-     Order /= "23415" and
-     Order /= "24315" and
-     Order /= "23451" and
-     Order /= "24351"
-   then
+   if Order /= "12345" and Order /= "12435" and Order /= "21345" and
+     Order /= "21435" and Order /= "23145" and Order /= "24135" and
+     Order /= "23415" and Order /= "24315" and Order /= "23451" and
+     Order /= "24351" then
       Failed ("ILLEGAL ELABORATION ORDER");
    end if;
 

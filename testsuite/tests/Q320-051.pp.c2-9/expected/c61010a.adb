@@ -44,25 +44,14 @@ procedure C61010a is
       subtype Int_0_20 is Integer range 0 .. 20;
       type Vrtype (C : Int_0_20 := 20) is limited private;
 
-      procedure Look_In_Vr
-        (X : in Vrtype;
-         C :    Integer;
-         I :    Integer;
-         S :    String;
-         M :    String);
+      procedure Look_In_Vr (X : in Vrtype; C : Integer; I : Integer;
+         S                    :    String; M : String);
 
-      procedure Look_Inout_Vr
-        (X : in out Vrtype;
-         C :        Integer;
-         I :        Integer;
-         S :        String;
-         M :        String);
+      procedure Look_Inout_Vr (X : in out Vrtype; C : Integer; I : Integer;
+         S                       :        String; M : String);
 
-      procedure Set_Vr
-        (X : in out Vrtype;
-         C :        Integer;
-         I :        Integer;
-         S :        String);
+      procedure Set_Vr (X : in out Vrtype; C : Integer; I : Integer;
+         S                :        String);
 
    private
 
@@ -115,12 +104,8 @@ procedure C61010a is
          X := Itype (Ident_Int (V));
       end Set_I;
 
-      procedure Look_In_Vr
-        (X : in Vrtype;
-         C :    Integer;
-         I :    Integer;
-         S :    String;
-         M :    String)
+      procedure Look_In_Vr (X : in Vrtype; C : Integer; I : Integer;
+         S                    :    String; M : String)
       is
       begin
          if (X.C /= C or X.I /= I) or else X.S /= S then
@@ -128,12 +113,8 @@ procedure C61010a is
          end if;
       end Look_In_Vr;
 
-      procedure Look_Inout_Vr
-        (X : in out Vrtype;
-         C :        Integer;
-         I :        Integer;
-         S :        String;
-         M :        String)
+      procedure Look_Inout_Vr (X : in out Vrtype; C : Integer; I : Integer;
+         S                       :        String; M : String)
       is
       begin
          if (X.C /= C or X.I /= I) or else X.S /= S then
@@ -141,11 +122,8 @@ procedure C61010a is
          end if;
       end Look_Inout_Vr;
 
-      procedure Set_Vr
-        (X : in out Vrtype;
-         C :        Integer;
-         I :        Integer;
-         S :        String)
+      procedure Set_Vr (X : in out Vrtype; C : Integer; I : Integer;
+         S                :        String)
       is
       begin
          X := (Ident_Int (C), Ident_Int (I), Ident_Str (S));
@@ -169,11 +147,8 @@ procedure C61010a is
       Look_In_I (X, V, M);
    end Check_In_I;
 
-   procedure Check_Inout_I
-     (X  : in out Itype;
-      Ov :        Integer;
-      Nv :        Integer;
-      M  :        String)
+   procedure Check_Inout_I (X : in out Itype; Ov : Integer; Nv : Integer;
+      M                       :        String)
    is
    begin
       Look_Inout_I (X, Ov, M & " - A");
@@ -189,11 +164,8 @@ procedure C61010a is
       end loop;
    end Check_In_A;
 
-   procedure Check_Inout_A
-     (X  : in out Atype;
-      Ov :        Integer;
-      Nv :        Integer;
-      M  :        String)
+   procedure Check_Inout_A (X : in out Atype; Ov : Integer; Nv : Integer;
+      M                       :        String)
    is
    begin
       for I in X'Range loop
@@ -204,26 +176,15 @@ procedure C61010a is
       end loop;
    end Check_Inout_A;
 
-   procedure Check_In_Vr
-     (X : in Vrtype;
-      C :    Integer;
-      I :    Integer;
-      S :    String;
-      M :    String)
+   procedure Check_In_Vr (X : in Vrtype; C : Integer; I : Integer; S : String;
+      M                     :    String)
    is
    begin
       Look_In_Vr (X, C, I, S, M);
    end Check_In_Vr;
 
-   procedure Check_Inout_Vr
-     (X  : in out Vrtype;
-      Oc :        Integer;
-      Oi :        Integer;
-      Os :        String;
-      Nc :        Integer;
-      Ni :        Integer;
-      Ns :        String;
-      M  :        String)
+   procedure Check_Inout_Vr (X : in out Vrtype; Oc : Integer; Oi : Integer;
+      Os :        String; Nc : Integer; Ni : Integer; Ns : String; M : String)
    is
    begin
       Look_Inout_Vr (X, Oc, Oi, Os, M & " - A");
@@ -232,30 +193,17 @@ procedure C61010a is
       Look_In_Vr (X, Nc, Ni, Ns, M & " - C");
    end Check_Inout_Vr;
 
-   procedure Check_In_R
-     (X : in Rtype;
-      J :    Integer;
-      C :    Integer;
-      I :    Integer;
-      S :    String;
-      M :    String)
+   procedure Check_In_R (X : in Rtype; J : Integer; C : Integer; I : Integer;
+      S                    :    String; M : String)
    is
    begin
       Look_In_I (X.J, J, M & " - A");
       Look_In_Vr (X.R, C, I, S, M & " - B");
    end Check_In_R;
 
-   procedure Check_Inout_R
-     (X  : in out Rtype;
-      Oj :        Integer;
-      Oc :        Integer;
-      Oi :        Integer;
-      Os :        String;
-      Nj :        Integer;
-      Nc :        Integer;
-      Ni :        Integer;
-      Ns :        String;
-      M  :        String)
+   procedure Check_Inout_R (X : in out Rtype; Oj : Integer; Oc : Integer;
+      Oi :    Integer; Os : String; Nj : Integer; Nc : Integer; Ni : Integer;
+      Ns                      :        String; M : String)
    is
    begin
       Look_Inout_I (X.J, Oj, M & " - A");
@@ -289,16 +237,7 @@ begin
    Check_In_R (R1, 6, D, 19, "ABCDEFGHIJ", "IN R");
 
    Check_Inout_R
-     (R1,
-      6,
-      D,
-      19,
-      "ABCDEFGHIJ",
-      13,
-      D,
-      5,
-      "ZYXWVUTSRQ",
-      "INOUT R");
+     (R1, 6, D, 19, "ABCDEFGHIJ", 13, D, 5, "ZYXWVUTSRQ", "INOUT R");
 
    Result;
 end C61010a;

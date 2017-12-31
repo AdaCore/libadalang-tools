@@ -69,8 +69,7 @@ begin
    Test
      ("C45220D",
       "CHECK THAT  '<' , '<=' , '>' , '>='  PRODUCE" &
-      " CORRECT RESULTS ON DERIVED-BOOLEAN-TYPE" &
-      " OPERANDS");
+      " CORRECT RESULTS ON DERIVED-BOOLEAN-TYPE" & " OPERANDS");
 
    -- 64 CASES ( 2 * 2 ORDERED PAIRS OF OPERAND VALUES,
    --               4    OPERATORS : '<' , <=' , '>' , '>='

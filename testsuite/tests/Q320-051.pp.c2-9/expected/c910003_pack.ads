@@ -66,19 +66,15 @@ package C910003_Pack is
 
    Produce_Count : constant := 2; -- Number of items to produce.
 
-   task type Producer
-     (Buffer_Access : Buffer_Access_Type;
-      Start_At      : Item_Type)
-   ;
+   task type Producer (Buffer_Access : Buffer_Access_Type;
+      Start_At                       : Item_Type);
    -- Produces PRODUCE_COUNT items. Starts when activated.
 
    type Tc_Item_Array_Access_Type is
      access Item_Array (1 .. Produce_Count * 2);
 
-   task type Consumer
-     (Buffer_Access : Buffer_Access_Type;
-      Results       : Tc_Item_Array_Access_Type)
-   is
+   task type Consumer (Buffer_Access : Buffer_Access_Type;
+      Results                        : Tc_Item_Array_Access_Type) is
       -- Stores PRODUCE_COUNT*2 items consumed in Results. Starts when
       -- activated.
       entry Wait_Until_Done;

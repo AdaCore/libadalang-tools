@@ -117,9 +117,7 @@ begin
       O5 : Ta2 := (others => (others => <>));
    begin
       Tctouch.Validate_One_Of
-        ("iiiiiiii",
-         "iiiiiiiiiiiiiiii",
-         Message => "O5");
+        ("iiiiiiii", "iiiiiiiiiiiiiiii", Message => "O5");
       -- First if build-in-place, second if not.
       if O5 /= (Ta2'Range (1) => (Ta2'Range (2) => Default)) then
          Report.Failed ("Wrong value: O5");
@@ -201,9 +199,7 @@ begin
       Result : Tc := (others => (others => Default));
    begin
       Tctouch.Validate_One_Of
-        ("iiiiiiii",
-         "iiiiiiiiiiiiiiii",
-         Message => "O21");
+        ("iiiiiiii", "iiiiiiiiiiiiiiii", Message => "O21");
       -- First if build-in-place, second if not.
       if O21 /= Result then
          Report.Failed ("Wrong value: O21");
@@ -226,9 +222,7 @@ begin
       Result : Tc := (others => (others => Default));
    begin
       Tctouch.Validate_One_Of
-        ("iiiiiiii",
-         "iiiiiiiiiiiiiiii",
-         Message => "O23");
+        ("iiiiiiii", "iiiiiiiiiiiiiiii", Message => "O23");
       -- First if build-in-place, second if not.
       if O23 /= Result then
          Report.Failed ("Wrong value: O23");

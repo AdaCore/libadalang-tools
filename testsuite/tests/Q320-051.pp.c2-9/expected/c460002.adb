@@ -15,8 +15,7 @@ procedure C460002 is
    begin
       -- The accessibility level of type Acc_L1 is 1.
       A1 := Acc_L1 (X);
-      if Natural (Ident_Int (A1.C (1))) /=
-        3
+      if Natural (Ident_Int (A1.C (1))) /= 3
       then       --Avoid Optimization of A1
          Report.Failed ("Initial Values not correct.");
       end if;
@@ -39,10 +38,8 @@ procedure C460002 is
 
    -------------------------------------------------------------
 
-   procedure Display_Results
-     (Result   : in Result_Kind;
-      Expected : in Result_Kind;
-      Msg      : in String)
+   procedure Display_Results (Result : in Result_Kind;
+      Expected                       : in Result_Kind; Msg : in String)
    is
    begin
       if Result /= Expected then

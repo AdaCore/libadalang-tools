@@ -69,18 +69,9 @@ begin
       type R10 (D : access Integer := new Integer'(4)) is limited null record;
       type Arr is array (Character) of Integer;
 
-      package Inst is new Gen
-        (T1  => Character,
-         T2  => Integer,
-         T3  => Modular,
-         T4  => Float,
-         T5  => Duration,
-         T6  => Decimal,
-         T7  => Access_Modular,
-         T8  => Boolean,
-         T9  => R9,
-         T10 => R10,
-         T11 => Arr);
+      package Inst is new Gen (T1 => Character, T2 => Integer, T3 => Modular,
+         T4 => Float, T5 => Duration, T6 => Decimal, T7 => Access_Modular,
+         T8 => Boolean, T9 => R9, T10 => R10, T11 => Arr);
 
       X1  : Inst.Nt1  := 'a';
       X2  : Inst.Nt2  := 0;
@@ -241,8 +232,7 @@ begin
       Comment
         ("Check that operational items can be specified for a " &
          "derived untagged type even if the parent type is a " &
-         "by-reference type, or has user-defined primitive " &
-         "subprograms");
+         "by-reference type, or has user-defined primitive " & "subprograms");
 
       Deriv.Nt1'Write (S'Access, X1);
       Deriv.Nt1'Read (S'Access, X1);

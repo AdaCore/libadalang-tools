@@ -113,8 +113,7 @@ begin
          -- Insert the word "programming" prior to "language".
          Document (1) :=
            Asunb.Insert
-             (Document (1),
-              Asunb.Index (Document (1), "language"),
+             (Document (1), Asunb.Index (Document (1), "language"),
               Asunb.To_String ("progra" &           -- Str &
               Asunb."*" (2, 'm') &   -- Unbd &
               "ing "));            -- Str
@@ -132,10 +131,8 @@ begin
          -- Replace the word "lifed" with "lived".
          Document (1) :=
            Asunb.Replace_Slice
-             (Document (1),
-              Asunb.Index (Document (1), "lifed"),
-              Asunb.Length (Document (1)),
-              "lived");
+             (Document (1), Asunb.Index (Document (1), "lifed"),
+              Asunb.Length (Document (1)), "lived");
 
          -- Overwrite the word "lived" with "lived" + additional text.
          Document (1) :=
@@ -151,18 +148,14 @@ begin
          -- unbounded string.
 
          Document (2) :=
-           'G' &
-           Asunb.To_Unbounded_String ("o ") &
-           Asunb.To_Unbounded_String ("with") &
-           ' ' &
-           "Ada!";
+           'G' & Asunb.To_Unbounded_String ("o ") &
+           Asunb.To_Unbounded_String ("with") & ' ' & "Ada!";
 
       end Enter_Text_Into_Document;
 
       -----
 
-      procedure Create_Camera_Ready_Copy
-        (Document    : in     Document_Type;
+      procedure Create_Camera_Ready_Copy (Document : in     Document_Type;
          Camera_Copy :    out Camera_Ready_Copy_Type)
       is
       begin
@@ -180,8 +173,7 @@ begin
               Asunb.Index
                 (Asunb.To_Unbounded_String
                    (Asunb.Slice (Document (1), 1, Line_Length)),
-                 Ada.Strings.Maps.To_Set (' '),
-                 Ada.Strings.Inside,
+                 Ada.Strings.Maps.To_Set (' '), Ada.Strings.Inside,
                  Ada.Strings.Backward)) &
            ' ';
 
@@ -189,8 +181,7 @@ begin
            (2) :=                 -- Take characters 40-79.
            Asunb.Slice
              (Document
-                (1),
-              40,
+                (1), 40,
               (Asunb.Index_Non_Blank          -- Should return 79
                  (Asunb.To_Unbounded_String
                     (Asunb.Slice
@@ -255,15 +246,12 @@ begin
       -- Reformat the unbounded strings into fixed string format.
 
       Create_Camera_Ready_Copy
-        (Document    => Pamphlet,
-         Camera_Copy => Camera_Ready_Copy);
+        (Document => Pamphlet, Camera_Copy => Camera_Ready_Copy);
 
       -- Verify the conversion process.
 
       if not Valid_Proofread
-          (Draft  => Camera_Ready_Copy,
-           Master => Tc_Finished_Product)
-      then
+          (Draft => Camera_Ready_Copy, Master => Tc_Finished_Product) then
          Report.Failed ("Incorrect string processing result");
       end if;
 

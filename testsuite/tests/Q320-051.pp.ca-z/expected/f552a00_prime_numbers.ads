@@ -66,22 +66,18 @@ package F552a00_Prime_Numbers is
    function Is_Prime (Value : Natural) return Boolean;
 
    package Prime_Number_Iterator is new Ada.Iterator_Interfaces
-     (Cursor      => Natural,
-      Has_Element => Is_Prime);
+     (Cursor => Natural, Has_Element => Is_Prime);
 
-   type Prime_Number_Set
-     (Max_Value : Natural)
-   is new Prime_Number_Iterator.Forward_Iterator with
-   null record;
+   type Prime_Number_Set (Max_Value : Natural)
+   is new Prime_Number_Iterator.Forward_Iterator with null record;
    --  A Prime_Number_Set represents all the prime numbers between 1 and
    --  Max_Value. Two is not considered to be a prime number. Max_Value may
    --  or may not be a prime number
 
    overriding function First (Object : Prime_Number_Set) return Natural;
 
-   overriding function Next
-     (Object : Prime_Number_Set;
-      Value  : Natural) return Natural;
+   overriding function Next (Object : Prime_Number_Set;
+      Value                         : Natural) return Natural;
 
    function Iterate
      (Set : Prime_Number_Set)

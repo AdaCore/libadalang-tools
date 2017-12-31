@@ -182,17 +182,13 @@ begin
       for Site in Completion_Site loop
          Reset_State (7);
          Result :=
-           (case Site is
-              when Vis  => Completed_In_Spec.F004.all,
+           (case Site is when Vis => Completed_In_Spec.F004.all,
               when Priv => Completed_In_Private_Part.F004_Wrapper.all,
-              when Bod  => Completed_In_Body.F004_Wrapper.all);
+              when Bod            => Completed_In_Body.F004_Wrapper.all);
          if Result /= Expected_Result then
             Report.Failed
-              ("Wrong result; Site = " &
-               Completion_Site'Image (Site) &
-               "; Result =" &
-               Index'Image (Result) &
-               "; Expected_Result = " &
+              ("Wrong result; Site = " & Completion_Site'Image (Site) &
+               "; Result =" & Index'Image (Result) & "; Expected_Result = " &
                Index'Image (Expected_Result));
          end if;
       end loop;

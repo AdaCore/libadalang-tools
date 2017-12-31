@@ -6,8 +6,7 @@ package body Fdb3a00 is
 
    Largest_Request_On_Record : System.Storage_Elements.Storage_Count := 0;
 
-   procedure Allocate
-     (Pool                     : in out Stack_Heap;
+   procedure Allocate (Pool    : in out Stack_Heap;
       Storage_Address          :    out System.Address;
       Size_In_Storage_Elements : in     System.Storage_Elements.Storage_Count;
       Alignment                : in     System.Storage_Elements.Storage_Count)
@@ -28,17 +27,14 @@ package body Fdb3a00 is
 
       -- check for overflow
       if Pool.Avail + Size_In_Storage_Elements > Pool.Water_Line then
-         if Pool.Avail >
-           Pool.Water_Line
+         if Pool.Avail > Pool.Water_Line
          then -- Keep Pool.Avail within the pool
             -- so the alignment calculation doesn't fail on a subsequent
             -- allocation:
             Pool.Avail := Pool.Water_Line;
          end if;
          raise Pool_Overflow
-           with "Pool " &
-           Pool.Tc_Id &
-           " with Water_Line" &
+           with "Pool " & Pool.Tc_Id & " with Water_Line" &
            System.Storage_Elements.Storage_Count'Image (Pool.Water_Line);
       end if;
 
@@ -48,13 +44,11 @@ package body Fdb3a00 is
       -- update the housekeeping
       Pool.Avail                := Pool.Avail + Size_In_Storage_Elements;
       Largest_Request_On_Record :=
-        System.Storage_Elements.Storage_Count'Max
-          (Largest_Request_On_Record,
+        System.Storage_Elements.Storage_Count'Max (Largest_Request_On_Record,
            Size_In_Storage_Elements);
    end Allocate;
 
-   procedure Deallocate
-     (Pool                     : in out Stack_Heap;
+   procedure Deallocate (Pool  : in out Stack_Heap;
       Storage_Address          : in     System.Address;
       Size_In_Storage_Elements : in     System.Storage_Elements.Storage_Count;
       Alignment                : in     System.Storage_Elements.Storage_Count)

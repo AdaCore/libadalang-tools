@@ -54,8 +54,7 @@ begin
 
    Test
      ("CE3104A",
-      "CHECK THAT COLUMN, LINE, AND " &
-      "PAGE NUMBERS ARE ONE AFTER A " &
+      "CHECK THAT COLUMN, LINE, AND " & "PAGE NUMBERS ARE ONE AFTER A " &
       "CREATE, OPEN, OR RESET");
 
    begin

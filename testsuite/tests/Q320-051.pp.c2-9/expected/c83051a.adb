@@ -126,9 +126,7 @@ begin
 
       -- A3: VISIBILITY FOR A DERIVED BOOLEAN TYPE
 
-      if Apack.Bpack."<"
-          (Apack.Bpack.T3'(Apack.Bpack.True),
-           Apack.Bpack.False)
+      if Apack.Bpack."<" (Apack.Bpack.T3'(Apack.Bpack.True), Apack.Bpack.False)
       then
          Failed ("VISIBILITY FOR DERIVED BOOLEAN BAD - A3");
       end if;
@@ -148,18 +146,14 @@ begin
       -- A6: VISIBILITY FOR A FIXED POINT INVOLVING UNARY MINUS
 
       if Apack.Bpack."<"
-          (Apack.Bpack.A_Fix,
-           Apack.Bpack.T67'(Apack.Bpack."-" (1.5)))
-      then
+          (Apack.Bpack.A_Fix, Apack.Bpack.T67'(Apack.Bpack."-" (1.5))) then
          Failed ("VISIBILITY FOR FIXED POINT WITH UNARY MINUS " & "BAD - A6");
       end if;
 
       -- A7: VISIBILITY FOR A FIXED POINT DIVIDED BY INTEGER
 
       if Apack.Bpack."/="
-          (Apack.Bpack.T67 (-0.5),
-           Apack.Bpack."/" (Apack.Bpack.A_Fix, 2))
-      then
+          (Apack.Bpack.T67 (-0.5), Apack.Bpack."/" (Apack.Bpack.A_Fix, 2)) then
          Failed
            ("VISIBILITY FOR FIXED POINT DIVIDED BY " & "INTEGER BAD - A7");
       end if;
@@ -168,10 +162,8 @@ begin
 
       if Apack.Bpack."/="
           (Apack.Bpack.Ary,
-           (Apack.Bpack.T3 (True),
-            Apack.Bpack.T3 (True),
-            Apack.Bpack.T3 (True),
-            Apack.Bpack.T3 (False)))
+           (Apack.Bpack.T3 (True), Apack.Bpack.T3 (True),
+            Apack.Bpack.T3 (True), Apack.Bpack.T3 (False)))
       then
          Failed ("VISIBILITY FOR ARRAY EQUALITY BAD - A8");
       end if;
@@ -179,9 +171,7 @@ begin
       -- A9: VISIBILITY FOR ACCESS EQUALITY
 
       if Apack.Bpack."/="
-          (Apack.Bpack.P1 (3),
-           Apack.Bpack.T3 (Ident_Bool (True)))
-      then
+          (Apack.Bpack.P1 (3), Apack.Bpack.T3 (Ident_Bool (True))) then
          Failed ("VISIBILITY FOR ACCESS EQUALITY BAD - A9");
       end if;
 
@@ -194,9 +184,7 @@ begin
       -- A11: VISIBILITY FOR DERIVED SUBPROGRAM
 
       if Apack.Bpack."/="
-          (Apack.Bpack.Ret_T1 (Apack.Bpack.Red),
-           Apack.Bpack.Green)
-      then
+          (Apack.Bpack.Ret_T1 (Apack.Bpack.Red), Apack.Bpack.Green) then
          Failed ("VISIBILITY FOR DERIVED SUBPROGRAM BAD - A11");
       end if;
 
@@ -285,9 +273,7 @@ begin
       -- B1: GENERIC INSTANCE OF UNOVERLOADED ENUMERATION LITERAL
 
       if Mypack.Apack.Bpack."<"
-          (Mypack.Apack.Bpack.Green,
-           Mypack.Apack.Bpack.Orange)
-      then
+          (Mypack.Apack.Bpack.Green, Mypack.Apack.Bpack.Orange) then
          Failed
            ("VISIBILITY FOR GENERIC INSTANCE OF " &
             "UNOVERLOADED ENUMERATION LITERAL BAD - B1");
@@ -319,18 +305,14 @@ begin
       -- B4: VISIBILITY FOR GENERIC INSTANCE OF DERIVED INTEGER
 
       if Mypack.Apack.Bpack."/="
-          (Mypack.Apack.Bpack."MOD" (Mypack.Apack.Bpack.Six, 2),
-           0)
-      then
+          (Mypack.Apack.Bpack."MOD" (Mypack.Apack.Bpack.Six, 2), 0) then
          Failed ("VISIBILITY FOR GENERIC INSTANCE OF INTEGER " & "BAD - B4");
       end if;
 
       -- B5: VISIBILITY FOR GENERIC INSTANCE OF FLOATING POINT
 
       if Mypack.Apack.Bpack.">"
-          (Mypack.Apack.Bpack.T5'(1.9),
-           Mypack.Apack.Bpack.B_Flt)
-      then
+          (Mypack.Apack.Bpack.T5'(1.9), Mypack.Apack.Bpack.B_Flt) then
          Failed
            ("VISIBILITY FOR GENERIC INSTANCE OF FLOATING " & "POINT BAD - B5");
       end if;
@@ -339,9 +321,7 @@ begin
       --     FIXED POINT UNARY PLUS
 
       if Mypack.Apack.Bpack."<"
-          (2.5,
-           Mypack.Apack.Bpack.T67'(Mypack.Apack.Bpack."+" (1.75)))
-      then
+          (2.5, Mypack.Apack.Bpack.T67'(Mypack.Apack.Bpack."+" (1.75))) then
          Failed
            ("VISIBILITY FOR GENERIC INSTANCE OF FIXED " &
             "POINT UNARY PLUS BAD - B6");
@@ -360,10 +340,8 @@ begin
 
       if Mypack.Apack.Bpack."/="
           (Mypack.Apack.Bpack.Ary,
-           (Mypack.Apack.Bpack.T3 (True),
-            Mypack.Apack.Bpack.T3 (False),
-            Mypack.Apack.Bpack.T3 (True),
-            Mypack.Apack.Bpack.T3 (False)))
+           (Mypack.Apack.Bpack.T3 (True), Mypack.Apack.Bpack.T3 (False),
+            Mypack.Apack.Bpack.T3 (True), Mypack.Apack.Bpack.T3 (False)))
       then
          Failed
            ("VISIBILITY FOR GENERIC INSTANCE OF ARRAY " & "EQUALITY BAD - B8");
@@ -383,9 +361,7 @@ begin
       -- B10: VISIBILITY FOR GENERIC INSTANCE OF PRIVATE EQUALITY
 
       if Mypack.Apack.Bpack."/="
-          (Mypack.Apack.Bpack.K1,
-           Mypack.Apack.Bpack.Ret_Char ('V'))
-      then
+          (Mypack.Apack.Bpack.K1, Mypack.Apack.Bpack.Ret_Char ('V')) then
          Failed
            ("VISIBILITY FOR GENERIC INSTANCE OF PRIVATE " &
             "EQUALITY BAD - B10");
@@ -407,9 +383,7 @@ begin
       My_Do_Nothing (Mypack.Apack.Bpack.V1);
 
       if Mypack.Apack.Bpack."/="
-          (Mypack.Apack.Bpack.V1,
-           Mypack.Apack.Bpack.T3 (False))
-      then
+          (Mypack.Apack.Bpack.V1, Mypack.Apack.Bpack.T3 (False)) then
          Failed
            ("VISIBILITY FOR GENERIC INSTANCE OF GENERIC " &
             "SUBPROGRAM BAD - B12");

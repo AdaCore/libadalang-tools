@@ -148,10 +148,8 @@ begin
          for I in Checkpoint_Id loop
             if Chk (I) /= Expected (I) then
                Report.Failed
-                 ("checkpoint error" &
-                  Checkpoint_Id'Image (I) &
-                  " actual is " &
-                  Boolean'Image (Chk (I)));
+                 ("checkpoint error" & Checkpoint_Id'Image (I) &
+                  " actual is " & Boolean'Image (Chk (I)));
             end if;
          end loop;
       end Check_The_Results;

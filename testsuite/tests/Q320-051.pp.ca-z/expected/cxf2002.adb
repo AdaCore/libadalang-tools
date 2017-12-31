@@ -14,8 +14,7 @@ begin
    Report.Test
      ("CXF2002",
       "Check decimal multiplication and division, and " &
-      "'Round, where the operand and result types are " &
-      "the same");
+      "'Round, where the operand and result types are " & "the same");
 
    ---=---=---=---=---=---=---=---=---=---=---
 

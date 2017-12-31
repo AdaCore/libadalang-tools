@@ -85,9 +85,7 @@ begin
       -- exception will be handled to produce a Not_Applicable result.
 
       Text_Io.Create
-        (File => Data_File,
-         Mode => Text_Io.Out_File,
-         Name => Data_Filename);
+        (File => Data_File, Mode => Text_Io.Out_File, Name => Data_Filename);
 
    exception
       when Text_Io.Use_Error | Text_Io.Name_Error =>
@@ -163,8 +161,7 @@ begin
         (Integer (Text_Io.Line (Data_File)) /=
          Report.Ident_Int (9)) or         -- Verify new
         (Integer (Text_Io.Col (Data_File)) /=              -- position.
-        Report.Ident_Int (1))
-      then
+        Report.Ident_Int (1)) then
          Report.Failed ("Incorrect results from line/column positioning");
       end if;
 
@@ -203,11 +200,9 @@ begin
             Text_Io.Get_Line (Data_File, Tc_String, Tc_Position);
          end loop;
 
-         if (Tc_Position /= 14)
-           or else          -- Verify the title line.
-           (Tc_String (1 .. 6) /= "X.  RE")
-           or else (Tc_String (2 .. 14) /= (".  " & Reference_Title))
-         then
+         if (Tc_Position /= 14) or else          -- Verify the title line.
+         (Tc_String (1 .. 6) /= "X.  RE")
+           or else (Tc_String (2 .. 14) /= (".  " & Reference_Title)) then
             Report.Failed ("Incorrect positioning of title line");
          end if;
          -- Loop to the eighth line
@@ -216,8 +211,7 @@ begin
          end loop;
 
          if (Tc_Position /= 51) or               -- Verify the contents.
-           (Tc_String (30 .. 51) /= "Available Upon Request")
-         then
+           (Tc_String (30 .. 51) /= "Available Upon Request") then
             Report.Failed ("Incorrect positioning of contents line");
          end if;
 

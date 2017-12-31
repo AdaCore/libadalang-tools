@@ -17,9 +17,8 @@ package body C641001_0 is
          Report.Failed ("Exception encountered in Check_String_10");
    end Check_String_10;
 
-   procedure Check_Illegal_Slice_Reference
-     (Slice_Passed : in out String;
-      Index        :        Natural)
+   procedure Check_Illegal_Slice_Reference (Slice_Passed : in out String;
+      Index                                              :        Natural)
    is
    begin
       -- essentially "do-nothing" for optimization foilage...

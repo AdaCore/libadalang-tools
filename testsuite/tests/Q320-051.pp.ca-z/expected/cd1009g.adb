@@ -38,8 +38,7 @@ begin
    Test
      ("CD1009G",
       "A 'SIZE' CLAUSE MAY BE GIVEN IN THE VISIBLE " &
-      "OR PRIVATE PART OF A PACKAGE FOR A " &
-      "RECORD TYPE DECLARED IN THE " &
+      "OR PRIVATE PART OF A PACKAGE FOR A " & "RECORD TYPE DECLARED IN THE " &
       "VISIBLE PART OF THE SAME PACKAGE");
    declare
       package Pack is
@@ -68,8 +67,7 @@ begin
 
       if X'Size < Specified_Size then
          Failed
-           ("OBJECT SIZE TOO SMALL -- CHECK_TYPE_1.  " &
-            "VALUE IS" &
+           ("OBJECT SIZE TOO SMALL -- CHECK_TYPE_1.  " & "VALUE IS" &
             Integer'Image (Ident_Int (X.I)));
       end if;
 
@@ -79,8 +77,7 @@ begin
 
       if Y'Size < Specified_Size then
          Failed
-           ("OBJECT SIZE TOO SMALL -- CHECK_TYPE_2.  " &
-            "VALUE IS" &
+           ("OBJECT SIZE TOO SMALL -- CHECK_TYPE_2.  " & "VALUE IS" &
             Integer'Image (Ident_Int (Y.I)));
       end if;
    end;

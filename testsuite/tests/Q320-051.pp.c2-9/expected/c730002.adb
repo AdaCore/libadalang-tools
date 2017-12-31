@@ -49,8 +49,7 @@ begin
       --       evaluated for the purposes of this test.
 
       if Tc_Personnel_Required (Nuclear_Drive) /= 3 or
-        Tc_Time_Required (Nuclear_Drive) /= 9
-      then
+        Tc_Time_Required (Nuclear_Drive) /= 9 then
          Report.Failed ("Wrong body was executed - non-dispatching case");
       end if;
 
@@ -71,8 +70,7 @@ begin
       end if;
 
       if Tc_Personnel_Required (Nuclear_Drive) /= 3 or
-        Tc_Time_Required (Nuclear_Drive) /= 9
-      then
+        Tc_Time_Required (Nuclear_Drive) /= 9 then
          Report.Failed ("Wrong body was executed - dispatching case");
       end if;
 

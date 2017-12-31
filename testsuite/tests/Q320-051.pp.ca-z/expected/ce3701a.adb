@@ -46,8 +46,7 @@ begin
 
    Test
      ("CE3701A",
-      "CHECK THAT GET AND PUT RAISE " &
-      "STATUS_ERROR IF THE FILE " &
+      "CHECK THAT GET AND PUT RAISE " & "STATUS_ERROR IF THE FILE " &
       "IS NOT OPEN");
 
    begin

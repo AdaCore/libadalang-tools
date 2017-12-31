@@ -52,9 +52,8 @@ procedure Cc51d01 is
 
    package Ranked_Lists is new Fc51d00 (Ranked_Id_Type);
    procedure Update_And_Write is new                     -- Overloads.
-   Cc51d01_1
-     (Elem_Type => Ranked_Id_Type,
-      List_Mgr  => Ranked_Lists);
+   Cc51d01_1 (Elem_Type => Ranked_Id_Type,
+      List_Mgr          => Ranked_Lists);
    Ranked_List : Ranked_Lists.List_Type;
 
 -- End instantiations and list declarations. -----------

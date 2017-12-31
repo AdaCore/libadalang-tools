@@ -10,9 +10,7 @@ procedure C980003 is
       if Cur /= Should_Be then
          Report.Failed (Msg);
          Report.Comment
-           ("expected: " &
-            States'Image (Should_Be) &
-            "  found: " &
+           ("expected: " & States'Image (Should_Be) & "  found: " &
             States'Image (Cur));
       elsif Verbose then
          Report.Comment ("passed: " & Msg);
@@ -106,8 +104,7 @@ begin
    State_Manager.Reset;
    declare
       type Pointer_Type is access Is_Controlled;
-      procedure Free is new Ada.Unchecked_Deallocation
-        (Is_Controlled,
+      procedure Free is new Ada.Unchecked_Deallocation (Is_Controlled,
          Pointer_Type);
       Ptr : Pointer_Type;
    begin

@@ -52,8 +52,7 @@ begin
    Test
      ("CE2410B",
       "CHECK THAT END_OF_FILE RAISES MODE_ERROR WHEN " &
-      "THE CURRENT MODE IS OUT_FILE AND THE FILE IS " &
-      "A TEMPORARY FILE.");
+      "THE CURRENT MODE IS OUT_FILE AND THE FILE IS " & "A TEMPORARY FILE.");
 
    begin
       Create (File1, Out_File);

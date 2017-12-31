@@ -52,8 +52,7 @@ procedure Ce3409a is
 begin
 
    Test
-     ("CE3409A",
-      "CHECK THAT SET_COL RAISES " & "LAYOUT_ERROR APPROPRIATELY");
+     ("CE3409A", "CHECK THAT SET_COL RAISES " & "LAYOUT_ERROR APPROPRIATELY");
 
    begin
       Create (File);

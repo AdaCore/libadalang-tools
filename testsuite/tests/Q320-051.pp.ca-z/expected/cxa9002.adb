@@ -60,10 +60,8 @@ begin
 
       type Tag_Pointer_Type is access String;
 
-      Tc_Account_Type_Tag,
-      Tc_Cash_Account_Type_Tag,
-      Tc_Investment_Account_Type_Tag,
-      Tc_Checking_Account_Type_Tag,
+      Tc_Account_Type_Tag, Tc_Cash_Account_Type_Tag,
+      Tc_Investment_Account_Type_Tag, Tc_Checking_Account_Type_Tag,
       Tc_Savings_Account_Type_Tag : Tag_Pointer_Type;
 
       Tc_Account : Account_Type := (Num => "123");
@@ -75,10 +73,8 @@ begin
         (Num => "456", Investment_Vehicle => Bonds);
 
       Tc_Checking_Account : Checking_Account_Type :=
-        (Num               => "567",
-         Years_As_Customer => 2,
-         Checks_Per_Year   => 300,
-         Interest_Bearing  => True);
+        (Num => "567", Years_As_Customer => 2, Checks_Per_Year => 300,
+         Interest_Bearing => True);
 
       Tc_Savings_Account : Savings_Account_Type :=
         (Num => "789", Years_As_Customer => 14, Kind => Business);
@@ -296,8 +292,7 @@ begin
          begin
 
             if Tc_Account_Type_Tag.all /=
-              Ada.Tags.External_Tag (Account_Type'Class (Account)'Tag)
-            then
+              Ada.Tags.External_Tag (Account_Type'Class (Account)'Tag) then
                Report.Failed ("Incorrect Account tag");
             end if;
 

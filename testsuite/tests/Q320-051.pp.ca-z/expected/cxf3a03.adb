@@ -115,10 +115,8 @@ begin
          return False;
       end V_Present;
 
-      function Accurate_Length
-        (Pict_Str        : String;
-         Inst            : Instantiation_Type;
-         Currency_String : String) return Boolean
+      function Accurate_Length (Pict_Str : String; Inst : Instantiation_Type;
+         Currency_String                 : String) return Boolean
       is
 
          Tc_Length                     : Natural := 0;
@@ -150,8 +148,7 @@ begin
 
          return Tc_Length =
            Editing.Pic_String (Tc_Picture)'Length +
-             Tc_Currency_Length_Adjustment -
-             Tc_Radix_Adjustment;
+             Tc_Currency_Length_Adjustment - Tc_Radix_Adjustment;
       end Accurate_Length;
 
    begin
@@ -167,15 +164,11 @@ begin
 
          for I in 1 .. 10 loop
             if not Accurate_Length
-                (Fxf3a00.Valid_Strings (I).all,
-                 Twodp,
-                 Tc_Us_String)
-            then
+                (Fxf3a00.Valid_Strings (I).all, Twodp, Tc_Us_String) then
                Report.Failed
                  ("Incorrect result from function Length, " &
                   "when used with a decimal type with delta .01 " &
-                  "and with the currency string " &
-                  Tc_Us_String &
+                  "and with the currency string " & Tc_Us_String &
                   " in evaluating picture string " &
                   Fxf3a00.Valid_Strings (I).all);
             end if;
@@ -187,15 +180,11 @@ begin
 
          for I in 17 .. 20 loop
             if not Accurate_Length
-                (Fxf3a00.Valid_Strings (I).all,
-                 Ndp,
-                 Tc_Us_String)
-            then
+                (Fxf3a00.Valid_Strings (I).all, Ndp, Tc_Us_String) then
                Report.Failed
                  ("Incorrect result from function Length, " &
                   "when used with a decimal type with delta 1.0 " &
-                  "and with the currency string " &
-                  Tc_Us_String &
+                  "and with the currency string " & Tc_Us_String &
                   " in evaluating picture string " &
                   Fxf3a00.Valid_Strings (I).all);
             end if;
@@ -207,15 +196,11 @@ begin
 
          for I in 1 .. Fxf3a00.Number_Of_Ff_Strings loop
             if not Accurate_Length
-                (Fxf3a00.Foreign_Strings (I).all,
-                 Twodp,
-                 Tc_Ff_String)
-            then
+                (Fxf3a00.Foreign_Strings (I).all, Twodp, Tc_Ff_String) then
                Report.Failed
                  ("Incorrect result from function Length, " &
                   "when used with a decimal type with delta .01 " &
-                  "and with the currency string " &
-                  Tc_Ff_String &
+                  "and with the currency string " & Tc_Ff_String &
                   " in evaluating picture string " &
                   Fxf3a00.Foreign_Strings (I).all);
             end if;
@@ -231,15 +216,11 @@ begin
 
          for I in Tc_Lower_Bound .. Tc_Higher_Bound loop
             if not Accurate_Length
-                (Fxf3a00.Foreign_Strings (I).all,
-                 Twodp,
-                 Tc_Dm_String)
-            then
+                (Fxf3a00.Foreign_Strings (I).all, Twodp, Tc_Dm_String) then
                Report.Failed
                  ("Incorrect result from function Length, " &
                   "when used with a decimal type with delta .01 " &
-                  "and with the currency string " &
-                  Tc_Dm_String &
+                  "and with the currency string " & Tc_Dm_String &
                   " in evaluating picture string " &
                   Fxf3a00.Foreign_Strings (I).all);
             end if;
@@ -250,15 +231,11 @@ begin
          -- string "CHF" (three characters).
 
          if not Accurate_Length
-             (Fxf3a00.Foreign_Strings (10).all,
-              Twodp,
-              Tc_Chf_String)
-         then
+             (Fxf3a00.Foreign_Strings (10).all, Twodp, Tc_Chf_String) then
             Report.Failed
               ("Incorrect result from function Length, " &
                "when used with a decimal type with delta .01 " &
-               "and with the currency string " &
-               Tc_Chf_String);
+               "and with the currency string " & Tc_Chf_String);
          end if;
 
       exception
@@ -294,15 +271,13 @@ begin
             Tc_Picture := Editing.To_Picture (Fxf3a00.Foreign_Strings (I).all);
 
             if not Pack_2dp.Valid
-                (Fxf3a00.Data_With_2dp (Tc_Offset + I),
-                 Tc_Picture,
+                (Fxf3a00.Data_With_2dp (Tc_Offset + I), Tc_Picture,
                  Tc_Ff_String)
             then
                Report.Failed
                  ("Incorrect result from function Valid, " &
                   "when used with a decimal type with delta .01 " &
-                  "and with the currency string " &
-                  Tc_Ff_String &
+                  "and with the currency string " & Tc_Ff_String &
                   " in evaluating picture string " &
                   Fxf3a00.Foreign_Strings (I).all);
             end if;
@@ -321,15 +296,13 @@ begin
             Tc_Picture := Editing.To_Picture (Fxf3a00.Foreign_Strings (I).all);
 
             if not Pack_2dp.Valid
-                (Fxf3a00.Data_With_2dp (Tc_Offset + I),
-                 Tc_Picture,
+                (Fxf3a00.Data_With_2dp (Tc_Offset + I), Tc_Picture,
                  Tc_Dm_String)
             then
                Report.Failed
                  ("Incorrect result from function Valid, " &
                   "when used with a decimal type with delta .01 " &
-                  "and with the currency string " &
-                  Tc_Dm_String &
+                  "and with the currency string " & Tc_Dm_String &
                   " in evaluating picture string " &
                   Fxf3a00.Foreign_Strings (I).all);
             end if;
@@ -343,15 +316,13 @@ begin
          Tc_Picture := Editing.To_Picture (Fxf3a00.Foreign_Strings (10).all);
 
          if not Pack_2dp.Valid
-             (Fxf3a00.Data_With_2dp (Tc_Offset + 10),
-              Tc_Picture,
+             (Fxf3a00.Data_With_2dp (Tc_Offset + 10), Tc_Picture,
               Tc_Chf_String)
          then
             Report.Failed
               ("Incorrect result from function Valid, " &
                "when used with a decimal type with delta .01 " &
-               "and with the currency string " &
-               Tc_Chf_String);
+               "and with the currency string " & Tc_Chf_String);
          end if;
 
          -- The following For Loop examines cases where the decimal
@@ -369,15 +340,11 @@ begin
               Editing.To_Picture (Fxf3a00.Valid_Strings (Tc_Offset + I).all);
 
             if not Pack_Ndp.Valid
-                (Fxf3a00.Data_With_Ndp (I),
-                 Tc_Picture,
-                 Tc_Us_String)
-            then
+                (Fxf3a00.Data_With_Ndp (I), Tc_Picture, Tc_Us_String) then
                Report.Failed
                  ("Incorrect result from function Valid, " &
                   "when used with a decimal type with delta .01 " &
-                  "and with the currency string " &
-                  Tc_Us_String &
+                  "and with the currency string " & Tc_Us_String &
                   " in evaluating picture string " &
                   Fxf3a00.Valid_Strings (I).all);
             end if;
@@ -399,15 +366,13 @@ begin
 
             if I < 3 then  -- Choose the appropriate instantiation.
                if Pack_2dp.Valid
-                   (Item     => Fxf3a00.Erroneous_Data (I),
-                    Pic      => Tc_Picture,
+                   (Item     => Fxf3a00.Erroneous_Data (I), Pic => Tc_Picture,
                     Currency => Tc_Us_String)
                then
                   Report.Failed
                     ("Incorrect result from function Valid, " &
                      "when used with a decimal type with delta " &
-                     "0.01 and with the currency string " &
-                     Tc_Us_String &
+                     "0.01 and with the currency string " & Tc_Us_String &
                      " in evaluating picture string " &
                      Fxf3a00.Valid_Strings (I).all);
                end if;
@@ -415,14 +380,12 @@ begin
                if Pack_Ndp.Valid
                    (Item =>
                       Fxf3a00.Decimal_Type_Ndp (Fxf3a00.Erroneous_Data (I)),
-                    Pic      => Tc_Picture,
-                    Currency => Tc_Us_String)
+                    Pic => Tc_Picture, Currency => Tc_Us_String)
                then
                   Report.Failed
                     ("Incorrect result from function Valid, " &
                      "when used with a decimal type with delta " &
-                     "1.0 and with the currency string " &
-                     Tc_Us_String &
+                     "1.0 and with the currency string " & Tc_Us_String &
                      " in evaluating picture string " &
                      Fxf3a00.Valid_Strings (I).all);
                end if;

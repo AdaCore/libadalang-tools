@@ -78,8 +78,7 @@ begin
             Ac : Accrec;
          begin
             Failed
-              ("NO EXCEPTION RAISED AT THE " &
-               "ELABORATION OF TYPE ACCREC " &
+              ("NO EXCEPTION RAISED AT THE " & "ELABORATION OF TYPE ACCREC " &
                Day'Image (Ac.D));
          end;
       exception

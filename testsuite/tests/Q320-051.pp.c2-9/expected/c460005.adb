@@ -97,8 +97,7 @@ begin
 
          if Operand not in Dtag_Type then
             Report.Failed ("Operand has wrong tag: #04");
-         elsif
-           (Operand /= Tag_Type'Class (Dtag_Type_Res))
+         elsif (Operand /= Tag_Type'Class (Dtag_Type_Res))
          then                                              -- Check to make
             Report.Failed ("Operand has wrong value: #04"); -- sure that C2 was
          end if;                                           -- not modified.
@@ -124,8 +123,7 @@ begin
 
          if Operand not in Ddtag_Type then
             Report.Failed ("Operand has wrong tag: #05");
-         elsif
-           (Operand /= Tag_Type'Class (Ddtag_Type_Res))
+         elsif (Operand /= Tag_Type'Class (Ddtag_Type_Res))
          then                                              -- Check to make
             Report.Failed ("Operand has wrong value: #05"); -- sure that C2, C3
          end if;                                           -- were not changed.

@@ -28,11 +28,8 @@ begin
 
       use Ada.Characters, Ada.Strings;
       use type Wide_Maps.Wide_Character_Set;
-      use type
-        Bs1.Bounded_Wide_String,
-        Bs20.Bounded_Wide_String,
-        Bs40.Bounded_Wide_String,
-        Bs80.Bounded_Wide_String;
+      use type Bs1.Bounded_Wide_String, Bs20.Bounded_Wide_String,
+        Bs40.Bounded_Wide_String, Bs80.Bounded_Wide_String;
 
       Tc_String : constant Wide_String := "A Standard String";
 
@@ -49,28 +46,16 @@ begin
       -- subprograms.
       New_Character_String : Wide_String (1 .. 10) :=
         Handling.To_Wide_String
-          (Acl1.Lc_A_Grave &
-           Acl1.Lc_A_Ring &
-           Acl1.Lc_Ae_Diphthong &
-           Acl1.Lc_C_Cedilla &
-           Acl1.Lc_E_Acute &
-           Acl1.Lc_I_Circumflex &
-           Acl1.Lc_Icelandic_Eth &
-           Acl1.Lc_N_Tilde &
-           Acl1.Lc_O_Oblique_Stroke &
+          (Acl1.Lc_A_Grave & Acl1.Lc_A_Ring & Acl1.Lc_Ae_Diphthong &
+           Acl1.Lc_C_Cedilla & Acl1.Lc_E_Acute & Acl1.Lc_I_Circumflex &
+           Acl1.Lc_Icelandic_Eth & Acl1.Lc_N_Tilde & Acl1.Lc_O_Oblique_Stroke &
            Acl1.Lc_Icelandic_Thorn);
 
       Tc_New_Character_String : Wide_String (1 .. 10) :=
         Handling.To_Wide_String
-          (Acl1.Uc_A_Grave &
-           Acl1.Uc_A_Ring &
-           Acl1.Uc_Ae_Diphthong &
-           Acl1.Uc_C_Cedilla &
-           Acl1.Uc_E_Acute &
-           Acl1.Uc_I_Circumflex &
-           Acl1.Uc_Icelandic_Eth &
-           Acl1.Uc_N_Tilde &
-           Acl1.Uc_O_Oblique_Stroke &
+          (Acl1.Uc_A_Grave & Acl1.Uc_A_Ring & Acl1.Uc_Ae_Diphthong &
+           Acl1.Uc_C_Cedilla & Acl1.Uc_E_Acute & Acl1.Uc_I_Circumflex &
+           Acl1.Uc_Icelandic_Eth & Acl1.Uc_N_Tilde & Acl1.Uc_O_Oblique_Stroke &
            Acl1.Uc_Icelandic_Thorn);
 
       -- Access objects that will be provided as parameters to the subprograms.
@@ -86,14 +71,11 @@ begin
       -- Function Index.
 
       if Bs80.Index
-          (Bs80.To_Bounded_Wide_String ("CoMpLeTeLy MiXeD CaSe"),
-           "MIXED CASE",
-           Ada.Strings.Forward,
-           Map_To_Upper_Case_Ptr) /=
+          (Bs80.To_Bounded_Wide_String ("CoMpLeTeLy MiXeD CaSe"), "MIXED CASE",
+           Ada.Strings.Forward, Map_To_Upper_Case_Ptr) /=
         12 or
         Bs1.Index
-            (Bs1.Null_Bounded_Wide_String,
-             "i",
+            (Bs1.Null_Bounded_Wide_String, "i",
              Mapping => Map_To_Lower_Case_Ptr) /=
           0
       then
@@ -105,13 +87,11 @@ begin
 
       -- Function Count.
       if Bs40.Count
-          (Bs40.To_Bounded_Wide_String ("This IS a MISmatched issue"),
-           "is",
+          (Bs40.To_Bounded_Wide_String ("This IS a MISmatched issue"), "is",
            Map_To_Lower_Case_Ptr) /=
         4 or
         Bs80.Count
-            (Bs80.To_Bounded_Wide_String ("ABABABA"),
-             "ABA",
+            (Bs80.To_Bounded_Wide_String ("ABABABA"), "ABA",
              Map_To_Upper_Case_Ptr) /=
           2
       then
@@ -139,8 +119,7 @@ begin
       -- Procedure Translate.
       Bstring_20 := Bs20.To_Bounded_Wide_String (String_20);
       Bs20.Translate (Bstring_20, Mapping => Map_To_Lower_Case_Ptr);
-      if Bstring_20 /=
-        Bs20.To_Bounded_Wide_String ("abcdefghijklmnopqrst")
+      if Bstring_20 /= Bs20.To_Bounded_Wide_String ("abcdefghijklmnopqrst")
       then
          Report.Failed ("Incorrect result from BND Procedure Translate - 1");
       end if;
@@ -159,8 +138,7 @@ begin
          Append (Bstring_20, 'T');
          Append (Bstring_20, "his string");
          Append
-           (Bstring_20,
-            To_Bounded_Wide_String (" is complete."),
+           (Bstring_20, To_Bounded_Wide_String (" is complete."),
             Drop => Ada.Strings.Right);            -- Drop 4 characters.
          if Bstring_20 /= To_Bounded_Wide_String ("This string is compl") then
             Report.Failed
@@ -189,12 +167,9 @@ begin
       Bstring_1 :=
         Bs1.To_Bounded_Wide_String ("cat", Drop => Ada.Strings.Right);
       Bstring_20 := Bs20.To_Bounded_Wide_String ("Santa Claus");
-      if Bstring_1 < "C" or
-        Bs1."<" (Bstring_1, "c") or
-        Bs1."<" ("x", Bstring_1) or
-        Bs20."<" (Bstring_20, "Santa ") or
-        Bs20."<" ("Santa and his Elves", Bstring_20)
-      then
+      if Bstring_1 < "C" or Bs1."<" (Bstring_1, "c") or
+        Bs1."<" ("x", Bstring_1) or Bs20."<" (Bstring_20, "Santa ") or
+        Bs20."<" ("Santa and his Elves", Bstring_20) then
          Report.Failed
            ("Incorrect results from BND Function ""<"" with " &
             "string - bounded string parameter combinations");
@@ -203,8 +178,7 @@ begin
       -- Operator "<=".
       Bstring_20 := Bs20.To_Bounded_Wide_String ("Sample string");
       if Bs20."<=" (Bstring_20, "Sample strin") or
-        not (Bs20."<=" ("Sample string", Bstring_20))
-      then
+        not (Bs20."<=" ("Sample string", Bstring_20)) then
          Report.Failed
            ("Incorrect results from BND Function ""<="" with " &
             "string - bounded string parameter combinations");
@@ -214,8 +188,7 @@ begin
       Bstring_40 :=
         Bs40.To_Bounded_Wide_String ("A MUCH LONGER SAMPLE STRING.");
       if Bstring_40 > "A much longer sample string" or
-        Bs40.To_Bounded_Wide_String ("ABCDEFGH") > "abcdefgh"
-      then
+        Bs40.To_Bounded_Wide_String ("ABCDEFGH") > "abcdefgh" then
          Report.Failed
            ("Incorrect results from BND Function "">"" with " &
             "string - bounded string parameter combinations");
@@ -254,8 +227,7 @@ begin
 
       Bstring_20 := Bs20.To_Bounded_Wide_String ("Short String");
       Bs20.Head (Bstring_20, 23, '-', Ada.Strings.Right);
-      if Bs20.To_Bounded_Wide_String ("Short String--------") /=
-        Bstring_20
+      if Bs20.To_Bounded_Wide_String ("Short String--------") /= Bstring_20
       then
          Report.Failed
            ("Incorrect results from BND Procedure Head with " &
@@ -274,8 +246,7 @@ begin
 
       Bstring_20 := Bs20.To_Bounded_Wide_String ("Maximum Length Chars");
       Bs20.Tail (Bstring_20, 23, '-', Ada.Strings.Right);
-      if Bs20.To_Bounded_Wide_String ("---Maximum Length Ch") /=
-        Bstring_20
+      if Bs20.To_Bounded_Wide_String ("---Maximum Length Ch") /= Bstring_20
       then
          Report.Failed
            ("Incorrect results from BND Procedure Tail with " &

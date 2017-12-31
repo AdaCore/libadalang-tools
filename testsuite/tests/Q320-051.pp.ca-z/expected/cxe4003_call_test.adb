@@ -24,8 +24,7 @@ package body Cxe4003_Call_Test is
      (Low   : Integer;
       High  : Integer;
       Prior : System.Priority;                            --RT
-      Id    : Integer)
-   is
+      Id    : Integer) is
       entry Go;
       pragma Priority (Prior);                                            --RT
    end Client;

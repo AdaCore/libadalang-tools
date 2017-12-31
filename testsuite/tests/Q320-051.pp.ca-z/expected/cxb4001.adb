@@ -203,8 +203,7 @@ begin
    begin    -- encapsulation
 
       if Cobol.Byte'First /= 0 or
-        Cobol.Byte'Last /= (2**Cobol.Cobol_Character'Size) - 1
-      then
+        Cobol.Byte'Last /= (2**Cobol.Cobol_Character'Size) - 1 then
          Report.Failed ("Byte is incorrectly defined");
       end if;
 

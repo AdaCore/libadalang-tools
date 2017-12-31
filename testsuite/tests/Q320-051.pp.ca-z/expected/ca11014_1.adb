@@ -2,27 +2,24 @@
 
 package body Ca11014_1 is
 
-   procedure Write_Element
-     (L : in out List_Mgr.List_Type;
-      E : in     List_Mgr.Element_Type)
+   procedure Write_Element (L : in out List_Mgr.List_Type;
+      E                       : in     List_Mgr.Element_Type)
    is
    begin
       L.Current.Item := E;               -- Write to current element.
       L.Current      := L.Current.Next;  -- Advance "current" pointer.
    end Write_Element;
    -------------------------------------------------------
-   procedure Read_Element
-     (L : in out List_Mgr.List_Type;
-      E :    out List_Mgr.Element_Type)
+   procedure Read_Element (L : in out List_Mgr.List_Type;
+      E                      :    out List_Mgr.Element_Type)
    is
    begin
       E         := L.Current.Item;       -- Retrieve current element.
       L.Current := L.Current.Next;       -- Advance "current" pointer.
    end Read_Element;
    -------------------------------------------------------
-   procedure Add_Element
-     (L : in out List_Mgr.List_Type;
-      E : in     List_Mgr.Element_Type)
+   procedure Add_Element (L : in out List_Mgr.List_Type;
+      E                     : in     List_Mgr.Element_Type)
    is
       New_Node : List_Mgr.Node_Pointer := new List_Mgr.Node_Type'(E, null);
       use type List_Mgr.Node_Pointer;

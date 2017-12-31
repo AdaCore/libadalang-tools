@@ -11,8 +11,7 @@ begin
      ("CXA4023",
       "Check that the subprograms defined in " &
       "package Ada.Strings.Wide_Unbounded are " &
-      "available, and that they produce correct " &
-      "results");
+      "available, and that they produce correct " & "results");
 
    Test_Block :
    declare
@@ -66,14 +65,10 @@ begin
       Asw.Find_Token
         (Magic_String,      -- Find location of first "ab" equiv.
          Ab_Set,            -- Should be (1..2).
-         Ada.Strings.Inside,
-         Token_Start,
-         Token_End);
+         Ada.Strings.Inside, Token_Start, Token_End);
 
       if Natural (Token_Start) /= Asw.To_Wide_String (Magic_String)'First or
-        Token_End /= Asw.Index (Magic_String, B_Set) or
-        Token_End /= 2
-      then
+        Token_End /= Asw.Index (Magic_String, B_Set) or Token_End /= 2 then
          Report.Failed ("Incorrect result from Procedure Find_Token - 1");
       end if;
 
@@ -81,8 +76,7 @@ begin
         (Source => Magic_String, -- Find location of char 'r'equiv
          Set    => Abcd_Set,     -- in wide str, should be (3..3)
          Test   => Ada.Strings.Outside,
-         First  => Token_Start,
-         Last   => Token_End);
+         First  => Token_Start, Last => Token_End);
 
       if Natural (Token_Start) /= 3 or Token_End /= 3 then
          Report.Failed ("Incorrect result from Procedure Find_Token - 2");
@@ -96,16 +90,13 @@ begin
          Last  => Token_End);         -- Last = 0.
 
       if Token_Start /= Asw.To_Wide_String (Magic_String)'First or
-        Token_End /= 0
-      then
+        Token_End /= 0 then
          Report.Failed ("Incorrect result from Procedure Find_Token - 3");
       end if;
 
       Asw.Find_Token
         (Asw.To_Unbounded_Wide_String (Equiv ("abpqpqrttrcpqr")),
-         Wide_Maps.To_Set (Equiv ("trpq")),
-         Ada.Strings.Inside,
-         Token_Start,
+         Wide_Maps.To_Set (Equiv ("trpq")), Ada.Strings.Inside, Token_Start,
          Token_End);
 
       if Token_Start /= 3 or Token_End /= 10 then
@@ -114,9 +105,7 @@ begin
 
       Asw.Find_Token
         (Asw.To_Unbounded_Wide_String (Equiv ("abpqpqrttrcpqr")),
-         Wide_Maps.To_Set (Equiv ("abpq")),
-         Ada.Strings.Outside,
-         Token_Start,
+         Wide_Maps.To_Set (Equiv ("abpq")), Ada.Strings.Outside, Token_Start,
          Token_End);
 
       if Token_Start /= 7 or Token_End /= 11 then
@@ -130,8 +119,7 @@ begin
 
       Incantation := Asw.Translate (Magic_String, Code_Map);
 
-      if Incantation /=
-        Asw.To_Unbounded_Wide_String (Equiv ("wxrwywzwxrw"))
+      if Incantation /= Asw.To_Unbounded_Wide_String (Equiv ("wxrwywzwxrw"))
       then
          Report.Failed ("Incorrect result from Function Translate - 1");
       end if;
@@ -157,8 +145,7 @@ begin
 
       Asw.Translate (Source => Test_String, Mapping => Ab_To_Yz_Map);
 
-      if Test_String /=
-        Asw.To_Unbounded_Wide_String (Equiv ("yzcdeyzcyz"))
+      if Test_String /= Asw.To_Unbounded_Wide_String (Equiv ("yzcdeyzcyz"))
       then
          Report.Failed ("Incorrect result from Procedure Translate - 2");
       end if;
@@ -169,8 +156,7 @@ begin
 
       Asw.Translate (Source => Test_String, Mapping => Ab_To_Yz_Map);
 
-      if Test_String /=
-        Asw.To_Unbounded_Wide_String (Equiv ("yzzyyyzyzz"))
+      if Test_String /= Asw.To_Unbounded_Wide_String (Equiv ("yzzyyyzyzz"))
       then
          Report.Failed ("Incorrect result from Procedure Translate - 3");
       end if;
@@ -190,11 +176,9 @@ begin
       Test_String := Asw.To_Unbounded_Wide_String (Equiv ("opabcdelmn"));
 
       Asw.Translate
-        (Test_String,
-         Wide_Maps.To_Mapping (Equiv ("abcde"), Equiv ("lmnop")));
+        (Test_String, Wide_Maps.To_Mapping (Equiv ("abcde"), Equiv ("lmnop")));
 
-      if Test_String /=
-        Asw.To_Unbounded_Wide_String (Equiv ("oplmnoplmn"))
+      if Test_String /= Asw.To_Unbounded_Wide_String (Equiv ("oplmnoplmn"))
       then
          Report.Failed ("Incorrect result from Procedure Translate - 5");
       end if;
@@ -236,8 +220,7 @@ begin
         (Source  => Test_String, -- change equivalent of 'a' and
          Mapping => Map_Ptr);    -- 'b' to ' '
 
-      if Test_String /=
-        Asw.To_Unbounded_Wide_String (Equiv ("  AB AB  BA   "))
+      if Test_String /= Asw.To_Unbounded_Wide_String (Equiv ("  AB AB  BA   "))
       then
          Report.Failed
            ("Incorrect result from Proc Translate, w/ access value map - 1");
@@ -276,8 +259,7 @@ begin
       Test_String := Asw.To_Unbounded_Wide_String (Equiv ("abAbBBAabbacD"));
 
       if Asw.Translate (Asw.Translate (Test_String, Map_Ptr), Map_Ptr) /=
-        Asw.To_Unbounded_Wide_String (Equiv ("  A BBA    cD"))
-      then
+        Asw.To_Unbounded_Wide_String (Equiv ("  A BBA    cD")) then
          Report.Failed
            ("Incorrect result from Function Translate, access value map - 1");
       end if;
@@ -322,15 +304,13 @@ begin
          Space_Array : array (1 .. 4) of Asw.Unbounded_Wide_String :=
            (Asw.To_Unbounded_Wide_String (Equiv ("  Pad    ")),
             Asw.To_Unbounded_Wide_String (Equiv ("Pad   ")),
-            Asw.To_Unbounded_Wide_String (Equiv ("     Pad")),
-            Pad);
+            Asw.To_Unbounded_Wide_String (Equiv ("     Pad")), Pad);
 
          String_Array : array (1 .. 5) of Asw.Unbounded_Wide_String :=
            (Asw.To_Unbounded_Wide_String (Equiv ("xyzxAda9Xpqr")),
             Asw.To_Unbounded_Wide_String (Equiv ("Ada9Xqqrp")),
             Asw.To_Unbounded_Wide_String (Equiv ("zxyxAda9Xqpqr")),
-            Asw.To_Unbounded_Wide_String (Equiv ("xxxyAda9X")),
-            The_New_Ada);
+            Asw.To_Unbounded_Wide_String (Equiv ("xxxyAda9X")), The_New_Ada);
 
       begin
 
@@ -350,11 +330,8 @@ begin
 
          for I in 1 .. 5 loop
             if Asw.Trim
-                (String_Array (I),
-                 Left  => Xyz_Set,
-                 Right => Pqr_Set) /=
-              The_New_Ada
-            then
+                (String_Array (I), Left => Xyz_Set, Right => Pqr_Set) /=
+              The_New_Ada then
                Report.Failed
                  ("Incorrect result from Trim for set characters - " &
                   Integer'Image (I));
@@ -365,10 +342,8 @@ begin
 
          if Asw.Trim
              (Asw.To_Unbounded_Wide_String (Equiv ("prqqprAda9Xyzzxyzzyz")),
-              Xyz_Set,
-              Pqr_Set) /=
-           Asw.To_Unbounded_Wide_String (Equiv ("prqqprAda9Xyzzxyzzyz"))
-         then
+              Xyz_Set, Pqr_Set) /=
+           Asw.To_Unbounded_Wide_String (Equiv ("prqqprAda9Xyzzxyzzyz")) then
             Report.Failed ("Incorrect result from Trim for set, no trimming");
          end if;
 
@@ -380,11 +355,9 @@ begin
       -- characters from the wide string.
 
       if Asw.Delete
-          (Source  => Asw.Delete (Magic_String, 8, Asw.Length (Magic_String)),
-           From    => Asw.To_Wide_String (Magic_String)'First,
-           Through => 4) /=
-        Cad_String
-      then
+          (Source => Asw.Delete (Magic_String, 8, Asw.Length (Magic_String)),
+           From   => Asw.To_Wide_String (Magic_String)'First, Through => 4) /=
+        Cad_String then
          Report.Failed ("Incorrect results from Function Delete");
       end if;
 
@@ -423,8 +396,7 @@ begin
 
          Sos :=
            Asw."&"
-             (Sos,
-              Asw."&"
+             (Sos, Asw."&"
                 (Asw."*" (Repeat, Dash),  -- "*"(#, W Str)
                  Asw."*" (Repeat, Dot))); -- "*"(#, W Unb Str)
 

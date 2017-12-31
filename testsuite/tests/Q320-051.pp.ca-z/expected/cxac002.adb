@@ -12,8 +12,7 @@ begin
      ("CXAC002",
       "Check that the subprograms defined in " &
       "package Ada.Streams.Stream_IO are accessible, " &
-      "and that they provide the appropriate " &
-      "functionality");
+      "and that they provide the appropriate " & "functionality");
 
    Test_For_Stream_Io_Support :
 
@@ -28,8 +27,7 @@ begin
 
       Ada.Streams.Stream_Io.Create
         (Filter_File,                    -- Create.
-         Ada.Streams.Stream_Io.Out_File,
-         Filter_Filename);
+         Ada.Streams.Stream_Io.Out_File, Filter_Filename);
    exception
 
       when Ada.Streams.Stream_Io.Use_Error |
@@ -145,8 +143,7 @@ begin
          end Reset2;
 
          if Ada.Streams.Stream_Io.Mode (Filter_File) /=           -- Mode.
-           Ada.Streams.Stream_Io.Append_File
-         then
+           Ada.Streams.Stream_Io.Append_File then
             Report.Failed ("Incorrect mode following Reset to Append");
          end if;
 
@@ -212,8 +209,7 @@ begin
          end Reset3;
 
          if Ada.Streams.Stream_Io.Mode (Filter_File) /=           -- Mode.
-           Ada.Streams.Stream_Io.In_File
-         then
+           Ada.Streams.Stream_Io.In_File then
             Report.Failed ("Incorrect mode following Reset to In_File");
          end if;
 
@@ -299,8 +295,7 @@ begin
       else
          Ada.Streams.Stream_Io.Open
            (Filter_File,                  -- Open.
-            Ada.Streams.Stream_Io.Out_File,
-            Filter_Filename);
+            Ada.Streams.Stream_Io.Out_File, Filter_Filename);
          Ada.Streams.Stream_Io.Delete (Filter_File);               -- Delete.
       end if;
    exception

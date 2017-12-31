@@ -79,15 +79,13 @@ begin
       begin
          if L.Size /= V1 then
             Failed
-              (S &
-               ".SIZE INITIALIZED INCORRECTLY TO " &
+              (S & ".SIZE INITIALIZED INCORRECTLY TO " &
                Integer'Image (L.Size));
          end if;
 
          if L.Value /= V2 then
             Failed
-              (S &
-               ".VALUE INITIALIZED INCORRECTLY TO " &
+              (S & ".VALUE INITIALIZED INCORRECTLY TO " &
                Integer'Image (L.Value));
          end if;
       end Check;

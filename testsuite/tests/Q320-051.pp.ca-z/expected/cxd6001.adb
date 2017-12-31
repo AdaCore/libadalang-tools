@@ -13,8 +13,7 @@ begin
    Report.Test
      ("CXD6001",
       "Check that an abort takes place as soon" &
-      " as the aborted task is no longer in an" &
-      " abort-deferred region.");
+      " as the aborted task is no longer in an" & " abort-deferred region.");
 
    if Impdef.Annex_D.Processor /= Impdef.Annex_D.Uni_Processor then
       Report.Not_Applicable ("Multi-Processor configuration");

@@ -44,10 +44,8 @@ procedure C37213b is
 
    F1_Cons : Integer := 2;
 
-   function Chk
-     (Cons    : Integer;
-      Value   : Integer;
-      Message : String) return Boolean
+   function Chk (Cons : Integer; Value : Integer;
+      Message         : String) return Boolean
    is
    begin
       if Cons /= Value then

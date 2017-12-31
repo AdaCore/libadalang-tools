@@ -39,8 +39,7 @@ package body C460002_0 is
          -- depth) of Acc_Deeper will always be deeper than or the same as
          -- that of the actual corresponding to Y.
          Ad := Acc_Deeper (X);
-         if Natural (Ident_Int (Ad.C (1))) /=
-           3
+         if Natural (Ident_Int (Ad.C (1))) /= 3
          then            --Avoid Optimization of AD
             Report.Failed ("Initial Values not correct.");
          end if;
@@ -68,8 +67,7 @@ package body C460002_0 is
       -- Acc_Local will always be deeper than or the same as that of the
       -- actual corresponding to X.
       Al := Acc_Local (X);
-      if Natural (Ident_Int (Al.C (1))) /=
-        3
+      if Natural (Ident_Int (Al.C (1))) /= 3
       then       --Avoid Optimization of AL
          Report.Failed ("Initial Values not correct.");
       end if;

@@ -38,8 +38,7 @@ begin
       "SUBPROGRAM, ENTRY, OR GENERIC UNIT HAS AN " &
       "UNCONSTRAINED TYPE WITH DISCRIMINANTS THAT " &
       "DO NOT HAVE DEFAULTS, 'CONSTRAINED IS " &
-      "'TRUE' REGARDLESS OF THE MODE OF THE " &
-      "PARAMETER");
+      "'TRUE' REGARDLESS OF THE MODE OF THE " & "PARAMETER");
 
    declare
 
@@ -59,10 +58,8 @@ begin
 
       Sc : constant Square := (Side => 1, Mat => (1 => (1 => 1)));
 
-      procedure P
-        (Pin1, Pin2 : in     Square;
-         Pinout     : in out Square;
-         Pout       :    out Square)
+      procedure P (Pin1, Pin2 : in     Square; Pinout : in out Square;
+         Pout                 :    out Square)
       is
 
       begin
@@ -95,19 +92,14 @@ begin
       end P;
 
       task T is
-         entry Q
-           (Pin1, Pin2 : in     Square;
-            Pinout     : in out Square;
-            Pout       :    out Square);
+         entry Q (Pin1, Pin2 : in     Square; Pinout : in out Square;
+            Pout             :    out Square);
       end T;
 
       task body T is
       begin
-         accept Q
-           (Pin1, Pin2 : in     Square;
-            Pinout     : in out Square;
-            Pout       :    out Square)
-         do
+         accept Q (Pin1, Pin2 : in     Square; Pinout : in out Square;
+            Pout              :    out Square) do
 
             begin
                if Pin1'Constrained then
@@ -128,8 +120,7 @@ begin
                   null;
                else
                   Failed
-                    ("'CONSTRAINED IS 'FALSE' FOR " &
-                     "OBJECT OF " &
+                    ("'CONSTRAINED IS 'FALSE' FOR " & "OBJECT OF " &
                      "IN OUT MODE - 2");
                end if;
 
@@ -137,8 +128,7 @@ begin
                   null;
                else
                   Failed
-                    ("'CONSTRAINED IS 'FALSE' FOR " &
-                     "OBJECT OF " &
+                    ("'CONSTRAINED IS 'FALSE' FOR " & "OBJECT OF " &
                      "OUT MODE - 2");
                end if;
 

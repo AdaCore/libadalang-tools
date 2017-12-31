@@ -41,8 +41,7 @@ begin
       "A 'SIZE' CLAUSE MAY BE GIVEN IN THE VISIBLE " &
       "PART OF A PACKAGE FOR AN INCOMPLETE TYPE, " &
       "WHOSE FULL DECLARATION IS AN ENUMERATION " &
-      "TYPE, DECLARED IN THE VISIBLE PART OF THE " &
-      "SAME PACKAGE");
+      "TYPE, DECLARED IN THE VISIBLE PART OF THE " & "SAME PACKAGE");
    declare
       package Pack is
          Specified_Size : constant := Integer'Size;

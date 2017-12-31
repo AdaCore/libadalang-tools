@@ -67,11 +67,8 @@ procedure C431002 is
       Zero : Default_To_Zero_Type;
    end record;
 
-   procedure Check_1
-     (Obj       : Root'Class;
-      Color     : Color_Type;
-      Halves    : Half_Type;
-      Test_Case : Character)
+   procedure Check_1 (Obj : Root'Class; Color : Color_Type; Halves : Half_Type;
+      Test_Case           : Character)
    is
    begin
       if Obj.Color /= Color then
@@ -82,12 +79,8 @@ procedure C431002 is
       end if;
    end Check_1;
 
-   procedure Check_2
-     (Obj       : Val_Ext'Class;
-      Color     : Color_Type;
-      Halves    : Half_Type;
-      Int       : Default_To_Zero_Type;
-      Test_Case : Character)
+   procedure Check_2 (Obj : Val_Ext'Class; Color : Color_Type;
+      Halves : Half_Type; Int : Default_To_Zero_Type; Test_Case : Character)
    is
    begin
       if Obj.Color /= Color then
@@ -121,50 +114,31 @@ begin
 
    -- Check tagged records (record aggregates):
    Check_1
-     (Root'(others => <>),
-      Color     => Unknown,
-      Halves    => 0.5,
-      Test_Case => 'B');
+     (Root'(others => <>), Color => Unknown, Halves => 0.5, Test_Case => 'B');
 
    Check_1
-     (Null_Ext'(Color => Red, others => <>),
-      Color     => Red,
-      Halves    => 0.5,
+     (Null_Ext'(Color => Red, others => <>), Color => Red, Halves => 0.5,
       Test_Case => 'C');
 
    Check_1
-     (Null_Ext'(Color => Red, Halves => 2.5, others => <>),
-      Color     => Red,
-      Halves    => 2.5,
-      Test_Case => 'D');
+     (Null_Ext'(Color => Red, Halves => 2.5, others => <>), Color => Red,
+      Halves => 2.5, Test_Case => 'D');
 
    Check_2
-     (Val_Ext'(Color => Yellow, Halves => 2.5, others => <>),
-      Color     => Yellow,
-      Halves    => 2.5,
-      Int       => 0,
-      Test_Case => 'E');
+     (Val_Ext'(Color => Yellow, Halves => 2.5, others => <>), Color => Yellow,
+      Halves => 2.5, Int => 0, Test_Case => 'E');
 
    Check_2
      (Val_Ext'(Color => Blue, Halves => 2.5, Zero => 2, others => <>),
-      Color     => Blue,
-      Halves    => 2.5,
-      Int       => 2,
-      Test_Case => 'F');
+      Color => Blue, Halves => 2.5, Int => 2, Test_Case => 'F');
 
    Check_2
-     (Val_Ext'(Halves => 2.5, Zero => 2, others => <>),
-      Color     => Unknown,
-      Halves    => 2.5,
-      Int       => 2,
-      Test_Case => 'G');
+     (Val_Ext'(Halves => 2.5, Zero => 2, others => <>), Color => Unknown,
+      Halves => 2.5, Int => 2, Test_Case => 'G');
 
    Check_2
-     (Val_Ext'(Color => Blue, Halves => <>, Zero => 2),
-      Color     => Blue,
-      Halves    => 0.5,
-      Int       => 2,
-      Test_Case => 'H');
+     (Val_Ext'(Color => Blue, Halves => <>, Zero => 2), Color => Blue,
+      Halves => 0.5, Int => 2, Test_Case => 'H');
 
    -- Check tagged records (extension aggregates):
    declare
@@ -173,44 +147,28 @@ begin
       Check_1 (O2, Color => Orange, Halves => 4.25, Test_Case => 'J');
 
       Check_1
-        (Null_Ext'(Root with others => <>),
-         Color     => Unknown,
-         Halves    => 0.5,
+        (Null_Ext'(Root with others => <>), Color => Unknown, Halves => 0.5,
          Test_Case => 'K');
 
       Check_1
-        (Null_Ext'(O2 with others => <>),
-         Color     => Orange,
-         Halves    => 4.25,
+        (Null_Ext'(O2 with others => <>), Color => Orange, Halves => 4.25,
          Test_Case => 'L');
 
       Check_2
-        (Val_Ext'(Root with others => <>),
-         Color     => Unknown,
-         Halves    => 0.5,
-         Int       => 0,
-         Test_Case => 'M');
+        (Val_Ext'(Root with others => <>), Color => Unknown, Halves => 0.5,
+         Int => 0, Test_Case => 'M');
 
       Check_2
-        (Val_Ext'(O2 with others => <>),
-         Color     => Orange,
-         Halves    => 4.25,
-         Int       => 0,
-         Test_Case => 'N');
+        (Val_Ext'(O2 with others => <>), Color => Orange, Halves => 4.25,
+         Int => 0, Test_Case => 'N');
 
       Check_2
-        (Val_Ext'(Root with Zero => 6, others => <>),
-         Color     => Unknown,
-         Halves    => 0.5,
-         Int       => 6,
-         Test_Case => 'P');
+        (Val_Ext'(Root with Zero => 6, others => <>), Color => Unknown,
+         Halves => 0.5, Int => 6, Test_Case => 'P');
 
       Check_2
-        (Val_Ext'(O2 with Zero => <>, others => <>),
-         Color     => Orange,
-         Halves    => 4.25,
-         Int       => 0,
-         Test_Case => 'Q');
+        (Val_Ext'(O2 with Zero => <>, others => <>), Color => Orange,
+         Halves => 4.25, Int => 0, Test_Case => 'Q');
 
    end;
 

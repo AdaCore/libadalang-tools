@@ -280,29 +280,22 @@ procedure Cxg2001 is
          Min_Mantissa_Digits :=
            Integer
              (Real'Ceiling
-                (Real (Real'Digits) *
-                 Log (10.0) /
+                (Real (Real'Digits) * Log (10.0) /
                  Log (Real (Real'Machine_Radix))));
-         if Real'Machine_Radix = 10
-           or else Real'Machine_Radix = 100
-           or else Real'Machine_Radix = 1_000
-         then
+         if Real'Machine_Radix = 10 or else Real'Machine_Radix = 100
+           or else Real'Machine_Radix = 1_000 then
             if Real'Model_Mantissa < Min_Mantissa_Digits then
                Report.Failed
-                 ("Model_Mantissa [" &
-                  Integer'Image (Real'Model_Mantissa) &
+                 ("Model_Mantissa [" & Integer'Image (Real'Model_Mantissa) &
                   "] < minimum mantissa digits [" &
-                  Integer'Image (Min_Mantissa_Digits) &
-                  "] (decimal)");
+                  Integer'Image (Min_Mantissa_Digits) & "] (decimal)");
             end if;
          else
             if Real'Model_Mantissa < (Min_Mantissa_Digits + 1) then
                Report.Failed
-                 ("Model_Mantissa [" &
-                  Integer'Image (Real'Model_Mantissa) &
+                 ("Model_Mantissa [" & Integer'Image (Real'Model_Mantissa) &
                   "] < minimum mantissa digits [" &
-                  Integer'Image (Min_Mantissa_Digits + 1) &
-                  "]");
+                  Integer'Image (Min_Mantissa_Digits + 1) & "]");
             end if;
          end if;
 
@@ -322,15 +315,13 @@ begin
    Report.Test
      ("CXG2001",
       "Check the attributes Model_Mantissa," &
-      " Machine_Mantissa, Machine_Radix," &
-      " and Machine_Rounds");
+      " Machine_Mantissa, Machine_Radix," & " and Machine_Rounds");
 
    Report.Comment ("checking Standard.Float");
    Chk_Float.Do_Test;
 
    Report.Comment
-     ("checking a digits" &
-      Integer'Image (System.Max_Digits) &
+     ("checking a digits" & Integer'Image (System.Max_Digits) &
       " floating point type");
    Chk_A_Long_Float.Do_Test;
 

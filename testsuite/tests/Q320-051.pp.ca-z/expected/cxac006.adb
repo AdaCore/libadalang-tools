@@ -57,11 +57,9 @@ procedure Cxac006 is
    -- Test subprograms:
    Abort_Test : exception; -- Some test invariant failed.
 
-   procedure Write_At_Index
-     (File           : in Strm_Io.File_Type;
-      Index          : in Strm_Io.Count;
-      Data           : in Character;
-      Positioning_Ok : in Boolean := False)
+   procedure Write_At_Index (File : in Strm_Io.File_Type;
+      Index                       : in Strm_Io.Count; Data : in Character;
+      Positioning_Ok              : in Boolean := False)
    is
    -- Write an item at Index, updating the local copy of the data as well. Any
    -- file positioning has already been accomplished. Positioning of the file
@@ -71,8 +69,7 @@ procedure Cxac006 is
          if Strm_Io.Index (File) /= Index then
             Report.Failed
               ("File index does not match test index - Index=" &
-               Strm_Io.Count'Image (Index) &
-               " File Index=" &
+               Strm_Io.Count'Image (Index) & " File Index=" &
                Strm_Io.Count'Image (Strm_Io.Index (File)));
             -- We allow the test to continue here, because some implementations
             -- have a broken implementation of Index.
@@ -85,9 +82,8 @@ procedure Cxac006 is
       File_Contents (Index) := Data;
    end Write_At_Index;
 
-   procedure Check_File_Contents
-     (File : in out Strm_Io.File_Type;
-      Code : in     Character)
+   procedure Check_File_Contents (File : in out Strm_Io.File_Type;
+      Code                             : in     Character)
    is
       -- Check the file contents against the local set. File will have mode
       -- "In_File" after this check.
@@ -99,9 +95,7 @@ procedure Cxac006 is
       exception
          when Info : others =>
             Report.Failed
-              ('(' &
-               Code &
-               ") Unable to reset stream file - " &
+              ('(' & Code & ") Unable to reset stream file - " &
                Ada.Exceptions.Exception_Name (Info));
             Report.Comment
               ("Additional information: " &
@@ -113,15 +107,9 @@ procedure Cxac006 is
          Character'Read (Strm_Io.Stream (File), Data);
          if Data /= File_Contents (I) then
             Report.Failed
-              ('(' &
-               Code &
-               ") File contents mismatch at " &
-               Strm_Io.Count'Image (I) &
-               "Read='" &
-               Data &
-               "', expected='" &
-               File_Contents (I) &
-               ''');
+              ('(' & Code & ") File contents mismatch at " &
+               Strm_Io.Count'Image (I) & "Read='" & Data & "', expected='" &
+               File_Contents (I) & ''');
             Any_Errors := True;
          end if;
       end loop;
@@ -131,12 +119,8 @@ procedure Cxac006 is
       begin
          if File_Length /= Strm_Io.Size (File) then
             Report.Failed
-              ('(' &
-               Code &
-               ") File size mismatch " &
-               "Read=" &
-               Strm_Io.Count'Image (Strm_Io.Size (File)) &
-               ", expected=" &
+              ('(' & Code & ") File size mismatch " & "Read=" &
+               Strm_Io.Count'Image (Strm_Io.Size (File)) & ", expected=" &
                Strm_Io.Count'Image (File_Length));
             Any_Errors := True;
          end if;
@@ -147,15 +131,11 @@ procedure Cxac006 is
    exception
       when Strm_Io.End_Error =>
          Report.Failed
-           ('(' &
-            Code &
-            ") Read past end of file when " &
+           ('(' & Code & ") Read past end of file when " &
             "checking contents");
       when Info : others =>
          Report.Failed
-           ('(' &
-            Code &
-            ") Unable to read stream file - " &
+           ('(' & Code & ") Unable to read stream file - " &
             Ada.Exceptions.Exception_Name (Info));
          Report.Comment
            ("Additional information: " &
@@ -170,9 +150,7 @@ begin
       "positioning properly or not at all");
    begin
       Strm_Io.Create
-        (File => File,
-         Mode => Strm_Io.Out_File,
-         Name => File_Name);
+        (File => File, Mode => Strm_Io.Out_File, Name => File_Name);
       Strm_Io.Delete (File);
    exception
       when Strm_Io.Name_Error =>
@@ -203,9 +181,7 @@ begin
       -- OK, we can create a file. Let's start the test:
       begin
          Strm_Io.Create
-           (File => File,
-            Mode => Strm_Io.Append_File,
-            Name => File_Name);
+           (File => File, Mode => Strm_Io.Append_File, Name => File_Name);
       exception
          when Strm_Io.Name_Error =>
             Report.Not_Applicable
@@ -312,25 +288,17 @@ begin
          end if;
       else
          Write_At_Index
-           (File,
-            Current_Position,
-            'S',
+           (File, Current_Position, 'S',
             Positioning_Ok => Append_Supports_Positioning);
       end if;
       Write_At_Index
-        (File,
-         Current_Position + 1,
-         'T',
+        (File, Current_Position + 1, 'T',
          Positioning_Ok => Append_Supports_Positioning);
       Write_At_Index
-        (File,
-         Current_Position + 2,
-         'T',
+        (File, Current_Position + 2, 'T',
          Positioning_Ok => Append_Supports_Positioning);
       Write_At_Index
-        (File,
-         Current_Position + 3,
-         ' ',
+        (File, Current_Position + 3, ' ',
          Positioning_Ok => Append_Supports_Positioning);
       Current_Position := Current_Position + 4;
 
@@ -365,31 +333,22 @@ begin
             Current_Position := Strm_Io.Index (File);
             Report.Failed
               ("(B) Wrong position for Set_Mode Append_File - " &
-               "position =" &
-               Strm_Io.Count'Image (Current_Position));
+               "position =" & Strm_Io.Count'Image (Current_Position));
          end if;
       end if;
 
       -- Write some more:
       Write_At_Index
-        (File,
-         Current_Position,
-         'N',
+        (File, Current_Position, 'N',
          Positioning_Ok => Append_Supports_Positioning);
       Write_At_Index
-        (File,
-         Current_Position + 1,
-         'H',
+        (File, Current_Position + 1, 'H',
          Positioning_Ok => Append_Supports_Positioning);
       Write_At_Index
-        (File,
-         Current_Position + 2,
-         'C',
+        (File, Current_Position + 2, 'C',
          Positioning_Ok => Append_Supports_Positioning);
       Write_At_Index
-        (File,
-         Current_Position + 3,
-         ' ',
+        (File, Current_Position + 3, ' ',
          Positioning_Ok => Append_Supports_Positioning);
       Current_Position := Current_Position + 4;
 
@@ -401,8 +360,7 @@ begin
             if Strm_Io.Index (File) /= Current_Position then
                Report.Failed
                  ("(C) Set_Mode (Out_File) changed the file " &
-                  "position to " &
-                  Strm_Io.Count'Image (Strm_Io.Index (File)));
+                  "position to " & Strm_Io.Count'Image (Strm_Io.Index (File)));
             end if;
          exception
             when Strm_Io.Use_Error =>
@@ -433,19 +391,13 @@ begin
 
       -- Write a few more characters:
       Write_At_Index
-        (File,
-         Current_Position,
-         'K',
+        (File, Current_Position, 'K',
          Positioning_Ok => Out_Supports_Positioning);
       Write_At_Index
-        (File,
-         Current_Position + 1,
-         'B',
+        (File, Current_Position + 1, 'B',
          Positioning_Ok => Out_Supports_Positioning);
       Write_At_Index
-        (File,
-         Current_Position + 2,
-         'D',
+        (File, Current_Position + 2, 'D',
          Positioning_Ok => Out_Supports_Positioning);
       Current_Position := Current_Position + 3;
 
@@ -457,8 +409,7 @@ begin
          begin
             if Strm_Io.Index (File) /= Current_Position then
                Report.Failed
-                 ("(D) Set_Mode (In_File) changed the file " &
-                  "position to " &
+                 ("(D) Set_Mode (In_File) changed the file " & "position to " &
                   Strm_Io.Count'Image (Strm_Io.Index (File)));
             end if;
          exception
@@ -483,9 +434,7 @@ begin
       -- Re-open file (with a different file object) and check contents again:
       begin
          Strm_Io.Open
-           (File => Another_File,
-            Mode => Strm_Io.In_File,
-            Name => File_Name);
+           (File => Another_File, Mode => Strm_Io.In_File, Name => File_Name);
       exception
          when Info : others =>
             Report.Failed

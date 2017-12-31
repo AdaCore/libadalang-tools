@@ -83,43 +83,19 @@ package Fxf3a00 is
      array (Integer range <>) of Str_Ptr;
 
    Data_With_Ndp : Data_Array_Type_1 (1 .. Number_Of_Ndp_Items) :=
-     (1  => 1_234.0,
-      2  => 51_234.0,
-      3  => -1_234.0,
-      4  => 1_234.0,
-      5  => 1.0,
-      6  => 0.0,
-      7  => -10.0,
-      8  => -1.0,
-      9  => 1_234.0,
-      10 => 1.0,
-      11 => 36.0,
+     (1  => 1_234.0, 2 => 51_234.0, 3 => -1_234.0, 4 => 1_234.0, 5 => 1.0,
+      6  => 0.0, 7 => -10.0, 8 => -1.0, 9 => 1_234.0, 10 => 1.0, 11 => 36.0,
       12 => 0.0);
 
    Data_With_2dp : Data_Array_Type_2 (1 .. Number_Of_2dp_Items) :=
-     (1  => 123_456.78,
-      2  => 123_456.78,
-      3  => 0.0,
-      4  => 0.20,
-      5  => 123_456.00,
-      6  => -123_456.78,
-      7  => 123_456.78,
-      8  => -12.34,
-      9  => 1.23,
-      10 => 12.34,
+     (1 => 123_456.78, 2 => 123_456.78, 3 => 0.0, 4 => 0.20, 5 => 123_456.00,
+      6 => -123_456.78, 7 => 123_456.78, 8 => -12.34, 9 => 1.23, 10 => 12.34,
 
    -- Items 11-20 are used with picture strings in evaluating use of foreign
    -- currency symbols.
 
-      11 => 123_456.78,
-      12 => 123_456.78,
-      13 => 32.10,
-      14 => -5_432.10,
-      15 => -1_234.57,
-      16 => 123_456.78,
-      17 => 12.34,
-      18 => 12.34,
-      19 => 1.23,
+      11 => 123_456.78, 12 => 123_456.78, 13 => 32.10, 14 => -5_432.10,
+      15 => -1_234.57, 16 => 123_456.78, 17 => 12.34, 18 => 12.34, 19 => 1.23,
       20 => 12_345.67);
 
    Valid_Strings : Picture_String_Array_Type (1 .. Number_Of_Valid_Strings) :=
@@ -127,32 +103,22 @@ package Fxf3a00 is
    -- Items 1-10 are used in conjunction with Data_With_2DP values to produce
    -- edited output strings, as well as in tests of function Valid.
 
-     (1  => new String'("-###**_***_**9.99"),
-      2  => new String'("-$**_***_**9.99"),
-      3  => new String'("-$$$$$$.$$"),
-      4  => new String'("-$$$$$$.$$"),
-      5  => new String'("+BBBZZ_ZZZ_ZZZ.ZZ"),
-      6  => new String'("--_---_---_--9"),
-      7  => new String'("-$_$$$_$$$_$$9.99"),
-      8  => new String'("<$$_$$$9.99>"),
-      9  => new String'("$_$$9.99"),
-      10 => new String'("$$9.99"),
+     (1 => new String'("-###**_***_**9.99"),
+      2 => new String'("-$**_***_**9.99"), 3 => new String'("-$$$$$$.$$"),
+      4 => new String'("-$$$$$$.$$"), 5 => new String'("+BBBZZ_ZZZ_ZZZ.ZZ"),
+      6 => new String'("--_---_---_--9"),
+      7 => new String'("-$_$$$_$$$_$$9.99"), 8 => new String'("<$$_$$$9.99>"),
+      9 => new String'("$_$$9.99"), 10 => new String'("$$9.99"),
 
    -- Items 11-22 are used in conjunction with Data_With_NDP values to produce
    -- edited output strings.
 
-      11 => new String'("ZZZZ9"),
-      12 => new String'("ZZZZ9"),
-      13 => new String'("<#Z_ZZ9>"),
-      14 => new String'("<#Z_ZZ9>"),
-      15 => new String'("ZZZ.ZZ"),
-      16 => new String'("ZZZ.ZZ"),
-      17 => new String'("<###99>"),
-      18 => new String'("ZZZZZ-"),
-      19 => new String'("$$$$9"),
-      20 => new String'("$$$$$"),
-      21 => new String'("<###99>"),
-      22 => new String'("$$$$9"),
+      11 => new String'("ZZZZ9"), 12 => new String'("ZZZZ9"),
+      13 => new String'("<#Z_ZZ9>"), 14 => new String'("<#Z_ZZ9>"),
+      15 => new String'("ZZZ.ZZ"), 16 => new String'("ZZZ.ZZ"),
+      17 => new String'("<###99>"), 18 => new String'("ZZZZZ-"),
+      19 => new String'("$$$$9"), 20 => new String'("$$$$$"),
+      21 => new String'("<###99>"), 22 => new String'("$$$$9"),
 
    -- Items 23-40 are used in validation of the Valid, To_Picture, and
    -- Pic_String subprograms of package Text_IO.Editing, and are not used
@@ -209,29 +175,17 @@ package Fxf3a00 is
    -- is presented). However, certain strings violate multiple of the
    -- constraints.
    --
-     (1  => new String'("<<<"),
-      2  => new String'("<<>>"),
-      3  => new String'("<<<9_B0/$DB"),
-      4  => new String'("+BB"),
-      5  => new String'("<-"),
-      6  => new String'("<CR"),
-      7  => new String'("<db"),
-      8  => new String'("<<BBBcr"),
-      9  => new String'("<<__DB"),
-      10 => new String'("<<<++++_++-"),
-      11 => new String'("-999.99>"),
-      12 => new String'("+++9.99+"),
-      13 => new String'("++++>>"),
-      14 => new String'("->"),
-      15 => new String'("++9-"),
-      16 => new String'("---999999->"),
-      17 => new String'("+++-"),
-      18 => new String'("+++_+++_+.--"),
-      19 => new String'("--B.BB+>"),
-      20 => new String'("$$#$"),
-      21 => new String'("#B$$$$"),
-      22 => new String'("**Z"),
-      23 => new String'("ZZZzzz*"),
+     (1  => new String'("<<<"), 2 => new String'("<<>>"),
+      3  => new String'("<<<9_B0/$DB"), 4 => new String'("+BB"),
+      5 => new String'("<-"), 6 => new String'("<CR"), 7 => new String'("<db"),
+      8  => new String'("<<BBBcr"), 9 => new String'("<<__DB"),
+      10 => new String'("<<<++++_++-"), 11 => new String'("-999.99>"),
+      12 => new String'("+++9.99+"), 13 => new String'("++++>>"),
+      14 => new String'("->"), 15 => new String'("++9-"),
+      16 => new String'("---999999->"), 17 => new String'("+++-"),
+      18 => new String'("+++_+++_+.--"), 19 => new String'("--B.BB+>"),
+      20 => new String'("$$#$"), 21 => new String'("#B$$$$"),
+      22 => new String'("**Z"), 23 => new String'("ZZZzzz*"),
       24 => new String'("9.99DB(2)"),
       25 => new String'(A_Picture_String_Too_Long));
 
@@ -240,16 +194,12 @@ package Fxf3a00 is
 
    -- The following 10 edited output strings result from the first 10 valid
    -- strings when used with the first 10 Data_With_2DP numeric values.
-     (1  => new String'("   $***123,456.78"),
-      2  => new String'(" $***123,456.78"),
-      3  => new String'("          "),
-      4  => new String'("      $.20"),
-      5  => new String'("+      123,456.00"),
-      6  => new String'("      -123,457"),
-      7  => new String'("      $123,456.78"),
-      8  => new String'("(    $12.34)"),
-      9  => new String'("   $1.23"),
-      10 => new String'("$12.34"),
+     (1 => new String'("   $***123,456.78"),
+      2 => new String'(" $***123,456.78"), 3 => new String'("          "),
+      4 => new String'("      $.20"), 5 => new String'("+      123,456.00"),
+      6 => new String'("      -123,457"),
+      7 => new String'("      $123,456.78"), 8 => new String'("(    $12.34)"),
+      9 => new String'("   $1.23"), 10 => new String'("$12.34"),
 
    -- The following 10 edited output strings correspond to the 10 foreign
    -- currency picture strings (the currency string is supplied at the time of
@@ -258,30 +208,22 @@ package Fxf3a00 is
 
       11 => new String'("  FF***123.456,78"),
       12 => new String'(" FF***123.456,78"),
-      13 => new String'("  FF   32,10 "),
-      14 => new String'("( FF5.432,10)"),
+      13 => new String'("  FF   32,10 "), 14 => new String'("( FF5.432,10)"),
       15 => new String'("  (1,234.57DM )"),
-      16 => new String'("      DM123,456.78"),
-      17 => new String'("DM 12.34"),
-      18 => new String'(" DM12.34"),
-      19 => new String'("   DM1.23"),
+      16 => new String'("      DM123,456.78"), 17 => new String'("DM 12.34"),
+      18 => new String'(" DM12.34"), 19 => new String'("   DM1.23"),
       20 => new String'("  CHF12,345.67"),
 
    -- The following 12 edited output strings correspond to the 12 Data_With_NDP
    -- items formatted using Valid_String items 11-22. This combination shows
    -- decimal data with no decimal places formatted using picture strings.
 
-      21 => new String'(" 1234"),
-      22 => new String'("51234"),
-      23 => new String'("($1,234)"),
-      24 => new String'(" $1,234 "),
-      25 => new String'("  1.00"),
-      26 => new String'("      "),
-      27 => new String'("(  $10)"),
-      28 => new String'("    1-"),
-      29 => new String'("$1234"),
-      30 => new String'("   $1"),
-      31 => new String'("   $36 "),
+ 21      => new String'(" 1234"),
+      22 => new String'("51234"), 23 => new String'("($1,234)"),
+      24 => new String'(" $1,234 "), 25 => new String'("  1.00"),
+      26 => new String'("      "), 27 => new String'("(  $10)"),
+      28 => new String'("    1-"), 29 => new String'("$1234"),
+      30 => new String'("   $1"), 31 => new String'("   $36 "),
       32 => new String'("   $0"));
 
    -- The following data is used to create exception situations in tests of
@@ -294,8 +236,7 @@ package Fxf3a00 is
 
    Erroneous_Strings : Picture_String_Array_Type
      (1 .. Number_Of_Erroneous_Conditions) :=
-     (1 => new String'("9.99"),
-      2 => new String'("99.99"),
+     (1 => new String'("9.99"), 2 => new String'("99.99"),
       3 => new String'("$$$$9"));
 
 end Fxf3a00;

@@ -40,10 +40,7 @@ begin
       package Bs40 is new Ada.Strings.Bounded.Generic_Bounded_Length (40);
       package Bs80 is new Ada.Strings.Bounded.Generic_Bounded_Length (80);
 
-      use type
-        Bs1.Bounded_String,
-        Bs20.Bounded_String,
-        Bs40.Bounded_String,
+      use type Bs1.Bounded_String, Bs20.Bounded_String, Bs40.Bounded_String,
         Bs80.Bounded_String;
 
       String_1  : String (1 .. 1)  := "A";
@@ -62,53 +59,40 @@ begin
 
       if Bs40.Index
           (Bs40.To_Bounded_String ("Package Strings.Bounded"),
-           Pattern => "s.b",
-           Going   => Ada.Strings.Forward,
+           Pattern => "s.b", Going => Ada.Strings.Forward,
            Mapping => Map_To_Lower_Case_Ptr) /=
         15 or
         Bs80.Index
-            (Bs80.To_Bounded_String ("STRING TRANSLATIONS SUBPROGRAMS"),
-             "tr",
+            (Bs80.To_Bounded_String ("STRING TRANSLATIONS SUBPROGRAMS"), "tr",
              Mapping => Map_To_Lower_Case_Ptr) /=
           2 or
         Bs20.Index
-            (Bs20.To_Bounded_String ("maximum number"),
-             "um",
-             Ada.Strings.Backward,
-             Map_To_Lower_Case_Ptr) /=
+            (Bs20.To_Bounded_String ("maximum number"), "um",
+             Ada.Strings.Backward, Map_To_Lower_Case_Ptr) /=
           10 or
         Bs80.Index
             (Bs80.To_Bounded_String ("CoMpLeTeLy MiXeD CaSe StRiNg"),
-             "MIXED CASE STRING",
-             Ada.Strings.Forward,
+             "MIXED CASE STRING", Ada.Strings.Forward,
              Map_To_Upper_Case_Ptr) /=
           12 or
         Bs40.Index
             (Bs40.To_Bounded_String ("STRING WITH NO MATCHING PATTERN"),
-             "WITH",
-             Ada.Strings.Backward,
-             Map_To_Lower_Case_Ptr) /=
+             "WITH", Ada.Strings.Backward, Map_To_Lower_Case_Ptr) /=
           0 or
         Bs80.Index
-            (Bs80.To_Bounded_String ("THIS STRING IS IN UPPER CASE"),
-             "I",
-             Ada.Strings.Backward,
-             Map_To_Upper_Case_Ptr) /=
+            (Bs80.To_Bounded_String ("THIS STRING IS IN UPPER CASE"), "I",
+             Ada.Strings.Backward, Map_To_Upper_Case_Ptr) /=
           16 or
         Bs1.Index
-            (Bs1.Null_Bounded_String,
-             "i",
-             Mapping => Map_To_Lower_Case_Ptr) /=
+            (Bs1.Null_Bounded_String, "i", Mapping => Map_To_Lower_Case_Ptr) /=
           0 or
         Bs40.Index
-            (Bs40.To_Bounded_String ("AAABBBaaabbb"),
-             "aabb",
+            (Bs40.To_Bounded_String ("AAABBBaaabbb"), "aabb",
              Mapping => Map_To_Lower_Case_Ptr) /=
           2 or
         Bs80.Index
             (Bs80.To_Bounded_String ("WOULD MATCH BUT FOR THE CASE"),
-             "WOULD MATCH BUT FOR THE CASE",
-             Ada.Strings.Backward,
+             "WOULD MATCH BUT FOR THE CASE", Ada.Strings.Backward,
              Map_To_Lower_Case_Ptr) /=
           0
       then
@@ -125,9 +109,7 @@ begin
       begin
          Tc_Natural :=
            Index
-             (To_Bounded_String ("A Valid String"),
-              "",
-              Ada.Strings.Forward,
+             (To_Bounded_String ("A Valid String"), "", Ada.Strings.Forward,
               Map_To_Lower_Case_Ptr);
          Report.Failed
            ("Pattern_Error not raised by Function Index when " &
@@ -145,43 +127,35 @@ begin
       -- Function Count.
 
       if Bs20.Count
-          (Bs20.To_Bounded_String ("ABABABA"),
-           Pattern => "aba",
+          (Bs20.To_Bounded_String ("ABABABA"), Pattern => "aba",
            Mapping => Map_To_Lower_Case_Ptr) /=
         2 or
         Bs20.Count
-            (Bs20.To_Bounded_String ("ABABABA"),
-             "ABA",
+            (Bs20.To_Bounded_String ("ABABABA"), "ABA",
              Map_To_Lower_Case_Ptr) /=
           0 or
         Bs40.Count
-            (Bs40.To_Bounded_String ("This IS a MISmatched issue"),
-             "is",
+            (Bs40.To_Bounded_String ("This IS a MISmatched issue"), "is",
              Map_To_Lower_Case_Ptr) /=
           4 or
         Bs80.Count
-            (Bs80.To_Bounded_String ("ABABABA"),
-             "ABA",
+            (Bs80.To_Bounded_String ("ABABABA"), "ABA",
              Map_To_Upper_Case_Ptr) /=
           2 or
         Bs40.Count
-            (Bs40.To_Bounded_String ("This IS a MISmatched issue"),
-             "is",
+            (Bs40.To_Bounded_String ("This IS a MISmatched issue"), "is",
              Map_To_Upper_Case_Ptr) /=
           0 or
         Bs80.Count
             (Bs80.To_Bounded_String ("Peter Piper and his Pickled Peppers"),
-             "p",
-             Map_To_Lower_Case_Ptr) /=
+             "p", Map_To_Lower_Case_Ptr) /=
           7 or
         Bs20.Count
-            (Bs20.To_Bounded_String ("She sells sea shells"),
-             "s",
+            (Bs20.To_Bounded_String ("She sells sea shells"), "s",
              Map_To_Upper_Case_Ptr) /=
           0 or
         Bs80.Count
-            (Bs80.To_Bounded_String ("No matches what-so-ever"),
-             "matches",
+            (Bs80.To_Bounded_String ("No matches what-so-ever"), "matches",
              Map_To_Upper_Case_Ptr) /=
           0
       then
@@ -198,9 +172,7 @@ begin
       begin
          Tc_Natural :=
            Count
-             (To_Bounded_String ("A Valid String"),
-              "",
-              Map_To_Lower_Case_Ptr);
+             (To_Bounded_String ("A Valid String"), "", Map_To_Lower_Case_Ptr);
          Report.Failed
            ("Pattern_Error not raised by Function Count using " &
             "a Character_Mapping_Function parameter when " &

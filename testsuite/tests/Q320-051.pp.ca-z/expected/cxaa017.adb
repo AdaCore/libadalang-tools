@@ -37,29 +37,14 @@ begin
       -- This string contains five ISO 646 Control characters and six ISO 646
       -- Graphic characters:
       Tc_String_1 : constant String :=
-        Stx &
-        Si &
-        Dc2 &
-        Can &
-        Us &
-        Space &
-        Ampersand &
-        Solidus &
-        'A' &
-        Lc_X &
+        Stx & Si & Dc2 & Can & Us & Space & Ampersand & Solidus & 'A' & Lc_X &
         Del;
 
       -- This string contains two ISO 6429 Control and six ISO 6429 Graphic
       -- characters:
       Tc_String_2 : constant String :=
-        Is4 &
-        Sci &
-        Yen_Sign &
-        Masculine_Ordinal_Indicator &
-        Uc_I_Grave &
-        Multiplication_Sign &
-        Lc_C_Cedilla &
-        Lc_Icelandic_Thorn;
+        Is4 & Sci & Yen_Sign & Masculine_Ordinal_Indicator & Uc_I_Grave &
+        Multiplication_Sign & Lc_C_Cedilla & Lc_Icelandic_Thorn;
 
       Tc_Number_Of_Strings : constant := 2;
 
@@ -70,10 +55,8 @@ begin
       Tc_String_Ptr_Array : String_Ptr_Array_Type :=
         (new String'(Tc_String_1), new String'(Tc_String_2));
 
-      procedure Create_New_File
-        (The_File : in out File_Type;
-         Mode     : in     File_Mode;
-         Next     : in     Integer)
+      procedure Create_New_File (The_File : in out File_Type;
+         Mode                             : in File_Mode; Next : in Integer)
       is
       begin
          Create (The_File, Mode, Report.Legal_File_Name (Next));
@@ -125,8 +108,7 @@ begin
             Report.Failed
               ("The following exception was raised during the " &
                "check that Look_Ahead raised Mode_Error when " &
-               "provided a file object that is not in In_File " &
-               "mode: " &
+               "provided a file object that is not in In_File " & "mode: " &
                Exception_Name (The_Error));
       end;
 
@@ -142,8 +124,7 @@ begin
               ("The following exception was raised during the " &
                "check that Get_Immediate raised Mode_Error " &
                "when provided a file object that is not in " &
-               "In_File mode: " &
-               Exception_Name (The_Error));
+               "In_File mode: " & Exception_Name (The_Error));
       end;
 
       -- The file will then be reset to In_File mode to properly function as a
@@ -183,11 +164,9 @@ begin
          -- and that they match the expected character from the file.
 
          if Udla_Char /= Tc_String_Ptr_Array (1).all (Char_Pos) or
-           Udgi_Char /= Tc_String_Ptr_Array (1).all (Char_Pos)
-         then
+           Udgi_Char /= Tc_String_Ptr_Array (1).all (Char_Pos) then
             Report.Failed
-              ("Incorrect retrieval of character " &
-               Integer'Image (Char_Pos) &
+              ("Incorrect retrieval of character " & Integer'Image (Char_Pos) &
                " of first string");
          end if;
 
@@ -261,11 +240,9 @@ begin
 
          if not Udgi_Available or
            Udla_Char /= Tc_String_Ptr_Array (2).all (Char_Pos) or
-           Udgi_Char /= Tc_String_Ptr_Array (2).all (Char_Pos)
-         then
+           Udgi_Char /= Tc_String_Ptr_Array (2).all (Char_Pos) then
             Report.Failed
-              ("Incorrect retrieval of character " &
-               Integer'Image (Char_Pos) &
+              ("Incorrect retrieval of character " & Integer'Image (Char_Pos) &
                " of second string");
          end if;
 
@@ -307,9 +284,7 @@ begin
             Delete (User_Defined_Input_File);
          else
             Open
-              (User_Defined_Input_File,
-               Out_File,
-               Report.Legal_File_Name (1));
+              (User_Defined_Input_File, Out_File, Report.Legal_File_Name (1));
             Delete (User_Defined_Input_File);
          end if;
       exception
@@ -329,8 +304,7 @@ begin
             "during text file creation");
       when The_Error : others =>
          Report.Failed
-           ("The following exception was raised in the " &
-            "Test_Block: " &
+           ("The following exception was raised in the " & "Test_Block: " &
             Exception_Name (The_Error));
    end Test_Block;
 

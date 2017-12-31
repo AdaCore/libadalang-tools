@@ -204,8 +204,7 @@ begin
                Report.Failed ("Tampering did not raise exception, case 2");
             when 3 =>
                Insert
-                 (Distances,
-                  "PADOVA    ",
+                 (Distances, "PADOVA    ",
                   816.46 * Km);    -- Tampering with cursor
                Report.Failed ("Tampering did not raise exception, case 3");
             when 4 =>
@@ -222,9 +221,7 @@ begin
                  ("NOGENT    ",
                   133.34 * Km);  -- Tampering with elements allowed here
                Replace_Element
-                 (Distances,
-                  C,
-                  624.00 * Km);    -- C designates STUTTGART
+                 (Distances, C, 624.00 * Km);    -- C designates STUTTGART
             when others =>
                Report.Failed ("Extra iteration in tampering check");
          end case;

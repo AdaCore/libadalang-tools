@@ -40,8 +40,7 @@ procedure Ce3810a is
 begin
 
    Test
-     ("CE3810A",
-      "CHECK THAT FLOAT_IO PUT " & "OPERATES ON STRINGS CORRECTLY");
+     ("CE3810A", "CHECK THAT FLOAT_IO PUT " & "OPERATES ON STRINGS CORRECTLY");
 
    declare
       type Fl is digits 4;

@@ -62,13 +62,10 @@ begin
       "CHECK THAT ANY SUBTYPE CONSTRAINT IMPOSED BY " &
       "THE TYPE MARK USED IN THE SLICE RENAMING " &
       "DECLARATION IS IGNORED, AND THAT THE SUBTYPE " &
-      "CONSTRAINT ASSOCIATED WITH THE RENAMED " &
-      "VARIABLE IS USED INSTEAD");
+      "CONSTRAINT ASSOCIATED WITH THE RENAMED " & "VARIABLE IS USED INSTEAD");
 
-   if Xs'First /= Ident_Int (10) or
-     Xs'Last /= Ident_Int (24) or
-     Xs'Length /= Ident_Int (15)
-   then
+   if Xs'First /= Ident_Int (10) or Xs'Last /= Ident_Int (24) or
+     Xs'Length /= Ident_Int (15) then
       Failed ("INCORRECT VALUE OF SLICE ATTRIBUTES - 1");
    end if;
 
@@ -82,10 +79,8 @@ begin
       Failed ("INCORRECT VALUE OF ORIGINAL STRING - 1");
    end if;
 
-   if Xt'First /= Ident_Int (1) or
-     Xt'Last /= Ident_Int (5) or
-     Xt'Length /= Ident_Int (5)
-   then
+   if Xt'First /= Ident_Int (1) or Xt'Last /= Ident_Int (5) or
+     Xt'Length /= Ident_Int (5) then
       Failed ("INCORRECT VALUE OF SLICE ATTRIBUTES - 2");
    end if;
 
@@ -99,10 +94,8 @@ begin
       Failed ("INCORRECT VALUE OF ORIGINAL STRING - 2");
    end if;
 
-   if Xg1'First /= Ident_Int (10) or
-     Xg1'Last /= Ident_Int (24) or
-     Xg1'Length /= Ident_Int (15)
-   then
+   if Xg1'First /= Ident_Int (10) or Xg1'Last /= Ident_Int (24) or
+     Xg1'Length /= Ident_Int (15) then
       Failed ("INCORRECT VALUE OF SLICE ATTRIBUTES - G1");
    end if;
 
@@ -116,10 +109,8 @@ begin
       Failed ("INCORRECT VALUE OF ORIGINAL STRING - G1");
    end if;
 
-   if Xg2'First /= Ident_Int (1) or
-     Xg2'Last /= Ident_Int (5) or
-     Xg2'Length /= Ident_Int (5)
-   then
+   if Xg2'First /= Ident_Int (1) or Xg2'Last /= Ident_Int (5) or
+     Xg2'Length /= Ident_Int (5) then
       Failed ("INCORRECT VALUE OF SLICE ATTRIBUTES - G2");
    end if;
 

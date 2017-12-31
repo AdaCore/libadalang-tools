@@ -49,34 +49,13 @@ procedure C52010a is
    use Report;
 
    type Enum is
-     (Aa,
-      Bb,
-      Cc,
-      Dd,
-      Ee,
-      Ff,
-      Gg,
-      Hh,
-      Ii,
-      Jj,
-      Kk,
-      Ll,
-      Mm,
-      Nn,
-      Pp,
-      Qq,
-      Tt,
-      Uu,
-      Vv,
-      Ww,
-      Xx,
-      Yy);
+     (Aa, Bb, Cc, Dd, Ee, Ff, Gg, Hh, Ii, Jj, Kk, Ll, Mm, Nn, Pp, Qq, Tt, Uu,
+      Vv, Ww, Xx, Yy);
 
 begin
 
    Test
-     ("C52010A",
-      "CHECK THAT RECORD ASSIGNMENTS USE ""COPY""" & " SEMANTICS");
+     ("C52010A", "CHECK THAT RECORD ASSIGNMENTS USE ""COPY""" & " SEMANTICS");
 
    declare
       type Rec is record

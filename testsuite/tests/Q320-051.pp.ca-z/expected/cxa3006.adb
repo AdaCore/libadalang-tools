@@ -57,19 +57,16 @@ procedure Cxa3006 is
 
    package Awch renames Ada.Wide_Characters.Handling;
 
-   procedure Test_Wide_Strings
-     (Lc_Wide_String_1 : in Wide_String;
-      Uc_Wide_String_1 : in Wide_String;
-      Lc_Wide_String_2 : in Wide_String;
-      Uc_Wide_String_2 : in Wide_String)
+   procedure Test_Wide_Strings (Lc_Wide_String_1 : in Wide_String;
+      Uc_Wide_String_1 : in Wide_String; Lc_Wide_String_2 : in Wide_String;
+      Uc_Wide_String_2                           : in Wide_String)
    is
    begin
 
       -- Function To_Lower for Wide_Strings
 
       if Awch.To_Lower (Uc_Wide_String_1) /= Lc_Wide_String_1 or
-        Awch.To_Lower (Lc_Wide_String_1) /= Lc_Wide_String_1
-      then
+        Awch.To_Lower (Lc_Wide_String_1) /= Lc_Wide_String_1 then
 
          Report.Failed ("Incorrect result from To_Lower for wide strings - 1");
 
@@ -90,8 +87,7 @@ procedure Cxa3006 is
       end if;
 
       if Awch.To_Upper (Lc_Wide_String_2) /= Uc_Wide_String_2 or
-        Awch.To_Upper (Uc_Wide_String_1) /= Uc_Wide_String_1
-      then
+        Awch.To_Upper (Uc_Wide_String_1) /= Uc_Wide_String_1 then
 
          Report.Failed ("Incorrect result from To_Upper for wide strings - 2");
 
@@ -136,8 +132,7 @@ begin
       for I in Wide_Character'Pos ('A') .. Wide_Character'Pos ('Z') loop
 
          if Awch.To_Lower (Wide_Character'Val (I)) /=
-           Wide_Character'Val (I + Offset)
-         then
+           Wide_Character'Val (I + Offset) then
 
             Report.Failed ("Incorrect operation of function To_Lower - 2");
 
@@ -145,11 +140,8 @@ begin
 
       end loop;
 
-      if Awch.To_Lower ('c') /= 'c' or
-        Awch.To_Lower ('w') /= 'w' or
-        Awch.To_Lower ('0') /= '0' or
-        Awch.To_Lower ('9') /= '9'
-      then
+      if Awch.To_Lower ('c') /= 'c' or Awch.To_Lower ('w') /= 'w' or
+        Awch.To_Lower ('0') /= '0' or Awch.To_Lower ('9') /= '9' then
 
          Report.Failed ("Incorrect operation of function To_Lower - 3");
 
@@ -195,8 +187,7 @@ begin
       for I in 16#0391# .. 16#3A1# loop -- Capital Alpha to Capital Rho
 
          if Awch.To_Lower (Wide_Character'Val (I)) /=
-           Wide_Character'Val (I + Offset)
-         then
+           Wide_Character'Val (I + Offset) then
 
             Report.Failed ("Incorrect operation of function To_Lower - 4");
 
@@ -209,8 +200,7 @@ begin
       for I in 16#03A3# .. 16#3A9# loop -- Capital Sigma to Capital Omega
 
          if Awch.To_Lower (Wide_Character'Val (I)) /=
-           Wide_Character'Val (I + Offset)
-         then
+           Wide_Character'Val (I + Offset) then
 
             Report.Failed ("Incorrect operation of function To_Lower - 5");
 
@@ -233,8 +223,7 @@ begin
       for I in 16#03B1# .. 16#3C1# loop -- Small Alpha to Small Rho
 
          if Awch.To_Upper (Wide_Character'Val (I)) /=
-           Wide_Character'Val (I - Offset)
-         then
+           Wide_Character'Val (I - Offset) then
 
             Report.Failed ("Incorrect operation of function To_Upper - 3");
 
@@ -247,8 +236,7 @@ begin
       for I in 16#03C3# .. 16#3C9# loop -- Small Sigma to Small Omega
 
          if Awch.To_Upper (Wide_Character'Val (I)) /=
-           Wide_Character'Val (I - Offset)
-         then
+           Wide_Character'Val (I - Offset) then
 
             Report.Failed ("Incorrect operation of function To_Upper - 4");
 

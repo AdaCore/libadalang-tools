@@ -19,10 +19,8 @@ package body C392d01_0 is
    end Self_Test;
 
    -----------------------------------------------------------
-   function Tc_Correct_Result
-     (C : Zoom_Camera;
-      D : F392d00.Depth_Of_Field;
-      S : F392d00.Shutter_Speed) return Boolean
+   function Tc_Correct_Result (C : Zoom_Camera; D : F392d00.Depth_Of_Field;
+      S                          : F392d00.Shutter_Speed) return Boolean
    is
       use type F392d00.Depth_Of_Field;
       use type F392d00.Shutter_Speed;

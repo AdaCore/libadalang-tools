@@ -56,16 +56,14 @@ begin
    if Parent_Type'Storage_Size < Ident_Int (Specified_Size) then
       Failed
         ("PARENT_TYPE'STORAGE_SIZE SHOULD NOT BE " &
-         "LESS THAN SPECIFIED_SIZE.  " &
-         "ACTUAL SIZE IS" &
+         "LESS THAN SPECIFIED_SIZE.  " & "ACTUAL SIZE IS" &
          Integer'Image (Parent_Type'Size));
    end if;
 
    if Derived_Type'Storage_Size /= Ident_Int (Parent_Type'Storage_Size) then
       Failed
         ("DERIVED_TYPE'STORAGE_SIZE SHOULD BE " &
-         "EQUAL TO PARENT_TYPE'STORAGE_SIZE.  " &
-         "ACTUAL SIZE IS" &
+         "EQUAL TO PARENT_TYPE'STORAGE_SIZE.  " & "ACTUAL SIZE IS" &
          Integer'Image (Derived_Type'Storage_Size));
    end if;
 

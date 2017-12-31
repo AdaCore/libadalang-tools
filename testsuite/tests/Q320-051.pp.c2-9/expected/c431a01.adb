@@ -133,10 +133,8 @@ begin
          I30 : Integer := F431a00.Init_Func (51);
       end record;
 
-      procedure Check
-        (Item    : in out T20'Class;
-         Value   : in     Integer;
-         Message : in     String)
+      procedure Check (Item : in out T20'Class; Value : in Integer;
+         Message            : in     String)
       is
       begin
          Check (Item.C10, Value, Message);

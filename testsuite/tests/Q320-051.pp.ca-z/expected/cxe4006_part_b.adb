@@ -19,10 +19,8 @@ package body Cxe4006_Part_B is
    B_Body_Obj : Cxe4006_Part_B.B_Body_Tagged_Type;
    Normal_Obj : Cxe4006_Normal.Normal_Spec_Tagged_Type;
 
-   procedure Single_Controlling_Operand
-     (Rtt         : in out B_Tagged_Type;
-      Test_Number : in     Integer;
-      Callee      :    out Type_Decl_Location)
+   procedure Single_Controlling_Operand (Rtt : in out B_Tagged_Type;
+      Test_Number : in     Integer; Callee : out Type_Decl_Location)
    is
       Expected : Integer := 0;
    begin
@@ -39,12 +37,9 @@ package body Cxe4006_Part_B is
 
       if Rtt.Common_Record_Field /= Expected then
          Report.Failed
-           ("CXE4006_Part_B expected" &
-            Integer'Image (Expected) &
-            " but received" &
-            Integer'Image (Rtt.Common_Record_Field) &
-            " in test" &
-            Integer'Image (Test_Number));
+           ("CXE4006_Part_B expected" & Integer'Image (Expected) &
+            " but received" & Integer'Image (Rtt.Common_Record_Field) &
+            " in test" & Integer'Image (Test_Number));
       end if;
 
       Rtt.Common_Record_Field := Expected + 9;
@@ -55,10 +50,8 @@ package body Cxe4006_Part_B is
    -- this procedure will pass all the parameters along to partition A
    -- CXE4006_Part_A1.Make_Dispatching_Call_With. Prior to making the call,
    -- the tag of X is checked to make sure it is correct.
-   procedure Wrapped_Around
-     (X           : in out Root_Tagged_Type'Class;
-      Test_Number : in     Integer;
-      Callee      :    out Type_Decl_Location)
+   procedure Wrapped_Around (X : in out Root_Tagged_Type'Class;
+      Test_Number              : in Integer; Callee : out Type_Decl_Location)
    is
       Good_Tag : Boolean := False;
    begin

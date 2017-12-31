@@ -74,9 +74,8 @@ begin
 
       ---
 
-      procedure Store_Information
-        (Info_String : in     Info_Wide_String_Type;
-         Db_Record   : in out Data_Base_Element_Type)
+      procedure Store_Information (Info_String : in     Info_Wide_String_Type;
+         Db_Record                             : in out Data_Base_Element_Type)
       is
 
          package As renames Ada.Strings;
@@ -108,9 +107,7 @@ begin
          Stop  :=
            As.Wide_Fixed.Index
              (Info_String (Start .. Info_String'Length),
-              As.Wide_Maps.To_Set (Blank),
-              As.Inside,
-              As.Forward) -
+              As.Wide_Maps.To_Set (Blank), As.Inside, As.Forward) -
            1;
 
          -- Store the name field in the data base element field for "Name".
@@ -130,11 +127,8 @@ begin
          Start := Stop + 1;
 
          As.Wide_Fixed.Find_Token
-           (Info_String (Start .. Info_String'Length),
-            Numeric_Set,
-            As.Inside,
-            Start,
-            Stop);
+           (Info_String (Start .. Info_String'Length), Numeric_Set, As.Inside,
+            Start, Stop);
 
          -- Store the street number field in the appropriate data base element.
          -- No modification of the default parameters of procedure Move is
@@ -154,16 +148,13 @@ begin
 
          Stop :=
            As.Wide_Fixed.Index
-             (Info_String (Start .. Info_String'Length),
-              Blank_Wide_String) -
+             (Info_String (Start .. Info_String'Length), Blank_Wide_String) -
            1;
 
          -- Store the street name in the appropriate data base element field.
 
          As.Wide_Fixed.Overwrite
-           (Db_Record.Street_Name,
-            1,
-            Info_String (Start .. Stop));
+           (Db_Record.Street_Name, 1, Info_String (Start .. Stop));
 
          -- Replace any underscore characters in the street name field
          -- that were used as word separation with blanks. Again, use
@@ -180,16 +171,13 @@ begin
 
          Stop :=
            As.Wide_Fixed.Index
-             (Info_String (Start .. Info_String'Length),
-              Blank_Wide_String) -
+             (Info_String (Start .. Info_String'Length), Blank_Wide_String) -
            1;
 
          -- Store the city name field in the appropriate data base element.
 
          As.Wide_Fixed.Replace_Slice
-           (Db_Record.City,
-            1,
-            Db_Record.City'Length,
+           (Db_Record.City, 1, Db_Record.City'Length,
             Info_String (Start .. Stop));
 
          -- Replace any underscore characters in the city name field that were
@@ -205,20 +193,15 @@ begin
          As.Wide_Fixed.Find_Token
            (Info_String (Start .. Info_String'Length),
             As.Wide_Maps."OR"
-              (California_Set,
-               As.Wide_Maps."OR" (Nevada_Set, Arizona_Set)),
-            As.Inside,
-            Start,
-            Stop);
+              (California_Set, As.Wide_Maps."OR" (Nevada_Set, Arizona_Set)),
+            As.Inside, Start, Stop);
 
          -- Store the state indicator into the data base element.
 
          As.Wide_Fixed.Move
-           (Source  => Info_String (Start .. Stop),
-            Target  => Db_Record.State,
-            Drop    => Ada.Strings.Right,
-            Justify => Ada.Strings.Left,
-            Pad     => As.Wide_Space);
+           (Source => Info_String (Start .. Stop), Target => Db_Record.State,
+            Drop   => Ada.Strings.Right, Justify => Ada.Strings.Left,
+            Pad    => As.Wide_Space);
 
          -- Continue the extraction process; remove the final data item in the
          -- info string, the zip code, and place it into the corresponding data

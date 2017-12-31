@@ -80,29 +80,21 @@ procedure Cxai012 is
    end My_Equivalent_Keys;
 
    package My_Bounded_Hashed_Maps is new Ada.Containers.Bounded_Hashed_Maps
-     (Key_Type        => My_Key_Type,
-      Element_Type    => My_Float,
-      Hash            => My_Hash,
+     (Key_Type => My_Key_Type, Element_Type => My_Float, Hash => My_Hash,
       Equivalent_Keys => My_Equivalent_Keys); -- Default =
 
    Num_Tests : constant := 10;
 
    Capacity_Reqd : constant := Num_Tests;
 
-   My_Map_1 : My_Bounded_Hashed_Maps
-     .Map
-     (Capacity => Capacity_Reqd,
-      Modulus  =>
+   My_Map_1 : My_Bounded_Hashed_Maps.Map (Capacity => Capacity_Reqd,
+      Modulus =>
         My_Bounded_Hashed_Maps.Default_Modulus (Capacity => Capacity_Reqd));
-   My_Map_2 : My_Bounded_Hashed_Maps
-     .Map
-     (Capacity => Capacity_Reqd,
-      Modulus  =>
+   My_Map_2 : My_Bounded_Hashed_Maps.Map (Capacity => Capacity_Reqd,
+      Modulus =>
         My_Bounded_Hashed_Maps.Default_Modulus (Capacity => Capacity_Reqd));
-   Big_Map : My_Bounded_Hashed_Maps
-     .Map
-     (Capacity => Capacity_Reqd,
-      Modulus  =>
+   Big_Map : My_Bounded_Hashed_Maps.Map (Capacity => Capacity_Reqd,
+      Modulus =>
         My_Bounded_Hashed_Maps.Default_Modulus (Capacity => Capacity_Reqd));
 
    subtype Array_Bounds_Type is Ada.Containers.Count_Type range 1 .. Num_Tests;
@@ -117,9 +109,8 @@ procedure Cxai012 is
 
    My_Inserted : Boolean;
 
-   procedure Tampering_Check
-     (Container : in out My_Bounded_Hashed_Maps.Map;
-      Where     : in     String) with
+   procedure Tampering_Check (Container : in out My_Bounded_Hashed_Maps.Map;
+      Where                             : in     String) with
       Pre => not Container.Is_Empty
     is
 
@@ -290,8 +281,7 @@ begin
 
       begin
 
-         if My_Map_1.Element (Key => My_Key_Type (I)) /=
-           Value_In_Array (I)
+         if My_Map_1.Element (Key => My_Key_Type (I)) /= Value_In_Array (I)
          then
 
             Report.Failed ("Mismatch between element and what was inserted");
@@ -299,8 +289,7 @@ begin
          end if;
 
          My_Bounded_Hashed_Maps.Query_Element
-           (Position => My_Cursor_1,
-            Process  => My_Query'Access);
+           (Position => My_Cursor_1, Process => My_Query'Access);
 
       end;
 
@@ -401,8 +390,7 @@ begin
               My_Bounded_Hashed_Maps.Element (Position => My_Cursor_1) * 2.0);
 
          My_Map_2.Update_Element
-           (Position => My_Cursor_2,
-            Process  => My_Update'Access);
+           (Position => My_Cursor_2, Process => My_Update'Access);
 
       end;
 
@@ -558,8 +546,7 @@ begin
          Big_Map.Insert
            (Key      => My_Key_Type (3), -- A value in the map.
             New_Item => Value_In_Array (1),
-            Position => A_Cursor,
-            Inserted => Inserted);
+            Position => A_Cursor, Inserted => Inserted);
 
          if Inserted then
             Report.Failed
@@ -581,10 +568,8 @@ begin
       begin
 
          Big_Map.Insert
-           (Key      => My_Key_Type (Capacity_Reqd),
-            New_Item => Value_In_Array (1),
-            Position => A_Cursor,
-            Inserted => Inserted);
+           (Key => My_Key_Type (Capacity_Reqd), New_Item => Value_In_Array (1),
+            Position => A_Cursor, Inserted => Inserted);
 
          if Inserted then
             Report.Failed
@@ -638,8 +623,7 @@ begin
       begin
 
          Big_Map.Insert
-           (Key      => My_Key_Type (Capacity_Reqd),
-            Position => A_Cursor,
+           (Key      => My_Key_Type (Capacity_Reqd), Position => A_Cursor,
             Inserted => Inserted);
          -- The default value is not found in the map.
 
@@ -909,8 +893,7 @@ begin
    My_Cursor_1 := My_Map_1.Find (Key => 10);
 
    if My_Bounded_Hashed_Maps.Element (Position => My_Cursor_1) /=
-     Value_In_Array (10)
-   then
+     Value_In_Array (10) then
 
       Report.Failed ("Found value not as expected");
 

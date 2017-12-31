@@ -9,8 +9,7 @@ begin
       "nature of formal tagged type parameters.  " &
       "Check aliased nature of the current " &
       "instance of a limited type.  Check the " &
-      "constraining of actual subtypes for " &
-      "discriminated objects");
+      "constraining of actual subtypes for " & "discriminated objects");
 
    C3a0013_4.Perform_Tests;
 

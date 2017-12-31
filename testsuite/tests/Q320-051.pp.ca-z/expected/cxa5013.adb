@@ -111,13 +111,11 @@ begin
 
       generic
          with package Gen_Pack is new Ada.Numerics.Discrete_Random (<>);
-      procedure Random_Test
-        (Trials_Per_Test : in     Integer;
-         Success         :    out Boolean);
+      procedure Random_Test (Trials_Per_Test : in     Integer;
+         Success                             :    out Boolean);
 
-      procedure Random_Test
-        (Trials_Per_Test : in     Integer;
-         Success         :    out Boolean)
+      procedure Random_Test (Trials_Per_Test : in     Integer;
+         Success                             :    out Boolean)
       is
          Total_Runs               : Integer := 0;
          Total_Trials             : Integer := 0;
@@ -275,8 +273,7 @@ begin
 
       if not Tc_Success then
          Report.Failed
-           ("Random_Test was run " &
-            Integer'Image (Tc_Test_Run) &
+           ("Random_Test was run " & Integer'Image (Tc_Test_Run) &
             " times, but a successful result was not recorded " &
             "from any run using the integer discrete random " &
             "number generator");
@@ -301,11 +298,9 @@ begin
 
       if not Tc_Success then
          Report.Failed
-           ("Random_Test was run " &
-            Integer'Image (Tc_Test_Run) &
+           ("Random_Test was run " & Integer'Image (Tc_Test_Run) &
             " times, but a successful result was not recorded " &
-            "from any run using the enumeration random number " &
-            "generator");
+            "from any run using the enumeration random number " & "generator");
       end if;
 
    exception

@@ -33,8 +33,7 @@ package body C730004_0.C730004_2 is
    begin
       if
         ((File.Descriptor /= Child_File.Descriptor) and
-         (File.Mode = Read_Only) and
-         (File.Name = "ACVC95"))
+         (File.Mode = Read_Only) and (File.Name = "ACVC95"))
       then
          return True;
       else
@@ -47,8 +46,7 @@ package body C730004_0.C730004_2 is
    begin
       if
         ((File.Descriptor /= C730004_0.C730004_1.System_File.Descriptor) and
-         (File.Mode = Read_Write) and
-         (File.Name = "ACVC  "))
+         (File.Mode = Read_Write) and (File.Name = "ACVC  "))
       then
          return True;
       else
@@ -61,8 +59,7 @@ package body C730004_0.C730004_2 is
    begin
       if
         ((Dir.Comp.Descriptor = C730004_0.C730004_1.System_File.Descriptor) and
-         (Dir.Comp.Mode = Write_Only) and
-         (Dir.Comp.Name = String2))
+         (Dir.Comp.Mode = Write_Only) and (Dir.Comp.Name = String2))
       then
          return True;
       else

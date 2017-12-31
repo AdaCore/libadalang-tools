@@ -41,13 +41,11 @@ package body C910003_Pack is
 
       -- Check the results (and function call with a prefix dereference).
       if Results.all (Report.Ident_Int (1)) /=
-        Buffer_Access.all.Tc_Items_Buffered (Report.Ident_Int (1))
-      then
+        Buffer_Access.all.Tc_Items_Buffered (Report.Ident_Int (1)) then
          Report.Failed ("First item mismatch");
       end if;
       if Results (Report.Ident_Int (2)) /=
-        Buffer_Access.Tc_Items_Buffered (Report.Ident_Int (2))
-      then
+        Buffer_Access.Tc_Items_Buffered (Report.Ident_Int (2)) then
          Report.Failed ("Second item mismatch");
       end if;
       accept Wait_Until_Done; -- Tell main that we're done.

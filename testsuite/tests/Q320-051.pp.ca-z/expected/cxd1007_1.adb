@@ -75,8 +75,7 @@ begin
       Report.Failed
         ("expected main priority to be" &
          System.Any_Priority'Image (Real_Main_Priority) &
-         " but the priority was" &
-         System.Any_Priority'Image (P));
+         " but the priority was" & System.Any_Priority'Image (P));
    else
       if Verbose then
          Report.Comment ("main priority is" & System.Any_Priority'Image (P));

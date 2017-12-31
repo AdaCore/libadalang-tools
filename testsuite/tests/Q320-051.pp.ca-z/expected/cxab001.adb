@@ -191,8 +191,7 @@ begin
 
          Ada.Wide_Text_Io.Open
            (Filter_File,                       -- Open.
-            Ada.Wide_Text_Io.In_File,
-            Filter_Filename);
+            Ada.Wide_Text_Io.In_File, Filter_Filename);
 
          -- Read the data of the First_String from the file, using the
          -- Get procedure defined for Wide_Character data. Verify that the
@@ -252,8 +251,7 @@ begin
       else
          Ada.Wide_Text_Io.Open
            (Filter_File,                    -- Open.
-            Ada.Wide_Text_Io.Out_File,
-            Filter_Filename);
+            Ada.Wide_Text_Io.Out_File, Filter_Filename);
          Ada.Wide_Text_Io.Delete (Filter_File);                 -- Delete.
       end if;
    exception

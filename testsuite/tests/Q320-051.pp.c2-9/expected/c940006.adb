@@ -198,8 +198,7 @@ begin
         (Ramp_31.Local_Overload = Clear_Level and
          Ramp_31.Next_Ramp_Overload = Clear_Level and
          Ramp_31.Freeway_Overload = Clear_Level) and
-        Ramp_32.Local_Overload = Clear_Level
-      then
+        Ramp_32.Local_Overload = Clear_Level then
          Report.Failed ("Initial Calls provided unexpected Results");
       end if;
 

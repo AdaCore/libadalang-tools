@@ -44,8 +44,7 @@ begin
    Test
      ("C97305B",
       "CHECK THAT IF THE RENDEZVOUS IS IMMEDIATELY " &
-      "POSSIBLE (FOR A TIMED ENTRY CALL), IT " &
-      "IS PERFORMED");
+      "POSSIBLE (FOR A TIMED ENTRY CALL), IT " & "IS PERFORMED");
 
    if Equal (3, 3) then
       Zero := 0.0;

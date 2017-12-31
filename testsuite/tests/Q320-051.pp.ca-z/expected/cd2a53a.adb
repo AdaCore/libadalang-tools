@@ -92,29 +92,23 @@ procedure Cd2a53a is
       end if;
    end Ident;
 
-   procedure Proc
-     (Cn1in, Cp1in       :        Check_Type;
-      Cn2inout, Cp2inout : in out Check_Type;
-      Czout              :    out Check_Type)
+   procedure Proc (Cn1in, Cp1in :        Check_Type;
+      Cn2inout, Cp2inout        : in out Check_Type; Czout : out Check_Type)
    is
    begin
 
       if Ident (Cn1in) + Cp1in not in -2.04 .. -2.03 or
-        Cp2inout - Ident (Cp1in) not in 2.03 .. 2.04
-      then
+        Cp2inout - Ident (Cp1in) not in 2.03 .. 2.04 then
          Failed ("INCORRECT RESULTS FOR " & "BINARY ADDING OPERATORS - 1");
       end if;
 
       if Check_Type (Cn1in * Ident (Cp1in)) not in -1.81 .. -1.78 or
-        Check_Type (Ident (Cn2inout) / Cp2inout) not in -0.13 .. -0.12
-      then
+        Check_Type (Ident (Cn2inout) / Cp2inout) not in -0.13 .. -0.12 then
          Failed ("INCORRECT RESULTS FOR " & "MULTIPLYING OPERATORS - 1");
       end if;
 
-      if Ident (Cp1in) not in 0.66 .. 0.670 or
-        Cn2inout in -0.32 .. 0.0 or
-        Ident (Cn2inout) in -1.0 .. -0.35
-      then
+      if Ident (Cp1in) not in 0.66 .. 0.670 or Cn2inout in -0.32 .. 0.0 or
+        Ident (Cn2inout) in -1.0 .. -0.35 then
          Failed ("INCORRECT RESULTS FOR MEMBERSHIP " & "OPERATORS - 1");
       end if;
 
@@ -157,14 +151,12 @@ begin
    end if;
 
    if +Ident (Cneg2) not in -0.34 .. -0.33 or
-     Ident (-Cpos1) not in -0.67 .. -0.66
-   then
+     Ident (-Cpos1) not in -0.67 .. -0.66 then
       Failed ("INCORRECT RESULTS FOR UNARY ADDING OPERATORS - 2");
    end if;
 
    if abs Ident (Cneg2) not in 0.33 .. 0.34 or
-     Ident (abs Cpos1) not in 0.66 .. 0.670
-   then
+     Ident (abs Cpos1) not in 0.66 .. 0.670 then
       Failed ("INCORRECT RESULTS FOR ABSOLUTE VALUE " & "OPERATORS - 2");
    end if;
 
@@ -173,21 +165,17 @@ begin
    end if;
 
    if Ident (Charray (0)) + Charray (2) not in -2.04 .. -2.03 or
-     Charray (3) - Ident (Charray (2)) not in 2.03 .. 2.04
-   then
+     Charray (3) - Ident (Charray (2)) not in 2.03 .. 2.04 then
       Failed ("INCORRECT RESULTS FOR BINARY ADDING OPERATORS - 3");
    end if;
 
    if Check_Type (Charray (0) * Ident (Charray (2))) not in -1.81 .. -1.78 or
-     Check_Type (Ident (Charray (1)) / Charray (3)) not in -0.13 .. -0.12
-   then
+     Check_Type (Ident (Charray (1)) / Charray (3)) not in -0.13 .. -0.12 then
       Failed ("INCORRECT RESULTS FOR MULTIPLYING OPERATORS - 3");
    end if;
 
    if Ident (Charray (2)) not in 0.66 .. 0.670 or
-     Charray (1) in -0.32 .. 0.0 or
-     Ident (Charray (1)) in -1.0 .. -0.35
-   then
+     Charray (1) in -0.32 .. 0.0 or Ident (Charray (1)) in -1.0 .. -0.35 then
       Failed ("INCORRECT RESULTS FOR MEMBERSHIP " & "OPERATORS - 3");
    end if;
 
@@ -196,21 +184,17 @@ begin
    end if;
 
    if +Ident (Chrec.Compn) not in -0.34 .. -0.33 or
-     Ident (-Chrec.Compp) not in -0.67 .. -0.66
-   then
+     Ident (-Chrec.Compp) not in -0.67 .. -0.66 then
       Failed ("INCORRECT RESULTS FOR UNARY ADDING OPERATORS - 4");
    end if;
 
    if abs Ident (Chrec.Compn) not in 0.33 .. 0.34 or
-     Ident (abs Chrec.Compp) not in 0.66 .. 0.670
-   then
+     Ident (abs Chrec.Compp) not in 0.66 .. 0.670 then
       Failed ("INCORRECT RESULTS FOR ABSOLUTE VALUE " & "OPERATORS - 4");
    end if;
 
    if Ident (Chrec.Compp) not in 0.66 .. 0.670 or
-     Chrec.Compn in -0.32 .. 0.0 or
-     Ident (Chrec.Compn) in -1.0 .. -0.35
-   then
+     Chrec.Compn in -0.32 .. 0.0 or Ident (Chrec.Compn) in -1.0 .. -0.35 then
       Failed ("INCORRECT RESULTS FOR MEMBERSHIP " & "OPERATORS - 4");
    end if;
 

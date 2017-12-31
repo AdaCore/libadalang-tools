@@ -95,24 +95,21 @@ begin
          pragma Pack (Tabox5);
 
          subtype Tabox52 is
-           Tabox5
-             (Ident_Int (13) .. Ident_Int (13),
+           Tabox5 (Ident_Int (13) .. Ident_Int (13),
               Ident_Int (-6) .. Ident_Int (Integer'Last - 4));
 
       begin
 
          Comment
            ("NO CONSTRAINT_ERROR FOR NON-NULL ARRAY SUBTYPE " &
-            "WHEN ONE DIMENSION HAS INTEGER'LAST + 3 " &
-            "COMPONENTS");
+            "WHEN ONE DIMENSION HAS INTEGER'LAST + 3 " & "COMPONENTS");
 
          Obj_Dcl :
          declare   -- THIS BLOCK DECLARES ONE NULL ARRAY AND ONE
             -- PACKED BOOLEAN ARRAY WITH INTEGER'LAST + 3 COMPONENTS; STORAGE
             -- ERROR MAY BE RAISED.
 
-            Arrx51 : Tabox5
-              (Ident_Int (13) .. Ident_Int (12),
+            Arrx51 : Tabox5 (Ident_Int (13) .. Ident_Int (12),
                Ident_Int (-6) .. Ident_Int (Integer'Last - 4));
             Arrx52 : Tabox52;     -- BIG ARRAY HERE.
 
@@ -133,8 +130,7 @@ begin
                Comment
                  ("CONSTRAINT_ERROR RAISED WHEN " &
                   "CHECKING LENGTHS FOR ARRAY HAVING " &
-                  "> INTEGER'LAST COMPONENTS ON ONE " &
-                  "DIMENSION");
+                  "> INTEGER'LAST COMPONENTS ON ONE " & "DIMENSION");
 
             when others =>
                Failed ("OTHER EXCEPTION RAISED - SUBTEST 10");
@@ -146,8 +142,7 @@ begin
          when Storage_Error =>
             Comment
               ("STORAGE_ERROR RAISED WHEN DECLARING ONE " &
-               "PACKED BOOLEAN ARRAY WITH INTEGER'LAST " &
-               "+ 3 COMPONENTS");
+               "PACKED BOOLEAN ARRAY WITH INTEGER'LAST " & "+ 3 COMPONENTS");
          when Constraint_Error =>
             Comment
               ("CONSTRAINT_ERROR RAISED WHEN DECLARING " &
@@ -163,8 +158,7 @@ begin
       when Constraint_Error =>
          Comment
            ("CONSTRAINT_ERROR RAISED WHEN DECLARING AN " &
-            "ARRAY SUBTYPE WITH INTEGER'LAST + 3 " &
-            "COMPONENTS");
+            "ARRAY SUBTYPE WITH INTEGER'LAST + 3 " & "COMPONENTS");
 
       when Storage_Error =>
          Failed ("STORAGE_ERROR RAISED FOR TYPE DECLARATION");

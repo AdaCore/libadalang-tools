@@ -73,8 +73,7 @@ begin -- C460A01.                                              -- [ Level = 1 ]
          -- The instantiation of C460A01_1 should NOT result in any exceptions.
 
          package Pack_Ok is new C460a01_1
-           (Designated_Type => F460a00.Tagged_Type,
-            Operand_Type    => Acctag_L2,
+           (Designated_Type => F460a00.Tagged_Type, Operand_Type => Acctag_L2,
             Target_Type     => Acctag_L3);
       begin
          -- The accessibility level of the actual passed as the operand type
@@ -124,8 +123,7 @@ begin -- C460A01.                                              -- [ Level = 1 ]
          -- The instantiation of C460A01_1 should NOT result in any exceptions.
 
          package Pack_Pe is new C460a01_1
-           (Designated_Type => F460a00.Tagged_Type,
-            Operand_Type    => Acctag_L3,
+           (Designated_Type => F460a00.Tagged_Type, Operand_Type => Acctag_L3,
             Target_Type     => Acctag_L2);
       begin
          -- The accessibility level of the actual passed as the operand type
@@ -171,8 +169,7 @@ begin -- C460A01.                                              -- [ Level = 1 ]
 
          -- The instantiation of C460A01_2 should NOT result in any exceptions.
 
-         package Pack_Ok is new C460a01_2
-           (F460a00.Tagged_Type'Class,
+         package Pack_Ok is new C460a01_2 (F460a00.Tagged_Type'Class,
             F460a00.Acctagclass_L0);
       begin
          -- The accessibility level of the actual passed as the operand
@@ -206,8 +203,7 @@ begin -- C460A01.                                              -- [ Level = 1 ]
 
          -- The instantiation of C460A01_2 should NOT result in any exceptions.
 
-         package Pack_Pe is new C460a01_2
-           (F460a00.Derived_Tagged_Type,
+         package Pack_Pe is new C460a01_2 (F460a00.Derived_Tagged_Type,
             Accdertag_L3);
       begin
          -- The accessibility level of the actual passed as the operand

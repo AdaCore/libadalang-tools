@@ -18,10 +18,7 @@ procedure Cd33001 is
    procedure Unexpected (Message : String; Wanted, Got : Integer) is
    begin
       Report.Failed
-        (Message &
-         " Wanted:" &
-         Integer'Image (Wanted) &
-         " Got:" &
+        (Message & " Wanted:" & Integer'Image (Wanted) & " Got:" &
          Integer'Image (Got));
    end Unexpected;
 
@@ -31,13 +28,11 @@ begin  -- Main test procedure.
      ("CD33001",
       "Check that Component_Sizes that are factor of " &
       "the word size are supported.  Check that for " &
-      "such Component_Sizes arrays contain no gaps " &
-      "between components");
+      "such Component_Sizes arrays contain no gaps " & "between components");
 
    if A_Half'Size /= A_Half'Component_Size * 16 then
       Unexpected
-        ("Half word Size",
-         Cd33001_0.Half_Stuff'Component_Size * 16,
+        ("Half word Size", Cd33001_0.Half_Stuff'Component_Size * 16,
          A_Half'Size);
    end if;
 

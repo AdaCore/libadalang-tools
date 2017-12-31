@@ -155,10 +155,8 @@ begin
                accept E2 do
                   if (E2'Count + E1'Count + 1) /= I then
                      Failed
-                       ("'COUNT NOT RETURNING " &
-                        "CORRECT VALUE FOR LOOP" &
-                        Integer'Image (I) &
-                        "VALUE " &
+                       ("'COUNT NOT RETURNING " & "CORRECT VALUE FOR LOOP" &
+                        Integer'Image (I) & "VALUE " &
                         Integer'Image ((E2'Count + E1'Count + 1)));
                   end if;
                end E2;
@@ -166,10 +164,8 @@ begin
                accept E1 do
                   if (E2'Count + E1'Count + 1) /= I then
                      Failed
-                       ("'COUNT NOT RETURNING " &
-                        "CORRECT VALUE FOR LOOP" &
-                        Integer'Image (I) &
-                        "VALUE " &
+                       ("'COUNT NOT RETURNING " & "CORRECT VALUE FOR LOOP" &
+                        Integer'Image (I) & "VALUE " &
                         Integer'Image ((E2'Count + E1'Count + 1)));
                   end if;
                end E1;

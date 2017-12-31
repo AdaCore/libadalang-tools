@@ -40,8 +40,7 @@ begin
 
    Test
      ("C9A004A",
-      "CHECK THAT IF A TASK IS ABORTED" &
-      " BEFORE BEING ACTIVATED," &
+      "CHECK THAT IF A TASK IS ABORTED" & " BEFORE BEING ACTIVATED," &
       "  THE TASK IS TERMINATED");
 
    declare

@@ -141,8 +141,7 @@ begin
       if not (String6 <= String7) then
          Failed
            ("DIFFERENT BOUNDS, SAME NUMBER OF COMPONENTS, " &
-            "MULTIPLE COMPONENTS, COMPONENTS NOT EQUAL - " &
-            "<=");
+            "MULTIPLE COMPONENTS, COMPONENTS NOT EQUAL - " & "<=");
       end if;
 
       if String6 > String7 then
@@ -154,8 +153,7 @@ begin
       if ">=" (Left => String6, Right => String7) then
          Failed
            ("DIFFERENT BOUNDS, SAME NUMBER OF COMPONENTS, " &
-            "MULTIPLE COMPONENTS, COMPONENTS NOT EQUAL - " &
-            ">=");
+            "MULTIPLE COMPONENTS, COMPONENTS NOT EQUAL - " & ">=");
       end if;
 
       if String6 < String8 then

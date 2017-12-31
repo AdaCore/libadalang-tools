@@ -58,8 +58,7 @@ begin
       "CIRCUMSTANCES.  CHECK WHEN THE DERIVED " &
       "OPERATOR IS IMPLICITLY DECLARED IN THE " &
       "PRIVATE PART OF A PACKAGE AFTER AN EXPLICIT " &
-      "DECLARATION OF A HOMOGRAPHIC OPERATOR IN " &
-      "THE VISIBLE PART");
+      "DECLARATION OF A HOMOGRAPHIC OPERATOR IN " & "THE VISIBLE PART");
 
    -----------------------------------------------------------------
 

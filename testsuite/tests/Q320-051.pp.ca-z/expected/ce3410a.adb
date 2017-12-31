@@ -50,8 +50,7 @@ procedure Ce3410a is
 begin
 
    Test
-     ("CE3410A",
-      "CHECK THAT SET_LINE RAISES " & "LAYOUT_ERROR APPROPRIATELY");
+     ("CE3410A", "CHECK THAT SET_LINE RAISES " & "LAYOUT_ERROR APPROPRIATELY");
 
    begin
       Create (File);

@@ -15,10 +15,8 @@ procedure C730a02 is
 
           --========================================================--
 
-   procedure Create_List
-     (Title, Author : in     C730a02_1.Data_List;
-      Pages         : in     C730a02_1.Page_Counts;
-      Head          : in out Priv_Node_Ptr)
+   procedure Create_List (Title, Author : in C730a02_1.Data_List;
+      Pages : in C730a02_1.Page_Counts; Head : in out Priv_Node_Ptr)
    is
 
       Book     : Priv_Node_Type;  -- Object of extended type.
@@ -56,8 +54,7 @@ procedure C730a02 is
       -- extension.
       -- Call inherited operations using dereferenced pointers.
          Get_Pages (Book1_Ptr.all) /= 456 or
-         Get_Pages (Book2_Ptr.all) /= 215 or
-         Get_Pages (Book3_Ptr.all) /= 237);
+         Get_Pages (Book2_Ptr.all) /= 215 or Get_Pages (Book3_Ptr.all) /= 237);
 
    end Bad_List_Contents;
 
@@ -73,9 +70,7 @@ begin  -- Main program.
 
    -- Create linked list using inherited operation:
    Create_List
-     (C730a02_1.Title_List,
-      C730a02_1.Author_List,
-      C730a02_1.Page_List,
+     (C730a02_1.Title_List, C730a02_1.Author_List, C730a02_1.Page_List,
       List_Of_Books);
 
    -- Verify results:

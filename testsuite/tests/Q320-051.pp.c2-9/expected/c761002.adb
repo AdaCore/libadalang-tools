@@ -24,8 +24,7 @@ procedure C761002 is
    -- check Unchecked_Deallocation
    procedure Subtest_2 is
       type Access_2 is access C761002_0.Global;
-      procedure Free is new Unchecked_Deallocation
-        (C761002_0.Global,
+      procedure Free is new Unchecked_Deallocation (C761002_0.Global,
          Access_2);
       V1 : Access_2;
       V2 : Access_2;
@@ -145,10 +144,8 @@ begin  -- Main test procedure.
      ("C761002",
       "Check that objects of a controlled type created " &
       "by an allocator for a named access type are " &
-      "finalized appropriately. " &
-      "Check that Unchecked_Deallocation of a " &
-      "controlled object causes finalization " &
-      "of that object");
+      "finalized appropriately. " & "Check that Unchecked_Deallocation of a " &
+      "controlled object causes finalization " & "of that object");
 
    Subtest_1;
    -- leaving the scope of the access type should finalize the collection

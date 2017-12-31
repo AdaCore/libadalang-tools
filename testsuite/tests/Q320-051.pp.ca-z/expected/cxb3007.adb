@@ -123,10 +123,9 @@ begin
       Tc_Wide_String (1 .. 6) := "abcdef";
 
       To_C
-        (Item       => Tc_Wide_String (1 .. 6),  -- Source slice of length 6.
-         Target     => Tc_Wchar_Array,
-         Count      => Tc_Size_T_Count,
-         Append_Nul => True);
+        (Item   => Tc_Wide_String (1 .. 6),  -- Source slice of length 6.
+         Target => Tc_Wchar_Array,
+         Count  => Tc_Size_T_Count, Append_Nul => True);
 
       -- Check that the out parameter Count is set to the appropriate value for
       -- the wide_nul terminated case.
@@ -139,13 +138,11 @@ begin
 
       for I in 1 .. Tc_Size_T_Count - 1 loop
          if Wchar_T_To_Wide_Character (Tc_Wchar_Array (I - 1)) /=
-           Tc_Wide_String (Integer (I))
-         then
+           Tc_Wide_String (Integer (I)) then
             Report.Failed
               ("Incorrect result from Procedure To_C when " &
                "checking individual wchar_t values, case of " &
-               "Append_Nul => True; " &
-               "wchar_t position = " &
+               "Append_Nul => True; " & "wchar_t position = " &
                Integer'Image (Integer (I)));
          end if;
       end loop;
@@ -169,10 +166,9 @@ begin
       Tc_Wide_String (1 .. 4) := "WXYZ";
 
       To_C
-        (Item       => Tc_Wide_String (1 .. 4),  -- Source slice of length 4.
-         Target     => Tc_Wchar_Array,
-         Count      => Tc_Size_T_Count,
-         Append_Nul => False);
+        (Item   => Tc_Wide_String (1 .. 4),  -- Source slice of length 4.
+         Target => Tc_Wchar_Array,
+         Count  => Tc_Size_T_Count, Append_Nul => False);
 
       -- Check that the out parameter Count is set to the appropriate value for
       -- the non-wide_nul terminated case.
@@ -185,13 +181,11 @@ begin
 
       for I in 1 .. Tc_Size_T_Count loop
          if Wchar_T_To_Wide_Character (Tc_Wchar_Array (I - 1)) /=
-           Tc_Wide_String (Integer (I))
-         then
+           Tc_Wide_String (Integer (I)) then
             Report.Failed
               ("Incorrect result from Procedure To_C when " &
                "checking individual wchar_t values, case of " &
-               "Append_Nul => False; " &
-               "wchar_t position = " &
+               "Append_Nul => False; " & "wchar_t position = " &
                Integer'Image (Integer (I)));
          end if;
       end loop;
@@ -216,9 +210,7 @@ begin
       Tc_Wchar_Array := (others => Wchar_T'First);
       begin
          To_C
-           ("A string too long",
-            Tc_Wchar_Array,
-            Tc_Size_T_Count,
+           ("A string too long", Tc_Wchar_Array, Tc_Size_T_Count,
             Append_Nul => True);
 
          Report.Failed
@@ -248,10 +240,8 @@ begin
       Tc_Wchar_Array := To_C ("ACVC-95", Append_Nul => True); -- 8 total chars.
 
       To_Ada
-        (Item     => Tc_Wchar_Array,
-         Target   => Tc_Wide_String,
-         Count    => Tc_Natural_Count,
-         Trim_Nul => False);
+        (Item  => Tc_Wchar_Array, Target => Tc_Wide_String,
+         Count => Tc_Natural_Count, Trim_Nul => False);
 
       if Tc_Natural_Count /= 8 then
          Report.Failed
@@ -261,20 +251,17 @@ begin
 
       for I in 1 .. Tc_Natural_Count loop
          if Wide_Character_To_Wchar_T (Tc_Wide_String (I)) /=
-           Tc_Wchar_Array (Size_T (I - 1))
-         then
+           Tc_Wchar_Array (Size_T (I - 1)) then
             Report.Failed
               ("Incorrect result from Procedure To_Ada when " &
                "checking individual wchar_t values, case of " &
                "Trim_Nul => False, when a wide_nul is present " &
-               "in the wchar_array input parameter; " &
-               "position = " &
+               "in the wchar_array input parameter; " & "position = " &
                Integer'Image (Integer (I)));
          end if;
       end loop;
 
-      if Tc_Wide_String (Tc_Natural_Count) /=
-        To_Wide_Character (Latin_1.Nul)
+      if Tc_Wide_String (Tc_Natural_Count) /= To_Wide_Character (Latin_1.Nul)
       then
          Report.Failed
            ("Last Wide_Character of Wide_String result of " &
@@ -287,10 +274,8 @@ begin
       Tc_Wchar_Array (0 .. 3) := To_C ("XYz", Append_Nul => True); -- 4 chars.
 
       To_Ada
-        (Item     => Tc_Wchar_Array,
-         Target   => Tc_Wide_String,
-         Count    => Tc_Natural_Count,
-         Trim_Nul => True);
+        (Item  => Tc_Wchar_Array, Target => Tc_Wide_String,
+         Count => Tc_Natural_Count, Trim_Nul => True);
 
       if Tc_Natural_Count /= 3 then
          Report.Failed
@@ -300,20 +285,17 @@ begin
 
       for I in 1 .. Tc_Natural_Count loop
          if Wide_Character_To_Wchar_T (Tc_Wide_String (I)) /=
-           Tc_Wchar_Array (Size_T (I - 1))
-         then
+           Tc_Wchar_Array (Size_T (I - 1)) then
             Report.Failed
               ("Incorrect result from Procedure To_Ada when " &
                "checking individual wchar_t values, case of " &
                "Trim_Nul => True, when a wide_nul is present " &
-               "in the wchar_array input parameter; " &
-               "position = " &
+               "in the wchar_array input parameter; " & "position = " &
                Integer'Image (Integer (I)));
          end if;
       end loop;
 
-      if Tc_Wide_String (Tc_Natural_Count) =
-        To_Wide_Character (Latin_1.Nul)
+      if Tc_Wide_String (Tc_Natural_Count) = To_Wide_Character (Latin_1.Nul)
       then
          Report.Failed
            ("Last Wide_Character of Wide_String result of " &
@@ -331,35 +313,29 @@ begin
       Tc_Wchar_Array := To_C ("ABCDWXYZ", Append_Nul => False);
 
       To_Ada
-        (Item     => Tc_Wchar_Array,
-         Target   => Tc_Wide_String,
-         Count    => Tc_Natural_Count,
-         Trim_Nul => False);
+        (Item  => Tc_Wchar_Array, Target => Tc_Wide_String,
+         Count => Tc_Natural_Count, Trim_Nul => False);
 
       if Tc_Natural_Count /= 8 then
          Report.Failed
            ("Incorrect value returned in out parameter Count " &
             "by Procedure To_Ada, case of Trim_Nul => False, " &
-            "with no wide_nul wchar_t present in the parameter " &
-            "Item");
+            "with no wide_nul wchar_t present in the parameter " & "Item");
       end if;
 
       for I in 1 .. Tc_Natural_Count loop
          if Wide_Character_To_Wchar_T (Tc_Wide_String (I)) /=
-           Tc_Wchar_Array (Size_T (I - 1))
-         then
+           Tc_Wchar_Array (Size_T (I - 1)) then
             Report.Failed
               ("Incorrect result from Procedure To_Ada when " &
                "checking individual wchar_t values, case of " &
                "Trim_Nul => False, when a wide_nul is not " &
-               "present in the wchar_array input parameter; " &
-               "position = " &
+               "present in the wchar_array input parameter; " & "position = " &
                Integer'Image (Integer (I)));
          end if;
       end loop;
 
-      if Tc_Wide_String (Tc_Natural_Count) =
-        To_Wide_Character (Latin_1.Nul)
+      if Tc_Wide_String (Tc_Natural_Count) = To_Wide_Character (Latin_1.Nul)
       then
          Report.Failed
            ("Last Wide_Character of Wide_String result of " &
@@ -377,10 +353,8 @@ begin
          Tc_Wchar_Array := To_C ("ABCDWXYZ", Append_Nul => False);
 
          To_Ada
-           (Tc_Wchar_Array,
-            Tc_Wide_String,
-            Count    => Tc_Natural_Count,
-            Trim_Nul => True);
+           (Tc_Wchar_Array, Tc_Wide_String, Count => Tc_Natural_Count,
+            Trim_Nul                              => True);
 
          Report.Failed
            ("Terminator_Error not raised when Item " &
@@ -409,8 +383,7 @@ begin
          To_Ada
            (Tc_Wchar_Array (0 .. 4),
             Tc_Short_Wide_String, -- Length of 4.
-            Count    => Tc_Natural_Count,
-            Trim_Nul => False);
+            Count => Tc_Natural_Count, Trim_Nul => False);
 
          Report.Failed
            ("Constraint_Error not raised when Wide_String " &
@@ -432,8 +405,7 @@ begin
    exception
       when The_Error : others =>
          Report.Failed
-           ("The following exception was raised in the " &
-            "Test_Block: " &
+           ("The following exception was raised in the " & "Test_Block: " &
             Exception_Name (The_Error));
    end Test_Block;
 

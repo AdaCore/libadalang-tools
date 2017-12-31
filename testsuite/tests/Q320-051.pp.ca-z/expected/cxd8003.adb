@@ -60,12 +60,9 @@ procedure Cxd8003 is
    begin
       Rt.Split (T, Sc, Ts);
       Report.Comment
-        (Note &
-         Rt.Seconds_Count'Image (Sc) &
-         Duration'Image (Rt.To_Duration (Ts)) &
-         " [" &
-         Integer'Image (Ts / Rt.Time_Span_Unit) &
-         "]");
+        (Note & Rt.Seconds_Count'Image (Sc) &
+         Duration'Image (Rt.To_Duration (Ts)) & " [" &
+         Integer'Image (Ts / Rt.Time_Span_Unit) & "]");
    end Print_Time;
 
    procedure Check_Split is

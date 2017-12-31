@@ -36,8 +36,7 @@ begin      -- Tasks start here
    Task1.Get_Status (User_Rec);
    if (F940a00.Counter.Number /= 1) or
      (Semaphores.Login_Semaphore.Available /= 1) or
-     (Semaphores.Tc_Key_Val (User_Rec) /= 1)
-   then
+     (Semaphores.Tc_Key_Val (User_Rec) /= 1) then
       Report.Failed ("Resource not assigned to task 1");
    end if;
 
@@ -48,8 +47,7 @@ begin      -- Tasks start here
    Task2.Get_Status (User_Rec);
    if (F940a00.Counter.Number /= 2) or
      (Semaphores.Login_Semaphore.Available /= 0) or
-     (Semaphores.Tc_Key_Val (User_Rec) /= 2)
-   then
+     (Semaphores.Tc_Key_Val (User_Rec) /= 2) then
       Report.Failed ("Resource not assigned to task 2");
    end if;
 
@@ -60,8 +58,7 @@ begin      -- Tasks start here
    -- is queued
 
    if (F940a00.Counter.Number /= 2) or
-     (Semaphores.Login_Semaphore.Available /= 0)
-   then
+     (Semaphores.Login_Semaphore.Available /= 0) then
       Report.Failed ("Resource incorrectly assigned to task 3");
    end if;
 
@@ -78,8 +75,7 @@ begin      -- Tasks start here
    Task3.Get_Status (User_Rec);
    if (F940a00.Counter.Number /= 2) or
      (Semaphores.Login_Semaphore.Available /= 0) or
-     (Semaphores.Tc_Key_Val (User_Rec) /= 3)
-   then
+     (Semaphores.Tc_Key_Val (User_Rec) /= 3) then
       Report.Failed ("Resource not properly released/assigned to task 3");
    end if;
 
@@ -89,8 +85,7 @@ begin      -- Tasks start here
    --   and is waiting for a call to Logout
 
    if (F940a00.Counter.Number /= 1) or
-     (Semaphores.Login_Semaphore.Available /= 1)
-   then
+     (Semaphores.Login_Semaphore.Available /= 1) then
       Report.Failed ("Resource not properly released from task 2");
    end if;
 
@@ -99,8 +94,7 @@ begin      -- Tasks start here
    -- all resources have been returned all tasks have terminated or will soon
 
    if (F940a00.Counter.Number /= 0) or
-     (Semaphores.Login_Semaphore.Available /= 2)
-   then
+     (Semaphores.Login_Semaphore.Available /= 2) then
       Report.Failed ("Resource not properly released from task 3");
    end if;
 

@@ -75,8 +75,7 @@ begin
       Null_String : constant String := "";
       Tc_String   : constant String := "A Standard String";
 
-      Tc_Unb_String,
-      Tc_New_Unb_String : Unb.Unbounded_String :=
+      Tc_Unb_String, Tc_New_Unb_String : Unb.Unbounded_String :=
         Unb.Null_Unbounded_String;
 
    begin
@@ -127,8 +126,7 @@ begin
 
       Unb.Append (Tc_Unb_String, Tc_New_Unb_String);
 
-      if Tc_Unb_String /=
-        Unb.To_Unbounded_String ("Sample string of length L")
+      if Tc_Unb_String /= Unb.To_Unbounded_String ("Sample string of length L")
       then
          Report.Failed
            ("Incorrect results from Procedure Append with " &
@@ -138,8 +136,7 @@ begin
       Tc_Unb_String := Unb.Null_Unbounded_String;
 
       Unb.Append
-        (Tc_Unb_String,
-         Unb.To_Unbounded_String ("New Unbounded String"));
+        (Tc_Unb_String, Unb.To_Unbounded_String ("New Unbounded String"));
 
       if Tc_Unb_String /= Unb.To_Unbounded_String ("New Unbounded String") then
          Report.Failed
@@ -158,8 +155,7 @@ begin
       then
          Report.Failed
            ("Incorrect results from Procedure Append with " &
-            "an unbounded string parameter and a string " &
-            "parameter - 1");
+            "an unbounded string parameter and a string " & "parameter - 1");
       end if;
 
       Tc_Unb_String := Unb.To_Unbounded_String ("An Unbounded String");
@@ -169,8 +165,7 @@ begin
       if Tc_Unb_String /= Unb.To_Unbounded_String ("An Unbounded String") then
          Report.Failed
            ("Incorrect results from Procedure Append with " &
-            "an unbounded string parameter and a string " &
-            "parameter - 2");
+            "an unbounded string parameter and a string " & "parameter - 2");
       end if;
 
       Tc_Unb_String := Unb.Null_Unbounded_String;
@@ -180,8 +175,7 @@ begin
       if Tc_Unb_String /= Unb.To_Unbounded_String ("A Standard String") then
          Report.Failed
            ("Incorrect results from Procedure Append with " &
-            "an unbounded string parameter and a string " &
-            "parameter - 3");
+            "an unbounded string parameter and a string " & "parameter - 3");
       end if;
 
       -- Procedure Append (Unbounded - Character)
@@ -236,8 +230,7 @@ begin
          Unb.To_Unbounded_String ("best") < "test") or
         Unb.Null_Unbounded_String < Null_String or
         " leading blank" < Unb.To_Unbounded_String (" leading blank") or
-        "ending blank " < Unb.To_Unbounded_String ("ending blank ")
-      then
+        "ending blank " < Unb.To_Unbounded_String ("ending blank ") then
          Report.Failed
            ("Incorrect results from function ""<"" with " &
             "string - unbounded string parameter combinations");
@@ -265,8 +258,7 @@ begin
         ("A much longer string" > Tc_Unb_String and
          Unb.To_Unbounded_String (Tc_String) > "A Standard Strin" and
          "abcdefgh" > Unb.To_Unbounded_String ("ABCDEFGH")) or
-        Unb.Null_Unbounded_String > Null_String
-      then
+        Unb.Null_Unbounded_String > Null_String then
          Report.Failed
            ("Incorrect results from function "">"" with " &
             "string - unbounded string parameter combinations");
@@ -290,8 +282,7 @@ begin
    exception
       when The_Error : others =>
          Report.Failed
-           ("The following exception was raised in the " &
-            "Test_Block: " &
+           ("The following exception was raised in the " & "Test_Block: " &
             Exception_Name (The_Error));
    end Test_Block;
 

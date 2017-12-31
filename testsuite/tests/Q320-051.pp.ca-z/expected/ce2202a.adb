@@ -50,10 +50,8 @@ procedure Ce2202a is
 begin
    Test
      ("CE2202A",
-      "CHECK THAT READ, WRITE, AND " &
-      "END_OF_FILE RAISE STATUS_ERROR " &
-      "WHEN APPLIED TO A NON-OPEN " &
-      "SEQUENTIAL FILE");
+      "CHECK THAT READ, WRITE, AND " & "END_OF_FILE RAISE STATUS_ERROR " &
+      "WHEN APPLIED TO A NON-OPEN " & "SEQUENTIAL FILE");
    begin
       begin
          Write (File1, Cnst);

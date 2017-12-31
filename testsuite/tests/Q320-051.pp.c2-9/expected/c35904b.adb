@@ -47,9 +47,7 @@ procedure C35904b is
       Sfix_Var : Sfix := Sfix (Ident_Int (0));
    begin
       Failed
-        ("NO EXCEPTION RAISED FOR " &
-         Str &
-         " " &
+        ("NO EXCEPTION RAISED FOR " & Str & " " &
          Sfix'Image (Sfix_Var));  --USE SFIX_VAR
    end Proc;
 
@@ -58,8 +56,7 @@ begin
    Test
      ("C35904B",
       "CHECK THAT INCOMPATIBLE FIXED POINT " &
-      "CONSTRAINTS RAISE CONSTRAINT_ERROR " &
-      "FOR GENERIC FORMAL TYPES");
+      "CONSTRAINTS RAISE CONSTRAINT_ERROR " & "FOR GENERIC FORMAL TYPES");
 
 -- TEST FOR INCORRECT SUBTYPE DEFINITION ON ACCURACY BETWEEN TYPE AND SUBTYPE
 -- DEFINITIONS.

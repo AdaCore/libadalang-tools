@@ -42,8 +42,7 @@ begin
      ("C45273A",
       "EQUALITY AND INEQUALITY ARE " &
       "EVALUATED CORRECTLY FOR RECORD OBJECTS HAVING " &
-      "DIFFERENT VALUES OF THE 'CONSTRAINED' " &
-      " ATTRIBUTE");
+      "DIFFERENT VALUES OF THE 'CONSTRAINED' " & " ATTRIBUTE");
 
    declare
       subtype Int is Integer range 1 .. 20;

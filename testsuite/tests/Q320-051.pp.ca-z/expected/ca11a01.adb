@@ -23,43 +23,33 @@ begin
    Report.Test
      ("CA11A01",
       "Check that type extended in a public " &
-      "child inherits primitive operations from its " &
-      "ancestor");
+      "child inherits primitive operations from its " & "ancestor");
 
    Set_Width (Default_Widget, 9);             -- Call from parent.
    Set_Height (Default_Widget, 10);           -- Call from parent.
 
    if Default_Widget.Width /= Widget_Length (Report.Ident_Int (9)) or
-     Default_Widget.Height /= Widget_Length (Report.Ident_Int (10))
-   then
+     Default_Widget.Height /= Widget_Length (Report.Ident_Int (10)) then
       Report.Failed ("Incorrect result for Default_Widget");
    end if;
 
    Color_Widget_Pkg.Set_Color_Widget
-     (Black_Widget,
-      17,
-      18,
-      Color_Widget_Pkg.Black);   -- Explicitly declared.
+     (Black_Widget, 17, 18, Color_Widget_Pkg.Black);   -- Explicitly declared.
 
    if Black_Widget.Width /= Widget_Length (Report.Ident_Int (17)) or
      Black_Widget.Height /= Widget_Length (Report.Ident_Int (18)) or
-     Color_Widget_Pkg."/=" (Black_Widget.Color, Color_Widget_Pkg.Black)
-   then
+     Color_Widget_Pkg."/=" (Black_Widget.Color, Color_Widget_Pkg.Black) then
       Report.Failed ("Incorrect result for Black_Widget");
    end if;
 
    Label_Widget_Pkg.Set_Label_Widget
-     (Mail_Widget,
-      15,
-      21,
-      Color_Widget_Pkg.White,
+     (Mail_Widget, 15, 21, Color_Widget_Pkg.White,
       "Quick_Mail");                                  -- Explicitly declared.
 
    if Mail_Widget.Width /= Widget_Length (Report.Ident_Int (15)) or
      Mail_Widget.Height /= Widget_Length (Report.Ident_Int (21)) or
      Color_Widget_Pkg."/=" (Mail_Widget.Color, Color_Widget_Pkg.White) or
-     not Label_Widget_Pkg.Verify_Label (Mail_Widget, Mail_Label)
-   then
+     not Label_Widget_Pkg.Verify_Label (Mail_Widget, Mail_Label) then
       Report.Failed ("Incorrect result for Mail_Widget");
    end if;
 

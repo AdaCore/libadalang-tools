@@ -46,12 +46,11 @@ procedure C45271a is
       A : Rec_Type1;
    end record;
 
-   Rec1, Rec2 : Rec_Type1     := (A => 2, others => (others => True));
-   Rec3, Rec4 : Rec_Type2 (5) := (5, "WHERE");
-   Rec5, Rec6 : Rec_Type2;
-   Rec7, Rec8 : Rec_Type3;
-   Rec9,
-   Rec10 : Rec_Type3 (3) :=
+   Rec1, Rec2  : Rec_Type1     := (A => 2, others => (others => True));
+   Rec3, Rec4  : Rec_Type2 (5) := (5, "WHERE");
+   Rec5, Rec6  : Rec_Type2;
+   Rec7, Rec8  : Rec_Type3;
+   Rec9, Rec10 : Rec_Type3 (3) :=
      (Num => 3, A => (A => 5, Bool => (others => False)));
 
 begin
@@ -59,8 +58,7 @@ begin
      ("C45271A",
       "CHECK THAT EQUALITY AND INEQUALITY ARE " &
       "EVALUATED CORRECTLY FOR RECORDS WHOSE " &
-      "COMPONENTS DO NOT HAVE CHANGEABLE " &
-      "DISCRIMINANTS");
+      "COMPONENTS DO NOT HAVE CHANGEABLE " & "DISCRIMINANTS");
 
    if "/=" (Left => Rec1, Right => Rec2) then
       Failed ("INCORRECT RESULTS FOR RECORDS - 1");

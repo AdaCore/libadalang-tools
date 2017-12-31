@@ -50,8 +50,7 @@ procedure Ce3804d is
 begin
 
    Test
-     ("CE3804D",
-      "FLOAT_IO GET RAISES DATA_ERROR FOR " & "OUT-OF-RANGE DATA");
+     ("CE3804D", "FLOAT_IO GET RAISES DATA_ERROR FOR " & "OUT-OF-RANGE DATA");
 
    declare
       Ft : File_Type;

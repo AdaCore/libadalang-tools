@@ -93,20 +93,14 @@ begin
          end if;
       end R;
 
-      procedure P1 is new P
-        (Bool => Boolean,
-         F    => Ident_Bool (False),
-         L    => Ident_Bool (True));
+      procedure P1 is new P (Bool => Boolean, F => Ident_Bool (False),
+         L                        => Ident_Bool (True));
 
-      procedure P2 is new P
-        (Bool => Tbool,
-         F    => Ident_Bool (True),
-         L    => Ident_Bool (True));
+      procedure P2 is new P (Bool => Tbool, F => Ident_Bool (True),
+         L                        => Ident_Bool (True));
 
-      procedure P3 is new P
-        (Bool => Fbool,
-         F    => Ident_Bool (False),
-         L    => Ident_Bool (False));
+      procedure P3 is new P (Bool => Fbool, F => Ident_Bool (False),
+         L                        => Ident_Bool (False));
 
       procedure P4 is new P (Bool => Newbool, F => False, L => True);
 

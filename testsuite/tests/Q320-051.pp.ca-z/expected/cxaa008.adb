@@ -83,8 +83,7 @@ begin
       -- exception will be handled to produce a Not_Applicable result.
 
       Text_Io.Create
-        (File => Inventory_File,
-         Mode => Text_Io.Append_File,
+        (File => Inventory_File, Mode => Text_Io.Append_File,
          Name => Inventory_Filename);
 
    exception
@@ -113,9 +112,7 @@ begin
         array (1 .. Daily_Orders_Received) of Product_Type;
 
       Daily_Inventory : Inventory_Type :=
-        ((1.0, 1.75, 50.00),
-         (155.0, 20.00, -5.50),
-         (3_343.5, 2.50, 126.50),
+        ((1.0, 1.75, 50.00), (155.0, 20.00, -5.50), (3_343.5, 2.50, 126.50),
          (4_986.0, 180.00, 31.75));
 
       package Item_Io is new Text_Io.Fixed_Io (Item_Type);
@@ -145,11 +142,8 @@ begin
             Item_Io.Put (Inventory_File, The_List (I).Item_Number);
             Cost_Io.Put (Inventory_File, The_List (I).Unit_Cost, 10, 4, 0);
             Markup_Io.Put
-              (File => Inventory_File,
-               Item => The_List (I).Percent_Markup,
-               Fore => 6,
-               Aft  => 3,
-               Exp  => 2);
+              (File => Inventory_File, Item => The_List (I).Percent_Markup,
+               Fore => 6, Aft => 3, Exp => 2);
             Text_Io.New_Line (Inventory_File);
          end loop;
          return (True);                         -- Return a Status value.
@@ -208,9 +202,7 @@ begin
             Item_Io.Get (Inventory_File, Tc_Item);
             Cost_Io.Get (Inventory_File, Tc_Cost);
             Markup_Io.Get
-              (File  => Inventory_File,
-               Item  => Tc_Markup,
-               Width => 0);
+              (File => Inventory_File, Item => Tc_Markup, Width => 0);
             Text_Io.Skip_Line (Inventory_File);
             Tc_Item_Count := Tc_Item_Count + 1;
 
@@ -223,8 +215,7 @@ begin
             if (Tc_Cost /= Daily_Inventory (Tc_Item_Count).Unit_Cost) then
                Report.Failed ("Error in Unit_Cost read from file");
             end if;
-            if not
-              (Tc_Markup = Daily_Inventory (Tc_Item_Count).Percent_Markup)
+            if not (Tc_Markup = Daily_Inventory (Tc_Item_Count).Percent_Markup)
             then
                Report.Failed ("Error in Percent_Markup read from file");
             end if;

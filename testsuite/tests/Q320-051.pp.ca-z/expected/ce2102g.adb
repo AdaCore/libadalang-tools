@@ -44,8 +44,7 @@ begin
    Test
      ("CE2102G",
       "CHECK THAT USE_ERROR IS RAISED IF AN " &
-      "IMPLEMENTATION DOES NOT SUPPORT RESET FOR " &
-      "SEQUENTIAL_IO");
+      "IMPLEMENTATION DOES NOT SUPPORT RESET FOR " & "SEQUENTIAL_IO");
    declare
       package Seq is new Sequential_Io (Integer);
       use Seq;
@@ -59,14 +58,12 @@ begin
          when Use_Error =>
             Not_Applicable
               ("USE_ERROR RAISED ON CREATE OF " &
-               "SEQUENTIAL FILE WITH OUT_FILE " &
-               "MODE");
+               "SEQUENTIAL FILE WITH OUT_FILE " & "MODE");
             raise Incomplete;
          when Name_Error =>
             Not_Applicable
               ("NAME_ERROR RAISED ON CREATE OF " &
-               "SEQUENTIAL FILE WITH OUT_FILE " &
-               "MODE");
+               "SEQUENTIAL FILE WITH OUT_FILE " & "MODE");
             raise Incomplete;
       end;
 
@@ -102,8 +99,7 @@ begin
          when Use_Error =>
             Not_Applicable
               ("USE_ERROR RAISED ON OPENING OF " &
-               "SEQUENTIAL FILE WITH IN_FILE " &
-               "MODE");
+               "SEQUENTIAL FILE WITH IN_FILE " & "MODE");
             raise Incomplete;
       end;
 

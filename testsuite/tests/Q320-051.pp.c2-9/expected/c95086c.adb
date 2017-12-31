@@ -110,8 +110,7 @@ begin
 
       type A is access T;
       subtype Sa is A ('D' .. 'F', False .. False);
-      V : A
-        (Ident_Char ('A') .. Ident_Char ('B'),
+      V : A (Ident_Char ('A') .. Ident_Char ('B'),
          Ident_Bool (True) .. Ident_Bool (True)) :=
         null;
       Entered : Boolean := False;
@@ -210,8 +209,7 @@ begin
 
       type A is access T;
       subtype Sa is A ('D' .. 'F', False .. False);
-      V : A
-        (Ident_Char ('A') .. Ident_Char ('B'),
+      V : A (Ident_Char ('A') .. Ident_Char ('B'),
          Ident_Bool (True) .. Ident_Bool (True)) :=
         null;
       Entered : Boolean := False;

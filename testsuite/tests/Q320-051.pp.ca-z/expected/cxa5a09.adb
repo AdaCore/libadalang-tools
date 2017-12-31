@@ -63,8 +63,7 @@ procedure Cxa5a09 is
 begin
 
    Report.Test
-     ("CXA5A09",
-      "Check that the Log function provides " & "correct results");
+     ("CXA5A09", "Check that the Log function provides " & "correct results");
 
    Test_Block :
    declare
@@ -78,12 +77,8 @@ begin
       Arg, Float_Result : Float     := 0.0;
       New_Float_Result  : New_Float := 0.0;
 
-      Incorrect_Inverse,
-      Incorrect_Inverse_Base_2,
-      Incorrect_Inverse_Base_8,
-      Incorrect_Inverse_Base_10,
-      Incorrect_Inverse_Base_16 : Boolean :=
-        False;
+      Incorrect_Inverse, Incorrect_Inverse_Base_2, Incorrect_Inverse_Base_8,
+      Incorrect_Inverse_Base_10, Incorrect_Inverse_Base_16 : Boolean := False;
 
       procedure Dont_Optimize_Float is new Dont_Optimize (Float);
       procedure Dont_Optimize_New_Float is new Dont_Optimize (New_Float);
@@ -162,8 +157,7 @@ begin
         not Fxa5a00.Result_Within_Range (Gef.Log (1.341), 0.293, 0.001) or
         not Fxa5a00.Result_Within_Range (Ef.Log (2.826), 1.04, 0.01) or
         not Fxa5a00.Result_Within_Range (Ef.Log (10.052), 2.31, 0.01) or
-        not Fxa5a00.Result_Within_Range (Ef.Log (2_569.143), 7.85, 0.01)
-      then
+        not Fxa5a00.Result_Within_Range (Ef.Log (2_569.143), 7.85, 0.01) then
          Report.Failed
            ("Incorrect results from Function Log when provided " &
             "a variety of input parameter values");
@@ -171,10 +165,7 @@ begin
 
       Arg := 0.001;
       while Arg < 1.0 and not Incorrect_Inverse loop
-         if not Result_Within_Range
-             (Ef."**" (E, Ef.Log (Arg)),
-              Arg,
-              0.001)
+         if not Result_Within_Range (Ef."**" (E, Ef.Log (Arg)), Arg, 0.001)
          then
             Incorrect_Inverse := True;
          end if;
@@ -236,8 +227,7 @@ begin
          when others =>
             Report.Failed
               ("Unexpected exception raised by the Log function " &
-               "with Base parameter, when the X parameter value " &
-               "is -1.0");
+               "with Base parameter, when the X parameter value " & "is -1.0");
       end;
 
       begin
@@ -338,9 +328,7 @@ begin
 
       if Gef.Log (X => 1.0, Base => 16.0) /= 0.0 or
         Ef.Log (X => 1.0, Base => 10.0) /= 0.0 or
-        Gef.Log (1.0, Base => 8.0) /= 0.0 or
-        Ef.Log (1.0, 2.0) /= 0.0
-      then
+        Gef.Log (1.0, Base => 8.0) /= 0.0 or Ef.Log (1.0, 2.0) /= 0.0 then
          Report.Failed
            ("Incorrect result from Function Log with specified " &
             "Base parameter when provided an parameter X input " &
@@ -357,8 +345,7 @@ begin
         not Result_Within_Range (Gef.Log (0.564_9, E), -0.57, 0.01) or
         not Result_Within_Range (Ef.Log (1.771_4, E), 0.57, 0.01) or
         not Result_Within_Range (Gef.Log (0.571_8, 10.0), -0.243, 0.001) or
-        not Result_Within_Range (Ef.Log (466.25, 10.0), 2.67, 0.01)
-      then
+        not Result_Within_Range (Ef.Log (466.25, 10.0), 2.67, 0.01) then
          Report.Failed
            ("Incorrect results from Function Log with specified " &
             "Base parameter, when provided a variety of input " &
@@ -368,37 +355,23 @@ begin
       Arg := 1.0;
       while Arg < 1_000.0 and
         not
-        (Incorrect_Inverse_Base_2 and
-         Incorrect_Inverse_Base_8 and
-         Incorrect_Inverse_Base_10 and
-         Incorrect_Inverse_Base_16)
+        (Incorrect_Inverse_Base_2 and Incorrect_Inverse_Base_8 and
+         Incorrect_Inverse_Base_10 and Incorrect_Inverse_Base_16)
       loop
          if not Fxa5a00.Result_Within_Range
-             (Ef."**" (2.0, Ef.Log (Arg, 2.0)),
-              Arg,
-              0.001)
-         then
+             (Ef."**" (2.0, Ef.Log (Arg, 2.0)), Arg, 0.001) then
             Incorrect_Inverse_Base_2 := True;
          end if;
          if not Fxa5a00.Result_Within_Range
-             (Ef."**" (8.0, Ef.Log (Arg, 8.0)),
-              Arg,
-              0.001)
-         then
+             (Ef."**" (8.0, Ef.Log (Arg, 8.0)), Arg, 0.001) then
             Incorrect_Inverse_Base_8 := True;
          end if;
          if not Fxa5a00.Result_Within_Range
-             (Ef."**" (10.0, Ef.Log (Arg, 10.0)),
-              Arg,
-              0.001)
-         then
+             (Ef."**" (10.0, Ef.Log (Arg, 10.0)), Arg, 0.001) then
             Incorrect_Inverse_Base_10 := True;
          end if;
          if not Fxa5a00.Result_Within_Range
-             (Ef."**" (16.0, Ef.Log (Arg, 16.0)),
-              Arg,
-              0.001)
-         then
+             (Ef."**" (16.0, Ef.Log (Arg, 16.0)), Arg, 0.001) then
             Incorrect_Inverse_Base_16 := True;
          end if;
          Arg := Arg + 1.0;

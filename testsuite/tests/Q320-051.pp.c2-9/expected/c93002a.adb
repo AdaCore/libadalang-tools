@@ -127,8 +127,7 @@ begin
          if Global /= 1 then
             Failed
               ("A RECORD OF TASK OBJECT IN A PACKAGE " &
-               "SPECIFICATION WAS ACTIVATED TOO LATE " &
-               "- (C1)");
+               "SPECIFICATION WAS ACTIVATED TOO LATE " & "- (C1)");
          end if;
       end P;
 
@@ -158,8 +157,7 @@ begin
          if Global /= 1 then
             Failed
               ("A RECORD OF TASK OBJECT IN A PACKAGE " &
-               "SPECIFICATION WAS ACTIVATED TOO LATE " &
-               "- (C2)");
+               "SPECIFICATION WAS ACTIVATED TOO LATE " & "- (C2)");
          end if;
       end Q;
 
@@ -188,8 +186,7 @@ begin
          if Global /= 1 then
             Failed
               ("A RECORD OF ARRAY OF TASK OBJECT IN A " &
-               "PACKAGE BODY WAS ACTIVATED " &
-               "TOO LATE - (D)");
+               "PACKAGE BODY WAS ACTIVATED " & "TOO LATE - (D)");
          end if;
       end P;
 

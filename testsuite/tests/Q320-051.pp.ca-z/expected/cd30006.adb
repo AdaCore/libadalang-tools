@@ -41,20 +41,17 @@ begin  -- Main test procedure.
    Report.Test
      ("CD30006",
       "Check that the implementation supports specifying " &
-      "Alignments for subtypes and objects using aspect " &
-      "notation");
+      "Alignments for subtypes and objects using aspect " & "notation");
 
    if A2i (Cd30006_0.Library_Level_Object'Address) mod
      Impdef.Max_Linker_Alignment /=
-     0
-   then
+     0 then
       Report.Failed ("Library_Level_Object" & Nac);
    end if;
 
    if A2i (Cd30006_0.Delay_Object'Address) mod
      (Cd30006_0.Multiple_Object_Alignment) /=
-     0
-   then
+     0 then
       Report.Failed ("Delayed multiple of words object" & Nac);
    end if;
 
@@ -78,8 +75,7 @@ begin  -- Main test procedure.
       Report.Failed ("Factor of words object" & Nac);
    end if;
 
-   if A2i (Half_Object'Address) mod (Cd30006_0.Multiple_Object_Alignment) /=
-     0
+   if A2i (Half_Object'Address) mod (Cd30006_0.Multiple_Object_Alignment) /= 0
    then
       Report.Failed ("Multiple of words object" & Nac);
    end if;

@@ -49,8 +49,7 @@ begin
    Test
      ("CE3102K",
       "CHECK THAT USE_ERROR IS RAISED WHEN MODE " &
-      "OUT_FILE IS NOT SUPPORTED FOR THE OPERATION " &
-      "OF OPEN FOR TEXT_IO");
+      "OUT_FILE IS NOT SUPPORTED FOR THE OPERATION " & "OF OPEN FOR TEXT_IO");
    begin
       begin
          Create (File1, Out_File, Legal_File_Name);

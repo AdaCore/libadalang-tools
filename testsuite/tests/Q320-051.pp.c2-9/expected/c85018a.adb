@@ -69,10 +69,7 @@ begin
          loop
             select
                accept Ent1
-               (Ident_Bool
-                  (True))
-                 (A : Integer := 1;
-                  B : Ta      := (1 .. 5 => 1))
+               (Ident_Bool (True)) (A : Integer := 1; B : Ta := (1 .. 5 => 1))
                do
                   if A in 1 .. 5 then
                      Results := B (A);

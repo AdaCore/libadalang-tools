@@ -65,12 +65,8 @@ begin
 
       procedure Proc is
       begin
-         if P1.C /= True or
-           P2.C /= T'First or
-           V1.C /= True or
-           V2.C /= T'First or
-           V3.C /= I'First
-         then
+         if P1.C /= True or P2.C /= T'First or V1.C /= True or
+           V2.C /= T'First or V3.C /= I'First then
             Failed ("WRONG GENERIC PARAMETER VALUE");
          end if;
 
@@ -88,17 +84,8 @@ begin
 
       declare
 
-         procedure Pr is new Proc
-           (T  => Dd,
-            I  => Dd,
-            R1 => Recb,
-            R2 => Recd,
-            R3 => Recd,
-            P1 => Rb1,
-            P2 => X1,
-            V1 => Rb,
-            V2 => X2,
-            V3 => X2);
+         procedure Pr is new Proc (T => Dd, I => Dd, R1 => Recb, R2 => Recd,
+            R3 => Recd, P1 => Rb1, P2 => X1, V1 => Rb, V2 => X2, V3 => X2);
       begin
          Pr;
          if Rb /= (True, 1) or X2.C1 /= "X" then

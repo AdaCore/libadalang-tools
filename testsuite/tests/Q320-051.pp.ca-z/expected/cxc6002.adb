@@ -7,8 +7,7 @@ procedure Cxc6002 is
 begin  -- Main test procedure.
 
    Report.Test
-     ("CXC6002",
-      "Check semantics for volatile " & "composite types");
+     ("CXC6002", "Check semantics for volatile " & "composite types");
 
    ------------ Subtest 1, Volatile Copy Semantics, Object
 

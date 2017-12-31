@@ -45,8 +45,7 @@ begin
      ("C97305C",
       "CHECK THAT IF THE RENDEZVOUS IS NOT " &
       "IMMEDIATELY POSSIBLE BUT BECOMES POSSIBLE " &
-      "BEFORE THE DELAY EXPIRES, THE TIMED ENTRY " &
-      "CALL IS ACCEPTED");
+      "BEFORE THE DELAY EXPIRES, THE TIMED ENTRY " & "CALL IS ACCEPTED");
 
    declare
 
@@ -71,8 +70,7 @@ begin
          delay Delay_In_Minutes * 60.0;
          Failed
            ("TIMED ENTRY CALL NOT ACCEPTED AFTER" &
-            Positive'Image (Delay_In_Minutes) &
-            " MINUTES ELAPSED");
+            Positive'Image (Delay_In_Minutes) & " MINUTES ELAPSED");
 
       end select;
 

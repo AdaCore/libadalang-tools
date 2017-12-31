@@ -37,8 +37,7 @@ begin
      ("C45345B",
       "CHECK THAT  CONSTRAINT_ERROR  IS NOT RAISED" &
       " IF THE RESULT OF CATENATION HAS PRECISELY" &
-      " THE MAXIMUM LENGTH PERMITTED BY THE" &
-      " INDEX SUBTYPE");
+      " THE MAXIMUM LENGTH PERMITTED BY THE" & " INDEX SUBTYPE");
 
    -------------------------------------------------------------------
    -----------------  STRG_VAR := STRG_LIT & STRG_LIT  ---------------

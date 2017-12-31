@@ -81,10 +81,8 @@ begin
 
       begin                                           -- Low > Source'Last+1
          Unb.Replace_Slice
-           (Source => Tc_Unb_String,
-            Low    => Unb.Length (Tc_Unb_String) + 2,
-            High   => Unb.Length (Tc_Unb_String),
-            By     => Tc_String_5);
+           (Source => Tc_Unb_String, Low => Unb.Length (Tc_Unb_String) + 2,
+            High   => Unb.Length (Tc_Unb_String), By => Tc_String_5);
          Report.Failed
            ("Index_Error not raised by Replace_Slice when Low " &
             "> Source'Last+1");
@@ -114,10 +112,7 @@ begin
       end if;
 
       Unb.Replace_Slice
-        (Tc_Unb_String,
-         11,
-         Unb.Length (Tc_Unb_String),
-         Tc_Null_String);
+        (Tc_Unb_String, 11, Unb.Length (Tc_Unb_String), Tc_Null_String);
 
       if Tc_Unb_String /= Unb.To_Unbounded_String ("ABCDEABCDE") then
          Report.Failed ("Incorrect results from Replace_Slice - 3");
@@ -138,10 +133,8 @@ begin
       end if;
 
       Unb.Replace_Slice
-        (Tc_Unb_String,
-         Unb.Length (Tc_Unb_String) + 1,
-         Unb.Length (Tc_Unb_String),
-         By => "zzz");
+        (Tc_Unb_String, Unb.Length (Tc_Unb_String) + 1,
+         Unb.Length (Tc_Unb_String), By => "zzz");
 
       if Tc_Unb_String /= Unb.To_Unbounded_String ("yyyABCxxxDEABCDEzzz") then
          Report.Failed ("Incorrect results from Replace_Slice - 6");
@@ -153,8 +146,7 @@ begin
 
       begin                  -- Before not in Source'First..Source'Last + 1
          Unb.Insert
-           (Source   => Tc_Unb_String,
-            Before   => Unb.Length (Tc_Unb_String) + 2,
+           (Source => Tc_Unb_String, Before => Unb.Length (Tc_Unb_String) + 2,
             New_Item => Tc_String_5);
          Report.Failed
            ("Index_Error not raised by Insert when Before " &
@@ -214,9 +206,7 @@ begin
       Tc_Unb_String := Unb.To_Unbounded_String ("Test String");
 
       Unb.Overwrite
-        (Source   => Tc_Unb_String,
-         Position => 1,
-         New_Item => "XXXX");
+        (Source => Tc_Unb_String, Position => 1, New_Item => "XXXX");
 
       if Tc_Unb_String /= Unb.To_Unbounded_String ("XXXX String") then
          Report.Failed ("Incorrect results from Overwrite - 1");
@@ -247,8 +237,7 @@ begin
       -- From > Through (No change to Source)
 
       Unb.Delete
-        (Source  => Tc_Unb_String,
-         From    => Unb.Length (Tc_Unb_String),
+        (Source  => Tc_Unb_String, From => Unb.Length (Tc_Unb_String),
          Through => Unb.Length (Tc_Unb_String) - 1);
 
       if Tc_Unb_String /= Unb.To_Unbounded_String ("Test String") then
@@ -306,8 +295,7 @@ begin
 
       Unb.Trim (Tc_Unb_String, Ada.Strings.Both);
 
-      if Tc_Unb_String /=
-        Unb.To_Unbounded_String ("Spaces   on  both  ends")
+      if Tc_Unb_String /= Unb.To_Unbounded_String ("Spaces   on  both  ends")
       then
          Report.Failed ("Incorrect results from Trim - 4");
       end if;
@@ -317,8 +305,7 @@ begin
       Tc_Unb_String := Unb.To_Unbounded_String ("lowerCASEletters");
 
       Unb.Trim
-        (Source => Tc_Unb_String,
-         Left   => Ada.Strings.Maps.Constants.Lower_Set,
+        (Source => Tc_Unb_String, Left => Ada.Strings.Maps.Constants.Lower_Set,
          Right  => Ada.Strings.Maps.Constants.Lower_Set);
 
       if Tc_Unb_String /= Unb.To_Unbounded_String ("CASE") then
@@ -328,8 +315,7 @@ begin
       Tc_Unb_String := Unb.To_Unbounded_String ("lowerCASEletters");
 
       Unb.Trim
-        (Tc_Unb_String,
-         Ada.Strings.Maps.Constants.Upper_Set,
+        (Tc_Unb_String, Ada.Strings.Maps.Constants.Upper_Set,
          Ada.Strings.Maps.Constants.Upper_Set);
 
       if Tc_Unb_String /= Unb.To_Unbounded_String ("lowerCASEletters") then
@@ -339,8 +325,7 @@ begin
       Tc_Unb_String := Unb.To_Unbounded_String ("012abcdefghGFEDCBA789ab");
 
       Unb.Trim
-        (Tc_Unb_String,
-         Ada.Strings.Maps.Constants.Hexadecimal_Digit_Set,
+        (Tc_Unb_String, Ada.Strings.Maps.Constants.Hexadecimal_Digit_Set,
          Ada.Strings.Maps.Constants.Hexadecimal_Digit_Set);
 
       if Tc_Unb_String /= Unb.To_Unbounded_String ("ghG") then
@@ -370,8 +355,7 @@ begin
       Tc_Unb_String := Unb.To_Unbounded_String ("Test String");
 
       Unb.Head
-        (Source => Tc_Unb_String,
-         Count  => Unb.Length (Tc_Unb_String),
+        (Source => Tc_Unb_String, Count => Unb.Length (Tc_Unb_String),
          Pad    => '*');
 
       if Tc_Unb_String /= Unb.To_Unbounded_String ("Test String") then
@@ -383,8 +367,7 @@ begin
       Tc_Unb_String := Unb.To_Unbounded_String ("Test String");
 
       Unb.Head
-        (Source => Tc_Unb_String,
-         Count  => Unb.Length (Tc_Unb_String) + 4,
+        (Source => Tc_Unb_String, Count => Unb.Length (Tc_Unb_String) + 4,
          Pad    => '*');
 
       if Tc_Unb_String /= Unb.To_Unbounded_String ("Test String****") then
@@ -394,8 +377,7 @@ begin
       Tc_Unb_String := Unb.Null_Unbounded_String;
 
       Unb.Head
-        (Source => Tc_Unb_String,
-         Count  => Unb.Length (Tc_Unb_String) + 3,
+        (Source => Tc_Unb_String, Count => Unb.Length (Tc_Unb_String) + 3,
          Pad    => '*');
 
       if Tc_Unb_String /= Unb.To_Unbounded_String ("***") then
@@ -425,8 +407,7 @@ begin
       Tc_Unb_String := Unb.To_Unbounded_String ("Test String");
 
       Unb.Tail
-        (Source => Tc_Unb_String,
-         Count  => Unb.Length (Tc_Unb_String),
+        (Source => Tc_Unb_String, Count => Unb.Length (Tc_Unb_String),
          Pad    => '*');
 
       if Tc_Unb_String /= Unb.To_Unbounded_String ("Test String") then
@@ -438,8 +419,7 @@ begin
       Tc_Unb_String := Unb.To_Unbounded_String ("Test String");
 
       Unb.Tail
-        (Source => Tc_Unb_String,
-         Count  => Unb.Length (Tc_Unb_String) + 5,
+        (Source => Tc_Unb_String, Count => Unb.Length (Tc_Unb_String) + 5,
          Pad    => 'x');
 
       if Tc_Unb_String /= Unb.To_Unbounded_String ("xxxxxTest String") then
@@ -449,8 +429,7 @@ begin
       Tc_Unb_String := Unb.Null_Unbounded_String;
 
       Unb.Tail
-        (Source => Tc_Unb_String,
-         Count  => Unb.Length (Tc_Unb_String) + 3,
+        (Source => Tc_Unb_String, Count => Unb.Length (Tc_Unb_String) + 3,
          Pad    => 'X');
 
       if Tc_Unb_String /= Unb.To_Unbounded_String ("XXX") then

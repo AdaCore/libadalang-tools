@@ -95,10 +95,8 @@ begin
 
          Complex_Pack.Set_Im (X => Tc_Complex, Im => 7.0);
 
-         if Tc_Complex.Re /= 5.0 or
-           Tc_Complex.Im /= 7.0 or
-           Tc_Complex /= Tc_Complex_Both_Fields
-         then
+         if Tc_Complex.Re /= 5.0 or Tc_Complex.Im /= 7.0 or
+           Tc_Complex /= Tc_Complex_Both_Fields then
             Report.Failed
               ("Incorrect results from Procedure Set_Im " &
                "with Complex argument");
@@ -127,8 +125,7 @@ begin
 
          if Complex_Pack.Re (X => Tc_Complex_1) /= 1.0 or
            Complex_Pack.Re (X => Tc_Complex_2) /= 0.0 or
-           Complex_Pack.Re (X => Tc_Complex_3) /= 4.0
-         then
+           Complex_Pack.Re (X => Tc_Complex_3) /= 4.0 then
             Report.Failed ("Incorrect results from Function Re");
          end if;
 
@@ -136,8 +133,7 @@ begin
 
          if Complex_Pack.Im (X => Tc_Complex_1) /= 0.0 or
            Complex_Pack.Im (X => Tc_Complex_2) /= 2.0 or
-           Complex_Pack.Im (X => Tc_Complex_3) /= 3.0
-         then
+           Complex_Pack.Im (X => Tc_Complex_3) /= 3.0 then
             Report.Failed
               ("Incorrect results from Function Im " &
                "with Complex argument");
@@ -146,8 +142,7 @@ begin
          -- Function Im; version with Imaginary argument.
 
          if Complex_Pack.Im (Complex_Pack.I) /= 1.0 or
-           Complex_Pack.Im (Complex_Pack.J) /= 1.0
-         then
+           Complex_Pack.Im (Complex_Pack.J) /= 1.0 then
             Report.Failed
               ("Incorrect results from use of Function Im " &
                "when used with an Imaginary argument");
@@ -234,8 +229,7 @@ begin
            Compose_From_Polar (-5.0, Angle_180, Angle_360) /= (5.0, 0.0) or
            Compose_From_Polar (-5.0, Angle_270, Angle_360) /= (0.0, 5.0) or
            Compose_From_Polar (-5.0, Angle_90, Angle_360) /= (0.0, -5.0) or
-           Compose_From_Polar (5.0, Angle_270, Angle_360) /= (0.0, -5.0)
-         then
+           Compose_From_Polar (5.0, Angle_270, Angle_360) /= (0.0, -5.0) then
             Report.Failed
               ("Incorrect result from Function " & "Compose_From_Polar - 2");
          end if;
@@ -260,8 +254,7 @@ begin
 
          if "abs" (Complex_Zero) /= 0.0 or
            "abs" (Compose_From_Polar (5.0, Angle_90, Angle_360)) /= 5.0 or
-           "abs" (Compose_From_Polar (-5.0, Angle_180, Angle_360)) /= 5.0
-         then
+           "abs" (Compose_From_Polar (-5.0, Angle_180, Angle_360)) /= 5.0 then
             Report.Failed ("Incorrect results from Function abs");
          end if;
 

@@ -102,30 +102,24 @@ begin
                Eo := C10;
                if Ei /= Temp then
                   Failed
-                    ("ASSIGNMENT TO PRIVATE " &
-                     "(SCALAR) OUT PARAMETER " &
-                     "CHANGES THE VALUE OF INPUT " &
-                     "PARAMETER");
+                    ("ASSIGNMENT TO PRIVATE " & "(SCALAR) OUT PARAMETER " &
+                     "CHANGES THE VALUE OF INPUT " & "PARAMETER");
                   Temp := Ei;   -- RESET TEMP FOR NEXT CASE.
                end if;
 
                Eio := Eio + C100;
                if Ei /= Temp then
                   Failed
-                    ("ASSIGNMENT TO PRIVATE " &
-                     "(SCALAR) IN OUT PARAMETER " &
-                     "CHANGES THE VALUE OF INPUT " &
-                     "PARAMETER");
+                    ("ASSIGNMENT TO PRIVATE " & "(SCALAR) IN OUT PARAMETER " &
+                     "CHANGES THE VALUE OF INPUT " & "PARAMETER");
                   Temp := Ei;   -- RESET TEMP FOR NEXT CASE.
                end if;
 
                I := I + C1;
                if Ei /= Temp then
                   Failed
-                    ("ASSIGNMENT TO PRIVATE " &
-                     "(SCALAR) ACTUAL PARAMETER " &
-                     "CHANGES THE VALUE OF " &
-                     "INPUT PARAMETER");
+                    ("ASSIGNMENT TO PRIVATE " & "(SCALAR) ACTUAL PARAMETER " &
+                     "CHANGES THE VALUE OF " & "INPUT PARAMETER");
                end if;
 
                raise E;              -- CHECK EXCEPTION
@@ -150,20 +144,16 @@ begin
                case Convert (I) is
                   when 11 =>
                      Failed
-                       ("OUT ACTUAL PRIVATE " &
-                        "(SCALAR) PARAMETER " &
+                       ("OUT ACTUAL PRIVATE " & "(SCALAR) PARAMETER " &
                         "CHANGED GLOBAL VALUE");
                   when 101 =>
                      Failed
-                       ("IN OUT ACTUAL PRIVATE " &
-                        "(SCALAR) PARAMETER " &
+                       ("IN OUT ACTUAL PRIVATE " & "(SCALAR) PARAMETER " &
                         "CHANGED GLOBAL VALUE");
                   when 111 =>
                      Failed
-                       ("OUT AND IN OUT ACTUAL " &
-                        "PRIVATE (SCALAR) " &
-                        "PARAMETER CHANGED " &
-                        "GLOBAL VALUE");
+                       ("OUT AND IN OUT ACTUAL " & "PRIVATE (SCALAR) " &
+                        "PARAMETER CHANGED " & "GLOBAL VALUE");
                   when others =>
                      Failed ("UNDETERMINED CHANGE TO " & "GLOBAL VALUE");
                end case;
@@ -224,30 +214,24 @@ begin
                I := C101;
                if Ei /= Temp then
                   Failed
-                    ("ASSIGNMENT TO PRIVATE " &
-                     "(ACCESS) ACTUAL VARIABLE " &
-                     "CHANGES THE VALUE OF INPUT " &
-                     "PARAMETER");
+                    ("ASSIGNMENT TO PRIVATE " & "(ACCESS) ACTUAL VARIABLE " &
+                     "CHANGES THE VALUE OF INPUT " & "PARAMETER");
                   Temp := Ei;   -- RESET TEMP FOR NEXT CASE.
                end if;
 
                Eo := C1;
                if Ei /= Temp then
                   Failed
-                    ("ASSIGNMENT TO PRIVATE " &
-                     "(ACCESS) OUT PARAMETER " &
-                     "CHANGES THE VALUE OF INPUT " &
-                     "PARAMETER");
+                    ("ASSIGNMENT TO PRIVATE " & "(ACCESS) OUT PARAMETER " &
+                     "CHANGES THE VALUE OF INPUT " & "PARAMETER");
                   Temp := Ei;   -- RESET TEMP FOR NEXT CASE.
                end if;
 
                Eio := C10;
                if Ei /= Temp then
                   Failed
-                    ("ASSIGNMENT TO PRIVATE " &
-                     "(ACCESS) IN OUT PARAMETER " &
-                     "CHANGES THE VALUE OF INPUT " &
-                     "PARAMETER");
+                    ("ASSIGNMENT TO PRIVATE " & "(ACCESS) IN OUT PARAMETER " &
+                     "CHANGES THE VALUE OF INPUT " & "PARAMETER");
                end if;
 
                raise E;                 -- CHECK EXCEPTION
@@ -270,8 +254,7 @@ begin
             if I /= C101 then
                Failed
                  ("OUT OR IN OUT ACTUAL ENTRY " &
-                  "PARAMETER VALUE CHANGED DESPITE " &
-                  "RAISED EXCEPTION");
+                  "PARAMETER VALUE CHANGED DESPITE " & "RAISED EXCEPTION");
             end if;
          when others =>
             Failed ("WRONG EXCEPTION RAISED - B");

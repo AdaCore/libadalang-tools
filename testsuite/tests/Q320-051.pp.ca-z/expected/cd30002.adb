@@ -56,8 +56,7 @@ begin  -- Main test procedure.
 
    if A2i (Cd30002_0.Library_Level_Object'Address) mod
      Impdef.Max_Linker_Alignment /=
-     0
-   then
+     0 then
       Report.Failed ("Library_Level_Object" & Nac);
    end if;
 
@@ -81,8 +80,7 @@ begin  -- Main test procedure.
       Report.Failed ("Factor of words object" & Nac);
    end if;
 
-   if A2i (Half_Object'Address) mod (Cd30002_0.Multiple_Object_Alignment) /=
-     0
+   if A2i (Half_Object'Address) mod (Cd30002_0.Multiple_Object_Alignment) /= 0
    then
       Report.Failed ("Multiple of words object" & Nac);
    end if;

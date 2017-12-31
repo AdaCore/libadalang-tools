@@ -126,8 +126,7 @@ begin  -- Main test procedure.
 -- Base
    Tctouch.Assert (Midrange'Base'First = 0, "Midrange'Base'First");
    Tctouch.Assert
-     (Midrange'Base'Last = Medium_Minus'Last,
-      "Midrange'Base'Last");
+     (Midrange'Base'Last = Medium_Minus'Last, "Midrange'Base'Last");
 
 -- First
    Tctouch.Assert (Max_Binary'First = 0, "Max_Binary'First");
@@ -136,11 +135,9 @@ begin  -- Main test procedure.
 
    Tctouch.Assert (Medium'First = Medium (Id (0)), "Medium'First");
    Tctouch.Assert
-     (Medium_Plus'First = Medium_Plus (Id (0)),
-      "Medium_Plus'First");
+     (Medium_Plus'First = Medium_Plus (Id (0)), "Medium_Plus'First");
    Tctouch.Assert
-     (Medium_Minus'First = Medium_Minus (Id (0)),
-      "Medium_Minus'First");
+     (Medium_Minus'First = Medium_Minus (Id (0)), "Medium_Minus'First");
 
    Tctouch.Assert (Small'First = Small (Id (0)), "Small'First");
    Tctouch.Assert (Finger'First = Finger (Id (0)), "Finger'First");
@@ -148,24 +145,20 @@ begin  -- Main test procedure.
 
 -- Image
    Tctouch.Assert
-     (Half_Max_Binary'Image (255) = " 255",
-      "Half_Max_Binary'Image");
+     (Half_Max_Binary'Image (255) = " 255", "Half_Max_Binary'Image");
    Tctouch.Assert (Medium'Image (0) = Id (" 0"), "Medium'Image");
    Tctouch.Assert
-     (Medium_Plus'Image (Medium_Plus'Last) = " 2041",
-      "Medium_Plus'Image");
+     (Medium_Plus'Image (Medium_Plus'Last) = " 2041", "Medium_Plus'Image");
    Tctouch.Assert
      (Medium_Minus'Image (Medium_Minus (Id (1_024))) = " 1024",
       "Medium_Minus'Image");
    Tctouch.Assert (Small'Image (Small (Id (1))) = " 1", "Small'Image");
    Tctouch.Assert
-     (Midrange'Image (Midrange (Id (333))) = " 333",
-      "Midrange'Image");
+     (Midrange'Image (Midrange (Id (333))) = " 333", "Midrange'Image");
 
 -- Last
    Tctouch.Assert
-     (Max_Binary'Last = System_Max_Bin_Mod_Pred,
-      "Max_Binary'Last");
+     (Max_Binary'Last = System_Max_Bin_Mod_Pred, "Max_Binary'Last");
    if Ones_Complement_Permission then
       Tctouch.Assert
         (Max_Nonbinary'Last >= System_Max_Nonbin_Mod_Pred,
@@ -176,16 +169,13 @@ begin  -- Main test procedure.
          "Max_NonBinary'Last");
    end if;
    Tctouch.Assert
-     (Half_Max_Binary'Last = Half_Max_Bin_Value_Pred,
-      "Half_Max_Binary'Last");
+     (Half_Max_Binary'Last = Half_Max_Bin_Value_Pred, "Half_Max_Binary'Last");
 
    Tctouch.Assert (Medium'Last = Medium (Id (2_047)), "Medium'Last");
    Tctouch.Assert
-     (Medium_Plus'Last = Medium_Plus (Id (2_041)),
-      "Medium_Plus'Last");
+     (Medium_Plus'Last = Medium_Plus (Id (2_041)), "Medium_Plus'Last");
    Tctouch.Assert
-     (Medium_Minus'Last = Medium_Minus (Id (2_110)),
-      "Medium_Minus'Last");
+     (Medium_Minus'Last = Medium_Minus (Id (2_110)), "Medium_Minus'Last");
    Tctouch.Assert (Small'Last = Small (Id (1)), "Small'Last");
    Tctouch.Assert (Finger'Last = Finger (Id (4)), "Finger'Last");
    Tctouch.Assert (Midrange'Last = Midrange (Id (1_111)), "Midrange'Last");
@@ -195,17 +185,14 @@ begin  -- Main test procedure.
      (Max_Binary'Max (Power_2_Bits, Max_Binary'Last) = Max_Binary'Last,
       "Max_Binary'Max");
    Tctouch.Assert
-     (Max_Nonbinary'Max (100, 2_000) = 2_000,
-      "Max_NonBinary'Max");
+     (Max_Nonbinary'Max (100, 2_000) = 2_000, "Max_NonBinary'Max");
    Tctouch.Assert
-     (Half_Max_Binary'Max (123, 456) = 456,
-      "Half_Max_Binary'Max");
+     (Half_Max_Binary'Max (123, 456) = 456, "Half_Max_Binary'Max");
 
    Tctouch.Assert (Medium'Max (0, 2_040) = 2_040, "Medium'Max");
    Tctouch.Assert (Medium_Plus'Max (0, 1) = 1, "Medium_Plus'Max");
    Tctouch.Assert
-     (Medium_Minus'Max (2_001, 1_995) = 2_001,
-      "Medium_Minus'Max");
+     (Medium_Minus'Max (2_001, 1_995) = 2_001, "Medium_Minus'Max");
    Tctouch.Assert (Small'Max (1, 0) = 1, "Small'Max");
    Tctouch.Assert (Finger'Max (Finger'Last + 1, 4) = 4, "Finger'Max");
    Tctouch.Assert
@@ -218,23 +205,19 @@ begin  -- Main test procedure.
       "Max_Binary'Min");
    Tctouch.Assert (Max_Nonbinary'Min (100, 2_000) = 100, "Max_NonBinary'Min");
    Tctouch.Assert
-     (Half_Max_Binary'Min (123, 456) = 123,
-      "Half_Max_Binary'Min");
+     (Half_Max_Binary'Min (123, 456) = 123, "Half_Max_Binary'Min");
 
    Tctouch.Assert (Medium'Min (0, Medium (Id (2_040))) = 0, "Medium'Min");
    Tctouch.Assert (Medium_Plus'Min (0, 1) = 0, "Medium_Plus'Min");
    Tctouch.Assert
-     (Medium_Minus'Min (2_001, 1_995) = 1_995,
-      "Medium_Minus'Min");
+     (Medium_Minus'Min (2_001, 1_995) = 1_995, "Medium_Minus'Min");
    Tctouch.Assert (Small'Min (1, 0) = 0, "Small'Min");
    Tctouch.Assert (Finger'Min (Finger'Last + 1, 4) /= 4, "Finger'Min");
    Tctouch.Assert
-     (Midrange'Min (Midrange'First + 1, 222) = 222,
-      "Midrange'Min");
+     (Midrange'Min (Midrange'First + 1, 222) = 222, "Midrange'Min");
 -- Modulus
    Tctouch.Assert
-     (Max_Binary'Modulus = System.Max_Binary_Modulus,
-      "Max_Binary'Modulus");
+     (Max_Binary'Modulus = System.Max_Binary_Modulus, "Max_Binary'Modulus");
    Tctouch.Assert
      (Max_Nonbinary'Modulus = System.Max_Nonbinary_Modulus,
       "Max_NonBinary'Modulus");
@@ -264,8 +247,7 @@ begin  -- Main test procedure.
 
 -- Pred
    Tctouch.Assert
-     (Max_Binary'Pred (0) = System_Max_Bin_Mod_Pred,
-      "Max_Binary'Pred(0)");
+     (Max_Binary'Pred (0) = System_Max_Bin_Mod_Pred, "Max_Binary'Pred(0)");
    if Ones_Complement_Permission then
       Tctouch.Assert
         (Max_Nonbinary'Pred (0) >= System_Max_Nonbin_Mod_Pred,
@@ -305,8 +287,7 @@ begin  -- Main test procedure.
 
 -- Succ
    Tctouch.Assert
-     (Max_Binary'Succ (System_Max_Bin_Mod_Pred) = 0,
-      "Max_Binary'Succ('Last)");
+     (Max_Binary'Succ (System_Max_Bin_Mod_Pred) = 0, "Max_Binary'Succ('Last)");
    if Ones_Complement_Permission then
       Tctouch.Assert
         ((Max_Nonbinary'Succ (System_Max_Nonbin_Mod_Pred) = 0) or
@@ -328,8 +309,7 @@ begin  -- Main test procedure.
    Tctouch.Assert (Small'Succ (1) = 0, "Small'Succ('Last)");
    Tctouch.Assert (Finger'Succ (4) = 0, "Finger'Succ('Last)");
    Tctouch.Assert
-     (Midrange'Succ (Midrange (Id (1_111))) = 1_112,
-      "Midrange'Succ('Last)");
+     (Midrange'Succ (Midrange (Id (1_111))) = 1_112, "Midrange'Succ('Last)");
 
 -- Val
    for I in Natural range Id (222) .. Id (1_111) loop
@@ -339,17 +319,14 @@ begin  -- Main test procedure.
 -- Value
 
    Tctouch.Assert
-     (Half_Max_Binary'Value ("255") = 255,
-      "Half_Max_Binary'Value");
+     (Half_Max_Binary'Value ("255") = 255, "Half_Max_Binary'Value");
 
    Tctouch.Assert (Medium'Value (" 1e2") = 100, "Medium'Value(""1e2"")");
    Tctouch.Assert (Medium'Value (" 0 ") = 0, "Medium'Value");
    Tctouch.Assert
-     (Medium_Plus'Value (Id ("2041")) = 2_041,
-      "Medium_Plus'Value");
+     (Medium_Plus'Value (Id ("2041")) = 2_041, "Medium_Plus'Value");
    Tctouch.Assert
-     (Medium_Minus'Value (Id ("+10_24")) = 1_024,
-      "Medium_Minus'Value");
+     (Medium_Minus'Value (Id ("+10_24")) = 1_024, "Medium_Minus'Value");
 
    Tctouch.Assert (Small'Value ("+1") = 1, "Small'Value");
    Tctouch.Assert (Midrange'Value (Id ("333")) = 333, "Midrange'Value");

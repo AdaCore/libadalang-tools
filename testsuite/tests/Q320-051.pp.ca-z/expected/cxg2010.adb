@@ -139,14 +139,9 @@ procedure Cxg2010 is
          if abs (Actual - Expected) > Max_Error then
             Accuracy_Error_Reported := True;
             Report.Failed
-              (Test_Name &
-               " actual: " &
-               Real'Image (Actual) &
-               " expected: " &
-               Real'Image (Expected) &
-               " difference: " &
-               Real'Image (Actual - Expected) &
-               " max err:" &
+              (Test_Name & " actual: " & Real'Image (Actual) & " expected: " &
+               Real'Image (Expected) & " difference: " &
+               Real'Image (Actual - Expected) & " max err:" &
                Real'Image (Max_Error));
          elsif Verbose then
             if Actual = Expected then
@@ -189,15 +184,9 @@ procedure Cxg2010 is
             -- note that since the expected value is computed, we must take the
             -- error in that computation into account.
             Check
-              (Zy,
-               Zx,
-               "test " &
-               Test &
-               " -" &
-               Integer'Image (I) &
-               " exp (" &
-               Real'Image (X) &
-               ")",
+              (Zy, Zx,
+               "test " & Test & " -" & Integer'Image (I) & " exp (" &
+               Real'Image (X) & ")",
                9.0);
             exit when Accuracy_Error_Reported;
          end loop;
@@ -242,15 +231,9 @@ procedure Cxg2010 is
             -- note that since the expected value is computed, we must take the
             -- error in that computation into account.
             Check
-              (Zy,
-               Zx,
-               "test " &
-               Test &
-               " -" &
-               Integer'Image (I) &
-               " exp (" &
-               Real'Image (X) &
-               ")",
+              (Zy, Zx,
+               "test " & Test & " -" & Integer'Image (I) & " exp (" &
+               Real'Image (X) & ")",
                9.0);
             exit when Accuracy_Error_Reported;
          end loop;
@@ -326,9 +309,7 @@ procedure Cxg2010 is
          end if;
 
          Argument_Range_Check_1
-           (1.0 / Sqrt (Real (Real'Machine_Radix)),
-            1.0,
-            "5");
+           (1.0 / Sqrt (Real (Real'Machine_Radix)), 1.0, "5");
          Error_Low_Bound := 0.0;  -- reset
 
          --- test 6 ---
@@ -393,14 +374,9 @@ procedure Cxg2010 is
          if abs (Actual - Expected) > Max_Error then
             Accuracy_Error_Reported := True;
             Report.Failed
-              (Test_Name &
-               " actual: " &
-               Real'Image (Actual) &
-               " expected: " &
-               Real'Image (Expected) &
-               " difference: " &
-               Real'Image (Actual - Expected) &
-               " max err:" &
+              (Test_Name & " actual: " & Real'Image (Actual) & " expected: " &
+               Real'Image (Expected) & " difference: " &
+               Real'Image (Actual - Expected) & " max err:" &
                Real'Image (Max_Error));
          elsif Verbose then
             if Actual = Expected then
@@ -443,15 +419,9 @@ procedure Cxg2010 is
             -- note that since the expected value is computed, we must take the
             -- error in that computation into account.
             Check
-              (Zy,
-               Zx,
-               "test " &
-               Test &
-               " -" &
-               Integer'Image (I) &
-               " exp (" &
-               Real'Image (X) &
-               ")",
+              (Zy, Zx,
+               "test " & Test & " -" & Integer'Image (I) & " exp (" &
+               Real'Image (X) & ")",
                9.0);
             exit when Accuracy_Error_Reported;
          end loop;
@@ -496,15 +466,9 @@ procedure Cxg2010 is
             -- note that since the expected value is computed, we must take the
             -- error in that computation into account.
             Check
-              (Zy,
-               Zx,
-               "test " &
-               Test &
-               " -" &
-               Integer'Image (I) &
-               " exp (" &
-               Real'Image (X) &
-               ")",
+              (Zy, Zx,
+               "test " & Test & " -" & Integer'Image (I) & " exp (" &
+               Real'Image (X) & ")",
                9.0);
             exit when Accuracy_Error_Reported;
          end loop;
@@ -580,9 +544,7 @@ procedure Cxg2010 is
          end if;
 
          Argument_Range_Check_1
-           (1.0 / Sqrt (Real (Real'Machine_Radix)),
-            1.0,
-            "5");
+           (1.0 / Sqrt (Real (Real'Machine_Radix)), 1.0, "5");
          Error_Low_Bound := 0.0;  -- reset
 
          --- test 6 ---
@@ -644,14 +606,9 @@ procedure Cxg2010 is
          if abs (Actual - Expected) > Max_Error then
             Accuracy_Error_Reported := True;
             Report.Failed
-              (Test_Name &
-               " actual: " &
-               Real'Image (Actual) &
-               " expected: " &
-               Real'Image (Expected) &
-               " difference: " &
-               Real'Image (Actual - Expected) &
-               " max err:" &
+              (Test_Name & " actual: " & Real'Image (Actual) & " expected: " &
+               Real'Image (Expected) & " difference: " &
+               Real'Image (Actual - Expected) & " max err:" &
                Real'Image (Max_Error));
          elsif Verbose then
             if Actual = Expected then
@@ -694,15 +651,9 @@ procedure Cxg2010 is
             -- note that since the expected value is computed, we must take the
             -- error in that computation into account.
             Check
-              (Zy,
-               Zx,
-               "test " &
-               Test &
-               " -" &
-               Integer'Image (I) &
-               " exp (" &
-               Real'Image (X) &
-               ")",
+              (Zy, Zx,
+               "test " & Test & " -" & Integer'Image (I) & " exp (" &
+               Real'Image (X) & ")",
                9.0);
             exit when Accuracy_Error_Reported;
          end loop;
@@ -747,15 +698,9 @@ procedure Cxg2010 is
             -- note that since the expected value is computed, we must take the
             -- error in that computation into account.
             Check
-              (Zy,
-               Zx,
-               "test " &
-               Test &
-               " -" &
-               Integer'Image (I) &
-               " exp (" &
-               Real'Image (X) &
-               ")",
+              (Zy, Zx,
+               "test " & Test & " -" & Integer'Image (I) & " exp (" &
+               Real'Image (X) & ")",
                9.0);
             exit when Accuracy_Error_Reported;
          end loop;
@@ -831,9 +776,7 @@ procedure Cxg2010 is
          end if;
 
          Argument_Range_Check_1
-           (1.0 / Sqrt (Real (Real'Machine_Radix)),
-            1.0,
-            "5");
+           (1.0 / Sqrt (Real (Real'Machine_Radix)), 1.0, "5");
          Error_Low_Bound := 0.0;  -- reset
 
          --- test 6 ---
@@ -873,8 +816,7 @@ begin
 
    if Verbose then
       Report.Comment
-        ("checking a digits" &
-         Integer'Image (System.Max_Digits) &
+        ("checking a digits" & Integer'Image (System.Max_Digits) &
          " floating point type");
    end if;
 

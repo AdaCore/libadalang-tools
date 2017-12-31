@@ -46,8 +46,7 @@ begin
    Test
      ("CE3403D",
       "CHECK THAT SKIP_LINE RAISES " &
-      "CONSTRAINT_ERROR IF SPACING IS ZERO, " &
-      "OR NEGATIVE");
+      "CONSTRAINT_ERROR IF SPACING IS ZERO, " & "OR NEGATIVE");
    begin
       Skip_Line (File, Positive_Count (Ident_Int (0)));
       Failed ("CONSTRAINT_ERROR NOT RAISED FOR ZERO");

@@ -12,9 +12,8 @@ begin
         ("Program control not transferred by raise in " &
          "child function FA11D00.CA11D012");
    else
-      return
-        (Real => (Left.Real / Right.Real),
-         Imag => (Left.Imag / Right.Imag));
+      return (Real => (Left.Real / Right.Real),
+         Imag      => (Left.Imag / Right.Imag));
    end if;
 
 end Fa11d00.Ca11d012;     -- Divide_Complex

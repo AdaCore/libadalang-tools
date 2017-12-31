@@ -54,12 +54,9 @@ begin
 
    begin
 
-      if (abs (G1'First) - 4.0) /= 0.0 or
-        (abs (G1'Last) - 4.0) /= 0.0 or
-        (abs (G2'First) - 4.0) /= 0.0 or
-        (abs (G2'Last) - 4.0) /= 0.0
-
-      then
+      if (abs (G1'First) - 4.0) /= 0.0 or (abs (G1'Last) - 4.0) /= 0.0 or
+        (abs (G2'First) - 4.0) /= 0.0 or (abs (G2'Last) - 4.0) /= 0.0
+ then
          Failed ("MIXED FIXED AND FLOAT IN FLOAT RANGE " & "CONSTRAINT");
 
       end if;

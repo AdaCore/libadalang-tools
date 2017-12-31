@@ -43,25 +43,14 @@ procedure C36305a is
 begin
    Test ("C36305A", "CHECK THAT STRINGS ARE REALLY ARRAYS");
 
-   if S'First /= 5 or
-     S'Last /= 10 or
-     S'Length /= 6 or
-     U'First (1) /= 5 or
-     U'Last (1) /= 10 or
-     U'Length (1) /= 6
-   then
+   if S'First /= 5 or S'Last /= 10 or S'Length /= 6 or U'First (1) /= 5 or
+     U'Last (1) /= 10 or U'Length (1) /= 6 then
       Failed ("INCORRECT STRING ATTRIBUTE VALUES");
    end if;
 
-   if 4 in U'Range or
-     3 in U'Range (1) or
-     0 in U'Range or
-     1 in U'Range or
-     5 not in U'Range or
-     7 not in U'Range or
-     10 not in U'Range or
-     not (11 not in U'Range)
-   then
+   if 4 in U'Range or 3 in U'Range (1) or 0 in U'Range or 1 in U'Range or
+     5 not in U'Range or 7 not in U'Range or 10 not in U'Range or
+     not (11 not in U'Range) then
       Failed ("INCORRECT STRING RANGE ATTRIBUTE");
    end if;
 
@@ -100,21 +89,15 @@ begin
 
    for I in 1 .. C'Length loop
       if C (1 .. I) /= U (5 .. I + 4) or
-        U (I + 4 .. U'Last) /= C (I .. C'Last) or
-        C (I) /= U (I + 4) or
-        C (I .. I) (I .. I) (I) /= U (U'Range) (I + 4)
-      then
+        U (I + 4 .. U'Last) /= C (I .. C'Last) or C (I) /= U (I + 4) or
+        C (I .. I) (I .. I) (I) /= U (U'Range) (I + 4) then
          Failed ("INCORRECT CHARACTER MISMATCH IN STRING");
          exit;
       end if;
    end loop;
 
-   if U /= C or
-     U /= "ABCDEF" or
-     U (U'Range) /= C (C'Range) or
-     U (5 .. 10) /= C (1 .. 6) or
-     U (5 .. 6) /= C (1 .. 2)
-   then
+   if U /= C or U /= "ABCDEF" or U (U'Range) /= C (C'Range) or
+     U (5 .. 10) /= C (1 .. 6) or U (5 .. 6) /= C (1 .. 2) then
       Failed ("STRINGS AS ARRAYS BEHAVE INCORRECTLY");
    end if;
 

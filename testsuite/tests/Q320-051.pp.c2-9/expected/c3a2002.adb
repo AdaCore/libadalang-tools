@@ -18,9 +18,8 @@ procedure C3a2002 is
    use type C3a2002_0.Result_Kind;
 
    -----------------------------------------------
-   procedure A_Is_Level_1
-     (X :     access C3a2002_0.Desig;
-      R : out C3a2002_0.Result_Kind)
+   procedure A_Is_Level_1 (X :     access C3a2002_0.Desig;
+      R                      : out C3a2002_0.Result_Kind)
    is
       -- Dereference of an access_to_object value is aliased.
       Ren : C3a2002_0.Desig renames X.all;      -- Renaming of a dereference
@@ -36,10 +35,8 @@ procedure C3a2002 is
    end A_Is_Level_1;
 
    -----------------------------------------------
-   procedure Display_Results
-     (Result   : in C3a2002_0.Result_Kind;
-      Expected : in C3a2002_0.Result_Kind;
-      Message  : in String)
+   procedure Display_Results (Result : in C3a2002_0.Result_Kind;
+      Expected : in C3a2002_0.Result_Kind; Message : in String)
    is
    begin
       if Result /= Expected then
@@ -97,24 +94,18 @@ begin -- C3A2002
 
    C3a2002_0.Never_Fails (new C3a2002_0.Desig, Res);
    Display_Results
-     (Res,
-      C3a2002_0.Ok,
-      "Allocator level 2, " & "local access type");
+     (Res, C3a2002_0.Ok, "Allocator level 2, " & "local access type");
 
    -- Since actual is an allocator, its accessibility level is that of the
    -- execution of the called subprogram, i.e., level 2.
 
    C3a2002_0.A_Is_Level_0 (new C3a2002_0.Desig, Res);
    Display_Results
-     (Res,
-      C3a2002_0.P_E,
-      "Allocator level 2, " & "level 0 access type");
+     (Res, C3a2002_0.P_E, "Allocator level 2, " & "level 0 access type");
 
    A_Is_Level_1 (new C3a2002_0.Desig, Res);
    Display_Results
-     (Res,
-      C3a2002_0.P_E,
-      "Allocator level 2, " & "level 1 access type");
+     (Res, C3a2002_0.P_E, "Allocator level 2, " & "level 1 access type");
 
    Block_L2 :
    declare
@@ -140,15 +131,11 @@ begin -- C3A2002
 
       C3a2002_0.Never_Fails (new C3a2002_0.Desig, Res);
       Display_Results
-        (Res,
-         C3a2002_0.Ok,
-         "Allocator level 3, " & "local access type");
+        (Res, C3a2002_0.Ok, "Allocator level 3, " & "local access type");
 
       A_Is_Level_1 (new C3a2002_0.Desig, Res);
       Display_Results
-        (Res,
-         C3a2002_0.P_E,
-         "Allocator level 3, " & "level 1 access type");
+        (Res, C3a2002_0.P_E, "Allocator level 3, " & "level 1 access type");
 
    end Block_L2;
 

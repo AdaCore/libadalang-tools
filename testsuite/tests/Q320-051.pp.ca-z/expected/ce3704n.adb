@@ -54,8 +54,7 @@ begin
       "CHECK THAT DATA_ERROR IS RAISED WHEN " &
       "A BASED LITERAL DOES NOT HAVE ITS BASE " &
       "IN THE RANGE 2 .. 16, DIGIT IS OUTSIDE " &
-      "THE BASE RANGE, OR THERE IS NO CLOSING " &
-      "'#' SIGN");
+      "THE BASE RANGE, OR THERE IS NO CLOSING " & "'#' SIGN");
 
    declare
       Ft : File_Type;

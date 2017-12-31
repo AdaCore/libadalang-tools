@@ -226,8 +226,7 @@ begin  -- Main test procedure.
       "a transfer of control or selection of a " &
       "terminate alternative attempts to propagate " &
       "an exception, the exception is ignored, but " &
-      "any other finalizations due to be performed " &
-      "are performed");
+      "any other finalizations due to be performed " & "are performed");
 
    Subtest_1;  -- checks internal
 

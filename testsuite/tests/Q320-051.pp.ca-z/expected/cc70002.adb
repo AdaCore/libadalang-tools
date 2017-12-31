@@ -14,19 +14,14 @@ procedure Cc70002 is
 
    type Table_Type is array (Cell_Type, Category_Type) of Data_Points;
 
-   package Data_Table_Support is new Cc70002_1
-     (Data_Points,
-      Cell_Type,
-      Category_Type,
-      Table_Type);
+   package Data_Table_Support is new Cc70002_1 (Data_Points, Cell_Type,
+      Category_Type, Table_Type);
 
    package Data_Table_Addition_Group is new Cc70002_0
-     (Group_Type => Table_Type,
-      Identity   => Data_Table_Support.Add_Ident,
+     (Group_Type => Table_Type, Identity => Data_Table_Support.Add_Ident,
       Operation  => Data_Table_Support."+");
 
-   package Table_Add_Ops is new Cc70002_2
-     (Data_Table_Support,
+   package Table_Add_Ops is new Cc70002_2 (Data_Table_Support,
       Data_Table_Addition_Group);
 
    Scores_Table : Table_Type := ((12, 0), (21, 33), (49, 9));
@@ -41,10 +36,7 @@ begin
 
    Scores_Table :=
      Table_Add_Ops.Add_Matrices_With_Coefficients
-       (Scores_Table,
-        2,
-        Scores_Table,
-        1);
+       (Scores_Table, 2, Scores_Table, 1);
 
    if (Scores_Table /= Expected) then
       Report.Failed ("Incorrect result for multi-dimensional array");

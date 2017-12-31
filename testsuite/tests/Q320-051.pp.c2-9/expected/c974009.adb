@@ -15,8 +15,7 @@ begin  -- Main program.
    Report.Test
      ("C974009",
       "Asynchronous Select: Trigger is a call to a " &
-      "task entry, is not queued and is completed " &
-      "first by an exception");
+      "task entry, is not queued and is completed " & "first by an exception");
 
    begin
 

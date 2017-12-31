@@ -82,8 +82,7 @@ procedure C74407b is
          "PRE-DEFINED EQUALITY AND ASSIGNMENT ARE " &
          "DEFINED AND AVAILABLE WITHIN THE PRIVATE " &
          "PART AND THE BODY OF A PACKAGE, AFTER " &
-         "THE FULL DECLARATION, IF THE FULL " &
-         "DECLARATION IS NOT LIMITED");
+         "THE FULL DECLARATION, IF THE FULL " & "DECLARATION IS NOT LIMITED");
 
       A := 10;
 
@@ -118,29 +117,25 @@ procedure C74407b is
       if not G then
          Failed
            ("IMPROPER RESULT FROM PRE-DEFINED EQUALITY " &
-            "OPERATION WITHIN THE PRIVATE PART OF THE " &
-            "PACKAGE - 1");
+            "OPERATION WITHIN THE PRIVATE PART OF THE " & "PACKAGE - 1");
       end if;
 
       if not H then
          Failed
            ("IMPROPER RESULT FROM PRE-DEFINED INEQUALITY " &
-            "OPERATION WITHIN THE PRIVATE PART OF THE " &
-            "PACKAGE - 1");
+            "OPERATION WITHIN THE PRIVATE PART OF THE " & "PACKAGE - 1");
       end if;
 
       if not Cons_Bool1 then
          Failed
            ("IMPROPER RESULT FROM PRE-DEFINED EQUALITY " &
-            "OPERATION WITHIN THE PRIVATE PART OF THE " &
-            "PACKAGE - 2");
+            "OPERATION WITHIN THE PRIVATE PART OF THE " & "PACKAGE - 2");
       end if;
 
       if not Cons_Bool2 then
          Failed
            ("IMPROPER RESULT FROM PRE-DEFINED INEQUALITY " &
-            "OPERATION WITHIN THE PRIVATE PART OF THE " &
-            "PACKAGE - 2");
+            "OPERATION WITHIN THE PRIVATE PART OF THE " & "PACKAGE - 2");
       end if;
 
       X := (1, 2, 3, 4, 5);

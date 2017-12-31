@@ -141,8 +141,7 @@ begin
       if not (Arr6 <= Arr7) then
          Failed
            ("DIFFERENT BOUNDS, SAME NUMBER OF COMPONENTS, " &
-            "MULTIPLE COMPONENTS, COMPONENTS NOT EQUAL - " &
-            "<=");
+            "MULTIPLE COMPONENTS, COMPONENTS NOT EQUAL - " & "<=");
       end if;
 
       if Arr6 > Arr7 then
@@ -154,8 +153,7 @@ begin
       if ">=" (Left => Arr6, Right => Arr7) then
          Failed
            ("DIFFERENT BOUNDS, SAME NUMBER OF COMPONENTS, " &
-            "MULTIPLE COMPONENTS, COMPONENTS NOT EQUAL - " &
-            ">=");
+            "MULTIPLE COMPONENTS, COMPONENTS NOT EQUAL - " & ">=");
       end if;
 
       if Arr6 < Arr8 then

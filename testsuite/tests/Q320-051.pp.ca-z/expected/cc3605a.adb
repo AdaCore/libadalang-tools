@@ -12,8 +12,7 @@ begin
    Test
      ("CC3605A",
       "CHECK THAT SOME DIFFERENCES BETWEEN THE " &
-      "FORMAL AND THE ACTUAL PARAMETERS DO NOT " &
-      "INVALIDATE A MATCH");
+      "FORMAL AND THE ACTUAL PARAMETERS DO NOT " & "INVALIDATE A MATCH");
 
 ----------------------------------------------------------------------
 -- DIFFERENT PARAMETER NAMES

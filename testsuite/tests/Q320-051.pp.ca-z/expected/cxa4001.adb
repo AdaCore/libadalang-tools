@@ -64,8 +64,7 @@ begin
      ("CXA4001",
       "Check that the types, operations, and other " &
       "entities defined within the package " &
-      "Ada.Strings.Maps are available and/or produce " &
-      "correct results");
+      "Ada.Strings.Maps are available and/or produce " & "correct results");
 
    Test_Block :
    declare
@@ -80,11 +79,7 @@ begin
       Half_Alphabet    : Maps.Character_Sequence (1 .. Midpoint_Letter);
       Inverse_Alphabet : Maps.Character_Sequence (1 .. Last_Letter);
 
-      Alphabet_Set,
-      Consonant_Set,
-      Vowel_Set,
-      Full_Vowel_Set,
-      First_Half_Set,
+      Alphabet_Set, Consonant_Set, Vowel_Set, Full_Vowel_Set, First_Half_Set,
       Second_Half_Set : Maps.Character_Set;
 
    begin
@@ -118,19 +113,16 @@ begin
       for I in 1 .. 5 loop
          if not Maps.Is_In (Vowels (I), Vowel_Set) or
            not Maps.Is_In (Vowels (I), Alphabet_Set) or
-           Maps.Is_In (Vowels (I), Consonant_Set)
-         then
+           Maps.Is_In (Vowels (I), Consonant_Set) then
             Report.Failed
-              ("Incorrect function Is_In use with set " &
-               "combinations - " &
+              ("Incorrect function Is_In use with set " & "combinations - " &
                Integer'Image (I));
          end if;
       end loop;
 
       if Maps.Is_Subset (Vowel_Set, First_Half_Set) or
         Maps."<=" (Vowel_Set, Second_Half_Set) or
-        not Maps.Is_Subset (Vowel_Set, Alphabet_Set)
-      then
+        not Maps.Is_Subset (Vowel_Set, Alphabet_Set) then
          Report.Failed ("Incorrect set evaluation using Is_Subset function");
       end if;
 
@@ -141,15 +133,13 @@ begin
       if not
         ((Vowel_Set and First_Half_Set) or
          (Full_Vowel_Set and Second_Half_Set)) =
-        Full_Vowel_Set
-      then
+        Full_Vowel_Set then
          Report.Failed
            ("Incorrect result for AND, OR, or ""="" set operators");
       end if;
 
       if (Alphabet_Set and Maps.Null_Set) /= Maps.Null_Set or
-        (Alphabet_Set or Maps.Null_Set) /= Alphabet_Set
-      then
+        (Alphabet_Set or Maps.Null_Set) /= Alphabet_Set then
          Report.Failed ("Incorrect result for AND or OR set operators");
       end if;
 
@@ -168,8 +158,7 @@ begin
          Inverse_Map : Maps.Character_Mapping :=
            Maps.To_Mapping (Alphabet, Inverse_Alphabet);
       begin
-         if Maps.Value (Maps.Identity, 'b') /=
-           Maps.Value (Inverse_Map, 'y')
+         if Maps.Value (Maps.Identity, 'b') /= Maps.Value (Inverse_Map, 'y')
          then
             Report.Failed ("Incorrect Inverse mapping");
          end if;

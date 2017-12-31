@@ -197,8 +197,7 @@ begin
          Tc_Result_Char_Array (0 .. 10) := Ics.Value (Tc_Chars_Ptr);
          for I in 0 .. Tc_Length - 1 loop
             if Tc_Result_Char_Array (I) /=
-              Ic.To_C (Tc_String_10 (Integer (I + 1)))
-            then
+              Ic.To_C (Tc_String_10 (Integer (I + 1))) then
                Report.Failed
                  ("Incorrect result from the character-by-" &
                   "character evaluation of the result of " &
@@ -209,8 +208,7 @@ begin
          when others =>
             Report.Failed
               ("Exception raised during the character-by-" &
-               "character evaluation of the result of " &
-               "Procedure Update");
+               "character evaluation of the result of " & "Procedure Update");
       end;
       Ics.Free (Tc_Chars_Ptr);
 
@@ -279,10 +277,8 @@ begin
       begin
          Tc_Chars_Ptr := Ics.New_Char_Array (Tc_Char_Array);
          Ics.Update
-           (Item   => Tc_Chars_Ptr,
-            Offset => 0,
-            Str    => Tc_String_10,
-            Check  => True);
+           (Item  => Tc_Chars_Ptr, Offset => 0, Str => Tc_String_10,
+            Check => True);
          if Ics.Value (Tc_Chars_Ptr) = Tc_String_10 then
             null; -- OK
          else
@@ -307,16 +303,13 @@ begin
       begin
          Tc_Chars_Ptr := Ics.New_Char_Array (Tc_Char_Array);
          Ics.Update
-           (Item   => Tc_Chars_Ptr,
-            Offset => 5,
-            Chars  => Ic.To_C (Tc_String_7),
-            Check  => True);
+           (Item  => Tc_Chars_Ptr, Offset => 5, Chars => Ic.To_C (Tc_String_7),
+            Check => True);
          Report.Failed
            ("Update_Error not raised by Procedure Update with " &
             "Chars parameter");
          Report.Comment
-           (Ics.Value (Tc_Chars_Ptr) &
-            "used here to defeat " &
+           (Ics.Value (Tc_Chars_Ptr) & "used here to defeat " &
             "optimization - should never be printed");
       exception
          when Ics.Update_Error =>
@@ -332,15 +325,13 @@ begin
       begin
          Tc_Chars_Ptr := Ics.New_Char_Array (Tc_Char_Array);
          Ics.Update
-           (Item   => Tc_Chars_Ptr,
-            Offset => Ics.Strlen (Tc_Chars_Ptr),
-            Str    => Tc_String_8); -- Default Check parameter value.
+           (Item => Tc_Chars_Ptr, Offset => Ics.Strlen (Tc_Chars_Ptr),
+            Str  => Tc_String_8); -- Default Check parameter value.
          Report.Failed
            ("Update_Error not raised by Procedure Update with " &
             "Str parameter");
          Report.Comment
-           (Ics.Value (Tc_Chars_Ptr) &
-            "used here to defeat " &
+           (Ics.Value (Tc_Chars_Ptr) & "used here to defeat " &
             "optimization - should never be printed");
       exception
          when Ics.Update_Error =>
@@ -359,10 +350,8 @@ begin
 
       begin
          Ics.Update
-           (Item   => Tc_Chars_Ptr,
-            Offset => 5,
-            Chars  => Ic.To_C (Tc_String_7),
-            Check  => True);
+           (Item  => Tc_Chars_Ptr, Offset => 5, Chars => Ic.To_C (Tc_String_7),
+            Check => True);
          Report.Failed
            ("Dereference_Error not raised by Procedure Update with " &
             "Chars parameter");
@@ -377,9 +366,8 @@ begin
 
       begin
          Ics.Update
-           (Item   => Tc_Chars_Ptr,
-            Offset => Ics.Strlen (Tc_Chars_Ptr),
-            Str    => Tc_String_8); -- Default Check parameter value.
+           (Item => Tc_Chars_Ptr, Offset => Ics.Strlen (Tc_Chars_Ptr),
+            Str  => Tc_String_8); -- Default Check parameter value.
          Report.Failed
            ("Dereference_Error not raised by Procedure Update with " &
             "Str parameter");
@@ -395,8 +383,7 @@ begin
    exception
       when The_Error : others =>
          Report.Failed
-           ("The following exception was raised in the " &
-            "Test_Block: " &
+           ("The following exception was raised in the " & "Test_Block: " &
             Exception_Name (The_Error));
    end Test_Block;
 

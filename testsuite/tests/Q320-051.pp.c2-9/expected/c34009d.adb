@@ -45,28 +45,15 @@ procedure C34009d is
 
       type Parent (B : Boolean := True; L : Length := 1) is private;
 
-      function Create
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         J : Integer;
-         F : Float;
-         X : Parent  -- TO RESOLVE OVERLOADING.
+      function Create (B : Boolean; L : Length; I : Integer; S : String;
+         J : Integer; F : Float; X : Parent  -- TO RESOLVE OVERLOADING.
          ) return Parent;
 
-      function Con
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         J : Integer) return Parent;
+      function Con (B : Boolean; L : Length; I : Integer; S : String;
+         J            : Integer) return Parent;
 
-      function Con
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         F : Float) return Parent;
+      function Con (B : Boolean; L : Length; I : Integer;
+         F            : Float) return Parent;
 
    private
 
@@ -98,14 +85,8 @@ procedure C34009d is
 
    package body Pkg is
 
-      function Create
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         J : Integer;
-         F : Float;
-         X : Parent) return Parent
+      function Create (B : Boolean; L : Length; I : Integer; S : String;
+         J               : Integer; F : Float; X : Parent) return Parent
       is
       begin
          case B is
@@ -116,22 +97,15 @@ procedure C34009d is
          end case;
       end Create;
 
-      function Con
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         J : Integer) return Parent
+      function Con (B : Boolean; L : Length; I : Integer; S : String;
+         J            : Integer) return Parent
       is
       begin
          return (True, L, I, S, J);
       end Con;
 
-      function Con
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         F : Float) return Parent
+      function Con (B : Boolean; L : Length; I : Integer;
+         F            : Float) return Parent
       is
       begin
          return (False, L, I, F);
@@ -177,11 +151,9 @@ begin
       Failed ("INCORRECT CONVERSION TO PARENT");
    end if;
 
-   if X.B /= True or
-     X.L /= 3 or
+   if X.B /= True or X.L /= 3 or
      Create (False, 2, 3, "XX", 5, 6.0, X).B /= False or
-     Create (False, 2, 3, "XX", 5, 6.0, X).L /= 2
-   then
+     Create (False, 2, 3, "XX", 5, 6.0, X).L /= 2 then
       Failed ("INCORRECT SELECTION (DISCRIMINANT)");
    end if;
 

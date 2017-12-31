@@ -73,8 +73,7 @@ begin
       Cad_String : Asunb.Unbounded_String := Asunb.To_Unbounded_String ("cad");
 
       Complete_String : Asunb.Unbounded_String :=
-        Asunb.To_Unbounded_String ("Incomplete") &
-        Ada.Strings.Space &
+        Asunb.To_Unbounded_String ("Incomplete") & Ada.Strings.Space &
         Asunb.To_Unbounded_String ("String");
 
       Incomplete_String : Asunb.Unbounded_String :=
@@ -117,8 +116,7 @@ begin
 
       if Incomplete_String < Complete_String or
         Incomplete_String > Complete_String or
-        Incomplete_String /= Complete_String
-      then
+        Incomplete_String /= Complete_String then
          Report.Failed ("Incorrect result from use of ""&"" operator");
       end if;
 
@@ -126,8 +124,7 @@ begin
 
       -- Last element of the unbounded string should be a 'g'.
       if Asunb.Element (Incomplete_String, Asunb.Length (Incomplete_String)) /=
-        A_Small_G
-      then
+        A_Small_G then
          Report.Failed ("Incorrect result from use of Function Element - 1");
       end if;
 
@@ -147,14 +144,12 @@ begin
       Asunb.Replace_Element (Incorrect_Spelling, 2, 'o');
 
       Asunb.Replace_Element
-        (Incorrect_Spelling,
-         Asunb.Index (Incorrect_Spelling, B_Set),
+        (Incorrect_Spelling, Asunb.Index (Incorrect_Spelling, B_Set),
          A_Small_D);
 
       Asunb.Replace_Element
         (Source => Incorrect_Spelling,
-         Index  => Asunb.Length (Incorrect_Spelling),
-         By     => 'y');
+         Index  => Asunb.Length (Incorrect_Spelling), By => 'y');
 
       if Incorrect_Spelling /= Asunb.To_Unbounded_String ("Good Day") then
          Report.Failed ("Incorrect result from Procedure Replace_Element");
@@ -179,8 +174,7 @@ begin
       if Asunb.Count (Magic_String, "ab") /=
         (Asunb.Count (Magic_String, "ac") +
          Asunb.Count (Magic_String, "ad")) or
-        Asunb.Count (Magic_String, "ab") /= 2
-      then
+        Asunb.Count (Magic_String, "ab") /= 2 then
          Report.Failed
            ("Incorrect result from Function Count with String parameter");
       end if;
@@ -190,13 +184,10 @@ begin
       Asunb.Find_Token
         (Magic_String,      -- Find location of first "ab".
          Ab_Set,            -- Should be (1..2).
-         Ada.Strings.Inside,
-         Token_Start,
-         Token_End);
+         Ada.Strings.Inside, Token_Start, Token_End);
 
       if Natural (Token_Start) /= Asunb.To_String (Magic_String)'First or
-        Token_End /= Asunb.Index (Magic_String, B_Set)
-      then
+        Token_End /= Asunb.Index (Magic_String, B_Set) then
          Report.Failed ("Incorrect result from Procedure Find_Token - 1");
       end if;
 
@@ -204,8 +195,7 @@ begin
         (Source => Magic_String, -- Find location of char 'r'
          Set    => Abcd_Set,     -- in string, should be (3..3)
          Test   => Ada.Strings.Outside,
-         First  => Token_Start,
-         Last   => Token_End);
+         First  => Token_Start, Last => Token_End);
 
       if Natural (Token_Start) /= 3 or Token_End /= 3 then
          Report.Failed ("Incorrect result from Procedure Find_Token - 2");
@@ -218,8 +208,7 @@ begin
          First => Token_Start,   -- Last = 0.
          Last  => Token_End);
 
-      if Token_Start /= Asunb.To_String (Magic_String)'First or
-        Token_End /= 0
+      if Token_Start /= Asunb.To_String (Magic_String)'First or Token_End /= 0
       then
          Report.Failed ("Incorrect result from Procedure Find_Token - 3");
       end if;
@@ -265,15 +254,13 @@ begin
          Space_Array : array (1 .. 4) of Asunb.Unbounded_String :=
            (Asunb.To_Unbounded_String ("  Pad    "),
             Asunb.To_Unbounded_String ("Pad   "),
-            Asunb.To_Unbounded_String ("     Pad"),
-            Pad);
+            Asunb.To_Unbounded_String ("     Pad"), Pad);
 
          String_Array : array (1 .. 5) of Asunb.Unbounded_String :=
            (Asunb.To_Unbounded_String ("xyzxAda9Xpqr"),
             Asunb.To_Unbounded_String ("Ada9Xqqrp"),
             Asunb.To_Unbounded_String ("zxyxAda9Xqpqr"),
-            Asunb.To_Unbounded_String ("xxxyAda9X"),
-            The_New_Ada);
+            Asunb.To_Unbounded_String ("xxxyAda9X"), The_New_Ada);
 
       begin
 
@@ -293,11 +280,8 @@ begin
 
          for I in 1 .. 5 loop
             if Asunb.Trim
-                (String_Array (I),
-                 Left  => Xyz_Set,
-                 Right => Pqr_Set) /=
-              The_New_Ada
-            then
+                (String_Array (I), Left => Xyz_Set, Right => Pqr_Set) /=
+              The_New_Ada then
                Report.Failed
                  ("Incorrect result from Trim for set characters - " &
                   Integer'Image (I));
@@ -314,10 +298,8 @@ begin
       if Asunb.Delete
           (Source =>
              Asunb.Delete (Magic_String, 8, Asunb.Length (Magic_String)),
-           From    => Asunb.To_String (Magic_String)'First,
-           Through => 4) /=
-        Cad_String
-      then
+           From => Asunb.To_String (Magic_String)'First, Through => 4) /=
+        Cad_String then
          Report.Failed ("Incorrect results from Function Delete");
       end if;
 

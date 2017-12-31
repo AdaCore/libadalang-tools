@@ -99,15 +99,13 @@ begin
          -- Exchange for a user handler twice:
 
          Ai.Exchange_Handler
-           (Old_Handler,
-            Cxc3007_0.Dynamic.Handler1'Access,
+           (Old_Handler, Cxc3007_0.Dynamic.Handler1'Access,
             Impdef.Annex_C.Interrupt_To_Generate);
 
          -- Old_Handler now points to default treatment.
 
          Ai.Exchange_Handler
-           (Old_Handler,
-            Cxc3007_0.Dynamic.Handler2'Access,
+           (Old_Handler, Cxc3007_0.Dynamic.Handler2'Access,
             Impdef.Annex_C.Interrupt_To_Generate);
 
          -- Old_Handler now points to Handler1.
@@ -119,9 +117,7 @@ begin
          -- Restore default treatment (using null):
 
          Ai.Exchange_Handler
-           (Old_Handler,
-            null,
-            Impdef.Annex_C.Interrupt_To_Generate);
+           (Old_Handler, null, Impdef.Annex_C.Interrupt_To_Generate);
 
          -- Old_Handler now points to Handler2.
 
@@ -136,8 +132,7 @@ begin
          -- Exchange for a user handler:
 
          Ai.Exchange_Handler
-           (Old_Handler,
-            Cxc3007_0.Dynamic.Handler1'Access,
+           (Old_Handler, Cxc3007_0.Dynamic.Handler1'Access,
             Impdef.Annex_C.Interrupt_To_Generate);
 
          -- Old_Handler now points to default treatment.
@@ -149,9 +144,7 @@ begin
          -- Restore default treatment (using current value of Old_Handler):
 
          Ai.Exchange_Handler
-           (Old_Handler,
-            Old_Handler,
-            Impdef.Annex_C.Interrupt_To_Generate);
+           (Old_Handler, Old_Handler, Impdef.Annex_C.Interrupt_To_Generate);
 
          -- Old_Handler now points to Handler1.
 

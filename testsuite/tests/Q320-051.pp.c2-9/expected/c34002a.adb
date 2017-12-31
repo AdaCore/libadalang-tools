@@ -38,8 +38,7 @@ procedure C34002a is
      Parent range Parent'Val (Ident_Int (-50)) .. Parent'Val (Ident_Int (50));
 
    type T is
-     new Subparent range
-       Parent'Val (Ident_Int (-30)) ..
+     new Subparent range Parent'Val (Ident_Int (-30)) ..
          Parent'Val (Ident_Int (30));
 
    type Fixed is delta 0.1 range -1_000.0 .. 1_000.0;
@@ -69,8 +68,7 @@ begin
    Test
      ("C34002A",
       "CHECK THAT THE REQUIRED PREDEFINED OPERATIONS " &
-      "ARE DECLARED (IMPLICITLY) FOR DERIVED " &
-      "INTEGER TYPES");
+      "ARE DECLARED (IMPLICITLY) FOR DERIVED " & "INTEGER TYPES");
 
    X := Ident (30);
    if X /= 30 then
@@ -216,8 +214,7 @@ begin
       Failed ("INCORRECT 'BASE'SIZE");
    end if;
 
-   if T'First /= -30 or
-     T'Pos (T'Base'First) /= Parent'Pos (Parent'Base'First)
+   if T'First /= -30 or T'Pos (T'Base'First) /= Parent'Pos (Parent'Base'First)
    then
       Failed ("INCORRECT 'FIRST");
    end if;

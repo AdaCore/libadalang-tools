@@ -60,8 +60,7 @@ begin
    Report.Test
      ("CXAA018",
       "Check that the subprograms defined in " &
-      "the package Text_IO.Modular_IO provide " &
-      "correct results");
+      "the package Text_IO.Modular_IO provide " & "correct results");
 
    Test_For_Text_Io_Support :
    declare
@@ -77,8 +76,7 @@ begin
       -- will be handled to produce a Not_Applicable result.
 
       Ada.Text_Io.Create
-        (File => Data_File,
-         Mode => Ada.Text_Io.Out_File,
+        (File => Data_File, Mode => Ada.Text_Io.Out_File,
          Name => Data_Filename);
 
       Test_Block :
@@ -114,10 +112,8 @@ begin
             for I in 1 .. Number_Of_Modular_Items loop
                -- Use default Base parameter of 10.
                Mod_Io.Put
-                 (File  => Data_File,
-                  Item  => Modular_Array (I),
-                  Width => 6,
-                  Base  => Mod_Io.Default_Base);
+                 (File => Data_File, Item => Modular_Array (I), Width => 6,
+                  Base => Mod_Io.Default_Base);
             end loop;
 
             -- Enter data into the file such that on the corresponding "Get" of
@@ -143,8 +139,7 @@ begin
 
                if Tc_Modular /= Modular_Array (I) then
                   Report.Failed
-                    ("Incorrect modular data read from file " &
-                     "data item #" &
+                    ("Incorrect modular data read from file " & "data item #" &
                      Integer'Image (I));
                end if;
             end loop;
@@ -159,8 +154,7 @@ begin
                   Report.Failed
                     ("Exception Data_Error not raised when Get " &
                      "was used to read modular data outside base " &
-                     "range of type, item # " &
-                     Integer'Image (I));
+                     "range of type, item # " & Integer'Image (I));
                exception
                   when Ada.Text_Io.Data_Error =>
                      null; -- OK, expected exception.
@@ -168,8 +162,7 @@ begin
                      Report.Failed
                        ("Unexpected exception raised when Get " &
                         "was used to read modular data outside " &
-                        "base range of type from Data_File, " &
-                        "data item #" &
+                        "base range of type from Data_File, " & "data item #" &
                         Integer'Image (I));
                end;
             end loop;
@@ -207,8 +200,7 @@ begin
 
             for I in 1 .. 2 loop
                Mod_Io.Put
-                 (To   => Tc_String_Array (I),
-                  Item => Modular_Array (I),
+                 (To   => Tc_String_Array (I), Item => Modular_Array (I),
                   Base => Mod_Io.Default_Base);
             end loop;
             for I in 3 .. 4 loop
@@ -224,16 +216,14 @@ begin
             for I in 1 .. Number_Of_Modular_Items loop
 
                Mod_Io.Get
-                 (From => Tc_String_Array (I),
-                  Item => Tc_Modular,
+                 (From => Tc_String_Array (I), Item => Tc_Modular,
                   Last => Tc_Last_Character_Read);
 
                if Tc_Modular /= Modular_Array (I) then
                   Report.Failed
                     ("Incorrect modular data value obtained " &
                      "from String following use of Procedures " &
-                     "Put and Get from Strings, Modular_Array " &
-                     "item #" &
+                     "Put and Get from Strings, Modular_Array " & "item #" &
                      Integer'Image (I));
                end if;
             end loop;

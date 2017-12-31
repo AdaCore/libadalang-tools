@@ -12,8 +12,7 @@ begin
    Report.Test
      ("C940016",
       "Check that Unchecked_Deallocation of a" &
-      " protected object finalizes the" &
-      " protected object");
+      " protected object finalizes the" & " protected object");
 
    First_Check :
    declare
@@ -36,8 +35,7 @@ begin
       end Semaphore;
 
       type Psem is access Semaphore;
-      procedure Zap_Semaphore is new Ada.Unchecked_Deallocation
-        (Semaphore,
+      procedure Zap_Semaphore is new Ada.Unchecked_Deallocation (Semaphore,
          Psem);
       Sem_Ptr : Psem := new Semaphore;
 
@@ -97,8 +95,7 @@ begin
       end Semaphore;
 
       type Psem is access Semaphore;
-      procedure Zap_Semaphore is new Ada.Unchecked_Deallocation
-        (Semaphore,
+      procedure Zap_Semaphore is new Ada.Unchecked_Deallocation (Semaphore,
          Psem);
       Sem_Ptr : Psem := new Semaphore;
 

@@ -63,13 +63,11 @@ begin
 
    Report.Test
      ("CB30002",
-      "Check that the optional message string in a " &
-      "raise expression is " &
+      "Check that the optional message string in a " & "raise expression is " &
       "associated with the raised exception " &
       "occurrence, and that the message string can " &
       "be obtained using the Exception_Message " &
-      "function with the associated " &
-      "Exception_Occurrence object");
+      "function with the associated " & "Exception_Occurrence object");
 
    Test_Block :
    declare
@@ -108,8 +106,7 @@ begin
             case I is
                when 1 =>
                   if Boolean'
-                      (raise User_Exception_1 with User_Messages (I).all)
-                  then
+                      (raise User_Exception_1 with User_Messages (I).all) then
                      Report.Failed ("Exception not raised - 1");
                   end if;
                when 2 =>
@@ -139,8 +136,7 @@ begin
 
             Report.Failed
               ("Exception not raised by raise expression " &
-               "for User_Exception #" &
-               Integer'Image (I));
+               "for User_Exception #" & Integer'Image (I));
 
          exception
             when Excptn : others =>
@@ -151,13 +147,11 @@ begin
                   -- function.
 
                   if User_Messages (I).all /=
-                    Ada.Exceptions.Exception_Message (Excptn)
-                  then
+                    Ada.Exceptions.Exception_Message (Excptn) then
                      Report.Failed
                        ("Message captured from exception is not the " &
                         "message provided when the exception was raised, " &
-                        "User_Exception #" &
-                        Integer'Image (I));
+                        "User_Exception #" & Integer'Image (I));
                   end if;
                end;
          end;
@@ -183,8 +177,7 @@ begin
          when Excptn : User_Exception_1 =>
 
             if User_Messages (5).all /=
-              Ada.Exceptions.Exception_Message (Excptn)
-            then
+              Ada.Exceptions.Exception_Message (Excptn) then
                Report.Failed ("User_Message_5 not found");
             end if;
 
@@ -216,8 +209,7 @@ begin
          when Excptn : User_Exception_2 =>
 
             if User_Messages (4).all /=
-              Ada.Exceptions.Exception_Message (Excptn)
-            then
+              Ada.Exceptions.Exception_Message (Excptn) then
                Report.Failed ("User_Message_4 not found");
             end if;
 
@@ -236,8 +228,7 @@ begin
          task body Raise_An_Exception is
          begin
             accept Raise_It do
-               if Boolean'
-                   (raise User_Exception_3 with User_Messages (2).all)
+               if Boolean'(raise User_Exception_3 with User_Messages (2).all)
                then
                   Report.Failed ("Nothing raised in accept");
                end if;
@@ -246,8 +237,7 @@ begin
          exception
             when Excptn : User_Exception_3 =>
                if User_Messages (2).all /=
-                 Ada.Exceptions.Exception_Message (Excptn)
-               then
+                 Ada.Exceptions.Exception_Message (Excptn) then
                   Report.Failed
                     ("User_Message_3 not returned inside task body");
                end if;
@@ -261,8 +251,7 @@ begin
       exception
          when Excptn : User_Exception_3 =>
             if User_Messages (2).all /=
-              Ada.Exceptions.Exception_Message (Excptn)
-            then
+              Ada.Exceptions.Exception_Message (Excptn) then
                Report.Failed ("User_Message_3 not returned to caller of task");
             end if;
          when others =>
@@ -285,9 +274,7 @@ begin
             end if;
 
             Flag :=
-              (if
-                 User_Messages (3).all (1 .. 3) = "The"
-               then
+              (if User_Messages (3).all (1 .. 3) = "The" then
                  Report.Ident_Bool (False)
                else raise Not_Raised_Exception_4 with User_Messages (4).all);
             if Flag then
@@ -298,13 +285,11 @@ begin
          when Excptn : Not_Raised_Exception_4 =>
 
             if User_Messages (4).all =
-              Ada.Exceptions.Exception_Message (Excptn)
-            then
+              Ada.Exceptions.Exception_Message (Excptn) then
                Report.Failed
                  ("Assignment of Flag raised Not_Raised_Exception_4");
             elsif User_Messages (5).all =
-              Ada.Exceptions.Exception_Message (Excptn)
-            then
+              Ada.Exceptions.Exception_Message (Excptn) then
                Report.Failed
                  ("Elaboration of Flag raised Not_Raised_Exception_4");
             else

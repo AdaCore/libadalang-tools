@@ -33,8 +33,7 @@ package body C761004_Support is
          Tctouch.Flush;
       else
          Tctouch.Validate
-           (Invert (Inits_Order (1 .. Inits_Called)),
-            "Subtest " & Number,
+           (Invert (Inits_Order (1 .. Inits_Called)), "Subtest " & Number,
             True);
       end if;
    end Validate;

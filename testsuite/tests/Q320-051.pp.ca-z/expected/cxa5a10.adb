@@ -86,16 +86,9 @@ begin
       Arg, Float_Result : Float;
       New_Float_Result  : New_Float;
 
-      Flag_1,
-      Flag_2,
-      Flag_3,
-      Flag_4,
-      Incorrect_Inverse_Base_E,
-      Incorrect_Inverse_Base_2,
-      Incorrect_Inverse_Base_8,
-      Incorrect_Inverse_Base_10,
-      Incorrect_Inverse_Base_16 : Boolean :=
-        False;
+      Flag_1, Flag_2, Flag_3, Flag_4, Incorrect_Inverse_Base_E,
+      Incorrect_Inverse_Base_2, Incorrect_Inverse_Base_8,
+      Incorrect_Inverse_Base_10, Incorrect_Inverse_Base_16 : Boolean := False;
 
       procedure Dont_Optimize_Float is new Dont_Optimize (Float);
       procedure Dont_Optimize_New_Float is new Dont_Optimize (New_Float);
@@ -233,9 +226,7 @@ begin
 
       if Gef."**" (Left => 10.0, Right => 0.0) /= 1.0 or
         Ef."**" (Fxa5a00.Large, Right => 0.0) /= 1.0 or
-        Gef."**" (3.0, 0.0) /= 1.0 or
-        Fxa5a00.Small**0.0 /= 1.0
-      then
+        Gef."**" (3.0, 0.0) /= 1.0 or Fxa5a00.Small**0.0 /= 1.0 then
          Report.Failed
            ("Incorrect results returned from the ""**"" " &
             "operator when the value of the exponent is 0.0");
@@ -246,9 +237,7 @@ begin
 
       if Gef."**" (Left => 50.0, Right => 1.0) /= 50.0 or
         Ef."**" (Fxa5a00.Large, Right => 1.0) /= Fxa5a00.Large or
-        Gef."**" (6.0, 1.0) /= 6.0 or
-        Fxa5a00.Small**1.0 /= Fxa5a00.Small
-      then
+        Gef."**" (6.0, 1.0) /= 6.0 or Fxa5a00.Small**1.0 /= Fxa5a00.Small then
          Report.Failed
            ("Incorrect results returned from the ""**"" " &
             "operator when the value of the exponent is 1.0");
@@ -258,9 +247,7 @@ begin
 
       if Gef."**" (Left => 1.0, Right => 16.0) /= 1.0 or
         Ef."**" (1.0, Right => Fxa5a00.Large) /= 1.0 or
-        Gef."**" (1.0, 3.0) /= 1.0 or
-        1.0**Fxa5a00.Small /= 1.0
-      then
+        Gef."**" (1.0, 3.0) /= 1.0 or 1.0**Fxa5a00.Small /= 1.0 then
          Report.Failed
            ("Incorrect results returned from the ""**"" " &
             "operator when the value of the operand is 1.0");
@@ -270,9 +257,7 @@ begin
 
       if Gef."**" (Left => 0.0, Right => 10.0) /= 0.0 or
         Ef."**" (0.0, Right => Fxa5a00.Large) /= 0.0 or
-        Gef."**" (0.0, 4.0) /= 0.0 or
-        0.0**Fxa5a00.Small /= 0.0
-      then
+        Gef."**" (0.0, 4.0) /= 0.0 or 0.0**Fxa5a00.Small /= 0.0 then
          Report.Failed
            ("Incorrect results returned from the ""**"" " &
             "operator when the value of the operand is 0.0");
@@ -287,12 +272,10 @@ begin
         not Result_Within_Range (Ef."**" (E, 5.0), 148.4, 0.1) or
         not Result_Within_Range (Ef."**" (10.0, E), 522.7, 0.1) or
         not Result_Within_Range (Ef."**" (E, (-3.0)), 0.050, 0.001) or
-        not Result_Within_Range (Gef."**" (10.0, (-2.0)), 0.010, 0.001)
-      then
+        not Result_Within_Range (Gef."**" (10.0, (-2.0)), 0.010, 0.001) then
          Report.Failed
            ("Incorrect results returned from the ""**"" " &
-            "operator with a variety of  operand and exponent " &
-            "values");
+            "operator with a variety of  operand and exponent " & "values");
       end if;
 
       -- Use the following loops to check for internal consistency between
@@ -306,17 +289,13 @@ begin
             for J in 0 .. 5 loop
                if not Incorrect_Inverse_Base_E and
                  not Fxa5a00.Result_Within_Range
-                   (Float (I)**Float (J),
-                    E**(Float (J) * Ef.Log (Float (I))),
+                   (Float (I)**Float (J), E**(Float (J) * Ef.Log (Float (I))),
                     Tc_Relative_Error)
                then
                   Incorrect_Inverse_Base_E := True;
                   Report.Failed
-                    ("Incorrect Log-** Inverse calc for Base e " &
-                     "with i= " &
-                     Integer'Image (I) &
-                     "  and j= " &
-                     Integer'Image (J));
+                    ("Incorrect Log-** Inverse calc for Base e " & "with i= " &
+                     Integer'Image (I) & "  and j= " & Integer'Image (J));
                end if;
                if not Incorrect_Inverse_Base_2 and
                  not Fxa5a00.Result_Within_Range
@@ -326,11 +305,8 @@ begin
                then
                   Incorrect_Inverse_Base_2 := True;
                   Report.Failed
-                    ("Incorrect Log-** Inverse calc for Base 2 " &
-                     "with i= " &
-                     Integer'Image (I) &
-                     "  and j= " &
-                     Integer'Image (J));
+                    ("Incorrect Log-** Inverse calc for Base 2 " & "with i= " &
+                     Integer'Image (I) & "  and j= " & Integer'Image (J));
                end if;
                if not Incorrect_Inverse_Base_8 and
                  not Fxa5a00.Result_Within_Range
@@ -340,11 +316,8 @@ begin
                then
                   Incorrect_Inverse_Base_8 := True;
                   Report.Failed
-                    ("Incorrect Log-** Inverse calc for Base 8 " &
-                     "with i= " &
-                     Integer'Image (I) &
-                     "  and j= " &
-                     Integer'Image (J));
+                    ("Incorrect Log-** Inverse calc for Base 8 " & "with i= " &
+                     Integer'Image (I) & "  and j= " & Integer'Image (J));
                end if;
                if not Incorrect_Inverse_Base_10 and
                  not Fxa5a00.Result_Within_Range
@@ -355,9 +328,7 @@ begin
                   Incorrect_Inverse_Base_10 := True;
                   Report.Failed
                     ("Incorrect Log-** Inverse calc for Base 10 " &
-                     "with i= " &
-                     Integer'Image (I) &
-                     "   and j= " &
+                     "with i= " & Integer'Image (I) & "   and j= " &
                      Integer'Image (J));
                end if;
                if not Incorrect_Inverse_Base_16 and
@@ -369,9 +340,7 @@ begin
                   Incorrect_Inverse_Base_16 := True;
                   Report.Failed
                     ("Incorrect Log-** Inverse calc for Base 16 " &
-                     "with i= " &
-                     Integer'Image (I) &
-                     "   and j= " &
+                     "with i= " & Integer'Image (I) & "   and j= " &
                      Integer'Image (J));
                end if;
             end loop;
@@ -407,8 +376,7 @@ begin
         not Result_Within_Range (Gef.Exp (-0.219_8), 0.803, 0.001) or
         not Result_Within_Range (Ef.Exp (-1.662_1), 0.190, 0.001) or
         not Result_Within_Range (Gef.Exp (-2.388_8), 0.092, 0.001) or
-        not Result_Within_Range (Ef.Exp (-5.441_5), 0.004, 0.001)
-      then
+        not Result_Within_Range (Ef.Exp (-5.441_5), 0.004, 0.001) then
          Report.Failed
            ("Incorrect result from Function Exp when provided " &
             "a variety of input parameter values");
@@ -421,45 +389,35 @@ begin
       while Arg < 10.0 loop
          if not Incorrect_Inverse_Base_E and
            Fxa5a00.Result_Within_Range
-             (Ef.Exp (Arg),
-              E**(Arg * Ef.Log (Arg)),
-              0.001)
+             (Ef.Exp (Arg), E**(Arg * Ef.Log (Arg)), 0.001)
          then
             Incorrect_Inverse_Base_E := True;
             Report.Failed ("Incorrect Exp-** Inverse calc for Base e");
          end if;
          if not Incorrect_Inverse_Base_2 and
            Fxa5a00.Result_Within_Range
-             (Ef.Exp (Arg),
-              2.0**(Arg * Ef.Log (Arg, 2.0)),
-              0.001)
+             (Ef.Exp (Arg), 2.0**(Arg * Ef.Log (Arg, 2.0)), 0.001)
          then
             Incorrect_Inverse_Base_2 := True;
             Report.Failed ("Incorrect Exp-** Inverse calc for Base 2");
          end if;
          if not Incorrect_Inverse_Base_8 and
            Fxa5a00.Result_Within_Range
-             (Ef.Exp (Arg),
-              8.0**(Arg * Ef.Log (Arg, 8.0)),
-              0.001)
+             (Ef.Exp (Arg), 8.0**(Arg * Ef.Log (Arg, 8.0)), 0.001)
          then
             Incorrect_Inverse_Base_8 := True;
             Report.Failed ("Incorrect Exp-** Inverse calc for Base 8");
          end if;
          if not Incorrect_Inverse_Base_10 and
            Fxa5a00.Result_Within_Range
-             (Ef.Exp (Arg),
-              10.0**(Arg * Ef.Log (Arg, 10.0)),
-              0.001)
+             (Ef.Exp (Arg), 10.0**(Arg * Ef.Log (Arg, 10.0)), 0.001)
          then
             Incorrect_Inverse_Base_10 := True;
             Report.Failed ("Incorrect Exp-** Inverse calc for Base 10");
          end if;
          if not Incorrect_Inverse_Base_16 and
            Fxa5a00.Result_Within_Range
-             (Ef.Exp (Arg),
-              16.0**(Arg * Ef.Log (Arg, 16.0)),
-              0.001)
+             (Ef.Exp (Arg), 16.0**(Arg * Ef.Log (Arg, 16.0)), 0.001)
          then
             Incorrect_Inverse_Base_16 := True;
             Report.Failed ("Incorrect Exp-** Inverse calc for Base 16");
@@ -477,8 +435,7 @@ begin
          Float_Result := Ef.Sqrt (X => -Fxa5a00.Small);
          Report.Failed
            ("Argument_Error not raised by Function Sqrt " &
-            "when provided a small negative input parameter " &
-            "value");
+            "when provided a small negative input parameter " & "value");
          Dont_Optimize_Float (Float_Result, 7);
       exception
          when Argument_Error =>
@@ -486,16 +443,14 @@ begin
          when others =>
             Report.Failed
               ("Unexpected exception raised by Function Sqrt " &
-               "when provided a small negative input parameter " &
-               "value");
+               "when provided a small negative input parameter " & "value");
       end;
 
       begin
          New_Float_Result := Gef.Sqrt (X => -64.0);
          Report.Failed
            ("Argument_Error not raised by Function Sqrt " &
-            "when provided a large negative input parameter " &
-            "value");
+            "when provided a large negative input parameter " & "value");
          Dont_Optimize_New_Float (New_Float_Result, 8);
       exception
          when Argument_Error =>
@@ -503,8 +458,7 @@ begin
          when others =>
             Report.Failed
               ("Unexpected exception raised by Function Sqrt " &
-               "when provided a large negative input parameter " &
-               "value");
+               "when provided a large negative input parameter " & "value");
       end;
 
       -- Check that the Sqrt Function, when given an X parameter value of 0.0,
@@ -534,8 +488,7 @@ begin
         not Fxa5a00.Result_Within_Range (Ef.Sqrt (32.820_8), 5.73, 0.01) or
         not Fxa5a00.Result_Within_Range (Ef.Sqrt (27_851.0), 166.9, 0.1) or
         not Fxa5a00.Result_Within_Range (Ef.Sqrt (61_203.4), 247.4, 0.1) or
-        not Fxa5a00.Result_Within_Range (Ef.Sqrt (655_891.0), 809.9, 0.1)
-      then
+        not Fxa5a00.Result_Within_Range (Ef.Sqrt (655_891.0), 809.9, 0.1) then
          Report.Failed
            ("Incorrect result from Function Sqrt when provided " &
             "a variety of input parameter values");
@@ -547,33 +500,26 @@ begin
       while Arg < 10.0 loop
          if not Flag_1 and
            not Fxa5a00.Result_Within_Range
-             (Arg,
-              Ef.Sqrt (Arg) * Ef.Sqrt (Arg),
-              0.01)
+             (Arg, Ef.Sqrt (Arg) * Ef.Sqrt (Arg), 0.01)
          then
             Report.Failed ("Inconsistency found in Case 1");
             Flag_1 := True;
          end if;
          if not Flag_2 and
-           not Fxa5a00.Result_Within_Range (Arg, Ef.Sqrt (Arg)**2.0, 0.01)
-         then
+           not Fxa5a00.Result_Within_Range (Arg, Ef.Sqrt (Arg)**2.0, 0.01) then
             Report.Failed ("Inconsistency found in Case 2");
             Flag_2 := True;
          end if;
          if not Flag_3 and
            not Fxa5a00.Result_Within_Range
-             (Ef.Log (Arg),
-              Ef.Log (Sqrt (Arg)**2.0),
-              0.01)
+             (Ef.Log (Arg), Ef.Log (Sqrt (Arg)**2.0), 0.01)
          then
             Report.Failed ("Inconsistency found in Case 3");
             Flag_3 := True;
          end if;
          if not Flag_4 and
            not Fxa5a00.Result_Within_Range
-             (Ef.Log (Arg),
-              2.00 * Ef.Log (Ef.Sqrt (Arg)),
-              0.01)
+             (Ef.Log (Arg), 2.00 * Ef.Log (Ef.Sqrt (Arg)), 0.01)
          then
             Report.Failed ("Inconsistency found in Case 4");
             Flag_4 := True;
@@ -584,8 +530,7 @@ begin
    exception
       when The_Error : others =>
          Report.Failed
-           ("The following exception was raised in the " &
-            "Test_Block: " &
+           ("The following exception was raised in the " & "Test_Block: " &
             Exception_Name (The_Error));
    end Test_Block;
 

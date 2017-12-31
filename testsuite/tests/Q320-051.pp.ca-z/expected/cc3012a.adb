@@ -224,11 +224,8 @@ begin
          Vdc := E5;
          Ve  := E2;
          Vb  := E2;
-         if Vi /= 1 or
-           Vdc /= 'M' or
-           Ve /= Enum'Val (Ident_Int (1)) or
-           Vb /= False
-         then
+         if Vi /= 1 or Vdc /= 'M' or Ve /= Enum'Val (Ident_Int (1)) or
+           Vb /= False then
             Failed
               ("OVERLOADING OF ENUMERATION LITERALS " &
                "AND PREDEFINED SUBPROGRAMS");

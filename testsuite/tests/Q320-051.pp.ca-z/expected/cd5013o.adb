@@ -59,8 +59,7 @@ procedure Cd5013o is
          " IN THE PRIVATE PART OF A PACKAGE " &
          "SPECIFICATION FOR A VARIABLE OF A " &
          "PRIVATE TYPE, WHERE THE VARIABLE IS " &
-         "DECLARED IN THE VISIBLE PART OF THE " &
-         "SPECIFICATION");
+         "DECLARED IN THE VISIBLE PART OF THE " & "SPECIFICATION");
    end P1;
 
    package body Pack is

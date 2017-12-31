@@ -12,8 +12,7 @@ begin
       "Check that the characteristics of a type " &
       "derived from a private extension (outside " &
       "the scope of the full view) are those " &
-      "defined by the partial view of the private " &
-      "extension");
+      "defined by the partial view of the private " & "extension");
 
    Check_Your_Cards :
    declare

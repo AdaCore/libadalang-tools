@@ -50,9 +50,7 @@ begin
          Aa : Array_Type (Bound .. 6);
       end record;
       Rec : Record_Type (Bound => Ident_Int (4)) :=
-        (Bound => 4,
-         B     => True,
-         A     => (1 .. Ident_Int (4) => 6),
+        (Bound => 4, B => True, A => (1 .. Ident_Int (4) => 6),
          Aa    => (4 .. 6 => 8));
       Bool : Boolean;
 

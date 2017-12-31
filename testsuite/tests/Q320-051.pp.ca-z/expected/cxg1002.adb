@@ -74,9 +74,7 @@ begin
 
       Complex_Zero : constant Complex_Pack.Complex := (0.0, 0.0);
 
-      Tc_Complex,
-      Tc_Complex_Right,
-      Tc_Complex_Left : Complex_Pack.Complex :=
+      Tc_Complex, Tc_Complex_Right, Tc_Complex_Left : Complex_Pack.Complex :=
         Complex_Zero;
 
       Tc_Real : Real_Type := 0.0;
@@ -94,12 +92,9 @@ begin
 
       if Im ("+" (Left => Tc_Complex, Right => Tc_Real)) /= 3.0 or
         Im ("+" (Tc_Complex, 6.0)) /= 3.0 or
-        Im (Tc_Complex + Tc_Real) /= 3.0 or
-        Im (Tc_Complex + 5.0) /= 3.0 or
-        Im ((7.0, 2.0) + 1.0) /= 2.0 or
-        Im ((7.0, 5.0) + (-2.0)) /= 5.0 or
-        Im ((-7.0, -2.0) + 1.0) /= -2.0 or
-        Im ((-7.0, -3.0) + (-3.0)) /= -3.0
+        Im (Tc_Complex + Tc_Real) /= 3.0 or Im (Tc_Complex + 5.0) /= 3.0 or
+        Im ((7.0, 2.0) + 1.0) /= 2.0 or Im ((7.0, 5.0) + (-2.0)) /= 5.0 or
+        Im ((-7.0, -2.0) + 1.0) /= -2.0 or Im ((-7.0, -3.0) + (-3.0)) /= -3.0
       then
          Report.Failed
            ("Incorrect results from Function ""+"" with " &
@@ -108,12 +103,9 @@ begin
 
       if Im ("+" (Left => Tc_Real, Right => Tc_Complex)) /= 3.0 or
         Im ("+" (4.0, Tc_Complex)) /= 3.0 or
-        Im (Tc_Real + Tc_Complex) /= 3.0 or
-        Im (9.0 + Tc_Complex) /= 3.0 or
-        Im (1.0 + (7.0, -9.0)) /= -9.0 or
-        Im ((-2.0) + (7.0, 2.0)) /= 2.0 or
-        Im (1.0 + (-7.0, -5.0)) /= -5.0 or
-        Im ((-3.0) + (-7.0, 16.0)) /= 16.0
+        Im (Tc_Real + Tc_Complex) /= 3.0 or Im (9.0 + Tc_Complex) /= 3.0 or
+        Im (1.0 + (7.0, -9.0)) /= -9.0 or Im ((-2.0) + (7.0, 2.0)) /= 2.0 or
+        Im (1.0 + (-7.0, -5.0)) /= -5.0 or Im ((-3.0) + (-7.0, 16.0)) /= 16.0
       then
          Report.Failed
            ("Incorrect results from Function ""+"" with " &
@@ -129,12 +121,9 @@ begin
 
       if Im ("-" (Left => Tc_Complex, Right => Tc_Real)) /= -4.0 or
         Im ("-" (Tc_Complex, 5.0)) /= -4.0 or
-        Im (Tc_Complex - Tc_Real) /= -4.0 or
-        Im (Tc_Complex - 4.0) /= -4.0 or
-        Im ((6.0, 5.0) - 1.0) /= 5.0 or
-        Im ((6.0, 13.0) - 7.0) /= 13.0 or
-        Im ((-5.0, 3.0) - (2.0)) /= 3.0 or
-        Im ((-5.0, -6.0) - (-3.0)) /= -6.0
+        Im (Tc_Complex - Tc_Real) /= -4.0 or Im (Tc_Complex - 4.0) /= -4.0 or
+        Im ((6.0, 5.0) - 1.0) /= 5.0 or Im ((6.0, 13.0) - 7.0) /= 13.0 or
+        Im ((-5.0, 3.0) - (2.0)) /= 3.0 or Im ((-5.0, -6.0) - (-3.0)) /= -6.0
       then
          Report.Failed
            ("Incorrect results from Function ""-"" with " &
@@ -152,8 +141,7 @@ begin
         Re ((-8.0, 5.0) + (2.0 * I)) /= -8.0 or
         Re ((2.0, 5.0) + (-2.0 * I)) /= 2.0 or
         Re ((-20.0, -5.0) + (3.0 * I)) /= -20.0 or
-        Re ((6.0, -5.0) + (-3.0 * I)) /= 6.0
-      then
+        Re ((6.0, -5.0) + (-3.0 * I)) /= 6.0 then
          Report.Failed
            ("Incorrect results from Function ""+"" with " &
             "one Complex and one Imaginary argument");
@@ -169,8 +157,7 @@ begin
         Re ((-4.0, 4.0) - (2.0 * I)) /= -4.0 or
         Re ((9.0, 4.0) - (5.0 * I)) /= 9.0 or
         Re ((16.0, -5.0) - (3.0 * I)) /= 16.0 or
-        Re ((-3.0, -5.0) - (-4.0 * I)) /= -3.0
-      then
+        Re ((-3.0, -5.0) - (-4.0 * I)) /= -3.0 then
          Report.Failed
            ("Incorrect results from Function ""-"" with " &
             "one Complex and one Imaginary argument");
@@ -183,10 +170,8 @@ begin
 
       Tc_Complex := Complex_Pack."+" (5.0, Complex_Pack.I);
 
-      if Tc_Complex /= (5.0, 1.0) or
-        (4.0 + I) /= (4.0, 1.0) or
-        "+" (Left => J, Right => 3.0) /= (3.0, 1.0)
-      then
+      if Tc_Complex /= (5.0, 1.0) or (4.0 + I) /= (4.0, 1.0) or
+        "+" (Left => J, Right => 3.0) /= (3.0, 1.0) then
          Report.Failed
            ("Incorrect results from Function ""+"" with " &
             "one Real and one Imaginary argument");

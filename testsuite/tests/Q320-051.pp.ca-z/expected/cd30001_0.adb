@@ -33,8 +33,7 @@ package body Cd30001_0 is
       end if;
 
       if Array_W_Aliased_Comps_Ref_Conv.To_Pointer (Aliased_Object'Address) /=
-        Aliased_Object'Unchecked_Access
-      then
+        Aliased_Object'Unchecked_Access then
          Report.Failed
            ("'Unchecked_Access does not match expected address value");
       end if;
@@ -42,8 +41,7 @@ package body Cd30001_0 is
       -- Check the element Aliased_Object(1)
 
       if Data_Ref_Conv.To_Address (Aliased_Object (1)'Access) /=
-        Aliased_Object (1)'Address
-      then
+        Aliased_Object (1)'Address then
          Report.Failed
            ("Array element 'Access does not match expected address value");
       end if;
@@ -51,8 +49,7 @@ package body Cd30001_0 is
       -- Check that Array'Address points at the first component...
 
       if Array_W_Aliased_Comps_Ref_Conv.To_Address (Aliased_Object'Access) /=
-        Aliased_Object (1)'Address
-      then
+        Aliased_Object (1)'Address then
          Report.Failed
            ("Address of array object does not equal address of first component");
       end if;
@@ -61,8 +58,7 @@ package body Cd30001_0 is
 
       if Simple_Enum_Type_Ref_Conv.To_Address
           (Aliased_Object (2).Aliased_Comp_1'Unchecked_Access) not in
-          System.Address
-      then
+          System.Address then
          Report.Failed ("Component 2 'Unchecked_Access not a valid address");
       end if;
 
@@ -83,24 +79,21 @@ package body Cd30001_0 is
       -- Check the object Specific_Object
 
       if System.Storage_Elements.To_Integer (Specific_Object'Address) /=
-        System.Storage_Elements.To_Integer (Spprt13.Variable_Address2)
-      then
+        System.Storage_Elements.To_Integer (Spprt13.Variable_Address2) then
          Report.Failed
            ("Specific_Object not at address specified in representation clause");
       end if;
 
       if Array_W_Aliased_Comps_Ref_Conv.To_Pointer
           (Spprt13.Variable_Address2) /=
-        Specific_Object'Unchecked_Access
-      then
+        Specific_Object'Unchecked_Access then
          Report.Failed ("Specific_Object'Unchecked_Access not expected value");
       end if;
 
       -- Check the element Specific_Object(1)
 
       if Data_Ref_Conv.To_Address (Specific_Object (1)'Access) /=
-        Specific_Object (1)'Address
-      then
+        Specific_Object (1)'Address then
          Report.Failed
            ("Specific Array element 'Access does not correspond to the " &
             "elements 'Address");
@@ -109,8 +102,7 @@ package body Cd30001_0 is
       -- Check that Array'Address points at the first component...
 
       if Array_W_Aliased_Comps_Ref_Conv.To_Address (Specific_Object'Access) /=
-        Specific_Object (1)'Address
-      then
+        Specific_Object (1)'Address then
          Report.Failed
            ("Address of array object does not equal address of first component");
       end if;
@@ -119,8 +111,7 @@ package body Cd30001_0 is
 
       if Simple_Enum_Type_Ref_Conv.To_Address
           (Specific_Object (1).Aliased_Comp_1'Access) not in
-          System.Address
-      then
+          System.Address then
          Report.Failed
            ("Access value of first record component for object at " &
             "specific address not a valid address");
@@ -143,9 +134,8 @@ package body Cd30001_0 is
 
    Tagged_Object : Tagged_But_Not_Exciting;
 
-   procedure Muck_With_Addresses
-     (It          : in out Tagged_But_Not_Exciting;
-      Its_Address : in     System.Address)
+   procedure Muck_With_Addresses (It : in out Tagged_But_Not_Exciting;
+      Its_Address                    : in     System.Address)
    is
    begin
       if It'Address /= Its_Address then

@@ -10,14 +10,8 @@ procedure Cxc7001 is
    -- locations for task objects and their unique identities.
 
    type Indicators is
-     (Simple_Object,
-      Array_Element_1,
-      Array_Element_2,
-      Embedded_Object_1,
-      Embedded_Object_2,
-      Designated_Object_1,
-      Designated_Object_2,
-      Main_Task,
+     (Simple_Object, Array_Element_1, Array_Element_2, Embedded_Object_1,
+      Embedded_Object_2, Designated_Object_1, Designated_Object_2, Main_Task,
       No_Task);
 
    type Id_List is array (Indicators) of Ada.Task_Identification.Task_Id;
@@ -41,9 +35,8 @@ procedure Cxc7001 is
 
    -- test support software:
 
-   procedure Tc_Match_States
-     (A_Task : in Cxc7001_0.Task_Type;
-      Item   : in Indicators)
+   procedure Tc_Match_States (A_Task : in Cxc7001_0.Task_Type;
+      Item                           : in Indicators)
    is
       -- check that the calls to the package interface return the same values
       -- as the corresponding attributes
@@ -181,9 +174,7 @@ begin  -- Main test procedure.
       for Tx in Indicators'Succ (Ti) .. Main_Task loop
          if The_Ids (Ti) = The_Ids (Tx) then
             Report.Failed
-              ("same ID for " &
-               Indicators'Image (Ti) &
-               " and " &
+              ("same ID for " & Indicators'Image (Ti) & " and " &
                Indicators'Image (Tx));
          end if;
       end loop;

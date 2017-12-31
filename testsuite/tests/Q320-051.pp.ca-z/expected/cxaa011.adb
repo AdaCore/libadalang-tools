@@ -82,8 +82,7 @@ begin
       -- exception will be handled to produce a Not_Applicable result.
 
       Text_Io.Create
-        (File => Status_Log,
-         Mode => Text_Io.Out_File,
+        (File => Status_Log, Mode => Text_Io.Out_File,
          Name => Status_Log_Filename);
    exception
 
@@ -124,15 +123,11 @@ begin
       -- enumeration literal Upper_Case.
       begin
          Day_Io.Put
-           (File => Status_Log,
-            Item => Reading.Day,
+           (File => Status_Log, Item => Reading.Day,
             Set  => Type_Set'(Upper_Case));
          Hours_Io.Put (Status_Log, Reading.Hour, 7);
          Status_Io.Put
-           (Status_Log,
-            Reading.Status,
-            Width => 8,
-            Set   => Lower_Case);
+           (Status_Log, Reading.Status, Width => 8, Set => Lower_Case);
          Text_Io.New_Line (Status_Log);
          return (True);
       exception
@@ -224,8 +219,7 @@ begin
 
          if (Tc_Reading2.Day /= Evening_Reading.Day) or
            (Tc_Reading2.Hour /= Evening_Reading.Hour) or
-           (Tc_Reading2.Status /= Evening_Reading.Status)
-         then
+           (Tc_Reading2.Status /= Evening_Reading.Status) then
             Report.Failed ("Data error on reading second record");
          end if;
 

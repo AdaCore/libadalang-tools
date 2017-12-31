@@ -81,8 +81,7 @@ begin
    Report.Test
      ("CXB3014",
       "Check that versions of the Value function " &
-      "from package Interfaces.C.Pointers produce " &
-      "correct results");
+      "from package Interfaces.C.Pointers produce " & "correct results");
 
    Test_Block :
    declare
@@ -114,8 +113,7 @@ begin
       Tc_Char_Array_4 : Interfaces.C.Char_Array (Char_Range);
 
       package Char_Pointers is new Interfaces.C.Pointers
-        (Index              => Interfaces.C.Size_T,
-         Element            => Interfaces.C.Char,
+        (Index => Interfaces.C.Size_T, Element => Interfaces.C.Char,
          Element_Array      => Interfaces.C.Char_Array,
          Default_Terminator => Interfaces.C.Nul);
 
@@ -139,8 +137,7 @@ begin
         Char_Pointers.Value (Ref => Char_Ptr, Terminator => Char_J);
 
       if Interfaces.C.To_Ada (Tc_Char_Array_1, False) /= Tc_String_1 or
-        Interfaces.C.Is_Nul_Terminated (Tc_Char_Array_1)
-      then
+        Interfaces.C.Is_Nul_Terminated (Tc_Char_Array_1) then
          Report.Failed
            ("Incorrect result from Function Value with Ref " &
             "and Terminator parameters, when supplied with " &
@@ -154,8 +151,7 @@ begin
       Tc_Char_Array_2 := Char_Pointers.Value (Char_Ptr);
 
       if Interfaces.C.To_Ada (Tc_Char_Array_2, True) /= Tc_String_2 or
-        not Interfaces.C.Is_Nul_Terminated (Tc_Char_Array_2)
-      then
+        not Interfaces.C.Is_Nul_Terminated (Tc_Char_Array_2) then
          Report.Failed
            ("Incorrect result from Function Value with Ref " &
             "and Terminator parameters, when using the " &
@@ -171,14 +167,12 @@ begin
 
       Tc_Char_Array_3 :=
         Char_Pointers.Value
-          (Ref    => Char_Ptr,
-           Length => Interfaces.C.Ptrdiff_T (Tc_Array_Size));
+          (Ref => Char_Ptr, Length => Interfaces.C.Ptrdiff_T (Tc_Array_Size));
 
       -- Verify the individual chars of the result.
       for I in 0 .. Tc_Array_Size - 1 loop
          if Interfaces.C.To_Ada (Tc_Char_Array_3 (I)) /=
-           Tc_String_3 (Integer (I) + 1)
-         then
+           Tc_String_3 (Integer (I) + 1) then
             Report.Failed
               ("Incorrect result from Function Value with " &
                "Ref and Length parameters, when specifying " &
@@ -193,8 +187,7 @@ begin
       Tc_Char_Array_4 := Char_Pointers.Value (Char_Ptr, 27);
 
       if Interfaces.C.To_Ada (Tc_Char_Array_4, True) /= Tc_String_4 or
-        not Interfaces.C.Is_Nul_Terminated (Tc_Char_Array_4)
-      then
+        not Interfaces.C.Is_Nul_Terminated (Tc_Char_Array_4) then
          Report.Failed
            ("Incorrect result from Function Value with Ref " &
             "and Length parameters, when specifying the " &
@@ -231,8 +224,7 @@ begin
       begin
          Tc_Char_Array_3 :=
            Char_Pointers.Value
-             (Char_Ptr,
-              Interfaces.C.Ptrdiff_T (Tc_Array_Size));
+             (Char_Ptr, Interfaces.C.Ptrdiff_T (Tc_Array_Size));
          Report.Failed
            ("Dereference_Error not raised by Function " &
             "Value with Length parameter, when provided " &

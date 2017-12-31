@@ -133,8 +133,7 @@ begin
 
          if Count_Nbr_Of_Reads /= Expected_Count then
             Failed
-              ("THE BAD VALUE FOR COUNT_NBR_OF_READS " &
-               "IS " &
+              ("THE BAD VALUE FOR COUNT_NBR_OF_READS " & "IS " &
                Natural'Image (Count_Nbr_Of_Reads));
          end if;
 

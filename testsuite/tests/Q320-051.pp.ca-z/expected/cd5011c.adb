@@ -47,10 +47,8 @@ procedure Cd5011c is
    begin
       Test
         ("CD5011C",
-         "AN ADDRESS CLAUSE CAN BE " &
-         "GIVEN FOR A VARIABLE OF AN INTEGER " &
-         "TYPE IN THE DECLARATIVE PART OF A " &
-         "PACKAGE BODY");
+         "AN ADDRESS CLAUSE CAN BE " & "GIVEN FOR A VARIABLE OF AN INTEGER " &
+         "TYPE IN THE DECLARATIVE PART OF A " & "PACKAGE BODY");
 
       if Equal (3, 3) then
          Int := 5;

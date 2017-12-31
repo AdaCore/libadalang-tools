@@ -42,9 +42,7 @@ procedure Cxe4006_B is
       Start_Test (1_001);  -- not remote
       Root_Obj.Common_Record_Field := 100;
       Single_Controlling_Operand
-        (Root_Tagged_Type'Class (Root_Obj),
-         1_001,
-         Callee);
+        (Root_Tagged_Type'Class (Root_Obj), 1_001, Callee);
       if Root_Obj.Common_Record_Field /= 105 then
          Report.Failed
            ("test 1001 expected 105 received" &
@@ -58,9 +56,7 @@ procedure Cxe4006_B is
       Start_Test (1_002);  -- remote
       A1_1_Obj.Common_Record_Field := 110;
       Single_Controlling_Operand
-        (Root_Tagged_Type'Class (A1_1_Obj),
-         1_002,
-         Callee);
+        (Root_Tagged_Type'Class (A1_1_Obj), 1_002, Callee);
       if A1_1_Obj.Common_Record_Field /= 116 then
          Report.Failed
            ("test 1002 expected 116 received" &
@@ -74,9 +70,7 @@ procedure Cxe4006_B is
       Start_Test (1_003);  -- remote
       A1_2_Obj.Common_Record_Field := 120;
       Single_Controlling_Operand
-        (Root_Tagged_Type'Class (A1_2_Obj),
-         1_003,
-         Callee);
+        (Root_Tagged_Type'Class (A1_2_Obj), 1_003, Callee);
       if A1_2_Obj.Common_Record_Field /= 127 then
          Report.Failed
            ("test 1003 expected 127 received" &
@@ -91,9 +85,7 @@ procedure Cxe4006_B is
       A2_Obj.Common_Record_Field := 130;
       A2_Obj.A2_Component        := "12345678901234567890";
       Single_Controlling_Operand
-        (Root_Tagged_Type'Class (A2_Obj),
-         1_004,
-         Callee);
+        (Root_Tagged_Type'Class (A2_Obj), 1_004, Callee);
       if A2_Obj.Common_Record_Field /= 138 then
          Report.Failed
            ("test 1004 expected 138 received" &
@@ -107,9 +99,7 @@ procedure Cxe4006_B is
       Start_Test (1_005);
       B_Obj.Common_Record_Field := 140;
       Single_Controlling_Operand
-        (Root_Tagged_Type'Class (B_Obj),
-         1_005,
-         Callee);
+        (Root_Tagged_Type'Class (B_Obj), 1_005, Callee);
       if B_Obj.Common_Record_Field /= 149 then
          Report.Failed
            ("test 1005 expected 149 received" &

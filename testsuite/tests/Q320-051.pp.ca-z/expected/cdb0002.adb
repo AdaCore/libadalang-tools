@@ -94,8 +94,7 @@ begin
    Report.Test
      ("CDB0002",
       "Check that operations on values of an access " &
-      "Type are not affected if Storage_Size is " &
-      "specified for the Type");
+      "Type are not affected if Storage_Size is " & "specified for the Type");
 
    Check_Param1 := new Maintype'(25, 35, 45);
    Check_Param2 := new Maintype'(25, 35, 45);
@@ -105,8 +104,7 @@ begin
    if Acc_Type'Storage_Size < Basic_Size then
       Report.Failed ("Incorrect value for access type Storage_Size - 1");
    elsif Acc_Type'Storage_Size >
-     Basic_Size + Impdef.Maximum_Adjustment_To_Specified_Storage_Size
-   then
+     Basic_Size + Impdef.Maximum_Adjustment_To_Specified_Storage_Size then
       Report.Failed ("Incorrect value for access type Storage_Size - 2");
    end if;
 
@@ -205,8 +203,7 @@ begin
 
             for I in 1 .. Place loop
                if I mod 2 = 1
-                 and then
-                   Ident_Char (Acc_Array (I).all) /=
+                 and then Ident_Char (Acc_Array (I).all) /=
                    Character'Val (I mod Ident_Int (128))
                then
                   Report.Failed ("Incorrect value in array");

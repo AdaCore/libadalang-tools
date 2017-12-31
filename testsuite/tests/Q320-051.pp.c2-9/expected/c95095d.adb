@@ -39,8 +39,7 @@ procedure C95095d is
 
 begin
    Test
-     ("C95095D",
-      "SUBPROGRAM/ENTRY OVERLOADING WITH " & "MINIMAL DIFFERENCES");
+     ("C95095D", "SUBPROGRAM/ENTRY OVERLOADING WITH " & "MINIMAL DIFFERENCES");
 
    --------------------------------------------------
 
@@ -82,8 +81,7 @@ begin
 
       if S /= "AB" then
          Failed
-           ("PROCEDURES/ENTRIES " &
-            "DIFFERING ONLY IN PARAMETER " &
+           ("PROCEDURES/ENTRIES " & "DIFFERING ONLY IN PARAMETER " &
             "TYPE ORDER CAUSED CONFUSION");
       end if;
    end;

@@ -23,11 +23,9 @@ procedure C760002 is
       S := T;
 
       Tctouch.Assert
-        ((S.Last_Proc_Called = C760002_1.Adj),
-         "Adjust for simple object");
+        ((S.Last_Proc_Called = C760002_1.Adj), "Adjust for simple object");
       Tctouch.Assert
-        ((S.My_Id = T.My_Id),
-         "Assignment failed for simple object");
+        ((S.My_Id = T.My_Id), "Assignment failed for simple object");
 
       -- Check that adjust was called
       Tctouch.Assert ((S.Visit_Tag = 'A'), "Adjust timing incorrect");
@@ -93,8 +91,7 @@ procedure C760002 is
       -- check results of declarations
       for N in 1 .. 4 loop
          Tctouch.Assert
-           (Left (N).My_Id < Now,
-            "Initialize for array initial value");
+           (Left (N).My_Id < Now, "Initialize for array initial value");
          Tctouch.Assert
            (Overlap (N).My_Id < Now,
             "Adjust for nested array (outer) initial value");
@@ -165,8 +162,7 @@ procedure C760002 is
       Tctouch.Assert (C.Nested.Visit_Tag = 'I', "NC Allocation, Nested");
       Tctouch.Assert (D.Visit_Tag = 'A', "NC Allocation, with value");
       Tctouch.Assert
-        (D.Nested.Visit_Tag = 'A',
-         "NC Allocation, Nested, with value");
+        (D.Nested.Visit_Tag = 'A', "NC Allocation, Nested, with value");
 
       Tctouch.Assert (E.Visit_Tag = 'i', "TL Allocation");
       Tctouch.Assert (F.Visit_Tag = 'i', "NL Allocation");
@@ -223,8 +219,7 @@ begin  -- Main test procedure.
       "object is assigned.  Check that Adjust is " &
       "called for components before the containing " &
       "object is adjusted.  Check that Adjust is not " &
-      "called for a Limited_Controlled type by the " &
-      "implementation");
+      "called for a Limited_Controlled type by the " & "implementation");
 
    Check_Simple_Objects;
 

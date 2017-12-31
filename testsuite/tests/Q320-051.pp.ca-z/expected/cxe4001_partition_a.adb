@@ -75,8 +75,7 @@ package body Cxe4001_Partition_A is
            ("Check that an exception declared in this partition" &
             " and not visible to the other partition is properly" &
             " handled when it propagates from this partition," &
-            " through the other partition, and back to this" &
-            " partition.");
+            " through the other partition, and back to this" & " partition.");
       end if;
       Cxe4001_Partition_B.Call_A_Raise_Invisible_1;
       Report.Failed ("Local exception was not propagated across partitions");
@@ -98,8 +97,7 @@ package body Cxe4001_Partition_A is
             " and not visible to the other partition is properly" &
             " handled when it propagates from this partition," &
             " is handled and then re-raised in the other" &
-            " partition, and propagated back to this" &
-            " partition.");
+            " partition, and propagated back to this" & " partition.");
       end if;
       Cxe4001_Partition_B.Call_A_Raise_Invisible_2;
       Report.Failed

@@ -63,8 +63,7 @@ begin
       "raised when an attempt is made to check " &
       "for the end of a line or page using the " &
       "predefined functions End_Of_Line or " &
-      "End_Of_Page on a text file with mode " &
-      "Append_File");
+      "End_Of_Page on a text file with mode " & "Append_File");
 
    Test_For_Text_Io_Support :
    begin

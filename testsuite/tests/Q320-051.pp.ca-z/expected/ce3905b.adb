@@ -48,8 +48,7 @@ begin
    Test
      ("CE3905B",
       "CHECK THAT ENUMERATION_IO GET RAISES " &
-      "MODE_ERROR WHEN THE MODE OF THE FILE IS " &
-      "OUT_FILE");
+      "MODE_ERROR WHEN THE MODE OF THE FILE IS " & "OUT_FILE");
 
    declare
       Ft : File_Type;
@@ -65,8 +64,7 @@ begin
          when Use_Error =>
             Not_Applicable
               ("USE_ERROR RAISED; TEXT CREATE " &
-               "FOR TEMP FILES WITH OUT_FILE " &
-               "MODE");
+               "FOR TEMP FILES WITH OUT_FILE " & "MODE");
             raise Incomplete;
       end;
 

@@ -2,8 +2,7 @@ package body C3a0015_0 is
 
    use System;
 
-   procedure Allocate
-     (Pool                     : in out C3a0015_0.Pool;
+   procedure Allocate (Pool    : in out C3a0015_0.Pool;
       Storage_Address          :    out System.Address;
       Size_In_Storage_Elements : in     Storage_Count;
       Alignment                : in     Storage_Count)
@@ -20,23 +19,19 @@ package body C3a0015_0 is
          Storage_Address :=
            Pool.Contents (Pool.First_Free + Alignment - Unalignment)'Address;
          Pool.First_Free :=
-           Pool.First_Free +
-           Size_In_Storage_Elements +
-           Alignment -
+           Pool.First_Free + Size_In_Storage_Elements + Alignment -
            Unalignment;
       end if;
    end Allocate;
 
-   procedure Deallocate
-     (Pool                     : in out C3a0015_0.Pool;
+   procedure Deallocate (Pool  : in out C3a0015_0.Pool;
       Storage_Address          : in     System.Address;
       Size_In_Storage_Elements : in     Storage_Count;
       Alignment                : in     Storage_Count)
    is
    begin
       if Storage_Address + Size_In_Storage_Elements =
-        Pool.Contents (Pool.First_Free)'Address
-      then
+        Pool.Contents (Pool.First_Free)'Address then
          -- Only deallocate if the block is at the end.
          Pool.First_Free := Pool.First_Free - Size_In_Storage_Elements;
       end if;

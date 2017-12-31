@@ -35,8 +35,7 @@ procedure C37107a is
    begin
       if not B then
          Failed
-           ("DEFAULT DISCRIMINANT EVALUATED " &
-            "UNNECESSARILY - " &
+           ("DEFAULT DISCRIMINANT EVALUATED " & "UNNECESSARILY - " &
             Integer'Image (I));
       end if;
 
@@ -47,8 +46,7 @@ begin
    Test
      ("C37107A",
       "CHECK THAT A DEFAULT DISCRIMINANT " &
-      "EXPRESSION NEED NOT BE STATIC AND IS " &
-      "EVALUATED ONLY WHEN NEEDED");
+      "EXPRESSION NEED NOT BE STATIC AND IS " & "EVALUATED ONLY WHEN NEEDED");
 
    declare
       type Rec1 (D : Integer := F (True, 1)) is record

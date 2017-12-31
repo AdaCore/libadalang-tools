@@ -2,9 +2,8 @@
 
 package body Ca11018_0.Ca11018_2 is
 
-   procedure Copy
-     (From_The_Word  : in     Message;
-      To_The_Message : in out Message_Type)
+   procedure Copy (From_The_Word : in     Message;
+      To_The_Message             : in out Message_Type)
    is
 
    -- Copy words to the appropriate messages.

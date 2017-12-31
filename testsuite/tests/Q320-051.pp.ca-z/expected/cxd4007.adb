@@ -454,9 +454,7 @@ begin
       for I in Failed'Range loop
          if Failed (I) then
             Report.Failed
-              ("entry" &
-               Integer'Image (I) &
-               " processed out of order after" &
+              ("entry" & Integer'Image (I) & " processed out of order after" &
                Integer'Image (Predecessor (I)));
          end if;
       end loop;

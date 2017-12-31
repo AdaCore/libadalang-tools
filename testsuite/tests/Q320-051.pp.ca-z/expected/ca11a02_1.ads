@@ -4,10 +4,8 @@ with Fa11a00.Ca11a02_0;               -- Color_Widget_Pkg.
 
 package Ca11a02_1 is
 
-   type Label_Widget
-     (Str_Disc : Integer)
-   is new Fa11a00.Ca11a02_0.Color_Widget with
-   record
+   type Label_Widget (Str_Disc : Integer)
+   is new Fa11a00.Ca11a02_0.Color_Widget with record
       Label : String (1 .. Str_Disc);
    end record;
 

@@ -70,8 +70,7 @@ begin
    Test
      ("C35A07D",
       "CHECK THAT FOR FIXED POINT TYPES THE FIRST " &
-      "AND LAST ATTRIBUTES YIELD CORRECT VALUES - " &
-      "TYPICAL TYPES");
+      "AND LAST ATTRIBUTES YIELD CORRECT VALUES - " & "TYPICAL TYPES");
 
    -------------------------------------------------------------------
 
@@ -127,15 +126,13 @@ begin
    -------------------------------------------------------------------
 
    -- PI IS IN 3.0 + 2319 * 'SMALL .. 3.0 + 2320 * 'SMALL.
-   if Symmetric_Radians_M16'First not in
-       -3.14160_15625 .. -3.14154_05273_4375
+   if Symmetric_Radians_M16'First not in -3.14160_15625 .. -3.14154_05273_4375
    then
       Failed
         ("SYMMETRIC_RADIANS_M16'FIRST NOT IN " &
          "-3.14160_15625 .. -3.14154_05273_4375");
    end if;
-   if Symmetric_Radians_M16'Last not in
-       3.14154_05273_4375 .. 3.14160_15625
+   if Symmetric_Radians_M16'Last not in 3.14154_05273_4375 .. 3.14160_15625
    then
       Failed
         ("SYMMETRIC_RADIANS_M16'LAST NOT IN " &

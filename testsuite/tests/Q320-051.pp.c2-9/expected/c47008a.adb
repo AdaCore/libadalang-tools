@@ -51,8 +51,7 @@ begin
       "EXPRESSION DENOTES A CONSTRAINED RECORD, " &
       "PRIVATE, OR LIMITED PRIVATE TYPE, CHECK " &
       "THAT CONSTRAINT_ERROR IS RAISED WHEN THE " &
-      "DISCRIMANTS OF THE OPERAND DO NOT EQUAL " &
-      "THOSE OF THE TYPE MARK");
+      "DISCRIMANTS OF THE OPERAND DO NOT EQUAL " & "THOSE OF THE TYPE MARK");
 
    declare
 
@@ -227,13 +226,11 @@ begin
          if Android'(F) = F then
             Failed
               ("NO EXCEPTION RAISED FOR OPERAND WITH " &
-               "DISC NOT EQUAL TO THOSE OF SUBTYPE " &
-               "ANDROID - 1");
+               "DISC NOT EQUAL TO THOSE OF SUBTYPE " & "ANDROID - 1");
          else
             Failed
               ("NO EXCEPTION RAISED FOR OPERAND WITH " &
-               "DISC NOT EQUAL TO THOSE OF SUBTYPE " &
-               "ANDROID - 2");
+               "DISC NOT EQUAL TO THOSE OF SUBTYPE " & "ANDROID - 2");
          end if;
       exception
          when Constraint_Error =>
@@ -241,8 +238,7 @@ begin
          when others =>
             Failed
               ("WRONG EXCEPTION RAISED FOR OPERAND " &
-               "WITH DISC NOT EQUAL TO THOSE OF " &
-               "SUBTYPE ANDROID");
+               "WITH DISC NOT EQUAL TO THOSE OF " & "SUBTYPE ANDROID");
       end Pkg2;
 
    begin
@@ -286,13 +282,11 @@ begin
          if Lovers'(F) = F then
             Failed
               ("NO EXCEPTION RAISED FOR OPERAND WITH " &
-               "DISC NOT EQUAL TO THOSE OF SUBTYPE " &
-               "LOVERS - 1");
+               "DISC NOT EQUAL TO THOSE OF SUBTYPE " & "LOVERS - 1");
          else
             Failed
               ("NO EXCEPTION RAISED FOR OPERAND WITH " &
-               "DISC NOT EQUAL TO THOSE OF SUBTYPE " &
-               "LOVERS - 2");
+               "DISC NOT EQUAL TO THOSE OF SUBTYPE " & "LOVERS - 2");
          end if;
       exception
          when Constraint_Error =>
@@ -300,8 +294,7 @@ begin
          when others =>
             Failed
               ("WRONG EXCEPTION RAISED FOR OPERAND " &
-               "WITH DISC NOT EQUAL TO THOSE OF " &
-               "SUBTYPE LOVERS");
+               "WITH DISC NOT EQUAL TO THOSE OF " & "SUBTYPE LOVERS");
       end Pkg2;
 
    begin

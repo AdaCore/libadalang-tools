@@ -51,8 +51,7 @@ begin
 
    Test
      ("CE2201B",
-      "CHECK THAT READ, WRITE, AND " &
-      "END_OF_FILE ARE SUPPORTED FOR " &
+      "CHECK THAT READ, WRITE, AND " & "END_OF_FILE ARE SUPPORTED FOR " &
       "SEQUENTIAL FILES - CONSTRAINED ARRAY");
 
    declare

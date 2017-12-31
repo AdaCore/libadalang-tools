@@ -47,8 +47,7 @@ begin
       "VALUE HAS BEEN SPECIFIED WHICH VIOLATES THE " &
       "CONSTRAINTS OF A RECORD OR AN ARRAY TYPE " &
       "WHOSE CONSTRAINT DEPENDS ON A DISCRIMINANT, " &
-      "AND NO EXPLICIT INITIALIZATION IS PROVIDED " &
-      "FOR THE OBJECT");
+      "AND NO EXPLICIT INITIALIZATION IS PROVIDED " & "FOR THE OBJECT");
 
    begin
       declare
@@ -63,8 +62,7 @@ begin
          begin
             R1.A (1) := Ident_Int (2);
             Failed
-              ("NO EXCEPTION RAISED AT DECLARATION OF " &
-               "R1" &
+              ("NO EXCEPTION RAISED AT DECLARATION OF " & "R1" &
                Integer'Image (R1.A (5)));  --USE R2
          exception
             when others =>
@@ -98,8 +96,7 @@ begin
          begin
             R2.A := R'(P => Ident_Int (1));
             Failed
-              ("NO EXCEPTION RAISED AT DECLARATION OF " &
-               "R2" &
+              ("NO EXCEPTION RAISED AT DECLARATION OF " & "R2" &
                Integer'Image (R2.A.P));  --USE R2
          exception
             when others =>

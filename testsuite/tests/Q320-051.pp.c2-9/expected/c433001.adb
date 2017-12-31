@@ -76,9 +76,7 @@ procedure C433001 is
         Report.Ident_Int (6) .. Report.Ident_Int (8));
    -- Orange .. Green, 6 .. 8
 
-   procedure Check_1
-     (Obj                                               : Array_1;
-      Low, High                                         : Integer;
+   procedure Check_1 (Obj : Array_1; Low, High : Integer;
       First_Component, Second_Component, Last_Component : Integer;
       Test_Case                                         : Character)
    is
@@ -100,9 +98,7 @@ procedure C433001 is
       end if;
    end Check_1;
 
-   procedure Check_2
-     (Obj                                               : Array_2;
-      Low, High                                         : Color_Type;
+   procedure Check_2 (Obj : Array_2; Low, High : Color_Type;
       First_Component, Second_Component, Last_Component : Integer;
       Test_Case                                         : Character)
    is
@@ -124,11 +120,9 @@ procedure C433001 is
       end if;
    end Check_2;
 
-   procedure Check_3
-     (Test_Obj, Check_Obj : Array_3;
-      Low_1, High_1       : Color_Type;
-      Low_2, High_2       : Integer;
-      Test_Case           : Character)
+   procedure Check_3 (Test_Obj, Check_Obj : Array_3;
+      Low_1, High_1 : Color_Type; Low_2, High_2 : Integer;
+      Test_Case                           : Character)
    is
    begin
       if Test_Obj'First (1) /= Low_1 then
@@ -152,35 +146,23 @@ procedure C433001 is
       end if;
    end Check_3;
 
-   procedure Subtest_Check_1
-     (Obj                                               : Sub_1_3;
+   procedure Subtest_Check_1 (Obj                       : Sub_1_3;
       First_Component, Second_Component, Last_Component : Integer;
       Test_Case                                         : Character)
    is
    begin
       Check_1
-        (Obj,
-         5,
-         9,
-         First_Component,
-         Second_Component,
-         Last_Component,
+        (Obj, 5, 9, First_Component, Second_Component, Last_Component,
          Test_Case);
    end Subtest_Check_1;
 
-   procedure Subtest_Check_2
-     (Obj                                               : Sub_2_2;
+   procedure Subtest_Check_2 (Obj                       : Sub_2_2;
       First_Component, Second_Component, Last_Component : Integer;
       Test_Case                                         : Character)
    is
    begin
       Check_2
-        (Obj,
-         Green,
-         Violet,
-         First_Component,
-         Second_Component,
-         Last_Component,
+        (Obj, Green, Violet, First_Component, Second_Component, Last_Component,
          Test_Case);
    end Subtest_Check_2;
 
@@ -200,70 +182,41 @@ begin
 
    -- Check with a qualified expression:
    Check_1
-     (Sub_1_1'(2, 3, others => 4),
-      Low              => 1,
-      High             => 3,
-      First_Component  => 2,
-      Second_Component => 3,
-      Last_Component   => 4,
-      Test_Case        => 'A');
+     (Sub_1_1'(2, 3, others => 4), Low => 1, High => 3, First_Component => 2,
+      Second_Component => 3, Last_Component => 4, Test_Case => 'A');
 
    Check_2
-     (Sub_2_1'(1, others => Report.Ident_Int (6)),
-      Low              => Red,
-      High             => Yellow,
-      First_Component  => 1,
-      Second_Component => 6,
-      Last_Component   => 6,
-      Test_Case        => 'B');
+     (Sub_2_1'(1, others => Report.Ident_Int (6)), Low => Red, High => Yellow,
+      First_Component => 1, Second_Component => 6, Last_Component => 6,
+      Test_Case       => 'B');
 
    Check_3
      (Sub_3_1'((1, others => 3), others => (2, 4, others => 6)),
-      Check_Obj => ((1, 3, 3), (2, 4, 6), (2, 4, 6)),
-      Low_1     => Red,
-      High_1    => Yellow,
-      Low_2     => 3,
-      High_2    => 5,
-      Test_Case => 'C');
+      Check_Obj => ((1, 3, 3), (2, 4, 6), (2, 4, 6)), Low_1 => Red,
+      High_1    => Yellow, Low_2 => 3, High_2 => 5, Test_Case => 'C');
 
    -- Check that the others clause does not need to represent any components:
    Check_1
-     (Sub_1_2'(5, 6, 8, others => 10),
-      Low              => 3,
-      High             => 5,
-      First_Component  => 5,
-      Second_Component => 6,
-      Last_Component   => 8,
-      Test_Case        => 'D');
+     (Sub_1_2'(5, 6, 8, others => 10), Low => 3, High => 5,
+      First_Component => 5, Second_Component => 6, Last_Component => 8,
+      Test_Case       => 'D');
 
    -- Check named choices are allowed:
    Check_1
-     (Sub_1_1'(2 => Report.Ident_Int (-1), others => 8),
-      Low              => 1,
-      High             => 3,
-      First_Component  => 8,
-      Second_Component => -1,
-      Last_Component   => 8,
-      Test_Case        => 'E');
+     (Sub_1_1'(2 => Report.Ident_Int (-1), others => 8), Low => 1, High => 3,
+      First_Component => 8, Second_Component => -1, Last_Component => 8,
+      Test_Case       => 'E');
 
    -- Check named choices and formal parameters:
    Subtest_Check_1
-     ((6 => 4, 8 => 86, others => 1),
-      First_Component  => 1,
-      Second_Component => 4,
-      Last_Component   => 1,
-      Test_Case        => 'F');
+     ((6 => 4, 8 => 86, others => 1), First_Component => 1,
+      Second_Component => 4, Last_Component => 1, Test_Case => 'F');
 
    Subtest_Check_2
-     ((Green  => Report.Ident_Int (88),
-       Violet => 89,
-       Indigo => Report.Ident_Int (42),
-       Blue   => 0,
-       others => -1),
-      First_Component  => 88,
-      Second_Component => 0,
-      Last_Component   => 89,
-      Test_Case        => 'G');
+     ((Green  => Report.Ident_Int (88), Violet => 89,
+       Indigo => Report.Ident_Int (42), Blue => 0, others => -1),
+      First_Component => 88, Second_Component => 0, Last_Component => 89,
+      Test_Case       => 'G');
 
    Subtest_Check_3
      ((Yellow => (7 => 0, others => 10), others => (1, 2, 3)),
@@ -274,32 +227,20 @@ begin
       Var : Sub_1_2 := (4, 36, others => 86);
    begin
       Check_1
-        (Var,
-         Low              => 3,
-         High             => 5,
-         First_Component  => 4,
-         Second_Component => 36,
-         Last_Component   => 86,
-         Test_Case        => 'I');
+        (Var, Low         => 3, High => 5, First_Component => 4,
+         Second_Component => 36, Last_Component => 86, Test_Case => 'I');
       Var := (5 => 415, others => Report.Ident_Int (1_522));
       Check_1
-        (Var,
-         Low              => 3,
-         High             => 5,
-         First_Component  => 1_522,
-         Second_Component => 1_522,
-         Last_Component   => 415,
-         Test_Case        => 'J');
+        (Var, Low         => 3, High => 5, First_Component => 1_522,
+         Second_Component => 1_522, Last_Component => 415, Test_Case => 'J');
    end;
 
    -- Check positional aggregates that are too long:
    begin
       Subtest_Check_2
         ((Report.Ident_Int (88), 89, 90, 91, 92, others => 93),
-         First_Component  => 88,
-         Second_Component => 89,
-         Last_Component   => 91,
-         Test_Case        => 'K');
+         First_Component => 88, Second_Component => 89, Last_Component => 91,
+         Test_Case       => 'K');
       Report.Failed
         ("Constraint_Error not raised by positional " &
          "aggregate with too many choices (K)");
@@ -310,11 +251,8 @@ begin
 
    begin
       Subtest_Check_3
-        (((0, others => 10),
-          (2, 3, others => 4),
-          (5, 6, 8, others => 10),
-          (1, 4, 7),
-          others => (1, 2, 3)),
+        (((0, others => 10), (2, 3, others => 4), (5, 6, 8, others => 10),
+          (1, 4, 7), others => (1, 2, 3)),
          Test_Case => 'L');
       Report.Failed
         ("Constraint_Error not raised by positional " &
@@ -334,10 +272,8 @@ begin
           8      => 89,
           10     => 66, -- 10 not in applicable index constraint
           others => 93),
-         First_Component  => 88,
-         Second_Component => 93,
-         Last_Component   => 93,
-         Test_Case        => 'M');
+         First_Component => 88, Second_Component => 93, Last_Component => 93,
+         Test_Case       => 'M');
       Report.Failed
         ("Constraint_Error not raised by aggregate choice " &
          "index outside of applicable index constraint (M)");
@@ -350,11 +286,8 @@ begin
       Subtest_Check_2
         (
          (Yellow => 23, -- Yellow not in applicable index constraint.
-          Blue   => 16, others => 77),
-         First_Component  => 77,
-         Second_Component => 16,
-         Last_Component   => 77,
-         Test_Case        => 'N');
+          Blue   => 16, others => 77), First_Component => 77,
+         Second_Component => 16, Last_Component => 77, Test_Case => 'N');
       Report.Failed
         ("Constraint_Error not raised by aggregate choice " &
          "index outside of applicable index constraint (N)");

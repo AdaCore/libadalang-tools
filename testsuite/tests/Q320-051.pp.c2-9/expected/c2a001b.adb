@@ -48,12 +48,8 @@ begin
    F4 := 8:2.3_7:;
    F5 := 8:3.4:E1_1;
 
-   if F1 = 1.25E1 and
-     F2 = 16:1.A: and
-     F3 = 8:13.5: and
-     F4 = 8:2.37: and
-     F5 = 8:3.4:E11
-   then
+   if F1 = 1.25E1 and F2 = 16:1.A: and F3 = 8:13.5: and F4 = 8:2.37: and
+     F5 = 8:3.4:E11 then
       null;
    else
       Failed

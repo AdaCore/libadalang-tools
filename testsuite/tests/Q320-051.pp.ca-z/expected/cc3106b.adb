@@ -125,12 +125,10 @@ begin  -- CC3106B
          procedure Gen_Proc2 is
          begin  -- GEN_PROC2
             if Gen_Bolarr (9) /= Report.Ident_Bool (True) or
-              Gen_Type'Pos (Gen_Typ) /= Report.Ident_Int (2)
-            then
+              Gen_Type'Pos (Gen_Typ) /= Report.Ident_Int (2) then
                Report.Failed
                  ("VALUES ARE DIFFERENT THAN " &
-                  "VALUES ASSIGNED IN THE MAIN " &
-                  "PROCEDURE");
+                  "VALUES ASSIGNED IN THE MAIN " & "PROCEDURE");
             end if;
             Gen_Bolarr (18) := True;
             Gen_Typ         := Gen_Type'Val (9);
@@ -147,8 +145,7 @@ begin  -- CC3106B
             Test_Cube (0, Jun, 'C') := Test_Value;
 
             if (Td_Array (0, Jun, 'C') /= Test_Value) or
-              (Test_Cube (-5, Mar, 'A') /= Wall_Date)
-            then
+              (Test_Cube (-5, Mar, 'A') /= Wall_Date) then
                Report.Failed
                  ("MULTI-DIMENSIONAL ARRAY VALUES ARE " &
                   "DIFFERENT THAN THE VALUES ASSIGNED " &
@@ -172,13 +169,9 @@ begin  -- CC3106B
          end Ent_3;
       end Tsk;
 
-      package Insta1 is new P
-        (Gen_Type   => Sm_Int,
-         Gen_Bolarr => Act_Bolarr,
-         Gen_Typ    => Si,
-         Gen_Tsk    => T,
-         Test_Value => First_Date,
-         Test_Cube  => Td_Array);
+      package Insta1 is new P (Gen_Type => Sm_Int, Gen_Bolarr => Act_Bolarr,
+         Gen_Typ => Si, Gen_Tsk => T, Test_Value => First_Date,
+         Test_Cube                      => Td_Array);
 
    begin  -- LOCAL_BLOCK
 
@@ -187,8 +180,7 @@ begin  -- CC3106B
       Si             := 2;
       Insta1.Gen_Proc2;
       if Act_Bolarr (18) /= Report.Ident_Bool (True) or
-        Si /= Report.Ident_Int (9)
-      then
+        Si /= Report.Ident_Int (9) then
          Report.Failed
            ("VALUES ARE DIFFERENT THAN VALUES " &
             "ASSIGNED IN THE GENERIC PROCEDURE");

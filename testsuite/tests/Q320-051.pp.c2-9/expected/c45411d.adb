@@ -56,8 +56,7 @@ begin
    Test
      ("C45411D",
       "CHECK THAT UNARY ""+"" AND ""-"" YIELD " &
-      "CORRECT RESULTS FOR OPERANDS OF DERIVED " &
-      "INTEGER TYPES");
+      "CORRECT RESULTS FOR OPERANDS OF DERIVED " & "INTEGER TYPES");
 
    for I in Dt1'(1 - 2) .. Dt1'(1) loop
       if "-" (Right => D1) /= Ident (I) then

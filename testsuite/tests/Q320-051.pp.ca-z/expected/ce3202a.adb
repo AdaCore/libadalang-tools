@@ -39,8 +39,7 @@ begin
 
    Test
      ("CE3202A",
-      "CHECK THAT CURRENT_INPUT AND " &
-      "CURRENT_OUTPUT INITIALLY " &
+      "CHECK THAT CURRENT_INPUT AND " & "CURRENT_OUTPUT INITIALLY " &
       "CORRESPOND TO STANDARD FILES");
 
    if Name (Current_Input) /= Name (Standard_Input) then

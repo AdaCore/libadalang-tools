@@ -17,9 +17,8 @@ procedure C3a0006 is
    Trig_Table : array (1 .. Total_Routines) of C3a0006_0.Trig_Function_Ptr;
 
    -- Key function to build the table
-   function Call_Trig_Func
-     (Func    : C3a0006_0.Trig_Function_Ptr;
-      Operand : Float) return Float
+   function Call_Trig_Func (Func : C3a0006_0.Trig_Function_Ptr;
+      Operand                    : Float) return Float
    is
    begin
       return (Func (Operand));
@@ -46,15 +45,12 @@ begin
 
    if C3a0006_0.Tc_Sine_Call /= Total_Routines or
      C3a0006_0.Tc_Cos_Call /= Total_Routines or
-     C3a0006_0.Tc_Tan_Call /= Total_Routines
-   then
+     C3a0006_0.Tc_Tan_Call /= Total_Routines then
       Report.Failed ("Incorrect subprograms result");
    end if;
 
-   if C3a0006_0.Sine_Value /= Sine_Total or
-     C3a0006_0.Cos_Value /= Cos_Total or
-     C3a0006_0.Tan_Value /= Tan_Total
-   then
+   if C3a0006_0.Sine_Value /= Sine_Total or C3a0006_0.Cos_Value /= Cos_Total or
+     C3a0006_0.Tan_Value /= Tan_Total then
       Report.Failed ("Incorrect values returned from subprograms");
    end if;
 

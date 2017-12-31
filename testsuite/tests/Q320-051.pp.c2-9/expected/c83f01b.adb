@@ -104,14 +104,8 @@ begin
 
    begin
 
-      if X1 /= 17 or
-        Z /= A or
-        Y2 /= 100 or
-        not Outer.P.X1 or
-        Outer.P.Z /= 13 or
-        Outer.P.Y2 /= 55 or
-        Outer.P.Y4 /= 55
-      then
+      if X1 /= 17 or Z /= A or Y2 /= 100 or not Outer.P.X1 or
+        Outer.P.Z /= 13 or Outer.P.Y2 /= 55 or Outer.P.Y4 /= 55 then
          Failed ("INCORRECT ACCESSING");
       end if;
 

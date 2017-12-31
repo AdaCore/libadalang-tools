@@ -10,8 +10,7 @@ begin
       "that R may represent a subprogram with a first " &
       "access parameter that designates the type T or " &
       "a class-wide type covered by T that is declared " &
-      "immediately in the declarative region of " &
-      "an ancestor of T.");
+      "immediately in the declarative region of " & "an ancestor of T.");
 
    -- Verify that the primitive operation in the ancestor is properly called.
 
@@ -41,8 +40,7 @@ begin
 
       --  call on inherited function (with parameters)
       if Q1_Ptr.Base_Func (Value => 1_234) /=
-        C413004q.Base_Func (Q1_Ptr, 1_234)
-      then
+        C413004q.Base_Func (Q1_Ptr, 1_234) then
          Report.Failed ("Wrong value (inherited function -4-)");
       end if;
    end;
@@ -76,8 +74,7 @@ begin
 
       --  call on primitive function (with parameters)
       if Q1_Ptr.Prim_Func (Value => 123) /=
-        C413004q.Prim_Func (Q1_Ptr, Value => 123)
-      then
+        C413004q.Prim_Func (Q1_Ptr, Value => 123) then
          Report.Failed ("Wrong value (primitive function -4-)");
       end if;
    end;
@@ -111,8 +108,7 @@ begin
 
       --  call on inherited function (with parameters)
       if Q1_Cptr.Base_Func (Value => 1_234) /=
-        C413004q.Base_Func (Q1_Ptr, 1_234)
-      then
+        C413004q.Base_Func (Q1_Ptr, 1_234) then
          Report.Failed ("Wrong value (inherited function -4-)");
       end if;
 
@@ -193,8 +189,7 @@ begin
 
       --  call on primitive function in nested package (with parameters)
       if L1_Ptr.Prim_Func (Value => 123) /=
-        C413004q.Local.Prim_Func (L1_Ptr, Value => 123)
-      then
+        C413004q.Local.Prim_Func (L1_Ptr, Value => 123) then
          Report.Failed ("Wrong value (primitive function -4-)");
       end if;
    end;

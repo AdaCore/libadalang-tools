@@ -79,16 +79,14 @@ procedure Cxaia13 is
    end My_Key;
 
    package My_Keys is new My_Indefinite_Ordered_Sets.Generic_Keys
-     (Key_Type => My_Key_Type,
-      Key      => My_Key); -- Predefined <
+     (Key_Type => My_Key_Type, Key => My_Key); -- Predefined <
 
    My_Set_1 : My_Indefinite_Ordered_Sets.Set;
 
    My_Cursor_1 : My_Indefinite_Ordered_Sets.Cursor;
 
    procedure Tampering_Check
-     (Container : in out My_Indefinite_Ordered_Sets.Set;
-      Where     : in     String)
+     (Container : in out My_Indefinite_Ordered_Sets.Set; Where : in String)
    is
 
       Program_Error_Raised : Boolean := False;
@@ -144,8 +142,7 @@ begin
    begin
 
       Tampering_Check
-        (Container => My_Set_1,
-         Where     => "Constant_Reference (cursor form)");
+        (Container => My_Set_1, Where => "Constant_Reference (cursor form)");
 
    end;
 
@@ -154,14 +151,12 @@ begin
       My_Constant_Reference : My_Indefinite_Ordered_Sets
         .Constant_Reference_Type :=
         My_Keys.Constant_Reference
-          (Container => My_Set_1,
-           Key       => My_Key (Value_In_Ptr_Array (1).all));
+          (Container => My_Set_1, Key => My_Key (Value_In_Ptr_Array (1).all));
 
    begin
 
       Tampering_Check
-        (Container => My_Set_1,
-         Where     => "Constant_Reference (key form)");
+        (Container => My_Set_1, Where => "Constant_Reference (key form)");
 
    end;
 
@@ -170,8 +165,7 @@ begin
 
          My_Reference : My_Keys.Reference_Type :=
            My_Keys.Reference_Preserving_Key
-             (Container => My_Set_1,
-              Position  => My_Set_1.First);
+             (Container => My_Set_1, Position => My_Set_1.First);
 
       begin
 
@@ -218,10 +212,8 @@ begin
    -- Variable_Indexing here) -- in a way that corresponds to likely usage.
 
    declare
-      procedure Test
-        (Value     : in String;
-         Expected  : in String;
-         Test_Case : in String)
+      procedure Test (Value : in String; Expected : in String;
+         Test_Case          : in String)
       is
       begin
          Tampering_Check (Container => My_Set_1, Where => Test_Case);
@@ -234,11 +226,8 @@ begin
          end if;
       end Test;
 
-      procedure Test_And_Mod
-        (Value     : in out String;
-         Expected  : in     String;
-         New_Item  : in     String;
-         Test_Case : in     String) with
+      procedure Test_And_Mod (Value : in out String; Expected : in String;
+         New_Item                   : in String; Test_Case : in String) with
          Pre => Value'Length = New_Item'Length
        is
       begin
@@ -259,8 +248,7 @@ begin
       Test
         (Value =>
            My_Keys.Constant_Reference
-             (My_Set_1,
-              Key => My_Key (Value_In_Ptr_Array (1).all))
+             (My_Set_1, Key => My_Key (Value_In_Ptr_Array (1).all))
              .Element.all,
          Expected  => "00", -- Value_In_Ptr_Array (1).all
          Test_Case => "Constant_Reference normal key");
@@ -268,8 +256,7 @@ begin
       Test_And_Mod
         (Value =>
            My_Keys.Reference_Preserving_Key
-             (My_Set_1,
-              Key => My_Key (Value_In_Ptr_Array (1).all))
+             (My_Set_1, Key => My_Key (Value_In_Ptr_Array (1).all))
              .Element.all,
          Expected  => "00",
          New_Item  => "0A", -- Can't change Key.
@@ -278,11 +265,9 @@ begin
       Test
         (Value =>
            My_Indefinite_Ordered_Sets.Constant_Reference
-             (My_Set_1,
-              Position => My_Cursor_1)
+             (My_Set_1, Position => My_Cursor_1)
              .Element.all,
-         Expected  => "0A",
-         Test_Case => "Constant_Reference normal cursor");
+         Expected => "0A", Test_Case => "Constant_Reference normal cursor");
 
       Test_And_Mod
         (Value =>
@@ -296,16 +281,14 @@ begin
       Test
         (Value =>
            My_Keys.Constant_Reference
-             (My_Set_1,
-              Key => My_Key (Value_In_Ptr_Array (1).all)),
+             (My_Set_1, Key => My_Key (Value_In_Ptr_Array (1).all)),
          Expected  => "06",
          Test_Case => "Constant_Reference normal generalized key");
 
       Test_And_Mod
         (Value =>
            My_Keys.Reference_Preserving_Key
-             (My_Set_1,
-              Key => My_Key (Value_In_Ptr_Array (1).all)),
+             (My_Set_1, Key => My_Key (Value_In_Ptr_Array (1).all)),
          Expected  => "06",
          New_Item  => "0Z", -- Can't change Key.
          Test_Case => "Reference normal generalized key");
@@ -313,16 +296,14 @@ begin
       Test
         (Value =>
            My_Indefinite_Ordered_Sets.Constant_Reference
-             (My_Set_1,
-              Position => My_Cursor_1),
+             (My_Set_1, Position => My_Cursor_1),
          Expected  => "0Z",
          Test_Case => "Constant_Reference normal generalized cursor");
 
       Test_And_Mod
         (Value =>
            My_Keys.Reference_Preserving_Key
-             (My_Set_1,
-              Position => My_Cursor_1),
+             (My_Set_1, Position => My_Cursor_1),
          Expected  => "0Z",
          New_Item  => "00", -- Reset to original.
          Test_Case => "Reference normal generalized cursor");
@@ -332,8 +313,7 @@ begin
       Test
         (Value =>
            My_Set_1.Constant_Reference (Position => My_Cursor_1).Element.all,
-         Expected  => "00",
-         Test_Case => "Constant_Reference prefix cursor");
+         Expected => "00", Test_Case => "Constant_Reference prefix cursor");
 
       -- Prefix call using a generalized reference (implicit dereference):
       Test
@@ -352,8 +332,7 @@ begin
          Test_And_Mod
            (Value =>
               My_Keys.Reference_Preserving_Key
-                (My_Set_1,
-                 Key => My_Key (Value_In_Ptr_Array (1).all))
+                (My_Set_1, Key => My_Key (Value_In_Ptr_Array (1).all))
                 .Element.all,
             Expected  => "00",
             New_Item  => "10", -- Changes Key.
@@ -433,8 +412,7 @@ begin
       for E of My_Set_1 loop
 
          Tampering_Check
-           (Container => My_Set_1,
-            Where     => "reading forward of loop");
+           (Container => My_Set_1, Where => "reading forward of loop");
 
          Pos_Of_First_Char := Character'Pos (E (1));
 
@@ -462,8 +440,7 @@ begin
       for E of reverse My_Set_1 loop
 
          Tampering_Check
-           (Container => My_Set_1,
-            Where     => "reading reverse of loop");
+           (Container => My_Set_1, Where => "reading reverse of loop");
 
          Pos_Of_First_Char := Character'Pos (E (1));
 
@@ -491,8 +468,7 @@ begin
       for C in My_Set_1.Iterate loop
 
          Tampering_Check
-           (Container => My_Set_1,
-            Where     => "reading forward in loop");
+           (Container => My_Set_1, Where => "reading forward in loop");
 
          Pos_Of_First_Char := Character'Pos (My_Set_1 (C) (1));
 
@@ -520,8 +496,7 @@ begin
       for C in reverse My_Set_1.Iterate loop
 
          Tampering_Check
-           (Container => My_Set_1,
-            Where     => "reading reverse in loop");
+           (Container => My_Set_1, Where => "reading reverse in loop");
 
          Pos_Of_First_Char := Character'Pos (My_Set_1 (C) (1));
 
@@ -557,8 +532,7 @@ begin
       for C in My_Set_1.Iterate (My_Cursor_1) loop
 
          Tampering_Check
-           (Container => My_Set_1,
-            Where     => "reading partial forward in loop");
+           (Container => My_Set_1, Where => "reading partial forward in loop");
 
          Pos_Of_First_Char := Character'Pos (My_Set_1 (C) (1));
 
@@ -594,8 +568,7 @@ begin
       for C in reverse My_Set_1.Iterate (My_Cursor_1) loop
 
          Tampering_Check
-           (Container => My_Set_1,
-            Where     => "reading partial reverse in loop");
+           (Container => My_Set_1, Where => "reading partial reverse in loop");
 
          Pos_Of_First_Char := Character'Pos (My_Set_1 (C) (1));
 

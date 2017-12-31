@@ -133,8 +133,7 @@ begin
 
    X := Ident (new Subdesignated'(1, 2, 3));
    if (X = null or else X = Y or else X.all /= (1, 2, 3)) or
-     X = new Designated'(1, 2)
-   then
+     X = new Designated'(1, 2) then
       Failed ("INCORRECT ALLOCATOR");
    end if;
 

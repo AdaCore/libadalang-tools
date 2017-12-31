@@ -53,8 +53,7 @@ begin
          null;
       when others =>
          Failed
-           ("WRONG EXCEPTION RAISED FOR " &
-            "SECOND POWER OF " &
+           ("WRONG EXCEPTION RAISED FOR " & "SECOND POWER OF " &
             "INTEGER'LAST");
    end;
 
@@ -69,8 +68,7 @@ begin
          null;
       when others =>
          Failed
-           ("WRONG EXCEPTION RAISED FOR " &
-            "THIRD POWER OF " &
+           ("WRONG EXCEPTION RAISED FOR " & "THIRD POWER OF " &
             "INTEGER'FIRST");
 
    end;

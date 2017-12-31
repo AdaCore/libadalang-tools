@@ -68,8 +68,7 @@ procedure C3a0025 is
    begin
       if Obj = null then
          null;
-      elsif Obj.all =
-        Report.Ident_Str ("ABC")
+      elsif Obj.all = Report.Ident_Str ("ABC")
       then -- Can't match, different lengths
          Report.Comment ("Don't optimize Obj");
       end if;

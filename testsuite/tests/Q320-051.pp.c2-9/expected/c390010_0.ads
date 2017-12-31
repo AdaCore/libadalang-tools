@@ -76,10 +76,8 @@ package C390010_0 is
    -- derive a type, "passing through" one discriminant, adding one
    -- discriminant, and a constrained subtype of THAT type:
 
-   type Derived_Record
-     (Disc1, Disc2 : Boolean)
-   is new Discr_Tag_Record (Disc1) with
-   record
+   type Derived_Record (Disc1, Disc2 : Boolean)
+   is new Discr_Tag_Record (Disc1) with record
       Fieldd : Character := 'D';
       case Disc2 is
          when True =>

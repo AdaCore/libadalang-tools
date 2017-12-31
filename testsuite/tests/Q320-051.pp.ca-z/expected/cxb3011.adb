@@ -127,8 +127,7 @@ begin
       Tc_Chars_Ptr := Ics.New_Char_Array (Tc_Char_Array_2);
 
       if Ics.Value (Item => Tc_Chars_Ptr) /=
-        Ic.To_Ada (Ics.Value (Tc_Chars_Ptr), Trim_Nul => True)
-      then
+        Ic.To_Ada (Ics.Value (Tc_Chars_Ptr), Trim_Nul => True) then
          Report.Failed ("Incorrect result from Function Value - 2");
       end if;
 
@@ -155,8 +154,7 @@ begin
       Tc_String (1 .. 5) := Ics.Value (Item => Tc_Chars_Ptr, Length => 6);
 
       if Tc_String (1 .. 4) /= Tc_String_1 (1 .. 4) or
-        Tc_String (Tc_String'Last) = Acl1.Nul
-      then
+        Tc_String (Tc_String'Last) = Acl1.Nul then
          Report.Failed ("Incorrect result from Function Value - 4");
       end if;
 
@@ -165,8 +163,7 @@ begin
       Tc_Chars_Ptr := Ics.New_Char_Array (Tc_Char_Array_2);
 
       if Ics.Value (Tc_Chars_Ptr, Length => 5) /=
-        Ic.To_Ada (Ics.Value (Tc_Chars_Ptr), Trim_Nul => True)
-      then
+        Ic.To_Ada (Ics.Value (Tc_Chars_Ptr), Trim_Nul => True) then
          Report.Failed ("Incorrect result from Function Value - 5");
       end if;
 

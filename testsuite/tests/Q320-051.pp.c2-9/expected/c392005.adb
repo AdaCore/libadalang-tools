@@ -63,8 +63,7 @@ begin
 
    C392005_0.C392005_1.Focus (Auto_Camera2, Auto_Depth);
 
-   if C392005_0.C392005_1.Tc_Get_Depth (Auto_Camera2) /=
-     Tc_Expected_Auto_Depth
+   if C392005_0.C392005_1.Tc_Get_Depth (Auto_Camera2) /= Tc_Expected_Auto_Depth
 
    then
       Report.Failed
@@ -75,8 +74,7 @@ begin
    -- For an object of type New_Camera, the initialization using Set_Ap should
    -- execute the overridden body, not the inherited one.
 
-   if C392005_0.C392005_1.Tc_Get_Aper (New_Camera1) /=
-     Tc_Expected_New_Aper
+   if C392005_0.C392005_1.Tc_Get_Aper (New_Camera1) /= Tc_Expected_New_Aper
    then
       Report.Failed
         ("Non-dispatching call to visible overriding " &

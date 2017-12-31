@@ -178,8 +178,7 @@ begin
 
          if My_Indefinite_Doubly_Linked_Lists.Element
              (Position => My_Cursor_1) /=
-           Value_In_Ptr_Array (I).all
-         then
+           Value_In_Ptr_Array (I).all then
 
             Report.Failed
               ("Mismatch between element and what was appended #2");
@@ -187,8 +186,7 @@ begin
          end if;
 
          My_Indefinite_Doubly_Linked_Lists.Query_Element
-           (Position => My_Cursor_1,
-            Process  => My_Query'Access);
+           (Position => My_Cursor_1, Process => My_Query'Access);
 
       end;
 
@@ -207,8 +205,7 @@ begin
    end loop;
 
    if My_List_1.First_Element /=
-     Value_In_Ptr_Array (Value_In_Ptr_Array'First).all
-   then
+     Value_In_Ptr_Array (Value_In_Ptr_Array'First).all then
 
       Report.Failed ("Mismatch between first element and first appended");
 
@@ -235,8 +232,7 @@ begin
    for I in reverse Fxaia00.Array_Bounds_Type loop
 
       if My_Indefinite_Doubly_Linked_Lists.Element (Position => My_Cursor_2) /=
-        Value_In_Ptr_Array (I).all
-      then
+        Value_In_Ptr_Array (I).all then
 
          Report.Failed ("Mismatch between element and what was prepended");
 
@@ -259,8 +255,7 @@ begin
    end loop;
 
    if My_List_1.Last_Element /=
-     Value_In_Ptr_Array (Value_In_Ptr_Array'Last).all
-   then
+     Value_In_Ptr_Array (Value_In_Ptr_Array'Last).all then
 
       Report.Failed ("Mismatch between last element and last prepended");
 
@@ -290,8 +285,7 @@ begin
          Tampering_Check (Container => My_List_3, Where => "Iterate");
 
          if My_Indefinite_Doubly_Linked_Lists.Element (Position) /=
-           Value_In_Ptr_Array (I).all
-         then
+           Value_In_Ptr_Array (I).all then
 
             Report.Failed ("Iterate hasn't found the expected value");
 
@@ -313,8 +307,7 @@ begin
          Tampering_Check (Container => My_List_3, Where => "Reverse_Iterate");
 
          if My_Indefinite_Doubly_Linked_Lists.Element (Position) /=
-           Value_In_Ptr_Array (I).all
-         then
+           Value_In_Ptr_Array (I).all then
 
             Report.Failed ("Reverse_Iterate hasn't found the expected value");
 
@@ -354,8 +347,7 @@ begin
          begin
 
             Tampering_Check
-              (Container => My_List_2,
-               Where     => "Update_Element");
+              (Container => My_List_2, Where => "Update_Element");
 
             -- Note that can only perform writes that don't change the
             -- length of the element otherwise will fail length check,
@@ -376,12 +368,10 @@ begin
          New_String (2) := Character'Succ (New_String (2));
 
          My_List_1.Replace_Element
-           (Position => My_Cursor_1,
-            New_Item => New_String);
+           (Position => My_Cursor_1, New_Item => New_String);
 
          My_List_2.Update_Element
-           (Position => My_Cursor_2,
-            Process  => My_Update'Access);
+           (Position => My_Cursor_2, Process => My_Update'Access);
 
       end;
 
@@ -419,8 +409,7 @@ begin
    for I in Fxaia00.Array_Bounds_Type loop
 
       if My_Indefinite_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-        Value_In_Ptr_Array (Fxaia00.Num_Tests - I + 1).all
-      then
+        Value_In_Ptr_Array (Fxaia00.Num_Tests - I + 1).all then
 
          Report.Failed ("Reversed array not as expected");
 
@@ -460,8 +449,7 @@ begin
    for I in Fxaia00.Array_Bounds_Type loop
 
       if My_Indefinite_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-        Value_In_Ptr_Array (I).all
-      then
+        Value_In_Ptr_Array (I).all then
 
          Report.Failed ("Target list not as expected after move");
 
@@ -503,8 +491,7 @@ begin
 
    -- This swaps the order of the elements
    My_List_2.Swap_Links
-     (I => My_List_2.First,
-      J => My_Cursor_2); -- First of added elements
+     (I => My_List_2.First, J => My_Cursor_2); -- First of added elements
 
    -- The order should now be Default_Value, Value_In_Ptr_Array
    -- (1).all, Default_Value, Default_Value, Value_In_Ptr_Array
@@ -525,8 +512,7 @@ begin
 
    -- Check = Default_Value
    if My_Indefinite_Doubly_Linked_Lists.Element (Position => My_Cursor_2) /=
-     My_Default_Value
-   then
+     My_Default_Value then
 
       Report.Failed ("Inserted value not as expected #1");
 
@@ -535,8 +521,7 @@ begin
    My_Indefinite_Doubly_Linked_Lists.Next (My_Cursor_2);
 
    if My_Indefinite_Doubly_Linked_Lists.Element (Position => My_Cursor_2) /=
-     Value_In_Ptr_Array (1).all
-   then
+     Value_In_Ptr_Array (1).all then
 
       Report.Failed ("Inserted value not as expected #2");
 
@@ -546,8 +531,7 @@ begin
 
    -- Check = Default_Value
    if My_Indefinite_Doubly_Linked_Lists.Element (Position => My_Cursor_2) /=
-     My_Default_Value
-   then
+     My_Default_Value then
 
       Report.Failed ("Inserted value not as expected #3");
 
@@ -556,8 +540,7 @@ begin
    My_Indefinite_Doubly_Linked_Lists.Next (My_Cursor_2);
 
    if My_Indefinite_Doubly_Linked_Lists.Element (Position => My_Cursor_2) /=
-     Value_In_Ptr_Array (2).all
-   then
+     Value_In_Ptr_Array (2).all then
 
       Report.Failed ("Inserted value not as expected #4");
 
@@ -566,8 +549,7 @@ begin
    My_Indefinite_Doubly_Linked_Lists.Next (My_Cursor_2);
 
    if My_Indefinite_Doubly_Linked_Lists.Element (Position => My_Cursor_2) /=
-     Value_In_Ptr_Array (2).all
-   then
+     Value_In_Ptr_Array (2).all then
 
       Report.Failed ("Inserted value not as expected #5");
 
@@ -577,8 +559,7 @@ begin
 
    -- Check = Default_Value
    if My_Indefinite_Doubly_Linked_Lists.Element (Position => My_Cursor_2) /=
-     My_Default_Value
-   then
+     My_Default_Value then
 
       Report.Failed ("Inserted value not as expected #6");
 
@@ -589,8 +570,7 @@ begin
    -- e.g. by insertions earlier in the list or swapping
 
    if My_Indefinite_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Ptr_Array (1).all
-   then
+     Value_In_Ptr_Array (1).all then
 
       Report.Failed
         ("Cursor no longer pointing to same element after shuffling about");
@@ -616,8 +596,7 @@ begin
 
    -- Check = Default_Value
    if My_Indefinite_Doubly_Linked_Lists.Element (My_List_2.First) /=
-     My_Default_Value
-   then
+     My_Default_Value then
 
       Report.Failed ("Remaining value not as expected");
 
@@ -651,9 +630,7 @@ begin
    My_Cursor_2 := My_List_2.Find (Item => Value_In_Ptr_Array (7).all);
 
    My_List_1.Splice
-     (Before   => My_Cursor_1,
-      Source   => My_List_2,
-      Position => My_Cursor_2);
+     (Before => My_Cursor_1, Source => My_List_2, Position => My_Cursor_2);
 
    -- The order should now be Value_In_Ptr_Array (1).all Value_In_Ptr_Array
    -- (2).all, Default_Value, Value_In_Ptr_Array (3).all, Value_In_Ptr_Array
@@ -676,8 +653,7 @@ begin
    My_Cursor_1 := My_List_1.First;
 
    if My_Indefinite_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Ptr_Array (1).all
-   then
+     Value_In_Ptr_Array (1).all then
 
       Report.Failed ("Spliced value not as expected #1");
 
@@ -686,8 +662,7 @@ begin
    My_Indefinite_Doubly_Linked_Lists.Next (My_Cursor_1);
 
    if My_Indefinite_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Ptr_Array (9).all
-   then
+     Value_In_Ptr_Array (9).all then
 
       Report.Failed ("Spliced value not as expected #2");
 
@@ -696,8 +671,7 @@ begin
    My_Indefinite_Doubly_Linked_Lists.Next (My_Cursor_1);
 
    if My_Indefinite_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Ptr_Array (2).all
-   then
+     Value_In_Ptr_Array (2).all then
 
       Report.Failed ("Spliced value not as expected #3");
 
@@ -707,8 +681,7 @@ begin
 
    -- Check = Default_Value
    if My_Indefinite_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     My_Default_Value
-   then
+     My_Default_Value then
 
       Report.Failed ("Spliced value not as expected #4");
 
@@ -717,8 +690,7 @@ begin
    My_Indefinite_Doubly_Linked_Lists.Next (My_Cursor_1);
 
    if My_Indefinite_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Ptr_Array (3).all
-   then
+     Value_In_Ptr_Array (3).all then
 
       Report.Failed ("Spliced value not as expected #5");
 
@@ -727,8 +699,7 @@ begin
    My_Indefinite_Doubly_Linked_Lists.Next (My_Cursor_1);
 
    if My_Indefinite_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Ptr_Array (4).all
-   then
+     Value_In_Ptr_Array (4).all then
 
       Report.Failed ("Spliced value not as expected #6");
 
@@ -737,8 +708,7 @@ begin
    My_Indefinite_Doubly_Linked_Lists.Next (My_Cursor_1);
 
    if My_Indefinite_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Ptr_Array (7).all
-   then
+     Value_In_Ptr_Array (7).all then
 
       Report.Failed ("Spliced value not as expected #7");
 
@@ -747,8 +717,7 @@ begin
    My_Indefinite_Doubly_Linked_Lists.Next (My_Cursor_1);
 
    if My_Indefinite_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Ptr_Array (5).all
-   then
+     Value_In_Ptr_Array (5).all then
 
       Report.Failed ("Spliced value not as expected #8");
 
@@ -757,8 +726,7 @@ begin
    My_Indefinite_Doubly_Linked_Lists.Next (My_Cursor_1);
 
    if My_Indefinite_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Ptr_Array (6).all
-   then
+     Value_In_Ptr_Array (6).all then
 
       Report.Failed ("Spliced value not as expected #9");
 
@@ -767,8 +735,7 @@ begin
    My_Indefinite_Doubly_Linked_Lists.Next (My_Cursor_1);
 
    if My_Indefinite_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Ptr_Array (7).all
-   then
+     Value_In_Ptr_Array (7).all then
 
       Report.Failed ("Spliced value not as expected #10");
 
@@ -777,8 +744,7 @@ begin
    My_Indefinite_Doubly_Linked_Lists.Next (My_Cursor_1);
 
    if My_Indefinite_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Ptr_Array (8).all
-   then
+     Value_In_Ptr_Array (8).all then
 
       Report.Failed ("Spliced value not as expected #11");
 
@@ -787,8 +753,7 @@ begin
    My_Indefinite_Doubly_Linked_Lists.Next (My_Cursor_1);
 
    if My_Indefinite_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Ptr_Array (10).all
-   then
+     Value_In_Ptr_Array (10).all then
 
       Report.Failed ("Spliced value not as expected #12");
 
@@ -813,8 +778,7 @@ begin
    -- My_Cursor_1 should still be pointing to the last element
 
    if not My_Indefinite_Doubly_Linked_Lists.Has_Element
-       (Position => My_Cursor_1)
-   then
+       (Position => My_Cursor_1) then
 
       Report.Failed ("Has_Element failed to find");
 
@@ -824,8 +788,7 @@ begin
 
    -- My_Cursor_1 should now be pointing off the end
 
-   if My_Indefinite_Doubly_Linked_Lists.Has_Element
-       (Position => My_Cursor_1)
+   if My_Indefinite_Doubly_Linked_Lists.Has_Element (Position => My_Cursor_1)
    then
 
       Report.Failed ("Has_Element found when shouldn't have");

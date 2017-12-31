@@ -70,20 +70,16 @@ generic
    type Decimal_Fixed_2 is delta <> digits <>;
 package Cxf2003_0 is
 
-   procedure Multiply_And_Truncate
-     (Balance : in out Decimal_Fixed_1;
-      Factor  : in     Decimal_Fixed_2);
+   procedure Multiply_And_Truncate (Balance : in out Decimal_Fixed_1;
+      Factor                                : in     Decimal_Fixed_2);
 
-   procedure Divide_And_Truncate
-     (Balance : in out Decimal_Fixed_1;
-      Divisor : in     Decimal_Fixed_2);
+   procedure Divide_And_Truncate (Balance : in out Decimal_Fixed_1;
+      Divisor                             : in     Decimal_Fixed_2);
 
-   procedure Multiply_And_Round
-     (Balance : in out Decimal_Fixed_1;
-      Factor  : in     Decimal_Fixed_2);
+   procedure Multiply_And_Round (Balance : in out Decimal_Fixed_1;
+      Factor                             : in     Decimal_Fixed_2);
 
-   procedure Divide_And_Round
-     (Balance : in out Decimal_Fixed_1;
-      Divisor : in     Decimal_Fixed_2);
+   procedure Divide_And_Round (Balance : in out Decimal_Fixed_1;
+      Divisor                          : in     Decimal_Fixed_2);
 
 end Cxf2003_0;

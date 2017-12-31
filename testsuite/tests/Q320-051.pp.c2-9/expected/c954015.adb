@@ -90,10 +90,7 @@ procedure C954015 is
    Tc_Sub_4_Value  : constant Integer := 5;
    --
    Tc_Full_Value : Integer :=
-     Tc_Credit_Value +
-     Tc_Sub_1_Value +
-     Tc_Sub_2_Value +
-     Tc_Sub_3_Value +
+     Tc_Credit_Value + Tc_Sub_1_Value + Tc_Sub_2_Value + Tc_Sub_3_Value +
      Tc_Sub_4_Value;
 
    type Transaction_Code is (Credit, Debit);
@@ -264,8 +261,7 @@ procedure C954015 is
 
       if This_Transaction.Code = Credit then
          if This_Transaction.Return_Value /= Tc_Full_Value or
-           not This_Transaction.Tc_Thru_Distrib
-         then
+           not This_Transaction.Tc_Thru_Distrib then
             Report.Failed ("Expected path not traversed - CR");
          end if;
          if This_Transaction.Tc_Message_Count not in 1 .. 2 then
@@ -274,8 +270,7 @@ procedure C954015 is
       else
          if This_Transaction.Return_Value /= Debit_Return or
            This_Transaction.Tc_Message_Count /= 1 or
-           not This_Transaction.Tc_Thru_Distrib
-         then
+           not This_Transaction.Tc_Thru_Distrib then
             Report.Failed ("Expected path not traversed - DB");
          end if;
       end if;

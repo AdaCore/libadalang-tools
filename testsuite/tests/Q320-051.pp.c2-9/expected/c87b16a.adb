@@ -102,27 +102,18 @@ begin
       R1 : Rec;
 
    begin
-      if R1.I1 /= -1 or
-        R1.W1 /= 0 or
-        Citrus'Pos (R1.C1) /= 2 or
-        Hue'Pos (R1.H1) /= 1
-      then
+      if R1.I1 /= -1 or R1.W1 /= 0 or Citrus'Pos (R1.C1) /= 2 or
+        Hue'Pos (R1.H1) /= 1 then
          Failed ("(A): RESOLUTION INCORRECT - FUNCTION CALL");
       end if;
 
-      if R1.I2 /= -1 or
-        R1.W2 /= 0 or
-        Citrus'Pos (R1.C2) /= 2 or
-        Hue'Pos (R1.H2) /= 1
-      then
+      if R1.I2 /= -1 or R1.W2 /= 0 or Citrus'Pos (R1.C2) /= 2 or
+        Hue'Pos (R1.H2) /= 1 then
          Failed ("(B): RESOLUTION INCORRECT - OPERATOR SYMBOL");
       end if;
 
-      if R1.I3 /= -1 or
-        R1.W3 /= 0 or
-        Citrus'Pos (R1.C3) /= 2 or
-        Hue'Pos (R1.H3) /= 1
-      then
+      if R1.I3 /= -1 or R1.W3 /= 0 or Citrus'Pos (R1.C3) /= 2 or
+        Hue'Pos (R1.H3) /= 1 then
          Failed ("(C): RESOLUTION INCORRECT - INFIX OPERATOR");
       end if;
 

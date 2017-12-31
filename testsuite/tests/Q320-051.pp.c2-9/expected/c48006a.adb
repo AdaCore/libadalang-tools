@@ -41,8 +41,7 @@ begin
 
    Test
      ("C48006A",
-      "CHECK THAT THE FORM 'NEW T'(X)' " &
-      "ALLOCATES A NEW OBJECT " &
+      "CHECK THAT THE FORM 'NEW T'(X)' " & "ALLOCATES A NEW OBJECT " &
       "AND THAT IF T IS A SCALAR OR ACCESS TYPE, THE " &
       "ALLOCATED OBJECT HAS THE VALUE OF X");
 
@@ -67,8 +66,7 @@ begin
 
       Va3 := new Integer'(Ident_Int (3) + Ident_Int (4));
       if
-        (Va1.all /= Ident_Int (12) or
-         Va2.all /= Ident_Int (3) or
+        (Va1.all /= Ident_Int (12) or Va2.all /= Ident_Int (3) or
          Va3.all /= Ident_Int (7))
       then
          Failed ("WRONG VALUES - VA3");

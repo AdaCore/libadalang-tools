@@ -177,88 +177,69 @@ begin  -- Main test procedure.
       "Check that Size clauses are supported for " &
       "values at least as large as the subtypes " &
       "size, and correspond to a size in storage " &
-      "elements that is a multiple of the objects " &
-      "(non-zero) Alignment");
+      "elements that is a multiple of the objects " & "(non-zero) Alignment");
 
    if Bit_8'Size /= System.Storage_Unit then
       Report.Failed
-        ("Expected Bit_8'Size =" &
-         Integer'Image (System.Storage_Unit) &
-         " , actually =" &
-         Integer'Image (Bit_8'Size));
+        ("Expected Bit_8'Size =" & Integer'Image (System.Storage_Unit) &
+         " , actually =" & Integer'Image (Bit_8'Size));
    end if;
 
    if Bit_G'Size /= Modular_Double_Size then
       Report.Failed
-        ("Expected Bit_G'Size =" &
-         Integer'Image (Modular_Double_Size) &
-         " , actually =" &
-         Integer'Image (Bit_G'Size));
+        ("Expected Bit_G'Size =" & Integer'Image (Modular_Double_Size) &
+         " , actually =" & Integer'Image (Bit_G'Size));
    end if;
 
    if Byte_8'Size /= Modular_Single_Size then
       Report.Failed
-        ("Expected Byte_8'Size =" &
-         Integer'Image (Modular_Single_Size) &
-         " , actually =" &
-         Integer'Image (Byte_8'Size));
+        ("Expected Byte_8'Size =" & Integer'Image (Modular_Single_Size) &
+         " , actually =" & Integer'Image (Byte_8'Size));
    end if;
 
    if Byte_G'Size /= Modular_Double_Size then
       Report.Failed
-        ("Expected Bit_G'Size =" &
-         Integer'Image (Modular_Double_Size) &
-         " , actually =" &
-         Integer'Image (Byte_G'Size));
+        ("Expected Bit_G'Size =" & Integer'Image (Modular_Double_Size) &
+         " , actually =" & Integer'Image (Byte_G'Size));
    end if;
 
    if Smallword_1'Size /= Modular_Double_Size then
       Report.Failed
-        ("Expected Smallword_1'Size =" &
-         Integer'Image (Modular_Double_Size) &
-         ", actually =" &
-         Integer'Image (Smallword_1'Size));
+        ("Expected Smallword_1'Size =" & Integer'Image (Modular_Double_Size) &
+         ", actually =" & Integer'Image (Smallword_1'Size));
    end if;
 
    if Smallword_2'Size /= Modular_Quad_Size then
       Report.Failed
-        ("Expected Smallword_2'Size =" &
-         Integer'Image (Modular_Quad_Size) &
-         ", actually =" &
-         Integer'Image (Smallword_2'Size));
+        ("Expected Smallword_2'Size =" & Integer'Image (Modular_Quad_Size) &
+         ", actually =" & Integer'Image (Smallword_2'Size));
    end if;
 
    if Byte_Array_1'Size /= Array_Quad_Size then
       Report.Failed
-        ("Expected Byte_Array_1'Size =" &
-         Integer'Image (Array_Quad_Size) &
-         ", actually =" &
-         Integer'Image (Byte_Array_1'Size));
+        ("Expected Byte_Array_1'Size =" & Integer'Image (Array_Quad_Size) &
+         ", actually =" & Integer'Image (Byte_Array_1'Size));
    end if;
 
    if Smallword_Array_1'Size /= Array_Octo_Size then
       Report.Failed
         ("Expected Smallword_Array_1'Size =" &
-         Integer'Image (Array_Octo_Size) &
-         ", actually =" &
+         Integer'Image (Array_Octo_Size) & ", actually =" &
          Integer'Image (Smallword_Array_1'Size));
    end if;
 
    if Transmission_Data_1'Size /= Enum_Size
-     and then Transmission_Data_1'Size /= Rounded_Enum_Size
-   then
+     and then Transmission_Data_1'Size /= Rounded_Enum_Size then
       Report.Failed
         ("Expected Transmission_Data_1'Size =" &
-         Integer'Image (Rounded_Enum_Size) &
-         ", actually =" &
+         Integer'Image (Rounded_Enum_Size) & ", actually =" &
          Integer'Image (Transmission_Data_1'Size));
    end if;
 
    if Transmission_Data_2'Size /= Enum_Quad_Size then
       Report.Failed
         ("Expected Transmission_Data_2'Size =" &
-         Integer'Image (Enum_Quad_Size) &
-         ", actually =" &
+         Integer'Image (Enum_Quad_Size) & ", actually =" &
          Integer'Image (Transmission_Data_2'Size));
    end if;
 

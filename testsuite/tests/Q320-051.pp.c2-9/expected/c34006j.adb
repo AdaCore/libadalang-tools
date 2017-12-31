@@ -83,30 +83,17 @@ procedure C34006j is
          end case;
       end record;
 
-      function Create
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         C : Component;
-         F : Float;
-         X : Parent  -- TO RESOLVE OVERLOADING.
+      function Create (B : Boolean; L : Length; I : Integer; S : String;
+         C : Component; F : Float; X : Parent  -- TO RESOLVE OVERLOADING.
          ) return Parent;
 
       function Equal (X, Y : Parent) return Boolean;
 
-      function Aggr
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         C : Component) return Parent;
+      function Aggr (B : Boolean; L : Length; I : Integer; S : String;
+         C             : Component) return Parent;
 
-      function Aggr
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         F : Float) return Parent;
+      function Aggr (B : Boolean; L : Length; I : Integer;
+         F             : Float) return Parent;
 
    end Pkg_P;
 
@@ -144,14 +131,8 @@ procedure C34006j is
 
    package body Pkg_P is
 
-      function Create
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         C : Component;
-         F : Float;
-         X : Parent) return Parent
+      function Create (B : Boolean; L : Length; I : Integer; S : String;
+         C               : Component; F : Float; X : Parent) return Parent
       is
       begin
          return A : Parent (B, L) do
@@ -179,12 +160,8 @@ procedure C34006j is
          end case;
       end Equal;
 
-      function Aggr
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         C : Component) return Parent
+      function Aggr (B : Boolean; L : Length; I : Integer; S : String;
+         C             : Component) return Parent
       is
       begin
          return Result : Parent (B, L) do
@@ -194,11 +171,8 @@ procedure C34006j is
          end return;
       end Aggr;
 
-      function Aggr
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         F : Float) return Parent
+      function Aggr (B : Boolean; L : Length; I : Integer;
+         F             : Float) return Parent
       is
       begin
          return Result : Parent (B, L) do
@@ -245,20 +219,15 @@ begin
       Failed ("INCORRECT CONVERSION TO PARENT");
    end if;
 
-   if X.B /= True or
-     X.L /= 3 or
+   if X.B /= True or X.L /= 3 or
      Create (False, 2, 3, "XX", C5, 6.0, X).B /= False or
-     Create (False, 2, 3, "XX", C5, 6.0, X).L /= 2
-   then
+     Create (False, 2, 3, "XX", C5, 6.0, X).L /= 2 then
       Failed ("INCORRECT SELECTION (DISCRIMINANT)");
    end if;
 
-   if X.I /= 1 or
-     X.S /= "ABC" or
-     not Equal (X.C, C4) or
+   if X.I /= 1 or X.S /= "ABC" or not Equal (X.C, C4) or
      Create (False, 2, 3, "XX", C5, 6.0, X).I /= 3 or
-     Create (False, 2, 3, "XX", C5, 6.0, X).F /= 6.0
-   then
+     Create (False, 2, 3, "XX", C5, 6.0, X).F /= 6.0 then
       Failed ("INCORRECT SELECTION (VALUE)");
    end if;
 

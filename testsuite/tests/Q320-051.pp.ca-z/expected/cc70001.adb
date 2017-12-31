@@ -14,8 +14,7 @@ procedure Cc70001 is
 
    procedure Reset_All_Scores is new Cc70001_2        -- Operation on lists of
      (Elem_Type => Cc70001_3.Points,                  -- points.
-      List_Mgr  => Lists_Of_Scores,
-      List_Ops  => Score_Ops);
+      List_Mgr  => Lists_Of_Scores, List_Ops => Score_Ops);
 
    -- Begin test code declarations: -----------------------
 
@@ -34,10 +33,8 @@ procedure Cc70001 is
       end loop;
    end Tc_Initialize_List;
 
-   procedure Tc_Verify_List
-     (L        : in out Lists_Of_Scores.List_Type;
-      Expected : in     Tc_Score_Array;
-      Ok       :    out Boolean)
+   procedure Tc_Verify_List (L : in out Lists_Of_Scores.List_Type;
+      Expected                 : in     Tc_Score_Array; Ok : out Boolean)
    is
       Actual : Tc_Score_Array;
    begin                                  -- Verify that all scores have been

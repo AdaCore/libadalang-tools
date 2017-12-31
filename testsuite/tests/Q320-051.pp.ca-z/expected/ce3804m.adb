@@ -49,8 +49,7 @@ begin
    Test
      ("CE3804M",
       "CHECK THAT FLOAT_IO GET WILL RAISE " &
-      "DATA_ERROR IF THE USE OF # AND : IN " &
-      "BASED LITERALS IS MIXED");
+      "DATA_ERROR IF THE USE OF # AND : IN " & "BASED LITERALS IS MIXED");
 
    declare
       Ft : File_Type;

@@ -56,10 +56,8 @@ procedure C458001 is
    Last_Check : Natural                    := Natural'First;
    Test_Array : array (1 .. 10) of Integer := (others => -1);
 
-   function Succession_Check
-     (X       : Integer;
-      Result  : Boolean;
-      Forward : Boolean) return Boolean
+   function Succession_Check (X : Integer; Result : Boolean;
+      Forward                   : Boolean) return Boolean
    is
    begin
 

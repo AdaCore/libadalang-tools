@@ -40,8 +40,7 @@ begin
      ("C35508H",
       "CHECK THAT 'PRED' AND 'SUCC' YIELD THE " &
       "CORRECT RESULTS WHEN THE PREFIX IS A " &
-      "FORMAL DISCRETE TYPE WHOSE ACTUAL PARAMETER " &
-      "IS A BOOLEAN TYPE");
+      "FORMAL DISCRETE TYPE WHOSE ACTUAL PARAMETER " & "IS A BOOLEAN TYPE");
 
    declare
 
@@ -81,8 +80,7 @@ begin
                null;
             when others =>
                Failed
-                 ("WRONG EXCEPTION RAISED FOR " &
-                  Str &
+                 ("WRONG EXCEPTION RAISED FOR " & Str &
                   "'PRED (SBOOL'BASE'FIRST)");
          end;
 
@@ -97,8 +95,7 @@ begin
                null;
             when others =>
                Failed
-                 ("WRONG EXCEPTION RAISED FOR " &
-                  Str &
+                 ("WRONG EXCEPTION RAISED FOR " & Str &
                   "'SUCC (SBOOL'BASE'LAST)");
          end;
       end P;

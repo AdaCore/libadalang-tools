@@ -55,8 +55,7 @@ begin
          begin
             Failed
               ("NO EXCEPTION RAISED AT THE " &
-               "ELABORATION OF SUBTYPE SUBREC " &
-               Integer'Image (Sr.D));
+               "ELABORATION OF SUBTYPE SUBREC " & Integer'Image (Sr.D));
          end;
       exception
          when others =>
@@ -79,8 +78,7 @@ begin
             Ar : Arr;
          begin
             Failed
-              ("NO EXCEPTION RAISED AT THE " &
-               "ELABORATION OF TYPE ARR " &
+              ("NO EXCEPTION RAISED AT THE " & "ELABORATION OF TYPE ARR " &
                Integer'Image (Ar (1).D));
          end;
       exception
@@ -106,8 +104,7 @@ begin
             R1 : Rec1;
          begin
             Failed
-              ("NO EXCEPTION RAISED AT THE " &
-               "ELABORATION OF TYPE REC1 " &
+              ("NO EXCEPTION RAISED AT THE " & "ELABORATION OF TYPE REC1 " &
                Integer'Image (R1.X.D));
          end;
       exception
@@ -130,8 +127,7 @@ begin
             Acr : Accrec;
          begin
             Failed
-              ("NO EXCEPTION RAISED AT THE " &
-               "ELABORATION OF TYPE ACCREC " &
+              ("NO EXCEPTION RAISED AT THE " & "ELABORATION OF TYPE ACCREC " &
                Integer'Image (Acr.D));
          end;
       exception
@@ -154,8 +150,7 @@ begin
             Nr : Newrec;
          begin
             Failed
-              ("NO EXCEPTION RAISED AT THE " &
-               "ELABORATION OF TYPE NEWREC " &
+              ("NO EXCEPTION RAISED AT THE " & "ELABORATION OF TYPE NEWREC " &
                Integer'Image (Nr.D));
          end;
       exception
@@ -175,8 +170,7 @@ begin
          R : Rec (Ident_Int (-1));
       begin
          Failed
-           ("NO EXCEPTION RAISED AT THE DECLARATION OF " &
-            "R " &
+           ("NO EXCEPTION RAISED AT THE DECLARATION OF " & "R " &
             Integer'Image (R.D));
       exception
          when others =>
@@ -198,8 +192,7 @@ begin
             Rn : Rec_Name := new Rec (Ident_Int (-1));
          begin
             Failed
-              ("NO EXCEPTION RAISED AT THE " &
-               "DECLARATION OF OBJECT RN " &
+              ("NO EXCEPTION RAISED AT THE " & "DECLARATION OF OBJECT RN " &
                Integer'Image (Rn.D));
          end;
       exception
@@ -223,8 +216,7 @@ begin
             Br : Bad_Rec;
          begin
             Failed
-              ("NO EXCEPTION RAISED AT THE " &
-               "DECLARATION OF OBJECT BR " &
+              ("NO EXCEPTION RAISED AT THE " & "DECLARATION OF OBJECT BR " &
                Integer'Image (Br.D));
          end;
       exception

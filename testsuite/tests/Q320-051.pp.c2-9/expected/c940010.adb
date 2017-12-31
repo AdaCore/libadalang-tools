@@ -251,8 +251,7 @@ begin
          -- Note: We are not really interested in this next check. It is
          --       here to ensure the earlier statements which raised the
          --       Constraint_Error are not optimized out
-        (Ramp_31.Tc_Get_Current_Exception /= 3)
-      then
+        (Ramp_31.Tc_Get_Current_Exception /= 3) then
          Report.Failed ("Unexpected paths taken");
       end if;
 

@@ -76,9 +76,8 @@ begin
          Value : Integer;
       end record;
 
-      R1, R2 : Rec (F (1), G (1)) := (F1 (1), G1 (1), Value => H (1));
-      Cr1,
-      Cr2 : constant Rec (F (2), G (2)) :=
+      R1, R2   : Rec (F (1), G (1)) := (F1 (1), G1 (1), Value => H (1));
+      Cr1, Cr2 : constant Rec (F (2), G (2)) :=
         (F1 (2), G1 (2), Value => H (2));
 
       procedure Check (R : Rec; V1, V2, Val : Integer; S : String) is
@@ -86,26 +85,16 @@ begin
          if R.D1 = V1 then
             if R.D2 = V2 then
                Comment
-                 (S &
-                  ".D1 INITIALIZED TO " &
-                  Integer'Image (V1) &
-                  " AND " &
-                  S &
-                  ".D2 INITIALIZED TO " &
-                  Integer'Image (V2));
+                 (S & ".D1 INITIALIZED TO " & Integer'Image (V1) & " AND " &
+                  S & ".D2 INITIALIZED TO " & Integer'Image (V2));
             else
                Failed (S & ".D2 INITIALIZED INCORRECTLY - 1");
             end if;
          elsif R.D1 = V2 then
             if R.D2 = V1 then
                Comment
-                 (S &
-                  ".D1 INITIALIZED TO " &
-                  Integer'Image (V2) &
-                  " AND " &
-                  S &
-                  ".D2 INITIALIZED TO " &
-                  Integer'Image (V1));
+                 (S & ".D1 INITIALIZED TO " & Integer'Image (V2) & " AND " &
+                  S & ".D2 INITIALIZED TO " & Integer'Image (V1));
             else
                Failed (S & ".D2 INITIALIZED INCORRECTLY - 2");
             end if;

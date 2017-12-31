@@ -11,9 +11,8 @@
       File.Blocks     := Max_File_Size;
    end Create_File;
    ------------------------------------------------------------------------
-   procedure Compress_File
-     (Original        : in     Extended_File_Type;
-      Compressed_File :    out Extended_File_Type)
+   procedure Compress_File (Original : in     Extended_File_Type;
+      Compressed_File                :    out Extended_File_Type)
    is
    begin
       Compressed_File.Descriptor := Next_Available_File;
@@ -25,8 +24,7 @@
    begin
       if
         ((File.Descriptor /= System_Extended_File.Descriptor) and
-         (File.Mode = Read_Write) and
-         (File.Blocks = Max_File_Size))
+         (File.Mode = Read_Write) and (File.Blocks = Max_File_Size))
       then
          return True;
       else
@@ -39,8 +37,7 @@
    begin
       if
         ((File.Descriptor /= System_File.Descriptor) and
-         (File.Mode = Read_Only) and
-         (File.Blocks = Max_File_Size / 2))
+         (File.Mode = Read_Only) and (File.Blocks = Max_File_Size / 2))
       then
          return True;
       else

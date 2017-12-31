@@ -113,9 +113,8 @@ begin
 
       Tc_Size : Natural := Natural'First;
 
-      procedure Data_Storage
-        (Number_Of_Units : in     Natural;
-         Result          :    out Natural)
+      procedure Data_Storage (Number_Of_Units : in     Natural;
+         Result                               :    out Natural)
       is
 
          -- Type based on input parameter. Uses type Unit_Type as the array
@@ -150,8 +149,7 @@ begin
          Buffer_Io.Create (Buffer_File, Buffer_Io.Out_File, The_Filename);
 
          Flat_Storage_Io.Write
-           (Buffer => Outbound_Buffer,
-            Item   => Storage_Item);
+           (Buffer => Outbound_Buffer, Item => Storage_Item);
 
          -- At this point, any levels of indirection have been removed by the
          -- Storage_IO procedure, and the buffered data can be written to a
@@ -174,9 +172,8 @@ begin
             end if;
       end Data_Storage;
 
-      procedure Data_Retrieval
-        (Number_Of_Units : in     Natural;
-         Result          :    out Natural)
+      procedure Data_Retrieval (Number_Of_Units : in     Natural;
+         Result                                 :    out Natural)
       is
          type Unit_Array_Type is array (1 .. Number_Of_Units) of Unit_Type;
 
@@ -247,16 +244,14 @@ begin
 
       -- The number of Units is provided in this call to Data_Storage.
       Data_Storage
-        (Number_Of_Units => Natural (Report.Ident_Int (5)),
-         Result          => Tc_Size);
+        (Number_Of_Units => Natural (Report.Ident_Int (5)), Result => Tc_Size);
 
       if Tc_Size /= 14 then
          Report.Failed ("Data_Storage error in Data_Storage");
       end if;
 
       Data_Retrieval
-        (Number_Of_Units => Natural (Report.Ident_Int (5)),
-         Result          => Tc_Size);
+        (Number_Of_Units => Natural (Report.Ident_Int (5)), Result => Tc_Size);
 
       if Tc_Size /= 14 then
          Report.Failed ("Data retrieval error in Data_Retrieval");

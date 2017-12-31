@@ -50,8 +50,7 @@ begin
    Test
      ("CE2404B",
       "CHECK THAT READ RAISES MODE_ERROR WHEN THE " &
-      "CURRENT MODE IS OUT_FILE AND THE FILE IS " &
-      "A TEMPORARY FILE");
+      "CURRENT MODE IS OUT_FILE AND THE FILE IS " & "A TEMPORARY FILE");
    begin
       Create (Dir_File_2, Out_File);
    exception

@@ -72,8 +72,7 @@ begin
      ("C93001A",
       "CHECK THAT DECLARED TASK OBJECTS ARE NOT " &
       "ACTIVATED BEFORE THE END OF THE DECLARATIVE " &
-
-      "PART");
+ "PART");
 
    --------------------------------------------------
 
@@ -160,8 +159,7 @@ begin
          if R.M /= 0 or R.N.N1 /= 0 then
             Failed
               ("NON-TASK COMPONENTS OF RECORD R NOT " &
-               "INITIALIZED BEFORE TASKS ACTIVATED " &
-               "- (C.1)");
+               "INITIALIZED BEFORE TASKS ACTIVATED " & "- (C.1)");
          end if;
       end Q;
 
@@ -170,8 +168,7 @@ begin
       if P.R.M /= 0 or P.R.N.N1 /= 0 then
          Failed
            ("NON-TASK COMPONENTS OF RECORDS NOT " &
-            "INITIALIZED BEFORE TASKS ACTIVATED " &
-            "- (C.2)");
+            "INITIALIZED BEFORE TASKS ACTIVATED " & "- (C.2)");
       end if;
 
       if P.I /= 0 or K /= 0 then
@@ -217,29 +214,25 @@ begin
          if Ra1.M.G /= Good or Ra1.N.all /= 0 then
             Failed
               ("NON-TASK COMPONENTS OF RECORD RA1 NOT " &
-               "INITIALIZED BEFORE TASKS ACTIVATED " &
-               "- (D)");
+               "INITIALIZED BEFORE TASKS ACTIVATED " & "- (D)");
          end if;
 
          if Ra2.M.G /= Good or Ra2.N.all /= 0 then
             Failed
               ("NON-TASK COMPONENTS OF RECORD RA2 NOT " &
-               "INITIALIZED BEFORE TASKS ACTIVATED " &
-               "- (D)");
+               "INITIALIZED BEFORE TASKS ACTIVATED " & "- (D)");
          end if;
 
          if Ra3.M.G /= Good or Ra3.N.all /= 0 then
             Failed
               ("NON-TASK COMPONENTS OF RECORD RA3 NOT " &
-               "INITIALIZED BEFORE TASKS ACTIVATED " &
-               "- (D)");
+               "INITIALIZED BEFORE TASKS ACTIVATED " & "- (D)");
          end if;
 
          if I /= 0 then
             Failed
               ("A RECORD OF ARRAY OF TASK OBJECT IN A " &
-               "PACKAGE SPEC OR BODY WAS ACTIVATED " &
-               "TOO SOON - (D)");
+               "PACKAGE SPEC OR BODY WAS ACTIVATED " & "TOO SOON - (D)");
          end if;
       end P;
 
@@ -274,15 +267,11 @@ begin
          Ar : array (1 .. 1) of Rt;
          I  : Integer := Global;
       begin
-         if Ar (1).M.B /= False or
-           Ar (1).M.C /= Ascii.Nul or
-           Ar (1).N.B /= False or
-           Ar (1).N.C /= Ascii.Nul
-         then
+         if Ar (1).M.B /= False or Ar (1).M.C /= Ascii.Nul or
+           Ar (1).N.B /= False or Ar (1).N.C /= Ascii.Nul then
             Failed
               ("NON-TASK COMPONENTS OF RECORD RT NOT " &
-               "INITIALIZED BEFORE TASKS ACTIVATED " &
-               "- (E)");
+               "INITIALIZED BEFORE TASKS ACTIVATED " & "- (E)");
          end if;
 
          if I /= 0 then

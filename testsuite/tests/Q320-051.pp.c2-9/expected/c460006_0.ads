@@ -93,13 +93,8 @@
 package C460006_0 is
 
    type Call_Id_Kind is
-     (None,
-      Parent_Outer,
-      Parent_Inner,
-      Child_Outer,
-      Child_Inner,
-      Grandchild_Outer,
-      Grandchild_Inner);
+     (None, Parent_Outer, Parent_Inner, Child_Outer, Child_Inner,
+      Grandchild_Outer, Grandchild_Inner);
 
    type Root_Type is abstract tagged record
       First_Call  : Call_Id_Kind := None;

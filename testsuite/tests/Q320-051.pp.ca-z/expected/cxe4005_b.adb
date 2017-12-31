@@ -22,8 +22,7 @@ procedure Cxe4005_B is
    type Object_Sn_Table_Type is
      array (Access_Evaluation, Type_Selection) of Integer;
    Objects : Object_Sn_Table_Type :=
-     (A1 => (101, 106, 107, 108),
-      A2 => (201, 206, 207, 208),
+     (A1 => (101, 106, 107, 108), A2 => (201, 206, 207, 208),
       B  => (301, 306, 307, 308));
 
    Test_Number : Integer := 100;
@@ -72,9 +71,7 @@ begin  -- CXE4005_B
 
             if Verbose then
                Report.Comment
-                 ("Test" &
-                  Integer'Image (Test_Number) &
-                  "  Object SN" &
+                 ("Test" & Integer'Image (Test_Number) & "  Object SN" &
                   Integer'Image (Objects (Ae, Ts)));
             end if;
 
@@ -82,39 +79,26 @@ begin  -- CXE4005_B
             if Sn1 /= Objects (Ae, Ts) then
                Report.Failed
                  ("Wrong object used in test number" &
-                  Integer'Image (Test_Number) &
-                  "  Expected" &
-                  Integer'Image (Objects (Ae, Ts)) &
-                  "  Received" &
-                  Integer'Image (Sn1) &
-                  " Single_Controlling_Operands SN");
+                  Integer'Image (Test_Number) & "  Expected" &
+                  Integer'Image (Objects (Ae, Ts)) & "  Received" &
+                  Integer'Image (Sn1) & " Single_Controlling_Operands SN");
             end if;
 
             Dual_Controlling_Operands
-              (Pointers (Ae, Ts),
-               Pointers (Ae, Ts),
-               Test_Number,
-               Sn1,
-               Sn2);
+              (Pointers (Ae, Ts), Pointers (Ae, Ts), Test_Number, Sn1, Sn2);
             if Sn1 /= Objects (Ae, Ts) then
                Report.Failed
                  ("Wrong object used in test number" &
-                  Integer'Image (Test_Number) &
-                  "  Expected" &
-                  Integer'Image (Objects (Ae, Ts)) &
-                  "  Received" &
-                  Integer'Image (Sn1) &
-                  " Dual_Controlling_Operands SN1");
+                  Integer'Image (Test_Number) & "  Expected" &
+                  Integer'Image (Objects (Ae, Ts)) & "  Received" &
+                  Integer'Image (Sn1) & " Dual_Controlling_Operands SN1");
             end if;
             if Sn2 /= Objects (Ae, Ts) then
                Report.Failed
                  ("Wrong object used in test number" &
-                  Integer'Image (Test_Number) &
-                  "  Expected" &
-                  Integer'Image (Objects (Ae, Ts)) &
-                  "  Received" &
-                  Integer'Image (Sn2) &
-                  " Dual_Controlling_Operands SN2");
+                  Integer'Image (Test_Number) & "  Expected" &
+                  Integer'Image (Objects (Ae, Ts)) & "  Received" &
+                  Integer'Image (Sn2) & " Dual_Controlling_Operands SN2");
             end if;
          end loop;
       end loop;
@@ -135,8 +119,7 @@ begin  -- CXE4005_B
       Report.Failed
         ("Program_Error not raised when remote call is" &
          " made passing a class-wide object where the" &
-         " type was declared in a" &
-         " normal package");
+         " type was declared in a" & " normal package");
    exception
       when Program_Error =>  -- expected exception
          if Verbose then
@@ -148,8 +131,7 @@ begin  -- CXE4005_B
          end if;
       when others =>
          Report.Failed
-           ("Incorrect exception raised." &
-            " Program_Error was expected" &
+           ("Incorrect exception raised." & " Program_Error was expected" &
             " when remote call is made passing a class" &
             " wide object where the type was declared in" &
             " a normal package");
@@ -163,21 +145,18 @@ begin  -- CXE4005_B
         (Cxe4005_Part_A1.Return_Open_Tagged_Type_Class);
       Report.Failed
         ("Program_Error not raised when remote access to" &
-         " class wide type designated type declared in a" &
-         " package body");
+         " class wide type designated type declared in a" & " package body");
    exception
       when Program_Error =>  -- expected exception
          if Verbose then
             Report.Comment
-              ("Program_Error raised as expected" &
-               " when remote access to" &
+              ("Program_Error raised as expected" & " when remote access to" &
                " class wide type designated type declared in a" &
                " package body");
          end if;
       when others =>
          Report.Failed
-           ("Incorrect exception raised." &
-            " Program_Error was expected" &
+           ("Incorrect exception raised." & " Program_Error was expected" &
             " when remote access to" &
             " class wide type designated type declared in a" &
             " package body");
@@ -193,11 +172,8 @@ begin  -- CXE4005_B
    begin
       Test_Number := 400;
       Dual_Controlling_Operands
-        (Pointers (A1, Common_Spec),
-         Pointers (B, Common_Spec),
-         Test_Number,
-         Sn1,
-         Sn2);
+        (Pointers (A1, Common_Spec), Pointers (B, Common_Spec), Test_Number,
+         Sn1, Sn2);
       Report.Failed
         ("Constraint_Error not raised when remote access to" &
          " class wide type originated from different partitions");
@@ -224,29 +200,20 @@ begin  -- CXE4005_B
    begin
       Test_Number := 500;
       Dual_Controlling_Operands
-        (Pointers (A1, Common_Spec),
-         Pointers (A2, Common_Spec),
-         Test_Number,
-         Sn1,
-         Sn2);
+        (Pointers (A1, Common_Spec), Pointers (A2, Common_Spec), Test_Number,
+         Sn1, Sn2);
       if Sn1 /= Objects (A1, Common_Spec) then
          Report.Failed
-           ("Wrong object used in test number" &
-            Integer'Image (Test_Number) &
-            "  Expected" &
-            Integer'Image (Objects (A1, Common_Spec)) &
-            "  Received" &
-            Integer'Image (Sn1) &
+           ("Wrong object used in test number" & Integer'Image (Test_Number) &
+            "  Expected" & Integer'Image (Objects (A1, Common_Spec)) &
+            "  Received" & Integer'Image (Sn1) &
             " Dual_Controlling_Operands SN1");
       end if;
       if Sn2 /= Objects (A2, Common_Spec) then
          Report.Failed
-           ("Wrong object used in test number" &
-            Integer'Image (Test_Number) &
-            "  Expected" &
-            Integer'Image (Objects (A2, Common_Spec)) &
-            "  Received" &
-            Integer'Image (Sn2) &
+           ("Wrong object used in test number" & Integer'Image (Test_Number) &
+            "  Expected" & Integer'Image (Objects (A2, Common_Spec)) &
+            "  Received" & Integer'Image (Sn2) &
             " Dual_Controlling_Operands SN2");
       end if;
       if Verbose then

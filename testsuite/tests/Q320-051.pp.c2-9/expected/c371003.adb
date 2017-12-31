@@ -65,10 +65,8 @@ procedure C371003 is
    Func1_Cons : Integer := 0;
 
    ---------------------------------------------------------
-   function Chk
-     (Cons    : Integer;
-      Value   : Integer;
-      Message : String) return Boolean
+   function Chk (Cons : Integer; Value : Integer;
+      Message         : String) return Boolean
    is
    begin
       if Cons /= Value then
@@ -115,16 +113,12 @@ begin
       if Vobj_1 /=
         (D3 => 1,
          C1 =>
-           (Disc1 => 1,
-            Disc2 => 1,
-            Str1  => (others => '*'),
+           (Disc1 => 1, Disc2 => 1, Str1 => (others => '*'),
             Str2  => (others => '*'))) or
         Vobj_2 /=
           (D3 => 2,
            C1 =>
-             (Disc1 => 2,
-              Disc2 => 1,
-              Str1  => (others => '*'),
+             (Disc1 => 2, Disc2 => 1, Str1 => (others => '*'),
               Str2  => (others => '*')))
       then
          Report.Failed ("VObj_1 & VObj_2 - Discriminant values not correct");
@@ -206,9 +200,7 @@ begin
                if Vobj_4 /=
                  (D3 => 1,
                   C1 =>
-                    (Disc1 => 1,
-                     Disc2 => 1,
-                     Str1  => (others => '*'),
+                    (Disc1 => 1, Disc2 => 1, Str1 => (others => '*'),
                      Str2  => (others => '*')))
                then
                   Report.Comment ("VObj_4 - Shouldn't get here");

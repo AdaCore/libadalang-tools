@@ -16,26 +16,20 @@ procedure C393013 is
    M_Gas  : C393013_5.Monitored_Gas_Turbine.Monitored_Generator;
    use type Ada.Tags.Tag;
 
-   procedure Make_Farm
-     (First_Obj : Generator'Class;
-      Tc_Tag    : Ada.Tags.Tag;
-      Tc_Id     : String)
+   procedure Make_Farm (First_Obj : Generator'Class; Tc_Tag : Ada.Tags.Tag;
+      Tc_Id                       : String)
    is
       -- Clone First_Obj with dispatching calls:
       Obj1 : Generator'Class := First_Obj.Clone (New_Location => 'X');
       Obj2 : Generator'Class := First_Obj.Clone (New_Location => 'Y');
       Obj3 : Generator'Class := First_Obj.Clone (New_Location => 'Z');
    begin
-      if Obj1.Location /= 'X'
-        or else Obj2.Location /= 'Y'
-        or else Obj3.Location /= 'Z'
-      then
+      if Obj1.Location /= 'X' or else Obj2.Location /= 'Y'
+        or else Obj3.Location /= 'Z' then
          Report.Failed ("Farm locations wrong - " & Tc_Id);
       end if;
-      if Obj1'Tag /= Tc_Tag
-        or else Obj2'Tag /= Tc_Tag
-        or else Obj3'Tag /= Tc_Tag
-      then
+      if Obj1'Tag /= Tc_Tag or else Obj2'Tag /= Tc_Tag
+        or else Obj3'Tag /= Tc_Tag then
          Report.Failed ("Farm tag wrong - " & Tc_Id);
       end if;
    end Make_Farm;
@@ -138,8 +132,7 @@ begin
       G16 : Generator'Class := G6.Clone (New_Location => 'G');
       G17 : Generator'Class := G7.Clone (New_Location => 'H');
    begin
-      if G1.Power_Output /= Report.Ident_Int (20)
-        or else G1.Location /= 'A'
+      if G1.Power_Output /= Report.Ident_Int (20) or else G1.Location /= 'A'
       then
          Report.Failed ("Wrong values for G1");
       end if;
@@ -147,8 +140,7 @@ begin
          Report.Failed ("Wrong tag for G1");
       end if;
 
-      if G2.Power_Output /= Report.Ident_Int (55)
-        or else G2.Location /= 'A'
+      if G2.Power_Output /= Report.Ident_Int (55) or else G2.Location /= 'A'
       then
          Report.Failed ("Wrong values for G2");
       end if;
@@ -158,8 +150,7 @@ begin
          Report.Failed ("Tags same for objects of different types - G2");
       end if;
 
-      if G3.Power_Output /= Report.Ident_Int (16)
-        or else G3.Location /= 'A'
+      if G3.Power_Output /= Report.Ident_Int (16) or else G3.Location /= 'A'
       then
          Report.Failed ("Wrong values for G3");
       end if;
@@ -169,8 +160,7 @@ begin
          Report.Failed ("Tags same for objects of different types - G3");
       end if;
 
-      if G4.Power_Output /= Report.Ident_Int (134)
-        or else G4.Location /= 'A'
+      if G4.Power_Output /= Report.Ident_Int (134) or else G4.Location /= 'A'
       then
          Report.Failed ("Wrong values for G4");
       end if;
@@ -180,8 +170,7 @@ begin
          Report.Failed ("Tags same for objects of different types - G4");
       end if;
 
-      if G5.Power_Output /= Report.Ident_Int (40)
-        or else G5.Location /= 'A'
+      if G5.Power_Output /= Report.Ident_Int (40) or else G5.Location /= 'A'
       then
          Report.Failed ("Wrong values for G5");
       end if;
@@ -191,8 +180,7 @@ begin
          Report.Failed ("Tags same for objects of different types - G5");
       end if;
 
-      if G6.Power_Output /= Report.Ident_Int (1_200)
-        or else G6.Location /= 'A'
+      if G6.Power_Output /= Report.Ident_Int (1_200) or else G6.Location /= 'A'
       then
          Report.Failed ("Wrong values for G6");
       end if;
@@ -202,8 +190,7 @@ begin
          Report.Failed ("Tags same for objects of different types - G6");
       end if;
 
-      if G7.Power_Output /= Report.Ident_Int (450)
-        or else G7.Location /= 'A'
+      if G7.Power_Output /= Report.Ident_Int (450) or else G7.Location /= 'A'
       then
          Report.Failed ("Wrong values for G7");
       end if;
@@ -213,8 +200,7 @@ begin
          Report.Failed ("Tags same for objects of different types - G7");
       end if;
 
-      if G11.Power_Output /= Report.Ident_Int (20)
-        or else G11.Location /= 'B'
+      if G11.Power_Output /= Report.Ident_Int (20) or else G11.Location /= 'B'
       then
          Report.Failed ("Wrong values for G11");
       end if;
@@ -222,8 +208,7 @@ begin
          Report.Failed ("Wrong tag for G11");
       end if;
 
-      if G12.Power_Output /= Report.Ident_Int (55)
-        or else G12.Location /= 'C'
+      if G12.Power_Output /= Report.Ident_Int (55) or else G12.Location /= 'C'
       then
          Report.Failed ("Wrong values for G12");
       end if;
@@ -231,8 +216,7 @@ begin
          Report.Failed ("Wrong tag for G12");
       end if;
 
-      if G13.Power_Output /= Report.Ident_Int (16)
-        or else G13.Location /= 'D'
+      if G13.Power_Output /= Report.Ident_Int (16) or else G13.Location /= 'D'
       then
          Report.Failed ("Wrong values for G13");
       end if;
@@ -240,8 +224,7 @@ begin
          Report.Failed ("Wrong tag for G13");
       end if;
 
-      if G14.Power_Output /= Report.Ident_Int (134)
-        or else G14.Location /= 'E'
+      if G14.Power_Output /= Report.Ident_Int (134) or else G14.Location /= 'E'
       then
          Report.Failed ("Wrong values for G14");
       end if;
@@ -249,8 +232,7 @@ begin
          Report.Failed ("Wrong tag for G14");
       end if;
 
-      if G15.Power_Output /= Report.Ident_Int (40)
-        or else G15.Location /= 'F'
+      if G15.Power_Output /= Report.Ident_Int (40) or else G15.Location /= 'F'
       then
          Report.Failed ("Wrong values for G15");
       end if;
@@ -259,21 +241,18 @@ begin
       end if;
 
       if G16.Power_Output /= Report.Ident_Int (1_200)
-        or else G16.Location /= 'G'
-      then
+        or else G16.Location /= 'G' then
          Report.Failed ("Wrong values for G16");
       end if;
       if G16'Tag /= C393013_5.Monitored_Hydro.Monitored_Generator'Tag then
          Report.Failed ("Wrong tag for G16");
       end if;
 
-      if G17.Power_Output /= Report.Ident_Int (450)
-        or else G17.Location /= 'H'
+      if G17.Power_Output /= Report.Ident_Int (450) or else G17.Location /= 'H'
       then
          Report.Failed ("Wrong values for G17");
       end if;
-      if G17'Tag /=
-        C393013_5.Monitored_Gas_Turbine.Monitored_Generator'Tag
+      if G17'Tag /= C393013_5.Monitored_Gas_Turbine.Monitored_Generator'Tag
       then
          Report.Failed ("Wrong tag for G17");
       end if;
@@ -284,9 +263,7 @@ begin
       Make_Farm (G3, C393013_3.Windmill'Tag, "Wind Farm");
       -- and Hoover Dam (lots of hydropower, to light Las Vegas):
       Make_Farm
-        (G6,
-         C393013_5.Monitored_Hydro.Monitored_Generator'Tag,
-         "Hoover Dam");
+        (G6, C393013_5.Monitored_Hydro.Monitored_Generator'Tag, "Hoover Dam");
    end;
 
    Report.Result;

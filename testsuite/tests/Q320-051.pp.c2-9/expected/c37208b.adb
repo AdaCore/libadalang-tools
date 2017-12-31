@@ -69,10 +69,8 @@ begin
       procedure Proc is
       begin
 
-         if P_In1'Constrained /= True or
-           P_In2'Constrained /= True or
-           P_In_Out'Constrained /= Status
-         then
+         if P_In1'Constrained /= True or P_In2'Constrained /= True or
+           P_In_Out'Constrained /= Status then
 
             Failed
               ("'CONSTRAINED ATTRIBUTES DO NOT MATCH " &
@@ -84,18 +82,15 @@ begin
             exception
                when others =>
                   Failed
-                    ("EXCEPTION RAISED " &
-                     "WHEN TRYING TO " &
-                     "CHANGE UNCONSTRAINED " &
-                     "DISCRIMINANT VALUE");
+                    ("EXCEPTION RAISED " & "WHEN TRYING TO " &
+                     "CHANGE UNCONSTRAINED " & "DISCRIMINANT VALUE");
             end;
          else
             begin
                P_In_Out := (Disc => Ident_Int (7));
                Failed
                  ("DISCRIMINANT OF CONSTRAINED " &
-                  "ACTUAL PARAMETER ILLEGALLY " &
-                  "CHANGED BY ASSIGNMENT");
+                  "ACTUAL PARAMETER ILLEGALLY " & "CHANGED BY ASSIGNMENT");
             exception
                when Constraint_Error =>
                   null;

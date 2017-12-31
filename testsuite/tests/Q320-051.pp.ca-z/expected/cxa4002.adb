@@ -73,24 +73,15 @@ begin
       type Restricted_Words_Array_Type is array (1 .. 10) of String (1 .. 10);
 
       Restricted_Words : Restricted_Words_Array_Type :=
-        ("   platoon",
-         " marines  ",
-         "  Marines ",
-         "north     ",
-         "south     ",
-         "      east",
-         "  beach   ",
-         "   airport",
-         "airfield  ",
-         "     road ");
+        ("   platoon", " marines  ", "  Marines ", "north     ", "south     ",
+         "      east", "  beach   ", "   airport", "airfield  ", "     road ");
 
       subtype Line_Of_Text_Type is String (1 .. 25);
       type Page_Of_Text_Type is
         array (1 .. Number_Of_Lines) of Line_Of_Text_Type;
 
       Text_Page : Page_Of_Text_Type :=
-        ("The platoon of Marines   ",
-         "moved south on the south ",
+        ("The platoon of Marines   ", "moved south on the south ",
          "road to the airfield.    ");
 
       Tc_Revised_Line_1 : constant String := "The XXXXXXX of XXXXXXX   ";
@@ -99,9 +90,8 @@ begin
 
       ---
 
-      procedure Censor
-        (Source_String  : in out String;
-         Pattern_String : in     String)
+      procedure Censor (Source_String : in out String;
+         Pattern_String               : in     String)
       is
 
          -- Create a replacement string that is the same length as the pattern
@@ -121,25 +111,20 @@ begin
          Tc_Total :=
            Tc_Total +                                     -- Count
            Ada.Strings.Fixed.Count
-             (Source  => Source_String,
-              Pattern => Pattern_String,
+             (Source  => Source_String, Pattern => Pattern_String,
               Mapping => Map);
          loop
 
             Index :=
               Ada.Strings.Fixed.Index                        -- Index
                 (Source_String (Start_Pos .. Source_String'Last),
-                 Pattern_String,
-                 Going,
-                 Map);
+                 Pattern_String, Going, Map);
 
             exit when Index = 0;   -- No matches, exit loop.
 
             -- if a match was found, modify the substring.
             Ada.Strings.Fixed.Replace_Slice                   -- Replace_Slice
-              (Source_String,
-               Index,
-               Index + Pattern_String'Length - 1,
+              (Source_String, Index, Index + Pattern_String'Length - 1,
                Replacement);
             Start_Pos := Index + Pattern_String'Length;
 

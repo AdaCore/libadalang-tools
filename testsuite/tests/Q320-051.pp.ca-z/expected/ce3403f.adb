@@ -55,8 +55,7 @@ begin
    Test
      ("CE3403F",
       "CHECK THAT SKIP_LINE RAISES END_ERROR " &
-      "IF AN ATTEMPT IS MADE TO SKIP A FILE " &
-      "TERMINATOR");
+      "IF AN ATTEMPT IS MADE TO SKIP A FILE " & "TERMINATOR");
 
    begin
       Create (File, Out_File, Legal_File_Name);

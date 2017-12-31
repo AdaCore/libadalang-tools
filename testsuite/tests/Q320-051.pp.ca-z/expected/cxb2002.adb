@@ -70,8 +70,7 @@ begin
       Tc_Amount : Natural := Natural'First;
 
       -- Range of type Unsigned_16 is 0..65535 (0..Modulus-1).
-      Tc_Val_Unsigned_16,
-      Tc_Result_Unsigned_16 : Unsigned_16 :=
+      Tc_Val_Unsigned_16, Tc_Result_Unsigned_16 : Unsigned_16 :=
         Unsigned_16'First;
 
    begin
@@ -93,8 +92,7 @@ begin
       if Shift_Left (Tc_Val_Unsigned_16, 0) /= Unsigned_16'Last or
         Shift_Left (Tc_Val_Unsigned_16, 5) /=
           Unsigned_16'Last - (2**0 + 2**1 + 2**2 + 2**3 + 2**4) or
-        Shift_Left (Tc_Val_Unsigned_16, 16) /= 0
-      then
+        Shift_Left (Tc_Val_Unsigned_16, 16) /= 0 then
          Report.Failed ("Incorrect result from Shift_Left - 2");
       end if;
 
@@ -105,8 +103,7 @@ begin
       Tc_Result_Unsigned_16 :=
         Shift_Right (Value => Tc_Val_Unsigned_16, Amount => Tc_Amount);
 
-      if Tc_Result_Unsigned_16 /=
-        Unsigned_16'Last - (2**15 + 2**14 + 2**13)
+      if Tc_Result_Unsigned_16 /= Unsigned_16'Last - (2**15 + 2**14 + 2**13)
       then
          Report.Failed ("Incorrect result from Shift_Right - 1");
       end if;
@@ -114,8 +111,7 @@ begin
       if Shift_Right (Tc_Val_Unsigned_16, 0) /= Unsigned_16'Last or
         Shift_Right (Tc_Val_Unsigned_16, 5) /=
           Unsigned_16'Last - (2**15 + 2**14 + 2**13 + 2**12 + 2**11) or
-        Shift_Right (Tc_Val_Unsigned_16, 16) /= 0
-      then
+        Shift_Right (Tc_Val_Unsigned_16, 16) /= 0 then
          Report.Failed ("Incorrect result from Shift_Right - 2");
       end if;
 
@@ -129,8 +125,7 @@ begin
           Unsigned_16'Last - (2**0 + 2**1 + 2**2) or
         Shift_Right (Shift_Left (Tc_Val_Unsigned_16, 2), 4) /=
           Unsigned_16'Last - (2**15 + 2**14 + 2**13 + 2**12) or
-        Shift_Right (Shift_Left (Tc_Val_Unsigned_16, 2), 16) /= 0
-      then
+        Shift_Right (Shift_Left (Tc_Val_Unsigned_16, 2), 16) /= 0 then
          Report.Failed
            ("Incorrect result from Shift_Left - " &
             "Shift_Right functions used in combination");
@@ -146,8 +141,7 @@ begin
       Tc_Val_Unsigned_16    := 2**15 - 1; -- Less than one half of modulus.
       Tc_Result_Unsigned_16 :=
         Shift_Right_Arithmetic (Tc_Val_Unsigned_16, Tc_Amount);
-      if Tc_Result_Unsigned_16 /=
-        Tc_Val_Unsigned_16 - (2**14 + 2**13 + 2**12)
+      if Tc_Result_Unsigned_16 /= Tc_Val_Unsigned_16 - (2**14 + 2**13 + 2**12)
       then
          Report.Failed ("Incorrect result from Shift_Right_Arithmetic - 1");
       end if;
@@ -156,8 +150,7 @@ begin
         Tc_Val_Unsigned_16 or
         Shift_Right_Arithmetic (Tc_Val_Unsigned_16, 5) /=
           Tc_Val_Unsigned_16 - (2**14 + 2**13 + 2**12 + 2**11 + 2**10) or
-        Shift_Right_Arithmetic (Tc_Val_Unsigned_16, 16) /= 0
-      then
+        Shift_Right_Arithmetic (Tc_Val_Unsigned_16, 16) /= 0 then
          Report.Failed ("Incorrect result from Shift_Right_Arithmetic - 2");
       end if;
 
@@ -202,8 +195,7 @@ begin
       Tc_Val_Unsigned_16 := 2**15 + 2**14 + 2**1 + 2**0;
       if Rotate_Left (Tc_Val_Unsigned_16, 0) /= 2**15 + 2**14 + 2**1 + 2**0 or
         Rotate_Left (Tc_Val_Unsigned_16, 5) /= 2**6 + 2**5 + 2**4 + 2**3 or
-        Rotate_Left (Tc_Val_Unsigned_16, 16) /= Tc_Val_Unsigned_16
-      then
+        Rotate_Left (Tc_Val_Unsigned_16, 16) /= Tc_Val_Unsigned_16 then
          Report.Failed ("Incorrect result from Rotate_Left - 2");
       end if;
 
@@ -219,8 +211,7 @@ begin
 
       if Rotate_Right (Tc_Val_Unsigned_16, 0) /= 2**1 + 2**0 or
         Rotate_Right (Tc_Val_Unsigned_16, 5) /= 2**12 + 2**11 or
-        Rotate_Right (Tc_Val_Unsigned_16, 16) /= 2**1 + 2**0
-      then
+        Rotate_Right (Tc_Val_Unsigned_16, 16) /= 2**1 + 2**0 then
          Report.Failed ("Incorrect result from Rotate_Right - 2");
       end if;
 
@@ -231,8 +222,7 @@ begin
       if Rotate_Left (Rotate_Right (Tc_Val_Unsigned_16, 4), 3) /= 49_152 or
         Rotate_Left (Rotate_Right (Tc_Val_Unsigned_16, 1), 3) /= 6 or
         Rotate_Right (Rotate_Left (Tc_Val_Unsigned_16, 3), 7) /= 6_144 or
-        Rotate_Right (Rotate_Left (Tc_Val_Unsigned_16, 1), 16) /= 3
-      then
+        Rotate_Right (Rotate_Left (Tc_Val_Unsigned_16, 1), 16) /= 3 then
          Report.Failed
            ("Incorrect result from Rotate_Left - " &
             "Rotate_Right functions used in combination");
@@ -241,8 +231,7 @@ begin
    exception
       when The_Error : others =>
          Report.Failed
-           ("The following exception was raised in the " &
-            "Test_Block: " &
+           ("The following exception was raised in the " & "Test_Block: " &
             Exception_Name (The_Error));
    end Test_Block;
 

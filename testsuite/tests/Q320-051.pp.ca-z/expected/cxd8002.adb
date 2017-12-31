@@ -36,23 +36,17 @@ procedure Cxd8002 is
          Finish := Rt.Clock;
          if Finish - Start < Delay_Amount then
             Report.Failed
-              ("delay_until too short at iteration" &
-               Int'Image (Iteration) &
+              ("delay_until too short at iteration" & Int'Image (Iteration) &
                "  requested delay: " &
                Duration'Image (Rt.To_Duration (Delay_Amount)) &
-               "  task priority:" &
-               Integer'Image (Pri) &
-               "  actual delay: " &
+               "  task priority:" & Integer'Image (Pri) & "  actual delay: " &
                Duration'Image (Rt.To_Duration (Finish - Start)));
          elsif Verbose then
             Report.Comment
-              ("delay_until iteration" &
-               Int'Image (Iteration) &
+              ("delay_until iteration" & Int'Image (Iteration) &
                "  requested delay: " &
                Duration'Image (Rt.To_Duration (Delay_Amount)) &
-               "  task priority:" &
-               Integer'Image (Pri) &
-               "  actual delay: " &
+               "  task priority:" & Integer'Image (Pri) & "  actual delay: " &
                Duration'Image (Rt.To_Duration (Finish - Start)));
          end if;
          exit when Rt.To_Duration (Delay_Amount) > Max_Delay;
@@ -71,31 +65,24 @@ procedure Cxd8002 is
          Start := Rt.Clock;
          delay Rt.To_Duration (Delay_Amount);
          Finish := Rt.Clock;
-         if Rt.To_Duration (Finish - Start) <
-           Rt.To_Duration (Delay_Amount)
+         if Rt.To_Duration (Finish - Start) < Rt.To_Duration (Delay_Amount)
          then
             -- We must check this in type Duration, as the conversion to
             -- Duration can round down if Duration'Small > Time_Unit and
             -- Duration'Small isn't a multiple of Time_Unit. In that case,
             -- we could delay less than Delay_Amount.
             Report.Failed
-              ("delay too short at iteration" &
-               Int'Image (Iteration) &
+              ("delay too short at iteration" & Int'Image (Iteration) &
                "  requested delay: " &
                Duration'Image (Rt.To_Duration (Delay_Amount)) &
-               "  task priority:" &
-               Integer'Image (Pri) &
-               "  actual delay: " &
+               "  task priority:" & Integer'Image (Pri) & "  actual delay: " &
                Duration'Image (Rt.To_Duration (Finish - Start)));
          elsif Verbose then
             Report.Comment
-              ("delay_relative iteration" &
-               Int'Image (Iteration) &
+              ("delay_relative iteration" & Int'Image (Iteration) &
                "  requested delay: " &
                Duration'Image (Rt.To_Duration (Delay_Amount)) &
-               "  task priority:" &
-               Integer'Image (Pri) &
-               "  actual delay: " &
+               "  task priority:" & Integer'Image (Pri) & "  actual delay: " &
                Duration'Image (Rt.To_Duration (Finish - Start)));
          end if;
          exit when Rt.To_Duration (Delay_Amount) > Max_Delay;
@@ -114,8 +101,7 @@ procedure Cxd8002 is
 begin
 
    Report.Test
-     ("CXD8002",
-      "Check the use of Real_Time.Clock" & " in delay statements");
+     ("CXD8002", "Check the use of Real_Time.Clock" & " in delay statements");
 
    declare
       -- lots of tests going on in parallel and preempting tests

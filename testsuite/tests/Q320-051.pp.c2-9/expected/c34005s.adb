@@ -102,11 +102,8 @@ procedure C34005s is
 
       type Parent is array (Index range <>, Index range <>) of Component;
 
-      function Create
-        (F1, L1 : Index;
-         F2, L2 : Index;
-         C      : Component;
-         Dummy  : Parent   -- TO RESOLVE OVERLOADING.
+      function Create (F1, L1 : Index; F2, L2 : Index; C : Component;
+         Dummy                : Parent   -- TO RESOLVE OVERLOADING.
          ) return Parent;
 
       function Equal (X, Y : Parent) return Boolean;
@@ -116,8 +113,7 @@ procedure C34005s is
    use Pkg_P;
 
    type T is
-     new Parent
-       (Ident_Int (4) .. Ident_Int (5),
+     new Parent (Ident_Int (4) .. Ident_Int (5),
         Ident_Int (6) .. Ident_Int (8));
 
    type Arrt is array (Integer range <>, Integer range <>) of Component;
@@ -173,11 +169,8 @@ procedure C34005s is
 
    package body Pkg_P is
 
-      function Create
-        (F1, L1 : Index;
-         F2, L2 : Index;
-         C      : Component;
-         Dummy  : Parent) return Parent
+      function Create (F1, L1 : Index; F2, L2 : Index; C : Component;
+         Dummy                : Parent) return Parent
       is
          B : Component;
       begin
@@ -267,8 +260,7 @@ begin
    Assign (U (9, 4), Create (6));
 
    if not Equal (X (Ident_Int (4), Ident_Int (6)), C1) or
-     not Equal (Create (6, 9, 2, 3, C4, X) (9, 3), C11)
-   then
+     not Equal (Create (6, 9, 2, 3, C4, X) (9, 3), C11) then
       Failed ("INCORRECT INDEX (VALUE)");
    end if;
 

@@ -69,8 +69,7 @@ begin
       Tc_Amount : Natural := Natural'First;
 
       -- Range of type Unsigned_32 is 0..(2**32)-1 (0..Modulus-1).
-      Tc_Val_Unsigned_32,
-      Tc_Result_Unsigned_32 : Unsigned_32 :=
+      Tc_Val_Unsigned_32, Tc_Result_Unsigned_32 : Unsigned_32 :=
         Unsigned_32'First;
 
    begin
@@ -92,8 +91,7 @@ begin
       Tc_Result_Unsigned_32 :=
         Unsigned_32'Last - (2**0 + 2**1 + 2**2 + 2**3 + 2**4);
       if Shift_Left (Tc_Val_Unsigned_32, 5) /= Tc_Result_Unsigned_32 or
-        Shift_Left (Tc_Val_Unsigned_32, 0) /= Unsigned_32'Last
-      then
+        Shift_Left (Tc_Val_Unsigned_32, 0) /= Unsigned_32'Last then
          Report.Failed ("Incorrect result from Shift_Left - 2");
       end if;
 
@@ -103,8 +101,7 @@ begin
       Tc_Val_Unsigned_32    := Unsigned_32'Last;
       Tc_Result_Unsigned_32 :=
         Shift_Right (Value => Tc_Val_Unsigned_32, Amount => Tc_Amount);
-      if Tc_Result_Unsigned_32 /=
-        Unsigned_32'Last - (2**31 + 2**30 + 2**29)
+      if Tc_Result_Unsigned_32 /= Unsigned_32'Last - (2**31 + 2**30 + 2**29)
       then
          Report.Failed ("Incorrect result from Shift_Right - 1");
       end if;
@@ -149,8 +146,7 @@ begin
 
       if Shift_Right_Arithmetic (Tc_Val_Unsigned_32, 0) /=
         Tc_Val_Unsigned_32 or
-        Shift_Right_Arithmetic (Tc_Val_Unsigned_32, 5) /= (2**10 + 2**5)
-      then
+        Shift_Right_Arithmetic (Tc_Val_Unsigned_32, 5) /= (2**10 + 2**5) then
          Report.Failed ("Incorrect result from Shift_Right_Arithmetic - 2");
       end if;
 
@@ -194,8 +190,7 @@ begin
       Tc_Val_Unsigned_32 := 2**31 + 2**30;
       if Rotate_Left (Tc_Val_Unsigned_32, 1) /= (2**31 + 2**0) or
         Rotate_Left (Tc_Val_Unsigned_32, 5) /= (2**4 + 2**3) or
-        Rotate_Left (Tc_Val_Unsigned_32, 32) /= Tc_Val_Unsigned_32
-      then
+        Rotate_Left (Tc_Val_Unsigned_32, 32) /= Tc_Val_Unsigned_32 then
          Report.Failed ("Incorrect result from Rotate_Left - 2");
       end if;
 
@@ -211,8 +206,7 @@ begin
 
       if Rotate_Right (Tc_Val_Unsigned_32, 3) /= (2**30 + 2**29) or
         Rotate_Right (Tc_Val_Unsigned_32, 6) /= (2**27 + 2**26) or
-        Rotate_Right (Tc_Val_Unsigned_32, 32) /= (2**1 + 2**0)
-      then
+        Rotate_Right (Tc_Val_Unsigned_32, 32) /= (2**1 + 2**0) then
          Report.Failed ("Incorrect result from Rotate_Right - 2");
       end if;
 
@@ -237,8 +231,7 @@ begin
    exception
       when The_Error : others =>
          Report.Failed
-           ("The following exception was raised in the " &
-            "Test_Block: " &
+           ("The following exception was raised in the " & "Test_Block: " &
             Exception_Name (The_Error));
    end Test_Block;
 

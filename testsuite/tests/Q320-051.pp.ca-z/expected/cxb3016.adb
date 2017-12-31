@@ -95,8 +95,7 @@ begin
    Report.Test
      ("CXB3016",
       "Check that subprograms Virtual_Length, " &
-      "Copy_Terminated_Array, and Copy_Array " &
-      "produce correct results");
+      "Copy_Terminated_Array, and Copy_Array " & "produce correct results");
 
    Test_Block :
    declare
@@ -104,12 +103,8 @@ begin
       use Ada.Exceptions;
       use Interfaces.C.Strings;
 
-      use type
-        Interfaces.C.Char,
-        Interfaces.C.Char_Array,
-        Interfaces.C.Ptrdiff_T,
-        Interfaces.C.Short,
-        Interfaces.C.Size_T;
+      use type Interfaces.C.Char, Interfaces.C.Char_Array,
+        Interfaces.C.Ptrdiff_T, Interfaces.C.Short, Interfaces.C.Size_T;
 
       Tc_Char          : Interfaces.C.Char   := 'a';
       Tc_Ptrdiff_T     : Interfaces.C.Ptrdiff_T;
@@ -123,13 +118,11 @@ begin
       type Short_Array_Type is
         array (Interfaces.C.Size_T range <>) of aliased Interfaces.C.Short;
 
-      Ch_Array : Interfaces.C
-        .Char_Array
+      Ch_Array : Interfaces.C.Char_Array
         (0 .. Interfaces.C.Size_T (Alphabet'Length)) :=
         Interfaces.C.To_C (Alphabet, True);
 
-      Tc_Ch_Array : Interfaces.C
-        .Char_Array
+      Tc_Ch_Array : Interfaces.C.Char_Array
         (0 .. Interfaces.C.Size_T (Blank_String'Length)) :=
         Interfaces.C.To_C (Blank_String, True);
 
@@ -137,14 +130,12 @@ begin
       Tc_Short_Array : Short_Array_Type (Min_Array_Size .. Max_Array_Size);
 
       package Char_Pointers is new Interfaces.C.Pointers
-        (Index              => Interfaces.C.Size_T,
-         Element            => Interfaces.C.Char,
+        (Index => Interfaces.C.Size_T, Element => Interfaces.C.Char,
          Element_Array      => Interfaces.C.Char_Array,
          Default_Terminator => Interfaces.C.Nul);
 
       package Short_Pointers is new Interfaces.C.Pointers
-        (Index              => Interfaces.C.Size_T,
-         Element            => Interfaces.C.Short,
+        (Index => Interfaces.C.Size_T, Element => Interfaces.C.Short,
          Element_Array      => Short_Array_Type,
          Default_Terminator => Short_Terminator);
 
@@ -243,8 +234,7 @@ begin
       -- Case 1: Copying the Terminator Element. (Default terminator)
 
       Char_Pointers.Copy_Terminated_Array
-        (Source => Char_Ptr,
-         Target => Tc_Char_Ptr);
+        (Source => Char_Ptr, Target => Tc_Char_Ptr);
 
       if Tc_Ch_Array /= Ch_Array then
          Report.Failed
@@ -268,9 +258,7 @@ begin
 
       Tc_Char := 'b';  -- Second char in char_array pointed to by Char_Ptr
       Char_Pointers.Copy_Terminated_Array
-        (Source     => Char_Ptr,
-         Target     => Tc_Char_Ptr,
-         Terminator => Tc_Char);
+        (Source => Char_Ptr, Target => Tc_Char_Ptr, Terminator => Tc_Char);
 
       if Tc_Ch_Array (0) /= Ch_Array (0) or  -- Initial value modified.
         Tc_Ch_Array (1) /= Ch_Array (1) or  -- Initial value modified.
@@ -293,9 +281,7 @@ begin
       end if;
 
       Short_Pointers.Copy_Terminated_Array
-        (Source     => Short_Ptr,
-         Target     => Tc_Short_Ptr,
-         Terminator => 2);
+        (Source => Short_Ptr, Target => Tc_Short_Ptr, Terminator => 2);
 
       if Tc_Short_Array (0) /= Short_Array (0) or
         Tc_Short_Array (1) /= Short_Array (1) or
@@ -320,9 +306,7 @@ begin
       Tc_Ptrdiff_T := 5;
 
       Short_Pointers.Copy_Terminated_Array
-        (Source     => Short_Ptr,
-         Target     => Tc_Short_Ptr,
-         Limit      => Tc_Ptrdiff_T,
+        (Source => Short_Ptr, Target => Tc_Short_Ptr, Limit => Tc_Ptrdiff_T,
          Terminator => Short_Terminator);
 
       if Tc_Short_Array (0) /= Short_Array (0) or
@@ -361,9 +345,7 @@ begin
       -- will serve as the "terminator" element.
 
       Short_Pointers.Copy_Terminated_Array
-        (Source     => Short_Ptr,
-         Target     => Tc_Short_Ptr,
-         Limit      => Tc_Ptrdiff_T,
+        (Source => Short_Ptr, Target => Tc_Short_Ptr, Limit => Tc_Ptrdiff_T,
          Terminator => Short_Terminator);
 
       if Tc_Short_Array (0) /= Short_Array (0) or  -- First element copied.
@@ -439,16 +421,11 @@ begin
       Tc_Ptrdiff_T := 4;
 
       Char_Pointers.Copy_Array
-        (Source => Char_Ptr,
-         Target => Tc_Char_Ptr,
-         Length => Tc_Ptrdiff_T);
+        (Source => Char_Ptr, Target => Tc_Char_Ptr, Length => Tc_Ptrdiff_T);
 
-      if Tc_Ch_Array (0) /= Ch_Array (0) or
-        Tc_Ch_Array (1) /= Ch_Array (1) or
-        Tc_Ch_Array (2) /= Ch_Array (2) or
-        Tc_Ch_Array (3) /= Ch_Array (3) or
-        Tc_Ch_Array (4) = Ch_Array (4)
-      then
+      if Tc_Ch_Array (0) /= Ch_Array (0) or Tc_Ch_Array (1) /= Ch_Array (1) or
+        Tc_Ch_Array (2) /= Ch_Array (2) or Tc_Ch_Array (3) /= Ch_Array (3) or
+        Tc_Ch_Array (4) = Ch_Array (4) then
          Report.Failed
            ("Incorrect result from Copy_Array when using " &
             "char pointer arguments, partial array copied");
@@ -528,8 +505,7 @@ begin
    exception
       when The_Error : others =>
          Report.Failed
-           ("The following exception was raised in the " &
-            "Test_Block: " &
+           ("The following exception was raised in the " & "Test_Block: " &
             Exception_Name (The_Error));
    end Test_Block;
 

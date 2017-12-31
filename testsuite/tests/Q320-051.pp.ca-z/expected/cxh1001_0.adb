@@ -3,9 +3,8 @@
 with Report;
 package body Cxh1001_0 is
 
-   procedure Heap_Check
-     (A_Value  : access Imp_H.Scalar_To_Normalize;
-      A_Number : access Imp_H.Small_Number)
+   procedure Heap_Check (A_Value : access Imp_H.Scalar_To_Normalize;
+      A_Number                   : access Imp_H.Small_Number)
    is
       Value  : Num;
       Number : Integer;
@@ -15,8 +14,7 @@ package body Cxh1001_0 is
          Value := Stn_2_Num (A_Value.all);
          if Imp_H.Default_For_Scalar_To_Normalize_Is_In_Range then
             if Imp_H.Scalar_To_Normalize'Val (Value) /=
-              Imp_H.Default_For_Scalar_To_Normalize
-            then
+              Imp_H.Default_For_Scalar_To_Normalize then
                Report.Failed
                  ("Implicit initial value for local variable is not " &
                   "the predicted value");
@@ -43,8 +41,7 @@ package body Cxh1001_0 is
                   "the predicted value");
             end if;
          else
-            if Integer (Global_Number) in
-                0 .. Report.Ident_Int (Small_Last)
+            if Integer (Global_Number) in 0 .. Report.Ident_Int (Small_Last)
             then
                Report.Failed
                  ("Implicit initial value for number is a " &
@@ -64,8 +61,7 @@ package body Cxh1001_0 is
          Value := Stn_2_Num (Global_Object);
          if Imp_H.Default_For_Scalar_To_Normalize_Is_In_Range then
             if Imp_H.Scalar_To_Normalize'Val (Value) /=
-              Imp_H.Default_For_Scalar_To_Normalize
-            then
+              Imp_H.Default_For_Scalar_To_Normalize then
                Report.Failed
                  ("Implicit initial value for local variable is not " &
                   "the predicted value");
@@ -92,8 +88,7 @@ package body Cxh1001_0 is
                   "the predicted value");
             end if;
          else
-            if Integer (Global_Number) in
-                0 .. Report.Ident_Int (Small_Last)
+            if Integer (Global_Number) in 0 .. Report.Ident_Int (Small_Last)
             then
                Report.Failed
                  ("Implicit initial value for number is a " &

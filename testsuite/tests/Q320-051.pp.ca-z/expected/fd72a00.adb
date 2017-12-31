@@ -6,9 +6,7 @@ package body Fd72a00 is
       Deblank : Positive := S'First;
    begin
       Num_Io.Put
-        (S,
-         Number (System.Storage_Elements.To_Integer (Adder)),
-         Base => 16);
+        (S, Number (System.Storage_Elements.To_Integer (Adder)), Base => 16);
       while S (Deblank) = ' ' loop
          Deblank := Deblank + 1;
       end loop;

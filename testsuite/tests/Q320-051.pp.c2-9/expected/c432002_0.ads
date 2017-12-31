@@ -125,10 +125,8 @@ package C432002_0 is
    --                               S4'Length = 8
 
    -- Discriminant of parent constrained to equal new discriminant
-   type New_Discriminant_Extension
-     (N : Length)
-   is new Discriminant (L => N) with
-   record
+   type New_Discriminant_Extension (N : Length)
+   is new Discriminant (L => N) with record
       S2 : String (1 .. N);
    end record;
 
@@ -148,10 +146,8 @@ package C432002_0 is
    --                             S3'Length = 5
 
    -- Discriminant of parent extension constrained to equal a new discriminant
-   type New_Extension_Extension
-     (I : Length)
-   is new New_Discriminant_Extension (N => I) with
-   record
+   type New_Extension_Extension (I : Length)
+   is new New_Discriminant_Extension (N => I) with record
       S3 : String (1 .. I);
    end record;
 
@@ -170,10 +166,8 @@ package C432002_0 is
    -- Aggregates of Multiple_Discriminants are of the form
    --    (A, B, S1, S2), where A = S1'Length, B = S2'Length
 
-   type Multiple_Discriminant_Extension
-     (C : Length)
-   is new Multiple_Discriminants (A => C, B => C) with
-   record
+   type Multiple_Discriminant_Extension (C : Length)
+   is new Multiple_Discriminants (A => C, B => C) with record
       S3 : String (1 .. C);
    end record;
 

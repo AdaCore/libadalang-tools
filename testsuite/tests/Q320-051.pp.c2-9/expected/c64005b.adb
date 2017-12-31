@@ -74,18 +74,12 @@ procedure C64005b is
 
 begin
    Test
-     ("C64005B",
-      "RECURSIVE SUBPROGRAMS WITH ALL KINDS " & "OF DATA ACCESS");
+     ("C64005B", "RECURSIVE SUBPROGRAMS WITH ALL KINDS " & "OF DATA ACCESS");
 
    R (0, G4, G5);
 
-   if (Count /= 2) or
-     (G1 /= 4) or
-     (G2 /= 4) or
-     (G3 /= 20) or
-     (G4 /= 14) or
-     (G5 /= 35)
-   then
+   if (Count /= 2) or (G1 /= 4) or (G2 /= 4) or (G3 /= 20) or (G4 /= 14) or
+     (G5 /= 35) then
       Failed
         ("RECURSIVE INVOCATIONS' DATA ACCESS IS NOT" & " WORKING CORRECTLY");
    end if;

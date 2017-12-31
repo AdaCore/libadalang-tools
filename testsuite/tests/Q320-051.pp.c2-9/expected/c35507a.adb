@@ -36,8 +36,7 @@ begin
    Test
      ("C35507A",
       "CHECK THAT THE ATTRIBUTE 'WIDTH' YIELDS " &
-      "THE CORRECT RESULTS WHEN THE PREFIX " &
-      "IS A CHARACTER TYPE");
+      "THE CORRECT RESULTS WHEN THE PREFIX " & "IS A CHARACTER TYPE");
 
    declare
       type Char1 is (A, 'A');

@@ -74,42 +74,26 @@ package body Cxd1008_1 is
 
          if A /= Float (Id2) + F then
             Report.Failed
-              ("Do_Float A = " &
-               Float'Image (A) &
-               " for Id = " &
-               Integer'Image (Id) &
-               " and F = " &
-               Float'Image (F));
+              ("Do_Float A = " & Float'Image (A) & " for Id = " &
+               Integer'Image (Id) & " and F = " & Float'Image (F));
          end if;
 
          if B /= Float (Id2 + 1) then
             Report.Failed
-              ("Do_Float B = " &
-               Float'Image (B) &
-               " for Id = " &
-               Integer'Image (Id) &
-               " and F = " &
-               Float'Image (F));
+              ("Do_Float B = " & Float'Image (B) & " for Id = " &
+               Integer'Image (Id) & " and F = " & Float'Image (F));
          end if;
 
          if C /= A**Id2 then
             Report.Failed
-              ("Do_Float C = " &
-               Float'Image (C) &
-               " for Id = " &
-               Integer'Image (Id) &
-               " and F = " &
-               Float'Image (F));
+              ("Do_Float C = " & Float'Image (C) & " for Id = " &
+               Integer'Image (Id) & " and F = " & Float'Image (F));
          end if;
 
          if E /= F**(Id2 + 3) then
             Report.Failed
-              ("Do_Float E = " &
-               Float'Image (E) &
-               " for Id = " &
-               Integer'Image (Id) &
-               " and F = " &
-               Float'Image (F));
+              ("Do_Float E = " & Float'Image (E) & " for Id = " &
+               Integer'Image (Id) & " and F = " & Float'Image (F));
          end if;
 
          -- optimization thwarting - make it look like the values computed in
@@ -153,9 +137,7 @@ package body Cxd1008_1 is
       when Constraint_Error | My_Exception =>
          if Id /= Count then
             Report.Failed
-              ("Exception test  Id =" &
-               Integer'Image (Id) &
-               " Count =" &
+              ("Exception test  Id =" & Integer'Image (Id) & " Count =" &
                Integer'Image (Count));
          end if;
       when others =>

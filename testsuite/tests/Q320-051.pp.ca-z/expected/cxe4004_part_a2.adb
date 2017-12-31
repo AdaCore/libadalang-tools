@@ -8,10 +8,8 @@ package body Cxe4004_Part_A2 is
    begin
       if T /= Expected then
          Report.Failed
-           ("expected 2 2s but received:" &
-            Integer'Image (T (T'First)) &
-            " length:" &
-            Integer'Image (T'Length));
+           ("expected 2 2s but received:" & Integer'Image (T (T'First)) &
+            " length:" & Integer'Image (T'Length));
       end if;
    end Call_With_2;
 
@@ -20,10 +18,8 @@ package body Cxe4004_Part_A2 is
    begin
       if T /= Expected then
          Report.Failed
-           ("expected 3 3s but received:" &
-            Integer'Image (T (T'First)) &
-            " length:" &
-            Integer'Image (T'Length));
+           ("expected 3 3s but received:" & Integer'Image (T (T'First)) &
+            " length:" & Integer'Image (T'Length));
       end if;
    end Call_With_3;
 

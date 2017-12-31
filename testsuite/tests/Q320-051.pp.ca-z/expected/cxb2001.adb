@@ -116,22 +116,19 @@ begin
            Shift_Left (Tc_Val_Unsigned_8, 5) /= 224 or
            Shift_Left (Tc_Val_Unsigned_8, 8) /= 0 or
            Shift_Left (Tc_Val_Unsigned_8, 9) /= 0 or
-           Shift_Left (Tc_Val_Unsigned_8, 0) /= Tc_Val_Unsigned_8
-         then
+           Shift_Left (Tc_Val_Unsigned_8, 0) /= Tc_Val_Unsigned_8 then
             Report.Failed ("Incorrect result from BE Shift_Left - 2");
          end if;
 
          Tc_Val_Unsigned_8 := 1;
          if Shift_Left (Tc_Val_Unsigned_8, 1) /= 2 or
-           Shift_Left (Tc_Val_Unsigned_8, Amount => 3) /= 8
-         then
+           Shift_Left (Tc_Val_Unsigned_8, Amount => 3) /= 8 then
             Report.Failed ("Incorrect result from BE Shift_Left - 3");
          end if;
 
          Tc_Val_Unsigned_8 := 7;
          if Shift_Left (Tc_Val_Unsigned_8, Amount => 4) /= 112 or
-           Shift_Left (Shift_Left (Tc_Val_Unsigned_8, 7), 1) /= 0
-         then
+           Shift_Left (Shift_Left (Tc_Val_Unsigned_8, 7), 1) /= 0 then
             Report.Failed ("Incorrect result from BE Shift_Left - 4");
          end if;
 
@@ -149,22 +146,19 @@ begin
            Shift_Left (Tc_Val_Unsigned_8, 3) /= 31 or
            Shift_Left (Tc_Val_Unsigned_8, 5) /= 7 or
            Shift_Left (Tc_Val_Unsigned_8, 8) /= 0 or
-           Shift_Left (Tc_Val_Unsigned_8, 0) /= Tc_Val_Unsigned_8
-         then
+           Shift_Left (Tc_Val_Unsigned_8, 0) /= Tc_Val_Unsigned_8 then
             Report.Failed ("Incorrect result from LE Shift_Left - 2");
          end if;
 
          Tc_Val_Unsigned_8 := 1;
          if Shift_Left (Tc_Val_Unsigned_8, 1) /= 0 or
-           Shift_Left (Tc_Val_Unsigned_8, 7) /= 0
-         then
+           Shift_Left (Tc_Val_Unsigned_8, 7) /= 0 then
             Report.Failed ("Incorrect result from LE Shift_Left - 3");
          end if;
 
          Tc_Val_Unsigned_8 := 129;
          if Shift_Left (Tc_Val_Unsigned_8, 4) /= 8 or
-           Shift_Left (Shift_Left (Tc_Val_Unsigned_8, 7), 1) /= 0
-         then
+           Shift_Left (Shift_Left (Tc_Val_Unsigned_8, 7), 1) /= 0 then
             Report.Failed ("Incorrect result from LE Shift_Left - 4");
          end if;
 
@@ -186,22 +180,19 @@ begin
            Shift_Right (Tc_Val_Unsigned_8, 3) /= 31 or
            Shift_Right (Tc_Val_Unsigned_8, 5) /= 7 or
            Shift_Right (Tc_Val_Unsigned_8, 8) /= 0 or
-           Shift_Right (Tc_Val_Unsigned_8, 0) /= Tc_Val_Unsigned_8
-         then
+           Shift_Right (Tc_Val_Unsigned_8, 0) /= Tc_Val_Unsigned_8 then
             Report.Failed ("Incorrect result from BE Shift_Right - 2");
          end if;
 
          Tc_Val_Unsigned_8 := 1;
          if Shift_Right (Tc_Val_Unsigned_8, 1) /= 0 or
-           Shift_Right (Tc_Val_Unsigned_8, 7) /= 0
-         then
+           Shift_Right (Tc_Val_Unsigned_8, 7) /= 0 then
             Report.Failed ("Incorrect result from BE Shift_Right - 3");
          end if;
 
          Tc_Val_Unsigned_8 := 129;
          if Shift_Right (Tc_Val_Unsigned_8, 4) /= 8 or
-           Shift_Right (Shift_Right (Tc_Val_Unsigned_8, 7), 1) /= 0
-         then
+           Shift_Right (Shift_Right (Tc_Val_Unsigned_8, 7), 1) /= 0 then
             Report.Failed ("Incorrect result from BE Shift_Right - 4");
          end if;
 
@@ -220,22 +211,19 @@ begin
            Shift_Right (Tc_Val_Unsigned_8, 5) /= 224 or
            Shift_Right (Tc_Val_Unsigned_8, 8) /= 0 or
            Shift_Right (Tc_Val_Unsigned_8, 9) /= 0 or
-           Shift_Right (Tc_Val_Unsigned_8, 0) /= Tc_Val_Unsigned_8
-         then
+           Shift_Right (Tc_Val_Unsigned_8, 0) /= Tc_Val_Unsigned_8 then
             Report.Failed ("Incorrect result from LE Shift_Right - 2");
          end if;
 
          Tc_Val_Unsigned_8 := 1;
          if Shift_Right (Tc_Val_Unsigned_8, 1) /= 2 or
-           Shift_Right (Tc_Val_Unsigned_8, Amount => 3) /= 8
-         then
+           Shift_Right (Tc_Val_Unsigned_8, Amount => 3) /= 8 then
             Report.Failed ("Incorrect result from LE Shift_Right - 3");
          end if;
 
          Tc_Val_Unsigned_8 := 7;
          if Shift_Right (Tc_Val_Unsigned_8, Amount => 4) /= 112 or
-           Shift_Right (Shift_Right (Tc_Val_Unsigned_8, 7), 1) /= 0
-         then
+           Shift_Right (Shift_Right (Tc_Val_Unsigned_8, 7), 1) /= 0 then
             Report.Failed ("Incorrect result from LE Shift_Right - 4");
          end if;
 
@@ -251,8 +239,7 @@ begin
            Tc_Val_Unsigned_8 or
            Shift_Left (Shift_Right (Tc_Val_Unsigned_8, 1), 3) /= 128 or
            Shift_Right (Shift_Left (Tc_Val_Unsigned_8, 2), 6) /= 2 or
-           Shift_Right (Shift_Left (Tc_Val_Unsigned_8, 2), 8) /= 0
-         then
+           Shift_Right (Shift_Left (Tc_Val_Unsigned_8, 2), 8) /= 0 then
             Report.Failed
               ("Incorrect result from BE Shift_Left - " &
                "Shift_Right functions used in combination");
@@ -266,8 +253,7 @@ begin
            Tc_Val_Unsigned_8 or
            Shift_Left (Shift_Right (Tc_Val_Unsigned_8, 1), 3) /= 8 or
            Shift_Right (Shift_Left (Tc_Val_Unsigned_8, 2), 3) /= 64 or
-           Shift_Right (Shift_Left (Tc_Val_Unsigned_8, 2), 4) /= 128
-         then
+           Shift_Right (Shift_Left (Tc_Val_Unsigned_8, 2), 4) /= 128 then
             Report.Failed
               ("Incorrect result from LE Shift_Left - " &
                "Shift_Right functions used in combination");
@@ -304,8 +290,7 @@ begin
 
          Tc_Val_Unsigned_8 := 1;
          if Shift_Right_Arithmetic (Tc_Val_Unsigned_8, Amount => 1) /= 0 or
-           Shift_Right_Arithmetic (Tc_Val_Unsigned_8, 3) /= 0
-         then
+           Shift_Right_Arithmetic (Tc_Val_Unsigned_8, 3) /= 0 then
             Report.Failed
               ("Incorrect result from BE Shift_Right_Arithmetic - 3");
          end if;
@@ -342,8 +327,7 @@ begin
          end if;
 
          Tc_Val_Unsigned_8 := Unsigned_8'Last;
-         if Shift_Right_Arithmetic (Tc_Val_Unsigned_8, 1) /=
-           Unsigned_8'Last
+         if Shift_Right_Arithmetic (Tc_Val_Unsigned_8, 1) /= Unsigned_8'Last
          then
             Report.Failed
               ("Incorrect result from BE Shift_Right_Arithmetic - 7");
@@ -376,8 +360,7 @@ begin
 
          Tc_Val_Unsigned_8 := 64;
          if Shift_Right_Arithmetic (Tc_Val_Unsigned_8, Amount => 1) /= 128 or
-           Shift_Right_Arithmetic (Tc_Val_Unsigned_8, 3) /= 0
-         then
+           Shift_Right_Arithmetic (Tc_Val_Unsigned_8, 3) /= 0 then
             Report.Failed
               ("Incorrect result from LE Shift_Right_Arithmetic - 3");
          end if;
@@ -417,8 +400,7 @@ begin
          end if;
 
          Tc_Val_Unsigned_8 := Unsigned_8'Last;
-         if Shift_Right_Arithmetic (Tc_Val_Unsigned_8, 1) /=
-           Unsigned_8'Last
+         if Shift_Right_Arithmetic (Tc_Val_Unsigned_8, 1) /= Unsigned_8'Last
          then
             Report.Failed
               ("Incorrect result from LE Shift_Right_Arithmetic - 7");
@@ -442,22 +424,19 @@ begin
            Rotate_Left (Tc_Val_Unsigned_8, 3) /= 12 or
            Rotate_Left (Tc_Val_Unsigned_8, 5) /= 48 or
            Rotate_Left (Tc_Val_Unsigned_8, 8) /= 129 or
-           Rotate_Left (Tc_Val_Unsigned_8, 0) /= Tc_Val_Unsigned_8
-         then
+           Rotate_Left (Tc_Val_Unsigned_8, 0) /= Tc_Val_Unsigned_8 then
             Report.Failed ("Incorrect result from BE Rotate_Left - 2");
          end if;
 
          Tc_Val_Unsigned_8 := 1;
          if Rotate_Left (Value => Tc_Val_Unsigned_8, Amount => 1) /= 2 or
-           Rotate_Left (Tc_Val_Unsigned_8, Amount => 3) /= 8
-         then
+           Rotate_Left (Tc_Val_Unsigned_8, Amount => 3) /= 8 then
             Report.Failed ("Incorrect result from BE Rotate_Left - 3");
          end if;
 
          Tc_Val_Unsigned_8 := 82;
          if Rotate_Left (Tc_Val_Unsigned_8, Amount => 4) /= 37 or
-           Rotate_Left (Rotate_Left (Tc_Val_Unsigned_8, 7), 1) /= 82
-         then
+           Rotate_Left (Rotate_Left (Tc_Val_Unsigned_8, 7), 1) /= 82 then
             Report.Failed ("Incorrect result from BE Rotate_Left - 4");
          end if;
 
@@ -476,8 +455,7 @@ begin
            Rotate_Left (Tc_Val_Unsigned_8, 3) /= 225 or
            Rotate_Left (Tc_Val_Unsigned_8, 5) /= 120 or
            Rotate_Left (Tc_Val_Unsigned_8, 8) /= Tc_Val_Unsigned_8 or
-           Rotate_Left (Tc_Val_Unsigned_8, 0) /= Tc_Val_Unsigned_8
-         then
+           Rotate_Left (Tc_Val_Unsigned_8, 0) /= Tc_Val_Unsigned_8 then
             Report.Failed ("Incorrect result from LE Rotate_Left - 2");
          end if;
 
@@ -488,15 +466,13 @@ begin
 
          Tc_Val_Unsigned_8 := 12;
          if Rotate_Left (Tc_Val_Unsigned_8, 1) /= 6 or
-           Rotate_Left (Tc_Val_Unsigned_8, 3) /= 129
-         then
+           Rotate_Left (Tc_Val_Unsigned_8, 3) /= 129 then
             Report.Failed ("Incorrect result from LE Rotate_Left - 4");
          end if;
 
          Tc_Val_Unsigned_8 := 129;
          if Rotate_Left (Tc_Val_Unsigned_8, 4) /= 24 or
-           Rotate_Left (Rotate_Left (Tc_Val_Unsigned_8, 7), 1) /= 129
-         then
+           Rotate_Left (Rotate_Left (Tc_Val_Unsigned_8, 7), 1) /= 129 then
             Report.Failed ("Incorrect result from LE Rotate_Left - 5");
          end if;
 
@@ -519,8 +495,7 @@ begin
            Rotate_Right (Tc_Val_Unsigned_8, 3) /= 225 or
            Rotate_Right (Tc_Val_Unsigned_8, 5) /= 120 or
            Rotate_Right (Tc_Val_Unsigned_8, 8) /= Tc_Val_Unsigned_8 or
-           Rotate_Right (Tc_Val_Unsigned_8, 0) /= Tc_Val_Unsigned_8
-         then
+           Rotate_Right (Tc_Val_Unsigned_8, 0) /= Tc_Val_Unsigned_8 then
             Report.Failed ("Incorrect result from BE Rotate_Right - 2");
          end if;
 
@@ -531,15 +506,13 @@ begin
 
          Tc_Val_Unsigned_8 := 12;
          if Rotate_Right (Tc_Val_Unsigned_8, 1) /= 6 or
-           Rotate_Right (Tc_Val_Unsigned_8, 3) /= 129
-         then
+           Rotate_Right (Tc_Val_Unsigned_8, 3) /= 129 then
             Report.Failed ("Incorrect result from BE Rotate_Right - 4");
          end if;
 
          Tc_Val_Unsigned_8 := 129;
          if Rotate_Right (Tc_Val_Unsigned_8, 4) /= 24 or
-           Rotate_Right (Rotate_Right (Tc_Val_Unsigned_8, 7), 1) /= 129
-         then
+           Rotate_Right (Rotate_Right (Tc_Val_Unsigned_8, 7), 1) /= 129 then
             Report.Failed ("Incorrect result from BE Rotate_Right - 5");
          end if;
 
@@ -557,22 +530,19 @@ begin
            Rotate_Right (Tc_Val_Unsigned_8, 3) /= 12 or
            Rotate_Right (Tc_Val_Unsigned_8, 5) /= 48 or
            Rotate_Right (Tc_Val_Unsigned_8, 8) /= 129 or
-           Rotate_Right (Tc_Val_Unsigned_8, 0) /= Tc_Val_Unsigned_8
-         then
+           Rotate_Right (Tc_Val_Unsigned_8, 0) /= Tc_Val_Unsigned_8 then
             Report.Failed ("Incorrect result from LE Rotate_Right - 2");
          end if;
 
          Tc_Val_Unsigned_8 := 1;
          if Rotate_Right (Value => Tc_Val_Unsigned_8, Amount => 1) /= 2 or
-           Rotate_Right (Tc_Val_Unsigned_8, Amount => 3) /= 8
-         then
+           Rotate_Right (Tc_Val_Unsigned_8, Amount => 3) /= 8 then
             Report.Failed ("Incorrect result from LE Rotate_Right - 3");
          end if;
 
          Tc_Val_Unsigned_8 := 82;
          if Rotate_Right (Tc_Val_Unsigned_8, Amount => 4) /= 37 or
-           Rotate_Right (Rotate_Right (Tc_Val_Unsigned_8, 7), 1) /= 82
-         then
+           Rotate_Right (Rotate_Right (Tc_Val_Unsigned_8, 7), 1) /= 82 then
             Report.Failed ("Incorrect result from LE Rotate_Right - 4");
          end if;
 
@@ -588,8 +558,7 @@ begin
            Tc_Val_Unsigned_8 or
            Rotate_Left (Rotate_Right (Tc_Val_Unsigned_8, 1), 3) /= 68 or
            Rotate_Right (Rotate_Left (Tc_Val_Unsigned_8, 3), 7) /= 17 or
-           Rotate_Right (Rotate_Left (Tc_Val_Unsigned_8, 2), 8) /= 68
-         then
+           Rotate_Right (Rotate_Left (Tc_Val_Unsigned_8, 2), 8) /= 68 then
             Report.Failed
               ("Incorrect result from BE Rotate_Left - " &
                "Rotate_Right functions used in combination");
@@ -603,8 +572,7 @@ begin
            Tc_Val_Unsigned_8 or
            Rotate_Left (Rotate_Right (Tc_Val_Unsigned_8, 1), 3) /= 1 or
            Rotate_Right (Rotate_Left (Tc_Val_Unsigned_8, 3), 7) /= 64 or
-           Rotate_Right (Rotate_Left (Tc_Val_Unsigned_8, 2), 8) /= 1
-         then
+           Rotate_Right (Rotate_Left (Tc_Val_Unsigned_8, 2), 8) /= 1 then
             Report.Failed
               ("Incorrect result from LE Rotate_Left - " &
                "Rotate_Right functions used in combination");
@@ -615,8 +583,7 @@ begin
    exception
       when The_Error : others =>
          Report.Failed
-           ("The following exception was raised in the " &
-            "Test_Block: " &
+           ("The following exception was raised in the " & "Test_Block: " &
             Exception_Name (The_Error));
    end Test_Block;
 

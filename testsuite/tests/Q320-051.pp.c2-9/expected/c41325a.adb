@@ -101,9 +101,7 @@ begin
       Failed ("INCORRECT RESULTS FROM EXPANDED NAME - 5");
    end if;
 
-   if P."/="
-       (Var_Ara_6,
-        P.Array_6'(1 .. 2 => (1 .. 3 => (1 .. 4 => True))))
+   if P."/=" (Var_Ara_6, P.Array_6'(1 .. 2 => (1 .. 3 => (1 .. 4 => True))))
    then
       Failed ("INCORRECT RESULTS FROM EXPANDED NAME - 6");
    end if;

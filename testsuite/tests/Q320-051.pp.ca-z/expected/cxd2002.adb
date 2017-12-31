@@ -105,8 +105,7 @@ begin
    Report.Test
      ("CXD2002",
       "Default Task Dispatching - a non-blocking delay " &
-      "puts the task at the tail " &
-      "of the ready queue for that priority");
+      "puts the task at the tail " & "of the ready queue for that priority");
 
    -- Some implementations will boot with the time set to 1901/1/1/0.0 This
    -- delay is such that the implementation guarantees that a subsequent call

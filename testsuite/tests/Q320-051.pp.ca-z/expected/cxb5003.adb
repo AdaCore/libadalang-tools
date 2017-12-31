@@ -139,50 +139,41 @@ begin
       -- assigned by To_Fortran.
 
       To_Fortran
-        (Item   => Tc_String_1,
-         Target => Fortran_Character_1,
-         Last   => Tc_Natural);
+        (Item => Tc_String_1, Target => Fortran_Character_1,
+         Last => Tc_Natural);
 
       if Fortran_Character_1 /= Tc_Fortran_Character_1 or
-        Tc_Natural /= Tc_Fortran_Character_1'Length
-      then
+        Tc_Natural /= Tc_Fortran_Character_1'Length then
          Report.Failed ("Incorrect result from procedure To_Fortran - 1");
       end if;
 
       To_Fortran
-        (To_String (Tc_Unb_String),
-         Target => Fortran_Character_5,
-         Last   => Tc_Natural);
+        (To_String (Tc_Unb_String), Target => Fortran_Character_5,
+         Last                              => Tc_Natural);
 
       if Fortran_Character_5 /= Tc_Fortran_Character_5 or
-        Tc_Natural /= Tc_Fortran_Character_5'Length
-      then
+        Tc_Natural /= Tc_Fortran_Character_5'Length then
          Report.Failed ("Incorrect result from procedure To_Fortran - 2");
       end if;
 
       To_Fortran
-        (To_String (Tc_Bnd_String),
-         Fortran_Character_10,
-         Last => Tc_Natural);
+        (To_String (Tc_Bnd_String), Fortran_Character_10, Last => Tc_Natural);
 
       if Fortran_Character_10 /= Tc_Fortran_Character_10 or
-        Tc_Natural /= Tc_Fortran_Character_10'Length
-      then
+        Tc_Natural /= Tc_Fortran_Character_10'Length then
          Report.Failed ("Incorrect result from procedure To_Fortran - 3");
       end if;
 
       To_Fortran (Tc_String_20, Fortran_Character_20, Tc_Natural);
 
       if Fortran_Character_20 /= Tc_Fortran_Character_20 or
-        Tc_Natural /= Tc_Fortran_Character_20'Length
-      then
+        Tc_Natural /= Tc_Fortran_Character_20'Length then
          Report.Failed ("Incorrect result from procedure To_Fortran - 4");
       end if;
 
       To_Fortran
         (Item   => Tc_String,     -- null string
-         Target => Fortran_Character_1,
-         Last   => Tc_Natural);
+         Target => Fortran_Character_1, Last => Tc_Natural);
 
       if Tc_Natural /= 0 then
          Report.Failed
@@ -198,9 +189,8 @@ begin
       begin
 
          To_Fortran
-           (Item   => Tc_String_20,
-            Target => Fortran_Character_10,
-            Last   => Tc_Natural);
+           (Item => Tc_String_20, Target => Fortran_Character_10,
+            Last => Tc_Natural);
          Report.Failed
            ("Constraint_Error not raised by procedure " &
             "To_Fortran when Item'Length exceeds Target'Length");
@@ -210,8 +200,7 @@ begin
          when The_Error : others =>
             Report.Failed
               ("The following exception was raised by procedure " &
-               "To_Fortran when Item'Length exceeds " &
-               "Target'Length: " &
+               "To_Fortran when Item'Length exceeds " & "Target'Length: " &
                Exception_Name (The_Error));
       end;
 
@@ -222,9 +211,8 @@ begin
       -- To_Ada.
 
       To_Ada
-        (Item   => Tc_Fortran_Character_1,
-         Target => String_1,
-         Last   => Tc_Natural);
+        (Item => Tc_Fortran_Character_1, Target => String_1,
+         Last => Tc_Natural);
 
       if String_1 /= Tc_String_1 or Tc_Natural /= Tc_String_1'Length then
          Report.Failed ("Incorrect result from procedure To_Ada - 1");
@@ -233,16 +221,14 @@ begin
       To_Ada (Tc_Fortran_Character_5, Target => String_5, Last => Tc_Natural);
 
       if String_5 /= To_String (Tc_Unb_String) or
-        Tc_Natural /= Length (Tc_Unb_String)
-      then
+        Tc_Natural /= Length (Tc_Unb_String) then
          Report.Failed ("Incorrect result from procedure To_Ada - 2");
       end if;
 
       To_Ada (Tc_Fortran_Character_10, String_10, Last => Tc_Natural);
 
       if String_10 /= To_String (Tc_Bnd_String) or
-        Tc_Natural /= Length (Tc_Bnd_String)
-      then
+        Tc_Natural /= Length (Tc_Bnd_String) then
          Report.Failed ("Incorrect result from procedure To_Ada - 3");
       end if;
 
@@ -271,9 +257,8 @@ begin
       begin
 
          To_Ada
-           (Item   => Tc_Fortran_Character_10,
-            Target => String_5,
-            Last   => Tc_Natural);
+           (Item => Tc_Fortran_Character_10, Target => String_5,
+            Last => Tc_Natural);
          Report.Failed
            ("Constraint_Error not raised by procedure To_Ada " &
             "when Item'Length exceeds Target'Length");
@@ -289,8 +274,7 @@ begin
    exception
       when The_Error : others =>
          Report.Failed
-           ("The following exception was raised in the " &
-            "Test_Block: " &
+           ("The following exception was raised in the " & "Test_Block: " &
             Exception_Name (The_Error));
    end Test_Block;
 

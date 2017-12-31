@@ -26,11 +26,9 @@ procedure C3a0015 is
    procedure Check (Subtest : String; User_Defined_Pool : Boolean) is
 
       procedure Deallocate is new Ada.Unchecked_Deallocation
-        (Object => Designated,
-         Name   => Acc);
+        (Object => Designated, Name => Acc);
       procedure Deallocate is new Ada.Unchecked_Deallocation
-        (Object => Designated,
-         Name   => Derived_Acc);
+        (Object => Designated, Name => Derived_Acc);
 
       First_Free : Storage_Count;
       X          : Acc;
@@ -95,10 +93,7 @@ procedure C3a0015 is
    exception
       when E : others =>
          Failed
-           (Subtest &
-            " - Exception " &
-            Exception_Name (E) &
-            " raised - " &
+           (Subtest & " - Exception " & Exception_Name (E) & " raised - " &
             Exception_Message (E));
    end Check;
 
@@ -112,25 +107,16 @@ begin
 
    Std :
    declare
-      procedure Check1 is new Check
-        (Designated  => Float,
-         Value       => 3.0,
-         Acc         => Standard_Pool,
-         Derived_Acc => Derived_Standard_Pool);
-      procedure Check2 is new Check
-        (Designated  => Float,
-         Value       => 4.0,
-         Acc         => Standard_Pool,
-         Derived_Acc => Derived_Derived_Standard_Pool);
-      procedure Check3 is new Check
-        (Designated  => Float,
-         Value       => 5.0,
-         Acc         => Derived_Standard_Pool,
+      procedure Check1 is new Check (Designated => Float, Value => 3.0,
+         Acc => Standard_Pool, Derived_Acc => Derived_Standard_Pool);
+      procedure Check2 is new Check (Designated => Float, Value => 4.0,
+         Acc => Standard_Pool, Derived_Acc => Derived_Derived_Standard_Pool);
+      procedure Check3 is new Check (Designated => Float, Value => 5.0,
+         Acc                                    => Derived_Standard_Pool,
          Derived_Acc => Derived_Derived_Standard_Pool);
    begin
       Check1
-        ("Standard_Pool/Derived_Standard_Pool",
-         User_Defined_Pool => False);
+        ("Standard_Pool/Derived_Standard_Pool", User_Defined_Pool => False);
       Check2
         ("Standard_Pool/Derived_Derived_Standard_Pool",
          User_Defined_Pool => False);
@@ -143,20 +129,13 @@ begin
 
    User :
    declare
-      procedure Check1 is new Check
-        (Designated  => Integer,
-         Value       => 17,
-         Acc         => User_Defined_Pool,
-         Derived_Acc => Derived_User_Defined_Pool);
-      procedure Check2 is new Check
-        (Designated  => Integer,
-         Value       => 18,
-         Acc         => User_Defined_Pool,
+      procedure Check1 is new Check (Designated => Integer, Value => 17,
+         Acc => User_Defined_Pool, Derived_Acc => Derived_User_Defined_Pool);
+      procedure Check2 is new Check (Designated => Integer, Value => 18,
+         Acc                                    => User_Defined_Pool,
          Derived_Acc => Derived_Derived_User_Defined_Pool);
-      procedure Check3 is new Check
-        (Designated  => Integer,
-         Value       => 19,
-         Acc         => Derived_User_Defined_Pool,
+      procedure Check3 is new Check (Designated => Integer, Value => 19,
+         Acc                                    => Derived_User_Defined_Pool,
          Derived_Acc => Derived_Derived_User_Defined_Pool);
    begin
       Check1

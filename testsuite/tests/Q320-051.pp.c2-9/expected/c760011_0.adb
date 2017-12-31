@@ -27,9 +27,8 @@ package body C760011_0 is
    function Create (With_Tag : Character) return Controlled_Type is
    begin
       return Controlled_Type'
-          (Ada.Finalization.Controlled with
-           Tag          => With_Tag,
-           Tc_Component => "*CON");
+          (Ada.Finalization.Controlled with Tag => With_Tag,
+           Tc_Component                         => "*CON");
    end Create;
 
    procedure Initialize (It : in out Non_Controlled) is
@@ -47,9 +46,8 @@ package body C760011_0 is
       return Non_Controlled'
           (Tag                  => With_Tag,
            Controlled_Component =>
-             (Ada.Finalization.Controlled with
-              Tag          => With_Tag,
-              Tc_Component => "#NON"));
+             (Ada.Finalization.Controlled with Tag => With_Tag,
+              Tc_Component                         => "#NON"));
    end Create;
 
 end C760011_0;

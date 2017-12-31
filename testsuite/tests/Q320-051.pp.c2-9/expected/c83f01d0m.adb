@@ -74,23 +74,15 @@ begin
 
    Test
      ("C83F01D",
-      "CHECK THAT INSIDE A  PACKAGE BODY" &
-      " NESTED WITHIN A SEPARATELY" &
+      "CHECK THAT INSIDE A  PACKAGE BODY" & " NESTED WITHIN A SEPARATELY" &
       " COMPILED PACKAGE BODY SUBUNIT," &
       " AN ATTEMPT TO REFERENCE AN IDENTIFIER" &
       " DECLARED IN THE CORRESPONDING PACKAGE SPECI" &
       "FICATION  IS SUCCESSFUL EVEN IF THE SAME IDEN" &
-      "TIFIER IS DECLARED IN THE OUTER PACKAGE" &
-      " (SPECIFICATION OR BODY)");
+      "TIFIER IS DECLARED IN THE OUTER PACKAGE" & " (SPECIFICATION OR BODY)");
 
-   if X1 /= 17 or
-     Z /= A or
-     Y2 /= 200 or
-     not C83f01d1.P.X1 or
-     C83f01d1.P.Z /= 23 or
-     C83f01d1.P.Y2 /= 55 or
-     C83f01d1.P.Y4 /= 55
-   then
+   if X1 /= 17 or Z /= A or Y2 /= 200 or not C83f01d1.P.X1 or
+     C83f01d1.P.Z /= 23 or C83f01d1.P.Y2 /= 55 or C83f01d1.P.Y4 /= 55 then
       Failed ("INCORRECT ACCESSING");
    end if;
 

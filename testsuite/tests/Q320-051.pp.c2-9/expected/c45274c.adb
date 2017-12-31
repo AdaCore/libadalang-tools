@@ -43,8 +43,7 @@ begin
       "CHECK THAT THE MEMBERSHIP OPERATOR  IN " &
       "  ( NOT IN )  YIELDS  TRUE   (RESP.  FALSE )" &
       " IF THE DISCRIMINANTS OF THE LEFT VALUE" &
-      " EQUAL THE DISCRIMINANTS OF THE SUBTYPE" &
-      " INDICATION");
+      " EQUAL THE DISCRIMINANTS OF THE SUBTYPE" & " INDICATION");
 
    -------------------------------------------------------------------
    -----------------  RECORD TYPES WITH DISCRIMINANTS  ---------------

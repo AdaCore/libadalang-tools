@@ -75,10 +75,8 @@ package C760011_0 is
    Initialized : Tracking_Array := (others => False);
    Finalized   : Tracking_Array := (others => False);
 
-   type Controlled_Type
-     (Tag : Character)
-   is new Ada.Finalization.Controlled with
-   record
+   type Controlled_Type (Tag : Character)
+   is new Ada.Finalization.Controlled with record
       Tc_Component : String (1 .. 4) := "ACVC";
    end record;
    procedure Initialize (It : in out Controlled_Type);

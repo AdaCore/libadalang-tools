@@ -38,8 +38,7 @@ begin
      ("CD1009J",
       "A 'STORAGE_SIZE' CLAUSE MAY BE GIVEN IN THE " &
       "VISIBLE OR PRIVATE PART OF A PACKAGE FOR AN " &
-      "ACCESS TYPE DECLARED IN THE VISIBLE PART OF " &
-      "THE SAME PACKAGE");
+      "ACCESS TYPE DECLARED IN THE VISIBLE PART OF " & "THE SAME PACKAGE");
    declare
       package Pack is
          Specified_Size : constant := Integer'Size * 10;

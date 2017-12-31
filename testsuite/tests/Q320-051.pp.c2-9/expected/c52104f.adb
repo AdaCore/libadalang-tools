@@ -259,12 +259,8 @@ begin
       when Constraint_Error =>
 
          -- CHECKING THE VALUES AFTER THE SLICE ASSIGNMENT:
-         if Arrx52 (5) /= True or
-           Arrx52 (6) /= False or
-           Arrx52 (7) /= True or
-           Arrx52 (8) /= True or
-           Arrx52 (9) /= False
-         then
+         if Arrx52 (5) /= True or Arrx52 (6) /= False or Arrx52 (7) /= True or
+           Arrx52 (8) /= True or Arrx52 (9) /= False then
             Failed ("LHS ARRAY ALTERED  (12)");
          end if;
 

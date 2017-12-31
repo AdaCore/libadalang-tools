@@ -38,9 +38,7 @@
 with Ada.Streams; use Ada.Streams;
 package Cdd2001_0 is
 
-   type My_Stream
-     (Size : Stream_Element_Count)
-   is new Root_Stream_Type with
+   type My_Stream (Size : Stream_Element_Count) is new Root_Stream_Type with
    record
       First    : Stream_Element_Offset := 1;
       Last     : Stream_Element_Offset := 0;
@@ -49,10 +47,8 @@ package Cdd2001_0 is
 
    procedure Clear (Stream : in out My_Stream);
 
-   procedure Read
-     (Stream : in out My_Stream;
-      Item   :    out Stream_Element_Array;
-      Last   :    out Stream_Element_Offset);
+   procedure Read (Stream : in out My_Stream; Item : out Stream_Element_Array;
+      Last                :    out Stream_Element_Offset);
 
    procedure Write (Stream : in out My_Stream; Item : in Stream_Element_Array);
 

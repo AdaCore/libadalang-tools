@@ -37,9 +37,7 @@ begin
    Cxe4005_Common.Set_Serial_Number (Root_Tagged_Type (Root_Obj)'Access, 301);
    Cxe4005_Common.Set_Serial_Number (Root_Tagged_Type (Rt_Obj)'Access, 306);
    Cxe4005_Common.Set_Serial_Number
-     (Root_Tagged_Type (Local_Only_Obj)'Access,
-      307);
+     (Root_Tagged_Type (Local_Only_Obj)'Access, 307);
    Cxe4005_Common.Set_Serial_Number
-     (Root_Tagged_Type (Normal_Obj)'Access,
-      308);
+     (Root_Tagged_Type (Normal_Obj)'Access, 308);
 end Cxe4005_Part_B;

@@ -44,19 +44,12 @@ begin
      ("C87B07D",
       "OVERLOADED OPERANDS TO THE ATTRIBUTES " & "'PRED' AND 'SUCC'");
 
-   if Integer'Succ (1 + 1) /= 3 or
-     Integer'Succ (3 + 3) + 1 /= 8 or
-     New_Int'Succ (1 + 1) /= 1 or
-     New_Int'Succ (3 + 3) + 1 /= 0 or
-     Whole'Succ (1 + 1) /= 2 or
-     Whole'Succ (3 + 3) + 1 /= 10 or
-     Integer'Pred (1 + 1) /= 1 or
-     Integer'Pred (3 + 3) + 1 /= 6 or
-     New_Int'Pred (1 + 1) /= -1 or
-     New_Int'Pred (3 + 3) + 1 /= -2 or
-     Whole'Pred (1 + 1) /= 0 or
-     Whole'Pred (3 + 3) + 1 /= 8
-   then
+   if Integer'Succ (1 + 1) /= 3 or Integer'Succ (3 + 3) + 1 /= 8 or
+     New_Int'Succ (1 + 1) /= 1 or New_Int'Succ (3 + 3) + 1 /= 0 or
+     Whole'Succ (1 + 1) /= 2 or Whole'Succ (3 + 3) + 1 /= 10 or
+     Integer'Pred (1 + 1) /= 1 or Integer'Pred (3 + 3) + 1 /= 6 or
+     New_Int'Pred (1 + 1) /= -1 or New_Int'Pred (3 + 3) + 1 /= -2 or
+     Whole'Pred (1 + 1) /= 0 or Whole'Pred (3 + 3) + 1 /= 8 then
       Failed
         ("RESOLUTION INCORRECT FOR OPERAND OR RESULT OF" &
          " THE 'PRED' OR 'SUCC' ATTRIBUTE");

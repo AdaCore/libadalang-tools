@@ -17,9 +17,8 @@ package C730001_2 is
       Display : Video_Type := Tv_Monitor;
    end record;
 
-   procedure Answer
-     (Cp : in out Conference_Room_Phone;
-      Ci : in     Indicator_Type := Modem);
+   procedure Answer (Cp : in out Conference_Room_Phone;
+      Ci                : in     Indicator_Type := Modem);
 
    function Tc_Get_Display (C : Alarm_Clock) return Display_Kind;
    function Tc_Get_Display_Illumination

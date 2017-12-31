@@ -52,8 +52,7 @@ begin
    Test
      ("C55B15A",
       "WHEN  'FOR  I  IN  ST RANGE L..R  LOOP' " &
-      "RAISES AN EXCEPTION, CONTROL DOES NOT ENTER " &
-      "THE BODY OF THE LOOP");
+      "RAISES AN EXCEPTION, CONTROL DOES NOT ENTER " & "THE BODY OF THE LOOP");
 
    -------------------------------------------------------------------
    ----------------- STATIC (SUB)TYPE, DYNAMIC RANGE -----------------

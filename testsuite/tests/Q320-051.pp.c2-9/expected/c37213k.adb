@@ -53,8 +53,7 @@ begin
       "DISCRIMINANT ARE PROPERLY CHECKED WHEN THE " &
       "RECORD TYPE IS CONSTRAINED BY DEFAULT AND " &
       "USED AS THE ACTUAL PARAMETER TO A GENERIC " &
-      "FORMAL TYPE USED TO DECLARE AN ARRAY OR A " &
-      "RECORD COMPONENT");
+      "FORMAL TYPE USED TO DECLARE AN ARRAY OR A " & "RECORD COMPONENT");
 
    declare
       subtype Sm is Integer range 1 .. 10;
@@ -92,8 +91,7 @@ begin
                if Obj_Xcp then
                   Failed
                     ("NO CHECK DURING DECLARATION " &
-                     "OF OBJECT OF TYPE ARR - " &
-                     Tag);
+                     "OF OBJECT OF TYPE ARR - " & Tag);
                elsif X /= Value then
                   Failed
                     ("INCORRECT VALUE FOR OBJECT OF " & "TYPE ARR - " & Tag);
@@ -104,17 +102,14 @@ begin
                if not Obj_Xcp then
                   Failed
                     ("IMPROPER CONSTRAINT CHECKED " &
-                     "DURING DECLARATION OF OBJECT " &
-                     "OF TYPE ARR - " &
-                     Tag);
+                     "DURING DECLARATION OF OBJECT " & "OF TYPE ARR - " & Tag);
                end if;
          end;
       exception
          when Constraint_Error =>
             Failed
               ("CONSTRAINT IMPROPERLY CHECKED " &
-               "DURING DECLARATION OF ARR - " &
-               Tag);
+               "DURING DECLARATION OF ARR - " & Tag);
       end Array_Comp_Chk;
 
       generic
@@ -143,8 +138,7 @@ begin
                if Obj_Xcp then
                   Failed
                     ("NO CHECK DURING DECLARATION " &
-                     "OF OBJECT OF TYPE NREC - " &
-                     Tag);
+                     "OF OBJECT OF TYPE NREC - " & Tag);
                elsif X /= Value then
                   Failed
                     ("INCORRECT VALUE FOR OBJECT " & "OF TYPE NREC - " & Tag);
@@ -155,8 +149,7 @@ begin
                if not Obj_Xcp then
                   Failed
                     ("IMPROPER CONSTRAINT CHECKED " &
-                     "DURING DECLARATION OF OBJECT " &
-                     "OF TYPE NREC - " &
+                     "DURING DECLARATION OF OBJECT " & "OF TYPE NREC - " &
                      Tag);
                end if;
          end;
@@ -164,8 +157,7 @@ begin
          when Constraint_Error =>
             Failed
               ("CONSTRAINT IMPROPERLY CHECKED " &
-               "DURING DECLARATION OF NREC - " &
-               Tag);
+               "DURING DECLARATION OF NREC - " & Tag);
       end Rec_Comp_Chk;
    begin
       Sequence_Number := 1;
@@ -174,10 +166,8 @@ begin
             C1 : Rec (D3, 0);
          end record;
 
-         package Pack1 is new Array_Comp_Chk
-           (Rec_Def,
-            Obj_Xcp => True,
-            Tag     => "PACK1");
+         package Pack1 is new Array_Comp_Chk (Rec_Def, Obj_Xcp => True,
+            Tag                                                => "PACK1");
 
          procedure Proc1 is new Rec_Comp_Chk (Rec_Def);
       begin
@@ -190,10 +180,8 @@ begin
             C1 : My_Arr (0 .. D3);
          end record;
 
-         package Pack2 is new Array_Comp_Chk
-           (Arr_Def,
-            Obj_Xcp => True,
-            Tag     => "PACK2");
+         package Pack2 is new Array_Comp_Chk (Arr_Def, Obj_Xcp => True,
+            Tag                                                => "PACK2");
 
          procedure Proc2 is new Rec_Comp_Chk (Arr_Def);
       begin
@@ -211,10 +199,8 @@ begin
             end case;
          end record;
 
-         package Pack3 is new Array_Comp_Chk
-           (Var_Rec_Def1,
-            Obj_Xcp => True,
-            Tag     => "PACK3");
+         package Pack3 is new Array_Comp_Chk (Var_Rec_Def1, Obj_Xcp => True,
+            Tag => "PACK3");
 
          procedure Proc3 is new Rec_Comp_Chk (Var_Rec_Def1);
       begin
@@ -232,10 +218,8 @@ begin
             end case;
          end record;
 
-         package Pack4 is new Array_Comp_Chk
-           (Var_Rec_Def6,
-            Obj_Xcp => False,
-            Tag     => "PACK4");
+         package Pack4 is new Array_Comp_Chk (Var_Rec_Def6, Obj_Xcp => False,
+            Tag => "PACK4");
 
          procedure Proc4 is new Rec_Comp_Chk (Var_Rec_Def6);
       begin
@@ -253,10 +237,8 @@ begin
             end case;
          end record;
 
-         package Pack5 is new Array_Comp_Chk
-           (Var_Rec_Def11,
-            Obj_Xcp => False,
-            Tag     => "PACK5");
+         package Pack5 is new Array_Comp_Chk (Var_Rec_Def11, Obj_Xcp => False,
+            Tag => "PACK5");
 
          procedure Proc5 is new Rec_Comp_Chk (Var_Rec_Def11);
       begin
@@ -274,10 +256,8 @@ begin
             end case;
          end record;
 
-         package Pack6 is new Array_Comp_Chk
-           (Var_Arr_Def1,
-            Obj_Xcp => True,
-            Tag     => "PACK6");
+         package Pack6 is new Array_Comp_Chk (Var_Arr_Def1, Obj_Xcp => True,
+            Tag => "PACK6");
 
          procedure Proc6 is new Rec_Comp_Chk (Var_Arr_Def1);
       begin
@@ -295,10 +275,8 @@ begin
             end case;
          end record;
 
-         package Pack7 is new Array_Comp_Chk
-           (Var_Arr_Def6,
-            Obj_Xcp => False,
-            Tag     => "PACK7");
+         package Pack7 is new Array_Comp_Chk (Var_Arr_Def6, Obj_Xcp => False,
+            Tag => "PACK7");
 
          procedure Proc7 is new Rec_Comp_Chk (Var_Arr_Def6);
       begin
@@ -316,10 +294,8 @@ begin
             end case;
          end record;
 
-         package Pack8 is new Array_Comp_Chk
-           (Var_Arr_Def11,
-            Obj_Xcp => False,
-            Tag     => "PACK8");
+         package Pack8 is new Array_Comp_Chk (Var_Arr_Def11, Obj_Xcp => False,
+            Tag => "PACK8");
 
          procedure Proc8 is new Rec_Comp_Chk (Var_Arr_Def11);
       begin

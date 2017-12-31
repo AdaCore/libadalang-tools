@@ -88,18 +88,15 @@ procedure C43204c is
 
    procedure Gproc11 is
    begin
-      if A'Length /= Ident_Int (7) or
-        A'First /= Ident_Int (-3) or
-        A'Last /= Ident_Int (3)
-      then
+      if A'Length /= Ident_Int (7) or A'First /= Ident_Int (-3) or
+        A'Last /= Ident_Int (3) then
          Failed ("INCORRECT LENGTH IN PROC11");
       end if;
 
       for I in Ident_Int (-3) .. Ident_Int (3) loop
          if Ident_Int (A (I)) /= 1 then
             Failed
-              ("INCORRECT VALUE OF COMPONENT " &
-               Integer'Image (I) &
+              ("INCORRECT VALUE OF COMPONENT " & Integer'Image (I) &
                ", PROC11");
          end if;
       end loop;
@@ -114,8 +111,7 @@ procedure C43204c is
       for I in Ident_Int (-3) .. Ident_Int (3) loop
          if Ident_Int (A (I)) /= 2 then
             Failed
-              ("INCORRECT VALUE OF COMPONENT " &
-               Integer'Image (I) &
+              ("INCORRECT VALUE OF COMPONENT " & Integer'Image (I) &
                ", PROC12");
          end if;
       end loop;
@@ -134,12 +130,8 @@ procedure C43204c is
          for J in Integer'(-1) .. 1 loop
             if Ident_Int (A (I, J)) /= C then
                Failed
-                 ("INCORRECT VALUE OF COMPONENT (" &
-                  Integer'Image (I) &
-                  "," &
-                  Integer'Image (J) &
-                  "), GPROC21 CALL " &
-                  "NUMBER" &
+                 ("INCORRECT VALUE OF COMPONENT (" & Integer'Image (I) & "," &
+                  Integer'Image (J) & "), GPROC21 CALL " & "NUMBER" &
                   Integer'Image (C));
             end if;
          end loop;
@@ -152,11 +144,8 @@ procedure C43204c is
          for J in Integer'(-1) .. 1 loop
             if Ident_Int (A (I, J)) /= 3 then
                Failed
-                 ("INCORRECT VALUE OF COMPONENT (" &
-                  Integer'Image (I) &
-                  "," &
-                  Integer'Image (J) &
-                  "), GPROC22");
+                 ("INCORRECT VALUE OF COMPONENT (" & Integer'Image (I) & "," &
+                  Integer'Image (J) & "), GPROC22");
             end if;
          end loop;
       end loop;
@@ -168,11 +157,8 @@ procedure C43204c is
          for J in Integer'(-1) .. 1 loop
             if Ident_Int (A (I, J)) /= 4 then
                Failed
-                 ("INCORRECT VALUE OF COMPONENT (" &
-                  Integer'Image (I) &
-                  "," &
-                  Integer'Image (J) &
-                  "), GPROC23");
+                 ("INCORRECT VALUE OF COMPONENT (" & Integer'Image (I) & "," &
+                  Integer'Image (J) & "), GPROC23");
             end if;
          end loop;
       end loop;
@@ -195,8 +181,7 @@ begin
       "CHECK THAT AN ARRAY AGGREGATE WITH AN OTHERS " &
       "CHOICE CAN APPEAR (AND BOUNDS ARE DETERMINED " &
       "CORRECTLY) AS AN ACTUAL PARAMETER OF A " &
-      "SUBPROGRAM CALL WHEN THE FORMAL PARAMETER IS " &
-      "CONSTRAINED");
+      "SUBPROGRAM CALL WHEN THE FORMAL PARAMETER IS " & "CONSTRAINED");
 
    Proc11;
    Proc12;

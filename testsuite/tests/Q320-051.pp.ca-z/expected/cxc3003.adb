@@ -36,8 +36,7 @@ begin -- CXC3003.
 --     Static_Handler.Handle_Interrupt to Interrupt_To_Generate, overriding
 --     the previous handler:
 
-      Static_Handler : Cxc3003_1
-        .Handler_Type
+      Static_Handler : Cxc3003_1.Handler_Type
         (Impdef.Annex_C.Interrupt_To_Generate);
 
    begin

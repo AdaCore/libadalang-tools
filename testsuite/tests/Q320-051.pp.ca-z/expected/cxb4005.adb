@@ -110,11 +110,9 @@ begin
       Tc_Alphanumeric_10 : Interfaces.Cobol.Alphanumeric (1 .. 10);
       Tc_Alphanumeric_20 : Interfaces.Cobol.Alphanumeric (1 .. 20);
 
-      Bnd_String,
-      Tc_Bnd_String : Bnd.Bounded_String :=
+      Bnd_String, Tc_Bnd_String : Bnd.Bounded_String :=
         Bnd.To_Bounded_String ("     ");
-      Unb_String,
-      Tc_Unb_String : Unb.Unbounded_String :=
+      Unb_String, Tc_Unb_String : Unb.Unbounded_String :=
         Unb.To_Unbounded_String ("                    ");
 
       The_String, Tc_String : String (1 .. 20) := ("                    ");
@@ -132,8 +130,7 @@ begin
       if Tc_Alphanumeric_1 /= "A" or
         Tc_Alphanumeric_1'Length /= Unb.Length (Unb_String) or
         Tc_Alphanumeric_1'Length /= 1 or
-        Cobol.To_Cobol (Unb.To_String (Unb_String))'First /= 1
-      then
+        Cobol.To_Cobol (Unb.To_String (Unb_String))'First /= 1 then
          Report.Failed ("Incorrect result from function To_COBOL - 1");
       end if;
 
@@ -143,8 +140,7 @@ begin
       if Tc_Alphanumeric_5 /= "abcde" or
         Tc_Alphanumeric_5'Length /= Bnd.Length (Bnd_String) or
         Tc_Alphanumeric_5'Length /= 5 or
-        Cobol.To_Cobol (Bnd.To_String (Bnd_String))'First /= 1
-      then
+        Cobol.To_Cobol (Bnd.To_String (Bnd_String))'First /= 1 then
          Report.Failed ("Incorrect result from function To_COBOL - 2");
       end if;
 
@@ -154,8 +150,7 @@ begin
       if Tc_Alphanumeric_10 /= "1A2B3c4d5F" or
         Tc_Alphanumeric_10'Length /= Unb.Length (Unb_String) or
         Tc_Alphanumeric_10'Length /= 10 or
-        Cobol.To_Cobol (Unb.To_String (Unb_String))'First /= 1
-      then
+        Cobol.To_Cobol (Unb.To_String (Unb_String))'First /= 1 then
          Report.Failed ("Incorrect result from function To_COBOL - 3");
       end if;
 
@@ -165,8 +160,7 @@ begin
       if Tc_Alphanumeric_20 /= "abcd  ghij1234  7890" or
         Tc_Alphanumeric_20'Length /= The_String'Length or
         Tc_Alphanumeric_20'Length /= 20 or
-        Cobol.To_Cobol (The_String)'First /= 1
-      then
+        Cobol.To_Cobol (The_String)'First /= 1 then
          Report.Failed ("Incorrect result from function To_COBOL - 4");
       end if;
 
@@ -181,8 +175,7 @@ begin
       if Tc_Unb_String /= "A" or
         Tc_Alphanumeric_1'Length /= Unb.Length (Tc_Unb_String) or
         Unb.Length (Tc_Unb_String) /= 1 or
-        Cobol.To_Ada (Tc_Alphanumeric_1)'First /= 1
-      then
+        Cobol.To_Ada (Tc_Alphanumeric_1)'First /= 1 then
          Report.Failed ("Incorrect value returned from function To_Ada - 1");
       end if;
 
@@ -192,8 +185,7 @@ begin
       if Tc_Bnd_String /= "abcde" or
         Tc_Alphanumeric_5'Length /= Bnd.Length (Tc_Bnd_String) or
         Bnd.Length (Tc_Bnd_String) /= 5 or
-        Cobol.To_Ada (Tc_Alphanumeric_5)'First /= 1
-      then
+        Cobol.To_Ada (Tc_Alphanumeric_5)'First /= 1 then
          Report.Failed ("Incorrect value returned from function To_Ada - 2");
       end if;
 
@@ -203,8 +195,7 @@ begin
       if Tc_Unb_String /= "1A2B3c4d5F" or
         Tc_Alphanumeric_10'Length /= Unb.Length (Tc_Unb_String) or
         Unb.Length (Tc_Unb_String) /= 10 or
-        Cobol.To_Ada (Tc_Alphanumeric_10)'First /= 1
-      then
+        Cobol.To_Ada (Tc_Alphanumeric_10)'First /= 1 then
          Report.Failed ("Incorrect value returned from function To_Ada - 3");
       end if;
 
@@ -212,8 +203,7 @@ begin
 
       if Tc_String /= "abcd  ghij1234  7890" or
         Tc_Alphanumeric_20'Length /= Tc_String'Length or
-        Tc_String'Length /= 20 or
-        Cobol.To_Ada (Tc_Alphanumeric_20)'First /= 1
+        Tc_String'Length /= 20 or Cobol.To_Ada (Tc_Alphanumeric_20)'First /= 1
       then
          Report.Failed ("Incorrect value returned from function To_Ada - 4");
       end if;
@@ -313,8 +303,7 @@ begin
       Interfaces.Cobol.Cobol_To_Ada (',') := '.';
 
       if Cobol.To_Ada (Cobol.To_Cobol (Unb.To_String (Tc_Unb_String))) /=
-        Unb_String
-      then
+        Unb_String then
          Report.Failed
            ("Incorrect result from function To_Ada after " &
             "modification of COBOL_To_Ada mapping array - 2");
@@ -323,8 +312,7 @@ begin
    exception
       when The_Error : others =>
          Report.Failed
-           ("The following exception was raised in the " &
-            "Test_Block: " &
+           ("The following exception was raised in the " & "Test_Block: " &
             Exception_Name (The_Error));
    end Test_Block;
 

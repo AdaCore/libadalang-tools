@@ -112,8 +112,7 @@ begin
      ("CXD2003",
       "Default Task Dispatching - when a task " &
       "drops in priority due to loss of inheritance " &
-      "it is added to the head " &
-      "of the ready queue for its priority");
+      "it is added to the head " & "of the ready queue for its priority");
 
    if Impdef.Annex_D.Processor /= Impdef.Annex_D.Uni_Processor then
       Report.Not_Applicable ("Multi-Processor Configuration");
@@ -307,8 +306,7 @@ begin
       Report.Comment ("Order Expected Actual");
       for I in Actual_Sequence'Range loop
          Report.Comment
-           (Integer'Image (I) &
-            Task_Identity'Image (Expected_Sequence (I)) &
+           (Integer'Image (I) & Task_Identity'Image (Expected_Sequence (I)) &
             Task_Identity'Image (Actual_Sequence (I)));
       end loop;
    end if;

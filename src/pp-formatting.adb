@@ -2815,15 +2815,15 @@ package body Pp.Formatting is
       end Keyword_Casing;
 
       procedure Insert_Form_Feeds;
-      --  Insert FF after "pragma Page;" if -ff switch was given. It might seem
-      --  silly to have a whole extra pass for this little feature, but it's a
-      --  rarely used feature, so we don't care if it's a little slower, and this
-      --  seems cleanest. We could have put this processing in some other
-      --  unrelated pass. Note that it would not be easy to do this in
-      --  Convert_Tree_To_Ada, because the FF goes after the ";", and the ";" is
-      --  not printed as part of the pragma -- it goes BETWEEN the pragma and
-      --  whatever comes next. Furthermore, we want to do this last so the FF
-      --  doesn't get turned back into NL.
+      --  Insert FF after "pragma Page;" if --ff-after-pragma-page switch was
+      --  given. It might seem silly to have a whole extra pass for this little
+      --  feature, but it's a rarely used feature, so we don't care if it's a
+      --  little slower, and this seems cleanest. We could have put this
+      --  processing in some other unrelated pass. Note that it would not be
+      --  easy to do this in Convert_Tree_To_Ada, because the FF goes after the
+      --  ";", and the ";" is not printed as part of the pragma -- it goes
+      --  BETWEEN the pragma and whatever comes next. Furthermore, we want to
+      --  do this last so the FF doesn't get turned back into NL.
 
       procedure Insert_Form_Feeds is
          use Scanner;

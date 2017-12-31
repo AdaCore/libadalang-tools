@@ -78,8 +78,7 @@ procedure Cb3004a is
       exception
          when Standard.Constraint_Error =>
             Failed
-              ("STANDARD.CONSTRAINT_ERROR EXCEPTION " &
-               "RAISED WHEN " &
+              ("STANDARD.CONSTRAINT_ERROR EXCEPTION " & "RAISED WHEN " &
                "(P3)CONSTRAINT_ERROR EXPECTED");
          when Constraint_Error =>
             begin
@@ -89,16 +88,13 @@ procedure Cb3004a is
             exception
                when Constraint_Error =>
                   Failed
-                    ("(P3)CONSTRAINT_ERROR " &
-                     "EXCEPTION RAISED WHEN " &
-                     "STANDARD.CONSTRAINT_ERROR " &
-                     "EXPECTED");
+                    ("(P3)CONSTRAINT_ERROR " & "EXCEPTION RAISED WHEN " &
+                     "STANDARD.CONSTRAINT_ERROR " & "EXPECTED");
                when Standard.Constraint_Error =>
                   Flow_Count := Flow_Count + 1;
                when others =>
                   Failed
-                    ("OTHERS RAISED WHEN " &
-                     "STANDARD.CONSTRAINT_ERROR " &
+                    ("OTHERS RAISED WHEN " & "STANDARD.CONSTRAINT_ERROR " &
                      "EXPECTED");
             end;
          when others =>

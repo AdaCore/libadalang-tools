@@ -144,11 +144,8 @@ procedure Cxd4009 is
             end E5;
          or
             -- allow test to start once everyone is here
-             when E1'Count = 1 and
-         E2'Count = 1 and
-         E3'Count = 1 and
-         E4'Count = 1 and
-         E5'Count = 1 =>
+             when E1'Count = 1 and E2'Count = 1 and E3'Count = 1 and
+         E4'Count = 1 and E5'Count = 1 =>
             accept Open_The_Gates;
             Gate := True;
          else
@@ -157,9 +154,7 @@ procedure Cxd4009 is
 
          if Verbose then
             Report.Comment
-              ("Have Checked" &
-               Integer'Image (Checked) &
-               "  Last_Accepted" &
+              ("Have Checked" & Integer'Image (Checked) & "  Last_Accepted" &
                Integer'Image (Last_Accepted));
          end if;
 
@@ -224,11 +219,8 @@ procedure Cxd4009 is
             end E3_2;
          or
             -- allow test to start once everyone is here
-             when E1_2'Count = 1 and
-         E2_2'Count = 1 and
-         E3_2'Count = 1 and
-         E4_2'Count = 1 and
-         E5_2'Count = 1 =>
+             when E1_2'Count = 1 and E2_2'Count = 1 and E3_2'Count = 1 and
+         E4_2'Count = 1 and E5_2'Count = 1 =>
             accept Open_The_Gates;
             Gate := True;
 
@@ -238,9 +230,7 @@ procedure Cxd4009 is
 
          if Verbose then
             Report.Comment
-              ("Have Checked" &
-               Integer'Image (Checked) &
-               "  Last_Accepted" &
+              ("Have Checked" & Integer'Image (Checked) & "  Last_Accepted" &
                Integer'Image (Last_Accepted));
          end if;
 
@@ -307,8 +297,7 @@ begin
 
    Report.Test
      ("CXD4009",
-      "Check that task" &
-      " entries are serviced in priority order when" &
+      "Check that task" & " entries are serviced in priority order when" &
       " all waiting tasks are of different priority");
 
    declare  -- encapsulate the test

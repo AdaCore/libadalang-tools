@@ -32,10 +32,7 @@ procedure C393010 is
       -- JFK -> LAX 02 18 2B First, Steak
       new C393010_1.Passenger_Ticket'
                 (C393010_1.Issue
-                   (C393010_1.First,
-                    18,
-                    " 2B",
-                    C393010_1.Steak)),
+                   (C393010_1.First, 18, " 2B", C393010_1.Steak)),
               new Itinerary'
                 (
       -- LAX -> SAN 03 5225 34H Coach
@@ -51,10 +48,7 @@ procedure C393010 is
       -- DFW -> ORL 05 15 1D First, Lobster
       new C393010_1.Passenger_Ticket'
                          (C393010_1.Issue
-                            (C393010_1.First,
-                             15,
-                             " 1D",
-                             C393010_1.Lobster)),
+                            (C393010_1.First, 15, " 1D", C393010_1.Lobster)),
                        null)))));
    end Travel_Agent_1;
 
@@ -89,8 +83,7 @@ begin
       "an abstract type and that a call on an abstract " &
       "operation is a dispatching operation.  Check " &
       "that such a call can dispatch to an overriding " &
-      "operation declared in the private part of a " &
-      "package");
+      "operation declared in the private part of a " & "package");
 
    Traveler (Travel_Agent_1);
    Tctouch.Validate ("LPFLPFLPCLPBLPF", "First Trip");

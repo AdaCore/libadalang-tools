@@ -56,13 +56,8 @@ procedure Cxai008 is
 
    package Dom is
       type Node_Kinds is
-        (Element_Kind,
-         Attribute_Kind,
-         Cdata_Section_Kind,
-         Entity_Reference_Kind,
-         Entity_Kind,
-         Text_Kind,
-         Comment_Kind);
+        (Element_Kind, Attribute_Kind, Cdata_Section_Kind,
+         Entity_Reference_Kind, Entity_Kind, Text_Kind, Comment_Kind);
 
       type Node_Rec (Kind : Node_Kinds) is record
          case Kind is
@@ -101,12 +96,9 @@ procedure Cxai008 is
 
    Xml_Syntax_Error : exception;
 
-   procedure Parse_Subtree
-     (Input           : in     String;
-      Start           : in out Positive;
-      Tree            : in out Node_Tree.Tree;
-      Parent          : in     Node_Tree.Cursor;
-      End_Of_Children :    out Boolean)
+   procedure Parse_Subtree (Input : in     String; Start : in out Positive;
+      Tree : in out Node_Tree.Tree; Parent : in Node_Tree.Cursor;
+      End_Of_Children             :    out Boolean)
    is
       -- Parse Input starting at Start, create an appropriate subtree, and
       -- append it as a child to the designated parent. Update Start to
@@ -135,9 +127,7 @@ procedure Cxai008 is
                   exit when Len = Match'Length;
                   if C /= Match (Match'First + Len) then
                      Report.Comment
-                       ("Expecting " &
-                        Match (Match'First + Len) &
-                        ", found " &
+                       ("Expecting " & Match (Match'First + Len) & ", found " &
                         C);
                      raise Xml_Syntax_Error;
                   end if;
@@ -269,10 +259,8 @@ procedure Cxai008 is
                         Within_Start_Tag := True;
                         -- Create node and add to tree
                         Node_Tree.Insert_Child
-                          (Tree,
-                           Parent,
-                           Before   => Node_Tree.No_Element,
-                           New_Item =>
+                          (Tree, Parent, Before => Node_Tree.No_Element,
+                           New_Item             =>
                              Node_Rec'
                                (Kind      => Element_Kind,
                                 Elem_Name => Element_Name),
@@ -297,8 +285,7 @@ procedure Cxai008 is
                      end if;
 
                      Node_Tree.Append_Child
-                       (Tree,
-                        Parent,
+                       (Tree, Parent,
                         Node_Rec'(Kind => Text_Kind, Text => Text));
                      return;
                   end;
@@ -319,13 +306,10 @@ procedure Cxai008 is
                      Absorb ("=");
                      Attr_Value := Parse_Attrib_Value;
                      Node_Tree.Append_Child
-                       (Tree,
-                        Element_Cursor,
+                       (Tree, Element_Cursor,
                         Node_Rec'
-                          (Kind       => Attribute_Kind,
-                           Attr_Name  => Attr_Name,
-                           Attr_Value => Attr_Value,
-                           Specified  => True));
+                          (Kind => Attribute_Kind, Attr_Name => Attr_Name,
+                           Attr_Value => Attr_Value, Specified => True));
                   end;
 
                when '/' =>
@@ -351,17 +335,12 @@ procedure Cxai008 is
                         if Text.all /= "" then
                            -- Append text element, if any
                            Node_Tree.Append_Child
-                             (Tree,
-                              Element_Cursor,
+                             (Tree, Element_Cursor,
                               Node_Rec'(Kind => Text_Kind, Text => Text));
                         end if;
                         -- Append nested element, if any
                         Parse_Subtree
-                          (Input,
-                           Start,
-                           Tree,
-                           Element_Cursor,
-                           Eoc);
+                          (Input, Start, Tree, Element_Cursor, Eoc);
                         exit when Eoc;
                      end;
                   end loop;
@@ -373,10 +352,8 @@ procedure Cxai008 is
                   begin
                      if End_Tag.all /= Element_Name.all then
                         Report.Comment
-                          ("End tag " &
-                           End_Tag.all &
-                           " does not match Start tag " &
-                           Element_Name.all);
+                          ("End tag " & End_Tag.all &
+                           " does not match Start tag " & Element_Name.all);
                         raise Xml_Syntax_Error;
                      end if;
                      Absorb (">");
@@ -394,8 +371,7 @@ procedure Cxai008 is
          exception
             when E : others =>
                Report.Failed
-                 ("Exception " &
-                  Ada.Exceptions.Exception_Name (E) &
+                 ("Exception " & Ada.Exceptions.Exception_Name (E) &
                   " raised");
                Start := Start + 1;
                raise;
@@ -437,8 +413,7 @@ begin
    if Tree_Count /= Expected_Count then
       Report.Failed
         ("Expected node count of" &
-         Ada.Containers.Count_Type'Image (Expected_Count) &
-         ", found" &
+         Ada.Containers.Count_Type'Image (Expected_Count) & ", found" &
          Ada.Containers.Count_Type'Image (Tree_Count));
    end if;
 

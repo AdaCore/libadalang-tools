@@ -181,10 +181,8 @@ package C432003_0 is
        (D1 => 15,  -- Disc. have
         D2 => 15); -- same value
 
-   type Mult_Nt_A1
-     (D3 : Length)
-   is new Mult_Unconstr_Der (D1 => D3, D2 => D3) with
-   record
+   type Mult_Nt_A1 (D3 : Length)
+   is new Mult_Unconstr_Der (D1 => D3, D2 => D3) with record
       S3 : String (1 .. D3);      -- Both inherited discriminants constrained
    end record;                 -- by new discriminant.
 

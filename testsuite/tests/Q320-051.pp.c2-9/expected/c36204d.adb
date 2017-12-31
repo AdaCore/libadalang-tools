@@ -54,9 +54,8 @@ procedure C36204d is
 
    First_Date : Date := (Day => 6, Month => Jun, Year => 1_967);
 
-   function "="
-     (Left  : in System.Address;
-      Right : in System.Address) return Boolean renames
+   function "=" (Left : in System.Address;
+      Right           : in System.Address) return Boolean renames
      System."=";
 
    generic
@@ -137,30 +136,21 @@ procedure C36204d is
 
    begin  -- ARRAY_ATTRIBUTE_TEST
 
-      if (Fa1 /= First_Index'First) or
-        (Fa3 /= Second_Index'First) or
-        (Sa1 /= First_Index'First) or
-        (Sa3 /= Second_Index'First) or
-        (Sa5 /= Third_Index'First)
-      then
+      if (Fa1 /= First_Index'First) or (Fa3 /= Second_Index'First) or
+        (Sa1 /= First_Index'First) or (Sa3 /= Second_Index'First) or
+        (Sa5 /= Third_Index'First) then
          Report.Failed ("INCORRECT VALUE RETURNED FOR 'FIRST - PACKAGE");
       end if;
 
-      if (Fa2 /= First_Index'Last) or
-        (Fa4 /= Second_Index'Last) or
-        (Sa2 /= First_Index'Last) or
-        (Sa4 /= Second_Index'Last) or
-        (Sa6 /= Third_Index'Last)
-      then
+      if (Fa2 /= First_Index'Last) or (Fa4 /= Second_Index'Last) or
+        (Sa2 /= First_Index'Last) or (Sa4 /= Second_Index'Last) or
+        (Sa6 /= Third_Index'Last) then
          Report.Failed ("INCORRECT VALUE RETURNED FOR 'LAST - PACKAGE");
       end if;
 
-      if (Fal1 /= First_Index_Length) or
-        (Fal2 /= Second_Index_Length) or
-        (Sal1 /= First_Index_Length) or
-        (Sal2 /= Second_Index_Length) or
-        (Sal3 /= Third_Index_Length)
-      then
+      if (Fal1 /= First_Index_Length) or (Fal2 /= Second_Index_Length) or
+        (Sal1 /= First_Index_Length) or (Sal2 /= Second_Index_Length) or
+        (Sal3 /= Third_Index_Length) then
          Report.Failed ("INCORRECT VALUE RETURNED FOR 'LENGTH - PACKAGE");
       end if;
 
@@ -195,8 +185,7 @@ procedure C36204d is
         (First_Test_Value not in Second_Array'Range (1)) or
         (Second_Test_Value not in First_Array'Range (2)) or
         (Second_Test_Value not in Second_Array'Range (2)) or
-        (Third_Test_Value not in Second_Array'Range (3))
-      then
+        (Third_Test_Value not in Second_Array'Range (3)) then
          Report.Failed
            ("INCORRECT HANDLING OF 'RANGE ATTRIBUTE " & "- PACKAGE");
       end if;
@@ -206,13 +195,8 @@ procedure C36204d is
            ("INCORRECT HANDLING OF THE 'SIZE ATTRIBUTE. " & "- PACKAGE");
       end if;
 
-      if (Faa = Taa) or
-        (Saa = Fraa) or
-        (Faa = Saa) or
-        (Faa = Fraa) or
-        (Saa = Taa) or
-        (Taa = Fraa)
-      then
+      if (Faa = Taa) or (Saa = Fraa) or (Faa = Saa) or (Faa = Fraa) or
+        (Saa = Taa) or (Taa = Fraa) then
          Report.Failed
            ("INCORRECT HANDLING OF THE 'ADDRESS ATTRIBUTE. " & "- PACKAGE");
       end if;
@@ -295,31 +279,22 @@ procedure C36204d is
 
    begin  -- PROC_ARRAY_ATT_TEST
 
-      if (Fa1 /= First_Index'First) or
-        (Fa3 /= Second_Index'First) or
-        (Sa1 /= First_Index'First) or
-        (Sa3 /= Second_Index'First) or
-        (Sa5 /= Third_Index'First)
-      then
+      if (Fa1 /= First_Index'First) or (Fa3 /= Second_Index'First) or
+        (Sa1 /= First_Index'First) or (Sa3 /= Second_Index'First) or
+        (Sa5 /= Third_Index'First) then
          Report.Failed
            ("INCORRECT VALUE RETURNED FOR 'FIRST " & "- PROCEDURE");
       end if;
 
-      if (Fa2 /= First_Index'Last) or
-        (Fa4 /= Second_Index'Last) or
-        (Sa2 /= First_Index'Last) or
-        (Sa4 /= Second_Index'Last) or
-        (Sa6 /= Third_Index'Last)
-      then
+      if (Fa2 /= First_Index'Last) or (Fa4 /= Second_Index'Last) or
+        (Sa2 /= First_Index'Last) or (Sa4 /= Second_Index'Last) or
+        (Sa6 /= Third_Index'Last) then
          Report.Failed ("INCORRECT VALUE RETURNED FOR 'LAST " & "- PROCEDURE");
       end if;
 
-      if (Fal1 /= First_Index_Length) or
-        (Fal2 /= Second_Index_Length) or
-        (Sal1 /= First_Index_Length) or
-        (Sal2 /= Second_Index_Length) or
-        (Sal3 /= Third_Index_Length)
-      then
+      if (Fal1 /= First_Index_Length) or (Fal2 /= Second_Index_Length) or
+        (Sal1 /= First_Index_Length) or (Sal2 /= Second_Index_Length) or
+        (Sal3 /= Third_Index_Length) then
          Report.Failed
            ("INCORRECT VALUE RETURNED FOR 'LENGTH " & "- PROCEDURE");
       end if;
@@ -355,8 +330,7 @@ procedure C36204d is
         (First_Test_Value not in Second_Array'Range (1)) or
         (Second_Test_Value not in First_Array'Range (2)) or
         (Second_Test_Value not in Second_Array'Range (2)) or
-        (Third_Test_Value not in Second_Array'Range (3))
-      then
+        (Third_Test_Value not in Second_Array'Range (3)) then
          Report.Failed
            ("INCORRECT HANDLING OF 'RANGE ATTRIBUTE " & "- PROCEDURE");
       end if;
@@ -366,13 +340,8 @@ procedure C36204d is
            ("INCORRECT HANDLING OF THE 'SIZE ATTRIBUTE. " & "- PROCEDURE");
       end if;
 
-      if (Faa = Taa) or
-        (Saa = Fraa) or
-        (Faa = Saa) or
-        (Faa = Fraa) or
-        (Saa = Taa) or
-        (Taa = Fraa)
-      then
+      if (Faa = Taa) or (Saa = Fraa) or (Faa = Saa) or (Faa = Fraa) or
+        (Saa = Taa) or (Taa = Fraa) then
          Report.Failed
            ("INCORRECT HANDLING OF THE 'ADDRESS ATTRIBUTE. " & "- PROCEDURE");
       end if;
@@ -455,30 +424,21 @@ procedure C36204d is
 
    begin  -- FUNC_ARRAY_ATT_TEST
 
-      if (Fa1 /= First_Index'First) or
-        (Fa3 /= Second_Index'First) or
-        (Sa1 /= First_Index'First) or
-        (Sa3 /= Second_Index'First) or
-        (Sa5 /= Third_Index'First)
-      then
+      if (Fa1 /= First_Index'First) or (Fa3 /= Second_Index'First) or
+        (Sa1 /= First_Index'First) or (Sa3 /= Second_Index'First) or
+        (Sa5 /= Third_Index'First) then
          Report.Failed ("INCORRECT VALUE RETURNED FOR 'FIRST " & "- FUNCTION");
       end if;
 
-      if (Fa2 /= First_Index'Last) or
-        (Fa4 /= Second_Index'Last) or
-        (Sa2 /= First_Index'Last) or
-        (Sa4 /= Second_Index'Last) or
-        (Sa6 /= Third_Index'Last)
-      then
+      if (Fa2 /= First_Index'Last) or (Fa4 /= Second_Index'Last) or
+        (Sa2 /= First_Index'Last) or (Sa4 /= Second_Index'Last) or
+        (Sa6 /= Third_Index'Last) then
          Report.Failed ("INCORRECT VALUE RETURNED FOR 'LAST " & "- FUNCTION");
       end if;
 
-      if (Fal1 /= First_Index_Length) or
-        (Fal2 /= Second_Index_Length) or
-        (Sal1 /= First_Index_Length) or
-        (Sal2 /= Second_Index_Length) or
-        (Sal3 /= Third_Index_Length)
-      then
+      if (Fal1 /= First_Index_Length) or (Fal2 /= Second_Index_Length) or
+        (Sal1 /= First_Index_Length) or (Sal2 /= Second_Index_Length) or
+        (Sal3 /= Third_Index_Length) then
          Report.Failed
            ("INCORRECT VALUE RETURNED FOR 'LENGTH " & "- FUNCTION");
       end if;
@@ -514,8 +474,7 @@ procedure C36204d is
         (First_Test_Value not in Second_Array'Range (1)) or
         (Second_Test_Value not in First_Array'Range (2)) or
         (Second_Test_Value not in Second_Array'Range (2)) or
-        (Third_Test_Value not in Second_Array'Range (3))
-      then
+        (Third_Test_Value not in Second_Array'Range (3)) then
          Report.Failed
            ("INCORRECT HANDLING OF 'RANGE ATTRIBUTE " & "- FUNCTION");
       end if;
@@ -525,13 +484,8 @@ procedure C36204d is
            ("INCORRECT HANDLING OF THE 'SIZE ATTRIBUTE. " & "- FUNCTION");
       end if;
 
-      if (Faa = Taa) or
-        (Saa = Fraa) or
-        (Faa = Saa) or
-        (Faa = Fraa) or
-        (Saa = Taa) or
-        (Taa = Fraa)
-      then
+      if (Faa = Taa) or (Saa = Fraa) or (Faa = Saa) or (Faa = Fraa) or
+        (Saa = Taa) or (Taa = Fraa) then
          Report.Failed
            ("INCORRECT HANDLING OF THE 'ADDRESS ATTRIBUTE. " & "- FUNCTION");
       end if;
@@ -554,54 +508,33 @@ begin -- C36204D
       Dummy : Boolean := False;
 
       package New_Array_Attribute_Test is new Array_Attribute_Test
-        (First_Index           => Short_Range,
-         First_Index_Length    => Short_Length,
-         First_Test_Value      => -7,
-         Second_Index          => Month_Type,
-         Second_Index_Length   => 12,
-         Second_Test_Value     => Aug,
-         Third_Index           => Boolean,
-         Third_Index_Length    => 2,
-         Third_Test_Value      => False,
-         First_Component_Type  => Month_Type,
-         First_Default_Value   => Jan,
-         Second_Default_Value  => Dec,
-         Second_Component_Type => Date,
-         Third_Default_Value   => Today,
+        (First_Index => Short_Range, First_Index_Length => Short_Length,
+         First_Test_Value      => -7, Second_Index => Month_Type,
+         Second_Index_Length   => 12, Second_Test_Value => Aug,
+         Third_Index           => Boolean, Third_Index_Length => 2,
+         Third_Test_Value      => False, First_Component_Type => Month_Type,
+         First_Default_Value   => Jan, Second_Default_Value => Dec,
+         Second_Component_Type => Date, Third_Default_Value => Today,
          Fourth_Default_Value  => First_Date);
 
       procedure New_Proc_Array_Att_Test is new Proc_Array_Att_Test
-        (First_Index           => Month_Type,
-         First_Index_Length    => 12,
-         First_Test_Value      => Aug,
-         Second_Index          => Short_Range,
-         Second_Index_Length   => Short_Length,
-         Second_Test_Value     => -7,
-         Third_Index           => Boolean,
-         Third_Index_Length    => 2,
-         Third_Test_Value      => False,
-         First_Component_Type  => Date,
-         First_Default_Value   => Today,
-         Second_Default_Value  => First_Date,
-         Second_Component_Type => Month_Type,
-         Third_Default_Value   => Jan,
+        (First_Index           => Month_Type, First_Index_Length => 12,
+         First_Test_Value      => Aug, Second_Index => Short_Range,
+         Second_Index_Length   => Short_Length, Second_Test_Value => -7,
+         Third_Index           => Boolean, Third_Index_Length => 2,
+         Third_Test_Value      => False, First_Component_Type => Date,
+         First_Default_Value   => Today, Second_Default_Value => First_Date,
+         Second_Component_Type => Month_Type, Third_Default_Value => Jan,
          Fourth_Default_Value  => Dec);
 
       function New_Func_Array_Att_Test is new Func_Array_Att_Test
-        (First_Index           => Day_Type,
-         First_Index_Length    => 31,
-         First_Test_Value      => 25,
-         Second_Index          => Short_Range,
-         Second_Index_Length   => Short_Length,
-         Second_Test_Value     => -7,
-         Third_Index           => Mid_Year,
-         Third_Index_Length    => 4,
-         Third_Test_Value      => Jul,
-         First_Component_Type  => Date,
-         First_Default_Value   => Today,
-         Second_Default_Value  => First_Date,
-         Second_Component_Type => Month_Type,
-         Third_Default_Value   => Jan,
+        (First_Index           => Day_Type, First_Index_Length => 31,
+         First_Test_Value      => 25, Second_Index => Short_Range,
+         Second_Index_Length   => Short_Length, Second_Test_Value => -7,
+         Third_Index           => Mid_Year, Third_Index_Length => 4,
+         Third_Test_Value      => Jul, First_Component_Type => Date,
+         First_Default_Value   => Today, Second_Default_Value => First_Date,
+         Second_Component_Type => Month_Type, Third_Default_Value => Jan,
          Fourth_Default_Value  => Dec);
 
    begin  -- LOCAL_BLOCK

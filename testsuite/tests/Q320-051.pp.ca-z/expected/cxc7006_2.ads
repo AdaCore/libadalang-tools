@@ -12,9 +12,7 @@ package Cxc7006_2 is
 
    procedure Clear_Fin_Array;
 
-   procedure Test_Finalized
-     (Id        : in     Integer;
-      Finalized :    out Boolean;
-      Err_Msg   :    out Cxc7006_1.String_Acc);
+   procedure Test_Finalized (Id : in     Integer; Finalized : out Boolean;
+      Err_Msg                   :    out Cxc7006_1.String_Acc);
 
 end Cxc7006_2;

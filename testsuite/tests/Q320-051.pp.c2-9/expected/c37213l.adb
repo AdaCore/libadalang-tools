@@ -53,8 +53,7 @@ begin
       "DISCRIMINANT ARE PROPERLY CHECKED WHEN THE " &
       "RECORD TYPE IS CONSTRAINED BY DEFAULT AND " &
       "USED AS THE ACTUAL PARAMETER TO A GENERIC " &
-      "FORMAL TYPE USED TO DECLARE A DERIVED OR AN " &
-      "ACCESS TYPE");
+      "FORMAL TYPE USED TO DECLARE A DERIVED OR AN " & "ACCESS TYPE");
 
    declare
       subtype Sm is Integer range 1 .. 10;
@@ -92,8 +91,7 @@ begin
                if Obj_Xcp then
                   Failed
                     ("NO CHECK DURING DECLARATION " &
-                     "OF OBJECT OF TYPE DREC - " &
-                     Tag);
+                     "OF OBJECT OF TYPE DREC - " & Tag);
                elsif X /= Value then
                   Failed
                     ("INCORRECT VALUE FOR OBJECT OF " & "TYPE DREC - " & Tag);
@@ -104,8 +102,7 @@ begin
                if not Obj_Xcp then
                   Failed
                     ("IMPROPER CONSTRAINT CHECKED " &
-                     "DURING DECLARATION OF OBJECT " &
-                     "OF TYPE DREC - " &
+                     "DURING DECLARATION OF OBJECT " & "OF TYPE DREC - " &
                      Tag);
                end if;
          end;
@@ -113,8 +110,7 @@ begin
          when Constraint_Error =>
             Failed
               ("CONSTRAINT IMPROPERLY CHECKED " &
-               "DURING DECLARATION OF DREC - " &
-               Tag);
+               "DURING DECLARATION OF DREC - " & Tag);
       end Der_Chk;
 
       generic
@@ -143,8 +139,7 @@ begin
                if Obj_Xcp then
                   Failed
                     ("NO CHECK DURING ALLOCATION " &
-                     "OF OBJECT OF TYPE CONS - " &
-                     Tag);
+                     "OF OBJECT OF TYPE CONS - " & Tag);
                elsif X.all /= Value then
                   Failed
                     ("INCORRECT VALUE FOR OBJECT " & "OF TYPE CONS - " & Tag);
@@ -153,26 +148,21 @@ begin
                when Constraint_Error =>
                   if not Obj_Xcp then
                      Failed
-                       ("IMPROPER CONSTRAINT " &
-                        "CHECKED DURING " &
-                        "ALLOCATION OF OBJECT " &
-                        "OF TYPE CONS - " &
-                        Tag);
+                       ("IMPROPER CONSTRAINT " & "CHECKED DURING " &
+                        "ALLOCATION OF OBJECT " & "OF TYPE CONS - " & Tag);
                   end if;
             end;
          exception
             when Constraint_Error =>
                Failed
                  ("CONSTRAINT IMPROPERLY CHECKED " &
-                  "DURING DECLARATION OF X - " &
-                  Tag);
+                  "DURING DECLARATION OF X - " & Tag);
          end;
       exception
          when Constraint_Error =>
             Failed
               ("CONSTRAINT IMPROPERLY CHECKED " &
-               "DURING DECLARATION OF ACC_CONS - " &
-               Tag);
+               "DURING DECLARATION OF ACC_CONS - " & Tag);
       end Acc_Chk;
    begin
       Sequence_Number := 1;
@@ -181,10 +171,8 @@ begin
             C1 : Rec (D3, 0);
          end record;
 
-         package Pack1 is new Der_Chk
-           (Rec_Def,
-            Obj_Xcp => True,
-            Tag     => "PACK1");
+         package Pack1 is new Der_Chk (Rec_Def, Obj_Xcp => True,
+            Tag                                         => "PACK1");
 
          procedure Proc1 is new Acc_Chk (Rec_Def);
       begin
@@ -197,10 +185,8 @@ begin
             C1 : My_Arr (0 .. D3);
          end record;
 
-         package Pack2 is new Der_Chk
-           (Arr_Def,
-            Obj_Xcp => True,
-            Tag     => "PACK2");
+         package Pack2 is new Der_Chk (Arr_Def, Obj_Xcp => True,
+            Tag                                         => "PACK2");
 
          procedure Proc2 is new Acc_Chk (Arr_Def);
       begin
@@ -218,10 +204,8 @@ begin
             end case;
          end record;
 
-         package Pack3 is new Der_Chk
-           (Var_Rec_Def1,
-            Obj_Xcp => True,
-            Tag     => "PACK3");
+         package Pack3 is new Der_Chk (Var_Rec_Def1, Obj_Xcp => True,
+            Tag                                              => "PACK3");
 
          procedure Proc3 is new Acc_Chk (Var_Rec_Def1);
       begin
@@ -239,10 +223,8 @@ begin
             end case;
          end record;
 
-         package Pack4 is new Der_Chk
-           (Var_Rec_Def6,
-            Obj_Xcp => False,
-            Tag     => "PACK4");
+         package Pack4 is new Der_Chk (Var_Rec_Def6, Obj_Xcp => False,
+            Tag                                              => "PACK4");
 
          procedure Proc4 is new Acc_Chk (Var_Rec_Def6);
       begin
@@ -260,10 +242,8 @@ begin
             end case;
          end record;
 
-         package Pack5 is new Der_Chk
-           (Var_Rec_Def11,
-            Obj_Xcp => False,
-            Tag     => "PACK5");
+         package Pack5 is new Der_Chk (Var_Rec_Def11, Obj_Xcp => False,
+            Tag                                               => "PACK5");
 
          procedure Proc5 is new Acc_Chk (Var_Rec_Def11);
       begin
@@ -281,10 +261,8 @@ begin
             end case;
          end record;
 
-         package Pack6 is new Der_Chk
-           (Var_Arr_Def1,
-            Obj_Xcp => True,
-            Tag     => "PACK6");
+         package Pack6 is new Der_Chk (Var_Arr_Def1, Obj_Xcp => True,
+            Tag                                              => "PACK6");
 
          procedure Proc6 is new Acc_Chk (Var_Arr_Def1);
       begin
@@ -302,10 +280,8 @@ begin
             end case;
          end record;
 
-         package Pack7 is new Der_Chk
-           (Var_Arr_Def6,
-            Obj_Xcp => False,
-            Tag     => "PACK7");
+         package Pack7 is new Der_Chk (Var_Arr_Def6, Obj_Xcp => False,
+            Tag                                              => "PACK7");
 
          procedure Proc7 is new Acc_Chk (Var_Arr_Def6);
       begin
@@ -323,10 +299,8 @@ begin
             end case;
          end record;
 
-         package Pack8 is new Der_Chk
-           (Var_Arr_Def11,
-            Obj_Xcp => False,
-            Tag     => "PACK8");
+         package Pack8 is new Der_Chk (Var_Arr_Def11, Obj_Xcp => False,
+            Tag                                               => "PACK8");
 
          procedure Proc8 is new Acc_Chk (Var_Arr_Def11);
       begin

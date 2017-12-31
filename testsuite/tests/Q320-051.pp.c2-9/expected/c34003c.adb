@@ -41,8 +41,7 @@ procedure C34003c is
    type Parent is digits 5;
 
    type T is
-     new Parent digits 4 range
-       Parent (Ident_Int (-30)) ..
+     new Parent digits 4 range Parent (Ident_Int (-30)) ..
          Parent (Ident_Int (30));
 
    subtype Subparent is Parent digits 4 range -30.0 .. 30.0;
@@ -60,8 +59,7 @@ begin
       "WHEN THE DERIVED TYPE DEFINITION IS " &
       "CONSTRAINED.  ALSO CHECK THAT ANY CONSTRAINT " &
       "IMPOSED ON THE PARENT SUBTYPE IS ALSO IMPOSED " &
-      "ON THE DERIVED SUBTYPE.  CHECK FOR DERIVED " &
-      "FLOATING POINT TYPES");
+      "ON THE DERIVED SUBTYPE.  CHECK FOR DERIVED " & "FLOATING POINT TYPES");
 
    -- CHECK THAT BASE TYPE VALUES NOT IN THE SUBTYPE ARE PRESENT.
 
@@ -72,8 +70,7 @@ begin
    if 12_344.0 + T'(1.0) + 1.0 /= 12_346.0 or
      12_344.0 + S'(1.0) + 1.0 /= 12_346.0 or
      -12_344.0 - T'(1.0) - 1.0 /= -12_346.0 or
-     -12_344.0 - S'(1.0) - 1.0 /= -12_346.0
-   then
+     -12_344.0 - S'(1.0) - 1.0 /= -12_346.0 then
       Failed ("INCORRECT + OR -");
    end if;
 
@@ -83,10 +80,7 @@ begin
       Failed ("INCORRECT 'DIGITS");
    end if;
 
-   if T'First /= -30.0 or
-     T'Last /= 30.0 or
-     S'First /= -30.0 or
-     S'Last /= 30.0
+   if T'First /= -30.0 or T'Last /= 30.0 or S'First /= -30.0 or S'Last /= 30.0
    then
       Failed ("INCORRECT 'FIRST OR 'LAST");
    end if;

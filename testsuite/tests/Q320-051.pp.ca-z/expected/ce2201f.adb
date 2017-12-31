@@ -65,8 +65,7 @@ begin
 
    Test
      ("CE2201F",
-      "CHECK THAT READ, WRITE, AND " &
-      "END_OF_FILE ARE SUPPORTED FOR " &
+      "CHECK THAT READ, WRITE, AND " & "END_OF_FILE ARE SUPPORTED FOR " &
       "SEQUENTIAL FILES FOR PRIVATE TYPES");
 
    declare

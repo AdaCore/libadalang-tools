@@ -68,8 +68,7 @@ begin
 
    Report.Test
      ("CXF3A08",
-      "Check that the version of " &
-      "Ada.Text_IO.Editing.Put with an out " &
+      "Check that the version of " & "Ada.Text_IO.Editing.Put with an out " &
       "String parameter propagates Layout_Error " &
       "if the output string exceeds the length " &
       "of the out String parameter");
@@ -84,10 +83,8 @@ begin
       -- Uses decimal type with delta 0.01 and
       package Pack_2dp is          -- non-default generic actual parameters.
       new Editing.Decimal_Output
-        (Num                => Fxf3a00.Decimal_Type_2dp,
-         Default_Currency   => "$",
-         Default_Fill       => '*',
-         Default_Separator  => ',',
+        (Num => Fxf3a00.Decimal_Type_2dp, Default_Currency => "$",
+         Default_Fill       => '*', Default_Separator => ',',
          Default_Radix_Mark => '.');
 
       package Pack_Ndp is          -- Uses decimal type with delta 1.0.
@@ -135,20 +132,15 @@ begin
             -- named parameter association.
 
             Pack_2dp.Put
-              (To         => Tc_Short_String,
-               Item       => Fxf3a00.Data_With_2dp (I),
-               Pic        => Tc_Picture,
-               Currency   => "$",
-               Fill       => '*',
-               Separator  => ',',
-               Radix_Mark => '.');
+              (To        => Tc_Short_String, Item => Fxf3a00.Data_With_2dp (I),
+               Pic       => Tc_Picture, Currency => "$", Fill => '*',
+               Separator => ',', Radix_Mark => '.');
 
             -- Test failure if exception not raised.
 
             Report.Failed
               ("Layout_Error not raised, decimal data with two decimal " &
-               "places, loop #" &
-               Integer'Image (I));
+               "places, loop #" & Integer'Image (I));
 
          exception
             when Layout_Error =>
@@ -184,16 +176,14 @@ begin
             -- and positional parameter association.
 
             Pack_Ndp.Put
-              (Tc_Short_String,
-               Fxf3a00.Data_With_Ndp (I - Tc_Offset),
+              (Tc_Short_String, Fxf3a00.Data_With_Ndp (I - Tc_Offset),
                Tc_Picture);
 
             -- Test failure if exception not raised.
 
             Report.Failed
               ("Layout_Error not raised, decimal data with no decimal " &
-               "places, loop #" &
-               Integer'Image (I));
+               "places, loop #" & Integer'Image (I));
 
          exception
             when Layout_Error =>
@@ -216,10 +206,8 @@ begin
       declare
 
          package Pack_Ff is new Editing.Decimal_Output
-           (Num                => Fxf3a00.Decimal_Type_2dp,
-            Default_Currency   => "FF",
-            Default_Fill       => '*',
-            Default_Separator  => '.',
+           (Num => Fxf3a00.Decimal_Type_2dp, Default_Currency => "FF",
+            Default_Fill       => '*', Default_Separator => '.',
             Default_Radix_Mark => ',');
 
       begin
@@ -244,8 +232,7 @@ begin
                  ("Layout_Error was not raised by Put from " &
                   "an instantiation of Decimal_Output using " &
                   "non-default parameters specific to FF " &
-                  "currency, loop #" &
-                  Integer'Image (I));
+                  "currency, loop #" & Integer'Image (I));
 
             exception
                when Layout_Error =>
@@ -255,8 +242,7 @@ begin
                     ("Incorrect exception raised by Put from " &
                      "an instantiation of Decimal_Output using " &
                      "non-default parameters specific to FF " &
-                     "currency, loop #" &
-                     Integer'Image (I));
+                     "currency, loop #" & Integer'Image (I));
             end;
          end loop;
 
@@ -275,19 +261,15 @@ begin
                       (I + Fxf3a00.Number_Of_Ff_Strings).all);
 
                Pack_2dp.Put
-                 (To         => Tc_Short_String,
-                  Item       => Fxf3a00.Data_With_2dp (I + Tc_Offset),
-                  Pic        => Tc_Picture,
-                  Currency   => "DM",
-                  Fill       => '*',
-                  Separator  => ',',
-                  Radix_Mark => '.');
+                 (To        => Tc_Short_String,
+                  Item      => Fxf3a00.Data_With_2dp (I + Tc_Offset),
+                  Pic       => Tc_Picture, Currency => "DM", Fill => '*',
+                  Separator => ',', Radix_Mark => '.');
 
                Report.Failed
                  ("Layout_Error was not raised by Put using " &
                   "non-default parameters specific to DM " &
-                  "currency, loop #" &
-                  Integer'Image (I));
+                  "currency, loop #" & Integer'Image (I));
 
             exception
                when Layout_Error =>
@@ -296,8 +278,7 @@ begin
                   Report.Failed
                     ("Incorrect exception raised by Put using " &
                      "non-default parameters specific to DM " &
-                     "currency, loop #" &
-                     Integer'Image (I));
+                     "currency, loop #" & Integer'Image (I));
             end;
          end loop;
 

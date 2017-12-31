@@ -38,8 +38,7 @@ procedure C74209a is
 begin
 
    Test
-     ("C74209A",
-      "CHECK THAT PROCEDURE SIGNATURES CAN USE " & "PRIVATE TYPES");
+     ("C74209A", "CHECK THAT PROCEDURE SIGNATURES CAN USE " & "PRIVATE TYPES");
 
    declare
 
@@ -86,18 +85,14 @@ begin
 
       end Pack;
 
-      procedure Proc1
-        (X : in out Pack.Priv;
-         Y : in     Pack.Priv := Pack.Priv_Const_In;
-         Z :    out Pack.Priv;
-         U :        Pack.Priv)
+      procedure Proc1 (X : in out Pack.Priv;
+         Y : in     Pack.Priv := Pack.Priv_Const_In; Z : out Pack.Priv;
+         U               :        Pack.Priv)
       is
       begin
 
-         if X /= Pack.Priv_Const_In or
-           Y /= Pack.Priv_Const_In or
-           U /= Pack.Priv_Const_In
-         then
+         if X /= Pack.Priv_Const_In or Y /= Pack.Priv_Const_In or
+           U /= Pack.Priv_Const_In then
             Failed ("WRONG INPUT VALUES  -  PROC1");
          end if;
 
@@ -106,17 +101,13 @@ begin
 
       end Proc1;
 
-      procedure Proc2
-        (X : in out Lim_Priv;
-         Y : in     Lim_Priv;
-         Z : in out Lim_Priv;
-         U :        Lim_Priv)
+      procedure Proc2 (X : in out Lim_Priv; Y : in Lim_Priv;
+         Z               : in out Lim_Priv; U : Lim_Priv)
       is
       begin
 
          if not (Equals (X, Packaged (17))) or
-           not (Equals (Y, Packaged (17))) or
-           not (Equals (U, Packaged (17)))
+           not (Equals (Y, Packaged (17))) or not (Equals (U, Packaged (17)))
          then
             Failed ("WRONG INPUT VALUES  -  PROC2");
          end if;
@@ -140,8 +131,7 @@ begin
       function Func2 (Y : in Lim_Priv; U : Lim_Priv) return Lim_Priv is
       begin
 
-         if not (Equals (Y, Packaged (17))) or
-           not (Equals (U, Packaged (17)))
+         if not (Equals (Y, Packaged (17))) or not (Equals (U, Packaged (17)))
          then
             Failed ("WRONG INPUT VALUES  -  FUNC2");
          end if;
@@ -159,8 +149,7 @@ begin
 
       Proc1 (Priv_Var_1, Z => Priv_Var_2, U => Priv_Const_In);
 
-      if Priv_Var_1 /= Pack.Priv_Const_Out or
-        Priv_Var_2 /= Pack.Priv_Const_Out
+      if Priv_Var_1 /= Pack.Priv_Const_Out or Priv_Var_2 /= Pack.Priv_Const_Out
       then
          Failed ("WRONG OUTPUT VALUES  -  PROC1");
       end if;
@@ -173,8 +162,7 @@ begin
       Proc2 (Lim_Priv_Var_1, Packaged (17), Lim_Priv_Var_2, Packaged (17));
 
       if not (Equals (Lim_Priv_Var_1, Packaged (13))) or
-        not (Equals (Lim_Priv_Var_2, Packaged (13)))
-      then
+        not (Equals (Lim_Priv_Var_2, Packaged (13))) then
          Failed ("WRONG OUTPUT VALUES  -  PROC2");
       end if;
 

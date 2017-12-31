@@ -65,13 +65,11 @@ with Ada.Calendar;
 with Impdef;
 procedure C974002 is
 
-   function "-"
-     (Left  : Ada.Calendar.Time;
-      Right : Duration) return Ada.Calendar.Time renames
+   function "-" (Left : Ada.Calendar.Time;
+      Right           : Duration) return Ada.Calendar.Time renames
      Ada.Calendar."-";
-   function "+"
-     (Left  : Ada.Calendar.Time;
-      Right : Duration) return Ada.Calendar.Time renames
+   function "+" (Left : Ada.Calendar.Time;
+      Right           : Duration) return Ada.Calendar.Time renames
      Ada.Calendar."+";
 
    Abortable_Part_Executed         : Boolean;

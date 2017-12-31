@@ -39,10 +39,8 @@ begin
 
    Test
      ("CD5012A",
-      "AN ADDRESS CLAUSE CAN BE " &
-      "GIVEN FOR A VARIABLE OF AN ENUMERATION " &
-      "TYPE IN THE DECLARATIVE PART OF A " &
-      "GENERIC SUBPROGRAM");
+      "AN ADDRESS CLAUSE CAN BE " & "GIVEN FOR A VARIABLE OF AN ENUMERATION " &
+      "TYPE IN THE DECLARATIVE PART OF A " & "GENERIC SUBPROGRAM");
 
    declare
       type Non_Char is (Red, Blue, Green);

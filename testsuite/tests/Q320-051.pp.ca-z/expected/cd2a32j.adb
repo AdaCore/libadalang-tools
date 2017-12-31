@@ -50,8 +50,7 @@ begin
       "CHECK THAT WHEN A SIZE SPECIFICATION " &
       "OF THE SMALLEST APPROPRIATE UNSIGNED SIZE " &
       "IS GIVEN FOR AN INTEGER TYPE, THE TYPE " &
-      "CAN BE PASSED AS AN ACTUAL PARAMETER TO " &
-      "GENERIC PROCEDURES");
+      "CAN BE PASSED AS AN ACTUAL PARAMETER TO " & "GENERIC PROCEDURES");
 
    declare -- TYPE DECLARATION WITHIN GENERIC PROCEDURE.
 
@@ -87,30 +86,23 @@ begin
          end if;
 
          if not
-           ((I0 < Ident (1)) and
-            (Ident (I2) > Ident (I1)) and
-            (I1 <= Ident (63)) and
-            (Ident (126) = I2))
+           ((I0 < Ident (1)) and (Ident (I2) > Ident (I1)) and
+            (I1 <= Ident (63)) and (Ident (126) = I2))
          then
             Failed ("INCORRECT RESULTS FOR RELATIONAL " & "OPERATORS");
          end if;
 
          if not
-           (((I0 + I2) = I2) and
-            ((I2 - I1) = I1) and
-            ((I1 * Ident (2)) = I2) and
-            ((I2 / I1) = Ident (2)) and
-            ((I1**1) = Ident (63)) and
-            ((I2 rem 10) = Ident (6)) and
+           (((I0 + I2) = I2) and ((I2 - I1) = I1) and
+            ((I1 * Ident (2)) = I2) and ((I2 / I1) = Ident (2)) and
+            ((I1**1) = Ident (63)) and ((I2 rem 10) = Ident (6)) and
             ((I1 mod 10) = Ident (3)))
          then
             Failed ("INCORRECT RESULTS FOR BINARY ARITHMETIC " & "OPERATORS");
          end if;
 
-         if Int'Pos (I0) /= Ident_Int (0) or
-           Int'Pos (I1) /= Ident_Int (63) or
-           Int'Pos (I2) /= Ident_Int (126)
-         then
+         if Int'Pos (I0) /= Ident_Int (0) or Int'Pos (I1) /= Ident_Int (63) or
+           Int'Pos (I2) /= Ident_Int (126) then
             Failed ("INCORRECT VALUE FOR INT'POS");
          end if;
 
@@ -120,8 +112,7 @@ begin
 
          if Int'Image (I0) /= Ident_Str (" 0") or
            Int'Image (I1) /= Ident_Str (" 63") or
-           Int'Image (I2) /= Ident_Str (" 126")
-         then
+           Int'Image (I2) /= Ident_Str (" 126") then
             Failed ("INCORRECT VALUE FOR INT'IMAGE");
          end if;
 

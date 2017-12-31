@@ -85,8 +85,7 @@ package Cxc3004_0 is
 
    protected Static_Handler is
       procedure Handle_Interrupt;
-      pragma Attach_Handler
-        (Handle_Interrupt,
+      pragma Attach_Handler (Handle_Interrupt,
          Impdef.Annex_C.Interrupt_To_Generate);
 
       function Handled return Boolean;

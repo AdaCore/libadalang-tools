@@ -30,14 +30,12 @@ begin
 
    begin
       Copy_Designated_Pkg.Copy
-        ("Alert Level 1 : Alert The Guard",
-         To_The_Message => The_Message);
+        ("Alert Level 1 : Alert The Guard", To_The_Message => The_Message);
 
       Message_Pkg.Highlight_Designated ("Alert", The_Message);
 
       if not Message_Pkg.Tc_Designated_Not_Zero and
-        Message_Pkg.Tc_Designated_Success
-      then
+        Message_Pkg.Tc_Designated_Success then
          Report.Failed ("Alert should have been highlighted");
       end if;
 
@@ -57,16 +55,13 @@ begin
 
    begin
       Copy_Particularly_Designated_Pkg.Copy
-        ("Alert Level 10 : Alert The Guard and Push The Alarm",
-         The_Message);
+        ("Alert Level 10 : Alert The Guard and Push The Alarm", The_Message);
 
       Message_Pkg.Highlight_Particularly_Designated
-        ("Push The Alarm",
-         The_Message);
+        ("Push The Alarm", The_Message);
 
       if not Message_Pkg.Tc_Particularly_Designated_Not_Zero and
-        Message_Pkg.Tc_Particularly_Designated_Success
-      then
+        Message_Pkg.Tc_Particularly_Designated_Success then
          Report.Failed ("Key words should have been highlighted");
       end if;
 

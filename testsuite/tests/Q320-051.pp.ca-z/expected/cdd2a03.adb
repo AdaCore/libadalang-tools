@@ -48,9 +48,8 @@ procedure Cdd2a03 is
    type Int is range 1 .. 1_000;
    type Str is array (Int range <>) of Character;
 
-   procedure Read
-     (Stream :     access Root_Stream_Type'Class;
-      Item   : out Int'Base);
+   procedure Read (Stream :     access Root_Stream_Type'Class;
+      Item                : out Int'Base);
    procedure Write (Stream : access Root_Stream_Type'Class; Item : Int'Base);
    function Input (Stream : access Root_Stream_Type'Class) return Int'Base;
    procedure Output (Stream : access Root_Stream_Type'Class; Item : Int'Base);
@@ -94,9 +93,8 @@ procedure Cdd2a03 is
    for Parent'Input use Input;
    for Parent'Output use Output;
 
-   procedure Actual_Read
-     (Stream :     access Root_Stream_Type'Class;
-      Item   : out Int)
+   procedure Actual_Read (Stream :     access Root_Stream_Type'Class;
+      Item                       : out Int)
    is
    begin
       Integer'Read (Stream, Integer (Item));
@@ -119,9 +117,8 @@ procedure Cdd2a03 is
       Integer'Output (Stream, Integer (Item));
    end Actual_Output;
 
-   procedure Actual_Read
-     (Stream :     access Root_Stream_Type'Class;
-      Item   : out Lim)
+   procedure Actual_Read (Stream :     access Root_Stream_Type'Class;
+      Item                       : out Lim)
    is
    begin
       Integer'Read (Stream, Integer (Item.C));
@@ -146,9 +143,8 @@ procedure Cdd2a03 is
       Integer'Output (Stream, Integer (Item.C));
    end Actual_Output;
 
-   procedure Actual_Read
-     (Stream :     access Root_Stream_Type'Class;
-      Item   : out Parent)
+   procedure Actual_Read (Stream :     access Root_Stream_Type'Class;
+      Item                       : out Parent)
    is
    begin
       case Item.B is
@@ -160,9 +156,8 @@ procedure Cdd2a03 is
       Str'Read (Stream, Item.S);
    end Actual_Read;
 
-   procedure Actual_Write
-     (Stream : access Root_Stream_Type'Class;
-      Item   : Parent)
+   procedure Actual_Write (Stream : access Root_Stream_Type'Class;
+      Item                        : Parent)
    is
    begin
       case Item.B is
@@ -181,87 +176,67 @@ procedure Cdd2a03 is
       return X : Parent (1, 1, True);
    end Actual_Input;
 
-   procedure Actual_Output
-     (Stream : access Root_Stream_Type'Class;
-      Item   : Parent)
+   procedure Actual_Output (Stream : access Root_Stream_Type'Class;
+      Item                         : Parent)
    is
    begin
       raise Input_Output_Error;
    end Actual_Output;
 
-   package Int_Ops is new Counting_Stream_Ops
-     (T             => Int'Base,
-      Actual_Write  => Actual_Write,
-      Actual_Input  => Actual_Input,
-      Actual_Read   => Actual_Read,
-      Actual_Output => Actual_Output);
+   package Int_Ops is new Counting_Stream_Ops (T => Int'Base,
+      Actual_Write => Actual_Write, Actual_Input => Actual_Input,
+      Actual_Read => Actual_Read, Actual_Output => Actual_Output);
 
-   package Lim_Ops is new Counting_Stream_Ops
-     (T             => Lim,
-      Actual_Write  => Actual_Write,
-      Actual_Input  => Actual_Input,
-      Actual_Read   => Actual_Read,
-      Actual_Output => Actual_Output);
+   package Lim_Ops is new Counting_Stream_Ops (T => Lim,
+      Actual_Write => Actual_Write, Actual_Input => Actual_Input,
+      Actual_Read => Actual_Read, Actual_Output => Actual_Output);
 
-   package Parent_Ops is new Counting_Stream_Ops
-     (T             => Parent,
-      Actual_Write  => Actual_Write,
-      Actual_Input  => Actual_Input,
-      Actual_Read   => Actual_Read,
-      Actual_Output => Actual_Output);
+   package Parent_Ops is new Counting_Stream_Ops (T => Parent,
+      Actual_Write => Actual_Write, Actual_Input => Actual_Input,
+      Actual_Read => Actual_Read, Actual_Output => Actual_Output);
 
-   procedure Read
-     (Stream :     access Root_Stream_Type'Class;
-      Item   : out Int'Base) renames
+   procedure Read (Stream :     access Root_Stream_Type'Class;
+      Item                : out Int'Base) renames
      Int_Ops.Read;
-   procedure Write
-     (Stream : access Root_Stream_Type'Class;
-      Item   : Int'Base) renames
+   procedure Write (Stream : access Root_Stream_Type'Class;
+      Item                 : Int'Base) renames
      Int_Ops.Write;
    function Input
      (Stream : access Root_Stream_Type'Class) return Int'Base renames
      Int_Ops.Input;
-   procedure Output
-     (Stream : access Root_Stream_Type'Class;
-      Item   : Int'Base) renames
+   procedure Output (Stream : access Root_Stream_Type'Class;
+      Item                  : Int'Base) renames
      Int_Ops.Output;
 
-   procedure Read
-     (Stream :     access Root_Stream_Type'Class;
-      Item   : out Lim) renames
+   procedure Read (Stream :     access Root_Stream_Type'Class;
+      Item                : out Lim) renames
      Lim_Ops.Read;
    procedure Write (Stream : access Root_Stream_Type'Class; Item : Lim) renames
      Lim_Ops.Write;
    function Input (Stream : access Root_Stream_Type'Class) return Lim renames
      Lim_Ops.Input;
-   procedure Output
-     (Stream : access Root_Stream_Type'Class;
-      Item   : Lim) renames
+   procedure Output (Stream : access Root_Stream_Type'Class;
+      Item                  : Lim) renames
      Lim_Ops.Output;
 
-   procedure Read
-     (Stream :     access Root_Stream_Type'Class;
-      Item   : out Parent) renames
+   procedure Read (Stream :     access Root_Stream_Type'Class;
+      Item                : out Parent) renames
      Parent_Ops.Read;
-   procedure Write
-     (Stream : access Root_Stream_Type'Class;
-      Item   : Parent) renames
+   procedure Write (Stream : access Root_Stream_Type'Class;
+      Item                 : Parent) renames
      Parent_Ops.Write;
    function Input
      (Stream : access Root_Stream_Type'Class) return Parent renames
      Parent_Ops.Input;
-   procedure Output
-     (Stream : access Root_Stream_Type'Class;
-      Item   : Parent) renames
+   procedure Output (Stream : access Root_Stream_Type'Class;
+      Item                  : Parent) renames
      Parent_Ops.Output;
 
    type Derived1 is new Parent with record
       C3 : Int;
    end record;
 
-   type Derived2
-     (D : Int)
-   is new Parent (D1 => D, D2 => D, B => False) with
+   type Derived2 (D : Int) is new Parent (D1 => D, D2 => D, B => False) with
    record
       C3 : Lim;
    end record;
@@ -279,40 +254,32 @@ begin
    Test1 :
    declare
       S  : aliased My_Stream (1_000);
-      X1 : Derived1
-        (D1 => Int (Ident_Int (2)),
-         D2 => Int (Ident_Int (5)),
-         B  => Ident_Bool (True));
-      X2 : Derived1
-        (D1 => Int (Ident_Int (2)),
-         D2 => Int (Ident_Int (5)),
-         B  => Ident_Bool (True));
+      X1 : Derived1 (D1 => Int (Ident_Int (2)), D2 => Int (Ident_Int (5)),
+         B => Ident_Bool (True));
+      X2 : Derived1 (D1 => Int (Ident_Int (2)), D2 => Int (Ident_Int (5)),
+         B => Ident_Bool (True));
    begin
       X1.S  := Str (Ident_Str ("bcde"));
       X1.C2 := Float (Ident_Int (4));
       X1.C3 := Int (Ident_Int (99));
 
       Derived1'Write (S'Access, X1);
-      if Int_Ops.Get_Counts /=
-        (Read => 0, Write => 1, Input => 0, Output => 0)
+      if Int_Ops.Get_Counts /= (Read => 0, Write => 1, Input => 0, Output => 0)
       then
          Failed ("Error writing extension components - 1");
       end if;
       if Parent_Ops.Get_Counts /=
-        (Read => 0, Write => 1, Input => 0, Output => 0)
-      then
+        (Read => 0, Write => 1, Input => 0, Output => 0) then
          Failed ("Didn't call parent type's Write - 1");
       end if;
 
       Derived1'Read (S'Access, X2);
-      if Int_Ops.Get_Counts /=
-        (Read => 1, Write => 1, Input => 0, Output => 0)
+      if Int_Ops.Get_Counts /= (Read => 1, Write => 1, Input => 0, Output => 0)
       then
          Failed ("Error reading extension components - 1");
       end if;
       if Parent_Ops.Get_Counts /=
-        (Read => 1, Write => 1, Input => 0, Output => 0)
-      then
+        (Read => 1, Write => 1, Input => 0, Output => 0) then
          Failed ("Didn't call inherited Read - 1");
       end if;
    end Test1;
@@ -328,26 +295,22 @@ begin
       X1.C3.C := Int (Ident_Int (666));
 
       Derived2'Write (S'Access, X1);
-      if Lim_Ops.Get_Counts /=
-        (Read => 0, Write => 1, Input => 0, Output => 0)
+      if Lim_Ops.Get_Counts /= (Read => 0, Write => 1, Input => 0, Output => 0)
       then
          Failed ("Error writing extension components - 2");
       end if;
       if Parent_Ops.Get_Counts /=
-        (Read => 1, Write => 2, Input => 0, Output => 0)
-      then
+        (Read => 1, Write => 2, Input => 0, Output => 0) then
          Failed ("Didn't call inherited Write - 2");
       end if;
 
       Derived2'Read (S'Access, X2);
-      if Lim_Ops.Get_Counts /=
-        (Read => 1, Write => 1, Input => 0, Output => 0)
+      if Lim_Ops.Get_Counts /= (Read => 1, Write => 1, Input => 0, Output => 0)
       then
          Failed ("Error reading extension components - 2");
       end if;
       if Parent_Ops.Get_Counts /=
-        (Read => 2, Write => 2, Input => 0, Output => 0)
-      then
+        (Read => 2, Write => 2, Input => 0, Output => 0) then
          Failed ("Didn't call inherited Read - 2");
       end if;
    end Test2;

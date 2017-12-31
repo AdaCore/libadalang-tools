@@ -153,12 +153,10 @@ begin
       type Tabox0 is array (Integer range <>, Integer range <>) of Integer;
 
       subtype Tabox01 is
-        Tabox0
-          (Ident_Int (1) .. Ident_Int (5),
+        Tabox0 (Ident_Int (1) .. Ident_Int (5),
            Ident_Int (0) .. Ident_Int (7));
       subtype Tabox02 is
-        Tabox0
-          (Ident_Int (0) .. Ident_Int (5),
+        Tabox0 (Ident_Int (0) .. Ident_Int (5),
            Ident_Int (2) .. Ident_Int (9));
 
       Arrx01 : Tabox01;

@@ -61,24 +61,21 @@ begin
          when Use_Error =>
             Not_Applicable
               ("USE_ERROR RAISED; TEXT CREATE " &
-               "FOR TEMP FILES WITH OUT_FILE " &
-               "MODE");
+               "FOR TEMP FILES WITH OUT_FILE " & "MODE");
             raise Incomplete;
       end;
 
       Put_Line (Ft, Ns1);
       if Line (Ft) /= Lc + 1 then
          Failed
-           ("PUT_LINE OF NULL STRING 1; LINE " &
-            "COUNT WAS" &
+           ("PUT_LINE OF NULL STRING 1; LINE " & "COUNT WAS" &
             Count'Image (Line (Ft)));
       end if;
 
       Put_Line (Ft, Ns2);
       if Line (Ft) /= Lc + 2 then
          Failed
-           ("PUT_LINE OF NULL STRING 2; LINE " &
-            "COUNT WAS" &
+           ("PUT_LINE OF NULL STRING 2; LINE " & "COUNT WAS" &
             Count'Image (Line (Ft)));
       end if;
 

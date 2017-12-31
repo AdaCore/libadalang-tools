@@ -106,10 +106,8 @@ package C392d01_0 is
 
    -- ...Additional operations.
 
-   function Tc_Correct_Result
-     (C : Zoom_Camera;
-      D : F392d00.Depth_Of_Field;
-      S : F392d00.Shutter_Speed) return Boolean;
+   function Tc_Correct_Result (C : Zoom_Camera; D : F392d00.Depth_Of_Field;
+      S                          : F392d00.Shutter_Speed) return Boolean;
 
 private
 

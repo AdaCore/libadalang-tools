@@ -44,8 +44,7 @@ begin
    Test
      ("CB5001B",
       "CHECK THAT AN EXCEPTION IN A RENDEVOUS IS " &
-      "PROPAGATED TO CALLER AND CALLED TASKS -- TWO " &
-      "LEVELS");
+      "PROPAGATED TO CALLER AND CALLED TASKS -- TWO " & "LEVELS");
 
    declare
       task T1 is

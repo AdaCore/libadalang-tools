@@ -43,8 +43,7 @@ package body C332001_0 is
         (Mtm < Integer_Type'Last,
          "MTM < Integer_Type'Last");                     -- 256 < 1023
       Assert
-        (Enp > Mtp,
-         "ENP > MTP");                                   -- 3 > 1
+        (Enp > Mtp, "ENP > MTP");                                   -- 3 > 1
       Assert
         ((Fts < Mtl) or (Fts >= Mtl),  -- given FTS is impdef...
          "(FTS < MTL) or (FTS >= MTL)");                 -- True

@@ -68,22 +68,13 @@ begin
 
    begin
 
-      if Lit not in St or
-        Var not in St or
-        Con not in St or
-        not (Var in St) or
-        Xx in St or
-        not (Xx not in St)
-      then
+      if Lit not in St or Var not in St or Con not in St or not (Var in St) or
+        Xx in St or not (Xx not in St) then
          Failed ("WRONG VALUES FOR 'IN ST'");
       end if;
 
-      if Lit in Aa .. Cc or
-        Var not in Lit .. Zz or
-        Con in Zz .. Aa or
-        not (Cc in Cc .. Yy) or
-        not (Bb not in Cc .. Yy)
-      then
+      if Lit in Aa .. Cc or Var not in Lit .. Zz or Con in Zz .. Aa or
+        not (Cc in Cc .. Yy) or not (Bb not in Cc .. Yy) then
          Failed ("WRONG VALUES FOR 'IN AA..CC'");
       end if;
 

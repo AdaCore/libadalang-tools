@@ -41,8 +41,7 @@ procedure C96008a is
 
 begin
    Test
-     ("C96008A",
-      "CHECK MISCELLANEOUS FUNCTIONS IN THE " & "PACKAGE CALENDAR");
+     ("C96008A", "CHECK MISCELLANEOUS FUNCTIONS IN THE " & "PACKAGE CALENDAR");
 
    ---------------------------------------------
 
@@ -59,8 +58,7 @@ begin
          if Now /= Time_Of (Yr, Mo, Dy, Sec) then
             Comment
               ("TIME_OF AND SPLIT ARE NOT INVERSES " &
-               "WHEN SECONDS IS A NON-MODEL NUMBER " &
-               "- (A)");
+               "WHEN SECONDS IS A NON-MODEL NUMBER " & "- (A)");
          end if;
       exception
          when others =>
@@ -119,11 +117,7 @@ begin
          Sec : Day_Duration := 0.0;
       begin
          Split
-           (Date    => Now,
-            Year    => Yr,
-            Month   => Mo,
-            Day     => Dy,
-            Seconds => Sec);
+           (Date => Now, Year => Yr, Month => Mo, Day => Dy, Seconds => Sec);
       exception
          when others =>
             Failed

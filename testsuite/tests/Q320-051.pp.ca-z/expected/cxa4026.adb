@@ -26,8 +26,7 @@ begin
       -- subprograms.
 
       New_Character_String : String (1 .. 10) :=
-        Ada.Characters.Latin_1.Lc_A_Grave &
-        Ada.Characters.Latin_1.Lc_A_Ring &
+        Ada.Characters.Latin_1.Lc_A_Grave & Ada.Characters.Latin_1.Lc_A_Ring &
         Ada.Characters.Latin_1.Lc_Ae_Diphthong &
         Ada.Characters.Latin_1.Lc_C_Cedilla &
         Ada.Characters.Latin_1.Lc_E_Acute &
@@ -38,8 +37,7 @@ begin
         Ada.Characters.Latin_1.Lc_Icelandic_Thorn;
 
       Tc_New_Character_String : String (1 .. 10) :=
-        Ada.Characters.Latin_1.Uc_A_Grave &
-        Ada.Characters.Latin_1.Uc_A_Ring &
+        Ada.Characters.Latin_1.Uc_A_Grave & Ada.Characters.Latin_1.Uc_A_Ring &
         Ada.Characters.Latin_1.Uc_Ae_Diphthong &
         Ada.Characters.Latin_1.Uc_C_Cedilla &
         Ada.Characters.Latin_1.Uc_E_Acute &
@@ -104,9 +102,7 @@ begin
             ("",  -- Null string.
              "is", Mapping => Map_To_Lower_Case_Ptr) /= 0 or
         Fixed.Index
-            ("AAABBBaaabbb",
-             "aabb",
-             Mapping => Map_To_Lower_Case_Ptr) /=
+            ("AAABBBaaabbb", "aabb", Mapping => Map_To_Lower_Case_Ptr) /=
           2
       then
          Report.Failed
@@ -118,34 +114,24 @@ begin
       -- Function Index, Backward direction search.
 
       if Fixed.Index
-          ("Case of a Mixed Case String",
-           "case",
-           Ada.Strings.Backward,
+          ("Case of a Mixed Case String", "case", Ada.Strings.Backward,
            Map_To_Lower_Case_Ptr) /=
         17 or
         Fixed.Index
-            ("Case of a Mixed Case String",
-             "CASE",
-             Ada.Strings.Backward,
+            ("Case of a Mixed Case String", "CASE", Ada.Strings.Backward,
              Map_To_Upper_Case_Ptr) /=
           17 or
         Fixed.Index
-            ("rain, Rain, and more RAIN",
-             "rain",
-             Ada.Strings.Backward,
+            ("rain, Rain, and more RAIN", "rain", Ada.Strings.Backward,
              Map_To_Lower_Case_Ptr) /=
           22 or
         Fixed.Index
-            ("RIGHT place, right time",
-             "RIGHT",
-             Ada.Strings.Backward,
+            ("RIGHT place, right time", "RIGHT", Ada.Strings.Backward,
              Map_To_Upper_Case_Ptr) /=
           14 or
         Fixed.Index
-            ("WOULD MATCH BUT FOR THE CASE",
-             "WOULD MATCH BUT FOR THE CASE",
-             Ada.Strings.Backward,
-             Map_To_Lower_Case_Ptr) /=
+            ("WOULD MATCH BUT FOR THE CASE", "WOULD MATCH BUT FOR THE CASE",
+             Ada.Strings.Backward, Map_To_Lower_Case_Ptr) /=
           0
       then
          Report.Failed
@@ -163,9 +149,7 @@ begin
       begin
          Tc_Natural :=
            Index
-             ("A Valid String",
-              Null_Pattern_String,
-              Ada.Strings.Forward,
+             ("A Valid String", Null_Pattern_String, Ada.Strings.Forward,
               Map_To_Lower_Case_Ptr);
          Report.Failed
            ("Pattern_Error not raised by Function Index when " &
@@ -212,8 +196,7 @@ begin
           8 or
         Fixed.Count
             ("",                       -- Null string.
-             "match", Map_To_Upper_Case_Ptr) /= 0
-      then
+             "match", Map_To_Upper_Case_Ptr) /= 0 then
          Report.Failed
            ("Incorrect results from Function Count, using " &
             "a Character Mapping Function parameter");
@@ -228,9 +211,7 @@ begin
       begin
          Tc_Natural :=
            Count
-             ("A Valid String",
-              Null_Pattern_String,
-              Map_To_Lower_Case_Ptr);
+             ("A Valid String", Null_Pattern_String, Map_To_Lower_Case_Ptr);
          Report.Failed
            ("Pattern_Error not raised by Function Count using " &
             "a Character Mapping Function parameter when " &
@@ -267,8 +248,7 @@ begin
           "ALL UPPER CASE STRING" or
 
         Fixed.Translate
-            ("LoTs Of MiXeD CaSe ChArAcTeRs",
-             Map_To_Upper_Case_Ptr) /=
+            ("LoTs Of MiXeD CaSe ChArAcTeRs", Map_To_Upper_Case_Ptr) /=
           "LOTS OF MIXED CASE CHARACTERS" or
 
         Fixed.Translate ("", Map_To_Upper_Case_Ptr) /= "" or
@@ -347,10 +327,8 @@ begin
       begin
 
          Trim
-           (Source  => Trim_String,
-            Side    => Ada.Strings.Left,
-            Justify => Ada.Strings.Right,
-            Pad     => 'x');
+           (Source  => Trim_String, Side => Ada.Strings.Left,
+            Justify => Ada.Strings.Right, Pad => 'x');
 
          if Trim_String /= "xxxxA string of characters    " then
             Report.Failed
@@ -383,10 +361,8 @@ begin
       begin
 
          Fixed.Head
-           (Source  => Fixed_String,
-            Count   => 14,
-            Justify => Ada.Strings.Center,
-            Pad     => '$');
+           (Source => Fixed_String, Count => 14, Justify => Ada.Strings.Center,
+            Pad    => '$');
 
          if Fixed_String /= "$$$A sample test $$$" then
             Report.Failed

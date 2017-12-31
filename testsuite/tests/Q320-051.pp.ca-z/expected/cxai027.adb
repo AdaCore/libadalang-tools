@@ -83,19 +83,15 @@ procedure Cxai027 is
    end My_Equivalent_Keys;
 
    package My_Bounded_Hashed_Maps is new Ada.Containers.Bounded_Hashed_Maps
-     (Key_Type        => My_Key_Type,
-      Element_Type    => My_Float,
-      Hash            => My_Hash,
+     (Key_Type => My_Key_Type, Element_Type => My_Float, Hash => My_Hash,
       Equivalent_Keys => My_Equivalent_Keys); -- Default =
 
    Num_Tests : constant := 10;
 
    Capacity_Reqd : constant := Num_Tests;
 
-   My_Map_1 : My_Bounded_Hashed_Maps
-     .Map
-     (Capacity => Capacity_Reqd,
-      Modulus  =>
+   My_Map_1 : My_Bounded_Hashed_Maps.Map (Capacity => Capacity_Reqd,
+      Modulus =>
         My_Bounded_Hashed_Maps.Default_Modulus (Capacity => Capacity_Reqd));
 
    subtype Array_Bounds_Type is Ada.Containers.Count_Type range 1 .. Num_Tests;
@@ -107,9 +103,8 @@ procedure Cxai027 is
 
    My_Cursor_1 : My_Bounded_Hashed_Maps.Cursor;
 
-   procedure Tampering_Check
-     (Container : in out My_Bounded_Hashed_Maps.Map;
-      Where     : in     String) with
+   procedure Tampering_Check (Container : in out My_Bounded_Hashed_Maps.Map;
+      Where                             : in     String) with
       Pre => not Container.Is_Empty
     is
 
@@ -166,8 +161,7 @@ begin
    begin
 
       Tampering_Check
-        (Container => My_Map_1,
-         Where     => "Constant_Reference (key form)");
+        (Container => My_Map_1, Where => "Constant_Reference (key form)");
 
    end;
 
@@ -190,8 +184,7 @@ begin
    begin
 
       Tampering_Check
-        (Container => My_Map_1,
-         Where     => "Constant_Reference (cursor form)");
+        (Container => My_Map_1, Where => "Constant_Reference (cursor form)");
 
    end;
 
@@ -203,8 +196,7 @@ begin
    begin
 
       Tampering_Check
-        (Container => My_Map_1,
-         Where     => "Reference (cursor form)");
+        (Container => My_Map_1, Where => "Reference (cursor form)");
 
    end;
 
@@ -213,10 +205,8 @@ begin
    -- -- in a way that corresponds to likely usage.
 
    declare
-      procedure Test
-        (Value     : in My_Float;
-         Expected  : in My_Float;
-         Test_Case : in String)
+      procedure Test (Value : in My_Float; Expected : in My_Float;
+         Test_Case          : in String)
       is
       begin
          Tampering_Check (Container => My_Map_1, Where => Test_Case);
@@ -229,11 +219,8 @@ begin
          end if;
       end Test;
 
-      procedure Test_And_Mod
-        (Value     : in out My_Float;
-         Expected  : in     My_Float;
-         New_Item  : in     My_Float;
-         Test_Case : in     String)
+      procedure Test_And_Mod (Value : in out My_Float; Expected : in My_Float;
+         New_Item                   : in     My_Float; Test_Case : in String)
       is
       begin
          Tampering_Check (Container => My_Map_1, Where => Test_Case);
@@ -253,8 +240,7 @@ begin
       Test
         (Value =>
            My_Bounded_Hashed_Maps.Constant_Reference
-             (My_Map_1,
-              Key => My_Key_Type (1))
+             (My_Map_1, Key => My_Key_Type (1))
              .Element.all,
          Expected  => Value_In_Array (1),
          Test_Case => "Constant_Reference normal key");
@@ -263,15 +249,13 @@ begin
         (Value =>
            My_Bounded_Hashed_Maps.Reference (My_Map_1, Key => My_Key_Type (1))
              .Element.all,
-         Expected  => Value_In_Array (1),
-         New_Item  => Value_In_Array (2),
+         Expected  => Value_In_Array (1), New_Item => Value_In_Array (2),
          Test_Case => "Reference normal key");
 
       Test
         (Value =>
            My_Bounded_Hashed_Maps.Constant_Reference
-             (My_Map_1,
-              Position => My_Cursor_1)
+             (My_Map_1, Position => My_Cursor_1)
              .Element.all,
          Expected  => Value_In_Array (2),
          Test_Case => "Constant_Reference normal cursor");
@@ -280,8 +264,7 @@ begin
         (Value =>
            My_Bounded_Hashed_Maps.Reference (My_Map_1, Position => My_Cursor_1)
              .Element.all,
-         Expected  => Value_In_Array (2),
-         New_Item  => Value_In_Array (3),
+         Expected  => Value_In_Array (2), New_Item => Value_In_Array (3),
          Test_Case => "Reference normal cursor");
 
       -- Prefix call with all components explicit:
@@ -293,8 +276,7 @@ begin
 
       Test_And_Mod
         (Value     => My_Map_1.Reference (Key => My_Key_Type (1)).Element.all,
-         Expected  => Value_In_Array (3),
-         New_Item  => Value_In_Array (4),
+         Expected  => Value_In_Array (3), New_Item => Value_In_Array (4),
          Test_Case => "Reference prefix key");
 
       Test
@@ -305,8 +287,7 @@ begin
 
       Test_And_Mod
         (Value     => My_Map_1.Reference (Position => My_Cursor_1).Element.all,
-         Expected  => Value_In_Array (4),
-         New_Item  => Value_In_Array (5),
+         Expected  => Value_In_Array (4), New_Item => Value_In_Array (5),
          Test_Case => "Reference prefix cursor");
 
       -- Prefix call using a generalized reference (implicit dereference):
@@ -317,8 +298,7 @@ begin
 
       Test_And_Mod
         (Value     => My_Map_1.Reference (Key => My_Key_Type (1)),
-         Expected  => Value_In_Array (5),
-         New_Item  => Value_In_Array (6),
+         Expected  => Value_In_Array (5), New_Item => Value_In_Array (6),
          Test_Case => "Reference generalized key");
 
       Test
@@ -328,8 +308,7 @@ begin
 
       Test_And_Mod
         (Value     => My_Map_1.Reference (Position => My_Cursor_1),
-         Expected  => Value_In_Array (6),
-         New_Item  => Value_In_Array (7),
+         Expected  => Value_In_Array (6), New_Item => Value_In_Array (7),
          Test_Case => "Reference generalized cursor");
 
       -- Object indexing, everything implicit.
@@ -374,8 +353,7 @@ begin
       for I in Array_Bounds_Type loop
 
          My_Map_1.Insert
-           (Key      => My_Key_Type (I),
-            New_Item => Value_In_Array (I));
+           (Key => My_Key_Type (I), New_Item => Value_In_Array (I));
 
          Total_In := Total_In + Value_In_Array (I);
 
@@ -433,8 +411,7 @@ begin
 
       for I in Array_Bounds_Type loop
 
-         if My_Bounded_Hashed_Maps.Element (Position => My_Cursor_1) /=
-           0.0
+         if My_Bounded_Hashed_Maps.Element (Position => My_Cursor_1) /= 0.0
          then
 
             Report.Failed ("Data set by of loop not as expected");

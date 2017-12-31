@@ -36,8 +36,7 @@ begin
    Test
      ("C35508A",
       "CHECK THAT THE ATTRIBUTE 'WIDTH' YIELDS " &
-      "THE CORRECT RESULTS WHEN THE PREFIX IS A " &
-      "BOOLEAN TYPE");
+      "THE CORRECT RESULTS WHEN THE PREFIX IS A " & "BOOLEAN TYPE");
 
    declare
       type Newbool is new Boolean;

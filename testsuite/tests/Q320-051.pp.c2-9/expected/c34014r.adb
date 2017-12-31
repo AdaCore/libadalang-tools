@@ -60,8 +60,7 @@ begin
       "CIRCUMSTANCES.  CHECK WHEN THE DERIVED " &
       "OPERATOR IS IMPLICITLY DECLARED IN THE " &
       "VISIBLE PART OF A PACKAGE AND A HOMOGRAPHIC " &
-      "OPERATOR IS LATER DECLARED EXPLICITLY IN " &
-      "THE PACKAGE BODY");
+      "OPERATOR IS LATER DECLARED EXPLICITLY IN " & "THE PACKAGE BODY");
 
    -----------------------------------------------------------------
 

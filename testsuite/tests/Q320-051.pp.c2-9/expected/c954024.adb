@@ -252,15 +252,13 @@ begin -- C954024
          if This_Transaction.Code = Credit then
             if This_Transaction.Return_Value /= Credit_Return or
               This_Transaction.Tc_Message_Count /= 1 or
-              not This_Transaction.Tc_Thru_Dist
-            then
+              not This_Transaction.Tc_Thru_Dist then
                Report.Failed ("Expected path not traversed");
             end if;
          else
             if This_Transaction.Return_Value /= Debit_Return or
               This_Transaction.Tc_Message_Count /= 1 or
-              not This_Transaction.Tc_Thru_Dist
-            then
+              not This_Transaction.Tc_Thru_Dist then
                Report.Failed ("Expected path not traversed");
             end if;
          end if;

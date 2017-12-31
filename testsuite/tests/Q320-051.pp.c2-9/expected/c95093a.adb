@@ -57,22 +57,16 @@ begin
          accept E1 (X, Y : Integer := F) do
             if X = Y or Y /= 2 then
                Failed
-                 ("DEFAULT NOT EVALUATED CORRECTLY - " &
-                  "1, X =" &
-                  Integer'Image (X) &
-                  ", Y =" &
-                  Integer'Image (Y));
+                 ("DEFAULT NOT EVALUATED CORRECTLY - " & "1, X =" &
+                  Integer'Image (X) & ", Y =" & Integer'Image (Y));
             end if;
          end E1;
 
          accept E1 (X, Y : Integer := F) do
             if X = Y or not ((X = 3 and Y = 4) or (X = 4 and Y = 3)) then
                Failed
-                 ("DEFAULT NOT EVALUATED CORRECTLY - " &
-                  "2, X =" &
-                  Integer'Image (X) &
-                  ", Y =" &
-                  Integer'Image (Y));
+                 ("DEFAULT NOT EVALUATED CORRECTLY - " & "2, X =" &
+                  Integer'Image (X) & ", Y =" & Integer'Image (Y));
             end if;
          end E1;
 

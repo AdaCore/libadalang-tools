@@ -9,10 +9,7 @@ package body Cxe4004_Shared is
    begin
       if Actual /= Expected then
          Report.Failed
-           (Note &
-            "  Expected:" &
-            The_Type'Image (Expected) &
-            " Actual:" &
+           (Note & "  Expected:" & The_Type'Image (Expected) & " Actual:" &
             The_Type'Image (Actual));
       elsif Verbose then
          Report.Comment (Note);

@@ -43,8 +43,7 @@ procedure Ce3809b is
 begin
 
    Test
-     ("CE3809B",
-      "CHECK THAT FIXED_IO GET " & "OPERATES CORRECTLY ON STRINGS");
+     ("CE3809B", "CHECK THAT FIXED_IO GET " & "OPERATES CORRECTLY ON STRINGS");
 
    declare
       type Fx is delta 0.001 range -2.0 .. 1_000.0;
@@ -70,8 +69,7 @@ begin
 
       if L /= Ident_Int (5) then
          Failed
-           ("VALUE OF LAST INCORRECT - FIXED - 1.  " &
-            "LAST IS" &
+           ("VALUE OF LAST INCORRECT - FIXED - 1.  " & "LAST IS" &
             Integer'Image (L));
       end if;
 
@@ -84,8 +82,7 @@ begin
             if L /= 5 then
                Failed
                  ("AFTER END_ERROR, VALUE OF LAST " &
-                  "INCORRECT - 2.  LAST IS" &
-                  Integer'Image (L));
+                  "INCORRECT - 2.  LAST IS" & Integer'Image (L));
             end if;
          when Data_Error =>
             Failed ("DATA_ERROR RAISED - FIXED - 2");
@@ -102,8 +99,7 @@ begin
             if L /= 5 then
                Failed
                  ("AFTER END_ERROR, VALUE OF LAST " &
-                  "INCORRECT - 3.  LAST IS" &
-                  Integer'Image (L));
+                  "INCORRECT - 3.  LAST IS" & Integer'Image (L));
             end if;
          when Data_Error =>
             Failed ("DATA_ERROR RAISED - FIXED - 3");
@@ -120,8 +116,7 @@ begin
             if L /= 5 then
                Failed
                  ("AFTER END_ERROR, VALUE OF LAST " &
-                  "INCORRECT - 4.  LAST IS" &
-                  Integer'Image (L));
+                  "INCORRECT - 4.  LAST IS" & Integer'Image (L));
             end if;
          when Data_Error =>
             Failed ("DATA_ERROR RAISED - FIXED - 4");
@@ -138,8 +133,7 @@ begin
             if L /= Ident_Int (5) then
                Failed
                  ("AFTER END_ERROR, VALUE OF LAST " &
-                  "INCORRECT - 5.  LAST IS" &
-                  Integer'Image (L));
+                  "INCORRECT - 5.  LAST IS" & Integer'Image (L));
             end if;
          when Data_Error =>
             Failed ("DATA_ERROR RAISED - FIXED - 5");
@@ -155,8 +149,7 @@ begin
          end if;
          if L /= 8 then
             Failed
-              ("LAST INCORRECT FOR SLICE - 6.  " &
-               "LAST IS" &
+              ("LAST INCORRECT FOR SLICE - 6.  " & "LAST IS" &
                Integer'Image (L));
          end if;
       exception
@@ -173,8 +166,7 @@ begin
 
          if L /= 8 then
             Failed
-              ("VALUE OF LAST INCORRECT - FIXED - 7.  " &
-               "LAST IS" &
+              ("VALUE OF LAST INCORRECT - FIXED - 7.  " & "LAST IS" &
                Integer'Image (L));
          end if;
       exception
@@ -215,8 +207,7 @@ begin
          end if;
          if L /= 8 then
             Failed
-              ("LAST INCORRECT FOR TAB - 10.  " &
-               "LAST IS" &
+              ("LAST INCORRECT FOR TAB - 10.  " & "LAST IS" &
                Integer'Image (L));
          end if;
       exception
@@ -236,8 +227,7 @@ begin
             if L /= Ident_Int (8) then
                Failed
                  ("AFTER END_ERROR, VALUE OF LAST " &
-                  "INCORRECT - 11.  LAST IS" &
-                  Integer'Image (L));
+                  "INCORRECT - 11.  LAST IS" & Integer'Image (L));
             end if;
          when Data_Error =>
             Failed ("DATA_ERROR RAISED - FIXED - 11");

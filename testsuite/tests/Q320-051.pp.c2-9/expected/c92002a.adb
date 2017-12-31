@@ -35,8 +35,7 @@ begin
    Test
      ("C92002A",
       "CHECK THAT CAN ASSIGN TO ASSIGNABLE " &
-      "COMPONENTS OF RECORDS WITH TASK " &
-      "COMPONENTS");
+      "COMPONENTS OF RECORDS WITH TASK " & "COMPONENTS");
 
    declare
 
@@ -65,8 +64,7 @@ begin
       if R.I /= 7 and R.J /= 9 then
          Failed
            ("WRONG VALUE(S) WHEN ASSIGNING TO " &
-            "INTEGER COMPONENTS OF RECORDS WITH " &
-            "TASK COMPONENTS");
+            "INTEGER COMPONENTS OF RECORDS WITH " & "TASK COMPONENTS");
       end if;
 
    end;

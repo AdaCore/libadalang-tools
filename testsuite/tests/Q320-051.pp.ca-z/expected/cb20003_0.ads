@@ -53,13 +53,10 @@
 
 package Cb20003_0 is                          -- package Push_Buttons
 
-   Non_Default_Priority,
-   Non_Alert_Priority,
+   Non_Default_Priority, Non_Alert_Priority,
    Non_Emergency_Priority : exception;
 
-   Handled_With_Others,
-   Reraised_In_Subprogram,
-   Handled_In_Caller : Boolean :=
+   Handled_With_Others, Reraised_In_Subprogram, Handled_In_Caller : Boolean :=
      False;
 
    subtype Priority_Type is Integer range 1 .. 10;
@@ -70,9 +67,8 @@ package Cb20003_0 is                          -- package Push_Buttons
 
    type Button is tagged private;                  -- Private tagged type.
 
-   type Button_Response_Ptr is access procedure
-     (P : in     Priority_Type;
-      B : in out Button);
+   type Button_Response_Ptr is access procedure (P : in     Priority_Type;
+      B                                            : in out Button);
 
    -- Procedures accessible with Button_Response_Ptr type.
 

@@ -152,9 +152,7 @@ begin
         (Fxa5a00.Result_Within_Range (Gef.Cot (Pi / 4.0), 1.0, 0.001) and
          Fxa5a00.Result_Within_Range (Ef.Cot (Pi / 2.0), 0.0, 0.001) and
          Fxa5a00.Result_Within_Range
-           (Gef.Cot (3.0 * Pi / 4.0),
-            -1.0,
-            0.001) and
+           (Gef.Cot (3.0 * Pi / 4.0), -1.0, 0.001) and
          Fxa5a00.Result_Within_Range (Ef.Cot (3.0 * Pi / 2.0), 0.0, 0.001))
       then
          Report.Failed
@@ -166,22 +164,15 @@ begin
       -- trigonometric relationships.
 
       if not Fxa5a00.Result_Within_Range
-          (Gef.Cot (New_Float (Pi / 4.0)),
-           1.0 / Ef.Tan (Pi / 4.0),
-           0.001) or
+          (Gef.Cot (New_Float (Pi / 4.0)), 1.0 / Ef.Tan (Pi / 4.0), 0.001) or
         not Fxa5a00.Result_Within_Range
-          (Ef.Cot (Pi / 4.0),
-           Ef.Cos (Pi / 4.0) / Ef.Sin (Pi / 4.0),
-           0.001) or
+          (Ef.Cot (Pi / 4.0), Ef.Cos (Pi / 4.0) / Ef.Sin (Pi / 4.0), 0.001) or
         not Fxa5a00.Result_Within_Range
-          (Ef.Cot (Ef.Arccot (Pi / 4.0)),
-           Pi / 4.0,
-           0.001)
+          (Ef.Cot (Ef.Arccot (Pi / 4.0)), Pi / 4.0, 0.001)
       then
          Report.Failed
            ("Incorrect result from Cot function with respect " &
-            "to various trigonometric relationship expected " &
-            "results");
+            "to various trigonometric relationship expected " & "results");
       end if;
 
       -- Testing of Cot with Cycle parameter.
@@ -227,8 +218,7 @@ begin
             New_Float_Result := Gef.Cot (0.0, 360.0);
             Report.Failed
               ("Constraint_Error not raised by Function Cot " &
-               "with specified cycle, when value of parameter " &
-               "X is 0.0");
+               "with specified cycle, when value of parameter " & "X is 0.0");
             Dont_Optimize_New_Float (New_Float_Result, 6);
          exception
             when Constraint_Error =>
@@ -260,8 +250,7 @@ begin
                Report.Failed
                  ("Unexpected exception raised by Function Cot " &
                   "with specified cycle, when value of parameter " &
-                  "X is a multiple of the half cycle" &
-                  " (180.0, 360.0)");
+                  "X is a multiple of the half cycle" & " (180.0, 360.0)");
          end;
       end if;
 
@@ -442,8 +431,7 @@ begin
          when others =>
             Report.Failed
               ("Unexpected exception raised by the Arccoth " &
-               "function with parameter value between 0.0 " &
-               "and -1.0");
+               "function with parameter value between 0.0 " & "and -1.0");
       end;
 
       -- Check the results of the Arccoth function with various input
@@ -467,8 +455,7 @@ begin
    exception
       when The_Error : others =>
          Report.Failed
-           ("The following exception was raised in the " &
-            "Test_Block: " &
+           ("The following exception was raised in the " & "Test_Block: " &
             Exception_Name (The_Error));
    end Test_Block;
 

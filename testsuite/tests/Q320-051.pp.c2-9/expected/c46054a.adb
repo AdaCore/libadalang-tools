@@ -38,8 +38,7 @@ begin
       "CONVERSION TO AN ACCESS SUBTYPE IF THE " &
       "OPERAND VALUE IS NOT NULL AND THE " &
       "DISCRIMINANTS OR INDEX BOUNDS OF THE " &
-      "DESIGNATED OBJECT DO NOT MATCH THOSE OF " &
-      "THE TARGET TYPE");
+      "DESIGNATED OBJECT DO NOT MATCH THOSE OF " & "THE TARGET TYPE");
 
    declare
       type Rec (D : Integer) is record
@@ -124,8 +123,7 @@ begin
       type Arr is array (Integer range <>, Integer range <>) of Integer;
 
       type Acarr is access Arr;
-      A : Acarr
-        (Ident_Int (1) .. Ident_Int (0),
+      A : Acarr (Ident_Int (1) .. Ident_Int (0),
          Ident_Int (4) .. Ident_Int (5)) :=
         new Arr'
           (Ident_Int (1) .. Ident_Int (0) =>

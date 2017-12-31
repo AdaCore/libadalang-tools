@@ -35,9 +35,7 @@ begin
          "(case 1), nonstatic target subtype");
    end if;
 
-   if not Equal
-       (Nonstatic_Integer_Subtype (Nn_Less_Half),
-        126)
+   if not Equal (Nonstatic_Integer_Subtype (Nn_Less_Half), 126)
    then  -- Case 2.
       Report.Failed
         ("Wrong result for named number operand" &
@@ -52,27 +50,21 @@ begin
          "(case 3), static target subtype");
    end if;
 
-   if not Equal
-       (Static_Integer_Subtype (-0.50),
-        -1)
+   if not Equal (Static_Integer_Subtype (-0.50), -1)
    then             -- Case 4.
       Report.Failed
         ("Wrong result for literal operand" &
          "(case 4), static target subtype");
    end if;
 
-   if not Equal
-       (Static_Integer_Subtype (29_546.5001),
-        29_547)
+   if not Equal (Static_Integer_Subtype (29_546.5001), 29_547)
    then   -- Case 5.
       Report.Failed
         ("Wrong result for literal operand" &
          "(case 5), static target subtype");
    end if;
 
-   if not Equal
-       (Nonstatic_Integer_Subtype (-66.499),
-        -66)
+   if not Equal (Nonstatic_Integer_Subtype (-66.499), -66)
    then       -- Case 6.
       Report.Failed
         ("Wrong result for literal operand" &
@@ -109,9 +101,7 @@ begin
          "(case 9), static target subtype");
    end if;
 
-   if not Equal
-       (Static_Integer_Subtype (Fix_Rnd_Away_Zero),
-        1)
+   if not Equal (Static_Integer_Subtype (Fix_Rnd_Away_Zero), 1)
    then  -- Case 10.
       Report.Failed
         ("Wrong result for fixed point operand" &
@@ -120,9 +110,7 @@ begin
 
    Nonstatic_Target := Nonstatic_Integer_Subtype (Fix_Rnd_Toward_Zero);
 
-   if not Equal
-       (Nonstatic_Target,
-        -3)
+   if not Equal (Nonstatic_Target, -3)
    then                          -- Case 11.
       Report.Failed
         ("Wrong result for fixed point operand" &

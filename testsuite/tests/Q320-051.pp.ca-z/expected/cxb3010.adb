@@ -158,8 +158,7 @@ begin
       Tc_Char_Array := Ics.Value (Item => Tc_Chars_Ptr);
 
       if Tc_Char_Array /= Tc_Char_Array_1 or
-        Ic.To_Ada (Tc_Char_Array, True) /= Ic.To_Ada (Tc_Char_Array_1)
-      then
+        Ic.To_Ada (Tc_Char_Array, True) /= Ic.To_Ada (Tc_Char_Array_1) then
          Report.Failed ("Incorrect result from Function Value - 1");
       end if;
 
@@ -167,14 +166,12 @@ begin
       Tc_Char_Array := Ics.Value (Item => Tc_Chars_Ptr);
 
       if Tc_Char_Array /= Tc_Char_Array_2 or
-        Ic.To_Ada (Tc_Char_Array, True) /= Ic.To_Ada (Tc_Char_Array_2)
-      then
+        Ic.To_Ada (Tc_Char_Array, True) /= Ic.To_Ada (Tc_Char_Array_2) then
          Report.Failed ("Incorrect result from Function Value - 2");
       end if;
 
       if Ics.Value (Item => Ics.New_String ("A little longer string")) /=
-        Ic.To_C ("A little longer string")
-      then
+        Ic.To_C ("A little longer string") then
          Report.Failed ("Incorrect result from Function Value - 3");
       end if;
 
@@ -214,8 +211,7 @@ begin
 
       if Tc_Char_Array /= Tc_Char_Array_2 or
         Ic.To_Ada (Tc_Char_Array) /= Ic.To_Ada (Tc_Char_Array_2) or
-        not (Ic.Is_Nul_Terminated (Tc_Char_Array))
-      then
+        not (Ic.Is_Nul_Terminated (Tc_Char_Array)) then
          Report.Failed
            ("Incorrect result from Function Value with Length " &
             "parameter - 2");
@@ -229,9 +225,8 @@ begin
          -- Declare a dummy function to demonstrate one way that a chars_ptr
          -- variable could inadvertantly be set to Null_Ptr prior to a call
          -- to Value (below).
-         function Freedom
-           (Condition : Boolean := False;
-            Ptr       : Ics.Chars_Ptr) return Ics.Chars_Ptr
+         function Freedom (Condition : Boolean := False;
+            Ptr                      : Ics.Chars_Ptr) return Ics.Chars_Ptr
          is
             Pointer : Ics.Chars_Ptr := Ptr;
          begin
@@ -316,8 +311,7 @@ begin
          when others =>
             Report.Failed
               ("Incorrect exception raised by Function Value " &
-               "with both Item and Length parameters, when " &
-               "Length = 0");
+               "with both Item and Length parameters, when " & "Length = 0");
       end;
 
    exception

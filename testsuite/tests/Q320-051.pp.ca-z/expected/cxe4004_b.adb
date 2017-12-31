@@ -8,9 +8,7 @@ with Cxe4004_Part_B;
 with Report;
 procedure Cxe4004_B is
    function "+"
-     (L,
-      R : Cxe4004_Common.Integer_Vector)
-      return Cxe4004_Common
+     (L, R : Cxe4004_Common.Integer_Vector) return Cxe4004_Common
      .Integer_Vector renames
      Cxe4004_Part_A1."+";
 
@@ -40,18 +38,12 @@ procedure Cxe4004_B is
       --    Another_Discriminated_Record are correct and the values in the
       --    arrays are correct
       Cxe4004_Part_A1.Check_In
-        (2,
-         V,
-         Not_Constrained,
+        (2, V, Not_Constrained,
          Another_Discriminated_Record'
-           (False,
-            Disc_Low         => 3,
-            Disc_High        => 5,
-            Common_Component => 18,
-            A_Bool           => False,
-            Some_Ints        => (3 => 30, 4 => 40, 5 => 50),
-            Some_More_Ints   => (1, 2, 3, 4, 5),
-            Even_More_Ints   => (3 .. 19 => 319, 20 => 200)),
+           (False, Disc_Low => 3, Disc_High => 5, Common_Component => 18,
+            A_Bool          => False, Some_Ints => (3 => 30, 4 => 40, 5 => 50),
+            Some_More_Ints  => (1, 2, 3, 4, 5),
+            Even_More_Ints  => (3 .. 19 => 319, 20 => 200)),
          Tagged_Rec);
    end In_Tests;
 
@@ -75,9 +67,7 @@ procedure Cxe4004_B is
          Chk ("Out_Tests.Vec(18)", Vec (18), 1_800);
          Chk ("Out_Tests.Dr1.A_Char", Dr1.A_Char, 'Z');
          Chk
-           ("Out_Tests.Dr2.Some_More_Ints(2)",
-            Dr2.Some_More_Ints (2),
-            2_222);
+           ("Out_Tests.Dr2.Some_More_Ints(2)", Dr2.Some_More_Ints (2), 2_222);
          Chk ("Out_Tests.Tr.In_Root", Tr.In_Root, 3_333);
       end;
 
@@ -111,14 +101,10 @@ procedure Cxe4004_B is
       Another_Dr : Another_Discriminated_Record (True, 9, 10) :=
         (True, 9, 10, 998, A_Char => 'q');
       A_Big_Dr : Another_Discriminated_Record (False, 19, 419) :=
-        (False,
-         19,
-         419,
-         Common_Component => 400,
-         Some_Ints        => (19 .. 419 => 10_101),
-         A_Bool           => True,
-         Some_More_Ints   => (1 .. 419 => 10_202),
-         Even_More_Ints   => (19 .. 20 => 10_303));
+        (False, 19, 419, Common_Component => 400,
+         Some_Ints => (19 .. 419 => 10_101), A_Bool => True,
+         Some_More_Ints                   => (1 .. 419 => 10_202),
+         Even_More_Ints                   => (19 .. 20 => 10_303));
       Tagged_Rec : Extended_2;
    begin
       Tagged_Rec.In_Root         := 678;
@@ -135,20 +121,17 @@ procedure Cxe4004_B is
       Chk ("InOut_Tests.Tagged_Rec.In_Root", Tagged_Rec.In_Root, 678);
       Chk
         ("InOut_Tests.Not_Constrained.Common_Component",
-         Not_Constrained.Common_Component,
-         17);
+         Not_Constrained.Common_Component, 17);
       Chk
         ("InOut_Tests.Another_DR.Common_Component",
-         Another_Dr.Common_Component,
-         998);
+         Another_Dr.Common_Component, 998);
 
       -- modified by call
       Chk ("InOut_Tests.V(13)", V (13), 881);
       Chk ("InOut_Tests.Not_Constrained.Disc", Not_Constrained.Disc, True);
       Chk ("InOut_Tests.Another_DR.A_Char", Another_Dr.A_Char, 's');
       Chk
-        ("InOut_Tests.Tagged_Rec.Ext_2_Component",
-         Tagged_Rec.Ext_2_Component,
+        ("InOut_Tests.Tagged_Rec.Ext_2_Component", Tagged_Rec.Ext_2_Component,
          109);
 
       -- Test #2
@@ -167,28 +150,23 @@ procedure Cxe4004_B is
       -- not modified by call
       Chk ("InOut_Tests.Big_V(2000)", Big_V (2_000), 2_000);
       Chk
-        ("InOut_Tests.Is_Constrained.Another_Int",
-         Is_Constrained.Another_Int,
+        ("InOut_Tests.Is_Constrained.Another_Int", Is_Constrained.Another_Int,
          142);
       Chk
         ("InOut_Tests.A_Big_DR.Even_More_Ints(20)",
-         A_Big_Dr.Even_More_Ints (20),
-         -20);
+         A_Big_Dr.Even_More_Ints (20), -20);
       Chk
-        ("InOut_Tests.Tagged_Rec.Ext_2_Component",
-         Tagged_Rec.Ext_2_Component,
+        ("InOut_Tests.Tagged_Rec.Ext_2_Component", Tagged_Rec.Ext_2_Component,
          1_124);
 
       -- modified by call
       Chk ("InOut_Tests.Big_V(1900)", Big_V (1_900), 135);
       Chk
-        ("InOut_Tests.Is_Constrained.Ints_3(5)",
-         Is_Constrained.Ints_3 (5),
+        ("InOut_Tests.Is_Constrained.Ints_3(5)", Is_Constrained.Ints_3 (5),
          35);
       Chk
         ("InOut_Tests.A_Big_DR.Even_More_Ints(19)",
-         A_Big_Dr.Even_More_Ints (19),
-         190);
+         A_Big_Dr.Even_More_Ints (19), 190);
       Chk ("InOut_Tests.Tagged_Rec.In_Root", Tagged_Rec.In_Root, 2_201);
 
    end Inout_Tests;

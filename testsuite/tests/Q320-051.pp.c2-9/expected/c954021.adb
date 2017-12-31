@@ -233,8 +233,7 @@ procedure C954021 is
       end Underloaded;
 
       entry Wait_For_Underload (Transaction : Acc_Transaction_Record)
-        when Release_All
-        is
+        when Release_All is
       begin
          requeue Credit_Computation.Input with abort;
          if Wait_For_Underload'Count = 0 then
@@ -373,16 +372,14 @@ procedure C954021 is
 
       if This_Transaction.Code = Credit then
          if This_Transaction.Return_Value /= Credit_Return or
-           not This_Transaction.Tc_Thru_Dist
-         then
+           not This_Transaction.Tc_Thru_Dist then
             Report.Failed ("Expected path not traversed - Credit");
          end if;
          Tc_Tasks_Completed.Increment;
       else
          if This_Transaction.Return_Value /= Debit_Return or
            This_Transaction.Tc_Message_Count /= 1 or
-           not This_Transaction.Tc_Thru_Dist
-         then
+           not This_Transaction.Tc_Thru_Dist then
             Report.Failed ("Expected path not traversed - Debit");
          end if;
          Tc_Debit_Message_Complete.Set_True;
@@ -404,8 +401,7 @@ procedure C954021 is
          select
             accept Input (Transaction : Acc_Transaction_Record) do
                if Distributor.Credit_Is_Overloaded and
-                 Transaction.Priority = Low
-               then
+                 Transaction.Priority = Low then
                   -- We should not be getting any Low Priority messages. They
                   -- should be waiting on the Hold.Wait_for_Underload queue
                   Report.Failed

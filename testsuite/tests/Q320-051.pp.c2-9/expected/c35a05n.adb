@@ -77,23 +77,18 @@ procedure C35a05n is
 
    -------------------------------------------------------------------
 
-   procedure Check_Attributes
-     (Name                                  : String;
+   procedure Check_Attributes (Name         : String;
       Actual_Attributes, Correct_Attributes : Fore_And_Aft)
    is
    begin
       if Actual_Attributes.Fore /= Correct_Attributes.Fore then
          Failed
-           ("GENERIC 'FORE FOR " &
-            Name &
-            " =" &
+           ("GENERIC 'FORE FOR " & Name & " =" &
             Integer'Image (Actual_Attributes.Fore));
       end if;
       if Actual_Attributes.Aft /= Correct_Attributes.Aft then
          Failed
-           ("GENERIC 'AFT  FOR " &
-            Name &
-            " =" &
+           ("GENERIC 'AFT  FOR " & Name & " =" &
             Integer'Image (Actual_Attributes.Aft));
       end if;
    end Check_Attributes;
@@ -125,8 +120,7 @@ begin
    Test
      ("C35A05N",
       "CHECK THAT FOR FIXED POINT TYPES THE FORE AND " &
-      "AFT ATTRIBUTES YIELD THE CORRECT VALUES - " &
-      "BASIC TYPES, GENERICS");
+      "AFT ATTRIBUTES YIELD THE CORRECT VALUES - " & "BASIC TYPES, GENERICS");
 
    Check_Attributes ("LEFT_OUT_M1", Fa_Left_Out_M1, (2, 1));
    Check_Attributes ("LEFT_EDGE_M1", Fa_Left_Edge_M1, (2, 1));

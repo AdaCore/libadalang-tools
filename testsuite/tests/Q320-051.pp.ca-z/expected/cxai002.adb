@@ -84,9 +84,8 @@ procedure Cxai002 is
    My_Cursor_2 : My_Doubly_Linked_Lists.Cursor;
    My_Cursor_3 : My_Doubly_Linked_Lists.Cursor;
 
-   procedure Tampering_Check
-     (Container : in out My_Doubly_Linked_Lists.List;
-      Where     : in     String)
+   procedure Tampering_Check (Container : in out My_Doubly_Linked_Lists.List;
+      Where                             : in     String)
    is
 
       Program_Error_Raised : Boolean := False;
@@ -182,8 +181,7 @@ begin
       begin
 
          if My_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-           Value_In_Array (I)
-         then
+           Value_In_Array (I) then
 
             Report.Failed
               ("Mismatch between element and what was appended #2");
@@ -191,8 +189,7 @@ begin
          end if;
 
          My_Doubly_Linked_Lists.Query_Element
-           (Position => My_Cursor_1,
-            Process  => My_Query'Access);
+           (Position => My_Cursor_1, Process => My_Query'Access);
 
       end;
 
@@ -235,8 +232,7 @@ begin
    for I in reverse Array_Bounds_Type loop
 
       if My_Doubly_Linked_Lists.Element (Position => My_Cursor_2) /=
-        Value_In_Array (I)
-      then
+        Value_In_Array (I) then
 
          Report.Failed ("Mismatch between element and what was prepended");
 
@@ -284,8 +280,7 @@ begin
 
          Tampering_Check (Container => My_List_3, Where => "Iterate");
 
-         if My_Doubly_Linked_Lists.Element (Position) /=
-           Value_In_Array (I)
+         if My_Doubly_Linked_Lists.Element (Position) /= Value_In_Array (I)
          then
 
             Report.Failed ("Iterate hasn't found the expected value");
@@ -307,8 +302,7 @@ begin
 
          Tampering_Check (Container => My_List_3, Where => "Reverse_Iterate");
 
-         if My_Doubly_Linked_Lists.Element (Position) /=
-           Value_In_Array (I)
+         if My_Doubly_Linked_Lists.Element (Position) /= Value_In_Array (I)
          then
 
             Report.Failed ("Reverse_Iterate hasn't found the expected value");
@@ -347,8 +341,7 @@ begin
          begin
 
             Tampering_Check
-              (Container => My_List_2,
-               Where     => "Update_Element");
+              (Container => My_List_2, Where => "Update_Element");
 
             Element := Element * 2.0;
 
@@ -357,12 +350,10 @@ begin
       begin
 
          My_List_1.Replace_Element
-           (Position => My_Cursor_1,
-            New_Item => Value_In_Array (I) * 2.0);
+           (Position => My_Cursor_1, New_Item => Value_In_Array (I) * 2.0);
 
          My_List_2.Update_Element
-           (Position => My_Cursor_2,
-            Process  => My_Update'Access);
+           (Position => My_Cursor_2, Process => My_Update'Access);
 
       end;
 
@@ -400,8 +391,7 @@ begin
    for I in Array_Bounds_Type loop
 
       if My_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-        Value_In_Array (Num_Tests - I + 1)
-      then
+        Value_In_Array (Num_Tests - I + 1) then
 
          Report.Failed ("Reversed array not as expected");
 
@@ -441,8 +431,7 @@ begin
    for I in Array_Bounds_Type loop
 
       if My_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-        Value_In_Array (I)
-      then
+        Value_In_Array (I) then
 
          Report.Failed ("Target list not as expected after move");
 
@@ -482,8 +471,7 @@ begin
 
    -- This swaps the order of the elements
    My_List_2.Swap_Links
-     (I => My_List_2.First,
-      J => My_Cursor_2); -- First of added elements
+     (I => My_List_2.First, J => My_Cursor_2); -- First of added elements
 
    -- The order should now be Default_Value, Value_In_Array (1), Default_Value,
    -- Default_Value, Value_In_Array (2), Value_In_Array (2)
@@ -502,8 +490,7 @@ begin
 
    -- Check = Default_Value
    if My_Doubly_Linked_Lists.Element (Position => My_Cursor_2) /=
-     My_Default_Value
-   then
+     My_Default_Value then
 
       Report.Failed ("Inserted value not as expected #1");
 
@@ -512,8 +499,7 @@ begin
    My_Doubly_Linked_Lists.Next (My_Cursor_2);
 
    if My_Doubly_Linked_Lists.Element (Position => My_Cursor_2) /=
-     Value_In_Array (1)
-   then
+     Value_In_Array (1) then
 
       Report.Failed ("Inserted value not as expected #2");
 
@@ -523,8 +509,7 @@ begin
 
    -- Check = Default_Value
    if My_Doubly_Linked_Lists.Element (Position => My_Cursor_2) /=
-     My_Default_Value
-   then
+     My_Default_Value then
 
       Report.Failed ("Inserted value not as expected #3");
 
@@ -533,8 +518,7 @@ begin
    My_Doubly_Linked_Lists.Next (My_Cursor_2);
 
    if My_Doubly_Linked_Lists.Element (Position => My_Cursor_2) /=
-     Value_In_Array (2)
-   then
+     Value_In_Array (2) then
 
       Report.Failed ("Inserted value not as expected #4");
 
@@ -543,8 +527,7 @@ begin
    My_Doubly_Linked_Lists.Next (My_Cursor_2);
 
    if My_Doubly_Linked_Lists.Element (Position => My_Cursor_2) /=
-     Value_In_Array (2)
-   then
+     Value_In_Array (2) then
 
       Report.Failed ("Inserted value not as expected #5");
 
@@ -554,8 +537,7 @@ begin
 
    -- Check = Default_Value
    if My_Doubly_Linked_Lists.Element (Position => My_Cursor_2) /=
-     My_Default_Value
-   then
+     My_Default_Value then
 
       Report.Failed ("Inserted value not as expected #6");
 
@@ -566,8 +548,7 @@ begin
    -- e.g. by insertions earlier in the list or swapping
 
    if My_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Array (1)
-   then
+     Value_In_Array (1) then
 
       Report.Failed
         ("Cursor no longer pointing to same element after shuffling about");
@@ -625,9 +606,7 @@ begin
    My_Cursor_2 := My_List_2.Find (Item => Value_In_Array (7));
 
    My_List_1.Splice
-     (Before   => My_Cursor_1,
-      Source   => My_List_2,
-      Position => My_Cursor_2);
+     (Before => My_Cursor_1, Source => My_List_2, Position => My_Cursor_2);
 
    -- The order should now be Value_In_Array (1), Value_In_Array (2),
    -- Default_Value, Value_In_Array (3), Value_In_Array (4), Value_In_Array
@@ -648,8 +627,7 @@ begin
    My_Cursor_1 := My_List_1.First;
 
    if My_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Array (1)
-   then
+     Value_In_Array (1) then
 
       Report.Failed ("Spliced value not as expected #1");
 
@@ -658,8 +636,7 @@ begin
    My_Doubly_Linked_Lists.Next (My_Cursor_1);
 
    if My_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Array (9)
-   then
+     Value_In_Array (9) then
 
       Report.Failed ("Spliced value not as expected #2");
 
@@ -668,8 +645,7 @@ begin
    My_Doubly_Linked_Lists.Next (My_Cursor_1);
 
    if My_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Array (2)
-   then
+     Value_In_Array (2) then
 
       Report.Failed ("Spliced value not as expected #3");
 
@@ -679,8 +655,7 @@ begin
 
    -- Check = Default_Value
    if My_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     My_Default_Value
-   then
+     My_Default_Value then
 
       Report.Failed ("Spliced value not as expected #4");
 
@@ -689,8 +664,7 @@ begin
    My_Doubly_Linked_Lists.Next (My_Cursor_1);
 
    if My_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Array (3)
-   then
+     Value_In_Array (3) then
 
       Report.Failed ("Spliced value not as expected #5");
 
@@ -699,8 +673,7 @@ begin
    My_Doubly_Linked_Lists.Next (My_Cursor_1);
 
    if My_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Array (4)
-   then
+     Value_In_Array (4) then
 
       Report.Failed ("Spliced value not as expected #6");
 
@@ -709,8 +682,7 @@ begin
    My_Doubly_Linked_Lists.Next (My_Cursor_1);
 
    if My_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Array (7)
-   then
+     Value_In_Array (7) then
 
       Report.Failed ("Spliced value not as expected #7");
 
@@ -719,8 +691,7 @@ begin
    My_Doubly_Linked_Lists.Next (My_Cursor_1);
 
    if My_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Array (5)
-   then
+     Value_In_Array (5) then
 
       Report.Failed ("Spliced value not as expected #8");
 
@@ -729,8 +700,7 @@ begin
    My_Doubly_Linked_Lists.Next (My_Cursor_1);
 
    if My_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Array (6)
-   then
+     Value_In_Array (6) then
 
       Report.Failed ("Spliced value not as expected #9");
 
@@ -739,8 +709,7 @@ begin
    My_Doubly_Linked_Lists.Next (My_Cursor_1);
 
    if My_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Array (7)
-   then
+     Value_In_Array (7) then
 
       Report.Failed ("Spliced value not as expected #10");
 
@@ -749,8 +718,7 @@ begin
    My_Doubly_Linked_Lists.Next (My_Cursor_1);
 
    if My_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Array (8)
-   then
+     Value_In_Array (8) then
 
       Report.Failed ("Spliced value not as expected #11");
 
@@ -759,8 +727,7 @@ begin
    My_Doubly_Linked_Lists.Next (My_Cursor_1);
 
    if My_Doubly_Linked_Lists.Element (Position => My_Cursor_1) /=
-     Value_In_Array (10)
-   then
+     Value_In_Array (10) then
 
       Report.Failed ("Spliced value not as expected #12");
 

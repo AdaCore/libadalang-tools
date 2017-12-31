@@ -92,42 +92,33 @@ begin
 
    if Derived_Int'Size /= Minimum_Size then
       Failed
-        ("DERIVED_INT'SIZE MUST BE EQUAL TO" &
-         Integer'Image (Minimum_Size) &
-         ".  ACTUAL SIZE IS" &
-         Integer'Image (Derived_Int'Size));
+        ("DERIVED_INT'SIZE MUST BE EQUAL TO" & Integer'Image (Minimum_Size) &
+         ".  ACTUAL SIZE IS" & Integer'Image (Derived_Int'Size));
    end if;
 
    if Int_In_P'Size /= Minimum_Size then
       Failed
-        ("INT_IN_P'SIZE MUST BE EQUAL TO" &
-         Integer'Image (Minimum_Size) &
-         ".  ACTUAL SIZE IS" &
-         Integer'Image (Int_In_P'Size));
+        ("INT_IN_P'SIZE MUST BE EQUAL TO" & Integer'Image (Minimum_Size) &
+         ".  ACTUAL SIZE IS" & Integer'Image (Int_In_P'Size));
    end if;
 
    if Alt_Int_In_P'Size /= Minimum_Size then
       Failed
-        ("ALT_INT_IN_P'SIZE MUST BE EQUAL TO" &
-         Integer'Image (Minimum_Size) &
-         ".  ACTUAL SIZE IS" &
-         Integer'Image (Alt_Int_In_P'Size));
+        ("ALT_INT_IN_P'SIZE MUST BE EQUAL TO" & Integer'Image (Minimum_Size) &
+         ".  ACTUAL SIZE IS" & Integer'Image (Alt_Int_In_P'Size));
    end if;
 
    if Derived_Private_Int'Size /= Minimum_Size then
       Failed
         ("DERIVED_PRIVATE_INT'SIZE MUST BE EQUAL TO " &
-         Integer'Image (Minimum_Size) &
-         ".  ACTUAL SIZE IS" &
+         Integer'Image (Minimum_Size) & ".  ACTUAL SIZE IS" &
          Integer'Image (Derived_Private_Int'Size));
    end if;
 
    if Gen_Check_Int'Size /= Minimum_Size then
       Failed
-        ("GEN_CHECK_INT'SIZE MUST BE EQUAL TO" &
-         Integer'Image (Minimum_Size) &
-         ".  ACTUAL SIZE IS" &
-         Integer'Image (Gen_Check_Int'Size));
+        ("GEN_CHECK_INT'SIZE MUST BE EQUAL TO" & Integer'Image (Minimum_Size) &
+         ".  ACTUAL SIZE IS" & Integer'Image (Gen_Check_Int'Size));
    end if;
 
    Result;

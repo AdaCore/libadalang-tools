@@ -99,8 +99,7 @@ procedure C95040d is
          Failed
            ("'TASKING_ERROR' CAUGHT IN 'DRIVER' WHEN IT " &
             "SHOULD HAVE BEEN CAUGHT IN 'SLAVE' TASK, OR " &
-            "'TASKING_ERROR' WAS INCORRECTLY PROPAGATED BY " &
-            "'SLAVE' TASK");
+            "'TASKING_ERROR' WAS INCORRECTLY PROPAGATED BY " & "'SLAVE' TASK");
    end Driver;
 
 begin  -- START OF MAIN PROGRAM.

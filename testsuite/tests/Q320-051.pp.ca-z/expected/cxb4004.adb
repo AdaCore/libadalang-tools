@@ -117,26 +117,18 @@ begin
 
       Package_1_Numeric_Items : Numeric_Items_Type
         (1 .. Number_Of_Decimal_Items) :=
-        (new Cobol.Numeric'("0"),
-         new Cobol.Numeric'("591"),
-         new Cobol.Numeric'("6342"),
-         new Cobol.Numeric'("+0"),
-         new Cobol.Numeric'("-1539"),
-         new Cobol.Numeric'("+9199"),
-         new Cobol.Numeric'("0-"),
-         new Cobol.Numeric'("8934+"),
+        (new Cobol.Numeric'("0"), new Cobol.Numeric'("591"),
+         new Cobol.Numeric'("6342"), new Cobol.Numeric'("+0"),
+         new Cobol.Numeric'("-1539"), new Cobol.Numeric'("+9199"),
+         new Cobol.Numeric'("0-"), new Cobol.Numeric'("8934+"),
          new Cobol.Numeric'("9949-"));
 
       Package_2_Numeric_Items : Numeric_Items_Type
         (1 .. Number_Of_Decimal_Items) :=
-        (new Cobol.Numeric'("3"),
-         new Cobol.Numeric'("105"),
-         new Cobol.Numeric'("1234567899"),
-         new Cobol.Numeric'("+8"),
-         new Cobol.Numeric'("-12345601"),
-         new Cobol.Numeric'("+9123459999"),
-         new Cobol.Numeric'("1-"),
-         new Cobol.Numeric'("123456781+"),
+        (new Cobol.Numeric'("3"), new Cobol.Numeric'("105"),
+         new Cobol.Numeric'("1234567899"), new Cobol.Numeric'("+8"),
+         new Cobol.Numeric'("-12345601"), new Cobol.Numeric'("+9123459999"),
+         new Cobol.Numeric'("1-"), new Cobol.Numeric'("123456781+"),
          new Cobol.Numeric'("9499999999-"));
 
       Decimal_Type_1_Items : array
@@ -145,15 +137,8 @@ begin
 
       Decimal_Type_2_Items : array
         (1 .. Number_Of_Decimal_Items) of Decimal_Type_2 :=
-        (3.0,
-         105.0,
-         1_234_567_899.0,
-         8.0,
-         -12_345_601.0,
-         9_123_459_999.0,
-         -1.0,
-         123_456_781.0,
-         -9_499_999_999.0);
+        (3.0, 105.0, 1_234_567_899.0, 8.0, -12_345_601.0, 9_123_459_999.0,
+         -1.0, 123_456_781.0, -9_499_999_999.0);
 
    begin
 
@@ -162,29 +147,24 @@ begin
       -- that will be required to hold the largest value of type Num.
 
       if Package_1.Length (Cobol.Unsigned) /= 4 or
-        Package_2.Length (Cobol.Unsigned) /= 10
-      then
+        Package_2.Length (Cobol.Unsigned) /= 10 then
          Report.Failed
            ("Incorrect results from function Length when " &
             "used with Display_Format parameter Unsigned");
       end if;
 
       if Package_1.Length (Format => Cobol.Leading_Separate) /= 5 or
-        Package_2.Length (Format => Cobol.Leading_Separate) /= 11
-      then
+        Package_2.Length (Format => Cobol.Leading_Separate) /= 11 then
          Report.Failed
            ("Incorrect results from function Length when " &
-            "used with Display_Format parameter " &
-            "Leading_Separate");
+            "used with Display_Format parameter " & "Leading_Separate");
       end if;
 
       if Package_1.Length (Cobol.Trailing_Separate) /= 5 or
-        Package_2.Length (Cobol.Trailing_Separate) /= 11
-      then
+        Package_2.Length (Cobol.Trailing_Separate) /= 11 then
          Report.Failed
            ("Incorrect results from function Length when " &
-            "used with Display_Format parameter " &
-            "Trailing_Separate");
+            "used with Display_Format parameter " & "Trailing_Separate");
       end if;
 
       -- Check that function To_Decimal with Numeric and Display_Format
@@ -198,8 +178,7 @@ begin
                if Package_1.To_Decimal
                    (Package_1_Numeric_Items (I).all,
                     Format => Cobol.Unsigned) /=
-                 Decimal_Type_1_Items (I)
-               then
+                 Decimal_Type_1_Items (I) then
                   Report.Failed
                     ("Incorrect result from function To_Decimal " &
                      "from an instantiation of Decimal_Conversions " &
@@ -211,8 +190,7 @@ begin
                if Package_2.To_Decimal
                    (Package_2_Numeric_Items (I).all,
                     Format => Cobol.Unsigned) /=
-                 Decimal_Type_2_Items (I)
-               then
+                 Decimal_Type_2_Items (I) then
                   Report.Failed
                     ("Incorrect result from function To_Decimal " &
                      "from an instantiation of Decimal_Conversions " &
@@ -226,8 +204,7 @@ begin
                if Package_1.To_Decimal
                    (Package_1_Numeric_Items (I).all,
                     Format => Cobol.Leading_Separate) /=
-                 Decimal_Type_1_Items (I)
-               then
+                 Decimal_Type_1_Items (I) then
                   Report.Failed
                     ("Incorrect result from function To_Decimal " &
                      "from an instantiation of Decimal_Conversions " &
@@ -239,8 +216,7 @@ begin
                if Package_2.To_Decimal
                    (Package_2_Numeric_Items (I).all,
                     Format => Cobol.Leading_Separate) /=
-                 Decimal_Type_2_Items (I)
-               then
+                 Decimal_Type_2_Items (I) then
                   Report.Failed
                     ("Incorrect result from function To_Decimal " &
                      "from an instantiation of Decimal_Conversions " &
@@ -254,8 +230,7 @@ begin
                if Package_1.To_Decimal
                    (Package_1_Numeric_Items (I).all,
                     Cobol.Trailing_Separate) /=
-                 Decimal_Type_1_Items (I)
-               then
+                 Decimal_Type_1_Items (I) then
                   Report.Failed
                     ("Incorrect result from function To_Decimal " &
                      "from an instantiation of Decimal_Conversions " &
@@ -267,8 +242,7 @@ begin
                if Package_2.To_Decimal
                    (Package_2_Numeric_Items (I).all,
                     Cobol.Trailing_Separate) /=
-                 Decimal_Type_2_Items (I)
-               then
+                 Decimal_Type_2_Items (I) then
                   Report.Failed
                     ("Incorrect result from function To_Decimal " &
                      "from an instantiation of Decimal_Conversions " &
@@ -299,8 +273,7 @@ begin
            ("Conversion_Error not raised by To_Decimal " &
             "when the value represented by parameter " &
             "Item is outside the range of the Decimal_Type " &
-            "used to instantiate the package " &
-            "Decimal_Conversions");
+            "used to instantiate the package " & "Decimal_Conversions");
          if Tc_Numeric_1 = Decimal_Type_1_Items (1) then
             Report.Comment
               ("To Guard Against Dead Assignment Elimination " &
@@ -314,8 +287,7 @@ begin
               ("Incorrect exception raised by To_Decimal " &
                "when the value represented by parameter " &
                "Item is outside the range of the Decimal_Type " &
-               "used to instantiate the package " &
-               "Decimal_Conversions");
+               "used to instantiate the package " & "Decimal_Conversions");
       end;
 
       -- Check that function To_Display with decimal type Num and
@@ -429,10 +401,8 @@ begin
 
       begin
          if Package_2.To_Display
-             (Item   => Decimal_Type_2_Items (9),
-              Format => Cobol.Unsigned) =
-           Package_2_Numeric_Items (2).all
-         then
+             (Item => Decimal_Type_2_Items (9), Format => Cobol.Unsigned) =
+           Package_2_Numeric_Items (2).all then
             Report.Comment
               ("To Guard Against Dead Assignment Elimination " &
                "-- Should never be printed");
@@ -456,8 +426,7 @@ begin
    exception
       when The_Error : others =>
          Report.Failed
-           ("The following exception was raised in the " &
-            "Test_Block: " &
+           ("The following exception was raised in the " & "Test_Block: " &
             Exception_Name (The_Error));
    end Test_Block;
 

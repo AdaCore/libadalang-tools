@@ -96,8 +96,7 @@ begin
       "TO THE NEXT DECLARATION.  ALSO, CHECK THAT " &
       "EXPRESSIONS IN THE SUBTYPE INDICATION OR " &
       "THE CONSTRAINED ARRAY DEFINITION ARE " &
-      "EVALUATED BEFORE ANY INITIALIZATION " &
-      "EXPRESSIONS ARE EVALUATED");
+      "EVALUATED BEFORE ANY INITIALIZATION " & "EXPRESSIONS ARE EVALUATED");
 
    declare -- (A).
       I1 : Integer                                  := 10_000 * F;
@@ -113,8 +112,7 @@ begin
          Failed
            ("OBJECTS NOT ELABORATED IN PROPER ORDER " &
             "VALUE OF ORDER_CHECK SHOULD BE 15343 OR " &
-            "15242 -- ACTUAL VALUE IS " &
-            Integer'Image (Order_Check) &
+            "15242 -- ACTUAL VALUE IS " & Integer'Image (Order_Check) &
             " - (A)");
       end if;
    end; -- (A).
@@ -130,17 +128,14 @@ begin
       Order_Check := A'Last (1) + A'Last (2) + R.D + R.Comp;
       if (H1 + S.D = 65) and (Order_Check = 4_321 or Order_Check = 4_312) then
          Comment
-           ("ORDER_CHECK HAS VALUE 65 " &
-            Integer'Image (Order_Check) &
+           ("ORDER_CHECK HAS VALUE 65 " & Integer'Image (Order_Check) &
             " - (B)");
       else
          Failed
            ("OBJECTS NOT ELABORATED IN PROPER ORDER " &
             "VALUE OF ORDER_CHECK SHOULD BE 65 4321 OR " &
-            "65 4312 -- ACTUAL VALUE IS " &
-            Integer'Image (H1 + S.D) &
-            Integer'Image (Order_Check) &
-            " - (B)");
+            "65 4312 -- ACTUAL VALUE IS " & Integer'Image (H1 + S.D) &
+            Integer'Image (Order_Check) & " - (B)");
       end if;
    end; -- (B).
 
@@ -158,8 +153,7 @@ begin
          Failed
            ("OBJECTS NOT ELABORATED IN PROPER ORDER " &
             "VALUE OF ORDER_CHECK SHOULD BE 4312 OR " &
-            "3412 -- ACTUAL VALUE IS " &
-            Integer'Image (Order_Check) &
+            "3412 -- ACTUAL VALUE IS " & Integer'Image (Order_Check) &
             " - (C)");
       end if;
    end; -- (C).
@@ -174,11 +168,8 @@ begin
 
    begin
       Order_Check := A1'Last + A1 (1).D + A1 (1).Comp + R1.D + R1.Comp;
-      if Order_Check = 25_341 or
-        Order_Check = 24_351 or
-        Order_Check = 15_342 or
-        Order_Check = 14_352
-      then
+      if Order_Check = 25_341 or Order_Check = 24_351 or
+        Order_Check = 15_342 or Order_Check = 14_352 then
          Comment
            ("ORDER_CHECK HAS VALUE " & Integer'Image (Order_Check) & " - (D)");
       else
@@ -186,8 +177,7 @@ begin
            ("OBJECTS NOT ELABORATED IN PROPER ORDER " &
             "VALUE OF ORDER_CHECK SHOULD BE 25341, " &
             "24351, 15342 OR 14352  -- ACTUAL VALUE IS " &
-            Integer'Image (Order_Check) &
-            " - (D)");
+            Integer'Image (Order_Check) & " - (D)");
       end if;
    end; -- (D).
 
@@ -202,10 +192,8 @@ begin
       if Order_Check /= 4_321 then
          Failed
            ("OBJECTS NOT ELABORATED IN PROPER ORDER " &
-            "VALUE OF ORDER_CHECK SHOULD BE 4321 " &
-            "-- ACTUAL VALUE IS " &
-            Integer'Image (Order_Check) &
-            " - (E)");
+            "VALUE OF ORDER_CHECK SHOULD BE 4321 " & "-- ACTUAL VALUE IS " &
+            Integer'Image (Order_Check) & " - (E)");
       end if;
    end; -- (E).
 
@@ -225,8 +213,7 @@ begin
          Failed
            ("OBJECTS NOT ELABORATED IN PROPER ORDER " &
             "VALUE OF ORDER_CHECK SHOULD BE 4231 OR " &
-            "4132 -- ACTUAL VALUE IS " &
-            Integer'Image (Order_Check) &
+            "4132 -- ACTUAL VALUE IS " & Integer'Image (Order_Check) &
             " - (F)");
       end if;
    end; -- (F).
@@ -241,10 +228,8 @@ begin
       if Order_Check /= 321 then
          Failed
            ("OBJECTS NOT ELABORATED IN PROPER ORDER " &
-            "VALUE OF ORDER_CHECK SHOULD BE 321 OR " &
-            "-- ACTUAL VALUE IS " &
-            Integer'Image (Order_Check) &
-            " - (G)");
+            "VALUE OF ORDER_CHECK SHOULD BE 321 OR " & "-- ACTUAL VALUE IS " &
+            Integer'Image (Order_Check) & " - (G)");
       end if;
    end; -- (G).
 
@@ -259,11 +244,8 @@ begin
       R2 : Rec (G * 100) := (G1 * 100, F * 1_000);
    begin
       Order_Check := R1.D + R1.Comp + R2.D + R2.Comp;
-      if Order_Check = 4_321 or
-        Order_Check = 4_312 or
-        Order_Check = 3_421 or
-        Order_Check = 3_412
-      then
+      if Order_Check = 4_321 or Order_Check = 4_312 or Order_Check = 3_421 or
+        Order_Check = 3_412 then
          Comment
            ("ORDER_CHECK HAS VALUE " & Integer'Image (Order_Check) & " - (H)");
       else
@@ -271,8 +253,7 @@ begin
            ("OBJECTS NOT ELABORATED IN PROPER ORDER " &
             "VALUE OF ORDER_CHECK SHOULD BE 4321, " &
             "4312, 3421, OR 3412 -- ACTUAL VALUE IS " &
-            Integer'Image (Order_Check) &
-            " - (H)");
+            Integer'Image (Order_Check) & " - (H)");
       end if;
    end; -- (H).
 
@@ -287,11 +268,8 @@ begin
       R2 : Rec2 (F, F * 10);
    begin
       Order_Check := R1.D1 + R1.D2 + R1.Comp + R2.D1 + R2.D2;
-      if Order_Check = 21_354 or
-        Order_Check = 21_345 or
-        Order_Check = 12_345 or
-        Order_Check = 12_354
-      then
+      if Order_Check = 21_354 or Order_Check = 21_345 or
+        Order_Check = 12_345 or Order_Check = 12_354 then
          Comment
            ("ORDER_CHECK HAS VALUE " & Integer'Image (Order_Check) & " - (I)");
       else
@@ -299,8 +277,7 @@ begin
            ("OBJECTS NOT ELABORATED IN PROPER ORDER " &
             "VALUE OF ORDER_CHECK SHOULD BE 21354, " &
             "21345, 12354, OR 12345 -- ACTUAL VALUE IS " &
-            Integer'Image (Order_Check) &
-            " - (I)");
+            Integer'Image (Order_Check) & " - (I)");
       end if;
 
    end; -- (I).
@@ -333,11 +310,8 @@ begin
       use P;
    begin
       Order_Check := P1.D + Get_A (P1) + P2.D + Get_A (P2);
-      if Order_Check = 4_321 or
-        Order_Check = 4_312 or
-        Order_Check = 3_412 or
-        Order_Check = 3_421
-      then
+      if Order_Check = 4_321 or Order_Check = 4_312 or Order_Check = 3_412 or
+        Order_Check = 3_421 then
          Comment
            ("ORDER_CHECK HAS VALUE " & Integer'Image (Order_Check) & " - (J)");
       else
@@ -345,8 +319,7 @@ begin
            ("OBJECTS NOT ELABORATED IN PROPER ORDER " &
             "VALUE OF ORDER_CHECK SHOULD BE 4321, " &
             "4312, 3421, OR 3412 -- ACTUAL VALUE IS " &
-            Integer'Image (Order_Check) &
-            " - (J)");
+            Integer'Image (Order_Check) & " - (J)");
       end if;
    end; -- (J).
 
@@ -369,19 +342,15 @@ begin
 
    begin
       Order_Check := P1.D1 + P1.D2 + P2.D1 + P2.D2;
-      if Order_Check = 4_321 or
-        Order_Check = 4_312 or
-        Order_Check = 3_412 or
-        Order_Check = 3_421
-      then
+      if Order_Check = 4_321 or Order_Check = 4_312 or Order_Check = 3_412 or
+        Order_Check = 3_421 then
          Comment
            ("ORDER_CHECK HAS VALUE " & Integer'Image (Order_Check) & " - (K)");
       else
          Failed
            ("OBJECTS NOT ELABORATED IN PROPER ORDER " &
             "VALUE OF ORDER_CHECK SHOULD BE 4321, 4312, " &
-            "3421, OR 3412 -- ACTUAL VALUE IS " &
-            Integer'Image (Order_Check) &
+            "3421, OR 3412 -- ACTUAL VALUE IS " & Integer'Image (Order_Check) &
             " - (K)");
       end if;
 

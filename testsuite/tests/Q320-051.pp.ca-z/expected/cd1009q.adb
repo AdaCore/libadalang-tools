@@ -67,8 +67,7 @@ begin
 
       if X'Size < Specified_Size then
          Failed
-           ("OBJECT SIZE TOO SMALL -- CHECK_TYPE_1.  " &
-            "VALUE IS" &
+           ("OBJECT SIZE TOO SMALL -- CHECK_TYPE_1.  " & "VALUE IS" &
             Integer'Image (Integer (X)));
       end if;
 

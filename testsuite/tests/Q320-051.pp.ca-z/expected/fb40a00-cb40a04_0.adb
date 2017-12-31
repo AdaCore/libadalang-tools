@@ -62,9 +62,8 @@ begin
 
    for I in 1 .. Text'Last loop          -- Raise immediate Constraint_Error
       if (Text (I) in 'a' .. 'z') or       -- with String slice passed from
-        (Text (I) in 'A' .. 'Z') or       -- caller. (Slice'first /= 1)
-        (Text (I) in '0' .. '9')
-      then
+      (Text (I) in 'A' .. 'Z') or       -- caller. (Slice'first /= 1)
+        (Text (I) in '0' .. '9') then
          Increment_Alphanumeric_Count;
       else
          Increment_Non_Alphanumeric_Count;

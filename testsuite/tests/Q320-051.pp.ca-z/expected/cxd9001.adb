@@ -134,8 +134,7 @@ begin
       if Count /= 2 then
          Report.Failed
            ("Result from protected object was expected to" &
-            " to be 2 but was" &
-            Integer'Image (Count));
+            " to be 2 but was" & Integer'Image (Count));
          Count := 2;
       end if;
 
@@ -174,8 +173,7 @@ begin
       if Count /= 13 then
          Report.Failed
            ("Result from protected object was expected to" &
-            " to be 13 but was" &
-            Integer'Image (Count));
+            " to be 13 but was" & Integer'Image (Count));
       end if;
 
    end;     -- encapsulation

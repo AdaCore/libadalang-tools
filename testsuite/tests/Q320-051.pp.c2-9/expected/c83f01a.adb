@@ -86,12 +86,7 @@ begin
 
    begin
 
-      if X1 /= 17 or
-        Z /= A or
-        Y2 /= 13 or
-        not P.X1 or
-        P.Z /= 13 or
-        P.Y2 /= 55
+      if X1 /= 17 or Z /= A or Y2 /= 13 or not P.X1 or P.Z /= 13 or P.Y2 /= 55
       then
          Failed ("INCORRECT ACCESSING");
       end if;

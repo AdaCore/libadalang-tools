@@ -80,8 +80,7 @@ begin
          when Use_Error =>
             Not_Applicable
               ("USE_ERROR RAISED ON TEXT CREATE " &
-               "FOR TEMPORARY FILES WITH " &
-               "OUT_FILE MODE");
+               "FOR TEMPORARY FILES WITH " & "OUT_FILE MODE");
             raise Incomplete;
       end;
 

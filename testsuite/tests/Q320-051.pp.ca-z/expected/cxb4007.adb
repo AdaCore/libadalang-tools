@@ -120,8 +120,7 @@ begin
           (Item   => Pack_1.To_Binary (Tc_Dec_1, High_Order_First),
            Format => High_Order_First) or
         not Pack_1.Valid
-          (Pack_1.To_Binary (0.0, Low_Order_First),
-           Format => Low_Order_First)
+          (Pack_1.To_Binary (0.0, Low_Order_First), Format => Low_Order_First)
       then
          Report.Failed
            ("Incorrect result from function Valid, using " &
@@ -148,8 +147,7 @@ begin
           (Pack_3.To_Binary (0.001, High_Order_First),
            Format => High_Order_First) or
         not Pack_3.Valid
-          (Pack_3.To_Binary (123.456, Native_Binary),
-           Native_Binary)
+          (Pack_3.To_Binary (123.456, Native_Binary), Native_Binary)
       then
          Report.Failed
            ("Incorrect result from function Valid, using " &
@@ -168,8 +166,7 @@ begin
           (Pack_3.To_Binary (Tc_Dec_3, High_Order_First),
            Format => High_Order_First) or
         Pack_3.Valid
-          (Pack_4.To_Binary (Tc_Dec_4, Native_Binary),
-           Native_Binary)
+          (Pack_4.To_Binary (Tc_Dec_4, Native_Binary), Native_Binary)
       then
          Report.Failed
            ("Incorrect result from function Valid, using " &
@@ -201,24 +198,20 @@ begin
           (Item =>
              Pack_1.To_Binary (Item => Tc_Dec_1, Format => Native_Binary),
            Format => Native_Binary) /=
-        Tc_Dec_1
-      then
+        Tc_Dec_1 then
          Report.Failed ("Incorrect result from function To_Decimal - 1");
       end if;
 
       if Pack_3.To_Decimal
           (Pack_3.To_Binary (Tc_Dec_3, High_Order_First),
            Format => High_Order_First) /=
-        Tc_Dec_3
-      then
+        Tc_Dec_3 then
          Report.Failed ("Incorrect result from function To_Decimal - 2");
       end if;
 
       if Pack_4.To_Decimal
-          (Pack_4.To_Binary (Tc_Dec_4, Low_Order_First),
-           Low_Order_First) /=
-        Tc_Dec_4
-      then
+          (Pack_4.To_Binary (Tc_Dec_4, Low_Order_First), Low_Order_First) /=
+        Tc_Dec_4 then
          Report.Failed ("Incorrect result from function To_Decimal - 3");
       end if;
 
@@ -249,12 +242,10 @@ begin
             null;  -- OK, expected exception.
          when The_Error : others =>
             Report.Failed
-              (Exception_Name (The_Error) &
-               " was incorrectly " &
+              (Exception_Name (The_Error) & " was incorrectly " &
                "raised following call to function To_Decimal " &
                "if the Byte_Array parameter Item represents " &
-               "a decimal value outside the range of decimal " &
-               "type Num");
+               "a decimal value outside the range of decimal " & "type Num");
       end;
 
       -- Check that function To_Binary will produce a Byte_Array result that
@@ -264,24 +255,21 @@ begin
       -- Different ordering.
       Tc_Dec_1 := 12_345.6;
       if Pack_1.To_Binary (Tc_Dec_1, Low_Order_First) =
-        Pack_1.To_Binary (Tc_Dec_1, High_Order_First)
-      then
+        Pack_1.To_Binary (Tc_Dec_1, High_Order_First) then
          Report.Failed ("Incorrect result from function To_Binary - 1");
       end if;
 
       -- Variable vs. literal.
       Tc_Dec_2 := 12_345.00;
       if Pack_2.To_Binary (Tc_Dec_2, Native_Binary) /=
-        Pack_2.To_Binary (12_345.00, Native_Binary)
-      then
+        Pack_2.To_Binary (12_345.00, Native_Binary) then
          Report.Failed ("Incorrect result from function To_Binary - 2");
       end if;
 
    exception
       when The_Error : others =>
          Report.Failed
-           ("The following exception was raised in the " &
-            "Test_Block: " &
+           ("The following exception was raised in the " & "Test_Block: " &
             Exception_Name (The_Error));
    end Test_Block;
 

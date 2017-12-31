@@ -46,9 +46,7 @@ begin
             Old_Handler : Ada.Interrupts.Parameterless_Handler;
          begin
             Ada.Interrupts.Exchange_Handler
-              (Old_Handler,
-               New_Handler,
-               Interrupt_Id);
+              (Old_Handler, New_Handler, Interrupt_Id);
             -- Not allowed C.3.2(21/3):
             -- Handler is not exchanged and Program_Error is raised.
             Report.Failed ("Exchange_Handler did not raise exception");

@@ -77,9 +77,8 @@ package C413003p is
    procedure Class_Wide_Proc (X : access Tp'Class);
    procedure Class_Wide_Proc (X : access Tp'Class; Value : Integer);
    function Class_Wide_Func (X : access constant Tp'Class) return Integer;
-   function Class_Wide_Func
-     (X     : access constant Tp'Class;
-      Value : Integer) return Integer;
+   function Class_Wide_Func (X : access constant Tp'Class;
+      Value                    : Integer) return Integer;
    --  These subprograms are used to check that the right class-wide subprogram
    --  is called even when they are redefined in extensions.
 

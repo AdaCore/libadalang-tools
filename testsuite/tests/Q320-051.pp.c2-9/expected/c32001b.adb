@@ -112,12 +112,10 @@ begin
 
    declare
 
-      S3,
-      S4 : array (1 .. F (3)) of Arr (1 .. F (3)) :=
+      S3, S4 : array (1 .. F (3)) of Arr (1 .. F (3)) :=
         (others => (others => F (3)));
 
-      Cs3,
-      Cs4 : constant array (1 .. F (4)) of Arr (1 .. F (4)) :=
+      Cs3, Cs4 : constant array (1 .. F (4)) of Arr (1 .. F (4)) :=
         (others => (others => F (4)));
    begin
       if S3'Last = 1 then

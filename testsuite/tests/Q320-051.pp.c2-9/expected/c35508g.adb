@@ -38,8 +38,7 @@ begin
    Test
      ("C35508G",
       "CHECK THAT 'PRED' AND 'SUCC' YIELD THE " &
-      "CORRECT RESULTS WHEN THE PREFIX IS A " &
-      "BOOLEAN TYPE");
+      "CORRECT RESULTS WHEN THE PREFIX IS A " & "BOOLEAN TYPE");
 
    begin
       if Boolean'Pred (Ident_Bool (True)) /= False then

@@ -55,8 +55,7 @@ begin
      ("CXF3004",
       "Check that statically identifiable " &
       "picture strings will cause function Image " &
-      "to raise Layout_Error under appropriate " &
-      "conditions");
+      "to raise Layout_Error under appropriate " & "conditions");
 
    Test_Block :
    declare
@@ -78,12 +77,10 @@ begin
 
       type Decimal_Data_Type is delta 0.01 digits 16;
 
-      package Image_Io is new Decimal_Output
-        (Num                => Decimal_Data_Type,
-         Default_Currency   => "$",
-         Default_Fill       => Star_Fill,
-         Default_Separator  => Default_Separator,
-         Default_Radix_Mark => Dm_Radix);
+      package Image_Io is new Decimal_Output (Num => Decimal_Data_Type,
+         Default_Currency => "$", Default_Fill => Star_Fill,
+         Default_Separator                        => Default_Separator,
+         Default_Radix_Mark                       => Dm_Radix);
 
       -- The following decimal data items are used with picture strings in
       -- evaluating use of foreign currency symbols.
@@ -125,86 +122,57 @@ begin
       -- constructed above, in creating foreign currency edited output strings.
 
       if Image_Io.Image
-          (Item       => Dec_Data_1,
-           Pic        => Picture_1,
-           Currency   => Ff_Currency,
-           Fill       => Star_Fill,
-           Separator  => Ff_Separator,
+          (Item       => Dec_Data_1, Pic => Picture_1, Currency => Ff_Currency,
+           Fill       => Star_Fill, Separator => Ff_Separator,
            Radix_Mark => Ff_Radix) /=
-        Output_1
-      then
+        Output_1 then
          Report.Failed ("Incorrect result from Fn. Image using Picture_1");
       end if;
 
       if Image_Io.Image
-          (Item       => Dec_Data_2,
-           Pic        => Picture_2,
-           Currency   => Ff_Currency,
-           Fill       => Blank_Fill,
-           Separator  => Ff_Separator,
+          (Item       => Dec_Data_2, Pic => Picture_2, Currency => Ff_Currency,
+           Fill       => Blank_Fill, Separator => Ff_Separator,
            Radix_Mark => Ff_Radix) /=
-        Output_2
-      then
+        Output_2 then
          Report.Failed ("Incorrect result from Fn. Image using Picture_2");
       end if;
 
       if Image_Io.Image
-          (Item       => Dec_Data_3,
-           Pic        => Picture_3,
-           Currency   => Dm_Currency,
-           Fill       => Blank_Fill,
-           Separator  => Dm_Separator,
+          (Item       => Dec_Data_3, Pic => Picture_3, Currency => Dm_Currency,
+           Fill       => Blank_Fill, Separator => Dm_Separator,
            Radix_Mark => Dm_Radix) /=
-        Output_3
-      then
+        Output_3 then
          Report.Failed ("Incorrect result from Fn. Image using Picture_3");
       end if;
 
       if Image_Io.Image
-          (Item       => Dec_Data_4,
-           Pic        => Picture_4,
-           Currency   => Dm_Currency,
-           Fill       => Blank_Fill,
-           Separator  => Dm_Separator,
+          (Item       => Dec_Data_4, Pic => Picture_4, Currency => Dm_Currency,
+           Fill       => Blank_Fill, Separator => Dm_Separator,
            Radix_Mark => Dm_Radix) /=
-        Output_4
-      then
+        Output_4 then
          Report.Failed ("Incorrect result from Fn. Image using Picture_4");
       end if;
 
       if Image_Io.Image
-          (Item       => Dec_Data_5,
-           Pic        => Picture_5,
-           Currency   => Dm_Currency,
-           Fill       => Blank_Fill,
-           Separator  => Dm_Separator,
+          (Item       => Dec_Data_5, Pic => Picture_5, Currency => Dm_Currency,
+           Fill       => Blank_Fill, Separator => Dm_Separator,
            Radix_Mark => Dm_Radix) /=
-        Output_5
-      then
+        Output_5 then
          Report.Failed ("Incorrect result from Fn. Image using Picture_5");
       end if;
 
       if Image_Io.Image
-          (Item       => Dec_Data_6,
-           Pic        => Picture_6,
-           Currency   => Dm_Currency,
-           Fill       => Blank_Fill,
-           Separator  => Dm_Separator,
+          (Item       => Dec_Data_6, Pic => Picture_6, Currency => Dm_Currency,
+           Fill       => Blank_Fill, Separator => Dm_Separator,
            Radix_Mark => Dm_Radix) /=
-        Output_6
-      then
+        Output_6 then
          Report.Failed ("Incorrect result from Fn. Image using Picture_6");
       end if;
 
       if Image_Io.Image
-          (Item       => Dec_Data_7,
-           Pic        => Picture_7,
-           Currency   => "CHF",
-           Fill       => Blank_Fill,
-           Separator  => ',',
-           Radix_Mark => '.') /=
-        Output_7
-      then
+          (Item => Dec_Data_7, Pic => Picture_7, Currency => "CHF",
+           Fill => Blank_Fill, Separator => ',', Radix_Mark => '.') /=
+        Output_7 then
          Report.Failed ("Incorrect result from Fn. Image using Picture_7");
       end if;
 
@@ -232,8 +200,7 @@ begin
          when The_Error : others =>
             Report.Failed
               ("The following exception was incorrectly raised in " &
-               "Exception_Block_1: " &
-               Exception_Name (The_Error));
+               "Exception_Block_1: " & Exception_Name (The_Error));
       end Exception_Block_1;
 
       Exception_Block_2 :
@@ -254,15 +221,13 @@ begin
          when The_Error : others =>
             Report.Failed
               ("The following exception was incorrectly raised in " &
-               "Exception_Block_2: " &
-               Exception_Name (The_Error));
+               "Exception_Block_2: " & Exception_Name (The_Error));
       end Exception_Block_2;
 
    exception
       when The_Error : others =>
          Report.Failed
-           ("The following exception was raised in the " &
-            "Test_Block: " &
+           ("The following exception was raised in the " & "Test_Block: " &
             Exception_Name (The_Error));
    end Test_Block;
 

@@ -100,9 +100,7 @@ begin
 
          if T'(I) /= I then
             Failed
-              ("INCORRECT RESULTS FOR QUALIFICATION " &
-               "WITH TYPE - " &
-               Str &
+              ("INCORRECT RESULTS FOR QUALIFICATION " & "WITH TYPE - " & Str &
                " - 1");
          end if;
 
@@ -110,28 +108,22 @@ begin
             null;
          else
             Failed
-              ("INCORRECT RESULTS FOR QUALIFICATION " &
-               "WITH TYPE - " &
-               Str &
+              ("INCORRECT RESULTS FOR QUALIFICATION " & "WITH TYPE - " & Str &
                " - 2");
          end if;
 
          if T (I1) /= I then
             Failed
-              ("INCORRECT RESULTS FOR EXPLICIT " &
-               "CONVERSION WITH TYPE - " &
-               Str &
-               " - 1");
+              ("INCORRECT RESULTS FOR EXPLICIT " & "CONVERSION WITH TYPE - " &
+               Str & " - 1");
          end if;
 
          if F (T (I1)) then
             null;
          else
             Failed
-              ("INCORRECT RESULTS FOR EXPLICIT  " &
-               "CONVERSION WITH TYPE - " &
-               Str &
-               " - 2");
+              ("INCORRECT RESULTS FOR EXPLICIT  " & "CONVERSION WITH TYPE - " &
+               Str & " - 2");
          end if;
 
       end P;

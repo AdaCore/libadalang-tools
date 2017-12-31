@@ -208,8 +208,7 @@ begin
       when Constraint_Error =>
          Comment
            ("CONSTRAINT_ERROR RAISED WHEN DECLARING AN " &
-            "ARRAY SUBTYPE WITH INTEGER'LAST + 3 " &
-            "COMPONENTS");
+            "ARRAY SUBTYPE WITH INTEGER'LAST + 3 " & "COMPONENTS");
 
       when Storage_Error =>
          Failed ("STORAGE_ERROR RAISED FOR TYPE DECLARATION");

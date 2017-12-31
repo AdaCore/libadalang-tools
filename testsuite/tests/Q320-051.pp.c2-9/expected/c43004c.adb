@@ -124,8 +124,7 @@ procedure C43004c is
          "IF THE VALUE OF A DISCRIMINANT OF A " &
          "CONSTRAINED COMPONENT OF AN AGGREGATE " &
          "DOES NOT EQUAL THE CORRESPONDING " &
-         "DISCRIMINANT VALUE FOR THECOMPONENT'S " &
-         "SUBTYPE");
+         "DISCRIMINANT VALUE FOR THECOMPONENT'S " & "SUBTYPE");
 
       begin
          Vv := (E => (D => 1));

@@ -53,9 +53,7 @@ begin -- C3A2A01.                                              -- [ Level = 1 ]
 
          type Acctag_L3 is access all F3a2a00.Tagged_Type;
 
-         package Pack_Ok is new C3a2a01_1
-           (F3a2a00.Tagged_Type,
-            Acctag_L3,
+         package Pack_Ok is new C3a2a01_1 (F3a2a00.Tagged_Type, Acctag_L3,
             F3a2a00.X_L0);
       begin
          -- The accessibility level of the actual object used to instantiate
@@ -91,10 +89,8 @@ begin -- C3A2A01.                                              -- [ Level = 1 ]
 
          X_L3 : F3a2a00.Tagged_Type;
 
-         package Pack_Pe is new C3a2a01_1
-           (F3a2a00.Tagged_Type,
-            F3a2a00.Acctag_L0,
-            X_L3);
+         package Pack_Pe is new C3a2a01_1 (F3a2a00.Tagged_Type,
+            F3a2a00.Acctag_L0, X_L3);
       begin
          -- The accessibility level of the actual object used to instantiate
          -- Pack_PE is 3. The accessibility level of the actual access type
@@ -142,9 +138,7 @@ begin -- C3A2A01.                                              -- [ Level = 1 ]
          Proc (X_L3'Access, Result1);
 
          F3a2a00.Tc_Display_Results
-           (Result1,
-            F3a2a00.Ok,
-            "SUBTEST #4: same levels");
+           (Result1, F3a2a00.Ok, "SUBTEST #4: same levels");
 
          declare                                               -- [ Level = 4 ]
             X_L4 : aliased F3a2a00.Array_Type;
@@ -157,9 +151,7 @@ begin -- C3A2A01.                                              -- [ Level = 1 ]
             Proc (X_L4'Access, Result2);
 
             F3a2a00.Tc_Display_Results
-              (Result2,
-               F3a2a00.P_E,
-               "SUBTEST #4: object at deeper level");
+              (Result2, F3a2a00.P_E, "SUBTEST #4: object at deeper level");
          end;
 
       end;

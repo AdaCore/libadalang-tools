@@ -9,10 +9,8 @@ procedure Cc30001 is
    package System_Messages renames Cc30001_3;
 
    Sys_Msg1 : System_Messages.Mail_Type :=
-     (Text         => "System shutting down",
-      Signal       => Cc30001_2.Warning,
-      To           => "AllUsers",
-      Message_Sent => False);
+     (Text => "System shutting down", Signal => Cc30001_2.Warning,
+      To   => "AllUsers", Message_Sent => False);
 
    Sys_Msg2 : System_Messages.Mail_Type'Class := Sys_Msg1;
 

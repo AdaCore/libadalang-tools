@@ -11,10 +11,8 @@ package body Cc70003_0 is
       return L (I).all;
    end View_Element;
 
-   procedure Write_Element
-     (I : in     List_Size;
-      L : in out List_Type;
-      E : in     Element_Type)
+   procedure Write_Element (I : in List_Size; L : in out List_Type;
+      E                       : in Element_Type)
    is
    begin
       L (I) := new Element_Type'(E);

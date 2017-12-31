@@ -32,9 +32,8 @@ package body C392010_0 is
       Ap.all (Cp);
    end Proc_W_Ap_And_Cp;
 
-   procedure Proc_W_Ap_And_Cp_W_Def
-     (Ap : Access_Procedure := Proc_2'Access;
-      Cp : Tagtype_Level_0  := A_Default_Value)
+   procedure Proc_W_Ap_And_Cp_W_Def (Ap : Access_Procedure := Proc_2'Access;
+      Cp                                : Tagtype_Level_0  := A_Default_Value)
    is
    begin
       Tctouch.Touch

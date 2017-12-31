@@ -120,47 +120,20 @@ begin
 
          Check_File
            (Ft,
-            "XXXXXXXXXX#" &
-            "XXXXXXXXXX#" &
-            "XXXXXXXXXX#" &
-            "XXXXXXXXXX#" &
-            "XXXXXXXXXX#@" &
-            "XXXXXXXXXX#" &
-            "XXXXXXXXXX#" &
-            "XXXXXXXXXX#" &
-            "XXXXXXXXXX#" &
-            "XXXXXXXXXX#@" &
-            "XXXXXXXXXX#" &
-            "XXXXXXXXXX#" &
-            "XXXXXXXXXX#" &
-            "XXXXXXXXXX#" &
-            "XXXXXXXXXX#" &
-            "BBBBB#" &
-            "BBBBB#" &
-            "BBBBB#" &
-            "BBBBB#" &
-            "BBBBB#@" &
-            "BBBBB#" &
-            "BBBBB#" &
-            "BBBBB#" &
-            "BBBBB#" &
-            "BBBBBKKKKKKKKKKKKKKKKKKKK#@" &
-            "KKKKKKKKKKKKKKKKKKKKKKKKK#" &
-            "KKKKKKKKKKKKKKKKKKKKKKKKK#" &
-            "KKKKKKKKKKKKKKKKKKKKKKKKK#" &
-            "KKKKKKKKKKKKKKKKKKKKKKKKK#@" &
-            "KKKKKKKKKKKKKKKKKKKKKKKKK#" &
-            "KKKKKKKKKKKKKKKKKKKKKKKKK#" &
-            "KKKKKKKKKKKKKKKKKKKKKKKKK#" &
-            "KKKKKKKKKKKKKKKKKKKKKKKKK#@" &
-            "KKKKKKKKKKKKKKKKKKKKKKKKK#" &
-            "KKKKKKKKKKKKKKKKKKKKKKKKK#" &
-            "KKKKKKKKKKKKKKKKKKKKKKKKK#" &
-            "KKKKKKKKKKKKKKKAAAAAAAAAAA" &
-            "AAAAAAAAAAAAAAAAAAAAAAAAAA" &
-            "AAAAAAAAAAAAAAAAAAAAAAAAAA" &
-            "AAAAAAAAAAAAAAAAAAAAAAAAAA" &
-            "AAAAAAAAAAA#@%");
+            "XXXXXXXXXX#" & "XXXXXXXXXX#" & "XXXXXXXXXX#" & "XXXXXXXXXX#" &
+            "XXXXXXXXXX#@" & "XXXXXXXXXX#" & "XXXXXXXXXX#" & "XXXXXXXXXX#" &
+            "XXXXXXXXXX#" & "XXXXXXXXXX#@" & "XXXXXXXXXX#" & "XXXXXXXXXX#" &
+            "XXXXXXXXXX#" & "XXXXXXXXXX#" & "XXXXXXXXXX#" & "BBBBB#" &
+            "BBBBB#" & "BBBBB#" & "BBBBB#" & "BBBBB#@" & "BBBBB#" & "BBBBB#" &
+            "BBBBB#" & "BBBBB#" & "BBBBBKKKKKKKKKKKKKKKKKKKK#@" &
+            "KKKKKKKKKKKKKKKKKKKKKKKKK#" & "KKKKKKKKKKKKKKKKKKKKKKKKK#" &
+            "KKKKKKKKKKKKKKKKKKKKKKKKK#" & "KKKKKKKKKKKKKKKKKKKKKKKKK#@" &
+            "KKKKKKKKKKKKKKKKKKKKKKKKK#" & "KKKKKKKKKKKKKKKKKKKKKKKKK#" &
+            "KKKKKKKKKKKKKKKKKKKKKKKKK#" & "KKKKKKKKKKKKKKKKKKKKKKKKK#@" &
+            "KKKKKKKKKKKKKKKKKKKKKKKKK#" & "KKKKKKKKKKKKKKKKKKKKKKKKK#" &
+            "KKKKKKKKKKKKKKKKKKKKKKKKK#" & "KKKKKKKKKKKKKKKAAAAAAAAAAA" &
+            "AAAAAAAAAAAAAAAAAAAAAAAAAA" & "AAAAAAAAAAAAAAAAAAAAAAAAAA" &
+            "AAAAAAAAAAAAAAAAAAAAAAAAAA" & "AAAAAAAAAAA#@%");
 
       exception
          when Incomplete =>

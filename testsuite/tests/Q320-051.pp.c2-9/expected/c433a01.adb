@@ -69,9 +69,8 @@ procedure C433a01 is
       for I in A'Range loop
 
          F433a00.Check
-           (A (I),
-            Value   => Value,
-            Message => Message & "(" & Integer'Image (I) & ")");
+           (A (I), Value => Value,
+            Message      => Message & "(" & Integer'Image (I) & ")");
 
       end loop;
    end Check;

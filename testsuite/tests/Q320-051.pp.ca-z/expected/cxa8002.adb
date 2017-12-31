@@ -78,8 +78,7 @@ begin
      ("CXA8002",
       "Check that resetting a file using mode " &
       "Append_File allows for the writing of " &
-      "elements to the file starting after the " &
-      "last element in the file");
+      "elements to the file starting after the " & "last element in the file");
 
    Test_For_Sequential_Io_Support :
    begin
@@ -160,9 +159,7 @@ begin
               ("Unexpected exception on Reset to In_File (Sequential_IO)");
             raise Incomplete;
       end;
-      if Data_Io."="
-          (Data_Io.Mode (Employee_Data_File),
-           Tc_Mode_Selection (1))
+      if Data_Io."=" (Data_Io.Mode (Employee_Data_File), Tc_Mode_Selection (1))
       then   -- Compare In_File mode
          -- Reset successful,
          Data_Io.Read
@@ -204,8 +201,7 @@ begin
          -- Append_File mode?
 
          if Data_Io."="
-             (Data_Io.Mode (Employee_Data_File),
-              Tc_Mode_Selection (3))
+             (Data_Io.Mode (Employee_Data_File), Tc_Mode_Selection (3))
          then   -- Compare to
             -- Append_File mode.
             Data_Io.Write

@@ -58,8 +58,7 @@ begin
       "FIELD'LAST WHEN FIELD'LAST IS LESS THAN " &
       "INTEGER'LAST, OR THE VALUE READ IS OUT OF " &
       "RANGE OF THE ITEM PARAMETER, BUT WITHIN THE " &
-      "RANGE OF THE SUBTYPE USED TO INSTANTIATE " &
-      "FLOAT_IO.");
+      "RANGE OF THE SUBTYPE USED TO INSTANTIATE " & "FLOAT_IO.");
 
    declare
       Ft : File_Type;
@@ -171,15 +170,13 @@ begin
             Get (Ft, X, Field'Last + Ident_Int (1));
             Failed
               ("CONSTRAINT_ERROR NOT RAISED - " &
-               "FIELD'LAST + 1 WIDTH WITH " &
-               "EXTERNAL FILE");
+               "FIELD'LAST + 1 WIDTH WITH " & "EXTERNAL FILE");
          exception
             when Constraint_Error =>
                null;
             when others =>
                Failed
-                 ("WRONG EXCEPTION RAISED - " &
-                  "FIELD'LAST + 1 WIDTH WITH " &
+                 ("WRONG EXCEPTION RAISED - " & "FIELD'LAST + 1 WIDTH WITH " &
                   "EXTERNAL FILE");
          end;
       end if;

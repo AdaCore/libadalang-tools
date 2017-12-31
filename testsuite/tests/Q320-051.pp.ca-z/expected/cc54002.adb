@@ -25,8 +25,7 @@ begin
 
    Cc54002_1.District_Subscription_Lists.Put    -- Element created statically.
      (List     => Cc54002_1.District_01_Subscribers,
-      Elem_Ptr => Cc54002_1.New_Subscriber_01'Access,
-      Location => 1);
+      Elem_Ptr => Cc54002_1.New_Subscriber_01'Access, Location => 1);
 
    Cc54002_1.District_Subscription_Lists.Put    -- Element created dynamically.
      (List     => Cc54002_1.District_01_Subscribers,
@@ -47,14 +46,10 @@ begin
    -- Retrieve elements of the list:
 
    Cc54002_1.District_Subscription_Lists.Get
-     (Cc54002_1.District_01_Subscribers,
-      Tc_Actual_01,
-      1);
+     (Cc54002_1.District_01_Subscribers, Tc_Actual_01, 1);
 
    Cc54002_1.District_Subscription_Lists.Get
-     (Cc54002_1.District_01_Subscribers,
-      Tc_Actual_02,
-      2);
+     (Cc54002_1.District_01_Subscribers, Tc_Actual_02, 2);
 
    -- Verify list contents in two ways: 1st verify the directly-dereferenced
    -- access objects against the dereferenced access objects returned by Get;
@@ -66,8 +61,7 @@ begin
    -- objects.
 
    if Cc54002_1.District_01_Subscribers.Elements (1).all /= Tc_Actual_01.all
-     or else
-       Cc54002_1.District_01_Subscribers.Elements (2).all /=
+     or else Cc54002_1.District_01_Subscribers.Elements (2).all /=
        Tc_Actual_02.all
    then
       Report.Failed ("Wrong results returned by Get");

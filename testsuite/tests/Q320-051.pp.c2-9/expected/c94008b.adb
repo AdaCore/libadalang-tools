@@ -52,8 +52,7 @@ begin
          for I in 1 .. Numb_Tt1 loop
             if Array_Tt1 (I)'Terminated then
                Failed
-                 ("TOO EARLY TERMINATION OF " &
-                  "TASK TT1 INDEX" &
+                 ("TOO EARLY TERMINATION OF " & "TASK TT1 INDEX" &
                   Integer'Image (I));
             end if;
          end loop;
@@ -70,8 +69,7 @@ begin
          if Array_Tt1 (I)'Terminated then
             Failed
               ("TERMINATION BEFORE OUTER " &
-               "UNIT HAS BEEN LEFT OF TASK TT1 INDEX " &
-               Integer'Image (I));
+               "UNIT HAS BEEN LEFT OF TASK TT1 INDEX " & Integer'Image (I));
          end if;
       end loop;
    end Block1;

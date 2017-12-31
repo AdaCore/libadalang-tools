@@ -23,8 +23,7 @@ begin
         ("3rd test: type's overridden operation not called for " &
          "operand of 1st subtype");
    end if;
-   if Tc_Operand + 3.0 >=
-     Tc_Operand2 - 13.0
+   if Tc_Operand + 3.0 >= Tc_Operand2 - 13.0
    then -- Various predefined operators.
       Report.Failed ("3rd test: wrong result from predefined operators");
    end if;

@@ -85,109 +85,91 @@ begin
       begin
          if T0 + 1 /= 1 then
             Failed
-              ("INCORRECT RESULTS FOR IMPLICIT " &
-               "CONVERSION WITH TYPE " &
-               Str &
-               " - 1");
+              ("INCORRECT RESULTS FOR IMPLICIT " & "CONVERSION WITH TYPE " &
+               Str & " - 1");
          end if;
 
          if T2 + 1 /= 3 then
             Failed
-              ("INCORRECT RESULTS FOR IMPLICIT " &
-               "CONVERSION WITH TYPE " &
-               Str &
-               " - 2");
+              ("INCORRECT RESULTS FOR IMPLICIT " & "CONVERSION WITH TYPE " &
+               Str & " - 2");
          end if;
 
          if Tn2 + 1 /= -1 then
             Failed
-              ("INCORRECT RESULTS FOR IMPLICIT " &
-               "CONVERSION WITH TYPE " &
-               Str &
-               " - 3");
+              ("INCORRECT RESULTS FOR IMPLICIT " & "CONVERSION WITH TYPE " &
+               Str & " - 3");
          end if;
 
          if T (Fi0) /= T0 then
             Failed
-              ("INCORRECT CONVERSION FROM " &
-               "FIXED VALUE 0.0 WITH TYPE " &
+              ("INCORRECT CONVERSION FROM " & "FIXED VALUE 0.0 WITH TYPE " &
                Str);
          end if;
 
          if T (Fi2) /= Ident (T2) then
             Failed
-              ("INCORRECT CONVERSION FROM " &
-               "FIXED VALUE 2.0 WITH TYPE " &
+              ("INCORRECT CONVERSION FROM " & "FIXED VALUE 2.0 WITH TYPE " &
                Str);
          end if;
 
          if T (Fin2) /= Tn2 then
             Failed
-              ("INCORRECT CONVERSION FROM " &
-               "FIXED VALUE -2.0 WITH TYPE " &
+              ("INCORRECT CONVERSION FROM " & "FIXED VALUE -2.0 WITH TYPE " &
                Str);
          end if;
 
          if T (Fl0) /= Ident (T0) then
             Failed
-              ("INCORRECT CONVERSION FROM " &
-               "FLOAT VALUE 0.0 WITH TYPE " &
+              ("INCORRECT CONVERSION FROM " & "FLOAT VALUE 0.0 WITH TYPE " &
                Str);
          end if;
 
          if T (Fl2) /= T2 then
             Failed
-              ("INCORRECT CONVERSION FROM " &
-               "FLOAT VALUE 2.0 WITH TYPE " &
+              ("INCORRECT CONVERSION FROM " & "FLOAT VALUE 2.0 WITH TYPE " &
                Str);
          end if;
 
          if T (Fln2) /= Ident (Tn2) then
             Failed
-              ("INCORRECT CONVERSION FROM " &
-               "FLOAT VALUE -2.0 WITH TYPE " &
+              ("INCORRECT CONVERSION FROM " & "FLOAT VALUE -2.0 WITH TYPE " &
                Str);
          end if;
 
          if Fixed (T0) /= Fi0 then
             Failed
-              ("INCORRECT CONVERSION TO " &
-               "FIXED VALUE 0.0 WITH TYPE " &
+              ("INCORRECT CONVERSION TO " & "FIXED VALUE 0.0 WITH TYPE " &
                Str);
          end if;
 
          if Fixed (Ident (T2)) /= Fi2 then
             Failed
-              ("INCORRECT CONVERSION TO " &
-               "FIXED VALUE 2.0 WITH TYPE " &
+              ("INCORRECT CONVERSION TO " & "FIXED VALUE 2.0 WITH TYPE " &
                Str);
          end if;
 
          if Fixed (Tn2) /= Fin2 then
             Failed
-              ("INCORRECT CONVERSION TO " &
-               "FIXED VALUE -2.0 WITH TYPE " &
+              ("INCORRECT CONVERSION TO " & "FIXED VALUE -2.0 WITH TYPE " &
                Str);
          end if;
 
          if Float (Ident (T0)) /= Fl0 then
             Failed
-              ("INCORRECT CONVERSION TO " &
-               "FLOAT VALUE 0.0 WITH TYPE " &
+              ("INCORRECT CONVERSION TO " & "FLOAT VALUE 0.0 WITH TYPE " &
                Str);
          end if;
 
          if Float (T2) /= Fl2 then
             Failed
-              ("INCORRECT CONVERSION TO " &
-               "FLOAT VALUE 2.0 WITH TYPE " &
+              ("INCORRECT CONVERSION TO " & "FLOAT VALUE 2.0 WITH TYPE " &
                Str);
          end if;
 
          if Float (Ident (Tn2)) /= Fln2 then
             Failed
-              ("INCORRECT CONVERSION TO " &
-               "FLOAT VALUE -2.0 WITH TYPE " &
+              ("INCORRECT CONVERSION TO " & "FLOAT VALUE -2.0 WITH TYPE " &
                Str);
          end if;
 

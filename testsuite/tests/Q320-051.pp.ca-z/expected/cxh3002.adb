@@ -4,13 +4,8 @@ with Report;
 with Cxh3002_0.Cxh3002_1;
 procedure Cxh3002 is
 
-   use type
-     Cxh3002_0.Enum,
-     Cxh3002_0.Int,
-     Cxh3002_0.Unt,
-     Cxh3002_0.Flt,
-     Cxh3002_0.Fix,
-     Cxh3002_0.Root;
+   use type Cxh3002_0.Enum, Cxh3002_0.Int, Cxh3002_0.Unt, Cxh3002_0.Flt,
+     Cxh3002_0.Fix, Cxh3002_0.Root;
 
    Main_Enum : Cxh3002_0.Enum                   := Cxh3002_0.Item;
    Main_Int  : Cxh3002_0.Int;
@@ -78,8 +73,7 @@ begin  -- Main test procedure.
                Assert (Main_Flt in 3.0 .. 3.5, "Main_Flt");
                Assert (Main_Fix = 0.5, "Main_Fix");
                Assert
-                 (Main_Rec = (Cxh3002_0.Stuff, I => 3, U => 4),
-                  "Main_Rec");
+                 (Main_Rec = (Cxh3002_0.Stuff, I => 3, U => 4), "Main_Rec");
                Assert (Main_List (Main_Unt) = Main_Rec, "Main_List");
                Assert
                  (Main_A_List (Cxh3002_0.Unt'First) =

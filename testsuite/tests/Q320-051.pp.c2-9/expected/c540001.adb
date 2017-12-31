@@ -18,8 +18,7 @@ begin
       "call may be used as a case statement expression.  Check " &
       "that a call to a generic formal function may be used as " &
       "a case statement expression.  Check that a call to an " &
-      "inherited function may be used as a case statement " &
-      "expression");
+      "inherited function may be used as a case statement " & "expression");
 
    Generic_Formal_Object_Subtest :
    begin
@@ -62,9 +61,8 @@ begin
          return New_Enum_Type'Val (P);
       end Get_Enum_Value;
 
-      function Val_Func is new C540001_3
-        (Formal_Enum_Type => New_Enum_Type,
-         Formal_Func      => Get_Enum_Value);
+      function Val_Func is new C540001_3 (Formal_Enum_Type => New_Enum_Type,
+         Formal_Func                                       => Get_Enum_Value);
 
       procedure Assign_Num (P : in out C540001_1.Small_Num) is
       begin
@@ -161,9 +159,8 @@ begin
          return New_Small_Int'First;
       end Get_Int_Value;
 
-      package Int_Pck is new C540001_4
-        (Formal_Int_Type => New_Small_Int,
-         Formal_Func     => Get_Int_Value);
+      package Int_Pck is new C540001_4 (Formal_Int_Type => New_Small_Int,
+         Formal_Func                                    => Get_Int_Value);
 
       use type C540001_1.Mixed;
       Mobj : C540001_1.Mixed := C540001_1.None;

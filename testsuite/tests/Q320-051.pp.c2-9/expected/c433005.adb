@@ -81,9 +81,7 @@ procedure C433005 is
         Report.Ident_Int (6) .. Report.Ident_Int (8));
    -- Orange .. Green, 6 .. 8
 
-   procedure Check_1
-     (Obj                                               : Array_1;
-      Low, High                                         : Integer;
+   procedure Check_1 (Obj : Array_1; Low, High : Integer;
       First_Component, Second_Component, Last_Component : Default_To_Zero;
       Test_Case                                         : Character)
    is
@@ -105,9 +103,7 @@ procedure C433005 is
       end if;
    end Check_1;
 
-   procedure Check_2
-     (Obj                                               : Array_2;
-      Low, High                                         : Color_Type;
+   procedure Check_2 (Obj : Array_2; Low, High : Color_Type;
       First_Component, Second_Component, Last_Component : Default_To_Zero;
       Test_Case                                         : Character)
    is
@@ -129,11 +125,9 @@ procedure C433005 is
       end if;
    end Check_2;
 
-   procedure Check_3
-     (Test_Obj, Check_Obj : Array_3;
-      Low_1, High_1       : Color_Type;
-      Low_2, High_2       : Integer;
-      Test_Case           : Character)
+   procedure Check_3 (Test_Obj, Check_Obj : Array_3;
+      Low_1, High_1 : Color_Type; Low_2, High_2 : Integer;
+      Test_Case                           : Character)
    is
    begin
       if Test_Obj'First (1) /= Low_1 then
@@ -222,64 +216,34 @@ begin
       "a return statement");
 
    Check_1
-     (Test_A,
-      Low              => 1,
-      High             => 3,
-      First_Component  => 2,
-      Second_Component => 3,
-      Last_Component   => 0,
-      Test_Case        => 'A');
+     (Test_A, Low => 1, High => 3, First_Component => 2, Second_Component => 3,
+      Last_Component => 0, Test_Case => 'A');
 
    Check_2
-     (Test_B,
-      Low              => Red,
-      High             => Yellow,
-      First_Component  => 1,
-      Second_Component => 6,
-      Last_Component   => 6,
-      Test_Case        => 'B');
+     (Test_B, Low      => Red, High => Yellow, First_Component => 1,
+      Second_Component => 6, Last_Component => 6, Test_Case => 'B');
 
    -- Check that the others clause does not need to represent any components:
    Check_1
-     (Test_C,
-      Low              => 3,
-      High             => 5,
-      First_Component  => 5,
-      Second_Component => 6,
-      Last_Component   => 8,
-      Test_Case        => 'C');
+     (Test_C, Low => 3, High => 5, First_Component => 5, Second_Component => 6,
+      Last_Component => 8, Test_Case => 'C');
 
    -- Check named choices are allowed:
    Check_1
-     (Test_D,
-      Low              => 1,
-      High             => 3,
-      First_Component  => 8,
-      Second_Component => 0,
-      Last_Component   => 8,
-      Test_Case        => 'D');
+     (Test_D, Low => 1, High => 3, First_Component => 8, Second_Component => 0,
+      Last_Component => 8, Test_Case => 'D');
 
    Check_3 (Test_E, Test_E, Orange, Green, 6, 8, Test_Case => 'E');
 
    Check_1
-     (Test_F,
-      Low              => 5,
-      High             => 9,
-      First_Component  => 1,
-      Second_Component => 0,
-      Last_Component   => 1,
-      Test_Case        => 'F');
+     (Test_F, Low => 5, High => 9, First_Component => 1, Second_Component => 0,
+      Last_Component => 1, Test_Case => 'F');
 
    -- Check positional aggregates that are too long:
    begin
       Check_2
-        (Test_G,
-         Low              => Green,
-         High             => Violet,
-         First_Component  => 88,
-         Second_Component => 89,
-         Last_Component   => 91,
-         Test_Case        => 'G');
+        (Test_G, Low      => Green, High => Violet, First_Component => 88,
+         Second_Component => 89, Last_Component => 91, Test_Case => 'G');
       Report.Failed
         ("Constraint_Error not raised by positional " &
          "aggregate with too many choices (G)");
@@ -293,13 +257,8 @@ begin
 
    begin
       Check_1
-        (Test_H,
-         Low              => 5,
-         High             => 9,
-         First_Component  => 88,
-         Second_Component => 0,
-         Last_Component   => 0,
-         Test_Case        => 'H');
+        (Test_H, Low      => 5, High => 9, First_Component => 88,
+         Second_Component => 0, Last_Component => 0, Test_Case => 'H');
       Report.Failed
         ("Constraint_Error not raised by aggregate choice " &
          "index outside of applicable index constraint (H)");
@@ -310,13 +269,8 @@ begin
 
    begin
       Check_2
-        (Test_J,
-         Low              => Green,
-         High             => Violet,
-         First_Component  => 77,
-         Second_Component => 0,
-         Last_Component   => 77,
-         Test_Case        => 'J');
+        (Test_J, Low      => Green, High => Violet, First_Component => 77,
+         Second_Component => 0, Last_Component => 77, Test_Case => 'J');
       Report.Failed
         ("Constraint_Error not raised by aggregate choice " &
          "index outside of applicable index constraint (J)");

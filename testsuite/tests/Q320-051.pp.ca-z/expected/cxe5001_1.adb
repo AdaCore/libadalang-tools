@@ -50,9 +50,8 @@
 --       Params     : access Params_Stream_Type;
 --       Result     : access Params_Stream_Type);
 with System.Rpc;
-procedure Cxe5001_1
-  (Param_In  : access System.Rpc.Params_Stream_Type;
-   Param_Out : access System.Rpc.Params_Stream_Type)
+procedure Cxe5001_1 (Param_In : access System.Rpc.Params_Stream_Type;
+   Param_Out                  : access System.Rpc.Params_Stream_Type)
 is
 begin
    null;

@@ -79,10 +79,8 @@ begin
 
       if S /= "AB" then
          Failed
-           ("PARAMETERIZED OVERLOADED " &
-            "SUBPROGRAMS, ONE A PROCEDURE AND " &
-            "THE OTHER A FUNCTION, CAUSED " &
-            "CONFUSION");
+           ("PARAMETERIZED OVERLOADED " & "SUBPROGRAMS, ONE A PROCEDURE AND " &
+            "THE OTHER A FUNCTION, CAUSED " & "CONFUSION");
       end if;
 
       S := "12";
@@ -91,10 +89,8 @@ begin
 
       if S /= "CD" then
          Failed
-           ("PARAMETERLESS OVERLOADED " &
-            "SUBPROGRAMS, ONE A PROCEDURE AND " &
-            "THE OTHER A FUNCTION, CAUSED " &
-            "CONFUSION");
+           ("PARAMETERLESS OVERLOADED " & "SUBPROGRAMS, ONE A PROCEDURE AND " &
+            "THE OTHER A FUNCTION, CAUSED " & "CONFUSION");
       end if;
    end;
 

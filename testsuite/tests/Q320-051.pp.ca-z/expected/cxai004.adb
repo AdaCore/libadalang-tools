@@ -85,9 +85,8 @@ procedure Cxai004 is
 
    My_Inserted : Boolean;
 
-   procedure Tampering_Check
-     (Container : in out My_Ordered_Maps.Map;
-      Where     : in     String)
+   procedure Tampering_Check (Container : in out My_Ordered_Maps.Map;
+      Where                             : in     String)
    is
 
       Program_Error_Raised : Boolean := False;
@@ -100,8 +99,7 @@ procedure Cxai004 is
          -- Use a key not already in map
 
          Container.Insert
-           (Key      => Num_Tests + 1,
-            New_Item => Value_In_Array (1));
+           (Key => Num_Tests + 1, New_Item => Value_In_Array (1));
 
       exception
 
@@ -194,16 +192,14 @@ begin
       begin
 
          if My_Ordered_Maps.Element (Position => My_Cursor_1) /=
-           Value_In_Array (I)
-         then
+           Value_In_Array (I) then
 
             Report.Failed
               ("Mismatch between element and what was inserted #2");
 
          end if;
 
-         if My_Map_1.Element (Key => My_Key_Type (I)) /=
-           Value_In_Array (I)
+         if My_Map_1.Element (Key => My_Key_Type (I)) /= Value_In_Array (I)
          then
 
             Report.Failed
@@ -211,8 +207,7 @@ begin
 
          end if;
 
-         if My_Ordered_Maps.Key (Position => My_Cursor_1) /=
-           My_Key_Type (I)
+         if My_Ordered_Maps.Key (Position => My_Cursor_1) /= My_Key_Type (I)
          then
 
             Report.Failed ("Key not as expected");
@@ -229,8 +224,7 @@ begin
          end if;
 
          My_Ordered_Maps.Query_Element
-           (Position => My_Cursor_1,
-            Process  => My_Query'Access);
+           (Position => My_Cursor_1, Process => My_Query'Access);
 
       end;
 
@@ -280,8 +274,7 @@ begin
    for I in reverse Array_Bounds_Type loop
 
       if My_Ordered_Maps.Element (Position => My_Cursor_2) /=
-        Value_In_Array (I)
-      then
+        Value_In_Array (I) then
 
          Report.Failed ("Mismatch between element and what was inserted #4");
 
@@ -398,12 +391,10 @@ begin
       begin
 
          My_Map_1.Replace_Element
-           (Position => My_Cursor_1,
-            New_Item => Value_In_Array (I) * 2.0);
+           (Position => My_Cursor_1, New_Item => Value_In_Array (I) * 2.0);
 
          My_Map_2.Update_Element
-           (Position => My_Cursor_2,
-            Process  => My_Update'Access);
+           (Position => My_Cursor_2, Process => My_Update'Access);
 
       end;
 
@@ -464,8 +455,7 @@ begin
    for I in Array_Bounds_Type loop
 
       if My_Ordered_Maps.Element (Position => My_Cursor_1) /=
-        Value_In_Array (I)
-      then
+        Value_In_Array (I) then
 
          Report.Failed ("Target Map not as expected after move");
 
@@ -640,8 +630,7 @@ begin
 
    My_Cursor_2 := My_Map_2.First;
 
-   if My_Ordered_Maps.Element (Position => My_Cursor_2) /=
-     Value_In_Array (2)
+   if My_Ordered_Maps.Element (Position => My_Cursor_2) /= Value_In_Array (2)
    then
 
       Report.Failed ("Inserted value not as expected #1");
@@ -651,8 +640,7 @@ begin
    My_Ordered_Maps.Next (Position => My_Cursor_2);
 
    -- Check = Default_Value
-   if My_Ordered_Maps.Element (Position => My_Cursor_2) /=
-     My_Default_Value
+   if My_Ordered_Maps.Element (Position => My_Cursor_2) /= My_Default_Value
    then
 
       Report.Failed ("Inserted value not as expected #2");
@@ -661,8 +649,7 @@ begin
 
    My_Ordered_Maps.Next (Position => My_Cursor_2);
 
-   if My_Ordered_Maps.Element (Position => My_Cursor_2) /=
-     Value_In_Array (1)
+   if My_Ordered_Maps.Element (Position => My_Cursor_2) /= Value_In_Array (1)
    then
 
       Report.Failed ("Inserted value not as expected #3");
@@ -671,8 +658,7 @@ begin
 
    My_Ordered_Maps.Next (Position => My_Cursor_2);
 
-   if My_Ordered_Maps.Element (Position => My_Cursor_2) /=
-     Value_In_Array (1)
+   if My_Ordered_Maps.Element (Position => My_Cursor_2) /= Value_In_Array (1)
    then
 
       Report.Failed ("Inserted value not as expected #4");
@@ -681,8 +667,7 @@ begin
 
    My_Ordered_Maps.Next (Position => My_Cursor_2);
 
-   if My_Ordered_Maps.Element (Position => My_Cursor_2) /=
-     My_Default_Value
+   if My_Ordered_Maps.Element (Position => My_Cursor_2) /= My_Default_Value
    then
 
       Report.Failed ("Inserted value not as expected #5");
@@ -691,8 +676,7 @@ begin
 
    My_Ordered_Maps.Next (Position => My_Cursor_2);
 
-   if My_Ordered_Maps.Element (Position => My_Cursor_2) /=
-     Value_In_Array (2)
+   if My_Ordered_Maps.Element (Position => My_Cursor_2) /= Value_In_Array (2)
    then
 
       Report.Failed ("Inserted value not as expected #6");
@@ -746,8 +730,7 @@ begin
 
    My_Cursor_1 := My_Map_1.Find (Key => 9);
 
-   if My_Ordered_Maps.Element (Position => My_Cursor_1) /=
-     Value_In_Array (9)
+   if My_Ordered_Maps.Element (Position => My_Cursor_1) /= Value_In_Array (9)
    then
 
       Report.Failed ("Found value not as expected");
@@ -756,8 +739,7 @@ begin
 
    My_Cursor_2 := My_Map_1.Floor (Key => 8);
 
-   if My_Ordered_Maps.Element (Position => My_Cursor_2) /=
-     Value_In_Array (8)
+   if My_Ordered_Maps.Element (Position => My_Cursor_2) /= Value_In_Array (8)
    then
 
       Report.Failed ("Floor value not as expected");
@@ -778,8 +760,7 @@ begin
 
    My_Cursor_1 := My_Map_1.Ceiling (Key => 10);
 
-   if My_Ordered_Maps.Element (Position => My_Cursor_1) /=
-     Value_In_Array (10)
+   if My_Ordered_Maps.Element (Position => My_Cursor_1) /= Value_In_Array (10)
    then
 
       Report.Failed ("Ceiling value not as expected");

@@ -103,8 +103,7 @@ begin
          end if;
 
          if T'Value (P17) /= T'Base'Last or
-           T'Image (P18) /= T'Image (T'Base'Last)
-         then
+           T'Image (P18) /= T'Image (T'Base'Last) then
             Failed ("IMPROPER VALUE FOR 'VALUE, 'IMAGE - " & Str);
          end if;
       end Pkg;
@@ -120,12 +119,8 @@ begin
 
          package N_Char is new Pkg (T => Char, Str => "CHAR", Ident => Ident);
       begin
-         if N_Char.Arr (1) /= Ident ('A') or
-           N_Char.Arr (2) /= Ident ('B') or
-           N_Char.Arr (3) /= 'A' or
-           N_Char.B1 /= True or
-           N_Char.B2 /= True
-         then
+         if N_Char.Arr (1) /= Ident ('A') or N_Char.Arr (2) /= Ident ('B') or
+           N_Char.Arr (3) /= 'A' or N_Char.B1 /= True or N_Char.B2 /= True then
             Failed
               ("IMPROPER VALUES FOR ARRAY COMPONENTS" &
                " IN INSTANTIATION OF N_CHAR.");
@@ -144,11 +139,8 @@ begin
 
       begin
          if N_Enum.Arr (1) /= Ident (Jovial) or
-           N_Enum.Arr (2) /= Ident (Ada) or
-           N_Enum.Arr (3) /= Jovial or
-           N_Enum.B1 /= True or
-           N_Enum.B2 /= True
-         then
+           N_Enum.Arr (2) /= Ident (Ada) or N_Enum.Arr (3) /= Jovial or
+           N_Enum.B1 /= True or N_Enum.B2 /= True then
             Failed
               ("IMPROPER VALUES FOR ARRAY COMPONENTS" &
                " IN INSTANTIATION OF N_ENUM.");
@@ -157,17 +149,13 @@ begin
 
       declare
 
-         package N_Int is new Pkg
-           (T     => Integer,
-            Str   => "INTEGER",
-            Ident => Ident_Int);
+         package N_Int is new Pkg (T => Integer, Str => "INTEGER",
+            Ident                    => Ident_Int);
       begin
          if N_Int.Arr (1) /= Ident_Int (Integer'First) or
            N_Int.Arr (2) /= Ident_Int (Integer'First + 1) or
-           N_Int.Arr (3) /= Integer'First or
-           N_Int.B1 /= True or
-           N_Int.B2 /= True
-         then
+           N_Int.Arr (3) /= Integer'First or N_Int.B1 /= True or
+           N_Int.B2 /= True then
             Failed
               ("IMPROPER VALUES FOR ARRAY COMPONENTS" &
                " IN INSTANTIATION OF N_INT.");

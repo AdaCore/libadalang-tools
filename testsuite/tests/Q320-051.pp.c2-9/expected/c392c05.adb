@@ -144,9 +144,7 @@ begin  -- Main test procedure.
 
 -- statically tagged controlling operands (specific types) provided to
 -- class-wide functions
-   if Switch.On (A_Switch) or
-     Switch.On (A_Dimmer) or
-     Switch.On (An_Autodim)
+   if Switch.On (A_Switch) or Switch.On (A_Dimmer) or Switch.On (An_Autodim)
    then
       Report.Failed ("Bad Value 4");
    end if;
@@ -157,8 +155,7 @@ begin  -- Main test procedure.
 -- function.
    if Switch.Off (Switch.Toggle'(Switch.Create))
      or else Switch.Off (Switch.Dimmer'(Switch.Create))
-     or else Switch.Off (Switch.Auto_Dimmer'(Switch.Create))
-   then
+     or else Switch.Off (Switch.Auto_Dimmer'(Switch.Create)) then
       Report.Failed ("Bad Value 5");
    end if;
    Tctouch.Validate ("1C2C3C", "Qualified Expression/Class-Wide");

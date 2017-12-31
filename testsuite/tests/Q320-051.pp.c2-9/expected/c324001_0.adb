@@ -18,8 +18,7 @@ package body C324001_0 is
    function Good return No_Defaults is
    begin
       return
-        Result : constant No_Defaults :=
-          (Comp => 0, Acc => new String'("xxx"))
+        Result : constant No_Defaults := (Comp => 0, Acc => new String'("xxx"))
       do
          pragma Assert (Result in No_Defaults_P);
          pragma Assert (Is_Good (Result));

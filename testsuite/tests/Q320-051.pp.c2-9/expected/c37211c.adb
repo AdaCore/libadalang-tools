@@ -54,8 +54,7 @@ begin
       "IN THE RANGE OF THE DISCRIMINANT WHERE THE " &
       "TYPE MARK DENOTES A PRIVATE OR LIMITED " &
       "PRIVATE TYPE, AND THE DISCRIMINANT " &
-      "CONSTRAINT OCCURS BEFORE THE FULL " &
-      "DECLARATION OF THE TYPE");
+      "CONSTRAINT OCCURS BEFORE THE FULL " & "DECLARATION OF THE TYPE");
 
    begin
       declare
@@ -81,8 +80,7 @@ begin
          begin
             Failed
               ("NO EXCEPTION RAISED AT THE " &
-               "ELABORATION OF SUBTYPE SUBPRIV " &
-               Boolean'Image (Sp.D));
+               "ELABORATION OF SUBTYPE SUBPRIV " & Boolean'Image (Sp.D));
          end;
       exception
          when others =>
@@ -127,8 +125,7 @@ begin
          begin
             Failed
               ("NO EXCEPTION RAISED AT THE " &
-               "ELABORATION OF SUBTYPE SUBLIM " &
-               Boolean'Image (Sl.D));
+               "ELABORATION OF SUBTYPE SUBLIM " & Boolean'Image (Sl.D));
          end;
       exception
          when others =>
@@ -171,8 +168,7 @@ begin
             Par : Parr;
          begin
             Failed
-              ("NO EXCEPTION RAISED AT THE " &
-               "ELABORATION OF TYPE PARR " &
+              ("NO EXCEPTION RAISED AT THE " & "ELABORATION OF TYPE PARR " &
                Boolean'Image (Par (1).D));
          end;
       exception
@@ -215,8 +211,7 @@ begin
             Lar : Larr;
          begin
             Failed
-              ("NO EXCEPTION RAISED AT THE " &
-               "ELABORATION OF TYPE LARR " &
+              ("NO EXCEPTION RAISED AT THE " & "ELABORATION OF TYPE LARR " &
                Boolean'Image (Lar (1).D));
          end;
       exception
@@ -262,8 +257,7 @@ begin
             P4 : Priv4;
          begin
             Failed
-              ("NO EXCEPTION RAISED AT THE " &
-               "ELABORATION OF TYPE PRIV4 " &
+              ("NO EXCEPTION RAISED AT THE " & "ELABORATION OF TYPE PRIV4 " &
                Boolean'Image (P4.X.D));
          end;
       exception
@@ -309,8 +303,7 @@ begin
             L4 : Lim4;
          begin
             Failed
-              ("NO EXCEPTION RAISED AT THE " &
-               "ELABORATION OF TYPE LIM4 " &
+              ("NO EXCEPTION RAISED AT THE " & "ELABORATION OF TYPE LIM4 " &
                Boolean'Image (L4.X.D));
          end;
       exception
@@ -354,8 +347,7 @@ begin
             Acp : Accpriv;
          begin
             Failed
-              ("NO EXCEPTION RAISED AT THE " &
-               "ELABORATION OF TYPE ACCPRIV " &
+              ("NO EXCEPTION RAISED AT THE " & "ELABORATION OF TYPE ACCPRIV " &
                Boolean'Image (Acp.D));
          end;
       exception
@@ -399,8 +391,7 @@ begin
             Acl : Acclim;
          begin
             Failed
-              ("NO EXCEPTION RAISED AT THE " &
-               "ELABORATION OF TYPE ACCLIM " &
+              ("NO EXCEPTION RAISED AT THE " & "ELABORATION OF TYPE ACCLIM " &
                Boolean'Image (Acl.D));
          end;
       exception

@@ -49,8 +49,7 @@ procedure Ca2007a0m is
       Test
         ("CA2007A",
          "CHECK THAT SUBUNIT PACKAGES ARE " &
-         "ELABORATED IN THE ORDER IN WHICH THEIR " &
-         "BODY STUBS APPEAR");
+         "ELABORATED IN THE ORDER IN WHICH THEIR " & "BODY STUBS APPEAR");
    end Call_Test;
 
    package Ca2007a3 is

@@ -42,12 +42,10 @@ procedure C35003b is
       type Gen_Int is range <>;
    package Gen_Pack is
       subtype Subenum is
-        Gen_Enum range
-          Gen_Enum'Succ (Gen_Enum'First) ..
+        Gen_Enum range Gen_Enum'Succ (Gen_Enum'First) ..
             Gen_Enum'Pred (Gen_Enum'Last);
       subtype Subint is
-        Gen_Int range
-          Gen_Int'Succ (Gen_Int'First) ..
+        Gen_Int range Gen_Int'Succ (Gen_Int'First) ..
             Gen_Int'Pred (Gen_Int'Last);
       type A1 is array (0 .. Gen_Int'Last) of Integer;
       type A2 is array (Gen_Int range Gen_Int'First .. 0) of Integer;

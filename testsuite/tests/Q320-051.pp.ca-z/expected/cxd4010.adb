@@ -81,10 +81,8 @@ procedure Cxd4010 is
       Tests : constant array (Positive range <>) of Test_Data :=
         (
       --  1 open long 2 open long expected
-      (True, False, False, False, 1),
-         (True, False, True, False, 1),
-         (True, True, True, False, 2),
-         (True, True, True, True, 1),
+      (True, False, False, False, 1), (True, False, True, False, 1),
+         (True, True, True, False, 2), (True, True, True, True, 1),
          (False, False, True, True, 2));
 
       Delay_Times : array (Boolean) of Calendar.Time;
@@ -118,11 +116,8 @@ procedure Cxd4010 is
             end if;
          else
             Report.Failed
-              ("Test" &
-               Integer'Image (Test_No) &
-               "  taken:" &
-               Integer'Image (Taken) &
-               "  expected:" &
+              ("Test" & Integer'Image (Test_No) & "  taken:" &
+               Integer'Image (Taken) & "  expected:" &
                Integer'Image (Tests (Test_No).Expected));
          end if;
       end loop;

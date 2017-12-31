@@ -45,8 +45,7 @@ begin
    Test
      ("CD2B11D",
       "CHECK THAT THE EXPRESSION IN A COLLECTION " &
-      "SIZE SPECIFICATION FOR AN ACCESS TYPE " &
-      "NEED NOT BE STATIC");
+      "SIZE SPECIFICATION FOR AN ACCESS TYPE " & "NEED NOT BE STATIC");
 
    if Acc_Type'Storage_Size < Ident_Int (256) then
       Failed ("INCORRECT VALUE FOR STORAGE_SIZE");

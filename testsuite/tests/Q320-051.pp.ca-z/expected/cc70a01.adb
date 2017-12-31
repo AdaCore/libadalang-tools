@@ -29,8 +29,7 @@ begin  -- Main program.
       "Check that the visible part of a generic " &
       "formal package includes the first list of basic " &
       "declarative items of the package specification. Check " &
-      "for a generic package where formal package has (<>) " &
-      "actual part");
+      "for a generic package where formal package has (<>) " & "actual part");
 
    declare
       Identity_2x2 : Matrix_2x2 := Identity_Matrix (Size => 2);

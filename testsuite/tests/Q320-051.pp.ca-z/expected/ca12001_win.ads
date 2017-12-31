@@ -98,20 +98,14 @@ package Ca12001_Win is
 
    Not_Valid_Error : exception;
 
-   procedure Create
-     (Window : in out Window_Type;
-      Id     : in     Window_Id_Type;
-      Width  : in     Window_Size;
-      Height : in     Window_Size);
+   procedure Create (Window : in out Window_Type; Id : in Window_Id_Type;
+      Width                 : in     Window_Size; Height : in Window_Size);
    -- Create a new top-level window with the specified characteristics. Raises
    -- Not_Valid_Error if the Window has already been created.
 
-   procedure Create
-     (Window : in out Window_Type;
-      Parent : in out Window_Type'Class;
-      Id     : in     Window_Id_Type;
-      Width  : in     Window_Size;
-      Height : in     Window_Size);
+   procedure Create (Window : in out Window_Type;
+      Parent                : in out Window_Type'Class; Id : in Window_Id_Type;
+      Width                 : in     Window_Size; Height : in Window_Size);
    -- Create a new child window with the specified characteristics. Raises
    -- Not_Valid_Error if the Window has already been created, or if the
    -- Parent window has not been created.
@@ -133,10 +127,8 @@ package Ca12001_Win is
    -- Returns the Width of a window. Raises Not_Valid_Error if the Window has
    -- not been created.
 
-   procedure Resize
-     (Window : in Window_Type;
-      Width  : in Window_Size;
-      Height : in Window_Size);
+   procedure Resize (Window : in Window_Type; Width : in Window_Size;
+      Height                : in Window_Size);
    -- Change the size of a window. Raises Not_Valid_Error if the Window has not
    -- been created.
 

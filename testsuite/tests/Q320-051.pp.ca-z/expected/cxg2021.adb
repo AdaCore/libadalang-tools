@@ -109,11 +109,8 @@ procedure Cxg2021 is
       -- the E_Factor is an additional amount added to the Expected value prior
       -- to computing the maximum relative error. This is needed because the
       -- error analysis (Cody pg 17-20) requires this additional allowance.
-      procedure Check
-        (Actual, Expected : Real;
-         Test_Name        : String;
-         Mre              : Real;
-         E_Factor         : Real := 0.0)
+      procedure Check (Actual, Expected : Real; Test_Name : String; Mre : Real;
+         E_Factor                       : Real := 0.0)
       is
          Max_Error : Real;
          Rel_Error : Real;
@@ -138,56 +135,32 @@ procedure Cxg2021 is
          if abs (Actual - Expected) > Max_Error then
             Accuracy_Error_Reported := True;
             Report.Failed
-              (Test_Name &
-               " actual: " &
-               Real'Image (Actual) &
-               " expected: " &
-               Real'Image (Expected) &
-               " difference: " &
-               Real'Image (Actual - Expected) &
-               " max err:" &
-               Real'Image (Max_Error) &
-               " efactor:" &
-               Real'Image (E_Factor));
+              (Test_Name & " actual: " & Real'Image (Actual) & " expected: " &
+               Real'Image (Expected) & " difference: " &
+               Real'Image (Actual - Expected) & " max err:" &
+               Real'Image (Max_Error) & " efactor:" & Real'Image (E_Factor));
          elsif Verbose then
             if Actual = Expected then
                Report.Comment (Test_Name & "  exact result");
             else
                Report.Comment
-                 (Test_Name &
-                  "  passed" &
-                  " actual: " &
-                  Real'Image (Actual) &
-                  " expected: " &
-                  Real'Image (Expected) &
-                  " difference: " &
-                  Real'Image (Actual - Expected) &
-                  " max err:" &
-                  Real'Image (Max_Error) &
-                  " efactor:" &
+                 (Test_Name & "  passed" & " actual: " & Real'Image (Actual) &
+                  " expected: " & Real'Image (Expected) & " difference: " &
+                  Real'Image (Actual - Expected) & " max err:" &
+                  Real'Image (Max_Error) & " efactor:" &
                   Real'Image (E_Factor));
             end if;
          end if;
       end Check;
 
-      procedure Check
-        (Actual, Expected   : Complex;
-         Test_Name          : String;
-         Mre                : Real;
-         R_Factor, I_Factor : Real := 0.0)
+      procedure Check (Actual, Expected : Complex; Test_Name : String;
+         Mre : Real; R_Factor, I_Factor : Real := 0.0)
       is
       begin
          Check
-           (Actual.Re,
-            Expected.Re,
-            Test_Name & " real part",
-            Mre,
-            R_Factor);
+           (Actual.Re, Expected.Re, Test_Name & " real part", Mre, R_Factor);
          Check
-           (Actual.Im,
-            Expected.Im,
-            Test_Name & " imaginary part",
-            Mre,
+           (Actual.Im, Expected.Im, Test_Name & " imaginary part", Mre,
             I_Factor);
       end Check;
 
@@ -199,14 +172,10 @@ procedure Cxg2021 is
          Minimum_Error : constant := 11.0;
       begin
          Check
-           (Sin (Pi / 2.0 + 0.0 * I),
-            1.0 + 0.0 * I,
-            "sin(pi/2+0i)",
+           (Sin (Pi / 2.0 + 0.0 * I), 1.0 + 0.0 * I, "sin(pi/2+0i)",
             Minimum_Error + 1.0);
          Check
-           (Cos (Pi / 2.0 + 0.0 * I),
-            0.0 + 0.0 * I,
-            "cos(pi/2+0i)",
+           (Cos (Pi / 2.0 + 0.0 * I), 0.0 + 0.0 * I, "cos(pi/2+0i)",
             Minimum_Error + 1.0);
       exception
          when Constraint_Error =>
@@ -297,19 +266,11 @@ procedure Cxg2021 is
                  abs (Im (Cos_Zmw) * Re (1.0 - Cos_W_M_1));
 
                Check
-                 (Actual1,
-                  Actual2,
-                  "Identity_1_Test " &
-                  Integer'Image (Ii) &
-                  Integer'Image (J) &
-                  ": Sin((" &
-                  Real'Image (Z.Re) &
-                  ", " &
-                  Real'Image (Z.Im) &
+                 (Actual1, Actual2,
+                  "Identity_1_Test " & Integer'Image (Ii) & Integer'Image (J) &
+                  ": Sin((" & Real'Image (Z.Re) & ", " & Real'Image (Z.Im) &
                   ")) ",
-                  11.0,
-                  R_Factor,
-                  I_Factor);
+                  11.0, R_Factor, I_Factor);
 
                -- now for the second identity
                --    Cos(Z) = Cos(Z-W) * Cos(W) - Sin(Z-W) * Sin(W)
@@ -333,19 +294,11 @@ procedure Cxg2021 is
                  abs (Im (Cos_Zmw) * Re (1.0 - Cos_W_M_1));
 
                Check
-                 (Actual1,
-                  Actual2,
-                  "Identity_2_Test " &
-                  Integer'Image (Ii) &
-                  Integer'Image (J) &
-                  ": Cos((" &
-                  Real'Image (Z.Re) &
-                  ", " &
-                  Real'Image (Z.Im) &
+                 (Actual1, Actual2,
+                  "Identity_2_Test " & Integer'Image (Ii) & Integer'Image (J) &
+                  ": Cos((" & Real'Image (Z.Re) & ", " & Real'Image (Z.Im) &
                   ")) ",
-                  11.0,
-                  R_Factor,
-                  I_Factor);
+                  11.0, R_Factor, I_Factor);
 
                if Accuracy_Error_Reported then
                   -- only report the first error in this test in order to keep
@@ -360,20 +313,12 @@ procedure Cxg2021 is
       exception
          when Constraint_Error =>
             Report.Failed
-              ("Constraint_Error raised in Identity_Test" &
-               " for Z=(" &
-               Real'Image (X) &
-               ", " &
-               Real'Image (Y) &
-               ")");
+              ("Constraint_Error raised in Identity_Test" & " for Z=(" &
+               Real'Image (X) & ", " & Real'Image (Y) & ")");
          when others =>
             Report.Failed
-              ("exception in Identity_Test" &
-               " for Z=(" &
-               Real'Image (X) &
-               ", " &
-               Real'Image (Y) &
-               ")");
+              ("exception in Identity_Test" & " for Z=(" & Real'Image (X) &
+               ", " & Real'Image (Y) & ")");
       end Identity_Test;
 
       procedure Do_Test is
@@ -401,8 +346,7 @@ procedure Cxg2021 is
 
 begin
    Report.Test
-     ("CXG2021",
-      "Check the accuracy of the complex SIN and COS functions");
+     ("CXG2021", "Check the accuracy of the complex SIN and COS functions");
 
    if Verbose then
       Report.Comment ("checking Standard.Float");
@@ -412,8 +356,7 @@ begin
 
    if Verbose then
       Report.Comment
-        ("checking a digits" &
-         Integer'Image (System.Max_Digits) &
+        ("checking a digits" & Integer'Image (System.Max_Digits) &
          " floating point type");
    end if;
 

@@ -18,12 +18,8 @@ procedure Cc3019a is
    begin
       if Val /= Str6_Vals (Cur_Str_Index) then
          Failed
-           ("STR6 ITERATOR FOR INDEX =" &
-            Integer'Image (Cur_Str_Index) &
-            " WITH VALUE " &
-            """" &
-            Val &
-            """");
+           ("STR6 ITERATOR FOR INDEX =" & Integer'Image (Cur_Str_Index) &
+            " WITH VALUE " & """" & Val & """");
       end if;
       Cur_Str_Index := Cur_Str_Index + 1;
    exception
@@ -37,12 +33,8 @@ procedure Cc3019a is
    begin
       if Val /= Int_Vals (Cur_Int_Index) then
          Failed
-           ("INTEGER ITERATOR FOR INDEX =" &
-            Integer'Image (Cur_Int_Index) &
-            " WITH VALUE " &
-            """" &
-            Integer'Image (Val) &
-            """");
+           ("INTEGER ITERATOR FOR INDEX =" & Integer'Image (Cur_Int_Index) &
+            " WITH VALUE " & """" & Integer'Image (Val) & """");
       end if;
       Cur_Int_Index := Cur_Int_Index + 1;
    exception

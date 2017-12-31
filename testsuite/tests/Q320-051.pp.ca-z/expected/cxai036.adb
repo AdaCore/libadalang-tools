@@ -82,10 +82,8 @@ procedure Cxai036 is
    package My_Bounded_Priority_Queues is new Ada.Containers
      .Bounded_Priority_Queues
      (Queue_Interfaces => My_Synchronized_Queue_Interfaces,
-      Queue_Priority   => Integer,
-      Get_Priority     => My_Get_Priority,
-      Before           => "<",
-      Default_Capacity => No_Tests);
+      Queue_Priority   => Integer, Get_Priority => My_Get_Priority,
+      Before           => "<", Default_Capacity => No_Tests);
    -- Inserting items that are before in value before in the queue means that
    -- the more negative the value the higher the priority.
 
@@ -295,8 +293,7 @@ begin
          -- of enqueuing.
 
          if Value_Out_Array (I) /=
-           Value_In_Array (No_Tests_Rounded_Up_To_Even + 1 - 2 * I)
-         then
+           Value_In_Array (No_Tests_Rounded_Up_To_Even + 1 - 2 * I) then
 
             Report.Failed ("Mismatch between dequeued and what was enqueued");
 
@@ -308,8 +305,7 @@ begin
          -- enqueuing.
 
          if Value_Out_Array (I) /=
-           Value_In_Array (2 * I - No_Tests_Rounded_Up_To_Even)
-         then
+           Value_In_Array (2 * I - No_Tests_Rounded_Up_To_Even) then
 
             Report.Failed ("Mismatch between dequeued and what was enqueued");
 
@@ -341,16 +337,13 @@ begin
    for I in Array_Bounds_Type range 1 .. No_Tests_Rounded_Up_To_Even / 2 loop
 
       My_Queue_2.Dequeue_Only_High_Priority
-        (At_Least => 0,
-         Element  => Value_Out_Array (I),
-         Success  => My_Success);
+        (At_Least => 0, Element => Value_Out_Array (I), Success => My_Success);
 
       -- The negative elements should be extracted first, in reverse order of
       -- enqueuing.
 
       if Value_Out_Array (I) /=
-        Value_In_Array (No_Tests_Rounded_Up_To_Even + 1 - 2 * I)
-      then
+        Value_In_Array (No_Tests_Rounded_Up_To_Even + 1 - 2 * I) then
 
          Report.Failed ("Mismatch between dequeued and what was enqueued");
 
@@ -373,9 +366,7 @@ begin
    -- There shouldn't be any high priority items left.
 
    My_Queue_2.Dequeue_Only_High_Priority
-     (At_Least => 0,
-      Element  => Value_Out_Array (1),
-      Success  => My_Success);
+     (At_Least => 0, Element => Value_Out_Array (1), Success => My_Success);
 
    if My_Success then
 

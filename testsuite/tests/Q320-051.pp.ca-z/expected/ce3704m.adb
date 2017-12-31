@@ -55,8 +55,7 @@ begin
      ("CE3704M",
       "CHECK THAT DATA_ERROR IS RAISED FOR " &
       "INTEGER_IO WHEN A DECIMAL POINT, OR " &
-      "LEADING OR TRAILING UNDERSCORES " &
-      "ARE DETECTED");
+      "LEADING OR TRAILING UNDERSCORES " & "ARE DETECTED");
 
    declare
       Ft : File_Type;

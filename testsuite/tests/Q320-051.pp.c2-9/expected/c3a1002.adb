@@ -54,10 +54,8 @@ begin
       Report.Failed ("Wrong values for Incomplete1_Obj_1");
    end if;
 
-   if (Incomplete2_Obj_1.D2 /= 6) or
-     (Incomplete2_Obj_1.Finteger /= 8) or
-     (Incomplete2_Obj_1.Id /= "ACVC95")
-   then
+   if (Incomplete2_Obj_1.D2 /= 6) or (Incomplete2_Obj_1.Finteger /= 8) or
+     (Incomplete2_Obj_1.Id /= "ACVC95") then
       Report.Failed ("Wrong values for Incomplete2_Obj_1");
    end if;
 
@@ -87,19 +85,13 @@ begin
       Report.Failed ("Wrong values for Incomplete1_Obj_2");
    end if;
 
-   if (Incomplete3_Obj_1.D /= 2) or
-     (Incomplete3_Obj_1.I /= 10) or
-     (Incomplete3_Obj_1.E /= F) or
-     (Incomplete3_Obj_1.S /= "Hi")
-   then
+   if (Incomplete3_Obj_1.D /= 2) or (Incomplete3_Obj_1.I /= 10) or
+     (Incomplete3_Obj_1.E /= F) or (Incomplete3_Obj_1.S /= "Hi") then
       Report.Failed ("Wrong values for Incomplete3_Obj_1");
    end if;
 
-   if (Incomplete4_Obj_1.E /= M) or
-     (Incomplete4_Obj_1.D /= 3) or
-     (Incomplete4_Obj_1.S /= "Bye") or
-     (Incomplete4_Obj_1.I /= 14)
-   then
+   if (Incomplete4_Obj_1.E /= M) or (Incomplete4_Obj_1.D /= 3) or
+     (Incomplete4_Obj_1.S /= "Bye") or (Incomplete4_Obj_1.I /= 14) then
       Report.Failed ("Wrong values for Incomplete4_Obj_1");
    end if;
 

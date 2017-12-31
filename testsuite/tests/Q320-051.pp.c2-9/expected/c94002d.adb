@@ -63,8 +63,7 @@ begin
    if Outer_Tt1.all'Terminated then
       Failed
         ("NON-DEPENDENT TASK IS TERMINATED " &
-         "IMMEDIATELY AFTER ENCLOSING UNIT HAS " &
-         "BEEN COMPLETED");
+         "IMMEDIATELY AFTER ENCLOSING UNIT HAS " & "BEEN COMPLETED");
    end if;
 
    Outer_Tt1.E2;       -- RELEASE TASK

@@ -159,8 +159,7 @@ begin  -- Main test procedure.
 
    Report.Test
      ("CD72A02",
-      "Check package " &
-      "System.Address_To_Access_Conversions " &
+      "Check package " & "System.Address_To_Access_Conversions " &
       "for composite types");
 
    -- take several pointer objects, convert them to addresses, and store the
@@ -183,8 +182,7 @@ begin  -- Main test procedure.
    if Tagged_Record
        (Class_Atac.To_Pointer
           (Hex_To_Address (The_Strings (Tagged_Type))).all) /=
-     Tagged_Record'(Value => Natural'Last)
-   then
+     Tagged_Record'(Value => Natural'Last) then
       Report.Failed ("Tagged_Record reconversion");
    end if;
 
@@ -208,21 +206,18 @@ begin  -- Main test procedure.
    -- value
 
    if Class_Atac.To_Pointer (Hex_To_Address (The_Strings (Tagged_Type))) /=
-     My_Rec'Unchecked_Access
-   then
+     My_Rec'Unchecked_Access then
       Report.Failed ("Tagged_Record Unchecked_Access");
    end if;
 
    if Task_Atac.To_Pointer (Hex_To_Address (The_Strings (Task_Type))) /=
-     My_Task'Unchecked_Access
-   then
+     My_Task'Unchecked_Access then
       Report.Failed ("Task Unchecked_Access");
    end if;
 
    if Protected_Atac.To_Pointer
        (Hex_To_Address (The_Strings (Protected_Type))) /=
-     My_Prot'Unchecked_Access
-   then
+     My_Prot'Unchecked_Access then
       Report.Failed ("Protected Unchecked_Access");
    end if;
 

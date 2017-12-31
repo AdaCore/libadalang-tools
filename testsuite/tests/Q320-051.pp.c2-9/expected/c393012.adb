@@ -20,8 +20,7 @@ procedure C393012 is
 
    Inbound : Itinerary :=
      (1 => new Tx.First'(456, 4, 'F', Tx.Sn),
-      2 => new Tx.Economy'(68, 12, 'D'),
-      3 => new Tx.Economy'(5_336, 6, 'A'));
+      2 => new Tx.Economy'(68, 12, 'D'), 3 => new Tx.Economy'(5_336, 6, 'A'));
 
 -- Each call to Display uses a parameter that is a type conversion to the
 -- abstract type Ticket.
@@ -69,17 +68,13 @@ begin  -- Main test procedure.
    -- Test conversions to abstract type
 
    Tc_Convert
-     (Outbound,
-      "Fl: 5335 K Seat: 5B",
-      "Fl: 67 FL Seat: 1J",
+     (Outbound, "Fl: 5335 K Seat: 5B", "Fl: 67 FL Seat: 1J",
       "Fl: 345 K Seat: 37C");
 
    Tctouch.Validate ("TeTfTe", "Outbound flight (converted)");
 
    Tc_Convert
-     (Inbound,
-      "Fl: 456 FSN Seat: 4F",
-      "Fl: 68 K Seat: 12D",
+     (Inbound, "Fl: 456 FSN Seat: 4F", "Fl: 68 K Seat: 12D",
       "Fl: 5336 K Seat: 6A");
 
    Tctouch.Validate ("TfTeTe", "Inbound flight (converted)");
@@ -87,17 +82,13 @@ begin  -- Main test procedure.
    -- Test without conversions to abstract type
 
    Tc_Match
-     (Outbound,
-      "Fl: 5335 K Seat: 5B",
-      "Fl: 67 FL Seat: 1J",
+     (Outbound, "Fl: 5335 K Seat: 5B", "Fl: 67 FL Seat: 1J",
       "Fl: 345 K Seat: 37C");
 
    Tctouch.Validate ("ETeFTfETe", "Outbound flight");
 
    Tc_Match
-     (Inbound,
-      "Fl: 456 FSN Seat: 4F",
-      "Fl: 68 K Seat: 12D",
+     (Inbound, "Fl: 456 FSN Seat: 4F", "Fl: 68 K Seat: 12D",
       "Fl: 5336 K Seat: 6A");
 
    Tctouch.Validate ("FTfETeETe", "Inbound flight");

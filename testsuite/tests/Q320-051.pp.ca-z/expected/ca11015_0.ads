@@ -59,10 +59,8 @@ package Ca11015_0 is
 
    procedure Initialize_Basic_Map (Map : in out Map_Type);
 
-   function Get_Physical_Feature
-     (Lat  : Latitude;
-      Long : Longitude;
-      Map  : Map_Type) return Physical_Features;
+   function Get_Physical_Feature (Lat : Latitude; Long : Longitude;
+      Map                             : Map_Type) return Physical_Features;
 
    function Next_Page return Page_Type;
 

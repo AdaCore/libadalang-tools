@@ -63,10 +63,8 @@ procedure C36205a is
       end if;
 
       if (Las not in A'Range and Las >= Fir) or
-        (Fir not in A'Range and Las >= Fir) or
-        Fir - 1 in A'Range or
-        Las + 1 in A'Range (1)
-      then
+        (Fir not in A'Range and Las >= Fir) or Fir - 1 in A'Range or
+        Las + 1 in A'Range (1) then
          Failed ("'RANGE IS WRONG " & S);
       end if;
 
@@ -86,11 +84,8 @@ procedure C36205a is
          Failed ("'LENGTH(1) IS WRONG " & S);
       end if;
 
-      if F1 - 1 in A'Range or
-        (F1 not in A'Range and F1 <= L1) or
-        (L1 not in A'Range (1) and F1 <= L1) or
-        L1 + 1 in A'Range (1)
-      then
+      if F1 - 1 in A'Range or (F1 not in A'Range and F1 <= L1) or
+        (L1 not in A'Range (1) and F1 <= L1) or L1 + 1 in A'Range (1) then
          Failed ("'RANGE(1) IS WRONG " & S);
       end if;
 
@@ -108,8 +103,7 @@ procedure C36205a is
 
       if F2 - 1 in A'Range (2) or
         (F2 not in A'Range (2) and A'Length (2) > 0) or
-        (L2 not in A'Range (2) and A'Length (2) /= 0) or
-        L2 + 1 in A'Range (2)
+        (L2 not in A'Range (2) and A'Length (2) /= 0) or L2 + 1 in A'Range (2)
       then
          Failed ("'RANGE(2) IS WRONG " & S);
       end if;
@@ -131,13 +125,9 @@ procedure C36205a is
 
       if
         (F <= L and
-         (F not in S'Range or
-          L not in S'Range or
-          F not in S'Range (1) or
+         (F not in S'Range or L not in S'Range or F not in S'Range (1) or
           L not in S'Range (1))) or
-        F - 1 in S'Range or
-        L + 1 in S'Range (1)
-      then
+        F - 1 in S'Range or L + 1 in S'Range (1) then
          Failed ("STRING 'RANGE IS WRONG " & Mess);
       end if;
    end S1;
@@ -146,46 +136,29 @@ begin
    Test
      ("C36205A",
       "CHECKING ATTRIBUTE VALUES POSSESSED BY FORMAL " &
-      "PARAMETERS WHOSE ACTUALS ARE UNCONSTRAINED " &
-      "ARRAYS - BASIC CHECKS");
+      "PARAMETERS WHOSE ACTUALS ARE UNCONSTRAINED " & "ARRAYS - BASIC CHECKS");
 
-   if A10'First /= 1 or
-     A2_10'First (1) /= 1 or
-     A2_10'First (2) /= Ident_Int (13) or
-     A2_20'First /= 11 or
-     A2_20'First (2) /= 21
-   then
+   if A10'First /= 1 or A2_10'First (1) /= 1 or
+     A2_10'First (2) /= Ident_Int (13) or A2_20'First /= 11 or
+     A2_20'First (2) /= 21 then
       Failed ("'FIRST FOR OBJECTS IS WRONG");
    end if;
 
-   if A10'Last (1) /= 10 or
-     A2_10'Last /= 10 or
-     A2_10'Last (2) /= 20 or
-     A2_20'Last (1) /= 30 or
-     A2_20'Last (2) /= Ident_Int (20)
-   then
+   if A10'Last (1) /= 10 or A2_10'Last /= 10 or A2_10'Last (2) /= 20 or
+     A2_20'Last (1) /= 30 or A2_20'Last (2) /= Ident_Int (20) then
       Failed ("'LAST FOR OBJECTS IS WRONG");
    end if;
-   if A10'Length /= Ident_Int (10) or
-     A2_10'Length (1) /= 10 or
-     A2_10'Length (2) /= Ident_Int (8) or
-     A2_20'Length /= 20 or
-     A2_20'Length (2) /= Ident_Int (0)
-   then
+   if A10'Length /= Ident_Int (10) or A2_10'Length (1) /= 10 or
+     A2_10'Length (2) /= Ident_Int (8) or A2_20'Length /= 20 or
+     A2_20'Length (2) /= Ident_Int (0) then
       Failed ("'LENGTH FOR OBJECTS IS WRONG");
    end if;
 
-   if 0 in A10'Range or
-     Ident_Int (11) in A10'Range (1) or
-     Ident_Int (0) in A2_10'Range (1) or
-     11 in A2_10'Range or
-     12 in A2_10'Range (2) or
-     Ident_Int (21) in A2_10'Range (2) or
-     10 in A2_20'Range or
-     Ident_Int (31) in A2_20'Range (1) or
-     Ident_Int (20) in A2_20'Range (2) or
-     0 in A2_20'Range (2)
-   then
+   if 0 in A10'Range or Ident_Int (11) in A10'Range (1) or
+     Ident_Int (0) in A2_10'Range (1) or 11 in A2_10'Range or
+     12 in A2_10'Range (2) or Ident_Int (21) in A2_10'Range (2) or
+     10 in A2_20'Range or Ident_Int (31) in A2_20'Range (1) or
+     Ident_Int (20) in A2_20'Range (2) or 0 in A2_20'Range (2) then
       Failed ("'RANGE FOR OBJECTS IS WRONG");
    end if;
 

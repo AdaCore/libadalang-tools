@@ -59,8 +59,7 @@ begin
       "DISCRIMINANT WITH A DEFAULT VALUE ARE " &
       "PROPERLY EVALUATED AND CHECKED WHEN THE " &
       "RECORD TYPE IS NOT EXPLICITLY CONSTRAINED AND " &
-      "THE COMPONENT IS AND IS NOT PRESENT IN THE " &
-      "SUBTYPE");
+      "THE COMPONENT IS AND IS NOT PRESENT IN THE " & "SUBTYPE");
 
    declare
       Sequence_Number : Integer;
@@ -71,10 +70,8 @@ begin
 
       F1_Cons : Integer := 2;
 
-      function Chk
-        (Cons    : Integer;
-         Value   : Integer;
-         Message : String) return Boolean
+      function Chk (Cons : Integer; Value : Integer;
+         Message         : String) return Boolean
       is
       begin
          if Cons /= Value then

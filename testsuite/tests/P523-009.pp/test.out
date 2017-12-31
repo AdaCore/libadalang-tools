@@ -95,9 +95,7 @@ package body ada_main is
       end;
       declare
          procedure F4;
-         pragma Import
-           (Ada,
-            F4,
+         pragma Import (Ada, F4,
             "system__finalization_masters__finalize_spec");
       begin
          F4;
@@ -111,9 +109,7 @@ package body ada_main is
       end;
       declare
          procedure Reraise_Library_Exception_If_Any;
-         pragma Import
-           (Ada,
-            Reraise_Library_Exception_If_Any,
+         pragma Import (Ada, Reraise_Library_Exception_If_Any,
             "__gnat_reraise_library_exception_if_any");
       begin
          Reraise_Library_Exception_If_Any;
@@ -122,9 +118,7 @@ package body ada_main is
 
    procedure adafinal is
       procedure s_stalib_adafinal;
-      pragma Import
-        (C,
-         s_stalib_adafinal,
+      pragma Import (C, s_stalib_adafinal,
          "system__standard_library__adafinal");
 
       procedure Runtime_Finalize;
@@ -153,19 +147,13 @@ package body ada_main is
       Queuing_Policy : Character;
       pragma Import (C, Queuing_Policy, "__gl_queuing_policy");
       Task_Dispatching_Policy : Character;
-      pragma Import
-        (C,
-         Task_Dispatching_Policy,
+      pragma Import (C, Task_Dispatching_Policy,
          "__gl_task_dispatching_policy");
       Priority_Specific_Dispatching : System.Address;
-      pragma Import
-        (C,
-         Priority_Specific_Dispatching,
+      pragma Import (C, Priority_Specific_Dispatching,
          "__gl_priority_specific_dispatching");
       Num_Specific_Dispatching : Integer;
-      pragma Import
-        (C,
-         Num_Specific_Dispatching,
+      pragma Import (C, Num_Specific_Dispatching,
          "__gl_num_specific_dispatching");
       Main_CPU : Integer;
       pragma Import (C, Main_CPU, "__gl_main_cpu");
@@ -174,9 +162,7 @@ package body ada_main is
       Num_Interrupt_States : Integer;
       pragma Import (C, Num_Interrupt_States, "__gl_num_interrupt_states");
       Unreserve_All_Interrupts : Integer;
-      pragma Import
-        (C,
-         Unreserve_All_Interrupts,
+      pragma Import (C, Unreserve_All_Interrupts,
          "__gl_unreserve_all_interrupts");
       Detect_Blocking : Integer;
       pragma Import (C, Detect_Blocking, "__gl_detect_blocking");
@@ -191,9 +177,7 @@ package body ada_main is
       pragma Import (C, Runtime_Initialize, "__gnat_runtime_initialize");
 
       Finalize_Library_Objects : No_Param_Proc;
-      pragma Import
-        (C,
-         Finalize_Library_Objects,
+      pragma Import (C, Finalize_Library_Objects,
          "__gnat_finalize_library_objects");
    begin
       if Is_Elaborated then
@@ -284,10 +268,8 @@ package body ada_main is
    procedure Ada_Main_Program;
    pragma Import (Ada, Ada_Main_Program, "_ada_test069");
 
-   function main
-     (argc : Integer;
-      argv : System.Address;
-      envp : System.Address) return Integer
+   function main (argc : Integer; argv : System.Address;
+      envp             : System.Address) return Integer
    is
       procedure Initialize (Addr : System.Address);
       pragma Import (C, Initialize, "__gnat_initialize");
@@ -356,10 +338,8 @@ package ada_main is
    procedure adafinal;
    pragma Export (C, adafinal, "adafinal");
 
-   function main
-     (argc : Integer;
-      argv : System.Address;
-      envp : System.Address) return Integer;
+   function main (argc : Integer; argv : System.Address;
+      envp             : System.Address) return Integer;
    pragma Export (C, main, "main");
 
    type Version_32 is mod 2**32;
@@ -832,9 +812,7 @@ package body ada_main is
       end;
       declare
          procedure Reraise_Library_Exception_If_Any;
-         pragma Import
-           (Ada,
-            Reraise_Library_Exception_If_Any,
+         pragma Import (Ada, Reraise_Library_Exception_If_Any,
             "__gnat_reraise_library_exception_if_any");
       begin
          Reraise_Library_Exception_If_Any;
@@ -843,9 +821,7 @@ package body ada_main is
 
    procedure adafinal is
       procedure s_stalib_adafinal;
-      pragma Import
-        (C,
-         s_stalib_adafinal,
+      pragma Import (C, s_stalib_adafinal,
          "system__standard_library__adafinal");
 
       procedure Runtime_Finalize;
@@ -874,19 +850,13 @@ package body ada_main is
       Queuing_Policy : Character;
       pragma Import (C, Queuing_Policy, "__gl_queuing_policy");
       Task_Dispatching_Policy : Character;
-      pragma Import
-        (C,
-         Task_Dispatching_Policy,
+      pragma Import (C, Task_Dispatching_Policy,
          "__gl_task_dispatching_policy");
       Priority_Specific_Dispatching : System.Address;
-      pragma Import
-        (C,
-         Priority_Specific_Dispatching,
+      pragma Import (C, Priority_Specific_Dispatching,
          "__gl_priority_specific_dispatching");
       Num_Specific_Dispatching : Integer;
-      pragma Import
-        (C,
-         Num_Specific_Dispatching,
+      pragma Import (C, Num_Specific_Dispatching,
          "__gl_num_specific_dispatching");
       Main_CPU : Integer;
       pragma Import (C, Main_CPU, "__gl_main_cpu");
@@ -895,9 +865,7 @@ package body ada_main is
       Num_Interrupt_States : Integer;
       pragma Import (C, Num_Interrupt_States, "__gl_num_interrupt_states");
       Unreserve_All_Interrupts : Integer;
-      pragma Import
-        (C,
-         Unreserve_All_Interrupts,
+      pragma Import (C, Unreserve_All_Interrupts,
          "__gl_unreserve_all_interrupts");
       Detect_Blocking : Integer;
       pragma Import (C, Detect_Blocking, "__gl_detect_blocking");
@@ -912,9 +880,7 @@ package body ada_main is
       pragma Import (C, Runtime_Initialize, "__gnat_runtime_initialize");
 
       Finalize_Library_Objects : No_Param_Proc;
-      pragma Import
-        (C,
-         Finalize_Library_Objects,
+      pragma Import (C, Finalize_Library_Objects,
          "__gnat_finalize_library_objects");
    begin
       if Is_Elaborated then
@@ -991,10 +957,8 @@ package body ada_main is
    procedure Ada_Main_Program;
    pragma Import (Ada, Ada_Main_Program, "_ada_test070");
 
-   function main
-     (argc : Integer;
-      argv : System.Address;
-      envp : System.Address) return Integer
+   function main (argc : Integer; argv : System.Address;
+      envp             : System.Address) return Integer
    is
       procedure Initialize (Addr : System.Address);
       pragma Import (C, Initialize, "__gnat_initialize");
@@ -1061,10 +1025,8 @@ package ada_main is
    procedure adafinal;
    pragma Export (C, adafinal, "adafinal");
 
-   function main
-     (argc : Integer;
-      argv : System.Address;
-      envp : System.Address) return Integer;
+   function main (argc : Integer; argv : System.Address;
+      envp             : System.Address) return Integer;
    pragma Export (C, main, "main");
 
    type Version_32 is mod 2**32;

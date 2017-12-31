@@ -40,17 +40,10 @@ begin
       "CHECK THAT 'FIRST AND 'LAST WORK FOR" &
       " ENUMERATION TYPES AND SUBTYPES");
 
-   if E'First /= E1 or
-     E'Last /= E5 or
-     E'Base'First /= E1 or
-     E'Base'Last /= E5 or
-     S'Base'First /= E1 or
-     S'Base'Last /= E5 or
-     S'First /= E2 or
-     S'Last /= E4 or
-     Boolean'First /= False or
-     Boolean'Last /= True
-   then
+   if E'First /= E1 or E'Last /= E5 or E'Base'First /= E1 or
+     E'Base'Last /= E5 or S'Base'First /= E1 or S'Base'Last /= E5 or
+     S'First /= E2 or S'Last /= E4 or Boolean'First /= False or
+     Boolean'Last /= True then
       Failed ("'FIRST OR 'LAST GIVES WRONG RESULTS");
    end if;
 

@@ -63,8 +63,7 @@ begin
       when E : Ada.Assertions.Assertion_Error =>
          Report.Comment ("Assertion_Error raised");
          Report.Comment
-           ("Exception message is: """ &
-            Ada.Exceptions.Exception_Message (E) &
+           ("Exception message is: """ & Ada.Exceptions.Exception_Message (E) &
             '"');
          Report.Comment ("Verify that count is 3");
          pragma Assert (Count (S) = 3);

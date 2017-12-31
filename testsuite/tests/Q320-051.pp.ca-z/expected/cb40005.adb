@@ -96,8 +96,7 @@ begin  -- Main test procedure.
 
    Fail_Soft.Fail_Soft_Call
      (Cause_Invisible_Exception'Access,     -- I
-      null,
-      Retry_Procedure'Access);
+      null, Retry_Procedure'Access);
 
    Tctouch.Assert (Fail_Soft.Event_Stack_Size = 0, "Empty stack");
 
@@ -115,8 +114,7 @@ begin  -- Main test procedure.
 
    Fail_Soft.Fail_Soft_Call
      (Cause_Invisible_Exception'Access,     -- I
-      null,
-      Retry_Procedure'Access);             -- RA
+      null, Retry_Procedure'Access);             -- RA
 
    Tctouch.Assert (Fail_Soft.Event_Stack_Size = 3, "Stack = 3");
 

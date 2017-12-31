@@ -44,10 +44,8 @@ procedure C37213f is
 
    F1_Cons : Integer := 2;
 
-   function Chk
-     (Cons    : Integer;
-      Value   : Integer;
-      Message : String) return Boolean
+   function Chk (Cons : Integer; Value : Integer;
+      Message         : String) return Boolean
    is
    begin
       if Cons /= Value then
@@ -68,8 +66,7 @@ begin
       "CHECK EVALUATION OF DISCRIMINANT EXPRESSIONS " &
       "WHEN CONSTRAINT DEPENDS ON DISCRIMINANT, " &
       "DISCRIMINANTS HAVE DEFAULTS, AND COMPONENT" &
-      "SUBTYPE DETERMINES WHETHER CONSTRAINT SHOULD " &
-      "BE CHECKED");
+      "SUBTYPE DETERMINES WHETHER CONSTRAINT SHOULD " & "BE CHECKED");
 
 -- CASE D1: COMPONENT IS PRESENT
 

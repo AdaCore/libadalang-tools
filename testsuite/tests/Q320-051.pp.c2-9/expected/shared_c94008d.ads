@@ -35,9 +35,8 @@
    type Value_Type is private;
    Initial_Value : Holder_Type;
    with procedure Set (Holder : out Holder_Type; Value : in Holder_Type) is <>;
-   with procedure Update
-     (Holder : in out Holder_Type;
-      Value  : in     Value_Type) is <>;
+   with procedure Update (Holder : in out Holder_Type;
+      Value                      : in     Value_Type) is <>;
 package Shared_C94008d is
    procedure Set (Value : in Holder_Type);
    procedure Update (Value : in Value_Type);

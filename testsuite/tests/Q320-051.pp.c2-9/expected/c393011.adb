@@ -17,21 +17,15 @@ begin
       "Check that an extended type can be derived " & "from an abstract type");
 
    if (Definitions.Display_Device /= Definitions.Bit_Bucket) or
-     (Definitions.Next /= 1) or
-     (Fa.Status /= Definitions.None) or
-     (Fa.Serial_Num /= 0) or
-     (Fa.Display_Dev /= Tty)
-   then
+     (Definitions.Next /= 1) or (Fa.Status /= Definitions.None) or
+     (Fa.Serial_Num /= 0) or (Fa.Display_Dev /= Tty) then
       Report.Failed ("Incorrect initial conditions");
    end if;
 
    Handle (Fa);
    if (Definitions.Display_Device /= Definitions.Tty) or
-     (Definitions.Next /= 2) or
-     (Fa.Status /= Definitions.Handled) or
-     (Fa.Serial_Num /= 1) or
-     (Fa.Display_Dev /= Tty)
-   then
+     (Definitions.Next /= 2) or (Fa.Status /= Definitions.Handled) or
+     (Fa.Serial_Num /= 1) or (Fa.Display_Dev /= Tty) then
       Report.Failed ("Incorrect results from Handle");
    end if;
 

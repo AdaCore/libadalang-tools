@@ -10,10 +10,8 @@ package body Cxe4005_Common is
    -- wrong object is passed to these routines then the exception Wrong_Object
    -- is raised.
 
-   procedure Single_Controlling_Operand
-     (Rtt         :        access Root_Tagged_Type;
-      Test_Number : in     Integer;
-      Obj_Sn      :    out Integer)
+   procedure Single_Controlling_Operand (Rtt :    access Root_Tagged_Type;
+      Test_Number : in Integer; Obj_Sn : out Integer)
    is
    begin
       Obj_Sn := Serial_Number (Rtt);
@@ -22,12 +20,9 @@ package body Cxe4005_Common is
       end if;
    end Single_Controlling_Operand;
 
-   procedure Dual_Controlling_Operands
-     (Rtt1        :        access Root_Tagged_Type;
-      Rtt2        :        access Root_Tagged_Type;
-      Test_Number : in     Integer;
-      Obj_Sn1     :    out Integer;
-      Obj_Sn2     :    out Integer)
+   procedure Dual_Controlling_Operands (Rtt1 :     access Root_Tagged_Type;
+      Rtt2 :     access Root_Tagged_Type; Test_Number : in Integer;
+      Obj_Sn1 : out Integer; Obj_Sn2 : out Integer)
    is
    begin
       Obj_Sn1 := Rtt1.Serial_Number;

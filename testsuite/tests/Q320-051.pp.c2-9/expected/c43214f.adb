@@ -37,8 +37,7 @@ procedure C43214f is
 begin
 
    Test
-     ("C43214F",
-      "ARRAY COMPONENT EXPRESSION OF AN ENCLOSING " & "AGGREGATE");
+     ("C43214F", "ARRAY COMPONENT EXPRESSION OF AN ENCLOSING " & "AGGREGATE");
 
    begin
 
@@ -60,9 +59,7 @@ begin
             E1 := (1 .. 2 => "ABC");
             if (E1'First /= 1 or E1'Last /= 2)
               or else
-              (E1 (1)'First /= 3 or
-               E1 (1)'Last /= 5 or
-               E1 (2)'First /= 3 or
+              (E1 (1)'First /= 3 or E1 (1)'Last /= 5 or E1 (2)'First /= 3 or
                E1 (2)'Last /= 5)
             then
                Failed ("CASE 1 : INCORRECT BOUNDS");
@@ -111,9 +108,7 @@ begin
             E3 := (1 .. 2 => "");
             if (E3'First /= 1 or E3'Last /= 2)
               or else
-              (E3 (1)'First /= 3 or
-               E3 (1)'Last /= 2 or
-               E3 (2)'First /= 3 or
+              (E3 (1)'First /= 3 or E3 (1)'Last /= 2 or E3 (2)'First /= 3 or
                E3 (2)'Last /= 2)
             then
                Failed ("CASE 3 : INCORRECT BOUND");

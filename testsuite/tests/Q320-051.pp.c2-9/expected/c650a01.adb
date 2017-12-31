@@ -29,18 +29,15 @@ begin
       Sa := C650a01_Map.Get_Item (Key => 4);
       Na := C650a01_Map.Get_Item (Key => 33); -- No item here.
       if Pa.all'Tag /= F650a00.P.Practice_Alert'Tag
-        or else Pa.Alert_Time /= 8.0
-      then
+        or else Pa.Alert_Time /= 8.0 then
          Report.Failed ("PA object has wrong value");
       end if;
       if Ta.all'Tag /= F650a00.P.Practice_Alert'Tag
-        or else Ta.Alert_Time /= 0.0
-      then
+        or else Ta.Alert_Time /= 0.0 then
          Report.Failed ("TA object has wrong value");
       end if;
       if Sa.all'Tag /= F650a00.S.Special_Alert'Tag
-        or else Sa.Alert_Time /= 54.0
-      then
+        or else Sa.Alert_Time /= 54.0 then
          Report.Failed ("SA object has wrong value");
       end if;
       if Na /= null then

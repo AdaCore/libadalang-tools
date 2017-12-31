@@ -69,14 +69,11 @@ package Fa11a00.Ca11a01_0 is     -- Color_Widget_Pkg
    -- from Widget.
 
    -- To be inherited by its derivatives.
-   procedure Set_Color
-     (The_Widget : in out Color_Widget;
-      C          : in     Widget_Color_Enum);
+   procedure Set_Color (The_Widget : in out Color_Widget;
+      C                            : in     Widget_Color_Enum);
 
-   procedure Set_Color_Widget
-     (The_Widget : in out Color_Widget;
-      The_Width  : in     Widget_Length;
-      The_Height : in     Widget_Length;
-      The_Color  : in     Widget_Color_Enum);
+   procedure Set_Color_Widget (The_Widget : in out Color_Widget;
+      The_Width : in     Widget_Length; The_Height : in Widget_Length;
+      The_Color                           : in     Widget_Color_Enum);
 
 end Fa11a00.Ca11a01_0;     -- Color_Widget_Pkg

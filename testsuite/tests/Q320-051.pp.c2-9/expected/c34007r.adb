@@ -57,14 +57,8 @@ procedure C34007r is
 
       type Parent is access Designated;
 
-      function Create
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         C : Component;
-         F : Float;
-         X : Parent  -- TO RESOLVE OVERLOADING.
+      function Create (B : Boolean; L : Length; I : Integer; S : String;
+         C : Component; F : Float; X : Parent  -- TO RESOLVE OVERLOADING.
          ) return Parent;
 
    end Pkg;
@@ -82,14 +76,8 @@ procedure C34007r is
 
    package body Pkg is
 
-      function Create
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         C : Component;
-         F : Float;
-         X : Parent) return Parent
+      function Create (B : Boolean; L : Length; I : Integer; S : String;
+         C               : Component; F : Float; X : Parent) return Parent
       is
       begin
          case B is
@@ -117,14 +105,12 @@ begin
    -- CHECK THAT BASE TYPE VALUES NOT IN THE SUBTYPE ARE PRESENT.
 
    if Create (False, 2, 3, "ZZ", 5, 6.0, X).all /= (False, 2, 3, 6.0) or
-     Create (False, 2, 3, "ZZ", 5, 6.0, Y).all /= (False, 2, 3, 6.0)
-   then
+     Create (False, 2, 3, "ZZ", 5, 6.0, Y).all /= (False, 2, 3, 6.0) then
       Failed ("CAN'T CREATE BASE TYPE VALUES OUTSIDE THE SUBTYPE");
    end if;
 
    if Create (False, 2, 3, "ZZ", 5, 6.0, X) in T or
-     Create (False, 2, 3, "ZZ", 5, 6.0, Y) in S
-   then
+     Create (False, 2, 3, "ZZ", 5, 6.0, Y) in S then
       Failed ("INCORRECT ""IN""");
    end if;
 
@@ -170,8 +156,7 @@ begin
          "X := NEW DESIGNATED'(TRUE, 4, 2, ""ZZZZ"", 6)");
       if X = null or else X.all = (True, 4, 2, "ZZZZ", 6) then  -- USE X.
          Comment
-           ("X ALTERED -- " &
-            "X := NEW DESIGNATED'" &
+           ("X ALTERED -- " & "X := NEW DESIGNATED'" &
             "(TRUE, 4, 2, ""ZZZZ"", 6)");
       end if;
    exception
@@ -207,8 +192,7 @@ begin
          "Y := NEW DESIGNATED'(TRUE, 4, 2, ""ZZZZ"", 6)");
       if Y = null or else Y.all = (True, 4, 2, "ZZZZ", 6) then  -- USE Y.
          Comment
-           ("Y ALTERED -- " &
-            "Y := NEW DESIGNATED'" &
+           ("Y ALTERED -- " & "Y := NEW DESIGNATED'" &
             "(TRUE, 4, 2, ""ZZZZ"", 6)");
       end if;
    exception

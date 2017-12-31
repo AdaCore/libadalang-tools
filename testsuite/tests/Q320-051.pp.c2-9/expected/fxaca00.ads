@@ -95,9 +95,7 @@ package Fxaca00 is
    Product_02 : Product_Type (Manufacture => Foreign) :=
      (Foreign, "Product2", 2, "Importer02");
    Product_03 : Product_Type (Foreign) :=
-     (Manufacture => Foreign,
-      Item        => "Product3",
-      Id          => 3,
+     (Manufacture => Foreign, Item => "Product3", Id => 3,
       Importer    => "Importer03");
    --
 
@@ -113,9 +111,7 @@ package Fxaca00 is
      (Domestic, "Buyer2", True, False);
 
    Sale_Rec_03 : Sales_Record_Type (Buyer => Foreign) :=
-     (Buyer             => Foreign,
-      Name              => "Buyer3",
-      Sale_Item         => True,
+     (Buyer             => Foreign, Name => "Buyer3", Sale_Item => True,
       Quantity_Discount => True);
 
    Sale_Rec_04 : Sales_Record_Type (Foreign) :=

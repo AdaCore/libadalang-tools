@@ -88,8 +88,7 @@ procedure C761006 is
    exception
       when Program_Error =>  -- expected case
          if Sup.Events_Occurring (Sup.Good_Finalize) /=
-           Sup.Events_Occurring (Sup.Good_Adjust)
-         then
+           Sup.Events_Occurring (Sup.Good_Adjust) then
             -- RM 7.6.1(16/1) says that the good Adjust may or may not be
             -- performed; but if it is, then the Finalize must be performed;
             -- and if it is not, then the Finalize must not performed.
@@ -143,8 +142,7 @@ procedure C761006 is
 
          type Shark is access C761006_2.Fin_Check;
 
-         procedure Catch is new Unchecked_Deallocation
-           (C761006_2.Fin_Check,
+         procedure Catch is new Unchecked_Deallocation (C761006_2.Fin_Check,
             Shark);
 
          procedure Finalize_17_Inner is
@@ -202,9 +200,7 @@ begin  -- Main test procedure.
       "Adjust and Finalize are processed correctly");
 
    Sub_Tests :=
-     (Simple_Test'Access,
-      Initialize_Test'Access,
-      Adjust_Test'Access,
+     (Simple_Test'Access, Initialize_Test'Access, Adjust_Test'Access,
       Finalize_Test'Access);
 
    for Test in Sub_Tests'Range loop
@@ -225,8 +221,7 @@ begin  -- Main test procedure.
             when Finalize =>
                -- Note that for Good_Adjust, we may get either True or False
                if Sup.Events_Occurring (Sup.Good_Initialize) = False or
-                 Sup.Events_Occurring (Sup.Good_Finalize) = False
-               then
+                 Sup.Events_Occurring (Sup.Good_Finalize) = False then
                   Report.Failed
                     ("Other operation missing in " & Test_Id'Image (Test));
                end if;
@@ -235,8 +230,7 @@ begin  -- Main test procedure.
       exception
          when How : others =>
             Report.Failed
-              (Ada.Exceptions.Exception_Name (How) &
-               " from " &
+              (Ada.Exceptions.Exception_Name (How) & " from " &
                Test_Id'Image (Test));
       end;
    end loop;

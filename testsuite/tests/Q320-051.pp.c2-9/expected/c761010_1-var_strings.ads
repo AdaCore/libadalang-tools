@@ -15,9 +15,7 @@ private
 
    type String_Ptr is access constant String;
 
-   type Var_String
-     (Length : Natural)
-   is new Finalization.Controlled with
+   type Var_String (Length : Natural) is new Finalization.Controlled with
    record
       Comp_1 : String_Ptr := new String'(2 .. Square (Length) - 1 => 'x');
       Comp_2 : String_Ptr (1 .. Length)  := null;
@@ -29,19 +27,11 @@ private
    procedure Finalize (X : in out Var_String);
 
    Some_String : constant Var_String :=
-     (Finalization.Controlled with
-      Length => 1,
-      Comp_1 => null,
-      Comp_2 => null,
-      Comp_3 => "x",
-      Tc_Lab => 'A');
+     (Finalization.Controlled with Length => 1, Comp_1 => null, Comp_2 => null,
+      Comp_3                              => "x", Tc_Lab => 'A');
 
    Another_String : constant Var_String :=
-     (Finalization.Controlled with
-      Length => 10,
-      Comp_1 => Some_String.Comp_2,
-      Comp_2 => new String'("1234567890"),
-      Comp_3 => "x",
-      Tc_Lab => 'B');
+     (Finalization.Controlled with Length => 10, Comp_1 => Some_String.Comp_2,
+      Comp_2 => new String'("1234567890"), Comp_3 => "x", Tc_Lab => 'B');
 
 end C761010_1.Var_Strings;

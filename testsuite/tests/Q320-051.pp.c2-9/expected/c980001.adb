@@ -28,9 +28,7 @@ procedure C980001 is
          C980001_0.Fail_And_Clear ("Finalize did not correctly complete");
       end if;
       Tctouch.Validate
-        ("FfFfFf",
-         "Finalization Sequence",
-         Order_Meaningful => False);
+        ("FfFfFf", "Finalization Sequence", Order_Meaningful => False);
    end Check_Finalize_Conditions;
 
    procedure Wait_Your_Turn is
@@ -89,8 +87,7 @@ begin  -- Main test procedure.
       begin
          Object1 := Object2;
          delay Impdef.Minimum_Task_Switch;
-         if Report.Ident_Int (Object2.Item) /=
-           Report.Ident_Int (Object1.Item)
+         if Report.Ident_Int (Object2.Item) /= Report.Ident_Int (Object1.Item)
          then
             Report.Failed ("Optimization foil 1 caused failure");
          end if;
@@ -114,8 +111,7 @@ begin  -- Main test procedure.
       begin
          Object1 := Object2;  -- cause a finalize call
          delay Impdef.Minimum_Task_Switch;
-         if Report.Ident_Int (Object2.Item) /=
-           Report.Ident_Int (Object1.Item)
+         if Report.Ident_Int (Object2.Item) /= Report.Ident_Int (Object1.Item)
          then
             Report.Failed ("Optimization foil 2 caused failure");
          end if;

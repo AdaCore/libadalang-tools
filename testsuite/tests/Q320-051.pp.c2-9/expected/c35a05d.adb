@@ -68,12 +68,8 @@ procedure C35a05d is
 
    -------------------------------------------------------------------
 
-   procedure Check_Fore_And_Aft
-     (Name         : String;
-      Actual_Fore  : Integer;
-      Correct_Fore : Positive;
-      Actual_Aft   : Integer;
-      Correct_Aft  : Positive)
+   procedure Check_Fore_And_Aft (Name : String; Actual_Fore : Integer;
+      Correct_Fore : Positive; Actual_Aft : Integer; Correct_Aft : Positive)
    is
    begin
       if Actual_Fore /= Ident_Int (Correct_Fore) then
@@ -89,31 +85,19 @@ begin
    Test
      ("C35A05D",
       "CHECK THAT FOR FIXED POINT TYPES THE FORE AND " &
-      "AFT ATTRIBUTES YIELD THE CORRECT VALUES - " &
-      "TYPICAL TYPES");
+      "AFT ATTRIBUTES YIELD THE CORRECT VALUES - " & "TYPICAL TYPES");
 
    Check_Fore_And_Aft
-     ("MICRO_ANGLE_ERROR_M15",
-      Micro_Angle_Error_M15'Fore,
-      7,
-      Micro_Angle_Error_M15'Aft,
-      1);
+     ("MICRO_ANGLE_ERROR_M15", Micro_Angle_Error_M15'Fore, 7,
+      Micro_Angle_Error_M15'Aft, 1);
 
    Check_Fore_And_Aft
-     ("TRACK_RANGE_M15",
-      Track_Range_M15'Fore,
-      5,
-      Track_Range_M15'Aft,
-      1);
+     ("TRACK_RANGE_M15", Track_Range_M15'Fore, 5, Track_Range_M15'Aft, 1);
 
    Check_Fore_And_Aft ("SECONDS_MM", Seconds_Mm'Fore, 4, Seconds_Mm'Aft, 5);
 
    Check_Fore_And_Aft
-     ("RANGE_CELL_MM",
-      Range_Cell_Mm'Fore,
-      7,
-      Range_Cell_Mm'Aft,
-      2);
+     ("RANGE_CELL_MM", Range_Cell_Mm'Fore, 7, Range_Cell_Mm'Aft, 2);
 
    Check_Fore_And_Aft ("PIXEL_M10", Pixel_M10'Fore, 2, Pixel_M10'Aft, 4);
 
@@ -124,48 +108,30 @@ begin
    Check_Fore_And_Aft ("MILES_M16", Miles_M16'Fore, 5, Miles_M16'Aft, 2);
 
    Check_Fore_And_Aft
-     ("SYMMETRIC_DEGREES_M7",
-      Symmetric_Degrees_M7'Fore,
-      4,
-      Symmetric_Degrees_M7'Aft,
-      1);
+     ("SYMMETRIC_DEGREES_M7", Symmetric_Degrees_M7'Fore, 4,
+      Symmetric_Degrees_M7'Aft, 1);
 
    Check_Fore_And_Aft
-     ("NATURAL_DEGREES_M15",
-      Natural_Degrees_M15'Fore,
-      4,
-      Natural_Degrees_M15'Aft,
-      2);
+     ("NATURAL_DEGREES_M15", Natural_Degrees_M15'Fore, 4,
+      Natural_Degrees_M15'Aft, 2);
 
    Check_Fore_And_Aft
-     ("SYMMETRIC_RADIANS_M16",
-      Symmetric_Radians_M16'Fore,
-      2,
-      Symmetric_Radians_M16'Aft,
-      5);
+     ("SYMMETRIC_RADIANS_M16", Symmetric_Radians_M16'Fore, 2,
+      Symmetric_Radians_M16'Aft, 5);
 
    Check_Fore_And_Aft
-     ("NATURAL_RADIANS_M8",
-      Natural_Radians_M8'Fore,
-      2,
-      Natural_Radians_M8'Aft,
+     ("NATURAL_RADIANS_M8", Natural_Radians_M8'Fore, 2, Natural_Radians_M8'Aft,
       2);
 
    Check_Fore_And_Aft ("ST_MILES_M8", St_Miles_M8'Fore, 3, St_Miles_M8'Aft, 2);
 
    Check_Fore_And_Aft
-     ("ST_NATURAL_DEGREES_M11",
-      St_Natural_Degrees_M11'Fore,
-      4,
-      St_Natural_Degrees_M11'Aft,
-      1);
+     ("ST_NATURAL_DEGREES_M11", St_Natural_Degrees_M11'Fore, 4,
+      St_Natural_Degrees_M11'Aft, 1);
 
    Check_Fore_And_Aft
-     ("ST_SYMMETRIC_RADIANS_M8",
-      St_Symmetric_Radians_M8'Fore,
-      2,
-      St_Symmetric_Radians_M8'Aft,
-      2);
+     ("ST_SYMMETRIC_RADIANS_M8", St_Symmetric_Radians_M8'Fore, 2,
+      St_Symmetric_Radians_M8'Aft, 2);
 
    Result;
 

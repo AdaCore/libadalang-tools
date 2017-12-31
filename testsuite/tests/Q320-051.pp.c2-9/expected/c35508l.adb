@@ -36,8 +36,7 @@ begin
      ("C35508L",
       "CHECK THAT 'POS' AND 'VAL' YIELD THE " &
       "CORRECT RESULTS WHEN THE PREFIX IS A " &
-      "FORMAL DISCRETE TYPE WHOSE ACTUAL PARAMETER " &
-      "IS A BOOLEAN TYPE");
+      "FORMAL DISCRETE TYPE WHOSE ACTUAL PARAMETER " & "IS A BOOLEAN TYPE");
 
    declare
       type Newbool is new Boolean;
@@ -77,54 +76,37 @@ begin
          begin
             if Bool'Val (I) = B then
                Failed
-                 (Str &
-                  "'VAL OF " &
-                  Integer'Image (I) &
-                  " = " &
+                 (Str & "'VAL OF " & Integer'Image (I) & " = " &
                   Bool'Image (B));
             end if;
             Failed
-              ("NO EXCEPTION RAISED FOR " &
-               Str &
-               "'VAL OF " &
+              ("NO EXCEPTION RAISED FOR " & Str & "'VAL OF " &
                Integer'Image (I));
          exception
             when Constraint_Error =>
                null;
             when others =>
                Failed
-                 ("WRONG EXCEPTION RAISED FOR " &
-                  Str &
-                  "'VAL " &
-                  "OF " &
+                 ("WRONG EXCEPTION RAISED FOR " & Str & "'VAL " & "OF " &
                   Integer'Image (I));
          end;
 
          begin
             if Sbool'Val (I) = B then
                Failed
-                 (Str &
-                  " SBOOL'VAL OF " &
-                  Integer'Image (I) &
-                  " = " &
+                 (Str & " SBOOL'VAL OF " & Integer'Image (I) & " = " &
                   Bool'Image (B));
             end if;
             Failed
-              ("NO EXCEPTION RAISED FOR VAL OF " &
-               Integer'Image (I) &
-               "WITH SBOOL OF " &
-               Str);
+              ("NO EXCEPTION RAISED FOR VAL OF " & Integer'Image (I) &
+               "WITH SBOOL OF " & Str);
          exception
             when Constraint_Error =>
                null;
             when others =>
                Failed
-                 ("WRONG EXCEPTION RAISED FOR " &
-                  Str &
-                  "'VAL " &
-                  "OF " &
-                  Integer'Image (I) &
-                  "WITH SBOOL ");
+                 ("WRONG EXCEPTION RAISED FOR " & Str & "'VAL " & "OF " &
+                  Integer'Image (I) & "WITH SBOOL ");
          end;
       end Q;
 

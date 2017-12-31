@@ -40,8 +40,7 @@ begin
       "declaration of a user-defined subprogram of a formal " &
       "derived record type declares a view of the corresponding " &
       "primitive subprogram of the ancestor, even if the " &
-      "primitive subprogram has been overridden for the actual " &
-      "type");
+      "primitive subprogram has been overridden for the actual " & "type");
 
    if (Fraction_Io.Put (Tc_Root_Type_Of_Class) /= Tc_Expected_Result) then
       Report.Failed ("Wrong result for root type");

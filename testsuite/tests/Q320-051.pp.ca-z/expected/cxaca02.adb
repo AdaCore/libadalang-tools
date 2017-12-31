@@ -80,9 +80,7 @@ begin
       -- Not_Applicable result.
 
       Ada.Streams.Stream_Io.Create
-        (Data_File,
-         Ada.Streams.Stream_Io.Out_File,
-         The_Filename);
+        (Data_File, Ada.Streams.Stream_Io.Out_File, The_Filename);
 
       Operational_Test_Block :
       declare
@@ -146,11 +144,8 @@ begin
          Sale_Rec_02 : Sales_Record_Type :=
            ("Buyer 02", True, Domestic, True, False);
          Sale_Rec_03 : Sales_Record_Type :=
-           (Name              => "Buyer 03",
-            Sale_Item         => True,
-            Buyer             => Foreign,
-            Quantity_Discount => False,
-            Cash_Discount     => True);
+           (Name => "Buyer 03", Sale_Item => True, Buyer => Foreign,
+            Quantity_Discount => False, Cash_Discount => True);
          Sale_Rec_04 : Sales_Record_Type :=
            ("Buyer 04", True, Foreign, False, False);
          Sale_Rec_05 : Sales_Record_Type :=
@@ -229,20 +224,15 @@ begin
          begin
             Tc_Write_Total := Tc_Write_Total + 10;
 
-            String_Data_Type'Output
-              (Data_Stream,
+            String_Data_Type'Output (Data_Stream,
                The_Item.Name);    -- Field 1.
-            Boolean'Write
-              (Data_Stream,
+            Boolean'Write (Data_Stream,
                The_Item.Sale_Item);         -- Field 2.
-            Origin_Type'Write
-              (Data_Stream,
+            Origin_Type'Write (Data_Stream,
                The_Item.Buyer);         -- Field 3.
-            Boolean'Write
-              (Data_Stream,
+            Boolean'Write (Data_Stream,
                The_Item.Quantity_Discount); -- Field 4.
-            Boolean'Write
-              (Data_Stream,
+            Boolean'Write (Data_Stream,
                The_Item.Cash_Discount);     -- Field 5.
          end Sales_Write;
 
@@ -269,10 +259,7 @@ begin
 
             Tc_Product1, Tc_Product2 : Product_Type;
 
-            Tc_Sale1,
-            Tc_Sale2,
-            Tc_Sale3,
-            Tc_Sale4,
+            Tc_Sale1, Tc_Sale2, Tc_Sale3, Tc_Sale4,
             Tc_Sale5 : Sales_Record_Type;
 
          begin
@@ -281,8 +268,7 @@ begin
             -- may be performed.
 
             Ada.Streams.Stream_Io.Reset
-              (Data_File,
-               Ada.Streams.Stream_Io.In_File);
+              (Data_File, Ada.Streams.Stream_Io.In_File);
 
             -- Data is read/reconstructed from the stream, in the order that
             -- the data was placed into the stream.
@@ -343,9 +329,7 @@ begin
          Ada.Streams.Stream_Io.Delete (Data_File);
       else
          Ada.Streams.Stream_Io.Open
-           (Data_File,
-            Ada.Streams.Stream_Io.Out_File,
-            The_Filename);
+           (Data_File, Ada.Streams.Stream_Io.Out_File, The_Filename);
          Ada.Streams.Stream_Io.Delete (Data_File);
       end if;
 

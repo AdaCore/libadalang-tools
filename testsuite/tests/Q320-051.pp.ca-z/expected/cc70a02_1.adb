@@ -2,9 +2,8 @@
 
 package body Cc70a02_1 is  -- Mathematical group operations.
 
-   function Power
-     (Left  : Group.Group_Type;
-      Right : Integer) return Group.Group_Type
+   function Power (Left : Group.Group_Type;
+      Right             : Integer) return Group.Group_Type
    is
       Result : Group.Group_Type := Group.Identity;
    begin

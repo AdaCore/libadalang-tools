@@ -39,10 +39,8 @@ procedure Ca11014 is
    --------------------------------------------------
 
    -- Verify that all scores have been set to zero.
-   procedure Tc_Verify_List
-     (L        : in out Lists_Of_Scores.List_Type;
-      Expected : in     Tc_Score_Array;
-      Ok       :    out Boolean)
+   procedure Tc_Verify_List (L : in out Lists_Of_Scores.List_Type;
+      Expected                 : in     Tc_Score_Array; Ok : out Boolean)
    is
       Actual : Tc_Score_Array;
    begin

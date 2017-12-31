@@ -54,8 +54,7 @@ begin
       exception
          when Use_Error =>
             Not_Applicable
-              ("USE_ERROR RAISED; TEXT " &
-               "CREATE FOR TEMP FILES " &
+              ("USE_ERROR RAISED; TEXT " & "CREATE FOR TEMP FILES " &
                "WITH OUT_FILE MODE");
             raise Incomplete;
       end;

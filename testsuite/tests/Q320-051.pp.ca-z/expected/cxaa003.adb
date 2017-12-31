@@ -87,9 +87,7 @@ begin
       -- exception will be handled to produce a Not_Applicable result.
 
       Text_Io.Create
-        (File => Data_File,
-         Mode => Text_Io.Out_File,
-         Name => Data_Filename);
+        (File => Data_File, Mode => Text_Io.Out_File, Name => Data_Filename);
    exception
       when Text_Io.Use_Error | Text_Io.Name_Error =>
          Report.Not_Applicable
@@ -147,8 +145,7 @@ begin
          -- Test control code.
          if (Integer (Text_Io.Page (The_File)) /= Report.Ident_Int (3)) or
            (Integer (Text_Io.Line (The_File)) /= Report.Ident_Int (3)) or
-           (Integer (Text_Io.Col (The_File)) /= Report.Ident_Int (1))
-         then
+           (Integer (Text_Io.Col (The_File)) /= Report.Ident_Int (1)) then
             Report.Failed ("Set_Line failed for current line");
          end if;
 
@@ -158,8 +155,7 @@ begin
 
          -- Test control code.
          if (Integer (Text_Io.Line (The_File)) /= Report.Ident_Int (4)) or
-           (Integer (Text_Io.Col (The_File)) /= Report.Ident_Int (10))
-         then
+           (Integer (Text_Io.Col (The_File)) /= Report.Ident_Int (10)) then
             Report.Failed ("Incorrect results from line/column positioning");
          end if;
 
@@ -232,11 +228,9 @@ begin
          for I in 1 .. 2 loop                   -- and read the contents.
             Text_Io.Get_Line (Data_File, Tc_String, Tc_Position);
          end loop;
-         if (Tc_Position /= 13)
-           or else         -- Verify the title line.
-           (Tc_String (1 .. 2) /= "IX")
-           or else (Tc_String (3 .. 13) /= (".  " & Glossary_Title))
-         then
+         if (Tc_Position /= 13) or else         -- Verify the title line.
+         (Tc_String (1 .. 2) /= "IX")
+           or else (Tc_String (3 .. 13) /= (".  " & Glossary_Title)) then
             Report.Failed ("Incorrect positioning of title line");
          end if;
 
@@ -247,8 +241,7 @@ begin
          end loop;
 
          if (Tc_Position /= 12) or              -- Verify the contents.
-           (Tc_String (8 .. 12) /= "  " & Glossary_Content)
-         then
+           (Tc_String (8 .. 12) /= "  " & Glossary_Content) then
             Report.Failed ("Incorrect positioning of contents line");
          end if;
 

@@ -114,8 +114,7 @@ begin
          -- CHECKING THE VALUES AFTER THE STRING ASSIGNMENT:
 
          if Arr82 /= "QUINC" or
-           Arr82 (Ident_Int (5) .. Ident_Int (9)) /= "QUINC"
-         then
+           Arr82 (Ident_Int (5) .. Ident_Int (9)) /= "QUINC" then
             Failed ("ORIGINAL VALUE ALTERED (8)");
          end if;
 
@@ -159,8 +158,7 @@ begin
          -- CHECKING THE VALUES AFTER THE STRING ASSIGNMENT:
 
          if Arr92 /= "QUINC" or
-           Arr92 (Ident_Int (5) .. Ident_Int (9)) /= "QUINC"
-         then
+           Arr92 (Ident_Int (5) .. Ident_Int (9)) /= "QUINC" then
             Failed ("ORIGINAL VALUE ALTERED (9)");
          end if;
 

@@ -101,10 +101,8 @@ begin
             Report.Failed ("WRONG EXCEPTION RAISED - PA1");
       end Pa;
 
-      procedure New_Pa is new Pa
-        (Integer_Type => Number,
-         Lower        => 1,
-         Upper        => 50);
+      procedure New_Pa is new Pa (Integer_Type => Number, Lower => 1,
+         Upper                                 => 50);
 
    begin   -- NONSTAT_ARRAY_PARMS
 
@@ -217,12 +215,8 @@ begin
             Report.Failed ("WRONG EXCEPTION RAISED - PC1");
       end Pc;
 
-      procedure New_Pc is new Pc
-        (Integer_Type   => Number,
-         F_Static_Value => 15,
-         S_Static_Value => 19,
-         T_Static_Value => 85,
-         L_Static_Value => 99);
+      procedure New_Pc is new Pc (Integer_Type => Number, F_Static_Value => 15,
+         S_Static_Value => 19, T_Static_Value => 85, L_Static_Value => 99);
 
    begin   -- REC_NON_STAT_COMPS
       New_Pc (Lower => 20, Upper => 80);
@@ -264,8 +258,7 @@ begin
          type A1 is
            array
              (Integer_Type range F_Static_Value .. S_Static_Value,
-              Integer_Type range
-                T_Static_Value ..
+              Integer_Type range T_Static_Value ..
                   L_Static_Value) of Subinteger_Type;
 
          procedure P1d1
@@ -289,16 +282,10 @@ begin
             Report.Failed ("WRONG EXCEPTION RAISED - P1D1");
       end P1d;
 
-      procedure New_P1d is new P1d
-        (Integer_Type   => Number,
-         F_Static_Value => 21,
-         S_Static_Value => 37,
-         T_Static_Value => 67,
-         L_Static_Value => 79,
-         A_Static_Value => 11,
-         B_Static_Value => 88,
-         C_Static_Value => 87,
-         D_Static_Value => 13);
+      procedure New_P1d is new P1d (Integer_Type => Number,
+         F_Static_Value => 21, S_Static_Value => 37, T_Static_Value => 67,
+         L_Static_Value => 79, A_Static_Value => 11, B_Static_Value => 88,
+         C_Static_Value                          => 87, D_Static_Value => 13);
 
    begin  -- FIRST_STATIC_ARRAY
       New_P1d (Lower => 10, Upper => 90);
@@ -338,8 +325,7 @@ begin
          type A1 is
            array
              (Integer_Type range F_Static_Value .. S_Static_Value,
-              Integer_Type range
-                T_Static_Value ..
+              Integer_Type range T_Static_Value ..
                   L_Static_Value) of Subinteger_Type;
 
          procedure P2d1
@@ -363,14 +349,9 @@ begin
             Report.Failed ("WRONG EXCEPTION RAISED - P2D1");
       end P2d;
 
-      procedure New_P2d is new P2d
-        (Integer_Type   => Number,
-         F_Static_Value => 21,
-         S_Static_Value => 37,
-         T_Static_Value => 67,
-         L_Static_Value => 79,
-         A_Static_Value => 7,
-         B_Static_Value => 93);
+      procedure New_P2d is new P2d (Integer_Type => Number,
+         F_Static_Value => 21, S_Static_Value => 37, T_Static_Value => 67,
+         L_Static_Value => 79, A_Static_Value => 7, B_Static_Value => 93);
 
    begin  -- SECOND_STATIC_ARRAY
       New_P2d (Lower => 5, Upper => 95);
@@ -415,8 +396,7 @@ begin
 
          procedure Pe1
            (R : Rec4 :=
-              (D_Static_Value,
-               F_Static_Value,
+              (D_Static_Value, F_Static_Value,
                (S_Static_Value, T_Static_Value, L_Static_Value)))
          is
          begin  -- PE1
@@ -435,13 +415,9 @@ begin
             Report.Failed ("WRONG EXCEPTION RAISED - PE1");
       end Pe;
 
-      procedure New_Pe is new Pe
-        (Integer_Type   => Number,
-         F_Static_Value => 37,
-         S_Static_Value => 21,
-         T_Static_Value => 67,
-         L_Static_Value => 79,
-         D_Static_Value => 44);
+      procedure New_Pe is new Pe (Integer_Type => Number, F_Static_Value => 37,
+         S_Static_Value => 21, T_Static_Value => 67, L_Static_Value => 79,
+         D_Static_Value                        => 44);
 
    begin  -- REC_NON_STATIC_CONS
       New_Pe (Lower => 2, Upper => 99);

@@ -15,8 +15,7 @@ procedure Cxe1001_A is
 begin
 
    Report.Test
-     ("CXE1001_A",
-      "Check Partition IDs. " & "-- This is the FIRST PARTITION");
+     ("CXE1001_A", "Check Partition IDs. " & "-- This is the FIRST PARTITION");
 
    Cxe1001_P;
    Cxe1001_Q;
@@ -29,14 +28,11 @@ begin
    end if;
    if P_Id /= Main_Id then
       Report.Failed
-        ("Partition ID of main not same as procedure " &
-         "in partition" &
-         Hold_Partition_Id'Image (Main_Id) &
-         Hold_Partition_Id'Image (P_Id));
+        ("Partition ID of main not same as procedure " & "in partition" &
+         Hold_Partition_Id'Image (Main_Id) & Hold_Partition_Id'Image (P_Id));
    end if;
    Report.Special_Action
-     ("Partition ID of FIRST Partition is: " &
-      Hold_Partition_Id'Image (P_Id) &
+     ("Partition ID of FIRST Partition is: " & Hold_Partition_Id'Image (P_Id) &
       ".  Check that this is different from that " &
       "of the SECOND partition");
 

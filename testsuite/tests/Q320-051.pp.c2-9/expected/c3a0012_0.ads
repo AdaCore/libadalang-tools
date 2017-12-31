@@ -50,9 +50,8 @@ package C3a0012_0 is
    Log_Result : Float := 0.0;
 
    -- Type accesses to any log procedure
-   type Log_Procedure_Ptr is access procedure
-     (Angle    : in     Float;
-      Log_Call :    out Call_Kind);
+   type Log_Procedure_Ptr is access procedure (Angle : in     Float;
+      Log_Call                                       :    out Call_Kind);
 
    procedure Log_Calc_Fast (Angle : in Float; Method : out Call_Kind);
 

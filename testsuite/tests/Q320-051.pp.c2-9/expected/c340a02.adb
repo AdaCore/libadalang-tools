@@ -15,10 +15,8 @@ procedure C340a02 is
 
           --========================================================--
 
-   procedure Create_List
-     (Title, Author : in     C340a02_1.Data_List;
-      Pages         : in     C340a02_1.Page_Counts;
-      Head          : in out Node_Ptr)
+   procedure Create_List (Title, Author : in C340a02_1.Data_List;
+      Pages : in C340a02_1.Page_Counts; Head : in out Node_Ptr)
    is
 
       Book     : Node_Type;  -- Object of extended type.
@@ -63,9 +61,7 @@ begin  -- Main program.
 
    -- Create linked list using inherited operation:
    Create_List
-     (C340a02_1.Title_List,
-      C340a02_1.Author_List,
-      C340a02_1.Page_List,
+     (C340a02_1.Title_List, C340a02_1.Author_List, C340a02_1.Page_List,
       List_Of_Books);
 
    -- Verify results:

@@ -58,8 +58,7 @@ begin
      ("C94002B",
       "CHECK THAT A MASTER UNIT, WHICH ALLOCATES " &
       "TASKS OF A GLOBAL ACCESS TYPE MAY TERMINATE " &
-      "WITHOUT WAITING FOR THE ALLOCATED TASKS TO " &
-      "TERMINATE");
+      "WITHOUT WAITING FOR THE ALLOCATED TASKS TO " & "TERMINATE");
 
    --------------------------------------------------
 

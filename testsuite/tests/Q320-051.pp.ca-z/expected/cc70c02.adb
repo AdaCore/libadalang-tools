@@ -15,8 +15,7 @@ procedure Cc70c02 is
    Fc70c00_1 (Lists_Of_Points);
 
    package Points_List_Ops is new                     -- More points-list ops.
-   Cc70c02_0
-     (Lists          => Lists_Of_Points,
+   Cc70c02_0 (Lists  => Lists_Of_Points,
       Basic_List_Ops => Basic_Point_Ops);
 
    Scores : Lists_Of_Points.List_Type;                -- List of points.
@@ -36,10 +35,8 @@ procedure Cc70c02 is
       end loop;
    end Tc_Initialize_List;
 
-   procedure Tc_Verify_List
-     (L        : in out Lists_Of_Points.List_Type;
-      Expected : in     Tc_Score_Array;
-      Ok       :    out Boolean)
+   procedure Tc_Verify_List (L : in out Lists_Of_Points.List_Type;
+      Expected                 : in     Tc_Score_Array; Ok : out Boolean)
    is
       Actual : Tc_Score_Array;
    begin

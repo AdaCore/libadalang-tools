@@ -40,8 +40,7 @@ begin
    Test
      ("C48004B",
       "CHECK THAT THE FORM 'NEW T' IS PERMITTED IF " &
-      "T IS A CONSTRAINED RECORD, PRIVATE, OR " &
-      "LIMITED PRIVATE TYPE");
+      "T IS A CONSTRAINED RECORD, PRIVATE, OR " & "LIMITED PRIVATE TYPE");
 
    declare
 
@@ -114,8 +113,7 @@ begin
 
       Vlp := new Lpriv0;
       if
-        (Vlp.A /= Ident_Int (1) or
-         Vlp.B /= 1 or
+        (Vlp.A /= Ident_Int (1) or Vlp.B /= 1 or
          P.Fun (Vlp.all) /= Ident_Int (7))
       then
          Failed ("WRONG VALUES  -  B4");
@@ -123,8 +121,7 @@ begin
 
       Vslcr := new Slcr;
       if
-        (Vslcr.A /= Ident_Int (1) or
-         Vslcr.B /= Ident_Int (2) or
+        (Vslcr.A /= Ident_Int (1) or Vslcr.B /= Ident_Int (2) or
          P.Fun (Vslcr.C) /= Ident_Int (7))
       then
          Failed ("WRONG VALUES - B5");

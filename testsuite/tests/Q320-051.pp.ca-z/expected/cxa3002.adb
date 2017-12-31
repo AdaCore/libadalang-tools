@@ -60,8 +60,7 @@ begin
       "Check that the conversion functions for " &
       "Characters and Strings defined in package " &
       "Ada.Characters.Handling provide correct " &
-      "results when given character/string input " &
-      "parameters");
+      "results when given character/string input " & "parameters");
 
    Character_Block :
    declare
@@ -87,15 +86,12 @@ begin
          Report.Failed ("Incorrect operation of function To_Lower - 3");
       end if;
 
-      if Ach.To_Lower ('c') /= 'c' or
-        Ach.To_Lower ('w') /= 'w' or
+      if Ach.To_Lower ('c') /= 'c' or Ach.To_Lower ('w') /= 'w' or
         Ach.To_Lower (Ac.Latin_1.Cr) /= Ac.Latin_1.Cr or
         Ach.To_Lower (Ac.Latin_1.Lf) /= Ac.Latin_1.Lf or
         Ach.To_Lower (Ac.Latin_1.Comma) /= Ac.Latin_1.Comma or
         Ach.To_Lower (Ac.Latin_1.Question) /= Ac.Latin_1.Question or
-        Ach.To_Lower ('0') /= '0' or
-        Ach.To_Lower ('9') /= '9'
-      then
+        Ach.To_Lower ('0') /= '0' or Ach.To_Lower ('9') /= '9' then
          Report.Failed ("Incorrect operation of function To_Lower - 4");
       end if;
 
@@ -116,14 +112,12 @@ begin
       if
         (Ach.To_Upper (Ac.Latin_1.Lc_U_Diaeresis) /=
          Ac.Latin_1.Uc_U_Diaeresis) or
-        (Ach.To_Upper (Ac.Latin_1.Lc_A_Ring) /= Ac.Latin_1.Uc_A_Ring)
-      then
+        (Ach.To_Upper (Ac.Latin_1.Lc_A_Ring) /= Ac.Latin_1.Uc_A_Ring) then
          Report.Failed ("Incorrect operation of function To_Upper - 3");
       end if;
 
       if not
-        (Ach.To_Upper ('F') = 'F' and
-         Ach.To_Upper ('U') = 'U' and
+        (Ach.To_Upper ('F') = 'F' and Ach.To_Upper ('U') = 'U' and
          Ach.To_Upper (Ac.Latin_1.Lc_German_Sharp_S) =
            Ac.Latin_1.Lc_German_Sharp_S and
          Ach.To_Upper (Ac.Latin_1.Lc_Y_Diaeresis) = Ac.Latin_1.Lc_Y_Diaeresis)
@@ -151,9 +145,7 @@ begin
 
       if Ach.To_Basic ('Y') /= 'Y' or
         Ach.To_Basic (Ac.Latin_1.Lc_E_Acute) /= 'e' or
-        Ach.To_Basic ('6') /= '6' or
-        Ach.To_Basic (Ac.Latin_1.Lc_R) /= 'r'
-      then
+        Ach.To_Basic ('6') /= '6' or Ach.To_Basic (Ac.Latin_1.Lc_R) /= 'r' then
          Report.Failed ("Incorrect operation of function To_Basic - 2");
       end if;
 
@@ -167,15 +159,13 @@ begin
       end if;
 
       if Ach.To_Basic (Ach.To_Lower (Ach.To_Upper (Ac.Latin_1.Lc_U_Grave))) /=
-        'u'
-      then
+        'u' then
          Report.Failed ("Incorrect operation of functions in combination - 2");
       end if;
 
       if Ach.To_Lower
           (Ach.To_Basic (Ach.To_Upper (Ac.Latin_1.Lc_O_Diaeresis))) /=
-        'o'
-      then
+        'o' then
          Report.Failed ("Incorrect operation of functions in combination - 3");
       end if;
 
@@ -196,20 +186,14 @@ begin
       Lc_Basic_String : constant String := "aei" & 'o' & 'u';
 
       Lc_Nonbasic_String : constant String :=
-        Ac.Latin_1.Lc_A_Diaeresis &
-        Ac.Latin_1.Lc_E_Circumflex &
-        Ac.Latin_1.Lc_I_Acute &
-        Ac.Latin_1.Lc_O_Tilde &
-        Ac.Latin_1.Lc_U_Grave;
+        Ac.Latin_1.Lc_A_Diaeresis & Ac.Latin_1.Lc_E_Circumflex &
+        Ac.Latin_1.Lc_I_Acute & Ac.Latin_1.Lc_O_Tilde & Ac.Latin_1.Lc_U_Grave;
 
       Uc_Basic_String : constant String := "AEIOU";
 
       Uc_Nonbasic_String : constant String :=
-        Ac.Latin_1.Uc_A_Tilde &
-        Ac.Latin_1.Uc_E_Acute &
-        Ac.Latin_1.Uc_I_Grave &
-        Ac.Latin_1.Uc_O_Diaeresis &
-        Ac.Latin_1.Uc_U_Circumflex;
+        Ac.Latin_1.Uc_A_Tilde & Ac.Latin_1.Uc_E_Acute & Ac.Latin_1.Uc_I_Grave &
+        Ac.Latin_1.Uc_O_Diaeresis & Ac.Latin_1.Uc_U_Circumflex;
 
       Lc_Special_String : constant String :=
         "ab" & Ac.Latin_1.Lc_German_Sharp_S & Ac.Latin_1.Lc_Y_Diaeresis;
@@ -222,8 +206,7 @@ begin
       -- Function To_Lower for Strings
 
       if Ach.To_Lower (Uc_String) /= Lc_String or
-        Ach.To_Lower (Lc_String) /= Lc_String
-      then
+        Ach.To_Lower (Lc_String) /= Lc_String then
          Report.Failed ("Incorrect result from To_Lower for strings - 1");
       end if;
 
@@ -238,8 +221,7 @@ begin
       end if;
 
       if Ach.To_Upper (Lc_Basic_String) /= Uc_Basic_String or
-        Ach.To_Upper (Uc_String) /= Uc_String
-      then
+        Ach.To_Upper (Uc_String) /= Uc_String then
          Report.Failed ("Incorrect result from To_Upper for strings - 2");
       end if;
 
@@ -250,8 +232,7 @@ begin
       -- Function To_Basic for Strings
 
       if (Ach.To_Basic (Lc_String) /= "azac") or
-        (Ach.To_Basic (Uc_String) /= "AZAC")
-      then
+        (Ach.To_Basic (Uc_String) /= "AZAC") then
          Report.Failed ("Incorrect result from To_Basic for Strings - 1");
       end if;
 
@@ -266,8 +247,7 @@ begin
       -- Using Functions (for Strings) in Combination
 
       if Ach.To_Upper (Ach.To_Lower (Uc_Basic_String)) /= Uc_Basic_String or
-        Ach.To_Lower (Ach.To_Upper (Lc_Basic_String)) /= Lc_Basic_String
-      then
+        Ach.To_Lower (Ach.To_Upper (Lc_Basic_String)) /= Lc_Basic_String then
          Report.Failed ("Incorrect operation of functions in combination - 4");
       end if;
 

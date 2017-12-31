@@ -35,8 +35,7 @@ begin
    Test
      ("C49023A",
       "A CONSTANT DECLARED BY AN OBJECT DECLARATION " &
-      "UNDER CERTAIN CONDITIONS CAN BE USED IN A " &
-      "STATIC EXPRESSION");
+      "UNDER CERTAIN CONDITIONS CAN BE USED IN A " & "STATIC EXPRESSION");
    declare
       type Enum is (Red, Green, Blue, Yellow);
       subtype Senum is Enum range Red .. Blue;

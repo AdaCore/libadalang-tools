@@ -67,8 +67,7 @@ begin
      ("C94001A",
       "CHECK THAT A UNIT WITH DEPENDENT TASKS " &
       "CREATED BY OBJECT DECLARATIONS IS NOT " &
-      "TERMINATED UNTIL ALL DEPENDENT TASKS " &
-      "BECOME TERMINATED");
+      "TERMINATED UNTIL ALL DEPENDENT TASKS " & "BECOME TERMINATED");
 
    --------------------------------------------------
 

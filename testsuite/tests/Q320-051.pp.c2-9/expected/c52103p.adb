@@ -211,14 +211,12 @@ begin
       type Tabox0 is array (Integer range <>, Integer range <>) of Integer;
 
       subtype Tabox01 is
-        Tabox0
-          (Ident_Int (1) .. Ident_Int (0),
+        Tabox0 (Ident_Int (1) .. Ident_Int (0),
            Ident_Int (0) .. Ident_Int (7));
       subtype Tabox02 is Tabox0;
 
       Arrx01 : Tabox01;
-      Arrx02 : Tabox02
-        (Ident_Int (7) .. Ident_Int (6),
+      Arrx02 : Tabox02 (Ident_Int (7) .. Ident_Int (6),
          Ident_Int (20) .. Ident_Int (27));
 
    begin
@@ -310,12 +308,8 @@ begin
 
       -- CHECKING THE VALUES AFTER THE SLICE ASSIGNMENT:
 
-      if Arrx52 (5) /= True or
-        Arrx52 (6) /= False or
-        Arrx52 (7) /= True or
-        Arrx52 (8) /= True or
-        Arrx52 (9) /= False
-      then
+      if Arrx52 (5) /= True or Arrx52 (6) /= False or Arrx52 (7) /= True or
+        Arrx52 (8) /= True or Arrx52 (9) /= False then
          Failed ("SLICE ASSIGNMENT NOT CORRECT (VALUES)");
       end if;
 

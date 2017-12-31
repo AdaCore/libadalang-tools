@@ -19,8 +19,7 @@ begin
       declare
          package Tid renames Ada.Task_Identification;
          generic package Ta renames Ada.Task_Attributes;
-         package Fta is new Ta
-           (Cxc7003_0.Notes_Finalization,
+         package Fta is new Ta (Cxc7003_0.Notes_Finalization,
             Cxc7003_0.Object_4);
       begin
          declare
@@ -101,8 +100,7 @@ begin
                     ("No finalization occurred" & " for reinitialize");
                when others =>
                   Report.Failed
-                    ("Unexpected result for" &
-                     " reinitialize:" &
+                    ("Unexpected result for" & " reinitialize:" &
                      Integer'Image (Cxc7003_0.Last_Finalized));
             end case;
 

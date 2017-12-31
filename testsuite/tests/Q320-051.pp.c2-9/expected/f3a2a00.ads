@@ -49,8 +49,6 @@ package F3a2a00 is
 
    type Tc_Result_Kind is (Ok, P_E, O_E);
 
-   procedure Tc_Display_Results
-     (Actual   : in Tc_Result_Kind;
-      Expected : in Tc_Result_Kind;
-      Message  : in String);
+   procedure Tc_Display_Results (Actual : in Tc_Result_Kind;
+      Expected : in Tc_Result_Kind; Message : in String);
 end F3a2a00;

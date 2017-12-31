@@ -76,13 +76,7 @@ package Cd90001_0 is
    for Eight_Bits'Size use 8;
 
    type User_Enums is
-     (One,
-      Two,
-      Four,
-      Eight,
-      Sixteen,
-      Thirty_Two,
-      Sixty_Four,
+     (One, Two, Four, Eight, Sixteen, Thirty_Two, Sixty_Four,
       One_Twenty_Eight);
    for User_Enums'Size use 8;
 

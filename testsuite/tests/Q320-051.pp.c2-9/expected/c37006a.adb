@@ -46,14 +46,11 @@ procedure C37006a is
    begin
       if Ar'First /= 1 or Ar'Last /= 2 then
          Failed
-           ("INCORRECT BOUNDS FOR R.COMP.A IN COMPONENT " &
-            "OF " &
-            Str &
+           ("INCORRECT BOUNDS FOR R.COMP.A IN COMPONENT " & "OF " & Str &
             " TYPE");
       elsif Ar /= (3, 4) then
          Failed
-           ("INITIALIZATION OF R.COMP.A IN COMPONENT OF " &
-            Str &
+           ("INITIALIZATION OF R.COMP.A IN COMPONENT OF " & Str &
             " TYPE FAILED");
       end if;
    end Check;
@@ -108,8 +105,7 @@ begin
       "COMPONENT, CHECK THAT A NON-STATIC " &
       "EXPRESSION CAN BE USED IN A DISCRIMINANT " &
       "CONSTRAINT OR (EXCEPTING LIMITED PRIVATE " &
-      "COMPONENTS) IN SPECIFYING A DEFAULT " &
-      "INITIAL VALUE");
+      "COMPONENTS) IN SPECIFYING A DEFAULT " & "INITIAL VALUE");
 
    begin
       declare
@@ -134,13 +130,11 @@ begin
          when Constraint_Error =>
             Failed
               ("CONSTRAINT_ERROR RAISED IN STATEMENT " &
-               "SEQUENCE FOLLOWING DECLARATION OF " &
-               "RECORD TYPE COMPONENT");
+               "SEQUENCE FOLLOWING DECLARATION OF " & "RECORD TYPE COMPONENT");
          when others =>
             Failed
               ("OTHER EXCEPTION RAISED IN STATEMENT " &
-               "SEQUENCE FOLLOWING DECLARATION OF " &
-               "RECORD TYPE COMPONENT");
+               "SEQUENCE FOLLOWING DECLARATION OF " & "RECORD TYPE COMPONENT");
       end;
 
    exception
@@ -177,13 +171,11 @@ begin
          when Constraint_Error =>
             Failed
               ("CONSTRAINT_ERROR RAISED IN STATEMENT " &
-               "SEQUENCE FOLLOWING DECLARATION OF " &
-               "ACCESS TYPE COMPONENT");
+               "SEQUENCE FOLLOWING DECLARATION OF " & "ACCESS TYPE COMPONENT");
          when others =>
             Failed
               ("OTHER EXCEPTION RAISED IN STATEMENT " &
-               "SEQUENCE FOLLOWING DECLARATION OF " &
-               "ACCESS TYPE COMPONENT");
+               "SEQUENCE FOLLOWING DECLARATION OF " & "ACCESS TYPE COMPONENT");
       end;
 
    exception

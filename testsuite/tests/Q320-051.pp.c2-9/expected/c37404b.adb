@@ -125,23 +125,13 @@ begin
         ("'CONSTRAINED TRUE FOR SUBPROGRAM OUT PARAMETER " & "AFTER THE CALL");
    end if;
 
-   if Ident_Int (A.I) /= 1 or
-     Ident_Int (B.I) /= 1 or
-     Ident_Int (C (1).I) /= 1 or
-     Ident_Int (D (1).I) /= 1 or
-     Ident_Int (E (1).I) /= 1 or
-     Ident_Int (F (1).I) /= 1 or
-     Ident_Int (Z.I) /= 1 or
-     Ident_Int (A.A) /= 5 or
-     Ident_Int (B.A) /= 5 or
-     Ident_Int (C (1).A) /= 5 or
-     Ident_Int (D (1).A) /= 5 or
-     Ident_Int (E (1).A) /= 5 or
-     Ident_Int (F (1).A) /= 5 or
-     Ident_Int (G.A) /= 5 or
-     Ident_Int (H.A) /= 5 or
-     Ident_Int (Z.A) /= 5
-   then
+   if Ident_Int (A.I) /= 1 or Ident_Int (B.I) /= 1 or
+     Ident_Int (C (1).I) /= 1 or Ident_Int (D (1).I) /= 1 or
+     Ident_Int (E (1).I) /= 1 or Ident_Int (F (1).I) /= 1 or
+     Ident_Int (Z.I) /= 1 or Ident_Int (A.A) /= 5 or Ident_Int (B.A) /= 5 or
+     Ident_Int (C (1).A) /= 5 or Ident_Int (D (1).A) /= 5 or
+     Ident_Int (E (1).A) /= 5 or Ident_Int (F (1).A) /= 5 or
+     Ident_Int (G.A) /= 5 or Ident_Int (H.A) /= 5 or Ident_Int (Z.A) /= 5 then
       Failed ("INCORRECT INITIALIZATION VALUES");
    end if;
 

@@ -183,10 +183,8 @@ begin
    -- -- in a way that corresponds to likely usage.
 
    declare
-      procedure Test
-        (Value     : in My_Float;
-         Expected  : in My_Float;
-         Test_Case : in String)
+      procedure Test (Value : in My_Float; Expected : in My_Float;
+         Test_Case          : in String)
       is
       begin
          Tampering_Check (Container => My_Tree_1, Where => Test_Case);
@@ -199,11 +197,8 @@ begin
          end if;
       end Test;
 
-      procedure Test_And_Mod
-        (Value     : in out My_Float;
-         Expected  : in     My_Float;
-         New_Item  : in     My_Float;
-         Test_Case : in     String)
+      procedure Test_And_Mod (Value : in out My_Float; Expected : in My_Float;
+         New_Item                   : in     My_Float; Test_Case : in String)
       is
       begin
          Tampering_Check (Container => My_Tree_1, Where => Test_Case);
@@ -224,8 +219,7 @@ begin
       Test
         (Value =>
            My_Bounded_Multiway_Trees.Constant_Reference
-             (My_Tree_1,
-              Position => My_Cursor_1)
+             (My_Tree_1, Position => My_Cursor_1)
              .Element.all,
          Expected  => Value_In_Array (1),
          Test_Case => "Constant_Reference normal cursor");
@@ -233,11 +227,9 @@ begin
       Test_And_Mod
         (Value =>
            My_Bounded_Multiway_Trees.Reference
-             (My_Tree_1,
-              Position => My_Cursor_1)
+             (My_Tree_1, Position => My_Cursor_1)
              .Element.all,
-         Expected  => Value_In_Array (1),
-         New_Item  => Value_In_Array (2),
+         Expected  => Value_In_Array (1), New_Item => Value_In_Array (2),
          Test_Case => "Reference normal cursor");
 
       -- Prefix call with all components explicit:
@@ -249,8 +241,7 @@ begin
 
       Test_And_Mod
         (Value => My_Tree_1.Reference (Position => My_Cursor_1).Element.all,
-         Expected  => Value_In_Array (2),
-         New_Item  => Value_In_Array (3),
+         Expected  => Value_In_Array (2), New_Item => Value_In_Array (3),
          Test_Case => "Reference prefix cursor");
 
       -- Prefix call using a generalized reference (implicit dereference):
@@ -261,8 +252,7 @@ begin
 
       Test_And_Mod
         (Value     => My_Tree_1.Reference (Position => My_Cursor_1),
-         Expected  => Value_In_Array (3),
-         New_Item  => Value_In_Array (4),
+         Expected  => Value_In_Array (3), New_Item => Value_In_Array (4),
          Test_Case => "Reference generalized cursor");
 
       -- Object indexing, everything implicit.
@@ -300,8 +290,7 @@ begin
       for I in Array_Bounds_Type loop
 
          My_Tree_1.Append_Child
-           (Parent   => Root_1,
-            New_Item => Value_In_Array (I));
+           (Parent => Root_1, New_Item => Value_In_Array (I));
 
          Total_In := Total_In + Value_In_Array (I);
 
@@ -367,8 +356,7 @@ begin
       for C in My_Bounded_Multiway_Trees.Iterate_Subtree (Root_1) loop
 
          Tampering_Check
-           (Container => My_Tree_1,
-            Where     => "reading in loop subtree");
+           (Container => My_Tree_1, Where => "reading in loop subtree");
 
          Total_Out := Total_Out + My_Tree_1 (C);
 
@@ -399,8 +387,7 @@ begin
       for C in My_Tree_1.Iterate_Children (Parent => Root_1) loop
 
          Tampering_Check
-           (Container => My_Tree_1,
-            Where     => "reading child in loop");
+           (Container => My_Tree_1, Where => "reading child in loop");
 
          Child_Total_In := Child_Total_In + My_Tree_1 (C);
 
@@ -425,8 +412,7 @@ begin
       for C in reverse My_Tree_1.Iterate_Children (Parent => Root_1) loop
 
          Tampering_Check
-           (Container => My_Tree_1,
-            Where     => "reading child in loop");
+           (Container => My_Tree_1, Where => "reading child in loop");
 
          Child_Total_Out := Child_Total_Out + My_Tree_1 (C);
 
@@ -495,8 +481,7 @@ begin
 
       for I in Array_Bounds_Type loop
 
-         if My_Bounded_Multiway_Trees.Element (Position => My_Cursor_1) /=
-           0.0
+         if My_Bounded_Multiway_Trees.Element (Position => My_Cursor_1) /= 0.0
          then
 
             Report.Failed ("Data set by of loop not as expected");

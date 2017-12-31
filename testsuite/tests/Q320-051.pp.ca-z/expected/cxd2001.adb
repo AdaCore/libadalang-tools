@@ -210,9 +210,7 @@ begin
       Report.Failed ("Prime_Task executed before a Sub_Task");
       for I in Prime_Order'Range loop
          Report.Comment
-           ("order:" &
-            Integer'Image (I) &
-            "  is prime: " &
+           ("order:" & Integer'Image (I) & "  is prime: " &
             Boolean'Image (Prime_Order (I)));
       end loop;
    end if;

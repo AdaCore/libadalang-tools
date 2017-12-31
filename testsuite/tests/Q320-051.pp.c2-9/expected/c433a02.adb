@@ -70,14 +70,9 @@ procedure C433a02 is
          for J in A'Range (2) loop
 
             F433a00.Check
-              (A (I, J),
-               Value   => Value,
-               Message =>
-                 Message &
-                 "(" &
-                 Integer'Image (I) &
-                 "," &
-                 Integer'Image (J) &
+              (A (I, J), Value => Value,
+               Message         =>
+                 Message & "(" & Integer'Image (I) & "," & Integer'Image (J) &
                  ")");
          end loop;
       end loop;

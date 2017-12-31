@@ -128,8 +128,7 @@ begin
      ("C85014B",
       "CHECK THAT THE BASE TYPE OF THE FORMAL " &
       "PARAMETER AND THE RESULT TYPE ARE USED TO " &
-      "DETERMINE WHICH SUBPROGRAM OR ENTRY IS BEING " &
-      "RENAMED");
+      "DETERMINE WHICH SUBPROGRAM OR ENTRY IS BEING " & "RENAMED");
 
    declare
       procedure Proc1 (J1 : in out Integer) renames Proc;

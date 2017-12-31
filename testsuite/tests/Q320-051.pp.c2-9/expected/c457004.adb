@@ -83,10 +83,8 @@ begin
       function Check return Boolean is
       begin
          return
-           (case Zero is
-              when -10 .. -1 => False,
-              when 0         => True,
-              when 1 .. 10   => False);
+           (case Zero is when -10 .. -1 => False, when 0 => True,
+              when 1 .. 10              => False);
       end Check;
 
    begin
@@ -123,10 +121,8 @@ begin
       function Check return Boolean is
       begin
          return
-           (case Get_Color (null) is
-              when White              => False,
-              when Red | Green | Blue => False,
-              when Black              => True);
+           (case Get_Color (null) is when White => False,
+              when Red | Green | Blue           => False, when Black => True);
       end Check;
    begin
       if not Check then
@@ -147,10 +143,8 @@ begin
          return
          -- Note: The more global Value is visible here and has the correct
          -- parameter type, but should not be part of the final solution.
-           (case Value (2) is
-              when 0 | 1    => False,
-              when 2        => True,
-              when 3 .. 255 => False);
+           (case Value (2) is when 0 | 1 => False, when 2 => True,
+              when 3 .. 255              => False);
       end Check;
 
    begin
@@ -170,10 +164,8 @@ begin
          -- Note: The more global Value is visible here and has the correct
          -- parameter type, but should not be part of the final solution.
          if
-           (case Value (A) is
-              when 0 | 1 | 2 => True,
-              when 3         => False,
-              when others    => True)
+           (case Value (A) is when 0 | 1 | 2 => True, when 3 => False,
+              when others                    => True)
          then
             Report.Failed ("Wrong case limb selected (4)");
          end if;
@@ -210,10 +202,8 @@ begin
       procedure Genm (A : Integer) is
       begin
          if
-           (case Convert (A) is
-              when 0 | 1 | 2 => True,
-              when 3 .. 10   => True,
-              when others    => False)
+           (case Convert (A) is when 0 | 1 | 2 => True, when 3 .. 10 => True,
+              when others                      => False)
          then
             Report.Failed ("Wrong case limb selected (5)");
          end if;

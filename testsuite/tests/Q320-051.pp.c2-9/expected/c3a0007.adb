@@ -18,8 +18,7 @@ begin
       "Check that a call to a subprogram via an " &
       "access-to-subprogram value stored in a data " &
       "structure will correctly dispatch according to " &
-      "the tag of the class-wide parameter passed " &
-      "via that call");
+      "the tag of the class-wide parameter passed " & "via that call");
 
    -- Call inherited operation Push to set Default_Response value in the
    -- extension.
@@ -28,8 +27,7 @@ begin
    Tctouch.Validate ("PCd", "First Green Button Push");
 
    Tctouch.Assert_Not
-     (C3a0007_0.Default_Call,
-      "Incorrect Green Default_Response");
+     (C3a0007_0.Default_Call, "Incorrect Green Default_Response");
 
    C3a0007_0.Push (Pink_Button);
    Tctouch.Validate ("PCD", "First Pink Button Push");

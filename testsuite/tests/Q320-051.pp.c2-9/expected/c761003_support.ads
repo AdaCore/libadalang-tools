@@ -68,10 +68,8 @@ package C761003_Support is
    -- assigned to objects to track an order sequence. These characters are
    -- then used in calls to TCTouch.Touch.
 
-   procedure Validate
-     (Initcount   : Natural;
-      Testnumber  : Natural;
-      Check_Order : Boolean := True);
+   procedure Validate (Initcount : Natural; Testnumber : Natural;
+      Check_Order                : Boolean := True);
    -- does a little extra processing prior to calling TCTouch.Validate,
    -- specifically, it reverses the stored string of characters, and checks
    -- for a correct count.

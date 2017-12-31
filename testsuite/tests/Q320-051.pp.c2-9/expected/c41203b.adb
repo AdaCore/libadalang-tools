@@ -80,8 +80,7 @@ begin
       N2 : A3          := new A1'(1, 2, 3, 4, 5, 6);
       N3 : T1 (1 .. 7) := (1, 2, 3, 4, 5, 6, 7);
       N4 : A4          :=
-        (1 => (1, 2, 3, 4, 5, 6),
-         2 => (7, 8, 9, 10, 11, 12),
+        (1 => (1, 2, 3, 4, 5, 6), 2 => (7, 8, 9, 10, 11, 12),
          3 => (13, 14, 15, 16, 17, 18));
       N5 : R (6) := (Length => 6, S => "ABCDEF");
 
@@ -176,8 +175,7 @@ begin
       N1 := (1, 2, 3, 4, 5, 6);
       P1 (N1 (Ident_Int (1) .. Ident_Int (2)),
          N1 (Ident_Int (3) .. Ident_Int (4)),
-         N1 (Ident_Int (5) .. Ident_Int (6)),
-         "N1");
+         N1 (Ident_Int (5) .. Ident_Int (6)), "N1");
       if N1 /= (1, 2, 10, 11, 12, 13) then
          Failed ("WRONG TARGET FOR (IN) OUT PARAMETER - N1");
       end if;
@@ -192,44 +190,38 @@ begin
       N2.all := (1, 2, 5, 6, 3, 4);
       P1 (N2 (Ident_Int (1) .. Ident_Int (2)),
          N2 (Ident_Int (5) .. Ident_Int (6)),
-         N2 (Ident_Int (3) .. Ident_Int (4)),
-         "N2");
+         N2 (Ident_Int (3) .. Ident_Int (4)), "N2");
       if N2.all /= (1, 2, 12, 13, 10, 11) then
          Failed ("WRONG TARGET FOR (IN) OUT PARAMETER - N2");
       end if;
 
       if "&" (String'("AB"), String'("CDEF"))
           (Ident_Int (4) .. Ident_Int (6)) /=
-        String'("DEF")
-      then
+        String'("DEF") then
          Failed ("WRONG VALUE FOR EXPRESSION - '&'");
       end if;
       P2 ("&" ("AB", "CD") (Ident_Int (2) .. Ident_Int (3)));
 
-      if "NOT" (M2a) (Ident_Int (3) .. Ident_Int (5)) /=
-        (False, True, True)
+      if "NOT" (M2a) (Ident_Int (3) .. Ident_Int (5)) /= (False, True, True)
       then
          Failed ("WRONG VALUE FOR EXPRESSION - 'NOT'");
       end if;
       P6 ("NOT" (M2a) (Ident_Int (2) .. Ident_Int (4)));
 
       if "AND" (M2a, M2b) (Ident_Int (3) .. Ident_Int (5)) /=
-        (True, False, False)
-      then
+        (True, False, False) then
          Failed ("WRONG VALUE FOR EXPRESSION - 'AND'");
       end if;
       P7 ("AND" (M2a, M2b) (Ident_Int (2) .. Ident_Int (4)));
 
       if "OR" (M2a, M2b) (Ident_Int (3) .. Ident_Int (5)) /=
-        (True, False, True)
-      then
+        (True, False, True) then
          Failed ("WRONG VALUE FOR EXPRESSION - 'OR'");
       end if;
       P8 ("OR" (M2a, M2b) (Ident_Int (4) .. Ident_Int (6)));
 
       if "XOR" (M2a, M2b) (Ident_Int (3) .. Ident_Int (5)) /=
-        (False, False, True)
-      then
+        (False, False, True) then
          Failed ("WRONG VALUE FOR EXPRESSION - 'XOR'");
       end if;
       P9 ("XOR" (M2a, M2b) (Ident_Int (1) .. Ident_Int (3)));
@@ -250,8 +242,7 @@ begin
       N2.all := (5, 6, 1, 2, 3, 4);
       P1 (F2 (Ident_Int (3) .. Ident_Int (4)),
          F2 (Ident_Int (5) .. Ident_Int (6)),
-         F2 (Ident_Int (1) .. Ident_Int (2)),
-         "F2");
+         F2 (Ident_Int (1) .. Ident_Int (2)), "F2");
       if N2.all /= (12, 13, 1, 2, 10, 11) then
          Failed ("WRONG TARGET FOR (IN) OUT PARAMETER - F2");
       end if;
@@ -266,8 +257,7 @@ begin
       N3 := (5, 3, 4, 1, 2, 6, 7);
       P1 (N3 (2 .. 7) (Ident_Int (4) .. Ident_Int (5)),
          N3 (2 .. 7) (Ident_Int (2) .. Ident_Int (3)),
-         N3 (2 .. 7) (Ident_Int (6) .. Ident_Int (7)),
-         "N3");
+         N3 (2 .. 7) (Ident_Int (6) .. Ident_Int (7)), "N3");
       if N3 /= (5, 10, 11, 1, 2, 12, 13) then
          Failed ("WRONG TARGET FOR (IN) OUT PARAMETER - N3");
       end if;
@@ -277,23 +267,19 @@ begin
       end if;
       N4 (2) (Ident_Int (1) .. Ident_Int (3)) := (21, 22, 23);
       if N4 /=
-        ((1, 2, 3, 4, 5, 6),
-         (21, 22, 23, 10, 11, 12),
+        ((1, 2, 3, 4, 5, 6), (21, 22, 23, 10, 11, 12),
          (13, 14, 15, 16, 17, 18))
       then
          Failed ("WRONG TARGET FOR ASSIGNMENT - N4");
       end if;
       N4 :=
-        (1 => (18, 19, 20, 21, 22, 23),
-         2 => (17, 16, 15, 1, 2, 14),
+        (1 => (18, 19, 20, 21, 22, 23), 2 => (17, 16, 15, 1, 2, 14),
          3 => (7, 3, 4, 5, 6, 8));
       P1 (N4 (2) (Ident_Int (4) .. Ident_Int (5)),
          N4 (3) (Ident_Int (2) .. Ident_Int (3)),
-         N4 (1) (Ident_Int (5) .. Ident_Int (6)),
-         "N4");
+         N4 (1) (Ident_Int (5) .. Ident_Int (6)), "N4");
       if N4 /=
-        ((18, 19, 20, 21, 12, 13),
-         (17, 16, 15, 1, 2, 14),
+        ((18, 19, 20, 21, 12, 13), (17, 16, 15, 1, 2, 14),
          (7, 10, 11, 5, 6, 8))
       then
          Failed ("WRONG TARGET FOR (IN) OUT PARAMETER - N4");
@@ -310,8 +296,7 @@ begin
       N1 := (1, 2, 3, 4, 5, 6);
       P1 (C41203b.N1 (Ident_Int (1) .. Ident_Int (2)),
          C41203b.N1 (Ident_Int (3) .. Ident_Int (4)),
-         C41203b.N1 (Ident_Int (5) .. Ident_Int (6)),
-         "C41203B.N1");
+         C41203b.N1 (Ident_Int (5) .. Ident_Int (6)), "C41203B.N1");
       if N1 /= (1, 2, 10, 11, 12, 13) then
          Failed ("WRONG TARGET FOR (IN) OUT PARAMETER " & "- C41203B.N1");
       end if;
@@ -361,9 +346,7 @@ begin
 
             function "=" (One, Two : A) return Boolean is
             begin
-               if One (1) = Two (2) and
-                 One (2) = Two (3) and
-                 One (3) = Two (4)
+               if One (1) = Two (2) and One (2) = Two (3) and One (3) = Two (4)
                then
                   return True;
                else

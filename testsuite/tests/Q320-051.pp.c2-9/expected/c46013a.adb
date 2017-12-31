@@ -54,8 +54,7 @@ begin
    Test
      ("C46013A",
       "CHECK THAT INTEGER CONVERSIONS ARE PERFORMED " &
-      "CORRECTLY WHEN THE OPERAND TYPE IS A FIXED " &
-      "POINT TYPE");
+      "CORRECTLY WHEN THE OPERAND TYPE IS A FIXED " & "POINT TYPE");
 
    if Integer (Fix1'(-7.25)) /= Ident_Int (-7) then
       Failed ("INCORRECT VALUE (1)");
@@ -74,40 +73,34 @@ begin
    end if;
 
    if Integer (Fix1'(3.33)) /= Ident_Int (3) and
-     Integer (Fix1'(3.33)) /= Ident_Int (4)
-   then
+     Integer (Fix1'(3.33)) /= Ident_Int (4) then
       Failed ("INCORRECT VALUE (5)");
    end if;
 
    if Integer (Fix1'(-2.5)) = Ident_Int (-2) and
      Integer (Fix1'(-1.5)) = Ident_Int (-1) and
      Integer (Fix1'(1.5)) = Ident_Int (2) and
-     Integer (Fix1'(2.5)) = Ident_Int (3)
-   then
+     Integer (Fix1'(2.5)) = Ident_Int (3) then
       Comment ("FIX1 HALF VALUES ROUND UP");
    elsif Integer (Fix1'(-2.5)) = Ident_Int (-3) and
      Integer (Fix1'(-1.5)) = Ident_Int (-2) and
      Integer (Fix1'(1.5)) = Ident_Int (1) and
-     Integer (Fix1'(2.5)) = Ident_Int (2)
-   then
+     Integer (Fix1'(2.5)) = Ident_Int (2) then
       Comment ("FIX1 HALF VALUES ROUND DOWN");
    elsif Integer (Fix1'(-2.5)) = Ident_Int (-2) and
      Integer (Fix1'(-1.5)) = Ident_Int (-2) and
      Integer (Fix1'(1.5)) = Ident_Int (2) and
-     Integer (Fix1'(2.5)) = Ident_Int (2)
-   then
+     Integer (Fix1'(2.5)) = Ident_Int (2) then
       Comment ("FIX1 HALF VALUES ROUND TO EVEN");
    elsif Integer (Fix1'(-2.5)) = Ident_Int (-2) and
      Integer (Fix1'(-1.5)) = Ident_Int (-1) and
      Integer (Fix1'(1.5)) = Ident_Int (1) and
-     Integer (Fix1'(2.5)) = Ident_Int (2)
-   then
+     Integer (Fix1'(2.5)) = Ident_Int (2) then
       Comment ("FIX1 HALF VALUES ROUND TOWARD ZERO");
    elsif Integer (Fix1'(-2.5)) = Ident_Int (-3) and
      Integer (Fix1'(-1.5)) = Ident_Int (-2) and
      Integer (Fix1'(1.5)) = Ident_Int (2) and
-     Integer (Fix1'(2.5)) = Ident_Int (3)
-   then
+     Integer (Fix1'(2.5)) = Ident_Int (3) then
       Comment ("FIX1 HALF VALUES ROUND AWAY FROM ZERO");
    else
       Comment ("FIX1 HALF VALUES ROUND ERRATICALLY");
@@ -130,40 +123,34 @@ begin
    end if;
 
    if Integer (Fix2'(66.67)) /= Ident_Int (67) and
-     Integer (Fix2'(66.67)) /= Ident_Int (66)
-   then
+     Integer (Fix2'(66.67)) /= Ident_Int (66) then
       Failed ("INCORRECT VALUE (10)");
    end if;
 
    if Integer (Fix2'(-2.5)) = Ident_Int (-2) and
      Integer (Fix2'(-1.5)) = Ident_Int (-1) and
      Integer (Fix2'(1.5)) = Ident_Int (2) and
-     Integer (Fix2'(2.5)) = Ident_Int (3)
-   then
+     Integer (Fix2'(2.5)) = Ident_Int (3) then
       Comment ("FIX2 HALF VALUES ROUND UP");
    elsif Integer (Fix2'(-2.5)) = Ident_Int (-3) and
      Integer (Fix2'(-1.5)) = Ident_Int (-2) and
      Integer (Fix2'(1.5)) = Ident_Int (1) and
-     Integer (Fix2'(2.5)) = Ident_Int (2)
-   then
+     Integer (Fix2'(2.5)) = Ident_Int (2) then
       Comment ("FIX2 HALF VALUES ROUND DOWN");
    elsif Integer (Fix2'(-2.5)) = Ident_Int (-2) and
      Integer (Fix2'(-1.5)) = Ident_Int (-2) and
      Integer (Fix2'(1.5)) = Ident_Int (2) and
-     Integer (Fix2'(2.5)) = Ident_Int (2)
-   then
+     Integer (Fix2'(2.5)) = Ident_Int (2) then
       Comment ("FIX2 HALF VALUES ROUND TO EVEN");
    elsif Integer (Fix2'(-2.5)) = Ident_Int (-2) and
      Integer (Fix2'(-1.5)) = Ident_Int (-1) and
      Integer (Fix2'(1.5)) = Ident_Int (1) and
-     Integer (Fix2'(2.5)) = Ident_Int (2)
-   then
+     Integer (Fix2'(2.5)) = Ident_Int (2) then
       Comment ("FIX2 HALF VALUES ROUND TOWARD ZERO");
    elsif Integer (Fix2'(-2.5)) = Ident_Int (-3) and
      Integer (Fix2'(-1.5)) = Ident_Int (-2) and
      Integer (Fix2'(1.5)) = Ident_Int (2) and
-     Integer (Fix2'(2.5)) = Ident_Int (3)
-   then
+     Integer (Fix2'(2.5)) = Ident_Int (3) then
       Comment ("FIX2 HALF VALUES ROUND AWAY FROM ZERO");
    else
       Comment ("FIX2 HALF VALUES ROUND ERRATICALLY");
@@ -186,40 +173,34 @@ begin
    end if;
 
    if Integer (Fix3'(-66.67)) /= Ident_Int (-67) and
-     Integer (Fix3'(-66.67)) /= Ident_Int (-66)
-   then
+     Integer (Fix3'(-66.67)) /= Ident_Int (-66) then
       Failed ("INCORRECT VALUE (15)");
    end if;
 
    if Integer (Fix3'(-2.5)) = Ident_Int (-2) and
      Integer (Fix3'(-1.5)) = Ident_Int (-1) and
      Integer (Fix3'(1.5)) = Ident_Int (2) and
-     Integer (Fix3'(2.5)) = Ident_Int (3)
-   then
+     Integer (Fix3'(2.5)) = Ident_Int (3) then
       Comment ("FIX3 HALF VALUES ROUND UP");
    elsif Integer (Fix3'(-2.5)) = Ident_Int (-3) and
      Integer (Fix3'(-1.5)) = Ident_Int (-2) and
      Integer (Fix3'(1.5)) = Ident_Int (1) and
-     Integer (Fix3'(2.5)) = Ident_Int (2)
-   then
+     Integer (Fix3'(2.5)) = Ident_Int (2) then
       Comment ("FIX3 HALF VALUES ROUND DOWN");
    elsif Integer (Fix3'(-2.5)) = Ident_Int (-2) and
      Integer (Fix3'(-1.5)) = Ident_Int (-2) and
      Integer (Fix3'(1.5)) = Ident_Int (2) and
-     Integer (Fix3'(2.5)) = Ident_Int (2)
-   then
+     Integer (Fix3'(2.5)) = Ident_Int (2) then
       Comment ("FIX3 HALF VALUES ROUND TO EVEN");
    elsif Integer (Fix3'(-2.5)) = Ident_Int (-2) and
      Integer (Fix3'(-1.5)) = Ident_Int (-1) and
      Integer (Fix3'(1.5)) = Ident_Int (1) and
-     Integer (Fix3'(2.5)) = Ident_Int (2)
-   then
+     Integer (Fix3'(2.5)) = Ident_Int (2) then
       Comment ("FIX3 HALF VALUES ROUND TOWARD ZERO");
    elsif Integer (Fix3'(-2.5)) = Ident_Int (-3) and
      Integer (Fix3'(-1.5)) = Ident_Int (-2) and
      Integer (Fix3'(1.5)) = Ident_Int (2) and
-     Integer (Fix3'(2.5)) = Ident_Int (3)
-   then
+     Integer (Fix3'(2.5)) = Ident_Int (3) then
       Comment ("FIX3 HALF VALUES ROUND AWAY FROM ZERO");
    else
       Comment ("FIX3 HALF VALUES ROUND ERRATICALLY");
@@ -242,40 +223,34 @@ begin
    end if;
 
    if Integer (Fix4'(3.33)) /= Ident_Int (3) and
-     Integer (Fix4'(3.33)) /= Ident_Int (4)
-   then
+     Integer (Fix4'(3.33)) /= Ident_Int (4) then
       Failed ("INCORRECT VALUE (20)");
    end if;
 
    if Integer (Fix4'(-2.5)) = Ident_Int (-2) and
      Integer (Fix4'(-1.5)) = Ident_Int (-1) and
      Integer (Fix4'(1.5)) = Ident_Int (2) and
-     Integer (Fix4'(2.5)) = Ident_Int (3)
-   then
+     Integer (Fix4'(2.5)) = Ident_Int (3) then
       Comment ("FIX4 HALF VALUES ROUND UP");
    elsif Integer (Fix4'(-2.5)) = Ident_Int (-3) and
      Integer (Fix4'(-1.5)) = Ident_Int (-2) and
      Integer (Fix4'(1.5)) = Ident_Int (1) and
-     Integer (Fix4'(2.5)) = Ident_Int (2)
-   then
+     Integer (Fix4'(2.5)) = Ident_Int (2) then
       Comment ("FIX4 HALF VALUES ROUND DOWN");
    elsif Integer (Fix4'(-2.5)) = Ident_Int (-2) and
      Integer (Fix4'(-1.5)) = Ident_Int (-2) and
      Integer (Fix4'(1.5)) = Ident_Int (2) and
-     Integer (Fix4'(2.5)) = Ident_Int (2)
-   then
+     Integer (Fix4'(2.5)) = Ident_Int (2) then
       Comment ("FIX4 HALF VALUES ROUND TO EVEN");
    elsif Integer (Fix4'(-2.5)) = Ident_Int (-2) and
      Integer (Fix4'(-1.5)) = Ident_Int (-1) and
      Integer (Fix4'(1.5)) = Ident_Int (1) and
-     Integer (Fix4'(2.5)) = Ident_Int (2)
-   then
+     Integer (Fix4'(2.5)) = Ident_Int (2) then
       Comment ("FIX4 HALF VALUES ROUND TOWARD ZERO");
    elsif Integer (Fix4'(-2.5)) = Ident_Int (-3) and
      Integer (Fix4'(-1.5)) = Ident_Int (-2) and
      Integer (Fix4'(1.5)) = Ident_Int (2) and
-     Integer (Fix4'(2.5)) = Ident_Int (3)
-   then
+     Integer (Fix4'(2.5)) = Ident_Int (3) then
       Comment ("FIX4 HALF VALUES ROUND AWAY FROM ZERO");
    else
       Comment ("FIX4 HALF VALUES ROUND ERRATICALLY");

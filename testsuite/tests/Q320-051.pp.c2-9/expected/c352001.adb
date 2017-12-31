@@ -188,8 +188,7 @@ begin
    for I in Cvii (Lower_Bound) .. Cvii (Middle_Bound) loop
       if Tc_Table (I).all /= Table_Of_Character (I).all then
          Report.Failed
-           ("Value of character#" &
-            Integer'Image (Character'Pos (I)) &
+           ("Value of character#" & Integer'Image (Character'Pos (I)) &
             " is not the same in the first half of the table");
       end if;
    end loop;
@@ -198,8 +197,7 @@ begin
    for I in Cvii (Half_Bound) .. Cvii (Upper_Bound) loop
       if Tc_Table (I).all /= Table_Of_Character (I).all then
          Report.Failed
-           ("Value of character#" &
-            Integer'Image (Character'Pos (I)) &
+           ("Value of character#" & Integer'Image (Character'Pos (I)) &
             " is not the same in the second half of the table");
       end if;
    end loop;
@@ -208,27 +206,23 @@ begin
    if Character'Image (Character'First) /= "NUL" then
       Report.Failed
         ("Value of character#" &
-         Integer'Image (Character'Pos (Character'First)) &
-         " is not NUL");
+         Integer'Image (Character'Pos (Character'First)) & " is not NUL");
    end if;
 
    -- Check that the names of the non-graphic characters are usable with Image
    -- and Value attributes.
    if Character'Value (Character'Image (Cvii (153))) /= Cvii (153) then
       Report.Failed
-        ("Value of character#" &
-         Integer'Image (Character'Pos (Cvii (153))) &
+        ("Value of character#" & Integer'Image (Character'Pos (Cvii (153))) &
          " is not reserved_153");
    end if;
 
    for I in Cvii (Lower_Bound) .. Cvii (Max_Bound) loop
       if Character'Value
           (Report.Ident_Str (Character'Image (Cvii (Character'Pos (I))))) /=
-        Cvii (Character'Pos (I))
-      then
+        Cvii (Character'Pos (I)) then
          Report.Failed
-           ("Value of character#" &
-            Integer'Image (Character'Pos (I)) &
+           ("Value of character#" & Integer'Image (Character'Pos (I)) &
             " is not the same as the predefined character type");
       end if;
    end loop;
@@ -240,16 +234,14 @@ begin
           (Report.Ident_Wide_Str
              (Wide_Character'Wide_Image
                 (Wide_Character'Val (Wide_Character'Pos (I))))) /=
-        Wide_Character'Val (Wide_Character'Pos (I))
-      then
+        Wide_Character'Val (Wide_Character'Pos (I)) then
          Report.Failed
            ("Value of the predefined Wide_Character type " & "is not correct");
       end if;
    end loop;
 
    if Wide_Character'Value (Wide_Character'Image (Wide_Character'Val (132))) /=
-     Wide_Character'Val (Report.Ident_Int (132))
-   then
+     Wide_Character'Val (Report.Ident_Int (132)) then
       Report.Failed ("Wide_Character at 132 is not reserved_132");
    end if;
 
@@ -258,8 +250,7 @@ begin
    end if;
 
    if Wide_Character'Image (Wide_Character'Pred (Wide_Character'Last)) /=
-     "HEX_0000FFFE"
-   then
+     "HEX_0000FFFE" then
       Report.Failed ("Wide_Character at 65534 is not HEX_0000FFFE");
    end if;
 

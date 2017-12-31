@@ -16,8 +16,7 @@ procedure Cb20001 is
 begin
 
    Report.Test
-     ("CB20001",
-      "Check that exceptions can be handled " & "in accept bodies");
+     ("CB20001", "Check that exceptions can be handled " & "in accept bodies");
 
    Off_Screen_Block :
    begin

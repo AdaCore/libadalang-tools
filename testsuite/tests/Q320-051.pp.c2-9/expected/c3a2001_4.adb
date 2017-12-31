@@ -3,9 +3,8 @@
 with Tctouch;
 package body C3a2001_4 is
 
-   function Construct
-     (Voltage  : C3a2001_2.Voltages;
-      Amperage : C3a2001_2.Amps) return Special_Breaker
+   function Construct (Voltage : C3a2001_2.Voltages;
+      Amperage                 : C3a2001_2.Amps) return Special_Breaker
    is
       It : Special_Breaker;
       procedure Set_Root (It : in out C3a2001_2.Basic_Breaker) is

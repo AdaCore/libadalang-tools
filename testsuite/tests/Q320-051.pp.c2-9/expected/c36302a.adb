@@ -39,12 +39,8 @@ procedure C36302a is
 begin
    Test ("C36302A", "STRING VARIABLE INDICES NEEDN'T START AT 1");
 
-   if S5'First /= 5 or
-     S5'Last /= 10 or
-     S5'Length /= 6 or
-     Sx'First /= Integer'Last - 5 or
-     Sx'Last /= Integer'Last or
-     Sx'Length /= 6
+   if S5'First /= 5 or S5'Last /= 10 or S5'Length /= 6 or
+     Sx'First /= Integer'Last - 5 or Sx'Last /= Integer'Last or Sx'Length /= 6
    then
       Failed ("WRONG STRING ATTRIBUTES");
    end if;

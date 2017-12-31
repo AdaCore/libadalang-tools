@@ -23,11 +23,9 @@ procedure C760001 is
          "Initialize for simple object");
       S := T;
       Tctouch.Assert
-        ((S.Last_Proc_Called = C760001_1.Adj),
-         "Adjust for simple object");
+        ((S.Last_Proc_Called = C760001_1.Adj), "Adjust for simple object");
       Tctouch.Assert
-        ((S.My_Id = T.My_Id),
-         "Simple object My_ID's don't match");
+        ((S.My_Id = T.My_Id), "Simple object My_ID's don't match");
       Tctouch.Assert
         ((S.My_Init_Id = T.My_Init_Id),
          "Simple object My_Init_ID's don't match");
@@ -43,8 +41,7 @@ procedure C760001 is
       No1 : C760001_1.Nested_Controlled;
    begin
       Tctouch.Assert
-        ((No1.My_Id < No1.My_Init_Id),
-         "Default value order incorrect");
+        ((No1.My_Id < No1.My_Init_Id), "Default value order incorrect");
       Tctouch.Assert
         ((No1.My_Init_Id > No1.Nested.My_Init_Id),
          "Initialization call order incorrect");
@@ -58,19 +55,12 @@ procedure C760001 is
       Tc_Now : constant C760001_0.Unique_Id := C760001_0.Unique_Value;
 
       A : C760001_1.Test_Controlled :=
-        (Ada.Finalization.Controlled with
-         Tc_Now,
-         Tc_Now,
-         Tc_Now,
+        (Ada.Finalization.Controlled with Tc_Now, Tc_Now, Tc_Now,
          C760001_1.None);
 
       B : C760001_1.Nested_Controlled :=
-        (Ada.Finalization.Controlled with
-         Tc_Now,
-         Tc_Now,
-         Tc_Now,
-         C760001_0.Root_Controlled (A),
-         C760001_1.None);
+        (Ada.Finalization.Controlled with Tc_Now, Tc_Now, Tc_Now,
+         C760001_0.Root_Controlled (A), C760001_1.None);
 
    begin
       -- the implementation may or may not call Adjust for the values assigned
@@ -138,10 +128,7 @@ procedure C760001 is
 
       Simple_Array_Explicit : Array_Simple :=
         (1 .. 4 =>
-           (Ada.Finalization.Controlled with
-            Tc_Now,
-            Tc_Now,
-            Tc_Now,
+           (Ada.Finalization.Controlled with Tc_Now, Tc_Now, Tc_Now,
             C760001_1.None));
 
       A : constant C760001_0.Root_Controlled :=
@@ -149,11 +136,7 @@ procedure C760001 is
 
       Nested_Array_Explicit : Array_Nested :=
         (1 .. 4 =>
-           (Ada.Finalization.Controlled with
-            Tc_Now,
-            Tc_Now,
-            Tc_Now,
-            A,
+           (Ada.Finalization.Controlled with Tc_Now, Tc_Now, Tc_Now, A,
             C760001_1.None));
 
    begin

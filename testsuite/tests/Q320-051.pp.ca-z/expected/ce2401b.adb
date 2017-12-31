@@ -51,10 +51,8 @@ begin
 
    Test
      ("CE2401B",
-      "CHECK READ, WRITE, SET_INDEX " &
-      "INDEX, SIZE, AND END_OF_FILE FOR " &
-      "DIRECT FILES FOR BOOLEAN, ACCESS " &
-      "AND ENUMERATION TYPES");
+      "CHECK READ, WRITE, SET_INDEX " & "INDEX, SIZE, AND END_OF_FILE FOR " &
+      "DIRECT FILES FOR BOOLEAN, ACCESS " & "AND ENUMERATION TYPES");
    declare
       package Dir_Bool is new Direct_Io (Boolean);
       use Dir_Bool;

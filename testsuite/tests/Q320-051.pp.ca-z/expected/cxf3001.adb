@@ -96,37 +96,25 @@ begin
 
       Picture_Strings : Picture_String_Array_Type
         (1 .. Number_Of_Picture_Strings) :=
-        (1 => new String'("-$$_$$9.99"),
-         2 => new String'("-$$_$$$.$$"),
-         3 => new String'("-ZZZZ.ZZ"),
-         4 => new String'("-$$$_999.99"));
+        (1 => new String'("-$$_$$9.99"), 2 => new String'("-$$_$$$.$$"),
+         3 => new String'("-ZZZZ.ZZ"), 4 => new String'("-$$$_999.99"));
 
       Edited_Output : Edited_Output_Results_Array_Type
         (1 .. Number_Of_Expected_Results) :=
-        (1 => new String'(" $5,678.90"),
-         2 => new String'(" $5,678.90"),
-         3 => new String'(" 5678.90"),
-         4 => new String'("  $5,678.90"),
+        (1 => new String'(" $5,678.90"), 2 => new String'(" $5,678.90"),
+         3 => new String'(" 5678.90"), 4 => new String'("  $5,678.90"),
 
-         5 => new String'("-$6,789.01"),
-         6 => new String'("-$6,789.01"),
-         7 => new String'("-6789.01"),
-         8 => new String'("- $6,789.01"),
+         5 => new String'("-$6,789.01"), 6 => new String'("-$6,789.01"),
+         7 => new String'("-6789.01"), 8 => new String'("- $6,789.01"),
 
-         9  => new String'("     $0.00"),
-         10 => new String'("          "),
-         11 => new String'("        "),
-         12 => new String'("   $ 000.00"),
+         9  => new String'("     $0.00"), 10 => new String'("          "),
+         11 => new String'("        "), 12 => new String'("   $ 000.00"),
 
-         13 => new String'("     $0.20"),
-         14 => new String'("      $.20"),
-         15 => new String'("     .20"),
-         16 => new String'("   $ 000.20"),
+         13 => new String'("     $0.20"), 14 => new String'("      $.20"),
+         15 => new String'("     .20"), 16 => new String'("   $ 000.20"),
 
-         17 => new String'("     $3.45"),
-         18 => new String'("     $3.45"),
-         19 => new String'("    3.45"),
-         20 => new String'("   $ 003.45"));
+         17 => new String'("     $3.45"), 18 => new String'("     $3.45"),
+         19 => new String'("    3.45"), 20 => new String'("   $ 003.45"));
 
       Tc_Picture    : Editing.Picture;
       Tc_Loop_Count : Natural := 0;
@@ -153,20 +141,17 @@ begin
                -- the expected result.
 
                if Ed_Out.Image (Decimal_Data (I), Tc_Picture) /=
-                 Edited_Output (Tc_Loop_Count).all
-               then
+                 Edited_Output (Tc_Loop_Count).all then
                   Report.Failed
                     ("Incorrect result from Function Image, " &
                      "when used with decimal data item # " &
-                     Integer'Image (I) &
-                     " and picture string # " &
+                     Integer'Image (I) & " and picture string # " &
                      Integer'Image (J));
                end if;
 
             else
                Report.Failed
-                 ("Picture String # " &
-                  Integer'Image (J) &
+                 ("Picture String # " & Integer'Image (J) &
                   "reported as being invalid");
                -- Immediate test failure if a string is invalid.
                exit Evaluate_Edited_Output;

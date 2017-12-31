@@ -96,8 +96,7 @@ begin
 
          type Ta42 is
            array
-             (Integer range
-                Ident_Int (-2) ..
+             (Integer range Ident_Int (-2) ..
                   Ident_Int (Integer'Last)) of Boolean;
          -- CONSTRAINT_ERROR MAY BE RAISED BY THE ARRAY TYPE DECLARATION.
          pragma Pack (Ta42);

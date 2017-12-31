@@ -43,8 +43,7 @@ procedure Ce3809a is
 begin
 
    Test
-     ("CE3809A",
-      "CHECK THAT FLOAT_IO GET " & "OPERATES CORRECTLY ON STRINGS");
+     ("CE3809A", "CHECK THAT FLOAT_IO GET " & "OPERATES CORRECTLY ON STRINGS");
 
    declare
       type Fl is digits 4;
@@ -83,8 +82,7 @@ begin
             if L /= 5 then
                Failed
                  ("AFTER END_ERROR, VALUE OF LAST " &
-                  "INCORRECT - 2.  LAST IS" &
-                  Integer'Image (L));
+                  "INCORRECT - 2.  LAST IS" & Integer'Image (L));
             end if;
          when Data_Error =>
             Failed ("DATA_ERROR RAISED - FLOAT - 2");
@@ -101,8 +99,7 @@ begin
             if L /= 5 then
                Failed
                  ("AFTER END_ERROR, VALUE OF LAST " &
-                  "INCORRECT - 3.  LAST IS" &
-                  Integer'Image (L));
+                  "INCORRECT - 3.  LAST IS" & Integer'Image (L));
             end if;
          when Data_Error =>
             Failed ("DATA_ERROR RAISED - FLOAT - 3");
@@ -119,8 +116,7 @@ begin
             if L /= 5 then
                Failed
                  ("AFTER END_ERROR, VALUE OF LAST " &
-                  "INCORRECT - 4.  LAST IS" &
-                  Integer'Image (L));
+                  "INCORRECT - 4.  LAST IS" & Integer'Image (L));
             end if;
          when Data_Error =>
             Failed ("DATA_ERROR RAISED - FLOAT - 4");
@@ -137,8 +133,7 @@ begin
             if L /= Ident_Int (5) then
                Failed
                  ("AFTER END_ERROR, VALUE OF LAST " &
-                  "INCORRECT - 5.  LAST IS" &
-                  Integer'Image (L));
+                  "INCORRECT - 5.  LAST IS" & Integer'Image (L));
             end if;
          when Data_Error =>
             Failed ("DATA_ERROR RAISED - FLOAT - 5");
@@ -170,8 +165,7 @@ begin
 
          if L /= 8 then
             Failed
-              ("VALUE OF LAST INCORRECT - FLOAT - 7.  " &
-               "LAST IS" &
+              ("VALUE OF LAST INCORRECT - FLOAT - 7.  " & "LAST IS" &
                Integer'Image (L));
          end if;
       exception
@@ -230,8 +224,7 @@ begin
             if L /= Ident_Int (8) then
                Failed
                  ("AFTER END_ERROR, VALUE OF LAST " &
-                  "INCORRECT - 11.  LAST IS" &
-                  Integer'Image (L));
+                  "INCORRECT - 11.  LAST IS" & Integer'Image (L));
             end if;
          when Data_Error =>
             Failed ("DATA_ERROR RAISED - FLOAT - 11");

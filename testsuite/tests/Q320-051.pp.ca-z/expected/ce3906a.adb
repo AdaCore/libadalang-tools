@@ -56,8 +56,7 @@ begin
       "OPERATE ON FILES OF MODE OUT_FILE AND THAT " &
       "WHEN NO FILE PARAMETER IS SPECIFIED THE " &
       "CURRENT DEFAULT OUTPUT FILE IS USED. CHECK " &
-      "THAT ENUMERATION_IO PUT OPERATES ON OUT_FILE " &
-      "FILES");
+      "THAT ENUMERATION_IO PUT OPERATES ON OUT_FILE " & "FILES");
 
    declare
       Ft1, Ft2 : File_Type;
@@ -73,8 +72,7 @@ begin
          when Use_Error =>
             Not_Applicable
               ("USE_ERROR RAISED; TEXT CREATE " &
-               "FOR TEMP FILES WITH OUT_FILE " &
-               "MODE - 1");
+               "FOR TEMP FILES WITH OUT_FILE " & "MODE - 1");
             raise Incomplete;
       end;
 

@@ -73,13 +73,11 @@ procedure C460008 is
    generic
       type Source is range <>;
       type Target is mod <>;
-   procedure Integer_Conversion_Check
-     (For_The_Value : Source;
-      Message       : String);
+   procedure Integer_Conversion_Check (For_The_Value : Source;
+      Message                                        : String);
 
-   procedure Integer_Conversion_Check
-     (For_The_Value : Source;
-      Message       : String)
+   procedure Integer_Conversion_Check (For_The_Value : Source;
+      Message                                        : String)
    is
 
       Item : Target;
@@ -98,16 +96,13 @@ procedure C460008 is
          Report.Failed ("Int Raised wrong exception " & Message);
    end Integer_Conversion_Check;
 
-   procedure Int_To_Short is new Integer_Conversion_Check
-     (Integer,
+   procedure Int_To_Short is new Integer_Conversion_Check (Integer,
       Unsigned_Edge_8);
 
-   procedure Int_To_Eight is new Integer_Conversion_Check
-     (Integer,
+   procedure Int_To_Eight is new Integer_Conversion_Check (Integer,
       Unsigned_8_Bit);
 
-   procedure Int_To_Wide is new Integer_Conversion_Check
-     (Integer,
+   procedure Int_To_Wide is new Integer_Conversion_Check (Integer,
       Unsigned_Over_8);
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -133,16 +128,13 @@ procedure C460008 is
          Report.Failed ("Flt raised wrong exception " & Message);
    end Float_Conversion_Check;
 
-   procedure Float_To_Short is new Float_Conversion_Check
-     (Float,
+   procedure Float_To_Short is new Float_Conversion_Check (Float,
       Unsigned_Edge_8);
 
-   procedure Float_To_Eight is new Float_Conversion_Check
-     (Float,
+   procedure Float_To_Eight is new Float_Conversion_Check (Float,
       Unsigned_8_Bit);
 
-   procedure Float_To_Wide is new Float_Conversion_Check
-     (Float,
+   procedure Float_To_Wide is new Float_Conversion_Check (Float,
       Unsigned_Over_8);
 
    function Identity (Root_Beer : Float) return Float is
@@ -179,16 +171,13 @@ procedure C460008 is
          Report.Failed ("Fix raised wrong exception " & Message);
    end Fixed_Conversion_Check;
 
-   procedure Fixed_To_Short is new Fixed_Conversion_Check
-     (Duration,
+   procedure Fixed_To_Short is new Fixed_Conversion_Check (Duration,
       Unsigned_Edge_8);
 
-   procedure Fixed_To_Eight is new Fixed_Conversion_Check
-     (Duration,
+   procedure Fixed_To_Eight is new Fixed_Conversion_Check (Duration,
       Unsigned_8_Bit);
 
-   procedure Fixed_To_Wide is new Fixed_Conversion_Check
-     (Duration,
+   procedure Fixed_To_Wide is new Fixed_Conversion_Check (Duration,
       Unsigned_Over_8);
 
    function Identity (A_Stitch : Duration) return Duration is
@@ -209,8 +198,7 @@ begin  -- Main test procedure.
      ("C460008",
       "Check that conversion to " &
       "a modular type raises Constraint_Error when " &
-      "the operand value is outside the base range " &
-      "of the modular type");
+      "the operand value is outside the base range " & "of the modular type");
 
    -- Integer Error cases
 
@@ -223,8 +211,7 @@ begin  -- Main test procedure.
    Int_To_Eight (Heavy_By_Two + 1, "I28 Static,  Over_Mod");
 
    Int_To_Wide
-     (Report.Ident_Int (-(Heavy_By_Two * 2)),
-      "I2W Dynamic, Negative");
+     (Report.Ident_Int (-(Heavy_By_Two * 2)), "I2W Dynamic, Negative");
    Int_To_Wide (Heavy_By_Two, "I2W Static,  At_Mod");
    Int_To_Wide (Report.Ident_Int (Heavy_By_Two * 2), "I2W Dynamic, Over_Mod");
 

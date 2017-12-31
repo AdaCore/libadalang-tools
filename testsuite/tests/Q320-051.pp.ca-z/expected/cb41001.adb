@@ -188,8 +188,7 @@ begin
             when others =>
                Report.Failed
                  ("Incorrect result from attempt to raise " &
-                  "Constraint_Error using the 'Identity " &
-                  "attribute - 2");
+                  "Constraint_Error using the 'Identity " & "attribute - 2");
          end Inner_Block;
 
          Report.Failed ("Exception not propagated from Inner_Block");
@@ -209,8 +208,7 @@ begin
          if not Tc_Check_Points (I) then
             Report.Failed
               ("Incorrect processing path taken through test, " &
-               "didn't pass check point #" &
-               Integer'Image (I));
+               "didn't pass check point #" & Integer'Image (I));
          end if;
       end loop;
 

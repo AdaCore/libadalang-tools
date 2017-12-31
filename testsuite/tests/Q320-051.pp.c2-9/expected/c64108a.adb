@@ -97,8 +97,7 @@ begin
 
    S1 := "AAA";
    S2 := "BBB";
-   P1 (S1 (1 .. Ident_Int (2)),
-      S2 (1 .. 2),
+   P1 (S1 (1 .. Ident_Int (2)), S2 (1 .. 2),
       S3 (Ident_Int (1) .. Ident_Int (2)));
    if (S2 /= "AAB") or (S3 /= "BBC") then
       Failed ("SLICE AS AN ACTUAL PARAMETER NOT WORKING");
@@ -140,8 +139,7 @@ begin
    Ptrtbl (1) := new String'("AAA");
    Ptrtbl (2) := new String'("BBB");
    Ptrtbl (3) := new String'("CCC");
-   P1 (F1 (1) (2 .. 3),
-      F1 (2) (Ident_Int (2) .. 3),
+   P1 (F1 (1) (2 .. 3), F1 (2) (Ident_Int (2) .. 3),
       F1 (3) (2 .. Ident_Int (3)));
    if (Ptrtbl (2).all /= "BAA") or (Ptrtbl (3).all /= "CBB") then
       Failed

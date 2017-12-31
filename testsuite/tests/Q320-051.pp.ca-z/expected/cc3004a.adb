@@ -57,11 +57,8 @@ begin
 
       package body P1 is
       begin
-         if A /= Ident_Int (4) or
-           B /= Ident_Int (12) or
-           C /= Ident_Int (11) or
-           D /= Ident_Int (-33)
-         then
+         if A /= Ident_Int (4) or B /= Ident_Int (12) or C /= Ident_Int (11) or
+           D /= Ident_Int (-33) then
             Failed ("WRONG GENERIC PARAMETER ASSOCIATIONS");
          end if;
       end P1;

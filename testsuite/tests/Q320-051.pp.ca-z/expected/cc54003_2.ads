@@ -12,11 +12,9 @@ package Cc54003_2 is
 
    Maximum_Ops : constant := 4;         -- Arbitrary.
 
-   package Stack_Of_Ops is new Cc54003_0
-     (Item_Type    => Cc54003_1.Message,
-      Item_Ptr     => Cc54003_1.Message_Ptr,
-      Function_Ptr => Operation_Ptr,
-      Size         => Maximum_Ops);
+   package Stack_Of_Ops is new Cc54003_0 (Item_Type => Cc54003_1.Message,
+      Item_Ptr => Cc54003_1.Message_Ptr, Function_Ptr => Operation_Ptr,
+      Size                                          => Maximum_Ops);
 
    Operation_Stack : Stack_Of_Ops.Stack_Type;
 

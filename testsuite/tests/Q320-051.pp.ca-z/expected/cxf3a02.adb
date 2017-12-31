@@ -72,20 +72,17 @@ procedure Cxf3a02 is
           (Source  => Source,
            Mapping =>
              Ada.Strings.Maps.To_Mapping
-               (From => Lower_Alpha,
-                To   => Upper_Alpha));
+               (From => Lower_Alpha, To => Upper_Alpha));
    end Uppercase;
 
 begin
 
    Report.Test
      ("CXF3A02",
-      "Check that the function " &
-      "Ada.Text_IO.Editing.To_Picture raises " &
+      "Check that the function " & "Ada.Text_IO.Editing.To_Picture raises " &
       "Picture_Error if the picture string provided " &
       "as input parameter does not conform to the " &
-      "composition constraints defined for picture " &
-      "strings");
+      "composition constraints defined for picture " & "strings");
 
    Test_Block :
    declare
@@ -112,12 +109,10 @@ begin
                Report.Failed
                  ("Picture_Error raised by function To_Picture " &
                   "with a valid picture string as input parameter, " &
-                  "Valid_String = " &
-                  Fxf3a00.Valid_Strings (I).all);
+                  "Valid_String = " & Fxf3a00.Valid_Strings (I).all);
             when others =>
                Report.Failed
-                 ("Unexpected exception raised - 1, " &
-                  "Valid_String = " &
+                 ("Unexpected exception raised - 1, " & "Valid_String = " &
                   Fxf3a00.Valid_Strings (I).all);
          end;
       end loop;
@@ -134,15 +129,13 @@ begin
             Report.Failed
               ("Picture_Error not raised by function To_Picture " &
                "with an invalid picture string as input parameter, " &
-               "Invalid_String = " &
-               Fxf3a00.Invalid_Strings (I).all);
+               "Invalid_String = " & Fxf3a00.Invalid_Strings (I).all);
          exception
             when Editing.Picture_Error =>
                null;  -- OK, expected exception.
             when others =>
                Report.Failed
-                 ("Unexpected exception raised, " &
-                  "Invalid_String = " &
+                 ("Unexpected exception raised, " & "Invalid_String = " &
                   Fxf3a00.Invalid_Strings (I).all);
          end;
       end loop;
@@ -166,12 +159,10 @@ begin
             -- using function Pic_String, and compare to the original string.
 
             if Editing.Pic_String (Pic => Tc_Picture) /=
-              Uppercase (Fxf3a00.Valid_Strings (I).all)
-            then
+              Uppercase (Fxf3a00.Valid_Strings (I).all) then
                Report.Failed
                  ("Inverse result incorrect from Editing.Pic_String, " &
-                  "Valid_String = " &
-                  Fxf3a00.Valid_Strings (I).all);
+                  "Valid_String = " & Fxf3a00.Valid_Strings (I).all);
             end if;
 
             -- Ensure that function Blank_When_Zero returns the correct value
@@ -182,15 +173,13 @@ begin
             if Editing.Blank_When_Zero (Pic => Tc_Picture) then
                Report.Failed
                  ("Inverse result incorrect from Editing.Blank_When_Zero, " &
-                  "Valid_String = " &
-                  Fxf3a00.Valid_Strings (I).all);
+                  "Valid_String = " & Fxf3a00.Valid_Strings (I).all);
             end if;
 
          exception
             when others =>
                Report.Failed
-                 ("Unexpected exception raised - 2, " &
-                  "Valid_String = " &
+                 ("Unexpected exception raised - 2, " & "Valid_String = " &
                   Fxf3a00.Valid_Strings (I).all);
          end;
       end loop;
@@ -232,20 +221,17 @@ begin
 
             Tc_Picture :=
               Editing.To_Picture
-                (Pic_String      => Valid_Strings (I).all,
-                 Blank_When_Zero => True);
+                (Pic_String => Valid_Strings (I).all, Blank_When_Zero => True);
 
             -- Reconvert the Picture result from To_Picture to a string value
             -- using function Pic_String, and compare to the original string.
 
             if Editing.Pic_String (Pic => Tc_Picture) /=
-              Uppercase (Fxf3a00.Valid_Strings (I).all)
-            then
+              Uppercase (Fxf3a00.Valid_Strings (I).all) then
                Report.Failed
                  ("Inverse result incorrect from Editing.Pic_String, used " &
                   "on Picture formed with parameter Blank_When_Zero = True, " &
-                  "Valid_String = " &
-                  Fxf3a00.Valid_Strings (I).all);
+                  "Valid_String = " & Fxf3a00.Valid_Strings (I).all);
             end if;
 
             -- Ensure that function Blank_When_Zero returns the correct value
@@ -257,15 +243,13 @@ begin
                Report.Failed
                  ("Inverse result incorrect from Editing.Blank_When_Zero, " &
                   "used on a Picture formed with parameter Blank_When_Zero " &
-                  "= True, Valid_String = " &
-                  Fxf3a00.Valid_Strings (I).all);
+                  "= True, Valid_String = " & Fxf3a00.Valid_Strings (I).all);
             end if;
 
          exception
             when others =>
                Report.Failed
-                 ("Unexpected exception raised - 3, " &
-                  "Valid_String = " &
+                 ("Unexpected exception raised - 3, " & "Valid_String = " &
                   Fxf3a00.Valid_Strings (I).all);
          end;
       end loop;

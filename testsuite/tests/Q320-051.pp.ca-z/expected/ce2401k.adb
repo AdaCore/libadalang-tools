@@ -44,8 +44,7 @@ begin
    Test
      ("CE2401K",
       "CHECK THAT DATA CAN BE OVERWRITTEN IN " &
-      "THE DIRECT FILE AND THE CORRECT VALUES " &
-      "CAN LATER BE READ.");
+      "THE DIRECT FILE AND THE CORRECT VALUES " & "CAN LATER BE READ.");
 
    declare
       package Dir_Io is new Direct_Io (Integer);

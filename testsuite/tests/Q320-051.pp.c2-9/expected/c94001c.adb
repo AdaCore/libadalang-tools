@@ -65,8 +65,7 @@ begin
      ("C94001C",
       "CHECK THAT A UNIT WITH INDIRECT DEPENDENT " &
       "TASKS CREATED BY OBJECT DECLARATIONS IS NOT " &
-      "TERMINATED UNTIL ALL INDIRECT DEPENDENT TASKS " &
-      "BECOME TERMINATED");
+      "TERMINATED UNTIL ALL INDIRECT DEPENDENT TASKS " & "BECOME TERMINATED");
 
    --------------------------------------------------
    Global := Ident_Int (0);

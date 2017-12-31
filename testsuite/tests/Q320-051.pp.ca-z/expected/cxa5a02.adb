@@ -132,13 +132,9 @@ begin
          Result_Within_Range (Gef.Cos (0.194_9), 0.981, 0.001) and
          Result_Within_Range (Ef.Cos (Ada.Numerics.Pi / 2.0), 0.00, 0.001) and
          Result_Within_Range
-           (Ef.Cos (2.0 * Ada.Numerics.Pi / 3.0),
-            -0.500,
-            0.001) and
+           (Ef.Cos (2.0 * Ada.Numerics.Pi / 3.0), -0.500, 0.001) and
          Result_Within_Range
-           (Gef.Cos (New_Float (Ada.Numerics.Pi)),
-            -1.00,
-            0.001))
+           (Gef.Cos (New_Float (Ada.Numerics.Pi)), -1.00, 0.001))
       then
          Report.Failed
            ("Incorrect value returned from Cos function when " &
@@ -224,13 +220,9 @@ begin
       -- Tests of Cos function with specified Cycle, using various input
       -- parameter values for prescribed results.
 
-      if Gef.Cos (0.0, 360.0) /= 1.0 or
-        Ef.Cos (360.0, 360.0) /= 1.0 or
-        Gef.Cos (90.0, 360.0) /= 0.0 or
-        Ef.Cos (270.0, 360.0) /= 0.0 or
-        Gef.Cos (180.0, 360.0) /= -1.0 or
-        Ef.Cos (540.0, 360.0) /= -1.0
-      then
+      if Gef.Cos (0.0, 360.0) /= 1.0 or Ef.Cos (360.0, 360.0) /= 1.0 or
+        Gef.Cos (90.0, 360.0) /= 0.0 or Ef.Cos (270.0, 360.0) /= 0.0 or
+        Gef.Cos (180.0, 360.0) /= -1.0 or Ef.Cos (540.0, 360.0) /= -1.0 then
          Report.Failed
            ("Incorrect result from the Cos function with " &
             "specified cycle for prescribed results");
@@ -322,8 +314,7 @@ begin
         not Fxa5a00.Result_Within_Range (Gef.Cosh (1.06), 1.616, 0.001) or
         not Fxa5a00.Result_Within_Range (Ef.Cosh (1.50), 2.352, 0.001) or
         not Fxa5a00.Result_Within_Range (Gef.Cosh (1.84), 3.228, 0.001) or
-        not Fxa5a00.Result_Within_Range (Ef.Cosh (3.40), 14.99, 0.01)
-      then
+        not Fxa5a00.Result_Within_Range (Ef.Cosh (3.40), 14.99, 0.01) then
          Report.Failed
            ("Incorrect result from Cosh function with " &
             "various input parameters");

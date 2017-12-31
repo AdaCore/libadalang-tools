@@ -131,8 +131,7 @@ procedure C940012 is
 begin
 
    Report.Test
-     ("C940012",
-      "Check that a protected object " & "can have discriminants");
+     ("C940012", "Check that a protected object " & "can have discriminants");
 
    -- Build the ramps and populate the ramp array
    for I in Ramp_Index loop

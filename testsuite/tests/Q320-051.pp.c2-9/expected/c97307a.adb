@@ -36,8 +36,7 @@ begin
      ("C97307A",
       "CHECK THAT A TIMED ENTRY CALL THAT IS " &
       "CANCELED (BECAUSE THE DELAY HAS EXPIRED) IS " &
-      "REMOVED FROM THE QUEUE OF THE CALLED TASK'S " &
-      "ENTRY");
+      "REMOVED FROM THE QUEUE OF THE CALLED TASK'S " & "ENTRY");
 
    declare
 
@@ -123,8 +122,7 @@ begin
       exception
          when others =>
             Failed
-              ("EXCEPTION RAISED IN TIMED_CALLER -- " &
-               "CALLER" &
+              ("EXCEPTION RAISED IN TIMED_CALLER -- " & "CALLER" &
                Natural'Image (My_Name));
       end Timed_Caller;
 
@@ -188,15 +186,10 @@ begin
          if Accepted /= (2, 4, 0, 0, 0) then
             Failed ("SOME TIMED CALLS NOT REMOVED FROM ENTRY " & "QUEUE");
             Comment
-              ("ORDER ACCEPTED WAS:" &
-               Natural'Image (Accepted (1)) &
-               ',' &
-               Natural'Image (Accepted (2)) &
-               ',' &
-               Natural'Image (Accepted (3)) &
-               ',' &
-               Natural'Image (Accepted (4)) &
-               ',' &
+              ("ORDER ACCEPTED WAS:" & Natural'Image (Accepted (1)) & ',' &
+               Natural'Image (Accepted (2)) & ',' &
+               Natural'Image (Accepted (3)) & ',' &
+               Natural'Image (Accepted (4)) & ',' &
                Natural'Image (Accepted (5)));
          end if;
       end T;

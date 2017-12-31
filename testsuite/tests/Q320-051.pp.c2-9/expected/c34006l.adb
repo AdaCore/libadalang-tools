@@ -88,30 +88,17 @@ procedure C34006l is
          end case;
       end record;
 
-      function Create
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         C : Component;
-         F : Float;
-         X : Parent  -- TO RESOLVE OVERLOADING.
+      function Create (B : Boolean; L : Length; I : Integer; S : String;
+         C : Component; F : Float; X : Parent  -- TO RESOLVE OVERLOADING.
          ) return Parent;
 
       function Equal (X, Y : Parent) return Boolean;
 
-      function Aggr
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         C : Component) return Parent;
+      function Aggr (B : Boolean; L : Length; I : Integer; S : String;
+         C             : Component) return Parent;
 
-      function Aggr
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         F : Float) return Parent;
+      function Aggr (B : Boolean; L : Length; I : Integer;
+         F             : Float) return Parent;
 
    end Pkg_P;
 
@@ -147,14 +134,8 @@ procedure C34006l is
 
    package body Pkg_P is
 
-      function Create
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         C : Component;
-         F : Float;
-         X : Parent) return Parent
+      function Create (B : Boolean; L : Length; I : Integer; S : String;
+         C               : Component; F : Float; X : Parent) return Parent
       is
       begin
          return A : Parent (B, L) do
@@ -182,12 +163,8 @@ procedure C34006l is
          end case;
       end Equal;
 
-      function Aggr
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         S : String;
-         C : Component) return Parent
+      function Aggr (B : Boolean; L : Length; I : Integer; S : String;
+         C             : Component) return Parent
       is
       begin
          return Result : Parent (B, L) do
@@ -197,11 +174,8 @@ procedure C34006l is
          end return;
       end Aggr;
 
-      function Aggr
-        (B : Boolean;
-         L : Length;
-         I : Integer;
-         F : Float) return Parent
+      function Aggr (B : Boolean; L : Length; I : Integer;
+         F             : Float) return Parent
       is
       begin
          return Result : Parent (B, L) do
@@ -244,18 +218,15 @@ begin
    -- CHECK THAT BASE TYPE VALUES NOT IN THE SUBTYPE ARE PRESENT.
 
    if not Equal
-       (Create (False, 2, 3, "ZZ", C5, 6.0, X),
-        Aggr (False, 2, 3, 6.0)) or
+       (Create (False, 2, 3, "ZZ", C5, 6.0, X), Aggr (False, 2, 3, 6.0)) or
      not Equal
-       (Create (False, 2, 3, "ZZ", C5, 6.0, Y),
-        Aggr (False, 2, 3, 6.0))
+       (Create (False, 2, 3, "ZZ", C5, 6.0, Y), Aggr (False, 2, 3, 6.0))
    then
       Failed ("CAN'T CREATE BASE TYPE VALUES OUTSIDE THE SUBTYPE");
    end if;
 
    if Create (False, 2, 3, "ZZ", C5, 6.0, X) in T or
-     Create (False, 2, 3, "ZZ", C5, 6.0, Y) in S
-   then
+     Create (False, 2, 3, "ZZ", C5, 6.0, Y) in S then
       Failed ("INCORRECT ""IN""");
    end if;
 

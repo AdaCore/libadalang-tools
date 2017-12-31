@@ -66,8 +66,7 @@ procedure Cxa3008 is
       -- Function To_Lower for Wide_Wide_Strings
 
       if Awwch.To_Lower (Uc_Wide_Wide_String_1) /= Lc_Wide_Wide_String_1 or
-        Awwch.To_Lower (Lc_Wide_Wide_String_1) /= Lc_Wide_Wide_String_1
-      then
+        Awwch.To_Lower (Lc_Wide_Wide_String_1) /= Lc_Wide_Wide_String_1 then
 
          Report.Failed ("Incorrect result from To_Lower for wide strings - 1");
 
@@ -81,8 +80,7 @@ procedure Cxa3008 is
 
       -- Function To_Upper for Wide_Wide_Strings
 
-      if not
-        (Awwch.To_Upper (Lc_Wide_Wide_String_1) = Uc_Wide_Wide_String_1)
+      if not (Awwch.To_Upper (Lc_Wide_Wide_String_1) = Uc_Wide_Wide_String_1)
       then
 
          Report.Failed ("Incorrect result from To_Upper for wide strings - 1");
@@ -90,8 +88,7 @@ procedure Cxa3008 is
       end if;
 
       if Awwch.To_Upper (Lc_Wide_Wide_String_2) /= Uc_Wide_Wide_String_2 or
-        Awwch.To_Upper (Uc_Wide_Wide_String_1) /= Uc_Wide_Wide_String_1
-      then
+        Awwch.To_Upper (Uc_Wide_Wide_String_1) /= Uc_Wide_Wide_String_1 then
 
          Report.Failed ("Incorrect result from To_Upper for wide strings - 2");
 
@@ -138,8 +135,7 @@ begin
       loop
 
          if Awwch.To_Lower (Wide_Wide_Character'Val (I)) /=
-           Wide_Wide_Character'Val (I + Offset)
-         then
+           Wide_Wide_Character'Val (I + Offset) then
 
             Report.Failed ("Incorrect operation of function To_Lower - 2");
 
@@ -147,11 +143,8 @@ begin
 
       end loop;
 
-      if Awwch.To_Lower ('c') /= 'c' or
-        Awwch.To_Lower ('w') /= 'w' or
-        Awwch.To_Lower ('0') /= '0' or
-        Awwch.To_Lower ('9') /= '9'
-      then
+      if Awwch.To_Lower ('c') /= 'c' or Awwch.To_Lower ('w') /= 'w' or
+        Awwch.To_Lower ('0') /= '0' or Awwch.To_Lower ('9') /= '9' then
 
          Report.Failed ("Incorrect operation of function To_Lower - 3");
 
@@ -197,8 +190,7 @@ begin
       for I in 16#0391# .. 16#3A1# loop -- Capital Alpha to Capital Rho
 
          if Awwch.To_Lower (Wide_Wide_Character'Val (I)) /=
-           Wide_Wide_Character'Val (I + Offset)
-         then
+           Wide_Wide_Character'Val (I + Offset) then
 
             Report.Failed ("Incorrect operation of function To_Lower - 4");
 
@@ -211,8 +203,7 @@ begin
       for I in 16#03A3# .. 16#3A9# loop -- Capital Sigma to Capital Omega
 
          if Awwch.To_Lower (Wide_Wide_Character'Val (I)) /=
-           Wide_Wide_Character'Val (I + Offset)
-         then
+           Wide_Wide_Character'Val (I + Offset) then
 
             Report.Failed ("Incorrect operation of function To_Lower - 5");
 
@@ -236,8 +227,7 @@ begin
       for I in 16#03B1# .. 16#3C1# loop -- Small Alpha to Small Rho
 
          if Awwch.To_Upper (Wide_Wide_Character'Val (I)) /=
-           Wide_Wide_Character'Val (I - Offset)
-         then
+           Wide_Wide_Character'Val (I - Offset) then
 
             Report.Failed ("Incorrect operation of function To_Upper - 3");
 
@@ -250,8 +240,7 @@ begin
       for I in 16#03C3# .. 16#3C9# loop -- Small Sigma to Small Omega
 
          if Awwch.To_Upper (Wide_Wide_Character'Val (I)) /=
-           Wide_Wide_Character'Val (I - Offset)
-         then
+           Wide_Wide_Character'Val (I - Offset) then
 
             Report.Failed ("Incorrect operation of function To_Upper - 4");
 

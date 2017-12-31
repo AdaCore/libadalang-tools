@@ -13,9 +13,8 @@ package C840001_1 is
 -- the corresponding operator of the 1st subtype are not directly visible in
 -- the same place.
 
-   function "**"
-     (Left  : Precision_Pos_Float;
-      Right : Natural'Base)
+   function "**" (Left : Precision_Pos_Float;
+      Right            : Natural'Base)
      return Precision_Pos_Float;           -- Accepts only positive exponent.
 
 end C840001_1;
