@@ -633,7 +633,7 @@ package body METRICS.Actions is
 
          when Ada_Aspect_Assoc =>
             declare
-               Id : constant Expr := Node.As_Aspect_Assoc.F_Id;
+               Id : constant Name := Node.As_Aspect_Assoc.F_Id;
             begin
                case Kind (Id) is
                   when Ada_Identifier =>
