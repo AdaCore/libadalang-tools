@@ -20,6 +20,7 @@ with GNAT.Lock_Files;
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
 with Langkit_Support.Slocs; use Langkit_Support;
+with Langkit_Support.Adalog;
 with LAL_Extensions; use LAL_Extensions;
 
 with Utils.Command_Lines.Common; use Utils.Command_Lines.Common;
@@ -1185,7 +1186,7 @@ package body Pp.Actions is
       --  command-line options.
 
       function Id_With_Casing
-        (Id                       : Symbol;
+        (Id                       : W_Str;
          Kind                     : Opt_ASIS_Elems;
          Is_Predef                : Boolean)
          return                     W_Str;
@@ -1205,8 +1206,8 @@ package body Pp.Actions is
       --  use the Decl_Kind attribute, which includes declared entities and
       --  attributes. For pragmas, we use the Kind of the pragma node.
       --
-      --  Is_Predef comes from the Is_Predef attribute of Usage_Names. It is
-      --  always False for Def_Names and pragmas.
+      --  Is_Predef is True if Id is a usage name that denotes a predefined
+      --  entity. It is always False for defining names and pragmas.
 
       function Init_Use_Dictionary return Boolean;
       function Init_Use_Dictionary return Boolean is
@@ -1283,17 +1284,14 @@ package body Pp.Actions is
          Name_SPARK_Mode'Access,
          Name_Use_VADS_Size'Access,
          Name_VADS_Size'Access);
-      pragma Unreferenced (Special_Case_Names);
 
       function Id_With_Casing
-        (Id                       : Symbol;
+        (Id                       : W_Str;
          Kind                     : Opt_ASIS_Elems;
          Is_Predef                : Boolean)
          return                     W_Str
       is
-         Src_Str : W_Str := To_W_Str (Id);
-         --  This is the name as declared
-         pragma Assert (Src_Str'First = 1);
+         pragma Assert (Id'First = 1);
 
          --  If it's a character literal, we want As_Declared -- it would be
          --  unfortunate to turn 'a' into 'A'. Operators go by keyword casing.
@@ -1305,36 +1303,40 @@ package body Pp.Actions is
          --  the appropriate option based on the Kind.
 
          Casing : constant PP_Casing :=
-           (if Src_Str (1) = ''' then As_Declared
---            elsif
---              Kind not in Ada_Attribute_Ref
+           (if Id (1) = ''' then As_Declared
+            elsif Id (1) = '"' -- operator symbol
+--              Kind not in Ada_Attribute_Ref | Ada_Update_Attribute_Ref
 --              and then
---              (Src_Str (1) = '"' -- operator symbol
+--              (Id (1) = '"') -- operator symbol
 --               or else Is_Reserved_Word (Id, Utils.Ada_Version)
 --               or else Id = Name_And_Then
 --               or else Id = Name_Or_Else)
---            then
---              PP_Keyword_Casing (Cmd)
+            then
+              PP_Keyword_Casing (Cmd)
             elsif Is_Predef and then Use_Predefined_Casing then
               As_Declared
             else
               (case Kind is
---                 when Ada_Attribute_Ref =>
---                   PP_Attribute_Casing (Cmd),
+                 when Ada_Attribute_Ref | Ada_Update_Attribute_Ref =>
+                   PP_Attribute_Casing (Cmd),
                  when Ada_Pragma_Node => PP_Pragma_Casing (Cmd),
---                 when Ada_Enumeration_Literal_Specification =>
---                   PP_Enum_Casing (Cmd),
---                 when Ada_Flat_Type_Declaration |
---                   Ada_Subtype_Declaration |
---                   Ada_Formal_Type_Declaration |
---                   Ada_Formal_Incomplete_Type_Declaration |
---                   Ada_Task_Body_Declaration |
---                   Ada_Protected_Body_Declaration =>
---                   PP_Type_Casing (Cmd),
---                 when Ada_Flat_Number_Declaration => PP_Number_Casing (Cmd),
---                 when Not_An_Element            =>
+                 when Ada_Enum_Literal_Decl =>
+                   PP_Enum_Casing (Cmd),
+                 when Ada_Type_Decl |
+                     Ada_Incomplete_Type_Decl |
+                     Ada_Incomplete_Tagged_Type_Decl |
+                     Ada_Subtype_Decl |
+                     Ada_Task_Type_Decl |
+                     Ada_Task_Body |
+                     Ada_Protected_Body |
+                     Ada_Protected_Type_Decl |
+                     Ada_Generic_Formal_Type_Decl =>
+                   PP_Type_Casing (Cmd),
+                 when Ada_Number_Decl => PP_Number_Casing (Cmd),
+                 when Null_Kind =>
 --                   (if PP_Name_Casing (Cmd) = As_Declared then Mixed
 --                    else PP_Name_Casing (Cmd)),
+                     PP_Name_Casing (Cmd),
                  when others => PP_Name_Casing (Cmd)));
          --  The Null_Kind case is for identifiers specific to pragmas
          --  and the like.
@@ -1342,37 +1344,40 @@ package body Pp.Actions is
          use Dictionaries;
       begin
          if Use_Dictionary then
-            Check_With_Dictionary (Ada_Name => Src_Str, Casing => Casing);
-            return Src_Str;
+            return Result : W_Str := Id do
+               Check_With_Dictionary (Ada_Name => Result, Casing => Casing);
+            end return;
          else
             case Casing is
                when Lower_Case =>
-                  return To_Lower (Src_Str);
+                  return To_Lower (Id);
 
                when Upper_Case =>
-                  return To_Upper (Src_Str);
+                  return To_Upper (Id);
 
                when Mixed =>
---                  if Kind in Ada_Attribute_Ref | ada_pragma_node
---                  then
---                     --  Handle pragma and attribute names that are special cases
---                     --  (some portion should be in ALL CAPS).
---
---                     declare
---                        Lower : constant W_Str := To_Lower (Src_Str);
---                     begin
---                        for Special of Special_Case_Names loop
---                           if Lower = To_Lower (Special.all) then
---                              return Special.all;
---                           end if;
---                        end loop;
---                     end;
---                  end if;
+                  if Kind in Ada_Attribute_Ref |
+                    Ada_Update_Attribute_Ref |
+                    Ada_Pragma_Node
+                  then
+                     --  Handle pragma and attribute names that are special cases
+                     --  (some portion should be in ALL CAPS).
 
-                  return Capitalize (Src_Str);
+                     declare
+                        Lower : constant W_Str := To_Lower (Id);
+                     begin
+                        for Special of Special_Case_Names loop
+                           if Lower = To_Lower (Special.all) then
+                              return Special.all;
+                           end if;
+                        end loop;
+                     end;
+                  end if;
+
+                  return Capitalize (Id);
 
                when As_Declared =>
-                  return Src_Str;
+                  return Id;
             end case;
          end if;
       end Id_With_Casing;
@@ -2893,7 +2898,7 @@ package body Pp.Actions is
          procedure Do_Subtype_Indication;
          procedure Do_Task_Def;
          procedure Do_Type_Decl;
-         procedure Do_Usage_Name;
+         procedure Do_Def_Or_Usage_Name;
 
          procedure Do_Others; -- anything not listed above
 
@@ -3573,7 +3578,7 @@ package body Pp.Actions is
          begin
             Put
               ("pragma \1",
-               Id_With_Casing (W_Intern (Id_Name (Tree.As_Pragma_Node.F_Id)),
+               Id_With_Casing (Id_Name (Tree.As_Pragma_Node.F_Id),
                                Tree.Kind, Is_Predef => False));
             Interpret_Template (Pragma_Alt_Templ);
          end Do_Pragma;
@@ -3811,20 +3816,95 @@ package body Pp.Actions is
             end if;
          end Do_Type_Decl;
 
-         procedure Do_Usage_Name is
---            P_Ref : constant Basic_Decl := Tree.As_Expr.P_Referenced_Decl;
-            P_Ref : constant Basic_Decl := No_Basic_Decl;
-            --  ???P_Referenced_Decl raises Constraint_Error.
-            K : constant Ada_Node_Kind_Type :=
-              (if P_Ref.Is_Null then Null_Kind else P_Ref.Kind);
+         function Denoted_Decl (Id : Base_Id) return Basic_Decl;
+         --  Returns the declaration denoted by Id. No_Basic_Decl
+         --  if it doesn't denote anything. If P_Referenced_Decl
+         --  raises an exception, we return No_Basic_Decl.
+
+         function Denoted_Def_Name
+           (Decl : Basic_Decl; Id : Base_Id) return Base_Id;
+         --  Returns the defining names denoted by Id.
+         --  Decl is the declaration denoted by Id, or null.
+         --  If Id doesn't denote anything, returns Id.
+
+         function Denoted_Decl (Id : Base_Id) return Basic_Decl is
          begin
-            Put
-              ("\1",
-               Id_With_Casing
-                 (W_Intern (Id_Name (Tree)),
-                  Kind => K,
-                  Is_Predef => False));
-         end Do_Usage_Name;
+            return Id.P_Referenced_Decl;
+         exception
+            --  ???At least some of these exceptions are bugs or
+            --  not-yet-implemented features of libadalang.
+
+            when Property_Error | Constraint_Error |
+              Langkit_Support.Adalog.Early_Binding_Error =>
+               return No_Basic_Decl;
+         end Denoted_Decl;
+
+         function Denoted_Def_Name
+           (Decl : Basic_Decl; Id : Base_Id) return Base_Id
+         is
+            use Libadalang;
+         begin
+            if Decl.Is_Null then
+               return Id;
+            else
+               --  Search through the defining names of the declaration to find
+               --  one with the same name.
+
+               declare
+                  Def_Names : constant Analysis.Name_Array :=
+                    P_Defining_Names (Decl);
+               begin
+                  for Def_Name of Def_Names loop
+                     case Def_Name.Kind is
+                        when Ada_Dotted_Name =>
+                           --  ???When processing lal_extensions.ads, the
+                           --  following assertion fails, so it is disabled for
+                           --  now. In particular "Vectors" in the
+                           --  instantiation appears to denote the declaration
+                           --  of Fast_Vectors, but it should denote the
+                           --  declaration of Vectors. The 'if' should not be
+                           --  necessary.
+                           pragma Assert
+                             (True or else
+                              L_Name (Id) =
+                                L_Name (Def_Name.As_Dotted_Name.F_Suffix));
+                           if L_Name (Id) =
+                                L_Name (Def_Name.As_Dotted_Name.F_Suffix)
+                           then
+                              return Def_Name.As_Dotted_Name.F_Suffix;
+                           end if;
+                        when Ada_Identifier | Ada_String_Literal =>
+                           if L_Name (Id) = L_Name (Def_Name) then
+                              return Def_Name.As_Base_Id;
+                           end if;
+                        when others => raise Program_Error;
+                     end case;
+                  end loop;
+                  if True then
+                     return Id; -- because of above ???
+                  end if;
+                  raise Program_Error;
+               end;
+            end if;
+         end Denoted_Def_Name;
+
+         procedure Do_Def_Or_Usage_Name is
+            Def : constant Boolean := Is_Def_Name (Tree.As_Base_Id);
+
+            Decl : constant Basic_Decl :=
+              (if Def then Tree.Parent.As_Basic_Decl
+               elsif Arg (Cmd, Syntax_Only) then No_Basic_Decl
+               else Denoted_Decl (Tree.As_Base_Id));
+            Def_Name : constant Base_Id :=
+              Denoted_Def_Name (Decl, Tree.As_Base_Id);
+            pragma Assert (if Def then Def_Name = Tree.As_Base_Id);
+            K : constant Ada_Node_Kind_Type :=
+              (if Decl.Is_Null then Null_Kind else Decl.Kind);
+         begin
+            Put ("\1", Id_With_Casing
+                         (Id_Name (Def_Name), Kind => K, Is_Predef => False));
+            --  ???Is_Predef is wrong.
+         end Do_Def_Or_Usage_Name;
 
       --  Start of processing for Subtree_To_Ada
 
@@ -3851,7 +3931,7 @@ package body Pp.Actions is
                Do_Compilation_Unit;
 
             when Ada_Identifier =>
-               Do_Usage_Name;
+               Do_Def_Or_Usage_Name;
 
             when Ada_Int_Literal | Ada_Real_Literal |
               Ada_String_Literal | Ada_Char_Literal =>
