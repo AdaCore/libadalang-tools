@@ -52,7 +52,9 @@ package Utils.Command_Lines.Common is
 
    package Common_Boolean_Defaults is new
      Common_Boolean_Switches.Set_Defaults
-       ((Syntax_Only => False));
+       ((Syntax_Only => True));
+   --  ???Default for Syntax_Only should be changed from True to False once
+   --  name resolution is working well.
 
    type Common_Strings is
      (Project_File,
