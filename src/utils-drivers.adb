@@ -25,7 +25,6 @@
 
 with Ada.Directories; use Ada;
 with Ada.Exceptions;
-with Ada.Assertions;
 with GNAT.Byte_Order_Mark;
 with GNAT.Command_Line;
 with GNAT.Directory_Operations; use GNAT.Directory_Operations;
@@ -40,7 +39,6 @@ with Utils.Projects; use Utils.Projects;
 with Utils.String_Utilities; use Utils.String_Utilities;
 with Utils.Tool_Names;
 
-with Langkit_Support.Adalog;
 with Langkit_Support.Diagnostics;
 with Langkit_Support.Text;
 
@@ -93,15 +91,6 @@ package body Utils.Drivers is
          when Property_Error =>
             Put ("P_Resolve_Names raised Property_Error\n");
             raise Name_Resolution_Failed;
-         when Langkit_Support.Adalog.Early_Binding_Error =>
-            Put ("P_Resolve_Names raised Early_Binding_Error\n");
-            raise Name_Resolution_Failed;
-         when Constraint_Error =>
-            Put ("P_Resolve_Names raised Constraint_Error\n");
-            raise Name_Resolution_Failed;
-         when Storage_Error =>
-            Put ("P_Resolve_Names raised Storage_Error\n");
-            raise Name_Resolution_Failed;
       end;
 
       if OK then
@@ -128,28 +117,12 @@ package body Utils.Drivers is
    procedure Name_Resolution (Unit : Analysis_Unit) is
       function Is_Xref_Entry_Point (N : Ada_Node) return Boolean is
         (N.P_Xref_Entry_Point);
-      use Utils.Formatted_Output;
    begin
       --  ???Name resolution does not yet work, and is turned off by default
       --  (see Syntax_Only switch; name resolution can be turned on via
       --  --no-syntax-only).  For now, catch exceptions and try to continue
       --  with the next file.
-      begin
-         Populate_Lexical_Env (Unit);
-      exception
-         when Property_Error =>
-            Put ("Populate_Lexical_Env raised Property_Error\n");
-            raise Name_Resolution_Failed;
-         when Ada.Assertions.Assertion_Error =>
-            Put ("Populate_Lexical_Env raised Assertion_Error\n");
-            raise Name_Resolution_Failed;
-         when Constraint_Error =>
-            Put ("Populate_Lexical_Env raised Constraint_Error\n");
-            raise Name_Resolution_Failed;
-         when Storage_Error =>
-            Put ("Populate_Lexical_Env raised Storage_Error\n");
-            raise Name_Resolution_Failed;
-      end;
+      Populate_Lexical_Env (Unit);
       for Node of Find (Root (Unit), Is_Xref_Entry_Point'Access).Consume loop
          Resolve_Node (Node, Quiet => not Debug_Flag_A);
       end loop;

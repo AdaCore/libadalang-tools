@@ -20,7 +20,6 @@ with GNAT.Lock_Files;
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
 with Langkit_Support.Slocs; use Langkit_Support;
-with Langkit_Support.Adalog;
 with LAL_Extensions; use LAL_Extensions;
 
 with Utils.Command_Lines.Common; use Utils.Command_Lines.Common;
@@ -3834,8 +3833,7 @@ package body Pp.Actions is
             --  ???At least some of these exceptions are bugs or
             --  not-yet-implemented features of libadalang.
 
-            when Property_Error | Constraint_Error |
-              Langkit_Support.Adalog.Early_Binding_Error =>
+            when Property_Error =>
                return No_Basic_Decl;
          end Denoted_Decl;
 
