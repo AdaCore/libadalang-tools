@@ -3816,9 +3816,9 @@ package body Pp.Actions is
          end Do_Type_Decl;
 
          function Denoted_Decl (Id : Base_Id) return Basic_Decl;
-         --  Returns the declaration denoted by Id. No_Basic_Decl
-         --  if it doesn't denote anything. If P_Referenced_Decl
-         --  raises an exception, we return No_Basic_Decl.
+         --  Returns the declaration denoted by Id. No_Basic_Decl if it doesn't
+         --  denote anything. P_Referenced_Decl can raise Property_Error, in
+         --  which case we return No_Basic_Decl.
 
          function Denoted_Def_Name
            (Decl : Basic_Decl; Id : Base_Id) return Base_Id;
