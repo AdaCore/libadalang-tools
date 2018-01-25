@@ -2420,7 +2420,7 @@ package body METRICS.Actions is
       CU_List : constant Ada_Node := Root (Unit);
       pragma Assert (not CU_List.Is_Null);
 --      pragma Assert (Kind (CU_List) = List_Kind);
---    pragma Assert (Child_Count (CU_List) = 1);
+--    pragma Assert (Children_Count (CU_List) = 1);
       --  libadalang supports multiple compilation units per file,
       --  but gnatmetric does not, and lalmetric does not yet.
 
@@ -2734,7 +2734,7 @@ package body METRICS.Actions is
 
             when Ada_Case_Stmt =>
                Inc_Cyc (Complexity_Statement,
-                 By => Node.As_Case_Stmt.F_Case_Alts.Child_Count - 1);
+                 By => Node.As_Case_Stmt.F_Case_Alts.Children_Count - 1);
 
             when Ada_Exit_Stmt =>
                if not Node.As_Exit_Stmt.F_Condition.Is_Null then
@@ -2744,11 +2744,12 @@ package body METRICS.Actions is
             when Ada_Select_Stmt =>
                declare
                   S : constant Select_Stmt := Node.As_Select_Stmt;
-                  Num_Alts : constant Metric_Nat := Child_Count (F_Guards (S));
+                  Num_Alts : constant Metric_Nat :=
+                     Children_Count (F_Guards (S));
                   Num_Else : constant Metric_Nat :=
-                    (if Child_Count (F_Else_Stmts (S)) = 0 then 0 else 1);
+                    (if Children_Count (F_Else_Stmts (S)) = 0 then 0 else 1);
                   Num_Abort : constant Metric_Nat :=
-                    (if Child_Count (F_Abort_Stmts (S)) = 0 then 0 else 1);
+                    (if Children_Count (F_Abort_Stmts (S)) = 0 then 0 else 1);
                begin
                   Inc_Cyc (Complexity_Statement,
                            By => Num_Alts + Num_Else + Num_Abort - 1);
@@ -2767,7 +2768,7 @@ package body METRICS.Actions is
 
             when Ada_Case_Expr =>
                Inc_Cyc (Complexity_Expression,
-                        By => Node.As_Case_Expr.F_Cases.Child_Count - 1);
+                        By => Node.As_Case_Expr.F_Cases.Children_Count - 1);
 
             when Ada_Quantified_Expr =>
                Inc_Cyc (Complexity_Expression, By => 2);
@@ -3068,7 +3069,7 @@ package body METRICS.Actions is
          function Find_Pragma
            (L : Ada_Node_List'Class) return Boolean is
          begin
-            for C in 1 .. Child_Count (L) loop
+            for C in 1 .. Children_Count (L) loop
                if Kind (Childx (L, C)) /= Ada_Pragma_Node then
                   return False;
                end if;
@@ -3108,7 +3109,7 @@ package body METRICS.Actions is
             if Node.As_Pragma_Node.F_Args.Is_Null then
                ON := True;
             else
-               case Node.As_Pragma_Node.F_Args.Child_Count is
+               case Node.As_Pragma_Node.F_Args.Children_Count is
                   when 0 => ON := True; pragma Assert (False);
                   when 1 =>
                      declare
@@ -3225,7 +3226,7 @@ package body METRICS.Actions is
                   Assocs : constant Aspect_Assoc_List :=
                     F_Aspect_Assocs (Aspects);
                begin
-                  for I in 1 .. Child_Count (Assocs) loop
+                  for I in 1 .. Children_Count (Assocs) loop
                      case Assertion_Kind (Childx (Assocs, I)) is
                         when Postcondition =>
                            Has_Contracts := True;
@@ -3244,7 +3245,7 @@ package body METRICS.Actions is
 
       begin
          if not Vis_Decls.Is_Null then -- Shouldn't it be empty list???
-            for I in 1 .. Child_Count (Vis_Decls) loop
+            for I in 1 .. Children_Count (Vis_Decls) loop
                declare
                   Decl : constant Ada_Node := Childx (Vis_Decls, I);
                   Has_Contracts, Has_Post : Boolean;
@@ -3449,7 +3450,7 @@ package body METRICS.Actions is
             declare
                N : constant Param_Spec := Node.As_Param_Spec;
                Num : constant Metric_Nat :=
-                 Metric_Nat (Child_Count (F_Ids (N)));
+                 Metric_Nat (Children_Count (F_Ids (N)));
             begin
                Inc (M.Vals (Param_Number), By => Num);
 
@@ -3476,7 +3477,7 @@ package body METRICS.Actions is
                   Names : constant Name_List :=
                     Node.As_With_Clause.F_Packages;
                begin
-                  for I in 1 .. Child_Count (Names) loop
+                  for I in 1 .. Children_Count (Names) loop
                      if Node.As_With_Clause.F_Has_Limited then
                         Include
                           (File_M.Limited_Depends_On,
@@ -3716,7 +3717,7 @@ package body METRICS.Actions is
             Gather_Extra_Exit_Points (Node, M);
          end if;
 
-         for I in 1 .. Child_Count (Node) loop
+         for I in 1 .. Children_Count (Node) loop
             declare
                Cur_Child : constant Ada_Node := Child (Node, I);
                In_Generic_Formal_Part_Set : Boolean := False;
