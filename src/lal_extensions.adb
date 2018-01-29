@@ -107,7 +107,7 @@ package body LAL_Extensions is
      return W_Str
    is
    begin
-      return Text_To_W_Str (Text (F_Tok (Nm.As_Single_Tok_Node)));
+      return Text_To_W_Str (Text (Nm.As_Single_Tok_Node));
    end Id_Name;
 
    function L_Name
