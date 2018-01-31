@@ -2734,10 +2734,10 @@ package body METRICS.Actions is
 
             when Ada_Case_Stmt =>
                Inc_Cyc (Complexity_Statement,
-                 By => Node.As_Case_Stmt.F_Case_Alts.Children_Count - 1);
+                 By => Node.As_Case_Stmt.F_Alternatives.Children_Count - 1);
 
             when Ada_Exit_Stmt =>
-               if not Node.As_Exit_Stmt.F_Condition.Is_Null then
+               if not Node.As_Exit_Stmt.F_Cond_Expr.Is_Null then
                   Inc_Cyc (Complexity_Statement);
                end if;
 
@@ -3339,7 +3339,7 @@ package body METRICS.Actions is
             Inc_All (Logical_Source_Lines);
          end if;
          if Kind (Node) = Ada_Exception_Handler
-           and then not Node.As_Exception_Handler.F_Exc_Name.Is_Null
+           and then not Node.As_Exception_Handler.F_Exception_Name.Is_Null
          then
             Inc_All (Declarations);
             Inc_All (Logical_Source_Lines);

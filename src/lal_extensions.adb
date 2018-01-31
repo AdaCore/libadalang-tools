@@ -228,10 +228,10 @@ package body LAL_Extensions is
                  F_Subp_Name (Get_Subp_Spec (Decl));
             when Ada_Single_Protected_Decl =>
                Result :=
-                 Decl.As_Single_Protected_Decl.F_Protected_Name.As_Name;
+                 Decl.As_Single_Protected_Decl.F_Name.As_Name;
             when Ada_Protected_Type_Decl =>
                Result :=
-                 Decl.As_Protected_Type_Decl.F_Type_Id.As_Name;
+                 Decl.As_Protected_Type_Decl.F_Name.As_Name;
             when Ada_Protected_Body =>
                Result := Decl.As_Protected_Body.F_Name;
             when Ada_Entry_Decl =>
@@ -242,10 +242,10 @@ package body LAL_Extensions is
                  Decl.As_Entry_Body.F_Entry_Name.As_Name;
             when Ada_Single_Task_Decl =>
                Result :=
-                 Decl.As_Single_Task_Decl.F_Task_Type.F_Type_Id.As_Name;
+                 Decl.As_Single_Task_Decl.F_Task_Type.F_Name.As_Name;
             when Ada_Task_Type_Decl =>
                Result :=
-                 Decl.As_Task_Type_Decl.F_Type_Id.As_Name;
+                 Decl.As_Task_Type_Decl.F_Name.As_Name;
             when Ada_Task_Body =>
                Result := Decl.As_Task_Body.F_Name;
             when others =>

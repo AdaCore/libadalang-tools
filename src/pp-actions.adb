@@ -503,6 +503,8 @@ package body Pp.Actions is
            when Ada_Contract_Cases => null,
            when Ada_Multi_Dim_Array_Assoc => null,
            when Ada_Unconstrained_Array_Indices => null,
+           when Ada_Error_Decl => null,
+           when Ada_Error_Stmt => null,
             --  ???The above are not used
 
            when Ada_Ada_List => null,
@@ -686,7 +688,9 @@ package body Pp.Actions is
              L ("subtype ! is[# !", Aspects, "]"),
            when Ada_Compilation_Unit => null,
            when Ada_Component_Def =>
-             L ("?~~ ~!"),
+             L ("?~~ ~?~~ ~!"),
+               --  The second "?~~ ~" is for Has_Constant, which should never
+               --  print anything.
            when Ada_Delta_Constraint =>
              L ("delta !? ~~~"),
            when Ada_Digits_Constraint =>
@@ -845,7 +849,7 @@ package body Pp.Actions is
            when Ada_Label => null,
            when Ada_Label_Decl => L ("!"),
            when Ada_Null_Stmt =>
-             L ("!"),
+             L ("null"),
            when Ada_Raise_Stmt =>
              L ("raise? ~~~?[# with ~~]~"),
            when Ada_Requeue_Stmt =>
