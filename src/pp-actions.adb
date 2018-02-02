@@ -4966,7 +4966,7 @@ package body Pp.Actions is
       Put (" --output-dir=dir / --dir=dir -- create output files in dir\n");
       Put (" --replace-backup  - replace the argument source with the pretty-printed " &
             "source and copy the\n");
-      Put ("        argument source into filename.npp");
+      Put ("        argument source into filename.npp\n");
       Put (" --replace-force-backup   - same as --replace-backup, but overwrites " &
             " an existing filename.npp\n");
       Put (" --pipe - send the output to standard output\n");
