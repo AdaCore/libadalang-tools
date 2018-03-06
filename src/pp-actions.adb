@@ -4924,7 +4924,7 @@ package body Pp.Actions is
       Put ("                           keywords, uncompatible with " &
             "--separate-loop-then\n");
 
-      Put (" --use-on-new-line       - use separate lines for USE clauses \n");
+      Put (" --use-on-new-line       - use separate lines for USE clauses\n");
       Put ("                           in a context clause\n");
 
       Put (" --insert-blank-lines    - insert blank lines where appropriate\n");
@@ -4978,12 +4978,12 @@ package body Pp.Actions is
             "if output_file\n");
       Put ("                  already exists\n");
       Put (" --output-force=output_file - write the output into output_file, " &
-            "overriding the existing \n");
+            "overriding the existing\n");
       Put ("                   file\n");
 
       Put ("\n");
 
-      Put (" filename - the name of the Ada source file to be reformatted. \n");
+      Put (" filename - the name of the Ada source file to be reformatted.\n");
       Put ("            Wildcards are allowed\n");
       Put (" --files=filename - the name of a text file containing a list\n");
       Put ("                   of Ada source files to reformat\n");
