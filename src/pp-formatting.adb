@@ -807,26 +807,17 @@ package body Pp.Formatting is
 
                      when Start_Of_Input | End_Of_Input |
                        End_Of_Line | Blank_Line | Other_Lexeme =>
-                        if Text (Src_Tok) /= Text (Out_Tok) then
-                           Dbg_Out.Output_Enabled := True;
-                           Dbg_Out.Put ("Kind: \1\n", Kind (Src_Tok)'Image);
-                           Dbg_Out.Put ("Src:\n");
-                           for X of Str (Text (Src_Tok)).S loop
-                              Dbg_Out.Put
-                                ("\1 (\2)\n",
-                                 X'Image,
-                                 Character'Pos (X)'Image);
-                           end loop;
-                           Dbg_Out.Put ("Out:\n");
-                           for X of Str (Text (Out_Tok)).S loop
-                              Dbg_Out.Put
-                                ("\1 (\2)\n",
-                                 X'Image,
-                                 Character'Pos (X)'Image);
-                           end loop;
-                        end if;
-                        pragma Assert (Text (Src_Tok) = Text (Out_Tok));
-                        --  ????Above assert fails on windows
+                        --  Src and Out tokens should be identical, except
+                        --  that line endings can contain CR (the Windows
+                        --  convention).
+
+                        pragma Assert
+                          ((Text (Src_Tok) = Text (Out_Tok))
+                             or else
+                           (Replace_String (Str (Text (Src_Tok)).S,
+                                            From => (1 => ASCII.CR),
+                                            To => "")
+                                      = Str (Text (Out_Tok)).S));
                         R := True;
 
                      when Reserved_Word =>
