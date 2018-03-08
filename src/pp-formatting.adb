@@ -103,6 +103,26 @@ package body Pp.Formatting is
 
    procedure Append_Temp_Line_Break (Lines_Data : in out Lines_Data_Rec);
 
+   function Equal_Ignoring_CR (Src_S, Out_S : Symbol) return Boolean;
+   --  Used in Match functions below, where the source and output tokens
+   --  should be identical, except that source line endings can contain
+   --  CR (the Windows convention).
+
+   -----------------------
+   -- Equal_Ignoring_CR --
+   -----------------------
+
+   function Equal_Ignoring_CR (Src_S, Out_S : Symbol) return Boolean is
+   begin
+      if Src_S = Out_S then
+         return True;
+      end if;
+
+      return Replace_String
+        (Str (Src_S).S, From => (1 => ASCII.CR), To => "")
+       = Str (Out_S).S;
+   end Equal_Ignoring_CR;
+
    ----------------
 
    procedure Collect_Enabled_Line_Breaks
@@ -807,17 +827,8 @@ package body Pp.Formatting is
 
                      when Start_Of_Input | End_Of_Input |
                        End_Of_Line | Blank_Line | Other_Lexeme =>
-                        --  Src and Out tokens should be identical, except
-                        --  that line endings can contain CR (the Windows
-                        --  convention).
-
                         pragma Assert
-                          ((Text (Src_Tok) = Text (Out_Tok))
-                             or else
-                           (Replace_String (Str (Text (Src_Tok)).S,
-                                            From => (1 => ASCII.CR),
-                                            To => "")
-                                      = Str (Text (Out_Tok)).S));
+                          (Equal_Ignoring_CR (Text (Src_Tok), Text (Out_Tok)));
                         R := True;
 
                      when Reserved_Word =>
@@ -1332,7 +1343,8 @@ package body Pp.Formatting is
 
                      when Start_Of_Input | End_Of_Input |
                        End_Of_Line | Blank_Line | Other_Lexeme =>
-                        pragma Assert (Text (Src_Tok) = Text (Out_Tok));
+                        pragma Assert
+                          (Equal_Ignoring_CR (Text (Src_Tok), Text (Out_Tok)));
                         R := True;
 
                      when Reserved_Word =>
@@ -3162,7 +3174,8 @@ package body Pp.Formatting is
 
                   when Start_Of_Input | End_Of_Input |
                     End_Of_Line | Blank_Line | Other_Lexeme =>
-                     pragma Assert (Text (Src_Tok) = Text (Out_Tok));
+                     pragma Assert
+                       (Equal_Ignoring_CR (Text (Src_Tok), Text (Out_Tok)));
                      R := True;
 
                   when Reserved_Word =>
