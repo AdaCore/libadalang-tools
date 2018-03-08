@@ -29,6 +29,7 @@ with GNAT.Byte_Order_Mark;
 with GNAT.Command_Line;
 with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 with GNAT.OS_Lib;
+with GNAT.Traceback.Symbolic;
 
 with Utils.Environment;
 with Utils.Formatted_Output;
@@ -364,8 +365,11 @@ package body Utils.Drivers is
                   begin
                      Remove (Context, F_Name.all);
                   exception
-                     when Constraint_Error =>
-                        Put ("Remove raised Constraint_Error\n");
+                     when E : Constraint_Error =>
+                        Put_Line ("Remove raised Constraint_Error");
+                        Put_Line ("Traceback:");
+                        Put (GNAT.Traceback.Symbolic.Symbolic_Traceback (E));
+                        Put_Line ("End traceback");
                         raise Name_Resolution_Failed;
                   end;
                   Free (Input);
