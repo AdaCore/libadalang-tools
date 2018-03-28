@@ -312,7 +312,7 @@ package body Stub.Actions is
             return Parent_Parent & "." & Parent_Simple;
          end;
       else
-         return Full_Name (Get_Def_Name (Parent_Body_Of_Subunit));
+         return Full_Name (Get_Def_Name (Parent_Body_Of_Subunit).As_Name);
       end if;
    end Get_Parent_Name;
 
@@ -332,7 +332,7 @@ package body Stub.Actions is
       Root_Node_Name : constant W_Str :=
         (if not Parent_Body_Of_Subunit.Is_Null
          then Parent_Name & "." else "") &
-        Full_Name (Get_Def_Name (Root_Node));
+        Full_Name (Get_Def_Name (Root_Node).As_Name);
       UC_Root_Node_Name : constant W_Str := To_Upper (Root_Node_Name);
       LC_Root_Node_Name : constant W_Str := To_Lower (Root_Node_Name);
 
@@ -506,7 +506,7 @@ package body Stub.Actions is
 
       procedure Walk (Decl : Ada_Node; Level : Natural) is
          Local_Decls : Ada_Node_Vector;
-         Name : constant W_Str := Full_Name (Get_Def_Name (Decl));
+         Name : constant W_Str := Full_Name (Get_Def_Name (Decl).As_Name);
          use Ada_Node_Vectors;
 
          procedure Collect_Local_Decls (Decls : Ada_Node_List);
