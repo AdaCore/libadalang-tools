@@ -497,7 +497,7 @@ package body Pp.Actions is
    begin
       return
         (case Kind is
-           when Ada_Discrete_Subtype_Expr => null,
+           when Ada_Discrete_Subtype_Name => null,
            when Ada_Unconstrained_Array_Index => null,
            when Ada_Contract_Case_Assoc => null,
            when Ada_Contract_Cases => null,
@@ -740,6 +740,8 @@ package body Pp.Actions is
              L ("! ![# ?[#~ ^|# ~]~]"),
            when Ada_Dotted_Name =>
              L ("![#.!]"),
+           when Ada_End_Name => L ("!"),
+           when Ada_Defining_Name => L ("!"),
            when Ada_Char_Literal => null,
            when Ada_Identifier => null,
            when Ada_String_Literal => null,
@@ -3846,48 +3848,20 @@ package body Pp.Actions is
          is
             use Libadalang;
          begin
-            if Decl.Is_Null then
-               return Id;
-            else
+            if not Decl.Is_Null then
                --  Search through the defining names of the declaration to find
                --  one with the same name.
-
-               declare
-                  Def_Names : constant Analysis.Name_Array :=
-                    P_Defining_Names (Decl);
-               begin
-                  for Def_Name of Def_Names loop
-                     case Def_Name.Kind is
-                        when Ada_Dotted_Name =>
-                           --  ???When processing lal_extensions.ads, the
-                           --  following assertion fails, so it is disabled for
-                           --  now. In particular "Vectors" in the
-                           --  instantiation appears to denote the declaration
-                           --  of Fast_Vectors, but it should denote the
-                           --  declaration of Vectors. The 'if' should not be
-                           --  necessary.
-                           pragma Assert
-                             (True or else
-                              L_Name (Id) =
-                                L_Name (Def_Name.As_Dotted_Name.F_Suffix));
-                           if L_Name (Id) =
-                                L_Name (Def_Name.As_Dotted_Name.F_Suffix)
-                           then
-                              return Def_Name.As_Dotted_Name.F_Suffix;
-                           end if;
-                        when Ada_Identifier | Ada_String_Literal =>
-                           if L_Name (Id) = L_Name (Def_Name) then
-                              return Def_Name.As_Base_Id;
-                           end if;
-                        when others => raise Program_Error;
-                     end case;
-                  end loop;
-                  if True then
-                     return Id; -- because of above ???
+               for Def_Name of Decl.P_Defining_Names loop
+                  if L_Name (Def_Name.P_Relative_Name) = L_Name (Id) then
+                     return Def_Name.P_Relative_Name.As_Base_Id;
                   end if;
-                  raise Program_Error;
-               end;
+               end loop;
             end if;
+
+            --  ??? Apparently sometimes Decl is passed but we still cannot
+            --  find the defining id, which is why we fallback from the if
+            --  above to this return.
+            return Id;
          end Denoted_Def_Name;
 
          procedure Do_Def_Or_Usage_Name is
@@ -3920,7 +3894,7 @@ package body Pp.Actions is
          Maybe_Blank_Line;
 
          case Tree.Kind is
-            when Ada_Discrete_Subtype_Expr |
+            when Ada_Discrete_Subtype_Name |
               Ada_Unconstrained_Array_Index |
               Ada_Contract_Case_Assoc |
               Ada_Contract_Cases |
