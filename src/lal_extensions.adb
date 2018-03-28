@@ -136,9 +136,6 @@ package body LAL_Extensions is
          when Ada_Identifier | Ada_String_Literal =>
             return Id_Name (Nm);
 
-         when Ada_Defining_Name =>
-            return Full_Name (Nm.As_Defining_Name.F_Name);
-
          when others =>
             raise Program_Error with
               "Full_Name of " & Short_Image (Nm.As_Ada_Node);
@@ -158,27 +155,115 @@ package body LAL_Extensions is
                   Node = Id);
    end Is_Def_Name;
 
-   function Get_Def_Name (Decl : Ada_Node'Class) return Defining_Name is
+   function Get_Def_Name (Decl : Ada_Node'Class) return Name is
    begin
-      case Kind (Decl) is
-         when Ada_Compilation_Unit =>
-            return Get_Def_Name (Decl.As_Compilation_Unit.F_Body);
-         when Ada_Library_Item =>
-            return Get_Def_Name (Decl.As_Library_Item.F_Item);
-         when Ada_Subunit =>
-            return Get_Def_Name (Decl.As_Subunit.F_Body);
-         when Ada_Basic_Decl =>
+      return Result : Name do
+         case Kind (Decl) is
+            when Ada_Compilation_Unit =>
+               Result :=
+                 Get_Def_Name (Decl.As_Compilation_Unit.F_Body);
+            when Ada_Library_Item =>
+               Result :=
+                 Get_Def_Name (Decl.As_Library_Item.F_Item);
+            when Ada_Subunit =>
+               Result :=
+                 Get_Def_Name (Decl.As_Subunit.F_Body);
+
+            when Ada_Generic_Subp_Instantiation =>
+               Result :=
+                 Decl.As_Generic_Subp_Instantiation.F_Subp_Name;
+            when Ada_Generic_Package_Instantiation =>
+               Result :=
+                 Decl.As_Generic_Package_Instantiation.F_Name;
+            when Ada_Generic_Package_Renaming_Decl =>
+               Result :=
+                 Decl.As_Generic_Package_Renaming_Decl.F_Name;
+            when Ada_Generic_Subp_Renaming_Decl =>
+               Result :=
+                 Decl.As_Generic_Subp_Renaming_Decl.F_Name;
+            when Ada_Package_Body_Stub =>
+               Result :=
+                 Decl.As_Package_Body_Stub.F_Name;
+            when Ada_Subp_Body_Stub =>
+               Result :=
+                 F_Subp_Name (Get_Subp_Spec (Decl));
+            when Ada_Task_Body_Stub =>
+               Result :=
+                 Decl.As_Task_Body_Stub.F_Name;
+            when Ada_Protected_Body_Stub =>
+               Result :=
+                 Decl.As_Protected_Body_Stub.F_Name;
+            when Ada_Package_Renaming_Decl =>
+               Result :=
+                 Decl.As_Package_Renaming_Decl.F_Name;
+            when Ada_Accept_Stmt =>
+               Result :=
+                 Decl.As_Accept_Stmt.F_Name.As_Name;
+            when Ada_Accept_Stmt_With_Stmts =>
+               Result :=
+                 Decl.As_Accept_Stmt_With_Stmts.F_Name.As_Name;
+            when Ada_Named_Stmt_Decl =>
+               Result := Decl.As_Named_Stmt_Decl.F_Name.As_Name;
+            when Ada_Abstract_Subp_Decl |
+              Ada_Expr_Function |
+              Ada_Null_Subp_Decl |
+              Ada_Subp_Renaming_Decl |
+              Ada_Subp_Decl =>
+               Result :=
+                 F_Subp_Name (Get_Subp_Spec (Decl));
+            when Ada_Package_Decl =>
+               Result :=
+                 Decl.As_Base_Package_Decl.F_Package_Name;
+            when Ada_Generic_Package_Decl =>
+               Result :=
+                 Decl.As_Generic_Package_Decl.F_Package_Decl.F_Package_Name;
+            when Ada_Generic_Subp_Decl =>
+               Result :=
+                 F_Subp_Name (Get_Subp_Spec (Decl));
+            when Ada_Package_Body =>
+               Result :=
+                 Decl.As_Package_Body.F_Package_Name;
+            when Ada_Subp_Body =>
+               Result :=
+                 F_Subp_Name (Get_Subp_Spec (Decl));
+            when Ada_Single_Protected_Decl =>
+               Result :=
+                 Decl.As_Single_Protected_Decl.F_Name.As_Name;
+            when Ada_Protected_Type_Decl =>
+               Result :=
+                 Decl.As_Protected_Type_Decl.F_Name.As_Name;
+            when Ada_Protected_Body =>
+               Result := Decl.As_Protected_Body.F_Name;
+            when Ada_Entry_Decl =>
+               Result :=
+                 Decl.As_Entry_Decl.F_Spec.F_Entry_Name.As_Name;
+            when Ada_Entry_Body =>
+               Result :=
+                 Decl.As_Entry_Body.F_Entry_Name.As_Name;
+            when Ada_Single_Task_Decl =>
+               Result :=
+                 Decl.As_Single_Task_Decl.F_Task_Type.F_Name.As_Name;
+            when Ada_Task_Type_Decl =>
+               Result :=
+                 Decl.As_Task_Type_Decl.F_Name.As_Name;
+            when Ada_Task_Body =>
+               Result := Decl.As_Task_Body.F_Name;
+            when others =>
+               raise Program_Error with
+                 "Get_Def_Name of " & Short_Image (Decl);
+         end case;
+
+         if Decl.Kind in Ada_Basic_Decl then
+            --  Should Subp_Decl_Type be in Basic_Decl_Type????
             declare
-               D : constant Defining_Name_Array :=
+               D : constant Name_Array :=
                  Decl.As_Basic_Decl.P_Defining_Names;
             begin
                pragma Assert (D'Length = 1);
-               return D (1);
+               pragma Assert (Result = D (1));
             end;
-         when others =>
-            raise Program_Error with
-              "Get_Def_Name of " & Short_Image (Decl);
-      end case;
+         end if;
+      end return;
    end Get_Def_Name;
 
    function Get_Aspects (Decl : Basic_Decl) return Aspect_Spec is
