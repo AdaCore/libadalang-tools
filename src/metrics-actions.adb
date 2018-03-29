@@ -551,7 +551,7 @@ package body METRICS.Actions is
 
             declare
                function Get_Name (N : Ada_Node) return String is
-                 (To_UTF8 (Full_Name (Get_Def_Name (N).As_Name)));
+                 (To_UTF8 (Full_Name (Get_Def_Name (N))));
             begin
                Result.XML_Name := Intern (Get_Name (Node));
 
@@ -3503,7 +3503,7 @@ package body METRICS.Actions is
               Ada_Subp_Body | -- could be acting as spec
               Ada_Generic_Subp_Decl =>
                declare
-                  Def_Name : constant Name := Get_Def_Name (Node).F_Name;
+                  Def_Name : constant Name := Get_Def_Name (Node);
                begin
                   if Kind (Def_Name) = Ada_Dotted_Name then
                      Include

@@ -81,7 +81,7 @@ package LAL_Extensions is
    function Is_Def_Name (Node : Base_Id'Class) return Boolean;
    --  True if it's a defining name
 
-   function Get_Def_Name (Decl : Ada_Node'Class) return Defining_Name;
+   function Get_Def_Name (Decl : Ada_Node'Class) return Name;
    --  Returns the defining name of a declaration or body
 
    function Get_Aspects (Decl : Basic_Decl) return Aspect_Spec;
