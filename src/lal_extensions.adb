@@ -107,7 +107,11 @@ package body LAL_Extensions is
      return W_Str
    is
    begin
-      return Text_To_W_Str (Text (Nm.As_Single_Tok_Node));
+      if Nm.Kind = Ada_Defining_Name then
+         return Id_Name (Nm.As_Defining_Name.F_Name);
+      else
+         return Text_To_W_Str (Text (Nm.As_Single_Tok_Node));
+      end if;
    end Id_Name;
 
    function L_Name
