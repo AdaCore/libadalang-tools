@@ -365,6 +365,10 @@ package body METRICS.Actions is
    function Metric_Name_String (Metric : Metrics_Enum) return String;
    --  Name of the metric for printing in text
 
+   procedure XML_Print_Config;
+   --  Print out the 'config' section, which maps XML metric names to text
+   --  metric names.
+
    --  Below, Depth parameters are the nesting depth, starting with 1 for the
    --  global metrics.
 
@@ -1434,6 +1438,28 @@ package body METRICS.Actions is
       end case;
    end XML_Metric_Name_String;
 
+   procedure XML_Print_Config is
+   begin
+      Indent;
+      Put ("<config>\n");
+      Indent;
+
+      for Metric in Metrics_Enum loop
+         case Metric is
+            when Current_Construct_Nesting | Computed_Metrics =>
+               null;
+            when others =>
+               Put ("<metric name=""\1"" display_name=""\2""/>\n",
+                    XML_Metric_Name_String (Metric),
+                    Metric_Name_String (Metric));
+         end case;
+      end loop;
+
+      Outdent;
+      Put ("</config>\n");
+      Outdent;
+   end XML_Print_Config;
+
    procedure XML_Print_Metrix_Vals
      (Metrics_To_Compute : Metrics_Set;
       First : Metrics_Enum;
@@ -2281,6 +2307,10 @@ package body METRICS.Actions is
                  Xsd_File_Name);
          else
             Put ("<global>\n");
+         end if;
+
+         if Arg (Cmd, XML_Config) then
+            XML_Print_Config;
          end if;
       end if;
 

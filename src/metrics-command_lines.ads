@@ -191,7 +191,9 @@ package METRICS.Command_Lines is
       Lines_All,
       Syntax_All,
       Complexity_All,
-      Coupling_All);
+      Coupling_All,
+      XML_Config -- undocumented, --no-config suppresses <config> in XML
+     );
    pragma Ordered (Metrics_Booleans);
    --  Otherwise, we get bogus warnings in Metrics.Actions.
 
@@ -261,6 +263,10 @@ package METRICS.Command_Lines is
        Hierarchy_Coupling_In  => +"--category-afferent-coupling",
        Metrics_All            => +"--all",
        others                 => null));
+
+   package Metrics_Boolean_Defaults is new
+     Metrics_Boolean_Switches.Set_Defaults
+       ((XML_Config => True, others => False));
 
    type Metrics_Strings is (Output_Suffix, Global_File_Name, Xml_File_Name);
 

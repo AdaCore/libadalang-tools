@@ -298,8 +298,10 @@ package Pp.Formatting is
    --  along with various tables. This performs the remaining passes, which
    --  do not make use of the tree.
 
-   procedure Assert_No_Trailing_Blanks (S : W_Str);
-   --  Assert that there are no lines with trailing blanks in S.
+   procedure Assert_No_Trailing_Blanks (Buf : Buffer);
+   --  Assert that there are no lines with trailing blanks in Buf, and that
+   --  all space characters are ' ' (e.g. no tabs), and that the last line
+   --  is terminated by NL.
 
    ----------------
 

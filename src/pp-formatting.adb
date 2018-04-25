@@ -282,16 +282,16 @@ package body Pp.Formatting is
       end return;
    end Num_Lits_Match;
 
-   procedure Assert_No_Trailing_Blanks (S : W_Str) is
+   procedure Assert_No_Trailing_Blanks (Buf : Buffer) is
    begin
-      pragma Assert (S'First = 1);
-      for X in 2 .. S'Last loop
-         pragma Assert (if S (X) /= ' ' then not Is_Space (S (X)));
-         if S (X) = NL then
-            pragma Assert (S (X - 1) /= ' ');
+      for X in 2 .. Last_Position (Buf) loop
+         pragma Assert
+           (if Char_At (Buf, X) /= ' ' then not Is_Space (Char_At (Buf, X)));
+         if Char_At (Buf, X) = NL then
+            pragma Assert (Char_At (Buf, X - 1) /= ' ');
          end if;
       end loop;
-      pragma Assert (S (S'Last) = NL);
+      pragma Assert (Char_At (Buf, Last_Position (Buf)) = NL);
    end Assert_No_Trailing_Blanks;
 
    procedure Append_Temp_Line_Break (Lines_Data : in out Lines_Data_Rec) is
@@ -360,7 +360,6 @@ package body Pp.Formatting is
                  Max_Line_Length =>
                    Arg (Cmd, Max_Line_Length) -
                    (Cur_Indentation + String'("--")'Length + Leading_Blanks)));
-         pragma Debug (Assert_No_Trailing_Blanks (From_UTF8 (S2)));
       begin
          return From_UTF8 (S2);
       end Filled_Text;
@@ -420,33 +419,6 @@ package body Pp.Formatting is
       Cur_Token_Index : Token_Index := 2; -- skip sentinel
       function Cur_Tok return Token is (Src_Toks (Cur_Token_Index));
 
-      procedure Assert;
-      --  If Comments_Only is True, but Comment_Filling_Enabled and
-      --  Comments_Gnat_Beginning are both False, then the input and output should
-      --  be identical. So assert.
-
-      procedure Assert is
-      begin
-         if Comment_Filling_Enabled (Cmd)
-           or else Arg (Cmd, Comments_Gnat_Beginning)
-         then
-            return;
-         end if;
-
-         --  Slice removes the extra leading NL
-
-         if Slice (Out_Buf, 2, Last_Position (Out_Buf)) /=
-           To_W_Str (Src_Buf)
-         then
-            Utils.Dbg_Out.Output_Enabled := True;
-            Text_IO.Put_Line ("Src_Buf:");
-            Dump_Buf (Src_Buf);
-            Text_IO.Put_Line ("Out_Buf:");
-            Dump_Buf (Out_Buf);
-            pragma Assert (False);
-         end if;
-      end Assert;
-
    --  Start of processing for Do_Comments_Only
 
    begin
@@ -492,8 +464,6 @@ package body Pp.Formatting is
       pragma Assert (At_End (Src_Buf));
       Reset (Src_Buf);
       Reset (Out_Buf);
-
-      pragma Debug (Assert);
 
       Final_Check (Lines_Data, Src_Buf, Cmd);
    end Do_Comments_Only;
@@ -572,7 +542,7 @@ package body Pp.Formatting is
                end;
             end loop;
 
-            Assert_No_Trailing_Blanks (To_W_Str (Out_Buf));
+            Assert_No_Trailing_Blanks (Out_Buf);
             pragma Assert
               (Position (Out_Buf, All_Line_Breaks (Last (All_Line_Breaks)).Mark) =
                Last_Position (Out_Buf));
@@ -1120,7 +1090,7 @@ package body Pp.Formatting is
             pragma Assert (Cur (Out_Buf) = NL);
             Move_Past_Out_Tok;
          end if;
-         pragma Debug (Assert_No_Trailing_Blanks (To_W_Str (Out_Buf)));
+         pragma Debug (Assert_No_Trailing_Blanks (Out_Buf));
 
          pragma Assert (Src_Index = Last_Index (Src_Tokens));
          pragma Assert (Out_Index = Last_Index (Out_Tokens));
@@ -1256,7 +1226,7 @@ package body Pp.Formatting is
          pragma Assert (At_End (Out_Buf));
          pragma Assert (Cur_Line = Last_Index (Line_Breaks));
          Reset (Out_Buf);
-         pragma Debug (Assert_No_Trailing_Blanks (To_W_Str (Out_Buf)));
+         pragma Debug (Assert_No_Trailing_Blanks (Out_Buf));
       end Insert_NLs_And_Indentation;
 
       procedure Insert_Comments_And_Blank_Lines;
@@ -2269,7 +2239,7 @@ package body Pp.Formatting is
             pragma Assert (Cur (Out_Buf) = NL);
             Move_Past_Out_Tok;
          end if;
-         pragma Debug (Assert_No_Trailing_Blanks (To_W_Str (Out_Buf)));
+         pragma Debug (Assert_No_Trailing_Blanks (Out_Buf));
 
          pragma Assert (Cur_Indentation = 0);
 
@@ -2792,7 +2762,7 @@ package body Pp.Formatting is
          end;
 
          Reset (Out_Buf);
-         pragma Debug (Assert_No_Trailing_Blanks (To_W_Str (Out_Buf)));
+         pragma Debug (Assert_No_Trailing_Blanks (Out_Buf));
       end Insert_Alignment;
 
       procedure Keyword_Casing;
@@ -3480,7 +3450,7 @@ package body Pp.Formatting is
          begin
             Final_Check_Helper (Lines_Data, Src_Buf, Cmd);
             pragma Assert (To_Vector (Out_Buf) = Old_Out_Buf);
-            pragma Debug (Assert_No_Trailing_Blanks (To_W_Str (Out_Buf)));
+            pragma Debug (Assert_No_Trailing_Blanks (Out_Buf));
          end;
       else
          Final_Check_Helper (Lines_Data, Src_Buf, Cmd);

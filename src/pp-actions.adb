@@ -4063,7 +4063,7 @@ package body Pp.Actions is
                Kind     => Null_Kind,
                Template => Name_Empty);
          end if;
-         pragma Debug (Assert_No_Trailing_Blanks (To_W_Str (Out_Buf)));
+         pragma Debug (Assert_No_Trailing_Blanks (Out_Buf));
 
          Append
            (Tabs,
