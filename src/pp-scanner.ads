@@ -37,18 +37,15 @@ package Pp.Scanner is
    --  This package provides a simple lexical scanner for Ada tokens. There are
    --  some unusual things about this scanner:
    --
-   --     We don't distinguish most of the different kinds of tokens; most are
-   --     lumped together under the Lexeme kind, and reserved words are lumped
-   --     together under Reserved_Word. We only distinguish where we need to.
-   --
    --     We do not ignore comments; a comment is considered to be a token.
    --
    --     We do not ignore blank lines. We do ignore a single line break,
-   --     if Ignore_Single_Line_Breaks is True. Other whitespace (blanks and
-   --     tabs) between tokens is always ignored.
+   --     if Ignore_Single_Line_Breaks is True. Blanks between tokens are
+   --     always ignored. Other space characters (tabs, NO-BREAK SPACE,
+   --     etc.) are removed in Buffers.
    --
    --     We don't check for errors, because we're in ASIS, where Ada code is
-   --     known to be legal.
+   --     known to be legal. ???No longer true.
 
    package Syms renames Utils.Symbols;
 

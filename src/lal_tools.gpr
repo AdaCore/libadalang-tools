@@ -26,8 +26,6 @@ project LAL_Tools is
          when "prod" =>
             for Default_Switches ("Ada") use
               ("-gnatyg",
-               "-gnatwae",
-               "-gnatw.u",
                "-g",
                "-Ofast",
                "-gnatp",

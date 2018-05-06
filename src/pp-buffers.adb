@@ -766,13 +766,16 @@ package body Pp.Buffers is
                end if;
          end case;
 
-         --  Insert C into the buffer, expanding tabs
+         --  Insert C into the buffer, expanding tabs. Turn other space
+         --  characters, such as NO-BREAK SPACE, into ' '.
 
          if C = W_HT and then Expand_Tabs then
             loop
                Insert_Ada (Buf, ' ');
                exit when Buf.Cur_Column mod Tab_Len = 1;
             end loop;
+         elsif Is_Space (C) then
+            Insert_Ada (Buf, ' ');
          else
             Insert_Ada (Buf, C);
          end if;

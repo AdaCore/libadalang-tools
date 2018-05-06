@@ -22,6 +22,7 @@
 ------------------------------------------------------------------------------
 
 with Text_IO;
+with Pp.Error_Slocs; use Pp.Error_Slocs;
 
 package body Pp.Scanner.Seqs is
 
@@ -147,9 +148,8 @@ package body Pp.Scanner.Seqs is
               Tok.Sloc.First + String'("--")'Length + Tok.Leading_Blanks
             else Tok.Sloc.First);
       begin
-         Append
-           (Name_Buffer,
-            To_UTF8 (Slice (Input, Token_Text_First, Tok.Sloc.Last)));
+         Append (Name_Buffer,
+                 To_UTF8 (Slice (Input, Token_Text_First, Tok.Sloc.Last)));
          if Tok.Kind in Comment_Kind then
             Append (Name_Buffer, ASCII.LF);
          end if;
@@ -726,6 +726,7 @@ package body Pp.Scanner.Seqs is
          --  might need to be combined with Tok.
          begin
             Get_Token (Tok, Allow_Short_Fillable => False);
+            Error_Sloc := To_Langkit (Sloc (Tok));
             if Tok.Kind in Comment_Kind then
                Append_Tok (Tok);
                if Tok.Kind /= Fillable_Comment then

@@ -1,5 +1,4 @@
 with Ada.Characters.Handling; use Ada.Characters.Handling;
-with Ada.Exceptions;
 with Ada.Finalization;
 with Ada.Strings.Fixed;
 with Ada.Strings.UTF_Encoding;
@@ -8,6 +7,7 @@ with System.WCh_Con;
 with Text_IO, Ada.Wide_Text_IO;
 with Pp.Buffers; use Pp.Buffers;
 with Pp.Command_Lines; use Pp.Command_Lines;
+with Pp.Error_Slocs; use Pp.Error_Slocs;
 with Pp.Formatting; use Pp.Formatting;
 with Pp.Formatting.Dictionaries;
 with Pp.Scanner.Seqs;
@@ -3841,6 +3841,9 @@ package body Pp.Actions is
 
             when Property_Error =>
                return No_Basic_Decl;
+--  Uncomment the following to recover from libadalang failures:
+--            when others =>
+--               return No_Basic_Decl;
          end Denoted_Decl;
 
          function Denoted_Def_Name
@@ -3861,6 +3864,10 @@ package body Pp.Actions is
             --  find the defining id, which is why we fallback from the if
             --  above to this return.
             return Id;
+--  Uncomment the following to recover from libadalang failures:
+--         exception
+--            when others =>
+--               return Id;
          end Denoted_Def_Name;
 
          procedure Do_Def_Or_Usage_Name is
@@ -3888,6 +3895,7 @@ package body Pp.Actions is
             return;
          end if;
 
+         Error_Sloc := Slocs.Start_Sloc (Sloc_Range (Tree));
          Append (Tree_Stack, Tree); -- push
 
          Maybe_Blank_Line;
@@ -4753,24 +4761,23 @@ package body Pp.Actions is
       when Command_Line_Error | Command_Line_Error_No_Tool_Name =>
          raise;
 
-      when X : others =>
+      when others =>
          --  In order to avoid damaging the user's source code, if there is a bug
          --  (like a token mismatch in Final_Check), we avoid writing the output
          --  file in Do_Diff mode; otherwise, we write the input to the output
          --  unchanged. This happens only in production builds.
          --
-         --  Raise_Token_Mismatch includes the file name and source location in
-         --  the message; include that if available.
+         --  Include the source location in the error message, if available.
 
          declare
-            use Ada.Exceptions;
+            use type Slocs.Source_Location;
             Loc : constant String :=
-              (if Exception_Identity (X) = Token_Mismatch'Identity
-                 then ":" & Exception_Message (X) else "");
+              (if Error_Sloc = Slocs.No_Source_Location
+                 then "" else ":" & Slocs.Image (Error_Sloc));
          begin
             Text_IO.Put_Line
               (Text_IO.Standard_Error,
-               File_Name & Loc &
+               Simple_Name (File_Name) & Loc &
                  ": pretty printing failed; unable to format");
          end;
 

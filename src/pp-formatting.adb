@@ -31,7 +31,10 @@ with GNATCOLL.Paragraph_Filling;
 with Utils.Symbols; use Utils.Symbols;
 with Text_IO;
 
+with Langkit_Support.Slocs; use Langkit_Support;
+
 with Pp.Command_Lines; use Pp.Command_Lines;
+with Pp.Error_Slocs; use Pp.Error_Slocs;
 
 package body Pp.Formatting is
    use Utils.Command_Lines;
@@ -285,11 +288,14 @@ package body Pp.Formatting is
    procedure Assert_No_Trailing_Blanks (Buf : Buffer) is
    begin
       for X in 2 .. Last_Position (Buf) loop
-         pragma Assert
-           (if Char_At (Buf, X) /= ' ' then not Is_Space (Char_At (Buf, X)));
-         if Char_At (Buf, X) = NL then
-            pragma Assert (Char_At (Buf, X - 1) /= ' ');
-         end if;
+         declare
+            C : constant W_Char := Char_At (Buf, X);
+         begin
+            pragma Assert (if C /= ' ' then not Is_Space (C));
+            if C = NL then
+               pragma Assert (Char_At (Buf, X - 1) /= ' ');
+            end if;
+         end;
       end loop;
       pragma Assert (Char_At (Buf, Last_Position (Buf)) = NL);
    end Assert_No_Trailing_Blanks;
@@ -531,10 +537,10 @@ package body Pp.Formatting is
                   elsif Break.Enabled then
                      pragma Assert
                        (Break.Length =
-                        Line_Length (X, Next_Enabled (All_Line_Breaks, X)));
+                        Line_Length (X, Next_Enabled (Line_Breaks, X)));
                      pragma Assert
                        (Break.Mark /=
-                        Line_Breaks (Next_Enabled (All_Line_Breaks, X)).Mark);
+                        Line_Breaks (Next_Enabled (Line_Breaks, X)).Mark);
 
                   else
                      pragma Assert (Break.Length = Natural'Last);
@@ -544,7 +550,7 @@ package body Pp.Formatting is
 
             Assert_No_Trailing_Blanks (Out_Buf);
             pragma Assert
-              (Position (Out_Buf, All_Line_Breaks (Last (All_Line_Breaks)).Mark) =
+              (Position (Out_Buf, Line_Breaks (Last (Line_Breaks)).Mark) =
                Last_Position (Out_Buf));
          end Assert;
 
@@ -554,18 +560,18 @@ package body Pp.Formatting is
          --  the least indented? If we remove a line break for a '[', should we
          --  remove the corresponding one for ']', and vice-versa?
          begin
-            Append (Temp, All_Line_Breaks (1));
+            Append (Temp, Line_Breaks (1));
 
-            for X in 2 .. Last_Index (All_Line_Breaks) loop
-               if All_Line_Breaks (X).Enabled
-                 or else not Is_Empty_Line (Out_Buf, All_Line_Breaks, X - 1, X)
+            for X in 2 .. Last_Index (Line_Breaks) loop
+               if Line_Breaks (X).Enabled
+                 or else not Is_Empty_Line (Out_Buf, Line_Breaks, X - 1, X)
                then
-                  Append (Temp, All_Line_Breaks (X));
+                  Append (Temp, Line_Breaks (X));
                else
-                  pragma Assert (not All_Line_Breaks (X).Hard);
+                  pragma Assert (not Line_Breaks (X).Hard);
                end if;
             end loop;
-            Move (Target => All_Line_Breaks, Source => Temp);
+            Move (Target => Line_Breaks, Source => Temp);
          end Remove_Duplicates;
 
          function Line_Length (F, L : Line_Break_Index) return Natural is
@@ -693,7 +699,9 @@ package body Pp.Formatting is
             More_Levels := True;
 
             loop -- through levels
-               L   := Next_Enabled (All_Line_Breaks, F);
+               --  ???It would be good to set Error_Sloc in this loop, but we
+               --  currently don't have that data conveniently available.
+               L   := Next_Enabled (Line_Breaks, F);
                Len := Line_Length (F, L);
                exit when Len <= Arg (Cmd, Max_Line_Length); -- short enough
                exit when not More_Levels; -- no more line breaks to enable
@@ -748,7 +756,7 @@ package body Pp.Formatting is
             Line_Breaks (F).Length := Len;
             pragma Assert
               (Line_Breaks (F).Length =
-                 Line_Length (F, Next_Enabled (All_Line_Breaks, F)));
+                 Line_Length (F, Next_Enabled (Line_Breaks, F)));
             F                      := L;
          end loop; -- through line breaks
 
@@ -931,6 +939,7 @@ package body Pp.Formatting is
 
          loop
             Src_Tok := Src_Tokens (Src_Index);
+            Error_Sloc := To_Langkit (Scanner.Sloc (Src_Tok));
             Out_Tok := Out_Tokens (Out_Index);
 
             pragma Assert (Kind (Out_Tok) not in Comment_Kind);
@@ -1140,6 +1149,7 @@ package body Pp.Formatting is
             --  below.
 
             while At_Point (Out_Buf, Line_Breaks (Cur_Line).Mark) loop
+               Error_Sloc := (Slocs.Line_Number (Cur_Line), 1);
                pragma Assert
                  (Point (Out_Buf) =
                   Position (Out_Buf, Line_Breaks (Cur_Line).Mark));
@@ -2732,18 +2742,17 @@ package body Pp.Formatting is
             Cur_Tab_Index : Tab_Index := 1;
             Cur_Tab       : Tab_Rec   := Tabs (Cur_Tab_Index);
             Cur_Line_Num  : Positive  := 1;
-
          begin
             while not At_End (Out_Buf) loop
                pragma Assert
                  (Point (Out_Buf) <= Position (Out_Buf, Cur_Tab.Mark));
 
                while At_Point (Out_Buf, Cur_Tab.Mark) loop
+                  Error_Sloc := (Slocs.Line_Number (Cur_Line_Num), 1);
                   if Scanner.Line_Length
                       (Out_Buf,
                        Out_Buf_Line_Ends,
-                       Cur_Line_Num) +
-                    Cur_Tab.Num_Blanks <=
+                       Cur_Line_Num) + Cur_Tab.Num_Blanks <=
                     Arg (Cmd, Max_Line_Length)
                   then
                      for J in 1 .. Cur_Tab.Num_Blanks loop
@@ -2789,6 +2798,7 @@ package body Pp.Formatting is
                Outer_Loop :
                for Out_Index in 2 .. Last_Index (Out_Tokens) loop
                   Out_Tok := Out_Tokens (Out_Index);
+                  Error_Sloc := To_Langkit (Scanner.Sloc (Out_Tok));
                   loop
                      if Kind (Out_Tok) in Reserved_Word then
                         Replace_Cur (Out_Buf, To_Upper (Cur (Out_Buf)));
@@ -2833,6 +2843,7 @@ package body Pp.Formatting is
             --  Skip sentinel and first 3 tokens
 
             Out_Tok := Out_Tokens (Out_Index);
+            Error_Sloc := To_Langkit (Scanner.Sloc (Out_Tok));
             Prev_Tok := Out_Tokens (Out_Index - 1);
             Prev_Prev_Tok := Out_Tokens (Out_Index - 2);
             loop
@@ -2966,6 +2977,8 @@ package body Pp.Formatting is
          --  region of Out_Buf).
 
          loop
+            --  ???It would be good to set Error_Sloc in this loop, but we
+            --  currently don't have that data conveniently available.
             Get_Next_Off_On
               (Out_Tokens, Out_Index, Out_Tok, Prev_Tok => Prev_Tok,
                Expect => Pp_Off_Comment);
@@ -3037,6 +3050,8 @@ package body Pp.Formatting is
       Src_Tokens : Scanner.Seqs.Token_Vector renames Lines_Data.Src_Tokens;
       Out_Tokens : Scanner.Seqs.Token_Vector renames Lines_Data.Out_Tokens;
    begin
+      Error_Sloc := To_Langkit (Scanner.Sloc (Src_Tok));
+
       if Enable_Token_Mismatch then
          declare
             use Scanner, Scanner.Seqs;
@@ -3095,7 +3110,7 @@ package body Pp.Formatting is
          end;
       end if;
 
-      raise Token_Mismatch with Scanner.Sloc_Image (Scanner.Sloc (Src_Tok));
+      raise Token_Mismatch;
    end Raise_Token_Mismatch;
 
    procedure Final_Check_Helper
@@ -3291,6 +3306,7 @@ package body Pp.Formatting is
 
       loop
          Src_Tok := Src_Tokens (Src_Index);
+         Error_Sloc := To_Langkit (Scanner.Sloc (Src_Tok));
          Out_Tok := Out_Tokens (Out_Index);
 
          if Src_Index > 5 and then Simulate_Token_Mismatch then
