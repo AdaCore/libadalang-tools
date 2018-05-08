@@ -170,9 +170,11 @@ package Utils.String_Utilities is
    --  Why don't we create the directory in the outer invocation, so it won't
    --  happen in parallel???
 
+   Move_Failure : exception;
    procedure Move_File (Old_Name : String; New_Name : String);
-   --  Same as GNAT.OS_Lib.Rename_File, but overwrites New_Name if it already
-   --  exists.
+   --  Same as GNAT.OS_Lib.Rename_File, but overwrites New_Name if it
+   --  already exists. On failure, raises Move_Failure with an appropriate
+   --  Exception_Message.
 
    package String_Vectors is
       new Ada.Containers.Indefinite_Vectors (Positive, String);

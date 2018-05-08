@@ -632,11 +632,11 @@ package body Utils.String_Utilities is
          Copy_File (Old_Name, New_Name, Success, Mode => Overwrite);
          Delete_File (Old_Name, Delete_Success);
          if not Success then
-            raise Program_Error with
+            raise Move_Failure with
               "unable to copy " & Old_Name & " to " & New_Name;
          end if;
          if not Delete_Success then
-            raise Program_Error with "unable to delete " & Old_Name;
+            raise Move_Failure with "unable to delete " & Old_Name;
          end if;
       end if;
    end Move_File;

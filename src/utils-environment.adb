@@ -148,11 +148,14 @@ package body Utils.Environment is
       --  way at the moment
       --  ????????????????I think Utils is now using a better method.
       Create_Temp_File (FD, Temp_Name);
+      if FD = Invalid_FD then
+         Cmd_Error ("cannot create temp file; directory is not writeable");
+      end if;
       Close (FD);
       Delete_File (Temp_Name, Success);
 
       if not Success then
-         Cmd_Error ("can not delete the temporary file that was just created");
+         Cmd_Error ("cannot delete temp file " & Temp_Name);
       end if;
 
       Tool_Temp_Dir := new String' -- Remove NUL
@@ -162,10 +165,9 @@ package body Utils.Environment is
       Parallel_Make_Dir (Tool_Temp_Dir.all);
 
       Change_Dir (Initial_Dir);
-
    exception
       when Directory_Error =>
-         Cmd_Error ("cannot create the temporary directory");
+         Cmd_Error ("cannot create the temp directory " & Tool_Temp_Dir.all);
    end Create_Temp_Dir;
 
    -------------------

@@ -175,8 +175,12 @@ package body Pp.Scanner.Seqs is
 
       procedure Scan_Identifier_Chars is
       begin
+         --  We allow '$' in identifiers because that's what preprocessor
+         --  symbols look like, and this allows us to process some files
+         --  that use preprocessing.
+
          while Is_Letter (Cur (Input))
-           or else Cur (Input) = '_'
+           or else Cur (Input) in '_' | '$'
            or else Is_Digit (Cur (Input))
            or else Is_Mark (Cur (Input))
          loop
@@ -366,7 +370,7 @@ package body Pp.Scanner.Seqs is
 
          --  identifier
 
-         elsif Is_Letter (Cur (Input)) then
+         elsif Is_Letter (Cur (Input)) or else Cur (Input) = '$' then
             Tok.Kind := Identifier;
             --  We will check for reserved words below
             Scan_Identifier_Chars;
@@ -564,9 +568,14 @@ package body Pp.Scanner.Seqs is
                   end if;
 
                when others =>
-                  raise Program_Error
-                    with "unrecognized character: " &
-                    To_UTF8 ((1 => Cur (Input)));
+                  Text_IO.Put_Line
+                    (Text_IO.Standard_Error,
+                     "illegal character: " & To_UTF8 ((1 => Cur (Input))));
+                  if Cur (Input) = '#' then
+                     Text_IO.Put_Line
+                       (Text_IO.Standard_Error, "preprocessing not supported");
+                  end if;
+                  raise Program_Error;
                   --  All legal token-starting characters are handled above
             end case;
          end if;

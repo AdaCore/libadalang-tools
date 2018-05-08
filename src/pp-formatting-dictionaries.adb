@@ -321,7 +321,7 @@ package body Pp.Formatting.Dictionaries is
          function Get_Exception_Kind return Opt_Casing_Exception_Kinds;
          --  Checks if String_Buffer (Start_Word .. End_Word) has a syntax of
          --  a casing exception and return the corresponding exception kind.
-         --  Returns Not_A_Casing_Exception if this word can not be interpreted
+         --  Returns Not_A_Casing_Exception if this word cannot be interpreted
          --  as a casing exception. As a side effect, this function may correct
          --  the values of Start_Word and End_Word to skip '*' in case of a
          --  subword.
@@ -541,13 +541,13 @@ package body Pp.Formatting.Dictionaries is
          when Name_Error =>
             Ada.Text_IO.Put_Line
               (Standard_Error,
-               "gnatpp: can not find dictionary file " & Dictionary_Name);
+               "gnatpp: dictionary file not found: " & Dictionary_Name);
             return;
 
          when Status_Error =>
             Ada.Text_IO.Put_Line
               (Standard_Error,
-               "gnatpp: can not open dictionary file " & Dictionary_Name);
+               "gnatpp: cannot open dictionary file: " & Dictionary_Name);
             Ada.Text_IO.Put_Line
               (Standard_Error,
                "        the file may be used by another process");

@@ -1,4 +1,5 @@
 with Ada.Characters.Handling; use Ada.Characters.Handling;
+with Ada.Exceptions;
 with Ada.Finalization;
 with Ada.Strings.Fixed;
 with Ada.Strings.UTF_Encoding;
@@ -178,39 +179,45 @@ package body Pp.Actions is
       if not Mimic_gcc (Cmd)
       --  and then not Nothing_To_Do
       then
-         Open (File_Name_File, In_File, Name => File_Name_File_Name.all);
-
-         --  The File_Name_File contains an initial blank line, due to Text_IO
-         --  weirdness, so we need to discard it.
-
-         declare
-            Ignore : constant String := Get_Line (File_Name_File);
          begin
-            null;
-         end;
+            Open (File_Name_File, In_File, Name => File_Name_File_Name.all);
 
-         --  Read pairs of lines from the file name file, and do the moves.
+            --  The File_Name_File contains an initial blank line, due to
+            --  Text_IO weirdness, so we need to discard it.
 
-         while not End_Of_File (File_Name_File) loop
-            Count := Count + 1;
             declare
-               Temp_Output_Name : constant String := Get_Line (File_Name_File);
-               Output_Name : constant String := Get_Line (File_Name_File);
+               Ignore : constant String := Get_Line (File_Name_File);
             begin
-               if False then
-                  Put_Line ("mv " & Temp_Output_Name & " " & Output_Name);
-               end if;
-               Move_File
-                 (Old_Name => Temp_Output_Name, New_Name => Output_Name);
+               null;
             end;
-         end loop;
 
-         Close (File_Name_File);
+            --  Read pairs of lines from the file name file, and do the moves.
 
-         if not Debug_Flag_N then
-            GNAT.OS_Lib.Delete_File (File_Name_File_Name.all, Ignored);
-            --  No point in complaining on failure
-         end if;
+            while not End_Of_File (File_Name_File) loop
+               Count := Count + 1;
+               declare
+                  Temp_Output_Name : constant String :=
+                    Get_Line (File_Name_File);
+                  Output_Name : constant String := Get_Line (File_Name_File);
+               begin
+                  if False then
+                     Put_Line ("mv " & Temp_Output_Name & " " & Output_Name);
+                  end if;
+                  Move_File
+                    (Old_Name => Temp_Output_Name, New_Name => Output_Name);
+               end;
+            end loop;
+
+            Close (File_Name_File);
+
+            if not Debug_Flag_N then
+               GNAT.OS_Lib.Delete_File (File_Name_File_Name.all, Ignored);
+               --  No point in complaining on failure
+            end if;
+         exception
+            when X : Move_Failure =>
+               Cmd_Error (Ada.Exceptions.Exception_Message (X));
+         end;
       end if;
    end Final;
 
@@ -4703,19 +4710,20 @@ package body Pp.Actions is
 --         end if;
 
          declare
+            Backup_Name : constant String := File_Name & NPP_Suffix;
             Success : Boolean;
             use Wide_Text_IO;
          begin
             Copy_File
               (Name     => File_Name,
-               Pathname => File_Name & NPP_Suffix,
+               Pathname => Backup_Name,
                Success  => Success,
                Mode     => Overwrite);
 
             if not Success then
-               Put (Standard_Error, "gnatpp: can not create ");
-               Put (Standard_Error, "the back-up copy for ");
-               Put (Standard_Error, To_Wide_String (File_Name));
+               Put (Standard_Error,
+                    "gnatpp: cannot create backup file ");
+               Put (Standard_Error, To_Wide_String (Backup_Name));
                New_Line (Standard_Error);
             end if;
          end;
@@ -4970,7 +4978,6 @@ package body Pp.Actions is
       Put (" --ignore=filename - do not process sources listed in filename\n");
       Put (" --eol=text_format - sets the format of the gnatpp output " &
         "file(s),\n");
-      Put ("                    can not be used together with -pipe option\n");
       Put ("       text_format can be - 'unix' or 'lf'   - lines end with " &
         "LF character\n");
       Put ("                          - 'dos'  or 'crlf' - lines end with " &
