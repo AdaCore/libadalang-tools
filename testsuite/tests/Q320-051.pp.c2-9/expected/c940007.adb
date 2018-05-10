@@ -254,7 +254,7 @@ begin
 
          procedure Time_Pulse_Received is
             Load : Load_Factor := Freeway_Overload; -- CALL MULTILEVEL FUNCTN
-         -- FROM WITHIN PROCEDURE
+            -- FROM WITHIN PROCEDURE
          begin
             -- if broken down, no vehicles are released
             if not Freeway_Breakdown then    -- CALL FUNCTION FROM A PROCEDURE

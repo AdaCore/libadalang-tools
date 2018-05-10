@@ -301,7 +301,7 @@ begin
             type New_Vrec is
               new Vrec_Of_Vrec_02
                 (Report.Ident_Int (0)); -- No Constraint_Error
-         -- raised.
+            -- raised.
          begin
             declare
                Vobj_8 : New_Vrec;                  -- Constraint_Error raised.
@@ -333,7 +333,7 @@ begin
             subtype Sub_Vrec is
               Vrec_Of_Vrec_02 (Report.Ident_Int (11)); -- No Constraint_Error
             Vobj_9 : Sub_Vrec;                       -- raised for either
-         -- declaration.
+            -- declaration.
          begin
             if Vobj_9 /= (11, 0) then
                Report.Comment ("VObj_9 - wrong values");
@@ -352,11 +352,11 @@ begin
             type Acc_Vrec_01 is
               access Vrec_Of_Vrec_02
                 (Report.Ident_Int (0));  -- No Constraint_Error
-         -- raised.
+            -- raised.
          begin
             declare
                Vobj_10 : Acc_Vrec_01;                -- No Constraint_Error
-            -- raised.
+               -- raised.
             begin
                Vobj_10 :=
                  new Vrec_Of_Vrec_02

@@ -858,6 +858,7 @@ package body Pp.Buffers is
          then
            (Last_Index (Buf.To) = 1
             or else Buf.To (Last_Index (Buf.To) - 1) /= ' '));
+
 --      if C = NL then
 --         Buf.Cur_Column := 1;
 --      end if;

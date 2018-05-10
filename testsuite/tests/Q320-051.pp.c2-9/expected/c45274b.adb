@@ -185,7 +185,7 @@ begin
 
       Y : Lp (True);
 
-   -- CHECK THAT NO EXCEPTION FOR UNINITIALIZED VARIABLE
+      -- CHECK THAT NO EXCEPTION FOR UNINITIALIZED VARIABLE
    begin
 
       if Y in Lp then

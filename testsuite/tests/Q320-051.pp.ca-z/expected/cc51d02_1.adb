@@ -11,7 +11,7 @@
 
 procedure Cc51d02_1 (L : in out List_Mgr.List_Type; E : in Elem_Type) is
    Element : Elem_Type := E;   -- Can't update IN parameter.
--- Initialization of unconstrained variable.
+   -- Initialization of unconstrained variable.
 begin
    Update_Id (Element);                    -- Executes actual type's version
    -- (for this test, this will be a dispatching call).

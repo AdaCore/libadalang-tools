@@ -21,7 +21,7 @@ package body Ca11017_0 is
           (With_The_String, In_The_String)
       then
          raise Ca11017_0.Ca11017_1.Position_Error;
-      -- Public child's exception.
+         -- Public child's exception.
       else
          In_The_String.The_Content (At_The_Position .. End_Position) :=
            With_The_String.The_Content (1 .. With_The_String.The_Length);

@@ -266,7 +266,7 @@ procedure Cxai008 is
                                 Elem_Name => Element_Name),
                            Position => Element_Cursor);
 
-                     -- when '?' => Processing instruction -- TBD
+                        -- when '?' => Processing instruction -- TBD
 
                      when others =>
                         raise Xml_Syntax_Error;

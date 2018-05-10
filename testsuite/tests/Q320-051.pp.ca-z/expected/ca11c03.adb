@@ -124,12 +124,13 @@ begin
         (Common_Name => "East-Indian Tarsier ", Weight => 7,
          Hair_Color  => Brown, Habitat => Fa11c00_2.Arboreal);
 
-   -- Demonstrates visibility of package FA11C00_0.FA11C00_1.FA11C00_2.
-   --
-   -- Type Primate referenced with the simple name of package FA11C00_2 only.
-   --
-   -- Simple name of package FA11C00_2 is directly visible through "use" of
-   -- parent.
+      -- Demonstrates visibility of package FA11C00_0.FA11C00_1.FA11C00_2.
+      --
+      -- Type Primate referenced with the simple name of package FA11C00_2
+      -- only.
+      --
+      -- Simple name of package FA11C00_2 is directly visible through "use" of
+      -- parent.
 
    begin
 

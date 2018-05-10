@@ -72,7 +72,7 @@ procedure Cb40005 is
       return Action_On_Exception'Access;
    end Retry_Procedure;
 
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+   -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 begin  -- Main test procedure.
 

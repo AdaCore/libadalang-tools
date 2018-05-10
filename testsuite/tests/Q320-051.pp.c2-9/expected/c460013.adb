@@ -184,7 +184,7 @@ begin
       exception
          when Constraint_Error =>
             Failed ("Null not allowed for normal access parameter");
-         -- This is Ada 95 semantics.
+            -- This is Ada 95 semantics.
          when F : others =>
             Failed
               ("Unexpected exception " & Exception_Name (F) &

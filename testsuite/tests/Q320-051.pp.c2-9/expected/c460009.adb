@@ -92,7 +92,7 @@ begin
       type Arr_Int2 is array (Int range <>, Int range <>) of Integer;
       Arr_Obj2 : Arr_Int2 (1 .. Report.Ident_Int (2),
          Report.Ident_Int (3) .. Report.Ident_Int (2));
-   -- null array object
+      -- null array object
    begin
 
       -- Same lengths, no Constraint_Error raised.
@@ -121,7 +121,7 @@ begin
       type Arr_Int3 is array (Int range <>, Int range <>) of Integer;
       Arr_Obj3 : Arr_Int3 (1 .. Report.Ident_Int (2),
          Report.Ident_Int (3) .. Report.Ident_Int (2));
-   -- null array object
+      -- null array object
 
    begin
 
@@ -155,7 +155,7 @@ begin
       Arr_Obj4 : Arr_Int4 (1 .. Report.Ident_Int (2),
          Report.Ident_Int (1) .. Report.Ident_Int (3),
          Report.Ident_Int (3) .. Report.Ident_Int (2));
-   -- null array object
+      -- null array object
    begin
 
       -- Lengths mismatch, Constraint_Error raised.

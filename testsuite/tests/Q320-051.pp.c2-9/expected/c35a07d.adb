@@ -63,7 +63,7 @@ procedure C35a07d is
      Natural_Degrees_M15 delta 0.25 range 0.0 .. 360.0;
    subtype St_Symmetric_Radians_M8 is
      Symmetric_Radians_M16 delta Half_Pi * 2.0**(-7) range -Half_Pi .. Half_Pi;
--- 'SMALL = 2.0 ** ( -7) = 0.00781_25.
+   -- 'SMALL = 2.0 ** ( -7) = 0.00781_25.
 
 begin
 

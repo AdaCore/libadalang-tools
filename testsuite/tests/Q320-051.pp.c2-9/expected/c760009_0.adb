@@ -12,7 +12,7 @@ package body C760009_0 is -- Check_1
 
    procedure Tc_Check_2 (Apf : out Private_Formal) is
       Local : Private_Formal;  -- initialized by virtue of actual being
-   -- Controlled
+      -- Controlled
    begin
       Apf := Local;
       Tc_Validate (Apf);

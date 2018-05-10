@@ -19,7 +19,7 @@ begin
       Total_Resources_Available : constant := 1;
 
       Resources : Semaphore.Counting_Semaphore (Total_Resources_Available);
-   -- An object of protected type.
+      -- An object of protected type.
 
    begin
 

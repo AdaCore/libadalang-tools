@@ -34,8 +34,8 @@ begin  -- Main program.
    declare
 
       Io_Request : Read_Task;                  -- Request a read from other
-   -- than the current track.
-   -- IO_Request will be requeued from Read to Pending_Read.
+      -- than the current track.
+      -- IO_Request will be requeued from Read to Pending_Read.
    begin
 
       -- To pass this test, the following must be true:

@@ -383,7 +383,7 @@ procedure Cxg2009 is
    type A_Long_Float is digits System.Max_Digits;
    package A_Long_Float_Check is new Generic_Norm_Check (A_Long_Float);
 
------------------------------------------------------------------------
+   -----------------------------------------------------------------------
 
 begin
    Report.Test

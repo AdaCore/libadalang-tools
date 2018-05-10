@@ -45,7 +45,7 @@ procedure Cc70001 is
       Ok := (Actual = Expected);
    end Tc_Verify_List;
 
--- End test code declarations. -------------------------
+   -- End test code declarations. -------------------------
 
 begin
    Report.Test

@@ -14,7 +14,7 @@ begin
       Total_Resources_Available : constant := 1;
 
       Resources : Semaphore.Counting_Semaphore (Total_Resources_Available);
-   -- An object of protected type.
+      -- An object of protected type.
 
    begin
 
@@ -37,7 +37,7 @@ begin
       exception
          when Semaphore.Resource_Underflow =>              -- Exception prop.
             Semaphore.Handled_In_Procedure_Caller := True; -- from protected
-         -- procedure.
+            -- procedure.
          when others =>
             Report.Failed ("Unknown exception during resource allocation");
       end Allocate_Resources;
@@ -55,7 +55,7 @@ begin
       exception
          when Semaphore.Resource_Overflow =>              -- Exception prop
             Semaphore.Handled_In_Function_Caller := True; -- from protected
-         -- function.
+            -- function.
          when others =>
             Report.Failed ("Exception raised during resource deallocation");
       end Deallocate_Resources;

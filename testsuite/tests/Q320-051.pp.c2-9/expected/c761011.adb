@@ -183,7 +183,7 @@ begin
          Obj3 : constant Ctrl :=
            (Ada.Finalization.Controlled with D => False,
             Finalized => Ident_Bool (False), C1 => Ident_Int (20));
-      -- Finalization: Tasking_Error
+         -- Finalization: Tasking_Error
       begin
          Comment ("Finalization because of return statement");
 
@@ -253,7 +253,7 @@ begin
          end if;
       when Funky_Error =>
          Failed ("Wrong exception propagated");
-      -- Should be Program_Error (7.6.1(19)).
+         -- Should be Program_Error (7.6.1(19)).
       when E : others =>
          Failed
            ("Exception " & Exception_Name (E) & " raised - " &

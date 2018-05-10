@@ -94,8 +94,8 @@ begin
 
    declare
       Node_1, Node_2, Node_3 : Network_Node_Type;
-   -- declare three tasks which will compete for a single token, managed by
-   -- Sequence Manager
+      -- declare three tasks which will compete for a single token, managed by
+      -- Sequence Manager
 
    begin                    -- tasks start
       null;

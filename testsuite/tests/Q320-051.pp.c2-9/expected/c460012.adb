@@ -61,8 +61,9 @@ procedure C460012 is
            ("No exception raised when changing the " &
             "discriminant of a view conversion, discriminant not " &
             "changed");
-      -- This check primarily exists to prevent X from being optimized by 11.6
-      -- permissions, or the Failed call being made before the assignment.
+         -- This check primarily exists to prevent X from being optimized
+         -- by 11.6 permissions, or the Failed call being made before the
+         -- assignment.
       else
          Failed
            ("No exception raised when changing the " &

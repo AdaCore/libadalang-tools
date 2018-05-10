@@ -43,12 +43,12 @@ package body C392011_2.C392011_3 is
 
       Next_Item : List_Pointer := The_List;
 
-   -- Check that if a function call with a controlling result is itself a
-   -- controlling operand of an enclosing call on a dispatching operation, then
-   -- its controlling tag value is determined by the controlling tag value of
-   -- the enclosing call.
+      -- Check that if a function call with a controlling result is itself a
+      -- controlling operand of an enclosing call on a dispatching operation,
+      -- then its controlling tag value is determined by the controlling tag
+      -- value of the enclosing call.
 
-   -- Level_2 -> Level_1 -> Level_2 -> Level_1 -> Level_0
+      -- Level_2 -> Level_1 -> Level_2 -> Level_1 -> Level_0
 
    begin
 

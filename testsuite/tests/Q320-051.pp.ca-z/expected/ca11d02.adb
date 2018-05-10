@@ -59,7 +59,7 @@ begin
            ("Exception raised in multiplication and " &
             "propagated to caller");
          Tc_Handled_In_Grandchild_Pkg_Func := False;
-      -- Improper exception handling in caller.
+         -- Improper exception handling in caller.
 
       when others =>
          Report.Failed ("Unexpected exception in multiplication");

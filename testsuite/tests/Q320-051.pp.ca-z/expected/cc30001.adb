@@ -15,7 +15,7 @@ procedure Cc30001 is
    Sys_Msg2 : System_Messages.Mail_Type'Class := Sys_Msg1;
 
    use System_Messages, Cc30001_2;                 -- All versions of "Send"
--- directly visible.
+   -- directly visible.
 
 begin
 

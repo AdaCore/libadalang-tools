@@ -10,10 +10,10 @@ package body Ca11016_0.Ca11016_1 is
          -- Parent's operation,
          when Forest =>
             return (Display_Value'First);
-         -- Parent's type.
+            -- Parent's type.
          when Desert =>
             return (Display_Value'Last);
-         -- Parent's type.
+            -- Parent's type.
          when others =>
             return ((Display_Value'Last - Display_Value'First) / 2);
             -- NOTE: Results are truncated.

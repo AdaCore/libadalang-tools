@@ -402,9 +402,9 @@ begin
          Tr : C432002_0.Twice_Removed :=
            C432002_0.Twice_Removed'
              (D with S2 => String_20, S3 => String_3, S4 => String_8);
-      -- N is constrained to a value in the derived_type_definition of
-      -- Constrained_Discriminant_Extension. Its omission from the above
-      -- record_component_association_list is allowed by 4.3.2(6).
+         -- N is constrained to a value in the derived_type_definition of
+         -- Constrained_Discriminant_Extension. Its omission from the above
+         -- record_component_association_list is allowed by 4.3.2(6).
 
       begin
          C432002_0.Do_Something (Tr); -- success

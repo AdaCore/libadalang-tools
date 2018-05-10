@@ -105,7 +105,7 @@ begin
          package body Raise_It is
             Pt1 : At1      := new T1;
             I   : Positive := Ident_Int (0); -- RAISE
-         -- CONSTRAINT_ERROR.
+            -- CONSTRAINT_ERROR.
          begin
             if I /= Ident_Int (2) or I = Ident_Int (1) + 1 then
                Failed ("PACKAGE DIDN'T RAISE EXCEPTION");

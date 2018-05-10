@@ -14,7 +14,7 @@ package body Ca11012_0.Ca11012_1 is
    ---------------------------------------------------------------
    function "*" (Factor : Int_Type; C : Complex_Type) return Complex_Type is
       Result : Complex_Type := Zero;   -- Zero is declared in parent,
-   -- Complex_Number
+      -- Complex_Number
    begin
       for I in 1 .. abs (Factor) loop
          Result := Result + C;         -- Complex_Number "+"

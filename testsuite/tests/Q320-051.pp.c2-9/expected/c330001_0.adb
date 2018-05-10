@@ -4,7 +4,7 @@ package body C330001_0 is
 
    function Indef_Func_1 return Fullviewdefinite_Unknown_Disc is
       Var_1 : Fullviewdefinite_Unknown_Disc;      -- No need for explicit
-   -- constraints, use initial
+      -- constraints, use initial
    begin                                          -- values.
       return Var_1;
    end Indef_Func_1;

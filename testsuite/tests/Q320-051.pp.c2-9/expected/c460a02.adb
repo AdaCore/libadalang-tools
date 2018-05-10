@@ -75,7 +75,7 @@ begin -- C460A02.                                              -- [ Level = 1 ]
       exception
          when Program_Error =>
             Result := F460a00.Pe_Exception;
-         -- Expected result.
+            -- Expected result.
          when others =>
             Result := F460a00.Others_Exception;
       end;

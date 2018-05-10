@@ -8,7 +8,7 @@ package body C392011_1 is
    function Create return Level_1 is
       Created_Item_1 : constant Level_1 :=
         (C392011_0.Create with Int_Item => Integer_1);
-   -- note call to ^--------------^ -- A
+      -- note call to ^--------------^ -- A
    begin
       Integer_1 := Integer'Succ (Integer_1);
       Tctouch.Touch

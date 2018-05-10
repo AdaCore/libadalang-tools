@@ -157,7 +157,7 @@ begin
       begin
          declare
             subtype Subtype_Rec is Rec_Of_Rec_01 (1);
-         -- No Constraint_Error raised.
+            -- No Constraint_Error raised.
          begin
             declare
                Obj4 : Subtype_Rec;           -- Constraint_Error raised.
@@ -282,7 +282,7 @@ begin
       begin
          declare
             type Acc_Rec is access Rec_Of_Rec_02 (Report.Ident_Int (0));
-         -- No Constraint_Error raised.
+            -- No Constraint_Error raised.
          begin
             declare
                Obj8 : Acc_Rec;               -- No Constraint_Error raised.

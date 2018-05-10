@@ -105,7 +105,7 @@ procedure C95085a is
                   Called := True;
                   if Who = "10" then
                      Pout := Ident_Int (10);  -- 10 IS NOT
-                  -- A DIGIT.
+                     -- A DIGIT.
                   else
                      Pout := -1;
                   end if;

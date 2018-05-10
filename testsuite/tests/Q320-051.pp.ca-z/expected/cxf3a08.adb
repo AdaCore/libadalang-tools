@@ -97,7 +97,7 @@ begin
       Tc_Offset     : Integer := 0;
 
       Tc_Short_String : String (1 .. 4);   -- Shorter than the shortest edited
-   -- output string result.
+      -- output string result.
 
    begin
 

@@ -37,13 +37,13 @@ procedure C392010 is
          case I is  -- use defaults
             when 1 =>
                C392010_0.Proc_W_Ap_And_Cp_W_Def;
-            -- DBz
+               -- DBz
             when 2 =>
                C392010_1.Proc_W_Ap_And_Cp_W_Def;
-            -- HBy
+               -- HBy
             when 3 =>
                C392010_2.Proc_W_Ap_And_Cp_W_Def;
-            -- HBx
+               -- HBx
             when others =>
                Report.Failed ("Unexpected loop value");
          end case;

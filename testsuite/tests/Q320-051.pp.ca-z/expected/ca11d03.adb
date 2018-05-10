@@ -68,7 +68,7 @@ begin
         Complex
           (Int_Type (Report.Ident_Int (-2)), Int_Type (Report.Ident_Int (8)));
       Complex_No : Complex_Type := One;   -- One is declared in parent
-   -- package.
+      -- package.
    begin
       Complex_No := Operand_1 + Operand_2;   -- Basic_Complex."+".
 

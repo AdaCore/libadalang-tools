@@ -7,7 +7,8 @@ with Report;
 procedure Cxac007 is
    Log_File_Name : constant String :=
      Report.Legal_File_Name (Nam => "CXAC007");
--- A file name that will be used for the log file. This file will be written.
+   -- A file name that will be used for the log file. This file will be
+   -- written.
 begin
    Report.Test ("CXAC007", "Check that Stream_IO is preelaborated");
 

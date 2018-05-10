@@ -23,8 +23,8 @@ package body C954a03_0 is  -- Printer server abstraction.
             -- entry accepted.
             select
                Printer (Index).Done_Printing;               -- Accepted immed.
-            -- when printer is
-            -- available.
+               -- when printer is
+               -- available.
             else
                Index := 1 + (Index mod Number_Of_Printers);-- Entry not immed.
                Printers_Busy := True;                      -- accepted; keep

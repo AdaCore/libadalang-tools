@@ -42,16 +42,13 @@ package Pp.Scanner.Seqs is
       Result                    : out Token_Vector;
       Ada_Version               : Ada_Version_Type;
       Pp_Off_On_Delimiters      : Pp_Off_On_Delimiters_Rec;
-      Ignore_Single_Line_Breaks : Boolean;
       Max_Tokens                : Token_Index       := Token_Index'Last;
       Line_Ends                 : Marker_Vector_Ptr := null;
       Gen_Regions               : Token_Vector_Ptr  := null);
-   --  Return in Result the sequence of tokens in the Input string. The
-   --  first one is always Start_Of_Input, and the last one End_Of_Input.
-   --  Ignore_Single_Line_Breaks means we should skip any End_Of_Line tokens
-   --  (but not Blank_Lines). Max_Tokens places a limit on the number of tokens
-   --  (not counting Start_Of_Input); we quit before reaching end of input if
-   --  we've gotten that many.
+   --  Return in Result the sequence of tokens in the Input string. The first
+   --  one is always Start_Of_Input, and the last one End_Of_Input. Max_Tokens
+   --  places a limit on the number of tokens (not counting Start_Of_Input); we
+   --  quit before reaching end of input if we've gotten that many.
    --
    --  If Line_Ends is non-null, we compute all the line endings in
    --  Line_Ends.all, which is a mapping from line numbers to Markers in the
@@ -63,19 +60,20 @@ package Pp.Scanner.Seqs is
    --  the sequence of Gen_Plus and Gen_Minus tokens.  The generated code is in
    --  the slices Gen_Regions(1).Sloc..Gen_Regions(2).Sloc,
    --  Gen_Regions(3).Sloc..Gen_Regions(4).Sloc, and so on.
+   --  ???This feature is not used.
 
    function Next_Lexeme
      (Tokens : Token_Vector;
       Index  : Token_Index)
       return   Token;
-   --  Returns the next token after Index that is not a blank line or comment
+   --  Returns the next token after Index that is not End_Of_Line, Blank_Line,
+   --  or Comment_Kind.
 
    function Prev_Lexeme
      (Tokens : Token_Vector;
       Index  : Token_Index)
       return   Token;
-   --  Returns the previous token before Index that is not a blank line or
-   --  comment
+   --  Returns the previous token before Index that is (as above)
 
    function Get_Token
      (Input : W_Str; Ada_Version : Ada_Version_Type)

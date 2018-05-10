@@ -316,7 +316,7 @@ begin  -- CC3019C2M
 
       when Person_Stack.Underflow =>
          null;  -- CORRECT EXCEPTION
-      -- RAISED
+         -- RAISED
       when others =>
          Report.Failed
            ("INCORRECT EXCEPTION RAISED IN " & "UNDERFLOW EXCEPTION TEST");
@@ -341,7 +341,7 @@ begin  -- CC3019C2M
 
       when Person_Stack.Overflow =>
          null;  -- CORRECT EXCEPTION
-      -- RAISED
+         -- RAISED
       when others =>
          Report.Failed
            ("INCORRECT EXCEPTION RAISED IN " & "OVERFLOW EXCEPTION TEST");

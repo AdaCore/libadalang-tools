@@ -14,7 +14,7 @@ procedure C640001 is
    My_Table1 : C640001_0.Table;             -- Initial values of both Row1 &
    -- Row2 are (T,F,T,F,T,F,T,F,T,F).
    My_Table2 : C640001_0.Table2;            -- Initial values of both Row1 &
--- Row2 are (T,F,T,F,T,F,T,F,T,F).
+   -- Row2 are (T,F,T,F,T,F,T,F,T,F).
 begin
    Report.Test
      ("C640001",

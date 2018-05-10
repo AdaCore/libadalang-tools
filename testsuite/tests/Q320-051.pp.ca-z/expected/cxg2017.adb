@@ -254,8 +254,8 @@ procedure Cxg2017 is
    type A_Long_Float is digits System.Max_Digits;
    package A_Long_Float_Check is new Generic_Check (A_Long_Float);
 
------------------------------------------------------------------------
------------------------------------------------------------------------
+   -----------------------------------------------------------------------
+   -----------------------------------------------------------------------
 
 begin
    Report.Test ("CXG2017", "Check the accuracy of the TANH function");

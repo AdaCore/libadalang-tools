@@ -120,7 +120,7 @@ begin
 
       function Record_Status (Reading : Status_Record_Type) return Boolean is
          use Text_Io;  -- To provide visibility to type Type_Set and
-      -- enumeration literal Upper_Case.
+         -- enumeration literal Upper_Case.
       begin
          Day_Io.Put
            (File => Status_Log, Item => Reading.Day,

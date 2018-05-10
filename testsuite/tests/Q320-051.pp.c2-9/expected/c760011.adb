@@ -27,7 +27,7 @@ procedure C760011 is
       procedure Subtest_1_Local_1 is
          An_Object : C760011_0.Controlled_Type'Class :=
            C760011_0.Controlled_Type'(Afc with 'X', "ONE*");
-      -- initialize An_Object
+         -- initialize An_Object
       begin
          if C760011_0.Controlled_Type (An_Object) =
            C760011_0.Controlled_Type'(Afc with 'A', "ONE*") then

@@ -64,7 +64,7 @@ begin
          type Asi is access Standard.Integer;
          Vasi : Asi;
          Vi   : Integer range 1 .. 10;   -- THE "REAL" STANDARD
-      -- TYPE 'INTEGER'
+         -- TYPE 'INTEGER'
 
       begin
 

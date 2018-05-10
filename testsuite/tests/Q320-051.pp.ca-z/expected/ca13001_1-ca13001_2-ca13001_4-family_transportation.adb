@@ -33,7 +33,7 @@ protected body Family_Transportation is
                   Walking := True;
                end if;
 
-            -- Drive clunker to other destinations.
+               -- Drive clunker to other destinations.
             else
                if not Vehicles (Clunker).In_Use and Fuel (Clunker) and
                  not Ca13001_1.Ca13001_2.Ca13001_3.Flat_Tire (Clunker) then
@@ -46,7 +46,7 @@ protected body Family_Transportation is
                end if;
             end if;
 
-         -- Similar for Teen.
+            -- Similar for Teen.
          when Teen =>
             if not Vehicles (Clunker).In_Use and Fuel (Clunker) and
               not Ca13001_1.Ca13001_2.Ca13001_3.Flat_Tire (Clunker) then

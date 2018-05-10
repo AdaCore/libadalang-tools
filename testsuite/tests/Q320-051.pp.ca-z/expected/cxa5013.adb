@@ -153,7 +153,7 @@ begin
          if All_Values_Present then
 
             Success := True;  -- Test was successful, exit procedure with no
-         -- further testing performed.
+            -- further testing performed.
          else
 
             -- Initial test above was unsuccessful, so set a timer and perform

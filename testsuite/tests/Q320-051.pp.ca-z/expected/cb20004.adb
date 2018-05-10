@@ -11,7 +11,7 @@ procedure Cb20004 is
    Data_Buffer : Buffer.Bounded_Buffer;   -- an object of protected type.
 
    Handled_In_Caller : Boolean := False;  -- same name as boolean declared
--- in package Buffer.
+   -- in package Buffer.
 begin
 
    Report.Test

@@ -97,7 +97,7 @@ begin
 
          subtype Tabox51 is
            Tabox5 (Ident_Int (-6) .. Ident_Int (Integer'Last - 4));
-      -- CONSTRAINT_ERROR MAY BE RAISED BY THIS SUBTYPE DECLARATION.
+         -- CONSTRAINT_ERROR MAY BE RAISED BY THIS SUBTYPE DECLARATION.
 
       begin
 

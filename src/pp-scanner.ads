@@ -39,10 +39,9 @@ package Pp.Scanner is
    --
    --     We do not ignore comments; a comment is considered to be a token.
    --
-   --     We do not ignore blank lines. We do ignore a single line break,
-   --     if Ignore_Single_Line_Breaks is True. Blanks between tokens are
-   --     always ignored. Other space characters (tabs, NO-BREAK SPACE,
-   --     etc.) are removed in Buffers.
+   --     We do not ignore line breaks. Blanks between tokens are always
+   --     ignored. Other space characters (tabs, NO-BREAK SPACE, etc.) are
+   --     removed in Buffers.
    --
    --     We don't check for errors, because we're in ASIS, where Ada code is
    --     known to be legal. ???No longer true.

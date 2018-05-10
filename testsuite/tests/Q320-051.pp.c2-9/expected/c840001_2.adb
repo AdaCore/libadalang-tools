@@ -11,8 +11,8 @@ procedure C840001_2 is
    Tc_Operand2 : C840001_1.Precision_Pos_Float;
 
    use type C840001_1.Precision_Pos_Float;
--- Makes the operators of its parent type directly visible, even though the
--- parent type and operators are not otherwise visible at all.
+   -- Makes the operators of its parent type directly visible, even though the
+   -- parent type and operators are not otherwise visible at all.
 
 begin
 

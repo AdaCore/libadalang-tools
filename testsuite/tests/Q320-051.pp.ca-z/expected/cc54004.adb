@@ -36,10 +36,10 @@ begin
      or else Tc_Med_Ptr.all not in Cc54004_1.Medium_Alert then
       Report.Failed ("Class-wide objects do not have expected tags");
 
-   -- The explicit dereference of the "Pop"ed pointers results in views of
-   -- the designated objects, the nominal subtypes of which are class-wide. In
-   -- order to be able to reference the component TC_Code, these views must be
-   -- converted to a specific type possessing that component.
+      -- The explicit dereference of the "Pop"ed pointers results in views of
+      -- the designated objects, the nominal subtypes of which are class-wide.
+      -- In order to be able to reference the component TC_Code, these views
+      -- must be converted to a specific type possessing that component.
 
    elsif Cc54004_1.Low_Alert (Tc_Low_Ptr.all).Tc_Code /= Cc54004_0.Low or
      Cc54004_1.Medium_Alert (Tc_Med_Ptr.all).Tc_Code /= Cc54004_0.Medium then

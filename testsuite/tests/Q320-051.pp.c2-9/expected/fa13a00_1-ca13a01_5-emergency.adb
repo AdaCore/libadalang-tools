@@ -6,7 +6,7 @@ separate (Fa13a00_1.Ca13a01_5)
 
 procedure Emergency is
    Bell : Bell_Type;                      -- Reference type declared in the
--- subunit parent's body.
+   -- subunit parent's body.
 
 begin
    -- Calls maintenance operation.

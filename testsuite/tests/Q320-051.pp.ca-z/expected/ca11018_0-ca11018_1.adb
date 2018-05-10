@@ -6,7 +6,7 @@ package body Ca11018_0.Ca11018_1 is
 
       Num : Count := Count'First;
 
-   -- Count how many time the word appears within the given message.
+      -- Count how many time the word appears within the given message.
 
    begin
       -- ... Error-checking code omitted for brevity.

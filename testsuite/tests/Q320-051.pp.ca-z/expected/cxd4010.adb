@@ -127,7 +127,7 @@ procedure Cxd4010 is
          Report.Failed ("unexpected exception in Checker");
    end Checker;
 
---------------------------------------------------------------
+   --------------------------------------------------------------
 
 begin
 

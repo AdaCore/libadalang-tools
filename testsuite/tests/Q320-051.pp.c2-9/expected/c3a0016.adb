@@ -68,7 +68,7 @@ procedure C3a0016 is
    Bo : aliased Boolean := False;
 
    Cab : constant access Boolean := Bo'Access;
--- Note: "access constant" is something very different!
+   -- Note: "access constant" is something very different!
 
 begin
    Report.Test

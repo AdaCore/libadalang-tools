@@ -56,7 +56,7 @@ procedure Cc51d01 is
       List_Mgr          => Ranked_Lists);
    Ranked_List : Ranked_Lists.List_Type;
 
--- End instantiations and list declarations. -----------
+   -- End instantiations and list declarations. -----------
 
 begin
    Report.Test

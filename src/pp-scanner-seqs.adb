@@ -74,7 +74,6 @@ package body Pp.Scanner.Seqs is
       Result                    : out Token_Vector;
       Ada_Version               : Ada_Version_Type;
       Pp_Off_On_Delimiters      : Pp_Off_On_Delimiters_Rec;
-      Ignore_Single_Line_Breaks : Boolean;
       Max_Tokens                : Token_Index       := Token_Index'Last;
       Line_Ends                 : Marker_Vector_Ptr := null;
       Gen_Regions               : Token_Vector_Ptr  := null)
@@ -120,8 +119,7 @@ package body Pp.Scanner.Seqs is
       procedure Append_To_Result (Tok : in out Token);
       --  Append the token onto Result, and set Preceding_Token and
       --  Preceding_Lexeme as appropriate. Special processing for End_Of_Line:
-      --  if it follows an End_Of_Line, turn it into a Blank_Line; otherwise
-      --  skip it unless Ignore_Single_Line_Breaks is False.
+      --  if it follows an End_Of_Line, turn it into a Blank_Line.
 
       procedure Scan_Decimal_Digit_Chars;
       procedure Scan_Identifier_Chars;
@@ -650,19 +648,17 @@ package body Pp.Scanner.Seqs is
               To_W_Str (Tok.Text) =
                 Slice (Input, Tok.Sloc.Firstx, Tok.Sloc.Lastx));
 
-         if Tok.Kind = End_Of_Line then
-            if Preceding_Token.Kind in End_Of_Line | Blank_Line then
-               Tok.Kind := Blank_Line;
-            elsif Ignore_Single_Line_Breaks then
-               goto Ignore_It;
-            end if;
+         if Tok.Kind = End_Of_Line
+           and then Preceding_Token.Kind in End_Of_Line | Blank_Line
+         then
+            Tok.Kind := Blank_Line;
          end if;
 
          Append (Result, Tok);
          <<Ignore_It>>
 
-         Preceding_Token := Tok; -- even if an ignored End_Of_Line
-         if Tok.Kind not in Blank_Line | End_Of_Line | Comment_Kind then
+         Preceding_Token := Tok;
+         if Tok.Kind not in End_Of_Line | Blank_Line | Comment_Kind then
             Preceding_Lexeme := Tok;
          end if;
       end Append_To_Result;
@@ -845,7 +841,7 @@ package body Pp.Scanner.Seqs is
       X : Token_Index := Index + 1;
 
    begin
-      while Tokens (X).Kind in Blank_Line | Comment_Kind loop
+      while Tokens (X).Kind in End_Of_Line | Blank_Line | Comment_Kind loop
          X := X + 1;
       end loop;
 
@@ -860,7 +856,7 @@ package body Pp.Scanner.Seqs is
       X : Token_Index := Index - 1;
 
    begin
-      while Tokens (X).Kind in Blank_Line | Comment_Kind loop
+      while Tokens (X).Kind in End_Of_Line | Blank_Line | Comment_Kind loop
          X := X - 1;
       end loop;
 
@@ -877,7 +873,6 @@ package body Pp.Scanner.Seqs is
       Get_Tokens
         (Buf, Tokens, Ada_Version,
          Pp_Off_On_Delimiters => (others => <>),
-         Ignore_Single_Line_Breaks => True,
          Max_Tokens                => 1);
       pragma Assert (Tokens (1).Kind = Start_Of_Input);
       pragma Assert (Last_Index (Tokens) = 2);

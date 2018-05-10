@@ -235,7 +235,7 @@ begin
 
       end Valid_Proofread;
 
-   -----
+      -----
 
    begin
 

@@ -9,7 +9,7 @@ procedure C324002 is
         Dynamic_Predicate => Length (Max_10_Char_String) <= 10;
 
    Our_Data : array (1 .. 10) of Max_10_Char_String;
--- Stand-in for application data structure.
+   -- Stand-in for application data structure.
 
 begin
    Report.Test

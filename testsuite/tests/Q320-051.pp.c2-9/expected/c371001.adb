@@ -209,7 +209,7 @@ begin
       begin
          declare
             Obj2 : C371001_2.Acc_Rec2;              -- No Constraint_Error
-         -- raised.
+            -- raised.
          begin
             Obj2 := new C371001_2.Rec_02 (Report.Ident_Int (11));
             -- Constraint_Error raised.
@@ -336,7 +336,7 @@ begin
       begin
          declare
             Obj4 : C371001_4.Acc_Rec4;               -- No Constraint_Error
-         -- raised.
+            -- raised.
          begin
             Obj4 :=
               new C371001_4.Rec_04 (1);        -- Constraint_Error raised.

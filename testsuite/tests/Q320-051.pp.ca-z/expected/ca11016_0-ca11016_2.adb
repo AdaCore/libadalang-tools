@@ -24,12 +24,12 @@ package body Ca11016_0.Ca11016_2 is
             Output_Packet.Color     := Blue;
             Output_Packet.Intensity :=
               Sdugd.Get_Display_Value (Lat, Long, Basic_Map);
-         -- Sibling's operation.
+            -- Sibling's operation.
          when Forest =>
             Output_Packet.Color     := Green;
             Output_Packet.Intensity :=
               Sdugd.Get_Display_Value (Lat, Long, Basic_Map);
-         -- Sibling's operation.
+            -- Sibling's operation.
          when others =>
             Output_Packet.Color     := Brown;
             Output_Packet.Intensity :=

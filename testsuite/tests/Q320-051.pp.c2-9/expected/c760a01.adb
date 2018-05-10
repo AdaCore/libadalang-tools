@@ -82,7 +82,7 @@ begin
       My_Arr : F760a00.Lim_Array :=
         (1 .. Report.Ident_Int (5) =>
            (A => Report.Ident_Int (10), B => True, Tc => <>));
-   -- Also the expression of an array aggregate association.
+      -- Also the expression of an array aggregate association.
    begin
       F760a00.Check_Init (My_Arr, "Lim_Array obj init");
       F760a00.Use_It (My_Arr);

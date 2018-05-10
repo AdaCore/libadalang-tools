@@ -4274,8 +4274,7 @@ package body Pp.Actions is
          Clear (Tabs);
 
          Get_Tokens
-           (Src_Buf, Src_Tokens, Utils.Ada_Version, Pp_Off_On_Delimiters,
-            Ignore_Single_Line_Breaks => not Arg (Cmd, Preserve_Line_Breaks));
+           (Src_Buf, Src_Tokens, Utils.Ada_Version, Pp_Off_On_Delimiters);
          if Debug_Mode then
             Dbg_Out.Put ("Src_Tokens:\n");
             Put_Tokens (Src_Tokens);

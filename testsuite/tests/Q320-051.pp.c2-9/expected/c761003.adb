@@ -75,7 +75,7 @@ procedure C761003 is
         array (Natural range <>) of C761003_0.Second (Sup.Pick_Char);
 
       Second_Items : Second_List (1 .. 4);  -- components have the same tag,
-   -- distinct from the tag used in Items
+      -- distinct from the tag used in Items
 
    begin
       -- check that nothing has happened yet!
