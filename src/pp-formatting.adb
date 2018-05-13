@@ -131,25 +131,24 @@ package body Pp.Formatting is
    procedure Collect_Enabled_Line_Breaks
      (Lines_Data : in out Lines_Data_Rec; Syntax_Also : Boolean)
    is
-      All_Line_Breaks : Line_Break_Vector renames Lines_Data.All_Line_Breaks;
-      Enabled_Line_Breaks : Line_Break_Vector
-          renames Lines_Data.Enabled_Line_Breaks;
-      Syntax_Line_Breaks : Line_Break_Vector
-          renames Lines_Data.Syntax_Line_Breaks;
+      All_LB : Line_Break_Vector renames Lines_Data.All_LB;
+      All_LBI : Line_Break_Index_Vector renames Lines_Data.All_LBI;
+      Enabled_LBI : Line_Break_Index_Vector renames Lines_Data.Enabled_LBI;
+      Syntax_LBI : Line_Break_Index_Vector renames Lines_Data.Syntax_LBI;
    begin
-      Clear (Enabled_Line_Breaks);
-      Clear (Syntax_Line_Breaks);
+      Clear (Enabled_LBI);
+      Clear (Syntax_LBI);
 
       --  We always include the last one, even though it has Length = 0
 
-      for J in 1 .. Last_Index (All_Line_Breaks) loop
-         if All_Line_Breaks (J).Enabled then
-            Append (Enabled_Line_Breaks, All_Line_Breaks (J));
-            if Syntax_Also and then All_Line_Breaks (J).Hard then
-               if All_Line_Breaks (J).Length /= 0
-                 or else J = Last_Index (All_Line_Breaks)
+      for J in 1 .. Last_Index (All_LBI) loop
+         if All_LB (All_LBI (J)).Enabled then
+            Append (Enabled_LBI, All_LBI (J));
+            if Syntax_Also and then All_LB (All_LBI (J)).Hard then
+               if All_LB (All_LBI (J)).Length /= 0
+                 or else J = Last_Index (All_LBI)
                then
-                  Append (Syntax_Line_Breaks, All_Line_Breaks (J));
+                  Append (Syntax_LBI, All_LBI (J));
                end if;
             end if;
          end if;
@@ -157,17 +156,20 @@ package body Pp.Formatting is
    end Collect_Enabled_Line_Breaks;
 
    function Next_Enabled
-     (Line_Breaks : Line_Break_Vector; F : Line_Break_Index)
-     return Line_Break_Index
+     (Lines_Data : Lines_Data_Rec;
+      F : Line_Break_Index_Index)
+     return Line_Break_Index_Index
    is
-      First : constant Line_Break := Line_Breaks (F);
+      All_LB : Line_Break_Vector renames Lines_Data.All_LB;
+      Line_Breaks : Line_Break_Index_Vector renames Lines_Data.All_LBI;
+      First :  Line_Break renames All_LB (Line_Breaks (F));
       pragma Assert (First.Enabled);
-      Result : Line_Break_Index := F + 1;
-      Last   : Line_Break       := Line_Breaks (Result);
+      Result : Line_Break_Index_Index := F + 1;
+      Last   : Line_Break := All_LB (Line_Breaks (Result));
    begin
       while not Last.Enabled loop
          Result := Result + 1;
-         Last   := Line_Breaks (Result);
+         Last   := All_LB (Line_Breaks (Result));
       end loop;
 
 --???      pragma Assert (First.Level = Last.Level);
@@ -176,11 +178,13 @@ package body Pp.Formatting is
 
    function Is_Empty_Line
      (Out_Buf : Buffer;
-      Line_Breaks : Line_Break_Vector;
-      F, L : Line_Break_Index) return Boolean
+      Lines_Data : Lines_Data_Rec;
+      F, L : Line_Break_Index_Index) return Boolean
    is
-      First : constant Line_Break := Line_Breaks (F);
-      Last  : constant Line_Break := Line_Breaks (L);
+      All_LB : Line_Break_Vector renames Lines_Data.All_LB;
+      Line_Breaks : Line_Break_Index_Vector renames Lines_Data.All_LBI;
+      First : Line_Break renames All_LB (Line_Breaks (F));
+      Last  : Line_Break renames All_LB (Line_Breaks (L));
       FP    : Positive            := Position (Out_Buf, First.Mark);
       LP    : constant Positive   := Position (Out_Buf, Last.Mark);
 
@@ -305,8 +309,9 @@ package body Pp.Formatting is
       Cur_Indentation : Natural renames Lines_Data.Cur_Indentation;
       Next_Line_Break_Unique_Id : Modular
         renames Lines_Data.Next_Line_Break_Unique_Id;
-      All_Line_Breaks : Line_Break_Vector renames Lines_Data.All_Line_Breaks;
-      Temp_Line_Breaks : Line_Break_Vector renames Lines_Data.Temp_Line_Breaks;
+      All_LB : Line_Break_Vector renames Lines_Data.All_LB;
+      All_LBI : Line_Break_Index_Vector renames Lines_Data.All_LBI;
+      Temp_LBI : Line_Break_Index_Vector renames Lines_Data.Temp_LBI;
       M : Marker;
    begin
       pragma Assert (Lookback (Out_Buf) /= ' '); -- no trailing blanks
@@ -314,13 +319,13 @@ package body Pp.Formatting is
       M := Mark_Previous (Out_Buf, Name => '-');
 
       if False then -- Too slow, but we keep it for documentation
-         for L of All_Line_Breaks loop
-            pragma Assert (M /= L.Mark);
+         for L of All_LBI loop
+            pragma Assert (M /= All_LB (L).Mark);
          end loop;
       end if;
 
       Append
-        (Temp_Line_Breaks,
+        (All_LB,
          Line_Break'
            (Mark        => M,
             Hard        => True,
@@ -333,6 +338,7 @@ package body Pp.Formatting is
             Template    => Intern ("Insert_Comments_And_Blank_Lines"),
             UID         => Next_Line_Break_Unique_Id));
       Next_Line_Break_Unique_Id := Next_Line_Break_Unique_Id + 1;
+      Append (Temp_LBI, Last_Index (All_LB));
       pragma Assert (Char_At (Out_Buf, M) = NL);
    end Append_Temp_Line_Break;
 
@@ -485,12 +491,11 @@ package body Pp.Formatting is
    is
       Out_Buf : Buffer renames Lines_Data.Out_Buf;
       Cur_Indentation : Natural renames Lines_Data.Cur_Indentation;
-      All_Line_Breaks : Line_Break_Vector renames Lines_Data.All_Line_Breaks;
-      Temp_Line_Breaks : Line_Break_Vector renames Lines_Data.Temp_Line_Breaks;
-      Enabled_Line_Breaks : Line_Break_Vector
-          renames Lines_Data.Enabled_Line_Breaks;
-      Syntax_Line_Breaks : Line_Break_Vector
-          renames Lines_Data.Syntax_Line_Breaks;
+      All_LB : Line_Break_Vector renames Lines_Data.All_LB;
+      All_LBI : Line_Break_Index_Vector renames Lines_Data.All_LBI;
+      Temp_LBI : Line_Break_Index_Vector renames Lines_Data.Temp_LBI;
+      Enabled_LBI : Line_Break_Index_Vector renames Lines_Data.Enabled_LBI;
+      Syntax_LBI : Line_Break_Index_Vector renames Lines_Data.Syntax_LBI;
       Tabs : Tab_Vector renames Lines_Data.Tabs;
       Src_Tokens : Scanner.Seqs.Token_Vector renames Lines_Data.Src_Tokens;
       Out_Tokens : Scanner.Seqs.Token_Vector renames Lines_Data.Out_Tokens;
@@ -505,15 +510,17 @@ package body Pp.Formatting is
       --  First_Time is for debugging.
 
       procedure Split_Lines (First_Time : Boolean) is
-         Line_Breaks : Line_Break_Vector renames All_Line_Breaks;
+         Line_Breaks : Line_Break_Index_Vector renames All_LBI;
 
          function Line_Length (F, L : Line_Break_Index) return Natural;
          --  F and L are the first and last index forming a line; returns the
          --  length of the line, not counting new-lines. F must be enabled.
 
-         function Worthwhile_Line_Break (X : Line_Break_Index) return Boolean;
-         --  Called for the first so-far-disabled line break on a line. Returning
-         --  False means don't bother enabling it.
+         function Worthwhile_Line_Break
+           (F, X : Line_Break_Index) return Boolean;
+         --  Called for X = the first so-far-disabled line break on a line.
+         --  Returning False means don't bother enabling it. F is the previous
+         --  one.
 
          procedure Remove_Duplicates;
          --  Remove soft line breaks that have the same Mark as other line
@@ -528,20 +535,19 @@ package body Pp.Formatting is
          begin
             for X in 1 .. Last_Index (Line_Breaks) loop
                declare
-                  Break : constant Line_Break := Line_Breaks (X);
-
+                  Break : Line_Break renames All_LB (Line_Breaks (X));
                begin
                   if X = Last_Index (Line_Breaks) then
                      pragma Assert (Break.Enabled and then Break.Length = 0);
-
                   elsif Break.Enabled then
                      pragma Assert
                        (Break.Length =
-                        Line_Length (X, Next_Enabled (Line_Breaks, X)));
+                        Line_Length
+                          (Line_Breaks (X),
+                           Line_Breaks (Next_Enabled (Lines_Data, X))));
                      pragma Assert
                        (Break.Mark /=
-                        Line_Breaks (Next_Enabled (Line_Breaks, X)).Mark);
-
+                        All_LB (Line_Breaks (Next_Enabled (Lines_Data, X))).Mark);
                   else
                      pragma Assert (Break.Length = Natural'Last);
                   end if;
@@ -550,12 +556,13 @@ package body Pp.Formatting is
 
             Assert_No_Trailing_Blanks (Out_Buf);
             pragma Assert
-              (Position (Out_Buf, Line_Breaks (Last (Line_Breaks)).Mark) =
+              (Position
+                 (Out_Buf, All_LB (Line_Breaks (Last (Line_Breaks))).Mark) =
                Last_Position (Out_Buf));
          end Assert;
 
          procedure Remove_Duplicates is
-            Temp : Line_Break_Vector;
+            Temp : Line_Break_Index_Vector;
          --  ???If we have duplicates with different Indentation, should we choose
          --  the least indented? If we remove a line break for a '[', should we
          --  remove the corresponding one for ']', and vice-versa?
@@ -563,21 +570,21 @@ package body Pp.Formatting is
             Append (Temp, Line_Breaks (1));
 
             for X in 2 .. Last_Index (Line_Breaks) loop
-               if Line_Breaks (X).Enabled
-                 or else not Is_Empty_Line (Out_Buf, Line_Breaks, X - 1, X)
+               if All_LB (Line_Breaks (X)).Enabled
+                 or else not Is_Empty_Line (Out_Buf, Lines_Data, X - 1, X)
                then
                   Append (Temp, Line_Breaks (X));
                else
-                  pragma Assert (not Line_Breaks (X).Hard);
+                  pragma Assert (not All_LB (Line_Breaks (X)).Hard);
                end if;
             end loop;
             Move (Target => Line_Breaks, Source => Temp);
          end Remove_Duplicates;
 
          function Line_Length (F, L : Line_Break_Index) return Natural is
-            pragma Assert (Line_Breaks (F).Enabled);
-            First : constant Line_Break := Line_Breaks (F);
-            Last  : constant Line_Break := Line_Breaks (L);
+            pragma Assert (All_LB (F).Enabled);
+            First : Line_Break renames All_LB (F);
+            Last  : Line_Break renames All_LB (L);
             F_Pos : constant Natural := Position (Out_Buf, First.Mark);
             L_Pos : constant Natural := Position (Out_Buf, Last.Mark);
 
@@ -616,19 +623,22 @@ package body Pp.Formatting is
             end if;
          end Line_Length;
 
-         function Worthwhile_Line_Break (X : Line_Break_Index) return Boolean is
-            This : constant Positive := Position (Out_Buf, Line_Breaks (X).Mark);
-            Prev : Positive := Position (Out_Buf, Line_Breaks (X - 1).Mark);
-            More : constant Boolean := -- more to be enabled to the right
-              X < Last_Index (Line_Breaks)
-              and then not Line_Breaks (X + 1).Enabled;
-            Threshold : constant Positive :=
-              (if True then PP_Indent_Continuation (Cmd) -- ????
-              else Positive'Max (PP_Indent_Continuation (Cmd) - 1,
-                                 (if More then 6 -- arbitrary
-                                 else 1)));
+         function Worthwhile_Line_Break
+           (F, X : Line_Break_Index) return Boolean
+         is
+            This : constant Positive := Position (Out_Buf, All_LB (X).Mark);
+            Prev : Positive := Position (Out_Buf, All_LB (F).Mark);
+--            More : constant Boolean := -- more to be enabled to the right
+--              X < Last_Index (Line_Breaks)
+--              and then not All_LB (Line_Breaks (X + 1)).Enabled;
+--            Threshold : constant Positive :=
+--              (if True then PP_Indent_Continuation (Cmd) -- ????
+--              else Positive'Max (PP_Indent_Continuation (Cmd) - 1,
+--                                 (if More then 6 -- arbitrary
+--                                 else 1)));
+            Threshold : constant Positive := PP_Indent_Continuation (Cmd);
          begin
-            if Line_Breaks (X - 1).Hard then
+            if All_LB (F).Hard then
                Prev := Prev + 1; -- skip NL
             end if;
 
@@ -652,8 +662,8 @@ package body Pp.Formatting is
             return True;
          end Worthwhile_Line_Break;
 
-         F   : Line_Break_Index := 1;
-         L   : Line_Break_Index;
+         F   : Line_Break_Index_Index := 1;
+         L   : Line_Break_Index_Index;
          Len : Natural;
 
          Level       : Nesting_Level;
@@ -689,7 +699,7 @@ package body Pp.Formatting is
          if False then
             --  ???For debugging, always split at optional newlines
             for Line_Index in 1 .. Last_Index (Line_Breaks) loop
-               Line_Breaks (Line_Index).Enabled := True;
+               All_LB (Line_Breaks (Line_Index)).Enabled := True;
             end loop;
             return;
          end if;
@@ -701,8 +711,8 @@ package body Pp.Formatting is
             loop -- through levels
                --  ???It would be good to set Error_Sloc in this loop, but we
                --  currently don't have that data conveniently available.
-               L   := Next_Enabled (Line_Breaks, F);
-               Len := Line_Length (F, L);
+               L   := Next_Enabled (Lines_Data, F);
+               Len := Line_Length (Line_Breaks (F), Line_Breaks (L));
                exit when Len <= Arg (Cmd, Max_Line_Length); -- short enough
                exit when not More_Levels; -- no more line breaks to enable
 
@@ -713,37 +723,39 @@ package body Pp.Formatting is
                --  additional one so we can always do LB (X + 1) below.
 
                for X in F + 1 .. L - 1 loop
-                  if Line_Breaks (X).Level > Level then
+                  if All_LB (Line_Breaks (X)).Level > Level then
                      More_Levels := True;
-                  elsif Line_Breaks (X).Level = Level then
+                  elsif All_LB (Line_Breaks (X)).Level = Level then
                      Inner_Loop_Count := Inner_Loop_Count + 1;
-                     Append (LB, X);
+                     Append (LB, Line_Breaks (X));
                   end if;
                end loop;
-               Append (LB, L);
+               Append (LB, Line_Breaks (L));
 
                declare
-                  FF : Line_Break_Index := F;
+                  FF : Line_Break_Index := Line_Breaks (F);
                   LL : Line_Break_Index;
                begin
                   --  Loop through line breaks at current level
 
                   for X in 1 .. Last_Index (LB) - 1 loop
                      LL := LB (X);
-                     pragma Assert (Line_Breaks (LL).Level = Level);
+                     pragma Assert (All_LB (LL).Level = Level);
 
                      --  Don't enable the first one, unless it's "worthwhile"
                      --  according to the heuristic.
 
-                     if LL = F + 1 and then not Worthwhile_Line_Break (LL) then
+                     if LL = Line_Breaks (F + 1)
+                       and then not Worthwhile_Line_Break (Line_Breaks (F), LL)
+                     then
                         null;
                      else
                         if not Greedy
                           or else Line_Length (FF, LB (X + 1)) >
                              Arg (Cmd, Max_Line_Length)
                         then
-                           pragma Assert (not Line_Breaks (LL).Enabled);
-                           Line_Breaks (LL).Enabled := True;
+                           pragma Assert (not All_LB (LL).Enabled);
+                           All_LB (LL).Enabled := True;
                            FF := LL;
                         end if;
                      end if;
@@ -753,14 +765,15 @@ package body Pp.Formatting is
                Level := Level + 1;
             end loop; -- through levels
 
-            Line_Breaks (F).Length := Len;
+            All_LB (Line_Breaks (F)).Length := Len;
             pragma Assert
-              (Line_Breaks (F).Length =
-                 Line_Length (F, Next_Enabled (Line_Breaks, F)));
-            F                      := L;
+              (All_LB (Line_Breaks (F)).Length =
+                 Line_Length (Line_Breaks (F),
+                              Line_Breaks (Next_Enabled (Lines_Data, F))));
+            F := L;
          end loop; -- through line breaks
 
-         Line_Breaks (F).Length := 0; -- last line
+         All_LB (Line_Breaks (F)).Length := 0; -- last line
 
          pragma Debug
            (Format_Debug_Output
@@ -848,18 +861,18 @@ package body Pp.Formatting is
 
          Src_Tok, Out_Tok : Token;
 
-         All_Cur_Line : Line_Break_Index := 2;
+         All_Cur_Line : Line_Break_Index_Index := 2;
 
          procedure Move_Past_Char is
             P : constant Positive := Point (Out_Buf);
          begin
             pragma Assert
-              (P <= Position (Out_Buf, All_Line_Breaks (All_Cur_Line).Mark));
+              (P <= Position (Out_Buf, All_LB (All_LBI (All_Cur_Line)).Mark));
 
-            --  Step past All_Line_Breaks at the current position
+            --  Step past All_LBI at the current position
 
-            while All_Cur_Line <= Last_Index (All_Line_Breaks)
-              and then At_Point (Out_Buf, All_Line_Breaks (All_Cur_Line).Mark)
+            while All_Cur_Line <= Last_Index (All_LBI)
+              and then At_Point (Out_Buf, All_LB (All_LBI (All_Cur_Line)).Mark)
             loop
                All_Cur_Line := All_Cur_Line + 1;
             end loop;
@@ -886,12 +899,12 @@ package body Pp.Formatting is
             --  previous line breaks that are at the same level, or that belong
             --  to '('. We stop when we see a hard line break.
 
-            if At_Point (Out_Buf, All_Line_Breaks (All_Cur_Line).Mark) then
+            if At_Point (Out_Buf, All_LB (All_LBI (All_Cur_Line)).Mark) then
                for Break in reverse 1 .. All_Cur_Line loop
-                  exit when All_Line_Breaks (Break).Hard;
+                  exit when All_LB (All_LBI (Break)).Hard;
                   declare
-                     LB : Line_Break renames All_Line_Breaks (All_Cur_Line);
-                     Prev_LB : Line_Break renames All_Line_Breaks (Break);
+                     LB : Line_Break renames All_LB (All_LBI (All_Cur_Line));
+                     Prev_LB : Line_Break renames All_LB (All_LBI (Break));
                      Prev_Pos : constant Positive :=
                        Position (Out_Buf, Prev_LB.Mark);
                   begin
@@ -1104,7 +1117,7 @@ package body Pp.Formatting is
       procedure Insert_NLs_And_Indentation is
          --  We loop through Out_Buf, and for each character, take care of
          --  the Line_Break at that character, if any. The Line_Breaks are in
-         --  Enabled_Line_Breaks. Enabled_Line_Breaks cannot have duplicates (two
+         --  Enabled_LBI. Enabled_LBI cannot have duplicates (two
          --  elements at the same Mark), because hard line breaks take up space in
          --  Out_Buf (there is an NL), and we never enable two soft line breaks in
          --  a row.
@@ -1112,8 +1125,8 @@ package body Pp.Formatting is
          At_Line_Start : Boolean := True;
          Indentation   : Natural := 0;
 
-         Cur_Line : Line_Break_Index := 1;
-         Line_Breaks : Line_Break_Vector renames Enabled_Line_Breaks;
+         Cur_Line : Line_Break_Index_Index := 1;
+         Line_Breaks : Line_Break_Index_Vector renames Enabled_LBI;
 
       begin
          Collect_Enabled_Line_Breaks (Lines_Data, Syntax_Also => False);
@@ -1125,29 +1138,29 @@ package body Pp.Formatting is
 
             pragma Assert
               (Point (Out_Buf) <=
-               Position (Out_Buf, Line_Breaks (Cur_Line).Mark));
-   --         if At_Point (Out_Buf, Line_Breaks (Cur_Line).Mark) then
+               Position (Out_Buf, All_LB (Line_Breaks (Cur_Line)).Mark));
+   --         if At_Point (Out_Buf, All_LB (Line_Breaks (Cur_Line)).Mark) then
    --            Dbg_Out.Put ("\n");
    --         end if;
 
-            --  Even though Enabled_Line_Breaks cannot have duplicates, we still
+            --  Even though Enabled_LBI cannot have duplicates, we still
             --  need 'while' (not 'if'), because in one case we Move_Forward
             --  below.
 
-            while At_Point (Out_Buf, Line_Breaks (Cur_Line).Mark) loop
+            while At_Point (Out_Buf, All_LB (Line_Breaks (Cur_Line)).Mark) loop
                Error_Sloc := (Slocs.Line_Number (Cur_Line), 1);
                pragma Assert
                  (Point (Out_Buf) =
-                  Position (Out_Buf, Line_Breaks (Cur_Line).Mark));
+                  Position (Out_Buf, All_LB (Line_Breaks (Cur_Line)).Mark));
    --            Dbg_Out.Put ("Point = \1, break = ", Image (Point (Out_Buf)));
-   --            Dump_Marker (Out_Buf, Line_Breaks (Cur_Line).Mark);
+   --            Dump_Marker (Out_Buf, All_LB (Line_Breaks (Cur_Line)).Mark);
 
                At_Line_Start := True;
 
                --  A hard line break already has NL; for a soft one, we need to
                --  add NL
 
-               if Line_Breaks (Cur_Line).Hard then
+               if All_LB (Line_Breaks (Cur_Line)).Hard then
    --               Dbg_Out.Put
    --                 ("\1: hard line break\n",
    --                  Image (Integer (Cur_Line)));
@@ -1166,7 +1179,8 @@ package body Pp.Formatting is
                      pragma Assert (Cur (Out_Buf) /= ' ');
                      Replace_Previous (Out_Buf, NL);
                      pragma Assert
-                       (not At_Point (Out_Buf, Line_Breaks (Cur_Line + 1).Mark));
+                       (not At_Point
+                          (Out_Buf, All_LB (Line_Breaks (Cur_Line + 1)).Mark));
 
                   elsif Cur (Out_Buf) = ' ' then
    --                  Dbg_Out.Put
@@ -1174,7 +1188,8 @@ package body Pp.Formatting is
    --                     Image (Integer (Cur_Line)));
                      Replace_Cur (Out_Buf, NL);
                      pragma Assert
-                       (not At_Point (Out_Buf, Line_Breaks (Cur_Line + 1).Mark));
+                       (not At_Point
+                          (Out_Buf, All_LB (Line_Breaks (Cur_Line + 1)).Mark));
                      Move_Forward (Out_Buf);
 
                   else
@@ -1183,10 +1198,11 @@ package body Pp.Formatting is
    --                     Image (Integer (Cur_Line)));
                      Insert_NL (Out_Buf);
                      pragma Assert
-                       (not At_Point (Out_Buf, Line_Breaks (Cur_Line + 1).Mark));
+                       (not At_Point
+                          (Out_Buf, All_LB (Line_Breaks (Cur_Line + 1)).Mark));
                   end if;
                end if;
-               Indentation := Line_Breaks (Cur_Line).Indentation;
+               Indentation := All_LB (Line_Breaks (Cur_Line)).Indentation;
 
                pragma Assert
                  (At_End (Out_Buf) = (Cur_Line = Last_Index (Line_Breaks)));
@@ -1196,11 +1212,11 @@ package body Pp.Formatting is
    --            Dbg_Out.Put
    --              ("    point = \1, next break = ",
    --               Image (Point (Out_Buf)));
-   --            Dump_Marker (Out_Buf, Line_Breaks (Cur_Line).Mark);
+   --            Dump_Marker (Out_Buf, All_LB (Line_Breaks (Cur_Line)).Mark);
    --            Dbg_Out.Put ("\n");
                pragma Assert
                  (Point (Out_Buf) <=
-                  Position (Out_Buf, Line_Breaks (Cur_Line).Mark));
+                  Position (Out_Buf, All_LB (Line_Breaks (Cur_Line)).Mark));
             end loop; -- through Line_Breaks table
 
             --  We can't be At_End, because we would have done "exit Char_Loop"
@@ -1396,17 +1412,17 @@ package body Pp.Formatting is
          Paren_Stack : Paren_Vectors.Vector;
          use Paren_Vectors;
 
-         Line_Breaks : Line_Break_Vector renames Syntax_Line_Breaks;
+         Line_Breaks : Line_Break_Index_Vector renames Syntax_LBI;
          --  Line breaks used for indenting whole-line comments
 
          --  ???
-         EOL_Line_Breaks : Line_Break_Vector renames Enabled_Line_Breaks;
-   --  EOL_Line_Breaks : Line_Break_Vector renames Nonblank_Line_Breaks; Line
+         EOL_LBI : Line_Break_Index_Vector renames Enabled_LBI;
+   --  EOL_LBI : Line_Break_Index_Vector renames Nonblank_LBI; Line
    --  breaks used for indenting end-of-line comments
 
-         Cur_Line     : Line_Break_Index := 2;
-         EOL_Cur_Line : Line_Break_Index := 2; -- for end-of-line comments
-         All_Cur_Line : Line_Break_Index := 2;
+         Cur_Line     : Line_Break_Index_Index := 2;
+         EOL_Cur_Line : Line_Break_Index_Index := 2; -- for end-of-line comment
+         All_Cur_Line : Line_Break_Index_Index := 2;
 
          Prev_Out_Index : Token_Index := Token_Index'Last;
          --  Used by Manage_Paren_Stack to avoid pushing/popping the same paren
@@ -1442,15 +1458,15 @@ package body Pp.Formatting is
             if Kind (Out_Tok) = '(' then
                if Is_Empty (Paren_Stack) then
                   declare
-                     Last_En : Line_Break_Index := All_Cur_Line - 1;
+                     Last_En : Line_Break_Index_Index := All_Cur_Line - 1;
                      Enabled_Line_Start, This_Line_Start : Positive;
                   begin
-                     while not All_Line_Breaks (Last_En).Enabled loop
+                     while not All_LB (All_LBI (Last_En)).Enabled loop
                         Last_En := @ - 1;
                      end loop;
 
                      Enabled_Line_Start :=
-                       Position (Out_Buf, All_Line_Breaks (Last_En).Mark) + 1;
+                       Position (Out_Buf, All_LB (All_LBI (Last_En)).Mark) + 1;
                      This_Line_Start :=
                        Position
                          (Out_Buf,
@@ -1490,32 +1506,32 @@ package body Pp.Formatting is
             P : constant Positive := Point (Out_Buf);
          begin
             pragma Assert
-              (P <= Position (Out_Buf, Line_Breaks (Cur_Line).Mark));
+              (P <= Position (Out_Buf, All_LB (Line_Breaks (Cur_Line)).Mark));
             pragma Assert
-              (P <= Position (Out_Buf, EOL_Line_Breaks (EOL_Cur_Line).Mark));
+              (P <= Position (Out_Buf, All_LB (EOL_LBI (EOL_Cur_Line)).Mark));
             pragma Assert
-              (P <= Position (Out_Buf, All_Line_Breaks (All_Cur_Line).Mark));
+              (P <= Position (Out_Buf, All_LB (All_LBI (All_Cur_Line)).Mark));
 
             --  Step past Line_Breaks at the current position
 
             while Cur_Line <= Last_Index (Line_Breaks)
-              and then At_Point (Out_Buf, Line_Breaks (Cur_Line).Mark)
+              and then At_Point (Out_Buf, All_LB (Line_Breaks (Cur_Line)).Mark)
             loop
                Cur_Line := Cur_Line + 1;
             end loop;
 
-            --  Step past EOL_Line_Breaks at the current position
+            --  Step past EOL_LBI at the current position
 
-            while EOL_Cur_Line <= Last_Index (EOL_Line_Breaks)
-              and then At_Point (Out_Buf, EOL_Line_Breaks (EOL_Cur_Line).Mark)
+            while EOL_Cur_Line <= Last_Index (EOL_LBI)
+              and then At_Point (Out_Buf, All_LB (EOL_LBI (EOL_Cur_Line)).Mark)
             loop
                EOL_Cur_Line := EOL_Cur_Line + 1;
             end loop;
 
-            --  Step past All_Line_Breaks at the current position
+            --  Step past All_LBI at the current position
 
-            while All_Cur_Line <= Last_Index (All_Line_Breaks)
-              and then At_Point (Out_Buf, All_Line_Breaks (All_Cur_Line).Mark)
+            while All_Cur_Line <= Last_Index (All_LBI)
+              and then At_Point (Out_Buf, All_LB (All_LBI (All_Cur_Line)).Mark)
             loop
                All_Cur_Line := All_Cur_Line + 1;
             end loop;
@@ -1540,7 +1556,7 @@ package body Pp.Formatting is
             if Kind (Out_Tok) = Res_Return then
                declare
                   Paren : constant Token      := Out_Tokens (Out_Index - 1);
-                  LB    : constant Line_Break := EOL_Line_Breaks (EOL_Cur_Line);
+                  LB    : Line_Break renames All_LB (EOL_LBI (EOL_Cur_Line));
                begin
                   --  If the function has no parameters, or if this is the
                   --  "return" of a return_statement, then there will be no ")",
@@ -1589,12 +1605,12 @@ package body Pp.Formatting is
          --  that tabs have been expanded in Src_Buf.
          begin
             pragma Assert (EOL_Cur_Line > 1);
-            Indentation := EOL_Line_Breaks (EOL_Cur_Line - 1).Indentation;
+            Indentation := All_LB (EOL_LBI (EOL_Cur_Line - 1)).Indentation;
 
             --  If we're just before a blank followed by NL, move past the blank,
             --  so we won't add a new NL below.
 
-            if not At_Point (Out_Buf, EOL_Line_Breaks (EOL_Cur_Line).Mark)
+            if not At_Point (Out_Buf, All_LB (EOL_LBI (EOL_Cur_Line)).Mark)
               and then Cur (Out_Buf) = ' '
             then
                Move_Past_Char;
@@ -1634,7 +1650,7 @@ package body Pp.Formatting is
             --        X + 1;
             --  we need to add a line break after the comment.
 
-            if not At_Point (Out_Buf, EOL_Line_Breaks (EOL_Cur_Line).Mark) then
+            if not At_Point (Out_Buf, All_LB (EOL_LBI (EOL_Cur_Line)).Mark) then
                pragma Assert (Cur (Out_Buf) /= NL);
                Cur_Indentation := Indentation;
                if Arg (Cmd, Insert_Line_Breaks) then
@@ -1654,33 +1670,36 @@ package body Pp.Formatting is
          --  errors; they must alternate, OFF, ON, OFF, ....
 
          function Before_Indentation return Natural;
-         --  Same as "Line_Breaks (Cur_Line - 1).Indentation", except we skip
-         --  Line_Breaks with Affects_Comments = False. In other words, this is
-         --  the previous line-breaks indentation which should affect comments.
+         --  Same as "All_LB (Line_Breaks (Cur_Line - 1)).Indentation", except
+         --  we skip Line_Breaks with Affects_Comments = False. In other
+         --  words, this is the previous line-breaks indentation which should
+         --  affect comments.
          function After_Indentation return Natural;
-         --  Same as "Line_Breaks (Cur_Line).Indentation", except we skip
-         --  Line_Breaks with Affects_Comments = False. In other words, this is
-         --  the current/next line-breaks indentation which should affect
-         --  comments.
+         --  Same as "All_LB (Line_Breaks (Cur_Line)).Indentation", except we
+         --  skip Line_Breaks with Affects_Comments = False. In other words,
+         --  this is the current/next line-breaks indentation which should
+         --  affect comments.
 
          function Before_Indentation return Natural is
-            X : Line_Break_Index := Cur_Line - 1;
+            X : Line_Break_Index_Index := Cur_Line - 1;
          begin
-            while X > 1 and then not Line_Breaks (X).Affects_Comments loop
+            while X > 1 and then
+              not All_LB (Line_Breaks (X)).Affects_Comments
+            loop
                X := X - 1;
             end loop;
-            return Line_Breaks (X).Indentation;
+            return All_LB (Line_Breaks (X)).Indentation;
          end Before_Indentation;
 
          function After_Indentation return Natural is
-            X : Line_Break_Index := Cur_Line;
+            X : Line_Break_Index_Index := Cur_Line;
          begin
             while X < Last_Index (Line_Breaks)
-              and then not Line_Breaks (X).Affects_Comments
+              and then not All_LB (Line_Breaks (X)).Affects_Comments
             loop
                X := X + 1;
             end loop;
-            return Line_Breaks (X).Indentation;
+            return All_LB (Line_Breaks (X)).Indentation;
          end After_Indentation;
 
          procedure Insert_Whole_Line_Comment is
@@ -1852,16 +1871,16 @@ package body Pp.Formatting is
             then
                pragma Assert
                  ((Cur (Out_Buf) = NL) =
-                    (At_Point (Out_Buf, Line_Breaks (Cur_Line).Mark)));
+                    (At_Point (Out_Buf, All_LB (Line_Breaks (Cur_Line)).Mark)));
                pragma Assert
                  (if
                     Cur (Out_Buf) = NL
                     then
-                 At_Point (Out_Buf, EOL_Line_Breaks (EOL_Cur_Line).Mark));
+                 At_Point (Out_Buf, All_LB (EOL_LBI (EOL_Cur_Line)).Mark));
             end if;
             declare
                LB_Pos : constant Positive :=
-                 Position (Out_Buf, EOL_Line_Breaks (EOL_Cur_Line).Mark);
+                 Position (Out_Buf, All_LB (EOL_LBI (EOL_Cur_Line)).Mark);
                P : constant Positive := Point (Out_Buf);
             begin
                if LB_Pos = P then
@@ -1883,18 +1902,18 @@ package body Pp.Formatting is
             Out_Tok_Pos : constant Positive :=
               Position (Out_Buf, Sloc (Out_Tok).Firstx);
             LB_Pos : constant Positive :=
-              Position (Out_Buf, Line_Breaks (Cur_Line).Mark);
+              Position (Out_Buf, All_LB (Line_Breaks (Cur_Line)).Mark);
             Prev_LB_Pos : constant Positive :=
-              Position (Out_Buf, Line_Breaks (Cur_Line - 1).Mark);
+              Position (Out_Buf, All_LB (Line_Breaks (Cur_Line - 1)).Mark);
 
          begin
             --  Either the current or previous line break is just before "end";
             --  that's the indentation we want for "private".
 
             if LB_Pos = Out_Tok_Pos - 1 then
-               Cur_Indentation := Line_Breaks (Cur_Line).Indentation;
+               Cur_Indentation := All_LB (Line_Breaks (Cur_Line)).Indentation;
             elsif Prev_LB_Pos = Out_Tok_Pos - 1 then
-               Cur_Indentation := Line_Breaks (Cur_Line - 1).Indentation;
+               Cur_Indentation := All_LB (Line_Breaks (Cur_Line - 1)).Indentation;
             else
                pragma Assert (False);
             end if;
@@ -1909,15 +1928,15 @@ package body Pp.Formatting is
             Src_Index := Src_Index + 1;
          end Insert_Private;
 
-         function Line_Break_LT (X, Y : Line_Break) return Boolean;
+         function Line_Break_LT (X, Y : Line_Break_Index) return Boolean;
 
-         function Line_Break_LT (X, Y : Line_Break) return Boolean is
+         function Line_Break_LT (X, Y : Line_Break_Index) return Boolean is
          begin
-            return Mark_LT (Out_Buf, X.Mark, Y.Mark);
+            return Mark_LT (Out_Buf, All_LB (X).Mark, All_LB (Y).Mark);
          end Line_Break_LT;
 
-         package Line_Break_Sorting is new Line_Break_Vectors.Generic_Sorting
-           ("<" => Line_Break_LT);
+         package Line_Break_Sorting is
+           new Line_Break_Index_Vectors.Generic_Sorting ("<" => Line_Break_LT);
 
          Qual_Nesting : Natural := 0;
       --  Count the nesting level of qualified expressions containing aggregates
@@ -1944,7 +1963,7 @@ package body Pp.Formatting is
          Line_Start_Out_Index := Out_Index;
 
          Collect_Enabled_Line_Breaks (Lines_Data, Syntax_Also => True);
-         Clear (Temp_Line_Breaks);
+         Clear (Temp_LBI);
 
          --  The two sequences Src_Tokens and Out_Tokens should be identical,
          --  with some exceptions where mismatches are possible. The code below
@@ -2242,18 +2261,16 @@ package body Pp.Formatting is
          pragma Assert (Out_Index = Last_Index (Out_Tokens));
          pragma Assert (At_End (Out_Buf) and then Lookback (Out_Buf) = NL);
          pragma Assert (Cur_Line = Last_Index (Line_Breaks) + 1);
-         pragma Assert (EOL_Cur_Line = Last_Index (EOL_Line_Breaks) + 1);
-         pragma Assert (All_Cur_Line = Last_Index (All_Line_Breaks) + 1);
+         pragma Assert (EOL_Cur_Line = Last_Index (EOL_LBI) + 1);
+         pragma Assert (All_Cur_Line = Last_Index (All_LBI) + 1);
 
          <<Done>> null;
 
-         pragma Assert (Line_Break_Sorting.Is_Sorted (All_Line_Breaks));
-         pragma Assert (Line_Break_Sorting.Is_Sorted (Temp_Line_Breaks));
-         Line_Break_Sorting.Merge
-           (Target => All_Line_Breaks,
-            Source => Temp_Line_Breaks);
-         pragma Assert (Is_Empty (Temp_Line_Breaks));
-         pragma Assert (Line_Break_Sorting.Is_Sorted (All_Line_Breaks));
+         pragma Assert (Line_Break_Sorting.Is_Sorted (All_LBI));
+         pragma Assert (Line_Break_Sorting.Is_Sorted (Temp_LBI));
+         Line_Break_Sorting.Merge (Target => All_LBI, Source => Temp_LBI);
+         pragma Assert (Is_Empty (Temp_LBI));
+         pragma Assert (Line_Break_Sorting.Is_Sorted (All_LBI));
          pragma Assert (Disable_Final_Check or else Qual_Nesting = 0);
          Reset (Out_Buf);
          Clear (Out_Tokens);
@@ -3450,14 +3467,15 @@ package body Pp.Formatting is
    --  Debugging:
 
    function Line_Text
-     (Out_Buf : Buffer;
-      Line_Breaks : Line_Break_Vector;
-      F, L : Line_Break_Index) return W_Str
+     (Lines_Data : Lines_Data_Rec;
+      F, L : Line_Break_Index_Index) return W_Str
    is
-      First  : constant Line_Break := Line_Breaks (F);
-      Last   : constant Line_Break := Line_Breaks (L);
+      Out_Buf : Buffer renames Lines_Data.Out_Buf;
+      All_LB : Line_Break_Vector renames Lines_Data.All_LB;
+      All_LBI : Line_Break_Index_Vector renames Lines_Data.All_LBI;
+      First  : constant Line_Break := All_LB (All_LBI (F));
+      Last   : constant Line_Break := All_LB (All_LBI (L));
       Result : constant W_Str      := Slice (Out_Buf, First.Mark, Last.Mark);
-
    begin
       return Result (Result'First + 1 .. Result'Last);
    end Line_Text;
@@ -3490,10 +3508,11 @@ package body Pp.Formatting is
 
    procedure Put_Buf_With_Marks (Lines_Data : Lines_Data_Rec) is
       Out_Buf : Buffer renames Lines_Data.Out_Buf;
-      Line_Breaks : Line_Break_Vector renames Lines_Data.All_Line_Breaks;
+      All_LB : Line_Break_Vector renames Lines_Data.All_LB;
+      All_LBI : Line_Break_Index_Vector renames Lines_Data.All_LBI;
       Tabs : Tab_Vector renames Lines_Data.Tabs;
 
-      Cur_Line : Line_Break_Index := 1;
+      Cur_Line : Line_Break_Index_Index := 1;
       Cur_Tab  : Tab_Index        := 1;
       S        : constant String  := To_String (Out_Buf);
 
@@ -3514,13 +3533,13 @@ package body Pp.Formatting is
          declare
             Indentation : Natural := 0;
          begin
-            while Cur_Line <= Last_Index (Line_Breaks)
+            while Cur_Line <= Last_Index (All_LBI)
               and then
-                Position (Out_Buf, Line_Breaks (Cur_Line).Mark) =
+                Position (Out_Buf, All_LB (All_LBI (Cur_Line)).Mark) =
                 Cur_Char
             loop
                declare
-                  Break : constant Line_Break := Line_Breaks (Cur_Line);
+                  Break : Line_Break renames All_LB (All_LBI (Cur_Line));
                begin
                   if Break.Enabled then
                      Indentation := Break.Indentation;
@@ -3566,54 +3585,55 @@ package body Pp.Formatting is
           else "not at point"));
    end Put_Line_Break;
 
-   procedure Put_Line_Breaks
-     (Out_Buf : Buffer; Line_Breaks : Line_Break_Vector)
-   is
-      L        : Line_Break_Index;
+   procedure Put_Line_Breaks (Lines_Data : Lines_Data_Rec) is
+      Out_Buf : Buffer renames Lines_Data.Out_Buf;
+      All_LB : Line_Break_Vector renames Lines_Data.All_LB;
+      All_LBI : Line_Break_Index_Vector renames Lines_Data.All_LBI;
+      L        : Line_Break_Index_Index;
       Line_Num : Natural := 0; -- only counts enabled lines
       use Dbg_Out;
    begin
       Put
-        ("Last_Index (Line_Breaks) = \1\n",
-         Image (Integer (Last_Index (Line_Breaks))));
+        ("Last_Index (All_LBI) = \1\n",
+         Image (Integer (Last_Index (All_LBI))));
 
-      for Cur_Line in 1 .. Last_Index (Line_Breaks) loop
-         if Line_Breaks (Cur_Line).Enabled then
+      for Cur_Line in 1 .. Last_Index (All_LBI) loop
+         if All_LB (All_LBI (Cur_Line)).Enabled then
             Line_Num := Line_Num + 1;
          end if;
 
          Put
            ("\1:\t\2\3\4",
             Image (Line_Num),
-            String'(1 .. Line_Breaks (Cur_Line).Indentation => '_'),
-            Image (Position (Out_Buf, Line_Breaks (Cur_Line).Mark)),
-            (if Line_Breaks (Cur_Line).Enabled then "" else "?"));
+            String'(1 .. All_LB (All_LBI (Cur_Line)).Indentation => '_'),
+            Image (Position (Out_Buf, All_LB (All_LBI (Cur_Line)).Mark)),
+            (if All_LB (All_LBI (Cur_Line)).Enabled then "" else "?"));
 
-         Put (" lev=\1", Image (Integer (Line_Breaks (Cur_Line).Level)));
+         Put (" lev=\1", Image (Integer (All_LB (All_LBI (Cur_Line)).Level)));
 
          if False then
---            Put ("\t\1", Image (Line_Breaks (Cur_Line).Kind));
-            Put ("\t\1", Str (Line_Breaks (Cur_Line).Template).S);
+--            Put ("\t\1", Image (All_LB (All_LBI (Cur_Line)).Kind));
+            Put ("\t\1", Str (All_LB (All_LBI (Cur_Line)).Template).S);
          end if;
 
-         if Line_Breaks (Cur_Line).Enabled
-           and then Cur_Line /= Last_Index (Line_Breaks)
+         if All_LB (All_LBI (Cur_Line)).Enabled
+           and then Cur_Line /= Last_Index (All_LBI)
          then
-            L := Next_Enabled (Line_Breaks, Cur_Line);
+            L := Next_Enabled (Lines_Data, Cur_Line);
             Put
               ("\t\1..\2 len=\3",
                Image (Integer (Cur_Line)),
                Image (Integer (L)),
-               Image (Line_Breaks (Cur_Line).Length));
+               Image (All_LB (All_LBI (Cur_Line)).Length));
             Put ("\t<<\1>>",
-                 To_UTF8 (Line_Text (Out_Buf, Line_Breaks, Cur_Line, L)));
+                 To_UTF8 (Line_Text (Lines_Data, Cur_Line, L)));
          end if;
 
-         Put ("#\1", Image (Line_Breaks (Cur_Line).UID));
+         Put ("#\1", Image (All_LB (All_LBI (Cur_Line)).UID));
          Put ("\n");
       end loop;
-      for Cur_Line in 1 .. Last_Index (Line_Breaks) loop
-         Put_Line_Break (Out_Buf, Line_Breaks (Cur_Line));
+      for Cur_Line in 1 .. Last_Index (All_LBI) loop
+         Put_Line_Break (Out_Buf, All_LB (All_LBI (Cur_Line)));
       end loop;
    end Put_Line_Breaks;
 
@@ -3621,7 +3641,6 @@ package body Pp.Formatting is
      (Lines_Data : Lines_Data_Rec; Message : String)
    is
       Out_Buf : Buffer renames Lines_Data.Out_Buf;
-      All_Line_Breaks : Line_Break_Vector renames Lines_Data.All_Line_Breaks;
       Tabs : Tab_Vector renames Lines_Data.Tabs;
 
       use Dbg_Out;
@@ -3637,7 +3656,7 @@ package body Pp.Formatting is
 
       Dump_Buf (Out_Buf);
 
-      Put_Line_Breaks (Out_Buf, All_Line_Breaks);
+      Put_Line_Breaks (Lines_Data);
 
       for X in 1 .. Last_Index (Tabs) loop
          Put ("\1\n", Tab_Image (Out_Buf, Tabs, X));

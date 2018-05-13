@@ -212,18 +212,22 @@ package Pp.Formatting is
       --  line breaks are initially disabled, and will be enabled if
       --  necessary to make lines short enough.
 
-      All_Line_Breaks : Line_Break_Vector;
+      All_LB : Line_Break_Vector;
+      --  All the line breaks, in no particular order. The _LBI variables below
+      --  are indices into this, always sorted in order by source location.
+
+      All_LBI : Line_Break_Index_Vector;
       --  All line breaks in the whole input file. Built in two passes.
 
-      Temp_Line_Breaks : Line_Break_Vector;
+      Temp_LBI : Line_Break_Index_Vector;
       --  Used by Insert_Comments_And_Blank_Lines to add new line breaks to
-      --  All_Line_Breaks; they are appended to Temp_Line_Breaks, which is
-      --  then merged with All_Line_Breaks when done. This is for efficiency
-      --  and to keep the tables in source-location order.
+      --  All_LBI; they are appended to Temp_LBI, which is then merged with
+      --  All_LBI when done. This is for efficiency and to keep the tables in
+      --  source-location order.
 
-      Enabled_Line_Breaks : Line_Break_Vector;
+      Enabled_LBI : Line_Break_Index_Vector;
       --  All enabled line breaks
-      Syntax_Line_Breaks : Line_Break_Vector;
+      Syntax_LBI : Line_Break_Index_Vector;
       --  All (enabled) nonblank hard line breaks. These are called
       --  "Syntax_..."  because they are determined by the syntax (e.g. we
       --  always put a line break after a statement).
@@ -257,19 +261,20 @@ package Pp.Formatting is
    procedure Collect_Enabled_Line_Breaks
      (Lines_Data : in out Lines_Data_Rec; Syntax_Also : Boolean);
    --  Collect all the enabled line breaks, and (if Syntax_Also is True) also
-   --  the syntax line breaks. This reads All_Line_Breaks, and writes
-   --  Enabled_Line_Breaks and Syntax_Line_Breaks.
+   --  the syntax line breaks. This reads All_LBI, and writes Enabled_LBI and
+   --  Syntax_LBI.
 
    function Next_Enabled
-     (Line_Breaks : Line_Break_Vector; F : Line_Break_Index)
-     return Line_Break_Index;
+     (Lines_Data : Lines_Data_Rec;
+      F : Line_Break_Index_Index)
+     return Line_Break_Index_Index;
    --  Next currently-enabled line break after F. Thus, F..Next_Enabled(F) is a
    --  line.
 
    function Is_Empty_Line
      (Out_Buf : Buffer;
-      Line_Breaks : Line_Break_Vector;
-      F, L : Line_Break_Index) return Boolean;
+      Lines_Data : Lines_Data_Rec;
+      F, L : Line_Break_Index_Index) return Boolean;
    --  True if F..L forms an empty line (or would, if both were enabled).
 
    ----------------
@@ -308,19 +313,15 @@ package Pp.Formatting is
    --  Debugging:
 
    function Line_Text
-     (Out_Buf : Buffer;
-      Line_Breaks : Line_Break_Vector;
-      F, L : Line_Break_Index) return W_Str;
+     (Lines_Data : Lines_Data_Rec;
+      F, L : Line_Break_Index_Index) return W_Str;
    --  F and L are the first and last index forming a line; returns the text of
    --  the line, not including any new-lines.
 
    function Tab_Image
      (Out_Buf : Buffer; Tabs : Tab_Vector; X : Tab_Index) return String;
 
-   procedure Put_Line_Breaks
-     (Out_Buf : Buffer; Line_Breaks : Line_Break_Vector);
-   --  ???This doesn't work unless Line_Breaks is All_Line_Breaks, because of
-   --  various global variables!
+   procedure Put_Line_Breaks (Lines_Data : Lines_Data_Rec);
 
    procedure Put_Line_Break (Out_Buf : Buffer; Break : Line_Break);
 

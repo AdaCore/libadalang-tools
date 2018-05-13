@@ -293,7 +293,7 @@ package body Pp.Actions is
 
    ----------------
 
-   use Line_Break_Vectors;
+   use Line_Break_Vectors, Line_Break_Index_Vectors;
    use Tab_Vectors;
    Lines_Data : Lines_Data_Rec;
 
@@ -301,7 +301,8 @@ package body Pp.Actions is
    Cur_Indentation : Natural renames Lines_Data.Cur_Indentation;
    Next_Line_Break_Unique_Id : Modular
        renames Lines_Data.Next_Line_Break_Unique_Id;
-   All_Line_Breaks : Line_Break_Vector renames Lines_Data.All_Line_Breaks;
+   All_LB : Line_Break_Vector renames Lines_Data.All_LB;
+   All_LBI : Line_Break_Index_Vector renames Lines_Data.All_LBI;
    Tabs : Tab_Vector renames Lines_Data.Tabs;
    Src_Tokens : Scanner.Seqs.Token_Vector renames Lines_Data.Src_Tokens;
    Pp_Off_On_Delimiters : Scanner.Pp_Off_On_Delimiters_Rec
@@ -1405,17 +1406,18 @@ package body Pp.Actions is
          pragma Assert
            (abs (Amount) in
               0 | 1 | PP_Indentation (Cmd) | PP_Indent_Continuation (Cmd));
-         Line_Breaks : Line_Break_Vector renames All_Line_Breaks;
+         Line_Breaks : Line_Break_Index_Vector renames All_LBI;
       begin
          Cur_Indentation := Cur_Indentation + Amount;
 
          pragma Assert (Point (Out_Buf) = Last_Position (Out_Buf) + 1);
          if Last_Position (Out_Buf) =
-           Position (Out_Buf, Line_Breaks (Last (Line_Breaks)).Mark)
-           and then Line_Breaks (Last (Line_Breaks)).Hard
+           Position (Out_Buf, All_LB (Line_Breaks (Last (Line_Breaks))).Mark)
+           and then All_LB (Line_Breaks (Last (Line_Breaks))).Hard
          then
---  pragma Assert (At_Point (Out_Buf, Line_Breaks (Last (Line_Breaks)).Mark));
-            Line_Breaks (Last (Line_Breaks)).Indentation := Cur_Indentation;
+--  pragma Assert (At_Point
+--  (Out_Buf, All_Lb (Line_Breaks (Last (Line_Breaks))).Mark));
+            All_LB (Line_Breaks (Last (Line_Breaks))).Indentation := Cur_Indentation;
          end if;
       end Indent;
 
@@ -1478,15 +1480,15 @@ package body Pp.Actions is
          Template : Symbol)
       is
          pragma Unreferenced (Kind);
-         Line_Breaks : Line_Break_Vector renames All_Line_Breaks;
+         Line_Breaks : Line_Break_Index_Vector renames All_LBI;
       begin
          --  If we see two line breaks in a row, we take the least indented one.
 
          if Hard and then Lookback (Out_Buf) = NL then
-            if Line_Breaks (Last_Index (Line_Breaks)).Indentation >
+            if All_LB (Line_Breaks (Last_Index (Line_Breaks))).Indentation >
               Cur_Indentation
             then
-               Line_Breaks (Last_Index (Line_Breaks)).Indentation :=
+               All_LB (Line_Breaks (Last_Index (Line_Breaks))).Indentation :=
                  Cur_Indentation;
             end if;
 
@@ -1496,7 +1498,7 @@ package body Pp.Actions is
          end if;
 
          Append
-           (Line_Breaks,
+           (All_LB,
             Line_Break'
               (Mark        => Mark (Out_Buf, Name => (if Hard then '$' else '#')),
                Hard        => Hard,
@@ -1509,6 +1511,7 @@ package body Pp.Actions is
                Template    => Template,
                UID         => Next_Line_Break_Unique_Id));
          Next_Line_Break_Unique_Id := Next_Line_Break_Unique_Id + 1;
+         Append (Line_Breaks, Last_Index (All_LB));
 
          --  A hard line break gets NL
 
@@ -1570,32 +1573,32 @@ package body Pp.Actions is
          return Cur_Level + Max_Nesting_Increment (Temp) + 1;
       end New_Level;
 
-      First_If_Line_Break : Line_Break_Index;
+      First_If_Line_Break : Line_Break_Index_Index;
       --  Valid only between calls to If_Stmt_Check_1 and
       --  If_Stmt_Check_2. Set by _1 to 1 past the end of the table, which
       --  is where the next line break will be placed. Used by _2 to find the
       --  first line break (if any) belonging to the condition.
 
       procedure If_Stmt_Check_1 is
-         Line_Breaks : Line_Break_Vector renames All_Line_Breaks;
+         Line_Breaks : Line_Break_Index_Vector renames All_LBI;
       begin
          First_If_Line_Break := Last_Index (Line_Breaks) + 1;
       end If_Stmt_Check_1;
 
       procedure If_Stmt_Check_2 (Level_Of_If : Nesting_Level) is
-         Line_Breaks : Line_Break_Vector renames All_Line_Breaks;
+         Line_Breaks : Line_Break_Index_Vector renames All_LBI;
          Min : Nesting_Level := Nesting_Level'Last;
       begin
          --  Find the minimum level:
          for J in First_If_Line_Break .. Last_Index (Line_Breaks) loop
-            Min := Nesting_Level'Min (Min, Line_Breaks (J).Level);
+            Min := Nesting_Level'Min (Min, All_LB (Line_Breaks (J)).Level);
          end loop;
 
          --  Overwrite all line breaks at the minimum level to the level of the
          --  'if':
          for J in First_If_Line_Break .. Last_Index (Line_Breaks) loop
-            if Line_Breaks (J).Level = Min then
-               Line_Breaks (J).Level := Level_Of_If;
+            if All_LB (Line_Breaks (J)).Level = Min then
+               All_LB (Line_Breaks (J)).Level := Level_Of_If;
             end if;
          end loop;
       end If_Stmt_Check_2;
@@ -2010,7 +2013,7 @@ package body Pp.Actions is
          Cur_Level       : Nesting_Level;
          Index_In_Parent : Query_Index)
       is
-         Line_Breaks : Line_Break_Vector renames All_Line_Breaks;
+         Line_Breaks : Line_Break_Index_Vector renames All_LBI;
 
          procedure Subtrees_To_Ada
            (Tree               : Ada_Tree;
@@ -2841,12 +2844,13 @@ package body Pp.Actions is
             end case;
 
             if Insert_Blank_Line_Before then
-               pragma Assert (Line_Breaks (Last (Line_Breaks)).Hard);
+               pragma Assert (All_LB (Line_Breaks (Last (Line_Breaks))).Hard);
                pragma Assert
                  (Point (Out_Buf) =
                   Last_Position (Out_Buf) + 1); -- ???Do we need Last_Position?
                pragma Assert
-                 (Position (Out_Buf, Line_Breaks (Last (Line_Breaks)).Mark) =
+                 (Position
+                    (Out_Buf, All_LB (Line_Breaks (Last (Line_Breaks))).Mark) =
                   Last_Position (Out_Buf));
                pragma Assert (Lookback (Out_Buf) = NL);
                --  There should already be a hard line break here; we're about to
@@ -4270,7 +4274,7 @@ package body Pp.Actions is
          --  times, so we need to clear out data structures left over from last time.
 
          pragma Assert (Cur_Indentation = 0);
-         Clear (All_Line_Breaks);
+         Clear (All_LBI);
          Clear (Tabs);
 
          Get_Tokens
