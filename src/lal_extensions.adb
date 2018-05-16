@@ -372,8 +372,8 @@ package body LAL_Extensions is
             return Node.As_Generic_Subp_Decl.F_Subp_Decl.F_Subp_Spec;
          when Ada_Subp_Body_Stub =>
             return Node.As_Subp_Body_Stub.F_Subp_Spec;
-         when Ada_Subp_Body =>
-            return Node.As_Subp_Body.F_Subp_Spec;
+         when Ada_Base_Subp_Body =>
+            return Node.As_Base_Subp_Body.F_Subp_Spec;
          when Ada_Access_To_Subp_Def =>
             return Node.As_Access_To_Subp_Def.F_Subp_Spec;
          when others => raise Program_Error;

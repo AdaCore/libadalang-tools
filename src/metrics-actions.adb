@@ -3194,7 +3194,6 @@ package body METRICS.Actions is
                  | Ada_Generic_Package_Decl
                  | Ada_Body_Node
                  | Ada_Abstract_Subp_Decl
-                 | Ada_Expr_Function
                  | Ada_Null_Subp_Decl
                  | Ada_Subp_Renaming_Decl
                  | Ada_Subp_Decl
@@ -3699,7 +3698,8 @@ package body METRICS.Actions is
          for Trivium of With_Trivia loop
             if Trivium.Kind = Trivia then
                pragma Assert
-                 (Kind (Data (Trivium.Trivia)) = Lexer.Ada_Comment);
+                 (Kind (Data (Trivium.Trivia))
+                  in Lexer.Ada_Comment | Lexer.Ada_Whitespace);
             end if;
          end loop;
 
