@@ -44,19 +44,29 @@ package body Utils.Versions is
 
    function Gnat_Free_Software return String is
    begin
-      return
-        "This is free software; see the source for copying conditions." &
-         ASCII.LF &
-         "See your AdaCore support agreement for details of warranty" &
-         " and support." &
-         ASCII.LF &
-         "If you do not have a current support agreement, then there" &
-         " is absolutely" &
-         ASCII.LF &
-         "no warranty; not even for MERCHANTABILITY or FITNESS FOR" &
-         " A PARTICULAR" &
-         ASCII.LF &
-         "PURPOSE.";
+     case Build_Type is
+        when GPL =>
+           return
+             "This is free software; see the source for copying conditions." &
+             ASCII.LF &
+             "There is NO warranty; not even for MERCHANTABILITY or FITNESS" &
+             " FOR A PARTICULAR PURPOSE.";
+
+        when Gnatpro =>
+           return
+             "This is free software; see the source for copying conditions." &
+              ASCII.LF &
+              "See your AdaCore support agreement for details of warranty" &
+              " and support." &
+              ASCII.LF &
+              "If you do not have a current support agreement, then there" &
+              " is absolutely" &
+              ASCII.LF &
+              "no warranty; not even for MERCHANTABILITY or FITNESS FOR" &
+              " A PARTICULAR" &
+              ASCII.LF &
+              "PURPOSE.";
+     end case;
    end Gnat_Free_Software;
 
    ------------------------
@@ -69,10 +79,20 @@ package body Utils.Versions is
    --  This is the first year in which any of the sources used by these tools
    --  was written.
 
+   function Edition return String is
+   begin
+      case Build_Type is
+         when Gnatpro =>
+            return "Pro";
+         when GPL =>
+            return "Community ";
+      end case;
+   end Edition;
+
    procedure Print_Tool_Version is
    begin
       Put ("\1 \2 \3\n",
-           To_Upper (Tool_Names.Tool_Name), Pro, Libadalang.Version);
+           To_Upper (Tool_Names.Tool_Name), Edition, Libadalang.Version);
       Put ("Copyright (C) \1-\2, \3\n",
            Initial_Year, Libadalang.Current_Year, Copyright_Holder);
       Put ("\1", Gnat_Free_Software);
@@ -85,7 +105,7 @@ package body Utils.Versions is
 
    procedure Print_Version_Info is
    begin
-      Put ("\1 \2 \3\n", Tool_Names.Tool_Name, Pro, Libadalang.Version);
+      Put ("\1 \2 \3\n", Tool_Names.Tool_Name, Edition, Libadalang.Version);
       Put ("Copyright (C) \1-\2, \3\n",
            Initial_Year, Libadalang.Current_Year, Copyright_Holder);
    end Print_Version_Info;

@@ -25,6 +25,20 @@
 
 package Utils.Versions is
 
+   type Gnat_Build_Type is (Gnatpro, GPL);
+
+   Build_Type : constant Gnat_Build_Type := Gnatpro;
+   --  Kind of GNAT Build:
+   --
+   --    Gnatpro
+   --       GNAT Professional version. This version of GNAT is supported by Ada
+   --       Core Technologies.
+   --
+   --    GPL
+   --       GNAT Community Edition. This is a special version of GNAT, released
+   --       by Ada Core Technologies and intended for academic users, and free
+   --       software developers.
+
    procedure Print_Tool_Version;
    --  Similar to Print_Version_Info, but sends the output into Stdout and
    --  the format of the information printed is similar to what is printed
