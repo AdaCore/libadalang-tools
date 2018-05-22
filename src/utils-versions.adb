@@ -80,7 +80,7 @@ package body Utils.Versions is
    function Edition return String is
       (case Build_Type is
          when Gnatpro => "Pro",
-         when GPL => "Community ");
+         when GPL => "Community");
 
    procedure Print_Tool_Version is
    begin
