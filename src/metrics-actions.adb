@@ -3245,8 +3245,8 @@ package body METRICS.Actions is
             Has_Post := False;
 
             if Kind (Subp_Decl) = Ada_Expr_Function then
-               --  Expression functions are considered to have
-               --  contracts and postconditions.
+               --  Expression functions are considered to have contracts and
+               --  postconditions.
                Has_Contracts := True;
                Has_Post := True;
 
@@ -3279,7 +3279,9 @@ package body METRICS.Actions is
                   Decl : constant Ada_Node := Childx (Vis_Decls, I);
                   Has_Contracts, Has_Post : Boolean;
                begin
-                  if Decl.Kind in Ada_Basic_Subp_Decl then
+                  if Decl.Kind in Ada_Basic_Subp_Decl | Ada_Expr_Function then
+                     --  Shouldn't Ada_Expr_Function be in
+                     --  Ada_Basic_Subp_Decl???  It used to be.
                      Search_Aspects (Decl, Has_Contracts, Has_Post);
 
                      if Has_Contracts then

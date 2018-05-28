@@ -364,6 +364,11 @@ package body Utils.Drivers is
                   --  ???For now, catch exceptions and try to continue.
                   begin
                      Remove (Context, F_Name.all);
+                     --  ???This Remove might be an efficiency issue.
+                     --  We could try removing Remove here, but then
+                     --  it might eat up too much memory.
+                     --  The libadalang project is considering using
+                     --  a cache to solve both problems.
                   exception
                      when E : Constraint_Error =>
                         Put_Line ("Remove raised Constraint_Error");

@@ -3843,6 +3843,10 @@ package body Pp.Actions is
          --  Returns the defining names denoted by Id.
          --  Decl is the declaration denoted by Id, or null.
          --  If Id doesn't denote anything, returns Id.
+         --  ???Possible optimization: If we have never seen
+         --  two differently-cased versions of the same identifier,
+         --  we don't need to know what it denotes to use the
+         --  right case.
 
          function Denoted_Decl (Id : Base_Id) return Basic_Decl is
          begin

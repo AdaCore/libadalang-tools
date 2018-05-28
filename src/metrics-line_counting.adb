@@ -60,6 +60,10 @@ package body METRICS.Line_Counting is
          begin
             exit when Kind (TD) = Ada_Termination;
 
+            if Kind (TD) = Ada_Whitespace then
+               goto Skip_Whitespace;
+            end if;
+
             if Cur_Line = Prev_Line then
                declare
                   Last : Cumulative_Counts renames Last_Ptr (Result).all;
@@ -106,6 +110,7 @@ package body METRICS.Line_Counting is
          end;
 
          Validate (Result (Last_Index (Result) - 1), Last_Element (Result));
+         <<Skip_Whitespace>>
          Cur := Next (Cur);
       end loop;
 
