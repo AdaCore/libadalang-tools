@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <global>
-   <file name="src/c23001a.adb">
+   <file name="c23001a.adb">
       <metric name="all_lines">64</metric>
       <metric name="code_lines">27</metric>
       <metric name="comment_lines">27</metric>
@@ -35,7 +35,7 @@
       <metric name="essential_complexity">1.00</metric>
       <metric name="max_loop_nesting">0.00</metric>
    </file>
-   <file name="src/c230063proc.adb">
+   <file name="c230063proc.adb">
       <metric name="all_lines">5</metric>
       <metric name="code_lines">4</metric>
       <metric name="comment_lines">0</metric>
@@ -73,7 +73,7 @@
       <metric name="essential_complexity">1.00</metric>
       <metric name="max_loop_nesting">0.00</metric>
    </file>
-   <file name="src/c230063proc.ads">
+   <file name="c230063proc.ads">
       <metric name="all_lines">3</metric>
       <metric name="code_lines">2</metric>
       <metric name="comment_lines">0</metric>
@@ -95,7 +95,7 @@
          <metric name="construct_nesting">1</metric>
       </unit>
    </file>
-   <file name="src/c23006a.adb">
+   <file name="c23006a.adb">
       <metric name="all_lines">48</metric>
       <metric name="code_lines">15</metric>
       <metric name="comment_lines">26</metric>
@@ -130,7 +130,7 @@
       <metric name="essential_complexity">1.00</metric>
       <metric name="max_loop_nesting">0.00</metric>
    </file>
-   <file name="src/c23006b.adb">
+   <file name="c23006b.adb">
       <metric name="all_lines">15</metric>
       <metric name="code_lines">12</metric>
       <metric name="comment_lines">0</metric>
@@ -165,7 +165,7 @@
       <metric name="essential_complexity">1.00</metric>
       <metric name="max_loop_nesting">0.00</metric>
    </file>
-   <file name="src/c23006bpkg.adb">
+   <file name="c23006bpkg.adb">
       <metric name="all_lines">11</metric>
       <metric name="code_lines">10</metric>
       <metric name="comment_lines">0</metric>
@@ -218,7 +218,7 @@
       <metric name="essential_complexity">1.00</metric>
       <metric name="max_loop_nesting">0.00</metric>
    </file>
-   <file name="src/c23006bpkg.ads">
+   <file name="c23006bpkg.ads">
       <metric name="all_lines">5</metric>
       <metric name="code_lines">4</metric>
       <metric name="comment_lines">0</metric>
@@ -248,7 +248,7 @@
          </unit>
       </unit>
    </file>
-   <file name="src/c23006c.adb">
+   <file name="c23006c.adb">
       <metric name="all_lines">21</metric>
       <metric name="code_lines">17</metric>
       <metric name="comment_lines">0</metric>
@@ -283,7 +283,7 @@
       <metric name="essential_complexity">1.00</metric>
       <metric name="max_loop_nesting">0.00</metric>
    </file>
-   <file name="src/c23006c_func.adb">
+   <file name="c23006c_func.adb">
       <metric name="all_lines">5</metric>
       <metric name="code_lines">4</metric>
       <metric name="comment_lines">0</metric>
@@ -318,7 +318,7 @@
       <metric name="essential_complexity">1.00</metric>
       <metric name="max_loop_nesting">0.00</metric>
    </file>
-   <file name="src/c23006c_proc.adb">
+   <file name="c23006c_proc.adb">
       <metric name="all_lines">33</metric>
       <metric name="code_lines">4</metric>
       <metric name="comment_lines">26</metric>
@@ -356,7 +356,7 @@
       <metric name="essential_complexity">1.00</metric>
       <metric name="max_loop_nesting">0.00</metric>
    </file>
-   <file name="src/c23006cfunc.adb">
+   <file name="c23006cfunc.adb">
       <metric name="all_lines">7</metric>
       <metric name="code_lines">6</metric>
       <metric name="comment_lines">0</metric>
@@ -391,7 +391,7 @@
       <metric name="essential_complexity">1.00</metric>
       <metric name="max_loop_nesting">0.00</metric>
    </file>
-   <file name="src/c23006cfunc.ads">
+   <file name="c23006cfunc.ads">
       <metric name="all_lines">2</metric>
       <metric name="code_lines">1</metric>
       <metric name="comment_lines">0</metric>
@@ -414,7 +414,7 @@
          <metric name="all_parameters">0</metric>
       </unit>
    </file>
-   <file name="src/c23006cproc.adb">
+   <file name="c23006cproc.adb">
       <metric name="all_lines">5</metric>
       <metric name="code_lines">4</metric>
       <metric name="comment_lines">0</metric>
@@ -452,7 +452,7 @@
       <metric name="essential_complexity">1.00</metric>
       <metric name="max_loop_nesting">0.00</metric>
    </file>
-   <file name="src/c23006cproc.ads">
+   <file name="c23006cproc.ads">
       <metric name="all_lines">2</metric>
       <metric name="code_lines">1</metric>
       <metric name="comment_lines">0</metric>
@@ -478,7 +478,7 @@
             <metric name="in_out_parameters">0</metric>
       </unit>
    </file>
-   <file name="src/c23006d.adb">
+   <file name="c23006d.adb">
       <metric name="all_lines">19</metric>
       <metric name="code_lines">14</metric>
       <metric name="comment_lines">0</metric>
@@ -513,7 +513,7 @@
       <metric name="essential_complexity">1.00</metric>
       <metric name="max_loop_nesting">0.00</metric>
    </file>
-   <file name="src/c23006b_pkg.ads">
+   <file name="c23006b_pkg.ads">
       <metric name="all_lines">32</metric>
       <metric name="code_lines">3</metric>
       <metric name="comment_lines">26</metric>
@@ -555,7 +555,7 @@
    <metric name="lsloc">70</metric>
    <metric name="average_complexity">1.75</metric>
    <coupling>
-      <file name="src/c23001a.adb">
+      <file name="c23001a.adb">
          <unit name="C23001A" line="32" col="1">
             <metric name="control_fan-out_coupling">0</metric>
             <metric name="control_fan-in_coupling">0</metric>
@@ -563,13 +563,13 @@
             <metric name="unit_fan-in_coupling">0</metric>
          </unit>
       </file>
-      <file name="src/c230063proc.ads">
+      <file name="c230063proc.ads">
          <unit name="C230063PROC" line="2" col="1">
             <metric name="unit_fan-out_coupling">0</metric>
             <metric name="unit_fan-in_coupling">0</metric>
          </unit>
       </file>
-      <file name="src/c23006a.adb">
+      <file name="c23006a.adb">
          <unit name="C23006A" line="31" col="1">
             <metric name="control_fan-out_coupling">0</metric>
             <metric name="control_fan-in_coupling">0</metric>
@@ -577,7 +577,7 @@
             <metric name="unit_fan-in_coupling">0</metric>
          </unit>
       </file>
-      <file name="src/c23006b.adb">
+      <file name="c23006b.adb">
          <unit name="C23006B" line="5" col="1">
             <metric name="control_fan-out_coupling">0</metric>
             <metric name="control_fan-in_coupling">0</metric>
@@ -585,7 +585,7 @@
             <metric name="unit_fan-in_coupling">0</metric>
          </unit>
       </file>
-      <file name="src/c23006bpkg.ads">
+      <file name="c23006bpkg.ads">
          <unit name="C23006BPKG" line="2" col="1">
             <metric name="control_fan-out_coupling">0</metric>
             <metric name="control_fan-in_coupling">0</metric>
@@ -593,13 +593,13 @@
             <metric name="unit_fan-in_coupling">1</metric>
          </unit>
       </file>
-      <file name="src/c23006b_pkg.ads">
+      <file name="c23006b_pkg.ads">
          <unit name="C23006B_PKG" line="30" col="1">
             <metric name="unit_fan-out_coupling">0</metric>
             <metric name="unit_fan-in_coupling">1</metric>
          </unit>
       </file>
-      <file name="src/c23006c.adb">
+      <file name="c23006c.adb">
          <unit name="C23006C" line="4" col="1">
             <metric name="control_fan-out_coupling">0</metric>
             <metric name="control_fan-in_coupling">0</metric>
@@ -607,7 +607,7 @@
             <metric name="unit_fan-in_coupling">0</metric>
          </unit>
       </file>
-      <file name="src/c23006cfunc.ads">
+      <file name="c23006cfunc.ads">
          <unit name="C23006CFUNC" line="2" col="1">
             <metric name="control_fan-out_coupling">0</metric>
             <metric name="control_fan-in_coupling">0</metric>
@@ -615,7 +615,7 @@
             <metric name="unit_fan-in_coupling">1</metric>
          </unit>
       </file>
-      <file name="src/c23006cproc.ads">
+      <file name="c23006cproc.ads">
          <unit name="C23006CPROC" line="2" col="1">
             <metric name="control_fan-out_coupling">0</metric>
             <metric name="control_fan-in_coupling">0</metric>
@@ -623,7 +623,7 @@
             <metric name="unit_fan-in_coupling">1</metric>
          </unit>
       </file>
-      <file name="src/c23006c_func.adb">
+      <file name="c23006c_func.adb">
          <unit name="C23006C_FUNC" line="2" col="1">
             <metric name="control_fan-out_coupling">0</metric>
             <metric name="control_fan-in_coupling">0</metric>
@@ -631,7 +631,7 @@
             <metric name="unit_fan-in_coupling">1</metric>
          </unit>
       </file>
-      <file name="src/c23006c_proc.adb">
+      <file name="c23006c_proc.adb">
          <unit name="C23006C_PROC" line="30" col="1">
             <metric name="control_fan-out_coupling">0</metric>
             <metric name="control_fan-in_coupling">0</metric>
@@ -639,7 +639,7 @@
             <metric name="unit_fan-in_coupling">1</metric>
          </unit>
       </file>
-      <file name="src/c23006d.adb">
+      <file name="c23006d.adb">
          <unit name="C23006D" line="5" col="1">
             <metric name="control_fan-out_coupling">0</metric>
             <metric name="control_fan-in_coupling">0</metric>

@@ -27,69 +27,69 @@ Average cyclomatic complexity: 1.75
 
 Coupling metrics:
 =================
-   Unit C23001A (src/c23001a.adb)
+   Unit C23001A (c23001a.adb)
       control fan-out coupling  : 0
       control fan-in coupling   : 0
       unit fan-out coupling     : 0
       unit fan-in coupling      : 0
 
-   Unit C230063PROC (src/c230063proc.ads)
+   Unit C230063PROC (c230063proc.ads)
       unit fan-out coupling     : 0
       unit fan-in coupling      : 0
 
-   Unit C23006A (src/c23006a.adb)
+   Unit C23006A (c23006a.adb)
       control fan-out coupling  : 0
       control fan-in coupling   : 0
       unit fan-out coupling     : 0
       unit fan-in coupling      : 0
 
-   Unit C23006B (src/c23006b.adb)
+   Unit C23006B (c23006b.adb)
       control fan-out coupling  : 0
       control fan-in coupling   : 0
       unit fan-out coupling     : 2
       unit fan-in coupling      : 0
 
-   Unit C23006BPKG (src/c23006bpkg.ads)
+   Unit C23006BPKG (c23006bpkg.ads)
       control fan-out coupling  : 0
       control fan-in coupling   : 0
       unit fan-out coupling     : 0
       unit fan-in coupling      : 1
 
-   Unit C23006B_PKG (src/c23006b_pkg.ads)
+   Unit C23006B_PKG (c23006b_pkg.ads)
       unit fan-out coupling     : 0
       unit fan-in coupling      : 1
 
-   Unit C23006C (src/c23006c.adb)
+   Unit C23006C (c23006c.adb)
       control fan-out coupling  : 0
       control fan-in coupling   : 0
       unit fan-out coupling     : 4
       unit fan-in coupling      : 0
 
-   Unit C23006CFUNC (src/c23006cfunc.ads)
+   Unit C23006CFUNC (c23006cfunc.ads)
       control fan-out coupling  : 0
       control fan-in coupling   : 0
       unit fan-out coupling     : 0
       unit fan-in coupling      : 1
 
-   Unit C23006CPROC (src/c23006cproc.ads)
+   Unit C23006CPROC (c23006cproc.ads)
       control fan-out coupling  : 0
       control fan-in coupling   : 0
       unit fan-out coupling     : 0
       unit fan-in coupling      : 1
 
-   Unit C23006C_FUNC (src/c23006c_func.adb)
+   Unit C23006C_FUNC (c23006c_func.adb)
       control fan-out coupling  : 0
       control fan-in coupling   : 0
       unit fan-out coupling     : 0
       unit fan-in coupling      : 1
 
-   Unit C23006C_PROC (src/c23006c_proc.adb)
+   Unit C23006C_PROC (c23006c_proc.adb)
       control fan-out coupling  : 0
       control fan-in coupling   : 0
       unit fan-out coupling     : 0
       unit fan-in coupling      : 1
 
-   Unit C23006D (src/c23006d.adb)
+   Unit C23006D (c23006d.adb)
       control fan-out coupling  : 0
       control fan-in coupling   : 0
       unit fan-out coupling     : 0

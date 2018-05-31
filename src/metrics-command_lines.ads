@@ -63,7 +63,7 @@ package METRICS.Command_Lines is
       Generate_XML_Output,
       Generate_XML_Schema,
       No_Text_Output,
-      Short_File_Name_In_Output,
+      Short_File_Names,
       Progress_Indicator_Mode);
 
    package Metrics_Flag_Switches is new Flag_Switches
@@ -100,7 +100,7 @@ package METRICS.Command_Lines is
        Generate_XML_Output       => +"-x",
        Generate_XML_Schema       => +"-xs",
        No_Text_Output            => +"-nt",
-       Short_File_Name_In_Output => +"-sfn",
+       Short_File_Names          => +"-sfn",
        Progress_Indicator_Mode   => +"-dd"));
 
    --  Metrics_Booleans serves both as switch names, and as index into

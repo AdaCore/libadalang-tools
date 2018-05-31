@@ -339,8 +339,8 @@ package body METRICS.Actions is
 
    function File_Name_To_Print
      (Cmd : Command_Line; File_Name : String) return String is
-      (if Arg (Cmd, Short_File_Name_In_Output)
-         then File_Name
+      (if Arg (Cmd, Short_File_Names)
+         then Directories.Simple_Name (File_Name)
          else Normalize_Pathname (File_Name));
 
    function Lines_String
@@ -1242,7 +1242,8 @@ package body METRICS.Actions is
 
       if Doing_Coupling_Metrics then
          if Depth = 3 then
-            Put ("Unit \1 (\2)\n", Str (M.Text_Name).S, File_Name);
+            Put ("Unit \1 (\2)\n", Str (M.Text_Name).S,
+                 File_Name_To_Print (Cmd, File_Name));
          end if;
       elsif M.Kind = Ada_Compilation_Unit then
          Put ("Metrics computed for \1\n",
