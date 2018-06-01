@@ -505,7 +505,6 @@ package body Pp.Actions is
    begin
       return
         (case Kind is
-           when Ada_Type_Ref   => null,
            when Ada_Discrete_Subtype_Name => null,
            when Ada_Unconstrained_Array_Index => null,
            when Ada_Contract_Case_Assoc => null,
@@ -905,6 +904,8 @@ package body Pp.Actions is
              L ("?~~ ~access? ~~~ !"),
            when Ada_Anonymous_Type_Decl =>
              L ("//!", Aspects),
+           when Ada_Synth_Anonymous_Type_Decl => null,
+           when Ada_Anonymous_Type_Access_Def => null,
            when Ada_Subtype_Indication |
                Ada_Constrained_Subtype_Indication |
                Ada_Discrete_Subtype_Indication =>
