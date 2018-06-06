@@ -100,8 +100,8 @@ procedure Cxc7005 is
       end if;
    end Check_Value;
 
-   procedure Check_Id (Id, Expected : Ada.Task_Identification.Task_Id;
-      Task_Name                     : String)
+   procedure Check_Id
+     (Id, Expected : Ada.Task_Identification.Task_Id; Task_Name : String)
    is
    begin
       if Id /= Expected then

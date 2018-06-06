@@ -7,8 +7,8 @@ package body Ca11011_0 is          -- Package body OS.
       return (An_Ada_File_Name);
    end Get_File_Name;
    ---------------------------------------------------------------------
-   procedure Verify_Initial_Conditions (Key : in     File_Descriptor_Type;
-      Status                                :    out Boolean)
+   procedure Verify_Initial_Conditions
+     (Key : in File_Descriptor_Type; Status : out Boolean)
    is
    begin
       Status := False;

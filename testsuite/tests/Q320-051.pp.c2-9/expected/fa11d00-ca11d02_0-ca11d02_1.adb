@@ -4,8 +4,9 @@ with Report;
 
 package body Fa11d00.Ca11d02_0.Ca11d02_1 is     -- Array_Complex
 
-   function Multiply (Left : Complex_Array_Type;
-      Right                : Complex_Array_Type) return Complex_Array_Type
+   function Multiply
+     (Left : Complex_Array_Type; Right : Complex_Array_Type)
+      return Complex_Array_Type
    is
 
       -- This procedure will raise an exception depending on the input
@@ -59,8 +60,8 @@ package body Fa11d00.Ca11d02_0.Ca11d02_1 is     -- Array_Complex
 
    end Add;
    --------------------------------------------------------------
-   procedure Inverse (Right : in     Complex_Array_Type;
-      Left                  : in out Complex_Array_Type)
+   procedure Inverse
+     (Right : in Complex_Array_Type; Left : in out Complex_Array_Type)
    is
 
       -- This function will raise an exception depending on the input

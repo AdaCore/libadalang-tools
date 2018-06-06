@@ -67,8 +67,9 @@ procedure C431002 is
       Zero : Default_To_Zero_Type;
    end record;
 
-   procedure Check_1 (Obj : Root'Class; Color : Color_Type; Halves : Half_Type;
-      Test_Case           : Character)
+   procedure Check_1
+     (Obj       : Root'Class; Color : Color_Type; Halves : Half_Type;
+      Test_Case : Character)
    is
    begin
       if Obj.Color /= Color then
@@ -79,8 +80,9 @@ procedure C431002 is
       end if;
    end Check_1;
 
-   procedure Check_2 (Obj : Val_Ext'Class; Color : Color_Type;
-      Halves : Half_Type; Int : Default_To_Zero_Type; Test_Case : Character)
+   procedure Check_2
+     (Obj : Val_Ext'Class; Color : Color_Type; Halves : Half_Type;
+      Int : Default_To_Zero_Type; Test_Case : Character)
    is
    begin
       if Obj.Color /= Color then

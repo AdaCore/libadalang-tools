@@ -2,8 +2,8 @@
 
 package body Ca11017_0.Ca11017_1 is
 
-   function Equal_Length (Left : in String_Rec;
-      Right                    : in String_Rec) return Boolean
+   function Equal_Length
+     (Left : in String_Rec; Right : in String_Rec) return Boolean
    is
    -- Quick comparison between the lengths of the input strings.
 
@@ -12,8 +12,8 @@ package body Ca11017_0.Ca11017_1 is
       -- type.
    end Equal_Length;
    --------------------------------------------------------------------
-   function Same_Content (Left : in String_Rec;
-      Right                    : in String_Rec) return Boolean
+   function Same_Content
+     (Left : in String_Rec; Right : in String_Rec) return Boolean
    is
 
    begin
@@ -27,8 +27,8 @@ package body Ca11017_0.Ca11017_1 is
 
    end Same_Content;
    --------------------------------------------------------------------
-   procedure Copy (From_The_Substring : in     Substring;
-      To_The_String                   : in out String_Rec)
+   procedure Copy
+     (From_The_Substring : in Substring; To_The_String : in out String_Rec)
    is
    begin
       To_The_String.The_Content        -- Parent's private type.

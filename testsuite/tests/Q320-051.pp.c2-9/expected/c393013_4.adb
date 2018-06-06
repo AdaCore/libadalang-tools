@@ -15,8 +15,8 @@ package body C393013_4 is
       return (C393013_1.Create (Power) with Kind => Natural_Gas);
    end Create;
 
-   function Clone (Obj :    Gas_Turbine;
-      New_Location     : in Character) return Gas_Turbine
+   function Clone
+     (Obj : Gas_Turbine; New_Location : in Character) return Gas_Turbine
    is
    begin
       return (C393013_1.Clone (C393013_1.Generator (Obj), New_Location) with

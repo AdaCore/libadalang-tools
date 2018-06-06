@@ -96,23 +96,23 @@ procedure C36205l is
         array (First_Index range <>, Second_Index range <>) of Component_Type;
       Component_Value : in Component_Type;
 
-   procedure Test_Procedure (First : in     Unconstrained_Array;
-      Ffifs : in First_Index; Ffils : in First_Index; Fsifs : in Second_Index;
-      Fsils : in     Second_Index; Fflen : in Natural; Fslen : in Natural;
-      Ffirt                        : in First_Index; Fsirt : in Second_Index;
-      Second :    out Unconstrained_Array; Sfifs : in First_Index;
-      Sfils : in First_Index; Ssifs : in Second_Index; Ssils : in Second_Index;
-      Sflen : in     Natural; Sslen : in Natural; Sfirt : in First_Index;
-      Ssirt                        : in     Second_Index; Remarks : in String);
+   procedure Test_Procedure
+     (First : in Unconstrained_Array; Ffifs : in First_Index;
+      Ffils : in First_Index; Fsifs : in Second_Index; Fsils : in Second_Index;
+      Fflen : in Natural; Fslen : in Natural; Ffirt : in First_Index;
+      Fsirt : in Second_Index; Second : out Unconstrained_Array;
+      Sfifs : in First_Index; Sfils : in First_Index; Ssifs : in Second_Index;
+      Ssils : in Second_Index; Sflen : in Natural; Sslen : in Natural;
+      Sfirt : in First_Index; Ssirt : in Second_Index; Remarks : in String);
 
-   procedure Test_Procedure (First : in     Unconstrained_Array;
-      Ffifs : in First_Index; Ffils : in First_Index; Fsifs : in Second_Index;
-      Fsils : in     Second_Index; Fflen : in Natural; Fslen : in Natural;
-      Ffirt                        : in First_Index; Fsirt : in Second_Index;
-      Second :    out Unconstrained_Array; Sfifs : in First_Index;
-      Sfils : in First_Index; Ssifs : in Second_Index; Ssils : in Second_Index;
-      Sflen : in     Natural; Sslen : in Natural; Sfirt : in First_Index;
-      Ssirt                        : in     Second_Index; Remarks : in String)
+   procedure Test_Procedure
+     (First : in Unconstrained_Array; Ffifs : in First_Index;
+      Ffils : in First_Index; Fsifs : in Second_Index; Fsils : in Second_Index;
+      Fflen : in Natural; Fslen : in Natural; Ffirt : in First_Index;
+      Fsirt : in Second_Index; Second : out Unconstrained_Array;
+      Sfifs : in First_Index; Sfils : in First_Index; Ssifs : in Second_Index;
+      Ssils : in Second_Index; Sflen : in Natural; Sslen : in Natural;
+      Sfirt : in First_Index; Ssirt : in Second_Index; Remarks : in String)
    is
 
    begin -- TEST_PROCEDURE

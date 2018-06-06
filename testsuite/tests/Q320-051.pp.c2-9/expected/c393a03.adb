@@ -20,8 +20,8 @@ procedure C393a03 is
       C393a03_0.Bump (It); -- dispatch to non-abstract procedure
    end Bump;
 
-   procedure Set_Max (It : in out C393a03_1.Modular_Object'Class;
-      Val                :        Natural)
+   procedure Set_Max
+     (It : in out C393a03_1.Modular_Object'Class; Val : Natural)
    is
    begin
       C393a03_1.Set_Max (It, Val); -- dispatch to non-abstract procedure

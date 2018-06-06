@@ -20,8 +20,8 @@ package Cc70002_2 is
    -- Add two matrices that are to be multiplied by coefficients: [ ] = CA*[ ]
    -- + CB*[ ].
 
-   function Add_Matrices_With_Coefficients (A : Matrix_Ops.Matrix_2d;
-      Ca : Integer; B : Matrix_Ops.Matrix_2d;
+   function Add_Matrices_With_Coefficients
+     (A  : Matrix_Ops.Matrix_2d; Ca : Integer; B : Matrix_Ops.Matrix_2d;
       Cb : Integer) return Matrix_Ops.Matrix_2d;
 
    -- ...Other operations.

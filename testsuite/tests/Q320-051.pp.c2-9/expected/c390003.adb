@@ -25,8 +25,8 @@ procedure C390003 is
 
    -- Check compatibility with the corresponding class wide type.
 
-   procedure Vehicle_Shop (It : in out Vehicle.Object'Class;
-      Key                     : in     Vehicle.Tc_Keys)
+   procedure Vehicle_Shop
+     (It : in out Vehicle.Object'Class; Key : in Vehicle.Tc_Keys)
    is
 
       -- Check that Subtype'Class is defined for tagged subtypes.

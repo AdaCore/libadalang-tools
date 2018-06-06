@@ -50,10 +50,11 @@ procedure C43204g is
         Ident_Int (-1) .. Ident_Int (1)) of Integer;
 
    task T is
-      entry E (Ea11 : Arr11 := (1, 1, 1, 1, others => Ident_Int (2));
-         Ea12       : Arr12 := (others => Ident_Int (2));
-         Ea13       : Arr13 := (others => Ident_Int (2));
-         Ea21       : Arr21 :=
+      entry E
+        (Ea11 : Arr11 := (1, 1, 1, 1, others => Ident_Int (2));
+         Ea12 : Arr12 := (others => Ident_Int (2));
+         Ea13 : Arr13 := (others => Ident_Int (2));
+         Ea21 : Arr21 :=
            ((1, 1, 1), (1, 1, 1), (1, 1, 1),
             others => (-1 .. 1 => Ident_Int (2)));
          Ea22 : Arr22 := ((others => Ident_Int (2)), (1, 1, 1), (1, 1, 1));
@@ -64,16 +65,18 @@ procedure C43204g is
 
    task body T is
    begin
-      accept E (Ea11 : Arr11 := (1, 1, 1, 1, others => Ident_Int (2));
-         Ea12        : Arr12 := (others => Ident_Int (2));
-         Ea13        : Arr13 := (others => Ident_Int (2));
-         Ea21        : Arr21 :=
+      accept E
+        (Ea11 : Arr11 := (1, 1, 1, 1, others => Ident_Int (2));
+         Ea12 : Arr12 := (others => Ident_Int (2));
+         Ea13 : Arr13 := (others => Ident_Int (2));
+         Ea21 : Arr21 :=
            ((1, 1, 1), (1, 1, 1), (1, 1, 1),
             others => (-1 .. 1 => Ident_Int (2)));
          Ea22 : Arr22 := ((others => Ident_Int (2)), (1, 1, 1), (1, 1, 1));
          Ea23 : Arr23 :=
            (-1 .. 0 => (others => 1), 1 => (others => Ident_Int (2)));
-         Ea24 : Arr24 := (others => (others => Ident_Int (2)))) do
+         Ea24 : Arr24 := (others => (others => Ident_Int (2))))
+      do
          if Ea11 /= (1, 1, 1, 1, 2, 2, 2) then
             Failed ("INCORRECT VALUE OF EA11");
          end if;

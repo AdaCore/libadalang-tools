@@ -2,8 +2,8 @@
 
 package body Cc70002_2 is
 
-   function Add_Matrices_With_Coefficients (A : Matrix_Ops.Matrix_2d;
-      Ca : Integer; B : Matrix_Ops.Matrix_2d;
+   function Add_Matrices_With_Coefficients
+     (A  : Matrix_Ops.Matrix_2d; Ca : Integer; B : Matrix_Ops.Matrix_2d;
       Cb : Integer) return Matrix_Ops.Matrix_2d
    is
       Left, Right : Matrix_Ops.Matrix_2d;

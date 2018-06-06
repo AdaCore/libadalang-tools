@@ -74,8 +74,9 @@ begin
 
       ---
 
-      procedure Store_Information (Info_String : in     Info_Wide_String_Type;
-         Db_Record                             : in out Data_Base_Element_Type)
+      procedure Store_Information
+        (Info_String : in     Info_Wide_String_Type;
+         Db_Record   : in out Data_Base_Element_Type)
       is
 
          package As renames Ada.Strings;

@@ -9,8 +9,8 @@ package body C3900052 is  -- Further extended alert system abstraction.
    use C3900050;  -- Enumeration values directly visible.
    use C3900051;  -- Extended alert system abstraction.
 
-   procedure Assign_Officer (Ma : in out Medium_Alert_Type;
-      To                        : in     Person_Enum)
+   procedure Assign_Officer
+     (Ma : in out Medium_Alert_Type; To : in Person_Enum)
    is
    begin
       Ma.Action_Officer := To;

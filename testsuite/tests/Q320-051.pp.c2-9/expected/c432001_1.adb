@@ -1,8 +1,9 @@
 with Report;
 package body C432001_1 is
 
-   function Check (Rec : in N_N; N : in Natural; E : in C432001_0.Eras;
-      P                : in Periods) return Boolean
+   function Check
+     (Rec : in N_N; N : in Natural; E : in C432001_0.Eras; P : in Periods)
+      return Boolean
    is
    begin
       if not C432001_0.Check (C432001_0.N (Rec), N, E) then

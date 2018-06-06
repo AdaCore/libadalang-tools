@@ -61,8 +61,9 @@ procedure C35a05a is
 
    -------------------------------------------------------------------
 
-   procedure Check_Fore_And_Aft (Name : String; Actual_Fore : Integer;
-      Correct_Fore : Positive; Actual_Aft : Integer; Correct_Aft : Positive)
+   procedure Check_Fore_And_Aft
+     (Name       : String; Actual_Fore : Integer; Correct_Fore : Positive;
+      Actual_Aft : Integer; Correct_Aft : Positive)
    is
    begin
       if Actual_Fore /= Ident_Int (Correct_Fore) then

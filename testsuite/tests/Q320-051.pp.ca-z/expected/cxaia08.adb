@@ -75,8 +75,8 @@ procedure Cxaia08 is
 
    My_Index_1 : Natural;
 
-   procedure Tampering_Check (Container : in out My_Indefinite_Vectors.Vector;
-      Where                             : in     String)
+   procedure Tampering_Check
+     (Container : in out My_Indefinite_Vectors.Vector; Where : in String)
    is
 
       Program_Error_Raised : Boolean := False;
@@ -175,8 +175,8 @@ begin
    -- -- in a way that corresponds to likely usage.
 
    declare
-      procedure Test (Value : in String; Expected : in String;
-         Test_Case          : in String)
+      procedure Test
+        (Value : in String; Expected : in String; Test_Case : in String)
       is
       begin
          Tampering_Check (Container => My_Vector_1, Where => Test_Case);
@@ -189,8 +189,9 @@ begin
          end if;
       end Test;
 
-      procedure Test_And_Mod (Value : in out String; Expected : in String;
-         New_Item                   : in String; Test_Case : in String) with
+      procedure Test_And_Mod
+        (Value     : in out String; Expected : in String; New_Item : in String;
+         Test_Case : in     String) with
          Pre => Value'Length = New_Item'Length
        is
       begin

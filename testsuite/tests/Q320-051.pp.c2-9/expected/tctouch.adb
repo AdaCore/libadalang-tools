@@ -51,8 +51,8 @@ package body Tctouch is
       end loop;
    end Sort_String;
 
-   procedure Validate (Expected : String; Message : String;
-      Order_Meaningful          : Boolean := True)
+   procedure Validate
+     (Expected : String; Message : String; Order_Meaningful : Boolean := True)
    is
       Want : String (1 .. Expected'Length) := Expected;
    begin
@@ -68,9 +68,10 @@ package body Tctouch is
       Finger := 0;
    end Validate;
 
-   procedure Validate_One_Of (Expected_1 : String; Expected_2 : String;
-      Expected_3 : String := ""; Expected_4 : String := "";
-      Expected_5 : String := ""; Expected_6 : String := ""; Message : String)
+   procedure Validate_One_Of
+     (Expected_1 : String; Expected_2 : String; Expected_3 : String := "";
+      Expected_4 : String := ""; Expected_5 : String := "";
+      Expected_6 : String := ""; Message : String)
    is
    -- OK if any of the expected strings is found. If the null string is a
    -- legitimate result, it must be given first.
@@ -133,8 +134,8 @@ package body Tctouch is
       Finger := 0;
    end Flush;
 
-   procedure Implementation_Check (Message : in String;
-      Annex : in Special_Needs_Annexes := Annex_C)
+   procedure Implementation_Check
+     (Message : in String; Annex : in Special_Needs_Annexes := Annex_C)
    is
    -- default to cover some legacy
    -- USAGE DISCIPLINE:

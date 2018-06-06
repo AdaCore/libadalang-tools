@@ -73,8 +73,9 @@ begin
       Arr        : array (Integer range 1 .. 10) of Rec1;
       Arr2       : array (1 .. 10) of Rec1 (4);
 
-      procedure Proc (P_In : in Rec1; P_Out : out Rec1; P_In_Out : in out Rec1;
-         Constr            : in Boolean)
+      procedure Proc
+        (P_In   : in Rec1; P_Out : out Rec1; P_In_Out : in out Rec1;
+         Constr : in Boolean)
       is
       begin
          if P_Out'Constrained /= Constr or P_In_Out'Constrained /= Constr then

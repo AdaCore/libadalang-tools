@@ -57,8 +57,8 @@ package body C413004p is
       return -2;
    end Class_Wide_Func;
 
-   function Class_Wide_Func (X : access constant Tp'Class;
-      Value                    : Integer) return Integer
+   function Class_Wide_Func
+     (X : access constant Tp'Class; Value : Integer) return Integer
    is
    begin
       return 3 * Value;

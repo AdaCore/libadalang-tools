@@ -125,8 +125,8 @@ procedure Cxai022 is
 
    My_Cursor_1 : My_Hashed_Sets.Cursor;
 
-   procedure Tampering_Check (Container : in out My_Hashed_Sets.Set;
-      Where                             : in     String)
+   procedure Tampering_Check
+     (Container : in out My_Hashed_Sets.Set; Where : in String)
    is
 
       Program_Error_Raised : Boolean := False;
@@ -249,8 +249,8 @@ begin
    -- Variable_Indexing here) -- in a way that corresponds to likely usage.
 
    declare
-      procedure Test (Value : in My_Float; Expected : in My_Float;
-         Test_Case          : in String)
+      procedure Test
+        (Value : in My_Float; Expected : in My_Float; Test_Case : in String)
       is
       begin
          Tampering_Check (Container => My_Set_1, Where => Test_Case);
@@ -263,8 +263,9 @@ begin
          end if;
       end Test;
 
-      procedure Test_And_Mod (Value : in out My_Float; Expected : in My_Float;
-         New_Item                   : in     My_Float; Test_Case : in String)
+      procedure Test_And_Mod
+        (Value    : in out My_Float; Expected : in My_Float;
+         New_Item : in     My_Float; Test_Case : in String)
       is
       begin
          Tampering_Check (Container => My_Set_1, Where => Test_Case);

@@ -48,9 +48,10 @@ procedure C34007f is
 
       type Parent is access Designated;
 
-      function Create (F, L : Natural; C : Component;
-         Dummy              : Parent   -- TO RESOLVE OVERLOADING.
-         ) return Parent;
+      function Create
+        (F, L  : Natural; C : Component;
+         Dummy : Parent   -- TO RESOLVE OVERLOADING.
+        ) return Parent;
 
    end Pkg;
 
@@ -67,8 +68,8 @@ procedure C34007f is
 
    package body Pkg is
 
-      function Create (F, L : Natural; C : Component;
-         Dummy              : Parent) return Parent
+      function Create
+        (F, L : Natural; C : Component; Dummy : Parent) return Parent
       is
          A : Parent    := new Designated (F .. L);
          B : Component := C;

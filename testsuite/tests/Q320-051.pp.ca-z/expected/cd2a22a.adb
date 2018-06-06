@@ -69,8 +69,9 @@ procedure Cd2a22a is
       end if;
    end Ident;
 
-   procedure Proc (Ci0, Ci2 :     Check_Type; Cio1, Cio2 : in out Check_Type;
-      Co2                   : out Check_Type)
+   procedure Proc
+     (Ci0, Ci2 :     Check_Type; Cio1, Cio2 : in out Check_Type;
+      Co2      : out Check_Type)
    is
    begin
       if not

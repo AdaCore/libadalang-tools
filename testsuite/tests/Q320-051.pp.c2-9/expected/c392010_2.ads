@@ -44,14 +44,16 @@ package C392010_2 is
 --     declared in other packages). Check that the subprogram does not
 --     dispatch for the other type(s).
 
-   procedure Proc_W_Non (Cp_Ap : access Tagtype_Level_2;
-      Noncp_Ap                 : access C392010_0.Tagtype_Level_0 :=
+   procedure Proc_W_Non
+     (Cp_Ap    : access Tagtype_Level_2;
+      Noncp_Ap : access C392010_0.Tagtype_Level_0 :=
         Lev2_Level_0_Global_Object'Access);
 
-   function Func_W_Non (Cp_Ap : access Tagtype_Level_2;
-      Noncp_Ap                : access C392010_0.Tagtype_Level_0 :=
-        Lev2_Level_0_Global_Object'Access) return C392010_1
-     .Access_Tagtype_Level_1;
+   function Func_W_Non
+     (Cp_Ap    : access Tagtype_Level_2;
+      Noncp_Ap : access C392010_0.Tagtype_Level_0 :=
+        Lev2_Level_0_Global_Object'Access)
+      return C392010_1.Access_Tagtype_Level_1;
 
    -- and override the other functions that require overriding
    function Func_W_Cp_Ap_And_Cr

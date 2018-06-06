@@ -101,8 +101,9 @@ procedure C390002 is
       Report.Comment ("This message intentionally blank.");
    end Tc_Id_Tag;
 
-   procedure Check_Tags (Machine : in Vehicle.Object'Class;
-      Expected_Name              : in String; External_Tag : in String)
+   procedure Check_Tags
+     (Machine      : in Vehicle.Object'Class; Expected_Name : in String;
+      External_Tag : in String)
    is
       The_Tag : constant Ada.Tags.Tag := Machine'Tag;
       use type Ada.Tags.Tag;

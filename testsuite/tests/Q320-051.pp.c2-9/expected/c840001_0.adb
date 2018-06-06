@@ -2,8 +2,8 @@
 
 package body C840001_0 is
 
-   function "**" (Left : Precision_Float;
-      Right            : Integer'Base) return Precision_Float
+   function "**"
+     (Left : Precision_Float; Right : Integer'Base) return Precision_Float
    is
    begin
       -- ... Utilize desired algorithm.

@@ -57,9 +57,9 @@ procedure Cxac006 is
    -- Test subprograms:
    Abort_Test : exception; -- Some test invariant failed.
 
-   procedure Write_At_Index (File : in Strm_Io.File_Type;
-      Index                       : in Strm_Io.Count; Data : in Character;
-      Positioning_Ok              : in Boolean := False)
+   procedure Write_At_Index
+     (File : in Strm_Io.File_Type; Index : in Strm_Io.Count;
+      Data : in Character; Positioning_Ok : in Boolean := False)
    is
    -- Write an item at Index, updating the local copy of the data as well. Any
    -- file positioning has already been accomplished. Positioning of the file
@@ -82,8 +82,8 @@ procedure Cxac006 is
       File_Contents (Index) := Data;
    end Write_At_Index;
 
-   procedure Check_File_Contents (File : in out Strm_Io.File_Type;
-      Code                             : in     Character)
+   procedure Check_File_Contents
+     (File : in out Strm_Io.File_Type; Code : in Character)
    is
       -- Check the file contents against the local set. File will have mode
       -- "In_File" after this check.

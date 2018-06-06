@@ -2,15 +2,15 @@
 
 package body C3a0010_0 is
 
-   procedure Add (First_Num, Second_Num : in     Real_Num;
-      Result_Num                        :    out Real_Num)
+   procedure Add
+     (First_Num, Second_Num : in Real_Num; Result_Num : out Real_Num)
    is
    begin
       Result_Num := First_Num + Second_Num;
    end Add;
 
-   procedure Subtract (First_Num, Second_Num : in     Real_Num;
-      Result_Num                             :    out Real_Num)
+   procedure Subtract
+     (First_Num, Second_Num : in Real_Num; Result_Num : out Real_Num)
    is
    begin
       Result_Num := First_Num - Second_Num;

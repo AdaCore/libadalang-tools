@@ -57,9 +57,9 @@ procedure Cxa3006 is
 
    package Awch renames Ada.Wide_Characters.Handling;
 
-   procedure Test_Wide_Strings (Lc_Wide_String_1 : in Wide_String;
-      Uc_Wide_String_1 : in Wide_String; Lc_Wide_String_2 : in Wide_String;
-      Uc_Wide_String_2                           : in Wide_String)
+   procedure Test_Wide_Strings
+     (Lc_Wide_String_1 : in Wide_String; Uc_Wide_String_1 : in Wide_String;
+      Lc_Wide_String_2 : in Wide_String; Uc_Wide_String_2 : in Wide_String)
    is
    begin
 

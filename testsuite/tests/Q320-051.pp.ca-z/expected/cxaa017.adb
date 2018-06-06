@@ -55,8 +55,8 @@ begin
       Tc_String_Ptr_Array : String_Ptr_Array_Type :=
         (new String'(Tc_String_1), new String'(Tc_String_2));
 
-      procedure Create_New_File (The_File : in out File_Type;
-         Mode                             : in File_Mode; Next : in Integer)
+      procedure Create_New_File
+        (The_File : in out File_Type; Mode : in File_Mode; Next : in Integer)
       is
       begin
          Create (The_File, Mode, Report.Legal_File_Name (Next));

@@ -84,8 +84,9 @@ procedure Cxg2002 is
       package Complex_Types is new Ada.Numerics.Generic_Complex_Types (Real);
       use Complex_Types;
 
-      procedure Check (Actual, Expected : Real; Test_Name : String;
-         Mre                            : Real := Maximum_Relative_Error)
+      procedure Check
+        (Actual, Expected : Real; Test_Name : String;
+         Mre              : Real := Maximum_Relative_Error)
       is
          Rel_Error, Abs_Error, Max_Error : Real;
       begin
@@ -262,8 +263,9 @@ procedure Cxg2002 is
    package body Non_Generic_Check is
       use Ada.Numerics.Complex_Types;
 
-      procedure Check (Actual, Expected : Real; Test_Name : String;
-         Mre                            : Real := Maximum_Relative_Error)
+      procedure Check
+        (Actual, Expected : Real; Test_Name : String;
+         Mre              : Real := Maximum_Relative_Error)
       is
          Rel_Error, Abs_Error, Max_Error : Real;
       begin

@@ -96,8 +96,8 @@ procedure Cxai006 is
 
    My_Inserted : Boolean;
 
-   procedure Tampering_Check (Container : in out My_Ordered_Sets.Set;
-      Where                             : in     String)
+   procedure Tampering_Check
+     (Container : in out My_Ordered_Sets.Set; Where : in String)
    is
 
       Program_Error_Raised : Boolean := False;

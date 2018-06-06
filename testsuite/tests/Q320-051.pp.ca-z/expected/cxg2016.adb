@@ -111,8 +111,8 @@ procedure Cxg2016 is
 
       function Arctan (Y : Real; X : Real := 1.0) return Real renames
         Elementary_Functions.Arctan;
-      function Arctan (Y : Real; X : Real := 1.0;
-         Cycle           : Real) return Real renames
+      function Arctan
+        (Y : Real; X : Real := 1.0; Cycle : Real) return Real renames
         Elementary_Functions.Arctan;
 
       -- flag used to terminate some tests early
@@ -215,8 +215,8 @@ procedure Cxg2016 is
             Report.Failed ("exception in special value test");
       end Special_Value_Test;
 
-      procedure Check_Exact (Actual, Expected_Low, Expected_High : Real;
-         Test_Name                                               : String)
+      procedure Check_Exact
+        (Actual, Expected_Low, Expected_High : Real; Test_Name : String)
       is
          -- If the expected result is not a model number, then Expected_Low
          -- is the first machine number less than the (exact) expected result,

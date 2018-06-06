@@ -59,8 +59,8 @@ begin
          end record;
 
          task T is
-            entry E (Rec1 : in     Rectype; Rec2 : in out Rectype;
-               Rec3       :    out Rectype);
+            entry E
+              (Rec1 : in Rectype; Rec2 : in out Rectype; Rec3 : out Rectype);
          end T;
 
       end Pkg;
@@ -73,8 +73,8 @@ begin
 
          task body T is
          begin
-            accept E (Rec1 : in     Rectype; Rec2 : in out Rectype;
-               Rec3        :    out Rectype) do
+            accept E
+              (Rec1 : in Rectype; Rec2 : in out Rectype; Rec3 : out Rectype) do
 
                if not Rec1'Constrained then
                   Failed ("REC1 IS NOT CONSTRAINED - A.1");
@@ -132,8 +132,8 @@ begin
          type Rectype (Constraint : Intrange := 15) is private;
 
          task T is
-            entry E (Rec1 : in     Rectype; Rec2 : in out Rectype;
-               Rec3       :    out Rectype);
+            entry E
+              (Rec1 : in Rectype; Rec2 : in out Rectype; Rec3 : out Rectype);
          end T;
 
       private
@@ -151,8 +151,8 @@ begin
 
          task body T is
          begin
-            accept E (Rec1 : in     Rectype; Rec2 : in out Rectype;
-               Rec3        :    out Rectype) do
+            accept E
+              (Rec1 : in Rectype; Rec2 : in out Rectype; Rec3 : out Rectype) do
 
                if Rec3'Constrained then
                   Failed ("REC3 IS CONSTRAINED - B.1");
@@ -202,8 +202,8 @@ begin
          type Rectype (Constraint : Intrange := 15) is limited private;
 
          task T is
-            entry E (Rec1 : in     Rectype; Rec2 : in out Rectype;
-               Rec3       :    out Rectype);
+            entry E
+              (Rec1 : in Rectype; Rec2 : in out Rectype; Rec3 : out Rectype);
          end T;
 
       private
@@ -221,8 +221,8 @@ begin
 
          task body T is
          begin
-            accept E (Rec1 : in     Rectype; Rec2 : in out Rectype;
-               Rec3        :    out Rectype) do
+            accept E
+              (Rec1 : in Rectype; Rec2 : in out Rectype; Rec3 : out Rectype) do
 
                begin  -- ASSIGNMENT TO IN OUT PARAMETER.
                   Rec2 := Rec_Oops;

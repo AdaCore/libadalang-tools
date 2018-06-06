@@ -63,8 +63,7 @@ package Cc50001_0 is
    end record;
 
    function "="
-     (Left,
-      Right : Count_Type)               -- User-defined
+     (Left, Right : Count_Type)               -- User-defined
       return Boolean;                                    -- equality operator.
 
    subtype Str_Len is Natural range 0 .. 100;
@@ -91,8 +90,7 @@ package Cc50001_0 is
    end record;
 
    function "="
-     (Left,
-      Right : Person_Type)              -- User-defined
+     (Left, Right : Person_Type)              -- User-defined
       return Boolean;                                    -- equality operator.
 
    -- Testing entities: ------------------------------------------------

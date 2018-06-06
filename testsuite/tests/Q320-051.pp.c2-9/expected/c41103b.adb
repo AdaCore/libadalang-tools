@@ -96,8 +96,8 @@ begin
          return N2;
       end F2;
 
-      procedure P1 (X : in Integer; Y : in out Integer; Z : out Integer;
-         W            : in String)
+      procedure P1
+        (X : in Integer; Y : in out Integer; Z : out Integer; W : in String)
       is
       begin
          if X /= 2 then

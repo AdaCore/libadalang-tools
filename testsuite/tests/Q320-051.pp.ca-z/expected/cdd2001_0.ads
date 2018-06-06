@@ -47,8 +47,9 @@ package Cdd2001_0 is
 
    procedure Clear (Stream : in out My_Stream);
 
-   procedure Read (Stream : in out My_Stream; Item : out Stream_Element_Array;
-      Last                :    out Stream_Element_Offset);
+   procedure Read
+     (Stream : in out My_Stream; Item : out Stream_Element_Array;
+      Last   :    out Stream_Element_Offset);
 
    procedure Write (Stream : in out My_Stream; Item : in Stream_Element_Array);
 

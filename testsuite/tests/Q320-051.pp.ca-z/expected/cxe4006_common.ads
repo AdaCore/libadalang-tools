@@ -122,7 +122,8 @@ package Cxe4006_Common is
       Common_Record_Field : Integer := 1_234;
    end record;
 
-   procedure Single_Controlling_Operand (Rtt : in out Root_Tagged_Type;
-      Test_Number : in     Integer; Callee : out Type_Decl_Location);
+   procedure Single_Controlling_Operand
+     (Rtt    : in out Root_Tagged_Type; Test_Number : in Integer;
+      Callee :    out Type_Decl_Location);
 
 end Cxe4006_Common;

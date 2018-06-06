@@ -92,8 +92,9 @@ procedure Cd2a53a is
       end if;
    end Ident;
 
-   procedure Proc (Cn1in, Cp1in :        Check_Type;
-      Cn2inout, Cp2inout        : in out Check_Type; Czout : out Check_Type)
+   procedure Proc
+     (Cn1in, Cp1in :     Check_Type; Cn2inout, Cp2inout : in out Check_Type;
+      Czout        : out Check_Type)
    is
    begin
 

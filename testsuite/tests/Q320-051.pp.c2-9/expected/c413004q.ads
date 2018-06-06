@@ -10,8 +10,8 @@ package C413004q is
    function Prim_Func (X : access constant Tq; Value : Integer) return Integer;
 
    procedure Class_Wide_Proc (X : access Tq'Class; Value : Float);
-   function Class_Wide_Func (X : access constant Tq'Class;
-      Value                    : Float) return Float;
+   function Class_Wide_Func
+     (X : access constant Tq'Class; Value : Float) return Float;
    --  Note: Formals of these class-wide subprograms are different from the
    --        class-wide subprograms defined in the ancestor.
 
@@ -23,7 +23,7 @@ package C413004q is
       procedure Prim_Proc (X : access Tpp);
       procedure Prim_Proc (X : access Tpp; Value : Integer);
       function Prim_Func (X : access constant Tpp) return Integer;
-      function Prim_Func (X : access constant Tpp;
-         Value              : Integer) return Integer;
+      function Prim_Func
+        (X : access constant Tpp; Value : Integer) return Integer;
    end Local;
 end C413004q;

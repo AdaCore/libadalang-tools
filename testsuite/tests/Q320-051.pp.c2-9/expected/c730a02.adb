@@ -15,8 +15,9 @@ procedure C730a02 is
 
           --========================================================--
 
-   procedure Create_List (Title, Author : in C730a02_1.Data_List;
-      Pages : in C730a02_1.Page_Counts; Head : in out Priv_Node_Ptr)
+   procedure Create_List
+     (Title, Author : in C730a02_1.Data_List; Pages : in C730a02_1.Page_Counts;
+      Head          : in out Priv_Node_Ptr)
    is
 
       Book     : Priv_Node_Type;  -- Object of extended type.

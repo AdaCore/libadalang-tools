@@ -78,10 +78,11 @@ package Cxc7006_1 is
    procedure Set_Expected_Exception (Id : Ae.Exception_Id);
    procedure Set_Expected_Exceptions (Ids : Exception_Array);
 
-   type Handler_Test_Procedure is access procedure (Param : in     Integer;
-      Ok :    out Boolean; Err_Msg : out String_Acc);
-   procedure Set_Handler_Test (Index : in Integer;
-      Test_Proc : in Handler_Test_Procedure; Param : in Integer);
+   type Handler_Test_Procedure is access procedure
+     (Param : in Integer; Ok : out Boolean; Err_Msg : out String_Acc);
+   procedure Set_Handler_Test
+     (Index : in Integer; Test_Proc : in Handler_Test_Procedure;
+      Param : in Integer);
 
    function The_Handler (Which : Handler_Id) return Att.Termination_Handler;
 

@@ -33,8 +33,8 @@ package C392010_1 is
    -- so, in the interest of testing dispatching, we override them all:
    -- except Proc_1 and Proc_2
 
-   procedure Proc_W_Ap_And_Cp (Ap : C392010_0.Access_Procedure;
-      Cp                          : Tagtype_Level_1);
+   procedure Proc_W_Ap_And_Cp
+     (Ap : C392010_0.Access_Procedure; Cp : Tagtype_Level_1);
 
    function A_Default_Value return Tagtype_Level_1;
 
@@ -51,13 +51,16 @@ package C392010_1 is
 --     Check that a subprogram dispatches correctly when it has
 --     access parameters that are not controlling.
 
-   procedure Proc_W_Non (Cp_Ap : access Tagtype_Level_1;
-      Noncp_Ap                 : access C392010_0.Tagtype_Level_0 :=
+   procedure Proc_W_Non
+     (Cp_Ap    : access Tagtype_Level_1;
+      Noncp_Ap : access C392010_0.Tagtype_Level_0 :=
         C392010_0.Level_0_Global_Object'Access);
 
-   function Func_W_Non (Cp_Ap : access Tagtype_Level_1;
-      Noncp_Ap                : access C392010_0.Tagtype_Level_0 :=
-        C392010_0.Level_0_Global_Object'Access) return Access_Tagtype_Level_1;
+   function Func_W_Non
+     (Cp_Ap    : access Tagtype_Level_1;
+      Noncp_Ap : access C392010_0.Tagtype_Level_0 :=
+        C392010_0.Level_0_Global_Object'Access)
+      return Access_Tagtype_Level_1;
 
    Level_1_Global_Object : aliased Tagtype_Level_1 :=
      (Int_Item => 0, Ch_Item => 'c');  --------------------------- c

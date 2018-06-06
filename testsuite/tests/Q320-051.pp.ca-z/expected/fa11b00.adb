@@ -2,15 +2,15 @@
 
 package body Fa11b00 is     -- Application_One_Widget
 
-   procedure Set_Color (The_Widget : in out App1_Widget;
-      C                            : in     Widget_Color_Enum)
+   procedure Set_Color
+     (The_Widget : in out App1_Widget; C : in Widget_Color_Enum)
    is
    begin
       The_Widget.Color := C;
    end Set_Color;
    -------------------------------------------------------------
-   procedure Set_Label (The_Widget : in out App1_Widget;
-      L                            : in     Widget_Label_Str)
+   procedure Set_Label
+     (The_Widget : in out App1_Widget; L : in Widget_Label_Str)
    is
    begin
       The_Widget.Label := L;
@@ -21,8 +21,9 @@ package body Fa11b00 is     -- Application_One_Widget
       The_Widget.Id := I;
    end Set_Id;
    -------------------------------------------------------------
-   procedure App1_Widget_Specific_Oper (The_Widget : in out App1_Widget;
-      I : in     Widget_Id; C : in Widget_Color_Enum; L : in Widget_Label_Str)
+   procedure App1_Widget_Specific_Oper
+     (The_Widget : in out App1_Widget; I : in Widget_Id;
+      C          : in     Widget_Color_Enum; L : in Widget_Label_Str)
    is
    begin
       Set_Color (The_Widget, C);

@@ -9,8 +9,8 @@ package C392d01_0.C392d01_1 is
 
    -- Implicit function TC_Correct_Result (Auto_Speed) declared here.
 
-   procedure Set_Shutter_Speed (C : in out Auto_Speed;
-      Speed                       : in     F392d00.Shutter_Speed);
+   procedure Set_Shutter_Speed
+     (C : in out Auto_Speed; Speed : in F392d00.Shutter_Speed);
 
    -- This version of Set_Shutter_Speed does NOT override the operation
    -- inherited from Zoom_Camera, because the inherited operation is never

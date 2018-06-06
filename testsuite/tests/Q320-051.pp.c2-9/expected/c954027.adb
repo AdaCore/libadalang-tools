@@ -55,8 +55,8 @@ with Report;
 procedure C954027 is
    package Adder is
       type Implementation is synchronized interface;
-      procedure Do_It (Self : in out Implementation;
-         Var                : in out Integer) is abstract with
+      procedure Do_It
+        (Self : in out Implementation; Var : in out Integer) is abstract with
          Synchronization => By_Entry;
    end Adder;
    type Adder_Implementer is access all Adder.Implementation'Class;

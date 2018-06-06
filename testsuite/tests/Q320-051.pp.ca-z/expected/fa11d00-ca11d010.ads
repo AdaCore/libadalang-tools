@@ -53,8 +53,7 @@ package Fa11d00.Ca11d010 is     -- Add_Subtract_Complex
       C           :    out Complex_Type);  -- numbers.
 
    function Subtract
-     (Left,
-      Right : Complex_Type)      -- Subtract two
+     (Left, Right : Complex_Type)      -- Subtract two
       return Complex_Type;                              -- complex numbers.
 
 end Fa11d00.Ca11d010;     -- Add_Subtract_Complex

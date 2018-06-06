@@ -19,8 +19,8 @@ package body C390003_3 is -- Special_Trucks
       Onto.Load_Count                := Onto.Load_Count + 1;
       Onto.Payload (Onto.Load_Count) := The_Car;
    end Load;
-   procedure Unload (The_Car :    out Motivators.Car;
-      Off_Of                 : in out Auto_Carrier)
+   procedure Unload
+     (The_Car : out Motivators.Car; Off_Of : in out Auto_Carrier)
    is
    begin
       The_Car           := Off_Of.Payload (Off_Of.Load_Count);

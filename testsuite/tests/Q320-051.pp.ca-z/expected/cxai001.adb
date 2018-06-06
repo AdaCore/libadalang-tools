@@ -87,8 +87,8 @@ procedure Cxai001 is
 
    My_Index_1 : Natural;
 
-   procedure Tampering_Check (Container : in out My_Vectors.Vector;
-      Where                             : in     String)
+   procedure Tampering_Check
+     (Container : in out My_Vectors.Vector; Where : in String)
    is
 
       Program_Error_Raised : Boolean := False;

@@ -46,8 +46,8 @@ package body F433a00 is
       end if;
    end Check_Init_Count;
 
-   procedure Check (Item : in out My_Rec; Value : in Integer;
-      Message            : in     String)
+   procedure Check
+     (Item : in out My_Rec; Value : in Integer; Message : in String)
    is
       Val : Integer;
    begin

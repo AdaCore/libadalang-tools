@@ -181,9 +181,10 @@ procedure C85006b is
       end loop;
    end Task1;
 
-   procedure Proc (Rec : in out Rec_Type; Ai1 : in out Arr_Int;
-      Aa1 : in out Arr_Arr; Ar1 : in out Arr_Rec; Ap1 : in out Arr_Ptr;
-      Av1              : in out Arr_Pvt; At1 : in out Arr_Tsk)
+   procedure Proc
+     (Rec : in out Rec_Type; Ai1 : in out Arr_Int; Aa1 : in out Arr_Arr;
+      Ar1 : in out Arr_Rec; Ap1 : in out Arr_Ptr; Av1 : in out Arr_Pvt;
+      At1 : in out Arr_Tsk)
    is
 
       Xri1 : Integer renames Rec.Ri1;
@@ -200,11 +201,12 @@ procedure C85006b is
       Xat1 : Arr_Tsk renames At1 (6 .. 8);
 
       task type Task2 is
-         entry Entry1 (Tri1 :    out Integer; Tra1 : out Array1;
-            Trr1            :    out Record1; Trp1 : in out Pointer1;
-            Trv1 : in out Pack1.Privy; Trt1 : in out Task1; Tai1 : out Arr_Int;
-            Taa1 :    out Arr_Arr; Tar1 : out Arr_Rec; Tap1 : in out Arr_Ptr;
-            Tav1            : in out Arr_Pvt; Tat1 : in out Arr_Tsk);
+         entry Entry1
+           (Tri1 :    out Integer; Tra1 : out Array1; Trr1 : out Record1;
+            Trp1 : in out Pointer1; Trv1 : in out Pack1.Privy;
+            Trt1 : in out Task1; Tai1 : out Arr_Int; Taa1 : out Arr_Arr;
+            Tar1 : out Arr_Rec; Tap1 : in out Arr_Ptr; Tav1 : in out Arr_Pvt;
+            Tat1 : in out Arr_Tsk);
       end Task2;
 
       I        : Integer;
@@ -212,11 +214,13 @@ procedure C85006b is
 
       task body Task2 is
       begin
-         accept Entry1 (Tri1 :    out Integer; Tra1 : out Array1;
-            Trr1             :    out Record1; Trp1 : in out Pointer1;
-            Trv1 : in out Pack1.Privy; Trt1 : in out Task1; Tai1 : out Arr_Int;
-            Taa1 :    out Arr_Arr; Tar1 : out Arr_Rec; Tap1 : in out Arr_Ptr;
-            Tav1             : in out Arr_Pvt; Tat1 : in out Arr_Tsk) do
+         accept Entry1
+           (Tri1 :    out Integer; Tra1 : out Array1; Trr1 : out Record1;
+            Trp1 : in out Pointer1; Trv1 : in out Pack1.Privy;
+            Trt1 : in out Task1; Tai1 : out Arr_Int; Taa1 : out Arr_Arr;
+            Tar1 : out Arr_Rec; Tap1 : in out Arr_Ptr; Tav1 : in out Arr_Pvt;
+            Tat1 : in out Arr_Tsk)
+         do
             Tri1 := Rec.Ri1 + 1;
             Tra1 := (Rec.Ra1 (1) + 1, Rec.Ra1 (2) + 1, Rec.Ra1 (3) + 1);
             Trr1 := (D => 1, Field1 => Rec.Rr1.Field1 + 1);
@@ -237,11 +241,11 @@ procedure C85006b is
          end Entry1;
       end Task2;
 
-      procedure Proc1 (Pri1 : in out Integer; Pra1 : in out Array1;
-         Prr1 : in out Record1; Prp1 : out Pointer1; Prv1 : out Pack1.Privy;
-         Prt1 : in out Task1; Pai1 : in out Arr_Int; Paa1 : in out Arr_Arr;
-         Par1 : in out Arr_Rec; Pap1 : out Arr_Ptr; Pav1 : out Arr_Pvt;
-         Pat1               : in out Arr_Tsk)
+      procedure Proc1
+        (Pri1 : in out Integer; Pra1 : in out Array1; Prr1 : in out Record1;
+         Prp1 :    out Pointer1; Prv1 : out Pack1.Privy; Prt1 : in out Task1;
+         Pai1 : in out Arr_Int; Paa1 : in out Arr_Arr; Par1 : in out Arr_Rec;
+         Pap1 :    out Arr_Ptr; Pav1 : out Arr_Pvt; Pat1 : in out Arr_Tsk)
       is
       begin
          Pri1 := Pri1 + 1;

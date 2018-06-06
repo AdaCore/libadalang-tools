@@ -21,8 +21,9 @@ package body Ca11016_0 is
 
    end Initialize_Basic_Map;
    --------------------------------------------------------
-   function Get_Physical_Feature (Lat : Latitude; Long : Longitude;
-      Map                             : Map_Type) return Physical_Features
+   function Get_Physical_Feature
+     (Lat : Latitude; Long : Longitude; Map : Map_Type)
+      return Physical_Features
    is
    begin
       return (Map (Lat, Long));

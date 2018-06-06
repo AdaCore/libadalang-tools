@@ -25,8 +25,8 @@ package body C761003_Support is
       return T;
    end Invert;
 
-   procedure Validate (Initcount : Natural; Testnumber : Natural;
-      Check_Order                : Boolean := True)
+   procedure Validate
+     (Initcount : Natural; Testnumber : Natural; Check_Order : Boolean := True)
    is
       Number : constant String := Natural'Image (Testnumber);
    begin

@@ -62,12 +62,13 @@ package C393a06_0 is
    procedure Swap (A, B : in out Organism);
    function Create return Organism;
 
-   procedure Initialize (The_Entity : in out Organism;
-      In_The_Kingdom                :        Kingdoms);
+   procedure Initialize
+     (The_Entity : in out Organism; In_The_Kingdom : Kingdoms);
    function Kingdom (Of_The_Entity : Organism) return Kingdoms;
 
-   procedure Tc_Check (An_Entity : Organism'Class; In_Kingdom : Kingdoms;
-      Initialized                : Boolean);
+   procedure Tc_Check
+     (An_Entity   : Organism'Class; In_Kingdom : Kingdoms;
+      Initialized : Boolean);
 
    Incompatible : exception;
 

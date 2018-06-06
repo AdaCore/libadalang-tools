@@ -101,8 +101,8 @@ procedure Cxai003 is
 
    My_Inserted : Boolean;
 
-   procedure Tampering_Check (Container : in out My_Hashed_Maps.Map;
-      Where                             : in     String)
+   procedure Tampering_Check
+     (Container : in out My_Hashed_Maps.Map; Where : in String)
    is
 
       Program_Error_Raised : Boolean := False;

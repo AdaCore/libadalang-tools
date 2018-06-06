@@ -39,10 +39,10 @@ procedure Cc3016c is
       First_Initial_Value : in Some_Type;
       Second_Initial_Value : in Some_Type;
       with procedure Change (First : in Some_Type; Result : out Some_Type);
-      with procedure Second_Change (First : in     Some_Type;
-         Result                           :    out Some_Type);
-      with procedure Third_Change (First : in     Some_Type;
-         Result                          :    out Some_Type);
+      with procedure Second_Change
+        (First : in Some_Type; Result : out Some_Type);
+      with procedure Third_Change
+        (First : in Some_Type; Result : out Some_Type);
       First_Expected_Result : in Some_Type;
       Second_Expected_Result : in Some_Type;
       Third_Expected_Result : in Some_Type;
@@ -60,8 +60,8 @@ procedure Cc3016c is
 
          Initial_Value : in Some_Type;
          with procedure Change (First : in Some_Type; Result : out Some_Type);
-         with procedure Second_Change (First : in     Some_Type;
-            Result                           :    out Some_Type);
+         with procedure Second_Change
+           (First : in Some_Type; Result : out Some_Type);
          First_Expected_Result : in Some_Type;
          Second_Expected_Result : in Some_Type;
          Third_Expected_Result : in Some_Type;
@@ -128,15 +128,15 @@ procedure Cc3016c is
       Giving_This_Result := 2 * This_Value;
    end Double;
 
-   procedure Add_20 (To_This_Value : in     Integer;
-      Giving_This_Result           :    out Integer)
+   procedure Add_20
+     (To_This_Value : in Integer; Giving_This_Result : out Integer)
    is
    begin -- ADD_20
       Giving_This_Result := To_This_Value + 20;
    end Add_20;
 
-   procedure Times_Five (This_Value : in     Integer;
-      Giving_This_Result            :    out Integer)
+   procedure Times_Five
+     (This_Value : in Integer; Giving_This_Result : out Integer)
    is
    begin -- TIMES_FIVE
       Giving_This_Result := 5 * This_Value;

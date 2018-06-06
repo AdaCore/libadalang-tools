@@ -111,11 +111,11 @@ begin
 
       generic
          with package Gen_Pack is new Ada.Numerics.Discrete_Random (<>);
-      procedure Random_Test (Trials_Per_Test : in     Integer;
-         Success                             :    out Boolean);
+      procedure Random_Test
+        (Trials_Per_Test : in Integer; Success : out Boolean);
 
-      procedure Random_Test (Trials_Per_Test : in     Integer;
-         Success                             :    out Boolean)
+      procedure Random_Test
+        (Trials_Per_Test : in Integer; Success : out Boolean)
       is
          Total_Runs               : Integer := 0;
          Total_Trials             : Integer := 0;

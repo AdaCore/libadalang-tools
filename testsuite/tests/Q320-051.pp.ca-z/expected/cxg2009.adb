@@ -121,8 +121,9 @@ procedure Cxg2009 is
          return Inf_N * Sqrt (Sum_Squares);
       end Two_Norm;
 
-      procedure Check (Actual, Expected : Real; Test_Name : String; Mre : Real;
-         Vector_Length                  : Integer)
+      procedure Check
+        (Actual, Expected : Real; Test_Name : String; Mre : Real;
+         Vector_Length    : Integer)
       is
          Rel_Error : Real;
          Abs_Error : Real;
@@ -258,8 +259,9 @@ procedure Cxg2009 is
          return Inf_N * Sqrt (Sum_Squares);
       end Two_Norm;
 
-      procedure Check (Actual, Expected : Real; Test_Name : String; Mre : Real;
-         Vector_Length                  : Integer)
+      procedure Check
+        (Actual, Expected : Real; Test_Name : String; Mre : Real;
+         Vector_Length    : Integer)
       is
          Rel_Error : Real;
          Abs_Error : Real;

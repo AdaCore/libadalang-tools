@@ -5,8 +5,9 @@ package C3a2001_4 is
 
    type Special_Breaker is new C3a2001_2.Basic_Breaker with private;
 
-   function Construct (Voltage : C3a2001_2.Voltages;
-      Amperage                 : C3a2001_2.Amps) return Special_Breaker;
+   function Construct
+     (Voltage : C3a2001_2.Voltages; Amperage : C3a2001_2.Amps)
+      return Special_Breaker;
 
    procedure Flip (The_Breaker : in out Special_Breaker);
    procedure Trip (The_Breaker : in out Special_Breaker);

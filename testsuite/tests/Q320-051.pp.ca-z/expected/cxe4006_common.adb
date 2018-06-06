@@ -3,8 +3,9 @@
 ---
 package body Cxe4006_Common is
 
-   procedure Single_Controlling_Operand (Rtt : in out Root_Tagged_Type;
-      Test_Number : in     Integer; Callee : out Type_Decl_Location)
+   procedure Single_Controlling_Operand
+     (Rtt    : in out Root_Tagged_Type; Test_Number : in Integer;
+      Callee :    out Type_Decl_Location)
    is
       Expected : Integer;
    begin

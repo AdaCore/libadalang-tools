@@ -20,8 +20,9 @@ package C393010_1 is
    end record;
 
    function Issue return Passenger_Ticket;
-   function Issue (Service : Service_Classes; Flight : Natural; Seat : String;
-      Meal                 : Menu := Fowl) return Passenger_Ticket;
+   function Issue
+     (Service : Service_Classes; Flight : Natural; Seat : String;
+      Meal    : Menu := Fowl) return Passenger_Ticket;
 
    procedure Label (T : Passenger_Ticket);
 

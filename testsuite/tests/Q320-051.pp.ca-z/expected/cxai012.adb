@@ -109,8 +109,8 @@ procedure Cxai012 is
 
    My_Inserted : Boolean;
 
-   procedure Tampering_Check (Container : in out My_Bounded_Hashed_Maps.Map;
-      Where                             : in     String) with
+   procedure Tampering_Check
+     (Container : in out My_Bounded_Hashed_Maps.Map; Where : in String) with
       Pre => not Container.Is_Empty
     is
 

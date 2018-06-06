@@ -100,8 +100,8 @@ procedure C974012 is
    -- Routine to find the most cost effective grid path for this particular
    -- deficiency at this particular time
    --
-   procedure Path_Negotiation (Requirement : in     Deficiency;
-      Best_Path                            :    out Grid_Path)
+   procedure Path_Negotiation
+     (Requirement : in Deficiency; Best_Path : out Grid_Path)
    is
 
       Dummy_Path : Grid_Path  := "NYC.425_NY.227_NH.132";

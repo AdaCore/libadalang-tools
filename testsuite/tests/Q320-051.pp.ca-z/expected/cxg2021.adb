@@ -109,8 +109,9 @@ procedure Cxg2021 is
       -- the E_Factor is an additional amount added to the Expected value prior
       -- to computing the maximum relative error. This is needed because the
       -- error analysis (Cody pg 17-20) requires this additional allowance.
-      procedure Check (Actual, Expected : Real; Test_Name : String; Mre : Real;
-         E_Factor                       : Real := 0.0)
+      procedure Check
+        (Actual, Expected : Real; Test_Name : String; Mre : Real;
+         E_Factor         : Real := 0.0)
       is
          Max_Error : Real;
          Rel_Error : Real;
@@ -153,8 +154,9 @@ procedure Cxg2021 is
          end if;
       end Check;
 
-      procedure Check (Actual, Expected : Complex; Test_Name : String;
-         Mre : Real; R_Factor, I_Factor : Real := 0.0)
+      procedure Check
+        (Actual, Expected   : Complex; Test_Name : String; Mre : Real;
+         R_Factor, I_Factor : Real := 0.0)
       is
       begin
          Check

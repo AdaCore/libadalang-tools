@@ -142,8 +142,9 @@ procedure Cxg2012 is
 
       -- the following version of Check computes the allowed error bound using
       -- the operands
-      procedure Check (Actual, Expected : Real; Left, Right : Real;
-         Test_Name                      : String; Mre_Factor : Real := 1.0)
+      procedure Check
+        (Actual, Expected : Real; Left, Right : Real; Test_Name : String;
+         Mre_Factor       : Real := 1.0)
       is
          Mre : Real;
       begin

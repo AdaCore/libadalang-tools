@@ -2,8 +2,8 @@
 
 package body Cc70c02_0 is
 
-   procedure Read_Element (L : in out Lists.List_Type;
-      E                      :    out Lists.Element_Type)
+   procedure Read_Element
+     (L : in out Lists.List_Type; E : out Lists.Element_Type)
    is
    begin
       if Basic_List_Ops.End_Of_List (L) then  -- Use of op from the previous
@@ -14,8 +14,8 @@ package body Cc70c02_0 is
       end if;
    end Read_Element;
 
-   procedure Add_Element (L : in out Lists.List_Type;
-      E                     : in     Lists.Element_Type)
+   procedure Add_Element
+     (L : in out Lists.List_Type; E : in Lists.Element_Type)
    is
       New_Node : Lists.Node_Pointer := new Lists.Node_Type'(E, null);
       use type Lists.Node_Pointer;

@@ -15,8 +15,9 @@ package Cc51009_1 is
 
       use Sets;
 
-      procedure Test (Set_1 : in out Set_Type; Set_2 : Set_Type;
-         Set_3              :        Set_Type; Elt : Element);
+      procedure Test
+        (Set_1 : in out Set_Type; Set_2 : Set_Type; Set_3 : Set_Type;
+         Elt   :        Element);
 
    end Set_Processing;
 

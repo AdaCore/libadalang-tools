@@ -1,7 +1,8 @@
 package body Cc3019c1_Nested_Generics is
 
-   procedure Copy (Source : in out Nested_Generics_Type;
-      Destination         : in out Nested_Generics_Type)
+   procedure Copy
+     (Source      : in out Nested_Generics_Type;
+      Destination : in out Nested_Generics_Type)
    is
 
    begin  -- COPY
@@ -12,8 +13,9 @@ package body Cc3019c1_Nested_Generics is
 
    end Copy;
 
-   procedure Set_Element (For_This_Ngt_Object : in out Nested_Generics_Type;
-      To_This_Element                         : in out Element)
+   procedure Set_Element
+     (For_This_Ngt_Object : in out Nested_Generics_Type;
+      To_This_Element     : in out Element)
    is
 
    begin  -- SET_ELEMENT
@@ -23,8 +25,9 @@ package body Cc3019c1_Nested_Generics is
 
    end Set_Element;
 
-   procedure Set_Number (For_This_Ngt_Object : in out Nested_Generics_Type;
-      To_This_Number                         : in     Natural)
+   procedure Set_Number
+     (For_This_Ngt_Object : in out Nested_Generics_Type;
+      To_This_Number      : in     Natural)
    is
 
    begin  -- SET_NUMBER
@@ -33,8 +36,9 @@ package body Cc3019c1_Nested_Generics is
 
    end Set_Number;
 
-   function "=" (Left : in Nested_Generics_Type;
-      Right           : in Nested_Generics_Type) return Boolean
+   function "="
+     (Left : in Nested_Generics_Type; Right : in Nested_Generics_Type)
+      return Boolean
    is
 
    begin  -- "="
@@ -95,8 +99,8 @@ package body Cc3019c1_Nested_Generics is
 
    package body Stack_Class is
 
-      procedure Push (This_Element : in out Element;
-         On_To_This_Stack          : in out Stack)
+      procedure Push
+        (This_Element : in out Element; On_To_This_Stack : in out Stack)
       is
 
       begin  -- PUSH
@@ -112,8 +116,8 @@ package body Cc3019c1_Nested_Generics is
 
       end Push;
 
-      procedure Pop (This_Element : in out Element;
-         Off_This_Stack           : in out Stack)
+      procedure Pop
+        (This_Element : in out Element; Off_This_Stack : in out Stack)
       is
 
       begin  -- POP

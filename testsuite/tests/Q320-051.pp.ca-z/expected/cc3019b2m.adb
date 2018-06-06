@@ -57,8 +57,8 @@ procedure Cc3019b2m is
 
    Wall_Date : Date := (Month => Nov, Day => 9, Year => 1_989);
 
-   procedure Assign (The_Value_Of_This_Date : in out Date;
-      To_This_Date                          : in out Date);
+   procedure Assign
+     (The_Value_Of_This_Date : in out Date; To_This_Date : in out Date);
 
    function Is_Equal (Left : in Date; Right : in Date) return Boolean;
 
@@ -69,12 +69,13 @@ procedure Cc3019b2m is
    Second_Date_Stack : Date_Stack.Stack;
    Third_Date_Stack  : Date_Stack.Stack;
 
-   function "=" (Left : in Date_Stack.Stack;
-      Right           : in Date_Stack.Stack) return Boolean renames
+   function "="
+     (Left : in Date_Stack.Stack; Right : in Date_Stack.Stack)
+      return Boolean renames
      Date_Stack."=";
 
-   procedure Assign (The_Value_Of_This_Date : in out Date;
-      To_This_Date                          : in out Date)
+   procedure Assign
+     (The_Value_Of_This_Date : in out Date; To_This_Date : in out Date)
    is
 
    begin -- ASSIGN

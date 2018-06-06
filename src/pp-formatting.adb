@@ -3547,10 +3547,8 @@ package body Pp.Formatting is
 
                   if Break.Hard then
                      Put_Char ('$');
-
                   elsif Break.Enabled then
                      Put_Char ('!');
-
                   else
                      Put_Char ('?');
                   end if;

@@ -16,8 +16,8 @@ procedure C393013 is
    M_Gas  : C393013_5.Monitored_Gas_Turbine.Monitored_Generator;
    use type Ada.Tags.Tag;
 
-   procedure Make_Farm (First_Obj : Generator'Class; Tc_Tag : Ada.Tags.Tag;
-      Tc_Id                       : String)
+   procedure Make_Farm
+     (First_Obj : Generator'Class; Tc_Tag : Ada.Tags.Tag; Tc_Id : String)
    is
       -- Clone First_Obj with dispatching calls:
       Obj1 : Generator'Class := First_Obj.Clone (New_Location => 'X');

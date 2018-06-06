@@ -10,8 +10,8 @@ package body Ca11016_0.Ca11016_2 is
 
    package Sdugd is new Ca11016_0.Ca11016_1 (Display_Val);
 
-   procedure Data_For_Sdugd (Lat : in     Latitude; Long : in Longitude;
-      Output_Packet              : in out Io_Packet)
+   procedure Data_For_Sdugd
+     (Lat : in Latitude; Long : in Longitude; Output_Packet : in out Io_Packet)
    is
 
    -- Simulates sending control information to a display device. Control

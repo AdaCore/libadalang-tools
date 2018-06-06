@@ -12,7 +12,7 @@ package Cc70a02_1 is  -- Mathematical group operations.
 
    generic            -- Powers for mathematical groups.
       with package Group is new Cc70a02_0 (<>);
-   function Power (Left : Group.Group_Type;
-      Right             : Integer) return Group.Group_Type;
+   function Power
+     (Left : Group.Group_Type; Right : Integer) return Group.Group_Type;
 
 end Cc70a02_1;

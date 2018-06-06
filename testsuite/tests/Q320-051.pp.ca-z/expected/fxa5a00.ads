@@ -60,11 +60,13 @@ package Fxa5a00 is
 
    type New_Float is new Float digits 6;
 
-   function Result_Within_Range (Result : Float; Expected_Result : Float;
-      Relative_Error                    : Float) return Boolean;
+   function Result_Within_Range
+     (Result : Float; Expected_Result : Float; Relative_Error : Float)
+      return Boolean;
 
-   function Result_Within_Range (Result : New_Float; Expected_Result : Float;
-      Relative_Error                    : Float) return Boolean;
+   function Result_Within_Range
+     (Result : New_Float; Expected_Result : Float; Relative_Error : Float)
+      return Boolean;
 
    -- This procedure is designed to defeat optimization attempts by an
    -- implementation in cases where an exception is specifically raised in a

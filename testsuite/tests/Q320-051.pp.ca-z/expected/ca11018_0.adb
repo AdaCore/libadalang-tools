@@ -38,8 +38,8 @@ package body Ca11018_0 is
    -- Calls functions from public child to search for a key word. If the word
    -- appears more than once in each message, highlight all of them.
 
-   procedure Highlight_Designated (The_Word : in     Message;
-      In_The_Message                        : in out Designated_Msg)
+   procedure Highlight_Designated
+     (The_Word : in Message; In_The_Message : in out Designated_Msg)
    is
 
    -- Not a real highlight procedure. Real application can use graphic device
@@ -61,7 +61,8 @@ package body Ca11018_0 is
 
    end Highlight_Designated;
    --------------------------------------------------------------
-   procedure Highlight_Particularly_Designated (The_Word : in     Message;
+   procedure Highlight_Particularly_Designated
+     (The_Word       : in     Message;
       In_The_Message : in out Particularly_Designated_Msg)
    is
 

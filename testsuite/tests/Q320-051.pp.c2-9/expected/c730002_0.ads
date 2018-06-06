@@ -113,8 +113,8 @@ package C730002_0 is
       Specialist         : Specialist_Id  := Manny;
    end record;
 
-   procedure Routine_Maintenance (Engine : in out Engine_Type;
-      Specialist                         : in     Specialist_Id := Moe);
+   procedure Routine_Maintenance
+     (Engine : in out Engine_Type; Specialist : in Specialist_Id := Moe);
 
    -- The Routine_Maintenance procedure implements the processing required for
    -- an engine.

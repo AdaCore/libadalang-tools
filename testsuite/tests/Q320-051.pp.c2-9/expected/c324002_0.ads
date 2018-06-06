@@ -71,18 +71,18 @@ package C324002_0 is
 
    function "+" (Source : Unbounded_String) return String;
 
-   procedure Set_Unbounded_String (Target :    out Unbounded_String;
-      Source                              : in     String);
+   procedure Set_Unbounded_String
+     (Target : out Unbounded_String; Source : in String);
 
    procedure Append (Source : in out Unbounded_String; New_Item : in String);
 
-   function "&" (Left : Unbounded_String;
-      Right           : String) return Unbounded_String;
+   function "&"
+     (Left : Unbounded_String; Right : String) return Unbounded_String;
 
    function "&" (Left, Right : Unbounded_String) return Unbounded_String;
 
-   function Element (Source : in Unbounded_String;
-      Index                 : in Positive) return Character;
+   function Element
+     (Source : in Unbounded_String; Index : in Positive) return Character;
 
    -- In a real package, there'd be many more operations here.
 

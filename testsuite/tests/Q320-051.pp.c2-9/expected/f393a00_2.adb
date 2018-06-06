@@ -16,8 +16,8 @@ package body F393a00_2 is
       return A_Mill;
    end Create;
 
-   procedure Add_Spin (To_Mill : in out Windmill;
-      Rpms                     : in     Rotational_Measurement)
+   procedure Add_Spin
+     (To_Mill : in out Windmill; Rpms : in Rotational_Measurement)
    is
    begin
       F393a00_0.Tc_Touch ('e');

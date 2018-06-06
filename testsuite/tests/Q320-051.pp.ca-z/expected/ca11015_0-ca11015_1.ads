@@ -13,11 +13,13 @@ package Ca11015_0.Ca11015_1 is
 
    type Feature_Map is private;
 
-   function Get_Feature_Val (Lat : Latitude; Long : Longitude;
-      Map                        : Feature_Map) return Generic_Feature;
+   function Get_Feature_Val
+     (Lat : Latitude; Long : Longitude; Map : Feature_Map)
+      return Generic_Feature;
 
-   procedure Set_Feature_Val (Lat : in Latitude; Long : in Longitude;
-      Fea : in Generic_Feature; Map : in out Feature_Map);
+   procedure Set_Feature_Val
+     (Lat : in     Latitude; Long : in Longitude; Fea : in Generic_Feature;
+      Map : in out Feature_Map);
 
    function Check_Page (Map : Feature_Map; Page_No : Page_Type) return Boolean;
 

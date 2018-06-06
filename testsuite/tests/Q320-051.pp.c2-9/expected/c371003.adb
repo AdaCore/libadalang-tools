@@ -65,8 +65,8 @@ procedure C371003 is
    Func1_Cons : Integer := 0;
 
    ---------------------------------------------------------
-   function Chk (Cons : Integer; Value : Integer;
-      Message         : String) return Boolean
+   function Chk
+     (Cons : Integer; Value : Integer; Message : String) return Boolean
    is
    begin
       if Cons /= Value then

@@ -2,8 +2,8 @@
 
 package body C730001_2 is
 
-   procedure Answer (Cp : in out Conference_Room_Phone;
-      Ci                : in     Indicator_Type := Modem)
+   procedure Answer
+     (Cp : in out Conference_Room_Phone; Ci : in Indicator_Type := Modem)
    is
    begin
       Cp.Status    := Conference;

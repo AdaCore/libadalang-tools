@@ -10,8 +10,8 @@ package body Ca11003_0.Ca11003_1 is     -- Child package body OS.Operations
       File.Blocks     := Min_File_Size;
    end Create_File;
    --------------------------------------------------
-   procedure Duplicate_File (Original : in     Extended_File_Type;
-      Duplicate                       :    out Extended_File_Type)
+   procedure Duplicate_File
+     (Original : in Extended_File_Type; Duplicate : out Extended_File_Type)
    is
    begin
       Duplicate.Descriptor := Next_Available_File;      -- Parent subprogram.

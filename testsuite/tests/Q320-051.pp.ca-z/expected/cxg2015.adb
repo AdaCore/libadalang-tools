@@ -305,8 +305,8 @@ procedure Cxg2015 is
             Report.Failed ("exception in special value test");
       end Special_Value_Test;
 
-      procedure Check_Exact (Actual, Expected_Low, Expected_High : Real;
-         Test_Name                                               : String)
+      procedure Check_Exact
+        (Actual, Expected_Low, Expected_High : Real; Test_Name : String)
       is
          -- If the expected result is not a model number, then Expected_Low
          -- is the first machine number less than the (exact) expected result,

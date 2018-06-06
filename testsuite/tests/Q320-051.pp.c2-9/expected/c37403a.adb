@@ -58,8 +58,8 @@ begin
 
       Sc : constant Square := (Side => 1, Mat => (1 => (1 => 1)));
 
-      procedure P (Pin1, Pin2 : in     Square; Pinout : in out Square;
-         Pout                 :    out Square)
+      procedure P
+        (Pin1, Pin2 : in Square; Pinout : in out Square; Pout : out Square)
       is
 
       begin
@@ -92,14 +92,15 @@ begin
       end P;
 
       task T is
-         entry Q (Pin1, Pin2 : in     Square; Pinout : in out Square;
-            Pout             :    out Square);
+         entry Q
+           (Pin1, Pin2 : in Square; Pinout : in out Square; Pout : out Square);
       end T;
 
       task body T is
       begin
-         accept Q (Pin1, Pin2 : in     Square; Pinout : in out Square;
-            Pout              :    out Square) do
+         accept Q
+           (Pin1, Pin2 : in Square; Pinout : in out Square; Pout : out Square)
+         do
 
             begin
                if Pin1'Constrained then

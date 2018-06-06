@@ -36,8 +36,9 @@ package F552a00_Bingo_Balls is
      private with
       Implicit_Dereference => Element;
 
-   function Constant_Reference (Container : Bingo_Game;
-      Position : Cursor) return Constant_Reference_Type;
+   function Constant_Reference
+     (Container : Bingo_Game; Position : Cursor)
+      return Constant_Reference_Type;
 
    Tc_Call_History : Strings.Unbounded.Unbounded_String;
    --

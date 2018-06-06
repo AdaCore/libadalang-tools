@@ -67,8 +67,8 @@ package C840001_0 is
    -- Implicit: function "**" (Left: Precision_Float; Right: Integer'Base)
    -- return Precision_Float;
 
-   function "**" (Left : Precision_Float;
-      Right            : Integer'Base) return Precision_Float;
+   function "**"
+     (Left : Precision_Float; Right : Integer'Base) return Precision_Float;
    -- Overrides predefined operator.
 
    function "+" (Right : Precision_Float) return Precision_Float;

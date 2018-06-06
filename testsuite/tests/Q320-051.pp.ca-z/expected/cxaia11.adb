@@ -178,8 +178,8 @@ begin
    -- -- in a way that corresponds to likely usage.
 
    declare
-      procedure Test (Value : in String; Expected : in String;
-         Test_Case          : in String)
+      procedure Test
+        (Value : in String; Expected : in String; Test_Case : in String)
       is
       begin
          Tampering_Check (Container => My_Map_1, Where => Test_Case);
@@ -192,8 +192,9 @@ begin
          end if;
       end Test;
 
-      procedure Test_And_Mod (Value : in out String; Expected : in String;
-         New_Item                   : in String; Test_Case : in String) with
+      procedure Test_And_Mod
+        (Value     : in out String; Expected : in String; New_Item : in String;
+         Test_Case : in     String) with
          Pre => Value'Length = New_Item'Length
        is
       begin

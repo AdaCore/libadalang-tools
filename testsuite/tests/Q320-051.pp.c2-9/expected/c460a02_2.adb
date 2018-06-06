@@ -1,8 +1,8 @@
      --==================================================================--
 
 with Report;
-procedure C460a02_2 (P :     access Designated_Type'Class;
-   Res                 : out F460a00.Tc_Result_Kind)
+procedure C460a02_2
+  (P : access Designated_Type'Class; Res : out F460a00.Tc_Result_Kind)
 is
    Ptr : Target_Type;
 begin

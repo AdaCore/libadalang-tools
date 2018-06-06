@@ -89,8 +89,8 @@ procedure Cxai010 is
 
    My_Index_1 : Natural;
 
-   procedure Tampering_Check (Container : in out My_Bounded_Vectors.Vector;
-      Where                             : in     String) with
+   procedure Tampering_Check
+     (Container : in out My_Bounded_Vectors.Vector; Where : in String) with
       Pre => not Container.Is_Empty
     is
 

@@ -85,8 +85,8 @@ procedure C35a05q is
 
    -------------------------------------------------------------------
 
-   procedure Check_Attributes (Name         : String;
-      Actual_Attributes, Correct_Attributes : Fore_And_Aft)
+   procedure Check_Attributes
+     (Name : String; Actual_Attributes, Correct_Attributes : Fore_And_Aft)
    is
    begin
       if Actual_Attributes.Fore /= Correct_Attributes.Fore then

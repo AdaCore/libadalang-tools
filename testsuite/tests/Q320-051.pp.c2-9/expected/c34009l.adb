@@ -47,15 +47,17 @@ procedure C34009l is
 
       type Parent (B : Boolean := True; L : Length := 3) is limited private;
 
-      function Create (B : Boolean; L : Length; I : Integer; S : String;
-         J : Integer; F : Float; X : Parent  -- TO RESOLVE OVERLOADING.
+      function Create
+        (B : Boolean; L : Length; I : Integer; S : String; J : Integer;
+         F : Float; X : Parent  -- TO RESOLVE OVERLOADING.
          ) return Parent;
 
-      function Con (B : Boolean; L : Length; I : Integer; S : String;
-         J            : Integer) return Parent;
+      function Con
+        (B : Boolean; L : Length; I : Integer; S : String; J : Integer)
+         return Parent;
 
-      function Con (B : Boolean; L : Length; I : Integer;
-         F            : Float) return Parent;
+      function Con
+        (B : Boolean; L : Length; I : Integer; F : Float) return Parent;
 
       function Equal (X, Y : Parent) return Boolean;
 
@@ -89,8 +91,9 @@ procedure C34009l is
 
    package body Pkg is
 
-      function Create (B : Boolean; L : Length; I : Integer; S : String;
-         J               : Integer; F : Float; X : Parent) return Parent
+      function Create
+        (B : Boolean; L : Length; I : Integer; S : String; J : Integer;
+         F : Float; X : Parent) return Parent
       is
       begin
          case B is
@@ -101,15 +104,16 @@ procedure C34009l is
          end case;
       end Create;
 
-      function Con (B : Boolean; L : Length; I : Integer; S : String;
-         J            : Integer) return Parent
+      function Con
+        (B : Boolean; L : Length; I : Integer; S : String; J : Integer)
+         return Parent
       is
       begin
          return (True, L, I, S, J);
       end Con;
 
-      function Con (B : Boolean; L : Length; I : Integer;
-         F            : Float) return Parent
+      function Con
+        (B : Boolean; L : Length; I : Integer; F : Float) return Parent
       is
       begin
          return (False, L, I, F);

@@ -10,11 +10,11 @@ generic
 
 package Ca11022_0.Ca11022_1 is
 
-   procedure Draw_Square (At_Col : in Column; At_Row : in Row;
-      Len                        : in Length);
+   procedure Draw_Square
+     (At_Col : in Column; At_Row : in Row; Len : in Length);
 
-   procedure Draw_Circle (At_Col : in Column; At_Row : in Row;
-      Rad                        : in Radius);
+   procedure Draw_Circle
+     (At_Col : in Column; At_Row : in Row; Rad : in Radius);
 
    -- procedure Draw_Ellipse ...
    -- and other drawings ...

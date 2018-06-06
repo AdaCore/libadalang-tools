@@ -97,9 +97,10 @@ begin
          -- The following procedure will store all of the customer specific
          -- information into the stream.
 
-         procedure Store_Data_In_Stream (Customer : in Fxacb00.Service_Type;
-            Months : in Fxacb00.Months_In_Service_Type;
-            History : in Fxacb00.Service_History_Type)
+         procedure Store_Data_In_Stream
+           (Customer : in Fxacb00.Service_Type;
+            Months   : in Fxacb00.Months_In_Service_Type;
+            History  : in Fxacb00.Service_History_Type)
          is
          begin
             Fxacb00.Service_Type'Output (Util_Stream, Customer);

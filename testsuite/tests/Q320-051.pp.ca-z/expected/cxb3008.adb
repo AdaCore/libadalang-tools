@@ -99,8 +99,8 @@ begin
       -- including the terminating nul char, into the char_array pointed to
       -- by Target.
 
-      procedure String_Copy (Target :    out Ic.Char_Array;
-         Source                     : in     Ic.Char_Array);
+      procedure String_Copy
+        (Target : out Ic.Char_Array; Source : in Ic.Char_Array);
 
       -- The String_Length function returns the length of the nul-terminated
       -- string pointed to by The_String. The nul is not included in the count.
@@ -113,8 +113,9 @@ begin
       -- value returned is zero.
 
 --      type Acc_ptr is access IC.char_array;
-      function String_To_Double (The_String : in Ic.Char_Array;
-         End_Ptr :    Icp.Pointer := null) return Ic.Double;
+      function String_To_Double
+        (The_String : in Ic.Char_Array; End_Ptr : Icp.Pointer := null)
+         return Ic.Double;
 
       -- Use the <string.h> strcpy function as a completion to the procedure
       -- specification. Note that the Ada interface to this C function is in

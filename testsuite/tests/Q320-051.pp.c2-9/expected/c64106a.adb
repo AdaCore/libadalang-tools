@@ -61,16 +61,18 @@ begin
          Rec3 : Rectype := (1, 1, "A");
          Rec4 : Rectype;  -- 80
 
-         procedure Chk_Rectype1 (Rec1 : in     Rectype := (2, 0, "AB");
-            Rec2                      :    out Rectype; Rec3 : in out Rectype);
+         procedure Chk_Rectype1
+           (Rec1 : in     Rectype := (2, 0, "AB"); Rec2 : out Rectype;
+            Rec3 : in out Rectype);
 
          procedure Chk_Rectype2 (Rec : out Rectype);
       end Pkg;
 
       package body Pkg is
 
-         procedure Chk_Rectype1 (Rec1 : in     Rectype := (2, 0, "AB");
-            Rec2                      :    out Rectype; Rec3 : in out Rectype)
+         procedure Chk_Rectype1
+           (Rec1 : in     Rectype := (2, 0, "AB"); Rec2 : out Rectype;
+            Rec3 : in out Rectype)
          is
          begin
             if (Rec1.Constraint /= Ident_Int (10)) then
@@ -120,8 +122,8 @@ begin
 
          type Rectype (Constraint : Int := 80) is private;
 
-         procedure Chk_Rectype1 (Rec1 : in     Rectype; Rec2 : out Rectype;
-            Rec3                      : in out Rectype);
+         procedure Chk_Rectype1
+           (Rec1 : in Rectype; Rec2 : out Rectype; Rec3 : in out Rectype);
 
          procedure Chk_Rectype2 (Rec : out Rectype);
 
@@ -139,8 +141,8 @@ begin
 
       package body Pkg is
 
-         procedure Chk_Rectype1 (Rec1 : in     Rectype; Rec2 : out Rectype;
-            Rec3                      : in out Rectype)
+         procedure Chk_Rectype1
+           (Rec1 : in Rectype; Rec2 : out Rectype; Rec3 : in out Rectype)
          is
          begin
             if (Rec1.Constraint /= Ident_Int (10)) then
@@ -196,8 +198,8 @@ begin
 
          type Rectype (Constraint : Int := 80) is limited private;
 
-         procedure Chk_Rectype1 (Rec1 : in     Rectype; Rec2 : out Rectype;
-            Rec3                      : in out Rectype);
+         procedure Chk_Rectype1
+           (Rec1 : in Rectype; Rec2 : out Rectype; Rec3 : in out Rectype);
 
          procedure Chk_Rectype2 (Rec : out Rectype);
 
@@ -215,8 +217,8 @@ begin
 
       package body Pkg is
 
-         procedure Chk_Rectype1 (Rec1 : in     Rectype; Rec2 : out Rectype;
-            Rec3                      : in out Rectype)
+         procedure Chk_Rectype1
+           (Rec1 : in Rectype; Rec2 : out Rectype; Rec3 : in out Rectype)
          is
          begin
             if (Rec1.Constraint /= Ident_Int (10)) then
@@ -279,8 +281,8 @@ begin
       S2 : String (-5 .. -7)           := "";
       S3 : String (1 .. 0)             := "";
 
-      procedure Chk_Array1 (A1 : in     Atype := Ca1; A2 : out Atype;
-         A3                    : in out Atype)
+      procedure Chk_Array1
+        (A1 : in Atype := Ca1; A2 : out Atype; A3 : in out Atype)
       is
       begin
          if
@@ -327,8 +329,8 @@ begin
          A4 := A2;
       end Chk_Array2;
 
-      procedure Chk_String (S1 : in     String; S2 : in out String;
-         S3                    :    out String)
+      procedure Chk_String
+        (S1 : in String; S2 : in out String; S3 : out String)
       is
       begin
          if

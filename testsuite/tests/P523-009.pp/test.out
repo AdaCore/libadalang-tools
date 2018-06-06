@@ -268,8 +268,9 @@ package body ada_main is
    procedure Ada_Main_Program;
    pragma Import (Ada, Ada_Main_Program, "_ada_test069");
 
-   function main (argc : Integer; argv : System.Address;
-      envp             : System.Address) return Integer
+   function main
+     (argc : Integer; argv : System.Address; envp : System.Address)
+      return Integer
    is
       procedure Initialize (Addr : System.Address);
       pragma Import (C, Initialize, "__gnat_initialize");
@@ -338,8 +339,9 @@ package ada_main is
    procedure adafinal;
    pragma Export (C, adafinal, "adafinal");
 
-   function main (argc : Integer; argv : System.Address;
-      envp             : System.Address) return Integer;
+   function main
+     (argc : Integer; argv : System.Address; envp : System.Address)
+      return Integer;
    pragma Export (C, main, "main");
 
    type Version_32 is mod 2**32;
@@ -957,8 +959,9 @@ package body ada_main is
    procedure Ada_Main_Program;
    pragma Import (Ada, Ada_Main_Program, "_ada_test070");
 
-   function main (argc : Integer; argv : System.Address;
-      envp             : System.Address) return Integer
+   function main
+     (argc : Integer; argv : System.Address; envp : System.Address)
+      return Integer
    is
       procedure Initialize (Addr : System.Address);
       pragma Import (C, Initialize, "__gnat_initialize");
@@ -1025,8 +1028,9 @@ package ada_main is
    procedure adafinal;
    pragma Export (C, adafinal, "adafinal");
 
-   function main (argc : Integer; argv : System.Address;
-      envp             : System.Address) return Integer;
+   function main
+     (argc : Integer; argv : System.Address; envp : System.Address)
+      return Integer;
    pragma Export (C, main, "main");
 
    type Version_32 is mod 2**32;

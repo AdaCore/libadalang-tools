@@ -5,7 +5,8 @@ package body C393001_3 is
 
    function Construct
      (Voltage  : C393001_2.Voltages; ------------------ g
-      Amperage : C393001_2.Amps) return Ground_Fault
+      Amperage : C393001_2.Amps)
+      return Ground_Fault
    is
 
       It : Ground_Fault;

@@ -110,8 +110,8 @@ package C431001_0 is
 
    function Summary (Disk : in Cd_Rom; Tc_Type : in Tc_Type_Id) return String;
 
-   function Catalog_Entry (R : in Recording'Class;
-      Tc_Type                : in Tc_Type_Id) return String;
+   function Catalog_Entry
+     (R : in Recording'Class; Tc_Type : in Tc_Type_Id) return String;
 
    procedure Print (S : in String); -- provides somewhere for the
    -- results of Catalog_Entry to "go", so they don't get optimized away.
@@ -139,8 +139,8 @@ package C431001_0 is
    procedure Tc_Check (N : in Extension_Of_Null; Tc_Type : in Tc_N_Type_Id);
 
    type Null_Extension_Of_Nonnull is new Extension_Of_Null with null record;
-   procedure Tc_Check (N : in Null_Extension_Of_Nonnull;
-      Tc_Type            : in Tc_N_Type_Id);
+   procedure Tc_Check
+     (N : in Null_Extension_Of_Nonnull; Tc_Type : in Tc_N_Type_Id);
 
    procedure Tc_Dispatch (N : in Null_Tagged'Class; Tc_Type : in Tc_N_Type_Id);
 

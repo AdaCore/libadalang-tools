@@ -7,8 +7,8 @@ with Report;
 
 procedure C392d03 is
 
-   type Focus_Ptr is access procedure (P1 : in out C392d03_0.Auto_Focus;
-      P2                                  : in     F392d00.Depth_Of_Field);
+   type Focus_Ptr is access procedure
+     (P1 : in out C392d03_0.Auto_Focus; P2 : in F392d00.Depth_Of_Field);
 
    Basic_Camera   : F392d00.Remote_Camera;
    Auto_Camera1   : C392d03_0.Auto_Focus;

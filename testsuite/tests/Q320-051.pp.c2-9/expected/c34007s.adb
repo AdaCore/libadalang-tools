@@ -50,8 +50,9 @@ procedure C34007s is
 
       type Designated (B : Boolean := True; L : Length := 1) is private;
 
-      function Create (B : Boolean; L : Length; I : Integer; S : String;
-         C               : Component; F : Float) return Designated;
+      function Create
+        (B : Boolean; L : Length; I : Integer; S : String; C : Component;
+         F : Float) return Designated;
 
    private
 
@@ -76,8 +77,9 @@ procedure C34007s is
 
       type Parent is access Designated;
 
-      function Create (B : Boolean; L : Length; I : Integer; S : String;
-         C : Component; F : Float; X : Parent  -- TO RESOLVE OVERLOADING.
+      function Create
+        (B : Boolean; L : Length; I : Integer; S : String; C : Component;
+         F : Float; X : Parent  -- TO RESOLVE OVERLOADING.
          ) return Parent;
 
    end Pkg_P;
@@ -98,8 +100,9 @@ procedure C34007s is
 
    package body Pkg_D is
 
-      function Create (B : Boolean; L : Length; I : Integer; S : String;
-         C               : Component; F : Float) return Designated
+      function Create
+        (B : Boolean; L : Length; I : Integer; S : String; C : Component;
+         F : Float) return Designated
       is
       begin
          case B is
@@ -114,8 +117,9 @@ procedure C34007s is
 
    package body Pkg_P is
 
-      function Create (B : Boolean; L : Length; I : Integer; S : String;
-         C               : Component; F : Float; X : Parent) return Parent
+      function Create
+        (B : Boolean; L : Length; I : Integer; S : String; C : Component;
+         F : Float; X : Parent) return Parent
       is
       begin
          return new Designated'(Create (B, L, I, S, C, F));

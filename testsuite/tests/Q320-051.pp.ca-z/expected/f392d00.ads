@@ -52,8 +52,8 @@ package F392d00 is
 
 private
 
-   procedure Set_Shutter_Speed (C : in out Remote_Camera;
-      Speed                       : in     Shutter_Speed);
+   procedure Set_Shutter_Speed
+     (C : in out Remote_Camera; Speed : in Shutter_Speed);
 
    -- For the basic remote camera, shutter speed might be set as a function of
    -- focus perhaps, thus it is declared as a private operation (usable only

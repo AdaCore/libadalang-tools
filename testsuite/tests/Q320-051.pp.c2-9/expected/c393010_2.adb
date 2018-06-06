@@ -17,8 +17,9 @@ package body C393010_2 is
            Serial_Number => Num);
    end Issue;
 
-   function Issue (Service : C393010_1.Service_Classes; Flight : Natural;
-      Seat                 : String; Meal : C393010_1.Menu) return Charter
+   function Issue
+     (Service : C393010_1.Service_Classes; Flight : Natural; Seat : String;
+      Meal    : C393010_1.Menu) return Charter
    is
    begin
       return Issue;

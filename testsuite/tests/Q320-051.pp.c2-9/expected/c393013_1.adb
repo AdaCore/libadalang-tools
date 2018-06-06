@@ -25,8 +25,8 @@ package body C393013_1 is
       return (Power_Output => Power, Location => 'A');
    end Create;
 
-   function Clone (Obj :    Generator;
-      New_Location     : in Character) return Generator
+   function Clone
+     (Obj : Generator; New_Location : in Character) return Generator
    is
    begin
       return (Power_Output => Obj.Power_Output, Location => New_Location);

@@ -60,8 +60,9 @@ package Ca11017_0 is
 
    -- ... Various other types used by the application.
 
-   procedure Replace (In_The_String : in out String_Rec;
-      At_The_Position : in     Positive; With_The_String : in String_Rec);
+   procedure Replace
+     (In_The_String   : in out String_Rec; At_The_Position : in Positive;
+      With_The_String : in     String_Rec);
 
    -- ... Various other operations used by the application.
 

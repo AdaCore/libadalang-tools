@@ -61,8 +61,9 @@ procedure C974013 is
 
           --========================================================--
 
-   function "+" (Left : Ada.Calendar.Time;
-      Right           : Duration) return Ada.Calendar.Time renames
+   function "+"
+     (Left : Ada.Calendar.Time; Right : Duration) return Ada.Calendar
+     .Time renames
      Ada.Calendar."+";
 
    Allotted_Time : constant Duration := Impdef.Switch_To_New_Task;

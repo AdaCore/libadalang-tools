@@ -8,8 +8,9 @@ package body C640001_2 is
       List.Ops (List.Top) := Op;
    end Add_Op;
 
-   procedure Process_Operand (Operand : in out Tag; List : in Op_List;
-      First_Op                        : in     Positive; Last_Op : in Positive)
+   procedure Process_Operand
+     (Operand : in out Tag; List : in Op_List; First_Op : in Positive;
+      Last_Op : in     Positive)
    is
    begin
       for I in First_Op .. Last_Op loop

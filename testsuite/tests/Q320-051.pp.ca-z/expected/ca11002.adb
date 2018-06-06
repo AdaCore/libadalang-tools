@@ -36,8 +36,8 @@ begin
    -- subprogram, and propagated to the caller. The exception is handled, and
    -- the child subprogram is called again, this time to perform without error.
    declare
-      procedure Convert_File_Mode (File : in out File_Type;
-         New_Mode                       : in     File_Mode) renames
+      procedure Convert_File_Mode
+        (File : in out File_Type; New_Mode : in File_Mode) renames
         Ca11002_0.Ca11002_2;
       New_File : File_Type;
    begin                               -- Raise an exception with this

@@ -79,8 +79,9 @@ package body Cxc7006_1 is
       Expected_Exceptions := new Exception_Array'(Ids);
    end Set_Expected_Exceptions;
 
-   procedure Set_Handler_Test (Index : in Integer;
-      Test_Proc : in Handler_Test_Procedure; Param : in Integer)
+   procedure Set_Handler_Test
+     (Index : in Integer; Test_Proc : in Handler_Test_Procedure;
+      Param : in Integer)
    is
    begin
       if Index in Test_Procs'Range then
@@ -124,10 +125,11 @@ package body Cxc7006_1 is
 
    protected body Pt is
 
-      procedure Handler (Id : in Handler_Id;
-         Cause              : in Ada.Task_Termination.Cause_Of_Termination;
-         T                  : in Ada.Task_Identification.Task_Id;
-         X                  : in Ada.Exceptions.Exception_Occurrence)
+      procedure Handler
+        (Id    : in Handler_Id;
+         Cause : in Ada.Task_Termination.Cause_Of_Termination;
+         T     : in Ada.Task_Identification.Task_Id;
+         X     : in Ada.Exceptions.Exception_Occurrence)
       is
          use type Att.Cause_Of_Termination;
          use type Ati.Task_Id;

@@ -3,8 +3,9 @@
 with Report;
 package body F3a2a00 is
 
-   procedure Tc_Display_Results (Actual : in Tc_Result_Kind;
-      Expected : in Tc_Result_Kind; Message : in String)
+   procedure Tc_Display_Results
+     (Actual  : in Tc_Result_Kind; Expected : in Tc_Result_Kind;
+      Message : in String)
    is
    begin
       if Actual /= Expected then

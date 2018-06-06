@@ -76,7 +76,8 @@ package C392010_0 is
    procedure Proc_W_Ap_And_Cp (Ap : Access_Procedure; Cp : Tagtype_Level_0);
    -- has both access procedure and controlling parameter
 
-   procedure Proc_W_Ap_And_Cp_W_Def (Ap : Access_Procedure := Proc_2'Access;
+   procedure Proc_W_Ap_And_Cp_W_Def
+     (Ap : Access_Procedure := Proc_2'Access;
       Cp : Tagtype_Level_0  := A_Default_Value);   ------------ z
    -- has both access procedure and controlling parameter with defaults
 

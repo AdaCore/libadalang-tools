@@ -2,8 +2,8 @@
 
 with Tctouch;
 package body C3a2001_2 is
-   function Construct (Voltage : Voltages;
-      Amperage                 : Amps) return Basic_Breaker
+   function Construct
+     (Voltage : Voltages; Amperage : Amps) return Basic_Breaker
    is
       It : Basic_Breaker;
    begin

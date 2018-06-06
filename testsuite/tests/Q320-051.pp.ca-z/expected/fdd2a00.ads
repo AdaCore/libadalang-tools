@@ -48,21 +48,22 @@ package Fdd2a00 is
 
    procedure Clear (Stream : in out My_Stream);
 
-   procedure Read (Stream : in out My_Stream; Item : out Stream_Element_Array;
-      Last                :    out Stream_Element_Offset);
+   procedure Read
+     (Stream : in out My_Stream; Item : out Stream_Element_Array;
+      Last   :    out Stream_Element_Offset);
 
    procedure Write (Stream : in out My_Stream; Item : in Stream_Element_Array);
 
    generic
       type T (<>) is limited private;
-      with procedure Actual_Write (Stream : access Root_Stream_Type'Class;
-         Item                             : T);
+      with procedure Actual_Write
+        (Stream : access Root_Stream_Type'Class; Item : T);
       with function Actual_Input
         (Stream : access Root_Stream_Type'Class) return T;
-      with procedure Actual_Read (Stream :     access Root_Stream_Type'Class;
-         Item                            : out T);
-      with procedure Actual_Output (Stream : access Root_Stream_Type'Class;
-         Item                              : T);
+      with procedure Actual_Read
+        (Stream : access Root_Stream_Type'Class; Item : out T);
+      with procedure Actual_Output
+        (Stream : access Root_Stream_Type'Class; Item : T);
    package Counting_Stream_Ops is
 
       procedure Write (Stream : access Root_Stream_Type'Class; Item : T);

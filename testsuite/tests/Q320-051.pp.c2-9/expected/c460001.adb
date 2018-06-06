@@ -18,8 +18,8 @@ procedure C460001 is
    use type C460001_0.Result_Kind;
 
    -----------------------------------------------
-   procedure Target_Is_Level_1 (X :     access C460001_0.Desig;
-      R                           : out C460001_0.Result_Kind)
+   procedure Target_Is_Level_1
+     (X : access C460001_0.Desig; R : out C460001_0.Result_Kind)
    is
    begin
       -- The accessibility level of type Acc_L1 is 1.
@@ -33,8 +33,9 @@ procedure C460001 is
    end Target_Is_Level_1;
 
    -----------------------------------------------
-   procedure Display_Results (Result : in C460001_0.Result_Kind;
-      Expected : in C460001_0.Result_Kind; Message : in String)
+   procedure Display_Results
+     (Result  : in C460001_0.Result_Kind; Expected : in C460001_0.Result_Kind;
+      Message : in String)
    is
    begin
       if Result /= Expected then

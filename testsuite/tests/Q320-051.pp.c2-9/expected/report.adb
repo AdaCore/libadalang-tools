@@ -303,8 +303,8 @@ package body Report is
          return X = Y;
    end Equal;
 
-   function Legal_File_Name (X : File_Num := 1;
-      Nam                      : String   := "") return String
+   function Legal_File_Name
+     (X : File_Num := 1; Nam : String := "") return String
    is
       Suffix : String (2 .. 6);
    begin

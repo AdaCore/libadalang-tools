@@ -1,8 +1,9 @@
 with Report; use Report;
 package body Cd10002_1 is
 
-   procedure Read (Stream : in out Dummy_Stream;
-      Item :    out Stream_Element_Array; Last : out Stream_Element_Offset)
+   procedure Read
+     (Stream : in out Dummy_Stream; Item : out Stream_Element_Array;
+      Last   :    out Stream_Element_Offset)
    is
    begin
       Failed ("Unexpected call to the Read operation of Dummy_Stream");

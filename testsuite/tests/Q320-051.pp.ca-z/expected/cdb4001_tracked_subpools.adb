@@ -2,8 +2,9 @@ with Ada.Unchecked_Deallocation;
 
 package body Cdb4001_Tracked_Subpools is
 
-   function Enclosing_Subpool (Pool : Tracked_Pool;
-      Storage_Address : System.Address) return Tracked_Subpool_Handle
+   function Enclosing_Subpool
+     (Pool : Tracked_Pool; Storage_Address : System.Address)
+      return Tracked_Subpool_Handle
    is
       use Allocator_Info_Maps;
       use Serialized_Allocator_Info_Maps;
@@ -50,10 +51,10 @@ package body Cdb4001_Tracked_Subpools is
       return Storage_Size (Allocated_Storage_Ref'Storage_Pool); -- ???
    end Storage_Size;
 
-   procedure Allocate_From_Subpool (Pool : in out Tracked_Pool;
-      Storage_Address                    :    out System.Address;
+   procedure Allocate_From_Subpool
+     (Pool : in out Tracked_Pool; Storage_Address : out System.Address;
       Size_In_Storage_Elements :    Storage_Count; Alignment : Storage_Count;
-      Subpool                            :    not null Subpools.Subpool_Handle)
+      Subpool                  :        not null Subpools.Subpool_Handle)
    is
 
       Allocated : constant Allocated_Storage_Ref :=
@@ -97,8 +98,8 @@ package body Cdb4001_Tracked_Subpools is
       Tracked_Subpool.First_In_Subpool.Update (Update_Allocation_Ref'Access);
    end Allocate_From_Subpool;
 
-   procedure Deallocate_Subpool (Pool : in out Tracked_Pool;
-      Subpool                         : in out Subpools.Subpool_Handle)
+   procedure Deallocate_Subpool
+     (Pool : in out Tracked_Pool; Subpool : in out Subpools.Subpool_Handle)
    is
       procedure Free is new Ada.Unchecked_Deallocation (Allocated_Storage,
          Allocated_Storage_Ref);

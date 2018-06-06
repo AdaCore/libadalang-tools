@@ -83,17 +83,19 @@ procedure C34006j is
          end case;
       end record;
 
-      function Create (B : Boolean; L : Length; I : Integer; S : String;
-         C : Component; F : Float; X : Parent  -- TO RESOLVE OVERLOADING.
+      function Create
+        (B : Boolean; L : Length; I : Integer; S : String; C : Component;
+         F : Float; X : Parent  -- TO RESOLVE OVERLOADING.
          ) return Parent;
 
       function Equal (X, Y : Parent) return Boolean;
 
-      function Aggr (B : Boolean; L : Length; I : Integer; S : String;
-         C             : Component) return Parent;
+      function Aggr
+        (B : Boolean; L : Length; I : Integer; S : String; C : Component)
+         return Parent;
 
-      function Aggr (B : Boolean; L : Length; I : Integer;
-         F             : Float) return Parent;
+      function Aggr
+        (B : Boolean; L : Length; I : Integer; F : Float) return Parent;
 
    end Pkg_P;
 
@@ -131,8 +133,9 @@ procedure C34006j is
 
    package body Pkg_P is
 
-      function Create (B : Boolean; L : Length; I : Integer; S : String;
-         C               : Component; F : Float; X : Parent) return Parent
+      function Create
+        (B : Boolean; L : Length; I : Integer; S : String; C : Component;
+         F : Float; X : Parent) return Parent
       is
       begin
          return A : Parent (B, L) do
@@ -160,8 +163,9 @@ procedure C34006j is
          end case;
       end Equal;
 
-      function Aggr (B : Boolean; L : Length; I : Integer; S : String;
-         C             : Component) return Parent
+      function Aggr
+        (B : Boolean; L : Length; I : Integer; S : String; C : Component)
+         return Parent
       is
       begin
          return Result : Parent (B, L) do
@@ -171,8 +175,8 @@ procedure C34006j is
          end return;
       end Aggr;
 
-      function Aggr (B : Boolean; L : Length; I : Integer;
-         F             : Float) return Parent
+      function Aggr
+        (B : Boolean; L : Length; I : Integer; F : Float) return Parent
       is
       begin
          return Result : Parent (B, L) do

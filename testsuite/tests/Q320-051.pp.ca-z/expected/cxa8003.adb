@@ -91,8 +91,8 @@ begin
 
          type Mode_Selection_Type is (A, I, Io, O);
 
-         procedure Change_Mode (File : in out Dir_Io.File_Type;
-            To                       : in     Mode_Selection_Type)
+         procedure Change_Mode
+           (File : in out Dir_Io.File_Type; To : in Mode_Selection_Type)
          is
          begin
             case To is

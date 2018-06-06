@@ -11,8 +11,8 @@ package body Ca13001_1.Ca13001_5 is
    -- components defined in the private packages from within the client
    -- program.
 
-   procedure Provide_Transportation (Who : in Family; Get_Key : out Key_Type;
-      Get_Veh                            :    out Boolean)
+   procedure Provide_Transportation
+     (Who : in Family; Get_Key : out Key_Type; Get_Veh : out Boolean)
    is
    begin
       -- Goto work, school, or to the beach.
@@ -28,8 +28,8 @@ package body Ca13001_1.Ca13001_5 is
 
    ----------------------------------------------------------------
 
-   procedure Return_Transportation (What : in     Transportation;
-      Rt_Veh                             :    out Boolean)
+   procedure Return_Transportation
+     (What : in Transportation; Rt_Veh : out Boolean)
    is
    begin
       Family_Transportation.Return_Vehicle (What);

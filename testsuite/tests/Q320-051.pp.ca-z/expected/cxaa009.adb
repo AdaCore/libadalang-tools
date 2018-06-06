@@ -127,8 +127,9 @@ begin
       -- entry was successful, False otherwise. This demonstrates use of
       -- Float_IO using a variety of data formats.
 
-      procedure Update_Loan_Info (The_File : in out Text_Io.File_Type;
-         The_Loan : in     Loan_Info_Type; Status : out Boolean)
+      procedure Update_Loan_Info
+        (The_File : in out Text_Io.File_Type; The_Loan : in Loan_Info_Type;
+         Status   :    out Boolean)
       is
       begin
          Acct_Io.Put (The_File, The_Loan.Account_Balance);

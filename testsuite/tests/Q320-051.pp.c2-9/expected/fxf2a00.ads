@@ -62,7 +62,8 @@ package Fxf2a00 is
       type Operator_Table is array (Optr_Range) of Operator_Ptr;
       type Operand_Table is array (Opnd_Range) of Decimal_Fixed;
 
-   function Operations_Loop (Initial : Decimal_Fixed;
-      Operator : Operator_Table; Operand : Operand_Table) return Decimal_Fixed;
+   function Operations_Loop
+     (Initial : Decimal_Fixed; Operator : Operator_Table;
+      Operand : Operand_Table) return Decimal_Fixed;
 
 end Fxf2a00;

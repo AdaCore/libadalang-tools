@@ -142,8 +142,8 @@ procedure Cxai014 is
 
    My_Inserted : Boolean;
 
-   procedure Tampering_Check (Container : in out My_Bounded_Hashed_Sets.Set;
-      Where                             : in     String) with
+   procedure Tampering_Check
+     (Container : in out My_Bounded_Hashed_Sets.Set; Where : in String) with
       Pre => not Container.Is_Empty
     is
 

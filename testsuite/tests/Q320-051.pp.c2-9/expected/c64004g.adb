@@ -36,8 +36,9 @@ procedure C64004g is
    Y1, Y2, Y3 : Integer := 0;
    O1, O2     : Integer := 0;
 
-   procedure P (I1 :     Integer; I2 : Integer := 2; I3 : Integer := 3;
-      O1, O2, O3   : out Integer)
+   procedure P
+     (I1         :     Integer; I2 : Integer := 2; I3 : Integer := 3;
+      O1, O2, O3 : out Integer)
    is
    begin
       O1 := I1;

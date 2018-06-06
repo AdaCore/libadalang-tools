@@ -134,8 +134,8 @@ package body Cd30001_0 is
 
    Tagged_Object : Tagged_But_Not_Exciting;
 
-   procedure Muck_With_Addresses (It : in out Tagged_But_Not_Exciting;
-      Its_Address                    : in     System.Address)
+   procedure Muck_With_Addresses
+     (It : in out Tagged_But_Not_Exciting; Its_Address : in System.Address)
    is
    begin
       if It'Address /= Its_Address then

@@ -2,8 +2,8 @@
 
 package body Cxf2004_0 is
 
-   procedure Multiply_And_Truncate (Balance : in out Decimal_Fixed;
-      Factor                                : in     Ordinary_Fixed)
+   procedure Multiply_And_Truncate
+     (Balance : in out Decimal_Fixed; Factor : in Ordinary_Fixed)
    is
       Interest : Decimal_Fixed;
    begin
@@ -11,8 +11,8 @@ package body Cxf2004_0 is
       Balance  := Balance + Interest;
    end Multiply_And_Truncate;
 
-   procedure Divide_And_Truncate (Balance : in out Decimal_Fixed;
-      Divisor                             : in     Ordinary_Fixed)
+   procedure Divide_And_Truncate
+     (Balance : in out Decimal_Fixed; Divisor : in Ordinary_Fixed)
    is
       Interest : Decimal_Fixed;
    begin
@@ -20,8 +20,8 @@ package body Cxf2004_0 is
       Balance  := Balance + Interest;
    end Divide_And_Truncate;
 
-   procedure Multiply_And_Round (Balance : in out Decimal_Fixed;
-      Factor                             : in     Ordinary_Fixed)
+   procedure Multiply_And_Round
+     (Balance : in out Decimal_Fixed; Factor : in Ordinary_Fixed)
    is
       Interest : Decimal_Fixed;
    begin
@@ -30,8 +30,8 @@ package body Cxf2004_0 is
       Balance  := Balance + Interest;
    end Multiply_And_Round;
 
-   procedure Divide_And_Round (Balance : in out Decimal_Fixed;
-      Divisor                          : in     Ordinary_Fixed)
+   procedure Divide_And_Round
+     (Balance : in out Decimal_Fixed; Divisor : in Ordinary_Fixed)
    is
       Interest : Decimal_Fixed;
    begin

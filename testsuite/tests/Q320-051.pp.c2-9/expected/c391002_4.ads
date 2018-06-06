@@ -12,11 +12,12 @@ package C391002_4 is -- Communications
 
    type Mil_Comm is new Modules.Electronics_Module with private;
 
-   procedure Creator (Plugs : in     Modules.Electronics_Module;
-      Gives                 :    out Mil_Comm);
+   procedure Creator
+     (Plugs : in Modules.Electronics_Module; Gives : out Mil_Comm);
 
-   function Creator (Key :    Integer;
-      Plugs              : in Modules.Electronics_Module) return Private_Comm;
+   function Creator
+     (Key : Integer; Plugs : in Modules.Electronics_Module)
+      return Private_Comm;
 
    procedure Setup (It : in out Public_Comm; Value : in Integer);
    procedure Setup (It : in out Private_Comm; Value : in Integer);

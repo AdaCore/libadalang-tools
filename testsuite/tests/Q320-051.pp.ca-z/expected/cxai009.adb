@@ -65,8 +65,8 @@ procedure Cxai009 is
    Animal_2 : constant String := "Monkey";
    Animal_3 : constant String := "Ostrich";
 
-   procedure Tampering_Check (Container : in out My_Indefinite_Holders.Holder;
-      Where                             : in     String)
+   procedure Tampering_Check
+     (Container : in out My_Indefinite_Holders.Holder; Where : in String)
    is
 
       Program_Error_Raised : Boolean := False;
@@ -264,8 +264,8 @@ begin
    -- possible use.
 
    declare
-      procedure Test (Value : in String; Expected : in String;
-         Test_Case          : in String)
+      procedure Test
+        (Value : in String; Expected : in String; Test_Case : in String)
       is
       begin
          Tampering_Check (Container => My_Holder_1, Where => Test_Case);

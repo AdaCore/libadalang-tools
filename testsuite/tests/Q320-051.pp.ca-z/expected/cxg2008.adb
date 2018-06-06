@@ -24,8 +24,8 @@ procedure Cxg2008 is
       Mult_Mbe   : constant Real := 5.0;
       Divide_Mbe : constant Real := 13.0;
 
-      procedure Check (Actual, Expected : Complex; Test_Name : String;
-         Mbe                            : Real)
+      procedure Check
+        (Actual, Expected : Complex; Test_Name : String; Mbe : Real)
       is
          Rel_Error : Real;
          Abs_Error : Real;
@@ -295,8 +295,8 @@ procedure Cxg2008 is
       Mult_Mbe   : constant Real := 5.0;
       Divide_Mbe : constant Real := 13.0;
 
-      procedure Check (Actual, Expected : Complex; Test_Name : String;
-         Mbe                            : Real)
+      procedure Check
+        (Actual, Expected : Complex; Test_Name : String; Mbe : Real)
       is
          Rel_Error : Real;
          Abs_Error : Real;
@@ -563,8 +563,8 @@ procedure Cxg2008 is
       Mult_Mbe   : constant Real := 5.0;
       Divide_Mbe : constant Real := 13.0;
 
-      procedure Check (Actual, Expected : Complex; Test_Name : String;
-         Mbe                            : Real)
+      procedure Check
+        (Actual, Expected : Complex; Test_Name : String; Mbe : Real)
       is
          Rel_Error : Real;
          Abs_Error : Real;

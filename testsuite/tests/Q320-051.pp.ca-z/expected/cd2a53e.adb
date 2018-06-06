@@ -99,9 +99,10 @@ begin
             end if;
          end Ident;
 
-         procedure Proc (Cn1in, Cp1in :        Fixed_Element;
-            Cn2inout, Cp2inout        : in out Fixed_Element;
-            Czout                     :    out Fixed_Element)
+         procedure Proc
+           (Cn1in, Cp1in       :        Fixed_Element;
+            Cn2inout, Cp2inout : in out Fixed_Element;
+            Czout              :    out Fixed_Element)
          is
          begin
 

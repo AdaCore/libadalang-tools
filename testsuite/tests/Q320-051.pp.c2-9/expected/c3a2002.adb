@@ -18,8 +18,8 @@ procedure C3a2002 is
    use type C3a2002_0.Result_Kind;
 
    -----------------------------------------------
-   procedure A_Is_Level_1 (X :     access C3a2002_0.Desig;
-      R                      : out C3a2002_0.Result_Kind)
+   procedure A_Is_Level_1
+     (X : access C3a2002_0.Desig; R : out C3a2002_0.Result_Kind)
    is
       -- Dereference of an access_to_object value is aliased.
       Ren : C3a2002_0.Desig renames X.all;      -- Renaming of a dereference
@@ -35,8 +35,9 @@ procedure C3a2002 is
    end A_Is_Level_1;
 
    -----------------------------------------------
-   procedure Display_Results (Result : in C3a2002_0.Result_Kind;
-      Expected : in C3a2002_0.Result_Kind; Message : in String)
+   procedure Display_Results
+     (Result  : in C3a2002_0.Result_Kind; Expected : in C3a2002_0.Result_Kind;
+      Message : in String)
    is
    begin
       if Result /= Expected then

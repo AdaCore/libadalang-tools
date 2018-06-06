@@ -62,8 +62,8 @@ begin
          Rec_Oops            : Rectype (4);
 
          task T is
-            entry E (Rec1 : in     Rectype; Rec2 : in out Rectype;
-               Rec3       :    out Rectype);
+            entry E
+              (Rec1 : in Rectype; Rec2 : in out Rectype; Rec3 : out Rectype);
          end T;
 
       end Pkg;
@@ -72,8 +72,8 @@ begin
 
          task body T is
          begin
-            accept E (Rec1 : in     Rectype; Rec2 : in out Rectype;
-               Rec3        :    out Rectype) do
+            accept E
+              (Rec1 : in Rectype; Rec2 : in out Rectype; Rec3 : out Rectype) do
 
                if (not Rec1'Constrained) or (Rec1.Constraint /= Ident_Int (9))
                then
@@ -132,8 +132,8 @@ begin
          type Rectype (Constraint : Intrange := 15) is private;
 
          task T is
-            entry E (Rec1 : in     Rectype; Rec2 : in out Rectype;
-               Rec3       :    out Rectype);
+            entry E
+              (Rec1 : in Rectype; Rec2 : in out Rectype; Rec3 : out Rectype);
          end T;
 
       private
@@ -151,8 +151,8 @@ begin
 
          task body T is
          begin
-            accept E (Rec1 : in     Rectype; Rec2 : in out Rectype;
-               Rec3        :    out Rectype) do
+            accept E
+              (Rec1 : in Rectype; Rec2 : in out Rectype; Rec3 : out Rectype) do
 
                if (not Rec1'Constrained) or (Rec1.Constraint /= Ident_Int (9))
                then
@@ -211,8 +211,8 @@ begin
          type Rectype (Constraint : Intrange := 15) is limited private;
 
          task T is
-            entry E (Rec1 : in     Rectype; Rec2 : in out Rectype;
-               Rec3       :    out Rectype);
+            entry E
+              (Rec1 : in Rectype; Rec2 : in out Rectype; Rec3 : out Rectype);
          end T;
 
       private
@@ -230,8 +230,8 @@ begin
 
          task body T is
          begin
-            accept E (Rec1 : in     Rectype; Rec2 : in out Rectype;
-               Rec3        :    out Rectype) do
+            accept E
+              (Rec1 : in Rectype; Rec2 : in out Rectype; Rec3 : out Rectype) do
 
                if (not Rec1'Constrained) or (Rec1.Constraint /= 9) then
                   Failed

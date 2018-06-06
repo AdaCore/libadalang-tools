@@ -47,9 +47,11 @@ procedure C34005m is
 
       type Parent is array (Index range <>, Index range <>) of Component;
 
-      function Create (F1, L1 : Index; F2, L2 : Index; C : Component;
-         Dummy                : Parent   -- TO RESOLVE OVERLOADING.
-         ) return Parent;
+      function Create
+        (F1, L1 : Index; F2, L2 : Index; C : Component;
+         Dummy  : Parent   -- TO RESOLVE OVERLOADING.
+        )
+         return Parent;
 
    end Pkg;
 
@@ -82,8 +84,9 @@ procedure C34005m is
 
    package body Pkg is
 
-      function Create (F1, L1 : Index; F2, L2 : Index; C : Component;
-         Dummy                : Parent) return Parent
+      function Create
+        (F1, L1 : Index; F2, L2 : Index; C : Component; Dummy : Parent)
+         return Parent
       is
          A : Parent (F1 .. L1, F2 .. L2);
          B : Component := C;

@@ -12,8 +12,8 @@ package Ca11003_0.Ca11003_1 is          -- Child package OS.Operations
 
    procedure Create_File (Mode : in File_Mode; File : out Extended_File_Type);
 
-   procedure Duplicate_File (Original : in     Extended_File_Type;
-      Duplicate                       :    out Extended_File_Type);
+   procedure Duplicate_File
+     (Original : in Extended_File_Type; Duplicate : out Extended_File_Type);
 
 private
    type Extended_File_Type is new File_Type with record

@@ -2,8 +2,8 @@
 
 package body C730002_3 is
 
-   procedure Routine_Maintenance (E : in out Electric_Series;
-      Sr                            : in     Specialist_Id := Curly)
+   procedure Routine_Maintenance
+     (E : in out Electric_Series; Sr : in Specialist_Id := Curly)
    is
    begin
       E.Ave_Repair_Time          := 9;

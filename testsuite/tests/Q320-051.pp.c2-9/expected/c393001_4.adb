@@ -3,7 +3,8 @@ package body C393001_4 is
 
    function Construct
      (Voltage  : C393001_2.Voltages; --------------- i
-      Amperage : C393001_2.Amps) return Special_Breaker
+      Amperage : C393001_2.Amps)
+      return Special_Breaker
    is
       It : Special_Breaker;
       procedure Set_Root (It : in out C393001_2.Basic_Breaker) is

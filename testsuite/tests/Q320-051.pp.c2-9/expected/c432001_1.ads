@@ -10,8 +10,9 @@ package C432001_1 is
       Period : Periods := C432001_1.Quaternary;
    end record;
 
-   function Check (Rec : in N_N; N : in Natural; E : in C432001_0.Eras;
-      P                : in Periods) return Boolean;
+   function Check
+     (Rec : in N_N; N : in Natural; E : in C432001_0.Eras; P : in Periods)
+      return Boolean;
 
    type N_P is new C432001_0.N with private;
 

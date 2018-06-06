@@ -57,8 +57,9 @@ procedure C34007r is
 
       type Parent is access Designated;
 
-      function Create (B : Boolean; L : Length; I : Integer; S : String;
-         C : Component; F : Float; X : Parent  -- TO RESOLVE OVERLOADING.
+      function Create
+        (B : Boolean; L : Length; I : Integer; S : String; C : Component;
+         F : Float; X : Parent  -- TO RESOLVE OVERLOADING.
          ) return Parent;
 
    end Pkg;
@@ -76,8 +77,9 @@ procedure C34007r is
 
    package body Pkg is
 
-      function Create (B : Boolean; L : Length; I : Integer; S : String;
-         C               : Component; F : Float; X : Parent) return Parent
+      function Create
+        (B : Boolean; L : Length; I : Integer; S : String; C : Component;
+         F : Float; X : Parent) return Parent
       is
       begin
          case B is

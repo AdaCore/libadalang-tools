@@ -30,8 +30,8 @@ procedure Cxc3001 is
 
                  --===--===--===--===--===--===--===--===--===--
 
-   procedure Check_Attachments (Isreserved : in Interrupt_Array;
-      Expected_Value                       : in Boolean)
+   procedure Check_Attachments
+     (Isreserved : in Interrupt_Array; Expected_Value : in Boolean)
    is
       Fail_Count : Natural := 0;
    begin

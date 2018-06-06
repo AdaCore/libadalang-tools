@@ -181,17 +181,19 @@ begin
       Xat1 : Task1 renames At1.all;
 
       task type Task2 is
-         entry Entry1 (Ti1 : out Integer; Ta1 : out Array1; Tr1 : out Record1;
-            Tp1            : in out Pointer1; Tv1 : in out Pack1.Privy;
-            Tt1            : in out Task1; Tk1 : in out Integer);
+         entry Entry1
+           (Ti1 :    out Integer; Ta1 : out Array1; Tr1 : out Record1;
+            Tp1 : in out Pointer1; Tv1 : in out Pack1.Privy;
+            Tt1 : in out Task1; Tk1 : in out Integer);
       end Task2;
 
       I          : Integer;
       A_Chk_Task : Task2;
 
-      procedure Proc1 (Pi1 : in out Integer; Pa1 : in out Array1;
-         Pr1 : in out Record1; Pp1 : out Pointer1; Pv1 : out Pack1.Privy;
-         Pt1               : in out Task1; Pk1 : out Integer)
+      procedure Proc1
+        (Pi1 : in out Integer; Pa1 : in out Array1; Pr1 : in out Record1;
+         Pp1 :    out Pointer1; Pv1 : out Pack1.Privy; Pt1 : in out Task1;
+         Pk1 :    out Integer)
       is
 
       begin
@@ -206,9 +208,11 @@ begin
 
       task body Task2 is
       begin
-         accept Entry1 (Ti1 : out Integer; Ta1 : out Array1; Tr1 : out Record1;
-            Tp1             : in out Pointer1; Tv1 : in out Pack1.Privy;
-            Tt1             : in out Task1; Tk1 : in out Integer) do
+         accept Entry1
+           (Ti1 :    out Integer; Ta1 : out Array1; Tr1 : out Record1;
+            Tp1 : in out Pointer1; Tv1 : in out Pack1.Privy;
+            Tt1 : in out Task1; Tk1 : in out Integer)
+         do
             Ti1 := Ai1.all + 1;
             Ta1 := (Aa1.all (1) + 1, Aa1.all (2) + 1, Aa1.all (3) + 1);
             Tr1 := (D => 1, Field1 => Ar1.all.Field1 + 1);

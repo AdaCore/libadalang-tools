@@ -65,11 +65,13 @@ private package Ca12001_Win.Impl is
 
    procedure Close (Win : in out Low_Win_Type);
 
-   procedure Set_Size (Win : in out Low_Win_Type; Width : in Window_Size;
-      Height               : in     Window_Size);
+   procedure Set_Size
+     (Win    : in out Low_Win_Type; Width : in Window_Size;
+      Height : in     Window_Size);
 
-   procedure Get_Size (Win : in     Low_Win_Type; Width : out Window_Size;
-      Height               :    out Window_Size);
+   procedure Get_Size
+     (Win    : in     Low_Win_Type; Width : out Window_Size;
+      Height :    out Window_Size);
 
 private
    type Low_Win_Type is record

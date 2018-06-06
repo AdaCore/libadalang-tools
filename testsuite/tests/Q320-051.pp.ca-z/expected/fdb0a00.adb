@@ -5,8 +5,8 @@ package body Fdb0a00 is
 
    Largest_Request_On_Record : System.Storage_Elements.Storage_Count := 0;
 
-   procedure Allocate (Pool    : in out Stack_Heap;
-      Storage_Address          :    out System.Address;
+   procedure Allocate
+     (Pool : in out Stack_Heap; Storage_Address : out System.Address;
       Size_In_Storage_Elements : in     System.Storage_Elements.Storage_Count;
       Alignment                : in     System.Storage_Elements.Storage_Count)
    is
@@ -38,8 +38,8 @@ package body Fdb0a00 is
          raise Pool_Overflow;  -- in case I missed an edge
    end Allocate;
 
-   procedure Deallocate (Pool  : in out Stack_Heap;
-      Storage_Address          : in     System.Address;
+   procedure Deallocate
+     (Pool : in out Stack_Heap; Storage_Address : in System.Address;
       Size_In_Storage_Elements : in     System.Storage_Elements.Storage_Count;
       Alignment                : in     System.Storage_Elements.Storage_Count)
    is

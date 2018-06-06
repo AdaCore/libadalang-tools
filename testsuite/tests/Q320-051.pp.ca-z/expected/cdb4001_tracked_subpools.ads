@@ -21,15 +21,17 @@ package Cdb4001_Tracked_Subpools is
    type Tracked_Subpool_Handle is access all Tracked_Subpool'Class;
    for Tracked_Subpool_Handle'Storage_Size use 0;
 
-   function Enclosing_Subpool (Pool : Tracked_Pool;
-      Storage_Address : System.Address) return Tracked_Subpool_Handle;
+   function Enclosing_Subpool
+     (Pool : Tracked_Pool; Storage_Address : System.Address)
+      return Tracked_Subpool_Handle;
    -- If the given address points into a block of storage that was returned by
    -- a previous call to this Pool type's Allocate (and was not subsequently
    -- freed), then return a reference to the enclosing subpool. Otherwise, the
    -- result is undefined.
 
-   function Enclosing_Subpool (Pool : Tracked_Pool;
-      Storage_Address : System.Address) return Subpools.Subpool_Handle is
+   function Enclosing_Subpool
+     (Pool : Tracked_Pool; Storage_Address : System.Address) return Subpools
+     .Subpool_Handle is
      (Subpools.Subpool_Handle
         (Tracked_Subpool_Handle'(Enclosing_Subpool (Pool, Storage_Address))));
 
@@ -43,13 +45,13 @@ package Cdb4001_Tracked_Subpools is
 private
    overriding function Storage_Size (Pool : Tracked_Pool) return Storage_Count;
 
-   overriding procedure Allocate_From_Subpool (Pool : in out Tracked_Pool;
-      Storage_Address                               :    out System.Address;
+   overriding procedure Allocate_From_Subpool
+     (Pool : in out Tracked_Pool; Storage_Address : out System.Address;
       Size_In_Storage_Elements :    Storage_Count; Alignment : Storage_Count;
-      Subpool :        not null Subpools.Subpool_Handle);
+      Subpool                  :        not null Subpools.Subpool_Handle);
 
-   overriding procedure Deallocate_Subpool (Pool : in out Tracked_Pool;
-      Subpool : in out Subpools.Subpool_Handle);
+   overriding procedure Deallocate_Subpool
+     (Pool : in out Tracked_Pool; Subpool : in out Subpools.Subpool_Handle);
 
    use Ada.Containers;
    use System;

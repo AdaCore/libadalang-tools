@@ -63,8 +63,8 @@ procedure C990001 is
      (A => "Before Activation", B => "During Activation",
       C => "During Execution ", D => "After Execution  ");
 
-   function Check (S : String; Call, B1, Term, B2 : Boolean;
-      E              : Enum) return Boolean
+   function Check
+     (S : String; Call, B1, Term, B2 : Boolean; E : Enum) return Boolean
    is
    begin
       if Call /= B1 then

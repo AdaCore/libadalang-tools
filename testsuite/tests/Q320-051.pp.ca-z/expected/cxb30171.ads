@@ -60,9 +60,10 @@ package Cxb30171 is
    pragma Export (C, Global,
       Impdef.Cxb30171_Global_External_Name);    -- N/A => ERROR
 
-   procedure Ada_Doubler (Inout1 : in out Interfaces.C.Int;
-      Inout2 : in out Interfaces.C.Short; Inout3 : in out Interfaces.C.C_Float;
-      Inout4                     : in out Interfaces.C.Double);
+   procedure Ada_Doubler
+     (Inout1 : in out Interfaces.C.Int; Inout2 : in out Interfaces.C.Short;
+      Inout3 : in out Interfaces.C.C_Float;
+      Inout4 : in out Interfaces.C.Double);
    -- Double the value of each of the parameters.
    pragma Export (C, Ada_Doubler,
       Impdef.Cxb30171_Proc_External_Name);      -- N/A => ERROR

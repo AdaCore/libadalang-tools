@@ -133,8 +133,9 @@ begin
          (Priority_2q, 203));
 
       task type Message_Task is
-         entry Start (Numb : in Message_Number;
-            Task_Priority  : in System.Priority; Task_Id : out Ati.Task_Id);
+         entry Start
+           (Numb    : in Message_Number; Task_Priority : in System.Priority;
+            Task_Id :    out Ati.Task_Id);
       end Message_Task;
       type Acc_Message_Task is access Message_Task;
 
@@ -213,8 +214,10 @@ begin
       task body Message_Task is
          This_Message_Number : Message_Number;
       begin
-         accept Start (Numb : in Message_Number;
-            Task_Priority   : in System.Priority; Task_Id : out Ati.Task_Id) do
+         accept Start
+           (Numb    : in Message_Number; Task_Priority : in System.Priority;
+            Task_Id :    out Ati.Task_Id)
+         do
 
             -- Set the priority of the task (uses the default
             --          Ada.Task_Identification.Current_Task)

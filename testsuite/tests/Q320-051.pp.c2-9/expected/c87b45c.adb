@@ -80,24 +80,27 @@ begin
       function "*" (X, Y : Integer) return Citrus renames F1;
 
       task T1 is
-         entry E1 (I1 : Integer := F1 (0, 0); W1 : Whole := F1 (0, 0);
-            C1        : Citrus  := F1 (0, 0); H1 : Hue := F1 (0, 0);
-            I2        : Integer := "*" (0, 0); W2 : Whole := "*" (0, 0);
-            C2        : Citrus  := "*" (0, 0); H2 : Hue := "*" (0, 0);
-            I3        : Integer := (0 * 0); W3 : Whole := (0 * 0);
+         entry E1
+           (I1 : Integer := F1 (0, 0); W1 : Whole := F1 (0, 0);
+            C1 : Citrus  := F1 (0, 0); H1 : Hue := F1 (0, 0);
+            I2 : Integer := "*" (0, 0); W2 : Whole := "*" (0, 0);
+            C2 : Citrus  := "*" (0, 0); H2 : Hue := "*" (0, 0);
+            I3 : Integer := (0 * 0); W3 : Whole := (0 * 0);
             C3 : Citrus := (0 * 0); H3 : Hue := (0 * 0); C4 : Citrus := Orange;
-            H4        : Hue     := Orange);
+            H4 : Hue     := Orange);
       end T1;
 
       task body T1 is
       begin
-         accept E1 (I1 : Integer := F1 (0, 0); W1 : Whole := F1 (0, 0);
-            C1         : Citrus  := F1 (0, 0); H1 : Hue := F1 (0, 0);
-            I2         : Integer := "*" (0, 0); W2 : Whole := "*" (0, 0);
-            C2         : Citrus  := "*" (0, 0); H2 : Hue := "*" (0, 0);
-            I3         : Integer := (0 * 0); W3 : Whole := (0 * 0);
+         accept E1
+           (I1 : Integer := F1 (0, 0); W1 : Whole := F1 (0, 0);
+            C1 : Citrus  := F1 (0, 0); H1 : Hue := F1 (0, 0);
+            I2 : Integer := "*" (0, 0); W2 : Whole := "*" (0, 0);
+            C2 : Citrus  := "*" (0, 0); H2 : Hue := "*" (0, 0);
+            I3 : Integer := (0 * 0); W3 : Whole := (0 * 0);
             C3 : Citrus := (0 * 0); H3 : Hue := (0 * 0); C4 : Citrus := Orange;
-            H4         : Hue     := Orange) do
+            H4 : Hue     := Orange)
+         do
 
             if I1 /= -1 or W1 /= 0 or Citrus'Pos (C1) /= 2 or Hue'Pos (H1) /= 1
             then

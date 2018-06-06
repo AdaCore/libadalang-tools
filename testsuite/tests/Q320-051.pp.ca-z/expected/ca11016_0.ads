@@ -63,8 +63,9 @@ package Ca11016_0 is
 
    procedure Initialize_Basic_Map (Map : in out Map_Type);
 
-   function Get_Physical_Feature (Lat : Latitude; Long : Longitude;
-      Map                             : Map_Type) return Physical_Features;
+   function Get_Physical_Feature
+     (Lat : Latitude; Long : Longitude; Map : Map_Type)
+      return Physical_Features;
 
 private
    type Map_Type is array (Latitude, Longitude) of Physical_Features;

@@ -3,8 +3,8 @@ package body Cd10002_Priv is
      T1_Ops.Write;
    function Input (Stream : access Root_Stream_Type'Class) return T1 renames
      T1_Ops.Input;
-   procedure Read (Stream :     access Root_Stream_Type'Class;
-      Item                : out T1) renames
+   procedure Read
+     (Stream : access Root_Stream_Type'Class; Item : out T1) renames
      T1_Ops.Read;
    procedure Output (Stream : access Root_Stream_Type'Class; Item : T1) renames
      T1_Ops.Output;
@@ -13,8 +13,8 @@ package body Cd10002_Priv is
      T2_Ops.Write;
    function Input (Stream : access Root_Stream_Type'Class) return T2 renames
      T2_Ops.Input;
-   procedure Read (Stream :     access Root_Stream_Type'Class;
-      Item                : out T2) renames
+   procedure Read
+     (Stream : access Root_Stream_Type'Class; Item : out T2) renames
      T2_Ops.Read;
    procedure Output (Stream : access Root_Stream_Type'Class; Item : T2) renames
      T2_Ops.Output;

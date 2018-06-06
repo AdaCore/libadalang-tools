@@ -62,8 +62,8 @@ begin
             Strfld : String (1 .. Constraint);
          end record;
 
-         procedure P (Rec1 : in     Rectype; Rec2 : in out Rectype;
-            Rec3           :    out Rectype);
+         procedure P
+           (Rec1 : in Rectype; Rec2 : in out Rectype; Rec3 : out Rectype);
       end Pkg;
 
       Rec91, Rec92, Rec93 : Pkg.Rectype :=
@@ -72,12 +72,12 @@ begin
 
       package body Pkg is
 
-         procedure P (Rec1 : in     Rectype; Rec2 : in out Rectype;
-            Rec3           :    out Rectype)
+         procedure P
+           (Rec1 : in Rectype; Rec2 : in out Rectype; Rec3 : out Rectype)
          is
 
-            procedure P1 (Rec11 : in     Rectype; Rec12 : in out Rectype;
-               Rec13            :    out Rectype)
+            procedure P1
+              (Rec11 : in Rectype; Rec12 : in out Rectype; Rec13 : out Rectype)
             is
             begin
 
@@ -138,8 +138,8 @@ begin
 
          type Rectype (Constraint : Intrange := 15) is private;
 
-         procedure P (Rec1 : in     Rectype; Rec2 : in out Rectype;
-            Rec3           :    out Rectype);
+         procedure P
+           (Rec1 : in Rectype; Rec2 : in out Rectype; Rec3 : out Rectype);
 
       private
 
@@ -154,12 +154,12 @@ begin
 
       package body Pkg is
 
-         procedure P (Rec1 : in     Rectype; Rec2 : in out Rectype;
-            Rec3           :    out Rectype)
+         procedure P
+           (Rec1 : in Rectype; Rec2 : in out Rectype; Rec3 : out Rectype)
          is
 
-            procedure P1 (Rec11 : in     Rectype; Rec12 : in out Rectype;
-               Rec13            :    out Rectype)
+            procedure P1
+              (Rec11 : in Rectype; Rec12 : in out Rectype; Rec13 : out Rectype)
             is
             begin
 
@@ -212,8 +212,8 @@ begin
 
          type Rectype (Constraint : Intrange := 15) is limited private;
 
-         procedure P (Rec1 : in     Rectype; Rec2 : in out Rectype;
-            Rec3           :    out Rectype);
+         procedure P
+           (Rec1 : in Rectype; Rec2 : in out Rectype; Rec3 : out Rectype);
 
       private
 
@@ -228,12 +228,12 @@ begin
 
       package body Pkg is
 
-         procedure P (Rec1 : in     Rectype; Rec2 : in out Rectype;
-            Rec3           :    out Rectype)
+         procedure P
+           (Rec1 : in Rectype; Rec2 : in out Rectype; Rec3 : out Rectype)
          is
 
-            procedure P1 (Rec11 : in     Rectype; Rec12 : in out Rectype;
-               Rec13            :    out Rectype)
+            procedure P1
+              (Rec11 : in Rectype; Rec12 : in out Rectype; Rec13 : out Rectype)
             is
             begin
 

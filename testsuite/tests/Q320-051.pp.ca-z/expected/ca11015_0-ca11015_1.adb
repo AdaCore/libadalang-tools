@@ -2,15 +2,17 @@
 
 package body Ca11015_0.Ca11015_1 is
 
-   function Get_Feature_Val (Lat : Latitude; Long : Longitude;
-      Map                        : Feature_Map) return Generic_Feature
+   function Get_Feature_Val
+     (Lat : Latitude; Long : Longitude; Map : Feature_Map)
+      return Generic_Feature
    is
    begin
       return (Map.Feature (Lat, Long));
    end Get_Feature_Val;
    ---------------------------------------------------
-   procedure Set_Feature_Val (Lat : in Latitude; Long : in Longitude;
-      Fea : in Generic_Feature; Map : in out Feature_Map)
+   procedure Set_Feature_Val
+     (Lat : in     Latitude; Long : in Longitude; Fea : in Generic_Feature;
+      Map : in out Feature_Map)
    is
    begin
       if Get_Physical_Feature (Lat, Long, Basic_Map) = Unexplored

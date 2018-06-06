@@ -7,10 +7,8 @@ package body Cc70a01_0 is  -- Generic complex matrix operations.
                --==============================================--
 
    function Inner_Product
-     (Left,
-      Right : Complex_Matrix_Type;
-      Row,
-      Column : Positive)    -- Compute inner product
+     (Left, Right : Complex_Matrix_Type;
+      Row, Column : Positive)    -- Compute inner product
       return Complex_Package.Complex_Type
    is           -- for matrix-multiply.
 
@@ -39,8 +37,9 @@ package body Cc70a01_0 is  -- Generic complex matrix operations.
 
                --==============================================--
 
-   function "*" (Left : Complex_Matrix_Type;
-      Right           : Complex_Matrix_Type) return Complex_Matrix_Type
+   function "*"
+     (Left : Complex_Matrix_Type; Right : Complex_Matrix_Type)
+      return Complex_Matrix_Type
    is
 
       subtype Rows is Positive range Left'Range (1);

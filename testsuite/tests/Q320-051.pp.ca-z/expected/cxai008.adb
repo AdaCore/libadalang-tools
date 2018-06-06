@@ -96,9 +96,9 @@ procedure Cxai008 is
 
    Xml_Syntax_Error : exception;
 
-   procedure Parse_Subtree (Input : in     String; Start : in out Positive;
-      Tree : in out Node_Tree.Tree; Parent : in Node_Tree.Cursor;
-      End_Of_Children             :    out Boolean)
+   procedure Parse_Subtree
+     (Input : in String; Start : in out Positive; Tree : in out Node_Tree.Tree;
+      Parent : in Node_Tree.Cursor; End_Of_Children : out Boolean)
    is
       -- Parse Input starting at Start, create an appropriate subtree, and
       -- append it as a child to the designated parent. Update Start to

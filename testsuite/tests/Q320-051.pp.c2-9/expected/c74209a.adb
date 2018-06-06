@@ -85,9 +85,9 @@ begin
 
       end Pack;
 
-      procedure Proc1 (X : in out Pack.Priv;
-         Y : in     Pack.Priv := Pack.Priv_Const_In; Z : out Pack.Priv;
-         U               :        Pack.Priv)
+      procedure Proc1
+        (X : in out Pack.Priv; Y : in Pack.Priv := Pack.Priv_Const_In;
+         Z :    out Pack.Priv; U : Pack.Priv)
       is
       begin
 
@@ -101,8 +101,9 @@ begin
 
       end Proc1;
 
-      procedure Proc2 (X : in out Lim_Priv; Y : in Lim_Priv;
-         Z               : in out Lim_Priv; U : Lim_Priv)
+      procedure Proc2
+        (X : in out Lim_Priv; Y : in Lim_Priv; Z : in out Lim_Priv;
+         U :        Lim_Priv)
       is
       begin
 

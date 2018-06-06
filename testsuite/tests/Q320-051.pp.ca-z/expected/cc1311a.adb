@@ -322,8 +322,8 @@ procedure Cc1311a is
 
    generic
       type T is (<>);
-      with procedure P (Results : out T;
-         X                      :     T := T'Val (Report.Ident_Int (0)));
+      with procedure P
+        (Results : out T; X : T := T'Val (Report.Ident_Int (0)));
    package Pkg2 is
    end Pkg2;
 

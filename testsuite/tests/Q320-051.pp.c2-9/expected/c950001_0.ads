@@ -60,8 +60,8 @@ package C950001_0 is
       Synchronization => By_Protected_Procedure;
    procedure Lock (L : in out Spinlock) is abstract with
       Synchronization => By_Entry;
-   procedure Try_Lock (L : in out Spinlock;
-      Success            :    out Boolean) is abstract with
+   procedure Try_Lock
+     (L : in out Spinlock; Success : out Boolean) is abstract with
       Synchronization => Optional;
    procedure Unlock_2 (L : in out Spinlock) is abstract with
       Synchronization => Optional;

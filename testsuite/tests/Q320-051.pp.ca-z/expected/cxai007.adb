@@ -86,8 +86,8 @@ procedure Cxai007 is
    My_Cursor_2               : My_Multiway_Trees.Cursor;
    Second_Child_Cursor_1     : My_Multiway_Trees.Cursor;
 
-   procedure Tampering_Check (Container : in out My_Multiway_Trees.Tree;
-      Where                             : in     String)
+   procedure Tampering_Check
+     (Container : in out My_Multiway_Trees.Tree; Where : in String)
    is
 
       Program_Error_Raised : Boolean := False;

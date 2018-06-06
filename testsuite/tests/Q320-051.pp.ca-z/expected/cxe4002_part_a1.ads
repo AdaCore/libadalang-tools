@@ -11,17 +11,18 @@ package Cxe4002_Part_A1 is
    subtype Record_Data is Cxe4002_Common.Record_Data;
 
    -- simple integer and float tests
-   procedure Check_In (Little : in Little_Number; Real : in Float;
-      Int                     : in Integer);
-   procedure Set_Out (Little : out Little_Number; Real : out Float;
-      Int                    : out Integer);
-   procedure Decr (Little : in out Little_Number; Real : in out Float;
-      Int                 : in out Integer);
+   procedure Check_In
+     (Little : in Little_Number; Real : in Float; Int : in Integer);
+   procedure Set_Out
+     (Little : out Little_Number; Real : out Float; Int : out Integer);
+   procedure Decr
+     (Little : in out Little_Number; Real : in out Float;
+      Int    : in out Integer);
 
    -- record tests
    function Current_Record (Name : Description) return Record_Data;
-   procedure Update_Record (Old_Data : in     Record_Data;
-      New_Data                       :    out Record_Data);
+   procedure Update_Record
+     (Old_Data : in Record_Data; New_Data : out Record_Data);
 
    -- array tests
    function "+" (A, B : in Integer_Vector) return Integer_Vector;

@@ -64,8 +64,8 @@ package body C431001_0 is
 
    end Summary;
 
-   function Catalog_Entry (R : in Recording'Class;
-      Tc_Type                : in Tc_Type_Id) return String
+   function Catalog_Entry
+     (R : in Recording'Class; Tc_Type : in Tc_Type_Id) return String
    is
    begin
       return Summary (R, Tc_Type); -- dispatched call
@@ -104,8 +104,8 @@ package body C431001_0 is
       end if;
    end Tc_Check;
 
-   procedure Tc_Check (N : in Null_Extension_Of_Nonnull;
-      Tc_Type            : in Tc_N_Type_Id)
+   procedure Tc_Check
+     (N : in Null_Extension_Of_Nonnull; Tc_Type : in Tc_N_Type_Id)
    is
    begin
       if Tc_Type /= Tc_Null_Extension_Of_Nonnull then

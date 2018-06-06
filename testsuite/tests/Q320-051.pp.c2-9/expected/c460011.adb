@@ -82,11 +82,11 @@ procedure C460011 is
    generic
       type Source is delta <> digits <>;
       type Target is mod <>;
-   procedure Decimal_Conversion_Check (For_The_Value : Source;
-      Message                                        : String);
+   procedure Decimal_Conversion_Check
+     (For_The_Value : Source; Message : String);
 
-   procedure Decimal_Conversion_Check (For_The_Value : Source;
-      Message                                        : String)
+   procedure Decimal_Conversion_Check
+     (For_The_Value : Source; Message : String)
    is
 
       Item : Target;

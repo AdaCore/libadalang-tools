@@ -90,9 +90,11 @@ procedure C34005u is
 
       type Parent is array (Index range <>, Index range <>) of Component;
 
-      function Create (F1, L1 : Index; F2, L2 : Index; C : Component;
-         Dummy                : Parent   -- TO RESOLVE OVERLOADING.
-         ) return Parent;
+      function Create
+        (F1, L1 : Index; F2, L2 : Index; C : Component;
+         Dummy  : Parent   -- TO RESOLVE OVERLOADING.
+        )
+         return Parent;
 
       function Equal (X, Y : Parent) return Boolean;
 
@@ -139,8 +141,9 @@ procedure C34005u is
 
    package body Pkg_P is
 
-      function Create (F1, L1 : Index; F2, L2 : Index; C : Component;
-         Dummy                : Parent) return Parent
+      function Create
+        (F1, L1 : Index; F2, L2 : Index; C : Component; Dummy : Parent)
+         return Parent
       is
          B : Component;
       begin

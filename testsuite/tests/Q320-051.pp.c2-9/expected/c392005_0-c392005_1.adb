@@ -9,8 +9,8 @@ package body C392005_0.C392005_1 is
    end Focus;
 
    ---------------------------------------------------------------
-   procedure Set_Shutter_Speed (C : in out Auto_Speed;
-      Speed                       : in     Shutter_Speed)
+   procedure Set_Shutter_Speed
+     (C : in out Auto_Speed; Speed : in Shutter_Speed)
    is
    begin
       -- Artificial for testing purposes.

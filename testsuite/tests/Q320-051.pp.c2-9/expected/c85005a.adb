@@ -72,9 +72,10 @@ procedure C85005a is
    end Task1;
 
    task type Task2 is
-      entry Entry1 (Ti1 :    out Integer; Ta1 : out Array1; Tr1 : out Record1;
+      entry Entry1
+        (Ti1 :    out Integer; Ta1 : out Array1; Tr1 : out Record1;
          Tp1 : in out Pointer1; Tv1 : in out Pack1.Privy; Tt1 : in out Task1;
-         Tk1            : in out Integer);
+         Tk1 : in out Integer);
    end Task2;
 
    I1 : Integer         := 0;
@@ -115,9 +116,10 @@ procedure C85005a is
       end if;
    end Ident;
 
-   procedure Proc1 (Pi1 : in out Integer; Pa1 : in out Array1;
-      Pr1 : in out Record1; Pp1 : out Pointer1; Pv1 : out Pack1.Privy;
-      Pt1               : in out Task1; Pk1 : out Integer)
+   procedure Proc1
+     (Pi1 : in out Integer; Pa1 : in out Array1; Pr1 : in out Record1;
+      Pp1 :    out Pointer1; Pv1 : out Pack1.Privy; Pt1 : in out Task1;
+      Pk1 :    out Integer)
    is
 
    begin
@@ -184,9 +186,11 @@ procedure C85005a is
 
    task body Task2 is
    begin
-      accept Entry1 (Ti1 :    out Integer; Ta1 : out Array1; Tr1 : out Record1;
+      accept Entry1
+        (Ti1 :    out Integer; Ta1 : out Array1; Tr1 : out Record1;
          Tp1 : in out Pointer1; Tv1 : in out Pack1.Privy; Tt1 : in out Task1;
-         Tk1             : in out Integer) do
+         Tk1 : in out Integer)
+      do
 
          Ti1 := I1 + 1;
          Ta1 := (A1 (1) + 1, A1 (2) + 1, A1 (3) + 1);

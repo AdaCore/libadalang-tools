@@ -59,6 +59,7 @@ package F460a00 is
 
    type Tc_Result_Kind is (Ok, Un_Init, Pe_Exception, Others_Exception);
 
-   procedure Tc_Check_Results (Actual : in Tc_Result_Kind;
-      Expected : in Tc_Result_Kind; Message : in String);
+   procedure Tc_Check_Results
+     (Actual  : in Tc_Result_Kind; Expected : in Tc_Result_Kind;
+      Message : in String);
 end F460a00;

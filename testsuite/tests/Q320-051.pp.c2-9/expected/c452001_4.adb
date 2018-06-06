@@ -1,29 +1,31 @@
 with Report;
 package body C452001_4 is
 
-   procedure Change (Object : in out Tagged_Partial_Tagged_Full;
-      Value                 : in     Boolean)
+   procedure Change
+     (Object : in out Tagged_Partial_Tagged_Full; Value : in Boolean)
    is
    begin
       Object := (Report.Ident_Bool (Value), Object.C);
    end Change;
 
-   procedure Change (Object : in out Untagged_Partial_Tagged_Full;
-      Value                 : in     Integer)
+   procedure Change
+     (Object : in out Untagged_Partial_Tagged_Full; Value : in Integer)
    is
    begin
       Object := (Report.Ident_Int (Value), Object.P);
    end Change;
 
-   procedure Change (Object : in out Untagged_Partial_Untagged_Record_Full;
-      Value                 : in     Duration)
+   procedure Change
+     (Object : in out Untagged_Partial_Untagged_Record_Full;
+      Value  : in     Duration)
    is
    begin
       Object := (Value, Report.Ident_Str (Object.S));
    end Change;
 
-   procedure Change (Object : in out Untagged_Partial_Untagged_Array_Full;
-      Value                 : in     Character)
+   procedure Change
+     (Object : in out Untagged_Partial_Untagged_Array_Full;
+      Value  : in     Character)
    is
    begin
       Object :=

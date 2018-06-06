@@ -66,8 +66,8 @@ package C391002_1 is
    procedure Create (The_Plaque : in out Object);
 
    -- Selector operations
-   function Tc_Match (Left_Plaque : Object;
-      Right_Natural               : Natural) return Boolean;
+   function Tc_Match
+     (Left_Plaque : Object; Right_Natural : Natural) return Boolean;
 
    function Serial_Number (A_Plaque : Object) return Natural;
 

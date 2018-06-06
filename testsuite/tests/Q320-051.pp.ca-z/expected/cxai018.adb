@@ -81,8 +81,8 @@ procedure Cxai018 is
 
    My_Cursor_1 : My_Vectors.Cursor;
 
-   procedure Tampering_Check (Container : in out My_Vectors.Vector;
-      Where                             : in     String)
+   procedure Tampering_Check
+     (Container : in out My_Vectors.Vector; Where : in String)
    is
 
       Program_Error_Raised : Boolean := False;
@@ -181,8 +181,8 @@ begin
    -- -- in a way that corresponds to likely usage.
 
    declare
-      procedure Test (Value : in My_Float; Expected : in My_Float;
-         Test_Case          : in String)
+      procedure Test
+        (Value : in My_Float; Expected : in My_Float; Test_Case : in String)
       is
       begin
          Tampering_Check (Container => My_Vector_1, Where => Test_Case);
@@ -195,8 +195,9 @@ begin
          end if;
       end Test;
 
-      procedure Test_And_Mod (Value : in out My_Float; Expected : in My_Float;
-         New_Item                   : in     My_Float; Test_Case : in String)
+      procedure Test_And_Mod
+        (Value    : in out My_Float; Expected : in My_Float;
+         New_Item : in     My_Float; Test_Case : in String)
       is
       begin
          Tampering_Check (Container => My_Vector_1, Where => Test_Case);

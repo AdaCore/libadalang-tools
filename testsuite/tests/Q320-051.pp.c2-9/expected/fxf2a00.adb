@@ -2,8 +2,9 @@
 
 package body Fxf2a00 is
 
-   function Operations_Loop (Initial : Decimal_Fixed;
-      Operator : Operator_Table; Operand : Operand_Table) return Decimal_Fixed
+   function Operations_Loop
+     (Initial : Decimal_Fixed; Operator : Operator_Table;
+      Operand : Operand_Table) return Decimal_Fixed
    is
 
       Result     : Decimal_Fixed := Initial;  -- Cumulator.

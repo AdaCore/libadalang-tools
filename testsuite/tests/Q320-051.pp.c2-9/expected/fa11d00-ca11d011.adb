@@ -1,7 +1,7 @@
 --=======================================================================--
 
-procedure Fa11d00.Ca11d011 (Left, Right : in     Complex_Type;
-   C                                    :    out Complex_Type)
+procedure Fa11d00.Ca11d011
+  (Left, Right : in Complex_Type; C : out Complex_Type)
 is
 -- Multiply_Complex.
 

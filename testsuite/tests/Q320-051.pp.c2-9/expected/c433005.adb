@@ -81,7 +81,8 @@ procedure C433005 is
         Report.Ident_Int (6) .. Report.Ident_Int (8));
    -- Orange .. Green, 6 .. 8
 
-   procedure Check_1 (Obj : Array_1; Low, High : Integer;
+   procedure Check_1
+     (Obj : Array_1; Low, High : Integer;
       First_Component, Second_Component, Last_Component : Default_To_Zero;
       Test_Case                                         : Character)
    is
@@ -103,7 +104,8 @@ procedure C433005 is
       end if;
    end Check_1;
 
-   procedure Check_2 (Obj : Array_2; Low, High : Color_Type;
+   procedure Check_2
+     (Obj : Array_2; Low, High : Color_Type;
       First_Component, Second_Component, Last_Component : Default_To_Zero;
       Test_Case                                         : Character)
    is
@@ -125,9 +127,9 @@ procedure C433005 is
       end if;
    end Check_2;
 
-   procedure Check_3 (Test_Obj, Check_Obj : Array_3;
-      Low_1, High_1 : Color_Type; Low_2, High_2 : Integer;
-      Test_Case                           : Character)
+   procedure Check_3
+     (Test_Obj, Check_Obj : Array_3; Low_1, High_1 : Color_Type;
+      Low_2, High_2       : Integer; Test_Case : Character)
    is
    begin
       if Test_Obj'First (1) /= Low_1 then

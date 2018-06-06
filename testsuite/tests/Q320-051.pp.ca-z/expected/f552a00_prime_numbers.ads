@@ -76,8 +76,8 @@ package F552a00_Prime_Numbers is
 
    overriding function First (Object : Prime_Number_Set) return Natural;
 
-   overriding function Next (Object : Prime_Number_Set;
-      Value                         : Natural) return Natural;
+   overriding function Next
+     (Object : Prime_Number_Set; Value : Natural) return Natural;
 
    function Iterate
      (Set : Prime_Number_Set)

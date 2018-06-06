@@ -69,8 +69,9 @@ procedure C457003 is
       return X;
    end Evaluation_Check;
 
-   function Do_Case (Selector : Small_Type;
-      Invalid_Selector        : Boolean := False) return Natural
+   function Do_Case
+     (Selector : Small_Type; Invalid_Selector : Boolean := False)
+      return Natural
    is
       Expression_Value : Natural := 0;
    begin

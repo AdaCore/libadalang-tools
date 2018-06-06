@@ -13,8 +13,8 @@ package body Ca11009_0.Ca11009_1 is  -- Child Package body OS.File_Manager
    -- These subprograms utilize calls to subprograms contained in a private
    -- sibling to perform the actual processing.
 
-   procedure Create_File (Mode : in     File_Mode_Type;
-      File_Key                 :    out File_Descriptor_Type)
+   procedure Create_File
+     (Mode : in File_Mode_Type; File_Key : out File_Descriptor_Type)
    is
    begin
       File_Key := Internal.Create (Mode);

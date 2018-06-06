@@ -3,8 +3,9 @@
 with Report;
 package body Cxh1001_0 is
 
-   procedure Heap_Check (A_Value : access Imp_H.Scalar_To_Normalize;
-      A_Number                   : access Imp_H.Small_Number)
+   procedure Heap_Check
+     (A_Value  : access Imp_H.Scalar_To_Normalize;
+      A_Number : access Imp_H.Small_Number)
    is
       Value  : Num;
       Number : Integer;

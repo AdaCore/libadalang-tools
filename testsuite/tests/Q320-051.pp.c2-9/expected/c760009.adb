@@ -29,10 +29,10 @@ procedure C760009 is
          Natural'Image (Got));
    end Fail;
 
-   procedure Master_Assertion (Layer_2_Inits : Natural;
-      Layer_2_Finals : Natural; Layer_1_Inits : Natural;
-      Layer_1_Adjs : Natural; Layer_1_Finals : Natural;
-      Failing_Message                        : String)
+   procedure Master_Assertion
+     (Layer_2_Inits  : Natural; Layer_2_Finals : Natural;
+      Layer_1_Inits  : Natural; Layer_1_Adjs : Natural;
+      Layer_1_Finals : Natural; Failing_Message : String)
    is
 
    begin
@@ -74,10 +74,10 @@ procedure C760009 is
 
    end Master_Assertion;
 
-   procedure Lesser_Assertion (Layer_2_Inits : Natural;
-      Layer_2_Finals : Natural; Layer_1_Inits : Natural;
-      Layer_1_Adjs : Natural; Layer_1_Finals : Natural;
-      Failing_Message                        : String)
+   procedure Lesser_Assertion
+     (Layer_2_Inits  : Natural; Layer_2_Finals : Natural;
+      Layer_1_Inits  : Natural; Layer_1_Adjs : Natural;
+      Layer_1_Finals : Natural; Failing_Message : String)
    is
    begin
 

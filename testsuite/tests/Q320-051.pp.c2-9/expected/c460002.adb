@@ -38,8 +38,8 @@ procedure C460002 is
 
    -------------------------------------------------------------
 
-   procedure Display_Results (Result : in Result_Kind;
-      Expected                       : in Result_Kind; Msg : in String)
+   procedure Display_Results
+     (Result : in Result_Kind; Expected : in Result_Kind; Msg : in String)
    is
    begin
       if Result /= Expected then

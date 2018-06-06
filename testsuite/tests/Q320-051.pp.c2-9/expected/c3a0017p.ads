@@ -46,8 +46,8 @@ package C3a0017p is
 
    function Double (X : Float) return Float;
 
-   function Evaluate (Fn : access function (X : Float) return Float;
-      X                  : Float) return Float;
+   function Evaluate
+     (Fn : access function (X : Float) return Float; X : Float) return Float;
 
    procedure Pass_It
      (Fn : access function (X : Float) return Float := Double'Access);

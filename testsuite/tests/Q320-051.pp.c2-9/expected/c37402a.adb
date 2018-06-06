@@ -63,9 +63,10 @@ begin
       Cc : Square (2);
       Cu : Square;
 
-      procedure P (Con, In_Con : in     Square; Inout_Con : in out Square;
+      procedure P
+        (Con, In_Con : in     Square; Inout_Con : in out Square;
          Out_Con : out Square; In_Unc : in Square; Inout_Unc : in out Square;
-         Out_Unc               :    out Square)
+         Out_Unc     :    out Square)
       is
 
       begin
@@ -120,16 +121,19 @@ begin
       end P;
 
       task T is
-         entry Q (Con, In_Con : in     Square; Inout_Con : in out Square;
-            Out_Con           :    out Square; In_Unc : in Square;
-            Inout_Unc         : in out Square; Out_Unc : out Square);
+         entry Q
+           (Con, In_Con : in     Square; Inout_Con : in out Square;
+            Out_Con     :    out Square; In_Unc : in Square;
+            Inout_Unc   : in out Square; Out_Unc : out Square);
       end T;
 
       task body T is
       begin
-         accept Q (Con, In_Con : in     Square; Inout_Con : in out Square;
-            Out_Con            :    out Square; In_Unc : in Square;
-            Inout_Unc          : in out Square; Out_Unc : out Square) do
+         accept Q
+           (Con, In_Con : in     Square; Inout_Con : in out Square;
+            Out_Con     :    out Square; In_Unc : in Square;
+            Inout_Unc   : in out Square; Out_Unc : out Square)
+         do
             begin
                if Con'Constrained then
                   null;

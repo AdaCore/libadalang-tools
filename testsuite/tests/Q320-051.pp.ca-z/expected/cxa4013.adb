@@ -106,8 +106,8 @@ begin
 
       ---
 
-      procedure Censor (Source_String : in out Wide_String;
-         Pattern_String               : in     Wide_String)
+      procedure Censor
+        (Source_String : in out Wide_String; Pattern_String : in Wide_String)
       is
 
          use Ada.Strings.Wide_Fixed; -- allows infix notation of "*" below.

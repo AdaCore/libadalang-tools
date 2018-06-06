@@ -2,8 +2,8 @@ package body C3a0015_0 is
 
    use System;
 
-   procedure Allocate (Pool    : in out C3a0015_0.Pool;
-      Storage_Address          :    out System.Address;
+   procedure Allocate
+     (Pool : in out C3a0015_0.Pool; Storage_Address : out System.Address;
       Size_In_Storage_Elements : in     Storage_Count;
       Alignment                : in     Storage_Count)
    is
@@ -24,8 +24,8 @@ package body C3a0015_0 is
       end if;
    end Allocate;
 
-   procedure Deallocate (Pool  : in out C3a0015_0.Pool;
-      Storage_Address          : in     System.Address;
+   procedure Deallocate
+     (Pool : in out C3a0015_0.Pool; Storage_Address : in System.Address;
       Size_In_Storage_Elements : in     Storage_Count;
       Alignment                : in     Storage_Count)
    is

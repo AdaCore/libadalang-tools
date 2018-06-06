@@ -164,16 +164,19 @@ begin
 
    declare
       task Main_Task is
-         entry Start (Ti1 : in out Integer; Ta1 : in out Array1;
-            Tr1           : in out Record1; Tp1 : in out Pointer1;
-            Tv1           : in out Pack1.Privy; Tt1 : in out Task1);
+         entry Start
+           (Ti1 : in out Integer; Ta1 : in out Array1; Tr1 : in out Record1;
+            Tp1 : in out Pointer1; Tv1 : in out Pack1.Privy;
+            Tt1 : in out Task1);
       end Main_Task;
 
       task body Main_Task is
       begin
-         accept Start (Ti1 : in out Integer; Ta1 : in out Array1;
-            Tr1            : in out Record1; Tp1 : in out Pointer1;
-            Tv1            : in out Pack1.Privy; Tt1 : in out Task1) do
+         accept Start
+           (Ti1 : in out Integer; Ta1 : in out Array1; Tr1 : in out Record1;
+            Tp1 : in out Pointer1; Tv1 : in out Pack1.Privy;
+            Tt1 : in out Task1)
+         do
             declare
                Xti1 : Integer renames Ti1;
                Xta1 : Array1 renames Ta1;
@@ -183,16 +186,18 @@ begin
                Xtt1 : Task1 renames Tt1;
 
                task type Task2 is
-                  entry Entry1 (Tti1 :    out Integer; Tta1 : out Array1;
-                     Ttr1            :    out Record1; Ttp1 : in out Pointer1;
-                     Ttv1 : in out Pack1.Privy; Ttt1 : in out Task1);
+                  entry Entry1
+                    (Tti1 : out Integer; Tta1 : out Array1; Ttr1 : out Record1;
+                     Ttp1 : in out Pointer1; Ttv1 : in out Pack1.Privy;
+                     Ttt1 : in out Task1);
                end Task2;
 
                Chk_Task : Task2;
 
-               procedure Proc1 (Pti1 : in out Integer; Pta1 : in out Array1;
-                  Ptr1               : in out Record1; Ptp1 : out Pointer1;
-                  Ptv1               :    out Pack1.Privy; Ptt1 : in out Task1)
+               procedure Proc1
+                 (Pti1 : in out Integer; Pta1 : in out Array1;
+                  Ptr1 : in out Record1; Ptp1 : out Pointer1;
+                  Ptv1 :    out Pack1.Privy; Ptt1 : in out Task1)
                is
                begin
                   Pti1 := Pti1 + 1;
@@ -205,9 +210,11 @@ begin
 
                task body Task2 is
                begin
-                  accept Entry1 (Tti1 :    out Integer; Tta1 : out Array1;
-                     Ttr1             :    out Record1; Ttp1 : in out Pointer1;
-                     Ttv1 : in out Pack1.Privy; Ttt1 : in out Task1) do
+                  accept Entry1
+                    (Tti1 : out Integer; Tta1 : out Array1; Ttr1 : out Record1;
+                     Ttp1 : in out Pointer1; Ttv1 : in out Pack1.Privy;
+                     Ttt1 : in out Task1)
+                  do
                      Tti1 := Ti1 + 1;
                      Tta1 := (Ta1 (1) + 1, Ta1 (2) + 1, Ta1 (3) + 1);
                      Ttr1 := (D => 1, Field1 => Tr1.Field1 + 1);

@@ -45,13 +45,13 @@ package Fdb0a00 is
    type Stack_Heap (Water_Line : System.Storage_Elements.Storage_Count) is
      new System.Storage_Pools.Root_Storage_Pool with private;
 
-   procedure Allocate (Pool    : in out Stack_Heap;
-      Storage_Address          :    out System.Address;
+   procedure Allocate
+     (Pool : in out Stack_Heap; Storage_Address : out System.Address;
       Size_In_Storage_Elements : in     System.Storage_Elements.Storage_Count;
       Alignment                : in     System.Storage_Elements.Storage_Count);
 
-   procedure Deallocate (Pool  : in out Stack_Heap;
-      Storage_Address          : in     System.Address;
+   procedure Deallocate
+     (Pool : in out Stack_Heap; Storage_Address : in System.Address;
       Size_In_Storage_Elements : in     System.Storage_Elements.Storage_Count;
       Alignment                : in     System.Storage_Elements.Storage_Count);
 

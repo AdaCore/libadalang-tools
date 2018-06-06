@@ -202,8 +202,8 @@ begin
    end;
 
    declare
-      procedure Pdef (X : Carr := A1 and A2; Y : Carr := A1 or A2;
-         Z              : Carr := A1 xor A2)
+      procedure Pdef
+        (X : Carr := A1 and A2; Y : Carr := A1 or A2; Z : Carr := A1 xor A2)
       is
       begin
          Check (X, "DEFAULT PARAMETER", "'AND'");

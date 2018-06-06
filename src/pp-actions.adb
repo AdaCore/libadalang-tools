@@ -3645,7 +3645,7 @@ package body Pp.Actions is
                   Tree.Kind));
             else
                Interpret_Template
-                 (Munge_Template ("?[# (~;# ~)]~",
+                 (Munge_Template ("?[# (~;#1 ~)]~",
                   Tree.Kind));
             end if;
          end Do_Params;

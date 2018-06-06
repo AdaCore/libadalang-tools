@@ -24,8 +24,9 @@ package body C761010_1.Var_Strings.Types is
       end if;
    end Check_Equal;
 
-   procedure My_Check_Equal (X : Rec := Rec_Var;
-      Y                        : Rec :=
+   procedure My_Check_Equal
+     (X : Rec := Rec_Var;
+      Y : Rec :=
         (N_Strings => 2,
          Ptrs      =>
            (2,

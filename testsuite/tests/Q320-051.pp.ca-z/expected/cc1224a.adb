@@ -100,8 +100,9 @@ procedure Cc1224a is
    type Arre is array (Subint) of Date;
    A6 : Arre := (A1'Range => Today);
 
-   function "=" (Left : in System.Address;
-      Right           : in System.Address) return Boolean renames
+   function "="
+     (Left : in System.Address; Right : in System.Address)
+      return Boolean renames
      System."=";
 
    generic
@@ -140,14 +141,14 @@ procedure Cc1224a is
       type Unconstrained_Array is
         array (First_Index range <>, Second_Index range <>) of Date;
 
-   procedure Test_Procedure (First : in Unconstrained_Array;
-      Ffifs : in First_Index; Ffils : in First_Index; Fsifs : in Second_Index;
-      Fsils : in Second_Index; Fflen : in Natural; Fslen : in Natural;
-      Ffirt                        : in First_Index; Fsirt : in Second_Index;
-      Second : in Unconstrained_Array; Sfifs : in First_Index;
-      Sfils : in First_Index; Ssifs : in Second_Index; Ssils : in Second_Index;
-      Sflen : in Natural; Sslen : in Natural; Sfirt : in First_Index;
-      Ssirt                        : in Second_Index; Remarks : in String);
+   procedure Test_Procedure
+     (First : in Unconstrained_Array; Ffifs : in First_Index;
+      Ffils : in First_Index; Fsifs : in Second_Index; Fsils : in Second_Index;
+      Fflen : in Natural; Fslen : in Natural; Ffirt : in First_Index;
+      Fsirt : in Second_Index; Second : in Unconstrained_Array;
+      Sfifs : in First_Index; Sfils : in First_Index; Ssifs : in Second_Index;
+      Ssils : in Second_Index; Sflen : in Natural; Sslen : in Natural;
+      Sfirt : in First_Index; Ssirt : in Second_Index; Remarks : in String);
    generic
 
       type First_Index is (<>);
@@ -156,10 +157,10 @@ procedure Cc1224a is
       type Constrained_Array is
         array (First_Index, Second_Index) of Component_Type;
 
-   procedure Ctest_Procedure (First : in Constrained_Array;
-      Ffirt                         : in First_Index; Fsirt : in Second_Index;
-      Second : in Constrained_Array; Sfirt : in First_Index;
-      Ssirt                         : in Second_Index; Remarks : in String);
+   procedure Ctest_Procedure
+     (First : in Constrained_Array; Ffirt : in First_Index;
+      Fsirt : in Second_Index; Second : in Constrained_Array;
+      Sfirt : in First_Index; Ssirt : in Second_Index; Remarks : in String);
 
    procedure P is
 
@@ -342,14 +343,14 @@ procedure Cc1224a is
 
    end P;
 
-   procedure Test_Procedure (First : in Unconstrained_Array;
-      Ffifs : in First_Index; Ffils : in First_Index; Fsifs : in Second_Index;
-      Fsils : in Second_Index; Fflen : in Natural; Fslen : in Natural;
-      Ffirt                        : in First_Index; Fsirt : in Second_Index;
-      Second : in Unconstrained_Array; Sfifs : in First_Index;
-      Sfils : in First_Index; Ssifs : in Second_Index; Ssils : in Second_Index;
-      Sflen : in Natural; Sslen : in Natural; Sfirt : in First_Index;
-      Ssirt                        : in Second_Index; Remarks : in String)
+   procedure Test_Procedure
+     (First : in Unconstrained_Array; Ffifs : in First_Index;
+      Ffils : in First_Index; Fsifs : in Second_Index; Fsils : in Second_Index;
+      Fflen : in Natural; Fslen : in Natural; Ffirt : in First_Index;
+      Fsirt : in Second_Index; Second : in Unconstrained_Array;
+      Sfifs : in First_Index; Sfils : in First_Index; Ssifs : in Second_Index;
+      Ssils : in Second_Index; Sflen : in Natural; Sslen : in Natural;
+      Sfirt : in First_Index; Ssirt : in Second_Index; Remarks : in String)
    is
 
    begin -- TEST_PROCEDURE
@@ -380,10 +381,10 @@ procedure Cc1224a is
 
    end Test_Procedure;
 
-   procedure Ctest_Procedure (First : in Constrained_Array;
-      Ffirt                         : in First_Index; Fsirt : in Second_Index;
-      Second : in Constrained_Array; Sfirt : in First_Index;
-      Ssirt                         : in Second_Index; Remarks : in String)
+   procedure Ctest_Procedure
+     (First : in Constrained_Array; Ffirt : in First_Index;
+      Fsirt : in Second_Index; Second : in Constrained_Array;
+      Sfirt : in First_Index; Ssirt : in Second_Index; Remarks : in String)
    is
 
    begin -- CTEST_PROCEDURE

@@ -35,8 +35,8 @@ procedure Cxc7001 is
 
    -- test support software:
 
-   procedure Tc_Match_States (A_Task : in Cxc7001_0.Task_Type;
-      Item                           : in Indicators)
+   procedure Tc_Match_States
+     (A_Task : in Cxc7001_0.Task_Type; Item : in Indicators)
    is
       -- check that the calls to the package interface return the same values
       -- as the corresponding attributes

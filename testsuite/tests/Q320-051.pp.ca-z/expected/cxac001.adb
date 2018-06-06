@@ -123,8 +123,9 @@ begin
       Product_Information_2 : Data_Array_Type (1 .. 4) :=
         ((5, Xlarge), (27, Small), (79, Medium), (93, Xlarge));
 
-      procedure Store_Data (The_Stream : in Strm_Pack.Stream_Access;
-         The_Array                     : in Data_Array_Type)
+      procedure Store_Data
+        (The_Stream : in Strm_Pack.Stream_Access;
+         The_Array  : in Data_Array_Type)
       is
          Header : Header_Type;
       begin
@@ -143,8 +144,9 @@ begin
 
       end Store_Data;
 
-      procedure Retrieve_Data (The_Stream : in     Strm_Pack.Stream_Access;
-         The_Header :    out Header_Type; The_Array : out Data_Array_Type)
+      procedure Retrieve_Data
+        (The_Stream : in Strm_Pack.Stream_Access; The_Header : out Header_Type;
+         The_Array  :    out Data_Array_Type)
       is
       begin
 

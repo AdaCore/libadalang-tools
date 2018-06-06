@@ -34,38 +34,38 @@ package Cd10002_Gen is
 
    procedure Write (Stream : access Root_Stream_Type'Class; Item : Nt1'Base);
    function Input (Stream : access Root_Stream_Type'Class) return Nt1'Base;
-   procedure Read (Stream :     access Root_Stream_Type'Class;
-      Item                : out Nt1'Base);
+   procedure Read
+     (Stream : access Root_Stream_Type'Class; Item : out Nt1'Base);
    procedure Output (Stream : access Root_Stream_Type'Class; Item : Nt1'Base);
 
    procedure Write (Stream : access Root_Stream_Type'Class; Item : Nt2'Base);
    function Input (Stream : access Root_Stream_Type'Class) return Nt2'Base;
-   procedure Read (Stream :     access Root_Stream_Type'Class;
-      Item                : out Nt2'Base);
+   procedure Read
+     (Stream : access Root_Stream_Type'Class; Item : out Nt2'Base);
    procedure Output (Stream : access Root_Stream_Type'Class; Item : Nt2'Base);
 
    procedure Write (Stream : access Root_Stream_Type'Class; Item : Nt3'Base);
    function Input (Stream : access Root_Stream_Type'Class) return Nt3'Base;
-   procedure Read (Stream :     access Root_Stream_Type'Class;
-      Item                : out Nt3'Base);
+   procedure Read
+     (Stream : access Root_Stream_Type'Class; Item : out Nt3'Base);
    procedure Output (Stream : access Root_Stream_Type'Class; Item : Nt3'Base);
 
    procedure Write (Stream : access Root_Stream_Type'Class; Item : Nt4'Base);
    function Input (Stream : access Root_Stream_Type'Class) return Nt4'Base;
-   procedure Read (Stream :     access Root_Stream_Type'Class;
-      Item                : out Nt4'Base);
+   procedure Read
+     (Stream : access Root_Stream_Type'Class; Item : out Nt4'Base);
    procedure Output (Stream : access Root_Stream_Type'Class; Item : Nt4'Base);
 
    procedure Write (Stream : access Root_Stream_Type'Class; Item : Nt5'Base);
    function Input (Stream : access Root_Stream_Type'Class) return Nt5'Base;
-   procedure Read (Stream :     access Root_Stream_Type'Class;
-      Item                : out Nt5'Base);
+   procedure Read
+     (Stream : access Root_Stream_Type'Class; Item : out Nt5'Base);
    procedure Output (Stream : access Root_Stream_Type'Class; Item : Nt5'Base);
 
    procedure Write (Stream : access Root_Stream_Type'Class; Item : Nt6'Base);
    function Input (Stream : access Root_Stream_Type'Class) return Nt6'Base;
-   procedure Read (Stream :     access Root_Stream_Type'Class;
-      Item                : out Nt6'Base);
+   procedure Read
+     (Stream : access Root_Stream_Type'Class; Item : out Nt6'Base);
    procedure Output (Stream : access Root_Stream_Type'Class; Item : Nt6'Base);
 
    procedure Write (Stream : access Root_Stream_Type'Class; Item : Nt7);
@@ -75,8 +75,8 @@ package Cd10002_Gen is
 
    procedure Write (Stream : access Root_Stream_Type'Class; Item : Nt8'Base);
    function Input (Stream : access Root_Stream_Type'Class) return Nt8'Base;
-   procedure Read (Stream :     access Root_Stream_Type'Class;
-      Item                : out Nt8'Base);
+   procedure Read
+     (Stream : access Root_Stream_Type'Class; Item : out Nt8'Base);
    procedure Output (Stream : access Root_Stream_Type'Class; Item : Nt8'Base);
 
    procedure Write (Stream : access Root_Stream_Type'Class; Item : Nt9);

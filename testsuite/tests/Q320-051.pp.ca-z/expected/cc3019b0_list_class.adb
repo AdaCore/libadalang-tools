@@ -15,8 +15,8 @@ package body Cc3019b0_List_Class is
 
    end Add;
 
-   procedure Delete (This_Element : in out Element;
-      From_This_List              : in out List)
+   procedure Delete
+     (This_Element : in out Element; From_This_List : in out List)
    is
 
    begin  -- DELETE

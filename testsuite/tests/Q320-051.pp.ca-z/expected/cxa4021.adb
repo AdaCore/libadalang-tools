@@ -190,8 +190,8 @@ begin
 
       -----
 
-      procedure Create_Camera_Ready_Copy (Document : in     Document_Type;
-         Camera_Copy :    out Camera_Ready_Copy_Type)
+      procedure Create_Camera_Ready_Copy
+        (Document : in Document_Type; Camera_Copy : out Camera_Ready_Copy_Type)
       is
       begin
          -- Break the unbounded wide strings into fixed lengths.

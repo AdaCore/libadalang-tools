@@ -127,14 +127,15 @@ package Cxe4005_Common is
    -- root tagged type for remote access to class wide type test
    type Root_Tagged_Type is tagged limited private;
 
-   procedure Single_Controlling_Operand (Rtt :    access Root_Tagged_Type;
-      Test_Number : in Integer; Obj_Sn : out Integer);
-   procedure Dual_Controlling_Operands (Rtt1 :     access Root_Tagged_Type;
-      Rtt2 :     access Root_Tagged_Type; Test_Number : in Integer;
-      Obj_Sn1 : out Integer; Obj_Sn2 : out Integer);
+   procedure Single_Controlling_Operand
+     (Rtt    :     access Root_Tagged_Type; Test_Number : in Integer;
+      Obj_Sn : out Integer);
+   procedure Dual_Controlling_Operands
+     (Rtt1        :    access Root_Tagged_Type; Rtt2 : access Root_Tagged_Type;
+      Test_Number : in Integer; Obj_Sn1 : out Integer; Obj_Sn2 : out Integer);
 
-   procedure Set_Serial_Number (Rtt :    access Root_Tagged_Type;
-      Sn                            : in Integer);
+   procedure Set_Serial_Number
+     (Rtt : access Root_Tagged_Type; Sn : in Integer);
 
    function Serial_Number (Rtt : access Root_Tagged_Type) return Integer;
 

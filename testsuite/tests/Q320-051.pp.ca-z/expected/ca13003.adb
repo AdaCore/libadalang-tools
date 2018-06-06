@@ -11,12 +11,14 @@ procedure Ca13003 is
    Expected_Name    : Ca13003_0.File_Name := "          ";
    Student_File     : Ca13003_0.File_Rec;
 
-   function Process_Input_Files (Id_In : Ca13003_0.File_Id;
-      File_In : Ca13003_0.File_Rec) return Ca13003_0.File_Name renames
+   function Process_Input_Files
+     (Id_In : Ca13003_0.File_Id; File_In : Ca13003_0.File_Rec) return Ca13003_0
+     .File_Name renames
      Ca13003_0.Ca13003_1.Ca13003_4;
 
-   function Process_Audit_Files (Id_In : Ca13003_0.File_Id;
-      File_In : Ca13003_0.File_Rec) return Ca13003_0.File_Name renames
+   function Process_Audit_Files
+     (Id_In : Ca13003_0.File_Id; File_In : Ca13003_0.File_Rec) return Ca13003_0
+     .File_Name renames
      Ca13003_0.Ca13003_2.Ca13003_4;
 begin
    Report.Test

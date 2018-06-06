@@ -136,8 +136,8 @@ begin
 
       -- The following procedure checks the results of function To_Ada.
 
-      procedure Check_Length (Str : in String; Ftn : in Fortran_Character;
-         Num                      : in Natural)
+      procedure Check_Length
+        (Str : in String; Ftn : in Fortran_Character; Num : in Natural)
       is
       begin
          if Str'Length /= Ftn'Length or Str'Length /= Num then

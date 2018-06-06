@@ -17,8 +17,9 @@ package body Cxc7006_2 is
       Fin_Array := (others => False);
    end Clear_Fin_Array;
 
-   procedure Test_Finalized (Id : in     Integer; Finalized : out Boolean;
-      Err_Msg                   :    out Cxc7006_1.String_Acc)
+   procedure Test_Finalized
+     (Id      : in     Integer; Finalized : out Boolean;
+      Err_Msg :    out Cxc7006_1.String_Acc)
    is
    begin
       if Id not in Fin_Array'Range then

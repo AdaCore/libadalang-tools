@@ -146,11 +146,12 @@ procedure C85006d is
       Xat1 : Arr_Tsk renames At1 (6 .. 8);
 
       task type Task2 is
-         entry Entry1 (Tri1 :    out Integer; Tra1 : out Array1;
-            Trr1            :    out Record1; Trp1 : in out Pointer1;
-            Trv1 : in out Pack1.Privy; Trt1 : in out Task1; Tai1 : out Arr_Int;
-            Taa1 :    out Arr_Arr; Tar1 : out Arr_Rec; Tap1 : in out Arr_Ptr;
-            Tav1            : in out Arr_Pvt; Tat1 : in out Arr_Tsk);
+         entry Entry1
+           (Tri1 :    out Integer; Tra1 : out Array1; Trr1 : out Record1;
+            Trp1 : in out Pointer1; Trv1 : in out Pack1.Privy;
+            Trt1 : in out Task1; Tai1 : out Arr_Int; Taa1 : out Arr_Arr;
+            Tar1 : out Arr_Rec; Tap1 : in out Arr_Ptr; Tav1 : in out Arr_Pvt;
+            Tat1 : in out Arr_Tsk);
       end Task2;
 
       Chk_Task : Task2;
@@ -193,11 +194,11 @@ procedure C85006d is
          end loop;
       end Generic2;
 
-      procedure Proc1 (Pri1 : in out Integer; Pra1 : in out Array1;
-         Prr1 : in out Record1; Prp1 : out Pointer1; Prv1 : out Pack1.Privy;
-         Prt1 : in out Task1; Pai1 : in out Arr_Int; Paa1 : in out Arr_Arr;
-         Par1 : in out Arr_Rec; Pap1 : out Arr_Ptr; Pav1 : out Arr_Pvt;
-         Pat1               : in out Arr_Tsk)
+      procedure Proc1
+        (Pri1 : in out Integer; Pra1 : in out Array1; Prr1 : in out Record1;
+         Prp1 :    out Pointer1; Prv1 : out Pack1.Privy; Prt1 : in out Task1;
+         Pai1 : in out Arr_Int; Paa1 : in out Arr_Arr; Par1 : in out Arr_Rec;
+         Pap1 :    out Arr_Ptr; Pav1 : out Arr_Pvt; Pat1 : in out Arr_Tsk)
       is
       begin
          Pri1 := Pri1 + 1;
@@ -221,11 +222,13 @@ procedure C85006d is
 
       task body Task2 is
       begin
-         accept Entry1 (Tri1 :    out Integer; Tra1 : out Array1;
-            Trr1             :    out Record1; Trp1 : in out Pointer1;
-            Trv1 : in out Pack1.Privy; Trt1 : in out Task1; Tai1 : out Arr_Int;
-            Taa1 :    out Arr_Arr; Tar1 : out Arr_Rec; Tap1 : in out Arr_Ptr;
-            Tav1             : in out Arr_Pvt; Tat1 : in out Arr_Tsk) do
+         accept Entry1
+           (Tri1 :    out Integer; Tra1 : out Array1; Trr1 : out Record1;
+            Trp1 : in out Pointer1; Trv1 : in out Pack1.Privy;
+            Trt1 : in out Task1; Tai1 : out Arr_Int; Taa1 : out Arr_Arr;
+            Tar1 : out Arr_Rec; Tap1 : in out Arr_Ptr; Tav1 : in out Arr_Pvt;
+            Tat1 : in out Arr_Tsk)
+         do
             Tri1 := Rec.Ri1 + 1;
             Tra1 := (Rec.Ra1 (1) + 1, Rec.Ra1 (2) + 1, Rec.Ra1 (3) + 1);
             Trr1 := (D => 1, Field1 => Rec.Rr1.Field1 + 1);

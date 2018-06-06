@@ -5,8 +5,9 @@ with Cxe4006_Part_B;
 with Cxe4006_Normal;
 package body Cxe4006_Part_A2 is
 
-   procedure Single_Controlling_Operand (Rtt : in out A2_Tagged_Type;
-      Test_Number : in     Integer; Callee : out Type_Decl_Location)
+   procedure Single_Controlling_Operand
+     (Rtt    : in out A2_Tagged_Type; Test_Number : in Integer;
+      Callee :    out Type_Decl_Location)
    is
       Expected        : Integer := 0;
       Expected_String : String_20;
@@ -42,8 +43,9 @@ package body Cxe4006_Part_A2 is
    end Single_Controlling_Operand;
 
    -- pass thru procedure
-   procedure Call_B (X : in out Root_Tagged_Type'Class;
-      Test_Number      : in     Integer; Callee : out Type_Decl_Location)
+   procedure Call_B
+     (X      : in out Root_Tagged_Type'Class; Test_Number : in Integer;
+      Callee :    out Type_Decl_Location)
    is
    begin
       Cxe4006_Part_B.Wrapped_Around (X, Test_Number, Callee);

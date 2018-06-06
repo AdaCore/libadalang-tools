@@ -35,8 +35,9 @@ package body Cxe4006_Part_A1 is
 
    ----------
 
-   procedure Single_Controlling_Operand (Rtt : in out A1_Tagged_Type_1;
-      Test_Number : in     Integer; Callee : out Type_Decl_Location)
+   procedure Single_Controlling_Operand
+     (Rtt    : in out A1_Tagged_Type_1; Test_Number : in Integer;
+      Callee :    out Type_Decl_Location)
    is
       Expected : Integer := 0;
    begin
@@ -62,8 +63,9 @@ package body Cxe4006_Part_A1 is
       Callee                  := Part_A1_1_Spec;
    end Single_Controlling_Operand;
 
-   procedure Single_Controlling_Operand (Rtt : in out A1_Tagged_Type_2;
-      Test_Number : in     Integer; Callee : out Type_Decl_Location)
+   procedure Single_Controlling_Operand
+     (Rtt    : in out A1_Tagged_Type_2; Test_Number : in Integer;
+      Callee :    out Type_Decl_Location)
    is
       Expected : Integer := 0;
    begin
@@ -91,8 +93,9 @@ package body Cxe4006_Part_A1 is
 
    ----------
 
-   procedure Make_Dispatching_Call_With (X : in out Root_Tagged_Type'Class;
-      Test_Number : in     Integer; Callee : out Type_Decl_Location)
+   procedure Make_Dispatching_Call_With
+     (X      : in out Root_Tagged_Type'Class; Test_Number : in Integer;
+      Callee :    out Type_Decl_Location)
    is
    begin
       Single_Controlling_Operand (X, Test_Number, Callee);

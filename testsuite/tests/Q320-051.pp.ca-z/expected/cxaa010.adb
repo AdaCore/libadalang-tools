@@ -177,8 +177,8 @@ begin
       Twice_A_Year :
       declare
 
-         procedure Collect_Tax (Index : in     Integer;
-            Tax_Array                 : in out Tax_Bill_Array_Type)
+         procedure Collect_Tax
+           (Index : in Integer; Tax_Array : in out Tax_Bill_Array_Type)
          is
             Id           : String (1 .. Id_Length);
             Price        : Price_Type := 0.0;

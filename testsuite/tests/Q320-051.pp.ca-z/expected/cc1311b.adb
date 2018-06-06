@@ -248,8 +248,8 @@ begin
       end Psub;
 
       generic
-         with procedure P (Results : out Float1;
-            X                      :     Float1 := -0.062_5) is Psub;
+         with procedure P
+           (Results : out Float1; X : Float1 := -0.062_5) is Psub;
       package Pkg is
       end Pkg;
 

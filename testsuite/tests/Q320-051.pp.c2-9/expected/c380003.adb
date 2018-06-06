@@ -67,8 +67,9 @@ begin
          end C1_D2;
       end Cons;
 
-      function Is_Ok (C : Cons; D3 : Integer; C1_D1 : Integer;
-         C1_D2          : Integer) return Boolean
+      function Is_Ok
+        (C : Cons; D3 : Integer; C1_D1 : Integer; C1_D2 : Integer)
+         return Boolean
       is
       begin
          return C.D3 = D3 and C.C1_D1 = C1_D1 and C.C1_D2 = C1_D2;

@@ -120,8 +120,9 @@ begin
       -- match before the test is considered to fail.
       --
 
-      procedure Check_Float_State (Gen_1, Gen_2 : Float_Random.Generator;
-         Sub_Test : Integer; States_Should_Match : Boolean)
+      procedure Check_Float_State
+        (Gen_1, Gen_2        : Float_Random.Generator; Sub_Test : Integer;
+         States_Should_Match : Boolean)
       is
 
          use type Float_Random.State;
@@ -227,8 +228,9 @@ begin
          end case;
       end Check_Discrete_State;
 
-      procedure Check_Float_Values (Gen_1, Gen_2 : Float_Random.Generator;
-         Sub_Test : Integer; Values_Should_Match : Boolean)
+      procedure Check_Float_Values
+        (Gen_1, Gen_2        : Float_Random.Generator; Sub_Test : Integer;
+         Values_Should_Match : Boolean)
       is
          Matches      : Natural := 0;
          Check_Failed : Boolean := False;

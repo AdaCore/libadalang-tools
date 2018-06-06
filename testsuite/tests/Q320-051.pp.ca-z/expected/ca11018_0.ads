@@ -69,13 +69,14 @@ package Ca11018_0 is
    -- Analyzes message for presence of word in the secret message. If found,
    -- word is highlighted.
 
-   procedure Highlight_Designated (The_Word : in     Message;
-      In_The_Message                        : in out Designated_Msg);
+   procedure Highlight_Designated
+     (The_Word : in Message; In_The_Message : in out Designated_Msg);
 
    -- Analyzes message for presence of word in the secret message. If found,
    -- word is highlighted and do other actions.
 
-   procedure Highlight_Particularly_Designated (The_Word : in     Message;
+   procedure Highlight_Particularly_Designated
+     (The_Word       : in     Message;
       In_The_Message : in out Particularly_Designated_Msg);
 
    -- Begin test code declarations: -----------------------

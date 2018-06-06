@@ -113,8 +113,8 @@ begin
 
       Tc_Size : Natural := Natural'First;
 
-      procedure Data_Storage (Number_Of_Units : in     Natural;
-         Result                               :    out Natural)
+      procedure Data_Storage
+        (Number_Of_Units : in Natural; Result : out Natural)
       is
 
          -- Type based on input parameter. Uses type Unit_Type as the array
@@ -172,8 +172,8 @@ begin
             end if;
       end Data_Storage;
 
-      procedure Data_Retrieval (Number_Of_Units : in     Natural;
-         Result                                 :    out Natural)
+      procedure Data_Retrieval
+        (Number_Of_Units : in Natural; Result : out Natural)
       is
          type Unit_Array_Type is array (1 .. Number_Of_Units) of Unit_Type;
 

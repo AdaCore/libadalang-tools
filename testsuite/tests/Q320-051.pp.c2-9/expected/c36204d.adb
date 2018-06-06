@@ -54,8 +54,9 @@ procedure C36204d is
 
    First_Date : Date := (Day => 6, Month => Jun, Year => 1_967);
 
-   function "=" (Left : in System.Address;
-      Right           : in System.Address) return Boolean renames
+   function "="
+     (Left : in System.Address; Right : in System.Address)
+      return Boolean renames
      System."=";
 
    generic

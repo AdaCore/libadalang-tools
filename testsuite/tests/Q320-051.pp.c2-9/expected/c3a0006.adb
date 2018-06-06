@@ -17,8 +17,8 @@ procedure C3a0006 is
    Trig_Table : array (1 .. Total_Routines) of C3a0006_0.Trig_Function_Ptr;
 
    -- Key function to build the table
-   function Call_Trig_Func (Func : C3a0006_0.Trig_Function_Ptr;
-      Operand                    : Float) return Float
+   function Call_Trig_Func
+     (Func : C3a0006_0.Trig_Function_Ptr; Operand : Float) return Float
    is
    begin
       return (Func (Operand));

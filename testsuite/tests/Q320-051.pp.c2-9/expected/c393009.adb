@@ -68,8 +68,8 @@ procedure C393009 is
       procedure Handle (A : in out Alert_Type) is abstract;
       -- abstract operation - must be overridden after instantiation
 
-      procedure Display (A : Alert_Type;
-         On                : Display_Devices.Display_Device_Enum);
+      procedure Display
+        (A : Alert_Type; On : Display_Devices.Display_Device_Enum);
       -- primitive operation of Alert_Type not required to be overridden
 
       function Get_Serial_Number (A : Alert_Type) return Serial_Type;
@@ -81,8 +81,8 @@ procedure C393009 is
 
    package body Alert_System is
 
-      procedure Display (A : in Alert_Type;
-         On                :    Display_Devices.Display_Device_Enum)
+      procedure Display
+        (A : in Alert_Type; On : Display_Devices.Display_Device_Enum)
       is
       begin
          Display_Devices.Display := On;

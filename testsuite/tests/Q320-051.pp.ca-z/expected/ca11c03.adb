@@ -83,8 +83,9 @@ procedure Ca11c03 is
 
    --
 
-   function Format_Primate_Data (Name : String := Blank_Name_String;
-      Hair : String := Blank_Hair_Color) return Data_String_Type
+   function Format_Primate_Data
+     (Name : String := Blank_Name_String; Hair : String := Blank_Hair_Color)
+      return Data_String_Type
    is
 
       Pos                        : Integer         := 1;

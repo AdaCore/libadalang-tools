@@ -125,8 +125,8 @@ procedure Cxaia05 is
 
    My_Inserted : Boolean;
 
-   procedure Tampering_Check (Container : in out My_Indefinite_Hashed_Sets.Set;
-      Where                             : in     String)
+   procedure Tampering_Check
+     (Container : in out My_Indefinite_Hashed_Sets.Set; Where : in String)
    is
 
       Program_Error_Raised : Boolean := False;

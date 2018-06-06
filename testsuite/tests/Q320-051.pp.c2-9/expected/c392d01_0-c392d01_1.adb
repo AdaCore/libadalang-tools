@@ -2,8 +2,8 @@
 
 package body C392d01_0.C392d01_1 is
 
-   procedure Set_Shutter_Speed (C : in out Auto_Speed;
-      Speed                       : in     F392d00.Shutter_Speed)
+   procedure Set_Shutter_Speed
+     (C : in out Auto_Speed; Speed : in F392d00.Shutter_Speed)
    is
    begin
       -- Artificial for testing purposes.

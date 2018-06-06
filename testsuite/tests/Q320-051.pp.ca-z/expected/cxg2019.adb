@@ -130,8 +130,8 @@ procedure Cxg2019 is
          end if;
       end Check;
 
-      procedure Check (Actual, Expected : Complex; Test_Name : String;
-         Mre                            : Real)
+      procedure Check
+        (Actual, Expected : Complex; Test_Name : String; Mre : Real)
       is
       begin
          Check (Actual.Re, Expected.Re, Test_Name & " real part", Mre);

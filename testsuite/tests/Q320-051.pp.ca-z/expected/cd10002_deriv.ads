@@ -45,8 +45,8 @@ package Cd10002_Deriv is
 
    procedure Write (Stream : access Root_Stream_Type'Class; Item : Nt1'Base);
    function Input (Stream : access Root_Stream_Type'Class) return Nt1'Base;
-   procedure Read (Stream :     access Root_Stream_Type'Class;
-      Item                : out Nt1'Base);
+   procedure Read
+     (Stream : access Root_Stream_Type'Class; Item : out Nt1'Base);
    procedure Output (Stream : access Root_Stream_Type'Class; Item : Nt1'Base);
 
    procedure Write (Stream : access Root_Stream_Type'Class; Item : Nt2);

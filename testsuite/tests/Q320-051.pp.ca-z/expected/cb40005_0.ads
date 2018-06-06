@@ -64,9 +64,10 @@ generic
    type Func_Pointer is access function return Proc_Pointer;
 package Cb40005_0 is -- Fail_Soft
 
-   procedure Fail_Soft_Call (Proc_To_Call : Proc_Pointer;
-      Proc_To_Call_On_Exception           : Proc_Pointer := null;
-      Retry_Routine                       : Func_Pointer := null);
+   procedure Fail_Soft_Call
+     (Proc_To_Call              : Proc_Pointer;
+      Proc_To_Call_On_Exception : Proc_Pointer := null;
+      Retry_Routine             : Func_Pointer := null);
 
    function Top_Event_Exception return Ada.Exceptions
      .Exception_Occurrence_Access;

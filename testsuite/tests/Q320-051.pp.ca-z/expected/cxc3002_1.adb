@@ -2,8 +2,8 @@
 
 package body Cxc3002_1 is
 
-   procedure Find_Reserved_Interrupt (Found : out Boolean;
-      Int_Id                                : out Ada.Interrupts.Interrupt_Id)
+   procedure Find_Reserved_Interrupt
+     (Found : out Boolean; Int_Id : out Ada.Interrupts.Interrupt_Id)
    is
    begin
       Found  := False;

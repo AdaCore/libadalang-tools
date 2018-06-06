@@ -1,7 +1,7 @@
 package body Cc3019b1_Stack_Class is
 
-   procedure Push (This_Element : in out Element;
-      On_To_This_Stack          : in out Stack)
+   procedure Push
+     (This_Element : in out Element; On_To_This_Stack : in out Stack)
    is
 
    begin  -- PUSH

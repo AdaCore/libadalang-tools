@@ -2,8 +2,8 @@
 
 package body C730002_1 is
 
-   procedure Routine_Maintenance (Eng : in out Diesel_Series;
-      Spec_Req                        : in     Specialist_Id := Jack)
+   procedure Routine_Maintenance
+     (Eng : in out Diesel_Series; Spec_Req : in Specialist_Id := Jack)
    is
    begin
       Eng.Ave_Repair_Time          := 6;

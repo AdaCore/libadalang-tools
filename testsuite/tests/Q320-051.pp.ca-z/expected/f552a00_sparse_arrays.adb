@@ -2,8 +2,9 @@ package body F552a00_Sparse_Arrays is
 
    Disable_History : Boolean := False;
 
-   procedure Append (Container : in out Sparse_Array;
-      Index                    : Sparse_Array_Index; New_Item : Element_Type)
+   procedure Append
+     (Container : in out Sparse_Array; Index : Sparse_Array_Index;
+      New_Item  :        Element_Type)
    is
    begin
       Container.Count                  := Container.Count + 1;
@@ -26,8 +27,8 @@ package body F552a00_Sparse_Arrays is
       return Found;
    end Has_Element;
 
-   function Has_Element (Container : Sparse_Array;
-      Index                        : Sparse_Array_Index) return Boolean
+   function Has_Element
+     (Container : Sparse_Array; Index : Sparse_Array_Index) return Boolean
    is
    begin
       return
@@ -44,13 +45,13 @@ package body F552a00_Sparse_Arrays is
 
    overriding function First (Object : Iterator) return Cursor;
 
-   overriding function Next (Object : Iterator;
-      Position                      : Cursor) return Cursor;
+   overriding function Next
+     (Object : Iterator; Position : Cursor) return Cursor;
 
    overriding function Last (Object : Iterator) return Cursor;
 
-   overriding function Previous (Object : Iterator;
-      Position                          : Cursor) return Cursor;
+   overriding function Previous
+     (Object : Iterator; Position : Cursor) return Cursor;
 
    function First (Object : Iterator) return Cursor is
    begin
@@ -98,8 +99,9 @@ package body F552a00_Sparse_Arrays is
       return Iterator'(Index => 0, Container => Container'Unchecked_Access);
    end Iterate;
 
-   function Constant_Reference (Container : aliased Sparse_Array;
-      Position :         Cursor) return Constant_Reference_Type
+   function Constant_Reference
+     (Container : aliased Sparse_Array; Position : Cursor)
+      return Constant_Reference_Type
    is
    begin
       Disable_History                := True;
@@ -121,8 +123,9 @@ package body F552a00_Sparse_Arrays is
 
    end Constant_Reference;
 
-   function Reference (Container : aliased in out Sparse_Array;
-      Position                   :                Cursor) return Reference_Type
+   function Reference
+     (Container : aliased in out Sparse_Array; Position : Cursor)
+      return Reference_Type
    is
    begin
       Disable_History                := True;

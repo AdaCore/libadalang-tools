@@ -11,7 +11,7 @@ package Cxe4002_Part_A2 is
    procedure Mixed_2 (X : in Integer; Y : out Integer; Z : in out Integer);
 
    type Remote_Proc is access procedure (X : Integer);
-   type Remote_Proc_Mixed is access procedure (A : in Integer; B : out Integer;
-      C                                          : in out Integer);
+   type Remote_Proc_Mixed is access procedure
+     (A : in Integer; B : out Integer; C : in out Integer);
 
 end Cxe4002_Part_A2;

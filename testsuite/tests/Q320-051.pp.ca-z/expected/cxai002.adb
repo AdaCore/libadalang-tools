@@ -84,8 +84,8 @@ procedure Cxai002 is
    My_Cursor_2 : My_Doubly_Linked_Lists.Cursor;
    My_Cursor_3 : My_Doubly_Linked_Lists.Cursor;
 
-   procedure Tampering_Check (Container : in out My_Doubly_Linked_Lists.List;
-      Where                             : in     String)
+   procedure Tampering_Check
+     (Container : in out My_Doubly_Linked_Lists.List; Where : in String)
    is
 
       Program_Error_Raised : Boolean := False;

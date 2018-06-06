@@ -225,8 +225,9 @@ begin
          -- Declare a dummy function to demonstrate one way that a chars_ptr
          -- variable could inadvertantly be set to Null_Ptr prior to a call
          -- to Value (below).
-         function Freedom (Condition : Boolean := False;
-            Ptr                      : Ics.Chars_Ptr) return Ics.Chars_Ptr
+         function Freedom
+           (Condition : Boolean := False; Ptr : Ics.Chars_Ptr) return Ics
+           .Chars_Ptr
          is
             Pointer : Ics.Chars_Ptr := Ptr;
          begin

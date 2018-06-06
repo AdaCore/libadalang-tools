@@ -53,8 +53,8 @@ procedure C41107a is
    V2 : Integer := Ident_Int (2);
    V3 : Integer := Ident_Int (3);
 
-   procedure P1 (X : in Integer; Y : in out Integer; Z : out Integer;
-      W            :    String)
+   procedure P1
+     (X : in Integer; Y : in out Integer; Z : out Integer; W : String)
    is
    begin
       if X /= 1 then

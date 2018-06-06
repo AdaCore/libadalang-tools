@@ -59,8 +59,9 @@ begin
          Rec4 : Rectype;  -- 80.
 
          task T1 is
-            entry E1 (Rec1 : in Rectype := (2, 0, "AB"); Rec2 : out Rectype;
-               Rec3        : in out Rectype);
+            entry E1
+              (Rec1 : in     Rectype := (2, 0, "AB"); Rec2 : out Rectype;
+               Rec3 : in out Rectype);
          end T1;
 
          task T2 is
@@ -72,8 +73,10 @@ begin
 
          task body T1 is
          begin
-            accept E1 (Rec1 : in Rectype := (2, 0, "AB"); Rec2 : out Rectype;
-               Rec3         : in out Rectype) do
+            accept E1
+              (Rec1 : in     Rectype := (2, 0, "AB"); Rec2 : out Rectype;
+               Rec3 : in out Rectype)
+            do
 
                if Rec1.Constraint /= Ident_Int (10) then
                   Failed
@@ -126,8 +129,8 @@ begin
          type Rectype (Constraint : Int := 80) is private;
 
          task T1 is
-            entry E1 (Rec1 : in     Rectype; Rec2 : out Rectype;
-               Rec3        : in out Rectype);
+            entry E1
+              (Rec1 : in Rectype; Rec2 : out Rectype; Rec3 : in out Rectype);
          end T1;
 
          task T2 is
@@ -150,8 +153,8 @@ begin
 
          task body T1 is
          begin
-            accept E1 (Rec1 : in     Rectype; Rec2 : out Rectype;
-               Rec3         : in out Rectype) do
+            accept E1
+              (Rec1 : in Rectype; Rec2 : out Rectype; Rec3 : in out Rectype) do
                if Rec1.Constraint /= Ident_Int (10) then
                   Failed
                     ("PRIVATE TYPE IN " & "PARAMETER DID " &
@@ -208,8 +211,8 @@ begin
          type Rectype (Constraint : Int := 80) is limited private;
 
          task T1 is
-            entry E1 (Rec1 : in     Rectype; Rec2 : out Rectype;
-               Rec3        : in out Rectype);
+            entry E1
+              (Rec1 : in Rectype; Rec2 : out Rectype; Rec3 : in out Rectype);
          end T1;
 
          task T2 is
@@ -232,8 +235,8 @@ begin
 
          task body T1 is
          begin
-            accept E1 (Rec1 : in     Rectype; Rec2 : out Rectype;
-               Rec3         : in out Rectype) do
+            accept E1
+              (Rec1 : in Rectype; Rec2 : out Rectype; Rec3 : in out Rectype) do
                if Rec1.Constraint /= Ident_Int (10) then
                   Failed
                     ("LIMITED PRIVATE TYPE IN " & "PARAMETER DID NOT USE " &

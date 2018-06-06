@@ -61,9 +61,10 @@ package Cxb30181 is
       Convention    => C,                         -- N/A => ERROR
       External_Name => Impdef.Cxb30181_Global_External_Name;
 
-   procedure Ada_Doubler (Inout1 : in out Interfaces.C.Int;
-      Inout2 : in out Interfaces.C.Short; Inout3 : in out Interfaces.C.C_Float;
-      Inout4                     : in out Interfaces.C.Double) with
+   procedure Ada_Doubler
+     (Inout1 : in out Interfaces.C.Int; Inout2 : in out Interfaces.C.Short;
+      Inout3 : in out Interfaces.C.C_Float;
+      Inout4 : in out Interfaces.C.Double) with
       Export,
       Convention    => C,                           -- N/A => ERROR
       External_Name => Impdef.Cxb30181_Proc_External_Name;

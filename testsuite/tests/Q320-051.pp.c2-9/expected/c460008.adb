@@ -73,11 +73,11 @@ procedure C460008 is
    generic
       type Source is range <>;
       type Target is mod <>;
-   procedure Integer_Conversion_Check (For_The_Value : Source;
-      Message                                        : String);
+   procedure Integer_Conversion_Check
+     (For_The_Value : Source; Message : String);
 
-   procedure Integer_Conversion_Check (For_The_Value : Source;
-      Message                                        : String)
+   procedure Integer_Conversion_Check
+     (For_The_Value : Source; Message : String)
    is
 
       Item : Target;

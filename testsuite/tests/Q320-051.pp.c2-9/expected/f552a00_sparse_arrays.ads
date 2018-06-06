@@ -22,8 +22,9 @@ package F552a00_Sparse_Arrays is
       Default_Iterator  => Iterate,
       Iterator_Element  => Element_Type;
 
-   procedure Append (Container : in out Sparse_Array;
-      Index :        Sparse_Array_Index; New_Item : Element_Type) with
+   procedure Append
+     (Container : in out Sparse_Array; Index : Sparse_Array_Index;
+      New_Item  :        Element_Type) with
       Pre => Container.Length < Container.Max_Elements
       and then not Has_Element (Container, Index);
       --  Duplicate indexes are not allowed.
@@ -35,8 +36,8 @@ package F552a00_Sparse_Arrays is
 
    function Has_Element (Position : Cursor) return Boolean;
 
-   function Has_Element (Container : Sparse_Array;
-      Index                        : Sparse_Array_Index) return Boolean;
+   function Has_Element
+     (Container : Sparse_Array; Index : Sparse_Array_Index) return Boolean;
 
    function Index_Of (Position : Cursor) return Sparse_Array_Index;
    --  Returns the array index assosiated with Position.
@@ -56,11 +57,13 @@ package F552a00_Sparse_Arrays is
    type Reference_Type (Element : not null access Element_Type) is private with
       Implicit_Dereference => Element;
 
-   function Constant_Reference (Container : aliased Sparse_Array;
-      Position :         Cursor) return Constant_Reference_Type;
+   function Constant_Reference
+     (Container : aliased Sparse_Array; Position : Cursor)
+      return Constant_Reference_Type;
 
-   function Reference (Container : aliased in out Sparse_Array;
-      Position                   :            Cursor) return Reference_Type;
+   function Reference
+     (Container : aliased in out Sparse_Array; Position : Cursor)
+      return Reference_Type;
 
    Tc_Call_History : Strings.Unbounded.Unbounded_String;
    --

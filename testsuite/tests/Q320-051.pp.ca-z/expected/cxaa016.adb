@@ -9,8 +9,8 @@ procedure Cxaa016 is
    No_Reset              : exception;
    Not_Applicable_System : Boolean := False;
 
-   procedure Delete_File (A_File : in out Ada.Text_Io.File_Type;
-      Id_Num                     : in     Integer)
+   procedure Delete_File
+     (A_File : in out Ada.Text_Io.File_Type; Id_Num : in Integer)
    is
    begin
       if not Ada.Text_Io.Is_Open (A_File) then
@@ -70,8 +70,8 @@ begin
       Line_5 : constant String := "This is the first line in Error file 2";
       Line_6 : constant String := "This is the next line in Error file 2";
 
-      procedure New_File (The_File : in out File_Type; Mode : in File_Mode;
-         Next                      : in     Integer)
+      procedure New_File
+        (The_File : in out File_Type; Mode : in File_Mode; Next : in Integer)
       is
       begin
          Create (The_File, Mode, Report.Legal_File_Name (Next));

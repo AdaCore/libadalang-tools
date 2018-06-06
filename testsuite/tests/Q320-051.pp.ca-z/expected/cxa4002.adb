@@ -90,8 +90,8 @@ begin
 
       ---
 
-      procedure Censor (Source_String : in out String;
-         Pattern_String               : in     String)
+      procedure Censor
+        (Source_String : in out String; Pattern_String : in String)
       is
 
          -- Create a replacement string that is the same length as the pattern

@@ -83,8 +83,8 @@ package F431a00 is
       T    : T_Task;                         --  limited component
    end record;
 
-   procedure Check (Item : in out My_Rec; Value : in Integer;
-      Message            : in     String);
+   procedure Check
+     (Item : in out My_Rec; Value : in Integer; Message : in String);
 
    type Ctrl_Rec is new Ada.Finalization.Controlled with record
       Info : Integer := 33;

@@ -26,8 +26,9 @@ package body C393010_1 is
 
    Num : Natural := 1_000;
 
-   function Issue (Service : Service_Classes; Flight : Natural; Seat : String;
-      Meal                 : Menu := Fowl) return Passenger_Ticket
+   function Issue
+     (Service : Service_Classes; Flight : Natural; Seat : String;
+      Meal    : Menu := Fowl) return Passenger_Ticket
    is
    begin
       Num := Num + 1;

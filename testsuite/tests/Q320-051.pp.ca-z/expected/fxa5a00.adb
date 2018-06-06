@@ -2,16 +2,18 @@
 
 package body Fxa5a00 is
 
-   function Result_Within_Range (Result : Float; Expected_Result : Float;
-      Relative_Error                    : Float) return Boolean
+   function Result_Within_Range
+     (Result : Float; Expected_Result : Float; Relative_Error : Float)
+      return Boolean
    is
    begin
       return (Result <= Expected_Result + Relative_Error) and
         (Result >= Expected_Result - Relative_Error);
    end Result_Within_Range;
 
-   function Result_Within_Range (Result : New_Float; Expected_Result : Float;
-      Relative_Error                    : Float) return Boolean
+   function Result_Within_Range
+     (Result : New_Float; Expected_Result : Float; Relative_Error : Float)
+      return Boolean
    is
    begin
       return (Float (Result) <= Expected_Result + Relative_Error) and

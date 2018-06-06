@@ -18,8 +18,7 @@ package Fa11d00.Ca11d02_0.Ca11d02_1 is     -- Array_Complex
       return Complex_Array_Type;
 
    function Add
-     (Left,
-      Right : Complex_Array_Type)   -- Add two complex
+     (Left, Right : Complex_Array_Type)   -- Add two complex
       return Complex_Array_Type;                      -- arrays.
 
    procedure Inverse

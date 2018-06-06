@@ -11,8 +11,9 @@
       File.Blocks     := Max_File_Size;
    end Create_File;
    ------------------------------------------------------------------------
-   procedure Compress_File (Original : in     Extended_File_Type;
-      Compressed_File                :    out Extended_File_Type)
+   procedure Compress_File
+     (Original        : in     Extended_File_Type;
+      Compressed_File :    out Extended_File_Type)
    is
    begin
       Compressed_File.Descriptor := Next_Available_File;

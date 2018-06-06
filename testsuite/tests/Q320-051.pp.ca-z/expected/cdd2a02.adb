@@ -42,8 +42,8 @@ procedure Cdd2a02 is
    type Int is range 1 .. 10;
    type Str is array (Int range <>) of Character;
 
-   procedure Read (Stream :     access Root_Stream_Type'Class;
-      Item                : out Int'Base);
+   procedure Read
+     (Stream : access Root_Stream_Type'Class; Item : out Int'Base);
    procedure Write (Stream : access Root_Stream_Type'Class; Item : Int'Base);
    function Input (Stream : access Root_Stream_Type'Class) return Int'Base;
    procedure Output (Stream : access Root_Stream_Type'Class; Item : Int'Base);
@@ -73,8 +73,8 @@ procedure Cdd2a02 is
    for Parent'Input use Input;
    for Parent'Output use Output;
 
-   procedure Actual_Read (Stream :     access Root_Stream_Type'Class;
-      Item                       : out Int)
+   procedure Actual_Read
+     (Stream : access Root_Stream_Type'Class; Item : out Int)
    is
    begin
       Integer'Read (Stream, Integer (Item));
@@ -97,8 +97,8 @@ procedure Cdd2a02 is
       Integer'Output (Stream, Integer (Item));
    end Actual_Output;
 
-   procedure Actual_Read (Stream :     access Root_Stream_Type'Class;
-      Item                       : out Parent)
+   procedure Actual_Read
+     (Stream : access Root_Stream_Type'Class; Item : out Parent)
    is
    begin
       case Item.B is
@@ -110,8 +110,8 @@ procedure Cdd2a02 is
       Str'Read (Stream, Item.S);
    end Actual_Read;
 
-   procedure Actual_Write (Stream : access Root_Stream_Type'Class;
-      Item                        : Parent)
+   procedure Actual_Write
+     (Stream : access Root_Stream_Type'Class; Item : Parent)
    is
    begin
       case Item.B is
@@ -141,8 +141,8 @@ procedure Cdd2a02 is
 
    end Actual_Input;
 
-   procedure Actual_Output (Stream : access Root_Stream_Type'Class;
-      Item                         : Parent)
+   procedure Actual_Output
+     (Stream : access Root_Stream_Type'Class; Item : Parent)
    is
    begin
       Int'Write (Stream, Item.D2);
@@ -159,30 +159,30 @@ procedure Cdd2a02 is
       Actual_Write => Actual_Write, Actual_Input => Actual_Input,
       Actual_Read => Actual_Read, Actual_Output => Actual_Output);
 
-   procedure Read (Stream :     access Root_Stream_Type'Class;
-      Item                : out Int'Base) renames
+   procedure Read
+     (Stream : access Root_Stream_Type'Class; Item : out Int'Base) renames
      Int_Ops.Read;
-   procedure Write (Stream : access Root_Stream_Type'Class;
-      Item                 : Int'Base) renames
+   procedure Write
+     (Stream : access Root_Stream_Type'Class; Item : Int'Base) renames
      Int_Ops.Write;
    function Input
      (Stream : access Root_Stream_Type'Class) return Int'Base renames
      Int_Ops.Input;
-   procedure Output (Stream : access Root_Stream_Type'Class;
-      Item                  : Int'Base) renames
+   procedure Output
+     (Stream : access Root_Stream_Type'Class; Item : Int'Base) renames
      Int_Ops.Output;
 
-   procedure Read (Stream :     access Root_Stream_Type'Class;
-      Item                : out Parent) renames
+   procedure Read
+     (Stream : access Root_Stream_Type'Class; Item : out Parent) renames
      Parent_Ops.Read;
-   procedure Write (Stream : access Root_Stream_Type'Class;
-      Item                 : Parent) renames
+   procedure Write
+     (Stream : access Root_Stream_Type'Class; Item : Parent) renames
      Parent_Ops.Write;
    function Input
      (Stream : access Root_Stream_Type'Class) return Parent renames
      Parent_Ops.Input;
-   procedure Output (Stream : access Root_Stream_Type'Class;
-      Item                  : Parent) renames
+   procedure Output
+     (Stream : access Root_Stream_Type'Class; Item : Parent) renames
      Parent_Ops.Output;
 
 begin

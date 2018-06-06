@@ -66,7 +66,8 @@ package Fa11b00 is          -- Application_One_Widget
 
    -- Primitive operation of type Widget. To be inherited by its children
    -- derivatives.
-   procedure App1_Widget_Specific_Oper (The_Widget : in out App1_Widget;
-      I : in     Widget_Id; C : in Widget_Color_Enum; L : in Widget_Label_Str);
+   procedure App1_Widget_Specific_Oper
+     (The_Widget : in out App1_Widget; I : in Widget_Id;
+      C          : in     Widget_Color_Enum; L : in Widget_Label_Str);
 
 end Fa11b00;                -- Application_One_Widget

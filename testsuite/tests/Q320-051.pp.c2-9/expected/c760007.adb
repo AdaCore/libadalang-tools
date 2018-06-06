@@ -4,8 +4,8 @@ with Report;
 with C760007_0;
 procedure C760007 is
 
-   procedure Check_Adjust_Count (Message : String; Min : Natural := 1;
-      Max                                : Natural := 2)
+   procedure Check_Adjust_Count
+     (Message : String; Min : Natural := 1; Max : Natural := 2)
    is
    begin
 
@@ -22,8 +22,8 @@ procedure C760007 is
       C760007_0.Adjust_Count := 0;
    end Check_Adjust_Count;
 
-   procedure Check_Child_Adjust_Count (Message : String; Min : Natural := 1;
-      Max                                      : Natural := 2)
+   procedure Check_Child_Adjust_Count
+     (Message : String; Min : Natural := 1; Max : Natural := 2)
    is
    begin
       -- ditto above

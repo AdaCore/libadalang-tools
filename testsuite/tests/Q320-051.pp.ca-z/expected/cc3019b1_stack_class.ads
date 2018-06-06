@@ -37,8 +37,8 @@ generic
 
    type Element is limited private;
 
-   with procedure Assign (Source : in out Element;
-      Destination                : in out Element);
+   with procedure Assign
+     (Source : in out Element; Destination : in out Element);
 
    with function "=" (Left : in Element; Right : in Element) return Boolean;
 
@@ -49,11 +49,11 @@ package Cc3019b1_Stack_Class is
    Overflow  : exception;
    Underflow : exception;
 
-   procedure Push (This_Element : in out Element;
-      On_To_This_Stack          : in out Stack);
+   procedure Push
+     (This_Element : in out Element; On_To_This_Stack : in out Stack);
 
-   procedure Pop (This_Element : in out Element;
-      Off_This_Stack           : in out Stack);
+   procedure Pop
+     (This_Element : in out Element; Off_This_Stack : in out Stack);
 
    procedure Copy (This_Stack : in out Stack; To_This_Stack : in out Stack);
 
@@ -61,8 +61,8 @@ package Cc3019b1_Stack_Class is
 
    generic
 
-      with procedure Process (This_Element : in     Element;
-         Continue                          :    out Boolean);
+      with procedure Process
+        (This_Element : in Element; Continue : out Boolean);
 
    procedure Iterate (Over_This_Stack : in Stack);
 

@@ -84,8 +84,8 @@ package C432004_0 is
 
    -- The following function is needed to verify the values of the private
    -- components.
-   function Tc_Correct_Result (Rec : Sampletype_F'Class;
-      E                            : Eras) return Boolean;
+   function Tc_Correct_Result
+     (Rec : Sampletype_F'Class; E : Eras) return Boolean;
 
 private
    type Sampletype_F is abstract tagged record

@@ -20,8 +20,8 @@ package body C660001_0 is
       return Source.Str.all;
    end "+";
 
-   procedure Set_Unbounded_String (Target :    out Unbounded_String;
-      Source                              : in     String)
+   procedure Set_Unbounded_String
+     (Target : out Unbounded_String; Source : in String)
    is
    begin
       Free (Target.Str);
@@ -61,8 +61,8 @@ package body C660001_0 is
       return Left = Right.Str.all;
    end "=";
 
-   function Element (Source : in Unbounded_String;
-      Index                 : in Positive) return Character
+   function Element
+     (Source : in Unbounded_String; Index : in Positive) return Character
    is
    begin
       return Source.Str.all (Index); -- Raises Constraint_Error if Index

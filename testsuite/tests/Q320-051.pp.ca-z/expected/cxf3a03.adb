@@ -115,8 +115,9 @@ begin
          return False;
       end V_Present;
 
-      function Accurate_Length (Pict_Str : String; Inst : Instantiation_Type;
-         Currency_String                 : String) return Boolean
+      function Accurate_Length
+        (Pict_Str        : String; Inst : Instantiation_Type;
+         Currency_String : String) return Boolean
       is
 
          Tc_Length                     : Natural := 0;

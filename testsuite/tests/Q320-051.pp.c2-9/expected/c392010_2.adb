@@ -4,8 +4,9 @@ with Tctouch;
 with Report;
 package body C392010_2 is
 
-   procedure Proc_W_Non (Cp_Ap : access Tagtype_Level_2;
-      Noncp_Ap                 : access C392010_0.Tagtype_Level_0 :=
+   procedure Proc_W_Non
+     (Cp_Ap    : access Tagtype_Level_2;
+      Noncp_Ap : access C392010_0.Tagtype_Level_0 :=
         Lev2_Level_0_Global_Object'Access)
    is
    begin
@@ -25,10 +26,11 @@ package body C392010_2 is
    Own : aliased Tagtype_Level_2 :=
      (Another_Int_Item | Int_Item => 4, Ch_Item => 'g');
 
-   function Func_W_Non (Cp_Ap : access Tagtype_Level_2;
-      Noncp_Ap                : access C392010_0.Tagtype_Level_0 :=
-        Lev2_Level_0_Global_Object'Access) return C392010_1
-     .Access_Tagtype_Level_1
+   function Func_W_Non
+     (Cp_Ap    : access Tagtype_Level_2;
+      Noncp_Ap : access C392010_0.Tagtype_Level_0 :=
+        Lev2_Level_0_Global_Object'Access)
+      return C392010_1.Access_Tagtype_Level_1
    is
    begin
       Tctouch.Touch

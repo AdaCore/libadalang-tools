@@ -4,15 +4,15 @@ with Report;
 with Tctouch;
 package body C391002_4 is -- Communications
 
-   procedure Creator (Plugs : in     Modules.Electronics_Module;
-      Gives                 :    out Mil_Comm)
+   procedure Creator
+     (Plugs : in Modules.Electronics_Module; Gives : out Mil_Comm)
    is
    begin
       Gives := (Plugs with Tc_Mc => -1);
    end Creator;
 
-   function Creator (Key :    Integer;
-      Plugs              : in Modules.Electronics_Module) return Private_Comm
+   function Creator
+     (Key : Integer; Plugs : in Modules.Electronics_Module) return Private_Comm
    is
    begin
       return (Plugs with Tc_Pc => Key);

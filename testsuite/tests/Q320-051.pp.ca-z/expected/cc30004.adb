@@ -81,11 +81,13 @@ begin
 
          type Integer_Item is range <>;
 
-      procedure P (P_In : in     Integer_Item; P_Out : out Integer_Item;
-         P_In_Out       : in out Integer_Item);
+      procedure P
+        (P_In     : in     Integer_Item; P_Out : out Integer_Item;
+         P_In_Out : in out Integer_Item);
 
-      procedure P (P_In : in     Integer_Item; P_Out : out Integer_Item;
-         P_In_Out       : in out Integer_Item)
+      procedure P
+        (P_In     : in     Integer_Item; P_Out : out Integer_Item;
+         P_In_Out : in out Integer_Item)
       is
 
          Store : Integer_Item;
@@ -222,11 +224,13 @@ begin
          type Item is private;
          type Access_Item is access Item;
 
-      procedure P (P_In : in     Access_Item; P_Out : out Access_Item;
-         P_In_Out       : in out Access_Item);
+      procedure P
+        (P_In     : in     Access_Item; P_Out : out Access_Item;
+         P_In_Out : in out Access_Item);
 
-      procedure P (P_In : in     Access_Item; P_Out : out Access_Item;
-         P_In_Out       : in out Access_Item)
+      procedure P
+        (P_In     : in     Access_Item; P_Out : out Access_Item;
+         P_In_Out : in out Access_Item)
       is
 
          Store : Access_Item;
@@ -349,11 +353,13 @@ begin
 
          type Float_Item is digits <>;
 
-      procedure P (P_In : in     Float_Item; P_Out : out Float_Item;
-         P_In_Out       : in out Float_Item);
+      procedure P
+        (P_In     : in     Float_Item; P_Out : out Float_Item;
+         P_In_Out : in out Float_Item);
 
-      procedure P (P_In : in     Float_Item; P_Out : out Float_Item;
-         P_In_Out       : in out Float_Item)
+      procedure P
+        (P_In     : in     Float_Item; P_Out : out Float_Item;
+         P_In_Out : in out Float_Item)
       is
 
          Store : Float_Item;
@@ -465,11 +471,13 @@ begin
          Cnst1 : in Private_Item;
          Cnst2 : in Private_Item;
 
-      procedure P (P_In : in     Private_Item; P_Out : out Private_Item;
-         P_In_Out       : in out Private_Item);
+      procedure P
+        (P_In     : in     Private_Item; P_Out : out Private_Item;
+         P_In_Out : in out Private_Item);
 
-      procedure P (P_In : in     Private_Item; P_Out : out Private_Item;
-         P_In_Out       : in out Private_Item)
+      procedure P
+        (P_In     : in     Private_Item; P_Out : out Private_Item;
+         P_In_Out : in out Private_Item)
       is
 
          Store : Private_Item;

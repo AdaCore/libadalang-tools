@@ -1,9 +1,10 @@
 with Interfaces.C;
 package body Cxb30171 is
 
-   procedure Ada_Doubler (Inout1 : in out Interfaces.C.Int;
-      Inout2 : in out Interfaces.C.Short; Inout3 : in out Interfaces.C.C_Float;
-      Inout4                     : in out Interfaces.C.Double)
+   procedure Ada_Doubler
+     (Inout1 : in out Interfaces.C.Int; Inout2 : in out Interfaces.C.Short;
+      Inout3 : in out Interfaces.C.C_Float;
+      Inout4 : in out Interfaces.C.Double)
    is
       -- Double the value of each of the parameters.
       use type Interfaces.C.Int;

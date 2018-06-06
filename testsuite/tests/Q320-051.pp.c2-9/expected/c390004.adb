@@ -20,8 +20,8 @@ procedure C390004 is
       Dmv.Park (It);
    end Valet;
 
-   procedure Tc_Match (Object : Dmv.Vehicle'Class; Taglet : Ada.Tags.Tag;
-      Where                   : String)
+   procedure Tc_Match
+     (Object : Dmv.Vehicle'Class; Taglet : Ada.Tags.Tag; Where : String)
    is
       use Ada.Tags;
    begin
@@ -60,8 +60,8 @@ procedure C390004 is
       end if;
    end Parking_Validation;
 
-   function Wash (It : V_Reference;
-      Tc_Expect      : Ada.Tags.Tag) return Dmv.Vehicle'Class
+   function Wash
+     (It : V_Reference; Tc_Expect : Ada.Tags.Tag) return Dmv.Vehicle'Class
    is
       This_Machine : Dmv.Vehicle'Class := It.all;
    begin
@@ -70,8 +70,8 @@ procedure C390004 is
       return This_Machine;
    end Wash;
 
-   function Wash (It : C_Reference;
-      Tc_Expect      : Ada.Tags.Tag) return Dmv.Car'Class
+   function Wash
+     (It : C_Reference; Tc_Expect : Ada.Tags.Tag) return Dmv.Car'Class
    is
       This_Machine : Dmv.Car'Class := It.all;
    begin

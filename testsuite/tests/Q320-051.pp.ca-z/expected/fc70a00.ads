@@ -49,13 +49,11 @@ package Fc70a00 is
       return Complex_Type;                             -- integer.
 
    function "+"
-     (Left,
-      Right : Complex_Type)          -- Add two complex
+     (Left, Right : Complex_Type)          -- Add two complex
       return Complex_Type;                             -- integers.
 
    function "*"
-     (Left,
-      Right : Complex_Type)          -- Multiply two complex
+     (Left, Right : Complex_Type)          -- Multiply two complex
       return Complex_Type;                             -- integers.
 
    function Reciprocal
@@ -63,8 +61,7 @@ package Fc70a00 is
       return Complex_Type;                             -- of a complex integer.
 
    function Complex
-     (Real,
-      Imag : Int_Type)           -- Create a complex
+     (Real, Imag : Int_Type)           -- Create a complex
       return Complex_Type;                             -- integer.
 
 private

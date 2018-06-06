@@ -88,8 +88,9 @@ procedure Cxg2007 is
 
       Maximum_Relative_Error : constant Real := 3.0;
 
-      procedure Check (Actual, Expected : Real; Test_Name : String; Mre : Real;
-         Arg_Error                      : Real)
+      procedure Check
+        (Actual, Expected : Real; Test_Name : String; Mre : Real;
+         Arg_Error        : Real)
       is
          -- Arg_Error is additional absolute error that is allowed beyond the
          -- MRE to account for error in the result that can be attributed to
@@ -125,8 +126,9 @@ procedure Cxg2007 is
          end if;
       end Check;
 
-      procedure Check (Actual, Expected : Complex; Test_Name : String;
-         Mre                            : Real; Arg_Error : Real)
+      procedure Check
+        (Actual, Expected : Complex; Test_Name : String; Mre : Real;
+         Arg_Error        : Real)
       is
       -- Arg_Error is additional absolute error that is allowed beyond the MRE
       -- to account for error in the result that can be attributed to error in

@@ -34,8 +34,8 @@ procedure C641001 is
          Report.Failed ("Exception in Check_Out_Sliding");
    end Check_Out_Sliding;
 
-   procedure Check_Dynamic_Subtype_Cases (F_Lower, F_Upper : Natural;
-      A_Lower, A_Upper                                     : Natural)
+   procedure Check_Dynamic_Subtype_Cases
+     (F_Lower, F_Upper : Natural; A_Lower, A_Upper : Natural)
    is
 
       subtype Dyn_String is String (F_Lower .. F_Upper);

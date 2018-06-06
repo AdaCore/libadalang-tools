@@ -80,8 +80,9 @@ procedure Cxg2003 is
       -- The default Maximum Relative Error is the value specified in the LRM.
       Default_Mre : constant Real := 2.0;
 
-      procedure Check (Actual, Expected : Real; Test_Name : String;
-         Mre                            : Real := Default_Mre)
+      procedure Check
+        (Actual, Expected : Real; Test_Name : String;
+         Mre              : Real := Default_Mre)
       is
          Rel_Error : Real;
          Abs_Error : Real;
@@ -274,8 +275,9 @@ procedure Cxg2003 is
       -- The default Maximum Relative Error is the value specified in the LRM.
       Default_Mre : constant Real := 2.0;
 
-      procedure Check (Actual, Expected : Real; Test_Name : String;
-         Mre                            : Real := Default_Mre)
+      procedure Check
+        (Actual, Expected : Real; Test_Name : String;
+         Mre              : Real := Default_Mre)
       is
          Rel_Error : Real;
          Abs_Error : Real;
@@ -461,8 +463,9 @@ procedure Cxg2003 is
       -- The default Maximum Relative Error is the value specified in the LRM.
       Default_Mre : constant Real := 2.0;
 
-      procedure Check (Actual, Expected : Real; Test_Name : String;
-         Mre                            : Real := Default_Mre)
+      procedure Check
+        (Actual, Expected : Real; Test_Name : String;
+         Mre              : Real := Default_Mre)
       is
          Rel_Error : Real;
          Abs_Error : Real;

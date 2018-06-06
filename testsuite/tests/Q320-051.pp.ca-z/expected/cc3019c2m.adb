@@ -90,13 +90,14 @@ procedure Cc3019c2m is
      (Birth_Date => Date'(Dec, 10, 1_980), Gender => Female,
       Name       => "CHRISSY   ");
 
-   procedure Assign (The_Value_Of_This_Date : in out Date;
-      To_This_Date                          : in out Date);
+   procedure Assign
+     (The_Value_Of_This_Date : in out Date; To_This_Date : in out Date);
 
    function Is_Equal (Left : in Date; Right : in Date) return Boolean;
 
-   procedure Assign (The_Value_Of_This_Person : in out Person;
-      To_This_Person                          : in out Person);
+   procedure Assign
+     (The_Value_Of_This_Person : in out Person;
+      To_This_Person           : in out Person);
 
    function Is_Equal (Left : in Person; Right : in Person) return Boolean;
 
@@ -108,8 +109,9 @@ procedure Cc3019c2m is
    First_Nng  : New_Nested_Generics.Nested_Generics_Type;
    Second_Nng : New_Nested_Generics.Nested_Generics_Type;
 
-   function "=" (Left : in New_Nested_Generics.Nested_Generics_Type;
-      Right           : in New_Nested_Generics.Nested_Generics_Type)
+   function "="
+     (Left  : in New_Nested_Generics.Nested_Generics_Type;
+      Right : in New_Nested_Generics.Nested_Generics_Type)
       return Boolean renames
      New_Nested_Generics."=";
 
@@ -130,12 +132,13 @@ procedure Cc3019c2m is
    Second_Person_Stack : Person_Stack.Stack;
    Third_Person_Stack  : Person_Stack.Stack;
 
-   function "=" (Left : in Person_Stack.Stack;
-      Right           : in Person_Stack.Stack) return Boolean renames
+   function "="
+     (Left : in Person_Stack.Stack; Right : in Person_Stack.Stack)
+      return Boolean renames
      Person_Stack."=";
 
-   procedure Assign (The_Value_Of_This_Date : in out Date;
-      To_This_Date                          : in out Date)
+   procedure Assign
+     (The_Value_Of_This_Date : in out Date; To_This_Date : in out Date)
    is
 
    begin -- ASSIGN
@@ -157,8 +160,8 @@ procedure Cc3019c2m is
 
    end Is_Equal;
 
-   procedure Assign (The_Value_Of_This_Person : in out Person;
-      To_This_Person                          : in out Person)
+   procedure Assign
+     (The_Value_Of_This_Person : in out Person; To_This_Person : in out Person)
    is
 
    begin -- ASSIGN
@@ -358,8 +361,8 @@ begin  -- CC3019C2M
 
       Table_Index : Positive := 1;
 
-      procedure Gather_People (This_Person : in     Person;
-         Continue                          :    out Boolean);
+      procedure Gather_People
+        (This_Person : in Person; Continue : out Boolean);
 
       procedure Show_People (This_Person : in Person; Continue : out Boolean);
 

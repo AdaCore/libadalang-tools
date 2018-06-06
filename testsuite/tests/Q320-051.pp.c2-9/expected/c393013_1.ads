@@ -70,8 +70,8 @@
    procedure Set_Location (Obj : in out Generator; Location : in Character);
    -- Natural and Character stand in for real application data types.
    function Create (Power : in Natural) return Generator;
-   function Clone (Obj : in Generator;
-      New_Location     : in Character) return Generator;
+   function Clone
+     (Obj : in Generator; New_Location : in Character) return Generator;
    -- Create a copy of Obj at a new location.
 private
    type Generator is tagged record

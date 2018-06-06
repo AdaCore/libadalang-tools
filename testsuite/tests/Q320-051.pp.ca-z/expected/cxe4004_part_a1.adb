@@ -8,9 +8,10 @@ package body Cxe4004_Part_A1 is
    procedure Chk is new Cxe4004_Shared.Gen_Chk (Boolean);
    procedure Chk is new Cxe4004_Shared.Gen_Chk (Character);
 
-   procedure Check_In (Test_No : in Integer; Vec : in Integer_Vector;
-      Dr1 : in Discriminated_Record; Dr2 : in Another_Discriminated_Record;
-      Tr                       : in Extended_2)
+   procedure Check_In
+     (Test_No : in Integer; Vec : in Integer_Vector;
+      Dr1     : in Discriminated_Record; Dr2 : in Another_Discriminated_Record;
+      Tr      : in Extended_2)
    is
    begin
       Start_Test_Section ("IN parameter test #" & Integer'Image (Test_No));
@@ -49,9 +50,10 @@ package body Cxe4004_Part_A1 is
       end case;
    end Check_In;
 
-   procedure Set_Out (Test_No : in     Integer; Vec : out Integer_Vector;
+   procedure Set_Out
+     (Test_No : in     Integer; Vec : out Integer_Vector;
       Dr1 : out Discriminated_Record; Dr2 : out Another_Discriminated_Record;
-      Tr                      :    out Extended_2)
+      Tr      :    out Extended_2)
    is
    begin
       Start_Test_Section ("OUT parameter test #" & Integer'Image (Test_No));
@@ -86,9 +88,10 @@ package body Cxe4004_Part_A1 is
       end case;
    end Set_Out;
 
-   procedure Modify (Test_No : in     Integer; Vec : in out Integer_Vector;
-      Dr1                    : in out Discriminated_Record;
-      Dr2 : in out Another_Discriminated_Record; Tr : in out Extended_2)
+   procedure Modify
+     (Test_No : in     Integer; Vec : in out Integer_Vector;
+      Dr1     : in out Discriminated_Record;
+      Dr2     : in out Another_Discriminated_Record; Tr : in out Extended_2)
    is
    begin
       Start_Test_Section ("IN OUT Parameter test #" & Integer'Image (Test_No));

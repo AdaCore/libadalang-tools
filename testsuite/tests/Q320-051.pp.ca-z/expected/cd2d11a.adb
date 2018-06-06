@@ -70,8 +70,9 @@ procedure Cd2d11a is
       end if;
    end Ident;
 
-   procedure Proc (N1_In, P1_In :        Check_Type;
-      N2_Inout, P2_Inout        : in out Check_Type; Czout : out Check_Type)
+   procedure Proc
+     (N1_In, P1_In :     Check_Type; N2_Inout, P2_Inout : in out Check_Type;
+      Czout        : out Check_Type)
    is
    begin
 

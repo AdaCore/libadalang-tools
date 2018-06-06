@@ -359,8 +359,8 @@ begin
 
    declare
       function Evaluate
-        (Fn : not null access function (X : Float) return Float;
-         X  : Float) return Float
+        (Fn : not null access function (X : Float) return Float; X : Float)
+         return Float
       is
       begin
          return Fn (X);

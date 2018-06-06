@@ -128,8 +128,9 @@ procedure C851001 is
 
    Rec : Rec_Type;
 
-   procedure Test_Param (Param1 : in out not null Int_Ptr;
-      Param2 : in out Nn_Int_Ptr; Param3 : in out not null Acc_Ptr)
+   procedure Test_Param
+     (Param1 : in out not null Int_Ptr; Param2 : in out Nn_Int_Ptr;
+      Param3 : in out not null Acc_Ptr)
    is
       Renp1 : Int_Ptr renames Param1;
       Renp2 : Int_Ptr renames Param2;
