@@ -15,7 +15,7 @@ all:
 install-strip:
 	mkdir -p "$(DESTDIR)"
 	cp -r bin "$(DESTDIR)/"
-	strip -g "$(DESTDIR)/bin/"*
+	strip "$(DESTDIR)/bin/"*
 
 .PHONY: clean
 clean:
