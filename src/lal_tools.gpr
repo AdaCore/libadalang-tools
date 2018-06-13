@@ -8,7 +8,10 @@ project LAL_Tools is
    for Object_Dir use "../obj";
 
    for Excluded_Source_Files use
-     ("pp-main.adb", "metrics-main.adb", "stub-main.adb");
+     ("utils-var_length_ints-test.adb",
+      "pp-main.adb",
+      "metrics-main.adb",
+      "stub-main.adb");
 
    package Compiler is
       case Build_Mode is
@@ -20,8 +23,7 @@ project LAL_Tools is
                "-g",
                "-O0",
                "-gnata",
-               "-gnatVa",
-               "-gnat2020");
+               "-gnatVa");
 
          when "prod" =>
             for Default_Switches ("Ada") use
@@ -29,8 +31,7 @@ project LAL_Tools is
                "-g",
                "-Ofast",
                "-gnatp",
-               "-gnatn2",
-               "-gnat2020");
+               "-gnatn2");
       end case;
    end Compiler;
 

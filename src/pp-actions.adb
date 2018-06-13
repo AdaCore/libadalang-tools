@@ -2199,7 +2199,7 @@ package body Pp.Actions is
             Tree := Ancestor_Tree (N);
             exit when Tree.Is_Null;
             Put ("\1\t\2\n", Image (Integer (N)), Short_Image (Tree));
-            N := @ + 1;
+            N := N + 1;
          end loop;
       end Dump_Ancestors;
       pragma Warnings (On);

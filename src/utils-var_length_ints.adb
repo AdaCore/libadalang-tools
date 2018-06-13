@@ -43,7 +43,7 @@ package body Utils.Var_Length_Ints is
             Append (V, To_Octet (Temp mod Radix, First_Octet));
             exit when Temp = 0;
             First_Octet := False;
-            Temp := @ / Radix;
+            Temp := Temp / Radix;
          end loop;
       end Encode;
 
@@ -63,8 +63,8 @@ package body Utils.Var_Length_Ints is
 
          Next (A, Temp_Index);
          loop
-            Temp_Index := @ - 1;
-            Result := (@ * Radix) + Val (A (Temp_Index));
+            Temp_Index := Temp_Index - 1;
+            Result := (Result * Radix) + Val (A (Temp_Index));
             exit when Is_First (A (Temp_Index));
          end loop;
          return Result;
@@ -95,7 +95,7 @@ package body Utils.Var_Length_Ints is
    begin
       pragma Assert (Is_First (A (Index)));
       loop
-         Index := @ + 1;
+         Index := Index + 1;
          exit when Index = A'Last + 1 or else Is_First (A (Index));
       end loop;
    end Next;
@@ -123,7 +123,7 @@ package body Utils.Var_Length_Ints is
    begin
       pragma Assert (Index = A'Last + 1 or else Is_First (A (Index)));
       loop
-         Index := @ - 1;
+         Index := Index - 1;
          exit when Is_First (A (Index));
       end loop;
    end Prev;

@@ -1474,7 +1474,7 @@ package body Pp.Formatting is
                      Enabled_Line_Start, This_Line_Start : Positive;
                   begin
                      while not All_LB (All_LBI (Last_En)).Enabled loop
-                        Last_En := @ - 1;
+                        Last_En := Last_En - 1;
                      end loop;
 
                      Enabled_Line_Start :=
@@ -2129,7 +2129,8 @@ package body Pp.Formatting is
                      begin
                         if Extra_Indent_For_Preserved_Line then
                            --  See Manage_Paren_Stack
-                           Indentation := @ + PP_Indent_Continuation (Cmd);
+                           Indentation :=
+                             Indentation + PP_Indent_Continuation (Cmd);
                         end if;
 
                         if Cur (Out_Buf) = ' ' then
@@ -2138,7 +2139,8 @@ package body Pp.Formatting is
                         end if;
 
                         if Kind (Out_Tok) /= End_Of_Line then
-                           Indentation := @ + L_Paren_Indentation_For_Preserve;
+                           Indentation :=
+                             Indentation + L_Paren_Indentation_For_Preserve;
                            Cur_Indentation := Indentation;
                            Append_Temp_Line_Break (Lines_Data);
                            Cur_Indentation := 0;

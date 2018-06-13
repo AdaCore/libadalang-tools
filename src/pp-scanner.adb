@@ -370,7 +370,7 @@ package body Pp.Scanner is
             end if;
          end if;
       end if;
-      Cur.Fi := @ + 1;
+      Cur.Fi := Cur.Fi + 1;
    end Next;
 
    function Prev (Cur : Tokn_Cursor) return Tokn_Cursor is
@@ -382,7 +382,7 @@ package body Pp.Scanner is
 
    procedure Prev (Cur : in out Tokn_Cursor) is
    begin
-      Cur.Fi := @ - 1;
+      Cur.Fi := Cur.Fi - 1;
       if Kind (Cur) in Stored_Text_Kind then
          if Kind (Cur) in Comment_Kind then
             if Kind (Cur) in Whole_Line_Comment then
@@ -1436,7 +1436,7 @@ package body Pp.Scanner is
             end if;
          end if;
       end if;
-      Cur.Fi := @ + 1;
+      Cur.Fi := Cur.Fi + 1;
    end Next;
 
    function Prev (Cur : Tokn_Seq_Cursor) return Tokn_Seq_Cursor is
@@ -1448,7 +1448,7 @@ package body Pp.Scanner is
 
    procedure Prev (Cur : in out Tokn_Seq_Cursor) is
    begin
-      Cur.Fi := @ - 1;
+      Cur.Fi := Cur.Fi - 1;
       if Kind (Cur) in Stored_Text_Kind then
          if Kind (Cur) in Comment_Kind then
             if Kind (Cur) in Whole_Line_Comment then
