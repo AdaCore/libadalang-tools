@@ -29,8 +29,7 @@ with Pp.Buffers; use Pp.Buffers;
 use Pp.Buffers.Marker_Vectors;
 --  use all type Pp.Buffers.Marker_Vector;
 
-with Utils.Predefined_Symbols;
-pragma Unreferenced (Utils.Predefined_Symbols);
+private with Utils.Var_Length_Ints;
 
 package Pp.Scanner is
 
@@ -48,14 +47,13 @@ package Pp.Scanner is
 
    package Syms renames Utils.Symbols;
 
-   type Token_Kind is
+   type Opt_Token_Kind is
      (Nil,
-      Start_Of_Input,
-      End_Of_Input,
       Identifier,
       Character_Literal,
       String_Literal,
       Numeric_Literal,
+      Spaces, -- A sequence of one or more space characters.
       Pp_Off_Comment,
       --  A whole-line comment that matches the --pp-off string
       Pp_On_Comment,
@@ -73,11 +71,19 @@ package Pp.Scanner is
       End_Of_Line_Comment,
    --  A comment that appears at the end of a line, after some other
    --  program text.
+
+      --  All the rest are in Same_Text_Kind (see body):
+
+      Start_Of_Input,
+      End_Of_Input,
       End_Of_Line, -- First in a series of one or more NLs.
       Blank_Line, -- Second, third, ... in a series of one or more NLs.
 
-      '-', ''', '&', '(', ')', '+', ',', ';', '|', '!', '@',
-      '>', '.', '*', '=',
+      '!', '#', '$', '?', '[', '\', ']', '^', '`', '{', '}', '~',
+      --  These are not in Ada
+
+      '-', ''', '&', '(', ')', '+', ',', ':', ';', '|', '@',
+      '<', '>', '.', '*', '=', '/',
       Arrow, --  =>
       Dot_Dot, --  ..
       Exp_Op, --  **
@@ -175,7 +181,9 @@ package Pp.Scanner is
       Res_Some
      );
 
-   subtype Other_Lexeme is Token_Kind range '-' .. Colon_Equal;
+   subtype Token_Kind is Opt_Token_Kind with Predicate => Token_Kind /= Nil;
+
+   subtype Other_Lexeme is Token_Kind range '!' .. Colon_Equal;
 
    subtype Reserved_Word is Token_Kind range Res_Abort .. Res_Some;
    subtype Reserved_Word_Or_Id is Token_Kind with
@@ -185,10 +193,6 @@ package Pp.Scanner is
    subtype Reserved_Word_2005 is
      Token_Kind range Res_Abort .. Res_Synchronized;
    subtype Reserved_Word_2012 is Token_Kind range Res_Abort .. Res_Some;
-
-   subtype Same_Text is Token_Kind range '-' .. Res_Some;
-   --  These are the tokens that always have the same text associated with them
-   --  (case insenstively), so we don't need to store the text with each token.
 
    subtype Whole_Line_Comment is Token_Kind with
      Predicate => Whole_Line_Comment in
@@ -201,6 +205,19 @@ package Pp.Scanner is
    subtype Pp_Off_On_Comment is Token_Kind with
         Predicate => Pp_Off_On_Comment in Pp_Off_Comment | Pp_On_Comment;
 
+   subtype Same_Text_Kind is Opt_Token_Kind range Start_Of_Input .. Res_Some;
+   --  These are the tokens that always have the same text associated with
+   --  them (case insensitively), so we don't need to store the text with
+   --  each token. Instead, the token text is stored in Token_To_Symbol_Map
+   --  below. Example: Every Less_Or_Equal token has the text "<=".
+
+   subtype Stored_Text_Kind is Token_Kind with
+     Predicate => Stored_Text_Kind not in Same_Text_Kind;
+   --  These are the tokens that have different text.
+   --  The token text is stored separately for each token.
+   --  Example: Identifier -- one might have text = "Foo",
+   --  and another might have "Bar".
+
    type Source_Location is record
       Line, Col : Positive; -- 1-based line and column numbers
       First     : Positive;
@@ -210,6 +227,46 @@ package Pp.Scanner is
       --  ???Same information as First&Last. These should replace First&Last
       --  eventually. Note that Lastx points one past the last character.
    end record;
+
+   --  Define type Token as a variant record. Mostly, we avoid using this type,
+   --  and access tokens via type Tokn_Cursor and its accessor functions.
+   --  See those accessor functions for documentation on the components
+   --  of this record.
+
+   type Opt_Token (Kind : Opt_Token_Kind := Nil) is record
+      Sloc : Source_Location;
+      case Kind is
+         when Same_Text_Kind => null;
+         when Stored_Text_Kind =>
+            Text : Syms.Symbol;
+            case Kind is
+               when Comment_Kind =>
+                  Leading_Blanks : Natural;
+                  case Kind is
+                     when Whole_Line_Comment =>
+                        Width : Natural;
+                     when others => null;
+                  end case;
+               when others => null;
+            end case;
+         when others => null;
+      end case;
+   end record;
+
+   subtype Token is Opt_Token with Predicate => Token.Kind /= Nil;
+
+   --  To add new token kinds:
+   --
+   --  Decide whether it belongs in Same_Text_Kind or Stored_Text_Kind,
+   --  and add the enumeral to Opt_Token_Kind in an appropriate place.
+   --
+   --  Add code to Get_Tokns.Get_Tokn to parse out the token.
+   --
+   --  If the token needs additional information, add it to the variant part
+   --  of type Token above. In addition, search the body of this package for
+   --  "Octet" to find all the places where the additional information needs to
+   --  be encoded, decoded, and skipped over. Currently, we only have support
+   --  for integer types.
 
    function First_Pos (Input : Buffer; Sloc : Source_Location) return Positive;
    function Last_Pos (Input : Buffer; Sloc : Source_Location) return Natural;
@@ -250,47 +307,6 @@ package Pp.Scanner is
      (File_Name : String; Sloc : Source_Location) return String is
        (File_Name & ":" & Image (Sloc.Line) & ":" & Image (Sloc.Col));
 
-   type Token is private;
-
-   --  Accessor functions
-
-   function Kind (X : Token) return Token_Kind;
-
-   function Text (X : Token) return Syms.Symbol;
-   --  The text of the token as it appears in the source, with these
-   --  exceptions and clarifications:
-   --
-   --  Start_Of_Input and End_Of_Input have Text = "".
-   --
-   --  For Blank_Line: does not include the text of the preceding
-   --  End_Of_Line or Blank_Line (i.e. it is usually just LF, but could
-   --  be CR/LF -- not LF,LF nor CR,LF,CR,LF).
-   --
-   --  For comments, the text of the comment excluding the initial "--"
-   --  and leading and trailing blanks, and followed by an extra NL. For
-   --  multi-line comment "paragraphs", used for filling, NL terminates each
-   --  line. The NL at the end isn't really part of the comment; the next
-   --  token in the stream will be End_Of_Line. The reason for the extra NL
-   --  is that GNATCOLL.Paragraph_Filling expects it, so it's simpler and
-   --  more efficient this way.
-
-   function Leading_Blanks (X : Token) return Natural;
-   --  For comments, the number of leading blanks, which are blanks after
-   --  the initial "--" and before any nonblank characters. For other
-   --  tokens, zero.
-
-   function Width (X : Token) return Natural;
-   --  For single-line Whole_Line_Comments, this is the width of the token,
-   --  i.e. the same as Sloc.Last-Sloc.First+1, and the same as the length of
-   --  Text. For multi-line comments, this is the width of the widest line.
-   --  The initial "--" and any leading blanks are included, but the NL's are
-   --  not.
-
-   function Sloc (X : Token) return Source_Location;
-
-   type Token_Index is new Positive;
-   type Token_Array is array (Token_Index range <>) of Token;
-
    function Line_Length
      (Input    : in out Buffer;
       Ends     : Marker_Vector;
@@ -313,144 +329,211 @@ package Pp.Scanner is
       --  We do not want these comments to be fillable.
    end record;
 
-   Gen_Plus : constant Syms.Symbol := Syms.W_Intern ("--gen+");
-   --  (style) two spaces required
-   Gen_Minus : constant Syms.Symbol := Syms.W_Intern ("--gen-");
-   --  Strings to mark start and end of automatically generated code.
-
    Token_Separator : constant W_Char := W_Char'Val (1);
    --  If Insert_Line_Breaks is False, this character is used instead of hard
    --  line breaks, because otherwise things like "isbegin" can be run
-   --  together.
+   --  together. ???This doesn't work.
 
-   use Syms;
+   ----------------
 
-   Token_To_Symbol_Map : constant array (Same_Text) of Symbol :=
-     ('-' => Intern ("-"),
-      ''' => Intern ("'"),
-      '&' => Intern ("&"),
-      '(' => Intern ("("),
-      ')' => Intern (")"),
-      '+' => Intern ("+"),
-      ',' => Intern (","),
-      ';' => Intern (";"),
-      '|' => Intern ("|"),
-      '!' => Intern ("!"),
-      '@' => Intern ("@"),
-      '>' => Intern (">"),
-      '.' => Intern ("."),
-      '*' => Intern ("*"),
-      '=' => Intern ("="),
+   type Tokn_Vec is limited private;
+   --  Growable sequence of tokens
+   type Tokn_Cursor (<>) is private;
+   --  Pointer into a Tokn_Vec
 
-      Arrow => Intern ("=>"),
-      Dot_Dot => Intern (".."),
-      Exp_Op => Intern ("**"),
-      Not_Equal => Intern ("/="),
-      Greater_Or_Equal => Intern (">="),
-      Right_Label_Bracket => Intern (">>"),
-      Less_Or_Equal => Intern ("<="),
-      Left_Label_Bracket => Intern ("<<"),
-      Box => Intern ("<>"),
-      Colon_Equal => Intern (":="),
+   type Tokn_Seq (<>) is limited private;
+   --  Fixed sequence of tokens
+   type Tokn_Seq_Cursor (<>) is private;
+   --  Pointer into a Tokn_Seq
 
-      --  Ada 83 reserved words
+   type Tokn_Index is new Positive;
 
-      Res_Abort => Intern ("abort"),
-      Res_Abs => Intern ("abs"),
-      Res_Accept => Intern ("accept"),
-      Res_Access => Intern ("access"),
-      Res_And => Intern ("and"),
-      Res_All => Intern ("all"),
-      Res_Array => Intern ("array"),
-      Res_At => Intern ("at"),
-      Res_Begin => Intern ("begin"),
-      Res_Body => Intern ("body"),
-      Res_Case => Intern ("case"),
-      Res_Constant => Intern ("constant"),
-      Res_Declare => Intern ("declare"),
-      Res_Delay => Intern ("delay"),
-      Res_Delta => Intern ("delta"),
-      Res_Digits => Intern ("digits"),
-      Res_Do => Intern ("do"),
-      Res_Else => Intern ("else"),
-      Res_Elsif => Intern ("elsif"),
-      Res_End => Intern ("end"),
-      Res_Entry => Intern ("entry"),
-      Res_Exception => Intern ("exception"),
-      Res_Exit => Intern ("exit"),
-      Res_For => Intern ("for"),
-      Res_Function => Intern ("function"),
-      Res_Generic => Intern ("generic"),
-      Res_Goto => Intern ("goto"),
-      Res_If => Intern ("if"),
-      Res_In => Intern ("in"),
-      Res_Is => Intern ("is"),
-      Res_Limited => Intern ("limited"),
-      Res_Loop => Intern ("loop"),
-      Res_Mod => Intern ("mod"),
-      Res_New => Intern ("new"),
-      Res_Not => Intern ("not"),
-      Res_Null => Intern ("null"),
-      Res_Of => Intern ("of"),
-      Res_Or => Intern ("or"),
-      Res_Others => Intern ("others"),
-      Res_Out => Intern ("out"),
-      Res_Package => Intern ("package"),
-      Res_Pragma => Intern ("pragma"),
-      Res_Private => Intern ("private"),
-      Res_Procedure => Intern ("procedure"),
-      Res_Raise => Intern ("raise"),
-      Res_Range => Intern ("range"),
-      Res_Record => Intern ("record"),
-      Res_Rem => Intern ("rem"),
-      Res_Renames => Intern ("renames"),
-      Res_Return => Intern ("return"),
-      Res_Reverse => Intern ("reverse"),
-      Res_Select => Intern ("select"),
-      Res_Separate => Intern ("separate"),
-      Res_Subtype => Intern ("subtype"),
-      Res_Task => Intern ("task"),
-      Res_Terminate => Intern ("terminate"),
-      Res_Then => Intern ("then"),
-      Res_Type => Intern ("type"),
-      Res_Use => Intern ("use"),
-      Res_When => Intern ("when"),
-      Res_While => Intern ("while"),
-      Res_With => Intern ("with"),
-      Res_Xor => Intern ("xor"),
+   function Kind (X : Tokn_Cursor) return Token_Kind;
+   --  Note that this cannot return Nil
 
-      --  Ada 95 reserved words
+   function Sloc (X : Tokn_Cursor) return Source_Location;
 
-      Res_Abstract => Intern ("abstract"),
-      Res_Aliased => Intern ("aliased"),
-      Res_Protected => Intern ("protected"),
-      Res_Until => Intern ("until"),
-      Res_Requeue => Intern ("requeue"),
-      Res_Tagged => Intern ("tagged"),
+   function Text (X : Tokn_Cursor) return Syms.Symbol;
+   --  The text of the token as it appears in the source, with these
+   --  exceptions and clarifications:
+   --
+   --  Start_Of_Input and End_Of_Input have Text = "".
+   --
+   --  End_Of_Line and Blank_Line have Text equal to a single LF character,
+   --  even if it is CR,LF in the input.
+   --
+   --  For comments, the text of the comment excluding the initial "--"
+   --  and leading and trailing blanks, and followed by an extra NL. For
+   --  multi-line comment "paragraphs", used for filling, NL terminates each
+   --  line. The NL at the end isn't really part of the comment; the next
+   --  token in the stream will be End_Of_Line. The reason for the extra NL
+   --  is that GNATCOLL.Paragraph_Filling expects it, so it's simpler and
+   --  more efficient this way.
 
-      --  Ada 2005 reserved words
+   function Leading_Blanks (X : Tokn_Cursor) return Natural with
+     Pre => Kind (X) in Comment_Kind;
+   --  The number of leading blanks, which are blanks after the initial "--"
+   --  and before any nonblank characters.
 
-      Res_Interface => Intern ("interface"),
-      Res_Overriding => Intern ("overriding"),
-      Res_Synchronized => Intern ("synchronized"),
+   function Width (X : Tokn_Cursor) return Natural with
+     Pre => Kind (X) in Whole_Line_Comment;
+   --  For single-line Whole_Line_Comments, this is the width of the token,
+   --  i.e. the same as Sloc.Last-Sloc.First+1, and the same as the length of
+   --  Text. For multi-line comments, this is the width of the widest line.
+   --  The initial "--" and any leading blanks are included, but the NL's are
+   --  not.
 
-      --  Ada 2012 reserved words
+   procedure Clear (V : in out Tokn_Vec);
+   function First (V : access Tokn_Vec) return Tokn_Cursor;
+   function Is_Empty (V : Tokn_Vec) return Boolean;
+   function At_Last (Cur : Tokn_Cursor) return Boolean;
+   function After_Last (Cur : Tokn_Cursor) return Boolean;
+   function Get_Tokn_Index (Cur : Tokn_Cursor) return Tokn_Index;
+   function Next (Cur : Tokn_Cursor) return Tokn_Cursor;
+   procedure Next (Cur : in out Tokn_Cursor);
+   function Prev (Cur : Tokn_Cursor) return Tokn_Cursor;
+   procedure Prev (Cur : in out Tokn_Cursor);
 
-      Res_Some => Intern ("some")
-     ); -- Token_To_Symbol_Map
+   function Succ (Cur : Tokn_Cursor; Count : Tokn_Index) return Tokn_Cursor;
+   function Pred (Cur : Tokn_Cursor; Count : Tokn_Index) return Tokn_Cursor;
+   --  Returns the cursor Count tokens after/before Cur, stopping if we
+   --  reach the end/start.
+
+   subtype Nonlexeme_Kind is Opt_Token_Kind with Predicate =>
+     Nonlexeme_Kind in End_Of_Line | Blank_Line | Spaces | Comment_Kind;
+   subtype Lexeme_Kind is Opt_Token_Kind with Predicate =>
+     Lexeme_Kind not in Nonlexeme_Kind;
+
+   function Next_Lexeme (Cur : Tokn_Cursor) return Tokn_Cursor;
+   --  Returns the next token after Cur that is not End_Of_Line, Blank_Line,
+   --  Spaces, or Comment_Kind.
+
+   function Prev_Lexeme (Cur : Tokn_Cursor) return Tokn_Cursor;
+   --  Returns the previous token before Index that is (as above)
+
+   procedure Append_Tokn (V : in out Tokn_Vec; X : Token);
+   procedure Append_Tokn (V : in out Tokn_Vec; X : Tokn_Cursor);
+   --  Append X onto the end of V
+
+   function Token_At_Cursor (X : Tokn_Cursor) return Token;
+
+   procedure Get_Tokns
+     (Input                     : in out Buffer;
+      Result                    : out Tokn_Vec;
+      Ada_Version               : Ada_Version_Type;
+      Pp_Off_On_Delimiters      : Pp_Off_On_Delimiters_Rec;
+      Max_Tokens                : Tokn_Index := Tokn_Index'Last;
+      Line_Ends                 : Marker_Vector_Ptr := null);
+   --  Return in Result the sequence of tokens in the Input string. The first
+   --  one is always Start_Of_Input, and the last one End_Of_Input. Max_Tokens
+   --  places a limit on the number of tokens (not counting Start_Of_Input); we
+   --  quit before reaching end of input if we've gotten that many.
+   --
+   --  If Line_Ends is non-null, we compute all the line endings in
+   --  Line_Ends.all, which is a mapping from line numbers to Markers in the
+   --  Input string. Each element points to a NL character in the corresponding
+   --  buffer.
+
+   function Get_Tokns
+     (Input                     : in out Buffer;
+      Result                    : out Tokn_Vec;
+      Ada_Version               : Ada_Version_Type;
+      Pp_Off_On_Delimiters      : Pp_Off_On_Delimiters_Rec;
+      Max_Tokens                : Tokn_Index := Tokn_Index'Last;
+      Line_Ends                 : Marker_Vector_Ptr := null)
+     return Boolean;
+   --  This is to get around the annoying restriction in Ada that you can't mix
+   --  declarations and statements. It does the same thing as the procedure,
+   --  and the result is to be ignored.
+
+   function Get_Tokn_Text
+     (Input : W_Str; Ada_Version : Ada_Version_Type) return Syms.Symbol with
+     Pre => Assert_Enabled; -- This is called only for debugging
+   --  Get just one token, ignoring single line breaks, and return the Text
+
+   ----------------
+
+   --  See the above versions for documentation of the following.
+
+   function Kind (X : Tokn_Seq_Cursor) return Token_Kind;
+   function Text (X : Tokn_Seq_Cursor) return Syms.Symbol;
+   function First (S : access Tokn_Seq) return Tokn_Seq_Cursor;
+   function Is_Empty (S : Tokn_Seq) return Boolean;
+   function At_Last (Cur : Tokn_Seq_Cursor) return Boolean;
+   function After_Last (Cur : Tokn_Seq_Cursor) return Boolean;
+   function Next (Cur : Tokn_Seq_Cursor) return Tokn_Seq_Cursor;
+   procedure Next (Cur : in out Tokn_Seq_Cursor);
+   function Prev (Cur : Tokn_Seq_Cursor) return Tokn_Seq_Cursor;
+   procedure Prev (Cur : in out Tokn_Seq_Cursor);
+   function Succ
+     (Cur : Tokn_Seq_Cursor; Count : Tokn_Index) return Tokn_Seq_Cursor;
+   function Pred
+     (Cur : Tokn_Seq_Cursor; Count : Tokn_Index) return Tokn_Seq_Cursor;
+   function Next_Lexeme (Cur : Tokn_Seq_Cursor) return Tokn_Seq_Cursor;
+   function Prev_Lexeme (Cur : Tokn_Seq_Cursor) return Tokn_Seq_Cursor;
+   function Leading_Blanks (X : Tokn_Seq_Cursor) return Natural with
+     Pre => Kind (X) in Comment_Kind;
+   function Width (X : Tokn_Seq_Cursor) return Natural with
+     Pre => Kind (X) in Whole_Line_Comment;
+   function Sloc (X : Tokn_Seq_Cursor) return Source_Location;
+
+   function To_Tokn_Seq (V : Tokn_Vec) return Tokn_Seq;
+
+   procedure Check_Same_Tokens (X, Y : Tokn_Vec) with Pre => False;
+   --  Checks that X and Y are the same except for Slocs and line breaks; raise
+   --  an exception if not.????Not yet used.
+
+   procedure Put_Token (Tok : Tokn_Cursor);
+   procedure Put_Tokens
+     (Tokens    : Tokn_Seq;
+      Highlight : Tokn_Index'Base := 0);
+   procedure Put_Tokens
+     (First     : Tokn_Cursor;
+      Last      : Tokn_Cursor;
+      Highlight : Tokn_Cursor);
+   --  Put token(s) to standard output (even if Text_IO.Current_Output has been
+   --  redirected). The tokens come out in compilable form, one per line, with
+   --  the text of the token first, and the other information commented out.
+   --  This one-token-per line code can be used for testing the scanner -- it
+   --  should have identical semantics to the original Ada code. First and Last
+   --  indicate a slice of Tokens, and we tolerate out-of-bounds indices.
+   --  We draw a comment line before Highlight.
+   procedure Put_Tokens (Tokens : Tokn_Vec);
 
 private
 
-   type Token is record
-      Kind : Token_Kind := Nil;
-      Text : Syms.Symbol;
-      Leading_Blanks : Natural;
-      Width : Natural;
+   use Utils.Var_Length_Ints;
+
+   type Fixed_Part is record
+      Kind : Token_Kind;
       Sloc : Source_Location;
    end record;
 
-   function Kind (X : Token) return Token_Kind is (X.Kind);
-   function Text (X : Token) return Syms.Symbol is (X.Text);
-   function Sloc (X : Token) return Source_Location is (X.Sloc);
+   type Fixed_Part_Array is array (Tokn_Index range <>) of Fixed_Part;
+
+   package Fixed_Part_Vectors is new Utils.Vectors
+     (Tokn_Index, Fixed_Part, Fixed_Part_Array);
+   subtype Fixed_Part_Vector is Fixed_Part_Vectors.Vector;
+
+   type Tokn_Vec is limited record
+      Fixed : Fixed_Part_Vector;
+      Octets : Octet_Vector;
+   end record;
+
+   type Tokn_Cursor (V : access Tokn_Vec) is record
+      Fi : Tokn_Index;
+      Oc : Octet_Index;
+   end record;
+
+   type Tokn_Seq (F_Len : Tokn_Index'Base; O_Len : Octet_Index'Base) is
+   limited record
+      Fixed : Fixed_Part_Array (1 .. F_Len);
+      Octets : Octet_Array (1 .. O_Len);
+   end record;
+
+   type Tokn_Seq_Cursor (S : access Tokn_Seq) is record
+      Fi : Tokn_Index;
+      Oc : Octet_Index;
+   end record;
 
 end Pp.Scanner;

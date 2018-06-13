@@ -35,7 +35,7 @@ with Utils.Symbols;
 with Utils.Predefined_Symbols; use Utils.Predefined_Symbols;
 with Utils.Command_Lines;
 with Pp.Buffers; use Pp.Buffers; use Pp.Buffers.Marker_Vectors;
-with Pp.Scanner.Seqs; use Pp.Scanner.Seqs.Token_Vectors;
+with Pp.Scanner;
 
 package Pp.Formatting is
 
@@ -71,7 +71,7 @@ package Pp.Formatting is
       Affects_Comments : Boolean;
       --  True if the indentation of this Line_Break should affect the
       --  indentation of surrounding comments. For example, True for '$' but
-      --  False for '%" (see type Ada_Template).
+      --  False for '$1' (see type Ada_Template).
       Enabled : Boolean;
       --  True if this line break will appear in the final output
       Level : Nesting_Level := 1000;
@@ -239,9 +239,9 @@ package Pp.Formatting is
       Tabs : Tab_Vector;
       --  All of the tabs in the whole input file, in increasing order
 
-      Src_Tokens, -- from original source file (Src_Buf)
-      Out_Tokens : -- from Out_Buf
-        Scanner.Seqs.Token_Vector;
+      Src_Tokns, -- from original source file (Src_Buf)
+      Out_Tokns : -- from Out_Buf
+        aliased Scanner.Tokn_Vec;
 
       Out_Buf_Line_Ends : aliased Marker_Vector;
 

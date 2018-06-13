@@ -30,7 +30,7 @@ package Pp.Scanner.Seqs is
 
    package Token_Vectors is new Utils.Vectors
      (Token_Index,
-      Token,
+      Opt_Token,
       Token_Array);
    subtype Token_Vector is Token_Vectors.Vector;
    type Token_Vector_Ptr is access all Token_Vector;
@@ -45,22 +45,8 @@ package Pp.Scanner.Seqs is
       Max_Tokens                : Token_Index       := Token_Index'Last;
       Line_Ends                 : Marker_Vector_Ptr := null;
       Gen_Regions               : Token_Vector_Ptr  := null);
-   --  Return in Result the sequence of tokens in the Input string. The first
-   --  one is always Start_Of_Input, and the last one End_Of_Input. Max_Tokens
-   --  places a limit on the number of tokens (not counting Start_Of_Input); we
-   --  quit before reaching end of input if we've gotten that many.
-   --
-   --  If Line_Ends is non-null, we compute all the line endings in
-   --  Line_Ends.all, which is a mapping from line numbers to Markers in the
-   --  Input string. Each element points to a NL character in the corresponding
-   --  buffer.
-   --
-   --  Comments starting with Gen_Plus and Gen_Minus, and tokens in between, do
-   --  not appear in Result. If Gen_Regions is non-null, we use it to return
-   --  the sequence of Gen_Plus and Gen_Minus tokens.  The generated code is in
-   --  the slices Gen_Regions(1).Sloc..Gen_Regions(2).Sloc,
-   --  Gen_Regions(3).Sloc..Gen_Regions(4).Sloc, and so on.
-   --  ???This feature is not used.
+   --  Same as Scanner.Get_Tokens, except for the result type.
+   --  ????
 
    function Next_Lexeme
      (Tokens : Token_Vector;
@@ -80,9 +66,9 @@ package Pp.Scanner.Seqs is
      return Token;
    --  Get just one token, ignoring single line breaks
 
-   procedure Check_Same_Tokens (X, Y : Token_Vector);
+   procedure Check_Same_Tokens (X, Y : Token_Vector) with Pre => False;
    --  Checks that X and Y are the same except for Slocs and line breaks; raise
-   --  an exception if not.
+   --  an exception if not.????Not used.
 
    function In_Gen_Regions
      (Line : Positive; Gen_Regions : Token_Vector) return Boolean;
