@@ -2159,8 +2159,12 @@ package body Pp.Formatting is
 
                elsif Kind (Src_Tok) = Blank_Line then
                   declare
-                     Prev_Tok_Kind : constant Token_Kind :=
-                       Kind (Prev (Src_Tok));
+                     pragma Assert
+                       (Kind (Prev (Src_Tok)) = End_Of_Line
+                          or else (Arg (Cmd, Preserve_Blank_Lines)
+                                 and then Kind (Prev (Src_Tok)) = Blank_Line));
+                     Prev_Prev_Tok_Kind : constant Token_Kind :=
+                       Kind (Prev (Prev (Src_Tok)));
                   begin
                      loop
                         Next (Src_Tok);
@@ -2178,7 +2182,7 @@ package body Pp.Formatting is
                           or else Preserve_Blank_Lines (Cmd)
                           or else (not Insert_Blank_Lines (Cmd)
                                      and then Kind (Src_Tok) /= End_Of_Input)
-                          or else Prev_Tok_Kind in Comment_Kind
+                          or else Prev_Prev_Tok_Kind in Comment_Kind
                           or else Next_Tok_Kind in Comment_Kind
                         then
                            Append_Temp_Line_Break (Lines_Data);
