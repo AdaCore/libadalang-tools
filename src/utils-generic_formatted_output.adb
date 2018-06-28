@@ -48,9 +48,6 @@ package body Utils.Generic_Formatted_Output is
    procedure Raw_Put_Char (C : Char_Type);
    --  Put the character and adjust Column
 
-   procedure Put (S : Str_Type);
-   --  Put_Char all the characters
-
    type Finalization is new Limited_Controlled with null record;
    procedure Finalize (X : in out Finalization);
    The_Finalization : Finalization;
@@ -140,27 +137,27 @@ package body Utils.Generic_Formatted_Output is
 
                when '1' =>
                   Used (1) := True;
-                  Put (X1);
+                  Put_Str (X1);
 
                when '2' =>
                   Used (2) := True;
-                  Put (X2);
+                  Put_Str (X2);
 
                when '3' =>
                   Used (3) := True;
-                  Put (X3);
+                  Put_Str (X3);
 
                when '4' =>
                   Used (4) := True;
-                  Put (X4);
+                  Put_Str (X4);
 
                when '5' =>
                   Used (5) := True;
-                  Put (X5);
+                  Put_Str (X5);
 
                when '6' =>
                   Used (6) := True;
-                  Put (X6);
+                  Put_Str (X6);
 
                when others =>
                   raise Program_Error;
@@ -192,12 +189,12 @@ package body Utils.Generic_Formatted_Output is
       end if;
    end Put;
 
-   procedure Put (S : Str_Type) is
+   procedure Put_Str (S : Str_Type) is
    begin
       for J in S'Range loop
          Put_Char (S (J));
       end loop;
-   end Put;
+   end Put_Str;
 
    --------------
    -- Put_Char --

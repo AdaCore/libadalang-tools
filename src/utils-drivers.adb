@@ -213,6 +213,9 @@ package body Utils.Drivers is
       --  on the command line (not in -cargs section). This is used when the
       --  -cargs section is used, and when a BOM selects UTF-8.
 
+      procedure Set_Ada_Version (Version : Ada_Version_Type);
+      --  Set the Ada_Version, from normal switches or from -cargs
+
       procedure Process_Cargs;
       --  Process arguments in the -cargs sections. This is questionable, given
       --  that lalpp does not call gcc, but we support at least "-cargs -Wx"
@@ -246,9 +249,16 @@ package body Utils.Drivers is
          end if;
       end Set_WCEM;
 
-      procedure Process_Cargs is
+      procedure Set_Ada_Version (Version : Ada_Version_Type) is
       begin
-         --  We actually only support -Ws, -W8, and -Wb.
+         Ada_Version := Version;
+         Ada_Version_Switches.Set_Arg (Cmd, Version);
+      end Set_Ada_Version;
+
+      procedure Process_Cargs is
+         use Ada_Version_Switches;
+      begin
+         --  We actually only support -W8 and -Wb.
          for Arg of Cmd_Cargs.all loop
             if Arg.all = "-gnatWh" then
                Set_WCEM ("h");
@@ -262,10 +272,24 @@ package body Utils.Drivers is
                Set_WCEM ("8");
             elsif Arg.all = "-gnatWb" then
                Set_WCEM ("b");
+
+            elsif Arg.all = "-gnat83" then
+               Set_Ada_Version (Ada_83);
+            elsif Arg.all = "-gnat95" then
+               Set_Ada_Version (Ada_95);
+            elsif Arg.all in "-gnat2005" | "-gnat05" then
+               Set_Ada_Version (Ada_2005);
+            elsif Arg.all in "-gnat2012" | "-gnat12" then
+               Set_Ada_Version (Ada_2012);
+
             else
                null; -- Ignore all others
             end if;
          end loop;
+
+         if Arg (Cmd) /= No_Ada_Version then
+            Set_Ada_Version (Ada_Version_Switches.Arg (Cmd));
+         end if;
       end Process_Cargs;
 
       procedure Process_Files is

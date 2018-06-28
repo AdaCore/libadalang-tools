@@ -266,7 +266,7 @@ package Pp.Command_Lines is
      (File_Name_File, -- Not documented
       Output,
       Output_Force,
-      End_Of_Line,
+      EOL,
       Pp_Off,
       Pp_On);
 
@@ -278,7 +278,7 @@ package Pp.Command_Lines is
      ((File_Name_File => '=',
        Output => '=',
        Output_Force => '=',
-       End_Of_Line => '=',
+       EOL => '=',
        Pp_Off => '=',
        Pp_On => '='));
 
@@ -287,7 +287,7 @@ package Pp.Command_Lines is
      ((File_Name_File => null,
        Output => +"-o",
        Output_Force => +"-of",
-       End_Of_Line => +"--eol",
+       EOL => null,
        Pp_Off => null,
        Pp_On => null));
 

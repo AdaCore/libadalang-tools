@@ -25,7 +25,6 @@ with LAL_Extensions; use LAL_Extensions;
 with Utils.Command_Lines.Common; use Utils.Command_Lines.Common;
 with Utils.Dbg_Out;
 with Utils.Formatted_Output;
-with Utils.Generic_Formatted_Output;
 
 with Utils_Debug; use Utils_Debug;
 with Utils.Vectors;
@@ -116,6 +115,23 @@ package body Pp.Actions is
       pragma Unreferenced (Tool);
       File_Name_File : Text_IO.File_Type;
 
+      procedure Init_Pp_Off_And_On;
+      --  Initialize Pp_Off_On_Delimiters
+
+      procedure Init_Pp_Off_And_On is
+      begin
+         if Arg (Cmd, Pp_Off) /= null then
+            pragma Assert (Arg (Cmd, Pp_Off).all /= "");
+            Scanner.Pp_Off_On_Delimiters.Off := new W_Str'
+              ("--" & To_Wide_String (Arg (Cmd, Pp_Off).all));
+         end if;
+         if Arg (Cmd, Pp_On) /= null then
+            pragma Assert (Arg (Cmd, Pp_On).all /= "");
+            Scanner.Pp_Off_On_Delimiters.On := new W_Str'
+              ("--" & To_Wide_String (Arg (Cmd, Pp_On).all));
+         end if;
+      end Init_Pp_Off_And_On;
+
    --  Start of processing for Init
 
    begin
@@ -129,6 +145,8 @@ package body Pp.Actions is
             raise Command_Line_Error;
          end if;
       end if;
+
+      Init_Pp_Off_And_On;
 
       --  ????Other checks from gnatpp/lal_ul-check_parameters.adb?
 
@@ -304,14 +322,11 @@ package body Pp.Actions is
    All_LBI : Line_Break_Index_Vector renames Lines_Data.All_LBI;
    Tabs : Tab_Vector renames Lines_Data.Tabs;
    Src_Tokns : Scanner.Tokn_Vec renames Lines_Data.Src_Tokns;
-   Pp_Off_On_Delimiters : Scanner.Pp_Off_On_Delimiters_Rec
-       renames Lines_Data.Pp_Off_On_Delimiters;
-   Pp_Off_On_Delimiters_Initialized : Boolean := False;
+   New_Tokns : Scanner.Tokn_Vec renames Lines_Data.New_Tokns;
    Check_Whitespace : Boolean renames Lines_Data.Check_Whitespace;
 
    procedure Tree_To_Ada_2
      (Root      : Ada_Node;
-      Out_Buf   : in out Buffer;
       Cmd       : Utils.Command_Lines.Command_Line;
       Partial   : Boolean);
    --  Partial is True if we are not processing an entire file.
@@ -332,13 +347,13 @@ package body Pp.Actions is
    --  Interpret_Template. The special character sequences are:
    --
    --      $ -- insert a hard line break
-   --      $1 -- same as $, but doesn't affect comment indentation
+   --      $0 -- same as $, but doesn't affect comment indentation
    --           (see Line_Break.Affects_Comments)
-   --      { -- indent
-   --      } -- outdent
    --      # -- insert a soft line break. May be followed by 1, 2, etc,
    --           to indicate additional nesting depth. Also +1, +2, etc
    --           (see below).
+   --      { -- indent
+   --      } -- outdent
    --      [ -- continuation-line indent
    --      ] -- continuation-line outdent
    --      ( -- insert a "(", and add "extra" indent by 1 character
@@ -348,9 +363,10 @@ package body Pp.Actions is
    --      Currently, we are assuming that "(" appears at the start
    --      of the line if indentation matters.
    --      ) -- insert a ")", and outdent the "extra"
-   --      ^ -- tab based on following token. May be followed by 1, 2, etc,
-   --           to indicate Index_In_Line.
-   --      ` -- insertion point for next "^" tab.
+   --      ^ -- tab based on following token. May be followed by 1, 2,
+   --           etc, to indicate Index_In_Line.
+   --      ` -- insertion point for next "^" tab. May be followed by 1, 2,
+   --           etc, to indicate Index_In_Line.
    --      ! -- insert next required subtree
    --      ? -- insert next optional or list subtree
    --      ~ -- delimits arguments of ?
@@ -1031,18 +1047,165 @@ package body Pp.Actions is
         ); -- end case
    end Template_For_Kind;
 
-   type Template_Table_Type is array (Ada_Tree_Kind) of Str_Template_Ptr;
+   Template_Tables_Initialized : Boolean := False;
 
-   Template_Table             : Template_Table_Type;
-   Template_Table_Initialized : Boolean := False;
+   Str_Template_Table : array (Ada_Tree_Kind) of Str_Template_Ptr;
+
+   type Instr_Kind is
+     (Hard_Break,            -- "$"
+      Hard_Break_No_Comment, -- "$0"
+      Soft_Break,            -- "#" "#1", "#+1"
+      Indent,                -- "{"
+      Outdent,               -- "}"
+      Continuation_Indent,   -- "["
+      Continuation_Outdent,  -- "]"
+      '(',
+      ')',
+      Tab,                   -- "^", "^1"
+      Tab_Insert_Point,      -- "`", "`1"
+      Required_Subtree,      -- "!", "!1"
+      Opt_Subtree_Or_List,   -- "?pre~between~post", "?1pre~between~post"
+      Ignore_Subtree,        -- "/"
+      Verbatim);
+
+   type Instr_Array;
+   type Instr_Array_Ptr is access all Instr_Array;
+
+   type Tok_Template is record
+      Instructions : Instr_Array_Ptr;
+
+      Max_Nesting_Increment : Nesting_Level_Increment;
+      --  If a digit occurs after '#', this is an additional "nesting
+      --  increment" to be added to the nesting level when we recursively
+      --  process the subtree. This is intended to allow some line breaks to
+      --  have precedence over others. If no such digit occurs, the default is
+      --  zero. This is the maximum such nesting increment in the template.
+      --
+      --  Note that "#+1" is ignored for Max_Nesting_Increment.
+   end record;
+
+   type Instr (Kind : Instr_Kind := Ignore_Subtree) is record
+      --  "Instr" = one "instruction" in a Tok_Template.
+      case Kind is
+         when Hard_Break | Hard_Break_No_Comment => null;
+         when Soft_Break =>
+            Plus : Boolean;
+            Level_Inc : Nesting_Level_Increment;
+         when Indent | Outdent | Continuation_Indent | Continuation_Outdent
+           | '(' | ')' =>
+            null;
+         when Tab | Tab_Insert_Point =>
+            Index_In_Line : Tab_Index_In_Line;
+         when Required_Subtree | Opt_Subtree_Or_List =>
+            Index : Query_Count; -- zero for "next"
+            case Kind is
+               when Opt_Subtree_Or_List =>
+                  Pre, Between, Post : Tok_Template;
+               when others => null;
+            end case;
+         when Ignore_Subtree => null;
+         when Verbatim =>
+            --  A token to be printed verbatim in the output. All we need is
+            --  Kind and Text -- the Sloc and comment-specific fields of tokens
+            --  are not used in templates.
+            T_Kind : Scanner.Token_Kind;
+            Text : Symbol;
+      end case;
+   end record;
+
+   type Instr_Index is new Positive;
+   type Instr_Array is
+     array (Instr_Index range <>) of Instr;
+   package Instr_Vectors is new Utils.Vectors
+     (Instr_Index,
+      Instr,
+      Instr_Array);
+   subtype Instr_Vector is Instr_Vectors.Vector;
+
+   Tok_Template_Table : array (Ada_Tree_Kind) of Tok_Template;
+
+   --  We have two representations for templates -- Str_Template is a sequence
+   --  of characters, and Tok_Template is a sequence of tokens. We create the
+   --  templates initially as Str_Templates, then convert them to Tok_Template,
+   --  and use the Tok_Templates for further processing.
+
+   function Back_To_Str_Templ (T : Tok_Template) return Str_Template;
+   --  Convert back to Str_Template for assertion
+
+   function Back_To_Str_Templ (T : Tok_Template) return Str_Template is
+      Result : Bounded_W_Str (Max_Length => 80);
+
+      function Im (Val : Integer) return W_Str is
+        (From_UTF8 (Image (Val)));
+   begin
+      for X of T.Instructions.all loop
+         case X.Kind is
+            when Hard_Break => Append (Result, "$");
+            when Hard_Break_No_Comment => Append (Result, "$0");
+
+            when Soft_Break =>
+               Append (Result, "#");
+               if X.Plus then
+                  Append (Result, "+");
+               end if;
+               if X.Level_Inc /= 0 then
+                  Append (Result, Im (Integer (X.Level_Inc)));
+               end if;
+
+            when Indent => Append (Result, "{");
+            when Outdent => Append (Result, "}");
+            when Continuation_Indent => Append (Result, "[");
+            when Continuation_Outdent => Append (Result, "]");
+            when '(' => Append (Result, "(");
+            when ')' => Append (Result, ")");
+
+            when Tab =>
+               Append (Result, "^");
+               if X.Index_In_Line /= 1 then
+                  Append (Result, Im (Integer (X.Index_In_Line)));
+               end if;
+
+            when Tab_Insert_Point =>
+               Append (Result, "`");
+               if X.Index_In_Line /= 1 then
+                  Append (Result, Im (Integer (X.Index_In_Line)));
+               end if;
+
+            when Required_Subtree =>
+               Append (Result, "!");
+               if X.Index /= 0 then
+                  Append (Result, Im (Integer (X.Index)));
+               end if;
+
+            when Opt_Subtree_Or_List =>
+               Append (Result, "?");
+               if X.Index /= 0 then
+                  Append (Result, Im (Integer (X.Index)));
+               end if;
+               Append (Result, W_Str (Back_To_Str_Templ (X.Pre)));
+               Append (Result, "~");
+               Append (Result, W_Str (Back_To_Str_Templ (X.Between)));
+               Append (Result, "~");
+               Append (Result, W_Str (Back_To_Str_Templ (X.Post)));
+               Append (Result, "~");
+
+            when Ignore_Subtree => Append (Result, "/");
+
+            when Verbatim =>
+               Append (Result, To_W_Str (X.Text));
+         end case;
+      end loop;
+
+      return Str_Template (+Result);
+   end Back_To_Str_Templ;
 
    function Fix_RM_Spacing
      (Cmd : Command_Line;
       T    : Str_Template;
       Kind : Ada_Tree_Kind := Null_Kind)
       return Str_Template;
-   --  Modify the template in certain ways based on command-line options and
-   --  the like.
+   --  If the --RM-style-spacing switch was specified, modify the template as
+   --  appropriate.
 
    function Fix_RM_Spacing
      (Cmd : Command_Line;
@@ -1110,9 +1273,9 @@ package body Pp.Actions is
          Temp := Replace_All (Temp, "end?2 ~~~", "end");
       end if;
 
-      --  The --insert-blank-lines is mostly handled by Maybe_Blank_Line,
-      --  but we need to handle "else" here, because it's not at the start
-      --  of any construct.
+      --  The --insert-blank-lines switch is mostly handled by
+      --  Maybe_Blank_Line, but we need to handle "else" here,
+      --  because it's not at the start of any construct.
 
       if Insert_Blank_Lines (Cmd) then
          Temp := Replace_All (Temp, "?else$", "?$else$");
@@ -1139,33 +1302,38 @@ package body Pp.Actions is
      (Kind : Ada_Tree_Kind; From, To : W_Str) return Str_Template
    is
       pragma Assert (From /= To);
-      Temp : Str_Template renames Template_Table (Kind).all;
+      Temp : Str_Template renames Str_Template_Table (Kind).all;
    begin
       return Str_Template (Must_Replace (W_Str (Temp), From, To));
    end Replace_One;
 
    procedure Replace_One (Kind : Ada_Tree_Kind; From, To : W_Str) is
-      Temp : Str_Template_Ptr := Template_Table (Kind);
+      Temp : Str_Template_Ptr := Str_Template_Table (Kind);
    begin
-      Template_Table (Kind) :=
+      Str_Template_Table (Kind) :=
         new Str_Template'(Replace_One (Kind, From, To));
       Free (Temp);
    end Replace_One;
 
    procedure Replace_Tmp (Kind : Ada_Tree_Kind; From, To : W_Str) is
    begin
-      pragma Assert (From = W_Str (Template_Table (Kind).all));
+      pragma Assert (From = W_Str (Str_Template_Table (Kind).all));
       Replace_One (Kind, From, To);
    end Replace_Tmp;
 
    package Alternative_Templates is
 
-      --  Some templates that are used instead of the ones in Template_Table
+      --  Some templates that are used instead of the ones in
+      --  Str_Template_Table.
 
       type Alt_Templates is
         (Empty_Alt,
+         Hard_Break_Alt,
          Semi_LB_Alt,
          Semi_LB_LB_Alt,
+         Semi_Soft,
+         Subtree_Alt,
+         Comma_Soft,
          Pragma_Alt,
          Parameter_Specification_Alt,
          Extended_Return_Stmt_Alt,
@@ -1178,20 +1346,18 @@ package body Pp.Actions is
          Single_Name_Assoc_Alt,
          Multi_Name_Vertical_Assoc_Alt,
          Multi_Name_Assoc_Alt,
-         Hard_Break_Alt,
          Comp_Clause_Alt,
          Handled_Stmts_With_Begin_Alt,
          Handled_Stmts_With_Do_Alt,
          Depends_Hack_Alt,
-         Un_Op_Plus_Minus_Alt,
-         Un_Op_Abs_Not_Alt,
+         Un_Op_No_Space_Alt,
+         Un_Op_Space_Alt,
          Dot_Dot_Wrong_Alt,
          Dot_Dot_For_Alt,
          Dot_Dot_Alt,
          Indent_Soft_Alt,
          Outdent_Alt,
          Soft_Alt,
-         Subtree_Alt,
          For_Loop_Spec_Stmt_Alt,
          For_Loop_Spec_Quant_Alt,
          Tab_2_Alt,
@@ -1217,7 +1383,7 @@ package body Pp.Actions is
          Type_Decl_Alt,
          Boxy_Constrained_Alt);
 
-      Alt_Table : array (Alt_Templates) of Str_Template_Ptr;
+      Str_Alt_Table : array (Alt_Templates) of Str_Template_Ptr;
 
       subtype Subp_Decl_Body_Kind is Ada_Tree_Kind with
         Predicate => Subp_Decl_Body_Kind in
@@ -1234,16 +1400,22 @@ package body Pp.Actions is
           Ada_Null_Subp_Decl |
           Ada_Entry_Body;
 
-      Subp_Decl_With_Hard_Breaks_Alt_Table :
+      Str_Subp_Decl_With_Hard_Breaks_Alt_Table :
         array (Ada_Tree_Kind) of Str_Template_Ptr;
+
+      Tok_Alt_Table : array (Alt_Templates) of Tok_Template;
+
+      Tok_Subp_Decl_With_Hard_Breaks_Alt_Table :
+        array (Ada_Tree_Kind) of Tok_Template;
+
    end Alternative_Templates;
 
-   procedure Init_Template_Table (Cmd : Command_Line);
-   --  We call this to initialize Template_Table the first time Tree_To_Ada
-   --  is called, so that we can base the initialization in part on the
-   --  command-line options.
+   procedure Init_Template_Tables (Cmd : Command_Line);
+   --  We call this to initialize the template tables the first time
+   --  Tree_To_Ada is called, so that we can base the initialization
+   --  in part on the command-line options.
 
-   procedure Init_Template_Table (Cmd : Command_Line) is
+   procedure Init_Template_Tables (Cmd : Command_Line) is
       use Alternative_Templates;
 
       function Subp_Decl_With_Hard_Breaks
@@ -1253,6 +1425,10 @@ package body Pp.Actions is
       --  between parameters with a hard line break. If Is_Function is True,
       --  put a hard line break before "return". Put a hard line break before
       --  "is", if any.
+
+      procedure Init_Alternative_Templates;
+
+      procedure Init_Tok_Templates;
 
       function Subp_Decl_With_Hard_Breaks
         (Cmd : Command_Line; Kind : Subp_Decl_Body_Kind)
@@ -1273,7 +1449,7 @@ package body Pp.Actions is
                    Ada_Null_Subp_Decl |
                    Ada_Entry_Body => True);
 
-         T : constant W_Str := W_Str (Template_Table (Kind).all);
+         T : constant W_Str := W_Str (Str_Template_Table (Kind).all);
          T2 : constant W_Str :=
            (if Has_Is and then Arg (Cmd, Separate_Is)
              then Replace_All (T, "# is$", "$is$")
@@ -1288,18 +1464,20 @@ package body Pp.Actions is
          end return;
       end Subp_Decl_With_Hard_Breaks;
 
-      procedure Init_Alternative_Templates;
       procedure Init_Alternative_Templates is
          Stmts_And_Handlers : constant Str_Template :=
            "{~;$~;$}~" &
            "?exception$" &
            "{~$~}~";
       begin
-         Alt_Table :=
+         Str_Alt_Table :=
            (Empty_Alt => L (""),
+            Hard_Break_Alt => L ("$"),
             Semi_LB_Alt => L (";$"),
             Semi_LB_LB_Alt => L (";$$"),
+            Semi_Soft => L (";# "),
             Subtree_Alt => L ("!"),
+            Comma_Soft => L (",# "),
             Pragma_Alt => L ("/?[ #(~,# ~)]~"),
             Parameter_Specification_Alt => L (" ^: "),
             Extended_Return_Stmt_Alt => L ("return !/"),
@@ -1317,7 +1495,6 @@ package body Pp.Actions is
             Single_Name_Assoc_Alt => L ("?~~ ^=>[# ~!]"),
             Multi_Name_Vertical_Assoc_Alt => L ("?~ ^|#1 ~ ^=>[$~!]"),
             Multi_Name_Assoc_Alt => L ("?~ ^|#1 ~ ^=>[# ~!]"),
-            Hard_Break_Alt => L ("$"),
             Comp_Clause_Alt =>
             L ("! ^at `2! ^2range [#`3! ^3../[# `4!^4]]"),
              --  We need to ignore the ".." subtree, and put it explicitly in
@@ -1326,9 +1503,9 @@ package body Pp.Actions is
             L ("?begin$" & Stmts_And_Handlers),
             Handled_Stmts_With_Do_Alt =>
             L ("# ?do$" & Stmts_And_Handlers),
-            Depends_Hack_Alt => L (" !"),
-            Un_Op_Plus_Minus_Alt => L ("/!"),
-            Un_Op_Abs_Not_Alt => L ("/ !"),
+            Depends_Hack_Alt => L ("?~~ ^=>~!"),
+            Un_Op_No_Space_Alt => L ("/!"),
+            Un_Op_Space_Alt => L ("/ !"),
             Dot_Dot_Wrong_Alt => L ("[[#! ../[# !]]]"),
                    --  This is wrong formatting, but gnatpp has an extra level
                    --  of indentation here. And it doesn't have "#1", which
@@ -1352,8 +1529,8 @@ package body Pp.Actions is
               L ("? when ~~ =>~$" & "{?~;$~;$~}"),
             Select_Or_When_Alt =>
             L ("or? when ~~ =>~$" & "{?~;$~;$~}"),
-            Call_Threshold_Alt => L ("!?[$1(~,$1~)]~"),
-             --  We use $1 instead of $ here, so that the indentation of these
+            Call_Threshold_Alt => L ("!?[$0(~,$0~)]~"),
+             --  We use $0 instead of $ here, so that the indentation of these
              --  will not affect following comments.
             Call_Alt => L ("!?[# (~,#1 ~)]~"),
             Par_Threshold_Alt => L ("?[$(~;$~)]~"),
@@ -1377,27 +1554,284 @@ package body Pp.Actions is
 
          for Alt in Alt_Templates loop
             declare
-               Temp : Str_Template_Ptr := Alt_Table (Alt);
+               Temp : Str_Template_Ptr := Str_Alt_Table (Alt);
             begin
-               Alt_Table (Alt) :=
+               Str_Alt_Table (Alt) :=
                  new Str_Template'(Fix_RM_Spacing (Cmd, Temp.all));
                Free (Temp);
             end;
          end loop;
 
          for K in Subp_Decl_Body_Kind loop
-            Subp_Decl_With_Hard_Breaks_Alt_Table (K) :=
+            Str_Subp_Decl_With_Hard_Breaks_Alt_Table (K) :=
               L (Fix_RM_Spacing (Cmd, Subp_Decl_With_Hard_Breaks (Cmd, K)));
          end loop;
       end Init_Alternative_Templates;
 
-      --  Start of processing for Init_Template_Table
+      procedure Init_Tok_Templates is
+         use Scanner;
+         function Compile_To_Instructions
+           (Str : Str_Template_Ptr) return Tok_Template;
+         --  Compile a Str_Template into a Tok_Template
+         function Compile_Tokens
+           (Cur : in out Tokn_Cursor; Stop : Token_Kind) return Tok_Template;
+         --  Compile, starting at Cur, stopping when we see Stop. This is
+         --  called by Compile_To_Instructions with Stop = End_Of_Input,
+         --  and recursively by Parse_Instruction for '?' (Opt_Subtree_Or_List)
+         --  with Stop = '~'. Moves Cur past the Stop token.
+
+         function Parse_Instruction (Cur : in out Tokn_Cursor) return Instr;
+
+         --  Note that Compile_Tokens and Parse_Instruction are functions with
+         --  side effect (on Cur), so we need to take care not to call them in
+         --  a context that allows arbitrary order of evaluation.
+
+         function Parse_Instruction (Cur : in out Tokn_Cursor) return Instr is
+            procedure Check_Between (Result : Instr);
+            --  Assert that Between doesn't contain any indentation or similar,
+            --  so we don't need special processing in Interpret_Template to
+            --  extract it.
+
+            procedure Check_Between (Result : Instr) is
+            begin
+               if Result.Kind = Opt_Subtree_Or_List then
+                  for X of Result.Between.Instructions.all loop
+                     pragma Assert
+                       (X.Kind in Hard_Break | Hard_Break_No_Comment |
+                          Soft_Break | Tab | Verbatim);
+                  end loop;
+               end if;
+            end Check_Between;
+
+            subtype Illegal_Chars is Character with Predicate =>
+              Illegal_Chars in '~' | '*' | '_' | '"' | '\' | '%' | '0' .. '9';
+            pragma Assert (Str (Text (Cur)).S (1) not in Illegal_Chars);
+
+         --  Start of processing for Parse_Instruction
+
+         begin
+            return Result : Instr do
+               case Kind (Cur) is
+                  when '$' =>
+                     Next (Cur);
+                     if Kind (Cur) = Numeric_Literal then
+                        pragma Assert (Text (Cur) = Intern ("0"));
+                        Result := (Kind => Hard_Break_No_Comment);
+                        Next (Cur);
+                     else
+                        Result := (Kind => Hard_Break);
+                     end if;
+
+                  when '#' =>
+                     Next (Cur);
+                     declare
+                        Plus : constant Boolean := Kind (Cur) = '+';
+                        Level_Inc : Nesting_Level_Increment;
+                     begin
+                        if Plus then
+                           Next (Cur);
+                        end if;
+
+                        if Kind (Cur) = Numeric_Literal then
+                           Level_Inc := Nesting_Level_Increment'Value
+                             (Str (Text (Cur)).S);
+                           Next (Cur);
+                        else
+                           Level_Inc := 0;
+                        end if;
+
+                        Result := (Soft_Break, Plus, Level_Inc);
+                     end;
+
+                  when '{' =>
+                     Result := (Kind => Indent);
+                     Next (Cur);
+                  when '}' =>
+                     Result := (Kind => Outdent);
+                     Next (Cur);
+                  when '[' =>
+                     Result := (Kind => Continuation_Indent);
+                     Next (Cur);
+                  when ']' =>
+                     Result := (Kind => Continuation_Outdent);
+                     Next (Cur);
+                  when '(' =>
+                     Result := (Kind => '(');
+                     Next (Cur);
+                  when ')' =>
+                     Result := (Kind => ')');
+                     Next (Cur);
+
+                  when '^' =>
+                     Next (Cur);
+                     if Kind (Cur) = Numeric_Literal then
+                        Result :=
+                          (Tab, Index_In_Line =>
+                                 Tab_Index_In_Line'Value (Str (Text (Cur)).S));
+                        Next (Cur);
+                     else
+                        Result := (Tab, Index_In_Line => 1);
+                     end if;
+
+                  when '`' =>
+                     Next (Cur);
+                     if Kind (Cur) = Numeric_Literal then
+                        Result :=
+                          (Tab_Insert_Point, Index_In_Line =>
+                                 Tab_Index_In_Line'Value (Str (Text (Cur)).S));
+                        Next (Cur);
+                     else
+                        Result := (Tab_Insert_Point, Index_In_Line => 1);
+                     end if;
+
+                  when '!' =>
+                     Next (Cur);
+                     if Kind (Cur) = Numeric_Literal then
+                        Result :=
+                          (Required_Subtree,
+                           Index => Query_Count'Value (Str (Text (Cur)).S));
+                        Next (Cur);
+                     else
+                        Result := (Required_Subtree, Index => 0);
+                     end if;
+
+                  when '?' =>
+                     Next (Cur);
+                     declare
+                        Index : Query_Count := 0;
+                     begin
+                        if Kind (Cur) = Numeric_Literal then
+                           Index := Query_Count'Value (Str (Text (Cur)).S);
+                           Next (Cur);
+                        end if;
+
+                        declare
+                           Pre : constant Tok_Template :=
+                             Compile_Tokens (Cur, Stop => '~');
+                           Between : constant Tok_Template :=
+                             Compile_Tokens (Cur, Stop => '~');
+                           Post : constant Tok_Template :=
+                             Compile_Tokens (Cur, Stop => '~');
+                        begin
+                           Result :=
+                             (Opt_Subtree_Or_List, Index, Pre, Between, Post);
+                        end;
+                     end;
+
+                  when '/' =>
+                     Result := (Kind => Ignore_Subtree);
+                     Next (Cur);
+
+                  when others =>
+                     for C of Str (Text (Cur)).S loop
+                        pragma Assert (C not in Illegal_Chars);
+                     end loop;
+
+                     Result :=
+                       (Kind => Verbatim,
+                        T_Kind => Kind (Cur), Text => Text (Cur));
+                     Next (Cur);
+               end case;
+
+               pragma Debug (Check_Between (Result));
+            end return;
+         end Parse_Instruction;
+
+         function Compile_Tokens
+           (Cur : in out Tokn_Cursor; Stop : Token_Kind) return Tok_Template
+         is
+            Instructions : Instr_Vector;
+            use Instr_Vectors;
+            Max_Nesting_Increment : Nesting_Level_Increment := 0;
+
+            procedure Set_Max (Level_Inc : Nesting_Level_Increment);
+            --  Set Max_Nesting_Increment to account for Level_Inc
+
+            procedure Set_Max (Level_Inc : Nesting_Level_Increment) is
+            begin
+               Max_Nesting_Increment := Nesting_Level_Increment'Max
+                 (Max_Nesting_Increment, Level_Inc);
+            end Set_Max;
+         begin
+            while Kind (Cur) /= Stop loop
+               declare
+                  Inst : constant Instr := Parse_Instruction (Cur);
+               begin
+                  Append (Instructions, Inst);
+
+                  if Inst.Kind = Soft_Break and then not Inst.Plus then
+                     Set_Max (Inst.Level_Inc);
+                  end if;
+
+                  if Inst.Kind = Opt_Subtree_Or_List then
+                     Set_Max (Inst.Pre.Max_Nesting_Increment);
+                     Set_Max (Inst.Between.Max_Nesting_Increment);
+                     Set_Max (Inst.Post.Max_Nesting_Increment);
+                  end if;
+               end;
+            end loop;
+            Next (Cur); -- skip the Stop token
+
+            return (Instructions => new Instr_Array'(To_Array (Instructions)),
+                    Max_Nesting_Increment => Max_Nesting_Increment);
+         end Compile_Tokens;
+
+         function Compile_To_Instructions
+           (Str : Str_Template_Ptr) return Tok_Template
+         is
+            Tokens : aliased Tokn_Vec;
+            Buf    : Buffer := String_To_Buffer (W_Str (Str.all));
+            Ignored : Boolean := Get_Tokns
+              (Buf, Tokens, Utils.Ada_Version,
+               Lang => Template_Lang);
+            Cur : Tokn_Cursor := First (Tokens'Access);
+         begin
+            pragma Assert (Kind (Cur) = Start_Of_Input);
+            Next (Cur);
+            return Result : constant Tok_Template :=
+              Compile_Tokens (Cur, Stop => End_Of_Input)
+            do
+               pragma Assert (Back_To_Str_Templ (Result) = Str.all);
+            end return;
+         end Compile_To_Instructions;
+
+      --  Start of processing for Init_Tok_Templates
+
+      begin
+         for K in Ada_Tree_Kind loop
+            if Str_Template_Table (K) = null then
+               pragma Assert (Tok_Template_Table (K).Instructions = null);
+            else
+               Tok_Template_Table (K) :=
+                 Compile_To_Instructions (Str_Template_Table (K));
+            end if;
+         end loop;
+
+         for Alt in Alt_Templates loop
+            Tok_Alt_Table (Alt) :=
+              Compile_To_Instructions (Str_Alt_Table (Alt));
+         end loop;
+
+         for K in Ada_Tree_Kind loop
+            if Str_Subp_Decl_With_Hard_Breaks_Alt_Table (K) = null then
+               pragma Assert
+                 (Tok_Subp_Decl_With_Hard_Breaks_Alt_Table (K).Instructions =
+                    null);
+            else
+               Tok_Subp_Decl_With_Hard_Breaks_Alt_Table (K) :=
+                 Compile_To_Instructions
+                   (Str_Subp_Decl_With_Hard_Breaks_Alt_Table (K));
+            end if;
+         end loop;
+      end Init_Tok_Templates;
+
+      --  Start of processing for Init_Template_Tables
 
    begin
-      pragma Assert (not Template_Table_Initialized);
-      Template_Table_Initialized := True;
+      pragma Assert (not Template_Tables_Initialized);
+      Template_Tables_Initialized := True;
 
-      --  We can't initialize Template_Table with an aggregate, because we
+      --  We can't initialize Str_Template_Table with an aggregate, because we
       --  refer to the Kind. The following case-within-loop construction may
       --  look odd, but it accomplishes two goals: the 'case' requires full
       --  coverage, so the items left null are done so explicitly, and the
@@ -1409,9 +1843,9 @@ package body Pp.Actions is
             Temp : Str_Template_Ptr := Template_For_Kind (Kind);
          begin
             if Temp = null then
-               Template_Table (Kind) := null;
+               Str_Template_Table (Kind) := null;
             else
-               Template_Table (Kind) :=
+               Str_Template_Table (Kind) :=
                  new Str_Template'
                    (Fix_RM_Spacing (Cmd, Replacements (Cmd, Temp.all), Kind));
                Free (Temp);
@@ -1508,7 +1942,7 @@ package body Pp.Actions is
 
       for Kind in Ada_Tree_Kind loop
          declare
-            T : constant Str_Template_Ptr := Template_Table (Kind);
+            T : constant Str_Template_Ptr := Str_Template_Table (Kind);
          begin
             if T /= null then
                declare
@@ -1565,7 +1999,9 @@ package body Pp.Actions is
             end if;
          end;
       end loop;
-   end Init_Template_Table;
+
+      Init_Tok_Templates;
+   end Init_Template_Tables;
 
    --  Debugging printouts:
    --  See also Libadalang.Debug.
@@ -1661,10 +2097,10 @@ package body Pp.Actions is
       Put ("--  Templates:\n");
 
       for Kind in Ada_Tree_Kind loop
-         if Template_Table (Kind) /= null then
+         if Str_Template_Table (Kind) /= null then
             declare
                T : constant String :=
-                 To_UTF8 (W_Str (Template_Table (Kind).all));
+                 To_UTF8 (W_Str (Str_Template_Table (Kind).all));
             begin
                Put ("--  \1 => \2", Capitalize (Kind'Img), """" & T & """");
                if Count (T, "[") /= Count (T, "]") then
@@ -1724,12 +2160,12 @@ package body Pp.Actions is
    pragma Style_Checks ("M85");
    procedure Tree_To_Ada_2
      (Root      : Ada_Node;
-      Out_Buf   : in out Buffer;
       Cmd       : Utils.Command_Lines.Command_Line;
       Partial   : Boolean)
    is
       procedure Put_To_Buffer (C : W_Char);
-      --  Append C to Buffer
+      procedure Put_To_Buffer (S : W_Str);
+      --  Append C/S to Buffer
 
       function Id_With_Casing
         (Id                       : W_Str;
@@ -1804,9 +2240,16 @@ package body Pp.Actions is
          end if;
 
          Append_Any (Out_Buf, C);
-         if False then
+         if False then -- for debugging
             String_Utilities.Wide_Text_IO_Put_Char (C);
          end if;
+      end Put_To_Buffer;
+
+      procedure Put_To_Buffer (S : W_Str) is
+      begin
+         for C of S loop
+            Put_To_Buffer (C);
+         end loop;
       end Put_To_Buffer;
 
       Name_CPP_Class : aliased constant W_Str := "CPP_Class";
@@ -1928,10 +2371,69 @@ package body Pp.Actions is
          end if;
       end Id_With_Casing;
 
-      package Buffered_Output is new Utils.Generic_Formatted_Output
-        (W_Char,
-         W_Str,
-         Basic_Put_Char => Put_To_Buffer);
+      use Scanner;
+
+      --  The following append a token to V, and also put the text in the
+      --  output buffer. We should get rid of the textual output.
+
+      procedure Append_And_Put (V : in out Tokn_Vec; X : Same_Text_Kind);
+      procedure Append_And_Put
+        (V : in out Tokn_Vec; X : Stored_Text_Kind; Tx : Symbol);
+      --  Call Scanner.Append_Tokn, and also sends to the Out_Buf
+
+      procedure Append_And_Put (V : in out Tokn_Vec; X : Ada_Op);
+
+      procedure Append_And_Put (V : in out Tokn_Vec; X : Same_Text_Kind) is
+      begin
+         Append_Tokn (V, X);
+         Put_To_Buffer (To_W_Str (Text (X)));
+      end Append_And_Put;
+
+      procedure Append_And_Put
+        (V : in out Tokn_Vec; X : Stored_Text_Kind; Tx : Symbol) is
+      begin
+         Append_Tokn (V, X, Tx);
+         Put_To_Buffer (To_W_Str (Tx));
+      end Append_And_Put;
+
+      procedure Append_And_Put (V : in out Tokn_Vec; X : Ada_Op) is
+      begin
+         case X is
+            when Ada_Op_And => Append_And_Put (V, Res_And);
+            when Ada_Op_Or => Append_And_Put (V, Res_Or);
+            when Ada_Op_Or_Else =>
+               Append_And_Put (V, Res_Or);
+               Append_And_Put (V, Spaces, Name_Space);
+               Append_And_Put (V, Res_Else);
+            when Ada_Op_And_Then =>
+               Append_And_Put (V, Res_And);
+               Append_And_Put (V, Spaces, Name_Space);
+               Append_And_Put (V, Res_Then);
+            when Ada_Op_Concat => Append_And_Put (V, '&');
+            when Ada_Op_Xor => Append_And_Put (V, Res_Xor);
+            when Ada_Op_In => Append_And_Put (V, Res_In);
+            when Ada_Op_Not_In =>
+               Append_And_Put (V, Res_Not);
+               Append_And_Put (V, Spaces, Name_Space);
+               Append_And_Put (V, Res_In);
+            when Ada_Op_Abs => Append_And_Put (V, Res_Abs);
+            when Ada_Op_Not => Append_And_Put (V, Res_Not);
+            when Ada_Op_Pow => Append_And_Put (V, Exp_Op);
+            when Ada_Op_Mult => Append_And_Put (V, '*');
+            when Ada_Op_Div => Append_And_Put (V, '/');
+            when Ada_Op_Mod => Append_And_Put (V, Res_Mod);
+            when Ada_Op_Rem => Append_And_Put (V, Res_Rem);
+            when Ada_Op_Plus => Append_And_Put (V, '+');
+            when Ada_Op_Minus => Append_And_Put (V, '-');
+            when Ada_Op_Eq => Append_And_Put (V, '=');
+            when Ada_Op_Neq => Append_And_Put (V, Not_Equal);
+            when Ada_Op_Lt => Append_And_Put (V, '<');
+            when Ada_Op_Lte => Append_And_Put (V, Less_Or_Equal);
+            when Ada_Op_Gt => Append_And_Put (V, '>');
+            when Ada_Op_Gte => Append_And_Put (V, Greater_Or_Equal);
+            when Ada_Op_Double_Dot => Append_And_Put (V, Dot_Dot);
+         end case;
+      end Append_And_Put;
 
       procedure Indent (Amount : Integer);
 
@@ -1958,24 +2460,11 @@ package body Pp.Actions is
         (Hard     : Boolean;
          Affects_Comments : Boolean;
          Level    : Nesting_Level;
-         Kind     : Ada_Tree_Kind;
-         Template : Symbol);
-
-      function Max_Nesting_Increment
-        (Temp : Str_Template) return Nesting_Level_Increment;
-      --  If a digit occurs after '#', this is an additional "nesting increment"
-      --  to be added to the nesting level when we recursively process the
-      --  subtree. This is intended to allow some line breaks to have precedence
-      --  over others. If no such digit occurs, the default is zero. This function
-      --  returns the maximum such nesting increment in the template.
-      --
-      --  Note that "#+1" is ignored by this function.
+         Kind     : Ada_Tree_Kind);
 
       function New_Level
-        (Tree          : Ada_Tree;
-         Subtree_Index : Query_Index;
-         Cur_Level     : Nesting_Level;
-         Temp          : Str_Template)
+        (Cur_Level     : Nesting_Level;
+         TT            : Tok_Template)
          return          Nesting_Level;
       --  Compute a new nesting level for a subtree. This is usually one more than
       --  the current level, but we also add in Max_Nesting_Increment.
@@ -2009,8 +2498,7 @@ package body Pp.Actions is
         (Hard     : Boolean;
          Affects_Comments : Boolean;
          Level    : Nesting_Level;
-         Kind     : Ada_Tree_Kind;
-         Template : Symbol)
+         Kind     : Ada_Tree_Kind)
       is
          pragma Unreferenced (Kind);
          Line_Breaks : Line_Break_Index_Vector renames All_LBI;
@@ -2041,7 +2529,7 @@ package body Pp.Actions is
                Indentation => Cur_Indentation,
                Length      => <>,
    --            Kind        => Kind,
-               Template    => Template,
+               Internal_To_Comment => False,
                UID         => Next_Line_Break_Unique_Id));
          Next_Line_Break_Unique_Id := Next_Line_Break_Unique_Id + 1;
          Append (Line_Breaks, Last_Index (All_LB));
@@ -2049,61 +2537,24 @@ package body Pp.Actions is
          --  A hard line break gets NL
 
          if Hard then
-            Buffered_Output.Put_Char (NL);
+            if Scanner.Kind (Last (New_Tokns'Access)) in End_Of_Line then
+               pragma Assert (Insert_Blank_Lines (Cmd));
+               Append_And_Put (New_Tokns, Blank_Line);
+            else
+               Append_And_Put (New_Tokns, True_End_Of_Line);
+            end if;
          elsif not Arg (Cmd, Insert_Line_Breaks) then
-            Buffered_Output.Put_Char (Scanner.Token_Separator);
+            Put_To_Buffer (Scanner.Token_Separator);
          end if;
       end Append_Line_Break;
 
-      function Max_Nesting_Increment
-        (Temp : Str_Template) return Nesting_Level_Increment
-      is
-         J : Positive := Temp'First;
-         C : W_Char;
-
-      begin
-         return Result : Nesting_Level_Increment := 0 do
-            while J <= Temp'Last loop
-               C := Temp (J);
-
-               case C is
-                  when '#' =>
-                     declare
-                        Digit     : W_Char;
-                        Increment : Nesting_Level_Increment;
-
-                     begin
-                        if J < Temp'Last and then Temp (J + 1) in '0' .. '9' then
-                           J         := J + 1;
-                           Digit     := Temp (J);
-                           Increment := Nesting_Level (Char_To_Digit (Digit));
-
-                        else
-                           Increment := 0;
-                        end if;
-
-                        Result := Nesting_Level'Max (Result, Increment);
-                     end;
-
-                  when others =>
-                     null;
-               end case;
-
-               J := J + 1;
-            end loop;
-         end return;
-      end Max_Nesting_Increment;
-
       function New_Level
-        (Tree          : Ada_Tree;
-         Subtree_Index : Query_Index;
-         Cur_Level     : Nesting_Level;
-         Temp          : Str_Template)
+        (Cur_Level     : Nesting_Level;
+         TT            : Tok_Template)
          return          Nesting_Level
       is
-         pragma Unreferenced (Tree, Subtree_Index);
       begin
-         return Cur_Level + Max_Nesting_Increment (Temp) + 1;
+         return Cur_Level + TT.Max_Nesting_Increment + 1;
       end New_Level;
 
       First_If_Line_Break : Line_Break_Index_Index;
@@ -2141,8 +2592,8 @@ package body Pp.Actions is
          Cur_Level       : Nesting_Level;
          Index_In_Parent : Query_Index);
       --  We recursively walk the tree, and for most nodes, take the template
-      --  from Template_Table, and pass it to Interpret_Template. Some nodes
-      --  need special casing, and bypass the Template_Table. Subtree_To_Ada is
+      --  from Str_Template_Table, and pass it to Interpret_Template. Some nodes
+      --  need special casing, and bypass the Str_Template_Table. Subtree_To_Ada is
       --  directly recursive, and also mutually recursive with Interpret_Template.
 
       procedure Convert_Tree_To_Ada (Tree : Ada_Tree);
@@ -2216,10 +2667,10 @@ package body Pp.Actions is
 
          procedure Subtrees_To_Ada
            (Tree               : Ada_Tree;
-            Pre, Between, Post : Str_Template);
+            Pre, Between, Post : Tok_Template);
 
          procedure Interpret_Template
-           (T         : Str_Template   := Template_Table (Tree.Kind).all;
+           (TT        : Tok_Template   := Tok_Template_Table (Tree.Kind);
             Subtrees  : Ada_Tree_Array := Pp.Actions.Subtrees (Tree);
             Cur_Level : Nesting_Level  := Subtree_To_Ada.Cur_Level;
             Kind      : Ada_Tree_Kind  := Tree.Kind);
@@ -2241,18 +2692,16 @@ package body Pp.Actions is
             Kind      : Ada_Tree_Kind  := Tree.Kind) is
          begin
             Interpret_Template
-              (Alternative_Templates.Alt_Table (Alt).all,
+              (Alternative_Templates.Tok_Alt_Table (Alt),
                Subtrees, Cur_Level, Kind);
          end Interpret_Alt_Template;
 
          procedure Append_Tab
            (Parent, Tree  : Ada_Tree_Base;
-            T             : Str_Template;
             Token_Text    : Symbol;
             Index_In_Line : Tab_Index_In_Line;
             Is_Insertion_Point : Boolean);
-         --  Append a Tab_Rec onto Tabs. If Token is Name_Empty, get the token
-         --  from the template T.
+         --  Append a Tab_Rec onto Tabs.
          --
          --  Handling of "fake tabs":
          --  Fake tabs are used to deal with situations like this:
@@ -2285,12 +2734,16 @@ package body Pp.Actions is
 
          procedure Append_Tab
            (Parent, Tree  : Ada_Tree_Base;
-            T             : Str_Template;
             Token_Text    : Symbol;
             Index_In_Line : Tab_Index_In_Line;
             Is_Insertion_Point : Boolean)
          is
-            Text : Symbol;
+            pragma Assert
+              (Token_Text in Name_Tab_Insertion_Point |
+                 Name_With | Name_Use | Name_Tab_In_Out | Name_Assign |
+                 Name_Colon | Name_Arrow | Name_Bar | Name_At | Name_Range |
+                 Name_Dot_Dot | Name_R_Sq);
+
             Pa              : Ada_Tree_Base := Parent;
             Tr              : Ada_Tree_Base := Tree;
 
@@ -2299,10 +2752,6 @@ package body Pp.Actions is
             --  if the last tab is fake, and the current one has the same
             --  Index_In_Line, Tree, and Parent, then the current one replaces the
             --  fake one.
-
-            function Tab_Token (T : Str_Template) return Symbol;
-            --  Returns the text of the token at the beginning of T, which is the
-            --  portion of an Str_Template immediately following "^".
 
             procedure Maybe_Replace_Fake_Tab is
             begin
@@ -2318,81 +2767,17 @@ package body Pp.Actions is
                     and then Tb.Tree = Tr
                     and then Tb.Parent = Pa
                   then
-                     pragma Assert (Tb.Token = Text);
+                     pragma Assert (Tb.Token = Token_Text);
                      pragma Assert
-                       ((Text = Name_Assign and then Index_In_Line in 2 | 4)
+                       ((Token_Text = Name_Assign
+                           and then Index_In_Line in 2 | 4)
                         or else
-                          (Text = Name_Use and then Index_In_Line = 2));
+                          (Token_Text = Name_Use and then Index_In_Line = 2));
                      pragma Assert (not Is_Insertion_Point);
                      Delete_Last (Tabs); -- replace fake tab with this real one
                   end if;
                end;
             end Maybe_Replace_Fake_Tab;
-
-            function Tab_Token (T : Str_Template) return Symbol is
-               --  There is a limited number of possibilities, and we take
-               --  advantage of that for efficiency. Currently, the only tokens
-               --  that can follow "^" in templates are as shown below. This needs
-               --  to be changed if we add more tabbing to templates.
-               Text : Symbol;
-            begin
-               if T = "" then
-                  pragma Assert
-                    (Tree.Kind in
-                       Ada_Param_Spec | Ada_Object_Decl |
-                       Ada_Extended_Return_Stmt_Object_Decl);
-                  Text := Name_Tab_In_Out;
-               else
-                  case T (T'First) is
-                     when ':' =>
-                        if Has_Prefix (W_Str (T), Prefix => ":=") then
-                           Text := Name_Assign;
-                        else
-                           Text := Name_Colon;
-                        end if;
-                     when '|' =>
-                        Text := Name_Bar;
-                     when '=' =>
-                        pragma Assert (Has_Prefix (W_Str (T), Prefix => "=>"));
-                        Text := Name_Arrow;
-                     when 'a' =>
-                        pragma Assert (Has_Prefix (W_Str (T), Prefix => "at"));
-                        Text := Name_At;
-                     when 'r' =>
-                        pragma Assert (Has_Prefix (W_Str (T), Prefix => "range"));
-                        Text := Name_Range;
-                     when '.' =>
-                        pragma Assert (Tree.Kind in Ada_Component_Clause);
-                        pragma Assert (Has_Prefix (W_Str (T), Prefix => ".."));
-                        Text := Name_Dot_Dot;
-                     when ']' =>
-                        pragma Assert (Tree.Kind in Ada_Component_Clause);
-                        Text := Name_R_Sq;
-                     when others =>
-                        pragma Assert (False);
-                  end case;
-                  if Assert_Enabled then
-                     declare
-                        Tok_Text : constant Syms.Symbol :=
-                          Scanner.Get_Tokn_Text (W_Str (T), Utils.Ada_Version);
-                     begin
-                        pragma Assert (Text = Tok_Text);
-                     end;
-                  end if;
-               end if;
-               pragma Assert
-                 (Text in
-                    Name_Tab_In_Out |
-                    Name_Assign |
-                    Name_Colon |
-                    Name_Arrow |
-                    Name_Bar |
-                    Name_At |
-                    Name_Range |
-                    Name_Dot_Dot |
-                    Name_R_Sq);
-               return Text;
-            end Tab_Token;
 
          --  Start of processing for Append_Tab
 
@@ -2407,18 +2792,9 @@ package body Pp.Actions is
                then
                   Pa   := No_Ada_Node;
                   Tr   := No_Ada_Node;
-                  Text := Name_With;
                else
                   return; -- ignore "limited with" and "private with"
                end if;
-            elsif Token_Text = Name_Empty then
-               if Is_Insertion_Point then
-                  Text := Name_Tab_Insertion_Point;
-               else
-                  Text := Tab_Token (T);
-               end if;
-            else
-               Text := Token_Text;
             end if;
 
             Maybe_Replace_Fake_Tab;
@@ -2431,7 +2807,7 @@ package body Pp.Actions is
                Tab_Rec'
                  (Pa,
                   Tr,
-                  Token           => Text,
+                  Token           => Token_Text,
                   Mark            => Mark (Out_Buf, '^'),
                   Index_In_Line   => Index_In_Line,
                   Col             => <>,
@@ -2456,7 +2832,7 @@ package body Pp.Actions is
                         --  generic formal object
 
                         if Index_In_Line = 3 then
-                           pragma Assert (Text = Name_Tab_In_Out);
+                           pragma Assert (Token_Text = Name_Tab_In_Out);
                            Append
                              (Tabs,
                               Tab_Rec'
@@ -2472,7 +2848,7 @@ package body Pp.Actions is
                         end if;
                      else
                         if Index_In_Line = 1 then
-                           pragma Assert (Text = Name_Colon);
+                           pragma Assert (Token_Text = Name_Colon);
                            Append
                              (Tabs,
                               Tab_Rec'
@@ -2490,7 +2866,7 @@ package body Pp.Actions is
 
                   when Ada_Param_Spec =>
                      if Index_In_Line = 3 then
-                        pragma Assert (Text = Name_Tab_In_Out);
+                        pragma Assert (Token_Text = Name_Tab_In_Out);
                         Append
                           (Tabs,
                            Tab_Rec'
@@ -2507,7 +2883,7 @@ package body Pp.Actions is
 
                   when Ada_With_Clause =>
                      if Index_In_Line = 1 then
-                        pragma Assert (Text = Name_With);
+                        pragma Assert (Token_Text = Name_With);
                         Append
                           (Tabs,
                            Tab_Rec'
@@ -2550,31 +2926,11 @@ package body Pp.Actions is
 
          procedure Subtrees_To_Ada
            (Tree               : Ada_Tree;
-            Pre, Between, Post : Str_Template)
+            Pre, Between, Post : Tok_Template)
          is
-            procedure Check_Between;
-            --  Assert that Between doesn't contain any indentation or similar, so
-            --  we don't need special processing to extract it.
-
-            procedure Check_Between is
-            begin
-               for X of Between loop
-                  if X in '{' | '}' | '[' | ']' | '(' | ')' | '`' |
-                    '!' | '?' | '~'
-                  then
-                     raise Program_Error;
-                  end if;
-               end loop;
-            end Check_Between;
-
-            pragma Debug (Check_Between);
-
             pragma Assert (Tree.Kind in Ada_Ada_List);
             Prev_With : With_Clause := No_With_Clause;
             --  See Use_Same_Line below
-
-         --  Start of processing for Subtrees_To_Ada
-
          begin
             if Subtree_Count (Tree) = 0 then
                return;
@@ -2651,11 +3007,17 @@ package body Pp.Actions is
                begin
                   pragma Assert (Tree.Kind not in Ada_If_Stmt | Ada_Elsif_Stmt_Part);
                   --  No need for If_Stmt_Check here
-                  Subtree_To_Ada
-                    (Subt,
-                     New_Level (Tree, Index, Cur_Level, Pre & Between & Post),
-                     Index);
-                  --  ???Shouldn't this use the entire template?
+
+                  declare
+                     New_Lev : Nesting_Level := New_Level (Cur_Level, Pre);
+                  begin
+                     New_Lev := Nesting_Level'Max
+                       (New_Lev, New_Level (Cur_Level, Between));
+                     New_Lev := Nesting_Level'Max
+                       (New_Lev, New_Level (Cur_Level, Post));
+                     --  ???Shouldn't New_Lev use the entire template?
+                     Subtree_To_Ada (Subt, New_Lev, Index);
+                  end;
 
                   if Present (Subt) then
                      case Subt.Kind is
@@ -2677,14 +3039,16 @@ package body Pp.Actions is
                      if Index < Subtree_Count (Tree) then
                         declare
                            Same_Line : constant Boolean := Use_Same_Line;
-                           pragma Assert (if Same_Line then Between = ";$");
-                           Tween : constant Str_Template :=
+                           use Alternative_Templates;
+                           pragma Assert
+                             (if Same_Line
+                                then Between = Tok_Alt_Table (Semi_LB_Alt));
+                           Tween : constant Tok_Template :=
                              (if Same_Line then
                                 (if Ada_Tree (Prev_With) = Subtree (Tree, Index)
-                                   then ";# "
-                                   else ";$")
-                              else -- else ";#1 "???
-                              Between);
+                                   then Tok_Alt_Table (Semi_Soft)
+                                   else Tok_Alt_Table (Semi_LB_Alt))
+                              else Between);
                         begin
                            Interpret_Template
                              (Tween, Subtrees => Empty_Tree_Array);
@@ -2692,7 +3056,6 @@ package body Pp.Actions is
                               Append_Tab
                                 (Parent        => No_Ada_Node,
                                  Tree          => No_Ada_Node,
-                                 T             => "",
                                  Token_Text    => Name_Use,
                                  Index_In_Line => 2,
                                  Is_Insertion_Point => False);
@@ -2709,308 +3072,222 @@ package body Pp.Actions is
          end Subtrees_To_Ada;
 
          procedure Interpret_Template
-           (T         : Str_Template   := Template_Table (Tree.Kind).all;
+           (TT        : Tok_Template   := Tok_Template_Table (Tree.Kind);
             Subtrees  : Ada_Tree_Array := Pp.Actions.Subtrees (Tree);
             Cur_Level : Nesting_Level  := Subtree_To_Ada.Cur_Level;
             Kind      : Ada_Tree_Kind  := Tree.Kind)
          is
-            pragma Assert (T = Fix_RM_Spacing (Cmd, T, Kind));
-            J : Positive := T'First;
             subtype Subtrees_Index is Query_Index range 1 .. Subtrees'Last;
             Used : array (Subtrees_Index) of Boolean := (others => False);
-            Cur_Subtree_Index : Query_Count                       := 0;
-            Numeric_Arg       : Boolean;
-            C                 : W_Char;
+            Cur_Subtree_Index : Query_Count := 0;
+            Inst : Instr;
 
-            function Debug_Template return Symbol;
+            procedure Do_Tab (Inst_Index : Instr_Index);
 
-            function Debug_Template return Symbol is
+            procedure Do_Subtree (Subtree_Index : Query_Index);
+
+            procedure Do_Opt_Subtree_Or_List
+              (Subt : Ada_Tree; Subtree_Index : Query_Index);
+
+            subtype Absent_Kinds is Ada_Node_Kind_Type with
+              Predicate => Absent_Kinds in
+              Ada_Abort_Absent |
+              Ada_Abstract_Absent |
+              Ada_Aliased_Absent |
+              Ada_All_Absent |
+              Ada_Constant_Absent |
+              Ada_Limited_Absent |
+              Ada_Not_Null_Absent |
+              Ada_Private_Absent |
+              Ada_Protected_Absent |
+              Ada_Reverse_Absent |
+              Ada_Synchronized_Absent |
+              Ada_Tagged_Absent |
+              Ada_Until_Absent |
+              Ada_With_Private_Absent |
+
+              Ada_Mode_Default |
+              Ada_Overriding_Unspecified;
+            --  This is needed because we have templates like "?~~ ~", which
+            --  inserts a space after the subtree, which might be
+            --  "private". But if "private" is not present, we don't want the
+            --  space. Perhaps we should get rid of this, and move the space
+            --  into the subtree, as in "private ".
+
+            procedure Do_Opt_Subtree_Or_List
+              (Subt : Ada_Tree; Subtree_Index : Query_Index) is
             begin
-               if False then
-                  return W_Intern
-                      ("X" & W_Str (T) & "X    [" & From_UTF8 (Image (J)) & "]");
-               else
-                  return Name_Empty;
-               end if;
-            end Debug_Template;
+               if Present (Subt) then
+                  case Subt.Kind is
+                     when Absent_Kinds => null;
+                     when Ada_Ada_List =>
+                        Push (Tree_Stack, Subt);
+                        Subtrees_To_Ada
+                          (Subt, Inst.Pre, Inst.Between, Inst.Post);
+                        Pop (Tree_Stack);
 
-            Nesting_Increment : Nesting_Level_Increment;
+                     when others =>
+                        Interpret_Template
+                          (Inst.Pre, Subtrees => Empty_Tree_Array);
+                        pragma Assert
+                          (Kind not in Ada_If_Stmt | Ada_Elsif_Stmt_Part);
+                        --  No need for If_Stmt_Check here
+                        Subtree_To_Ada
+                          (Subt, New_Level (Cur_Level, TT), Subtree_Index);
+                        Interpret_Template
+                          (Inst.Post, Subtrees => Empty_Tree_Array);
+                  end case;
+               end if;
+            end Do_Opt_Subtree_Or_List;
+
+            procedure Do_Subtree (Subtree_Index : Query_Index) is
+               pragma Assert (Subtree_Index in Subtrees_Index);
+               Subt : constant Ada_Tree := Subtrees (Subtree_Index);
+            begin
+               Used (Subtree_Index) := True;
+               if Inst.Kind = Required_Subtree then
+                  if Tree.Kind in Ada_If_Stmt | Ada_Elsif_Stmt_Part then
+                     pragma Assert (Subtree_Index = 1);
+                     If_Stmt_Check_1;
+                  end if;
+
+                  Subtree_To_Ada
+                    (Subt, New_Level (Cur_Level, TT), Subtree_Index);
+
+                  if Tree.Kind in Ada_If_Stmt | Ada_Elsif_Stmt_Part then
+                     If_Stmt_Check_2 (Cur_Level);
+                  end if;
+
+               else
+                  pragma Assert (Inst.Kind = Opt_Subtree_Or_List);
+                  Do_Opt_Subtree_Or_List (Subt, Subtree_Index);
+               end if;
+            end Do_Subtree;
+
+            procedure Do_Tab (Inst_Index : Instr_Index) is
+               Par : constant Ada_Tree :=
+                 (if Tree = Parent_Tree
+                    then Ancestor_Tree (2) -- up one more level
+                    else Parent_Tree);
+
+               function Token_Text return Symbol;
+               --  Computes the token to be associated with the tab.
+
+               function Token_Text return Symbol is
+               begin
+                  if Inst.Kind = Tab_Insert_Point then
+                     return Name_Tab_Insertion_Point;
+                  elsif Tree.Kind = Ada_With_Clause then
+                     return Name_With;
+                  elsif Inst_Index = TT.Instructions'Last then
+                     pragma Assert
+                       (Tree.Kind in
+                          Ada_Param_Spec | Ada_Object_Decl |
+                          Ada_Extended_Return_Stmt_Object_Decl);
+                     return Name_Tab_In_Out;
+
+                  --  Except for the above special cases, we return
+                  --  the text of the token after "^" in the template.
+
+                  else
+                     declare
+                        Next_Inst : Instr renames
+                          TT.Instructions (Inst_Index + 1);
+                     begin
+                        if Next_Inst.Kind = Continuation_Outdent then
+                           return Name_R_Sq;
+                           --  This happens for Comp_Clause_Alt.
+                        else
+                           pragma Assert (Next_Inst.Kind = Verbatim);
+                           return Next_Inst.Text;
+                        end if;
+                     end;
+                  end if;
+               end Token_Text;
+
+            begin
+               Append_Tab
+                 (Par,
+                  Tree,
+                  Token_Text,
+                  Index_In_Line => Inst.Index_In_Line,
+                  Is_Insertion_Point => Inst.Kind = Tab_Insert_Point);
+            end Do_Tab;
 
          --  Start of processing for Interpret_Template
 
          begin
-            while J <= T'Last loop
-               Numeric_Arg := False;
-               C           := T (J);
+            for Inst_Index in TT.Instructions'Range loop
+               Inst := TT.Instructions (Inst_Index);
+               case Inst.Kind is
+                  when Hard_Break | Hard_Break_No_Comment =>
+                     Append_Line_Break
+                       (Hard     => Arg (Cmd, Insert_Line_Breaks),
+                        Affects_Comments => Inst.Kind = Hard_Break,
+                        Level    => Cur_Level,
+                        Kind     => Kind);
 
-               case C is
-                  --  The following characters are not currently used in templates
-                  --  (as literal text, or as the initial character of a special
-                  --  character sequence); reserved for future use (except if they
-                  --  conflict with Ada tokens).
-
-                  when '0' .. '9' |
-                    '~'           |
-                    '*'           |
-                    '_'           |
-                    '"'           |
-                    '\'           |
-                    '%'           =>
-                     raise Program_Error with "Illegal template character";
-
-                  when '$' =>
-                     declare
-                        One_Seen : constant Boolean :=
-                          J < T'Last and then T (J + 1) = '1';
-                     begin
-                        if One_Seen then
-                           J := J + 1;
-                        end if;
-                        Append_Line_Break
-                          (Hard     => Arg (Cmd, Insert_Line_Breaks),
-                           Affects_Comments => not One_Seen,
-                           Level    => Cur_Level,
-                           Kind     => Kind,
-                           Template => Debug_Template);
-                     end;
-                  when '#' =>
+                  when Soft_Break =>
                      --  "#+n" is treated the same as "#n" (where n is a
                      --  digit), except that Max_Nesting_Increment ignores
                      --  the former.
-                     if J < T'Last and then T (J + 1) = '+' then
-                        J := J + 1;
-                     end if;
-
-                     if J < T'Last and then T (J + 1) in '0' .. '9' then
-                        J := J + 1;
-                        Nesting_Increment :=
-                          Nesting_Level (Char_To_Digit (T (J)));
-                     else
-                        Nesting_Increment := 0;
-                     end if;
                      Append_Line_Break
                        (Hard     => False,
                         Affects_Comments => False,
-                        Level    => Cur_Level + Nesting_Increment,
-                        Kind     => Kind,
-                        Template => Debug_Template);
+                        Level    => Cur_Level + Inst.Level_Inc,
+                        Kind     => Kind);
 
-                  when '{' =>
+                  when Indent =>
                      Indent (PP_Indentation (Cmd));
-                  when '}' =>
+                  when Outdent =>
                      Indent (-PP_Indentation (Cmd));
 
-                  when '[' =>
+                  when Continuation_Indent =>
                      Indent (PP_Indent_Continuation (Cmd));
-                  when ']' =>
+                  when Continuation_Outdent =>
                      Indent (-PP_Indent_Continuation (Cmd));
 
                   when '(' =>
-                     Buffered_Output.Put_Char (C);
+                     Append_And_Put (New_Tokns, '(');
                      Indent (1); -- extra indentation
+
                   when ')' =>
-                     Buffered_Output.Put_Char (C);
+                     Append_And_Put (New_Tokns, ')');
                      Indent (-1);
 
-                  when '^' | '`' =>
-                     declare
-                        Index_In_Line : Tab_Index_In_Line;
-                        Par           : Ada_Tree := Parent_Tree;
-                     begin
-                        if J < T'Last and then T (J + 1) in '0' .. '9' then
-                           J             := J + 1;
-                           Index_In_Line :=
-                             Tab_Index_In_Line (Char_To_Digit (T (J)));
+                  when Tab | Tab_Insert_Point =>
+                     Do_Tab (Inst_Index);
 
-                        else
-                           Index_In_Line := 1;
-                        end if;
-                        if Par = Tree then
-                           Par := Ancestor_Tree (2); -- up one more level
-                        end if;
-                        Append_Tab
-                          (Par,
-                           Tree,
-                           T (J + 1 .. T'Last),
-                           Name_Empty,
-                           Index_In_Line => Index_In_Line,
-                           Is_Insertion_Point => C = '`');
-                     end;
-
-                  when '/' =>
+                  when Ignore_Subtree =>
                      Cur_Subtree_Index := Cur_Subtree_Index + 1;
                      Used (Cur_Subtree_Index) := True;
 
-                  when '!' | '?' =>
-                     if J < T'Last and then T (J + 1) in '0' .. '9' then
-                        Numeric_Arg := True;
-                        J           := J + 1;
-
-                     else
+                  when Required_Subtree | Opt_Subtree_Or_List =>
+                     if Inst.Index = 0 then
                         Cur_Subtree_Index := Cur_Subtree_Index + 1;
                      end if;
 
-                     declare
-                        Subtree_Index : Query_Index;
+                     Do_Subtree
+                       (Subtree_Index => (if Inst.Index = 0
+                                            then Cur_Subtree_Index
+                                            else Inst.Index));
 
-                     begin
-                        if Numeric_Arg then
-                           Subtree_Index := Query_Index (Char_To_Digit (T (J)));
-
-                        else
-                           Subtree_Index := Cur_Subtree_Index;
-                        end if;
-                        if Subtree_Index not in Subtrees_Index then
-                           Utils.Dbg_Out.Output_Enabled := True;
-                           Utils.Dbg_Out.Put
-                             ("Subtree_Index = \1, not in \2..\3 <<\4>>\n",
-                              Image (Subtree_Index),
-                              Image (Subtrees'First), Image (Subtrees'Last),
-                              Kind'Img);
-                        end if;
-                        pragma Assert (Subtree_Index in Subtrees_Index);
-
-                        declare
-                           Subt : constant Ada_Tree :=
-                             Subtrees (Subtree_Index);
-
-                        begin
-                           Used (Subtree_Index) := True;
-                           if C = '!' then
-                              if Tree.Kind in Ada_If_Stmt | Ada_Elsif_Stmt_Part then
-                                 pragma Assert (Subtree_Index = 1);
-                                 If_Stmt_Check_1;
-                              end if;
-
-                              Subtree_To_Ada
-                                (Subt,
-                                 New_Level (Tree, Subtree_Index, Cur_Level, T),
-                                 Subtree_Index);
-
-                              if Tree.Kind in Ada_If_Stmt | Ada_Elsif_Stmt_Part then
-                                 If_Stmt_Check_2 (Cur_Level);
-                              end if;
-
-                           else
-                              pragma Assert (C = '?');
-
-                              declare
-                                 function Scan_To_Tilde return Positive;
-
-                                 function Scan_To_Tilde return Positive is
-                                 begin
-                                    loop
-                                       J := J + 1;
-                                       exit when T (J) = '~';
-                                    end loop;
-                                    return J - 1;
-                                 end Scan_To_Tilde;
-
-                                 Pre_First : constant Positive := J + 1;
-                                 Pre_Last  : constant Positive := Scan_To_Tilde;
-                                 pragma Assert (T (J) = '~');
-
-                                 Between_First : constant Positive := J + 1;
-                                 Between_Last  : constant Positive :=
-                                   Scan_To_Tilde;
-                                 pragma Assert (T (J) = '~');
-
-                                 Post_First : constant Positive := J + 1;
-                                 Post_Last  : constant Positive := Scan_To_Tilde;
-                                 pragma Assert (T (J) = '~');
-
-                                 subtype Absent_Kinds is Ada_Node_Kind_Type with
-                                   Predicate => Absent_Kinds in
-                                     Ada_Abort_Absent |
-                                     Ada_Abstract_Absent |
-                                     Ada_Aliased_Absent |
-                                     Ada_All_Absent |
-                                     Ada_Constant_Absent |
-                                     Ada_Limited_Absent |
-                                     Ada_Not_Null_Absent |
-                                     Ada_Private_Absent |
-                                     Ada_Protected_Absent |
-                                     Ada_Reverse_Absent |
-                                     Ada_Synchronized_Absent |
-                                     Ada_Tagged_Absent |
-                                     Ada_Until_Absent |
-                                     Ada_With_Private_Absent |
-
-                                     Ada_Mode_Default |
-                                     Ada_Overriding_Unspecified;
-                                 --  This is needed because we have templates
-                                 --  like "?~~ ~", which inserts a space after
-                                 --  the subtree, which might be "private". But
-                                 --  if "private" is not present, we don't want
-                                 --  the space. Perhaps we should get rid of
-                                 --  this, and move the space into the subtree,
-                                 --  as in "private ".
-
-                              begin
-                                 Used (Subtree_Index) := True;
-                                 --  ???The following could use some cleanup
-                                 if Present (Subt) then
-                                    case Subt.Kind is
-                                       when Absent_Kinds => null;
-                                       when Ada_Ada_List =>
-                                          Append (Tree_Stack, Subt); -- push
-                                          Subtrees_To_Ada
-                                            (Subt,
-                                             T (Pre_First .. Pre_Last),
-                                             T (Between_First .. Between_Last),
-                                             T (Post_First .. Post_Last));
-                                          Delete_Last (Tree_Stack); -- pop
-
-                                       when others =>
-                                          Interpret_Template
-                                            (T (Pre_First .. Pre_Last),
-                                             Subtrees => Empty_Tree_Array);
-                                          --  ???
-                                          --  if False and then Between /= "" then
-                                          --  Put ("\1, \2: ???Between = <<\3>>, " &
-                                          --  "T = <<\4>>\n", "???Image (Tr.Kind)",
-                                          --  Image (Subt.Kind), String (Between),
-                                          --  String (T)); pragma Assert (Between =
-                                          --  ""); end if;
-                                          pragma Assert
-                                            (Kind not in Ada_If_Stmt |
-                                               Ada_Elsif_Stmt_Part);
-                                          --  No need for If_Stmt_Check here
-                                          Subtree_To_Ada
-                                            (Subt,
-                                             New_Level
-                                               (Tree,
-                                                Subtree_Index,
-                                                Cur_Level,
-                                                T),
-                                             Subtree_Index);
-                                          Interpret_Template
-                                            (T (Post_First .. Post_Last),
-                                             Subtrees => Empty_Tree_Array);
-                                    end case;
-                                 end if;
-                              end;
-                           end if;
-                        end;
-                     end;
-
-                  when ';' =>
-                     if Label_Seen then
+                  when Verbatim =>
+                     if Label_Seen and then Inst.T_Kind = ';' then
                         Label_Seen := False;
                      else
-                        Buffered_Output.Put_Char (C);
+                        case Token_Kind'(Inst.T_Kind) is
+                           when Same_Text_Kind =>
+                              Append_And_Put (New_Tokns, Inst.T_Kind);
+                           when Stored_Text_Kind =>
+                              Append_And_Put
+                                (New_Tokns, Inst.T_Kind, Inst.Text);
+                        end case;
                      end if;
-
-                  when others =>
-                     Buffered_Output.Put_Char (C);
-
                end case;
-
-               J := J + 1;
             end loop;
-
             pragma Assert
-              (Used = (Subtrees_Index => True), "???Not all used: " & Kind'Img);
+              (Used = (Subtrees_Index => True), "Not all used: " & Kind'Img);
          end Interpret_Template;
 
          use Alternative_Templates;
@@ -3086,8 +3363,7 @@ package body Pp.Actions is
                  (Hard     => True,
                   Affects_Comments => False,
                   Level    => 1,
-                  Kind     => Tree.Kind,
-                  Template => Intern ("Maybe_Blank_Line"));
+                  Kind     => Tree.Kind);
             end if;
          end Maybe_Blank_Line;
 
@@ -3103,17 +3379,17 @@ package body Pp.Actions is
          --  context.
 
          --  Procedures for formatting the various kinds of node that are not
-         --  fully covered by Template_Table:
+         --  fully covered by Str_Template_Table:
 
          procedure Do_Aggregate;
          procedure Do_Assign_Stmt;
-         procedure Do_Assoc;
          procedure Do_Compilation_Unit;
          procedure Do_Component_Clause;
          procedure Do_Handled_Stmts;
          procedure Do_Extended_Return_Stmt;
          procedure Do_For_Loop_Spec;
 
+         procedure Do_Assoc;
          procedure Do_Un_Op (Tree : Ada_Tree);
 
          procedure Do_Bin_Op
@@ -3193,59 +3469,6 @@ package body Pp.Actions is
             end if;
          end Do_Assign_Stmt;
 
-         procedure Do_Assoc is
-            --  Some have a single name before the "=>", and some have a list
-            --  separated by "|".
-            --  Positional_Notation is True if there are no names (no "=>").
-            --  Single_Name is True if there is a single name before "=>",
-            --  regardless of whether a list is allowed.
-
-            Designator : constant Ada_Tree := Subtree (Tree, 1);
-            Positional_Notation : constant Boolean :=
-              Is_Nil (Designator) or else
-                (Designator.Kind in Ada_Ada_List
-                   and then Subtree_Count (Designator) = 0);
-         begin
-            if Positional_Notation then
-               Interpret_Alt_Template (Pos_Notation_Assoc_Alt);
-            else
-               declare
-                  Single_Name : constant Boolean :=
-                    (if Tree.Kind = Ada_Discriminant_Assoc
-                       then Subtree_Count
-                         (Tree.As_Discriminant_Assoc.F_Ids) = 1
-                     elsif Tree.Kind = Ada_Aggregate_Assoc
-                       then Subtree_Count
-                        (Tree.As_Aggregate_Assoc.F_Designators) = 1
-                     else True);
-                  Vertical : constant Boolean :=
-                    Tree.Kind = Ada_Aggregate_Assoc
-                    and then
-                      Is_Vertical_Aggregate
-                        (Tree.As_Aggregate_Assoc.F_R_Expr);
-               begin
-                  --  The Single_Name test is needed because the "[]" is not
-                  --  properly nested with the "?~~~".
-                  --  "! ^=>[# !]" doesn't work for discrims.
-                  if Single_Name then
-                     if Vertical then
-                        Interpret_Alt_Template (Single_Name_Vertical_Assoc_Alt);
-                     else
-                        Interpret_Alt_Template (Single_Name_Assoc_Alt);
-                     end if;
-                  else
-                     if Vertical then
-                        Interpret_Alt_Template (Multi_Name_Vertical_Assoc_Alt);
-                     else
-                        Interpret_Alt_Template (Multi_Name_Assoc_Alt);
-                     end if;
-                  end if;
-               end;
-            end if;
-         end Do_Assoc;
-
-         use Buffered_Output;
-
          procedure Do_Compilation_Unit is
          begin
    --          Put ("--  \1 = \2", "Unit_Kind", Capitalize (Tree.Unit_Kind'Img));
@@ -3263,20 +3486,20 @@ package body Pp.Actions is
    --          Interpret_Template ("$", Subtrees => Empty_Tree_Array);
             Subtrees_To_Ada
               (Subtree (Tree, 1),
-               Pre     => Alt_Table (Empty_Alt).all,
-               Between => Alt_Table (Semi_LB_Alt).all,
-               Post    => Alt_Table (Semi_LB_LB_Alt).all);
+               Pre     => Tok_Alt_Table (Empty_Alt),
+               Between => Tok_Alt_Table (Semi_LB_Alt),
+               Post    => Tok_Alt_Table (Semi_LB_LB_Alt));
             Subtree_To_Ada
               (Subtree (Tree, 2),
                Cur_Level + 1,
                Index_In_Parent => 2);
-            Put (";");
+            Append_And_Put (New_Tokns, ';');
             Interpret_Alt_Template (Hard_Break_Alt, Subtrees => Empty_Tree_Array);
             Subtrees_To_Ada
               (Subtree (Tree, 3),
-               Pre     => Alt_Table (Empty_Alt).all,
-               Between => Alt_Table (Semi_LB_Alt).all,
-               Post    => Alt_Table (Semi_LB_Alt).all);
+               Pre     => Tok_Alt_Table (Empty_Alt),
+               Between => Tok_Alt_Table (Semi_LB_Alt),
+               Post    => Tok_Alt_Table (Semi_LB_Alt));
          end Do_Compilation_Unit;
 
          procedure Do_Component_Clause is
@@ -3326,35 +3549,6 @@ package body Pp.Actions is
                Interpret_Template;
             end if;
          end Do_Extended_Return_Stmt;
-
-         Operator_Symbol_Table : constant array (Ada_Op) of Symbol :=
-           (Ada_Op_And => Intern ("and"),
-            Ada_Op_Or => Intern ("or"),
-            Ada_Op_Or_Else => Intern ("or else"),
-            Ada_Op_And_Then => Intern ("and then"),
-            Ada_Op_Concat => Intern ("&"),
-            Ada_Op_Xor => Intern ("xor"),
-            Ada_Op_In => Intern ("in"),
-            Ada_Op_Not_In => Intern ("not in"),
-            Ada_Op_Abs => Intern ("abs"),
-            Ada_Op_Not => Intern ("not"),
-            Ada_Op_Pow => Intern ("**"),
-            Ada_Op_Mult => Intern ("*"),
-            Ada_Op_Div => Intern ("/"),
-            Ada_Op_Mod => Intern ("mod"),
-            Ada_Op_Rem => Intern ("rem"),
-            Ada_Op_Plus => Intern ("+"),
-            Ada_Op_Minus => Intern ("-"),
-            Ada_Op_Eq => Intern ("="),
-            Ada_Op_Neq => Intern ("/="),
-            Ada_Op_Lt => Intern ("<"),
-            Ada_Op_Lte => Intern ("<="),
-            Ada_Op_Gt => Intern (">"),
-            Ada_Op_Gte => Intern (">="),
-            Ada_Op_Double_Dot => Intern (".."));
-
-         function Operator_Symbol (Op : Ada_Op) return W_Str is
-            (To_W_Str (Operator_Symbol_Table (Op)));
 
          type Precedence_Level is range 1 .. 8;
          function Precedence (Expr : Ada_Tree) return Precedence_Level;
@@ -3407,9 +3601,80 @@ package body Pp.Actions is
             end case;
          end Precedence;
 
+         function Depends_RHS (Tree : Ada_Tree) return Ada_Tree is
+         --  For a tree of the form "Depends => (A => xxx)", this returns
+         --  the xxx.
+           (Subtree (Subtree (Subtree (Subtree (Tree, 2), 2), 1), 2));
+
+         function Depends_Hack (Tree : Ada_Tree) return Boolean is
+         --  True if Tree is an Aspect_Assoc of the form "Depends => (A =>+ B)"
+         --  or the same for Refined_Depends.
+           (Tree.Kind = Ada_Aspect_Assoc
+             and then W_Intern (Id_Name (Subtree (Tree, 1))) in
+               Name_Depends | Name_Refined_Depends
+             and then Depends_RHS (Tree).Kind = Ada_Un_Op
+             and then Subtree (Depends_RHS (Tree), 1).Kind = Ada_Op_Plus);
+
+         procedure Do_Assoc is
+            --  Some have a single name before the "=>", and some have a list
+            --  separated by "|".
+            --  Positional_Notation is True if there are no names (no "=>").
+            --  Single_Name is True if there is a single name before "=>",
+            --  regardless of whether a list is allowed.
+
+            Designator : constant Ada_Tree := Subtree (Tree, 1);
+            Positional_Notation : constant Boolean :=
+              Is_Nil (Designator) or else
+                (Designator.Kind in Ada_Ada_List
+                   and then Subtree_Count (Designator) = 0);
+         begin
+            if Positional_Notation then
+               Interpret_Alt_Template (Pos_Notation_Assoc_Alt);
+            else
+               declare
+                  Single_Name : constant Boolean :=
+                    (if Tree.Kind = Ada_Discriminant_Assoc
+                       then Subtree_Count
+                         (Tree.As_Discriminant_Assoc.F_Ids) = 1
+                     elsif Tree.Kind = Ada_Aggregate_Assoc
+                       then Subtree_Count
+                        (Tree.As_Aggregate_Assoc.F_Designators) = 1
+                     else True);
+                  Vertical : constant Boolean :=
+                    Tree.Kind = Ada_Aggregate_Assoc
+                    and then
+                      Is_Vertical_Aggregate
+                        (Tree.As_Aggregate_Assoc.F_R_Expr);
+               begin
+                  --  The Single_Name test is needed because the "[]" is not
+                  --  properly nested with the "?~~~".
+                  --  "! ^=>[# !]" doesn't work for discrims.
+                  if Single_Name then
+                     if Depends_Hack (Ancestor_Tree (3)) then
+                        Interpret_Alt_Template (Depends_Hack_Alt);
+                        --  Avoid the usual " " after "=>"; see Do_Un_Op below for an
+                        --  explanation.
+                     elsif Vertical then
+                        Interpret_Alt_Template (Single_Name_Vertical_Assoc_Alt);
+                     else
+                        Interpret_Alt_Template (Single_Name_Assoc_Alt);
+                     end if;
+                  else
+                     if Vertical then
+                        Interpret_Alt_Template (Multi_Name_Vertical_Assoc_Alt);
+                     else
+                        Interpret_Alt_Template (Multi_Name_Assoc_Alt);
+                     end if;
+                  end if;
+               end;
+            end if;
+         end Do_Assoc;
+
          procedure Do_Un_Op (Tree : Ada_Tree) is
             Expr : constant Un_Op := Tree.As_Un_Op;
          begin
+            Append_And_Put (New_Tokns, F_Op (Expr));
+
             --  First we have a special case for the Depends and
             --  Refined_Depends aspect specifications. We want to pretend that
             --  "=>+" is an operator, so we print: "Depends => (A =>+ B)"
@@ -3418,32 +3683,19 @@ package body Pp.Actions is
             --  compiler's implementation of the aspect, so we don't expect it
             --  to be used much.
 
-            if Ancestor_Tree (4).Kind = Ada_Aspect_Assoc
-              and then W_Intern (Id_Name (Subtree (Ancestor_Tree (4), 1))) in
-                Name_Depends | Name_Refined_Depends
-            then
+            if Depends_Hack (Ancestor_Tree (4)) then
                pragma Assert (Subtree (Expr, 1).Kind = Ada_Op_Plus);
-               pragma Assert
-                 (Slice (Out_Buf, Point (Out_Buf) - 4, Point (Out_Buf) - 1)
-                    = " => ");
-               declare
-                  Subtrees : constant Ada_Tree_Array :=
-                    (1 => Subtree (Expr, 2));
-               begin
-                  Replace_Previous (Out_Buf, '+');
-                  Interpret_Alt_Template (Depends_Hack_Alt, Subtrees);
-               end;
+               Interpret_Alt_Template (Un_Op_Space_Alt, Subtrees (Expr));
 
             --  No special "[Refined_]Depends" case. Put a space after the
             --  operator, except for "+" and "-".
 
             else
-               Put ("\1", Operator_Symbol (F_Op (Expr)));
                case F_Op (Expr) is
                   when Ada_Op_Plus | Ada_Op_Minus =>
-                     Interpret_Alt_Template (Un_Op_Plus_Minus_Alt, Subtrees (Expr));
+                     Interpret_Alt_Template (Un_Op_No_Space_Alt, Subtrees (Expr));
                   when Ada_Op_Abs | Ada_Op_Not =>
-                     Interpret_Alt_Template (Un_Op_Abs_Not_Alt, Subtrees (Expr));
+                     Interpret_Alt_Template (Un_Op_Space_Alt, Subtrees (Expr));
                   when others => raise Program_Error;
                end case;
             end if;
@@ -3536,8 +3788,15 @@ package body Pp.Actions is
             then
                Interpret_Alt_Template (Soft_Alt, Empty_Tree_Array, Cur_Level);
             end if;
-            Put ((if Oper = Ada_Op_Pow then "\1" else " \1 "),
-                 Operator_Symbol (Oper)); -- no blanks for "**"
+
+            if Oper = Ada_Op_Pow then
+               Append_And_Put (New_Tokns, Oper); -- no blanks for "**"
+            else
+               Append_And_Put (New_Tokns, Spaces, Name_Space);
+               Append_And_Put (New_Tokns, Oper);
+               Append_And_Put (New_Tokns, Spaces, Name_Space);
+            end if;
+
             if not (Is_Short_C or Arg (Cmd, Split_Line_Before_Op))
               and Oper /= Ada_Op_Pow
             then
@@ -3584,11 +3843,16 @@ package body Pp.Actions is
          --  of one element, in which case the Between doesn't matter (e.g.
          --  Defining_Name_List, where there is only one).
          begin
-            Subtrees_To_Ada (Tree, Pre => "", Between => "$", Post => "");
+            Subtrees_To_Ada
+              (Tree,
+               Pre => Tok_Alt_Table (Empty_Alt),
+               Between => Tok_Alt_Table (Hard_Break_Alt),
+               Post => Tok_Alt_Table (Empty_Alt));
          end Do_List;
 
          procedure Do_Literal is
             S : constant W_Str := Id_Name (Tree);
+            V : Bounded_W_Str (Max_Length => 100);
 
             function Last_Digit
               (First : Positive; Based : Boolean) return Positive;
@@ -3615,9 +3879,9 @@ package body Pp.Actions is
             begin
                for J in Part'Range loop
                   if J /= Part'First and then Count mod Grouping = 0 then
-                     Put_Char ('_');
+                     Append (V, '_');
                   end if;
-                  Put_Char (Part (J));
+                  Append (V, Part (J));
                   Count := Count + Inc;
                end loop;
             end Put_With_Underscores;
@@ -3653,62 +3917,62 @@ package body Pp.Actions is
             --  ":"; note that "10#...#" is considered based, not decimal.
 
             case Tree.Kind is
-               when Ada_String_Literal | Ada_Char_Literal =>
-                  Put ("\1", S);
+               when Ada_String_Literal =>
+                  Append_And_Put (New_Tokns, String_Lit, W_Intern (S));
+
+               when Ada_Char_Literal =>
+                  Append_And_Put (New_Tokns, Character_Literal, W_Intern (S));
 
                when Ada_Int_Literal | Ada_Real_Literal =>
-                  if Arg (Cmd, Decimal_Grouping) = 0
-                    and then Arg (Cmd, Based_Grouping) = 0
-                  then
-                     Put ("\1", S);
-                  else
-                     declare
-                        Sharp : constant Natural :=
-                          (if Find (S, "#") /= 0 then Find (S, "#")
-                           else Find (S, ":"));
-                        Underscore : constant Natural := Find (S, "_");
+                  declare
+                     Sharp : constant Natural :=
+                       (if Find (S, "#") /= 0 then Find (S, "#")
+                        else Find (S, ":"));
+                     Underscore : constant Natural := Find (S, "_");
 
-                        Grouping : constant Natural :=
-                          (if Underscore /= 0 then 0
-                           elsif Sharp = 0 then Arg (Cmd, Decimal_Grouping)
-                           else Arg (Cmd, Based_Grouping));
+                     Grouping : constant Natural :=
+                       (if Underscore /= 0 then 0
+                        elsif Sharp = 0 then Arg (Cmd, Decimal_Grouping)
+                        else Arg (Cmd, Based_Grouping));
 
-                        Int_First, Int_Last, Frac_First, Frac_Last : Natural;
-                        --  These point to the slices of the literal that should
-                        --  have underscores inserted. For example:
-                        --     For 12345 or 12345E6:
-                        --       S (Int_First .. Int_Last) = "12345"
-                        --     For 12345.6789 or 16#12345.6789#E-3:
-                        --       S (Int_First .. Int_Last) = "12345", and
-                        --       S (Frac_First .. Frac_Last) = "6789"
-                     begin
-                        if Grouping = 0 then
-                           Put ("\1", S);
+                     Int_First, Int_Last, Frac_First, Frac_Last : Natural;
+                     --  These point to the slices of the literal that should
+                     --  have underscores inserted. For example:
+                     --     For 12345 or 12345E6:
+                     --       S (Int_First .. Int_Last) = "12345"
+                     --     For 12345.6789 or 16#12345.6789#E-3:
+                     --       S (Int_First .. Int_Last) = "12345", and
+                     --       S (Frac_First .. Frac_Last) = "6789"
+                  begin
+                     if Grouping = 0 then
+                        Append_And_Put
+                          (New_Tokns, Numeric_Literal, W_Intern (S));
+                     else
+                        Int_First := Sharp + 1;
+                        Int_Last :=
+                          Last_Digit (Int_First, Based => Sharp /= 0);
+                        Append (V, S (1 .. Sharp));
+                        Put_With_Underscores
+                          (S (Int_First .. Int_Last),
+                           Grouping, Int => True);
+                        if Tree.Kind = Ada_Int_Literal then
+                           Append (V, S (Int_Last + 1 .. S'Last));
                         else
-                           Int_First := Sharp + 1;
-                           Int_Last :=
-                             Last_Digit (Int_First, Based => Sharp /= 0);
-                           Put ("\1", S (1 .. Sharp));
+                           Frac_First := Int_Last + 2; -- skip '.'
+                           Frac_Last := Last_Digit
+                             (Frac_First, Based => Sharp /= 0);
+                           pragma Assert
+                             (S (Int_Last + 1 .. Frac_First - 1) = ".");
+                           Append (V, ".");
                            Put_With_Underscores
-                             (S (Int_First .. Int_Last),
-                              Grouping, Int => True);
-                           if Tree.Kind = Ada_Int_Literal then
-                              Put ("\1", S (Int_Last + 1 .. S'Last));
-                           else
-                              Frac_First := Int_Last + 2; -- skip '.'
-                              Frac_Last := Last_Digit
-                                (Frac_First, Based => Sharp /= 0);
-                              pragma Assert
-                                (S (Int_Last + 1 .. Frac_First - 1) = ".");
-                              Put_Char ('.');
-                              Put_With_Underscores
-                                (S (Frac_First .. Frac_Last),
-                                 Grouping, Int => False);
-                              Put ("\1", S (Frac_Last + 1 .. S'Last));
-                           end if;
+                             (S (Frac_First .. Frac_Last),
+                              Grouping, Int => False);
+                           Append (V, S (Frac_Last + 1 .. S'Last));
                         end if;
-                     end;
-                  end if;
+                        Append_And_Put
+                          (New_Tokns, Numeric_Literal, W_Intern (+V));
+                     end if;
+                  end;
 
                when others => raise Program_Error;
             end case;
@@ -3727,12 +3991,9 @@ package body Pp.Actions is
          end Do_Label;
 
          procedure Do_Others is
-            use Utils.Dbg_Out;
          begin
-            if Template_Table (Tree.Kind) = null then
-               Utils.Dbg_Out.Output_Enabled := True;
-               Put ("null template:\1", Short_Image (Tree));
-               raise Program_Error;
+            if Str_Template_Table (Tree.Kind) = null then
+               raise Program_Error with "null template: " & Short_Image (Tree);
             else
                Interpret_Template;
             end if;
@@ -3745,9 +4006,9 @@ package body Pp.Actions is
             --  F_Ids:
             Subtrees_To_Ada
               (Subtree (Tree, Index),
-               Pre     => "",
-               Between => ",# ",
-               Post    => "");
+               Pre     => Tok_Alt_Table (Empty_Alt),
+               Between => Tok_Alt_Table (Comma_Soft),
+               Post    => Tok_Alt_Table (Empty_Alt));
             Interpret_Alt_Template
               (Parameter_Specification_Alt,
                Subtrees => Empty_Tree_Array);
@@ -3757,7 +4018,7 @@ package body Pp.Actions is
 
             if Subtree (Tree, Index).Kind = Ada_Aliased_Present then
                Subtree_To_Ada (Subtree (Tree, Index), Cur_Level + 1, Index);
-               Put (" ");
+               Append_And_Put (New_Tokns, Spaces, Name_Space);
             end if;
 
             --  Skip F_Has_Constant:
@@ -3768,13 +4029,15 @@ package body Pp.Actions is
             --  F_Mode/F_Inout: ???Why not use the same name?
             Index := Index + 1;
             if Subtree (Tree, Index).Kind in Ada_Mode_In | Ada_Mode_In_Out then
-               Put ("in ");
+               Append_And_Put (New_Tokns, Res_In);
+               Append_And_Put (New_Tokns, Spaces, Name_Space);
             end if;
             if AM then
                Interpret_Alt_Template (Tab_2_Alt, Subtrees => Empty_Tree_Array);
             end if;
             if Subtree (Tree, Index).Kind in Ada_Mode_Out | Ada_Mode_In_Out then
-               Put ("out ");
+               Append_And_Put (New_Tokns, Res_Out);
+               Append_And_Put (New_Tokns, Spaces, Name_Space);
             end if;
             if AM then
                Interpret_Alt_Template (Tab_3_Alt, Subtrees => Empty_Tree_Array);
@@ -3802,11 +4065,13 @@ package body Pp.Actions is
          end Do_Parameter_Specification;
 
          procedure Do_Pragma is
-         begin
-            Put
-              ("pragma \1",
+            With_Casing : constant W_Str :=
                Id_With_Casing (Id_Name (Tree.As_Pragma_Node.F_Id),
-                               Tree.Kind, Is_Predef => False));
+                               Tree.Kind, Is_Predef => False);
+         begin
+            Append_And_Put (New_Tokns, Res_Pragma);
+            Append_And_Put (New_Tokns, Spaces, Name_Space);
+            Append_And_Put (New_Tokns, Ident, W_Intern (With_Casing));
             Interpret_Alt_Template (Pragma_Alt);
          end Do_Pragma;
 
@@ -3929,7 +4194,7 @@ package body Pp.Actions is
                  or else Param_Count > Query_Count (Arg (Cmd, Par_Threshold))
                then
                   Interpret_Template
-                    (Subp_Decl_With_Hard_Breaks_Alt_Table (Tree.Kind).all,
+                    (Tok_Subp_Decl_With_Hard_Breaks_Alt_Table (Tree.Kind),
                      Subtrees => Subs);
                else
                   Interpret_Template (Subtrees => Subs);
@@ -4074,10 +4339,11 @@ package body Pp.Actions is
             pragma Assert (if Def then Def_Name = Tree.As_Base_Id);
             K : constant Ada_Node_Kind_Type :=
               (if Decl.Is_Null then Null_Kind else Decl.Kind);
-         begin
-            Put ("\1", Id_With_Casing
-                         (Id_Name (Def_Name), Kind => K, Is_Predef => False));
+            With_Casing : constant W_Str :=
+                Id_With_Casing (Id_Name (Def_Name), Kind => K, Is_Predef => False);
             --  ???Is_Predef is wrong.
+         begin
+            Append_And_Put (New_Tokns, Ident, W_Intern (With_Casing));
          end Do_Def_Or_Usage_Name;
 
       --  Start of processing for Subtree_To_Ada
@@ -4088,7 +4354,7 @@ package body Pp.Actions is
          end if;
 
          Error_Sloc := Slocs.Start_Sloc (Sloc_Range (Tree));
-         Append (Tree_Stack, Tree); -- push
+         Push (Tree_Stack, Tree);
 
          Maybe_Blank_Line;
 
@@ -4232,21 +4498,24 @@ package body Pp.Actions is
                Do_Others;
          end case;
 
-         Delete_Last (Tree_Stack); -- pop
+         Pop (Tree_Stack);
       end Subtree_To_Ada;
 
       procedure Convert_Tree_To_Ada (Tree : Ada_Tree) is
       begin
+         Scanner.Append_Tokn (New_Tokns, Scanner.Start_Of_Input);
+
          --  Append first link break. The Kind here doesn't matter.
          Append_Line_Break
            (Hard     => True,
             Affects_Comments => True,
             Level    => 1,
-            Kind     => Null_Kind,
-            Template => Name_Empty);
+            Kind     => Null_Kind);
 
          pragma Assert (Check_Whitespace);
          Subtree_To_Ada (Tree, Cur_Level => 1, Index_In_Parent => 1);
+
+         Scanner.Append_Tokn (New_Tokns, Scanner.End_Of_Input);
 
          --  In Partial mode, we might need to add a line break
 
@@ -4258,20 +4527,21 @@ package body Pp.Actions is
               (Hard     => True,
                Affects_Comments => True,
                Level    => 1,
-               Kind     => Null_Kind,
-               Template => Name_Empty);
+               Kind     => Null_Kind);
          end if;
          pragma Debug (Assert_No_Trailing_Blanks (Out_Buf));
 
-         Append
-           (Tabs,
-            Tab_Rec'
-              (Parent | Tree => No_Ada_Node,
-               Mark => Mark (Out_Buf, '$'),
-               others => <>));
-         --  Append a sentinel tab, whose Position is greater than any actual
-         --  position. This ensures that as we step through Tabs, there is
-         --  always one more.
+         if Alignment_Enabled (Cmd) then
+            Append
+              (Tabs,
+               Tab_Rec'
+                 (Parent | Tree => No_Ada_Node,
+                  Mark => Mark (Out_Buf, '$'),
+                  others => <>));
+            --  Append a sentinel tab, whose Position is greater than any
+            --  actual position. This ensures that as we step through Tabs,
+            --  there is always one more.
+         end if;
          pragma Assert (Is_Empty (Tree_Stack));
          Reset (Out_Buf);
          pragma Assert (Cur_Indentation = 0);
@@ -4280,8 +4550,8 @@ package body Pp.Actions is
    --  Start of processing for Tree_To_Ada_2
 
    begin
-      if not Template_Table_Initialized then
-         Init_Template_Table (Cmd);
+      if not Template_Tables_Initialized then
+         Init_Template_Tables (Cmd);
 
          if Debug_Mode then
             Put_Str_Templates;
@@ -4328,7 +4598,7 @@ package body Pp.Actions is
 
       function Get_Out_File_Format return Out_File_Formats is
          Is_Windows : constant Boolean := GNAT.OS_Lib.Directory_Separator = '\';
-         Val : constant String_Ref := Arg (Cmd, End_Of_Line);
+         Val : constant String_Ref := Arg (Cmd, EOL);
       begin
          if Val = null then
             return (if Is_Windows then CRLF else LF);
@@ -4345,25 +4615,6 @@ package body Pp.Actions is
 
       Out_File_Format : constant Out_File_Formats := Get_Out_File_Format;
       --  Format of the tool report file(s)
-
-      procedure Init_Pp_Off_And_On;
-      --  Initialize Pp_Off_On_Delimiters
-
-      procedure Init_Pp_Off_And_On is
-      begin
-         pragma Assert (not Pp_Off_On_Delimiters_Initialized);
-         Pp_Off_On_Delimiters_Initialized := True;
-         if Arg (Cmd, Pp_Off) /= null then
-            pragma Assert (Arg (Cmd, Pp_Off).all /= "");
-            Pp_Off_On_Delimiters.Off := new W_Str'
-              ("--" & To_Wide_String (Arg (Cmd, Pp_Off).all));
-         end if;
-         if Arg (Cmd, Pp_On) /= null then
-            pragma Assert (Arg (Cmd, Pp_On).all /= "");
-            Pp_Off_On_Delimiters.On := new W_Str'
-              ("--" & To_Wide_String (Arg (Cmd, Pp_On).all));
-         end if;
-      end Init_Pp_Off_And_On;
 
       function Remove_Extra_Line_Breaks return WChar_Vector;
       --  Removes extra NL's. The result has exactly one NL at the beginning, and
@@ -4448,25 +4699,22 @@ package body Pp.Actions is
             Utils.Dbg_Out.Output_Enabled := True;
          end if;
 
-         if not Pp_Off_On_Delimiters_Initialized then
-            Init_Pp_Off_And_On;
-         end if;
-
-         Scanner.Get_Tokns
-           (Src_Buf, Src_Tokns, Utils.Ada_Version, Pp_Off_On_Delimiters);
+         Scanner.Get_Tokns (Src_Buf, Src_Tokns, Utils.Ada_Version);
          if Debug_Mode then
             Dbg_Out.Put ("Src_Tokens:\n");
             Scanner.Put_Tokens (Src_Tokns);
             Dbg_Out.Put ("end Src_Tokens:\n");
          end if;
 
-         --  Note that if we're processing multiple files, we will get here multiple
-         --  times, so we need to clear out data structures left over from last time.
+         --  Note that if we're processing multiple files, we will get here
+         --  multiple times, so data structures left over from last time must
+         --  have been cleared out.
 
          pragma Assert (Cur_Indentation = 0);
-         Clear (All_LBI);
-         Clear (Tabs);
+         Assert_No_LB (Lines_Data);
+         pragma Assert (Is_Empty (Tabs));
          Clear (Out_Buf);
+         Scanner.Clear (New_Tokns);
 
          --  If --comments-only was specified, format the comments and quit
 
@@ -4476,7 +4724,7 @@ package body Pp.Actions is
             --  Otherwise, convert the tree to text, and then run all the
             --  text-based passes.
 
-            Tree_To_Ada_2 (Node, Out_Buf, Cmd, Partial);
+            Tree_To_Ada_2 (Node, Cmd, Partial);
             Post_Tree_Phases (Lines_Data, Messages, Src_Buf, Cmd, Partial);
          end if;
       end Tree_To_Ada;
@@ -4875,6 +5123,11 @@ package body Pp.Actions is
             else
                Write_Src_Buf;
             end if;
+
+            --  Reset Lines_Data to its initial state, so we don't blow up on
+            --  subsequent files.
+
+            Lines_Data := (others => <>);
          end if;
    end Per_File_Action;
 

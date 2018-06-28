@@ -244,6 +244,7 @@ package Utils.Command_Lines is
    generic
       Descriptor : in out Command_Line_Descriptor;
       type Switches is (<>);
+      Default : Switches := Switches'First;
    package Enum_Switches is
 
       --  An instance of this generic declares an enumeration-like set of

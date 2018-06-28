@@ -54,7 +54,7 @@ package Pp.Buffers is
    --  Move_Forward), inserting text at various places (see procedure Insert).
    --  When we get to the end, we can call Reset to move back to the beginning.
 
-   type Buffer is limited private;
+   type Buffer is private;
    --  Initially empty. A buffer has a current insertion point, called 'point',
    --  which is initially at position 1.
 
@@ -166,7 +166,8 @@ package Pp.Buffers is
      (Buf  : in out Buffer;
       Mark : Marker;
       C    : W_Char) with
-      Pre => At_Point (Buf, Mark);
+     Pre => At_Point (Buf, Mark),
+     Unreferenced; -- currently not used
       --  Mark must be at 'point'. This does the same as Insert (Buf, C),
       --  except that Mark is not adjusted to point to the character after
       --  'point'; it ends up pointing at the newly-inserted C.
@@ -213,8 +214,9 @@ package Pp.Buffers is
    --  current 'point'.
 
    function At_Point (Buf : Buffer; Mark : Marker) return Boolean;
+   function At_Point (Buf : Buffer; Position : Positive) return Boolean;
    pragma Inline (At_Point);
-   --  True if Mark = the current 'point'
+   --  True if Mark/Position = the current 'point'
 
    function Point (Buf : Buffer) return Positive;
    --  Returns the position of 'point' in the logical string
@@ -308,7 +310,7 @@ private
    use Marker_Rec_Vectors;
    --  use all type Marker_Rec_Vector;
 
-   type Buffer is new Ada.Finalization.Limited_Controlled with record
+   type Buffer is new Ada.Finalization.Controlled with record
       To, From : WChar_Vector;
       --  The current characters of the buffer are:
       --
@@ -319,7 +321,7 @@ private
       --  to To, and adjust From_First. Inserted characters are simply appended
       --  to To.
 
-      From_First : Positive;
+      From_First : Positive := 1;
       --  First in-use character in From. Characters before that have already
       --  been copied to To.
 
@@ -338,22 +340,22 @@ private
       --  To_Markers, not prepend to From_Markers. Both arrays are stored in
       --  increasing order of Position.
 
-      From_Markers_First : Marker_Index;
+      From_Markers_First : Marker_Index := 1;
       --  First in-use Marker in From_Markers. Markers before that have already
       --  been copied to To. Thus, all valid Markers are:
       --     To_Markers & From_Markers(From_Markers_First..From_Markers'Last).
 
       To_Flag : Boolean := False; -- Initial value doesn't matter
 
-      Cur_Char : W_Char;
+      Cur_Char : W_Char := W_NUL;
       --  This is the result of the Cur function. It is equal to the first
       --  character in the valid portion of From:
       --     Buf.From (Buf.From_First)
       --  unless we're at the end, in which case it is NUL.
 
-      Cur_Column : Positive;
+      Cur_Column : Positive := 1;
    end record;
 
-   procedure Initialize (Buf : in out Buffer);
+   overriding procedure Initialize (Buf : in out Buffer);
 
 end Pp.Buffers;

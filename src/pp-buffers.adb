@@ -78,10 +78,18 @@ package body Pp.Buffers is
 
    function At_Point (Buf : Buffer; Mark : Marker) return Boolean is
       Rec : constant Marker_Rec := Buf.Markers (Mark);
-
    begin
-      return Rec.Position = Last_Index (Buf.To) + 1
-        and then Rec.Flag = Buf.To_Flag;
+      return Result : constant Boolean :=
+        Rec.Position = Last_Index (Buf.To) + 1
+        and then Rec.Flag = Buf.To_Flag
+      do
+         pragma Assert (Result = At_Point (Buf, Position (Buf, Mark)));
+      end return;
+   end At_Point;
+
+   function At_Point (Buf : Buffer; Position : Positive) return Boolean is
+   begin
+      return Point (Buf) = Position;
    end At_Point;
 
    function Char_At (Buf : Buffer; Mark : Marker) return W_Char is
@@ -361,7 +369,8 @@ package body Pp.Buffers is
       Buf.Cur_Column         := 1;
    end Initialize_Buffer;
 
-   procedure Initialize (Buf : in out Buffer) renames Initialize_Buffer;
+   overriding procedure Initialize (Buf : in out Buffer)
+     renames Initialize_Buffer;
 
    procedure Maybe_Adjust_Marker (Buf : in out Buffer) is
    begin
@@ -639,7 +648,6 @@ package body Pp.Buffers is
    begin
       if Rec.Flag = Buf.To_Flag then
          return Rec.Position;
-
       else
          return Last_Index (Buf.To) - (Buf.From_First - 1) + Rec.Position;
       end if;
@@ -962,14 +970,6 @@ package body Pp.Buffers is
 
    function String_To_Buffer (S : W_Str) return Buffer is
    begin
-      --  This is called only for debugging. "pragma Assert (Assert_Enabled);"
-      --  doesn't work, because if Assert_Enabled is False, the pragma is
-      --  disabled.
-
-      if not Assert_Enabled then
-         raise Program_Error;
-      end if;
-
       return Buf : Buffer do
          Insert (Buf, S);
          Reset (Buf);

@@ -326,7 +326,7 @@ package body Utils.Command_Lines is
 
       function Arg (Cmd : Command_Line) return Switches is
       begin
-         return Result : Switches := Switches'First do
+         return Result : Switches := Default do
             --  Default is Switches'First, which will be overwritten below if
             --  any of the switches were explicitly specified.
 

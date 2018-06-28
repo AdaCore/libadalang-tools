@@ -48,6 +48,9 @@ package Utils.Generic_Formatted_Output is
    procedure Put_Char (C : Char_Type);
    --  Same as Put ("\1", (1 => C));
 
+   procedure Put_Str (S : Str_Type);
+   --  Same as Put ("\1", S);
+
    Default_Indentation_Amount : constant Natural := 3;
 
    procedure Indent

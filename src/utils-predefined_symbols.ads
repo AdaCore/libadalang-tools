@@ -148,5 +148,6 @@ package Utils.Predefined_Symbols is
    Name_R_Sq : constant Symbol := Intern ("]");
 
    Name_Page : constant Symbol := Intern ("page");
+   Name_Space : constant Symbol := Intern (" ");
 
 end Utils.Predefined_Symbols;

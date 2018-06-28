@@ -54,6 +54,21 @@ package Utils.Command_Lines.Common is
      Common_Boolean_Switches.Set_Defaults
        ((Syntax_Only => False));
 
+   package Common_Boolean_Shorthands is new
+     Common_Boolean_Switches.Set_Shorthands
+       ((Syntax_Only => +"-so"));
+
+   package Ada_Version_Switches is new Enum_Switches
+     (Common_Descriptor, Opt_Ada_Version_Type,
+      Default => No_Ada_Version);
+
+   package Ada_Version_Shorthands is new Ada_Version_Switches.Set_Shorthands
+     ((Ada_83 => +"-gnat83",
+       Ada_95 => +"-gnat95",
+       Ada_2005 => +"-gnat2005",
+       Ada_2012 => +"-gnat2012",
+       No_Ada_Version => null));
+
    type Common_Strings is
      (Project_File,
       Run_Time_System,

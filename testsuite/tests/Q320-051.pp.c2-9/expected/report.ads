@@ -56,29 +56,29 @@ package Report is
      (Name  : String;      -- TEST NAME, E.G., "C23001A-AB".
       Descr : String      -- BRIEF DESCRIPTION OF TEST, E.G.,
       -- "UPPER/LOWER CASE EQUIVALENCE IN " & "IDENTIFIERS".
-   );
+      );
 
    procedure Failed         -- OUTPUT A FAILURE MESSAGE.  SHOULD BE
    -- INVOKED SEPARATELY TO REPORT THE FAILURE OF EACH SUBTEST WITHIN A TEST.
      (Descr : String      -- BRIEF DESCRIPTION OF WHAT FAILED.
      -- SHOULD BE PHRASED AS:
-   -- "(FAILED BECAUSE) ...REASON...".
-   );
+      -- "(FAILED BECAUSE) ...REASON...".
+      );
 
    procedure Not_Applicable -- OUTPUT A NOT-APPLICABLE MESSAGE.
    -- SHOULD BE INVOKED SEPARATELY TO REPORT THE NON-APPLICABILITY OF EACH
    -- SUBTEST WITHIN A TEST.
      (Descr : String      -- BRIEF DESCRIPTION OF WHAT IS
      -- NOT-APPLICABLE. SHOULD BE PHRASED AS: "(NOT-APPLICABLE
-   -- BECAUSE)...REASON...".
-   );
+      -- BECAUSE)...REASON...".
+      );
 
    procedure Special_Action -- OUTPUT A MESSAGE DESCRIBING SPECIAL
    -- ACTIONS TO BE TAKEN.
    -- SHOULD BE INVOKED SEPARATELY TO GIVE EACH SPECIAL ACTION.
      (Descr : String      -- BRIEF DESCRIPTION OF ACTION TO BE
      -- TAKEN.
-   );
+      );
 
    procedure Comment        -- OUTPUT A COMMENT MESSAGE.
      (Descr : String      -- THE MESSAGE.

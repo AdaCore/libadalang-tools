@@ -540,7 +540,7 @@ package body METRICS.Actions is
 
    begin
       return Result : constant Metrix_Ref := new Metrix (Kind => K) do
-         Append (Tool.Metrix_Stack, Result); -- push
+         Push (Tool.Metrix_Stack, Result);
 
          Result.Node := Node;
          Result.Knd := Get_Fine_Kind (Node);
@@ -2867,7 +2867,7 @@ package body METRICS.Actions is
            Ada_If_Stmt | Ada_Case_Stmt | Ada_For_Loop_Stmt | Ada_Loop_Stmt |
            Ada_While_Loop_Stmt | Ada_Select_Stmt
          then
-            Append (EC_Stack, EC_Rec'(Node, Counted => False)); -- push
+            Push (EC_Stack, EC_Rec'(Node, Counted => False));
             --  (The corresponding Pop is at the end of
             --  Gather_Metrics_And_Walk_Children.)
          end if;
@@ -3613,7 +3613,7 @@ package body METRICS.Actions is
             In_Assertion := True;
          end if;
 
-         Append (Node_Stack, Node); -- push
+         Push (Node_Stack, Node);
 
          --  For the library item and eligible local units, we push and pop the
          --  Metrix_Stack around the call to Gather_Metrics_And_Walk_Children;
@@ -3811,7 +3811,7 @@ package body METRICS.Actions is
          Indent;
       end if;
 
-      Append (Node_Stack, CU_Node); -- push
+      Push (Node_Stack, CU_Node);
       Append (Global_M.Submetrix, File_M);
 
       Gather_Metrics_And_Walk_Children (CU_Node);

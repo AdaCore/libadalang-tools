@@ -206,11 +206,13 @@ package body Stub.Actions is
    function Get_Pp_Cmd return Command_Line;
    --  Return a command line for passing to the pretty printer.
 
-   Comments_Fill_Arg : aliased String := "--comments-fill";
+   Syntax_Only_Arg : aliased String := "--syntax-only";
+   Comments_Unchanged_Arg : aliased String := "--comments-unchanged";
    Decimal_Grouping : aliased String := "--decimal-grouping=3";
    Based_Grouping : aliased String := "--based-grouping=4";
    Args : aliased GNAT.OS_Lib.Argument_List :=
-     (Comments_Fill_Arg'Unchecked_Access,
+     (Syntax_Only_Arg'Unchecked_Access,
+      Comments_Unchanged_Arg'Unchecked_Access,
       Decimal_Grouping'Unchecked_Access,
       Based_Grouping'Unchecked_Access);
 
