@@ -76,11 +76,13 @@ package Pp.Scanner is
 
       Start_Of_Input,
       End_Of_Input,
-      False_End_Of_Line, True_End_Of_Line, -- First in a series of NLs.
+      Enabled_LB_Token,
+      Disabled_LB_Token,
+      Tab_Token,
+      False_End_Of_Line, True_End_Of_Line,
       --  A False_End_Of_Line follows a comment, and is merely a placeholder
       --  for a line break that will be processed later. All others are
       --  True_End_Of_Line.
-      Blank_Line, -- Second, third, ... in a series of NLs.
 
       '!', '#', '$', '?', '[', '\', ']', '^', '`', '{', '}', '~',
       --  These are not in Ada
@@ -208,6 +210,9 @@ package Pp.Scanner is
    subtype End_Of_Line is Token_Kind with
      Predicate => End_Of_Line in False_End_Of_Line | True_End_Of_Line;
 
+   subtype Line_Break_Token is Token_Kind with
+     Predicate => Line_Break_Token in Enabled_LB_Token | Disabled_LB_Token;
+
    subtype Pp_Off_On_Comment is Token_Kind with
         Predicate => Pp_Off_On_Comment in Pp_Off_Comment | Pp_On_Comment;
 
@@ -239,8 +244,7 @@ package Pp.Scanner is
    --  See those accessor functions for documentation on the components
    --  of this record.
 
-   type Opt_Token (Kind : Opt_Token_Kind := Nil) is private;
-   subtype Token is Opt_Token with Predicate => Token.Kind /= Nil;
+   type Token (Kind : Opt_Token_Kind := Nil) is private;
 
    function Text (X : Same_Text_Kind) return Syms.Symbol;
    function Text (X : Token) return Syms.Symbol;
@@ -254,9 +258,9 @@ package Pp.Scanner is
    --
    --  If the token needs additional information, add it to the variant part
    --  of type Token above. In addition, search the body of this package for
-   --  "Octet" to find all the places where the additional information needs to
-   --  be encoded, decoded, and skipped over. Currently, we only have support
-   --  for integer types.
+   --  "Octet" to find all places where the additional information needs to
+   --  be encoded, decoded, and skipped over. Token_At_Cursor also needs to
+   --  be modified. Currently, we only have support for integer types.
 
    function Image (Sloc : Source_Location) return String is
      (Image (Sloc.Line) & ":" &
@@ -330,8 +334,6 @@ package Pp.Scanner is
    function Kind (X : Tokn_Cursor) return Token_Kind;
    --  Note that this cannot return Nil
 
-   procedure Set_Tokn_Kind (X : Tokn_Cursor; K : Token_Kind);
-
    function Sloc (X : Tokn_Cursor) return Source_Location;
    function Sloc_Line (X : Tokn_Cursor) return Positive;
    function Sloc_Col (X : Tokn_Cursor) return Positive;
@@ -356,8 +358,8 @@ package Pp.Scanner is
    --
    --  Start_Of_Input and End_Of_Input have Text = "".
    --
-   --  End_Of_Line and Blank_Line have Text equal to a single LF character,
-   --  even if it is CR,LF in the input.
+   --  End_Of_Line have Text equal to a single LF character, even if it is
+   --  CR,LF in the input.
    --
    --  For comments, the text of the comment excluding the initial "--"
    --  and leading and trailing blanks, and followed by an extra NL. For
@@ -406,14 +408,20 @@ package Pp.Scanner is
    --  Returns the cursor Count tokens after/before Cur, stopping if we
    --  reach the end/start.
 
+   function Is_Blank_Line (X : Tokn_Cursor) return Boolean is
+     ((Kind (X) in End_Of_Line and then Kind (Prev (X)) in End_Of_Line)
+      or else
+     (Kind (X) in Enabled_LB_Token
+        and then Kind (Prev (X)) in Enabled_LB_Token));
+
    subtype Nonlexeme_Kind is Opt_Token_Kind with Predicate =>
-     Nonlexeme_Kind in End_Of_Line | Blank_Line | Spaces | Comment_Kind;
+     Nonlexeme_Kind in End_Of_Line | Spaces | Comment_Kind;
    subtype Lexeme_Kind is Opt_Token_Kind with Predicate =>
      Lexeme_Kind not in Nonlexeme_Kind;
 
    function Next_Lexeme (Cur : Tokn_Cursor) return Tokn_Cursor;
-   --  Returns the next token after Cur that is not End_Of_Line, Blank_Line,
-   --  Spaces, or Comment_Kind.
+   --  Returns the next token after Cur that is not End_Of_Line, Spaces, or
+   --  Comment_Kind.
 
    function Prev_Lexeme (Cur : Tokn_Cursor) return Tokn_Cursor;
    --  Returns the previous token before Index that is (as above)
@@ -444,10 +452,6 @@ package Pp.Scanner is
    --  up if the previously appended token was a Spaces.
    --  If Existing_OK is True then we combine the two
    --  tokens.
-
-   procedure Append_EOL (V : in out Tokn_Vec; Org : String);
-   --  Appends an End_Of_Line token, unless the previous token is already
-   --  End_Of_Line or Blank_Line, which case we append a Blank_Line.
 
    procedure Append_Comment
      (V : in out Tokn_Vec; X : Tokn_Cursor; Org : String) with
@@ -533,16 +537,23 @@ package Pp.Scanner is
    --  indicate a slice of Tokens, and we tolerate out-of-bounds indices.
    --  We draw a comment line before Highlight.
    procedure Put_Tokens (Tokens : Tokn_Vec);
+   procedure Put_Tokns (Tok : Tokn_Cursor);
+   --  This puts all the tokens in the vector that Tok points to, highlighting
+   --  Tok.
 
    Show_Origin : Boolean := False with Export;
    --  Set to True in debugger to see Origins
 
 private
 
-   type Opt_Token (Kind : Opt_Token_Kind := Nil) is record
+   type Token (Kind : Opt_Token_Kind := Nil) is record
       Sloc : Source_Location;
       case Kind is
-         when Same_Text_Kind => null;
+         when Line_Break_Token | Tab_Token =>
+            Index : Positive;
+            --  This is really of type Line_Break_Index or Tab_Index, but
+            --  we don't want to depend on Pp.Formatting, where those are
+            --  declared. See child package Lines for a well-typed interface.
          when Stored_Text_Kind =>
             Text : Syms.Symbol;
             case Kind is
@@ -567,7 +578,10 @@ private
             end case;
          when others => null;
       end case;
-   end record;
+   end record; -- Token
+
+   subtype Opt_Token is Token;
+   --  Opt_Token is used when Kind can be Nil; otherwise Token is used
 
    use Utils.Var_Length_Ints;
 
@@ -601,5 +615,15 @@ private
       Fi : Tokn_Index; -- Pointer into V.Fixed
       Oc : Octet_Index; -- Pointer into V.Octets
    end record;
+
+   --  The following are private, for use by child package Lines:
+
+   function Index (X : Tokn_Cursor) return Positive with
+     Pre => Kind (X) in Line_Break_Token | Tab_Token;
+
+   procedure Append_Tokn_With_Index
+     (V : in out Tokn_Vec; X : Token_Kind; Index : Positive;
+      Org : String := "Append Kind") with
+     Pre => X in Line_Break_Token | Tab_Token;
 
 end Pp.Scanner;

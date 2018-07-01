@@ -11,6 +11,7 @@ with Pp.Command_Lines; use Pp.Command_Lines;
 with Pp.Error_Slocs; use Pp.Error_Slocs;
 with Pp.Formatting; use Pp.Formatting;
 with Pp.Formatting.Dictionaries;
+with Pp.Scanner.Lines; use Pp.Scanner.Lines;
 
 with Ada.Directories; use Ada.Directories;
 with Interfaces; use type Interfaces.Unsigned_16;
@@ -2385,6 +2386,7 @@ package body Pp.Actions is
 
       procedure Append_And_Put (V : in out Tokn_Vec; X : Same_Text_Kind) is
       begin
+         pragma Assert (X not in End_Of_Line);
          Append_Tokn (V, X);
          Put_To_Buffer (To_W_Str (Text (X)));
       end Append_And_Put;
@@ -2502,6 +2504,7 @@ package body Pp.Actions is
       is
          pragma Unreferenced (Kind);
          Line_Breaks : Line_Break_Index_Vector renames All_LBI;
+         M : Marker;
       begin
          --  If we see two line breaks in a row, we take the least indented one.
 
@@ -2518,10 +2521,11 @@ package body Pp.Actions is
             end if;
          end if;
 
+         M := Mark (Out_Buf, Name => (if Hard then '$' else '#'));
          Append
            (All_LB,
             Line_Break'
-              (Mark        => Mark (Out_Buf, Name => (if Hard then '$' else '#')),
+              (Mark        => M,
                Hard        => Hard,
                Affects_Comments => Affects_Comments,
                Enabled     => Hard,
@@ -2534,15 +2538,14 @@ package body Pp.Actions is
          Next_Line_Break_Unique_Id := Next_Line_Break_Unique_Id + 1;
          Append (Line_Breaks, Last_Index (All_LB));
 
+         Append_Line_Break_Tokn
+           (New_Tokns, Enabled => Hard, Index => Last_Index (All_LB));
+         --  Note that the Line_Break_Token replaces the End_Of_Line token
+
          --  A hard line break gets NL
 
          if Hard then
-            if Scanner.Kind (Last (New_Tokns'Access)) in End_Of_Line then
-               pragma Assert (Insert_Blank_Lines (Cmd));
-               Append_And_Put (New_Tokns, Blank_Line);
-            else
-               Append_And_Put (New_Tokns, True_End_Of_Line);
-            end if;
+            Put_To_Buffer (NL);
          elsif not Arg (Cmd, Insert_Line_Breaks) then
             Put_To_Buffer (Scanner.Token_Separator);
          end if;
@@ -2814,6 +2817,7 @@ package body Pp.Actions is
                   Num_Blanks      => <>,
                   Is_Fake         => False,
                   Is_Insertion_Point => Is_Insertion_Point));
+            Append_Tab_Tokn (New_Tokns, Last_Index (Tabs));
             pragma Assert
               (Position (Out_Buf, Last_Element (Tabs).Mark) =
                Last_Position (Out_Buf) + 1);
@@ -2845,6 +2849,7 @@ package body Pp.Actions is
                                  Num_Blanks      => <>,
                                  Is_Fake         => True,
                                  Is_Insertion_Point => False));
+                           Append_Tab_Tokn (New_Tokns, Last_Index (Tabs));
                         end if;
                      else
                         if Index_In_Line = 1 then
@@ -2861,6 +2866,7 @@ package body Pp.Actions is
                                  Num_Blanks      => <>,
                                  Is_Fake         => True,
                                  Is_Insertion_Point => False));
+                           Append_Tab_Tokn (New_Tokns, Last_Index (Tabs));
                         end if;
                      end if;
 
@@ -2879,6 +2885,7 @@ package body Pp.Actions is
                               Num_Blanks      => <>,
                               Is_Fake         => True,
                               Is_Insertion_Point => False));
+                        Append_Tab_Tokn (New_Tokns, Last_Index (Tabs));
                      end if;
 
                   when Ada_With_Clause =>
@@ -2896,6 +2903,7 @@ package body Pp.Actions is
                               Num_Blanks      => <>,
                               Is_Fake         => True,
                               Is_Insertion_Point => False));
+                        Append_Tab_Tokn (New_Tokns, Last_Index (Tabs));
                      end if;
 
                   when Ada_Variant |
@@ -4540,7 +4548,8 @@ package body Pp.Actions is
                   others => <>));
             --  Append a sentinel tab, whose Position is greater than any
             --  actual position. This ensures that as we step through Tabs,
-            --  there is always one more.
+            --  there is always one more. We don't need the sentinel in the
+            --  token stream.
          end if;
          pragma Assert (Is_Empty (Tree_Stack));
          Reset (Out_Buf);

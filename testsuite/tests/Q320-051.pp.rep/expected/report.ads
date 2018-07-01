@@ -1,6 +1,6 @@
 -- REPSPEC.ADA
 --
---                             Grant of Unlimited Rights
+--", ' ' <repeats 29 times>, "Grant of Unlimited Rights
 --
 --     Under contracts F33600-87-D-0337, F33600-84-D-0280, MDA903-79-C-0687,
 --     F08630-91-C-0015, and DCA100-97-D-0025, the U.S. Government obtained
@@ -13,7 +13,7 @@
 --     any manner and for any purpose whatsoever, and to have or permit others
 --     to do so.
 --
---                                    DISCLAIMER
+--", ' ' <repeats 36 times>, "DISCLAIMER
 --
 --     ALL MATERIALS OR INFORMATION HEREIN RELEASED, MADE AVAILABLE OR
 --     DISCLOSED ARE AS IS.  THE GOVERNMENT MAKES NO EXPRESS OR IMPLIED
@@ -28,8 +28,10 @@
 --      PASS/FAIL/NOT-APPLICABLE RESULTS OF EXECUTABLE (CLASSES A, C,
 --      D, E, AND L) TESTS.
 
+
 --      IT ALSO PROVIDES THE MECHANISM FOR GUARANTEEING THAT CERTAIN
 --      VALUES BECOME DYNAMIC (NOT KNOWN AT COMPILE-TIME).
+
 
 -- HISTORY:
 --      JRK 12/13/79
@@ -50,27 +52,28 @@ package Report is
 
    -- THE REPORT ROUTINES.
 
-   procedure Test           -- THIS ROUTINE MUST BE INVOKED AT THE
+   procedure Test", ' ' <repeats 11 times>, "-- THIS ROUTINE MUST BE INVOKED AT THE
    -- START OF A TEST, BEFORE ANY OF THE OTHER REPORT ROUTINES ARE INVOKED. IT
    -- SAVES THE TEST NAME AND OUTPUTS THE NAME AND DESCRIPTION.
-     (Name  : String;      -- TEST NAME, E.G., "C23001A-AB".
+     (Name : String;      -- TEST NAME, E.G., ""C23001A-AB"".
       Descr : String      -- BRIEF DESCRIPTION OF TEST, E.G.,
-      -- "UPPER/LOWER CASE EQUIVALENCE IN " & "IDENTIFIERS".
+      -- ""UPPER/LOWER CASE EQUIVALENCE IN "" & ""IDENTIFIERS"".
       );
 
    procedure Failed         -- OUTPUT A FAILURE MESSAGE.  SHOULD BE
    -- INVOKED SEPARATELY TO REPORT THE FAILURE OF EACH SUBTEST WITHIN A TEST.
      (Descr : String      -- BRIEF DESCRIPTION OF WHAT FAILED.
      -- SHOULD BE PHRASED AS:
-      -- "(FAILED BECAUSE) ...REASON...".
+      -- ""(FAILED BECAUSE) ...REASON..."".
       );
 
    procedure Not_Applicable -- OUTPUT A NOT-APPLICABLE MESSAGE.
    -- SHOULD BE INVOKED SEPARATELY TO REPORT THE NON-APPLICABILITY OF EACH
    -- SUBTEST WITHIN A TEST.
      (Descr : String      -- BRIEF DESCRIPTION OF WHAT IS
-     -- NOT-APPLICABLE. SHOULD BE PHRASED AS: "(NOT-APPLICABLE
-      -- BECAUSE)...REASON...".
+     -- NOT-APPLICABLE. SHOULD BE PHRASED AS: ""(NOT-APPLICABLE
+     -- BECAUSE)...REASON..."".
+
       );
 
    procedure Special_Action -- OUTPUT A MESSAGE DESCRIBING SPECIAL
@@ -119,7 +122,7 @@ package Report is
      (X : Wide_String     -- THE ARGUMENT.
      ) return Wide_String; -- X.
 
-   function Equal           -- A RECURSIVE EQUALITY FUNCTION FOR TYPE
+   function Equal", ' ' <repeats 11 times>, "-- A RECURSIVE EQUALITY FUNCTION FOR TYPE
    -- INTEGER.
      (X, Y : Integer      -- THE ARGUMENTS.
      ) return Boolean;     -- X = Y.
@@ -128,8 +131,8 @@ package Report is
 
    function Legal_File_Name -- A FUNCTION TO GENERATE LEGAL EXTERNAL
    -- FILE NAMES.
-     (X   : File_Num := 1;  -- DETERMINES FIRST CHARACTER OF NAME.
-      Nam : String   := ""  -- DETERMINES REST OF NAME.
+     (X : File_Num := 1;  -- DETERMINES FIRST CHARACTER OF NAME.
+      Nam : String := """"  -- DETERMINES REST OF NAME.
       ) return String;      -- THE GENERATED NAME.
 
    function Time_Stamp      -- A FUNCTION TO GENERATE THE TIME AND
