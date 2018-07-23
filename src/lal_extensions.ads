@@ -2,6 +2,7 @@ with Langkit_Support.Text; use Langkit_Support.Text;
 
 with Libadalang; use Libadalang;
 with Libadalang.Analysis; use Libadalang.Analysis;
+with Libadalang.Common; use Libadalang.Common;
 
 with Utils.String_Utilities; use Utils.String_Utilities;
 with Utils.Vectors;
@@ -51,8 +52,8 @@ package LAL_Extensions is
       Node_Kind : Ada_Node_Kind_Type) return Ada_Node_Array;
    --  Same as above, except return an array of the relevant nodes
 
-   function Token_Text (Tok : Token_Type) return W_Str;
-   function L_Token_Text (Tok : Token_Type) return W_Str;
+   function Token_Text (Tok : Token_Reference) return W_Str;
+   function L_Token_Text (Tok : Token_Reference) return W_Str;
    --  Text of a token. The L_Token_Text is converted to lower case.
 
    function Id_Name

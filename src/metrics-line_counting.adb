@@ -1,10 +1,11 @@
 with Libadalang; use Libadalang;
+with Libadalang.Common;   use Libadalang.Common;
 with Libadalang.Lexer;    use Libadalang.Lexer;
 
 with Utils.Vectors;
 package body METRICS.Line_Counting is
 
-   subtype Token_Data_Type is Libadalang.Analysis.Token_Data_Type;
+   subtype Token_Data_Type is Libadalang.Common.Token_Data_Type;
 
    procedure Inc (X : in out Metric_Nat; By : Metric_Nat := 1) is
    begin
@@ -39,7 +40,7 @@ package body METRICS.Line_Counting is
       Result : Cumulative_Counts_Vectors.Vector;
       use Cumulative_Counts_Vectors;
       Prev_Line : Line_Num'Base := 0;
-      Cur : Token_Type := First_Token (Unit);
+      Cur : Token_Reference := First_Token (Unit);
    begin
       Append (Result, Cumulative_Counts'(others => 0));
 

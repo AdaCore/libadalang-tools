@@ -45,6 +45,7 @@ with Langkit_Support.Text;
 
 with Libadalang;     use Libadalang;
 with Libadalang.Analysis; use Libadalang.Analysis;
+with Libadalang.Common;   use Libadalang.Common;
 with Libadalang.Iterators; use Libadalang.Iterators;
 
 package body Utils.Drivers is
@@ -410,7 +411,6 @@ package body Utils.Drivers is
 
             <<Continue>>
          end loop;
-         Destroy (Context);
          pragma Assert (Counter = 0);
       end Process_Files;
 

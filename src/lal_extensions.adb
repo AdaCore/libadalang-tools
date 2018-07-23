@@ -91,12 +91,12 @@ package body LAL_Extensions is
       return To_Array (Result_Vector);
    end Find_All;
 
-   function Token_Text (Tok : Token_Type) return W_Str is
+   function Token_Text (Tok : Token_Reference) return W_Str is
    begin
       return Text_To_W_Str (Text (Tok));
    end Token_Text;
 
-   function L_Token_Text (Tok : Token_Type) return W_Str is
+   function L_Token_Text (Tok : Token_Reference) return W_Str is
       use Ada.Wide_Characters.Handling;
    begin
       return To_Lower (Token_Text (Tok));

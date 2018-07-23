@@ -21,6 +21,7 @@ with GNAT.Lock_Files;
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
 with Langkit_Support.Slocs; use Langkit_Support;
+with Libadalang.Common; use Libadalang.Common;
 with LAL_Extensions; use LAL_Extensions;
 
 with Utils.Command_Lines.Common; use Utils.Command_Lines.Common;

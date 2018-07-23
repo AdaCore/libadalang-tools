@@ -1,6 +1,7 @@
 with Libadalang.Analysis; use Libadalang.Analysis;
+with Libadalang.Common;   use Libadalang.Common;
 with Utils.Command_Lines; use Utils.Command_Lines;
-with Utils.Tools; use Utils.Tools;
+with Utils.Tools;         use Utils.Tools;
 
 private with Ada.Containers.Hashed_Sets;
 private with Utils.Vectors;

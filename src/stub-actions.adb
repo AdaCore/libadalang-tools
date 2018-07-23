@@ -11,8 +11,9 @@ with Interfaces; use type Interfaces.Unsigned_16;
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
 with Langkit_Support.Slocs; use Langkit_Support;
-with Libadalang;     use Libadalang;
-with LAL_Extensions; use LAL_Extensions;
+with Libadalang;            use Libadalang;
+with Libadalang.Common;     use Libadalang.Common;
+with LAL_Extensions;        use LAL_Extensions;
 
 with Utils.Command_Lines.Common; use Utils.Command_Lines.Common;
 with Utils.Dbg_Out;
@@ -716,7 +717,7 @@ package body Stub.Actions is
       end Walk;
 
       procedure Format is
-         Context : Analysis_Context :=
+         Context : constant Analysis_Context :=
            Create (Charset => Wide_Character_Encoding (Cmd));
          Out_Str : String renames Elems (Out_Vec) (1 .. Last_Index (Out_Vec));
          Out_Unit : constant Analysis_Unit := Get_From_Buffer
@@ -735,8 +736,7 @@ package body Stub.Actions is
             Messages => Tool.Ignored_Messages);
          pragma Assert (Is_Empty (Tool.Ignored_Messages));
 
-         Remove (Context, File_Name => "????");
-         Destroy (Context);
+         Remove (Context, Filename => "????");
       end Format;
 
       function Get_Output_Name (Resolve_Links : Boolean) return String is
