@@ -8,3 +8,7 @@ testsuite/out
 
 # Python artifacts
 *.pyc
+
+# External ASIS testsuite
+asis-testsuite
+testsuite/tests/asis
