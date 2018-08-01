@@ -84,7 +84,7 @@ package Pp.Scanner is
       --  for a line break that will be processed later. All others are
       --  True_End_Of_Line.
 
-      '!', '#', '$', '?', '[', '\', ']', '^', '`', '{', '}', '~',
+      '!', '#', '$', '?', '[', '\', ']', '^', '`', '{', '}', '~', '_',
       --  These are not in Ada
 
       '-', ''', '&', '(', ')', '+', ',', ':', ';', '|', '@',
@@ -317,17 +317,16 @@ package Pp.Scanner is
 
    Pp_Off_On_Delimiters : Scanner.Pp_Off_On_Delimiters_Rec;
 
-   Token_Separator : constant W_Char := W_Char'Val (1);
-   --  If Insert_Line_Breaks is False, this character is used instead of hard
-   --  line breaks, because otherwise things like "isbegin" can be run
-   --  together. ???This doesn't work.
-
    ----------------
 
    type Tokn_Vec is private;
+   type Tokn_Vec_Ref is access constant Tokn_Vec;
    --  Growable sequence of tokens
-   type Tokn_Cursor (<>) is private;
+   type Tokn_Cursor is private;
    --  Pointer into a Tokn_Vec
+
+   function Is_Nil (X : Tokn_Cursor) return Boolean;
+   function Nil_Tokn_Cursor return Tokn_Cursor;
 
    type Tokn_Index is new Positive;
 
@@ -392,8 +391,8 @@ package Pp.Scanner is
    --  text, so the indentation is included in all but the first line.
 
    procedure Clear (V : in out Tokn_Vec);
-   function First (V : access constant Tokn_Vec) return Tokn_Cursor;
-   function Last (V : access constant Tokn_Vec) return Tokn_Cursor;
+   function First (V : Tokn_Vec_Ref) return Tokn_Cursor;
+   function Last (V : Tokn_Vec_Ref) return Tokn_Cursor;
    function Is_Empty (V : Tokn_Vec) return Boolean;
    function At_Last (Cur : Tokn_Cursor) return Boolean;
    function After_Last (Cur : Tokn_Cursor) return Boolean;
@@ -407,6 +406,9 @@ package Pp.Scanner is
    function Pred (Cur : Tokn_Cursor; Count : Tokn_Index) return Tokn_Cursor;
    --  Returns the cursor Count tokens after/before Cur, stopping if we
    --  reach the end/start.
+
+   function Get_Num_Tokens (V : Tokn_Vec) return Tokn_Index is
+     (Get_Tokn_Index (Last (V'Unrestricted_Access)));
 
    function Is_Blank_Line (X : Tokn_Cursor) return Boolean is
      ((Kind (X) in End_Of_Line and then Kind (Prev (X)) in End_Of_Line)
@@ -468,12 +470,9 @@ package Pp.Scanner is
    --  and using the possibly-filled text Tx. I don't think it's
    --  zero indentation!
 
+   procedure Delete_Last (V : in out Tokn_Vec);
    function Delete_Last (V : in out Tokn_Vec) return Token;
-   --  Removes the last token and returns it
-
-   procedure Freeze_Tokns (V : in out Tokn_Vec);
-   procedure Melt_Tokns (V : in out Tokn_Vec);
-   --  No modifications allowed between Freeze and Melt
+   --  Removes the last token (and the function returns it)
 
    function Token_At_Cursor (X : Tokn_Cursor) return Token;
    --  Return the token as a record
@@ -514,6 +513,7 @@ package Pp.Scanner is
    --  Tokn_Vec instead of a dummy Boolean, but that might be too inefficient.
 
    procedure Move_Tokns (Target, Source : in out Tokn_Vec);
+   function Move_Tokns (Target, Source : in out Tokn_Vec) return Boolean;
    --  Move Source to Target, leaving Source empty
 
    function Same_Token (X, Y : Token) return Boolean;
@@ -536,6 +536,8 @@ package Pp.Scanner is
    --  should have identical semantics to the original Ada code. First and Last
    --  indicate a slice of Tokens, and we tolerate out-of-bounds indices.
    --  We draw a comment line before Highlight.
+   procedure Put_Tokens (Highlight : Tokn_Cursor; Num_Toks : Tokn_Index := 8);
+   --  Num_Toks is the number of tokens before and after Highlight to print
    procedure Put_Tokens (Tokens : Tokn_Vec);
    procedure Put_Tokns (Tok : Tokn_Cursor);
    --  This puts all the tokens in the vector that Tok points to, highlighting
@@ -543,6 +545,10 @@ package Pp.Scanner is
 
    Show_Origin : Boolean := False with Export;
    --  Set to True in debugger to see Origins
+
+   Check_Comment_Length : Boolean := True;
+   --  True if Append_Tokn should check that the length of a comment is
+   --  correct. It will not be correct during the Insert_Alignment phase.
 
 private
 
@@ -605,15 +611,14 @@ private
    subtype Fixed_Part_Vector is Fixed_Part_Vectors.Vector;
 
    type Tokn_Vec is record
-      Frozen : Boolean := False;
       New_Sloc_First : Positive := 1;
       Fixed : Fixed_Part_Vector;
       Octets : Octet_Vector;
    end record;
 
-   type Tokn_Cursor (V : access constant Tokn_Vec) is record
-      Fi : Tokn_Index; -- Pointer into V.Fixed
-      Oc : Octet_Index; -- Pointer into V.Octets
+   type Tokn_Cursor (V : Tokn_Vec_Ref := null) is record
+      Fi : Tokn_Index := 666_666; -- Pointer into V.Fixed
+      Oc : Octet_Index := 666_666; -- Pointer into V.Octets
    end record;
 
    --  The following are private, for use by child package Lines:

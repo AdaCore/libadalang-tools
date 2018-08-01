@@ -314,7 +314,7 @@ package body Pp.Actions is
 
    use Line_Break_Vectors, Line_Break_Index_Vectors;
    use Tab_Vectors;
-   Lines_Data : Lines_Data_Rec;
+   Lines_Data : aliased Lines_Data_Rec;
 
    Out_Buf : Buffer renames Lines_Data.Out_Buf;
    Cur_Indentation : Natural renames Lines_Data.Cur_Indentation;
@@ -358,6 +358,8 @@ package body Pp.Actions is
    --      } -- outdent
    --      [ -- continuation-line indent
    --      ] -- continuation-line outdent
+   --      * -- one space indent (see Spec_Alt template)
+   --      _ -- one space outdent (see Spec_Alt template)
    --      ( -- insert a "(", and add "extra" indent by 1 character
    --      ???If a further indent ({ or [) is done without any
    --      intervening line break we should negate the effect of the
@@ -1061,6 +1063,8 @@ package body Pp.Actions is
       Outdent,               -- "}"
       Continuation_Indent,   -- "["
       Continuation_Outdent,  -- "]"
+      One_Space_Indent,      -- "*"
+      One_Space_Outdent,     -- "_"
       '(',
       ')',
       Tab,                   -- "^", "^1"
@@ -1094,7 +1098,7 @@ package body Pp.Actions is
             Plus : Boolean;
             Level_Inc : Nesting_Level_Increment;
          when Indent | Outdent | Continuation_Indent | Continuation_Outdent
-           | '(' | ')' =>
+           | One_Space_Indent | One_Space_Outdent | '(' | ')' =>
             null;
          when Tab | Tab_Insert_Point =>
             Index_In_Line : Tab_Index_In_Line;
@@ -1158,6 +1162,8 @@ package body Pp.Actions is
             when Outdent => Append (Result, "}");
             when Continuation_Indent => Append (Result, "[");
             when Continuation_Outdent => Append (Result, "]");
+            when One_Space_Indent => Append (Result, "*");
+            when One_Space_Outdent => Append (Result, "_");
             when '(' => Append (Result, "(");
             when ')' => Append (Result, ")");
 
@@ -1538,7 +1544,18 @@ package body Pp.Actions is
             Par_Threshold_Alt => L ("?[$(~;$~)]~"),
             Par_Alt => L ("?[# (~;#1 ~)]~"),
             Spec_Threshold_Alt => L ("!? ~~~?~~~?[$ return] ~~~"),
-            Spec_Alt => L ("!? ~~~?~~~?[#+2 return] ~~~"),
+            Spec_Alt => L ("!? ~~~?~~~?[*#+2 return_] ~~~"),
+            --  The above is the only place "one space in/outdent" is used (the
+            --  "*" and "_" characters). This is to deal with something like:
+            --
+            --     function Some_Function
+            --       (A_Parameter       : A_Parameter_Type;
+            --        Another_Parameter : Another_Parameter_Type)
+            --        return Result_Type;
+            --       ^ Here we want the "return" indented one character
+            --       | with respect to the "(", even though it is not
+            --         inside the parentheses.
+
             Subtype_Ind_Index_Alt => L ("?~~ ~!?~~~"),
             Subtype_Ind_Alt => L ("?~~ ~!? ~~~"),
             Record_Type_Decl_Split_Alt =>
@@ -1606,7 +1623,7 @@ package body Pp.Actions is
             end Check_Between;
 
             subtype Illegal_Chars is Character with Predicate =>
-              Illegal_Chars in '~' | '*' | '_' | '"' | '\' | '%' | '0' .. '9';
+              Illegal_Chars in '~' | '"' | '\' | '%' | '0' .. '9';
             pragma Assert (Str (Text (Cur)).S (1) not in Illegal_Chars);
 
          --  Start of processing for Parse_Instruction
@@ -1656,6 +1673,12 @@ package body Pp.Actions is
                      Next (Cur);
                   when ']' =>
                      Result := (Kind => Continuation_Outdent);
+                     Next (Cur);
+                  when '*' =>
+                     Result := (Kind => One_Space_Indent);
+                     Next (Cur);
+                  when '_' =>
+                     Result := (Kind => One_Space_Outdent);
                      Next (Cur);
                   when '(' =>
                      Result := (Kind => '(');
@@ -1786,7 +1809,7 @@ package body Pp.Actions is
             Ignored : Boolean := Get_Tokns
               (Buf, Tokens, Utils.Ada_Version,
                Lang => Template_Lang);
-            Cur : Tokn_Cursor := First (Tokens'Access);
+            Cur : Tokn_Cursor := First (Tokens'Unchecked_Access);
          begin
             pragma Assert (Kind (Cur) = Start_Of_Input);
             Next (Cur);
@@ -2527,7 +2550,9 @@ package body Pp.Actions is
            (All_LB,
             Line_Break'
               (Mark        => M,
+               Tok | Tokn_Val => <>, -- Initial value not used
                Hard        => Hard,
+               Removed     => False,
                Affects_Comments => Affects_Comments,
                Enabled     => Hard,
                Level       => Level,
@@ -2547,8 +2572,6 @@ package body Pp.Actions is
 
          if Hard then
             Put_To_Buffer (NL);
-         elsif not Arg (Cmd, Insert_Line_Breaks) then
-            Put_To_Buffer (Scanner.Token_Separator);
          end if;
       end Append_Line_Break;
 
@@ -2752,10 +2775,12 @@ package body Pp.Actions is
             Tr              : Ada_Tree_Base := Tree;
 
             procedure Maybe_Replace_Fake_Tab;
-            --  Replace a fake tab with a real one, if appropriate. In particular,
-            --  if the last tab is fake, and the current one has the same
-            --  Index_In_Line, Tree, and Parent, then the current one replaces the
-            --  fake one.
+            --  Replace a fake tab with a real one, if appropriate. In
+            --  particular, if the last tab is fake, and the current one has
+            --  the same Index_In_Line, Tree, and Parent, then the current one
+            --  replaces the fake one. We don't physically delete the Tab_Rec
+            --  from the table, nor the Tab_Token from the token stream; we
+            --  just mark it as Deleted, so later phases know to ignore it.
 
             procedure Maybe_Replace_Fake_Tab is
             begin
@@ -2764,7 +2789,7 @@ package body Pp.Actions is
                end if;
 
                declare
-                  Tb : constant Tab_Rec := Last_Element (Tabs);
+                  Tb : Tab_Rec renames Last_Ptr (Tabs).all;
                begin
                   if Tb.Is_Fake
                     and then Tb.Index_In_Line = Index_In_Line
@@ -2778,7 +2803,8 @@ package body Pp.Actions is
                         or else
                           (Token_Text = Name_Use and then Index_In_Line = 2));
                      pragma Assert (not Is_Insertion_Point);
-                     Delete_Last (Tabs); -- replace fake tab with this real one
+                     pragma Assert (not Tb.Deleted);
+                     Tb.Deleted := True;
                   end if;
                end;
             end Maybe_Replace_Fake_Tab;
@@ -2813,11 +2839,13 @@ package body Pp.Actions is
                   Tr,
                   Token           => Token_Text,
                   Mark            => Mark (Out_Buf, '^'),
+                  Insertion_Point => <>,
                   Index_In_Line   => Index_In_Line,
                   Col             => <>,
                   Num_Blanks      => <>,
                   Is_Fake         => False,
-                  Is_Insertion_Point => Is_Insertion_Point));
+                  Is_Insertion_Point => Is_Insertion_Point,
+                  Deleted => False));
             Append_Tab_Tokn (New_Tokns, Last_Index (Tabs));
             pragma Assert
               (Position (Out_Buf, Last_Element (Tabs).Mark) =
@@ -2845,11 +2873,13 @@ package body Pp.Actions is
                                  Tree            => Tr,
                                  Token           => Name_Assign,
                                  Mark            => Mark (Out_Buf, '^'),
+                                 Insertion_Point => <>,
                                  Index_In_Line   => 4,
                                  Col             => <>,
                                  Num_Blanks      => <>,
                                  Is_Fake         => True,
-                                 Is_Insertion_Point => False));
+                                 Is_Insertion_Point => False,
+                                 Deleted => False));
                            Append_Tab_Tokn (New_Tokns, Last_Index (Tabs));
                         end if;
                      else
@@ -2862,11 +2892,13 @@ package body Pp.Actions is
                                  Tree            => Tr,
                                  Token           => Name_Assign,
                                  Mark            => Mark (Out_Buf, '^'),
+                                 Insertion_Point => <>,
                                  Index_In_Line   => 2,
                                  Col             => <>,
                                  Num_Blanks      => <>,
                                  Is_Fake         => True,
-                                 Is_Insertion_Point => False));
+                                 Is_Insertion_Point => False,
+                                 Deleted => False));
                            Append_Tab_Tokn (New_Tokns, Last_Index (Tabs));
                         end if;
                      end if;
@@ -2881,11 +2913,13 @@ package body Pp.Actions is
                               Tree            => Tr,
                               Token           => Name_Assign,
                               Mark            => Mark (Out_Buf, '^'),
+                              Insertion_Point => <>,
                               Index_In_Line   => 4,
                               Col             => <>,
                               Num_Blanks      => <>,
                               Is_Fake         => True,
-                              Is_Insertion_Point => False));
+                              Is_Insertion_Point => False,
+                              Deleted => False));
                         Append_Tab_Tokn (New_Tokns, Last_Index (Tabs));
                      end if;
 
@@ -2899,11 +2933,13 @@ package body Pp.Actions is
                               Tree            => Tr,
                               Token           => Name_Use,
                               Mark            => Mark (Out_Buf, '^'),
+                              Insertion_Point => <>,
                               Index_In_Line   => 2,
                               Col             => <>,
                               Num_Blanks      => <>,
                               Is_Fake         => True,
-                              Is_Insertion_Point => False));
+                              Is_Insertion_Point => False,
+                              Deleted => False));
                         Append_Tab_Tokn (New_Tokns, Last_Index (Tabs));
                      end if;
 
@@ -3255,6 +3291,11 @@ package body Pp.Actions is
                      Indent (PP_Indent_Continuation (Cmd));
                   when Continuation_Outdent =>
                      Indent (-PP_Indent_Continuation (Cmd));
+
+                  when One_Space_Indent =>
+                     Indent (1);
+                  when One_Space_Outdent =>
+                     Indent (-1);
 
                   when '(' =>
                      Append_And_Put (New_Tokns, '(');
@@ -4729,13 +4770,14 @@ package body Pp.Actions is
          --  If --comments-only was specified, format the comments and quit
 
          if Arg (Cmd, Comments_Only) then
-            Do_Comments_Only (Lines_Data, Src_Buf, Cmd);
+            Do_Comments_Only (Lines_Data'Access, Src_Buf, Cmd);
          else
             --  Otherwise, convert the tree to text, and then run all the
             --  text-based passes.
 
             Tree_To_Ada_2 (Node, Cmd, Partial);
-            Post_Tree_Phases (Lines_Data, Messages, Src_Buf, Cmd, Partial);
+            Post_Tree_Phases
+              (Lines_Data'Access, Messages, Src_Buf, Cmd, Partial);
          end if;
       end Tree_To_Ada;
 
@@ -4770,9 +4812,7 @@ package body Pp.Actions is
          begin
             Clear (Output);
             for WC of Out_Arr loop
-               if WC /= Scanner.Token_Separator then
-                  Encode (WC, Wide_Char_Encoding);
-               end if;
+               Encode (WC, Wide_Char_Encoding);
             end loop;
          end;
       end if;

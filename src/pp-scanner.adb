@@ -51,6 +51,7 @@ package body Pp.Scanner is
       '{' => Intern ("{"),
       '}' => Intern ("}"),
       '~' => Intern ("~"),
+      '_' => Intern ("_"),
 
       '-' => Intern ("-"),
       ''' => Intern ("'"),
@@ -239,6 +240,9 @@ package body Pp.Scanner is
    package Natural_Encodings is new Encodings (Natural);
    use Fixed_Part_Vectors, Octet_Vectors, Symbol_Encodings, Natural_Encodings;
 
+   function Is_Nil (X : Tokn_Cursor) return Boolean is (X.V = null);
+   function Nil_Tokn_Cursor return Tokn_Cursor is (others => <>);
+
    function Kind (X : Tokn_Cursor) return Token_Kind is
    begin
       pragma Assert (not After_Last (X));
@@ -342,7 +346,6 @@ package body Pp.Scanner is
 
    procedure Clear (V : in out Tokn_Vec) is
    begin
-      pragma Assert (not V.Frozen);
       V.New_Sloc_First := 1;
       Clear (V.Fixed);
       Clear (V.Octets);
@@ -356,8 +359,6 @@ package body Pp.Scanner is
 
    procedure Append_Tokn (V : in out Tokn_Vec; X : Token;
                           Org : String := "Append Token") is
-      pragma Assert (not V.Frozen);
-
       --  We require that X.Sloc.First and X.Sloc.Last indicate the right
       --  length, although they don't have to be right. X.Last_Line_Len must be
       --  correct, and X.Sloc.Col for whole-line comments. The other fields of
@@ -380,9 +381,6 @@ package body Pp.Scanner is
                if Kind (P) = Spaces then
                   pragma Assert (K not in End_Of_Line | Spaces);
                end if;
-               if Kind (P) in Comment_Kind then
-                  pragma Assert (K in End_Of_Line | Line_Break_Token);
-               end if;
             end;
          end if;
 
@@ -393,7 +391,7 @@ package body Pp.Scanner is
            (if K in True_End_Of_Line then
               Length (X) in 1 | 2 and then Text_Len = 1);
          --  2 is for CR/LF
-         if K in Comment_Kind then
+         if Check_Comment_Length and then K in Comment_Kind then
             declare
                L : constant Positive :=
                  (if K in Whole_Line_Comment then X.Num_Lines else 1);
@@ -439,7 +437,6 @@ package body Pp.Scanner is
                      Result.Line := Prev_Sloc.Line + 1;
                      Result.Col := 1;
                   elsif Kind (Prev) in Whole_Line_Comment then
-                     pragma Assert (K in End_Of_Line | Line_Break_Token);
                      Result.Line :=
                        Prev_Sloc.Line + Num_Lines (Prev) - 1;
                      Result.Col := Prev_Sloc.Col + Last_Line_Len (Prev);
@@ -494,7 +491,7 @@ package body Pp.Scanner is
    procedure Append_Tokn (V : in out Tokn_Vec; X : Tokn_Cursor;
                           Org : String := "Append Tokn_Cursor") is
    begin
-      --  ????It would be more efficient to simply copy over the data, and
+      --  ???It would be more efficient to simply copy over the data, and
       --  avoid converting back to type Token. Also below.
       Append_Tokn (V, Token_At_Cursor (X), Org);
    end Append_Tokn;
@@ -644,34 +641,27 @@ package body Pp.Scanner is
       Append_Tokn (V, Tok, Org);
    end Append_Tokn_With_Index;
 
-   function Delete_Last (V : in out Tokn_Vec) return Token is
-      pragma Assert (not V.Frozen);
+   procedure Delete_Last (V : in out Tokn_Vec) is
       L : constant Tokn_Cursor := Last (V'Unrestricted_Access);
       New_New_Sloc_First : constant Positive := Next_Sloc_First (Prev (L));
    begin
+      Delete_Last (V.Fixed);
+
+      while L.Oc /= Last_Index (V.Octets) + 1 loop
+         Delete_Last (V.Octets);
+      end loop;
+
+      V.New_Sloc_First := New_New_Sloc_First;
+   end Delete_Last;
+
+   function Delete_Last (V : in out Tokn_Vec) return Token is
+      L : constant Tokn_Cursor := Last (V'Unrestricted_Access);
+   begin
       return Result : constant Token := Token_At_Cursor (L) do
-         Delete_Last (V.Fixed);
-
-         while L.Oc /= Last_Index (V.Octets) + 1 loop
-            Delete_Last (V.Octets);
-         end loop;
-
-         V.New_Sloc_First := New_New_Sloc_First;
+         Delete_Last (V);
          pragma Assert (After_Last (L));
       end return;
    end Delete_Last;
-
-   procedure Freeze_Tokns (V : in out Tokn_Vec) is
-   begin
-      pragma Assert (not V.Frozen);
-      V.Frozen := True;
-   end Freeze_Tokns;
-
-   procedure Melt_Tokns (V : in out Tokn_Vec) is
-   begin
-      pragma Assert (V.Frozen);
-      V.Frozen := False;
-   end Melt_Tokns;
 
    function Token_At_Cursor (X : Tokn_Cursor) return Token is
    begin
@@ -696,7 +686,7 @@ package body Pp.Scanner is
       end return;
    end Token_At_Cursor;
 
-   function First (V : access constant Tokn_Vec) return Tokn_Cursor is
+   function First (V : Tokn_Vec_Ref) return Tokn_Cursor is
    begin
       return (V, 1, 1);
    end First;
@@ -993,7 +983,7 @@ package body Pp.Scanner is
          loop
             Get;
             exit when not (Is_Letter (Cur (Input))
-                             or else Cur (Input) = '_'
+                             or else (Cur (Input) = '_' and Lang = Ada_Lang)
                              or else Is_Digit (Cur (Input))
                              or else Is_Mark (Cur (Input)));
          end loop;
@@ -1042,7 +1032,6 @@ package body Pp.Scanner is
          procedure Skip_To_EOL is
          begin
             while not Is_Line_Terminator (Cur (Input))
-              and then Cur (Input) /= Token_Separator
               and then Cur (Input) /= W_NUL
             loop
                Get;
@@ -1188,10 +1177,6 @@ package body Pp.Scanner is
 
       procedure Get_Tokn (Tok : out Token; Allow_Short_Fillable : Boolean) is
       begin
-         while Cur (Input) = Token_Separator loop
-            Get;
-         end loop;
-
          Tok.Sloc :=
            (Line   => Cur_Line,
             Col    => Cur_Col,
@@ -1244,6 +1229,12 @@ package body Pp.Scanner is
             case Cur (Input) is
                when W_NUL =>
                   Tok := (Kind => End_Of_Input, Sloc => Tok.Sloc);
+
+               --  One_Space_Outdent instruction in the Template_Lang
+
+               when '_' =>
+                  Tok := (Kind => '_', Sloc => Tok.Sloc);
+                  Get;
 
                --  Minus sign or comment
 
@@ -1779,12 +1770,16 @@ package body Pp.Scanner is
 
    procedure Move_Tokns (Target, Source : in out Tokn_Vec) is
    begin
-      pragma Assert (not Target.Frozen);
-      pragma Assert (not Source.Frozen);
       Target.New_Sloc_First := Source.New_Sloc_First;
       Source.New_Sloc_First := 1;
       Move (Target.Fixed, Source.Fixed);
       Move (Target.Octets, Source.Octets);
+   end Move_Tokns;
+
+   function Move_Tokns (Target, Source : in out Tokn_Vec) return Boolean is
+   begin
+      Move_Tokns (Target, Source);
+      return False;
    end Move_Tokns;
 
    function Same_Token (X, Y : Token) return Boolean is
@@ -1914,6 +1909,11 @@ package body Pp.Scanner is
 
    procedure Put_Token (Tok : Tokn_Cursor) is
    begin
+      if Is_Nil (Tok) then
+         Text_IO.Put_Line (Text_IO.Standard_Output, " -- <nil token??>");
+         return;
+      end if;
+
       if Kind (Tok) in Comment_Kind then
          Text_IO.Put
            (Text_IO.Standard_Output,
@@ -1968,7 +1968,8 @@ package body Pp.Scanner is
    begin
       while Tok /= After_Last loop
          if Tok = Highlight then
-            Text_IO.Put_Line (Text_IO.Standard_Output, "----------------");
+            Text_IO.Put_Line
+              (Text_IO.Standard_Output, "================++++++++++++++++");
          end if;
 
          Put_Token (Tok);
@@ -1979,7 +1980,16 @@ package body Pp.Scanner is
          "New_Sloc_First = " & First.V.New_Sloc_First'Img);
    end Put_Tokens;
 
-   function Last (V : access constant Tokn_Vec) return Tokn_Cursor is
+   procedure Put_Tokens
+     (Highlight : Tokn_Cursor; Num_Toks : Tokn_Index := 8)
+   is
+      First : constant Tokn_Cursor := Pred (Highlight, Num_Toks);
+      Last : constant Tokn_Cursor := Succ (Highlight, Num_Toks);
+   begin
+      Put_Tokens (First, After_Last => Next (Last), Highlight => Highlight);
+   end Put_Tokens;
+
+   function Last (V : Tokn_Vec_Ref) return Tokn_Cursor is
    begin
       return Result : Tokn_Cursor :=
         (V, Last_Index (V.Fixed) + 1, Last_Index (V.Octets) + 1)

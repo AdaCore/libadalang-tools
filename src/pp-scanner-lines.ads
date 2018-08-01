@@ -26,8 +26,8 @@ with Pp.Formatting; use Pp.Formatting;
 package Pp.Scanner.Lines is
 
    --  This package is for portions of Pp.Scanner that need to depend on
-   --  Pp.Formatting; we don't want Pp.Scanner to depend on it directly, for
-   --  aesthetic reasons, and for compilation speed.
+   --  Pp.Formatting; Pp.Scanner can't depend on it directly, because that
+   --  would cause cyclic with clauses.
 
    function Line_Break_Token_Index (X : Tokn_Cursor) return Line_Break_Index
      with Pre => Kind (X) in Line_Break_Token;
@@ -42,5 +42,8 @@ package Pp.Scanner.Lines is
    procedure Append_Tab_Tokn
      (V : in out Tokn_Vec; Index : Tab_Index;
       Org : String := "Append_Tab_Tokn");
+
+   procedure Put_Index_Info (All_LB : Line_Break_Vector; X : Tokn_Cursor)
+     with Pre => Kind (X) in Line_Break_Token | Tab_Token;
 
 end Pp.Scanner.Lines;

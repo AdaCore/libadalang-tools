@@ -21,6 +21,8 @@
 -- The gnat2xml tool was derived from the Avatox sources.                   --
 ------------------------------------------------------------------------------
 
+with Text_IO;
+
 package body Pp.Scanner.Lines is
 
    function Line_Break_Token_Index (X : Tokn_Cursor) return Line_Break_Index is
@@ -46,5 +48,25 @@ package body Pp.Scanner.Lines is
    begin
       Append_Tokn_With_Index  (V, Tab_Token, Positive (Index), Org);
    end Append_Tab_Tokn;
+
+   procedure Put_Index_Info (All_LB : Line_Break_Vector; X : Tokn_Cursor) is
+   begin
+      case Kind (X) is
+         when Line_Break_Token =>
+            declare
+               Break : Line_Break renames All_LB (Line_Break_Token_Index (X));
+            begin
+               Text_IO.Put
+                 (Text_IO.Standard_Output,
+                  "ind = " & Image (Break.Indentation) &
+                  ", " & (if Break.Hard then "hard" else "soft") &
+                  ", " & (if Break.Enabled then "enabled" else "disabled") &
+                  ", " & "lev = " & Image (Integer (Break.Level)));
+            end;
+         when Tab_Token =>
+            null; -- not yet implemented
+         when others => raise Program_Error;
+      end case;
+   end Put_Index_Info;
 
 end Pp.Scanner.Lines;
