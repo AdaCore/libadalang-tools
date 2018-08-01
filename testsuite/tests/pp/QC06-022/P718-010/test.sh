@@ -1,1 +1,23 @@
-make --silent preserve_existing_continuation_lines.gnatpp
+gnatmake -q -f -g -O0 -gnata normalize.adb
+normalize preserve_existing_continuation_lines.adb > normalized_preserve_existing_continuation_lines.adb
+gnatpp \
+    --pipe \
+    --vertical-enum-types \
+    --vertical-array-types \
+    --vertical-named-aggregates \
+    --vertical-case-alternatives \
+    --preserve-line-breaks \
+    --based-grouping=4 \
+    --call_threshold=0 \
+    --decimal-grouping=3 \
+    --eol=unix \
+    --insert-blank-lines \
+    --par_threshold=0 \
+    --separate-loop-then \
+    --split-line-before-op \
+    --use-on-new-line \
+    -M132 \
+    -cl3 \
+    \
+    -nM \
+  normalized_preserve_existing_continuation_lines.adb
