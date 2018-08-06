@@ -25,9 +25,7 @@ with Utils.Char_Vectors;
 with Utils.Vectors;
 with Utils.Symbols;
 
-with Pp.Buffers; use Pp.Buffers;
-use Pp.Buffers.Marker_Vectors;
---  use all type Pp.Buffers.Marker_Vector;
+with Pp.Buffers;
 
 private with Utils.Var_Length_Ints;
 
@@ -233,10 +231,6 @@ package Pp.Scanner is
       Line, Col : Positive := 9999; -- 1-based line and column numbers
       First     : Positive := 9999;
       Last      : Natural := 9999;
-
-      Firstx, Lastx : Marker := 9999;
-      --  ???Same information as First&Last. These should replace First&Last
-      --  eventually. Note that Lastx points one past the last character.
    end record;
 
    --  Define type Token as a variant record. Mostly, we avoid using this type,
@@ -288,15 +282,6 @@ package Pp.Scanner is
    function Message_Image
      (File_Name : String; Sloc : Source_Location) return String is
        (File_Name & ":" & Image (Sloc.Line) & ":" & Image (Sloc.Col));
-
-   function Line_Length
-     (Input    : in out Buffer;
-      Ends     : Marker_Vector;
-      Line_Num : Positive)
-      return     Natural;
-   --  Doesn't count the NL character. This doesn't work for CR/LF line
-   --  endings, which is OK, because we only use it for internally-generated
-   --  text that always uses a single NL.
 
    Default_Pp_Off_String : aliased constant W_Str := "--!pp off";
    Default_Pp_On_String : aliased constant W_Str := "--!pp on";
@@ -483,28 +468,21 @@ package Pp.Scanner is
    --  this is used to indicate differences.
 
    procedure Get_Tokns
-     (Input                     : in out Buffer;
+     (Input                     : in out Buffers.Buffer;
       Result                    : out Tokn_Vec;
       Ada_Version               : Ada_Version_Type;
       Max_Tokens                : Tokn_Index := Tokn_Index'Last;
-      Line_Ends                 : Marker_Vector_Ptr := null;
       Lang                      : Language := Ada_Lang);
    --  Return in Result the sequence of tokens in the Input string. The first
    --  one is always Start_Of_Input, and the last one End_Of_Input. Max_Tokens
    --  places a limit on the number of tokens (not counting Start_Of_Input); we
    --  quit before reaching end of input if we've gotten that many.
-   --
-   --  If Line_Ends is non-null, we compute all the line endings in
-   --  Line_Ends.all, which is a mapping from line numbers to Markers in the
-   --  Input string. Each element points to a NL character in the corresponding
-   --  buffer.
 
    function Get_Tokns
-     (Input                     : in out Buffer;
+     (Input                     : in out Buffers.Buffer;
       Result                    : out Tokn_Vec;
       Ada_Version               : Ada_Version_Type;
       Max_Tokens                : Tokn_Index := Tokn_Index'Last;
-      Line_Ends                 : Marker_Vector_Ptr := null;
       Lang                      : Language := Ada_Lang)
      return Boolean;
    --  This is to get around the annoying restriction in Ada that you can't mix
@@ -600,7 +578,6 @@ private
       Sloc_Line : Positive;
       Sloc_Col : Positive;
       Sloc_First : Positive;
-      Firstx, Lastx : Marker;
       Origin : Syms.Symbol;
    end record;
 

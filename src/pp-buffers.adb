@@ -548,9 +548,9 @@ package body Pp.Buffers is
         Result : constant Boolean :=
           Is_Empty (Buf.From) and then Is_Empty (Buf.To)
       do
-         pragma Assert (Result = Is_Empty (Buf.Markers));
-         pragma Assert (Result = Is_Empty (Buf.From_Markers));
-         pragma Assert (Result = Is_Empty (Buf.To_Markers));
+         pragma Assert (if Result then Is_Empty (Buf.Markers));
+         pragma Assert (if Result then Is_Empty (Buf.From_Markers));
+         pragma Assert (if Result then Is_Empty (Buf.To_Markers));
       end return;
    end Is_Empty;
 

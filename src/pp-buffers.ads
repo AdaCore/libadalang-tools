@@ -203,13 +203,15 @@ package Pp.Buffers is
       --  'point' must be at the end of the buffer. Move 'point' back to the
       --  beginning. The buffer contents and markers are not changed.
 
-   function Mark (Buf : in out Buffer; Name : W_Char) return Marker;
+   function Mark (Buf : in out Buffer; Name : W_Char) return Marker
+     with Unreferenced;
    --  Return a Marker that points to the current 'point'. Name is for
    --  debugging; it is printed by debugging printouts, and may be used to keep
    --  track of different kinds of Markers. Note that if you call Mark twice at
    --  the same position, only the first Name will be used.
 
-   function Mark_Previous (Buf : in out Buffer; Name : W_Char) return Marker;
+   function Mark_Previous (Buf : in out Buffer; Name : W_Char) return Marker
+     with Unreferenced;
    --  Similar to Mark, but the Marker points to the character just before the
    --  current 'point'.
 

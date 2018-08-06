@@ -212,28 +212,6 @@ package body Pp.Scanner is
       end case;
    end Text;
 
-   function Line_Length
-     (Input    : in out Buffer;
-      Ends     : Marker_Vector;
-      Line_Num : Positive)
-      return     Natural
-   is
-
-      M1 : constant Marker   := Ends (Marker_Index (Line_Num));
-      P1 : constant Positive := Position (Input, M1);
-      M0 : Marker;
-      P0 : Natural;
-
-   begin
-      if Line_Num = 1 then
-         P0 := 0;
-      else
-         M0 := Ends (Marker_Index (Line_Num - 1));
-         P0 := Position (Input, M0);
-      end if;
-      return P1 - P0 - 1;
-   end Line_Length;
-
    ----------------
 
    package Symbol_Encodings is new Encodings (Symbol);
@@ -254,9 +232,7 @@ package body Pp.Scanner is
       return (Line => Sloc_Line (X),
               Col => Sloc_Col (X),
               First => Sloc_First (X),
-              Last => Sloc_Last (X),
-              Firstx => X.V.Fixed (X.Fi).Firstx,
-              Lastx => X.V.Fixed (X.Fi).Lastx);
+              Last => Sloc_Last (X));
    end Sloc;
 
    function Sloc_Line (X : Tokn_Cursor) return Positive is
@@ -423,8 +399,7 @@ package body Pp.Scanner is
          return Result : Source_Location do
             if Is_Empty (V) then
                pragma Assert (K = Start_Of_Input);
-               Result := (Line => 1, Col => 1, First => 1, Last => 0,
-                          Firstx | Lastx => <>);
+               Result := (Line => 1, Col => 1, First => 1, Last => 0);
             else
                pragma Assert (K /= Start_Of_Input);
                declare
@@ -450,9 +425,6 @@ package body Pp.Scanner is
                   Result.Last := Prev_Sloc.Last + Length (X);
                end;
             end if;
-
-            Result.Firstx := X.Sloc.Firstx;
-            Result.Lastx := X.Sloc.Lastx;
          end return;
       end Get_Sloc;
 
@@ -465,8 +437,6 @@ package body Pp.Scanner is
                           Sloc_Line => Sloc.Line,
                           Sloc_Col => Sloc.Col,
                           Sloc_First => Sloc.First,
-                          Firstx => Sloc.Firstx,
-                          Lastx => Sloc.Lastx,
                           Origin => Intern (Org)));
       case K is
          when Same_Text_Kind =>
@@ -863,40 +833,31 @@ package body Pp.Scanner is
    end Lookup_Reserved_Word;
 
    function Get_Tokns
-     (Input                     : in out Buffer;
+     (Input                     : in out Buffers.Buffer;
       Result                    : out Tokn_Vec;
       Ada_Version               : Ada_Version_Type;
       Max_Tokens                : Tokn_Index := Tokn_Index'Last;
-      Line_Ends                 : Marker_Vector_Ptr := null;
       Lang                      : Language := Ada_Lang)
      return Boolean is
    begin
-      Get_Tokns (Input, Result, Ada_Version, Max_Tokens, Line_Ends, Lang);
+      Get_Tokns (Input, Result, Ada_Version, Max_Tokens, Lang);
       return True;
    end Get_Tokns;
 
    procedure Get_Tokns
-     (Input                     : in out Buffer;
+     (Input                     : in out Buffers.Buffer;
       Result                    : out Tokn_Vec;
       Ada_Version               : Ada_Version_Type;
       Max_Tokens                : Tokn_Index := Tokn_Index'Last;
-      Line_Ends                 : Marker_Vector_Ptr := null;
       Lang                      : Language := Ada_Lang)
    is
-      procedure Assert;
-      --  Assert that Line_Ends is correct
-
-      pragma Assert
-        (if
-           Line_Ends /= null
-         then
-           Char_At (Input, Last_Position (Input)) = NL);
-
       Cur_Line, Cur_Col : Positive := 1;
       Cur_First         : Positive := 1;
 
       Name_Buffer : Bounded_Str;
       Name_Len : Natural renames Name_Buffer.Length;
+
+      function Cur return W_Char is (Buffers.Cur (Input));
 
       procedure Get;
       --  Move ahead one character in the input
@@ -931,7 +892,7 @@ package body Pp.Scanner is
 
       procedure Scan_Comment
         (Tok : in out Opt_Token; Allow_Short_Fillable : Boolean);
-      --  Cur (Input) is the first '-' of the start of the comment.
+      --  Cur is the first '-' of the start of the comment.
       --  Allow_Short_Fillable indicates that we should allow a comment to be
       --  fillable even if it is short. In the inner loop in Get_Tokns where
       --  we are collecting fillable comments into a single comment paragraph,
@@ -953,8 +914,9 @@ package body Pp.Scanner is
               Tok.Sloc.First + String'("--")'Length + Tok.Leading_Blanks
             else Tok.Sloc.First);
       begin
-         Append (Name_Buffer,
-                 To_UTF8 (Slice (Input, Token_Text_First, Tok.Sloc.Last)));
+         Append
+           (Name_Buffer,
+            To_UTF8 (Buffers.Slice (Input, Token_Text_First, Tok.Sloc.Last)));
          if Tok.Kind in Comment_Kind then
             Append (Name_Buffer, ASCII.LF);
          end if;
@@ -968,12 +930,12 @@ package body Pp.Scanner is
          --  It's OK for this to be greater than Input'Last; in that case, Cur
          --  will return W_NUL, indicating end-of-input.
 
-         Move_Forward (Input);
+         Buffers.Move_Forward (Input);
       end Get;
 
       procedure Scan_Decimal_Digit_Chars is
       begin
-         while Cur (Input) in '0' .. '9' | '_' loop
+         while Cur in '0' .. '9' | '_' loop
             Get;
          end loop;
       end Scan_Decimal_Digit_Chars;
@@ -982,10 +944,10 @@ package body Pp.Scanner is
       begin
          loop
             Get;
-            exit when not (Is_Letter (Cur (Input))
-                             or else (Cur (Input) = '_' and Lang = Ada_Lang)
-                             or else Is_Digit (Cur (Input))
-                             or else Is_Mark (Cur (Input)));
+            exit when not (Is_Letter (Cur)
+                             or else (Cur = '_' and Lang = Ada_Lang)
+                             or else Is_Digit (Cur)
+                             or else Is_Mark (Cur));
          end loop;
       end Scan_Identifier_Chars;
 
@@ -994,12 +956,12 @@ package body Pp.Scanner is
          loop
             Get;
 
-            pragma Assert (Cur (Input) /= W_NUL);
+            pragma Assert (Cur /= W_NUL);
 
-            if Cur (Input) = Q_Char then
+            if Cur = Q_Char then
                Get;
 
-               exit when Cur (Input) /= Q_Char;
+               exit when Cur /= Q_Char;
             end if;
          end loop;
       end Scan_String_Literal;
@@ -1022,7 +984,7 @@ package body Pp.Scanner is
          function Count_Blanks return Natural is
          begin
             return Result : Natural := 0 do
-               while Is_Space (Cur (Input)) loop
+               while Is_Space (Cur) loop
                   Result := Result + 1;
                   Get;
                end loop;
@@ -1031,8 +993,8 @@ package body Pp.Scanner is
 
          procedure Skip_To_EOL is
          begin
-            while not Is_Line_Terminator (Cur (Input))
-              and then Cur (Input) /= W_NUL
+            while not Is_Line_Terminator (Cur)
+              and then Cur /= W_NUL
             loop
                Get;
             end loop;
@@ -1054,19 +1016,19 @@ package body Pp.Scanner is
 
          if Kind_Of_Comment = Other_Whole_Line_Comment
            and then not
-             (Is_Letter (Cur (Input))
-                or else Is_Digit (Cur (Input))
-                or else Is_Space (Cur (Input))
-                or else Is_Line_Terminator (Cur (Input))
-                or else Cur (Input) = '-')
-            --  ???For now, we don't consider "-----" to be special, because
-            --  otherwise various comments are messed up.
+             (Is_Letter (Cur)
+                or else Is_Digit (Cur)
+                or else Is_Space (Cur)
+                or else Is_Line_Terminator (Cur)
+                or else Cur = '-')
+            --  We don't consider "-----" to be special, because otherwise
+            --  various comments are misformatted.
          then
             Kind_Of_Comment := Special_Comment;
          end if;
 
          Is_Fillable_Comment := Kind_Of_Comment = Other_Whole_Line_Comment
-           and then Is_Space (Cur (Input));
+           and then Is_Space (Cur);
          --  We don't fill comments unless there is at least one leading blank,
          --  because otherwise some special character like "#" could end up at
          --  the start of a line, causing it to turn into a special comment,
@@ -1084,8 +1046,8 @@ package body Pp.Scanner is
             --  Don't fill if comment ends with "--" (like a typical copyright
             --  header). Note that this includes the case of an empty comment,
             --  where the initial "--" is immediately followed by NL.
-            if Lookback (Input, 2) = '-'
-              and then Lookback (Input, 1) = '-'
+            if Buffers.Lookback (Input, 2) = '-'
+              and then Buffers.Lookback (Input, 1) = '-'
             then
                Is_Fillable_Comment := False;
             end if;
@@ -1095,7 +1057,7 @@ package body Pp.Scanner is
             then
                declare
                   Comment_Text : constant W_Str :=
-                    Slice (Input, Tok.Sloc.First, Cur_First - 1);
+                    Buffers.Slice (Input, Tok.Sloc.First, Cur_First - 1);
                begin
                   if Has_Prefix
                     (Comment_Text, Prefix => Pp_Off_On_Delimiters.Off.all)
@@ -1181,19 +1143,12 @@ package body Pp.Scanner is
            (Line   => Cur_Line,
             Col    => Cur_Col,
             First  => Cur_First,
-            Last   => <>,
-            Firstx => Mark (Input, '<'),
-            Lastx  => <>);
+            Last   => <>);
 
          --  end of line
 
-         if Is_Line_Terminator (Cur (Input)) then
-            if Line_Ends /= null then
-               Append (Line_Ends.all, Tok.Sloc.Firstx);
-            end if;
-
-            if Cur (Input) = W_CR and then Lookahead (Input) = W_LF then
-               pragma Assert (Line_Ends = null);
+         if Is_Line_Terminator (Cur) then
+            if Cur = W_CR and then Buffers.Lookahead (Input) = W_LF then
                Get;
             end if;
 
@@ -1206,9 +1161,9 @@ package body Pp.Scanner is
 
          --  Spaces
 
-         elsif Is_Space (Cur (Input)) then
+         elsif Is_Space (Cur) then
             Tok := (Kind => Spaces, Sloc => Tok.Sloc, Text => <>);
-            while Is_Space (Cur (Input)) loop
+            while Is_Space (Cur) loop
                Get;
             end loop;
 
@@ -1218,15 +1173,15 @@ package body Pp.Scanner is
          --  preprocessor symbols look like, and this allows us to process some
          --  files that use preprocessing.
 
-         elsif Is_Letter (Cur (Input)) or else
-           (Lang = Ada_Lang and then Cur (Input) = '$')
+         elsif Is_Letter (Cur) or else
+           (Lang = Ada_Lang and then Cur = '$')
          then
             Tok := (Kind => Ident, Sloc => Tok.Sloc, Text => <>);
             --  We will check for reserved words below
             Scan_Identifier_Chars;
 
          else
-            case Cur (Input) is
+            case Cur is
                when W_NUL =>
                   Tok := (Kind => End_Of_Input, Sloc => Tok.Sloc);
 
@@ -1239,7 +1194,7 @@ package body Pp.Scanner is
                --  Minus sign or comment
 
                when '-' =>
-                  if Lookahead (Input) = '-' then
+                  if Buffers.Lookahead (Input) = '-' then
                      Scan_Comment (Tok, Allow_Short_Fillable);
                   else
                      Get;
@@ -1256,27 +1211,28 @@ package body Pp.Scanner is
                   case Lang is
                      when Template_Lang => null; -- we're done
                      when Ada_Lang =>
-                        if Cur (Input) in '#' | ':' then
+                        if Cur in '#' | ':' then
                            loop
                               Get;
 
-                              pragma Assert (Cur (Input) /= W_NUL);
-                              exit when Cur (Input) in '#' | ':';
+                              pragma Assert (Cur /= W_NUL);
+                              exit when Cur in '#' | ':';
                            end loop;
 
                            Get;
 
-                        elsif Cur (Input) = '.' then
-                           if Lookahead (Input) /= '.' then -- could be ".."
+                        elsif Cur = '.' then
+                           if Buffers.Lookahead (Input) /= '.' then
+                              --  It's not ".."
                               Get;
                               Scan_Decimal_Digit_Chars;
                            end if;
                         end if;
 
-                        if To_Lower (Cur (Input)) = 'e' then
+                        if To_Lower (Cur) = 'e' then
                            Get;
 
-                           if Cur (Input) in '+' | '-' then
+                           if Cur in '+' | '-' then
                               Get;
                            end if;
 
@@ -1312,7 +1268,7 @@ package body Pp.Scanner is
                      Tok := (Kind => Character_Literal,
                              Sloc => Tok.Sloc, others => <>);
                      Get;
-                     pragma Assert (Cur (Input) = ''');
+                     pragma Assert (Cur = ''');
                      Get;
                   end if;
 
@@ -1321,7 +1277,7 @@ package body Pp.Scanner is
                when '"' | '%' =>
                   Tok := (Kind => String_Lit,
                           Sloc => Tok.Sloc, others => <>);
-                  Scan_String_Literal (Q_Char => Cur (Input));
+                  Scan_String_Literal (Q_Char => Cur);
 
                --  One-character tokens
 
@@ -1394,7 +1350,7 @@ package body Pp.Scanner is
                when '=' =>
                   Get;
 
-                  if Cur (Input) = '>' then
+                  if Cur = '>' then
                      Tok := (Kind => Arrow, Sloc => Tok.Sloc);
                      Get;
                   else
@@ -1404,7 +1360,7 @@ package body Pp.Scanner is
                when '.' =>
                   Get;
 
-                  if Cur (Input) = '.' then
+                  if Cur = '.' then
                      Tok := (Kind => Dot_Dot, Sloc => Tok.Sloc);
                      Get;
                   else
@@ -1414,7 +1370,7 @@ package body Pp.Scanner is
                when '*' =>
                   Get;
 
-                  if Cur (Input) = '*' then
+                  if Cur = '*' then
                      Tok := (Kind => Exp_Op, Sloc => Tok.Sloc);
                      Get;
                   else
@@ -1424,7 +1380,7 @@ package body Pp.Scanner is
                when '/' =>
                   Get;
 
-                  if Cur (Input) = '=' then
+                  if Cur = '=' then
                      Tok := (Kind => Not_Equal, Sloc => Tok.Sloc);
                      Get;
                   else
@@ -1434,10 +1390,10 @@ package body Pp.Scanner is
                when '>' =>
                   Get;
 
-                  if Cur (Input) = '=' then
+                  if Cur = '=' then
                      Tok := (Kind => Greater_Or_Equal, Sloc => Tok.Sloc);
                      Get;
-                  elsif Cur (Input) = '>' then
+                  elsif Cur = '>' then
                      Tok := (Kind => Right_Label_Bracket, Sloc => Tok.Sloc);
                      Get;
                   else
@@ -1447,13 +1403,13 @@ package body Pp.Scanner is
                when '<' =>
                   Get;
 
-                  if Cur (Input) = '=' then
+                  if Cur = '=' then
                      Tok := (Kind => Less_Or_Equal, Sloc => Tok.Sloc);
                      Get;
-                  elsif Cur (Input) = '<' then
+                  elsif Cur = '<' then
                      Tok := (Kind => Left_Label_Bracket, Sloc => Tok.Sloc);
                      Get;
-                  elsif Cur (Input) = '>' then
+                  elsif Cur = '>' then
                      Tok := (Kind => Box, Sloc => Tok.Sloc);
                      Get;
                   else
@@ -1463,7 +1419,7 @@ package body Pp.Scanner is
                when ':' =>
                   Get;
 
-                  if Cur (Input) = '=' then
+                  if Cur = '=' then
                      Tok := (Kind => Colon_Equal, Sloc => Tok.Sloc);
                      Get;
                   else
@@ -1473,8 +1429,8 @@ package body Pp.Scanner is
                when others =>
                   Text_IO.Put_Line
                     (Text_IO.Standard_Error,
-                     "illegal character: " & To_UTF8 ((1 => Cur (Input))));
-                  if Cur (Input) = '#' then
+                     "illegal character: " & To_UTF8 ((1 => Cur)));
+                  if Cur = '#' then
                      Text_IO.Put_Line
                        (Text_IO.Standard_Error, "preprocessing not supported");
                   end if;
@@ -1483,7 +1439,6 @@ package body Pp.Scanner is
             end case;
          end if;
 
-         Tok.Sloc.Lastx := Mark (Input, '>');
          Tok.Sloc.Last  := Cur_First - 1;
          pragma Assert (if Tok.Kind in Whole_Line_Comment then
            Tok.Width = Tok.Sloc.Last - Tok.Sloc.First + 1);
@@ -1545,7 +1500,7 @@ package body Pp.Scanner is
          if Assert_Enabled then
             declare
                Inp : constant W_Str :=
-                 Slice (Input, Tok.Sloc.Firstx, Tok.Sloc.Lastx);
+                 Buffers.Slice (Input, Tok.Sloc.First, Tok.Sloc.Last);
                L : constant Tokn_Cursor := Last (Result'Unrestricted_Access);
                Outp : constant W_Str := To_W_Str (Text (L));
             begin
@@ -1563,27 +1518,13 @@ package body Pp.Scanner is
          end if;
       end Append_To_Result;
 
-      Start_Mark_F  : constant Marker := Mark (Input, '!');
-      Start_Mark_L  : constant Marker := Mark (Input, '>');
       Start_Token : constant Token  :=
         (Start_Of_Input,
          Sloc =>
            (Line  => Cur_Line,
             Col   => Cur_Col,
             First => Cur_First,
-            Last  => 0,
-            Firstx => Start_Mark_F,
-            Lastx => Start_Mark_L));
-
-      procedure Assert is
-      begin
-         if Line_Ends /= null then
-            for E in 1 .. Last_Index (Line_Ends.all) loop
-               pragma Assert
-                 (Char_At (Input, Position (Input, Line_Ends.all (E))) = NL);
-            end loop;
-         end if;
-      end Assert;
+            Last  => 0));
 
       procedure Collect_Comment_Paragraph (Tok : in out Token) is
          Tok_EOL, Possible_Spaces, Tok_2 : Opt_Token;
@@ -1675,7 +1616,6 @@ package body Pp.Scanner is
                   Append_Tok_Text (Tok_2);
                   Tok.Width := Natural'Max (Tok.Width, Tok_2.Width);
                   Tok.Sloc.Last := Tok_2.Sloc.Last;
-                  Tok.Sloc.Lastx := Tok_2.Sloc.Lastx;
                   Tok.Num_Lines := Tok.Num_Lines + 1;
                   Tok.Last_Line_Len := Tok_2.Last_Line_Len;
                   --  Go around the loop again, in case the next Tok_2 can be
@@ -1718,19 +1658,15 @@ package body Pp.Scanner is
    --  Start of processing for Get_Tokns
 
    begin
-      pragma Assert (Point (Input) = 1);
+      pragma Assert (Buffers.Point (Input) = 1);
       Clear (Result);
       Append_Tokn (Result, Start_Token);
-
-      if Line_Ends /= null then
-         Clear (Line_Ends.all);
-      end if;
 
       loop
          if Result.Fixed.Last_Index - 1 = Max_Tokens then
             --  "- 1" because Start_Of_Input doesn't count
-            while not At_End (Input) loop
-               Move_Forward (Input);
+            while not Buffers.At_End (Input) loop
+               Buffers.Move_Forward (Input);
             end loop;
             exit;
          end if;
@@ -1764,8 +1700,7 @@ package body Pp.Scanner is
          end;
       end loop;
 
-      pragma Debug (Assert);
-      Reset (Input);
+      Buffers.Reset (Input);
    end Get_Tokns;
 
    procedure Move_Tokns (Target, Source : in out Tokn_Vec) is
@@ -1785,10 +1720,6 @@ package body Pp.Scanner is
    function Same_Token (X, Y : Token) return Boolean is
       YY : Token := Y;
    begin
-      --  Ignore these parts in the comparison:
-      YY.Sloc.Firstx := X.Sloc.Firstx;
-      YY.Sloc.Lastx := X.Sloc.Lastx;
-
       --  Filling can cause a comment to shrink, which makes it unfillable:
 
       if X.Kind = Fillable_Comment

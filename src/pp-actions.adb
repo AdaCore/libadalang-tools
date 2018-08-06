@@ -316,7 +316,6 @@ package body Pp.Actions is
    use Tab_Vectors;
    Lines_Data : aliased Lines_Data_Rec;
 
-   Out_Buf : Buffer renames Lines_Data.Out_Buf;
    Cur_Indentation : Natural renames Lines_Data.Cur_Indentation;
    Next_Line_Break_Unique_Id : Modular
        renames Lines_Data.Next_Line_Break_Unique_Id;
@@ -2188,10 +2187,6 @@ package body Pp.Actions is
       Cmd       : Utils.Command_Lines.Command_Line;
       Partial   : Boolean)
    is
-      procedure Put_To_Buffer (C : W_Char);
-      procedure Put_To_Buffer (S : W_Str);
-      --  Append C/S to Buffer
-
       function Id_With_Casing
         (Id                       : W_Str;
          Kind                     : Opt_ASIS_Elems;
@@ -2243,39 +2238,6 @@ package body Pp.Actions is
 
       Use_Predefined_Casing : constant Boolean := Init_Use_Predefined_Casing;
       --  True if the -D- switch was NOT given
-
-      procedure Put_To_Buffer (C : W_Char) is
-      begin
-         if Assert_Enabled then
-            pragma Assert (if C = NL then Lookback (Out_Buf) /= ' ');
-            --  no trailing blanks
-
-            if Check_Whitespace
-              and then Arg (Cmd, Par_Threshold) = Natural'Last
-              and then C = ' '
-              and then Lookback (Out_Buf) = ' '
-            then
-               --  No double blanks. Except that there is one special case when
-               --  the Par_Threshold switch is used, where we have an
-               --  extra blank (see Subp_Decl_With_Hard_Breaks).
-               if not Debug_Flag_4 then
-                  raise Program_Error;
-               end if;
-            end if;
-         end if;
-
-         Append_Any (Out_Buf, C);
-         if False then -- for debugging
-            String_Utilities.Wide_Text_IO_Put_Char (C);
-         end if;
-      end Put_To_Buffer;
-
-      procedure Put_To_Buffer (S : W_Str) is
-      begin
-         for C of S loop
-            Put_To_Buffer (C);
-         end loop;
-      end Put_To_Buffer;
 
       Name_CPP_Class : aliased constant W_Str := "CPP_Class";
       Name_CPP_Constructor : aliased constant W_Str := "CPP_Constructor";
@@ -2412,14 +2374,12 @@ package body Pp.Actions is
       begin
          pragma Assert (X not in End_Of_Line);
          Append_Tokn (V, X);
-         Put_To_Buffer (To_W_Str (Text (X)));
       end Append_And_Put;
 
       procedure Append_And_Put
         (V : in out Tokn_Vec; X : Stored_Text_Kind; Tx : Symbol) is
       begin
          Append_Tokn (V, X, Tx);
-         Put_To_Buffer (To_W_Str (Tx));
       end Append_And_Put;
 
       procedure Append_And_Put (V : in out Tokn_Vec; X : Ada_Op) is
@@ -2462,23 +2422,19 @@ package body Pp.Actions is
       end Append_And_Put;
 
       procedure Indent (Amount : Integer);
+      --  Indent by the given number of columns negative Amount for "outdent"
 
       procedure Indent (Amount : Integer) is
          pragma Assert
-           (abs (Amount) in
+           (abs Amount in
               0 | 1 | PP_Indentation (Cmd) | PP_Indent_Continuation (Cmd));
-         Line_Breaks : Line_Break_Index_Vector renames All_LBI;
+         Last_LBI : constant Line_Break_Index := All_LBI (Last (All_LBI));
+         Last_LB : Line_Break renames All_LB (Last_LBI);
       begin
          Cur_Indentation := Cur_Indentation + Amount;
 
-         pragma Assert (Point (Out_Buf) = Last_Position (Out_Buf) + 1);
-         if Last_Position (Out_Buf) =
-           Position (Out_Buf, All_LB (Line_Breaks (Last (Line_Breaks))).Mark)
-           and then All_LB (Line_Breaks (Last (Line_Breaks))).Hard
-         then
---  pragma Assert (At_Point
---  (Out_Buf, All_Lb (Line_Breaks (Last (Line_Breaks))).Mark));
-            All_LB (Line_Breaks (Last (Line_Breaks))).Indentation := Cur_Indentation;
+         if Last_LB.Hard and then Last_LB.Tok = Last (New_Tokns'Access) then
+            Last_LB.Indentation := Cur_Indentation;
          end if;
       end Indent;
 
@@ -2527,52 +2483,53 @@ package body Pp.Actions is
          Kind     : Ada_Tree_Kind)
       is
          pragma Unreferenced (Kind);
-         Line_Breaks : Line_Break_Index_Vector renames All_LBI;
-         M : Marker;
       begin
          --  If we see two line breaks in a row, we take the least indented one.
 
-         if Hard and then Lookback (Out_Buf) = NL then
-            if All_LB (Line_Breaks (Last_Index (Line_Breaks))).Indentation >
-              Cur_Indentation
-            then
-               All_LB (Line_Breaks (Last_Index (Line_Breaks))).Indentation :=
-                 Cur_Indentation;
-            end if;
+         if not Is_Empty (All_LBI) then
+            declare
+               Last_LBI : constant Line_Break_Index := All_LBI (Last (All_LBI));
+               Last_LB : Line_Break renames All_LB (Last_LBI);
+            begin
+               if Hard and then
+                 Scanner.Kind (Last (New_Tokns'Access)) = Enabled_LB_Token
+               then
+                  if Last_LB.Indentation > Cur_Indentation then
+                     Last_LB.Indentation := Cur_Indentation;
+                  end if;
 
-            if not Insert_Blank_Lines (Cmd) then
-               return;
-            end if;
+                  if not Insert_Blank_Lines (Cmd) then
+                     return;
+                  end if;
+               end if;
+            end;
          end if;
 
-         M := Mark (Out_Buf, Name => (if Hard then '$' else '#'));
-         Append
-           (All_LB,
-            Line_Break'
-              (Mark        => M,
-               Tok | Tokn_Val => <>, -- Initial value not used
-               Hard        => Hard,
-               Removed     => False,
-               Affects_Comments => Affects_Comments,
-               Enabled     => Hard,
-               Level       => Level,
-               Indentation => Cur_Indentation,
-               Length      => <>,
-   --            Kind        => Kind,
-               Internal_To_Comment => False,
-               UID         => Next_Line_Break_Unique_Id));
+         declare
+            Tok : constant Scanner.Tokn_Cursor :=
+                Next (Last (New_Tokns'Access));
+         begin
+            Append_Line_Break_Tokn
+              (New_Tokns, Enabled => Hard, Index => Last_Index (All_LB) + 1);
+            --  Note that the Line_Break_Token replaces the End_Of_Line token
+
+            Append
+              (All_LB,
+               Line_Break'
+                 (Tok         => Tok,
+                  Tokn_Val    => Token_At_Cursor (Tok),
+                  Hard        => Hard,
+                  Affects_Comments => Affects_Comments,
+                  Enabled     => Hard,
+                  Level       => Level,
+                  Indentation => Cur_Indentation,
+                  Length      => <>,
+      --            Kind        => Kind,
+                  Internal_To_Comment => False,
+                  UID         => Next_Line_Break_Unique_Id));
+         end;
          Next_Line_Break_Unique_Id := Next_Line_Break_Unique_Id + 1;
-         Append (Line_Breaks, Last_Index (All_LB));
-
-         Append_Line_Break_Tokn
-           (New_Tokns, Enabled => Hard, Index => Last_Index (All_LB));
-         --  Note that the Line_Break_Token replaces the End_Of_Line token
-
-         --  A hard line break gets NL
-
-         if Hard then
-            Put_To_Buffer (NL);
-         end if;
+         Append (All_LBI, Last_Index (All_LB));
       end Append_Line_Break;
 
       function New_Level
@@ -2591,25 +2548,23 @@ package body Pp.Actions is
       --  first line break (if any) belonging to the condition.
 
       procedure If_Stmt_Check_1 is
-         Line_Breaks : Line_Break_Index_Vector renames All_LBI;
       begin
-         First_If_Line_Break := Last_Index (Line_Breaks) + 1;
+         First_If_Line_Break := Last_Index (All_LBI) + 1;
       end If_Stmt_Check_1;
 
       procedure If_Stmt_Check_2 (Level_Of_If : Nesting_Level) is
-         Line_Breaks : Line_Break_Index_Vector renames All_LBI;
          Min : Nesting_Level := Nesting_Level'Last;
       begin
          --  Find the minimum level:
-         for J in First_If_Line_Break .. Last_Index (Line_Breaks) loop
-            Min := Nesting_Level'Min (Min, All_LB (Line_Breaks (J)).Level);
+         for J in First_If_Line_Break .. Last_Index (All_LBI) loop
+            Min := Nesting_Level'Min (Min, All_LB (All_LBI (J)).Level);
          end loop;
 
          --  Overwrite all line breaks at the minimum level to the level of the
          --  'if':
-         for J in First_If_Line_Break .. Last_Index (Line_Breaks) loop
-            if All_LB (Line_Breaks (J)).Level = Min then
-               All_LB (Line_Breaks (J)).Level := Level_Of_If;
+         for J in First_If_Line_Break .. Last_Index (All_LBI) loop
+            if All_LB (All_LBI (J)).Level = Min then
+               All_LB (All_LBI (J)).Level := Level_Of_If;
             end if;
          end loop;
       end If_Stmt_Check_2;
@@ -2690,8 +2645,6 @@ package body Pp.Actions is
          Cur_Level       : Nesting_Level;
          Index_In_Parent : Query_Index)
       is
-         Line_Breaks : Line_Break_Index_Vector renames All_LBI;
-
          procedure Subtrees_To_Ada
            (Tree               : Ada_Tree;
             Pre, Between, Post : Tok_Template);
@@ -2829,16 +2782,12 @@ package body Pp.Actions is
 
             Maybe_Replace_Fake_Tab;
 
-            pragma Assert
-              (Point (Out_Buf) =
-               Last_Position (Out_Buf) + 1); -- ???Do we need Last_Position?
             Append
               (Tabs,
                Tab_Rec'
                  (Pa,
                   Tr,
                   Token           => Token_Text,
-                  Mark            => Mark (Out_Buf, '^'),
                   Insertion_Point => <>,
                   Index_In_Line   => Index_In_Line,
                   Col             => <>,
@@ -2847,9 +2796,6 @@ package body Pp.Actions is
                   Is_Insertion_Point => Is_Insertion_Point,
                   Deleted => False));
             Append_Tab_Tokn (New_Tokns, Last_Index (Tabs));
-            pragma Assert
-              (Position (Out_Buf, Last_Element (Tabs).Mark) =
-               Last_Position (Out_Buf) + 1);
 
             --  Append a fake tab if appropriate
 
@@ -2872,7 +2818,6 @@ package body Pp.Actions is
                                 (Parent          => Pa,
                                  Tree            => Tr,
                                  Token           => Name_Assign,
-                                 Mark            => Mark (Out_Buf, '^'),
                                  Insertion_Point => <>,
                                  Index_In_Line   => 4,
                                  Col             => <>,
@@ -2891,7 +2836,6 @@ package body Pp.Actions is
                                 (Parent          => Pa,
                                  Tree            => Tr,
                                  Token           => Name_Assign,
-                                 Mark            => Mark (Out_Buf, '^'),
                                  Insertion_Point => <>,
                                  Index_In_Line   => 2,
                                  Col             => <>,
@@ -2912,7 +2856,6 @@ package body Pp.Actions is
                              (Parent          => Pa,
                               Tree            => Tr,
                               Token           => Name_Assign,
-                              Mark            => Mark (Out_Buf, '^'),
                               Insertion_Point => <>,
                               Index_In_Line   => 4,
                               Col             => <>,
@@ -2932,7 +2875,6 @@ package body Pp.Actions is
                              (Parent          => Pa,
                               Tree            => Tr,
                               Token           => Name_Use,
-                              Mark            => Mark (Out_Buf, '^'),
                               Insertion_Point => <>,
                               Index_In_Line   => 2,
                               Col             => <>,
@@ -3397,18 +3339,7 @@ package body Pp.Actions is
             end case;
 
             if Insert_Blank_Line_Before then
-               pragma Assert (All_LB (Line_Breaks (Last (Line_Breaks))).Hard);
-               pragma Assert
-                 (Point (Out_Buf) =
-                  Last_Position (Out_Buf) + 1); -- ???Do we need Last_Position?
-               pragma Assert
-                 (Position
-                    (Out_Buf, All_LB (Line_Breaks (Last (Line_Breaks))).Mark) =
-                  Last_Position (Out_Buf));
-               pragma Assert (Lookback (Out_Buf) = NL);
-               --  There should already be a hard line break here; we're about to
-               --  add another one.
-
+               pragma Assert (All_LB (All_LBI (Last (All_LBI))).Hard);
                Append_Line_Break
                  (Hard     => True,
                   Affects_Comments => False,
@@ -4565,36 +4496,33 @@ package body Pp.Actions is
          pragma Assert (Check_Whitespace);
          Subtree_To_Ada (Tree, Cur_Level => 1, Index_In_Parent => 1);
 
-         Scanner.Append_Tokn (New_Tokns, Scanner.End_Of_Input);
-
          --  In Partial mode, we might need to add a line break
 
-         pragma Assert (At_End (Out_Buf));
-         if (Partial or else not Arg (Cmd, Insert_Line_Breaks))
-           and then Cur (Out_Buf) /= NL
-         then
+         if Partial or else not Arg (Cmd, Insert_Line_Breaks) then
+            pragma Assert
+              (Kind (Last (New_Tokns'Access)) not in Line_Break_Token);
             Append_Line_Break
               (Hard     => True,
                Affects_Comments => True,
                Level    => 1,
                Kind     => Null_Kind);
          end if;
-         pragma Debug (Assert_No_Trailing_Blanks (Out_Buf));
 
          if Alignment_Enabled (Cmd) then
             Append
               (Tabs,
                Tab_Rec'
                  (Parent | Tree => No_Ada_Node,
-                  Mark => Mark (Out_Buf, '$'),
                   others => <>));
             --  Append a sentinel tab, whose Position is greater than any
             --  actual position. This ensures that as we step through Tabs,
             --  there is always one more. We don't need the sentinel in the
             --  token stream.
          end if;
+
+         Scanner.Append_Tokn (New_Tokns, Scanner.End_Of_Input);
+
          pragma Assert (Is_Empty (Tree_Stack));
-         Reset (Out_Buf);
          pragma Assert (Cur_Indentation = 0);
       end Convert_Tree_To_Ada;
 
@@ -4679,6 +4607,7 @@ package body Pp.Actions is
       --  it doesn't do that on unix, so we insert CR's by hand.
 
       function Remove_Extra_Line_Breaks return WChar_Vector is
+         Out_Buf : Buffer renames Lines_Data.Out_Buf;
          Add_CR : constant Boolean := Out_File_Format = CRLF;
          --  True if we should convert LF to CRLF -- if it was requested on the
          --  command line, or if we're on windows and nothing was requested.
@@ -4764,7 +4693,7 @@ package body Pp.Actions is
          pragma Assert (Cur_Indentation = 0);
          Assert_No_LB (Lines_Data);
          pragma Assert (Is_Empty (Tabs));
-         Clear (Out_Buf);
+         Clear (Lines_Data.Out_Buf);
          Scanner.Clear (New_Tokns);
 
          --  If --comments-only was specified, format the comments and quit
