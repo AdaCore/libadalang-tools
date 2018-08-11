@@ -1203,6 +1203,7 @@ package body Utils.Projects is
                     GNATCOLL.Projects.Create (My_Project, +File_Name.all);
                begin
                   pragma Assert (Res /= No_File);
+                  --  ???This can fail if a directory name is given
                   File_Name := new String'(Res.Display_Full_Name);
                end;
             end if;

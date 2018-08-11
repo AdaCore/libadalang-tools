@@ -699,6 +699,10 @@ package body Stub.Actions is
             end if;
          end loop;
 
+         --  For things we recursively walked above (packages, protecteds),
+         --  generate the end of the body. For other things (tasks,
+         --  subprograms, entries), generate nothing.
+
          case Decl.Kind is
             when Ada_Package_Decl | Ada_Generic_Package_Decl |
               Ada_Package_Body_Stub |
@@ -788,33 +792,46 @@ package body Stub.Actions is
               Create (Tool.Project_Tree.all, +File_Name);
             Arg_File_Info : constant File_Info :=
               Info (Tool.Project_Tree.all, Arg_Virt_File);
+            Unit_Name : constant String := To_UTF8 (LC_Root_Node_Name);
+            --  Unit_Name is correct for both library units and Ada stubs
+            Part : constant Unit_Parts :=
+              (if Root_Node.Kind in Ada_Body_Stub then Unit_Separate
+               else Unit_Body);
+            --  ????Part is Unit_Separate in the case of Ada_Body_Stub,
+            --  but currently this causes File_From_Unit to return "".
          begin
-            --  ????Doesn't put it in the right directory.
-            --  Doesn't work for subunits.
-            return +GNATCOLL.Projects.File_From_Unit
+            pragma Assert
+              (Extending_Project (Project (Arg_File_Info)) = No_Project);
+            --  We don't want to modify extended projects
+
+            return Result : constant String :=
+              +GNATCOLL.Projects.File_From_Unit
                 (Project         => Project (Arg_File_Info),
-                 Unit_Name       => Unit_Name (Arg_File_Info),
-                 Part            => Unit_Body,
+                 Unit_Name       => Unit_Name,
+                 Part            => Part,
                  Language        => "Ada",
-                 File_Must_Exist => False);
+                 File_Must_Exist => False)
+            do
+               null;
+            end return;
          end Name_From_Project;
 
          --  If the output file is specified on the command line,
          --  use that. Otherwise, if there is a project file,
          --  use that. Otherwise use the default naming convention.
 
-         Simple : constant String := -- ???
+         Simple : constant String :=
            (if Arg (Cmd, Output) = null then
               (if Status (Tool.Project_Tree.all) = Empty
-                 then Default_Name
+                 then Simple_Name (Default_Name)
                  else Name_From_Project)
             else Arg (Cmd, Output).all);
+         pragma Assert (Simple_Name (Simple) = Simple);
       begin
          return Result : constant String :=
            (if Arg (Cmd, Output_Directory) = null
-              then Simple
-              else Compose (Arg (Cmd, Output_Directory).all,
-                            Simple_Name (Simple)))
+              then Compose (Containing_Directory (File_Name), Simple)
+              else Compose (Arg (Cmd, Output_Directory).all, Simple))
          do
             if Debug_Flag_C then
                Formatted_Output.Put ("writing \1?\n", Result);
