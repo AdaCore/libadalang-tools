@@ -10,6 +10,7 @@ with Interfaces; use type Interfaces.Unsigned_16;
 
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
+with Langkit_Support.Diagnostics;
 with Langkit_Support.Slocs; use Langkit_Support;
 with Libadalang;            use Libadalang;
 with Libadalang.Common;     use Libadalang.Common;
@@ -227,6 +228,13 @@ package body Stub.Actions is
    end Get_Pp_Cmd;
 
    Pp_Cmd : constant Command_Line := Get_Pp_Cmd;
+
+   function Overriding_String
+     (Overrides : Ada_Overriding_Node) return W_Str is
+      (case Overrides is
+         when Ada_Overriding_Not_Overriding => "not overriding ",
+         when Ada_Overriding_Overriding => "overriding ",
+         when Ada_Overriding_Unspecified => "");
 
    function Intersperse_Spaces (S : W_Str) return W_Str is
       use WChar_Vectors;
@@ -586,12 +594,7 @@ package body Stub.Actions is
                      Messages => Tool.Ignored_Messages);
                   pragma Assert (Is_Empty (Tool.Ignored_Messages));
                   Put ("\1 \2 is\n",
-                       (case Overrides is
-                          when Ada_Overriding_Not_Overriding =>
-                            "not overriding ",
-                          when Ada_Overriding_Overriding =>
-                            "overriding ",
-                          when Ada_Overriding_Unspecified => ""),
+                       Overriding_String (Overrides),
                        From_UTF8 -- ????wrong
                          (Elems (Pp_Out_Vec) (1 .. Last_Index (Pp_Out_Vec))));
                   Generate_Stub_Begin_End
@@ -617,25 +620,15 @@ package body Stub.Actions is
                         Out_Range => Tool.Ignored_Out_Range,
                         Messages => Tool.Ignored_Messages);
                      pragma Assert (Is_Empty (Tool.Ignored_Messages));
-                     Put ("\1entry \2(\3) when Standard.True is\n",
-                          (case Overrides is
-                             when Ada_Overriding_Not_Overriding =>
-                               "not overriding ",
-                             when Ada_Overriding_Overriding =>
-                               "overriding ",
-                             when Ada_Overriding_Unspecified => ""),
+                     Put ("\1entry \2 \3 when Standard.True is\n",
+                          Overriding_String (Overrides),
                           Name,
                           From_UTF8 -- ????wrong
                             (Elems (Pp_Out_Vec)
                                (1 .. Last_Index (Pp_Out_Vec))));
                   else
                      Put ("\1entry \2 when Standard.True is\n",
-                          (case Overrides is
-                             when Ada_Overriding_Not_Overriding =>
-                               "not overriding ",
-                             when Ada_Overriding_Overriding =>
-                               "overriding ",
-                             when Ada_Overriding_Unspecified => ""),
+                          Overriding_String (Overrides),
                           Name);
                   end if;
 
@@ -728,8 +721,19 @@ package body Stub.Actions is
            (Context, Filename => "????",
             Buffer => Out_Str);
       begin
-         pragma Assert (not Has_Diagnostics (Out_Unit));
+         if Has_Diagnostics (Out_Unit) then
+            if Assert_Enabled then
+               Text_IO.Put_Line ("Errors while parsing """ & Out_Str & """");
+               for D of Analysis.Diagnostics (Out_Unit) loop
+                  Text_IO.Put_Line
+                    (Langkit_Support.Diagnostics.To_Pretty_String (D));
+               end loop;
+            end if;
+
+            raise Program_Error;
+         end if;
          pragma Assert (not Root (Out_Unit).Is_Null);
+
          Pp.Actions.Format_Vector
            (Pp_Cmd,
             Input => Out_Vec,
