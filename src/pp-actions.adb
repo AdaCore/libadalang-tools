@@ -4078,7 +4078,8 @@ package body Pp.Actions is
 
          procedure Do_Params is
             Is_Function : constant Boolean :=
-              (if Parent_Tree.Kind in
+              (if Is_Nil (Parent_Tree)
+                 or else Parent_Tree.Kind in
                    Ada_Entry_Spec | Ada_Entry_Body |
                    Ada_Accept_Stmt | Ada_Accept_Stmt_With_Stmts
                  then False
