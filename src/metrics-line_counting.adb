@@ -23,6 +23,11 @@ package body METRICS.Line_Counting is
       X := X - By;
    end Dec;
 
+   function Last (Counts : Cumulative_Counts_Array) return Slocs.Line_Number is
+     (Slocs.Line_Number (Counts'Last - 1));
+   --  We want to return the index of the last real line, not that of the
+   --  sentinel at the end.
+
    function Line (TD : Token_Data_Type) return Line_Num is
    --  Return the line number on which the token appears
      (Line_Num (Sloc_Range (TD).Start_Line));
@@ -57,11 +62,10 @@ package body METRICS.Line_Counting is
       loop
          declare
             TD : constant Token_Data_Type := Data (Cur);
+            K : constant Token_Kind := Kind (TD);
             Cur_Line : constant Line_Num := Line (TD);
          begin
-            exit when Kind (TD) = Ada_Termination;
-
-            if Kind (TD) = Ada_Whitespace then
+            if K = Ada_Whitespace then
                goto Skip_Whitespace;
             end if;
 
@@ -76,11 +80,14 @@ package body METRICS.Line_Counting is
                   --  this line.
                end;
 
-               if Kind (TD) = Ada_Comment then
+               exit when K = Ada_Termination;
+
+               if K = Ada_Comment then
                   Inc (Last_Ptr (Result) (Lines_Eol_Comment));
                end if;
 
             else
+               pragma Assert (Cur_Line > Prev_Line);
                --  First token on this line
 
                --  Deal with blank lines, if any
@@ -90,12 +97,14 @@ package body METRICS.Line_Counting is
                   Inc (Last_Ptr (Result) (Lines_Blank));
                end loop;
 
+               exit when K = Ada_Termination;
+
                --  Append an entry for the next line, and increment as
                --  appropriate.
 
                Append (Result, Last_Element (Result));
 
-               if Kind (TD) = Ada_Comment then
+               if K = Ada_Comment then
                   Inc (Last_Ptr (Result) (Lines_Comment));
                else
                   Inc (Last_Ptr (Result) (Lines_Code));

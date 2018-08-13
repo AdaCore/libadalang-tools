@@ -2957,16 +2957,22 @@ package body METRICS.Actions is
          if Node = M.Node then
             declare
                use type Slocs.Line_Number;
+
+               --  At the file level, we want to include all the comments and
+               --  blank lines preceding and following the compilation unit.
+
                Start : constant Slocs.Line_Number :=
                  (if Kind (Node) = Ada_Compilation_Unit
                     then 1
                     else M.Sloc.Start_Line);
-               --  At the file level, we want to include all the comments and
-               --  blank lines preceding the compilation unit. We should also
-               --  include trailing lines, but we don't do that yet.
+
+               Stop : constant Slocs.Line_Number :=
+                 (if Kind (Node) = Ada_Compilation_Unit
+                    then Last (Cumulative)
+                    else M.Sloc.End_Line);
 
                Lines_Count : constant Metric_Nat :=
-                 Metric_Nat (M.Sloc.End_Line - Start + 1);
+                 Metric_Nat (Stop - Start + 1);
             begin
                pragma Assert (M.Vals (Lines) = 0);
                M.Vals (Lines) := Lines_Count;
@@ -2979,7 +2985,7 @@ package body METRICS.Actions is
                      Range_Count : Metric_Nat :=
                        Line_Range_Count
                          (Cumulative,
-                          First_Line => Start, Last_Line => M.Sloc.End_Line,
+                          First_Line => Start, Last_Line => Stop,
                           Metric => Metric);
                   begin
                      M.Vals (Metric) := Range_Count;

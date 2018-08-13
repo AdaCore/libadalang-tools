@@ -16,6 +16,7 @@ package METRICS.Line_Counting is
        Lines_Code | Lines_Comment | Lines_Eol_Comment | Lines_Blank;
 
    type Cumulative_Counts_Array (<>) is private;
+   function Last (Counts : Cumulative_Counts_Array) return Slocs.Line_Number;
 
    function Get_Cumulative_Counts
      (Unit : Analysis_Unit) return Cumulative_Counts_Array;
@@ -39,7 +40,7 @@ private
    --  printed in the right order. So we need to skip that one.
 
    type Line_Num is new Positive;
-   --  Use Slocs.Line_Number????
+   --  We'd like to use Slocs.Line_Number, but that is a modular type
    type Cumulative_Counts_Array is
      array (Line_Num range <>) of Cumulative_Counts;
 
