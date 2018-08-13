@@ -192,7 +192,7 @@ package METRICS.Command_Lines is
       Syntax_All,
       Complexity_All,
       Coupling_All,
-      XML_Config -- undocumented, --no-config suppresses <config> in XML
+      XML_Config -- undocumented, --no-xml-config suppresses <config> in XML
      );
    pragma Ordered (Metrics_Booleans);
    --  Otherwise, we get bogus warnings in Metrics.Actions.

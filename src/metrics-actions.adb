@@ -3691,8 +3691,6 @@ package body METRICS.Actions is
          With_Trivia : constant Children_Array := Children_With_Trivia (Node);
          B           : Boolean;
 
-         use type Lexer.Token_Kind;
-
       --  Start of processing for Gather_Metrics_And_Walk_Children
 
       begin
@@ -3706,9 +3704,13 @@ package body METRICS.Actions is
          end loop;
          for Trivium of With_Trivia loop
             if Trivium.Kind = Trivia then
-               pragma Assert
-                 (Kind (Data (Trivium.Trivia))
-                  in Lexer.Ada_Comment | Lexer.Ada_Whitespace);
+               declare
+                  use Lexer;
+                  K : constant Token_Kind := Kind (Data (Trivium.Trivia));
+               begin
+                  pragma Assert
+                    (K in Ada_Comment | Ada_Whitespace | Ada_Prep_Line);
+               end;
             end if;
          end loop;
 
