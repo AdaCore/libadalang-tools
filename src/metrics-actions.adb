@@ -2250,18 +2250,26 @@ package body METRICS.Actions is
 
       procedure Print_Computed_Metric
         (T : Template; Metric : Metrics_Enum; C_Metric : Computed_Metrics);
+      --  Print a "computed metric". Metric is the base metric, C_Metric is the
+      --  computed metric based on that.
+
       procedure Print_Computed_Metric
         (T : Template; Metric : Metrics_Enum; C_Metric : Computed_Metrics) is
       begin
          if Gen_Text (Cmd) and then Metrics_To_Compute (Metric) then
-            Put (T,
-                 Val_To_Print (Metric, Global_M.all, XML => False),
-                 Val_To_Print (C_Metric, Global_M.all, XML => False));
+            if Global_M.Vals (Metric) > 0 then
+               Put (T,
+                    Val_To_Print (Metric, Global_M.all, XML => False),
+                    Val_To_Print (C_Metric, Global_M.all, XML => False));
 
-            if Metric = Public_Types then
-               Put ("\n including");
-               Put ("\n    \1 private types",
-                    Val_To_Print (Private_Types, Global_M.all, XML => False));
+               if Metric = Public_Types then
+                  if Global_M.Vals (Private_Types) > 0 then
+                     Put ("\n including");
+                     Put ("\n    \1 private types",
+                          Val_To_Print
+                            (Private_Types, Global_M.all, XML => False));
+                  end if;
+               end if;
             end if;
          end if;
       end Print_Computed_Metric;
