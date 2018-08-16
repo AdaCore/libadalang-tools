@@ -715,7 +715,7 @@ package body Stub.Actions is
 
       procedure Format is
          Context : constant Analysis_Context :=
-           Create (Charset => Wide_Character_Encoding (Cmd));
+           Create_Context (Charset => Wide_Character_Encoding (Cmd));
          Out_Str : String renames Elems (Out_Vec) (1 .. Last_Index (Out_Vec));
          Out_Unit : constant Analysis_Unit := Get_From_Buffer
            (Context, Filename => "????",
@@ -743,8 +743,6 @@ package body Stub.Actions is
             Out_Range => Tool.Ignored_Out_Range,
             Messages => Tool.Ignored_Messages);
          pragma Assert (Is_Empty (Tool.Ignored_Messages));
-
-         Remove (Context, Filename => "????");
       end Format;
 
       function Get_Output_Name (Resolve_Links : Boolean) return String is

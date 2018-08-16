@@ -29,7 +29,6 @@ with GNAT.Byte_Order_Mark;
 with GNAT.Command_Line;
 with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 with GNAT.OS_Lib;
-with GNAT.Traceback.Symbolic;
 
 with Utils.Environment;
 with Utils.Formatted_Output;
@@ -352,9 +351,8 @@ package body Utils.Drivers is
                --  anyway if it's controlled by the command line).
 
                if Counter = Num_File_Names - 1 then
-                  Context := Create
-                    (Charset => Wide_Character_Encoding (Cmd),
-                     With_Trivia => True);
+                  Context := Create_Context
+                    (Charset => Wide_Character_Encoding (Cmd));
                end if;
 
                declare
@@ -387,21 +385,6 @@ package body Utils.Drivers is
                   end if;
                   Per_File_Action (Tool, Cmd, F_Name.all, Inp, BOM_Seen, Unit);
                   --  ???For now, catch exceptions and try to continue.
-                  begin
-                     Remove (Context, F_Name.all);
-                     --  ???This Remove might be an efficiency issue.
-                     --  We could try removing Remove here, but then
-                     --  it might eat up too much memory.
-                     --  The libadalang project is considering using
-                     --  a cache to solve both problems.
-                  exception
-                     when E : Constraint_Error =>
-                        Put_Line ("Remove raised Constraint_Error");
-                        Put_Line ("Traceback:");
-                        Put (GNAT.Traceback.Symbolic.Symbolic_Traceback (E));
-                        Put_Line ("End traceback");
-                        raise Name_Resolution_Failed;
-                  end;
                   Free (Input);
                end;
             exception
