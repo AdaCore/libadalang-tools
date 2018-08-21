@@ -293,18 +293,61 @@ package body Stub.Actions is
    end Less_Than;
 
    function Needs_Completion (N : Ada_Node) return Boolean is
-   begin
-      --  ???This is incomplete. It should return True for an incomplete type
-      --  in a private part, but only if the incomplete type is not completed
-      --  in the private part. For a package, it should return True only if
-      --  there is something in it that needs completion.
+      function Recurse (Decls : Ada_Node_List) return Boolean;
+      --  Recursively process a nested declaration list. This is used for a
+      --  package spec, which needs a completion if and only if there's
+      --  something in it that needs a completion.
 
+      function Recurse (Decls : Ada_Node_List) return Boolean is
+      begin
+         if not Decls.Is_Null then
+            for X in 1 .. Last_Child_Index (Decls) loop
+               declare
+                  Subtree : constant Ada_Node := Childx (Decls, X);
+               begin
+                  if Needs_Completion (Subtree)
+                    or else Subtree.Kind in Ada_Incomplete_Type_Decl |
+                                            Ada_Incomplete_Tagged_Type_Decl
+                  then
+                     return True;
+                  end if;
+               end;
+            end loop;
+         end if;
+
+         return False;
+      end Recurse;
+
+   --  Start of processing for Needs_Completion
+
+   begin
       case N.Kind is
-         when Ada_Package_Decl | Ada_Generic_Package_Decl => return True;
+         when Ada_Package_Decl | Ada_Generic_Package_Decl =>
+            declare
+               VP : constant Public_Part := Vis_Part (N);
+               PP : constant Private_Part := Priv_Part (N);
+            begin
+               return
+                 (not VP.Is_Null and then Recurse (F_Decls (VP)))
+                   or else
+                 (not PP.Is_Null and then Recurse (F_Decls (PP)));
+            end;
+
          when Ada_Single_Protected_Decl | Ada_Protected_Type_Decl |
            Ada_Single_Task_Decl | Ada_Task_Type_Decl => return True;
+
          when Ada_Entry_Decl => return True;
-         when Ada_Subp_Decl | Ada_Generic_Subp_Decl => return True;
+
+         when Ada_Subp_Decl =>
+            return not N.As_Basic_Subp_Decl.P_Is_Imported;
+
+         when Ada_Generic_Subp_Decl =>
+            return not N.As_Generic_Subp_Decl.P_Is_Imported;
+
+         when Ada_Incomplete_Type_Decl | Ada_Incomplete_Tagged_Type_Decl =>
+            return False;
+            --  Because these are handled specially in Walk
+
          when others => return False;
       end case;
    end Needs_Completion;
@@ -377,7 +420,7 @@ package body Stub.Actions is
       --  Generate code corresponding to Decl, and recursively walk subtrees.
       --
       --  Note on recursion: Generate calls Walk.  Walk calls Walk.  Walk calls
-      --  generate. In more detail: Generate is called on the compilation unit
+      --  Generate. In more detail: Generate is called on the compilation unit
       --  spec or body. In the case of a spec, Generate calls Walk on the spec,
       --  which calls Walk on nested specs, and generates a body for each one.
       --  In the case of a body, Generate calls Walk on the body, which calls
@@ -388,7 +431,7 @@ package body Stub.Actions is
       --  Generate the local header that appears before each body,
       --  unless the --no_local_header switch was given.
 
-      procedure Generate_Subunit_Start;
+      procedure Generate_Subunit_Start (Level : Natural);
       --  If we are processing a subunit, generate "separate (parent)".
 
       procedure Generate_Stub_Begin_End (Name, Stub_Kind : W_Str);
@@ -487,9 +530,9 @@ package body Stub.Actions is
          end if;
       end Generate_Local_Header;
 
-      procedure Generate_Subunit_Start is
+      procedure Generate_Subunit_Start (Level : Natural) is
       begin
-         if not Parent_Body_Of_Subunit.Is_Null then
+         if Level = 0 and then not Parent_Body_Of_Subunit.Is_Null then
             Put ("separate (\1)\n", Parent_Name);
          end if;
       end Generate_Subunit_Start;
@@ -516,13 +559,17 @@ package body Stub.Actions is
       end Generate_Stub_Begin_End;
 
       procedure Walk (Decl : Ada_Node; Level : Natural) is
-         Local_Decls : Ada_Node_Vector;
+         Local_Decls, Incomplete_Types : Ada_Node_Vector;
          Name : constant W_Str := Full_Name (Get_Def_Name (Decl).As_Name);
          use Ada_Node_Vectors;
 
          procedure Collect_Local_Decls (Decls : Ada_Node_List);
          --  Append all the declarations that need recursive processing onto
          --  Local_Decls.
+
+         procedure Collect_Incomplete_Types (Decls : Ada_Node_List);
+         --  Append all the incomplete type declarations in a private part that
+         --  are not completed in the same private part onto Incomplete_Types.
 
          procedure Collect_Local_Decls (Decls : Ada_Node_List) is
          begin
@@ -542,6 +589,33 @@ package body Stub.Actions is
             end loop;
          end Collect_Local_Decls;
 
+         procedure Collect_Incomplete_Types (Decls : Ada_Node_List) is
+         begin
+            for X in 1 .. Last_Child_Index (Decls) loop
+               declare
+                  Subtree : constant Ada_Node := Childx (Decls, X);
+               begin
+                  if Subtree.Kind in Ada_Incomplete_Type_Decl |
+                    Ada_Incomplete_Tagged_Type_Decl
+                  then
+                     declare
+                        Next_Part : constant Base_Type_Decl :=
+                          Subtree.As_Base_Type_Decl.P_Next_Part;
+                     begin
+                        if Next_Part.Is_Null
+                          or else Next_Part = Subtree
+                        then
+                           --  ???Not sure why P_Next_Part sometimes returns
+                           --  "self".
+
+                           Append (Incomplete_Types, Subtree);
+                        end if;
+                     end;
+                  end if;
+               end;
+            end loop;
+         end Collect_Incomplete_Types;
+
       --  Start of processing for Walk
 
       begin
@@ -557,23 +631,23 @@ package body Stub.Actions is
             when Ada_Package_Decl | Ada_Generic_Package_Decl |
               Ada_Package_Body_Stub =>
                Generate_Local_Header (Name, Level);
-               Generate_Subunit_Start;
+               Generate_Subunit_Start (Level);
                Put ("package body \1 is\n", Name);
             when Ada_Single_Protected_Decl | Ada_Protected_Type_Decl |
               Ada_Protected_Body_Stub =>
                Generate_Local_Header (Name, Level);
-               Generate_Subunit_Start;
+               Generate_Subunit_Start (Level);
                Put ("protected body \1 is\n", Name);
             when Ada_Single_Task_Decl | Ada_Task_Type_Decl |
               Ada_Task_Body_Stub =>
                Generate_Local_Header (Name, Level);
-               Generate_Subunit_Start;
+               Generate_Subunit_Start (Level);
                Put ("task body \1 is\n", Name);
                Generate_Stub_Begin_End (Name, "task");
 
             when Ada_Subp_Decl | Ada_Generic_Subp_Decl | Ada_Subp_Body_Stub =>
                Generate_Local_Header (Name, Level);
-               Generate_Subunit_Start;
+               Generate_Subunit_Start (Level);
                declare
                   Empty_Vec, Pp_Out_Vec : Char_Vector;
                   Spec : constant Subp_Spec := Get_Subp_Spec (Decl);
@@ -637,6 +711,7 @@ package body Stub.Actions is
 
             when Ada_Subp_Body | Ada_Package_Body | Ada_Task_Body |
               Ada_Protected_Body => null;
+
             when others => raise Program_Error;
          end case;
 
@@ -659,13 +734,26 @@ package body Stub.Actions is
                Collect_Local_Decls (F_Decls (Body_Decls (Decl)));
 
             when Ada_Package_Body_Stub | Ada_Protected_Body_Stub =>
-               null; -- ????We should find the corresponding spec,
-               --  and walk the decls therein.
+               --  Find the corresponding spec, and walk the decls therein
+
+               declare
+                  Spec : constant Basic_Decl :=
+                    P_Previous_Part (Decl.As_Body_Node);
+               begin
+                  if not Vis_Part (Spec).Is_Null then
+                     Collect_Local_Decls (F_Decls (Vis_Part (Spec)));
+                  end if;
+
+                  if not Priv_Part (Spec).Is_Null then
+                     Collect_Local_Decls (F_Decls (Priv_Part (Spec)));
+                  end if;
+               end;
 
             when Ada_Subp_Decl | Ada_Generic_Subp_Decl |
               Ada_Single_Task_Decl | Ada_Task_Type_Decl |
               Ada_Entry_Decl |
-              Ada_Task_Body_Stub | Ada_Subp_Body_Stub => null;
+              Ada_Task_Body_Stub | Ada_Subp_Body_Stub =>
+               null;
 
             when others => raise Program_Error;
          end case;
@@ -677,12 +765,36 @@ package body Stub.Actions is
             Sorting.Sort (Local_Decls);
          end if;
 
+         --  For an incomplete type in a private part that has no completion in
+         --  the same private part, generate a completion in the package body.
+         --  We do this separately from the normal walk, because we want the
+         --  full type declarations to come first, before procedure bodies and
+         --  whatnot.
+
+         case Decl.Kind is
+            when Ada_Package_Decl | Ada_Generic_Package_Decl =>
+               if not Priv_Part (Decl).Is_Null then
+                  Collect_Incomplete_Types (F_Decls (Priv_Part (Decl)));
+
+                  for Child of Incomplete_Types loop
+                     Put ("\ntype \1 is\2 null record;\n",
+                          Full_Name (Get_Def_Name (Child).As_Name),
+                          (if Child.Kind = Ada_Incomplete_Type_Decl then ""
+                          else " tagged"));
+                  end loop;
+               end if;
+
+            when others => null;
+         end case;
+
          --  Recursively process the nested declarations. In the case of Ada
          --  stubs, we call Generate, because the corrsponding subunit goes in
          --  a separate file, and Generate knows how to create files.
 
          for Child of Local_Decls loop
-            if Looking_For_Ada_Stubs then
+            if Looking_For_Ada_Stubs and
+              Decl.Kind not in Ada_Package_Body_Stub | Ada_Protected_Body_Stub
+            then
                pragma Assert (Child.Kind in Ada_Body_Stub);
                Generate (Tool, Cmd, File_Name, Input, BOM_Seen,
                          Root_Node => Child,
@@ -708,7 +820,8 @@ package body Stub.Actions is
               Ada_Task_Body_Stub |
               Ada_Entry_Decl |
               Ada_Subp_Body | Ada_Package_Body | Ada_Task_Body |
-              Ada_Protected_Body => null;
+              Ada_Protected_Body =>
+               null;
             when others => raise Program_Error;
          end case;
       end Walk;
@@ -964,6 +1077,14 @@ package body Stub.Actions is
             if Arg (Cmd, Subunits) then
                Cmd_Error ("argument unit cannot have subunits");
             end if;
+
+            if not Needs_Completion (Root_Node) then
+               Cmd_Error_No_Help
+                 ("Compilation unit " &
+                    To_UTF8 (Full_Name (Get_Def_Name (Root_Node).As_Name)) &
+                    " does not require a body");
+            end if;
+
          when Ada_Body_Node =>
             if not Arg (Cmd, Subunits) then
                declare
