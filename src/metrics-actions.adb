@@ -9,6 +9,9 @@ with Unchecked_Deallocation;
 
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
+with GNATCOLL.VFS;
+with GNATCOLL.Projects;
+
 with Libadalang;     use Libadalang;
 with Libadalang.Lexer;
 with LAL_Extensions; use LAL_Extensions;
@@ -21,11 +24,6 @@ with Utils.Tool_Names;
 
 with Utils_Debug; use Utils_Debug;
 with Utils.Predefined_Symbols; use Utils.Predefined_Symbols;
-
-pragma Warnings (Off);
-with Utils.Projects;
-with Utils.Drivers;
-pragma Warnings (On);
 
 package body METRICS.Actions is
 
@@ -439,7 +437,8 @@ package body METRICS.Actions is
      (Cmd : Command_Line;
       XML_File : in out Text_IO.File_Type;
       File_M : Metrix;
-      Metrics_To_Compute : Metrics_Set);
+      Metrics_To_Compute : Metrics_Set;
+      Object_Dir : String);
    --  Print out the metrics for this file, and for all units
    --  within it.
 
@@ -929,7 +928,9 @@ package body METRICS.Actions is
          when Private_Types =>
             return Depth = 3 and then M.Vals (Metric) > 0;
          when Public_Subprograms =>
-            if Depth = 3 and then M.Is_Private_Lib_Unit then
+            if Depth = 3
+              and then (M.Is_Private_Lib_Unit or else M.LI_Sub = Subunit_Sym)
+            then
                pragma Assert (M.Vals (Metric) = 0);
                return False;
             end if;
@@ -1013,10 +1014,6 @@ package body METRICS.Actions is
       if not Implemented (Metric) then
          pragma Assert (M.Vals (Metric) = Initial_Metrics_Values (Metric));
          return "nyi";
-      end if;
-
-      if M.Vals (Metric) = Metric_Nat'Last then
-         return "unknown";
       end if;
 
       if (Metric in Complexity_Metrics
@@ -1624,7 +1621,8 @@ package body METRICS.Actions is
      (Cmd : Command_Line;
       XML_File : in out Text_IO.File_Type;
       File_M : Metrix;
-      Metrics_To_Compute : Metrics_Set)
+      Metrics_To_Compute : Metrics_Set;
+      Object_Dir : String)
    is
       Suffix : constant String :=
         (if Arg (Cmd, Output_Suffix) = null
@@ -1634,11 +1632,13 @@ package body METRICS.Actions is
       Text : File_Type;
       File_Name : String renames File_M.Source_File_Name.all;
       Text_File_Name : constant String :=
-        (if Arg (Cmd, Output_Directory) = null
-           then File_Name & Suffix
+        (if Arg (Cmd, Output_Directory) = null then
+          (if Object_Dir = "" then File_Name & Suffix
            else Directories.Compose
-             (Arg (Cmd, Output_Directory).all,
-              Directories.Simple_Name (File_Name) & Suffix));
+             (Object_Dir, Directories.Simple_Name (File_Name) & Suffix))
+         else Directories.Compose
+           (Arg (Cmd, Output_Directory).all,
+            Directories.Simple_Name (File_Name) & Suffix));
       --  Can't pass Suffix as Extension, because that inserts an extra "."
    begin
       if Text_File_Name = File_Name then
@@ -2076,29 +2076,24 @@ package body METRICS.Actions is
                declare
                   Dep : constant Metrix_Ref :=
                     Specs (Same_Ignoring_Case (Sym));
+                  pragma Assert (Dep /= null);
+                  --  It can't be null, because we removed nonexistent units
                begin
-                  if Dep /= null then
-                     --  ???It shouldn't be null, because we removed
-                     --  nonexistent units. But Set_CU_Metrix doesn't work
-                     --  right for subprogram bodies yet.
+                  --  Compute *_Coupling_Out From this unit To what it depends
+                  --  on:
 
-                     --  Compute *_Coupling_Out From this unit To what it
-                     --  depends on:
+                  Do_Edge (Tagged_Coupling_Out, S, Dep);
+                  Do_Edge (Hierarchy_Coupling_Out, S, Dep);
+                  Do_Edge (Control_Coupling_Out, S, Dep);
+                  Do_Edge (Unit_Coupling_Out, S, Dep);
 
-                     Do_Edge (Tagged_Coupling_Out, S, Dep);
-                     Do_Edge (Hierarchy_Coupling_Out, S, Dep);
-                     Do_Edge (Control_Coupling_Out, S, Dep);
-                     Do_Edge (Unit_Coupling_Out, S, Dep);
+                  --  Compute *_Coupling_In To this unit From what it depends
+                  --  on (noting that To and From are reversed from the above):
 
-                     --  Compute *_Coupling_In To this unit From what it
-                     --  depends on (noting that To and From are reversed from
-                     --  the above):
-
-                     Do_Edge (Tagged_Coupling_In, Dep, S);
-                     Do_Edge (Hierarchy_Coupling_In, Dep, S);
-                     Do_Edge (Control_Coupling_In, Dep, S);
-                     Do_Edge (Unit_Coupling_In, Dep, S);
-                  end if;
+                  Do_Edge (Tagged_Coupling_In, Dep, S);
+                  Do_Edge (Hierarchy_Coupling_In, Dep, S);
+                  Do_Edge (Control_Coupling_In, Dep, S);
+                  Do_Edge (Unit_Coupling_In, Dep, S);
                end;
             end loop;
          end if;
@@ -2214,14 +2209,36 @@ package body METRICS.Actions is
       --  switch was given. By default, this information is sent to standard
       --  output.
 
+      function Get_Object_Dir return String;
+      --  Name of the Object_Dir specified in the project file, if any
+
+      function Get_Object_Dir return String is
+         use GNATCOLL.Projects, GNATCOLL.VFS;
+      begin
+         if Status (Tool.Project_Tree.all) = Empty then
+            return "";
+         else
+            declare
+               Prj : constant Project_Type := Tool.Project_Tree.Root_Project;
+               Name : constant Filesystem_String :=
+                 Full_Name (Object_Dir (Prj));
+            begin
+               return String (Name);
+            end;
+         end if;
+      end Get_Object_Dir;
+
+      Object_Dir : constant String := Get_Object_Dir;
+
+      Xml_Simple_Name : constant String :=
+        (if Arg (Cmd, Xml_File_Name) = null
+           then "metrix.xml"
+           else Arg (Cmd, Xml_File_Name).all);
+      --  ASIS-based gnatmetric ignores Output_Dir for the xml.
+
       Xml_F_Name : constant String :=
-        (if Arg (Cmd, Xml_File_Name) /= null
-           then Arg (Cmd, Xml_File_Name).all
-           else
-             (if Arg (Cmd, Xml_File_Name) = null
-                then "metrix.xml"
-                else Arg (Cmd, Xml_File_Name).all));
-      --  Gnatmetric ignores Output_Dir for the xml.
+        (if Object_Dir = "" then Xml_Simple_Name
+         else Directories.Compose (Object_Dir, Xml_Simple_Name));
 
       XML_File : Text_IO.File_Type;
       --  All XML output for all source files goes to this file.
@@ -2294,7 +2311,6 @@ package body METRICS.Actions is
       Compute_Coupling (Tool, Global_M.all);
 
       if Gen_XML (Cmd) then
-
          --  Generate schema (XSD file), if requested
 
          if Arg (Cmd, Generate_XML_Schema) then
@@ -2328,7 +2344,7 @@ package body METRICS.Actions is
       for File_M of Global_M.Submetrix loop
          pragma Assert (Debug_Flag_V or else Indentation = 0);
          Print_File_Metrics
-           (Cmd, XML_File, File_M.all, Without_Coupling);
+           (Cmd, XML_File, File_M.all, Without_Coupling, Object_Dir);
          pragma Assert (Debug_Flag_V or else Indentation = 0);
 --         Destroy (File_M);
       end loop;
@@ -3326,14 +3342,15 @@ package body METRICS.Actions is
                   Inc_All (Public_Subprograms);
                end if;
 
-               --  Ada_Subp_Body should be counted only if there is no
-               --  corresponding spec. Here we increment by an obviously-wrong
-               --  value, so it stands out. ???
+               --  A library subprogram body should be counted only if there is
+               --  no corresponding spec.
 
                if Last_Index (Metrix_Stack) = 3
+                 and then not Unit_Is_Subunit (Node)
                  and then M.Kind = Ada_Subp_Body
+                 and then P_Decl_Part (Node.As_Body_Node).Is_Null
                then
-                  Inc_All (Public_Subprograms, By => Metric_Nat'Last);
+                  Inc_All (Public_Subprograms);
                end if;
             end if;
          end if;
@@ -3524,7 +3541,10 @@ package body METRICS.Actions is
                     Node.As_With_Clause.F_Packages;
                begin
                   for I in 1 .. Children_Count (Names) loop
-                     if Node.As_With_Clause.F_Has_Limited then
+                     if True and then Node.As_With_Clause.F_Has_Limited then
+                        --  ???Apparently, limited with's are not transitive
+                        --  for tagged coupling, but are transitive for unit
+                        --  coupling.
                         Include
                           (File_M.Limited_Depends_On,
                            W_Intern (Full_Name (Childx (Names, I).As_Name)));

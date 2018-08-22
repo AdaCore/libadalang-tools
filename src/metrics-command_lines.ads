@@ -33,28 +33,6 @@ package METRICS.Command_Lines is
    type Metrics_Flags is
      (Test,
 
-   --  Old metric control options, are kept for upward compatibility
-   --  reasons (as non-documented feature)
-   --  These really should be shorthands, but that doesn't work???
-      La_Switch,
-      Lcode_Switch,
-      Lcomm_Switch,
-      Leol_Switch,
-      Lb_Switch,
-      Lratio_Switch,
-      Lav_Switch,
-      Enu_Switch,
-      Es_Switch,
-      Ed_Switch,
-      Eps_Switch,
-      Eas_Switch,
-      Ept_Switch,
-      Eat_Switch,
-      Ec_Switch,
-      Nocc_Switch,
-      Noec_Switch,
-      Nonl_Switch,
-
       No_Treat_Exit_As_Goto, -- Option for Complexity_Essential
       No_Local_Metrics,
 
@@ -72,25 +50,6 @@ package METRICS.Command_Lines is
 
    package Metrics_Flag_Shorthands is new Metrics_Flag_Switches.Set_Shorthands
      ((Test => null,
-
-       La_Switch     => +"-la",
-       Lcode_Switch  => +"-lcode",
-       Lcomm_Switch  => +"-lcomm",
-       Leol_Switch   => +"-leol",
-       Lb_Switch     => +"-lb",
-       Lratio_Switch => +"-lratio",
-       Lav_Switch    => +"-lav",
-       Enu_Switch    => +"-enu",
-       Es_Switch     => +"-es",
-       Ed_Switch     => +"-ed",
-       Eps_Switch    => +"-eps",
-       Eas_Switch    => +"-eas",
-       Ept_Switch    => +"-ept",
-       Eat_Switch    => +"-eat",
-       Ec_Switch     => +"-ec",
-       Nocc_Switch   => +"-nocc",
-       Noec_Switch   => +"-noec",
-       Nonl_Switch   => +"-nonl",
 
        No_Treat_Exit_As_Goto => +"-ne",
        No_Local_Metrics      => +"-nolocal",
@@ -231,33 +190,38 @@ package METRICS.Command_Lines is
      (Descriptor,
       Metrics_Booleans);
 
-   --  Old coupling metric control options, kept for upward
-   --  compatibility reasons (as non_documented feature):
-
    package Metrics_Boolean_Shorthands is new Metrics_Boolean_Switches
      .Set_Shorthands
-   --  Old metric control options, are kept for upward compatibility
-   --  reasons (as non-documented feature)
---       ((Lines              => +"-la",
---         Lines_Code         => +"-lcode",
---         Lines_Comment      => +"-lcomm",
---         Lines_Eol_Comment  => +"-leol",
---         Lines_Ratio        => +"-lratio",
---         Lines_Blank        => +"-lb",
---         Lines_Average      => +"-lav",
---         Unit_Nesting       => +"-enu",
---         Statements         => +"-es",
---         Declarations       => +"-ed",
---         Public_Subprograms => +"-eps",
---         All_Subprograms    => +"-eas",
---         Public_Types       => +"-ept",
---         All_Types          => +"-eat",
---         Construct_Nesting  => +"-ec",
---  Above are commented out, because these shorthands do not have exactly the
---  same semantics as the long forms. For example, -lratio seems to turn on
---  --complexity-average, whereas --lines-ratio does not.
+   --  Old metric control options are kept for upward compatibility reasons
+   --  (as an undocumented feature). In the old ASIS-based version, these
+   --  shorthands do not have exactly the same semantics as the long forms. For
+   --  example, -lratio seems to turn on --complexity-average, whereas
+   --  --lines-ratio does not. We don't need the complexity of those
+   --  variations.
+   --
+   --  The old version also had -nocc (turns off Complexity_Cyclomatic), -noec
+   --  (turns off Complexity_Essential), and -nonl (turns off Loop_Nesting).
+   --  We no longer support those.
+     ((Lines              => +"-la",
+       Lines_Code         => +"-lcode",
+       Lines_Comment      => +"-lcomm",
+       Lines_Eol_Comment  => +"-leol",
+       Lines_Ratio        => +"-lratio",
+       Lines_Blank        => +"-lb",
+       Lines_Average      => +"-lav",
+       Unit_Nesting       => +"-enu",
+       Statements         => +"-es",
+       Declarations       => +"-ed",
+       Public_Subprograms => +"-eps",
+       All_Subprograms    => +"-eas",
+       Public_Types       => +"-ept",
+       All_Types          => +"-eat",
+       Construct_Nesting  => +"-ec",
 
-     ((Tagged_Coupling_Out    => +"--package-efferent-coupling",
+       --  Old coupling metric control options, kept for upward
+       --  compatibility reasons (as an undocumented feature):
+
+       Tagged_Coupling_Out    => +"--package-efferent-coupling",
        Tagged_Coupling_In     => +"--package-afferent-coupling",
        Hierarchy_Coupling_Out => +"--category-efferent-coupling",
        Hierarchy_Coupling_In  => +"--category-afferent-coupling",

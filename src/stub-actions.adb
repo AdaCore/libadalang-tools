@@ -323,6 +323,8 @@ package body Stub.Actions is
    begin
       case N.Kind is
          when Ada_Package_Decl | Ada_Generic_Package_Decl =>
+            --  ???Return True if the package has Elaborate_Body
+
             declare
                VP : constant Public_Part := Vis_Part (N);
                PP : constant Private_Part := Priv_Part (N);
