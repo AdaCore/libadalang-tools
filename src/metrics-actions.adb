@@ -13,7 +13,6 @@ with GNATCOLL.VFS;
 with GNATCOLL.Projects;
 
 with Libadalang;     use Libadalang;
-with Libadalang.Lexer;
 with LAL_Extensions; use LAL_Extensions;
 
 with Utils.Command_Lines.Common; use Utils; use Utils.Command_Lines.Common;
@@ -3733,7 +3732,6 @@ package body METRICS.Actions is
          for Trivium of With_Trivia loop
             if Trivium.Kind = Trivia then
                declare
-                  use Lexer;
                   K : constant Token_Kind := Kind (Data (Trivium.Trivia));
                begin
                   pragma Assert

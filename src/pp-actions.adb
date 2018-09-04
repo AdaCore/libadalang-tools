@@ -1592,7 +1592,8 @@ package body Pp.Actions is
            (Str : Str_Template_Ptr) return Tok_Template;
          --  Compile a Str_Template into a Tok_Template
          function Compile_Tokens
-           (Cur : in out Tokn_Cursor; Stop : Token_Kind) return Tok_Template;
+           (Cur  : in out Tokn_Cursor;
+            Stop : Scanner.Token_Kind) return Tok_Template;
          --  Compile, starting at Cur, stopping when we see Stop. This is
          --  called by Compile_To_Instructions with Stop = End_Of_Input,
          --  and recursively by Parse_Instruction for '?' (Opt_Subtree_Or_List)
@@ -1762,7 +1763,8 @@ package body Pp.Actions is
          end Parse_Instruction;
 
          function Compile_Tokens
-           (Cur : in out Tokn_Cursor; Stop : Token_Kind) return Tok_Template
+           (Cur  : in out Tokn_Cursor;
+            Stop : Scanner.Token_Kind) return Tok_Template
          is
             Instructions : Instr_Vector;
             use Instr_Vectors;
@@ -3268,7 +3270,7 @@ package body Pp.Actions is
                      if Label_Seen and then Inst.T_Kind = ';' then
                         Label_Seen := False;
                      else
-                        case Token_Kind'(Inst.T_Kind) is
+                        case Scanner.Token_Kind'(Inst.T_Kind) is
                            when Same_Text_Kind =>
                               Append_And_Put (New_Tokns, Inst.T_Kind);
                            when Stored_Text_Kind =>

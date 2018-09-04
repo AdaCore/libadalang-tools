@@ -1,6 +1,5 @@
-with Libadalang; use Libadalang;
-with Libadalang.Common;   use Libadalang.Common;
-with Libadalang.Lexer;    use Libadalang.Lexer;
+with Libadalang;        use Libadalang;
+with Libadalang.Common; use Libadalang.Common;
 
 with Utils.Vectors;
 package body METRICS.Line_Counting is
