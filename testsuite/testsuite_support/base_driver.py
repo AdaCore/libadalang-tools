@@ -1,3 +1,4 @@
+import difflib
 import os
 import os.path
 
@@ -208,9 +209,39 @@ class BaseDriver(TestDriver):
     # Analysis helpers
     #
 
-    # Do a case insensitive diff, because gnatpp does not yet generate the
-    # correct case of identifiers. ???When that is fixed, change this.
     def analyze(self):
-        self.analyze_diff(
-            expected=self.result.expected_output.lower(),
-            actual=self.result.actual_output.lower())
+
+        def compared_lines(text):
+            """
+            Turn `text`, a multiline string, into a list of lines, LF
+            characters not included and with the optional trailing CR character
+            stripped.
+
+            :type text: str
+            :rtype: list[str]
+            """
+            # Don't use .rstrip so that only one CR is removed (if any)
+            return [l[:-1] if l and l[-1] == '\r' else l
+                    for l in text.split('\n')]
+
+        if self.global_env['options'].strict_diff:
+            # Rely directly on difflib rather than GNATpython's diff facilities
+            # in order to test as much as possible all formatting aspects in
+            # test outputs. Remember that testing covers a pretty-printer, so
+            # performing strict comparisons is important.
+            diff = list(difflib.unified_diff(
+                a=compared_lines(self.result.expected_output),
+                b=compared_lines(self.result.actual_output),
+                fromfile='expected', tofile='output', lineterm=''))
+            if diff:
+                self.result.diff = '\n'.join(diff)
+                self.result.set_status('FAILED', 'output diff')
+            else:
+                self.result.set_status('PASSED')
+        else:
+            # Do a case insensitive diff, because gnatpp does not yet generate
+            # the correct case of identifiers. ???When that is fixed, change
+            # this.
+            self.analyze_diff(
+                expected=self.result.expected_output.lower(),
+                actual=self.result.actual_output.lower())

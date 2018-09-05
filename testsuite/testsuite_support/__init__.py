@@ -12,3 +12,8 @@ class Testsuite(BaseTestsuite):
         'python_script': PythonScriptDriver,
         'shell_script': ShellScriptDriver,
     }
+
+    def add_options(self):
+        self.main.add_option(
+            '--strict-diff', action='store_true',
+            help='Use strict diff algorithm to check testcase outputs')
