@@ -224,14 +224,24 @@ class BaseDriver(TestDriver):
             return [l[:-1] if l and l[-1] == '\r' else l
                     for l in text.split('\n')]
 
-        if self.global_env['options'].strict_diff:
+        def maybe_lower(text):
+            """
+            Depending on testsuite run settings, return `text` itself or
+            lower-case it.
+            """
+            return (text if self.global_env['options'].strict_casing_diff else
+                    text.lower())
+
+        expected = maybe_lower(self.result.expected_output)
+        actual = maybe_lower(self.result.actual_output)
+
+        if self.global_env['options'].strict_whitespace_diff:
             # Rely directly on difflib rather than GNATpython's diff facilities
             # in order to test as much as possible all formatting aspects in
             # test outputs. Remember that testing covers a pretty-printer, so
             # performing strict comparisons is important.
             diff = list(difflib.unified_diff(
-                a=compared_lines(self.result.expected_output),
-                b=compared_lines(self.result.actual_output),
+                a=compared_lines(expected), b=compared_lines(actual),
                 fromfile='expected', tofile='output', lineterm=''))
             if diff:
                 self.result.diff = '\n'.join(diff)
@@ -242,6 +252,4 @@ class BaseDriver(TestDriver):
             # Do a case insensitive diff, because gnatpp does not yet generate
             # the correct case of identifiers. ???When that is fixed, change
             # this.
-            self.analyze_diff(
-                expected=self.result.expected_output.lower(),
-                actual=self.result.actual_output.lower())
+            self.analyze_diff(expected=expected, actual=actual)

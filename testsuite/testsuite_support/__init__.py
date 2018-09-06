@@ -15,5 +15,8 @@ class Testsuite(BaseTestsuite):
 
     def add_options(self):
         self.main.add_option(
-            '--strict-diff', action='store_true',
-            help='Use strict diff algorithm to check testcase outputs')
+            '--strict-casing-diff', action='store_true',
+            help='Check casing in testcase outputs')
+        self.main.add_option(
+            '--strict-whitespace-diff', action='store_true',
+            help='Strictly check whitespaces in testcase outputs')
