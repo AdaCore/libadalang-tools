@@ -216,14 +216,16 @@ private
                   --  This is because coupling metrics treat a spec along with
                   --  its body and subunits as a single entity.
                   --
-                  --  We're working with names here, because we don't have
-                  --  semantic information. We use a set so that redundancies
-                  --  don't count (e.g. "with X; with X;" should count as
-                  --  depending on X (once)).
+                  --  We're working with names here, because this was written
+                  --  before libadalang supported semantic information. This
+                  --  works because library unit names are unique. We use a set
+                  --  so that redundancies don't count (e.g. "with X; with X;"
+                  --  should count as depending on X (once)).
                   --
                   --  "limited with" clauses are treated separately
                   --  (Limited_Depends_On), because those are counted as just 1
                   --  dependence (not followed to find indirect dependencies).
+                  --  ???No longer true.
 
                   Has_Tagged_Type, Has_Subprogram : Boolean := False;
                   --  True if this is a unit containing a tagged type or a

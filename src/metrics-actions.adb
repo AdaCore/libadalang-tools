@@ -96,9 +96,9 @@ package body METRICS.Actions is
       --  statement or in an exception handler.
 
       Tagged_Coupling_Out    => True,
-      Hierarchy_Coupling_Out => False, ---------------- (needs semantic info)
+      Hierarchy_Coupling_Out => True, -- partial (needs semantic info)
       Tagged_Coupling_In     => True,
-      Hierarchy_Coupling_In  => False, ---------------- (needs semantic info)
+      Hierarchy_Coupling_In  => True, -- partial (needs semantic info)
       --  For hierarchy coupling, we need to know whether a package
       --  instantiation contains tagged types, so we need to find the generic
       --  package. We also need to find parent packages.
@@ -1857,8 +1857,9 @@ package body METRICS.Actions is
 
    procedure Compute_Indirect_Dependencies (Global_M : Metrix) with
      Pre => Global_M.Kind = Null_Kind;
-   --  Depends_On contains direct dependencies. This computes the indirect
-   --  dependencies for all compilation units by walking the dependency graph.
+   --  Depends_On contains direct dependencies (as computed by
+   --  Gather_Dependencies). This computes the indirect dependencies
+   --  for all compilation units by walking the dependency graph.
 
    procedure Compute_Coupling
      (Tool : in out Metrics_Tool; Global_M : Metrix);
@@ -2012,6 +2013,27 @@ package body METRICS.Actions is
       --  If the Metric is Coupling_In, then To depends on From.
       --  Thus, the metric is always recorded in the Outer_Unit of From.
 
+      --  The ASIS-based version computes Hierarchy_Coupling as follows:
+      --
+      --  Crown in computed for each unit. This is the set of leaf descendants
+      --  of this unit. Crown is a local variable. (Better: in
+      --  Gather_Dependencies, if we see a leaf unit, add it Crown(?name) of
+      --  each ancestor.)
+      --
+      --  Crown is used only for Hierarchy_Coupling_Out. Loop through Crown,
+      --  Union its OO_Supporters into Category_Supporters (local var). Remove
+      --  descendents of the unit (including itself) from Category_Supporters.
+      --  Hierarchy_Coupling_Out is then Length (Category_Supporters).
+      --
+      --  Length(OO_Supporters) = Tagged_Coupling_Out!
+      --  OO_Dependents is the reverse of OO_Supporters.
+      --
+      --  For Hierarchy_Coupling_In, loop through the unit's descendents
+      --  (including itself), and union its OO_Dependents into
+      --  Category_Dependents (local var).  Remove descendents of the unit
+      --  (including itself) from Category_Dependents.  Hierarchy_Coupling_Out
+      --  is then Length (Category_Dependents).
+
       procedure Do_Edge (Metric : Coupling_Metrics; From, To : Metrix_Ref) is
          Outer_Unit : Metrix renames Element (From.Submetrix, 1).all;
          --  Outer_Unit is the outermost package spec, procedure spec, etc.
@@ -2022,9 +2044,7 @@ package body METRICS.Actions is
                   Inc (Outer_Unit.Vals (Metric));
                end if;
             when Hierarchy_Coupling_Out | Hierarchy_Coupling_In =>
-               if False and -- ???
-                 From.Has_Tagged_Type and To.Has_Tagged_Type
-               then
+               if From.Has_Tagged_Type and To.Has_Tagged_Type then
                   Inc (Outer_Unit.Vals (Metric));
                end if;
             when Control_Coupling_Out | Control_Coupling_In =>
@@ -3540,7 +3560,7 @@ package body METRICS.Actions is
                     Node.As_With_Clause.F_Packages;
                begin
                   for I in 1 .. Children_Count (Names) loop
-                     if True and then Node.As_With_Clause.F_Has_Limited then
+                     if False and then Node.As_With_Clause.F_Has_Limited then
                         --  ???Apparently, limited with's are not transitive
                         --  for tagged coupling, but are transitive for unit
                         --  coupling.
