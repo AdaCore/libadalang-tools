@@ -309,6 +309,7 @@ package Pp.Command_Lines is
      (Max_Line_Length,
       Indentation,
       Indent_Continuation,
+      Initial_Indentation, -- Not documented; used by gnatstub
       Decimal_Grouping,
       Based_Grouping,
       Call_Threshold,
@@ -326,6 +327,7 @@ package Pp.Command_Lines is
      ((Max_Line_Length => '!',
        Indentation => '!',
        Indent_Continuation => '!',
+       Initial_Indentation => '=',
        Decimal_Grouping => '=',
        Based_Grouping => '=',
        Call_Threshold => '=',
@@ -337,6 +339,7 @@ package Pp.Command_Lines is
        Indentation => 3,
        Indent_Continuation => 0,
    --  Default for Indent_Continuation is one less than Indentation, or 1.
+       Initial_Indentation => 0,
        Decimal_Grouping => 0,
        Based_Grouping => 0,
        Call_Threshold => Natural'Last,
@@ -347,6 +350,7 @@ package Pp.Command_Lines is
      ((Max_Line_Length => +"-M",
        Indentation => +"-i",
        Indent_Continuation => +"-cl",
+       Initial_Indentation => null,
        Decimal_Grouping => null,
        Based_Grouping => null,
        Call_Threshold => null,

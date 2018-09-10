@@ -48,6 +48,83 @@ package body Stub.Actions is
 
    use Scanner.Source_Message_Vectors;
 
+   --  The current body-generating version of gnatstub generates output bodies;
+   --  we could implement a new body-modifying version modifies existing
+   --  bodies.
+   --
+   --  Body-generating: By default, the command line arguments refer to specs,
+   --  and the --subunits switch is not given. The output is a body. It is an
+   --  error if the body already exists. If the --force/-f switch is given,
+   --  then any existing body is overwritten; if that body contains
+   --  hand-written code, it is lost. If the --subunits switch is given, the
+   --  command line arguments refer to bodies, and a subunit is generated for
+   --  each Ada stub found in that body, skipping ones that already exist.
+   --
+   --  Thus "--subunits switch given" if and only if "argument is a body".
+   --
+   --  Body-modifying: Command-line arguments always refer to specs. [???Or
+   --  perhaps allow bodies, but process as if the corresponding spec were
+   --  mentioned.] If the body exists, read it; otherwise create an empty one.
+   --  Further processing can then assume that the body exists.
+   --
+   --  If --subunits is not given, then for each declaration in the spec and in
+   --  the body that requires completion, and whose completion does not exist,
+   --  generate the completion in the body. The completion is placed
+   --  immediately after the completion of the preceding declaration (where the
+   --  order takes into account the Alphabetical_Order switch, if given).
+   --  What about private types???
+   --
+   --  If --subunits is given, then processing is as above, except we generate
+   --  an Ada stub instead of a proper body.
+   --
+   --  With or without --subunits, for each Ada stub (whether or not newly
+   --  generated), we generate the subunit if it doesn't already exist.
+   --  ???Recursively process subunits, even if they already exist?
+   --
+   --  Withdraw support for the --force/-f switch. We are always updating an
+   --  existing body, not replacing it.
+   --
+   --  Design notes:
+   --
+   --   Read text of spec, parse.
+   --   Read text of body (or concoct empty one), parse, split text into lines.
+   --   Collect relevant nodes into an Ada_Node_Vector. Relevant = requires
+   --    completion, or is an Ada Stub. Nodes from the spec, followed by nodes
+   --    from the body.
+   --   Sort. By default, types first, then other things, otherwise retaining
+   --   order from the source. If --alphabetical-order is given, then types
+   --   first, in alphabetical order, then bodies, in alphabetical order,
+   --   retaining source order for overloaded declarations.
+   --
+   --   Walk the sorted vector, generating a vector of strings. Each string is
+   --   the text of a completion, and has a source location attached. For each
+   --   item:
+   --    If it requires completion, and the completion does not exist, append
+   --    that completion to the string vector, along with the source location
+   --    just after the preceding item. If --subunits is given, the completion
+   --    is an Ada stub, and we also generate the subunit if it does not
+   --    exist.
+   --    If it is an Ada stub, generate the subunit if it does not exist.
+   --
+   --   Sort the completions in source location order.
+   --
+   --   Walk the text lines of the body and the completions in sync, copying
+   --   both to the output, interleaved by source location.
+
+   --  The above is way too complicated for now. A customer has asked for a way
+   --  to generate the body for a single declaration in a package spec. Here
+   --  are design notes for that. See Update_Body.
+   --
+   --  If --update=line:col is given, it must be a [generic] package spec.
+   --  Collect subp decls.
+   --  Find the one with the right sloc. Better not have a completion.
+   --  Sort if --alphabetic-order.
+   --  Find preceding one that has a completion, or the start of the
+   --    declarative part if no such.
+   --  Copy body text through that one.
+   --  Append completion.
+   --  Copy rest of body text.
+
    ----------
    -- Init --
    ----------
@@ -208,15 +285,13 @@ package body Stub.Actions is
    function Get_Pp_Cmd return Command_Line;
    --  Return a command line for passing to the pretty printer.
 
-   Syntax_Only_Arg : aliased String := "--syntax-only";
-   Comments_Unchanged_Arg : aliased String := "--comments-unchanged";
-   Decimal_Grouping : aliased String := "--decimal-grouping=3";
-   Based_Grouping : aliased String := "--based-grouping=4";
+   Comments_Fill_Arg : aliased String := "--comments-fill";
+   Decimal_Grouping_Arg : aliased String := "--decimal-grouping=3";
+   Based_Grouping_Arg : aliased String := "--based-grouping=4";
    Args : aliased GNAT.OS_Lib.Argument_List :=
-     (Syntax_Only_Arg'Unchecked_Access,
-      Comments_Unchanged_Arg'Unchecked_Access,
-      Decimal_Grouping'Unchecked_Access,
-      Based_Grouping'Unchecked_Access);
+     (Comments_Fill_Arg'Access,
+      Decimal_Grouping_Arg'Access,
+      Based_Grouping_Arg'Access);
 
    function Get_Pp_Cmd return Command_Line is
    begin
@@ -227,7 +302,7 @@ package body Stub.Actions is
       end return;
    end Get_Pp_Cmd;
 
-   Pp_Cmd : constant Command_Line := Get_Pp_Cmd;
+   Pp_Cmd : Command_Line := Get_Pp_Cmd;
 
    function Overriding_String
      (Overrides : Ada_Overriding_Node) return W_Str is
@@ -436,6 +511,12 @@ package body Stub.Actions is
       procedure Generate_Subunit_Start (Level : Natural);
       --  If we are processing a subunit, generate "separate (parent)".
 
+      procedure Generate_Subp_Body (Decl : Ada_Node; Name : W_Str);
+      --  Generate a subprogram body stub
+
+      procedure Generate_Entry_Body (Decl : Ada_Node; Name : W_Str);
+      --  Generate an entry body stub
+
       procedure Generate_Stub_Begin_End (Name, Stub_Kind : W_Str);
       --  Generate the text from "begin" to "end" of the generated code for a
       --  subprogram, entry, or task body. Stub_Kind is "function",
@@ -457,8 +538,7 @@ package body Stub.Actions is
                Header : String_Access :=
                  Read_File (Arg (Cmd, Header_File).all);
             begin
-               Put ("\1", From_UTF8 -- ????wrong
-                      (Header.all));
+               Put ("\1", From_UTF8 (Header.all));
                Free (Header);
             end;
          end if;
@@ -538,6 +618,65 @@ package body Stub.Actions is
             Put ("separate (\1)\n", Parent_Name);
          end if;
       end Generate_Subunit_Start;
+
+      procedure Generate_Subp_Body (Decl : Ada_Node; Name : W_Str) is
+         Empty_Vec, Pp_Out_Vec : Char_Vector;
+         Spec : constant Subp_Spec := Get_Subp_Spec (Decl);
+         Overrides : constant Ada_Overriding_Node :=
+           (if Decl.Kind in Ada_Classic_Subp_Decl
+              then Decl.As_Classic_Subp_Decl.F_Overriding
+              else Ada_Overriding_Unspecified);
+         Returns : constant Boolean :=
+           not F_Subp_Returns (Spec).Is_Null;
+      begin
+         Pp.Actions.Format_Vector
+           (Pp_Cmd,
+            Input => Empty_Vec,
+            Node => Ada_Node (Spec),
+            In_Range => (1, 0),
+            Output => Pp_Out_Vec,
+            Out_Range => Tool.Ignored_Out_Range,
+            Messages => Tool.Ignored_Messages);
+         pragma Assert (Is_Empty (Tool.Ignored_Messages));
+         Put ("\1 \2 is\n",
+              Overriding_String (Overrides),
+              From_UTF8
+                (Elems (Pp_Out_Vec) (1 .. Last_Index (Pp_Out_Vec))));
+         Generate_Stub_Begin_End
+           (Name, (if Returns then "function" else "procedure"));
+      end Generate_Subp_Body;
+
+      procedure Generate_Entry_Body (Decl : Ada_Node; Name : W_Str) is
+         Empty_Vec, Pp_Out_Vec : Char_Vector;
+         Parms : constant Params :=
+           Decl.As_Entry_Decl.F_Spec.F_Entry_Params;
+         Overrides : constant Ada_Overriding_Node :=
+           Decl.As_Entry_Decl.F_Overriding;
+      begin
+         if not Parms.Is_Null then
+            Pp.Actions.Format_Vector
+              (Pp_Cmd,
+               Input => Empty_Vec,
+               Node => Ada_Node (Parms),
+               In_Range => (1, 0),
+               Output => Pp_Out_Vec,
+               Out_Range => Tool.Ignored_Out_Range,
+               Messages => Tool.Ignored_Messages);
+            pragma Assert (Is_Empty (Tool.Ignored_Messages));
+            Put ("\1entry \2 \3 when Standard.True is\n",
+                 Overriding_String (Overrides),
+                 Name,
+                 From_UTF8
+                   (Elems (Pp_Out_Vec)
+                      (1 .. Last_Index (Pp_Out_Vec))));
+         else
+            Put ("\1entry \2 when Standard.True is\n",
+                 Overriding_String (Overrides),
+                 Name);
+         end if;
+
+         Generate_Stub_Begin_End (Name, "entry");
+      end Generate_Entry_Body;
 
       procedure Generate_Stub_Begin_End (Name, Stub_Kind : W_Str) is
          Returns : constant Boolean := Stub_Kind = "function";
@@ -650,66 +789,11 @@ package body Stub.Actions is
             when Ada_Subp_Decl | Ada_Generic_Subp_Decl | Ada_Subp_Body_Stub =>
                Generate_Local_Header (Name, Level);
                Generate_Subunit_Start (Level);
-               declare
-                  Empty_Vec, Pp_Out_Vec : Char_Vector;
-                  Spec : constant Subp_Spec := Get_Subp_Spec (Decl);
-                  Overrides : constant Ada_Overriding_Node :=
-                    (if Decl.Kind in Ada_Classic_Subp_Decl
-                       then Decl.As_Classic_Subp_Decl.F_Overriding
-                       else Ada_Overriding_Unspecified);
-                  Returns : constant Boolean :=
-                    not F_Subp_Returns (Spec).Is_Null;
-               begin
-                  Pp.Actions.Format_Vector
-                    (Pp_Cmd,
-                     Input => Empty_Vec,
-                     Node => Ada_Node (Spec),
-                     In_Range => (1, 0),
-                     Output => Pp_Out_Vec,
-                     Out_Range => Tool.Ignored_Out_Range,
-                     Messages => Tool.Ignored_Messages);
-                  pragma Assert (Is_Empty (Tool.Ignored_Messages));
-                  Put ("\1 \2 is\n",
-                       Overriding_String (Overrides),
-                       From_UTF8 -- ????wrong
-                         (Elems (Pp_Out_Vec) (1 .. Last_Index (Pp_Out_Vec))));
-                  Generate_Stub_Begin_End
-                    (Name, (if Returns then "function" else "procedure"));
-               end;
+               Generate_Subp_Body (Decl, Name);
 
             when Ada_Entry_Decl =>
                Generate_Local_Header (Name, Level);
-               declare
-                  Empty_Vec, Pp_Out_Vec : Char_Vector;
-                  Parms : constant Params :=
-                    Decl.As_Entry_Decl.F_Spec.F_Entry_Params;
-                  Overrides : constant Ada_Overriding_Node :=
-                    Decl.As_Entry_Decl.F_Overriding;
-               begin
-                  if not Parms.Is_Null then
-                     Pp.Actions.Format_Vector
-                       (Pp_Cmd,
-                        Input => Empty_Vec,
-                        Node => Ada_Node (Parms),
-                        In_Range => (1, 0),
-                        Output => Pp_Out_Vec,
-                        Out_Range => Tool.Ignored_Out_Range,
-                        Messages => Tool.Ignored_Messages);
-                     pragma Assert (Is_Empty (Tool.Ignored_Messages));
-                     Put ("\1entry \2 \3 when Standard.True is\n",
-                          Overriding_String (Overrides),
-                          Name,
-                          From_UTF8 -- ????wrong
-                            (Elems (Pp_Out_Vec)
-                               (1 .. Last_Index (Pp_Out_Vec))));
-                  else
-                     Put ("\1entry \2 when Standard.True is\n",
-                          Overriding_String (Overrides),
-                          Name);
-                  end if;
-
-                  Generate_Stub_Begin_End (Name, "entry");
-               end;
+               Generate_Entry_Body (Decl, Name);
 
             when Ada_Subp_Body | Ada_Package_Body | Ada_Task_Body |
               Ada_Protected_Body => null;
@@ -868,7 +952,7 @@ package body Stub.Actions is
          function Default_Name return String;
          --  This is used when the output file is not specified on the
          --  command line, and there is no project file. It uses the
-         --  default GNAT converntions for file names (.ads, .adb).
+         --  default GNAT conventions for file names (.ads, .adb).
 
          function Name_From_Project return String;
          --  This is used when there is a project file. It queries the
@@ -994,20 +1078,268 @@ package body Stub.Actions is
             Formatted_Output.Put ("wrote \1\n", Output_Name);
          end if;
 
+         --  ???The following messages would be more helpful if they say what
+         --  is created, not what it's created for.
+
          if not Arg (Cmd, Quiet) then
             if Root_Node.Kind in Ada_Body_Stub then
                Formatted_Output.Put
                  ("separate body is created for stub for \1\n",
                   To_UTF8 (Id_Name (Get_Def_Name (Root_Node))));
+            elsif Update_Body_Specified (Cmd) then
+               Formatted_Output.Put ("body is updated for \1\n", File_Name);
             else
                Formatted_Output.Put ("body is created for \1\n", File_Name);
             end if;
          end if;
       end Write_Output_File;
 
+      procedure Update_Body;
+      --  Implement the --update-body=N switch.
+
+      procedure Update_Body is
+         --  ???We don't do proper error checking -- just raise exceptions. We
+         --  should check that the body exists (including for nested
+         --  packages). We should allow generics and protecteds. It doesn't
+         --  make sense to have more than one file name. It's not clear we need
+         --  the backup file.
+
+         use Slocs, Ada_Node_Vectors;
+         Search_Line : constant Line_Number :=
+           Line_Number (Arg (Cmd, Update_Body));
+         --  For --update-body=N, this is the value of N; we are searching for
+         --  a subprogram declaration that appears on line N of the spec.
+
+         Subp_Decl : Ada_Node := No_Ada_Node;
+         --  The Subp_Decl at Search_Line
+
+         Body_Line : Line_Number := Line_Number'Last / 2;
+         --  The line number in the body file after which the new subprogram
+         --  body should be inserted. Initialize to intentionally bogus value.
+
+         procedure Search;
+         --  Compute Subp_Decl and Body_Line
+
+         function Find_Insertion_Index
+           (Old_Content : String; Body_Line : Line_Number) return Positive;
+         --  Return the index at which the stub is to be inserted
+
+         procedure Indent_Stub;
+         --  Indents the stub that is in Pp_Out_Vec. This is needed because the
+         --  --initial-indentation switch doesn't fully work. We don't specify
+         --  --initial-indentation=3; instead we subtract 3 from
+         --  --max-line-length, and call Indent_Stub.
+
+         procedure Search is
+            --  Walk the spec, recursing into nested package and protected
+            --  specs, searching for the subprogram declaration at Search_Line.
+            --  Each time we see a declaration that has a corresponding
+            --  declaration in the body, update Result; we're going to insert
+            --  the new body after the last such one encountered.
+
+            procedure Rec (Decl : Ada_Node);
+
+            procedure Rec (Decl : Ada_Node) is
+               Sorted : Ada_Node_Vector;
+
+               procedure Update_Body_Line (New_Body_Line : Line_Number);
+               --  Update Body_Line, asserting that we have not yet found the
+               --  subprogram declaration we are looking for; once found, we
+               --  should quit.
+
+               procedure Collect_Decls (Decls : Ada_Node_List);
+               --  Collect the declarations into Sorted, which will be sorted
+               --  if --alphabetical-order was specified.
+
+               procedure Update_Body_Line (New_Body_Line : Line_Number) is
+                  use Utils.Formatted_Output;
+               begin
+                  if Debug_Flag_V then
+                     nn (Decl);
+                     Put ("\1 ==> \2\n", Image (Integer (Body_Line)),
+                          Image (Integer (New_Body_Line)));
+                  end if;
+                  pragma Assert (Subp_Decl.Is_Null);
+                  Body_Line := New_Body_Line;
+               end Update_Body_Line;
+
+               procedure Collect_Decls (Decls : Ada_Node_List) is
+               begin
+                  for X in 1 .. Last_Child_Index (Decls) loop
+                     declare
+                        Subtree : constant Ada_Node := Childx (Decls, X);
+                     begin
+                        Append (Sorted, Subtree);
+                     end;
+                  end loop;
+               end Collect_Decls;
+
+               Sloc : constant Source_Location_Range := Sloc_Range (Decl);
+
+            begin
+               if Search_Line in Sloc.Start_Line .. Sloc.End_Line then
+                  case Decl.Kind is
+                     when Ada_Package_Decl | Ada_Generic_Package_Decl |
+                       Ada_Single_Protected_Decl | Ada_Protected_Type_Decl =>
+                        Update_Body_Line
+                          (Body_Decls (Decl.As_Basic_Decl.P_Body_Part_For_Decl)
+                            .Sloc_Range.Start_Line);
+
+                        if not Vis_Part (Decl).Is_Null then
+                           Collect_Decls (F_Decls (Vis_Part (Decl)));
+                        end if;
+
+                        if not Priv_Part (Decl).Is_Null then
+                           Collect_Decls (F_Decls (Priv_Part (Decl)));
+                        end if;
+
+                        if Arg (Cmd, Alphabetical_Order) then
+                           Sorting.Sort (Sorted);
+                        end if;
+
+                        for X in 1 .. Last_Index (Sorted) loop
+                           Rec (Sorted (X));
+                           exit when not Subp_Decl.Is_Null;
+                        end loop;
+                        pragma Assert (not Subp_Decl.Is_Null);
+
+                     when Ada_Subp_Decl | Ada_Generic_Subp_Decl =>
+                        pragma Assert
+                          (P_Body_Part (Decl.As_Basic_Subp_Decl).Is_Null);
+                        pragma Assert (Subp_Decl.Is_Null);
+                        Subp_Decl := Decl;
+
+                     when others => raise Program_Error;
+                  end case;
+               else
+                  pragma Assert
+                    (if not Arg (Cmd, Alphabetical_Order) then
+                       Search_Line > Sloc.End_Line);
+                  case Decl.Kind is
+                     when Ada_Package_Decl | Ada_Generic_Package_Decl |
+                       Ada_Single_Protected_Decl | Ada_Protected_Type_Decl =>
+                        declare
+                           B : constant Body_Node :=
+                             Decl.As_Basic_Decl.P_Body_Part_For_Decl;
+                        begin
+                           if not B.Is_Null then
+                              Update_Body_Line (B.Sloc_Range.End_Line);
+                           end if;
+                        end;
+                     when others =>
+                        null;
+                  end case;
+               end if;
+            end Rec;
+
+         begin
+            Rec (Root_Node);
+            pragma Assert (not Subp_Decl.Is_Null);
+         end Search;
+
+         function Find_Insertion_Index
+           (Old_Content : String; Body_Line : Line_Number) return Positive
+         is
+            Line_Num : Line_Number := 1;
+         begin
+            return Result : Positive := 1 do
+               while Line_Num <= Body_Line loop
+                  if Old_Content (Result) = ASCII.LF then
+                     Line_Num := Line_Num + 1;
+                  end if;
+                  Result := Result + 1;
+               end loop;
+            end return;
+         end Find_Insertion_Index;
+
+         procedure Indent_Stub is
+            Ind : constant String := "   ";
+            Temp : Char_Vector;
+         begin
+            Append (Temp, Ind);
+
+            for X in 1 .. Last_Index (Pp_Out_Vec) loop
+               Append (Temp, Pp_Out_Vec (X));
+
+               if Pp_Out_Vec (X) = ASCII.LF
+                 and then X /= Last_Index (Pp_Out_Vec)
+               then
+                  Append (Temp, Ind);
+               end if;
+            end loop;
+
+            Move (Target => Pp_Out_Vec, Source => Temp);
+         end Indent_Stub;
+
+         Backup_Name : constant String := Output_Name & ".bak";
+         Old_Content : String_Access := Read_File (Output_Name);
+
+      --  Start of processing for Update_Body
+
+      begin
+         if Root_Node.Kind /= Ada_Package_Decl then
+            raise Program_Error;
+         end if;
+
+         Search;
+
+         declare
+            Name : constant W_Str :=
+              Full_Name (Get_Def_Name (Subp_Decl).As_Name);
+            Level : constant Natural := 1;
+            Insertion_Index : constant Positive :=
+              Find_Insertion_Index (Old_Content.all, Body_Line);
+            pragma Assert (Old_Content (Insertion_Index - 1) = ASCII.LF);
+         begin
+            --  We want to insert the generated stub into the body at
+            --  Insertion_Index. We want to pretty print the generated stub,
+            --  but leave the rest of the code alone. So we generate the stub
+            --  into Out_Vec, then call Format, which formats it into
+            --  Pp_Out_Vec. Then move it back into Out_Vec, copy the first part
+            --  of the body to Pp_Out_Vec, copy the stub into Pp_Out_Vec, and
+            --  copy the rest of the body into Pp_Out_Vec. Finally, call
+            --  Write_Output_File to write Pp_Out_Vec to the output (body)
+            --  file.
+
+            pragma Assert (Is_Empty (Out_Vec) and Is_Empty (Pp_Out_Vec));
+            Generate_Local_Header (Name, Level);
+            Generate_Subunit_Start (Level);
+            Generate_Subp_Body (Subp_Decl, Name);
+            Pp.Command_Lines.Pp_Nat_Switches.Set_Arg
+              (Pp_Cmd, Pp.Command_Lines.Initial_Indentation, 0);
+            Pp.Command_Lines.Pp_Nat_Switches.Set_Arg
+              (Pp_Cmd, Pp.Command_Lines.Max_Line_Length,
+               Pp.Command_Lines.Pp_Nat_Switches.Arg
+                 (Pp_Cmd, Pp.Command_Lines.Max_Line_Length) - 3);
+            Format;
+            Indent_Stub;
+            Move (Target => Out_Vec, Source => Pp_Out_Vec);
+
+            Append (Pp_Out_Vec,
+                    Old_Content (Old_Content'First .. Insertion_Index - 1));
+            Append (Pp_Out_Vec, ASCII.LF);
+            Append (Pp_Out_Vec, Elems (Out_Vec) (1 .. Last_Index (Out_Vec)));
+            if Old_Content (Insertion_Index) /= ASCII.LF then
+               Append (Pp_Out_Vec, ASCII.LF);
+            end if;
+            Append (Pp_Out_Vec,
+                    Old_Content (Insertion_Index .. Old_Content'Last));
+            Free (Old_Content);
+            Clear (Out_Vec);
+         end;
+
+         Move_File (Old_Name => Output_Name, New_Name => Backup_Name);
+         Write_Output_File;
+      end Update_Body;
+
    --  Start of processing for Generate
 
    begin
+      if Update_Body_Specified (Cmd) then
+         Update_Body;
+         goto Skip;
+      end if;
+
       --  If we are looking for Ada stubs, then of course the body file exists;
       --  we are not going to overwrite it. If we are generating a subunit for
       --  an Ada stub, and the subunit file already exists, we simply skip

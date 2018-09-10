@@ -2424,12 +2424,13 @@ package body Pp.Actions is
       end Append_And_Put;
 
       procedure Indent (Amount : Integer);
-      --  Indent by the given number of columns negative Amount for "outdent"
+      --  Indent by the given number of columns. Negative Amount for "outdent".
 
       procedure Indent (Amount : Integer) is
          pragma Assert
            (abs Amount in
-              0 | 1 | PP_Indentation (Cmd) | PP_Indent_Continuation (Cmd));
+              0 | 1 | PP_Indentation (Cmd) | PP_Indent_Continuation (Cmd) |
+              Arg (Cmd, Initial_Indentation));
          Last_LBI : constant Line_Break_Index := All_LBI (Last (All_LBI));
          Last_LB : Line_Break renames All_LB (Last_LBI);
       begin
@@ -4496,6 +4497,8 @@ package body Pp.Actions is
             Level    => 1,
             Kind     => Null_Kind);
 
+         Indent (Arg (Cmd, Initial_Indentation));
+
          pragma Assert (Check_Whitespace);
          Subtree_To_Ada (Tree, Cur_Level => 1, Index_In_Parent => 1);
 
@@ -4525,6 +4528,7 @@ package body Pp.Actions is
 
          Scanner.Append_Tokn (New_Tokns, Scanner.End_Of_Input);
 
+         Indent (-Arg (Cmd, Initial_Indentation)); -- note negation
          pragma Assert (Is_Empty (Tree_Stack));
          pragma Assert (Cur_Indentation = 0);
       end Convert_Tree_To_Ada;

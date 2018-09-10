@@ -527,6 +527,15 @@ package body Pp.Formatting is
       Ignore : Boolean := Move_Tokns
         (Target => Saved_New_Tokns, Source => New_Tokns);
 
+      procedure Reset_Indentation;
+      --  Set the indentation to it's initial value (usually 0, but can be set
+      --  by the --initial-indentation switch.
+
+      procedure Reset_Indentation is
+      begin
+         Cur_Indentation := Arg (Cmd, Initial_Indentation);
+      end Reset_Indentation;
+
    --  Start of processing for Do_Comments_Only
 
    begin
@@ -550,7 +559,7 @@ package body Pp.Formatting is
             end case;
 
             Insert_Comment_Text (Lines_Data_P, Cmd, Cur_Tok);
-            Cur_Indentation := 0;
+            Reset_Indentation;
          else
             Append_Tokn (New_Tokns, Cur_Tok, Org => "only, other");
          end if;
@@ -2214,6 +2223,10 @@ package body Pp.Formatting is
          Src_Tokns : Scanner.Tokn_Vec renames Lines_Data.Src_Tokns;
          Saved_New_Tokns : Scanner.Tokn_Vec renames Lines_Data.Saved_New_Tokns;
 
+         procedure Reset_Indentation;
+         --  Set the indentation to it's initial value (usually 0, but can be set
+         --  by the --initial-indentation switch.
+
          function Match (Src_Tok, Out_Tok : Tokn_Cursor) return Boolean;
          --  True if the tokens have the same kind and same text, except that the
          --  matching is case insensitive for identifiers, reserved words, and
@@ -2245,6 +2258,11 @@ package body Pp.Formatting is
          --  insert "private", whether or not it was in the source code. If
          --  there is a comment, this re-inserts "private" before the comment,
          --  to avoid messing up the formatting.
+
+         procedure Reset_Indentation is
+         begin
+            Cur_Indentation := Arg (Cmd, Initial_Indentation);
+         end Reset_Indentation;
 
          function Match (Src_Tok, Out_Tok : Tokn_Cursor) return Boolean is
          begin
@@ -2602,7 +2620,7 @@ package body Pp.Formatting is
                           (Lines_Data_P,
                            Org => "Append_Temp_ in Insert_End_Of_Line_Comment");
                      end if;
-                     Cur_Indentation := 0;
+                     Reset_Indentation;
                   end if;
                else
                   Append_Tokn (New_Tokns, False_End_Of_Line, "eol extra");
@@ -2860,7 +2878,7 @@ package body Pp.Formatting is
                end if;
             end;
 
-            Cur_Indentation := 0;
+            Reset_Indentation;
          end Insert_Whole_Line_Comment;
 
          procedure Insert_Private is
@@ -2878,7 +2896,7 @@ package body Pp.Formatting is
             Append_Tokn (New_Tokns, Res_Private);
             Append_Temp_Line_Break
               (Lines_Data_P, Org => "Append_Temp_ private 2");
-            Cur_Indentation := 0;
+            Reset_Indentation;
             Next_ss (Src_Tok);
          end Insert_Private;
 
@@ -3123,7 +3141,7 @@ package body Pp.Formatting is
                            Append_Temp_Line_Break
                              (Lines_Data_P,
                               Org => "Append_Temp_ Preserve_Line_Breaks");
-                           Cur_Indentation := 0;
+                           Reset_Indentation;
                            New_Line_Start_Out := New_Tok;
                         end if;
                      end;
@@ -3166,7 +3184,7 @@ package body Pp.Formatting is
 
          pragma Assert (Is_Empty (Paren_Stack));
 
-         pragma Assert (Cur_Indentation = 0);
+         pragma Assert (Cur_Indentation = Arg (Cmd, Initial_Indentation));
 
          pragma Assert (At_Last (Src_Tok));
          Append_Tokn (New_Tokns, End_Of_Input);
