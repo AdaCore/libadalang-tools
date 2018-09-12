@@ -511,8 +511,10 @@ package body Stub.Actions is
       procedure Generate_Subunit_Start (Level : Natural);
       --  If we are processing a subunit, generate "separate (parent)".
 
-      procedure Generate_Subp_Body (Decl : Ada_Node; Name : W_Str);
-      --  Generate a subprogram body stub
+      procedure Generate_Subp_Body
+        (Decl : Ada_Node; Name : W_Str; Ada_Stub : Boolean);
+      --  Generate a subprogram body stub. If Ada_Stub is True, we generate
+      --  "is separate"; otherwise the so-called "stub" is a proper body.
 
       procedure Generate_Entry_Body (Decl : Ada_Node; Name : W_Str);
       --  Generate an entry body stub
@@ -619,7 +621,9 @@ package body Stub.Actions is
          end if;
       end Generate_Subunit_Start;
 
-      procedure Generate_Subp_Body (Decl : Ada_Node; Name : W_Str) is
+      procedure Generate_Subp_Body
+        (Decl : Ada_Node; Name : W_Str; Ada_Stub : Boolean)
+      is
          Empty_Vec, Pp_Out_Vec : Char_Vector;
          Spec : constant Subp_Spec := Get_Subp_Spec (Decl);
          Overrides : constant Ada_Overriding_Node :=
@@ -638,12 +642,17 @@ package body Stub.Actions is
             Out_Range => Tool.Ignored_Out_Range,
             Messages => Tool.Ignored_Messages);
          pragma Assert (Is_Empty (Tool.Ignored_Messages));
-         Put ("\1 \2 is\n",
+         Put ("\1 \2 is",
               Overriding_String (Overrides),
               From_UTF8
                 (Elems (Pp_Out_Vec) (1 .. Last_Index (Pp_Out_Vec))));
-         Generate_Stub_Begin_End
-           (Name, (if Returns then "function" else "procedure"));
+         if Ada_Stub then
+            Put (" separate;");
+         else
+            Put ("\n");
+            Generate_Stub_Begin_End
+              (Name, (if Returns then "function" else "procedure"));
+         end if;
       end Generate_Subp_Body;
 
       procedure Generate_Entry_Body (Decl : Ada_Node; Name : W_Str) is
@@ -789,7 +798,7 @@ package body Stub.Actions is
             when Ada_Subp_Decl | Ada_Generic_Subp_Decl | Ada_Subp_Body_Stub =>
                Generate_Local_Header (Name, Level);
                Generate_Subunit_Start (Level);
-               Generate_Subp_Body (Decl, Name);
+               Generate_Subp_Body (Decl, Name, Ada_Stub => False);
 
             when Ada_Entry_Decl =>
                Generate_Local_Header (Name, Level);
@@ -917,8 +926,7 @@ package body Stub.Actions is
            Create_Context (Charset => Wide_Character_Encoding (Cmd));
          Out_Str : String renames Elems (Out_Vec) (1 .. Last_Index (Out_Vec));
          Out_Unit : constant Analysis_Unit := Get_From_Buffer
-           (Context, Filename => "????",
-            Buffer => Out_Str);
+           (Context, Filename => "", Buffer => Out_Str);
       begin
          if Has_Diagnostics (Out_Unit) then
             if Assert_Enabled then
@@ -1124,7 +1132,7 @@ package body Stub.Actions is
            (Old_Content : String; Body_Line : Line_Number) return Positive;
          --  Return the index at which the stub is to be inserted
 
-         procedure Indent_Stub;
+         procedure Indent_Stub (Amount : Natural);
          --  Indents the stub that is in Pp_Out_Vec. This is needed because the
          --  --initial-indentation switch doesn't fully work. We don't specify
          --  --initial-indentation=3; instead we subtract 3 from
@@ -1252,8 +1260,8 @@ package body Stub.Actions is
             end return;
          end Find_Insertion_Index;
 
-         procedure Indent_Stub is
-            Ind : constant String := "   ";
+         procedure Indent_Stub (Amount : Natural) is
+            Ind : constant String := (1 .. Amount => ' ');
             Temp : Char_Vector;
          begin
             Append (Temp, Ind);
@@ -1263,6 +1271,7 @@ package body Stub.Actions is
 
                if Pp_Out_Vec (X) = ASCII.LF
                  and then X /= Last_Index (Pp_Out_Vec)
+                 and then Pp_Out_Vec (X + 1) /= ASCII.LF
                then
                   Append (Temp, Ind);
                end if;
@@ -1304,15 +1313,24 @@ package body Stub.Actions is
             pragma Assert (Is_Empty (Out_Vec) and Is_Empty (Pp_Out_Vec));
             Generate_Local_Header (Name, Level);
             Generate_Subunit_Start (Level);
-            Generate_Subp_Body (Subp_Decl, Name);
+            Generate_Subp_Body
+              (Subp_Decl, Name, Ada_Stub => Arg (Cmd, Subunits));
             Pp.Command_Lines.Pp_Nat_Switches.Set_Arg
               (Pp_Cmd, Pp.Command_Lines.Initial_Indentation, 0);
             Pp.Command_Lines.Pp_Nat_Switches.Set_Arg
               (Pp_Cmd, Pp.Command_Lines.Max_Line_Length,
                Pp.Command_Lines.Pp_Nat_Switches.Arg
                  (Pp_Cmd, Pp.Command_Lines.Max_Line_Length) - 3);
-            Format;
-            Indent_Stub;
+            if Update_Body_Specified (Cmd) and then Arg (Cmd, Subunits) then
+               --  We would prefer to use Format in this case, with an
+               --  appropriate Rule passed to Get_From_Buffer, but that
+               --  doesn't quite work.
+               Move (Target => Pp_Out_Vec, Source => Out_Vec);
+               Indent_Stub (2);
+            else
+               Format;
+               Indent_Stub (3);
+            end if;
             Move (Target => Out_Vec, Source => Pp_Out_Vec);
 
             Append (Pp_Out_Vec,
@@ -1330,6 +1348,20 @@ package body Stub.Actions is
 
          Move_File (Old_Name => Output_Name, New_Name => Backup_Name);
          Write_Output_File;
+
+         --  Finally, if we generated an Ada stub (i.e. --subunits is True), we
+         --  recursively call ourself on the body to generate the subunits.
+
+         if Arg (Cmd, Subunits) then
+            declare
+               Body_Cmd : Cmd_Line := Copy_Command_Line (Cmd);
+            begin
+               Clear_File_Names (Body_Cmd);
+               Append_File_Name (Body_Cmd, Output_Name);
+               Set_Arg (Body_Cmd, Update_Body, No_Update_Body);
+               Process_File (Tool, Body_Cmd, Output_Name);
+            end;
+         end if;
       end Update_Body;
 
    --  Start of processing for Generate
@@ -1408,7 +1440,9 @@ package body Stub.Actions is
       case Root_Node.Kind is
          when Ada_Package_Decl | Ada_Generic_Package_Decl |
            Ada_Subp_Decl | Ada_Generic_Subp_Decl =>
-            if Arg (Cmd, Subunits) then
+            if Arg (Cmd, Subunits)
+              and then not Update_Body_Specified (Cmd)
+            then
                Cmd_Error ("argument unit cannot have subunits");
             end if;
 

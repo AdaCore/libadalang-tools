@@ -1,6 +1,16 @@
 with GNATCOLL.Iconv;
 package body Utils.Command_Lines.Common is
 
+   procedure Set_WCEM (Cmd : in out Command_Line; Encoding : String) is
+   begin
+      if not Present (Arg (Cmd, Wide_Character_Encoding)) then
+         Set_Arg (Cmd, Wide_Character_Encoding, Encoding);
+      elsif Arg (Cmd, Wide_Character_Encoding).all /= Encoding then
+         Cmd_Error_No_Help
+           ("input and output wide character encodings conflict");
+      end if;
+   end Set_WCEM;
+
    function WCEM (Cmd : Command_Line) return Character;
    --  Return the single-character encoding letter
 

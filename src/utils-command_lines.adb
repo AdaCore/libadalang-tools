@@ -779,6 +779,16 @@ package body Utils.Command_Lines is
       end return;
    end Copy_Descriptor;
 
+   function Copy_Command_Line (Cmd : Command_Line) return Command_Line is
+   begin
+      return Result : Command_Line (Cmd.Descriptor) do
+         Result.File_Names := Cmd.File_Names;
+         Result.Current_Position := Cmd.Current_Position;
+         Result.Sw := new Dynamically_Typed_Switches'(Cmd.Sw.all);
+         Result.Error_Detected := Cmd.Error_Detected;
+      end return;
+   end Copy_Command_Line;
+
    function Text_To_Switch
      (Descriptor : Command_Line_Descriptor;
       Text       : String) return All_Switches;

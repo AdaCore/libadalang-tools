@@ -25,13 +25,11 @@
 
 with Ada.Directories; use Ada;
 with Ada.Exceptions;
-with GNAT.Byte_Order_Mark;
 with GNAT.Command_Line;
 with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 with GNAT.OS_Lib;
 
 with Utils.Environment;
-with Utils.Formatted_Output;
 with Utils.Command_Lines.Common;   use Utils.Command_Lines.Common;
 --  with Utils.Command_Lines.Common.Post;
 with Utils.Projects; use Utils.Projects;
@@ -39,12 +37,8 @@ with Utils.Projects; use Utils.Projects;
 with Utils.String_Utilities; use Utils.String_Utilities;
 with Utils.Tool_Names;
 
-with Langkit_Support.Diagnostics;
-with Langkit_Support.Text;
-
 with Libadalang;     use Libadalang;
 with Libadalang.Analysis; use Libadalang.Analysis;
-with Libadalang.Common;   use Libadalang.Common;
 with Libadalang.Iterators; use Libadalang.Iterators;
 
 package body Utils.Drivers is
@@ -54,80 +48,9 @@ package body Utils.Drivers is
      Common_String_Seq_Switches, Common_Nat_Switches;
    pragma Warnings (On);
 
-   use Tools;
-
-   Name_Resolution_Failed : exception;
-
-   procedure Resolve_Node (N : Ada_Node; Quiet : Boolean);
-   --  Call P_Resolve_Names on N, which is a node for which Is_Xref_Entry_Point
-   --  is True. ????No need to call P_Resolve_Names anymore, see P610-018,
-   --  Tue, 21 Nov 2017 20:12:48 +0100.
-
-   procedure Name_Resolution (Unit : Analysis_Unit);
-   --  Resolve the entire unit, calling Resolve_Node on each relevant node.
    --  See libadalang_env/src/libadalang/ada/testsuite/ada/nameres.adb.
 
-   procedure Resolve_Node (N : Ada_Node; Quiet : Boolean) is
-      function Safe_Image
-        (Node : Ada_Node'Class) return String is
-         (if Node.Is_Null then
-            "None"
-          else
-            Langkit_Support.Text.Image (Node.Short_Image));
-
-      function Is_Expr (N : Ada_Node) return Boolean is
-        (N.Kind in Ada_Expr);
-
-      OK : Boolean;
-
-      use Utils.Formatted_Output;
-   begin
---      if Langkit_Support.Adalog.Debug.Debug then
---         N.Assign_Names_To_Logic_Vars;
---      end if;
-      --  ???For now, catch exceptions and try to continue.
-      begin
-         OK := N.P_Resolve_Names;
-      exception
-         when Property_Error =>
-            Put ("P_Resolve_Names raised Property_Error\n");
-            raise Name_Resolution_Failed;
-      end;
-
-      if OK then
-         for Node of Find (N, Is_Expr'Access).Consume loop
-            declare
-               P_Ref  : constant Basic_Decl := Node.As_Expr.P_Referenced_Decl;
-               P_Type : constant Base_Type_Decl :=
-                 Node.As_Expr.P_Expression_Type;
-            begin
-               if not Quiet then
-                  Put ("Expr: \1, references \2, type is \3\n",
-                       Safe_Image (Node),
-                       Safe_Image (P_Ref),
-                       Safe_Image (P_Type));
-               end if;
-            end;
-         end loop;
-      else
-         Put ("Resolution failed for node \1\n", Safe_Image (N));
-         raise Name_Resolution_Failed;
-      end if;
-   end Resolve_Node;
-
-   procedure Name_Resolution (Unit : Analysis_Unit) is
-      function Is_Xref_Entry_Point (N : Ada_Node) return Boolean is
-        (N.P_Xref_Entry_Point);
-   begin
-      --  ???Name resolution does not yet work, and is turned off by default
-      --  (see Syntax_Only switch; name resolution can be turned on via
-      --  --no-syntax-only).  For now, catch exceptions and try to continue
-      --  with the next file.
-      Populate_Lexical_Env (Unit);
-      for Node of Find (Root (Unit), Is_Xref_Entry_Point'Access).Consume loop
-         Resolve_Node (Node, Quiet => not Debug_Flag_A);
-      end loop;
-   end Name_Resolution;
+   use Tools;
 
    procedure Post_Cmd_Line_1 (Cmd : Command_Line);
    --  This is called by Process_Command_Line after the first pass through
@@ -208,11 +131,6 @@ package body Utils.Drivers is
 
       procedure Process_Files;
 
-      procedure Set_WCEM (Encoding : String);
-      --  Set the wide character encoding method as if the switch had appeared
-      --  on the command line (not in -cargs section). This is used when the
-      --  -cargs section is used, and when a BOM selects UTF-8.
-
       procedure Set_Ada_Version (Version : Ada_Version_Type);
       --  Set the Ada_Version, from normal switches or from -cargs
 
@@ -239,16 +157,6 @@ package body Utils.Drivers is
       Individual_Source_Options       : String_String_List_Map;
       Result_Dirs                     : String_String_Map;
 
-      procedure Set_WCEM (Encoding : String) is
-      begin
-         if not Present (Arg (Cmd, Wide_Character_Encoding)) then
-            Set_Arg (Cmd, Wide_Character_Encoding, Encoding);
-         elsif Arg (Cmd, Wide_Character_Encoding).all /= Encoding then
-            Cmd_Error_No_Help
-              ("input and output wide character encodings conflict");
-         end if;
-      end Set_WCEM;
-
       procedure Set_Ada_Version (Version : Ada_Version_Type) is
       begin
          Ada_Version := Version;
@@ -261,17 +169,17 @@ package body Utils.Drivers is
          --  We actually only support -W8 and -Wb.
          for Arg of Cmd_Cargs.all loop
             if Arg.all = "-gnatWh" then
-               Set_WCEM ("h");
+               Set_WCEM (Cmd, "h");
             elsif Arg.all = "-gnatWu" then
-               Set_WCEM ("u");
+               Set_WCEM (Cmd, "u");
             elsif Arg.all = "-gnatWs" then
-               Set_WCEM ("s");
+               Set_WCEM (Cmd, "s");
             elsif Arg.all = "-gnatWE" then
-               Set_WCEM ("E");
+               Set_WCEM (Cmd, "E");
             elsif Arg.all = "-gnatW8" then
-               Set_WCEM ("8");
+               Set_WCEM (Cmd, "8");
             elsif Arg.all = "-gnatWb" then
-               Set_WCEM ("b");
+               Set_WCEM (Cmd, "b");
 
             elsif Arg.all = "-gnat83" then
                Set_Ada_Version (Ada_83);
@@ -293,7 +201,6 @@ package body Utils.Drivers is
       end Process_Cargs;
 
       procedure Process_Files is
-         Context : Analysis_Context;
          Num_File_Names : constant Natural := File_Names (Cmd)'Length;
          Counter : Natural := Num_File_Names;
          use Text_IO;
@@ -311,88 +218,7 @@ package body Utils.Drivers is
             Counter := Counter - 1;
 
 --         Utils.Options.No_Argument_File_Specified := False;
-            declare
-               use GNAT.OS_Lib, GNAT.Byte_Order_Mark;
-               --  We read the file into a String, and convert to wide
-               --  characters according to the encoding method.
-               --
-               --  No matter what the encoding method is, we recognize brackets
-               --  encoding, but not within comments.
-               --
-               --  These behaviors are intended to match what the compiler
-               --  does.
-
-               Input : String_Access := Read_File (F_Name.all);
-               First : Natural       := 1;
-
-               BOM     : BOM_Kind;
-               BOM_Len : Natural;
-               BOM_Seen : Boolean := False;
-            begin
-               --  Check for BOM at start of file. The only supported BOM is
-               --  UTF8_All. If present, when we're called from gnatpp, the
-               --  Wide_Character_Encoding should already be set to
-               --  WCEM_UTF8, but when we're called from xml2gnat, we need to
-               --  set it.
-
-               Read_BOM (Input.all, BOM_Len, BOM);
-               if BOM = UTF8_All then
-                  First := BOM_Len + 1; -- skip it
-                  BOM_Seen := True;
-                  Set_WCEM ("8");
-               else
-                  pragma Assert (BOM = Unknown); -- no BOM found
-               end if;
-
-               --  We have to defer the Create call until after we've read the
-               --  first file, because it might set the Wide_Character_Encoding
-               --  via the BOM. This makes the somewhat questionable assumption
-               --  that all files have the same encoding (which is necessary
-               --  anyway if it's controlled by the command line).
-
-               if Counter = Num_File_Names - 1 then
-                  Context := Create_Context
-                    (Charset => Wide_Character_Encoding (Cmd));
-               end if;
-
-               declare
-                  Inp : String renames Input (First .. Input'Last);
-                  Unit : constant Analysis_Unit := Get_From_Buffer
-                    (Context, F_Name.all,
-                     Buffer => Inp);
-               begin
-                  if Has_Diagnostics (Unit) then
-                     Put_Line ("Errors while parsing " & F_Name.all);
-                     for D of Diagnostics (Unit) loop
-                        Put_Line
-                          (Langkit_Support.Diagnostics.To_Pretty_String (D));
-                        --  To stderr????
-                     end loop;
-
-                     if Root (Unit).Is_Null then
-                        goto Continue;
-                     end if;
-                  end if;
-
-                  --  We continue even in the presence of errors (if we have a
-                  --  tree).
-
-                  pragma Assert (not Root (Unit).Is_Null);
-                  if False and then
-                    not Arg (Cmd, Syntax_Only)
-                  then
-                     Name_Resolution (Unit);
-                  end if;
-                  Per_File_Action (Tool, Cmd, F_Name.all, Inp, BOM_Seen, Unit);
-                  --  ???For now, catch exceptions and try to continue.
-                  Free (Input);
-               end;
-            exception
-               when Name_Resolution_Failed =>
-                  Free (Input);
-            end;
-
-            <<Continue>>
+            Process_File (Tool, Cmd, F_Name.all);
          end loop;
          pragma Assert (Counter = 0);
       end Process_Files;

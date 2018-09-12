@@ -192,6 +192,11 @@ package Utils.Command_Lines.Common is
    --  Libadalang wants the encoding as a String, whereas Pp.Buffers uses
    --  WC_Encoding_Method.
 
+   procedure Set_WCEM (Cmd : in out Command_Line; Encoding : String);
+   --  Set the wide character encoding method as if the switch had appeared on
+   --  the command line (not in -cargs section). This is used when the -cargs
+   --  section is used, and when a BOM selects UTF-8.
+
    ----------------
 
    function Mimic_gcc (Cmd : Command_Line) return Boolean is

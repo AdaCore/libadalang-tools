@@ -15,6 +15,9 @@ package Utils.Tools is
       --  The only tool that needs access to the Project_Tree is gnatstub.
       --  The driver sets this to the current project. If there is no
       --  -P switch, then the Status will be Empty.
+
+      Context : Analysis_Context := No_Analysis_Context;
+      --  The only tool that needs access to the Context is gnatstub.
    end record;
 
    procedure Init (Tool : in out Tool_State; Cmd : Command_Line) is abstract;
@@ -29,6 +32,20 @@ package Utils.Tools is
    --  Input is the contents of the file named by File_Name.
    --  BOM_Seen is True if there was a BOM at the start of the file;
    --  the BOM is not included in Input.
+
+   procedure Process_File
+     (Tool : in out Tool_State'Class;
+      Cmd : in out Command_Line;
+      File_Name : String);
+   --  This class-wide procedure takes care of some bookkeeping, and then
+   --  dispatches to Per_File_Action.
+   --
+   --  If Tool.Context is nil, Process_File creates it. This is necessary
+   --  because we have to defer the Create_Context call until after we've read
+   --  the first file, because it might set the Wide_Character_Encoding via the
+   --  BOM. This makes the somewhat questionable assumption that all files have
+   --  the same encoding (which is necessary anyway if it's controlled by the
+   --  command line).
 
    procedure Final (Tool : in out Tool_State; Cmd : Command_Line) is abstract;
    procedure Tool_Help (Tool : Tool_State) is abstract;

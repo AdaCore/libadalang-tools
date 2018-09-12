@@ -1,0 +1,74 @@
+body is updated for pack.ads
+
+----------------------------------------------------------------
+
+--  pack.adb
+
+package body Pack is
+
+   ----------
+   -- Proc --
+   ----------
+
+   procedure Proc (I : Integer; B : Boolean) is
+   begin
+      --  Generated stub: replace with real body!
+      pragma Compile_Time_Warning (Standard.True, "Proc unimplemented");
+      raise Program_Error with "Unimplemented procedure Proc";
+   end Proc;
+
+   package body Inner is separate;
+end Pack;
+body is updated for pack.ads
+separate body is created for stub for Proc
+separate body is created for stub for Inner
+
+----------------------------------------------------------------
+
+--  pack.adb
+
+package body Pack is
+
+   ----------
+   -- Proc --
+   ----------
+
+   procedure Proc (I : Integer; B : Boolean)
+   is separate;
+   package body Inner is separate;
+end Pack;
+pragma Ada_2012;
+separate (Pack)
+package body Inner is
+
+   --------
+   -- P1 --
+   --------
+
+   procedure P1 (I : Integer) is
+   begin
+      --  Generated stub: replace with real body!
+      pragma Compile_Time_Warning (Standard.True, "P1 unimplemented");
+      raise Program_Error with "Unimplemented procedure P1";
+   end P1;
+
+   --------
+   -- F1 --
+   --------
+
+   function F1 (I : Integer) return Boolean is
+   begin
+      --  Generated stub: replace with real body!
+      pragma Compile_Time_Warning (Standard.True, "F1 unimplemented");
+      return raise Program_Error with "Unimplemented function F1";
+   end F1;
+
+end Inner;
+pragma Ada_2012;
+separate (Pack)
+procedure Proc (I : Integer; B : Boolean) is
+begin
+   --  Generated stub: replace with real body!
+   pragma Compile_Time_Warning (Standard.True, "Proc unimplemented");
+   raise Program_Error with "Unimplemented procedure Proc";
+end Proc;

@@ -89,6 +89,8 @@ package Utils.Command_Lines is
    type Command_Line (Descriptor : Descriptor_Access) is limited private;
    --  Result of Parse (Step 2). Depends on the command line typed by the user.
 
+   function Copy_Command_Line (Cmd : Command_Line) return Command_Line;
+
    --  Warn about mixing the wrong Command_Line????
 
    type All_Switches is private;
