@@ -11,7 +11,8 @@ with Interfaces; use type Interfaces.Unsigned_16;
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
 with Langkit_Support.Diagnostics;
-with Langkit_Support.Slocs; use Langkit_Support;
+with Langkit_Support.Slocs;
+with Langkit_Support.Text;
 with Libadalang;            use Libadalang;
 with Libadalang.Common;     use Libadalang.Common;
 with LAL_Extensions;        use LAL_Extensions;
@@ -124,6 +125,14 @@ package body Stub.Actions is
    --  Copy body text through that one.
    --  Append completion.
    --  Copy rest of body text.
+
+   package Slocs renames Langkit_Support.Slocs;
+
+   Elaborate_Body : constant Langkit_Support.Text.Unbounded_Text_Type :=
+     Langkit_Support.Text.To_Unbounded_Text ("elaborate_body");
+
+   function Has_Elaborate_Body (N : Ada_Node) return Boolean is
+     (not P_Get_Attribute (N.As_Basic_Decl, Elaborate_Body).Is_Null);
 
    ----------
    -- Init --
@@ -398,7 +407,9 @@ package body Stub.Actions is
    begin
       case N.Kind is
          when Ada_Package_Decl | Ada_Generic_Package_Decl =>
-            --  ???Return True if the package has Elaborate_Body
+            if Has_Elaborate_Body (N) then
+               return True;
+            end if;
 
             declare
                VP : constant Public_Part := Vis_Part (N);
