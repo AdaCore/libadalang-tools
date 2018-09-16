@@ -8,6 +8,7 @@ with Langkit_Support.Diagnostics;
 
 with Libadalang;     use Libadalang;
 with Libadalang.Iterators; use Libadalang.Iterators;
+with Libadalang.Unit_Files.Projects; use Libadalang.Unit_Files.Projects;
 
 package body Utils.Tools is
 
@@ -50,8 +51,21 @@ package body Utils.Tools is
       end if;
 
       if Tool.Context = No_Analysis_Context then
-         Tool.Context := Create_Context
-           (Charset => Wide_Character_Encoding (Cmd));
+         declare
+            use GNATCOLL.Projects;
+
+            Provider : constant Unit_Provider_Reference :=
+              (if Status (Tool.Project_Tree.all) = Empty
+               then No_Unit_Provider_Reference
+               else Create_Unit_Provider_Reference
+                      (Create_Project_Unit_Provider
+                         (Tool.Project_Tree, Tool.Project_Env,
+                          Is_Project_Owner => False)));
+         begin
+            Tool.Context := Create_Context
+              (Charset       => Wide_Character_Encoding (Cmd),
+               Unit_Provider => Provider);
+         end;
       end if;
 
       declare

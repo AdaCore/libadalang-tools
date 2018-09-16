@@ -29,6 +29,8 @@ with GNAT.Command_Line;
 with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 with GNAT.OS_Lib;
 
+with GNATCOLL.Projects;
+
 with Utils.Environment;
 with Utils.Command_Lines.Common;   use Utils.Command_Lines.Common;
 --  with Utils.Command_Lines.Common.Post;
@@ -244,6 +246,7 @@ package body Utils.Drivers is
          Individual_Source_Options => Individual_Source_Options,
          Result_Dirs               => Result_Dirs,
          The_Project_Tree          => Tool.Project_Tree,
+         The_Project_Env           => Tool.Project_Env,
          Needs_Per_File_Output     => Needs_Per_File_Output,
          Preprocessing_Allowed     => Preprocessing_Allowed,
          Tool_Package_Name         => Tool_Package_Name,
@@ -319,6 +322,8 @@ package body Utils.Drivers is
       Process_Files;
       Final (Tool, Cmd);
 
+      GNATCOLL.Projects.Unload (Tool.Project_Tree.all);
+      GNATCOLL.Projects.Free (Tool.Project_Env);
       Environment.Clean_Up;
 
 --      if not Utils.Options.Incremental_Mode then

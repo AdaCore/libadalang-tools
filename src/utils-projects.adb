@@ -26,7 +26,8 @@ package body Utils.Projects is
      Common_String_Seq_Switches, Common_Nat_Switches;
    pragma Warnings (On);
 
-   My_Project : aliased Project_Tree;
+   My_Project_Tree : aliased Project_Tree;
+   Project_Env : Project_Environment_Access;
 
    function Project_File_Name (Cmd : Command_Line) return String with
       Pre => Arg (Cmd, Project_File) /= null;
@@ -56,7 +57,7 @@ package body Utils.Projects is
       Result_Dirs               :    out String_String_Map;
       Needs_Per_File_Output     :        Boolean;
       Preprocessing_Allowed     :        Boolean;
-      My_Project                : in out Project_Tree;
+      My_Project_Tree           : in out Project_Tree;
       Tool_Package_Name         :        String;
       Compute_Project_Closure   :        Boolean;
       Callback                  :        Parse_Callback;
@@ -101,14 +102,12 @@ package body Utils.Projects is
       Result_Dirs               :    out String_String_Map;
       Needs_Per_File_Output     :        Boolean;
       Preprocessing_Allowed     :        Boolean;
-      My_Project : in out Project_Tree; -- My_Project_Tree????????????????
+      My_Project_Tree           : in out Project_Tree;
       Tool_Package_Name         :        String;
       Compute_Project_Closure   :        Boolean;
       Callback                  :        Parse_Callback;
       Tool_Temp_Dir             :        String)
    is
-      Project_Env : Project_Environment_Access;
-
       use String_Access_Vectors;
       Compiler_Options_Vector : String_Access_Vector;
 
@@ -250,18 +249,18 @@ package body Utils.Projects is
             Error_Printed := True;
          end Errors;
       begin
-         My_Project.Load
+         My_Project_Tree.Load
            (GNATCOLL.VFS.Create (+Project_File_Name (Cmd)),
             Project_Env,
             Errors => Errors'Unrestricted_Access,
             Recompute_View => False,
             Report_Missing_Dirs => False);
 
-         if Is_Aggregate_Project (My_Project.Root_Project) then
+         if Is_Aggregate_Project (My_Project_Tree.Root_Project) then
             Cmd_Error ("aggregate projects are not supported");
          end if;
 
-         My_Project.Recompute_View
+         My_Project_Tree.Recompute_View
            (Errors => Recompute_View_Errors'Unrestricted_Access);
       exception
          when Invalid_Project =>
@@ -279,7 +278,7 @@ package body Utils.Projects is
       function Is_Ada_File (File : Virtual_File) return Boolean is
          use Ada.Characters.Handling;
       begin
-         return To_Lower (Language (Info (My_Project, File))) = "ada";
+         return To_Lower (Language (Info (My_Project_Tree, File))) = "ada";
       end Is_Ada_File;
 
       -------------------------
@@ -287,8 +286,8 @@ package body Utils.Projects is
       -------------------------
 
       function Is_Externally_Built (File : Virtual_File) return Boolean is
-         F_Info : constant File_Info            := Info (My_Project, File);
-         Proj   : constant Project_Type         := Project (F_Info);
+         F_Info : constant File_Info := Info (My_Project_Tree, File);
+         Proj   : constant Project_Type := Project (F_Info);
          Attr   : constant Attribute_Pkg_String :=
            Build ("", "externally_built");
       begin
@@ -312,7 +311,7 @@ package body Utils.Projects is
       begin
          Append (Main_Files, Create (+Main_Unit_Name (Cmd).all));
          Get_Closures
-           (My_Project.Root_Project,
+           (My_Project_Tree.Root_Project,
             Main_Files,
             All_Projects => True,
             Include_Externally_Built => False,
@@ -386,7 +385,7 @@ package body Utils.Projects is
 
          if Compute_Project_Closure and then not Argument_File_Specified then
             if Main_Unit_Name (Cmd) = null then
-               Prj := My_Project.Root_Project;
+               Prj := My_Project_Tree.Root_Project;
 
                Files := Prj.Source_Files (Recursive => Arg (Cmd, Update_All));
 
@@ -460,7 +459,7 @@ package body Utils.Projects is
       ------------------------------------
 
       procedure Extract_Compilation_Attributes is
-         Proj      : Project_Type := My_Project.Root_Project;
+         Proj      : Project_Type := My_Project_Tree.Root_Project;
          Attr_Proj : Project_Type;
 
          --  Attributes to check:
@@ -570,7 +569,7 @@ package body Utils.Projects is
       procedure Extract_Tool_Options is
          Arg_File_Name : String_Access;
 
-         Proj : constant Project_Type := Root_Project (My_Project);
+         Proj : constant Project_Type := Root_Project (My_Project_Tree);
 
          Attr_Switches : constant Attribute_Pkg_List :=
            Build (Tool_Package_Name, "Switches");
@@ -638,7 +637,7 @@ package body Utils.Projects is
          declare
             Config_Name : constant String :=
               GNATCOLL.Projects.Aux.Create_Config_Pragmas_File
-                (My_Project.Root_Project);
+                (My_Project_Tree.Root_Project);
          begin
             Append
               (Compiler_Options_Vector,
@@ -662,7 +661,7 @@ package body Utils.Projects is
          declare
             Mapping_Name : constant String :=
               GNATCOLL.Projects.Aux.Create_Ada_Mapping_File
-                (My_Project.Root_Project);
+                (My_Project_Tree.Root_Project);
          begin
             Append
               (Compiler_Options_Vector,
@@ -683,14 +682,14 @@ package body Utils.Projects is
             if Arg (Cmd, Subdirs) /= null then
                Set_Object_Subdir (Project_Env.all, +Arg (Cmd, Subdirs).all);
                Recompute_View
-                 (My_Project,
+                 (My_Project_Tree,
                   Errors => Recompute_View_Errors'Unrestricted_Access);
             end if;
 
-            Global_Report_Dir := My_Project.Root_Project.Object_Dir;
+            Global_Report_Dir := My_Project_Tree.Root_Project.Object_Dir;
 
             if Global_Report_Dir = No_File then
-               Global_Report_Dir := My_Project.Root_Project.Project_Path;
+               Global_Report_Dir := My_Project_Tree.Root_Project.Project_Path;
             end if;
 
             Process_Project.Global_Report_Dir :=
@@ -724,14 +723,14 @@ package body Utils.Projects is
             Report_Dir := Source_Prj.Object_Dir;
 
             if Report_Dir = No_File then
-               Report_Dir := My_Project.Root_Project.Project_Path;
+               Report_Dir := My_Project_Tree.Root_Project.Project_Path;
             end if;
 
             return Display_Dir_Name (Report_Dir);
          end Source_Result_Dir;
 
          Sources : constant File_Array_Access :=
-           My_Project.Root_Project.Source_Files (Recursive => True);
+           My_Project_Tree.Root_Project.Source_Files (Recursive => True);
 
          Project_U   : Project_Type;
          Attr_Proj   : Project_Type;
@@ -822,7 +821,7 @@ package body Utils.Projects is
 
       begin
          for S in Sources'Range loop
-            Source_Info := My_Project.Info (Sources (S));
+            Source_Info := My_Project_Tree.Info (Sources (S));
             Project_U   := Project (Source_Info);
             Name        := new String'(Display_Base_Name (Sources (S)));
 
@@ -972,8 +971,8 @@ package body Utils.Projects is
       --  apparently unnecessary (no tests fail if it is removed).
 
       --  Process_Project_File has:
-      --  Register_Tool_Attributes (My_Project); which is needed for gnat2xml
-      --  (LA17-020-gnat2xml_1).
+      --  Register_Tool_Attributes (My_Project_Tree); which is needed for
+      --  gnat2xml (LA17-020-gnat2xml_1).
 
       Initialize_Environment;
       Set_External_Values;
@@ -1112,6 +1111,7 @@ package body Utils.Projects is
       Individual_Source_Options       :    out String_String_List_Map;
       Result_Dirs                     :    out String_String_Map;
       The_Project_Tree                :    out not null Project_Tree_Access;
+      The_Project_Env                : out not null Project_Environment_Access;
       Needs_Per_File_Output           :        Boolean;
       Preprocessing_Allowed           :        Boolean;
       Tool_Package_Name               :        String;
@@ -1134,7 +1134,8 @@ package body Utils.Projects is
    --  In addition, we parse the command line ignoring errors first, for
    --  --version and --help switches. ???This also sets debug flags, etc.
    begin
-      The_Project_Tree := My_Project'Access;
+      The_Project_Tree := My_Project_Tree'Access;
+      The_Project_Env := Project_Env;
       Cmd_Text := Text_Args_From_Command_Line;
       Cmd_Cargs := Text_Cargs_From_Command_Line;
 
@@ -1200,7 +1201,7 @@ package body Utils.Projects is
             if Arg (Cmd, Project_File) /= null then
                declare
                   Res : constant Virtual_File :=
-                    GNATCOLL.Projects.Create (My_Project, +File_Name.all);
+                    GNATCOLL.Projects.Create (My_Project_Tree, +File_Name.all);
                begin
                   pragma Assert (Res /= No_File);
                   --  ???This can fail if a directory name is given
@@ -1221,7 +1222,7 @@ package body Utils.Projects is
                Result_Dirs,
                Needs_Per_File_Output,
                Preprocessing_Allowed,
-               My_Project,
+               My_Project_Tree,
                Tool_Package_Name,
                Compute_Project_Closure,
                Callback,

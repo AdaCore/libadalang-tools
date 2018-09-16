@@ -12,9 +12,10 @@ package Utils.Tools is
 
    type Tool_State is abstract tagged limited record
       Project_Tree : GNATCOLL.Projects.Project_Tree_Access;
-      --  The only tool that needs access to the Project_Tree is gnatstub.
       --  The driver sets this to the current project. If there is no
       --  -P switch, then the Status will be Empty.
+
+      Project_Env : GNATCOLL.Projects.Project_Environment_Access;
 
       Context : Analysis_Context := No_Analysis_Context;
       --  The only tool that needs access to the Context is gnatstub.

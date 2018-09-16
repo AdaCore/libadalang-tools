@@ -47,6 +47,7 @@ package Utils.Projects is
       Individual_Source_Options       :    out String_String_List_Map;
       Result_Dirs                     :    out String_String_Map;
       The_Project_Tree                :    out not null Project_Tree_Access;
+      The_Project_Env                : out not null Project_Environment_Access;
       Needs_Per_File_Output           :        Boolean;
       Preprocessing_Allowed           :        Boolean;
       Tool_Package_Name               :        String;
