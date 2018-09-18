@@ -1,4 +1,33 @@
+================================================================
+gnatstub --update-body=4 pack.ads
 body is updated for pack.ads
+gnatstub: only one file name allowed with --update-body
+try "gnatstub --help" for more information.
+
+----------------------------------------------------------------
+
+--  mumble-processing.adb
+
+package body Mumble.Processing is
+
+   procedure Init (Tool : in out Stub_Tool; Cmd : Command_Line) is
+   begin
+      null;
+   end Init;
+
+   procedure Tool_Help (Tool : Stub_Tool) is
+   begin
+      null;
+   end Tool_Help;
+
+end Mumble.Processing;
+
+----------------------------------------------------------------
+
+--  pack-child.adb
+
+package body Pack.Child is
+end Pack.Child;
 
 ----------------------------------------------------------------
 
@@ -19,24 +48,36 @@ package body Pack is
 
    package body Inner is separate;
 end Pack;
+================================================================
+gnatstub --update-body=4 pack.ads --subunits
 body is updated for pack.ads
 separate body is created for stub for Proc
 separate body is created for stub for Inner
 
 ----------------------------------------------------------------
 
---  pack.adb
+--  mumble-processing.adb
 
-package body Pack is
+package body Mumble.Processing is
 
-   ----------
-   -- Proc --
-   ----------
+   procedure Init (Tool : in out Stub_Tool; Cmd : Command_Line) is
+   begin
+      null;
+   end Init;
 
-   procedure Proc (I : Integer; B : Boolean)
-   is separate;
-   package body Inner is separate;
-end Pack;
+   procedure Tool_Help (Tool : Stub_Tool) is
+   begin
+      null;
+   end Tool_Help;
+
+end Mumble.Processing;
+
+----------------------------------------------------------------
+
+--  pack-child.adb
+
+package body Pack.Child is
+end Pack.Child;
 pragma Ada_2012;
 separate (Pack)
 package body Inner is
@@ -72,3 +113,491 @@ begin
    pragma Compile_Time_Warning (Standard.True, "Proc unimplemented");
    raise Program_Error with "Unimplemented procedure Proc";
 end Proc;
+
+----------------------------------------------------------------
+
+--  pack.adb
+
+package body Pack is
+
+   ----------
+   -- Proc --
+   ----------
+
+   procedure Proc (I : Integer; B : Boolean)
+   is separate;
+
+   package body Inner is separate;
+end Pack;
+================================================================
+pack-child.ads
+gnatstub: subprogram not found at line 9
+try "gnatstub --help" for more information.
+body is updated for pack-child.ads
+body is updated for pack-child.ads
+body is updated for pack-child.ads
+
+----------------------------------------------------------------
+
+--  mumble-processing.adb
+
+package body Mumble.Processing is
+
+   procedure Init (Tool : in out Stub_Tool; Cmd : Command_Line) is
+   begin
+      null;
+   end Init;
+
+   procedure Tool_Help (Tool : Stub_Tool) is
+   begin
+      null;
+   end Tool_Help;
+
+end Mumble.Processing;
+
+----------------------------------------------------------------
+
+--  pack-child.adb
+
+package body Pack.Child is
+
+   ----------
+   -- Proc --
+   ----------
+
+   procedure Proc is
+   begin
+      --  Generated stub: replace with real body!
+      pragma Compile_Time_Warning (Standard.True, "Proc unimplemented");
+      raise Program_Error with "Unimplemented procedure Proc";
+   end Proc;
+
+   -------
+   -- A --
+   -------
+
+   procedure A is
+   begin
+      --  Generated stub: replace with real body!
+      pragma Compile_Time_Warning (Standard.True, "A unimplemented");
+      raise Program_Error with "Unimplemented procedure A";
+   end A;
+
+   -------
+   -- B --
+   -------
+
+   procedure B is
+   begin
+      --  Generated stub: replace with real body!
+      pragma Compile_Time_Warning (Standard.True, "B unimplemented");
+      raise Program_Error with "Unimplemented procedure B";
+   end B;
+
+end Pack.Child;
+pragma Ada_2012;
+separate (Pack)
+package body Inner is
+
+   --------
+   -- P1 --
+   --------
+
+   procedure P1 (I : Integer) is
+   begin
+      --  Generated stub: replace with real body!
+      pragma Compile_Time_Warning (Standard.True, "P1 unimplemented");
+      raise Program_Error with "Unimplemented procedure P1";
+   end P1;
+
+   --------
+   -- F1 --
+   --------
+
+   function F1 (I : Integer) return Boolean is
+   begin
+      --  Generated stub: replace with real body!
+      pragma Compile_Time_Warning (Standard.True, "F1 unimplemented");
+      return raise Program_Error with "Unimplemented function F1";
+   end F1;
+
+end Inner;
+pragma Ada_2012;
+separate (Pack)
+procedure Proc (I : Integer; B : Boolean) is
+begin
+   --  Generated stub: replace with real body!
+   pragma Compile_Time_Warning (Standard.True, "Proc unimplemented");
+   raise Program_Error with "Unimplemented procedure Proc";
+end Proc;
+
+----------------------------------------------------------------
+
+--  pack.adb
+
+package body Pack is
+
+   ----------
+   -- Proc --
+   ----------
+
+   procedure Proc (I : Integer; B : Boolean)
+   is separate;
+
+   package body Inner is separate;
+end Pack;
+================================================================
+alphabetical-order
+body is updated for pack-child.ads
+body is updated for pack-child.ads
+body is updated for pack-child.ads
+
+----------------------------------------------------------------
+
+--  mumble-processing.adb
+
+package body Mumble.Processing is
+
+   procedure Init (Tool : in out Stub_Tool; Cmd : Command_Line) is
+   begin
+      null;
+   end Init;
+
+   procedure Tool_Help (Tool : Stub_Tool) is
+   begin
+      null;
+   end Tool_Help;
+
+end Mumble.Processing;
+
+----------------------------------------------------------------
+
+--  pack-child.adb
+
+package body Pack.Child is
+
+   -------
+   -- A --
+   -------
+
+   procedure A is
+   begin
+      --  Generated stub: replace with real body!
+      pragma Compile_Time_Warning (Standard.True, "A unimplemented");
+      raise Program_Error with "Unimplemented procedure A";
+   end A;
+
+   -------
+   -- B --
+   -------
+
+   procedure B is
+   begin
+      --  Generated stub: replace with real body!
+      pragma Compile_Time_Warning (Standard.True, "B unimplemented");
+      raise Program_Error with "Unimplemented procedure B";
+   end B;
+
+   ----------
+   -- Proc --
+   ----------
+
+   procedure Proc is
+   begin
+      --  Generated stub: replace with real body!
+      pragma Compile_Time_Warning (Standard.True, "Proc unimplemented");
+      raise Program_Error with "Unimplemented procedure Proc";
+   end Proc;
+
+end Pack.Child;
+
+----------------------------------------------------------------
+
+--  pack.adb
+
+package body Pack is
+   package body Inner is separate;
+end Pack;
+================================================================
+subunits
+body is updated for pack-child.ads
+separate body is created for stub for Proc
+body is updated for pack-child.ads
+separate body is created for stub for A
+body is updated for pack-child.ads
+separate body is created for stub for B
+
+----------------------------------------------------------------
+
+--  mumble-processing.adb
+
+package body Mumble.Processing is
+
+   procedure Init (Tool : in out Stub_Tool; Cmd : Command_Line) is
+   begin
+      null;
+   end Init;
+
+   procedure Tool_Help (Tool : Stub_Tool) is
+   begin
+      null;
+   end Tool_Help;
+
+end Mumble.Processing;
+pragma Ada_2012;
+separate (Pack.Child)
+procedure A is
+begin
+   --  Generated stub: replace with real body!
+   pragma Compile_Time_Warning (Standard.True, "A unimplemented");
+   raise Program_Error with "Unimplemented procedure A";
+end A;
+pragma Ada_2012;
+separate (Pack.Child)
+procedure B is
+begin
+   --  Generated stub: replace with real body!
+   pragma Compile_Time_Warning (Standard.True, "B unimplemented");
+   raise Program_Error with "Unimplemented procedure B";
+end B;
+pragma Ada_2012;
+separate (Pack.Child)
+procedure Proc is
+begin
+   --  Generated stub: replace with real body!
+   pragma Compile_Time_Warning (Standard.True, "Proc unimplemented");
+   raise Program_Error with "Unimplemented procedure Proc";
+end Proc;
+
+----------------------------------------------------------------
+
+--  pack-child.adb
+
+package body Pack.Child is
+
+   -------
+   -- B --
+   -------
+
+   procedure B
+   is separate;
+
+   -------
+   -- A --
+   -------
+
+   procedure A
+   is separate;
+
+   ----------
+   -- Proc --
+   ----------
+
+   procedure Proc
+   is separate;
+
+end Pack.Child;
+
+----------------------------------------------------------------
+
+--  pack.adb
+
+package body Pack is
+   package body Inner is separate;
+end Pack;
+================================================================
+alphabetical-order, subunits
+body is updated for pack-child.ads
+separate body is created for stub for Proc
+body is updated for pack-child.ads
+separate body is created for stub for A
+body is updated for pack-child.ads
+separate body is created for stub for B
+
+----------------------------------------------------------------
+
+--  mumble-processing.adb
+
+package body Mumble.Processing is
+
+   procedure Init (Tool : in out Stub_Tool; Cmd : Command_Line) is
+   begin
+      null;
+   end Init;
+
+   procedure Tool_Help (Tool : Stub_Tool) is
+   begin
+      null;
+   end Tool_Help;
+
+end Mumble.Processing;
+pragma Ada_2012;
+separate (Pack.Child)
+procedure A is
+begin
+   --  Generated stub: replace with real body!
+   pragma Compile_Time_Warning (Standard.True, "A unimplemented");
+   raise Program_Error with "Unimplemented procedure A";
+end A;
+pragma Ada_2012;
+separate (Pack.Child)
+procedure B is
+begin
+   --  Generated stub: replace with real body!
+   pragma Compile_Time_Warning (Standard.True, "B unimplemented");
+   raise Program_Error with "Unimplemented procedure B";
+end B;
+pragma Ada_2012;
+separate (Pack.Child)
+procedure Proc is
+begin
+   --  Generated stub: replace with real body!
+   pragma Compile_Time_Warning (Standard.True, "Proc unimplemented");
+   raise Program_Error with "Unimplemented procedure Proc";
+end Proc;
+
+----------------------------------------------------------------
+
+--  pack-child.adb
+
+package body Pack.Child is
+
+   -------
+   -- B --
+   -------
+
+   procedure B
+   is separate;
+
+   -------
+   -- A --
+   -------
+
+   procedure A
+   is separate;
+
+   ----------
+   -- Proc --
+   ----------
+
+   procedure Proc
+   is separate;
+
+end Pack.Child;
+
+----------------------------------------------------------------
+
+--  pack.adb
+
+package body Pack is
+   package body Inner is separate;
+end Pack;
+================================================================
+mumble-processing.ads
+body is updated for mumble-processing.ads
+separate body is created for stub for Init
+body is updated for mumble-processing.ads
+separate body is created for stub for Per_File_Action
+body is updated for mumble-processing.ads
+separate body is created for stub for Final
+gnatstub: body for Tool_Help already exists
+try "gnatstub --help" for more information.
+body is updated for mumble-processing.ads
+separate body is created for stub for Dump
+pragma Ada_2012;
+separate (Mumble.Processing)
+procedure Dump (Tool : in out Stub_Tool; Message : String := "") is
+begin
+   --  Generated stub: replace with real body!
+   pragma Compile_Time_Warning (Standard.True, "Dump unimplemented");
+   raise Program_Error with "Unimplemented procedure Dump";
+end Dump;
+pragma Ada_2012;
+separate (Mumble.Processing)
+procedure Final (Tool : in out Stub_Tool; Cmd : Command_Line) is
+begin
+   --  Generated stub: replace with real body!
+   pragma Compile_Time_Warning (Standard.True, "Final unimplemented");
+   raise Program_Error with "Unimplemented procedure Final";
+end Final;
+pragma Ada_2012;
+separate (Mumble.Processing)
+procedure Init (Tool : in out Stub_Tool; Cmd : Command_Line) is
+begin
+   --  Generated stub: replace with real body!
+   pragma Compile_Time_Warning (Standard.True, "Init unimplemented");
+   raise Program_Error with "Unimplemented procedure Init";
+end Init;
+pragma Ada_2012;
+separate (Mumble.Processing)
+procedure Per_File_Action
+  (Tool  : in out Stub_Tool; Cmd : Command_Line; File_Name : String;
+   Input :        String; BOM_Seen : Boolean; Unit : Analysis_Unit)
+is
+begin
+   --  Generated stub: replace with real body!
+   pragma Compile_Time_Warning (Standard.True,
+      "Per_File_Action unimplemented");
+   raise Program_Error with "Unimplemented procedure Per_File_Action";
+end Per_File_Action;
+
+----------------------------------------------------------------
+
+--  mumble-processing.adb
+
+package body Mumble.Processing is
+
+   -----------
+   -- Final --
+   -----------
+
+   overriding procedure Final (Tool : in out Stub_Tool; Cmd : Command_Line)
+   is separate;
+
+   ---------------------
+   -- Per_File_Action --
+   ---------------------
+
+   overriding procedure Per_File_Action (Tool : in out Stub_Tool; Cmd : Command_Line; File_Name : String; Input : String; BOM_Seen : Boolean; Unit : Analysis_Unit)
+   is separate;
+
+   ----------
+   -- Init --
+   ----------
+
+   overriding procedure Init (Tool : in out Stub_Tool; Cmd : Command_Line)
+   is separate;
+
+   procedure Init (Tool : in out Stub_Tool; Cmd : Command_Line) is
+   begin
+      null;
+   end Init;
+
+   procedure Tool_Help (Tool : Stub_Tool) is
+   begin
+      null;
+   end Tool_Help;
+
+   ----------
+   -- Dump --
+   ----------
+
+   procedure Dump (Tool : in out Stub_Tool; Message : String := "")
+   is separate;
+
+end Mumble.Processing;
+
+----------------------------------------------------------------
+
+--  pack-child.adb
+
+package body Pack.Child is
+end Pack.Child;
+
+----------------------------------------------------------------
+
+--  pack.adb
+
+package body Pack is
+   package body Inner is separate;
+end Pack;

@@ -32,6 +32,10 @@ package Pack.Child is
    private
       State : Integer;
    end;
+
+   procedure A;
+   procedure B;
+
 end Pack.Child;
 
 ----------------------------------------------------------------
@@ -43,7 +47,15 @@ end Pack.Child;
 
 ----------------------------------------------------------------
 
---  stub-actions.ads
+--  mumble.ads
+
+package Mumble is
+
+end Mumble;
+
+----------------------------------------------------------------
+
+--  mumble-processing.ads
 
 with Libadalang.Analysis; use Libadalang.Analysis;
 with Utils.Char_Vectors; use Utils.Char_Vectors;
@@ -51,7 +63,7 @@ with Utils.Command_Lines; use Utils.Command_Lines;
 with Utils.Tools; use Utils.Tools;
 with Pp.Scanner; use Pp;
 
-package Stub.Actions is
+package Mumble.Processing is
 
    type Stub_Tool is new Tool_State with private;
 
@@ -79,6 +91,22 @@ private
      (Tool : in out Stub_Tool;
       Message : String := "");
 
-end Stub.Actions;
+end Mumble.Processing;
 
 ----------------------------------------------------------------
+
+--  mumble-processing.adb
+
+package body Mumble.Processing is
+
+   procedure Init (Tool : in out Stub_Tool; Cmd : Command_Line) is
+   begin
+      null;
+   end Init;
+
+   procedure Tool_Help (Tool : Stub_Tool) is
+   begin
+      null;
+   end Tool_Help;
+
+end Mumble.Processing;

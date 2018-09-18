@@ -530,6 +530,9 @@ package body Stub.Actions is
       procedure Generate_Entry_Body (Decl : Ada_Node; Name : W_Str);
       --  Generate an entry body stub
 
+      procedure Generate_Subp_Or_Entry_Body
+        (Decl : Ada_Node; Name : W_Str; Ada_Stub : Boolean);
+
       procedure Generate_Stub_Begin_End (Name, Stub_Kind : W_Str);
       --  Generate the text from "begin" to "end" of the generated code for a
       --  subprogram, entry, or task body. Stub_Kind is "function",
@@ -653,12 +656,12 @@ package body Stub.Actions is
             Out_Range => Tool.Ignored_Out_Range,
             Messages => Tool.Ignored_Messages);
          pragma Assert (Is_Empty (Tool.Ignored_Messages));
-         Put ("\1 \2 is",
+         Put (" \1\2 is",
               Overriding_String (Overrides),
               From_UTF8
                 (Elems (Pp_Out_Vec) (1 .. Last_Index (Pp_Out_Vec))));
          if Ada_Stub then
-            Put (" separate;");
+            Put (" separate;\n");
          else
             Put ("\n");
             Generate_Stub_Begin_End
@@ -697,6 +700,19 @@ package body Stub.Actions is
 
          Generate_Stub_Begin_End (Name, "entry");
       end Generate_Entry_Body;
+
+      procedure Generate_Subp_Or_Entry_Body
+        (Decl : Ada_Node; Name : W_Str; Ada_Stub : Boolean) is
+      begin
+         case Decl.Kind is
+            when Ada_Subp_Decl | Ada_Generic_Subp_Decl =>
+               Generate_Subp_Body (Decl, Name, Ada_Stub);
+            when Ada_Entry_Decl =>
+               Generate_Entry_Body (Decl, Name);
+            when others =>
+               raise Program_Error;
+         end case;
+      end Generate_Subp_Or_Entry_Body;
 
       procedure Generate_Stub_Begin_End (Name, Stub_Kind : W_Str) is
          Returns : constant Boolean := Stub_Kind = "function";
@@ -1017,8 +1033,6 @@ package body Stub.Actions is
             Part : constant Unit_Parts :=
               (if Root_Node.Kind in Ada_Body_Stub then Unit_Separate
                else Unit_Body);
-            --  ????Part is Unit_Separate in the case of Ada_Body_Stub,
-            --  but currently this causes File_From_Unit to return "".
          begin
             pragma Assert
               (Extending_Project (Project (Arg_File_Info)) = No_Project);
@@ -1117,12 +1131,6 @@ package body Stub.Actions is
       --  Implement the --update-body=N switch.
 
       procedure Update_Body is
-         --  ???We don't do proper error checking -- just raise exceptions. We
-         --  should check that the body exists (including for nested
-         --  packages). We should allow generics and protecteds. It doesn't
-         --  make sense to have more than one file name. It's not clear we need
-         --  the backup file.
-
          use Slocs, Ada_Node_Vectors;
          Search_Line : constant Line_Number :=
            Line_Number (Arg (Cmd, Update_Body));
@@ -1132,9 +1140,10 @@ package body Stub.Actions is
          Subp_Decl : Ada_Node := No_Ada_Node;
          --  The Subp_Decl at Search_Line
 
-         Body_Line : Line_Number := Line_Number'Last / 2;
+         Body_Line : Line_Number;
          --  The line number in the body file after which the new subprogram
-         --  body should be inserted. Initialize to intentionally bogus value.
+         --  body should be inserted.
+         Body_Line_Set : Boolean := False;
 
          procedure Search;
          --  Compute Subp_Decl and Body_Line
@@ -1153,8 +1162,10 @@ package body Stub.Actions is
             --  Walk the spec, recursing into nested package and protected
             --  specs, searching for the subprogram declaration at Search_Line.
             --  Each time we see a declaration that has a corresponding
-            --  declaration in the body, update Result; we're going to insert
-            --  the new body after the last such one encountered.
+            --  declaration in the body, update Body_Line; we're going to
+            --  insert the new body after the last such one encountered. When
+            --  we find the subprogram we're searching for, we set Subp_Decl
+            --  and quit.
 
             procedure Rec (Decl : Ada_Node);
 
@@ -1179,6 +1190,7 @@ package body Stub.Actions is
                           Image (Integer (New_Body_Line)));
                   end if;
                   pragma Assert (Subp_Decl.Is_Null);
+                  Body_Line_Set := True;
                   Body_Line := New_Body_Line;
                end Update_Body_Line;
 
@@ -1194,15 +1206,30 @@ package body Stub.Actions is
                end Collect_Decls;
 
                Sloc : constant Source_Location_Range := Sloc_Range (Decl);
+               Decl_Name : constant String :=
+                 To_UTF8 (Full_Name (Get_Def_Name (Decl).As_Name));
+
+            --  Start of processing for Rec
 
             begin
                if Search_Line in Sloc.Start_Line .. Sloc.End_Line then
                   case Decl.Kind is
                      when Ada_Package_Decl | Ada_Generic_Package_Decl |
                        Ada_Single_Protected_Decl | Ada_Protected_Type_Decl =>
-                        Update_Body_Line
-                          (Body_Decls (Decl.As_Basic_Decl.P_Body_Part_For_Decl)
-                            .Sloc_Range.Start_Line);
+                        declare
+                           B : constant Body_Node :=
+                             Decl.As_Basic_Decl.P_Body_Part_For_Decl;
+                        begin
+                           if B.Is_Null then
+                              if not Body_Line_Set then
+                                 Cmd_Error
+                                   ("body of " & Decl_Name & " not found");
+                              end if;
+                           else
+                              Update_Body_Line
+                                (Body_Decls (B).Sloc_Range.Start_Line);
+                           end if;
+                        end;
 
                         if not Vis_Part (Decl).Is_Null then
                            Collect_Decls (F_Decls (Vis_Part (Decl)));
@@ -1220,40 +1247,43 @@ package body Stub.Actions is
                            Rec (Sorted (X));
                            exit when not Subp_Decl.Is_Null;
                         end loop;
-                        pragma Assert (not Subp_Decl.Is_Null);
+                        if Subp_Decl.Is_Null then
+                           Cmd_Error ("subprogram not found at line " &
+                                        Image (Arg (Cmd, Update_Body)));
+                        end if;
 
-                     when Ada_Subp_Decl | Ada_Generic_Subp_Decl =>
-                        pragma Assert
-                          (P_Body_Part (Decl.As_Basic_Subp_Decl).Is_Null);
+                     when Ada_Subp_Decl | Ada_Generic_Subp_Decl |
+                       Ada_Entry_Decl =>
                         pragma Assert (Subp_Decl.Is_Null);
                         Subp_Decl := Decl;
 
-                     when others => raise Program_Error;
+                        if not Decl.As_Basic_Decl.P_Body_Part_For_Decl.Is_Null
+                        then
+                           Cmd_Error
+                             ("body for " & Decl_Name & " already exists");
+                        end if;
+
+                     when others => null;
                   end case;
+
                else
-                  pragma Assert
-                    (if not Arg (Cmd, Alphabetical_Order) then
-                       Search_Line > Sloc.End_Line);
-                  case Decl.Kind is
-                     when Ada_Package_Decl | Ada_Generic_Package_Decl |
-                       Ada_Single_Protected_Decl | Ada_Protected_Type_Decl =>
-                        declare
-                           B : constant Body_Node :=
-                             Decl.As_Basic_Decl.P_Body_Part_For_Decl;
-                        begin
-                           if not B.Is_Null then
-                              Update_Body_Line (B.Sloc_Range.End_Line);
-                           end if;
-                        end;
-                     when others =>
-                        null;
-                  end case;
+                  declare
+                     B : constant Body_Node :=
+                       Decl.As_Basic_Decl.P_Body_Part_For_Decl;
+                  begin
+                     if not B.Is_Null then
+                        Update_Body_Line (B.Sloc_Range.End_Line);
+                     end if;
+                  end;
                end if;
             end Rec;
 
          begin
             Rec (Root_Node);
-            pragma Assert (not Subp_Decl.Is_Null);
+            if Subp_Decl.Is_Null then
+               Cmd_Error ("no subprogram found at line " &
+                            Image (Arg (Cmd, Update_Body)));
+            end if;
          end Search;
 
          function Find_Insertion_Index
@@ -1291,17 +1321,22 @@ package body Stub.Actions is
             Move (Target => Pp_Out_Vec, Source => Temp);
          end Indent_Stub;
 
-         Backup_Name : constant String := Output_Name & ".bak";
          Old_Content : String_Access := Read_File (Output_Name);
+         Backup_Name : constant String := Output_Name & ".bak";
+         Create_Backup : constant Boolean := False;
+         --  For now, we do not create a backup file
 
       --  Start of processing for Update_Body
 
       begin
-         if Root_Node.Kind /= Ada_Package_Decl then
-            raise Program_Error;
+         if Root_Node.Kind not in
+           Ada_Package_Decl | Ada_Generic_Package_Decl
+         then
+            Cmd_Error ("package spec not found");
          end if;
 
          Search;
+         pragma Assert (Body_Line_Set);
 
          declare
             Name : constant W_Str :=
@@ -1324,7 +1359,7 @@ package body Stub.Actions is
             pragma Assert (Is_Empty (Out_Vec) and Is_Empty (Pp_Out_Vec));
             Generate_Local_Header (Name, Level);
             Generate_Subunit_Start (Level);
-            Generate_Subp_Body
+            Generate_Subp_Or_Entry_Body
               (Subp_Decl, Name, Ada_Stub => Arg (Cmd, Subunits));
             Pp.Command_Lines.Pp_Nat_Switches.Set_Arg
               (Pp_Cmd, Pp.Command_Lines.Initial_Indentation, 0);
@@ -1357,7 +1392,9 @@ package body Stub.Actions is
             Clear (Out_Vec);
          end;
 
-         Move_File (Old_Name => Output_Name, New_Name => Backup_Name);
+         if Create_Backup then
+            Move_File (Old_Name => Output_Name, New_Name => Backup_Name);
+         end if;
          Write_Output_File;
 
          --  Finally, if we generated an Ada stub (i.e. --subunits is True), we
@@ -1446,6 +1483,13 @@ package body Stub.Actions is
          Print (Unit);
 --         Put ("With trivia\n");
 --         PP_Trivia (Unit);
+      end if;
+
+      if Update_Body_Specified (Cmd) and then Num_File_Names (Cmd) > 1 then
+         Cmd_Error -- In Init???
+           ("only one file name allowed with " &
+            Switch_Text
+              (Stub.Command_Lines.Descriptor, To_All (Update_Body)).all);
       end if;
 
       case Root_Node.Kind is
