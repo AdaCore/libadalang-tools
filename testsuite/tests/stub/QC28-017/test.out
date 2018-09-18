@@ -1,0 +1,33 @@
+pragma Ada_2012;
+package body P is
+
+   ----------------------
+   -- Incomplete_Types --
+   ----------------------
+
+   package body Incomplete_Types is
+
+      type Stt_Incomplete is null record;
+
+   end Incomplete_Types;
+
+   -----------------------
+   -- Private_Procedure --
+   -----------------------
+
+   package body Private_Procedure is
+
+      -------
+      -- Q --
+      -------
+
+      procedure Q is
+      begin
+         --  Generated stub: replace with real body!
+         pragma Compile_Time_Warning (Standard.True, "Q unimplemented");
+         raise Program_Error with "Unimplemented procedure Q";
+      end Q;
+
+   end Private_Procedure;
+
+end P;

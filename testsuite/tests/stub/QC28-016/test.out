@@ -1,0 +1,6 @@
+pragma Ada_2012;
+package body P is
+
+   type Stt_Incomplete is null record;
+
+end P;
