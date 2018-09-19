@@ -5127,7 +5127,7 @@ package body Pp.Actions is
    begin
       pragma Style_Checks ("M200"); -- Allow long lines
 
-      Put ("usage: gnatpp [options] {filename} {-files filename}\n");
+      Put ("usage: gnatpp [options] {filename}\n");
       Put (" options:\n");
       Put (" --version - Display version and exit\n");
       Put (" --help    - Display usage and exit\n");
