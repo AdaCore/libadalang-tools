@@ -69,7 +69,8 @@ package Stub.Command_Lines is
    type Stub_Nats is
      (Max_Line_Length,
       Indentation,
-      Update_Body);
+      Update_Body); -- undocumented
+   --  Update_Body is intended mainly for use by GPS or other text editors
 
    package Stub_Nat_Switches is new Other_Switches
      (Descriptor,

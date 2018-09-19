@@ -1537,62 +1537,46 @@ package body Stub.Actions is
    begin
       pragma Style_Checks ("M200"); -- Allow long lines
 
-      Put ("Usage: gnatstub [options] filename [-cargs gcc_switches]\n");
+      Put ("Usage: gnatstub [options] {filename}\n");
       Put ("\n");
       Put ("  filename               Ada source file\n");
       Put ("\n");
+
       Put ("options:\n");
       Put ("  --version              Display version and exit\n");
       Put ("  --help                 Display usage and exit\n");
       Put ("\n");
-      Put ("  -Pproject              Use project file project. Only one such switch.\n");
-      Put ("                         can be used.\n");
-      Put ("  -Xname=value           specify an external reference for argument\n");
-      Put ("                         project file\n");
-      Put ("  -eL                    follow all symbolic links when processing\n");
-      Put ("                         project files\n");
+
+      Put ("  -Pproject              Use project file project\n");
+      Put ("  -U                     process all sources of the argument project\n");
+      Put ("  -U main                process the closure of units rooted at unit main\n");
+      Put ("  -Xname=value           specify an external reference for argument project file\n");
+      Put ("  -eL                    follow all symbolic links when processing project files\n");
       Put ("\n");
-      Put (" --subunits              generate separate bodies for body stubs\n");
+
+      Put ("  --subunits              generate separate bodies for body stubs\n");
+      Put ("  --files=filename        name of a file containing a list of files to process\n");
       Put ("\n");
-      Put ("  -f                     replace an existing body file (if any), with a body\n");
-      Put ("                         sample (is not allowed with '--subunits')\n");
-      Put ("  -gnatec<path>          use additional configuration file,\n");
-      Put ("                         same meaning as for gcc\n");
-      Put ("  -gnatyMnnn             maximum line length in a sample body\n");
-      Put ("  -gnatyn                (n in 1 .. 9) number of spaces used for indentation in\n");
-      Put ("                         a sample body\n");
-      Put ("  -gnatyo                alphabetically order local bodies\n");
-      Put ("  -hg                    insert a sample comment header\n");
-      Put ("  -hs                    insert the comment header from the spec\n");
+
+      Put ("  --force                replace an existing body file (if any), with a body sample\n");
+      Put ("  --max-line-length=nnn  maximum line length in sample body\n");
+      Put ("  --indentation=n        number of spaces used for indentation in sample body\n");
+      Put ("  --alphabetical-order   alphabetically order local bodies\n");
+      Put ("  --comment_header_sample insert a sample comment header\n");
+      Put ("  --comment_header_spec  insert the comment header from the spec\n");
       Put ("  --header-file=filename insert the comment header from the specified file\n");
-      Put ("  -Idir                  source search dir, has the same meaning as for\n");
-      Put ("                         gcc and gnatmake\n");
-      Put ("  -I-                    do not look for the sources in the default directory\n");
-      Put ("  -in                    same as -gnatyn\n");
-      Put ("  -k                     do not remove the tree file\n");
-      Put ("  -lnnn                  same as -gnatyMnnn\n");
-      Put ("  --no-exception         avoid raising Program_Error in stubs\n");
+      Put ("  --no-exception         avoid raising Program_Error in procedure stubs\n");
       Put ("  --no-local-header      no local comment headers for unit stubs\n");
-      Put ("  -o body-name           the name of the file to place the body into.\n");
-      Put ("  --dir=directory        place generated file(s) into directory\n");
-      Put ("  -W(h|u|s|e|8|b)        sets the wide character encoding of the result file\n");
-      Put ("                          h - Hex ESC encoding\n");
-      Put ("                          u - Upper half encoding\n");
-      Put ("                          s - Shift-JIS encoding\n");
-      Put ("                          e - EUC Encoding\n");
-      Put ("                          8 - UTF-8 encoding\n");
-      Put ("                          b - Brackets encoding (this is the default)\n");
+      Put ("  --output=body-name     the name of the file to place the body into\n");
+      Put ("  --output-dir=directory place generated file(s) into directory\n");
+      Put ("  --wide-character-encoding=(8|b)\n");
+      Put ("                         wide character encoding of the result file\n");
       Put ("\n");
-      Put ("  -q                     quiet mode\n");
-      Put ("  -r                     reuse the tree file (if any) instead of creating it\n");
-      Put ("                         (-r also implies -k)\n");
-      Put ("  -t                     overwrite the existing tree file\n");
-      Put ("  -v                     verbose mode\n");
-      Put ("  gcc_switches           switches to be passed to gcc called by \1\n",
-           Tool_Names.Tool_Name); -- ???
-      Put ("\n");
-      Put ("\n");
-      Put ("Report bugs to report@adacore.com\n");
+
+      Put ("  --quiet / -q           quiet mode\n");
+      Put ("  --verbose / -v         verbose mode\n");
+
+      Put ("\n\nReport bugs to report@adacore.com\n");
 
       pragma Style_Checks ("M79");
    end Tool_Help;
