@@ -724,8 +724,6 @@ package body Stub.Actions is
               Q (Name));
 
          if Arg (Cmd, No_Exception) and then not Returns then
-            --  ????This is wrong; should usually generate
-            --  "return Result;" if No_Exception.
             Put ("null;");
          else
             Put ("\1raise Program_Error with ""Unimplemented \2 \3"";\n",
