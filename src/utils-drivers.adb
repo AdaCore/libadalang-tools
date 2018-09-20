@@ -39,8 +39,7 @@ with Utils.Projects; use Utils.Projects;
 with Utils.String_Utilities; use Utils.String_Utilities;
 with Utils.Tool_Names;
 
-with Libadalang;     use Libadalang;
-with Libadalang.Analysis; use Libadalang.Analysis;
+with Libadalang;           use Libadalang;
 with Libadalang.Iterators; use Libadalang.Iterators;
 
 package body Utils.Drivers is

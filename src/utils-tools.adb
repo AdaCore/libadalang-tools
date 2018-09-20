@@ -6,9 +6,9 @@ with Utils.String_Utilities; use Utils.String_Utilities;
 
 with Langkit_Support.Diagnostics;
 
-with Libadalang;     use Libadalang;
-with Libadalang.Iterators; use Libadalang.Iterators;
-with Libadalang.Unit_Files.Projects; use Libadalang.Unit_Files.Projects;
+with Libadalang;                  use Libadalang;
+with Libadalang.Iterators;        use Libadalang.Iterators;
+with Libadalang.Project_Provider; use Libadalang.Project_Provider;
 
 package body Utils.Tools is
 
@@ -57,10 +57,9 @@ package body Utils.Tools is
             Provider : constant Unit_Provider_Reference :=
               (if Status (Tool.Project_Tree.all) = Empty
                then No_Unit_Provider_Reference
-               else Create_Unit_Provider_Reference
-                      (Create_Project_Unit_Provider
-                         (Tool.Project_Tree, Tool.Project_Env,
-                          Is_Project_Owner => False)));
+               else Create_Project_Unit_Provider_Reference
+                      (Tool.Project_Tree, Tool.Project_Env,
+                       Is_Project_Owner => False));
          begin
             Tool.Context := Create_Context
               (Charset       => Wide_Character_Encoding (Cmd),
