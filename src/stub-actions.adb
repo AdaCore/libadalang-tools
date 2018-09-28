@@ -139,11 +139,18 @@ package body Stub.Actions is
    ----------
 
    procedure Init (Tool : in out Stub_Tool; Cmd : Command_Line) is
-      pragma Unreferenced (Tool, Cmd);
+      pragma Unreferenced (Tool);
    begin
       --  ????Other checks from gnatstub/lal_ul-check_parameters.adb?
 
       pragma Assert (Environment.Initial_Dir = Current_Directory);
+
+      if Update_Body_Specified (Cmd) and then Num_File_Names (Cmd) > 1 then
+         Cmd_Error
+           ("only one file name allowed with " &
+            Switch_Text
+              (Stub.Command_Lines.Descriptor, To_All (Update_Body)).all);
+      end if;
    end Init;
 
    -----------
@@ -1481,13 +1488,6 @@ package body Stub.Actions is
          Print (Unit);
 --         Put ("With trivia\n");
 --         PP_Trivia (Unit);
-      end if;
-
-      if Update_Body_Specified (Cmd) and then Num_File_Names (Cmd) > 1 then
-         Cmd_Error -- In Init???
-           ("only one file name allowed with " &
-            Switch_Text
-              (Stub.Command_Lines.Descriptor, To_All (Update_Body)).all);
       end if;
 
       case Root_Node.Kind is

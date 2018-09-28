@@ -1194,7 +1194,7 @@ package body Utils.Projects is
 
          procedure Update_File_Name (File_Name : in out String_Ref) is
          begin
-            if Is_Regular_File (File_Name.all) then -- ????
+            if Is_Regular_File (File_Name.all) then
                return;
             end if;
 
@@ -1203,8 +1203,13 @@ package body Utils.Projects is
                   Res : constant Virtual_File :=
                     GNATCOLL.Projects.Create (My_Project_Tree, +File_Name.all);
                begin
-                  pragma Assert (Res /= No_File);
-                  --  ???This can fail if a directory name is given
+                  if Res = No_File
+                    or else not Is_Regular_File (Res.Display_Full_Name)
+                  then
+                     Cmd_Error ("""" & File_Name.all &
+                                """: source file name expected");
+                  end if;
+
                   File_Name := new String'(Res.Display_Full_Name);
                end;
             end if;
