@@ -1,0 +1,315 @@
+Line metrics summed over 3 units
+  all lines            : 11
+  code lines           : 11
+  comment lines        : 0
+  end-of-line comments : 0
+  comment percentage   : 0.00
+  blank lines          : 0
+
+Average lines in body: 4.00
+
+Element metrics summed over 3 units
+  all statements      : 1
+  all declarations    : 5
+  logical SLOC        : 6
+
+ 2 public subprograms in 2 units
+
+ 1 subprogram bodies in 1 units
+
+Average cyclomatic complexity: 1.00
+
+Coupling metrics:
+=================
+   Unit Main (main.adb)
+      control fan-out coupling  : 1
+      control fan-in coupling   : 0
+      unit fan-out coupling     : 1
+      unit fan-in coupling      : 0
+
+   Unit P (p.ads)
+      control fan-out coupling  : 0
+      control fan-in coupling   : 1
+      unit fan-out coupling     : 0
+      unit fan-in coupling      : 1
+Metrics computed for main.adb
+containing procedure body Main
+
+=== Code line metrics ===
+  all lines           : 5
+  code lines          : 5
+  comment lines       : 0
+  end-of-line comments: 0
+  comment percentage  : 0.00
+  blank lines         : 0
+
+Main (procedure body - library item at lines  2: 5)
+
+=== Code line metrics ===
+   all lines           : 4
+   code lines          : 4
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 0
+
+=== Element metrics ===
+   public subprograms       : 1
+   all subprogram bodies    : 1
+   all statements           : 1
+   all declarations         : 1
+   logical SLOC             : 2
+   maximal construct nesting: 1
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 1
+   expression complexity    : 0
+   cyclomatic complexity    : 1
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00
+Metrics computed for p.adb
+containing package body P
+
+=== Code line metrics ===
+  all lines           : 3
+  code lines          : 3
+  comment lines       : 0
+  end-of-line comments: 0
+  comment percentage  : 0.00
+  blank lines         : 0
+
+P (package body - library item at lines  1: 3)
+
+=== Code line metrics ===
+   all lines           : 3
+   code lines          : 3
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 0
+
+=== Element metrics ===
+   all subprogram bodies    : 0
+   all statements           : 0
+   all declarations         : 2
+   logical SLOC             : 2
+   maximal construct nesting: 1
+Metrics computed for p.ads
+containing package P
+
+=== Code line metrics ===
+  all lines           : 3
+  code lines          : 3
+  comment lines       : 0
+  end-of-line comments: 0
+  comment percentage  : 0.00
+  blank lines         : 0
+
+P (package - library item at lines  1: 3)
+
+=== Code line metrics ===
+   all lines           : 3
+   code lines          : 3
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 0
+
+=== Contract metrics ===
+   contract                 : 0
+   post                     : 0
+   contract complete        : nyi
+
+=== Element metrics ===
+   public subprograms       : 1
+   all statements           : 0
+   all declarations         : 2
+   logical SLOC             : 2
+   maximal unit nesting     : 1
+   maximal construct nesting: 1
+
+   Q (procedure at lines  2: 2)
+
+   === Contract metrics ===
+      contract complexity      : 1
+
+   === Element metrics ===
+      all parameters           : 0
+<?xml version="1.0"?>
+<global>
+   <config>
+      <metric name="contract" display_name="contract"/>
+      <metric name="post" display_name="post"/>
+      <metric name="contract_complete" display_name="contract complete"/>
+      <metric name="contract_complexity" display_name="contract complexity"/>
+      <metric name="all_lines" display_name="all lines"/>
+      <metric name="code_lines" display_name="code lines"/>
+      <metric name="comment_lines" display_name="comment lines"/>
+      <metric name="eol_comments" display_name="end-of-line comments"/>
+      <metric name="comment_percentage" display_name="comment percentage"/>
+      <metric name="blank_lines" display_name="blank lines"/>
+      <metric name="average_lines_in_bodies" display_name="Average lines in body"/>
+      <metric name="spark_lines" display_name="spark lines"/>
+      <metric name="lines_in_bodies" display_name="lines in bodies"/>
+      <metric name="num_bodies" display_name="num bodies"/>
+      <metric name="public_types" display_name="public types"/>
+      <metric name="private_types" display_name="private types"/>
+      <metric name="all_types" display_name="all type definitions"/>
+      <metric name="public_subprograms" display_name="public subprograms"/>
+      <metric name="all_subprograms" display_name="all subprogram bodies"/>
+      <metric name="all_stmts" display_name="all statements"/>
+      <metric name="all_dcls" display_name="all declarations"/>
+      <metric name="lsloc" display_name="logical SLOC"/>
+      <metric name="unit_nesting" display_name="maximal unit nesting"/>
+      <metric name="construct_nesting" display_name="maximal construct nesting"/>
+      <metric name="all_parameters" display_name="all parameters"/>
+      <metric name="in_parameters" display_name="IN parameters"/>
+      <metric name="out_parameters" display_name="OUT parameters"/>
+      <metric name="in_out_parameters" display_name="IN OUT parameters"/>
+      <metric name="statement_complexity" display_name="statement complexity"/>
+      <metric name="expression_complexity" display_name="expression complexity"/>
+      <metric name="cyclomatic_complexity" display_name="cyclomatic complexity"/>
+      <metric name="essential_complexity" display_name="essential complexity"/>
+      <metric name="average_complexity" display_name="average complexity"/>
+      <metric name="max_loop_nesting" display_name="maximum loop nesting"/>
+      <metric name="extra_exit_points" display_name="extra exit points"/>
+      <metric name="tagged_fan-out_coupling" display_name="tagged fan-out coupling"/>
+      <metric name="hierarchy_fan-out_coupling" display_name="hierarchy fan-out coupling"/>
+      <metric name="tagged_fan-in_coupling" display_name="tagged fan-in coupling"/>
+      <metric name="hierarchy_fan-in_coupling" display_name="hierarchy fan-in coupling"/>
+      <metric name="control_fan-out_coupling" display_name="control fan-out coupling"/>
+      <metric name="control_fan-in_coupling" display_name="control fan-in coupling"/>
+      <metric name="unit_fan-out_coupling" display_name="unit fan-out coupling"/>
+      <metric name="unit_fan-in_coupling" display_name="unit fan-in coupling"/>
+   </config>
+   <file name="main.adb">
+      <metric name="all_lines">5</metric>
+      <metric name="code_lines">5</metric>
+      <metric name="comment_lines">0</metric>
+      <metric name="eol_comments">0</metric>
+      <metric name="comment_percentage">0.00</metric>
+      <metric name="blank_lines">0</metric>
+      <metric name="spark_lines">0</metric>
+      <unit name="Main" kind="procedure body" line="2" col="1">
+         <metric name="all_lines">4</metric>
+         <metric name="code_lines">4</metric>
+         <metric name="comment_lines">0</metric>
+         <metric name="eol_comments">0</metric>
+         <metric name="comment_percentage">0.00</metric>
+         <metric name="blank_lines">0</metric>
+         <metric name="public_subprograms">1</metric>
+         <metric name="all_subprograms">1</metric>
+         <metric name="all_stmts">1</metric>
+         <metric name="all_dcls">1</metric>
+         <metric name="lsloc">2</metric>
+         <metric name="construct_nesting">1</metric>
+         <metric name="all_parameters">0</metric>
+         <metric name="statement_complexity">1</metric>
+         <metric name="expression_complexity">0</metric>
+         <metric name="cyclomatic_complexity">1</metric>
+         <metric name="essential_complexity">1</metric>
+         <metric name="max_loop_nesting">0</metric>
+         <metric name="extra_exit_points">0</metric>
+      </unit>
+      <metric name="statement_complexity">1.00</metric>
+      <metric name="expression_complexity">0.00</metric>
+      <metric name="cyclomatic_complexity">1.00</metric>
+      <metric name="essential_complexity">1.00</metric>
+      <metric name="max_loop_nesting">0.00</metric>
+   </file>
+   <file name="p.adb">
+      <metric name="all_lines">3</metric>
+      <metric name="code_lines">3</metric>
+      <metric name="comment_lines">0</metric>
+      <metric name="eol_comments">0</metric>
+      <metric name="comment_percentage">0.00</metric>
+      <metric name="blank_lines">0</metric>
+      <metric name="spark_lines">0</metric>
+      <unit name="P" kind="package body" line="1" col="1">
+         <metric name="all_lines">3</metric>
+         <metric name="code_lines">3</metric>
+         <metric name="comment_lines">0</metric>
+         <metric name="eol_comments">0</metric>
+         <metric name="comment_percentage">0.00</metric>
+         <metric name="blank_lines">0</metric>
+         <metric name="all_subprograms">0</metric>
+         <metric name="all_stmts">0</metric>
+         <metric name="all_dcls">2</metric>
+         <metric name="lsloc">2</metric>
+         <metric name="construct_nesting">1</metric>
+      </unit>
+   </file>
+   <file name="p.ads">
+      <metric name="all_lines">3</metric>
+      <metric name="code_lines">3</metric>
+      <metric name="comment_lines">0</metric>
+      <metric name="eol_comments">0</metric>
+      <metric name="comment_percentage">0.00</metric>
+      <metric name="blank_lines">0</metric>
+      <metric name="spark_lines">0</metric>
+      <unit name="P" kind="package" line="1" col="1">
+         <metric name="contract">0</metric>
+         <metric name="post">0</metric>
+         <metric name="contract_complete">nyi</metric>
+         <metric name="all_lines">3</metric>
+         <metric name="code_lines">3</metric>
+         <metric name="comment_lines">0</metric>
+         <metric name="eol_comments">0</metric>
+         <metric name="comment_percentage">0.00</metric>
+         <metric name="blank_lines">0</metric>
+         <metric name="public_subprograms">1</metric>
+         <metric name="all_stmts">0</metric>
+         <metric name="all_dcls">2</metric>
+         <metric name="lsloc">2</metric>
+         <metric name="unit_nesting">1</metric>
+         <metric name="construct_nesting">1</metric>
+         <unit name="Q" kind="procedure" line="2" col="4">
+            <metric name="contract_complexity">1</metric>
+            <metric name="all_parameters">0</metric>
+         </unit>
+      </unit>
+   </file>
+   <metric name="all_lines">11</metric>
+   <metric name="code_lines">11</metric>
+   <metric name="comment_lines">0</metric>
+   <metric name="eol_comments">0</metric>
+   <metric name="comment_percentage">0.00</metric>
+   <metric name="blank_lines">0</metric>
+   <metric name="average_lines_in_bodies">4.00</metric>
+   <metric name="spark_lines">0</metric>
+   <metric name="lines_in_bodies">4</metric>
+   <metric name="num_bodies">1</metric>
+   <metric name="public_subprograms">2</metric>
+   <metric name="all_subprograms">1</metric>
+   <metric name="all_stmts">1</metric>
+   <metric name="all_dcls">5</metric>
+   <metric name="lsloc">6</metric>
+   <metric name="average_complexity">1.00</metric>
+   <coupling>
+      <file name="main.adb">
+         <unit name="Main" line="2" col="1">
+            <metric name="control_fan-out_coupling">1</metric>
+            <metric name="control_fan-in_coupling">0</metric>
+            <metric name="unit_fan-out_coupling">1</metric>
+            <metric name="unit_fan-in_coupling">0</metric>
+         </unit>
+      </file>
+      <file name="p.ads">
+         <unit name="P" line="1" col="1">
+            <metric name="control_fan-out_coupling">0</metric>
+            <metric name="control_fan-in_coupling">1</metric>
+            <metric name="unit_fan-out_coupling">0</metric>
+            <metric name="unit_fan-in_coupling">1</metric>
+         </unit>
+      </file>
+   </coupling>
+</global>

@@ -33,8 +33,9 @@ package Utils.Generic_Symbols is
    --  vectors indexed by it. Other arithmetic operations on Symbols don't make
    --  much sense.
 
-   function Present (S : Opt_Symbol) return Boolean is (S /= No_Symbol);
-   pragma Inline (Present);
+   function No (S : Opt_Symbol) return Boolean is (S = No_Symbol);
+   function Present (S : Opt_Symbol) return Boolean is (not No (S));
+   pragma Inline (No, Present);
 
    function Intern (S : String) return Symbol;
    --  Convert S to a Symbol, adding it to the table if necessary.

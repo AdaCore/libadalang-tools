@@ -41,6 +41,8 @@ private
    subtype CU_Symbol is CU_Symbols.Symbol;
    --  The name of a compilation unit
 
+   Empty_CU_Sym : constant CU_Symbol := Intern ("");
+
    package CU_Symbol_Sets is new Ada.Containers.Hashed_Sets
      (CU_Symbol, Hash_Symbol, Equivalent_Elements => Case_Insensitive_Equal);
    use CU_Symbol_Sets;
@@ -188,9 +190,14 @@ private
                   --  If this is a subunit, name of the parent; empty string
                   --  otherwise.
 
+                  Child_Parent : CU_Symbol := Empty_CU_Sym;
+                  --  If this is a child unit, name of the parent; empty string
+                  --  otherwise. Do we really need separate _Parent fields???
+                  --  Perhaps we should compute these together, in
+                  --  Push_New_Metrix.
+
                   Depends_On : CU_Symbol_Sets.Set;
                   Indirect_Dependences_Computed : Boolean := False;
-                  Limited_Depends_On : CU_Symbol_Sets.Set;
                   --  Depends_On is the set of compilation units this one
                   --  depends upon. It is computed in 3 steps:
                   --
@@ -221,11 +228,6 @@ private
                   --  works because library unit names are unique. We use a set
                   --  so that redundancies don't count (e.g. "with X; with X;"
                   --  should count as depending on X (once)).
-                  --
-                  --  "limited with" clauses are treated separately
-                  --  (Limited_Depends_On), because those are counted as just 1
-                  --  dependence (not followed to find indirect dependencies).
-                  --  ???No longer true.
 
                   Has_Tagged_Type, Has_Subprogram : Boolean := False;
                   --  True if this is a unit containing a tagged type or a

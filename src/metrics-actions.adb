@@ -96,16 +96,11 @@ package body METRICS.Actions is
       --  statement or in an exception handler.
 
       Tagged_Coupling_Out    => True,
-      Hierarchy_Coupling_Out => True, -- partial (needs semantic info)
+      Hierarchy_Coupling_Out => True,
       Tagged_Coupling_In     => True,
-      Hierarchy_Coupling_In  => True, -- partial (needs semantic info)
-      --  For hierarchy coupling, we need to know whether a package
-      --  instantiation contains tagged types, so we need to find the generic
-      --  package. We also need to find parent packages.
-      Control_Coupling_Out   => True, -- partial (needs semantic info)
-      Control_Coupling_In    => True, -- partial (needs semantic info)
-      --  For control coupling, we need to know whether a package instantiation
-      --  contains any subprograms.
+      Hierarchy_Coupling_In  => True,
+      Control_Coupling_Out   => True,
+      Control_Coupling_In    => True,
       Unit_Coupling_Out      => True,
       Unit_Coupling_In       => True);
 
@@ -210,8 +205,6 @@ package body METRICS.Actions is
    Subunit_Sym : constant Symbol := Intern (" - subunit");
    Library_Item_Sym : constant Symbol := Intern (" - library item");
 
-   Empty_CU_Sym : constant CU_Symbol := Intern ("");
-
    type Metrix_Ref_Array is
      array (CU_Symbol range <>) of aliased Metrix_Ref;
 
@@ -226,6 +219,23 @@ package body METRICS.Actions is
    function Pragma_Name (Node : Ada_Node) return W_Str is
      (L_Name (Node.As_Pragma_Node.F_Id));
    --  Name of a pragma node, in lower case
+
+   function Is_Ancestor_CU (Anc, Child : Metrix_Ref) return Boolean is
+      (Anc /= null and then Child /= null
+         and then (Anc = Child
+                   or else Is_Ancestor_CU (Anc, Specs (Child.Child_Parent))));
+   --  True if Anc is an ancestor library unit of Child
+
+   function Same_Hierarchy (M1, M2 : Metrix_Ref) return Boolean is
+     (Is_Ancestor_CU (M1, M2) or else Is_Ancestor_CU (M2, M1));
+   --  True if one is an ancestor of the other. Used for coupling metrics
+   --  Hierarchy_Coupling_In/Out. There are ways to do this more efficiently.
+   --  If each Metrix has an array of ancestors, we can do it in constant time
+   --  rather than chasing up a linked list. Alternatively, if we store a flag
+   --  with each dependence that indicates whether that dependence comes from a
+   --  chain of only parent dependences, versus including one or more with's,
+   --  then we could simply ignore the former when doing
+   --  Hierarchy_Coupling_In/Out.
 
    function Get_CU_Access
      (A : in out CU_Metrix.Vector; S : CU_Symbol)
@@ -252,7 +262,8 @@ package body METRICS.Actions is
    end Get_CU_Access;
 
    procedure Validate (M : Metrix);
-   --  For testing/debugging. Check consistency of M.
+   procedure Validate_Coupling (Units_For_Coupling : Metrix_Vectors.Vector);
+   --  For testing/debugging. Check consistency.
 
    procedure Destroy (M : in out Metrix_Ref);
    --  Reclaim memory for a tree of Metrix records
@@ -982,18 +993,24 @@ package body METRICS.Actions is
 
          when Coupling_Metrics =>
             pragma Assert (Depth <= 3);
-            if Depth /= 3 then
-               return False;
-            end if;
-            case Coupling_Metrics'(Metric) is
-               when Tagged_Coupling_Out | Tagged_Coupling_In |
-                 Hierarchy_Coupling_Out | Hierarchy_Coupling_In =>
-                  return M.Comp_Unit.Has_Tagged_Type;
-               when Control_Coupling_Out | Control_Coupling_In =>
-                  return M.Comp_Unit.Has_Subprogram;
-               when Unit_Coupling_Out | Unit_Coupling_In =>
-                  return True;
-            end case;
+            return Result : Boolean do
+               if Depth = 3 then
+                  case Coupling_Metrics'(Metric) is
+                     when Tagged_Coupling_Out | Tagged_Coupling_In |
+                       Hierarchy_Coupling_Out | Hierarchy_Coupling_In =>
+                        Result := M.Comp_Unit.Has_Tagged_Type;
+                     when Control_Coupling_Out | Control_Coupling_In =>
+                        Result := M.Comp_Unit.Has_Subprogram;
+                     when Unit_Coupling_Out | Unit_Coupling_In =>
+                        Result := True;
+                  end case;
+               else
+                  Result := False;
+               end if;
+
+               pragma Assert (if not Result then M.Vals (Metric) = 0);
+            end return;
+
          when Computed_Metrics =>
             raise Program_Error;
       end case;
@@ -1190,13 +1207,12 @@ package body METRICS.Actions is
       M : Metrix;
       Depth : Positive)
    is
+      pragma Debug (Validate (M));
       pragma Assert (M.Node.Is_Null);
 
       Doing_Coupling_Metrics : constant Boolean :=
         (Metrics_To_Compute and not Coupling_Only) = Empty_Metrics_Set;
    begin
-      Validate (M);
-
       --  Return immediately if we're doing coupling metrics, and this is not a
       --  compilation unit spec, or if M is for a Contract_Complexity_Eligible
       --  node, and we're not going to print. Also don't print metrics for
@@ -1502,6 +1518,7 @@ package body METRICS.Actions is
       M : Metrix;
       Depth : Positive)
    is
+      pragma Debug (Validate (M));
       pragma Assert (M.Node.Is_Null);
       pragma Assert (Cur_Column = 1);
 
@@ -1862,8 +1879,10 @@ package body METRICS.Actions is
    --  for all compilation units by walking the dependency graph.
 
    procedure Compute_Coupling
-     (Tool : in out Metrics_Tool; Global_M : Metrix);
+     (Tool : in out Metrics_Tool; Global_M : Metrix;
+      Metrics_To_Compute : Metrics_Set);
    --  This uses the dependency information to compute the coupling metrics.
+   --  Metrics_To_Compute is for debugging only.
 
    function Get_Spec (M : Metrix_Ref) return Metrix_Ref with
      Pre => M.Kind = Ada_Compilation_Unit;
@@ -2004,7 +2023,8 @@ package body METRICS.Actions is
    end Get_Spec;
 
    procedure Compute_Coupling
-     (Tool : in out Metrics_Tool; Global_M : Metrix)
+     (Tool : in out Metrics_Tool; Global_M : Metrix;
+      Metrics_To_Compute : Metrics_Set)
    is
 
       procedure Do_Edge (Metric : Coupling_Metrics; From, To : Metrix_Ref);
@@ -2037,22 +2057,47 @@ package body METRICS.Actions is
       procedure Do_Edge (Metric : Coupling_Metrics; From, To : Metrix_Ref) is
          Outer_Unit : Metrix renames Element (From.Submetrix, 1).all;
          --  Outer_Unit is the outermost package spec, procedure spec, etc.
+
+         procedure Do_Inc;
+         --  Call Inc, with some extra debugging output
+
+         procedure Do_Inc is
+         begin
+            if Debug_Flag_8 and then Metrics_To_Compute (Metric) then
+               declare
+                  Metric_Name : constant String :=
+                    XML_Metric_Name_String (Metric);
+                  Longest_Metric_Name : constant String :=
+                    XML_Metric_Name_String (Hierarchy_Coupling_Out);
+                  Spaces : constant String :=
+                    (Metric_Name'Length .. Longest_Metric_Name'Length => ' ');
+               begin
+                  Put ("\1\2: \3 --> \4\n", Metric_Name, Spaces,
+                       Str (From.XML_Name).S, Str (To.XML_Name).S);
+               end;
+            end if;
+
+            Inc (Outer_Unit.Vals (Metric));
+         end Do_Inc;
+
       begin
          case Metric is
             when Tagged_Coupling_Out | Tagged_Coupling_In =>
                if From.Has_Tagged_Type and To.Has_Tagged_Type then
-                  Inc (Outer_Unit.Vals (Metric));
+                  Do_Inc;
                end if;
             when Hierarchy_Coupling_Out | Hierarchy_Coupling_In =>
                if From.Has_Tagged_Type and To.Has_Tagged_Type then
-                  Inc (Outer_Unit.Vals (Metric));
+                  if not Same_Hierarchy (From, To) then
+                     Do_Inc;
+                  end if;
                end if;
             when Control_Coupling_Out | Control_Coupling_In =>
-               if From.Has_Tagged_Type and To.Has_Tagged_Type then
-                  Inc (Outer_Unit.Vals (Metric));
+               if From.Has_Subprogram and To.Has_Subprogram then
+                  Do_Inc;
                end if;
             when Unit_Coupling_Out | Unit_Coupling_In =>
-               Inc (Outer_Unit.Vals (Metric));
+               Do_Inc;
          end case;
       end Do_Edge;
 
@@ -2077,7 +2122,6 @@ package body METRICS.Actions is
             begin
                if S /= B then
                   Union (S.Depends_On, B.Depends_On);
-                  Union (S.Limited_Depends_On, B.Limited_Depends_On);
                end if;
             end;
          end if;
@@ -2091,7 +2135,7 @@ package body METRICS.Actions is
          if S /= null then
             pragma Assert (S.Indirect_Dependences_Computed);
 
-            for Sym of Union (S.Depends_On, S.Limited_Depends_On) loop
+            for Sym of S.Depends_On loop
                declare
                   Dep : constant Metrix_Ref :=
                     Specs (Same_Ignoring_Case (Sym));
@@ -2327,7 +2371,8 @@ package body METRICS.Actions is
       Dump (Tool, Global_M.all, "Initial:");
       Compute_Indirect_Dependencies (Global_M.all);
       Dump (Tool, Global_M.all, "After Compute_Indirect_Dependencies");
-      Compute_Coupling (Tool, Global_M.all);
+      Compute_Coupling (Tool, Global_M.all, With_Coupling);
+      Validate_Coupling (Units_For_Coupling);
 
       if Gen_XML (Cmd) then
          --  Generate schema (XSD file), if requested
@@ -3550,6 +3595,69 @@ package body METRICS.Actions is
 
       procedure Gather_Dependencies (Node : Ada_Node) is
          File_M : Metrix renames Element (Metrix_Stack, 2).all;
+
+         procedure Set_Flags (Node : Ada_Node);
+         --  Set the Has_Tagged_Type and/or Has_Subprogram flags if
+         --  appropriate. In case of a package instantiation, we recursively
+         --  walk the generic unit.
+
+         function Visit (Node : Ada_Node'Class) return Visit_Status;
+         --  Visit one subnode of a generic being instantiated
+
+         function Visit (Node : Ada_Node'Class) return Visit_Status is
+         begin
+            Set_Flags (Ada_Node (Node));
+            return Into;
+            --  ???This could be more efficient if we return Over in cases
+            --  where we know there are no interesting subnodes.
+         end Visit;
+
+         procedure Set_Flags (Node : Ada_Node) is
+         begin
+            case Kind (Node) is
+               when Ada_Generic_Package_Instantiation =>
+                  begin
+                     Traverse
+                       (P_Designated_Generic_Decl
+                          (Node.As_Generic_Instantiation),
+                        Visit'Access);
+                     --  Set one or both flags according to whether the generic
+                     --  package contains tagged types or subprograms.
+                  exception
+                     when Property_Error => null;
+                        --  ???Ignore errors in P_Designated_Generic_Decl,
+                        --  which occur when the generic being instantiated is
+                        --  declared by a generic_renaming_declaration.
+                  end;
+
+               when Ada_Interface_Type_Def =>
+                  File_M.Has_Tagged_Type := True;
+               when Ada_Incomplete_Tagged_Type_Decl =>
+                  File_M.Has_Tagged_Type := True;
+               when Ada_Private_Type_Def =>
+                  if Node.As_Private_Type_Def.F_Has_Tagged then
+                     File_M.Has_Tagged_Type := True;
+                  end if;
+               when Ada_Record_Type_Def =>
+                  if Node.As_Record_Type_Def.F_Has_Tagged then
+                     File_M.Has_Tagged_Type := True;
+                  end if;
+               when Ada_Derived_Type_Def =>
+                  if not Node.As_Derived_Type_Def.F_Record_Extension.Is_Null
+                    or else Node.As_Derived_Type_Def.F_Has_With_Private
+                  then
+                     File_M.Has_Tagged_Type := True;
+                  end if;
+
+               when Ada_Generic_Subp_Instantiation |
+                 Ada_Subp_Renaming_Decl |
+                 Ada_Subp_Decl |
+                 Ada_Subp_Body =>
+                  File_M.Has_Subprogram := True;
+
+               when others => null;
+            end case;
+         end Set_Flags;
       begin
          case Kind (Node) is
             --  For "with P, Q;" include P and Q
@@ -3560,22 +3668,15 @@ package body METRICS.Actions is
                     Node.As_With_Clause.F_Packages;
                begin
                   for I in 1 .. Children_Count (Names) loop
-                     if False and then Node.As_With_Clause.F_Has_Limited then
-                        --  ???Apparently, limited with's are not transitive
-                        --  for tagged coupling, but are transitive for unit
-                        --  coupling.
-                        Include
-                          (File_M.Limited_Depends_On,
-                           W_Intern (Full_Name (Childx (Names, I).As_Name)));
-                     else
-                        Include
-                          (File_M.Depends_On,
-                           W_Intern (Full_Name (Childx (Names, I).As_Name)));
-                     end if;
+                     Include
+                       (File_M.Depends_On,
+                        W_Intern (Full_Name (Childx (Names, I).As_Name)));
                   end loop;
                end;
 
-            --  A child unit depends on its parent
+            --  A child unit depends on its parent. We don't need to bother
+            --  with bodies here (except subprogram bodies), because the
+            --  coupling metrics treat spec and body as one.
 
             when Ada_Generic_Subp_Instantiation |
               Ada_Generic_Package_Instantiation |
@@ -3591,51 +3692,17 @@ package body METRICS.Actions is
                   Def_Name : constant Name := Get_Def_Name (Node).F_Name;
                begin
                   if Kind (Def_Name) = Ada_Dotted_Name then
-                     Include
-                       (File_M.Depends_On,
-                        W_Intern
-                          (Full_Name (Def_Name.As_Dotted_Name.F_Prefix)));
+                     pragma Assert (File_M.Child_Parent = Empty_CU_Sym);
+                     File_M.Child_Parent :=
+                       W_Intern (Full_Name (Def_Name.As_Dotted_Name.F_Prefix));
+                     Include (File_M.Depends_On, File_M.Child_Parent);
                   end if;
                end;
 
             when others => null;
          end case;
 
-         --  Set Has_Tagged_Type or Has_Subprogram if appropriate:
-
-         case Kind (Node) is
-            when Ada_Interface_Type_Def =>
-               File_M.Has_Tagged_Type := True;
-            when Ada_Incomplete_Tagged_Type_Decl =>
-               File_M.Has_Tagged_Type := True;
-            when Ada_Private_Type_Def =>
-               if Node.As_Private_Type_Def.F_Has_Tagged then
-                  File_M.Has_Tagged_Type := True;
-               end if;
-            when Ada_Record_Type_Def =>
-               if Node.As_Record_Type_Def.F_Has_Tagged then
-                  File_M.Has_Tagged_Type := True;
-               end if;
-            when Ada_Derived_Type_Def =>
-               if not Node.As_Derived_Type_Def.F_Record_Extension.Is_Null
-                 or else Node.As_Derived_Type_Def.F_Has_With_Private
-               then
-                  File_M.Has_Tagged_Type := True;
-               end if;
-
-            when Ada_Generic_Subp_Instantiation |
-              Ada_Subp_Renaming_Decl |
-              Ada_Subp_Decl |
-              Ada_Subp_Body =>
-               File_M.Has_Subprogram := True;
-            when Ada_Generic_Package_Instantiation =>
-               File_M.Has_Subprogram := True;
-               --  ???This isn't correct. We need to set Has_Subprogram if the
-               --  generic being instantiated has subprograms. For that, we
-               --  need semantic info.
-
-            when others => null;
-         end case;
+         Set_Flags (Node);
       end Gather_Dependencies;
 
       procedure Rec (Node : Ada_Node) is
@@ -4038,7 +4105,33 @@ package body METRICS.Actions is
 
       pragma Assert (M.Vals (Logical_Source_Lines) =
                        M.Vals (Statements) + M.Vals (Declarations));
+
+      pragma Assert
+        (M.Vals (Hierarchy_Coupling_Out) <= M.Vals (Tagged_Coupling_Out));
+      pragma Assert
+        (M.Vals (Hierarchy_Coupling_In) <= M.Vals (Tagged_Coupling_In));
    end Validate;
+
+   procedure Validate_Coupling (Units_For_Coupling : Metrix_Vectors.Vector) is
+      Totals : array (Coupling_Metrics) of Metric_Nat := (others => 0);
+   begin
+      for File_M of Units_For_Coupling loop
+         Validate (File_M.all);
+
+         for Metric in Coupling_Metrics loop
+            Totals (Metric) := Totals (Metric) + File_M.Vals (Metric);
+         end loop;
+      end loop;
+
+      pragma Assert
+        (Totals (Tagged_Coupling_Out) = Totals (Tagged_Coupling_In));
+      pragma Assert
+        (Totals (Hierarchy_Coupling_Out) = Totals (Hierarchy_Coupling_In));
+      pragma Assert
+        (Totals (Control_Coupling_Out) = Totals (Control_Coupling_In));
+      pragma Assert
+        (Totals (Unit_Coupling_Out) = Totals (Unit_Coupling_In));
+   end Validate_Coupling;
 
    procedure Dump_Metrix (M : Metrix) is
    begin
