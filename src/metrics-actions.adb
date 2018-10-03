@@ -2371,6 +2371,15 @@ package body METRICS.Actions is
       Pop (Metrix_Stack);
       Clear (Metrix_Stack);
 
+      if Object_Dir /= "" and then not Directories.Exists (Object_Dir) then
+         begin
+            Directories.Create_Directory (Object_Dir);
+         exception
+            when Directories.Name_Error | Directories.Use_Error =>
+               Cmd_Error ("cannot create directory " & Object_Dir);
+         end;
+      end if;
+
       Dump (Tool, Global_M.all, "Initial:");
       Compute_Indirect_Dependencies (Global_M.all);
       Dump (Tool, Global_M.all, "After Compute_Indirect_Dependencies");
