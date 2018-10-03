@@ -374,7 +374,7 @@ package body METRICS.Actions is
    --  Name of the metric for printing in text
 
    procedure XML_Print_Config;
-   --  Print out the 'config' section, which maps XML metric names to text
+   --  Print out the '<config>' section, which maps XML metric names to text
    --  metric names.
 
    --  Below, Depth parameters are the nesting depth, starting with 1 for the
@@ -919,7 +919,7 @@ package body METRICS.Actions is
          when Lines_Spark =>
             return Depth in 1 | 2;
          when Lines_Code_In_Bodies | Num_Bodies =>
-            return Depth = 1;
+            return False;
          when Lines_Average =>
             return Depth = 1;
 
@@ -1394,10 +1394,8 @@ package body METRICS.Actions is
             return "spark_lines";
          when Lines_Average =>
             return "average_lines_in_bodies";
-         when Lines_Code_In_Bodies =>
-            return "lines_in_bodies";
-         when Num_Bodies =>
-            return "num_bodies";
+         when Lines_Code_In_Bodies | Num_Bodies =>
+            raise Program_Error;
          when Lines_Ratio =>
             return "comment_percentage";
          when Public_Types =>
@@ -1459,8 +1457,13 @@ package body METRICS.Actions is
 
       for Metric in Metrics_Enum loop
          case Metric is
-            when Current_Construct_Nesting | Computed_Metrics =>
+            when Lines_Code_In_Bodies | Num_Bodies |
+              Current_Construct_Nesting | Computed_Metrics =>
                null;
+               --  The above are never printed, so we don't include them in the
+               --  <config>. These are the same ones tht raise Program_Error if
+               --  passed to XML_Metric_Name_String.
+
             when others =>
                Put ("<metric name=""\1"" display_name=""\2""/>\n",
                     XML_Metric_Name_String (Metric),
@@ -1783,7 +1786,11 @@ package body METRICS.Actions is
    procedure Init (Tool : in out Metrics_Tool; Cmd : Command_Line) is
 
       function To_Compute return Metrics_Set;
-      --  Computes which metrics we should compute
+      --  Computes which metrics we should compute. We actually compute all
+      --  metrics, but this controls which ones we print. If some metrics are
+      --  expensive to compute, we could suppress their computation when we're
+      --  not going to print, but most metrics are so cheap that it's not worth
+      --  it.
 
       function To_Compute return Metrics_Set is
       begin
@@ -1854,18 +1861,14 @@ package body METRICS.Actions is
 
       Ignored : constant Metrix_Ref :=
          Push_New_Metrix (Tool, Node => No_Ada_Node);
+      --  Initialize the Metrix_Stack by pushing the outermost Metrix, which is
+      --  for totals for all the files together.
 
    --  Start of processing for Init
 
    begin
       Tool.Treat_Exit_As_Goto := not Arg (Cmd, No_Treat_Exit_As_Goto);
-
-      --  Decide what metrics to compute. Initialize the Metrix_Stack
-      --  by pushing the outermost Metrix, which is for totals for all
-      --  the files together. If XML requested, create the XML file
-      --  and put the first lines.
-
-      Metrics_To_Compute := To_Compute;
+      Metrics_To_Compute := To_Compute; -- Decide what metrics to print
    end Init;
 
    -----------
