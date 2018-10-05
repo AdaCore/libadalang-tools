@@ -19,7 +19,8 @@ test: all
 install-strip:
 	mkdir -p "$(DESTDIR)"
 	cp -r bin "$(DESTDIR)/"
-	strip "$(DESTDIR)/bin/"*
+	# Don't strip debug builds
+	test "$(BUILD_MODE)" = dev || strip "$(DESTDIR)/bin/"*
 
 .PHONY: clean
 clean:
