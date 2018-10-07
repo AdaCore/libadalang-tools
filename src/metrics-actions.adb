@@ -30,10 +30,10 @@ package body METRICS.Actions is
 
    Implemented : constant Metrics_Set :=
    --  Set of metrics that are implemented in lalmetric so far.
-   --    47 metrics total
-   --    33 fully implemented
-   --    11 partially implemented
-   --    3 not implemented
+   --    48 metrics total
+   --    44 fully implemented
+   --    3 partially implemented
+   --    1 not implemented
 
      (Contract            => True,
       Post                => True,
@@ -58,11 +58,8 @@ package body METRICS.Actions is
 
       Public_Types         => True,
       Private_Types        => True,
-      All_Types            => True, -- partial (needs semantic info)
-      --  We need to know if a full type is the completion of a private type
-      Public_Subprograms   => True, -- partial (needs semantic info)
-      --  We need semantic information to distinguish specless bodies from
-      --  specful bodies.
+      All_Types            => True,
+      Public_Subprograms   => True,
       All_Subprograms      => True,
       Statements           => True,
       Declarations         => True,
@@ -70,13 +67,10 @@ package body METRICS.Actions is
       Unit_Nesting         => True,
       Construct_Nesting    => True,
       Current_Construct_Nesting => True,
-      Param_Number         => True, -- partial (needs semantic info)
-      In_Parameters        => True, -- partial (needs semantic info)
-      Out_Parameters       => True, -- partial (needs semantic info)
-      In_Out_Parameters    => True, -- partial (needs semantic info)
-      --  We need semantic information to distinguish specless bodies from
-      --  specful bodies, for the above four. For a subprogram instantiation,
-      --  we also need to find the generic subprogram.
+      Param_Number         => True,
+      In_Parameters        => True,
+      Out_Parameters       => True,
+      In_Out_Parameters    => True,
 
       Computed_Public_Types       => True,
       Computed_All_Types          => True,
@@ -2540,14 +2534,14 @@ package body METRICS.Actions is
            ("\n\n \1 public types in \2 units",
             Public_Types, Computed_Public_Types);
          Print_Computed_Metric
+           ("\n\n \1 type declarations in \2 units",
+            All_Types, Computed_All_Types);
+         Print_Computed_Metric
            ("\n\n \1 public subprograms in \2 units",
             Public_Subprograms, Computed_Public_Subprograms);
          Print_Computed_Metric
            ("\n\n \1 subprogram bodies in \2 units",
             All_Subprograms, Computed_All_Subprograms);
-         Print_Computed_Metric
-           ("\n\n \1 type declarations in \2 units",
-            All_Types, Computed_All_Types);
 
          --  For Complexity_Average, the actual metric value is in
          --  Complexity_Cyclomatic, and Val_To_Print will compute the
@@ -2556,6 +2550,7 @@ package body METRICS.Actions is
 
          if Metrics_To_Compute (Complexity_Average)
            and then Global_M.Num_With_Complexity > 0
+           and then not Arg (Cmd, No_Local_Metrics)
          then
             declare
                All_But_Complexity_Average : constant Metrics_Set :=
@@ -3485,7 +3480,75 @@ package body METRICS.Actions is
       end Gather_Contract_Metrics;
 
       procedure Gather_Syntax_Metrics (Node : Ada_Node; M : in out Metrix) is
+
+         procedure Count_Params (Spec : Subp_Spec);
+         --  For each Param_Spec of the form "Id1, Id2, ..., IdN : [mode] T",
+         --  increment value for Param_Number and the value for the mode
+         --  by N (the number of identifiers).
+
+         procedure Count_Params (Spec : Subp_Spec) is
+         begin
+            if Spec.F_Subp_Params.Is_Null then
+               return;
+            end if;
+
+            for Param_Spec of Spec.F_Subp_Params.F_Params loop
+               declare
+                  Num : constant Metric_Nat :=
+                    Children_Count (Param_Spec.F_Ids);
+               begin
+                  Inc (M.Vals (Param_Number), By => Num);
+
+                  case Param_Spec.F_Mode is
+                     when Ada_Mode_Default | Ada_Mode_In =>
+                        Inc (M.Vals (In_Parameters), By => Num);
+                     when Ada_Mode_Out =>
+                        Inc (M.Vals (Out_Parameters), By => Num);
+                     when Ada_Mode_In_Out =>
+                        Inc (M.Vals (In_Out_Parameters), By => Num);
+                  end case;
+               end;
+            end loop;
+         end Count_Params;
+
+      --  Start of processing for Gather_Syntax_Metrics
+
       begin
+         --  Param_Number and friends
+
+         if Kind (Node) in
+           Ada_Subp_Decl |
+           Ada_Expr_Function |
+           Ada_Abstract_Subp_Decl |
+           Ada_Null_Subp_Decl |
+           Ada_Subp_Renaming_Decl |
+           Ada_Subp_Body |
+           Ada_Subp_Body_Stub
+         then
+            declare
+               pragma Assert (Node = M.Node);
+               Spec : constant Subp_Spec :=
+                 Node.As_Basic_Decl.P_Subp_Spec_Or_Null.As_Subp_Spec;
+            begin
+               Count_Params (Spec);
+            end;
+
+         --  For a subprogram instantiation, we have to find the generic
+         --  subprogram, and call Count_Params on that spec.
+
+         elsif Kind (Node) = Ada_Generic_Subp_Instantiation then
+            declare
+               pragma Assert (Node = M.Node);
+               G : constant Basic_Decl :=
+                 Node.As_Generic_Instantiation.P_Designated_Generic_Decl;
+               Spec : constant Subp_Spec :=
+                 G.As_Generic_Subp_Decl.F_Subp_Decl
+                   .P_Subp_Spec_Or_Null.As_Subp_Spec;
+            begin
+               Count_Params (Spec);
+            end;
+         end if;
+
          --  Public_Subprograms
 
          if Last_Index (Metrix_Stack) = 3 or else In_Visible_Part then
@@ -3597,11 +3660,9 @@ package body METRICS.Actions is
            Ada_Protected_Type_Decl | Ada_Task_Type_Decl |
            Ada_Incomplete_Type_Decl | Ada_Incomplete_Tagged_Type_Decl
          then
-            --  ???We're not supposed to count the full type declaration of a
-            --  private type/extension. The following 'if' is an approximation
-            --  of that, given that we don't have semantic information.
-
-            if Private_Part_Count = 0 then
+            if P_Previous_Part (Node.As_Base_Type_Decl).Is_Null
+              and then Node.Parent.Kind /= Ada_Generic_Formal_Type_Decl
+            then
                Inc_All (All_Types);
             end if;
          end if;
@@ -3661,34 +3722,6 @@ package body METRICS.Actions is
                   end loop;
                end;
             end if;
-         end if;
-
-         --  Param_Number and friends
-
-         if Kind (Node) = Ada_Param_Spec then
-            declare
-               N : constant Param_Spec := Node.As_Param_Spec;
-               Num : constant Metric_Nat :=
-                 Metric_Nat (Children_Count (F_Ids (N)));
-               P : constant Ada_Node := P_Semantic_Parent (N);
-            begin
-               if P.Kind not in
-                 Ada_Formal_Subp_Decl | Ada_Generic_Subp_Internal |
-                 Ada_Type_Decl -- access-to-subp type
-               then
-                  pragma Assert (P = M.Node);
-                  Inc (M.Vals (Param_Number), By => Num);
-
-                  case F_Mode (N) is
-                     when Ada_Mode_Default | Ada_Mode_In =>
-                        Inc (M.Vals (In_Parameters), By => Num);
-                     when Ada_Mode_Out =>
-                        Inc (M.Vals (Out_Parameters), By => Num);
-                     when Ada_Mode_In_Out =>
-                        Inc (M.Vals (In_Out_Parameters), By => Num);
-                  end case;
-               end if;
-            end;
          end if;
       end Gather_Syntax_Metrics;
 
