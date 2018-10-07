@@ -237,6 +237,9 @@ package body METRICS.Actions is
    --  then we could simply ignore the former when doing
    --  Hierarchy_Coupling_In/Out.
 
+   function Acts_As_Spec (M : Metrix) return Boolean is (M.Acts_As_Spec);
+   --  True if M is for a subprogram body that has no spec
+
    function Get_CU_Access
      (A : in out CU_Metrix.Vector; S : CU_Symbol)
      return CU_Metrix.Element_Access;
@@ -281,6 +284,8 @@ package body METRICS.Actions is
        Ada_Protected_Type_Decl |
        Ada_Entry_Body |
        Ada_Subp_Body |
+       Ada_Subp_Body_Stub |
+       Ada_Generic_Subp_Instantiation |
        Ada_Task_Body |
        Ada_Single_Task_Decl |
        Ada_Task_Type_Decl;
@@ -419,6 +424,15 @@ package body METRICS.Actions is
    --  printed in groups (line metrics, contract metrics, etc).  Name is the
    --  name of the group, e.g. "=== Lines metrics ===". Prints the name
    --  followed by metrics First..Last.
+
+   function Skip_Print_Metrix
+     (Cmd : Command_Line;
+      Metrics_To_Compute : Metrics_Set;
+      M : Metrix;
+      Depth : Positive;
+      Doing_Coupling_Metrics : Boolean) return Boolean;
+   --  Return True if Print_Metrix and XML_Print_Metrix should return
+   --  immediately without printing anything.
 
    procedure Print_Metrix
      (Cmd : Command_Line;
@@ -616,6 +630,18 @@ package body METRICS.Actions is
             Result.Statements_Sloc :=
               Node.As_Package_Body.F_Stmts.F_Stmts.Sloc_Range;
          end if;
+
+         if not Node.Is_Null
+           and then Kind (Node) in Ada_Subp_Body | Ada_Subp_Body_Stub
+         then
+            declare
+               B : constant Body_Node := Node.As_Body_Node;
+               S : constant Basic_Decl := P_Decl_Part (B);
+               Acts_As_Spec : constant Boolean := S.Is_Null;
+            begin
+               Result.Acts_As_Spec := Acts_As_Spec;
+            end;
+         end if;
       end return;
    end Push_New_Metrix;
 
@@ -755,6 +781,15 @@ package body METRICS.Actions is
                return
                  (if R.Is_Null then Procedure_Body_Knd else Function_Body_Knd);
             end;
+         when Ada_Subp_Body_Stub =>
+            declare
+               R : constant Type_Expr :=
+                 F_Subp_Returns (Get_Subp_Spec (Node));
+            begin
+               return
+                 (if R.Is_Null then Procedure_Body_Stub_Knd
+                  else Function_Body_Stub_Knd);
+            end;
          when Ada_Task_Body =>
             return Task_Body_Knd;
          when Ada_Single_Task_Decl =>
@@ -789,7 +824,6 @@ package body METRICS.Actions is
          when Ada_Package_Renaming_Decl =>
             return Package_Renaming_Knd;
          when Ada_Abstract_Subp_Decl |
-             Ada_Null_Subp_Decl |
              Ada_Subp_Renaming_Decl |
              Ada_Subp_Decl =>
             declare
@@ -798,6 +832,8 @@ package body METRICS.Actions is
             begin
                return (if R.Is_Null then Procedure_Knd else Function_Knd);
             end;
+         when Ada_Null_Subp_Decl =>
+            return Null_Procedure_Knd;
 
          when Ada_Expr_Function =>
             return Expression_Function_Knd;
@@ -889,6 +925,7 @@ package body METRICS.Actions is
       XML : Boolean) return Boolean
    is
       pragma Assert ((M.Kind = Ada_Compilation_Unit) = (Depth = 2));
+      pragma Assert (M.Node.Is_Null);
    begin
       --  Don't print metrics that weren't requested on the command line (or by
       --  default).
@@ -902,8 +939,15 @@ package body METRICS.Actions is
 
       if Depth > 3
         and then M.Kind in Contract_Complexity_Eligible
-        and then Metric not in Contract_Complexity | Param_Number |
-          In_Parameters | Out_Parameters | In_Out_Parameters
+        and then Metric not in Contract_Complexity |
+          Param_Number | In_Parameters | Out_Parameters | In_Out_Parameters
+      then
+         return False;
+      end if;
+
+      if M.Kind in Ada_Subp_Body_Stub | Ada_Generic_Subp_Instantiation
+        and then Metric not in
+          Param_Number | In_Parameters | Out_Parameters | In_Out_Parameters
       then
          return False;
       end if;
@@ -932,8 +976,7 @@ package body METRICS.Actions is
                       Ada_Protected_Body)
               or else (XML and then Depth = 1);
          when All_Types | Public_Types =>
-            return ((Depth = 3)
-                or else (XML and then Depth = 1))
+            return (Depth = 3 or else (XML and then Depth = 1))
               and then M.Vals (Metric) > 0;
          when Private_Types =>
             return Depth = 3 and then M.Vals (Metric) > 0;
@@ -945,15 +988,27 @@ package body METRICS.Actions is
                return False;
             end if;
 
-            return (Depth = 3
-              and then M.Kind in
-                      Ada_Package_Decl |
-                      Ada_Generic_Package_Decl |
-                      Ada_Subp_Decl |
-                      Ada_Subp_Body |
-                      --  Only if no spec???
-                      Ada_Generic_Subp_Decl)
-              or else (XML and then Depth = 1);
+            if XML and then Depth = 1 then
+               return True;
+            end if;
+
+            if Depth = 3 then
+               if M.Kind in
+                 Ada_Package_Decl |
+                 Ada_Generic_Package_Decl |
+                 Ada_Subp_Decl |
+                 Ada_Generic_Subp_Decl
+               then
+                  return True;
+               end if;
+
+               if M.Kind in Ada_Subp_Body and then Acts_As_Spec (M) then
+                  return True;
+               end if;
+            end if;
+
+            return False;
+
          when Declarations |
            Statements |
            Logical_Source_Lines =>
@@ -963,8 +1018,20 @@ package body METRICS.Actions is
          when Current_Construct_Nesting =>
             return False;
          when Param_Number =>
-            return M.Kind in Ada_Subp_Decl | Ada_Generic_Subp_Instantiation |
-              Ada_Expr_Function | Ada_Subp_Body; -- only if acting as spec???
+            if M.Kind in Ada_Subp_Decl | Ada_Generic_Subp_Instantiation |
+              Ada_Expr_Function | Ada_Null_Subp_Decl
+            then
+               return True;
+            end if;
+
+            if M.Kind in Ada_Subp_Body |  Ada_Subp_Body_Stub
+              and then Acts_As_Spec (M)
+            then
+               return True;
+            end if;
+
+            return False;
+
          when In_Parameters |
            Out_Parameters |
            In_Out_Parameters =>
@@ -1000,7 +1067,7 @@ package body METRICS.Actions is
                        Hierarchy_Coupling_Out | Hierarchy_Coupling_In =>
                         Result := M.Comp_Unit.Has_Tagged_Type;
                      when Control_Coupling_Out | Control_Coupling_In =>
-                        Result := M.Comp_Unit.Has_Subprogram;
+                        Result := M.Comp_Unit.Has_Subp;
                      when Unit_Coupling_Out | Unit_Coupling_In =>
                         Result := True;
                   end case;
@@ -1200,6 +1267,60 @@ package body METRICS.Actions is
       end if;
    end Print_Range;
 
+   function Skip_Print_Metrix
+     (Cmd : Command_Line;
+      Metrics_To_Compute : Metrics_Set;
+      M : Metrix;
+      Depth : Positive;
+      Doing_Coupling_Metrics : Boolean) return Boolean is
+   begin
+      --  Skip if we're doing coupling metrics, and this is not a
+      --  compilation unit spec, or if M is for a Contract_Complexity_Eligible
+      --  node, and we're not going to print. Also don't print metrics for
+      --  "eligible local program units" if the -nolocal switch was given.
+
+      if Depth > 3 then
+         if Doing_Coupling_Metrics then
+            return True;
+         end if;
+
+         if M.Kind in Contract_Complexity_Eligible
+           and then not
+             (Should_Print
+               (Contract_Complexity, Metrics_To_Compute, M, Depth, XML => True)
+                or else
+              Should_Print
+               (Param_Number, Metrics_To_Compute, M, Depth, XML => True))
+         then
+            return True;
+         end if;
+
+         if Arg (Cmd, No_Local_Metrics) then
+            return True;
+         end if;
+      end if;
+
+      --  For subprogram stubs and instantiations, Param_Number is the only
+      --  metric printed.
+
+      if M.Kind in Ada_Subp_Body_Stub | Ada_Generic_Subp_Instantiation
+        and then not Metrics_To_Compute (Param_Number)
+      then
+         return True;
+      end if;
+
+      --  Coupling metrics are only printed for specs
+
+      if M.Kind = Ada_Compilation_Unit
+        and then Doing_Coupling_Metrics
+        and then not M.Is_Spec
+      then
+         return True;
+      end if;
+
+      return False;
+   end Skip_Print_Metrix;
+
    procedure Print_Metrix
      (Cmd : Command_Line;
       File_Name : String;
@@ -1213,37 +1334,10 @@ package body METRICS.Actions is
       Doing_Coupling_Metrics : constant Boolean :=
         (Metrics_To_Compute and not Coupling_Only) = Empty_Metrics_Set;
    begin
-      --  Return immediately if we're doing coupling metrics, and this is not a
-      --  compilation unit spec, or if M is for a Contract_Complexity_Eligible
-      --  node, and we're not going to print. Also don't print metrics for
-      --  "eligible local program units" if the -nolocal switch was given.
+      pragma Assert (Metrics_To_Compute /= Empty_Metrics_Set);
 
-      if Depth > 3 then
-         if Doing_Coupling_Metrics then
-            return;
-         end if;
-
-         if M.Kind in Contract_Complexity_Eligible
-           and then not
-             (Should_Print
-               (Contract_Complexity, Metrics_To_Compute, M, Depth, XML => True)
-                or else
-              Should_Print
-               (Param_Number, Metrics_To_Compute, M, Depth, XML => True))
-         then
-            return;
-         end if;
-
-         if Arg (Cmd, No_Local_Metrics) then
-            return;
-         end if;
-      end if;
-
-      --  Coupling metrics are only printed for specs
-
-      if M.Kind = Ada_Compilation_Unit
-        and then Doing_Coupling_Metrics
-        and then not M.Is_Spec
+      if Skip_Print_Metrix
+        (Cmd, Metrics_To_Compute, M, Depth, Doing_Coupling_Metrics)
       then
          return;
       end if;
@@ -1552,37 +1646,8 @@ package body METRICS.Actions is
          return;
       end if;
 
-      --  Return immediately if we're doing coupling metrics, and this is not a
-      --  compilation unit spec, or if M is for a Contract_Complexity_Eligible
-      --  node, and we're not going to print. Also don't print metrics for
-      --  "eligible local program units" if the -nolocal switch was given.
-
-      if Depth > 3 then
-         if Doing_Coupling_Metrics then
-            return;
-         end if;
-
-         if M.Kind in Contract_Complexity_Eligible
-           and then not
-             (Should_Print
-               (Contract_Complexity, Metrics_To_Compute, M, Depth, XML => True)
-                or else
-              Should_Print
-               (Param_Number, Metrics_To_Compute, M, Depth, XML => True))
-         then
-            return;
-         end if;
-
-         if Arg (Cmd, No_Local_Metrics) then
-            return;
-         end if;
-      end if;
-
-      --  Coupling metrics are only printed for specs
-
-      if M.Kind = Ada_Compilation_Unit
-        and then Doing_Coupling_Metrics
-        and then not M.Is_Spec
+      if Skip_Print_Metrix
+        (Cmd, Metrics_To_Compute, M, Depth, Doing_Coupling_Metrics)
       then
          return;
       end if;
@@ -1843,15 +1908,30 @@ package body METRICS.Actions is
                Result := (Computed_Metrics => False, others => True);
 
             --  If no metrics were requested on the command line, we compute
-            --  all metrics except coupling and "computed" metrics. Also, at
-            --  least for now, disable contract metrics and Lines_Spark,
-            --  because those don't exist in lalmetric and we're trying to
-            --  be compatible.
+            --  all metrics except coupling and "computed" metrics. ???This
+            --  doesn't match the documentation. Also, at least for now,
+            --  disable contract metrics and Lines_Spark, because those don't
+            --  exist in lalmetric and we're trying to be compatible.
 
             elsif Result = Empty_Metrics_Set then
-               Result :=
+               Result := (others => True);
+
+               declare
+                  Explicit_False_Switches : Metrics_Set := Empty_Metrics_Set;
+               begin
+                  for Metric in Metrics_Enum loop
+                     Explicit_False_Switches (Metric) :=
+                       Explicit (Cmd, Metric);
+                  end loop;
+
+                  if Explicit_False_Switches /= Empty_Metrics_Set then
+                     Result := Result and not Explicit_False_Switches;
+                  end if;
+               end;
+
+               Result := Result and Metrics_Set'
                  (Coupling_Metrics | Computed_Metrics |
-                    Contract_Metrics | Lines_Spark => False,
+                  Contract_Metrics | Lines_Spark => False,
                   others => True);
             end if;
          end return;
@@ -2096,7 +2176,7 @@ package body METRICS.Actions is
                   end if;
                end if;
             when Control_Coupling_Out | Control_Coupling_In =>
-               if From.Has_Subprogram and To.Has_Subprogram then
+               if From.Has_Subp and To.Has_Subp then
                   Do_Inc;
                end if;
             when Unit_Coupling_Out | Unit_Coupling_In =>
@@ -3424,7 +3504,7 @@ package body METRICS.Actions is
                if Last_Index (Metrix_Stack) = 3
                  and then not Unit_Is_Subunit (Node)
                  and then M.Kind = Ada_Subp_Body
-                 and then P_Decl_Part (Node.As_Body_Node).Is_Null
+                 and then Acts_As_Spec (M)
                then
                   Inc_All (Public_Subprograms);
                end if;
@@ -3590,17 +3670,24 @@ package body METRICS.Actions is
                N : constant Param_Spec := Node.As_Param_Spec;
                Num : constant Metric_Nat :=
                  Metric_Nat (Children_Count (F_Ids (N)));
+               P : constant Ada_Node := P_Semantic_Parent (N);
             begin
-               Inc (M.Vals (Param_Number), By => Num);
+               if P.Kind not in
+                 Ada_Formal_Subp_Decl | Ada_Generic_Subp_Internal |
+                 Ada_Type_Decl -- access-to-subp type
+               then
+                  pragma Assert (P = M.Node);
+                  Inc (M.Vals (Param_Number), By => Num);
 
-               case F_Mode (N) is
-                  when Ada_Mode_Default | Ada_Mode_In =>
-                     Inc (M.Vals (In_Parameters), By => Num);
-                  when Ada_Mode_Out =>
-                     Inc (M.Vals (Out_Parameters), By => Num);
-                  when Ada_Mode_In_Out =>
-                     Inc (M.Vals (In_Out_Parameters), By => Num);
-               end case;
+                  case F_Mode (N) is
+                     when Ada_Mode_Default | Ada_Mode_In =>
+                        Inc (M.Vals (In_Parameters), By => Num);
+                     when Ada_Mode_Out =>
+                        Inc (M.Vals (Out_Parameters), By => Num);
+                     when Ada_Mode_In_Out =>
+                        Inc (M.Vals (In_Out_Parameters), By => Num);
+                  end case;
+               end if;
             end;
          end if;
       end Gather_Syntax_Metrics;
@@ -3609,9 +3696,9 @@ package body METRICS.Actions is
          File_M : Metrix renames Element (Metrix_Stack, 2).all;
 
          procedure Set_Flags (Node : Ada_Node);
-         --  Set the Has_Tagged_Type and/or Has_Subprogram flags if
-         --  appropriate. In case of a package instantiation, we recursively
-         --  walk the generic unit.
+         --  Set the Has_Tagged_Type and/or Has_Subp flags if appropriate. In
+         --  case of a package instantiation, we recursively walk the generic
+         --  unit.
 
          function Visit (Node : Ada_Node'Class) return Visit_Status;
          --  Visit one subnode of a generic being instantiated
@@ -3665,11 +3752,14 @@ package body METRICS.Actions is
                  Ada_Subp_Renaming_Decl |
                  Ada_Subp_Decl |
                  Ada_Subp_Body =>
-                  File_M.Has_Subprogram := True;
+                  File_M.Has_Subp := True;
 
                when others => null;
             end case;
          end Set_Flags;
+
+      --  Start of processing for Gather_Dependencies
+
       begin
          case Kind (Node) is
             --  For "with P, Q;" include P and Q

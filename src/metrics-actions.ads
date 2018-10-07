@@ -84,6 +84,8 @@ private
       Entry_Body_Knd,
       Procedure_Body_Knd,
       Function_Body_Knd,
+      Procedure_Body_Stub_Knd,
+      Function_Body_Stub_Knd,
       Task_Body_Knd,
       Task_Object_Knd,
       Task_Type_Knd,
@@ -98,6 +100,7 @@ private
       Package_Renaming_Knd,
       Procedure_Knd,
       Function_Knd,
+      Null_Procedure_Knd,
       Expression_Function_Knd);
 
    --  Overall processing:
@@ -125,7 +128,7 @@ private
    --  into other components of Metrix. Hence the seemingly-redundant
    --  components like Kind and Sloc, below.
 
-   type Metrix (Kind : Ada_Node_Kind_Type) is record
+   type Metrix (Kind : Ada_Node_Kind_Type) is limited record
       Node : Ada_Node := No_Ada_Node;
       --  Node to which the metrics are associated, except for Metrix_Stack[1],
       --  which has Node = null. Node is used only while gathering metrics; it
@@ -229,7 +232,7 @@ private
                   --  so that redundancies don't count (e.g. "with X; with X;"
                   --  should count as depending on X (once)).
 
-                  Has_Tagged_Type, Has_Subprogram : Boolean := False;
+                  Has_Tagged_Type, Has_Subp : Boolean := False;
                   --  True if this is a unit containing a tagged type or a
                   --  subprogram. Used to compute coupling metrics. Ignored for
                   --  bodies.
@@ -246,10 +249,14 @@ private
             --  For a package body with statements, this is their location.
             --  No_Source_Location_Range if there are no statements.
 
+         when Ada_Subp_Body | Ada_Subp_Body_Stub =>
+            Acts_As_Spec : Boolean;
+            --  True for a subprogram body with no corresponding spec
+
          when others =>
             null;
       end case;
-   end record;
+   end record; -- Metrix
 
    type Metrics_Tool is new Tool_State with record
       Metrics_To_Compute : Metrics_Set;

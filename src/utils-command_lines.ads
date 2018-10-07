@@ -228,6 +228,10 @@ package Utils.Command_Lines is
         (Cmd : in out Command_Line; Switch : Switches; Val : Boolean := True);
       --  Set the given switch to Val.
 
+      function Explicit (Cmd : Command_Line; Switch : Switches) return Boolean;
+      --  True if the switch was specified explicitly, as opposed to being
+      --  defaulted.
+
       type Switch_To_Boolean_Mapping is array (Switches) of Boolean;
       type Switch_To_String_Mapping is array (Switches) of String_Ref;
 
@@ -491,6 +495,8 @@ package Utils.Command_Lines is
 
       Text : String_Ref;
       --  The text of the switch; could be a shorthand
+
+      Explicit : Boolean;
 
       case Kind is
          when No_Such | False_Switch =>

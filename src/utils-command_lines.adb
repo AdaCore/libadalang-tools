@@ -234,6 +234,12 @@ package body Utils.Command_Lines is
          Cmd.Sw (To_All (Switch)).Boolean_Val := Val;
       end Set_Arg;
 
+      function Explicit
+        (Cmd : Command_Line; Switch : Switches) return Boolean is
+      begin
+         return Cmd.Sw (To_All (Switch)).Explicit;
+      end Explicit;
+
       package body Set_Defaults is
          pragma Assert (Descriptor.Allowed_Switches = null);
       begin
@@ -897,6 +903,7 @@ package body Utils.Command_Lines is
          Dyn : Dynamically_Typed_Switch renames Cmd.Sw (Alias);
       begin
          Dyn.Text := Descriptor.Allowed_Switches (Switch).Text;
+         Dyn.Explicit := True;
 
          case Descriptor.Allowed_Switches (Switch).Kind is
             when No_Such =>
@@ -1107,18 +1114,23 @@ package body Utils.Command_Lines is
                        (True_Switch,
                         Switch,
                         Text        => null,
+                        Explicit => False,
                         Boolean_Val =>
                           Descriptor.Allowed_Switches (Switch).Default_Bool);
 
                   when Enum_Switch =>
                      Cmd.Sw (Switch) :=
-                       (Enum_Switch, Switch, Text => null, Position => 0);
+                       (Enum_Switch, Switch,
+                        Text => null,
+                        Explicit => False,
+                        Position => 0);
 
                   when String_Switch =>
                      Cmd.Sw (Switch) :=
                        (String_Switch,
                         Switch,
                         Text       => null,
+                        Explicit => False,
                         String_Val =>
                           Descriptor.Allowed_Switches (Switch).Default);
 
@@ -1127,6 +1139,7 @@ package body Utils.Command_Lines is
                        (String_Seq_Switch,
                         Switch,
                         Text    => null,
+                        Explicit => False,
                         Seq_Val => String_Ref_Vectors.Empty_Vector);
                end case;
             end if;
