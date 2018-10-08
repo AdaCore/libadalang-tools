@@ -70,7 +70,7 @@ package body Utils.Tools is
       declare
          Inp : String renames Input (First .. Input'Last);
          Unit : constant Analysis_Unit :=
-           Get_From_Buffer (Tool.Context, File_Name, Buffer => Inp);
+            Get_From_File (Tool.Context, File_Name);
          use Text_IO;
       begin
          if Has_Diagnostics (Unit) then
