@@ -15,7 +15,8 @@ package body Utils.Tools is
    procedure Process_File
      (Tool : in out Tool_State'Class;
       Cmd : in out Command_Line;
-      File_Name : String)
+      File_Name : String;
+      Reparse : Boolean := False)
    is
       use GNAT.OS_Lib, GNAT.Byte_Order_Mark;
       --  We read the file into a String, and convert to wide
@@ -70,7 +71,7 @@ package body Utils.Tools is
       declare
          Inp : String renames Input (First .. Input'Last);
          Unit : constant Analysis_Unit :=
-            Get_From_File (Tool.Context, File_Name);
+           Get_From_File (Tool.Context, File_Name, Reparse => Reparse);
          use Text_IO;
       begin
          if Has_Diagnostics (Unit) then

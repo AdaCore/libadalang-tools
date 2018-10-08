@@ -1405,6 +1405,10 @@ package body Stub.Actions is
          --  Finally, if we generated an Ada stub (i.e. --subunits is True), we
          --  recursively call ourself on the body to generate the subunits.
 
+         --  We pass Reparse => True to Process_File, because otherwise, it
+         --  will think the body file has not changed, and will incorrectly
+         --  "optimize" away the work.
+
          if Arg (Cmd, Subunits) then
             declare
                Body_Cmd : Cmd_Line := Copy_Command_Line (Cmd);
@@ -1412,7 +1416,7 @@ package body Stub.Actions is
                Clear_File_Names (Body_Cmd);
                Append_File_Name (Body_Cmd, Output_Name);
                Set_Arg (Body_Cmd, Update_Body, No_Update_Body);
-               Process_File (Tool, Body_Cmd, Output_Name);
+               Process_File (Tool, Body_Cmd, Output_Name, Reparse => True);
             end;
          end if;
       end Update_Body;
