@@ -124,6 +124,8 @@ package body Utils.Drivers is
       Preprocessing_Allowed :        Boolean        := True;
       Callback              :        Parse_Callback := null)
    is
+      use String_Sets;
+
       procedure Local_Callback
         (Phase : Parse_Phase;
          Swit  : Dynamically_Typed_Switch);
@@ -152,11 +154,11 @@ package body Utils.Drivers is
 
       Cmd_Text, Cmd_Cargs, Project_Switches_Text :
         GNAT.OS_Lib.Argument_List_Access;
-      Global_Report_Dir               : String_Ref;
-      Compiler_Options                : GNAT.OS_Lib.Argument_List_Access;
-      Custom_RTS                      : GNAT.OS_Lib.String_Access;
-      Individual_Source_Options       : String_String_List_Map;
-      Result_Dirs                     : String_String_Map;
+      Global_Report_Dir         : String_Ref;
+      Compiler_Options          : GNAT.OS_Lib.Argument_List_Access;
+      Custom_RTS                : GNAT.OS_Lib.String_Access;
+      Individual_Source_Options : String_String_List_Map;
+      Result_Dirs               : String_String_Map;
 
       procedure Set_Ada_Version (Version : Ada_Version_Type) is
       begin
@@ -201,25 +203,47 @@ package body Utils.Drivers is
          end if;
       end Process_Cargs;
 
-      procedure Process_Files is
-         Num_File_Names : constant Natural := File_Names (Cmd)'Length;
-         Counter : Natural := Num_File_Names;
-         use Text_IO;
-      begin
-         for F_Name of ASIS_Order_File_Names (File_Names (Cmd)) loop
-            if Arg (Cmd, Verbose) then
-               Put_Line
-                 (Standard_Error, "[" & Image (Counter) & "] " & F_Name.all);
-               --  ????Use Formatted_Output?
-            elsif not Arg (Cmd, Quiet) and then Num_File_Names > 1 then
-               Put
-                 (Standard_Error,
-                  "Units remaining: " & Image (Counter) & "     " & ASCII.CR);
-            end if;
-            Counter := Counter - 1;
+      procedure Include_One (File_Name : String);
+      --  Include File_Name in the Ignored set below
 
---         Utils.Options.No_Argument_File_Specified := False;
-            Process_File (Tool, Cmd, F_Name.all);
+      Ignored : String_Set;
+      --  Set of file names mentioned in the --ignore=... switch
+
+      procedure Include_One (File_Name : String) is
+      begin
+         Include (Ignored, File_Name);
+      end Include_One;
+
+      procedure Process_Files is
+         N_File_Names : constant Natural :=
+           Num_File_Names (Cmd) - Arg_Length (Cmd, Ignore);
+         Counter : Natural := N_File_Names;
+         use Text_IO, Directories;
+      begin
+         --  First compute the Ignored set by looking at all the --ignored
+         --  switches.
+
+         for Ignored_Arg of Arg (Cmd, Ignore) loop
+            Read_File_Names_From_File (Ignored_Arg.all, Include_One'Access);
+         end loop;
+
+         for F_Name of ASIS_Order_File_Names (File_Names (Cmd)) loop
+            if not Contains (Ignored, Simple_Name (F_Name.all)) then
+               if Arg (Cmd, Verbose) then
+                  Put_Line
+                   (Standard_Error, "[" & Image (Counter) & "] " & F_Name.all);
+                  --  ????Use Formatted_Output?
+               elsif not Arg (Cmd, Quiet) and then N_File_Names > 1 then
+                  Put
+                    (Standard_Error,
+                     "Units remaining: " & Image (Counter) &
+                     "     " & ASCII.CR);
+               end if;
+               Counter := Counter - 1;
+
+   --         Utils.Options.No_Argument_File_Specified := False;
+               Process_File (Tool, Cmd, F_Name.all);
+            end if;
          end loop;
          pragma Assert (Counter = 0);
       end Process_Files;

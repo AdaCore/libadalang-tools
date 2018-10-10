@@ -100,6 +100,12 @@ package Utils.Projects is
    --
    --  Print_Help is called if --help appears on the command line.
 
+   procedure Read_File_Names_From_File
+     (Par_File_Name : String;
+      Action        : not null access procedure (File_Name : String));
+   --  Read each file name from the named file, and call Action for each
+   --  one. This is used to implement the --files and --ignore switches.
+
    procedure Print_Command_Line (Incremental_Mode, Mimic_gcc : Boolean);
    --  Prints the command line to standard output for debugging
 

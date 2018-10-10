@@ -139,7 +139,7 @@ package Utils.Command_Lines.Common is
    --  Gnatmetric, however, uses "--gnatmetric-debugx" with a shorthand
    --  of "-debugx".
 
-   type Common_String_Seqs is (Debug, Files, External_Variable);
+   type Common_String_Seqs is (Debug, Files, Ignore, External_Variable);
 
    package Common_String_Seq_Switches is new String_Seq_Switches
      (Common_Descriptor,
@@ -147,13 +147,14 @@ package Utils.Command_Lines.Common is
 
    package Common_String_Seq_Syntax is new Common_String_Seq_Switches
      .Set_Syntax
-     ((Debug => '!', Files => '=', External_Variable => '!'));
+     ((Debug => '!', Files => '=', Ignore => '=', External_Variable => '!'));
 
    package Common_String_Seq_Shorthands is new Common_String_Seq_Switches
      .Set_Shorthands
-     ((Debug => +"-d", Files => +"-files", External_Variable => +"-X"));
+     ((Debug => +"-d", Files => +"-files", Ignore => null,
+       External_Variable => +"-X"));
 
-   --  ????????????????I think -j is ignored.
+   --  ??? -j is ignored.
    type Common_Nats is (Jobs);
    package Common_Nat_Switches is new Other_Switches
      (Common_Descriptor,

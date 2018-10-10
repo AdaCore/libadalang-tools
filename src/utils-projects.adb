@@ -71,11 +71,6 @@ package body Utils.Projects is
       return Name & Ext;
    end Project_File_Name;
 
-   procedure Read_File_Names_From_File
-     (Cmd           : in out Command_Line;
-      Par_File_Name :        String);
-   --  ????????????????Should replace Read_Args_From_File
-
    ---------------------------
    -- Recompute_View_Errors --
    ---------------------------
@@ -995,8 +990,8 @@ package body Utils.Projects is
    -------------------------
 
    procedure Read_File_Names_From_File
-     (Cmd           : in out Command_Line;
-      Par_File_Name :        String)
+     (Par_File_Name : String;
+      Action        : not null access procedure (File_Name : String))
    is
       Arg_File    : File_Type;
       Next_Ch     : Character;
@@ -1092,7 +1087,7 @@ package body Utils.Projects is
             Tmp_Str : constant String := Get_File_Name;
          begin
             exit when Tmp_Str = "";
-            Append_File_Name (Cmd, Tmp_Str);
+            Action (Tmp_Str);
          end;
       end loop;
 
@@ -1192,6 +1187,9 @@ package body Utils.Projects is
          procedure Update_File_Name (File_Name : in out String_Ref);
          --  Set File_Name to the full name if -P specified
 
+         procedure Append_One (File_Name : String);
+         --  Append one file name onto Cmd
+
          procedure Update_File_Name (File_Name : in out String_Ref) is
          begin
             if Is_Regular_File (File_Name.all) then
@@ -1214,6 +1212,11 @@ package body Utils.Projects is
                end;
             end if;
          end Update_File_Name;
+
+         procedure Append_One (File_Name : String) is
+         begin
+            Append_File_Name (Cmd, File_Name);
+         end Append_One;
 
       begin
          if Arg (Cmd, Project_File) /= null then
@@ -1263,7 +1266,7 @@ package body Utils.Projects is
          --  if appropriate.
 
          for Par_File_Name of Arg (Cmd, Files) loop
-            Read_File_Names_From_File (Cmd, Par_File_Name.all);
+            Read_File_Names_From_File (Par_File_Name.all, Append_One'Access);
          end loop;
 
          if Num_File_Names (Cmd) = 0 then

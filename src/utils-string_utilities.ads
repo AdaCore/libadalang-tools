@@ -22,6 +22,7 @@
 ------------------------------------------------------------------------------
 
 with Unchecked_Deallocation;
+with Ada.Containers.Indefinite_Ordered_Sets;
 with Ada.Containers.Indefinite_Vectors;
 with Ada.Strings.UTF_Encoding.Wide_Strings;
 with Ada.Strings.Wide_Fixed;
@@ -179,6 +180,9 @@ package Utils.String_Utilities is
    package String_Vectors is
       new Ada.Containers.Indefinite_Vectors (Positive, String);
    subtype String_Vector is String_Vectors.Vector;
+
+   package String_Sets is new Ada.Containers.Indefinite_Ordered_Sets (String);
+   subtype String_Set is String_Sets.Set;
 
    ---------------------
    -- Bounded Strings --
