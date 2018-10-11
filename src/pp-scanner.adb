@@ -355,13 +355,13 @@ package body Pp.Scanner is
                Ignored_Prev := Token_At_Cursor (P);
 
                if Kind (P) = Spaces then
-                  pragma Assert (K not in End_Of_Line | Spaces);
+                  pragma Assert (K not in EOL_Token | Spaces);
                end if;
             end;
          end if;
 
          pragma Assert
-           (if K not in End_Of_Line | Comment_Kind then
+           (if K not in EOL_Token | Comment_Kind then
               Length (X) = Text_Len);
          pragma Assert
            (if K in True_End_Of_Line then
@@ -408,7 +408,7 @@ package body Pp.Scanner is
                   --  We don't want two Spaces tokens in a row
                   Prev_Sloc : constant Source_Location := Sloc (Prev);
                begin
-                  if Kind (Prev) in End_Of_Line | Enabled_LB_Token then
+                  if Kind (Prev) in EOL_Token | Enabled_LB_Token then
                      Result.Line := Prev_Sloc.Line + 1;
                      Result.Col := 1;
                   elsif Kind (Prev) in Whole_Line_Comment then
@@ -1508,7 +1508,7 @@ package body Pp.Scanner is
                pragma Assert
                  (case Tok.Kind is
                     when Comment_Kind => True,
-                    when End_Of_Line =>
+                    when EOL_Token =>
                       Inp in (1 => W_LF) | (W_CR, W_LF)
                         | (1 => W_FF) | (1 => W_VT)
                         and then Outp = (1 => NL),
@@ -1529,7 +1529,7 @@ package body Pp.Scanner is
       procedure Collect_Comment_Paragraph (Tok : in out Token) is
          Tok_EOL, Possible_Spaces, Tok_2 : Opt_Token;
          --  Tok is a Fillable_Comment; it might be the first of a
-         --  paragraph. Tok_EOL is the End_Of_Line token that follows the
+         --  paragraph. Tok_EOL is the EOL_Token token that follows the
          --  comment, Possible_Spaces is the spaces on the next line (unless
          --  the Tok_2 is at the start of line), and Tok_2 is the token after
          --  that, which might need to be combined with Tok.
@@ -1548,11 +1548,11 @@ package body Pp.Scanner is
          --  yyyyyy yyyyyy yyyyyy yyyyyy yyyyyy yyyyyy yyyyyy yyyyyy
 
          --  Then we enter this with Tok = the "xx..." comment.  Tok_EOL will
-         --  be the End_Of_Line after that, Possible_Spaces will be the " "
+         --  be the EOL_Token after that, Possible_Spaces will be the " "
          --  after that, and Tok_2 will be the "yy..." comment. Tok_2 will be
          --  combined with Tok, and we go around the loop again. Now Tok is the
-         --  combined comment, Tok_EOL is the End_Of_Line after "yy...",
-         --  Possible_Spaces is not used, and Tok_2 is the End_Of_Line after
+         --  combined comment, Tok_EOL is the EOL_Token after "yy...",
+         --  Possible_Spaces is not used, and Tok_2 is the EOL_Token after
          --  Tok_EOL. Tok_2 is not a fillable comment, so we send Tok, Tok_EOL,
          --  (not Possible_Spaces), and Tok_2 to the output, in that order, and
          --  exit the loop.
@@ -1583,7 +1583,7 @@ package body Pp.Scanner is
 
          loop
             Get_Tokn (Tok_EOL, Allow_Short_Fillable => False);
-            pragma Assert (Tok_EOL.Kind in End_Of_Line);
+            pragma Assert (Tok_EOL.Kind in EOL_Token);
             Get_Tokn (Possible_Spaces, Allow_Short_Fillable => True);
             if Possible_Spaces.Kind = Spaces then
                Get_Tokn (Tok_2, Allow_Short_Fillable => True);
@@ -1738,8 +1738,8 @@ package body Pp.Scanner is
                 Last_Line_Len => YY.Last_Line_Len);
       end if;
 
-      if (X.Kind in End_Of_Line and then YY.Kind = Enabled_LB_Token)
-        or else (X.Kind = Enabled_LB_Token and then YY.Kind in End_Of_Line)
+      if (X.Kind in EOL_Token and then YY.Kind = Enabled_LB_Token)
+        or else (X.Kind = Enabled_LB_Token and then YY.Kind in EOL_Token)
       then
          return X.Sloc = YY.Sloc;
       end if;

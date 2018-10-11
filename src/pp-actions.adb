@@ -2374,7 +2374,7 @@ package body Pp.Actions is
 
       procedure Append_And_Put (V : in out Tokn_Vec; X : Same_Text_Kind) is
       begin
-         pragma Assert (X not in End_Of_Line);
+         pragma Assert (X not in EOL_Token);
          Append_Tokn (V, X);
       end Append_And_Put;
 
@@ -2514,7 +2514,7 @@ package body Pp.Actions is
          begin
             Append_Line_Break_Tokn
               (New_Tokns, Enabled => Hard, Index => Last_Index (All_LB) + 1);
-            --  Note that the Line_Break_Token replaces the End_Of_Line token
+            --  Note that the Line_Break_Token replaces the EOL_Token token
 
             Append
               (All_LB,
@@ -4584,7 +4584,7 @@ package body Pp.Actions is
 
       function Get_Out_File_Format return Out_File_Formats is
          Is_Windows : constant Boolean := GNAT.OS_Lib.Directory_Separator = '\';
-         Val : constant String_Ref := Arg (Cmd, EOL);
+         Val : constant String_Ref := Arg (Cmd, End_Of_Line);
       begin
          if Val = null then
             return (if Is_Windows then CRLF else LF);

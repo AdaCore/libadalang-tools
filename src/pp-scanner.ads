@@ -205,8 +205,8 @@ package Pp.Scanner is
    subtype Comment_Kind is Token_Kind with
         Predicate => Comment_Kind in Whole_Line_Comment | End_Of_Line_Comment;
 
-   subtype End_Of_Line is Token_Kind with
-     Predicate => End_Of_Line in False_End_Of_Line | True_End_Of_Line;
+   subtype EOL_Token is Token_Kind with
+     Predicate => EOL_Token in False_End_Of_Line | True_End_Of_Line;
 
    subtype Line_Break_Token is Token_Kind with
      Predicate => Line_Break_Token in Enabled_LB_Token | Disabled_LB_Token;
@@ -342,14 +342,14 @@ package Pp.Scanner is
    --
    --  Start_Of_Input and End_Of_Input have Text = "".
    --
-   --  End_Of_Line have Text equal to a single LF character, even if it is
+   --  EOL_Token have Text equal to a single LF character, even if it is
    --  CR,LF in the input.
    --
    --  For comments, the text of the comment excluding the initial "--"
    --  and leading and trailing blanks, and followed by an extra NL. For
    --  multi-line comment "paragraphs", used for filling, NL terminates each
    --  line. The NL at the end isn't really part of the comment; the next
-   --  token in the stream will be End_Of_Line. The reason for the extra NL
+   --  token in the stream will be EOL_Token. The reason for the extra NL
    --  is that GNATCOLL.Paragraph_Filling expects it, so it's simpler and
    --  more efficient this way.
 
@@ -396,18 +396,18 @@ package Pp.Scanner is
      (Get_Tokn_Index (Last (V'Unrestricted_Access)));
 
    function Is_Blank_Line (X : Tokn_Cursor) return Boolean is
-     ((Kind (X) in End_Of_Line and then Kind (Prev (X)) in End_Of_Line)
+     ((Kind (X) in EOL_Token and then Kind (Prev (X)) in EOL_Token)
       or else
      (Kind (X) in Enabled_LB_Token
         and then Kind (Prev (X)) in Enabled_LB_Token));
 
    subtype Nonlexeme_Kind is Opt_Token_Kind with Predicate =>
-     Nonlexeme_Kind in End_Of_Line | Spaces | Comment_Kind;
+     Nonlexeme_Kind in EOL_Token | Spaces | Comment_Kind;
    subtype Lexeme_Kind is Opt_Token_Kind with Predicate =>
      Lexeme_Kind not in Nonlexeme_Kind;
 
    function Next_Lexeme (Cur : Tokn_Cursor) return Tokn_Cursor;
-   --  Returns the next token after Cur that is not End_Of_Line, Spaces, or
+   --  Returns the next token after Cur that is not EOL_Token, Spaces, or
    --  Comment_Kind.
 
    function Prev_Lexeme (Cur : Tokn_Cursor) return Tokn_Cursor;
@@ -548,7 +548,7 @@ private
                         Width : Positive;
 
                         --  The following are used to compute the Sloc of the
-                        --  End_Of_Line token that follows the comment.
+                        --  EOL_Token token that follows the comment.
 
                         Num_Lines : Positive;
                         --  Number of lines in the comment; this can be greater

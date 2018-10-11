@@ -95,7 +95,7 @@ package body Pp.Formatting is
       if Kind (Cur) = Spaces then
          Next (Cur);
          pragma Assert
-           (Kind (Cur) not in Enabled_LB_Token | End_Of_Line | Spaces);
+           (Kind (Cur) not in Enabled_LB_Token | EOL_Token | Spaces);
       end if;
    end Next_ss;
 
@@ -427,7 +427,7 @@ package body Pp.Formatting is
              Scanner.Leading_Blanks (Comment_Tok) >= 2);
       Prev_Tok : constant Tokn_Cursor := Prev (Comment_Tok);
       pragma Assert (if Kind (Comment_Tok) in Whole_Line_Comment then
-        Kind (Prev_Tok) in Spaces | End_Of_Line | Line_Break_Token);
+        Kind (Prev_Tok) in Spaces | EOL_Token | Line_Break_Token);
       Indentation : constant W_Str :=
         (if Kind (Comment_Tok) in Whole_Line_Comment then
           (if Kind (Prev_Tok) = Spaces then To_W_Str (Text (Prev_Tok)) else "")
@@ -770,7 +770,7 @@ package body Pp.Formatting is
          end loop;
          pragma Assert (Kind (Tok) in Expect | End_Of_Input);
          pragma Assert
-           (Kind (Prev_ss (Tok)) in Start_Of_Input | End_Of_Line);
+           (Kind (Prev_ss (Tok)) in Start_Of_Input | EOL_Token);
       end Get_Next_Off_On;
 
       procedure Copy (Buf : in out Buffer; Up_To : Positive) is
@@ -1045,7 +1045,7 @@ package body Pp.Formatting is
          return R : Boolean do
             if Kind (Src_Tok) = Kind (Out_Tok) then
                case Kind (Src_Tok) is
-                  when End_Of_Line | Spaces =>
+                  when EOL_Token | Spaces =>
                      raise Program_Error;
 
                   when Start_Of_Input | End_Of_Input | Line_Break_Token |
@@ -1172,8 +1172,8 @@ package body Pp.Formatting is
                   --  Tok and Out_Tok are the same object.
                end if;
                Next_ss (Tok);
-               exit when Kind (Tok) not in End_Of_Line;
---  ???Should we skip Spaces? exit when Kind (Tok) not in End_Of_Line | Spaces;
+               exit when Kind (Tok) not in EOL_Token;
+--  ???Should we skip Spaces? exit when Kind (Tok) not in EOL_Token | Spaces;
             end loop;
          end loop;
       end Collect_Comments;
@@ -1184,8 +1184,8 @@ package body Pp.Formatting is
       pragma Assert (Cur (Out_Buf) = NL);
       Move_Forward (Out_Buf); -- skip sentinel
 
-      --  Skip initial End_Of_Line token
-      pragma Assert (Kind (Out_Tok) in End_Of_Line);
+      --  Skip initial EOL_Token token
+      pragma Assert (Kind (Out_Tok) in EOL_Token);
       Next_ss (Out_Tok);
 
       --  This loop is similar to the one in
@@ -1200,7 +1200,7 @@ package body Pp.Formatting is
               ("Final_Check 0", Lines_Data, Src_Buf, Src_Tok, Out_Tok);
          end if;
 
-         if Kind (Src_Tok) not in End_Of_Line
+         if Kind (Src_Tok) not in EOL_Token
            and then
            (Match (Src_Tok, Out_Tok)
             or else (Kind (Src_Tok) = '!' and then Kind (Out_Tok) = '|'))
@@ -1287,10 +1287,10 @@ package body Pp.Formatting is
                     ("Final_Check 3", Lines_Data, Src_Buf, Src_Tok, Out_Tok);
                end if;
 
-            elsif Kind (Src_Tok) in End_Of_Line then
+            elsif Kind (Src_Tok) in EOL_Token then
                Next_ss (Src_Tok);
 
-            elsif Kind (Out_Tok) in End_Of_Line then
+            elsif Kind (Out_Tok) in EOL_Token then
                Move_Past_Out_Tok;
                Next_ss (Out_Tok);
 
@@ -1943,7 +1943,7 @@ package body Pp.Formatting is
             return R : Boolean do
                if Kind (Src_Tok) = Kind (Out_Tok) then
                   case Kind (Src_Tok) is
-                     when Line_Break_Token | Tab_Token | End_Of_Line | Spaces |
+                     when Line_Break_Token | Tab_Token | EOL_Token | Spaces |
                        Comment_Kind =>
                         raise Program_Error;
 
@@ -2076,7 +2076,7 @@ package body Pp.Formatting is
            (Format_Debug_Output
               (Lines_Data, "before Enable_Line_Breaks_For_EOL_Comments"));
 
-         --  Skip initial End_Of_Line token
+         --  Skip initial EOL_Token token
          pragma Assert (Kind (New_Tok) = Enabled_LB_Token);
          Next_ss (New_Tok);
 
@@ -2086,7 +2086,7 @@ package body Pp.Formatting is
          loop
             Error_Sloc := To_Langkit (Scanner.Sloc (Src_Tok));
 
-            if Kind (Src_Tok) not in End_Of_Line
+            if Kind (Src_Tok) not in EOL_Token
               and then
               (Match (Src_Tok, New_Tok)
                or else (Kind (Src_Tok) = '!' and then Kind (New_Tok) = '|'))
@@ -2167,11 +2167,11 @@ package body Pp.Formatting is
                elsif Kind (Src_Tok) = End_Of_Line_Comment then
                   Do_End_Of_Line_Comment;
 
-               elsif Kind (Src_Tok) in End_Of_Line then
+               elsif Kind (Src_Tok) in EOL_Token then
                   if Is_Blank_Line (Src_Tok) then
                      loop
                         Next_ss (Src_Tok);
-                        exit when Kind (Src_Tok) not in End_Of_Line
+                        exit when Kind (Src_Tok) not in EOL_Token
                           or else not Arg (Cmd, Insert_Line_Breaks)
                           or else Preserve_Blank_Lines (Cmd);
                      end loop;
@@ -2275,7 +2275,7 @@ package body Pp.Formatting is
             return R : Boolean do
                if Kind (Src_Tok) = Kind (Out_Tok) then
                   case Kind (Src_Tok) is
-                     when End_Of_Line | Spaces | Comment_Kind =>
+                     when EOL_Token | Spaces | Comment_Kind =>
                         raise Program_Error;
 
                      when Start_Of_Input | End_Of_Input | Line_Break_Token |
@@ -2473,7 +2473,7 @@ package body Pp.Formatting is
                Append_Tokn (Pending_Tokns, Start_Of_Input);
             end;
 
-            pragma Assert (Kind (New_Tok) not in End_Of_Line);
+            pragma Assert (Kind (New_Tok) not in EOL_Token);
             if Kind (New_Tok) in Enabled_LB_Token then
 
                --  Step past Syntax_LBI at the current position
@@ -2625,7 +2625,7 @@ package body Pp.Formatting is
                else
                   Append_Tokn (New_Tokns, False_End_Of_Line, "eol extra");
                   --  This is needed because every comment in New_Tokns must be
-                  --  followed by End_Of_Line.
+                  --  followed by EOL_Token.
                end if;
             end;
             Next_ss (Src_Tok);
@@ -2830,7 +2830,7 @@ package body Pp.Formatting is
                --  ???Handle blank lines here, too?
                Insert_Comment_Text (Lines_Data_P, Cmd, Src_Tok);
                Next_ss (Src_Tok);
-               pragma Assert (Kind (Src_Tok) in End_Of_Line);
+               pragma Assert (Kind (Src_Tok) in EOL_Token);
                Next_ss (Src_Tok);
 
                exit when Kind (Src_Tok) not in
@@ -2867,7 +2867,7 @@ package body Pp.Formatting is
                   Append_Tokn
                     (New_Tokns, False_End_Of_Line, "whole line extra");
                   --  This is needed because every comment in New_Tokns must
-                  --  be followed by End_Of_Line.
+                  --  be followed by EOL_Token.
                else
                   Cur_Indentation := Indentation;
                   if Arg (Cmd, Insert_Line_Breaks) then
@@ -2926,7 +2926,7 @@ package body Pp.Formatting is
          Scanner.Clear (New_Tokns);
          Append_Tokn (New_Tokns, Start_Of_Input);
 
-         --  Skip initial End_Of_Line token
+         --  Skip initial EOL_Token token
          pragma Assert (Kind (New_Tok) = Enabled_LB_Token);
          New_To_Newer;
          New_Line_Start_Out := New_Tok;
@@ -2977,7 +2977,7 @@ package body Pp.Formatting is
             --  Whole_Line_Comments must be handled after blank lines, because
             --  the blank line should precede the comment.
 
-            if Kind (Src_Tok) not in End_Of_Line
+            if Kind (Src_Tok) not in EOL_Token
               and then
               (Match (Src_Tok, New_Tok)
                or else (Kind (Src_Tok) = '!' and then Kind (New_Tok) = '|'))
@@ -3077,13 +3077,13 @@ package body Pp.Formatting is
 
                elsif Is_Blank_Line (Src_Tok) then
                   declare
-                     pragma Assert (Kind (Prev_ss (Src_Tok)) in End_Of_Line);
+                     pragma Assert (Kind (Prev_ss (Src_Tok)) in EOL_Token);
                      Prev_Prev_Tok_Kind : constant Token_Kind :=
                        Kind (Prev_ss (Prev_ss (Src_Tok)));
                   begin
                      loop
                         Next_ss (Src_Tok);
-                        exit when Kind (Src_Tok) not in End_Of_Line
+                        exit when Kind (Src_Tok) not in EOL_Token
                           or else not Arg (Cmd, Insert_Line_Breaks)
                           or else Preserve_Blank_Lines (Cmd);
                      end loop;
@@ -3106,7 +3106,7 @@ package body Pp.Formatting is
                      end;
                   end;
 
-               --  Normally, we simply ignore End_Of_Line in the input. But
+               --  Normally, we simply ignore EOL_Token in the input. But
                --  for --preserve-line-breaks mode, if we see a line break in
                --  the input that is not yet in the output, we copy it
                --  over. We set the indentation to take into account
@@ -3116,7 +3116,7 @@ package body Pp.Formatting is
                --  from the indentation to make up for that. (There can never
                --  be two in a row.)
 
-               elsif Kind (Src_Tok) in End_Of_Line then
+               elsif Kind (Src_Tok) in EOL_Token then
                   pragma Assert (not Is_Blank_Line (Src_Tok));
                   Next_ss (Src_Tok);
 
@@ -3260,7 +3260,7 @@ package body Pp.Formatting is
                   then
                      goto Skip;
                   end if;
-               when End_Of_Line => pragma Assert (False);
+               when EOL_Token => pragma Assert (False);
                when others => null;
             end case;
 
