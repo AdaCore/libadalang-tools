@@ -13,6 +13,15 @@ package body LAL_Extensions is
       return Child (Ada_Node (Node), Index);
    end Childx;
 
+   function Contains_Kind
+     (Node : Ada_Node'Class; Kind : Ada_Node_Kind_Type) return Boolean
+   is
+      function Visit (Node : Ada_Node'Class) return Visit_Status is
+        (if Node.Kind = Kind then Stop else Into);
+   begin
+      return Traverse (Node, Visit'Access) = Stop;
+   end Contains_Kind;
+
    procedure Find_Iter
      (Node      : Ada_Node'Class;
       Predicate : not null access function
@@ -379,6 +388,15 @@ package body LAL_Extensions is
          when others => raise Program_Error;
       end case;
    end Get_Subp_Spec;
+
+   function Xref (Node : Ada_Node'Class) return Defining_Name is
+   begin
+      case Node.Kind is
+         when Ada_Identifier => return Node.As_Identifier.P_Xref;
+         when Ada_Dotted_Name => return Xref (Node.As_Dotted_Name.F_Suffix);
+         when others => raise Program_Error;
+      end case;
+   end Xref;
 
    function Adds_New_Nesting_Level (Node : Ada_Node) return Boolean is
    begin

@@ -133,14 +133,14 @@ package body METRICS.Actions is
       Put ("\1\n", Kind (X)'Img);
    end knd;
 
-   procedure pp (X : Ada_Node) is
+   procedure pp (X : Ada_Node'Class) is
       use Utils.Dbg_Out;
    begin
       Utils.Dbg_Out.Output_Enabled := True;
       Put ("\1\n", (if X.Is_Null then "null" else Short_Image (X)));
    end pp;
 
-   procedure ppp (X : Ada_Node) is
+   procedure ppp (X : Ada_Node'Class) is
       use Utils.Dbg_Out;
    begin
       pp (X);
@@ -3084,7 +3084,68 @@ package body METRICS.Actions is
       end Gather_Essential_Complexity;
 
       procedure Gather_Extra_Exit_Points
-        (Node : Ada_Node; M : in out Metrix) is
+        (Node : Ada_Node; M : in out Metrix)
+      is
+
+         function Is_Handled_By
+           (H : Exception_Handler; Exc : Defining_Name) return Boolean;
+         --  True if exception Exc is handled by H, and no exception is raised
+         --  by H.
+         function Is_Handled_In
+           (HS : Handled_Stmts; Exc : Defining_Name) return Boolean;
+         --  True if Is_Handled_By is True for one or more handlers of the
+         --  handled sequence of statements.
+         function Handled_Locally return Boolean;
+         --  True if Is_Handled_In is True for one or more handled sequences of
+         --  statements within the subprogram, and enclosing the raise
+         --  statement.
+
+         function Is_Handled_By
+           (H : Exception_Handler; Exc : Defining_Name) return Boolean is
+         begin
+            for X of H.F_Handled_Exceptions loop
+               if (X.Kind = Ada_Others_Designator or else Exc = Xref (X))
+                 and then not Contains_Kind (H, Ada_Raise_Stmt)
+               then
+                  return True;
+               end if;
+            end loop;
+            return False;
+         end Is_Handled_By;
+
+         function Is_Handled_In
+           (HS : Handled_Stmts; Exc : Defining_Name) return Boolean is
+         begin
+            for H of HS.F_Exceptions loop
+               if Is_Handled_By (H.As_Exception_Handler, Exc) then
+                  return True;
+               end if;
+            end loop;
+            return False;
+         end Is_Handled_In;
+
+         function Handled_Locally return Boolean is
+            Exc : constant Defining_Name :=
+              Node.As_Raise_Stmt.F_Exception_Name.P_Xref;
+         begin
+            for Anc_Index in 1 .. Last_Index (Node_Stack) loop
+               declare
+                  Anc : constant Ada_Node := Ancestor_Node (Anc_Index);
+               begin
+                  exit when Anc = M.Node; ----------------
+
+                  if Anc.Kind = Ada_Handled_Stmts then
+                     if Is_Handled_In (Anc.As_Handled_Stmts, Exc) then
+                        return True;
+                     end if;
+                  end if;
+               end;
+            end loop;
+            return False;
+         end Handled_Locally;
+
+      --  Start of processing for Gather_Extra_Exit_Points
+
       begin
          --  Don't compute this metric within exception handlers.
 
@@ -3096,12 +3157,14 @@ package body METRICS.Actions is
             when Ada_Return_Stmt | Ada_Extended_Return_Stmt =>
                Inc (M.Vals (Extra_Exit_Points));
             when Ada_Raise_Stmt =>
-               --  gnatmetric does some additional analysis to determine
-               --  whether the exception will be handled locally. That's
-               --  impossible to get completely right, but in any case, we need
-               --  semantic information to do what gnatmetric does (which
-               --  exception is denoted by a raise and a handler).
-               Inc (M.Vals (Extra_Exit_Points));
+               --  We do some additional analysis to determine whether the
+               --  exception will be handled locally, as best we can
+               --  statically. If the exception is handled locally by these
+               --  heuristics, we don't count it as an extra exit point.
+
+               if not Handled_Locally then
+                  Inc (M.Vals (Extra_Exit_Points));
+               end if;
             when others => null;
          end case;
       end Gather_Extra_Exit_Points;

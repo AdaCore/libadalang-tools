@@ -23,6 +23,10 @@ package LAL_Extensions is
       Index : Positive) return Ada_Node;
    --  Should this replace Analysis.Child???
 
+   function Contains_Kind
+     (Node : Ada_Node'Class; Kind : Ada_Node_Kind_Type) return Boolean;
+   --  True if some subnode (including Node itself) has the specified Kind
+
    procedure Find_Iter
      (Node      : Ada_Node'Class;
       Predicate : not null access function
@@ -118,6 +122,10 @@ package LAL_Extensions is
 
    function Get_Subp_Spec (Node : Ada_Node'Class) return Subp_Spec;
    --  Return F_Subp_Spec
+
+   function Xref (Node : Ada_Node'Class) return Defining_Name;
+   --  Wrapper for P_Xref. Works for Identifiers and Dotted_Names, and returns
+   --  the denoted defining name.
 
    function Adds_New_Nesting_Level (Node : Ada_Node) return Boolean;
    --  True if Node should be counted as a nesting level for the purposes of

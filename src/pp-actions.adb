@@ -4295,6 +4295,7 @@ package body Pp.Actions is
             if not Decl.Is_Null then
                --  Search through the defining names of the declaration to find
                --  one with the same name.
+               --  ???Use Xref instead (see metrics-actions.adb)?
                for Def_Name of Decl.P_Defining_Names loop
                   if L_Name (Def_Name.P_Relative_Name) = L_Name (Id) then
                      return Def_Name.P_Relative_Name.As_Base_Id;
