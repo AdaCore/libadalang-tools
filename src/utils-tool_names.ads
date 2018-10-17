@@ -15,7 +15,10 @@ package Utils.Tool_Names is
 
    function Target return String;
    --  If this is a cross version of the tool, Tool_Name will be of the form
-   --  target-tool, and this return "target". If the tool name starts with
+   --  target-tool, and this returns "target". If the tool name starts with
    --  "gnaamp", returns "AAMP". Otherwise, this returns "".
+
+   function Basic_Tool_Name return String;
+   --  Returns the tool name without the target & "-", if any
 
 end Utils.Tool_Names;

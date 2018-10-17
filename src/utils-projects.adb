@@ -47,6 +47,12 @@ package body Utils.Projects is
    procedure Recompute_View_Errors (S : String);
    --  Print out all errors but the warnings about missing directories.
 
+   procedure Gnatstub_Special_Case (Cmd : in out Command_Line);
+   --  Gnatstub accepts a command line of the form "src dir", where "dir" is
+   --  treated as "--output-dir=dir". This feature is not documented, but is
+   --  used by GPS. It is unfortunate that this general-purpose driver has to
+   --  know about a particular tool, but Init is called too late.
+
    procedure Process_Project
      (Cmd                       : in out Command_Line;
       Project_Switches_Text     :    out Argument_List_Access;
@@ -1097,6 +1103,26 @@ package body Utils.Projects is
          Cmd_Error ("cannot read arguments from " & Par_File_Name);
    end Read_File_Names_From_File;
 
+   procedure Gnatstub_Special_Case (Cmd : in out Command_Line) is
+   begin
+      if Basic_Tool_Name = "gnatstub" then
+         if Num_File_Names (Cmd) = 2 then
+            declare
+               Old : constant String_Ref_Array := File_Names (Cmd);
+            begin
+               if Is_Directory (Old (2).all) then
+                  --  Change "gnatstub src dir" to
+                  --   "gnatstub src --output-dir=dir".
+
+                  Clear_File_Names (Cmd);
+                  Append_File_Name (Cmd, Old (1).all);
+                  Set_Arg (Cmd, Output_Directory, Old (2).all);
+               end if;
+            end;
+         end if;
+      end if;
+   end Gnatstub_Special_Case;
+
    procedure Process_Command_Line
      (Cmd                             : in out Command_Line;
       Cmd_Text, Cmd_Cargs, Project_Switches_Text :    out Argument_List_Access;
@@ -1185,7 +1211,8 @@ package body Utils.Projects is
 
       declare
          procedure Update_File_Name (File_Name : in out String_Ref);
-         --  Set File_Name to the full name if -P specified
+         --  Set File_Name to the full name if -P specified. If the file
+         --  doesn't exist, or is not a regular file, give an error.
 
          procedure Append_One (File_Name : String);
          --  Append one file name onto Cmd
@@ -1201,15 +1228,18 @@ package body Utils.Projects is
                   Res : constant Virtual_File :=
                     GNATCOLL.Projects.Create (My_Project_Tree, +File_Name.all);
                begin
-                  if Res = No_File
-                    or else not Is_Regular_File (Res.Display_Full_Name)
-                  then
-                     Cmd_Error ("""" & File_Name.all &
-                                """: source file name expected");
+                  if Res = No_File then
+                     Cmd_Error ("file not found: " & File_Name.all);
                   end if;
 
                   File_Name := new String'(Res.Display_Full_Name);
                end;
+            end if;
+
+            if Ada.Directories.Exists (File_Name.all)
+              and then not Is_Regular_File (File_Name.all)
+            then
+               Cmd_Error ("not a regular file: " & File_Name.all);
             end if;
          end Update_File_Name;
 
@@ -1272,6 +1302,8 @@ package body Utils.Projects is
          if Num_File_Names (Cmd) = 0 then
             Cmd_Error ("No input source file set");
          end if;
+
+         Gnatstub_Special_Case (Cmd);
 
          Sort_File_Names (Cmd);
          Iter_File_Names (Cmd, Update_File_Name'Access);

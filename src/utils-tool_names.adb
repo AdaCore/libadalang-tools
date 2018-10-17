@@ -3,9 +3,9 @@ with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 
 package body Utils.Tool_Names is
 
-   -------------------
-   -- Detect_Target --
-   -------------------
+   ------------
+   -- Target --
+   ------------
 
    function Target return String is
       Tgt_Last : constant Natural := Index (Tool_Name, "-", Backward);
@@ -19,5 +19,19 @@ package body Utils.Tool_Names is
          return "";
       end if;
    end Target;
+
+   ---------------------
+   -- Basic_Tool_Name --
+   ---------------------
+
+   function Basic_Tool_Name return String is
+      Tgt_Last : constant Natural := Index (Tool_Name, "-", Backward);
+   begin
+      if Tgt_Last > 0 then
+         return Tool_Name (Tgt_Last + 1 .. Tool_Name'Last);
+      else
+         return Tool_Name;
+      end if;
+   end Basic_Tool_Name;
 
 end Utils.Tool_Names;
