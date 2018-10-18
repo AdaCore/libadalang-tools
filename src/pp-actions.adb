@@ -530,6 +530,7 @@ package body Pp.Actions is
    begin
       return
         (case Kind is
+           when Ada_Discrete_Base_Subtype_Decl => null,
            when Ada_Discrete_Subtype_Name => null,
            when Ada_Unconstrained_Array_Index => null,
            when Ada_Contract_Case_Assoc => null,
