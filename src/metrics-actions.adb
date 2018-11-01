@@ -2622,7 +2622,7 @@ package body METRICS.Actions is
       BOM_Seen : Boolean;
       Unit : Analysis_Unit)
    is
-      pragma Unreferenced (Cmd, Input, BOM_Seen);
+      pragma Unreferenced (Input, BOM_Seen);
       CU_List : constant Ada_Node := Root (Unit);
       pragma Assert (not CU_List.Is_Null);
 --      pragma Assert (Kind (CU_List) = List_Kind);
@@ -2934,8 +2934,24 @@ package body METRICS.Actions is
                if Quantified_Expr_Count = 0 then
                   --  We want to increment the statement count only for real
                   --  for loops.
+
+                  if Arg (Cmd, No_Static_Loop) then
+                     declare
+                        Subtype_Decl : constant Basic_Decl :=
+                          Node.As_For_Loop_Spec.F_Iter_Expr.P_Referenced_Decl;
+                     begin
+                        if not Subtype_Decl.Is_Null
+                          and then Subtype_Decl.P_Is_Static_Decl
+                        then
+                           --  Ignore "static loops" if the --no-static-loop
+                           --  switch was given.
+                           goto Ignore_Static_Loop;
+                        end if;
+                     end;
+                  end if;
+
                   Inc_Cyc (Complexity_Statement);
-                  --  ???except in some cases (see No_Static_Loop)
+                  <<Ignore_Static_Loop>>
                end if;
 
             when Ada_Case_Stmt =>
