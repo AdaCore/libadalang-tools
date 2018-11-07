@@ -19,7 +19,6 @@ with Utils.Command_Lines.Common; use Utils; use Utils.Command_Lines.Common;
 with Utils.Dbg_Out;
 with Utils.Formatted_Output;
 with Utils.String_Utilities; use Utils.String_Utilities;
-with Utils.Tool_Names;
 
 with Utils_Debug; use Utils_Debug;
 with Utils.Predefined_Symbols; use Utils.Predefined_Symbols;
@@ -4192,7 +4191,7 @@ package body METRICS.Actions is
       pragma Unreferenced (Tool);
    begin
       pragma Style_Checks ("M200"); -- Allow long lines
-      Put ("usage: gnatmetric [options] {filename} {-files filename} [-cargs gcc_switches]\n");
+      Put ("usage: gnatmetric [options] {filename}\n");
       Put (" options:\n");
       Put (" --version - Display version and exit\n");
       Put (" --help    - Display usage and exit\n");
@@ -4202,20 +4201,17 @@ package body METRICS.Actions is
       Put (" -U main          - process the closure of units rooted at unit main\n");
       Put (" -Xname=value     - specify an external reference for argument project file\n");
       Put (" --subdirs=dir    - specify subdirectory to place the result files into\n");
-      Put (" --no_objects_dir - place results into current dir instead of project dir\n");
       Put (" -eL              - follow all symbolic links when processing project files\n");
 
       Put ("\n");
-      Put (" -a    - process sources from RTL\n");
       if False then -- Disable this for now
          Put (" --incremental -- incremental processing on a per-file basis\n");
       end if;
-      Put (" -jn   - n is the maximal number of processes\n");
-      Put (" -v    - verbose mode\n");
-      Put (" -q    - quiet mode\n");
+      Put (" --verbose    - verbose mode\n");
+      Put (" --quiet      - quiet mode\n");
       Put ("\n");
 
-      Put (" -nolocal - do not compute detailed metrics for local program units\n");
+      Put (" --no-local-metrics - do not compute detailed metrics for local program units\n");
       Put ("\n");
 
       Put ("Options to control metrics to compute. An option --<metric> turns computing\n");
@@ -4240,7 +4236,7 @@ package body METRICS.Actions is
       Put ("  --complexity-average    - average McCabe Cyclomatic Complexity of a body\n");
       Put ("  --loop-nesting          - maximal loop nesting level\n");
       Put ("  --no-static-loop        - do not count static loops for cyclomatic complexity\n");
-      Put ("  -ne                     - do not consider exit statements as gotos when\n");
+      Put ("  --no-treat-exit-as-goto - do not consider exit statements as gotos when\n");
       Put ("                            computing Essential Complexity\n");
       Put ("  --extra-exit-points     - extra exit points in subprograms\n");
       Put ("\n");
@@ -4257,7 +4253,7 @@ package body METRICS.Actions is
       Put ("  --lines-spark       - code lines with SPARK_Mode (not included in --lines-all)\n");
       Put ("\n");
 
-      Put (" Syntax element metrics:\n");
+      Put ("Syntax element metrics:\n");
       Put ("  --syntax-all         - all syntax element metrics\n");
       Put ("  --declarations       - total number of declarations\n");
       Put ("  --statements         - total number of statements\n");
@@ -4269,8 +4265,7 @@ package body METRICS.Actions is
       Put ("  --construct-nesting  - maximal construct nesting level\n");
       Put ("\n");
 
-      Put (" Coupling metrics. By default they are disabled, options below enable all or\n");
-      Put (" specific coupling metrics, there is no  option to disable coupling metrics\n");
+      Put ("Coupling metrics:\n");
       Put ("  --coupling-all           - all coupling metrics\n");
       Put ("  --tagged-coupling-out    - tagged (class) fan-out coupling\n");
       Put ("  --tagged-coupling-in     - tagged (class) fan-in coupling\n");
@@ -4282,26 +4277,20 @@ package body METRICS.Actions is
       Put ("  --control-coupling-in    - control fan-in coupling\n");
       Put ("\n");
 
-      Put (" output file control:\n");
-      Put ("  -d=dirname     - put files with detailed metrics into 'dirname'\n");
-      Put ("  -x             - generate XML output\n");
-      Put ("  -xs            - generate XML output and corresponding schema file\n");
-      Put ("  -nt            - do not generate output in text form, implies '-x'\n");
-      Put ("  -o file-suffix - suffix for the file to put detailed metrics for\n");
-      Put ("                   a source file into (file suffix should follow OS\n");
-      Put ("                   file name conventions and contain '.' or '$' character)\n");
-      Put ("  -og filename   - name of the file to put global metrics info into\n");
-      Put ("                   (if not set, this info is sent to Stdout),\n");
-      Put ("                   ignored if -nt is used\n");
-      Put ("  -ox filename   - name of the file to put XML output into, implies '-x'\n");
-      Put ("  -sfn           - use short source file name in output\n");
+      Put ("output file control:\n");
+      Put ("  --output-dir=dirname     - put files with detailed metrics into 'dirname'\n");
+      Put ("  --generate-xml-output    - generate XML output\n");
+      Put ("  --generate-xml-schema    - generate XML output and corresponding schema file\n");
+      Put ("  --no-text-output         - do not generate output in text form\n");
+      Put ("  --output-suffix=file-suffix - suffix for the detailed metrics file\n");
+      Put ("  --global-file-name=filename - name of the global metrics file\n");
+      Put ("  --xml-file-name=filename    - name of the XML output file\n");
+      Put ("  --short-file-names          - use short source file names in output\n");
       Put ("\n");
-      Put (" filename        - name of Ada source file for which metrics\n");
-      Put ("                   should be computed (wildcards are allowed)\n");
-      Put (" -files filename - name of the text file containing a list of Ada\n");
-      Put ("                   source files for which metrics should be computed\n");
-
-      Put (" gcc_switches    - switches to be passed to gcc called by \1\n", Tool_Names.Tool_Name);
+      Put (" filename         - name of Ada source file for which metrics\n");
+      Put ("                    should be computed\n");
+      Put (" --files=filename - name of a text file containing a list of Ada\n");
+      Put ("                    source files for which metrics should be computed\n");
       pragma Style_Checks ("M79");
    end Tool_Help;
 
