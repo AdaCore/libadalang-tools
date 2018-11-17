@@ -2369,15 +2369,19 @@ package body METRICS.Actions is
 
       Object_Dir : constant String := Get_Object_Dir;
 
-      Xml_Simple_Name : constant String :=
+      Xml_F_Name : constant String :=
         (if Arg (Cmd, Xml_File_Name) = null
            then "metrix.xml"
            else Arg (Cmd, Xml_File_Name).all);
       --  ASIS-based gnatmetric ignores Output_Dir for the xml.
 
-      Xml_F_Name : constant String :=
-        (if Object_Dir = "" then Xml_Simple_Name
-         else Directories.Compose (Object_Dir, Xml_Simple_Name));
+      Has_Dir : constant Boolean :=
+        Directories.Simple_Name (Xml_F_Name) /= Xml_F_Name;
+      --  True if Xml_F_Name contains directory information
+
+      Xml_FD_Name : constant String :=
+        (if Object_Dir = "" or else Has_Dir then Xml_F_Name
+         else Directories.Compose (Object_Dir, Xml_F_Name));
 
       XML_File : Text_IO.File_Type;
       --  All XML output for all source files goes to this file.
@@ -2393,7 +2397,7 @@ package body METRICS.Actions is
       --  to being used to open the XSD file.
 
       function Xsd_File_Name return String is
-         Norm : constant String  := Normalize_Pathname (Xml_F_Name);
+         Norm : constant String  := Normalize_Pathname (Xml_FD_Name);
          Xml : constant String := ".xml";
          Xsd : constant String := ".xsd";
       begin
@@ -2469,7 +2473,7 @@ package body METRICS.Actions is
          --  Put initial lines of XML
 
          if not Output_To_Standard_Output then
-            Text_IO.Create (XML_File, Name => Xml_F_Name);
+            Text_IO.Create (XML_File, Name => Xml_FD_Name);
             Text_IO.Set_Output (XML_File);
          end if;
          Put ("<?xml version=\1?>\n", Q ("1.0"));
