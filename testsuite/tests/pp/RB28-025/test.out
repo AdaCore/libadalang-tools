@@ -1,0 +1,23 @@
+gnatpp --pipe abc.ads
+package Abc is
+end Abc;
+gnatpp --replace_backup abc.ads
+package Abc is end;
+package Abc is
+end Abc;
+gnatpp --replace_backup abc.ads
+gnatpp: file abc.ads.npp exists. Use '--replace-force-backup' option to override
+gnatpp --replace_force_backup abc.ads
+package Abc is end;
+package Abc is
+end Abc;
+gnatpp --replace_backup --output-dir=out abc.ads
+package Abc is end;
+package Abc is
+end Abc;
+gnatpp --replace_backup --output-dir=out abc.ads
+gnatpp: file out/abc.ads.npp exists. Use '--replace-force-backup' option to override
+gnatpp --replace_force_backup --output-dir=out abc.ads
+package Abc is end;
+package Abc is
+end Abc;

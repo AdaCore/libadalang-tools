@@ -4910,6 +4910,7 @@ package body Pp.Actions is
          Out_File : File_Descriptor := Standout;
          Out_String : String renames Elems (Out_Vec) (1 .. Last_Index (Out_Vec));
          Status : Boolean;
+         use System.WCh_Con;
       begin
    --  ???
    --      if False then -- ???Messes up the diff's.
@@ -4933,11 +4934,8 @@ package body Pp.Actions is
          --  in the output.
 
          if BOM_Seen then
-   --         if Options.Output_Encoding /= System.WCh_Con.WCEM_UTF8 then
-   --            raise Program_Error;
-   --         end if;
+            pragma Assert (Wide_Character_Encoding (Cmd) = WCEM_UTF8);
             Write_File (Out_File, Ada.Strings.UTF_Encoding.BOM_8);
---            Put (W_Char'Val (16#FEFF#)); -- BOM as a wide character
          end if;
 
          Write_File (Out_File, Out_String);
@@ -4975,59 +4973,29 @@ package body Pp.Actions is
    begin
       if Debug_Mode then
          Print (Unit);
---         Put ("With trivia\n");
---         PP_Trivia (Unit);
       end if;
 
---      case Output_Mode is
---         when Pipe | Replace_Modes | Default =>
---            pragma Assert (Res_File_Name = null);
---            pragma Assert (Out_Dir = null);
---         when Create_Modes =>
---            pragma Assert (Res_File_Name /= null);
---            pragma Assert (Out_Dir = null);
---         when Out_Directory =>
---            pragma Assert (Res_File_Name = null);
---            pragma Assert (Out_Dir /= null);
---
---            if Out_Dir.all =
---              Containing_Directory (Source_Name (SF))
---            then
---               Error ("--output-dir=" & Out_Dir.all);
---               Error (" contains input file " & Short_Source_Name (SF));
---               Error (" skipping " & Short_Source_Name (SF));
---               Error (" use -rnb to update source files in place");
---               return;
---            end if;
---      end case;
---
---      Set_Output_Encoding;
---
---      if Output_Mode = Replace_Backup and then
---         Is_Regular_File (Source_Name (SF) & NPP_Suffix)
---      then
---         Put (Standard_Error, "gnatpp: file ");
---         Put (Standard_Error,
---              To_Wide_String (Source_Name (SF) & NPP_Suffix));
---         Put (Standard_Error, " exists. Use '-rf' option to override");
---         New_Line (Standard_Error);
---         return;
---      end if;
-
       if Output_Mode in Replace_Backup | Replace_Force_Backup then
-
---         if Verbose_Mode then
---            Put (Standard_Error, "gnatpp: creating the back-up copy ");
---            Put (Standard_Error, "of the original source ");
---            Put (Standard_Error, To_Wide_String (Source_Name (SF)));
---            New_Line (Standard_Error);
---         end if;
-
          declare
-            Backup_Name : constant String := File_Name & NPP_Suffix;
+            Backup_Simple_Name : constant String := File_Name & NPP_Suffix;
+            Backup_Name : constant String :=
+              (if Arg (Cmd, Output_Directory) = null then Backup_Simple_Name
+               else Compose (Arg (Cmd, Output_Directory).all,
+                             Simple_Name (Backup_Simple_Name)));
             Success : Boolean;
             use Wide_Text_IO;
          begin
+            if Output_Mode = Replace_Backup
+              and then Is_Regular_File (Backup_Name)
+            then
+               Put (Standard_Error, "gnatpp: file ");
+               Put (Standard_Error, To_Wide_String (Backup_Name));
+               Put (Standard_Error,
+                   " exists. Use '--replace-force-backup' option to override");
+               New_Line (Standard_Error);
+               return;
+            end if;
+
             Copy_File
               (Name     => File_Name,
                Pathname => Backup_Name,
