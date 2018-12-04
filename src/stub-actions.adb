@@ -1566,8 +1566,8 @@ package body Stub.Actions is
       Put ("  --max-line-length=nnn  maximum line length in sample body\n");
       Put ("  --indentation=n        number of spaces used for indentation in sample body\n");
       Put ("  --alphabetical-order   alphabetically order local bodies\n");
-      Put ("  --comment_header_sample insert a sample comment header\n");
-      Put ("  --comment_header_spec  insert the comment header from the spec\n");
+      Put ("  --comment-header-sample insert a sample comment header\n");
+      Put ("  --comment-header-spec  insert the comment header from the spec\n");
       Put ("  --header-file=filename insert the comment header from the specified file\n");
       Put ("  --no-exception         avoid raising Program_Error in procedure stubs\n");
       Put ("  --no-local-header      no local comment headers for unit stubs\n");
@@ -1575,6 +1575,7 @@ package body Stub.Actions is
       Put ("  --output-dir=directory place generated file(s) into directory\n");
       Put ("  --wide-character-encoding=(8|b)\n");
       Put ("                         wide character encoding of the result file\n");
+      Put ("  --update-body=N        update body at line N\n");
       Put ("\n");
 
       Put ("  --quiet / -q           quiet mode\n");

@@ -19,8 +19,8 @@ options:
   --max-line-length=nnn  maximum line length in sample body
   --indentation=n        number of spaces used for indentation in sample body
   --alphabetical-order   alphabetically order local bodies
-  --comment_header_sample insert a sample comment header
-  --comment_header_spec  insert the comment header from the spec
+  --comment-header-sample insert a sample comment header
+  --comment-header-spec  insert the comment header from the spec
   --header-file=filename insert the comment header from the specified file
   --no-exception         avoid raising Program_Error in procedure stubs
   --no-local-header      no local comment headers for unit stubs
@@ -28,6 +28,7 @@ options:
   --output-dir=directory place generated file(s) into directory
   --wide-character-encoding=(8|b)
                          wide character encoding of the result file
+  --update-body=N        update body at line N
 
   --quiet / -q           quiet mode
   --verbose / -v         verbose mode
