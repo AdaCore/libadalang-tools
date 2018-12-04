@@ -1,0 +1,25 @@
+procedure foo (i : in out integer) is
+begin
+if i > 0 then
+goto fin;
+end if;
+<<fin>>
+end foo;
+line metrics summed over 1 units
+all lines            : 7
+code lines           : 7
+comment lines        : 0
+end-of-line comments : 0
+comment percentage   : 0.00
+blank lines          : 0
+average lines in body: 7.00
+element metrics summed over 1 units
+all statements      : 2
+all declarations    : 2
+logical sloc        : 4
+1 public subprograms in 1 units
+1 subprogram bodies in 1 units
+average cyclomatic complexity: 2.00
+gnatstub: input file looks like a body
+gnatstub: output file name should be provided because /src1/foo.adb does not follow gnat naming rules for spec files
+>>>program returned status code 1

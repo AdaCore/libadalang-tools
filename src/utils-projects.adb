@@ -1,6 +1,7 @@
 with Ada.Characters.Handling;
 with Ada.Command_Line;
 with Ada.Directories;
+with Ada.Environment_Variables;
 with Ada.Strings;       use Ada.Strings;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 with Ada.Text_IO;
@@ -436,6 +437,8 @@ package body Utils.Projects is
 
       procedure Set_External_Values is
          X_Vars : constant String_Ref_Array := Arg (Cmd, External_Variable);
+         GPR_TOOL_Set : Boolean := False;
+         --  True if -XGPR_TOOL=... appears on the command line
       begin
          for X of X_Vars loop
             --  X is of the form "VAR=value"
@@ -450,9 +453,22 @@ package body Utils.Projects is
                   Cmd_Error ("wrong parameter of -X option: " & X.all);
                end if;
 
+               if X_Var = "GPR_TOOL" then
+                  GPR_TOOL_Set := True;
+               end if;
+
                Project_Env.Change_Environment (X_Var, X_Val);
             end;
          end loop;
+
+         --  Set GPR_TOOL, unless it is already set via an environment variable
+         --  or on the command line.
+
+         if not Ada.Environment_Variables.Exists ("GPR_TOOL")
+           and then not GPR_TOOL_Set
+         then
+            Project_Env.Change_Environment ("GPR_TOOL", Basic_Tool_Name);
+         end if;
       end Set_External_Values;
 
       ------------------------------------
