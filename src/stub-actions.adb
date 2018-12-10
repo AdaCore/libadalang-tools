@@ -304,10 +304,12 @@ package body Stub.Actions is
    Comments_Fill_Arg : aliased String := "--comments-fill";
    Decimal_Grouping_Arg : aliased String := "--decimal-grouping=3";
    Based_Grouping_Arg : aliased String := "--based-grouping=4";
+   Eol_Arg : aliased String := "--eol=lf";
    Args : aliased GNAT.OS_Lib.Argument_List :=
      (Comments_Fill_Arg'Access,
       Decimal_Grouping_Arg'Access,
-      Based_Grouping_Arg'Access);
+      Based_Grouping_Arg'Access,
+      Eol_Arg'Access);
 
    function Get_Pp_Cmd return Command_Line is
    begin
