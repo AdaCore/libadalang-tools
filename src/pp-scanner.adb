@@ -430,6 +430,8 @@ package body Pp.Scanner is
 
       Sloc : constant Source_Location := Get_Sloc;
 
+   --  Start of processing for Append_Tokn
+
    begin
       V.New_Sloc_First := Sloc.Last + 1;
       Append (V.Fixed,
@@ -833,29 +835,36 @@ package body Pp.Scanner is
    end Lookup_Reserved_Word;
 
    function Get_Tokns
-     (Input                     : in out Buffers.Buffer;
-      Result                    : out Tokn_Vec;
-      Ada_Version               : Ada_Version_Type;
-      Max_Tokens                : Tokn_Index := Tokn_Index'Last;
-      Lang                      : Language := Ada_Lang)
-     return Boolean is
+     (Input           : in out Buffers.Buffer;
+      Result          : out Tokn_Vec;
+      Ada_Version     : Ada_Version_Type;
+      Max_Tokens      : Tokn_Index := Tokn_Index'Last;
+      Lang            : Language := Ada_Lang)
+     return Boolean
+   is
+      Ignored : Optional_EOL_Formats;
    begin
-      Get_Tokns (Input, Result, Ada_Version, Max_Tokens, Lang);
+      Get_Tokns (Input, Result, Ignored, Ada_Version, Max_Tokens, Lang);
       return True;
    end Get_Tokns;
 
    procedure Get_Tokns
-     (Input                     : in out Buffers.Buffer;
-      Result                    : out Tokn_Vec;
-      Ada_Version               : Ada_Version_Type;
-      Max_Tokens                : Tokn_Index := Tokn_Index'Last;
-      Lang                      : Language := Ada_Lang)
+     (Input           : in out Buffers.Buffer;
+      Result          : out Tokn_Vec;
+      EOL_Format      : out EOL_Formats;
+      Ada_Version     : Ada_Version_Type;
+      Max_Tokens      : Tokn_Index := Tokn_Index'Last;
+      Lang            : Language := Ada_Lang)
    is
       Cur_Line, Cur_Col : Positive := 1;
       Cur_First         : Positive := 1;
 
       Name_Buffer : Bounded_Str;
       Name_Len : Natural renames Name_Buffer.Length;
+
+      CRLF_Seen, LF_Seen : Boolean := False;
+      --  True if CRLF-style (respectively, LF-style) line endings have been
+      --  seen.
 
       function Cur return W_Char is (Buffers.Cur (Input));
 
@@ -1150,6 +1159,9 @@ package body Pp.Scanner is
          if Is_Line_Terminator (Cur) then
             if Cur = W_CR and then Buffers.Lookahead (Input) = W_LF then
                Get;
+               CRLF_Seen := True;
+            elsif Cur = W_LF then
+               LF_Seen := True;
             end if;
 
             Get;
@@ -1699,6 +1711,13 @@ package body Pp.Scanner is
             exit when Tok.Kind = End_Of_Input;
          end;
       end loop;
+
+      --  If all lines are terminated by CRLF, we want the output to use CRLF,
+      --  If all lines are terminated by LF, we want the output to use LF.
+      --  Otherwise, the file is malformed, so we don't really care, but in
+      --  that case we use LF in the output.
+
+      EOL_Format := (if CRLF_Seen and not LF_Seen then CRLF else LF);
 
       Buffers.Reset (Input);
    end Get_Tokns;

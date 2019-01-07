@@ -301,15 +301,18 @@ package body Stub.Actions is
    function Get_Pp_Cmd return Command_Line;
    --  Return a command line for passing to the pretty printer.
 
+   Syntax_Only_Arg : aliased String := "--syntax-only";
+   --  --syntax-only makes it easier to debug, because we don't get so many
+   --  Property_Errors.
    Comments_Fill_Arg : aliased String := "--comments-fill";
    Decimal_Grouping_Arg : aliased String := "--decimal-grouping=3";
    Based_Grouping_Arg : aliased String := "--based-grouping=4";
-   Eol_Arg : aliased String := "--eol=lf";
+
    Args : aliased GNAT.OS_Lib.Argument_List :=
-     (Comments_Fill_Arg'Access,
+     (Syntax_Only_Arg'Access,
+      Comments_Fill_Arg'Access,
       Decimal_Grouping_Arg'Access,
-      Based_Grouping_Arg'Access,
-      Eol_Arg'Access);
+      Based_Grouping_Arg'Access);
 
    function Get_Pp_Cmd return Command_Line is
    begin
@@ -320,7 +323,7 @@ package body Stub.Actions is
       end return;
    end Get_Pp_Cmd;
 
-   Pp_Cmd : Command_Line := Get_Pp_Cmd;
+   Pp_Base_Cmd : constant Cmd_Line := Get_Pp_Cmd;
 
    function Overriding_String
      (Overrides : Ada_Overriding_Node) return W_Str is
@@ -491,7 +494,15 @@ package body Stub.Actions is
         Wide_Character_Encoding (Cmd);
       Out_Vec, Pp_Out_Vec : Char_Vector;
 
+      Pp_Cmd : Cmd_Line := Copy_Command_Line (Pp_Base_Cmd);
+      --  Make a local copy so we can modify it per file
+
+      function EOL_Switch return String;
+      --  Return "lf" or "crlf" according to which end-of-line convention the
+      --  input uses. We want the output to match the input.
+
       procedure Put_To_Out_Vec (WC : W_Char);
+
       procedure Put_To_Out_Vec (WC : W_Char) is
          procedure Append_One (C : Character);
          pragma Inline (Append_One);
@@ -1423,9 +1434,31 @@ package body Stub.Actions is
          end if;
       end Update_Body;
 
+      function EOL_Switch return String is
+      begin
+         --  If all line endings are CRLF, we return "crlf"; if all are LF, we
+         --  return "lf". If the file is malformed (mixed, CR without LF, no
+         --  line endings at all), we don't care -- we arbitrarily return "lf"
+         --  in those cases, so we don't have to search past the first CR or
+         --  LF.
+
+         for Ch of Input loop
+            case Ch is
+               when ASCII.CR => return "crlf";
+               when ASCII.LF => exit;
+               when others => null;
+            end case;
+         end loop;
+
+         return "lf";
+      end EOL_Switch;
+
    --  Start of processing for Generate
 
    begin
+      Pp.Command_Lines.Pp_String_Switches.Set_Arg
+        (Pp_Cmd, Pp.Command_Lines.End_Of_Line, EOL_Switch);
+
       if Update_Body_Specified (Cmd) then
          Update_Body;
          goto Skip;

@@ -416,7 +416,7 @@ package Pp.Command_Lines is
      Predicate => Lower_Upper_Mixed_PP_Casing
        in Lower_Case | Upper_Case | Mixed;
 
-   subtype Cmd_Line is Utils.Command_Lines.Command_Line;
+   subtype Cmd_Line is Command_Line;
 
    function PP_Attribute_Casing
      (Cmd : Cmd_Line) return Lower_Upper_Mixed_PP_Casing is

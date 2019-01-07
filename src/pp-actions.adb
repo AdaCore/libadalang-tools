@@ -4569,40 +4569,71 @@ package body Pp.Actions is
       Wide_Char_Encoding : constant System.WCh_Con.WC_Encoding_Method :=
         Wide_Character_Encoding (Cmd);
 
-      type Out_File_Formats is (CRLF, LF);
+      In_File_Format : Scanner.Optional_EOL_Formats;
 
-      function Get_Out_File_Format return Out_File_Formats;
-      --  This function is supposed to be used as a part of tool parameters
-      --  processing. It tries to convert its parameter into the corresponding
-      --  value of Out_File_Formats type using the following conventions:
-      --
-      --    "dos"     -> CRLF
-      --    "crlf"    -> CRLF
-      --    "unix"    -> LF
-      --     "lf"     -> LF
-      --
-      --  Generates the error message and raises Parameter_Error if such a
-      --  conversion is not possible.
+      function Out_File_Format return Scanner.EOL_Formats;
+      --  Returns the end-of-line convention for the output, as specified by
+      --  the --eol switch, and defaulting to the same as the input.
 
-      function Get_Out_File_Format return Out_File_Formats is
-         Is_Windows : constant Boolean := GNAT.OS_Lib.Directory_Separator = '\';
+      procedure Tree_To_Ada;
+
+      procedure Tree_To_Ada is
+      begin
+         if Debug_Mode then
+            Utils.Dbg_Out.Output_Enabled := True;
+         end if;
+
+         Scanner.Get_Tokns (Src_Buf, Src_Tokns, In_File_Format, Utils.Ada_Version);
+         if Debug_Mode then
+            Dbg_Out.Put ("Src_Tokens:\n");
+            Scanner.Put_Tokens (Src_Tokns);
+            Dbg_Out.Put ("end Src_Tokens:\n");
+         end if;
+
+         --  Note that if we're processing multiple files, we will get here
+         --  multiple times, so data structures left over from last time must
+         --  have been cleared out.
+
+         pragma Assert (Cur_Indentation = 0);
+         Assert_No_LB (Lines_Data);
+         pragma Assert (Is_Empty (Tabs));
+         Clear (Lines_Data.Out_Buf);
+         Scanner.Clear (New_Tokns);
+
+         --  If --comments-only was specified, format the comments and quit
+
+         if Arg (Cmd, Comments_Only) then
+            Do_Comments_Only (Lines_Data'Access, Src_Buf, Cmd);
+         else
+            --  Otherwise, convert the tree to text, and then run all the
+            --  text-based passes.
+
+            Tree_To_Ada_2 (Node, Cmd, Partial);
+            Post_Tree_Phases
+              (Lines_Data'Access, Messages, Src_Buf, Cmd, Partial);
+         end if;
+      end Tree_To_Ada;
+
+      function Out_File_Format return Scanner.EOL_Formats is
          Val : constant String_Ref := Arg (Cmd, End_Of_Line);
+         use Scanner;
       begin
          if Val = null then
-            return (if Is_Windows then CRLF else LF);
-         elsif Val.all = "dos" or else Val.all = "crlf" then
-            return CRLF;
-         elsif Val.all = "unix" or else Val.all = "lf" then
-            return LF;
+            return In_File_Format;
          else
-            raise Program_Error; -- Should have been validated earlier.
-   --         Error ("Unrecognized output file format " & Val.all);
-   --         raise Parameter_Error;
+            declare
+               Lower : constant String := To_Lower (Val.all);
+            begin
+               if Lower in "dos" | "crlf" then
+                  return CRLF;
+               elsif Lower in "unix" | "lf" then
+                  return LF;
+               else
+                  Cmd_Error ("Unrecognized --eol switch: " & Val.all);
+               end if;
+            end;
          end if;
-      end Get_Out_File_Format;
-
-      Out_File_Format : constant Out_File_Formats := Get_Out_File_Format;
-      --  Format of the tool report file(s)
+      end Out_File_Format;
 
       function Remove_Extra_Line_Breaks return WChar_Vector;
       --  Removes extra NL's. The result has exactly one NL at the beginning, and
@@ -4617,9 +4648,8 @@ package body Pp.Actions is
 
       function Remove_Extra_Line_Breaks return WChar_Vector is
          Out_Buf : Buffer renames Lines_Data.Out_Buf;
-         Add_CR : constant Boolean := Out_File_Format = CRLF;
-         --  True if we should convert LF to CRLF -- if it was requested on the
-         --  command line, or if we're on windows and nothing was requested.
+         Add_CR : constant Boolean := Out_File_Format in Scanner.CRLF;
+         --  True if we should convert LF to CRLF
       begin
          --  Optimize the case where we're not changing anything. The reason
          --  Remove_Extra_Line_Breaks keeps the initial NL is that this
@@ -4680,44 +4710,6 @@ package body Pp.Actions is
             return Result;
          end;
       end Remove_Extra_Line_Breaks;
-
-      procedure Tree_To_Ada;
-      procedure Tree_To_Ada is
-      begin
-         if Debug_Mode then
-            Utils.Dbg_Out.Output_Enabled := True;
-         end if;
-
-         Scanner.Get_Tokns (Src_Buf, Src_Tokns, Utils.Ada_Version);
-         if Debug_Mode then
-            Dbg_Out.Put ("Src_Tokens:\n");
-            Scanner.Put_Tokens (Src_Tokns);
-            Dbg_Out.Put ("end Src_Tokens:\n");
-         end if;
-
-         --  Note that if we're processing multiple files, we will get here
-         --  multiple times, so data structures left over from last time must
-         --  have been cleared out.
-
-         pragma Assert (Cur_Indentation = 0);
-         Assert_No_LB (Lines_Data);
-         pragma Assert (Is_Empty (Tabs));
-         Clear (Lines_Data.Out_Buf);
-         Scanner.Clear (New_Tokns);
-
-         --  If --comments-only was specified, format the comments and quit
-
-         if Arg (Cmd, Comments_Only) then
-            Do_Comments_Only (Lines_Data'Access, Src_Buf, Cmd);
-         else
-            --  Otherwise, convert the tree to text, and then run all the
-            --  text-based passes.
-
-            Tree_To_Ada_2 (Node, Cmd, Partial);
-            Post_Tree_Phases
-              (Lines_Data'Access, Messages, Src_Buf, Cmd, Partial);
-         end if;
-      end Tree_To_Ada;
 
    --  Start of processing for Format_Vector
 

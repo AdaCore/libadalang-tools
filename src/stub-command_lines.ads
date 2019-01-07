@@ -109,7 +109,7 @@ package Stub.Command_Lines is
      Stub_Nat_Switches;
    pragma Warnings (On);
 
-   subtype Cmd_Line is Utils.Command_Lines.Command_Line;
+   subtype Cmd_Line is Command_Line;
 
    function Update_Body_Specified (Cmd : Cmd_Line) return Boolean is
      (Arg (Cmd, Update_Body) /= No_Update_Body);
