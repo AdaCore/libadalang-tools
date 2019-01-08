@@ -425,6 +425,7 @@ package body Pp.Actions is
    --  example, if we have "blah #blah #1blah", then the #1 is considered more
    --  nested than the #, so if the line is too long, we first enable the #,
    --  and only enable the #1 if the line is still too long.
+   --
    --  # may also be followed by "+" and a digit, as in "#+1".
    --  The difference is that for "#1", all subtrees start out deeper than the
    --  deepest of the outer ones, whereas for "#+1", the subtrees are just one
@@ -2486,31 +2487,6 @@ package body Pp.Actions is
       --  Compute a new nesting level for a subtree. This is usually one more than
       --  the current level, but we also add in Max_Nesting_Increment.
 
-      procedure If_Stmt_Check_1;
-      procedure If_Stmt_Check_2 (Level_Of_If : Nesting_Level);
-      --  The above are for a special check related to if_statements, which comes
-      --  in two parts. If_Stmt_Check_1 and _2 are called before and after
-      --  calling Subtree_To_Ada on the condition of an 'if'.
-      --
-      --  The compiler style checks complain if "then" appears by itself on the
-      --  line immediately following "if" (still true???), as in:
-      --     if <condition>
-      --     then
-      --  where <condition> is just long enough to split the line before "then",
-      --  but not long enough to be split itself. To avoid that, we make sure
-      --  at least one line break in <condition> is at the same level as the one
-      --  just before "then", thus ensuring that if the latter is enabled, some
-      --  line break within <condition> will also be enabled. The same goes for
-      --  "elsif".
-      --
-      --  Part _1 remembers the index of the first line break for the condition.
-      --  Then the condition is walked, possibly inserting some line breaks. Part
-      --  _2 then finds the minimum nested level (i.e. outermost), and patches
-      --  that to equal the level of the 'if'. If there are no line breaks in the
-      --  condition, but it is still long enough to force the "then" onto the next
-      --  line, then there's not much we can do -- the style check will fail in
-      --  that unlikely case.
-
       procedure Append_Line_Break
         (Hard     : Boolean;
          Affects_Comments : Boolean;
@@ -2575,34 +2551,6 @@ package body Pp.Actions is
       begin
          return Cur_Level + TT.Max_Nesting_Increment + 1;
       end New_Level;
-
-      First_If_Line_Break : Line_Break_Index_Index;
-      --  Valid only between calls to If_Stmt_Check_1 and
-      --  If_Stmt_Check_2. Set by _1 to 1 past the end of the table, which
-      --  is where the next line break will be placed. Used by _2 to find the
-      --  first line break (if any) belonging to the condition.
-
-      procedure If_Stmt_Check_1 is
-      begin
-         First_If_Line_Break := Last_Index (All_LBI) + 1;
-      end If_Stmt_Check_1;
-
-      procedure If_Stmt_Check_2 (Level_Of_If : Nesting_Level) is
-         Min : Nesting_Level := Nesting_Level'Last;
-      begin
-         --  Find the minimum level:
-         for J in First_If_Line_Break .. Last_Index (All_LBI) loop
-            Min := Nesting_Level'Min (Min, All_LB (All_LBI (J)).Level);
-         end loop;
-
-         --  Overwrite all line breaks at the minimum level to the level of the
-         --  'if':
-         for J in First_If_Line_Break .. Last_Index (All_LBI) loop
-            if All_LB (All_LBI (J)).Level = Min then
-               All_LB (All_LBI (J)).Level := Level_Of_If;
-            end if;
-         end loop;
-      end If_Stmt_Check_2;
 
       procedure Subtree_To_Ada
         (Tree            : Ada_Tree;
@@ -3168,18 +3116,8 @@ package body Pp.Actions is
             begin
                Used (Subtree_Index) := True;
                if Inst.Kind = Required_Subtree then
-                  if Tree.Kind in Ada_If_Stmt | Ada_Elsif_Stmt_Part then
-                     pragma Assert (Subtree_Index = 1);
-                     If_Stmt_Check_1;
-                  end if;
-
                   Subtree_To_Ada
                     (Subt, New_Level (Cur_Level, TT), Subtree_Index);
-
-                  if Tree.Kind in Ada_If_Stmt | Ada_Elsif_Stmt_Part then
-                     If_Stmt_Check_2 (Cur_Level);
-                  end if;
-
                else
                   pragma Assert (Inst.Kind = Opt_Subtree_Or_List);
                   Do_Opt_Subtree_Or_List (Subt, Subtree_Index);
