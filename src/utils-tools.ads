@@ -21,7 +21,8 @@ package Utils.Tools is
       --  The only tool that needs access to the Context is gnatstub.
    end record;
 
-   procedure Init (Tool : in out Tool_State; Cmd : Command_Line) is abstract;
+   procedure Init (Tool : in out Tool_State; Cmd : in out Command_Line)
+      is abstract;
    procedure Per_File_Action
      (Tool : in out Tool_State;
       Cmd : Command_Line;

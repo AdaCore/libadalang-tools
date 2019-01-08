@@ -138,7 +138,8 @@ package body Stub.Actions is
    -- Init --
    ----------
 
-   procedure Init (Tool : in out Stub_Tool; Cmd : Command_Line) is
+   procedure Init
+     (Tool : in out Stub_Tool; Cmd : in out Command_Line) is
       pragma Unreferenced (Tool);
    begin
       --  ????Other checks from gnatstub/lal_ul-check_parameters.adb?

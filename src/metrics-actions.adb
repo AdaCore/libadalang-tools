@@ -1841,7 +1841,9 @@ package body METRICS.Actions is
    -- Init --
    ----------
 
-   procedure Init (Tool : in out Metrics_Tool; Cmd : Command_Line) is
+   procedure Init
+     (Tool : in out Metrics_Tool; Cmd : in out Command_Line)
+   is
 
       function To_Compute return Metrics_Set;
       --  Computes which metrics we should compute. We actually compute all

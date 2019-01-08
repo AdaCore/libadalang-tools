@@ -17,7 +17,8 @@ package METRICS.Actions is
 
 private
 
-   overriding procedure Init (Tool : in out Metrics_Tool; Cmd : Command_Line);
+   overriding procedure Init
+     (Tool : in out Metrics_Tool; Cmd : in out Command_Line);
    overriding procedure Per_File_Action
      (Tool : in out Metrics_Tool;
       Cmd : Command_Line;

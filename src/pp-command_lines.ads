@@ -33,7 +33,11 @@ package Pp.Command_Lines is
       Replace_Backup,
       Replace_Force_Backup,
       Replace,
+      Separate_Loop,
+      Separate_Then,
       Separate_Loop_Then,
+      No_Separate_Loop,
+      No_Separate_Then,
       No_Separate_Loop_Then,
       No_End_Labels, -- Not documented
       Xml_Help, -- Not documented
@@ -66,7 +70,11 @@ package Pp.Command_Lines is
        Replace_Backup => +"-r",
        Replace_Force_Backup => +"-rf",
        Replace => +"-rnb",
+       Separate_Loop => null,
+       Separate_Then => null,
        Separate_Loop_Then => null,
+       No_Separate_Loop => null,
+       No_Separate_Then => null,
        No_Separate_Loop_Then => null,
        No_End_Labels => +"-e", -- Not documented
        Xml_Help => +"-hx", -- Not documented

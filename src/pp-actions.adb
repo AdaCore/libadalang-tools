@@ -113,7 +113,9 @@ package body Pp.Actions is
    -- Init --
    ----------
 
-   procedure Init (Tool : in out Pp_Tool; Cmd : Command_Line) is
+   procedure Init
+     (Tool : in out Pp_Tool; Cmd : in out Command_Line)
+   is
       pragma Unreferenced (Tool);
       File_Name_File : Text_IO.File_Type;
 
@@ -151,6 +153,26 @@ package body Pp.Actions is
       Init_Pp_Off_And_On;
 
       --  ????Other checks from gnatpp/lal_ul-check_parameters.adb?
+
+      if Arg (Cmd, Separate_Loop_Then)
+        and then Arg (Cmd, No_Separate_Loop_Then)
+      then
+         Cmd_Error ("incompatible switches --separate-loop-then, " &
+                      "--no-separate-loop-then");
+      end if;
+
+      --  The --separate-loop-then swithch is equivalent to --separate-loop and
+      --  --separate-then. Likewise for the --no-... switches.
+
+      if Arg (Cmd, Separate_Loop_Then) then
+         Set_Arg (Cmd, Separate_Then);
+         Set_Arg (Cmd, Separate_Loop);
+      end if;
+
+      if Arg (Cmd, No_Separate_Loop_Then) then
+         Set_Arg (Cmd, No_Separate_Then);
+         Set_Arg (Cmd, No_Separate_Loop);
+      end if;
 
       pragma Assert (Environment.Initial_Dir = Current_Directory);
       if Mimic_gcc (Cmd) then
@@ -1882,25 +1904,34 @@ package body Pp.Actions is
 
       --  Some more-specific replacements
 
-      --  For Separate_Loop_Then, we want a hard line break before
-      --  "then" and "loop".
+      --  For Separate_Loop, we want a hard line break before "loop"
 
-      if Arg (Cmd, Separate_Loop_Then) then
-         Replace_One (Ada_If_Stmt, "# then$", "$then$");
-         Replace_One (Ada_Elsif_Stmt_Part, "# then$", "$then$");
+      if Arg (Cmd, Separate_Loop) then
          Replace_One (Ada_Loop_Stmt, "?~~# ~loop$", "?~~$~loop$");
          Replace_One (Ada_For_Loop_Stmt, "?~~# ~loop$", "?~~$~loop$");
          Replace_One (Ada_While_Loop_Stmt, "?~~# ~loop$", "?~~$~loop$");
+      end if;
 
-      --  For No_Separate_Loop_Then, we remove the soft line break
-      --  before "then" and "loop".
+      --  For No_Separate_Loop, we remove the soft line break before "loop"
 
-      elsif Arg (Cmd, No_Separate_Loop_Then) then
-         Replace_One (Ada_If_Stmt, "# then$", " then$");
-         Replace_One (Ada_Elsif_Stmt_Part, "# then$", " then$");
+      if Arg (Cmd, No_Separate_Loop) then
          Replace_One (Ada_Loop_Stmt, "?~~# ~loop$", "?~~ ~loop$");
          Replace_One (Ada_For_Loop_Stmt, "?~~# ~loop$", "?~~ ~loop$");
          Replace_One (Ada_While_Loop_Stmt, "?~~# ~loop$", "?~~ ~loop$");
+      end if;
+
+      --  For Separate_Then, we want a hard line break before "then"
+
+      if Arg (Cmd, Separate_Then) then
+         Replace_One (Ada_If_Stmt, "# then$", "$then$");
+         Replace_One (Ada_Elsif_Stmt_Part, "# then$", "$then$");
+      end if;
+
+      --  For No_Separate_Then, we remove the soft line break before "then"
+
+      if Arg (Cmd, No_Separate_Then) then
+         Replace_One (Ada_If_Stmt, "# then$", " then$");
+         Replace_One (Ada_Elsif_Stmt_Part, "# then$", " then$");
       end if;
 
       --  Replacements for Vertical_Enum_Types
@@ -5151,17 +5182,14 @@ package body Pp.Actions is
       Put (" --comments-gnat-indentation - GNAT style comment line indentation (default)\n");
       Put (" --comments-gnat-beginning - GNAT style comment beginning\n");
       Put (" --comments-fill - fill comment blocks\n");
-      Put (" --comments-special - do not change comments with a special character " &
-            "just after --\n");
+      Put (" --comments-special - do not change comments with a special character just after --\n");
       Put (" --comments-only - format just the comments\n");
 
       Put (" --indentation=n - indentation level, n from 1 .. 9 (default 3)\n");
       Put (" --indent-continuation - indentation level for continuation lines (default one less than --indentation)\n");
 
-      Put (" --dictionary=<file> - set <file> as the dictionary file defining casing " &
-            "exceptions\n");
-      Put (" --dictionary=-      - do not use RM-defined casing for predefined " &
-            "names\n");
+      Put (" --dictionary=<file> - set <file> as the dictionary file defining casing exceptions\n");
+      Put (" --dictionary=-      - do not use RM-defined casing for predefined names\n");
 
       Put (" --decimal-grouping=n  - underscores in decimal literals every n characters\n");
 
@@ -5170,26 +5198,22 @@ package body Pp.Actions is
       Put (" --max-line-length=nnn - set maximum line length (default 79)\n");
 
       Put (" --pp-off=xxx - Use ""--xxx"" as the comment string to disable\n");
-      Put ("                pretty printing instead of the default " &
-              """--!pp off""\n");
+      Put ("                pretty printing instead of the default ""--!pp off""\n");
       Put (" --pp-on=xxx - Use ""--xxx"" as the comment string to reenable\n");
-      Put ("                pretty printing instead of the default " &
-              """--!pp on""\n");
+      Put ("                pretty printing instead of the default ""--!pp on""\n");
 
       Put (" --RTS=<dir> - the same as gcc --RTS option\n");
 
       Put (" --quiet / -q  - quiet mode\n");
 
-      Put (" --no-separate-is        - try not to place 'IS' on a separate " &
-            " line in\n");
+      Put (" --no-separate-is        - try not to place 'IS' on a separate line in\n");
       Put ("                           a subprogram body\n");
-      Put (" --separate-loop-then    - use a separate line for LOOP and " &
-            "THEN keywords\n");
-
-      Put (" --no-separate-loop-then - do not use a separate line for LOOP " &
-            "and THEN\n");
-      Put ("                           keywords, uncompatible with " &
-            "--separate-loop-then\n");
+      Put (" --separate-loop         - use a separate line for LOOP\n");
+      Put (" --separate-then         - use a separate line for THEN\n");
+      Put (" --separate-loop-then    - above two combined\n");
+      Put (" --no-separate-loop      - do not use a separate line for LOOP\n");
+      Put (" --no-separate-then      - do not use a separate line for THEN\n");
+      Put (" --no-separate-loop-then - above two combined\n");
 
       Put (" --use-on-new-line       - use separate lines for USE clauses\n");
       Put ("                           in a context clause\n");
@@ -5205,8 +5229,7 @@ package body Pp.Actions is
       Put (" --split-line-before-record  - ""record"" on next line\n");
       Put (" --indent-named-statements - named statements indented more than name\n");
 
-      Put (" --RM-style-spacing      - no extra space before " &
-            "'(' and ':'\n");
+      Put (" --RM-style-spacing      - no extra space before '(' and ':'\n");
 
       Put (" --par-threshold=nnn     - if the number of parameter specifications is greater\n");
       Put ("                           than nnn, each specification starts from a new line\n");
@@ -5232,20 +5255,15 @@ package body Pp.Actions is
       Put ("\n");
 
       Put ("Output file control:\n");
-      Put (" --replace - replace the argument source with the pretty-printed " &
-            "source (default)\n");
+      Put (" --replace - replace the argument source with the pretty-printed source (default)\n");
       Put (" --output-dir=dir / --dir=dir -- create output files in dir\n");
-      Put (" --replace-backup  - replace the argument source with the pretty-printed " &
-            "source and copy the\n");
+      Put (" --replace-backup  - replace the argument source with the pretty-printed source and copy the\n");
       Put ("        argument source into filename.npp\n");
-      Put (" --replace-force-backup   - same as --replace-backup, but overwrites " &
-            " an existing filename.npp\n");
+      Put (" --replace-force-backup   - same as --replace-backup, but overwrites an existing filename.npp\n");
       Put (" --pipe - send the output to standard output\n");
-      Put (" --output=output_file - write the output into output_file. Give up " &
-            "if output_file\n");
+      Put (" --output=output_file - write the output into output_file. Give up if output_file\n");
       Put ("                  already exists\n");
-      Put (" --output-force=output_file - write the output into output_file, " &
-            "overriding the existing\n");
+      Put (" --output-force=output_file - write the output into output_file, overriding the existing\n");
       Put ("                   file\n");
 
       Put ("\n");
@@ -5255,15 +5273,11 @@ package body Pp.Actions is
       Put (" --files=filename - the name of a text file containing a list\n");
       Put ("                   of Ada source files to reformat\n");
       Put (" --ignore=filename - do not process sources listed in filename\n");
-      Put (" --eol=text_format - sets the format of the gnatpp output " &
-        "file(s),\n");
-      Put ("       text_format can be - 'unix' or 'lf'   - lines end with " &
-        "LF character\n");
-      Put ("                          - 'dos'  or 'crlf' - lines end with " &
-        "CRLF characters\n");
+      Put (" --eol=text_format - sets the format of the gnatpp output file(s),\n");
+      Put ("       text_format can be - 'unix' or 'lf'   - lines end with LF character\n");
+      Put ("                          - 'dos'  or 'crlf' - lines end with CRLF characters\n");
 
-      Put (" --wide-character-encoding=(8|b) - set the wide " &
-        "character encoding of the result file\n");
+      Put (" --wide-character-encoding=(8|b) - set the wide character encoding of the result file\n");
       Put ("    8 - UTF-8 encoding\n");
       Put ("    b - Brackets encoding (default)\n");
       Put ("\n");
