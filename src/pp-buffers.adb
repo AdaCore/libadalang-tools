@@ -723,6 +723,10 @@ package body Pp.Buffers is
    --  the percent doesn't end the string literal.
 
    begin
+      if Input = "" then
+         return; -- leave Buf empty
+      end if;
+
       while Ptr <= Input'Last loop
          --  Set C to the current wide character
 
@@ -767,9 +771,9 @@ package body Pp.Buffers is
                  and then Input (Ptr) = '-'
                then
                   State := In_Comment;
-               elsif C in '"' then
+               elsif C = '"' then
                   State := In_String_Literal;
-               elsif C in '%' then
+               elsif C = '%' then
                   State := In_Obsolescent_String_Literal;
                end if;
          end case;

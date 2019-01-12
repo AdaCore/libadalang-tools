@@ -586,10 +586,14 @@ package body Utils.Command_Lines is
         (Cmd : in out Command_Line; Switch : Switches; Val : Arg_Type) is
          S : constant String := Image (Val);
       begin
-         Free (Cmd.Sw (To_All (Switch)).String_Val);
          if Cmd.Sw (To_All (Switch)).String_Val = null
            or else Cmd.Sw (To_All (Switch)).String_Val.all /= S
          then
+            --  We don't Free the old value, here, because that
+            --  would require Copy_Command_Line to do a deep copy,
+            --  which would probably waste more memory than we're
+            --  leaking here; this procedure is called very rarely.
+
             Cmd.Sw (To_All (Switch)).String_Val := new String'(S);
          end if;
       end Set_Arg;
@@ -985,10 +989,10 @@ package body Utils.Command_Lines is
                            --  Raise_Cmd_Error if the switch parameter
                            --  is malformed; Raise_Cmd_Error raises.
 
-                           Free (Dyn.String_Val);
                            if Dyn.String_Val = null
                              or else Dyn.String_Val.all /= S
                            then
+                              Free (Dyn.String_Val);
                               Dyn.String_Val := new String'(S);
                            end if;
                         when String_Seq_Switch =>

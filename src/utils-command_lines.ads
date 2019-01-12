@@ -517,7 +517,7 @@ package Utils.Command_Lines is
          when String_Seq_Switch =>
             Seq_Val : String_Ref_Vector;
       end case;
-   end record;
+   end record; -- Dynamically_Typed_Switch
 
    type Parse_Callback is access procedure
      (Phase : Parse_Phase;

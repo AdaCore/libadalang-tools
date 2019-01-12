@@ -498,7 +498,7 @@ package body Stub.Actions is
       Pp_Cmd : Cmd_Line := Copy_Command_Line (Pp_Base_Cmd);
       --  Make a local copy so we can modify it per file
 
-      function EOL_Switch return String;
+      function Get_EOL_Switch return String;
       --  Return "lf" or "crlf" according to which end-of-line convention the
       --  input uses. We want the output to match the input.
 
@@ -1364,6 +1364,7 @@ package body Stub.Actions is
             Insertion_Index : constant Positive :=
               Find_Insertion_Index (Old_Content.all, Body_Line);
             pragma Assert (Old_Content (Insertion_Index - 1) = ASCII.LF);
+            use Pp.Command_Lines, Pp.Command_Lines.Pp_Nat_Switches;
          begin
             --  We want to insert the generated stub into the body at
             --  Insertion_Index. We want to pretty print the generated stub,
@@ -1380,12 +1381,13 @@ package body Stub.Actions is
             Generate_Subunit_Start (Level);
             Generate_Subp_Or_Entry_Body
               (Subp_Decl, Name, Ada_Stub => Arg (Cmd, Subunits));
-            Pp.Command_Lines.Pp_Nat_Switches.Set_Arg
-              (Pp_Cmd, Pp.Command_Lines.Initial_Indentation, 0);
-            Pp.Command_Lines.Pp_Nat_Switches.Set_Arg
-              (Pp_Cmd, Pp.Command_Lines.Max_Line_Length,
-               Pp.Command_Lines.Pp_Nat_Switches.Arg
-                 (Pp_Cmd, Pp.Command_Lines.Max_Line_Length) - 3);
+            Set_Arg (Pp_Cmd, Initial_Indentation, 0);
+            declare
+               Switch : constant Pp_Nats := Pp.Command_Lines.Max_Line_Length;
+               Val : constant Natural := Arg (Pp_Cmd, Switch);
+            begin
+               Set_Arg (Pp_Cmd, Switch, Val - 3);
+            end;
             if Update_Body_Specified (Cmd) and then Arg (Cmd, Subunits) then
                --  We would prefer to use Format in this case, with an
                --  appropriate Rule passed to Get_From_Buffer, but that
@@ -1435,7 +1437,7 @@ package body Stub.Actions is
          end if;
       end Update_Body;
 
-      function EOL_Switch return String is
+      function Get_EOL_Switch return String is
       begin
          --  If all line endings are CRLF, we return "crlf"; if all are LF, we
          --  return "lf". If the file is malformed (mixed, CR without LF, no
@@ -1452,13 +1454,16 @@ package body Stub.Actions is
          end loop;
 
          return "lf";
-      end EOL_Switch;
+      end Get_EOL_Switch;
+
+      EOL_Switch : constant String := Get_EOL_Switch;
+
+      use Pp.Command_Lines, Pp.Command_Lines.Pp_String_Switches;
 
    --  Start of processing for Generate
 
    begin
-      Pp.Command_Lines.Pp_String_Switches.Set_Arg
-        (Pp_Cmd, Pp.Command_Lines.End_Of_Line, EOL_Switch);
+      Set_Arg (Pp_Cmd, End_Of_Line, EOL_Switch);
 
       if Update_Body_Specified (Cmd) then
          Update_Body;
