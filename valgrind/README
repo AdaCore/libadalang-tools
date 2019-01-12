@@ -1,0 +1,7 @@
+To run the test suite under valgrind on Linux, put
+this directory on your PATH before libadalang-tools/bin.
+The testsuite.py script will then find the scripts
+in this directory, which run the "real" versions
+under valgrind.
+
+It takes almost 40 times longer.
