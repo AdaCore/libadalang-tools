@@ -3460,8 +3460,6 @@ package body METRICS.Actions is
                  | Ada_Generic_Package_Decl
                  | Ada_Body_Node
                  | Ada_Abstract_Subp_Decl
-                 | Ada_Null_Subp_Decl
-                 | Ada_Subp_Renaming_Decl
                  | Ada_Subp_Decl
                  | Ada_Generic_Subp_Decl
                =>
