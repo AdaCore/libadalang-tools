@@ -4,4 +4,5 @@ The testsuite.py script will then find the scripts
 in this directory, which run the "real" versions
 under valgrind.
 
-It takes almost 40 times longer.
+Tests run almost 40 times slower, so you might
+need to change the TIMEOUT.
