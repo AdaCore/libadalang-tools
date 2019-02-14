@@ -37,6 +37,11 @@ class ShellScriptDriver(BaseDriver):
         self.diff = self.test_env.get('diff', None)
         self.diff_args = self.test_env.get('diff_args', '')
 
+        # Tests run almost 40 times slower under valgrind, so increase the
+        # TIMEOUT in that case.
+        if self.global_env['options'].valgrind:
+            self.TIMEOUT *= 40
+
     @catch_test_errors
     def run(self):
         # We need to add "." to the PATH, because some tests run programs in

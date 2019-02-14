@@ -1,3 +1,5 @@
+import os
+
 from gnatpython.testsuite import Testsuite as BaseTestsuite
 
 from testsuite_support.contract_coverage import ContractCoverageDriver
@@ -20,3 +22,15 @@ class Testsuite(BaseTestsuite):
         self.main.add_option(
             '--strict-whitespace-diff', action='store_true',
             help='Strictly check whitespaces in testcase outputs')
+        self.main.add_option(
+            '--valgrind', action='store_true', default=False,
+            help='Run tests under valgrind')
+
+    def tear_up(self):
+        if self.global_env['options'].valgrind:
+            # The --valgrind switch was given. Set the PATH to point to the
+            # valgrind directory (see ../../valgrind/README).
+            script_dir = os.path.dirname(__file__)
+            valgrind_dir = os.path.abspath(
+                os.path.join(script_dir, '..', '..', 'valgrind'))
+            os.environ["PATH"] = valgrind_dir + os.pathsep + os.environ["PATH"]
