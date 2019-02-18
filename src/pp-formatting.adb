@@ -238,7 +238,7 @@ package body Pp.Formatting is
    --  Final pass: check that we have not damaged the input source text.
    --  Parameters and Out_Buf are as for Insert_Comments_And_Blank_Lines,
    --  except that comments are now included in Out_[Tokens|Buf], and this
-   --  checks that they match the ones in Src_Tokens. Final_Check simply
+   --  checks that they match the ones in Src_Tokns. Final_Check simply
    --  calls Final_Check_Helper, plus asserts that Out_Buf wasn't modified.
 
    --  The code in Final_Check[_Helper] is parallel to the code in
@@ -866,10 +866,11 @@ package body Pp.Formatting is
          Lines_Data_P : Lines_Data_Ptr;
          Cmd : Command_Line;
          Pp_Off_Present : in out Boolean);
-      --  Src_Tokens is the tokens from the original source file. Out_Tokens
-      --  is the newly-generated tokens. Out_Buf contains the corresponding
-      --  characters to Out_Tokens. Out_[Tokens|Buf] doesn't contain any
-      --  comments; they are inserted into the output from Src_Tokens.
+      --  New_Tokns doesn't contain any comments; they are inserted into the
+      --  output from Src_Tokns. Blank lines are also copied from Src_Tokns to
+      --  New_Tokns. The output is also patched up in miscellaneous other ways,
+      --  such as insert preprocessor directives (see comments in the body for
+      --  details).
       --
       --  This procedure also does some work in preparation for
       --  Copy_Pp_Off_Regions. In particular, it checks that OFF/ON commands
@@ -1077,6 +1078,9 @@ package body Pp.Formatting is
                      else
                         R := Text (Src_Tok) = Text (Out_Tok);
                      end if;
+
+                  when Preprocessor_Directive =>
+                     R := Text (Src_Tok) = Text (Out_Tok);
 
                   when Comment_Kind =>
                      R :=
@@ -1944,7 +1948,7 @@ package body Pp.Formatting is
                if Kind (Src_Tok) = Kind (Out_Tok) then
                   case Kind (Src_Tok) is
                      when Line_Break_Token | Tab_Token | EOL_Token | Spaces |
-                       Comment_Kind =>
+                       Comment_Kind | Preprocessor_Directive =>
                         raise Program_Error;
 
                      when Start_Of_Input | End_Of_Input | Other_Lexeme =>
@@ -2185,6 +2189,9 @@ package body Pp.Formatting is
                elsif Kind (New_Tok) in Line_Break_Token then
                   Move_Past_Out_Tok;
 
+               elsif Kind (Src_Tok) = Preprocessor_Directive then
+                  Next (Src_Tok);
+
                elsif Disable_Final_Check then
                   Next_ss (Src_Tok);
                   if At_Last (Src_Tok) then
@@ -2249,9 +2256,13 @@ package body Pp.Formatting is
          --  indentation to that of the surrounding code.
 
          procedure Insert_Whole_Line_Comment;
-         --  Found a Whole_Line_Comment; copy it to the buffer, taking care to
+         --  Found a Whole_Line_Comment; copy it to the output, taking care to
          --  indent, except that if the comment starts in column 1, we assume
          --  the user wants to keep it that way.
+
+         procedure Insert_Preprocessor_Directive;
+         --  Found a Preprocessor_Directive; copy it to the output, preserving
+         --  its indentation.
 
          procedure Insert_Private;
          --  If a private part has no declarations, the earlier passes don't
@@ -2275,7 +2286,8 @@ package body Pp.Formatting is
             return R : Boolean do
                if Kind (Src_Tok) = Kind (Out_Tok) then
                   case Kind (Src_Tok) is
-                     when EOL_Token | Spaces | Comment_Kind =>
+                     when EOL_Token | Spaces | Comment_Kind |
+                       Preprocessor_Directive =>
                         raise Program_Error;
 
                      when Start_Of_Input | End_Of_Input | Line_Break_Token |
@@ -2881,6 +2893,44 @@ package body Pp.Formatting is
             Reset_Indentation;
          end Insert_Whole_Line_Comment;
 
+         procedure Insert_Preprocessor_Directive is
+         begin
+            --  The libadalang parser simply ignores preprocessor directives,
+            --  so it will produce a more-or-less reasonable tree if the input
+            --  text is syntactically legal after deleting the directives. The
+            --  Convert_Tree_To_Ada phase will format based on that tree, so
+            --  something like:
+            --
+            --     package P is
+            --     #IF SOMETHING
+            --        X : constant Integer := 123;
+            --     #ELSE
+            --        X : constant Integer := 456;
+            --     #END IF;
+            --     end P;
+            --
+            --  will be formatted as if it were:
+            --
+            --     package P is
+            --        X : constant Integer := 123;
+            --        X : constant Integer := 456;
+            --     end P;
+            --
+            --  Then this procedure reinserts the directives.
+            --
+            --  So there is a limitation: if deleting the directives does not
+            --  produce text that libadalang can parse, then pretty printing
+            --  will fail.
+
+            Cur_Indentation := Sloc (Src_Tok).Col - 1; -- Keep as in input
+            Append_Temp_Line_Break
+              (Lines_Data_P,
+               Org => "Append_Temp_ Preprocessor_Directive");
+            Append_Tokn (New_Tokns, Src_Tok);
+            Next (Src_Tok);
+            Reset_Indentation;
+         end Insert_Preprocessor_Directive;
+
          procedure Insert_Private is
          begin
             --  The previous line break is just before "end";
@@ -3149,6 +3199,9 @@ package body Pp.Formatting is
 
                elsif Kind (Src_Tok) in Whole_Line_Comment then
                   Insert_Whole_Line_Comment;
+
+               elsif Kind (Src_Tok) = Preprocessor_Directive then
+                  Insert_Preprocessor_Directive;
 
                elsif Kind (New_Tok) = Enabled_LB_Token then
                   New_To_Newer;

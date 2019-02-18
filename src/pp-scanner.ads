@@ -51,6 +51,7 @@ package Pp.Scanner is
       Character_Literal,
       String_Lit,
       Numeric_Literal,
+      Preprocessor_Directive, -- line starting with "#"
       Spaces, -- A sequence of one or more space characters.
       Pp_Off_Comment,
       --  A whole-line comment that matches the --pp-off string

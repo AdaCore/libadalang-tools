@@ -348,8 +348,8 @@ package Pp.Formatting is
    --     the line break.
    --
    --  Insert_Comments_And_Blank_Lines (***)
-   --     Step through the source tokens and Out_Buf tokens. Copy comment and
-   --     blank line tokens into Out_Buf as they are encountered.
+   --     Step through the source tokens and output tokens. Copy comment and
+   --     blank line tokens into the output as they are encountered.
    --
    --  Split_Lines (again)
    --     We do this again because inserted end-of-line comments can cause

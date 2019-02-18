@@ -871,6 +871,9 @@ package body Pp.Scanner is
       procedure Get;
       --  Move ahead one character in the input
 
+      procedure Skip_To_EOL;
+      --  Move to end of line
+
       procedure Get_Tokn (Tok : out Token; Allow_Short_Fillable : Boolean);
       --  Get one token from the input, and return it in Tok, except that
       --  Tok.Text is not set. Here, Whole_Line_Comment represents a single
@@ -914,6 +917,15 @@ package body Pp.Scanner is
         Pre => Tok.Kind = Fillable_Comment;
       --  Collect series of Fillable_Comment into comment "paragraphs" that
       --  will be filled if the appropriate command-line option was given.
+
+      procedure Skip_To_EOL is
+      begin
+         while not Is_Line_Terminator (Cur)
+           and then Cur /= W_NUL
+         loop
+            Get;
+         end loop;
+      end Skip_To_EOL;
 
       procedure Append_Tok_Text (Tok : Token) is
          Token_Text_First : constant Positive :=
@@ -987,9 +999,6 @@ package body Pp.Scanner is
          --  Skip to next non-blank character, and return the number of blanks
          --  skipped
 
-         procedure Skip_To_EOL;
-         --  Move to end of line
-
          function Count_Blanks return Natural is
          begin
             return Result : Natural := 0 do
@@ -999,15 +1008,6 @@ package body Pp.Scanner is
                end loop;
             end return;
          end Count_Blanks;
-
-         procedure Skip_To_EOL is
-         begin
-            while not Is_Line_Terminator (Cur)
-              and then Cur /= W_NUL
-            loop
-               Get;
-            end loop;
-         end Skip_To_EOL;
 
          Kind_Of_Comment : Comment_Kind;
          Is_Fillable_Comment : Boolean;
@@ -1297,8 +1297,15 @@ package body Pp.Scanner is
                   Tok := (Kind => '!', Sloc => Tok.Sloc);
                   Get;
                when '#' =>
-                  Tok := (Kind => '#', Sloc => Tok.Sloc);
-                  Get;
+                  case Lang is
+                     when Template_Lang =>
+                        Tok := (Kind => '#', Sloc => Tok.Sloc);
+                        Get;
+                     when Ada_Lang =>
+                        Tok := (Kind => Preprocessor_Directive,
+                                Sloc => Tok.Sloc, others => <>);
+                        Skip_To_EOL;
+                  end case;
                when '$' =>
                   Tok := (Kind => '$', Sloc => Tok.Sloc);
                   Get;
@@ -1442,10 +1449,6 @@ package body Pp.Scanner is
                   Text_IO.Put_Line
                     (Text_IO.Standard_Error,
                      "illegal character: " & To_UTF8 ((1 => Cur)));
-                  if Cur = '#' then
-                     Text_IO.Put_Line
-                       (Text_IO.Standard_Error, "preprocessing not supported");
-                  end if;
                   raise Program_Error;
                   --  All legal token-starting characters are handled above
             end case;
