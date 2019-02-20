@@ -562,6 +562,8 @@ package body Pp.Actions is
            when Ada_Unconstrained_Array_Indices => null,
            when Ada_Error_Decl => null,
            when Ada_Error_Stmt => null,
+           when Ada_Enum_Subp_Spec => null,
+           when Ada_Enum_Lit_Synth_Type_Expr => null,
             --  ???The above are not used
 
            when Ada_Ada_List => null,
