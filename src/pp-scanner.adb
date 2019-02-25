@@ -862,9 +862,9 @@ package body Pp.Scanner is
       Name_Buffer : Bounded_Str;
       Name_Len : Natural renames Name_Buffer.Length;
 
-      CRLF_Seen, LF_Seen : Boolean := False;
-      --  True if CRLF-style (respectively, LF-style) line endings have been
-      --  seen.
+      CRLF_Seen, LF_Seen : Natural := 0;
+      --  Count of the number of CRLF-style (respectively, LF-style) line
+      --  endings that have been seen.
 
       function Cur return W_Char is (Buffers.Cur (Input));
 
@@ -1159,9 +1159,9 @@ package body Pp.Scanner is
          if Is_Line_Terminator (Cur) then
             if Cur = W_CR and then Buffers.Lookahead (Input) = W_LF then
                Get;
-               CRLF_Seen := True;
+               CRLF_Seen := CRLF_Seen + 1;
             elsif Cur = W_LF then
-               LF_Seen := True;
+               LF_Seen := LF_Seen + 1;
             end if;
 
             Get;
@@ -1717,10 +1717,11 @@ package body Pp.Scanner is
 
       --  If all lines are terminated by CRLF, we want the output to use CRLF,
       --  If all lines are terminated by LF, we want the output to use LF.
-      --  Otherwise, the file is malformed, so we don't really care, but in
-      --  that case we use LF in the output.
+      --  Otherwise, the file is malformed, so we don't really care. However,
+      --  if the last line of the file didn't have an end-of-line, an LF is
+      --  inserted, so we take a majority vote here, with ties going to LF.
 
-      EOL_Format := (if CRLF_Seen and not LF_Seen then CRLF else LF);
+      EOL_Format := (if CRLF_Seen > LF_Seen then CRLF else LF);
 
       Buffers.Reset (Input);
    end Get_Tokns;
