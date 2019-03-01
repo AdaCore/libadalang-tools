@@ -18,7 +18,6 @@ Element metrics summed over 2 units
  1 subprogram bodies in 1 units
 
 Average cyclomatic complexity: 1.00
-
 <?xml version="1.0"?>
 <global>
    <config>

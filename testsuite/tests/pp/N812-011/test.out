@@ -1,6 +1,6 @@
 package P with
    Pure
- is
+is
 
    type T is new Integer with
       Atomic;

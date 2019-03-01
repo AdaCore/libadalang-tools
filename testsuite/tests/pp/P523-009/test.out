@@ -1406,8 +1406,8 @@ package test_gnatpp is
 
       select_rof_num                                                --  6
       --
-      -- Activate the numeric setting of the rate-of-fire. The numeric
-      -- value must be set with the function set_rof_num().
+         -- Activate the numeric setting of the rate-of-fire. The numeric
+         -- value must be set with the function set_rof_num().
 
 );
 
