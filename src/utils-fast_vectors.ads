@@ -226,6 +226,14 @@ package Utils.Fast_Vectors is
 
    procedure Append (Container : in out Vector; New_Items : Elements_Array);
 
+   procedure Put
+     (Container : Vector;
+      Put : not null access procedure (Item : Element_Type);
+      Put_Between : not null access procedure);
+   --  Prints out the Container for debugging. We don't want to depend on any
+   --  output packages here, so you must pass in Put (to print out an element)
+   --  and Put_Between (to print out a separator between elements).
+
 private
 
    pragma Inline (Append);

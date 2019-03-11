@@ -14,6 +14,7 @@ with GNATCOLL.Traces;
 
 with Utils.Command_Lines.Common;     use Utils.Command_Lines.Common;
 with Utils.Environment;
+with Utils.Err_Out;
 with Utils.Formatted_Output;
 with Utils.Tool_Names; use Utils.Tool_Names;
 with Utils.Strings;      use Utils.Strings;
@@ -22,10 +23,8 @@ with Utils.Versions;
 package body Utils.Projects is
    use Text_IO;
 
-   pragma Warnings (Off);
    use Common_Flag_Switches, Common_String_Switches,
-     Common_String_Seq_Switches, Common_Nat_Switches;
-   pragma Warnings (On);
+     Common_String_Seq_Switches;
 
    My_Project_Tree : aliased Project_Tree;
    Project_Env : Project_Environment_Access;
@@ -44,6 +43,10 @@ package body Utils.Projects is
    --  If "-U main_unit" was specified, this returns the main unit. Otherwise
    --  (-U was not specified, or was specified without a main unit name),
    --  returns null.
+
+   procedure Post_Cmd_Line_1 (Cmd : Command_Line);
+   --  This is called by Process_Command_Line after the first pass through
+   --  the command-line arguments.
 
    procedure Recompute_View_Errors (S : String);
    --  Print out all errors but the warnings about missing directories.
@@ -238,15 +241,18 @@ package body Utils.Projects is
 
       procedure Load_Tool_Project is
          Error_Printed : Boolean := False;
+
          procedure Errors (S : String);
+         --  Load calls this in case of certain (but not all) errors
+
          procedure Errors (S : String) is
          begin
             if Index (S, " not a regular file") /= 0 then
-               Ada.Text_IO.Put_Line
-                 (Tool_Name & ": project file " &
-                  Project_File_Name (Cmd) & " not found");
+               Err_Out.Put
+                 ("\1: project file \2 not found\n",
+                  Tool_Name, Project_File_Name (Cmd));
             else
-               Ada.Text_IO.Put_Line (Tool_Name & ": " & S);
+               Err_Out.Put ("\1: \2\n", Tool_Name, S);
             end if;
             Error_Printed := True;
          end Errors;
@@ -268,9 +274,9 @@ package body Utils.Projects is
          when Invalid_Project =>
             if Error_Printed then
                raise Command_Line_Error;
-            else
-               Cmd_Error (Project_File_Name (Cmd) & ": invalid project");
             end if;
+
+            Cmd_Error (Project_File_Name (Cmd) & ": invalid project");
       end Load_Tool_Project;
 
       -----------------
@@ -785,7 +791,7 @@ package body Utils.Projects is
          procedure Scan_Switches is
          begin
             for J in Sws'Range loop
-               if Utils_Debug.Debug_Flag_C then
+               if Debug_Flag_C then
                   Put (Sws (J).all & ' ');
                end if;
 
@@ -794,7 +800,7 @@ package body Utils.Projects is
                end if;
             end loop;
 
-            if Utils_Debug.Debug_Flag_C then
+            if Debug_Flag_C then
                if Is_Default then
                   Put ("(default)");
                end if;
@@ -842,7 +848,7 @@ package body Utils.Projects is
             Project_U   := Project (Source_Info);
             Name        := new String'(Display_Base_Name (Sources (S)));
 
-            if Utils_Debug.Debug_Flag_C then
+            if Debug_Flag_C then
                Put_Line ("Switches defined for " & Name.all);
             end if;
 
@@ -921,11 +927,11 @@ package body Utils.Projects is
             end if;
 
             if Is_Empty (File_Switches) then
-               if Utils_Debug.Debug_Flag_C then
+               if Debug_Flag_C then
                   Put_Line ("No stored switches");
                end if;
             else
---               if Utils_Debug.Debug_Flag_C then
+--               if Debug_Flag_C then
 --                  Put_Line ("Stored switches " & File_Switches.all);
 --               end if;
 
@@ -982,15 +988,6 @@ package body Utils.Projects is
    --  Start of processing for Process_Project
 
    begin
-      --  ????????????????
-      --  Process_Project_File has:
-      --  Opt.Directories_Must_Exist_In_Projects := False; But that is
-      --  apparently unnecessary (no tests fail if it is removed).
-
-      --  Process_Project_File has:
-      --  Register_Tool_Attributes (My_Project_Tree); which is needed for
-      --  gnat2xml (LA17-020-gnat2xml_1).
-
       Initialize_Environment;
       Set_External_Values;
       Load_Tool_Project;
@@ -1139,6 +1136,17 @@ package body Utils.Projects is
       end if;
    end Gnatstub_Special_Case;
 
+   procedure Post_Cmd_Line_1 (Cmd : Command_Line) is
+      use Utils.Environment;
+   begin
+      for Dbg of Arg (Cmd, Command_Lines.Common.Debug) loop
+         Set_Debug_Options (Dbg.all);
+      end loop;
+
+      Tool_Current_Dir := new String'(Initial_Dir);
+      --  Leave Tool_Inner_Dir = null
+   end Post_Cmd_Line_1;
+
    procedure Process_Command_Line
      (Cmd                             : in out Command_Line;
       Cmd_Text, Cmd_Cargs, Project_Switches_Text :    out Argument_List_Access;
@@ -1154,7 +1162,6 @@ package body Utils.Projects is
       Tool_Package_Name               :        String;
       Compute_Project_Closure         :        Boolean        := True;
       Callback                        :        Parse_Callback := null;
-      Post_Cmd_Line_1_Action : not null access procedure (Cmd : Command_Line);
       Tool_Temp_Dir                   :        String;
       Print_Help                      : not null access procedure)
    is
@@ -1173,7 +1180,7 @@ package body Utils.Projects is
    begin
       The_Project_Tree := My_Project_Tree'Access;
       The_Project_Env := Project_Env;
-      Cmd_Text := Text_Args_From_Command_Line;
+      Cmd_Text := Text_Args_From_Command_Line (Tool_Package_Name);
       Cmd_Cargs := Text_Cargs_From_Command_Line;
 
       --  First, process --version or --help switches, if present
@@ -1189,11 +1196,9 @@ package body Utils.Projects is
          Cmd_Error ("--incremental not yet supported");
       end if;
 
-      Post_Cmd_Line_1_Action (Cmd);
-      --  Why not just move that processing here? We have vis on
-      --  Common????????????????
+      Post_Cmd_Line_1 (Cmd);
 
-      if Utils_Debug.Debug_Flag_C then
+      if Debug_Flag_C then
          Print_Command_Line (Incremental_Mode (Cmd), Mimic_gcc (Cmd));
       end if;
 

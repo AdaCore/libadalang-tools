@@ -1,5 +1,6 @@
 with Ada.Characters.Handling; use Ada.Characters.Handling;
 with Ada.Command_Line;
+with Ada.Environment_Variables;
 with Ada.Exceptions;
 with Ada.Strings;             use Ada.Strings;
 with Ada.Strings.Fixed;       use Ada.Strings.Fixed;
@@ -12,6 +13,7 @@ with GNAT.Command_Line;
 
 with Utils.Tool_Names;
 with Utils.Strings; use Utils.Strings;
+with Utils.String_Utilities;
 
 package body Utils.Command_Lines is
    use Text_IO;
@@ -43,10 +45,11 @@ package body Utils.Command_Lines is
       raise Command_Line_Error_No_Tool_Name with Message;
    end Cmd_Error_No_Tool_Name;
 
-   function Text_Args_From_Command_Line return Argument_List_Access is
+   function Text_Args_From_Command_Line
+     (Tool_Package_Name : String) return Argument_List_Access
+   is
       use Ada.Command_Line;
       Result : String_Access_Vector;
-
       Cur : Positive := 1;
    begin
       while Cur <= Argument_Count loop
@@ -88,6 +91,25 @@ package body Utils.Command_Lines is
             Append (Result, new String'(Argument (Cur)));
             Cur := Cur + 1;
          end if;
+      end loop;
+
+      --  If environment variables of the form below exist, then take them to
+      --  be arguments. This feature is for testing, so is not documented, and
+      --  is not particularly friendly. It would be friendlier to have just one
+      --  environment variable, with space-separated arguments, but that's
+      --  harder to parse (consider quoting and whatnot).  We can add more of
+      --  these if needed. Example: PRETTY_PRINTER_EXTRA_ARG_1.
+
+      for N in 1 .. 8 loop
+         declare
+            use Environment_Variables, String_Utilities;
+            Env_Var_Name : constant String :=
+              To_Upper (Tool_Package_Name) & "_EXTRA_ARG_" & Image (N);
+         begin
+            if Exists (Env_Var_Name) then
+               Append (Result, new String'(Value (Env_Var_Name)));
+            end if;
+         end;
       end loop;
 
       return new Argument_List'(To_Array (Result));

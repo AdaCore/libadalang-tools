@@ -809,4 +809,21 @@ package body Utils.Fast_Vectors is
       Container.Last                                         := New_Last;
    end Append;
 
+   procedure Put
+     (Container : Vector;
+      Put : not null access procedure (Item : Element_Type);
+      Put_Between : not null access procedure)
+   is
+      First_Time : Boolean := True;
+   begin
+      for X of Container loop
+         if First_Time then
+            First_Time := False;
+            Put_Between.all;
+         end if;
+
+         Put (X);
+      end loop;
+   end Put;
+
 end Utils.Fast_Vectors;

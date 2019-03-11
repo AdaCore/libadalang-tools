@@ -1,14 +1,15 @@
 with GNAT.Byte_Order_Mark;
 with GNAT.OS_Lib;
 
-with Utils.Command_Lines.Common;   use Utils.Command_Lines.Common;
-with Utils.String_Utilities; use Utils.String_Utilities;
-
 with Langkit_Support.Diagnostics;
 
 with Libadalang;                  use Libadalang;
 with Libadalang.Iterators;        use Libadalang.Iterators;
 with Libadalang.Project_Provider; use Libadalang.Project_Provider;
+
+with Utils.Command_Lines.Common;   use Utils.Command_Lines.Common;
+with Utils.Err_Out;
+with Utils.String_Utilities; use Utils.String_Utilities;
 
 package body Utils.Tools is
 
@@ -72,14 +73,12 @@ package body Utils.Tools is
          Inp : String renames Input (First .. Input'Last);
          Unit : constant Analysis_Unit :=
            Get_From_File (Tool.Context, File_Name, Reparse => Reparse);
-         use Text_IO;
       begin
          if Has_Diagnostics (Unit) then
-            Put_Line ("Errors while parsing " & File_Name);
+            Err_Out.Put ("Errors while parsing \1\n", File_Name);
             for D of Diagnostics (Unit) loop
-               Put_Line
-                 (Standard_Error,
-                  Langkit_Support.Diagnostics.To_Pretty_String (D));
+               Err_Out.Put
+                 ("\1\n", Langkit_Support.Diagnostics.To_Pretty_String (D));
             end loop;
          end if;
 

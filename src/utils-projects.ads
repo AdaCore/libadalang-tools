@@ -53,7 +53,6 @@ package Utils.Projects is
       Tool_Package_Name               :        String;
       Compute_Project_Closure         :        Boolean        := True;
       Callback                        :        Parse_Callback := null;
-      Post_Cmd_Line_1_Action : not null access procedure (Cmd : Command_Line);
       Tool_Temp_Dir                   :        String;
       Print_Help                      : not null access procedure);
    --  Processes the command line and (if specified on the command line) the
@@ -92,8 +91,6 @@ package Utils.Projects is
    --
    --  Callback is called for each switch, and can be used when some immediate
    --  action is required as soon as the switch is seen.
-   --
-   --  Post_Cmd_Line_1_Action is called after the Cmd_Line_1 pass.
    --
    --  Tool_Temp_Dir is the name of the directory to which temp files should be
    --  written.

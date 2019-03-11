@@ -83,6 +83,21 @@ package body Utils.String_Utilities is
       return Char_To_Digit (Characters.Conversions.To_Character (C));
    end Char_To_Digit;
 
+   -----------------
+   -- Count_Chars --
+   -----------------
+
+   function Count_Chars (S : String; C : Character) return Natural is
+   begin
+      return R : Natural := 0 do
+         for X of S loop
+            if X = C then
+               R := R + 1;
+            end if;
+         end loop;
+      end return;
+   end Count_Chars;
+
    -----------
    -- Image --
    -----------

@@ -123,6 +123,9 @@ package body Utils.Generic_Formatted_Output is
                when 'n' =>
                   Put_Char (Char_Type'Val (W_Char'Pos (NL)));
 
+               when 'r' =>
+                  Put_Char (Char_Type'Val (W_Char'Pos (W_CR)));
+
                when 't' =>
                   Put_Char (Char_Type'Val (W_Char'Pos (W_HT)));
 

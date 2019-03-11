@@ -100,26 +100,6 @@ package body METRICS.Actions is
    function Image (X : Integer) return String
      renames Utils.String_Utilities.Image;
 
-   pragma Warnings (Off);
-   procedure Stop (Node : Ada_Node; S : W_Str);
-   --  For setting breakpoints in gdb
-
-   procedure Stop (Node : Ada_Node; S : W_Str) is
-      P : constant Ada_Node_Array := Parents (Node);
-      use Utils.Dbg_Out;
-   begin
-      if False then
-         Put ("Node:\n");
-         Print (Node);
-         if False then
-            for X in P'Range loop
-               Put ("Parent \1:\n", Image (X));
-               Print (P (X));
-            end loop;
-         end if;
-      end if;
-   end Stop;
-
    --  Debugging printouts
    --  See also Libadalang.Debug.
    pragma Warnings (Off);
@@ -154,7 +134,6 @@ package body METRICS.Actions is
          Put ("----------------\n");
       end loop;
    end Put_Ada_Node_Array;
-   pragma Warnings (On);
 
    procedure Put_Child_Record (C : Child_Record) is
       use Utils.Dbg_Out;
@@ -185,13 +164,10 @@ package body METRICS.Actions is
    pragma Style_Checks (On);
    pragma Warnings (On);
 
-   pragma Warnings (Off); -- ???
-   use Common_Flag_Switches, Common_String_Switches,
-     Common_String_Seq_Switches, Common_Nat_Switches;
+   use Common_String_Switches;
 
    use Metrics_Flag_Switches, Metrics_Boolean_Switches,
-     Metrics_String_Switches, Metrics_String_Seq_Switches;
-   pragma Warnings (On);
+       Metrics_String_Switches;
 
    use Utils.Formatted_Output;
 
@@ -4018,21 +3994,12 @@ package body METRICS.Actions is
       procedure Gather_Metrics_And_Walk_Children (Node : Ada_Node) is
          M : Metrix renames
            Element (Metrix_Stack, Last_Index (Metrix_Stack)).all;
-
          With_Trivia : constant Children_Array := Children_With_Trivia (Node);
          B           : Boolean;
 
       --  Start of processing for Gather_Metrics_And_Walk_Children
 
       begin
-         for Trivium of With_Trivia loop
-            if False and then Trivium.Kind = Trivia then
-               Put_Children_Array (With_Trivia);
-               Put ("----\n");
-               Stop (Node, Text_To_W_Str (Text (Trivium.Trivia)));
-               exit;
-            end if;
-         end loop;
          for Trivium of With_Trivia loop
             if Trivium.Kind = Trivia then
                declare
@@ -4200,14 +4167,15 @@ package body METRICS.Actions is
       Put (" --version - Display version and exit\n");
       Put (" --help    - Display usage and exit\n");
       Put ("\n");
+
       Put (" -Pproject        - Use project file project. Only one such switch can be used\n");
       Put (" -U               - process all sources of the argument project\n");
       Put (" -U main          - process the closure of units rooted at unit main\n");
       Put (" -Xname=value     - specify an external reference for argument project file\n");
       Put (" --subdirs=dir    - specify subdirectory to place the result files into\n");
       Put (" -eL              - follow all symbolic links when processing project files\n");
-
       Put ("\n");
+
       if False then -- Disable this for now
          Put (" --incremental -- incremental processing on a per-file basis\n");
       end if;
@@ -4291,6 +4259,7 @@ package body METRICS.Actions is
       Put ("  --xml-file-name=filename    - name of the XML output file\n");
       Put ("  --short-file-names          - use short source file names in output\n");
       Put ("\n");
+
       Put (" filename         - name of Ada source file for which metrics\n");
       Put ("                    should be computed\n");
       Put (" --files=filename - name of a text file containing a list of Ada\n");

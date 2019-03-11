@@ -573,8 +573,8 @@ package body Pp.Actions is
            when Ada_Aggregate_Assoc => null,
 
            when Ada_Constrained_Array_Indices => L ("(?~,# ~~)"),
-           when Ada_Aspect_Assoc => L ("!? ^=> ~~~"),
-           when Ada_At_Clause => L ("for ! use at !"),
+           when Ada_Aspect_Assoc              => L ("!? ^=> ~~~"),
+           when Ada_At_Clause                 => L ("for ! use at !"),
            when Ada_Attribute_Def_Clause | Ada_Enum_Rep_Clause =>
              L ("for ! use [!]"),
            when Ada_Record_Rep_Clause =>
@@ -644,7 +644,7 @@ package body Pp.Actions is
              L ("generic package ! renames !", Aspects),
            when Ada_Generic_Subp_Renaming_Decl =>
              L ("generic ! ! renames !", Aspects),
-           when Ada_Generic_Subp_Decl => L ("generic$", "!", "!"),
+           when Ada_Generic_Subp_Decl     => L ("generic$", "!", "!"),
            when Ada_Generic_Subp_Internal => L ("!", Aspects),
            when Ada_Number_Decl => L ("?~,# ~~ ^: constant ^2:=[# !]"),
            when Ada_Object_Decl | Ada_Extended_Return_Stmt_Object_Decl =>
@@ -687,9 +687,9 @@ package body Pp.Actions is
            --  The second "?~~ ~" is for Has_Constant, which should never
            --  print anything.
 
-           when Ada_Delta_Constraint => L ("delta !? ~~~"),
-           when Ada_Digits_Constraint => L ("digits !? ~~~"),
-           when Ada_Discriminant_Assoc                             => null,
+           when Ada_Delta_Constraint   => L ("delta !? ~~~"),
+           when Ada_Digits_Constraint  => L ("digits !? ~~~"),
+           when Ada_Discriminant_Assoc => null,
            when Ada_Discriminant_Constraint | Ada_Index_Constraint =>
              L ("?[#(~,# ~)]~"),
            when Ada_Range_Constraint  => L ("!"),
@@ -709,11 +709,11 @@ package body Pp.Actions is
            --  ???This includes function calls to attributes, such as
            --  T'Max(X, Y), which isn't really right.
 
-           when Ada_Update_Attribute_Ref     => L ("!'[#1!# !]"),
+           when Ada_Update_Attribute_Ref => L ("!'[#1!# !]"),
            when Ada_Bin_Op | Ada_Relation_Op => null,
-           when Ada_Call_Expr                => null,
-           when Ada_Case_Expr                => L ("case ! is[# ?#~,# ~~]"),
-           when Ada_Case_Expr_Alternative    => L ("when[ ?~ |# ~~] ^=>[# !]"),
+           when Ada_Call_Expr             => null,
+           when Ada_Case_Expr             => L ("case ! is[# ?#~,# ~~]"),
+           when Ada_Case_Expr_Alternative => L ("when[ ?~ |# ~~] ^=>[# !]"),
            --  ???Ada_Case_Stmt_Alternative has a "^" just before the "|"
 
            when Ada_Box_Expr => L ("<>"),
@@ -3781,7 +3781,7 @@ package body Pp.Actions is
             Spec : constant Subp_Spec :=
               (case Tree.Kind is
                  when Ada_Entry_Decl | Ada_Entry_Body => No_Subp_Spec,
-                 when others                          => Get_Subp_Spec (Tree));
+                 when others => Get_Subp_Spec (Tree));
 
             Params : constant Param_Spec_List :=
               (case Tree.Kind is

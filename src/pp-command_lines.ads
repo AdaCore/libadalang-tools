@@ -7,10 +7,7 @@ package Pp.Command_Lines is
    Descriptor : aliased Command_Line_Descriptor :=
      Copy_Descriptor (Common_Descriptor);
 
-   pragma Warnings (Off);
-   use Common_Flag_Switches, Common_String_Switches,
-     Common_String_Seq_Switches, Common_Nat_Switches;
-   pragma Warnings (On);
+   use Common_Flag_Switches;
 
    package Pp_Disable is new Disable_Switches
      (Descriptor, (1 => To_All (Rep_Clauses)));
@@ -211,21 +208,20 @@ package Pp.Command_Lines is
       Rm_Style_Spacing,
       Insert_Blank_Lines,
       Preserve_Blank_Lines,
-      Insert_Line_Breaks,
+      Source_Line_Breaks,
+      Spaces_Only,
       Preserve_Line_Breaks,
       Ff_After_Pragma_Page,
       Vertical_Enum_Types,
       Vertical_Array_Types,
       Vertical_Named_Aggregates,
       Vertical_Case_Alternatives);
-   --  Insert_Line_Breaks tells gnatpp to insert line breaks where
-   --  appropriate. This is the default. Preserve_Line_Breaks tells
-   --  gnatpp to preserve line breaks found in the input (OFF by default).
-   --  The switch "--no-insert_line_breaks" doesn't make much sense by
-   --  itself, because that would put the whole program text on one line.
-   --  ???Or perhaps --no-insert_line_breaks should imply
-   --  --preserve_line_breaks. In any case, --no-insert_line_breaks
-   --  does not yet work.
+   --  --source-line-breaks means to keep the line breaks from the source;
+   --  do not insert or delete any line breaks. --spaces-only means to insert
+   --  and delete spaces as appropriate, but not make any other transformations
+   --  (such as changing "end;" to "end X;").
+   --
+   --  ???Spaces_Only is not yet implemented and is currently undocumented.
 
    package Pp_Boolean_Switches is new Boolean_Switches
      (Descriptor,
@@ -242,7 +238,8 @@ package Pp.Command_Lines is
        Rm_Style_Spacing => +"--RM-style-spacing",
        Insert_Blank_Lines => null,
        Preserve_Blank_Lines => null,
-       Insert_Line_Breaks => null,
+       Source_Line_Breaks => null,
+       Spaces_Only => null,
        Preserve_Line_Breaks => null,
        Ff_After_Pragma_Page => +"-ff",
        Vertical_Enum_Types => null,
@@ -262,7 +259,8 @@ package Pp.Command_Lines is
          Rm_Style_Spacing => False,
          Insert_Blank_Lines => False,
          Preserve_Blank_Lines => False,
-         Insert_Line_Breaks => True,
+         Source_Line_Breaks => False,
+         Spaces_Only => False,
          Preserve_Line_Breaks => False,
          Ff_After_Pragma_Page => False,
          Vertical_Enum_Types => False,
@@ -367,7 +365,6 @@ package Pp.Command_Lines is
 
    package Freeze is new Freeze_Descriptor (Descriptor);
 
-   pragma Warnings (Off);
    use Pp_Flag_Switches,
      Pp_Boolean_Switches,
      Attribute_Casing_Switches,
@@ -377,10 +374,7 @@ package Pp.Command_Lines is
      Type_Casing_Switches,
      Number_Casing_Switches,
      Pragma_Casing_Switches,
-     Pp_String_Switches,
-     Pp_Nat_Switches,
-     Pp_String_Seq_Switches;
-   pragma Warnings (On);
+     Pp_Nat_Switches;
 
    function Alignment_Enabled (Cmd : Command_Line) return Boolean is
      ((not Arg (Cmd, Rm_Style_Spacing))

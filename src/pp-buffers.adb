@@ -1,4 +1,4 @@
-------------------------------------------------------------------------------
+-----------------------------------------------------------------------------
 --                                                                          --
 --                            GNAT2XML COMPONENTS                           --
 --                                                                          --
@@ -153,11 +153,6 @@ package body Pp.Buffers is
       From_First : constant Positive := Buf.From_First + 1;
    begin
       Buf.From_First := From_First;
---         if C = NL then
---            Buf.Cur_Column := 1;
---         else
---            Buf.Cur_Column := Buf.Cur_Column + 1;
---         end if;
       Buf.Cur_Char :=
         (if From_First > Last_Index (Buf.From) then W_NUL
          else Buf.From (From_First));
@@ -330,11 +325,6 @@ package body Pp.Buffers is
    begin
       Buf.From_First := From_First;
       Append (Buf.To, Buf.Cur_Char);
---         if C = NL then
---            Buf.Cur_Column := 1;
---         else
---            Buf.Cur_Column := Buf.Cur_Column + 1;
---         end if;
       Buf.Cur_Char :=
         (if From_First > Last_Index (Buf.From) then W_NUL
          else Buf.From (From_First));
@@ -348,11 +338,6 @@ package body Pp.Buffers is
    begin
       Buf.From_First := From_First;
       Append (Buf.To, Buf.Cur_Char);
---         if C = NL then
---            Buf.Cur_Column := 1;
---         else
---            Buf.Cur_Column := Buf.Cur_Column + 1;
---         end if;
       Result :=
         (if From_First > Last_Index (Buf.From) then W_NUL
          else Buf.From (From_First));
@@ -396,7 +381,7 @@ package body Pp.Buffers is
    procedure Insert (Buf : in out Buffer; C : W_Char) is
       pragma Assert (C /= W_NUL);
       pragma Assert (not Is_Line_Terminator (C));
-      pragma Assert (C /= W_HT); -- ???For now
+      pragma Assert (C /= W_HT);
    begin
       --  The whole point of this package is that we don't need to adjust the
       --  Markers here! Markers in To_Markers are to the left of the newly
@@ -410,8 +395,6 @@ package body Pp.Buffers is
       --  adjusted, but only if 'point' is not at the end:
 
       Maybe_Adjust_Marker (Buf);
-
---      Buf.Cur_Column := Buf.Cur_Column + 1;
       Append (Buf.To, C);
    end Insert;
 
@@ -424,21 +407,14 @@ package body Pp.Buffers is
 
    procedure Insert_Any (Buf : in out Buffer; C : W_Char) is
       pragma Assert (C /= W_NUL);
-      pragma Assert (C /= W_HT); -- ???For now
+      pragma Assert (C /= W_HT);
    begin
       Maybe_Adjust_Marker (Buf);
 
       pragma Assert -- no trailing blanks allowed
-        (if
-           Is_Line_Terminator (C)
-         then
-           (Is_Empty (Buf.To) or else Last_Element (Buf.To) /= ' '));
+        (if Is_Line_Terminator (C) then
+          (Is_Empty (Buf.To) or else Last_Element (Buf.To) /= ' '));
 
---      if Is_Line_Terminator (C) then
---         Buf.Cur_Column := 1;
---      else
---         Buf.Cur_Column := Buf.Cur_Column + 1;
---      end if;
       Append (Buf.To, C);
    end Insert_Any;
 
@@ -453,9 +429,8 @@ package body Pp.Buffers is
    begin
       Maybe_Adjust_Marker (Buf);
 
---      Buf.Cur_Column := 1;
-      pragma Assert -- no trailing blanks allowed
-      (Is_Empty (Buf.To) or else Last_Element (Buf.To) /= ' ');
+      pragma Assert (Is_Empty (Buf.To) or else Last_Element (Buf.To) /= ' ');
+      --  no trailing blanks allowed
 
       Append (Buf.To, NL);
    end Insert_NL;
@@ -464,12 +439,11 @@ package body Pp.Buffers is
       pragma Assert (False); -- not currently used
       pragma Assert (At_End (Buf));
       pragma Assert (not Is_Line_Terminator (C));
-      pragma Assert (C /= W_HT); -- ???For now
+      pragma Assert (C /= W_HT);
    begin
       Maybe_Adjust_Marker (Buf);
-
---      Buf.Cur_Column := Buf.Cur_Column + 1;
       Append (Buf.To, C);
+
       pragma Assert (At_End (Buf));
    end Append;
 
@@ -483,21 +457,14 @@ package body Pp.Buffers is
 
    procedure Append_Any (Buf : in out Buffer; C : W_Char) is
       pragma Assert (At_End (Buf));
-      pragma Assert (C /= W_HT); -- ???For now
+      pragma Assert (C /= W_HT);
    begin
       Maybe_Adjust_Marker (Buf);
 
       pragma Assert -- no trailing blanks allowed
-        (if
-           Is_Line_Terminator (C)
-         then
-           (Is_Empty (Buf.To) or else Last_Element (Buf.To) /= ' '));
+        (if Is_Line_Terminator (C) then
+          (Is_Empty (Buf.To) or else Last_Element (Buf.To) /= ' '));
 
---      if Is_Line_Terminator (C) then
---         Buf.Cur_Column := 1;
---      else
---         Buf.Cur_Column := Buf.Cur_Column + 1;
---      end if;
       Append (Buf.To, C);
       pragma Assert (At_End (Buf));
    end Append_Any;
@@ -516,31 +483,12 @@ package body Pp.Buffers is
    begin
       Maybe_Adjust_Marker (Buf);
 
---      Buf.Cur_Column := 1;
-      pragma Assert -- no trailing blanks allowed
-      (Is_Empty (Buf.To) or else Last_Element (Buf.To) /= ' ');
+      pragma Assert (Is_Empty (Buf.To) or else Last_Element (Buf.To) /= ' ');
+      --  no trailing blanks allowed
 
       Append (Buf.To, NL);
       pragma Assert (At_End (Buf));
    end Append_NL;
-
-   procedure Insert_Keeping_Mark
-     (Buf  : in out Buffer;
-      Mark : Marker;
-      C    : W_Char)
-   is
-   begin
-      pragma Assert (False); -- ???Not used
-
-      Append (Buf.To, C);
---      if C = NL then
---         Buf.Cur_Column := 1;
---      else
---         Buf.Cur_Column := Buf.Cur_Column + 1;
---      end if;
-
-      pragma Assert (Char_At (Buf, Mark) = C);
-   end Insert_Keeping_Mark;
 
    function Is_Empty (Buf : Buffer) return Boolean is
    begin
@@ -654,7 +602,7 @@ package body Pp.Buffers is
    end Position;
 
    procedure Insert_Ada (Buf : in out Buffer; C : W_Char) is
-      pragma Assert (C /= W_HT); -- ???For now
+      pragma Assert (C /= W_HT);
    begin
       pragma Assert (At_End (Buf));
       pragma Assert
@@ -682,7 +630,7 @@ package body Pp.Buffers is
       Wide_Character_Encoding : System.WCh_Con.WC_Encoding_Method;
       Expand_Tabs : Boolean := False)
    is
-      pragma Assert (Expand_Tabs); -- ???For now
+      pragma Assert (Expand_Tabs);
 
       package Decoder is new GNAT.Decode_String
         (Encoding_Method => Wide_Character_Encoding);
@@ -737,6 +685,7 @@ package body Pp.Buffers is
                C   := '[';
                Ptr := Ptr + 1;
             end if;
+
          else
             Decoder.Decode_Wide_Character (Input, Ptr, C);
          end if;
@@ -746,25 +695,19 @@ package body Pp.Buffers is
          case State is
             when In_Comment =>
                if Is_Line_Terminator (C) then
-                  if False and then C = W_VT then
-                     --  Ignore VT characters in comments. This differs from
-                     --  the behavior of the old gnatpp, which has an option
-                     --  for that. ???Disable this, at least for now.
-                     --  There's really no such thing as a VT in a comment,
-                     --  because VT is a line terminator.
-                     Ptr := Ptr + 1;
-                     goto Continue;
-                  end if;
                   State := Other;
                end if;
+
             when In_String_Literal =>
                if C in '"' then
                   State := Other;
                end if;
+
             when In_Obsolescent_String_Literal =>
                if C in '%' then
                   State := Other;
                end if;
+
             when Other =>
                if C = '-'
                  and then Ptr <= Input'Last
@@ -791,7 +734,6 @@ package body Pp.Buffers is
          else
             Insert_Ada (Buf, C);
          end if;
-         <<Continue>>
       end loop;
 
       --  Make sure last line is terminated by NL
@@ -865,15 +807,9 @@ package body Pp.Buffers is
    begin
       Buf.To (Last_Index (Buf.To)) := C;
       pragma Assert -- no trailing blanks
-        (if
-           C = NL
-         then
-           (Last_Index (Buf.To) = 1
+        (if C = NL then
+          (Last_Index (Buf.To) = 1
             or else Buf.To (Last_Index (Buf.To) - 1) /= ' '));
-
---      if C = NL then
---         Buf.Cur_Column := 1;
---      end if;
    end Replace_Previous;
 
    procedure Reset (Buf : in out Buffer) is

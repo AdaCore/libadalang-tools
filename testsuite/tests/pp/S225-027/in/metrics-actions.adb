@@ -322,7 +322,7 @@ package body METRICS.Actions is
    function Is_Assertion (Node : Ada_Node) return Boolean is
      (case Assertion_Kind (Node) is
         when Postcondition | Other_Assertion => True,
-        when Not_An_Assertion                => False);
+        when Not_An_Assertion => False);
    --  True for pragma Assert and for Pre, Post, Contract_Cases,
    --  Pre'Class, and Post'Class.
 

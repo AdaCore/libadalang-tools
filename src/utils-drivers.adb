@@ -31,11 +31,10 @@ with GNAT.OS_Lib;
 
 with GNATCOLL.Projects;
 
-with Utils.Environment;
 with Utils.Command_Lines.Common;   use Utils.Command_Lines.Common;
---  with Utils.Command_Lines.Common.Post;
+with Utils.Environment;
+with Utils.Err_Out;
 with Utils.Projects; use Utils.Projects;
---  with Utils.Check_Parameters;
 with Utils.String_Utilities; use Utils.String_Utilities;
 with Utils.Tool_Names;
 
@@ -44,77 +43,12 @@ with Libadalang.Iterators; use Libadalang.Iterators;
 
 package body Utils.Drivers is
 
-   pragma Warnings (Off);
-   use Common_Flag_Switches, Common_Boolean_Switches, Common_String_Switches,
-     Common_String_Seq_Switches, Common_Nat_Switches;
-   pragma Warnings (On);
+   use Common_Flag_Switches, Common_String_Switches,
+     Common_String_Seq_Switches;
 
    --  See libadalang_env/src/libadalang/ada/testsuite/ada/nameres.adb.
 
    use Tools;
-
-   procedure Post_Cmd_Line_1 (Cmd : Command_Line);
-   --  This is called by Process_Command_Line after the first pass through
-   --  the command-line arguments.
-
-   function ASIS_Order_File_Names
-     (X : String_Ref_Array) return String_Ref_Array;
-   --  ????ASIS (or maybe just gnatmetric) seems to process files in a
-   --  strange order. First, all files with bodies, in alphabetical
-   --  order. Then all files without bodies, in alphabetical order.
-   --  We're temporarily mimicking that here.
-
-   procedure Post_Cmd_Line_1 (Cmd : Command_Line) is
-      --  ????See lal_ul-driver.adb
-      use Utils.Environment;
-   begin
-      for Dbg of Arg (Cmd, Command_Lines.Common.Debug) loop
-         Set_Debug_Options (Dbg.all);
-      end loop;
-
-      Tool_Current_Dir := new String'(Initial_Dir);
-      --  Leave Tool_Inner_Dir = null
-   end Post_Cmd_Line_1;
-
-   function ASIS_Order_File_Names
-     (X : String_Ref_Array) return String_Ref_Array
-   is
-      use String_Ref_Sets;
-      Bodies : String_Ref_Set;
-
-      function Has_Body (S : String_Ref) return Boolean;
-      function Has_Body (S : String_Ref) return Boolean is
-         Body_String : aliased String := S (1 .. S'Last - 1) & "b";
-      begin
-         return Contains (Bodies, Body_String'Unchecked_Access);
-      end Has_Body;
-
-      Result : String_Ref_Vector;
-      use String_Ref_Vectors;
-   begin
-      for S of X loop
-         if Has_Suffix (S.all, ".adb") then
-            Insert (Bodies, S);
-         end if;
-      end loop;
-
-      for S of X loop
-         if not Has_Suffix (S.all, ".ads") then
-            Append (Result, S);
-         end if;
-         if Has_Suffix (S.all, ".ads") and then Has_Body (S) then
-            Append (Result, S);
-         end if;
-      end loop;
-
-      for S of X loop
-         if Has_Suffix (S.all, ".ads") and then not Has_Body (S) then
-            Append (Result, S);
-         end if;
-      end loop;
-
-      return To_Array (Result);
-   end ASIS_Order_File_Names;
 
    procedure Driver
      (Cmd                   : in out Command_Line;
@@ -218,7 +152,7 @@ package body Utils.Drivers is
          N_File_Names : constant Natural :=
            Num_File_Names (Cmd) - Arg_Length (Cmd, Ignore);
          Counter : Natural := N_File_Names;
-         use Text_IO, Directories;
+         use Directories;
       begin
          --  First compute the Ignored set by looking at all the --ignored
          --  switches.
@@ -227,21 +161,15 @@ package body Utils.Drivers is
             Read_File_Names_From_File (Ignored_Arg.all, Include_One'Access);
          end loop;
 
-         for F_Name of ASIS_Order_File_Names (File_Names (Cmd)) loop
+         for F_Name of File_Names (Cmd) loop
             if not Contains (Ignored, Simple_Name (F_Name.all)) then
                if Arg (Cmd, Verbose) then
-                  Put_Line
-                   (Standard_Error, "[" & Image (Counter) & "] " & F_Name.all);
-                  --  ????Use Formatted_Output?
+                  Err_Out.Put ("[\1] \2\n", Image (Counter), F_Name.all);
                elsif not Arg (Cmd, Quiet) and then N_File_Names > 1 then
-                  Put
-                    (Standard_Error,
-                     "Units remaining: " & Image (Counter) &
-                     "     " & ASCII.CR);
+                  Err_Out.Put ("Units remaining: \1     \r", Image (Counter));
                end if;
-               Counter := Counter - 1;
 
-   --         Utils.Options.No_Argument_File_Specified := False;
+               Counter := Counter - 1;
                Process_File (Tool, Cmd, F_Name.all);
             end if;
          end loop;
@@ -274,7 +202,6 @@ package body Utils.Drivers is
          Preprocessing_Allowed     => Preprocessing_Allowed,
          Tool_Package_Name         => Tool_Package_Name,
          Callback                  => Local_Callback'Unrestricted_Access,
-         Post_Cmd_Line_1_Action    => Post_Cmd_Line_1'Access,
          Tool_Temp_Dir             => Environment.Tool_Temp_Dir.all,
          Print_Help                => Print_Help'Access);
 --      Utils.Command_Lines.Common.Post.Postprocess_Common (Cmd);
@@ -362,10 +289,9 @@ package body Utils.Drivers is
    exception
       when X : File_Not_Found =>
          declare
-            use Text_IO, Ada.Exceptions, Utils.Tool_Names;
+            use Ada.Exceptions, Utils.Tool_Names;
          begin
-            Put_Line
-              (Standard_Error, Tool_Name & ": " & Exception_Message (X));
+            Err_Out.Put ("\1: \2\n", Tool_Name, Exception_Message (X));
          end;
          Environment.Clean_Up;
          GNAT.OS_Lib.OS_Exit (1);

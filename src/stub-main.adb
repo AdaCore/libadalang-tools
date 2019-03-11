@@ -11,17 +11,7 @@ procedure Stub.Main is
    procedure Callback (Phase : Parse_Phase; Swit : Dynamically_Typed_Switch);
 
    procedure Callback (Phase : Parse_Phase; Swit : Dynamically_Typed_Switch) is
-      pragma Unreferenced (Swit);
-      pragma Warnings (Off); -- ???
-      use Stub.Command_Lines;
-      use String_Ref_Vectors;
-      pragma Warnings (On);
-   begin
-      if Phase = Cmd_Line_1 then
-
-         return;
-      end if;
-   end Callback;
+     null;
 
    Tool : Actions.Stub_Tool;
    Cmd : Command_Line (Stub.Command_Lines.Descriptor'Access);

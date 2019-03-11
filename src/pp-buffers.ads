@@ -162,16 +162,6 @@ package Pp.Buffers is
    --  ???Actually, we should probably get rid of these; they probably don't
    --  do any good.
 
-   procedure Insert_Keeping_Mark
-     (Buf  : in out Buffer;
-      Mark : Marker;
-      C    : W_Char) with
-     Pre => At_Point (Buf, Mark),
-     Unreferenced; -- currently not used
-      --  Mark must be at 'point'. This does the same as Insert (Buf, C),
-      --  except that Mark is not adjusted to point to the character after
-      --  'point'; it ends up pointing at the newly-inserted C.
-
    procedure Replace_Cur (Buf : in out Buffer; C : W_Char);
    --  Replace character at 'point' with C
 

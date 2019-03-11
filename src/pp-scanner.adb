@@ -301,6 +301,12 @@ package body Pp.Scanner is
       return Decode (X.V.Octets, X.Oc);
    end Index;
 
+   function Origin (X : Tokn_Cursor) return Syms.Symbol is
+   begin
+      pragma Assert (not After_Last (X));
+      return X.V.Fixed (X.Fi).Origin;
+   end Origin;
+
    function Token_Output_Len (X : Token) return Positive is
       Text_Len : constant Natural := To_W_Str (X.Text)'Length;
       L : constant Positive :=
@@ -465,7 +471,11 @@ package body Pp.Scanner is
    begin
       --  ???It would be more efficient to simply copy over the data, and
       --  avoid converting back to type Token. Also below.
-      Append_Tokn (V, Token_At_Cursor (X), Org);
+      if Org = "Append Tokn_Cursor" then
+         Append_Tokn (V, Token_At_Cursor (X), Str (Origin (X)).S);
+      else
+         Append_Tokn (V, Token_At_Cursor (X), Org);
+      end if;
    end Append_Tokn;
 
    procedure Append_Tokn (V : in out Tokn_Vec; X : Same_Text_Kind;
@@ -780,6 +790,12 @@ package body Pp.Scanner is
          end loop;
       end return;
    end Pred;
+
+   function Tokens_Require_Space (X, Y : Tokn_Cursor) return Boolean is
+   begin
+      return Kind (X) in Ident | Reserved_Word
+        and then Kind (Y) in Ident | Reserved_Word | Numeric_Literal;
+   end Tokens_Require_Space;
 
    function Next_Lexeme (Cur : Tokn_Cursor) return Tokn_Cursor is
    begin
@@ -1446,11 +1462,10 @@ package body Pp.Scanner is
                   end if;
 
                when others =>
-                  Text_IO.Put_Line
-                    (Text_IO.Standard_Error,
-                     "illegal character: " & To_UTF8 ((1 => Cur)));
-                  raise Program_Error;
-                  --  All legal token-starting characters are handled above
+                  Get;
+
+                  Tok := (Kind => Illegal_Character,
+                          Sloc => Tok.Sloc, others => <>);
             end case;
          end if;
 
@@ -1780,7 +1795,7 @@ package body Pp.Scanner is
       if not Same_Token (XX, YY) then
          Text_IO.Put_Line
            (Text_IO.Standard_Output, Message & ": Tokens differ:");
-         if Debug.Debug_Flag_3 then
+         if Debug_Flag_3 then
             Text_IO.Put_Line (Text_IO.Standard_Output, Name_1 & " =");
             Put_Tokens (X.V.all);
             Text_IO.Put_Line (Text_IO.Standard_Output, Name_2 & " =");
@@ -1824,7 +1839,7 @@ package body Pp.Scanner is
       --  we could make gnatpp closer to idempotency (e.g. DO consider them
       --  part of the same paragraph in the first place).
 
-      if Debug.Debug_Flag_2 then
+      if Debug_Flag_2 then
          return;
       end if;
 

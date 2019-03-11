@@ -582,7 +582,8 @@ package Utils.Command_Lines is
 
    procedure Dump_Descriptor (Descriptor : Command_Line_Descriptor);
 
-   function Text_Args_From_Command_Line return Argument_List_Access;
+   function Text_Args_From_Command_Line
+     (Tool_Package_Name : String) return Argument_List_Access;
    --  Returns the sequence of command-line arguments
 
    function Text_Cargs_From_Command_Line return Argument_List_Access;

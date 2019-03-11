@@ -124,6 +124,9 @@ package Utils.String_Utilities is
    function Char_To_Digit (C : W_Char) return Digit;
    --  Converts '0' ==> 0, etc
 
+   function Count_Chars (S : String; C : Character) return Natural;
+   --  Number of occurrences of C in S
+
    BOM_8 : constant Ada.Strings.UTF_Encoding.UTF_8_String :=
      Ada.Strings.UTF_Encoding.BOM_8;
 

@@ -22,10 +22,7 @@
 ------------------------------------------------------------------------------
 
 package body Utils.Slow_Vectors is
-   pragma Warnings (Off);
    use all type Vector;
-   --  ???Compiler warns "ineffective use clause...", which is incorrect.
-   pragma Warnings (On);
 
    procedure Free (Container : in out Vector) is
    begin

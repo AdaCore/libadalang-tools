@@ -5,7 +5,7 @@ with Ada.Strings.Fixed;
 with Ada.Strings.UTF_Encoding;
 with System.WCh_Cnv;
 with System.WCh_Con;
-with Text_IO, Ada.Wide_Text_IO;
+with Text_IO;
 with Pp.Buffers; use Pp.Buffers;
 with Pp.Command_Lines; use Pp.Command_Lines;
 with Pp.Error_Slocs; use Pp.Error_Slocs;
@@ -26,14 +26,12 @@ with LAL_Extensions; use LAL_Extensions;
 
 with Utils.Command_Lines.Common; use Utils.Command_Lines.Common;
 with Utils.Dbg_Out;
-with Utils.Formatted_Output;
-
-with Utils_Debug; use Utils_Debug;
-with Utils.Vectors;
-
-with Utils.Symbols; use Utils.Symbols;
 with Utils.Environment;
+with Utils.Err_Out;
+with Utils.Formatted_Output;
 with Utils.Predefined_Symbols; use Utils.Predefined_Symbols;
+with Utils.Symbols; use Utils.Symbols;
+with Utils.Vectors;
 
 package body Pp.Actions is
 
@@ -42,24 +40,13 @@ package body Pp.Actions is
    function Image (X : Integer) return String
      renames Utils.String_Utilities.Image;
 
-   pragma Warnings (Off);
-   use Common_Flag_Switches, Common_String_Switches,
-     Common_String_Seq_Switches, Common_Nat_Switches,
-     Common_Boolean_Switches;
+   use Common_Flag_Switches, Common_String_Switches, Common_Boolean_Switches;
 
    use Pp_Flag_Switches,
      Pp_Boolean_Switches,
-     Attribute_Casing_Switches,
-     Keyword_Casing_Switches,
-     Name_Casing_Switches,
-     Enum_Casing_Switches,
-     Type_Casing_Switches,
-     Number_Casing_Switches,
-     Pragma_Casing_Switches,
      Pp_String_Switches,
      Pp_Nat_Switches,
      Pp_String_Seq_Switches;
-   pragma Warnings (On);
 
    File_Name_File_Name : String_Access;
    --  There is a "file name file"; this is its name. ASIS_Processing writes
@@ -143,10 +130,7 @@ package body Pp.Actions is
 
       if Arg (Cmd, Pp_Off) /= null and then Arg (Cmd, Pp_On) /= null then
          if Arg (Cmd, Pp_Off).all = Arg (Cmd, Pp_On).all then
-            Text_IO.Put_Line -- Use Cmd_Error???
-              (Text_IO.Standard_Error,
-               "gnatpp: cannot specify --pp-off and --pp-on with same string");
-            raise Command_Line_Error;
+            Cmd_Error ("cannot specify --pp-off and --pp-on with same string");
          end if;
       end if;
 
@@ -161,7 +145,7 @@ package body Pp.Actions is
                       "--no-separate-loop-then");
       end if;
 
-      --  The --separate-loop-then swithch is equivalent to --separate-loop and
+      --  The --separate-loop-then switch is equivalent to --separate-loop and
       --  --separate-then. Likewise for the --no-... switches.
 
       if Arg (Cmd, Separate_Loop_Then) then
@@ -172,6 +156,35 @@ package body Pp.Actions is
       if Arg (Cmd, No_Separate_Loop_Then) then
          Set_Arg (Cmd, No_Separate_Then);
          Set_Arg (Cmd, No_Separate_Loop);
+      end if;
+
+      --  If --source-line-breaks was given, then formatting options that
+      --  control line-splitting make no sense.
+
+      if Arg (Cmd, Source_Line_Breaks) then
+         Set_Arg (Cmd, Comments_Fill, False);
+         Set_Arg (Cmd, Separate_Loop_Then, False);
+         Set_Arg (Cmd, Separate_Then, False);
+         Set_Arg (Cmd, Separate_Loop, False);
+         Set_Arg (Cmd, No_Separate_Loop, False);
+         Set_Arg (Cmd, No_Separate_Then, False);
+         Set_Arg (Cmd, No_Separate_Loop_Then, False);
+         Set_Arg (Cmd, Separate_Label, False);
+         Set_Arg (Cmd, Separate_Stmt_Name, False);
+         Set_Arg (Cmd, Separate_Is, False);
+         Set_Arg (Cmd, Use_On_New_Line, False);
+         Set_Arg (Cmd, Split_Line_Before_Op, False);
+         Set_Arg (Cmd, Split_Line_Before_Record, False);
+         Set_Arg (Cmd, Insert_Blank_Lines, False);
+         Set_Arg (Cmd, Preserve_Blank_Lines, False);
+         Set_Arg (Cmd, Preserve_Line_Breaks, False);
+         Set_Arg (Cmd, Vertical_Enum_Types, False);
+         Set_Arg (Cmd, Vertical_Array_Types, False);
+         Set_Arg (Cmd, Vertical_Named_Aggregates, False);
+         Set_Arg (Cmd, Vertical_Case_Alternatives, False);
+         Set_Arg (Cmd, Call_Threshold, Natural'Last);
+         Set_Arg (Cmd, Par_Threshold, Natural'Last);
+         Set_Arg (Cmd, Case_Threshold, Natural'Last);
       end if;
 
       pragma Assert (Environment.Initial_Dir = Current_Directory);
@@ -339,8 +352,6 @@ package body Pp.Actions is
    Lines_Data : aliased Lines_Data_Rec;
 
    Cur_Indentation : Natural renames Lines_Data.Cur_Indentation;
-   Next_Line_Break_Unique_Id : Modular
-       renames Lines_Data.Next_Line_Break_Unique_Id;
    All_LB : Line_Break_Vector renames Lines_Data.All_LB;
    All_LBI : Line_Break_Index_Vector renames Lines_Data.All_LBI;
    Tabs : Tab_Vector renames Lines_Data.Tabs;
@@ -789,8 +800,7 @@ package body Pp.Actions is
            when Ada_Case_Expr =>
              L ("case ! is[# ?#~,# ~~]"),
            when Ada_Case_Expr_Alternative =>
-             L ("when[ ?~ |# ~~] ^=>[# !]"),
-               --  ???Ada_Case_Stmt_Alternative has a "^" just before the "|"
+             L ("when[ ?~ ^|# ~~] ^=>[# !]"),
            when Ada_Box_Expr =>
              L ("<>"),
            when Ada_If_Expr =>
@@ -1966,7 +1976,7 @@ package body Pp.Actions is
       declare
          subtype When_Kinds is Ada_Node_Kind_Type with
            Predicate => When_Kinds in Ada_Case_Stmt_Alternative |
---  ???                                  Ada_Case_Expr_Alternative |
+                                      Ada_Case_Expr_Alternative |
                                       Ada_Variant;
          --  Things that start with "when" that we want to treat
          --  alike here.
@@ -1977,8 +1987,6 @@ package body Pp.Actions is
                --  Perhaps this should be unconditional, not just for
                --  Vertical_Case_Alternatives.
             end loop;
-            Replace_One (Ada_Case_Expr_Alternative,
-                         "when[ ?~ |# ~~]", "when{ ?~$| ~~}");
          end if;
       end;
 
@@ -2534,14 +2542,13 @@ package body Pp.Actions is
                   Hard        => Hard,
                   Affects_Comments => Affects_Comments,
                   Enabled     => Hard,
+                  Source_Line_Breaks_Enabled => False,
                   Level       => Level,
                   Indentation => Cur_Indentation,
-                  Length      => <>,
-      --            Kind        => Kind,
-                  Internal_To_Comment => False,
-                  UID         => Next_Line_Break_Unique_Id));
+                  Length      => <>
+      --            Kind        => Kind
+                 ));
          end;
-         Next_Line_Break_Unique_Id := Next_Line_Break_Unique_Id + 1;
          Append (All_LBI, Last_Index (All_LB));
       end Append_Line_Break;
 
@@ -3184,7 +3191,7 @@ package body Pp.Actions is
                case Inst.Kind is
                   when Hard_Break | Hard_Break_No_Comment =>
                      Append_Line_Break
-                       (Hard     => Arg (Cmd, Insert_Line_Breaks),
+                       (Hard     => True,
                         Affects_Comments => Inst.Kind = Hard_Break,
                         Level    => Cur_Level,
                         Kind     => Kind);
@@ -4475,16 +4482,17 @@ package body Pp.Actions is
          pragma Assert (Check_Whitespace);
          Subtree_To_Ada (Tree, Cur_Level => 1, Index_In_Parent => 1);
 
-         --  In Partial mode, we might need to add a line break
+         --  In Partial mode, we might need to add a line break. Same for
+         --  Source_Line_Breaks.
 
-         if Partial or else not Arg (Cmd, Insert_Line_Breaks) then
-            pragma Assert
-              (Kind (Last (New_Tokns'Access)) not in Line_Break_Token);
-            Append_Line_Break
-              (Hard     => True,
-               Affects_Comments => True,
-               Level    => 1,
-               Kind     => Null_Kind);
+         if Partial or else Arg (Cmd, Source_Line_Breaks) then
+            if Kind (Last (New_Tokns'Access)) not in Line_Break_Token then
+               Append_Line_Break
+                 (Hard     => True,
+                  Affects_Comments => True,
+                  Level    => 1,
+                  Kind     => Null_Kind);
+            end if;
          end if;
 
          if Alignment_Enabled (Cmd) then
@@ -4542,6 +4550,10 @@ package body Pp.Actions is
 
       In_File_Format : Scanner.Optional_EOL_Formats;
 
+      function Get_End_Of_Line return Scanner.Optional_EOL_Formats;
+      --  Returns the end-of-line convention specified by the --eol switch, or
+      --  Nil.
+
       function Out_File_Format return Scanner.EOL_Formats;
       --  Returns the end-of-line convention for the output, as specified by
       --  the --eol switch, and defaulting to the same as the input.
@@ -4585,12 +4597,12 @@ package body Pp.Actions is
          end if;
       end Tree_To_Ada;
 
-      function Out_File_Format return Scanner.EOL_Formats is
+      function Get_End_Of_Line return Scanner.Optional_EOL_Formats is
          Val : constant String_Ref := Arg (Cmd, End_Of_Line);
          use Scanner;
       begin
          if Val = null then
-            return In_File_Format;
+            return Nil;
          else
             declare
                Lower : constant String := To_Lower (Val.all);
@@ -4604,82 +4616,136 @@ package body Pp.Actions is
                end if;
             end;
          end if;
+      end Get_End_Of_Line;
+
+      Requested_End_Of_Line : constant Scanner.Optional_EOL_Formats :=
+        Get_End_Of_Line;
+
+      function Out_File_Format return Scanner.EOL_Formats is
+         use Scanner;
+      begin
+         return (if Requested_End_Of_Line = Nil then In_File_Format
+                   else Requested_End_Of_Line);
       end Out_File_Format;
 
-      function Remove_Extra_Line_Breaks return WChar_Vector;
+      function Remove_Extra_Line_Breaks (Add_CR : Boolean) return WChar_Vector;
       --  Removes extra NL's. The result has exactly one NL at the beginning, and
       --  exactly one at the end. Also, if Preserve_Blank_Lines is False, we
       --  collapse 3 or more NL's in a row down to 2.  ???It would be cleaner if
       --  we didn't put multiple blank lines in in the first place.
       --
       --  This also converts LF to CRLF if appropriate.
-
+      --
+      --  Add_CR is True if we should convert LF to CRLF.
+      --
       --  Wide_Text_IO accepts a Form parameter that inserts CR's on windows, but
       --  it doesn't do that on unix, so we insert CR's by hand.
 
-      function Remove_Extra_Line_Breaks return WChar_Vector is
+      function Remove_Extra_Line_Breaks
+        (Add_CR : Boolean) return WChar_Vector
+      is
          Out_Buf : Buffer renames Lines_Data.Out_Buf;
-         Add_CR : constant Boolean := Out_File_Format in Scanner.CRLF;
-         --  True if we should convert LF to CRLF
       begin
-         --  Optimize the case where we're not changing anything. The reason
-         --  Remove_Extra_Line_Breaks keeps the initial NL is that this
-         --  optimization wouldn't work otherwise.
+         if Preserve_Blank_Lines (Cmd)
+           or else Arg (Cmd, Source_Line_Breaks)
+         then
+            if Add_CR then
+               return Result : WChar_Vector do
+                  --  The first sentinel NL doesn't get CR
 
-         if Preserve_Blank_Lines (Cmd) and then not Add_CR then
-            return To_Vector (Out_Buf);
-         end if;
+                  pragma Assert (Cur (Out_Buf) = NL);
+                  Append (Result, Cur (Out_Buf));
+                  Move_Forward (Out_Buf);
 
-         declare
-            Result : WChar_Vector;
-         begin
-            while Cur (Out_Buf) = NL loop
-               Move_Forward (Out_Buf);
-            end loop;
-            Append (Result, W_LF);
-            --  We don't want a CR here; caller skips the one LF character
-
-            loop
-               declare
-                  NL_Count : Natural := 0;
-               begin
-                  while Cur (Out_Buf) = NL loop
-                     Move_Forward (Out_Buf);
-                     NL_Count := NL_Count + 1;
-                  end loop;
-
-                  exit when At_End (Out_Buf);
-
-                  if not Preserve_Blank_Lines (Cmd) and then NL_Count > 2 then
-                     NL_Count := 2;
-                  end if;
-
-                  for J in 1 .. NL_Count loop
-                     if Add_CR then
+                  while not At_End (Out_Buf) loop
+                     if Cur (Out_Buf) = NL then
                         Append (Result, W_CR);
                      end if;
-                     Append (Result, W_LF);
+
+                     Append (Result, Cur (Out_Buf));
+                     Move_Forward (Out_Buf);
                   end loop;
-               end;
 
-               pragma Assert (Cur (Out_Buf) /= NL);
-               Append (Result, Cur (Out_Buf));
-               Move_Forward (Out_Buf);
-            end loop;
+                  Reset (Out_Buf);
 
-            if Add_CR then
-               Append (Result, W_CR);
+                  --  If the last line of the was not terminated by a newline,
+                  --  delete the last CR and LF to match the input.
+
+                  pragma Assert (Last_Element (Result) = W_LF);
+                  if Last_Element (Input) /= ASCII.LF then
+                     Delete_Last (Result);
+                     pragma Assert (Last_Element (Result) = W_CR);
+                     Delete_Last (Result);
+                  end if;
+               end return;
+
+            --  Optimize the case where we're not changing anything. The reason
+            --  Remove_Extra_Line_Breaks keeps the initial NL is that this
+            --  optimization wouldn't work otherwise.
+
+            else
+               return Result : WChar_Vector := To_Vector (Out_Buf) do
+
+                  --  If the last line of the input was not terminated by a
+                  --  newline, delete the last LF from the output to match the
+                  --  input.
+
+                  pragma Assert (Last_Element (Result) = W_LF);
+                  if Last_Element (Input) /= ASCII.LF then
+                     Delete_Last (Result);
+                  end if;
+               end return;
             end if;
-            Append (Result, W_LF);
-            Reset (Out_Buf);
-            pragma Assert (Result (1) = NL);
-            pragma Assert (Result (2) /= NL);
-            if not Add_CR then
-               pragma Assert (Result (Last_Index (Result) - 1) /= NL);
-               pragma Assert (Result (Last_Index (Result)) = NL);
-            end if;
-            return Result;
-         end;
+
+         else
+            return Result : WChar_Vector do
+               while Cur (Out_Buf) = NL loop
+                  Move_Forward (Out_Buf);
+               end loop;
+               Append (Result, W_LF);
+               --  We don't want a CR here; caller skips the one LF character
+
+               loop
+                  declare
+                     NL_Count : Natural := 0;
+                  begin
+                     while Cur (Out_Buf) = NL loop
+                        Move_Forward (Out_Buf);
+                        NL_Count := NL_Count + 1;
+                     end loop;
+
+                     exit when At_End (Out_Buf);
+
+                     if NL_Count > 2 then
+                        NL_Count := 2;
+                     end if;
+
+                     for J in 1 .. NL_Count loop
+                        if Add_CR then
+                           Append (Result, W_CR);
+                        end if;
+                        Append (Result, W_LF);
+                     end loop;
+                  end;
+
+                  pragma Assert (Cur (Out_Buf) /= NL);
+                  Append (Result, Cur (Out_Buf));
+                  Move_Forward (Out_Buf);
+               end loop;
+
+               if Add_CR then
+                  Append (Result, W_CR);
+               end if;
+               Append (Result, W_LF);
+               Reset (Out_Buf);
+               pragma Assert (Result (1) = NL);
+               pragma Assert (Result (2) /= NL);
+               if not Add_CR then
+                  pragma Assert (Result (Last_Index (Result) - 1) /= NL);
+                  pragma Assert (Result (Last_Index (Result)) = NL);
+               end if;
+            end return;
+         end if;
       end Remove_Extra_Line_Breaks;
 
    --  Start of processing for Format_Vector
@@ -4699,8 +4765,12 @@ package body Pp.Actions is
 
       if Scanner.Source_Message_Vectors.Is_Empty (Messages) then
          declare
-            Out_Vec : constant WChar_Vector := Remove_Extra_Line_Breaks;
-            Out_Arr : W_Str renames Elems (Out_Vec) (2 .. Last_Index (Out_Vec));
+            use Scanner;
+            Out_Vec : constant WChar_Vector :=
+              Remove_Extra_Line_Breaks
+                (Add_CR => Out_File_Format = CRLF);
+            Out_Arr : W_Str renames
+              Elems (Out_Vec) (2 .. Last_Index (Out_Vec));
             --  2 to skip sentinel newline
 
             procedure Append_One (C : Character);
@@ -4711,11 +4781,41 @@ package body Pp.Actions is
             procedure Encode is new
               System.WCh_Cnv.Wide_Char_To_Char_Sequence (Append_One);
          begin
-            Clear (Output);
+            pragma Assert (Is_Empty (Output));
+
             for WC of Out_Arr loop
                Encode (WC, Wide_Char_Encoding);
             end loop;
          end;
+
+         --  If Source_Line_Breaks switch was given, then assert that the
+         --  number of output lines matches the input.
+
+         if Debug_Flag_L
+           and then not Disable_Final_Check
+           and then Enable_Token_Mismatch
+           and then Arg (Cmd, Source_Line_Breaks)
+         then
+            declare
+               I : String renames Elems (Input) (1 .. Last_Index (Input));
+               O : String renames Elems (Output) (1 .. Last_Index (Output));
+               Src_Lines : constant Natural := Count_Chars (I, ASCII.LF);
+               Out_Lines : constant Natural := Count_Chars (O, ASCII.LF);
+               Comp : constant String :=
+                 (if Src_Lines < Out_Lines then "<" else ">");
+               Src_CR : constant Natural := Count_Chars (I, ASCII.CR);
+            begin
+               if Src_Lines /= Out_Lines then
+                  if Src_CR in 0 | Src_Lines
+                    and then Count_Chars (I, ASCII.FF) = 0
+                  then
+                     Err_Out.Put ("Incorrect line count: \1 \2 \3\n",
+                        Src_Lines'Image, Comp, Natural'(Out_Lines)'Image);
+                     raise Program_Error;
+                  end if;
+               end if;
+            end;
+         end if;
       end if;
    end Format_Vector;
 
@@ -4884,8 +4984,8 @@ package body Pp.Actions is
 
          Output_Written := True;
          if Temp_Output_Name /= "" then
-            --  If Temp_Output_Name = "", use standard output; otherwise point
-            --  open the file.
+            --  If Temp_Output_Name = "", use standard output; otherwise open
+            --  the file.
             Out_File := Create_File (Temp_Output_Name, Fmode => Binary);
             if Out_File = Invalid_FD then
                raise Program_Error with
@@ -4946,16 +5046,14 @@ package body Pp.Actions is
                else Compose (Arg (Cmd, Output_Directory).all,
                              Simple_Name (Backup_Simple_Name)));
             Success : Boolean;
-            use Wide_Text_IO;
          begin
             if Output_Mode = Replace_Backup
               and then Is_Regular_File (Backup_Name)
             then
-               Put (Standard_Error, "gnatpp: file ");
-               Put (Standard_Error, To_Wide_String (Backup_Name));
-               Put (Standard_Error,
-                   " exists. Use '--replace-force-backup' option to override");
-               New_Line (Standard_Error);
+               Err_Out.Put
+                 ("gnatpp: file \1 exists\n", Backup_Name);
+               Err_Out.Put
+                 (" use '--replace-force-backup' option to override\n");
                return;
             end if;
 
@@ -4966,10 +5064,8 @@ package body Pp.Actions is
                Mode     => Overwrite);
 
             if not Success then
-               Put (Standard_Error,
-                    "gnatpp: cannot create backup file ");
-               Put (Standard_Error, To_Wide_String (Backup_Name));
-               New_Line (Standard_Error);
+               Err_Out.Put
+                 ("gnatpp: cannot create backup file \1\n", Backup_Name);
             end if;
          end;
 
@@ -5028,10 +5124,8 @@ package body Pp.Actions is
               (if Error_Sloc = Slocs.No_Source_Location
                  then "" else ":" & Slocs.Image (Error_Sloc));
          begin
-            Text_IO.Put_Line
-              (Text_IO.Standard_Error,
-               Simple_Name (File_Name) & Loc &
-                 ": pretty printing failed; unable to format");
+            Err_Out.Put ("\1\2: pretty printing failed; unable to format\n",
+                        Simple_Name (File_Name), Loc);
          end;
 
          if Enable_Token_Mismatch then
@@ -5065,51 +5159,45 @@ package body Pp.Actions is
       Put (" --version - Display version and exit\n");
       Put (" --help    - Display usage and exit\n");
       Put ("\n");
+
       Put (" -Pproject     - use project file project\n");
       Put (" -U            - process all sources of the argument project\n");
       Put (" -U main       - process the closure of units rooted at unit main\n");
       Put (" -Xname=value  - specify an external reference for argument project file\n");
       Put (" -eL           - follow all symbolic links when processing project files\n");
-
       Put ("\n");
+
       Put (" --alignment -- alignment ON (default)\n");
       Put (" --no-alignment -- alignment OFF\n");
       Put (" --align-modes -- alignment of parameter modes ON (default)\n");
       Put (" --no-align-modes -- alignment of parameter modes OFF\n");
-
       Put ("casing switches:\n");
       Put (" --name-case-as-declared - usage names as declared (default)\n");
       Put (" --name-lower-case - names in lower case\n");
       Put (" --name-upper-case - names in upper case\n");
       Put (" --name-mixed-case - names in mixed case\n");
-
       Put ("attribute casing:\n");
       Put (" --attribute-lower-case\n");
       Put (" --attribute-upper-case\n");
       Put (" --attribute-mixed-case (default)\n");
-
       Put ("reserved word casing:\n");
       Put (" --keyword-lower-case (default)\n");
       Put (" --keyword-upper-case\n");
-
       Put ("enumeration literal casing:\n");
       Put (" --enum-case-as-declared\n");
       Put (" --enum-lower-case\n");
       Put (" --enum-upper-case\n");
       Put (" --enum-mixed-case\n");
-
       Put ("type and subtype casing:\n");
       Put (" --type-case-as-declared\n");
       Put (" --type-lower-case\n");
       Put (" --type-upper-case\n");
       Put (" --type-mixed-case\n");
-
       Put ("named number casing:\n");
       Put (" --number-case-as-declared\n");
       Put (" --number-lower-case\n");
       Put (" --number-upper-case\n");
       Put (" --number-mixed-case\n");
-
       Put ("pragma casing:\n");
       Put (" --pragma-mixed-case\n");
       Put (" --pragma-lower-case\n");
@@ -5117,35 +5205,25 @@ package body Pp.Actions is
       Put ("\n");
 
       Put (" --based-grouping=n  - underscores in based literals every n characters\n");
-
       Put (" --comments-unchanged - do not format comments\n");
       Put (" --comments-gnat-indentation - GNAT style comment line indentation (default)\n");
       Put (" --comments-gnat-beginning - GNAT style comment beginning\n");
       Put (" --comments-fill - fill comment blocks\n");
       Put (" --comments-special - do not change comments with a special character just after --\n");
       Put (" --comments-only - format just the comments\n");
-
       Put (" --indentation=n - indentation level, n from 1 .. 9 (default 3)\n");
       Put (" --indent-continuation - indentation level for continuation lines (default one less than --indentation)\n");
-
       Put (" --dictionary=<file> - set <file> as the dictionary file defining casing exceptions\n");
       Put (" --dictionary=-      - do not use RM-defined casing for predefined names\n");
-
       Put (" --decimal-grouping=n  - underscores in decimal literals every n characters\n");
-
       Put (" --ff-after-pragma-page - put Form Feed after a pragma Page\n");
-
       Put (" --max-line-length=nnn - set maximum line length (default 79)\n");
-
       Put (" --pp-off=xxx - Use ""--xxx"" as the comment string to disable\n");
       Put ("                pretty printing instead of the default ""--!pp off""\n");
       Put (" --pp-on=xxx - Use ""--xxx"" as the comment string to reenable\n");
       Put ("                pretty printing instead of the default ""--!pp on""\n");
-
       Put (" --RTS=<dir> - the same as gcc --RTS option\n");
-
       Put (" --quiet / -q  - quiet mode\n");
-
       Put (" --no-separate-is        - try not to place 'IS' on a separate line in\n");
       Put ("                           a subprogram body\n");
       Put (" --separate-loop         - use a separate line for LOOP\n");
@@ -5154,43 +5232,29 @@ package body Pp.Actions is
       Put (" --no-separate-loop      - do not use a separate line for LOOP\n");
       Put (" --no-separate-then      - do not use a separate line for THEN\n");
       Put (" --no-separate-loop-then - above two combined\n");
-
       Put (" --use-on-new-line       - use separate lines for USE clauses\n");
       Put ("                           in a context clause\n");
-
       Put (" --insert-blank-lines    - insert blank lines where appropriate\n");
-
       Put (" --preserve-blank-lines  - preserve blank lines in the input\n");
-
-      Put (" --insert-line-breaks    - insert line breaks where appropriate (default)\n");
-      Put (" --no-insert-line-breaks    - do not insert line breaks\n");
-
+      Put (" --source-line-breaks    - take line breaks only from source\n");
       Put (" --split-line-before-op  - operator on next line\n");
       Put (" --split-line-before-record  - ""record"" on next line\n");
       Put (" --indent-named-statements - named statements indented more than name\n");
-
       Put (" --RM-style-spacing      - no extra space before '(' and ':'\n");
-
       Put (" --par-threshold=nnn     - if the number of parameter specifications is greater\n");
       Put ("                           than nnn, each specification starts from a new line\n");
-
       Put (" --call-threshold=nnn    - if the number of parameter associations in a call is\n");
       Put ("                           greater than nnn and there is at least one named\n");
       Put ("                           association, each association starts from a new line\n");
-
       Put (" --vertical-enum-types - multi-line enumeration types\n");
       Put (" --vertical-array-types - multi-line array types\n");
       Put (" --vertical-named-aggregates - multi-line named aggregates\n");
       Put (" --vertical-case-alternatives -multi-line case alternatives\n");
-
       Put (" --incremental -- incremental processing on a per-file basis\n");
       Put (" -jn - n is the maximal number of processes to carry out\n");
-
       Put (" --syntax-only  - do not run semantic analysis (default)\n");
       Put (" --no-syntax-only  - run semantic analysis\n");
-
       Put (" --verbose / -v  - verbose mode\n");
-
       Put (" -dd - progress indicator verbose mode\n");
       Put ("\n");
 
@@ -5205,7 +5269,6 @@ package body Pp.Actions is
       Put ("                  already exists\n");
       Put (" --output-force=output_file - write the output into output_file, overriding the existing\n");
       Put ("                   file\n");
-
       Put ("\n");
 
       Put (" filename - the name of the Ada source file to be reformatted.\n");
@@ -5216,7 +5279,6 @@ package body Pp.Actions is
       Put (" --eol=text_format - sets the format of the gnatpp output file(s),\n");
       Put ("       text_format can be - 'unix' or 'lf'   - lines end with LF character\n");
       Put ("                          - 'dos'  or 'crlf' - lines end with CRLF characters\n");
-
       Put (" --wide-character-encoding=(8|b) - set the wide character encoding of the result file\n");
       Put ("    8 - UTF-8 encoding\n");
       Put ("    b - Brackets encoding (default)\n");

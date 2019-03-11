@@ -10,6 +10,9 @@ with Interfaces; use type Interfaces.Unsigned_16;
 
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
+with GNATCOLL.VFS;
+with GNATCOLL.Projects;
+
 with Langkit_Support.Diagnostics;
 with Langkit_Support.Slocs;
 with Langkit_Support.Text;
@@ -17,17 +20,15 @@ with Libadalang;            use Libadalang;
 with Libadalang.Common;     use Libadalang.Common;
 with LAL_Extensions;        use LAL_Extensions;
 
-with Utils.Command_Lines.Common; use Utils.Command_Lines.Common;
-with Utils.Dbg_Out;
-with Utils.Formatted_Output;
-with Utils.Tool_Names;
-with GNATCOLL.VFS;
-with GNATCOLL.Projects;
-with Utils.Generic_Formatted_Output;
-
 with Utils_Debug; use Utils_Debug;
 
+with Utils.Command_Lines.Common; use Utils.Command_Lines.Common;
+with Utils.Dbg_Out;
 with Utils.Environment;
+with Utils.Err_Out;
+with Utils.Formatted_Output;
+with Utils.Generic_Formatted_Output;
+with Utils.Tool_Names;
 
 with Pp.Actions;
 with Pp.Command_Lines;
@@ -38,10 +39,7 @@ package body Stub.Actions is
    function Image (X : Integer) return String
      renames Utils.String_Utilities.Image;
 
-   pragma Warnings (Off);
-   use Common_Flag_Switches, Common_String_Switches,
-     Common_String_Seq_Switches, Common_Nat_Switches;
-   pragma Warnings (On);
+   use Common_Flag_Switches, Common_String_Switches;
 
    use Stub_Flag_Switches,
      Stub_String_Switches,
@@ -1111,11 +1109,7 @@ package body Stub.Actions is
          end if;
 
          if BOM_Seen then
-   --         if Options.Output_Encoding /= System.WCh_Con.WCEM_UTF8 then
-   --            raise Program_Error;
-   --         end if;
             Write_File (Out_File, Ada.Strings.UTF_Encoding.BOM_8);
---            Put (W_Char'Val (16#FEFF#)); -- BOM as a wide character
          end if;
 
          Write_File (Out_File, Out_String);
@@ -1531,8 +1525,6 @@ package body Stub.Actions is
    begin
       if Debug_Mode then
          Print (Unit);
---         Put ("With trivia\n");
---         PP_Trivia (Unit);
       end if;
 
       case Root_Node.Kind is
@@ -1553,18 +1545,15 @@ package body Stub.Actions is
 
          when Ada_Body_Node =>
             if not Arg (Cmd, Subunits) then
-               declare
-                  use Text_IO;
-               begin
-                  Put (Standard_Error, Utils.Tool_Names.Tool_Name & ": ");
-                  Put_Line (Standard_Error, "input file looks like a body");
-                  Cmd_Error_No_Help
-                    ("output file name should be provided because " &
-                       File_Name &
-                       " does not follow GNAT naming rules for " &
-                       "spec files");
-               end;
+               Err_Out.Put ("\1: input file looks like a body\n",
+                            Utils.Tool_Names.Tool_Name);
+               Cmd_Error_No_Help
+                 ("output file name should be provided because " &
+                    File_Name &
+                    " does not follow GNAT naming rules for " &
+                    "spec files");
             end if;
+
          when others => raise Program_Error;
       end case;
 
@@ -1584,6 +1573,7 @@ package body Stub.Actions is
 
       Put ("Usage: gnatstub [options] {filename}\n");
       Put ("\n");
+
       Put ("  filename               Ada source file\n");
       Put ("\n");
 

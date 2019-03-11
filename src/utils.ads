@@ -23,21 +23,9 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
---  The top of Asis Utility Library (ASIS UL) hierarchy
---
---  ASIS UL originated from the idea to factor out the common components of the
---  functionality from the ASIS-based tools developed at ACT/ACT Europe. It
---  accumulates the "driver-level" functionality, for the useful ASIS secondary
---  queries and ASIS extensions see Asis.Extensions hierarchy in the asis/asis
---  directory. ASIS UL contains such things as diagnostic message reporting,
---  detecting the compiler to be used to create the tree for the ASIS part of
---  a tool, dealing with temporary directory where tool storing these trees
---  etc.
---
---  ASIS UL may be used by GNAT Pro ASIS users to create ASIS tools that follow
---  some general design rules (to be described in full details later...)
+--  The top of libadalang-tools Utils hierarchy
 
-pragma Warnings (Off);
+pragma Warnings (Off); -- imported for children
 with Utils_Debug; use Utils_Debug;
 with Text_IO;
 pragma Warnings (On);
@@ -52,8 +40,7 @@ package Utils is
      Ada_83 .. Opt_Ada_Version_Type'Pred (No_Ada_Version);
    Ada_Version : Ada_Version_Type := Ada_Version_Type'Last;
 
-   package Debug renames Utils_Debug;
-   Debug_Mode : Boolean renames Debug.Debug_Flag_9;
+   Debug_Mode : Boolean renames Debug_Flag_9;
 
    Assert_Enabled : Boolean := False;
    --  Set to True in body if assertions are enabled. This should really be a

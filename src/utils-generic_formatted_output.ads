@@ -40,6 +40,7 @@ package Utils.Generic_Formatted_Output is
       X1, X2, X3, X4, X5, X6 : Str_Type := (1 .. 0 => <>));
    --  Prints the template as is, except for the following escape characters:
    --    "\n" is end of line.
+   --    "\r" is ASCII.CR (carriage return).
    --    "\t" is ASCII.HT (tab character).
    --    "\i" indents, and "\o" outdents.
    --    "\1" is replaced with X1, and similarly for 2, 3, ....

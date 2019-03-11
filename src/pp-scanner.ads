@@ -39,14 +39,12 @@ package Pp.Scanner is
    --     We do not ignore line breaks. Blanks between tokens are always
    --     ignored. Other space characters (tabs, NO-BREAK SPACE, etc.) are
    --     removed in Buffers.
-   --
-   --     We don't check for errors, because we're in ASIS, where Ada code is
-   --     known to be legal. ???No longer true.
 
    package Syms renames Utils.Symbols;
 
    type Opt_Token_Kind is
      (Nil,
+      Illegal_Character,
       Ident,
       Character_Literal,
       String_Lit,
@@ -75,13 +73,17 @@ package Pp.Scanner is
 
       Start_Of_Input,
       End_Of_Input,
-      Enabled_LB_Token,
-      Disabled_LB_Token,
+      Enabled_LB_Token, Disabled_LB_Token,
       Tab_Token,
       False_End_Of_Line, True_End_Of_Line,
+      --  False_End_Of_Line and True_End_Of_Line are used only in Src_Tokns;
+      --  the scanner produces these when scanning the source.
       --  A False_End_Of_Line follows a comment, and is merely a placeholder
       --  for a line break that will be processed later. All others are
       --  True_End_Of_Line.
+      --  Enabled_LB_Token and Disabled_LB_Token are used in New_Tokns,
+      --  representing line breaks in the generated output; these contain an
+      --  index into the lines break table.
 
       '!', '#', '$', '?', '[', '\', ']', '^', '`', '{', '}', '~', '_',
       --  These are not in Ada
@@ -393,6 +395,13 @@ package Pp.Scanner is
    --  Returns the cursor Count tokens after/before Cur, stopping if we
    --  reach the end/start.
 
+   function Tokens_Require_Space (X, Y : Tokn_Cursor) return Boolean;
+   --  True if a space is needed between X and Y to keep them from running
+   --  together. For example, if X is the identifier "Mumble", and Y is the
+   --  reserved word "is", then without a space between, it would look like a
+   --  single identifier "Mumbleis". If Y cannot follow X according to the
+   --  grammar, then it doesn't matter whether this returns True or False.
+
    function Get_Num_Tokens (V : Tokn_Vec) return Tokn_Index is
      (Get_Tokn_Index (Last (V'Unrestricted_Access)));
 
@@ -403,16 +412,16 @@ package Pp.Scanner is
         and then Kind (Prev (X)) in Enabled_LB_Token));
 
    subtype Nonlexeme_Kind is Opt_Token_Kind with Predicate =>
-     Nonlexeme_Kind in EOL_Token | Spaces | Comment_Kind;
+     Nonlexeme_Kind in EOL_Token | Spaces | Comment_Kind | Tab_Token;
    subtype Lexeme_Kind is Opt_Token_Kind with Predicate =>
      Lexeme_Kind not in Nonlexeme_Kind;
+   --  Tokens classified (or not) as "lexemes"
 
    function Next_Lexeme (Cur : Tokn_Cursor) return Tokn_Cursor;
-   --  Returns the next token after Cur that is not EOL_Token, Spaces, or
-   --  Comment_Kind.
+   --  Returns the next lexeme
 
    function Prev_Lexeme (Cur : Tokn_Cursor) return Tokn_Cursor;
-   --  Returns the previous token before Index that is (as above)
+   --  Returns the previous lexeme
 
    procedure Append_Tokn (V : in out Tokn_Vec; X : Tokn_Cursor;
                           Org : String := "Append Tokn_Cursor");
@@ -502,6 +511,8 @@ package Pp.Scanner is
    procedure Move_Tokns (Target, Source : in out Tokn_Vec);
    function Move_Tokns (Target, Source : in out Tokn_Vec) return Boolean;
    --  Move Source to Target, leaving Source empty
+
+   function Origin (X : Tokn_Cursor) return Syms.Symbol;
 
    function Same_Token (X, Y : Token) return Boolean;
    procedure Check_Same_Token

@@ -7,10 +7,7 @@ package Stub.Command_Lines is
    Descriptor : aliased Command_Line_Descriptor :=
      Copy_Descriptor (Common_Descriptor);
 
-   pragma Warnings (Off);
-   use Common_Flag_Switches, Common_String_Switches,
-     Common_String_Seq_Switches, Common_Nat_Switches;
-   pragma Warnings (On);
+   use Common_Flag_Switches;
 
    package Stub_Disable is new Disable_Switches
      (Descriptor, (To_All (Rep_Clauses), To_All (Compute_Timing)));
@@ -103,11 +100,7 @@ package Stub.Command_Lines is
 
    package Freeze is new Freeze_Descriptor (Descriptor);
 
-   pragma Warnings (Off);
-   use Stub_Flag_Switches,
-     Stub_String_Switches,
-     Stub_Nat_Switches;
-   pragma Warnings (On);
+   use Stub_Nat_Switches;
 
    subtype Cmd_Line is Command_Line;
 

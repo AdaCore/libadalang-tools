@@ -26,6 +26,7 @@
 with Ada.Text_IO;             use Ada.Text_IO;
 with Ada.Characters.Handling; use Ada.Characters.Handling;
 with Ada.Containers.Hashed_Sets; use Ada.Containers;
+with Utils.Err_Out;
 
 package body Pp.Formatting.Dictionaries is
    package Syms renames Utils.Symbols;
@@ -471,15 +472,9 @@ package body Pp.Formatting.Dictionaries is
          Exc_Kind := Get_Exception_Kind;
 
          if Exc_Kind = Not_A_Casing_Exception then
-            Ada.Text_IO.Put_Line
-              (Standard_Error,
-               Dictionary_Name &
-               ':' &
-               Image (Line_Num) &
-               ':' &
-               Image (Start_Word) &
-               ": wrong syntax of a casing exception, line ignored");
-
+            Err_Out.Put
+              ("\1:\2:\3: wrong syntax of a casing exception, line ignored\n",
+               Dictionary_Name, Image (Line_Num), Image (Start_Word));
          else
             Add_To_Dictionary
               (String_Buffer (Start_Word .. End_Word),
@@ -506,22 +501,12 @@ package body Pp.Formatting.Dictionaries is
                    and then String_Buffer (Start_Word) = '-'
                    and then String_Buffer (Start_Word + 1) = '-'))
                then
-                  Ada.Text_IO.Put_Line
-                    (Standard_Error,
-                     Dictionary_Name &
-                     ':' &
-                     Image (Line_Num) &
-                     ':' &
-                     Image (Start_Word) &
-                     ": only one casing exception per line is allowed");
-                  Ada.Text_IO.Put_Line
-                    (Standard_Error,
-                     Dictionary_Name &
-                     ':' &
-                     Image (Line_Num) &
-                     ':' &
-                     Image (Start_Word) &
-                     ": end of line ignored");
+                  Err_Out.Put
+                    ("\1:\2:\3: only one casing exception per line\n",
+                     Dictionary_Name, Image (Line_Num), Image (Start_Word));
+                  Err_Out.Put
+                    ("\1:\2:\3: end of line ignored\n",
+                     Dictionary_Name, Image (Line_Num), Image (Start_Word));
                end if;
             end if;
          end if;
@@ -539,18 +524,14 @@ package body Pp.Formatting.Dictionaries is
             Name => Dictionary_Name);
       exception
          when Name_Error =>
-            Ada.Text_IO.Put_Line
-              (Standard_Error,
-               "gnatpp: dictionary file not found: " & Dictionary_Name);
+            Err_Out.Put
+              ("gnatpp: dictionary file not found: \1\n", Dictionary_Name);
             return;
 
          when Status_Error =>
-            Ada.Text_IO.Put_Line
-              (Standard_Error,
-               "gnatpp: cannot open dictionary file: " & Dictionary_Name);
-            Ada.Text_IO.Put_Line
-              (Standard_Error,
-               "        the file may be used by another process");
+            Err_Out.Put
+              ("gnatpp: cannot open dictionary file: \1\n", Dictionary_Name);
+            Err_Out.Put ("        file may be in use by another process");
             return;
       end;
 
