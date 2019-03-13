@@ -150,6 +150,8 @@ package body Stub.Actions is
             Switch_Text
               (Stub.Command_Lines.Descriptor, To_All (Update_Body)).all);
       end if;
+
+      --  Note that we never call Pp.Actions.Pp_Tool.Init
    end Init;
 
    -----------
