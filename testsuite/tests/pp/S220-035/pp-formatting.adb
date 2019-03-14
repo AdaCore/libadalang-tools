@@ -1,31 +1,4 @@
-------------------------------------------------------------------------------
---                                                                          --
---                            GNATPP COMPONENTS                             --
---                                                                          --
---                                    Pp                                    --
---                                                                          --
---                                 S p e c                                  --
---                                                                          --
---                    Copyright (C) 2001-2017, AdaCore                      --
---                                                                          --
--- GNATPP  is free software; you can redistribute it and/or modify it under --
--- terms  of  the  GNU  General  Public  License  as  published by the Free --
--- Software Foundation;  either version 3, or ( at your option)  any  later --
--- version.  GNATCHECK  is  distributed in the hope that it will be useful, --
--- but  WITHOUT  ANY  WARRANTY;   without  even  the  implied  warranty  of --
--- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General --
--- Public License for more details.  You should have received a copy of the --
--- GNU General Public License distributed with GNAT; see file  COPYING3. If --
--- not,  go  to  http://www.gnu.org/licenses  for  a  complete  copy of the --
--- license.                                                                 --
---                                                                          --
--- GNATPP is maintained by AdaCore (http://www.adacore.com)                 --
---                                                                          --
-------------------------------------------------------------------------------
-
-with Ada.Finalization;
-with Ada.Strings.Unbounded;
-with Text_IO;
+with Ada.Finalization; with Ada.Strings.Unbounded; with Text_IO;
 
 with GNATCOLL.Paragraph_Filling;
 
@@ -61,9 +34,7 @@ package body Pp.Formatting is
    procedure Tokns_To_Buffer
      (Buf : in out Buffer; Tokns : Scanner.Tokn_Vec;
       Cmd : Utils.Command_Lines.Command_Line);
-   --  Turns a sequence of tokens back into text. Overwrites Buf, and leaves
-   --  'point' at the beginning. Whole_Line_Comment takes their indentation
-   --  from the previous Spaces token, if any.
+   --  Turns a sequence of tokens back into text. Overwrites Buf, and leaves 'point' at the beginning. Whole_Line_Comment takes their indentation from the previous Spaces token, if any.
 
    --  The following Next_ss/Prev_ss are the same as Scanner.Next/Prev, except
    --  they skip the Spaces token, if present. The "ss" stands for "skip

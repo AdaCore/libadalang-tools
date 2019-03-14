@@ -44,6 +44,13 @@ package body Pp.Actions is
 
    use Pp_Flag_Switches,
      Pp_Boolean_Switches,
+     Attribute_Casing_Switches,
+     Keyword_Casing_Switches,
+     Name_Casing_Switches,
+     Enum_Casing_Switches,
+     Type_Casing_Switches,
+     Number_Casing_Switches,
+     Pragma_Casing_Switches,
      Pp_String_Switches,
      Pp_Nat_Switches,
      Pp_String_Seq_Switches;
@@ -158,8 +165,37 @@ package body Pp.Actions is
          Set_Arg (Cmd, No_Separate_Loop);
       end if;
 
-      --  If --source-line-breaks was given, then formatting options that
-      --  control line-splitting make no sense.
+      --  If --spaces-only was given, then other formatting options make no
+      --  sense.
+
+      if Arg (Cmd, Spaces_Only) then
+         Set_Arg (Cmd, Source_Line_Breaks, True);
+         --  ...which disables more options below
+
+         Set_Arg (Cmd, Syntax_Only, True);
+         --  This will cause it to avoid changing the casing to match the
+         --  declaration.
+
+         Set_Arg (Cmd, Attribute_Casing'First);
+         Set_Arg (Cmd, Keyword_Casing'First);
+         Set_Arg (Cmd, Name_Casing'First);
+         Set_Arg (Cmd, Enum_Casing'First);
+         Set_Arg (Cmd, Type_Casing'First);
+         Set_Arg (Cmd, Number_Casing'First);
+         Set_Arg (Cmd, Pragma_Casing'First);
+         --  Set those to their default values, which is always the first
+         --  enumeral.
+
+         Set_Arg (Cmd, Dictionary, (1 .. 0 => <>));
+
+         Set_Arg (Cmd, End_Id, False);
+         Set_Arg (Cmd, Decimal_Grouping, 0);
+         Set_Arg (Cmd, Based_Grouping, 0);
+         Set_Arg (Cmd, Comments_Gnat_Beginning, False);
+      end if;
+
+      --  If --source-line-breaks was given (or set above by --spaces-only),
+      --  then formatting options that control line-splitting make no sense.
 
       if Arg (Cmd, Source_Line_Breaks) then
          Set_Arg (Cmd, Comments_Fill, False);

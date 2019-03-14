@@ -220,8 +220,6 @@ package Pp.Command_Lines is
    --  do not insert or delete any line breaks. --spaces-only means to insert
    --  and delete spaces as appropriate, but not make any other transformations
    --  (such as changing "end;" to "end X;").
-   --
-   --  ???Spaces_Only is not yet implemented and is currently undocumented.
 
    package Pp_Boolean_Switches is new Boolean_Switches
      (Descriptor,
