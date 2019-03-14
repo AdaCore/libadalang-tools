@@ -481,6 +481,15 @@ package body Stub.Actions is
       Root_Node : Ada_Node;
       Parent_Body_Of_Subunit : Ada_Node)
    is
+      Generating_Ada_Stubs : constant Boolean :=
+        Root_Node.Kind in Ada_Package_Decl | Ada_Generic_Package_Decl
+        and then Arg (Cmd, Subunits);
+      --  True if gnatstub is called on a [generic] package spec with the
+      --  --subunits switch. In this case, we generate a corresponding package
+      --  body containing Ada stubs for the subprograms in the spec. Then we
+      --  call Process_File recursively on the newly-generated package body to
+      --  generate subunits.
+
       Looking_For_Ada_Stubs : constant Boolean :=
         Root_Node.Kind in Ada_Body_Node
         and then Root_Node.Kind not in Ada_Body_Stub;
@@ -568,6 +577,12 @@ package body Stub.Actions is
 
       function Get_Output_Name (Resolve_Links : Boolean) return String;
       --  Return the name of the output file
+
+      procedure Process_New_Body;
+      --  Recursively call Process_File on the body file. This is used after
+      --  Update_Body has updated the body, and also in case the command-line
+      --  arg is a spec, and the --subunits switch was given, so we generated a
+      --  body containing Ada stubs.
 
       procedure Update_Body;
       --  Implement the --update-body=N switch.
@@ -848,7 +863,8 @@ package body Stub.Actions is
             when Ada_Subp_Decl | Ada_Generic_Subp_Decl | Ada_Subp_Body_Stub =>
                Generate_Local_Header (Name, Level);
                Generate_Subunit_Start (Level);
-               Generate_Subp_Body (Decl, Name, Ada_Stub => False);
+               Generate_Subp_Body
+                 (Decl, Name, Ada_Stub => Generating_Ada_Stubs);
 
             when Ada_Entry_Decl =>
                Generate_Local_Header (Name, Level);
@@ -1148,6 +1164,21 @@ package body Stub.Actions is
          end if;
       end Write_Output_File;
 
+      procedure Process_New_Body is
+         Body_Cmd : Cmd_Line := Copy_Command_Line (Cmd);
+      begin
+         Clear_File_Names (Body_Cmd);
+         Append_File_Name (Body_Cmd, Output_Name);
+         Set_Arg (Body_Cmd, Update_Body, No_Update_Body);
+
+         --  We pass Reparse => True to Process_File, because otherwise (for
+         --  Update_Body), it will think the body file has not changed, and
+         --  will incorrectly "optimize" away the work. In the other case
+         --  (Subunits), the body is new, so Reparse doesn't matter.
+
+         Process_File (Tool, Body_Cmd, Output_Name, Reparse => True);
+      end Process_New_Body;
+
       procedure Update_Body is
          use Slocs, Ada_Node_Vectors;
          Search_Line : constant Line_Number :=
@@ -1389,7 +1420,7 @@ package body Stub.Actions is
                Set_Arg (Pp_Cmd, Switch, Val - 3);
             end;
 
-            if Update_Body_Specified (Cmd) and then Arg (Cmd, Subunits) then
+            if Arg (Cmd, Subunits) then
                --  We would prefer to use Format in this case, with an
                --  appropriate Rule passed to Get_From_Buffer, but that
                --  doesn't quite work.
@@ -1423,19 +1454,8 @@ package body Stub.Actions is
          --  Finally, if we generated an Ada stub (i.e. --subunits is True), we
          --  recursively call ourself on the body to generate the subunits.
 
-         --  We pass Reparse => True to Process_File, because otherwise, it
-         --  will think the body file has not changed, and will incorrectly
-         --  "optimize" away the work.
-
          if Arg (Cmd, Subunits) then
-            declare
-               Body_Cmd : Cmd_Line := Copy_Command_Line (Cmd);
-            begin
-               Clear_File_Names (Body_Cmd);
-               Append_File_Name (Body_Cmd, Output_Name);
-               Set_Arg (Body_Cmd, Update_Body, No_Update_Body);
-               Process_File (Tool, Body_Cmd, Output_Name, Reparse => True);
-            end;
+            Process_New_Body;
          end if;
       end Update_Body;
 
@@ -1507,6 +1527,10 @@ package body Stub.Actions is
          Write_Output_File;
       end if;
 
+      if Generating_Ada_Stubs then
+         Process_New_Body;
+      end if;
+
       <<Skip>>
    end Generate_File;
 
@@ -1536,10 +1560,15 @@ package body Stub.Actions is
       end if;
 
       case Root_Node.Kind is
-         when Ada_Package_Decl | Ada_Generic_Package_Decl |
-           Ada_Subp_Decl | Ada_Generic_Subp_Decl =>
-            if Arg (Cmd, Subunits)
-              and then not Update_Body_Specified (Cmd)
+         when Ada_Subp_Decl | Ada_Generic_Subp_Decl |
+           Ada_Package_Decl | Ada_Generic_Package_Decl =>
+
+            --  We used to give the following "cannot have subunits" error for
+            --  these as well, but now we generate the package body containing
+            --  Ada stubs, and then process the body to generate subunits.
+
+            if Root_Node.Kind in Ada_Subp_Decl | Ada_Generic_Subp_Decl
+              and then Arg (Cmd, Subunits)
             then
                Cmd_Error ("argument unit cannot have subunits");
             end if;
