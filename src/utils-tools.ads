@@ -50,9 +50,9 @@ package Utils.Tools is
    --  the same encoding (which is necessary anyway if it's controlled by the
    --  command line).
    --
-   --  Reparse has the same meaning as the parameter of Get_From_File. See
-   --  Update_Body in Stub.Actions for the reason (search for the call to
-   --  Process_File).
+   --  Reparse has the same meaning as the parameter of Get_From_File. The
+   --  reason this is needed is documented in Stub.Actions (search for the call
+   --  to Process_File).
 
    procedure Final (Tool : in out Tool_State; Cmd : Command_Line) is abstract;
    procedure Tool_Help (Tool : Tool_State) is abstract;

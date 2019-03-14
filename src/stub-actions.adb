@@ -48,7 +48,7 @@ package body Stub.Actions is
    use Scanner.Source_Message_Vectors;
 
    --  The current body-generating version of gnatstub generates output bodies;
-   --  we could implement a new body-modifying version modifies existing
+   --  we could implement a new body-modifying version that modifies existing
    --  bodies.
    --
    --  Body-generating: By default, the command line arguments refer to specs,
@@ -114,7 +114,7 @@ package body Stub.Actions is
    --  to generate the body for a single declaration in a package spec. Here
    --  are design notes for that. See Update_Body.
    --
-   --  If --update=line:col is given, it must be a [generic] package spec.
+   --  If --update=line is given, it must be a [generic] package spec.
    --  Collect subp decls.
    --  Find the one with the right sloc. Better not have a completion.
    --  Sort if --alphabetic-order.
@@ -255,7 +255,7 @@ package body Stub.Actions is
    pragma Style_Checks (On);
    pragma Warnings (On);
 
-   procedure Generate
+   procedure Generate_File
      (Tool : in out Stub_Tool;
       Cmd : Command_Line;
       File_Name : String;
@@ -264,7 +264,8 @@ package body Stub.Actions is
       Root_Node : Ada_Node;
       Parent_Body_Of_Subunit : Ada_Node);
    --  Given a spec, generate the body file. Given a body, recursively call
-   --  Generate on any Ada stubs, and given a stub, generate the subunit file.
+   --  Generate_File on any Ada stubs, and given a stub, generate the subunit
+   --  file.
    --
    --  Note: "stub" is used in two different ways. In Ada, a stub ends with "is
    --  separate;", and we generate subunits for those. But the "stubs"
@@ -471,7 +472,7 @@ package body Stub.Actions is
       end if;
    end Get_Parent_Name;
 
-   procedure Generate
+   procedure Generate_File
      (Tool : in out Stub_Tool;
       Cmd : Command_Line;
       File_Name : String;
@@ -528,13 +529,13 @@ package body Stub.Actions is
       procedure Walk (Decl : Ada_Node; Level : Natural);
       --  Generate code corresponding to Decl, and recursively walk subtrees.
       --
-      --  Note on recursion: Generate calls Walk.  Walk calls Walk.  Walk calls
-      --  Generate. In more detail: Generate is called on the compilation unit
-      --  spec or body. In the case of a spec, Generate calls Walk on the spec,
-      --  which calls Walk on nested specs, and generates a body for each one.
-      --  In the case of a body, Generate calls Walk on the body, which calls
-      --  Generate on nested Ada body stubs, to generate subunit files for each
-      --  one.
+      --  Note on recursion: Generate_File calls Walk. Walk calls Walk. Walk
+      --  calls Generate_File. In more detail: Generate_File is called on the
+      --  compilation unit spec or body. In the case of a spec, Generate_File
+      --  calls Walk on the spec, which calls Walk on nested specs, and
+      --  generates a body for each one. In the case of a body, Generate_File
+      --  calls Walk on the body, which calls Generate_File on nested Ada body
+      --  stubs, to generate subunit files for each one.
 
       procedure Generate_Local_Header (Name : W_Str; Level : Natural);
       --  Generate the local header that appears before each body,
@@ -567,6 +568,9 @@ package body Stub.Actions is
 
       function Get_Output_Name (Resolve_Links : Boolean) return String;
       --  Return the name of the output file
+
+      procedure Update_Body;
+      --  Implement the --update-body=N switch.
 
       procedure Generate_CU_Header is
       begin
@@ -607,8 +611,8 @@ package body Stub.Actions is
             begin
                --  We want to copy comment lines from the input, starting at
                --  the start of the file, and stopping when we get to a
-               --  noncomment line.  Se set Last to point to the NL at the
-               --  end of the last comment line in the header.
+               --  noncomment line. Set Last to point to the NL at the end
+               --  of the last comment line in the header.
 
                while Next <= Input'Last - 2 loop
                   while Next <= Input'Last - 2 and then
@@ -929,17 +933,19 @@ package body Stub.Actions is
          end case;
 
          --  Recursively process the nested declarations. In the case of Ada
-         --  stubs, we call Generate, because the corrsponding subunit goes in
-         --  a separate file, and Generate knows how to create files.
+         --  stubs, we call Generate_File, because the corrsponding subunit
+         --  goes in a separate file, and Generate_File knows how to create
+         --  files.
 
          for Child of Local_Decls loop
             if Looking_For_Ada_Stubs and
               Decl.Kind not in Ada_Package_Body_Stub | Ada_Protected_Body_Stub
             then
                pragma Assert (Child.Kind in Ada_Body_Stub);
-               Generate (Tool, Cmd, File_Name, Input, BOM_Seen,
-                         Root_Node => Child,
-                         Parent_Body_Of_Subunit => Root_Node);
+               Generate_File
+                 (Tool, Cmd, File_Name, Input, BOM_Seen,
+                  Root_Node => Child,
+                  Parent_Body_Of_Subunit => Root_Node);
             else
                Walk (Child, Level + 1);
             end if;
@@ -1141,9 +1147,6 @@ package body Stub.Actions is
             end if;
          end if;
       end Write_Output_File;
-
-      procedure Update_Body;
-      --  Implement the --update-body=N switch.
 
       procedure Update_Body is
          use Slocs, Ada_Node_Vectors;
@@ -1378,16 +1381,19 @@ package body Stub.Actions is
             Generate_Subp_Or_Entry_Body
               (Subp_Decl, Name, Ada_Stub => Arg (Cmd, Subunits));
             Set_Arg (Pp_Cmd, Initial_Indentation, 0);
+
             declare
                Switch : constant Pp_Nats := Pp.Command_Lines.Max_Line_Length;
                Val : constant Natural := Arg (Pp_Cmd, Switch);
             begin
                Set_Arg (Pp_Cmd, Switch, Val - 3);
             end;
+
             if Update_Body_Specified (Cmd) and then Arg (Cmd, Subunits) then
                --  We would prefer to use Format in this case, with an
                --  appropriate Rule passed to Get_From_Buffer, but that
                --  doesn't quite work.
+
                Move (Target => Pp_Out_Vec, Source => Out_Vec);
                Indent_Stub (2);
             else
@@ -1456,7 +1462,7 @@ package body Stub.Actions is
 
       use Pp.Command_Lines, Pp.Command_Lines.Pp_String_Switches;
 
-   --  Start of processing for Generate
+   --  Start of processing for Generate_File
 
    begin
       Set_Arg (Pp_Cmd, End_Of_Line, EOL_Switch);
@@ -1491,10 +1497,10 @@ package body Stub.Actions is
       --  If we're processing a body for stubs, we don't want to output
       --  anything corresponding to that body; we've already output the
       --  subunits. In that case, the above Walk will have generated some
-      --  rubbage, which we ignore. Looking_For_Ada_Stubs will be False if the
-      --  input is a spec, so we're generating bodies, or if we're in a
-      --  recursive call to Generate for an Ada stub. It will be True only for
-      --  the outer call with a body as input.
+      --  rubbage, which we ignore. Looking_For_Ada_Stubs will be False if
+      --  the input is a spec, so we're generating bodies, or if we're in a
+      --  recursive call to Generate_File for an Ada stub. It will be True
+      --  only for the outer call with a body as input.
 
       if not Looking_For_Ada_Stubs then
          Format;
@@ -1502,7 +1508,7 @@ package body Stub.Actions is
       end if;
 
       <<Skip>>
-   end Generate;
+   end Generate_File;
 
    procedure Per_File_Action
      (Tool : in out Stub_Tool;
@@ -1559,8 +1565,9 @@ package body Stub.Actions is
          when others => raise Program_Error;
       end case;
 
-      Generate (Tool, Cmd, File_Name, Input, BOM_Seen, Root_Node,
-                Parent_Body_Of_Subunit => No_Ada_Node);
+      Generate_File
+        (Tool, Cmd, File_Name, Input, BOM_Seen, Root_Node,
+         Parent_Body_Of_Subunit => No_Ada_Node);
    end Per_File_Action;
 
    ---------------
