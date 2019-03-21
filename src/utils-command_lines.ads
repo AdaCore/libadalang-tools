@@ -666,6 +666,7 @@ private
 
    type Switch_Descriptor_Array is
      array (All_Switches range <>) of Switch_Descriptor;
+   type Switch_Descriptor_Array_Ptr is access all Switch_Descriptor_Array;
 
    package Switch_Descriptor_Vectors is new Utils.Vectors
      (All_Switches,
@@ -675,7 +676,7 @@ private
 
    type Command_Line_Descriptor is limited record
       Allowed_Switches_Vector : Switch_Descriptor_Vectors.Vector;
-      Allowed_Switches        : access Switch_Descriptor_Array := null;
+      Allowed_Switches        : Switch_Descriptor_Array_Ptr := null;
       --  Allowed_Switches_Vector is built up by Step 1 (instantiations
       --  of _Switches generics). Then Step 2 (Parse) copies that into
       --  Allowed_Switches, and Allowed_Switches_Vector is no longer used.
