@@ -2603,7 +2603,7 @@ package body METRICS.Actions is
       BOM_Seen : Boolean;
       Unit : Analysis_Unit)
    is
-      pragma Unreferenced (Input, BOM_Seen);
+      pragma Unreferenced (Input, BOM_Seen, Cmd);
       CU_List : constant Ada_Node := Root (Unit);
       pragma Assert (not CU_List.Is_Null);
 --      pragma Assert (Kind (CU_List) = List_Kind);
@@ -2914,25 +2914,29 @@ package body METRICS.Actions is
             when Ada_For_Loop_Spec =>
                if Quantified_Expr_Count = 0 then
                   --  We want to increment the statement count only for real
-                  --  for loops.
+                  --  for loops, not for quantified expressions, which use the
+                  --  same node kind.
 
-                  if Arg (Cmd, No_Static_Loop) then
-                     declare
-                        Subtype_Decl : constant Basic_Decl :=
-                          Node.As_For_Loop_Spec.F_Iter_Expr.P_Referenced_Decl;
-                     begin
-                        if not Subtype_Decl.Is_Null
-                          and then Subtype_Decl.P_Is_Static_Decl
-                        then
-                           --  Ignore "static loops" if the --no-static-loop
-                           --  switch was given.
-                           goto Ignore_Static_Loop;
-                        end if;
-                     end;
-                  end if;
+                  --  ????Disable No_Static_Loop for now, pending updates to
+                  --  libadalang that will enable us to do this right.
 
+--                  if Arg (Cmd, No_Static_Loop) then
+--                     declare
+--                        Subtype_Decl : constant Basic_Decl :=
+--                         Node.As_For_Loop_Spec.F_Iter_Expr.P_Referenced_Decl;
+--                     begin
+--                        if not Subtype_Decl.Is_Null
+--                          and then Subtype_Decl.P_Is_Static_Decl
+--                        then
+--                           --  Ignore "static loops" if the --no-static-loop
+--                           --  switch was given.
+--                           goto Ignore_Static_Loop;
+--                        end if;
+--                     end;
+--                  end if;
+--
                   Inc_Cyc (Complexity_Statement);
-                  <<Ignore_Static_Loop>>
+--                  <<Ignore_Static_Loop>>
                end if;
 
             when Ada_Case_Stmt =>
