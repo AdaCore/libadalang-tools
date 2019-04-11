@@ -35,6 +35,7 @@ with Utils.Command_Lines.Common;   use Utils.Command_Lines.Common;
 with Utils.Environment;
 with Utils.Err_Out;
 with Utils.Projects; use Utils.Projects;
+with Utils.Projects.Aggregate;
 with Utils.String_Utilities; use Utils.String_Utilities;
 with Utils.Tool_Names;
 
@@ -49,6 +50,7 @@ package body Utils.Drivers is
    --  See libadalang_env/src/libadalang/ada/testsuite/ada/nameres.adb.
 
    use Tools;
+   use type GNAT.OS_Lib.String_Access;
 
    procedure Driver
      (Cmd                   : in out Command_Line;
@@ -269,7 +271,13 @@ package body Utils.Drivers is
       end if;
 
       Init (Tool, Cmd);
-      Process_Files;
+
+      if Aggregate.Use_Subprocesses_For_Aggregated_Projects then
+         Aggregate.Process_Aggregated_Projects (Cmd, Tool_Package_Name);
+      else
+         Process_Files;
+      end if;
+
       Final (Tool, Cmd);
 
       GNATCOLL.Projects.Unload (Tool.Project_Tree.all);

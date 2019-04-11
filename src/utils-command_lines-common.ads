@@ -71,6 +71,7 @@ package Utils.Command_Lines.Common is
 
    type Common_Strings is
      (Project_File,
+      Aggregated_Project_File,
       Run_Time_System,
       Configuration_Pragmas_File,
       Mapping_File,
@@ -86,12 +87,19 @@ package Utils.Command_Lines.Common is
       Wide_Character_Encoding -- Use Enum_Switches????
      );
 
+   --  Aggregated_Project_File is an undocumented switch used in the
+   --  implementation of aggregate projects. When gnatpp is invoked with an
+   --  aggregate project where the aggregated projects are a, b, and c, it
+   --  spawns 3 subprocesses passing --aggregated-project-file=a,
+   --  --aggregated-project-file=b, and  --aggregated-project-file=c.
+
    package Common_String_Switches is new String_Switches
      (Common_Descriptor,
       Common_Strings);
 
    package Common_String_Syntax is new Common_String_Switches.Set_Syntax
      ((Project_File               => ':',
+       Aggregated_Project_File    => '=',
        Run_Time_System            => '=',
        Configuration_Pragmas_File => '!',
        Mapping_File               => '!',
@@ -105,6 +113,7 @@ package Utils.Command_Lines.Common is
 
    package Common_String_Defaults is new Common_String_Switches.Set_Defaults
      ((Project_File               => null,
+       Aggregated_Project_File    => null,
        Run_Time_System            => +"", -- ????Needed?
        Configuration_Pragmas_File => null,
        Mapping_File               => null,
@@ -119,6 +128,7 @@ package Utils.Command_Lines.Common is
    package Common_String_Shorthands is new Common_String_Switches
      .Set_Shorthands
      ((Project_File               => +"-P",
+       Aggregated_Project_File    => null,
        Run_Time_System            => +"--RTS",
        Configuration_Pragmas_File => +"-gnatec",
        Mapping_File               => +"-gnatem",

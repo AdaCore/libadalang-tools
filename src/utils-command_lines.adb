@@ -45,11 +45,10 @@ package body Utils.Command_Lines is
       raise Command_Line_Error_No_Tool_Name with Message;
    end Cmd_Error_No_Tool_Name;
 
-   function Text_Args_From_Command_Line
-     (Tool_Package_Name : String) return Argument_List_Access
+   procedure Append_Text_Args_From_Command_Line
+     (Tool_Package_Name : String; Args : in out String_Access_Vector)
    is
       use Ada.Command_Line;
-      Result : String_Access_Vector;
       Cur : Positive := 1;
    begin
       while Cur <= Argument_Count loop
@@ -88,7 +87,7 @@ package body Utils.Command_Lines is
             Cur := Cur + 1;
 
          else
-            Append (Result, new String'(Argument (Cur)));
+            Append (Args, new String'(Argument (Cur)));
             Cur := Cur + 1;
          end if;
       end loop;
@@ -107,12 +106,19 @@ package body Utils.Command_Lines is
               To_Upper (Tool_Package_Name) & "_EXTRA_ARG_" & Image (N);
          begin
             if Exists (Env_Var_Name) then
-               Append (Result, new String'(Value (Env_Var_Name)));
+               Append (Args, new String'(Value (Env_Var_Name)));
             end if;
          end;
       end loop;
+   end Append_Text_Args_From_Command_Line;
 
-      return new Argument_List'(To_Array (Result));
+   function Text_Args_From_Command_Line
+     (Tool_Package_Name : String) return Argument_List_Access
+   is
+      Result : String_Access_Vector;
+   begin
+      Append_Text_Args_From_Command_Line (Tool_Package_Name, Result);
+      return To_Argument_List_Access (Result);
    end Text_Args_From_Command_Line;
 
    function Text_Cargs_From_Command_Line return Argument_List_Access is
@@ -149,7 +155,7 @@ package body Utils.Command_Lines is
          end if;
       end loop;
 
-      return new Argument_List'(To_Array (Result));
+      return To_Argument_List_Access (Result);
    end Text_Cargs_From_Command_Line;
 
    generic

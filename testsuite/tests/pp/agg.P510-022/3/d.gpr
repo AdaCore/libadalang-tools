@@ -1,0 +1,7 @@
+project D is
+   for source_dirs use ("src_d");
+
+   package Pretty_Printer is
+      for Default_Switches ("Ada") use ("--name_upper_case", "--indentation=2");
+   end Pretty_Printer;
+end D;

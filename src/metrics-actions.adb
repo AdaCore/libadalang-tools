@@ -1223,7 +1223,7 @@ package body METRICS.Actions is
                      Put ("\n");
                   end if;
                   Put ("\1", Metric_Name);
-                  Tab_To_Column (Indentation + Tab);
+                  Tab_To_Column (Indentation_Level + Tab);
                   Put (": \1", Val_To_Print (I, M, XML => False));
                   Outdent (Indentation_Amount);
                end;
@@ -1715,7 +1715,7 @@ package body METRICS.Actions is
          end if;
       end if;
 
-      pragma Assert (Indentation = 0);
+      pragma Assert (Indentation_Level = 0);
       if Gen_XML (Cmd) then
          if not Output_To_Standard_Output then
             Set_Output (XML_File);
@@ -2287,7 +2287,7 @@ package body METRICS.Actions is
       Put ("<coupling>\n");
 
       for File_M of Units_For_Coupling loop
-         pragma Assert (Indentation = 3);
+         pragma Assert (Indentation_Level = 3);
          declare
             Outer_Unit : Metrix renames Element (File_M.Submetrix, 1).all;
          begin
@@ -2473,10 +2473,10 @@ package body METRICS.Actions is
       --  Print the metrics for each file in text and XML form
 
       for File_M of Global_M.Submetrix loop
-         pragma Assert (Debug_Flag_V or else Indentation = 0);
+         pragma Assert (Debug_Flag_V or else Indentation_Level = 0);
          Print_File_Metrics
            (Cmd, XML_File, File_M.all, Without_Coupling, Object_Dir);
-         pragma Assert (Debug_Flag_V or else Indentation = 0);
+         pragma Assert (Debug_Flag_V or else Indentation_Level = 0);
 --         Destroy (File_M);
       end loop;
 

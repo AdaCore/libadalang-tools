@@ -22,12 +22,15 @@
 ------------------------------------------------------------------------------
 
 with Unchecked_Deallocation;
+with Ada.Containers.Hashed_Maps;
+with Ada.Containers.Ordered_Sets;
 with Ada.Containers.Indefinite_Ordered_Sets;
 with Ada.Containers.Indefinite_Vectors;
 with Ada.Strings.UTF_Encoding.Wide_Strings;
 with Ada.Strings.Wide_Fixed;
 
 with GNAT.OS_Lib; use GNAT.OS_Lib;
+with GNAT.String_Hash;
 
 package Utils.String_Utilities is
 
@@ -186,6 +189,43 @@ package Utils.String_Utilities is
 
    package String_Sets is new Ada.Containers.Indefinite_Ordered_Sets (String);
    subtype String_Set is String_Sets.Set;
+
+   function String_Less
+     (S1, S2 : String_Access) return Boolean is
+       (S1.all < S2.all);
+
+   function String_Equal
+     (S1, S2 : String_Access) return Boolean is
+       (S1.all = S2.all);
+
+   package String_Access_Sets is new Ada.Containers.Ordered_Sets
+     (String_Access, "<" => String_Less, "=" => String_Equal);
+   subtype String_Access_Set is String_Access_Sets.Set;
+
+   function Hash is new GNAT.String_Hash.Hash
+     (Character, String, Ada.Containers.Hash_Type);
+
+   function Hash
+     (S : String_Access) return Ada.Containers.Hash_Type is
+       (Hash (S.all));
+
+   function Equivalent_Strings
+     (S1, S2 : String_Access) return Boolean is
+       (S1.all = S2.all);
+
+   package String_String_Maps is new Ada.Containers.Hashed_Maps
+     (Key_Type        => String_Access,
+      Element_Type    => String_Access,
+      Hash            => Hash,
+      Equivalent_Keys => Equivalent_Strings);
+   subtype String_String_Map is String_String_Maps.Map;
+
+   package String_String_List_Maps is new Ada.Containers.Hashed_Maps
+     (Key_Type        => String_Access,
+      Element_Type    => String_List_Access,
+      Hash            => Hash,
+      Equivalent_Keys => Equivalent_Strings);
+   subtype String_String_List_Map is String_String_List_Maps.Map;
 
    ---------------------
    -- Bounded Strings --

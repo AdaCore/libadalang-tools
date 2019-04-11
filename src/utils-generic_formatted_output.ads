@@ -70,7 +70,7 @@ package Utils.Generic_Formatted_Output is
    --  Set this to False to send all output into the bit bucket. Used for
    --  debugging output.
 
-   Indentation : Natural := 0;
+   Indentation_Level : Natural := 0;
    --  Current indentation level. We deliberately expose this variable
    --  to clients, because some need to directly get/set this, bypassing
    --  In/Outdent.

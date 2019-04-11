@@ -582,6 +582,12 @@ package Utils.Command_Lines is
 
    procedure Dump_Descriptor (Descriptor : Command_Line_Descriptor);
 
+   function To_Argument_List_Access
+     (Args : String_Access_Vector) return Argument_List_Access is
+      (new Argument_List'(To_Array (Args)));
+
+   procedure Append_Text_Args_From_Command_Line
+     (Tool_Package_Name : String; Args : in out String_Access_Vector);
    function Text_Args_From_Command_Line
      (Tool_Package_Name : String) return Argument_List_Access;
    --  Returns the sequence of command-line arguments

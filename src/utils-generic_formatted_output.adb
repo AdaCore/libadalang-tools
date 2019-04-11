@@ -72,7 +72,7 @@ package body Utils.Generic_Formatted_Output is
       pragma Unreferenced (X);
    begin
       if Main_Done then
-         if Indentation /= 0 then
+         if Indentation_Level /= 0 then
             raise Program_Error with "Indentation should be zero at end.";
          end if;
       end if;
@@ -86,7 +86,7 @@ package body Utils.Generic_Formatted_Output is
      (Indentation_Amount : Natural := Default_Indentation_Amount)
    is
    begin
-      Indentation := Indentation + Indentation_Amount;
+      Indentation_Level := Indentation_Level + Indentation_Amount;
    end Indent;
 
    -------------
@@ -97,7 +97,7 @@ package body Utils.Generic_Formatted_Output is
      (Indentation_Amount : Natural := Default_Indentation_Amount)
    is
    begin
-      Indentation := Indentation - Indentation_Amount;
+      Indentation_Level := Indentation_Level - Indentation_Amount;
    end Outdent;
 
    ---------
@@ -211,7 +211,7 @@ package body Utils.Generic_Formatted_Output is
       end if;
 
       if Column = 1 and then C /= Char_Type'Val (W_Char'Pos (NL)) then
-         for J in 1 .. Indentation mod 60 loop
+         for J in 1 .. Indentation_Level mod 60 loop
             --  The "mod 60" is so we don't indent by huge amounts
             Raw_Put_Char (Char_Type'Val (W_Char'Pos (' ')));
          end loop;

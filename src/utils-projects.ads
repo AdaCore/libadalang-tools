@@ -1,42 +1,11 @@
-with Ada.Containers.Hashed_Maps;
-
 with GNAT.OS_Lib; use GNAT.OS_Lib;
-with GNAT.String_Hash;
 
 with GNATCOLL.Projects; use GNATCOLL.Projects;
 
 with Utils.Command_Lines; use Utils.Command_Lines;
+with Utils.String_Utilities; use Utils.String_Utilities;
 
 package Utils.Projects is
-
-   function Hash is new GNAT.String_Hash.Hash
-     (Character,
-      String,
-      Ada.Containers.Hash_Type);
-
-   function Hash
-     (S : String_Access) return Ada.Containers.Hash_Type is
-     (Hash (S.all));
-
-   function Equivalent_Keys
-     (S1, S2 : String_Access) return Boolean is
-     (S1.all = S2.all);
-
-   package String_String_Maps is new Ada.Containers.Hashed_Maps
-     (Key_Type        => String_Access,
-      Element_Type    => String_Access,
-      Hash            => Hash,
-      Equivalent_Keys => Equivalent_Keys);
-   use String_String_Maps;
-   subtype String_String_Map is String_String_Maps.Map;
-
-   package String_String_List_Maps is new Ada.Containers.Hashed_Maps
-     (Key_Type        => String_Access,
-      Element_Type    => String_List_Access,
-      Hash            => Hash,
-      Equivalent_Keys => Equivalent_Keys);
-   use String_String_List_Maps;
-   subtype String_String_List_Map is String_String_List_Maps.Map;
 
    procedure Process_Command_Line
      (Cmd                             : in out Command_Line;

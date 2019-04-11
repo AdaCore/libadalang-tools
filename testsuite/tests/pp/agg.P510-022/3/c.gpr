@@ -1,0 +1,7 @@
+project C is
+   for source_dirs use ("src_c");
+
+   package Pretty_Printer is
+      for Default_Switches ("Ada") use ("--keyword_upper_case", "--indentation=5");
+   end Pretty_Printer;
+end C;

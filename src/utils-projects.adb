@@ -16,12 +16,15 @@ with Utils.Command_Lines.Common;     use Utils.Command_Lines.Common;
 with Utils.Environment;
 with Utils.Err_Out;
 with Utils.Formatted_Output;
+with Utils.Projects.Aggregate;
 with Utils.Tool_Names; use Utils.Tool_Names;
-with Utils.Strings;      use Utils.Strings;
 with Utils.Versions;
 
 package body Utils.Projects is
    use Text_IO;
+
+   use String_String_Maps;
+   use String_String_List_Maps;
 
    use Common_Flag_Switches, Common_String_Switches,
      Common_String_Seq_Switches;
@@ -189,6 +192,13 @@ package body Utils.Projects is
       --  * otherwise tries to get the tool attributes from the
       --    Default_Switches attribute.
 
+      procedure Load_Aggregated_Project;
+      --  Loads My_Project_Tree (that is supposed to be an aggregate project),
+      --  then unloads it and loads in the same environment the project passed
+      --  as a parameter of '--aggregated_project_file option' (which is
+      --  supposed to be a (non-aggregate) project aggregated by
+      --  My_Project_Tree.
+
       procedure Create_Configuration_File;
       procedure Create_Mapping_File;
       --  Create the configuration/mapping file for the project and adds the
@@ -264,12 +274,47 @@ package body Utils.Projects is
             Recompute_View => False,
             Report_Missing_Dirs => False);
 
-         if Is_Aggregate_Project (My_Project_Tree.Root_Project) then
-            Cmd_Error ("aggregate projects are not supported");
-         end if;
-
          My_Project_Tree.Recompute_View
            (Errors => Recompute_View_Errors'Unrestricted_Access);
+
+         if Is_Aggregate_Project (My_Project_Tree.Root_Project) then
+
+            if My_Project_Tree.Root_Project = No_Project then
+               Cmd_Error ("project not loaded");
+            end if;
+
+            Aggregate.Collect_Aggregated_Projects
+              (My_Project_Tree.Root_Project);
+
+            if Aggregate.Use_Subprocesses_For_Aggregated_Projects then
+               --  General case - more than one project is aggregated. We
+               --  process them one by one spawning the tool for each
+               --  project.
+
+               if not Has_Suffix (Tool_Name, Suffix => "gnatpp") then
+                  --  Currently full support for aggregate projects is
+                  --  implemented for gnatpp only???
+                  Cmd_Error ("aggregate projects are not supported");
+               end if;
+
+            else
+               --  Important and useful particular case - exactly one
+               --  project is aggregated, so we load it in the environment
+               --  that already has all the settings from the argument
+               --  aggregate project:
+
+               My_Project_Tree.Unload;
+               Load
+                 (Self                => My_Project_Tree,
+                  Root_Project_Path   =>
+                    Create (Filesystem_String
+                              (Aggregate.Get_Aggregated_Prj_Src.all)),
+                  Env                 => Project_Env,
+                  Errors              => Errors'Unrestricted_Access,
+                  Report_Missing_Dirs => False);
+            end if;
+         end if;
+
       exception
          when Invalid_Project =>
             if Error_Printed then
@@ -278,6 +323,64 @@ package body Utils.Projects is
 
             Cmd_Error (Project_File_Name (Cmd) & ": invalid project");
       end Load_Tool_Project;
+
+      -----------------------------
+      -- Load_Aggregated_Project --
+      -----------------------------
+
+      procedure Load_Aggregated_Project is
+         pragma Assert (Arg (Cmd, Aggregated_Project_File) /= null);
+
+         procedure Errors (S : String);
+
+         procedure Errors (S : String) is
+         begin
+            if Index (S, " not a regular file") /= 0 then
+               Cmd_Error ("project file " &
+                          Project_File_Name (Cmd) &
+                          " not found");
+            elsif Index (S, "is illegal for typed string") /= 0 then
+               Cmd_Error (S);
+            elsif Index (S, "warning") /= 0
+                 and then Index (S, "directory") /= 0
+                 and then Index (S, "not found") /= 0
+            then
+               return;
+            else
+               Cmd_Error (S);
+            end if;
+         end Errors;
+
+         Aggregated_Name : constant Filesystem_String :=
+           Filesystem_String (Arg (Cmd, Aggregated_Project_File).all);
+
+      --  Start of processing for Load_Aggregated_Project
+
+      begin
+         My_Project_Tree.Load
+           (GNATCOLL.VFS.Create (+Project_File_Name (Cmd)),
+            Project_Env,
+            Errors              => Errors'Unrestricted_Access,
+            Report_Missing_Dirs => False);
+
+         if My_Project_Tree.Root_Project = No_Project then
+            Cmd_Error ("project not loaded");
+         end if;
+
+         pragma Assert (Is_Aggregate_Project (My_Project_Tree.Root_Project));
+
+         My_Project_Tree.Unload;
+
+         Load
+           (Self                => My_Project_Tree,
+            Root_Project_Path   => Create (Aggregated_Name),
+            Env                 => Project_Env,
+            Errors              => Errors'Unrestricted_Access,
+            Report_Missing_Dirs => False);
+
+         pragma Assert
+           (not Is_Aggregate_Project (My_Project_Tree.Root_Project));
+      end Load_Aggregated_Project;
 
       -----------------
       -- Is_Ada_File --
@@ -990,18 +1093,39 @@ package body Utils.Projects is
    begin
       Initialize_Environment;
       Set_External_Values;
-      Load_Tool_Project;
-      Extract_Compilation_Attributes;
-      Extract_Tool_Options;
-      Get_Sources_From_Project;
-      Create_Mapping_File;
-      Create_Configuration_File;
 
-      Set_Global_Result_Dirs;
-      Set_Individual_Source_Options;
+      if Arg (Cmd, Aggregated_Project_File) = null then
+         Load_Tool_Project;
+      else
+         Load_Aggregated_Project;
+      end if;
 
-      Compiler_Options :=
-        new Argument_List'(To_Array (Compiler_Options_Vector));
+      if Aggregate.Use_Subprocesses_For_Aggregated_Projects then
+
+         if Num_File_Names (Cmd) /= 0 then
+            Cmd_Error
+              ("argument file cannot be specified for aggregate project");
+         end if;
+
+         if Arg (Cmd, Update_All) then
+            Cmd_Error ("'-U' cannot be specified for aggregate project");
+         end if;
+
+         --  Information in 'else' below is not extracted from the aggregate
+         --  project itself.
+
+      else
+         Extract_Compilation_Attributes;
+         Extract_Tool_Options;
+         Get_Sources_From_Project;
+         Create_Mapping_File;
+         Create_Configuration_File;
+         Set_Global_Result_Dirs;
+         Set_Individual_Source_Options;
+         Compiler_Options :=
+           new Argument_List'(To_Array (Compiler_Options_Vector));
+      end if;
+
    end Process_Project;
 
    -------------------------
@@ -1214,7 +1338,9 @@ package body Utils.Projects is
          OS_Exit (0);
       end if;
 
-      if Arg (Cmd, Verbose) then
+      if Arg (Cmd, Verbose)
+        and then Arg (Cmd, Aggregated_Project_File) = null
+      then
          Versions.Print_Version_Info;
       end if;
 
@@ -1320,7 +1446,9 @@ package body Utils.Projects is
             Read_File_Names_From_File (Par_File_Name.all, Append_One'Access);
          end loop;
 
-         if Num_File_Names (Cmd) = 0 then
+         if not Aggregate.Use_Subprocesses_For_Aggregated_Projects
+           and then Num_File_Names (Cmd) = 0
+         then
             Cmd_Error ("No input source file set");
          end if;
 

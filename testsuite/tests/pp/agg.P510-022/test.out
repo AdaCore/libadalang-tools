@@ -1,0 +1,46 @@
+test number 1
+PACKAGE a1 IS
+     I : Integer;
+END a1;
+test number 2
+PACKAGE a IS
+     TYPE Int IS RANGE 1 .. 10;
+     X : Int;
+
+     Y : Boolean;
+
+     Z : Float;
+END a;
+test number 3
+----------------
+src_c/c.ads
+PACKAGE C IS
+     D : Boolean;
+     S : String := "ololo";
+
+     I : Integer;
+END C;
+----------------
+src_c/cc.ads
+PACKAGE CC IS
+     D : Boolean;
+     S : String := "ololo";
+
+     I : Integer;
+
+     A : ARRAY (1 .. 10) OF Integer;
+END CC;
+----------------
+src_d/d.ads
+package D is
+  I : INTEGER;
+  F : FLOAT;
+end D;
+----------------
+src_d/dd.ads
+package DD is
+  I : INTEGER;
+  F : FLOAT;
+
+  A : array (1 .. 10) of INTEGER;
+end DD;
