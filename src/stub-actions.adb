@@ -758,14 +758,18 @@ package body Stub.Actions is
          Returns : constant Boolean := Stub_Kind = "function";
       begin
          Put ("begin\n");
-         Put (" --  Generated stub: replace with real body!\n");
          Put ("pragma Compile_Time_Warning " &
                 "(Standard.True, ""\1 unimplemented"");\n",
               Q (Name));
 
-         if Arg (Cmd, No_Exception) and then not Returns then
-            Put ("null;");
-         else
+         --  If --no-exception was specified, we suppress the "raise", except
+         --  we can't do that for functions, because they require a return
+         --  statement.
+
+         if not Arg (Cmd, No_Exception) or else Returns then
+            --  For a procedure, generate a raise statement. For a function,
+            --  generate a return statement containing a raise expression.
+
             Put ("\1raise Program_Error with ""Unimplemented \2 \3"";\n",
                  (if Returns then "return " else ""), Stub_Kind, Q (Name));
          end if;

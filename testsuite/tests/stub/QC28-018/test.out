@@ -7,9 +7,7 @@ package body P is
 
    procedure P is
    begin
-      --  Generated stub: replace with real body!
       pragma Compile_Time_Warning (Standard.True, "P unimplemented");
-      null;
    end P;
 
    -------
@@ -18,7 +16,6 @@ package body P is
 
    function F return String is
    begin
-      --  Generated stub: replace with real body!
       pragma Compile_Time_Warning (Standard.True, "F unimplemented");
       return raise Program_Error with "Unimplemented function F";
    end F;
@@ -29,7 +26,6 @@ package body P is
 
    function F return Boolean is
    begin
-      --  Generated stub: replace with real body!
       pragma Compile_Time_Warning (Standard.True, "F unimplemented");
       return raise Program_Error with "Unimplemented function F";
    end F;
