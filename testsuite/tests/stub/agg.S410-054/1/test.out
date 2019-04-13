@@ -1,0 +1,26 @@
+pragma Ada_2012;
+package body a1 is
+
+   -------
+   -- P --
+   -------
+
+   procedure P is
+   begin
+      --  Generated stub: replace with real body!
+      pragma Compile_Time_Warning (Standard.True, "P unimplemented");
+      null;
+   end P;
+
+   -------
+   -- F --
+   -------
+
+   function F return Boolean is
+   begin
+      --  Generated stub: replace with real body!
+      pragma Compile_Time_Warning (Standard.True, "F unimplemented");
+      return raise Program_Error with "Unimplemented function F";
+   end F;
+
+end a1;

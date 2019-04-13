@@ -1,0 +1,28 @@
+pragma Ada_2012;
+package body a is
+
+   ------------------
+   -- Do_Something --
+   ------------------
+
+   procedure Do_Something (Param_1, Param_2 : My_Integer_Range_10) is
+   begin
+      --  Generated stub: replace with real body!
+      pragma Compile_Time_Warning (Standard.True,
+         "Do_Something unimplemented");
+      raise Program_Error with "Unimplemented procedure Do_Something";
+   end Do_Something;
+
+   -----------------------
+   -- Do_Something_Else --
+   -----------------------
+
+   procedure Do_Something_Else (Param_1, Param_2 : My_Integer_Range_10) is
+   begin
+      --  Generated stub: replace with real body!
+      pragma Compile_Time_Warning (Standard.True,
+         "Do_Something_Else unimplemented");
+      raise Program_Error with "Unimplemented procedure Do_Something_Else";
+   end Do_Something_Else;
+
+end a;

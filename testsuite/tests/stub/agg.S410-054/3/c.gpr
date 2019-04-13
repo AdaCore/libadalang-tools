@@ -1,0 +1,7 @@
+project C is
+   for source_dirs use ("src_c");
+
+   package Gnatstub is
+      for Default_Switches ("ada") use ("--no-exception");
+   end Gnatstub;
+end C;

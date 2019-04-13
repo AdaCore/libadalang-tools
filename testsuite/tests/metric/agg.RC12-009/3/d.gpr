@@ -1,0 +1,12 @@
+project D is
+   for source_dirs use ("src_d");
+   for Object_Dir use "d.obj";
+
+   package Metrics is
+      for Default_Switches ("Ada") use
+        ("--generate-xml-output",
+         "--short-file-names",
+         "--syntax-all",
+         "--no-xml-config");
+   end Metrics;
+end D;

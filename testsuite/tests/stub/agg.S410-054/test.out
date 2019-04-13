@@ -1,0 +1,193 @@
+test number 1
+pragma Ada_2012;
+package body a1 is
+
+   -------
+   -- P --
+   -------
+
+   procedure P is
+   begin
+      --  Generated stub: replace with real body!
+      pragma Compile_Time_Warning (Standard.True, "P unimplemented");
+      null;
+   end P;
+
+   -------
+   -- F --
+   -------
+
+   function F return Boolean is
+   begin
+      --  Generated stub: replace with real body!
+      pragma Compile_Time_Warning (Standard.True, "F unimplemented");
+      return raise Program_Error with "Unimplemented function F";
+   end F;
+
+end a1;
+test number 2
+pragma Ada_2012;
+package body a is
+
+   ------------------
+   -- Do_Something --
+   ------------------
+
+   procedure Do_Something (Param_1, Param_2 : My_Integer_Range_10) is
+   begin
+      --  Generated stub: replace with real body!
+      pragma Compile_Time_Warning (Standard.True,
+         "Do_Something unimplemented");
+      raise Program_Error with "Unimplemented procedure Do_Something";
+   end Do_Something;
+
+   -----------------------
+   -- Do_Something_Else --
+   -----------------------
+
+   procedure Do_Something_Else (Param_1, Param_2 : My_Integer_Range_10) is
+   begin
+      --  Generated stub: replace with real body!
+      pragma Compile_Time_Warning (Standard.True,
+         "Do_Something_Else unimplemented");
+      raise Program_Error with "Unimplemented procedure Do_Something_Else";
+   end Do_Something_Else;
+
+end a;
+test number 3
+----------------
+src_c/c.adb
+pragma Ada_2012;
+package body C is
+
+   ------------------
+   -- Do_Something --
+   ------------------
+
+   procedure Do_Something (Param_1, Param_2 : My_Integer_Range_10) is
+   begin
+      --  Generated stub: replace with real body!
+      pragma Compile_Time_Warning (Standard.True,
+         "Do_Something unimplemented");
+      null;
+   end Do_Something;
+
+   --------------------
+   -- Something_Else --
+   --------------------
+
+   function Something_Else
+     (Param_1, Param_2 : My_Integer_Range_10) return Boolean
+   is
+   begin
+      --  Generated stub: replace with real body!
+      pragma Compile_Time_Warning (Standard.True,
+         "Something_Else unimplemented");
+      return raise Program_Error with "Unimplemented function Something_Else";
+   end Something_Else;
+
+end C;
+----------------
+src_c/cc.adb
+pragma Ada_2012;
+package body CC is
+
+   ------------------
+   -- Do_Something --
+   ------------------
+
+   procedure Do_Something (Param_1, Param_2 : My_Integer_Range_10) is
+   begin
+      --  Generated stub: replace with real body!
+      pragma Compile_Time_Warning (Standard.True,
+         "Do_Something unimplemented");
+      null;
+   end Do_Something;
+
+   --------------------
+   -- Something_Else --
+   --------------------
+
+   function Something_Else
+     (Param_1, Param_2 : My_Integer_Range_10) return Boolean
+   is
+   begin
+      --  Generated stub: replace with real body!
+      pragma Compile_Time_Warning (Standard.True,
+         "Something_Else unimplemented");
+      return raise Program_Error with "Unimplemented function Something_Else";
+   end Something_Else;
+
+end CC;
+----------------
+src_d/d.adb
+pragma Ada_2012;
+package body D is
+
+   ------------------
+   -- Do_Something --
+   ------------------
+
+   procedure Do_Something (Param_1, Param_2 : My_Integer_Range_10) is
+   begin
+      --  Generated stub: replace with real body!
+      pragma Compile_Time_Warning (Standard.True,
+         "Do_Something unimplemented");
+      raise Program_Error with "Unimplemented procedure Do_Something";
+   end Do_Something;
+
+   --------------------
+   -- Something_Else --
+   --------------------
+
+   function Something_Else
+     (Param_1, Param_2 : My_Integer_Range_10) return Boolean
+   is
+   begin
+      --  Generated stub: replace with real body!
+      pragma Compile_Time_Warning (Standard.True,
+         "Something_Else unimplemented");
+      return raise Program_Error with "Unimplemented function Something_Else";
+   end Something_Else;
+
+end D;
+----------------
+src_d/dd.adb
+pragma Ada_2012;
+package body DD is
+
+   ------------------
+   -- Do_Something --
+   ------------------
+
+   procedure Do_Something (Param_1, Param_2 : My_Integer_Range_10) is
+   begin
+      --  Generated stub: replace with real body!
+      pragma Compile_Time_Warning (Standard.True,
+         "Do_Something unimplemented");
+      raise Program_Error with "Unimplemented procedure Do_Something";
+   end Do_Something;
+
+   --------------------
+   -- Something_Else --
+   --------------------
+
+   function Something_Else
+     (Param_1, Param_2 : My_Integer_Range_10) return Boolean
+   is
+   begin
+      --  Generated stub: replace with real body!
+      pragma Compile_Time_Warning (Standard.True,
+         "Something_Else unimplemented");
+      return raise Program_Error with "Unimplemented function Something_Else";
+   end Something_Else;
+
+end DD;
+c.adb:11:36: warning: Do_Something unimplemented
+c.adb:25:36: warning: Something_Else unimplemented
+cc.adb:11:36: warning: Do_Something unimplemented
+cc.adb:25:36: warning: Something_Else unimplemented
+d.adb:11:36: warning: Do_Something unimplemented
+d.adb:25:36: warning: Something_Else unimplemented
+dd.adb:11:36: warning: Do_Something unimplemented
+dd.adb:25:36: warning: Something_Else unimplemented

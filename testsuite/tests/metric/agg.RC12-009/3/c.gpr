@@ -1,0 +1,12 @@
+project C is
+   for source_dirs use ("src_c");
+   for Object_Dir use "c.obj";
+
+   package Metrics is
+      for Default_Switches ("Ada") use
+        ("--generate-xml-output",
+         "--short-file-names",
+         "--lines-all",
+         "--no-xml-config");
+   end Metrics;
+end C;

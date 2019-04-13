@@ -1,0 +1,7 @@
+project D is
+   for source_dirs use ("src_d");
+
+   package Gnatstub is
+      for Default_Switches ("Ada") use ("--max-line-length=40");
+   end Gnatstub;
+end D;

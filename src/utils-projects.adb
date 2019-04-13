@@ -289,13 +289,10 @@ package body Utils.Projects is
             if Aggregate.Use_Subprocesses_For_Aggregated_Projects then
                --  General case - more than one project is aggregated. We
                --  process them one by one spawning the tool for each
-               --  project.
+               --  project. See Process_Aggregated_Projects in
+               --  Utils.Projects.Aggregate.
 
-               if not Has_Suffix (Tool_Name, Suffix => "gnatpp") then
-                  --  Currently full support for aggregate projects is
-                  --  implemented for gnatpp only???
-                  Cmd_Error ("aggregate projects are not supported");
-               end if;
+               null;
 
             else
                --  Important and useful particular case - exactly one
