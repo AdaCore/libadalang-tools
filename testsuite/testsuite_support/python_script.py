@@ -39,6 +39,10 @@ class PythonScriptDriver(BaseDriver):
 
     @catch_test_errors
     def run(self):
+        if self.skip_test:
+            self.result.set_status('DEAD', self.message)
+            return
+
         self.call_and_check([sys.executable, 'test.py'])
         if self.diff:
             for diff_pair in self.diff:

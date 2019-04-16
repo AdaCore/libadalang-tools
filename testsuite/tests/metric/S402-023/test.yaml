@@ -1,0 +1,6 @@
+description:
+    gnatmetric test
+
+driver: shell_script
+control:
+    - [XFAIL, 'True', 'Waiting for a fix on S402-023']

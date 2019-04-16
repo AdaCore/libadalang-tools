@@ -1,0 +1,6 @@
+description:
+    gnatpp test
+
+driver: shell_script
+control:
+    - [XFAIL, 'windows', "Cygwin's cat(1) lacks support for -v"]

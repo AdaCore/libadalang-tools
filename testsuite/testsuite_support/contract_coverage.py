@@ -36,6 +36,10 @@ class ContractCoverageDriver(BaseDriver):
 
     @catch_test_errors
     def run(self):
+        if self.skip_test:
+            self.result.set_status('DEAD', self.message)
+            return
+
         source_files = sorted(
             filename
             for filename in os.listdir(self.test_dir)

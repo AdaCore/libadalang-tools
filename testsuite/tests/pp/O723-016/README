@@ -1,6 +1,0 @@
-This test is disabled because the output differs on windows.
-The command line contains "–based-grouping=4", where that
-initial character is NOT a dash ("-").  On Linux it correctly
-assumes that it's a file name, and prints an error.  On
-windows, the error message is missing the non-dash
-character.

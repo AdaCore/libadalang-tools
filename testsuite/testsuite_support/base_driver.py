@@ -3,6 +3,7 @@ import os
 import os.path
 
 from gnatpython import fileutils
+from gnatpython.env import Env
 from gnatpython.ex import Run, STDOUT
 from gnatpython.testsuite.driver import TestDriver
 
@@ -75,22 +76,121 @@ class BaseDriver(TestDriver):
             self.result.expected_output = ''
 
         # See if we expect a failure for this testcase
-        try:
-            comment = self.test_env['expect_failure']
-        except KeyError:
-            self.expect_failure = False
-            self.expect_failure_comment = None
-        else:
-            # Because of wrapping in the YAML file, we can get multi-line
-            # strings, which is not valid for comments.
-            comment = comment.replace('\n', ' ').strip()
+        self.skip_test = False
+        self.expect_failure = False
 
+        status, self.message = self.run_control()
+        if status == 'XFAIL':
             self.expect_failure = True
-            if not (comment is None or isinstance(comment, basestring)):
-                raise SetupError('Invalid "expect_failure" entry:'
-                                 ' expected a string but got {}'.format(
-                                     type(comment)))
-            self.expect_failure_comment = comment
+        elif status == 'SKIP':
+            self.skip_test = True
+        else:
+            assert status is None and self.message is None
+
+    @property
+    def control_vars(self):
+        """
+        Return a dictionary to contain all values available in the control
+        expressions (see the `run_control` method).
+
+        :rtype: dict[str, object]
+        """
+        env = Env()
+        return {
+            'env': env,
+
+            # Shortcuts to test the build OS
+            'darwin': env.build.os.name == 'darwin',
+            'linux': env.build.os.name == 'linux',
+            'windows': env.build.os.name == 'windows',
+        }
+
+    def run_control(self):
+        """
+        If test.yaml has a "control" entry, run through its entries and either
+        skip this test or put it on XFAIL depending on its content.
+
+        The expected format for this entry is the following::
+
+            control:
+                - [XFAIL,
+                   'linux or windows',
+                   'Test is failing for now, will be fixed once XXX']
+                - [SKIP, 'darwin', 'message', 'Test makes no sense on Darwin']
+
+        This entry must contain an array of triples. Each triple contains:
+
+        1. Either the XFAIL string or SKIP.
+        2. A string that can be evaluated as a Python expression.
+        3. A string that contains information about the control entry.
+
+        The semantics of this entry is that the status of this test is the
+        first entry for the first couple for which the expression evaluates to
+        true. XFAIL means that the test is executed (result is XFAIL or UOK
+        depending on its outcome), while SKIP means that the test is not
+        executed (result is DEAD).
+
+        Return the status that matched (if any) with the corresponding message,
+        or (None, None) if no item matched.
+
+        :rtype: (str, str) | (None, None)
+        """
+        # Evaluate variables available for expressions only once
+        vars = self.control_vars
+
+        # If there is a control entry, validate it entirely (don't stop at the
+        # first entry) to detect errors in this specification as much as
+        # possible, i.e. don't mask errors on the second item just because the
+        # first one matched.
+        items = []
+
+        try:
+            control = self.test_env['control']
+        except KeyError:
+            return (None, None)
+        if not isinstance(control, list):
+            raise SetupError('"control" must be an array')
+
+        for i, item in enumerate(control):
+            if not isinstance(item, list):
+                raise SetupError('#{} entry in "control" must be an array'
+                                 .format(i))
+            if len(item) != 3:
+                raise SetupError(
+                    '#{} entry in "control" must be a 3-elements array'
+                    .format(i))
+
+            status, expr, message = item
+
+            # Decode the status
+            if status not in ('XFAIL', 'SKIP'):
+                raise SetupError(
+                    '#{} entry in "control" has invalid command: {}'
+                    .format(i, status))
+
+            # Execute the expression
+            try:
+                enabled = eval(expr, vars)
+            except Exception as exc:
+                raise SetupError(
+                    '#{} entry in "control" has invalid expression:'
+                    '{}: {}'
+                    .format(i, type(exc).__name__, str(exc)))
+
+            # Decode the message.  Because of wrapping in the YAML file, we can
+            # get multi-line strings, which is not valid for comments.
+            if not isinstance(message, basestring):
+                raise SetupError(
+                    '#{} entry in "control" has an invalid message'
+                    .format(i))
+            message = message.replace('\n', ' ').strip()
+
+            items.append((status, enabled, message))
+
+        for status, enabled, message in items:
+            if enabled:
+                return (status, message)
+        return (None, None)
 
     def read_file(self, filename):
         """Return the content of `filename`."""
@@ -104,18 +204,16 @@ class BaseDriver(TestDriver):
         if self.expect_failure:
             self.result.set_status('XFAIL', '{}{}'.format(
                 message,
-                ' ({})'.format(self.expect_failure_comment)
-                if self.expect_failure_comment else ''
+                ' ({})'.format(self.message)
+                if self.message else ''
             ))
         else:
             self.result.set_status('FAILED', message)
 
     def set_passed(self):
         if self.expect_failure:
-            msg = (
-                'Failure was expected: {}'.format(self.expect_failure_comment)
-                if self.expect_failure_comment else None
-            )
+            msg = ('Failure was expected: {}'.format(self.message)
+                   if self.message else None)
             self.result.set_status('UOK', msg)
         else:
             self.result.set_status('PASSED')
@@ -243,13 +341,17 @@ class BaseDriver(TestDriver):
             diff = list(difflib.unified_diff(
                 a=compared_lines(expected), b=compared_lines(actual),
                 fromfile='expected', tofile='output', lineterm=''))
-            if diff:
-                self.result.diff = '\n'.join(diff)
-                self.result.set_status('FAILED', 'output diff')
-            else:
-                self.result.set_status('PASSED')
+            self.result.diff = '\n'.join(diff)
         else:
             # Do a case insensitive diff, because gnatpp does not yet generate
             # the correct case of identifiers. ???When that is fixed, change
             # this.
             self.analyze_diff(expected=expected, actual=actual)
+
+            # TestDriver.analyze_diff does not take our XFAIL mechanism into
+            # account, so patch the result...
+
+        if self.result.diff:
+            self.set_failure('output diff')
+        else:
+            self.set_passed()

@@ -1,0 +1,6 @@
+description:
+    gnatstub test
+
+driver: shell_script
+control:
+    - [XFAIL, 'windows', 'Does not work on Windows (TODO: why?)']

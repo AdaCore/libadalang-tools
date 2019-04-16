@@ -44,6 +44,10 @@ class ShellScriptDriver(BaseDriver):
 
     @catch_test_errors
     def run(self):
+        if self.skip_test:
+            self.result.set_status('DEAD', self.message)
+            return
+
         # We need to add "." to the PATH, because some tests run programs in
         # the current directory.
         os.environ['PATH'] = "%s:." % os.environ['PATH']
