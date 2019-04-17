@@ -1,8 +1,6 @@
 import sys
 
-from testsuite_support.base_driver import (
-    BaseDriver, catch_test_errors,
-)
+from testsuite_support.base_driver import BaseDriver, catch_test_errors
 
 
 class PythonScriptDriver(BaseDriver):
@@ -27,24 +25,9 @@ class PythonScriptDriver(BaseDriver):
     #
 
     @catch_test_errors
-    def tear_up(self):
-        super(PythonScriptDriver, self).tear_up()
-
-        args = self.test_env.get('args', None)
-
-        if args:
-            self.args = args.split()
-        self.diff = self.test_env.get('diff', None)
-        self.diff_args = self.test_env.get('diff_args', '')
-
-    @catch_test_errors
     def run(self):
         if self.skip_test:
             self.result.set_status('DEAD', self.message)
             return
 
         self.call_and_check([sys.executable, 'test.py'])
-        if self.diff:
-            for diff_pair in self.diff:
-                self.call(['diff', '-r'] + diff_pair.split() +
-                          self.diff_args.split())
