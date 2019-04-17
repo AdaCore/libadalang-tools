@@ -277,28 +277,34 @@ class BaseDriver(TestDriver):
     # Run helpers
     #
 
-    def call(self, argv):
+    def call(self, argv, env=None):
         """
-        Run a subprocess with `argv`
-        """
-        Run(argv, cwd=self.working_dir(),
-            timeout=self.TIMEOUT,
-            output=self.output_file,
-            error=STDOUT)
-        self.result.actual_output += self.read_file(self.output_file)
+        Run a subprocess with the given arguments and environment variables.
 
-    def call_and_check(self, argv):
-        """
-        Run a subprocess with `argv` and check it completes with status code 0.
+        This returns the Run() instance for the subprocess and appends the
+        process output (stdout and stderr) to the result's actual_output field.
 
-        In case of failure, the status is appended to the actual output
+        :param list[str] argv: List of arguments for the subprocess to run.
+        :param None|dict[str, str] env: None to inherit the environment
+            variables, or a dictionary to override the environment passed to
+            the subprocess.
+        :rtype: Run
         """
-
-        p = Run(argv, cwd=self.working_dir(),
+        p = Run(argv, cwd=self.working_dir(), env=env,
                 timeout=self.TIMEOUT,
                 output=self.output_file,
                 error=STDOUT)
         self.result.actual_output += self.read_file(self.output_file)
+        return p
+
+    def call_and_check(self, argv, env=None):
+        """
+        Run a subprocess with `argv` and check it completes with status code 0.
+
+        In case of failure, the status is appended to the actual output.
+        Arguments are the same as for the `call` method.
+        """
+        p = self.call(argv, env)
         if p.status != 0:
             self.result.actual_output += \
                 '>>>program returned status code %s\n' % p.status
