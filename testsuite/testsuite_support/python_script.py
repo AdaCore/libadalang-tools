@@ -1,5 +1,7 @@
+import os
 import sys
 
+import testsuite_support
 from testsuite_support.base_driver import BaseDriver, catch_test_errors
 
 
@@ -30,4 +32,17 @@ class PythonScriptDriver(BaseDriver):
             self.result.set_status('DEAD', self.message)
             return
 
-        self.call_and_check([sys.executable, 'test.py'])
+        # Run the Python script, making testsuite_support modules available
+        testsuite_support_path = os.path.dirname(
+            os.path.dirname(testsuite_support.__file__))
+
+        env = dict(os.environ)
+        old_path = env.get('PYTHONPATH', '')
+        if old_path:
+            new_path = '{}{}{}'.format(
+                testsuite_support_path, os.path.pathsep, old_path)
+        else:
+            new_path = testsuite_support_path
+        env['PYTHONPATH'] = new_path
+
+        self.call_and_check([sys.executable, 'test.py'], env=env)
