@@ -1,3 +1,20 @@
+import shlex
+import subprocess
+
+
+def run(args):
+    """
+    Run a command, just like a shell script would, but also print non-zero
+    status code.
+
+    :type args: str
+    """
+    returncode = subprocess.call(shlex.split(args))
+    if returncode:
+        print('>>> non-zero return code for {}: {}'
+              .format(args, returncode))
+
+
 def show_nonprintable(text):
     """
     Transform `text` as if it was pipe'd through `cat -v`.
