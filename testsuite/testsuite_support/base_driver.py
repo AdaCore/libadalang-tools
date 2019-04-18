@@ -339,23 +339,14 @@ class BaseDriver(TestDriver):
         expected = maybe_lower(self.result.expected_output)
         actual = maybe_lower(self.result.actual_output)
 
-        if self.global_env['options'].strict_whitespace_diff:
-            # Rely directly on difflib rather than GNATpython's diff facilities
-            # in order to test as much as possible all formatting aspects in
-            # test outputs. Remember that testing covers a pretty-printer, so
-            # performing strict comparisons is important.
-            diff = list(difflib.unified_diff(
-                a=compared_lines(expected), b=compared_lines(actual),
-                fromfile='expected', tofile='output', lineterm=''))
-            self.result.diff = '\n'.join(diff)
-        else:
-            # Do a case insensitive diff, because gnatpp does not yet generate
-            # the correct case of identifiers. ???When that is fixed, change
-            # this.
-            self.analyze_diff(expected=expected, actual=actual)
-
-            # TestDriver.analyze_diff does not take our XFAIL mechanism into
-            # account, so patch the result...
+        # Rely directly on difflib rather than GNATpython's diff facilities in
+        # order to test as much as possible all formatting aspects in test
+        # outputs. Remember that testing covers a pretty-printer, so performing
+        # strict comparisons is important.
+        diff = list(difflib.unified_diff(
+            a=compared_lines(expected), b=compared_lines(actual),
+            fromfile='expected', tofile='output', lineterm=''))
+        self.result.diff = '\n'.join(diff)
 
         if self.result.diff:
             self.set_failure('output diff')

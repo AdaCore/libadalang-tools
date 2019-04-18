@@ -20,9 +20,6 @@ class Testsuite(BaseTestsuite):
             '--strict-casing-diff', action='store_true',
             help='Check casing in testcase outputs')
         self.main.add_option(
-            '--strict-whitespace-diff', action='store_true', default=True,
-            help='Strictly check whitespaces in testcase outputs')
-        self.main.add_option(
             '--valgrind', action='store_true', default=False,
             help='Run tests under valgrind')
 
