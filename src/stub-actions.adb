@@ -1148,23 +1148,14 @@ package body Stub.Actions is
               "write of " & Output_Name & " failed";
          end if;
 
-         if Debug_Flag_C then
-            Formatted_Output.Put ("wrote \1\n", Output_Name);
+         if not Arg (Cmd, Quiet) then
+            Formatted_Output.Put
+              ("\1 \2\n", Simple_Name (Output_Name),
+               (if Update_Body_Specified (Cmd) then "updated" else "created"));
          end if;
 
-         --  ???The following messages would be more helpful if they say what
-         --  is created, not what it's created for.
-
-         if not Arg (Cmd, Quiet) then
-            if Root_Node.Kind in Ada_Body_Stub then
-               Formatted_Output.Put
-                 ("separate body is created for stub for \1\n",
-                  To_UTF8 (Id_Name (Get_Def_Name (Root_Node))));
-            elsif Update_Body_Specified (Cmd) then
-               Formatted_Output.Put ("body is updated for \1\n", File_Name);
-            else
-               Formatted_Output.Put ("body is created for \1\n", File_Name);
-            end if;
+         if Debug_Flag_C then
+            Formatted_Output.Put ("wrote \1\n", Output_Name);
          end if;
       end Write_Output_File;
 

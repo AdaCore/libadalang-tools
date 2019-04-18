@@ -1,6 +1,6 @@
 ================================================================
 gnatstub --update-body=4 pack.ads
-body is updated for pack.ads
+pack.adb updated
 gnatstub: only one file name allowed with --update-body
 try "gnatstub --help" for more information.
 
@@ -49,9 +49,9 @@ package body Pack is
 end Pack;
 ================================================================
 gnatstub --update-body=4 pack.ads --subunits
-body is updated for pack.ads
-separate body is created for stub for Proc
-separate body is created for stub for Inner
+pack.adb updated
+pack-proc.adb created
+pack-inner.adb created
 
 ----------------------------------------------------------------
 
@@ -129,9 +129,9 @@ end Pack;
 pack-child.ads
 gnatstub: subprogram not found at line 9
 try "gnatstub --help" for more information.
-body is updated for pack-child.ads
-body is updated for pack-child.ads
-body is updated for pack-child.ads
+pack-child.adb updated
+pack-child.adb updated
+pack-child.adb updated
 
 ----------------------------------------------------------------
 
@@ -238,9 +238,9 @@ package body Pack is
 end Pack;
 ================================================================
 alphabetical-order
-body is updated for pack-child.ads
-body is updated for pack-child.ads
-body is updated for pack-child.ads
+pack-child.adb updated
+pack-child.adb updated
+pack-child.adb updated
 
 ----------------------------------------------------------------
 
@@ -307,12 +307,12 @@ package body Pack is
 end Pack;
 ================================================================
 subunits
-body is updated for pack-child.ads
-separate body is created for stub for Proc
-body is updated for pack-child.ads
-separate body is created for stub for A
-body is updated for pack-child.ads
-separate body is created for stub for B
+pack-child.adb updated
+pack-child-proc.adb created
+pack-child.adb updated
+pack-child-a.adb created
+pack-child.adb updated
+pack-child-b.adb created
 
 ----------------------------------------------------------------
 
@@ -391,12 +391,12 @@ package body Pack is
 end Pack;
 ================================================================
 alphabetical-order, subunits
-body is updated for pack-child.ads
-separate body is created for stub for Proc
-body is updated for pack-child.ads
-separate body is created for stub for A
-body is updated for pack-child.ads
-separate body is created for stub for B
+pack-child.adb updated
+pack-child-proc.adb created
+pack-child.adb updated
+pack-child-a.adb created
+pack-child.adb updated
+pack-child-b.adb created
 
 ----------------------------------------------------------------
 
@@ -475,16 +475,16 @@ package body Pack is
 end Pack;
 ================================================================
 mumble-processing.ads
-body is updated for mumble-processing.ads
-separate body is created for stub for Init
-body is updated for mumble-processing.ads
-separate body is created for stub for Per_File_Action
-body is updated for mumble-processing.ads
-separate body is created for stub for Final
+mumble-processing.adb updated
+mumble-processing-init.adb created
+mumble-processing.adb updated
+mumble-processing-per_file_action.adb created
+mumble-processing.adb updated
+mumble-processing-final.adb created
 gnatstub: body for Tool_Help already exists
 try "gnatstub --help" for more information.
-body is updated for mumble-processing.ads
-separate body is created for stub for Dump
+mumble-processing.adb updated
+mumble-processing-dump.adb created
 pragma Ada_2012;
 separate (Mumble.Processing)
 procedure Dump (Tool : in out Stub_Tool; Message : String := "") is
