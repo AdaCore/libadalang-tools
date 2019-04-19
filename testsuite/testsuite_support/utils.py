@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import shlex
 import subprocess
 
@@ -37,3 +39,13 @@ def show_nonprintable(text):
             return char
 
     return ''.join(escape(c) for c in text)
+
+
+def print_nonprintable(filename):
+    """
+    Print the output of show_nonprintable on the given file.
+
+    :param str filename: Name of the file to read.
+    """
+    with open(filename, 'rb') as f:
+        print(show_nonprintable(f.read()), end='')
