@@ -361,3 +361,8 @@ class BaseDriver(TestDriver):
             self.set_failure('output diff')
         else:
             self.set_passed()
+
+        # The --show-error-output option displays "actual_output". What users
+        # need to read in order to understand the test failure is the diff
+        # between actual output and expected one.
+        self.result.actual_output = self.result.diff
