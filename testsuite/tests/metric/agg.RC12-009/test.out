@@ -138,6 +138,9 @@ Element metrics summed over 0 units
   all statements      : 0
   all declarations    : 0
   logical SLOC        : 0
+
+Coupling metrics:
+=================
 ----------------
 c.obj/c.ads.metrix
 Metrics computed for c.ads

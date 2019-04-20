@@ -1,2 +1,2 @@
 gnatpp -P p.gpr --pipe foo.adb
-gnatmetric -P p.gpr foo.adb
+gnatmetric --short-file-names -P p.gpr foo.adb

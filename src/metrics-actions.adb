@@ -1524,8 +1524,8 @@ package body METRICS.Actions is
               Current_Construct_Nesting | Computed_Metrics =>
                null;
                --  The above are never printed, so we don't include them in the
-               --  <config>. These are the same ones tht raise Program_Error if
-               --  passed to XML_Metric_Name_String.
+               --  <config>. These are the same ones that raise Program_Error
+               --  if passed to XML_Metric_Name_String.
 
             when others =>
                Put ("<metric name=""\1"" display_name=""\2""/>\n",
@@ -1838,18 +1838,24 @@ package body METRICS.Actions is
                Result (Metric) := Arg (Cmd, Metric);
             end loop;
 
+            --  "all" switches:
+
             if Arg (Cmd, Contract_All) then
                Result (Contract_Metrics) := (others => True);
             end if;
+
             if Arg (Cmd, Complexity_All) then
                Result (Complexity_Metrics) := (others => True);
             end if;
+
             if Arg (Cmd, Lines_All) then
                Result (Lines_Metrics) := (others => True);
             end if;
+
             if Arg (Cmd, Syntax_All) then
                Result (Syntax_Metrics) := (others => True);
             end if;
+
             if Arg (Cmd, Coupling_All) then
                Result (Coupling_Metrics) := (others => True);
             end if;
@@ -1875,17 +1881,12 @@ package body METRICS.Actions is
                Result (In_Out_Parameters) := True;
             end if;
 
-            if Arg (Cmd, Metrics_All) then
+            --  If no metrics were requested on the command line, or the
+            --  --metrics-all switch was specified, we compute all metrics
+            --  except "computed" metrics.
+
+            if Result = Empty_Metrics_Set or else Arg (Cmd, Metrics_All) then
                Result := (Computed_Metrics => False, others => True);
-
-            --  If no metrics were requested on the command line, we compute
-            --  all metrics except coupling and "computed" metrics. ???This
-            --  doesn't match the documentation. Also, at least for now,
-            --  disable contract metrics and Lines_Spark, because those don't
-            --  exist in lalmetric and we're trying to be compatible.
-
-            elsif Result = Empty_Metrics_Set then
-               Result := (others => True);
 
                declare
                   Explicit_False_Switches : Metrics_Set := Empty_Metrics_Set;
@@ -1899,11 +1900,6 @@ package body METRICS.Actions is
                      Result := Result and not Explicit_False_Switches;
                   end if;
                end;
-
-               Result := Result and Metrics_Set'
-                 (Coupling_Metrics | Computed_Metrics |
-                  Contract_Metrics | Lines_Spark => False,
-                  others => True);
             end if;
          end return;
       end To_Compute;
