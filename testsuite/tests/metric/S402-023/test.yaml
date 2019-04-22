@@ -3,4 +3,4 @@ description:
 
 driver: shell_script
 control:
-    - [XFAIL, 'True', 'Waiting for a fix on S402-023']
+    - [XFAIL, 'True', 'Waiting for a fix on S422-013]
