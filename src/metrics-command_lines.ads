@@ -146,7 +146,8 @@ package METRICS.Command_Lines is
       Syntax_All,
       Complexity_All,
       Coupling_All,
-      XML_Config -- undocumented, --no-xml-config suppresses <config> in XML
+      XML_Config, -- undocumented, --no-xml-config suppresses <config> in XML
+      Ignore_Assertions
      );
    pragma Ordered (Metrics_Booleans);
    --  Otherwise, we get bogus warnings in Metrics.Actions.
@@ -224,7 +225,7 @@ package METRICS.Command_Lines is
 
    package Metrics_Boolean_Defaults is new
      Metrics_Boolean_Switches.Set_Defaults
-       ((XML_Config => True, others => False));
+       ((XML_Config | Ignore_Assertions => True, others => False));
 
    type Metrics_Strings is (Output_Suffix, Global_File_Name, Xml_File_Name);
 

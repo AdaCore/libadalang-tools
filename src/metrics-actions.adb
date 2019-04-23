@@ -286,6 +286,7 @@ package body METRICS.Actions is
    function Push_New_Metrix
      (Tool : in out Metrics_Tool'Class;
       Node : Ada_Node;
+      Ignore_Assertions : Boolean;
       Source_File_Name : String_Ref := null)
      return Metrix_Ref with
      Pre => (Source_File_Name /= null) =
@@ -315,7 +316,8 @@ package body METRICS.Actions is
    --  True for pragma Assert and for Pre, Post, Contract_Cases,
    --  Pre'Class, and Post'Class.
 
-   function Has_Complexity_Metrics (Node : Ada_Node) return Boolean;
+   function Has_Complexity_Metrics
+     (Node : Ada_Node; Ignore_Assertions : Boolean) return Boolean;
    --  True if complexity metrix should be computed for Node (assuming it's
    --  requested on the command line).
 
@@ -442,6 +444,7 @@ package body METRICS.Actions is
    function Push_New_Metrix
      (Tool : in out Metrics_Tool'Class;
       Node : Ada_Node;
+      Ignore_Assertions : Boolean;
       Source_File_Name : String_Ref := null)
      return Metrix_Ref
    is
@@ -540,7 +543,8 @@ package body METRICS.Actions is
                            then Slocs.No_Source_Location_Range
                            else Sloc_Range (Node));
          Result.Is_Private_Lib_Unit := Is_Private (Node);
-         Result.Has_Complexity_Metrics := Has_Complexity_Metrics (Node);
+         Result.Has_Complexity_Metrics :=
+           Has_Complexity_Metrics (Node, Ignore_Assertions);
 
          if not Node.Is_Null then
             Result.Comp_Unit := Element (Tool.Metrix_Stack, 2);
@@ -682,7 +686,8 @@ package body METRICS.Actions is
       return Not_An_Assertion;
    end Assertion_Kind;
 
-   function Has_Complexity_Metrics (Node : Ada_Node) return Boolean is
+   function Has_Complexity_Metrics
+     (Node : Ada_Node; Ignore_Assertions : Boolean) return Boolean is
    begin
       if Node.Is_Null then
          return False;
@@ -696,7 +701,7 @@ package body METRICS.Actions is
             declare
                Outer_Unit : constant Ada_Node := Get_Outer_Unit (Node);
             begin
-               return Has_Complexity_Metrics (Outer_Unit)
+               return Has_Complexity_Metrics (Outer_Unit, Ignore_Assertions)
                        or else Kind (Outer_Unit) in
                          Ada_Package_Decl | Ada_Generic_Package_Decl |
                          Ada_Package_Body | Ada_Protected_Body;
@@ -712,6 +717,9 @@ package body METRICS.Actions is
             --  Apparently, gnatmetric doesn't do nested package bodies if
             --  there are no statements.
             return not Node.As_Package_Body.F_Stmts.Is_Null;
+
+         when Contract_Complexity_Eligible =>
+            return not Ignore_Assertions;
 
          when others =>
             return False;
@@ -1907,7 +1915,7 @@ package body METRICS.Actions is
       Metrics_To_Compute : Metrics_Set renames Tool.Metrics_To_Compute;
 
       Ignored : constant Metrix_Ref :=
-         Push_New_Metrix (Tool, Node => No_Ada_Node);
+         Push_New_Metrix (Tool, No_Ada_Node, Arg (Cmd, Ignore_Assertions));
       --  Initialize the Metrix_Stack by pushing the outermost Metrix, which is
       --  for totals for all the files together.
 
@@ -2599,7 +2607,7 @@ package body METRICS.Actions is
       BOM_Seen : Boolean;
       Unit : Analysis_Unit)
    is
-      pragma Unreferenced (Input, BOM_Seen, Cmd);
+      pragma Unreferenced (Input, BOM_Seen);
       CU_List : constant Ada_Node := Root (Unit);
       pragma Assert (not CU_List.Is_Null);
 --      pragma Assert (Kind (CU_List) = List_Kind);
@@ -2706,7 +2714,13 @@ package body METRICS.Actions is
 
       In_Assertion : Boolean := False;
       --  True if we are nested within an assertion (pragma Assert,
-      --  or a pre/post/etc aspect). 'gnatmetric' skips such constructs.
+      --  or a pre/post/etc aspect).
+
+      function In_Ignored_Assertion return Boolean is
+        (In_Assertion and then Arg (Cmd, Ignore_Assertions));
+      --  True if we are nested within an assertion, and --ignore-assertions is
+      --  in force, which is the default. If --no-ignore-assertions was
+      --  specified, then this is False. 'gnatmetric' skips such constructs.
       --  However, we need to process those, but only for the
       --  --contract-complexity metric.
 
@@ -2882,7 +2896,7 @@ package body METRICS.Actions is
             if M.Kind in Contract_Complexity_Eligible then
                Inc (M.Vals (Contract_Complexity), By);
                Inc (File_M.Vals (Contract_Complexity), By);
-            elsif not In_Assertion then
+            elsif not In_Ignored_Assertion then
                Inc (M.Vals (Metric), By);
                Inc (M.Vals (Complexity_Cyclomatic), By);
                Inc (File_M.Vals (Metric), By);
@@ -2981,7 +2995,7 @@ package body METRICS.Actions is
                --  nesting level for this unit. We only set it for the
                --  innermost unit and at the file level.
 
-               if not In_Assertion then
+               if not In_Ignored_Assertion then
                   if Loop_Count > M.Vals (Loop_Nesting) then
                      M.Vals (Loop_Nesting) := Loop_Count;
                   end if;
@@ -3938,7 +3952,8 @@ package body METRICS.Actions is
                File_M : Metrix renames Element (Metrix_Stack, 2).all;
                Parent : Metrix renames
                  Element (Metrix_Stack, Last_Index (Metrix_Stack)).all;
-               M : constant Metrix_Ref := Push_New_Metrix (Tool, Node);
+               M : constant Metrix_Ref :=
+                 Push_New_Metrix (Tool, Node, Arg (Cmd, Ignore_Assertions));
                Saved_Loop_Count : constant Natural := Loop_Count;
             begin
                Loop_Count := 0;
@@ -4027,7 +4042,8 @@ package body METRICS.Actions is
               (Node.Parents (3) =
                  Element (Node_Stack, Last_Index (Node_Stack) - 2));
          end if;
-         if not In_Assertion then
+
+         if not In_Ignored_Assertion then
             Gather_Line_Metrics (Node, M);
             Gather_SPARK_Line_Metrics (Node, M);
             Gather_Syntax_Metrics (Node, M);
@@ -4101,7 +4117,8 @@ package body METRICS.Actions is
       Global_M : Metrix renames Element (Metrix_Stack, 1).all;
       File_M : constant Metrix_Ref :=
         Push_New_Metrix
-          (Tool, CU_Node, Source_File_Name => new String'(File_Name));
+          (Tool, CU_Node, Arg (Cmd, Ignore_Assertions),
+           Source_File_Name => new String'(File_Name));
 
    --  Start of processing for Per_File_Action
    begin
