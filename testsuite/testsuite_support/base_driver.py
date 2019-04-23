@@ -328,16 +328,20 @@ class BaseDriver(TestDriver):
             return [l[:-1] if l and l[-1] == '\r' else l
                     for l in text.split('\n')]
 
-        def maybe_lower(text):
+        def canonicalize(text):
             """
-            Depending on testsuite run settings, return `text` itself or
-            lower-case it.
+            Depending on testsuite run settings and testcase options,
+            canonicalize `text` (lower-case conversion, backslash to forward
+            slash substitution, ...).
             """
-            return (text if self.global_env['options'].strict_casing_diff else
-                    text.lower())
+            if not self.global_env['options'].strict_casing_diff:
+                text = text.lower()
+            if self.test_env.get('canonicalize_backslashes', False):
+                text = text.replace('\\', '/')
+            return text
 
-        expected = maybe_lower(self.result.expected_output)
-        actual = maybe_lower(self.result.actual_output)
+        expected = canonicalize(self.result.expected_output)
+        actual = canonicalize(self.result.actual_output)
 
         # Rely directly on difflib rather than GNATpython's diff facilities in
         # order to test as much as possible all formatting aspects in test
