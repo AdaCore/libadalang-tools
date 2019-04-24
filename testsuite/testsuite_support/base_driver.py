@@ -340,15 +340,16 @@ class BaseDriver(TestDriver):
                 text = text.replace('\\', '/')
             return text
 
-        expected = canonicalize(self.result.expected_output)
-        actual = canonicalize(self.result.actual_output)
+        self.result.expected_output = canonicalize(self.result.expected_output)
+        self.result.actual_output = canonicalize(self.result.actual_output)
 
         # Rely directly on difflib rather than GNATpython's diff facilities in
         # order to test as much as possible all formatting aspects in test
         # outputs. Remember that testing covers a pretty-printer, so performing
         # strict comparisons is important.
         diff = list(difflib.unified_diff(
-            a=compared_lines(expected), b=compared_lines(actual),
+            a=compared_lines(self.result.expected_output),
+            b=compared_lines(self.result.actual_output),
             fromfile='expected', tofile='output', lineterm=''))
         self.result.diff = '\n'.join(diff)
 
@@ -356,8 +357,3 @@ class BaseDriver(TestDriver):
             self.set_failure('output diff')
         else:
             self.set_passed()
-
-        # The --show-error-output option displays "actual_output". What users
-        # need to read in order to understand the test failure is the diff
-        # between actual output and expected one.
-        self.result.actual_output = self.result.diff
