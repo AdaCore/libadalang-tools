@@ -12,4 +12,4 @@ cat  src_d/d.adb
 echo "----------------"
 echo src_d/dd.adb
 cat  src_d/dd.adb
-gnatmake -q -P agg1.gpr
+gnatmake -q -P agg1.gpr |& sort
