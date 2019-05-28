@@ -3609,15 +3609,22 @@ package body METRICS.Actions is
          --  subprogram, and call Count_Params on that spec.
 
          elsif Kind (Node) = Ada_Generic_Subp_Instantiation then
-            declare
-               pragma Assert (Node = M.Node);
-               G : constant Basic_Decl :=
-                 Node.As_Generic_Instantiation.P_Designated_Generic_Decl;
-               Spec : constant Subp_Spec :=
-                 G.As_Generic_Subp_Decl.F_Subp_Decl
-                   .P_Subp_Spec_Or_Null.As_Subp_Spec;
             begin
-               Count_Params (Spec);
+               declare
+                  pragma Assert (Node = M.Node);
+                  G : constant Basic_Decl :=
+                    Node.As_Generic_Instantiation.P_Designated_Generic_Decl;
+                  Spec : constant Subp_Spec :=
+                    G.As_Generic_Subp_Decl.F_Subp_Decl
+                      .P_Subp_Spec_Or_Null.As_Subp_Spec;
+               begin
+                  Count_Params (Spec);
+               end;
+            exception
+               when Property_Error =>
+                  --  If the generic unit being instantiated is not present, we
+                  --  simply ignore this instantiation.
+                  null;
             end;
          end if;
 
