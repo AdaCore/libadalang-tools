@@ -1880,8 +1880,7 @@ package body Pp.Actions is
             Tokens : aliased Tokn_Vec;
             Buf    : Buffer := String_To_Buffer (W_Str (Str.all));
             Ignored : Boolean := Get_Tokns
-              (Buf, Tokens, Utils.Ada_Version,
-               Lang => Template_Lang);
+              (Buf, Tokens, Lang => Template_Lang);
             Cur : Tokn_Cursor := First (Tokens'Unchecked_Access);
          begin
             pragma Assert (Kind (Cur) = Start_Of_Input);
@@ -4602,7 +4601,7 @@ package body Pp.Actions is
             Utils.Dbg_Out.Output_Enabled := True;
          end if;
 
-         Scanner.Get_Tokns (Src_Buf, Src_Tokns, In_File_Format, Utils.Ada_Version);
+         Scanner.Get_Tokns (Src_Buf, Src_Tokns, In_File_Format);
          if Debug_Mode then
             Dbg_Out.Put ("Src_Tokens:\n");
             Scanner.Put_Tokens (Src_Tokns);

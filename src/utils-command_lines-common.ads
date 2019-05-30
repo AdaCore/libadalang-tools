@@ -20,7 +20,6 @@ package Utils.Command_Lines.Common is
       Follow_Symbolic_Links,
       No_Objects_Dir,
       Compute_Timing,
-      Gnat2005,
       Process_RTL_Units);
 
    package Common_Flag_Switches is new Flag_Switches
@@ -41,7 +40,6 @@ package Utils.Command_Lines.Common is
        Follow_Symbolic_Links     => +"-eL",
        No_Objects_Dir            => null,
        Compute_Timing            => +"-t",
-       Gnat2005                  => +"-gnat05", -- ignored
        Process_RTL_Units         => +"-a"));
 
    type Common_Booleans is (Syntax_Only);
@@ -58,16 +56,24 @@ package Utils.Command_Lines.Common is
      Common_Boolean_Switches.Set_Shorthands
        ((Syntax_Only => +"-so"));
 
+   type Ada_Version_Type is (Ada_83, Ada_95, Ada_2005, Ada_2012);
+
    package Ada_Version_Switches is new Enum_Switches
-     (Common_Descriptor, Opt_Ada_Version_Type,
-      Default => No_Ada_Version);
+     (Common_Descriptor, Ada_Version_Type,
+      Default => Ada_Version_Type'Last);
+   --  These switches are ignored. The tools are tolerant of using newer
+   --  reserved words, such as "interface", as identifiers, so we don't need to
+   --  know the version.
 
    package Ada_Version_Shorthands is new Ada_Version_Switches.Set_Shorthands
      ((Ada_83 => +"-gnat83",
        Ada_95 => +"-gnat95",
        Ada_2005 => +"-gnat2005",
-       Ada_2012 => +"-gnat2012",
-       No_Ada_Version => null));
+       Ada_2012 => +"-gnat2012"));
+
+   package Ada_Version_Shorthands_2 is new Ada_Version_Switches.Set_Shorthands
+     ((Ada_2005 => +"-gnat05",
+       others => null));
 
    type Common_Strings is
      (Project_File,

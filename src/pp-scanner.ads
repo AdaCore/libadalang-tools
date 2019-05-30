@@ -200,6 +200,12 @@ package Pp.Scanner is
      Token_Kind range Res_Abort .. Res_Synchronized;
    subtype Reserved_Word_2012 is Token_Kind range Res_Abort .. Res_Some;
 
+   subtype Reserved_Word_New is Reserved_Word_2012 with
+     Predicate => Reserved_Word_New not in Reserved_Word_83;
+   --  These are the reserved words that were added to Ada after Ada 83. We
+   --  don't know what language version we are processing, so we allow these
+   --  as identifiers.
+
    subtype Whole_Line_Comment is Token_Kind with
      Predicate => Whole_Line_Comment in
        Pp_Off_Comment | Pp_On_Comment | Special_Comment |
@@ -488,7 +494,6 @@ package Pp.Scanner is
      (Input           : in out Buffers.Buffer;
       Result          : out Tokn_Vec;
       EOL_Format      : out EOL_Formats;
-      Ada_Version     : Ada_Version_Type;
       Max_Tokens      : Tokn_Index := Tokn_Index'Last;
       Lang            : Language := Ada_Lang);
    --  Return in Result the sequence of tokens in the Input string. The first
@@ -500,7 +505,6 @@ package Pp.Scanner is
    function Get_Tokns
      (Input           : in out Buffers.Buffer;
       Result          : out Tokn_Vec;
-      Ada_Version     : Ada_Version_Type;
       Max_Tokens      : Tokn_Index := Tokn_Index'Last;
       Lang            : Language := Ada_Lang)
      return Boolean;

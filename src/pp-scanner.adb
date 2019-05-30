@@ -168,11 +168,10 @@ package body Pp.Scanner is
       Res_Some => Intern ("some")
      ); -- Token_To_Symbol_Map
 
-   function Lookup_Reserved_Word
-     (Text : Symbol; Ada_Version : Ada_Version_Type)
-      return Reserved_Word_Or_Id;
-   --  If Text is a reserved word for the given Ada_Version, return that
-   --  Reserved_Word. Otherwise, return Ident.
+   function Lookup_Reserved_Word (Text : Symbol) return Reserved_Word_Or_Id;
+   --  If Text is a reserved word, return that Reserved_Word. Otherwise, return
+   --  Ident. Note that we don't know the Ada version, so we assume the
+   --  latest. Thus, "interface" is a reserved word, for example.
 
    ----------------
 
@@ -835,15 +834,10 @@ package body Pp.Scanner is
    Symbol_To_Reserved_Word_Map : constant Symbol_To_Reserved_Word_Mapping :=
      Init_Symbol_To_Reserved_Word_Map;
 
-   function Lookup_Reserved_Word
-     (Text : Symbol; Ada_Version : Ada_Version_Type)
-      return Reserved_Word_Or_Id
-   is
+   function Lookup_Reserved_Word (Text : Symbol) return Reserved_Word_Or_Id is
       Normalized : constant Symbol := Same_Ignoring_Case (Text);
    begin
-      if Normalized in Potential_Reserved_Word_Sym'First ..
-        Last_Reserved_For_Ada_Version (Ada_Version)
-      then
+      if Normalized in Potential_Reserved_Word_Sym then
          return Symbol_To_Reserved_Word_Map (Normalized);
       else
          return Ident;
@@ -853,14 +847,13 @@ package body Pp.Scanner is
    function Get_Tokns
      (Input           : in out Buffers.Buffer;
       Result          : out Tokn_Vec;
-      Ada_Version     : Ada_Version_Type;
       Max_Tokens      : Tokn_Index := Tokn_Index'Last;
       Lang            : Language := Ada_Lang)
      return Boolean
    is
       Ignored : Optional_EOL_Formats;
    begin
-      Get_Tokns (Input, Result, Ignored, Ada_Version, Max_Tokens, Lang);
+      Get_Tokns (Input, Result, Ignored, Max_Tokens, Lang);
       return True;
    end Get_Tokns;
 
@@ -868,7 +861,6 @@ package body Pp.Scanner is
      (Input           : in out Buffers.Buffer;
       Result          : out Tokn_Vec;
       EOL_Format      : out EOL_Formats;
-      Ada_Version     : Ada_Version_Type;
       Max_Tokens      : Tokn_Index := Tokn_Index'Last;
       Lang            : Language := Ada_Lang)
    is
@@ -1495,7 +1487,7 @@ package body Pp.Scanner is
                   if Preceding_Lexeme /= ''' then
                      declare
                         RW : constant Reserved_Word_Or_Id :=
-                          Lookup_Reserved_Word (Tok_Text, Ada_Version);
+                          Lookup_Reserved_Word (Tok_Text);
                         Old_Sloc : constant Source_Location := Tok.Sloc;
                      begin
                         case RW is
@@ -1512,6 +1504,7 @@ package body Pp.Scanner is
                when others =>
                   null;
             end case;
+
             if Tok.Kind in Stored_Text_Kind then
                Tok.Text := Tok_Text;
             end if;

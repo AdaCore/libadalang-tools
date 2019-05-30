@@ -100,13 +100,6 @@ package Utils.Predefined_Symbols is
    --  Might include some non-reserved-word symbols, depending on the order in
    --  which things get interned.
 
-   Last_Reserved_For_Ada_Version :
-     constant array (Ada_Version_Type) of Potential_Reserved_Word_Sym :=
-       (Ada_83 => Name_Xor,
-        Ada_95 => Name_Tagged,
-        Ada_2005 => Name_Synchronized,
-        Ada_2012 => Name_Some);
-
    --  Miscellaneous useful Symbols:
 
    Name_Empty : constant Symbol := Intern ("");

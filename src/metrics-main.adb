@@ -15,7 +15,6 @@ procedure METRICS.Main is
    procedure Callback (Phase : Parse_Phase; Swit : Dynamically_Typed_Switch) is
       use METRICS.Command_Lines;
       use Metrics_String_Seq_Switches;
-      use String_Ref_Vectors;
    begin
       if Phase = Cmd_Line_1 then
 

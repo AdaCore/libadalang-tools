@@ -33,13 +33,6 @@ pragma Warnings (On);
 package Utils is
    pragma Elaborate_Body;
 
-   type Opt_Ada_Version_Type is
-     (Ada_83, Ada_95, Ada_2005, Ada_2012, No_Ada_Version);
-   pragma Ordered (Opt_Ada_Version_Type);
-   subtype Ada_Version_Type is Opt_Ada_Version_Type range
-     Ada_83 .. Opt_Ada_Version_Type'Pred (No_Ada_Version);
-   Ada_Version : Ada_Version_Type := Ada_Version_Type'Last;
-
    Debug_Mode : Boolean renames Debug_Flag_9;
 
    Assert_Enabled : Boolean := False;

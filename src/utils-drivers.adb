@@ -70,9 +70,6 @@ package body Utils.Drivers is
 
       procedure Process_Files;
 
-      procedure Set_Ada_Version (Version : Ada_Version_Type);
-      --  Set the Ada_Version, from normal switches or from -cargs
-
       procedure Process_Cargs;
       --  Process arguments in the -cargs sections. This is questionable, given
       --  that lalpp does not call gcc, but we support at least "-cargs -Wx"
@@ -96,14 +93,7 @@ package body Utils.Drivers is
       Individual_Source_Options : String_String_List_Map;
       Result_Dirs               : String_String_Map;
 
-      procedure Set_Ada_Version (Version : Ada_Version_Type) is
-      begin
-         Ada_Version := Version;
-         Ada_Version_Switches.Set_Arg (Cmd, Version);
-      end Set_Ada_Version;
-
       procedure Process_Cargs is
-         use Ada_Version_Switches;
       begin
          --  We actually only support -W8 and -Wb.
          for Arg of Cmd_Cargs.all loop
@@ -120,23 +110,10 @@ package body Utils.Drivers is
             elsif Arg.all = "-gnatWb" then
                Set_WCEM (Cmd, "b");
 
-            elsif Arg.all = "-gnat83" then
-               Set_Ada_Version (Ada_83);
-            elsif Arg.all = "-gnat95" then
-               Set_Ada_Version (Ada_95);
-            elsif Arg.all in "-gnat2005" | "-gnat05" then
-               Set_Ada_Version (Ada_2005);
-            elsif Arg.all in "-gnat2012" | "-gnat12" then
-               Set_Ada_Version (Ada_2012);
-
             else
                null; -- Ignore all others
             end if;
          end loop;
-
-         if Arg (Cmd) /= No_Ada_Version then
-            Set_Ada_Version (Ada_Version_Switches.Arg (Cmd));
-         end if;
       end Process_Cargs;
 
       procedure Include_One (File_Name : String);

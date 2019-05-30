@@ -136,18 +136,14 @@ package body Pp.Formatting is
       --  lower case.
 
    function Sname_83 (Tok : Scanner.Tokn_Cursor) return Boolean;
-   --  True if Tok can be a simple_name (in Ada 83).
-   --  This includes reserved words that were added to the language
-   --  after Ada 83. Needed because we don't necessarily know
-   --  which language version is being used.
+   --  True if Tok can be a simple_name (in Ada 83). This includes reserved
+   --  words that were added to the language after Ada 83. Needed because we
+   --  don't know which language version is being used.
 
    function Sname_83 (Tok : Scanner.Tokn_Cursor) return Boolean is
       use Scanner;
    begin
-      return Kind (Tok) in Ident | String_Lit
-        or else
-          (Kind (Tok) in Reserved_Word_2012
-             and then Kind (Tok) not in Reserved_Word_83);
+      return Kind (Tok) in Ident | String_Lit | Reserved_Word_New;
    end Sname_83;
 
    procedure Insert_Comment_Text
@@ -504,8 +500,7 @@ package body Pp.Formatting is
       Cur_Indentation : Natural renames Lines_Data.Cur_Indentation;
       Src_Toks : aliased Tokn_Vec;
       pragma Assert (Is_Empty (Src_Toks));
-      Ignored : Boolean :=
-        Get_Tokns (Src_Buf, Src_Toks, Utils.Ada_Version);
+      Ignored : Boolean := Get_Tokns (Src_Buf, Src_Toks);
       Cur_Tok : Tokn_Cursor :=
         Next (First (Src_Toks'Unchecked_Access)); -- skip sentinel
 
@@ -611,8 +606,7 @@ package body Pp.Formatting is
                Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
                Out_Buf : Buffer renames Lines_Data.Out_Buf;
                Out_Tokns : Scanner.Tokn_Vec renames Lines_Data.Out_Tokns;
-               Ignored : Boolean := Get_Tokns
-                 (Out_Buf, Out_Tokns, Utils.Ada_Version);
+               Ignored : Boolean := Get_Tokns (Out_Buf, Out_Tokns);
                Out_Tok : Tokn_Cursor := First (Out_Tokns'Access);
 
             begin
@@ -664,8 +658,7 @@ package body Pp.Formatting is
       Out_Buf : Buffer renames Lines_Data.Out_Buf;
       Out_Tokns : Scanner.Tokn_Vec renames Lines_Data.Out_Tokns;
       use Scanner;
-      Ignored : Boolean := Get_Tokns
-        (Out_Buf, Out_Tokns, Utils.Ada_Version);
+      Ignored : Boolean := Get_Tokns (Out_Buf, Out_Tokns);
       Prev_Prev_Tok : Tokn_Cursor := Next_ss (First (Out_Tokns'Access));
       Prev_Tok : Tokn_Cursor := Next_ss (Prev_Prev_Tok);
       Out_Tok : Tokn_Cursor := Next_ss (Prev_Tok);
@@ -779,8 +772,7 @@ package body Pp.Formatting is
          end loop;
       end Skip;
 
-      Ignored : Boolean := Get_Tokns
-        (Out_Buf, Out_Tokns, Utils.Ada_Version);
+      Ignored : Boolean := Get_Tokns (Out_Buf, Out_Tokns);
       Src_Tok : Tokn_Cursor := First (Src_Tokns'Access);
       Out_Tok : Tokn_Cursor := First (Out_Tokns'Access);
 
@@ -1057,6 +1049,11 @@ package body Pp.Formatting is
                        and then Text (Src_Tok) = Text (Out_Tok);
                end case;
 
+            elsif Kind (Src_Tok) in Reserved_Word_New
+              and then Kind (Out_Tok) = Ident
+            then
+               R := Case_Insensitive_Equal (Text (Src_Tok), Text (Out_Tok));
+
             elsif Kind (Src_Tok) = End_Of_Line_Comment
               and then Kind (Out_Tok) in Whole_Line_Comment
             then
@@ -1079,8 +1076,7 @@ package body Pp.Formatting is
          end return;
       end Match;
 
-      Ignored : Boolean := Get_Tokns
-        (Out_Buf, Out_Tokns, Utils.Ada_Version);
+      Ignored : Boolean := Get_Tokns (Out_Buf, Out_Tokns);
 
       Src_Tok : Tokn_Cursor := Next_ss (First (Src_Tokns'Access));
       Out_Tok : Tokn_Cursor := Next_ss (First (Out_Tokns'Access));
@@ -2017,6 +2013,15 @@ package body Pp.Formatting is
                            R := Text (Src_Tok) = Text (Out_Tok);
                         end if;
                   end case;
+
+               --  Allow, for example, reserved word "interface" to match
+               --  identifier "INTERFACE".
+
+               elsif Kind (Src_Tok) in Reserved_Word_New
+                 and then Kind (Out_Tok) = Ident
+               then
+                  R := Case_Insensitive_Equal (Text (Src_Tok), Text (Out_Tok));
+
                else
                   R := False;
                end if;
@@ -2353,6 +2358,12 @@ package body Pp.Formatting is
                            R := Text (Src_Tok) = Text (Out_Tok);
                         end if;
                   end case;
+
+               elsif Kind (Src_Tok) in Reserved_Word_New
+                 and then Kind (Out_Tok) = Ident
+               then
+                  R := Case_Insensitive_Equal (Text (Src_Tok), Text (Out_Tok));
+
                else
                   R := False;
                end if;
