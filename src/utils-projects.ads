@@ -9,7 +9,6 @@ package Utils.Projects is
 
    procedure Process_Command_Line
      (Cmd                             : in out Command_Line;
-      Cmd_Text, Cmd_Cargs, Project_Switches_Text :    out Argument_List_Access;
       Global_Report_Dir               :    out String_Ref;
       Compiler_Options                :    out String_List_Access;
       Project_RTS                     :    out String_Access;
@@ -26,11 +25,6 @@ package Utils.Projects is
       Print_Help                      : not null access procedure);
    --  Processes the command line and (if specified on the command line) the
    --  project file.
-   --
-   --  Cmd_Text and Project_Switches_Text are the textual arguments from
-   --  the command line and project file, if any. Project_Switches_Text is
-   --  empty if there is no project file. These are needed temporarily so
-   --  we can process "-cargs" the old way.
    --
    --  Global_Report_Dir is set to the directory name in which to place global
    --  tool results, if this information comes from the project file (see

@@ -70,11 +70,6 @@ package body Utils.Drivers is
 
       procedure Process_Files;
 
-      procedure Process_Cargs;
-      --  Process arguments in the -cargs sections. This is questionable, given
-      --  that lalpp does not call gcc, but we support at least "-cargs -Wx"
-      --  for compatibility, at least for now.
-
       procedure Print_Help;
 
       procedure Local_Callback
@@ -85,36 +80,11 @@ package body Utils.Drivers is
          Callback (Phase, Swit);
       end Local_Callback;
 
-      Cmd_Text, Cmd_Cargs, Project_Switches_Text :
-        GNAT.OS_Lib.Argument_List_Access;
       Global_Report_Dir         : String_Ref;
       Compiler_Options          : GNAT.OS_Lib.Argument_List_Access;
       Custom_RTS                : GNAT.OS_Lib.String_Access;
       Individual_Source_Options : String_String_List_Map;
       Result_Dirs               : String_String_Map;
-
-      procedure Process_Cargs is
-      begin
-         --  We actually only support -W8 and -Wb.
-         for Arg of Cmd_Cargs.all loop
-            if Arg.all = "-gnatWh" then
-               Set_WCEM (Cmd, "h");
-            elsif Arg.all = "-gnatWu" then
-               Set_WCEM (Cmd, "u");
-            elsif Arg.all = "-gnatWs" then
-               Set_WCEM (Cmd, "s");
-            elsif Arg.all = "-gnatWE" then
-               Set_WCEM (Cmd, "E");
-            elsif Arg.all = "-gnatW8" then
-               Set_WCEM (Cmd, "8");
-            elsif Arg.all = "-gnatWb" then
-               Set_WCEM (Cmd, "b");
-
-            else
-               null; -- Ignore all others
-            end if;
-         end loop;
-      end Process_Cargs;
 
       procedure Include_One (File_Name : String);
       --  Include File_Name in the Ignored set below
@@ -167,9 +137,6 @@ package body Utils.Drivers is
 
       Process_Command_Line
         (Cmd,
-         Cmd_Text,
-         Cmd_Cargs,
-         Project_Switches_Text,
          Global_Report_Dir,
          Compiler_Options,
          Project_RTS               => Custom_RTS,
@@ -184,7 +151,6 @@ package body Utils.Drivers is
          Tool_Temp_Dir             => Environment.Tool_Temp_Dir.all,
          Print_Help                => Print_Help'Access);
 --      Utils.Command_Lines.Common.Post.Postprocess_Common (Cmd);
-      Process_Cargs;
 
       if Debug_Flag_C then
          Dump_Cmd (Cmd);

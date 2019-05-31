@@ -20,7 +20,8 @@ package Utils.Command_Lines.Common is
       Follow_Symbolic_Links,
       No_Objects_Dir,
       Compute_Timing,
-      Process_RTL_Units);
+      Process_RTL_Units,
+      Cargs);
 
    package Common_Flag_Switches is new Flag_Switches
      (Common_Descriptor,
@@ -40,7 +41,8 @@ package Utils.Command_Lines.Common is
        Follow_Symbolic_Links     => +"-eL",
        No_Objects_Dir            => null,
        Compute_Timing            => +"-t",
-       Process_RTL_Units         => +"-a"));
+       Process_RTL_Units         => +"-a",
+       Cargs => +"-cargs"));
 
    type Common_Booleans is (Syntax_Only);
 
@@ -208,8 +210,7 @@ package Utils.Command_Lines.Common is
 
    procedure Set_WCEM (Cmd : in out Command_Line; Encoding : String);
    --  Set the wide character encoding method as if the switch had appeared on
-   --  the command line (not in -cargs section). This is used when the -cargs
-   --  section is used, and when a BOM selects UTF-8.
+   --  the command line. This is used when a BOM selects UTF-8.
 
    ----------------
 

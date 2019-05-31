@@ -62,7 +62,6 @@ package body Utils.Projects is
 
    procedure Process_Project
      (Cmd                       : in out Command_Line;
-      Project_Switches_Text     :    out Argument_List_Access;
       Global_Report_Dir         :    out String_Ref;
       Compiler_Options          :    out String_List_Access;
       Project_RTS               :    out String_Access;
@@ -102,7 +101,6 @@ package body Utils.Projects is
 
    procedure Process_Project
      (Cmd                       : in out Command_Line;
-      Project_Switches_Text     :    out Argument_List_Access;
       Global_Report_Dir         :    out String_Ref;
       Compiler_Options          :    out String_List_Access;
       Project_RTS               :    out String_Access;
@@ -701,6 +699,7 @@ package body Utils.Projects is
 
          Attr_Indexes : String_List_Access;
          Index_Found  : Boolean := False;
+         Project_Switches_Text : Argument_List_Access;
       begin
          if Num_File_Names (Cmd) = 1 then
             --  ????What if the "one file" comes from -files=
@@ -732,9 +731,7 @@ package body Utils.Projects is
             end if;
          end if;
 
-         if Project_Switches_Text = null then
-            Project_Switches_Text := new Argument_List'(1 .. 0 => <>);
-         else
+         if Project_Switches_Text /= null then
             Parse
               (Project_Switches_Text,
                Cmd,
@@ -1270,7 +1267,6 @@ package body Utils.Projects is
 
    procedure Process_Command_Line
      (Cmd                             : in out Command_Line;
-      Cmd_Text, Cmd_Cargs, Project_Switches_Text :    out Argument_List_Access;
       Global_Report_Dir               :    out String_Ref;
       Compiler_Options                :    out String_List_Access;
       Project_RTS                     :    out String_Access;
@@ -1286,23 +1282,24 @@ package body Utils.Projects is
       Tool_Temp_Dir                   :        String;
       Print_Help                      : not null access procedure)
    is
-   --  We have to Parse the command line BEFORE we Parse the project file,
-   --  because command-line args tell us the name of the project file, and
-   --  options for processing it.
+      --  We have to Parse the command line BEFORE we Parse the project file,
+      --  because command-line args tell us the name of the project file, and
+      --  options for processing it.
 
-   --  We have to Parse the command line AFTER we Parse the project file,
-   --  because command-line switches should override those from the project
-   --  file.
+      --  We have to Parse the command line AFTER we Parse the project file,
+      --  because command-line switches should override those from the project
+      --  file.
 
-   --  So we do both.
+      --  So we do both.
 
-   --  In addition, we parse the command line ignoring errors first, for
-   --  --version and --help switches. ???This also sets debug flags, etc.
+      --  In addition, we parse the command line ignoring errors first, for
+      --  --version and --help switches. ???This also sets debug flags, etc.
+
+      Cmd_Text : constant Argument_List_Access :=
+        Text_Args_From_Command_Line (Tool_Package_Name);
    begin
       The_Project_Tree := My_Project_Tree'Access;
       The_Project_Env := Project_Env;
-      Cmd_Text := Text_Args_From_Command_Line (Tool_Package_Name);
-      Cmd_Cargs := Text_Cargs_From_Command_Line;
 
       --  First, process --version or --help switches, if present
 
@@ -1335,12 +1332,17 @@ package body Utils.Projects is
          OS_Exit (0);
       end if;
 
+      if Arg (Cmd, Cargs) then
+         Cmd_Error_No_Tool_Name
+           ("-cargs switch is no longer supported; use " &
+            "e.g. --wide-character-encoding=8 instead of -cargs -gnatW8");
+      end if;
+
       if Arg (Cmd, Verbose)
         and then Arg (Cmd, Aggregated_Project_File) = null
       then
          Versions.Print_Version_Info;
       end if;
-
       if Error_Detected (Cmd) then
          Parse
            (Cmd_Text,
@@ -1396,7 +1398,6 @@ package body Utils.Projects is
          if Arg (Cmd, Project_File) /= null then
             Process_Project
               (Cmd,
-               Project_Switches_Text,
                Global_Report_Dir,
                Compiler_Options,
                Project_RTS,
@@ -1410,8 +1411,7 @@ package body Utils.Projects is
                Callback,
                Tool_Temp_Dir);
          else
-            Compiler_Options      := new Argument_List'(1 .. 0 => <>);
-            Project_Switches_Text := new Argument_List'(1 .. 0 => <>);
+            Compiler_Options := new Argument_List'(1 .. 0 => <>);
             --  Leave Individual_Source_Options and Result_Dirs empty
          end if;
 

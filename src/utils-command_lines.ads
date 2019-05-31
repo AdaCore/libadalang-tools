@@ -592,9 +592,6 @@ package Utils.Command_Lines is
      (Tool_Package_Name : String) return Argument_List_Access;
    --  Returns the sequence of command-line arguments
 
-   function Text_Cargs_From_Command_Line return Argument_List_Access;
-   --  Returns the -cargs sections
-
    function "+" (S : String) return String_Ref is (new String'(S));
    --  Hack to get around the fact that Ada doesn't allow arrays of String
 

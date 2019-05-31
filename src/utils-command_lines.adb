@@ -62,30 +62,6 @@ package body Utils.Command_Lines is
          then
             Cur := Cur + 2;
 
-         --  We also skip -cargs sections. For gnatcheck, we need to deal
-         --  with -rules sections. ????Perhaps this should be parameterized
-         --  by sections to skip and section to pay attention to.
-
-         elsif Argument (Cur) = "-cargs"
-           or else Argument (Cur) = "-inner-cargs"
-         then
-            --  Skip until we get to the end or see "-asis-tool-args"
-            --  Shouldn't we stop at "-rules" as well????
-
-            loop
-               Cur := Cur + 1;
-               if Cur > Argument_Count then
-                  exit;
-               end if;
-               if Argument (Cur) = "-asis-tool-args" then
-                  Cur := Cur + 1;
-                  exit;
-               end if;
-            end loop;
-
-         elsif Argument (Cur) = "-asis-tool-args" then
-            Cur := Cur + 1;
-
          else
             Append (Args, new String'(Argument (Cur)));
             Cur := Cur + 1;
@@ -120,43 +96,6 @@ package body Utils.Command_Lines is
       Append_Text_Args_From_Command_Line (Tool_Package_Name, Result);
       return To_Argument_List_Access (Result);
    end Text_Args_From_Command_Line;
-
-   function Text_Cargs_From_Command_Line return Argument_List_Access is
-      use Ada.Command_Line;
-      Result : String_Access_Vector;
-
-      Cur : Positive := 1;
-   begin
-      while Cur <= Argument_Count loop
-         if Argument (Cur) = "-cargs"
-           or else Argument (Cur) = "-inner-cargs"
-         then
-            --  Append until we get to the end or see "-asis-tool-args"
-            --  Shouldn't we stop at "-rules" as well????
-
-            loop
-               Append
-                 (Result,
-                  new String'
-                    (if Argument (Cur) = "-inner-cargs"
-                       then "-cargs"
-                       else Argument (Cur)));
-               Cur := Cur + 1;
-               if Cur > Argument_Count then
-                  exit;
-               end if;
-               if Argument (Cur) = "-asis-tool-args" then
-                  Cur := Cur + 1;
-                  exit;
-               end if;
-            end loop;
-         else -- skip
-            Cur := Cur + 1;
-         end if;
-      end loop;
-
-      return To_Argument_List_Access (Result);
-   end Text_Cargs_From_Command_Line;
 
    generic
       type Switches is (<>);
