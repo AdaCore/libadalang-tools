@@ -856,8 +856,9 @@ package body Pp.Actions is
            when Ada_Int_Literal => null,
            when Ada_Qual_Expr =>
              L ("!'[#!]"),
-               --  ???There are no parentheses here, because the subexpression
-               --  is either a parenthesized expression or an aggregate.
+               --  There are no parentheses here, because the subexpression is
+               --  either a parenthesized expression or an aggregate. We want
+               --  T'(...), not T'((...)).
            when Ada_Quantified_Expr =>
              L ("for ! ! ^=>[# !]"),
            when Ada_Raise_Expr =>
@@ -1420,6 +1421,7 @@ package body Pp.Actions is
          Nonvertical_Agg_Alt,
          Obj_Decl_Vertical_Agg_Alt,
          Assign_Vertical_Agg_Alt,
+         Qualified_Vertical_Agg_Alt,
          Aspect_Assoc_Alt,
          Pos_Notation_Assoc_Alt,
          Single_Name_Vertical_Assoc_Alt,
@@ -1444,7 +1446,6 @@ package body Pp.Actions is
          Tab_3_Alt,
          AM_Tab_4_Alt,
          Not_AM_Default_Alt,
-         Qualified_Aggr_Alt,
          Select_When_Alt,
          Select_Or_When_Alt,
          Call_Threshold_Alt,
@@ -1569,6 +1570,9 @@ package body Pp.Actions is
             Assign_Vertical_Agg_Alt =>
             L (Replace_One
                  (Ada_Assign_Stmt, From => ":=[# !]", To => ":=[$!]")),
+            Qualified_Vertical_Agg_Alt =>
+              L (Replace_One
+                 (Ada_Qual_Expr, From => "!'[#!]", To => "!'[$!]")),
             Aspect_Assoc_Alt => L ("/? ^=> ~~~"),
             Pos_Notation_Assoc_Alt =>
               L ("?~~~!"), -- The "?~~~" generates nothing.
@@ -1602,10 +1606,6 @@ package body Pp.Actions is
             Tab_3_Alt => L ("^3"),
             AM_Tab_4_Alt => L (" ^4:=[# !]"),
             Not_AM_Default_Alt => L (" :=[# !]"),
-            Qualified_Aggr_Alt => L ("!'[#!]"),
-             --  If the thing after the ' is an aggregate, we leave out the
-             --  parentheses here, because the aggregate will insert them. We
-             --  want T'(X, Y, Z), not T'((X, Y, Z)).
             Select_When_Alt =>
               L ("? when ~~ =>~$" & "{?~;$~;$~}"),
             Select_Or_When_Alt =>
@@ -3384,9 +3384,9 @@ package body Pp.Actions is
          --  are in named notation, and the aggregate appears in an appropriate
          --  context. An appropriate context is as the initial value of an
          --  object declaration, as the aggregate in an enumeration
-         --  representation clause, or as the expression of a component
-         --  association of an outer aggregate that is itself in such a
-         --  context.
+         --  representation clause, as the expression of a qualified
+         --  expression, or as the expression of a component association of an
+         --  outer aggregate that is itself in such a context.
 
          --  Procedures for formatting the various kinds of node that are not
          --  fully covered by Str_Template_Table:
@@ -3446,6 +3446,7 @@ package body Pp.Actions is
                then
                   if X.Parent.Kind in Ada_Object_Decl |
                     Ada_Assign_Stmt |
+                    Ada_Qual_Expr |
                     Ada_Enum_Rep_Clause
                   then
                      Result := True;
@@ -4108,10 +4109,8 @@ package body Pp.Actions is
 
          procedure Do_Qual_Expr is
          begin
-            if Subtree (Tree, 2).Kind in
-              Ada_Aggregate | Ada_Null_Record_Aggregate
-            then
-               Interpret_Alt_Template (Qualified_Aggr_Alt);
+            if Is_Vertical_Aggregate (F_Suffix (Tree.As_Qual_Expr)) then
+               Interpret_Alt_Template (Qualified_Vertical_Agg_Alt);
             else
                Interpret_Template;
             end if;
