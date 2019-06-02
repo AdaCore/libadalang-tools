@@ -1420,6 +1420,7 @@ package body Pp.Actions is
          Nonvertical_Agg_Alt,
          Obj_Decl_Vertical_Agg_Alt,
          Assign_Vertical_Agg_Alt,
+         Aspect_Assoc_Alt,
          Pos_Notation_Assoc_Alt,
          Single_Name_Vertical_Assoc_Alt,
          Single_Name_Assoc_Alt,
@@ -1568,6 +1569,7 @@ package body Pp.Actions is
             Assign_Vertical_Agg_Alt =>
             L (Replace_One
                  (Ada_Assign_Stmt, From => ":=[# !]", To => ":=[$!]")),
+            Aspect_Assoc_Alt => L ("/? ^=> ~~~"),
             Pos_Notation_Assoc_Alt =>
               L ("?~~~!"), -- The "?~~~" generates nothing.
             Single_Name_Vertical_Assoc_Alt => L ("?~~ ^=>[$~!]"),
@@ -2375,9 +2377,15 @@ package body Pp.Actions is
               (case Kind is
                  when Ada_Attribute_Ref | Ada_Update_Attribute_Ref =>
                    PP_Attribute_Casing (Cmd),
-                 when Ada_Pragma_Node => PP_Pragma_Casing (Cmd),
+
+                 when Ada_Aspect_Assoc | Ada_Pragma_Node =>
+                   --  Treat an aspect_mark like a pragma name.
+
+                   PP_Pragma_Casing (Cmd),
+
                  when Ada_Enum_Literal_Decl =>
                    PP_Enum_Casing (Cmd),
+
                  when Ada_Type_Decl |
                      Ada_Incomplete_Type_Decl |
                      Ada_Incomplete_Tagged_Type_Decl |
@@ -2388,14 +2396,17 @@ package body Pp.Actions is
                      Ada_Protected_Type_Decl |
                      Ada_Generic_Formal_Type_Decl =>
                    PP_Type_Casing (Cmd),
+
                  when Ada_Number_Decl => PP_Number_Casing (Cmd),
+
                  when Null_Kind =>
+                   --  The Null_Kind case is for identifiers specific to
+                   --  pragmas and the like.
 --                   (if PP_Name_Casing (Cmd) = As_Declared then Mixed
 --                    else PP_Name_Casing (Cmd)),
                      PP_Name_Casing (Cmd),
+
                  when others => PP_Name_Casing (Cmd)));
-         --  The Null_Kind case is for identifiers specific to pragmas
-         --  and the like.
 
          use Dictionaries;
       begin
@@ -2414,10 +2425,11 @@ package body Pp.Actions is
                when Mixed =>
                   if Kind in Ada_Attribute_Ref |
                     Ada_Update_Attribute_Ref |
+                    Ada_Aspect_Assoc |
                     Ada_Pragma_Node
                   then
-                     --  Handle pragma and attribute names that are special cases
-                     --  (some portion should be in ALL CAPS).
+                     --  Handle attribute, aspect, and pragma names that are
+                     --  special cases (some portion should be in ALL CAPS).
 
                      declare
                         Lower : constant W_Str := To_Lower (Id);
@@ -3387,6 +3399,7 @@ package body Pp.Actions is
          procedure Do_Extended_Return_Stmt;
          procedure Do_For_Loop_Spec;
 
+         procedure Do_Aspect_Assoc;
          procedure Do_Assoc;
          procedure Do_Un_Op (Tree : Ada_Tree);
 
@@ -3603,6 +3616,26 @@ package body Pp.Actions is
          --  For a tree of the form "Depends => (A => xxx)", this returns
          --  the xxx.
            (Subtree (Subtree (Subtree (Subtree (Tree, 2), 2), 1), 2));
+
+         procedure Do_Aspect_Assoc is
+            K : constant Ada_Node_Kind_Type := Tree.As_Aspect_Assoc.F_Id.Kind;
+            pragma Assert (K in Ada_Identifier | Ada_Attribute_Ref);
+            --  ???libadalang-analysis.ads lists more kinds, but that doesn't
+            --  seem possible.
+         begin
+            if K = Ada_Identifier then
+               declare
+                  With_Casing : constant W_Str :=
+                    Id_With_Casing (Id_Name (Tree.As_Aspect_Assoc.F_Id),
+                                    Tree.Kind, Is_Predef => False);
+               begin
+                  Append_And_Put (New_Tokns, Ident, W_Intern (With_Casing));
+                  Interpret_Alt_Template (Aspect_Assoc_Alt);
+               end;
+            else
+               Interpret_Template;
+            end if;
+         end Do_Aspect_Assoc;
 
          function Depends_Hack (Tree : Ada_Tree) return Boolean is
          --  True if Tree is an Aspect_Assoc of the form "Depends => (A =>+ B)"
@@ -4398,6 +4431,9 @@ package body Pp.Actions is
 
             when Ada_Assign_Stmt =>
                Do_Assign_Stmt;
+
+            when Ada_Aspect_Assoc =>
+               Do_Aspect_Assoc;
 
             when Ada_Param_Assoc |
               Ada_Aggregate_Assoc |
