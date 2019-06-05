@@ -3128,6 +3128,11 @@ package body METRICS.Actions is
                end if;
             end loop;
             return False;
+
+         exception
+            when Property_Error =>
+               --  If we can't find the exception declaration, return False
+               return False;
          end Is_Handled_By;
 
          function Is_Handled_In
