@@ -75,17 +75,15 @@ package body Utils.Tools is
            Get_From_File (Tool.Context, File_Name, Reparse => Reparse);
       begin
          if Has_Diagnostics (Unit) then
-            Err_Out.Put ("Errors while parsing \1\n", File_Name);
+            Err_Out.Put ("Syntax errors in \1\n", File_Name);
+
             for D of Diagnostics (Unit) loop
                Err_Out.Put
                  ("\1\n", Langkit_Support.Diagnostics.To_Pretty_String (D));
             end loop;
-         end if;
 
-         --  We continue even in the presence of errors (if we have a
-         --  tree).
-
-         if not Root (Unit).Is_Null then
+         else
+            pragma Assert (not Root (Unit).Is_Null);
             Per_File_Action
               (Tool, Cmd, File_Name, Inp, BOM_Seen, Unit);
          end if;

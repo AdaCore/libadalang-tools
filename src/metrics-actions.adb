@@ -607,12 +607,18 @@ package body METRICS.Actions is
          if not Node.Is_Null
            and then Kind (Node) in Ada_Subp_Body | Ada_Subp_Body_Stub
          then
+            Result.Acts_As_Spec := True;
+
             declare
                B : constant Body_Node := Node.As_Body_Node;
-               S : constant Basic_Decl := P_Decl_Part (B);
-               Acts_As_Spec : constant Boolean := S.Is_Null;
             begin
-               Result.Acts_As_Spec := Acts_As_Spec;
+               if not P_Decl_Part (B).Is_Null then
+                  Result.Acts_As_Spec := False;
+               end if;
+            exception
+               when Property_Error =>
+                  --  If the spec is not found, we leave Acts_As_Spec = True
+                  null;
             end;
          end if;
       end return;
@@ -3128,17 +3134,27 @@ package body METRICS.Actions is
            (HS : Handled_Stmts; Exc : Defining_Name) return Boolean is
          begin
             for H of HS.F_Exceptions loop
-               if Is_Handled_By (H.As_Exception_Handler, Exc) then
+               if H.Kind /= Ada_Pragma_Node
+                 and then Is_Handled_By (H.As_Exception_Handler, Exc)
+               then
                   return True;
                end if;
             end loop;
+
             return False;
          end Is_Handled_In;
 
          function Handled_Locally return Boolean is
-            Exc : constant Defining_Name :=
-              Node.As_Raise_Stmt.F_Exception_Name.P_Xref;
+            Exc : Defining_Name;
          begin
+            begin
+               Exc := Node.As_Raise_Stmt.F_Exception_Name.P_Xref;
+            exception
+               when Property_Error =>
+                  --  If we can't find the exception declaration, return False
+                  return False;
+            end;
+
             for Anc_Index in 1 .. Last_Index (Node_Stack) loop
                declare
                   Anc : constant Ada_Node := Ancestor_Node (Anc_Index);
@@ -3599,10 +3615,16 @@ package body METRICS.Actions is
          then
             declare
                pragma Assert (Node = M.Node);
-               Spec : constant Subp_Spec :=
-                 Node.As_Basic_Decl.P_Subp_Spec_Or_Null.As_Subp_Spec;
+               Spec : Subp_Spec;
             begin
-               Count_Params (Spec);
+               begin
+                  Spec := Node.As_Basic_Decl.P_Subp_Spec_Or_Null.As_Subp_Spec;
+                  Count_Params (Spec);
+               exception
+                  when Property_Error =>
+                     --  If we can't find the spec, ignore it
+                     null;
+               end;
             end;
 
          --  For a subprogram instantiation, we have to find the generic
@@ -3739,11 +3761,17 @@ package body METRICS.Actions is
            Ada_Protected_Type_Decl | Ada_Task_Type_Decl |
            Ada_Incomplete_Type_Decl | Ada_Incomplete_Tagged_Type_Decl
          then
-            if P_Previous_Part (Node.As_Base_Type_Decl).Is_Null
-              and then Node.Parent.Kind /= Ada_Generic_Formal_Type_Decl
-            then
-               Inc_All (All_Types);
-            end if;
+            begin
+               if P_Previous_Part (Node.As_Base_Type_Decl).Is_Null
+                 and then Node.Parent.Kind /= Ada_Generic_Formal_Type_Decl
+               then
+                  Inc_All (All_Types);
+               end if;
+            exception
+               when Property_Error =>
+                  --  If we can't find the previous part, ignore this
+                  null;
+            end;
          end if;
 
          --  Unit_Nesting
