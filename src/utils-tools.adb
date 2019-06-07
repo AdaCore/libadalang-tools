@@ -17,6 +17,7 @@ package body Utils.Tools is
      (Tool : in out Tool_State'Class;
       Cmd : in out Command_Line;
       File_Name : String;
+      Counter : Natural;
       Reparse : Boolean := False)
    is
       use GNAT.OS_Lib, GNAT.Byte_Order_Mark;
@@ -52,7 +53,10 @@ package body Utils.Tools is
          pragma Assert (BOM = Unknown); -- no BOM found
       end if;
 
-      if Tool.Context = No_Analysis_Context then
+      --  Call Create_Context if we don't have one, or after an arbitrary
+      --  number of files.
+
+      if Tool.Context = No_Analysis_Context or else Counter mod 100 = 0 then
          declare
             use GNATCOLL.Projects;
 

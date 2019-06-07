@@ -1171,7 +1171,8 @@ package body Stub.Actions is
          --  will incorrectly "optimize" away the work. In the other case
          --  (Subunits), the body is new, so Reparse doesn't matter.
 
-         Process_File (Tool, Body_Cmd, Output_Name, Reparse => True);
+         Process_File
+           (Tool, Body_Cmd, Output_Name, Counter => 1, Reparse => True);
       end Process_New_Body;
 
       procedure Update_Body is

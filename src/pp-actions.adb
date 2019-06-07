@@ -5188,15 +5188,17 @@ package body Pp.Actions is
          --
          --  Include the source location in the error message, if available.
 
-         declare
-            use type Slocs.Source_Location;
-            Loc : constant String :=
-              (if Error_Sloc = Slocs.No_Source_Location
-                 then "" else ":" & Slocs.Image (Error_Sloc));
-         begin
-            Err_Out.Put ("\1\2: pretty printing failed; unable to format\n",
-                        Simple_Name (File_Name), Loc);
-         end;
+         if Arg (Cmd, Failure_Message) then
+            declare
+               use type Slocs.Source_Location;
+               Loc : constant String :=
+                 (if Error_Sloc = Slocs.No_Source_Location
+                    then "" else ":" & Slocs.Image (Error_Sloc));
+            begin
+               Err_Out.Put ("\1\2: pretty printing failed; unable to format\n",
+                           Simple_Name (File_Name), Loc);
+            end;
+         end if;
 
          if Enable_Token_Mismatch then
             raise;

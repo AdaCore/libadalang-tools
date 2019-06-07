@@ -39,6 +39,7 @@ package Utils.Tools is
      (Tool : in out Tool_State'Class;
       Cmd : in out Command_Line;
       File_Name : String;
+      Counter : Natural;
       Reparse : Boolean := False);
    --  This class-wide procedure takes care of some bookkeeping, and then
    --  dispatches to Per_File_Action.
@@ -49,6 +50,12 @@ package Utils.Tools is
    --  BOM. This makes the somewhat questionable assumption that all files have
    --  the same encoding (which is necessary anyway if it's controlled by the
    --  command line).
+   --
+   --  Counter is a count of the number of files left to process. This is used
+   --  to call Create_Context every N files, for some arbitrary N. Without
+   --  that, we use up huge amounts of memory when processing a lot of files,
+   --  due to caching in libadalang. But we don't want to call Create_Context
+   --  on every file, because that slows down processing a lot.
    --
    --  Reparse has the same meaning as the parameter of Get_From_File. The
    --  reason this is needed is documented in Stub.Actions (search for the call

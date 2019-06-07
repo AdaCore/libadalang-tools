@@ -119,7 +119,7 @@ package body Utils.Drivers is
                end if;
 
                Counter := Counter - 1;
-               Process_File (Tool, Cmd, F_Name.all);
+               Process_File (Tool, Cmd, F_Name.all, Counter);
             end if;
          end loop;
          pragma Assert (Counter = 0);
