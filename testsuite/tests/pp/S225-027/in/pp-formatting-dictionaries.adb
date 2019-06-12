@@ -265,7 +265,7 @@ package body Pp.Formatting.Dictionaries is
    ---------------------
 
    procedure Scan_Dictionary (Dictionary_Name : String) is
-      String_Buffer_Max_Len : constant Natural := 1024;
+      String_Buffer_Max_Len : constant Natural := 1_024;
       --  Should be enough, I hope...
 
       String_Buffer : String (1 .. String_Buffer_Max_Len);

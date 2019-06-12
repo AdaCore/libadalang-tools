@@ -218,9 +218,9 @@ package Pp.Scanner is
    --  and another might have "Bar".
 
    type Source_Location is record
-      Line, Col : Positive := 9999; -- 1-based line and column numbers
-      First     : Positive := 9999;
-      Last      : Natural  := 9999;
+      Line, Col : Positive := 9_999; -- 1-based line and column numbers
+      First     : Positive := 9_999;
+      Last      : Natural  := 9_999;
    end record;
 
    --  Define type Token as a variant record. Mostly, we avoid using this type,

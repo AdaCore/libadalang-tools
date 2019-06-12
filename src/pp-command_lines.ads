@@ -19,12 +19,6 @@ package Pp.Command_Lines is
       Obsolete_A3,
       Obsolete_A4,
       Obsolete_A5,
-      Comments_Unchanged,
-      Comments_Gnat_Indentation,
-      Comments_Standard_Indentation, -- Not documented
-      Comments_Gnat_Beginning,
-      Comments_Fill,
-      Comments_Special,
       Comments_Only,
       Failure_Message,
       Pipe,
@@ -57,12 +51,6 @@ package Pp.Command_Lines is
        Obsolete_A3 => +"-A3",
        Obsolete_A4 => +"-A4",
        Obsolete_A5 => +"-A5",
-       Comments_Unchanged => +"-c0",
-       Comments_Gnat_Indentation => +"-c1",
-       Comments_Standard_Indentation => +"-c2", -- Not documented
-       Comments_Gnat_Beginning => +"-c3",
-       Comments_Fill => +"-c4",
-       Comments_Special => +"-c5",
        Comments_Only => null,
        Failure_Message => null,
        Pipe => +"-pipe",
@@ -201,6 +189,12 @@ package Pp.Command_Lines is
 
    type Pp_Booleans is
      (Align_Modes,
+      Comments_Unchanged,
+      Comments_Gnat_Indentation,
+      Comments_Standard_Indentation, -- Not documented
+      Comments_Gnat_Beginning,
+      Comments_Fill,
+      Comments_Special,
       End_Id,
       Separate_Is,
       Use_On_New_Line,
@@ -229,6 +223,12 @@ package Pp.Command_Lines is
 
    package Pp_Boolean_Shorthands is new Pp_Boolean_Switches.Set_Shorthands
      ((Align_Modes => null,
+       Comments_Unchanged => +"-c0",
+       Comments_Gnat_Indentation => +"-c1",
+       Comments_Standard_Indentation => +"-c2", -- Not documented
+       Comments_Gnat_Beginning => +"-c3",
+       Comments_Fill => +"-c4",
+       Comments_Special => +"-c5",
        End_Id => null,
        Separate_Is => null,
        Use_On_New_Line => null,
@@ -250,6 +250,12 @@ package Pp.Command_Lines is
    package Pp_Boolean_Defaults is new
      Pp_Boolean_Switches.Set_Defaults
        ((Align_Modes => True,
+         Comments_Unchanged => False,
+         Comments_Gnat_Indentation => False,
+         Comments_Standard_Indentation => False,
+         Comments_Gnat_Beginning => False,
+         Comments_Fill => True,
+         Comments_Special => False,
          End_Id => True,
          Separate_Is => True,
          Use_On_New_Line => False,
@@ -346,8 +352,8 @@ package Pp.Command_Lines is
        Indent_Continuation => 0,
    --  Default for Indent_Continuation is one less than Indentation, or 1.
        Initial_Indentation => 0,
-       Decimal_Grouping => 0,
-       Based_Grouping => 0,
+       Decimal_Grouping => 3,
+       Based_Grouping => 4,
        Call_Threshold => Natural'Last,
        Par_Threshold => Natural'Last,
        Case_Threshold => 10)); -- Not documented

@@ -1,5 +1,4 @@
---  This file has CRLF line endings,^M
---  but no CRLF after the last line.^M
+--  This file has CRLF line endings, but no CRLF after the last line.^M
 ^M
 package Last_Line_Missing_CRLF is^M
 ^M

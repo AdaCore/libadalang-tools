@@ -72,10 +72,10 @@ package Pp.Formatting is
       Enabled : Boolean;
       --  True if this line break will appear in the final output
       Source_Line_Breaks_Kludge : Boolean; -- ????????????????
-      Level                     : Nesting_Level := 1000;
+      Level                     : Nesting_Level := 1_000;
       --  Nesting level of [...] (continuation-line indentation, mainly for
       --  soft line breaks).
-      Indentation : Natural := 1000;
+      Indentation : Natural := 1_000;
       --  Indentation level of this line break
       Length : Natural := Natural'Last;
       --  Number of characters in line, not counting NL. Calculated by
