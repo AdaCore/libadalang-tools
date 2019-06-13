@@ -5324,8 +5324,7 @@ package body Pp.Actions is
       Put (" --vertical-case-alternatives -multi-line case alternatives\n");
       Put (" --incremental -- incremental processing on a per-file basis\n");
       Put (" -jn - n is the maximal number of processes to carry out\n");
-      Put (" --syntax-only  - do not run semantic analysis (default)\n");
-      Put (" --no-syntax-only  - run semantic analysis\n");
+      Put (" --syntax-only  - do not run semantic analysis\n");
       Put (" --verbose / -v  - verbose mode\n");
       Put (" -dd - progress indicator verbose mode\n");
       Put ("\n");
