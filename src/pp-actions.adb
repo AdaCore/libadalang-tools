@@ -614,6 +614,7 @@ package body Pp.Actions is
            when Ada_Error_Stmt => null,
            when Ada_Enum_Subp_Spec => null,
            when Ada_Enum_Lit_Synth_Type_Expr => null,
+           when Ada_Prim_Type_Accessor => null,
             --  ???The above are not used
 
            when Ada_Ada_List => null,
