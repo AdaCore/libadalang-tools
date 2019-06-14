@@ -17,8 +17,8 @@ class Testsuite(BaseTestsuite):
 
     def add_options(self):
         self.main.add_option(
-            '--strict-casing-diff', action='store_true',
-            help='Check casing in testcase outputs')
+            '--fold-casing', action='store_true',
+            help='Ignore casing in testcase outputs')
         self.main.add_option(
             '--valgrind', action='store_true', default=False,
             help='Run tests under valgrind')

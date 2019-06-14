@@ -334,7 +334,7 @@ class BaseDriver(TestDriver):
             canonicalize `text` (lower-case conversion, backslash to forward
             slash substitution, ...).
             """
-            if not self.global_env['options'].strict_casing_diff:
+            if self.global_env['options'].fold_casing:
                 text = text.lower()
             if self.test_env.get('canonicalize_backslashes', False):
                 text = text.replace('\\', '/')
