@@ -720,9 +720,9 @@ package body Pp.Actions is
            when Ada_Exception_Decl =>
                  L ("?~,# ~~ ^: exception!", Aspects),
            when Ada_Generic_Package_Instantiation =>
-             L ("package ! is new !?[# (~,# ~)]~", Aspects),
+             L ("package ! is new !?[# (~,#1 ~)]~", Aspects),
            when Ada_Generic_Subp_Instantiation =>
-             L ("?~~ ~! ! is new !?[# (~,# ~)]~", Aspects),
+             L ("?~~ ~! ! is new !?[# (~,#1 ~)]~", Aspects),
            when Ada_Generic_Package_Decl =>
              L ("generic$",
                 "!",
