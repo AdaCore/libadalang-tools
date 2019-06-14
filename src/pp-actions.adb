@@ -20,7 +20,8 @@ with Unchecked_Deallocation;
 with GNAT.Lock_Files;
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
-with Langkit_Support.Slocs; use Langkit_Support;
+with Langkit_Support.Slocs;
+with Langkit_Support.Text;
 with Libadalang.Common; use Libadalang.Common;
 with LAL_Extensions; use LAL_Extensions;
 
@@ -54,6 +55,8 @@ package body Pp.Actions is
      Pp_String_Switches,
      Pp_Nat_Switches,
      Pp_String_Seq_Switches;
+
+   package Slocs renames Langkit_Support.Slocs;
 
    File_Name_File_Name : String_Access;
    --  There is a "file name file"; this is its name. ASIS_Processing writes
@@ -2113,6 +2116,11 @@ package body Pp.Actions is
    --  See also Libadalang.Debug.
    pragma Warnings (Off);
    pragma Style_Checks (Off);
+   function Par (X : Ada_Node) return Ada_Node is
+   begin
+      return Parent (X);
+   end Par;
+
    procedure knd (X : Ada_Node) is
       use Utils.Dbg_Out;
    begin
@@ -2276,22 +2284,22 @@ package body Pp.Actions is
          return                     W_Str;
       --  This handles casing of defining names and usage names, converting to
       --  the appropriate case based on command-line options. Kind is the kind of
-      --  declaration denoted by Id, or an attribute, or nil. Is_Predef is True if
-      --  Id denotes a predefined Ada or GNAT identifier.
+      --  declaration denoted by Id, or an attribute, or nil.
+      --
+      --  Is_Predef is True if Id is a usage name that denotes a predefined
+      --  entity. It is always False for defining names, pragmas, and aspects.
       --
       --  This is called early (during Subtree_To_Ada). Casing of reserved words
       --  is handled later, in a separate pass (see Keyword_Casing), because they
       --  are not explicit in the tree, except that operator symbols are handled
       --  here. All of the Str_Templates have reserved words in lower case.
       --
-      --  Id_With_Casing is used for Def_Names, Usage_Names and pragmas. For
-      --  Def_Names, the Kind comes from the Symbol_Table, which only works
-      --  because it's within one unit. That doesn't work for Usage_Names; we
-      --  use the Decl_Kind attribute, which includes declared entities and
-      --  attributes. For pragmas, we use the Kind of the pragma node.
-      --
-      --  Is_Predef is True if Id is a usage name that denotes a predefined
-      --  entity. It is always False for defining names and pragmas.
+      --  Id_With_Casing is used for Def_Names, Usage_Names, pragmas, and
+      --  aspects. For Def_Names, the Kind comes from the Symbol_Table, which
+      --  only works because it's within one unit. That doesn't work for
+      --  Usage_Names; we use the Decl_Kind attribute, which includes declared
+      --  entities and attributes. For pragmas, we use the Kind of the pragma
+      --  node.
 
       function Init_Use_Dictionary return Boolean;
       function Init_Use_Dictionary return Boolean is
@@ -4320,6 +4328,45 @@ package body Pp.Actions is
          --  we don't need to know what it denotes to use the
          --  right case.
 
+         function Is_Predef
+           (Is_Def_Name : Boolean; Decl : Basic_Decl) return Boolean;
+         --  Return True iff Decl is predefined (is Standard, or is declared
+         --  immediately within Standard, or is declared within Ada, System,
+         --  Interfaces, or GNAT). Always False if Is_Def_Name.
+
+         function Is_Predef
+           (Is_Def_Name : Boolean; Decl : Basic_Decl) return Boolean
+         is
+            use Langkit_Support.Text;
+         begin
+            if Is_Def_Name or else Decl.Is_Null then
+               return False;
+            end if;
+
+            --  ???P_Fully_Qualified_Name_Array sometimes goes into an infinite
+            --  recursion for the following node kinds. Work around this bug
+            --  until it gets fixed in libadalang.
+
+            if Decl.Kind in Ada_Single_Task_Type_Decl |
+              Ada_Entry_Decl |
+              Ada_Param_Spec |
+              Ada_Incomplete_Tagged_Type_Decl |
+              Ada_Discriminant_Spec
+            then
+               return False;
+            end if;
+
+            declare
+               Full : constant Unbounded_Text_Type_Array :=
+                 P_Fully_Qualified_Name_Array (Decl);
+               First : constant Text_Type :=
+                 (if Full'Length = 0 then "" else To_Text (Full (1)));
+            begin
+               return First in
+                 "standard" | "ada" | "system" | "interfaces" | "gnat";
+            end;
+         end Is_Predef;
+
          function Denoted_Decl (Id : Base_Id) return Basic_Decl is
          begin
             return Id.P_Referenced_Decl;
@@ -4360,20 +4407,24 @@ package body Pp.Actions is
          end Denoted_Def_Name;
 
          procedure Do_Def_Or_Usage_Name is
-            Def : constant Boolean := Is_Def_Name (Tree.As_Base_Id);
+            Id : constant Base_Id := Tree.As_Base_Id;
+            Is_Def_Name : constant Boolean :=
+              Id.Parent.Kind = Ada_Defining_Name;
 
             Decl : constant Basic_Decl :=
-              (if Def then Tree.Parent.As_Basic_Decl
+              (if Is_Def_Name then P_Basic_Decl (Tree.Parent.As_Defining_Name)
                elsif Arg (Cmd, Syntax_Only) then No_Basic_Decl
-               else Denoted_Decl (Tree.As_Base_Id));
-            Def_Name : constant Base_Id :=
-              Denoted_Def_Name (Decl, Tree.As_Base_Id);
-            pragma Assert (if Def then Def_Name = Tree.As_Base_Id);
+               else Denoted_Decl (Id));
+
+            Def_Name : constant Base_Id := Denoted_Def_Name (Decl, Id);
+            pragma Assert (if Is_Def_Name then Def_Name = Id);
+
             K : constant Ada_Node_Kind_Type :=
               (if Decl.Is_Null then Null_Kind else Decl.Kind);
             With_Casing : constant W_Str :=
-                Id_With_Casing (Id_Name (Def_Name), Kind => K, Is_Predef => False);
-            --  ???Is_Predef is wrong.
+              Id_With_Casing
+                (Id_Name (Def_Name), Kind => K,
+                 Is_Predef => Is_Predef (Is_Def_Name, Decl));
          begin
             Append_And_Put (New_Tokns, Ident, W_Intern (With_Casing));
          end Do_Def_Or_Usage_Name;

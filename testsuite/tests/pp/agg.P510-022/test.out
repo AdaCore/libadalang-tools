@@ -33,14 +33,14 @@ END CC;
 ----------------
 src_d/d.ads
 package D is
-  I : INTEGER;
-  F : FLOAT;
+  I : Integer;
+  F : Float;
 end D;
 ----------------
 src_d/dd.ads
 package DD is
-  I : INTEGER;
-  F : FLOAT;
+  I : Integer;
+  F : Float;
 
-  A : array (1 .. 10) of INTEGER;
+  A : array (1 .. 10) of Integer;
 end DD;

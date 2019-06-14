@@ -4,18 +4,18 @@ procedure test_main is
    -- output of gnat pp, in two versions ...
 
    -- what a nice type!
-   type my_animal_1 is
-     (dog, -- very long test documentation with much characters, which build words that hopefully make sense
+   type My_Animal_1 is
+     (DOG, -- very long test documentation with much characters, which build words that hopefully make sense
    -- together
-      cat, -- test docu
-      cow -- test docu
+      CAT, -- test docu
+      COW -- test docu
       );
 
    -- what a nice type!
-   type my_animal_2 is
-     (dog, -- very long test documentation with much characters, which build words that hopefully make sense together
-      cat, -- test docu
-      cow -- test docu
+   type My_Animal_2 is
+     (DOG, -- very long test documentation with much characters, which build words that hopefully make sense together
+      CAT, -- test docu
+      COW -- test docu
       );
 
    --!pp off

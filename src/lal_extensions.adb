@@ -164,13 +164,6 @@ package body LAL_Extensions is
       return To_Lower (Full_Name (Nm));
    end L_Full_Name;
 
-   function Is_Def_Name (Node : Base_Id'Class) return Boolean is
-   begin
-      return Node.Parent.Kind in Ada_Basic_Decl
-        and then (for some Id of Node.Parent.As_Basic_Decl.P_Defining_Names =>
-                  Node = Id);
-   end Is_Def_Name;
-
    function Get_Def_Name (Decl : Ada_Node'Class) return Defining_Name is
    begin
       case Kind (Decl) is

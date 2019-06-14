@@ -1,20 +1,20 @@
 procedure TEST is
    procedure PROCEDURE_NAME
-     (PARAM1 : in INTEGER;
-      PARAM2 : in INTEGER;
-      PARAM3 : in INTEGER);
+     (PARAM1 : in Integer;
+      PARAM2 : in Integer;
+      PARAM3 : in Integer);
    procedure PROCEDURE_NAME
-     (PARAM1 : in INTEGER;
-      PARAM2 : in INTEGER;
-      PARAM3 : in INTEGER)
+     (PARAM1 : in Integer;
+      PARAM2 : in Integer;
+      PARAM3 : in Integer)
    is
    begin
       null;
    end PROCEDURE_NAME;
    type T is record
-      FIELD1 : INTEGER;
-      FIELD2 : INTEGER;
-      FIELD3 : INTEGER;
+      FIELD1 : Integer;
+      FIELD2 : Integer;
+      FIELD3 : Integer;
    end record;
    Variable : T :=
      (FIELD1 => 1,
@@ -25,7 +25,7 @@ begin
      (PARAM1 => 1,
       PARAM2 => 2,
       PARAM3 => 3);
-   VARIABLE :=
+   Variable :=
      (FIELD1 => 1,
       FIELD2 => 2,
       FIELD3 => 3);
