@@ -1,0 +1,12 @@
+WITH System.Multiprocessors.Dispatching_Domains;
+PACKAGE p IS
+   TASK t IS
+      ENTRY set (core_affinity : IN Natural; success : OUT Boolean);
+   END t;
+END p;
+WITH System.Multiprocessors.Dispatching_Domains;
+PACKAGE p IS
+   TASK t IS
+      ENTRY set (core_affinity : IN Natural; success : OUT Boolean);
+   END t;
+END p;
