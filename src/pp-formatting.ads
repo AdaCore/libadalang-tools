@@ -255,12 +255,6 @@ package Pp.Formatting is
       --  be switched to use New_Tokns instead. In any case, both Out_Tokns and
       --  Saved_New_Tokns are temps, used only within a phase, and should be
       --  empty between phases.
-
-      --  Debugging:
-
-      Check_Whitespace : Boolean := True;
-      --  Used during the Subtree_To_Ada phase. True except within comments and
-      --  literals. Check for two blanks in a row.
    end record; -- Lines_Data_Rec
    type Lines_Data_Ptr is access all Lines_Data_Rec;
 

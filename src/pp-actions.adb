@@ -396,7 +396,6 @@ package body Pp.Actions is
    Tabs : Tab_Vector renames Lines_Data.Tabs;
    Src_Tokns : Scanner.Tokn_Vec renames Lines_Data.Src_Tokns;
    New_Tokns : Scanner.Tokn_Vec renames Lines_Data.New_Tokns;
-   Check_Whitespace : Boolean renames Lines_Data.Check_Whitespace;
 
    procedure Tree_To_Ada_2
      (Root      : Ada_Node;
@@ -1620,10 +1619,11 @@ package body Pp.Actions is
             Call_Alt => L ("!?[# (~,#1 ~)]~"),
             Par_Threshold_Alt => L ("?[$(~;$~)]~"),
             Par_Alt => L ("?[# (~;#1 ~)]~"),
-            Spec_Threshold_Alt => L ("!? ~~~?~~~?[$ return] ~~~"),
+            Spec_Threshold_Alt => L ("!? ~~~?~~~?[*$0 return_] ~~~"),
             Spec_Alt => L ("!? ~~~?~~~?[*#+2 return_] ~~~"),
-            --  The above is the only place "one space in/outdent" is used (the
-            --  "*" and "_" characters). This is to deal with something like:
+            --  The above two are the only templates that use "one space
+            --  in/outdent" (the "*" and "_" characters). This is to deal
+            --  with something like:
             --
             --     function Some_Function
             --       (A_Parameter       : A_Parameter_Type;
@@ -3946,9 +3946,6 @@ package body Pp.Actions is
          --  Start of processing for Do_Literal
 
          begin
-            pragma Assert (Check_Whitespace);
-            Check_Whitespace := False;
-
             --  In most cases, we simply print out S. All of the complicated code
             --  below is for the --decimal-grouping and --based-grouping
             --  switches. If --decimal-grouping was used to specify a nonzero
@@ -4017,8 +4014,6 @@ package body Pp.Actions is
 
                when others => raise Program_Error;
             end case;
-
-            Check_Whitespace := True;
          end Do_Literal;
 
          procedure Do_Label is
@@ -4601,7 +4596,6 @@ package body Pp.Actions is
 
          Indent (Arg (Cmd, Initial_Indentation));
 
-         pragma Assert (Check_Whitespace);
          Subtree_To_Ada (Tree, Cur_Level => 1, Index_In_Parent => 1);
 
          --  In Partial mode, we might need to add a line break. Same for
