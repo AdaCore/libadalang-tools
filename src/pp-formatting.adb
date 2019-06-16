@@ -743,6 +743,16 @@ package body Pp.Formatting is
       --  Move forward in Buf, up to the given position, ignoring the
       --  characters.
 
+      procedure Indent_Pp_Off (Src_Tok, Out_Tok : Tokn_Cursor) with
+        Pre => Kind (Src_Tok) = Kind (Out_Tok)
+          and then Kind (Src_Tok) in Pp_Off_Comment | End_Of_Input
+          and then Kind (Out_Tok) in Pp_Off_Comment | End_Of_Input;
+      --  This is called just after copying Spaces from Out_Buf, and just
+      --  before copying Pp_Off_Comment from Src_Buf. This appends additional
+      --  spaces to New_Buf so the Pp_Off_Comment will be indented as it was in
+      --  Src_Buf. We don't need any such adjustment for Pp_On_Comment, because
+      --  indentation preceding those is copied from Src_Buf.
+
       procedure Get_Next_Off_On
         (Tok : in out Tokn_Cursor;
          Expect : Pp_Off_On_Comment) is
@@ -772,6 +782,14 @@ package body Pp.Formatting is
          end loop;
       end Skip;
 
+      procedure Indent_Pp_Off (Src_Tok, Out_Tok : Tokn_Cursor) is
+      begin
+         if Kind (Out_Tok) = Pp_Off_Comment then
+            Insert (New_Buf,
+                    (Sloc_Col (Out_Tok) .. Sloc_Col (Src_Tok) - 1 => ' '));
+         end if;
+      end Indent_Pp_Off;
+
       Ignored : Boolean := Get_Tokns (Out_Buf, Out_Tokns);
       Src_Tok : Tokn_Cursor := First (Src_Tokns'Access);
       Out_Tok : Tokn_Cursor := First (Out_Tokns'Access);
@@ -799,17 +817,19 @@ package body Pp.Formatting is
 
       loop
          Get_Next_Off_On (Out_Tok, Expect => Pp_Off_Comment);
-         Copy (Out_Buf, Up_To => Next_Sloc_First (Prev (Out_Tok)));
          Get_Next_Off_On (Src_Tok, Expect => Pp_Off_Comment);
+         Copy (Out_Buf, Up_To => Next_Sloc_First (Prev (Out_Tok)));
          Skip (Src_Buf, Up_To => Next_Sloc_First (Prev (Src_Tok)));
 
          pragma Assert
            ((Kind (Out_Tok) = End_Of_Input) = (Kind (Src_Tok) = End_Of_Input));
          exit when Kind (Out_Tok) = End_Of_Input;
 
+         Indent_Pp_Off (Src_Tok, Out_Tok);
+
          Get_Next_Off_On (Src_Tok, Expect => Pp_On_Comment);
-         Copy (Src_Buf, Up_To => Next_Sloc_First (Src_Tok));
          Get_Next_Off_On (Out_Tok, Expect => Pp_On_Comment);
+         Copy (Src_Buf, Up_To => Next_Sloc_First (Src_Tok));
          Skip (Out_Buf, Up_To => Next_Sloc_First (Out_Tok));
 
          pragma Assert
