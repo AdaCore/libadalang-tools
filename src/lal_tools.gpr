@@ -8,10 +8,11 @@ project LAL_Tools is
    for Object_Dir use "../obj";
 
    for Excluded_Source_Files use
-     ("utils-var_length_ints-test.adb",
-      "pp-main.adb",
+     ("pp-main.adb",
       "metrics-main.adb",
-      "stub-main.adb");
+      "stub-main.adb",
+      "test-main.adb",
+      "utils-var_length_ints-test.adb");
 
    package Compiler is
       case Build_Mode is
