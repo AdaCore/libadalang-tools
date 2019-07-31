@@ -2,8 +2,9 @@ with Libadalang.Analysis; use Libadalang.Analysis;
 with Utils.Command_Lines; use Utils.Command_Lines;
 with Utils.Tools;         use Utils.Tools;
 
-private with Test.Command_Lines;
-pragma Unreferenced (Test.Command_Lines); -- ????
+pragma Warnings (Off); -- ????
+private with Test.Command_Lines; -- ????might want this here, or in body
+pragma Warnings (On);
 
 package Test.Actions is
 
