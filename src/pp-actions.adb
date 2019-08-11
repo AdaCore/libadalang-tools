@@ -604,11 +604,9 @@ package body Pp.Actions is
         (case Kind is
            when Ada_Discrete_Base_Subtype_Decl => null,
            when Ada_Discrete_Subtype_Name => null,
-           when Ada_Unconstrained_Array_Index => null,
            when Ada_Contract_Case_Assoc => null,
            when Ada_Contract_Cases => null,
            when Ada_Multi_Dim_Array_Assoc => null,
-           when Ada_Unconstrained_Array_Indices => null,
            when Ada_Error_Decl => null,
            when Ada_Error_Stmt => null,
            when Ada_Enum_Subp_Spec => null,
@@ -620,8 +618,11 @@ package body Pp.Actions is
            when Ada_Subp_Spec => null,
            when Ada_Aggregate_Assoc => null,
 
-           when Ada_Constrained_Array_Indices =>
+           when Ada_Constrained_Array_Indices |
+             Ada_Unconstrained_Array_Indices =>
              L ("(?~,# ~~)"),
+           when Ada_Unconstrained_Array_Index =>
+             L ("! range <>"),
            when Ada_Aspect_Assoc =>
              L ("!? ^=> ~~~"),
            when Ada_At_Clause =>
@@ -2001,6 +2002,9 @@ package body Pp.Actions is
          Replace_Tmp
            (Ada_Constrained_Array_Indices,
             "(?~,# ~~)", "?{{ (~,# ~)}}~");
+         Replace_Tmp
+           (Ada_Unconstrained_Array_Indices,
+            "(?~,# ~~)", "?{{ (~,# ~)}}~");
          --  Note the double indentation. It just happens that 3 more
          --  characters place us just after "array ". Perhaps we should
          --  use the Paren_Stack mechanism in PP.Formatting.
@@ -2084,6 +2088,7 @@ package body Pp.Actions is
                              Ada_Generic_Formal_Part |
                              Ada_Array_Type_Def |
                              Ada_Constrained_Array_Indices |
+                             Ada_Unconstrained_Array_Indices |
 
                              Ada_Case_Stmt_Alternative |
                              Ada_Case_Expr_Alternative |
@@ -4439,11 +4444,9 @@ package body Pp.Actions is
 
          case Tree.Kind is
             when Ada_Discrete_Subtype_Name |
-              Ada_Unconstrained_Array_Index |
               Ada_Contract_Case_Assoc |
               Ada_Contract_Cases |
-              Ada_Multi_Dim_Array_Assoc |
-              Ada_Unconstrained_Array_Indices =>
+              Ada_Multi_Dim_Array_Assoc =>
                raise Program_Error with Short_Image (Tree) & " encountered";
                --  ???The above are not used
 
@@ -4521,31 +4524,6 @@ package body Pp.Actions is
 
             when Ada_Type_Decl =>
                Do_Type_Decl;
-
-            when Ada_Constrained_Array_Indices =>
-               declare
-                  SI : constant Ada_Tree :=
-                    Subtree (Tree.As_Constrained_Array_Indices.F_List, 1);
-               begin
-                  if Kind (SI) = Ada_Subtype_Indication then
-                     declare
-                        C : constant Constraint :=
-                          SI.As_Subtype_Indication.F_Constraint;
-                     begin
-                        if Present (C)
-                          and then Kind (C) = Ada_Range_Constraint
-                          and then Kind (C.As_Range_Constraint.F_Range) =
-                            Ada_Box_Expr
-                        then
-                           Interpret_Alt_Template (Boxy_Constrained_Alt);
-                           goto Done_Constrained_Array_Indices;
-                        end if;
-                     end;
-                  end if;
-               end;
-               Interpret_Template;
-
-               <<Done_Constrained_Array_Indices>>
 
             when Ada_Select_When_Part =>
                Do_Select_When_Part;
