@@ -1,4 +1,3 @@
-with Libadalang;        use Libadalang;
 with Libadalang.Common; use Libadalang.Common;
 
 with Utils.Vectors;

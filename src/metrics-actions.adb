@@ -12,7 +12,6 @@ with GNAT.OS_Lib; use GNAT.OS_Lib;
 with GNATCOLL.VFS;
 with GNATCOLL.Projects;
 
-with Libadalang;     use Libadalang;
 with LAL_Extensions; use LAL_Extensions;
 
 with Utils.Command_Lines.Common; use Utils; use Utils.Command_Lines.Common;

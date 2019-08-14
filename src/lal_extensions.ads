@@ -1,6 +1,5 @@
 with Langkit_Support.Text; use Langkit_Support.Text;
 
-with Libadalang; use Libadalang;
 with Libadalang.Analysis; use Libadalang.Analysis;
 with Libadalang.Common; use Libadalang.Common;
 

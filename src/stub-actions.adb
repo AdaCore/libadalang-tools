@@ -16,9 +16,8 @@ with GNATCOLL.Projects;
 with Langkit_Support.Diagnostics;
 with Langkit_Support.Slocs;
 with Langkit_Support.Text;
-with Libadalang;            use Libadalang;
-with Libadalang.Common;     use Libadalang.Common;
-with LAL_Extensions;        use LAL_Extensions;
+with Libadalang.Common; use Libadalang.Common;
+with LAL_Extensions;    use LAL_Extensions;
 
 with Utils_Debug; use Utils_Debug;
 
@@ -34,6 +33,7 @@ with Pp.Actions;
 with Pp.Command_Lines;
 
 package body Stub.Actions is
+
    use Utils.Char_Vectors.Char_Vectors;
 
    function Image (X : Integer) return String
@@ -1003,7 +1003,7 @@ package body Stub.Actions is
          if Has_Diagnostics (Out_Unit) then
             if Assert_Enabled then
                Text_IO.Put_Line ("Errors while parsing """ & Out_Str & """");
-               for D of Analysis.Diagnostics (Out_Unit) loop
+               for D of Libadalang.Analysis.Diagnostics (Out_Unit) loop
                   Text_IO.Put_Line
                     (Langkit_Support.Diagnostics.To_Pretty_String (D));
                end loop;

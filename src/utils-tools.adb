@@ -3,7 +3,6 @@ with GNAT.OS_Lib;
 
 with Langkit_Support.Diagnostics;
 
-with Libadalang;                  use Libadalang;
 with Libadalang.Iterators;        use Libadalang.Iterators;
 with Libadalang.Project_Provider; use Libadalang.Project_Provider;
 
