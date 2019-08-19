@@ -130,7 +130,7 @@ package body Stub.Actions is
      Langkit_Support.Text.To_Unbounded_Text ("elaborate_body");
 
    function Has_Elaborate_Body (N : Ada_Node) return Boolean is
-     (not P_Get_Attribute (N.As_Basic_Decl, Elaborate_Body).Is_Null);
+     (Exists (P_Get_Aspect (N.As_Basic_Decl, Elaborate_Body)));
 
    ----------
    -- Init --
