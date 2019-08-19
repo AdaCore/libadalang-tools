@@ -19,8 +19,9 @@ Build
 -----
 
 In order to build these tools, first build and install
-[Libadalang](https://github.com/AdaCore/libadalang/). Then, just run from this
-directory:
+[Libadalang](https://github.com/AdaCore/libadalang/). Note that in order to
+build this repository's `master` branch, you should use Libadalang and
+Langkit's `stable` branches. Then, just run from this directory:
 
 ```sh
 make
