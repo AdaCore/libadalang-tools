@@ -1,13 +1,39 @@
+------------------------------------------------------------------------------
+--                                                                          --
+--                           GNATTEST COMPONENTS                            --
+--                                                                          --
+--                     G N A T T E S T . A C T I O N S                      --
+--                                                                          --
+--                                 B o d y                                  --
+--                                                                          --
+--                       Copyright (C) 2019, AdaCore                        --
+--                                                                          --
+-- GNATTEST  is  free  software;  you  can redistribute it and/or modify it --
+-- under terms of the  GNU  General Public License as published by the Free --
+-- Software  Foundation;  either  version  2, or (at your option) any later --
+-- version.  GNATTEST  is  distributed  in the hope that it will be useful, --
+-- but  WITHOUT  ANY  WARRANTY;   without  even  the  implied  warranty  of --
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General --
+-- Public License for more details.  You should have received a copy of the --
+-- GNU  General  Public License distributed with GNAT; see file COPYING. If --
+-- not, write to the  Free  Software  Foundation, 51 Franklin Street, Fifth --
+-- Floor, Boston, MA 02110-1301, USA.,                                      --
+--                                                                          --
+-- GNATTEST is maintained by AdaCore (http://www.adacore.com).              --
+--                                                                          --
+------------------------------------------------------------------------------
+
 with Ada.Containers; use type Ada.Containers.Count_Type;
 with Interfaces; use type Interfaces.Unsigned_16;
 
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
-with GNATCOLL.VFS;
+with GNATCOLL.VFS; use GNATCOLL.VFS;
 with GNATCOLL.Projects;
+with GNATCOLL.Traces;
 
 with Libadalang;     use Libadalang;
-with LAL_Extensions; use LAL_Extensions;
+--  with LAL_Extensions; use LAL_Extensions;
 
 with Utils.Command_Lines.Common; use Utils; use Utils.Command_Lines.Common;
 pragma Unreferenced (Utils.Command_Lines.Common); -- ????
@@ -16,6 +42,16 @@ with Utils.Formatted_Output;
 with Utils_Debug; use Utils_Debug;
 
 with Test.Command_Lines; use Test.Command_Lines;
+
+with Test.Skeleton;
+with Test.Harness;
+with Test.Mapping;
+with Test.Common;
+with Test.Skeleton.Source_Table;
+
+with Ada.Directories; use Ada.Directories;
+with Utils.Projects; use Utils.Projects;
+with GNAT.Directory_Operations;
 
 package body Test.Actions is
 
@@ -42,53 +78,95 @@ package body Test.Actions is
    procedure Init
      (Tool : in out Test_Tool; Cmd : in out Command_Line)
    is
-      pragma Unreferenced (Tool); -- ????
+      Tmp : GNAT.OS_Lib.String_Access;
    begin
-      null; -- ????
+      GNATCOLL.Traces.Parse_Config_File;
 
-      --  Here's some code to illustrate how to query the args. The parsed
-      --  comand line (including stuff from project files) is passed as Cmd.
-      --  Call "Arg (Cmd, <switch_name>)" to get the value specified for the
-      --  switch.
+      --  We need to fill a local source table since gnattest actually needs
+      --  info not only on current source but on any particular one or even
+      --  all of them at once.
 
-      --  First, a Boolean one: "Arg (Cmd, Strict)" will return True if
-      --  --strict appears on the command line or in a project file. It
-      --  defaults to False (see Test.Command_Line).
+      declare
+         --  For now repeating code from Utils.Drivers to get rid of ignored
+         --  files, this should be optimized.
+         use Test.Common.String_Set;
 
-      --  You have to "use" all the "..._Switches" packages. Otherwise, you get
-      --  incomprehensible error messages about "Arg" not resolving. "Arg" is
-      --  heavily overloaded. If a "use" is missing, the compiler doesn't
-      --  say "use Test_Boolean_Switches is missing". It says, "Here's 37
-      --  different Arg functions with the wrong parameter types."
+         procedure Include_One (File_Name : String);
+         --  Include File_Name in the Ignored set below
 
-      if Arg (Cmd, Strict) then
-         Put ("--strict\n");
-      else
-         Put ("--no-strict\n");
-      end if;
+         Ignored : Test.Common.String_Set.Set;
+         --  Set of file names mentioned in the --ignore=... switch
 
+         procedure Include_One (File_Name : String) is
+         begin
+            Include (Ignored, File_Name);
+         end Include_One;
+      begin
+
+         for Ignored_Arg of Arg (Cmd, Ignore) loop
+            Read_File_Names_From_File (Ignored_Arg.all, Include_One'Access);
+         end loop;
+
+         for File of File_Names (Cmd) loop
+            if not Contains (Ignored, Simple_Name (File.all)) then
+               Test.Skeleton.Source_Table.Add_Source_To_Process (File.all);
+            end if;
+         end loop;
+      end;
+
+      Test.Common.Source_Project_Tree :=
+        GNATCOLL.Projects.Project_Tree (Tool.Project_Tree.all);
+      Test.Skeleton.Source_Table.Set_Direct_Output;
+
+      --  Processing harness dir specification
       --  --harness-dir is a string switch, so Arg returns null or a pointer to
       --  the specified string.
 
-      if Arg (Cmd, Harness_Dir) = null then
-         Put ("--harness-dir not specified\n");
+      if Arg (Cmd, Harness_Dir) /= null then
+         Free (Test.Common.Harness_Dir_Str);
+         if
+           Is_Absolute_Path (GNATCOLL.VFS.Create (+Arg (Cmd, Harness_Dir).all))
+         then
+            Test.Common.Harness_Dir_Str :=
+              new String'(Arg (Cmd, Harness_Dir).all);
+         else
+            Test.Common.Harness_Dir_Str := new String'
+              (Tool.Project_Tree.Root_Project.Object_Dir.Display_Full_Name
+               & Arg (Cmd, Harness_Dir).all);
+         end if;
       else
-         Put ("--harness-dir = \1\n", Arg (Cmd, Harness_Dir).all);
+         Tmp := new String'
+           (Tool.Project_Tree.Root_Project.Object_Dir.Display_Full_Name
+            & Test.Common.Harness_Dir_Str.all);
+         Free (Test.Common.Harness_Dir_Str);
+         Test.Common.Harness_Dir_Str := Tmp;
       end if;
 
-      --  --additional-tests is a string sequence, so it can be given multiple
-      --  times on the command line, and Arg returns an array of pointers to
-      --  strings.
+      if Is_Regular_File (Test.Common.Harness_Dir_Str.all) then
+         Cmd_Error_No_Help ("gnattest: cannot create harness directory");
+      elsif not Is_Directory (Test.Common.Harness_Dir_Str.all) then
 
-      declare
-         Additional : constant String_Ref_Array := Arg (Cmd, Additional_Tests);
-      begin
-         Put ("Additional_Tests:\n");
-         for X of Additional loop
-            Put ("    \1\n", X.all);
-         end loop;
-         Put ("end Additional_Tests\n");
-      end;
+         declare
+            Dir : File_Array_Access;
+         begin
+            Append
+              (Dir, GNATCOLL.VFS.Create (+Test.Common.Harness_Dir_Str.all));
+            Test.Common.Create_Dirs (Dir);
+         exception
+            when GNAT.Directory_Operations.Directory_Error =>
+               Cmd_Error_No_Help ("gnattest: cannot create harness directory");
+         end;
+
+      end if;
+
+      Tmp := new String'(Normalize_Pathname
+        (Name           => Test.Common.Harness_Dir_Str.all,
+         Case_Sensitive => False));
+      Free (Test.Common.Harness_Dir_Str);
+      Test.Common.Harness_Dir_Str :=
+        new String'(Tmp.all & Directory_Separator);
+      Free (Tmp);
+
    end Init;
 
    -----------
@@ -97,7 +175,18 @@ package body Test.Actions is
 
    procedure Final (Tool : in out Test_Tool; Cmd : Command_Line) is
    begin
-      null; -- ????
+      if not Arg (Cmd, Harness_Only) then
+         Test.Skeleton.Generate_Project_File
+           (Tool.Project_Tree.Root_Project.Project_Path.Display_Full_Name);
+         Test.Common.Generate_Common_File;
+
+         Test.Harness.Test_Runner_Generator
+           (Tool.Project_Tree.Root_Project.Project_Path.Display_Full_Name);
+         Test.Harness.Project_Creator
+           (Tool.Project_Tree.Root_Project.Project_Path.Display_Full_Name);
+
+         Test.Mapping.Generate_Mapping_File;
+      end if;
    end Final;
 
    ---------------------
@@ -114,15 +203,13 @@ package body Test.Actions is
    is
       pragma Unreferenced (Tool, Input, BOM_Seen); -- ????
    begin
-      Put ("gnattest is processing \1.\n", File_Name);
-      Dump_Cmd (Cmd);
-
       if Debug_Flag_V then
          Print (Unit);
          Put ("With trivia\n");
          PP_Trivia (Unit);
       end if;
-      null; -- ????
+
+      Test.Skeleton.Process_Source (Unit);
    end Per_File_Action;
 
    ---------------
