@@ -15,7 +15,7 @@ project Build is
      ("pp-main.adb",
       "metrics-main.adb",
       "stub-main.adb",
---      "test-main.adb",
+      "test-main.adb",
       "utils-var_length_ints-test.adb");
 
    --  ???test-main.adb (gnattest) is temporarily commented out because
@@ -27,7 +27,7 @@ project Build is
       for Executable ("pp-main.adb") use "gnatpp";
       for Executable ("metrics-main.adb") use "gnatmetric";
       for Executable ("stub-main.adb") use "gnatstub";
---      for Executable ("test-main.adb") use "gnattest";
+      for Executable ("test-main.adb") use "gnattest";
    end Builder;
 
    package Binder is
