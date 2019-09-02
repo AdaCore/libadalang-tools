@@ -17,7 +17,10 @@ class Testsuite(BaseTestsuite):
 
     def add_options(self):
         self.main.add_option(
-            '--fold-casing', action='store_true',
+            '--no-wip', action='store_true', default=False,
+            help='Do not run tests for work-in-progress (WIP) programs')
+        self.main.add_option(
+            '--fold-casing', action='store_true', default=False,
             help='Ignore casing in testcase outputs')
         self.main.add_option(
             '--valgrind', action='store_true', default=False,

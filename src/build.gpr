@@ -1,25 +1,27 @@
 with "lal_tools.gpr";
 project Build is
 
+   type Tools_Set_Type is ("all", "no-wip");
+   Tools_Set : Tools_Set_Type := external ("LALTOOLS_SET", "all");
+
+   Tools_Mains :=
+     ("pp-main.adb",
+      "metrics-main.adb",
+      "stub-main.adb",
+      "utils-var_length_ints-test.adb");
+   case Tools_Set is
+      when "all" =>
+         Tools_Mains := Tools_Mains & ("test-main.adb");
+      when others =>
+         null;
+   end case;
+
    for Source_Dirs use (".");
    for Object_Dir use "../obj";
    for Exec_Dir use "../bin";
-   for Source_Files use
-     ("pp-main.adb",
-      "metrics-main.adb",
-      "stub-main.adb",
---      "test-main.adb",
-      "utils-var_length_ints-test.adb");
+   for Source_Files use Tools_Mains;
 
-   for Main use
-     ("pp-main.adb",
-      "metrics-main.adb",
-      "stub-main.adb",
---      "test-main.adb",
-      "utils-var_length_ints-test.adb");
-
-   --  ???test-main.adb (gnattest) is temporarily commented out because
-   --  it doesn't link on Darwin (undefined symbols).
+   for Main use Tools_Mains;
 
    package Compiler renames LAL_Tools.Compiler;
 
@@ -27,7 +29,7 @@ project Build is
       for Executable ("pp-main.adb") use "gnatpp";
       for Executable ("metrics-main.adb") use "gnatmetric";
       for Executable ("stub-main.adb") use "gnatstub";
---      for Executable ("test-main.adb") use "gnattest";
+      for Executable ("test-main.adb") use "gnattest";
    end Builder;
 
    package Binder is

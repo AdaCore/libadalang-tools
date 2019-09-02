@@ -3,14 +3,19 @@
 
 BUILD_MODE ?= dev
 LIBRARY_TYPE ?= static
+LALTOOLS_SET ?= all
 PROCESSORS ?= 0
 
 .PHONY: all
 all:
 	which gprbuild
 	which gcc
-	gprbuild -v -k -XLIBRARY_TYPE=$(LIBRARY_TYPE) -XXMLADA_BUILD=$(LIBRARY_TYPE) \
-		-XBUILD_MODE=$(BUILD_MODE) -P src/build.gpr -p -j$(PROCESSORS)
+	gprbuild -v -k \
+	   -XLIBRARY_TYPE=$(LIBRARY_TYPE) \
+	   -XXMLADA_BUILD=$(LIBRARY_TYPE) \
+	   -XBUILD_MODE=$(BUILD_MODE) \
+	   -XLALTOOLS_SET=$(LALTOOLS_SET) \
+	   -P src/build.gpr -p -j$(PROCESSORS)
 
 .PHONY: test
 test: all

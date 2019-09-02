@@ -58,8 +58,39 @@ class BaseDriver(TestDriver):
 
     TIMEOUT = None
 
+    # Name of test directories for tools that are considered work in progress
+    WIP_TOOLS = {'test'}
+
+    # Name of test directories for all tools
+    ALL_TOOLS = {'pp', 'metric', 'stub'} | WIP_TOOLS
+
+    @property
+    def tool_dirname(self):
+        """
+        Return the name of the per-tool directory for this testcase.
+
+        We are looking for any directory in the path whose name matches the
+        name of a tool (see ALL_TOOLS above).
+
+        :rtype: str
+        """
+        for name in self.test_env['test_name'].split('__'):
+            if name in self.ALL_TOOLS:
+                return name
+        raise SetupError('Cannot guess which tool is tested from test name')
+
     def tear_up(self):
         super(BaseDriver, self).tear_up()
+
+        # If we must not test the tool this testcase exercize, just skip it
+        if (
+            self.global_env['options'].no_wip and
+            self.tool_dirname in self.WIP_TOOLS
+        ):
+            self.skip_test = True
+            self.message = 'WIP tool'
+            return
+
         self.create_test_workspace()
 
         # Do a case insensitive subst, because gnatpp does not yet generate the
