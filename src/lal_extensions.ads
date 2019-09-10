@@ -120,8 +120,8 @@ package LAL_Extensions is
    --  Return F_Subp_Spec
 
    function Xref (Node : Ada_Node'Class) return Defining_Name;
-   --  Wrapper for P_Xref. Works for Identifiers and Dotted_Names, and returns
-   --  the denoted defining name.
+   --  Wrapper for P_Referenced_Decl. Works for Identifiers and Dotted_Names,
+   --  and returns the denoted defining name.
 
    function Adds_New_Nesting_Level (Node : Ada_Node) return Boolean;
    --  True if Node should be counted as a nesting level for the purposes of

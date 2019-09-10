@@ -385,7 +385,8 @@ package body LAL_Extensions is
    function Xref (Node : Ada_Node'Class) return Defining_Name is
    begin
       case Node.Kind is
-         when Ada_Identifier => return Node.As_Identifier.P_Xref;
+         when Ada_Identifier =>
+            return Node.As_Identifier.P_Referenced_Defining_Name;
          when Ada_Dotted_Name => return Xref (Node.As_Dotted_Name.F_Suffix);
          when others => raise Program_Error;
       end case;

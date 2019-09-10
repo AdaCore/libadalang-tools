@@ -3152,7 +3152,8 @@ package body METRICS.Actions is
             Exc : Defining_Name;
          begin
             begin
-               Exc := Node.As_Raise_Stmt.F_Exception_Name.P_Xref;
+               Exc := (Node.As_Raise_Stmt.F_Exception_Name
+                       .P_Referenced_Defining_Name);
             exception
                when Property_Error =>
                   --  If we can't find the exception declaration, return False
