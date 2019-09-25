@@ -618,6 +618,8 @@ package body Pp.Actions is
            when Ada_Subp_Spec => null,
            when Ada_Aggregate_Assoc => null,
 
+           when Ada_Entry_Completion_Formal_Params => L ("!"),
+
            when Ada_Constrained_Array_Indices |
              Ada_Unconstrained_Array_Indices =>
              L ("(?~,# ~~)"),
@@ -4138,8 +4140,7 @@ package body Pp.Actions is
             Is_Function : constant Boolean :=
               (if Is_Nil (Parent_Tree)
                  or else Parent_Tree.Kind in
-                   Ada_Entry_Spec | Ada_Entry_Body |
-                   Ada_Accept_Stmt | Ada_Accept_Stmt_With_Stmts
+                   Ada_Entry_Spec | Ada_Entry_Completion_Formal_Params
                  then False
                  else Present (Parent_Tree.As_Subp_Spec.F_Subp_Returns));
             Param_Count : Query_Count :=
@@ -4196,8 +4197,8 @@ package body Pp.Actions is
                       then Tree.As_Entry_Decl.F_Spec.F_Entry_Params.F_Params
                       else No_Param_Spec_List),
                  when Ada_Entry_Body =>
-                   (if Present (Tree.As_Entry_Body.F_Params)
-                      then Tree.As_Entry_Body.F_Params.F_Params
+                   (if Present (Tree.As_Entry_Body.F_Params.F_Params)
+                      then Tree.As_Entry_Body.F_Params.F_Params.F_Params
                       else No_Param_Spec_List),
                  when others =>
                    (if Present (F_Subp_Params (Spec))

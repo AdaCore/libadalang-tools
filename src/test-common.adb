@@ -520,7 +520,7 @@ package body Test.Common is
         P_Primitive_Subp_Of (As_Subp_Spec (Subp));
    begin
       for Owner of Primitive_Owners loop
-         if P_Is_Tagged_Type (F_Type_Def (As_Type_Decl (Owner))) then
+         if P_Is_Tagged_Type (As_Type_Decl (Owner)) then
             return Owner;
          end if;
       end loop;

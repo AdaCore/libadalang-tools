@@ -750,7 +750,7 @@ package body Test.Skeleton is
             return Into;
          end if;
 
-         if not Node.As_Type_Decl.F_Type_Def.P_Is_Tagged_Type then
+         if not Node.As_Type_Decl.P_Is_Tagged_Type then
             return Over;
          end if;
 
