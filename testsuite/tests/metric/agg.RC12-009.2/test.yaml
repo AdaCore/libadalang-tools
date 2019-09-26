@@ -2,3 +2,5 @@ description:
     gnatmetric test
 
 driver: shell_script
+control:
+    - [XFAIL, 'True', 'See S926-029']
