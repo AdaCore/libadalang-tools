@@ -2,3 +2,5 @@ description:
     gnatstub test
 
 driver: shell_script
+control:
+    - [XFAIL, 'True', 'See S925-019']
