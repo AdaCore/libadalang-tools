@@ -1155,6 +1155,8 @@ package body Pp.Scanner is
       end Scan_Comment;
 
       procedure Get_Tokn (Tok : out Token; Allow_Short_Fillable : Boolean) is
+         subtype Extended_Digit is W_Char with -- See RM-2.4.2(5)
+           Predicate => Extended_Digit in '0' .. '9' | 'A' .. 'F' | 'a' .. 'f';
       begin
          Tok.Sloc :=
            (Line   => Cur_Line,
@@ -1231,7 +1233,9 @@ package body Pp.Scanner is
                   case Lang is
                      when Template_Lang => null; -- we're done
                      when Ada_Lang =>
-                        if Cur in '#' | ':' then
+                        if Cur in '#' | ':'
+                          and then Buffers.Lookahead (Input) in Extended_Digit
+                        then
                            loop
                               Get;
 
