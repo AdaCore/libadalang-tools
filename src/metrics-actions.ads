@@ -170,7 +170,7 @@ private
 
       Comp_Unit : Metrix_Ref := null;
       --  The compilation unit in which this Metrix is nested.
-      --  Null for Metrix_Stack[1]. For Metrix_Stack[1], points
+      --  Null for Metrix_Stack[1]. For Metrix_Stack[2], points
       --  to itself.
 
       Vals : Metrics_Values := Initial_Metrics_Values;

@@ -77,13 +77,15 @@ package METRICS.Command_Lines is
       Lines_Eol_Comment,
       Lines_Ratio,
       Lines_Blank,
-      Lines_Average, -- global
+      Lines_Average,
       Lines_Spark, -- not included in Lines_All
       Lines_Code_In_Bodies, -- undocumented, not included in Lines_All
       Num_Bodies, -- undocumented
    --  Lines_Code_In_Bodies is the number of code lines in various
    --  bodies, and Num_Bodies is the number of various bodies. These
    --  are used to compute Lines_Average, as the ratio of these.
+   --  The Lines_Code_In_Bodies and Num_Bodies switches can be specified
+   --  explicitly, which is useful for debugging.
 
    --  Syntax element metrics options:
       Public_Types,

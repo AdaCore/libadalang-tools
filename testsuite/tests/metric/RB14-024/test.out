@@ -84,6 +84,7 @@ Coupling metrics:
       <metric name="eol_comments">0</metric>
       <metric name="comment_percentage">0.00</metric>
       <metric name="blank_lines">0</metric>
+      <metric name="average_lines_in_bodies">4.00</metric>
       <metric name="spark_lines">0</metric>
       <unit name="hello" kind="procedure body" line="1" col="1">
          <metric name="all_lines">4</metric>
@@ -119,6 +120,7 @@ Coupling metrics:
       <metric name="eol_comments">0</metric>
       <metric name="comment_percentage">0.00</metric>
       <metric name="blank_lines">0</metric>
+      <metric name="average_lines_in_bodies">0.00</metric>
       <metric name="spark_lines">0</metric>
       <unit name="p" kind="package" line="1" col="1">
          <metric name="contract">0</metric>
@@ -186,6 +188,8 @@ containing package p
   comment percentage  : 0.00
   blank lines         : 0
 
+Average lines in body: 0.00
+
 p (package - library item at lines  1: 3)
 
 === Code line metrics ===
@@ -226,6 +230,8 @@ containing procedure body hello
   end-of-line comments: 0
   comment percentage  : 0.00
   blank lines         : 0
+
+Average lines in body: 4.00
 
 hello (procedure body - library item at lines  1: 4)
 

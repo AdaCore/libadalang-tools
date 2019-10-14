@@ -19,6 +19,8 @@ containing package a1
   comment percentage  : 0.00
   blank lines         : 0
 
+Average lines in body: 0.00
+
 a1 (package - library item at lines  1: 3)
 
 === Code line metrics ===
@@ -37,6 +39,7 @@ a1 (package - library item at lines  1: 3)
       <metric name="eol_comments">0</metric>
       <metric name="comment_percentage">0.00</metric>
       <metric name="blank_lines">0</metric>
+      <metric name="average_lines_in_bodies">0.00</metric>
       <unit name="a1" kind="package" line="1" col="1">
          <metric name="all_lines">3</metric>
          <metric name="code_lines">3</metric>
@@ -75,6 +78,8 @@ containing package a
   comment percentage  : 0.00
   blank lines         : 2
 
+Average lines in body: 0.00
+
 a (package - library item at lines  1: 8)
 
 === Code line metrics ===
@@ -93,6 +98,7 @@ a (package - library item at lines  1: 8)
       <metric name="eol_comments">0</metric>
       <metric name="comment_percentage">0.00</metric>
       <metric name="blank_lines">2</metric>
+      <metric name="average_lines_in_bodies">0.00</metric>
       <unit name="a" kind="package" line="1" col="1">
          <metric name="all_lines">8</metric>
          <metric name="code_lines">6</metric>
@@ -154,6 +160,8 @@ containing package C
   comment percentage  : 0.00
   blank lines         : 1
 
+Average lines in body: 0.00
+
 C (package - library item at lines  1: 6)
 
 === Code line metrics ===
@@ -176,6 +184,8 @@ containing package CC
   comment percentage  : 0.00
   blank lines         : 2
 
+Average lines in body: 0.00
+
 CC (package - library item at lines  1: 8)
 
 === Code line metrics ===
@@ -196,6 +206,7 @@ c.obj/metrix.xml
       <metric name="eol_comments">0</metric>
       <metric name="comment_percentage">0.00</metric>
       <metric name="blank_lines">1</metric>
+      <metric name="average_lines_in_bodies">0.00</metric>
       <unit name="C" kind="package" line="1" col="1">
          <metric name="all_lines">6</metric>
          <metric name="code_lines">5</metric>
@@ -212,6 +223,7 @@ c.obj/metrix.xml
       <metric name="eol_comments">0</metric>
       <metric name="comment_percentage">0.00</metric>
       <metric name="blank_lines">2</metric>
+      <metric name="average_lines_in_bodies">0.00</metric>
       <unit name="CC" kind="package" line="1" col="1">
          <metric name="all_lines">8</metric>
          <metric name="code_lines">6</metric>

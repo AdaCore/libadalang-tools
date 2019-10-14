@@ -51,6 +51,7 @@ ignore-assertions
       <metric name="eol_comments">0</metric>
       <metric name="comment_percentage">0.00</metric>
       <metric name="blank_lines">4</metric>
+      <metric name="average_lines_in_bodies">6.00</metric>
       <metric name="spark_lines">0</metric>
       <unit name="Assertions" kind="package body" line="2" col="1">
          <metric name="all_lines">15</metric>
@@ -84,6 +85,7 @@ ignore-assertions
       <metric name="eol_comments">0</metric>
       <metric name="comment_percentage">0.00</metric>
       <metric name="blank_lines">4</metric>
+      <metric name="average_lines_in_bodies">0.00</metric>
       <metric name="spark_lines">0</metric>
       <unit name="Assertions" kind="package" line="1" col="1">
          <metric name="contract">1</metric>
@@ -185,6 +187,7 @@ no-ignore-assertions
       <metric name="eol_comments">0</metric>
       <metric name="comment_percentage">0.00</metric>
       <metric name="blank_lines">4</metric>
+      <metric name="average_lines_in_bodies">6.00</metric>
       <metric name="spark_lines">0</metric>
       <unit name="Assertions" kind="package body" line="2" col="1">
          <metric name="all_lines">15</metric>
@@ -218,6 +221,7 @@ no-ignore-assertions
       <metric name="eol_comments">0</metric>
       <metric name="comment_percentage">0.00</metric>
       <metric name="blank_lines">4</metric>
+      <metric name="average_lines_in_bodies">0.00</metric>
       <metric name="spark_lines">0</metric>
       <unit name="Assertions" kind="package" line="1" col="1">
          <metric name="contract">1</metric>

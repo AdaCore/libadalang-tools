@@ -5,7 +5,7 @@ pragma Warnings (Off, "internal GNAT unit");
 with System.String_Hash;
 pragma Warnings (On, "internal GNAT unit");
 
-with Utils.Formatted_Output;
+with Utils.Dbg_Out;
 with Utils.Vectors;
 
 package body Utils.Generic_Symbols is
@@ -362,7 +362,7 @@ package body Utils.Generic_Symbols is
 
    procedure Print_Statistics is
       Stats : constant Statistics_Rec := Protector.Get_Statistics;
-      use Formatted_Output;
+      use Dbg_Out;
    begin
       Put ("Symbols statistics:\n");
       Put ("  Symbols_Count = \1\n", Image (Stats.Count));

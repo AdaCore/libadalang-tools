@@ -940,14 +940,12 @@ package body METRICS.Actions is
            Lines_Comment |
            Lines_Eol_Comment |
            Lines_Blank |
-           Lines_Ratio =>
+           Lines_Ratio |
+           Lines_Code_In_Bodies |
+           Num_Bodies =>
             return True;
-         when Lines_Spark =>
+         when Lines_Average | Lines_Spark =>
             return Depth in 1 | 2;
-         when Lines_Code_In_Bodies | Num_Bodies =>
-            return False;
-         when Lines_Average =>
-            return Depth = 1;
 
          when All_Subprograms =>
             return (Depth = 3
@@ -1081,9 +1079,8 @@ package body METRICS.Actions is
          return "nyi";
       end if;
 
-      if (Metric in Complexity_Metrics
-            and then M.Kind in Ada_Compilation_Unit | Null_Kind)
-      or else (Metric = Lines_Average and then M.Kind = Null_Kind)
+      if Metric in Complexity_Metrics | Lines_Average
+        and then M.Kind in Ada_Compilation_Unit | Null_Kind
       then
          if Metric = Loop_Nesting then
             --  We want the total here, not the average.
@@ -1126,8 +1123,9 @@ package body METRICS.Actions is
             --  average. For complexity metrics, that is the Metric itself, but
             --  for Lines_Average, we need to divide Lines_Code_In_Bodies by
             --  something.
+            Numerator : constant Metric_Nat := M.Vals (Numerator_Metric);
             Av : constant Float :=
-              Float (M.Vals (Numerator_Metric) + Adjust) / Float (Num);
+              Float (Numerator + Adjust) / Float (Num);
             Img : constant String := Fixed (Av)'Img;
          begin
             pragma Assert (Img'First = 1 and then Img (1) = ' ');
@@ -1200,47 +1198,45 @@ package body METRICS.Actions is
          if Should_Print
            (I, Metrics_To_Compute, M, Depth, XML => False)
          then
-            if True or else M.Vals (I) /= 0 then -- ???
-               declare
-                  Metric_Name : constant String :=
-                    (if Name = Average_Complexity_Metrics
-                       then XML_Metric_Name_String (I)
-                       else Metric_Name_String (I));
-                  Indentation_Amount : constant Natural :=
-                    (if I = Lines_Average
-                       then 0
-                     elsif Depth = 1
-                       then 2
-                     elsif Depth = 2 and then First in Lines_Metrics
-                       then 2
-                     elsif Name = Average_Complexity_Metrics
-                       then 2 * Default_Indentation_Amount
-                     else Default_Indentation_Amount);
-                  --  Indentation_Amount, and Tab below, are
-                  --  intended to mimic some partially arbitrary
-                  --  behavior of gnatmetric.
-                  Tab : constant Positive :=
-                    (if Depth = 1 and then I in Lines_Metrics
-                       then 22
-                     elsif Depth = 1 or else I in Lines_Metrics
-                       then 21
-                     else 26);
-               begin
-                  Indent (Indentation_Amount);
-                  if First_Printed_Metric then
-                     First_Printed_Metric := False;
-                  else
-                     Put ("\n");
-                  end if;
-                  if I = Lines_Average then -- gnatmetric puts extra line
-                     Put ("\n");
-                  end if;
-                  Put ("\1", Metric_Name);
-                  Tab_To_Column (Indentation_Level + Tab);
-                  Put (": \1", Val_To_Print (I, M, XML => False));
-                  Outdent (Indentation_Amount);
-               end;
-            end if;
+            declare
+               Metric_Name : constant String :=
+                 (if Name = Average_Complexity_Metrics
+                    then XML_Metric_Name_String (I)
+                    else Metric_Name_String (I));
+               Indentation_Amount : constant Natural :=
+                 (if I = Lines_Average
+                    then 0
+                  elsif Depth = 1
+                    then 2
+                  elsif Depth = 2 and then First in Lines_Metrics
+                    then 2
+                  elsif Name = Average_Complexity_Metrics
+                    then 2 * Default_Indentation_Amount
+                  else Default_Indentation_Amount);
+               --  Indentation_Amount, and Tab below, are
+               --  intended to mimic some partially arbitrary
+               --  behavior of gnatmetric.
+               Tab : constant Positive :=
+                 (if Depth = 1 and then I in Lines_Metrics
+                    then 22
+                  elsif Depth = 1 or else I in Lines_Metrics
+                    then 21
+                  else 26);
+            begin
+               Indent (Indentation_Amount);
+               if First_Printed_Metric then
+                  First_Printed_Metric := False;
+               else
+                  Put ("\n");
+               end if;
+               if I = Lines_Average then -- gnatmetric puts extra line
+                  Put ("\n");
+               end if;
+               Put ("\1", Metric_Name);
+               Tab_To_Column (Indentation_Level + Tab);
+               Put (": \1", Val_To_Print (I, M, XML => False));
+               Outdent (Indentation_Amount);
+            end;
          end if;
       end loop;
 
@@ -1470,8 +1466,10 @@ package body METRICS.Actions is
             return "spark_lines";
          when Lines_Average =>
             return "average_lines_in_bodies";
-         when Lines_Code_In_Bodies | Num_Bodies =>
-            raise Program_Error;
+         when Lines_Code_In_Bodies =>
+            return "lines_code_in_bodies";
+         when Num_Bodies =>
+            return "num_bodies";
          when Lines_Ratio =>
             return "comment_percentage";
          when Public_Types =>
@@ -1536,9 +1534,9 @@ package body METRICS.Actions is
             when Lines_Code_In_Bodies | Num_Bodies |
               Current_Construct_Nesting | Computed_Metrics =>
                null;
-               --  The above are never printed, so we don't include them in the
-               --  <config>. These are the same ones that raise Program_Error
-               --  if passed to XML_Metric_Name_String.
+               --  The above are not documented, and not printed unless
+               --  explicitly specified on the command line, so we don't
+               --  include them in the <config>.
 
             when others =>
                Put ("<metric name=""\1"" display_name=""\2""/>\n",
@@ -1896,10 +1894,15 @@ package body METRICS.Actions is
 
             --  If no metrics were requested on the command line, or the
             --  --metrics-all switch was specified, we compute all metrics
-            --  except "computed" metrics.
+            --  except "computed" metrics and the Lines_Code_In_Bodies and
+            --  Num_Bodies (unless explicitly specified on the command
+            --  Line).
 
             if Result = Empty_Metrics_Set or else Arg (Cmd, Metrics_All) then
                Result := (Computed_Metrics => False, others => True);
+               Result (Lines_Code_In_Bodies) :=
+                 Arg (Cmd, Lines_Code_In_Bodies);
+               Result (Num_Bodies) := Arg (Cmd, Num_Bodies);
 
                declare
                   Explicit_False_Switches : Metrics_Set := Empty_Metrics_Set;
@@ -3220,6 +3223,7 @@ package body METRICS.Actions is
          end Should_Gather_Body_Lines;
 
          Global_M : Metrix renames Element (Metrix_Stack, 1).all;
+         File_M : Metrix renames Element (Metrix_Stack, 2).all;
 
       --  Start of processing for Gather_Line_Metrics
 
@@ -3294,6 +3298,9 @@ package body METRICS.Actions is
                                 By => Range_Count);
                         end if;
 
+                        Inc (File_M.Vals (Lines_Code_In_Bodies),
+                             By => Range_Count);
+                        Inc (File_M.Vals (Num_Bodies));
                         Inc (M.Vals (Num_Bodies));
                         Inc (Global_M.Vals (Num_Bodies));
                      end if;
