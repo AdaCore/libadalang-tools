@@ -76,7 +76,9 @@ package body Utils.Drivers is
          Swit  : Dynamically_Typed_Switch)
       is
       begin
-         Callback (Phase, Swit);
+         if Callback /= null then
+            Callback (Phase, Swit);
+         end if;
       end Local_Callback;
 
       Global_Report_Dir         : String_Ref;
