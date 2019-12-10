@@ -62,8 +62,9 @@ package body Utils.Tools is
             Provider : constant Unit_Provider_Reference :=
               (if Status (Tool.Project_Tree.all) = Empty
                then No_Unit_Provider_Reference
-               else Create_Project_Unit_Provider_Reference
-                      (Tool.Project_Tree, Tool.Project_Env,
+               else Create_Project_Unit_Provider
+                      (Tree             => Tool.Project_Tree,
+                       Env              => Tool.Project_Env,
                        Is_Project_Owner => False));
          begin
             Tool.Context := Create_Context
