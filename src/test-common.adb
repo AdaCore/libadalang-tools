@@ -517,7 +517,7 @@ package body Test.Common is
                                     return Base_Type_Decl
    is
       Primitive_Owners : constant Base_Type_Decl_Array :=
-        P_Primitive_Subp_Of (As_Subp_Spec (Subp));
+        P_Primitive_Subp_Types (As_Subp_Spec (Subp));
    begin
       for Owner of Primitive_Owners loop
          if P_Is_Tagged_Type (As_Type_Decl (Owner)) then
