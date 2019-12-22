@@ -468,12 +468,12 @@ package body Pp.Actions is
    --  it's Null_Kind, nothing is printed.
    --
    --  Normally, the soft line breaks inserted by # have a priority based on
-   --  the syntactic nesting depth. Less-nested breaks are enabled in favor of
-   --  more deeply nested ones. However, if # is followed by a digit, that
-   --  indicates an additional nesting depth not reflected in the syntax. For
-   --  example, if we have "blah #blah #1blah", then the #1 is considered more
-   --  nested than the #, so if the line is too long, we first enable the #,
-   --  and only enable the #1 if the line is still too long.
+   --  the syntactic nesting depth. Less-deeply-nested breaks are enabled in
+   --  favor of more-deeply-nested ones. However, if # is followed by a digit,
+   --  that indicates an additional nesting depth not reflected in the
+   --  syntax. For example, if we have "blah #blah #1blah", then the #1 is
+   --  considered more nested than the #, so if the line is too long, we first
+   --  enable the #, and only enable the #1 if the line is still too long.
    --
    --  # may also be followed by "+" and a digit, as in "#+1".
    --  The difference is that for "#1", all subtrees start out deeper than the
@@ -712,8 +712,7 @@ package body Pp.Actions is
            when Ada_Entry_Spec =>
              L ("!?[# (~~)]~?~~~"),
            when Ada_Entry_Body =>
-             L ("entry !?[# (~~)]~?~~~[# when !# is]$",
-                --  ???Perhaps "# is]" should be "#+1 is]" or "# ]is".
+             L ("entry !?[# (~~)]~?~~~[# when !]# is$",
                 "!",
                 "!",
                 "end !1/"),
@@ -809,7 +808,7 @@ package body Pp.Actions is
              L ("digits !? ~~~"),
            when Ada_Discriminant_Assoc => null,
            when Ada_Discriminant_Constraint | Ada_Index_Constraint =>
-             L ("?[#(~,# ~)]~"),
+             L ("?[#(~,#1 ~)]~"),
            when Ada_Range_Constraint =>
              L ("!"),
            when Ada_Declarative_Part =>
@@ -832,7 +831,7 @@ package body Pp.Actions is
            when Ada_Allocator =>
              L ("new? #(~~)~ !"),
            when Ada_Attribute_Ref =>
-             L ("!'[#1!?# (~,# ~)~]"),
+             L ("!'[#2!?# (~,#1 ~)~]"),
              --  ???This includes function calls to attributes, such as
              --  T'Max(X, Y), which isn't really right.
            when Ada_Update_Attribute_Ref =>
@@ -850,7 +849,7 @@ package body Pp.Actions is
            when Ada_Membership_Expr =>
              L ("! ![# ?[#~ ^|# ~]~]"),
            when Ada_Dotted_Name =>
-             L ("![#.!]"),
+             L ("![#1.!]"),
            when Ada_End_Name => L ("!"),
            when Ada_Defining_Name => L ("!"),
            when Ada_Char_Literal => null,
@@ -969,7 +968,7 @@ package body Pp.Actions is
            when Ada_Requeue_Stmt =>
              L ("requeue !? ~~~"),
            when Ada_Return_Stmt =>
-             L ("return[? ~~~]"),
+             L ("return[?# ~~~]"),
            when Ada_Terminate_Alternative =>
              L ("terminate"),
            when Ada_Subunit =>
@@ -1001,7 +1000,7 @@ package body Pp.Actions is
            when Ada_Signed_Int_Type_Def =>
              L ("!"),
            when Ada_Known_Discriminant_Part =>
-             L ("?[# (~;# ~)]~#"),
+             L ("?[# (~;#1 ~)]~#"),
            when Ada_Unknown_Discriminant_Part =>
              L (" #(<>)"),
            when Ada_Access_To_Subp_Def =>
@@ -1425,6 +1424,7 @@ package body Pp.Actions is
          Extended_Return_Stmt_Alt,
          Vertical_Agg_Alt,
          Nonvertical_Agg_Alt,
+         Enum_Rep_Nonvertical_Agg_Alt,
          Obj_Decl_Vertical_Agg_Alt,
          Assign_Vertical_Agg_Alt,
          Qualified_Vertical_Agg_Alt,
@@ -1565,11 +1565,12 @@ package body Pp.Actions is
             Semi_Soft => L (";# "),
             Subtree_Alt => L ("!"),
             Comma_Soft => L (",# "),
-            Pragma_Alt => L ("/?[ #(~,# ~)]~"),
+            Pragma_Alt => L ("/?[# (~,#1 ~)]~"),
             Parameter_Specification_Alt => L (" ^: "),
             Extended_Return_Stmt_Alt => L ("return !/"),
             Vertical_Agg_Alt => L ("(?~~ with #~?~,$~~)"),
             Nonvertical_Agg_Alt => L ("#(?~~ with #~?~,# ~~)"),
+            Enum_Rep_Nonvertical_Agg_Alt => L ("#(?~~ with #~?~,#1 ~~)"),
             Obj_Decl_Vertical_Agg_Alt =>
             L (Replace_One
                  (Ada_Object_Decl, From => ":=[# ~~]~!", To => ":=[$~~]~!")),
@@ -3483,6 +3484,8 @@ package body Pp.Actions is
          begin
             if Is_Vertical_Aggregate (Tree) then
                Interpret_Alt_Template (Vertical_Agg_Alt);
+            elsif Tree.Parent.Kind = Ada_Enum_Rep_Clause then
+               Interpret_Alt_Template (Enum_Rep_Nonvertical_Agg_Alt);
             else
                Interpret_Alt_Template (Nonvertical_Agg_Alt);
             end if;

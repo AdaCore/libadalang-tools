@@ -1857,15 +1857,6 @@ package body Pp.Formatting is
          --  All line breaks for a given line that are at the same level,
          --  plus an extra one at the end that is already enabled.
 
-         Greedy : constant Boolean := True;
-         --  True if we are using the "greedy" algorithm, which packs as many
-         --  subtrees on the same line as possible. This seems to look much
-         --  better, but we're using this flag in case people complain, so we
-         --  can add a switch to go back to the old algorithm. The old
-         --  algorithm was: if we enable a soft line break at a certain level,
-         --  we enable all soft line breaks at the same level (within a line we
-         --  are splitting).
-
       --  Start of processing for Split_Lines
 
       begin
@@ -1931,9 +1922,9 @@ package body Pp.Formatting is
                      then
                         null;
                      else
-                        if not Greedy
-                          or else Line_Len (All_LB, FF, LB (X + 1)) >
+                        if Line_Len (All_LB, FF, LB (X + 1)) >
                              Arg (Cmd, Max_Line_Length)
+                          or else not Arg (Cmd, Compact)
                         then
                            pragma Assert (not All_LB (LL).Enabled);
                            All_LB (LL).Enabled := True;

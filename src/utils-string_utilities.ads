@@ -150,7 +150,8 @@ package Utils.String_Utilities is
    --  Put C to Current_Output. Used to instantiate Formatted_Output.
 
    procedure Std_Err_Put_Char (C : Character);
-   --  Put C to Standard_Error. Used to instantiate Dbg_Out.
+   --  Put C to Standard_Error. Used to instantiate Formatted_Stderr and
+   --  Dbg_Out.
 
    function Read_File (FD : File_Descriptor) return String_Access;
    function Read_File (File_Name : String) return String_Access;

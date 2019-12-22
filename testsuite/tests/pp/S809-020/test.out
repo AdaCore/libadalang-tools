@@ -110,7 +110,8 @@ package body ada_main is
       declare
          procedure Reraise_Library_Exception_If_Any;
          pragma Import
-           (Ada, Reraise_Library_Exception_If_Any,
+           (Ada,
+            Reraise_Library_Exception_If_Any,
             "__gnat_reraise_library_exception_if_any");
       begin
          Reraise_Library_Exception_If_Any;
@@ -152,7 +153,8 @@ package body ada_main is
         (C, Task_Dispatching_Policy, "__gl_task_dispatching_policy");
       Priority_Specific_Dispatching : System.Address;
       pragma Import
-        (C, Priority_Specific_Dispatching,
+        (C,
+         Priority_Specific_Dispatching,
          "__gl_priority_specific_dispatching");
       Num_Specific_Dispatching : Integer;
       pragma Import
@@ -271,7 +273,9 @@ package body ada_main is
    pragma Import (Ada, Ada_Main_Program, "_ada_test069");
 
    function main
-     (argc : Integer; argv : System.Address; envp : System.Address)
+     (argc : Integer;
+      argv : System.Address;
+      envp : System.Address)
       return Integer
    is
       procedure Initialize (Addr : System.Address);
@@ -342,7 +346,9 @@ package ada_main is
    pragma Export (C, adafinal, "adafinal");
 
    function main
-     (argc : Integer; argv : System.Address; envp : System.Address)
+     (argc : Integer;
+      argv : System.Address;
+      envp : System.Address)
       return Integer;
    pragma Export (C, main, "main");
 
@@ -750,7 +756,8 @@ package body ada_main is
       declare
          procedure Reraise_Library_Exception_If_Any;
          pragma Import
-           (Ada, Reraise_Library_Exception_If_Any,
+           (Ada,
+            Reraise_Library_Exception_If_Any,
             "__gnat_reraise_library_exception_if_any");
       begin
          Reraise_Library_Exception_If_Any;
@@ -792,7 +799,8 @@ package body ada_main is
         (C, Task_Dispatching_Policy, "__gl_task_dispatching_policy");
       Priority_Specific_Dispatching : System.Address;
       pragma Import
-        (C, Priority_Specific_Dispatching,
+        (C,
+         Priority_Specific_Dispatching,
          "__gl_priority_specific_dispatching");
       Num_Specific_Dispatching : Integer;
       pragma Import
@@ -897,7 +905,9 @@ package body ada_main is
    pragma Import (Ada, Ada_Main_Program, "_ada_test070");
 
    function main
-     (argc : Integer; argv : System.Address; envp : System.Address)
+     (argc : Integer;
+      argv : System.Address;
+      envp : System.Address)
       return Integer
    is
       procedure Initialize (Addr : System.Address);
@@ -966,7 +976,9 @@ package ada_main is
    pragma Export (C, adafinal, "adafinal");
 
    function main
-     (argc : Integer; argv : System.Address; envp : System.Address)
+     (argc : Integer;
+      argv : System.Address;
+      envp : System.Address)
       return Integer;
    pragma Export (C, main, "main");
 
@@ -1248,6 +1260,390 @@ package ada_main is
    --  ELABORATION ORDER
 
 end ada_main;
+package Csc_Channel.Version_Handling is
+   type T_Version_Handling is limited interface;
+   type T_Version_Handling_Class_Access is access all T_Version_Handling'Class;
+
+   procedure V_Receive_Version
+     (This    :        not null access T_Version_Handling;
+      Test    :        access T_Version_Handling;
+      Version : in     Lang.Primitifs.T_Uint;
+      P1      :    out Lang.Primitifs.T_Uint;
+      P2      :    out Lang.Primitifs.T_Uint) is abstract;
+end Csc_Channel.Version_Handling;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+procedure Gnatpp_Array_Formatting is
+   type Rec_T is record
+      S : Unbounded_String;
+      B : Boolean;
+   end record;
+
+   A_String           : Unbounded_String := To_Unbounded_String ("a string");
+   Another_String : Unbounded_String := To_Unbounded_String ("another string");
+   Yet_Another_String : Unbounded_String :=
+     To_Unbounded_String ("yet another string");
+
+   Arr : constant array (1 .. 3) of Rec_T :=
+     ((A_String, True), (Another_String, False), (Yet_Another_String, False));
+
+   A : constant Rec_T := Rec_T'(A_String, True);
+   B : constant Rec_T := Rec_T'(Another_String, False);
+   C : Rec_T          := Rec_T'(Yet_Another_String, False);
+
+   pragma Unreferenced (Arr, A, B, C);
+begin
+   null;
+end Gnatpp_Array_Formatting;
+with Ada.Text_IO;
+procedure Gnatpp_Exdentation is
+   A_String_1   : constant String  := "abc";
+   A_String_2   : constant String  := "def";
+   A_String_3   : constant String  := "uvw";
+   A_String_4   : constant String  := "xyz";
+   An_Integer_1 : constant Integer := 1;
+   An_Integer_2 : constant Integer := 2;
+   An_Integer_3 : constant Integer := 3;
+   An_Integer_4 : constant Integer := 4;
+begin
+   Ada.Text_IO.Put
+     ("String concatenation:" &
+      ASCII.LF &
+      "1&2: " &
+      A_String_1 &
+      A_String_2 &
+      ASCII.LF &
+      "3&4: " &
+      A_String_3 &
+      A_String_4 &
+      ASCII.LF);
+   if An_Integer_1 /= An_Integer_2
+     and then An_Integer_3 /= An_Integer_4
+     and then An_Integer_1 = An_Integer_3
+   then
+      Ada.Text_IO.Put
+        ("Computing addition: " &
+         ASCII.LF &
+         "1+2" &
+         Integer'Image (An_Integer_1 + An_Integer_2) &
+         ASCII.LF &
+         "3+4" &
+         Integer'Image (An_Integer_3 + An_Integer_4) &
+         ASCII.LF);
+   end if;
+end Gnatpp_Exdentation;
+procedure Loop_Then is
+   X_012345,
+   X_0123456,
+   X_01234567,
+   X_012345678,
+   X_0123456789,
+   X_01234567890,
+   X_012345678901,
+   X_0123456789012,
+   X_01234567890123,
+   X_012345678901234,
+   X_0123456789012345,
+   X_01234567890123456,
+   X_012345678901234567,
+   X_0123456789012345678,
+   X_01234567890123456789 : Boolean :=
+     True;
+begin
+   if X_0123456789 = X_012345 then
+      null;
+   elsif X_0123456789 = X_012345 then
+      null;
+   end if;
+   if X_0123456789 = X_0123456 then
+      null;
+   elsif X_0123456789 = X_0123456 then
+      null;
+   end if;
+   if X_0123456789 = X_01234567 then
+      null;
+   elsif X_0123456789 = X_01234567 then
+      null;
+   end if;
+   if X_0123456789 = X_012345678 then
+      null;
+   elsif X_0123456789 = X_012345678 then
+      null;
+   end if;
+   if X_0123456789 = X_0123456789 then
+      null;
+   elsif X_0123456789 = X_0123456789 then
+      null;
+   end if;
+   if X_0123456789 = X_01234567890 then
+      null;
+   elsif X_0123456789 = X_01234567890 then
+      null;
+   end if;
+   if X_0123456789 = X_012345678901 then
+      null;
+   elsif X_0123456789 = X_012345678901 then
+      null;
+   end if;
+   if X_0123456789 = X_0123456789012 then
+      null;
+   elsif X_0123456789 = X_0123456789012 then
+      null;
+   end if;
+   if X_0123456789 = X_01234567890123 then
+      null;
+   elsif X_0123456789 = X_01234567890123 then
+      null;
+   end if;
+   if X_0123456789 = X_012345678901234 then
+      null;
+   elsif X_0123456789 = X_012345678901234 then
+      null;
+   end if;
+   if X_0123456789 = X_0123456789012345 then
+      null;
+   elsif X_0123456789 = X_0123456789012345 then
+      null;
+   end if;
+   if X_0123456789 = X_01234567890123456 then
+      null;
+   elsif X_0123456789 = X_01234567890123456 then
+      null;
+   end if;
+   if X_0123456789 = X_012345678901234567 then
+      null;
+   elsif X_0123456789 = X_012345678901234567 then
+      null;
+   end if;
+   if X_0123456789 = X_0123456789012345678 then
+      null;
+   elsif X_0123456789 = X_0123456789012345678 then
+      null;
+   end if;
+   if X_0123456789 = X_01234567890123456789 then
+      null;
+   elsif X_0123456789 = X_01234567890123456789 then
+      null;
+   end if;
+
+   while X_0123456789 /= X_012345 loop
+      null;
+   end loop;
+   while X_0123456789 /= X_0123456 loop
+      null;
+   end loop;
+   while X_0123456789 /= X_01234567 loop
+      null;
+   end loop;
+   while X_0123456789 /= X_012345678 loop
+      null;
+   end loop;
+   while X_0123456789 /= X_0123456789 loop
+      null;
+   end loop;
+   while X_0123456789 /= X_01234567890 loop
+      null;
+   end loop;
+   while X_0123456789 /= X_012345678901 loop
+      null;
+   end loop;
+   while X_0123456789 /= X_0123456789012 loop
+      null;
+   end loop;
+   while X_0123456789 /= X_01234567890123 loop
+      null;
+   end loop;
+   while X_0123456789 /= X_012345678901234 loop
+      null;
+   end loop;
+   while X_0123456789 /= X_0123456789012345 loop
+      null;
+   end loop;
+   while X_0123456789 /= X_01234567890123456 loop
+      null;
+   end loop;
+   while X_0123456789 /= X_012345678901234567 loop
+      null;
+   end loop;
+   while X_0123456789 /= X_0123456789012345678 loop
+      null;
+   end loop;
+   while X_0123456789 /= X_01234567890123456789 loop
+      null;
+   end loop;
+end Loop_Then;
+procedure Ors is
+begin
+   Rcc.Ahb1enr :=
+     Rcc.Ahb1enr or
+     RCC_Bits.Ahb1enr.Dma2en or
+     RCC_Bits.Ahb1enr.Dma1en or
+     RCC_Bits.Ahb1enr.Gpioaen or
+     RCC_Bits.Ahb1enr.Gpioben or
+     RCC_Bits.Ahb1enr.Gpiocen or
+     RCC_Bits.Ahb1enr.Gpioden or
+     RCC_Bits.Ahb1enr.Gpioeen or
+     RCC_Bits.Ahb1enr.Gpiofen or
+     RCC_Bits.Ahb1enr.Gpiogen or
+     RCC_Bits.Ahb1enr.Gpiohen or
+     RCC_Bits.Ahb1enr.Gpioien;
+end Ors;
+procedure Pretty is
+
+   package IP is
+
+      type Horizontal_Enum_Type is (Red, Blue, Green);
+
+      type Short_Enum_Type is (Red, Blue, Green);
+
+      type Short_List_Enum_Type is
+        (Red,
+         Blue1,
+         Blue2,
+         Blue3,
+         Blue4,
+         Blue5,
+         Blue6,
+         Blue7,
+         Blue8,
+         Blue9,
+         Blue0,
+         Blue11,
+         Blue12,
+         Blue13,
+         Blue14,
+         Blue15,
+         Blue16,
+         Blue17,
+         Green);
+
+      type Long_Enum_Type is
+        (Valuexxxxxxxxxxxxxxxxxxxxxxxxx1,
+         Valuexxxxxxxxxxxxxxxxxxxxxxxxx2,
+         Valuexxxxxxxxxxxxxxxxxxxxxxxxx3);
+
+   end IP;
+
+   type Horizontal_Enum_Type is (Red, Blue, Green);
+
+   type Short_Enum_Type is (Red, Blue, Green);
+
+   type Short_List_Enum_Type is
+     (Red,
+      Blue1,
+      Blue2,
+      Blue3,
+      Blue4,
+      Blue5,
+      Blue6,
+      Blue7,
+      Blue8,
+      Blue9,
+      Blue0,
+      Blue11,
+      Blue12,
+      Blue13,
+      Blue14,
+      Blue15,
+      Blue16,
+      Blue17,
+      Green);
+
+   type Long_Enum_Type is
+     (Valuexxxxxxxxxxxxxxxxxxxxxxxxx1,
+      Valuexxxxxxxxxxxxxxxxxxxxxxxxx2,
+      Valuexxxxxxxxxxxxxxxxxxxxxxxxx3);
+
+   Short_Enum_Lookup : constant array (1 .. 3) of Short_Enum_Type :=
+     (1 => Red, 2 => Blue, 3 => Green);
+
+   Long_Enum_Lookup : constant array (1 .. 3) of Long_Enum_Type :=
+     (1 => Valuexxxxxxxxxxxxxxxxxxxxxxxxx1,
+      2 => Valuexxxxxxxxxxxxxxxxxxxxxxxxx2,
+      3 => Valuexxxxxxxxxxxxxxxxxxxxxxxxx3);
+
+   Short_Ext_Lookup : constant array (1 .. 3) of IP.Short_Enum_Type :=
+     (1 => IP.Red, 2 => IP.Blue, 3 => IP.Green);
+
+   Long_Ext_Lookup : constant array (1 .. 3) of IP.Long_Enum_Type :=
+     (1 => IP.Valuexxxxxxxxxxxxxxxxxxxxxxxxx1,
+      2 => IP.Valuexxxxxxxxxxxxxxxxxxxxxxxxx2,
+      3 => IP.Valuexxxxxxxxxxxxxxxxxxxxxxxxx3);
+
+begin
+
+   null;
+
+end Pretty;
+procedure Separate_Thens is
+   X_0123456789,
+   X_01234567890,
+   X_012345678901,
+   X_0123456789012,
+   X_01234567890123,
+   X_012345678901234,
+   X_0123456789012345,
+   X_01234567890123456,
+   X_012345678901234567,
+   X_0123456789012345678,
+   X_01234567890123456789 : Boolean :=
+     True;
+begin
+   if X_0123456789 = X_0123456789 then
+      null;
+   elsif X_0123456789 = X_0123456789 then
+      null;
+   end if;
+   if X_0123456789 = X_01234567890 then
+      null;
+   elsif X_0123456789 = X_01234567890 then
+      null;
+   end if;
+   if X_0123456789 = X_012345678901 then
+      null;
+   elsif X_0123456789 = X_012345678901 then
+      null;
+   end if;
+   if X_0123456789 = X_0123456789012 then
+      null;
+   elsif X_0123456789 = X_0123456789012 then
+      null;
+   end if;
+   if X_0123456789 = X_01234567890123 then
+      null;
+   elsif X_0123456789 = X_01234567890123 then
+      null;
+   end if;
+   if X_0123456789 = X_012345678901234 then
+      null;
+   elsif X_0123456789 = X_012345678901234 then
+      null;
+   end if;
+   if X_0123456789 = X_0123456789012345 then
+      null;
+   elsif X_0123456789 = X_0123456789012345 then
+      null;
+   end if;
+   if X_0123456789 = X_01234567890123456 then
+      null;
+   elsif X_0123456789 = X_01234567890123456 then
+      null;
+   end if;
+   if X_0123456789 = X_012345678901234567 then
+      null;
+   elsif X_0123456789 = X_012345678901234567 then
+      null;
+   end if;
+   if X_0123456789 = X_0123456789012345678 then
+      null;
+   elsif X_0123456789 = X_0123456789012345678 then
+      null;
+   end if;
+   if X_0123456789 = X_01234567890123456789 then
+      null;
+   elsif X_0123456789 = X_01234567890123456789 then
+      null;
+   end if;
+end Separate_Thens;
 procedure Test070;
 with Ada.Text_IO;
 with test_gnatpp;
@@ -1262,35 +1658,42 @@ begin
 
    Ada.Text_IO.Put_Line ("Test070 End");
 end test070;
+procedure Junk is
+begin
+   Test
+     ("C24203B",
+      "CHECK THAT BASED REAL LITERALS WITH BASES " &
+      "2 THROUGH 16 ALL YIELD CORRECT VALUES");
+end Junk;
 package test_gnatpp is
 
    type development_switch is
      (none,                                                         --  0
 
       general_tracing,                                              --  1
-      --
-      -- Additional output in the GCU trace
+   --
+   -- Additional output in the GCU trace
 
       detailed_tracing,                                             --  2
-      --
-      -- Detailed debug output in every 200 Hz cycle
+   --
+   -- Detailed debug output in every 200 Hz cycle
 
       serial_write_tracing,                                         --  3
-      --
-      -- Protocol all outgoing bytes
+   --
+   -- Protocol all outgoing bytes
 
       serial_read_tracing,                                          --  4
-      --
-      -- Protocol all incoming bytes
+   --
+   -- Protocol all incoming bytes
 
       trigger_booster_overwrite_supply,                             --  5
-      --
-      -- The power supply for the trigger drive is always set to high.
+   --
+   -- The power supply for the trigger drive is always set to high.
 
       select_rof_num                                                --  6
-      --
-         -- Activate the numeric setting of the rate-of-fire. The numeric value
-         -- must be set with the function set_rof_num().
+   --
+      -- Activate the numeric setting of the rate-of-fire. The numeric value
+      -- must be set with the function set_rof_num().
 
 );
 

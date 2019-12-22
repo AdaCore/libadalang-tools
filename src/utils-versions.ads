@@ -39,19 +39,22 @@ package Utils.Versions is
    --       by Ada Core Technologies and intended for academic users, and free
    --       software developers.
 
-   procedure Print_Tool_Version;
-   --  Similar to Print_Version_Info, but sends the output into Stdout and
-   --  the format of the information printed is similar to what is printed
-   --  for '--version' option by all the other GNAT tools.
-   --
-   --  This is used when --version is specified.
-
    procedure Print_Version_Info;
-   --  Prints the tool version information in the following format:
+   --  Prints the tool version information to standard error in the following
+   --  format:
    --
    --  <toolname>
    --  Copyright <current year>, AdaCore.
    --
-   --  This is used when -v is specified.
+   --  This is used when -v is specified. It is meant to mimic old versions of
+   --  the tools.
+
+   procedure Print_Tool_Version;
+   --  Similar to Print_Version_Info, except the output is sent into Stdout,
+   --  and the format of the information printed is similar to what is printed
+   --  for '--version' option by all the other GNAT tools.
+   --
+   --  This is used when --version is specified. It is meant to mimic other
+   --  GNAT tools.
 
 end Utils.Versions;

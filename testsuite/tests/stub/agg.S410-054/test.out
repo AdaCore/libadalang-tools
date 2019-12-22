@@ -32,8 +32,8 @@ package body a is
 
    procedure Do_Something (Param_1, Param_2 : My_Integer_Range_10) is
    begin
-      pragma Compile_Time_Warning (Standard.True,
-         "Do_Something unimplemented");
+      pragma Compile_Time_Warning
+        (Standard.True, "Do_Something unimplemented");
       raise Program_Error with "Unimplemented procedure Do_Something";
    end Do_Something;
 
@@ -43,8 +43,8 @@ package body a is
 
    procedure Do_Something_Else (Param_1, Param_2 : My_Integer_Range_10) is
    begin
-      pragma Compile_Time_Warning (Standard.True,
-         "Do_Something_Else unimplemented");
+      pragma Compile_Time_Warning
+        (Standard.True, "Do_Something_Else unimplemented");
       raise Program_Error with "Unimplemented procedure Do_Something_Else";
    end Do_Something_Else;
 
@@ -61,8 +61,8 @@ package body C is
 
    procedure Do_Something (Param_1, Param_2 : My_Integer_Range_10) is
    begin
-      pragma Compile_Time_Warning (Standard.True,
-         "Do_Something unimplemented");
+      pragma Compile_Time_Warning
+        (Standard.True, "Do_Something unimplemented");
    end Do_Something;
 
    --------------------
@@ -73,8 +73,8 @@ package body C is
      (Param_1, Param_2 : My_Integer_Range_10) return Boolean
    is
    begin
-      pragma Compile_Time_Warning (Standard.True,
-         "Something_Else unimplemented");
+      pragma Compile_Time_Warning
+        (Standard.True, "Something_Else unimplemented");
       return raise Program_Error with "Unimplemented function Something_Else";
    end Something_Else;
 
@@ -90,8 +90,8 @@ package body CC is
 
    procedure Do_Something (Param_1, Param_2 : My_Integer_Range_10) is
    begin
-      pragma Compile_Time_Warning (Standard.True,
-         "Do_Something unimplemented");
+      pragma Compile_Time_Warning
+        (Standard.True, "Do_Something unimplemented");
    end Do_Something;
 
    --------------------
@@ -102,8 +102,8 @@ package body CC is
      (Param_1, Param_2 : My_Integer_Range_10) return Boolean
    is
    begin
-      pragma Compile_Time_Warning (Standard.True,
-         "Something_Else unimplemented");
+      pragma Compile_Time_Warning
+        (Standard.True, "Something_Else unimplemented");
       return raise Program_Error with "Unimplemented function Something_Else";
    end Something_Else;
 
@@ -119,8 +119,8 @@ package body D is
 
    procedure Do_Something (Param_1, Param_2 : My_Integer_Range_10) is
    begin
-      pragma Compile_Time_Warning (Standard.True,
-         "Do_Something unimplemented");
+      pragma Compile_Time_Warning
+        (Standard.True, "Do_Something unimplemented");
       raise Program_Error with "Unimplemented procedure Do_Something";
    end Do_Something;
 
@@ -132,8 +132,8 @@ package body D is
      (Param_1, Param_2 : My_Integer_Range_10) return Boolean
    is
    begin
-      pragma Compile_Time_Warning (Standard.True,
-         "Something_Else unimplemented");
+      pragma Compile_Time_Warning
+        (Standard.True, "Something_Else unimplemented");
       return raise Program_Error with "Unimplemented function Something_Else";
    end Something_Else;
 
@@ -149,8 +149,8 @@ package body DD is
 
    procedure Do_Something (Param_1, Param_2 : My_Integer_Range_10) is
    begin
-      pragma Compile_Time_Warning (Standard.True,
-         "Do_Something unimplemented");
+      pragma Compile_Time_Warning
+        (Standard.True, "Do_Something unimplemented");
       raise Program_Error with "Unimplemented procedure Do_Something";
    end Do_Something;
 
@@ -162,17 +162,17 @@ package body DD is
      (Param_1, Param_2 : My_Integer_Range_10) return Boolean
    is
    begin
-      pragma Compile_Time_Warning (Standard.True,
-         "Something_Else unimplemented");
+      pragma Compile_Time_Warning
+        (Standard.True, "Something_Else unimplemented");
       return raise Program_Error with "Unimplemented function Something_Else";
    end Something_Else;
 
 end DD;
-c.adb:10:36: warning: Do_Something unimplemented
-c.adb:22:36: warning: Something_Else unimplemented
-cc.adb:10:36: warning: Do_Something unimplemented
-cc.adb:22:36: warning: Something_Else unimplemented
-d.adb:10:36: warning: Do_Something unimplemented
-d.adb:23:36: warning: Something_Else unimplemented
-dd.adb:10:36: warning: Do_Something unimplemented
-dd.adb:23:36: warning: Something_Else unimplemented
+c.adb:11:10: warning: Do_Something unimplemented
+c.adb:23:10: warning: Something_Else unimplemented
+cc.adb:11:10: warning: Do_Something unimplemented
+cc.adb:23:10: warning: Something_Else unimplemented
+d.adb:11:10: warning: Do_Something unimplemented
+d.adb:24:10: warning: Something_Else unimplemented
+dd.adb:11:10: warning: Do_Something unimplemented
+dd.adb:24:10: warning: Something_Else unimplemented

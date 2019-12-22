@@ -24,7 +24,8 @@
 ------------------------------------------------------------------------------
 
 with Ada.Characters.Handling; use Ada.Characters.Handling;
-with Utils.Formatted_Output; use Utils.Formatted_Output;
+with Utils.Formatted_Output;
+with Utils.Formatted_Stderr;
 with Utils.Tool_Names;
 with Libadalang;
 
@@ -83,6 +84,7 @@ package body Utils.Versions is
          when GPL => "Community");
 
    procedure Print_Tool_Version is
+      use Utils.Formatted_Output;
    begin
       Put ("\1 \2 \3\n",
            To_Upper (Tool_Names.Tool_Name), Edition, Libadalang.Version);
@@ -97,6 +99,7 @@ package body Utils.Versions is
    ------------------------
 
    procedure Print_Version_Info is
+      use Utils.Formatted_Stderr;
    begin
       Put ("\1 \2 \3\n", Tool_Names.Tool_Name, Edition, Libadalang.Version);
       Put ("Copyright (C) \1-\2, \3\n",
