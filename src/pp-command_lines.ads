@@ -13,8 +13,8 @@ package Pp.Command_Lines is
      (Descriptor, (1 => To_All (Rep_Clauses)));
 
    type Pp_Flags is
-     (No_Alignment,
-      Alignment,
+     (Obsolete_A0,
+      Obsolete_A1,
       Obsolete_A2,
       Obsolete_A3,
       Obsolete_A4,
@@ -45,8 +45,8 @@ package Pp.Command_Lines is
       Pp_Flags);
 
    package Pp_Flag_Shorthands is new Pp_Flag_Switches.Set_Shorthands
-     ((No_Alignment => +"-A0",
-       Alignment => +"-A1",
+     ((Obsolete_A0 => +"-A0",
+       Obsolete_A1 => +"-A1",
        Obsolete_A2 => +"-A2",
        Obsolete_A3 => +"-A3",
        Obsolete_A4 => +"-A4",
@@ -188,7 +188,8 @@ package Pp.Command_Lines is
        Pragma_Mixed_Case => +"-pM"));
 
    type Pp_Booleans is
-     (Align_Modes,
+     (Alignment,
+      Align_Modes,
       Comments_Unchanged,
       Comments_Gnat_Indentation,
       Comments_Standard_Indentation, -- Not documented
@@ -201,7 +202,7 @@ package Pp.Command_Lines is
       Split_Line_Before_Op,
       Split_Line_Before_Record,
       Indent_Named_Statements,
-      Rm_Style_Spacing,
+      RM_Style_Spacing,
       Insert_Blank_Lines,
       Preserve_Blank_Lines,
       Source_Line_Breaks,
@@ -223,7 +224,8 @@ package Pp.Command_Lines is
       Pp_Booleans);
 
    package Pp_Boolean_Shorthands is new Pp_Boolean_Switches.Set_Shorthands
-     ((Align_Modes => null,
+     ((Alignment => null,
+       Align_Modes => null,
        Comments_Unchanged => +"-c0",
        Comments_Gnat_Indentation => +"-c1",
        Comments_Standard_Indentation => +"-c2", -- Not documented
@@ -236,7 +238,7 @@ package Pp.Command_Lines is
        Split_Line_Before_Op => null,
        Split_Line_Before_Record => null,
        Indent_Named_Statements => null,
-       Rm_Style_Spacing => +"--RM-style-spacing",
+       RM_Style_Spacing => +"--RM-style-spacing",
        Insert_Blank_Lines => null,
        Preserve_Blank_Lines => null,
        Source_Line_Breaks => null,
@@ -251,7 +253,8 @@ package Pp.Command_Lines is
 
    package Pp_Boolean_Defaults is new
      Pp_Boolean_Switches.Set_Defaults
-       ((Align_Modes => True,
+       ((Alignment => True,
+         Align_Modes => True,
          Comments_Unchanged => False,
          Comments_Gnat_Indentation => False,
          Comments_Standard_Indentation => False,
@@ -264,7 +267,7 @@ package Pp.Command_Lines is
          Split_Line_Before_Op => False,
          Split_Line_Before_Record => False,
          Indent_Named_Statements => False,
-         Rm_Style_Spacing => False,
+         RM_Style_Spacing => False,
          Insert_Blank_Lines => False,
          Preserve_Blank_Lines => False,
          Source_Line_Breaks => False,
@@ -385,16 +388,29 @@ package Pp.Command_Lines is
      Pragma_Casing_Switches,
      Pp_Nat_Switches;
 
+   function Obsolete_Alignment_Switch (Cmd : Command_Line) return Boolean is
+              (Arg (Cmd, Obsolete_A1)
+       or else Arg (Cmd, Obsolete_A2)
+       or else Arg (Cmd, Obsolete_A3)
+       or else Arg (Cmd, Obsolete_A4)
+       or else Arg (Cmd, Obsolete_A5));
+
    function Alignment_Enabled (Cmd : Command_Line) return Boolean is
-     ((not Arg (Cmd, Rm_Style_Spacing))
-         and then (not Arg (Cmd, No_Alignment)
-                     or else Arg (Cmd, Obsolete_A2)
-                     or else Arg (Cmd, Obsolete_A3)
-                     or else Arg (Cmd, Obsolete_A4)
-                     or else Arg (Cmd, Obsolete_A5)));
+     (if Arg (Cmd, RM_Style_Spacing) then Explicit (Cmd, Alignment)
+      elsif Arg (Cmd, Obsolete_A0) then Obsolete_Alignment_Switch (Cmd)
+      else Arg (Cmd, Alignment) or Obsolete_Alignment_Switch (Cmd));
    --  The old gnatpp had the ability to individually enable different kinds of
-   --  alignment; the new gnatpp does not. Instead, we align if ANY alignment
-   --  option is enabled; if all alignment is turned off, we don't align.
+   --  alignment with -A1, -A2, -A3, -A4, and -A5. In addition, -A0 turned off
+   --  all 5 of those. The new gnatpp does not support that complexity, because
+   --  we believe users either like alignment for all cases, or don't like it.
+   --  For compatibility, we recognize the obsolete switches, and turn on
+   --  alignment if any of -A1..5 are specified (regardless of -A0). The -A0
+   --  switch turns off alignment if no other -A switches are given.
+   --
+   --  Alignment is on by default, except when --rm-style-spacing is given; in
+   --  that case, only an explicit --alignment turns on alignment. The ability
+   --  to have both alignment and RM-style spacing is newer, so we don't need
+   --  the horsing around with -A switches in that case.
 
    function Comment_Filling_Enabled (Cmd : Command_Line) return Boolean is
      (not Arg (Cmd, Comments_Unchanged) and Arg (Cmd, Comments_Fill));
@@ -406,19 +422,20 @@ package Pp.Command_Lines is
      (not Arg (Cmd, Insert_Blank_Lines) and Arg (Cmd, Preserve_Blank_Lines));
 
    type PP_Casing is
-   --  Defines the casing of identifiers and keywords generated by gnatpp
-    (Lower_Case,
-   --  All letters are lowercase
-    Upper_Case,
-   --  All letters are uppercase
-    Mixed,
-   --  For both defining and usage occurrences of identifiers The first letter
-   --  and each letter which immediately follows the underscore are uppercase,
-   --  and all the other letters are lowercase
-    As_Declared);
-   --  All the usage occurrences of identifiers have the same casing as
-   --  defining occurrences, defining occurrences have the same casing as
-   --  the corresponding defining occurrences in the argument source.
+     --  Defines the casing of identifiers and keywords generated by gnatpp
+     (Lower_Case,
+      --  All letters are lowercase
+      Upper_Case,
+      --  All letters are uppercase
+      Mixed,
+      --  For both defining and usage occurrences of identifiers, the first
+      --  letter and each letter which immediately follows the underscore are
+      --  uppercase, and all the other letters are lowercase.
+      As_Declared
+      --  All the usage occurrences of identifiers have the same casing as
+      --  defining occurrences, defining occurrences have the same casing as
+      --  source code.
+     );
 
    subtype Lower_Upper_PP_Casing is PP_Casing with
      Predicate => Lower_Upper_PP_Casing in Lower_Case | Upper_Case;

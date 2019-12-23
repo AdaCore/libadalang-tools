@@ -1299,7 +1299,7 @@ package body Pp.Actions is
       return Str_Template
    is
    begin
-      if not Arg (Cmd, Rm_Style_Spacing) then
+      if not Arg (Cmd, RM_Style_Spacing) then
          return T;
       end if;
       declare
@@ -4269,7 +4269,7 @@ package body Pp.Actions is
             --  If we put the "extra" space in the constraint,
             --  we could use Fix_RM_Spacing and get rid of
             --  Do_Subtype_Indication.
-            if Arg (Cmd, Rm_Style_Spacing)
+            if Arg (Cmd, RM_Style_Spacing)
               and then Present (Subtree (Tree, 3))
               and then Subtree (Tree, 3).Kind = Ada_Index_Constraint
             then
