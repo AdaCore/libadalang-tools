@@ -440,6 +440,14 @@ package body METRICS.Actions is
    --  True if Node is a private library unit. ???This doesn't work for
    --  bodies; we need semantic information.
 
+   procedure Process_CU
+     (Tool : in out Metrics_Tool;
+      Cmd : Command_Line;
+      File_Name : String;
+      Unit : Analysis_Unit;
+      CU_Node : Ada_Node);
+   --  Process one compilation unit
+
    function Push_New_Metrix
      (Tool : in out Metrics_Tool'Class;
       Node : Ada_Node;
@@ -2604,24 +2612,18 @@ package body METRICS.Actions is
    end Final;
 
    ---------------------
-   -- Per_File_Action --
+   -- Process_CU --
    ---------------------
 
-   procedure Per_File_Action
+   procedure Process_CU
      (Tool : in out Metrics_Tool;
       Cmd : Command_Line;
       File_Name : String;
-      Input : String;
-      BOM_Seen : Boolean;
-      Unit : Analysis_Unit)
+      Unit : Analysis_Unit;
+      CU_Node : Ada_Node)
    is
-      pragma Unreferenced (Input, BOM_Seen);
-      CU_List : constant Ada_Node := Root (Unit);
-      pragma Assert (not CU_List.Is_Null);
---      pragma Assert (Kind (CU_List) = List_Kind);
---    pragma Assert (Children_Count (CU_List) = 1);
-      --  libadalang supports multiple compilation units per file,
-      --  but gnatmetric does not, and lalmetric does not yet.
+      pragma Assert (Kind (CU_Node) = Ada_Compilation_Unit);
+      Outer_Unit : constant Ada_Node := Get_Outer_Unit (CU_Node);
 
       Cumulative : constant Cumulative_Counts_Array :=
         Get_Cumulative_Counts (Unit);
@@ -2646,11 +2648,6 @@ package body METRICS.Actions is
             Dec (M.Vals (Metric), By);
          end loop;
       end Dec_All;
-
-      --  CU_Node : constant Ada_Node := Childx (CU_List, 1);
-      CU_Node : constant Ada_Node := CU_List;
-      pragma Assert (Kind (CU_Node) = Ada_Compilation_Unit);
-      Outer_Unit : constant Ada_Node := Get_Outer_Unit (CU_Node);
 
       Node_Stack : Ada_Node_Vector;
       --  Stack of all nodes currently being walked
@@ -4167,7 +4164,8 @@ package body METRICS.Actions is
           (Tool, CU_Node, Arg (Cmd, Ignore_Assertions),
            Source_File_Name => new String'(File_Name));
 
-   --  Start of processing for Per_File_Action
+   --  Start of processing for Process_CU
+
    begin
       if Debug_Flag_V then
          Print (Unit);
@@ -4211,6 +4209,49 @@ package body METRICS.Actions is
       pragma Assert (File_M.Vals (Complexity_Cyclomatic) =
                        File_M.Vals (Complexity_Statement) +
                        File_M.Vals (Complexity_Expression));
+
+      if Debug_Flag_V then
+         Outdent;
+         Put ("<--Walk: \1\n", Short_Image (CU_Node));
+      end if;
+   end Process_CU;
+
+   ---------------------
+   -- Per_File_Action --
+   ---------------------
+
+   procedure Per_File_Action
+     (Tool : in out Metrics_Tool;
+      Cmd : Command_Line;
+      File_Name : String;
+      Input : String;
+      BOM_Seen : Boolean;
+      Unit : Analysis_Unit)
+   is
+      pragma Unreferenced (Input, BOM_Seen);
+      CU_List : constant Ada_Node := Root (Unit);
+      pragma Assert (not CU_List.Is_Null);
+--      pragma Assert (Kind (CU_List) = List_Kind);
+--    pragma Assert (Children_Count (CU_List) = 1);
+      --  ???libadalang supports multiple compilation units per file.
+      --  The old ASIS-based gnatmetric does not, and neither does this
+      --  libadalang-based version. We should probably fix that, or at
+      --  least make sure it fails gracefully.
+
+      --  CU_Node : constant Ada_Node := Childx (CU_List, 1);
+      CU_Node : constant Ada_Node := CU_List;
+   begin
+      if Debug_Flag_V then
+         Print (Unit);
+         Put ("With trivia\n");
+         PP_Trivia (Unit);
+      end if;
+
+      if Kind (CU_Node) = Ada_Pragma_Node_List then
+         Put ("Skipping \1 (pragmas only)\n", File_Name);
+      else
+         Process_CU (Tool, Cmd, File_Name, Unit, CU_Node);
+      end if;
 
       if Debug_Flag_V then
          Outdent;
