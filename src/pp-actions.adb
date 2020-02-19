@@ -5341,6 +5341,8 @@ package body Pp.Actions is
       Put (" --split-line-before-record  - ""record"" on next line\n");
       Put (" --indent-named-statements - named statements indented more than name\n");
       Put (" --RM-style-spacing      - no extra space before '(' and ':'\n");
+      Put (" --compact               - compact formatting of calls and similar (default)\n");
+      Put (" --no-compact            - more verbose formatting of calls and similar\n");
       Put (" --par-threshold=nnn     - if the number of parameter specifications is greater\n");
       Put ("                           than nnn, each specification starts from a new line\n");
       Put (" --call-threshold=nnn    - if the number of parameter associations in a call is\n");
