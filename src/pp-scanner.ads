@@ -83,7 +83,11 @@ package Pp.Scanner is
       --  True_End_Of_Line.
       --  Enabled_LB_Token and Disabled_LB_Token are used in New_Tokns,
       --  representing line breaks in the generated output; these contain an
-      --  index into the lines break table.
+      --  index into the lines break table. When a disabled line break is
+      --  enabled, the Enabled flag in the lines break table is set, but the
+      --  token kind is still Disabled_LB_Token. A later pass will replace it
+      --  with an Enabled_LB_Token. Thus, a Disabled_LB_Token can temporarily
+      --  correspond to an enabled line break.
 
       '!', '#', '$', '?', '[', '\', ']', '^', '`', '{', '}', '~', '_',
       --  These are not in Ada

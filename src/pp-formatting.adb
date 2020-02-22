@@ -872,18 +872,12 @@ package body Pp.Formatting is
       --  New_Tokns doesn't contain any comments; they are inserted into the
       --  output from Src_Tokns. Blank lines are also copied from Src_Tokns to
       --  New_Tokns. The output is also patched up in miscellaneous other ways,
-      --  such as insert preprocessor directives (see comments in the body for
-      --  details).
+      --  such as inserting preprocessor directives (see comments in the body
+      --  for details).
       --
       --  This procedure also does some work in preparation for
       --  Copy_Pp_Off_Regions. In particular, it checks that OFF/ON commands
       --  are in the proper sequence, and it sets the Pp_Off_Present flag.
-      --
-      --  True if there is at least one Pp_Off_Comment. We don't care about
-      --  Pp_On_Comments, because it's an error to have a Pp_On_Comment without
-      --  a preceding Pp_Off_Comment. Set True if appropriate by
-      --  Insert_Comments_And_Blank_Lines. This allows us to skip the
-      --  Copy_Pp_Off_Regions pass as an optimization.
 
       procedure Insert_Indentation (Lines_Data_P : Lines_Data_Ptr);
 
@@ -906,6 +900,11 @@ package body Pp.Formatting is
       All_LBI : Line_Break_Index_Vector renames Lines_Data.All_LBI;
 
       Pp_Off_Present : Boolean := False;
+      --  True if there is at least one Pp_Off_Comment. We don't care about
+      --  Pp_On_Comments, because it's an error to have a Pp_On_Comment
+      --  without a preceding Pp_Off_Comment. Set True if appropriate by
+      --  Insert_Comments_And_Blank_Lines. This allows us to skip the
+      --  Copy_Pp_Off_Regions pass as an optimization.
 
    begin
       --  ????We probably want to do more, but this is for gnatstub
@@ -1503,8 +1502,12 @@ package body Pp.Formatting is
                Image (Integer (Cur_Line)),
                Image (Integer (L)),
                Image (All_LB (All_LBI (Cur_Line)).Length));
-            Put ("\t<<\1>>",
-                 To_UTF8 (Line_Text (Lines_Data, Cur_Line, L)));
+            --  ???Line_Text doesn't work, because Out_Buf isn't set yet, so
+            --  disable this for now. It would be better to reconstruct the
+            --  text from the tokens.
+            if False then
+               Put ("\t<<\1>>", To_UTF8 (Line_Text (Lines_Data, Cur_Line, L)));
+            end if;
          end if;
 
          Put ("\n");
@@ -2097,7 +2100,7 @@ package body Pp.Formatting is
             --  If an end-of-line comment appears at a place where there is a
             --  soft line break, we enable that line break. We also enable
             --  previous line breaks that are at the same level, or that belong
-            --  to '('. We stop when we see a hard line break.
+            --  to '('. We stop when we see an enabled line break.
 
             pragma Assert
               (if Kind (Last_LB) /= Start_Of_Input then
@@ -2105,10 +2108,11 @@ package body Pp.Formatting is
                 (LB_Tok (LB) = Last_LB));
             if LB_Tok (LB) = Last_LB then
                for Break in reverse 1 .. New_Cur_Line loop
-                  exit when All_LB (All_LBI (Break)).Hard;
                   declare
                      Prev_LB : Line_Break renames All_LB (All_LBI (Break));
                   begin
+                     exit when Prev_LB.Enabled;
+
                      if Prev_LB.Level = LB.Level
                        or else
                         (Prev_LB.Level < LB.Level
@@ -2612,6 +2616,35 @@ package body Pp.Formatting is
 
          procedure Insert_End_Of_Line_Comment is
             pragma Assert (Enabled_Cur_Line > 1);
+
+            function New_Space_NL return Boolean;
+            --  True if we should move past a space that is immediately
+            --  followed by a new line.
+
+            function New_Space_NL return Boolean is
+            begin
+               if Get_Num_Tokens (Pending_Tokns) < 3 then
+                  return False;
+               end if;
+
+               pragma Assert
+                 (Kind (Last (Pending_Tokns'Unchecked_Access)) =
+                  Kind (Prev (New_Tok)));
+               pragma Assert
+                 (Kind (Prev (Last (Pending_Tokns'Unchecked_Access))) =
+                  Kind (Prev (Prev (New_Tok))));
+
+               declare
+                  Pending_Space : constant Boolean :=
+                    Kind (Prev (Prev (New_Tok))) = Spaces;
+                  At_LB : constant Boolean :=
+                    Kind (Prev (New_Tok)) = Disabled_LB_Token
+                    or else Kind (Prev (New_Tok)) = Tab_Token;
+               begin
+                  return Pending_Space and At_LB;
+               end;
+            end New_Space_NL;
+
             Prev_LB : Line_Break renames
               All_LB (Enabled_LBI (Enabled_Cur_Line - 1));
             LB      : Line_Break renames All_LB (Enabled_LBI (Enabled_Cur_Line));
@@ -2625,22 +2658,9 @@ package body Pp.Formatting is
             --  Note that tab characters have been expanded into spaces in
             --  Src_Buf.
 
-            Pending_Space, At_LB : Boolean := False;
-            New_Space_NL : Boolean := False;
-         begin
-            if Get_Num_Tokens (Pending_Tokns) >= 3 then
-               pragma Assert
-                 (Kind (Last (Pending_Tokns'Unchecked_Access)) =
-                  Kind (Prev (New_Tok)));
-               pragma Assert
-                 (Kind (Prev (Last (Pending_Tokns'Unchecked_Access))) =
-                  Kind (Prev (Prev (New_Tok))));
-               Pending_Space := Kind (Prev (Prev (New_Tok))) = Spaces;
-               At_LB := Kind (Prev (New_Tok)) = Disabled_LB_Token
-                 or else Kind (Prev (New_Tok)) = Tab_Token;
-               New_Space_NL := Pending_Space and At_LB;
-            end if;
+         --  Start of procedding for Insert_End_Of_Line_Comment
 
+         begin
             --  If we're just before a blank followed by NL, move past the blank,
             --  so we won't add a new NL below.
 
@@ -2677,11 +2697,22 @@ package body Pp.Formatting is
             Insert_Comment_Text (Lines_Data_P, Cmd, Src_Tok);
 
             --  In the usual case, the end-of-line comment is at a natural
-            --  (hard) line break, like this:
+            --  hard line break, like this:
+            --
             --      X := X + 1; -- Increment X
-            --  so we don't need another one. But if the original was:
-            --      X := -- Increment X
-            --        X + 1;
+            --
+            --  so we don't want another one. Likewise, if
+            --  Enable_Line_Breaks_For_EOL_Comments enabled a natural
+            --  soft line break, as in:
+            --
+            --     type Enum is
+            --       (Red, -- soft line break enabled here
+            --        ...);
+            --
+            --  we don't want another one. But if the original was:
+            --
+            --      procedure P ( -- strange place for a comment
+            --
             --  we need to add a line break after the comment.
 
             declare
@@ -2696,7 +2727,15 @@ package body Pp.Formatting is
                   At_Tok := True;
                end if;
 
-               if not At_Tok then
+               if At_Tok then
+                  Append_Tokn (New_Tokns, False_End_Of_Line, "eol extra");
+                  --  This is needed because every comment in New_Tokns must be
+                  --  followed by EOL_Token.
+               else
+                  pragma Assert
+                    (if Kind (New_Tok) = Disabled_LB_Token then
+                       not All_LB (Line_Break_Token_Index (New_Tok)).Enabled);
+
                   if Kind (New_Tok) = Enabled_LB_Token then
                      declare
                         This_LB : Line_Break renames
@@ -2704,21 +2743,30 @@ package body Pp.Formatting is
                      begin
                         Append_Spaces (New_Tokns, Count => This_LB.Indentation);
                      end;
+
+                  --  Avoid inserting an extra line break if we're just past a
+                  --  line break followed by spaces. This happens for soft line
+                  --  breaks, e.g. a comment on an enumeration literal
+                  --  specification.
+
+                  elsif Kind (Prev (New_Tok)) = Spaces
+                    and then Kind (Prev (Prev (New_Tok))) in Line_Break_Token
+                  then
+                     null;
+
                   else
                      Cur_Indentation := Indentation;
                      if not Arg (Cmd, Source_Line_Breaks) then
                         Append_Temp_Line_Break
                           (Lines_Data_P,
-                           Org => "Append_Temp_ in Insert_End_Of_Line_Comment");
+                           Org =>
+                             "Append_Temp_ in Insert_End_Of_Line_Comment");
                      end if;
                      Reset_Indentation;
                   end if;
-               else
-                  Append_Tokn (New_Tokns, False_End_Of_Line, "eol extra");
-                  --  This is needed because every comment in New_Tokns must be
-                  --  followed by EOL_Token.
                end if;
             end;
+
             Next_ss (Src_Tok);
          end Insert_End_Of_Line_Comment;
 

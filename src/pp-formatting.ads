@@ -288,7 +288,9 @@ package Pp.Formatting is
      (Lines_Data : Lines_Data_Rec;
       F, L : Line_Break_Index_Index) return W_Str;
    --  F and L are the first and last index forming a line; returns the text of
-   --  the line, not including any new-lines.
+   --  the line, not including any new-lines. ???This doesn't work since the
+   --  conversion to token vectors, because Out_Buf is not set until near the
+   --  end.
 
    function Tab_Image (Tabs : Tab_Vector; X : Tab_Index) return String;
 
