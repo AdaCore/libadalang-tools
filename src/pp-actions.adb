@@ -1460,6 +1460,7 @@ package body Pp.Actions is
          Par_Alt,
          Spec_Threshold_Alt,
          Spec_Alt,
+         Spec_No_Separate_Return_Alt,
          Subtype_Ind_Index_Alt,
          Subtype_Ind_Alt,
          Record_Type_Decl_Split_Alt,
@@ -1636,6 +1637,11 @@ package body Pp.Actions is
             --       ^ Here we want the "return" indented one character
             --       | with respect to the "(", even though it is not
             --         inside the parentheses.
+            Spec_No_Separate_Return_Alt => L ("!? ~~~?~~~?[{#+3 return}] ~~~"),
+            --  This is for the --no-separate-return switch, which causes line
+            --  breaks to diverge from the syntax. In particular, the soft line
+            --  break before "return" is lower priority than the ones between
+            --  formals.
 
             Subtype_Ind_Index_Alt => L ("?~~ ~!?~~~"),
             Subtype_Ind_Alt => L ("?~~ ~!? ~~~"),
@@ -4177,6 +4183,10 @@ package body Pp.Actions is
               or else Param_Count > Query_Count (Arg (Cmd, Par_Threshold))
             then
                Interpret_Alt_Template (Spec_Threshold_Alt);
+            elsif not Arg (Cmd, Separate_Return)
+              and then not Arg (Cmd, Compact)
+            then
+               Interpret_Alt_Template (Spec_No_Separate_Return_Alt);
             else
                Interpret_Alt_Template (Spec_Alt);
                --  F_Name is optional for access-to-subp.
@@ -5326,6 +5336,8 @@ package body Pp.Actions is
       Put (" --quiet / -q  - quiet mode\n");
       Put (" --no-separate-is        - try not to place 'IS' on a separate line in\n");
       Put ("                           a subprogram body\n");
+      Put (" --no-separate-return    - try not to place 'RETURN' on a separate line in\n");
+      Put ("                           specs\n");
       Put (" --separate-loop         - use a separate line for LOOP\n");
       Put (" --separate-then         - use a separate line for THEN\n");
       Put (" --separate-loop-then    - above two combined\n");
