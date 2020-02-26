@@ -6,7 +6,7 @@
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
---                       Copyright (C) 2019, AdaCore                        --
+--                     Copyright (C) 2019-2020, AdaCore                     --
 --                                                                          --
 -- GNATTEST  is  free  software;  you  can redistribute it and/or modify it --
 -- under terms of the  GNU  General Public License as published by the Free --
@@ -29,7 +29,7 @@ with Interfaces; use type Interfaces.Unsigned_16;
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
 with GNATCOLL.VFS; use GNATCOLL.VFS;
-with GNATCOLL.Projects;
+with GNATCOLL.Projects; use GNATCOLL.Projects;
 with GNATCOLL.Traces;
 
 with Libadalang;     use Libadalang;
@@ -52,8 +52,15 @@ with Test.Skeleton.Source_Table;
 with Ada.Directories; use Ada.Directories;
 with Utils.Projects; use Utils.Projects;
 with GNAT.Directory_Operations;
+with Ada.Characters.Handling; use Ada.Characters.Handling;
 
 package body Test.Actions is
+
+   SPT : GNATCOLL.Projects.Project_Tree renames
+     Test.Common.Source_Project_Tree;
+
+   function Is_Externally_Built (File : Virtual_File) return Boolean;
+   --  Checks if the given source file belongs to an externally build library.
 
    use Utils.Formatted_Output;
 
@@ -78,13 +85,16 @@ package body Test.Actions is
    procedure Init
      (Tool : in out Test_Tool; Cmd : in out Command_Line)
    is
-      Tmp : GNAT.OS_Lib.String_Access;
+      Tmp   : GNAT.OS_Lib.String_Access;
+      Files : File_Array_Access;
    begin
       GNATCOLL.Traces.Parse_Config_File;
 
       --  We need to fill a local source table since gnattest actually needs
       --  info not only on current source but on any particular one or even
       --  all of them at once.
+
+      SPT := GNATCOLL.Projects.Project_Tree (Tool.Project_Tree.all);
 
       declare
          --  For now repeating code from Utils.Drivers to get rid of ignored
@@ -101,7 +111,9 @@ package body Test.Actions is
          begin
             Include (Ignored, File_Name);
          end Include_One;
+
       begin
+         Common.Stub_Mode_ON := Arg (Cmd, Stub);
 
          for Ignored_Arg of Arg (Cmd, Ignore) loop
             Read_File_Names_From_File (Ignored_Arg.all, Include_One'Access);
@@ -109,13 +121,63 @@ package body Test.Actions is
 
          for File of File_Names (Cmd) loop
             if not Contains (Ignored, Simple_Name (File.all)) then
-               Test.Skeleton.Source_Table.Add_Source_To_Process (File.all);
+
+               if Info (SPT, Create (+File.all)).Unit_Part = Unit_Spec then
+                  Test.Skeleton.Source_Table.Add_Source_To_Process (File.all);
+               end if;
             end if;
          end loop;
       end;
 
-      Test.Common.Source_Project_Tree :=
-        GNATCOLL.Projects.Project_Tree (Tool.Project_Tree.all);
+      if Arg (Cmd, Stub) then
+         Free (Test.Common.Test_Dir_Name);
+         Test.Common.Test_Dir_Name := new String'
+           ("gnattest_stub" & Directory_Separator & "tests");
+         Free (Test.Common.Stub_Dir_Name);
+         Test.Common.Stub_Dir_Name := new String'
+           ("gnattest_stub" & Directory_Separator & "stubs");
+         Free (Test.Common.Harness_Dir_Str);
+         Test.Common.Harness_Dir_Str := new String'
+           ("gnattest_stub" & Directory_Separator & "harness");
+         Test.Skeleton.Source_Table.Initialize_Project_Table (SPT);
+
+         Files := SPT.Root_Project.Source_Files (True);
+         for F in Files'Range loop
+            if
+              To_Lower (SPT.Info (Files (F)).Language) = "ada"
+              and then not Is_Externally_Built (Files (F))
+            then
+               case SPT.Info (Files (F)).Unit_Part is
+                  when Unit_Body =>
+                     declare
+                        P : Project_Type :=
+                          SPT.Info (Files (F)).Project;
+                     begin
+                        --  The name of the project here will be used to create
+                        --  stub projects. Those extend original projects, so
+                        --  if a source belongs to an extended project we need
+                        --  the extending on here instead, so that we do not
+                        --  end up with different extensions of same project.
+                        while Extending_Project (P) /= No_Project loop
+                           P := Extending_Project (P);
+                        end loop;
+
+                        Test.Skeleton.Source_Table.Add_Body_To_Process
+                          (Files (F).Display_Full_Name,
+                           P.Name,
+                           SPT.Info (Files (F)).Unit_Name);
+                     end;
+                  when Unit_Spec =>
+                     Test.Skeleton.Source_Table.Add_Body_Reference
+                       (Files (F).Display_Full_Name);
+                  when others =>
+                     null;
+               end case;
+            end if;
+         end loop;
+         Unchecked_Free (Files);
+
+      end if;
       Test.Skeleton.Source_Table.Set_Direct_Output;
 
       --  Processing harness dir specification
@@ -167,6 +229,9 @@ package body Test.Actions is
         new String'(Tmp.all & Directory_Separator);
       Free (Tmp);
 
+      if Common.Stub_Mode_ON then
+         Test.Skeleton.Source_Table.Set_Direct_Stub_Output;
+      end if;
    end Init;
 
    -----------
@@ -174,17 +239,18 @@ package body Test.Actions is
    -----------
 
    procedure Final (Tool : in out Test_Tool; Cmd : Command_Line) is
+      Src_Prj : constant String :=
+        Tool.Project_Tree.Root_Project.Project_Path.Display_Full_Name;
    begin
       if not Arg (Cmd, Harness_Only) then
-         Test.Skeleton.Generate_Project_File
-           (Tool.Project_Tree.Root_Project.Project_Path.Display_Full_Name);
+         if Arg (Cmd, Stub) then
+            Test.Harness.Generate_Stub_Test_Driver_Projects (Src_Prj);
+         else
+            Test.Skeleton.Generate_Project_File (Src_Prj);
+            Test.Harness.Test_Runner_Generator  (Src_Prj);
+            Test.Harness.Project_Creator        (Src_Prj);
+         end if;
          Test.Common.Generate_Common_File;
-
-         Test.Harness.Test_Runner_Generator
-           (Tool.Project_Tree.Root_Project.Project_Path.Display_Full_Name);
-         Test.Harness.Project_Creator
-           (Tool.Project_Tree.Root_Project.Project_Path.Display_Full_Name);
-
          Test.Mapping.Generate_Mapping_File;
       end if;
    end Final;
@@ -242,5 +308,22 @@ package body Test.Actions is
       Put ("\n");
       pragma Style_Checks ("M79");
    end Tool_Help;
+
+   -------------------------
+   -- Is_Externally_Built --
+   -------------------------
+
+   function Is_Externally_Built (File : Virtual_File) return Boolean is
+      F_Info : constant File_Info    := Info (SPT, File);
+      Proj   : constant Project_Type := Project (F_Info);
+      Attr   : constant Attribute_Pkg_String := Build ("", "externally_built");
+   begin
+      if Has_Attribute (Proj, Attr) then
+         if To_Lower (Attribute_Value (Proj, Attr)) = "true" then
+            return True;
+         end if;
+      end if;
+      return False;
+   end Is_Externally_Built;
 
 end Test.Actions;

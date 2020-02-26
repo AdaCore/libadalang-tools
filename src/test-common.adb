@@ -6,7 +6,7 @@
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
---                     Copyright (C) 2011-2019, AdaCore                     --
+--                     Copyright (C) 2011-2020, AdaCore                     --
 --                                                                          --
 -- GNATTEST  is  free  software;  you  can redistribute it and/or modify it --
 -- under terms of the  GNU  General Public License as published by the Free --
@@ -39,9 +39,12 @@ with Utils.Command_Lines; use Utils.Command_Lines;
 
 with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 
+with Utils.Tool_Names;
+
 package body Test.Common is
 
-   Me_Hash    : constant Trace_Handle := Create ("Hash", Default => On);
+   Me_Hash    : constant Trace_Handle := Create ("Hash", Default => Off);
+   Me_Stub    : constant Trace_Handle := Create ("Stubs", Default => Off);
 
    function Operator_Image (Node : Ada_Node'Class) return String;
    --  According to operator symbols returns their literal names to make the
@@ -111,7 +114,8 @@ package body Test.Common is
    function Mangle_Hash_Full
      (Subp           : Ada_Node'Class;
       Case_Sensitive : Boolean := False;
-      N_Controlling  : Boolean := False) return String
+      N_Controlling  : Boolean := False;
+      For_Stubs      : Boolean := False) return String
    is
       pragma Unreferenced (N_Controlling);
       Subp_Name : constant String :=
@@ -154,16 +158,20 @@ package body Test.Common is
          Param  : Param_Spec;
       begin
          Subp_Depth := Subp_Depth + 1;
-         for I in Params'Range loop
-            Param := Params (I);
+         if Params'Length = 0 then
+            Append (Result, "()");
+         else
+            for I in Params'Range loop
+               Param := Params (I);
 
-            Result :=
-              Result
-              & (if I = Params'First then "(" else ";")
-              & Parameter_Image (Param);
-         end loop;
+               Result :=
+                 Result
+                 & (if I = Params'First then "(" else ";")
+                 & Parameter_Image (Param);
+            end loop;
 
-         Append (Result, (if Subp_Depth = 1 then ";)" else ")"));
+            Append (Result, (if Subp_Depth = 1 then ";)" else ")"));
+         end if;
 
          if Result_Profile /= No_Type_Expr then
             Append
@@ -214,6 +222,7 @@ package body Test.Common is
                if
                  Subp_Depth < 2 and then not Attr_Flag
                  and then Type_Decl = Tagged_Rec
+                   and then not For_Stubs
                then
                   Type_Decl := Root_Ignore;
                end if;
@@ -349,7 +358,7 @@ package body Test.Common is
       Result  : Unbounded_String := To_Unbounded_String ("");
    begin
       for I in Nesting'First + 1 .. Nesting'Last loop
-         if Kind (Nesting (I)) = Ada_Package_Decl then
+         if Kind (Nesting (I)) in Ada_Basic_Decl then
             if Result = "" then
                Result := To_Unbounded_String
                  (Node_Image (P_Defining_Name (As_Basic_Decl (Nesting (I)))));
@@ -584,6 +593,7 @@ package body Test.Common is
 
    procedure Report_Err (Message : String) is
    begin
+      Put (Standard_Error, Utils.Tool_Names.Tool_Name & ": ");
       Ada.Text_IO.Put_Line (Ada.Text_IO.Standard_Error, Message);
    end Report_Err;
 
@@ -699,6 +709,8 @@ package body Test.Common is
       Harness_Dir : GNAT.OS_Lib.String_Access renames Harness_Dir_Str;
 
       Common_Package_Name : constant String := "Gnattest_Generated";
+      Persistent_Package_Name : constant String :=
+        Common_Package_Name & ".Persistent";
       Common_File_Subdir  : constant String :=
         Harness_Dir.all & GNAT.OS_Lib.Directory_Separator & "common";
 
@@ -726,6 +738,101 @@ package body Test.Common is
       S_Put (0, "end Gnattest_Generated;");
 
       Close_File;
+
+      declare
+         Persistent_File_Name_Spec : constant String :=
+           Common_File_Subdir &
+           Directory_Separator &
+           Unit_To_File_Name (Persistent_Package_Name) & ".ads";
+         Persistent_File_Name_Body : constant String :=
+           Common_File_Subdir &
+           Directory_Separator &
+           Unit_To_File_Name (Persistent_Package_Name) & ".adb";
+      begin
+         if not Is_Regular_File (Persistent_File_Name_Spec) then
+            Create (Persistent_File_Name_Spec);
+            S_Put (0, "package " & Persistent_Package_Name & " is");
+            Put_New_Line;
+            S_Put (3, "procedure Global_Set_Up;");
+            Put_New_Line;
+            S_Put (3, "procedure Global_Tear_Down;");
+            Put_New_Line;
+            S_Put (0, "end " & Persistent_Package_Name & ";");
+            Put_New_Line;
+            Close_File;
+         end if;
+         if not Is_Regular_File (Persistent_File_Name_Body) then
+            Create (Persistent_File_Name_Body);
+            S_Put (0, "package body " & Persistent_Package_Name & " is");
+            Put_New_Line;
+            Put_New_Line;
+            S_Put (3, "procedure Global_Set_Up is");
+            Put_New_Line;
+            S_Put (3, "begin");
+            Put_New_Line;
+            S_Put (6, "null;");
+            Put_New_Line;
+            S_Put (3, "end Global_Set_Up;");
+            Put_New_Line;
+            Put_New_Line;
+            S_Put (3, "procedure Global_Tear_Down is");
+            Put_New_Line;
+            S_Put (3, "begin");
+            Put_New_Line;
+            S_Put (6, "null;");
+            Put_New_Line;
+            S_Put (3, "end Global_Tear_Down;");
+            Put_New_Line;
+            Put_New_Line;
+            S_Put (0, "end " & Persistent_Package_Name & ";");
+            Put_New_Line;
+            Close_File;
+         end if;
+      end;
    end Generate_Common_File;
+
+   ----------------
+   -- Is_Private --
+   ----------------
+
+   function Is_Private (Node : Ada_Node'Class) return Boolean
+   is
+      P_List : constant Ada_Node_Array := Parents (Node);
+   begin
+      for P of P_List loop
+         if P.Kind = Ada_Private_Part then
+            return True;
+         end if;
+      end loop;
+      return False;
+   end Is_Private;
+
+   ---------------------------------
+   -- Store_Default_Excluded_Stub --
+   ---------------------------------
+
+   procedure Store_Default_Excluded_Stub (Excluded : String) is
+   begin
+      Trace (Me_Stub, "do not ever stub " & Excluded);
+      Default_Stub_Exclusion_List.Include (Excluded);
+   end Store_Default_Excluded_Stub;
+
+   -------------------------
+   -- Store_Excluded_Stub --
+   -------------------------
+
+   procedure Store_Excluded_Stub (Source : String; Excluded : String) is
+      Local_Set : String_Set.Set := String_Set.Empty_Set;
+   begin
+      Trace (Me_Stub, "do not stub " & Excluded & " when testing " & Source);
+      if Stub_Exclusion_Lists.Contains (Source) then
+         Local_Set := Copy (Stub_Exclusion_Lists.Element (Source));
+         Local_Set.Include (Excluded);
+         Stub_Exclusion_Lists.Replace (Source, Local_Set);
+      else
+         Local_Set.Include (Excluded);
+         Stub_Exclusion_Lists.Include (Source, Local_Set);
+      end if;
+   end Store_Excluded_Stub;
 
 end Test.Common;

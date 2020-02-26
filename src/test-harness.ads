@@ -6,7 +6,7 @@
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
---                     Copyright (C) 2011-2019, AdaCore                     --
+--                     Copyright (C) 2011-2020, AdaCore                     --
 --                                                                          --
 -- GNATTEST  is  free  software;  you  can redistribute it and/or modify it --
 -- under terms of the  GNU  General Public License as published by the Free --
@@ -28,6 +28,8 @@ with GNAT.OS_Lib;                use GNAT.OS_Lib;
 with Ada.Containers.Indefinite_Vectors;
 
 with Libadalang.Analysis; use Libadalang.Analysis;
+
+with Test.Common; use Test.Common;
 
 package Test.Harness is
 
@@ -121,30 +123,30 @@ package Test.Harness is
          when Declaration_Data =>
 
             Test_Types : TT_Info.Vector;
-            --  List of test types.
+            --  List of test types
 
             TR_List  : TR_Info.Vector;
-            --  List of test routines declared in the test package.
+            --  List of test routines declared in the test package
 
             ITR_List : TR_Info_Enhanced.Vector;
             --  List of test routines inherited from packages declaring
             --  predecessing test types.
 
             LTR_List : TR_Info_Enhanced.Vector;
-            --  List of test routines overriden in current package.
+            --  List of test routines overriden in current package
 
             TC_List : TC_Info.Vector;
-            --  List of test_case types in current package.
+            --  List of test_case types in current package
 
             --  Flags:
             Generic_Kind         : Boolean := False;
-            --  On, when the given package is generic.
+            --  On, when the given package is generic
 
             Good_For_Suite       : Boolean := False;
-            --  The suite should be generated.
+            --  The suite should be generated
 
             Good_For_Substitution       : Boolean := False;
-            --  Substitution suite should be generated.
+            --  Substitution suite should be generated
 
          when Instantination_Data =>
 
@@ -165,10 +167,21 @@ package Test.Harness is
    --  Creates a test suites for both the directly declared
    --  tests and inherited ones.
 
+   procedure Generate_Test_Drivers
+     (Data      : Data_Holder;
+      UUT       : String;
+      Stub_List : Ada_Nodes_List.List);
+   --  For the given UUT generates a set of independent test driver mains,
+   --  one per subprogram under test, inherited or declared.
+
+   procedure Generate_Stub_Test_Driver_Projects (Source_Prj : String);
+   --  Generates all project files necessary for separate test drivers in stub
+   --  mode.
+
    procedure Test_Runner_Generator (Source_Prj : String);
    --  Generates Main_Sute and Test_Runner
 
    procedure Project_Creator (Source_Prj : String);
-   --  Generates a simple project file for the test driver.
+   --  Generates a simple project file for the test driver
 
 end Test.Harness;

@@ -6,7 +6,7 @@
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
---                     Copyright (C) 2011-2019, AdaCore                     --
+--                     Copyright (C) 2011-2020, AdaCore                     --
 --                                                                          --
 -- GNATTEST  is  free  software;  you  can redistribute it and/or modify it --
 -- under terms of the  GNU  General Public License as published by the Free --
@@ -80,6 +80,10 @@ package Test.Skeleton.Source_Table is
    procedure Add_Body_To_Process
      (Fname : String; Pname : String; Uname : String);
    --  Adds body sources for stub mode.
+
+   procedure Add_Body_Reference (Fname : String);
+   --  In stub mode we need references from non-argument sources to their
+   --  bodies in case we'd need to stub any of them.
 
    function SF_Table_Empty return Boolean;
    --  Checks if the source table is empty
@@ -165,5 +169,14 @@ package Test.Skeleton.Source_Table is
    --  Returns a list of names of all projects importing given project.
 
    function Project_Extended (Project_Name : String) return Boolean;
+
+   procedure Enforce_Project_Extention
+     (Prj_Name              : String;
+      Subroot_Stub_Prj      : String;
+      Current_Project_Infix : String);
+   procedure Enforce_Custom_Project_Extention
+     (File_Name            : String;
+      Subroot_Stub_Prj     : String;
+      Current_Source_Infix : String);
 
 end Test.Skeleton.Source_Table;

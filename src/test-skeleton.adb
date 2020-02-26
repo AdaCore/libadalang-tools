@@ -6,7 +6,7 @@
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
---                     Copyright (C) 2011-2019, AdaCore                     --
+--                     Copyright (C) 2011-2020, AdaCore                     --
 --                                                                          --
 -- GNATTEST  is  free  software;  you  can redistribute it and/or modify it --
 -- under terms of the  GNU  General Public License as published by the Free --
@@ -54,6 +54,7 @@ with Test.Common; use Test.Common;
 with Test.Harness;
 with Test.Skeleton.Source_Table; use Test.Skeleton.Source_Table;
 with Test.Mapping; use Test.Mapping;
+with Test.Stub;
 with Utils.Command_Lines; use Utils.Command_Lines;
 
 package body Test.Skeleton is
@@ -176,10 +177,10 @@ package body Test.Skeleton is
       --  CU itself.
 
       Unit_Full_Name : String_Access;
-      --  Fully expanded Ada name of the CU.
+      --  Fully expanded Ada name of the CU
 
       Unit_File_Name : String_Access;
-      --  Full name of the file, containing the CU.
+      --  Full name of the file, containing the CU
 
       case Data_Kind is
          --  Indicates which data storing structures are used, determines the
@@ -211,17 +212,20 @@ package body Test.Skeleton is
             --  declaration.
 
             Package_Data_List : Package_Info_List.List;
-            --  Stores info of nested packages.
+            --  Stores info of nested packages
+
+            Units_To_Stub : Ada_Nodes_List.List;
+            --  List of direct dependancies of current unit
 
             Subp_Name_Frequency : Name_Frequency.Map;
 
          when Instantiation =>
 
             Gen_Unit_Full_Name : String_Access;
-            --  Fully expanded Ada name of the generic CU.
+            --  Fully expanded Ada name of the generic CU
 
             Gen_Unit_File_Name : String_Access;
-            --  Name of file containing the generic CU.
+            --  Name of file containing the generic CU
 
       end case;
 
@@ -278,7 +282,6 @@ package body Test.Skeleton is
    use TR_Mapping_List;
    use DT_Mapping_List;
    use TP_Mapping_List;
---     use SP_Mapping;
 
    procedure Add_TR
      (TP_List : in out TP_Mapping_List.List;
@@ -391,6 +394,13 @@ package body Test.Skeleton is
 
    function Format_Time (Time : GNAT.OS_Lib.OS_Time) return String;
    --  Returns image of given time in 1901-01-01 00:00:00 format.
+
+   procedure Get_Units_To_Stub
+     (The_Unit :        Compilation_Unit;
+      Data     : in out Data_Holder);
+   --  Populates the list of units that should be stubbed.
+
+   procedure Process_Stubs (List : Ada_Nodes_List.List);
 
    ---------
    -- "<" --
@@ -594,13 +604,20 @@ package body Test.Skeleton is
       end Get_Suite_Components;
    begin
       if P_Unit_Kind (CU) = Unit_Body then
-         --  Only interested in specs.
+         --  Only interested in specs
          return;
       end if;
       Gather_Data
         (CU, Data, Suite_Data_List, Apropriate_Source);
 
       if Apropriate_Source then
+
+         --  First, create stubs if needed. This will allow to import stub_data
+         --  packages into test packages only for actually stubbed
+         --  dependencies.
+         if Stub_Mode_ON then
+            Process_Stubs (Data.Units_To_Stub);
+         end if;
 
          declare
             F : File_Array_Access;
@@ -635,6 +652,26 @@ package body Test.Skeleton is
 
                String_Set.Next (Cur);
             end loop;
+
+            if Stub_Mode_ON or else Separate_Drivers then
+
+               Cur := Test_Packages.First;
+               while Cur /= String_Set.No_Element loop
+
+                  Suite_Data := Get_Suite_Components
+                    (Suite_Data_List,
+                     String_Set.Element (Cur));
+
+                  if Suite_Data.Good_For_Suite then
+                     Test.Harness.Generate_Test_Drivers
+                       (Suite_Data,
+                        Data.Unit_File_Name.all,
+                        Data.Units_To_Stub);
+                  end if;
+
+                  String_Set.Next (Cur);
+               end loop;
+            end if;
 
          end if;
       end if;
@@ -706,9 +743,9 @@ package body Test.Skeleton is
          return Into;
       end Get_Nested_Packages;
 
-      ---------------------
-      -- Get_Subprograms --
-      ---------------------
+      -----------------
+      -- Get_Records --
+      -----------------
 
       function Get_Records (Node : Ada_Node'Class) return Visit_Status is
          Cur_Node : Ada_Node;
@@ -1184,6 +1221,10 @@ package body Test.Skeleton is
             Subp_Data_List.Next (Cur);
          end loop;
       end;
+
+      if Stub_Mode_ON then
+         Get_Units_To_Stub (The_Unit, Data);
+      end if;
 
    end Gather_Data;
 
@@ -4687,6 +4728,83 @@ package body Test.Skeleton is
       Close (Input_File);
    end Get_Subprograms_From_Package;
 
+   -----------------------
+   -- Get_Units_To_Stub --
+   -----------------------
+
+   procedure Get_Units_To_Stub
+     (The_Unit :        Compilation_Unit;
+      Data     : in out Data_Holder)
+   is
+      Body_N : Body_Node;
+      Body_Unit   : Compilation_Unit;
+
+      Already_Stubbing : String_Set.Set := String_Set.Empty_Set;
+      --  It is generally easier to store units to stub in a list, however
+      --  to avoid duplications we use this local set since it is easier
+      --  and faster to check membership in a set.
+
+      procedure Add_Units_To_Stub (The_Unit : Compilation_Unit);
+
+      procedure Add_Units_To_Stub (The_Unit : Compilation_Unit)
+      is
+         Clauses : constant Ada_Node_List := The_Unit.F_Prelude;
+      begin
+         for Cl of Clauses loop
+            if
+              Cl.Kind = Ada_With_Clause
+              and then not Cl.As_With_Clause.F_Has_Limited
+            then
+               declare
+                  With_Names : constant Name_List :=
+                    Cl.As_With_Clause.F_Packages;
+
+                  Withed_Spec : Basic_Decl;
+               begin
+                  for WN of With_Names loop
+                     Withed_Spec := WN.As_Name.P_Referenced_Decl;
+
+                     declare
+                        Withed_Spec_Image : constant String :=
+                          Withed_Spec.Unit.Get_Filename;
+                     begin
+                        if not Already_Stubbing.Contains (Withed_Spec_Image)
+                        then
+                           Already_Stubbing.Include (Withed_Spec_Image);
+                           Data.Units_To_Stub.Append (Withed_Spec.As_Ada_Node);
+                           Trace (Me, Withed_Spec_Image);
+                        end if;
+                     end;
+                  end loop;
+               end;
+            end if;
+         end loop;
+      end Add_Units_To_Stub;
+
+   begin
+      Trace
+        (Me,
+         "units to stub for "
+         & Base_Name (The_Unit.Unit.Get_Filename));
+      Increase_Indent (Me);
+
+      --  Gathering with clauses from spec
+      Add_Units_To_Stub (The_Unit);
+
+      Body_N :=
+        The_Unit.F_Body.As_Library_Item.F_Item.As_Basic_Decl.
+          P_Body_Part_For_Decl;
+
+      --  Gathering with clauses from body
+      if Body_N /= No_Body_Node then
+         Body_Unit := Body_N.Unit.Root.As_Compilation_Unit;
+         Add_Units_To_Stub (Body_Unit);
+      end if;
+
+      Decrease_Indent (Me);
+      Already_Stubbing.Clear;
+   end Get_Units_To_Stub;
+
    ----------------------
    -- Sanitize_TC_Name --
    ----------------------
@@ -5268,5 +5386,50 @@ package body Test.Skeleton is
                                   (Name => Output_Prj.all,
                                    Case_Sensitive => False));
    end Generate_Project_File;
+
+   -------------------
+   -- Process_Stubs --
+   -------------------
+
+   procedure Process_Stubs (List : Ada_Nodes_List.List)
+   is
+      Cur : Ada_Nodes_List.Cursor;
+      Str : String_Access;
+
+      use Ada_Nodes_List;
+   begin
+      if Is_Empty (List) then
+         return;
+      end if;
+
+      --  Once we change the context, contents of List won't make sense.
+      Cur := List.First;
+      while Cur /= Ada_Nodes_List.No_Element loop
+
+         Str := new String'(Ada_Nodes_List.Element (Cur).Unit.Get_Filename);
+
+         if Get_Source_Body (Str.all) /= "" then
+            if not Source_Stubbed (Str.all) then
+               Test.Stub.Process_Unit
+                 (Ada_Nodes_List.Element (Cur),
+                  Get_Source_Stub_Dir (Str.all)
+                  & GNAT.OS_Lib.Directory_Separator
+                  & Base_Name (Get_Source_Body (Str.all)),
+                  Get_Source_Stub_Dir (Str.all)
+                  & GNAT.OS_Lib.Directory_Separator
+                  & Get_Source_Stub_Data_Spec (Str.all),
+                  Get_Source_Stub_Dir (Str.all)
+                  & GNAT.OS_Lib.Directory_Separator
+                  & Get_Source_Stub_Data_Body (Str.all));
+               Mark_Sourse_Stubbed (Str.all);
+            end if;
+         end if;
+
+         Free (Str);
+
+         Next (Cur);
+      end loop;
+
+   end Process_Stubs;
 
 end Test.Skeleton;

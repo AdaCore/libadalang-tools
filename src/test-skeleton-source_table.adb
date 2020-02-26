@@ -6,7 +6,7 @@
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
---                     Copyright (C) 2011-2019, AdaCore                     --
+--                     Copyright (C) 2011-2020, AdaCore                     --
 --                                                                          --
 -- GNATTEST  is  free  software;  you  can redistribute it and/or modify it --
 -- under terms of the  GNU  General Public License as published by the Free --
@@ -37,7 +37,10 @@ with Ada.Characters.Handling; use Ada.Characters.Handling;
 
 package body Test.Skeleton.Source_Table is
 
-   Me : constant Trace_Handle := Create ("Skeletons.Sources", Default => Off);
+   Me         : constant Trace_Handle :=
+     Create ("Skeletons.Sources", Default => Off);
+   Me_Verbose : constant Trace_Handle :=
+     Create ("Skeletons.Sources_Verbose", Default => Off);
 
    -----------------------
    -- Source File table --
@@ -133,7 +136,6 @@ package body Test.Skeleton.Source_Table is
    PF_Table : Project_File_Table.Map;
 
    function Is_Body (Source_Name : String) return Boolean;
-   pragma Unreferenced (Is_Body);
 
    -----------------------------
    --  Add_Source_To_Process  --
@@ -195,6 +197,54 @@ package body Test.Skeleton.Source_Table is
         new String'(Short_Source_Name_String.all (First_Idx .. Last_Idx));
 
       New_SF_Record.Status := Waiting;
+
+      if Stub_Mode_ON then
+         declare
+            Given_File : constant GNATCOLL.VFS.Virtual_File :=
+              Create (+Fname);
+            Other_File : constant GNATCOLL.VFS.Virtual_File :=
+              Source_Project_Tree.Other_File (Given_File);
+            F_Info     : constant File_Info                 :=
+              Source_Project_Tree.Info (Given_File);
+            P : Project_Type;
+         begin
+            if Given_File /= Other_File
+              and then Is_Regular_File (Other_File.Display_Full_Name)
+            then
+               New_SF_Record.Corresponding_Body :=
+                 new String'(Other_File.Display_Full_Name);
+            end if;
+
+            New_SF_Record.Stub_Data_Base_Spec := new String'
+              (+
+                 (File_From_Unit
+                      (Project         => F_Info.Project,
+                       Unit_Name       =>
+                         F_Info.Unit_Name & "." & Stub_Data_Unit_Name,
+                       Part            => Unit_Spec,
+                       Language        => F_Info.Language,
+                       File_Must_Exist => False)));
+
+            New_SF_Record.Stub_Data_Base_Body := new String'
+              (+
+                 (File_From_Unit
+                      (Project         => F_Info.Project,
+                       Unit_Name       =>
+                         F_Info.Unit_Name & "." & Stub_Data_Unit_Name,
+                       Part            => Unit_Body,
+                       Language        => F_Info.Language,
+                       File_Must_Exist => False)));
+
+            P := F_Info.Project;
+            loop
+               exit when Extending_Project (P) = No_Project;
+               P := Extending_Project (P);
+            end loop;
+
+            New_SF_Record.Project_Name := new String'(P.Name);
+         end;
+
+      end if;
 
       Insert (SF_Table, Full_Source_Name_String.all, New_SF_Record);
 
@@ -269,9 +319,114 @@ package body Test.Skeleton.Source_Table is
       Free (Full_Source_Name_String);
    end Add_Body_To_Process;
 
-   ----------------
-   --  Is_Empty  --
-   ----------------
+   ------------------------
+   -- Add_Body_Reference --
+   ------------------------
+
+   procedure Add_Body_Reference (Fname : String) is
+      First_Idx : Natural;
+      Last_Idx  : Natural;
+
+      New_SF_Record : SF_Record;
+   begin
+      Trace (Me, "adding source (as reference): " & Fname);
+
+      if not Is_Regular_File (Fname) then
+         Report_Std ("gnattest: " & Fname & " not found");
+         return;
+      end if;
+
+      Short_Source_Name_String := new String'(Base_Name (Fname));
+      Full_Source_Name_String  :=
+        new String'(Normalize_Pathname
+          (Fname,
+           Resolve_Links  => False,
+             Case_Sensitive => False));
+
+      --  Already present specs should not be overridden
+      if
+        SF_Table.Find
+          (Full_Source_Name_String.all) /= Source_File_Table.No_Element
+      then
+         return;
+      end if;
+
+      --  Making the new SF_Record
+      New_SF_Record.Full_Source_Name :=
+        new String'(Full_Source_Name_String.all);
+
+      First_Idx := Short_Source_Name_String'First;
+      Last_Idx  := Short_Source_Name_String'Last;
+
+      for J in reverse  First_Idx + 1 .. Last_Idx loop
+
+         if Short_Source_Name_String (J) = '.' then
+            Last_Idx := J - 1;
+            exit;
+         end if;
+
+      end loop;
+
+      New_SF_Record.Suffixless_Name :=
+        new String'(Short_Source_Name_String.all (First_Idx .. Last_Idx));
+
+      New_SF_Record.Status := Body_Reference;
+
+      declare
+         Given_File : constant GNATCOLL.VFS.Virtual_File :=
+           Create (+Fname);
+         Other_File : constant GNATCOLL.VFS.Virtual_File :=
+           Source_Project_Tree.Other_File (Given_File);
+         F_Info     : constant File_Info                 :=
+           Source_Project_Tree.Info (Given_File);
+         P : Project_Type;
+      begin
+         if Given_File /= Other_File
+           and then Is_Regular_File (Other_File.Display_Full_Name)
+         then
+            New_SF_Record.Corresponding_Body :=
+              new String'(Other_File.Display_Full_Name);
+         end if;
+
+         New_SF_Record.Stub_Data_Base_Spec := new String'
+           (+
+              (File_From_Unit
+                   (Project         => F_Info.Project,
+                    Unit_Name       =>
+                      F_Info.Unit_Name & "." & Stub_Data_Unit_Name,
+                    Part            => Unit_Spec,
+                    Language        => F_Info.Language,
+                    File_Must_Exist => False)));
+
+         New_SF_Record.Stub_Data_Base_Body := new String'
+           (+
+              (File_From_Unit
+                   (Project         => F_Info.Project,
+                    Unit_Name       =>
+                      F_Info.Unit_Name & "." & Stub_Data_Unit_Name,
+                    Part            => Unit_Body,
+                    Language        => F_Info.Language,
+                    File_Must_Exist => False)));
+
+         P := F_Info.Project;
+         loop
+            exit when Extending_Project (P) = No_Project;
+            P := Extending_Project (P);
+         end loop;
+         New_SF_Record.Project_Name := new String'(P.Name);
+         New_SF_Record.Unit_Name := new String'(F_Info.Unit_Name);
+      end;
+
+      Insert (SF_Table, Full_Source_Name_String.all, New_SF_Record);
+
+      Free (Short_Source_Name_String);
+      Free (Full_Source_Name_String);
+   end Add_Body_Reference;
+
+   ----------------------
+   --  SF_Table_Empty  --
+   ----------------------
+
    function SF_Table_Empty return Boolean is
       Empty : constant Boolean := Is_Empty (SF_Table);
       Cur   : Source_File_Table.Cursor;
@@ -1065,5 +1220,622 @@ package body Test.Skeleton.Source_Table is
       return Source_File_Table.Element
         (SF_Table, SN).Stub_Created;
    end Source_Stubbed;
+
+   --------------------------------------
+   -- Enforce_Custom_Project_Extention --
+   --------------------------------------
+
+   procedure Enforce_Custom_Project_Extention
+     (File_Name            : String;
+      Subroot_Stub_Prj     : String;
+      Current_Source_Infix : String)
+   is
+      Short_Name : constant String := Base_Name (File_Name);
+
+      Excluded_Sources             : String_Set.Set := String_Set.Empty_Set;
+      Current_Proj_Present_Sources : String_Set.Set := String_Set.Empty_Set;
+      Processed_Projects           : String_Set.Set := String_Set.Empty_Set;
+
+      SS_Cur  : String_Set.Cursor;
+      Subroot_Prj_Name : constant String :=
+        Get_Source_Project_Name (File_Name);
+
+      procedure Process_Project (Proj : String);
+
+      procedure Set_Present_Subset_For_Project (Proj : String);
+
+      procedure Process_Project (Proj : String) is
+         Cur, I_Cur : List_Of_Strings.Cursor;
+         E_Cur : String_Set.Cursor;
+         Arg_Proj : Project_Record;
+
+         Relative_P_Path, Relative_I_Path : String_Access;
+      begin
+         if Processed_Projects.Contains (Proj) then
+            return;
+         end if;
+         Processed_Projects.Include (Proj);
+         Arg_Proj := PF_Table.Element (Proj);
+
+         if Proj = Subroot_Prj_Name then
+            --  The root of the subtree is extended by the test driver project.
+            goto Process_Imported;
+         end if;
+
+         if Arg_Proj.Needed_For_Extention then
+
+            declare
+               F : File_Array_Access;
+            begin
+               Append
+                 (F,
+                  GNATCOLL.VFS.Create
+                    (+(Arg_Proj.Stub_Dir.all)));
+               Append
+                 (F,
+                  GNATCOLL.VFS.Create
+                    (+(Arg_Proj.Stub_Dir.all
+                     & Directory_Separator
+                     & Unit_To_File_Name
+                       (Stub_Project_Prefix & Current_Source_Infix & Proj))));
+
+               if Arg_Proj.Is_Library then
+                  Append
+                    (F,
+                     GNATCOLL.VFS.Create
+                       (+(Arg_Proj.Stub_Dir.all
+                        & Directory_Separator
+                        & Unit_To_File_Name
+                          (Stub_Project_Prefix
+                           & Current_Source_Infix
+                           & Proj
+                           & "_lib"))));
+               end if;
+               Create_Dirs (F);
+            end;
+
+            Relative_P_Path := new String'
+              (+Relative_Path
+                 (Create (+Arg_Proj.Path.all),
+                  Create (+Arg_Proj.Stub_Dir.all)));
+
+            Trace
+              (Me,
+               "Creating "
+               & Arg_Proj.Stub_Dir.all
+               & Directory_Separator
+               & Unit_To_File_Name
+                 (Stub_Project_Prefix & Current_Source_Infix & Proj)
+               & ".gpr");
+            Create
+              (Arg_Proj.Stub_Dir.all
+               & Directory_Separator
+               & Unit_To_File_Name
+                 (Stub_Project_Prefix & Current_Source_Infix & Proj)
+               & ".gpr");
+
+            I_Cur := Arg_Proj.Imported_List.First;
+            while I_Cur /= List_Of_Strings.No_Element loop
+               if
+                 PF_Table.Element
+                 (List_Of_Strings.Element (I_Cur)).Needed_For_Extention
+               then
+                  declare
+                     Imported_Sub_Project : constant String :=
+                       PF_Table.Element
+                         (List_Of_Strings.Element (I_Cur)).Stub_Dir.all
+                         & Directory_Separator
+                       & To_Lower (Stub_Project_Prefix
+                                   & Current_Source_Infix
+                                   & List_Of_Strings.Element (I_Cur))
+                       & ".gpr";
+                  begin
+                     if List_Of_Strings.Element (I_Cur) = Subroot_Prj_Name then
+                        Relative_I_Path := new String'
+                          (+Relative_Path (Create (+Subroot_Stub_Prj),
+                           Create (+Arg_Proj.Stub_Dir.all)));
+                     else
+                        Relative_I_Path := new String'
+                          (+Relative_Path (Create (+Imported_Sub_Project),
+                           Create (+Arg_Proj.Stub_Dir.all)));
+                     end if;
+                  end;
+                  if Arg_Proj.Limited_Withed.Contains
+                    (List_Of_Strings.Element (I_Cur))
+                  then
+                     S_Put
+                       (0,
+                        "limited with """
+                        & Relative_I_Path.all
+                        & """;");
+                  else
+                     S_Put
+                       (0,
+                        "with """
+                        & Relative_I_Path.all
+                        & """;");
+                  end if;
+                  Put_New_Line;
+               end if;
+               Next (I_Cur);
+            end loop;
+
+            S_Put
+              (0,
+               "project "
+               & Stub_Project_Prefix
+               & Current_Source_Infix
+               & Proj
+               & " extends """
+               & Relative_P_Path.all
+               & """ is");
+            Put_New_Line;
+            S_Put (3, "for Source_Dirs use (""."");");
+            Put_New_Line;
+
+            Set_Present_Subset_For_Project (Proj);
+            E_Cur := Current_Proj_Present_Sources.First;
+            if E_Cur /= String_Set.No_Element then
+               S_Put (3, "for Source_Files use (");
+               Put_New_Line;
+            else
+               S_Put (3, "for Source_Files use ();");
+               Put_New_Line;
+            end if;
+            while E_Cur /= String_Set.No_Element loop
+               if not Excluded_Test_Data_Files.Contains
+                 (Get_Source_Stub_Data_Spec (String_Set.Element (E_Cur)))
+               then
+                  S_Put
+                    (6,
+                     """"
+                     & Base_Name
+                       (Get_Source_Stub_Data_Spec (String_Set.Element (E_Cur)))
+                     & """,");
+                  Put_New_Line;
+               end if;
+               if not Excluded_Test_Data_Files.Contains
+                 (Get_Source_Stub_Data_Body (String_Set.Element (E_Cur)))
+               then
+                  S_Put
+                    (6,
+                     """"
+                     & Base_Name
+                       (Get_Source_Stub_Data_Body (String_Set.Element (E_Cur)))
+                     & """,");
+                  Put_New_Line;
+               end if;
+               S_Put
+                 (6,
+                  """"
+                  & Base_Name (Get_Source_Body (String_Set.Element (E_Cur)))
+                  & """");
+               Next (E_Cur);
+               if E_Cur = String_Set.No_Element then
+                  S_Put (0, ");");
+               else
+                  S_Put (0, ",");
+               end if;
+               Put_New_Line;
+            end loop;
+
+            S_Put
+              (3,
+               "for Object_Dir use """
+               & Unit_To_File_Name
+                 (Stub_Project_Prefix & Current_Source_Infix & Proj)
+               & """;");
+            Put_New_Line;
+            if Arg_Proj.Is_Library then
+               S_Put
+                 (3,
+                  "for Library_Dir use """
+                  & Unit_To_File_Name
+                    (Stub_Project_Prefix
+                     & Current_Source_Infix & Proj & "_lib")
+                  & """;");
+               Put_New_Line;
+               S_Put
+                 (3,
+                  "for Library_Name use """
+                  & Unit_To_File_Name
+                    (Stub_Project_Prefix & Current_Source_Infix & Proj)
+                  & """;");
+               Put_New_Line;
+            end if;
+            Put_New_Line;
+
+            E_Cur := Current_Proj_Present_Sources.First;
+            if E_Cur /= String_Set.No_Element then
+               S_Put (3, "package Coverage is");
+               Put_New_Line;
+               S_Put (6, "for Excluded_Units use (");
+               Put_New_Line;
+
+               while E_Cur /= String_Set.No_Element loop
+                  S_Put
+                    (9,
+                     """"
+                     & Get_Source_Unit_Name
+                       (Get_Source_Body (String_Set.Element (E_Cur)))
+                     & """");
+                  Next (E_Cur);
+                  if E_Cur = String_Set.No_Element then
+                     S_Put (0, ");");
+                  else
+                     S_Put (0, ",");
+                  end if;
+                  Put_New_Line;
+               end loop;
+               S_Put (3, "end Coverage;");
+               Put_New_Line;
+            end if;
+
+            S_Put
+              (0,
+               "end "
+               & Stub_Project_Prefix
+               & Current_Source_Infix
+               & Proj
+               & ";");
+
+            Close_File;
+         end if;
+
+         <<Process_Imported>>
+
+         Cur := Arg_Proj.Imported_List.First;
+         while Cur /= List_Of_Strings.No_Element loop
+            Process_Project (List_Of_Strings.Element (Cur));
+            Next (Cur);
+         end loop;
+      end Process_Project;
+
+      procedure Set_Present_Subset_For_Project (Proj : String) is
+         Cur : Source_File_Table.Cursor := SF_Table.First;
+      begin
+         Current_Proj_Present_Sources.Clear;
+
+         while Cur /= Source_File_Table.No_Element loop
+            declare
+               Key  : constant String := Source_File_Table.Key (Cur);
+            begin
+               if Source_File_Table.Element (Cur).Project_Name.all = Proj
+                 and then not Is_Body (Key)
+                 and then Source_Stubbed (Key)
+                 and then not Excluded_Sources.Contains (Base_Name (Key))
+               then
+                  Current_Proj_Present_Sources.Include
+                    (Source_File_Table.Key (Cur));
+               end if;
+            end;
+            Next (Cur);
+         end loop;
+      end Set_Present_Subset_For_Project;
+   begin
+      Union (Excluded_Sources, Default_Stub_Exclusion_List);
+      if Stub_Exclusion_Lists.Contains (Short_Name) then
+         Union (Excluded_Sources, Stub_Exclusion_Lists.Element (Short_Name));
+      end if;
+
+      if Excluded_Sources.Is_Empty then
+         Trace
+           (Me,
+            "No special extending project subtree needed for" & Short_Name);
+         return;
+      end if;
+
+      Trace
+        (Me, "Creating extending project subtree for source " & Short_Name);
+
+      if Me_Verbose.Is_Active then
+         Trace (Me_Verbose, "Current infix is " & Current_Source_Infix);
+         Trace (Me_Verbose, "Root of subtree is " & Subroot_Prj_Name);
+         Trace (Me_Verbose, "excluded sources are:");
+         Increase_Indent (Me_Verbose);
+         SS_Cur := Excluded_Sources.First;
+            while SS_Cur /= String_Set.No_Element loop
+               Trace (Me_Verbose, String_Set.Element (SS_Cur));
+               Next (SS_Cur);
+            end loop;
+         Decrease_Indent (Me_Verbose);
+      end if;
+
+      Process_Project (Subroot_Prj_Name);
+
+   end Enforce_Custom_Project_Extention;
+
+   -------------------------------
+   -- Enforce_Project_Extention --
+   -------------------------------
+
+   procedure Enforce_Project_Extention
+     (Prj_Name              : String;
+      Subroot_Stub_Prj      : String;
+      Current_Project_Infix : String)
+   is
+
+      Processed_Projects : String_Set.Set := String_Set.Empty_Set;
+
+      Current_Proj_Present_Sources : String_Set.Set := String_Set.Empty_Set;
+
+      procedure Process_Project (Proj : String);
+      procedure Set_Present_Subset_For_Project (Proj : String);
+
+      procedure Set_Present_Subset_For_Project (Proj : String) is
+         Cur : Source_File_Table.Cursor := SF_Table.First;
+      begin
+         Current_Proj_Present_Sources.Clear;
+
+         while Cur /= Source_File_Table.No_Element loop
+            declare
+               Key  : constant String := Source_File_Table.Key (Cur);
+            begin
+               if Source_File_Table.Element (Cur).Project_Name.all = Proj
+                 and then not Is_Body (Key)
+                 and then Source_Stubbed (Key)
+                 and then not
+                   Default_Stub_Exclusion_List.Contains (Base_Name (Key))
+               then
+                  Current_Proj_Present_Sources.Include
+                    (Source_File_Table.Key (Cur));
+               end if;
+            end;
+            Next (Cur);
+         end loop;
+      end Set_Present_Subset_For_Project;
+
+      procedure Process_Project (Proj : String) is
+         Relative_P_Path, Relative_I_Path : String_Access;
+         Arg_Proj : Project_Record;
+         Cur, I_Cur : List_Of_Strings.Cursor;
+         E_Cur : String_Set.Cursor;
+      begin
+         if Processed_Projects.Contains (Proj) then
+            return;
+         end if;
+         Processed_Projects.Include (Proj);
+
+         Arg_Proj := PF_Table.Element (Proj);
+
+         if Proj = Prj_Name then
+            --  The root of the subtree is extended by the test driver project.
+            goto Process_Imported;
+         end if;
+
+         --  generating stuff
+         if Arg_Proj.Needed_For_Extention then
+
+            declare
+               F : File_Array_Access;
+            begin
+               Append
+                 (F,
+                  GNATCOLL.VFS.Create
+                    (+(Arg_Proj.Stub_Dir.all)));
+               Append
+                 (F,
+                  GNATCOLL.VFS.Create
+                    (+(Arg_Proj.Stub_Dir.all
+                     & Directory_Separator
+                     & Unit_To_File_Name
+                       (Stub_Project_Prefix & Current_Project_Infix & Proj))));
+               if Arg_Proj.Is_Library then
+                  Append
+                    (F,
+                     GNATCOLL.VFS.Create
+                       (+(Arg_Proj.Stub_Dir.all
+                        & Directory_Separator
+                        & Unit_To_File_Name
+                          (Stub_Project_Prefix
+                           & Current_Project_Infix
+                           & Proj
+                           & "_lib"))));
+               end if;
+               Create_Dirs (F);
+            end;
+
+            Relative_P_Path := new String'
+              (+Relative_Path
+                 (Create (+Arg_Proj.Path.all),
+                  Create (+Arg_Proj.Stub_Dir.all)));
+
+            Trace
+              (Me,
+               "Creating "
+               & Arg_Proj.Stub_Dir.all
+               & Directory_Separator
+               & Unit_To_File_Name
+                 (Stub_Project_Prefix & Current_Project_Infix & Proj)
+               & ".gpr");
+            Create
+              (Arg_Proj.Stub_Dir.all
+               & Directory_Separator
+               & Unit_To_File_Name
+                 (Stub_Project_Prefix & Current_Project_Infix & Proj)
+               & ".gpr");
+
+            I_Cur := Arg_Proj.Imported_List.First;
+            while I_Cur /= List_Of_Strings.No_Element loop
+               if
+                 PF_Table.Element
+                 (List_Of_Strings.Element (I_Cur)).Needed_For_Extention
+               then
+                  declare
+                     Imported_Sub_Project : constant String :=
+                       PF_Table.Element
+                         (List_Of_Strings.Element (I_Cur)).Stub_Dir.all
+                         & Directory_Separator
+                       & To_Lower (Stub_Project_Prefix
+                                   & Current_Project_Infix
+                                   & List_Of_Strings.Element (I_Cur))
+                       & ".gpr";
+                  begin
+                     if List_Of_Strings.Element (I_Cur) = Prj_Name then
+                        Relative_I_Path := new String'
+                          (+Relative_Path (Create (+Subroot_Stub_Prj),
+                           Create (+Arg_Proj.Stub_Dir.all)));
+                     else
+                        Relative_I_Path := new String'
+                          (+Relative_Path (Create (+Imported_Sub_Project),
+                           Create (+Arg_Proj.Stub_Dir.all)));
+                     end if;
+                  end;
+                  if Arg_Proj.Limited_Withed.Contains
+                    (List_Of_Strings.Element (I_Cur))
+                  then
+                     S_Put
+                       (0,
+                        "limited with """
+                        & Relative_I_Path.all
+                        & """;");
+                  else
+                     S_Put
+                       (0,
+                        "with """
+                        & Relative_I_Path.all
+                        & """;");
+                  end if;
+                  Put_New_Line;
+               end if;
+               Next (I_Cur);
+            end loop;
+
+            S_Put
+              (0,
+               "project "
+               & Stub_Project_Prefix
+               & Current_Project_Infix
+               & Proj
+               & " extends """
+               & Relative_P_Path.all
+               & """ is");
+            Put_New_Line;
+            S_Put (3, "for Source_Dirs use (""."");");
+            Put_New_Line;
+
+            Set_Present_Subset_For_Project (Proj);
+            E_Cur := Current_Proj_Present_Sources.First;
+            if E_Cur /= String_Set.No_Element then
+               S_Put (3, "for Source_Files use (");
+               Put_New_Line;
+            else
+               S_Put (3, "for Source_Files use ();");
+               Put_New_Line;
+            end if;
+            while E_Cur /= String_Set.No_Element loop
+               if not Excluded_Test_Data_Files.Contains
+                 (Get_Source_Stub_Data_Spec (String_Set.Element (E_Cur)))
+               then
+                  S_Put
+                    (6,
+                     """"
+                     & Base_Name
+                       (Get_Source_Stub_Data_Spec (String_Set.Element (E_Cur)))
+                     & """,");
+                  Put_New_Line;
+               end if;
+               if not Excluded_Test_Data_Files.Contains
+                 (Get_Source_Stub_Data_Body (String_Set.Element (E_Cur)))
+               then
+                  S_Put
+                    (6,
+                     """"
+                     & Base_Name
+                       (Get_Source_Stub_Data_Body (String_Set.Element (E_Cur)))
+                     & """,");
+                  Put_New_Line;
+               end if;
+               S_Put
+                 (6,
+                  """"
+                  & Base_Name (Get_Source_Body (String_Set.Element (E_Cur)))
+                  & """");
+               Next (E_Cur);
+               if E_Cur = String_Set.No_Element then
+                  S_Put (0, ");");
+               else
+                  S_Put (0, ",");
+               end if;
+               Put_New_Line;
+            end loop;
+
+            S_Put
+              (3,
+               "for Object_Dir use """
+               & Unit_To_File_Name
+                 (Stub_Project_Prefix & Current_Project_Infix & Proj)
+               & """;");
+            Put_New_Line;
+            if Arg_Proj.Is_Library then
+               S_Put
+                 (3,
+                  "for Library_Dir use """
+                  & Unit_To_File_Name
+                    (Stub_Project_Prefix
+                     & Current_Project_Infix & Proj & "_lib")
+                  & """;");
+               Put_New_Line;
+               S_Put
+                 (3,
+                  "for Library_Name use """
+                  & Unit_To_File_Name
+                    (Stub_Project_Prefix & Current_Project_Infix & Proj)
+                  & """;");
+               Put_New_Line;
+            end if;
+            Put_New_Line;
+
+            E_Cur := Current_Proj_Present_Sources.First;
+            if E_Cur /= String_Set.No_Element then
+               S_Put (3, "package Coverage is");
+               Put_New_Line;
+               S_Put (6, "for Excluded_Units use (");
+               Put_New_Line;
+
+               while E_Cur /= String_Set.No_Element loop
+                  S_Put
+                    (9,
+                     """"
+                     & Get_Source_Unit_Name
+                       (Get_Source_Body (String_Set.Element (E_Cur)))
+                     & """");
+                  Next (E_Cur);
+                  if E_Cur = String_Set.No_Element then
+                     S_Put (0, ");");
+                  else
+                     S_Put (0, ",");
+                  end if;
+                  Put_New_Line;
+               end loop;
+               S_Put (3, "end Coverage;");
+               Put_New_Line;
+            end if;
+
+            S_Put
+              (0,
+               "end "
+               & Stub_Project_Prefix
+               & Current_Project_Infix
+               & Proj
+               & ";");
+
+            Close_File;
+         end if;
+
+         <<Process_Imported>>
+
+         Cur := Arg_Proj.Imported_List.First;
+         while Cur /= List_Of_Strings.No_Element loop
+            Process_Project (List_Of_Strings.Element (Cur));
+            Next (Cur);
+         end loop;
+      end Process_Project;
+
+   begin
+
+      Process_Project (Prj_Name);
+
+   end Enforce_Project_Extention;
 
 end Test.Skeleton.Source_Table;
