@@ -66,13 +66,32 @@ package body Pp.Formatting is
    --  from the previous Spaces token, if any.
 
    --  The following Next_ss/Prev_ss are the same as Scanner.Next/Prev, except
-   --  they skip the Spaces token, if present. The "ss" stands for "skip
-   --  spaces".
+   --  they skip a following Spaces token, if present. The "ss" stands for
+   --  "skip spaces".
 
    function Next_ss (Cur : Scanner.Tokn_Cursor) return Scanner.Tokn_Cursor;
    procedure Next_ss (Cur : in out Scanner.Tokn_Cursor);
    function Prev_ss (Cur : Scanner.Tokn_Cursor) return Scanner.Tokn_Cursor;
    procedure Prev_ss (Cur : in out Scanner.Tokn_Cursor);
+
+   procedure Next_ssnl (Cur : in out Scanner.Tokn_Cursor);
+   --  Same as Next_ss, but also skip line endings
+
+   procedure Next_ssnl (Cur : in out Scanner.Tokn_Cursor) is
+      use Scanner;
+   begin
+      Next (Cur);
+
+      while Kind (Cur) in Enabled_LB_Token | EOL_Token loop
+         Next (Cur);
+      end loop;
+
+      if Kind (Cur) = Spaces then
+         Next (Cur);
+         pragma Assert
+           (Kind (Cur) not in Enabled_LB_Token | EOL_Token | Spaces);
+      end if;
+   end Next_ssnl;
 
    procedure Next_ss (Cur : in out Scanner.Tokn_Cursor) is
       use Scanner;
@@ -1250,11 +1269,11 @@ package body Pp.Formatting is
                  and then Sname_83 (Out_Tok)
                then
                   loop -- could be "end A.B.C;"
-                     Next_ss (Out_Tok);
+                     Next_ssnl (Out_Tok);
 
                      exit when Kind (Out_Tok) /= '.';
 
-                     Next_ss (Out_Tok);
+                     Next_ssnl (Out_Tok);
 
                      if not Sname_83 (Out_Tok) then
                         Raise_Token_Mismatch
@@ -1262,7 +1281,7 @@ package body Pp.Formatting is
                            Lines_Data, Src_Buf, Src_Tok, Out_Tok);
                      end if;
                   end loop;
-                  if Kind (Src_Tok) /= ';' then
+                  if Kind (Out_Tok) /= ';' then
                      Raise_Token_Mismatch
                        ("Final_Check 4",
                         Lines_Data, Src_Buf, Src_Tok, Out_Tok);

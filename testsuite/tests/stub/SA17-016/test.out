@@ -1,0 +1,17 @@
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-yyyyyyyyyyyyyyyyyyyy.adb created
+pragma Ada_2012;
+package body Xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  .Yyyyyyyyyyyyyyyyyyyy is
+
+   -------
+   -- P --
+   -------
+
+   procedure P is
+   begin
+      pragma Compile_Time_Warning (Standard.True, "P unimplemented");
+      raise Program_Error with "Unimplemented procedure P";
+   end P;
+
+end Xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  .Yyyyyyyyyyyyyyyyyyyy;
