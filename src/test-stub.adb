@@ -1834,6 +1834,7 @@ package body Test.Stub is
 
             --  Processing result profile
             SP := Param_List.Last_Element;
+
             if
               Is_Only_Limited_Withed (SP.Type_Elem.As_Type_Expr)
               or else Is_Abstract (SP.Type_Elem.As_Type_Expr)
@@ -2489,6 +2490,10 @@ package body Test.Stub is
             Type_Unit := Type_Decl.Unit;
          end if;
       end;
+
+      if Type_Unit = Type_Decl.P_Standard_Unit then
+         return False;
+      end if;
 
       if Origin_Unit = Type_Unit then
          return False;

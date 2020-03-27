@@ -1460,6 +1460,10 @@ package body Test.Skeleton is
       --  Check if Markered_Data_Map is empty or the only element present is
       --  actually the Body_Statements persistent block.
 
+      procedure Put_Stub_Data_Import;
+      --  Put with and use clauses for Stub_Data packages of units stubbed
+      --  for current UUT.
+
       procedure Put_Persistent_Section (PS_Type : Persistent_Section_Type) is
          UH     : Unique_Hash;
          MD     : Markered_Data;
@@ -1655,6 +1659,43 @@ package body Test.Skeleton is
          New_Line_Count;
          New_Line_Count;
       end Put_TP_Header;
+
+      procedure Put_Stub_Data_Import is
+         S_Cur : Ada_Nodes_List.Cursor := Data.Units_To_Stub.First;
+         Tmp : Unbounded_String;
+         Def_Name : Defining_Name;
+         use Ada_Nodes_List;
+      begin
+         while S_Cur /= Ada_Nodes_List.No_Element loop
+            Tmp := To_Unbounded_String
+              (Element (S_Cur).Unit.Get_Filename);
+
+            if
+              Source_Stubbed (To_String (Tmp)) and then
+              not Excluded_Test_Data_Files.Contains
+                (Base_Name
+                   (Get_Source_Stub_Data_Spec (To_String (Tmp))))
+            then
+               Def_Name :=
+                 Ada_Nodes_List.Element
+                   (S_Cur).As_Basic_Decl.P_Defining_Name;
+               S_Put
+                 (0,
+                  "with "
+                  & Node_Image (Def_Name)
+                  & "."
+                  & Stub_Data_Unit_Name
+                  & "; use "
+                  & Node_Image (Def_Name)
+                  & "."
+                  & Stub_Data_Unit_Name
+                  & ";");
+               New_Line_Count;
+            end if;
+
+            Next (S_Cur);
+         end loop;
+      end Put_Stub_Data_Import;
 
       use GNAT.OS_Lib;
    begin
@@ -2865,6 +2906,9 @@ package body Test.Skeleton is
             New_Line_Count;
             S_Put (0, "with System.Assertions;");
             New_Line_Count;
+            if Stub_Mode_ON then
+               Put_Stub_Data_Import;
+            end if;
             New_Line_Count;
 
             Put_Persistent_Section (With_Clauses);
@@ -3993,6 +4037,9 @@ package body Test.Skeleton is
                New_Line_Count;
                S_Put (0, "with System.Assertions;");
                New_Line_Count;
+               if Stub_Mode_ON then
+                  Put_Stub_Data_Import;
+               end if;
                New_Line_Count;
 
                Put_Persistent_Section (With_Clauses);
@@ -4739,12 +4786,16 @@ package body Test.Skeleton is
       Body_N : Body_Node;
       Body_Unit   : Compilation_Unit;
 
+      Parent : Ada_Node;
+
       Already_Stubbing : String_Set.Set := String_Set.Empty_Set;
       --  It is generally easier to store units to stub in a list, however
       --  to avoid duplications we use this local set since it is easier
       --  and faster to check membership in a set.
 
       procedure Add_Units_To_Stub (The_Unit : Compilation_Unit);
+
+      procedure Iterate_Separates (The_Unit : Compilation_Unit);
 
       procedure Add_Units_To_Stub (The_Unit : Compilation_Unit)
       is
@@ -4760,6 +4811,8 @@ package body Test.Skeleton is
                     Cl.As_With_Clause.F_Packages;
 
                   Withed_Spec : Basic_Decl;
+
+                  Parent_Unit : Ada_Node;
                begin
                   for WN of With_Names loop
                      Withed_Spec := WN.As_Name.P_Referenced_Decl;
@@ -4775,11 +4828,58 @@ package body Test.Skeleton is
                            Trace (Me, Withed_Spec_Image);
                         end if;
                      end;
+
+                     --  Gathering parent packages
+                     Parent_Unit := Withed_Spec.P_Semantic_Parent;
+                     while
+                       not Parent_Unit.Is_Null and then
+                       Parent_Unit.Unit /= Parent_Unit.P_Standard_Unit
+                     loop
+                        declare
+                           Parent_File : constant String :=
+                             Parent_Unit.Unit.Get_Filename;
+                        begin
+                           if not Already_Stubbing.Contains (Parent_File) then
+                              Already_Stubbing.Include (Parent_File);
+                              Data.Units_To_Stub.Append (Parent_Unit);
+                              Trace (Me, Parent_File);
+                           end if;
+                        end;
+                        Parent_Unit := Parent_Unit.P_Semantic_Parent;
+                     end loop;
                   end loop;
                end;
             end if;
          end loop;
+
       end Add_Units_To_Stub;
+
+      procedure Iterate_Separates (The_Unit : Compilation_Unit) is
+         Bod : Ada_Node;
+
+         function Find (Node : Ada_Node'Class) return Visit_Status;
+         function Find (Node : Ada_Node'Class) return Visit_Status is
+            Separate_A_Unit : Analysis_Unit;
+            Separate_C_Unit : Compilation_Unit;
+         begin
+            if Node.Kind in Ada_Body_Stub then
+               Separate_A_Unit := Node.As_Basic_Decl.P_Next_Part_For_Decl.Unit;
+               Separate_C_Unit := Separate_A_Unit.Root.As_Compilation_Unit;
+               Add_Units_To_Stub (Separate_C_Unit);
+               Iterate_Separates (Separate_C_Unit);
+            end if;
+            return Into;
+         end Find;
+      begin
+
+         if The_Unit.F_Body.Kind = Ada_Library_Item then
+            Bod := The_Unit.F_Body.As_Library_Item.F_Item.As_Ada_Node;
+         else
+            Bod := The_Unit.F_Body.As_Subunit.F_Body.As_Ada_Node;
+         end if;
+
+         Traverse (Bod, Find'Access);
+      end Iterate_Separates;
 
    begin
       Trace
@@ -4799,7 +4899,27 @@ package body Test.Skeleton is
       if Body_N /= No_Body_Node then
          Body_Unit := Body_N.Unit.Root.As_Compilation_Unit;
          Add_Units_To_Stub (Body_Unit);
+         Iterate_Separates (Body_Unit);
       end if;
+
+      --  Gathering parent packages
+      Parent :=
+        The_Unit.F_Body.As_Library_Item.F_Item.As_Ada_Node.P_Semantic_Parent;
+      while
+        not Parent.Is_Null and then Parent.Unit /= Parent.P_Standard_Unit
+      loop
+         declare
+            Parent_File : constant String := Parent.Unit.Get_Filename;
+         begin
+            if not Already_Stubbing.Contains (Parent_File) then
+               Already_Stubbing.Include (Parent_File);
+               Data.Units_To_Stub.Append (Parent);
+               Trace (Me, Parent_File);
+            end if;
+         end;
+
+         Parent := Parent.P_Semantic_Parent;
+      end loop;
 
       Decrease_Indent (Me);
       Already_Stubbing.Clear;
