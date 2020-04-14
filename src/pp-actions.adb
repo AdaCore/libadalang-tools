@@ -746,6 +746,7 @@ package body Pp.Actions is
            when Ada_Number_Decl =>
              L ("?~,# ~~ ^: constant ^2:=[# !]"),
            when Ada_Object_Decl |
+               Ada_Anonymous_Object_Decl |
                Ada_Extended_Return_Stmt_Object_Decl =>
              L ("?~,# ~~ ^:? ~~~? ~~~? ~~~ !? ^2:=[# ~~]~!", Aspects),
            when Ada_Package_Renaming_Decl =>
@@ -880,7 +881,7 @@ package body Pp.Actions is
            when Ada_Pragma_Argument_Assoc => null,
            when Ada_Pragma_Node => null,
            when Ada_Component_Clause => null, -- ?
-           when Ada_Renaming_Clause =>
+           when Ada_Renaming_Clause | Ada_Synthetic_Renaming_Clause =>
              L ("? renames[# ~~]~"),
            when Ada_Select_Stmt =>
              L ("select",
