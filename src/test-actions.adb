@@ -53,6 +53,8 @@ with Ada.Directories; use Ada.Directories;
 with Utils.Projects; use Utils.Projects;
 with GNAT.Directory_Operations;
 with Ada.Characters.Handling; use Ada.Characters.Handling;
+with Ada.Text_IO;
+with Ada.Strings.Fixed;
 
 package body Test.Actions is
 
@@ -60,7 +62,10 @@ package body Test.Actions is
      Test.Common.Source_Project_Tree;
 
    function Is_Externally_Built (File : Virtual_File) return Boolean;
-   --  Checks if the given source file belongs to an externally build library.
+   --  Checks if the given source file belongs to an externally build library
+
+   procedure Process_Exclusion_List (Value : String);
+   --  Processes value of --exclude-from-stubbing switch
 
    use Utils.Formatted_Output;
 
@@ -231,6 +236,14 @@ package body Test.Actions is
 
       if Common.Stub_Mode_ON then
          Test.Skeleton.Source_Table.Set_Direct_Stub_Output;
+         declare
+            Excludes : constant String_Ref_Array :=
+              Arg (Cmd, Exclude_From_Stubbing);
+         begin
+            for Exclude of Excludes loop
+               Process_Exclusion_List (Exclude.all);
+            end loop;
+         end;
       end if;
    end Init;
 
@@ -325,5 +338,74 @@ package body Test.Actions is
       end if;
       return False;
    end Is_Externally_Built;
+
+   ----------------------------
+   -- Process_Exclusion_List --
+   ----------------------------
+
+   procedure Process_Exclusion_List (Value : String) is
+      use Ada.Text_IO;
+      use Ada.Strings.Fixed;
+      Idx   : Natural;
+      First : constant Natural := Value'First;
+
+      F : File_Type;
+
+      Exclude_For_One_UUT : constant Boolean :=
+        Value'Length > 3    and then
+        Value (First) = ':' and then
+        Index (Value, "=") > First + 1;
+
+      S : String_Access;
+
+      function Is_Comment (S : String) return Boolean is
+        (S'Length >= 2 and then S (S'First .. S'First + 1) = "--");
+   begin
+      if Exclude_For_One_UUT then
+         Idx := Index (Value, "=");
+         declare
+            Unit   : constant String := Value (First + 1 .. Idx - 1);
+            F_Path : constant String :=
+              Normalize_Pathname
+                (Name           => Value (Idx + 1 .. Value'Last),
+                 Case_Sensitive => False);
+         begin
+            if not Is_Regular_File (F_Path) then
+               Cmd_Error_No_Help ("cannot find " & F_Path);
+            end if;
+            Open (F, In_File, F_Path);
+            while not End_Of_File (F) loop
+               S := new String'(Get_Line (F));
+               if not Is_Comment (S.all) then
+                  Test.Common.Store_Excluded_Stub (Unit, S.all);
+               end if;
+               Free (S);
+            end loop;
+            Close (F);
+         end;
+         return;
+      end if;
+
+      declare
+         F_Path : constant String :=
+           Normalize_Pathname
+             (Name           => Value,
+              Case_Sensitive => False);
+      begin
+         if not Is_Regular_File (F_Path) then
+            Cmd_Error_No_Help ("cannot find " & F_Path);
+         end if;
+         Open (F, In_File, F_Path);
+         while not End_Of_File (F) loop
+            S := new String'(Get_Line (F));
+            if not Is_Comment (S.all) then
+               Test.Common.Store_Default_Excluded_Stub (S.all);
+            end if;
+            Free (S);
+         end loop;
+         Close (F);
+      end;
+
+   end Process_Exclusion_List;
 
 end Test.Actions;

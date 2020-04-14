@@ -79,8 +79,7 @@ package Test.Command_Lines is
       Subdir,
       Tests_Root,
       Stubs_Dir,
-      Exclude_From_Stubbing,
-      --  ????Not sure about --exclude-from-stubbing:{unit}={filename}
+      Additional_Tests,
       Skeleton_Default,
       Passed_Tests,
       Exit_Status,
@@ -99,7 +98,7 @@ package Test.Command_Lines is
        Exit_Status => +"off", -- or "on"
        others => null));
 
-   type Test_String_Seqs is (Additional_Tests);
+   type Test_String_Seqs is (Exclude_From_Stubbing);
 
    package Test_String_Seq_Switches is new String_Seq_Switches
      (Descriptor,
@@ -107,7 +106,7 @@ package Test.Command_Lines is
 
    package Test_String_Seq_Syntax is new Test_String_Seq_Switches
      .Set_Syntax
-     ((Additional_Tests => '='));
+     ((Exclude_From_Stubbing => '!'));
 
    package Freeze is new Freeze_Descriptor (Descriptor);
 

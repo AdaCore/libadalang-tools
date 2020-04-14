@@ -4793,9 +4793,19 @@ package body Test.Skeleton is
       --  to avoid duplications we use this local set since it is easier
       --  and faster to check membership in a set.
 
+      function Good_To_Stub (Check_Unit : Analysis_Unit) return Boolean;
+      --  Checks that given unit is suitable for stubbing
+
       procedure Add_Units_To_Stub (The_Unit : Compilation_Unit);
+      --  Adds units from with clauses and parent units to the list of
+      --  units to stub.
 
       procedure Iterate_Separates (The_Unit : Compilation_Unit);
+      --  Looks for inuts withed in separate bodies
+
+      -----------------------
+      -- Add_Units_To_Stub --
+      -----------------------
 
       procedure Add_Units_To_Stub (The_Unit : Compilation_Unit)
       is
@@ -4821,7 +4831,9 @@ package body Test.Skeleton is
                         Withed_Spec_Image : constant String :=
                           Withed_Spec.Unit.Get_Filename;
                      begin
-                        if not Already_Stubbing.Contains (Withed_Spec_Image)
+                        if Good_To_Stub (Withed_Spec.Unit)
+                          and then not Already_Stubbing.Contains
+                            (Withed_Spec_Image)
                         then
                            Already_Stubbing.Include (Withed_Spec_Image);
                            Data.Units_To_Stub.Append (Withed_Spec.As_Ada_Node);
@@ -4839,7 +4851,10 @@ package body Test.Skeleton is
                            Parent_File : constant String :=
                              Parent_Unit.Unit.Get_Filename;
                         begin
-                           if not Already_Stubbing.Contains (Parent_File) then
+                           if Good_To_Stub (Parent_Unit.Unit)
+                             and then not Already_Stubbing.Contains
+                               (Parent_File)
+                           then
                               Already_Stubbing.Include (Parent_File);
                               Data.Units_To_Stub.Append (Parent_Unit);
                               Trace (Me, Parent_File);
@@ -4853,6 +4868,10 @@ package body Test.Skeleton is
          end loop;
 
       end Add_Units_To_Stub;
+
+      -----------------------
+      -- Iterate_Separates --
+      -----------------------
 
       procedure Iterate_Separates (The_Unit : Compilation_Unit) is
          Bod : Ada_Node;
@@ -4880,6 +4899,38 @@ package body Test.Skeleton is
 
          Traverse (Bod, Find'Access);
       end Iterate_Separates;
+
+      ------------------
+      -- Good_To_Stub --
+      ------------------
+
+      function Good_To_Stub (Check_Unit : Analysis_Unit) return Boolean is
+         File_Name     : constant String :=
+           Base_Name (Check_Unit.Get_Filename);
+         Arg_File_Name : constant String :=
+           Base_Name (The_Unit.Unit.Get_Filename);
+      begin
+         if not Source_Present (Check_Unit.Get_Filename) then
+            return False;
+         end if;
+         if Check_Unit = The_Unit.Unit then
+            --  No self stubbing
+            return False;
+         end if;
+
+         if Default_Stub_Exclusion_List.Contains (File_Name) then
+            return False;
+         end if;
+
+         if Stub_Exclusion_Lists.Contains (Arg_File_Name) then
+            if
+              Stub_Exclusion_Lists.Element (Arg_File_Name).Contains (File_Name)
+            then
+               return False;
+            end if;
+         end if;
+         return True;
+      end Good_To_Stub;
 
    begin
       Trace
