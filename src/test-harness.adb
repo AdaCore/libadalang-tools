@@ -26,18 +26,24 @@
 with GNATCOLL.VFS;                use GNATCOLL.VFS;
 with GNATCOLL.VFS_Utils;          use GNATCOLL.VFS_Utils;
 with GNATCOLL.Traces;             use GNATCOLL.Traces;
-with Utils.Command_Lines; use Utils.Command_Lines;
+with Utils.Command_Lines;         use Utils.Command_Lines;
 
-with GNAT.Directory_Operations; use GNAT.Directory_Operations;
+with GNAT.Directory_Operations;   use GNAT.Directory_Operations;
 
-with Ada.Containers;    use Ada.Containers;
+with Ada.Characters.Handling;     use Ada.Characters.Handling;
+with Ada.Containers;              use Ada.Containers;
 with Ada.Containers.Indefinite_Ordered_Sets;
 with Ada.Containers.Vectors;
 
-with Ada.Strings;       use Ada.Strings;
-with Ada.Strings.Fixed; use Ada.Strings.Fixed;
+with Ada.Strings;                 use Ada.Strings;
+with Ada.Strings.Fixed;           use Ada.Strings.Fixed;
 
 with Test.Skeleton.Source_Table;
+with Test.Mapping;                use Test.Mapping;
+with Test.Harness.Source_Table;   use Test.Harness.Source_Table;
+
+with Libadalang.Common;           use Libadalang.Common;
+with Langkit_Support.Slocs;       use Langkit_Support.Slocs;
 
 package body Test.Harness is
 
@@ -133,6 +139,31 @@ package body Test.Harness is
    function Get_Next_Infix return String;
    --  Returns a numbered infix ("1_", "2_",..), increasing the number for
    --  each call.
+
+   procedure Gather_Data
+     (The_Unit          :     Compilation_Unit;
+      Data              : out Data_Holder;
+      Appropriate_Source : out Boolean);
+   --  Iterates through the given unit and sets the values of Main_Type and
+   --  Subp_List. All the iterations are done here.
+   --  Checks if given unit is of the right kind and if it is appropriate.
+   --  Marks unappropriate sources in the source table.
+
+   function Is_AUnit_Part (Unit : Analysis_Unit) return Boolean;
+   --  Checks if the unit under consideration is a part of AUnit library itself
+
+   function Is_Test_Routine (Subp : Basic_Subp_Decl) return Boolean;
+   --  Indicates if the given Subprogram is a test routine, which means it
+   --  has only one parameter whose type is a descendant of AUnit test type.
+   --  Also returns False for Set_Up, Set_Up_Case, Tear_Down, Tear_Down_Case.
+
+   function Is_Test_Fixture_Routine (Subp : Basic_Subp_Decl) return Boolean;
+   --  Same as above, but only returns true if the ancestor test type is
+   --  Test_Fixture.
+
+   function Is_Test_Related (Subp : Basic_Subp_Decl) return Boolean;
+   --  Indicates if the given Subprogram is of interest, that is a test routine
+   --  or Set_Up/Tear_Down etc.
 
    -----------------------------------------
    -- Generate_Global_Config_Pragmas_File --
@@ -2760,5 +2791,482 @@ package body Test.Harness is
 
       Generate_Aggregate_Project;
    end Generate_Common_Harness_Files;
+
+   --------------------
+   -- Process_Source --
+   --------------------
+
+   procedure Process_Source (The_Unit : Analysis_Unit) is
+      CU : constant Compilation_Unit := Root (The_Unit).As_Compilation_Unit;
+
+      Appropriate_Source : Boolean;
+      Data               : Data_Holder;
+   begin
+      if P_Unit_Kind (CU) = Unit_Body then
+         --  Only interested in specs
+         return;
+      end if;
+      Gather_Data (CU, Data, Appropriate_Source);
+
+      if Appropriate_Source then
+         if Data.Good_For_Suite then
+            Generate_Suite (Data);
+         end if;
+      end if;
+   end Process_Source;
+
+   -----------------
+   -- Gather_Data --
+   -----------------
+
+   procedure Gather_Data
+     (The_Unit          :     Compilation_Unit;
+      Data              : out Data_Holder;
+      Appropriate_Source : out Boolean)
+   is
+      Bod : constant Library_Item := The_Unit.F_Body.As_Library_Item;
+
+      Unit : Ada_Node;
+
+      Number_Of_Test_Types : Natural  := 0;
+
+      Local_TP_Mapping : User_Test_Package;
+
+      function Get_Records (Node : Ada_Node'Class) return Visit_Status;
+      --  Collects descendants of AUnit types Test_Case and Test_Fixture
+
+      function Get_Subprograms (Node : Ada_Node'Class) return Visit_Status;
+      --  Collects test routines and mapping info on Set_Up and Tear_Down
+
+      function Is_Test_Case (Type_Decl : Base_Type_Decl) return Boolean;
+      --  Indicates if given type is a test_case type of AUnit framework
+
+      ------------------
+      -- Is_Test_Case --
+      ------------------
+
+      function Is_Test_Case (Type_Decl : Base_Type_Decl) return Boolean is
+         Dec_Elem : Base_Type_Decl := Type_Decl;
+      begin
+         while Dec_Elem /= No_Base_Type_Decl loop
+            if
+              Node_Image (Dec_Elem.As_Basic_Decl.P_Defining_Name) = "Test_Case"
+              and then Is_AUnit_Part (Dec_Elem.Unit)
+            then
+               return True;
+            end if;
+
+            Dec_Elem := Parent_Type_Declaration (Dec_Elem);
+         end loop;
+
+         return False;
+      end Is_Test_Case;
+
+      -----------------
+      -- Get_Records --
+      -----------------
+
+      function Get_Records (Node : Ada_Node'Class) return Visit_Status is
+         Cur_Node : Base_Type_Decl;
+         Type_Def : Derived_Type_Def;
+
+         Type_Info : Test_Type_Info;
+         Test_Case : Test_Case_Info;
+      begin
+         if Kind (Node) = Ada_Generic_Package_Decl then
+            return Over;
+         end if;
+
+         if Kind (Node) /= Ada_Type_Decl then
+            return Into;
+         end if;
+
+         if not Node.As_Type_Decl.P_Is_Tagged_Type then
+            return Over;
+         end if;
+
+         if Node.As_Base_Type_Decl.P_Is_Private then
+            Cur_Node :=
+              Node.As_Base_Type_Decl.P_Private_Completion;
+         else
+            Cur_Node := Node.As_Base_Type_Decl;
+         end if;
+
+         if
+           Cur_Node.As_Type_Decl.F_Type_Def.Kind /= Ada_Derived_Type_Def
+           or else Abstract_Type (Cur_Node.As_Base_Type_Decl)
+         then
+            return Over;
+         end if;
+
+         Type_Def := Cur_Node.As_Type_Decl.F_Type_Def.As_Derived_Type_Def;
+         if Type_Def.F_Has_Limited then
+            return Over;
+         end if;
+
+         if not Is_AUnit_Part (Root_Type_Declaration (Cur_Node).Unit) then
+            return Over;
+         end if;
+
+         --  Checking for duplicating types
+         for
+           I in Data.Test_Types.First_Index .. Data.Test_Types.Last_Index
+         loop
+            if
+              Data.Test_Types.Element (I).Test_Type = Cur_Node.As_Ada_Node
+            then
+               return Over;
+            end if;
+         end loop;
+
+         Number_Of_Test_Types := Number_Of_Test_Types + 1;
+
+         declare
+            Name   : constant Defining_Name :=
+              Cur_Node.As_Basic_Decl.P_Defining_Name;
+            N_Span : constant Source_Location_Range := Name.Sloc_Range;
+         begin
+            Free (Local_TP_Mapping.Type_Name);
+            Local_TP_Mapping.Type_Name := new String'(Node_Image (Name));
+            Local_TP_Mapping.Type_Sloc :=
+              (Natural (N_Span.Start_Line), Natural (N_Span.Start_Column));
+
+            if Is_Test_Case (Cur_Node) then
+
+               Test_Case.Name := new String'(Node_Image (Name));
+               Test_Case.Nesting := new String'(Get_Nesting (Cur_Node));
+
+               Data.TC_List.Append (Test_Case);
+            else
+
+               Type_Info.Test_Type := Cur_Node.As_Ada_Node;
+               Type_Info.Test_Type_Name := new String'(Node_Image (Name));
+               Type_Info.Nesting := new String'(Get_Nesting (Cur_Node));
+
+               Data.Test_Types.Append (Type_Info);
+            end if;
+         end;
+
+         return Over;
+      end Get_Records;
+
+      ---------------------
+      -- Get_Subprograms --
+      ---------------------
+
+      function Get_Subprograms (Node : Ada_Node'Class) return Visit_Status is
+         Local_TR_Mapping : TR_Mapping;
+         Test_Routine     : Test_Routine_Info;
+
+         Name   : Defining_Name;
+         N_Span : Source_Location_Range;
+
+         Owner_Decl : Base_Type_Decl;
+         Type_Found : Boolean;
+      begin
+         if Node.Kind = Ada_Generic_Package_Decl then
+            return Over;
+         end if;
+
+         if Node.Kind = Ada_Subp_Decl then
+            if
+              Node.As_Basic_Subp_Decl.
+                P_Subp_Decl_Spec.As_Subp_Spec.F_Subp_Kind.Kind /=
+                Ada_Subp_Kind_Procedure
+            then
+               --  Test routine cannot be a function
+               return Over;
+            end if;
+         else
+            return Into;
+         end if;
+
+         Name   := Node.As_Basic_Decl.P_Defining_Name;
+         N_Span := Name.Sloc_Range;
+
+         if Is_Test_Routine (Node.As_Basic_Subp_Decl) then
+            Local_TR_Mapping.TR_Name := new String'(Node_Image (Name));
+            Local_TR_Mapping.Line    := Natural (N_Span.Start_Line);
+            Local_TR_Mapping.Column  := Natural (N_Span.Start_Column);
+
+            Local_TP_Mapping.TR_List.Append (Local_TR_Mapping);
+         elsif Is_Test_Related (Node.As_Basic_Subp_Decl) then
+            if To_Lower (Node_Image (Name)) = "set_up" then
+               Local_TP_Mapping.SetUp_Sloc :=
+                 (Natural (N_Span.Start_Line), Natural (N_Span.Start_Column));
+            elsif To_Lower (Node_Image (Name)) = "tear_down" then
+               Local_TP_Mapping.TearDown_Sloc :=
+                 (Natural (N_Span.Start_Line), Natural (N_Span.Start_Column));
+            end if;
+         end if;
+
+         if not Is_Test_Fixture_Routine (Node.As_Basic_Subp_Decl) then
+            --  Test routines with parameters of Test_Case-descendant type
+            --  are registered automatically, nothing to do for them.
+            return Over;
+         end if;
+
+         Test_Routine.TR_Declaration := Node.As_Ada_Node;
+         Test_Routine.TR_Text_Name   := new String'(Node_Image (Name));
+         Test_Routine.Nesting        := new String'(Get_Nesting (Node));
+
+         declare
+            Subp_Span : constant Source_Location_Range := Node.Sloc_Range;
+         begin
+            Test_Routine.Tested_Sloc := new String'
+              (Base_Name (Data.Test_Unit_File_Name.all)
+               & ":"
+               & Trim (Subp_Span.Start_Line'Img, Both)
+               & ":"
+               & Trim (Subp_Span.Start_Column'Img, Both)
+               & ": "
+               & Test_Routine.TR_Text_Name.all
+               & ":");
+         end;
+
+         Owner_Decl := Tagged_Primitive_Owner
+           (Node.As_Basic_Subp_Decl.P_Subp_Decl_Spec);
+
+         Type_Found := False;
+         for
+           I in Data.Test_Types.First_Index .. Data.Test_Types.Last_Index
+         loop
+
+            if Data.Test_Types.Element (I).Test_Type = Owner_Decl then
+               Test_Routine.Test_Type_Numb := I;
+               Type_Found := True;
+               exit;
+            end if;
+
+         end loop;
+
+         if Type_Found then
+            Data.TR_List.Append (Test_Routine);
+         end if;
+
+         return Over;
+      end Get_Subprograms;
+
+   begin
+      Unit := Bod.F_Item.As_Ada_Node;
+
+      case Unit.Kind is
+         when Ada_Package_Decl =>
+            Data.Generic_Kind := False;
+
+         when others =>
+            Report_Std
+              ("gnattest: "
+               & Base_Name (The_Unit.Unit.Get_Filename)
+               & " is an unsupported kind of unit");
+            Set_Source_Status
+              (Base_Name (The_Unit.Unit.Get_Filename),
+               Bad_Content);
+            Appropriate_Source := False;
+
+            return;
+      end case;
+
+      Increase_Indent
+        (Me,
+         "processing " & Node_Image (Unit.As_Basic_Decl.P_Defining_Name)
+         &  " (" & Base_Name (The_Unit.Unit.Get_Filename) & ")");
+
+      --  That's quite ulikely for AUnit itself to be included into the
+      --  input files, yet still we have to check this.
+      if Is_AUnit_Part (The_Unit.Unit) then
+         Cmd_Error_No_Help ("trying to process aunit itself");
+      end if;
+
+      Local_TP_Mapping.Name := new String'
+        (Base_Name (The_Unit.Unit.Get_Filename));
+
+      Data.Test_Unit := The_Unit;
+      Data.Test_Unit_Full_Name := new String'
+        (Node_Image (Unit.As_Basic_Decl.P_Defining_Name));
+      Data.Test_Unit_File_Name := new String'(The_Unit.Unit.Get_Filename);
+      Data.Good_For_Suite := False;
+
+      Trace (Me, "Gathering test types");
+      Traverse (Unit, Get_Records'Access);
+      Trace (Me, "Gathering test routines");
+      Traverse (Unit, Get_Subprograms'Access);
+
+      Decrease_Indent (Me, "Traversings finished");
+
+      if
+        Data.TR_List.Is_Empty
+        and then Data.ITR_List.Is_Empty
+        and then Data.TC_List.Is_Empty
+      then
+         Data.Good_For_Suite := False;
+         Set_Source_Status
+           (Base_Name (The_Unit.Unit.Get_Filename),
+            Processed_In_Vain);
+      else
+         Data.Good_For_Suite := True;
+         Set_Source_Status
+           (Base_Name (The_Unit.Unit.Get_Filename),
+            Processed);
+         if Number_Of_Test_Types = 1 then
+            Additional_Mapping.Append (Local_TP_Mapping);
+         else
+            Report_Std
+              ("warning: (gnattest) cannot create mapping for "
+               & Data.Test_Unit_File_Name.all);
+         end if;
+      end if;
+
+      Appropriate_Source := True;
+   end Gather_Data;
+
+   -------------------
+   -- Is_AUnit_Part --
+   -------------------
+
+   function Is_AUnit_Part (Unit : Analysis_Unit) return Boolean is
+      File_Name : constant String := Base_Name (Unit.Get_Filename);
+   begin
+      return
+        File_Name'Length > 5
+        and then File_Name (File_Name'First .. File_Name'First + 4) = "aunit";
+   end Is_AUnit_Part;
+
+   ---------------------
+   -- Is_Test_Routine --
+   ---------------------
+
+   function Is_Test_Routine (Subp : Basic_Subp_Decl) return Boolean is
+      Subp_Name : constant String :=
+        To_Lower (Node_Image (Subp.As_Basic_Decl.P_Defining_Name));
+   begin
+      if not Is_Test_Related (Subp) then
+         return False;
+      end if;
+
+      --  Checking for predefined AUnit set up and tear down routines.
+      if Subp_Name = "set_up" then
+         return False;
+      end if;
+
+      if Subp_Name = "set_up_case" then
+         return False;
+      end if;
+
+      if Subp_Name = "tear_down" then
+         return False;
+      end if;
+
+      if Subp_Name = "tear_down_case" then
+         return False;
+      end if;
+
+      return True;
+   end Is_Test_Routine;
+
+   -----------------------
+   --  Is_Test_Related  --
+   -----------------------
+
+   function Is_Test_Related (Subp : Basic_Subp_Decl) return Boolean is
+
+      Params : constant Param_Spec_Array :=
+        Subp.P_Subp_Decl_Spec.P_Params;
+      Param  : Param_Spec;
+
+      Param_Type_Expr : Type_Expr;
+      Param_Type_Name : Libadalang.Analysis.Name;
+      Param_Type_Decl : Base_Type_Decl;
+   begin
+      if Params'Length /= 1 then
+         return False;
+      end if;
+
+      if Is_AUnit_Part (Subp.Unit) then
+         return False;
+      end if;
+
+      Param := (Params (Params'First));
+
+      declare
+         Param_Names : constant Defining_Name_List := F_Ids (Param);
+         Param_Names_Size : Natural := 0;
+      begin
+         for N of Param_Names loop
+            Param_Names_Size := Param_Names_Size + 1;
+         end loop;
+
+         if Param_Names_Size > 1 then
+            return False;
+         end if;
+      end;
+
+      Param_Type_Expr := Param.F_Type_Expr;
+      if Param_Type_Expr.Kind /= Ada_Subtype_Indication then
+         return False;
+      end if;
+
+      Param_Type_Name := Param_Type_Expr.As_Subtype_Indication.F_Name;
+
+      if Kind (Param_Type_Name) = Ada_Attribute_Ref then
+         return False;
+      end if;
+
+      Param_Type_Name := Param_Type_Name.P_Relative_Name.As_Name;
+      Param_Type_Decl := P_Canonical_Type
+        (Param_Type_Name.P_Referenced_Decl.As_Base_Type_Decl);
+
+      Param_Type_Decl := Root_Type_Declaration (Param_Type_Decl);
+
+      if Param_Type_Decl.Is_Null then
+         return False;
+      end if;
+
+      if Is_AUnit_Part (Param_Type_Decl.Unit) then
+         return True;
+      else
+         return False;
+      end if;
+
+   end Is_Test_Related;
+
+   -----------------------------
+   -- Is_Test_Fixture_Routine --
+   -----------------------------
+
+   function Is_Test_Fixture_Routine (Subp : Basic_Subp_Decl) return Boolean is
+      Params : constant Param_Spec_Array :=
+        Subp.P_Subp_Decl_Spec.P_Params;
+      Param  : Param_Spec;
+
+      Param_Type_Expr : Type_Expr;
+      Param_Type_Name : Libadalang.Analysis.Name;
+      Param_Type_Decl : Base_Type_Decl;
+   begin
+      if not Is_Test_Routine (Subp) then
+         return False;
+      end if;
+
+      Param := Params (Params'First);
+      Param_Type_Expr := Param.F_Type_Expr;
+      Param_Type_Name := Param_Type_Expr.As_Subtype_Indication.F_Name;
+      Param_Type_Name := Param_Type_Name.P_Relative_Name.As_Name;
+      Param_Type_Decl := P_Canonical_Type
+        (Param_Type_Name.P_Referenced_Decl.As_Base_Type_Decl);
+
+      while not Param_Type_Decl.Is_Null loop
+         if
+           Node_Image (Param_Type_Decl.As_Basic_Decl.P_Defining_Name) =
+           "Test_Case"
+           and then Is_AUnit_Part (Param_Type_Decl.Unit)
+         then
+            return False;
+         end if;
+
+         Param_Type_Decl := Parent_Type_Declaration (Param_Type_Decl);
+      end loop;
+
+      return True;
+   end Is_Test_Fixture_Routine;
 
 end Test.Harness;

@@ -184,4 +184,8 @@ package Test.Harness is
    procedure Project_Creator (Source_Prj : String);
    --  Generates a simple project file for the test driver
 
+   procedure Process_Source (The_Unit : Analysis_Unit);
+   --  Processes source for harness-only and additional-tests modes, generates
+   --  suite packages.
+
 end Test.Harness;

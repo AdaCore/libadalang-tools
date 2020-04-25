@@ -116,6 +116,9 @@ package Test.Common is
    --  (immediately or being nested in some other constructs), this function
    --  also returns True.
 
+   function Abstract_Type (Decl : Base_Type_Decl) return Boolean;
+   --  Returns true if the declared type is abstract
+
    procedure Report_Err (Message : String);
    --  Prints its argument to the standard error output
    procedure Report_Std (Message : String; Offset : Integer := 0);

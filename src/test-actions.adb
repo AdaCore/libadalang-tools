@@ -48,6 +48,7 @@ with Test.Harness;
 with Test.Mapping;
 with Test.Common;
 with Test.Skeleton.Source_Table;
+with Test.Harness.Source_Table;
 
 with Ada.Directories; use Ada.Directories;
 with Utils.Projects; use Utils.Projects;
@@ -94,6 +95,7 @@ package body Test.Actions is
       Files : File_Array_Access;
    begin
       GNATCOLL.Traces.Parse_Config_File;
+      Test.Common.Harness_Only := Arg (Cmd, Harness_Only);
 
       --  We need to fill a local source table since gnattest actually needs
       --  info not only on current source but on any particular one or even
@@ -128,7 +130,13 @@ package body Test.Actions is
             if not Contains (Ignored, Simple_Name (File.all)) then
 
                if Info (SPT, Create (+File.all)).Unit_Part = Unit_Spec then
-                  Test.Skeleton.Source_Table.Add_Source_To_Process (File.all);
+                  if Test.Common.Harness_Only then
+                     Test.Harness.Source_Table.Add_Source_To_Process
+                       (File.all);
+                  else
+                     Test.Skeleton.Source_Table.Add_Source_To_Process
+                       (File.all);
+                  end if;
                end if;
             end if;
          end loop;
@@ -255,17 +263,18 @@ package body Test.Actions is
       Src_Prj : constant String :=
         Tool.Project_Tree.Root_Project.Project_Path.Display_Full_Name;
    begin
-      if not Arg (Cmd, Harness_Only) then
-         if Arg (Cmd, Stub) then
-            Test.Harness.Generate_Stub_Test_Driver_Projects (Src_Prj);
-         else
+
+      if Arg (Cmd, Stub) then
+         Test.Harness.Generate_Stub_Test_Driver_Projects (Src_Prj);
+      else
+         if not Arg (Cmd, Harness_Only) then
             Test.Skeleton.Generate_Project_File (Src_Prj);
-            Test.Harness.Test_Runner_Generator  (Src_Prj);
-            Test.Harness.Project_Creator        (Src_Prj);
          end if;
-         Test.Common.Generate_Common_File;
-         Test.Mapping.Generate_Mapping_File;
+         Test.Harness.Test_Runner_Generator  (Src_Prj);
+         Test.Harness.Project_Creator        (Src_Prj);
       end if;
+      Test.Common.Generate_Common_File;
+      Test.Mapping.Generate_Mapping_File;
    end Final;
 
    ---------------------
@@ -288,7 +297,11 @@ package body Test.Actions is
          PP_Trivia (Unit);
       end if;
 
-      Test.Skeleton.Process_Source (Unit);
+      if Test.Common.Harness_Only then
+         Test.Harness.Process_Source (Unit);
+      else
+         Test.Skeleton.Process_Source (Unit);
+      end if;
    end Per_File_Action;
 
    ---------------

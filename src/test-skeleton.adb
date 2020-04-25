@@ -763,7 +763,7 @@ package body Test.Skeleton is
 
          procedure Get_Type_Parent_Data (Type_Data : in out Base_Type_Info) is
             procedure Set_No_Parent (Type_Data : in out Base_Type_Info);
-         --  Sets all data relevant to parent type to null/false
+            --  Sets all data relevant to parent type to null/false
 
             -------------------
             -- Set_No_Parent --
@@ -798,7 +798,7 @@ package body Test.Skeleton is
             Cur_Node := Node.As_Ada_Node;
          end if;
 
-         --  Checking for doubled types.
+         --  Checking for duplicating types
          for I in Data.Type_Data_List.First_Index ..
            Data.Type_Data_List.Last_Index
          loop
@@ -816,10 +816,7 @@ package body Test.Skeleton is
          Get_Type_Parent_Data (Type_Data);
 
          Type_Data.Main_Type_Abstract :=
-           (Cur_Node.Kind = Ada_Record_Type_Def and then
-            Cur_Node.As_Record_Type_Def.F_Has_Abstract) or else
-           (Cur_Node.Kind = Ada_Derived_Type_Def and then
-            Cur_Node.As_Derived_Type_Def.F_Has_Abstract);
+           Abstract_Type (Cur_Node.As_Base_Type_Decl);
 
          Type_Data.Type_Number := Type_Counter;
          Type_Counter          := Type_Counter + 1;

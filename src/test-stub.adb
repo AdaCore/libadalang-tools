@@ -2144,40 +2144,6 @@ package body Test.Stub is
       Param_Type_Def  : Type_Def;
       Type_Decl, Decl : Base_Type_Decl;
       Subtype_Ind     : Subtype_Indication;
-
-      function Abstract_Type (Decl : Base_Type_Decl) return Boolean;
-
-      function Abstract_Type (Decl : Base_Type_Decl) return Boolean is
-         Type_Decl : constant Base_Type_Decl := Decl;
-      begin
-         if
-           Type_Decl.Kind = Ada_Incomplete_Tagged_Type_Decl and then
-           Type_Decl.As_Incomplete_Tagged_Type_Decl.F_Has_Abstract
-         then
-            return True;
-         end if;
-
-         if Type_Decl.Kind = Ada_Type_Decl then
-            Param_Type_Def := Type_Decl.As_Type_Decl.F_Type_Def;
-            if
-              Param_Type_Def.Kind = Ada_Derived_Type_Def and then
-              Param_Type_Def.As_Derived_Type_Def.F_Has_Abstract
-            then
-               return True;
-            elsif
-              Param_Type_Def.Kind = Ada_Private_Type_Def and then
-              Param_Type_Def.As_Private_Type_Def.F_Has_Abstract
-            then
-               return True;
-            elsif
-              Param_Type_Def.Kind = Ada_Record_Type_Def and then
-              Param_Type_Def.As_Record_Type_Def.F_Has_Abstract
-            then
-               return True;
-            end if;
-         end if;
-         return False;
-      end Abstract_Type;
    begin
 
       if Param_Type.Kind = Ada_Anonymous_Type then
