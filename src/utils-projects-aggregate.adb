@@ -44,9 +44,8 @@ package body Utils.Projects.Aggregate is
    ---------------------------------
 
    procedure Collect_Aggregated_Projects (P : Project_Type) is
-      Iter : Project_Iterator := Start (Root_Project     => P,
-                                        Recursive        => True,
-                                        Direct_Only      => True);
+      Aggregated_Prjs : Project_Array_Access :=
+        P.Aggregated_Projects (Unwind_Aggregated => True);
 
       Arg_Prj_Name : constant Filesystem_String :=
         Full_Name (P.Project_Path, Normalize => True);
@@ -55,31 +54,20 @@ package body Utils.Projects.Aggregate is
          Ada.Text_IO.Put_Line (String (Arg_Prj_Name));
       end if;
 
-      while Current (Iter) /= No_Project loop
-         if Is_Aggregate_Project (Current (Iter)) then
-            if Arg_Prj_Name /= Full_Name (Current (Iter).Project_Path,
-                                          Normalize => True)
-            then
-               --  Iterator also returns the top project the iteration starts
-               --  from, we should not process it again to avoid cycling
-
-               Collect_Aggregated_Projects (Current (Iter));
-            end if;
-         else
-            declare
-               VF : constant Virtual_File := Current (Iter).Project_Path;
-               pragma Assert (VF /= No_File);
-               Prj_Name : constant Filesystem_String :=
-                 Full_Name (VF, Normalize => True);
-               Prj_String : constant String_Access :=
-                 new String'(String (Prj_Name));
-            begin
-               Include (Aggregated_Projects, Prj_String);
-            end;
-         end if;
-
-         Next (Iter);
+      for Prj of Aggregated_Prjs.all loop
+         declare
+            VF : constant Virtual_File := Prj.Project_Path;
+            pragma Assert (VF /= No_File);
+            Prj_Name : constant Filesystem_String :=
+              Full_Name (VF, Normalize => True);
+            Prj_String : constant String_Access :=
+              new String'(String (Prj_Name));
+         begin
+            Include (Aggregated_Projects, Prj_String);
+         end;
       end loop;
+
+      Unchecked_Free (Aggregated_Prjs);
 
       if Num_Of_Aggregated_Projects = 0 then
          Cmd_Error

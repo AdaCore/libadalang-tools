@@ -1,0 +1,5 @@
+with "abst.gpr";
+aggregate project aggr
+is
+   for project_Files use ("p.gpr");
+end aggr;
