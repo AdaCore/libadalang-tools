@@ -614,14 +614,6 @@ package body Pp.Actions is
            when Ada_Prim_Type_Accessor => null,
             --  ???The above are not used
 
-           when Ada_Iterated_Assoc => null,
-           when Ada_Bracket_Aggregate => null,
-           when Ada_Bracket_Delta_Aggregate => null,
-           when Ada_Delta_Aggregate => null,
-           when Ada_Decl_Expr => null,
-           --  ??? Ada 2020 related expressions, needs to be implemented. See
-           --  T519-017.
-
            when Ada_Ada_List => null,
            when Ada_Subp_Spec => null,
            when Ada_Aggregate_Assoc => null,
