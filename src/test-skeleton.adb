@@ -402,6 +402,11 @@ package body Test.Skeleton is
 
    procedure Process_Stubs (List : Ada_Nodes_List.List);
 
+   function Is_Declared_In_Regular_Package
+     (Elem : Ada_Node) return Boolean;
+   --  Checks that all enclosing elements for the given element are regular
+   --  package declarations.
+
    ---------
    -- "<" --
    ---------
@@ -711,6 +716,23 @@ package body Test.Skeleton is
       function Get_Records (Node : Ada_Node'Class) return Visit_Status;
       function Get_Subprograms (Node : Ada_Node'Class) return Visit_Status;
 
+      procedure Gather_Inherited_Subprograms
+        (Dummy_Types     : Natural;
+         Suite_Data_List : in out Suites_Data_Type);
+      --  Populates the list of inherited subprograms. Dummy_Types indicates
+      --  the number of Test types created for non-primitives.
+
+      function Is_Callable_Subprogram (Subp : Basic_Decl) return Boolean is
+         (Subp.Kind not in Ada_Abstract_Subp_Decl | Ada_Null_Subp_Decl);
+      --  Checks that given subprogram is neither an abstract subprogram
+      --  nor a null procedure. This ensures that corresponding test routine
+      --  is created for such subprogram.
+
+      function Is_Fully_Private
+        (Arg : Base_Type_Decl) return Boolean;
+      --  Detects if Arg and its incomplete declaration (if present)
+      --  are both in private part.
+
       -------------------------
       -- Get_Nested_Packages --
       --------------------------
@@ -753,6 +775,7 @@ package body Test.Skeleton is
          Type_Data     : Base_Type_Info;
          Test_Type     : Test.Harness.Test_Type_Info;
          Test_Package  : String_Access;
+         Tmp_Decl      : Base_Type_Decl;
 
          procedure Get_Type_Parent_Data (Type_Data : in out Base_Type_Info);
          --  Gathers data on parent type
@@ -762,8 +785,17 @@ package body Test.Skeleton is
          --------------------------
 
          procedure Get_Type_Parent_Data (Type_Data : in out Base_Type_Info) is
+
+            Parent_Type : Base_Type_Decl;
+
             procedure Set_No_Parent (Type_Data : in out Base_Type_Info);
             --  Sets all data relevant to parent type to null/false
+
+            function Is_Interface_Declaration
+              (Arg : Type_Decl) return Boolean
+            is
+              (Arg.F_Type_Def.Kind in Ada_Interface_Kind);
+            --  Detects if Arg is a declaration of an interface
 
             -------------------
             -- Set_No_Parent --
@@ -778,7 +810,42 @@ package body Test.Skeleton is
                Type_Data.Has_Argument_Father       := False;
             end Set_No_Parent;
          begin
-            Set_No_Parent (Type_Data);
+
+            if Stub_Mode_ON then
+               Set_No_Parent (Type_Data);
+               return;
+            end if;
+
+            Parent_Type :=
+              Parent_Type_Declaration (Cur_Node.As_Base_Type_Decl);
+
+            if Parent_Type.Is_Null then
+               Set_No_Parent (Type_Data);
+               return;
+            end if;
+
+            if
+              not Is_Declared_In_Regular_Package (Parent_Type.As_Ada_Node)
+              or else Is_Interface_Declaration (Parent_Type.As_Type_Decl)
+              or else Is_Fully_Private (Parent_Type)
+            then
+               Set_No_Parent (Type_Data);
+               return;
+            end if;
+
+            if not Source_Present (Parent_Type.Unit.Get_Filename) then
+               Set_No_Parent (Type_Data);
+               return;
+            end if;
+
+            Type_Data.Argument_Father_Type_Name := new
+              String'(Node_Image (Parent_Type.P_Defining_Name));
+            Type_Data.Argument_Father_Nesting   := new
+              String'(Get_Nesting (Parent_Type));
+            Type_Data.Argument_Father_Unit_Name := new String'
+                (Enclosing_Unit_Name (Parent_Type));
+
+            Type_Data.Has_Argument_Father       := True;
          end Get_Type_Parent_Data;
       begin
          --  We should first abandon for Private parts, abandon for ghost
@@ -812,6 +879,28 @@ package body Test.Skeleton is
          Type_Data.Main_Type_Text_Name := new
            String'(Node_Image (Cur_Node.As_Basic_Decl.P_Defining_Name));
          Type_Data.Nesting := new String'(Get_Nesting (Cur_Node));
+
+         --  Checking if any of ancestor types had a discriminant part
+         Type_Data.No_Default_Discriminant := False;
+         Tmp_Decl := Cur_Node.As_Base_Type_Decl;
+         while not Tmp_Decl.Is_Null loop
+            if not Tmp_Decl.As_Type_Decl.F_Discriminants.Is_Null then
+               declare
+                  Discr_Specs : constant Discriminant_Spec_List :=
+                    Tmp_Decl.As_Type_Decl.F_Discriminants.
+                      As_Known_Discriminant_Part.F_Discr_Specs;
+               begin
+                  for Discr_Spec of Discr_Specs loop
+                     if Discr_Spec.F_Default_Expr.Is_Null then
+                        Type_Data.No_Default_Discriminant := True;
+                        exit;
+                     end if;
+                  end loop;
+               end;
+            end if;
+
+            Tmp_Decl := Parent_Type_Declaration (Tmp_Decl);
+         end loop;
 
          Get_Type_Parent_Data (Type_Data);
 
@@ -1107,6 +1196,307 @@ package body Test.Skeleton is
          return Over;
       end Get_Subprograms;
 
+      ----------------------------------
+      -- Gather_Inherited_Subprograms --
+      ----------------------------------
+
+      procedure Gather_Inherited_Subprograms
+        (Dummy_Types     : Natural;
+         Suite_Data_List : in out Suites_Data_Type)
+      is
+         Type_Dec : Type_Decl;
+
+         function Is_Overridden (Subp : Basic_Decl) return Boolean;
+         --  Checks whether given inherited subprogram is hidden by an
+         --  overriding one.
+
+         function Test_Types_Linked
+           (Inheritance_Root_Type  : Base_Type_Decl;
+            Inheritance_Final_Type : Base_Type_Decl)
+            return Boolean;
+         --  Checks that there is no fully private types between the root type
+         --  and the final descendant, so that corresponding test types are
+         --  members of same hierarchy.
+
+         -------------------
+         -- Is_Overridden --
+         -------------------
+
+         function Is_Overridden (Subp : Basic_Decl) return Boolean is
+            Test_Name : constant String  := Mangle_Hash (Subp);
+            TN_Length : constant Natural := Test_Name'Length;
+         begin
+            for Sub of Suite_Data_List.TR_List loop
+               --  Tests for current UUT might have test cases, so we cannot
+               --  directly compare test routine names, instead we have to
+               --  check that the beginning is the same.
+               if
+                 Head (Sub.TR_Info.TR_Text_Name.all, TN_Length) = Test_Name
+               then
+                  return True;
+               end if;
+            end loop;
+
+            return False;
+         end Is_Overridden;
+
+         -----------------------
+         -- Test_Types_Linked --
+         -----------------------
+
+         function Test_Types_Linked
+           (Inheritance_Root_Type  : Base_Type_Decl;
+            Inheritance_Final_Type : Base_Type_Decl)
+            return Boolean
+         is
+            Intermidiate : Base_Type_Decl := Inheritance_Final_Type;
+         begin
+
+            while not Intermidiate.Is_Null loop
+               if Is_Fully_Private (Intermidiate) then
+                  return False;
+               end if;
+
+               if Intermidiate = Inheritance_Root_Type then
+                  return True;
+               end if;
+               Intermidiate := Parent_Type_Declaration (Intermidiate);
+            end loop;
+
+            return False;
+         end Test_Types_Linked;
+
+         Test_Routine : Test.Harness.Test_Routine_Info_Enhanced;
+         Test_Routine_Wrapper : Test_Routine_Info_Enhanced_Wrapper;
+
+         Tmp_Data        : Data_Holder;
+         Tmp_Suites_Data : Suites_Data_Type;
+         Tmp_Subp        : Subp_Info;
+         Dummy_TR_Info   : Test_Routine_Info_Wrapper;
+         Tmp_TR          : Test.Harness.Test_Routine_Info;
+         Tmp_Has_TC    : Boolean;
+      begin
+
+         for
+           K in Suite_Data_List.Test_Types.First_Index + Dummy_Type_Counter ..
+             Suite_Data_List.Test_Types.Last_Index
+         loop
+            Type_Dec := As_Type_Decl
+              (Suite_Data_List.Test_Types.Element (K).Original_Type);
+            declare
+               ISubs : constant Basic_Decl_Array :=
+                 Type_Dec.P_Get_Primitives (Only_Inherited => True);
+               Ancestor_Type : Base_Type_Decl;
+            begin
+               for ISub of ISubs loop
+
+                  if
+                    Source_Present (ISub.Unit.Get_Filename)
+                    and then Is_Callable_Subprogram (ISub)
+                  then
+
+                     Ancestor_Type :=
+                       P_Primitive_Subp_Tagged_Type
+                         (ISub.As_Basic_Subp_Decl.P_Subp_Decl_Spec);
+                     while not Ancestor_Type.P_Next_Part.Is_Null loop
+                        Ancestor_Type := Ancestor_Type.P_Next_Part;
+                     end loop;
+
+                     if Test_Types_Linked
+                       (Ancestor_Type, Type_Dec.As_Base_Type_Decl)
+                     then
+                        if not Is_Overridden (ISub) then
+
+                           --  Check if the inherited subprogram had
+                           --  Test_Cases. In such case one test per Test_Case
+                           --  should be inherited.
+                           Tmp_Data.Unit_File_Name := new
+                             String'(Base_Name (ISub.Unit.Get_Filename));
+                           Tmp_Subp.Subp_Declaration := ISub.As_Ada_Node;
+                           Tmp_Subp.Subp_Text_Name :=
+                             new String'(Get_Subp_Name (ISub));
+                           Tmp_Subp.Subp_Mangle_Name :=
+                             new String'(Mangle_Hash (ISub));
+                           Tmp_Subp.Subp_Name_Image := new String'
+                             (Node_Image (ISub.As_Basic_Decl.P_Defining_Name));
+
+                           Gather_Test_Cases
+                             (Tmp_Subp,
+                              Dummy_TR_Info,
+                              Tmp_Data,
+                              Tmp_Suites_Data,
+                              Tmp_Has_TC);
+
+                           if
+                             Get_Nesting (ISub) = Enclosing_Unit_Name (ISub)
+                           then
+                              Test_Routine.TR_Rarent_Unit_Name := new String'
+                                (Enclosing_Unit_Name (ISub)
+                                 & "."
+                                 & Node_Image
+                                   (P_Defining_Name
+                                        (Ancestor_Type.As_Basic_Decl))
+                                 & Test_Data_Unit_Name_Suff
+                                 & "."
+                                 & Node_Image
+                                   (P_Defining_Name
+                                        (Ancestor_Type.As_Basic_Decl))
+                                 & Test_Unit_Name_Suff);
+                           else
+                              Test_Routine.TR_Rarent_Unit_Name := new String'
+                                (Enclosing_Unit_Name (ISub)
+                                 & "."
+                                 & Test_Data_Unit_Name
+                                 & "."
+                                 & Test_Unit_Name
+                                 & "."
+                                 & Nesting_Difference
+                                   (Get_Nesting (ISub),
+                                    Enclosing_Unit_Name (ISub))
+                                 & Node_Image
+                                   (P_Defining_Name
+                                        (Ancestor_Type.As_Basic_Decl))
+                                 & Test_Data_Unit_Name_Suff
+                                 & "."
+                                 & Node_Image
+                                   (P_Defining_Name
+                                        (Ancestor_Type.As_Basic_Decl))
+                                 & Test_Unit_Name_Suff);
+                           end if;
+                           Test_Routine.Nesting := new String'
+                             (Test_Routine.TR_Rarent_Unit_Name.all);
+
+                           if
+                             Get_Nesting (Type_Dec) = Data.Unit_Full_Name.all
+                           then
+                              Test_Routine_Wrapper.Test_Package := new String'
+                                (Data.Unit_Full_Name.all
+                                 & "."
+                                 & Node_Image
+                                     (P_Defining_Name
+                                        (Type_Dec.As_Basic_Decl))
+                                 & Test_Data_Unit_Name_Suff
+                                 & "."
+                                 & Node_Image
+                                     (P_Defining_Name
+                                        (Type_Dec.As_Basic_Decl))
+                                 & Test_Unit_Name_Suff);
+
+                           else
+                              Test_Routine_Wrapper.Test_Package := new String'
+                                (Data.Unit_Full_Name.all
+                                 & "."
+                                 & Test_Data_Unit_Name
+                                 & "."
+                                 & Test_Unit_Name
+                                 & "."
+                                 & Nesting_Difference
+                                   (Get_Nesting (Type_Dec),
+                                    Data.Unit_Full_Name.all)
+                                 & "."
+                                 & Node_Image
+                                     (P_Defining_Name
+                                        (Type_Dec.As_Basic_Decl))
+                                 & Test_Data_Unit_Name_Suff
+                                 & "."
+                                 & Node_Image
+                                     (P_Defining_Name
+                                        (Type_Dec.As_Basic_Decl))
+                                 & Test_Unit_Name_Suff);
+                           end if;
+
+                           --  Type is always the same, test_cases or not
+                           Test_Routine_Wrapper.Original_Type :=
+                             Type_Dec.As_Ada_Node;
+
+                           if Tmp_Has_TC then
+
+                              --  There were Test_Cases
+                              for I in Tmp_Suites_Data.TR_List.First_Index ..
+                                Tmp_Suites_Data.TR_List.Last_Index
+                              loop
+                                 Tmp_TR :=
+                                   Tmp_Suites_Data.TR_List.Element (I).TR_Info;
+
+                                 Test_Routine.TR_Text_Name :=
+                                   new String'(Tmp_TR.TR_Text_Name.all);
+
+                                 --  adding sloc info
+                                 Test_Routine.Tested_Sloc := new String'
+                                   (Tmp_TR.Tested_Sloc.all
+                                    & " inherited at "
+                                    & Base_Name
+                                        (Enclosing_Unit_Name (Type_Dec))
+                                    & ":"
+                                    & Trim
+                                      (First_Line_Number (Type_Dec)'Img, Both)
+                                    & ":"
+                                    & Trim
+                                      (First_Column_Number (Type_Dec)'Img,
+                                       Both)
+                                    & ":");
+
+                                 Test_Routine_Wrapper.TR_Info := Test_Routine;
+
+                                 Suite_Data_List.ITR_List.Append
+                                   (Test_Routine_Wrapper);
+                              end loop;
+                           else
+                              --  There were no test_Cases, we just need
+                              --  to add the single inherited test.
+
+                              Test_Routine.TR_Text_Name   := new String'
+                                (Mangle_Hash (ISub));
+
+                              --  Adding sloc info
+                              Test_Routine.Tested_Sloc := new String'
+                                (Base_Name (Enclosing_Unit_Name (ISub))
+                                 & ":"
+                                 & Trim
+                                     (First_Line_Number (ISub)'Img, Both)
+                                 & ":"
+                                 & Trim
+                                     (First_Column_Number (ISub)'Img, Both)
+                                 & ": inherited at "
+                                 & Base_Name (Enclosing_Unit_Name (Type_Dec))
+                                 & ":"
+                                 & Trim
+                                     (First_Line_Number (Type_Dec)'Img, Both)
+                                 & ":"
+                                 & Trim
+                                     (First_Column_Number (Type_Dec)'Img, Both)
+                                 & ":");
+
+                              Test_Routine_Wrapper.TR_Info := Test_Routine;
+
+                              Suite_Data_List.ITR_List.Append
+                                (Test_Routine_Wrapper);
+                           end if;
+                        end if;
+                     end if;
+                  end if;
+
+                  Tmp_Data.Subp_List.Clear;
+                  Tmp_Suites_Data.TR_List.Clear;
+               end loop;
+            end;
+         end loop;
+      end Gather_Inherited_Subprograms;
+
+      ----------------------
+      -- Is_Fully_Private --
+      ----------------------
+
+      function Is_Fully_Private (Arg : Base_Type_Decl) return Boolean is
+         Type_Part : Base_Type_Decl := Arg;
+      begin
+         while not Type_Part.P_Previous_Part.Is_Null loop
+            Type_Part := Type_Part.P_Previous_Part;
+         end loop;
+
+         return Is_Private (Type_Part);
+      end Is_Fully_Private;
+
    begin
       Unit := Bod.F_Item.As_Ada_Node;
 
@@ -1186,6 +1576,11 @@ package body Test.Skeleton is
       Traverse (Unit, Get_Subprograms'Access);
 
       Decrease_Indent (Me, "Traversings finished");
+
+      if Inheritance_To_Suite then
+         Gather_Inherited_Subprograms
+           (Dummy_Type_Counter, Suite_Data_List);
+      end if;
 
       if Data.Type_Data_List.Is_Empty and Data.Subp_List.Is_Empty then
          Apropriate_Source := False;
@@ -5599,5 +5994,23 @@ package body Test.Skeleton is
       end loop;
 
    end Process_Stubs;
+
+   ------------------------------------
+   -- Is_Declared_In_Regular_Package --
+   ------------------------------------
+
+   function Is_Declared_In_Regular_Package
+     (Elem : Ada_Node) return Boolean
+   is
+      Nesting : constant Ada_Node_Array := Parents (Elem);
+   begin
+      for I in Nesting'First + 1 .. Nesting'Last loop
+         if Kind (Nesting (I)) = Ada_Generic_Package_Decl then
+            return False;
+         end if;
+      end loop;
+
+      return True;
+   end Is_Declared_In_Regular_Package;
 
 end Test.Skeleton;

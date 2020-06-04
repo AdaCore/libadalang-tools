@@ -94,6 +94,10 @@ package Test.Common is
    --  if Subp is a subprigram declaration it will return subprogram's name;
    --  if Subp is an overloaded operator - it's text name
 
+   function Enclosing_Unit_Name (Node : Ada_Node'Class) return String is
+      (Node_Image (P_Top_Level_Decl (Node, Node.Unit).P_Defining_Name));
+   --  Returns name of the compilation unit enclosing given node
+
    function Tagged_Primitive_Owner (Subp : Base_Subp_Spec)
                                     return Base_Type_Decl;
    --  Returns the tagged type of which given subprogram is primitive or
@@ -150,9 +154,9 @@ package Test.Common is
 
    procedure Put_Harness_Header;
 
-   function First_Line_Number (Element : Ada_Node) return Line_Number
+   function First_Line_Number (Element : Ada_Node'Class) return Line_Number
      is (Element.Sloc_Range.Start_Line);
-   function First_Column_Number (Element : Ada_Node) return Column_Number
+   function First_Column_Number (Element : Ada_Node'Class) return Column_Number
      is (Element.Sloc_Range.Start_Column);
    --  Returns the number on the first line/column of the element
 
@@ -299,4 +303,9 @@ package Test.Common is
    Inherited_Switches : List_Of_Strings.List := List_Of_Strings.Empty_List;
 
    Relocatable_Harness : Boolean := False;
+
+   Inheritance_To_Suite : Boolean := True;
+   --  Whether or not to add inherited tests that correspond to inherited
+   --  primitives to the test suite for descendant type.
+
 end Test.Common;

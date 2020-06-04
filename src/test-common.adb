@@ -563,7 +563,13 @@ package body Test.Common is
           (P_Relative_Name
              (F_Name (F_Subtype_Indication (As_Derived_Type_Def (T_Def)))));
 
-      return P_Canonical_Type (As_Base_Type_Decl (P_Referenced_Decl (T_Name)));
+      T_Dec := T_Name.P_Referenced_Decl.As_Base_Type_Decl.P_Canonical_Type;
+
+      while not T_Dec.P_Next_Part.Is_Null loop
+         T_Dec := T_Dec.P_Next_Part;
+      end loop;
+
+      return T_Dec;
    end Parent_Type_Declaration;
 
    ---------------------------
