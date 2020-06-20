@@ -142,6 +142,9 @@ package body Test.Actions is
          end loop;
       end;
 
+      Test.Common.Substitution_Suite := Arg (Cmd, Validate_Type_Extensions);
+      Test.Common.Inheritance_To_Suite := Arg (Cmd, Inheritance_Check);
+
       if Arg (Cmd, Stub) then
          Free (Test.Common.Test_Dir_Name);
          Test.Common.Test_Dir_Name := new String'

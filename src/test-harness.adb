@@ -165,6 +165,14 @@ package body Test.Harness is
    --  Indicates if the given Subprogram is of interest, that is a test routine
    --  or Set_Up/Tear_Down etc.
 
+   function Type_Test_Package (Elem : Base_Type_Decl) return String;
+   --  Get name of test package where test type corresponding to Elem should be
+   --  declared.
+
+   function Type_Name (Elem : Base_Type_Decl) return String is
+     (Node_Image (Elem.As_Basic_Decl.P_Defining_Name));
+   --  Returns image of type name
+
    -----------------------------------------
    -- Generate_Global_Config_Pragmas_File --
    -----------------------------------------
@@ -3268,5 +3276,419 @@ package body Test.Harness is
 
       return True;
    end Is_Test_Fixture_Routine;
+
+   ---------------------------------------------
+   -- Generate_Substitution_Suite_From_Tested --
+   ---------------------------------------------
+
+   procedure Generate_Substitution_Suite_From_Tested
+     (Data : Data_Holder; Path : String := "")
+   is
+      File_Destination : constant String :=
+        (if Path = "" then Harness_Dir.all else Path);
+
+      New_Unit_Name : constant String :=
+        Data.Test_Unit_Full_Name.all & "." & Substitution_Suite_Name;
+
+      Type_Ancestor : Base_Type_Decl;
+
+      package Include_Sets renames String_Set;
+      use Include_Sets;
+
+      type Duplication_Array is array
+        (Data.Test_Types.First_Index .. Data.Test_Types.Last_Index) of Boolean;
+
+      Duplication : Duplication_Array := (others => False);
+
+      Include_Units : Include_Sets.Set;
+      Include_Cur   : Include_Sets.Cursor;
+
+      Type_Im  : String_Access;
+      PUnit_Im : String_Access;
+      Type_Ns  : String_Access;
+
+      Current_TT : Test_Type_Info;
+      Current_TT_Number : Natural;
+
+      procedure Set_Current_TT (Type_Dec : Ada_Node);
+      --  Sets Current_TT and Current_TT_Number
+
+      ---------------------
+      --  Set_Current_TT --
+      ---------------------
+
+      procedure Set_Current_TT (Type_Dec : Ada_Node)
+      is
+         Tmp_TT : Test_Type_Info;
+      begin
+
+         for
+           I in Data.Test_Types.First_Index .. Data.Test_Types.Last_Index
+         loop
+            Tmp_TT := Data.Test_Types.Element (I);
+            if Tmp_TT.Tested_Type = Type_Dec then
+               Current_TT := Tmp_TT;
+               Current_TT_Number := I;
+               exit;
+            end if;
+         end loop;
+
+      end Set_Current_TT;
+
+   begin
+
+      --  Creating overridden test suite spec
+      Create (File_Destination
+              & Unit_To_File_Name (New_Unit_Name)
+              & ".ads");
+
+      Put_Harness_Header;
+      S_Put (0, GT_Marker_Begin);
+      Put_New_Line;
+
+      S_Put (0, "with AUnit.Test_Suites;");
+      Put_New_Line;
+      Put_New_Line;
+      S_Put (0, "package " & New_Unit_Name & " is");
+      Put_New_Line;
+      Put_New_Line;
+      S_Put (0, "use AUnit.Test_Suites;");
+      Put_New_Line;
+      Put_New_Line;
+      S_Put (3, "function Suite return AUnit.Test_Suites.Access_Test_Suite;");
+      Put_New_Line;
+      Put_New_Line;
+      S_Put (0, "end " & New_Unit_Name & ";");
+      Put_New_Line;
+      S_Put (0, GT_Marker_End);
+      Put_New_Line;
+
+      Close_File;
+
+      --  Gathering additional information about the tests. We need to
+      --  correctly address the test types for conversion from parent
+      --  tests to actual tests. Thus we should know all the names of units
+      --  containing predecessor types and distinguish them.
+
+      for I in Data.LTR_List.First_Index .. Data.LTR_List.Last_Index loop
+
+         Set_Current_TT (Data.LTR_List.Element (I).Tested_Type);
+
+         Type_Ancestor := Current_TT.Tested_Type.As_Base_Type_Decl;
+
+         for
+           K in 1 .. Data.Test_Types.Element
+             (Current_TT_Number).Max_Inheritance_Depth
+         loop
+
+            Type_Ancestor := Parent_Type_Declaration (Type_Ancestor);
+
+            Type_Ns  := new String'(Get_Nesting (Type_Ancestor));
+            PUnit_Im := new String'(Enclosing_Unit_Name (Type_Ancestor));
+
+            if Type_Ns.all = PUnit_Im.all then
+               Include_Units.Include
+                 (PUnit_Im.all              &
+                  "."                       &
+                  Type_Name (Type_Ancestor) &
+                  Test_Data_Unit_Name_Suff  &
+                  "."                       &
+                  Type_Name (Type_Ancestor) &
+                  Test_Unit_Name_Suff);
+            else
+               Include_Units.Include
+                 (PUnit_Im.all                                  &
+                  "."                                           &
+                  Test_Data_Unit_Name                           &
+                  "."                                           &
+                  Test_Unit_Name                                &
+                  "."                                           &
+                  Nesting_Difference
+                    (Type_Ns.all, PUnit_Im.all)                 &
+                  "."                                           &
+                  Type_Name (Type_Ancestor)                     &
+                  Test_Data_Unit_Name_Suff                      &
+                  "."                                           &
+                  Type_Name (Type_Ancestor)                     &
+                  Test_Unit_Name_Suff);
+            end if;
+
+         end loop;
+      end loop;
+
+      --  Creating overridden test suite body
+      Create (File_Destination
+              & Unit_To_File_Name (New_Unit_Name)
+              & ".adb");
+
+      Put_Harness_Header;
+      S_Put (0, GT_Marker_Begin);
+      Put_New_Line;
+
+      S_Put (0, "with AUnit.Test_Caller;");
+      Put_New_Line;
+      S_Put (0, "with Ada.Unchecked_Conversion;");
+      Put_New_Line;
+      S_Put (0, "with Gnattest_Generated;");
+      Put_New_Line;
+      Put_New_Line;
+
+      --  Adding dependancy units;
+      Include_Cur := Include_Units.First;
+      loop
+         exit when Include_Cur = Include_Sets.No_Element;
+         S_Put (0, "with " & Include_Sets.Element (Include_Cur) & ";");
+         Put_New_Line;
+         Include_Sets.Next (Include_Cur);
+      end loop;
+
+      Put_New_Line;
+      S_Put (0,
+             "package body " &
+             New_Unit_Name   &
+             " is");
+      Put_New_Line;
+      Put_New_Line;
+
+      for I in Data.Test_Types.First_Index .. Data.Test_Types.Last_Index loop
+         S_Put
+           (3,
+            "package Runner_"  &
+            Positive_Image (I) &
+            " is new AUnit.Test_Caller");
+         Put_New_Line;
+
+         S_Put (5,
+                "(GNATtest_Generated.GNATtest_Standard."       &
+                Data.Test_Unit_Full_Name.all                   &
+                "."                                            &
+                Data.Test_Types.Element (I).Test_Type_Name.all &
+                ");");
+
+         Put_New_Line;
+      end loop;
+
+      Put_New_Line;
+
+      --  Declaring access to test routines types
+      for L in Data.LTR_List.First_Index .. Data.LTR_List.Last_Index loop
+
+         Set_Current_TT (Data.LTR_List.Element (L).Tested_Type);
+
+         Type_Ancestor := Current_TT.Tested_Type.As_Base_Type_Decl;
+
+         if not Duplication (Current_TT_Number) then
+
+            for K in 1 .. Current_TT.Max_Inheritance_Depth loop
+
+               Type_Ancestor := Parent_Type_Declaration (Type_Ancestor);
+               Type_Im  := new String'
+                 (Test_Routine_Prefix &
+                  Type_Name (Type_Ancestor));
+               PUnit_Im := new String'(Type_Test_Package (Type_Ancestor));
+
+               S_Put (3,
+                      "type Test_Method_"                &
+                      Positive_Image (Current_TT_Number) &
+                      "_"                                &
+                      Trim (Integer'Image (K), Both)     &
+                      " is access procedure");
+               Put_New_Line;
+               S_Put (5,
+                      "(T : in out " &
+                      PUnit_Im.all   &
+                      "."            &
+                      Type_Im.all    &
+                      ");");
+               Put_New_Line;
+
+               Free (Type_Im);
+               Free (PUnit_Im);
+            end loop;
+            Duplication (Current_TT_Number) := True;
+         end if;
+      end loop;
+
+      Put_New_Line;
+      S_Put (3, "Result : aliased AUnit.Test_Suites.Test_Suite;");
+      Put_New_Line;
+      Put_New_Line;
+
+      --  Declaring test cases
+      for K in Data.LTR_List.First_Index .. Data.LTR_List.Last_Index loop
+
+         Set_Current_TT (Data.LTR_List.Element (K).Tested_Type);
+
+         for Depth in 1 .. Data.LTR_List.Element (K).Inheritance_Depth loop
+            S_Put
+              (3,
+               Test_Case_Prefix                           &
+               Positive_Image (Current_TT_Number)         &
+               "_"                                        &
+               Data.LTR_List.Element (K).TR_Text_Name.all &
+               "_"                                        &
+               Trim (Integer'Image (Depth), Both)         &
+               " : aliased Runner_"                       &
+               Positive_Image (Current_TT_Number)         &
+               ".Test_Case;");
+            Put_New_Line;
+         end loop;
+
+      end loop;
+
+      Put_New_Line;
+      S_Put (3,
+             "function Suite return AUnit.Test_Suites.Access_Test_Suite is");
+      Put_New_Line;
+      Put_New_Line;
+
+      --  Instantinating test type converters
+      for K in Data.Test_Types.First_Index .. Data.Test_Types.Last_Index loop
+
+         for
+           I in 1 .. Data.Test_Types.Element (K).Max_Inheritance_Depth
+         loop
+
+            S_Put
+              (6,
+               "function Convert is new Gnattest_Generated." &
+               "Gnattest_Standard.Ada.Unchecked_Conversion");
+            Put_New_Line;
+            S_Put (8,
+                   "(Test_Method_"                &
+                   Positive_Image (K)             &
+                   "_"                            &
+                   Trim (Integer'Image (I), Both) &
+                   ", Runner_"                    &
+                   Positive_Image (K)             &
+                   ".Test_Method);");
+            Put_New_Line;
+         end loop;
+      end loop;
+
+      Put_New_Line;
+      S_Put (3, "begin");
+      Put_New_Line;
+      Put_New_Line;
+
+      --  Creating test cases
+      for K in Data.LTR_List.First_Index .. Data.LTR_List.Last_Index loop
+
+         Set_Current_TT (Data.LTR_List.Element (K).Tested_Type);
+
+         Type_Ancestor := Current_TT.Tested_Type.As_Base_Type_Decl;
+
+         for Depth in 1 .. Data.LTR_List.Element (K).Inheritance_Depth loop
+
+            Type_Ancestor := Parent_Type_Declaration (Type_Ancestor);
+            PUnit_Im := new String'(Type_Test_Package (Type_Ancestor));
+
+            S_Put
+              (6,
+               "Runner_"                          &
+               Positive_Image (Current_TT_Number) &
+               ".Create");
+            Put_New_Line;
+            S_Put
+              (8,
+               "("                                        &
+               Test_Case_Prefix                           &
+               Positive_Image (Current_TT_Number)         &
+               "_"                                        &
+               Data.LTR_List.Element (K).TR_Text_Name.all &
+               "_"                                        &
+               Trim (Integer'Image (Depth), Both)         &
+               ",");
+            Put_New_Line;
+            S_Put (9,
+                   """"
+                   & Data.LTR_List.Element (K).Tested_Sloc.all
+                   & """,");
+            Put_New_Line;
+            S_Put (9,
+                   "Convert ("                                &
+                   PUnit_Im.all                               &
+                   "."                                        &
+                   Data.LTR_List.Element (K).TR_Text_Name.all &
+                   "'Access));");
+            Put_New_Line;
+
+            Free (PUnit_Im);
+
+         end loop;
+
+      end loop;
+
+      Put_New_Line;
+
+      --  Adding test cases to the suite
+      for K in Data.LTR_List.First_Index .. Data.LTR_List.Last_Index loop
+
+         Set_Current_TT (Data.LTR_List.Element (K).Tested_Type);
+
+         for Depth in 1 .. Data.LTR_List.Element (K).Inheritance_Depth loop
+            S_Put
+              (6,
+               "Add_Test (Result'Access, "                      &
+               Test_Case_Prefix                                 &
+               Positive_Image (Current_TT_Number)               &
+               "_"                                              &
+               Data.LTR_List.Element (K).TR_Text_Name.all       &
+               "_"                                              &
+               Trim (Integer'Image (Depth), Both)               &
+               "'Access);");
+            Put_New_Line;
+
+         end loop;
+
+      end loop;
+
+      Put_New_Line;
+      S_Put (6, "return Result'Access;");
+      Put_New_Line;
+      Put_New_Line;
+      S_Put (3, "end Suite;");
+      Put_New_Line;
+      Put_New_Line;
+      S_Put (0, "end " & New_Unit_Name & ";");
+      Put_New_Line;
+      S_Put (0, GT_Marker_End);
+      Put_New_Line;
+      Close_File;
+
+      List_Of_Strings.Append (Suit_List, New_Unit_Name);
+
+   end Generate_Substitution_Suite_From_Tested;
+
+   -----------------------
+   -- Type_Test_Package --
+   -----------------------
+
+   function Type_Test_Package (Elem : Base_Type_Decl) return String
+   is
+      Type_Nesting : constant String := Get_Nesting (Elem);
+      Package_Name : constant String := Enclosing_Unit_Name (Elem);
+   begin
+      if Type_Nesting = Package_Name then
+         return
+           Package_Name & "." & Type_Name (Elem) &
+           Test_Data_Unit_Name_Suff & "." &
+           Type_Name (Elem) & Test_Unit_Name_Suff;
+      end if;
+
+      return
+        Package_Name & "." &
+        Test_Data_Unit_Name & "." &
+        Test_Unit_Name & "." &
+        Nesting_Difference
+        (Type_Nesting,
+         Package_Name) &
+        "." &
+        Type_Name (Elem) &
+        Test_Data_Unit_Name_Suff &
+        "." &
+        Type_Name (Elem) &
+        Test_Unit_Name_Suff;
+   end Type_Test_Package;
 
 end Test.Harness;

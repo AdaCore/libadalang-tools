@@ -403,7 +403,7 @@ package body Test.Skeleton is
    procedure Process_Stubs (List : Ada_Nodes_List.List);
 
    function Is_Declared_In_Regular_Package
-     (Elem : Ada_Node) return Boolean;
+     (Elem : Ada_Node'Class) return Boolean;
    --  Checks that all enclosing elements for the given element are regular
    --  package declarations.
 
@@ -651,7 +651,12 @@ package body Test.Skeleton is
                   if not Stub_Mode_ON and then not Separate_Drivers then
 
                      Test.Harness.Generate_Suite (Suite_Data);
-
+                     if Substitution_Suite
+                       and then Suite_Data.Good_For_Substitution
+                     then
+                        Test.Harness.Generate_Substitution_Suite_From_Tested
+                          (Suite_Data);
+                     end if;
                   end if;
                end if;
 
@@ -722,6 +727,10 @@ package body Test.Skeleton is
       --  Populates the list of inherited subprograms. Dummy_Types indicates
       --  the number of Test types created for non-primitives.
 
+      procedure Gather_Substitution_Data
+        (Suite_Data_List : in out Suites_Data_Type);
+      --  Populates the list of overridden subprograms
+
       function Is_Callable_Subprogram (Subp : Basic_Decl) return Boolean is
          (Subp.Kind not in Ada_Abstract_Subp_Decl | Ada_Null_Subp_Decl);
       --  Checks that given subprogram is neither an abstract subprogram
@@ -732,6 +741,21 @@ package body Test.Skeleton is
         (Arg : Base_Type_Decl) return Boolean;
       --  Detects if Arg and its incomplete declaration (if present)
       --  are both in private part.
+
+      function Test_Types_Linked
+        (Inheritance_Root_Type  : Base_Type_Decl;
+         Inheritance_Final_Type : Base_Type_Decl)
+         return Boolean;
+      --  Checks that there is no fully private types between the root type
+      --  and the final descendant, so that corresponding test types are
+      --  members of same hierarchy.
+
+      function No_Inheritance_Through_Generics
+        (Inheritance_Root_Type  : Base_Type_Decl;
+         Inheritance_Final_Type : Base_Type_Decl)
+         return Boolean;
+      --  Checks that all types between the root type and the final descendant
+      --  are declared in regular packages.
 
       -------------------------
       -- Get_Nested_Packages --
@@ -1210,14 +1234,6 @@ package body Test.Skeleton is
          --  Checks whether given inherited subprogram is hidden by an
          --  overriding one.
 
-         function Test_Types_Linked
-           (Inheritance_Root_Type  : Base_Type_Decl;
-            Inheritance_Final_Type : Base_Type_Decl)
-            return Boolean;
-         --  Checks that there is no fully private types between the root type
-         --  and the final descendant, so that corresponding test types are
-         --  members of same hierarchy.
-
          -------------------
          -- Is_Overridden --
          -------------------
@@ -1239,32 +1255,6 @@ package body Test.Skeleton is
 
             return False;
          end Is_Overridden;
-
-         -----------------------
-         -- Test_Types_Linked --
-         -----------------------
-
-         function Test_Types_Linked
-           (Inheritance_Root_Type  : Base_Type_Decl;
-            Inheritance_Final_Type : Base_Type_Decl)
-            return Boolean
-         is
-            Intermidiate : Base_Type_Decl := Inheritance_Final_Type;
-         begin
-
-            while not Intermidiate.Is_Null loop
-               if Is_Fully_Private (Intermidiate) then
-                  return False;
-               end if;
-
-               if Intermidiate = Inheritance_Root_Type then
-                  return True;
-               end if;
-               Intermidiate := Parent_Type_Declaration (Intermidiate);
-            end loop;
-
-            return False;
-         end Test_Types_Linked;
 
          Test_Routine : Test.Harness.Test_Routine_Info_Enhanced;
          Test_Routine_Wrapper : Test_Routine_Info_Enhanced_Wrapper;
@@ -1304,6 +1294,8 @@ package body Test.Skeleton is
 
                      if Test_Types_Linked
                        (Ancestor_Type, Type_Dec.As_Base_Type_Decl)
+                       and then No_Inheritance_Through_Generics
+                         (Ancestor_Type, Type_Dec.As_Base_Type_Decl)
                      then
                         if not Is_Overridden (ISub) then
 
@@ -1426,7 +1418,7 @@ package body Test.Skeleton is
                                    (Tmp_TR.Tested_Sloc.all
                                     & " inherited at "
                                     & Base_Name
-                                        (Enclosing_Unit_Name (Type_Dec))
+                                        (Type_Dec.Unit.Get_Filename)
                                     & ":"
                                     & Trim
                                       (First_Line_Number (Type_Dec)'Img, Both)
@@ -1450,7 +1442,7 @@ package body Test.Skeleton is
 
                               --  Adding sloc info
                               Test_Routine.Tested_Sloc := new String'
-                                (Base_Name (Enclosing_Unit_Name (ISub))
+                                (Base_Name (ISub.Unit.Get_Filename)
                                  & ":"
                                  & Trim
                                      (First_Line_Number (ISub)'Img, Both)
@@ -1458,7 +1450,7 @@ package body Test.Skeleton is
                                  & Trim
                                      (First_Column_Number (ISub)'Img, Both)
                                  & ": inherited at "
-                                 & Base_Name (Enclosing_Unit_Name (Type_Dec))
+                                 & Base_Name (Type_Dec.Unit.Get_Filename)
                                  & ":"
                                  & Trim
                                      (First_Line_Number (Type_Dec)'Img, Both)
@@ -1483,6 +1475,120 @@ package body Test.Skeleton is
          end loop;
       end Gather_Inherited_Subprograms;
 
+      ------------------------------
+      -- Gather_Substitution_Data --
+      ------------------------------
+
+      procedure Gather_Substitution_Data
+        (Suite_Data_List : in out Suites_Data_Type)
+      is
+         OSub          : Basic_Decl := No_Basic_Decl;
+         Ancestor_Type : Base_Type_Decl;
+
+         TR    : Test.Harness.Test_Routine_Info;
+         LTR   : Test.Harness.Test_Routine_Info_Enhanced;
+         LTR_W : Test_Routine_Info_Enhanced_Wrapper;
+         Depth : Natural;
+
+         Test_Type_Wrapper : Test_Type_Info_Wrapper;
+      begin
+         for TR_W of Suite_Data_List.TR_List loop
+            if not TR_W.Original_Type.Is_Null then
+               declare
+                  OSubs : constant Basic_Decl_Array :=
+                    P_Base_Subp_Declarations
+                      (TR_W.Original_Subp.As_Basic_Decl);
+               begin
+                  if OSubs'Length > 1 then
+                     OSub := OSubs (OSubs'Last - 1);
+                  end if;
+               end;
+            end if;
+
+            if not OSub.Is_Null then
+               Ancestor_Type :=
+                 P_Primitive_Subp_Tagged_Type
+                   (OSub.As_Basic_Subp_Decl.P_Subp_Decl_Spec);
+               while not Ancestor_Type.P_Next_Part.Is_Null loop
+                  Ancestor_Type := Ancestor_Type.P_Next_Part;
+               end loop;
+
+               if Source_Present (Ancestor_Type.Unit.Get_Filename)
+                 and then Is_Callable_Subprogram (OSub)
+                 and then Test_Types_Linked
+                   (Ancestor_Type, TR_W.Original_Type.As_Base_Type_Decl)
+                 and then No_Inheritance_Through_Generics
+                   (Ancestor_Type, TR_W.Original_Type.As_Base_Type_Decl)
+               then
+                  Depth := Inheritance_Depth
+                    (Ancestor_Type.As_Base_Type_Decl,
+                     TR_W.Original_Type.As_Base_Type_Decl);
+
+                  --  Inheritance depth of corresponding test type needs to be
+                  --  updated
+                  for
+                    L in Suite_Data_List.Test_Types.First_Index ..
+                      Suite_Data_List.Test_Types.Last_Index
+                  loop
+
+                     Test_Type_Wrapper :=
+                       Suite_Data_List.Test_Types.Element (L);
+
+                     if Test_Type_Wrapper.Original_Type = TR_W.Original_Type
+                     then
+                        if Depth >
+                          Test_Type_Wrapper.TT_Info.Max_Inheritance_Depth
+                        then
+                           Test_Type_Wrapper.TT_Info.Max_Inheritance_Depth :=
+                             Depth;
+
+                           Suite_Data_List.Test_Types.Replace_Element
+                             (L, Test_Type_Wrapper);
+
+                           exit;
+                        end if;
+                     end if;
+
+                  end loop;
+
+                  --  ATM Test_Cases are not taken into account.
+                  TR := TR_W.TR_Info;
+                  LTR.TR_Text_Name := new String'(TR.TR_Text_Name.all);
+                  LTR.Inheritance_Depth := Depth;
+                  LTR_W.TR_Info         := LTR;
+                  LTR_W.Original_Type   := TR_W.Original_Type;
+                  LTR_W.Test_Package    := new String'(TR_W.Test_Package.all);
+
+                  --  Adding sloc info
+                  LTR_W.TR_Info.Tested_Sloc := new String'
+                    (Base_Name (OSub.Unit.Get_Filename)
+                     & ":"
+                     & Trim
+                       (First_Line_Number (OSub)'Img,
+                        Both)
+                     & ":"
+                     & Trim
+                       (First_Column_Number (OSub)'Img,
+                        Both)
+                     & ": overridden at "
+                     & Base_Name
+                       (TR_W.Original_Type.Unit.Get_Filename)
+                     & ":"
+                     & Trim
+                       (First_Line_Number (TR_W.Original_Subp)'Img,
+                        Both)
+                     & ":"
+                     & Trim
+                       (First_Column_Number (TR_W.Original_Subp)'Img,
+                        Both)
+                     & ":");
+
+                  Suite_Data_List.LTR_List.Append (LTR_W);
+               end if;
+            end if;
+         end loop;
+      end Gather_Substitution_Data;
+
       ----------------------
       -- Is_Fully_Private --
       ----------------------
@@ -1496,6 +1602,57 @@ package body Test.Skeleton is
 
          return Is_Private (Type_Part);
       end Is_Fully_Private;
+
+      -----------------------
+      -- Test_Types_Linked --
+      -----------------------
+
+      function Test_Types_Linked
+        (Inheritance_Root_Type  : Base_Type_Decl;
+         Inheritance_Final_Type : Base_Type_Decl)
+            return Boolean
+      is
+         Intermidiate : Base_Type_Decl := Inheritance_Final_Type;
+      begin
+
+         while not Intermidiate.Is_Null loop
+            if Is_Fully_Private (Intermidiate) then
+               return False;
+            end if;
+
+            if Intermidiate = Inheritance_Root_Type then
+               return True;
+            end if;
+            Intermidiate := Parent_Type_Declaration (Intermidiate);
+         end loop;
+
+         return False;
+      end Test_Types_Linked;
+
+      -------------------------------------
+      -- No_Inheritance_Through_Generics --
+      -------------------------------------
+
+      function No_Inheritance_Through_Generics
+        (Inheritance_Root_Type  : Base_Type_Decl;
+         Inheritance_Final_Type : Base_Type_Decl)
+         return Boolean
+      is
+         Intermidiate : Base_Type_Decl := Inheritance_Final_Type;
+      begin
+         while not Intermidiate.Is_Null loop
+            if not Is_Declared_In_Regular_Package (Intermidiate) then
+               return False;
+            end if;
+
+            if Intermidiate = Inheritance_Root_Type then
+               return True;
+            end if;
+            Intermidiate := Parent_Type_Declaration (Intermidiate);
+         end loop;
+
+         return False;
+      end No_Inheritance_Through_Generics;
 
    begin
       Unit := Bod.F_Item.As_Ada_Node;
@@ -1580,6 +1737,10 @@ package body Test.Skeleton is
       if Inheritance_To_Suite then
          Gather_Inherited_Subprograms
            (Dummy_Type_Counter, Suite_Data_List);
+      end if;
+
+      if Substitution_Suite then
+         Gather_Substitution_Data (Suite_Data_List);
       end if;
 
       if Data.Type_Data_List.Is_Empty and Data.Subp_List.Is_Empty then
@@ -6000,7 +6161,7 @@ package body Test.Skeleton is
    ------------------------------------
 
    function Is_Declared_In_Regular_Package
-     (Elem : Ada_Node) return Boolean
+     (Elem : Ada_Node'Class) return Boolean
    is
       Nesting : constant Ada_Node_Array := Parents (Elem);
    begin

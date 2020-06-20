@@ -40,7 +40,7 @@ package Test.Harness is
    type Test_Type_Info is record
       Test_Type             : Ada_Node := No_Ada_Node;
       Test_Type_Name        : String_Access := null;
-      Good_For_Substitution       : Boolean := False;
+      Good_For_Substitution : Boolean := False;
 
       Max_Inheritance_Depth : Natural := 0;
       --  Inheritance depth of a test routine is a number of packages
@@ -166,6 +166,11 @@ package Test.Harness is
    procedure Generate_Suite (Data : Data_Holder; Path : String := "");
    --  Creates a test suites for both the directly declared
    --  tests and inherited ones.
+
+   procedure Generate_Substitution_Suite_From_Tested
+     (Data : Data_Holder; Path : String := "");
+   --  Generates substitution suite from data gathered during skeleton
+   --  generation.
 
    procedure Generate_Test_Drivers
      (Data      : Data_Holder;

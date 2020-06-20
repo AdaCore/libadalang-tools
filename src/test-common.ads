@@ -108,6 +108,12 @@ package Test.Common is
    --  Returns a corresponding parent type declaration for a given tagged type
    --  extension declaration.
 
+   function Inheritance_Depth
+     (Inheritance_Root_Type  : Base_Type_Decl;
+      Inheritance_Final_Type : Base_Type_Decl)
+      return Natural;
+   --  Returns the number of derivations that lead from root type to final type
+
    function Root_Type_Declaration
      (Type_Dec : Base_Type_Decl) return Base_Type_Decl;
    --  Returns root type of the hierarchy
@@ -307,5 +313,9 @@ package Test.Common is
    Inheritance_To_Suite : Boolean := True;
    --  Whether or not to add inherited tests that correspond to inherited
    --  primitives to the test suite for descendant type.
+
+   Substitution_Suite   : Boolean := False;
+   --  Whenever or not to genretate suites for overrden tests applying them
+   --  to fixture containing object of descendant type.
 
 end Test.Common;

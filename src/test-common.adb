@@ -878,4 +878,30 @@ package body Test.Common is
       return False;
    end Abstract_Type;
 
+   -----------------------
+   -- Inheritance_Depth --
+   -----------------------
+
+   function Inheritance_Depth
+     (Inheritance_Root_Type  : Base_Type_Decl;
+      Inheritance_Final_Type : Base_Type_Decl)
+      return Natural
+   is
+      Count    : Natural        := 0;
+      Type_Dec : Base_Type_Decl := Inheritance_Final_Type;
+   begin
+
+      while not Type_Dec.Is_Null loop
+
+         Count := Count + 1;
+         Type_Dec := Parent_Type_Declaration (Type_Dec);
+
+         if Type_Dec = Inheritance_Root_Type then
+            return Count;
+         end if;
+      end loop;
+
+      return 0;
+   end Inheritance_Depth;
+
 end Test.Common;

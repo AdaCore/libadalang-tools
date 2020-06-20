@@ -67,7 +67,7 @@ package Test.Command_Lines is
 
    package Test_Boolean_Defaults is new
      Test_Boolean_Switches.Set_Defaults
-       ((Inheritance_Check => False, -- ????Not sure about this default
+       ((Inheritance_Check => True,
          Command_Line_Support => True,
          Harness_Only => False,
          others => False));
