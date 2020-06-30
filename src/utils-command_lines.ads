@@ -547,6 +547,9 @@ package Utils.Command_Lines is
    --  Command_Line_Error to be raised. The caller should print the "try
    --  --help" message and exit the program.
 
+   procedure Clear (Cmd : in out Command_Line);
+   --  Reset Cmd to empty value and release used memory
+
    procedure Clear_File_Names (Cmd : in out Command_Line);
    --  Sets the File_Names of Cmd to empty
 

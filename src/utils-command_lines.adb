@@ -20,6 +20,9 @@ package body Utils.Command_Lines is
 
    procedure Free is new Unchecked_Deallocation (String, String_Ref);
 
+   procedure Free is new Unchecked_Deallocation
+     (Dynamically_Typed_Switches, Dynamically_Typed_Switches_Access);
+
    procedure Raise_Cmd_Error (Message : String) is
    begin
       raise Command_Line_Error with Message;
@@ -1183,6 +1186,39 @@ package body Utils.Command_Lines is
    begin
       Sorting.Sort (Cmd.File_Names);
    end Sort_File_Names;
+
+   procedure Clear (Cmd : in out Command_Line) is
+      procedure Destroy (Vector : in out String_Ref_Vector);
+      --  Free contained strings and the Vector
+
+      procedure Destroy (Vector : in out String_Ref_Vector) is
+      begin
+         for Item of Vector loop
+            Free (Item);
+         end loop;
+
+         Free (Vector);
+      end Destroy;
+   begin
+      Destroy (Cmd.File_Names);
+
+      if Cmd.Sw = null then
+         return;
+      end if;
+
+      for Item of Cmd.Sw.all loop
+         case Item.Kind is
+            when String_Switch =>
+               Free (Item.String_Val);
+            when String_Seq_Switch =>
+               Destroy (Item.Seq_Val);
+            when others =>
+               null;
+         end case;
+      end loop;
+
+      Free (Cmd.Sw);
+   end Clear;
 
    procedure Clear_File_Names (Cmd : in out Command_Line) is
    begin
