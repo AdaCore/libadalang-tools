@@ -1436,6 +1436,7 @@ package body Pp.Actions is
          Nonvertical_Agg_Alt,
          Enum_Rep_Nonvertical_Agg_Alt,
          Obj_Decl_Vertical_Agg_Alt,
+         Comp_Decl_Vertical_Agg_Alt,
          Assign_Vertical_Agg_Alt,
          Qualified_Vertical_Agg_Alt,
          Aspect_Assoc_Alt,
@@ -1583,10 +1584,13 @@ package body Pp.Actions is
             Nonvertical_Agg_Alt => L ("#(?~~ with #~?~,# ~~)"),
             Enum_Rep_Nonvertical_Agg_Alt => L ("#(?~~ with #~?~,#1 ~~)"),
             Obj_Decl_Vertical_Agg_Alt =>
-            L (Replace_One
-                 (Ada_Object_Decl, From => ":=[# ~~]~!", To => ":=[$~~]~!")),
+              L (Replace_One
+                 (Ada_Object_Decl, From => ":=[# ~~]~", To => ":=[$~~]~")),
+            Comp_Decl_Vertical_Agg_Alt =>
+              L (Replace_One
+                 (Ada_Component_Decl, From => ":=[# ~~]~", To => ":=[$~~]~")),
             Assign_Vertical_Agg_Alt =>
-            L (Replace_One
+              L (Replace_One
                  (Ada_Assign_Stmt, From => ":=[# !]", To => ":=[$!]")),
             Qualified_Vertical_Agg_Alt =>
               L (Replace_One
@@ -1599,13 +1603,13 @@ package body Pp.Actions is
             Multi_Name_Vertical_Assoc_Alt => L ("?~ ^|#1 ~ ^=>[$~!]"),
             Multi_Name_Assoc_Alt => L ("?~ ^|#1 ~ ^=>[# ~!]"),
             Comp_Clause_Alt =>
-            L ("! ^at `2! ^2range [#`3! ^3../[# `4!^4]]"),
+              L ("! ^at `2! ^2range [#`3! ^3../[# `4!^4]]"),
              --  We need to ignore the ".." subtree, and put it explicitly in
              --  the template, because function Tab_Token checks for the ".".
             Handled_Stmts_With_Begin_Alt =>
-            L ("?begin$" & Stmts_And_Handlers),
+              L ("?begin$" & Stmts_And_Handlers),
             Handled_Stmts_With_Do_Alt =>
-            L ("# ?do$" & Stmts_And_Handlers),
+              L ("# ?do$" & Stmts_And_Handlers),
             Depends_Hack_Alt => L ("?~~ ^=>~!"),
             Un_Op_No_Space_Alt => L ("/!"),
             Un_Op_Space_Alt => L ("/ !"),
@@ -1656,12 +1660,12 @@ package body Pp.Actions is
             Subtype_Ind_Index_Alt => L ("?~~ ~!?~~~"),
             Subtype_Ind_Alt => L ("?~~ ~!? ~~~"),
             Record_Type_Decl_Split_Alt =>
-            L ("type !! is${!}" & Aspects),
+              L ("type !! is${!}" & Aspects),
             Record_Type_Decl_Alt => L ("type !! is !" & Aspects),
                       --  Otherwise, we could have a line break just before the
                       --  last semicolon.
             Record_Type_Decl_Aspects_Alt =>
-            L ("type !! is !" & Aspects),
+              L ("type !! is !" & Aspects),
             Access_To_Subp_Decl_Alt => L ("type !! is !" & Aspects),
                --  gnatpp doesn't put a line break after "is" in this case.
             Enum_Array_Decl_Alt => L ("type !! is$[!]" & Aspects),
@@ -3412,14 +3416,29 @@ package body Pp.Actions is
 
          function Is_Vertical_Aggregate (X : Ada_Tree'Class) return Boolean;
          --  True if X is an aggregate that should be formatted vertically. In
-         --  particular, this is true if the --vertical-named-aggregates switch
-         --  was given, and X is an aggregate, and all component associations
-         --  are in named notation, and the aggregate appears in an appropriate
-         --  context. An appropriate context is as the initial value of an
-         --  object declaration, as the aggregate in an enumeration
-         --  representation clause, as the expression of a qualified
-         --  expression, or as the expression of a component association of an
-         --  outer aggregate that is itself in such a context.
+         --  particular, this is true if all of the following are true:
+         --
+         --     - The --vertical-named-aggregates switch was given.
+         --
+         --     - X is an aggregate.
+         --
+         --     - All component associations are in named notation.
+         --
+         --     - There is more than one component association, or if just one,
+         --       its expression is a subaggregate. The latter part is for
+         --       something like (A => (B => X, C => Y)), where we want both
+         --       the outer and inner aggregates to be vertical, even though
+         --       the outer one has only one component association.
+         --
+         --     - The aggregate appears in an appropriate context. An
+         --       appropriate context is as the initial value of an object
+         --       declaration, as the default value for a component
+         --       declaration, as the aggregate in an enumeration
+         --       representation clause, as the expression of a qualified
+         --       expression, or as the expression of a component association
+         --       of an outer aggregate that is itself vertical.
+
+         ----------------
 
          --  Procedures for formatting the various kinds of node that are not
          --  fully covered by Str_Template_Table:
@@ -3465,31 +3484,54 @@ package body Pp.Actions is
          procedure Do_Others; -- anything not listed above
 
          function Is_Vertical_Aggregate (X : Ada_Tree'Class) return Boolean is
-            function All_Named return Boolean is
-              (Present (Subtree (Subtree (F_Assocs (X.As_Aggregate), 1), 1)));
-            --  True if all component associations are named. We only need to
-            --  check the first one, because of the restriction in Ada that
-            --  positional associations can't follow named ones.
          begin
             return Result : Boolean := False do
                if Arg (Cmd, Vertical_Named_Aggregates)
                  and then Present (X)
                  and then X.Kind = Ada_Aggregate
-                 and then All_Named
                then
-                  if X.Parent.Kind in Ada_Object_Decl |
-                    Ada_Assign_Stmt |
-                    Ada_Qual_Expr |
-                    Ada_Enum_Rep_Clause
-                  then
-                     Result := True;
-                  elsif X.Parent.Kind = Ada_Aggregate_Assoc then
+                  --  Subaggregate case
+
+                  if X.Parent.Kind = Ada_Aggregate_Assoc then
                      declare
                         Agg : constant Ada_Tree := X.Parent.Parent.Parent;
                         pragma Assert (Agg.Kind = Ada_Aggregate);
                      begin
                         Result := Is_Vertical_Aggregate (Agg);
                         --  Recurse on outer aggregate
+                     end;
+
+                  --  Outermost aggregate case
+
+                  else
+                     declare
+                        Assocs : constant Assoc_List := F_Assocs (X.As_Aggregate);
+                        All_Named : constant Boolean :=
+                          (Present (Subtree (Subtree (Assocs, 1), 1)));
+                        --  True if all component associations are named. We
+                        --  only need to check the first one, because of the
+                        --  restriction in Ada that positional associations
+                        --  can't follow named ones.
+
+                        One_Assoc : constant Boolean := Subtree_Count (Assocs) = 1;
+                        --  Exactly one association
+
+                        One_Agg_Assoc : constant Boolean :=
+                          One_Assoc and then All_Named and then
+                          Subtree (Subtree (Assocs, 1), 2).Kind = Ada_Aggregate;
+                        --  Exactly one named association whose expression is a
+                        --  subaggregate.
+
+                     begin
+                        if All_Named and then (not One_Assoc or One_Agg_Assoc)
+                          and then X.Parent.Kind in Ada_Object_Decl |
+                            Ada_Component_Decl |
+                            Ada_Assign_Stmt |
+                            Ada_Qual_Expr |
+                            Ada_Enum_Rep_Clause
+                        then
+                           Result := True;
+                        end if;
                      end;
                   end if;
                end if;
@@ -4542,6 +4584,15 @@ package body Pp.Actions is
                  (F_Default_Expr (Tree.As_Object_Decl))
                then
                   Interpret_Alt_Template (Obj_Decl_Vertical_Agg_Alt);
+               else
+                  Interpret_Template;
+               end if;
+
+            when Ada_Component_Decl =>
+               if Is_Vertical_Aggregate
+                 (F_Default_Expr (Tree.As_Component_Decl))
+               then
+                  Interpret_Alt_Template (Comp_Decl_Vertical_Agg_Alt);
                else
                   Interpret_Template;
                end if;

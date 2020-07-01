@@ -2809,7 +2809,8 @@ package body Pp.Formatting is
          --  affect comments.
 
          function Before_Indentation return Natural is
-            X : Line_Break_Index_Index := Syntax_Cur_Line - 1;
+            X : Line_Break_Index_Index :=
+              (if Syntax_Cur_Line = 1 then 1 else Syntax_Cur_Line - 1);
          begin
             while X > 1 and then
               not All_LB (Syntax_LBI (X)).Affects_Comments
