@@ -1,6 +1,6 @@
-from gnatpython.fileutils import rm
+from e3.fs import rm
 
-from testsuite_support.utils import run, print_nonprintable
+from drivers.utils import run, print_nonprintable
 
 
 rm('last-line-missing-crlf.ads.pp')
