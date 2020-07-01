@@ -1199,6 +1199,8 @@ package body Utils.Command_Lines is
 
          Free (Vector);
       end Destroy;
+
+      Descriptor : Command_Line_Descriptor renames Cmd.Descriptor.all;
    begin
       Destroy (Cmd.File_Names);
 
@@ -1206,12 +1208,16 @@ package body Utils.Command_Lines is
          return;
       end if;
 
-      for Item of Cmd.Sw.all loop
-         case Item.Kind is
+      for Switch in Cmd.Sw'Range loop
+         case Cmd.Sw (Switch).Kind is
             when String_Switch =>
-               Free (Item.String_Val);
+               if Cmd.Sw (Switch).String_Val /=
+                 Descriptor.Allowed_Switches (Switch).Default
+               then
+                  Free (Cmd.Sw (Switch).String_Val);
+               end if;
             when String_Seq_Switch =>
-               Destroy (Item.Seq_Val);
+               Destroy (Cmd.Sw (Switch).Seq_Val);
             when others =>
                null;
          end case;
