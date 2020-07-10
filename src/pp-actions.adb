@@ -2174,7 +2174,7 @@ package body Pp.Actions is
       use Utils.Dbg_Out;
    begin
       Utils.Dbg_Out.Output_Enabled := True;
-      Put ("\1\n", (if Is_Nil (X) then "null" else Short_Image (X)));
+      Put ("\1\n", (if Is_Nil (X) then "null" else X.Image));
    end nn;
 
    procedure ppp (X : Ada_Node) is
@@ -2200,7 +2200,7 @@ package body Pp.Actions is
    begin
       case C.Kind is
          when Child =>
-            Put ("Child: \1\n", Short_Image (C.Node));
+            Put ("Child: \1\n", C.Node.Image);
          when Trivia =>
             declare
                Trivia_Data : constant Token_Data_Type := Data (C.Trivia);
@@ -2707,7 +2707,7 @@ package body Pp.Actions is
          loop
             Tree := Ancestor_Tree (N);
             exit when Tree.Is_Null;
-            Put ("\1\t\2\n", Image (Integer (N)), Short_Image (Tree));
+            Put ("\1\t\2\n", Image (Integer (N)), Tree.Image);
             N := N + 1;
          end loop;
       end Dump_Ancestors;
@@ -4097,7 +4097,7 @@ package body Pp.Actions is
          procedure Do_Others is
          begin
             if Str_Template_Table (Tree.Kind) = null then
-               raise Program_Error with "null template: " & Short_Image (Tree);
+               raise Program_Error with "null template: " & Tree.Image;
             else
                Interpret_Template;
             end if;
@@ -4513,7 +4513,7 @@ package body Pp.Actions is
               Ada_Contract_Case_Assoc |
               Ada_Contract_Cases |
               Ada_Multi_Dim_Array_Assoc =>
-               raise Program_Error with Short_Image (Tree) & " encountered";
+               raise Program_Error with Tree.Image & " encountered";
                --  ???The above are not used
 
             when Ada_Compilation_Unit =>

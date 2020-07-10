@@ -154,7 +154,7 @@ package body LAL_Extensions is
 
          when others =>
             raise Program_Error with
-              "Full_Name of " & Short_Image (Nm.As_Ada_Node);
+              "Full_Name of " & Nm.Image;
       end case;
    end Full_Name;
 
@@ -183,7 +183,7 @@ package body LAL_Extensions is
             end;
          when others =>
             raise Program_Error with
-              "Get_Def_Name of " & Short_Image (Decl);
+              "Get_Def_Name of " & Decl.Image;
       end case;
    end Get_Def_Name;
 

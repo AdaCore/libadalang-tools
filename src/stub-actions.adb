@@ -195,7 +195,7 @@ package body Stub.Actions is
       use Utils.Dbg_Out;
    begin
       Utils.Dbg_Out.Output_Enabled := True;
-      Put ("\1\n", (if X.Is_Null then "null" else Short_Image (X)));
+      Put ("\1\n", (if X.Is_Null then "null" else X.Image));
    end nn;
 
    procedure ppp (X : Ada_Node) is
@@ -219,7 +219,7 @@ package body Stub.Actions is
    begin
       case C.Kind is
          when Child =>
-            Put ("Child: \1\n", Short_Image (C.Node));
+            Put ("Child: \1\n", C.Node.Image);
          when Trivia =>
             declare
                Trivia_Data : constant Token_Data_Type := Data (C.Trivia);

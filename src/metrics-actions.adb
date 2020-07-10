@@ -115,7 +115,7 @@ package body METRICS.Actions is
       use Utils.Dbg_Out;
    begin
       Utils.Dbg_Out.Output_Enabled := True;
-      Put ("\1\n", (if X.Is_Null then "null" else Short_Image (X)));
+      Put ("\1\n", (if X.Is_Null then "null" else X.Image));
    end pp;
 
    procedure ppp (X : Ada_Node'Class) is
@@ -139,7 +139,7 @@ package body METRICS.Actions is
    begin
       case C.Kind is
          when Child =>
-            Put ("Child: \1\n", Short_Image (C.Node));
+            Put ("Child: \1\n", C.Node.Image);
          when Trivia =>
             declare
                Trivia_Data : constant Token_Data_Type := Data (C.Trivia);
@@ -534,7 +534,7 @@ package body METRICS.Actions is
                M.Is_Spec := True;
 
             when others =>
-               raise Program_Error with Short_Image (M.Node);
+               raise Program_Error with M.Node.Image;
          end case;
       end Set_CU_Metrix;
 
@@ -3702,7 +3702,7 @@ package body METRICS.Actions is
            and then Node.Kind not in Ada_Named_Stmt
          then
             if Debug_Flag_W then
-               Put ("Statement: \1\n", Short_Image (Node));
+               Put ("Statement: \1\n", Node.Image);
             end if;
             Inc_All (Statements);
             Inc_All (Logical_Source_Lines);
@@ -3959,7 +3959,7 @@ package body METRICS.Actions is
       procedure Rec (Node : Ada_Node) is
       begin
          if Debug_Flag_V then
-            Put ("-->Walk: \1\n", Short_Image (Node));
+            Put ("-->Walk: \1\n", Node.Image);
             Indent;
          end if;
 
@@ -4046,14 +4046,14 @@ package body METRICS.Actions is
 
          if Debug_Flag_V then
             Outdent;
-            Put ("<--Walk: \1\n", Short_Image (Node));
+            Put ("<--Walk: \1\n", Node.Image);
          end if;
       end Rec;
 
       procedure Gather_Metrics_And_Walk_Children (Node : Ada_Node) is
          M : Metrix renames
            Element (Metrix_Stack, Last_Index (Metrix_Stack)).all;
-         With_Trivia : constant Children_Array := Children_With_Trivia (Node);
+         With_Trivia : constant Children_Array := Children_And_Trivia (Node);
          B           : Boolean;
 
       --  Start of processing for Gather_Metrics_And_Walk_Children
@@ -4174,7 +4174,7 @@ package body METRICS.Actions is
       end if;
 
       if Debug_Flag_V then
-         Put ("-->Walk: \1\n", Short_Image (CU_Node));
+         Put ("-->Walk: \1\n", CU_Node.Image);
          Indent;
       end if;
 
@@ -4212,7 +4212,7 @@ package body METRICS.Actions is
 
       if Debug_Flag_V then
          Outdent;
-         Put ("<--Walk: \1\n", Short_Image (CU_Node));
+         Put ("<--Walk: \1\n", CU_Node.Image);
       end if;
    end Process_CU;
 
@@ -4255,7 +4255,7 @@ package body METRICS.Actions is
 
       if Debug_Flag_V then
          Outdent;
-         Put ("<--Walk: \1\n", Short_Image (CU_Node));
+         Put ("<--Walk: \1\n", CU_Node.Image);
       end if;
    end Per_File_Action;
 

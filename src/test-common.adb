@@ -364,7 +364,7 @@ package body Test.Common is
                  (Node_Image (P_Defining_Name (As_Basic_Decl (Nesting (I)))));
             else
                Result :=
-                 Debug_Text (Nesting (I).As_Basic_Decl.P_Defining_Name)
+                 Image (Text (Nesting (I).As_Basic_Decl.P_Defining_Name))
                  & "."
                  & Result;
             end if;

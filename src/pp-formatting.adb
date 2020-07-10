@@ -136,8 +136,7 @@ package body Pp.Formatting is
    subtype Ada_Node is Libadalang.Analysis.Ada_Node;
    use type Ada_Node;
    function Is_Null (Tree : Ada_Node) return Boolean is (Tree.Is_Null);
-   function T_Img (Tree : Ada_Node) return String is
-     (Libadalang.Analysis.Short_Image (Tree));
+   function T_Img (Tree : Ada_Node) return String is (Tree.Image);
 
    Op_Sym_Table : constant array (Positive range <>) of Symbol :=
      (Name_Q_And,
