@@ -3601,7 +3601,9 @@ package body Pp.Formatting is
 
          if Assert_Enabled then
             for LB of All_LB loop
+               pragma Warnings (Off);
                LB := (others => <>);
+               pragma Warnings (On);
             end loop;
          end if;
          Clear (All_LB);
@@ -4073,8 +4075,10 @@ package body Pp.Formatting is
                            Flush_Para;
                            First_Line_Tabs := Cur_Line_Tabs;
                         end if;
+                        pragma Warnings (Off);
                         F_Tab := (others => <>);
                         C_Tab := (others => <>);
+                        pragma Warnings (On);
                      end if;
                      Append (Paragraph_Tabs, Cur_Line_Tabs);
                      Clear (Cur_Line_Tabs);
