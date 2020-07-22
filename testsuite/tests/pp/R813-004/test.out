@@ -2,7 +2,8 @@ package body P is
 
   function F return T is
   begin
-    return Lkajdsflkjsdfljasdffdd.Irjeogjeoigjerjgoiejgireggssi'
+    return
+     Lkajdsflkjsdfljasdffdd.Irjeogjeoigjerjgoiejgireggssi'
       (Aoirjisjoas => Aoirjisjoas,
        Dsfdsfs     =>
         (Ueirost => Osijdfojarijforjaoggjg.Jsggg,

@@ -728,7 +728,7 @@ package body Pp.Actions is
            when Ada_Enum_Literal_Decl =>
              L ("!"),
            when Ada_Exception_Decl =>
-                 L ("?~,# ~~ ^: exception!", Aspects),
+             L ("?~,# ~~ ^: exception!", Aspects),
            when Ada_Generic_Package_Instantiation =>
              L ("package ! is new !?[# (~,#1 ~)]~", Aspects),
            when Ada_Generic_Subp_Instantiation =>
@@ -1430,8 +1430,10 @@ package body Pp.Actions is
          Subtree_Alt,
          Comma_Soft,
          Pragma_Alt,
-         Parameter_Specification_Alt,
-         Extended_Return_Stmt_Alt,
+         Param_Spec_Alt,
+         Extended_Return_Stmt_Short_Alt,
+         Extended_Return_Stmt_Short_Vertical_Agg_Alt,
+         Extended_Return_Stmt_Vertical_Agg_Alt,
          Vertical_Agg_Alt,
          Nonvertical_Agg_Alt,
          Enum_Rep_Nonvertical_Agg_Alt,
@@ -1439,6 +1441,10 @@ package body Pp.Actions is
          Comp_Decl_Vertical_Agg_Alt,
          Assign_Vertical_Agg_Alt,
          Qualified_Vertical_Agg_Alt,
+         Expr_Function_Vertical_Agg_Alt,
+         Generic_Package_Instantiation_Vertical_Agg_Alt,
+         Generic_Subp_Instantiation_Vertical_Agg_Alt,
+         Return_Stmt_Vertical_Agg_Alt,
          Aspect_Assoc_Alt,
          Pos_Notation_Assoc_Alt,
          Single_Name_Vertical_Assoc_Alt,
@@ -1448,6 +1454,7 @@ package body Pp.Actions is
          Comp_Clause_Alt,
          Handled_Stmts_With_Begin_Alt,
          Handled_Stmts_With_Do_Alt,
+         Handled_Stmts_With_Do_Vertical_Agg_Alt,
          Depends_Hack_Alt,
          Un_Op_No_Space_Alt,
          Un_Op_Space_Alt,
@@ -1463,6 +1470,8 @@ package body Pp.Actions is
          Tab_3_Alt,
          AM_Tab_4_Alt,
          Not_AM_Default_Alt,
+         Vertical_Agg_AM_Tab_4_Alt,
+         Vertical_Agg_Not_AM_Default_Alt,
          Select_When_Alt,
          Select_Or_When_Alt,
          Call_Threshold_Alt,
@@ -1533,33 +1542,35 @@ package body Pp.Actions is
         (Cmd : Command_Line; Kind : Subp_Decl_Body_Kind)
         return Str_Template
       is
-         Has_Is : constant Boolean :=
+         Has_Is_NL : constant Boolean :=
            (case Kind is
               when Ada_Subp_Decl |
                    Ada_Subp_Renaming_Decl |
                    Ada_Access_To_Subp_Def |
                    Ada_Entry_Decl |
-                   Ada_Formal_Subp_Decl |
-                   Ada_Generic_Subp_Decl => False,
-              when Ada_Subp_Body_Stub |
-                   Ada_Subp_Body |
-                   Ada_Abstract_Subp_Decl |
                    Ada_Expr_Function |
+                   Ada_Abstract_Subp_Decl |
+                   Ada_Formal_Subp_Decl |
+                   Ada_Subp_Body_Stub |
                    Ada_Null_Subp_Decl |
+                   Ada_Generic_Subp_Decl => False,
+              when Ada_Subp_Body |
                    Ada_Entry_Body => True);
+         --  True if there is an "is" in the syntax, and we want a hard line
+         --  break before it.
+
+         Sep_Is : constant Boolean :=
+           Has_Is_NL and then Arg (Cmd, Separate_Is);
 
          T : constant W_Str := W_Str (Str_Template_Table (Kind).all);
          T2 : constant W_Str :=
-           (if Has_Is and then Arg (Cmd, Separate_Is)
-             then Replace_All (T, "# is$", "$is$")
-             else T);
+           (if Sep_Is then Replace_All (T, "# is$", "$is$") else T);
          T3 : constant W_Str :=
-           (if Has_Is and then Arg (Cmd, Separate_Is)
-             then Replace_All (T2, "#+1 is$", "$is$")
-             else T2);
+           (if Sep_Is then Replace_All (T2, "#+1 is$", "$is$") else T2);
+
       begin
          return Result : constant Str_Template := Str_Template (T3) do
-            pragma Assert (True or else W_Str (Result) /= T); -- ???
+            pragma Assert (if Sep_Is then W_Str (Result) /= T);
          end return;
       end Subp_Decl_With_Hard_Breaks;
 
@@ -1578,8 +1589,19 @@ package body Pp.Actions is
             Subtree_Alt => L ("!"),
             Comma_Soft => L (",# "),
             Pragma_Alt => L ("/?[# (~,#1 ~)]~"),
-            Parameter_Specification_Alt => L (" ^: "),
-            Extended_Return_Stmt_Alt => L ("return !/"),
+            Extended_Return_Stmt_Short_Alt => L ("return !/"),
+            --  Unfortunately, the --named-vertical-aggregate switch requires
+            --  not only different formatting of aggregates, but different
+            --  formatting of various contexts in which the aggregate might
+            --  appear. Therefore we need various ..._Vertical_Agg_Alt
+            --  templates, which typically replace a soft line break with a
+            --  hard line break.
+            Extended_Return_Stmt_Short_Vertical_Agg_Alt => L ("return$!/"),
+            Extended_Return_Stmt_Vertical_Agg_Alt =>
+              L (Replace_One
+                 (Ada_Extended_Return_Stmt,
+                  From => "return[# !]", To => "return[$!]")),
+            Param_Spec_Alt => L (" ^: "),
             Vertical_Agg_Alt => L ("(?~~ with #~?~,$~~)"),
             Nonvertical_Agg_Alt => L ("#(?~~ with #~?~,# ~~)"),
             Enum_Rep_Nonvertical_Agg_Alt => L ("#(?~~ with #~?~,#1 ~~)"),
@@ -1595,6 +1617,27 @@ package body Pp.Actions is
             Qualified_Vertical_Agg_Alt =>
               L (Replace_One
                  (Ada_Qual_Expr, From => "!'[#!]", To => "!'[$!]")),
+            Expr_Function_Vertical_Agg_Alt =>
+              L (Replace_One
+                 (Ada_Expr_Function, From => " is[# !]", To => " is[$!]")),
+            Generic_Package_Instantiation_Vertical_Agg_Alt =>
+              L (Replace_One
+                 (Ada_Generic_Package_Instantiation,
+                  From => (if Arg (Cmd, RM_Style_Spacing) then
+                             "?[#(~,#1 ~)]~"
+                           else "?[# (~,#1 ~)]~"),
+                  To => "?[$(~,$ ~)]~")),
+            Generic_Subp_Instantiation_Vertical_Agg_Alt =>
+              L (Replace_One
+                 (Ada_Generic_Subp_Instantiation,
+                  From => (if Arg (Cmd, RM_Style_Spacing) then
+                             "?[#(~,#1 ~)]~"
+                           else "?[# (~,#1 ~)]~"),
+                  To => "?[$(~,$ ~)]~")),
+            Return_Stmt_Vertical_Agg_Alt =>
+              L (Replace_One
+                 (Ada_Return_Stmt,
+                  From => "return[?# ~~~]", To => "return[?$~~~]")),
             Aspect_Assoc_Alt => L ("/? ^=> ~~~"),
             Pos_Notation_Assoc_Alt =>
               L ("?~~~!"), -- The "?~~~" generates nothing.
@@ -1610,6 +1653,8 @@ package body Pp.Actions is
               L ("?begin$" & Stmts_And_Handlers),
             Handled_Stmts_With_Do_Alt =>
               L ("# ?do$" & Stmts_And_Handlers),
+            Handled_Stmts_With_Do_Vertical_Agg_Alt =>
+              L ("$?do$" & Stmts_And_Handlers),
             Depends_Hack_Alt => L ("?~~ ^=>~!"),
             Un_Op_No_Space_Alt => L ("/!"),
             Un_Op_Space_Alt => L ("/ !"),
@@ -1628,6 +1673,8 @@ package body Pp.Actions is
             Tab_3_Alt => L ("^3"),
             AM_Tab_4_Alt => L (" ^4:=[# !]"),
             Not_AM_Default_Alt => L (" :=[# !]"),
+            Vertical_Agg_AM_Tab_4_Alt => L (" ^4:=[$!]"),
+            Vertical_Agg_Not_AM_Default_Alt => L (" :=[$!]"),
             Select_When_Alt =>
               L ("? when ~~ =>~$" & "{?~;$~;$~}"),
             Select_Or_When_Alt =>
@@ -3420,7 +3467,8 @@ package body Pp.Actions is
          --
          --     - The --vertical-named-aggregates switch was given.
          --
-         --     - X is an aggregate.
+         --     - X is an aggregate or a qualified expression whose expression
+         --       is an aggregate.
          --
          --     - All component associations are in named notation.
          --
@@ -3430,13 +3478,18 @@ package body Pp.Actions is
          --       the outer and inner aggregates to be vertical, even though
          --       the outer one has only one component association.
          --
-         --     - The aggregate appears in an appropriate context. An
-         --       appropriate context is as the initial value of an object
-         --       declaration, as the default value for a component
-         --       declaration, as the aggregate in an enumeration
-         --       representation clause, as the expression of a qualified
-         --       expression, or as the expression of a component association
-         --       of an outer aggregate that is itself vertical.
+         --     - If the aggregate is the expression of a component association
+         --       of an outer aggregate, then the outer one is itself vertical.
+
+         function Has_Vertical_Aggregates
+           (Params : Param_Spec_List) return Boolean;
+         --  True if one of the parameters has a default expression that is a
+         --  vertical aggregate.
+
+         function Has_Vertical_Aggregates
+           (Assocs : Assoc_List) return Boolean;
+         --  True if one of the parameter associations has an expression that
+         --  is a vertical aggregate.
 
          ----------------
 
@@ -3448,6 +3501,7 @@ package body Pp.Actions is
          procedure Do_Compilation_Unit;
          procedure Do_Component_Clause;
          procedure Do_Handled_Stmts;
+         procedure Do_Return_Stmt;
          procedure Do_Extended_Return_Stmt;
          procedure Do_For_Loop_Spec;
 
@@ -3468,7 +3522,11 @@ package body Pp.Actions is
          procedure Do_List;
          procedure Do_Literal;
          procedure Do_Label;
-         procedure Do_Parameter_Specification; -- also Formal_Object_Declaration
+         procedure Do_Param_Spec; -- also Formal_Object_Declaration
+         procedure Do_Object_Decl;
+         --  Anonymous_Object_Decl and Extended_Return_Stmt_Object_Decl are
+         --  also passed to Do_Object_Decl.
+         procedure Do_Component_Decl;
          procedure Do_Pragma;
          procedure Do_Qual_Expr;
          procedure Do_Select_When_Part;
@@ -3476,6 +3534,7 @@ package body Pp.Actions is
          procedure Do_Subp_Spec;
          procedure Do_Subp_Decl; -- subprograms and the like
          procedure Do_Call_Expr;
+         procedure Do_Instantiation;
          procedure Do_Subtype_Indication;
          procedure Do_Task_Def;
          procedure Do_Type_Decl;
@@ -3486,57 +3545,91 @@ package body Pp.Actions is
          function Is_Vertical_Aggregate (X : Ada_Tree'Class) return Boolean is
          begin
             return Result : Boolean := False do
-               if Arg (Cmd, Vertical_Named_Aggregates)
-                 and then Present (X)
-                 and then X.Kind = Ada_Aggregate
+               if Arg (Cmd, Vertical_Named_Aggregates) and then Present (X)
                then
-                  --  Subaggregate case
+                  case X.Kind is
+                     --  Parenthesized expression case; recurse on inner
+                     --  expression
 
-                  if X.Parent.Kind = Ada_Aggregate_Assoc then
-                     declare
-                        Agg : constant Ada_Tree := X.Parent.Parent.Parent;
-                        pragma Assert (Agg.Kind = Ada_Aggregate);
-                     begin
-                        Result := Is_Vertical_Aggregate (Agg);
-                        --  Recurse on outer aggregate
-                     end;
-
-                  --  Outermost aggregate case
-
-                  else
-                     declare
-                        Assocs : constant Assoc_List := F_Assocs (X.As_Aggregate);
-                        All_Named : constant Boolean :=
-                          (Present (Subtree (Subtree (Assocs, 1), 1)));
-                        --  True if all component associations are named. We
-                        --  only need to check the first one, because of the
-                        --  restriction in Ada that positional associations
-                        --  can't follow named ones.
-
-                        One_Assoc : constant Boolean := Subtree_Count (Assocs) = 1;
-                        --  Exactly one association
-
-                        One_Agg_Assoc : constant Boolean :=
-                          One_Assoc and then All_Named and then
-                          Subtree (Subtree (Assocs, 1), 2).Kind = Ada_Aggregate;
-                        --  Exactly one named association whose expression is a
-                        --  subaggregate.
-
-                     begin
-                        if All_Named and then (not One_Assoc or One_Agg_Assoc)
-                          and then X.Parent.Kind in Ada_Object_Decl |
-                            Ada_Component_Decl |
-                            Ada_Assign_Stmt |
-                            Ada_Qual_Expr |
-                            Ada_Enum_Rep_Clause
-                        then
+                     when Ada_Paren_Expr =>
+                        if Is_Vertical_Aggregate (X.As_Paren_Expr.F_Expr) then
                            Result := True;
                         end if;
-                     end;
-                  end if;
+
+                     --  Qualified expression case; recurse on the suffix
+
+                     when Ada_Qual_Expr =>
+                        if Is_Vertical_Aggregate (X.As_Qual_Expr.F_Suffix) then
+                           Result := True;
+                        end if;
+
+                     when Ada_Aggregate =>
+                        --  Subaggregate case; recurse on outer aggregate
+
+                        if X.Parent.Kind = Ada_Aggregate_Assoc then
+                           declare
+                              Outer_Agg : constant Ada_Tree :=
+                                X.Parent.Parent.Parent;
+                              pragma Assert (Outer_Agg.Kind = Ada_Aggregate);
+                           begin
+                              if Is_Vertical_Aggregate (Outer_Agg) then
+                                 Result := True;
+                              end if;
+                           end;
+
+                        --  Outermost aggregate case
+
+                        else
+                           declare
+                              Assocs : constant Assoc_List :=
+                                F_Assocs (X.As_Aggregate);
+                              All_Named : constant Boolean :=
+                                (Present (Subtree (Subtree (Assocs, 1), 1)));
+                              --  True if all component associations are
+                              --  named. We only need to check the first one,
+                              --  because of the restriction in Ada that
+                              --  positional associations can't follow named
+                              --  ones.
+
+                              One_Assoc : constant Boolean :=
+                                Subtree_Count (Assocs) = 1;
+                              --  Exactly one association
+
+                              One_Agg_Assoc : constant Boolean :=
+                                One_Assoc and then All_Named and then
+                                Subtree (Subtree (Assocs, 1), 2).Kind =
+                                  Ada_Aggregate;
+                              --  Exactly one named association whose
+                              --  expression is a subaggregate.
+
+                           begin
+                              if All_Named
+                                and then (One_Agg_Assoc or not One_Assoc)
+                              then
+                                 Result := True;
+                              end if;
+                           end;
+                        end if;
+
+                     when others => null;
+                  end case;
                end if;
             end return;
          end Is_Vertical_Aggregate;
+
+         function Has_Vertical_Aggregates
+           (Params : Param_Spec_List) return Boolean is
+         begin
+            return (for some Param of Params =>
+                      Is_Vertical_Aggregate (Param.F_Default_Expr));
+         end Has_Vertical_Aggregates;
+
+         function Has_Vertical_Aggregates
+           (Assocs : Assoc_List) return Boolean is
+         begin
+            return (for some Assoc of Assocs =>
+                      Is_Vertical_Aggregate (Assoc.As_Param_Assoc.F_R_Expr));
+         end Has_Vertical_Aggregates;
 
          procedure Do_Aggregate is
          begin
@@ -3614,7 +3707,7 @@ package body Pp.Actions is
 
          procedure Do_Handled_Stmts is
          begin
-            case Ada_Node'(Parent (Tree)).Kind is
+            case Parent_Tree.Kind is
                when Ada_Entry_Body |
                  Ada_Package_Body |
                  Ada_Subp_Body |
@@ -3622,20 +3715,60 @@ package body Pp.Actions is
                  Ada_Begin_Block |
                  Ada_Decl_Block =>
                   Interpret_Alt_Template (Handled_Stmts_With_Begin_Alt);
-               when Ada_Extended_Return_Stmt | Ada_Accept_Stmt_With_Stmts =>
+
+               when Ada_Extended_Return_Stmt =>
+                  declare
+                     Vertical : constant Boolean :=
+                       Is_Vertical_Aggregate
+                         (Parent_Tree.As_Extended_Return_Stmt.F_Decl
+                            .F_Default_Expr);
+                  begin
+                     if Vertical then
+                        Interpret_Alt_Template
+                          (Handled_Stmts_With_Do_Vertical_Agg_Alt);
+                     else
+                        Interpret_Alt_Template (Handled_Stmts_With_Do_Alt);
+                     end if;
+                  end;
+
+               when Ada_Accept_Stmt_With_Stmts =>
                   Interpret_Alt_Template (Handled_Stmts_With_Do_Alt);
+
                when others => raise Program_Error;
             end case;
          end Do_Handled_Stmts;
 
-         procedure Do_Extended_Return_Stmt is
+         procedure Do_Return_Stmt is
          begin
-            --  If there are no statements or exception handlers, use short form
-
-            if Is_Nil (Tree.As_Extended_Return_Stmt.F_Stmts) then
-               Interpret_Alt_Template (Extended_Return_Stmt_Alt);
+            if Is_Vertical_Aggregate (Tree.As_Return_Stmt.F_Return_Expr) then
+               Interpret_Alt_Template (Return_Stmt_Vertical_Agg_Alt);
             else
                Interpret_Template;
+            end if;
+         end Do_Return_Stmt;
+
+         procedure Do_Extended_Return_Stmt is
+            Vertical : constant Boolean :=
+              Is_Vertical_Aggregate
+                (Tree.As_Extended_Return_Stmt.F_Decl.F_Default_Expr);
+         begin
+            --  If there are no statements or exception handlers, use one of
+            --  the short forms.
+
+            if Is_Nil (Tree.As_Extended_Return_Stmt.F_Stmts) then
+               if Vertical then
+                  Interpret_Alt_Template
+                    (Extended_Return_Stmt_Short_Vertical_Agg_Alt);
+               else
+                  Interpret_Alt_Template (Extended_Return_Stmt_Short_Alt);
+               end if;
+            else
+               if Vertical then
+                  Interpret_Alt_Template
+                    (Extended_Return_Stmt_Vertical_Agg_Alt);
+               else
+                  Interpret_Template;
+               end if;
             end if;
          end Do_Extended_Return_Stmt;
 
@@ -3750,14 +3883,19 @@ package body Pp.Actions is
                         (Tree.As_Aggregate_Assoc.F_Designators) = 1
                      else True);
                   Vertical : constant Boolean :=
-                    Tree.Kind = Ada_Aggregate_Assoc
-                    and then
-                      Is_Vertical_Aggregate
-                        (Tree.As_Aggregate_Assoc.F_R_Expr);
+                    (Tree.Kind = Ada_Aggregate_Assoc and then
+                      Is_Vertical_Aggregate (Tree.As_Aggregate_Assoc.F_R_Expr))
+                        or else
+                    (Tree.Kind = Ada_Param_Assoc and then
+                      Is_Vertical_Aggregate (Tree.As_Param_Assoc.F_R_Expr));
+                  --  True if the right-hand side of the "=>" is a vertical
+                  --  aggregate, which case we need a different template.
+
                begin
                   --  The Single_Name test is needed because the "[]" is not
                   --  properly nested with the "?~~~".
                   --  "! ^=>[# !]" doesn't work for discrims.
+
                   if Single_Name then
                      if Depends_Hack (Ancestor_Tree (3)) then
                         Interpret_Alt_Template (Depends_Hack_Alt);
@@ -3768,6 +3906,7 @@ package body Pp.Actions is
                      else
                         Interpret_Alt_Template (Single_Name_Assoc_Alt);
                      end if;
+
                   else
                      if Vertical then
                         Interpret_Alt_Template (Multi_Name_Vertical_Assoc_Alt);
@@ -4103,7 +4242,7 @@ package body Pp.Actions is
             end if;
          end Do_Others;
 
-         procedure Do_Parameter_Specification is
+         procedure Do_Param_Spec is
             Index : Query_Index := 1;
             AM : constant Boolean := Arg (Cmd, Align_Modes);
          begin
@@ -4114,8 +4253,7 @@ package body Pp.Actions is
                Between => Tok_Alt_Table (Comma_Soft),
                Post    => Tok_Alt_Table (Empty_Alt));
             Interpret_Alt_Template
-              (Parameter_Specification_Alt,
-               Subtrees => Empty_Tree_Array);
+              (Param_Spec_Alt, Subtrees => Empty_Tree_Array);
 
             --  F_Has_Aliased:
             Index := Index + 1;
@@ -4154,9 +4292,19 @@ package body Pp.Actions is
             --  F_Default_Expr:
             Index := Index + 1;
             if Present (Subtree (Tree, Index)) then
-               Interpret_Alt_Template
-                 ((if AM then AM_Tab_4_Alt else Not_AM_Default_Alt),
-                  Subtrees => (1 => Subtree (Tree, Index)));
+               declare
+                  Default : constant Ada_Tree := Subtree (Tree, Index);
+                  Vertical : constant Boolean :=
+                    Is_Vertical_Aggregate (Default);
+                  T : constant Alt_Templates :=
+                    (if Vertical then
+                      (if AM then Vertical_Agg_AM_Tab_4_Alt
+                       else Vertical_Agg_Not_AM_Default_Alt)
+                     else (if AM then AM_Tab_4_Alt else Not_AM_Default_Alt));
+               begin
+                  Interpret_Alt_Template
+                    (T, Subtrees => (1 => Subtree (Tree, Index)));
+               end;
             end if;
 
             --  Skip F_Renaming_Clause, F_Aspects:
@@ -4166,7 +4314,36 @@ package body Pp.Actions is
             end if;
 
             pragma Assert (Index = Subtree_Count (Tree));
-         end Do_Parameter_Specification;
+         end Do_Param_Spec;
+
+         procedure Do_Object_Decl is
+         begin
+            if Is_Generic_Formal_Object_Decl (Tree) then
+               Do_Param_Spec;
+
+            elsif Is_Vertical_Aggregate
+              (F_Default_Expr (Tree.As_Object_Decl))
+
+            then
+               Interpret_Alt_Template (Obj_Decl_Vertical_Agg_Alt);
+
+            else
+               Interpret_Template;
+            end if;
+         end Do_Object_Decl;
+
+         procedure Do_Component_Decl is
+         begin
+            if Is_Vertical_Aggregate
+              (F_Default_Expr (Tree.As_Component_Decl))
+
+            then
+               Interpret_Alt_Template (Comp_Decl_Vertical_Agg_Alt);
+
+            else
+               Interpret_Template;
+            end if;
+         end Do_Component_Decl;
 
          procedure Do_Pragma is
             With_Casing : constant W_Str :=
@@ -4197,6 +4374,26 @@ package body Pp.Actions is
             end if;
          end Do_Select_When_Part;
 
+         procedure Do_Instantiation is
+            Actuals : constant Assoc_List :=
+              (if Tree.Kind = Ada_Generic_Subp_Instantiation then
+                 Tree.As_Generic_Subp_Instantiation.F_Params
+               else
+                 Tree.As_Generic_Package_Instantiation.F_Params);
+
+            Temp : constant Alt_Templates :=
+              (if Tree.Kind = Ada_Generic_Subp_Instantiation then
+                 Generic_Subp_Instantiation_Vertical_Agg_Alt
+               else
+                 Generic_Package_Instantiation_Vertical_Agg_Alt);
+         begin
+            if Has_Vertical_Aggregates (Actuals) then
+               Interpret_Alt_Template (Temp);
+            else
+               Interpret_Template;
+            end if;
+         end Do_Instantiation;
+
          procedure Do_Params is
             Is_Function : constant Boolean :=
               (if Is_Nil (Parent_Tree)
@@ -4212,6 +4409,7 @@ package body Pp.Actions is
             end if;
             if (Arg (Cmd, Par_Threshold) = 0 and then Arg (Cmd, Separate_Is))
               or else Param_Count > Query_Count (Arg (Cmd, Par_Threshold))
+              or else Has_Vertical_Aggregates (Tree.As_Params.F_Params)
             then
                Interpret_Alt_Template (Par_Threshold_Alt);
             else
@@ -4279,6 +4477,10 @@ package body Pp.Actions is
             Is_Function : Boolean;
             Param_Count : Query_Count :=
               (if Params.Is_Null then 0 else Subtree_Count (Params));
+
+            Vertical_Expr_Function : constant Boolean :=
+              Tree.Kind = Ada_Expr_Function
+                and then Is_Vertical_Aggregate (Tree.As_Expr_Function.F_Expr);
          begin
             if Tree.Kind in Ada_Entry_Decl | Ada_Entry_Body then
                Is_Function := False;
@@ -4296,12 +4498,17 @@ package body Pp.Actions is
                          Tree.As_Subp_Body.P_Defining_Name.As_Ada_Node
                     else Subtrees (Tree));
             begin
-               if (Arg (Cmd, Par_Threshold) = 0 and then Arg (Cmd, Separate_Is))
+               if Vertical_Expr_Function then
+                  Interpret_Alt_Template
+                    (Expr_Function_Vertical_Agg_Alt, Subtrees => Subs);
+
+               elsif (Arg (Cmd, Par_Threshold) = 0 and then Arg (Cmd, Separate_Is))
                  or else Param_Count > Query_Count (Arg (Cmd, Par_Threshold))
                then
                   Interpret_Template
                     (Tok_Subp_Decl_With_Hard_Breaks_Alt_Table (Tree.Kind),
                      Subtrees => Subs);
+
                else
                   Interpret_Template (Subtrees => Subs);
                end if;
@@ -4309,7 +4516,7 @@ package body Pp.Actions is
          end Do_Subp_Decl;
 
          procedure Do_Call_Expr is
-            function Past_Call_Threshold (Actuals : Ada_Tree) return Boolean is
+            function Past_Call_Threshold (Actuals : Assoc_List) return Boolean is
                (Natural (Subtree_Count (Actuals)) >
                   Arg (Cmd, Call_Threshold)
                   and then
@@ -4317,9 +4524,15 @@ package body Pp.Actions is
                      Present (Subtree (Assoc, 1))));
             --  True if there are more parameter associations than the threshold,
             --  and at least one of them is named.
+
+            Actuals : constant Ada_Tree := Tree.As_Call_Expr.F_Suffix;
          begin
-            if Past_Call_Threshold (Tree.As_Call_Expr.F_Suffix) then
+            if Actuals.Kind = Ada_Assoc_List
+              and then (Past_Call_Threshold (Actuals.As_Assoc_List)
+                       or else Has_Vertical_Aggregates (Actuals.As_Assoc_List))
+            then
                Interpret_Alt_Template (Call_Threshold_Alt);
+
             else
                Interpret_Alt_Template (Call_Alt);
             end if;
@@ -4486,8 +4699,14 @@ package body Pp.Actions is
             Def_Name : constant Base_Id := Denoted_Def_Name (Decl, Id);
             pragma Assert (if Is_Def_Name then Def_Name = Id);
 
+            Is_Attr_Name : constant Boolean :=
+              Parent_Tree.Kind in Ada_Attribute_Ref | Ada_Update_Attribute_Ref
+                and then Tree = Parent_Tree.As_Attribute_Ref.F_Attribute;
+
             K : constant Ada_Node_Kind_Type :=
-              (if Decl.Is_Null then Null_Kind else Decl.Kind);
+              (if Is_Attr_Name then Parent_Tree.Kind
+               elsif Decl.Is_Null then Null_Kind
+               else Decl.Kind);
             With_Casing : constant W_Str :=
               Id_With_Casing
                 (Id_Name (Def_Name), Kind => K,
@@ -4568,34 +4787,25 @@ package body Pp.Actions is
             when Ada_Handled_Stmts =>
                Do_Handled_Stmts;
 
+            when Ada_Return_Stmt =>
+               Do_Return_Stmt;
+
             when Ada_Extended_Return_Stmt =>
                Do_Extended_Return_Stmt;
 
             when Ada_Qual_Expr =>
                Do_Qual_Expr;
 
-            when Ada_Param_Spec => -- ???generic formal object: | Ada_Object_Decl =>
-               Do_Parameter_Specification;
+            when Ada_Param_Spec =>
+               Do_Param_Spec;
 
-            when Ada_Object_Decl =>
-               if Is_Generic_Formal_Object_Decl (Tree) then
-                  Do_Parameter_Specification;
-               elsif Is_Vertical_Aggregate
-                 (F_Default_Expr (Tree.As_Object_Decl))
-               then
-                  Interpret_Alt_Template (Obj_Decl_Vertical_Agg_Alt);
-               else
-                  Interpret_Template;
-               end if;
+            when Ada_Object_Decl |
+              Ada_Anonymous_Object_Decl |
+              Ada_Extended_Return_Stmt_Object_Decl =>
+               Do_Object_Decl;
 
             when Ada_Component_Decl =>
-               if Is_Vertical_Aggregate
-                 (F_Default_Expr (Tree.As_Component_Decl))
-               then
-                  Interpret_Alt_Template (Comp_Decl_Vertical_Agg_Alt);
-               else
-                  Interpret_Template;
-               end if;
+               Do_Component_Decl;
 
             when Ada_Type_Decl =>
                Do_Type_Decl;
@@ -4608,6 +4818,10 @@ package body Pp.Actions is
 
             when Ada_Subp_Spec =>
                Do_Subp_Spec;
+
+            when Ada_Generic_Subp_Instantiation |
+              Ada_Generic_Package_Instantiation =>
+               Do_Instantiation;
 
             when Ada_Subp_Decl |
                  Ada_Abstract_Subp_Decl |

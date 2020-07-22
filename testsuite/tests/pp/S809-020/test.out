@@ -207,7 +207,7 @@ package body ada_main is
 
       Runtime_Initialize (1);
 
-      Finalize_Library_Objects := finalize_library'access;
+      Finalize_Library_Objects := finalize_library'Access;
 
       System.Soft_Links'Elab_Spec;
       System.Exception_Table'Elab_Body;
@@ -262,9 +262,9 @@ package body ada_main is
       Ada.Text_Io'Elab_Body;
       E007 := E007 + 1;
       E112 := E112 + 1;
-      test_queues'elab_spec;
+      test_queues'Elab_Spec;
       E110 := E110 + 1;
-      test_refactoring'elab_body;
+      test_refactoring'Elab_Body;
       E108 := E108 + 1;
       E002 := E002 + 1;
    end adainit;
@@ -853,7 +853,7 @@ package body ada_main is
 
       Runtime_Initialize (1);
 
-      Finalize_Library_Objects := finalize_library'access;
+      Finalize_Library_Objects := finalize_library'Access;
 
       System.Soft_Links'Elab_Spec;
       System.Exception_Table'Elab_Body;
@@ -1654,7 +1654,7 @@ begin
    Ada.Text_IO.Put_Line ("Test070 Start");
 
    Ada.Text_IO.Put_Line
-     ("  switch => " & test_gnatpp.development_switch'image (switch));
+     ("  switch => " & test_gnatpp.development_switch'Image (switch));
 
    Ada.Text_IO.Put_Line ("Test070 End");
 end test070;
