@@ -845,24 +845,27 @@ package body Pp.Scanner is
    end Lookup_Reserved_Word;
 
    function Get_Tokns
-     (Input           : in out Buffers.Buffer;
-      Result          : out Tokn_Vec;
-      Max_Tokens      : Tokn_Index := Tokn_Index'Last;
-      Lang            : Language := Ada_Lang)
+     (Input               : in out Buffers.Buffer;
+      Result              : out Tokn_Vec;
+      Comments_Special_On : Boolean;
+      Max_Tokens          : Tokn_Index := Tokn_Index'Last;
+      Lang                : Language := Ada_Lang)
      return Boolean
    is
       Ignored : Optional_EOL_Formats;
    begin
-      Get_Tokns (Input, Result, Ignored, Max_Tokens, Lang);
+      Get_Tokns
+        (Input, Result, Ignored, Comments_Special_On, Max_Tokens, Lang);
       return True;
    end Get_Tokns;
 
    procedure Get_Tokns
-     (Input           : in out Buffers.Buffer;
-      Result          : out Tokn_Vec;
-      EOL_Format      : out EOL_Formats;
-      Max_Tokens      : Tokn_Index := Tokn_Index'Last;
-      Lang            : Language := Ada_Lang)
+     (Input               : in out Buffers.Buffer;
+      Result              : out Tokn_Vec;
+      EOL_Format          : out EOL_Formats;
+      Comments_Special_On : Boolean;
+      Max_Tokens          : Tokn_Index := Tokn_Index'Last;
+      Lang                : Language := Ada_Lang)
    is
       Cur_Line, Cur_Col : Positive := 1;
       Cur_First         : Positive := 1;
@@ -1031,7 +1034,8 @@ package body Pp.Scanner is
          Get; -- skip '-'
          Get; -- skip '-'
 
-         if Kind_Of_Comment = Other_Whole_Line_Comment
+         if Comments_Special_On
+           and then Kind_Of_Comment = Other_Whole_Line_Comment
            and then not
              (Is_Letter (Cur)
                 or else Is_Digit (Cur)

@@ -518,7 +518,9 @@ package body Pp.Formatting is
       Cur_Indentation : Natural renames Lines_Data.Cur_Indentation;
       Src_Toks : aliased Tokn_Vec;
       pragma Assert (Is_Empty (Src_Toks));
-      Ignored : Boolean := Get_Tokns (Src_Buf, Src_Toks);
+      Ignored : Boolean := Get_Tokns
+        (Src_Buf, Src_Toks,
+         Comments_Special_On => Arg (Cmd, Comments_Special));
       Cur_Tok : Tokn_Cursor :=
         Next (First (Src_Toks'Unchecked_Access)); -- skip sentinel
 
@@ -599,7 +601,8 @@ package body Pp.Formatting is
    procedure Copy_Pp_Off_Regions
      (Src_Buf : in out Buffer;
       Lines_Data_P : Lines_Data_Ptr;
-      Pp_Off_Present : Boolean);
+      Pp_Off_Present : Boolean;
+      Cmd : Command_Line);
    --  Out_Buf is fully formatted at this point, including regions where
    --  pretty printing is supposed to be turned off. This replaces those
    --  regions of Out_Buf with the corresponding regions of Src_Buf. Note
@@ -624,7 +627,11 @@ package body Pp.Formatting is
                Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
                Out_Buf : Buffer renames Lines_Data.Out_Buf;
                Out_Tokns : Scanner.Tokn_Vec renames Lines_Data.Out_Tokns;
-               Ignored : Boolean := Get_Tokns (Out_Buf, Out_Tokns);
+
+               Ignored : Boolean := Get_Tokns
+                 (Out_Buf, Out_Tokns,
+                  Comments_Special_On => Arg (Cmd, Comments_Special));
+
                Out_Tok : Tokn_Cursor := First (Out_Tokns'Access);
 
             begin
@@ -655,7 +662,8 @@ package body Pp.Formatting is
    end Keyword_Casing;
 
    procedure Insert_Form_Feeds_Helper
-     (Lines_Data_P : Lines_Data_Ptr);
+     (Lines_Data_P : Lines_Data_Ptr;
+      Cmd : Command_Line);
 
    procedure Insert_Form_Feeds
      (Lines_Data_P : Lines_Data_Ptr;
@@ -665,18 +673,23 @@ package body Pp.Formatting is
       --  we have much bigger issues that need fixing.
 
       if False and then Arg (Cmd, Ff_After_Pragma_Page) then
-         Insert_Form_Feeds_Helper (Lines_Data_P);
+         Insert_Form_Feeds_Helper (Lines_Data_P, Cmd);
       end if;
    end Insert_Form_Feeds;
 
    procedure Insert_Form_Feeds_Helper
-     (Lines_Data_P : Lines_Data_Ptr)
+     (Lines_Data_P : Lines_Data_Ptr;
+      Cmd : Command_Line)
    is
       Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
       Out_Buf : Buffer renames Lines_Data.Out_Buf;
       Out_Tokns : Scanner.Tokn_Vec renames Lines_Data.Out_Tokns;
       use Scanner;
-      Ignored : Boolean := Get_Tokns (Out_Buf, Out_Tokns);
+
+      Ignored : Boolean := Get_Tokns
+        (Out_Buf, Out_Tokns,
+         Comments_Special_On => Arg (Cmd, Comments_Special));
+
       Prev_Prev_Tok : Tokn_Cursor := Next_ss (First (Out_Tokns'Access));
       Prev_Tok : Tokn_Cursor := Next_ss (Prev_Prev_Tok);
       Out_Tok : Tokn_Cursor := Next_ss (Prev_Tok);
@@ -708,22 +721,25 @@ package body Pp.Formatting is
 
    procedure Copy_Pp_Off_Regions_Helper
      (Src_Buf : in out Buffer;
-      Lines_Data_P : Lines_Data_Ptr);
+      Lines_Data_P : Lines_Data_Ptr;
+      Cmd : Command_Line);
 
    procedure Copy_Pp_Off_Regions
      (Src_Buf : in out Buffer;
       Lines_Data_P : Lines_Data_Ptr;
-      Pp_Off_Present : Boolean) is
+      Pp_Off_Present : Boolean;
+      Cmd : Command_Line) is
    begin
       --  Optimize by skipping this phase if there are no Pp_Off_Comments
       if Pp_Off_Present then
-         Copy_Pp_Off_Regions_Helper (Src_Buf, Lines_Data_P);
+         Copy_Pp_Off_Regions_Helper (Src_Buf, Lines_Data_P, Cmd);
       end if;
    end Copy_Pp_Off_Regions;
 
    procedure Copy_Pp_Off_Regions_Helper
      (Src_Buf : in out Buffer;
-      Lines_Data_P : Lines_Data_Ptr)
+      Lines_Data_P : Lines_Data_Ptr;
+      Cmd : Command_Line)
    is
       Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
       Out_Buf : Buffer renames Lines_Data.Out_Buf;
@@ -808,7 +824,10 @@ package body Pp.Formatting is
          end if;
       end Indent_Pp_Off;
 
-      Ignored : Boolean := Get_Tokns (Out_Buf, Out_Tokns);
+      Ignored : Boolean := Get_Tokns
+        (Out_Buf, Out_Tokns,
+         Comments_Special_On => Arg (Cmd, Comments_Special));
+
       Src_Tok : Tokn_Cursor := First (Src_Tokns'Access);
       Out_Tok : Tokn_Cursor := First (Out_Tokns'Access);
 
@@ -953,7 +972,7 @@ package body Pp.Formatting is
 
       Keyword_Casing (Lines_Data_P, Cmd);
       Insert_Form_Feeds (Lines_Data_P, Cmd);
-      Copy_Pp_Off_Regions (Src_Buf, Lines_Data_P, Pp_Off_Present);
+      Copy_Pp_Off_Regions (Src_Buf, Lines_Data_P, Pp_Off_Present, Cmd);
 
       --  The following pass doesn't modify anything; it just checks that the
       --  sequence of tokens we have constructed matches the original source
@@ -1113,7 +1132,9 @@ package body Pp.Formatting is
          end return;
       end Match;
 
-      Ignored : Boolean := Get_Tokns (Out_Buf, Out_Tokns);
+      Ignored : Boolean := Get_Tokns
+        (Out_Buf, Out_Tokns,
+         Comments_Special_On => Arg (Cmd, Comments_Special));
 
       Src_Tok : Tokn_Cursor := Next_ss (First (Src_Tokns'Access));
       Out_Tok : Tokn_Cursor := Next_ss (First (Out_Tokns'Access));

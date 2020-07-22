@@ -1957,7 +1957,9 @@ package body Pp.Actions is
             Tokens : aliased Tokn_Vec;
             Buf    : Buffer := String_To_Buffer (W_Str (Str.all));
             Ignored : Boolean := Get_Tokns
-              (Buf, Tokens, Lang => Template_Lang);
+              (Buf, Tokens,
+               Comments_Special_On => False,
+               Lang => Template_Lang);
             Cur : Tokn_Cursor := First (Tokens'Unchecked_Access);
          begin
             pragma Assert (Kind (Cur) = Start_Of_Input);
@@ -4949,7 +4951,9 @@ package body Pp.Actions is
             Utils.Dbg_Out.Output_Enabled := True;
          end if;
 
-         Scanner.Get_Tokns (Src_Buf, Src_Tokns, In_File_Format);
+         Scanner.Get_Tokns
+           (Src_Buf, Src_Tokns, In_File_Format,
+            Comments_Special_On => Arg (Cmd, Comments_Special));
          if Debug_Mode then
             Dbg_Out.Put ("Src_Tokens:\n");
             Scanner.Put_Tokens (Src_Tokns);
@@ -5593,7 +5597,7 @@ package body Pp.Actions is
       Put (" --comments-unchanged - do not format comments\n");
       Put (" --comments-gnat-indentation - GNAT style comment line indentation (default)\n");
       Put (" --comments-gnat-beginning - GNAT style comment beginning\n");
-      Put (" --comments-fill - fill comment blocks\n");
+      Put (" --comments-fill - fill comment blocks (default)\n");
       Put (" --comments-special - do not change comments with a special character just after --\n");
       Put (" --comments-only - format just the comments\n");
       Put (" --indentation=n - indentation level, n from 1 .. 9 (default 3)\n");

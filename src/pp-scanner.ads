@@ -495,22 +495,25 @@ package Pp.Scanner is
    --  Conventions for ends of lines
 
    procedure Get_Tokns
-     (Input           : in out Buffers.Buffer;
-      Result          : out Tokn_Vec;
-      EOL_Format      : out EOL_Formats;
-      Max_Tokens      : Tokn_Index := Tokn_Index'Last;
-      Lang            : Language := Ada_Lang);
+     (Input               : in out Buffers.Buffer;
+      Result              : out Tokn_Vec;
+      EOL_Format          : out EOL_Formats;
+      Comments_Special_On : Boolean;
+      Max_Tokens          : Tokn_Index := Tokn_Index'Last;
+      Lang                : Language := Ada_Lang);
    --  Return in Result the sequence of tokens in the Input string. The first
-   --  one is always Start_Of_Input, and the last one End_Of_Input.
-   --  EOL_Format is set to the convention used by the input file. Max_Tokens
-   --  places a limit on the number of tokens (not counting Start_Of_Input); we
-   --  quit before reaching end of input if we've gotten that many.
+   --  one is always Start_Of_Input, and the last one End_Of_Input.  EOL_Format
+   --  is set to the convention used by the input file. Comments_Special_On is
+   --  True if the --comments-special switch was given. Max_Tokens places a
+   --  limit on the number of tokens (not counting Start_Of_Input); we quit
+   --  before reaching end of input if we've gotten that many.
 
    function Get_Tokns
-     (Input           : in out Buffers.Buffer;
-      Result          : out Tokn_Vec;
-      Max_Tokens      : Tokn_Index := Tokn_Index'Last;
-      Lang            : Language := Ada_Lang)
+     (Input               : in out Buffers.Buffer;
+      Result              : out Tokn_Vec;
+      Comments_Special_On : Boolean;
+      Max_Tokens          : Tokn_Index := Tokn_Index'Last;
+      Lang                : Language := Ada_Lang)
      return Boolean;
    --  This is to get around the annoying restriction in Ada that you can't mix
    --  declarations and statements. It does the same thing as the procedure,
