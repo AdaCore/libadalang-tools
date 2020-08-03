@@ -129,6 +129,10 @@ package Test.Common is
    function Abstract_Type (Decl : Base_Type_Decl) return Boolean;
    --  Returns true if the declared type is abstract
 
+   function Is_Function (Decl : Basic_Subp_Decl) return Boolean;
+   --  Returns True for function declarations, False for any unexpected
+   --  arguments.
+
    procedure Report_Err (Message : String);
    --  Prints its argument to the standard error output
    procedure Report_Std (Message : String; Offset : Integer := 0);
@@ -317,5 +321,12 @@ package Test.Common is
    Substitution_Suite   : Boolean := False;
    --  Whenever or not to genretate suites for overrden tests applying them
    --  to fixture containing object of descendant type.
+
+   Test_Case_Only : Boolean := False;
+   --  Whether test skeletons should be created only for subprograms with
+   --  associated Test_Case pragmas/aspects.
+
+   Verbose : Boolean := False;
+   --  Turns on additional verbose output and more detailed traces
 
 end Test.Common;

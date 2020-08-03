@@ -95,6 +95,7 @@ package body Test.Actions is
       Files : File_Array_Access;
    begin
       GNATCOLL.Traces.Parse_Config_File;
+      Test.Common.Verbose := Arg (Cmd, Verbose);
       Test.Common.Harness_Only := Arg (Cmd, Harness_Only);
 
       --  We need to fill a local source table since gnattest actually needs

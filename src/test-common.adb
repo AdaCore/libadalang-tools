@@ -364,7 +364,7 @@ package body Test.Common is
                  (Node_Image (P_Defining_Name (As_Basic_Decl (Nesting (I)))));
             else
                Result :=
-                 Image (Text (Nesting (I).As_Basic_Decl.P_Defining_Name))
+                 Node_Image (Nesting (I).As_Basic_Decl.P_Defining_Name)
                  & "."
                  & Result;
             end if;
@@ -903,5 +903,18 @@ package body Test.Common is
 
       return 0;
    end Inheritance_Depth;
+
+   -----------------
+   -- Is_Function --
+   -----------------
+
+   function Is_Function (Decl : Basic_Subp_Decl) return Boolean is
+   begin
+      return Decl.P_Subp_Decl_Spec.As_Subp_Spec.F_Subp_Kind.Kind =
+        Ada_Subp_Kind_Function;
+   exception
+      when others =>
+         return False;
+   end Is_Function;
 
 end Test.Common;

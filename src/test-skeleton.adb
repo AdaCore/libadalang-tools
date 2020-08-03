@@ -33,6 +33,7 @@ with Ada.Containers.Indefinite_Hashed_Sets;
 with Ada.Containers.Indefinite_Hashed_Maps;
 
 with Libadalang.Common; use Libadalang.Common;
+with Langkit_Support.Text; use Langkit_Support.Text;
 
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -47,7 +48,7 @@ with GNATCOLL.VFS; use GNATCOLL.VFS;
 with Langkit_Support.Slocs; use Langkit_Support.Slocs;
 
 with GNAT.OS_Lib;
-
+with GNAT.SHA1;
 with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 
 with Test.Common; use Test.Common;
@@ -105,11 +106,16 @@ package body Test.Skeleton is
    use String_Set;
 
    type Test_Case_Mode is (Normal, Robustness);
-   pragma Unreferenced (Normal, Robustness);
 
    type Test_Case_Info is record
+      Pre  : Expr;
+      Post : Expr;
+
+      Elem : Ada_Node;
       Name : String_Access;
       Mode : Test_Case_Mode;
+      Req  : Expr;
+      Ens  : Expr;
 
       Req_Image : String_Access;
       Ens_Image : String_Access;
@@ -348,10 +354,16 @@ package body Test.Skeleton is
    --  for given subprogram.
 
    procedure Generate_Nested_Hierarchy (Data : Data_Holder);
-   --  Create dummy child packages copying nested packages from tested package.
+   --  Creates dummy child packages copying nested packages from tested package
 
    procedure Generate_Test_Package (Data : Data_Holder);
-   --  Generates test package spec and body.
+   --  Generates test package spec and body
+
+   procedure Generate_Procedure_Wrapper (Current_Subp : Subp_Info);
+   --  Prints a test-case specific wrapper for tested procedure
+
+   procedure Generate_Function_Wrapper (Current_Subp : Subp_Info);
+   --  Prints a test-case specific wrapper for tested function
 
    procedure Print_Comment_Declaration (Subp : Subp_Info; Span : Natural := 0);
    --  Prints the file containing the tested subprogram as well as the line
@@ -382,6 +394,10 @@ package body Test.Skeleton is
    --  as a part of test routine name. the name is trimmed, then all sequences
    --  of whitespace characters are replaced with an underscore, all other
    --  illegal characters are omitted.
+
+   procedure Put_Wrapper_Rename (Span : Natural; Current_Subp : Subp_Info);
+   --  Puts subprogram renaming declaration, which renames generated wrapper
+   --  into original tested subprogram's name.
 
    function Find_Same_Short_Name
      (MD_Map : Markered_Data_Maps.Map;
@@ -1796,13 +1812,935 @@ package body Test.Skeleton is
       Me_TC : constant Trace_Handle :=
         Create ("Skeletons.Test_Cases", Default => Off);
 
+      procedure Get_TC_Info_From_Pragma
+        (TC_Pragma :     Pragma_Node;
+         Name      : out String_Access;
+         Mode      : out Test_Case_Mode;
+         Requires  : out Expr;
+         Ensures   : out Expr);
+      --  Processes pragma node and sets values of corresponding parameters
+
+      procedure Get_TC_Info_From_Aspect
+        (TC_Aspect :     Aspect_Assoc;
+         Name      : out String_Access;
+         Mode      : out Test_Case_Mode;
+         Requires  : out Expr;
+         Ensures   : out Expr);
+      --  Processes aspect node and sets values of corresponding parameters
+
+      function Get_Condition_Image (Elem : Expr) return String;
+      --  Returns element image as a single line removing all double spaces
+
+      type Old_Attr_Loc is record
+         El            : Ada_Node;
+         Temp_Var_Name : String_Access;
+         Needs_Deref   : Boolean;
+      end record;
+      Old_Attr_Counter : Positive := 1;
+
+      package Source_Locations is new
+        Ada.Containers.Indefinite_Vectors (Positive, Old_Attr_Loc);
+
+      Old_Attr_Ref : Source_Locations.Vector;
+
+      function Replace_Old_Attribute (Elem : Expr) return String;
+      --  Replaces all entrances of <expr>'old in Post with
+      --  Gnattest_<expr>'Old in Elem's image.
+
+      function Replace_Result_Attribute
+        (Post   : String;
+         F_Name : String;
+         R_Name : String)
+         return String;
+      --  Replaces all entrances of function'Result in Post with R_Name
+
+      function Get_Old_Attr_Locations
+        (Node : Ada_Node'Class) return Visit_Status;
+      --  Gathers locations of 'Old attribute references through the given
+      --  expression and populates Old_Attr_Ref.
+
+      Subp_Add    : Subp_Info;
+      TR_Info_Add : Test_Routine_Info_Wrapper;
+
+      TC : Test_Case_Info;
+
+      Dec : constant Basic_Decl := Subp.Subp_Declaration.As_Basic_Decl;
+
+      Next : Ada_Node;
+
+      Test_Cases : Ada_Nodes_List.List;
+
+      Requiers, Ensures : Expr;
+      Mode : Test_Case_Mode;
+      Name : String_Access;
+
+      GT_Prefix : constant String := "Gnattest_";
+
+      Params_To_Temp : String_Set.Set;
+
+      Result_Value : String_Access;
+
+      -----------------------------
+      -- Get_TC_Info_From_Pragma --
+      -----------------------------
+
+      procedure Get_TC_Info_From_Pragma
+        (TC_Pragma :     Pragma_Node;
+         Name      : out String_Access;
+         Mode      : out Test_Case_Mode;
+         Requires  : out Expr;
+         Ensures   : out Expr)
+      is
+         Pragma_Params : constant Base_Assoc_List := F_Args (TC_Pragma);
+         PP_First      : constant Positive        :=
+           Pragma_Params.Base_Assoc_List_First;
+
+         Param_Expr : Expr;
+         P_Assoc    : Pragma_Argument_Assoc;
+      begin
+         --  Name
+         Param_Expr :=
+           Pragma_Params.List_Child (PP_First).As_Pragma_Argument_Assoc.F_Expr;
+         if Param_Expr.Kind = Ada_String_Literal then
+            Name := new String'
+              (Encode
+                 (Text    => Param_Expr.As_String_Literal.P_Denoted_Value,
+                  Charset => Param_Expr.Unit.Get_Charset));
+         else
+            Name     := null;
+            Mode     := Robustness;
+            Requires := No_Expr;
+            Ensures  := No_Expr;
+            return;
+         end if;
+
+         --  Mode
+         Param_Expr :=
+           Pragma_Params.List_Child
+             (PP_First + 1).As_Pragma_Argument_Assoc.F_Expr;
+         if To_Lower (Node_Image (Param_Expr)) = "nominal" then
+            Mode := Normal;
+         else
+            Mode := Robustness;
+         end if;
+
+         if Pragma_Params.List_Child (PP_First + 2).Is_Null then
+            Requires := No_Expr;
+            Ensures  := No_Expr;
+            return;
+         end if;
+
+         --  Requires and Ensures
+         P_Assoc := Pragma_Params.List_Child
+           (PP_First + 2).As_Pragma_Argument_Assoc;
+
+         if To_Lower (Node_Image (P_Assoc.F_Id)) = "requires" then
+            Requires := P_Assoc.F_Expr;
+         else
+            Requires := No_Expr;
+            Ensures  := P_Assoc.F_Expr;
+            return;
+         end if;
+
+         if Pragma_Params.List_Child (PP_First + 3).Is_Null then
+            Ensures := No_Expr;
+         else
+            Ensures :=
+              Pragma_Params.List_Child
+                (PP_First + 3).As_Pragma_Argument_Assoc.F_Expr;
+         end if;
+      end Get_TC_Info_From_Pragma;
+
+      -----------------------------
+      -- Get_TC_Info_From_Aspect --
+      -----------------------------
+
+      procedure Get_TC_Info_From_Aspect
+        (TC_Aspect :     Aspect_Assoc;
+         Name      : out String_Access;
+         Mode      : out Test_Case_Mode;
+         Requires  : out Expr;
+         Ensures   : out Expr)
+      is
+         Aspect_Params : constant Basic_Assoc_List :=
+           TC_Aspect.F_Expr.As_Aggregate.F_Assocs.As_Basic_Assoc_List;
+         AP_First      : constant Positive   :=
+           Aspect_Params.Basic_Assoc_List_First;
+
+         Param_Expr : Expr;
+         A_Assoc    : Aggregate_Assoc;
+      begin
+         --  Name
+         Param_Expr :=
+           Aspect_Params.List_Child (AP_First).As_Aggregate_Assoc.F_R_Expr;
+         if Param_Expr.Kind = Ada_String_Literal then
+            Name := new String'
+              (Encode
+                 (Text    => Param_Expr.As_String_Literal.P_Denoted_Value,
+                  Charset => Param_Expr.Unit.Get_Charset));
+         else
+            Name     := null;
+            Mode     := Robustness;
+            Requires := No_Expr;
+            Ensures  := No_Expr;
+            return;
+         end if;
+
+         --  Mode
+         Param_Expr :=
+           Aspect_Params.List_Child
+             (AP_First + 1).As_Aggregate_Assoc.F_R_Expr;
+         if To_Lower (Node_Image (Param_Expr)) = "nominal" then
+            Mode := Normal;
+         else
+            Mode := Robustness;
+         end if;
+
+         if Aspect_Params.List_Child (AP_First + 2).Is_Null then
+            Requires := No_Expr;
+            Ensures  := No_Expr;
+            return;
+         end if;
+
+         --  Requires and Ensures
+         A_Assoc := Aspect_Params.List_Child
+           (AP_First + 2).As_Aggregate_Assoc;
+
+         declare
+            Des : constant Ada_Node_List :=
+              A_Assoc.F_Designators.As_Ada_Node_List;
+         begin
+
+            if To_Lower (Node_Image (Des.Ada_Node_List_Element
+                         (Des.Ada_Node_List_First))) = "requires"
+            then
+               Requires := A_Assoc.F_R_Expr;
+            else
+               Requires := No_Expr;
+               Ensures  := A_Assoc.F_R_Expr;
+               return;
+            end if;
+         end;
+
+         if Aspect_Params.List_Child (AP_First + 3).Is_Null then
+            Ensures := No_Expr;
+         else
+            Ensures :=
+              Aspect_Params.List_Child
+                (AP_First + 3).As_Aggregate_Assoc.F_R_Expr;
+         end if;
+      end Get_TC_Info_From_Aspect;
+
+      ---------------------------
+      -- Replace_Old_Attribute --
+      ---------------------------
+
+      function Replace_Old_Attribute (Elem : Expr) return String
+      is
+         Unprocessed_Start : Token_Reference;
+         Expression_End    : Token_Reference;
+
+         Result : Unbounded_String;
+      begin
+         Trace (Me_TC, "Replace_Old_Attribute");
+         if Verbose then
+            Trace (Me_TC, "called for: " & Image (Elem));
+         end if;
+
+         if Elem.Is_Null then
+            return "";
+         end if;
+
+         Traverse (Elem, Get_Old_Attr_Locations'Access);
+
+         if Old_Attr_Ref.Is_Empty then
+            return Node_Image (Elem);
+         end if;
+
+         --  ??? While there is no proper name resolution for Identifiers from
+         --  Test_Case expressions that come from pragma Test_Case, it is not
+         --  possible to properly handle 'Old.
+         --  For now replace the whole expression with True.
+         for Par of Parents (Elem) loop
+            if Par.Kind = Ada_Pragma_Node then
+               Old_Attr_Ref.Clear;
+               return "True";
+            end if;
+         end loop;
+
+         Unprocessed_Start := Elem.Token_Start;
+         Expression_End    := Elem.Token_End;
+
+         for Attr_Ref of Old_Attr_Ref loop
+            Append
+              (Result,
+               Encode
+                 (Text
+                      (Unprocessed_Start, Previous (Attr_Ref.El.Token_Start)),
+                  Elem.Unit.Get_Charset));
+
+            if Attr_Ref.Needs_Deref then
+               Append (Result, Attr_Ref.Temp_Var_Name.all & ".all");
+            else
+               Append (Result, Attr_Ref.Temp_Var_Name.all);
+            end if;
+            Free (Attr_Ref.Temp_Var_Name);
+
+            Unprocessed_Start :=
+              Libadalang.Common.Next (Attr_Ref.El.Token_End);
+         end loop;
+
+         Append
+           (Result,
+            Encode
+              (Text (Unprocessed_Start, Expression_End),
+               Elem.Unit.Get_Charset));
+
+         Old_Attr_Ref.Clear;
+         return To_String (Result);
+
+      end Replace_Old_Attribute;
+
+      ----------------------------
+      -- Get_Old_Attr_Locations --
+      ----------------------------
+
+      function Get_Old_Attr_Locations
+        (Node : Ada_Node'Class) return Visit_Status
+      is
+         Loc      : Old_Attr_Loc;
+         Nm       : Libadalang.Analysis.Name;
+         Id       : Identifier;
+         Dec      : Basic_Decl;
+         Type_Dec : Basic_Decl;
+         Def      : Type_Def;
+         Res, Obj : Type_Expr;
+
+      begin
+         if Node.Kind /= Ada_Attribute_Ref
+           or else To_Lower
+             (Node_Image (Node.As_Attribute_Ref.F_Attribute)) /= "old"
+         then
+            return Into;
+         end if;
+
+         Nm := Node.As_Attribute_Ref.F_Prefix;
+         Id := Nm.P_Relative_Name.As_Identifier;
+
+         Trace (Me_TC, "Resolving name " & Id.Image);
+
+         --  ??? While there is no proper name resolution for Identifiers from
+         --  Test_Case expressions that come from pragma Test_Case, it is not
+         --  possible to properly handle 'Old.
+         --  No need to continue processing the expression since it will be
+         --  replaced with "True" in Replace_Old_Attribute, just add one
+         --  dummy Loc.
+
+         for Par of Parents (Node) loop
+            if Par.Kind = Ada_Pragma_Node then
+               Loc.El := No_Ada_Node;
+               Loc.Temp_Var_Name := null;
+               Old_Attr_Ref.Append (Loc);
+               return Stop;
+            end if;
+         end loop;
+
+         Dec := Id.P_Referenced_Decl;
+
+         --  Constructing temp variable assignments
+         if Nm.Kind = Ada_Explicit_Deref then
+            Nm := Nm.As_Explicit_Deref.F_Prefix;
+            Loc.Needs_Deref := True;
+         else
+            Loc.Needs_Deref := False;
+         end if;
+
+         case Dec.Kind is
+            when Ada_Subp_Decl =>
+
+               Loc.Temp_Var_Name := new String'
+                 (GT_Prefix
+                  & Trim (Positive'Image (Old_Attr_Counter), Both)
+                  & "_"
+                  & Get_Subp_Name (Dec));
+               Res := Dec.As_Subp_Decl.F_Subp_Spec.P_Returns;
+
+               if Res.Kind = Ada_Anonymous_Type then
+                  Def := F_Type_Def
+                    (Res.As_Anonymous_Type.F_Type_Decl.As_Type_Decl);
+                  if Def.Kind = Ada_Type_Access_Def then
+                     Type_Dec := Def.As_Type_Access_Def.F_Subtype_Indication.
+                       F_Name.P_Relative_Name.P_Referenced_Decl;
+                     Params_To_Temp.Include
+                       (Loc.Temp_Var_Name.all
+                        & " : constant access "
+                        & Encode
+                          (Type_Dec.P_Fully_Qualified_Name,
+                           Type_Dec.Unit.Get_Charset)
+                        & " := "
+                        & Node_Image (Nm)
+                        & ";");
+                  else
+                     Params_To_Temp.Include
+                       (Loc.Temp_Var_Name.all
+                        & " : constant "
+                        & Node_Image (Dec.As_Subp_Decl.F_Subp_Spec.P_Returns)
+                        & " := "
+                        & Node_Image (Nm)
+                        & ";");
+                  end if;
+               else
+                  Type_Dec := Res.As_Subtype_Indication.F_Name.
+                    P_Relative_Name.P_Referenced_Decl;
+                  Params_To_Temp.Include
+                    (Loc.Temp_Var_Name.all
+                     & " : constant "
+                     & Encode
+                       (Type_Dec.P_Fully_Qualified_Name,
+                        Type_Dec.Unit.Get_Charset)
+                     & " := "
+                     & Node_Image (Nm)
+                     & ";");
+               end if;
+
+            when Ada_Param_Spec =>
+
+               Loc.Temp_Var_Name := new String'
+                 (GT_Prefix
+                  & Trim (Positive'Image (Old_Attr_Counter), Both)
+                  & "_"
+                  & Node_Image (Id));
+               Params_To_Temp.Include
+                 (Loc.Temp_Var_Name.all
+                  & " : constant "
+                  & Node_Image (Dec.As_Param_Spec.F_Type_Expr)
+                  & " := "
+                  & Node_Image (Nm)
+                  & ";");
+
+            when Ada_Object_Decl =>
+
+               Loc.Temp_Var_Name := new String'
+                 (GT_Prefix
+                  & Trim (Positive'Image (Old_Attr_Counter), Both)
+                  & "_"
+                  & Node_Image (Id));
+
+               Obj := Dec.As_Object_Decl.F_Type_Expr;
+
+               if Obj.Kind = Ada_Anonymous_Type then
+                  Def := F_Type_Def
+                    (Obj.As_Anonymous_Type.F_Type_Decl.As_Type_Decl);
+                  if Def.Kind = Ada_Type_Access_Def then
+                     Type_Dec := Def.As_Type_Access_Def.F_Subtype_Indication.
+                       F_Name.P_Relative_Name.P_Referenced_Decl;
+                     Params_To_Temp.Include
+                       (Loc.Temp_Var_Name.all
+                        & " : constant access "
+                        & Encode
+                          (Type_Dec.P_Fully_Qualified_Name,
+                           Type_Dec.Unit.Get_Charset)
+                        & " := "
+                        & Node_Image (Nm)
+                        & ";");
+                  else
+                     Params_To_Temp.Include
+                       (Loc.Temp_Var_Name.all
+                        & " : constant "
+                        & Node_Image (Dec.As_Subp_Decl.F_Subp_Spec.P_Returns)
+                        & " := "
+                        & Node_Image (Nm)
+                        & ";");
+                  end if;
+               else
+                  Type_Dec := Obj.As_Subtype_Indication.F_Name.
+                    P_Relative_Name.P_Referenced_Decl;
+                  Params_To_Temp.Include
+                    (Loc.Temp_Var_Name.all
+                     & " : constant "
+                     & Encode
+                       (Type_Dec.P_Fully_Qualified_Name,
+                        Type_Dec.Unit.Get_Charset)
+                     & " := "
+                     & Node_Image (Nm)
+                     & ";");
+               end if;
+
+            when others =>
+               null;
+         end case;
+
+         Loc.El := Node.As_Ada_Node;
+         Old_Attr_Counter := Old_Attr_Counter + 1;
+         Old_Attr_Ref.Append (Loc);
+
+         return Over;
+      end Get_Old_Attr_Locations;
+
+      ------------------------------
+      -- Replace_Result_Attribute --
+      ------------------------------
+
+      function Replace_Result_Attribute
+        (Post   : String;
+         F_Name : String;
+         R_Name : String)
+         return String
+      is
+         Res : String_Access := new String'("");
+         Tmp : String_Access;
+
+         Quote : Boolean := False;
+
+         Subp_Is_Operator : Boolean := False;
+         Trying_Quote     : Boolean := False;
+
+         F_Name_Length : constant Integer := F_Name'Length + 7;
+         Idx           :          Integer := Post'First;
+
+         function Eq (L, R : String) return Boolean is
+           (To_Lower (L) = To_Lower (R));
+         --  Case insensitive comparision
+      begin
+         if F_Name (F_Name'First) = '"' then
+            Subp_Is_Operator := True;
+         end if;
+
+         for I in Post'Range loop
+            if Post (I) = '"' then
+               if Quote then
+                  if I = Post'Last or else Post (I + 1) /= '"' then
+                     Quote := False;
+                  end if;
+
+               else
+                  Quote := True;
+                  if Subp_Is_Operator then
+                     Trying_Quote := True;
+                  end if;
+               end if;
+            end if;
+
+            if not Quote or else Trying_Quote then
+               Trying_Quote := False;
+
+               if Post'Last >= I + F_Name_Length - 1 then
+                  if Eq (Post (I .. I + F_Name_Length - 1), F_Name & "'Result")
+                  then
+                     Tmp := new String'
+                       (Res.all
+                        & Post (Idx .. I - 1)
+                        & R_Name);
+                     Free (Res);
+                     Res := new String'(Tmp.all);
+                     Free (Tmp);
+                     Idx := I + F_Name_Length;
+                  end if;
+               end if;
+
+               if Post'Last >= I + F_Name_Length then
+                  if Eq (Post (I .. I + F_Name_Length), F_Name & "' Result")
+                    or else Eq (Post (I .. I + F_Name_Length),
+                                F_Name & " 'Result")
+                  then
+                     Tmp := new String'
+                       (Res.all
+                        & Post (Idx .. I - 1)
+                        & R_Name);
+                     Free (Res);
+                     Res := new String'(Tmp.all);
+                     Free (Tmp);
+                     Idx := I + F_Name_Length + 1;
+                  end if;
+
+               end if;
+
+               if Post'Last >= I + F_Name_Length + 1 then
+                  if Eq (Post (I .. I + F_Name_Length + 1),
+                         F_Name & " ' Result")
+                  then
+                     Tmp := new String'
+                       (Res.all
+                        & Post (Idx .. I - 1)
+                        & R_Name);
+                     Free (Res);
+                     Res := new String'(Tmp.all);
+                     Free (Tmp);
+                     Idx := I + F_Name_Length + 2;
+                  end if;
+
+               end if;
+
+               if Post'Last = I then
+                  Tmp := new String'(Res.all & Post (Idx .. I));
+                  Free (Res);
+                  Res := new String'(Tmp.all);
+                  Free (Tmp);
+               end if;
+            end if;
+         end loop;
+
+         return Res.all;
+      end Replace_Result_Attribute;
+
+      -------------------------
+      -- Get_Condition_Image --
+      -------------------------
+
+      function Get_Condition_Image (Elem : Expr) return String
+      is
+
+         Res, Tmp, Packed : String_Access;
+
+         Idx   : Integer;
+         Space : Boolean;
+
+      begin
+         Res := new String'(Replace_Old_Attribute (Elem));
+
+         Tmp := new String'(Trim (Res.all, Both));
+         Free (Res);
+         Res := new String'(Tmp.all);
+         Free (Tmp);
+
+         Space := False;
+         Packed := new String'("");
+         Idx := Res'First;
+
+         for I in Res'Range loop
+            if Res (I) in ' ' | ASCII.CR | ASCII.LF then
+               if not Space then
+                  Space := True;
+                  Tmp := new String'(Packed.all & " " & Res (Idx .. I - 1));
+                  Free (Packed);
+                  Packed := new String'(Tmp.all);
+                  Free (Tmp);
+               end if;
+
+            else
+               if Space then
+                  Idx   := I;
+                  Space := False;
+               end if;
+            end if;
+
+            if I = Res'Last then
+               Tmp := new String'(Packed.all & " " & Res (Idx .. I));
+               Free (Packed);
+               Packed := new String'(Tmp.all);
+               Free (Tmp);
+            end if;
+         end loop;
+
+         return Trim (Packed.all, Both);
+      end Get_Condition_Image;
+
    begin
       Trace (Me_TC, "Looking for test cases of " & Subp.Subp_Text_Name.all);
 
       TC_Found := False;
 
-      Data.Subp_List.Append (Subp);
-      Suite_Data_List.TR_List.Append (TR_Info);
+      Next := Dec.Next_Sibling;
+      while not Next.Is_Null and then Next.Kind = Ada_Pragma_Node loop
+         declare
+            Pragma_Name : constant String :=
+              To_Lower (Node_Image (F_Id (Next.As_Pragma_Node)));
+         begin
+            if Pragma_Name = "test_case" then
+
+               Get_TC_Info_From_Pragma
+                 (Next.As_Pragma_Node,
+                  Name, Mode, Requiers, Ensures);
+
+               if Name = null then
+                  Report_Std
+                    (" warning: "
+                     & Base_Name (Next.Unit.Get_Filename)
+                     & ":"
+                     & Trim (First_Line_Number (Next)'Img, Both)
+                     & ":"
+                     & Trim (First_Column_Number (Next)'Img, Both)
+                     & ": Test_Case has complex name; skipping");
+               else
+                  Free (Name);
+                  Test_Cases.Append (Next);
+               end if;
+
+            elsif Pragma_Name = "pre" then
+
+               TC.Pre := List_Child
+                 (Next.As_Pragma_Node.F_Args,
+                  Next.As_Pragma_Node.F_Args.Base_Assoc_List_First)
+                 .As_Pragma_Argument_Assoc.F_Expr;
+
+            elsif Pragma_Name = "post" then
+
+               TC.Post := List_Child
+                 (Next.As_Pragma_Node.F_Args,
+                  Next.As_Pragma_Node.F_Args.Base_Assoc_List_First)
+                 .As_Pragma_Argument_Assoc.F_Expr;
+
+            end if;
+         end;
+
+         Next := Next.Next_Sibling;
+      end loop;
+
+      if not Dec.F_Aspects.Is_Null then
+         for Assoc of Dec.F_Aspects.F_Aspect_Assocs loop
+
+            declare
+               Aspect_Name : constant String :=
+                 To_Lower (Node_Image (Assoc.F_Id));
+            begin
+               if Aspect_Name = "test_case" then
+
+                  Get_TC_Info_From_Aspect
+                    (Assoc.As_Aspect_Assoc,
+                     Name, Mode, Requiers, Ensures);
+
+                  if Name = null then
+                     Report_Std
+                       (" warning: "
+                        & Base_Name (Assoc.Unit.Get_Filename)
+                        & ":"
+                        & Trim (First_Line_Number (Assoc)'Img, Both)
+                        & ":"
+                        & Trim (First_Column_Number (Assoc)'Img, Both)
+                        & ": Test_Case has complex name; skipping");
+                  else
+                     Free (Name);
+                     Test_Cases.Append (Assoc.As_Ada_Node);
+                  end if;
+
+               elsif Aspect_Name = "pre" then
+                  TC.Pre := Assoc.F_Expr;
+               elsif Aspect_Name = "post" then
+                  TC.Post := Assoc.F_Expr;
+               end if;
+            end;
+
+         end loop;
+      end if;
+
+      if Test_Cases.Is_Empty then
+         if not Test_Case_Only then
+            Data.Subp_List.Append (Subp);
+            Suite_Data_List.TR_List.Append (TR_Info);
+         end if;
+         Trace (Me_TC, "No test case found for " & Subp.Subp_Text_Name.all);
+         return;
+      end if;
+
+      --  At this point we are pretty sure that at least one Test_Case exists.
+      TC_Found := True;
+      Common.Has_Test_Cases := True;
+
+      for Test_Case of Test_Cases loop
+         Subp_Add.Has_TC_Info := True;
+         TC.Elem := Test_Case;
+
+         Subp_Add.Subp_Declaration := Subp.Subp_Declaration;
+         Subp_Add.Corresp_Type     := Subp.Corresp_Type;
+         Subp_Add.Nesting          := new String'(Subp.Nesting.all);
+         Subp_Add.Subp_Text_Name   := new String'(Subp.Subp_Text_Name.all);
+         Subp_Add.Subp_Name_Image  := new String'(Subp.Subp_Name_Image.all);
+         Subp_Add.Subp_Full_Hash   := new String'(Subp.Subp_Full_Hash.all);
+         Subp_Add.Subp_Hash_V1     := new String'(Subp.Subp_Hash_V1.all);
+         Subp_Add.Subp_Hash_V2_1   := new String'(Subp.Subp_Hash_V2_1.all);
+
+         TC.Req := No_Expr;
+         TC.Ens := No_Expr;
+
+         if Test_Case.Kind = Ada_Pragma_Node then
+            Get_TC_Info_From_Pragma
+              (Test_Case.As_Pragma_Node,
+               TC.Name, TC.Mode, TC.Req, TC.Ens);
+         else
+            Get_TC_Info_From_Aspect
+              (Test_Case.As_Aspect_Assoc,
+               TC.Name, TC.Mode, TC.Req, TC.Ens);
+         end if;
+
+         --  Creating second part of hash code for test routine name
+         if TC.Mode = Normal then
+            declare
+               Full_Hash : constant String :=
+                 GNAT.SHA1.Digest
+                   (TC.Name.all
+                    & "#"
+                    & Get_Condition_Image (TC.Pre)
+                    & "#"
+                    & Get_Condition_Image (TC.Post)
+                    & "#"
+                    & Get_Condition_Image (TC.Req)
+                    & "#"
+                    & Get_Condition_Image (TC.Ens));
+            begin
+               TC.TC_Hash := new String'
+                 (Full_Hash (Full_Hash'First .. Full_Hash'First + 15));
+            end;
+         else
+            declare
+               Full_Hash : constant String :=
+                 GNAT.SHA1.Digest
+                 (TC.Name.all
+                  & "#"
+                  & Get_Condition_Image (TC.Req)
+                  & "#"
+                  & Get_Condition_Image (TC.Ens));
+            begin
+               TC.TC_Hash := new String'
+                 (Full_Hash (Full_Hash'First .. Full_Hash'First + 15));
+            end;
+         end if;
+
+         if Is_Function (Subp.Subp_Declaration.As_Basic_Subp_Decl) then
+            Result_Value := new String'
+              (Subp.Subp_Mangle_Name.all
+               & "_"
+               & TC.TC_Hash (TC.TC_Hash'First .. TC.TC_Hash'First + 5)
+               & "_Result");
+         end if;
+
+         Subp_Add.Subp_Mangle_Name := new String'
+           (Subp.Subp_Mangle_Name.all
+            & "_"
+            & TC.TC_Hash (TC.TC_Hash'First .. TC.TC_Hash'First + 5));
+
+         Params_To_Temp.Clear;
+         Old_Attr_Counter := 1;
+
+         if TC.Mode = Normal then
+
+            --  Requires and Pre
+            if TC.Req.Is_Null then
+               if TC.Pre.Is_Null then
+                  TC.Req_Image := new String'("");
+               else
+                  TC.Req_Image := new String'(Get_Condition_Image (TC.Pre));
+               end if;
+            else
+               if TC.Pre.Is_Null then
+                  TC.Req_Image := new String'(Get_Condition_Image (TC.Req));
+               else
+                  TC.Req_Image := new String'
+                    ("("
+                     & Get_Condition_Image (TC.Pre)
+                     & ") and ("
+                     & Get_Condition_Image (TC.Req)
+                     & ")");
+               end if;
+            end if;
+
+            --  Ensures and Post
+            if TC.Ens.Is_Null then
+               if TC.Post.Is_Null then
+                  TC.Ens_Image := new String'("");
+               else
+                  TC.Ens_Image := new String'(Get_Condition_Image (TC.Post));
+               end if;
+            else
+               if TC.Post.Is_Null then
+                  if Result_Value = null then
+                     TC.Ens_Image := new String'(Get_Condition_Image (TC.Ens));
+                  else
+                     TC.Ens_Image := new String'
+                       (Replace_Result_Attribute
+                          (Get_Condition_Image (TC.Ens),
+                           Subp.Subp_Name_Image.all,
+                           Result_Value.all));
+                  end if;
+               else
+                  if Result_Value = null then
+                     TC.Ens_Image := new String'
+                       ("("
+                        & Get_Condition_Image (TC.Post)
+                        & ") and ("
+                        & Get_Condition_Image (TC.Ens)
+                        & ")");
+                  else
+                     TC.Ens_Image := new String'
+                       (Replace_Result_Attribute
+                          ("("
+                           & Get_Condition_Image (TC.Post)
+                           & ") and ("
+                           & Get_Condition_Image (TC.Ens)
+                           & ")",
+                           Subp.Subp_Name_Image.all,
+                           Result_Value.all));
+                  end if;
+               end if;
+            end if;
+
+         else
+
+            --  Requires
+            if TC.Req.Is_Null then
+               TC.Req_Image := new String'("");
+            else
+               TC.Req_Image := new String'(Get_Condition_Image (TC.Req));
+            end if;
+
+            --  Ensures
+            if TC.Ens.Is_Null then
+               TC.Ens_Image := new String'("");
+            else
+               if Result_Value = null then
+                  TC.Ens_Image := new String'(Get_Condition_Image (TC.Ens));
+               else
+                  TC.Ens_Image := new String'
+                    (Replace_Result_Attribute
+                       (Get_Condition_Image (TC.Ens),
+                        Subp.Subp_Name_Image.all,
+                        Result_Value.all));
+               end if;
+            end if;
+
+         end if;
+
+         Free (Result_Value);
+
+         TC.Params_To_Temp := Params_To_Temp;
+         Params_To_Temp.Clear;
+
+         --  adding requiers and ensures slocs
+         TC.Req_Line := new String'
+           (Base_Name (Data.Unit_File_Name.all)
+            & ":"
+            & (if TC.Req.Is_Null then "0" else
+                   Trim (First_Line_Number (TC.Req)'Img, Both))
+            & ":");
+         TC.Ens_Line := new String'
+           (Base_Name (Data.Unit_File_Name.all)
+            & ":"
+            & (if TC.Ens.Is_Null then "0" else
+                   Trim (First_Line_Number (TC.Ens)'Img, Both))
+            & ":");
+
+         Subp_Add.TC_Info := TC;
+
+         Data.Subp_List.Append (Subp_Add);
+
+         TR_Info_Add := TR_Info;
+         TR_Info_Add.TR_Info.TR_Text_Name := new String'
+           (Subp_Add.Subp_Mangle_Name.all);
+
+         --  Changing tested sloc so it corresponds to test case instead
+         --  of tested subprogram
+
+         GNAT.OS_Lib.Free (TR_Info_Add.TR_Info.Tested_Sloc);
+         TR_Info_Add.TR_Info.Tested_Sloc := new String'
+           (Base_Name (Data.Unit_File_Name.all)
+            & ":"
+            & Trim (First_Line_Number (TC.Elem)'Img, Both)
+            & ":"
+            & Trim (First_Column_Number (TC.Elem)'Img, Both)
+            & ":");
+
+         Suite_Data_List.TR_List.Append (TR_Info_Add);
+      end loop;
+
    end Gather_Test_Cases;
 
    -------------------------------
@@ -3483,6 +4421,19 @@ package body Test.Skeleton is
                then
                   Current_Subp := Subp_Data_List.Element (Subp_Cur);
 
+                  if Subp_Data_List.Element (Subp_Cur).Has_TC_Info then
+                     if Is_Function
+                       (Subp_Data_List.Element
+                          (Subp_Cur).Subp_Declaration.As_Basic_Subp_Decl)
+                     then
+                        Generate_Function_Wrapper
+                          (Subp_Data_List.Element (Subp_Cur));
+                     else
+                        Generate_Procedure_Wrapper
+                          (Subp_Data_List.Element (Subp_Cur));
+                     end if;
+                  end if;
+
                   if Generate_Separates then
                      S_Put
                        (3,
@@ -4611,6 +5562,19 @@ package body Test.Skeleton is
                   if Subp_Data_List.Element (Subp_Cur).Corresp_Type = 0 then
 
                      Current_Subp := Subp_Data_List.Element (Subp_Cur);
+
+                     if Subp_Data_List.Element (Subp_Cur).Has_TC_Info then
+                        if Is_Function
+                          (Subp_Data_List.Element
+                             (Subp_Cur).Subp_Declaration.As_Basic_Subp_Decl)
+                        then
+                           Generate_Function_Wrapper
+                             (Subp_Data_List.Element (Subp_Cur));
+                        else
+                           Generate_Procedure_Wrapper
+                             (Subp_Data_List.Element (Subp_Cur));
+                        end if;
+                     end if;
 
                      if Generate_Separates then
                         S_Put
@@ -5902,9 +6866,9 @@ package body Test.Skeleton is
             New_Line_Count;
          end if;
 
---           if Subp.Has_TC_Info then
---              Put_Wrapper_Rename (6, Subp);
---           end if;
+         if Subp.Has_TC_Info then
+            Put_Wrapper_Rename (6, Subp);
+         end if;
       end if;
 
       S_Put (0, "--  end read only");
@@ -6173,5 +7137,406 @@ package body Test.Skeleton is
 
       return True;
    end Is_Declared_In_Regular_Package;
+
+   ------------------------
+   -- Put_Wrapper_Rename --
+   ------------------------
+
+   procedure Put_Wrapper_Rename (Span : Natural; Current_Subp : Subp_Info)
+   is
+      Spec    : constant Base_Subp_Spec   :=
+        Current_Subp.Subp_Declaration.As_Basic_Subp_Decl.P_Subp_Decl_Spec;
+      Params  : constant Param_Spec_Array := Spec.P_Params;
+      Is_Func : constant Boolean          :=
+        Is_Function (Current_Subp.Subp_Declaration.As_Basic_Subp_Decl);
+   begin
+
+      if Is_Func then
+         S_Put
+           (Span,
+            "function " & Current_Subp.Subp_Name_Image.all);
+
+      else
+         S_Put
+           (Span,
+            "procedure " & Current_Subp.Subp_Name_Image.all);
+      end if;
+
+      if Params'Length /= 0 then
+         S_Put (1, "(");
+         for P in Params'Range loop
+            S_Put (0, Node_Image (Params (P)));
+            if P = Params'Last then
+               S_Put (0, ")");
+            else
+               S_Put (0, "; ");
+            end if;
+         end loop;
+      end if;
+
+      if Is_Func then
+         S_Put (1, "return " & Node_Image (Spec.P_Returns));
+      end if;
+
+      S_Put
+        (1,
+         "renames "
+         & Wrapper_Prefix
+         & Current_Subp.Subp_Mangle_Name.all
+         & ";");
+      New_Line_Count;
+   end Put_Wrapper_Rename;
+
+   -------------------------------
+   -- Generate_Function_Wrapper --
+   -------------------------------
+
+   procedure Generate_Function_Wrapper (Current_Subp : Subp_Info)
+   is
+      Spec    : constant Base_Subp_Spec   :=
+        Current_Subp.Subp_Declaration.As_Basic_Subp_Decl.P_Subp_Decl_Spec;
+      Params  : constant Param_Spec_Array := Spec.P_Params;
+      Str_Set : String_Set.Set;
+      Cur     : String_Set.Cursor;
+   begin
+      S_Put (0, GT_Marker_Begin);
+      New_Line_Count;
+      S_Put
+        (3,
+         "function " &
+           Wrapper_Prefix &
+           Current_Subp.Subp_Mangle_Name.all);
+
+      for I in Params'Range loop
+         if I = Params'First then
+            S_Put (0, " (");
+         end if;
+         S_Put (0, Node_Image (Params (I)));
+         if I = Params'Last then
+            S_Put (0, ") ");
+         else
+            S_Put (0, "; ");
+         end if;
+      end loop;
+
+      S_Put (0, " return " & Node_Image (Spec.P_Returns));
+
+      New_Line_Count;
+      S_Put (3, "is");
+      New_Line_Count;
+
+      Str_Set := Current_Subp.TC_Info.Params_To_Temp;
+      Cur := Str_Set.First;
+      loop
+         exit when Cur = String_Set.No_Element;
+
+         S_Put (6, String_Set.Element (Cur));
+         New_Line_Count;
+
+         String_Set.Next (Cur);
+      end loop;
+
+      S_Put (3, "begin");
+      New_Line_Count;
+
+      if Current_Subp.TC_Info.Req_Image.all /= "" then
+         S_Put (6, "begin");
+         New_Line_Count;
+         S_Put (9, "pragma Assert");
+         New_Line_Count;
+         S_Put
+           (11,
+            "(" &
+              Current_Subp.TC_Info.Req_Image.all &
+              ");");
+         New_Line_Count;
+         S_Put (9, "null;");
+         New_Line_Count;
+         S_Put (6, "exception");
+         New_Line_Count;
+         S_Put (12, "when System.Assertions.Assert_Failure =>");
+         New_Line_Count;
+         S_Put (15, "AUnit.Assertions.Assert");
+         New_Line_Count;
+         S_Put (17, "(False,");
+         New_Line_Count;
+         S_Put
+           (18,
+            """req_sloc("
+            & Current_Subp.TC_Info.Req_Line.all
+            & "):"
+            & Current_Subp.TC_Info.Name.all
+            & " test requirement violated"");");
+         New_Line_Count;
+         S_Put (6, "end;");
+         New_Line_Count;
+      end if;
+
+      S_Put (6, "declare");
+      New_Line_Count;
+      S_Put
+        (9,
+         Current_Subp.Subp_Mangle_Name.all
+         & "_Result : constant "
+         & Node_Image (Spec.P_Returns)
+         & " := GNATtest_Generated.GNATtest_Standard."
+         & Current_Subp.Nesting.all
+         & "."
+         & Current_Subp.Subp_Name_Image.all);
+
+      if Params'Length = 0 then
+         S_Put (0, ";");
+      else
+         S_Put (1, "(");
+         for I in Params'Range loop
+            declare
+               Name_List : constant Defining_Name_List := F_Ids (Params (I));
+               Idx       :          Positive :=
+                 Name_List.Defining_Name_List_First;
+            begin
+               while Name_List.Defining_Name_List_Has_Element (Idx) loop
+                  S_Put
+                    (0,
+                     Node_Image (Name_List.Defining_Name_List_Element (Idx)));
+                  Idx := Name_List.Defining_Name_List_Next (Idx);
+                  if Name_List.Defining_Name_List_Has_Element (Idx) then
+                     S_Put (0, ", ");
+                  end if;
+               end loop;
+            end;
+
+            if I = Params'Last then
+               S_Put (0, ");");
+            else
+               S_Put (0, ", ");
+            end if;
+         end loop;
+      end if;
+
+      New_Line_Count;
+
+      S_Put (6, "begin");
+      New_Line_Count;
+
+      if Current_Subp.TC_Info.Ens_Image.all /= "" then
+         S_Put (9, "begin");
+         New_Line_Count;
+         S_Put (12, "pragma Assert");
+         New_Line_Count;
+         S_Put
+           (14,
+            "(" &
+              Current_Subp.TC_Info.Ens_Image.all &
+              ");");
+         New_Line_Count;
+         S_Put (12, "null;");
+         New_Line_Count;
+         S_Put (9, "exception");
+         New_Line_Count;
+         S_Put (12, "when System.Assertions.Assert_Failure =>");
+         New_Line_Count;
+         S_Put (15, "AUnit.Assertions.Assert");
+         New_Line_Count;
+         S_Put (17, "(False,");
+         New_Line_Count;
+         S_Put
+           (18,
+            """ens_sloc("
+            & Current_Subp.TC_Info.Ens_Line.all
+            & "):"
+            & Current_Subp.TC_Info.Name.all
+            & " test commitment violated"");");
+         New_Line_Count;
+         S_Put (9, "end;");
+         New_Line_Count;
+      end if;
+
+      S_Put
+        (9,
+         "return " &
+           Current_Subp.Subp_Mangle_Name.all &
+           "_Result;");
+      New_Line_Count;
+
+      S_Put (6, "end;");
+      New_Line_Count;
+
+      S_Put
+        (3,
+         "end " &
+           Wrapper_Prefix &
+           Current_Subp.Subp_Mangle_Name.all &
+           ";");
+      New_Line_Count;
+      S_Put (0, GT_Marker_End);
+      New_Line_Count;
+
+   end Generate_Function_Wrapper;
+
+   --------------------------------
+   -- Generate_Procedure_Wrapper --
+   --------------------------------
+
+   procedure Generate_Procedure_Wrapper (Current_Subp : Subp_Info)
+   is
+      Spec    : constant Base_Subp_Spec   :=
+        Current_Subp.Subp_Declaration.As_Basic_Subp_Decl.P_Subp_Decl_Spec;
+      Params  : constant Param_Spec_Array := Spec.P_Params;
+      Str_Set : String_Set.Set;
+      Cur     : String_Set.Cursor;
+   begin
+      S_Put (0, GT_Marker_Begin);
+      New_Line_Count;
+      S_Put
+        (3,
+         "procedure " &
+           Wrapper_Prefix &
+           Current_Subp.Subp_Mangle_Name.all);
+
+      for I in Params'Range loop
+         if I = Params'First then
+            S_Put (0, " (");
+         end if;
+         S_Put (0, Node_Image (Params (I)));
+         if I = Params'Last then
+            S_Put (0, ") ");
+         else
+            S_Put (0, "; ");
+         end if;
+      end loop;
+
+      New_Line_Count;
+      S_Put (3, "is");
+      New_Line_Count;
+
+      Str_Set := Current_Subp.TC_Info.Params_To_Temp;
+      Cur := Str_Set.First;
+      loop
+         exit when Cur = String_Set.No_Element;
+
+         S_Put (6, String_Set.Element (Cur));
+         New_Line_Count;
+
+         String_Set.Next (Cur);
+      end loop;
+
+      S_Put (3, "begin");
+      New_Line_Count;
+
+      if Current_Subp.TC_Info.Req_Image.all /= "" then
+         S_Put (6, "begin");
+         New_Line_Count;
+         S_Put (9, "pragma Assert");
+         New_Line_Count;
+         S_Put
+           (11,
+            "(" &
+              Current_Subp.TC_Info.Req_Image.all &
+              ");");
+         New_Line_Count;
+         S_Put (9, "null;");
+         New_Line_Count;
+         S_Put (6, "exception");
+         New_Line_Count;
+         S_Put (9, "when System.Assertions.Assert_Failure =>");
+         New_Line_Count;
+         S_Put (12, "AUnit.Assertions.Assert");
+         New_Line_Count;
+         S_Put (14, "(False,");
+         New_Line_Count;
+         S_Put
+           (15,
+            """req_sloc("
+            & Current_Subp.TC_Info.Req_Line.all
+            & "):"
+            & Current_Subp.TC_Info.Name.all
+            & " test requirement violated"");");
+         New_Line_Count;
+         S_Put (6, "end;");
+         New_Line_Count;
+      end if;
+
+      S_Put
+        (6,
+         "GNATtest_Generated.GNATtest_Standard." &
+           Current_Subp.Nesting.all &
+           "." &
+           Current_Subp.Subp_Text_Name.all);
+
+      if Params'Length = 0 then
+         S_Put (0, ";");
+      else
+         S_Put (1, "(");
+         for I in Params'Range loop
+            declare
+               Name_List : constant Defining_Name_List := F_Ids (Params (I));
+               Idx       :          Positive :=
+                 Name_List.Defining_Name_List_First;
+            begin
+               while Name_List.Defining_Name_List_Has_Element (Idx) loop
+                  S_Put
+                    (0,
+                     Node_Image (Name_List.Defining_Name_List_Element (Idx)));
+                  Idx := Name_List.Defining_Name_List_Next (Idx);
+                  if Name_List.Defining_Name_List_Has_Element (Idx) then
+                     S_Put (0, ", ");
+                  end if;
+               end loop;
+            end;
+
+            if I = Params'Last then
+               S_Put (0, ");");
+            else
+               S_Put (0, ", ");
+            end if;
+         end loop;
+      end if;
+
+      New_Line_Count;
+
+      if Current_Subp.TC_Info.Ens_Image.all /= "" then
+         S_Put (6, "begin");
+         New_Line_Count;
+         S_Put (9, "pragma Assert");
+         New_Line_Count;
+         S_Put
+           (11,
+            "(" &
+              Current_Subp.TC_Info.Ens_Image.all &
+              ");");
+         New_Line_Count;
+         S_Put (9, "null;");
+         New_Line_Count;
+         S_Put (6, "exception");
+         New_Line_Count;
+         S_Put (9, "when System.Assertions.Assert_Failure =>");
+         New_Line_Count;
+         S_Put (12, "AUnit.Assertions.Assert");
+         New_Line_Count;
+         S_Put (14, "(False,");
+         New_Line_Count;
+         S_Put
+           (15,
+            """ens_sloc("
+            & Current_Subp.TC_Info.Ens_Line.all
+            & "):"
+            & Current_Subp.TC_Info.Name.all
+            & " test commitment violated"");");
+         New_Line_Count;
+         S_Put (6, "end;");
+         New_Line_Count;
+      end if;
+
+      S_Put
+        (3,
+         "end " &
+           Wrapper_Prefix &
+           Current_Subp.Subp_Mangle_Name.all &
+           ";");
+      New_Line_Count;
+      S_Put (0, GT_Marker_End);
+      New_Line_Count;
+
+   end Generate_Procedure_Wrapper;
 
 end Test.Skeleton;
