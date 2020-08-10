@@ -758,6 +758,10 @@ package body Test.Skeleton is
       --  Detects if Arg and its incomplete declaration (if present)
       --  are both in private part.
 
+      function Is_Ghost_Code (Decl : Basic_Decl) return Boolean is
+         (Decl.P_Has_Aspect (To_Unbounded_Text (To_Text ("ghost"))));
+      --  Detects if given declaration has aspect Ghost
+
       function Test_Types_Linked
         (Inheritance_Root_Type  : Base_Type_Decl;
          Inheritance_Final_Type : Base_Type_Decl)
@@ -781,7 +785,16 @@ package body Test.Skeleton is
       is
          Package_Data : Package_Info;
       begin
-         --  We should first abandon for Private parts, abandon for ghost
+         if Node.Kind in Ada_Basic_Decl
+           and then Is_Ghost_Code (Node.As_Basic_Decl)
+         then
+            return Over;
+         end if;
+
+         if Is_Private (Node) then
+            return Over;
+         end if;
+
          case Kind (Node) is
             when Ada_Package_Decl =>
                if Get_Nesting (Node) = "" then
@@ -888,10 +901,14 @@ package body Test.Skeleton is
             Type_Data.Has_Argument_Father       := True;
          end Get_Type_Parent_Data;
       begin
-         --  We should first abandon for Private parts, abandon for ghost
-
          if Kind (Node) /= Ada_Type_Decl then
             return Into;
+         end if;
+
+         if Node.Kind in Ada_Basic_Decl
+           and then Is_Ghost_Code (Node.As_Basic_Decl)
+         then
+            return Over;
          end if;
 
          if not Node.As_Type_Decl.P_Is_Tagged_Type then
@@ -1034,7 +1051,12 @@ package body Test.Skeleton is
 
          end Update_Name_Frequency;
       begin
-         --  We should first abandon for Private parts, abandon for ghost
+
+         if Node.Kind in Ada_Basic_Decl
+           and then Is_Ghost_Code (Node.As_Basic_Decl)
+         then
+            return Over;
+         end if;
 
          if
            Node.Kind in Ada_Protected_Type_Decl | Ada_Single_Protected_Decl
@@ -1682,7 +1704,56 @@ package body Test.Skeleton is
               ("gnattest: "
                & Base_Name (The_Unit.Unit.Get_Filename)
                & " is an unsupported kind of unit");
+            Apropriate_Source := False;
+            Set_Source_Status (The_Unit.Unit.Get_Filename, Bad_Content);
+            return;
       end case;
+
+      if Unit.As_Basic_Decl.P_Has_Aspect
+        (To_Unbounded_Text (To_Text ("Remote_Call_Interface")))
+      then
+         Apropriate_Source := False;
+         Report_Std
+           ("gnattest: "
+            & Base_Name (The_Unit.Unit.Get_Filename)
+            & " is RCI package; skipping");
+         Set_Source_Status (The_Unit.Unit.Get_Filename, Processed_In_Vain);
+         return;
+      end if;
+
+      declare
+         Sem_Parent : Ada_Node := Unit;
+      begin
+         while not Sem_Parent.Is_Null loop
+
+            if Is_Ghost_Code (Sem_Parent.As_Basic_Decl) then
+               --  The whole UUT is Ghost
+               Set_Source_Status (The_Unit.Unit.Get_Filename, Bad_Content);
+               Apropriate_Source := False;
+
+               return;
+            end if;
+
+            if not Stub_Mode_ON and then not Separate_Drivers
+              and then Sem_Parent.Parent.As_Library_Item.F_Has_Private
+            then
+               --  Cannot incorporate test packages of private packages
+               --  in monolyth mode.
+
+               Report_Std
+                 ("gnattest: "
+                  & Enclosing_Unit_Name (The_Unit)
+                  & " is private or child of private; skipping");
+
+               Set_Source_Status (The_Unit.Unit.Get_Filename, Bad_Content);
+               Apropriate_Source := False;
+
+               return;
+            end if;
+
+            Sem_Parent := Sem_Parent.P_Semantic_Parent;
+         end loop;
+      end;
 
       Increase_Indent
         (Me,
