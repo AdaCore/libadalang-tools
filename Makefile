@@ -6,16 +6,23 @@ LIBRARY_TYPE ?= static
 LALTOOLS_SET ?= all
 PROCESSORS ?= 0
 
+PROJECTS = \
+   src/build.gpr \
+   testsuite/ada_drivers/refactor_imports/refactor_imports.gpr
+
 .PHONY: all
 all:
 	which gprbuild
 	which gcc
-	gprbuild -v -k \
+	for proj in $(PROJECTS) ; do \
+          gprbuild -v -k \
 	   -XLIBRARY_TYPE=$(LIBRARY_TYPE) \
 	   -XXMLADA_BUILD=$(LIBRARY_TYPE) \
 	   -XBUILD_MODE=$(BUILD_MODE) \
 	   -XLALTOOLS_SET=$(LALTOOLS_SET) \
-	   -P src/build.gpr -p -j$(PROCESSORS)
+	   -P $$proj -p -j$(PROCESSORS) ; \
+        done
+
 
 .PHONY: test
 test: all
