@@ -26,13 +26,13 @@
 with Ada.Containers.Indefinite_Hashed_Maps;
 with Ada.Containers.Hashed_Sets;
 with Ada.Containers.Vectors;
+with Ada.Strings.Wide_Wide_Hash;
+with Ada.Strings.Wide_Wide_Unbounded;
 
 with Libadalang.Analysis;
 with Libadalang.Helpers;
 
 with Langkit_Support.Text;
-
-with Ada.Strings.Wide_Wide_Hash;
 
 package Laltools.Refactor_Imports is
 
@@ -46,17 +46,16 @@ package Laltools.Refactor_Imports is
    --  This is convenient for containers with Basic_Decl elements.
 
    package Reachable_Declarations_Hashed_Set is new Ada.Containers.Hashed_Sets
-     (Element_Type => LALAnalysis.Basic_Decl,
-      Hash         => Basic_Decl_Hash,
+     (Element_Type        => LALAnalysis.Basic_Decl,
+      Hash                => Basic_Decl_Hash,
       Equivalent_Elements => LALAnalysis."=",
-      "=" => LALAnalysis."=");
+      "="                 => LALAnalysis."=");
 
    function Text_Type_Equivalent
-     (Left, Right : LKSText.Text_Type) return Boolean is
-     (Left = Right);
+     (Left, Right : LKSText.Text_Type) return Boolean is (Left = Right);
    --  True if two Text_Type elements are the same.
 
-   package Reachable_Declarations_Result is new
+   package Reachable_Declarations_Map is new
      Ada.Containers.Indefinite_Hashed_Maps
        (Key_Type        => LKSText.Text_Type,
         Element_Type    => Reachable_Declarations_Hashed_Set.Set,
@@ -64,29 +63,57 @@ package Laltools.Refactor_Imports is
         Equivalent_Keys => Text_Type_Equivalent,
         "="             => Reachable_Declarations_Hashed_Set."=");
 
-   type Import_Suggestion is record
-      Declaration : LALAnalysis.Basic_Decl := LALAnalysis.No_Basic_Decl;
-      Import_Text : LKSText.Unbounded_Text_Type;
-      Prefix_Text : LKSText.Unbounded_Text_Type;
+   package Aliases_Hashed_Set is new Ada.Containers.Hashed_Sets
+     (Element_Type => LALAnalysis.Basic_Decl,
+      Hash                => Basic_Decl_Hash,
+      Equivalent_Elements => LALAnalysis."=",
+      "="                 => LALAnalysis."=");
+
+   package Reachable_Declarations_Aliases_Map is new
+     Ada.Containers.Indefinite_Hashed_Maps
+       (Key_Type        => LALAnalysis.Basic_Decl,
+        Element_Type    => Aliases_Hashed_Set.Set,
+        Hash            => Basic_Decl_Hash,
+        Equivalent_Keys => LALAnalysis."=",
+        "="             => Aliases_Hashed_Set."=");
+
+   type Reachable_Declarations is record
+      Decls_Map         : Reachable_Declarations_Map.Map;
+      Aliased_Decls_Map : Reachable_Declarations_Aliases_Map.Map;
    end record;
 
+   type Import_Suggestion is record
+      Declaration      : LALAnalysis.Basic_Decl := LALAnalysis.No_Basic_Decl;
+      With_Clause_Text : LKSText.Unbounded_Text_Type :=
+        Ada.Strings.Wide_Wide_Unbounded.Null_Unbounded_Wide_Wide_String;
+      Prefix_Text      : LKSText.Unbounded_Text_Type :=
+        Ada.Strings.Wide_Wide_Unbounded.Null_Unbounded_Wide_Wide_String;
+   end record;
+
+   function "<" (Left, Right : Import_Suggestion) return Boolean;
+
    package Import_Suggestions_Vector is new Ada.Containers.Vectors
-     (Index_Type => Natural, Element_Type => Import_Suggestion);
+     (Index_Type   => Natural,
+      Element_Type => Import_Suggestion);
+
+   package Import_Suggestions_Vector_Sorting is new
+     Import_Suggestions_Vector.Generic_Sorting;
 
    function Get_Reachable_Declarations
      (Identifier : LALAnalysis.Identifier;
       Units      : LALHelpers.Unit_Vectors.Vector)
-      return Reachable_Declarations_Hashed_Set.Set;
+      return Reachable_Declarations;
    --  Finds all the declarations that are reachable by Identifier. A reachable
    --  declaration is one that is visible by adding a with clause of the
    --  respective package or that is visible because it is declared in a
    --  visible part of the local unit.
 
    function Get_Import_Suggestions
-     (Id              : LALAnalysis.Identifier;
-      Reachable_Decls : Reachable_Declarations_Hashed_Set.Set)
+     (Identifier : LALAnalysis.Identifier;
+      Units      : LALHelpers.Unit_Vectors.Vector)
       return Import_Suggestions_Vector.Vector;
-   --  For each declaration of Reachable_Decls, determines a vector of valid
-   --  with clauses and corresponding prefixes so that Id becomes visible.
+   --  For each declaration of Reachable_Declarations, determines a vector of
+   --  valid with clauses and corresponding prefixes so that Identifier becomes
+   --  visible.
 
 end Laltools.Refactor_Imports;

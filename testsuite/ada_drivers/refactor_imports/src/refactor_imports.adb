@@ -168,18 +168,14 @@ procedure Refactor_Imports is
       else
          declare
             use Laltools.Refactor_Imports;
-            Reach_Decls : constant Reachable_Declarations_Hashed_Set.Set
-              := Get_Reachable_Declarations (Node.As_Identifier, Units);
             Suggestions : constant Import_Suggestions_Vector.Vector
-              := Get_Import_Suggestions
-                (Node.As_Identifier,
-                 Reach_Decls);
+              := Get_Import_Suggestions (Node.As_Identifier, Units);
          begin
             for S of Suggestions loop
                Ada.Text_IO.Put_Line (S.Declaration.Image);
                Ada.Wide_Wide_Text_IO.Put_Line
                  (Ada.Strings.Wide_Wide_Unbounded.To_Wide_Wide_String
-                    (S.Import_Text));
+                    (S.With_Clause_Text));
                Ada.Wide_Wide_Text_IO.Put_Line
                  (Ada.Strings.Wide_Wide_Unbounded.To_Wide_Wide_String
                     (S.Prefix_Text));

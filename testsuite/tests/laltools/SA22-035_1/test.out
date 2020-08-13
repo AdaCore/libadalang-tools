@@ -1,12 +1,36 @@
-<SubpDecl ["Subprogram"] a.ads:15:13-15:34>
-A
-A.B.C.D.
-<SubpDecl ["Subprogram"] a.ads:11:10-11:31>
-A
-A.B.C.
-<SubpDecl ["Subprogram"] a.ads:7:7-7:28>
-A
-A.B.
-<SubpDecl ["Subprogram"] a.ads:3:4-3:25>
+<SubpDecl ["Subprogram"] a.ads:15:4-15:25>
 A
 A.
+<SubpDecl ["Subprogram"] a.ads:28:7-28:28>
+A
+A.B.
+<SubpDecl ["Subprogram"] a.ads:41:10-41:31>
+A
+A.B.C.
+<SubpDecl ["Subprogram"] a.ads:54:13-54:34>
+A
+A.B.C.D.
+<SubpDecl ["Subprogram"] a.ads:15:4-15:25>
+E
+E.
+<SubpDecl ["Subprogram"] a.ads:28:7-28:28>
+E
+E.B.
+<SubpDecl ["Subprogram"] a.ads:41:10-41:31>
+E
+E.B.C.
+<SubpDecl ["Subprogram"] a.ads:54:13-54:34>
+E
+E.B.C.D.
+<SubpDecl ["Subprogram"] a.ads:15:4-15:25>
+F
+F.
+<SubpDecl ["Subprogram"] a.ads:28:7-28:28>
+F
+F.B.
+<SubpDecl ["Subprogram"] a.ads:41:10-41:31>
+F
+F.B.C.
+<SubpDecl ["Subprogram"] a.ads:54:13-54:34>
+F
+F.B.C.D.
