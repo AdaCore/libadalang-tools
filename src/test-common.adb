@@ -358,7 +358,11 @@ package body Test.Common is
       Result  : Unbounded_String := To_Unbounded_String ("");
    begin
       for I in Nesting'First + 1 .. Nesting'Last loop
-         if Kind (Nesting (I)) in Ada_Basic_Decl then
+         if Kind (Nesting (I)) in
+           Ada_Package_Decl | Ada_Generic_Package_Decl | Ada_Task_Type_Decl
+             | Ada_Protected_Type_Decl | Ada_Single_Protected_Decl
+               | Ada_Single_Task_Decl
+         then
             if Result = "" then
                Result := To_Unbounded_String
                  (Node_Image (P_Defining_Name (As_Basic_Decl (Nesting (I)))));

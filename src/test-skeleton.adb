@@ -807,9 +807,32 @@ package body Test.Skeleton is
                end if;
 
                Package_Data.Is_Generic := False;
-               Package_Data.Data_Kind := Declaration_Data;
-               Package_Data.Element := Node.As_Ada_Node;
+               Package_Data.Data_Kind  := Declaration_Data;
+               Package_Data.Element    := Node.As_Ada_Node;
                Data.Package_Data_List.Append (Package_Data);
+
+            when Ada_Generic_Package_Decl =>
+
+               if Stub_Mode_ON then
+                  return Over;
+               end if;
+
+               --  Only library level generics are processed
+               if Node.Parent.Kind = Ada_Library_Item then
+                  if Get_Nesting (Node) = "" then
+                     Package_Data.Name := new String'
+                       (Node_Image (Node.As_Basic_Decl.P_Defining_Name));
+                  else
+                     Package_Data.Name := new String'
+                       (Get_Nesting (Node) & "."
+                        & Node_Image (Node.As_Basic_Decl.P_Defining_Name));
+                  end if;
+
+                  Package_Data.Is_Generic  := True;
+                  Package_Data.Data_Kind   := Declaration_Data;
+                  Package_Data.Element     := Node.As_Ada_Node;
+                  Data.Package_Data_List.Append (Package_Data);
+               end if;
 
             when others =>
                null;
@@ -903,6 +926,13 @@ package body Test.Skeleton is
       begin
          if Kind (Node) /= Ada_Type_Decl then
             return Into;
+         end if;
+
+         if Node.Kind = Ada_Generic_Package_Decl
+           and then Node.Parent.Kind /= Ada_Library_Item
+         then
+            --  Nested generics are not supported
+            return Over;
          end if;
 
          if Node.Kind in Ada_Basic_Decl
@@ -1055,6 +1085,13 @@ package body Test.Skeleton is
          if Node.Kind in Ada_Basic_Decl
            and then Is_Ghost_Code (Node.As_Basic_Decl)
          then
+            return Over;
+         end if;
+
+         if Node.Kind = Ada_Generic_Package_Decl
+           and then Node.Parent.Kind /= Ada_Library_Item
+         then
+            --  Nested generics are not supported
             return Over;
          end if;
 
@@ -1698,6 +1735,9 @@ package body Test.Skeleton is
       case Unit.Kind is
          when Ada_Package_Decl =>
             Data.Is_Generic := False;
+
+         when Ada_Generic_Package_Decl =>
+            Data.Is_Generic := True;
 
          when others =>
             Report_Std
