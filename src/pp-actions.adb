@@ -1439,9 +1439,6 @@ package body Pp.Actions is
          Enum_Rep_Nonvertical_Agg_Alt,
          Obj_Decl_Vertical_Agg_Alt,
          Comp_Decl_Vertical_Agg_Alt,
-         Assign_Vertical_Agg_Alt,
-         Qualified_Vertical_Agg_Alt,
-         Expr_Function_Vertical_Agg_Alt,
          Generic_Package_Instantiation_Vertical_Agg_Alt,
          Generic_Subp_Instantiation_Vertical_Agg_Alt,
          Return_Stmt_Vertical_Agg_Alt,
@@ -1611,15 +1608,6 @@ package body Pp.Actions is
             Comp_Decl_Vertical_Agg_Alt =>
               L (Replace_One
                  (Ada_Component_Decl, From => ":=[# ~~]~", To => ":=[$~~]~")),
-            Assign_Vertical_Agg_Alt =>
-              L (Replace_One
-                 (Ada_Assign_Stmt, From => ":=[# !]", To => ":=[$!]")),
-            Qualified_Vertical_Agg_Alt =>
-              L (Replace_One
-                 (Ada_Qual_Expr, From => "!'[#!]", To => "!'[$!]")),
-            Expr_Function_Vertical_Agg_Alt =>
-              L (Replace_One
-                 (Ada_Expr_Function, From => " is[# !]", To => " is[$!]")),
             Generic_Package_Instantiation_Vertical_Agg_Alt =>
               L (Replace_One
                  (Ada_Generic_Package_Instantiation,
@@ -2104,6 +2092,9 @@ package body Pp.Actions is
                --  Perhaps this should be unconditional, not just for
                --  Vertical_Case_Alternatives.
             end loop;
+
+            Replace_One (Ada_Case_Expr,
+                         "case ! is[# ?#~,# ~~]", "case ! is?[$~,$~~]");
          end if;
       end;
 
@@ -2790,6 +2781,36 @@ package body Pp.Actions is
             Kind      : Ada_Tree_Kind  := Tree.Kind);
          --  Call Interpret_Template with one of the alternative templates
 
+         function Is_Vertical_Aggregate (X : Ada_Tree'Class) return Boolean;
+         --  True if X is an aggregate that should be formatted vertically. In
+         --  particular, this is true if all of the following are true:
+         --
+         --     - The --vertical-named-aggregates switch was given.
+         --
+         --     - X is an aggregate or a qualified expression whose expression
+         --       is an aggregate.
+         --
+         --     - All component associations are in named notation.
+         --
+         --     - There is more than one component association, or if just one,
+         --       its expression is a subaggregate. The latter part is for
+         --       something like (A => (B => X, C => Y)), where we want both
+         --       the outer and inner aggregates to be vertical, even though
+         --       the outer one has only one component association.
+         --
+         --     - If the aggregate is the expression of a component association
+         --       of an outer aggregate, then the outer one is itself vertical.
+
+         function Has_Vertical_Aggregates
+           (Params : Param_Spec_List) return Boolean;
+         --  True if one of the parameters has a default expression that is a
+         --  vertical aggregate.
+
+         function Has_Vertical_Aggregates
+           (Assocs : Assoc_List) return Boolean;
+         --  True if one of the parameter associations has an expression that
+         --  is a vertical aggregate.
+
          procedure Interpret_Alt_Template
            (Alt       : Alternative_Templates.Alt_Templates;
             Subtrees  : Ada_Tree_Array := Pp.Actions.Subtrees (Tree);
@@ -3195,11 +3216,27 @@ package body Pp.Actions is
             Inst : Instr;
 
             procedure Do_Tab (Inst_Index : Instr_Index);
+            --  Process Tab or Tab_Insert_Point instruction
 
             procedure Do_Subtree (Subtree_Index : Query_Index);
+            --  Recursively format a required or optional subtree, or a list
 
             procedure Do_Opt_Subtree_Or_List
               (Subt : Ada_Tree; Subtree_Index : Query_Index);
+            --  Subsidiary to Do_Subtree in the optional subtree or list case
+
+            function Treat_Soft_Break_As_Hard return Boolean;
+            --  True if we should treat a soft line break as a hard line
+            --  break. In particular, if a soft line break is followed by a
+            --  case expression or aggregate that is treated vertically,
+            --  then we want to treat the soft line break as hard.
+            --  This is for situations like:
+            --
+            --     Some_Variable :=
+            --       (case ...
+            --
+            --  where we want a line break after ":=" if the
+            --  --vertical-case-alternatives switch is given.
 
             subtype Absent_Kinds is Ada_Node_Kind_Type with
               Predicate => Absent_Kinds in
@@ -3255,15 +3292,21 @@ package body Pp.Actions is
             procedure Do_Subtree (Subtree_Index : Query_Index) is
                pragma Assert (Subtree_Index in Subtrees_Index);
                Subt : constant Ada_Tree := Subtrees (Subtree_Index);
+
             begin
                Used (Subtree_Index) := True;
-               if Inst.Kind = Required_Subtree then
-                  Subtree_To_Ada
-                    (Subt, New_Level (Cur_Level, TT), Subtree_Index);
-               else
-                  pragma Assert (Inst.Kind = Opt_Subtree_Or_List);
-                  Do_Opt_Subtree_Or_List (Subt, Subtree_Index);
-               end if;
+
+               case Inst.Kind is
+                  when Required_Subtree =>
+                     Subtree_To_Ada
+                       (Subt, New_Level (Cur_Level, TT), Subtree_Index);
+
+                  when Opt_Subtree_Or_List =>
+                     Do_Opt_Subtree_Or_List (Subt, Subtree_Index);
+
+                  when others =>
+                     raise Program_Error;
+               end case;
             end Do_Subtree;
 
             procedure Do_Tab (Inst_Index : Instr_Index) is
@@ -3316,11 +3359,40 @@ package body Pp.Actions is
                   Is_Insertion_Point => Inst.Kind = Tab_Insert_Point);
             end Do_Tab;
 
+            function Treat_Soft_Break_As_Hard return Boolean is
+               Next_Index : Query_Count := Cur_Subtree_Index;
+               Next_Subtree : Ada_Tree;
+            begin
+               --  Find next nonnull subtree, if any:
+
+               loop
+                  Next_Index := Next_Index + 1;
+
+                  if Next_Index > Subtrees'Last then
+                     return False;
+                  end if;
+
+                  Next_Subtree := Subtrees (Next_Index);
+
+                  exit when Present (Next_Subtree);
+               end loop;
+
+               --  Return True if the next subtree is to be treated as verical
+
+               return (Arg (Cmd, Vertical_Case_Alternatives)
+                         and then Next_Subtree.Kind = Ada_Case_Expr)
+                 or else
+                   Is_Vertical_Aggregate (Next_Subtree);
+            end Treat_Soft_Break_As_Hard;
+
+            Inst_Index : Instr_Index := TT.Instructions'First;
+
          --  Start of processing for Interpret_Template
 
          begin
-            for Inst_Index in TT.Instructions'Range loop
+            while Inst_Index <= TT.Instructions'Last loop
                Inst := TT.Instructions (Inst_Index);
+
                case Inst.Kind is
                   when Hard_Break | Hard_Break_No_Comment =>
                      Append_Line_Break
@@ -3330,14 +3402,40 @@ package body Pp.Actions is
                         Kind     => Kind);
 
                   when Soft_Break =>
-                     --  "#+n" is treated the same as "#n" (where n is a
-                     --  digit), except that Max_Nesting_Increment ignores
-                     --  the former.
-                     Append_Line_Break
-                       (Hard     => False,
-                        Affects_Comments => False,
-                        Level    => Cur_Level + Inst.Level_Inc,
-                        Kind     => Kind);
+                     --  Check whether we want to use a hard line break
+                     --  in case of --vertical-case-alternatives or
+                     --  --vertical-named-aggregates switches.
+
+                     if Treat_Soft_Break_As_Hard then
+                        Append_Line_Break
+                          (Hard     => True,
+                           Affects_Comments => Inst.Kind = Hard_Break,
+                           Level    => Cur_Level,
+                           Kind     => Kind);
+
+                        --  If the soft line break is followed immediately by a
+                        --  single space, then skip the space.
+
+                        if Inst_Index < TT.Instructions'Last
+                          and then TT.Instructions (Inst_Index + 1) =
+                            (Kind => Verbatim,
+                             T_Kind => Spaces,
+                             Text => Name_Space)
+                        then
+                           Inst_Index := Inst_Index + 1;
+                        end if;
+
+                     else
+
+                        --  "#+n" is treated the same as "#n" (where n is a
+                        --  digit), except that Max_Nesting_Increment ignores
+                        --  the former.
+                        Append_Line_Break
+                          (Hard     => False,
+                           Affects_Comments => False,
+                           Level    => Cur_Level + Inst.Level_Inc,
+                           Kind     => Kind);
+                     end if;
 
                   when Indent =>
                      Indent (PP_Indentation (Cmd));
@@ -3392,7 +3490,10 @@ package body Pp.Actions is
                         end case;
                      end if;
                end case;
+
+               Inst_Index := Inst_Index + 1;
             end loop;
+
             pragma Assert
               (Used = (Subtrees_Index => True), "Not all used: " & Kind'Img);
          end Interpret_Template;
@@ -3463,43 +3564,12 @@ package body Pp.Actions is
             end if;
          end Maybe_Blank_Line;
 
-         function Is_Vertical_Aggregate (X : Ada_Tree'Class) return Boolean;
-         --  True if X is an aggregate that should be formatted vertically. In
-         --  particular, this is true if all of the following are true:
-         --
-         --     - The --vertical-named-aggregates switch was given.
-         --
-         --     - X is an aggregate or a qualified expression whose expression
-         --       is an aggregate.
-         --
-         --     - All component associations are in named notation.
-         --
-         --     - There is more than one component association, or if just one,
-         --       its expression is a subaggregate. The latter part is for
-         --       something like (A => (B => X, C => Y)), where we want both
-         --       the outer and inner aggregates to be vertical, even though
-         --       the outer one has only one component association.
-         --
-         --     - If the aggregate is the expression of a component association
-         --       of an outer aggregate, then the outer one is itself vertical.
-
-         function Has_Vertical_Aggregates
-           (Params : Param_Spec_List) return Boolean;
-         --  True if one of the parameters has a default expression that is a
-         --  vertical aggregate.
-
-         function Has_Vertical_Aggregates
-           (Assocs : Assoc_List) return Boolean;
-         --  True if one of the parameter associations has an expression that
-         --  is a vertical aggregate.
-
          ----------------
 
          --  Procedures for formatting the various kinds of node that are not
          --  fully covered by Str_Template_Table:
 
          procedure Do_Aggregate;
-         procedure Do_Assign_Stmt;
          procedure Do_Compilation_Unit;
          procedure Do_Component_Clause;
          procedure Do_Handled_Stmts;
@@ -3530,7 +3600,6 @@ package body Pp.Actions is
          --  also passed to Do_Object_Decl.
          procedure Do_Component_Decl;
          procedure Do_Pragma;
-         procedure Do_Qual_Expr;
          procedure Do_Select_When_Part;
          procedure Do_Params;
          procedure Do_Subp_Spec;
@@ -3643,15 +3712,6 @@ package body Pp.Actions is
                Interpret_Alt_Template (Nonvertical_Agg_Alt);
             end if;
          end Do_Aggregate;
-
-         procedure Do_Assign_Stmt is
-         begin
-            if Is_Vertical_Aggregate (F_Expr (Tree.As_Assign_Stmt)) then
-               Interpret_Alt_Template (Assign_Vertical_Agg_Alt);
-            else
-               Interpret_Template;
-            end if;
-         end Do_Assign_Stmt;
 
          procedure Do_Compilation_Unit is
          begin
@@ -4358,15 +4418,6 @@ package body Pp.Actions is
             Interpret_Alt_Template (Pragma_Alt);
          end Do_Pragma;
 
-         procedure Do_Qual_Expr is
-         begin
-            if Is_Vertical_Aggregate (F_Suffix (Tree.As_Qual_Expr)) then
-               Interpret_Alt_Template (Qualified_Vertical_Agg_Alt);
-            else
-               Interpret_Template;
-            end if;
-         end Do_Qual_Expr;
-
          procedure Do_Select_When_Part is
          begin
             if Index_In_Parent = 1 then
@@ -4480,9 +4531,6 @@ package body Pp.Actions is
             Param_Count : Query_Count :=
               (if Params.Is_Null then 0 else Subtree_Count (Params));
 
-            Vertical_Expr_Function : constant Boolean :=
-              Tree.Kind = Ada_Expr_Function
-                and then Is_Vertical_Aggregate (Tree.As_Expr_Function.F_Expr);
          begin
             if Tree.Kind in Ada_Entry_Decl | Ada_Entry_Body then
                Is_Function := False;
@@ -4500,11 +4548,7 @@ package body Pp.Actions is
                          Tree.As_Subp_Body.P_Defining_Name.As_Ada_Node
                     else Subtrees (Tree));
             begin
-               if Vertical_Expr_Function then
-                  Interpret_Alt_Template
-                    (Expr_Function_Vertical_Agg_Alt, Subtrees => Subs);
-
-               elsif (Arg (Cmd, Par_Threshold) = 0 and then Arg (Cmd, Separate_Is))
+               if (Arg (Cmd, Par_Threshold) = 0 and then Arg (Cmd, Separate_Is))
                  or else Param_Count > Query_Count (Arg (Cmd, Par_Threshold))
                then
                   Interpret_Template
@@ -4765,9 +4809,6 @@ package body Pp.Actions is
             when Ada_Task_Def =>
                Do_Task_Def;
 
-            when Ada_Assign_Stmt =>
-               Do_Assign_Stmt;
-
             when Ada_Aspect_Assoc =>
                Do_Aspect_Assoc;
 
@@ -4794,9 +4835,6 @@ package body Pp.Actions is
 
             when Ada_Extended_Return_Stmt =>
                Do_Extended_Return_Stmt;
-
-            when Ada_Qual_Expr =>
-               Do_Qual_Expr;
 
             when Ada_Param_Spec =>
                Do_Param_Spec;
