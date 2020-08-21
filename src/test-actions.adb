@@ -272,6 +272,7 @@ package body Test.Actions is
          Test.Harness.Generate_Stub_Test_Driver_Projects (Src_Prj);
       else
          if not Arg (Cmd, Harness_Only) then
+            Test.Skeleton.Report_Unused_Generic_Tests;
             Test.Skeleton.Generate_Project_File (Src_Prj);
          end if;
          Test.Harness.Test_Runner_Generator  (Src_Prj);

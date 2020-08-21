@@ -31,4 +31,10 @@ package Test.Skeleton is
    --  Generates a project file that sets the value of Source_Dirs
    --  with the directories whe generated tests are placed and includes
    --  the argument project file.
+
+   procedure Report_Unused_Generic_Tests;
+   --  Outputs a warning message for generic UUTs that have been processed and
+   --  have corresponding generic test packages generated, but no corresponding
+   --  instantiations have been processed and thus tests for those UUTs are not
+   --  included in the final harness.
 end Test.Skeleton;

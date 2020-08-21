@@ -8004,4 +8004,27 @@ package body Test.Skeleton is
       Gen_Package_Storage.Append (GP);
    end Update_Generic_Packages;
 
+   ---------------------------------
+   -- Report_Unused_Generic_Tests --
+   ---------------------------------
+
+   procedure Report_Unused_Generic_Tests is
+   begin
+      for GP of Gen_Package_Storage loop
+         if not GP.Has_Instantiation then
+            Report_Std
+              (GP.Sloc.all
+               & ": warning: no instance of "
+               & GP.Name.all);
+            Report_Std
+              (" corresponding tests are not included into harness");
+
+            Free (GP.Name);
+            Free (GP.Sloc);
+         end if;
+      end loop;
+
+      Gen_Package_Storage.Clear;
+   end Report_Unused_Generic_Tests;
+
 end Test.Skeleton;
