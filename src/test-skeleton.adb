@@ -256,6 +256,8 @@ package body Test.Skeleton is
       Test_Package  : String_Access;
       Original_Type : Ada_Node := No_Ada_Node;
       Original_Subp : Ada_Node := No_Ada_Node;
+
+      From_Generic  : Boolean := False;
    end record;
 
    package TR_Info is new
@@ -303,6 +305,46 @@ package body Test.Skeleton is
       Test_F  : String;
       Line    : Natural;
       Column  : Natural);
+
+   --------------
+   -- Generics --
+   --------------
+
+   type Generic_Tests is record
+      Gen_Unit_Full_Name : String_Access;
+      Tested_Type_Names  : List_Of_Strings.List;
+      Has_Simple_Case    : Boolean := False;
+   end record;
+   --  Stores info necessary to calculate names of test packages that
+   --  correspond to the generic UUT: names of tagged types and
+   --  absence/presense of simple case.
+
+   package Generic_Tests_Storage is new
+     Ada.Containers.Indefinite_Doubly_Linked_Lists (Generic_Tests);
+
+   Gen_Tests_Storage : Generic_Tests_Storage.List;
+   --  List of data on all the generic tests created during the processing of
+   --  generic UUTs.
+
+   type Generic_Package is record
+      Name : String_Access;
+      Sloc : String_Access := null;
+
+      Has_Instantiation : Boolean := False;
+   end record;
+
+   package Generic_Package_Storage is new
+     Ada.Containers.Indefinite_Doubly_Linked_Lists (Generic_Package);
+
+   Gen_Package_Storage : Generic_Package_Storage.List;
+   --  Used to detect processed generic packages that do not have
+   --  instantiations in the scope of argument sources and, therefore, won't be
+   --  included into final harness.
+
+   procedure Update_Generic_Packages (Instantiation : String);
+   --  Updates Gen_Package_Storage with a name of processed instantiation
+   procedure Update_Generic_Packages (Gen_Pack      : Generic_Package);
+   --  Updates Gen_Package_Storage with a new generic package info
 
    -----------------------
    -- Marker Processing --
@@ -457,33 +499,22 @@ package body Test.Skeleton is
       Cur : String_Set.Cursor;
 
       procedure Get_Test_Packages_List (S_Data : Suites_Data_Type);
+      --  Fills suite data sorting out routines from generic packages
 
       function Get_Suite_Components
         (S_Data       : Suites_Data_Type;
          Package_Name : String)
          return Test.Harness.Data_Holder;
 
-      procedure Get_Test_Packages_List (S_Data : Suites_Data_Type)
-      is
-         Declared_In_Generic : Boolean;
-         Elem : Ada_Node;
+      ----------------------------
+      -- Get_Test_Packages_List --
+      ----------------------------
+
+      procedure Get_Test_Packages_List (S_Data : Suites_Data_Type) is
       begin
          for K in S_Data.TR_List.First_Index .. S_Data.TR_List.Last_Index loop
 
-            Declared_In_Generic := False;
-            Elem := S_Data.TR_List.Element (K).Original_Subp;
-            loop
-               exit when Elem = No_Ada_Node;
-
-               if Elem.Kind = Ada_Generic_Package_Decl then
-                  Declared_In_Generic := True;
-                  exit;
-               end if;
-
-               Elem := Elem.Parent;
-            end loop;
-
-            if not Declared_In_Generic then
+            if not S_Data.TR_List.Element (K).From_Generic then
                Test_Packages.Include
                  (S_Data.TR_List.Element (K).Test_Package.all);
             end if;
@@ -737,6 +768,18 @@ package body Test.Skeleton is
       function Get_Records (Node : Ada_Node'Class) return Visit_Status;
       function Get_Subprograms (Node : Ada_Node'Class) return Visit_Status;
 
+      Inside_Inst : Boolean := False;
+      --  Indicates that we are parsing the generic package in place of its
+      --  instantiation to populate Data for suite creation. In that mode
+      --  the nestings gathered by Get_Records and Get_Subprograms must be
+      --  replaced with the real nesting of instantiation.
+
+      Instance_Nesting : String_Access;
+      --  Stores the nesting of instantiation and its name
+
+      Instance_Sloc : String_Access;
+      --  Stores sloc of instance that is used for test routine output
+
       procedure Gather_Inherited_Subprograms
         (Dummy_Types     : Natural;
          Suite_Data_List : in out Suites_Data_Type);
@@ -776,6 +819,12 @@ package body Test.Skeleton is
          return Boolean;
       --  Checks that all types between the root type and the final descendant
       --  are declared in regular packages.
+
+      function Is_Node_From_Generic (Node : Ada_Node'Class) return Boolean;
+      --  Checks that there are no enclosing generic package declarations for
+      --  Node, but takes into account the value of Inside_Inst, so that nodes
+      --  from instantiations could be distinguished from same nodes from
+      --  corresponding generics.
 
       -------------------------
       -- Get_Nested_Packages --
@@ -833,6 +882,41 @@ package body Test.Skeleton is
                   Package_Data.Element     := Node.As_Ada_Node;
                   Data.Package_Data_List.Append (Package_Data);
                end if;
+
+            when Ada_Generic_Package_Instantiation =>
+
+               if Stub_Mode_ON then
+                  return Over;
+               end if;
+
+               declare
+                  Gen_Name : constant Libadalang.Analysis.Name :=
+                    Node.As_Generic_Package_Instantiation.F_Generic_Pkg_Name;
+                  Gen_Decl : constant Basic_Decl :=
+                    Gen_Name.P_Relative_Name.As_Name.P_Referenced_Decl;
+                  Gen_File : constant String := Gen_Decl.Unit.Get_Filename;
+               begin
+                  --  No processing for instantiations of nested generics,
+                  --  also if corresponding generic is not processed (or going
+                  --  to be) there is no corresponding generic test package.
+                  if not Source_Present (Gen_File)
+                    or else Gen_Decl.Parent.Kind /= Ada_Library_Item
+                  then
+                     return Over;
+                  end if;
+
+                  Package_Data.Name := new String'
+                    (Get_Nesting (Node)
+                     & "."
+                     & Node_Image (Node.As_Basic_Decl.P_Defining_Name));
+                  Package_Data.Data_Kind := Instantiation;
+                  Package_Data.Is_Generic := False;
+                  Package_Data.Generic_Containing_Package := new String'
+                    (Node_Image (Gen_Decl.P_Defining_Name));
+                  Package_Data.Element := Node.As_Ada_Node;
+                  Data.Package_Data_List.Append (Package_Data);
+                  return Over;
+               end;
 
             when others =>
                null;
@@ -924,10 +1008,6 @@ package body Test.Skeleton is
             Type_Data.Has_Argument_Father       := True;
          end Get_Type_Parent_Data;
       begin
-         if Kind (Node) /= Ada_Type_Decl then
-            return Into;
-         end if;
-
          if Node.Kind = Ada_Generic_Package_Decl
            and then Node.Parent.Kind /= Ada_Library_Item
          then
@@ -941,6 +1021,60 @@ package body Test.Skeleton is
             return Over;
          end if;
 
+         if Node.Kind = Ada_Package_Decl and then Inside_Inst then
+            --  No processing for packages nested inside generic ones
+            return Over;
+         end if;
+
+         if Node.Kind = Ada_Generic_Package_Instantiation
+           and then not Inside_Inst
+         then
+            if Stub_Mode_ON then
+               return Over;
+            end if;
+
+            declare
+               Gen_Name : constant Libadalang.Analysis.Name :=
+                 Node.As_Generic_Package_Instantiation.F_Generic_Pkg_Name;
+               Gen_Decl : constant Basic_Decl :=
+                 Gen_Name.P_Relative_Name.As_Name.P_Referenced_Decl;
+               Gen_File : constant String := Gen_Decl.Unit.Get_Filename;
+            begin
+               --  No processing for instantiations of nested generics,
+               --  also if corresponding generic is not processed (or going
+               --  to be) there is no corresponding generic test package.
+               if not Source_Present (Gen_File)
+                 or else Gen_Decl.Parent.Kind /= Ada_Library_Item
+               then
+                  return Over;
+               end if;
+
+               Inside_Inst := True;
+               Instance_Nesting := new String'
+                 (Encode
+                    (Node.As_Basic_Decl.P_Fully_Qualified_Name,
+                     Node.Unit.Get_Charset));
+               Instance_Sloc := new String'
+                 (Base_Name (Data.Unit_File_Name.all)
+                  & ":"
+                  & Trim (First_Line_Number (Node)'Img, Both)
+                  & ":"
+                  & Trim (First_Column_Number (Node)'Img, Both)
+                  & ":");
+
+               Traverse (Gen_Decl, Get_Records'Access);
+
+               Inside_Inst := False;
+               Free (Instance_Nesting);
+               Free (Instance_Sloc);
+               return Over;
+            end;
+         end if;
+
+         if Kind (Node) /= Ada_Type_Decl then
+            return Into;
+         end if;
+
          if not Node.As_Type_Decl.P_Is_Tagged_Type then
             return Over;
          end if;
@@ -952,20 +1086,34 @@ package body Test.Skeleton is
             Cur_Node := Node.As_Ada_Node;
          end if;
 
-         --  Checking for duplicating types
-         for I in Data.Type_Data_List.First_Index ..
-           Data.Type_Data_List.Last_Index
-         loop
-            if Data.Type_Data_List.Element (I).Main_Type_Elem = Cur_Node then
-               return Over;
-            end if;
-         end loop;
-
          --  Gathering basic data about type
          Type_Data.Main_Type_Elem := Cur_Node;
          Type_Data.Main_Type_Text_Name := new
            String'(Node_Image (Cur_Node.As_Basic_Decl.P_Defining_Name));
-         Type_Data.Nesting := new String'(Get_Nesting (Cur_Node));
+         if Inside_Inst then
+            Type_Data.Nesting := new String'(Instance_Nesting.all);
+         else
+            Type_Data.Nesting := new String'(Get_Nesting (Cur_Node));
+         end if;
+
+         --  Checking for duplicating types
+         declare
+            Stored_Type : Base_Type_Info;
+         begin
+
+            for I in Data.Type_Data_List.First_Index ..
+              Data.Type_Data_List.Last_Index
+            loop
+               Stored_Type := Data.Type_Data_List.Element (I);
+               if Stored_Type.Main_Type_Elem = Cur_Node
+                 and then Stored_Type.Nesting.all = Type_Data.Nesting.all
+               then
+                  Free (Type_Data.Main_Type_Text_Name);
+                  Free (Type_Data.Nesting);
+                  return Over;
+               end if;
+            end loop;
+         end;
 
          --  Checking if any of ancestor types had a discriminant part
          Type_Data.No_Default_Discriminant := False;
@@ -1095,10 +1243,61 @@ package body Test.Skeleton is
             return Over;
          end if;
 
+         if Node.Kind = Ada_Package_Decl and then Inside_Inst then
+            --  No processing for packages nested inside generic ones
+            return Over;
+         end if;
+
          if
            Node.Kind in Ada_Protected_Type_Decl | Ada_Single_Protected_Decl
          then
             return Over;
+         end if;
+
+         if Node.Kind = Ada_Generic_Package_Instantiation
+           and then not Inside_Inst
+         then
+
+            if Stub_Mode_ON then
+               return Over;
+            end if;
+
+            declare
+               Gen_Name : constant Libadalang.Analysis.Name :=
+                 Node.As_Generic_Package_Instantiation.F_Generic_Pkg_Name;
+               Gen_Decl : constant Basic_Decl :=
+                 Gen_Name.P_Relative_Name.As_Name.P_Referenced_Decl;
+               Gen_File : constant String := Gen_Decl.Unit.Get_Filename;
+            begin
+               --  No processing for instantiations of nested generics,
+               --  also if corresponding generic is not processed (or going
+               --  to be) there is no corresponding generic test package
+               if not Source_Present (Gen_File)
+                 or else Gen_Decl.Parent.Kind /= Ada_Library_Item
+               then
+                  return Over;
+               end if;
+
+               Inside_Inst := True;
+               Instance_Nesting := new String'
+                 (Encode
+                    (Node.As_Basic_Decl.P_Fully_Qualified_Name,
+                     Node.Unit.Get_Charset));
+               Instance_Sloc := new String'
+                 (Base_Name (Data.Unit_File_Name.all)
+                  & ":"
+                  & Trim (First_Line_Number (Node)'Img, Both)
+                  & ":"
+                  & Trim (First_Column_Number (Node)'Img, Both)
+                  & ":");
+
+               Traverse (Gen_Decl, Get_Subprograms'Access);
+
+               Inside_Inst := False;
+               Free (Instance_Nesting);
+               Free (Instance_Sloc);
+               return Over;
+            end;
          end if;
 
          if
@@ -1120,20 +1319,35 @@ package body Test.Skeleton is
          Subp.Subp_Text_Name   := new String'(Get_Subp_Name (Node));
          Subp.Subp_Name_Image   := new String'
            (Node_Image (Node.As_Basic_Decl.P_Defining_Name));
-         Subp.Nesting := new String'(Get_Nesting (Node));
+         if Inside_Inst then
+            Subp.Nesting := new String'(Instance_Nesting.all);
+         else
+            Subp.Nesting := new String'(Get_Nesting (Node));
+         end if;
 
          --  Setting tested subprogram sloc for suite info
          declare
             Subp_Span : constant Source_Location_Range :=
               Subp.Subp_Declaration.Sloc_Range;
          begin
-            Test_Routine.Tested_Sloc := new String'
-              (Base_Name (Data.Unit_File_Name.all)
-               & ":"
-               & Trim (Subp_Span.Start_Line'Img, Both)
-               & ":"
-               & Trim (Subp_Span.Start_Column'Img, Both)
-               & ":");
+            if Inside_Inst then
+               Test_Routine.Tested_Sloc := new String'
+                 (Base_Name (Subp.Subp_Declaration.Unit.Get_Filename)
+                  & ":"
+                  & Trim (Subp_Span.Start_Line'Img, Both)
+                  & ":"
+                  & Trim (Subp_Span.Start_Column'Img, Both)
+                  & " instance at "
+                  & Instance_Sloc.all);
+            else
+               Test_Routine.Tested_Sloc := new String'
+                 (Base_Name (Data.Unit_File_Name.all)
+                  & ":"
+                  & Trim (Subp_Span.Start_Line'Img, Both)
+                  & ":"
+                  & Trim (Subp_Span.Start_Column'Img, Both)
+                  & ":");
+            end if;
          end;
 
          Owner_Decl := Tagged_Primitive_Owner
@@ -1280,7 +1494,8 @@ package body Test.Skeleton is
               (TR_Info       => Test_Routine,
                Test_Package  => Test_Package_Name,
                Original_Type => Original_Type.As_Ada_Node,
-               Original_Subp => Node.As_Ada_Node);
+               Original_Subp => Node.As_Ada_Node,
+               From_Generic  => Is_Node_From_Generic (Node));
 
             Gather_Test_Cases
               (Subp,
@@ -1728,6 +1943,30 @@ package body Test.Skeleton is
 
          return False;
       end No_Inheritance_Through_Generics;
+
+      --------------------------
+      -- Is_Node_From_Generic --
+      --------------------------
+
+      function Is_Node_From_Generic (Node : Ada_Node'Class) return Boolean
+      is
+         Elem : Ada_Node := Node.As_Ada_Node;
+      begin
+         if Inside_Inst then
+            return False;
+         end if;
+
+         while not Elem.Is_Null loop
+
+            if Elem.Kind = Ada_Generic_Package_Decl then
+               return True;
+            end if;
+
+            Elem := Elem.Parent;
+         end loop;
+
+         return False;
+      end Is_Node_From_Generic;
 
    begin
       Unit := Bod.F_Item.As_Ada_Node;
@@ -2988,6 +3227,10 @@ package body Test.Skeleton is
       --  Indicates if current test package has at least one non-abstract test
       --  routine. In that case we need to include AUnit.Assertions.
 
+      Gen_Tests : Generic_Tests;
+      --  Used to store all test type names in case of generic tested package.
+      --  They are to be added at generic test storage.
+
       Nesting_Add : String_Access;
 
       UH     : Unique_Hash;
@@ -3307,6 +3550,10 @@ package body Test.Skeleton is
       end if;
 
       Test_Unit_Suffix := new String'(Test_Unit_Name_Suff);
+
+      if Data.Is_Generic then
+         Gen_Tests.Gen_Unit_Full_Name := new String'(Data.Unit_Full_Name.all);
+      end if;
 
       for I in
         Data.Type_Data_List.First_Index .. Data.Type_Data_List.Last_Index
@@ -3988,6 +4235,22 @@ package body Test.Skeleton is
             S_Put (0, "generic");
             Put_New_Line;
 
+            declare
+               GP : Generic_Package;
+            begin
+               GP.Name := new String'(Current_Pack.Name.all);
+               GP.Sloc := new String'
+                 (Base_Name (Data.Unit_File_Name.all)
+                  & ":"
+                  & Trim
+                    (First_Line_Number (Current_Pack.Element)'Img,
+                     Both)
+                  & ":"
+                  & Trim
+                    (First_Column_Number (Current_Pack.Element)'Img,
+                     Both));
+               Update_Generic_Packages (GP);
+            end;
          end if;
 
          S_Put (0, "package " & Unit_Name.all & " is");
@@ -4046,6 +4309,8 @@ package body Test.Skeleton is
                & " is new GNATtest_Generated.GNATtest_Standard."
                & Data_Unit_Name.all & ".New_Test with null record;");
 
+            Update_Generic_Packages
+              (Current_Pack.Generic_Containing_Package.all);
          end if;
 
          Put_New_Line;
@@ -5037,6 +5302,8 @@ package body Test.Skeleton is
                   end if;
                   Put_New_Line;
                   S_Put (3, "end Tear_Down;");
+                  Put_New_Line;
+                  Put_New_Line;
                else
                   S_Put
                     (3,
@@ -5178,6 +5445,22 @@ package body Test.Skeleton is
                S_Put (0, "generic");
                Put_New_Line;
 
+               declare
+                  GP : Generic_Package;
+               begin
+                  GP.Name := new String'(Current_Pack.Name.all);
+                  GP.Sloc := new String'
+                    (Base_Name (Data.Unit_File_Name.all)
+                     & ":"
+                     & Trim
+                       (First_Line_Number (Current_Pack.Element)'Img,
+                        Both)
+                     & ":"
+                     & Trim
+                       (First_Column_Number (Current_Pack.Element)'Img,
+                        Both));
+                  Update_Generic_Packages (GP);
+               end;
             end if;
 
             S_Put (0, "package " & Unit_Name.all & " is");
@@ -5197,6 +5480,8 @@ package body Test.Skeleton is
                   "type Test is new GNATtest_Generated.GNATtest_Standard." &
                     Data_Unit_Name.all & ".New_Test");
 
+               Update_Generic_Packages
+                 (Current_Pack.Generic_Containing_Package.all);
             end if;
             Put_New_Line;
             S_Put (3, "with null record;");
@@ -5978,6 +6263,10 @@ package body Test.Skeleton is
 
       Add_Test_List (Data.Unit_File_Name.all, TP_List);
       TP_List.Clear;
+
+      if Data.Is_Generic then
+         Gen_Tests_Storage.Append (Gen_Tests);
+      end if;
 
    end Generate_Test_Package;
 
@@ -7649,5 +7938,70 @@ package body Test.Skeleton is
       New_Line_Count;
 
    end Generate_Procedure_Wrapper;
+
+   -----------------------------
+   -- Update_Generic_Packages --
+   -----------------------------
+
+   procedure Update_Generic_Packages (Gen_Pack : Generic_Package) is
+      Cur : Generic_Package_Storage.Cursor := Gen_Package_Storage.First;
+      GP  : Generic_Package;
+
+      use Generic_Package_Storage;
+   begin
+      while Cur /= Generic_Package_Storage.No_Element loop
+
+         GP := Generic_Package_Storage.Element (Cur);
+
+         if GP.Name.all = Gen_Pack.Name.all then
+            if GP.Sloc /= null then
+               --  Same package can be added several times.
+               return;
+            end if;
+            GP.Sloc := Gen_Pack.Sloc;
+            Gen_Package_Storage.Replace_Element (Cur, GP);
+            return;
+         end if;
+
+         Next (Cur);
+      end loop;
+
+      Gen_Package_Storage.Append (Gen_Pack);
+   end Update_Generic_Packages;
+
+   -----------------------------
+   -- Update_Generic_Packages --
+   -----------------------------
+
+   procedure Update_Generic_Packages (Instantiation : String) is
+      Cur : Generic_Package_Storage.Cursor := Gen_Package_Storage.First;
+      GP  : Generic_Package;
+
+      use Generic_Package_Storage;
+   begin
+      while Cur /= Generic_Package_Storage.No_Element loop
+
+         GP := Generic_Package_Storage.Element (Cur);
+
+         if GP.Name.all = Instantiation then
+            if GP.Has_Instantiation then
+               --  Same package can be instantiated multiple times.
+               return;
+            end if;
+            GP.Has_Instantiation := True;
+            Gen_Package_Storage.Replace_Element (Cur, GP);
+            return;
+         end if;
+
+         Next (Cur);
+      end loop;
+
+      --  Instantiation is processed ahead of coresponding generic.
+      --  Adding a template for it to later fill in the sloc.
+      GP.Name := new String'(Instantiation);
+      GP.Sloc := null;
+      GP.Has_Instantiation := True;
+      Gen_Package_Storage.Append (GP);
+   end Update_Generic_Packages;
 
 end Test.Skeleton;
