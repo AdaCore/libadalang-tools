@@ -329,4 +329,16 @@ package Test.Common is
    Verbose : Boolean := False;
    --  Turns on additional verbose output and more detailed traces
 
+   Queues_Number : Positive := 1;
+   --  Number of test drivers run in parallel in aggregation mode
+
+   Environment_Dir : GNAT.OS_Lib.String_Access := null;
+   --  Designates a directory whose content should be copied to the test driver
+   --  spawn directories to solve potential issues like loading a file with
+   --  a hardcoded relative path.
+
+   Aggregate_Subdir_Name : String_Access := new String'("");
+   --  Used to prepend the names of test driver executables in
+   --  test_drivers.list.
+
 end Test.Common;

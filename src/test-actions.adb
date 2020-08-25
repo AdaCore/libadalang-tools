@@ -43,6 +43,7 @@ with Utils_Debug; use Utils_Debug;
 
 with Test.Command_Lines; use Test.Command_Lines;
 
+with Test.Aggregator;
 with Test.Skeleton;
 with Test.Harness;
 with Test.Mapping;
@@ -95,6 +96,22 @@ package body Test.Actions is
       Files : File_Array_Access;
    begin
       GNATCOLL.Traces.Parse_Config_File;
+
+      if Status (Tool.Project_Tree.all) = Empty then
+         for File of File_Names (Cmd) loop
+            Test.Aggregator.Add_Drivers_To_List (File.all);
+         end loop;
+
+         --  Clearing argument files so that the driver does not try to process
+         --  them as ada sources.
+         Clear_File_Names (Cmd);
+
+         Test.Common.Queues_Number := Arg (Cmd, Jobs);
+
+         --  Aggregation mode does not require any further processing
+         return;
+      end if;
+
       Test.Common.Verbose := Arg (Cmd, Verbose);
       Test.Common.Harness_Only := Arg (Cmd, Harness_Only);
 
@@ -268,18 +285,22 @@ package body Test.Actions is
         Tool.Project_Tree.Root_Project.Project_Path.Display_Full_Name;
    begin
 
-      if Arg (Cmd, Stub) then
-         Test.Harness.Generate_Stub_Test_Driver_Projects (Src_Prj);
+      if Status (Tool.Project_Tree.all) = Empty then
+         Test.Aggregator.Process_Drivers_List;
       else
-         if not Arg (Cmd, Harness_Only) then
-            Test.Skeleton.Report_Unused_Generic_Tests;
-            Test.Skeleton.Generate_Project_File (Src_Prj);
+         if Arg (Cmd, Stub) then
+            Test.Harness.Generate_Stub_Test_Driver_Projects (Src_Prj);
+         else
+            if not Arg (Cmd, Harness_Only) then
+               Test.Skeleton.Report_Unused_Generic_Tests;
+               Test.Skeleton.Generate_Project_File (Src_Prj);
+            end if;
+            Test.Harness.Test_Runner_Generator  (Src_Prj);
+            Test.Harness.Project_Creator        (Src_Prj);
          end if;
-         Test.Harness.Test_Runner_Generator  (Src_Prj);
-         Test.Harness.Project_Creator        (Src_Prj);
+         Test.Common.Generate_Common_File;
+         Test.Mapping.Generate_Mapping_File;
       end if;
-      Test.Common.Generate_Common_File;
-      Test.Mapping.Generate_Mapping_File;
    end Final;
 
    ---------------------
