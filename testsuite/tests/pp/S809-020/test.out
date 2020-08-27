@@ -1306,29 +1306,15 @@ procedure Gnatpp_Exdentation is
    An_Integer_4 : constant Integer := 4;
 begin
    Ada.Text_IO.Put
-     ("String concatenation:" &
-      ASCII.LF &
-      "1&2: " &
-      A_String_1 &
-      A_String_2 &
-      ASCII.LF &
-      "3&4: " &
-      A_String_3 &
-      A_String_4 &
-      ASCII.LF);
-   if An_Integer_1 /= An_Integer_2
-     and then An_Integer_3 /= An_Integer_4
+     ("String concatenation:" & ASCII.LF & "1&2: " & A_String_1 & A_String_2 &
+      ASCII.LF & "3&4: " & A_String_3 & A_String_4 & ASCII.LF);
+   if An_Integer_1 /= An_Integer_2 and then An_Integer_3 /= An_Integer_4
      and then An_Integer_1 = An_Integer_3
    then
       Ada.Text_IO.Put
-        ("Computing addition: " &
-         ASCII.LF &
-         "1+2" &
-         Integer'Image (An_Integer_1 + An_Integer_2) &
-         ASCII.LF &
-         "3+4" &
-         Integer'Image (An_Integer_3 + An_Integer_4) &
-         ASCII.LF);
+        ("Computing addition: " & ASCII.LF & "1+2" &
+         Integer'Image (An_Integer_1 + An_Integer_2) & ASCII.LF & "3+4" &
+         Integer'Image (An_Integer_3 + An_Integer_4) & ASCII.LF);
    end if;
 end Gnatpp_Exdentation;
 procedure Loop_Then is
@@ -1474,17 +1460,11 @@ end Loop_Then;
 procedure Ors is
 begin
    Rcc.Ahb1enr :=
-     Rcc.Ahb1enr or
-     RCC_Bits.Ahb1enr.Dma2en or
-     RCC_Bits.Ahb1enr.Dma1en or
-     RCC_Bits.Ahb1enr.Gpioaen or
-     RCC_Bits.Ahb1enr.Gpioben or
-     RCC_Bits.Ahb1enr.Gpiocen or
-     RCC_Bits.Ahb1enr.Gpioden or
-     RCC_Bits.Ahb1enr.Gpioeen or
-     RCC_Bits.Ahb1enr.Gpiofen or
-     RCC_Bits.Ahb1enr.Gpiogen or
-     RCC_Bits.Ahb1enr.Gpiohen or
+     Rcc.Ahb1enr or RCC_Bits.Ahb1enr.Dma2en or RCC_Bits.Ahb1enr.Dma1en or
+     RCC_Bits.Ahb1enr.Gpioaen or RCC_Bits.Ahb1enr.Gpioben or
+     RCC_Bits.Ahb1enr.Gpiocen or RCC_Bits.Ahb1enr.Gpioden or
+     RCC_Bits.Ahb1enr.Gpioeen or RCC_Bits.Ahb1enr.Gpiofen or
+     RCC_Bits.Ahb1enr.Gpiogen or RCC_Bits.Ahb1enr.Gpiohen or
      RCC_Bits.Ahb1enr.Gpioien;
 end Ors;
 procedure Pretty is

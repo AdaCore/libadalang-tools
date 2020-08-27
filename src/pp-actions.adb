@@ -2621,6 +2621,10 @@ package body Pp.Actions is
       --  Compute a new nesting level for a subtree. This is usually one more than
       --  the current level, but we also add in Max_Nesting_Increment.
 
+      Bin_Op_Count : Natural := 0;
+      --  Number of binary operators we are inside of. This is used to set the
+      --  Bin_Op_Count of line breaks.
+
       procedure Append_Line_Break
         (Hard     : Boolean;
          Affects_Comments : Boolean;
@@ -2661,15 +2665,16 @@ package body Pp.Actions is
             Append
               (All_LB,
                Line_Break'
-                 (Tok         => Tok,
-                  Tokn_Val    => Token_At_Cursor (Tok),
-                  Hard        => Hard,
-                  Affects_Comments => Affects_Comments,
-                  Enabled     => Hard,
+                 (Tok                        => Tok,
+                  Tokn_Val                   => Token_At_Cursor (Tok),
+                  Hard                       => Hard,
+                  Affects_Comments           => Affects_Comments,
+                  Enabled                    => Hard,
                   Source_Line_Breaks_Enabled => False,
-                  Level       => Level,
-                  Indentation => Cur_Indentation,
-                  Length      => <>
+                  Level                      => Level,
+                  Indentation                => Cur_Indentation,
+                  Bin_Op_Count               => Bin_Op_Count,
+                  Length                     => <>
       --            Kind        => Kind
                  ));
          end;
@@ -4034,10 +4039,6 @@ package body Pp.Actions is
             Arg1_Higher : constant Boolean := Precedence (Arg1) > Precedence (Tree);
             --  Arg1 is higher precedence than Expr
 
-         --  Calculate template fragments for the args (Arg1/2_T), that indent
-         --  if the arg is a higher precedence binary operator than the whole
-         --  expression.
-
          --  Start of processing for Do_Bin_Op
 
          begin
@@ -4052,6 +4053,8 @@ package body Pp.Actions is
                end if;
                return;
             end if;
+
+            Bin_Op_Count := Bin_Op_Count + 1;
 
             --  The recursive calls to Do_Bin_Op below bypass the
             --  normal recursion via Subtree_To_Ada, so we need to pass along the
@@ -4129,6 +4132,8 @@ package body Pp.Actions is
                   Subtrees  => (1 => Arg2),
                   Cur_Level => Cur_Level + 1);
             end if;
+
+            Bin_Op_Count := Bin_Op_Count - 1;
          end Do_Bin_Op;
 
          procedure Do_For_Loop_Spec is
@@ -4949,6 +4954,8 @@ package body Pp.Actions is
       end if;
 
       Convert_Tree_To_Ada (Root);
+
+      pragma Assert (Bin_Op_Count = 0);
    end Tree_To_Ada_2;
 
    procedure Format_Vector

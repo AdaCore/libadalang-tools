@@ -316,14 +316,15 @@ package body Pp.Formatting is
       Append
         (All_LB,
          Line_Break'
-           (Tok | Tokn_Val => <>, -- Initial value not used
-            Hard        => True,
-            Affects_Comments => False,
-            Enabled     => True,
+           (Tok | Tokn_Val             => <>, -- Initial value not used
+            Hard                       => True,
+            Affects_Comments           => False,
+            Enabled                    => True,
             Source_Line_Breaks_Enabled => False,
-            Level       => 1,
-            Indentation => Cur_Indentation,
-            Length      => <>
+            Level                      => 1,
+            Indentation                => Cur_Indentation,
+            Bin_Op_Count               => 0,
+            Length                     => <>
 --            Kind        => Not_An_Element
            ));
       Append (Temp_LBI, Last_Index (All_LB));
@@ -1963,15 +1964,21 @@ package body Pp.Formatting is
                        and then not Worthwhile_Line_Break (All_LBI (F), LL)
                      then
                         null;
-                     else
-                        if Line_Len (All_LB, FF, LB (X + 1)) >
-                             Arg (Cmd, Max_Line_Length)
-                          or else not Arg (Cmd, Compact)
-                        then
-                           pragma Assert (not All_LB (LL).Enabled);
-                           All_LB (LL).Enabled := True;
-                           FF := LL;
-                        end if;
+
+                     --  If the line is too long, enable this soft line
+                     --  break. In --no-compact mode, if one line break is
+                     --  enabled, we enable all line breaks at the same nesting
+                     --  level, except that we don't do that within binary
+                     --  operators.
+
+                     elsif Line_Len (All_LB, FF, LB (X + 1)) >
+                         Arg (Cmd, Max_Line_Length)
+                       or else (not Arg (Cmd, Compact)
+                                  and then All_LB (LL).Bin_Op_Count = 0)
+                     then
+                        pragma Assert (not All_LB (LL).Enabled);
+                        All_LB (LL).Enabled := True;
+                        FF := LL;
                      end if;
                   end loop; -- through line breaks at current level
                end;
