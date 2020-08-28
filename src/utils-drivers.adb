@@ -205,7 +205,7 @@ package body Utils.Drivers is
                end if;
             else
                begin
-                  Create_Directory (Dir);
+                  Create_Path (Dir);
                exception
                   when Name_Error | Use_Error =>
                      Cmd_Error (Cannot_Create);

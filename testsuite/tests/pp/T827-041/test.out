@@ -1,0 +1,34 @@
+Line metrics summed over 2 units
+  all lines            : 12
+  code lines           : 10
+  comment lines        : 0
+  end-of-line comments : 0
+  comment percentage   : 0.00
+  blank lines          : 2
+
+Average lines in body: 4.00
+
+Element metrics summed over 2 units
+  all statements      : 2
+  all declarations    : 2
+  logical SLOC        : 4
+
+ 2 public subprograms in 2 units
+
+ 2 subprogram bodies in 2 units
+
+Average cyclomatic complexity: 1.00
+
+Coupling metrics:
+=================
+   Unit Project1 (/src/project1/project1.adb)
+      control fan-out coupling  : 0
+      control fan-in coupling   : 0
+      unit fan-out coupling     : 0
+      unit fan-in coupling      : 0
+
+   Unit Project2 (/src/project2/project2.adb)
+      control fan-out coupling  : 0
+      control fan-in coupling   : 0
+      unit fan-out coupling     : 0
+      unit fan-in coupling      : 0

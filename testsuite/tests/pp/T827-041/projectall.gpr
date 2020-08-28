@@ -1,0 +1,9 @@
+with "project1.gpr";
+with "project2.gpr";
+with "common.gpr";
+
+abstract project ProjectAll is
+
+  for Object_Dir use Common.Out_Dir & Project'Name & "/obj";
+   
+end ProjectAll;

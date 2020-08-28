@@ -2448,7 +2448,7 @@ package body METRICS.Actions is
 
       if Object_Dir /= "" and then not Directories.Exists (Object_Dir) then
          begin
-            Directories.Create_Directory (Object_Dir);
+            Directories.Create_Path (Object_Dir);
          exception
             when Directories.Name_Error | Directories.Use_Error =>
                Cmd_Error ("cannot create directory " & Object_Dir);
