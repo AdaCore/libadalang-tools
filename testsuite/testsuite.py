@@ -38,10 +38,17 @@ class Testsuite(e3.testsuite.Testsuite):
         self.env.no_wip = self.main.args.no_wip
         self.env.fold_casing = self.main.args.fold_casing
         self.env.valgrind = self.main.args.valgrind
+
+        # Put the testsuite drivers in the PATH
+        script_dir = os.path.dirname(__file__)
+        os.environ["PATH"] = "{}{}{}".format(
+            os.path.abspath(os.path.join(script_dir, 'ada_drivers', 'bin')),
+            os.pathsep,
+            os.environ["PATH"])
+
         if self.env.valgrind:
             # The --valgrind switch was given. Set the PATH to point to the
             # valgrind directory (see ../../valgrind/README).
-            script_dir = os.path.dirname(__file__)
             valgrind_dir = os.path.abspath(
                 os.path.join(script_dir, '..', '..', 'valgrind'))
             os.environ["PATH"] = valgrind_dir + os.pathsep + os.environ["PATH"]
