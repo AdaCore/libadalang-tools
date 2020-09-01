@@ -1,0 +1,6 @@
+Code-Review+2: Nicolas Setton <setton@adacore.com>
+Submitted-by: João Azevedo <azevedo@adacore.com>
+Submitted-at: Tue, 01 Sep 2020 14:49:03 +0200
+Reviewed-on: https://git.adacore.com/78062
+Project: libadalang-tools
+Branch: refs/heads/topic/SA22-035
