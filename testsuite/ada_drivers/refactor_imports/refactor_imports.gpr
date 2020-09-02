@@ -1,4 +1,4 @@
-with "lal_tools.gpr";
+with "../../../src/lal_tools.gpr";
 with "libadalang.gpr";
 
 project Refactor_Imports is
@@ -7,22 +7,15 @@ project Refactor_Imports is
    for Exec_Dir use "../bin";
    for Main use ("refactor_imports.adb");
 
-
-   type Build_Mode_Type is ("dev");
-   Build_Mode : Build_Mode_Type := external ("BUILD_MODE", "dev");
-
    package Compiler is
-      case Build_Mode is
-         when "dev" =>
-            for Default_Switches ("Ada") use
-              ("-gnatyg",
-               "-gnatwae",
-               "-gnatw.u", -- warn inappropriate use of unordered enums
-               "-g",
-               "-O0",
-               "-gnata",
-               "-gnatVa");
-      end case;
+      for Default_Switches ("Ada") use
+        ("-gnatyg",
+         "-gnatwae",
+         "-gnatw.u", -- warn inappropriate use of unordered enums
+         "-g",
+         "-O0",
+         "-gnata",
+         "-gnatVa");
    end Compiler;
 
 end Refactor_Imports;
