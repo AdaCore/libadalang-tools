@@ -21,13 +21,13 @@ Average cyclomatic complexity: 1.00
 
 Coupling metrics:
 =================
-   Unit Project1 (/src/project1/project1.adb)
+   Unit Project1 (project1.adb)
       control fan-out coupling  : 0
       control fan-in coupling   : 0
       unit fan-out coupling     : 0
       unit fan-in coupling      : 0
 
-   Unit Project2 (/src/project2/project2.adb)
+   Unit Project2 (project2.adb)
       control fan-out coupling  : 0
       control fan-in coupling   : 0
       unit fan-out coupling     : 0
