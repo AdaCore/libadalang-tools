@@ -1,0 +1,7 @@
+<SubpDecl ["Foo"] p.ads:3:4-3:32> <Id "Foo" main.adb:7:7-7:10>
+<SubpDecl ["Foo"] p.ads:3:4-3:32> <Id "Foo" main.adb:13:25-13:28>
+<SubpDecl ["Foo"] p.ads:3:4-3:32> <Id "Foo" main.adb:17:25-17:28>
+<SubpDecl ["Foo"] p.ads:3:4-3:32> <Id "Foo" main.adb:19:15-19:18>
+Node is not a name.
+Node is not a subprogram.
+Node is not a defining name.
