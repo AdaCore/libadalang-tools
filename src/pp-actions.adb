@@ -5642,7 +5642,7 @@ package body Pp.Actions is
       Put (" --comments-unchanged - do not format comments\n");
       Put (" --comments-gnat-indentation - GNAT style comment line indentation (default)\n");
       Put (" --comments-gnat-beginning - GNAT style comment beginning\n");
-      Put (" --comments-fill - fill comment blocks (default)\n");
+      Put (" --comments-fill - fill comment blocks (default, --no-comments-fill to disable)\n");
       Put (" --comments-special - do not change comments with a special character just after --\n");
       Put (" --comments-only - format just the comments\n");
       Put (" --indentation=n - indentation level, n from 1 .. 9 (default 3)\n");
