@@ -39,6 +39,10 @@ class Testsuite(e3.testsuite.Testsuite):
         self.env.fold_casing = self.main.args.fold_casing
         self.env.valgrind = self.main.args.valgrind
 
+        # We need to add "." to the PATH, because some tests run programs in
+        # the current directory.
+        os.environ['PATH'] = "%s:." % os.environ['PATH']
+
         # Put the testsuite drivers in the PATH
         script_dir = os.path.dirname(__file__)
         os.environ["PATH"] = "{}{}{}".format(

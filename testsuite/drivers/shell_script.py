@@ -30,10 +30,6 @@ class ShellScriptDriver(BaseDriver):
         return result
 
     def run(self):
-        # We need to add "." to the PATH, because some tests run programs in
-        # the current directory.
-        os.environ['PATH'] = "%s:." % os.environ['PATH']
-
         # Some tests expect the script to stop with an error status code: in
         # that case just print it so that the baseline catches it.
         p = self.shell(['bash', 'test.sh'], catch_error=False)
