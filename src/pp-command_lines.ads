@@ -261,7 +261,7 @@ package Pp.Command_Lines is
          Comments_Gnat_Indentation => False,
          Comments_Standard_Indentation => False,
          Comments_Gnat_Beginning => False,
-         Comments_Fill => True,
+         Comments_Fill => False,
          Comments_Special => False,
          End_Id => True,
          Separate_Is => True,
