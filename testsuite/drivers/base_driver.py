@@ -43,15 +43,21 @@ class BaseDriver(DiffTestDriver):
 
     @property
     def baseline(self):
-        # Allow a missing test.out -- treat as empty
+        # Allow a missing test.out or regex_test.out -- treat as empty
         test_out = self.test_dir("test.out")
+        regex_test_out = self.test_dir("regex_test.out")
+        regex = False
         if os.path.exists(test_out):
             with open(test_out, encoding=self.default_encoding) as f:
                 baseline = f.read()
+        elif os.path.exists(regex_test_out):
+            with open(regex_test_out, encoding=self.default_encoding) as f:
+                baseline = f.read()
+            regex = True
         else:
             baseline = ''
 
-        return (None, baseline, False)
+        return (None, baseline, regex)
 
     @property
     def test_control_creator(self):
