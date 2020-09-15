@@ -31,6 +31,10 @@ class Testsuite(e3.testsuite.Testsuite):
                             help='Ignore casing in testcase outputs')
         parser.add_argument('--valgrind', action='store_true',
                             help='Run tests under valgrind')
+        parser.add_argument(
+            '--rewrite', '-r', action='store_true',
+            help='Rewrite test baselines according to current output.'
+        )
 
     def set_up(self):
         super().set_up()
@@ -38,6 +42,7 @@ class Testsuite(e3.testsuite.Testsuite):
         self.env.no_wip = self.main.args.no_wip
         self.env.fold_casing = self.main.args.fold_casing
         self.env.valgrind = self.main.args.valgrind
+        self.env.rewrite_baselines = self.main.args.rewrite
 
         # We need to add "." to the PATH, because some tests run programs in
         # the current directory.

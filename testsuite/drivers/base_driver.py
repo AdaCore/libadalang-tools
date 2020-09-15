@@ -56,8 +56,9 @@ class BaseDriver(DiffTestDriver):
             regex = True
         else:
             baseline = ''
+            test_out = None
 
-        return (None, baseline, regex)
+        return (test_out, baseline, regex)
 
     @property
     def test_control_creator(self):
