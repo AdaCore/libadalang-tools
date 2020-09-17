@@ -552,6 +552,7 @@ package body Laltools.Common is
       Result : LALAnalysis.Defining_Name;
       use type LALAnalysis.Defining_Name;
    begin
+      Imprecise := False;
 
       --  First try to resolve precisely
       begin
