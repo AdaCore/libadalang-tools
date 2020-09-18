@@ -191,6 +191,9 @@ package Test.Common is
    --  String constants  --
    ------------------------
 
+   GT_Package : constant String := "gnattest";
+   --  Name of tool specific package in the project file.
+
    Test_Routine_Prefix      : constant String := "Test_";
    --  Prefix to each test routine
 
@@ -245,7 +248,7 @@ package Test.Common is
    Stub_Dir_Name     : GNAT.OS_Lib.String_Access := new String'
      ("gnattest" & GNAT.OS_Lib.Directory_Separator & "stubs");
 
-   Test_Subdir_Name  : String_Access := new String'("tests");
+   Test_Subdir_Name  : String_Access;
    --  Name of subdirectory to place test files in case of --sudbir option
 
    Separate_Root_Dir : String_Access;

@@ -69,6 +69,29 @@ package body Test.Actions is
    procedure Process_Exclusion_List (Value : String);
    --  Processes value of --exclude-from-stubbing switch
 
+   procedure Check_Direct;
+   --  Checks if there are no intersections between target and source dirs.
+   --  If everything is fine, tries to create target dirs.
+
+   procedure Check_Subdir;
+   --  Checks if there are no intersections between target and source dirs.
+   --  If everything is fine, tries to create all target subdirs.
+
+   procedure Check_Separate_Root;
+   --  Checks if there are no intersections between target and source dirs.
+   --  If everything is fine, tries to create a directory hierarchy similar
+   --  to one of the tested sources.
+
+   procedure Check_Stub;
+   --  Checks if there are no intersections between stub and source dirs and
+   --  between stub and test dirs.
+
+   function Non_Null_Intersection
+     (Left  : File_Array_Access;
+      Right : File_Array)
+      return Boolean;
+   --  Returns True if two file arrays have at least one common file.
+
    use Utils.Formatted_Output;
 
    pragma Warnings (Off); -- ????
@@ -94,6 +117,71 @@ package body Test.Actions is
    is
       Tmp   : GNAT.OS_Lib.String_Access;
       Files : File_Array_Access;
+
+      Root_Prj : Project_Type;
+
+      type Output_Mode_Type is (Root_Mode, Subdir_Mode, Direct_Mode);
+      Output_Mode : Output_Mode_Type := Direct_Mode;
+
+      Subdir_Mode_Att : constant Attribute_Pkg_String :=
+        Build (Test.Common.GT_Package, "subdir");
+      Root_Mode_Att   : constant Attribute_Pkg_String :=
+        Build (Test.Common.GT_Package, "tests_root");
+      Direct_Mode_Att : constant Attribute_Pkg_String :=
+        Build (Test.Common.GT_Package, "tests_dir");
+
+      function Build_Att_String
+        (Attribute_Name : String) return Attribute_Pkg_String
+      is
+        (Build (Test.Common.GT_Package, Attribute_Name));
+
+      --  Flags for default output dirs being set explicitly:
+      Stub_Dir_Set    : Boolean := False;
+      Tests_Dir_Set   : Boolean := False;
+      Harness_Dir_Set : Boolean := False;
+
+      procedure Report_Multiple_Output
+        (Second_Output_Mode : Output_Mode_Type;
+         From_Project       : Boolean := False);
+      --  Issue message about switches that correspond to Output_Mode and
+      --  Second_Output_Mode are mutually exclusive and raise
+      --  Command_Line_Error.
+
+      procedure Report_Multiple_Output
+        (Second_Output_Mode : Output_Mode_Type;
+         From_Project       : Boolean := False)
+      is
+         function Mode_Image_Cmd (M : Output_Mode_Type) return String is
+           (case M is
+                when Root_Mode   => "--tests-root",
+                when Subdir_Mode => "--subdir",
+                when Direct_Mode => "--tests-dir");
+
+         function Mode_Image_Att (M : Output_Mode_Type) return String is
+           (case M is
+                when Root_Mode   => "Tests_Root",
+                when Subdir_Mode => "Subdir",
+                when Direct_Mode => "Tests_Dir");
+      begin
+         Test.Common.Report_Err
+           ("gnattest: multiple output modes are not allowed");
+         if From_Project then
+            Cmd_Error_No_Help
+              ("gnattest: attributes "
+               & Mode_Image_Att (Output_Mode)
+               & " and "
+               & Mode_Image_Att (Second_Output_Mode)
+               & " are mutually exclusive");
+         else
+            Cmd_Error_No_Help
+              ("gnattest: options "
+               & Mode_Image_Cmd (Output_Mode)
+               & " and "
+               & Mode_Image_Cmd (Second_Output_Mode)
+               & " are mutually exclusive");
+         end if;
+      end Report_Multiple_Output;
+
    begin
       GNATCOLL.Traces.Parse_Config_File;
 
@@ -115,11 +203,140 @@ package body Test.Actions is
       Test.Common.Verbose := Arg (Cmd, Verbose);
       Test.Common.Harness_Only := Arg (Cmd, Harness_Only);
 
+      SPT := GNATCOLL.Projects.Project_Tree (Tool.Project_Tree.all);
+      Root_Prj := SPT.Root_Project;
+
+      --  Check for multiple output modes
+      if Arg (Cmd, Tests_Dir) /= null then
+
+         Output_Mode := Direct_Mode;
+
+         if Arg (Cmd, Tests_Root) /= null then
+            Report_Multiple_Output (Root_Mode);
+         elsif Arg (Cmd, Subdir) /= null then
+            Report_Multiple_Output (Subdir_Mode);
+         end if;
+
+         Tests_Dir_Set := True;
+         Free (Test.Common.Test_Dir_Name);
+         Test.Common.Test_Dir_Name := new String'
+           (Arg (Cmd, Tests_Dir).all);
+
+      elsif Arg (Cmd, Tests_Root) /= null then
+
+         Output_Mode := Root_Mode;
+
+         if Arg (Cmd, Subdir) /= null then
+            Report_Multiple_Output (Subdir_Mode);
+         end if;
+
+         Tests_Dir_Set := True;
+         Test.Common.Separate_Root_Dir := new String'
+           (Arg (Cmd, Tests_Root).all);
+
+      elsif Arg (Cmd, Subdir) /= null then
+
+         Output_Mode := Subdir_Mode;
+         Tests_Dir_Set := True;
+         Test.Common.Test_Subdir_Name := new String'
+           (Arg (Cmd, Subdir).all);
+
+      else
+
+         if Root_Prj.Has_Attribute (Direct_Mode_Att) then
+
+            Output_Mode := Direct_Mode;
+
+            if Root_Prj.Has_Attribute (Root_Mode_Att) then
+               Report_Multiple_Output (Root_Mode, True);
+            elsif Root_Prj.Has_Attribute (Subdir_Mode_Att) then
+               Report_Multiple_Output (Subdir_Mode, True);
+            end if;
+
+            Tests_Dir_Set := True;
+            Free (Test.Common.Test_Dir_Name);
+            Test.Common.Test_Dir_Name := new String'
+              (Root_Prj.Attribute_Value (Direct_Mode_Att));
+
+         elsif Root_Prj.Has_Attribute (Root_Mode_Att) then
+
+            Output_Mode := Root_Mode;
+
+            if Root_Prj.Has_Attribute (Subdir_Mode_Att) then
+               Report_Multiple_Output (Subdir_Mode, True);
+            end if;
+
+            Tests_Dir_Set := True;
+            Test.Common.Separate_Root_Dir := new String'
+              (Root_Prj.Attribute_Value (Subdir_Mode_Att));
+
+         elsif Root_Prj.Has_Attribute (Subdir_Mode_Att) then
+
+            Output_Mode := Subdir_Mode;
+            Tests_Dir_Set := True;
+            Test.Common.Test_Subdir_Name := new String'
+              (Root_Prj.Attribute_Value (Subdir_Mode_Att));
+
+         end if;
+
+      end if;
+
+      if Arg (Cmd, Stubs_Dir) /= null then
+
+         Free (Test.Common.Stub_Dir_Name);
+         Test.Common.Stub_Dir_Name := new String'(Arg (Cmd, Stubs_Dir).all);
+         Stub_Dir_Set := True;
+
+      elsif Root_Prj.Has_Attribute (Build_Att_String ("stubs_dir")) then
+
+         Free (Test.Common.Stub_Dir_Name);
+         Test.Common.Stub_Dir_Name := new String'
+           (Root_Prj.Attribute_Value (Build_Att_String ("stubs_dir")));
+         Stub_Dir_Set := True;
+
+      end if;
+
+      if Arg (Cmd, Harness_Dir) /= null then
+
+         Free (Test.Common.Harness_Dir_Str);
+         Test.Common.Harness_Dir_Str := new String'
+           (Arg (Cmd, Harness_Dir).all);
+         Harness_Dir_Set := True;
+
+      elsif Root_Prj.Has_Attribute (Build_Att_String ("harness_dir")) then
+
+         Free (Test.Common.Harness_Dir_Str);
+         Test.Common.Harness_Dir_Str := new String'
+           (Root_Prj.Attribute_Value (Build_Att_String ("harness_dir")));
+         Harness_Dir_Set := True;
+
+      end if;
+
+      --  Checking if argument project has IDE package specified.
+      declare
+         S : constant Attribute_Pkg_String := Build (Ide_Package, "");
+      begin
+         if Has_Attribute (Root_Prj, S) then
+            Test.Common.IDE_Package_Present := True;
+         else
+            Test.Common.IDE_Package_Present := False;
+         end if;
+      end;
+
+      --  Checking if argument project has Make package specified.
+      declare
+         S : constant Attribute_Pkg_String := Build ("make", "");
+      begin
+         if Has_Attribute (Root_Prj, S) then
+            Test.Common.Make_Package_Present := True;
+         else
+            Test.Common.Make_Package_Present := False;
+         end if;
+      end;
+
       --  We need to fill a local source table since gnattest actually needs
       --  info not only on current source but on any particular one or even
       --  all of them at once.
-
-      SPT := GNATCOLL.Projects.Project_Tree (Tool.Project_Tree.all);
 
       declare
          --  For now repeating code from Utils.Drivers to get rid of ignored
@@ -164,15 +381,35 @@ package body Test.Actions is
       Test.Common.Inheritance_To_Suite := Arg (Cmd, Inheritance_Check);
 
       if Arg (Cmd, Stub) then
-         Free (Test.Common.Test_Dir_Name);
-         Test.Common.Test_Dir_Name := new String'
-           ("gnattest_stub" & Directory_Separator & "tests");
-         Free (Test.Common.Stub_Dir_Name);
-         Test.Common.Stub_Dir_Name := new String'
-           ("gnattest_stub" & Directory_Separator & "stubs");
-         Free (Test.Common.Harness_Dir_Str);
-         Test.Common.Harness_Dir_Str := new String'
-           ("gnattest_stub" & Directory_Separator & "harness");
+
+         if Arg (Cmd, Harness_Only) then
+            Cmd_Error_No_Help
+              ("options --harness-only and --stub are incompatible");
+         end if;
+
+         if Arg (Cmd, Additional_Tests) /= null then
+            Cmd_Error_No_Help
+              ("options --additional-tests and --stub are incompatible");
+         end if;
+
+         if not Tests_Dir_Set then
+            Free (Test.Common.Test_Dir_Name);
+            Test.Common.Test_Dir_Name := new String'
+              ("gnattest_stub" & Directory_Separator & "tests");
+         end if;
+
+         if not Stub_Dir_Set then
+            Free (Test.Common.Stub_Dir_Name);
+            Test.Common.Stub_Dir_Name := new String'
+              ("gnattest_stub" & Directory_Separator & "stubs");
+         end if;
+
+         if not Harness_Dir_Set then
+            Free (Test.Common.Harness_Dir_Str);
+            Test.Common.Harness_Dir_Str := new String'
+              ("gnattest_stub" & Directory_Separator & "harness");
+         end if;
+
          Test.Skeleton.Source_Table.Initialize_Project_Table (SPT);
 
          Files := SPT.Root_Project.Source_Files (True);
@@ -212,34 +449,43 @@ package body Test.Actions is
          Unchecked_Free (Files);
 
       end if;
-      Test.Skeleton.Source_Table.Set_Direct_Output;
 
       --  Processing harness dir specification
-      --  --harness-dir is a string switch, so Arg returns null or a pointer to
-      --  the specified string.
 
-      if Arg (Cmd, Harness_Dir) /= null then
-         Free (Test.Common.Harness_Dir_Str);
-         if
-           Is_Absolute_Path (GNATCOLL.VFS.Create (+Arg (Cmd, Harness_Dir).all))
-         then
-            Test.Common.Harness_Dir_Str :=
-              new String'(Arg (Cmd, Harness_Dir).all);
-         else
-            Test.Common.Harness_Dir_Str := new String'
-              (Tool.Project_Tree.Root_Project.Object_Dir.Display_Full_Name
-               & Arg (Cmd, Harness_Dir).all);
-         end if;
+      if Is_Absolute_Path
+        (GNATCOLL.VFS.Create (+Test.Common.Harness_Dir_Str.all))
+      then
+         Tmp := Test.Common.Harness_Dir_Str;
+         Test.Common.Harness_Dir_Str := new String'
+           (Normalize_Pathname
+              (Tmp.all,
+               Case_Sensitive => False)
+            & Directory_Separator);
+         Free (Tmp);
       else
-         Tmp := new String'
-           (Tool.Project_Tree.Root_Project.Object_Dir.Display_Full_Name
-            & Test.Common.Harness_Dir_Str.all);
-         Free (Test.Common.Harness_Dir_Str);
-         Test.Common.Harness_Dir_Str := Tmp;
+         Tmp := Test.Common.Harness_Dir_Str;
+         Test.Common.Harness_Dir_Str := new String'
+           (Normalize_Pathname
+              (Root_Prj.Object_Dir.Display_Full_Name & Tmp.all,
+               Case_Sensitive => False)
+            & Directory_Separator);
+         Free (Tmp);
       end if;
 
+      for Dir of Root_Prj.Source_Dirs (Recursive => True) loop
+         if Test.Common.Harness_Dir_Str.all =
+           Normalize_Pathname
+             (Dir.Display_Full_Name, Case_Sensitive => False)
+           & Directory_Separator
+         then
+            Cmd_Error_No_Help
+              ("invalid harness directory, cannot mix up "
+               & "infrastructure and sources");
+         end if;
+      end loop;
+
       if Is_Regular_File (Test.Common.Harness_Dir_Str.all) then
-         Cmd_Error_No_Help ("gnattest: cannot create harness directory");
+         Cmd_Error_No_Help ("cannot create harness directory");
       elsif not Is_Directory (Test.Common.Harness_Dir_Str.all) then
 
          declare
@@ -250,21 +496,22 @@ package body Test.Actions is
             Test.Common.Create_Dirs (Dir);
          exception
             when GNAT.Directory_Operations.Directory_Error =>
-               Cmd_Error_No_Help ("gnattest: cannot create harness directory");
+               Cmd_Error_No_Help ("cannot create harness directory");
          end;
 
       end if;
 
-      Tmp := new String'(Normalize_Pathname
-        (Name           => Test.Common.Harness_Dir_Str.all,
-         Case_Sensitive => False));
-      Free (Test.Common.Harness_Dir_Str);
-      Test.Common.Harness_Dir_Str :=
-        new String'(Tmp.all & Directory_Separator);
-      Free (Tmp);
+      case Output_Mode is
+         when Direct_Mode =>
+            Check_Direct;
+         when Subdir_Mode =>
+            Check_Subdir;
+         when Root_Mode   =>
+            Check_Separate_Root;
+      end case;
 
       if Common.Stub_Mode_ON then
-         Test.Skeleton.Source_Table.Set_Direct_Stub_Output;
+         Check_Stub;
          declare
             Excludes : constant String_Ref_Array :=
               Arg (Cmd, Exclude_From_Stubbing);
@@ -446,5 +693,539 @@ package body Test.Actions is
       end;
 
    end Process_Exclusion_List;
+
+   ----------------------------------
+   -- Register_Specific_Attributes --
+   ----------------------------------
+
+   procedure Register_Specific_Attributes is
+      procedure Report_If_Err (S : String);
+      --  Outputs warning when attribute cannot be registered
+
+      procedure Report_If_Err (S : String) is
+      begin
+         if S = "" then
+            return;
+         else
+            Common.Report_Std (S);
+         end if;
+      end Report_If_Err;
+   begin
+      Report_If_Err
+        (GNATCOLL.Projects.Register_New_Attribute
+           (Name    => "gnattest_switches",
+            Pkg     => Test.Common.GT_Package,
+            Is_List => True,
+            Indexed => False));
+      Report_If_Err
+        (GNATCOLL.Projects.Register_New_Attribute
+           (Name => "harness_dir",
+            Pkg  => Test.Common.GT_Package));
+      Report_If_Err
+        (GNATCOLL.Projects.Register_New_Attribute
+           (Name => "subdir",
+            Pkg  => Test.Common.GT_Package));
+      Report_If_Err
+        (GNATCOLL.Projects.Register_New_Attribute
+           (Name => "tests_root",
+            Pkg  => Test.Common.GT_Package));
+      Report_If_Err
+        (GNATCOLL.Projects.Register_New_Attribute
+           (Name => "tests_dir",
+            Pkg  => Test.Common.GT_Package));
+      Report_If_Err
+        (GNATCOLL.Projects.Register_New_Attribute
+           (Name => "additional_tests",
+            Pkg  => Test.Common.GT_Package));
+      Report_If_Err
+        (GNATCOLL.Projects.Register_New_Attribute
+           (Name    => "stubs_dir",
+            Pkg     => Test.Common.GT_Package));
+      Report_If_Err
+        (GNATCOLL.Projects.Register_New_Attribute
+           (Name => "skeletons_default",
+            Pkg  => Test.Common.GT_Package));
+      Report_If_Err
+        (GNATCOLL.Projects.Register_New_Attribute
+           (Name => "default_stub_exclusion_list",
+            Pkg  => Test.Common.GT_Package));
+      Report_If_Err
+        (GNATCOLL.Projects.Register_New_Attribute
+           (Name    => "stub_exclusion_list",
+            Pkg     => Test.Common.GT_Package,
+            Indexed => True));
+
+      --  Not really a gnattest specific attribute, but we still need to
+      --  inherit makefile attribute in test driver.
+      Report_If_Err
+        (GNATCOLL.Projects.Register_New_Attribute
+           (Name => "makefile",
+            Pkg  => "make"));
+   end Register_Specific_Attributes;
+
+   ---------------------------
+   -- Non_Null_Intersection --
+   ---------------------------
+
+   function Non_Null_Intersection
+     (Left  : File_Array_Access;
+      Right : File_Array) return Boolean is
+   begin
+      for J in Left'Range loop
+         declare
+            Left_Str : constant String :=
+              Normalize_Pathname
+                (Name           => Left.all (J).Display_Full_Name,
+                 Case_Sensitive => False);
+         begin
+            for K in Right'Range loop
+
+               if Left_Str =
+                 Normalize_Pathname
+                   (Name           => Right (K).Display_Full_Name,
+                    Case_Sensitive => False)
+               then
+                  Test.Common.Report_Std
+                    ("gnattest: "
+                     & Left_Str & " is used for more than one purpose");
+                  return True;
+               end if;
+            end loop;
+         end;
+      end loop;
+
+      return False;
+   end Non_Null_Intersection;
+
+   ------------------
+   -- Check_Direct --
+   ------------------
+
+   procedure Check_Direct is
+      use Test.Common;
+
+      Tmp : String_Access;
+      TD_Name : constant Virtual_File :=
+        GNATCOLL.VFS.Create (+Test_Dir_Name.all);
+      Future_Dirs : File_Array_Access := new File_Array'(Empty_File_Array);
+      Harness_Dir_Ar : constant File_Array (1 .. 1) :=
+        (1 => Create (+(Harness_Dir_Str.all)));
+
+      Obj_Dir : String_Access;
+
+      All_Source_Locations : constant File_Array :=
+        Source_Project_Tree.Root_Project.Source_Dirs (Recursive => True);
+
+      Project  : Project_Type;
+      Iterator : Project_Iterator :=
+        Start (Source_Project_Tree.Root_Project);
+   begin
+
+      if TD_Name.Is_Absolute_Path then
+         Append (Future_Dirs, GNATCOLL.VFS.Create (+Test_Dir_Name.all));
+      else
+         loop
+            Project := Current (Iterator);
+            exit when Project = No_Project;
+
+            Obj_Dir := new String'(Project.Object_Dir.Display_Full_Name);
+            Tmp := new String'(Obj_Dir.all & Test_Dir_Name.all);
+            Append (Future_Dirs, GNATCOLL.VFS.Create (+Tmp.all));
+            Free (Tmp);
+            Free (Obj_Dir);
+
+            Next (Iterator);
+         end loop;
+      end if;
+
+      if Non_Null_Intersection (Future_Dirs, All_Source_Locations) then
+         Cmd_Error_No_Help
+           ("invalid output directory, cannot mix up "
+            & "tests and sources");
+      end if;
+
+      if Non_Null_Intersection (Future_Dirs, Harness_Dir_Ar) then
+         Cmd_Error_No_Help
+           ("invalid output directory, cannot mix up "
+            & "tests and infrastructure");
+      end if;
+
+      Unchecked_Free (Future_Dirs);
+
+      Test.Skeleton.Source_Table.Set_Direct_Output;
+   end Check_Direct;
+
+   ------------------
+   -- Check_Subdir --
+   ------------------
+
+   procedure Check_Subdir is
+      use Test.Common;
+
+      Future_Dirs : File_Array_Access := new File_Array'(Empty_File_Array);
+      --  List of dirs to be generated. The list is checked for intersections
+      --  with source dirs before any new directories are created.
+
+      Harness_Dir_Ar : constant File_Array (1 .. 1) :=
+        (1 => Create (+(Harness_Dir_Str.all)));
+
+      All_Source_Locations : constant File_Array :=
+        Source_Project_Tree.Root_Project.Source_Dirs (Recursive => True);
+   begin
+      for Loc of All_Source_Locations loop
+         Append (Future_Dirs, Loc / (+Test_Subdir_Name.all));
+      end loop;
+
+      if Non_Null_Intersection (Future_Dirs, All_Source_Locations) then
+         Cmd_Error_No_Help
+           ("invalid output directory, cannot mix up "
+            & "tests and sources");
+      end if;
+
+      if Non_Null_Intersection (Future_Dirs, Harness_Dir_Ar) then
+         Cmd_Error_No_Help
+           ("invalid output directory, cannot mix up "
+            & "tests and infrastructure");
+      end if;
+
+      Test.Skeleton.Source_Table.Set_Subdir_Output;
+   end Check_Subdir;
+
+   -------------------------
+   -- Check_Separate_Root --
+   -------------------------
+
+   procedure Check_Separate_Root is
+      use Test.Common;
+
+      RD_Name : constant Virtual_File :=
+        GNATCOLL.VFS.Create (+Separate_Root_Dir.all);
+
+      Tmp, Buff    : String_Access;
+      Maximin_Root : String_Access;
+      Root_Length  : Integer;
+
+      Future_Dirs : File_Array_Access := new File_Array'(Empty_File_Array);
+      --  List of dirs to be generated. The list is checked for intersections
+      --  with source dirs before any new directories are created.
+
+      Harness_Dir_Ar : constant File_Array (1 .. 1) :=
+        (1 => Create (+(Harness_Dir_Str.all)));
+
+      All_Source_Locations : constant File_Array :=
+        Source_Project_Tree.Root_Project.Source_Dirs (Recursive => True);
+
+      Files : File_Array_Access;
+      Project  : Project_Type;
+      Iterator : Project_Iterator :=
+        Start_Reversed (Source_Project_Tree.Root_Project);
+
+      Ext_Bld : constant Attribute_Pkg_String :=
+        Build ("", "externally_built");
+
+      Obj_Dir                 : String_Access;
+      Local_Separate_Root_Dir : String_Access;
+
+      function Common_Root (Left : String; Right : String) return String;
+      --  Returns the coincident beginning of both paths or an empty string.
+
+      -------------------
+      --  Common_Root  --
+      -------------------
+
+      function Common_Root (Left : String; Right : String) return String is
+         Idxl : Integer := Left'First;
+         Idxr : Integer := Right'First;
+
+         Last_Dir_Sep_Index : Integer := Idxl - 1;
+         --  We need to check for the following:
+         --  ...somepath/dir/
+         --  ...somepath/directory/
+
+      begin
+         if Left = "" or Right = "" then
+            return "";
+         end if;
+
+         loop
+            if Left (Idxl) = Directory_Separator
+              and then Right (Idxr) = Directory_Separator
+            then
+               Last_Dir_Sep_Index := Idxl;
+            end if;
+
+            if Left (Idxl) /= Right (Idxr) then
+               return Left (Left'First .. Last_Dir_Sep_Index);
+            end if;
+
+            exit when Idxl = Left'Last or Idxr = Right'Last;
+
+            Idxl := Idxl + 1;
+            Idxr := Idxr + 1;
+         end loop;
+
+         return Left (Left'First .. Idxl);
+      end Common_Root;
+
+   begin
+
+      if RD_Name.Is_Absolute_Path then
+
+         Test.Skeleton.Source_Table.Reset_Location_Iterator;
+         Tmp := new String'
+           (Test.Skeleton.Source_Table.Next_Source_Location);
+         Maximin_Root := new String'(Tmp.all);
+
+         loop
+            Tmp := new String'
+              (Test.Skeleton.Source_Table.Next_Source_Location);
+            exit when Tmp.all = "";
+
+            Buff := new String'(Common_Root (Tmp.all, Maximin_Root.all));
+
+            if Buff.all = "" then
+               Cmd_Error_No_Help
+                 ("gnattest: sources have different root dirs, "
+                  & "cannot apply separate root output");
+            end if;
+
+            Free (Maximin_Root);
+            Maximin_Root := new String'(Buff.all);
+            Free (Buff);
+            Free (Tmp);
+         end loop;
+
+         Root_Length := Maximin_Root.all'Length;
+
+         Separate_Root_Dir := new String'
+           (Normalize_Pathname (Name => Separate_Root_Dir.all,
+                                Case_Sensitive => False));
+
+         Test.Skeleton.Source_Table.Reset_Location_Iterator;
+
+         loop
+            Tmp := new String'
+              (Test.Skeleton.Source_Table.Next_Source_Location);
+            exit when Tmp.all = "";
+
+            Append (Future_Dirs, GNATCOLL.VFS.Create
+              (+(Separate_Root_Dir.all & Directory_Separator &
+                 Tmp.all (Root_Length + 1 .. Tmp.all'Last))));
+
+            Free (Tmp);
+         end loop;
+
+         if Non_Null_Intersection (Future_Dirs, All_Source_Locations) then
+            Cmd_Error_No_Help
+              ("gnattest: invalid output directory, cannot mix up "
+               & "tests and sources");
+         end if;
+
+         if Non_Null_Intersection (Future_Dirs, Harness_Dir_Ar) then
+            Cmd_Error_No_Help
+              ("gnattest: invalid output directory, cannot mix up "
+               & "tests and infrastructure");
+         end if;
+
+         Test.Skeleton.Source_Table.Set_Separate_Root (Maximin_Root.all);
+      else
+
+         loop
+            Project := Current (Iterator);
+            exit when Project = No_Project;
+
+            declare
+               Dirs : constant File_Array := Project.Source_Dirs (False);
+
+               Common_Root_Dir : String_Access;
+            begin
+               if Dirs'Length > 0 then
+                  Common_Root_Dir := new String'
+                    (Dirs (Dirs'First).Display_Full_Name);
+
+                  for J in Dirs'Range loop
+                     Tmp := new String'(Dirs (J).Display_Full_Name);
+                     Buff := new String'
+                       (Common_Root (Tmp.all, Common_Root_Dir.all));
+
+                     if Buff.all = "" then
+                        Cmd_Error_No_Help
+                          ("gnattest: sources have different root dirs, "
+                           & "cannot apply separate root output");
+                     end if;
+
+                     Free (Common_Root_Dir);
+                     Common_Root_Dir := new String'(Buff.all);
+                     Free (Buff);
+                     Free (Tmp);
+                  end loop;
+
+                  for J in Dirs'Range loop
+                     if Dirs (J).Display_Full_Name = Common_Root_Dir.all then
+                        Maximin_Root := Common_Root_Dir;
+                        exit;
+                     end if;
+                  end loop;
+               end if;
+            end;
+
+            Files := Project.Source_Files;
+
+            if Files'Length > 0 then
+               if Maximin_Root = null then
+                  Maximin_Root := new String'
+                    (Files (Files'First).Display_Dir_Name);
+               end if;
+
+               for F in Files'Range loop
+                  Tmp := new String'(Files (F).Display_Dir_Name);
+                  Buff := new String'(Common_Root (Tmp.all, Maximin_Root.all));
+
+                  if Buff.all = "" then
+                     Cmd_Error_No_Help
+                       ("gnattest: sources have different root dirs, "
+                        & "cannot apply separate root output");
+                  end if;
+
+                  Free (Maximin_Root);
+                  Maximin_Root := new String'(Buff.all);
+                  Free (Buff);
+                  Free (Tmp);
+               end loop;
+
+               Root_Length := Maximin_Root.all'Length;
+
+               Obj_Dir := new String'(Project.Object_Dir.Display_Full_Name);
+
+               Local_Separate_Root_Dir := new String'
+                 (Normalize_Pathname
+                    (Name => Obj_Dir.all & Separate_Root_Dir.all,
+                     Case_Sensitive => False));
+
+               for F in Files'Range loop
+
+                  if
+                    Source_Project_Tree.Info (Files (F)).Unit_Part = Unit_Spec
+                    and then Test.Skeleton.Source_Table.Source_Present
+                      (Files (F).Display_Full_Name)
+                  then
+                     Tmp := new String'(Files (F).Display_Dir_Name);
+
+                     Append (Future_Dirs, GNATCOLL.VFS.Create
+                       (+(Local_Separate_Root_Dir.all & Directory_Separator &
+                          Tmp.all (Root_Length + 1 .. Tmp.all'Last))));
+
+                     Test.Skeleton.Source_Table.Set_Output_Dir
+                       (Files (F).Display_Full_Name,
+                        Local_Separate_Root_Dir.all & Directory_Separator &
+                        Tmp.all (Root_Length + 1 .. Tmp.all'Last));
+                  end if;
+
+               end loop;
+
+            end if;
+
+            --  Externally built projects should be skipped.
+            loop
+               Next (Iterator);
+
+               if
+                 Current (Iterator) = No_Project
+                 or else (not Has_Attribute (Current (Iterator), Ext_Bld))
+                 or else
+                   To_Lower
+                     (Attribute_Value (Current (Iterator), Ext_Bld)) /= "true"
+               then
+                  exit;
+               end if;
+            end loop;
+         end loop;
+
+         if Non_Null_Intersection (Future_Dirs, All_Source_Locations) then
+            Cmd_Error_No_Help
+              ("gnattest: invalid output directory, cannot mix up "
+               & "tests and sources");
+         end if;
+
+         if Non_Null_Intersection (Future_Dirs, Harness_Dir_Ar) then
+            Cmd_Error_No_Help
+              ("gnattest: invalid output directory, cannot mix up "
+               & "tests and infrastructure");
+         end if;
+
+      end if;
+
+   end Check_Separate_Root;
+
+   ----------------
+   -- Check_Stub --
+   ----------------
+
+   procedure Check_Stub is
+      use Test.Common;
+
+      Tmp : String_Access;
+      SD_Name : constant Virtual_File :=
+        GNATCOLL.VFS.Create (+Stub_Dir_Name.all);
+      Future_Dirs : File_Array_Access := new File_Array'(Empty_File_Array);
+
+      All_Source_Locations : constant File_Array :=
+        Source_Project_Tree.Root_Project.Source_Dirs (Recursive => True);
+
+      Obj_Dir : String_Access;
+
+      Project  : Project_Type;
+      Iterator : Project_Iterator :=
+        Start (Source_Project_Tree.Root_Project);
+   begin
+
+      --  look for collisions with source dirs
+      if SD_Name.Is_Absolute_Path then
+         Append (Future_Dirs, GNATCOLL.VFS.Create (+Test_Dir_Name.all));
+      else
+         loop
+            Project := Current (Iterator);
+            exit when Project = No_Project;
+
+            Obj_Dir := new String'(Project.Object_Dir.Display_Full_Name);
+            Tmp := new String'(Obj_Dir.all & Stub_Dir_Name.all);
+            Append (Future_Dirs, GNATCOLL.VFS.Create (+Tmp.all));
+            Free (Tmp);
+            Free (Obj_Dir);
+
+            Next (Iterator);
+         end loop;
+      end if;
+
+      if Non_Null_Intersection (Future_Dirs, All_Source_Locations) then
+         Cmd_Error_No_Help
+           ("gnattest: invalid stub directory, cannot mix up "
+            & "stubs and source files");
+      end if;
+
+      Test.Skeleton.Source_Table.Set_Direct_Stub_Output;
+
+      --  Once stub dirs are set we can compare them with test dirs per source.
+      Skeleton.Source_Table.Reset_Source_Iterator;
+      Tmp := new String'(Skeleton.Source_Table.Next_Source_Name);
+      while Tmp.all /= "" loop
+         if
+           Skeleton.Source_Table.Get_Source_Output_Dir (Tmp.all) =
+           Skeleton.Source_Table.Get_Source_Stub_Dir (Tmp.all)
+         then
+            Test.Common.Report_Std
+              ("gnattest: "
+               & Skeleton.Source_Table.Get_Source_Stub_Dir (Tmp.all)
+               & " is used for more than one purpose");
+            Cmd_Error_No_Help
+              ("gnattest: invalid stub directory, cannot mix up "
+               & "stubs and tests");
+         end if;
+         Free (Tmp);
+         Tmp := new String'(Skeleton.Source_Table.Next_Source_Name);
+      end loop;
+
+      Skeleton.Source_Table.Reset_Source_Iterator;
+   end Check_Stub;
 
 end Test.Actions;

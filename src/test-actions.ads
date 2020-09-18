@@ -6,7 +6,7 @@
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
---                       Copyright (C) 2019, AdaCore                        --
+--                     Copyright (C) 2019-2020, AdaCore                     --
 --                                                                          --
 -- GNATTEST  is  free  software;  you  can redistribute it and/or modify it --
 -- under terms of the  GNU  General Public License as published by the Free --
@@ -27,13 +27,13 @@ with Libadalang.Analysis; use Libadalang.Analysis;
 with Utils.Command_Lines; use Utils.Command_Lines;
 with Utils.Tools;         use Utils.Tools;
 
-pragma Warnings (Off); -- ????
-private with Test.Command_Lines; -- ????might want this here, or in body
-pragma Warnings (On);
-
 package Test.Actions is
 
    type Test_Tool is new Tool_State with private;
+
+   procedure Register_Specific_Attributes;
+   --  Registers gnattest specific project attributes so that they can be
+   --  queried later.
 
 private
 
@@ -49,8 +49,6 @@ private
    overriding procedure Final (Tool : in out Test_Tool; Cmd : Command_Line);
    overriding procedure Tool_Help (Tool : Test_Tool);
 
-   type Test_Tool is new Tool_State with record
-      null; -- ????
-   end record;
+   type Test_Tool is new Tool_State with null record;
 
 end Test.Actions;

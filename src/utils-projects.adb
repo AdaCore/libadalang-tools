@@ -696,6 +696,8 @@ package body Utils.Projects is
            Build (Tool_Package_Name, "Switches");
          Attr_Def_Switches : constant Attribute_Pkg_List :=
            Build (Tool_Package_Name, "Default_Switches");
+         Attr_GT_Switches : constant Attribute_Pkg_List :=
+           Build (Tool_Package_Name, "GNATtest_Switches");
 
          Attr_Indexes : String_List_Access;
          Index_Found  : Boolean := False;
@@ -723,6 +725,9 @@ package body Utils.Projects is
             if Has_Attribute (Proj, Attr_Def_Switches, "ada") then
                Project_Switches_Text :=
                  Attribute_Value (Proj, Attr_Def_Switches, "ada");
+            elsif Has_Attribute (Proj, Attr_GT_Switches) then
+               Project_Switches_Text :=
+                 Attribute_Value (Proj, Attr_GT_Switches);
             end if;
          else
             if Has_Attribute (Proj, Attr_Switches) then
