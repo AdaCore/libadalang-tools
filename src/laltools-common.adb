@@ -243,14 +243,16 @@ package body Laltools.Common is
    -------------------------
 
    function Find_Canonical_Part
-     (Definition : LALAnalysis.Defining_Name;
-      Trace      : GNATCOLL.Traces.Trace_Handle)
+     (Definition         : LALAnalysis.Defining_Name;
+      Trace              : GNATCOLL.Traces.Trace_Handle;
+      Imprecise_Fallback : Boolean := False)
       return LALAnalysis.Defining_Name
    is
       Canonical : LALAnalysis.Defining_Name;
       use type LALAnalysis.Defining_Name;
    begin
-      Canonical := Definition.P_Canonical_Part;
+      Canonical :=
+        Definition.P_Canonical_Part (Imprecise_Fallback => Imprecise_Fallback);
 
       if Canonical = Definition then
          return LALAnalysis.No_Defining_Name;
@@ -269,14 +271,16 @@ package body Laltools.Common is
    --------------------
 
    function Find_Next_Part
-     (Definition : LALAnalysis.Defining_Name;
-      Trace      : GNATCOLL.Traces.Trace_Handle)
+     (Definition         : LALAnalysis.Defining_Name;
+      Trace              : GNATCOLL.Traces.Trace_Handle;
+      Imprecise_Fallback : Boolean := False)
       return LALAnalysis.Defining_Name
    is
       Next   : LALAnalysis.Defining_Name;
       use type LALAnalysis.Defining_Name;
    begin
-      Next := Definition.P_Next_Part;
+      Next :=
+        Definition.P_Next_Part (Imprecise_Fallback => Imprecise_Fallback);
 
       if Next = Definition then
          return LALAnalysis.No_Defining_Name;

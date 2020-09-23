@@ -128,15 +128,17 @@ package Laltools.Common is
    --  Return True if the node belongs to derived type declaration.
 
    function Find_Canonical_Part
-     (Definition : LALAnalysis.Defining_Name;
-      Trace      : GNATCOLL.Traces.Trace_Handle)
+     (Definition         : LALAnalysis.Defining_Name;
+      Trace              : GNATCOLL.Traces.Trace_Handle;
+      Imprecise_Fallback : Boolean := False)
       return LALAnalysis.Defining_Name;
    --  Wrapper around P_Canonical_Part that returns null if canonical part
    --  is name itself. It also catches Property_Error and reports it in traces.
 
    function Find_Next_Part
-     (Definition : LALAnalysis.Defining_Name;
-      Trace      : GNATCOLL.Traces.Trace_Handle)
+     (Definition         : LALAnalysis.Defining_Name;
+      Trace              : GNATCOLL.Traces.Trace_Handle;
+      Imprecise_Fallback : Boolean := False)
       return LALAnalysis.Defining_Name;
    --  Wrapper around P_Next_Part that returns No_Defining_Name if next part
    --  is name itself. It also catches Property_Error and reports it in traces.
