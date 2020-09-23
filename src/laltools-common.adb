@@ -29,6 +29,8 @@ with Ada.Wide_Wide_Characters.Handling;
 
 with GNAT.Traceback.Symbolic;
 
+with Libadalang.Iterators;
+
 package body Laltools.Common is
 
    procedure Log
@@ -404,6 +406,25 @@ package body Laltools.Common is
          Log (Trace, E);
          return LALAnalysis.No_Defining_Name;
    end Find_Other_Part_Fallback;
+
+   --------------------------------------------
+   --  Get_First_Identifier_From_Declaration --
+   --------------------------------------------
+
+   function Get_First_Identifier_From_Declaration
+     (Decl : LALAnalysis.Basic_Decl'Class) return LALAnalysis.Identifier
+   is
+      Node : constant LALAnalysis.Ada_Node :=
+        Libadalang.Iterators.Find_First
+          (Decl, Libadalang.Iterators.Kind_Is (LALCommon.Ada_Identifier));
+      use type LALAnalysis.Ada_Node;
+   begin
+      if Node /= LALAnalysis.No_Ada_Node then
+         return Node.As_Identifier;
+      else
+         return LALAnalysis.No_Identifier;
+      end if;
+   end Get_First_Identifier_From_Declaration;
 
    -------------------
    -- Get_Last_Name --

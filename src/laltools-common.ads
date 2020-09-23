@@ -151,6 +151,10 @@ package Laltools.Common is
    --  This should be called only if straightforward Libadalang calls
    --  have failed.
 
+   function Get_First_Identifier_From_Declaration
+     (Decl : LALAnalysis.Basic_Decl'Class) return LALAnalysis.Identifier;
+   --  Return the first identifier found in a basic declaration.
+
    function Get_Last_Name (Name_Node : LALAnalysis.Name)
                            return LKSText.Unbounded_Text_Type;
    --  Return the last name, for example if name is A.B.C then return C.

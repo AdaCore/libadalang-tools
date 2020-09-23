@@ -1,0 +1,4 @@
+description:
+    refactor_imports - This test proves that overloaded subprograms do not cause a duplicated suggestion.
+
+driver: shell_script

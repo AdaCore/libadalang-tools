@@ -26,25 +26,23 @@ with Ada.Strings;
 with Langkit_Support.Errors;
 
 with Libadalang.Common;
-with Libadalang.Iterators;
 
 package body Laltools.Refactor_Imports is
 
    package LALCommon renames Libadalang.Common;
-   package LALIterators renames Libadalang.Iterators;
 
    package Parent_Packages_Vector is new Ada.Containers.Vectors
      (Index_Type => Natural, Element_Type => LALAnalysis.Basic_Decl,
       "="        => LALAnalysis."=");
 
+   function Weak_Equivalent (Left, Right : Import_Suggestion) return Boolean;
+   --  True if Declaration's defining name text is the same, as well as the
+   --  with clause and the prefix. For instance, overloaded subprograms.
+
    function Is_Specification_Unit
      (Unit : LALAnalysis.Analysis_Unit) return Boolean;
    --  Check if Unit is an analysis unit of a package specification file.
    --  ??? Possibly move this function to Libadalang.
-
-   function Get_First_Identifier_From_Declaration
-     (Decl : LALAnalysis.Basic_Decl'Class) return LALAnalysis.Identifier;
-   --  Return the first identifier found in a basic declaration.
 
    function Get_Generic_Package_Internal
      (Gen_Pkg_Instantiation : LALAnalysis.Generic_Package_Instantiation)
@@ -96,11 +94,18 @@ package body Laltools.Refactor_Imports is
      (Node : LALAnalysis.Ada_Node'Class) return Parent_Packages_Vector.Vector;
    --  Finds all parent packages of a node that is inside nested packages
 
+   procedure Remove_Duplicated_Suggestions
+     (Suggestions_Vector : in out Import_Suggestions_Vector.Vector);
+   --  Removes duplicate suggestions using the Weak_Equivalent function.
+   --  Suggestions_Vector must be sorted.
+
    ---------
    -- "<" --
    ---------
 
-   function "<" (Left, Right : Import_Suggestion) return Boolean is
+   function "<" (Left, Right : Import_Suggestion)
+                 return Boolean
+   is
       use type LKSText.Unbounded_Text_Type;
    begin
       if Left.With_Clause_Text = Right.With_Clause_Text then
@@ -108,6 +113,21 @@ package body Laltools.Refactor_Imports is
       end if;
       return Left.With_Clause_Text < Right.With_Clause_Text;
    end "<";
+
+   ---------------------
+   -- Weak_Equivalent --
+   ---------------------
+
+   function Weak_Equivalent (Left, Right : Import_Suggestion)
+                             return Boolean
+   is
+      use type LKSText.Unbounded_Text_Type;
+   begin
+      return Left.Declaration.P_Defining_Name.Text
+        = Right.Declaration.P_Defining_Name.Text
+        and then Left.With_Clause_Text = Right.With_Clause_Text
+        and then Left.Prefix_Text = Right.Prefix_Text;
+   end Weak_Equivalent;
 
    ---------------------
    -- Basic_Decl_Hash --
@@ -169,25 +189,6 @@ package body Laltools.Refactor_Imports is
       end if;
       return False;
    end Is_Specification_Unit;
-
-   --------------------------------------------
-   --  Get_First_Identifier_From_Declaration --
-   --------------------------------------------
-
-   function Get_First_Identifier_From_Declaration
-     (Decl : LALAnalysis.Basic_Decl'Class) return LALAnalysis.Identifier
-   is
-      Node : constant LALAnalysis.Ada_Node :=
-        LALIterators.Find_First
-          (Decl, LALIterators.Kind_Is (LALCommon.Ada_Identifier));
-      use type LALAnalysis.Ada_Node;
-   begin
-      if Node /= LALAnalysis.No_Ada_Node then
-         return Node.As_Identifier;
-      else
-         return LALAnalysis.No_Identifier;
-      end if;
-   end Get_First_Identifier_From_Declaration;
 
    ------------------------------------------
    -- List_And_Expand_Package_Declarations --
@@ -314,22 +315,16 @@ package body Laltools.Refactor_Imports is
 
       procedure Append (Decl : LALAnalysis.Basic_Decl)
       is
-         Identifier : constant LALAnalysis.Identifier :=
-           Get_First_Identifier_From_Declaration (Decl);
-         use type LALAnalysis.Identifier;
+         Text : constant LKSText.Text_Type := Decl.P_Defining_Name.F_Name.Text;
       begin
-         if Identifier = LALAnalysis.No_Identifier then
-            return;
-         end if;
-
-         if Decls_Map.Contains (Identifier.Text) then
-            Decls_Map.Reference (Identifier.Text).Include (Decl);
+         if Decls_Map.Contains (Text) then
+            Decls_Map.Reference (Text).Include (Decl);
          else
             declare
                Decls_Set : Reachable_Declarations_Hashed_Set.Set;
             begin
                Decls_Set.Include (Decl);
-               Decls_Map.Insert (Identifier.Text, Decls_Set);
+               Decls_Map.Insert (Text, Decls_Set);
             end;
          end if;
       end Append;
@@ -681,6 +676,36 @@ package body Laltools.Refactor_Imports is
       end;
       return Reach_Decls;
    end Get_Local_Unit_Reachable_Declarations;
+
+   -----------------------------------
+   -- Remove_Duplicated_Suggestions --
+   -----------------------------------
+
+   procedure Remove_Duplicated_Suggestions
+     (Suggestions_Vector : in out Import_Suggestions_Vector.Vector)
+   is
+      Unique_Suggestions_Vector : Import_Suggestions_Vector.Vector;
+      J : Import_Suggestions_Vector.Extended_Index := 0;
+      use type Ada.Containers.Count_Type;
+   begin
+      if Suggestions_Vector.Length < 2 then
+         return;
+      end if;
+
+      Unique_Suggestions_Vector.Append (Suggestions_Vector.First_Element);
+      for K in 1 .. Import_Suggestions_Vector.Extended_Index
+        (Suggestions_Vector.Length) - 1
+      loop
+         if not Weak_Equivalent
+           (Suggestions_Vector.Element (J),
+            Suggestions_Vector.Element (K))
+         then
+            Unique_Suggestions_Vector.Append (Suggestions_Vector.Element (K));
+         end if;
+         J := J + 1;
+      end loop;
+      Suggestions_Vector := Unique_Suggestions_Vector;
+   end Remove_Duplicated_Suggestions;
 
    --------------------------------
    -- Get_Reachable_Declarations --
@@ -1075,6 +1100,7 @@ package body Laltools.Refactor_Imports is
       end loop;
 
       Import_Suggestions_Vector_Sorting.Sort (Suggestions);
+      Remove_Duplicated_Suggestions (Suggestions);
       return Suggestions;
    end Get_Import_Suggestions;
 
