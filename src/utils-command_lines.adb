@@ -1106,7 +1106,11 @@ package body Utils.Command_Lines is
                         Text       => null,
                         Explicit => False,
                         String_Val =>
-                          Descriptor.Allowed_Switches (Switch).Default);
+                          (if Descriptor.Allowed_Switches
+                               (Switch).Default = null
+                           then null
+                           else new String'(Descriptor.Allowed_Switches
+                              (Switch).Default.all)));
 
                   when String_Seq_Switch =>
                      Cmd.Sw (Switch) :=
@@ -1199,8 +1203,6 @@ package body Utils.Command_Lines is
 
          Free (Vector);
       end Destroy;
-
-      Descriptor : Command_Line_Descriptor renames Cmd.Descriptor.all;
    begin
       Destroy (Cmd.File_Names);
 
@@ -1211,11 +1213,7 @@ package body Utils.Command_Lines is
       for Switch in Cmd.Sw'Range loop
          case Cmd.Sw (Switch).Kind is
             when String_Switch =>
-               if Cmd.Sw (Switch).String_Val /=
-                 Descriptor.Allowed_Switches (Switch).Default
-               then
-                  Free (Cmd.Sw (Switch).String_Val);
-               end if;
+               Free (Cmd.Sw (Switch).String_Val);
             when String_Seq_Switch =>
                Destroy (Cmd.Sw (Switch).Seq_Val);
             when others =>
@@ -1300,9 +1298,10 @@ package body Utils.Command_Lines is
                   when Enum_Switch =>
                      null; -- Too much trouble to determine default here
                   when String_Switch =>
-                     if Sw (Switch).String_Val =
-                       Descriptor.Allowed_Switches (Switch).Default
-                     then
+                     if Sw (Switch).String_Val = null then
+                        --  This means that
+                        --     Descriptor.Allowed_Switches (Switch).Default
+                        --  is null as well: we can continue
                         goto Continue;
                      end if;
                      if Descriptor.Allowed_Switches (Switch).Default /= null
