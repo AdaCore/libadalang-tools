@@ -7434,6 +7434,23 @@ package body Test.Skeleton is
          Put_New_Line;
       end if;
 
+      S_Put (3, "for Object_Dir use ""test_obj"";");
+      Put_New_Line;
+      declare
+         Obj_Dir : constant String :=
+           Harness_Dir_Str.all
+           & Directory_Separator
+           & "test_obj";
+         Dir     : File_Array_Access;
+      begin
+         Append (Dir, GNATCOLL.VFS.Create (+Obj_Dir));
+         Create_Dirs (Dir);
+      exception
+         when Directory_Error =>
+            Cmd_Error_No_Help
+              ("cannot create directory " & Obj_Dir);
+      end;
+
       S_Put (3, "for Languages use Gnattest_Common'Languages & (""Ada"");");
       Put_New_Line;
 
@@ -7460,6 +7477,14 @@ package body Test.Skeleton is
          Put_New_Line;
          Put_New_Line;
       end if;
+
+      S_Put (3, "package Coverage is");
+      Put_New_Line;
+      S_Put (6, "for Units use ();");
+      Put_New_Line;
+      S_Put (3, "end Coverage;");
+      Put_New_Line;
+      Put_New_Line;
 
       S_Put
         (0,

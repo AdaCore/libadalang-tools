@@ -32,7 +32,6 @@ with GNAT.Directory_Operations;   use GNAT.Directory_Operations;
 
 with Ada.Characters.Handling;     use Ada.Characters.Handling;
 with Ada.Containers;              use Ada.Containers;
-with Ada.Containers.Indefinite_Ordered_Sets;
 with Ada.Containers.Vectors;
 
 with Ada.Strings;                 use Ada.Strings;
@@ -68,6 +67,7 @@ package body Test.Harness is
       Test_Data        : String_Access := null;
       UUT_File_Name    : String_Access := null;
       Sources_List     : List_Of_Strings.List := List_Of_Strings.Empty_List;
+      Units_List       : List_Of_Strings.List := List_Of_Strings.Empty_List;
    end record;
 
    package Separate_Project_Info_Vectors is new
@@ -732,6 +732,14 @@ package body Test.Harness is
          Put_New_Line;
       end if;
 
+      S_Put (3, "package Coverage is");
+      Put_New_Line;
+      S_Put (6, "for Units use ();");
+      Put_New_Line;
+      S_Put (3, "end Coverage;");
+      Put_New_Line;
+      Put_New_Line;
+
       if not Harness_Only then
          S_Put (3, "package GNATtest is");
          Put_New_Line;
@@ -1393,6 +1401,9 @@ package body Test.Harness is
                         begin
                            if App /= "" then
                               SPI.Sources_List.Append (App);
+                              SPI.Units_List.Append
+                                (Skeleton.Source_Table.Get_Source_Unit_Name
+                                   (App));
                               declare
                                  SD_Spec : constant String :=
                                    Test.Skeleton.Source_Table.
@@ -1405,6 +1416,11 @@ package body Test.Harness is
                                    Excluded_Test_Data_Files.Contains (SD_Spec)
                                  then
                                     SPI.Sources_List.Append (SD_Spec);
+                                    SPI.Units_List.Append
+                                      (Skeleton.Source_Table.
+                                         Get_Source_Unit_Name (App)
+                                       & "."
+                                       & Stub_Data_Unit_Name);
                                  end if;
                                  if not
                                    Excluded_Test_Data_Files.Contains (SD_Body)
@@ -1918,12 +1934,10 @@ package body Test.Harness is
 
       Tmp, Current_Infix : String_Access;
 
-      package Srcs is new
-        Ada.Containers.Indefinite_Ordered_Sets (String);
-      use Srcs;
+      Out_Dirs     : String_Set.Set;
+      Out_Dirs_Cur : String_Set.Cursor;
 
-      Out_Dirs     : Srcs.Set;
-      Out_Dirs_Cur : Srcs.Cursor;
+      use String_Set;
 
       procedure Add_Nesting_Hierarchy_Dummies (S : String);
       --  For nested packages corresponding test packages are children to a
@@ -2206,6 +2220,28 @@ package body Test.Harness is
          Put_New_Line;
          Put_New_Line;
 
+         S_Put (3, "package Coverage is");
+         Put_New_Line;
+         S_Cur := P.Units_List.First;
+         if S_Cur /= List_Of_Strings.No_Element then
+            S_Put (6, "for Excluded_Units use (");
+            Put_New_Line;
+            while S_Cur /= List_Of_Strings.No_Element loop
+               S_Put
+                 (9,
+                  """"
+                  & List_Of_Strings.Element (S_Cur)
+                  & """"
+                  & (if S_Cur = P.Units_List.Last then ");" else ","));
+               Put_New_Line;
+
+               Next (S_Cur);
+            end loop;
+         end if;
+         S_Put (3, "end Coverage;");
+         Put_New_Line;
+         Put_New_Line;
+
          S_Put
            (0,
             "end "
@@ -2344,12 +2380,12 @@ package body Test.Harness is
             S_Put
               (0,
                +Relative_Path
-                 (Create (+Srcs.Element (Out_Dirs_Cur)),
+                 (Create (+String_Set.Element (Out_Dirs_Cur)),
                   Create (+Dir_Name (P.Path_TD.all))) &
                  """");
             loop
-               Srcs.Next (Out_Dirs_Cur);
-               exit when Out_Dirs_Cur = Srcs.No_Element;
+               Next (Out_Dirs_Cur);
+               exit when Out_Dirs_Cur = String_Set.No_Element;
 
                S_Put (0, ",");
                Put_New_Line;
@@ -2357,7 +2393,7 @@ package body Test.Harness is
                S_Put
                  (0,
                   +Relative_Path
-                    (Create (+Srcs.Element (Out_Dirs_Cur)),
+                    (Create (+String_Set.Element (Out_Dirs_Cur)),
                      Create (+Dir_Name (P.Path_TD.all))) &
                     """");
 
@@ -2667,7 +2703,9 @@ package body Test.Harness is
       end loop;
 
       Put_New_Line;
-      S_Put (0, "CKPTS = $(patsubst %,%-gnatcov-cov,$(PRJS))");
+      S_Put (0, "CKPTS = $(patsubst %,%-gnatcov-cov-inst,$(PRJS))");
+      Put_New_Line;
+      S_Put (0, "BIN_CKPTS = $(patsubst %,%-gnatcov-cov,$(PRJS))");
       Put_New_Line;
       S_Put (0, "GNATCOV_LEVEL=stmt+decision");
       Put_New_Line;
@@ -2696,6 +2734,9 @@ package body Test.Harness is
       Put_New_Line;
 
       if Driver_Per_Unit then
+
+         --  Non-instrumented
+
          S_Put (0, "%-build-cov: %/test_driver.gpr");
          Put_New_Line;
          S_Put
@@ -2727,6 +2768,73 @@ package body Test.Harness is
          Put_New_Line;
          Put_New_Line;
 
+         S_Put (0, "bin-gnatcov-consolidate: $(BIN_CKPTS)");
+         Put_New_Line;
+         declare
+            Pth : constant String :=
+              +Relative_Path
+              (Create (+Source_Prj),
+               Create (+Harness_Dir.all));
+         begin
+            S_Put
+              (0,
+               ASCII.HT
+               & "$(GNATCOV) coverage -P"
+               & Path_To_Unix (Pth)
+               & " $(patsubst %,-C "
+               & "%-gnattest.ckpt,$(PRJS)) -a $(GNATCOV_OUTPUT_FMT) "
+               & "--level=$(GNATCOV_LEVEL)");
+         end;
+         Put_New_Line;
+         Put_New_Line;
+
+         S_Put (0, "bin-coverage: bin-gnatcov-consolidate");
+         Put_New_Line;
+         Put_New_Line;
+
+         --  Instrumented
+
+         S_Put (0, "%-gnatcov-inst: %/test_driver.gpr");
+         Put_New_Line;
+         S_Put
+           (0,
+            ASCII.HT
+            & "$(GNATCOV) instrument --level=$(GNATCOV_LEVEL) "
+            & "-P$*test_driver.gpr --dump-trigger=atexit");
+         Put_New_Line;
+         Put_New_Line;
+
+         S_Put (0, "%-cov-build: %-gnatcov-inst");
+         Put_New_Line;
+         S_Put
+           (0,
+            ASCII.HT
+            & "$(GPRBUILD) $(BUILDERFLAGS) -P$*test_driver.gpr "
+            & "--src-subdirs=gnatcov-instr --implicit-with=gnatcov_rts_full");
+         Put_New_Line;
+         Put_New_Line;
+
+         S_Put (0, "%-inst-run: %-cov-build");
+         Put_New_Line;
+         S_Put
+           (0,
+            ASCII.HT
+            & "GNATCOV_TRACE_FILE=$*gnattest_td.srctrace "
+            & "$**-test_runner$(EXE_EXT)");
+         Put_New_Line;
+         Put_New_Line;
+
+         S_Put (0, "%-gnatcov-cov-inst: %-inst-run");
+         Put_New_Line;
+         S_Put
+           (0,
+            ASCII.HT
+            & "$(GNATCOV) coverage --save-checkpoint=$*-gnattest.ckpt "
+            & "--level=$(GNATCOV_LEVEL) -P$*/test_driver.gpr "
+            & "$*gnattest_td.srctrace");
+         Put_New_Line;
+         Put_New_Line;
+
          S_Put (0, "gnatcov-consolidate: $(CKPTS)");
          Put_New_Line;
          declare
@@ -2750,6 +2858,7 @@ package body Test.Harness is
          S_Put (0, "coverage: gnatcov-consolidate");
          Put_New_Line;
          Put_New_Line;
+
       end if;
 
       S_Put (0, "clean: $(patsubst %,%-clean,$(PRJS))");
