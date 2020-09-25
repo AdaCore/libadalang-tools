@@ -89,15 +89,6 @@ package Test.Command_Lines is
      (Descriptor,
       Test_Strings);
 
-   --  ????Perhaps following should use Other_Switches, with an enum type
-   --  for each one (e.g. (Unit, Test) or (Off, On), etc.
-   package Test_String_Defaults is new Test_String_Switches.Set_Defaults
-     ((Separate_Drivers => +"unit", -- or "test"
-       Skeleton_Default => +"fail", -- or "pass"
-       Passed_Tests => +"show", -- or "hide"
-       Exit_Status => +"off", -- or "on"
-       others => null));
-
    type Test_String_Seqs is (Exclude_From_Stubbing);
 
    package Test_String_Seq_Switches is new String_Seq_Switches

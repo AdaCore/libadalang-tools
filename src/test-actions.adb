@@ -33,7 +33,7 @@ with GNATCOLL.Projects; use GNATCOLL.Projects;
 with GNATCOLL.Traces;
 
 with Libadalang;     use Libadalang;
---  with LAL_Extensions; use LAL_Extensions;
+with Libadalang.Project_Provider;
 
 with Utils.Command_Lines.Common; use Utils; use Utils.Command_Lines.Common;
 pragma Unreferenced (Utils.Command_Lines.Common); -- ????
@@ -66,8 +66,11 @@ package body Test.Actions is
    function Is_Externally_Built (File : Virtual_File) return Boolean;
    --  Checks if the given source file belongs to an externally build library
 
-   procedure Process_Exclusion_List (Value : String);
-   --  Processes value of --exclude-from-stubbing switch
+   procedure Process_Exclusion_List
+     (Value        : String;
+      From_Project : Boolean := False);
+   --  Processes value of --exclude-from-stubbing switch. If values come from
+   --  project attributes they do not override already stored ones.
 
    procedure Check_Direct;
    --  Checks if there are no intersections between target and source dirs.
@@ -91,6 +94,12 @@ package body Test.Actions is
       Right : File_Array)
       return Boolean;
    --  Returns True if two file arrays have at least one common file.
+
+   procedure Process_Additional_Tests
+     (Env : Project_Environment_Access; Cmd : Command_Line);
+   --  Loads the project containing additional tests and processes them.
+   --  This project needs to get loaded with the same environment as the
+   --  argument one.
 
    use Utils.Formatted_Output;
 
@@ -184,6 +193,18 @@ package body Test.Actions is
 
    begin
       GNATCOLL.Traces.Parse_Config_File;
+      Test.Common.Verbose := Arg (Cmd, Verbose);
+
+      if Arg (Cmd, Passed_Tests) /= null then
+         if Arg (Cmd, Passed_Tests).all = "hide" then
+            Test.Common.Show_Passed_Tests := False;
+         elsif Arg (Cmd, Passed_Tests).all = "show" then
+            Test.Common.Show_Passed_Tests := True;
+         else
+            Cmd_Error_No_Help
+              ("--passed-tests should be either show or hide");
+         end if;
+      end if;
 
       if Status (Tool.Project_Tree.all) = Empty then
          for File of File_Names (Cmd) loop
@@ -200,11 +221,22 @@ package body Test.Actions is
          return;
       end if;
 
-      Test.Common.Verbose := Arg (Cmd, Verbose);
-      Test.Common.Harness_Only := Arg (Cmd, Harness_Only);
-
       SPT := GNATCOLL.Projects.Project_Tree (Tool.Project_Tree.all);
       Root_Prj := SPT.Root_Project;
+
+      if Arg (Cmd, Harness_Only) then
+         Test.Common.Harness_Only := True;
+
+         if Arg (Cmd, Additional_Tests) /= null then
+            Cmd_Error_No_Help
+              ("--harness only and --additional-tests are mutually exclusive");
+         elsif Root_Prj.Has_Attribute (Build_Att_String ("additional_tests"))
+         then
+            Cmd_Error_No_Help
+              ("--harness only and Gnattest.Additional_Tests "
+               & "are mutually exclusive");
+         end if;
+      end if;
 
       --  Check for multiple output modes
       if Arg (Cmd, Tests_Dir) /= null then
@@ -349,6 +381,8 @@ package body Test.Actions is
          Ignored : Test.Common.String_Set.Set;
          --  Set of file names mentioned in the --ignore=... switch
 
+         Source_Info : File_Info;
+
          procedure Include_One (File_Name : String) is
          begin
             Include (Ignored, File_Name);
@@ -364,13 +398,17 @@ package body Test.Actions is
          for File of File_Names (Cmd) loop
             if not Contains (Ignored, Simple_Name (File.all)) then
 
-               if Info (SPT, Create (+File.all)).Unit_Part = Unit_Spec then
+               Source_Info := Info (SPT, Create (+File.all));
+
+               if Source_Info.Unit_Part = Unit_Spec then
                   if Test.Common.Harness_Only then
                      Test.Harness.Source_Table.Add_Source_To_Process
-                       (File.all);
+                       (SPT.Create
+                          (+File.all, Source_Info.Project).Display_Full_Name);
                   else
                      Test.Skeleton.Source_Table.Add_Source_To_Process
-                       (File.all);
+                       (SPT.Create
+                          (+File.all, Source_Info.Project).Display_Full_Name);
                   end if;
                end if;
             end if;
@@ -379,6 +417,33 @@ package body Test.Actions is
 
       Test.Common.Substitution_Suite := Arg (Cmd, Validate_Type_Extensions);
       Test.Common.Inheritance_To_Suite := Arg (Cmd, Inheritance_Check);
+
+      --  Default behaviour of tests
+      declare
+         Skeleton_Default_Att : constant Attribute_Pkg_String :=
+           Build_Att_String ("skeletons_default");
+         Skeleton_Default_Val : constant String :=
+           (if Arg (Cmd, Skeleton_Default) = null then
+               (if Root_Prj.Has_Attribute (Skeleton_Default_Att) then
+                   Root_Prj.Attribute_Value (Skeleton_Default_Att)
+                else
+                    "")
+            else Arg (Cmd, Skeleton_Default).all);
+      begin
+         if Skeleton_Default_Val = "pass" then
+            Test.Common.Skeletons_Fail := False;
+         elsif Skeleton_Default_Val = "fail" then
+            Test.Common.Skeletons_Fail := True;
+         elsif Skeleton_Default_Val /= "" then
+            if Arg (Cmd, Skeleton_Default) = null then
+               Cmd_Error_No_Help
+                 ("--skeleton-default should be either fail or pass");
+            else
+               Cmd_Error_No_Help
+                 ("Gnattest.Skeletons_Default should be either fail or pass");
+            end if;
+         end if;
+      end;
 
       if Arg (Cmd, Stub) then
 
@@ -520,7 +585,49 @@ package body Test.Actions is
                Process_Exclusion_List (Exclude.all);
             end loop;
          end;
+
+         declare
+            Default_Exclude_Attr : constant Attribute_Pkg_String :=
+              Build (Test.Common.GT_Package, "default_stub_exclusion_list");
+            Exclude_Attr         : constant Attribute_Pkg_String :=
+              Build (Test.Common.GT_Package, "stub_exclusion_list");
+            Indexes              : constant String_List          :=
+              Attribute_Indexes (Root_Prj, Exclude_Attr);
+         begin
+            if Has_Attribute (Root_Prj, Default_Exclude_Attr) then
+               Process_Exclusion_List
+                 (Attribute_Value (Root_Prj, Default_Exclude_Attr),
+                  From_Project => True);
+            end if;
+            for Index of Indexes loop
+               Process_Exclusion_List
+                 (Attribute_Value (Root_Prj, Exclude_Attr, Index.all),
+                  From_Project => True);
+            end loop;
+         end;
       end if;
+
+      --  Process additional tests
+      if Arg (Cmd, Additional_Tests) /= null then
+         Test.Common.Additional_Tests_Prj := new String'
+           (Normalize_Pathname
+              (Arg (Cmd, Additional_Tests).all,
+               Case_Sensitive => False));
+      elsif Root_Prj.Has_Attribute (Build_Att_String ("additional_tests")) then
+         Test.Common.Additional_Tests_Prj := new String'
+           (Normalize_Pathname
+              (Root_Prj.Attribute_Value
+                   (Build_Att_String ("additional_tests")),
+               Case_Sensitive => False));
+      end if;
+
+      if Test.Common.Additional_Tests_Prj /= null and then
+        not Is_Regular_File (Test.Common.Additional_Tests_Prj.all)
+      then
+         Cmd_Error_No_Help
+           ("cannot find " & Test.Common.Additional_Tests_Prj.all);
+      end if;
+
    end Init;
 
    -----------
@@ -539,6 +646,9 @@ package body Test.Actions is
             Test.Harness.Generate_Stub_Test_Driver_Projects (Src_Prj);
          else
             if not Arg (Cmd, Harness_Only) then
+               if Test.Common.Additional_Tests_Prj /= null then
+                  Process_Additional_Tests (Tool.Project_Env, Cmd);
+               end if;
                Test.Skeleton.Report_Unused_Generic_Tests;
                Test.Skeleton.Generate_Project_File (Src_Prj);
             end if;
@@ -629,7 +739,10 @@ package body Test.Actions is
    -- Process_Exclusion_List --
    ----------------------------
 
-   procedure Process_Exclusion_List (Value : String) is
+   procedure Process_Exclusion_List
+     (Value        : String;
+      From_Project : Boolean := False)
+   is
       use Ada.Text_IO;
       use Ada.Strings.Fixed;
       Idx   : Natural;
@@ -659,6 +772,13 @@ package body Test.Actions is
             if not Is_Regular_File (F_Path) then
                Cmd_Error_No_Help ("cannot find " & F_Path);
             end if;
+
+            if From_Project and then
+              Test.Common.Stub_Exclusion_Lists.Contains (Unit)
+            then
+               return;
+            end if;
+
             Open (F, In_File, F_Path);
             while not End_Of_File (F) loop
                S := new String'(Get_Line (F));
@@ -669,6 +789,12 @@ package body Test.Actions is
             end loop;
             Close (F);
          end;
+         return;
+      end if;
+
+      if From_Project and then
+        not Test.Common.Default_Stub_Exclusion_List.Is_Empty
+      then
          return;
       end if;
 
@@ -1227,5 +1353,65 @@ package body Test.Actions is
 
       Skeleton.Source_Table.Reset_Source_Iterator;
    end Check_Stub;
+
+   ------------------------------
+   -- Process_Additional_Tests --
+   ------------------------------
+
+   procedure Process_Additional_Tests
+     (Env : Project_Environment_Access; Cmd : Command_Line)
+   is
+      PT       : Project_Tree_Access := new Project_Tree;
+      Sources  : File_Array_Access;
+      Src_Info : File_Info;
+
+      Context  : Analysis_Context;
+      Provider : Unit_Provider_Reference;
+      Unit     : Analysis_Unit;
+
+      Current_Source : String_Access;
+
+      use Libadalang.Project_Provider;
+   begin
+      PT.Load (Create (+Test.Common.Additional_Tests_Prj.all), Env);
+      Sources := PT.Root_Project.Source_Files;
+      for Src in Sources.all'Range loop
+         Src_Info := PT.Info (Sources (Src));
+         if Src_Info.Unit_Part = Unit_Spec then
+            Test.Harness.Source_Table.Add_Source_To_Process
+              (Sources (Src).Display_Full_Name);
+         end if;
+      end loop;
+      Unchecked_Free (Sources);
+
+      Provider := Create_Project_Unit_Provider
+        (Tree             => PT,
+         Env              => Env,
+         Is_Project_Owner => False);
+
+      Context := Create_Context
+        (Charset       => Wide_Character_Encoding (Cmd),
+         Unit_Provider => Provider);
+
+      Current_Source := new String'
+        (Test.Harness.Source_Table.Next_Non_Processed_Source);
+      while Current_Source.all /= "" loop
+
+         Unit := Get_From_File
+           (Context,
+            Test.Harness.Source_Table.Get_Source_Full_Name
+              (Current_Source.all));
+
+         Test.Harness.Process_Source (Unit);
+
+         Free (Current_Source);
+         Current_Source := new String'
+           (Test.Harness.Source_Table.Next_Non_Processed_Source);
+      end loop;
+      Free (Current_Source);
+
+      PT.Unload;
+      Free (PT);
+   end Process_Additional_Tests;
 
 end Test.Actions;
