@@ -3,18 +3,19 @@ project Build is
 
    type Tools_Set_Type is ("all", "no-wip");
    Tools_Set : Tools_Set_Type := external ("LALTOOLS_SET", "all");
+   --  This project has two modes: "all" will build all available tools, while
+   --  "no-wip" will build only the stable ones. This allows safe development
+   --  of unstable tools without disturbing the ones used in production.
+   --
+   --  Even though there is currently no "wip" (unstable) tool, we keep this
+   --  infrastructure for the development of new tools in the future.
 
    Tools_Mains :=
      ("pp-main.adb",
       "metrics-main.adb",
       "stub-main.adb",
+      "test-main.adb",
       "utils-var_length_ints-test.adb");
-   case Tools_Set is
-      when "all" =>
-         Tools_Mains := Tools_Mains & ("test-main.adb");
-      when others =>
-         null;
-   end case;
 
    for Source_Dirs use (".");
    for Object_Dir use "../obj";

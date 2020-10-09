@@ -19,10 +19,10 @@ class BaseDriver(DiffTestDriver):
     """Base class to provide common test driver helpers."""
 
     # Name of test directories for tools that are considered work in progress
-    WIP_TOOLS = {'test'}
+    WIP_TOOLS = set()
 
     # Name of test directories for all tools
-    ALL_TOOLS = {'pp', 'metric', 'stub', 'laltools'} | WIP_TOOLS
+    ALL_TOOLS = {'pp', 'metric', 'stub', 'test', 'laltools'} | WIP_TOOLS
 
     @property
     def tool_dirname(self):
