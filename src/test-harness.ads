@@ -179,9 +179,20 @@ package Test.Harness is
    --  For the given UUT generates a set of independent test driver mains,
    --  one per subprogram under test, inherited or declared.
 
+   procedure Generate_Substitution_Test_Drivers (Data : Data_Holder);
+   --  For given UUT generates a set of independent test driver mains, one per
+   --  overriden subprogram. Each test driver may contain one to several
+   --  tests: one for overriden operation, and if it is an inherited one,
+   --  one for each of the inherited ones for ancestor types right up to the
+   --  original declaration.
+   --  Can only be called for separate drivers mode, not for stub mode.
+
    procedure Generate_Stub_Test_Driver_Projects (Source_Prj : String);
    --  Generates all project files necessary for separate test drivers in stub
    --  mode.
+
+   procedure Generate_Test_Driver_Projects (Source_Prj : String);
+   --  Generates all project files necessary for separate test drivers.
 
    procedure Test_Runner_Generator (Source_Prj : String);
    --  Generates Main_Sute and Test_Runner

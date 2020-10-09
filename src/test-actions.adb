@@ -417,6 +417,31 @@ package body Test.Actions is
 
       Test.Common.Substitution_Suite := Arg (Cmd, Validate_Type_Extensions);
       Test.Common.Inheritance_To_Suite := Arg (Cmd, Inheritance_Check);
+      Test.Common.Test_Case_Only := Arg (Cmd, Test_Case_Only);
+      Test.Common.Omit_Sloc := Arg (Cmd, Omit_Sloc);
+      Test.Common.Show_Test_Duration := Arg (Cmd, Test_Duration);
+      Test.Common.Relocatable_Harness := Arg (Cmd, Relocatable_Harness);
+
+      --  Command line support
+
+      if not Arg (Cmd, Command_Line_Support) then
+         Test.Common.No_Command_Line := True;
+      else
+         declare
+            Files : constant GNATCOLL.VFS.File_Array :=
+              Predefined_Source_Files (Root_Prj.Get_Environment);
+            A_Comlin_Found : Boolean := False;
+         begin
+            for I in Files'Range loop
+               if Files (I).Display_Base_Name = "a-comlin.ads" then
+                  A_Comlin_Found := True;
+                  exit;
+               end if;
+            end loop;
+
+            Test.Common.No_Command_Line := not A_Comlin_Found;
+         end;
+      end if;
 
       --  Default behaviour of tests
       declare
@@ -444,6 +469,32 @@ package body Test.Actions is
             end if;
          end if;
       end;
+
+      --  Exit status
+      if Arg (Cmd, Exit_Status) /= null then
+         if Arg (Cmd, Exit_Status).all = "off" then
+            Test.Common.Show_Passed_Tests := False;
+         elsif Arg (Cmd, Exit_Status).all = "on" then
+            Test.Common.Add_Exit_Status := True;
+         else
+            Cmd_Error_No_Help
+              ("--exit-status should be either on or off");
+         end if;
+      end if;
+
+      --  Separate dreivers
+      if Arg (Cmd, Separate_Drivers) /= null then
+         if Arg (Cmd, Separate_Drivers).all = "unit" then
+            Test.Common.Separate_Drivers := True;
+            Test.Common.Driver_Per_Unit := True;
+         elsif Arg (Cmd, Separate_Drivers).all = "test" then
+            Test.Common.Separate_Drivers := True;
+            Test.Common.Driver_Per_Unit := False;
+         else
+            Cmd_Error_No_Help
+              ("--separate-drivers should be either unit or test");
+         end if;
+      end if;
 
       if Arg (Cmd, Stub) then
 
@@ -644,6 +695,9 @@ package body Test.Actions is
       else
          if Arg (Cmd, Stub) then
             Test.Harness.Generate_Stub_Test_Driver_Projects (Src_Prj);
+         elsif Arg (Cmd, Separate_Drivers) /= null then
+            Test.Skeleton.Generate_Project_File (Src_Prj);
+            Test.Harness.Generate_Test_Driver_Projects (Src_Prj);
          else
             if not Arg (Cmd, Harness_Only) then
                if Test.Common.Additional_Tests_Prj /= null then

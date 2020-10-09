@@ -1869,6 +1869,13 @@ package body Test.Harness is
             Harness_Dir.all
             & Data.Test_Unit_Full_Name.all
             & Directory_Separator);
+         if not Stub_Mode_ON and then Data.Good_For_Substitution then
+            Generate_Substitution_Suite_From_Tested
+              (Local_Data_Holder,
+               Harness_Dir.all
+               & Data.Test_Unit_Full_Name.all
+               & Directory_Separator);
+         end if;
 
          declare
             S1 : constant String_Access := new String'
@@ -1920,6 +1927,473 @@ package body Test.Harness is
 
       Decrease_Indent (Me, "done");
    end Generate_Test_Drivers;
+
+   ----------------------------------------
+   -- Generate_Substitution_Test_Drivers --
+   ----------------------------------------
+
+   procedure Generate_Substitution_Test_Drivers (Data : Data_Holder) is
+      Current_Type : Test_Type_Info;
+      Type_Ancestor : Base_Type_Decl;
+
+      Current_TR : Test_Routine_Info_Enhanced;
+
+      New_Unit_Name : String_Access;
+      New_Unit_Dir  : String_Access;
+
+      function Get_SPI
+        (Current_TR    : Test_Routine_Info'Class;
+         New_Unit_Dir  : String_Access;
+         New_Unit_Name : String_Access)
+         return Separate_Project_Info;
+
+      function Get_SPI
+        (Current_TR    : Test_Routine_Info'Class;
+         New_Unit_Dir  : String_Access;
+         New_Unit_Name : String_Access)
+         return Separate_Project_Info
+      is
+         SPI : Separate_Project_Info;
+      begin
+         SPI.Name_TD         := new String'
+           (TD_Prefix_Overriden
+            & Current_TR.TR_Text_Name.all);
+         SPI.Path_TD         := new String'
+           (New_Unit_Dir.all
+            & Unit_To_File_Name
+              (TD_Prefix_Overriden
+               & Current_TR.TR_Text_Name.all)
+            & ".gpr");
+         SPI.Main_File_Name   := new String'
+           (Unit_To_File_Name (New_Unit_Name.all)
+            & ".adb");
+
+         return SPI;
+      end Get_SPI;
+
+   begin
+
+      for K in Data.LTR_List.First_Index .. Data.LTR_List.Last_Index loop
+
+         Current_TR   := Data.LTR_List.Element (K);
+         Current_Type := Data.Test_Types.Element (Current_TR.Test_Type_Numb);
+
+         New_Unit_Name := new String'
+           (Data.Test_Unit_Full_Name.all
+            & "."
+            & TD_Prefix_Overriden
+            & Current_TR.TR_Text_Name.all);
+
+         --  Distinguish different set of test drivers by putting them in dirs
+         --  with names corresponding to UUTs.
+         New_Unit_Dir := new String'
+           (Harness_Dir.all
+            & Data.Test_Unit_Full_Name.all
+            & Directory_Separator);
+
+         declare
+            Dir : File_Array_Access;
+         begin
+            Append (Dir, GNATCOLL.VFS.Create (+New_Unit_Dir.all));
+            Create_Dirs (Dir);
+         exception
+            when Directory_Error =>
+               Cmd_Error_No_Help
+                 ("cannot create directory " & New_Unit_Dir.all);
+         end;
+
+         --  Creating test driver procedure
+         Create (New_Unit_Dir.all
+                 & Unit_To_File_Name (New_Unit_Name.all)
+                 & ".adb");
+
+         Put_Harness_Header;
+         S_Put (0, GT_Marker_Begin);
+         Put_New_Line;
+
+         S_Put (0, "pragma Ada_2005;");
+         Put_New_Line;
+         Put_New_Line;
+         S_Put (0, "with AUnit.Test_Suites; use AUnit.Test_Suites;");
+         Put_New_Line;
+         S_Put (0, "with AUnit.Test_Caller;");
+         Put_New_Line;
+         S_Put (0, "with Gnattest_Generated;");
+         Put_New_Line;
+         S_Put (0, "with Gnattest_Generated.Persistent;");
+         Put_New_Line;
+         S_Put (0, "with AUnit.Reporter.GNATtest;");
+         Put_New_Line;
+         S_Put (0, "with AUnit.Run;");
+         Put_New_Line;
+         S_Put (0, "with AUnit.Options; use AUnit.Options;");
+         Put_New_Line;
+         S_Put (0, "with Ada.Unchecked_Conversion;");
+         Put_New_Line;
+         if Add_Exit_Status and then not No_Command_Line then
+            S_Put (0, "with AUnit; use AUnit;");
+            Put_New_Line;
+            S_Put (0, "with Ada.Command_Line;");
+            Put_New_Line;
+         end if;
+         Put_New_Line;
+         Put_New_Line;
+
+         Type_Ancestor := Current_Type.Tested_Type.As_Base_Type_Decl;
+
+         for I in 1 .. Current_Type.Max_Inheritance_Depth loop
+            Type_Ancestor := Parent_Type_Declaration (Type_Ancestor);
+            S_Put (0, "with " & Type_Test_Package (Type_Ancestor) & ";");
+            Put_New_Line;
+         end loop;
+
+         Put_New_Line;
+
+         S_Put (0, "procedure " & New_Unit_Name.all & " is");
+         Put_New_Line;
+         Put_New_Line;
+
+         Type_Ancestor := Current_Type.Tested_Type.As_Base_Type_Decl;
+
+         for I in 1 .. Current_Type.Max_Inheritance_Depth loop
+            Type_Ancestor := Parent_Type_Declaration (Type_Ancestor);
+            S_Put
+              (3,
+               "type Test_Method_"
+               & Trim (Integer'Image (I), Both)
+               & " is access procedure");
+            Put_New_Line;
+            Put_New_Line;
+            S_Put
+              (5,
+               "(T : in out "
+               & Type_Test_Package (Type_Ancestor)
+               & ".Test_"
+               & Type_Name (Type_Ancestor)
+               & ");");
+            Put_New_Line;
+         end loop;
+
+         S_Put
+           (3, "function Suite return AUnit.Test_Suites.Access_Test_Suite;");
+         Put_New_Line;
+         Put_New_Line;
+
+         S_Put (3, "Result : aliased AUnit.Test_Suites.Test_Suite;");
+         Put_New_Line;
+         S_Put
+           (3,
+            "package Caller is new AUnit.Test_Caller");
+         Put_New_Line;
+         S_Put
+           (5,
+            "(GNATtest_Generated.GNATtest_Standard."
+            & Data.Test_Unit_Full_Name.all
+            & "."
+            & Current_Type.Test_Type_Name.all
+            & ");");
+         Put_New_Line;
+
+         for I in 1 .. Current_Type.Max_Inheritance_Depth loop
+            S_Put
+              (3,
+               "Local_Test_Case_"
+               & Trim (Integer'Image (I), Both)
+               & " : aliased Caller.Test_Case;");
+            Put_New_Line;
+         end loop;
+
+         Put_New_Line;
+
+         S_Put
+           (3, "function Suite return AUnit.Test_Suites.Access_Test_Suite is");
+         Put_New_Line;
+         Put_New_Line;
+
+         for I in 1 .. Current_Type.Max_Inheritance_Depth loop
+            S_Put
+              (6,
+               "function Convert is new Gnattest_Generated." &
+               "Gnattest_Standard.Ada.Unchecked_Conversion");
+            S_Put
+              (8,
+               "(Test_Method_"
+               & Trim (Integer'Image (I), Both)
+               & ", Caller.Test_Method);");
+            Put_New_Line;
+         end loop;
+         Put_New_Line;
+
+         S_Put (3, "begin");
+         Put_New_Line;
+
+         Type_Ancestor := Current_Type.Tested_Type.As_Base_Type_Decl;
+
+         for I in 1 .. Current_Type.Max_Inheritance_Depth loop
+            Type_Ancestor := Parent_Type_Declaration (Type_Ancestor);
+
+            S_Put (6, "Caller.Create");
+            Put_New_Line;
+            S_Put
+              (8,
+               "(Local_Test_Case_"
+               & Trim (Integer'Image (I), Both)
+               & ",");
+            Put_New_Line;
+            S_Put (9,
+                   """"
+                   & Current_TR.Tested_Sloc.all
+                   & """,");
+            Put_New_Line;
+            S_Put (9,
+                   "Convert ("
+                   & Type_Test_Package (Type_Ancestor)
+                   & "."
+                   & Current_TR.TR_Text_Name.all
+                   & "'Access));");
+            Put_New_Line;
+         end loop;
+
+         Put_New_Line;
+         for I in 1 .. Current_Type.Max_Inheritance_Depth loop
+            S_Put
+              (6,
+               "Add_Test (Result'Access, Local_Test_Case_"
+               & Trim (Integer'Image (I), Both)
+               & "'Access);");
+            Put_New_Line;
+         end loop;
+
+         Put_New_Line;
+         S_Put (6, "return Result'Unchecked_Access;");
+         Put_New_Line;
+         S_Put (3, "end Suite;");
+         Put_New_Line;
+         Put_New_Line;
+
+         if Add_Exit_Status and then not No_Command_Line then
+            S_Put
+              (3,
+               "function Runner is new "
+               & "AUnit.Run.Test_Runner_With_Status (Suite);");
+         else
+            S_Put
+              (3, "procedure Runner is new AUnit.Run.Test_Runner (Suite);");
+         end if;
+         Put_New_Line;
+
+         S_Put (3, "Reporter : AUnit.Reporter.GNATtest.GNATtest_Reporter;");
+         Put_New_Line;
+         S_Put (3, "GT_Options : AUnit_Options := Default_Options;");
+         Put_New_Line;
+         if Add_Exit_Status and then not No_Command_Line then
+            Put_New_Line;
+            S_Put (3, "Exit_Status : AUnit.Status;");
+         end if;
+         Put_New_Line;
+
+         S_Put (0, "begin");
+         Put_New_Line;
+         if Show_Passed_Tests then
+            S_Put (3, "GT_Options.Report_Successes := True;");
+         else
+            S_Put (3, "GT_Options.Report_Successes := False;");
+         end if;
+         Put_New_Line;
+         if Show_Test_Duration then
+            S_Put (3,
+                   "GT_Options.Test_Case_Timer := True;");
+            Put_New_Line;
+         end if;
+         Put_New_Line;
+         S_Put (3, "Gnattest_Generated.Persistent.Global_Set_Up;");
+         Put_New_Line;
+         if Add_Exit_Status and then not No_Command_Line then
+            S_Put (3, "Exit_Status := Runner (Reporter, GT_Options);");
+            Put_New_Line;
+            S_Put (3, "Gnattest_Generated.Persistent.Global_Tear_Down;");
+            Put_New_Line;
+            Put_New_Line;
+            S_Put
+              (3,
+               "if Exit_Status = AUnit.Failure then");
+            Put_New_Line;
+            S_Put
+              (6,
+               "Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);");
+            Put_New_Line;
+            S_Put
+              (3,
+               "end if;");
+            Put_New_Line;
+         else
+
+            S_Put (3, "Runner (Reporter, GT_Options);");
+            Put_New_Line;
+            S_Put (3, "Gnattest_Generated.Persistent.Global_Tear_Down;");
+            Put_New_Line;
+         end if;
+         Put_New_Line;
+
+         S_Put (0, "end " & New_Unit_Name.all & ";");
+         Put_New_Line;
+         S_Put (0, GT_Marker_End);
+         Put_New_Line;
+         Close_File;
+
+         Separate_Projects.Append
+           (Get_SPI
+              (Current_TR,
+               New_Unit_Dir,
+               New_Unit_Name));
+      end loop;
+   end Generate_Substitution_Test_Drivers;
+
+   -----------------------------------
+   -- Generate_Test_Driver_Projects --
+   -----------------------------------
+
+   procedure Generate_Test_Driver_Projects (Source_Prj : String) is
+      P : Separate_Project_Info;
+   begin
+      if Separate_Projects.Is_Empty then
+         Report_Std
+           ("gnattest: no test skeletons generated because "
+            & "no subprogram to test");
+         Report_Std
+           ("found in project " & Source_Prj, 10);
+         Cmd_Error_No_Help ("cannot create main suite and test runner");
+      end if;
+
+      for
+        K in Separate_Projects.First_Index .. Separate_Projects.Last_Index
+      loop
+         P := Separate_Projects.Element (K);
+
+         declare
+            Dir : File_Array_Access;
+         begin
+            Append
+              (Dir,
+               GNATCOLL.VFS.Create
+                 (+(Dir_Name (P.Path_TD.all)
+                  & Directory_Separator
+                  & P.Name_TD.all
+                  & "_obj")));
+            Create_Dirs (Dir);
+         exception
+            when Directory_Error =>
+               Cmd_Error_No_Help
+                 ("gnattest: cannot create obj directory for "
+                  & P.Path_TD.all);
+         end;
+
+         Create (P.Path_TD.all);
+
+         S_Put (0, "with ""aunit"";");
+         Put_New_Line;
+         S_Put
+           (0,
+            "with """
+              & (+Relative_Path
+                 (Create (+Tmp_Test_Prj.all),
+                   Create (+Dir_Name (P.Path_TD.all))))
+            & """;");
+         Put_New_Line;
+         S_Put
+           (0,
+            "with """
+              & (+Relative_Path
+                 (Create (+Gnattest_Common_Prj_Name),
+                   Create (+Dir_Name (P.Path_TD.all))))
+            & """;");
+         Put_New_Line;
+         Put_New_Line;
+
+         S_Put
+           (0,
+            "project "
+            & P.Name_TD.all
+            & " is");
+         Put_New_Line;
+         Put_New_Line;
+         if Relocatable_Harness then
+            S_Put
+              (3,
+               "for Origin_Project use external "
+               & "(""ORIGIN_PROJECT_DIR"", """") & """
+               & Base_Name (Source_Prj)
+               & """;");
+         else
+            S_Put
+              (3,
+               "for Origin_Project use """
+               & (+Relative_Path
+                 (Create (+Source_Prj),
+                      Create (+Normalize_Pathname (Dir_Name (P.Path_TD.all)))))
+               & """;");
+         end if;
+         Put_New_Line;
+         Put_New_Line;
+
+         S_Put (3, "for Target use Gnattest_Common'Target;");
+         Put_New_Line;
+         Put_New_Line;
+         S_Put
+           (3,
+            "for Runtime (""Ada"") use Gnattest_Common'Runtime (""Ada"");");
+         Put_New_Line;
+         Put_New_Line;
+
+         S_Put (3, "package Ide renames Gnattest_Common.Ide;");
+         Put_New_Line;
+         Put_New_Line;
+         S_Put (3, "package Make renames Gnattest_Common.Make;");
+         Put_New_Line;
+         Put_New_Line;
+
+         S_Put (3, "for Languages use Gnattest_Common'Languages & (""Ada"");");
+         Put_New_Line;
+
+         S_Put
+           (3,
+            "for Main use ("""
+            & P.Main_File_Name.all
+            & """);");
+         Put_New_Line;
+         S_Put (3, "for Exec_Dir use ""."";");
+         Put_New_Line;
+         S_Put (3, "for Source_Dirs use (""."");");
+         Put_New_Line;
+         S_Put
+           (3,
+            "for Object_Dir use """
+            & P.Name_TD.all
+            & "_obj"";");
+         Put_New_Line;
+         Put_New_Line;
+
+         S_Put (3, "package Builder renames Gnattest_Common.Builder;");
+         Put_New_Line;
+         S_Put (3, "package Linker renames Gnattest_Common.Linker;");
+         Put_New_Line;
+         S_Put (3, "package Binder renames Gnattest_Common.Binder;");
+         Put_New_Line;
+         S_Put (3, "package Compiler renames Gnattest_Common.Compiler;");
+         Put_New_Line;
+         Put_New_Line;
+
+         S_Put
+           (0,
+            "end "
+            & P.Name_TD.all
+            & ";");
+         Close_File;
+      end loop;
+
+      Generate_Common_Harness_Files (Source_Prj);
+
+   end Generate_Test_Driver_Projects;
 
    ----------------------------------------
    -- Generate_Stub_Test_Driver_Projects --

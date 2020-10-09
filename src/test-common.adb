@@ -119,7 +119,8 @@ package body Test.Common is
    is
       pragma Unreferenced (N_Controlling);
       Subp_Name : constant String :=
-        Common.Node_Image (P_Defining_Name (As_Basic_Subp_Decl (Subp)));
+        Common.Node_Image
+          (P_Defining_Name (As_Basic_Decl (Subp)));
 
       L_Subp      : Base_Subp_Spec;
       L_Subp_Span : Source_Location_Range;
@@ -294,7 +295,12 @@ package body Test.Common is
       end Parameter_Type_Image;
 
    begin
-      L_Subp := P_Subp_Decl_Spec (As_Basic_Subp_Decl (Subp));
+      if Subp.Kind = Ada_Expr_Function then
+         L_Subp := Subp.As_Base_Subp_Body.F_Subp_Spec.As_Base_Subp_Spec;
+      else
+         L_Subp := Subp.As_Basic_Subp_Decl.P_Subp_Decl_Spec;
+      end if;
+
       L_Subp_Span := Sloc_Range (L_Subp);
 
       Trace

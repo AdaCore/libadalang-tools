@@ -48,7 +48,8 @@ package Test.Command_Lines is
       Command_Line_Support,
       Separates,
       Transition,
-      Test_Duration);
+      Test_Duration,
+      Relocatable_Harness);
 
    package Test_Boolean_Switches is new Boolean_Switches
      (Descriptor,
