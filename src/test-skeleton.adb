@@ -390,7 +390,8 @@ package body Test.Skeleton is
       TR_Info         :        Test_Routine_Info_Wrapper;
       Data            : in out Data_Holder;
       Suite_Data_List : in out Suites_Data_Type;
-      TC_Found        :    out Boolean);
+      TC_Found        :    out Boolean;
+      Instance_Sloc   :        String := "");
    --  Adds one subprogram-to-test per each test case.
    --  Sets TC_Found if at least one Test_Case aspect or pragma has been found
    --  for given subprogram.
@@ -1308,10 +1309,8 @@ package body Test.Skeleton is
 
          if
            Node.Kind = Ada_Expr_Function
-           and then (Node.As_Base_Subp_Body.F_Subp_Spec = No_Subp_Spec
-                     or else Node.As_Base_Subp_Body.F_Subp_Spec = Node)
+           and then not Node.As_Base_Subp_Body.P_Previous_Part_For_Decl.Is_Null
          then
-            Print (Node.As_Base_Subp_Body.F_Subp_Spec);
             --  It will be treated at spec.
             return Over;
          end if;
@@ -1515,7 +1514,8 @@ package body Test.Skeleton is
                Test_Routine_Wrapper,
                Data,
                Suite_Data_List,
-               Has_TC);
+               Has_TC,
+               (if Instance_Sloc = null then "" else Instance_Sloc.all));
 
             if Has_TC or else not Test_Case_Only then
                Update_Name_Frequency (Subp.Subp_Text_Name.all);
@@ -2032,7 +2032,9 @@ package body Test.Skeleton is
       begin
          while not Sem_Parent.Is_Null loop
 
-            if Is_Ghost_Code (Sem_Parent.As_Basic_Decl) then
+            if Sem_Parent.Kind in Ada_Basic_Decl
+              and then Is_Ghost_Code (Sem_Parent.As_Basic_Decl)
+            then
                --  The whole UUT is Ghost
                Set_Source_Status (The_Unit.Unit.Get_Filename, Bad_Content);
                Apropriate_Source := False;
@@ -2041,6 +2043,7 @@ package body Test.Skeleton is
             end if;
 
             if not Stub_Mode_ON and then not Separate_Drivers
+              and then Sem_Parent.Kind in Ada_Library_Item_Range
               and then Sem_Parent.Parent.As_Library_Item.F_Has_Private
             then
                --  Cannot incorporate test packages of private packages
@@ -2183,7 +2186,8 @@ package body Test.Skeleton is
       TR_Info         :        Test_Routine_Info_Wrapper;
       Data            : in out Data_Holder;
       Suite_Data_List : in out Suites_Data_Type;
-      TC_Found        :    out Boolean)
+      TC_Found        :    out Boolean;
+      Instance_Sloc   :        String := "")
    is
 
       Me_TC : constant Trace_Handle :=
@@ -2813,7 +2817,8 @@ package body Test.Skeleton is
       end Get_Condition_Image;
 
    begin
-      Trace (Me_TC, "Looking for test cases of " & Subp.Subp_Text_Name.all);
+      Increase_Indent
+        (Me_TC, "Looking for test cases of " & Subp.Subp_Text_Name.all);
 
       TC_Found := False;
 
@@ -2905,7 +2910,8 @@ package body Test.Skeleton is
             Data.Subp_List.Append (Subp);
             Suite_Data_List.TR_List.Append (TR_Info);
          end if;
-         Trace (Me_TC, "No test case found for " & Subp.Subp_Text_Name.all);
+         Decrease_Indent
+           (Me_TC, "No test case found for " & Subp.Subp_Text_Name.all);
          return;
       end if;
 
@@ -3106,17 +3112,29 @@ package body Test.Skeleton is
          --  Changing tested sloc so it corresponds to test case instead
          --  of tested subprogram
 
-         GNAT.OS_Lib.Free (TR_Info_Add.TR_Info.Tested_Sloc);
-         TR_Info_Add.TR_Info.Tested_Sloc := new String'
-           (Base_Name (Data.Unit_File_Name.all)
-            & ":"
-            & Trim (First_Line_Number (TC.Elem)'Img, Both)
-            & ":"
-            & Trim (First_Column_Number (TC.Elem)'Img, Both)
-            & ":");
+         if Instance_Sloc = "" then
+            TR_Info_Add.TR_Info.Tested_Sloc := new String'
+              (Base_Name (Data.Unit_File_Name.all)
+               & ":"
+               & Trim (First_Line_Number (TC.Elem)'Img, Both)
+               & ":"
+               & Trim (First_Column_Number (TC.Elem)'Img, Both)
+               & ":");
+         else
+            TR_Info_Add.TR_Info.Tested_Sloc := new String'
+              (Base_Name (Subp.Subp_Declaration.Unit.Get_Filename)
+               & ":"
+               & Trim (First_Line_Number (TC.Elem)'Img, Both)
+               & ":"
+               & Trim (First_Column_Number (TC.Elem)'Img, Both)
+               & " instance at "
+               & Instance_Sloc);
+         end if;
 
          Suite_Data_List.TR_List.Append (TR_Info_Add);
       end loop;
+
+      Decrease_Indent (Me_TC, "done");
 
    end Gather_Test_Cases;
 

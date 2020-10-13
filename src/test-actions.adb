@@ -176,14 +176,14 @@ package body Test.Actions is
            ("gnattest: multiple output modes are not allowed");
          if From_Project then
             Cmd_Error_No_Help
-              ("gnattest: attributes "
+              ("attributes "
                & Mode_Image_Att (Output_Mode)
                & " and "
                & Mode_Image_Att (Second_Output_Mode)
                & " are mutually exclusive");
          else
             Cmd_Error_No_Help
-              ("gnattest: options "
+              ("options "
                & Mode_Image_Cmd (Output_Mode)
                & " and "
                & Mode_Image_Cmd (Second_Output_Mode)
@@ -194,6 +194,7 @@ package body Test.Actions is
    begin
       GNATCOLL.Traces.Parse_Config_File;
       Test.Common.Verbose := Arg (Cmd, Verbose);
+      Test.Common.Quiet   := Arg (Cmd, Quiet);
 
       if Arg (Cmd, Passed_Tests) /= null then
          if Arg (Cmd, Passed_Tests).all = "hide" then
@@ -208,7 +209,15 @@ package body Test.Actions is
 
       if Status (Tool.Project_Tree.all) = Empty then
          for File of File_Names (Cmd) loop
-            Test.Aggregator.Add_Drivers_To_List (File.all);
+            Tmp := new String'
+              (GNAT.OS_Lib.Normalize_Pathname
+                 (File.all,
+                  Case_Sensitive => False));
+            if not GNAT.OS_Lib.Is_Regular_File (Tmp.all) then
+               Cmd_Error_No_Help ("cannot find " & Tmp.all);
+            end if;
+            Test.Aggregator.Add_Drivers_To_List (Tmp.all);
+            GNAT.OS_Lib.Free (Tmp);
          end loop;
 
          --  Clearing argument files so that the driver does not try to process
@@ -398,17 +407,15 @@ package body Test.Actions is
          for File of File_Names (Cmd) loop
             if not Contains (Ignored, Simple_Name (File.all)) then
 
-               Source_Info := Info (SPT, Create (+File.all));
+               Source_Info := Info (SPT, Create (SPT, +File.all));
 
                if Source_Info.Unit_Part = Unit_Spec then
                   if Test.Common.Harness_Only then
                      Test.Harness.Source_Table.Add_Source_To_Process
-                       (SPT.Create
-                          (+File.all, Source_Info.Project).Display_Full_Name);
+                       (Source_Info.File.Display_Full_Name);
                   else
                      Test.Skeleton.Source_Table.Add_Source_To_Process
-                       (SPT.Create
-                          (+File.all, Source_Info.Project).Display_Full_Name);
+                       (Source_Info.File.Display_Full_Name);
                   end if;
                end if;
             end if;

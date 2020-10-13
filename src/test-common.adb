@@ -477,51 +477,51 @@ package body Test.Common is
       end loop;
 
       if Name = """and""" then               -- and
-         return """And""";
+         return "And";
       elsif Name = """or""" then             -- or
-         return """Or""";
+         return "Or";
       elsif Name = """xor""" then            -- xor
-         return """Xor""";
+         return "Xor";
       elsif Name = """=""" then              -- =
-         return """Equal""";
+         return "Equal";
       elsif Name = """/=""" then             -- /=
-         return """Not_Equal""";
+         return "Not_Equal";
       elsif Name = """<""" then              -- <
-         return """Less_Than""";
+         return "Less_Than";
       elsif Name = """<=""" then             -- <=
-         return """Less_Than_Or_Equal""";
+         return "Less_Than_Or_Equal";
       elsif Name = """>""" then              -- >
-         return """Greater_Than""";
+         return "Greater_Than";
       elsif Name = """>=""" then             -- >=
-         return """Greater_Than_Or_Equal""";
+         return "Greater_Than_Or_Equal";
       elsif Name = """+""" then              -- +
          if Params'Length = 2 or else First_Param_Names_Size = 2 then
-            return """Plus""";
+            return "Plus";
          else
-            return """Unary_Plus""";
+            return "Unary_Plus";
          end if;
       elsif Name = """-""" then              -- -
          if Params'Length = 2 or else First_Param_Names_Size = 2 then
-            return """Minus""";
+            return "Minus";
          else
-            return """Unary_Minus""";
+            return "Unary_Minus";
          end if;
       elsif Name = """&""" then              -- &
-         return """Concatenate""";
+         return "Concatenate";
       elsif Name = """*""" then              -- *
-         return """Multiply""";
+         return "Multiply";
       elsif Name = """/""" then              -- /
-         return """Divide""";
+         return "Divide";
       elsif Name = """mod""" then            -- mod
-         return """Mod""";
+         return "Mod";
       elsif Name = """rem""" then            -- rem
-         return """Rem""";
-      elsif Name = """**""" then             -- **
-         return """Exponentiate""";
+         return "Rem";
+      elsif Name = "**" then             -- **
+         return "Exponentiate";
       elsif Name = """abs""" then            -- abs
-         return """Abs""";
+         return "Abs";
       elsif Name = """not""" then            -- not
-         return """Not""";
+         return "Not";
       end if;
 
       return "unknown operator";
@@ -619,6 +619,10 @@ package body Test.Common is
 
    procedure Report_Std (Message : String; Offset : Integer := 0) is
    begin
+
+      if Quiet then
+         return;
+      end if;
 
       for I in 1 .. Offset loop
          Ada.Text_IO.Put (Ada.Text_IO.Standard_Output, " ");

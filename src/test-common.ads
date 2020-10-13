@@ -344,4 +344,7 @@ package Test.Common is
    --  Used to prepend the names of test driver executables in
    --  test_drivers.list.
 
+   Quiet : Boolean := False;
+   --  Supresses non-critical output
+
 end Test.Common;
