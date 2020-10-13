@@ -2013,14 +2013,18 @@ package body Test.Stub is
       function Can_Declare_Variable (Param_Type : Type_Expr) return Boolean;
 
       function Can_Declare_Variable (Param_Type : Type_Expr) return Boolean is
+         Param_Type_Name : Libadalang.Analysis.Name;
+         Attr_Name        : Identifier;
       begin
 
-         if
-           Param_Type.Kind = Ada_Attribute_Ref and then
-           To_Lower (Node_Image (Param_Type.As_Attribute_Ref.F_Attribute)) =
-             "class"
-         then
-            return False;
+         if Param_Type.Kind = Ada_Subtype_Indication then
+            Param_Type_Name := Param_Type.As_Subtype_Indication.F_Name;
+            if Param_Type_Name.Kind = Ada_Attribute_Ref then
+               Attr_Name := Param_Type_Name.As_Attribute_Ref.F_Attribute;
+               if To_Lower (Node_Image (Attr_Name)) = "class" then
+                  return False;
+               end if;
+            end if;
          end if;
 
          return
