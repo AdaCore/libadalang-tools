@@ -493,7 +493,9 @@ package body Utils.Projects is
             if Main_Unit_Name (Cmd) = null then
                Prj := My_Project_Tree.Root_Project;
 
-               Files := Prj.Source_Files (Recursive => Arg (Cmd, Update_All));
+               Files := Prj.Source_Files
+                 (Recursive => Arg (Cmd, Update_All),
+                  Include_Externally_Built => False);
 
                for F in Files'Range loop
                   if not Is_Externally_Built (Files (F))
