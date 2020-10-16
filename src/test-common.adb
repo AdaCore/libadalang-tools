@@ -297,6 +297,8 @@ package body Test.Common is
    begin
       if Subp.Kind = Ada_Expr_Function then
          L_Subp := Subp.As_Base_Subp_Body.F_Subp_Spec.As_Base_Subp_Spec;
+      elsif Subp.Kind = Ada_Subp_Renaming_Decl then
+         L_Subp := Subp.As_Subp_Renaming_Decl.F_Subp_Spec.As_Base_Subp_Spec;
       else
          L_Subp := Subp.As_Basic_Subp_Decl.P_Subp_Decl_Spec;
       end if;

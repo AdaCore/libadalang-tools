@@ -90,6 +90,19 @@ package Test.Command_Lines is
      (Descriptor,
       Test_Strings);
 
+   package Test_String_Syntax is new Test_String_Switches.Set_Syntax
+     ((Separate_Drivers => '?',
+       Harness_Dir      => '=',
+       Tests_Dir        => '=',
+       Subdir           => '=',
+       Tests_Root       => '=',
+       Stubs_Dir        => '=',
+       Additional_Tests => '=',
+       Skeleton_Default => '=',
+       Passed_Tests     => '=',
+       Exit_Status      => '=',
+       Copy_Environment => '='));
+
    type Test_String_Seqs is (Exclude_From_Stubbing);
 
    package Test_String_Seq_Switches is new String_Seq_Switches

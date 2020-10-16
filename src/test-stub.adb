@@ -341,6 +341,7 @@ package body Test.Stub is
    is
       Data : Data_Holder;
    begin
+
       Gather_Data (Pack, Data);
       Gather_Markered_Data (Body_File_Name, Markered_Data);
 
@@ -411,6 +412,11 @@ package body Test.Stub is
          if Element.Kind in Ada_Base_Package_Decl then
             Pub_Part  := Element.As_Base_Package_Decl.F_Public_Part;
             Priv_Part := Element.As_Base_Package_Decl.F_Private_Part;
+         elsif Element.Kind = Ada_Generic_Package_Decl then
+            Pub_Part  :=
+              Element.As_Generic_Package_Decl.F_Package_Decl.F_Public_Part;
+            Priv_Part :=
+              Element.As_Generic_Package_Decl.F_Package_Decl.F_Private_Part;
          elsif Element.Kind = Ada_Protected_Type_Decl then
             Pub_Part  :=
               Element.As_Protected_Type_Decl.F_Definition.F_Public_Part;
@@ -500,8 +506,22 @@ package body Test.Stub is
          end if;
 
       end Create_Element_Node;
+
+      Clauses : constant Ada_Node_List :=
+        The_Unit.Unit.Root.As_Compilation_Unit.F_Prelude;
    begin
       Trace (Me, "gathering data from " & Spec_Base_File_Name);
+
+      for Cl of Clauses loop
+         if
+           Cl.Kind = Ada_With_Clause
+           and then Cl.As_With_Clause.F_Has_Limited
+         then
+            for WN of Cl.As_With_Clause.F_Packages loop
+               Data.Limited_Withed_Units.Include (Node_Image (WN));
+            end loop;
+         end if;
+      end loop;
 
       Tasks_Present := False;
       State_Cur := Data.Elem_Tree.Root;
@@ -524,6 +544,11 @@ package body Test.Stub is
             return N.Parent.Parent.Parent.Kind = Ada_Protected_Def;
 
          when Ada_Subp_Decl =>
+            if not N.As_Subp_Decl.P_Next_Part_For_Decl.Is_Null
+              and then N.As_Subp_Decl.P_Next_Part_For_Decl.Unit = N.Unit
+            then
+               return False;
+            end if;
             return not N.As_Basic_Subp_Decl.P_Is_Imported;
 
          when Ada_Generic_Subp_Decl =>
@@ -1094,6 +1119,15 @@ package body Test.Stub is
             else
                Generate_Procedure_Body (Node);
             end if;
+         when Ada_Generic_Subp_Decl                                      =>
+            if Node.Spec.As_Generic_Subp_Decl.F_Subp_Decl.As_Basic_Subp_Decl.
+              P_Subp_Decl_Spec.As_Subp_Spec.F_Subp_Kind =
+                Ada_Subp_Kind_Function
+            then
+               Generate_Function_Body (Node);
+            else
+               Generate_Procedure_Body (Node);
+            end if;
          when Ada_Entry_Decl                                             =>
             Generate_Entry_Body (Node);
          when Ada_Single_Protected_Decl | Ada_Protected_Type_Decl        =>
@@ -1338,8 +1372,12 @@ package body Test.Stub is
       MD  : Markered_Data_Type;
 
       Arg_Kind  : constant Ada_Node_Kind_Type := Node.Spec.Kind;
-      Parameters : constant Param_Spec_Array :=
-        Node.Spec.As_Basic_Subp_Decl.P_Subp_Decl_Spec.P_Params;
+      Spec : constant Base_Subp_Spec'Class :=
+        (if Arg_Kind = Ada_Generic_Subp_Decl then
+            Node.Spec.As_Generic_Subp_Decl.F_Subp_Decl.P_Subp_Decl_Spec
+         else
+            Node.Spec.As_Basic_Subp_Decl.P_Subp_Decl_Spec);
+      Parameters : constant Param_Spec_Array := Spec.P_Params;
 
       Param_List : constant Stubbed_Parameter_Lists.List :=
         Get_Args_List (Node);
@@ -1365,18 +1403,18 @@ package body Test.Stub is
 
       Add_Entity_To_Local_List (Node, New_Line_Counter, Level * Indent_Level);
 
-      if
-        Node.Spec.As_Classic_Subp_Decl.F_Overriding.Kind =
-          Ada_Overriding_Overriding
-      then
-         S_Put (Level * Indent_Level, "overriding");
-         New_Line_Count;
-      elsif
-        Node.Spec.As_Classic_Subp_Decl.F_Overriding.Kind =
-          Ada_Overriding_Not_Overriding
-      then
-         S_Put (Level * Indent_Level, "not overriding");
-         New_Line_Count;
+      if Arg_Kind = Ada_Subp_Decl then
+         if Node.Spec.As_Classic_Subp_Decl.F_Overriding.Kind =
+           Ada_Overriding_Overriding
+         then
+            S_Put (Level * Indent_Level, "overriding");
+            New_Line_Count;
+         elsif Node.Spec.As_Classic_Subp_Decl.F_Overriding.Kind =
+             Ada_Overriding_Not_Overriding
+         then
+            S_Put (Level * Indent_Level, "not overriding");
+            New_Line_Count;
+         end if;
       end if;
 
       S_Put (Level * Indent_Level, "procedure " & Node.Spec_Name.all);
@@ -1600,11 +1638,15 @@ package body Test.Stub is
       MD  : Markered_Data_Type;
 
       Arg_Kind  : constant Ada_Node_Kind_Type := Node.Spec.Kind;
-      Parameters : constant Param_Spec_Array :=
-        Node.Spec.As_Basic_Subp_Decl.P_Subp_Decl_Spec.P_Params;
-      Res_Profile : constant Type_Expr :=
-        Node.Spec.As_Basic_Subp_Decl.P_Subp_Decl_Spec.
-          As_Subp_Spec.F_Subp_Returns;
+
+      Spec : constant Base_Subp_Spec'Class :=
+        (if Arg_Kind = Ada_Generic_Subp_Decl then
+            Node.Spec.As_Generic_Subp_Decl.F_Subp_Decl.P_Subp_Decl_Spec
+         else
+            Node.Spec.As_Basic_Subp_Decl.P_Subp_Decl_Spec);
+
+      Parameters : constant Param_Spec_Array := Spec.P_Params;
+      Res_Profile : constant Type_Expr := Spec.As_Subp_Spec.F_Subp_Returns;
 
       Param_List : constant Stubbed_Parameter_Lists.List :=
         Get_Args_List (Node);
@@ -1675,21 +1717,23 @@ package body Test.Stub is
 
       Add_Entity_To_Local_List (Node, New_Line_Counter, Level * Indent_Level);
 
-      if
-        Node.Spec.As_Classic_Subp_Decl.F_Overriding.Kind =
-          Ada_Overriding_Overriding
-      then
-         S_Put (Level * Indent_Level, "overriding");
-         New_Line_Count;
-      elsif
-        Node.Spec.As_Classic_Subp_Decl.F_Overriding.Kind =
-          Ada_Overriding_Not_Overriding
-      then
-         S_Put (Level * Indent_Level, "not overriding");
-         New_Line_Count;
+      if Arg_Kind = Ada_Subp_Decl then
+         if Node.Spec.As_Classic_Subp_Decl.F_Overriding.Kind =
+           Ada_Overriding_Overriding
+         then
+            S_Put (Level * Indent_Level, "overriding");
+            New_Line_Count;
+         elsif Node.Spec.As_Classic_Subp_Decl.F_Overriding.Kind =
+             Ada_Overriding_Not_Overriding
+         then
+            S_Put (Level * Indent_Level, "not overriding");
+            New_Line_Count;
+         end if;
       end if;
 
-      S_Put (Level * Indent_Level, "function " & Node.Spec_Name.all);
+      S_Put
+        (Level * Indent_Level,
+         "function " & Node_Image (Node.Spec.As_Basic_Decl.P_Defining_Name));
 
       if Parameters'Length = 0 then
          S_Put
@@ -1943,7 +1987,9 @@ package body Test.Stub is
 
       S_Put (0, GT_Marker_Begin);
          New_Line_Count;
-      S_Put ((Level) * Indent_Level, "end " & Node.Spec_Name.all & ";");
+      S_Put
+        ((Level) * Indent_Level,
+         "end " & Node_Image (Node.Spec.As_Basic_Decl.P_Defining_Name) & ";");
       New_Line_Count;
       New_Line_Count;
       S_Put (0, GT_Marker_End);
@@ -2003,10 +2049,13 @@ package body Test.Stub is
       Result : Stubbed_Parameter_Lists.List :=
         Stubbed_Parameter_Lists.Empty_List;
 
-      Parameters : constant Param_Spec_Array :=
-        Node.Spec.As_Basic_Subp_Decl.P_Subp_Decl_Spec.P_Params;
+      Spec : constant Base_Subp_Spec'Class :=
+        (if Node.Spec.Kind = Ada_Generic_Subp_Decl then
+            Node.Spec.As_Generic_Subp_Decl.F_Subp_Decl.P_Subp_Decl_Spec
+         else
+            Node.Spec.As_Basic_Subp_Decl.P_Subp_Decl_Spec);
 
-      Spec : Base_Subp_Spec;
+      Parameters : constant Param_Spec_Array := Spec.P_Params;
 
       SP : Stubbed_Parameter;
 
@@ -2016,6 +2065,10 @@ package body Test.Stub is
          Param_Type_Name : Libadalang.Analysis.Name;
          Attr_Name        : Identifier;
       begin
+
+         if Is_Only_Limited_Withed (Param_Type) then
+            return False;
+         end if;
 
          if Param_Type.Kind = Ada_Subtype_Indication then
             Param_Type_Name := Param_Type.As_Subtype_Indication.F_Name;
@@ -2045,14 +2098,16 @@ package body Test.Stub is
             Param_Type : constant Type_Expr          := Param.F_Type_Expr;
 
             Type_Of_Interest : constant Boolean :=
-              not Is_Abstract (Param_Type);
+              Is_Only_Limited_Withed (Param_Type)
+              or else not Is_Abstract (Param_Type);
             --  From limited view or else not abstract
          begin
             if Type_Of_Interest then
-               if
-                 Param_Type.Kind = Ada_Anonymous_Type and then
-                 Param_Type.As_Anonymous_Type.F_Type_Decl.As_Type_Decl.
-                   F_Type_Def.Kind = Ada_Type_Access_Def
+               if Param_Type.Kind = Ada_Anonymous_Type
+                 and then Param_Type.As_Anonymous_Type.F_Type_Decl.
+                   As_Type_Decl.F_Type_Def.Kind = Ada_Type_Access_Def
+                 and then not Param_Type.As_Anonymous_Type.F_Type_Decl.
+                   As_Type_Decl.F_Type_Def.As_Type_Access_Def.F_Has_Constant
                then
                   for N of Name_List loop
                      SP.Name := new String'(Node_Image (N));
@@ -2098,7 +2153,6 @@ package body Test.Stub is
          end;
       end loop;
 
-      Spec := Node.Spec.As_Basic_Subp_Decl.P_Subp_Decl_Spec;
       if Spec.As_Subp_Spec.F_Subp_Kind.Kind = Ada_Subp_Kind_Function then
          declare
             Res_Profile : constant Type_Expr :=
@@ -2740,8 +2794,10 @@ package body Test.Stub is
 
       S_Put
         (Level * Indent_Level,
-        "type " & Node.Spec_Name.all & " ");
-      if Discr_Part.Kind = Ada_Known_Discriminant_Part then
+         "type " & Node.Spec_Name.all & " ");
+      if not Discr_Part.Is_Null
+        and then Discr_Part.Kind = Ada_Known_Discriminant_Part
+      then
          S_Put (0, Node_Image (Discr_Part) & " ");
       end if;
       S_Put (0, "is");

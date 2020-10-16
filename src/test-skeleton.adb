@@ -1028,6 +1028,10 @@ package body Test.Skeleton is
             return Over;
          end if;
 
+         if Node.Kind = Ada_Private_Part then
+            return Over;
+         end if;
+
          if Node.Kind = Ada_Package_Decl and then Inside_Inst then
             --  No processing for packages nested inside generic ones
             return Over;
@@ -1083,6 +1087,10 @@ package body Test.Skeleton is
          end if;
 
          if not Node.As_Type_Decl.P_Is_Tagged_Type then
+            return Over;
+         end if;
+
+         if Node.As_Type_Decl.P_Is_Interface_Type then
             return Over;
          end if;
 
@@ -1261,6 +1269,10 @@ package body Test.Skeleton is
             return Over;
          end if;
 
+         if Node.Kind = Ada_Private_Part then
+            return Over;
+         end if;
+
          if Node.Kind = Ada_Generic_Package_Instantiation
            and then not Inside_Inst
          then
@@ -1360,6 +1372,9 @@ package body Test.Skeleton is
          if Node.Kind = Ada_Expr_Function then
             Owner_Decl := Tagged_Primitive_Owner
               (Node.As_Base_Subp_Body.F_Subp_Spec.As_Base_Subp_Spec);
+         elsif Node.Kind = Ada_Subp_Renaming_Decl then
+            Owner_Decl := Tagged_Primitive_Owner
+              (Node.As_Subp_Renaming_Decl.F_Subp_Spec.As_Base_Subp_Spec);
          else
             Owner_Decl := Tagged_Primitive_Owner
               (Node.As_Basic_Subp_Decl.P_Subp_Decl_Spec);
@@ -6809,19 +6824,21 @@ package body Test.Skeleton is
                        not Parent_Unit.Is_Null and then
                        Parent_Unit.Unit /= Parent_Unit.P_Standard_Unit
                      loop
-                        declare
-                           Parent_File : constant String :=
-                             Parent_Unit.Unit.Get_Filename;
-                        begin
-                           if Good_To_Stub (Parent_Unit.Unit)
-                             and then not Already_Stubbing.Contains
-                               (Parent_File)
-                           then
-                              Already_Stubbing.Include (Parent_File);
-                              Data.Units_To_Stub.Append (Parent_Unit);
-                              Trace (Me, Parent_File);
-                           end if;
-                        end;
+                        if Parent_Unit.Kind = Ada_Package_Decl then
+                           declare
+                              Parent_File : constant String :=
+                                Parent_Unit.Unit.Get_Filename;
+                           begin
+                              if Good_To_Stub (Parent_Unit.Unit)
+                                and then not Already_Stubbing.Contains
+                                  (Parent_File)
+                              then
+                                 Already_Stubbing.Include (Parent_File);
+                                 Data.Units_To_Stub.Append (Parent_Unit);
+                                 Trace (Me, Parent_File);
+                              end if;
+                           end;
+                        end if;
                         Parent_Unit := Parent_Unit.P_Semantic_Parent;
                      end loop;
                   end loop;
@@ -6871,12 +6888,25 @@ package body Test.Skeleton is
            Base_Name (Check_Unit.Get_Filename);
          Arg_File_Name : constant String :=
            Base_Name (The_Unit.Unit.Get_Filename);
+         Lib_Item : constant Library_Item :=
+           Check_Unit.Root.As_Compilation_Unit.F_Body.As_Library_Item;
       begin
          if not Source_Present (Check_Unit.Get_Filename) then
             return False;
          end if;
          if Check_Unit = The_Unit.Unit then
             --  No self stubbing
+            return False;
+         end if;
+
+         if Lib_Item.F_Item.Kind /= Ada_Package_Decl then
+            --  Only packages are stubbed
+            return False;
+         end if;
+
+         if Lib_Item.F_Item.As_Basic_Decl.P_Has_Aspect
+           (To_Unbounded_Text (To_Text ("Remote_Call_Interface")))
+         then
             return False;
          end if;
 
@@ -6921,15 +6951,17 @@ package body Test.Skeleton is
       while
         not Parent.Is_Null and then Parent.Unit /= Parent.P_Standard_Unit
       loop
-         declare
-            Parent_File : constant String := Parent.Unit.Get_Filename;
-         begin
-            if not Already_Stubbing.Contains (Parent_File) then
-               Already_Stubbing.Include (Parent_File);
-               Data.Units_To_Stub.Append (Parent);
-               Trace (Me, Parent_File);
-            end if;
-         end;
+         if Parent.Kind = Ada_Package_Decl then
+            declare
+               Parent_File : constant String := Parent.Unit.Get_Filename;
+            begin
+               if not Already_Stubbing.Contains (Parent_File) then
+                  Already_Stubbing.Include (Parent_File);
+                  Data.Units_To_Stub.Append (Parent);
+                  Trace (Me, Parent_File);
+               end if;
+            end;
+         end if;
 
          Parent := Parent.P_Semantic_Parent;
       end loop;

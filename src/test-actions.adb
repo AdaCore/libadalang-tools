@@ -173,7 +173,7 @@ package body Test.Actions is
                 when Direct_Mode => "Tests_Dir");
       begin
          Test.Common.Report_Err
-           ("gnattest: multiple output modes are not allowed");
+           ("multiple output modes are not allowed");
          if From_Project then
             Cmd_Error_No_Help
               ("attributes "
@@ -219,6 +219,12 @@ package body Test.Actions is
             Test.Aggregator.Add_Drivers_To_List (Tmp.all);
             GNAT.OS_Lib.Free (Tmp);
          end loop;
+
+         if Arg (Cmd, Jobs) = 0 then
+            Cmd_Error_No_Help (" -j should be a positive number");
+         else
+            Test.Common.Queues_Number := Arg (Cmd, Jobs);
+         end if;
 
          --  Clearing argument files so that the driver does not try to process
          --  them as ada sources.
@@ -309,7 +315,7 @@ package body Test.Actions is
 
             Tests_Dir_Set := True;
             Test.Common.Separate_Root_Dir := new String'
-              (Root_Prj.Attribute_Value (Subdir_Mode_Att));
+              (Root_Prj.Attribute_Value (Root_Mode_Att));
 
          elsif Root_Prj.Has_Attribute (Subdir_Mode_Att) then
 
@@ -491,7 +497,7 @@ package body Test.Actions is
 
       --  Separate dreivers
       if Arg (Cmd, Separate_Drivers) /= null then
-         if Arg (Cmd, Separate_Drivers).all = "unit" then
+         if Arg (Cmd, Separate_Drivers).all in "unit" | "" then
             Test.Common.Separate_Drivers := True;
             Test.Common.Driver_Per_Unit := True;
          elsif Arg (Cmd, Separate_Drivers).all = "test" then
@@ -499,7 +505,8 @@ package body Test.Actions is
             Test.Common.Driver_Per_Unit := False;
          else
             Cmd_Error_No_Help
-              ("--separate-drivers should be either unit or test");
+              ("--separate-drivers should be either unit or test"
+               & " >" & Arg (Cmd, Separate_Drivers).all & "<");
          end if;
       end if;
 
@@ -1204,13 +1211,13 @@ package body Test.Actions is
 
          if Non_Null_Intersection (Future_Dirs, All_Source_Locations) then
             Cmd_Error_No_Help
-              ("gnattest: invalid output directory, cannot mix up "
+              ("invalid output directory, cannot mix up "
                & "tests and sources");
          end if;
 
          if Non_Null_Intersection (Future_Dirs, Harness_Dir_Ar) then
             Cmd_Error_No_Help
-              ("gnattest: invalid output directory, cannot mix up "
+              ("invalid output directory, cannot mix up "
                & "tests and infrastructure");
          end if;
 
@@ -1330,13 +1337,13 @@ package body Test.Actions is
 
          if Non_Null_Intersection (Future_Dirs, All_Source_Locations) then
             Cmd_Error_No_Help
-              ("gnattest: invalid output directory, cannot mix up "
+              ("invalid output directory, cannot mix up "
                & "tests and sources");
          end if;
 
          if Non_Null_Intersection (Future_Dirs, Harness_Dir_Ar) then
             Cmd_Error_No_Help
-              ("gnattest: invalid output directory, cannot mix up "
+              ("invalid output directory, cannot mix up "
                & "tests and infrastructure");
          end if;
 
