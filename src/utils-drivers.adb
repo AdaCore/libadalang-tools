@@ -30,6 +30,7 @@ with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 with GNAT.OS_Lib;
 
 with GNATCOLL.Projects;
+with GNATCOLL.Projects.Aux;
 
 with Utils.Command_Lines.Common;   use Utils.Command_Lines.Common;
 with Utils.Environment;
@@ -224,6 +225,12 @@ package body Utils.Drivers is
 
       Final (Tool, Cmd);
 
+      if GNATCOLL.Projects."/="
+        (Tool.Project_Tree.Status, GNATCOLL.Projects.Empty)
+      then
+         GNATCOLL.Projects.Aux.Delete_All_Temp_Files
+           (Tool.Project_Tree.Root_Project);
+      end if;
       GNATCOLL.Projects.Unload (Tool.Project_Tree.all);
       GNATCOLL.Projects.Free (Tool.Project_Env);
       Environment.Clean_Up;
