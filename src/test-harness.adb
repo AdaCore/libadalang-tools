@@ -468,6 +468,8 @@ package body Test.Harness is
          S_Put (0, "with Ada.Command_Line;");
          Put_New_Line;
       end if;
+      S_Put (0, "with Gnattest_Generated.Persistent;");
+      Put_New_Line;
       if not No_Command_Line then
          S_Put (0, "with GNAT.Command_Line; use GNAT.Command_Line;");
          Put_New_Line;
@@ -608,9 +610,18 @@ package body Test.Harness is
          Put_New_Line;
       end if;
       if No_Command_Line then
+         S_Put (3, "Gnattest_Generated.Persistent.Global_Set_Up;");
+         Put_New_Line;
          S_Put (3, "Runner (Reporter, GT_Options);");
+         Put_New_Line;
+         S_Put (3, "Gnattest_Generated.Persistent.Global_Tear_Down;");
+         Put_New_Line;
       else
+         S_Put (3, "Gnattest_Generated.Persistent.Global_Set_Up;");
+         Put_New_Line;
          S_Put (3, "Exit_Status := Runner (Reporter, GT_Options);");
+         Put_New_Line;
+         S_Put (3, "Gnattest_Generated.Persistent.Global_Tear_Down;");
          Put_New_Line;
          S_Put
            (3,
@@ -3704,7 +3715,7 @@ package body Test.Harness is
          else
             Report_Std
               ("warning: (gnattest) cannot create mapping for "
-               & Data.Test_Unit_File_Name.all);
+               & Base_Name (Data.Test_Unit_File_Name.all));
          end if;
       end if;
 
@@ -3798,10 +3809,6 @@ package body Test.Harness is
       end if;
 
       Param_Type_Name := Param_Type_Expr.As_Subtype_Indication.F_Name;
-
-      if Kind (Param_Type_Name) = Ada_Attribute_Ref then
-         return False;
-      end if;
 
       Param_Type_Name := Param_Type_Name.P_Relative_Name.As_Name;
       Param_Type_Decl := P_Canonical_Type

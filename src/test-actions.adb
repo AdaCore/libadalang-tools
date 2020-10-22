@@ -163,7 +163,7 @@ package body Test.Actions is
          function Mode_Image_Cmd (M : Output_Mode_Type) return String is
            (case M is
                 when Root_Mode   => "--tests-root",
-                when Subdir_Mode => "--subdir",
+                when Subdir_Mode => "--subdirs",
                 when Direct_Mode => "--tests-dir");
 
          function Mode_Image_Att (M : Output_Mode_Type) return String is
@@ -208,6 +208,13 @@ package body Test.Actions is
       end if;
 
       if Status (Tool.Project_Tree.all) = Empty then
+
+         if Arg (Cmd, Subdirs) /= null then
+            GNAT.OS_Lib.Free (Test.Common.Aggregate_Subdir_Name);
+            Test.Common.Aggregate_Subdir_Name := new String'
+              (Arg (Cmd, Subdirs).all);
+         end if;
+
          for File of File_Names (Cmd) loop
             Tmp := new String'
               (GNAT.OS_Lib.Normalize_Pathname
@@ -226,6 +233,19 @@ package body Test.Actions is
             Test.Common.Queues_Number := Arg (Cmd, Jobs);
          end if;
 
+         --  Dealing with environment dir to copy
+         if Arg (Cmd, Copy_Environment) /= null then
+            Test.Common.Environment_Dir := new String'
+              (Normalize_Pathname
+                 (Arg (Cmd, Copy_Environment).all,
+                  Case_Sensitive => False));
+            if not Is_Directory (Test.Common.Environment_Dir.all) then
+               Cmd_Error_No_Help
+                 ("environment dir "
+                  & Test.Common.Environment_Dir.all & " does not exist");
+            end if;
+         end if;
+
          --  Clearing argument files so that the driver does not try to process
          --  them as ada sources.
          Clear_File_Names (Cmd);
@@ -237,6 +257,13 @@ package body Test.Actions is
       end if;
 
       SPT := GNATCOLL.Projects.Project_Tree (Tool.Project_Tree.all);
+
+      --  Most output directories should be calculated relatively to original
+      --  object dirs, so possible side effect of --subdirs must be undone.
+      if Arg (Cmd, Subdirs) /= null then
+         SPT.Root_Project.Get_Environment.Set_Object_Subdir ("");
+         SPT.Recompute_View;
+      end if;
       Root_Prj := SPT.Root_Project;
 
       if Arg (Cmd, Harness_Only) then
@@ -260,7 +287,7 @@ package body Test.Actions is
 
          if Arg (Cmd, Tests_Root) /= null then
             Report_Multiple_Output (Root_Mode);
-         elsif Arg (Cmd, Subdir) /= null then
+         elsif Arg (Cmd, Subdirs) /= null then
             Report_Multiple_Output (Subdir_Mode);
          end if;
 
@@ -273,7 +300,7 @@ package body Test.Actions is
 
          Output_Mode := Root_Mode;
 
-         if Arg (Cmd, Subdir) /= null then
+         if Arg (Cmd, Subdirs) /= null then
             Report_Multiple_Output (Subdir_Mode);
          end if;
 
@@ -281,12 +308,12 @@ package body Test.Actions is
          Test.Common.Separate_Root_Dir := new String'
            (Arg (Cmd, Tests_Root).all);
 
-      elsif Arg (Cmd, Subdir) /= null then
+      elsif Arg (Cmd, Subdirs) /= null then
 
          Output_Mode := Subdir_Mode;
          Tests_Dir_Set := True;
          Test.Common.Test_Subdir_Name := new String'
-           (Arg (Cmd, Subdir).all);
+           (Arg (Cmd, Subdirs).all);
 
       else
 

@@ -924,10 +924,15 @@ package body Test.Common is
    -- Is_Function --
    -----------------
 
-   function Is_Function (Decl : Basic_Subp_Decl) return Boolean is
+   function Is_Function (Decl : Basic_Decl) return Boolean is
    begin
-      return Decl.P_Subp_Decl_Spec.As_Subp_Spec.F_Subp_Kind.Kind =
-        Ada_Subp_Kind_Function;
+      if Decl.Kind = Ada_Expr_Function then
+         return Decl.As_Expr_Function.F_Subp_Spec.F_Subp_Kind.Kind =
+           Ada_Subp_Kind_Function;
+      else
+         return Decl.As_Basic_Subp_Decl.P_Subp_Decl_Spec.As_Subp_Spec.
+           F_Subp_Kind.Kind = Ada_Subp_Kind_Function;
+      end if;
    exception
       when others =>
          return False;

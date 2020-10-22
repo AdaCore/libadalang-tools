@@ -129,7 +129,7 @@ package Test.Common is
    function Abstract_Type (Decl : Base_Type_Decl) return Boolean;
    --  Returns true if the declared type is abstract
 
-   function Is_Function (Decl : Basic_Subp_Decl) return Boolean;
+   function Is_Function (Decl : Basic_Decl) return Boolean;
    --  Returns True for function declarations, False for any unexpected
    --  arguments.
 
@@ -340,7 +340,7 @@ package Test.Common is
    --  spawn directories to solve potential issues like loading a file with
    --  a hardcoded relative path.
 
-   Aggregate_Subdir_Name : String_Access := new String'("");
+   Aggregate_Subdir_Name : GNAT.OS_Lib.String_Access := new String'("");
    --  Used to prepend the names of test driver executables in
    --  test_drivers.list.
 

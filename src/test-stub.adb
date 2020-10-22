@@ -2344,6 +2344,10 @@ package body Test.Stub is
          return Overall_Image;
       end if;
 
+      if Decl.Unit /= Param_Type.Unit then
+         return Overall_Image;
+      end if;
+
       declare
          Type_Nesting : constant String := To_Lower (Get_Nesting (Decl));
       begin

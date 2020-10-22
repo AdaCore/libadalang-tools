@@ -901,12 +901,15 @@ package body Test.Skeleton is
                     Node.As_Generic_Package_Instantiation.F_Generic_Pkg_Name;
                   Gen_Decl : constant Basic_Decl :=
                     Gen_Name.P_Relative_Name.As_Name.P_Referenced_Decl;
-                  Gen_File : constant String := Gen_Decl.Unit.Get_Filename;
                begin
+                  if Gen_Decl.Is_Null then
+                     return Over;
+                  end if;
+
                   --  No processing for instantiations of nested generics,
                   --  also if corresponding generic is not processed (or going
                   --  to be) there is no corresponding generic test package.
-                  if not Source_Present (Gen_File)
+                  if not Source_Present (Gen_Decl.Unit.Get_Filename)
                     or else Gen_Decl.Parent.Kind /= Ada_Library_Item
                   then
                      return Over;
@@ -958,12 +961,6 @@ package body Test.Skeleton is
             procedure Set_No_Parent (Type_Data : in out Base_Type_Info);
             --  Sets all data relevant to parent type to null/false
 
-            function Is_Interface_Declaration
-              (Arg : Type_Decl) return Boolean
-            is
-              (Arg.F_Type_Def.Kind in Ada_Interface_Kind);
-            --  Detects if Arg is a declaration of an interface
-
             -------------------
             -- Set_No_Parent --
             -------------------
@@ -993,7 +990,7 @@ package body Test.Skeleton is
 
             if
               not Is_Declared_In_Regular_Package (Parent_Type.As_Ada_Node)
-              or else Is_Interface_Declaration (Parent_Type.As_Type_Decl)
+              or else Parent_Type.As_Type_Decl.P_Is_Interface_Type
               or else Is_Fully_Private (Parent_Type)
             then
                Set_No_Parent (Type_Data);
@@ -1016,7 +1013,8 @@ package body Test.Skeleton is
          end Get_Type_Parent_Data;
       begin
          if Node.Kind = Ada_Generic_Package_Decl
-           and then Node.Parent.Kind /= Ada_Library_Item
+           and then (Node.Parent.Kind /= Ada_Library_Item
+                     or else Stub_Mode_ON)
          then
             --  Nested generics are not supported
             return Over;
@@ -1049,12 +1047,15 @@ package body Test.Skeleton is
                  Node.As_Generic_Package_Instantiation.F_Generic_Pkg_Name;
                Gen_Decl : constant Basic_Decl :=
                  Gen_Name.P_Relative_Name.As_Name.P_Referenced_Decl;
-               Gen_File : constant String := Gen_Decl.Unit.Get_Filename;
             begin
+               if Gen_Decl.Is_Null then
+                  return Over;
+               end if;
+
                --  No processing for instantiations of nested generics,
                --  also if corresponding generic is not processed (or going
                --  to be) there is no corresponding generic test package.
-               if not Source_Present (Gen_File)
+               if not Source_Present (Gen_Decl.Unit.Get_Filename)
                  or else Gen_Decl.Parent.Kind /= Ada_Library_Item
                then
                   return Over;
@@ -1252,7 +1253,8 @@ package body Test.Skeleton is
          end if;
 
          if Node.Kind = Ada_Generic_Package_Decl
-           and then Node.Parent.Kind /= Ada_Library_Item
+           and then (Node.Parent.Kind /= Ada_Library_Item
+                     or else Stub_Mode_ON)
          then
             --  Nested generics are not supported
             return Over;
@@ -1286,12 +1288,15 @@ package body Test.Skeleton is
                  Node.As_Generic_Package_Instantiation.F_Generic_Pkg_Name;
                Gen_Decl : constant Basic_Decl :=
                  Gen_Name.P_Relative_Name.As_Name.P_Referenced_Decl;
-               Gen_File : constant String := Gen_Decl.Unit.Get_Filename;
             begin
+               if Gen_Decl.Is_Null then
+                  return Over;
+               end if;
+
                --  No processing for instantiations of nested generics,
                --  also if corresponding generic is not processed (or going
                --  to be) there is no corresponding generic test package
-               if not Source_Present (Gen_File)
+               if not Source_Present (Gen_Decl.Unit.Get_Filename)
                  or else Gen_Decl.Parent.Kind /= Ada_Library_Item
                then
                   return Over;
@@ -1564,11 +1569,11 @@ package body Test.Skeleton is
          begin
             for Dec of Decls loop
                if Subp = Dec then
-                  return True;
+                  return False;
                end if;
             end loop;
 
-            return False;
+            return True;
          end Is_Overridden;
 
          Test_Routine : Test.Harness.Test_Routine_Info_Enhanced;
@@ -1581,6 +1586,13 @@ package body Test.Skeleton is
          Tmp_TR          : Test.Harness.Test_Routine_Info;
          Tmp_Has_TC    : Boolean;
       begin
+
+         --  Creating a stub for Subp_Info object
+         Tmp_Subp.Nesting          := new String'("");
+         Tmp_Subp.Subp_Text_Name   := new String'("");
+         Tmp_Subp.Subp_Full_Hash   := new String'("");
+         Tmp_Subp.Subp_Hash_V1     := new String'("");
+         Tmp_Subp.Subp_Hash_V2_1   := new String'("");
 
          for
            K in Suite_Data_List.Test_Types.First_Index + Dummy_Type_Counter ..
@@ -1824,12 +1836,18 @@ package body Test.Skeleton is
                       (TR_W.Original_Subp.As_Basic_Decl);
                begin
                   if OSubs'Length > 1 then
-                     OSub := OSubs (OSubs'Last - 1);
+                     OSub := No_Basic_Decl;
+                     for O in reverse OSubs'First .. OSubs'Last - 1 loop
+                        if OSubs (O).Kind /= Ada_Abstract_Subp_Decl then
+                           OSub := OSubs (O);
+                        end if;
+                     end loop;
                   end if;
                end;
             end if;
 
             if not OSub.Is_Null then
+
                if OSub.Kind = Ada_Expr_Function then
                   Ancestor_Type :=
                     P_Primitive_Subp_Tagged_Type
@@ -2993,7 +3011,7 @@ package body Test.Skeleton is
             end;
          end if;
 
-         if Is_Function (Subp.Subp_Declaration.As_Basic_Subp_Decl) then
+         if Is_Function (Subp.Subp_Declaration.As_Basic_Decl) then
             Result_Value := new String'
               (Subp.Subp_Mangle_Name.all
                & "_"
@@ -4860,7 +4878,7 @@ package body Test.Skeleton is
                   if Subp_Data_List.Element (Subp_Cur).Has_TC_Info then
                      if Is_Function
                        (Subp_Data_List.Element
-                          (Subp_Cur).Subp_Declaration.As_Basic_Subp_Decl)
+                          (Subp_Cur).Subp_Declaration.As_Basic_Decl)
                      then
                         Generate_Function_Wrapper
                           (Subp_Data_List.Element (Subp_Cur));
@@ -6022,7 +6040,7 @@ package body Test.Skeleton is
                      if Subp_Data_List.Element (Subp_Cur).Has_TC_Info then
                         if Is_Function
                           (Subp_Data_List.Element
-                             (Subp_Cur).Subp_Declaration.As_Basic_Subp_Decl)
+                             (Subp_Cur).Subp_Declaration.As_Basic_Decl)
                         then
                            Generate_Function_Wrapper
                              (Subp_Data_List.Element (Subp_Cur));
@@ -7646,11 +7664,14 @@ package body Test.Skeleton is
 
    procedure Put_Wrapper_Rename (Span : Natural; Current_Subp : Subp_Info)
    is
-      Spec    : constant Base_Subp_Spec   :=
-        Current_Subp.Subp_Declaration.As_Basic_Subp_Decl.P_Subp_Decl_Spec;
+      Spec    : constant Base_Subp_Spec'Class :=
+        (if Current_Subp.Subp_Declaration.Kind = Ada_Expr_Function then
+            Current_Subp.Subp_Declaration.As_Expr_Function.F_Subp_Spec
+         else
+            Current_Subp.Subp_Declaration.As_Basic_Subp_Decl.P_Subp_Decl_Spec);
       Params  : constant Param_Spec_Array := Spec.P_Params;
       Is_Func : constant Boolean          :=
-        Is_Function (Current_Subp.Subp_Declaration.As_Basic_Subp_Decl);
+        Is_Function (Current_Subp.Subp_Declaration.As_Basic_Decl);
    begin
 
       if Is_Func then
@@ -7695,8 +7716,12 @@ package body Test.Skeleton is
 
    procedure Generate_Function_Wrapper (Current_Subp : Subp_Info)
    is
-      Spec    : constant Base_Subp_Spec   :=
-        Current_Subp.Subp_Declaration.As_Basic_Subp_Decl.P_Subp_Decl_Spec;
+      Spec    : constant Base_Subp_Spec'Class :=
+        (if Current_Subp.Subp_Declaration.Kind = Ada_Expr_Function then
+            Current_Subp.Subp_Declaration.As_Expr_Function.F_Subp_Spec
+         else
+            Current_Subp.Subp_Declaration.As_Basic_Subp_Decl.P_Subp_Decl_Spec);
+
       Params  : constant Param_Spec_Array := Spec.P_Params;
       Str_Set : String_Set.Set;
       Cur     : String_Set.Cursor;
