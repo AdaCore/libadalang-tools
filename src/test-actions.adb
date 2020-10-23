@@ -149,6 +149,9 @@ package body Test.Actions is
       Tests_Dir_Set   : Boolean := False;
       Harness_Dir_Set : Boolean := False;
 
+      Ignored : Test.Common.String_Set.Set;
+      --  Set of file names mentioned in the --ignore=... switch
+
       procedure Report_Multiple_Output
         (Second_Output_Mode : Output_Mode_Type;
          From_Project       : Boolean := False);
@@ -265,6 +268,42 @@ package body Test.Actions is
          SPT.Recompute_View;
       end if;
       Root_Prj := SPT.Root_Project;
+
+      declare
+         procedure Include_One (File_Name : String);
+         --  Include File_Name in the Ignored set
+
+         procedure Include_One (File_Name : String) is
+         begin
+            Ignored.Include (File_Name);
+         end Include_One;
+      begin
+         for Ignored_Arg of Arg (Cmd, Ignore) loop
+            Read_File_Names_From_File (Ignored_Arg.all, Include_One'Access);
+         end loop;
+      end;
+
+      if Arg (Cmd, Recursive) then
+         --  We need to override the list of argument sources. Switch -r is
+         --  a legacy switch equal to -U without parameter that other tools
+         --  do not have. We can also optimise a bit, since gnattest only cares
+         --  about units specs as entry points of analysis.
+         Clear_File_Names (Cmd);
+         declare
+            All_Sources : File_Array_Access :=
+              Root_Prj.Source_Files (Recursive => True);
+         begin
+            for S of All_Sources.all loop
+               if not Ignored.Contains (Simple_Name (S.Display_Full_Name))
+                 and then To_Lower (SPT.Info (S).Language) = "ada"
+                 and then SPT.Info (S).Unit_Part = Unit_Spec
+               then
+                  Append_File_Name (Cmd, S.Display_Full_Name);
+               end if;
+            end loop;
+            Unchecked_Free (All_Sources);
+         end;
+      end if;
 
       if Arg (Cmd, Harness_Only) then
          Test.Common.Harness_Only := True;
@@ -417,25 +456,10 @@ package body Test.Actions is
          --  files, this should be optimized.
          use Test.Common.String_Set;
 
-         procedure Include_One (File_Name : String);
-         --  Include File_Name in the Ignored set below
-
-         Ignored : Test.Common.String_Set.Set;
-         --  Set of file names mentioned in the --ignore=... switch
-
          Source_Info : File_Info;
-
-         procedure Include_One (File_Name : String) is
-         begin
-            Include (Ignored, File_Name);
-         end Include_One;
 
       begin
          Common.Stub_Mode_ON := Arg (Cmd, Stub);
-
-         for Ignored_Arg of Arg (Cmd, Ignore) loop
-            Read_File_Names_From_File (Ignored_Arg.all, Include_One'Access);
-         end loop;
 
          for File of File_Names (Cmd) loop
             if not Contains (Ignored, Simple_Name (File.all)) then
@@ -719,6 +743,8 @@ package body Test.Actions is
          Cmd_Error_No_Help
            ("cannot find " & Test.Common.Additional_Tests_Prj.all);
       end if;
+
+      Ignored.Clear;
 
    end Init;
 
