@@ -755,7 +755,6 @@ package body Pp.Actions is
            when Ada_Number_Decl =>
              L ("?~,# ~~ ^: constant ^2:=[# !]"),
            when Ada_Object_Decl |
-               Ada_Anonymous_Object_Decl |
                Ada_Extended_Return_Stmt_Object_Decl =>
              L ("?~,# ~~ ^:? ~~~? ~~~? ~~~ !? ^2:=[# ~~]~!", Aspects),
            when Ada_Package_Renaming_Decl =>
@@ -1018,6 +1017,9 @@ package body Pp.Actions is
            when Ada_Anonymous_Type_Decl =>
              L ("//!", Aspects),
            when Ada_Synth_Anonymous_Type_Decl => null,
+           when Ada_Anonymous_Expr_Decl => null,
+               --  Anonymous expr decls cannot appear in source trees
+
            when Ada_Anonymous_Type_Access_Def => null,
            when Ada_Subtype_Indication |
                Ada_Constrained_Subtype_Indication |
@@ -3601,8 +3603,7 @@ package body Pp.Actions is
          procedure Do_Label;
          procedure Do_Param_Spec; -- also Formal_Object_Declaration
          procedure Do_Object_Decl;
-         --  Anonymous_Object_Decl and Extended_Return_Stmt_Object_Decl are
-         --  also passed to Do_Object_Decl.
+         --  Extended_Return_Stmt_Object_Decl is also passed to Do_Object_Decl
          procedure Do_Component_Decl;
          procedure Do_Pragma;
          procedure Do_Select_When_Part;
@@ -4845,7 +4846,6 @@ package body Pp.Actions is
                Do_Param_Spec;
 
             when Ada_Object_Decl |
-              Ada_Anonymous_Object_Decl |
               Ada_Extended_Return_Stmt_Object_Decl =>
                Do_Object_Decl;
 
