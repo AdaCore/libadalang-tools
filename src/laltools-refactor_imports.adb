@@ -27,6 +27,8 @@ with Langkit_Support.Errors;
 
 with Libadalang.Common;
 
+with Laltools.Common;
+
 package body Laltools.Refactor_Imports is
 
    package LALCommon renames Libadalang.Common;
@@ -78,11 +80,6 @@ package body Laltools.Refactor_Imports is
    --  If Unit is a specification unit, then creates a map where the keys
    --  identify a declaration by its identifier text, and the key's value is
    --  a list of all declarations with such identifier text.
-
-   function Get_Declarative_Part
-     (Stmts : LALAnalysis.Handled_Stmts) return LALAnalysis.Declarative_Part;
-   --  Finds the Handled_Stmts's respective Declarative_Part, if it exists.
-   --  ??? Possibly move this function to Libadalang.
 
    function Get_Local_Unit_Reachable_Declarations
      (Node : LALAnalysis.Ada_Node'Class)
@@ -523,43 +520,6 @@ package body Laltools.Refactor_Imports is
       return Reach_Decls;
    end Get_Specification_Unit_Declarations;
 
-   --------------------------
-   -- Get_Declarative_Part --
-   --------------------------
-
-   function Get_Declarative_Part
-     (Stmts : LALAnalysis.Handled_Stmts) return LALAnalysis.Declarative_Part
-   is
-      use type LALAnalysis.Handled_Stmts;
-      use type LALAnalysis.Ada_Node;
-   begin
-      if Stmts = LALAnalysis.No_Handled_Stmts
-        or else Stmts.Parent = LALAnalysis.No_Ada_Node
-      then
-         return LALAnalysis.No_Declarative_Part;
-      end if;
-
-      case Stmts.Parent.Kind is
-         when LALCommon.Ada_Decl_Block =>
-            return Stmts.Parent.As_Decl_Block.F_Decls;
-
-         when LALCommon.Ada_Entry_Body =>
-            return Stmts.Parent.As_Entry_Body.F_Decls;
-
-         when LALCommon.Ada_Package_Body =>
-            return Stmts.Parent.As_Package_Body.F_Decls;
-
-         when LALCommon.Ada_Subp_Body =>
-            return Stmts.Parent.As_Subp_Body.F_Decls;
-
-         when LALCommon.Ada_Task_Body =>
-            return Stmts.Parent.As_Task_Body.F_Decls;
-
-         when others =>
-            return LALAnalysis.No_Declarative_Part;
-      end case;
-   end Get_Declarative_Part;
-
    -------------------------------------------
    -- Get_Local_Unit_Reachable_Declarations --
    -------------------------------------------
@@ -597,7 +557,8 @@ package body Laltools.Refactor_Imports is
 
                declare
                   Decl_Part : constant LALAnalysis.Declarative_Part :=
-                    Get_Declarative_Part (Parent.As_Handled_Stmts);
+                    Laltools.Common.Get_Declarative_Part
+                      (Parent.As_Handled_Stmts);
                begin
                   if Decl_Part /= LALAnalysis.No_Declarative_Part then
                      for Decl of Decl_Part.F_Decls loop

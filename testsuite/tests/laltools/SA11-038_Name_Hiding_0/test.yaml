@@ -1,0 +1,5 @@
+description:
+    Refactoring - Rename test that checks if renaming a definition will start
+    hiding another one.
+
+driver: shell_script

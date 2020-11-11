@@ -1,0 +1,19 @@
+#!/bin/sh
+rename -P default.gpr -S ./src/foo.ads -L 1 -R 9 -N Bar --algorithm analyse_ast
+rename -P default.gpr -S ./src/foo.ads -L 1 -R 9 -N Qaax --algorithm analyse_ast
+rename -P default.gpr -S ./src/foo.ads -L 1 -R 9 -N Garply --algorithm analyse_ast
+rename -P default.gpr -S ./src/foo.ads -L 1 -R 9 -N Bor --algorithm analyse_ast
+rename -P default.gpr -S ./src/foo.ads -L 1 -R 9 -N Wibble --algorithm analyse_ast
+rename -P default.gpr -S ./src/foo.ads -L 1 -R 9 -N Wobble --algorithm analyse_ast
+rename -P default.gpr -S ./src/foo.ads -L 1 -R 9 -N Fleb --algorithm analyse_ast
+rename -P default.gpr -S ./src/foo.ads -L 1 -R 9 -N Flib --algorithm analyse_ast
+rename -P default.gpr -S ./src/foo.ads -L 1 -R 9 -N Flob --algorithm analyse_ast
+rename -P default.gpr -S ./src/foo.adb -L 12 -R 17 -N Qaax --algorithm analyse_ast
+rename -P default.gpr -S ./src/foo.adb -L 12 -R 17 -N Garply --algorithm analyse_ast
+rename -P default.gpr -S ./src/foo.adb -L 12 -R 17 -N Wibble --algorithm analyse_ast
+rename -P default.gpr -S ./src/foo.adb -L 12 -R 17 -N Wobble --algorithm analyse_ast
+rename -P default.gpr -S ./src/foo.adb -L 12 -R 17 -N Fleb --algorithm analyse_ast
+rename -P default.gpr -S ./src/foo.adb -L 12 -R 17 -N Flib --algorithm analyse_ast
+rename -P default.gpr -S ./src/foo.adb -L 12 -R 17 -N Flob --algorithm analyse_ast
+rename -P default.gpr -S ./src/foo.adb -L 25 -R 10 -N Flib --algorithm analyse_ast
+rename -P default.gpr -S ./src/foo.adb -L 25 -R 10 -N Flob --algorithm analyse_ast

@@ -1,0 +1,236 @@
+# Renaming node a.ads:22:14: 
+References:
+Unit:/src/a.adb
+Line: 40
+Source Location Range:
+Start_Line: 40
+Start_Column: 14
+End_Line: 40
+End_Column: 29
+Line: 43
+Source Location Range:
+Start_Line: 43
+Start_Column: 8
+End_Line: 43
+End_Column: 23
+Unit:/src/a.ads
+Line: 22
+Source Location Range:
+Start_Line: 22
+Start_Column: 14
+End_Line: 22
+End_Column: 29
+Problems:
+Renaming Foo_Procedure_1 to Bar_Procedure_1 will override <Id "Bar_Procedure_1" a.ads:8:14-8:29>
+
+# Renaming node a.ads:22:14: 
+References:
+Unit:/src/a.adb
+Line: 40
+Source Location Range:
+Start_Line: 40
+Start_Column: 14
+End_Line: 40
+End_Column: 29
+Line: 43
+Source Location Range:
+Start_Line: 43
+Start_Column: 8
+End_Line: 43
+End_Column: 23
+Unit:/src/a.ads
+Line: 22
+Source Location Range:
+Start_Line: 22
+Start_Column: 14
+End_Line: 22
+End_Column: 29
+
+# Renaming node a.ads:22:14: 
+References:
+Unit:/src/a.adb
+Line: 40
+Source Location Range:
+Start_Line: 40
+Start_Column: 14
+End_Line: 40
+End_Column: 29
+Line: 43
+Source Location Range:
+Start_Line: 43
+Start_Column: 8
+End_Line: 43
+End_Column: 23
+Unit:/src/a.ads
+Line: 22
+Source Location Range:
+Start_Line: 22
+Start_Column: 14
+End_Line: 22
+End_Column: 29
+
+# Renaming node a.ads:26:13: 
+References:
+Unit:/src/a.adb
+Line: 50
+Source Location Range:
+Start_Line: 50
+Start_Column: 13
+End_Line: 50
+End_Column: 27
+Line: 54
+Source Location Range:
+Start_Line: 54
+Start_Column: 8
+End_Line: 54
+End_Column: 22
+Unit:/src/a.ads
+Line: 26
+Source Location Range:
+Start_Line: 26
+Start_Column: 13
+End_Line: 26
+End_Column: 27
+
+# Renaming node a.ads:26:13: 
+References:
+Unit:/src/a.adb
+Line: 50
+Source Location Range:
+Start_Line: 50
+Start_Column: 13
+End_Line: 50
+End_Column: 27
+Line: 54
+Source Location Range:
+Start_Line: 54
+Start_Column: 8
+End_Line: 54
+End_Column: 22
+Unit:/src/a.ads
+Line: 26
+Source Location Range:
+Start_Line: 26
+Start_Column: 13
+End_Line: 26
+End_Column: 27
+Problems:
+Renaming Foo_Function_1 to Bar_Function_1 will override <Id "Bar_Function_1" a.ads:12:13-12:27>
+
+# Renaming node a.ads:26:13: 
+References:
+Unit:/src/a.adb
+Line: 50
+Source Location Range:
+Start_Line: 50
+Start_Column: 13
+End_Line: 50
+End_Column: 27
+Line: 54
+Source Location Range:
+Start_Line: 54
+Start_Column: 8
+End_Line: 54
+End_Column: 22
+Unit:/src/a.ads
+Line: 26
+Source Location Range:
+Start_Line: 26
+Start_Column: 13
+End_Line: 26
+End_Column: 27
+
+# Renaming node a.ads:26:13: 
+References:
+Unit:/src/a.adb
+Line: 50
+Source Location Range:
+Start_Line: 50
+Start_Column: 13
+End_Line: 50
+End_Column: 27
+Line: 54
+Source Location Range:
+Start_Line: 54
+Start_Column: 8
+End_Line: 54
+End_Column: 22
+Unit:/src/a.ads
+Line: 26
+Source Location Range:
+Start_Line: 26
+Start_Column: 13
+End_Line: 26
+End_Column: 27
+
+# Renaming node a.ads:26:13: 
+References:
+Unit:/src/a.adb
+Line: 50
+Source Location Range:
+Start_Line: 50
+Start_Column: 13
+End_Line: 50
+End_Column: 27
+Line: 54
+Source Location Range:
+Start_Line: 54
+Start_Column: 8
+End_Line: 54
+End_Column: 22
+Unit:/src/a.ads
+Line: 26
+Source Location Range:
+Start_Line: 26
+Start_Column: 13
+End_Line: 26
+End_Column: 27
+
+# Renaming node a.ads:30:13: 
+References:
+Unit:/src/a.adb
+Line: 62
+Source Location Range:
+Start_Line: 62
+Start_Column: 13
+End_Line: 62
+End_Column: 27
+Line: 67
+Source Location Range:
+Start_Line: 67
+Start_Column: 8
+End_Line: 67
+End_Column: 22
+Unit:/src/a.ads
+Line: 30
+Source Location Range:
+Start_Line: 30
+Start_Column: 13
+End_Line: 30
+End_Column: 27
+
+# Renaming node a.ads:30:13: 
+References:
+Unit:/src/a.adb
+Line: 62
+Source Location Range:
+Start_Line: 62
+Start_Column: 13
+End_Line: 62
+End_Column: 27
+Line: 67
+Source Location Range:
+Start_Line: 67
+Start_Column: 8
+End_Line: 67
+End_Column: 22
+Unit:/src/a.ads
+Line: 30
+Source Location Range:
+Start_Line: 30
+Start_Column: 13
+End_Line: 30
+End_Column: 27
+Problems:
+Renaming Foo_Function_3 to Bar_Function_3 will override <Id "Bar_Function_3" a.ads:16:13-16:27>
+

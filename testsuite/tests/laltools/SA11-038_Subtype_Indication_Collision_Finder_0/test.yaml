@@ -1,0 +1,6 @@
+description:
+    Refactoring - Rename test that checks if renaming a reference of a type
+    that is a type indication of a subprogram parameter will cause a name
+    collision with the parameter.
+
+driver: shell_script

@@ -1,0 +1,230 @@
+# Renaming node foo.ads:6:4: 
+References:
+Unit:/src/foo.adb
+Line: 34
+Source Location Range:
+Start_Line: 34
+Start_Column: 52
+End_Line: 34
+End_Column: 55
+Unit:/src/foo.ads
+Line: 6
+Source Location Range:
+Start_Line: 6
+Start_Column: 4
+End_Line: 6
+End_Column: 7
+Problems:
+Renaming Ber to Flob will hide it by <Id "Flob" foo.adb:32:16-32:20>
+
+# Renaming node foo.ads:13:7: 
+References:
+Unit:/src/foo.adb
+Line: 35
+Source Location Range:
+Start_Line: 35
+Start_Column: 52
+End_Line: 35
+End_Column: 56
+Unit:/src/foo.ads
+Line: 13
+Source Location Range:
+Start_Line: 13
+Start_Column: 7
+End_Line: 13
+End_Column: 11
+Problems:
+Renaming Qeex to Flob will hide it by <Id "Flob" foo.adb:32:16-32:20>
+
+# Renaming node foo.ads:16:10: 
+References:
+Unit:/src/foo.adb
+Line: 36
+Source Location Range:
+Start_Line: 36
+Start_Column: 52
+End_Line: 36
+End_Column: 58
+Unit:/src/foo.ads
+Line: 16
+Source Location Range:
+Start_Line: 16
+Start_Column: 10
+End_Line: 16
+End_Column: 16
+Problems:
+Renaming Garply to Flob will hide it by <Id "Flob" foo.adb:32:16-32:20>
+
+# Renaming node foo.ads:20:10: 
+References:
+Unit:/src/foo.adb
+Line: 37
+Source Location Range:
+Start_Line: 37
+Start_Column: 52
+End_Line: 37
+End_Column: 58
+Unit:/src/foo.ads
+Line: 20
+Source Location Range:
+Start_Line: 20
+Start_Column: 10
+End_Line: 20
+End_Column: 16
+Problems:
+Renaming Gerply to Flob will hide it by <Id "Flob" foo.adb:32:16-32:20>
+
+# Renaming node foo.ads:23:7: 
+References:
+Unit:/src/foo.adb
+Line: 38
+Source Location Range:
+Start_Line: 38
+Start_Column: 52
+End_Line: 38
+End_Column: 56
+Unit:/src/foo.ads
+Line: 23
+Source Location Range:
+Start_Line: 23
+Start_Column: 7
+End_Line: 23
+End_Column: 11
+Problems:
+Renaming Qiix to Flob will hide it by <Id "Flob" foo.adb:32:16-32:20>
+
+# Renaming node foo.ads:26:4: 
+References:
+Unit:/src/foo.adb
+Line: 39
+Source Location Range:
+Start_Line: 39
+Start_Column: 52
+End_Line: 39
+End_Column: 55
+Unit:/src/foo.ads
+Line: 26
+Source Location Range:
+Start_Line: 26
+Start_Column: 4
+End_Line: 26
+End_Column: 7
+Problems:
+Renaming Bir to Flob will hide it by <Id "Flob" foo.adb:32:16-32:20>
+
+# Renaming node foo.ads:28:4: 
+References:
+Unit:/src/foo.adb
+Line: 40
+Source Location Range:
+Start_Line: 40
+Start_Column: 52
+End_Line: 40
+End_Column: 55
+Unit:/src/foo.ads
+Line: 28
+Source Location Range:
+Start_Line: 28
+Start_Column: 4
+End_Line: 28
+End_Column: 7
+Problems:
+Renaming Bor to Flob will hide it by <Id "Flob" foo.adb:32:16-32:20>
+
+# Renaming node foo.adb:11:4: 
+References:
+Unit:/src/foo.adb
+Line: 11
+Source Location Range:
+Start_Line: 11
+Start_Column: 4
+End_Line: 11
+End_Column: 9
+Line: 41
+Source Location Range:
+Start_Line: 41
+Start_Column: 52
+End_Line: 41
+End_Column: 57
+Problems:
+Renaming Xyzzy to Flob will hide it by <Id "Flob" foo.adb:32:16-32:20>
+
+# Renaming node foo.adb:22:7: 
+References:
+Unit:/src/foo.adb
+Line: 22
+Source Location Range:
+Start_Line: 22
+Start_Column: 7
+End_Line: 22
+End_Column: 13
+Line: 42
+Source Location Range:
+Start_Line: 42
+Start_Column: 52
+End_Line: 42
+End_Column: 58
+Problems:
+Renaming Wubble to Flob will hide it by <Id "Flob" foo.adb:32:16-32:20>
+
+# Renaming node foo.adb:26:10: 
+References:
+Unit:/src/foo.adb
+Line: 26
+Source Location Range:
+Start_Line: 26
+Start_Column: 10
+End_Line: 26
+End_Column: 14
+Line: 43
+Source Location Range:
+Start_Line: 43
+Start_Column: 52
+End_Line: 43
+End_Column: 56
+Problems:
+Renaming Fleb to Flob will hide it by <Id "Flob" foo.adb:32:16-32:20>
+
+# Renaming node foo.adb:29:13: 
+References:
+Unit:/src/foo.adb
+Line: 29
+Source Location Range:
+Start_Line: 29
+Start_Column: 13
+End_Line: 29
+End_Column: 17
+Line: 44
+Source Location Range:
+Start_Line: 44
+Start_Column: 52
+End_Line: 44
+End_Column: 56
+Problems:
+Renaming Flib to Flob will hide it by <Id "Flob" foo.adb:32:16-32:20>
+
+# Renaming node foo.adb:28:27: 
+References:
+Unit:/src/foo.adb
+Line: 28
+Source Location Range:
+Start_Line: 28
+Start_Column: 27
+End_Line: 28
+End_Column: 30
+Line: 45
+Source Location Range:
+Start_Line: 45
+Start_Column: 52
+End_Line: 45
+End_Column: 55
+Unit:/src/foo.ads
+Line: 18
+Source Location Range:
+Start_Line: 18
+Start_Column: 27
+End_Line: 18
+End_Column: 30
+Problems:
+Renaming Jab to Flob will hide it by <Id "Flob" foo.adb:32:16-32:20>
+

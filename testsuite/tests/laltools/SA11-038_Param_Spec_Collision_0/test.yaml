@@ -1,0 +1,5 @@
+description:
+    Refactoring - Rename test that checks if we're renaming a parameter
+    to the same name as another parameter or its type indication.
+
+driver: shell_script

@@ -1,0 +1,39 @@
+# Renaming node main.adb:6:4: 
+References:
+Unit:/src/main.adb
+Line: 6
+Source Location Range:
+Start_Line: 6
+Start_Column: 4
+End_Line: 6
+End_Column: 8
+Line: 11
+Source Location Range:
+Start_Line: 11
+Start_Column: 14
+End_Line: 11
+End_Column: 18
+Line: 12
+Source Location Range:
+Start_Line: 12
+Start_Column: 14
+End_Line: 12
+End_Column: 18
+Line: 19
+Source Location Range:
+Start_Line: 19
+Start_Column: 17
+End_Line: 19
+End_Column: 21
+Line: 20
+Source Location Range:
+Start_Line: 20
+Start_Column: 17
+End_Line: 20
+End_Column: 21
+Problems:
+Renaming Quux to Baz loses reference <Id "Quux" main.adb:19:17-19:21>
+Renaming Quux to Baz loses reference <Id "Quux" main.adb:20:17-20:21>
+Renaming Quux to Baz creates a new reference <Id "Baz" main.adb:9:14-9:17>
+Renaming Quux to Baz creates a new reference <Id "Baz" main.adb:10:14-10:17>
+

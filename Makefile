@@ -11,7 +11,8 @@ LIB_PROJECTS = \
 
 TESTSUITE_PROJECTS = \
    testsuite/ada_drivers/refactor_imports/refactor_imports.gpr \
-   testsuite/ada_drivers/outgoing_calls/outgoing_calls.gpr
+   testsuite/ada_drivers/outgoing_calls/outgoing_calls.gpr \
+   testsuite/ada_drivers/refactoring_rename/rename.gpr \
 
 ALL_PROJECTS = \
    $(LIB_PROJECTS) $(TESTSUITE_PROJECTS)

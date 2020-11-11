@@ -1,0 +1,5 @@
+description:
+    Refactoring - Rename test that checks if renaming a definition will
+    hide it by another one. More specifically, this tests definitions
+    inside nested packages and nested declarative parts.
+driver: shell_script

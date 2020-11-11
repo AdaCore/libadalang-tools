@@ -1,0 +1,5 @@
+description:
+    Refactoring - Rename test that checks if renaming a subprogram that is a
+    primitive of a type will start overriding a inherithed primitive.
+
+driver: shell_script

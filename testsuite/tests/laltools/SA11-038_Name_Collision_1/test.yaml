@@ -1,0 +1,7 @@
+description:
+    Refactoring - Rename test that checks for a name collision created by
+    renaming a definition to 1) the same name as another existing definition
+    in the same scope or 2) the same same as an existing compilation unit
+    that has the same parent package as the definition we're renaming.
+
+driver: shell_script

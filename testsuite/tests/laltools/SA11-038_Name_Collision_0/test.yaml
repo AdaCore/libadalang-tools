@@ -1,0 +1,6 @@
+description:
+    Refactoring - Rename test that checks for name collision created by
+    renaming a declaration to the same name as another existing declaration
+    in the same scope.
+
+driver: shell_script
