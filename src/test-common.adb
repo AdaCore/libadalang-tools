@@ -23,19 +23,20 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Libadalang.Common; use Libadalang.Common;
+with Libadalang.Common;         use Libadalang.Common;
 
-with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO;               use Ada.Text_IO;
+with Ada.IO_Exceptions;
+with Ada.Exceptions;            use Ada.Exceptions;
+with Ada.Characters.Handling;   use Ada.Characters.Handling;
+with Ada.Strings;               use Ada.Strings;
+with Ada.Strings.Fixed;         use Ada.Strings.Fixed;
 
-with Ada.Characters.Handling; use Ada.Characters.Handling;
-with Ada.Strings; use Ada.Strings;
-with Ada.Strings.Fixed; use Ada.Strings.Fixed;
-
-with GNATCOLL.Traces; use GNATCOLL.Traces;
+with GNATCOLL.Traces;           use GNATCOLL.Traces;
 
 with GNAT.SHA1;
 
-with Utils.Command_Lines; use Utils.Command_Lines;
+with Utils.Command_Lines;       use Utils.Command_Lines;
 
 with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 
@@ -685,6 +686,12 @@ package body Test.Common is
       end if;
       Char_Sequential_IO.Create
         (Output_File, Char_Sequential_IO.Out_File, P_Name & B_Name);
+   exception
+      when Ex : Ada.IO_Exceptions.Name_Error =>
+         if Index (Exception_Information (Ex), "file name too long") > 0 then
+            Report_Err ("file name exceeds length limitation");
+         end if;
+         Cmd_Error_No_Help ("cannot create " & Name);
    end Create;
 
    -----------
