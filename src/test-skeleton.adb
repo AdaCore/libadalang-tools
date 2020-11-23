@@ -851,6 +851,10 @@ package body Test.Skeleton is
             return Over;
          end if;
 
+         if Node.Kind = Ada_Generic_Formal_Part then
+            return Over;
+         end if;
+
          case Kind (Node) is
             when Ada_Package_Decl =>
                if Get_Nesting (Node) = "" then
@@ -1027,6 +1031,10 @@ package body Test.Skeleton is
          end if;
 
          if Node.Kind = Ada_Private_Part then
+            return Over;
+         end if;
+
+         if Node.Kind = Ada_Generic_Formal_Part then
             return Over;
          end if;
 
@@ -1272,6 +1280,10 @@ package body Test.Skeleton is
          end if;
 
          if Node.Kind = Ada_Private_Part then
+            return Over;
+         end if;
+
+         if Node.Kind = Ada_Generic_Formal_Part then
             return Over;
          end if;
 
@@ -1613,6 +1625,7 @@ package body Test.Skeleton is
                   if
                     Source_Present (ISub.Unit.Get_Filename)
                     and then Is_Callable_Subprogram (ISub)
+                    and then not Is_Private (ISub)
                     and then not Is_Overridden (ISub, ISubs2)
                   then
 
@@ -2076,7 +2089,7 @@ package body Test.Skeleton is
             end if;
 
             if not Stub_Mode_ON and then not Separate_Drivers
-              and then Sem_Parent.Kind in Ada_Library_Item_Range
+              and then Sem_Parent.Parent.Kind in Ada_Library_Item_Range
               and then Sem_Parent.Parent.As_Library_Item.F_Has_Private
             then
                --  Cannot incorporate test packages of private packages
