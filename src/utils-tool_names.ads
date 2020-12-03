@@ -21,8 +21,7 @@ package Utils.Tool_Names is
    function Basic_Tool_Name return String;
    --  Returns the tool name without the target & "-", if any
 
-   Full_Tool_Name : String renames
-     Locate_Exec_On_Path (Ada.Command_Line.Command_Name).all;
-   --  Full path name of the tool executable file. Cannot be null.
+   function Full_Tool_Name return String;
+   --  Returns the full tool name
 
 end Utils.Tool_Names;

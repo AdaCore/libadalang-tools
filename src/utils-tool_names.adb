@@ -34,4 +34,18 @@ package body Utils.Tool_Names is
       end if;
    end Basic_Tool_Name;
 
+   --------------------
+   -- Full_Tool_Name --
+   --------------------
+
+   function Full_Tool_Name return String
+   is
+      Tool_Access : String_Access :=
+        Locate_Exec_On_Path (Ada.Command_Line.Command_Name);
+      Res : constant String := Tool_Access.all;
+   begin
+      Free (Tool_Access);
+      return Res;
+   end Full_Tool_Name;
+
 end Utils.Tool_Names;
