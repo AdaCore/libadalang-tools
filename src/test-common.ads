@@ -98,11 +98,6 @@ package Test.Common is
       (Node_Image (P_Top_Level_Decl (Node, Node.Unit).P_Defining_Name));
    --  Returns name of the compilation unit enclosing given node
 
-   function Tagged_Primitive_Owner (Subp : Base_Subp_Spec)
-                                    return Base_Type_Decl;
-   --  Returns the tagged type of which given subprogram is primitive or
-   --  No_Base_Type_Decl if there is no such type.
-
    function Parent_Type_Declaration
      (Type_Dec : Base_Type_Decl) return Base_Type_Decl;
    --  Returns a corresponding parent type declaration for a given tagged type

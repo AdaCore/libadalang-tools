@@ -546,7 +546,7 @@ package body Test.Actions is
          end if;
       end if;
 
-      --  Separate dreivers
+      --  Separate drivers
       if Arg (Cmd, Separate_Drivers) /= null then
          if Arg (Cmd, Separate_Drivers).all in "unit" | "" then
             Test.Common.Separate_Drivers := True;
@@ -742,6 +742,27 @@ package body Test.Actions is
       then
          Cmd_Error_No_Help
            ("cannot find " & Test.Common.Additional_Tests_Prj.all);
+      end if;
+
+      if Root_Prj.Has_Attribute (Compiler_Default_Switches_Attribute) then
+         declare
+            Switches : String_List_Access :=
+              Attribute_Value (Root_Prj,
+                               Compiler_Default_Switches_Attribute,
+                               "ada");
+         begin
+            if Switches = null then
+               return;
+            end if;
+
+            for I in Switches'Range loop
+               if Switches (I).all = "-gnatE" then
+                  Test.Common.Inherited_Switches.Append (Switches (I).all);
+               end if;
+            end loop;
+
+            Free (Switches);
+         end;
       end if;
 
       Ignored.Clear;

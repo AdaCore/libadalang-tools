@@ -812,6 +812,12 @@ package body Test.Skeleton is
          (Decl.P_Has_Aspect (To_Unbounded_Text (To_Text ("ghost"))));
       --  Detects if given declaration has aspect Ghost
 
+      procedure Check_Type_For_Elaboration (Type_Dec : Base_Type_Decl);
+      --  Checking if is any of parent types have pragma
+      --  Preelaborable_Initialization. This might cause
+      --  elaboration conflicts in the harness, so a warning
+      --  should be isued.
+
       function Test_Types_Linked
         (Inheritance_Root_Type  : Base_Type_Decl;
          Inheritance_Final_Type : Base_Type_Decl)
@@ -896,7 +902,7 @@ package body Test.Skeleton is
 
             when Ada_Generic_Package_Instantiation =>
 
-               if Stub_Mode_ON then
+               if Stub_Mode_ON or else Is_Node_From_Generic (Node) then
                   return Over;
                end if;
 
@@ -1138,6 +1144,8 @@ package body Test.Skeleton is
                end if;
             end loop;
          end;
+
+         Check_Type_For_Elaboration (Cur_Node.As_Base_Type_Decl);
 
          --  Checking if any of ancestor types had a discriminant part
          Type_Data.No_Default_Discriminant := False;
@@ -1387,13 +1395,13 @@ package body Test.Skeleton is
          end;
 
          if Node.Kind = Ada_Expr_Function then
-            Owner_Decl := Tagged_Primitive_Owner
+            Owner_Decl := P_Primitive_Subp_Tagged_Type
               (Node.As_Base_Subp_Body.F_Subp_Spec.As_Base_Subp_Spec);
          elsif Node.Kind = Ada_Subp_Renaming_Decl then
-            Owner_Decl := Tagged_Primitive_Owner
+            Owner_Decl := P_Primitive_Subp_Tagged_Type
               (Node.As_Subp_Renaming_Decl.F_Subp_Spec.As_Base_Subp_Spec);
          else
-            Owner_Decl := Tagged_Primitive_Owner
+            Owner_Decl := P_Primitive_Subp_Tagged_Type
               (Node.As_Basic_Subp_Decl.P_Subp_Decl_Spec);
          end if;
 
@@ -2040,6 +2048,83 @@ package body Test.Skeleton is
 
          return False;
       end Is_Node_From_Generic;
+
+      --------------------------------
+      -- Check_Type_For_Elaboration --
+      --------------------------------
+
+      procedure Check_Type_For_Elaboration (Type_Dec : Base_Type_Decl) is
+         Dec  : Base_Type_Decl := Type_Dec;
+         Dec2 : Base_Type_Decl;
+
+         Elab_Name : constant Langkit_Support.Text.Unbounded_Text_Type :=
+           To_Unbounded_Text ("preelaborable_initialization");
+
+         Unit_SF_Name : constant String :=
+           Base_Name (Type_Dec.Unit.Get_Filename);
+
+         function Check_Pragma (Node : Ada_Node'Class) return Boolean;
+         --  Checks for pragma in the following nodes
+
+         function Check_Pragma (Node : Ada_Node'Class) return Boolean is
+            Next : Ada_Node := Node.Next_Sibling;
+         begin
+            while not Next.Is_Null and then Next.Kind = Ada_Pragma_Node loop
+               if To_Lower (Node_Image (F_Id (Next.As_Pragma_Node))) =
+                 "preelaborable_initialization"
+               then
+                  return True;
+               end if;
+
+               Next := Next.Next_Sibling;
+            end loop;
+
+            return False;
+         end Check_Pragma;
+
+      begin
+
+         while not Dec.Is_Null loop
+
+            --  We need to check all 3 possible declarations, so first roll
+            --  to the topmost one.
+            while not Dec.P_Previous_Part.Is_Null loop
+               Dec := Dec.P_Previous_Part;
+            end loop;
+
+            Dec2 := Dec;
+
+            while not Dec2.Is_Null loop
+               if Dec2.P_Has_Aspect (Elab_Name)
+                 or else not Dec2.P_Get_Pragma (Elab_Name).Is_Null
+                 or else Check_Pragma (Dec2)
+               then
+                  Report_Std
+                    ("warning: (gnattest) "
+                     & Unit_SF_Name
+                     & ":"
+                     & Trim (First_Line_Number (Dec2)'Img, Both)
+                     & ":"
+                     & Trim (First_Column_Number (Dec2)'Img, Both)
+                     & ":"
+                     & " elaboration control pragma given"
+                     & " for ancestor type of "
+                     & Node_Image (Type_Dec.P_Defining_Name));
+                  Report_Std
+                    ("this can cause circularity in the test harness",
+                     1);
+                  return;
+               end if;
+
+               if Dec2.P_Next_Part.Is_Null then
+                  Dec := Parent_Type_Declaration (Dec2);
+               end if;
+
+               Dec2 := Dec2.P_Next_Part;
+            end loop;
+
+         end loop;
+      end Check_Type_For_Elaboration;
 
    begin
       Unit := Bod.F_Item.As_Ada_Node;

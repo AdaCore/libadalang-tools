@@ -3626,7 +3626,7 @@ package body Test.Harness is
                & ":");
          end;
 
-         Owner_Decl := Tagged_Primitive_Owner
+         Owner_Decl := P_Primitive_Subp_Tagged_Type
            (Node.As_Basic_Subp_Decl.P_Subp_Decl_Spec);
 
          Type_Found := False;

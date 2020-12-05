@@ -313,7 +313,7 @@ package body Test.Common is
            else " at line" & L_Subp_Span.Start_Line'Img));
       Increase_Indent (Me_Hash);
 
-      Tagged_Rec := Tagged_Primitive_Owner (L_Subp);
+      Tagged_Rec := P_Primitive_Subp_Tagged_Type (L_Subp);
 
       if Tagged_Rec /= No_Base_Type_Decl then
          Root_Ignore := Root_Type_Declaration (Tagged_Rec);
@@ -531,24 +531,6 @@ package body Test.Common is
 
    end Operator_Image;
 
-   ----------------------------
-   -- Tagged_Primitive_Owner --
-   ----------------------------
-
-   function Tagged_Primitive_Owner (Subp : Base_Subp_Spec)
-                                    return Base_Type_Decl
-   is
-      Primitive_Owners : constant Base_Type_Decl_Array :=
-        P_Primitive_Subp_Types (As_Subp_Spec (Subp));
-   begin
-      for Owner of Primitive_Owners loop
-         if P_Is_Tagged_Type (As_Type_Decl (Owner)) then
-            return Owner;
-         end if;
-      end loop;
-      return No_Base_Type_Decl;
-   end Tagged_Primitive_Owner;
-
    -----------------------------
    -- Parent_Type_Declaration --
    -----------------------------
@@ -561,11 +543,19 @@ package body Test.Common is
 
       T_Name : Libadalang.Analysis.Name;
    begin
+
       if Kind (T_Dec) = Ada_Incomplete_Tagged_Type_Decl then
          T_Dec := P_Next_Part (T_Dec);
       end if;
 
       T_Def := F_Type_Def (As_Type_Decl (T_Dec));
+
+      if T_Def.Kind = Ada_Private_Type_Def
+        and then T_Def.As_Private_Type_Def.F_Has_Tagged
+      then
+         T_Dec := P_Next_Part (T_Dec);
+         T_Def := F_Type_Def (As_Type_Decl (T_Dec));
+      end if;
 
       if Kind (T_Def) /= Ada_Derived_Type_Def then
          return No_Base_Type_Decl;
@@ -580,6 +570,12 @@ package body Test.Common is
 
       while not T_Dec.P_Next_Part.Is_Null loop
          T_Dec := T_Dec.P_Next_Part;
+      end loop;
+
+      for Par of T_Dec.Parents loop
+         if Par.Kind = Ada_Generic_Formal_Part then
+            return No_Base_Type_Decl;
+         end if;
       end loop;
 
       return T_Dec;
