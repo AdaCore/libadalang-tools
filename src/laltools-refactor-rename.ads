@@ -25,7 +25,6 @@
 --  rename tools.
 
 with Ada.Containers; use Ada.Containers;
-with Ada.Containers.Hashed_Maps;
 with Ada.Containers.Indefinite_Hashed_Maps;
 with Ada.Containers.Indefinite_Vectors;
 with Ada.Containers.Ordered_Maps;
@@ -85,12 +84,14 @@ package Laltools.Refactor.Rename is
         Element_Type => Slocs_Sets.Set,
         "="          => Slocs_Sets."=");
 
-   package Unit_Slocs_Maps is new Ada.Containers.Hashed_Maps
-     (Key_Type        => Analysis_Unit,
-      Element_Type    => Slocs_Maps.Map,
-      Hash            => Hash,
-      Equivalent_Keys => "=",
-      "="             => Slocs_Maps."=");
+   function "<" (Left, Right : Analysis_Unit) return Boolean is
+     (Left.Get_Filename < Right.Get_Filename);
+
+   package Unit_Slocs_Maps is new Ada.Containers.Ordered_Maps
+     (Key_Type     => Analysis_Unit,
+      Element_Type => Slocs_Maps.Map,
+      "<"          => "<",
+      "="          => Slocs_Maps."=");
 
    type Renamable_References is
       record
