@@ -728,15 +728,22 @@ package body Laltools.Common is
                exit Find_Declarative_Part_Owner;
 
             when Ada_Package_Decl =>
-               Traverse
-                 (N.As_Package_Decl.P_Body_Part.F_Decls.F_Decls,
-                  Find_Nested_Declarative_Parts'Access);
+               if not N.As_Package_Decl.P_Body_Part.Is_Null then
+                  Traverse
+                    (N.As_Package_Decl.P_Body_Part.F_Decls.F_Decls,
+                     Find_Nested_Declarative_Parts'Access);
+               end if;
+
                Traverse
                  (N.As_Package_Decl.F_Public_Part.F_Decls,
                   Find_Nested_Declarative_Parts'Access);
-               Traverse
-                 (N.As_Package_Decl.F_Public_Part.F_Decls,
-                  Find_Nested_Declarative_Parts'Access);
+
+               if not N.As_Package_Decl.F_Private_Part.Is_Null then
+                  Traverse
+                    (N.As_Package_Decl.F_Private_Part.F_Decls,
+                     Find_Nested_Declarative_Parts'Access);
+               end if;
+
                exit Find_Declarative_Part_Owner;
 
             when Ada_Subp_Body =>
