@@ -580,10 +580,10 @@ package body Laltools.Refactor.Rename is
                | Ada_Package_Decl =>
                return Check_Rename_Conflicts (Scope);
 
-            when Ada_Subp_Decl =>
-               return Check_Subp_Rename_Conflicts (Scope);
-
-            when Ada_Subp_Body =>
+            when Ada_Subp_Decl
+               | Ada_Subp_Body
+               | Ada_Subp_Renaming_Decl
+               | Ada_Null_Subp_Decl =>
                return Check_Subp_Rename_Conflicts (Scope);
 
             when others =>
@@ -593,13 +593,12 @@ package body Laltools.Refactor.Rename is
 
    begin
       case Self.Canonical_Definition.P_Basic_Decl.Kind is
-         when Ada_Subp_Decl =>
+         when Ada_Subp_Decl
+            | Ada_Subp_Body
+            | Ada_Subp_Renaming_Decl
+            | Ada_Null_Subp_Decl =>
             Original_Subp_Spec :=
-              Self.Canonical_Definition.P_Basic_Decl.As_Subp_Decl.F_Subp_Spec;
-
-         when Ada_Subp_Body =>
-            Original_Subp_Spec :=
-              Self.Canonical_Definition.P_Basic_Decl.As_Subp_Body.F_Subp_Spec;
+              Get_Subp_Spec (Self.Canonical_Definition.P_Basic_Decl);
 
          when others =>
             null;

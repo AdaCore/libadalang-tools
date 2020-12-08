@@ -388,6 +388,12 @@ package Laltools.Common is
    --  If Subp is a primitive subrogram of a type, then returns an array
    --  with all declaration overriding or that are being overridden by Subp.
 
+   function Get_Subp_Spec
+     (Subp : Basic_Decl'Class)
+      return Subp_Spec;
+   --  Gets the Subp_Spec associated to a subprogram. If Subp is not a
+   --  subprogram, returns No_Subp_Spec.
+
    function Get_Task_Body_Declarative_Part (Task_B : Task_Body)
                                             return Declarative_Part;
    --  Gets the Declarative_Part associated to a Task_Body.

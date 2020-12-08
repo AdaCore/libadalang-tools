@@ -1373,6 +1373,40 @@ package body Laltools.Common is
       return Overriding_Decls & Base_Subp_Decls;
    end Get_Subp_Hierarchy;
 
+   -------------------
+   -- Get_Subp_Spec --
+   -------------------
+
+   function Get_Subp_Spec
+     (Subp : Basic_Decl'Class)
+      return Subp_Spec is
+
+   begin
+      case Subp.Kind is
+         when Ada_Subp_Decl =>
+            return Subp.As_Subp_Decl.F_Subp_Spec;
+
+         when Ada_Subp_Body =>
+            return Subp.As_Subp_Body.F_Subp_Spec;
+
+         when Ada_Null_Subp_Decl =>
+            return Subp.As_Null_Subp_Decl.F_Subp_Spec;
+
+         when Ada_Subp_Renaming_Decl =>
+            declare
+               Original_Subp : constant Basic_Decl'Class :=
+                 Resolve_Name_Precisely
+                   (Subp.As_Subp_Renaming_Decl.F_Renames.F_Renamed_Object).
+                     P_Basic_Decl;
+            begin
+               return Get_Subp_Spec (Original_Subp);
+            end;
+
+         when others =>
+            return No_Subp_Spec;
+      end case;
+   end Get_Subp_Spec;
+
    ------------------------------------
    -- Get_Task_Body_Declarative_Part --
    ------------------------------------
