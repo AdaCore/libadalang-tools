@@ -519,7 +519,7 @@ package body Test.Common is
          return "Mod";
       elsif Name = """rem""" then            -- rem
          return "Rem";
-      elsif Name = "**" then             -- **
+      elsif Name = """**""" then             -- **
          return "Exponentiate";
       elsif Name = """abs""" then            -- abs
          return "Abs";
