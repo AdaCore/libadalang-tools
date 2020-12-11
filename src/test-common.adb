@@ -232,8 +232,9 @@ package body Test.Common is
                Param_Type_Name := F_Name (P_Defining_Name (Type_Decl));
 
                return
-                 Get_Nesting (Type_Decl)
-                 & "." & Node_Image (Param_Type_Name)
+                 Encode
+                    (Type_Decl.As_Basic_Decl.P_Fully_Qualified_Name,
+                     Type_Decl.Unit.Get_Charset)
                  & (if Attr_Flag then "'Attr" else "");
 
             when Ada_Anonymous_Type =>
@@ -269,8 +270,9 @@ package body Test.Common is
 
                      return
                        "@"
-                       & Get_Nesting (Type_Decl)
-                       & "." & Node_Image (Param_Type_Name)
+                       & Encode
+                          (Type_Decl.As_Basic_Decl.P_Fully_Qualified_Name,
+                           Type_Decl.Unit.Get_Charset)
                        & (if Attr_Flag then "'Attr" else "");
 
                   when Ada_Access_To_Subp_Def =>

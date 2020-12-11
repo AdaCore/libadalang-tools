@@ -818,6 +818,11 @@ package body Test.Skeleton is
       --  elaboration conflicts in the harness, so a warning
       --  should be isued.
 
+      function Check_Type_For_Unset_Discriminants
+        (Type_Dec : Base_Type_Decl) return Boolean;
+      --  Returns True if given type or any of its ancestors have
+      --  a discriminant without a default value.
+
       function Test_Types_Linked
         (Inheritance_Root_Type  : Base_Type_Decl;
          Inheritance_Final_Type : Base_Type_Decl)
@@ -955,7 +960,6 @@ package body Test.Skeleton is
          Type_Data     : Base_Type_Info;
          Test_Type     : Test.Harness.Test_Type_Info;
          Test_Package  : String_Access;
-         Tmp_Decl      : Base_Type_Decl;
 
          procedure Get_Type_Parent_Data (Type_Data : in out Base_Type_Info);
          --  Gathers data on parent type
@@ -1050,7 +1054,7 @@ package body Test.Skeleton is
          end if;
 
          if Node.Kind = Ada_Generic_Package_Instantiation
-           and then not Inside_Inst
+           and then not Inside_Inst and then not Data.Is_Generic
          then
             if Stub_Mode_ON then
                return Over;
@@ -1148,26 +1152,8 @@ package body Test.Skeleton is
          Check_Type_For_Elaboration (Cur_Node.As_Base_Type_Decl);
 
          --  Checking if any of ancestor types had a discriminant part
-         Type_Data.No_Default_Discriminant := False;
-         Tmp_Decl := Cur_Node.As_Base_Type_Decl;
-         while not Tmp_Decl.Is_Null loop
-            if not Tmp_Decl.As_Type_Decl.F_Discriminants.Is_Null then
-               declare
-                  Discr_Specs : constant Discriminant_Spec_List :=
-                    Tmp_Decl.As_Type_Decl.F_Discriminants.
-                      As_Known_Discriminant_Part.F_Discr_Specs;
-               begin
-                  for Discr_Spec of Discr_Specs loop
-                     if Discr_Spec.F_Default_Expr.Is_Null then
-                        Type_Data.No_Default_Discriminant := True;
-                        exit;
-                     end if;
-                  end loop;
-               end;
-            end if;
-
-            Tmp_Decl := Parent_Type_Declaration (Tmp_Decl);
-         end loop;
+         Type_Data.No_Default_Discriminant :=
+           Check_Type_For_Unset_Discriminants (Cur_Node.As_Base_Type_Decl);
 
          Get_Type_Parent_Data (Type_Data);
 
@@ -1296,7 +1282,7 @@ package body Test.Skeleton is
          end if;
 
          if Node.Kind = Ada_Generic_Package_Instantiation
-           and then not Inside_Inst
+           and then not Inside_Inst and then not Data.Is_Generic
          then
 
             if Stub_Mode_ON then
@@ -1357,6 +1343,18 @@ package body Test.Skeleton is
              | Ada_Subp_Renaming_Decl | Ada_Expr_Function
          then
             return Into;
+         end if;
+
+         --  No point in testing a renaming of a subprogram declared in same
+         --  unit, it will get identical hash and will receive its own
+         --  test skeleton anyway.
+         if Node.Kind = Ada_Subp_Renaming_Decl
+           and then not Node.As_Subp_Renaming_Decl.F_Renames.F_Renamed_Object.
+             P_Referenced_Decl.Is_Null
+           and then Node.As_Subp_Renaming_Decl.F_Renames.F_Renamed_Object.
+             P_Referenced_Decl.Unit = Node.Unit
+         then
+            return Over;
          end if;
 
          Subp.Subp_Declaration := Node.As_Ada_Node;
@@ -1486,6 +1484,25 @@ package body Test.Skeleton is
 
             Test_Routine.Nesting := new String'(Test_Package_Name.all);
          else
+
+            --  In case when owner tagged type is declared in the private part
+            --  the check for Elaboration control is not performed
+            --  for the type in Get_Records so we need to launch it here.
+            if Node.Kind = Ada_Expr_Function then
+               Owner_Decl := P_Primitive_Subp_Tagged_Type
+                 (Node.As_Base_Subp_Body.F_Subp_Spec.As_Base_Subp_Spec);
+            elsif Node.Kind = Ada_Subp_Renaming_Decl then
+               Owner_Decl := P_Primitive_Subp_Tagged_Type
+                 (Node.As_Subp_Renaming_Decl.F_Subp_Spec.As_Base_Subp_Spec);
+            else
+               Owner_Decl := P_Primitive_Subp_Tagged_Type
+                 (Node.As_Basic_Subp_Decl.P_Subp_Decl_Spec);
+            end if;
+
+            if Owner_Decl /= No_Base_Type_Decl then
+               Check_Type_For_Elaboration (Owner_Decl);
+            end if;
+
             --  In simple case the type is always found, because in fact
             --  we do not depend on it.
             Type_Found            := True;
@@ -2125,6 +2142,67 @@ package body Test.Skeleton is
 
          end loop;
       end Check_Type_For_Elaboration;
+
+      function Check_Type_For_Unset_Discriminants
+        (Type_Dec : Base_Type_Decl) return Boolean
+      is
+         Dec  : Base_Type_Decl := Type_Dec;
+         Dec2 : Base_Type_Decl;
+
+         Discr : Discriminant_Part;
+      begin
+
+         while not Dec.Is_Null loop
+
+            --  We need to check all 3 possible declarations, so first roll
+            --  to the topmost one.
+            while not Dec.P_Previous_Part.Is_Null loop
+               Dec := Dec.P_Previous_Part;
+            end loop;
+
+            Dec2 := Dec;
+
+            while not Dec2.Is_Null loop
+
+               if Dec2.Kind in Ada_Incomplete_Type_Decl
+                             | Ada_Incomplete_Tagged_Type_Decl
+               then
+                  Discr := Dec2.As_Incomplete_Type_Decl.F_Discriminants;
+               else
+                  Discr := Dec2.As_Type_Decl.F_Discriminants;
+               end if;
+
+               if not Discr.Is_Null then
+
+                  if Discr.Kind = Ada_Unknown_Discriminant_Part
+                  then
+                     return True;
+                  end if;
+
+                  declare
+                     Discr_Specs : constant Discriminant_Spec_List :=
+                       Discr.As_Known_Discriminant_Part.F_Discr_Specs;
+                  begin
+                     for Discr_Spec of Discr_Specs loop
+                        if Discr_Spec.F_Default_Expr.Is_Null then
+                           return True;
+                        end if;
+                     end loop;
+                  end;
+               end if;
+
+               if Dec2.P_Next_Part.Is_Null then
+                  Dec := Parent_Type_Declaration (Dec2);
+               end if;
+
+               Dec2 := Dec2.P_Next_Part;
+            end loop;
+
+         end loop;
+
+         return False;
+
+      end Check_Type_For_Unset_Discriminants;
 
    begin
       Unit := Bod.F_Item.As_Ada_Node;
@@ -6920,43 +6998,46 @@ package body Test.Skeleton is
                   for WN of With_Names loop
                      Withed_Spec := WN.As_Name.P_Referenced_Decl;
 
-                     declare
-                        Withed_Spec_Image : constant String :=
-                          Withed_Spec.Unit.Get_Filename;
-                     begin
-                        if Good_To_Stub (Withed_Spec.Unit)
-                          and then not Already_Stubbing.Contains
-                            (Withed_Spec_Image)
-                        then
-                           Already_Stubbing.Include (Withed_Spec_Image);
-                           Data.Units_To_Stub.Append (Withed_Spec.As_Ada_Node);
-                           Trace (Me, Withed_Spec_Image);
-                        end if;
-                     end;
+                     if not Withed_Spec.Is_Null then
+                        declare
+                           Withed_Spec_Image : constant String :=
+                             Withed_Spec.Unit.Get_Filename;
+                        begin
+                           if Good_To_Stub (Withed_Spec.Unit)
+                             and then not Already_Stubbing.Contains
+                               (Withed_Spec_Image)
+                           then
+                              Already_Stubbing.Include (Withed_Spec_Image);
+                              Data.Units_To_Stub.Append
+                                (Withed_Spec.As_Ada_Node);
+                              Trace (Me, Withed_Spec_Image);
+                           end if;
+                        end;
 
-                     --  Gathering parent packages
-                     Parent_Unit := Withed_Spec.P_Semantic_Parent;
-                     while
-                       not Parent_Unit.Is_Null and then
-                       Parent_Unit.Unit /= Parent_Unit.P_Standard_Unit
-                     loop
-                        if Parent_Unit.Kind = Ada_Package_Decl then
-                           declare
-                              Parent_File : constant String :=
-                                Parent_Unit.Unit.Get_Filename;
-                           begin
-                              if Good_To_Stub (Parent_Unit.Unit)
-                                and then not Already_Stubbing.Contains
-                                  (Parent_File)
-                              then
-                                 Already_Stubbing.Include (Parent_File);
-                                 Data.Units_To_Stub.Append (Parent_Unit);
-                                 Trace (Me, Parent_File);
-                              end if;
-                           end;
-                        end if;
-                        Parent_Unit := Parent_Unit.P_Semantic_Parent;
-                     end loop;
+                        --  Gathering parent packages
+                        Parent_Unit := Withed_Spec.P_Semantic_Parent;
+                        while
+                        not Parent_Unit.Is_Null and then
+                          Parent_Unit.Unit /= Parent_Unit.P_Standard_Unit
+                        loop
+                           if Parent_Unit.Kind = Ada_Package_Decl then
+                              declare
+                                 Parent_File : constant String :=
+                                   Parent_Unit.Unit.Get_Filename;
+                              begin
+                                 if Good_To_Stub (Parent_Unit.Unit)
+                                   and then not Already_Stubbing.Contains
+                                     (Parent_File)
+                                 then
+                                    Already_Stubbing.Include (Parent_File);
+                                    Data.Units_To_Stub.Append (Parent_Unit);
+                                    Trace (Me, Parent_File);
+                                 end if;
+                              end;
+                           end if;
+                           Parent_Unit := Parent_Unit.P_Semantic_Parent;
+                        end loop;
+                     end if;
                   end loop;
                end;
             end if;
