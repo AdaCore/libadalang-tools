@@ -14,6 +14,8 @@ with GNATCOLL.Projects;
 
 with LAL_Extensions; use LAL_Extensions;
 
+with Laltools.Common; use Laltools.Common;
+
 with Utils.Command_Lines.Common; use Utils; use Utils.Command_Lines.Common;
 with Utils.Dbg_Out;
 with Utils.Formatted_Output;
@@ -3229,22 +3231,89 @@ package body METRICS.Actions is
             declare
                use type Slocs.Line_Number;
 
-               --  At the file level, we want to include all the comments and
-               --  blank lines preceding and following the compilation unit.
-
-               Start : constant Slocs.Line_Number :=
-                 (if Kind (Node) = Ada_Compilation_Unit
-                    then 1
-                    else M.Sloc.Start_Line);
-
-               Stop : constant Slocs.Line_Number :=
-                 (if Kind (Node) = Ada_Compilation_Unit
-                    then Last (Cumulative)
-                    else M.Sloc.End_Line);
-
-               Lines_Count : constant Metric_Nat :=
-                 Metric_Nat (Stop - Start + 1);
+               Start : Slocs.Line_Number;
+               Stop : Slocs.Line_Number;
+               Lines_Count : Metric_Nat;
             begin
+
+               --  If this is a compilation unit and the only one in the
+               --  analysis unit, then we want to include the entire analysis
+               --  unit.
+
+               if M.Node.Kind = Ada_Compilation_Unit
+                 and then M.Node.Parent.Is_Null
+               then
+                  Start := 1;
+
+                  Stop := Last (Cumulative);
+
+                  Lines_Count := Metric_Nat (Stop - Start + 1);
+
+               --  If this is a compilation unit but not the only one in the
+               --  analysis unit, then Line_Count must be computed accordingly.
+
+               elsif M.Node.Kind = Ada_Compilation_Unit
+                 and then not M.Node.Parent.Is_Null
+               then
+                  declare
+                     Comp_Units : constant Ada_Node_Array :=
+                       M.Node.Parent.As_Compilation_Unit_List.Children;
+
+                  begin
+
+                     --  If this is the first compilation unit of the file
+                     --  then, we want to include all the comments and blank
+                     --  lines preceding and following the compilation unit
+                     --  until the next one.
+
+                     if M.Node = Comp_Units (Comp_Units'First) then
+                        Start := 1;
+
+                        Stop := Comp_Units (Comp_Units'First + 1).
+                          Sloc_Range.Start_Line - 1;
+
+                        Lines_Count := Metric_Nat (Stop - Start + 1);
+
+                     --  If this is the last compilation unit of the analysis
+                     --  unit then, we want to include all the comments and
+                     --  blank lines following the compilation unit until the
+                     --  end of the analysis unit.
+
+                     elsif M.Node = Comp_Units (Comp_Units'Last) then
+                        Start := M.Node.Sloc_Range.Start_Line;
+
+                        Stop := Last (Cumulative);
+
+                        Lines_Count := Metric_Nat (Stop - Start + 1);
+
+                     --  If this compilation unit is in the middle of the
+                     --  compilation unit list of this analysis unit, then
+                     --  we want to include all the comments and blank lines
+                     --  following the compilation unit until the next one.
+
+                     else
+                        for Idx in Comp_Units'First .. Comp_Units'Length loop
+                           if M.Node = Comp_Units (Idx) then
+                              Start := Comp_Units (Idx).Sloc_Range.Start_Line;
+
+                              Stop :=
+                                Comp_Units (Idx + 1).Sloc_Range.Start_Line - 1;
+
+                              Lines_Count := Metric_Nat (Stop - Start + 1);
+                              exit;
+                           end if;
+                        end loop;
+                     end if;
+                  end;
+               else
+                  Start := M.Sloc.Start_Line;
+
+                  Stop := M.Sloc.End_Line;
+
+                  Lines_Count := Metric_Nat (Stop - Start + 1);
+               end if;
+               Lines_Count := Metric_Nat (Stop - Start + 1);
+
                pragma Assert (M.Vals (Lines) = 0);
                M.Vals (Lines) := Lines_Count;
                if Kind (Node) = Ada_Compilation_Unit then
@@ -3305,6 +3374,7 @@ package body METRICS.Actions is
                end loop;
             end;
          end if;
+
       end Gather_Line_Metrics;
 
       procedure Gather_SPARK_Line_Metrics
@@ -4229,33 +4299,33 @@ package body METRICS.Actions is
       Unit : Analysis_Unit)
    is
       pragma Unreferenced (Input, BOM_Seen);
-      CU_List : constant Ada_Node := Root (Unit);
-      pragma Assert (not CU_List.Is_Null);
---      pragma Assert (Kind (CU_List) = List_Kind);
---    pragma Assert (Children_Count (CU_List) = 1);
-      --  ???libadalang supports multiple compilation units per file.
-      --  The old ASIS-based gnatmetric does not, and neither does this
-      --  libadalang-based version. We should probably fix that, or at
-      --  least make sure it fails gracefully.
+      Unit_Root : constant Ada_Node := Root (Unit);
+      pragma Assert (not Unit_Root.Is_Null);
 
-      --  CU_Node : constant Ada_Node := Childx (CU_List, 1);
-      CU_Node : constant Ada_Node := CU_List;
    begin
+      --  The root node of an empty file is of Ada_Compilation_Unit_List
+      --  kind. Therefore, do nothing for empty files.
+
+      if Unit_Root.Kind = Ada_Compilation_Unit_List
+        and then Length (Unit_Root.As_Compilation_Unit_List) = 0
+      then
+         return;
+      end if;
+
       if Debug_Flag_V then
          Print (Unit);
          Put ("With trivia\n");
          PP_Trivia (Unit);
       end if;
 
-      if Kind (CU_Node) = Ada_Pragma_Node_List then
+      if Unit_Root.Kind = Ada_Pragma_Node_List then
          Put ("Skipping \1 (pragmas only)\n", File_Name);
+      elsif Unit_Root.Kind = Ada_Compilation_Unit_List then
+         for Unit_Node of Unit_Root.As_Compilation_Unit_List loop
+            Process_CU (Tool, Cmd, File_Name, Unit, Unit_Node.As_Ada_Node);
+         end loop;
       else
-         Process_CU (Tool, Cmd, File_Name, Unit, CU_Node);
-      end if;
-
-      if Debug_Flag_V then
-         Outdent;
-         Put ("<--Walk: \1\n", CU_Node.Image);
+         Process_CU (Tool, Cmd, File_Name, Unit, Unit_Root);
       end if;
    end Per_File_Action;
 

@@ -406,6 +406,9 @@ package Laltools.Common is
       return Declarative_Part_Vectors.Vector;
    --  Gets all public Declarative_Parts of the units used by Node's unit.
 
+   function Length (List : Compilation_Unit_List) return Natural;
+   --  Returns how many Compilation_Unit nodes List has.
+
    function List_Bodies_Of
      (Definition         : Defining_Name;
       Trace              : GNATCOLL.Traces.Trace_Handle;

@@ -1474,6 +1474,20 @@ package body Laltools.Common is
       return Declarative_Parts;
    end Get_Use_Units_Declarative_Parts;
 
+   ------------
+   -- Length --
+   ------------
+
+   function Length (List : Compilation_Unit_List) return Natural
+   is
+      L : Natural := 0;
+   begin
+      for Unit of List loop
+         L := L + 1;
+      end loop;
+      return L;
+   end Length;
+
    --------------------
    -- List_Bodies_Of --
    --------------------
