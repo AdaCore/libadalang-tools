@@ -1,0 +1,9 @@
+project Ada_Playground is
+
+   for Source_Dirs use ("src/**");
+   for Main use ("playground_0.adb",
+                 "playground_1.adb",
+                 "main.adb");
+
+end Ada_Playground;
+
