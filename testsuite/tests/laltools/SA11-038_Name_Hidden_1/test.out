@@ -1,13 +1,13 @@
 # Renaming node foo.ads:6:4: 
 References:
-Unit:/src/foo.adb
+Unit:foo.adb
 Line: 34
 Source Location Range:
 Start_Line: 34
 Start_Column: 52
 End_Line: 34
 End_Column: 55
-Unit:/src/foo.ads
+Unit:foo.ads
 Line: 6
 Source Location Range:
 Start_Line: 6
@@ -19,14 +19,14 @@ Renaming Ber to Flob will hide it by <Id "Flob" foo.adb:32:16-32:20>
 
 # Renaming node foo.ads:13:7: 
 References:
-Unit:/src/foo.adb
+Unit:foo.adb
 Line: 35
 Source Location Range:
 Start_Line: 35
 Start_Column: 52
 End_Line: 35
 End_Column: 56
-Unit:/src/foo.ads
+Unit:foo.ads
 Line: 13
 Source Location Range:
 Start_Line: 13
@@ -38,14 +38,14 @@ Renaming Qeex to Flob will hide it by <Id "Flob" foo.adb:32:16-32:20>
 
 # Renaming node foo.ads:16:10: 
 References:
-Unit:/src/foo.adb
+Unit:foo.adb
 Line: 36
 Source Location Range:
 Start_Line: 36
 Start_Column: 52
 End_Line: 36
 End_Column: 58
-Unit:/src/foo.ads
+Unit:foo.ads
 Line: 16
 Source Location Range:
 Start_Line: 16
@@ -57,14 +57,14 @@ Renaming Garply to Flob will hide it by <Id "Flob" foo.adb:32:16-32:20>
 
 # Renaming node foo.ads:20:10: 
 References:
-Unit:/src/foo.adb
+Unit:foo.adb
 Line: 37
 Source Location Range:
 Start_Line: 37
 Start_Column: 52
 End_Line: 37
 End_Column: 58
-Unit:/src/foo.ads
+Unit:foo.ads
 Line: 20
 Source Location Range:
 Start_Line: 20
@@ -76,14 +76,14 @@ Renaming Gerply to Flob will hide it by <Id "Flob" foo.adb:32:16-32:20>
 
 # Renaming node foo.ads:23:7: 
 References:
-Unit:/src/foo.adb
+Unit:foo.adb
 Line: 38
 Source Location Range:
 Start_Line: 38
 Start_Column: 52
 End_Line: 38
 End_Column: 56
-Unit:/src/foo.ads
+Unit:foo.ads
 Line: 23
 Source Location Range:
 Start_Line: 23
@@ -95,14 +95,14 @@ Renaming Qiix to Flob will hide it by <Id "Flob" foo.adb:32:16-32:20>
 
 # Renaming node foo.ads:26:4: 
 References:
-Unit:/src/foo.adb
+Unit:foo.adb
 Line: 39
 Source Location Range:
 Start_Line: 39
 Start_Column: 52
 End_Line: 39
 End_Column: 55
-Unit:/src/foo.ads
+Unit:foo.ads
 Line: 26
 Source Location Range:
 Start_Line: 26
@@ -114,14 +114,14 @@ Renaming Bir to Flob will hide it by <Id "Flob" foo.adb:32:16-32:20>
 
 # Renaming node foo.ads:28:4: 
 References:
-Unit:/src/foo.adb
+Unit:foo.adb
 Line: 40
 Source Location Range:
 Start_Line: 40
 Start_Column: 52
 End_Line: 40
 End_Column: 55
-Unit:/src/foo.ads
+Unit:foo.ads
 Line: 28
 Source Location Range:
 Start_Line: 28
@@ -133,7 +133,7 @@ Renaming Bor to Flob will hide it by <Id "Flob" foo.adb:32:16-32:20>
 
 # Renaming node foo.adb:11:4: 
 References:
-Unit:/src/foo.adb
+Unit:foo.adb
 Line: 11
 Source Location Range:
 Start_Line: 11
@@ -151,7 +151,7 @@ Renaming Xyzzy to Flob will hide it by <Id "Flob" foo.adb:32:16-32:20>
 
 # Renaming node foo.adb:22:7: 
 References:
-Unit:/src/foo.adb
+Unit:foo.adb
 Line: 22
 Source Location Range:
 Start_Line: 22
@@ -169,7 +169,7 @@ Renaming Wubble to Flob will hide it by <Id "Flob" foo.adb:32:16-32:20>
 
 # Renaming node foo.adb:26:10: 
 References:
-Unit:/src/foo.adb
+Unit:foo.adb
 Line: 26
 Source Location Range:
 Start_Line: 26
@@ -187,7 +187,7 @@ Renaming Fleb to Flob will hide it by <Id "Flob" foo.adb:32:16-32:20>
 
 # Renaming node foo.adb:29:13: 
 References:
-Unit:/src/foo.adb
+Unit:foo.adb
 Line: 29
 Source Location Range:
 Start_Line: 29
@@ -205,7 +205,7 @@ Renaming Flib to Flob will hide it by <Id "Flob" foo.adb:32:16-32:20>
 
 # Renaming node foo.adb:28:27: 
 References:
-Unit:/src/foo.adb
+Unit:foo.adb
 Line: 28
 Source Location Range:
 Start_Line: 28
@@ -218,7 +218,7 @@ Start_Line: 45
 Start_Column: 52
 End_Line: 45
 End_Column: 55
-Unit:/src/foo.ads
+Unit:foo.ads
 Line: 18
 Source Location Range:
 Start_Line: 18

@@ -22,15 +22,9 @@
 ------------------------------------------------------------------------------
 
 with Ada.Text_IO; use Ada.Text_IO;
-with Ada.Strings.Maps; use Ada.Strings.Maps;
-with Ada.Strings.Fixed; use Ada.Strings.Fixed;
+with Ada.Directories; use Ada.Directories;
 
 package body Printers is
-
-   function To_Unix_Separator (From : Character) return Character is
-     (if From = '\' then '/' else From);
-   --  Converts '\' characters to '/' characters so that paths are
-   --  printed equally on Unix and Windows.
 
    --------
    -- PP --
@@ -82,13 +76,11 @@ package body Printers is
 
    procedure PP (Map : Unit_Slocs_Ordered_Maps.Map)
    is
-      Mapper : constant Character_Mapping_Function := To_Unix_Separator'Access;
-
       use Unit_Slocs_Ordered_Maps;
       C : Cursor := Map.First;
    begin
       while Has_Element (C) loop
-         Put_Line ("Unit:" & Translate (Key (C).Get_Filename, Mapper));
+         Put_Line ("Unit:" & Simple_Name (Key (C).Get_Filename));
          PP (Constant_Reference (Map, C));
          Next (C);
       end loop;

@@ -1,6 +1,6 @@
 # Renaming node b-z.adb:3:16: 
 References:
-Unit:/src/b-z.adb
+Unit:b-z.adb
 Line: 3
 Source Location Range:
 Start_Line: 3
@@ -13,7 +13,7 @@ Start_Line: 10
 Start_Column: 7
 End_Line: 10
 End_Column: 8
-Unit:/src/b-z.ads
+Unit:b-z.ads
 Line: 1
 Source Location Range:
 Start_Line: 1
@@ -31,7 +31,7 @@ Start_Line: 7
 Start_Column: 7
 End_Line: 7
 End_Column: 8
-Unit:/src/main.adb
+Unit:main.adb
 Line: 4
 Source Location Range:
 Start_Line: 4
@@ -54,7 +54,7 @@ Renaming B.Z to C creates a name collision with <Id "C" b.ads:3:9-3:10>
 
 # Renaming node b-z.adb:3:16: 
 References:
-Unit:/src/b-z.adb
+Unit:b-z.adb
 Line: 3
 Source Location Range:
 Start_Line: 3
@@ -67,7 +67,7 @@ Start_Line: 10
 Start_Column: 7
 End_Line: 10
 End_Column: 8
-Unit:/src/b-z.ads
+Unit:b-z.ads
 Line: 1
 Source Location Range:
 Start_Line: 1
@@ -85,7 +85,7 @@ Start_Line: 7
 Start_Column: 7
 End_Line: 7
 End_Column: 8
-Unit:/src/main.adb
+Unit:main.adb
 Line: 4
 Source Location Range:
 Start_Line: 4
@@ -108,7 +108,7 @@ Renaming B.Z to C_Private creates a name collision with <Id "C_Private" b.ads:25
 
 # Renaming node b-z.adb:3:16: 
 References:
-Unit:/src/b-z.adb
+Unit:b-z.adb
 Line: 3
 Source Location Range:
 Start_Line: 3
@@ -121,7 +121,7 @@ Start_Line: 10
 Start_Column: 7
 End_Line: 10
 End_Column: 8
-Unit:/src/b-z.ads
+Unit:b-z.ads
 Line: 1
 Source Location Range:
 Start_Line: 1
@@ -139,7 +139,7 @@ Start_Line: 7
 Start_Column: 7
 End_Line: 7
 End_Column: 8
-Unit:/src/main.adb
+Unit:main.adb
 Line: 4
 Source Location Range:
 Start_Line: 4
@@ -160,7 +160,7 @@ End_Column: 7
 
 # Renaming node b-z.adb:3:16: 
 References:
-Unit:/src/b-z.adb
+Unit:b-z.adb
 Line: 3
 Source Location Range:
 Start_Line: 3
@@ -173,7 +173,7 @@ Start_Line: 10
 Start_Column: 7
 End_Line: 10
 End_Column: 8
-Unit:/src/b-z.ads
+Unit:b-z.ads
 Line: 1
 Source Location Range:
 Start_Line: 1
@@ -191,7 +191,7 @@ Start_Line: 7
 Start_Column: 7
 End_Line: 7
 End_Column: 8
-Unit:/src/main.adb
+Unit:main.adb
 Line: 4
 Source Location Range:
 Start_Line: 4
@@ -214,7 +214,7 @@ Renaming B.Z to R creates a name collision with <DottedName b-r.ads:1:9-1:12>
 
 # Renaming node b-z.adb:3:16: 
 References:
-Unit:/src/b-z.adb
+Unit:b-z.adb
 Line: 3
 Source Location Range:
 Start_Line: 3
@@ -227,7 +227,7 @@ Start_Line: 10
 Start_Column: 7
 End_Line: 10
 End_Column: 8
-Unit:/src/b-z.ads
+Unit:b-z.ads
 Line: 1
 Source Location Range:
 Start_Line: 1
@@ -245,7 +245,7 @@ Start_Line: 7
 Start_Column: 7
 End_Line: 7
 End_Column: 8
-Unit:/src/main.adb
+Unit:main.adb
 Line: 4
 Source Location Range:
 Start_Line: 4
@@ -268,7 +268,7 @@ Renaming B.Z to U creates a name collision with <DottedName b-u.adb:3:11-3:14>
 
 # Renaming node b.ads:13:12: 
 References:
-Unit:/src/b.adb
+Unit:b.adb
 Line: 20
 Source Location Range:
 Start_Line: 20
@@ -281,7 +281,7 @@ Start_Line: 27
 Start_Column: 8
 End_Line: 27
 End_Column: 9
-Unit:/src/b.ads
+Unit:b.ads
 Line: 13
 Source Location Range:
 Start_Line: 13
@@ -299,7 +299,7 @@ Renaming I to C creates a name collision with <Id "C" b.ads:3:9-3:10>
 
 # Renaming node b.ads:13:12: 
 References:
-Unit:/src/b.adb
+Unit:b.adb
 Line: 20
 Source Location Range:
 Start_Line: 20
@@ -312,7 +312,7 @@ Start_Line: 27
 Start_Column: 8
 End_Line: 27
 End_Column: 9
-Unit:/src/b.ads
+Unit:b.ads
 Line: 13
 Source Location Range:
 Start_Line: 13
@@ -330,7 +330,7 @@ Renaming I to K creates a name collision with <Id "K" b.adb:38:14-38:15>
 
 # Renaming node b.ads:13:12: 
 References:
-Unit:/src/b.adb
+Unit:b.adb
 Line: 20
 Source Location Range:
 Start_Line: 20
@@ -343,7 +343,7 @@ Start_Line: 27
 Start_Column: 8
 End_Line: 27
 End_Column: 9
-Unit:/src/b.ads
+Unit:b.ads
 Line: 13
 Source Location Range:
 Start_Line: 13
@@ -361,7 +361,7 @@ Renaming I to C_Private creates a name collision with <Id "C_Private" b.ads:25:9
 
 # Renaming node b.ads:13:12: 
 References:
-Unit:/src/b.adb
+Unit:b.adb
 Line: 20
 Source Location Range:
 Start_Line: 20
@@ -374,7 +374,7 @@ Start_Line: 27
 Start_Column: 8
 End_Line: 27
 End_Column: 9
-Unit:/src/b.ads
+Unit:b.ads
 Line: 13
 Source Location Range:
 Start_Line: 13
@@ -390,7 +390,7 @@ End_Column: 9
 
 # Renaming node b.ads:13:12: 
 References:
-Unit:/src/b.adb
+Unit:b.adb
 Line: 20
 Source Location Range:
 Start_Line: 20
@@ -403,7 +403,7 @@ Start_Line: 27
 Start_Column: 8
 End_Line: 27
 End_Column: 9
-Unit:/src/b.ads
+Unit:b.ads
 Line: 13
 Source Location Range:
 Start_Line: 13
@@ -421,7 +421,7 @@ Renaming I to Z creates a name collision with <DottedName b-z.ads:1:9-1:12>
 
 # Renaming node b.ads:13:12: 
 References:
-Unit:/src/b.adb
+Unit:b.adb
 Line: 20
 Source Location Range:
 Start_Line: 20
@@ -434,7 +434,7 @@ Start_Line: 27
 Start_Column: 8
 End_Line: 27
 End_Column: 9
-Unit:/src/b.ads
+Unit:b.ads
 Line: 13
 Source Location Range:
 Start_Line: 13
@@ -452,7 +452,7 @@ Renaming I to U creates a name collision with <DottedName b-u.adb:3:11-3:14>
 
 # Renaming node b.ads:13:12: 
 References:
-Unit:/src/b.adb
+Unit:b.adb
 Line: 20
 Source Location Range:
 Start_Line: 20
@@ -465,7 +465,7 @@ Start_Line: 27
 Start_Column: 8
 End_Line: 27
 End_Column: 9
-Unit:/src/b.ads
+Unit:b.ads
 Line: 13
 Source Location Range:
 Start_Line: 13

@@ -1,6 +1,6 @@
 # Renaming node main.adb:5:9: 
 References:
-Unit:/src/main.adb
+Unit:main.adb
 Line: 5
 Source Location Range:
 Start_Line: 5
@@ -24,7 +24,7 @@ Renaming A to Y hides <Id "Y" z.ads:2:9-2:10>
 
 # Renaming node main.adb:10:12: 
 References:
-Unit:/src/main.adb
+Unit:main.adb
 Line: 10
 Source Location Range:
 Start_Line: 10
@@ -42,7 +42,7 @@ Renaming B to A hides <Id "A" main.adb:5:9-5:10>
 
 # Renaming node main.adb:10:12: 
 References:
-Unit:/src/main.adb
+Unit:main.adb
 Line: 10
 Source Location Range:
 Start_Line: 10
@@ -60,7 +60,7 @@ Renaming B to Y hides <Id "Y" z.ads:2:9-2:10>
 
 # Renaming node main.adb:12:7: 
 References:
-Unit:/src/main.adb
+Unit:main.adb
 Line: 12
 Source Location Range:
 Start_Line: 12
@@ -78,7 +78,7 @@ Renaming Var_BB to Var_A hides <Id "Var_A" main.adb:6:4-6:9>
 
 # Renaming node main.adb:12:7: 
 References:
-Unit:/src/main.adb
+Unit:main.adb
 Line: 12
 Source Location Range:
 Start_Line: 12

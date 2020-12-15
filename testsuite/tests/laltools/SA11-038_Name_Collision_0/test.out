@@ -1,6 +1,6 @@
 # Renaming node main.adb:5:14: 
 References:
-Unit:/src/main.adb
+Unit:main.adb
 Line: 5
 Source Location Range:
 Start_Line: 5
@@ -24,7 +24,7 @@ Renaming A to B creates a name collision with <Id "B" main.adb:12:9-12:10>
 
 # Renaming node main.adb:5:14: 
 References:
-Unit:/src/main.adb
+Unit:main.adb
 Line: 5
 Source Location Range:
 Start_Line: 5
@@ -48,7 +48,7 @@ Renaming A to C1 creates a name collision with <Id "C1" main.adb:14:4-14:6>
 
 # Renaming node main.adb:5:14: 
 References:
-Unit:/src/main.adb
+Unit:main.adb
 Line: 5
 Source Location Range:
 Start_Line: 5
@@ -72,7 +72,7 @@ Renaming A to D creates a name collision with <Id "D" main.adb:16:9-16:10>
 
 # Renaming node main.adb:5:14: 
 References:
-Unit:/src/main.adb
+Unit:main.adb
 Line: 5
 Source Location Range:
 Start_Line: 5
@@ -96,7 +96,7 @@ Renaming A to E creates a name collision with <Id "E" main.adb:23:14-23:15>
 
 # Renaming node main.adb:5:14: 
 References:
-Unit:/src/main.adb
+Unit:main.adb
 Line: 5
 Source Location Range:
 Start_Line: 5
@@ -118,7 +118,7 @@ End_Column: 9
 
 # Renaming node main.adb:5:14: 
 References:
-Unit:/src/main.adb
+Unit:main.adb
 Line: 5
 Source Location Range:
 Start_Line: 5
@@ -142,7 +142,7 @@ Renaming A to G creates a name collision with <Id "G" main.adb:37:12-37:13>
 
 # Renaming node main.adb:5:14: 
 References:
-Unit:/src/main.adb
+Unit:main.adb
 Line: 5
 Source Location Range:
 Start_Line: 5
@@ -164,7 +164,7 @@ End_Column: 9
 
 # Renaming node main.adb:49:13: 
 References:
-Unit:/src/main.adb
+Unit:main.adb
 Line: 49
 Source Location Range:
 Start_Line: 49
@@ -188,7 +188,7 @@ Renaming H to I creates a name collision with <Id "I" main.adb:56:13-56:14>
 
 # Renaming node main.adb:49:13: 
 References:
-Unit:/src/main.adb
+Unit:main.adb
 Line: 49
 Source Location Range:
 Start_Line: 49
@@ -212,7 +212,7 @@ Renaming H to J creates a name collision with <Id "J" main.adb:63:13-63:14>
 
 # Renaming node main.adb:49:13: 
 References:
-Unit:/src/main.adb
+Unit:main.adb
 Line: 49
 Source Location Range:
 Start_Line: 49
@@ -234,7 +234,7 @@ End_Column: 9
 
 # Renaming node main.adb:49:13: 
 References:
-Unit:/src/main.adb
+Unit:main.adb
 Line: 49
 Source Location Range:
 Start_Line: 49

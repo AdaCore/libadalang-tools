@@ -1,6 +1,6 @@
 # Renaming node main.adb:6:4: 
 References:
-Unit:/src/main.adb
+Unit:main.adb
 Line: 6
 Source Location Range:
 Start_Line: 6
