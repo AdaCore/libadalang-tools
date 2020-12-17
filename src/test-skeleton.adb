@@ -494,7 +494,7 @@ package body Test.Skeleton is
 
       Apropriate_Source : Boolean;
 
-      CU : constant Compilation_Unit := Root (The_Unit).As_Compilation_Unit;
+      CU : Compilation_Unit;
 
       Test_Packages : String_Set.Set;
       Cur : String_Set.Cursor;
@@ -656,6 +656,14 @@ package body Test.Skeleton is
 
       end Get_Suite_Components;
    begin
+      if The_Unit.Root.Kind /= Ada_Compilation_Unit then
+         --  For example, it can be a Pragma_Node_List for a body source
+         --  containing pragma No_Body.
+         return;
+      end if;
+
+      CU := Root (The_Unit).As_Compilation_Unit;
+
       if P_Unit_Kind (CU) = Unit_Body then
          --  Only interested in specs
          return;
@@ -1345,15 +1353,11 @@ package body Test.Skeleton is
             return Into;
          end if;
 
-         --  No point in testing a renaming of a subprogram declared in same
-         --  unit, it will get identical hash and will receive its own
-         --  test skeleton anyway.
          if Node.Kind = Ada_Subp_Renaming_Decl
-           and then not Node.As_Subp_Renaming_Decl.F_Renames.F_Renamed_Object.
-             P_Referenced_Decl.Is_Null
-           and then Node.As_Subp_Renaming_Decl.F_Renames.F_Renamed_Object.
-             P_Referenced_Decl.Unit = Node.Unit
+           and then not Node.As_Basic_Decl.P_Previous_Part_For_Decl.Is_Null
          then
+            --  A subprogram renaming in this case is a renaming-as-body
+            --  corresponding declaration has already been processed.
             return Over;
          end if;
 
@@ -1635,6 +1639,12 @@ package body Test.Skeleton is
            K in Suite_Data_List.Test_Types.First_Index + Dummy_Type_Counter ..
              Suite_Data_List.Test_Types.Last_Index
          loop
+            if Suite_Data_List.Test_Types.Element (K).Original_Type.Kind in
+              Ada_Task_Type_Decl | Ada_Protected_Type_Decl
+            then
+               goto Skip_Inheritance;
+            end if;
+
             Type_Dec := As_Type_Decl
               (Suite_Data_List.Test_Types.Element (K).Original_Type);
             declare
@@ -1658,6 +1668,11 @@ package body Test.Skeleton is
                         Ancestor_Type :=
                           P_Primitive_Subp_Tagged_Type
                             (ISub.As_Base_Subp_Body.F_Subp_Spec.
+                               As_Base_Subp_Spec);
+                     elsif ISub.Kind = Ada_Subp_Renaming_Decl then
+                        Ancestor_Type :=
+                          P_Primitive_Subp_Tagged_Type
+                            (ISub.As_Subp_Renaming_Decl.F_Subp_Spec.
                                As_Base_Subp_Spec);
                      else
                         Ancestor_Type :=
@@ -1846,6 +1861,7 @@ package body Test.Skeleton is
                   Tmp_Suites_Data.TR_List.Clear;
                end loop;
             end;
+            <<Skip_Inheritance>>
          end loop;
       end Gather_Inherited_Subprograms;
 
@@ -2168,6 +2184,13 @@ package body Test.Skeleton is
                              | Ada_Incomplete_Tagged_Type_Decl
                then
                   Discr := Dec2.As_Incomplete_Type_Decl.F_Discriminants;
+
+               elsif Dec2.Kind = Ada_Protected_Type_Decl then
+                  Discr := Dec2.As_Protected_Type_Decl.F_Discriminants;
+
+               elsif Dec2.Kind = Ada_Task_Type_Decl then
+                  Discr := Dec2.As_Task_Type_Decl.F_Discriminants;
+
                else
                   Discr := Dec2.As_Type_Decl.F_Discriminants;
                end if;
@@ -7136,7 +7159,9 @@ package body Test.Skeleton is
           P_Body_Part_For_Decl;
 
       --  Gathering with clauses from body
-      if Body_N /= No_Body_Node then
+      if Body_N /= No_Body_Node
+        and then Body_N.Unit.Root.Kind = Ada_Compilation_Unit
+      then
          Body_Unit := Body_N.Unit.Root.As_Compilation_Unit;
          Add_Units_To_Stub (Body_Unit);
          Iterate_Separates (Body_Unit);

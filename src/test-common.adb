@@ -550,6 +550,10 @@ package body Test.Common is
          T_Dec := P_Next_Part (T_Dec);
       end if;
 
+      if T_Dec.Kind in Ada_Protected_Type_Decl | Ada_Task_Type_Decl then
+         return No_Base_Type_Decl;
+      end if;
+
       T_Def := F_Type_Def (As_Type_Decl (T_Dec));
 
       if T_Def.Kind = Ada_Private_Type_Def
