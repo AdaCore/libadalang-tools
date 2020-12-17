@@ -5038,7 +5038,7 @@ Playground_1_Y spec:
       <metric name="unit_fan-out_coupling" display_name="unit fan-out coupling"/>
       <metric name="unit_fan-in_coupling" display_name="unit fan-in coupling"/>
    </config>
-   <file name="/src/playground0/foo.adb">
+   <file name="foo.adb">
       <metric name="all_lines">8</metric>
       <metric name="code_lines">6</metric>
       <metric name="comment_lines">0</metric>
@@ -5085,7 +5085,7 @@ Playground_1_Y spec:
       <metric name="essential_complexity">1.00</metric>
       <metric name="max_loop_nesting">0.00</metric>
    </file>
-   <file name="/src/playground0/foo.ads">
+   <file name="foo.ads">
       <metric name="all_lines">5</metric>
       <metric name="code_lines">3</metric>
       <metric name="comment_lines">0</metric>
@@ -5119,7 +5119,7 @@ Playground_1_Y spec:
          </unit>
       </unit>
    </file>
-   <file name="/src/main.adb">
+   <file name="main.adb">
       <metric name="all_lines">6</metric>
       <metric name="code_lines">5</metric>
       <metric name="comment_lines">0</metric>
@@ -5155,7 +5155,7 @@ Playground_1_Y spec:
       <metric name="essential_complexity">1.00</metric>
       <metric name="max_loop_nesting">0.00</metric>
    </file>
-   <file name="/src/playground0/playground_0.adb">
+   <file name="playground_0.adb">
       <metric name="all_lines">7</metric>
       <metric name="code_lines">6</metric>
       <metric name="comment_lines">0</metric>
@@ -5191,7 +5191,7 @@ Playground_1_Y spec:
       <metric name="essential_complexity">1.00</metric>
       <metric name="max_loop_nesting">0.00</metric>
    </file>
-   <file name="/src/playground1/playground_1.adb">
+   <file name="playground_1.adb">
       <metric name="all_lines">16</metric>
       <metric name="code_lines">9</metric>
       <metric name="comment_lines">2</metric>
@@ -5227,7 +5227,7 @@ Playground_1_Y spec:
       <metric name="essential_complexity">1.00</metric>
       <metric name="max_loop_nesting">0.00</metric>
    </file>
-   <file name="/src/playground1/playground_1.adb">
+   <file name="playground_1.adb">
       <metric name="all_lines">14</metric>
       <metric name="code_lines">8</metric>
       <metric name="comment_lines">2</metric>
@@ -5263,7 +5263,7 @@ Playground_1_Y spec:
       <metric name="essential_complexity">1.00</metric>
       <metric name="max_loop_nesting">0.00</metric>
    </file>
-   <file name="/src/playground1/playground_1.adb">
+   <file name="playground_1.adb">
       <metric name="all_lines">16</metric>
       <metric name="code_lines">8</metric>
       <metric name="comment_lines">2</metric>
@@ -5314,7 +5314,7 @@ Playground_1_Y spec:
    <metric name="lsloc">32</metric>
    <metric name="average_complexity">1.00</metric>
    <coupling>
-      <file name="/src/playground0/foo.ads">
+      <file name="foo.ads">
          <unit name="Foo" line="1" col="1">
             <metric name="control_fan-out_coupling">0</metric>
             <metric name="control_fan-in_coupling">1</metric>
@@ -5323,7 +5323,7 @@ Playground_1_Y spec:
          </unit>
 
       </file>
-      <file name="/src/main.adb">
+      <file name="main.adb">
          <unit name="Main" line="3" col="1">
             <metric name="control_fan-out_coupling">0</metric>
             <metric name="control_fan-in_coupling">0</metric>
@@ -5332,7 +5332,7 @@ Playground_1_Y spec:
          </unit>
 
       </file>
-      <file name="/src/playground0/playground_0.adb">
+      <file name="playground_0.adb">
          <unit name="Playground_0" line="3" col="1">
             <metric name="control_fan-out_coupling">1</metric>
             <metric name="control_fan-in_coupling">0</metric>
@@ -5342,7 +5342,7 @@ Playground_1_Y spec:
       <dependence dep="Playground_0 spec depends on Foo">
 
       </file>
-      <file name="/src/playground1/playground_1.adb">
+      <file name="playground_1.adb">
          <unit name="Playground_1" line="3" col="1">
             <metric name="control_fan-out_coupling">0</metric>
             <metric name="control_fan-in_coupling">0</metric>
@@ -5351,7 +5351,7 @@ Playground_1_Y spec:
          </unit>
 
       </file>
-      <file name="/src/playground1/playground_1.adb">
+      <file name="playground_1.adb">
          <unit name="Playground_1_X" line="17" col="1">
             <metric name="control_fan-out_coupling">0</metric>
             <metric name="control_fan-in_coupling">0</metric>
@@ -5360,7 +5360,7 @@ Playground_1_Y spec:
          </unit>
 
       </file>
-      <file name="/src/playground1/playground_1.adb">
+      <file name="playground_1.adb">
          <unit name="Playground_1_Y" line="31" col="1">
             <metric name="control_fan-out_coupling">0</metric>
             <metric name="control_fan-in_coupling">0</metric>
