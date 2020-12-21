@@ -1912,7 +1912,7 @@ package body Test.Stub is
                S_Put
                  ((Level + 1) * Indent_Level,
                   "return "
-                  & Node.Spec_Name.all);
+                  & Node_Image (Node.Spec.As_Basic_Decl.P_Defining_Name));
                if Parameters'Length = 0 then
                   S_Put (0, ";");
                else
@@ -1975,7 +1975,7 @@ package body Test.Stub is
             S_Put
               ((Level + 1) * Indent_Level,
                "return "
-               & Node.Spec_Name.all);
+               & Node_Image (Node.Spec.As_Basic_Decl.P_Defining_Name));
             if Parameters'Length = 0 then
                S_Put (0, ";");
             else
@@ -2102,6 +2102,7 @@ package body Test.Stub is
               or else not Is_Abstract (Param_Type);
             --  From limited view or else not abstract
          begin
+
             if Type_Of_Interest then
                if Param_Type.Kind = Ada_Anonymous_Type
                  and then Param_Type.As_Anonymous_Type.F_Type_Decl.
@@ -2344,13 +2345,48 @@ package body Test.Stub is
          return Overall_Image;
       end if;
 
-      if Decl.Unit /= Param_Type.Unit then
-         return Overall_Image;
-      end if;
+      declare
+         Insts : constant Generic_Instantiation_Array :=
+           Decl.P_Generic_Instantiations;
+      begin
+         if Insts'Length = 0 and then Decl.Unit /= Param_Type.Unit then
+            --  Type declared in another unit, we can keep type name as is
+            return Overall_Image;
+         elsif Insts'Length > 0
+           and then Insts (Insts'First).Unit /= Param_Type.Unit
+         then
+            --  Type declared in an instantiation that is declared in another
+            --  unit, we can keep the type name as is.
+            return Overall_Image;
+         end if;
+      end;
+
+      --  At this point the type is daclared in an instantiation that itself if
+      --  declared in the same unit. It may be declared in the same nested
+      --  package, in that case we need to put a fully qualified name istead
+      --  of the original name.
 
       declare
-         Type_Nesting : constant String := To_Lower (Get_Nesting (Decl));
+         Type_Full : constant String :=
+           Encode
+             (Decl.As_Basic_Decl.P_Fully_Qualified_Name,
+              Decl.Unit.Get_Charset);
+
+         Type_Nesting : constant String :=
+           To_Lower
+             (Type_Full
+                (Type_Full'First .. Index (Type_Full, ".", Backward) - 1));
+
+         Span_Start : constant Token_Reference := Param_Type.Token_Start;
+         Span_End   : constant Token_Reference := Param_Type.Token_End;
+         Type_Name  : Libadalang.Analysis.Name;
       begin
+
+         Type_Name := Subtype_Ind.F_Name;
+         if Type_Name.Kind = Ada_Attribute_Ref then
+            Type_Name := Type_Name.As_Attribute_Ref.F_Prefix;
+         end if;
+
          if
            Index (Type_Nesting, Enclosing_Unit_Name) /= Type_Nesting'First
            or else Type_Nesting'Length <= Enclosing_Unit_Name'Length
@@ -2359,10 +2395,14 @@ package body Test.Stub is
             return Overall_Image;
          end if;
 
-         return Insert
-           (Overall_Image,
-            Index (Overall_Image, Node_Image (Subtype_Ind)),
-            Type_Nesting & ".");
+         return
+           Encode
+             (Text (Span_Start, Previous (Type_Name.Token_Start)),
+              Subtype_Ind.Unit.Get_Charset)
+           & Type_Full
+           &  Encode
+                (Text (Next (Type_Name.Token_End), Span_End),
+                 Subtype_Ind.Unit.Get_Charset);
       end;
    end Get_Type_Image;
 
@@ -2457,25 +2497,34 @@ package body Test.Stub is
          Subtype_Ind := Param_Type.As_Subtype_Indication;
       end if;
 
-      Type_Decl := Get_Declaration (Subtype_Ind);
+      Type_Decl := Get_Declaration (Subtype_Ind).P_Canonical_Type;
 
-      if Type_Decl.Kind in Ada_Generic_Formal then
-         return False;
-      end if;
+      while not Type_Decl.Is_Null loop
+         if Type_Decl.Kind in Ada_Generic_Formal then
+            return False;
+         end if;
 
-      Decl := Type_Decl;
-      while not Decl.Is_Null loop
-         if Limited_Type (Decl) then
-            return True;
-         end if;
-         Decl := Decl.P_Next_Part;
-      end loop;
-      Decl := Type_Decl.P_Previous_Part;
-      while not Decl.Is_Null loop
-         if Limited_Type (Decl) then
-            return True;
-         end if;
-         Decl := Decl.P_Previous_Part;
+         Decl := Type_Decl;
+         while not Decl.Is_Null loop
+            if Limited_Type (Decl) then
+               return True;
+            end if;
+            Decl := Decl.P_Next_Part;
+         end loop;
+         Decl := Type_Decl.P_Previous_Part;
+         while not Decl.Is_Null loop
+            if Limited_Type (Decl) then
+               return True;
+            end if;
+            Decl := Decl.P_Previous_Part;
+         end loop;
+
+         Decl := Type_Decl;
+         while not Decl.P_Next_Part.Is_Null loop
+            Decl := Decl.P_Next_Part;
+         end loop;
+         Type_Decl := Parent_Type_Declaration (Decl);
+
       end loop;
 
       return False;
@@ -2548,6 +2597,13 @@ package body Test.Stub is
                begin
                   for WN of With_Names loop
                      Withed_Spec := WN.As_Name.P_Referenced_Decl.As_Ada_Node;
+
+                     if Withed_Spec.Kind = Ada_Package_Renaming_Decl then
+                        --  Package renamings should be unwinded
+                        Withed_Spec := Withed_Spec.As_Package_Renaming_Decl.
+                          F_Renames.F_Renamed_Object.
+                            P_Referenced_Decl.As_Ada_Node;
+                     end if;
 
                      while not Withed_Spec.Is_Null loop
                         if Withed_Spec = Type_Unit_Spec then

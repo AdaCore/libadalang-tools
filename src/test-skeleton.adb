@@ -7177,7 +7177,9 @@ package body Test.Skeleton is
             declare
                Parent_File : constant String := Parent.Unit.Get_Filename;
             begin
-               if not Already_Stubbing.Contains (Parent_File) then
+               if Good_To_Stub (Parent.Unit)
+                 and then not Already_Stubbing.Contains (Parent_File)
+               then
                   Already_Stubbing.Include (Parent_File);
                   Data.Units_To_Stub.Append (Parent);
                   Trace (Me, Parent_File);
