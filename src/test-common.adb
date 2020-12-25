@@ -1050,4 +1050,116 @@ package body Test.Common is
          return False;
    end Is_Function;
 
+   --------------------------------
+   -- Check_Unit_For_Elaboration --
+   --------------------------------
+
+   procedure Check_Unit_For_Elaboration (CU : Compilation_Unit) is
+
+      Elab_Found : Boolean := False;
+
+      procedure Process_CU (CU : Compilation_Unit);
+      --  Processes compilation unit and looks for elaboration pragmas/aspects
+
+      procedure Report_Elab (N : Ada_Node'Class);
+      --  Outputs warning about possible problems with elaboration
+
+      function Check_Name (S : String) return Boolean is
+        (To_Lower (S) in "preelaborate"   |
+                         "pure"           |
+                         "elaborate"      |
+                         "elaborate_body" |
+                         "elaborate_all"  |
+                         "preelaborable_initialization");
+      --  Checks that given name is among the list of elaboration pragmas
+
+      -----------------
+      -- Report_Elab --
+      -----------------
+
+      procedure Report_Elab (N : Ada_Node'Class) is
+      begin
+         Report_Std
+           ("warning: (gnattest) "
+            & Base_Name (N.Unit.Get_Filename)
+            & ":"
+            & Trim (First_Line_Number (N)'Img, Both)
+            & ":"
+            & Trim (First_Column_Number (N)'Img, Both)
+            & ": elaboration control "
+            & (if N.Kind = Ada_Pragma_Node then "pragma" else "aspect"));
+         Report_Std
+           ("this can cause circularity in the test harness", 1);
+         Elab_Found := True;
+      end Report_Elab;
+
+      ----------------
+      -- Process_CU --
+      ----------------
+
+      procedure Process_CU (CU : Compilation_Unit) is
+         Decl  : Basic_Decl;
+         Decls : Ada_Node_List;
+         Sibl  : Ada_Node;
+      begin
+         for Pr of CU.F_Prelude loop
+            if Pr.Kind = Ada_Pragma_Node
+              and then Check_Name (Node_Image (Pr.As_Pragma_Node.F_Id))
+            then
+               Report_Elab (Pr);
+               return;
+            end if;
+         end loop;
+
+         Decl := CU.F_Body.As_Library_Item.F_Item;
+         if not Decl.F_Aspects.Is_Null then
+            for Assoc of Decl.F_Aspects.F_Aspect_Assocs loop
+               if Check_Name (Node_Image (Assoc.As_Aspect_Assoc.F_Id)) then
+                  Report_Elab (Assoc);
+                  return;
+               end if;
+            end loop;
+         end if;
+
+         if Decl.Kind = Ada_Package_Decl then
+            Decls := Decl.As_Package_Decl.F_Public_Part.F_Decls;
+         elsif Decl.Kind = Ada_Package_Body then
+            Decls := Decl.As_Package_Body.F_Decls.F_Decls;
+         else
+            return;
+         end if;
+
+         Sibl := Decls.Ada_Node_List_Element
+           (Decls.Ada_Node_List_First).As_Ada_Node;
+
+         while not Sibl.Is_Null and then Sibl.Kind = Ada_Pragma_Node loop
+            if Check_Name (Node_Image (Sibl.As_Pragma_Node.F_Id)) then
+               Report_Elab (Sibl);
+               return;
+            end if;
+            Sibl := Sibl.Next_Sibling;
+         end loop;
+      end Process_CU;
+
+      Body_N : Body_Node;
+
+   begin
+      Process_CU (CU);
+
+      if Elab_Found then
+         --  Spec already reported as problematic, no point looking at body
+         return;
+      end if;
+
+      Body_N :=
+        CU.F_Body.As_Library_Item.F_Item.As_Basic_Decl.P_Body_Part_For_Decl;
+
+      if Body_N /= No_Body_Node
+        and then Body_N.Unit.Root.Kind = Ada_Compilation_Unit
+      then
+         Process_CU (Body_N.Unit.Root.As_Compilation_Unit);
+      end if;
+
+   end Check_Unit_For_Elaboration;
+
 end Test.Common;

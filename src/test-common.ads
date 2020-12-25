@@ -128,6 +128,10 @@ package Test.Common is
    --  Returns True for function declarations, False for any unexpected
    --  arguments.
 
+   procedure Check_Unit_For_Elaboration (CU : Compilation_Unit);
+   --  Checks if given compilation unit has elaboration related pragmas or
+   --  aspects and outputs corresponding warnings.
+
    procedure Report_Err (Message : String);
    --  Prints its argument to the standard error output
    procedure Report_Std (Message : String; Offset : Integer := 0);

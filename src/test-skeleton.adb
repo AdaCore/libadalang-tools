@@ -2301,6 +2301,8 @@ package body Test.Skeleton is
          "processing " & Node_Image (Unit.As_Basic_Decl.P_Defining_Name)
          &  " (" & Base_Name (The_Unit.Unit.Get_Filename) & ")");
 
+      Check_Unit_For_Elaboration (The_Unit);
+
       Data.Unit := The_Unit;
       Data.Unit_Full_Name := new String'
         (Node_Image (Unit.As_Basic_Decl.P_Defining_Name));
