@@ -2498,6 +2498,14 @@ package body Test.Stub is
       end if;
 
       Type_Decl := Get_Declaration (Subtype_Ind).P_Canonical_Type;
+      if Type_Decl.Kind = Ada_Classwide_Type_Decl
+        and then Get_Declaration (Subtype_Ind).Kind = Ada_Subtype_Decl
+      then
+         Type_Decl :=
+           Get_Declaration
+             (Subtype_Ind).As_Subtype_Decl.F_Subtype.F_Name.P_Relative_Name.
+                P_Referenced_Decl.As_Base_Type_Decl;
+      end if;
 
       while not Type_Decl.Is_Null loop
          if Type_Decl.Kind in Ada_Generic_Formal then

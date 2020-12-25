@@ -138,6 +138,21 @@ package body Test.Common is
       --  Also, for compatibility reasons the last parameter on depth 1
       --  should have ";" after itself, which is not the case for depths >= 2.
 
+      --  ???  Workaround for a name resolution issue
+      --
+      --  Atm LAL does not support pragma Extend_System. If one of subprogram
+      --  parameters is of type declared in such extension of System, its name
+      --  cannot be resolved by LAL, and there is no way to properly compute
+      --  hash image for this subprogram.
+      --
+      --  So in case when there is both an unresolved name of type and
+      --  enclosing compilation unit specifies pragma Extend_System we assume
+      --  the type is declared in this extension.
+
+      function Get_System_Extension return String;
+      --  Returns the name specifed in pramga Extend_System for enclosing unit
+      --  of Subp, if no such pragma is specified returns empty string.
+
       function Handle_Parameters
         (Params         : Param_Spec_Array;
          Result_Profile : Type_Expr) return String;
@@ -151,6 +166,44 @@ package body Test.Common is
 
       function Parameter_Type_Image (Param : Type_Expr) return String;
       --  Returns the image of given type specification.
+
+      --------------------------
+      -- Get_System_Extension --
+      --------------------------
+
+      function Get_System_Extension return String is
+         Prelude : constant Ada_Node_List :=
+           Subp.Unit.Root.As_Compilation_Unit.F_Prelude;
+      begin
+         for Pr of Prelude loop
+            if Pr.Kind = Ada_Pragma_Node
+              and then To_Lower (Node_Image (Pr.As_Pragma_Node.F_Id)) =
+                "extend_system"
+            then
+               declare
+                  Assocs : constant Base_Assoc_List :=
+                    Pr.As_Pragma_Node.F_Args;
+               begin
+                  Print
+                    (Assocs.Base_Assoc_List_Element
+                       (Assocs.Base_Assoc_List_First).
+                         As_Pragma_Argument_Assoc.F_Expr);
+                  return
+                    Node_Image
+                      (Assocs.Base_Assoc_List_Element
+                         (Assocs.Base_Assoc_List_First).
+                             As_Pragma_Argument_Assoc.F_Expr);
+               end;
+            end if;
+         end loop;
+
+         return "";
+      exception
+         when others =>
+            return "";
+      end Get_System_Extension;
+
+      System_Extension : constant String := Get_System_Extension;
 
       function Handle_Parameters
         (Params         : Param_Spec_Array;
@@ -217,6 +270,25 @@ package body Test.Common is
                   Attr_Flag := True;
                end if;
                Param_Type_Name := As_Name (P_Relative_Name (Param_Type_Name));
+
+               if Param_Type_Name.P_Referenced_Decl.Is_Null then
+                  if System_Extension = "" then
+                     Report_Err
+                       ("name resolution error for "
+                        & Param_Type_Name.Image);
+                     return
+                       Node_Image (Param_Type_Name)
+                       & (if Attr_Flag then "'Attr" else "");
+                  else
+                     return
+                       "System."
+                       & System_Extension
+                       & "."
+                       & Node_Image (Param_Type_Name)
+                       & (if Attr_Flag then "'Attr" else "");
+                  end if;
+               end if;
+
                Type_Decl :=
                  P_Canonical_Type
                    (As_Base_Type_Decl (P_Referenced_Decl (Param_Type_Name)));
@@ -224,7 +296,7 @@ package body Test.Common is
                if
                  Subp_Depth < 2 and then not Attr_Flag
                  and then Type_Decl = Tagged_Rec
-                   and then not For_Stubs
+                 and then not For_Stubs
                then
                   Type_Decl := Root_Ignore;
                end if;
@@ -254,6 +326,26 @@ package body Test.Common is
                      end if;
                      Param_Type_Name :=
                        As_Name (P_Relative_Name (Param_Type_Name));
+
+                     if Param_Type_Name.P_Referenced_Decl.Is_Null then
+                        if System_Extension = "" then
+                           Report_Err
+                             ("name resolution error for "
+                              & Param_Type_Name.Image);
+                           return
+                             "@"
+                             & Node_Image (Param_Type_Name)
+                             & (if Attr_Flag then "'Attr" else "");
+                        else
+                           return
+                             "@System."
+                             & System_Extension
+                             & "."
+                             & Node_Image (Param_Type_Name)
+                             & (if Attr_Flag then "'Attr" else "");
+                        end if;
+                     end if;
+
                      Type_Decl :=
                        P_Canonical_Type
                          (As_Base_Type_Decl
@@ -262,6 +354,7 @@ package body Test.Common is
                      if
                        Subp_Depth < 2 and then not Attr_Flag
                        and then Type_Decl = Tagged_Rec
+                       and then not For_Stubs
                      then
                         Type_Decl := Root_Ignore;
                      end if;
@@ -551,6 +644,16 @@ package body Test.Common is
       end if;
 
       if T_Dec.Kind in Ada_Protected_Type_Decl | Ada_Task_Type_Decl then
+         return No_Base_Type_Decl;
+      end if;
+
+      if T_Dec.Kind = Ada_Classwide_Type_Decl then
+         --  Special case when we end up here being called from the stub part
+         --  checking if any of the ancestor types is limited.
+         return No_Base_Type_Decl;
+      end if;
+
+      if not T_Dec.As_Type_Decl.P_Is_Tagged_Type then
          return No_Base_Type_Decl;
       end if;
 
