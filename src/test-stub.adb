@@ -2464,19 +2464,23 @@ package body Test.Stub is
 
          if Type_Decl.Kind = Ada_Type_Decl then
             Param_Type_Def := Type_Decl.As_Type_Decl.F_Type_Def;
-            if
-              Param_Type_Def.Kind = Ada_Derived_Type_Def and then
-              Param_Type_Def.As_Derived_Type_Def.F_Has_Limited
+            if Param_Type_Def.Kind = Ada_Derived_Type_Def
+              and then Param_Type_Def.As_Derived_Type_Def.F_Has_Limited
             then
                return True;
-            elsif
-              Param_Type_Def.Kind = Ada_Private_Type_Def and then
-              Param_Type_Def.As_Private_Type_Def.F_Has_Limited
+            elsif Param_Type_Def.Kind = Ada_Private_Type_Def
+              and then Param_Type_Def.As_Private_Type_Def.F_Has_Limited
             then
                return True;
-            elsif
-              Param_Type_Def.Kind = Ada_Record_Type_Def and then
-              Param_Type_Def.As_Record_Type_Def.F_Has_Limited
+            elsif Param_Type_Def.Kind = Ada_Record_Type_Def
+              and then Param_Type_Def.As_Record_Type_Def.F_Has_Limited
+            then
+               return True;
+            elsif Param_Type_Def.Kind = Ada_Interface_Type_Def
+              and then not Param_Type_Def.As_Interface_Type_Def.
+                F_Interface_Kind.Is_Null
+              and then Param_Type_Def.As_Interface_Type_Def.F_Interface_Kind =
+                Ada_Interface_Kind_Limited
             then
                return True;
             end if;
