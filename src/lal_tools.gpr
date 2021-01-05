@@ -1,11 +1,15 @@
 with "libadalang.gpr";
-project LAL_Tools is
+with "common.gpr";
+library project LAL_Tools is
 
-   type Build_Mode_Type is ("dev", "prod");
-   Build_Mode : Build_Mode_Type := external ("BUILD_MODE", "dev");
+   type Library_Type_Type is ("static", "static-pic", "relocatable");
+   Library_Type : Library_Type_Type := external ("LIBRARY_TYPE", "static");
 
    for Source_Dirs use (".");
-   for Object_Dir use "../obj";
+   for Object_Dir use "../obj/lib." & Library_Type;
+   for Library_Kind use Library_Type;
+   for Library_Dir use "../lib." & Library_Type;
+   for Library_Name use "lal_tools";
 
    for Excluded_Source_Files use
      ("pp-main.adb",
@@ -14,28 +18,6 @@ project LAL_Tools is
       "test-main.adb",
       "utils-var_length_ints-test.adb");
 
-   package Compiler is
-      case Build_Mode is
-         when "dev" =>
-            for Default_Switches ("Ada") use
-              ("-gnatyg",
-               "-gnatwae",
-               "-gnatw.u", -- warn inappropriate use of unordered enums
-               "-g",
-               "-O0",
-               "-gnata",
-               "-gnatVa");
-
-         when "prod" =>
-            for Default_Switches ("Ada") use
-              ("-gnatyg",
-               "-g",
-               "-Ofast",
-	       --  T915-005: deactivate -gnatp, as this seems to cause
-	       --  linking errors when linking the Ada Language Server
-               --  "-gnatp"
-               "-gnatn2");
-      end case;
-   end Compiler;
+   package Compiler renames Common.Compiler;
 
 end LAL_Tools;

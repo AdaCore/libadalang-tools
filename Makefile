@@ -6,7 +6,12 @@ LIBRARY_TYPE ?= static
 LALTOOLS_SET ?= all
 PROCESSORS ?= 0
 
+ALL_LIBRARY_TYPES = static static-pic relocatable
+
 LIB_PROJECTS = \
+   src/lal_tools.gpr
+
+BIN_PROJECTS = \
    src/build.gpr
 
 TESTSUITE_PROJECTS = \
@@ -22,6 +27,19 @@ lib:
 	which gprbuild
 	which gcc
 	for proj in $(LIB_PROJECTS) ; do \
+	  for kind in $(ALL_LIBRARY_TYPES) ; do \
+	    gprbuild -v -k \
+	      -XLIBRARY_TYPE=$$kind \
+	      -XBUILD_MODE=$(BUILD_MODE) \
+	      -P $$proj -p -j$(PROCESSORS) ; \
+	  done ; \
+	done
+
+.PHONY: bin
+bin:
+	which gprbuild
+	which gcc
+	for proj in $(BIN_PROJECTS) ; do \
           gprbuild -v -k \
 	   -XLIBRARY_TYPE=$(LIBRARY_TYPE) \
 	   -XXMLADA_BUILD=$(LIBRARY_TYPE) \
@@ -62,7 +80,21 @@ test: all
 	bin/utils-var_length_ints-test
 	testsuite/testsuite.py
 
-install-strip:
+install-lib:
+	for proj in $(LIB_PROJECTS) ; do \
+	  for kind in $(ALL_LIBRARY_TYPES) ; do \
+	    gprinstall \
+	      -XLIBRARY_TYPE=$$kind \
+	      -XBUILD_MODE=$(BUILD_MODE) \
+	      --prefix="$(DESTDIR)" \
+	      --sources-subdir=include/$$(basename $$proj | cut -d. -f1) \
+	      --build-name=$$kind \
+	      --build-var=LIBRARY_TYPE --build-var=LAL_TOOLS_BUILD \
+	      -P $$proj -p -f ; \
+	  done ; \
+	done
+
+install-bin-strip:
 	mkdir -p "$(DESTDIR)"
 	cp -r bin "$(DESTDIR)/"
 	# Don't strip debug builds

@@ -1,4 +1,5 @@
 with "lal_tools.gpr";
+with "common.gpr";
 project Build is
 
    type Tools_Set_Type is ("all", "no-wip");
@@ -24,7 +25,7 @@ project Build is
 
    for Main use Tools_Mains;
 
-   package Compiler renames LAL_Tools.Compiler;
+   package Compiler renames Common.Compiler;
 
    package Builder is
       for Executable ("pp-main.adb") use "gnatpp";
