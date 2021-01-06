@@ -1,4 +1,4 @@
-abstract project Common is
+abstract project LAL_Tools_Common is
 
    type Build_Mode_Type is ("dev", "prod");
    Build_Mode : Build_Mode_Type := external ("BUILD_MODE", "dev");
@@ -27,4 +27,4 @@ abstract project Common is
       end case;
    end Compiler;
 
-end Common;
+end LAL_Tools_Common;

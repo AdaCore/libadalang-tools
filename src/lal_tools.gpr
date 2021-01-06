@@ -1,5 +1,5 @@
 with "libadalang.gpr";
-with "common.gpr";
+with "lal_tools_common.gpr";
 library project LAL_Tools is
 
    type Library_Type_Type is ("static", "static-pic", "relocatable");
@@ -18,6 +18,6 @@ library project LAL_Tools is
       "test-main.adb",
       "utils-var_length_ints-test.adb");
 
-   package Compiler renames Common.Compiler;
+   package Compiler renames LAL_Tools_Common.Compiler;
 
 end LAL_Tools;
