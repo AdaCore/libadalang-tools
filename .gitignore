@@ -1,6 +1,7 @@
 # Build artifacts
 obj
 bin
+lib.*
 
 # Testsuite output
 out
