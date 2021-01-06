@@ -8,8 +8,7 @@ package Utils.Test_Pkg is
    Descriptor : aliased Command_Line_Descriptor :=
      Copy_Descriptor (Common_Descriptor);
 
-   use Common_Flag_Switches, Common_String_Switches,
-     Common_String_Seq_Switches, Common_Nat_Switches;
+   use Common_String_Seq_Switches;
 
    package Disable is new Disable_Switches (Descriptor, (1 => To_All (Debug)));
 
@@ -38,7 +37,5 @@ package Utils.Test_Pkg is
      ((Test_Debug => +"-debug"));
 
    package Freeze is new Freeze_Descriptor (Descriptor);
-
-   use Some_Flags_Switches, Some_Boolean_Switches, My_Enum_Switches;
 
 end Utils.Test_Pkg;
