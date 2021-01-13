@@ -577,7 +577,8 @@ package body Laltools.Refactor.Rename is
                | Ada_Task_Type_Decl
                | Ada_Param_Spec
                | Ada_Package_Body
-               | Ada_Package_Decl =>
+               | Ada_Package_Decl
+               | Ada_Package_Renaming_Decl =>
                return Check_Rename_Conflicts (Scope);
 
             when Ada_Subp_Decl
