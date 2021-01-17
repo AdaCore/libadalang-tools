@@ -1002,6 +1002,11 @@ package body Test.Skeleton is
                return;
             end if;
 
+            if Data.Is_Generic or else Inside_Inst then
+               Set_No_Parent (Type_Data);
+               return;
+            end if;
+
             Parent_Type :=
               Parent_Type_Declaration (Cur_Node.As_Base_Type_Decl);
 
