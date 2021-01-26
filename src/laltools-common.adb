@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -1588,6 +1588,10 @@ package body Laltools.Common is
       use type Defining_Name;
    begin
       Imprecise := False;
+
+      if Name_Node.Is_Null then
+         return No_Defining_Name;
+      end if;
 
       --  First try to resolve precisely
       begin
