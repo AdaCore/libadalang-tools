@@ -87,9 +87,9 @@ package body Utils.Versions is
       use Utils.Formatted_Output;
    begin
       Put ("\1 \2 \3\n",
-           To_Upper (Tool_Names.Tool_Name), Edition, Libadalang.Version);
+           To_Upper (Tool_Names.Tool_Name), Edition, Version);
       Put ("Copyright (C) \1-\2, \3\n",
-           Initial_Year, Libadalang.Current_Year, Copyright_Holder);
+           Initial_Year, Current_Year, Copyright_Holder);
       Put ("\1", Gnat_Free_Software);
       Put ("\n");
    end Print_Tool_Version;
@@ -101,9 +101,9 @@ package body Utils.Versions is
    procedure Print_Version_Info is
       use Utils.Formatted_Stderr;
    begin
-      Put ("\1 \2 \3\n", Tool_Names.Tool_Name, Edition, Libadalang.Version);
+      Put ("\1 \2 \3\n", Tool_Names.Tool_Name, Edition, Version);
       Put ("Copyright (C) \1-\2, \3\n",
-           Initial_Year, Libadalang.Current_Year, Copyright_Holder);
+           Initial_Year, Current_Year, Copyright_Holder);
    end Print_Version_Info;
 
 end Utils.Versions;

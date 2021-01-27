@@ -25,6 +25,9 @@
 
 package Utils.Versions is
 
+   Version      : constant String := "dev";
+   Current_Year : constant String := "unknown";
+
    type Gnat_Build_Type is (Gnatpro, GPL);
 
    Build_Type : constant Gnat_Build_Type := Gnatpro;
