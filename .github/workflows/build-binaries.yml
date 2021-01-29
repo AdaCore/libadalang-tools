@@ -1,0 +1,43 @@
+on:
+  [push, pull_request]
+name: Check compilation
+jobs:
+  build:
+    name: Build
+    strategy:
+      fail-fast: false
+      matrix: # Build debug and production
+        debug: ['', 'debug']      # '' if production, 'debug' for debug
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Initialize git autocrlf
+        shell: bash
+        run: git config --global core.autocrlf input
+      - name: Install iconv and gmp (Windows only)
+        if: ${{ runner.os == 'Windows' }}
+        uses: msys2/setup-msys2@v2
+        with:
+          path-type: inherit
+          update: true
+          install: >-
+            mingw64/mingw-w64-x86_64-libiconv
+            mingw64/mingw-w64-x86_64-gmp
+      - name: Get LAL_Tools
+        uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: ./cached_gnat
+          key: ${{ runner.os }}-gnat-ce-2020
+      - name: Get GNAT Community 2020 toolchain
+        uses: ada-actions/toolchain@ce2020
+        with:
+          distrib: community
+          install_dir: ./cached_gnat
+      - name: Build (Windows)
+        if: ${{ runner.os == 'Windows' }}
+        shell: msys2 {0}
+        run: .github/workflows/build-binaries.sh "${{ matrix.debug }}" ${{ runner.os }}
+      - name: Build (non-Windows)
+        if: ${{ runner.os != 'Windows' }}
+        run: .github/workflows/build-binaries.sh "${{ matrix.debug }}" ${{ runner.os }}
