@@ -27,7 +27,6 @@ with Ada.Characters.Handling; use Ada.Characters.Handling;
 with Utils.Formatted_Output;
 with Utils.Formatted_Stderr;
 with Utils.Tool_Names;
-with Libadalang;
 
 package body Utils.Versions is
 
