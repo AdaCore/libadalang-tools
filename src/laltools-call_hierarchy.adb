@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -21,59 +21,86 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Laltools.Common;
-
-with Libadalang.Common;
+with Laltools.Common; use Laltools.Common;
 
 package body Laltools.Call_Hierarchy is
 
-   package LALCommon renames Libadalang.Common;
+   ---------------------------
+   --  Find_Incomming_Calls --
+   ---------------------------
+
+   procedure Find_Incoming_Calls
+     (Definition : Defining_Name;
+      Units      : Analysis_Unit_Array;
+      Callback   : not null access procedure
+        (Subp_Call : Call_Stmt))
+   is
+      Aux_Node : Ada_Node := No_Ada_Node;
+
+   begin
+      for Reference of Definition.P_Find_All_Calls (Units) loop
+         Aux_Node := Ref (Reference).As_Ada_Node;
+
+         while not (Aux_Node.Kind in Ada_Call_Stmt_Range) loop
+            Aux_Node := Aux_Node.Parent;
+         end loop;
+
+         if Aux_Node.Is_Null
+           or else not (Aux_Node.Kind in Ada_Call_Stmt_Range)
+         then
+            raise Program_Error
+              with "Could not find a Call_Stmt node";
+         end if;
+
+         Callback (Aux_Node.As_Call_Stmt);
+      end loop;
+   end Find_Incoming_Calls;
 
    -------------------------
    -- Find_Outgoing_Calls --
    -------------------------
 
    procedure Find_Outgoing_Calls
-     (Definition : LALAnalysis.Defining_Name;
+     (Definition : Defining_Name;
       Callback   : not null access procedure
-        (Subp_Call : LALAnalysis.Ada_Node'Class);
+        (Subp_Call : Ada_Node'Class);
       Trace      : GNATCOLL.Traces.Trace_Handle;
       Imprecise  : in out Boolean)
    is
 
-      function Process_Body_Children (N : LALAnalysis.Ada_Node'Class)
-                                      return LALCommon.Visit_Status;
+      function Process_Body_Children (N : Ada_Node'Class)
+                                      return Visit_Status;
       --  Check if N is a subprogram call and if so call callback.
 
       ----------------------------
       -- Process_Body_Childreen --
       ----------------------------
 
-      function Process_Body_Children (N : LALAnalysis.Ada_Node'Class)
-                                      return LALCommon.Visit_Status is
+      function Process_Body_Children (N : Ada_Node'Class)
+                                      return Visit_Status is
       begin
          --  Do not consider calls made by nested subprograms, expression
          --  functions or tasks.
 
          if N.Kind in
-           LALCommon.Ada_Subp_Body
-             | LALCommon.Ada_Subp_Spec
-               | LALCommon.Ada_Expr_Function
-                 | LALCommon.Ada_Task_Body
-                   | LALCommon.Ada_Single_Task_Decl
-                     | LALCommon.Ada_Task_Type_Decl
+           Ada_Subp_Body
+             | Ada_Subp_Spec
+               | Ada_Expr_Function
+                 | Ada_Task_Body
+                   | Ada_Single_Task_Decl
+                     | Ada_Task_Type_Decl
          then
-            return LALCommon.Over;
+            return Over;
          end if;
 
-         if Laltools.Common.Is_Call (N, Trace, Imprecise) then
+         if Is_Call (N, Trace, Imprecise) then
             Callback (N);
          end if;
-         return LALCommon.Into;
+         return Into;
       end Process_Body_Children;
 
-      Bodies : constant Laltools.Common.Bodies_List.List :=
-        Laltools.Common.List_Bodies_Of (Definition, Trace, Imprecise);
+      Bodies : constant Bodies_List.List :=
+        List_Bodies_Of (Definition, Trace, Imprecise);
    begin
       --  Iterate through all the bodies, and for each, iterate
       --  through all the childreen looking for function calls.

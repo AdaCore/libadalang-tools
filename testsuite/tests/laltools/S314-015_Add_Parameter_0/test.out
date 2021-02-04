@@ -1,0 +1,104 @@
+Not possible to add any parameter due to invalid input
+
+Adding parameter (Bar : Integer) with index  1
+/main_package.adb
+3:17-3:17  (Bar : Integer)
+/main_package.ads
+3:17-3:17  (Bar : Integer)
+
+Adding parameter (Bar : in out Integer) with index  1
+/main_package.adb
+3:17-3:17  (Bar : in out Integer)
+/main_package.ads
+3:17-3:17  (Bar : in out Integer)
+
+Adding parameter (Bar : Integer := 1) with index  1
+/main_package.adb
+3:17-3:17  (Bar : Integer := 1)
+/main_package.ads
+3:17-3:17  (Bar : Integer := 1)
+
+Adding parameter (Bar : in out Integer := 1) with index  1
+/main_package.adb
+3:17-3:17  (Bar : in out Integer := 1)
+/main_package.ads
+3:17-3:17  (Bar : in out Integer := 1)
+
+Not possible to add any parameter due to invalid input
+
+Adding parameter (Baz : Integer) with index  1
+/main_package.adb
+5:19-5:19 Baz : Integer; 
+/main_package.ads
+5:19-5:19 Baz : Integer; 
+
+Adding parameter (Baz : in out Integer) with index  1
+/main_package.adb
+5:19-5:19 Baz : in out Integer; 
+/main_package.ads
+5:19-5:19 Baz : in out Integer; 
+
+Adding parameter (Baz : Integer := 1) with index  1
+/main_package.adb
+5:19-5:19 Baz : Integer := 1; 
+/main_package.ads
+5:19-5:19 Baz : Integer := 1; 
+
+Adding parameter (Baz : in out Integer := 1) with index  1
+/main_package.adb
+5:19-5:19 Baz : in out Integer := 1; 
+/main_package.ads
+5:19-5:19 Baz : in out Integer := 1; 
+
+Not possible to add any parameter due to invalid input
+
+Adding parameter (Baz : Integer) with index  2
+/main_package.adb
+5:39-5:39 ; Baz : Integer
+/main_package.ads
+5:39-5:39 ; Baz : Integer
+
+Adding parameter (Baz : in out Integer) with index  2
+/main_package.adb
+5:39-5:39 ; Baz : in out Integer
+/main_package.ads
+5:39-5:39 ; Baz : in out Integer
+
+Adding parameter (Baz : Integer := 1) with index  2
+/main_package.adb
+5:39-5:39 ; Baz : Integer := 1
+/main_package.ads
+5:39-5:39 ; Baz : Integer := 1
+
+Adding parameter (Baz : in out Integer := 1) with index  2
+/main_package.adb
+5:39-5:39 ; Baz : in out Integer := 1
+/main_package.ads
+5:39-5:39 ; Baz : in out Integer := 1
+
+Not possible to add any parameter due to invalid input
+
+Adding parameter (Baz : Integer) with index  2
+/main_package.adb
+9:7-9:7 Baz : Integer; 
+/main_package.ads
+7:22-7:24  : in out Integer; Baz : Integer; 
+
+Adding parameter (Baz : in out Integer) with index  2
+/main_package.adb
+9:7-9:7 Baz : in out Integer; 
+/main_package.ads
+7:22-7:24  : in out Integer; Baz : in out Integer; 
+
+Adding parameter (Baz : Integer := 1) with index  2
+/main_package.adb
+9:7-9:7 Baz : Integer := 1; 
+/main_package.ads
+7:22-7:24  : in out Integer; Baz : Integer := 1; 
+
+Adding parameter (Baz : in out Integer := 1) with index  2
+/main_package.adb
+9:7-9:7 Baz : in out Integer := 1; 
+/main_package.ads
+7:22-7:24  : in out Integer; Baz : in out Integer := 1; 
+

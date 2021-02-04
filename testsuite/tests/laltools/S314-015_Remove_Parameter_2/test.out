@@ -1,0 +1,68 @@
+Removing parameter A
+/main.adb
+13:20-13:33 
+15:20-15:38 
+24:7-24:11 
+25:7-25:16 
+26:7-26:11 
+27:7-27:16 
+37:9-37:18 
+38:9-38:13 
+40:9-40:13 
+41:9-41:18 
+/main_package.adb
+7:18-7:36 
+9:18-9:31 
+/main_package.ads
+4:18-4:36 
+
+Removing parameter A
+/main.adb
+26:7-26:11 
+27:7-27:16 
+/main_package.adb
+9:18-9:31 
+/main_package.ads
+6:18-6:31 
+
+Removing parameter A
+/main.adb
+17:19-17:32 
+28:9-28:13 
+29:9-29:18 
+42:8-42:12 
+43:8-43:17 
+/main_package.adb
+11:18-11:36 
+/main_package.ads
+10:18-10:36 
+
+Removing parameter A
+/main.adb
+31:10-31:14 
+32:10-32:19 
+/main_package.adb
+16:19-16:48 
+/main_package.ads
+15:19-15:48 
+
+Removing parameter A
+/main.adb
+9:28-9:41 
+20:20-20:46 
+21:20-21:46 
+/main_package.ads
+17:20-17:33 
+
+Removing parameter A
+/main.adb
+17:19-17:32 
+28:9-28:13 
+29:9-29:18 
+42:8-42:12 
+43:8-43:17 
+/main_package.adb
+11:18-11:36 
+/main_package.ads
+10:18-10:36 
+

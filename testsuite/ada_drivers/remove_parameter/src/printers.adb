@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                       Copyright (C) 2020, AdaCore                        --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -20,28 +20,14 @@
 -- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
---
---  This package contains LAL_Tools contructs to represent refactoring
---  problems.
 
-with Ada.Containers.Indefinite_Vectors;
+with Ada.Text_IO; use Ada.Text_IO;
 
-package Laltools.Refactor.Problems is
+package body Printers is
 
-   type Refactor_Problem is interface;
+   procedure PP (A : Integer) is
+   begin
+      Put_Line (A'Image);
+   end PP;
 
-   function Filename (Self : Refactor_Problem) return String is abstract;
-   --  Returns the filename of the analysis unit where Self happens.
-
-   function Location (Self : Refactor_Problem)
-                      return Source_Location_Range is abstract;
-   --  Return a location in the file where Self happens.
-
-   function Info (Self : Refactor_Problem) return String is abstract;
-   --  Returns a human readable message with the description of Self.
-
-   package Refactor_Problem_Vectors is new Ada.Containers.Indefinite_Vectors
-     (Index_Type   => Natural,
-      Element_Type => Refactor_Problem'Class);
-
-end Laltools.Refactor.Problems;
+end Printers;

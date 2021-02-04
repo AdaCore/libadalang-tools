@@ -18,6 +18,10 @@ TESTSUITE_PROJECTS = \
    testsuite/ada_drivers/refactor_imports/refactor_imports.gpr \
    testsuite/ada_drivers/outgoing_calls/outgoing_calls.gpr \
    testsuite/ada_drivers/refactoring_rename/rename.gpr \
+   testsuite/ada_drivers/add_parameter/add_parameter.gpr \
+   testsuite/ada_drivers/remove_parameter/remove_parameter.gpr \
+   testsuite/ada_drivers/move_parameter/move_parameter.gpr \
+   testsuite/ada_drivers/change_parameter_mode/change_parameter_mode.gpr
 
 ALL_PROJECTS = \
    $(LIB_PROJECTS) $(TESTSUITE_PROJECTS)

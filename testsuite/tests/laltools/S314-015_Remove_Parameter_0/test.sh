@@ -1,0 +1,24 @@
+#!/bin/sh
+remove_parameter -P default.gpr -S main_package.ads -L 4 -R 7
+remove_parameter -P default.gpr -S main_package.ads -L 5 -R 10
+remove_parameter -P default.gpr -S main_package.ads -L 6 -R 13
+remove_parameter -P default.gpr -S main_package.ads -L 4 -R 17
+remove_parameter -P default.gpr -S main_package.ads -L 5 -R 17
+remove_parameter -P default.gpr -S main_package.ads -L 6 -R 17
+remove_parameter -P default.gpr -S main_package.ads -L 3 -R 14
+remove_parameter -P default.gpr -S main_package.adb -L 4 -R 7 
+remove_parameter -P default.gpr -S main_package.adb -L 4 -R 10
+remove_parameter -P default.gpr -S main_package.adb -L 5 -R 7
+remove_parameter -P default.gpr -S main_package.adb -L 5 -R 19
+remove_parameter -P default.gpr -S main_package.adb -L 5 -R 23
+remove_parameter -P default.gpr -S main_package.adb -L 6 -R 7
+remove_parameter -P default.gpr -S main_package.adb -L 6 -R 10
+remove_parameter -P default.gpr -S main_package.adb -L 3 -R 14
+remove_parameter -P default.gpr -S main.adb -L 7 -R 7
+remove_parameter -P default.gpr -S main.adb -L 7 -R 20
+remove_parameter -P default.gpr -S main.adb -L 7 -R 23
+remove_parameter -P default.gpr -S main.adb -L 7 -R 45
+remove_parameter -P default.gpr -S main.adb -L 19 -R 7
+remove_parameter -P default.gpr -S main.adb -L 19 -R 36
+remove_parameter -P default.gpr -S main.adb -L 19 -R 52
+remove_parameter -P default.gpr -S main.adb -L 19 -R 65

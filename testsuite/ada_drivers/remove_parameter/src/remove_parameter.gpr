@@ -1,0 +1,12 @@
+with "../../../src/lal_tools.gpr";
+with "libadalang.gpr";
+
+project Remove_Parameter is
+   for Source_Dirs use ("src");
+   for Object_Dir use "obj";
+   for Exec_Dir use "../bin/";
+   for Main use ("remove_parameter.adb");
+
+   package Compiler renames LAL_Tools.Compiler;
+
+end Remove_Parameter;

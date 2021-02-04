@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -30,16 +30,11 @@ with Ada.Containers.Indefinite_Vectors;
 with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Ordered_Sets;
 
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 
-with Laltools.Common; use Laltools.Common;
 with Laltools.Refactor.Problems; use Laltools.Refactor.Problems;
 
-with Langkit_Support.Slocs; use Langkit_Support.Slocs;
 with Langkit_Support.Text; use Langkit_Support.Text;
-
-with Libadalang.Analysis; use Libadalang.Analysis;
 
 package Laltools.Refactor.Rename is
 

@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -26,16 +26,25 @@
 
 with GNATCOLL.Traces;
 
-with Libadalang.Analysis;
+with Libadalang.Analysis; use Libadalang.Analysis;
+with Libadalang.Common; use Libadalang.Common;
 
 package Laltools.Call_Hierarchy is
 
-   package LALAnalysis renames Libadalang.Analysis;
+   procedure Find_Incoming_Calls
+     (Definition : Defining_Name;
+      Units      : Analysis_Unit_Array;
+      Callback   : not null access procedure
+        (Subp_Call : Call_Stmt))
+       with Pre => Definition.P_Basic_Decl.P_Is_Subprogram or
+       Definition.P_Basic_Decl.Kind in Ada_Generic_Subp_Instantiation_Range;
+   --  Finds all incomming calls of the subprogram given by Definition and
+   --  calls Callback on each call that was found.
 
    procedure Find_Outgoing_Calls
-     (Definition : LALAnalysis.Defining_Name;
+     (Definition : Defining_Name;
       Callback   : not null access procedure
-        (Subp_Call : LALAnalysis.Ada_Node'Class);
+        (Subp_Call : Ada_Node'Class);
       Trace      : GNATCOLL.Traces.Trace_Handle;
       Imprecise  : in out Boolean)
      with Pre => Definition.P_Basic_Decl.P_Is_Subprogram;

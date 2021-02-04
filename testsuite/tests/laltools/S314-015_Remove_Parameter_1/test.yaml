@@ -1,0 +1,4 @@
+description:
+    Refactoring - Delete parameter from subprogram specification.
+
+driver: shell_script

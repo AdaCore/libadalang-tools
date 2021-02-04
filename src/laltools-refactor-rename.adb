@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -517,7 +517,6 @@ package body Laltools.Refactor.Rename is
       function Check_Subp_Rename_Conflicts (Scope : Ada_Node_List)
                                             return Defining_Name is
          use type Ada_Node_Kind_Type;
-         use type Basic_Decl;
       begin
          Assert (Original_Subp_Spec /= No_Subp_Spec);
          for Decl of Scope loop
@@ -562,8 +561,6 @@ package body Laltools.Refactor.Rename is
          Definition_Basic_Decl_Kind : Ada_Node_Kind_Type renames
            Def_Basic_Decl.Kind;
 
-         use type Ada_Node_List;
-         use type Ada_Node_Kind_Type;
       begin
          if Scope = No_Ada_Node_List then
             return No_Defining_Name;
@@ -633,10 +630,6 @@ package body Laltools.Refactor.Rename is
       return Rename_Problem'Class
    is
       Parent_Package : Package_Decl := No_Package_Decl;
-
-      use type Package_Decl;
-      use type Basic_Decl;
-      use type Analysis_Unit;
 
    begin
       Find_Parent_Package :
@@ -709,8 +702,6 @@ package body Laltools.Refactor.Rename is
       Parent_Unit : constant Analysis_Unit :=
         Self.Canonical_Definition.P_Basic_Decl.P_Parent_Basic_Decl.Unit;
       Parent_Package : Package_Decl := No_Package_Decl;
-
-      use type Analysis_Unit;
 
    begin
       if Self.Canonical_Definition.Unit.Root.As_Compilation_Unit.P_Decl
