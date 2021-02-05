@@ -7,7 +7,8 @@ abstract project LAL_Tools_Common is
       case Build_Mode is
          when "dev" =>
             for Default_Switches ("Ada") use
-              ("-gnatyg",
+              ("-fPIC",
+               "-gnatyg",
                "-gnatwae",
                "-gnatw.u", -- warn inappropriate use of unordered enums
                "-g",
@@ -17,7 +18,8 @@ abstract project LAL_Tools_Common is
 
          when "prod" =>
             for Default_Switches ("Ada") use
-              ("-gnatyg",
+              ("-fPIC",
+               "-gnatyg",
                "-g",
                "-Ofast",
                --  T915-005: deactivate -gnatp, as this seems to cause

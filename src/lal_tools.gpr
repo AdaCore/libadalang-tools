@@ -6,9 +6,9 @@ library project LAL_Tools is
    Library_Type : Library_Type_Type := external ("LIBRARY_TYPE", "static");
 
    for Source_Dirs use (".");
-   for Object_Dir use "../obj/lib." & Library_Type;
+   for Object_Dir use "../obj/lib";
    for Library_Kind use Library_Type;
-   for Library_Dir use "../lib." & Library_Type;
+   for Library_Dir use "../lib";
    for Library_Name use "lal_tools";
 
    for Excluded_Source_Files use

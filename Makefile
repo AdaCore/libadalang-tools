@@ -28,6 +28,7 @@ lib:
 	which gcc
 	for proj in $(LIB_PROJECTS) ; do \
 	  for kind in $(ALL_LIBRARY_TYPES) ; do \
+	    rm -f obj/lib/*.lexch; \
 	    gprbuild -v -k \
 	      -XLIBRARY_TYPE=$$kind \
 	      -XBUILD_MODE=$(BUILD_MODE) \
