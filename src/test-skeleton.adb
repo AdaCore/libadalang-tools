@@ -33,6 +33,7 @@ with Ada.Containers.Indefinite_Hashed_Sets;
 with Ada.Containers.Indefinite_Hashed_Maps;
 
 with Libadalang.Common; use Libadalang.Common;
+with Langkit_Support.Errors;
 with Langkit_Support.Text; use Langkit_Support.Text;
 
 with Ada.Text_IO; use Ada.Text_IO;
@@ -40,6 +41,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with Ada.Characters.Handling; use Ada.Characters.Handling;
+with Ada.Exceptions;
 with Ada.Strings; use Ada.Strings;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 
@@ -63,7 +65,6 @@ package body Test.Skeleton is
      Create ("Skeletons", Default => Off);
    Me_Direct_Callees : constant Trace_Handle :=
      Create ("Skeletons.Direct_Callees", Default => Off);
-   pragma Unreferenced (Me_Direct_Callees);
 
    -------------------
    --  Minded Data  --
@@ -465,6 +466,11 @@ package body Test.Skeleton is
      (Elem : Ada_Node'Class) return Boolean;
    --  Checks that all enclosing elements for the given element are regular
    --  package declarations.
+
+   function Get_Direct_Callees_Setters
+     (Subp : Basic_Decl) return String_Set.Set;
+   --  Returns the list of possible setters for all subprograms called from
+   --  the body of given subprogram.
 
    ---------
    -- "<" --
@@ -5158,6 +5164,11 @@ package body Test.Skeleton is
 
                      if MD.TR_Text.Is_Empty then
 
+                        if Stub_Mode_ON then
+                           Setters_Set := Get_Direct_Callees_Setters
+                             (Current_Subp.Subp_Declaration.As_Basic_Decl);
+                        end if;
+
                         New_Tests_Counter := New_Tests_Counter + 1;
                         New_Line_Count;
                         S_Put (6, "pragma Unreferenced (Gnattest_T);");
@@ -6317,6 +6328,11 @@ package body Test.Skeleton is
 
                         if MD.TR_Text.Is_Empty then
 
+                           if Stub_Mode_ON then
+                              Setters_Set := Get_Direct_Callees_Setters
+                                (Current_Subp.Subp_Declaration.As_Basic_Decl);
+                           end if;
+
                            New_Tests_Counter := New_Tests_Counter + 1;
                            New_Line_Count;
                            S_Put (6, "pragma Unreferenced (Gnattest_T);");
@@ -6742,6 +6758,120 @@ package body Test.Skeleton is
       end if;
       New_Line_Count;
    end Print_Comment_Declaration;
+
+   --------------------------------
+   -- Get_Direct_Callees_Setters --
+   --------------------------------
+
+   function Get_Direct_Callees_Setters
+     (Subp : Basic_Decl) return String_Set.Set
+   is
+      Result : String_Set.Set;
+
+      function Get_Callees (Node : Ada_Node'Class) return Visit_Status;
+      --  Traverses subprogram body in search for callees
+
+      function Get_Callees (Node : Ada_Node'Class) return Visit_Status is
+         Decl : Basic_Decl;
+      begin
+         --  P_Is_Call may occasionally crash on some constructs, commented out
+         --  setter suggestions are not important enough to keep the tool
+         --  exposed to possible crashes, so instead we just skip such cases
+         --  and issue error data in the traces.
+         begin
+            if (Node.Kind = Ada_Identifier
+                 and then Node.As_Name.P_Is_Call)
+              or else Node.Kind in Ada_Op
+            then
+               Decl := Node.As_Name.P_Referenced_Decl;
+
+               if Decl.Is_Null then
+                  return Over;
+               end if;
+            else
+               return Into;
+            end if;
+
+         exception
+            when Ex : Langkit_Support.Errors.Property_Error =>
+               Trace (Me_Direct_Callees,
+                      "Error while processing" & Node.Image);
+               Trace (Me_Direct_Callees,
+                      Ada.Exceptions.Exception_Name (Ex)
+                      & " : "
+                      & Ada.Exceptions.Exception_Message (Ex));
+               return Over;
+         end;
+
+         if Decl.Unit = Node.Unit or else Decl.Unit = Subp.Unit then
+            --  Callee is from the same unit spec or even from the body,
+            --  it won't be stubbed.
+            return Over;
+         end if;
+
+         if not Source_Present (Decl.Unit.Get_Filename) then
+            --
+            return Over;
+         end if;
+
+         --  Process simple cases for now. Dispatchings, renamings and parts of
+         --  instances are not yet supported.
+
+         if Decl.Kind in Ada_Generic_Subp_Instantiation | Ada_Formal_Subp_Decl
+           | Ada_Subp_Renaming_Decl | Ada_Enum_Literal_Decl | Ada_Entry_Decl
+           | Ada_Null_Subp_Decl | Ada_Subp_Body | Ada_Subp_Body_Stub
+         then
+            return Over;
+         end if;
+
+         for Parent of Decl.Parents loop
+            if Parent.Kind = Ada_Generic_Package_Decl then
+               return Over;
+            end if;
+         end loop;
+
+         if Decl.Parent.Kind = Ada_Library_Item then
+            --  Library level supprograms are not stubbed
+            return Over;
+         end if;
+
+         declare
+            Suffix : constant String :=
+              "_"
+              & Head (Mangle_Hash_Full (Decl), 6)
+              & "_"
+              & Head (GNAT.SHA1.Digest (Get_Nesting (Decl)), 6);
+         begin
+            Result.Include
+              (Get_Nesting (Decl)
+               & "."
+               & Stub_Data_Unit_Name
+               & "."
+               & Setter_Prefix
+               & Get_Subp_Name (Decl)
+               & Suffix);
+         end;
+
+         return Into;
+      end Get_Callees;
+
+   begin
+      Increase_Indent
+        (Me_Direct_Callees,
+         "Gathering direct callees for " & Subp.Image);
+
+      if Subp.Kind = Ada_Expr_Function then
+         Traverse (Subp.As_Expr_Function.F_Expr, Get_Callees'Access);
+      elsif Subp.Kind = Ada_Subp_Decl then
+         Traverse (Subp.As_Subp_Decl.P_Body_Part, Get_Callees'Access);
+      end if;
+
+      Trace
+        (Me_Direct_Callees,
+         "Direct callees gathered");
+      Decrease_Indent;
+      return Result;
+   end Get_Direct_Callees_Setters;
 
    ----------------------------------
    -- Get_Subprogram_From_Separate --
