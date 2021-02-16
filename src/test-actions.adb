@@ -837,26 +837,72 @@ package body Test.Actions is
       pragma Unreferenced (Tool);
    begin
       pragma Style_Checks ("M200"); -- Allow long lines
-      Put ("usage: gnattest [options] {filename}\n");
-      Put (" options:\n");
-      Put (" --version - Display version and exit\n");
-      Put (" --help    - Display usage and exit\n");
+      Put ("usage: gnattest -Pprj [opts] {filename}\n");
+      Put ("        - generates the unit testing framework\n");
+      Put ("\n");
+      Put (" or   gnattest test_drivers.list [opts]\n");
+      Put ("        - executes tests and aggregates the results\n");
+      Put ("\n");
+      Put (" --version        - Display version and exit\n");
+      Put (" --help           - Display usage and exit\n");
+      Put (" -v, --verbose    - Verbose mode\n");
+      Put (" -q, --quiet      - Quiet mode\n");
       Put ("\n");
 
+      Put ("Framework generation mode options:\n");
+      Put ("\n");
       Put (" -Pproject        - Use project file project. Only one such switch can be used\n");
-      Put (" -U               - process all sources of the argument project\n");
-      Put (" -U main          - process the closure of units rooted at unit main\n");
-      Put (" -Xname=value     - specify an external reference for argument project file\n");
-      Put (" --subdirs=dir    - specify subdirectory to place the result files into\n");
-      Put (" -eL              - follow all symbolic links when processing project files\n");
+      Put (" -U               - Process all sources of the argument project\n");
+      Put (" -U main          - Process the closure of units rooted at unit main\n");
+      Put (" -Xname=value     - Specify an external reference for argument project file\n");
+      Put (" -eL              - Follow all symbolic links when processing project files\n");
+      Put (" --target=target  - Specify a target\n");
+      Put (" --RTS=runtime    - Specify runtime for Ada\n");
+      Put (" --files=file     - Name of a text file containing a list of Ada\n");
+      Put ("                    source files for which metrics should be computed\n");
+      Put (" --ignore=file    - Name of a text file containing a list of sources\n");
+      Put ("                    to be excluded from processing\n");
+
+      Put (" --strict                - Return error exit code if there are parsing errors\n");
+      Put (" --additional-tests=prj  - Treat sources from project prj as additional\n");
+      Put ("                           manual tests to add to the test suite\n");
+      Put (" --harness-only          - Treat argument sources as tests to add to the suite\n");
+      Put (" --stub                  - Generate testing framework that uses stubs\n");
       Put ("\n");
 
-      Put (" --verbose    - verbose mode\n");
-      Put (" --quiet      - quiet mode\n");
+      Put (" --exclude-from-stubbing=file       - List of sources whose bodies should not\n");
+      Put ("                                      be stubbed\n");
+      Put (" --exclude-from-stubbing:unit=file  - List of sources whose bodies should not\n");
+      Put ("                                      be stubbed when testing unit\n");
       Put ("\n");
 
-      Put (" --etc ????\n");
+      Put (" --harness-dir=dirname  - Output dir for test harness\n");
+      Put (" --tests-dir=dirname    - Test files are put in dirname\n");
+      Put (" --subdirs=dirname      - Test files are put in subdirs dirname of source dirs\n");
+      Put (" --tests-root=dirname   - Test files are put in the same directory hierarchy\n");
+      Put ("                          as sources but rooted at dirname\n");
+      Put (" --stubs-dir=dirname    - Stub files are put in subdirs of dirname\n");
       Put ("\n");
+
+      Put (" --validate-type-extensions     - Run all tests from all parents to check LSP\n");
+      Put (" --inheritance-check            - Run inherited tests for descendants\n");
+      Put (" --no-inheritance-check         - Do not run inherited tests for descendants\n");
+      Put (" --test-case-only               - Create tests only when Test_Case is specified\n");
+      Put (" --skeleton-default=(pass|fail) - Default behavior of unimplemented tests\n");
+      Put (" --passed-tests=(show|hide)     - Default output of passed tests\n");
+      Put (" --exit-status=(on|off)         - Default usage of the exit status\n");
+      Put (" --omit-sloc                    - Don't record subprogram sloc in test package\n");
+      Put (" --no-command-line              - Don't add command line support to test driver\n");
+      Put (" --test-duration                - Show timing for each test\n");
+      Put ("\n");
+
+      Put ("Tests execution mode options:\n");
+      Put ("\n");
+      Put (" --passed-tests=(show|hide)  - Default output of passed tests\n");
+      Put (" --queues=n, -jn             - Run n tests in parallel (default n=1)\n");
+      Put (" --copy-environment=dir      - Copy contents of dir to temp dirs where test\n");
+      Put ("                               drivers are spawned\n");
+      Put (" --subdirs=dirname           - Look for test drivers in subdirs\n");
       pragma Style_Checks ("M79");
    end Tool_Help;
 
