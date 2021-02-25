@@ -546,7 +546,9 @@ package body Laltools.Refactor.Subprogram_Signature is
          return True;
 
       else
-         if Parent_Identifier = No_Identifier then
+         if Parent_Identifier = No_Identifier
+           or else Get_Subp_Params (Parent_Subp_Decl).Is_Null
+         then
             return False;
          end if;
 

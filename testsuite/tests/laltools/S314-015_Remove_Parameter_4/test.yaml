@@ -1,0 +1,5 @@
+description: |+
+    This test checks that the Remove Parameter refactoring is not available on
+    subprograms that do not have parameters.
+
+driver: shell_script
