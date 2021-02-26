@@ -86,14 +86,14 @@ package Laltools.Refactor.Subprogram_Signature is
    --  necessary data to create a Mode_Changer object or to call
    --  'Change_Mode'.
 
-   type Move_Direction_Type is (Left, Right);
+   type Move_Direction_Type is (Backward, Forward);
 
    type Move_Direction_Availability_Type is
      array (Move_Direction_Type) of Boolean;
 
-   Only_Left       : constant Move_Direction_Availability_Type :=
+   Only_Backward   : constant Move_Direction_Availability_Type :=
      (True, False);
-   Only_Right      : constant Move_Direction_Availability_Type :=
+   Only_Forward    : constant Move_Direction_Availability_Type :=
      (False, True);
    Both_Directions : constant Move_Direction_Availability_Type :=
      (True, True);
@@ -163,15 +163,15 @@ package Laltools.Refactor.Subprogram_Signature is
    --  'Parameter_Indices_Range' to 'New_Mode'. The new mode is added to the
    --  entire subprogram hierarchy, as well as, all renames hierarchy.
 
-   function Move_Left
+   function Move_Backward
      (Subp            : Basic_Decl;
       Parameter_Index : Positive;
       Units           : Analysis_Unit_Array)
       return Edit_Map
      with Pre => Subp.P_Is_Subprogram
      or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
-   --  Moves the parameter defined by 'Parameter_Index' to the left. The
-   --  parameter is moved to the left in the entire subprogram hierarchy, as
+   --  Moves the parameter defined by 'Parameter_Index' backward. The
+   --  parameter is moved backward in the entire subprogram hierarchy, as
    --  well as, all renames hierarchy.
 
    function Move_Right
@@ -179,7 +179,7 @@ package Laltools.Refactor.Subprogram_Signature is
       Parameter_Index : Positive;
       Units           : Analysis_Unit_Array)
       return Edit_Map
-   is (Move_Left (Subp, Parameter_Index + 1, Units));
+   is (Move_Backward (Subp, Parameter_Index + 1, Units));
    --  Moves the parameter defined by 'Parameter_Index' to the right. The
    --  parameter is moved to the right in the entire subprogram hierarchy, as
    --  well as, all renames hierarchy.
@@ -311,39 +311,39 @@ package Laltools.Refactor.Subprogram_Signature is
 
    type Parameter_Mover is interface and Signature_Changer;
 
-   type Left_Mover is new Parameter_Mover with private;
+   type Backward_Mover is new Parameter_Mover with private;
 
    function Create
      (Target          : Basic_Decl;
       Parameter_Index : Natural;
       Configuration   : Signature_Changer_Configuration_Type :=
         Default_Configuration)
-      return Left_Mover;
-   --  Creates a signature changer that moves a parameter to the left.
+      return Backward_Mover;
+   --  Creates a signature changer that moves a parameter backward.
    --  The parameter is defined by 'Parameter_Index'.
 
    overriding
    function Refactor
-     (Self : Left_Mover;
+     (Self : Backward_Mover;
       Analysis_Units : access function return Analysis_Unit_Array)
       return Edit_Map;
    --  Returns an Edit_Map with all the refactoring edits needed to move
-   --  a parameter to the left.
+   --  a parameter backward.
 
-   type Right_Mover is new Parameter_Mover with private;
+   type Forward_Mover is new Parameter_Mover with private;
 
    function Create
      (Target          : Basic_Decl;
       Parameter_Index : Natural;
       Configuration   : Signature_Changer_Configuration_Type :=
         Default_Configuration)
-      return Right_Mover;
-   --  Creates a signature changer that moves a parameter to the right.
+      return Forward_Mover;
+   --  Creates a signature changer that moves a parameter forward.
    --  The parameter is defined by 'Parameter_Index'.
 
    overriding
    function Refactor
-     (Self : Right_Mover;
+     (Self : Forward_Mover;
       Analysis_Units : access function return Analysis_Unit_Array)
       return Edit_Map;
    --  Returns an Edit_Map with all the refactoring edits needed to move
@@ -367,16 +367,16 @@ private
          Configuration           : Signature_Changer_Configuration_Type;
       end record;
 
-   type Left_Mover is new Parameter_Mover with
+   type Backward_Mover is new Parameter_Mover with
       record
          Subp            : Basic_Decl;
          Parameter_Index : Positive;
          Configuration   : Signature_Changer_Configuration_Type;
       end record;
 
-   type Right_Mover is new Parameter_Mover with
+   type Forward_Mover is new Parameter_Mover with
       record
-         Mover : Left_Mover;
+         Mover : Backward_Mover;
       end record;
 
    type Parameter_Remover is new Signature_Changer with

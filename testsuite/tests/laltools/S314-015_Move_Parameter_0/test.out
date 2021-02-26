@@ -1,6 +1,6 @@
-A cannot be moved to the left
+A cannot be moved backward
 
-Moving parameter B to the left
+Moving parameter B backward
 /main.adb
 5:19-5:20 B
 5:22-5:23 A
@@ -15,7 +15,7 @@ Moving parameter B to the left
 2:19-2:33 B : in Integer
 2:35-2:49 A : in Integer
 
-Moving parameter C to the left
+Moving parameter C backward
 /main.adb
 5:20-5:23 
 5:53-5:53 ; B : in Integer
@@ -30,7 +30,7 @@ Moving parameter C to the left
 2:35-2:49 C : out Integer
 3:19-3:34 B : in Integer
 
-Moving parameter C to the left
+Moving parameter C backward
 /main.adb
 5:20-5:23 
 5:53-5:53 ; B : in Integer
@@ -45,7 +45,7 @@ Moving parameter C to the left
 2:35-2:49 C : out Integer
 3:19-3:34 B : in Integer
 
-Moving parameter D to the left
+Moving parameter D backward
 /main.adb
 5:38-5:53 D : out Integer
 5:55-5:70 C : out Integer
@@ -60,7 +60,7 @@ Moving parameter D to the left
 3:19-3:34 D : out Integer
 3:36-3:51 C : out Integer
 
-Moving parameter B to the left
+Moving parameter B backward
 /main.adb
 5:19-5:20 B
 5:22-5:23 A
@@ -75,9 +75,9 @@ Moving parameter B to the left
 2:19-2:33 B : in Integer
 2:35-2:49 A : in Integer
 
-D cannot be moved to the right
+D cannot be moved forward
 
-Moving parameter A to the right
+Moving parameter A forward
 /main.adb
 5:19-5:20 B
 5:22-5:23 A
@@ -92,7 +92,7 @@ Moving parameter A to the right
 2:19-2:33 B : in Integer
 2:35-2:49 A : in Integer
 
-Moving parameter B to the right
+Moving parameter B forward
 /main.adb
 5:20-5:23 
 5:53-5:53 ; B : in Integer
@@ -107,7 +107,7 @@ Moving parameter B to the right
 2:35-2:49 C : out Integer
 3:19-3:34 B : in Integer
 
-Moving parameter C to the right
+Moving parameter C forward
 /main.adb
 5:38-5:53 D : out Integer
 5:55-5:70 C : out Integer
@@ -122,7 +122,7 @@ Moving parameter C to the right
 3:19-3:34 D : out Integer
 3:36-3:51 C : out Integer
 
-Moving parameter C to the right
+Moving parameter C forward
 /main.adb
 5:38-5:53 D : out Integer
 5:55-5:70 C : out Integer
@@ -137,7 +137,7 @@ Moving parameter C to the right
 3:19-3:34 D : out Integer
 3:36-3:51 C : out Integer
 
-Moving parameter B to the right
+Moving parameter B forward
 /main.adb
 5:20-5:23 
 5:53-5:53 ; B : in Integer

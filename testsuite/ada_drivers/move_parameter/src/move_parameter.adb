@@ -23,7 +23,7 @@
 --
 --  Move Parameter Tool
 --
---  This tool will move a parameter to the left or to the right, if possible.
+--  This tool will move a parameter forward or backward, if possible.
 --
 --  Usage:
 --  remove_parameter -P <project_file> -S <source_code_file> -L <line_number>
@@ -60,9 +60,8 @@ procedure Move_Parameter is
       Jobs : App_Job_Context_Array);
    --  Main procedure of this program.
 
-   function Image (D : Move_Direction_Type) return String is
-     ((if D = Right then "right" else "left"));
-   --  Returns 'right' if D = Right and 'left' if D = Left.
+   function Image (D : Move_Direction_Type) return String;
+   --  Returns 'forward' if D = Forward and 'backward' if D = Backward
 
    package Move_Parameter_App is new App
      (Name             => "move_parameter",
@@ -103,11 +102,23 @@ procedure Move_Parameter is
      (Parser      => Move_Parameter_App.Args.Parser,
       Short       => "-D",
       Long        => "--direction",
-      Help        => "Move direction: 'left' or 'right'",
+      Help        => "Move direction: 'forward' or 'backward'",
       Arg_Type    => Unbounded_String,
       Convert     => To_Unbounded_String,
       Default_Val => Null_Unbounded_String,
       Enabled     => True);
+
+   -----------
+   -- Image --
+   -----------
+
+   function Image (D : Move_Direction_Type) return String is
+   begin
+      case D is
+         when Forward  => return "forward";
+         when Backward => return "backward";
+      end case;
+   end Image;
 
    ------------------------------
    -- Move_Parameter_App_Setup --
@@ -144,19 +155,19 @@ procedure Move_Parameter is
 
    begin
       if Ada.Strings.Unbounded.Equal_Case_Insensitive
-        (Direction_String, To_Unbounded_String ("left"))
+        (Direction_String, To_Unbounded_String ("forward"))
       then
-         Move_Direction := Left;
+         Move_Direction := Forward;
 
       elsif Ada.Strings.Unbounded.Equal_Case_Insensitive
-        (Direction_String, To_Unbounded_String ("right"))
+        (Direction_String, To_Unbounded_String ("backward"))
       then
-         Move_Direction := Right;
+         Move_Direction := Backward;
 
       else
          Put_Line
            ("Invalid direction argument (-D, --direction)."
-            & "Valid direction arguments are 'left' and 'right'");
+            & "Valid direction arguments are 'forward' and 'backward'");
          New_Line;
          return;
       end if;
@@ -185,22 +196,22 @@ procedure Move_Parameter is
               ("Moving parameter "
                & Image (Get_Parameter_Name
                  (Target_Subp, Target_Parameter_Index))
-               & " to the "
+               & " "
                & Image (Move_Direction));
 
             case Move_Direction is
-               when Left =>
+               when Forward =>
                   declare
-                     Mover : constant Left_Mover := Create
+                     Mover : constant Forward_Mover := Create
                        (Target_Subp, Target_Parameter_Index);
 
                   begin
                      Edits := Mover.Refactor (Analysis_Units'Access);
                   end;
 
-               when Right =>
+               when Backward =>
                   declare
-                     Mover : constant Right_Mover := Create
+                     Mover : constant Backward_Mover := Create
                        (Target_Subp, Target_Parameter_Index);
 
                   begin
@@ -213,7 +224,7 @@ procedure Move_Parameter is
          else
             Put_Line
               (Image (Get_Parameter_Name (Target_Subp, Target_Parameter_Index))
-               & " cannot be moved to the "
+               & " cannot be moved "
                & Image (Move_Direction));
             New_Line;
          end if;

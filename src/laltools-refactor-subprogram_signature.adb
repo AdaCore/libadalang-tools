@@ -73,11 +73,11 @@ package body Laltools.Refactor.Subprogram_Signature is
    --  Changes the parameter mode of the parameters defined by
    --  'Parameter_Indices_Range' to 'New_Mode'.
 
-   procedure Move_Left
+   procedure Move_Backward
      (Subp            : Basic_Decl'Class;
       Parameter_Index : Positive;
       Edits           : in out Edit_Map);
-   --  Moves the parameter defined by 'Parameter_Index' to the left.
+   --  Moves the parameter defined by 'Parameter_Index' backward
 
    function Parameters_And_Arguments_Slocs
      (Subp  : Basic_Decl'Class;
@@ -424,14 +424,14 @@ package body Laltools.Refactor.Subprogram_Signature is
       Assert (Total_Parameters >= Parameter_Index);
 
       --  If the target parameter is the first one, then it can only be moved
-      --  to the right. If it is the last one, then it can only be moved to
-      --  the left. Otherwise, both directions are valid.
+      --  forward. If it is the last one, then it can only be moved backward.
+      --  Otherwise, both directions are valid.
 
       if Parameter_Index = 1 then
-         Move_Directions := Only_Right;
+         Move_Directions := Only_Forward;
 
       elsif Parameter_Index = Total_Parameters then
-         Move_Directions := Only_Left;
+         Move_Directions := Only_Backward;
 
       else
          Move_Directions := Both_Directions;
@@ -725,11 +725,11 @@ package body Laltools.Refactor.Subprogram_Signature is
       return Edits;
    end Change_Mode;
 
-   ---------------
-   -- Move_Left --
-   ---------------
+   -------------------
+   -- Move_Backward --
+   -------------------
 
-   function Move_Left
+   function Move_Backward
      (Subp            : Basic_Decl;
       Parameter_Index : Positive;
       Units           : Analysis_Unit_Array)
@@ -756,11 +756,11 @@ package body Laltools.Refactor.Subprogram_Signature is
          if Relative_Subp.P_Is_Subprogram
            or else Relative_Subp.Kind in Ada_Generic_Subp_Decl_Range
          then
-            Move_Left
+            Move_Backward
               (Relative_Subp, Parameter_Index, Edits);
 
             if not Relative_Subp_Body.Is_Null then
-               Move_Left
+               Move_Backward
                  (Relative_Subp_Body, Parameter_Index, Edits);
             end if;
          end if;
@@ -971,7 +971,7 @@ package body Laltools.Refactor.Subprogram_Signature is
          Calls_Callback => Move_Arguments_Callback'Access);
 
       return Edits;
-   end Move_Left;
+   end Move_Backward;
 
    ----------------------
    -- Remove_Parameter --
@@ -1833,10 +1833,10 @@ package body Laltools.Refactor.Subprogram_Signature is
       Parameter_Index : Natural;
       Configuration   : Signature_Changer_Configuration_Type :=
         Default_Configuration)
-      return Left_Mover
+      return Backward_Mover
    is
    begin
-      return Left_Mover'
+      return Backward_Mover'
         (Subp            => Target,
          Parameter_Index => Parameter_Index,
          Configuration   => Configuration);
@@ -1848,18 +1848,19 @@ package body Laltools.Refactor.Subprogram_Signature is
 
    overriding
    function Refactor
-     (Self : Left_Mover;
+     (Self           : Backward_Mover;
       Analysis_Units : access function return Analysis_Unit_Array)
       return Edit_Map is
    begin
-      return Move_Left (Self.Subp, Self.Parameter_Index, Analysis_Units.all);
+      return Move_Backward
+        (Self.Subp, Self.Parameter_Index, Analysis_Units.all);
    end Refactor;
 
-   ----------
-   -- Move --
-   ----------
+   -------------------
+   -- Move_Backward --
+   -------------------
 
-   procedure Move_Left
+   procedure Move_Backward
      (Subp            : Basic_Decl'Class;
       Parameter_Index : Positive;
       Edits           : in out Edit_Map)
@@ -1880,7 +1881,7 @@ package body Laltools.Refactor.Subprogram_Signature is
                --  Case 1:
                --
                --  Parameter B is the only one of the Param_Spec, and the
-               --  parameter on his left is alsoi the only one of the
+               --  previous parameter is also the only one of the
                --  Previous_Param_Spec.
                --
                --  A : in Integer; B : out Float
@@ -1907,7 +1908,7 @@ package body Laltools.Refactor.Subprogram_Signature is
                --  Case 2:
                --
                --  Parameter C is the only one of the Param_Spec, and the
-               --  parameter on his left is not the only on the the
+               --  previous parameter is not the only one on the
                --  Previous_Param_Spec
                --
                --  A, B : in Integer; C : out Float
@@ -1980,8 +1981,8 @@ package body Laltools.Refactor.Subprogram_Signature is
                --  Case 3 :
                --
                --  Parameter B is the first one of Param_Spec, and the
-               --  parameter on his left is the only one of the previous
-               --  Param_Spec.
+               --  previous parameter is the only one on the previous
+               --  Previous_Param_Spec.
                --
                --  A : in Integer; B, C : out Float
                --                  ---
@@ -2051,8 +2052,8 @@ package body Laltools.Refactor.Subprogram_Signature is
                --  Case 4
                --
                --  Parameter C is the first one of Param_Spec, and the
-               --  parameter on his left is not the only one of the previous
-               --  Param_Spec.
+               --  previous parameter is not the only one of the previous
+               --  Previous_Param_Spec.
                --
                --  A, B : in Integer; C, D : out Float
                --   --                ---
@@ -2202,7 +2203,7 @@ package body Laltools.Refactor.Subprogram_Signature is
          Previous_Param_Spec := Param_Spec.As_Param_Spec;
          Previous_Param_Spec_Length := Param_Spec_Length;
       end loop;
-   end Move_Left;
+   end Move_Backward;
 
    ------------
    -- Create --
@@ -2213,8 +2214,8 @@ package body Laltools.Refactor.Subprogram_Signature is
       Parameter_Index : Natural;
       Configuration   : Signature_Changer_Configuration_Type :=
         Default_Configuration)
-      return Right_Mover
-   is (Right_Mover'
+      return Forward_Mover
+   is (Forward_Mover'
          (Mover => Create (Target, Parameter_Index + 1, Configuration)));
 
    --------------
@@ -2223,7 +2224,7 @@ package body Laltools.Refactor.Subprogram_Signature is
 
    overriding
    function Refactor
-     (Self : Right_Mover;
+     (Self           : Forward_Mover;
       Analysis_Units : access function return Analysis_Unit_Array)
       return Edit_Map is
      (Self.Mover.Refactor (Analysis_Units));

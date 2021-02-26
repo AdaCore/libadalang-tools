@@ -1,7 +1,7 @@
 description: |+
-    This test covers multiple scenarios of moving a parameter to the left or right.
+    This test covers multiple scenarios of moving a parameter forward and backward.
 
-    Move parameter to the LEFT test cases:
+    Move parameter backward test cases:
 
         0 - (A : in Integer; B : out Float) - Move A
         A is the first parameter, therefore, can't be moved.
@@ -22,25 +22,25 @@ description: |+
         B is not the first parameter of  its Param_Spec.
 
 
-    Move parameter to the RIGHT test cases:
+    Move parameter forward test cases:
 
         0 - (A : in Integer; B : out Float) - Move B
         B is the last parameter, threfore, can't be moved.
 
         1 - (A : in Integer; B : out Float) - Move A
-        Equivalent to moving B to the left, therefore, equivalent to move parameter to the left test case 1.
+        Equivalent to moving B backward, therefore, equivalent to move parameter backward test case 1.
 
         2 - (A : in Integer; B, C : out Float) - Move A
-        Equivalent to moving B to the left, therefore, equivalent to move parameter to the left test case 3.
+        Equivalent to moving B backward, therefore, equivalent to move parameter backward test case 3.
 
         3 - (A, B : in Integer) - Move A
-        Equivalent to moving B to the left, therefore, equivalent to move parameter to the left test case 5.
+        Equivalent to moving B backward, therefore, equivalent to move parameter backward test case 5.
 
         4 - (A, B : in Integer; C : out Float) - Move B
-        Equivalent to moving C to the left, therefore, equivalent to move parameter to the left test case 2.
+        Equivalent to moving C backward, therefore, equivalent to move parameter backward test case 2.
 
         5 - (A, B : in Integer; C, D : out Float) - Move B
-        Equivalent to moving C to the left, therefore, equivalent to move parameter to the left test case 4.
+        Equivalent to moving C backward, therefore, equivalent to move parameter backward test case 4.
 
 
 driver: shell_script

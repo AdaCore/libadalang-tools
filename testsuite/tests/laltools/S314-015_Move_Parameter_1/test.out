@@ -1,4 +1,4 @@
-Moving parameter A to the left
+Moving parameter A backward
 /main.adb
 7:19-7:34 A : in Integer
 7:36-7:50 Self : Foo_Type
@@ -13,7 +13,7 @@ Moving parameter A to the left
 4:19-4:34 A : in Integer
 4:36-4:50 Self : Foo_Type
 
-Moving parameter Self to the right
+Moving parameter Self forward
 /main.adb
 7:19-7:34 A : in Integer
 7:36-7:50 Self : Foo_Type
