@@ -23,6 +23,7 @@
 
 with Ada.Strings; use Ada.Strings;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
+with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -144,7 +145,7 @@ package body Laltools.Refactor is
 
    begin
       while Has_Element (C) loop
-         Ada.Text_IO.Put_Line (Key (C));
+         Ada.Text_IO.Put_Line (Format_Pathname (Key (C), UNIX));
          Print (Element (C));
          Next (C);
       end loop;
