@@ -1,17 +1,17 @@
 Removing parameter E
-/main.adb
+main.adb
 7:27-7:30 
 11:27-11:30 
 18:13-19:13 
 30:7-31:7 
 49:13-50:13 
-/main_package.adb
+main_package.adb
 5:11-5:14 
-/main_package.ads
+main_package.ads
 5:8-5:11 
 
 Removing parameters G to I
-/main.adb
+main.adb
 7:33-7:42 
 11:33-11:42 
 18:7-19:7 
@@ -19,9 +19,9 @@ Removing parameters G to I
 32:13-35:13 
 45:13-47:13 
 48:13-49:13 
-/main_package.adb
+main_package.adb
 5:17-5:20 
 5:30-6:21 
-/main_package.ads
+main_package.ads
 5:24-6:24 
 

@@ -1,30 +1,30 @@
 Moving parameter A backward
-/main.adb
+main.adb
 7:19-7:34 A : in Integer
 7:36-7:50 Self : Foo_Type
 14:22-14:23 1
 14:25-14:26 F
 15:9-15:10 1
 15:12-15:13 F
-/main_package.adb
+main_package.adb
 2:19-2:34 A : in Integer
 2:36-2:50 Self : Foo_Type
-/main_package.ads
+main_package.ads
 4:19-4:34 A : in Integer
 4:36-4:50 Self : Foo_Type
 
 Moving parameter Self forward
-/main.adb
+main.adb
 7:19-7:34 A : in Integer
 7:36-7:50 Self : Foo_Type
 14:22-14:23 1
 14:25-14:26 F
 15:9-15:10 1
 15:12-15:13 F
-/main_package.adb
+main_package.adb
 2:19-2:34 A : in Integer
 2:36-2:50 Self : Foo_Type
-/main_package.ads
+main_package.ads
 4:19-4:34 A : in Integer
 4:36-4:50 Self : Foo_Type
 

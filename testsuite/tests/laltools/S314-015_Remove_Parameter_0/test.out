@@ -1,5 +1,5 @@
 Removing parameter A
-/main.adb
+main.adb
 7:7-7:20 
 11:7-11:20 
 15:7-15:20 
@@ -14,13 +14,13 @@ Removing parameter A
 66:7-67:7 
 77:10-77:13 
 79:7-80:7 
-/main_package.adb
+main_package.adb
 4:7-4:10 
-/main_package.ads
+main_package.ads
 4:7-4:10 
 
 Removing parameter E
-/main.adb
+main.adb
 7:27-7:30 
 11:27-11:30 
 15:27-15:30 
@@ -35,13 +35,13 @@ Removing parameter E
 69:13-70:13 
 77:20-77:23 
 82:13-83:13 
-/main_package.adb
+main_package.adb
 5:11-5:14 
-/main_package.ads
+main_package.ads
 5:8-5:11 
 
 Removing parameter I
-/main.adb
+main.adb
 7:39-7:42 
 11:39-11:42 
 15:39-15:42 
@@ -56,13 +56,13 @@ Removing parameter I
 73:13-74:13 
 77:32-77:35 
 86:13-87:13 
-/main_package.adb
+main_package.adb
 6:8-6:11 
-/main_package.ads
+main_package.ads
 6:11-6:14 
 
 Removing parameters A to C
-/main.adb
+main.adb
 7:7-7:20 
 7:20-7:26 
 11:7-11:20 
@@ -81,14 +81,14 @@ Removing parameters A to C
 66:7-69:7 
 77:10-77:19 
 79:7-82:7 
-/main_package.adb
+main_package.adb
 4:7-5:7 
 5:7-5:10 
-/main_package.ads
+main_package.ads
 4:7-5:7 
 
 Removing parameters D to F
-/main.adb
+main.adb
 7:24-7:33 
 11:24-11:33 
 15:24-15:33 
@@ -103,13 +103,13 @@ Removing parameters D to F
 68:13-71:13 
 77:17-77:26 
 81:13-84:13 
-/main_package.adb
+main_package.adb
 5:8-5:17 
-/main_package.ads
+main_package.ads
 5:7-6:7 
 
 Removing parameters G to I
-/main.adb
+main.adb
 7:33-7:42 
 11:33-11:42 
 15:33-15:42 
@@ -124,14 +124,14 @@ Removing parameters G to I
 71:13-74:13 
 77:26-77:35 
 84:13-87:13 
-/main_package.adb
+main_package.adb
 5:17-5:20 
 5:30-6:21 
-/main_package.ads
+main_package.ads
 5:24-6:24 
 
 Removing parameters A to I
-/main.adb
+main.adb
 7:6-7:53 
 11:6-11:53 
 15:6-15:53 
@@ -146,13 +146,13 @@ Removing parameters A to I
 65:7-74:14 
 77:8-77:36 
 78:8-87:14 
-/main_package.adb
+main_package.adb
 4:6-6:22 
-/main_package.ads
+main_package.ads
 4:6-6:25 
 
 Removing parameter A
-/main.adb
+main.adb
 7:7-7:20 
 11:7-11:20 
 15:7-15:20 
@@ -167,13 +167,13 @@ Removing parameter A
 66:7-67:7 
 77:10-77:13 
 79:7-80:7 
-/main_package.adb
+main_package.adb
 4:7-4:10 
-/main_package.ads
+main_package.ads
 4:7-4:10 
 
 Removing parameter B
-/main.adb
+main.adb
 7:20-7:23 
 11:20-11:23 
 15:20-15:23 
@@ -188,13 +188,13 @@ Removing parameter B
 66:13-67:13 
 77:11-77:14 
 79:13-80:13 
-/main_package.adb
+main_package.adb
 4:8-4:11 
-/main_package.ads
+main_package.ads
 4:8-4:11 
 
 Removing parameter C
-/main.adb
+main.adb
 7:21-7:24 
 11:21-11:24 
 15:21-15:24 
@@ -209,13 +209,13 @@ Removing parameter C
 67:13-68:13 
 77:14-77:17 
 80:13-81:13 
-/main_package.adb
+main_package.adb
 5:7-5:10 
-/main_package.ads
+main_package.ads
 4:11-4:14 
 
 Removing parameter G
-/main.adb
+main.adb
 7:33-7:36 
 11:33-11:36 
 15:33-15:36 
@@ -230,13 +230,13 @@ Removing parameter G
 71:13-72:13 
 77:26-77:29 
 84:13-85:13 
-/main_package.adb
+main_package.adb
 5:17-5:20 
-/main_package.ads
+main_package.ads
 6:7-6:10 
 
 Removing parameters C to G
-/main.adb
+main.adb
 7:21-7:36 
 11:21-11:36 
 15:21-15:36 
@@ -252,15 +252,15 @@ Removing parameters C to G
 67:13-72:13 
 77:14-77:29 
 80:13-85:13 
-/main_package.adb
+main_package.adb
 5:7-6:7 
-/main_package.ads
+main_package.ads
 4:11-4:14 
 5:7-6:7 
 6:7-6:10 
 
 Removing parameter H
-/main.adb
+main.adb
 7:36-7:39 
 11:36-11:39 
 15:36-15:39 
@@ -275,13 +275,13 @@ Removing parameter H
 72:13-73:13 
 77:29-77:32 
 85:13-86:13 
-/main_package.adb
+main_package.adb
 6:7-6:10 
-/main_package.ads
+main_package.ads
 6:8-6:11 
 
 Removing parameter I
-/main.adb
+main.adb
 7:39-7:42 
 11:39-11:42 
 15:39-15:42 
@@ -296,13 +296,13 @@ Removing parameter I
 73:13-74:13 
 77:32-77:35 
 86:13-87:13 
-/main_package.adb
+main_package.adb
 6:8-6:11 
-/main_package.ads
+main_package.ads
 6:11-6:14 
 
 Removing parameters A to I
-/main.adb
+main.adb
 7:6-7:53 
 11:6-11:53 
 15:6-15:53 
@@ -317,13 +317,13 @@ Removing parameters A to I
 65:7-74:14 
 77:8-77:36 
 78:8-87:14 
-/main_package.adb
+main_package.adb
 4:6-6:22 
-/main_package.ads
+main_package.ads
 4:6-6:25 
 
 Removing parameter A
-/main.adb
+main.adb
 7:7-7:20 
 11:7-11:20 
 15:7-15:20 
@@ -338,13 +338,13 @@ Removing parameter A
 66:7-67:7 
 77:10-77:13 
 79:7-80:7 
-/main_package.adb
+main_package.adb
 4:7-4:10 
-/main_package.ads
+main_package.ads
 4:7-4:10 
 
 Removing parameter B
-/main.adb
+main.adb
 7:20-7:23 
 11:20-11:23 
 15:20-15:23 
@@ -359,13 +359,13 @@ Removing parameter B
 66:13-67:13 
 77:11-77:14 
 79:13-80:13 
-/main_package.adb
+main_package.adb
 4:8-4:11 
-/main_package.ads
+main_package.ads
 4:8-4:11 
 
 Removing parameter C
-/main.adb
+main.adb
 7:21-7:24 
 11:21-11:24 
 15:21-15:24 
@@ -380,13 +380,13 @@ Removing parameter C
 67:13-68:13 
 77:14-77:17 
 80:13-81:13 
-/main_package.adb
+main_package.adb
 5:7-5:10 
-/main_package.ads
+main_package.ads
 4:11-4:14 
 
 Removing parameters B to I
-/main.adb
+main.adb
 7:18-7:52 
 11:18-11:52 
 15:18-15:52 
@@ -401,15 +401,15 @@ Removing parameters B to I
 66:13-74:13 
 77:11-77:35 
 79:13-87:13 
-/main_package.adb
+main_package.adb
 4:8-4:11 
 4:21-6:21 
-/main_package.ads
+main_package.ads
 4:8-4:14 
 4:24-6:24 
 
 Removing parameter A
-/main.adb
+main.adb
 7:7-7:20 
 11:7-11:20 
 15:7-15:20 
@@ -424,13 +424,13 @@ Removing parameter A
 66:7-67:7 
 77:10-77:13 
 79:7-80:7 
-/main_package.adb
+main_package.adb
 4:7-4:10 
-/main_package.ads
+main_package.ads
 4:7-4:10 
 
 Removing parameters B to F
-/main.adb
+main.adb
 7:20-7:35 
 11:20-11:35 
 15:20-15:35 
@@ -445,15 +445,15 @@ Removing parameters B to F
 66:13-71:13 
 77:11-77:26 
 79:13-84:13 
-/main_package.adb
+main_package.adb
 4:8-4:11 
 5:7-5:19 
-/main_package.ads
+main_package.ads
 4:8-4:14 
 5:7-6:7 
 
 Removing parameters G and H
-/main.adb
+main.adb
 7:33-7:39 
 11:33-11:39 
 15:33-15:39 
@@ -468,14 +468,14 @@ Removing parameters G and H
 71:13-73:13 
 77:26-77:32 
 84:13-86:13 
-/main_package.adb
+main_package.adb
 5:17-5:20 
 6:7-6:10 
-/main_package.ads
+main_package.ads
 6:7-6:13 
 
 Removing parameter I
-/main.adb
+main.adb
 7:39-7:42 
 11:39-11:42 
 15:39-15:42 
@@ -490,8 +490,8 @@ Removing parameter I
 73:13-74:13 
 77:32-77:35 
 86:13-87:13 
-/main_package.adb
+main_package.adb
 6:8-6:11 
-/main_package.ads
+main_package.ads
 6:11-6:14 
 

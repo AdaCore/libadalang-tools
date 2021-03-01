@@ -145,7 +145,7 @@ package body Laltools.Refactor is
 
    begin
       while Has_Element (C) loop
-         Ada.Text_IO.Put_Line (Format_Pathname (Key (C), UNIX));
+         Ada.Text_IO.Put_Line (Base_Name (Key (C)));
          Print (Element (C));
          Next (C);
       end loop;
