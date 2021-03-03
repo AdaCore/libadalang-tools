@@ -191,7 +191,7 @@ procedure Add_Parameter is
          Type_Indication => Parameter_Type.Get,
          Default_Expr    => Parameter_Default.Get);
 
-      Edits : Edit_Map;
+      Edits : Refactoring_Edits;
 
    begin
       Main_Unit := Jobs (1).Analysis_Ctx.Get_From_File
@@ -229,7 +229,7 @@ procedure Add_Parameter is
 
                Edits := Adder.Refactor (Analysis_Units'Access);
 
-               Print (Edits);
+               Print (Edits.Text_Edits);
             end;
 
          else

@@ -145,7 +145,7 @@ procedure Change_Parameter_Mode is
 
       Parameters_Names : Langkit_Support.Text.Unbounded_Text_Type;
 
-      Edits : Edit_Map;
+      Edits : Refactoring_Edits;
 
       use type Ada.Strings.Wide_Wide_Unbounded.Unbounded_Wide_Wide_String;
 
@@ -155,9 +155,9 @@ procedure Change_Parameter_Mode is
       function Image (M : Ada_Mode) return String is
       begin
          case M is
-            when Ada_Mode_In => return "in";
-            when Ada_Mode_Out => return "out";
-            when Ada_Mode_In_Out => return "in out";
+            when Ada_Mode_In      => return "in";
+            when Ada_Mode_Out     => return "out";
+            when Ada_Mode_In_Out  => return "in out";
             when Ada_Mode_Default => return "default";
          end case;
       end Image;
@@ -266,7 +266,7 @@ procedure Change_Parameter_Mode is
 
          Edits := Mode_Changer_Refactoring.Refactor (Analysis_Units'Access);
 
-         Print (Edits);
+         Print (Edits.Text_Edits);
 
       else
          Put_Line

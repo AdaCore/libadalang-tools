@@ -32,10 +32,10 @@ package body Laltools.Refactor is
    function Image (S : Source_Location_Range) return String;
    --  Return a Source_Location_Range as a string in a human readable format
 
-   procedure Print (E : Edit);
+   procedure Print (E : Text_Edit);
    --  Print an Edit in an human readable format to the standard output
 
-   procedure Print (S : Edit_Ordered_Set);
+   procedure Print (S : Text_Edit_Ordered_Set);
    --  Print an Edit_Ordered_Set in an human readable format to the standart
    --  output.
 
@@ -59,23 +59,23 @@ package body Laltools.Refactor is
    ------------
 
    procedure Insert
-     (Edits    : in out Edit_Map;
+     (Edits    : in out Text_Edit_Map;
       Filename : String;
       Location : Langkit_Support.Slocs.Source_Location_Range;
       Text     : Ada.Strings.Unbounded.Unbounded_String)
    is
-      Edits_Set : Edit_Ordered_Set;
+      Edits_Set : Text_Edit_Ordered_Set;
 
    begin
       if Edits.Contains (Filename) then
          if not Edits.Reference (Filename).
-           Contains (Edit'(Location, Text))
+           Contains (Text_Edit'(Location, Text))
          then
-            Edits.Reference (Filename).Insert (Edit'(Location, Text));
+            Edits.Reference (Filename).Insert (Text_Edit'(Location, Text));
          end if;
 
       else
-         Edits_Set.Insert (Edit'(Location, Text));
+         Edits_Set.Insert (Text_Edit'(Location, Text));
          Edits.Insert (Filename, Edits_Set);
       end if;
    end Insert;
@@ -85,33 +85,33 @@ package body Laltools.Refactor is
    -----------
 
    procedure Merge
-     (Source : in out Edit_Map;
-      Target : Edit_Map)
+     (Source : in out Text_Edit_Map;
+      Target : Text_Edit_Map)
    is
-      Map_Cursor : Edit_Ordered_Maps.Cursor := Target.First;
+      Map_Cursor : Text_Edit_Ordered_Maps.Cursor := Target.First;
 
    begin
-      while Edit_Ordered_Maps.Has_Element (Map_Cursor) loop
-         if Source.Contains (Edit_Ordered_Maps.Key (Map_Cursor)) then
+      while Text_Edit_Ordered_Maps.Has_Element (Map_Cursor) loop
+         if Source.Contains (Text_Edit_Ordered_Maps.Key (Map_Cursor)) then
             declare
-               Set_Cursor : Edit_Ordered_Sets.Cursor :=
+               Set_Cursor : Text_Edit_Ordered_Sets.Cursor :=
                  Target.Constant_Reference (Map_Cursor).First;
 
             begin
-               while Edit_Ordered_Sets.Has_Element (Set_Cursor) loop
-                  Source.Reference (Edit_Ordered_Maps.Key (Map_Cursor)).Insert
-                    (Edit_Ordered_Sets.Element (Set_Cursor));
-                  Edit_Ordered_Sets.Next (Set_Cursor);
+               while Text_Edit_Ordered_Sets.Has_Element (Set_Cursor) loop
+                  Source.Reference (Text_Edit_Ordered_Maps.Key (Map_Cursor)).
+                    Insert (Text_Edit_Ordered_Sets.Element (Set_Cursor));
+                  Text_Edit_Ordered_Sets.Next (Set_Cursor);
                end loop;
             end;
 
          else
             Source.Insert
-              (Edit_Ordered_Maps.Key (Map_Cursor),
-               Edit_Ordered_Maps.Element (Map_Cursor));
+              (Text_Edit_Ordered_Maps.Key (Map_Cursor),
+               Text_Edit_Ordered_Maps.Element (Map_Cursor));
          end if;
 
-         Edit_Ordered_Maps.Next (Map_Cursor);
+         Text_Edit_Ordered_Maps.Next (Map_Cursor);
       end loop;
    end Merge;
 
@@ -119,7 +119,7 @@ package body Laltools.Refactor is
    -- Print --
    -----------
 
-   procedure Print (E : Edit) is
+   procedure Print (E : Text_Edit) is
    begin
       Ada.Text_IO.Put_Line (Image (E.Location) & " " & To_String (E.Text));
    end Print;
@@ -128,7 +128,7 @@ package body Laltools.Refactor is
    -- Print --
    -----------
 
-   procedure Print (S : Edit_Ordered_Set) is
+   procedure Print (S : Text_Edit_Ordered_Set) is
    begin
       for E of S loop
          Print (E);
@@ -139,8 +139,8 @@ package body Laltools.Refactor is
    -- Print --
    -----------
 
-   procedure Print (M : Edit_Map) is
-      use Edit_Ordered_Maps;
+   procedure Print (M : Text_Edit_Map) is
+      use Text_Edit_Ordered_Maps;
       C : Cursor := M.First;
 
    begin

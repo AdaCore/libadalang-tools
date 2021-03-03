@@ -151,7 +151,7 @@ procedure Move_Parameter is
       Target_Parameter_Index : Positive;
       Available_Directions   : Move_Direction_Availability_Type;
 
-      Edits : Edit_Map;
+      Edits : Refactoring_Edits;
 
    begin
       if Ada.Strings.Unbounded.Equal_Case_Insensitive
@@ -219,7 +219,7 @@ procedure Move_Parameter is
                   end;
             end case;
 
-            Print (Edits);
+            Print (Edits.Text_Edits);
 
          else
             Put_Line

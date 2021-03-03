@@ -34,7 +34,7 @@ package body Laltools.Refactor.Subprogram_Signature is
    procedure Add_To_Empty_Params
      (Subp  : Basic_Decl'Class;
       Data  : Parameter_Data_Type;
-      Edits : in out Edit_Map)
+      Edits : in out Text_Edit_Map)
      with Pre => Subp.P_Is_Subprogram
      or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
    --  Adds a parameter defined by 'Data' as the first parameter of a 'Subp'
@@ -43,7 +43,7 @@ package body Laltools.Refactor.Subprogram_Signature is
    procedure Add_As_First_Parameter
      (Subp  : Basic_Decl'Class;
       Data  : Parameter_Data_Type;
-      Edits : in out Edit_Map)
+      Edits : in out Text_Edit_Map)
      with Pre => Subp.P_Is_Subprogram
      or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
    --  Adds a parameter defined by 'Data' as the first parameter.
@@ -51,7 +51,7 @@ package body Laltools.Refactor.Subprogram_Signature is
    procedure Add_As_Last_Parameter
      (Subp  : Basic_Decl'Class;
       Data  : Parameter_Data_Type;
-      Edits : in out Edit_Map)
+      Edits : in out Text_Edit_Map)
      with Pre => Subp.P_Is_Subprogram
      or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
    --  Adds a parameter defined by 'Data' as the last parameter.
@@ -60,7 +60,7 @@ package body Laltools.Refactor.Subprogram_Signature is
      (Subp  : Basic_Decl'Class;
       Data  : Parameter_Data_Type;
       Index : Positive;
-      Edits : in out Edit_Map)
+      Edits : in out Text_Edit_Map)
      with Pre => Subp.P_Is_Subprogram
      or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
    --  Adds a parameter defined by 'Data' to position defined by 'Index'.
@@ -69,20 +69,20 @@ package body Laltools.Refactor.Subprogram_Signature is
      (Subp               : Basic_Decl'Class;
       Parameters_Indices : Parameter_Indices_Range_Type;
       New_Mode           : Ada_Mode;
-      Edits              : in out Edit_Map);
+      Edits              : in out Text_Edit_Map);
    --  Changes the parameter mode of the parameters defined by
    --  'Parameter_Indices_Range' to 'New_Mode'.
 
    procedure Move_Backward
      (Subp            : Basic_Decl'Class;
       Parameter_Index : Positive;
-      Edits           : in out Edit_Map);
+      Edits           : in out Text_Edit_Map);
    --  Moves the parameter defined by 'Parameter_Index' backward
 
    function Parameters_And_Arguments_Slocs
      (Subp  : Basic_Decl'Class;
       Units : Analysis_Unit_Array)
-      return Edit_Map
+      return Text_Edit_Map
      with Pre => Subp.P_Is_Subprogram
      or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
    --  Returns a map with the location of the parameters of 'Subp' and the
@@ -91,7 +91,7 @@ package body Laltools.Refactor.Subprogram_Signature is
    function Parameters_And_Arguments_Slocs
      (Target : Params;
       Units  : Analysis_Unit_Array)
-      return Edit_Map
+      return Text_Edit_Map
    is (Parameters_And_Arguments_Slocs
        (Target.Parent.Parent.As_Basic_Decl, Units));
    --  Returns a map with the location of the parameters of 'Subp' and the
@@ -101,7 +101,7 @@ package body Laltools.Refactor.Subprogram_Signature is
      (Subp                     : Basic_Decl'Class;
       Parameter_Indices_Ranges : Parameter_Indices_Ranges_Type;
       Units                    : Analysis_Unit_Array)
-      return Edit_Map
+      return Text_Edit_Map
      with Pre => Subp.P_Is_Subprogram
      or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
    --  Returns a map with the location of the parameters of 'Subp' defined by
@@ -111,7 +111,7 @@ package body Laltools.Refactor.Subprogram_Signature is
      (Subp            : Basic_Decl'Class;
       Parameter_Index : Positive;
       Units           : Analysis_Unit_Array)
-      return Edit_Map
+      return Text_Edit_Map
      with Pre => Subp.P_Is_Subprogram
      or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
    --  Returns a map with the location of the parameter of 'Subp' defined by
@@ -121,7 +121,7 @@ package body Laltools.Refactor.Subprogram_Signature is
      (Subp              : Basic_Decl'Class;
       Parameter_Indices : Parameter_Indices_Type;
       Units             : Analysis_Unit_Array)
-      return Edit_Map
+      return Text_Edit_Map
      with Pre => Subp.P_Is_Subprogram
      or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
    --  Returns a map with the location of the parameters of 'Subp' defined by
@@ -577,7 +577,7 @@ package body Laltools.Refactor.Subprogram_Signature is
       New_Parameter   : Parameter_Data_Type;
       Parameter_Index : Positive;
       Units           : Analysis_Unit_Array)
-      return Edit_Map
+      return Text_Edit_Map
    is
       Target_Params : constant Params := Get_Subp_Params (Subp);
       Params_Length : constant Natural :=
@@ -585,7 +585,7 @@ package body Laltools.Refactor.Subprogram_Signature is
          then 0
          else Length (Target_Params.F_Params));
 
-      Edits : Edit_Map;
+      Edits : Text_Edit_Map;
 
       procedure Add_Parameter_Callback (Relative_Subp : Basic_Decl'Class);
       --  Determines the necessary changes to 'Relative_Subp' specification,
@@ -680,9 +680,9 @@ package body Laltools.Refactor.Subprogram_Signature is
       Parameter_Indices_Range : Parameter_Indices_Range_Type;
       New_Mode                : Ada_Mode;
       Units                   : Analysis_Unit_Array)
-      return Edit_Map
+      return Text_Edit_Map
    is
-      Edits : Edit_Map;
+      Edits : Text_Edit_Map;
 
       procedure Change_Mode_Callback (Relative_Subp : Basic_Decl'Class);
       --  Determines the necessary changes to 'Relative_Subp' specification,
@@ -733,9 +733,9 @@ package body Laltools.Refactor.Subprogram_Signature is
      (Subp            : Basic_Decl;
       Parameter_Index : Positive;
       Units           : Analysis_Unit_Array)
-      return Edit_Map
+      return Text_Edit_Map
    is
-      Edits : Edit_Map;
+      Edits : Text_Edit_Map;
 
       procedure Move_Parameter_Callback (Relative_Subp : Basic_Decl'Class);
       --  Callback that adds to Edits the necessary edits to 'Relative_Subp'
@@ -800,7 +800,7 @@ package body Laltools.Refactor.Subprogram_Signature is
          end Has_Parameter_Association;
 
          procedure Process_Dot_Call is
-            Edits_Set : Edit_Ordered_Set;
+            Edits_Set : Text_Edit_Ordered_Set;
 
             Object_Name : Base_Id := No_Base_Id;
             Call_Name   : Base_Id := No_Base_Id;
@@ -900,7 +900,7 @@ package body Laltools.Refactor.Subprogram_Signature is
 
             Param_Assoc_Index : Positive := 1;
 
-            Edits_Set : Edit_Ordered_Set;
+            Edits_Set : Text_Edit_Ordered_Set;
 
          begin
             for Param_Assoc of Call_Expression.F_Suffix.As_Assoc_List loop
@@ -981,7 +981,7 @@ package body Laltools.Refactor.Subprogram_Signature is
      (Subp            : Basic_Decl;
       Parameter_Index : Positive;
       Units           : Analysis_Unit_Array)
-      return Edit_Map
+      return Text_Edit_Map
    is (Parameters_And_Arguments_Slocs (Subp, Parameter_Index, Units));
 
    ----------------------
@@ -992,7 +992,7 @@ package body Laltools.Refactor.Subprogram_Signature is
      (Subp              : Basic_Decl;
       Parameter_Indices : Parameter_Indices_Type;
       Units             : Analysis_Unit_Array)
-      return Edit_Map
+      return Text_Edit_Map
    is (Parameters_And_Arguments_Slocs (Subp, Parameter_Indices, Units));
 
    ----------------------
@@ -1003,9 +1003,9 @@ package body Laltools.Refactor.Subprogram_Signature is
      (Subp                    : Basic_Decl;
       Parameter_Indices_Range : Parameter_Indices_Range_Type;
       Units                   : Analysis_Unit_Array)
-      return Edit_Map
+      return Text_Edit_Map
    is
-      Edits : Edit_Map;
+      Edits : Text_Edit_Map;
       Parameter_Indices_Ranges : constant
         Parameter_Indices_Ranges_Type (1 .. 1) :=
           (1 => Parameter_Indices_Range);
@@ -1036,9 +1036,9 @@ package body Laltools.Refactor.Subprogram_Signature is
      (Subp                     : Basic_Decl;
       Parameter_Indices_Ranges : Parameter_Indices_Ranges_Type;
       Units                    : Analysis_Unit_Array)
-      return Edit_Map
+      return Text_Edit_Map
    is
-      Edits : Edit_Map;
+      Edits : Text_Edit_Map;
 
    begin
       for Indices_Range of Parameter_Indices_Ranges loop
@@ -1055,7 +1055,7 @@ package body Laltools.Refactor.Subprogram_Signature is
    function Parameters_And_Arguments_Slocs
      (Subp  : Basic_Decl'Class;
       Units : Analysis_Unit_Array)
-      return Edit_Map
+      return Text_Edit_Map
    is
       use Source_Location_Range_Maps;
 
@@ -1065,10 +1065,10 @@ package body Laltools.Refactor.Subprogram_Signature is
         Slocs.First;
 
    begin
-      return Edits : Edit_Map do
+      return Edits : Text_Edit_Map do
          while Has_Element (Slocs_Cursor) loop
             declare
-               Edits_Set : Edit_Ordered_Set;
+               Edits_Set : Text_Edit_Ordered_Set;
             begin
                for Sloc of Slocs.Element (Key (Slocs_Cursor)) loop
                   Edits_Set.Insert ((Sloc, To_Unbounded_String ("")));
@@ -1090,7 +1090,7 @@ package body Laltools.Refactor.Subprogram_Signature is
      (Subp            : Basic_Decl'Class;
       Parameter_Index : Positive;
       Units           : Analysis_Unit_Array)
-      return Edit_Map
+      return Text_Edit_Map
    is
       use Source_Location_Range_Maps;
 
@@ -1100,10 +1100,10 @@ package body Laltools.Refactor.Subprogram_Signature is
         Slocs.First;
 
    begin
-      return Edits : Edit_Map do
+      return Edits : Text_Edit_Map do
          while Has_Element (Slocs_Cursor) loop
             declare
-               Edits_Set : Edit_Ordered_Set;
+               Edits_Set : Text_Edit_Ordered_Set;
             begin
                for Sloc of Slocs.Element (Key (Slocs_Cursor)) loop
                   Edits_Set.Insert ((Sloc, To_Unbounded_String ("")));
@@ -1125,7 +1125,7 @@ package body Laltools.Refactor.Subprogram_Signature is
      (Subp              : Basic_Decl'Class;
       Parameter_Indices : Parameter_Indices_Type;
       Units             : Analysis_Unit_Array)
-      return Edit_Map
+      return Text_Edit_Map
    is
       use Source_Location_Range_Maps;
 
@@ -1135,10 +1135,10 @@ package body Laltools.Refactor.Subprogram_Signature is
         Slocs.First;
 
    begin
-      return Edits : Edit_Map do
+      return Edits : Text_Edit_Map do
          while Has_Element (Slocs_Cursor) loop
             declare
-               Edits_Set : Edit_Ordered_Set;
+               Edits_Set : Text_Edit_Ordered_Set;
             begin
                for Sloc of Slocs.Element (Key (Slocs_Cursor)) loop
                   Edits_Set.Insert ((Sloc, To_Unbounded_String ("")));
@@ -1160,7 +1160,7 @@ package body Laltools.Refactor.Subprogram_Signature is
      (Subp                     : Basic_Decl'Class;
       Parameter_Indices_Ranges : Parameter_Indices_Ranges_Type;
       Units                    : Analysis_Unit_Array)
-      return Edit_Map
+      return Text_Edit_Map
    is
       use Source_Location_Range_Maps;
 
@@ -1170,10 +1170,10 @@ package body Laltools.Refactor.Subprogram_Signature is
         Slocs.First;
 
    begin
-      return Edits : Edit_Map do
+      return Edits : Text_Edit_Map do
          while Has_Element (Slocs_Cursor) loop
             declare
-               Edits_Set : Edit_Ordered_Set;
+               Edits_Set : Text_Edit_Ordered_Set;
             begin
                for Sloc of Slocs.Element (Key (Slocs_Cursor)) loop
                   Edits_Set.Insert ((Sloc, To_Unbounded_String ("")));
@@ -1207,12 +1207,15 @@ package body Laltools.Refactor.Subprogram_Signature is
    function Refactor
      (Self : Parameter_Remover;
       Analysis_Units : access function return Analysis_Unit_Array)
-      return Edit_Map is
+      return Refactoring_Edits is
    begin
-      return Remove_Parameter
-        (Subp                    => Self.Subp,
-         Parameter_Indices_Range => Self.Parameter_Indices_Range,
-         Units                   => Analysis_Units.all);
+      return Refactoring_Edits'
+        (Text_Edits =>
+           Remove_Parameter
+             (Subp                    => Self.Subp,
+              Parameter_Indices_Range => Self.Parameter_Indices_Range,
+              Units                   => Analysis_Units.all),
+         others     => <>);
    end Refactor;
 
    ------------
@@ -1242,13 +1245,16 @@ package body Laltools.Refactor.Subprogram_Signature is
    function Refactor
      (Self           : Parameter_Adder;
       Analysis_Units : access function return Analysis_Unit_Array)
-      return Edit_Map is
+      return Refactoring_Edits is
    begin
-      return Add_Parameter
-        (Self.Subp,
-         Self.New_Parameter,
-         Self.Parameter_Index,
-         Analysis_Units.all);
+      return Refactoring_Edits'
+        (Text_Edits =>
+           Add_Parameter
+             (Self.Subp,
+              Self.New_Parameter,
+              Self.Parameter_Index,
+              Analysis_Units.all),
+         others     => <>);
    end Refactor;
 
    -------------------------
@@ -1258,7 +1264,7 @@ package body Laltools.Refactor.Subprogram_Signature is
    procedure Add_To_Empty_Params
      (Subp  : Basic_Decl'Class;
       Data  : Parameter_Data_Type;
-      Edits : in out Edit_Map)
+      Edits : in out Text_Edit_Map)
    is
       Definition_Sloc : constant Source_Location_Range :=
         Subp.P_Defining_Name.Sloc_Range;
@@ -1282,7 +1288,7 @@ package body Laltools.Refactor.Subprogram_Signature is
    procedure Add_As_First_Parameter
      (Subp  : Basic_Decl'Class;
       Data  : Parameter_Data_Type;
-      Edits : in out Edit_Map)
+      Edits : in out Text_Edit_Map)
    is
       Target_Params_List_Sloc : constant Source_Location_Range :=
         Get_Subp_Params (Subp).F_Params.Sloc_Range;
@@ -1307,7 +1313,7 @@ package body Laltools.Refactor.Subprogram_Signature is
    procedure Add_As_Last_Parameter
      (Subp  : Basic_Decl'Class;
       Data  : Parameter_Data_Type;
-      Edits : in out Edit_Map)
+      Edits : in out Text_Edit_Map)
    is
       Target_Params_List_Sloc : constant Source_Location_Range :=
         Get_Subp_Params (Subp).F_Params.Sloc_Range;
@@ -1332,7 +1338,7 @@ package body Laltools.Refactor.Subprogram_Signature is
      (Subp  : Basic_Decl'Class;
       Data  : Parameter_Data_Type;
       Index : Positive;
-      Edits : in out Edit_Map)
+      Edits : in out Text_Edit_Map)
    is
       Current_Parameter_Index : Positive := 1;
       Param_Spec_Ids_Length : Positive;
@@ -1451,13 +1457,16 @@ package body Laltools.Refactor.Subprogram_Signature is
    function Refactor
      (Self : Mode_Changer;
       Analysis_Units : access function return Analysis_Unit_Array)
-      return Edit_Map is
+      return Refactoring_Edits is
    begin
-      return Change_Mode
-        (Self.Subp,
-         Self.Parameter_Indices_Range,
-         Self.New_Mode,
-         Analysis_Units.all);
+      return Refactoring_Edits'
+        (Text_Edits =>
+           Change_Mode
+             (Self.Subp,
+              Self.Parameter_Indices_Range,
+              Self.New_Mode,
+              Analysis_Units.all),
+         others     => <>);
    end Refactor;
 
    -----------------
@@ -1468,7 +1477,7 @@ package body Laltools.Refactor.Subprogram_Signature is
      (Subp               : Basic_Decl'Class;
       Parameters_Indices : Parameter_Indices_Range_Type;
       New_Mode           : Ada_Mode;
-      Edits              : in out Edit_Map)
+      Edits              : in out Text_Edit_Map)
    is
       Current_Parameter_Index  : Positive := 1;
       First_Parameter_Index    : Positive :=
@@ -1850,10 +1859,12 @@ package body Laltools.Refactor.Subprogram_Signature is
    function Refactor
      (Self           : Backward_Mover;
       Analysis_Units : access function return Analysis_Unit_Array)
-      return Edit_Map is
+      return Refactoring_Edits is
    begin
-      return Move_Backward
-        (Self.Subp, Self.Parameter_Index, Analysis_Units.all);
+      return Refactoring_Edits'
+        (Text_Edits =>
+           Move_Backward (Self.Subp, Self.Parameter_Index, Analysis_Units.all),
+         others     => <>);
    end Refactor;
 
    -------------------
@@ -1863,7 +1874,7 @@ package body Laltools.Refactor.Subprogram_Signature is
    procedure Move_Backward
      (Subp            : Basic_Decl'Class;
       Parameter_Index : Positive;
-      Edits           : in out Edit_Map)
+      Edits           : in out Text_Edit_Map)
    is
       Param_Spec_Length          : Positive;
       Current_Parameter_Index    : Positive := 1;
@@ -2226,7 +2237,7 @@ package body Laltools.Refactor.Subprogram_Signature is
    function Refactor
      (Self           : Forward_Mover;
       Analysis_Units : access function return Analysis_Unit_Array)
-      return Edit_Map is
+      return Refactoring_Edits is
      (Self.Mover.Refactor (Analysis_Units));
 
 end Laltools.Refactor.Subprogram_Signature;

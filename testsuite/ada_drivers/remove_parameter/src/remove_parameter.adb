@@ -191,7 +191,7 @@ procedure Remove_Parameter is
       Target_Subp              : Basic_Decl;
       Target_Parameter_Indices : Parameter_Indices_Range_Type;
 
-      Edits : Edit_Map;
+      Edits : Refactoring_Edits;
 
    begin
       Main_Unit := Jobs (1).Analysis_Ctx.Get_From_File
@@ -223,7 +223,7 @@ procedure Remove_Parameter is
 
             Edits := Remover.Refactor (Analysis_Units'Access);
 
-            Print (Edits);
+            Print (Edits.Text_Edits);
          end;
 
       else

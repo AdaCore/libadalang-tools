@@ -144,7 +144,7 @@ package Laltools.Refactor.Subprogram_Signature is
       New_Parameter   : Parameter_Data_Type;
       Parameter_Index : Positive;
       Units           : Analysis_Unit_Array)
-      return Edit_Map
+      return Text_Edit_Map
      with Pre => Subp.P_Is_Subprogram
      or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
    --  Adds a parameter defined by 'New_Parameter' to position defined by
@@ -156,7 +156,7 @@ package Laltools.Refactor.Subprogram_Signature is
       Parameter_Indices_Range : Parameter_Indices_Range_Type;
       New_Mode                : Ada_Mode;
       Units                   : Analysis_Unit_Array)
-      return Edit_Map
+      return Text_Edit_Map
      with Pre => Subp.P_Is_Subprogram
      or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
    --  Changes the parameter mode of the parameters defined by
@@ -167,7 +167,7 @@ package Laltools.Refactor.Subprogram_Signature is
      (Subp            : Basic_Decl;
       Parameter_Index : Positive;
       Units           : Analysis_Unit_Array)
-      return Edit_Map
+      return Text_Edit_Map
      with Pre => Subp.P_Is_Subprogram
      or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
    --  Moves the parameter defined by 'Parameter_Index' backward. The
@@ -178,17 +178,17 @@ package Laltools.Refactor.Subprogram_Signature is
      (Subp            : Basic_Decl;
       Parameter_Index : Positive;
       Units           : Analysis_Unit_Array)
-      return Edit_Map
+      return Text_Edit_Map
    is (Move_Backward (Subp, Parameter_Index + 1, Units));
-   --  Moves the parameter defined by 'Parameter_Index' to the right. The
-   --  parameter is moved to the right in the entire subprogram hierarchy, as
+   --  Moves the parameter defined by 'Parameter_Index' forward. The
+   --  parameter is moved forward in the entire subprogram hierarchy, as
    --  well as, all renames hierarchy.
 
    function Remove_Parameter
      (Subp            : Basic_Decl;
       Parameter_Index : Positive;
       Units           : Analysis_Unit_Array)
-      return Edit_Map
+      return Text_Edit_Map
      with Pre => Subp.P_Is_Subprogram
      or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
    --  Removes the parameter defined by Parameter_Index. The parameter is
@@ -199,7 +199,7 @@ package Laltools.Refactor.Subprogram_Signature is
      (Subp              : Basic_Decl;
       Parameter_Indices : Parameter_Indices_Type;
       Units             : Analysis_Unit_Array)
-      return Edit_Map
+      return Text_Edit_Map
      with Pre => Subp.P_Is_Subprogram
      or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
    --  Removes the parameters defined by Parameter_Indices. The parameter is
@@ -210,7 +210,7 @@ package Laltools.Refactor.Subprogram_Signature is
      (Subp                    : Basic_Decl;
       Parameter_Indices_Range : Parameter_Indices_Range_Type;
       Units                   : Analysis_Unit_Array)
-      return Edit_Map
+      return Text_Edit_Map
      with Pre => Subp.P_Is_Subprogram
      or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
    --  Removes the parameters defined by Parameter_Indices_Range. The
@@ -221,7 +221,7 @@ package Laltools.Refactor.Subprogram_Signature is
      (Subp                     : Basic_Decl;
       Parameter_Indices_Ranges : Parameter_Indices_Ranges_Type;
       Units                    : Analysis_Unit_Array)
-      return Edit_Map
+      return Text_Edit_Map
      with Pre => Subp.P_Is_Subprogram
      or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
    --  Removes the parameters defined by Parameter_Indices_Ranges. The
@@ -253,7 +253,7 @@ package Laltools.Refactor.Subprogram_Signature is
    function Refactor
      (Self           : Parameter_Remover;
       Analysis_Units : access function return Analysis_Unit_Array)
-      return Edit_Map;
+      return Refactoring_Edits;
    --  Returns an Edit_Map with all the refactoring edits needed to remove
    --  a parameter.
 
@@ -273,7 +273,7 @@ package Laltools.Refactor.Subprogram_Signature is
    function Refactor
      (Self           : Parameter_Adder;
       Analysis_Units : access function return Analysis_Unit_Array)
-      return Edit_Map;
+      return Refactoring_Edits;
    --  Returns an Edit_Map with all the refactoring edits needed to add
    --  a parameter.
 
@@ -305,7 +305,7 @@ package Laltools.Refactor.Subprogram_Signature is
    function Refactor
      (Self           : Mode_Changer;
       Analysis_Units : access function return Analysis_Unit_Array)
-      return Edit_Map;
+      return Refactoring_Edits;
    --  Returns an Edit_Map with all the refactoring edits needed to change
    --  a parameter mode.
 
@@ -326,7 +326,7 @@ package Laltools.Refactor.Subprogram_Signature is
    function Refactor
      (Self : Backward_Mover;
       Analysis_Units : access function return Analysis_Unit_Array)
-      return Edit_Map;
+      return Refactoring_Edits;
    --  Returns an Edit_Map with all the refactoring edits needed to move
    --  a parameter backward.
 
@@ -345,9 +345,9 @@ package Laltools.Refactor.Subprogram_Signature is
    function Refactor
      (Self : Forward_Mover;
       Analysis_Units : access function return Analysis_Unit_Array)
-      return Edit_Map;
+      return Refactoring_Edits;
    --  Returns an Edit_Map with all the refactoring edits needed to move
-   --  a parameter to the right.
+   --  a parameter forward.
 
 private
 
