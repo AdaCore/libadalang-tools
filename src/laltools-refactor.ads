@@ -123,12 +123,28 @@ package Laltools.Refactor is
    procedure Print (M : Text_Edit_Map);
    --  Print an Edit_Map in an human readable format to the standart output
 
+   procedure Print (S : File_Creation_Ordered_Set);
+   --  Print a File_Creation_Ordered_Set in an human readable format to the
+   --  standard output
+
+   procedure Print (S : File_Deletion_Ordered_Set);
+   --  Print a File_Deletion_Ordered_Set in an human readable format to the
+   --  standart output
+
+   procedure Print (S : File_Rename_Ordered_Set);
+   --  Print a File_Rename_Ordered_Set in an human readable format to the
+   --  standart output
+
+   procedure Print (E : Refactoring_Edits);
+   --  Print a Refactoring_Edits in an human readable format to the standart
+   --  output.
+
    type Refactoring_Tool is limited interface;
 
    function Refactor
      (Self           : Refactoring_Tool;
       Analysis_Units : access function return Analysis_Unit_Array)
       return Refactoring_Edits is abstract;
-   --  Runs the refactoring analysis and return a map with all the needed edits
+   --  Runs the refactoring analysis and return all the needed edits
 
 end Laltools.Refactor;

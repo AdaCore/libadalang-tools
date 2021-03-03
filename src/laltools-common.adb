@@ -1145,6 +1145,35 @@ package body Laltools.Common is
       end case;
    end Find_Subp_Body;
 
+   --------------------------
+   -- Get_Compilation_Unit --
+   --------------------------
+
+   function Get_Compilation_Unit
+     (Node : Ada_Node'Class)
+         return Compilation_Unit
+   is
+      C_Unit : Ada_Node :=
+        (if Node.Is_Null then No_Ada_Node else Node.As_Ada_Node);
+
+   begin
+      --  Iterate throught the parents until a Compilation_Unit node is
+      --  found
+      while not C_Unit.Is_Null
+        and then not (C_Unit.Kind in Ada_Compilation_Unit_Range)
+      loop
+         C_Unit := C_Unit.Parent;
+      end loop;
+
+      if C_Unit.Is_Null
+        or else not (C_Unit.Kind in Ada_Compilation_Unit_Range)
+      then
+         return No_Compilation_Unit;
+      end if;
+
+      return C_Unit.As_Compilation_Unit;
+   end Get_Compilation_Unit;
+
    --------------------------------------
    -- Get_CU_Visible_Declarative_Parts --
    --------------------------------------
@@ -1791,6 +1820,54 @@ package body Laltools.Common is
       end loop;
       return Declarative_Parts;
    end Get_Use_Units_Declarative_Parts;
+
+   --------------------
+   -- Get_Used_Units --
+   --------------------
+
+   function Get_Used_Units
+     (Node : Compilation_Unit'Class)
+         return Compilation_Unit_Array
+   is
+      package Compilation_Unit_Vectors is new Ada.Containers.Vectors
+        (Index_Type   => Natural,
+         Element_Type => Compilation_Unit,
+         "="          => "=");
+
+      Used_Units : Compilation_Unit_Vectors.Vector;
+   begin
+
+      for Clause of Node.F_Prelude loop
+         if Clause.Kind in Ada_Use_Package_Clause_Range then
+            for Use_Clause of Clause.As_Use_Package_Clause.F_Packages loop
+               declare
+                  C_Unit : constant Compilation_Unit :=
+                    Get_Compilation_Unit (Use_Clause.P_Referenced_Decl);
+               begin
+                  if not C_Unit.Is_Null then
+                     Used_Units.Append (C_Unit);
+                  end if;
+               end;
+            end loop;
+         end if;
+      end loop;
+
+      --  Copy the Used_Units elements to an array
+
+      return R : Compilation_Unit_Array
+        (1 .. Integer (Used_Units.Length))
+      do
+         declare
+            Idx : Positive := 1;
+
+         begin
+            for U of Used_Units loop
+               R (Idx) := U;
+               Idx := Idx + 1;
+            end loop;
+         end;
+      end return;
+   end Get_Used_Units;
 
    ------------
    -- Insert --

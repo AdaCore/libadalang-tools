@@ -150,6 +150,54 @@ package body Laltools.Refactor is
          Next (C);
       end loop;
 
-      Ada.Text_IO.New_Line;
+      New_Line;
    end Print;
+
+   -----------
+   -- Print --
+   -----------
+
+   procedure Print (S : File_Creation_Ordered_Set) is
+   begin
+      for F of S loop
+         Ada.Text_IO.Put_Line (Base_Name (To_String (F.Filepath)));
+         Ada.Text_IO.Put_Line (To_String (F.Content));
+      end loop;
+   end Print;
+
+   -----------
+   -- Print --
+   -----------
+
+   procedure Print (S : File_Deletion_Ordered_Set) is
+   begin
+      for F of S loop
+         Ada.Text_IO.Put_Line (Base_Name (To_String (F)));
+      end loop;
+   end Print;
+
+   -----------
+   -- Print --
+   -----------
+
+   procedure Print (S : File_Rename_Ordered_Set) is
+   begin
+      for F of S loop
+         Ada.Text_IO.Put_Line (Base_Name (To_String (F.Filepath)));
+         Ada.Text_IO.Put_Line (Base_Name (To_String (F.New_Name)));
+      end loop;
+   end Print;
+
+   -----------
+   -- Print --
+   -----------
+
+   procedure Print (E : Refactoring_Edits) is
+   begin
+      Print (E.Text_Edits);
+      Print (E.File_Creations);
+      Print (E.File_Deletions);
+      Print (E.File_Renames);
+   end Print;
+
 end Laltools.Refactor;

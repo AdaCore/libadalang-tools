@@ -329,6 +329,11 @@ package Laltools.Common is
    --  If Subp is of kind Ada_Subp_Decl or Ada_Generic_Subp_Decl then
    --  returns its body part, if is exists. Otherwise return No_Base_Subp_Body.
 
+   function Get_Compilation_Unit
+     (Node : Ada_Node'Class)
+         return Compilation_Unit;
+   --  Returns the Compilation_Unit associated to Node
+
    function Get_CU_Visible_Declarative_Parts
      (Node : Ada_Node'Class;
       Skip_First : Boolean := False)
@@ -473,6 +478,12 @@ package Laltools.Common is
      (Node : Ada_Node'Class)
       return Declarative_Part_Vectors.Vector;
    --  Gets all public Declarative_Parts of the units used by Node's unit.
+
+   function Get_Used_Units
+     (Node : Compilation_Unit'Class)
+         return Compilation_Unit_Array;
+   --  Returns a Compilation_Unit_Array with all the Compilation_Unit
+   --  whose Node has a use clause for.
 
    procedure Insert
      (Map     : in out Source_Location_Range_Map;
