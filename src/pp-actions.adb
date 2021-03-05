@@ -623,6 +623,13 @@ package body Pp.Actions is
            --  ??? Ada 2020 related expressions, needs to be implemented. See
            --  T519-017.
 
+           when Ada_Abstract_State_Decl => null,
+           when Ada_Abstract_State_Decl_Expr => null,
+           when Ada_Multi_Abstract_State_Decl => null,
+           when Ada_Paren_Abstract_State_Decl => null,
+           --   ??? SPARK related expressions, needs to be implemented. See
+           --   U305-048.
+
            when Ada_Ada_List => null,
            when Ada_Subp_Spec => null,
            when Ada_Aggregate_Assoc => null,
