@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -160,8 +160,6 @@ package body Laltools.Refactor_Imports is
      (Unit : LALAnalysis.Analysis_Unit) return Boolean
    is
       use type LALAnalysis.Analysis_Unit;
-      use type LALAnalysis.Ada_Node;
-      use type LALAnalysis.Compilation_Unit;
       use type LALCommon.Ada_Node_Kind_Type;
       use type LALCommon.Analysis_Unit_Kind;
    begin
@@ -169,14 +167,14 @@ package body Laltools.Refactor_Imports is
          declare
             Root_Node : constant LALAnalysis.Ada_Node := Unit.Root;
          begin
-            if Root_Node /= LALAnalysis.No_Ada_Node
+            if not Root_Node.Is_Null
               and then Root_Node.Kind = LALCommon.Ada_Compilation_Unit
             then
                declare
                   Compilation_Unit : constant LALAnalysis.Compilation_Unit :=
                     LALAnalysis.As_Compilation_Unit (Root_Node);
                begin
-                  if Compilation_Unit /= LALAnalysis.No_Compilation_Unit then
+                  if not Compilation_Unit.Is_Null then
                      return Compilation_Unit.P_Unit_Kind =
                        LALCommon.Unit_Specification;
                   end if;
@@ -244,37 +242,18 @@ package body Laltools.Refactor_Imports is
          end loop;
       end Explore_Declarative_Part;
 
-      use type LALCommon.Ada_Node_Kind_Type;
-      use type LALAnalysis.Base_Package_Decl;
-      use type LALAnalysis.Generic_Package_Internal;
-      use type LALAnalysis.Package_Decl;
-      use type LALAnalysis.Public_Part;
-      use type LALAnalysis.Private_Part;
    begin
-      --  Return an empty set if Pkg_Decl is No_Base_Package_Decl,
-      --  No_Generic_Package_Internal, or No_Package_Decl.
+      --  Return an empty set if Pkg_Decl is null
 
-      if Pkg_Decl.As_Base_Package_Decl = LALAnalysis.No_Base_Package_Decl then
+      if Pkg_Decl.Is_Null then
          return All_Decls;
-      elsif Pkg_Decl.Kind = LALCommon.Ada_Generic_Package_Internal then
-         if Pkg_Decl.As_Generic_Package_Internal =
-           LALAnalysis.No_Generic_Package_Internal
-         then
-            return All_Decls;
-         end if;
-      elsif Pkg_Decl.Kind = LALCommon.Ada_Package_Decl then
-         if Pkg_Decl.As_Package_Decl = LALAnalysis.No_Package_Decl then
-            return All_Decls;
-         end if;
       end if;
 
-      if Pkg_Decl.F_Public_Part /= LALAnalysis.No_Public_Part then
+      if not Pkg_Decl.F_Public_Part.Is_Null then
          Explore_Declarative_Part (Pkg_Decl.F_Public_Part.F_Decls);
       end if;
 
-      if Incl_Private
-        and then Pkg_Decl.F_Private_Part /= LALAnalysis.No_Private_Part
-      then
+      if Incl_Private and then not Pkg_Decl.F_Private_Part.Is_Null then
          Explore_Declarative_Part (Pkg_Decl.F_Private_Part.F_Decls);
       end if;
 
@@ -310,20 +289,27 @@ package body Laltools.Refactor_Imports is
       -- Append --
       ------------
 
-      procedure Append (Decl : LALAnalysis.Basic_Decl)
-      is
-         Text : constant LKSText.Text_Type := Decl.P_Defining_Name.F_Name.Text;
+      procedure Append (Decl : LALAnalysis.Basic_Decl) is
       begin
-         if Decls_Map.Contains (Text) then
-            Decls_Map.Reference (Text).Include (Decl);
-         else
-            declare
-               Decls_Set : Reachable_Declarations_Hashed_Set.Set;
-            begin
-               Decls_Set.Include (Decl);
-               Decls_Map.Insert (Text, Decls_Set);
-            end;
+         if Decl.Is_Null or else Decl.P_Defining_Name.Is_Null then
+            return;
          end if;
+
+         declare
+            Text : constant LKSText.Text_Type :=
+              Decl.P_Defining_Name.F_Name.Text;
+         begin
+            if Decls_Map.Contains (Text) then
+               Decls_Map.Reference (Text).Include (Decl);
+            else
+               declare
+                  Decls_Set : Reachable_Declarations_Hashed_Set.Set;
+               begin
+                  Decls_Set.Include (Decl);
+                  Decls_Map.Insert (Text, Decls_Set);
+               end;
+            end if;
+         end;
       end Append;
 
       ------------------
@@ -432,13 +418,9 @@ package body Laltools.Refactor_Imports is
       Comp_Unit_Decl      : LALAnalysis.Basic_Decl;
       Comp_Unit_Decl_Kind : LALCommon.Ada_Node_Kind_Type;
 
-      use type LALAnalysis.Ada_Node;
-      use type LALAnalysis.Public_Part;
-      use type LALAnalysis.Private_Part;
-      use type LALAnalysis.Generic_Package_Internal;
    begin
       if not Is_Specification_Unit (Unit)
-        or else not (Unit.Root /= LALAnalysis.No_Ada_Node
+        or else not (not Unit.Root.Is_Null
                      and then Unit.Root.Kind = LALCommon.Ada_Compilation_Unit)
       then
          return Reach_Decls;
@@ -460,15 +442,12 @@ package body Laltools.Refactor_Imports is
                Pkg_Decl : constant LALAnalysis.Package_Decl :=
                  Comp_Unit_Decl.As_Package_Decl;
             begin
-               if Pkg_Decl.F_Public_Part /= LALAnalysis.No_Public_Part then
+               if not Pkg_Decl.F_Public_Part.Is_Null then
                   Add_Declarations
                     (Pkg_Decl.F_Public_Part.As_Public_Part.F_Decls);
                end if;
 
-               if Incl_Private
-                 and then Pkg_Decl.F_Private_Part /=
-                   LALAnalysis.No_Private_Part
-               then
+               if Incl_Private and then not Pkg_Decl.F_Private_Part.Is_Null then
                   Add_Declarations
                     (Pkg_Decl.F_Private_Part.As_Private_Part.F_Decls);
                end if;
@@ -486,10 +465,8 @@ package body Laltools.Refactor_Imports is
                    Get_Generic_Package_Internal
                      (Comp_Unit_Decl.As_Generic_Package_Instantiation);
             begin
-               if Gen_Pkg_Internal /=
-                 LALAnalysis.No_Generic_Package_Internal
-                 and then Gen_Pkg_Internal.F_Public_Part /=
-                   LALAnalysis.No_Public_Part
+               if not Gen_Pkg_Internal.Is_Null
+                 and then not Gen_Pkg_Internal.F_Public_Part.Is_Null
                then
                   Add_Declarations
                     (Gen_Pkg_Internal.F_Public_Part.As_Public_Part.
@@ -529,22 +506,21 @@ package body Laltools.Refactor_Imports is
       return Reachable_Declarations
    is
       Reach_Decls : Reachable_Declarations;
-      use type LALAnalysis.Ada_Node;
+
    begin
-      if Node.Parent = LALAnalysis.No_Ada_Node then
+      if Node.Parent.Is_Null then
          return Reach_Decls;
       end if;
 
       declare
          Stop_Decl : LALAnalysis.Basic_Decl := LALAnalysis.No_Basic_Decl;
 
-         use type LALAnalysis.Declarative_Part;
          use type LALAnalysis.Basic_Decl;
          use type LALCommon.Ada_Node_Kind_Type;
       begin
          for Parent of Node.Parent.Parents loop
             if Parent.Kind in LALCommon.Ada_Basic_Decl
-              and then Stop_Decl = LALAnalysis.No_Basic_Decl
+              and then Stop_Decl.Is_Null
             then
                Stop_Decl := Parent.As_Basic_Decl;
             end if;
@@ -560,7 +536,7 @@ package body Laltools.Refactor_Imports is
                     Laltools.Common.Get_Declarative_Part
                       (Parent.As_Handled_Stmts);
                begin
-                  if Decl_Part /= LALAnalysis.No_Declarative_Part then
+                  if not Decl_Part.Is_Null then
                      for Decl of Decl_Part.F_Decls loop
                         if Decl.Kind in LALCommon.Ada_Basic_Decl then
                            Add_Declaration
@@ -576,7 +552,7 @@ package body Laltools.Refactor_Imports is
                   Decl_Part : constant LALAnalysis.Declarative_Part :=
                     Parent.As_Declarative_Part;
                begin
-                  if Decl_Part /= LALAnalysis.No_Declarative_Part then
+                  if not Decl_Part.Is_Null then
                      --  For a node in a Declarative_Part of a Package_Body
                      --  only the previously declared declarations are
                      --  visible.
@@ -622,9 +598,8 @@ package body Laltools.Refactor_Imports is
                --  declarations found in the Package_Declaration are
                --  added to Map.
 
-               if Parent.As_Basic_Decl.P_Defining_Name.P_Canonical_Part
-                 .P_Basic_Decl /=
-                   LALAnalysis.No_Basic_Decl
+               if not Parent.As_Basic_Decl.P_Defining_Name.P_Canonical_Part
+                 .P_Basic_Decl.Is_Null
                then
                   Add_Declaration
                     (Decl        =>
@@ -684,10 +659,9 @@ package body Laltools.Refactor_Imports is
       Aliased_Decls_Map : Reachable_Declarations_Aliases_Map.Map renames
         Reach_Decls.Aliased_Decls_Map;
 
-      use type LALAnalysis.Identifier;
    begin
 
-      if Identifier = LALAnalysis.No_Identifier then
+      if Identifier.Is_Null then
          return Reach_Decls;
       end if;
 
@@ -915,8 +889,6 @@ package body Laltools.Refactor_Imports is
       end Apply_Aliases;
 
       use type LALAnalysis.Basic_Decl;
-      use type LALAnalysis.Identifier;
-      use type LALAnalysis.Ada_Node;
       use type Ada.Containers.Count_Type;
 
       package LKSText renames Langkit_Support.Text;
@@ -931,9 +903,7 @@ package body Laltools.Refactor_Imports is
         Reach_Decls.Decls_Map;
    begin
 
-      if Identifier = LALAnalysis.No_Identifier
-        or else Identifier.Parent = LALAnalysis.No_Ada_Node
-      then
+      if Identifier.Is_Null or else Identifier.Parent.Is_Null then
          return Suggestions;
       end if;
 

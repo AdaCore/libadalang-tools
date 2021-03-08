@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -32,6 +32,7 @@ with GNATCOLL.VFS; use GNATCOLL.VFS;
 with Langkit_Support.Slocs;
 
 with Libadalang.Analysis;
+with Libadalang.Common; use Libadalang.Common;
 with Libadalang.Helpers;
 
 with Laltools.Refactor_Imports;
@@ -166,6 +167,9 @@ procedure Refactor_Imports is
                                     Main_Unit.Format_GNU_Diagnostic (D));
          end loop;
       else
+         if Node.Kind /= Ada_Identifier then
+            return;
+         end if;
          declare
             use Laltools.Refactor_Imports;
             Suggestions : constant Import_Suggestions_Vector.Vector

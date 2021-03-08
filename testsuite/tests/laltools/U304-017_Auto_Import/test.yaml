@@ -1,0 +1,5 @@
+description:
+    This test checks that the Auto Imports refactoring doesn't throw uncaught
+    exceptions when applied in incorrect places
+
+driver: shell_script
