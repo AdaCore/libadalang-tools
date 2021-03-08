@@ -1,0 +1,5 @@
+description: |+
+    This test checks that the Change Subprogram Signature refactoring tools
+    do not raise an exception in invalid Ada code
+
+driver: shell_script

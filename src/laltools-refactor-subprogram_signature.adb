@@ -161,6 +161,21 @@ package body Laltools.Refactor.Subprogram_Signature is
       Requires_Type   : out Boolean)
       return Boolean
    is
+      procedure Initialize_Out_Parameters;
+      --  Initiazes the out parameters of this function with values as if
+      --  the refactoring is not available.
+
+      -------------------------------
+      -- Initialize_Out_Parameters --
+      -------------------------------
+
+      procedure Initialize_Out_Parameters is
+      begin
+         Subp := No_Basic_Decl;
+         Parameter_Index := 1;
+         Requires_Type := False;
+      end Initialize_Out_Parameters;
+
       Parent_Defining_Name       : Defining_Name := No_Defining_Name;
       Parent_Defining_Name_List  : Defining_Name_List := No_Defining_Name_List;
       Parent_Params              : Params := No_Params;
@@ -173,9 +188,7 @@ package body Laltools.Refactor.Subprogram_Signature is
       Aux_Node : Ada_Node := Node.As_Ada_Node;
 
    begin
-      Subp := No_Basic_Decl;
-      Parameter_Index := 1;
-      Requires_Type := False;
+      Initialize_Out_Parameters;
 
       Find_Subp :
       while not Aux_Node.Is_Null loop
@@ -200,8 +213,6 @@ package body Laltools.Refactor.Subprogram_Signature is
       if Aux_Node.Is_Null then
          return False;
       end if;
-
-      Assert (Aux_Node.Kind in Ada_Subp_Spec_Range);
 
       Parent_Subp_Decl := Aux_Node.As_Subp_Spec.P_Parent_Basic_Decl;
 
@@ -243,6 +254,13 @@ package body Laltools.Refactor.Subprogram_Signature is
       end if;
 
       return False;
+   exception
+      when Precondition_Failure =>
+         --  Assume that Precondition_Failure is raised due to invalid code and
+         --  set again the out parameters since they might have been changed
+         --  since initialized.
+         Initialize_Out_Parameters;
+         return False;
    end Is_Add_Parameter_Available;
 
    ------------------------------
@@ -256,6 +274,22 @@ package body Laltools.Refactor.Subprogram_Signature is
       Mode_Alternatives       : out Mode_Alternatives_Type)
       return Boolean
    is
+      procedure Initialize_Out_Parameters;
+      --  Initiazes the out parameters of this function with values as if
+      --  the refactoring is not available.
+
+      -------------------------------
+      -- Initialize_Out_Parameters --
+      -------------------------------
+
+      procedure Initialize_Out_Parameters is
+      begin
+         Subp := No_Basic_Decl;
+         Parameter_Indices_Range := (1, 1);
+         Mode_Alternatives :=
+           (Ada_Mode_Default, Ada_Mode_Default, Ada_Mode_Default);
+      end Initialize_Out_Parameters;
+
       Parent_Defining_Name       : Defining_Name := No_Defining_Name;
       Parent_Subptype_Indication : Subtype_Indication := No_Subtype_Indication;
       Parent_Defining_Name_List  : Defining_Name_List := No_Defining_Name_List;
@@ -268,10 +302,7 @@ package body Laltools.Refactor.Subprogram_Signature is
       Aux_Node : Ada_Node := Node.As_Ada_Node;
 
    begin
-      Subp := No_Basic_Decl;
-      Parameter_Indices_Range := (1, 1);
-      Mode_Alternatives :=
-        (Ada_Mode_Default, Ada_Mode_Default, Ada_Mode_Default);
+      Initialize_Out_Parameters;
 
       Find_Subp :
       while not Aux_Node.Is_Null loop
@@ -348,6 +379,13 @@ package body Laltools.Refactor.Subprogram_Signature is
       else
          return False;
       end if;
+   exception
+      when Precondition_Failure =>
+         --  Assume that Precondition_Failure is raised due to invalid code and
+         --  set again the out parameters since they might have been changed
+         --  since initialized.
+         Initialize_Out_Parameters;
+         return False;
    end Is_Change_Mode_Available;
 
    ---------------------------------
@@ -361,6 +399,21 @@ package body Laltools.Refactor.Subprogram_Signature is
       Move_Directions : out Move_Direction_Availability_Type)
       return Boolean
    is
+      procedure Initialize_Out_Parameters;
+      --  Initiazes the out parameters of this function with values as if
+      --  the refactoring is not available.
+
+      -------------------------------
+      -- Initialize_Out_Parameters --
+      -------------------------------
+
+      procedure Initialize_Out_Parameters is
+      begin
+         Subp := No_Basic_Decl;
+         Parameter_Index := 1;
+         Move_Directions := (False, False);
+      end Initialize_Out_Parameters;
+
       --  Aux_Node must have the following parent nodes in order to guarantee
       --  that Aux_Node is related to a parameter.
       Parent_Defining_Name       : Defining_Name := No_Defining_Name;
@@ -374,9 +427,7 @@ package body Laltools.Refactor.Subprogram_Signature is
       Aux_Node : Ada_Node := Node.As_Ada_Node;
 
    begin
-      Subp := No_Basic_Decl;
-      Parameter_Index := 1;
-      Move_Directions := (False, False);
+      Initialize_Out_Parameters;
 
       Find_Subp :
       while not Aux_Node.Is_Null loop
@@ -438,6 +489,13 @@ package body Laltools.Refactor.Subprogram_Signature is
       end if;
 
       return True;
+   exception
+      when Precondition_Failure =>
+         --  Assume that Precondition_Failure is raised due to invalid code and
+         --  set again the out parameters since they might have been changed
+         --  since initialized.
+         Initialize_Out_Parameters;
+         return False;
    end Is_Move_Parameter_Available;
 
    -----------------------------------
@@ -450,6 +508,20 @@ package body Laltools.Refactor.Subprogram_Signature is
       Parameter_Indices_Range : out Parameter_Indices_Range_Type)
       return Boolean
    is
+      procedure Initialize_Out_Parameters;
+      --  Initiazes the out parameters of this function with values as if
+      --  the refactoring is not available.
+
+      -------------------------------
+      -- Initialize_Out_Parameters --
+      -------------------------------
+
+      procedure Initialize_Out_Parameters is
+      begin
+         Subp := No_Basic_Decl;
+         Parameter_Indices_Range := (1, 1);
+      end Initialize_Out_Parameters;
+
       Parent_Identifier          : Identifier := No_Identifier;
       Parent_Defining_Name       : Defining_Name := No_Defining_Name;
       Parent_Subptype_Indication : Subtype_Indication := No_Subtype_Indication;
@@ -465,8 +537,7 @@ package body Laltools.Refactor.Subprogram_Signature is
       Aux_Node : Ada_Node := Node.As_Ada_Node;
 
    begin
-      Subp := No_Basic_Decl;
-      Parameter_Indices_Range := (1, 1);
+      Initialize_Out_Parameters;
 
       Find_Subp :
       while not Aux_Node.Is_Null loop
@@ -501,8 +572,6 @@ package body Laltools.Refactor.Subprogram_Signature is
          return False;
       end if;
 
-      Assert (Aux_Node.Kind in Ada_Subp_Spec_Range);
-
       Parent_Subp_Decl := Aux_Node.As_Subp_Spec.P_Parent_Basic_Decl;
 
       if not (Parent_Subp_Decl.P_Is_Subprogram
@@ -524,9 +593,6 @@ package body Laltools.Refactor.Subprogram_Signature is
          return True;
 
       elsif Parent_Subptype_Indication /= No_Subtype_Indication then
-         Assert (Parent_Param_Spec_List /= No_Param_Spec_List
-                 and then Parent_Param_Spec /= No_Param_Spec);
-
          Subp := Parent_Subp_Decl;
 
          Parameter_Absolute_Index := 1;
@@ -566,6 +632,13 @@ package body Laltools.Refactor.Subprogram_Signature is
             return True;
          end if;
       end if;
+   exception
+      when Precondition_Failure =>
+         --  Assume that Precondition_Failure is raised due to invalid code and
+         --  set again the out parameters since they might have been changed
+         --  since initialized.
+         Initialize_Out_Parameters;
+         return False;
    end Is_Remove_Parameter_Available;
 
    -------------------
@@ -916,7 +989,8 @@ package body Laltools.Refactor.Subprogram_Signature is
                Param_Assoc_Index := Param_Assoc_Index + 1;
             end loop;
 
-            Assert (not Arg_A.Is_Null and not Arg_B.Is_Null);
+            --  Assert that Arg_A and Arg_B have been found and have changed
+            Assert (Arg_A /= No_Param_Assoc and Arg_B /= No_Param_Assoc);
 
             Arg_A_Sloc := Arg_A.Sloc_Range;
             Arg_B_Sloc := Arg_B.Sloc_Range;
@@ -2027,6 +2101,8 @@ package body Laltools.Refactor.Subprogram_Signature is
                      Current_Parameter_Index := Current_Parameter_Index + 1;
                   end loop;
 
+                  --  Assert that Parameter_B and Parameter_C have been found
+                  --  and have changed.
                   Assert (Parameter_B /= No_Defining_Name
                           and then Parameter_C /= No_Defining_Name);
 
@@ -2186,6 +2262,8 @@ package body Laltools.Refactor.Subprogram_Signature is
                   Current_Parameter_Index := Current_Parameter_Index + 1;
                end loop;
 
+               --  Assert that Parameter_A and Parameter_B have been found
+               --  have changed.
                Assert (Parameter_A /= No_Defining_Name
                        and then Parameter_B /= No_Defining_Name);
 
