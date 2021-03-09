@@ -447,7 +447,8 @@ package body Laltools.Refactor_Imports is
                     (Pkg_Decl.F_Public_Part.As_Public_Part.F_Decls);
                end if;
 
-               if Incl_Private and then not Pkg_Decl.F_Private_Part.Is_Null then
+               if Incl_Private and then not Pkg_Decl.F_Private_Part.Is_Null
+               then
                   Add_Declarations
                     (Pkg_Decl.F_Private_Part.As_Private_Part.F_Decls);
                end if;
