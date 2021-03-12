@@ -37,4 +37,9 @@ package Test.Skeleton is
    --  have corresponding generic test packages generated, but no corresponding
    --  instantiations have been processed and thus tests for those UUTs are not
    --  included in the final harness.
+
+   procedure Report_Tests_Total;
+   --  Outputs number of processed subprograms in each of analyzed sources,
+   --  number of new skeletons created and total number of tests.
+
 end Test.Skeleton;

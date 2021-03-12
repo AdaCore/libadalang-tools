@@ -2553,6 +2553,7 @@ package body Test.Stub is
 
       Origin_Unit : constant Analysis_Unit := Param_Type.Unit;
       Type_Unit   : Analysis_Unit;
+      Parent_Unit : Ada_Node;
 
    begin
       if Param_Type.Kind = Ada_Anonymous_Type then
@@ -2589,6 +2590,18 @@ package body Test.Stub is
       end if;
 
       --  Units are different, we need to analyse with clauses of original unit
+      --  and check whether it is a parent unit.
+
+      Parent_Unit := Param_Type.P_Semantic_Parent;
+      while not Parent_Unit.Is_Null and then
+        Parent_Unit.Unit /= Parent_Unit.P_Standard_Unit
+      loop
+         if Parent_Unit.Unit = Type_Unit then
+            return False;
+         end if;
+         Parent_Unit := Parent_Unit.P_Semantic_Parent;
+      end loop;
+
       declare
          Clauses : constant Ada_Node_List :=
            Origin_Unit.Root.As_Compilation_Unit.F_Prelude;

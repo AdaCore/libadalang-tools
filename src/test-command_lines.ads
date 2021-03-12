@@ -83,7 +83,8 @@ package Test.Command_Lines is
       Skeleton_Default,
       Passed_Tests,
       Exit_Status,
-      Copy_Environment);
+      Copy_Environment,
+      Reporter);
 
    package Test_String_Switches is new String_Switches
      (Descriptor,
@@ -99,7 +100,8 @@ package Test.Command_Lines is
        Skeleton_Default => '=',
        Passed_Tests     => '=',
        Exit_Status      => '=',
-       Copy_Environment => '='));
+       Copy_Environment => '=',
+       Reporter         => '='));
 
    type Test_String_Seqs is (Exclude_From_Stubbing);
 

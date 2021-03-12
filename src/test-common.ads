@@ -280,7 +280,7 @@ package Test.Common is
 
    Tmp_Test_Prj : GNAT.OS_Lib.String_Access := null;
 
-   Reporter_Name : String_Access := new String'("gnattest");
+   Reporter_Name : GNAT.OS_Lib.String_Access := new String'("gnattest");
 
    No_Command_Line : Boolean := False;
 

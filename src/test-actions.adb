@@ -561,6 +561,16 @@ package body Test.Actions is
          end if;
       end if;
 
+      --  Reporter
+      if Arg (Cmd, Reporter) /= null then
+         Free (Test.Common.Reporter_Name);
+         Test.Common.Reporter_Name := new String'(Arg (Cmd, Reporter).all);
+         if Arg (Cmd, Stub) or else Arg (Cmd, Separate_Drivers) /= null then
+            Test.Common.Report_Std
+              ("warning: (gnattest) --reporter has no effect");
+         end if;
+      end if;
+
       if Arg (Cmd, Stub) then
 
          if Arg (Cmd, Harness_Only) then
@@ -793,6 +803,9 @@ package body Test.Actions is
                end if;
                Test.Skeleton.Report_Unused_Generic_Tests;
                Test.Skeleton.Generate_Project_File (Src_Prj);
+               if Test.Common.Verbose then
+                  Test.Skeleton.Report_Tests_Total;
+               end if;
             end if;
             Test.Harness.Test_Runner_Generator  (Src_Prj);
             Test.Harness.Project_Creator        (Src_Prj);

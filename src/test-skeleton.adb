@@ -2248,6 +2248,15 @@ package body Test.Skeleton is
          when Ada_Generic_Package_Decl =>
             Data.Is_Generic := True;
 
+         when Ada_Generic_Package_Instantiation =>
+            Report_Std
+              ("gnattest: "
+               & Base_Name (The_Unit.Unit.Get_Filename)
+               & " is a library level instantiation");
+            Apropriate_Source := False;
+            Set_Source_Status (The_Unit.Unit.Get_Filename, Bad_Content);
+            return;
+
          when others =>
             Report_Std
               ("gnattest: "
@@ -8473,6 +8482,35 @@ package body Test.Skeleton is
       GP.Has_Instantiation := True;
       Gen_Package_Storage.Append (GP);
    end Update_Generic_Packages;
+
+   ------------------------
+   -- Report_Tests_Total --
+   ------------------------
+
+   procedure Report_Tests_Total is
+      Cur : Tests_Per_Unit.Cursor := Test_Info.First;
+   begin
+      loop
+         exit when Cur = Tests_Per_Unit.No_Element;
+
+         Report_Std
+           (Natural'Image (Tests_Per_Unit.Element (Cur)) &
+              " testable subprograms in " &
+              Base_Name (Tests_Per_Unit.Key (Cur)));
+
+         Tests_Per_Unit.Next (Cur);
+      end loop;
+
+      Test_Info.Clear;
+      Report_Std
+        ("gnattest:" &
+           Natural'Image (All_Tests_Counter) &
+           " testable subprogram(s) processed");
+      Report_Std
+        ("gnattest:" &
+           Natural'Image (New_Tests_Counter) &
+           " new skeleton(s) generated");
+   end Report_Tests_Total;
 
    ---------------------------------
    -- Report_Unused_Generic_Tests --
