@@ -3,6 +3,8 @@ abstract project LAL_Tools_Common is
    type Build_Mode_Type is ("dev", "prod");
    Build_Mode : Build_Mode_Type := external ("BUILD_MODE", "dev");
 
+   Superproject := external ("SUPERPROJECT", "");
+
    package Compiler is
       case Build_Mode is
          when "dev" =>
