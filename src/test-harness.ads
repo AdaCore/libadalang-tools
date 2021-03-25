@@ -192,6 +192,9 @@ package Test.Harness is
    procedure Generate_Test_Driver_Projects (Source_Prj : String);
    --  Generates all project files necessary for separate test drivers.
 
+   procedure Generate_Makefile (Source_Prj : String);
+   --  Generate Makefile with relevant coverage targets
+
    procedure Test_Runner_Generator (Source_Prj : String);
    --  Generates Main_Sute and Test_Runner
 

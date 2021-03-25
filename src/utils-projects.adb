@@ -244,12 +244,20 @@ package body Utils.Projects is
       ----------------------------
 
       procedure Initialize_Environment is
+
+         Target_Opt : constant String := (if Arg (Cmd, Target) /= null
+                                 then Arg (Cmd, Target).all
+                                 else "");
+         RTS_Opt : constant String := (if Arg (Cmd, Run_Time_System) /= null
+                              then Arg (Cmd, Run_Time_System).all
+                              else "");
       begin
          GNATCOLL.Traces.Parse_Config_File;
          Initialize (Project_Env);
 
          Project_Env.Set_Target_And_Runtime
-           (Target, Arg (Cmd, Run_Time_System).all);
+           (Target  => (if Target_Opt /= "" then Target_Opt else Target),
+            Runtime => RTS_Opt);
 
          if Arg (Cmd, Follow_Symbolic_Links) then
             Project_Env.Set_Trusted_Mode (True);

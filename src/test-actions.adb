@@ -281,6 +281,10 @@ package body Test.Actions is
          end loop;
       end;
 
+      if Root_Prj.Has_Attribute (Runtime_Attribute) then
+         Test.Common.RTS_Attribute_Val := new String'(Root_Prj.Get_Runtime);
+      end if;
+
       if Arg (Cmd, Recursive) then
          --  We need to override the list of argument sources. Switch -r is
          --  a legacy switch equal to -U without parameter that other tools
@@ -808,6 +812,7 @@ package body Test.Actions is
             Test.Harness.Test_Runner_Generator  (Src_Prj);
             Test.Harness.Project_Creator        (Src_Prj);
          end if;
+         Test.Harness.Generate_Makefile (Src_Prj);
          Test.Common.Generate_Common_File;
          Test.Mapping.Generate_Mapping_File;
       end if;
@@ -1086,6 +1091,24 @@ package body Test.Actions is
         (GNATCOLL.Projects.Register_New_Attribute
            (Name => "makefile",
             Pkg  => "make"));
+
+      --  Needed for gnatcov integration
+
+      Report_If_Err
+        (GNATCOLL.Projects.Register_New_Attribute
+           (Name                 => "Switches",
+            Pkg                  => "Coverage",
+            Is_List              => True,
+            Indexed              => True,
+            Case_Sensitive_Index => False));
+
+      Report_If_Err
+        (GNATCOLL.Projects.Register_New_Attribute
+           (Name    => "Board",
+            Pkg     => "Emulator",
+            Is_List => False,
+            Indexed => False));
+
    end Register_Specific_Attributes;
 
    ---------------------------

@@ -22,11 +22,12 @@
 ------------------------------------------------------------------------------
 
 with GNATCOLL.VFS;                use GNATCOLL.VFS;
-with GNATCOLL.VFS_Utils;          use GNATCOLL.VFS_Utils;
 with GNATCOLL.Traces;             use GNATCOLL.Traces;
+with GNATCOLL.Projects;           use GNATCOLL.Projects;
 with Utils.Command_Lines;         use Utils.Command_Lines;
 
 with GNAT.Directory_Operations;   use GNAT.Directory_Operations;
+with GNAT.Strings;
 
 with Ada.Characters.Handling;     use Ada.Characters.Handling;
 with Ada.Containers;              use Ada.Containers;
@@ -133,6 +134,9 @@ package body Test.Harness is
       (Trim (Positive'Image (P), Both));
    --  Returns a trimmed image of the argument
 
+   function Path_To_Unix (S : String) return String;
+   --  Replace all "\" with "/".
+
    Infix : Natural := 0;
    function Get_Next_Infix return String;
    --  Returns a numbered infix ("1_", "2_",..), increasing the number for
@@ -170,6 +174,16 @@ package body Test.Harness is
    function Type_Name (Elem : Base_Type_Decl) return String is
      (Node_Image (Elem.As_Basic_Decl.P_Defining_Name));
    --  Returns image of type name
+
+   function File_Exists (Filename : String) return Boolean;
+   --  Returns True if Filename exists on disk and is readable.
+
+   -----------------
+   -- File_Exists --
+   -----------------
+
+   function File_Exists (Filename : String) return Boolean is
+     (Create (+Filename).Is_Readable);
 
    -----------------------------------------
    -- Generate_Global_Config_Pragmas_File --
@@ -1920,6 +1934,17 @@ package body Test.Harness is
          end;
 
          Separate_Projects.Append (Local_SPI);
+
+         --  Create a file with the unit under test so that gnatcov only
+         --  computes coverage information of it, to avoid incidental coverage.
+
+         Create (Harness_Dir.all
+                 & Data.Test_Unit_Full_Name.all
+                 & Directory_Separator
+                 & "units.list");
+         S_Put (0, Source_Project_Tree.Info (Create (+UUT)).Unit_Name);
+         Close_File;
+
          Decrease_Indent (Me, "done");
          return;
       end if;
@@ -1933,6 +1958,16 @@ package body Test.Harness is
             Process_Test_Routine (Data.ITR_List.Element (K));
          end loop;
       end if;
+
+      --  Create a file with the unit under test so that gnatcov only computes
+      --  coverage information of it, to avoid incidental coverage.
+
+      Create (Harness_Dir.all
+              & Data.Test_Unit_Full_Name.all
+              & Directory_Separator
+              & "units.list");
+      S_Put (0, Source_Project_Tree.Info (Create (+UUT)).Unit_Name);
+      Close_File;
 
       Decrease_Indent (Me, "done");
    end Generate_Test_Drivers;
@@ -2995,6 +3030,22 @@ package body Test.Harness is
       return Trim (Natural'Image (Infix), Both) & "_";
    end Get_Next_Infix;
 
+   ------------------
+   -- Path_To_Unix --
+   ------------------
+
+   function Path_To_Unix (S : String) return String is
+      S1 : String := (S);
+   begin
+      for I in S1'Range loop
+         if S1 (I) = '\' then
+            S1 (I) := '/';
+         end if;
+      end loop;
+
+      return S1;
+   end Path_To_Unix;
+
    -----------------------------------
    -- Generate_Common_Harness_Files --
    -----------------------------------
@@ -3004,9 +3055,6 @@ package body Test.Harness is
 
       procedure Generate_Aggregate_Project;
       --  Create aggregate project that incorparates all test driver projects.
-
-      function Path_To_Unix (S : String) return String;
-      --  Replace all "\" with "/".
 
       procedure Generate_Aggregate_Project is
       begin
@@ -3098,22 +3146,205 @@ package body Test.Harness is
          Close_File;
       end Generate_Aggregate_Project;
 
-      function Path_To_Unix (S : String) return String is
-         S1 : String := (S);
-      begin
-         for I in S1'Range loop
-            if S1 (I) = '\' then
-               S1 (I) := '/';
-            end if;
-         end loop;
-
-         return S1;
-      end Path_To_Unix;
-
    begin
       Generate_Gnattest_Common_Prj;
 
-      --  Makefile
+      --  suppress.adc & suppress_no_ghost.adc
+      Generate_Global_Config_Pragmas_File;
+
+      --  Executable list
+      Create (Harness_Dir.all & "test_drivers.list");
+
+      declare
+         Exe_Suffix : String_Access := Get_Target_Executable_Suffix;
+      begin
+         for
+           K in Separate_Projects.First_Index .. Separate_Projects.Last_Index
+         loop
+            P := Separate_Projects.Element (K);
+
+            S_Put
+              (0,
+               Dir_Name (P.Path_TD.all)
+               & Base_Name (P.Main_File_Name.all, ".adb")
+               & Exe_Suffix.all);
+            Put_New_Line;
+         end loop;
+
+         Free (Exe_Suffix);
+      end;
+
+      Close_File;
+
+      Generate_Aggregate_Project;
+   end Generate_Common_Harness_Files;
+
+   -----------------------
+   -- Generate_Makefile --
+   -----------------------
+
+   procedure Generate_Makefile (Source_Prj : String) is
+      P : Separate_Project_Info;
+
+      Root_Prj           : constant Project_Type :=
+        Source_Project_Tree.Root_Project;
+      Switches_Attribute : constant Attribute_Pkg_List :=
+        Build ("Coverage", "Switches");
+      Board_Attribute    : constant Attribute_Pkg_String :=
+        Build ("Emulator", "Board");
+      --  Root project and switches of interest for coverage purposes
+
+      Target_Driver : constant String :=
+        Base_Name (Root_Prj.Attribute_Value
+                   (Compiler_Driver_Attribute, Index => "ada"),
+                   Suffix => (if Dir_Separator = '\' then ".exe" else ""));
+
+      Target_Native : constant Boolean := Target_Driver = "gcc";
+
+      Target : constant String :=
+        (if Root_Prj.Has_Attribute (Target_Attribute)
+         then Root_Prj.Attribute_Value (Target_Attribute)
+         else "");
+
+      Switches : GNAT.Strings.String_List_Access;
+
+      Switches_From_Prj     : Boolean := False;
+      Switches_From_Default : Boolean := False;
+      --  Used to keep track of the origin of the gnatcov switches (from
+      --  project or default switches) and to warn of any possible
+      --  incompatibility.
+
+   begin
+
+      --  Generate coverage setting makefile if it doesn't already exists
+
+      if not File_Exists (Harness_Dir.all & "coverage_settings.mk") then
+         Create (Harness_Dir.all & "coverage_settings.mk");
+         S_Put (0, "# Settings in this file were extracted from the source"
+                & " project");
+         Put_New_Line;
+         S_Put (0, "# or are gnattest default values if they weren't specified"
+                & " in the source project.");
+         Put_New_Line;
+         S_Put (0, "# They may need adjustments to fit your particular"
+                & " coverage needs.");
+         Put_New_Line;
+         S_Put (0, "# This file won't be overwritten when regenerating the"
+                & " harness.");
+         Put_New_Line;
+         Put_New_Line;
+
+         S_Put (0, "# Switches for the various gnatcov commands");
+         Put_New_Line;
+
+         --  Instrument switches
+
+         if Root_Prj.Has_Attribute (Switches_Attribute, Index => "instrument")
+         then
+            Switches := Root_Prj.Attribute_Value
+              (Switches_Attribute, Index => "instrument");
+            S_Put (0, "SWITCHES_INSTRUMENT=");
+            for Switch of Switches.all loop
+               S_Put (0, Switch.all & ' ');
+            end loop;
+            GNAT.Strings.Free (Switches);
+            Switches_From_Prj := True;
+         else
+            S_Put (0, "# The instrument switches are default ones, they may"
+                   & " need to be adjusted to fit your coverage needs.");
+            Put_New_Line;
+            S_Put (0, "SWITCHES_INSTRUMENT=-cstmt --dump-trigger=atexit");
+            Switches_From_Default := True;
+         end if;
+         Put_New_Line;
+         Put_New_Line;
+
+         --  Run switches
+
+         if Root_Prj.Has_Attribute (Switches_Attribute, Index => "run")
+         then
+            Switches := Root_Prj.Attribute_Value
+              (Switches_Attribute, Index => "run");
+            S_Put (0, "SWITCHES_RUN=");
+            for Switch of Switches.all loop
+               S_Put (0, Switch.all & ' ');
+            end loop;
+            GNAT.Strings.Free (Switches);
+            Switches_From_Prj := True;
+         else
+            S_Put (0, "# The run switches are default ones, they may"
+                   & " need to be adjusted to fit your coverage needs.");
+            Put_New_Line;
+            S_Put (0, "SWITCHES_RUN=-cstmt");
+            Switches_From_Default := True;
+         end if;
+         Put_New_Line;
+         Put_New_Line;
+
+         --  Coverage switches
+
+         if Root_Prj.Has_Attribute (Switches_Attribute, Index => "coverage")
+         then
+            Switches := Root_Prj.Attribute_Value
+              (Switches_Attribute, Index => "coverage");
+            S_Put (0, "SWITCHES_COVERAGE=");
+            for Switch of Switches.all loop
+               S_Put (0, Switch.all & ' ');
+            end loop;
+            GNAT.Strings.Free (Switches);
+            Switches_From_Prj := True;
+         else
+            S_Put (0, "# The coverage switches are default ones, they may"
+                   & " need to be adjusted to fit your coverage needs.");
+            Put_New_Line;
+            S_Put (0, "SWITCHES_COVERAGE=-cstmt -adhtml "
+                   & "--output-dir=dhtml-report");
+            Switches_From_Default := True;
+         end if;
+         Put_New_Line;
+         Put_New_Line;
+
+         --  If there are both switches from the project file and "default"
+         --  switches in the makefile, warn the user that there may be
+         --  incompatibilities.
+
+         if Switches_From_Default and then Switches_From_Prj then
+            S_Put (0, "$(warning Some of the switches defined for the various"
+                   & "  gnatcov commands come from the source project while"
+                   & " others are gnattest default. There may be "
+                   & " incompatibilities.)");
+            Put_New_Line;
+            Put_New_Line;
+         end if;
+
+         --  Cross-config specific options
+
+         if not Target_Native then
+            Put_New_Line;
+            S_Put (0, "# Target and RTS for cross build");
+            Put_New_Line;
+            S_Put (0, "TARGET=" & Target);
+            Put_New_Line;
+            if RTS_Attribute_Val /= null then
+               S_Put (0, "RTSFLAG=--RTS=" & RTS_Attribute_Val.all);
+            end if;
+            Put_New_Line;
+            if Root_Prj.Has_Attribute (Board_Attribute) then
+               S_Put (0, "GNATEMU_BOARD="
+                      & Root_Prj.Attribute_Value (Board_Attribute));
+            else
+               S_Put (0, "# Couldn't determine board from project file");
+               Put_New_Line;
+               S_Put (0, "# GNATEMU_BOARD=...");
+            end if;
+            Put_New_Line;
+         end if;
+         Close_File;
+
+      end if;
+
+      --  Generate actual Makefile no matter what
+
       Create (Harness_Dir.all & "Makefile");
       S_Put (0, "# Check if we are running on Windows");
       Put_New_Line;
@@ -3164,42 +3395,55 @@ package body Test.Harness is
       S_Put (0, "GPRFLAGS=");
       Put_New_Line;
       Put_New_Line;
+
       S_Put (0, "# List of projects to build");
       Put_New_Line;
-      S_Put (0, "PRJS = \");
-      Put_New_Line;
 
-      for
-        K in Separate_Projects.First_Index .. Separate_Projects.Last_Index
-      loop
-         P := Separate_Projects.Element (K);
-         declare
-            Rel_Pth : constant Filesystem_String :=
-              Relative_Path
-                (Create (+P.Path_TD.all),
-                 Create (+Harness_Dir.all));
-            Pth : constant String :=
-              (if Driver_Per_Unit then +Dir_Name (Rel_Pth) else +Rel_Pth);
-         begin
-            S_Put
-                (0,
-                 ASCII.HT
-                 & Path_To_Unix (Pth)
-                 & (if K = Separate_Projects.Last_Index then "" else " \"));
-         end;
+      if Separate_Drivers or else Stub_Mode_ON then
+         S_Put (0, "PRJS = \");
          Put_New_Line;
-      end loop;
+         for
+           K in Separate_Projects.First_Index .. Separate_Projects.Last_Index
+         loop
+            P := Separate_Projects.Element (K);
+            declare
+               Rel_Pth : constant String :=
+                 +Relative_Path
+                 (Create (+P.Path_TD.all),
+                  Create (+Harness_Dir.all));
+
+               Pth : constant String :=
+                 Rel_Pth (Rel_Pth'First .. Rel_Pth'Last - 4);
+               --  Remove the .gpr file extension
+            begin
+               S_Put
+                 (0,
+                  ASCII.HT
+                  & Path_To_Unix (Pth)
+                  & (if K = Separate_Projects.Last_Index then "" else " \"));
+            end;
+            Put_New_Line;
+         end loop;
+
+      else
+         S_Put (0, "PRJS=test_driver");
+      end if;
 
       Put_New_Line;
       S_Put (0, "CKPTS = $(patsubst %,%-gnatcov-cov-inst,$(PRJS))");
       Put_New_Line;
       S_Put (0, "BIN_CKPTS = $(patsubst %,%-gnatcov-cov,$(PRJS))");
       Put_New_Line;
-      S_Put (0, "GNATCOV_LEVEL=stmt+decision");
       Put_New_Line;
-      S_Put (0, "GNATCOV_OUTPUT_FMT=dhtml --output-dir=dhtml-report");
+      S_Put (0, "# Settings for coverage commands, these will not be"
+             & " overwritten when regenerating the harness");
+      Put_New_Line;
+      S_Put (0, "include coverage_settings.mk");
       Put_New_Line;
       Put_New_Line;
+
+      --  Simple build, no coverage
+
       S_Put (0, ".PHONY: all");
       Put_New_Line;
       Put_New_Line;
@@ -3208,11 +3452,7 @@ package body Test.Harness is
       Put_New_Line;
       Put_New_Line;
 
-      if Driver_Per_Unit then
-         S_Put (0, "%-build: %/test_driver.gpr");
-      else
-         S_Put (0, "%-build: %");
-      end if;
+      S_Put (0, "%-build: %.gpr");
       Put_New_Line;
       S_Put
         (0,
@@ -3221,181 +3461,310 @@ package body Test.Harness is
       Put_New_Line;
       Put_New_Line;
 
-      if Driver_Per_Unit then
+      --  In most cases, the difference between a native coverage analysis and
+      --  a cross coverage analysis is only a few option on the command line.
+      --  In order to avoid duplication in the Makefile rules, the specific
+      --  options for cross-analysis will be set using target-specific
+      --  Variable values.
 
-         --  Non-instrumented
+      --  Non-Instrumented
+      --  Build
 
-         S_Put (0, "%-build-cov: %/test_driver.gpr");
+      S_Put (0, "# Bin-trace coverage rules:");
+      Put_New_Line;
+      S_Put (0, "%-build-cov: %.gpr");
+      Put_New_Line;
+      S_Put (0, ASCII.HT & "@echo -e '\n'Building $*.gpr:");
+      Put_New_Line;
+      S_Put
+        (0,
+         ASCII.HT
+         & "$(GPRBUILD) $(BUILDERFLAGS) -P$< $(GPRFLAGS)"
+         & " -o $(notdir $*)$(EXE_EXT) -gargs -j$(NUMPROC) -cargs -g"
+         & " -fdump-scos -fpreserve-control-flow");
+      Put_New_Line;
+      Put_New_Line;
+
+      --  Run
+
+      S_Put (0, "%-gnatcov-run: %-build-cov");
+      Put_New_Line;
+      S_Put (0, ASCII.HT & "@echo -e '\n'Running $*.gpr:");
+      Put_New_Line;
+      S_Put
+        (0,
+         ASCII.HT
+         & "$(GNATCOV) run -P$*.gpr $(SWITCHES_RUN) $(GPRFLAGS)"
+         & " -o $*-gnattest.trace --projects="
+         & Source_Project_Tree.Root_Project.Name);
+      if Stub_Mode_ON or else Separate_Drivers then
+         S_Put (0, " --units=@$(dir $*)units.list");
+      end if;
+      S_Put (0, " $*$(EXE_EXT)");
+      Put_New_Line;
+      Put_New_Line;
+
+      --  Checkpoint-creation
+
+      S_Put (0, "%-gnatcov-cov: %-gnatcov-run");
+      Put_New_Line;
+      S_Put (0, ASCII.HT & "@echo -e '\n'Creating checkpoint for $*.gpr:");
+      Put_New_Line;
+      S_Put
+        (0,
+         ASCII.HT
+         & "$(GNATCOV) coverage --save-checkpoint=$*-gnattest.ckpt"
+         & " --projects=" & Source_Project_Tree.Root_Project.Name
+         & " -P$*.gpr $(GPRFLAGS) $(SWITCHES_COVERAGE) $*-gnattest.trace");
+      if Separate_Drivers or else Stub_Mode_ON then
+         S_Put (0, " --units=@$(dir $*)units.list");
+      end if;
+      Put_New_Line;
+      Put_New_Line;
+
+      --  Consolidation and report
+
+      S_Put (0, "bin-gnatcov-consolidate: $(BIN_CKPTS)");
+      Put_New_Line;
+      S_Put (0, ASCII.HT & "@echo -e '\n'Creating coverage report:");
+      Put_New_Line;
+      declare
+         Pth : constant String :=
+           +Relative_Path
+           (Create (+Source_Prj),
+            Create (+Harness_Dir.all));
+      begin
+         S_Put
+           (0,
+            ASCII.HT
+            & "$(GNATCOV) coverage -P"
+            & Path_To_Unix (Pth)
+            & " $(patsubst %,-C"
+            & " %-gnattest.ckpt,$(PRJS)) $(SWITCHES_COVERAGE)");
+      end;
+      Put_New_Line;
+      Put_New_Line;
+
+      --  Instrumented
+      --  Instrument
+
+      S_Put (0, "# src-trace coverage rules");
+      Put_New_Line;
+      S_Put (0, "%-gnatcov-inst: %.gpr");
+      Put_New_Line;
+      S_Put (0, ASCII.HT & "@echo -e '\n'Instrumenting project $*.gpr:");
+      Put_New_Line;
+      S_Put
+        (0,
+         ASCII.HT
+         & "$(GNATCOV) instrument -P$< $(SWITCHES_INSTRUMENT) $(GPRFLAGS)"
+         & " --projects=" & Source_Project_Tree.Root_Project.Name);
+      if Separate_Drivers or else Stub_Mode_ON then
+         S_Put (0, " --units=@$(dir $*)units.list");
+      end if;
+      Put_New_Line;
+      Put_New_Line;
+
+      --  Build
+
+      S_Put (0, "%-cov-build: %-gnatcov-inst");
+      Put_New_Line;
+      S_Put (0, ASCII.HT & "@echo -e '\n'Building $*.gpr:");
+      Put_New_Line;
+      S_Put
+        (0,
+         ASCII.HT
+         & "$(GPRBUILD) $(BUILDERFLAGS) -P$*.gpr $(GPRFLAGS)"
+         & " -o $(notdir $*)$(EXE_EXT) --src-subdirs=gnatcov-instr "
+         & (if Target_Native then "--implicit-with=gnatcov_rts_full" else ""));
+      Put_New_Line;
+      Put_New_Line;
+
+      --  Run
+
+      S_Put (0, "%-inst-run: %-cov-build");
+      Put_New_Line;
+      S_Put (0, ASCII.HT & "@echo -e '\n'Running $*.gpr:");
+      Put_New_Line;
+
+      --  The logic here is a bit tricky: the commands to run an instrumented
+      --  program are significantly different on a native target and on a cross
+      --  target, but having separate targets for the run step would imply to
+      --  also have separate rules for the coverage and report steps, which are
+      --  the same command regardless of the target.
+      --
+      --  To avoid duplicating all the instrumented targets I try to only have
+      --  a single rule for running the program. It is a bit more complicated,
+      --  given that for cross configs, this requires two commands whereas only
+      --  one is needed for native configs.
+
+      --  Cross, first command, run intrumented program on gnatemu
+
+      if not Target_Native then
+         S_Put (0, ASCII.HT & "$(if $(run_cross), \");
          Put_New_Line;
          S_Put
            (0,
             ASCII.HT
-            & "$(GPRBUILD) $(BUILDERFLAGS) -P$< $(GPRFLAGS) -gargs "
-            & "-j$(NUMPROC) -cargs -g -fdump-scos -fpreserve-control-flow");
+            & "$(TARGET)-gnatemu "
+            & "--serial=file:$*-gnattest_td.b64trace "
+            & "$(if $(GNATEMU_BOARD), --board=$(GNATEMU_BOARD),) "
+            & "$*$(EXE_EXT), \");
          Put_New_Line;
-         Put_New_Line;
+      end if;
 
-         S_Put (0, "%-gnatcov-run: %-build-cov");
+      --  Native, first (and only) command, run the instrumented program
+
+      S_Put
+        (0,
+         ASCII.HT
+         & "GNATCOV_TRACE_FILE=$*-gnattest_td.srctrace $*$(EXE_EXT)");
+
+      --  Cross, second command, convert base64 trace into regular trace
+
+      if not Target_Native then
+         S_Put (0, ")");
          Put_New_Line;
+         S_Put (0, ASCII.HT & "$(if $(run_cross), ");
          S_Put
            (0,
             ASCII.HT
-            & "$(GNATCOV) run --level=$(GNATCOV_LEVEL) -P$*/test_driver.gpr "
-            & " $*/*-test_runner$(EXE_EXT) -o $*-gnattest.trace");
-         Put_New_Line;
-         Put_New_Line;
+            & "$(GNATCOV) extract-base64-trace $*-gnattest_td.b64trace "
+            & "$*-gnattest_td.srctrace)");
+      end if;
 
-         S_Put (0, "%-gnatcov-cov: %-gnatcov-run");
-         Put_New_Line;
+      Put_New_Line;
+      Put_New_Line;
+
+      --  Checkpoint creation
+
+      S_Put (0, "%-gnatcov-cov-inst: %-inst-run");
+      Put_New_Line;
+      S_Put (0, ASCII.HT & "@echo -e '\n'Creating checkpoint for $*.gpr:");
+      Put_New_Line;
+      S_Put
+        (0,
+         ASCII.HT
+         & "$(GNATCOV) coverage --save-checkpoint=$*-gnattest.ckpt"
+         & " -P$*.gpr $(GPRFLAGS) $(SWITCHES_COVERAGE)"
+         & " --projects=" & Source_Project_Tree.Root_Project.Name
+         & " $*-gnattest_td.srctrace");
+      if Separate_Drivers or else Stub_Mode_ON then
+         S_Put (0, " --units=@$(dir $*)units.list");
+      end if;
+      Put_New_Line;
+      Put_New_Line;
+
+      --  Consolidation and report
+
+      S_Put (0, "gnatcov-consolidate: $(CKPTS)");
+      Put_New_Line;
+      S_Put (0, ASCII.HT & "@echo -e '\n'Creating coverage report:");
+      Put_New_Line;
+      declare
+         Pth : constant String :=
+           +Relative_Path
+           (Create (+Source_Prj),
+            Create (+Harness_Dir.all));
+      begin
          S_Put
            (0,
             ASCII.HT
-            & "$(GNATCOV) coverage --save-checkpoint=$*-gnattest.ckpt "
-            & "--level=$(GNATCOV_LEVEL) "
-            & "-P$*/test_driver.gpr $*-gnattest.trace");
-         Put_New_Line;
-         Put_New_Line;
+            & "$(GNATCOV) coverage -P"
+            & Path_To_Unix (Pth)
+            & " $(patsubst %,-C"
+            & "%-gnattest.ckpt,$(PRJS)) $(SWITCHES_COVERAGE)");
+      end;
+      Put_New_Line;
+      Put_New_Line;
 
-         S_Put (0, "bin-gnatcov-consolidate: $(BIN_CKPTS)");
-         Put_New_Line;
-         declare
-            Pth : constant String :=
-              +Relative_Path
-              (Create (+Source_Prj),
-               Create (+Harness_Dir.all));
-         begin
-            S_Put
-              (0,
-               ASCII.HT
-               & "$(GNATCOV) coverage -P"
-               & Path_To_Unix (Pth)
-               & " $(patsubst %,-C "
-               & "%-gnattest.ckpt,$(PRJS)) -a $(GNATCOV_OUTPUT_FMT) "
-               & "--level=$(GNATCOV_LEVEL)");
-         end;
-         Put_New_Line;
-         Put_New_Line;
+      S_Put (0, "bin-coverage: bin-gnatcov-consolidate");
+      Put_New_Line;
+      Put_New_Line;
 
-         S_Put (0, "bin-coverage: bin-gnatcov-consolidate");
+      if not Target_Native then
+         S_Put (0, "# Specific settings for non-instrumented cross runs");
+         Put_New_Line;
+         S_Put (0, "bin-coverage-cross: BUILDERFLAGS+=--target=$(TARGET)"
+                & " $(RTSFLAG)");
+         Put_New_Line;
+         S_Put (0, "bin-coverage-cross: SWITCHES_RUN+="
+                & "--target=$(TARGET),$(GNATEMU_BOARD) $(RTSFLAG)");
+         Put_New_Line;
+         S_Put (0, "bin-coverage-cross: SWITCHES_COVERAGE+="
+                & "--target=$(TARGET) $(RTSFLAG)");
+         Put_New_Line;
+         S_Put (0, "bin-coverage-cross: bin-gnatcov-consolidate");
          Put_New_Line;
          Put_New_Line;
+      end if;
 
-         --  Instrumented
-
-         S_Put (0, "%-gnatcov-inst: %/test_driver.gpr");
-         Put_New_Line;
-         S_Put
-           (0,
-            ASCII.HT
-            & "$(GNATCOV) instrument --level=$(GNATCOV_LEVEL) "
-            & "-P$*test_driver.gpr --dump-trigger=atexit");
-         Put_New_Line;
-         Put_New_Line;
-
-         S_Put (0, "%-cov-build: %-gnatcov-inst");
-         Put_New_Line;
-         S_Put
-           (0,
-            ASCII.HT
-            & "$(GPRBUILD) $(BUILDERFLAGS) -P$*test_driver.gpr "
-            & "--src-subdirs=gnatcov-instr --implicit-with=gnatcov_rts_full");
-         Put_New_Line;
-         Put_New_Line;
-
-         S_Put (0, "%-inst-run: %-cov-build");
-         Put_New_Line;
-         S_Put
-           (0,
-            ASCII.HT
-            & "GNATCOV_TRACE_FILE=$*gnattest_td.srctrace "
-            & "$**-test_runner$(EXE_EXT)");
-         Put_New_Line;
-         Put_New_Line;
-
-         S_Put (0, "%-gnatcov-cov-inst: %-inst-run");
-         Put_New_Line;
-         S_Put
-           (0,
-            ASCII.HT
-            & "$(GNATCOV) coverage --save-checkpoint=$*-gnattest.ckpt "
-            & "--level=$(GNATCOV_LEVEL) -P$*/test_driver.gpr "
-            & "$*gnattest_td.srctrace");
-         Put_New_Line;
-         Put_New_Line;
-
-         S_Put (0, "gnatcov-consolidate: $(CKPTS)");
-         Put_New_Line;
-         declare
-            Pth : constant String :=
-              +Relative_Path
-              (Create (+Source_Prj),
-               Create (+Harness_Dir.all));
-         begin
-            S_Put
-              (0,
-               ASCII.HT
-               & "$(GNATCOV) coverage -P"
-               & Path_To_Unix (Pth)
-               & " $(patsubst %,-C "
-               & "%-gnattest.ckpt,$(PRJS)) -a $(GNATCOV_OUTPUT_FMT) "
-               & "--level=$(GNATCOV_LEVEL)");
-         end;
-         Put_New_Line;
-         Put_New_Line;
-
+      if Target_Native then
          S_Put (0, "coverage: gnatcov-consolidate");
+      else
+         S_Put (0, "inst-coverage: BUILDERFLAGS+="
+                & "--implicit-with=gnatcov_rts_full");
          Put_New_Line;
-         Put_New_Line;
+         S_Put (0, "inst-coverage: gnatcov-consolidate");
+      end if;
+      Put_New_Line;
+      Put_New_Line;
 
+      if not Target_Native then
+         S_Put (0, "# Specific settings for intrumented cross runs");
+         Put_New_Line;
+         S_Put (0, "inst-coverage-cross: SWITCHES_INSTRUMENT+="
+                & "--dump-trigger=main-end --dump-channel=base64-stdout "
+                & "--target=$(TARGET) $(RTSFLAG)");
+         Put_New_Line;
+         S_Put (0, "inst-coverage-cross: BUILDERFLAGS+="
+                & "--target=$(TARGET) $(RTSFLAG)"
+                & " --implicit-with=gnatcov_rts");
+         Put_New_Line;
+         S_Put (0, "inst-coverage-cross: run_cross=cross");
+         Put_New_Line;
+         S_Put (0, "inst-coverage-cross: SWITCHES_COVERAGE+="
+                & "--target=$(TARGET) $(RTSFLAG)");
+         Put_New_Line;
+         S_Put (0, "inst-coverage-cross: gnatcov-consolidate");
+         Put_New_Line;
+         Put_New_Line;
+         S_Put (0, "coverage: bin-coverage-cross");
+         Put_New_Line;
+         Put_New_Line;
       end if;
 
       S_Put (0, "clean: $(patsubst %,%-clean,$(PRJS))");
       Put_New_Line;
       Put_New_Line;
 
-      if Driver_Per_Unit then
-         S_Put (0, "%-clean: %/test_driver.gpr");
-      else
-         S_Put (0, "%-clean: %");
-      end if;
+      S_Put (0, "%-clean: %.gpr");
       Put_New_Line;
       S_Put
         (0,
          ASCII.HT
          & "$(GPRCLEAN) $(BUILDERFLAGS) -P$<");
       Put_New_Line;
+      S_Put (0,
+             ASCII.HT
+             & "rm -f $(dir $*)*.trace");
+      Put_New_Line;
+      S_Put (0,
+             ASCII.HT
+             & "rm -f $(dir $*)*.srctrace");
+      Put_New_Line;
+      S_Put (0,
+             ASCII.HT
+             & "rm -f $(dir $*)*.b64trace");
+      Put_New_Line;
+      S_Put (0,
+             ASCII.HT
+             & "rm -f $(dir $*)*.ckpt");
+      Put_New_Line;
 
       Close_File;
 
-      --  suppress.adc & suppress_no_ghost.adc
-      Generate_Global_Config_Pragmas_File;
-
-      --  Executable list
-      Create (Harness_Dir.all & "test_drivers.list");
-
-      declare
-         Exe_Suffix : String_Access := Get_Target_Executable_Suffix;
-      begin
-         for
-           K in Separate_Projects.First_Index .. Separate_Projects.Last_Index
-         loop
-            P := Separate_Projects.Element (K);
-
-            S_Put
-              (0,
-               Dir_Name (P.Path_TD.all)
-               & Base_Name (P.Main_File_Name.all, ".adb")
-               & Exe_Suffix.all);
-            Put_New_Line;
-         end loop;
-
-         Free (Exe_Suffix);
-      end;
-
-      Close_File;
-
-      Generate_Aggregate_Project;
-   end Generate_Common_Harness_Files;
+   end Generate_Makefile;
 
    --------------------
    -- Process_Source --
