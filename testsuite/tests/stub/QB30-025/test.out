@@ -1,6 +1,6 @@
-p-q.adb:5:33: warning: Q unimplemented
-p-r.adb:5:33: warning: R unimplemented
-p-s.adb:5:33: warning: S unimplemented
+p-q.adb:5:33: warning: Q unimplemented [enabled by default]
+p-r.adb:5:33: warning: R unimplemented [enabled by default]
+p-s.adb:5:33: warning: S unimplemented [enabled by default]
 
 raised PROGRAM_ERROR : Unimplemented procedure Q
 >>>program returned status code 1

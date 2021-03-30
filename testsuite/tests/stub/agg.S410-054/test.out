@@ -168,11 +168,11 @@ package body DD is
    end Something_Else;
 
 end DD;
-c.adb:11:10: warning: Do_Something unimplemented
-c.adb:23:10: warning: Something_Else unimplemented
-cc.adb:11:10: warning: Do_Something unimplemented
-cc.adb:23:10: warning: Something_Else unimplemented
-d.adb:11:10: warning: Do_Something unimplemented
-d.adb:24:10: warning: Something_Else unimplemented
-dd.adb:11:10: warning: Do_Something unimplemented
-dd.adb:24:10: warning: Something_Else unimplemented
+c.adb:11:10: warning: Do_Something unimplemented [enabled by default]
+c.adb:23:10: warning: Something_Else unimplemented [enabled by default]
+cc.adb:11:10: warning: Do_Something unimplemented [enabled by default]
+cc.adb:23:10: warning: Something_Else unimplemented [enabled by default]
+d.adb:11:10: warning: Do_Something unimplemented [enabled by default]
+d.adb:24:10: warning: Something_Else unimplemented [enabled by default]
+dd.adb:11:10: warning: Do_Something unimplemented [enabled by default]
+dd.adb:24:10: warning: Something_Else unimplemented [enabled by default]
