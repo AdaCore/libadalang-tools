@@ -1,30 +1,28 @@
 ------------------------------------------------------------------------------
 --                                                                          --
---                  COMMON ASIS TOOLS COMPONENTS LIBRARY                    --
+--                             Libadalang Tools                             --
 --                                                                          --
---                  A S I S _ U L . E N V I R O N M E N T                   --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
---                                 S p e c                                  --
+-- Libadalang Tools  is free software; you can redistribute it and/or modi- --
+-- fy  it  under  terms of the  GNU General Public License  as published by --
+-- the Free Software Foundation;  either version 3, or (at your option) any --
+-- later version. This software  is distributed in the hope that it will be --
+-- useful but  WITHOUT  ANY  WARRANTY; without even the implied warranty of --
+-- MERCHANTABILITY  or  FITNESS  FOR A PARTICULAR PURPOSE.                  --
 --                                                                          --
---                    Copyright (C) 2004-2017, AdaCore                      --
+-- As a special  exception  under  Section 7  of  GPL  version 3,  you are  --
+-- granted additional  permissions described in the  GCC  Runtime  Library  --
+-- Exception, version 3.1, as published by the Free Software Foundation.    --
 --                                                                          --
--- Asis Utility Library (ASIS UL) is free software; you can redistribute it --
--- and/or  modify  it  under  terms  of  the  GNU General Public License as --
--- published by the Free Software Foundation; either version 3, or (at your --
--- option)  any later version.  ASIS UL  is distributed in the hope that it --
--- will  be  useful,  but  WITHOUT  ANY  WARRANTY; without even the implied --
--- warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the --
--- GNU  General Public License for more details. You should have received a --
--- copy of the  GNU General Public License  distributed with GNAT; see file --
--- COPYING3. If not,  go to http://www.gnu.org/licenses for a complete copy --
--- of the license.                                                          --
---                                                                          --
--- ASIS UL is maintained by AdaCore (http://www.adacore.com).               --
---                                                                          --
+-- You should have received a copy of the GNU General Public License and a  --
+-- copy of the GCC Runtime Library Exception along with this program;  see  --
+-- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
+-- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
 --  This package contains routines for creating, maintaining and cleaning up
---  the working environment for an ASIS tool
+--  the working environment for the tool
 
 with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 with GNAT.OS_Lib;               use GNAT.OS_Lib;

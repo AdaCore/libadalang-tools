@@ -1,26 +1,24 @@
 ------------------------------------------------------------------------------
 --                                                                          --
---                           GNATTEST COMPONENTS                            --
+--                             Libadalang Tools                             --
 --                                                                          --
---                     G N A T T E S T . M A P P I N G                      --
+--                      Copyright (C) 2015-2021, AdaCore                    --
 --                                                                          --
---                                 S p e c                                  --
+-- Libadalang Tools  is free software; you can redistribute it and/or modi- --
+-- fy  it  under  terms of the  GNU General Public License  as published by --
+-- the Free Software Foundation;  either version 3, or (at your option) any --
+-- later version. This software  is distributed in the hope that it will be --
+-- useful but  WITHOUT  ANY  WARRANTY; without even the implied warranty of --
+-- MERCHANTABILITY  or  FITNESS  FOR A PARTICULAR PURPOSE.                  --
 --                                                                          --
---                     Copyright (C) 2015-2019, AdaCore                     --
+-- As a special  exception  under  Section 7  of  GPL  version 3,  you are  --
+-- granted additional  permissions described in the  GCC  Runtime  Library  --
+-- Exception, version 3.1, as published by the Free Software Foundation.    --
 --                                                                          --
--- GNATTEST  is  free  software;  you  can redistribute it and/or modify it --
--- under terms of the  GNU  General Public License as published by the Free --
--- Software  Foundation;  either  version  2, or (at your option) any later --
--- version.  GNATTEST  is  distributed  in the hope that it will be useful, --
--- but  WITHOUT  ANY  WARRANTY;   without  even  the  implied  warranty  of --
--- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General --
--- Public License for more details.  You should have received a copy of the --
--- GNU  General  Public License distributed with GNAT; see file COPYING. If --
--- not, write to the  Free  Software  Foundation, 51 Franklin Street, Fifth --
--- Floor, Boston, MA 02110-1301, USA.,                                      --
---                                                                          --
--- GNATTEST is maintained by AdaCore (http://www.adacore.com).              --
---                                                                          --
+-- You should have received a copy of the GNU General Public License and a  --
+-- copy of the GCC Runtime Library Exception along with this program;  see  --
+-- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
+-- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
 pragma Ada_2012;
