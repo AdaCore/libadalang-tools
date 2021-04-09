@@ -3070,6 +3070,38 @@ package body Pp.Formatting is
                     (New_Tokns, False_End_Of_Line, "whole line extra");
                   --  This is needed because every comment in New_Tokns must
                   --  be followed by EOL_Token.
+
+               elsif Kind (Prev (New_Tok)) in Spaces
+                 and then Kind (Prev (Prev (New_Tok))) in Disabled_LB_Token
+                 and then Kind (Prev (Prev (Prev (New_Tok)))) in ','
+                 and then Kind (Next_ss (New_Tok)) in Tab_Token
+                 and then Kind (Next (Next_ss (New_Tok))) in Arrow
+                 and then not (Kind (Src_Tok) in True_End_Of_Line
+                               and then Kind (Prev (Src_Tok)) in
+                                 True_End_Of_Line)
+               then
+                  --  U329-016
+                  --  Avoid adding an empty line after a whole line comment
+                  --  betweeen two value assignments of enumerations, unless
+                  --  the whole line comment is itselft surrounded by empty
+                  --  lines.
+                  --
+                  --  ...
+                  --  literal_foo => literal_foo_value,
+                  --  --  Some comment (does not add a LB here)
+                  --  literal_bar => literal_bar_value,
+                  --  ...
+                  --
+                  --  ...
+                  --  literal_foo => literal_foo_value,
+                  --
+                  --  --  Some comment (but adds a LB here)
+                  --
+                  --  literal_bar => literal_bar_value,
+                  --  ...
+
+                  null;
+
                else
                   Cur_Indentation := Indentation;
                   Append_Temp_Line_Break
