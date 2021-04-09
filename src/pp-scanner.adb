@@ -1535,13 +1535,18 @@ package body Pp.Scanner is
                L : constant Tokn_Cursor := Last (Result'Unrestricted_Access);
                Outp : constant W_Str := To_W_Str (Text (L));
             begin
-               --  Can't assert for comments because block comments
+               --  Can't assert for comments because block comments.
+               --
+               --  When Tok.Kind is EOL_Token, also allow bare W_CR to avoid
+               --  an assertion failure. However, this might cause some
+               --  additional linebreaks to be added.
+
                pragma Assert
                  (case Tok.Kind is
                     when Comment_Kind => True,
                     when EOL_Token =>
                       Inp in (1 => W_LF) | (W_CR, W_LF)
-                        | (1 => W_FF) | (1 => W_VT)
+                        | (1 => W_FF) | (1 => W_VT) | (1 => W_CR)
                         and then Outp = (1 => NL),
                     when Reserved_Word => To_Lower (Inp) = Outp,
                     when others => Inp = Outp);

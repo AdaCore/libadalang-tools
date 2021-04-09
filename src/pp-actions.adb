@@ -5120,7 +5120,20 @@ package body Pp.Actions is
                   Move_Forward (Out_Buf);
 
                   while not At_End (Out_Buf) loop
-                     if Cur (Out_Buf) = NL then
+                     --  U409-028
+                     --  Only add a W_CR if there isn't already one before an
+                     --  LF.
+                     --
+                     --  ??? Future improvement:
+                     --  This is only happening on !pp off regions on files
+                     --  that have CRLF line breaks. Copy_Pp_Off_Regions
+                     --  procedure must be inserting those CR. Ideally, it
+                     --  shouldn't and the following if statement doesn't need
+                     --  to lookback for W_CR.
+
+                     if Cur (Out_Buf) = NL
+                       and then Lookback (Out_Buf) /= W_CR
+                     then
                         Append (Result, W_CR);
                      end if;
 
@@ -5183,7 +5196,9 @@ package body Pp.Actions is
                      end if;
 
                      for J in 1 .. NL_Count loop
-                        if Add_CR then
+                        --  U409-028: Same situation as above
+
+                        if Add_CR and then Lookback (Out_Buf) /= W_CR then
                            Append (Result, W_CR);
                         end if;
                         Append (Result, W_LF);
