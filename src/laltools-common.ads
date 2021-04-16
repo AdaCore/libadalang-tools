@@ -44,6 +44,10 @@ package Laltools.Common is
      (Left.Text < Right.Text
       or else (Left.Text = Right.Text
         and then Left.Full_Sloc_Image < Right.Full_Sloc_Image));
+   function "<" (Left, Right : Base_Id) return Boolean is
+     (Left.Text < Right.Text
+      or else (Left.Text = Right.Text
+        and then Left.Full_Sloc_Image < Right.Full_Sloc_Image));
    --  The Ordered_Maps is using the "<" in its Equivalent_Keys function:
    --  this is too basic and it will assume that Left.Text = Right.Text implies
    --  Left = Right which is wrong.
@@ -117,15 +121,16 @@ package Laltools.Common is
    type Param_Spec_Indices_Ranges_Type is
      array (Positive range <>) of Param_Spec_Indices_Range_Type;
 
-   package References_List is new Ada.Containers.Doubly_Linked_Lists
+   package References_Sets is new Ada.Containers.Ordered_Sets
      (Element_Type => Base_Id,
+      "<"          => "<",
       "="          => "=");
 
    package References_By_Subprogram is new Ada.Containers.Ordered_Maps
      (Key_Type     => Defining_Name,
-      Element_Type => References_List.List,
+      Element_Type => References_Sets.Set,
       "<"          => "<",
-      "="          => References_List."=");
+      "="          => References_Sets."=");
 
    package Source_Location_Range_Sets is new
      Ada.Containers.Ordered_Sets
