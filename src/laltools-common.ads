@@ -56,6 +56,11 @@ package Laltools.Common is
    --  Checks if L is < than R, first based on the line number and then on
    --  the column number
 
+   function "<" (Left, Right : Base_Id) return Boolean is
+     (Left.Text < Right.Text
+      or else Left.Sloc_Range < Right.Sloc_Range);
+   --  Use the Sloc to compare two Base_Id nodes when their text is equal.
+
    type Analysis_Unit_Array_Access is access Analysis_Unit_Array;
 
    package Ada_Node_List_Vectors is new Ada.Containers.Vectors
@@ -117,15 +122,16 @@ package Laltools.Common is
    type Param_Spec_Indices_Ranges_Type is
      array (Positive range <>) of Param_Spec_Indices_Range_Type;
 
-   package References_List is new Ada.Containers.Doubly_Linked_Lists
+   package References_Sets is new Ada.Containers.Ordered_Sets
      (Element_Type => Base_Id,
+      "<"          => "<",
       "="          => "=");
 
    package References_By_Subprogram is new Ada.Containers.Ordered_Maps
      (Key_Type     => Defining_Name,
-      Element_Type => References_List.List,
+      Element_Type => References_Sets.Set,
       "<"          => "<",
-      "="          => References_List."=");
+      "="          => References_Sets."=");
 
    package Source_Location_Range_Sets is new
      Ada.Containers.Ordered_Sets
