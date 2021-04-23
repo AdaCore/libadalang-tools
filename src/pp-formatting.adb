@@ -2827,6 +2827,9 @@ package body Pp.Formatting is
          --  we skip Syntax_LBI with Affects_Comments = False. In other
          --  words, this is the previous line-breaks indentation which should
          --  affect comments.
+         function Prev_Indentation_Affect_Comments return Boolean;
+         --  Will return True if the last line-breaks indentation affect
+         --  comments (i.e., Syntax_LBI Affects_Comments = False
          function After_Indentation return Natural;
          --  Same as "All_LB (Syntax_LBI (Cur_Line)).Indentation", except we
          --  skip Syntax_LBI with Affects_Comments = False. In other words,
@@ -2844,6 +2847,13 @@ package body Pp.Formatting is
             end loop;
             return All_LB (Syntax_LBI (X)).Indentation;
          end Before_Indentation;
+
+         function Prev_Indentation_Affect_Comments return Boolean is
+            X : constant Line_Break_Index_Index :=
+              (if Syntax_Cur_Line = 1 then 1 else Syntax_Cur_Line - 1);
+         begin
+            return (X > 1 and then All_LB (Syntax_LBI (X)).Affects_Comments);
+         end Prev_Indentation_Affect_Comments;
 
          function After_Indentation return Natural is
             X : Line_Break_Index_Index := Syntax_Cur_Line;
@@ -2931,6 +2941,9 @@ package body Pp.Formatting is
                end if;
             end Set_Cur_Indent;
 
+            function Next_Is_Action (Tok : Tokn_Cursor) return Boolean is
+               (Kind (Next (Tok)) in Res_Procedure | Res_Function);
+
             use Source_Message_Vectors;
 
             Other_Sloc : constant String := Sloc_Image (Sloc (Last_Pp_Off_On));
@@ -2986,7 +2999,22 @@ package body Pp.Formatting is
                Indentation := After_Indentation;
 
                if Look_Before then
-                  Indentation := Natural'Max (Indentation, Before_Indentation);
+
+                  --  If last lines-breaks indentation does not affect comments
+                  --  and if the previous line is a blank line and the following
+                  --  line is a subprogram declaration, the after indentation
+                  --  value is kept.
+
+                  if not Prev_Indentation_Affect_Comments and then
+                    Next_Is_Action (New_Tok) and then
+                    Is_Blank_Line (Prev_ss (Src_Tok))
+                  then
+                     null;
+                  else
+                     Indentation := Natural'Max (Indentation,
+                                                 Before_Indentation);
+                  end if;
+
                end if;
             end if;
 
