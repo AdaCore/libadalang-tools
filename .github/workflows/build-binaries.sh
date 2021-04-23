@@ -15,8 +15,10 @@ export LIBRARY_PATH=/usr/local/lib:/mingw64/lib
 export DYLD_LIBRARY_PATH=/usr/local/lib
 BRANCH=stable
 mkdir -p $prefix
-URL=https://bintray.com/reznikmm/libadalang/download_file\?file_path=libadalang-$RUNNER_OS-$BRANCH${DEBUG:+-dbg}-static.tar.gz
-curl -L $URL | tar xzf - -C $prefix
+FILE=libadalang-$RUNNER_OS-$BRANCH${DEBUG:+-dbg}-static.tar.gz
+aws s3 cp s3://adacore-gha-tray-eu-west-1/libadalang/$FILE . --sse=AES256
+tar xzf $FILE -C $prefix
+rm -f -v $FILE
 gprinstall --uninstall gnatcoll || true
 gprinstall --uninstall gpr || true
 

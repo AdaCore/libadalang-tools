@@ -1,6 +1,8 @@
 on:
   [push, pull_request]
 name: Check compilation
+env:
+  AWS_DEFAULT_REGION: eu-west-1
 jobs:
   build:
     name: Build
@@ -37,7 +39,13 @@ jobs:
       - name: Build (Windows)
         if: ${{ runner.os == 'Windows' }}
         shell: msys2 {0}
+        env:
+          AWS_ACCESS_KEY_ID: ${{secrets.GHA_CACHE_ACCESS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: ${{secrets.GHA_CACHE_SECRET}}
         run: .github/workflows/build-binaries.sh "${{ matrix.debug }}" ${{ runner.os }}
       - name: Build (non-Windows)
         if: ${{ runner.os != 'Windows' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{secrets.GHA_CACHE_ACCESS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: ${{secrets.GHA_CACHE_SECRET}}
         run: .github/workflows/build-binaries.sh "${{ matrix.debug }}" ${{ runner.os }}
