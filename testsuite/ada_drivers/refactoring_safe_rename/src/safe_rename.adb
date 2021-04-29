@@ -24,26 +24,26 @@
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with GNATCOLL.Opt_Parse;
-with GNATCOLL.VFS;
+with GNATCOLL.Opt_Parse; use GNATCOLL.Opt_Parse;
+with GNATCOLL.VFS; use GNATCOLL.VFS;
 
 with Langkit_Support.Slocs; use Langkit_Support.Slocs;
 with Langkit_Support.Text; use Langkit_Support.Text;
 
+with Laltools.Refactor.Safe_Rename; use Laltools.Refactor.Safe_Rename;
+
 with Libadalang.Analysis; use Libadalang.Analysis;
 with Libadalang.Helpers; use Libadalang.Helpers;
 
-with Laltools.Refactor.Rename; use Laltools.Refactor.Rename;
-
 with Printers; use Printers;
 
---  This procedure defines the Refactor Rename Tool. Given the location of
+--  This procedure defines the Refactor Safe Rename Tool. Given the location of
 --  an identifier in a source code file, and the project it belongs to, it
---  finds all references of the node's refereced declaration and checks
+--  finds all references of the node's referenced declaration and checks
 --  if the rename will cause an issue.
 
 --  Usage:
---  outgoing_calls -P <project_file> -S <source_code_file> -L <line_number>
+--  safe_rename -P <project_file> -S <source_code_file> -L <line_number>
 --  -R <column_number> -N <new_name> -A <algorithm>
 --
 --  -P, --project          Project file to use
@@ -54,35 +54,32 @@ with Printers; use Printers;
 --  -A, --algorithm        Algorithm used to check for rename conflicts:
 --                         'map_references' or 'analyse_ast'
 
-procedure Rename is
+procedure Safe_Rename is
 
-   Main_Unit : Analysis_Unit;
-   Node : Ada_Node;
-
-   procedure App_Setup
+   procedure Safe_Rename_App_Setup
      (Context : App_Context;
       Jobs : App_Job_Context_Array);
    --  This procedure is called right after command line options are parsed,
    --  the project is loaded (if present) and the list of files to process
    --  is computed.
 
-   package App is new Libadalang.Helpers.App
-     (Name             => "rename",
-      Description      => "Rename",
-      App_setup        => App_Setup);
+   package Safe_Rename_App is new Libadalang.Helpers.App
+     (Name             => "safe_rename",
+      Description      => "Safe_Rename",
+      App_setup        => Safe_Rename_App_Setup);
 
    package Source is new GNATCOLL.Opt_Parse.Parse_Option
-     (Parser      => App.Args.Parser,
+     (Parser      => Safe_Rename_App.Args.Parser,
       Short       => "-S",
       Long        => "--source",
       Help        => "Source code file of the node",
-      Arg_Type    => Ada.Strings.Unbounded.Unbounded_String,
-      Convert     => Ada.Strings.Unbounded.To_Unbounded_String,
-      Default_Val => Ada.Strings.Unbounded.Null_Unbounded_String,
+      Arg_Type    => Unbounded_String,
+      Convert     => To_Unbounded_String,
+      Default_Val => Null_Unbounded_String,
       Enabled     => True);
 
    package Line is new GNATCOLL.Opt_Parse.Parse_Option
-     (Parser      => App.Args.Parser,
+     (Parser      => Safe_Rename_App.Args.Parser,
       Short       => "-L",
       Long        => "--line",
       Help        => "Line of the node",
@@ -92,7 +89,7 @@ procedure Rename is
       Enabled     => True);
 
    package Column is new GNATCOLL.Opt_Parse.Parse_Option
-     (Parser      => App.Args.Parser,
+     (Parser      => Safe_Rename_App.Args.Parser,
       Short       => "-R",
       Long        => "--column",
       Help        => "Column of the node",
@@ -102,68 +99,69 @@ procedure Rename is
       Enabled     => True);
 
    package New_Name is new GNATCOLL.Opt_Parse.Parse_Option
-     (Parser      => App.Args.Parser,
+     (Parser      => Safe_Rename_App.Args.Parser,
       Short       => "-N",
       Long        => "--new-name",
       Help        => "New name",
-      Arg_Type    => Ada.Strings.Unbounded.Unbounded_String,
-      Convert     => Ada.Strings.Unbounded.To_Unbounded_String,
-      Default_Val => Ada.Strings.Unbounded.Null_Unbounded_String,
+      Arg_Type    => Unbounded_String,
+      Convert     => To_Unbounded_String,
+      Default_Val => Null_Unbounded_String,
       Enabled     => True);
 
    package Algorithm is new GNATCOLL.Opt_Parse.Parse_Option
-     (Parser      => App.Args.Parser,
+     (Parser      => Safe_Rename_App.Args.Parser,
       Long        => "--algorithm",
       Help        => "Algorithm used to check for rename conflicts: "
       & "'map_references' or 'analyse_ast'",
-      Arg_Type    => Ada.Strings.Unbounded.Unbounded_String,
-      Convert     => Ada.Strings.Unbounded.To_Unbounded_String,
-      Default_Val => Ada.Strings.Unbounded.To_Unbounded_String
+      Arg_Type    => Unbounded_String,
+      Convert     => To_Unbounded_String,
+      Default_Val => To_Unbounded_String
         ("map_references"),
       Enabled     => True);
 
-   ---------------
-   -- App_Setup --
-   ---------------
+   ---------------------------
+   -- Safe_Rename_App_Setup --
+   ---------------------------
 
-   procedure App_Setup
+   procedure Safe_Rename_App_Setup
      (Context : App_Context;
       Jobs : App_Job_Context_Array)
    is
-      Source_File : constant Unbounded_String :=
-        Source.Get;
+      Source_File : constant Unbounded_String := Source.Get;
+
       Sloc : constant Source_Location :=
-        (Line   => Line_Number (Line.Get),
-         Column => Column_Number (Column.Get));
+        (Line_Number (Line.Get), Column_Number (Column.Get));
+
       NN : constant Unbounded_String := New_Name.Get;
       Rename_Algorithm : constant Unbounded_String := Algorithm.Get;
 
       Files : constant GNATCOLL.VFS.File_Array_Access :=
         Context.Provider.Project.Root_Project.Source_Files;
 
+      Main_Unit       : Analysis_Unit;
+      Node            : Ada_Node;
       Number_Of_Units : constant Positive := Files'Length;
-
-      Idx : Positive := 1;
-
-      Units : Analysis_Unit_Array (1 .. Number_Of_Units);
+      Units_Index     : Positive := 1;
+      Units           : Analysis_Unit_Array (1 .. Number_Of_Units);
 
       References : Renamable_References;
 
-      use type Ada.Strings.Unbounded.Unbounded_String;
-
    begin
       Main_Unit := Jobs (1).Analysis_Ctx.Get_From_File
-        (Ada.Strings.Unbounded.To_String (Source_File));
+        (To_String (Source_File));
+
       Node := Main_Unit.Root.Lookup (Sloc);
 
       Put_Line ("# Renaming node " & Image (Node.Full_Sloc_Image));
 
-      for F of Files.all loop
+      for File of Files.all loop
          declare
-            FN : constant GNATCOLL.VFS.Filesystem_String := F.Full_Name;
+            Filename : constant Filesystem_String := File.Full_Name;
+
          begin
-            Units (Idx) := Node.Unit.Context.Get_From_File (String (FN));
-            Idx := Idx + 1;
+            Units (Units_Index) :=
+              Node.Unit.Context.Get_From_File (String (Filename));
+            Units_Index := Units_Index + 1;
          end;
       end loop;
 
@@ -189,8 +187,8 @@ procedure Rename is
 
       PP (References);
       New_Line;
-   end App_Setup;
+   end Safe_Rename_App_Setup;
 
 begin
-   App.Run;
-end Rename;
+   Safe_Rename_App.Run;
+end Safe_Rename;

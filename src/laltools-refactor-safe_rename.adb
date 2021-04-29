@@ -31,7 +31,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Libadalang.Common; use Libadalang.Common;
 
-package body Laltools.Refactor.Rename is
+package body Laltools.Refactor.Safe_Rename is
 
    function Check_Rename_Conflict
      (New_Name : Unbounded_Text_Type;
@@ -1723,4 +1723,4 @@ package body Laltools.Refactor.Rename is
       end if;
    end Update_Canonical_Definition;
 
-end Laltools.Refactor.Rename;
+end Laltools.Refactor.Safe_Rename;

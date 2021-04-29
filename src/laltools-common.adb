@@ -22,14 +22,10 @@
 ------------------------------------------------------------------------------
 
 with Ada.Assertions; use Ada.Assertions;
-
 with Ada.Containers; use Ada.Containers;
 with Ada.Containers.Generic_Array_Sort;
-
 with Ada.Exceptions;
-
 with Ada.Strings.Wide_Wide_Fixed;
-
 with Ada.Wide_Wide_Characters.Handling;
 
 with GNAT.Traceback.Symbolic;
@@ -1796,28 +1792,80 @@ package body Laltools.Common is
      (Node : Ada_Node'Class)
       return Declarative_Part_Vectors.Vector
    is
-      This_Unit : Compilation_Unit renames Node.Unit.Root.As_Compilation_Unit;
-      This_Prelude : constant Ada_Node_List := This_Unit.F_Prelude;
+      use Declarative_Part_Vectors;
 
-      Declarative_Parts : Declarative_Part_Vectors.Vector;
+      Node_Unit  : constant Compilation_Unit := Get_Compilation_Unit (Node);
+      Used_Units : constant Compilation_Unit_Array :=
+        Get_Used_Units (Node_Unit);
 
-      use type Ada_Node_Kind_Type;
-   begin
-      for Node of This_Prelude loop
-         if Node.Kind = Ada_Use_Package_Clause then
-            for P of Node.As_Use_Package_Clause.F_Packages loop
-               declare
-                  Package_Name : constant Name :=
-                    Get_Node_As_Name (P.As_Ada_Node);
-               begin
+      Declarative_Parts : Vector;
+
+      procedure Process_Top_Level_Decl (TLD : Basic_Decl);
+      --  Processes the top level declaration of a unit if it is a
+      --  Package_Decl, Generic_Package_Instantiation or a Package_Rename_Decl.
+      --  Processes by getting the public part of the package, casting it
+      --  as Declarative_Part and adding it to Declarative_Parts.
+      --  This package can be recursive up to one time, i.e., it can call
+      --  itself if TLD is a Package_Rename_Decl, but then it won't call
+      --  itself again.
+
+      ----------------------------
+      -- Process_Top_Level_Decl --
+      ----------------------------
+
+      procedure Process_Top_Level_Decl (TLD : Basic_Decl) is
+         --  Designated_Generic_Decl
+         DGD : Basic_Decl;
+
+      begin
+         if not TLD.Is_Null then
+            case TLD.Kind is
+               when Ada_Package_Decl_Range =>
                   Declarative_Parts.Append
-                    (Get_Package_Decl_Public_Declarative_Part
-                       (Resolve_Name_Precisely (Package_Name).
-                            P_Basic_Decl.As_Package_Decl));
-               end;
-            end loop;
+                    (TLD.As_Package_Decl.F_Public_Part.As_Declarative_Part);
+
+               when Ada_Generic_Package_Instantiation_Range =>
+                  --  If TLD is a Generic_Package_Instantiation then we need to
+                  --  get its designated generic declaration, which can be
+                  --  null.
+
+                  DGD :=
+                    TLD.As_Generic_Instantiation.P_Designated_Generic_Decl;
+
+                  if not DGD.Is_Null
+                    and then DGD.Kind in Ada_Generic_Package_Decl_Range
+                  then
+                     Declarative_Parts.Append
+                       (DGD.As_Generic_Package_Decl.F_Package_Decl.
+                          F_Public_Part.As_Declarative_Part);
+                  end if;
+
+               when Ada_Package_Renaming_Decl_Range =>
+                  --  If TLD is a Package_Renaming_Decl, unwind the renames
+                  --  the final declaration if reached. This will be a package
+                  --  Decl, which can be considered as a TLD. Therefore,
+                  --  call recursively call Process_Top_Level_Decl with the
+                  --  final TLD.
+
+                  Process_Top_Level_Decl
+                    (TLD.As_Package_Renaming_Decl.P_Final_Renamed_Package);
+
+               when others =>
+                  null;
+            end case;
          end if;
+      end Process_Top_Level_Decl;
+
+   begin
+      for Used_Unit of Used_Units loop
+         --  The array returned by Get_Used_Units does not contain null
+         --  Compilation_Units, so it safe to try to get the top level
+         --  declaration and process it.
+
+         Process_Top_Level_Decl
+           (Used_Unit.P_Top_Level_Decl (Used_Unit.Unit));
       end loop;
+
       return Declarative_Parts;
    end Get_Use_Units_Declarative_Parts;
 
@@ -1835,7 +1883,11 @@ package body Laltools.Common is
          "="          => "=");
 
       Used_Units : Compilation_Unit_Vectors.Vector;
+
    begin
+      if Node.Is_Null then
+         return R : constant Compilation_Unit_Array (1 .. 0) := (others => <>);
+      end if;
 
       for Clause of Node.F_Prelude loop
          if Clause.Kind in Ada_Use_Package_Clause_Range then

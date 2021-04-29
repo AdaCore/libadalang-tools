@@ -26,7 +26,7 @@
 
 with Ada.Containers.Ordered_Maps;
 
-with Laltools.Refactor.Rename; use Laltools.Refactor.Rename;
+with Laltools.Refactor.Safe_Rename; use Laltools.Refactor.Safe_Rename;
 
 with Langkit_Support.Slocs; use Langkit_Support.Slocs;
 

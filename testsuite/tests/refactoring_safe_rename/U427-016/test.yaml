@@ -1,0 +1,8 @@
+description: |
+    This test checks if the safe rename tool correctly handles different kinds
+    of packages used on a Use_Package_Clause. The kinds of packages tested by
+    this test are: Package_Decl, Package_Renaming_Decl and
+    Generic_Package_Instantiation.
+    A use clause with multiple packages separated by a comma is also tested.
+
+driver: shell_script

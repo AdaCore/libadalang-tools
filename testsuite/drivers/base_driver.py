@@ -4,8 +4,12 @@ import os.path
 
 from e3.testsuite.control import YAMLTestControlCreator
 from e3.testsuite.driver.classic import TestAbortWithError, TestSkip
-from e3.testsuite.driver.diff import (DiffTestDriver, OutputRefiner,
-                                      ReplacePath, Substitute)
+from e3.testsuite.driver.diff import (
+    DiffTestDriver,
+    OutputRefiner,
+    ReplacePath,
+    Substitute,
+)
 
 
 class ToLower(OutputRefiner):
@@ -22,7 +26,14 @@ class BaseDriver(DiffTestDriver):
     WIP_TOOLS = set()
 
     # Name of test directories for all tools
-    ALL_TOOLS = {'pp', 'metric', 'stub', 'test', 'laltools'} | WIP_TOOLS
+    ALL_TOOLS = {
+        "pp",
+        "metric",
+        "stub",
+        "test",
+        "laltools",
+        "refactoring_safe_rename",
+    } | WIP_TOOLS
 
     @property
     def tool_dirname(self):
@@ -34,11 +45,11 @@ class BaseDriver(DiffTestDriver):
 
         :rtype: str
         """
-        for name in self.test_env['test_name'].split('__'):
+        for name in self.test_env["test_name"].split("__"):
             if name in self.ALL_TOOLS:
                 return name
         raise TestAbortWithError(
-            'Cannot guess which tool is tested from test name'
+            "Cannot guess which tool is tested from test name"
         )
 
     @property
@@ -55,7 +66,7 @@ class BaseDriver(DiffTestDriver):
                 baseline = f.read()
             regex = True
         else:
-            baseline = ''
+            baseline = ""
             test_out = None
 
         return (test_out, baseline, regex)
@@ -70,22 +81,17 @@ class BaseDriver(DiffTestDriver):
         super().set_up()
 
         # If we must not test the tool this testcase exercize, just skip it
-        if (
-            self.env.no_wip and
-            self.tool_dirname in self.WIP_TOOLS
-        ):
+        if self.env.no_wip and self.tool_dirname in self.WIP_TOOLS:
             raise TestSkip("WIP tool")
 
-        if 'description' not in self.test_env:
+        if "description" not in self.test_env:
             raise TestAbortWithError('test.yaml: missing "description" field')
 
     @property
     def output_refiners(self):
-        result = super().output_refiners + [
-            ReplacePath(self.working_dir()),
-        ]
+        result = super().output_refiners + [ReplacePath(self.working_dir())]
         if self.env.fold_casing:
             result.append(ToLower())
-        if self.test_env.get('canonicalize_backslashes', False):
+        if self.test_env.get("canonicalize_backslashes", False):
             result.append(Substitute("\\", "/"))
         return result

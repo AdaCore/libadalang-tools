@@ -36,7 +36,7 @@ with Laltools.Refactor.Problems; use Laltools.Refactor.Problems;
 
 with Langkit_Support.Text; use Langkit_Support.Text;
 
-package Laltools.Refactor.Rename is
+package Laltools.Refactor.Safe_Rename is
 
    type Rename_Problem is abstract new Refactor_Problem with
       record
@@ -393,4 +393,4 @@ private
    function Find (Self : Name_Hidden_Finder) return Rename_Problem'Class;
    --  Checks if renamin a definition will make it hidden by another one.
 
-end Laltools.Refactor.Rename;
+end Laltools.Refactor.Safe_Rename;

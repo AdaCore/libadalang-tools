@@ -487,9 +487,11 @@ package Laltools.Common is
 
    function Get_Used_Units
      (Node : Compilation_Unit'Class)
-         return Compilation_Unit_Array;
+      return Compilation_Unit_Array;
    --  Returns a Compilation_Unit_Array with all the Compilation_Unit
-   --  whose Node has a use clause for.
+   --  whose Node has a use clause for. If Node is null, then returns an empty
+   --  Compilation_Unit_Array. The return array does not contain null
+   --  Compilation_Units.
 
    procedure Insert
      (Map     : in out Source_Location_Range_Map;
