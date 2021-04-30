@@ -3547,11 +3547,9 @@ package body Pp.Actions is
                return;
             end if;
 
-            if Tree.Kind = Ada_Compilation_Unit then
-               Insert_Blank_Line_Before := True;
-            end if;
-
             case Tree.Kind is
+               when Ada_Compilation_Unit =>
+                  Insert_Blank_Line_Before := True;
                when Ada_Type_Decl |
                  Ada_Task_Type_Decl |
                  Ada_Protected_Type_Decl |
@@ -4662,14 +4660,17 @@ package body Pp.Actions is
                else
                   Interpret_Alt_Template (Record_Type_Decl_Aspects_Alt);
                end if;
+
             elsif Def.Kind = Ada_Access_To_Subp_Def then
                Interpret_Alt_Template (Access_To_Subp_Decl_Alt);
+
             elsif (Def.Kind = Ada_Enum_Type_Def
                      and then Arg (Cmd, Vertical_Enum_Types))
               or else (Def.Kind = Ada_Array_Type_Def
                          and then Arg (Cmd, Vertical_Array_Types))
             then
                Interpret_Alt_Template (Enum_Array_Decl_Alt);
+
             else
                Interpret_Alt_Template (Type_Decl_Alt);
             end if;

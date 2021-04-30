@@ -3094,6 +3094,19 @@ package body Pp.Formatting is
                        Kind (Prev (New_Tok)) = Disabled_LB_Token));
             begin
                if LB.Tok = New_Tok then
+
+                  --  The inserted LB.Indentation is set to 0 when the LB is
+                  --  added in case of --insert-blank-lines switch usage
+                  --  Take the Cur_Indentation value as reference in that case
+                  --  for the current line break indentation.
+
+                  if Insert_Blank_Lines (Cmd) and then
+                    LB.Indentation = 0 and then
+                    LB.Indentation < Cur_Indentation
+                  then
+                     LB.Indentation := Cur_Indentation;
+                  end if;
+
                   Append_Tokn
                     (New_Tokns, False_End_Of_Line, "whole line extra");
                   --  This is needed because every comment in New_Tokns must
