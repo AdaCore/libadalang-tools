@@ -1591,13 +1591,39 @@ package body Pp.Actions is
          Sep_Is : constant Boolean :=
            Has_Is_NL and then Arg (Cmd, Separate_Is);
 
+         Expr_Function_Sep_Is : constant Boolean :=
+           Kind = Ada_Expr_Function and then
+           Arg (Cmd, Par_Threshold) = 0 and then
+           Arg (Cmd, Separate_Is);
+         --  True for an Ada_Expr_Function subprogram declaration body kind
+         --  when the "is" in the syntax is expected to be generated in a
+         --  new line.
+
          T : constant W_Str := W_Str (Str_Template_Table (Kind).all);
          T2 : constant W_Str :=
            (if Sep_Is then Replace_All (T, "# is$", "$is$") else T);
          T3 : constant W_Str :=
            (if Sep_Is then Replace_All (T2, "#+1 is$", "$is$") else T2);
 
+         T2_Expr_F : constant W_Str :=
+           (if Expr_Function_Sep_Is then
+               Replace_All (T, " is[# !]", " $is[# !]") else T);
+         --  Handling separate is for Ada_Expr_Function template by adding
+         --  a hard line break before it
+
       begin
+         --  For an Ada_Expr_Function a hard line break is added before "is" if
+         --  the switch --par-threshold=0 is present and --no-separate-is
+         --  switch is passed.
+
+         if Expr_Function_Sep_Is then
+            return Result : constant Str_Template := Str_Template (T2_Expr_F)
+            do
+               pragma Assert
+                 (if Expr_Function_Sep_Is then W_Str (Result) /= T);
+            end return;
+         end if;
+
          return Result : constant Str_Template := Str_Template (T3) do
             pragma Assert (if Sep_Is then W_Str (Result) /= T);
          end return;
@@ -3533,6 +3559,7 @@ package body Pp.Actions is
 
             pragma Assert
               (Used = (Subtrees_Index => True), "Not all used: " & Kind'Img);
+
          end Interpret_Template;
 
          use Alternative_Templates;
@@ -4575,6 +4602,7 @@ package body Pp.Actions is
                   --  Add one extra for function result
                end if;
             end if;
+
             declare
                Subs : constant Ada_Tree_Array :=
                  (if Tree.Kind = Ada_Subp_Body
