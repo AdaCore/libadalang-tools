@@ -1005,6 +1005,33 @@ package body Laltools.Common is
          return No_Defining_Name;
    end Find_Next_Part;
 
+   ------------------------
+   -- Find_Previous_Part --
+   ------------------------
+
+   function Find_Previous_Part
+     (Definition         : Defining_Name;
+      Trace              : GNATCOLL.Traces.Trace_Handle;
+      Imprecise_Fallback : Boolean := False)
+      return Defining_Name
+   is
+      Next   : Defining_Name;
+      use type Defining_Name;
+   begin
+      Next :=
+        Definition.P_Previous_Part (Imprecise_Fallback => Imprecise_Fallback);
+
+      if Next = Definition then
+         return No_Defining_Name;
+      else
+         return Next;
+      end if;
+   exception
+      when E :  Libadalang.Common.Property_Error =>
+         Log (Trace, E);
+         return No_Defining_Name;
+   end Find_Previous_Part;
+
    ------------------------------
    -- Find_Other_Part_Fallback --
    ------------------------------
@@ -1034,9 +1061,7 @@ package body Laltools.Common is
       function Matches
         (Node : Ada_Node'Class) return Visit_Status is
       begin
-         if Node.Is_Null
-           or else Node.Kind not in Libadalang.Common.Ada_Basic_Decl
-         then
+         if Node.Is_Null then
             return Libadalang.Common.Into;
          end if;
 
@@ -1044,25 +1069,30 @@ package body Laltools.Common is
          --  result that matches.
          --  TODO: improve this by find all entities that match, and
          --  finding the best through a distance/scoring heuristics.
-
-         declare
-            Decl : constant Basic_Decl := Node.As_Basic_Decl;
-            Def  : constant Defining_Name := Decl.P_Defining_Name;
-         begin
-            if Def /= Definition
-              and then Decl.P_Fully_Qualified_Name = Qualified_Name
-            then
-               Found := Def;
-               return Libadalang.Common.Stop;
-            end if;
-         end;
+         if Node.Kind in Libadalang.Common.Ada_Basic_Decl then
+            declare
+               Decl     : constant Basic_Decl := Node.As_Basic_Decl;
+               Def      : constant Defining_Name := Decl.P_Defining_Name;
+               Def_Name : constant Langkit_Support.Text.Text_Type :=
+                 Decl.P_Fully_Qualified_Name;
+            begin
+               --  Search a declaration with the same qualified_name which is
+               --  not Definition itself.
+               if Def /= Definition
+                 and then Def_Name = Qualified_Name
+               then
+                  Found := Def;
+                  return Libadalang.Common.Stop;
+               end if;
+            end;
+         end if;
 
          return Libadalang.Common.Into;
       end Matches;
 
-      Parent_Node : Ada_Node;
-      Parent_Spec : Defining_Name;
-      Parent_Body : Defining_Name;
+      Parent_Node  : Ada_Node := No_Ada_Node;
+      Current_Root : Defining_Name;
+      Other_Root   : Defining_Name;
    begin
       --  The heuristics implemented is the following: we're looking at the
       --  spec and body of the enclosing entity, to find an entity that
@@ -1082,36 +1112,38 @@ package body Laltools.Common is
          return No_Defining_Name;
       end if;
 
-      --  First obtain the spec.
-      --  Note: we could refine the number of calls to P_Semantic_Parent.
-      --  Two calls to P_Semantic_Parents are needed in the case of a
-      --  subprogram: the first jumps to the SubpDecl, the second to the
-      --  PackageDecl.
+      --  First obtain the highest level declaration of the current tree
+      declare
+         All_Parents : constant Ada_Node_Array := Definition.Parents;
+      begin
+         for P of reverse All_Parents loop
+            if P.Kind in Ada_Basic_Decl then
+               Parent_Node := P;
+               exit;
+            end if;
+         end loop;
+      end;
 
-      Parent_Node := Definition.P_Semantic_Parent.P_Semantic_Parent;
-
-      if Parent_Node.Is_Null
-        or else Parent_Node.Kind not in Ada_Basic_Decl
-      then
+      if Parent_Node = No_Ada_Node then
          return No_Defining_Name;
       end if;
 
-      Parent_Spec := Parent_Node.As_Basic_Decl.
-        P_Canonical_Part.P_Defining_Name;
-
-      --  Traverse the spec. The visiting function assigns the matching
+      --  Traverse the current tree. The visiting function assigns the matching
       --  result, if any, to Found.
-      Parent_Spec.Parent.Traverse (Matches'Unrestricted_Access);
+      Parent_Node.Traverse (Matches'Unrestricted_Access);
 
-      --  If we didn't find a result when traversing the spec, traverse the
-      --  body of the containing entity.
       if Found = No_Defining_Name then
-         Parent_Body := Laltools.Common.Find_Next_Part (Parent_Spec, Trace);
-         if Parent_Body = No_Defining_Name then
-            Parent_Body := Laltools.Common.Find_Next_Part (Parent_Spec, Trace);
+         Current_Root := Parent_Node.As_Basic_Decl.P_Defining_Name;
+         --  Try Next_Part and then Previous_Part to find the body/spec of
+         --  the current root.
+         Other_Root := Laltools.Common.Find_Next_Part (Current_Root, Trace);
+         if Other_Root = No_Defining_Name then
+            Other_Root := Laltools.Common.Find_Previous_Part
+              (Current_Root, Trace);
          end if;
-         if Parent_Body /= No_Defining_Name then
-            Parent_Body.Parent.Traverse (Matches'Unrestricted_Access);
+         --  Traverse the other root
+         if Other_Root /= No_Defining_Name then
+            Other_Root.Parent.Traverse (Matches'Unrestricted_Access);
          end if;
       end if;
 

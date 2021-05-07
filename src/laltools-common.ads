@@ -319,6 +319,15 @@ package Laltools.Common is
    --  Wrapper around P_Next_Part that returns No_Defining_Name if next part
    --  is name itself. It also catches Property_Error and reports it in traces.
 
+   function Find_Previous_Part
+     (Definition         : Defining_Name;
+      Trace              : GNATCOLL.Traces.Trace_Handle;
+      Imprecise_Fallback : Boolean := False)
+      return Defining_Name;
+   --  Wrapper around P_Previous_Part that returns No_Defining_Name if previous
+   --  part is name itself. It also catches Property_Error and reports it
+   --  in traces.
+
    function Find_Other_Part_Fallback
      (Definition : Defining_Name;
       Trace      : GNATCOLL.Traces.Trace_Handle)
