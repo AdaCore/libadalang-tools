@@ -821,8 +821,8 @@ package Laltools.Common is
       Imprecise : out Boolean)
       return Defining_Name;
    --  Return the definition node (canonical part) of the given name.
-   --  Imprecise is set to True if LAL's imprecise fallback mechanism has been
-   --  used to compute the cross reference.
+   --  Imprecise is set to True if LAL has marked the result as imprecise or
+   --  if an error happened.
 
    function Resolve_Name_Precisely (Name_Node : Name) return Defining_Name;
    --  Return the definition node (canonical part) of the given name.

@@ -3514,45 +3514,37 @@ package body Laltools.Common is
       Imprecise : out Boolean) return Defining_Name
    is
       Result : Defining_Name;
+      Failsafe_Result : Refd_Def;
       use type Defining_Name;
    begin
       Imprecise := False;
 
       if Name_Node.Is_Null then
          return No_Defining_Name;
-      end if;
-
-      --  First try to resolve precisely
-      begin
-         if Name_Node.P_Is_Defining then
-            Result := Name_Node.P_Enclosing_Defining_Name.P_Canonical_Part;
-         else
-            Result := Name_Node.P_Referenced_Defining_Name
-              (Imprecise_Fallback => False);
-            if Result /= No_Defining_Name then
-               Result := Result.P_Canonical_Part;
-            end if;
-         end if;
-      exception
-         when E : Property_Error =>
-            Log (Trace, E);
-            Result := No_Defining_Name;
-      end;
-
-      --  The result was found precisely: return it
-      if Result /= No_Defining_Name then
-         return Result;
-      end if;
-
-      --  If we reach this, it means we've failed to get a precise result.
-      --  Try again with the imprecise fallback.
-      if not Name_Node.P_Is_Defining then
-         Result := Name_Node.P_Referenced_Defining_Name
+      --  P_Failsafe_Referenced_Def_Name doesn't work on the decl itself
+      elsif Name_Node.P_Is_Defining then
+         Result := Name_Node.P_Enclosing_Defining_Name.P_Canonical_Part;
+      else
+         Failsafe_Result := Name_Node.P_Failsafe_Referenced_Def_Name
            (Imprecise_Fallback => True);
+         case Kind (Failsafe_Result) is
+            when Precise =>
+            --  Nothing extra to do here
+               null;
+            when Libadalang.Common.Imprecise =>
+               Imprecise := True;
+            when Error =>
+               Imprecise := True;
+               return No_Defining_Name;
+            when Noref =>
+               return No_Defining_Name;
+         end case;
+
+         Result := Defining_Name (Def_Name (Failsafe_Result));
+
          if Result /= No_Defining_Name then
             Result := Result.P_Canonical_Part;
          end if;
-         Imprecise := Result /= No_Defining_Name;
       end if;
 
       return Result;
@@ -3560,6 +3552,7 @@ package body Laltools.Common is
    exception
       when E : Property_Error =>
          Log (Trace, E);
+         Imprecise := True;
          return No_Defining_Name;
    end Resolve_Name;
 
@@ -3578,6 +3571,7 @@ package body Laltools.Common is
          return No_Defining_Name;
       end if;
 
+      --  P_Referenced_Defining_Name doesn't work on the decl itself
       if Name_Node.P_Is_Defining then
          return Name_Node.P_Enclosing_Defining_Name.P_Canonical_Part;
       else
