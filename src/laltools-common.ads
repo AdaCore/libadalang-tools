@@ -346,8 +346,17 @@ package Laltools.Common is
 
    function Get_Compilation_Unit
      (Node : Ada_Node'Class)
-         return Compilation_Unit;
+      return Compilation_Unit;
    --  Returns the Compilation_Unit associated to Node
+
+   function Get_Insert_With_Location
+     (Node      : Compilation_Unit'Class;
+      Pack_Name : Text_Type;
+      Last      : out Boolean)
+      return Source_Location;
+   --  Returns the Source_Location where to insert a with clause for Pack_Name
+   --  or No_Source_Location if Pack_Name is already withed.
+   --  Last indicates if the location is after the last with/use clause.
 
    function Get_CU_Visible_Declarative_Parts
      (Node : Ada_Node'Class;

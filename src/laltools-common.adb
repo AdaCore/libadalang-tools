@@ -1202,6 +1202,54 @@ package body Laltools.Common is
       return C_Unit.As_Compilation_Unit;
    end Get_Compilation_Unit;
 
+   ------------------------------
+   -- Get_Insert_With_Location --
+   ------------------------------
+
+   function Get_Insert_With_Location
+     (Node      : Compilation_Unit'Class;
+      Pack_Name : Text_Type;
+      Last      : out Boolean)
+      return Source_Location
+   is
+      --  Cover the no with clause case
+      Res                  : Source_Location := Start_Sloc (Node.Sloc_Range);
+      Searching_Insert_Loc : Boolean := True;
+   begin
+      for N of Node.F_Prelude loop
+         if N.Kind in Ada_With_Clause_Range then
+            --  Handle list of packages: "with A, B, C;"
+            for P of N.As_With_Clause.F_Packages loop
+               if Pack_Name = P.Text then
+                  --  We are already withed
+                  return No_Source_Location;
+               elsif Searching_Insert_Loc
+                 and then Pack_Name < P.Text
+               then
+                  --  Assuming the with clauses are sorted alphabetically,
+                  --  the insert location is before the first clause higher
+                  --  than us. (Attention we must insert before N and not P)
+                  Last := False;
+                  Res := Start_Sloc (N.Sloc_Range);
+                  Searching_Insert_Loc := False;
+               end if;
+            end loop;
+         end if;
+
+         if Searching_Insert_Loc
+           and then N.Kind in Ada_With_Clause_Range | Ada_Use_Package_Clause
+         then
+            --  If the highest alphabetically, insert it after the last
+            --  with clause. To not split a pair also keep track of the last
+            --  use clause.
+            Last := True;
+            Res := End_Sloc (N.Sloc_Range);
+         end if;
+      end loop;
+
+      return Res;
+   end Get_Insert_With_Location;
+
    --------------------------------------
    -- Get_CU_Visible_Declarative_Parts --
    --------------------------------------

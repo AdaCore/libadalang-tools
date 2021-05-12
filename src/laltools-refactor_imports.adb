@@ -747,6 +747,7 @@ package body Laltools.Refactor_Imports is
    is
       Parent_Pkgs : Parent_Packages_Vector.Vector;
       use type LALCommon.Ada_Node_Kind_Type;
+      use type LALAnalysis.Basic_Decl;
    begin
       for P of Node.Parent.Parents loop
          if P.Kind in LALCommon.Ada_Package_Body
@@ -756,6 +757,20 @@ package body Laltools.Refactor_Imports is
             Parent_Pkgs.Append (P.As_Basic_Decl);
          end if;
       end loop;
+
+      declare
+         Top_Level : constant LALAnalysis.Basic_Decl :=
+           Node.P_Top_Level_Decl (Node.Unit);
+      begin
+         if Top_Level /= LALAnalysis.No_Basic_Decl
+           and then Top_Level.Kind in LALCommon.Ada_Subp_Body_Range
+         then
+            --  Inside a main file: add the main name as the last element
+            --  it will be used to filter out all the elements defined inside
+            --  the unit itself.
+            Parent_Pkgs.Append (Top_Level);
+         end if;
+      end;
 
       if Node.P_Parent_Basic_Decl.Kind =
         LALCommon.Ada_Generic_Package_Instantiation
@@ -940,12 +955,7 @@ package body Laltools.Refactor_Imports is
                --  Id is in a unit that does not have a parent package
                --  (for instance, a standalone subprogram).
 
-               if Decl_Parent_Pkgs.Length = 0 then
-                  --  If D is a standalone subprogram, then it does not need a
-                  --  prefix, and the with clause is simply it's defining name.
-
-                  Prefix_Decls.Append (D);
-               else
+               if Decl_Parent_Pkgs.Length /= 0 then
                   --  Otherwise, the prefix must contain all the parent
                   --  packages of D but the with clause must only contain
                   --  the top level parent package of D.
@@ -954,12 +964,8 @@ package body Laltools.Refactor_Imports is
                   With_Clause_Decls.Append (Decl_Parent_Pkgs.Last_Element);
                end if;
             else
-               if Decl_Parent_Pkgs.Length = 0 then
-                  --  If D is a standalone subprogram, then it does not need a
-                  --  prefix, and the with clause is simply it's defining name.
-
-                  Prefix_Decls.Append (D);
-               elsif Id_Parent_Pkgs.Last_Element.P_Defining_Name.
+               if Decl_Parent_Pkgs.Length /= 0
+                 and then Id_Parent_Pkgs.Last_Element.P_Defining_Name.
                  P_Canonical_Part.P_Basic_Decl =
                    Decl_Parent_Pkgs.Last_Element.P_Defining_Name.
                      P_Canonical_Part.P_Basic_Decl
@@ -1025,7 +1031,12 @@ package body Laltools.Refactor_Imports is
                      end if;
                   end loop;
 
-                  Suggestions.Append (Suggestion);
+                  if Suggestion.Prefix_Text /=
+                    Ada.Strings.Wide_Wide_Unbounded.
+                      Null_Unbounded_Wide_Wide_String
+                  then
+                     Suggestions.Append (Suggestion);
+                  end if;
                end loop;
             end;
          end;
