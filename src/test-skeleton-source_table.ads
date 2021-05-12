@@ -168,6 +168,8 @@ package Test.Skeleton.Source_Table is
 
    function Project_Extended (Project_Name : String) return Boolean;
 
+   function Project_Is_Library (Project_Name : String) return Boolean;
+
    procedure Enforce_Project_Extention
      (Prj_Name              : String;
       Subroot_Stub_Prj      : String;

@@ -957,6 +957,16 @@ package body Test.Skeleton.Source_Table is
         (PF_Table, Project_Name).Needed_For_Extention;
    end Project_Extended;
 
+   ------------------------
+   -- Project_Is_Library --
+   ------------------------
+
+   function Project_Is_Library (Project_Name : String) return Boolean is
+   begin
+      return Project_File_Table.Element
+        (PF_Table, Project_Name).Is_Library;
+   end Project_Is_Library;
+
    -------------------------------
    --  Reset_Location_Iterator  --
    -------------------------------

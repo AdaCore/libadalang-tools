@@ -2638,12 +2638,17 @@ package body Test.Harness is
                   & P.Path_Extending.all);
          end;
 
-         S_Put
-           (3,
-            "for Library_Dir use """
-            & P.Name_Extending.all
-            & "_lib"";");
-         Put_New_Line;
+         if Test.Skeleton.Source_Table.Project_Is_Library
+           (P.Name_Of_Extended.all)
+         then
+            S_Put
+              (3,
+               "for Library_Dir use """
+               & P.Name_Extending.all
+               & "_lib"";");
+            Put_New_Line;
+         end if;
+
          S_Put
            (3,
             "for Object_Dir use """
