@@ -1154,6 +1154,8 @@ package body Test.Common is
 
       if Body_N /= No_Body_Node
         and then Body_N.Unit.Root.Kind = Ada_Compilation_Unit
+        and then Body_N.Unit.Root.As_Compilation_Unit.F_Body.Kind /=
+          Ada_Subunit
       then
          Process_CU (Body_N.Unit.Root.As_Compilation_Unit);
       end if;
