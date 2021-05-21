@@ -1,0 +1,6 @@
+description:
+    Tests that GNATpp does not crash when handling projects that
+    contains two or more non Ada source code files with the same
+    name.
+
+driver: shell_script

@@ -66,6 +66,5 @@ begin
      (Cmd,
       Tool,
       Tool_Package_Name     => "metrics",
-      Needs_Per_File_Output => True,
       Callback              => Callback'Unrestricted_Access);
 end METRICS.Main;

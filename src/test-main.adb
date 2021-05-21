@@ -54,6 +54,5 @@ begin
      (Cmd,
       Tool,
       Tool_Package_Name     => Test.Common.GT_Package,
-      Needs_Per_File_Output => True,
       Callback              => Callback'Unrestricted_Access);
 end Test.Main;

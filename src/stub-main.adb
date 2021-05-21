@@ -44,6 +44,5 @@ begin
      (Cmd,
       Tool,
       Tool_Package_Name     => "gnatstub",
-      Needs_Per_File_Output => True,
       Callback              => Callback'Unrestricted_Access);
 end Stub.Main;

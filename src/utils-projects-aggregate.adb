@@ -26,6 +26,7 @@ with Ada.Text_IO;
 with GNATCOLL.VFS; use GNATCOLL.VFS;
 
 with Utils.Command_Lines.Common; use Utils.Command_Lines.Common;
+with Utils.String_Utilities; use Utils.String_Utilities;
 with Utils.Tool_Names;
 
 package body Utils.Projects.Aggregate is

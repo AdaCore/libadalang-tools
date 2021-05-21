@@ -40,14 +40,12 @@ with Utils.Environment;
 with Utils.Err_Out;
 with Utils.Formatted_Output;
 with Utils.Projects.Aggregate;
+with Utils.String_Utilities; use Utils.String_Utilities;
 with Utils.Tool_Names; use Utils.Tool_Names;
 with Utils.Versions;
 
 package body Utils.Projects is
    use Text_IO;
-
-   use String_String_Maps;
-   use String_String_List_Maps;
 
    use Common_Flag_Switches, Common_String_Switches,
      Common_String_Seq_Switches;
@@ -88,9 +86,6 @@ package body Utils.Projects is
       Global_Report_Dir         :    out String_Ref;
       Compiler_Options          :    out String_List_Access;
       Project_RTS               :    out String_Access;
-      Individual_Source_Options :    out String_String_List_Map;
-      Result_Dirs               :    out String_String_Map;
-      Needs_Per_File_Output     :        Boolean;
       Preprocessing_Allowed     :        Boolean;
       My_Project_Tree           : in out Project_Tree;
       Tool_Package_Name         :        String;
@@ -127,9 +122,6 @@ package body Utils.Projects is
       Global_Report_Dir         :    out String_Ref;
       Compiler_Options          :    out String_List_Access;
       Project_RTS               :    out String_Access;
-      Individual_Source_Options :    out String_String_List_Map;
-      Result_Dirs               :    out String_String_Map;
-      Needs_Per_File_Output     :        Boolean;
       Preprocessing_Allowed     :        Boolean;
       My_Project_Tree           : in out Project_Tree;
       Tool_Package_Name         :        String;
@@ -853,32 +845,6 @@ package body Utils.Projects is
 
       procedure Set_Individual_Source_Options is
 
-         function Source_Result_Dir (Source_Prj : Project_Type) return String;
-         --  Detects the path to the directory where the source-specific
-         --  results for Source_File should be placed. Returns the object
-         --  directory for the project the source belongs to (Source_Prj),
-         --  it takes into account the effect of '--subdir=<dir>' option.
-         --  ????????????????Way too complicated. Why not just return the
-         --  obj dir? And then we can get rid of Needs_Per_File_Output.
-
-         -----------------------
-         -- Source_Result_Dir --
-         -----------------------
-
-         function Source_Result_Dir
-           (Source_Prj : Project_Type) return String
-         is
-            Report_Dir : Virtual_File;
-         begin
-            Report_Dir := Source_Prj.Object_Dir;
-
-            if Report_Dir = No_File then
-               Report_Dir := My_Project_Tree.Root_Project.Project_Path;
-            end if;
-
-            return Display_Dir_Name (Report_Dir);
-         end Source_Result_Dir;
-
          Sources : constant File_Array_Access :=
            My_Project_Tree.Root_Project.Source_Files (Recursive => True);
 
@@ -1057,27 +1023,9 @@ package body Utils.Projects is
                if Debug_Flag_C then
                   Put_Line ("No stored switches");
                end if;
-            else
---               if Debug_Flag_C then
---                  Put_Line ("Stored switches " & File_Switches.all);
---               end if;
-
-               Insert
-                 (Individual_Source_Options,
-                  Name,
-                  new String_List'(To_Array (File_Switches)));
             end if;
 
             --  Defining the directory to place the file-specific results into:
-
-            if not Arg (Cmd, No_Objects_Dir)
-              and then Needs_Per_File_Output
-            then
-               Insert
-                 (Result_Dirs,
-                  Name,
-                  new String'(Source_Result_Dir (Project_U)));
-            end if;
          end loop;
       end Set_Individual_Source_Options;
 
@@ -1300,11 +1248,8 @@ package body Utils.Projects is
       Global_Report_Dir               :    out String_Ref;
       Compiler_Options                :    out String_List_Access;
       Project_RTS                     :    out String_Access;
-      Individual_Source_Options       :    out String_String_List_Map;
-      Result_Dirs                     :    out String_String_Map;
       The_Project_Tree                :    out not null Project_Tree_Access;
       The_Project_Env                : out not null Project_Environment_Access;
-      Needs_Per_File_Output           :        Boolean;
       Preprocessing_Allowed           :        Boolean;
       Tool_Package_Name               :        String;
       Compute_Project_Closure         :        Boolean        := True;
@@ -1431,9 +1376,6 @@ package body Utils.Projects is
                Global_Report_Dir,
                Compiler_Options,
                Project_RTS,
-               Individual_Source_Options,
-               Result_Dirs,
-               Needs_Per_File_Output,
                Preprocessing_Allowed,
                My_Project_Tree,
                Tool_Package_Name,

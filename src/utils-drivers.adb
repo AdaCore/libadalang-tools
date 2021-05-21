@@ -54,7 +54,6 @@ package body Utils.Drivers is
      (Cmd                   : in out Command_Line;
       Tool                  : in out Tool_State'Class;
       Tool_Package_Name     :        String;
-      Needs_Per_File_Output :        Boolean        := False;
       Preprocessing_Allowed :        Boolean        := True;
       Callback              :        Parse_Callback := null)
    is
@@ -83,8 +82,6 @@ package body Utils.Drivers is
       Global_Report_Dir         : String_Ref;
       Compiler_Options          : GNAT.OS_Lib.Argument_List_Access;
       Custom_RTS                : GNAT.OS_Lib.String_Access;
-      Individual_Source_Options : String_String_List_Map;
-      Result_Dirs               : String_String_Map;
 
       procedure Include_One (File_Name : String);
       --  Include File_Name in the Ignored set below
@@ -140,11 +137,8 @@ package body Utils.Drivers is
          Global_Report_Dir,
          Compiler_Options,
          Project_RTS               => Custom_RTS,
-         Individual_Source_Options => Individual_Source_Options,
-         Result_Dirs               => Result_Dirs,
          The_Project_Tree          => Tool.Project_Tree,
          The_Project_Env           => Tool.Project_Env,
-         Needs_Per_File_Output     => Needs_Per_File_Output,
          Preprocessing_Allowed     => Preprocessing_Allowed,
          Tool_Package_Name         => Tool_Package_Name,
          Callback                  => Local_Callback'Unrestricted_Access,

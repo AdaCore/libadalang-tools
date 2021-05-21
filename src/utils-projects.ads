@@ -26,7 +26,6 @@ with GNAT.OS_Lib; use GNAT.OS_Lib;
 with GNATCOLL.Projects; use GNATCOLL.Projects;
 
 with Utils.Command_Lines; use Utils.Command_Lines;
-with Utils.String_Utilities; use Utils.String_Utilities;
 
 package Utils.Projects is
 
@@ -35,11 +34,8 @@ package Utils.Projects is
       Global_Report_Dir               :    out String_Ref;
       Compiler_Options                :    out String_List_Access;
       Project_RTS                     :    out String_Access;
-      Individual_Source_Options       :    out String_String_List_Map;
-      Result_Dirs                     :    out String_String_Map;
       The_Project_Tree                :    out not null Project_Tree_Access;
       The_Project_Env                : out not null Project_Environment_Access;
-      Needs_Per_File_Output           :        Boolean;
       Preprocessing_Allowed           :        Boolean;
       Tool_Package_Name               :        String;
       Compute_Project_Closure         :        Boolean        := True;
