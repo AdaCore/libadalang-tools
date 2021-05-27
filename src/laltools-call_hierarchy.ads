@@ -32,14 +32,23 @@ with Libadalang.Common; use Libadalang.Common;
 package Laltools.Call_Hierarchy is
 
    procedure Find_Incoming_Calls
-     (Definition : Defining_Name;
-      Units      : Analysis_Unit_Array;
-      Callback   : not null access procedure
-        (Subp_Call : Call_Stmt))
-       with Pre => Definition.P_Basic_Decl.P_Is_Subprogram or
+     (Definition         : Defining_Name'Class;
+      Units              : Analysis_Unit_Array;
+      Visit              : not null access procedure
+        (Call_Identifier : Base_Id'Class;
+         Kind            : Ref_Result_Kind;
+         Cancel          : in out Boolean);
+      Follow_Renamings   : Boolean := True;
+      Imprecise_Fallback : Boolean := False)
+     with Pre => Definition.P_Basic_Decl.P_Is_Subprogram or
        Definition.P_Basic_Decl.Kind in Ada_Generic_Subp_Instantiation_Range;
-   --  Finds all incomming calls of the subprogram given by Definition and
-   --  calls Callback on each call that was found.
+   --  For all Units, finds all incomming calls of the subprogram given by
+   --  Definition and calls Visit on each call that was found. Exits early if
+   --  Cancel if modified by Visit to True.
+   --  If Follow_Renamings is True also includes calls that ultimately refer
+   --  to Definition, by unwinding renaming clauses.
+   --  If Imprecise_Fallback is True also includes calls that imprecisely refer
+   --  to Definition.
 
    procedure Find_Outgoing_Calls
      (Definition : Defining_Name;
@@ -50,5 +59,7 @@ package Laltools.Call_Hierarchy is
      with Pre => Definition.P_Basic_Decl.P_Is_Subprogram;
    --  Finds all outgoing calls of the subprogram given by Definition and
    --  calls Callback on each call that was found.
+   --  If Imprecise_Fallback is True also includes calls that imprecisely refer
+   --  to Definition.
 
 end Laltools.Call_Hierarchy;

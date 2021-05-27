@@ -53,13 +53,29 @@ package Laltools.Refactor is
 
    subtype Text_Edit_Ordered_Set is Text_Edit_Ordered_Sets.Set;
 
+   procedure Safe_Insert
+     (Edits : in out Text_Edit_Ordered_Set;
+      Edit  : Text_Edit);
+   --  Checks if Edits already contains Edit and if not, inserts it.
+
+   subtype File_Name_Type is String;
+
    package Text_Edit_Ordered_Maps is new Ada.Containers.Indefinite_Ordered_Maps
-     (Key_Type        => String,
+     (Key_Type        => File_Name_Type,
       Element_Type    => Text_Edit_Ordered_Set,
       "<"             => "<",
       "="             => Text_Edit_Ordered_Sets."=");
 
    subtype Text_Edit_Map is Text_Edit_Ordered_Maps.Map;
+
+   procedure Safe_Insert
+     (Edits     : in out Text_Edit_Map;
+      File_Name : File_Name_Type;
+      Edit      : Text_Edit);
+   --  If Edits does not contain a File_Name key, then a Text_Edit_Ordered_Set
+   --  is created with Edit, and inserted into Edits.
+   --  Otherwise, checks if Edits.Element (File_Name) already contains Edit and
+   --  if not, inserts it.
 
    package Unbounded_String_Ordered_Sets is new Ada.Containers.Ordered_Sets
      (Element_Type => Unbounded_String,
@@ -107,13 +123,6 @@ package Laltools.Refactor is
          File_Deletions : File_Deletion_Ordered_Set;
          File_Renames   : File_Rename_Ordered_Set;
       end record;
-
-   procedure Insert
-     (Edits    : in out Text_Edit_Map;
-      Filename : String;
-      Location : Source_Location_Range;
-      Text     : Unbounded_String);
-   --  Insert a new edit in the map
 
    procedure Merge
      (Source : in out Text_Edit_Map;

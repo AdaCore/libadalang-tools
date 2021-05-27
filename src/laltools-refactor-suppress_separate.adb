@@ -296,11 +296,11 @@ package body Laltools.Refactor.Suppress_Separate is
          end loop;
       end;
 
-      Insert
+      Safe_Insert
         (Edits.Text_Edits,
          Separate_Stub.Unit.Get_Filename,
-         New_Text_Slocs,
-         To_Unbounded_String (To_UTF8 (To_Text (New_Text))));
+         (New_Text_Slocs,
+         To_Unbounded_String (To_UTF8 (To_Text (New_Text)))));
 
       --  Compute the necessary edits for the subprogram body declarative part
       --  and statements.
@@ -340,11 +340,11 @@ package body Laltools.Refactor.Suppress_Separate is
       Append (New_Text, ";");
       Append (New_Text, Chars.LF);
 
-      Insert
+      Safe_Insert
         (Edits.Text_Edits,
          Separate_Stub.Unit.Get_Filename,
-         New_Text_Slocs,
-         To_Unbounded_String (To_UTF8 (To_Text (New_Text))));
+         (New_Text_Slocs,
+         To_Unbounded_String (To_UTF8 (To_Text (New_Text)))));
       Edits.File_Deletions.Insert
         (To_Unbounded_String (Separate_Body.Unit.Get_Filename));
 

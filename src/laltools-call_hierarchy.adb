@@ -30,29 +30,25 @@ package body Laltools.Call_Hierarchy is
    ---------------------------
 
    procedure Find_Incoming_Calls
-     (Definition : Defining_Name;
-      Units      : Analysis_Unit_Array;
-      Callback   : not null access procedure
-        (Subp_Call : Call_Stmt))
+     (Definition         : Defining_Name'Class;
+      Units              : Analysis_Unit_Array;
+      Visit              : not null access procedure
+        (Call_Identifier : Base_Id'Class;
+         Kind            : Ref_Result_Kind;
+         Cancel          : in out Boolean);
+      Follow_Renamings   : Boolean := True;
+      Imprecise_Fallback : Boolean := False)
    is
-      Aux_Node : Ada_Node := No_Ada_Node;
+      Cancel : Boolean := False;
 
    begin
-      for Reference of Definition.P_Find_All_Calls (Units) loop
-         Aux_Node := Ref (Reference).As_Ada_Node;
+      for Reference of
+        Definition.P_Find_All_Calls
+          (Units, Follow_Renamings, Imprecise_Fallback)
+      loop
+         Visit (Ref (Reference), Kind (Reference), Cancel);
 
-         while not (Aux_Node.Kind in Ada_Call_Stmt_Range) loop
-            Aux_Node := Aux_Node.Parent;
-         end loop;
-
-         if Aux_Node.Is_Null
-           or else not (Aux_Node.Kind in Ada_Call_Stmt_Range)
-         then
-            raise Program_Error
-              with "Could not find a Call_Stmt node";
-         end if;
-
-         Callback (Aux_Node.As_Call_Stmt);
+         exit when Cancel;
       end loop;
    end Find_Incoming_Calls;
 

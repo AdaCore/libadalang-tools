@@ -54,32 +54,6 @@ package body Laltools.Refactor is
         & Trim (S.End_Column'Image, Both);
    end Image;
 
-   ------------
-   -- Insert --
-   ------------
-
-   procedure Insert
-     (Edits    : in out Text_Edit_Map;
-      Filename : String;
-      Location : Langkit_Support.Slocs.Source_Location_Range;
-      Text     : Ada.Strings.Unbounded.Unbounded_String)
-   is
-      Edits_Set : Text_Edit_Ordered_Set;
-
-   begin
-      if Edits.Contains (Filename) then
-         if not Edits.Reference (Filename).
-           Contains (Text_Edit'(Location, Text))
-         then
-            Edits.Reference (Filename).Insert (Text_Edit'(Location, Text));
-         end if;
-
-      else
-         Edits_Set.Insert (Text_Edit'(Location, Text));
-         Edits.Insert (Filename, Edits_Set);
-      end if;
-   end Insert;
-
    -----------
    -- Merge --
    -----------
@@ -199,5 +173,39 @@ package body Laltools.Refactor is
       Print (E.File_Deletions);
       Print (E.File_Renames);
    end Print;
+
+   -----------------
+   -- Safe_Insert --
+   -----------------
+
+   procedure Safe_Insert
+     (Edits : in out Text_Edit_Ordered_Set;
+      Edit  : Text_Edit) is
+   begin
+      if not Edits.Contains (Edit) then
+         Edits.Insert (Edit);
+      end if;
+   end Safe_Insert;
+
+   -----------------
+   -- Safe_Insert --
+   -----------------
+
+   procedure Safe_Insert
+     (Edits    : in out Text_Edit_Map;
+      File_Name : File_Name_Type;
+      Edit      : Text_Edit)
+   is
+      Edits_Set : Text_Edit_Ordered_Set;
+
+   begin
+      if Edits.Contains (File_Name) then
+         Safe_Insert (Edits.Reference (File_Name), Edit);
+
+      else
+         Edits_Set.Insert (Edit);
+         Edits.Insert (File_Name, Edits_Set);
+      end if;
+   end Safe_Insert;
 
 end Laltools.Refactor;

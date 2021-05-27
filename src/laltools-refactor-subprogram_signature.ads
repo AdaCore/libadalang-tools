@@ -42,8 +42,20 @@ package Laltools.Refactor.Subprogram_Signature is
       end record;
 
    function Image (Data : Parameter_Data_Type) return Unbounded_String;
-   --  Returns a human readable mesUnbounded_Stringsage with the description of
+   --  Returns a human readable Unbounded_String with the description of
    --  a Parameter_Data_Type.
+
+   type Parameter_Indices_Type is array (Positive range <>) of Positive;
+
+   type Parameter_Indices_Range_Type is
+      record
+         First, Last  : Positive;
+      end record
+     with Dynamic_Predicate =>
+       Parameter_Indices_Range_Type.First <= Parameter_Indices_Range_Type.Last;
+
+   type Parameter_Indices_Ranges_Type is
+     array (Positive range <>) of Parameter_Indices_Range_Type;
 
    function Is_Add_Parameter_Available
      (Node            : Ada_Node'Class;
@@ -195,38 +207,34 @@ package Laltools.Refactor.Subprogram_Signature is
    --  removed in the entire subprogram hierarchy, as well as, all renames
    --  hierarchy.
 
-   function Remove_Parameter
+   function Remove_Parameters
      (Subp              : Basic_Decl;
       Parameter_Indices : Parameter_Indices_Type;
       Units             : Analysis_Unit_Array)
-      return Text_Edit_Map
-     with Pre => Subp.P_Is_Subprogram
-     or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
-   --  Removes the parameters defined by Parameter_Indices. The parameter is
+      return Text_Edit_Map;
+   --  Removes the parameters defined by 'Parameter_Indices'. The parameter is
    --  removed in the entire subprogram hierarchy, as well as, all renames
    --  hierarchy.
 
-   function Remove_Parameter
-     (Subp                    : Basic_Decl;
-      Parameter_Indices_Range : Parameter_Indices_Range_Type;
-      Units                   : Analysis_Unit_Array)
-      return Text_Edit_Map
-     with Pre => Subp.P_Is_Subprogram
-     or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
-   --  Removes the parameters defined by Parameter_Indices_Range. The
-   --  parameters are removed in the entire subprogram hierarchy, as well as,
-   --  all renames hierarchy.
-
-   function Remove_Parameter
+   function Remove_Parameters
      (Subp                     : Basic_Decl;
       Parameter_Indices_Ranges : Parameter_Indices_Ranges_Type;
       Units                    : Analysis_Unit_Array)
       return Text_Edit_Map
      with Pre => Subp.P_Is_Subprogram
      or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
-   --  Removes the parameters defined by Parameter_Indices_Ranges. The
-   --  parameters are removed in the entire subprogram hierarchy, as well as,
-   --  all renames hierarchy.
+   --  Removes the parameters defined by 'Parameter_Indices_Ranges'. The
+   --  parameter is removed in the entire subprogram hierarchy, as well as, all
+   --  renames hierarchy.
+
+   function Remove_All_Parameters
+     (Subp                    : Basic_Decl'Class;
+      Units                   : Analysis_Unit_Array)
+      return Text_Edit_Map
+     with Pre => Subp.P_Is_Subprogram
+     or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
+   --  Removes all parameters os 'Subp'. The parameters are removed in the
+   --  entire subprogram hierarchy, as well as, all renames hierarchy.
 
    type Signature_Changer_Option_Type is (Include_Parents, Include_Children);
 
@@ -234,7 +242,7 @@ package Laltools.Refactor.Subprogram_Signature is
      array (Signature_Changer_Option_Type) of Boolean;
 
    Default_Configuration : Signature_Changer_Configuration_Type :=
-     (others => True);
+     (Include_Parents .. Include_Children  => True);
 
    type Signature_Changer is limited interface and Refactoring_Tool;
 

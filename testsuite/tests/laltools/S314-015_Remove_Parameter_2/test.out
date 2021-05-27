@@ -15,6 +15,7 @@ main_package.adb
 9:18-9:31 
 main_package.ads
 4:18-4:36 
+6:18-6:31 
 
 Removing parameter A
 main.adb
@@ -49,8 +50,8 @@ main_package.ads
 Removing parameter A
 main.adb
 9:28-9:41 
-20:20-20:46 
-21:20-21:46 
+20:41-20:45 
+21:36-21:45 
 main_package.ads
 17:20-17:33 
 
