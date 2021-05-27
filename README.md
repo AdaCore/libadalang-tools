@@ -12,6 +12,9 @@ for Ada:
 * `gnatstub`, which creates body stub (empty but compilable bodies) for library
   unit declarations.
 
+* `gnattest`, which creates creates unit-test skeletons
+  as well as a test driver infrastructure.
+
 These are currently under development.
 
 
