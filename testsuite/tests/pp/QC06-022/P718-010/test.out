@@ -3,9 +3,9 @@ is
 
    type Array_Type is
       array (Integer,
-            Integer,
-            Integer,
-            Integer)
+             Integer,
+             Integer,
+             Integer)
       of Boolean;
    Value                   : Array_Type;
    Index_Long_Identifier_1 : Integer;
@@ -18,9 +18,9 @@ is
 
 begin
    Result := Value (Index_Long_Identifier_1,
-                   Index_Long_Identifier_2,
-                   Index_Long_Identifier_3,
-                   Index_Long_Identifier_4);
+                    Index_Long_Identifier_2,
+                    Index_Long_Identifier_3,
+                    Index_Long_Identifier_4);
 
    if Boolean_Value_1
      and then Boolean_Value_2

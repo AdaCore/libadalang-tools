@@ -4636,7 +4636,7 @@ package body Pp.Actions is
          begin
             if Actuals.Kind = Ada_Assoc_List
               and then (Past_Call_Threshold (Actuals.As_Assoc_List)
-                       or else Has_Vertical_Aggregates (Actuals.As_Assoc_List))
+                        or else Has_Vertical_Aggregates (Actuals.As_Assoc_List))
             then
                Interpret_Alt_Template (Call_Threshold_Alt);
 
