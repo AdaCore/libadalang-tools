@@ -32,6 +32,7 @@ class BaseDriver(DiffTestDriver):
         "stub",
         "test",
         "laltools",
+        "refactoring_remove_parameter",
         "refactoring_safe_rename",
     } | WIP_TOOLS
 
