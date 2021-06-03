@@ -1,0 +1,8 @@
+title: U420-017_0 Refactoring Remove Parameter
+
+description: |+
+    This test removes a parameter from a subprogram that has a single
+    parameter with a default value. The tested subprogram has two
+    calls, one without actual parameters (i.e., uses the default value).
+
+driver: shell_script

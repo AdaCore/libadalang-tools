@@ -1,0 +1,8 @@
+Removing parameter I
+foo.adb
+3:18-3:36 
+foo.ads
+3:18-3:36 
+main.adb
+5:7-5:11 
+
