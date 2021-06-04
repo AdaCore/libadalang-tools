@@ -3267,12 +3267,12 @@ package body Pp.Formatting is
             Crt_Tok : Tokn_Cursor := New_Tok;
          begin
             --  It is expected to have something like "X => val1" or
-            --  "X | Y | Z => val2"
+            --  "X | Y | Z => val2" or "others => val"
             --  Return false otherwise.
 
             Crt_Tok := New_Tok;
             while Kind (Crt_Tok) /= Arrow loop
-               if Kind (Crt_Tok) = Ident or
+               if Kind (Crt_Tok) = Ident or Kind (Crt_Tok) = Res_Others or
                  (Kind (Crt_Tok) in Spaces | Tab_Token | Disabled_LB_Token) or
                  Kind (Crt_Tok) = '|'
                then
@@ -3292,6 +3292,7 @@ package body Pp.Formatting is
       --  Start of processing for Insert_Comments_And_Blank_Lines
 
       begin
+
          pragma Debug
            (Format_Debug_Output
               (Lines_Data, "before Insert_Comments_And_Blank_Lines"));
@@ -3529,9 +3530,16 @@ package body Pp.Formatting is
                         if Indentation /= 0 then
                            --  Handle cases when line break just after Spaces or
                            --  just after a '('
-                           if Kind (Prev (New_Tok)) = Spaces or else
-                             Kind (Prev (New_Tok)) = '('
-                           then
+                           if Kind (Prev (New_Tok)) = Spaces then
+                              --  If an affectation is preceeding the Spaces
+                              --  then nothing to do
+                              if Kind
+                                (Prev (Prev (Prev (New_Tok)))) /= Colon_Equal
+                              then
+                                 Indentation := Indentation - 1;
+                              end if;
+
+                           elsif Kind (Prev (New_Tok)) = '(' then
                               Indentation := Indentation - 1;
                            end if;
                         end if;
@@ -3574,8 +3582,24 @@ package body Pp.Formatting is
                                    (Before_Paren_Indent_For_Preserve);
 
                            else
-                              Indentation :=
-                                Indentation + L_Paren_Indentation_For_Preserve;
+                              --  If we have an aggregate or parathesized
+                              --  expression just after a line break we should
+                              --  not take into account parenthesis position
+                              if not Is_Empty (Paren_Stack) and then
+                                Kind (New_Tok) = '(' and then
+                                Kind (Prev (Prev (Prev (New_Tok)))) = Colon_Equal
+                              then
+                                 pragma Assert
+                                   (not Extra_Indent_For_Preserved_Line);
+                                 --  Keep the PP_Indentation as current
+                                 --  indentation reference
+                                 Indentation :=
+                                   Indentation + PP_Indent_Continuation (Cmd);
+                              else
+                                 Indentation :=
+                                   Indentation + L_Paren_Indentation_For_Preserve;
+                              end if;
+
                            end if;
 
                            Cur_Indentation := Indentation;
