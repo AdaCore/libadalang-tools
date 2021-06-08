@@ -631,6 +631,15 @@ package body Laltools.Refactor.Safe_Rename is
    is
       Parent_Package : Package_Decl := No_Package_Decl;
 
+      package Compilation_Unit_Vectors is new Ada.Containers.Indefinite_Vectors
+        (Index_Type   => Natural,
+         Element_Type => Compilation_Unit'Class,
+         "="          => "=");
+
+      subtype Compilation_Unit_Vector is Compilation_Unit_Vectors.Vector;
+
+      Compilation_Units : Compilation_Unit_Vector;
+
    begin
       Find_Parent_Package :
       for Parent of Self.Canonical_Definition.P_Basic_Decl.Parent.Parents loop
@@ -663,30 +672,47 @@ package body Laltools.Refactor.Safe_Rename is
       end if;
 
       for Unit of Self.Units loop
-         if Unit.Root.As_Compilation_Unit.P_Decl.P_Canonical_Part /=
-           Parent_Package.As_Basic_Decl
-           and then Unit.Root.As_Compilation_Unit.
-             P_Decl.P_Parent_Basic_Decl.Unit = Parent_Package.Unit
-         then
-            declare
-               Unit_Decl_Identifier : constant Identifier :=
-                 Get_Defining_Name_Id
-                   (Unit.Root.As_Compilation_Unit.P_Decl.P_Defining_Name);
-            begin
-               --  Check if the new name is already used by other unit.
-
-               if Unit_Decl_Identifier.Text = To_Text (Self.New_Name)
-               then
-                  return Name_Collision'
-                    (Canonical_Definition => Self.Canonical_Definition,
-                     New_Name             => Self.New_Name,
-                     Conflicting_Id       =>
-                       Unit.Root.As_Compilation_Unit.P_Decl.
-                         P_Defining_Name.F_Name);
-               end if;
-            end;
+         if not Unit.Root.Is_Null then
+            if Unit.Root.Kind in Ada_Compilation_Unit then
+               Compilation_Units.Append (Unit.Root.As_Compilation_Unit);
+            elsif Unit.Root.Kind in Ada_Compilation_Unit_List then
+               for Comp_Unit of Unit.Root.As_Compilation_Unit_List loop
+                  if not Comp_Unit.Is_Null then
+                     Compilation_Units.Append (Comp_Unit);
+                  end if;
+               end loop;
+            end if;
          end if;
       end loop;
+
+      for Comp_Unit of Compilation_Units loop
+         declare
+            Unit_Decl : constant Basic_Decl := Comp_Unit.P_Decl;
+
+         begin
+            if Unit_Decl.P_Canonical_Part /= Parent_Package.As_Basic_Decl
+              and then Unit_Decl.P_Parent_Basic_Decl.Unit = Parent_Package.Unit
+            then
+               declare
+                  Unit_Decl_Identifier : constant Identifier :=
+                    Get_Defining_Name_Id (Unit_Decl.P_Defining_Name);
+
+               begin
+                  --  Check if the new name is already used by other unit
+                  --  FIXME: Do a case insensitive comparison
+
+                  if Unit_Decl_Identifier.Text = To_Text (Self.New_Name) then
+                     return Name_Collision'
+                       (Canonical_Definition => Self.Canonical_Definition,
+                        New_Name             => Self.New_Name,
+                        Conflicting_Id       =>
+                          Unit_Decl.P_Defining_Name.F_Name);
+                  end if;
+               end;
+            end if;
+         end;
+      end loop;
+
       return No_Rename_Problem;
    end Find;
 

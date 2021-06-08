@@ -1,0 +1,5 @@
+description: |
+    This test checks if the safe rename tool correctly handles projects
+    with files that only contain the No_Body pragma.
+
+driver: shell_script
