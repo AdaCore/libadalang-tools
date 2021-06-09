@@ -1,0 +1,5 @@
+description: |
+    This test checks if the safe rename tool correctly handles
+    For_Loop_Var_Decl nodes.
+
+driver: shell_script

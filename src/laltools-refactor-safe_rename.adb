@@ -465,6 +465,9 @@ package body Laltools.Refactor.Safe_Rename is
       Local_Scopes : Ada_Node_List_Vectors.Vector renames
         Find_Local_Scopes (Self.Canonical_Definition.P_Basic_Decl);
 
+      Def_Basic_Decl : constant Basic_Decl :=
+        Self.Canonical_Definition.P_Basic_Decl;
+
       --  If Self.Canonical_Definition is associated to a subprogram, then its
       --  spec is needed to check for collisions with other subprograms.
 
@@ -553,54 +556,24 @@ package body Laltools.Refactor.Safe_Rename is
       -- Process_Scope --
       -------------------
 
-      function Process_Scope (Scope : Ada_Node_List)
-                              return Defining_Name
-      is
-         Def_Basic_Decl : constant Basic_Decl :=
-           Self.Canonical_Definition.P_Basic_Decl;
-         Definition_Basic_Decl_Kind : Ada_Node_Kind_Type renames
-           Def_Basic_Decl.Kind;
-
+      function Process_Scope (Scope : Ada_Node_List) return Defining_Name is
       begin
          if Scope = No_Ada_Node_List then
             return No_Defining_Name;
          end if;
 
-         case Definition_Basic_Decl_Kind is
-            when Ada_Type_Decl
-               | Ada_Object_Decl
-               | Ada_Single_Task_Decl
-               | Ada_Task_Body
-               | Ada_Task_Type_Decl
-               | Ada_Param_Spec
-               | Ada_Package_Body
-               | Ada_Package_Decl
-               | Ada_Package_Renaming_Decl =>
-               return Check_Rename_Conflicts (Scope);
+         if Def_Basic_Decl.P_Is_Subprogram then
+            return Check_Subp_Rename_Conflicts (Scope);
 
-            when Ada_Subp_Decl
-               | Ada_Subp_Body
-               | Ada_Subp_Renaming_Decl
-               | Ada_Null_Subp_Decl =>
-               return Check_Subp_Rename_Conflicts (Scope);
-
-            when others =>
-               raise Program_Error;
-         end case;
+         else
+            return Check_Rename_Conflicts (Scope);
+         end if;
       end Process_Scope;
 
    begin
-      case Self.Canonical_Definition.P_Basic_Decl.Kind is
-         when Ada_Subp_Decl
-            | Ada_Subp_Body
-            | Ada_Subp_Renaming_Decl
-            | Ada_Null_Subp_Decl =>
-            Original_Subp_Spec :=
-              Get_Subp_Spec (Self.Canonical_Definition.P_Basic_Decl);
-
-         when others =>
-            null;
-      end case;
+      if Def_Basic_Decl.P_Is_Subprogram then
+         Original_Subp_Spec := Get_Subp_Spec (Def_Basic_Decl);
+      end if;
 
       for Scope of Local_Scopes loop
          declare
