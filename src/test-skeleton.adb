@@ -1290,10 +1290,6 @@ package body Test.Skeleton is
             return Over;
          end if;
 
-         if Node.Kind = Ada_Private_Part then
-            return Over;
-         end if;
-
          if Node.Kind = Ada_Generic_Formal_Part then
             return Over;
          end if;
