@@ -108,8 +108,12 @@ package body Laltools.Common is
             end if;
       end case;
 
-      return Subp_A.F_Subp_Kind = Ada_Subp_Kind_Function
-        and then Subp_A.P_Return_Type = Subp_B.P_Return_Type;
+      --  If we are checking procedures then they are type conformant.
+      --  Otherwise, finally check if the return type is the same.
+
+      return Subp_A.F_Subp_Kind in Ada_Subp_Kind_Procedure_Range
+        or else (Subp_A.F_Subp_Kind in Ada_Subp_Kind_Function_Range
+                 and then Subp_A.P_Return_Type = Subp_B.P_Return_Type);
    end Are_Subprograms_Type_Conformant;
 
    ---------------------------
@@ -893,6 +897,34 @@ package body Laltools.Common is
       return Res;
    end Get_Insert_With_Location;
 
+   ---------------------------
+   -- Find_Matching_Parents --
+   ---------------------------
+
+   procedure Find_Matching_Parents
+     (Node     : Ada_Node'Class;
+      Match    : not null access function
+        (Node : Ada_Node'Class) return Boolean;
+      Callback : not null access procedure
+        (Parent : Ada_Node;
+         Stop   : in out Boolean))
+   is
+      Stop   : Boolean := False;
+      Parent : Ada_Node :=
+        (if Node.Is_Null then No_Ada_Node else Node.As_Ada_Node);
+
+   begin
+      while not Stop loop
+         Parent := Parent.Parent;
+
+         exit when Parent.Is_Null;
+
+         if Match (Parent) then
+            Callback (Parent, Stop);
+         end if;
+      end loop;
+   end Find_Matching_Parents;
+
    --------------------------------------
    -- Get_CU_Visible_Declarative_Parts --
    --------------------------------------
@@ -902,60 +934,171 @@ package body Laltools.Common is
       Skip_First : Boolean := False)
       return Declarative_Part_Vectors.Vector
    is
-      Declarative_Parts : Declarative_Part_Vectors.Vector;
-      Last_Parent       : Ada_Node := Node.Parent;
-   begin
-      if Skip_First then
-         Skip_First_Parent :
-         for Parent of Node.Parent.Parents loop
-            if Parent.Kind in
-              Ada_Package_Body | Ada_Package_Decl | Ada_Subp_Body
-                | Ada_Task_Body | Ada_Decl_Block
-            then
-               Last_Parent := Parent;
-               exit Skip_First_Parent;
-            end if;
-         end loop Skip_First_Parent;
-      end if;
+      Decl_Parts : Declarative_Part_Vector;
 
-      if Last_Parent.Parent = No_Ada_Node then
-         return Declarative_Parts;
-      end if;
+      Parent : Ada_Node := No_Ada_Node;
 
-      for Parent of Last_Parent.Parent.Parents loop
-         case Parent.Kind is
-            when Ada_Package_Body =>
-               for Declarative_Part of
-                 Get_Package_Declarative_Parts (Parent.As_Package_Body)
-               loop
-                  Declarative_Parts.Append (Declarative_Part);
-               end loop;
+      function Is_Declarative_Part_Owner
+        (This_Node : Ada_Node'Class)
+         return Boolean
+      is (This_Node.Kind in
+            Ada_Decl_Block_Range
+              | Ada_Entry_Body_Range
+                | Ada_Package_Body_Range
+                  | Ada_Protected_Body_Range
+                    | Ada_Subp_Body_Range
+                      | Ada_Task_Body_Range
+                        | Ada_Base_Package_Decl
+                          | Ada_Protected_Def_Range
+                            | Ada_Task_Def_Range);
+      --  Checks if This_Node can have a Declarative_Part child
 
-            when Ada_Package_Decl =>
-               for Declarative_Part of
-                 Get_Package_Declarative_Parts (Parent.As_Package_Decl)
-               loop
-                  Declarative_Parts.Append (Declarative_Part);
-               end loop;
+      procedure Ignore_First (Owner : Ada_Node; Stop : in out Boolean);
+      --  This procedure is used as a Callback of Find_Matching_Parents.
+      --  It simply sets Parent to the first matching parent and stops the
+      --  iterative process.
 
-            when Ada_Subp_Body =>
-               Declarative_Parts.Append
-                 (Get_Subp_Body_Declarative_Part (Parent.As_Subp_Body));
+      procedure Append_Declarative_Parts
+        (Owner : Ada_Node;
+         Stop : in out Boolean);
+      --  This procedure is used as a Callback of Find_Matching_Parents and it
+      --  will add every Declarative_Part of Owner to Decl_Parts, including
+      --  the Public_Part and Private_Part (if existent) if Owner kind is in
+      --  Ada_Package_Body_Range, Ada_Base_Package_Decl,
+      --  Ada_Protected_Def_Range, Ada_Protected_Def_Range or
+      --  Ada_Task_Def_Range.
 
-            when Ada_Task_Body =>
-               Declarative_Parts.Append
-                 (Get_Task_Body_Declarative_Part (Parent.As_Task_Body));
+      ------------------
+      -- Ignore_First --
+      ------------------
 
-            when Ada_Decl_Block =>
-               Declarative_Parts.Append
-                 (Get_Decl_Block_Declarative_Part (Parent.As_Decl_Block));
+      procedure Ignore_First (Owner : Ada_Node; Stop : in out Boolean) is
+      begin
+         Stop := True;
+         Parent := Owner;
+      end Ignore_First;
+
+      ------------------------------
+      -- Append_Declarative_Parts --
+      ------------------------------
+
+      procedure Append_Declarative_Parts
+        (Owner : Ada_Node;
+         Stop  : in out Boolean)
+      is
+         pragma Unreferenced (Stop);
+
+      begin
+         case Owner.Kind is
+            when Ada_Decl_Block_Range =>
+               Decl_Parts.Append (Owner.As_Decl_Block.F_Decls);
+
+            when Ada_Entry_Body_Range =>
+               Decl_Parts.Append (Owner.As_Entry_Body.F_Decls);
+
+            when Ada_Package_Body_Range =>
+               declare
+                  Pkg_Decl          : constant Package_Decl :=
+                    Owner.As_Package_Body.P_Canonical_Part.As_Package_Decl;
+                  Private_Decl_Part : constant Private_Part :=
+                    Pkg_Decl.F_Private_Part;
+
+               begin
+                  Decl_Parts.Append (Pkg_Decl.F_Public_Part);
+
+                  if not Private_Decl_Part.Is_Null then
+                     Decl_Parts.Append (Private_Decl_Part);
+                  end if;
+
+                  Decl_Parts.Append (Owner.As_Package_Body.F_Decls);
+               end;
+
+            when Ada_Protected_Body_Range =>
+               Decl_Parts.Append (Owner.As_Protected_Body.F_Decls);
+
+            when Ada_Subp_Body_Range =>
+               Decl_Parts.Append (Owner.As_Subp_Body.F_Decls);
+
+            when Ada_Task_Body_Range =>
+               Decl_Parts.Append (Owner.As_Task_Body.F_Decls);
+
+            when Ada_Base_Package_Decl =>
+               declare
+                  Pkg_Body          : constant Package_Body :=
+                    Owner.As_Package_Decl.P_Body_Part;
+                  Private_Decl_Part : constant Private_Part :=
+                    Owner.As_Package_Decl.F_Private_Part;
+
+               begin
+                  Decl_Parts.Append (Owner.As_Package_Decl.F_Public_Part);
+
+                  if not Private_Decl_Part.Is_Null then
+                     Decl_Parts.Append (Private_Decl_Part);
+                  end if;
+
+                  if not Pkg_Body.Is_Null then
+                     Decl_Parts.Append (Pkg_Body.F_Decls);
+                  end if;
+               end;
+
+            when Ada_Protected_Def_Range =>
+               declare
+                  Private_Decl_Part : constant Private_Part :=
+                    Owner.As_Protected_Def.F_Private_Part;
+               begin
+                  Decl_Parts.Append (Owner.As_Protected_Def.F_Public_Part);
+
+                  if not Private_Decl_Part.Is_Null then
+                     Decl_Parts.Append (Private_Decl_Part);
+                  end if;
+               end;
+
+            when Ada_Task_Def_Range =>
+               declare
+                  Private_Decl_Part : constant Private_Part :=
+                    Owner.As_Task_Def.F_Private_Part;
+               begin
+                  Decl_Parts.Append (Owner.As_Task_Def.F_Public_Part);
+
+                  if not Private_Decl_Part.Is_Null then
+                     Decl_Parts.Append (Private_Decl_Part);
+                  end if;
+               end;
 
             when others =>
-               null;
+               raise Assertion_Error;
          end case;
-      end loop;
+      end Append_Declarative_Parts;
 
-      return Declarative_Parts;
+   begin
+      if Node.Is_Null then
+         return Decl_Parts;
+      end if;
+
+      --  For detecting if a declaration hides another one, we are not
+      --  interested in the first declarative part since any conflicts there
+      --  would be considered name collisions.
+
+      if Skip_First then
+         Find_Matching_Parents
+           (Node     => Node,
+            Match    => Is_Declarative_Part_Owner'Access,
+            Callback => Ignore_First'Access);
+
+         if Parent.Is_Null then
+            return Decl_Parts;
+         end if;
+
+      else
+         Parent := Node.As_Ada_Node;
+      end if;
+
+      Find_Matching_Parents
+        (Node     => Parent,
+         Match    => Is_Declarative_Part_Owner'Access,
+         Callback => Append_Declarative_Parts'Access);
+
+      return Decl_Parts;
    end Get_CU_Visible_Declarative_Parts;
 
    -------------------------------------
@@ -1409,66 +1552,32 @@ package body Laltools.Common is
    ---------------------
 
    function Get_Subp_Params (Subp : Basic_Decl'Class) return Params is
-      Subp_Params : Params := No_Params;
-
-   begin
-      case Subp.Kind is
-         when Ada_Base_Subp_Body =>
-            Subp_Params := Subp.As_Base_Subp_Body.F_Subp_Spec.F_Subp_Params;
-
-         when Ada_Classic_Subp_Decl =>
-            Subp_Params := Subp.As_Classic_Subp_Decl.F_Subp_Spec.F_Subp_Params;
-
-         when Ada_Generic_Subp_Internal_Range =>
-            Subp_Params :=
-              Subp.As_Generic_Subp_Internal.F_Subp_Spec.F_Subp_Params;
-
-         when Ada_Subp_Body_Stub_Range =>
-            Subp_Params :=
-              Subp.As_Subp_Body_Stub.F_Subp_Spec.F_Subp_Params;
-
-         when Ada_Generic_Subp_Decl_Range =>
-            Subp_Params :=
-              Subp.As_Generic_Subp_Decl.F_Subp_Decl.F_Subp_Spec.F_Subp_Params;
-
-         when others =>
-            raise Assertion_Error;
-      end case;
-
-      return Subp_Params;
-   end Get_Subp_Params;
+     (Get_Subp_Spec (Subp).F_Subp_Params);
 
    -------------------
    -- Get_Subp_Spec --
    -------------------
 
-   function Get_Subp_Spec
-     (Subp : Basic_Decl'Class)
-      return Subp_Spec is
-
+   function Get_Subp_Spec (Subp : Basic_Decl'Class) return Subp_Spec is
    begin
       case Subp.Kind is
-         when Ada_Subp_Decl =>
-            return Subp.As_Subp_Decl.F_Subp_Spec;
+         when Ada_Base_Subp_Body =>
+            return Subp.As_Base_Subp_Body.F_Subp_Spec;
 
-         when Ada_Subp_Body =>
-            return Subp.As_Subp_Body.F_Subp_Spec;
+         when Ada_Classic_Subp_Decl =>
+            return Subp.As_Classic_Subp_Decl.F_Subp_Spec;
 
-         when Ada_Null_Subp_Decl =>
-            return Subp.As_Null_Subp_Decl.F_Subp_Spec;
+         when Ada_Generic_Subp_Internal_Range =>
+            return Subp.As_Generic_Subp_Internal.F_Subp_Spec;
 
-         when Ada_Subp_Renaming_Decl =>
-            declare
-               Original_Subp : constant Basic_Decl'Class :=
-                 Resolve_Name_Precisely
-                   (Subp.As_Subp_Renaming_Decl.F_Renames.F_Renamed_Object).
-                 P_Basic_Decl;
-            begin
-               return Get_Subp_Spec (Original_Subp);
-            end;
+         when Ada_Subp_Body_Stub_Range =>
+            return Subp.As_Subp_Body_Stub.F_Subp_Spec;
+
+         when Ada_Generic_Subp_Decl_Range =>
+            return Subp.As_Generic_Subp_Decl.F_Subp_Decl.F_Subp_Spec;
 
          when others =>
-            return No_Subp_Spec;
+            raise Assertion_Error;
       end case;
    end Get_Subp_Spec;
 
@@ -1506,21 +1615,19 @@ package body Laltools.Common is
       return Task_B.F_Decls.F_Decls;
    end Get_Task_Body_Decls;
 
-   --------------------------------------
-   --  Get_Use_Units_Declarative_Parts --
-   --------------------------------------
+   --------------------------------
+   -- Get_Use_Units_Public_Parts --
+   --------------------------------
 
-   function Get_Use_Units_Declarative_Parts
+   function Get_Use_Units_Public_Parts
      (Node : Ada_Node'Class)
-      return Declarative_Part_Vectors.Vector
+      return Declarative_Part_Vector
    is
-      use Declarative_Part_Vectors;
+      Public_Parts : Declarative_Part_Vector;
 
       Node_Unit  : constant Compilation_Unit := Get_Compilation_Unit (Node);
       Used_Units : constant Compilation_Unit_Array :=
         Get_Used_Units (Node_Unit);
-
-      Declarative_Parts : Vector;
 
       procedure Process_Top_Level_Decl (TLD : Basic_Decl);
       --  Processes the top level declaration of a unit if it is a
@@ -1543,8 +1650,7 @@ package body Laltools.Common is
          if not TLD.Is_Null then
             case TLD.Kind is
                when Ada_Package_Decl_Range =>
-                  Declarative_Parts.Append
-                    (TLD.As_Package_Decl.F_Public_Part.As_Declarative_Part);
+                  Public_Parts.Append (TLD.As_Package_Decl.F_Public_Part);
 
                when Ada_Generic_Package_Instantiation_Range =>
                   --  If TLD is a Generic_Package_Instantiation then we need to
@@ -1557,7 +1663,7 @@ package body Laltools.Common is
                   if not DGD.Is_Null
                     and then DGD.Kind in Ada_Generic_Package_Decl_Range
                   then
-                     Declarative_Parts.Append
+                     Public_Parts.Append
                        (DGD.As_Generic_Package_Decl.F_Package_Decl.
                           F_Public_Part.As_Declarative_Part);
                   end if;
@@ -1573,7 +1679,7 @@ package body Laltools.Common is
                     (TLD.As_Package_Renaming_Decl.P_Final_Renamed_Package);
 
                when others =>
-                  null;
+                  raise Assertion_Error;
             end case;
          end if;
       end Process_Top_Level_Decl;
@@ -1588,8 +1694,8 @@ package body Laltools.Common is
            (Used_Unit.P_Top_Level_Decl (Used_Unit.Unit));
       end loop;
 
-      return Declarative_Parts;
-   end Get_Use_Units_Declarative_Parts;
+      return Public_Parts;
+   end Get_Use_Units_Public_Parts;
 
    --------------------
    -- Get_Used_Units --

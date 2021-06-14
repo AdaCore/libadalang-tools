@@ -36,11 +36,6 @@ package body Laltools.Subprogram_Hierarchy is
 
    subtype Subp_Renaming_Decl_Vector is Subp_Renaming_Decl_Vectors.Vector;
 
-   function Unwind_Subp_Renaming_Decl
-     (Subp : Subp_Renaming_Decl'Class)
-      return Basic_Decl;
-   --  Unwinds a subprogram renaming declaration
-
    ---------------------------------
    -- Find_Base_Subp_Declarations --
    ---------------------------------
@@ -60,7 +55,7 @@ package body Laltools.Subprogram_Hierarchy is
 
       if Subp.Kind in Ada_Subp_Renaming_Decl_Range then
          Unwinded_Subp :=
-           Unwind_Subp_Renaming_Decl (Subp.As_Subp_Renaming_Decl);
+           Final_Renamed_Subp (Subp.As_Subp_Renaming_Decl);
       else
          Unwinded_Subp := Subp.As_Basic_Decl;
       end if;
@@ -192,7 +187,7 @@ package body Laltools.Subprogram_Hierarchy is
 
       if Subp.Kind in Ada_Subp_Renaming_Decl_Range then
          Unwinded_Subp :=
-           Unwind_Subp_Renaming_Decl (Subp.As_Subp_Renaming_Decl);
+           Final_Renamed_Subp (Subp.As_Subp_Renaming_Decl);
       else
          Unwinded_Subp := Subp.As_Basic_Decl;
       end if;
@@ -320,7 +315,7 @@ package body Laltools.Subprogram_Hierarchy is
 
       if Aux_Decl.Kind in Ada_Subp_Renaming_Decl_Range then
          Aux_Decl :=
-           Unwind_Subp_Renaming_Decl (Aux_Decl.As_Subp_Renaming_Decl);
+           Final_Renamed_Subp (Aux_Decl.As_Subp_Renaming_Decl);
       end if;
 
       if Aux_Decl.Kind in Ada_Generic_Subp_Instantiation_Range then
@@ -470,7 +465,7 @@ package body Laltools.Subprogram_Hierarchy is
    -- Unwind_Subp_Renaming_Decl --
    -------------------------------
 
-   function Unwind_Subp_Renaming_Decl
+   function Final_Renamed_Subp
      (Subp : Subp_Renaming_Decl'Class)
       return Basic_Decl
    is
@@ -487,6 +482,6 @@ package body Laltools.Subprogram_Hierarchy is
       end loop;
 
       return Aux_Subp;
-   end Unwind_Subp_Renaming_Decl;
+   end Final_Renamed_Subp;
 
 end Laltools.Subprogram_Hierarchy;

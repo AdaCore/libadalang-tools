@@ -31,6 +31,8 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Libadalang.Common; use Libadalang.Common;
 
+with Laltools.Subprogram_Hierarchy; use Laltools.Subprogram_Hierarchy;
+
 package body Laltools.Refactor.Safe_Rename is
 
    function Check_Rename_Conflict
@@ -38,7 +40,8 @@ package body Laltools.Refactor.Safe_Rename is
       Target   : Defining_Name'Class)
       return Boolean is (Target.F_Name.Text = To_Text (New_Name))
      with Pre => Target /= No_Defining_Name;
-   --  Checks if Target's name is equal to New_Name.
+   --  Checks if Target's name is equal to New_Name
+   --  FIXME: Do a case insensitive comparison
 
    function Check_Subp_Rename_Conflict
      (Subp_A   : Subp_Spec;
@@ -479,12 +482,12 @@ package body Laltools.Refactor.Safe_Rename is
       --  as Self.New_Name. If so, return a the Defining_Name of the
       --  conflicting declaration.
 
-      function Check_Subp_Rename_Conflicts (Scope      : Ada_Node_List)
+      function Check_Subp_Rename_Conflicts (Scope : Ada_Node_List)
                                             return Defining_Name;
       --  For every declaration of Scope, checks if it has the same
       --  name as Self.New_Name. Also checks if such declaration is a
       --  subprogram as if so, calls Check_Subp_Rename_Conflict to check
-      --  if both are type conformant.
+      --  if both are type conformant (if they have the same signature).
 
       function Process_Scope (Scope : Ada_Node_List)
                               return Defining_Name;
@@ -517,38 +520,42 @@ package body Laltools.Refactor.Safe_Rename is
       -- Check_Subp_Rename_Conflicts --
       ---------------------------------
 
-      function Check_Subp_Rename_Conflicts (Scope : Ada_Node_List)
-                                            return Defining_Name is
-         use type Ada_Node_Kind_Type;
+      function Check_Subp_Rename_Conflicts
+        (Scope : Ada_Node_List)
+         return Defining_Name is
       begin
          Assert (Original_Subp_Spec /= No_Subp_Spec);
+
          for Decl of Scope loop
-            if Decl.Kind = Ada_Subp_Body then
-               if Check_Subp_Rename_Conflict
-                 (Original_Subp_Spec,
-                  Self.New_Name,
-                  Decl.As_Subp_Body.F_Subp_Spec)
-               then
-                  return Decl.As_Subp_Body.P_Defining_Name;
-               end if;
+            if Decl.Kind in Ada_Basic_Decl then
+               --  Filter the nodes that are not Basic_Decl
 
-            elsif Decl.Kind = Ada_Subp_Decl then
-               if Check_Subp_Rename_Conflict
-                 (Original_Subp_Spec,
-                  Self.New_Name,
-                  Decl.As_Subp_Decl.F_Subp_Spec)
+               if Decl.As_Basic_Decl.P_Is_Subprogram
+                 or else Decl.Kind in Ada_Generic_Subp_Decl_Range
                then
-                  return Decl.As_Subp_Decl.P_Defining_Name;
-               end if;
+                  --  If Decl is a subprogram, then not only check the name but
+                  --  also its signature.
 
-            elsif Decl.Kind in Ada_Basic_Decl then
-               for Definition of Decl.As_Basic_Decl.P_Defining_Names loop
-                  if Check_Rename_Conflict (Self.New_Name, Definition) then
-                     return Definition;
+                  if Check_Subp_Rename_Conflict
+                    (Original_Subp_Spec,
+                     Self.New_Name,
+                     Get_Subp_Spec (Decl.As_Basic_Decl))
+                  then
+                     return Decl.As_Basic_Decl.P_Defining_Name;
                   end if;
-               end loop;
+
+               else
+                  --  Otherwise just check the name
+
+                  for Definition of Decl.As_Basic_Decl.P_Defining_Names loop
+                     if Check_Rename_Conflict (Self.New_Name, Definition) then
+                        return Definition;
+                     end if;
+                  end loop;
+               end if;
             end if;
          end loop;
+
          return No_Defining_Name;
       end Check_Subp_Rename_Conflicts;
 
@@ -571,7 +578,9 @@ package body Laltools.Refactor.Safe_Rename is
       end Process_Scope;
 
    begin
-      if Def_Basic_Decl.P_Is_Subprogram then
+      if Def_Basic_Decl.P_Is_Subprogram
+        or else Def_Basic_Decl.Kind in Ada_Generic_Subp_Decl_Range
+      then
          Original_Subp_Spec := Get_Subp_Spec (Def_Basic_Decl);
       end if;
 
@@ -1003,49 +1012,130 @@ package body Laltools.Refactor.Safe_Rename is
      (Self : Name_Hiding_Finder)
       return Rename_Problem'Class
    is
-      Declarative_Parts : constant Declarative_Part_Vectors.Vector :=
+      Canonical_Decl : constant Basic_Decl :=
+        Self.Canonical_Definition.P_Basic_Decl;
+      Is_Subprogram  : constant Boolean :=
+        Canonical_Decl.P_Is_Subprogram
+        or else Self.Canonical_Definition.P_Basic_Decl.Kind
+          in Ada_Generic_Subp_Decl_Range;
+
+      Possible_Problem : Hiding_Name;
+      Found_Problem    : Boolean := False;
+
+      Visible_Declarative_Parts   : constant Declarative_Part_Vector :=
         Get_CU_Visible_Declarative_Parts
           (Node       => Self.Canonical_Definition.P_Basic_Decl,
            Skip_First => True);
-      Use_Units_Declarative_Parts : constant Declarative_Part_Vectors.Vector :=
-        Get_Use_Units_Declarative_Parts (Self.Canonical_Definition);
+      Use_Units_Public_Parts : constant Declarative_Part_Vector :=
+        Get_Use_Units_Public_Parts (Self.Canonical_Definition);
+
+      procedure Check_Declarative_Part
+        (Decl_Part : Declarative_Part'Class);
+      --  Checks if Decl_Part contains any declaration that can be hidden by
+      --  Canonical_Decl. If so, Possible_Problem is filled with the
+      --  appropriate information and Found_Problem is set to True.
+
+      procedure Check_Declarative_Part
+        (Decl_Part : Declarative_Part'Class) is
+      begin
+         if Is_Subprogram then
+            for Decl of Decl_Part.F_Decls loop
+               --  Conflicts can only exist with subprograms and not with other
+               --  kind of declarations.
+
+               if Decl.Kind in Ada_Basic_Decl
+                 and then (Decl.As_Basic_Decl.P_Is_Subprogram
+                           or else Decl.Kind in Ada_Generic_Subp_Decl_Range)
+               then
+                  if Decl.Kind in Ada_Subp_Renaming_Decl_Range then
+                     declare
+                        Unwinded_Decl : constant Basic_Decl :=
+                          Final_Renamed_Subp
+                            (Decl.As_Subp_Renaming_Decl);
+
+                     begin
+                        if not Unwinded_Decl.Is_Null
+                          and then Check_Subp_Rename_Conflict
+                            (Subp_A   => Get_Subp_Spec (Canonical_Decl),
+                             New_Name => Self.New_Name,
+                             Subp_B   => Get_Subp_Spec (Unwinded_Decl))
+                        then
+                           Possible_Problem :=
+                             (Canonical_Definition =>
+                                Self.Canonical_Definition,
+                              New_Name             => Self.New_Name,
+                              Conflicting_Id       =>
+                                Decl.As_Basic_Decl.P_Canonical_Part.
+                                  P_Defining_Name.F_Name);
+                           Found_Problem := True;
+                           return;
+                        end if;
+                     end;
+                  else
+                     if Check_Subp_Rename_Conflict
+                       (Subp_A   => Get_Subp_Spec (Canonical_Decl),
+                        New_Name => Self.New_Name,
+                        Subp_B   => Get_Subp_Spec (Decl.As_Basic_Decl))
+                     then
+                        Possible_Problem :=
+                          (Canonical_Definition => Self.Canonical_Definition,
+                           New_Name             => Self.New_Name,
+                           Conflicting_Id       =>
+                             Decl.As_Basic_Decl.P_Canonical_Part.
+                               P_Defining_Name.F_Name);
+                        Found_Problem := True;
+                        return;
+                     end if;
+                  end if;
+               end if;
+            end loop;
+
+         else
+            for Decl of Decl_Part.F_Decls loop
+               --  Conflicts can exists with any kind of declaration except
+               --  subprograms.
+
+               if Decl.Kind in Ada_Basic_Decl
+                 and then (not (Decl.As_Basic_Decl.P_Is_Subprogram
+                                or else Decl.Kind in
+                                  Ada_Generic_Subp_Decl_Range))
+               then
+                  if Check_Rename_Conflict
+                    (Self.New_Name,
+                     Decl.As_Basic_Decl.P_Canonical_Part.P_Defining_Name)
+                  then
+                     Possible_Problem :=
+                       (Canonical_Definition => Self.Canonical_Definition,
+                        New_Name             => Self.New_Name,
+                        Conflicting_Id       =>
+                          Decl.As_Basic_Decl.P_Canonical_Part.
+                            P_Defining_Name.F_Name);
+                     Found_Problem := True;
+                     return;
+                  end if;
+               end if;
+            end loop;
+         end if;
+      end Check_Declarative_Part;
 
    begin
-      for Decl_Part of Declarative_Parts loop
-         for Decl of Decl_Part.F_Decls loop
-            if Decl.Kind in Ada_Basic_Decl then
-               if Check_Rename_Conflict
-                 (Self.New_Name,
-                  Decl.As_Basic_Decl.P_Canonical_Part.P_Defining_Name)
-               then
-                  return Hiding_Name'
-                    (Canonical_Definition => Self.Canonical_Definition,
-                     New_Name             => Self.New_Name,
-                     Conflicting_Id       =>
-                       Decl.As_Basic_Decl.P_Canonical_Part.
-                         P_Defining_Name.F_Name);
-               end if;
-            end if;
-         end loop;
+      for Decl_Part of Visible_Declarative_Parts loop
+         Check_Declarative_Part (Decl_Part);
+         exit when Found_Problem;
       end loop;
 
-      for Decl_Part of Use_Units_Declarative_Parts loop
-         for Decl of Decl_Part.F_Decls loop
-            if Decl.Kind in Ada_Basic_Decl then
-               if Check_Rename_Conflict
-                 (Self.New_Name,
-                  Decl.As_Basic_Decl.P_Canonical_Part.P_Defining_Name)
-               then
-                  return Hiding_Name'
-                    (Canonical_Definition => Self.Canonical_Definition,
-                     New_Name             => Self.New_Name,
-                     Conflicting_Id       =>
-                       Decl.As_Basic_Decl.P_Canonical_Part.
-                         P_Defining_Name.F_Name);
-               end if;
-            end if;
-         end loop;
+      if Found_Problem then
+         return Possible_Problem;
+      end if;
+
+      for Decl_Part of Use_Units_Public_Parts loop
+         Check_Declarative_Part (Decl_Part);
+         exit when Found_Problem;
       end loop;
+
+      if Found_Problem then
+         return Possible_Problem;
+      end if;
 
       return No_Rename_Problem;
    end Find;

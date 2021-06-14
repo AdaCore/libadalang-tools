@@ -1,0 +1,5 @@
+description: |
+    This test checks if the safe rename tool name hiding finder compares
+    two subprograms using their signature instead of just their name.
+
+driver: shell_script

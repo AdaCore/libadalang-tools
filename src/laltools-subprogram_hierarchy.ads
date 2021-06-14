@@ -121,4 +121,11 @@ package Laltools.Subprogram_Hierarchy is
    --  overwritting subprogram, renames and generic instantiations) and calls
    --  'Decl_Callback' on them. If 'Find_Calls' then also calls
    --  'Calls_Callback' on their call statements.
+
+   function Final_Renamed_Subp
+     (Subp : Subp_Renaming_Decl'Class)
+      return Basic_Decl;
+   --  Return the subprogram declaration that is ultimately renamed by Subp,
+   --  skipping through all intermediate subprogram renamings.
+
 end Laltools.Subprogram_Hierarchy;

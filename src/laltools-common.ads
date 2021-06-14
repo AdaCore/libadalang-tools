@@ -29,6 +29,7 @@ with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Ordered_Sets;
 with Ada.Containers.Vectors;
+with Ada.Containers.Indefinite_Vectors;
 
 with GNATCOLL.Traces;
 
@@ -78,14 +79,18 @@ package Laltools.Common is
       Element_Type => Basic_Decl,
       "="          => "=");
 
+   subtype Basic_Decl_Vector is Basic_Decl_Vectors.Vector;
+
    package Bodies_List is new Ada.Containers.Doubly_Linked_Lists
      (Element_Type => Defining_Name,
       "="          => "=");
 
-   package Declarative_Part_Vectors is new Ada.Containers.Vectors
+   package Declarative_Part_Vectors is new Ada.Containers.Indefinite_Vectors
      (Index_Type   => Natural,
-      Element_Type => Declarative_Part,
+      Element_Type => Declarative_Part'Class,
       "="          => "=");
+
+   subtype Declarative_Part_Vector is Declarative_Part_Vectors.Vector;
 
    type Param_Data is record
       Param_Mode : Mode;
@@ -226,6 +231,17 @@ package Laltools.Common is
    --  Wrapper around P_Canonical_Part that returns null if canonical part
    --  is name itself. It also catches Property_Error and reports it in traces.
 
+   procedure Find_Matching_Parents
+     (Node     : Ada_Node'Class;
+      Match    : not null access function
+        (Node : Ada_Node'Class) return Boolean;
+      Callback : not null access procedure
+        (Parent : Ada_Node;
+         Stop   : in out Boolean));
+   --  Iterates through the parents of Node and calls Callback on the parents
+   --  where Match returns True. This iterative process stops if Callback sets
+   --  Stop to True.
+
    function Find_Local_Scopes (Node : Ada_Node'Class)
                                return Ada_Node_List_Vectors.Vector;
    --  Find all scopes in Node's compilation unit visible by Node.
@@ -290,7 +306,9 @@ package Laltools.Common is
      (Node : Ada_Node'Class;
       Skip_First : Boolean := False)
       return Declarative_Part_Vectors.Vector;
-   --  Find all Declarative_Parts in Node's compilation unit visible by Node.
+   --  Returns a vector with all Declarative_Parts in Node's compilation unit
+   --  visible by Node. If Skip_First is True, then Node's first
+   --  Declarative_Part parent is skipped.
 
    function Get_Decl_Block_Declarative_Part (Decl_B : Decl_Block)
                                              return Declarative_Part;
@@ -414,16 +432,17 @@ package Laltools.Common is
    --  Gets the Ada_Node_List of a Declarative_Part associated to a Subp_Body.
 
    function Get_Subp_Params (Subp : Basic_Decl'Class) return Params
-     with Pre => Subp.P_Is_Subprogram
-     or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
-   --  Gets the Params node of 'Subp', if it exists. If it doesn't exist then
-   --  returns No_Params.
+     with Pre => (not Subp.Is_Null
+                  and then (Subp.P_Is_Subprogram
+                    or else Subp.Kind in Ada_Generic_Subp_Decl_Range));
+   --  Gets the Params node associatedof 'Subp', if it exists.
+   --  If it doesn't exist returns No_Params.
 
-   function Get_Subp_Spec
-     (Subp : Basic_Decl'Class)
-      return Subp_Spec;
-   --  Gets the Subp_Spec associated to a subprogram. If Subp is not a
-   --  subprogram, returns No_Subp_Spec.
+   function Get_Subp_Spec (Subp : Basic_Decl'Class) return Subp_Spec
+     with Pre => (not Subp.Is_Null
+                  and then (Subp.P_Is_Subprogram
+                    or else Subp.Kind in Ada_Generic_Subp_Decl_Range));
+   --  Gets the Subp_Spec node associated to a subprogram
 
    function Get_Task_Body_Declarative_Part (Task_B : Task_Body)
                                             return Declarative_Part;
@@ -432,10 +451,10 @@ package Laltools.Common is
    function Get_Task_Body_Decls (Task_B : Task_Body) return Ada_Node_List;
    --  Gets the Ada_Node_List of a Declarative_Part associated to a Task_Body.
 
-   function Get_Use_Units_Declarative_Parts
+   function Get_Use_Units_Public_Parts
      (Node : Ada_Node'Class)
       return Declarative_Part_Vectors.Vector;
-   --  Gets all public Declarative_Parts of the units used by Node's unit.
+   --  Gets all public Declarative_Parts of the units used by Node's unit
 
    function Get_Used_Units
      (Node : Compilation_Unit'Class)
