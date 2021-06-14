@@ -115,6 +115,8 @@ Start_Line: 10
 Start_Column: 8
 End_Line: 10
 End_Column: 9
+Problems:
+Renaming A to F creates a name collision with <Id "F" main.adb:30:14-30:15>
 
 # Renaming node main.adb:5:14: 
 References:
