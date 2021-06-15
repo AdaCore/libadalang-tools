@@ -98,4 +98,5 @@ End_Line: 4
 End_Column: 43
 Problems:
 Renaming My_Other_Bar to My_Bar_Foo creates a name collision with <Id "My_Bar_Foo" a.adb:10:7-10:17>
+Renaming My_Other_Bar to My_Bar_Foo will hide it by <Id "My_Bar_Foo" a.adb:10:7-10:17>
 
