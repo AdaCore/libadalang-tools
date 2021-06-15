@@ -1,0 +1,5 @@
+description: |
+    This test checks if the safe rename tool name correctly handles
+    ExprFunction nodes and NullSubpDecl nodes.
+
+driver: shell_script

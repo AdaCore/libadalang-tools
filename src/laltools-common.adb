@@ -535,93 +535,174 @@ package body Laltools.Common is
    -- Find_Nested_Scopes --
    ------------------------
 
-   function Find_Nested_Scopes (Node : Ada_Node'Class)
-                                return Declarative_Part_Vectors.Vector
+   function Find_Nested_Scopes
+     (Node : Ada_Node'Class)
+      return Declarative_Part_Vector
    is
       Nested_Declarative_Parts : Declarative_Part_Vectors.Vector;
 
-      function Find_Nested_Declarative_Parts (This_Node : Ada_Node'Class)
-                                              return Visit_Status;
+      Parent_Declarative_Part_Owner : Ada_Node;
 
-      function Find_Nested_Declarative_Parts (This_Node : Ada_Node'Class)
-                                              return Visit_Status is
+      procedure Set_Parent_Declarative_Part_Owner
+        (Owner : Ada_Node;
+         Stop  : in out Boolean);
+      --  Callback of Find_Matching_Parents that sets
+      --  Parent_Declarative_Part_Owner and stops the iteration.
+
+      function Append_Nested_Declarative_Parts
+        (This_Node : Ada_Node'Class)
+         return Visit_Status;
+      --  Callback of Find_Matching_Parents that checks if This_Node is a
+      --  Declarative_Part, and if so, appends it to Nested_Declarative_Parts.
+
+      -------------------------------------
+      -- Append_Nested_Declarative_Parts --
+      -------------------------------------
+
+      function Append_Nested_Declarative_Parts
+        (This_Node : Ada_Node'Class)
+         return Visit_Status is
       begin
          if This_Node.Kind in Ada_Declarative_Part_Range then
             Nested_Declarative_Parts.Append (This_Node.As_Declarative_Part);
          end if;
 
          return Into;
-      end Find_Nested_Declarative_Parts;
+      end Append_Nested_Declarative_Parts;
+
+      ---------------------------------------
+      -- Set_Parent_Declarative_Part_Owner --
+      ---------------------------------------
+
+      procedure Set_Parent_Declarative_Part_Owner
+        (Owner : Ada_Node;
+         Stop  : in out Boolean) is
+      begin
+         Parent_Declarative_Part_Owner := Owner;
+         Stop := True;
+      end Set_Parent_Declarative_Part_Owner;
+
+      Body_Decl_Part    : Declarative_Part := No_Declarative_Part;
+      Public_Decl_Part  : Public_Part := No_Public_Part;
+      Private_Decl_Part : Private_Part := No_Private_Part;
+      Stmts             : Handled_Stmts := No_Handled_Stmts;
 
    begin
-      Find_Declarative_Part_Owner :
-      for N of Node.Parents loop
-         case N.Kind is
-            when Ada_Decl_Block =>
-               Traverse
-                 (N.As_Decl_Block.F_Decls.F_Decls,
-                  Find_Nested_Declarative_Parts'Access);
-               Traverse
-                 (N.As_Decl_Block.F_Stmts,
-                  Find_Nested_Declarative_Parts'Access);
-               exit Find_Declarative_Part_Owner;
+      if Node.Is_Null then
+         return Nested_Declarative_Parts;
+      end if;
 
-            when Ada_Package_Body =>
-               Traverse
-                 (N.As_Package_Body.F_Decls.F_Decls,
-                  Find_Nested_Declarative_Parts'Access);
-               exit Find_Declarative_Part_Owner;
+      if Is_Declarative_Part_Owner (Node) then
+         Parent_Declarative_Part_Owner := Node.As_Ada_Node;
 
-            when Ada_Package_Decl =>
-               if not N.As_Package_Decl.P_Body_Part.Is_Null then
-                  Traverse
-                    (N.As_Package_Decl.P_Body_Part.F_Decls.F_Decls,
-                     Find_Nested_Declarative_Parts'Access);
+      else
+         Find_Matching_Parents
+           (Node     => Node,
+            Match    => Is_Declarative_Part_Owner'Access,
+            Callback => Set_Parent_Declarative_Part_Owner'Access);
+      end if;
+
+      if Parent_Declarative_Part_Owner.Is_Null then
+         return Nested_Declarative_Parts;
+      end if;
+
+      case Parent_Declarative_Part_Owner.Kind is
+         when Ada_Decl_Block_Range =>
+            Body_Decl_Part :=
+              Parent_Declarative_Part_Owner.As_Decl_Block.F_Decls;
+            Stmts := Parent_Declarative_Part_Owner.As_Decl_Block.F_Stmts;
+
+         when Ada_Entry_Body_Range =>
+            Body_Decl_Part :=
+              Parent_Declarative_Part_Owner.As_Entry_Body.F_Decls;
+            Stmts := Parent_Declarative_Part_Owner.As_Entry_Body.F_Stmts;
+
+         when Ada_Package_Body_Range =>
+            Body_Decl_Part :=
+              Parent_Declarative_Part_Owner.As_Package_Body.F_Decls;
+
+            declare
+               Pkg_Decl : constant Basic_Decl :=
+                 Parent_Declarative_Part_Owner.As_Package_Body.
+                   P_Canonical_Part;
+
+            begin
+               if not Pkg_Decl.Is_Null then
+                  Public_Decl_Part := Pkg_Decl.As_Package_Decl.F_Public_Part;
+                  Private_Decl_Part := Pkg_Decl.As_Package_Decl.F_Private_Part;
                end if;
+            end;
 
-               Traverse
-                 (N.As_Package_Decl.F_Public_Part.F_Decls,
-                  Find_Nested_Declarative_Parts'Access);
+         when Ada_Protected_Body_Range =>
+            Body_Decl_Part :=
+              Parent_Declarative_Part_Owner.As_Entry_Body.F_Decls;
+            Stmts := Parent_Declarative_Part_Owner.As_Entry_Body.F_Stmts;
 
-               if not N.As_Package_Decl.F_Private_Part.Is_Null then
-                  Traverse
-                    (N.As_Package_Decl.F_Private_Part.F_Decls,
-                     Find_Nested_Declarative_Parts'Access);
+         when Ada_Subp_Body_Range =>
+            Body_Decl_Part :=
+              Parent_Declarative_Part_Owner.As_Subp_Body.F_Decls;
+            Stmts := Parent_Declarative_Part_Owner.As_Subp_Body.F_Stmts;
+
+         when Ada_Task_Body_Range =>
+            Body_Decl_Part :=
+              Parent_Declarative_Part_Owner.As_Task_Body.F_Decls;
+            Stmts := Parent_Declarative_Part_Owner.As_Task_Body.F_Stmts;
+
+         when Ada_Base_Package_Decl =>
+            Public_Decl_Part :=
+              Parent_Declarative_Part_Owner.As_Base_Package_Decl.F_Public_Part;
+            Private_Decl_Part :=
+              Parent_Declarative_Part_Owner.
+                As_Base_Package_Decl.F_Private_Part;
+
+            declare
+               Pkg_Body : constant Package_Body :=
+                 Parent_Declarative_Part_Owner.As_Package_Decl.P_Body_Part;
+
+            begin
+               if not Pkg_Body.Is_Null then
+                  Body_Decl_Part := Pkg_Body.F_Decls;
                end if;
+            end;
 
-               exit Find_Declarative_Part_Owner;
+         when Ada_Protected_Def_Range =>
+            Public_Decl_Part :=
+              Parent_Declarative_Part_Owner.As_Protected_Def.F_Public_Part;
+            Private_Decl_Part :=
+              Parent_Declarative_Part_Owner.As_Protected_Def.F_Private_Part;
 
-            when Ada_Subp_Body =>
-               Traverse
-                 (N.As_Subp_Body.F_Decls.F_Decls,
-                  Find_Nested_Declarative_Parts'Access);
-               Traverse
-                 (N.As_Subp_Body.F_Stmts,
-                  Find_Nested_Declarative_Parts'Access);
-               exit Find_Declarative_Part_Owner;
+         when Ada_Task_Def_Range =>
+            Public_Decl_Part :=
+              Parent_Declarative_Part_Owner.As_Task_Def.F_Public_Part;
+            Private_Decl_Part :=
+              Parent_Declarative_Part_Owner.As_Task_Def.F_Private_Part;
 
-            when Ada_Subp_Decl =>
-               Traverse
-                 (N.As_Subp_Decl.P_Body_Part.As_Subp_Body.F_Decls.F_Decls,
-                  Find_Nested_Declarative_Parts'Access);
-               Traverse
-                 (N.As_Subp_Decl.P_Body_Part.As_Subp_Body.F_Stmts,
-                  Find_Nested_Declarative_Parts'Access);
-               exit Find_Declarative_Part_Owner;
+         when others =>
+            raise Assertion_Error;
+      end case;
 
-            when Ada_Task_Body =>
-               Traverse
-                 (N.As_Task_Body.F_Decls.F_Decls,
-                  Find_Nested_Declarative_Parts'Access);
-               Traverse
-                 (N.As_Task_Body.F_Stmts,
-                  Find_Nested_Declarative_Parts'Access);
-               exit Find_Declarative_Part_Owner;
+      if not Body_Decl_Part.Is_Null then
+         Traverse
+           (Body_Decl_Part.F_Decls,
+            Append_Nested_Declarative_Parts'Access);
+      end if;
 
-            when others =>
-               null;
-         end case;
-      end loop Find_Declarative_Part_Owner;
+      if not Public_Decl_Part.Is_Null then
+         Traverse
+           (Public_Decl_Part.F_Decls,
+            Append_Nested_Declarative_Parts'Access);
+      end if;
+
+      if not Private_Decl_Part.Is_Null then
+         Traverse
+           (Private_Decl_Part.F_Decls,
+            Append_Nested_Declarative_Parts'Access);
+      end if;
+
+      if not Stmts.Is_Null then
+         Traverse (Stmts, Append_Nested_Declarative_Parts'Access);
+      end if;
+
       return Nested_Declarative_Parts;
    end Find_Nested_Scopes;
 
@@ -938,21 +1019,6 @@ package body Laltools.Common is
 
       Parent : Ada_Node := No_Ada_Node;
 
-      function Is_Declarative_Part_Owner
-        (This_Node : Ada_Node'Class)
-         return Boolean
-      is (This_Node.Kind in
-            Ada_Decl_Block_Range
-              | Ada_Entry_Body_Range
-                | Ada_Package_Body_Range
-                  | Ada_Protected_Body_Range
-                    | Ada_Subp_Body_Range
-                      | Ada_Task_Body_Range
-                        | Ada_Base_Package_Decl
-                          | Ada_Protected_Def_Range
-                            | Ada_Task_Def_Range);
-      --  Checks if This_Node can have a Declarative_Part child
-
       procedure Ignore_First (Owner : Ada_Node; Stop : in out Boolean);
       --  This procedure is used as a Callback of Find_Matching_Parents.
       --  It simply sets Parent to the first matching parent and stops the
@@ -1171,6 +1237,93 @@ package body Laltools.Common is
             return No_Declarative_Part;
       end case;
    end Get_Declarative_Part;
+
+   ---------------------------
+   -- Get_Declarative_Parts --
+   ---------------------------
+
+   function Get_Declarative_Parts
+     (Node : Ada_Node'Class)
+      return Declarative_Part_Vector
+   is
+      Declarative_Parts : Declarative_Part_Vector;
+
+      Body_Decl_Part    : Declarative_Part := No_Declarative_Part;
+      Public_Decl_Part  : Public_Part := No_Public_Part;
+      Private_Decl_Part : Private_Part := No_Private_Part;
+
+      procedure Safe_Append (Decl_Part : Declarative_Part'Class);
+
+      procedure Safe_Append (Decl_Part : Declarative_Part'Class) is
+      begin
+         if not Decl_Part.Is_Null then
+            Declarative_Parts.Append (Decl_Part);
+         end if;
+      end Safe_Append;
+
+   begin
+      case Node.Kind is
+         when Ada_Decl_Block_Range =>
+            Body_Decl_Part := Node.As_Decl_Block.F_Decls;
+
+         when Ada_Entry_Body_Range =>
+            Body_Decl_Part := Node.As_Entry_Body.F_Decls;
+
+         when Ada_Package_Body_Range =>
+            Body_Decl_Part := Node.As_Package_Body.F_Decls;
+
+            declare
+               Pkg_Decl : constant Basic_Decl :=
+                 Node.As_Package_Body.P_Canonical_Part;
+
+            begin
+               if not Pkg_Decl.Is_Null then
+                  Public_Decl_Part := Pkg_Decl.As_Package_Decl.F_Public_Part;
+                  Private_Decl_Part := Pkg_Decl.As_Package_Decl.F_Private_Part;
+               end if;
+            end;
+
+         when Ada_Protected_Body_Range =>
+            Body_Decl_Part := Node.As_Entry_Body.F_Decls;
+
+         when Ada_Subp_Body_Range =>
+            Body_Decl_Part := Node.As_Subp_Body.F_Decls;
+
+         when Ada_Task_Body_Range =>
+            Body_Decl_Part := Node.As_Task_Body.F_Decls;
+
+         when Ada_Base_Package_Decl =>
+            Public_Decl_Part := Node.As_Base_Package_Decl.F_Public_Part;
+            Private_Decl_Part := Node.As_Base_Package_Decl.F_Private_Part;
+
+            declare
+               Pkg_Body : constant Package_Body :=
+                 Node.As_Package_Decl.P_Body_Part;
+
+            begin
+               if not Pkg_Body.Is_Null then
+                  Body_Decl_Part := Pkg_Body.F_Decls;
+               end if;
+            end;
+
+         when Ada_Protected_Def_Range =>
+            Public_Decl_Part := Node.As_Protected_Def.F_Public_Part;
+            Private_Decl_Part := Node.As_Protected_Def.F_Private_Part;
+
+         when Ada_Task_Def_Range =>
+            Public_Decl_Part := Node.As_Task_Def.F_Public_Part;
+            Private_Decl_Part := Node.As_Task_Def.F_Private_Part;
+
+         when others =>
+            raise Assertion_Error;
+      end case;
+
+      Safe_Append (Body_Decl_Part);
+      Safe_Append (Public_Decl_Part);
+      Safe_Append (Private_Decl_Part);
+
+      return Declarative_Parts;
+   end Get_Declarative_Parts;
 
    --------------------------
    -- Get_Defining_Name_Id --
@@ -1850,6 +2003,24 @@ package body Laltools.Common is
 
       return False;
    end Is_Constant;
+
+   -------------------------------
+   -- Is_Declarative_Part_Owner --
+   -------------------------------
+
+   function Is_Declarative_Part_Owner
+     (Node : Ada_Node'Class)
+      return Boolean
+   is (Node.Kind in
+         Ada_Decl_Block_Range
+           | Ada_Entry_Body_Range
+             | Ada_Package_Body_Range
+               | Ada_Protected_Body_Range
+                 | Ada_Subp_Body_Range
+                   | Ada_Task_Body_Range
+                     | Ada_Base_Package_Decl
+                       | Ada_Protected_Def_Range
+                         | Ada_Task_Def_Range);
 
    ---------------------------------------------------
    -- Is_Definition_Without_Separate_Implementation --

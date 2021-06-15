@@ -1147,10 +1147,17 @@ package body Laltools.Refactor.Safe_Rename is
    overriding
    function Find (Self : Name_Hidden_Finder) return Rename_Problem'Class
    is
-      Nested_Declarative_Parts : constant Declarative_Part_Vectors.Vector :=
-        Find_Nested_Scopes (Self.Canonical_Definition.P_Basic_Decl);
-      Own_Declarative_Part : Declarative_Part_Vectors.Vector :=
-        Declarative_Part_Vectors.Empty_Vector;
+      Canonical_Decl : constant Basic_Decl :=
+        Self.Canonical_Definition.P_Basic_Decl;
+
+      Nested_Declarative_Parts : constant Declarative_Part_Vector :=
+        Find_Nested_Scopes (Canonical_Decl);
+      Own_Declarative_Part     : constant Declarative_Part_Vector :=
+        (if Is_Declarative_Part_Owner (Canonical_Decl) then
+            Get_Declarative_Parts (Canonical_Decl)
+         else
+            Declarative_Part_Vectors.Empty_Vector);
+
       Stop_Node : Ada_Node := No_Ada_Node;
       Dec_Visible_Declarative_Parts : constant Declarative_Part_Vectors.Vector
         := Find_Local_Scopes (Self.Canonical_Definition.P_Basic_Decl);
@@ -1160,10 +1167,13 @@ package body Laltools.Refactor.Safe_Rename is
       --  subprogram that is type conformant.
 
       Is_Subp : constant Boolean :=
-        Self.Canonical_Definition.P_Basic_Decl.Kind in
-          Ada_Subp_Body | Ada_Subp_Decl;
-
-      Spec : Subp_Spec := No_Subp_Spec;
+        Canonical_Decl.P_Is_Subprogram
+        or else Canonical_Decl.Kind in Ada_Generic_Subp_Decl_Range;
+      Spec    : constant Subp_Spec :=
+        (if Is_Subp then
+            Get_Subp_Spec (Canonical_Decl)
+         else
+            No_Subp_Spec);
 
       function Check_Conflict (Definition : Defining_Name) return Boolean;
       --  Delegates to Check_Subp_Rename_Conflict after doing necessary
@@ -1198,22 +1208,11 @@ package body Laltools.Refactor.Safe_Rename is
       end Check_Conflict;
 
    begin
-      if Is_Subp then
-         if Self.Canonical_Definition.P_Basic_Decl.Kind = Ada_Subp_Body then
-            Spec :=
-              Self.Canonical_Definition.P_Basic_Decl.As_Subp_Body.F_Subp_Spec;
-         else
-            Spec :=
-              Self.Canonical_Definition.P_Basic_Decl.As_Subp_Decl.F_Subp_Spec;
-         end if;
-      end if;
-
-      --  First start by checking if Self.Canonical_Definition will be hidden
-      --  by the rename.
-
-      --  Checks if there is a declaration with the same name as Self.New_Name
-      --  in the nested declarative parts that have visibility of
-      --  Self.Canonical_Part.
+      --  First: Check if there is a declaration with the same name as
+      --  Self.New_Name in the nested declarative parts that have visibility of
+      --  Self.Canonical_Definition.
+      --  Example: a procedure Foo that declares, in a declarative part inside
+      --  its Handled_Stmts, a nested procedure also called Foo.
 
       for Declarative_Part of Nested_Declarative_Parts loop
          for Declaration of Declarative_Part.F_Decls loop
@@ -1232,29 +1231,11 @@ package body Laltools.Refactor.Safe_Rename is
          end loop;
       end loop;
 
-      case Self.Canonical_Definition.P_Basic_Decl.Kind is
-         when Ada_Package_Decl =>
-            Own_Declarative_Part := Get_Package_Declarative_Parts
-              (Self.Canonical_Definition.P_Basic_Decl.As_Package_Decl);
-         when Ada_Package_Body =>
-            Own_Declarative_Part := Get_Package_Declarative_Parts
-              (Self.Canonical_Definition.P_Basic_Decl.As_Package_Body);
-         when Ada_Subp_Decl =>
-            Own_Declarative_Part.Append
-              (Get_Subp_Body_Declarative_Part
-                 (Self.Canonical_Definition.P_Basic_Decl.As_Subp_Decl.
-                      P_Body_Part.As_Subp_Body));
-         when Ada_Subp_Body =>
-            Own_Declarative_Part.Append
-              (Get_Subp_Body_Declarative_Part
-                 (Self.Canonical_Definition.P_Basic_Decl.As_Subp_Body));
-         when Ada_Task_Body =>
-            Own_Declarative_Part.Append
-              (Get_Task_Body_Declarative_Part
-                 (Self.Canonical_Definition.P_Basic_Decl.As_Task_Body));
-         when others =>
-            null;
-      end case;
+      --  Second: If Self.Canonical_Definition.P_Basic_Decl is a
+      --  declarative part owner, then check if there are any declarations with
+      --  the same name as Self.New_Name in its own declarative parts.
+      --  Example: a procedure Foo that declares, in its own declarative part,
+      --  a nested procedure also called Foo.
 
       for Declarative_Part of Own_Declarative_Part loop
          for Declaration of Declarative_Part.F_Decls loop
@@ -1273,7 +1254,7 @@ package body Laltools.Refactor.Safe_Rename is
          end loop;
       end loop;
 
-      --  Second, check if Self.Canonical_Definition references will be hidden
+      --  Third: Check if Self.Canonical_Definition references will be hidden
       --  by another definition, i.e., if they will become references of
       --  another definition.
 

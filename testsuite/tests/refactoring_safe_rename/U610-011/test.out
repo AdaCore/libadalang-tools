@@ -1,0 +1,45 @@
+# Renaming node test.ads:2:13: 
+References:
+Unit:test.ads
+Line: 2
+Source Location Range:
+Start_Line: 2
+Start_Column: 13
+End_Line: 2
+End_Column: 16
+Line: 3
+Source Location Range:
+Start_Line: 3
+Start_Column: 36
+End_Line: 3
+End_Column: 39
+Problems:
+Renaming Foo to Bar creates a name collision with <Id "Bar" test.ads:3:13-3:16>
+
+# Renaming node test.ads:3:13: 
+References:
+Unit:test.ads
+Line: 3
+Source Location Range:
+Start_Line: 3
+Start_Column: 13
+End_Line: 3
+End_Column: 16
+
+# Renaming node test.ads:4:14: 
+References:
+Unit:test.adb
+Line: 2
+Source Location Range:
+Start_Line: 2
+Start_Column: 14
+End_Line: 2
+End_Column: 17
+Unit:test.ads
+Line: 4
+Source Location Range:
+Start_Line: 4
+Start_Column: 14
+End_Line: 4
+End_Column: 17
+
