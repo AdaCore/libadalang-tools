@@ -875,7 +875,7 @@ package body Test.Actions is
       Put (" --target=target  - Specify a target\n");
       Put (" --RTS=runtime    - Specify runtime for Ada\n");
       Put (" --files=file     - Name of a text file containing a list of Ada\n");
-      Put ("                    source files for which metrics should be computed\n");
+      Put ("                    source files to process\n");
       Put (" --ignore=file    - Name of a text file containing a list of sources\n");
       Put ("                    to be excluded from processing\n");
 
