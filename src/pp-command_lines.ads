@@ -312,7 +312,8 @@ package Pp.Command_Lines is
       Output_Force,
       End_Of_Line,
       Pp_Off,
-      Pp_On);
+      Pp_On,
+      Templates);
 
    package Pp_String_Switches is new String_Switches
      (Descriptor,
@@ -324,7 +325,8 @@ package Pp.Command_Lines is
        Output_Force => '=',
        End_Of_Line => '=',
        Pp_Off => '=',
-       Pp_On => '='));
+       Pp_On => '=',
+       Templates => '='));
 
    package Pp_String_Shorthands is new Pp_String_Switches
      .Set_Shorthands
@@ -333,7 +335,8 @@ package Pp.Command_Lines is
        Output_Force => +"-of",
        End_Of_Line => +"--eol",
        Pp_Off => null,
-       Pp_On => null));
+       Pp_On => null,
+       Templates => null));
 
    type Pp_String_Seqs is (Dictionary);
 

@@ -27,6 +27,7 @@ with Ada.Exceptions;
 with Ada.Finalization;
 with Ada.Strings.Fixed;
 with Ada.Strings.UTF_Encoding;
+with Ada.Text_IO;
 with System.WCh_Cnv;
 with System.WCh_Con;
 with Text_IO;
@@ -43,6 +44,8 @@ with Unchecked_Deallocation;
 
 with GNAT.Lock_Files;
 with GNAT.OS_Lib; use GNAT.OS_Lib;
+with GNATCOLL.VFS;
+with GNATCOLL.JSON;
 
 with Langkit_Support.Slocs;
 with Langkit_Support.Text;
@@ -57,6 +60,7 @@ with Utils.Formatted_Output;
 with Utils.Predefined_Symbols; use Utils.Predefined_Symbols;
 with Utils.Symbols; use Utils.Symbols;
 with Utils.Vectors;
+with Ada.Strings.Wide_Unbounded;
 
 package body Pp.Actions is
 
@@ -561,7 +565,30 @@ package body Pp.Actions is
      (T : Ada_Node'Class; X : Query_Index) return Ada_Tree is
        (Child (T, X));
 
+   function Init_Custom_Templates (Cmd : Command_Line) return Boolean;
+   --  Loads custom templates from a templates json file.
+   --  The json structure must be:
+   --  {
+   --      "<ADA_NODE_KIND_TYPE_1_IN_UPPER_CASE>": "<custom_template_1>",
+   --      "<ADA_NODE_KIND_TYPE_2_IN_UPPER_CASE>": "<custom_template_2>",
+   --      ...
+   --  }
+   --  If any literal of ADA_NODE_KIND_TYPE is missing, then an empty string
+   --  is assigned as custom template.
+   --  Returns False if any exception is raised while trying to initialize the
+   --  custom templates. Returns True otherwise.
+
    function Template_For_Kind (Kind : Ada_Tree_Kind) return Str_Template_Ptr;
+
+   Custom_Templates : array (Ada_Tree_Kind) of
+     Ada.Strings.Wide_Unbounded.Unbounded_Wide_String :=
+       (others => Ada.Strings.Wide_Unbounded.Null_Unbounded_Wide_String);
+   --  Custom templates loaded from a json file
+
+   function Custom_Template_For_Kind (Kind : Ada_Tree_Kind) return Str_Template
+   is (Str_Template
+       (Ada.Strings.Wide_Unbounded.To_Wide_String (Custom_Templates (Kind))));
+   --  Returns the custom template of this Kind
 
    function L (T1 : Str_Template) return Str_Template_Ptr;
    function L (T1, T2 : Str_Template) return Str_Template_Ptr;
@@ -1168,6 +1195,35 @@ package body Pp.Actions is
              L ("with private")
         ); -- end case
    end Template_For_Kind;
+
+   ---------------------------
+   -- Init_Custom_Templates --
+   ---------------------------
+
+   function Init_Custom_Templates (Cmd : Command_Line) return Boolean
+   is
+      Templates_Filename : constant GNATCOLL.VFS.Filesystem_String :=
+        GNATCOLL.VFS.Filesystem_String (Arg (Cmd, Templates).all);
+      Templates_File     : constant GNATCOLL.VFS.Virtual_File :=
+        GNATCOLL.VFS.Create (Templates_Filename);
+      Templates_JSON     : constant GNATCOLL.JSON.JSON_Value :=
+        GNATCOLL.JSON.Read (GNATCOLL.VFS.Read_File (Templates_File).all);
+
+   begin
+      for Kind in Ada_Node_Kind_Type loop
+         if Templates_JSON.Has_Field (Kind'Image) then
+            Custom_Templates (Kind) :=
+              Ada.Strings.Wide_Unbounded.To_Unbounded_Wide_String
+                (To_Wide_String (Templates_JSON.Get (Kind'Image)));
+         end if;
+      end loop;
+
+      return True;
+   exception
+      when others =>
+         Ada.Text_IO.Put_Line ("Failed to load templates from template file");
+         return False;
+   end Init_Custom_Templates;
 
    Template_Tables_Initialized : Boolean := False;
 
@@ -2073,6 +2129,39 @@ package body Pp.Actions is
             end if;
          end;
       end loop;
+
+      --  Check if we want to use custom templates loaded from a file. If so,
+      --  overwrite the default ones.
+
+      if Arg (Cmd, Templates) /= null and then Init_Custom_Templates (Cmd) then
+         --  Update the Custom_Templates array with the templates from the file
+
+         for Kind in Ada_Tree_Kind loop
+            declare
+               New_Template : constant Str_Template :=
+                 Custom_Template_For_Kind (Kind);
+               Old_Template :  Str_Template_Ptr renames
+                 Str_Template_Table (Kind);
+
+            begin
+               --  Only update the templates that are present in the file,
+               --  and leave the rest as the default ones.
+
+               if Old_Template /= null
+                 and then New_Template /= ""
+                 and then New_Template /= Old_Template.all
+               then
+                  Replace_Tmp
+                    (Kind, W_Str (Old_Template.all), W_Str (New_Template));
+
+               elsif Old_Template = null
+                 and then New_Template /= ""
+               then
+                  Replace_Tmp (Kind, "", W_Str (New_Template));
+               end if;
+            end;
+         end loop;
+      end if;
 
       --  Some more-specific replacements
 
