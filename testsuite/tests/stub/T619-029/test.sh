@@ -1,0 +1,1 @@
+gnatstub example.ads

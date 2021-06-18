@@ -459,11 +459,43 @@ package body Stub.Actions is
             end;
 
          when Ada_Single_Protected_Decl | Ada_Protected_Type_Decl |
-           Ada_Single_Task_Decl | Ada_Task_Type_Decl => return True;
+              Ada_Single_Task_Decl | Ada_Task_Type_Decl =>
+            return True;
 
-         when Ada_Entry_Decl => return True;
+         when Ada_Entry_Decl =>
+            return True;
 
          when Ada_Subp_Decl =>
+            --  For a function defined in the public part of a package spec and
+            --  implemented in the private part as an expression function,
+            --  the P_Next_Part_For_Decl should return a non-null value
+            --  and no need to generate a stub for it in the body.
+            --  (see ticket for a more detailed use case T619-029)
+
+            if not N.As_Basic_Subp_Decl.P_Next_Part_For_Decl.Is_Null then
+               declare
+                  Paren_D_Scope : constant Basic_Decl :=
+                    N.P_Declarative_Scope.P_Parent_Basic_Decl;
+                  Paren_B_Scope : constant Basic_Decl :=
+                    N.As_Basic_Subp_Decl.P_Body_Part_For_Decl.
+                      P_Declarative_Scope.P_Parent_Basic_Decl;
+
+                  pragma Assert (Paren_D_Scope.Kind = Ada_Package_Decl);
+               begin
+                  --  If the body part for declaration has the same parent
+                  --  scope (expected, Package_Decl) no need to generate a
+                  --  stub in this case.
+                  --  However, if a stub was already been generated the parent
+                  --  scope won't be the same kind as for the declaration and
+                  --  in this case, if requested, we should be able to
+                  --  re-generated.
+
+                  if Paren_D_Scope.Kind = Paren_B_Scope.Kind then
+                     return False;
+                  end if;
+               end;
+            end if;
+
             return not N.As_Basic_Subp_Decl.P_Is_Imported;
 
          when Ada_Generic_Subp_Decl =>
@@ -471,9 +503,11 @@ package body Stub.Actions is
 
          when Ada_Incomplete_Type_Decl | Ada_Incomplete_Tagged_Type_Decl =>
             return False;
+
             --  Because these are handled specially in Walk
 
-         when others => return False;
+         when others =>
+            return False;
       end case;
    end Needs_Completion;
 
