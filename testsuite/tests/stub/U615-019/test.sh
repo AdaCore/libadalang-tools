@@ -1,0 +1,1 @@
+gnatstub p.ads

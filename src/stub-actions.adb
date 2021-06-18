@@ -1580,7 +1580,8 @@ package body Stub.Actions is
 
       case Root_Node.Kind is
          when Ada_Subp_Decl | Ada_Generic_Subp_Decl |
-           Ada_Package_Decl | Ada_Generic_Package_Decl =>
+              Ada_Package_Decl | Ada_Generic_Package_Decl |
+              Ada_Generic_Package_Instantiation =>
 
             --  We used to give the following "cannot have subunits" error for
             --  these as well, but now we generate the package body containing
