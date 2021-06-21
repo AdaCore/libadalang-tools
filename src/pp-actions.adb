@@ -5208,138 +5208,169 @@ package body Pp.Actions is
       end Out_File_Format;
 
       function Remove_Extra_Line_Breaks (Add_CR : Boolean) return WChar_Vector;
-      --  Removes extra NL's. The result has exactly one NL at the beginning, and
-      --  exactly one at the end. Also, if Preserve_Blank_Lines is False, we
-      --  collapse 3 or more NL's in a row down to 2.  ???It would be cleaner if
-      --  we didn't put multiple blank lines in in the first place.
+      --  Removes extra NL's. The result has exactly one NL at the beginning,
+      --  and exactly one at the end. Also, if Preserve_Blank_Lines is False,
+      --  we collapse 3 or more NL's in a row down to 2.
+      --  ??? It would be cleaner if we didn't put multiple blank lines in in
+      --  the first place.
       --
-      --  This also converts LF to CRLF if appropriate.
+      --  This also converts LF to CRLF if Add_CR is True.
       --
-      --  Add_CR is True if we should convert LF to CRLF.
-      --
-      --  Wide_Text_IO accepts a Form parameter that inserts CR's on windows, but
-      --  it doesn't do that on unix, so we insert CR's by hand.
+      --  Wide_Text_IO accepts a Form parameter that inserts CR's on windows,
+      --  but it doesn't do that on unix, so we insert CR's by hand.
 
       function Remove_Extra_Line_Breaks
         (Add_CR : Boolean) return WChar_Vector
       is
          Out_Buf : Buffer renames Lines_Data.Out_Buf;
+         Result  : WChar_Vector;
+
+         Inside_Pp_Off_Region : Boolean := False;
+         Pp_Off_Command : constant W_Str :=
+           (if Arg (Cmd, Pp_Off) /= null then
+               Scanner.Pp_Off_On_Delimiters.Off.all
+            else
+               Pp.Scanner.Default_Pp_Off_String);
+         Pp_On_Command  : constant W_Str :=
+           (if Arg (Cmd, Pp_Off) /= null then
+               Scanner.Pp_Off_On_Delimiters.On.all
+            else
+               Pp.Scanner.Default_Pp_On_String);
+
+         procedure Skip_Pp_Off_Region;
+         --  Checks if the current position of 'Out_Buf' is the start of a
+         --  pp off region and if so skips it by moving forward 'Out_Buf'
+         --  whilst appending 'Cur (Out_Buf)' to 'Result';
+
+         procedure Skip_Pp_Off_Region is
+         begin
+            Inside_Pp_Off_Region :=
+              Fast_Match_Slice (Out_Buf, Pp_Off_Command);
+
+            while Inside_Pp_Off_Region and not At_End (Out_Buf) loop
+               Inside_Pp_Off_Region :=
+                 not Fast_Match_Slice (Out_Buf, Pp_On_Command);
+               Append (Result, Cur (Out_Buf));
+               Move_Forward (Out_Buf);
+            end loop;
+         end Skip_Pp_Off_Region;
+
       begin
          if Preserve_Blank_Lines (Cmd)
            or else Arg (Cmd, Source_Line_Breaks)
          then
             if Add_CR then
-               return Result : WChar_Vector do
-                  --  The first sentinel NL doesn't get CR
+               --  The first sentinel NL doesn't get CR
 
-                  pragma Assert (Cur (Out_Buf) = NL);
-                  Append (Result, Cur (Out_Buf));
-                  Move_Forward (Out_Buf);
+               pragma Assert (Cur (Out_Buf) = NL);
+               Append (Result, Cur (Out_Buf));
+               Move_Forward (Out_Buf);
 
-                  while not At_End (Out_Buf) loop
-                     --  U409-028
-                     --  Only add a W_CR if there isn't already one before an
-                     --  LF.
-                     --
-                     --  ??? Future improvement:
-                     --  This is only happening on !pp off regions on files
-                     --  that have CRLF line breaks. Copy_Pp_Off_Regions
-                     --  procedure must be inserting those CR. Ideally, it
-                     --  shouldn't and the following if statement doesn't need
-                     --  to lookback for W_CR.
+               loop
+                  Skip_Pp_Off_Region;
 
-                     if Cur (Out_Buf) = NL
-                       and then Lookback (Out_Buf) /= W_CR
-                     then
-                        Append (Result, W_CR);
-                     end if;
+                  exit when At_End (Out_Buf);
 
-                     Append (Result, Cur (Out_Buf));
-                     Move_Forward (Out_Buf);
-                  end loop;
+                  --  We're outside a pp off regions
 
-                  Reset (Out_Buf);
-
-                  --  If the last line of the was not terminated by a newline,
-                  --  delete the last CR and LF to match the input.
-
-                  pragma Assert (Last_Element (Result) = W_LF);
-                  if Last_Element (Input) /= ASCII.LF then
-                     Delete_Last (Result);
-                     pragma Assert (Last_Element (Result) = W_CR);
-                     Delete_Last (Result);
+                  if Cur (Out_Buf) = NL then
+                     Append (Result, W_CR);
                   end if;
-               end return;
+                  Append (Result, Cur (Out_Buf));
+
+                  Move_Forward (Out_Buf);
+               end loop;
+
+               Reset (Out_Buf);
+
+               --  If the last line of the was not terminated by a newline,
+               --  delete the last CR and LF to match the input.
+
+               pragma Assert (Last_Element (Result) = W_LF);
+               if Last_Element (Input) /= ASCII.LF then
+                  Delete_Last (Result);
+                  pragma Assert (Last_Element (Result) = W_CR);
+                  Delete_Last (Result);
+               end if;
 
             --  Optimize the case where we're not changing anything. The reason
             --  Remove_Extra_Line_Breaks keeps the initial NL is that this
             --  optimization wouldn't work otherwise.
 
             else
-               return Result : WChar_Vector := To_Vector (Out_Buf) do
+               Result := To_Vector (Out_Buf);
 
-                  --  If the last line of the input was not terminated by a
-                  --  newline, delete the last LF from the output to match the
-                  --  input.
+                 --  If the last line of the input was not terminated by a
+                 --  newline, delete the last LF from the output to match the
+                 --  input.
 
-                  pragma Assert (Last_Element (Result) = W_LF);
-                  if Last_Element (Input) /= ASCII.LF then
-                     Delete_Last (Result);
-                  end if;
-               end return;
+               pragma Assert (Last_Element (Result) = W_LF);
+               if Last_Element (Input) /= ASCII.LF then
+                  Delete_Last (Result);
+               end if;
             end if;
 
          else
-            return Result : WChar_Vector do
-               while Cur (Out_Buf) = NL loop
-                  Move_Forward (Out_Buf);
-               end loop;
-               Append (Result, W_LF);
-               --  We don't want a CR here; caller skips the one LF character
+            --  Start by removing line breaks in the begining of the file
 
-               loop
-                  declare
-                     NL_Count : Natural := 0;
-                  begin
-                     while Cur (Out_Buf) = NL loop
-                        Move_Forward (Out_Buf);
-                        NL_Count := NL_Count + 1;
-                     end loop;
+            while Cur (Out_Buf) = NL loop
+               Move_Forward (Out_Buf);
+            end loop;
 
-                     exit when At_End (Out_Buf);
+            Append (Result, W_LF);
+            --  We don't want a CR here; caller skips the one LF character
 
-                     if NL_Count > 2 then
-                        NL_Count := 2;
+            loop
+               Skip_Pp_Off_Region;
+
+               exit when At_End (Out_Buf);
+
+               --  We're outside a pp off regions
+
+               declare
+                  NL_Count : Natural := 0;
+               begin
+                  while Cur (Out_Buf) = NL loop
+                     Move_Forward (Out_Buf);
+                     NL_Count := NL_Count + 1;
+                  end loop;
+
+                  exit when At_End (Out_Buf);
+
+                  if NL_Count > 2 then
+                     NL_Count := 2;
+                  end if;
+
+                  for J in 1 .. NL_Count loop
+                     if Add_CR then
+                        Append (Result, W_CR);
                      end if;
+                     Append (Result, W_LF);
+                  end loop;
+               end;
 
-                     for J in 1 .. NL_Count loop
-                        --  U409-028: Same situation as above
+               pragma Assert (Cur (Out_Buf) /= NL);
+               Append (Result, Cur (Out_Buf));
+               Move_Forward (Out_Buf);
+            end loop;
 
-                        if Add_CR and then Lookback (Out_Buf) /= W_CR then
-                           Append (Result, W_CR);
-                        end if;
-                        Append (Result, W_LF);
-                     end loop;
-                  end;
-
-                  pragma Assert (Cur (Out_Buf) /= NL);
-                  Append (Result, Cur (Out_Buf));
-                  Move_Forward (Out_Buf);
-               end loop;
-
+            if not Inside_Pp_Off_Region then
                if Add_CR then
                   Append (Result, W_CR);
                end if;
                Append (Result, W_LF);
-               Reset (Out_Buf);
                pragma Assert (Result (1) = NL);
                pragma Assert (Result (2) /= NL);
                if not Add_CR then
                   pragma Assert (Result (Last_Index (Result) - 1) /= NL);
                   pragma Assert (Result (Last_Index (Result)) = NL);
                end if;
-            end return;
+            end if;
+
+            Reset (Out_Buf);
          end if;
+
+         return Result;
       end Remove_Extra_Line_Breaks;
 
    --  Start of processing for Format_Vector

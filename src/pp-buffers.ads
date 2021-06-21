@@ -256,6 +256,10 @@ package Pp.Buffers is
 
    procedure Validate (Buf : Buffer; Message : String);
 
+   function Fast_Match_Slice (Buf : Buffer; Target : W_Str)
+                              return Boolean;
+   --  Returns True if the current position of 'Buf' matches 'Target'
+
 private
 
    --  The concept of markers that automatically track buffer changes comes

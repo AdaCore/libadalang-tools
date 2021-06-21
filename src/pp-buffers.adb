@@ -1114,4 +1114,25 @@ package body Pp.Buffers is
       Validations := Validations + 1;
    end Validate;
 
+   ----------------------------
+   -- Fast_Match_Slice --
+   ----------------------------
+
+   function Fast_Match_Slice (Buf : Buffer; Target : W_Str)
+                              return Boolean is
+   begin
+      return Match : Boolean := Cur (Buf) = Target (Target'First) do
+         --  The function Slices is intentionally not used:
+         --  - It throws an exception if First or Last is out of range,
+         --    in contrast to Lookahead which returns a null character
+         --  - This away allow us to early exit when a character does not
+         --    match, avoiding the comparisson of the entire string
+
+         for J in Target'First + 1 .. Target'Last loop
+            exit when not Match;
+
+            Match := Lookahead (Buf, J - 1) = Target (J);
+         end loop;
+      end return;
+   end Fast_Match_Slice;
 end Pp.Buffers;

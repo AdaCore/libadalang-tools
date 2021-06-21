@@ -1,4 +1,5 @@
---!pp off
+--!custom pp off
+
 
 
 
@@ -9,6 +10,8 @@
 package pp_off_test is
 
    X : constant Integer := 0;
+
+
 
    --  the POK method
    function POK
@@ -23,8 +26,14 @@ package pp_off_test is
       return Boolean;
 
 
+
+--!custom pp on
+
    --  the Q procedure
    procedure Q
      (V : Float);
+
+
+
 
 end pp_off_test;
