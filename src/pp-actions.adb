@@ -5347,11 +5347,14 @@ package body Pp.Actions is
                      end if;
                      Append (Result, W_LF);
                   end loop;
-               end;
 
-               pragma Assert (Cur (Out_Buf) /= NL);
-               Append (Result, Cur (Out_Buf));
-               Move_Forward (Out_Buf);
+                  pragma Assert (Cur (Out_Buf) /= NL);
+
+                  if NL_Count = 0 then
+                     Append (Result, Cur (Out_Buf));
+                     Move_Forward (Out_Buf);
+                  end if;
+               end;
             end loop;
 
             if not Inside_Pp_Off_Region then
