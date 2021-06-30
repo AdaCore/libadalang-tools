@@ -33,18 +33,6 @@ with Libadalang.Common; use Libadalang.Common;
 
 package Laltools.Refactor.Subprogram_Signature is
 
-   type Parameter_Data_Type is
-      record
-         Name            : Unbounded_String;
-         Mode            : Unbounded_String;
-         Type_Indication : Unbounded_String;
-         Default_Expr    : Unbounded_String;
-      end record;
-
-   function Image (Data : Parameter_Data_Type) return Unbounded_String;
-   --  Returns a human readable Unbounded_String with the description of
-   --  a Parameter_Data_Type.
-
    type Parameter_Indices_Type is array (Positive range <>) of Positive;
 
    type Parameter_Indices_Range_Type is
@@ -58,18 +46,13 @@ package Laltools.Refactor.Subprogram_Signature is
      array (Positive range <>) of Parameter_Indices_Range_Type;
 
    function Is_Add_Parameter_Available
-     (Node            : Ada_Node'Class;
-      Subp            : out Basic_Decl;
-      Parameter_Index : out Positive;
-      Requires_Type   : out Boolean)
-      return Boolean
-     with Pre => not Node.Is_Null,
-          Post => (if Is_Add_Parameter_Available'Result then
-                     Is_Subprogram (Subp));
-   --  Checks if from 'Node' we can add a parameter. If so, then returns True
-   --  'Subp', 'Parameter_Index' and 'Requires_Type' will have the
-   --  necessary data to create a Parameter_Adder object or to call
-   --  'Add_Parameter'.
+     (Unit                        : Analysis_Unit;
+      Location                    : Source_Location;
+      Requires_Full_Specification : out Boolean)
+      return Boolean;
+   --  Checks if we can add a parameter in the given Location of Unit.
+   --  If so, Requires_Full_Specification specifies if the new parameter
+   --  needs to be fully specified, i.e., a Param_Spec is expected.
 
    type Mode_Alternatives_Type is array (1 .. 3) of Ada_Mode;
    type Mode_Alternatives_Map_Type is array (Ada_Mode)
@@ -146,17 +129,6 @@ package Laltools.Refactor.Subprogram_Signature is
    --  Params node, inclusive, i.e., any node of "(A : Integer)".
    --  This is because since there is only one paremeter, we can unambigously
    --  identify it as long as Node refers to a Params node or any child of it.
-
-   function Add_Parameter
-     (Subp            : Basic_Decl;
-      New_Parameter   : Parameter_Data_Type;
-      Parameter_Index : Positive;
-      Units           : Analysis_Unit_Array)
-      return Text_Edit_Map
-     with Pre => Is_Subprogram (Subp);
-   --  Adds a parameter defined by 'New_Parameter' to position defined by
-   --  'Index'. The new parameter is added to the entire subprogram hierarchy,
-   --  as well as, all renames hierarchy.
 
    function Change_Mode
      (Subp                    : Basic_Decl;
@@ -258,14 +230,14 @@ package Laltools.Refactor.Subprogram_Signature is
    type Parameter_Adder is new Signature_Changer with private;
 
    function Create
-     (Target         : Basic_Decl;
-      New_Parameter  : Parameter_Data_Type;
-      Index          : Positive;
-      Configuration  : Signature_Changer_Configuration_Type :=
-        Default_Configuration)
-      return Parameter_Adder;
-   --  Creates a signature changer that adds a parameter, defined by
-   --  'New_Parameter'. Its position is defined by 'Index'.
+     (Unit          : Analysis_Unit;
+      Location      : Source_Location;
+      New_Parameter : Unbounded_String)
+      return Parameter_Adder
+     with Pre => Unit /= No_Analysis_Unit
+                   and then Location /= No_Source_Location
+                   and then New_Parameter /= Null_Unbounded_String;
+   --  Creates a signature changer that adds a parameter
 
    overriding
    function Refactor
@@ -349,13 +321,39 @@ package Laltools.Refactor.Subprogram_Signature is
 
 private
 
+   type Relative_Position_Type is (Before, After);
+
+   type Parameter_Relative_Position_Type is
+      record
+         Side  : Relative_Position_Type;
+         Index : Positive;
+      end record;
+
    type Parameter_Adder is new Signature_Changer with
       record
-         Subp            : Basic_Decl;
-         New_Parameter   : Parameter_Data_Type;
-         Parameter_Index : Natural;
-         Configuration   : Signature_Changer_Configuration_Type;
+         Spec               : Subp_Spec;
+         New_Parameter      : Unbounded_String;
+         Relative_Position  : Parameter_Relative_Position_Type;
+         Full_Specification : Boolean;
       end record;
+
+   procedure Add_Full_Parameter_Specification
+     (Self   : Parameter_Adder;
+      Target : Basic_Decl'Class;
+      Edits : in out Text_Edit_Map)
+     with Pre => Target.P_Is_Subprogram
+                   or else Target.Kind in Ada_Generic_Subp_Decl_Range;
+   --  Adds a fully specified parameter (Self.New_Parameter) to Target.
+   --  Must only be used if Self.Full_Specification is True.
+
+   procedure Add_Parameter_Defining_Id_Or_Ids
+     (Self   : Parameter_Adder;
+      Target : Basic_Decl'Class;
+      Edits  : in out Text_Edit_Map)
+     with Pre => Target.P_Is_Subprogram
+                   or else Target.Kind in Ada_Generic_Subp_Decl_Range;
+   --  Adds a parameter or a list of parameters (Self.New_Parameter) to Target.
+   --  Must only be used if Self.Full_Specification is False.
 
    type Mode_Changer is new Signature_Changer with
       record

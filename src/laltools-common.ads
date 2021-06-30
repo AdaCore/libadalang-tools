@@ -32,6 +32,8 @@ with Ada.Containers.Ordered_Sets;
 with Ada.Containers.Vectors;
 with Ada.Containers.Indefinite_Vectors;
 
+with Ada.Strings.Unbounded;
+
 with GNATCOLL.Traces;
 
 with Libadalang.Analysis; use Libadalang.Analysis;
@@ -162,8 +164,15 @@ package Laltools.Common is
    --  Checks whether the Token's Pattern is delimited by word delimiters
    --  if As_Word is True.
 
-   function Count_Subp_Parameters (Subp_Params : Params) return Natural
-     with Pre => not Subp_Params.Is_Null;
+   function Count_Param_Spec_Parameters
+     (Param_Spec : Libadalang.Analysis.Param_Spec'Class)
+      return Natural;
+   --  Returns the amount of parameters Param_Spec has
+
+   function Count_Subp_Param_Specs (Subp_Params : Params'Class) return Natural;
+   --  Returns the amount of Param_Spec nodes 'Subp_Params' has.
+
+   function Count_Subp_Parameters (Subp_Params : Params'Class) return Natural;
    --  Returns the amount of parameters 'Subp_Params' has.
 
    procedure Find_All_References
@@ -309,11 +318,6 @@ package Laltools.Common is
    function Get_Decl_Block_Decls (Decl_B : Decl_Block) return Ada_Node_List;
    --  Gets the Ada_Node_List of a Declarative_Part associated to a Decl_Block.
 
-   function Get_Declarative_Part (Stmts : Handled_Stmts)
-                                  return Declarative_Part;
-   --  Finds the Handled_Stmts's respective Declarative_Part, if it exists.
-   --  ??? Possibly move this function to Libadalang.
-
    function Is_Declarative_Part_Owner
      (Node : Ada_Node'Class)
       return Boolean;
@@ -325,6 +329,18 @@ package Laltools.Common is
      with Post => (if Is_Decl_Expr_Owner'Result then
                      Node.Kind in Ada_Expr_Function_Range);
    --  Checks if Node is an Expr_Function with a Decl_Expr child
+
+   function Get_Declarative_Part
+     (Node         : Ada_Node'Class;
+      Private_Part : Boolean := False)
+      return Declarative_Part
+     with Pre => not Node.Is_Null
+                 and then (Is_Declarative_Part_Owner (Node)
+                           or else Node.Kind in Ada_Handled_Stmts_Range);
+   --  Returns the Declarative_Part of Node. If Node.Kind is
+   --  Ada_Base_Package_Decl | Ada_Protected_Def_Range | Ada_Task_Def_Range,
+   --  it might have a Private_Part node. If Private_Part is True, then
+   --  the Private_Part is returned, which can be null is it does not exist.
 
    function Get_Declarative_Parts
      (Node : Ada_Node'Class)
@@ -598,5 +614,11 @@ package Laltools.Common is
 
    function Resolve_Name_Precisely (Name_Node : Name) return Defining_Name;
    --  Return the definition node (canonical part) of the given name.
+
+   function Validate_Syntax
+     (Value : Ada.Strings.Unbounded.Unbounded_String;
+      Rule  : Grammar_Rule)
+      return Boolean;
+   --  True if Value has a valid syntax according to Rule
 
 end Laltools.Common;

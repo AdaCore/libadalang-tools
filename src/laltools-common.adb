@@ -136,18 +136,54 @@ package body Laltools.Common is
       return True;
    end Contains;
 
+   ---------------------------------
+   -- Count_Param_Spec_Parameters --
+   ---------------------------------
+
+   function Count_Param_Spec_Parameters
+     (Param_Spec : Libadalang.Analysis.Param_Spec'Class)
+      return Natural is
+   begin
+      return Count : Natural := 0 do
+         if not Param_Spec.Is_Null then
+            for Parameter of Param_Spec.F_Ids loop
+               Count := Count + 1;
+            end loop;
+         end if;
+      end return;
+   end Count_Param_Spec_Parameters;
+
+   ----------------------------
+   -- Count_Subp_Param_Specs --
+   ----------------------------
+
+   function Count_Subp_Param_Specs
+     (Subp_Params : Params'Class)
+      return Natural is
+   begin
+      return Count : Natural := 0 do
+         if not Subp_Params.Is_Null then
+            for Param_Spec of Subp_Params.F_Params loop
+               Count := Count + 1;
+            end loop;
+         end if;
+      end return;
+   end Count_Subp_Param_Specs;
+
    ---------------------------
    -- Count_Subp_Parameters --
    ---------------------------
 
-   function Count_Subp_Parameters (Subp_Params : Params) return Natural is
+   function Count_Subp_Parameters
+     (Subp_Params : Params'Class)
+      return Natural is
    begin
       return Count : Natural := 0 do
-         for Param_Spec of Subp_Params.F_Params loop
-            for Param of Param_Spec.F_Ids loop
-               Count := Count + 1;
+         if not Subp_Params.Is_Null then
+            for Param_Spec of Subp_Params.F_Params loop
+               Count := Count + Count_Param_Spec_Parameters (Param_Spec);
             end loop;
-         end loop;
+         end if;
       end return;
    end Count_Subp_Parameters;
 
@@ -1212,36 +1248,83 @@ package body Laltools.Common is
    --------------------------
 
    function Get_Declarative_Part
-     (Stmts : Handled_Stmts) return Declarative_Part
+     (Node         : Ada_Node'Class;
+      Private_Part : Boolean := False)
+      return Declarative_Part
    is
-      use type Handled_Stmts;
-      use type Ada_Node;
+      function Get_Declarative_Part_From_Owner
+        (This_Node : Ada_Node'Class)
+         return Declarative_Part;
+      --  Gets the Declarative_Part node of This_Node
+
+      -------------------------------------
+      -- Get_Declarative_Part_From_Owner --
+      -------------------------------------
+
+      function Get_Declarative_Part_From_Owner
+        (This_Node : Ada_Node'Class)
+         return Declarative_Part is
+      begin
+         case This_Node.Kind is
+            when Ada_Decl_Block_Range =>
+               return This_Node.As_Decl_Block.F_Decls;
+
+            when Ada_Entry_Body_Range =>
+               return This_Node.As_Entry_Body.F_Decls;
+
+            when Ada_Package_Body_Range =>
+               return This_Node.As_Package_Body.F_Decls;
+
+            when Ada_Protected_Body_Range =>
+               return This_Node.As_Entry_Body.F_Decls;
+
+            when Ada_Subp_Body_Range =>
+               return This_Node.As_Subp_Body.F_Decls;
+
+            when Ada_Task_Body_Range =>
+               return This_Node.As_Task_Body.F_Decls;
+
+            when Ada_Base_Package_Decl =>
+               return (if Private_Part then
+                          This_Node.As_Base_Package_Decl.F_Private_Part.
+                            As_Declarative_Part
+                       else
+                          This_Node.As_Base_Package_Decl.F_Public_Part.
+                            As_Declarative_Part);
+
+            when Ada_Protected_Def_Range =>
+               return (if Private_Part then
+                          This_Node.As_Protected_Def.F_Private_Part.
+                            As_Declarative_Part
+                       else
+                          This_Node.As_Protected_Def.F_Public_Part.
+                            As_Declarative_Part);
+
+            when Ada_Task_Def_Range =>
+               return (if Private_Part then
+                          This_Node.As_Task_Def.F_Private_Part.
+                            As_Declarative_Part
+                       else
+                          This_Node.As_Task_Def.F_Public_Part.
+                            As_Declarative_Part);
+
+            when others =>
+               raise Assertion_Error;
+         end case;
+      end Get_Declarative_Part_From_Owner;
+
    begin
-      if Stmts = No_Handled_Stmts
-        or else Stmts.Parent = No_Ada_Node
+      if Node.Kind in Ada_Handled_Stmts_Range
+        and then Is_Declarative_Part_Owner (Node.Parent)
       then
-         return No_Declarative_Part;
+         return Get_Declarative_Part_From_Owner (Node.Parent);
+
+      elsif Is_Declarative_Part_Owner (Node) then
+         return Get_Declarative_Part_From_Owner (Node);
+
+      else
+         raise Assertion_Error;
       end if;
-
-      case Stmts.Parent.Kind is
-         when Ada_Decl_Block =>
-            return Stmts.Parent.As_Decl_Block.F_Decls;
-
-         when Ada_Entry_Body =>
-            return Stmts.Parent.As_Entry_Body.F_Decls;
-
-         when Ada_Package_Body =>
-            return Stmts.Parent.As_Package_Body.F_Decls;
-
-         when Ada_Subp_Body =>
-            return Stmts.Parent.As_Subp_Body.F_Decls;
-
-         when Ada_Task_Body =>
-            return Stmts.Parent.As_Task_Body.F_Decls;
-
-         when others =>
-            return No_Declarative_Part;
-      end case;
    end Get_Declarative_Part;
 
    ---------------------------
@@ -2365,5 +2448,31 @@ package body Laltools.Common is
          end return;
       end if;
    end Resolve_Name_Precisely;
+
+   ---------------------
+   -- Validate_Syntax --
+   ---------------------
+
+   function Validate_Syntax
+     (Value : Ada.Strings.Unbounded.Unbounded_String;
+      Rule  : Grammar_Rule)
+      return Boolean
+   is
+      Unit : constant Analysis_Unit :=
+        Create_Context.Get_From_Buffer
+          (Filename => "", Buffer => Value, Rule => Rule);
+
+   begin
+      if Unit.Has_Diagnostics then
+         return False;
+      else
+
+         return True;
+      end if;
+
+   exception
+      when others =>
+         return False;
+   end Validate_Syntax;
 
 end Laltools.Common;

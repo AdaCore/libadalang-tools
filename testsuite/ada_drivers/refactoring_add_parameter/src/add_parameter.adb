@@ -52,6 +52,8 @@
 --  3) If the location given refers to Qux, then the new parameter will be
 --     added as the last parameter.
 
+with Ada.Strings; use Ada.Strings;
+with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -60,25 +62,16 @@ with GNATCOLL.VFS; use GNATCOLL.VFS;
 
 with Langkit_Support.Slocs; use Langkit_Support.Slocs;
 
+with Laltools.Common; use Laltools.Common;
 with Laltools.Refactor; use Laltools.Refactor;
 with Laltools.Refactor.Subprogram_Signature;
 use Laltools.Refactor.Subprogram_Signature;
 
 with Libadalang.Analysis; use Libadalang.Analysis;
 with Libadalang.Helpers; use Libadalang.Helpers;
+with Libadalang.Common; use Libadalang.Common;
 
 procedure Add_Parameter is
-
-   function Is_Data_Valid
-     (Parameter_Data : Parameter_Data_Type;
-      Requires_Type  : Boolean)
-      return Boolean is
-     (Parameter_Data.Name /= Null_Unbounded_String
-      and then (if Requires_Type
-        then Parameter_Data.Type_Indication /= Null_Unbounded_String
-        else True));
-   --  This functions checks if the new parameter data given as input to this
-   --  program is valid.
 
    procedure Add_Parameter_App_Setup
      (Context : App_Context;
@@ -119,45 +112,16 @@ procedure Add_Parameter is
       Default_Val => 1,
       Enabled     => True);
 
-   package Parameter_Name is new Parse_Option
+   package Parameter is new Parse_Option
      (Parser      => Add_Parameter_App.Args.Parser,
       Short       => "-N",
-      Long        => "--name",
-      Help        => "Parameter name",
+      Long        => "--new_parameter",
+      Help        => "Parameter identifier or full specification",
       Arg_Type    => Unbounded_String,
       Convert     => To_Unbounded_String,
       Default_Val => Null_Unbounded_String,
       Enabled     => True);
 
-   package Parameter_Mode is new Parse_Option
-     (Parser      => Add_Parameter_App.Args.Parser,
-      Short       => "-M",
-      Long        => "--mode",
-      Help        => "Parameter mode",
-      Arg_Type    => Unbounded_String,
-      Convert     => To_Unbounded_String,
-      Default_Val => Null_Unbounded_String,
-      Enabled     => True);
-
-   package Parameter_Type is new Parse_Option
-     (Parser      => Add_Parameter_App.Args.Parser,
-      Short       => "-T",
-      Long        => "--type",
-      Help        => "Parameter type",
-      Arg_Type    => Unbounded_String,
-      Convert     => To_Unbounded_String,
-      Default_Val => Null_Unbounded_String,
-      Enabled     => True);
-
-   package Parameter_Default is new Parse_Option
-     (Parser      => Add_Parameter_App.Args.Parser,
-      Short       => "-D",
-      Long        => "--default",
-      Help        => "Parameter default value",
-      Arg_Type    => Unbounded_String,
-      Convert     => To_Unbounded_String,
-      Default_Val => Null_Unbounded_String,
-      Enabled     => True);
    -----------------------------
    -- Add_Parameter_App_Setup --
    -----------------------------
@@ -166,81 +130,95 @@ procedure Add_Parameter is
      (Context : App_Context;
       Jobs : App_Job_Context_Array)
    is
-      Source_File : constant Unbounded_String := Source.Get;
-
-      Sloc : constant Source_Location :=
+      Source_File   : constant Unbounded_String := Source.Get;
+      Location      : constant Source_Location :=
         (Line_Number (Line.Get), Column_Number (Column.Get));
+      New_Parameter : constant Unbounded_String := Parameter.Get;
 
       Files : constant File_Array_Access :=
-        Context.Provider.Project.Root_Project.Source_Files;
+        Context.Provider.Project.Root_Project.Source_Files (Recursive => True);
 
-      Main_Unit       : Analysis_Unit;
-      Node            : Ada_Node;
+      Unit            : Analysis_Unit;
       Number_Of_Units : constant Positive := Files'Length;
       Units_Index     : Positive := 1;
       Units           : Analysis_Unit_Array (1 .. Number_Of_Units);
 
       function Analysis_Units return Analysis_Unit_Array is (Units);
 
-      Target_Subp            : Basic_Decl;
-      Target_Parameter_Index : Positive;
-      Requires_Type          : Boolean;
-      Parameter_Data         : constant Parameter_Data_Type :=
-        (Name            => Parameter_Name.Get,
-         Mode            => Parameter_Mode.Get,
-         Type_Indication => Parameter_Type.Get,
-         Default_Expr    => Parameter_Default.Get);
+      Requires_Full_Specification : Boolean;
 
       Edits : Refactoring_Edits;
 
    begin
-      Main_Unit := Jobs (1).Analysis_Ctx.Get_From_File
+      Unit := Jobs (1).Analysis_Ctx.Get_From_File
         (Ada.Strings.Unbounded.To_String (Source_File));
 
-      Node := Main_Unit.Root.Lookup (Sloc);
-
-      for File of Files.all loop
-         declare
-            Filename : constant GNATCOLL.VFS.Filesystem_String :=
-              File.Full_Name;
-
-         begin
-            Units (Units_Index) :=
-              Node.Unit.Context.Get_From_File (String (Filename));
-            Units_Index := Units_Index + 1;
-         end;
-      end loop;
-
       if Is_Add_Parameter_Available
-        (Node, Target_Subp, Target_Parameter_Index, Requires_Type)
+        (Unit, Location, Requires_Full_Specification)
       then
-         if Is_Data_Valid (Parameter_Data, Requires_Type)
-         then
+         for File of Files.all loop
             declare
-               Adder : constant Parameter_Adder :=
-                 Create (Target_Subp, Parameter_Data, Target_Parameter_Index);
+               Filename : constant GNATCOLL.VFS.Filesystem_String :=
+                 File.Full_Name;
 
             begin
-               Put_Line
-                 ("Adding parameter ("
-                  & To_String (Image (Parameter_Data))
-                  & ") with index "
-                  & Target_Parameter_Index'Image);
-
-               Edits := Adder.Refactor (Analysis_Units'Access);
-
-               Print (Edits.Text_Edits);
+               Units (Units_Index) :=
+                 Jobs (1).Analysis_Ctx.Get_From_File (String (Filename));
+               Units_Index := Units_Index + 1;
             end;
+         end loop;
 
-         else
-            Put_Line
-              ("Not possible to add any parameter due to invalid input");
+         --  Full parameter specification is required, so check if the input
+         --  is syntactically correct against Param_Spec_Rule.
+
+         if Requires_Full_Specification
+           and then not Validate_Syntax (New_Parameter, Param_Spec_Rule)
+         then
+            Put_Line ("Failed to add a new parameter. "
+                      & "Full parameter specification is required.");
             New_Line;
+            return;
          end if;
+
+         --  Full parameter specification is not required, so check if
+         --  the input is syntactically correct against Param_Spec_Rule or
+         --  Identifier_Rule.
+
+         if not Requires_Full_Specification
+           and then not (Validate_Syntax (New_Parameter, Param_Spec_Rule)
+                         or Validate_Syntax (New_Parameter, Defining_Id_Rule)
+                         or Validate_Syntax
+                           (New_Parameter, Defining_Id_List_Rule))
+         then
+            Put_Line ("Failed to add a new parameter. "
+                      & "Full parameter specification or an identifier is "
+                      & "required.");
+            New_Line;
+            return;
+         end if;
+
+         --  Inputs have been sanitized and it is possible to add a parameter
+         --  to the given location.
+
+         declare
+            Adder : constant Parameter_Adder :=
+              Create (Unit, Location, New_Parameter);
+
+         begin
+            Put_Line
+              ("Adding parameter "
+               & To_String (New_Parameter));
+
+            Edits := Adder.Refactor (Analysis_Units'Access);
+
+            Print (Edits.Text_Edits);
+         end;
 
       else
          Put_Line
-           ("Not possible to add any parameter given node " & Node.Image);
+           ("Not possible to add any parameter given location "
+            & To_String (Source_File) & ":" & Trim (Location.Line'Image, Both)
+            & ":" & Trim (Location.Column'Image, Both));
          New_Line;
       end if;
    end Add_Parameter_App_Setup;

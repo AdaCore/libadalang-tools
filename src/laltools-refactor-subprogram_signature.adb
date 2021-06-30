@@ -150,36 +150,6 @@ package body Laltools.Refactor.Subprogram_Signature is
      with Pre => not Call.Is_Null;
    --  Returns the source location range of Call's arguments
 
-   procedure Add_As_First_Parameter
-     (Subp  : Basic_Decl'Class;
-      Data  : Parameter_Data_Type;
-      Edits : in out Text_Edit_Map)
-     with Pre => Is_Subprogram (Subp);
-   --  Adds a parameter defined by 'Data' as the first parameter
-
-   procedure Add_As_Last_Parameter
-     (Subp  : Basic_Decl'Class;
-      Data  : Parameter_Data_Type;
-      Edits : in out Text_Edit_Map)
-     with Pre => Is_Subprogram (Subp);
-   --  Adds a parameter defined by 'Data' as the last parameter
-
-   procedure Add_Parameter
-     (Subp  : Basic_Decl'Class;
-      Data  : Parameter_Data_Type;
-      Index : Positive;
-      Edits : in out Text_Edit_Map)
-     with Pre => Is_Subprogram (Subp);
-   --  Adds a parameter defined by 'Data' to position defined by 'Index'
-
-   procedure Add_To_Empty_Params
-     (Subp  : Basic_Decl'Class;
-      Data  : Parameter_Data_Type;
-      Edits : in out Text_Edit_Map)
-     with Pre => Is_Subprogram (Subp);
-   --  Adds a parameter defined by 'Data' as the first parameter of a 'Subp'
-   --  that has no parameters
-
    procedure Change_Mode
      (Subp               : Basic_Decl'Class;
       Parameters_Indices : Parameter_Indices_Range_Type;
@@ -828,29 +798,6 @@ package body Laltools.Refactor.Subprogram_Signature is
       return Slocs;
    end Parameters_SLOC;
 
-   -----------
-   -- Image --
-   -----------
-
-   function Image (Data : Parameter_Data_Type) return Unbounded_String is
-      S : Unbounded_String;
-   begin
-      Append (S, Data.Name);
-      Append (S, " : ");
-
-      if Data.Mode /= Null_Unbounded_String then
-         Append (S, Data.Mode & " ");
-      end if;
-
-      Append (S, Data.Type_Indication);
-
-      if Data.Default_Expr /= Null_Unbounded_String then
-         Append (S, " := " & Data.Default_Expr);
-      end if;
-
-      return S;
-   end Image;
-
    ----------------------
    -- To_Unique_Ranges --
    ----------------------
@@ -912,112 +859,45 @@ package body Laltools.Refactor.Subprogram_Signature is
    --------------------------------
 
    function Is_Add_Parameter_Available
-     (Node            : Ada_Node'Class;
-      Subp            : out Basic_Decl;
-      Parameter_Index : out Positive;
-      Requires_Type   : out Boolean)
+     (Unit                        : Analysis_Unit;
+      Location                    : Source_Location;
+      Requires_Full_Specification : out Boolean)
       return Boolean
    is
-      procedure Initialize_Out_Parameters;
-      --  Initiazes the out parameters of this function with values as if
-      --  the refactoring is not available.
-
-      -------------------------------
-      -- Initialize_Out_Parameters --
-      -------------------------------
-
-      procedure Initialize_Out_Parameters is
-      begin
-         Subp := No_Basic_Decl;
-         Parameter_Index := 1;
-         Requires_Type := False;
-      end Initialize_Out_Parameters;
-
-      Parent_Defining_Name       : Defining_Name := No_Defining_Name;
-      Parent_Defining_Name_List  : Defining_Name_List := No_Defining_Name_List;
-      Parent_Params              : Params := No_Params;
-      Parent_Subp_Decl           : Basic_Decl := No_Basic_Decl;
-
-      Parameter_Absolute_Index : Positive;
-
-      Total_Parameters : Natural := 0;
-
-      Aux_Node : Ada_Node := Node.As_Ada_Node;
+      Aux_Node : Ada_Node :=
+        (if Unit /= No_Analysis_Unit
+           and then Location /= No_Source_Location
+         then
+            Unit.Root.Lookup (Location)
+         else
+            No_Ada_Node);
 
    begin
-      Initialize_Out_Parameters;
+      if Aux_Node.Is_Null then
+         return False;
+      end if;
 
-      Find_Subp :
-      while not Aux_Node.Is_Null loop
-         exit Find_Subp when Aux_Node.Kind in Ada_Subp_Spec_Range;
+      if Aux_Node.Kind in Ada_Subp_Decl_Range
+        and then Is_Subprogram (Aux_Node.As_Basic_Decl)
+      then
+         Aux_Node := Get_Subp_Spec (Aux_Node.As_Basic_Decl).As_Ada_Node;
 
-         case Aux_Node.Kind is
-            when Ada_Defining_Name =>
-               Parent_Defining_Name := Aux_Node.As_Defining_Name;
+      else
+         while not Aux_Node.Is_Null loop
+            exit when Aux_Node.Kind in Ada_Subp_Spec_Range;
 
-            when Ada_Defining_Name_List =>
-               Parent_Defining_Name_List := Aux_Node.As_Defining_Name_List;
-
-            when Ada_Params =>
-               Parent_Params := Aux_Node.As_Params;
-
-            when others => null;
-         end case;
-
-         Aux_Node := Aux_Node.Parent;
-      end loop Find_Subp;
+            Aux_Node := Aux_Node.Parent;
+         end loop;
+      end if;
 
       if Aux_Node.Is_Null then
          return False;
       end if;
 
-      Parent_Subp_Decl := Aux_Node.As_Subp_Spec.P_Parent_Basic_Decl;
+      Requires_Full_Specification :=
+        Aux_Node.As_Subp_Spec.F_Subp_Params.Is_Null;
 
-      if not Is_Subprogram (Parent_Subp_Decl) then
-         return False;
-      end if;
-
-      if Parent_Params /= No_Params
-        and then Parent_Defining_Name_List /= No_Defining_Name_List
-        and then Parent_Defining_Name /= No_Defining_Name
-      then
-         Parameter_Absolute_Index :=
-           Get_Parameter_Absolute_Index (Parent_Defining_Name);
-
-         Subp := Parent_Subp_Decl;
-         Parameter_Index := Parameter_Absolute_Index + 1;
-         Requires_Type := False;
-
-         return True;
-
-      elsif Parent_Params = No_Params then
-         Subp := Parent_Subp_Decl;
-         Parameter_Index := 1;
-
-         Parent_Params := Get_Subp_Params (Parent_Subp_Decl);
-
-         if not Parent_Params.Is_Null then
-            Total_Parameters :=
-              Count_Subp_Parameters (Parent_Params);
-         end if;
-
-         if Total_Parameters = 0 then
-            Requires_Type := True;
-         else
-            Requires_Type := False;
-         end if;
-
-         return True;
-      end if;
-
-      return False;
-   exception
-      when Precondition_Failure =>
-         --  Assume that Precondition_Failure is raised due to invalid code and
-         --  set again the out parameters since they might have been changed
-         --  since initialized.
-         Initialize_Out_Parameters;
-         return False;
+      return True;
    end Is_Add_Parameter_Available;
 
    ------------------------------
@@ -1395,102 +1275,6 @@ package body Laltools.Refactor.Subprogram_Signature is
          Initialize_Out_Parameters;
          return False;
    end Is_Remove_Parameter_Available;
-
-   -------------------
-   -- Add_Parameter --
-   -------------------
-
-   function Add_Parameter
-     (Subp            : Basic_Decl;
-      New_Parameter   : Parameter_Data_Type;
-      Parameter_Index : Positive;
-      Units           : Analysis_Unit_Array)
-      return Text_Edit_Map
-   is
-      Target_Params : constant Params := Get_Subp_Params (Subp);
-      Params_Length : constant Natural :=
-        (if Target_Params.Is_Null or else Target_Params = No_Params
-         then 0
-         else Length (Target_Params.F_Params));
-
-      Edits : Text_Edit_Map;
-
-      procedure Add_Parameter_Callback (Relative_Subp : Basic_Decl'Class);
-      --  Determines the necessary changes to 'Relative_Subp' specification,
-      --  and adds them to 'Edits'.
-
-      ----------------------------
-      -- Add_Parameter_Callback --
-      ----------------------------
-
-      procedure Add_Parameter_Callback (Relative_Subp : Basic_Decl'Class) is
-         Relative_Subp_Body : constant Base_Subp_Body :=
-           Find_Subp_Body (Relative_Subp);
-
-      begin
-         if Params_Length = 0 then
-            if Is_Subprogram (Relative_Subp) then
-               Add_To_Empty_Params
-                 (Relative_Subp, New_Parameter, Edits);
-
-               if not Relative_Subp_Body.Is_Null then
-                  Add_To_Empty_Params
-                    (Relative_Subp_Body, New_Parameter, Edits);
-               end if;
-            end if;
-
-         elsif Parameter_Index = 1 then
-            if Is_Subprogram (Relative_Subp) then
-               Add_As_First_Parameter
-                 (Relative_Subp, New_Parameter, Edits);
-
-               if not Relative_Subp_Body.Is_Null then
-                  Add_As_First_Parameter
-                    (Relative_Subp_Body, New_Parameter, Edits);
-               end if;
-            end if;
-
-         elsif Parameter_Index = Params_Length + 1 then
-            if Is_Subprogram (Subp) then
-               Add_As_Last_Parameter
-                 (Relative_Subp, New_Parameter, Edits);
-
-               if not Relative_Subp_Body.Is_Null then
-                  Add_As_Last_Parameter
-                    (Relative_Subp_Body, New_Parameter, Edits);
-               end if;
-            end if;
-
-         else
-            Assert (Parameter_Index in 2 .. Params_Length);
-
-            if Is_Subprogram (Relative_Subp)
-            then
-               Add_Parameter
-                 (Relative_Subp,
-                  New_Parameter,
-                  Parameter_Index,
-                  Edits);
-
-               if not Relative_Subp_Body.Is_Null then
-                  Add_Parameter
-                    (Relative_Subp_Body,
-                     New_Parameter,
-                     Parameter_Index,
-                     Edits);
-               end if;
-            end if;
-         end if;
-      end Add_Parameter_Callback;
-
-   begin
-      Find_Subp_Relatives
-        (Subp           => Subp,
-         Units          => Units,
-         Decls_Callback => Add_Parameter_Callback'Access);
-
-      return Edits;
-   end Add_Parameter;
 
    -----------------
    -- Change_Mode --
@@ -2255,23 +2039,359 @@ package body Laltools.Refactor.Subprogram_Signature is
          others     => <>);
    end Refactor;
 
+   function Get_Parameter_Relative_Position
+     (Subp_Spec : Libadalang.Analysis.Subp_Spec;
+      Location  : Source_Location)
+      return Parameter_Relative_Position_Type;
+   --  Returns the relative position of Location in relation to a parameter in
+   --  Subp_Spec.
+   --
+   --  Example:
+   --
+   --  procedure Foo (A, B : Bar; C : Baz);
+   --                ||  |       |
+   --                ||  |       `-> Location_0
+   --                ||  `-> Location_1
+   --                |`-> Location_2
+   --                `->Location_3
+   --  Location 0 = Before C
+   --  Location 1 = After B
+   --  Location 2 = Before B
+   --  Location 3 = Before A
+   --
+   --  Note that the distintic between "Before C" and "After B" is important
+   --  when adding a parameter without fully specifying it. In that case, the
+   --  new parameter will have the same Param_Spec as the already existing one.
+   --  Therefore, "After B" means that the new parameter will be on the
+   --  "A, B : Bar" Param_Spec, after parameter B. "After C" means that the
+   --  new parameter will be on the "C : Baz" Param_Spec, before parameter C.
+
+   -------------------------------------
+   -- Get_Parameter_Relative_Position --
+   -------------------------------------
+
+   function Get_Parameter_Relative_Position
+     (Subp_Spec : Libadalang.Analysis.Subp_Spec;
+      Location  : Source_Location)
+      return Parameter_Relative_Position_Type
+   is
+      Subp_Params : constant Params := Subp_Spec.F_Subp_Params;
+
+      Total_Param_Specs           : constant Natural :=
+        Count_Subp_Param_Specs (Subp_Params);
+      Total_Param_Spec_Parameters : Natural;
+
+      Is_First_Param_Spec : Boolean := True;
+      Is_Last_Param_Spec  : Boolean;
+
+      Is_First_Parameter : Boolean := True;
+      Is_Last_Parameter  : Boolean;
+
+      Previous_Param_Spec : Param_Spec := No_Param_Spec;
+      Previous_Parameter  : Defining_Name := No_Defining_Name;
+
+      Param_Spec_Idx           : Positive := 1;
+      Param_Spec_Parameter_Idx : Positive := 1;
+      Parameter_Idx            : Positive := 1;
+
+   begin
+      if Total_Param_Specs = 0 then
+         return (Before, 1);
+      end if;
+
+      Foo :
+      for Param_Spec of Subp_Params.F_Params loop
+         Is_Last_Param_Spec := Param_Spec_Idx = Total_Param_Specs;
+         Is_First_Parameter := True;
+         Total_Param_Spec_Parameters :=
+           Count_Param_Spec_Parameters (Param_Spec.As_Param_Spec);
+         Param_Spec_Parameter_Idx := 1;
+
+         for Parameter of Param_Spec.F_Ids loop
+            Is_Last_Parameter :=
+              Param_Spec_Parameter_Idx = Total_Param_Spec_Parameters;
+
+            if Is_First_Parameter
+              and then Is_Last_Parameter
+              and then Is_First_Param_Spec
+              and then Is_Last_Param_Spec
+            then
+               declare
+                  Tail   : constant Source_Location :=
+                    Start_Sloc (Subp_Spec.Sloc_Range);
+                  Middle : constant Source_Location :=
+                    Start_Sloc (Parameter.Sloc_Range);
+                  Trail  : constant Source_Location :=
+                    End_Sloc (Subp_Spec.Sloc_Range);
+               begin
+                  Assert
+                    (Parameter_Idx = 1,
+                     "First parameter does not have index 1");
+                  if Location < Middle then
+                     Assert (Location >= Tail);
+                     return (Before, Parameter_Idx);
+                  else
+                     Assert (Location <= Trail);
+                     return (After, Parameter_Idx);
+                  end if;
+               end;
+
+            elsif Is_First_Parameter
+              and then Is_Last_Parameter
+              and then Is_First_Param_Spec
+              and then not Is_Last_Param_Spec
+            then
+               declare
+                  Tail   : constant Source_Location :=
+                    Start_Sloc (Subp_Spec.Sloc_Range);
+                  Middle : constant Source_Location :=
+                    Start_Sloc (Parameter.Sloc_Range);
+                  Trail  : constant Source_Location :=
+                    End_Sloc (Param_Spec.Sloc_Range);
+
+               begin
+                  Assert (Parameter_Idx = 1);
+
+                  if Location >= Tail and then Location < Middle then
+                     return (Before, Parameter_Idx);
+                  elsif Location >= Middle and Location <= Trail then
+                     return (After, Parameter_Idx);
+                  end if;
+               end;
+
+            elsif Is_First_Parameter
+              and then Is_Last_Parameter
+              and then not Is_First_Param_Spec
+              and then not Is_Last_Param_Spec
+            then
+               Assert (not Previous_Param_Spec.Is_Null);
+
+               declare
+                  Tail   : constant Source_Location :=
+                    End_Sloc (Previous_Param_Spec.Sloc_Range);
+                  Middle : constant Source_Location :=
+                    Start_Sloc (Parameter.Sloc_Range);
+                  Trail  : constant Source_Location :=
+                    End_Sloc (Param_Spec.Sloc_Range);
+
+               begin
+                  Assert (Parameter_Idx > 1);
+
+                  if Location >= Tail and then Location < Middle then
+                     return (Before, Parameter_Idx);
+                  elsif Location >= Middle and Location <= Trail then
+                     return (After, Parameter_Idx);
+                  end if;
+               end;
+
+            elsif Is_First_Parameter
+              and then Is_Last_Parameter
+              and then not Is_First_Param_Spec
+              and then Is_Last_Param_Spec
+            then
+               Assert (not Previous_Param_Spec.Is_Null);
+
+               declare
+                  Tail   : constant Source_Location :=
+                    End_Sloc (Previous_Param_Spec.Sloc_Range);
+                  Middle : constant Source_Location :=
+                    Start_Sloc (Parameter.Sloc_Range);
+                  Trail  : constant Source_Location :=
+                    End_Sloc (Subp_Spec.Sloc_Range);
+
+               begin
+                  Assert (Parameter_Idx > 1);
+
+                  if Location >= Tail and then Location < Middle then
+                     return (Before, Parameter_Idx);
+                  elsif Location >= Middle and Location <= Trail then
+                     return (After, Parameter_Idx);
+                  end if;
+               end;
+
+            elsif Is_First_Parameter
+              and then not Is_Last_Parameter
+              and then Is_First_Param_Spec
+            then
+               Assert
+                 (Parameter_Idx = 1,
+                  "First parameter does not have index 1");
+
+               declare
+                  Tail   : constant Source_Location :=
+                    Start_Sloc (Subp_Spec.Sloc_Range);
+                  Trail  : constant Source_Location :=
+                    Start_Sloc (Parameter.Sloc_Range);
+
+               begin
+                  Assert (Location >= Tail);
+                  if Location < Trail then
+                     return (Before, Parameter_Idx);
+                  end if;
+               end;
+
+            elsif not Is_First_Parameter
+              and then Is_Last_Parameter
+              and then not Is_Last_Param_Spec
+            then
+               Assert (not Previous_Parameter.Is_Null);
+               Assert (Parameter_Idx > 1);
+
+               declare
+                  Tail   : constant Source_Location :=
+                    Start_Sloc (Previous_Parameter.Sloc_Range);
+                  Middle : constant Source_Location :=
+                    Start_Sloc (Parameter.Sloc_Range);
+                  Trail  : constant Source_Location :=
+                    End_Sloc (Param_Spec.Sloc_Range);
+
+               begin
+                  if Location >= Tail and then Location < Middle then
+                     return (Before, Parameter_Idx);
+                  elsif Location >= Middle and Location <= Trail then
+                     return (After, Parameter_Idx);
+                  end if;
+               end;
+
+            elsif Is_First_Parameter
+              and then not Is_Last_Parameter
+              and then not Is_First_Param_Spec
+            then
+               Assert (not Previous_Param_Spec.Is_Null);
+
+               declare
+                  Tail  : constant Source_Location :=
+                    End_Sloc (Previous_Param_Spec.Sloc_Range);
+                  Trail : constant Source_Location :=
+                    Start_Sloc (Param_Spec.Sloc_Range);
+
+               begin
+                  Assert (Parameter_Idx > 1);
+
+                  if Location >= Tail and then Location < Trail then
+                     return (Before, Parameter_Idx);
+                  end if;
+               end;
+
+            elsif not Is_First_Parameter
+              and then not Is_Last_Parameter
+            then
+               Assert (not Previous_Parameter.Is_Null);
+
+               declare
+                  Tail  : constant Source_Location :=
+                    Start_Sloc (Previous_Parameter.Sloc_Range);
+                  Trail : constant Source_Location :=
+                    Start_Sloc (Parameter.Sloc_Range);
+
+               begin
+                  if Location >= Tail and then Location < Trail then
+                     return (Before, Parameter_Idx);
+                  end if;
+               end;
+
+            elsif not Is_First_Parameter
+              and then Is_Last_Parameter
+              and then Is_Last_Param_Spec
+            then
+               Assert (not Previous_Parameter.Is_Null);
+
+               declare
+                  Tail   : constant Source_Location :=
+                    Start_Sloc (Previous_Parameter.Sloc_Range);
+                  Middle : constant Source_Location :=
+                    Start_Sloc (Parameter.Sloc_Range);
+                  Trail  : constant Source_Location :=
+                    End_Sloc (Subp_Spec.Sloc_Range);
+
+               begin
+                  Assert (Parameter_Idx > 1);
+
+                  if Location >= Tail and then Location < Middle then
+                     return (Before, Parameter_Idx);
+                  elsif Location >= Middle and Location <= Trail then
+                     return (After, Parameter_Idx);
+                  end if;
+               end;
+
+            end if;
+
+            Previous_Parameter := Parameter.As_Defining_Name;
+            Param_Spec_Parameter_Idx := Param_Spec_Parameter_Idx + 1;
+            Parameter_Idx := Parameter_Idx + 1;
+            Is_First_Parameter := False;
+         end loop;
+
+         Previous_Param_Spec := Param_Spec.As_Param_Spec;
+         Param_Spec_Idx := Param_Spec_Idx + 1;
+         Is_First_Param_Spec := False;
+      end loop Foo;
+
+      raise Program_Error;
+   end Get_Parameter_Relative_Position;
+
    ------------
    -- Create --
    ------------
 
    function Create
-     (Target         : Basic_Decl;
-      New_Parameter  : Parameter_Data_Type;
-      Index          : Positive;
-      Configuration  : Signature_Changer_Configuration_Type :=
-        Default_Configuration)
-      return Parameter_Adder is
+     (Unit          : Analysis_Unit;
+      Location      : Source_Location;
+      New_Parameter : Unbounded_String)
+      return Parameter_Adder
+   is
+      Is_Defining_Id      : constant Boolean :=
+        Validate_Syntax (New_Parameter, Defining_Id_Rule);
+      Is_Defining_Id_List : constant Boolean :=
+        Validate_Syntax (New_Parameter, Defining_Id_List_Rule);
+      Is_Param_Spec       : constant Boolean :=
+        Validate_Syntax (New_Parameter, Param_Spec_Rule);
+
+      Is_Valid : constant Boolean :=
+        Is_Defining_Id or else Is_Defining_Id_List or else Is_Param_Spec;
+
+      Aux_Node : Ada_Node :=
+        (if Location /= No_Source_Location
+         and then Unit /= No_Analysis_Unit
+         then
+            Unit.Root.Lookup (Location)
+         else
+            No_Ada_Node);
+
+      Subp_Spec : Libadalang.Analysis.Subp_Spec := No_Subp_Spec;
+
    begin
+      if Aux_Node.Is_Null or not Is_Valid then
+         raise Program_Error;
+      end if;
+
+      if not (Aux_Node.Kind in Ada_Basic_Decl
+              and then (Aux_Node.Kind in Ada_Generic_Subp_Decl_Range
+                        or else Aux_Node.As_Basic_Decl.P_Is_Subprogram))
+      then
+         while not Aux_Node.Is_Null loop
+
+            exit when Aux_Node.Kind in Ada_Subp_Spec_Range;
+
+            Aux_Node := Aux_Node.Parent;
+         end loop;
+      end if;
+
+      if Aux_Node.Is_Null then
+         raise Program_Error;
+      end if;
+
+      Subp_Spec := (if Aux_Node.Kind in Ada_Subp_Spec_Range then
+                       Aux_Node.As_Subp_Spec
+                    else
+                       Get_Subp_Spec (Aux_Node.As_Basic_Decl).As_Subp_Spec);
+
       return Parameter_Adder'
-        (Subp            => Target,
-         New_Parameter   => New_Parameter,
-         Parameter_Index => Index,
-         Configuration   => Configuration);
+        (Spec               => Subp_Spec,
+         New_Parameter      => New_Parameter,
+         Relative_Position  =>
+           Get_Parameter_Relative_Position (Subp_Spec, Location),
+         Full_Specification => Is_Param_Spec);
    end Create;
 
    --------------
@@ -2282,173 +2402,472 @@ package body Laltools.Refactor.Subprogram_Signature is
    function Refactor
      (Self           : Parameter_Adder;
       Analysis_Units : access function return Analysis_Unit_Array)
-      return Refactoring_Edits is
+      return Refactoring_Edits
+   is
+      Edits : Text_Edit_Map;
+
+      generic
+         with procedure Add_Parameter
+           (Self   : Parameter_Adder;
+            Target : Basic_Decl'Class;
+            Edits  : in out Text_Edit_Map);
+      procedure Add_Parameter_Callback (Relative_Subp : Basic_Decl'Class);
+      --  Generic callback to add a parameter.
+      --  Add_Parameter can be adjusted depending on where/how we're adding
+      --  a parameter, for instance, if we're adding an identifier or a full
+      --  parameter specification
+
+      ----------------------------
+      -- Add_Parameter_Callback --
+      ----------------------------
+
+      procedure Add_Parameter_Callback (Relative_Subp : Basic_Decl'Class)
+      is
+         Relative_Subp_Body : constant Base_Subp_Body :=
+           Find_Subp_Body (Relative_Subp);
+
+      begin
+         if Relative_Subp.P_Is_Subprogram
+           or else Relative_Subp.Kind in Ada_Generic_Subp_Decl_Range
+         then
+            Add_Parameter (Self, Relative_Subp, Edits);
+
+            if not Relative_Subp_Body.Is_Null then
+               Add_Parameter (Self, Relative_Subp_Body, Edits);
+            end if;
+         end if;
+      end Add_Parameter_Callback;
+
+      procedure Add_Full_Parameter_Specification_Callback is
+        new Add_Parameter_Callback (Add_Full_Parameter_Specification);
+      --  Callback to add a parameter fully specified
+
+      procedure Add_Parameter_Defining_Id_Or_Ids_Callback is
+        new Add_Parameter_Callback (Add_Parameter_Defining_Id_Or_Ids);
+      --  Callback to add a parameter identifier or a list of identifiers
+
    begin
-      return Refactoring_Edits'
-        (Text_Edits =>
-           Add_Parameter
-             (Self.Subp,
-              Self.New_Parameter,
-              Self.Parameter_Index,
-              Analysis_Units.all),
-         others     => <>);
+      if Self.Full_Specification then
+         Find_Subp_Relatives
+           (Subp           => Self.Spec.P_Parent_Basic_Decl,
+            Units          => Analysis_Units.all,
+            Decls_Callback =>
+              Add_Full_Parameter_Specification_Callback'Access);
+      else
+         Find_Subp_Relatives
+           (Subp           => Self.Spec.P_Parent_Basic_Decl,
+            Units          => Analysis_Units.all,
+            Decls_Callback =>
+              Add_Parameter_Defining_Id_Or_Ids_Callback'Access);
+      end if;
+
+      return Refactoring_Edits'(Text_Edits => Edits, others => <>);
    end Refactor;
 
-   -------------------------
-   -- Add_To_Empty_Params --
-   -------------------------
+   --------------------------------------
+   -- Add_Full_Parameter_Specification --
+   --------------------------------------
 
-   procedure Add_To_Empty_Params
-     (Subp  : Basic_Decl'Class;
-      Data  : Parameter_Data_Type;
-      Edits : in out Text_Edit_Map)
+   procedure Add_Full_Parameter_Specification
+     (Self   : Parameter_Adder;
+      Target : Basic_Decl'Class;
+      Edits  : in out Text_Edit_Map)
    is
-      Definition_Sloc : constant Source_Location_Range :=
-        Subp.P_Defining_Name.Sloc_Range;
+      function "+" (T : Text_Type) return Unbounded_String is
+         (To_Unbounded_String (To_UTF8 (T)));
+
+      Subp_Spec   : constant Libadalang.Analysis.Subp_Spec :=
+        Get_Subp_Spec (Target).As_Subp_Spec;
+      Subp_Params : constant Params :=
+        (if Subp_Spec.Is_Null then No_Params else Subp_Spec.F_Subp_Params);
+
+      Total_Param_Specs           : constant Natural :=
+        Count_Subp_Param_Specs (Subp_Params);
+      Total_Param_Spec_Parameters : Natural;
+
+      Is_First_Param_Spec : Boolean := True;
+      Is_Last_Param_Spec  : Boolean;
+
+      Is_First_Parameter : Boolean := True;
+      Is_Last_Parameter  : Boolean;
+
+      Previous_Parameter  : Defining_Name := No_Defining_Name;
+
+      Param_Spec_Idx           : Positive := 1;
+      Param_Spec_Parameter_Idx : Positive := 1;
+      Parameter_Idx  : Positive := 1;
+
+      Aliased_Text   : Unbounded_String;
+      Mode_Text      : Unbounded_String;
+      Type_Expr_Text : Unbounded_String;
+      Default_Text   : Unbounded_String;
 
    begin
-      Safe_Insert
-        (Edits     => Edits,
-         File_Name => Subp.Unit.Get_Filename,
-         Edit      =>
-           (Location => Source_Location_Range'
-             (Start_Line   => Definition_Sloc.End_Line,
-              End_Line     => Definition_Sloc.End_Line,
-              Start_Column => Definition_Sloc.End_Column,
-              End_Column   => Definition_Sloc.End_Column),
-            Text     => " (" & Image (Data) & ")"));
-   end Add_To_Empty_Params;
-
-   ----------------------------
-   -- Add_As_First_Parameter --
-   ----------------------------
-
-   procedure Add_As_First_Parameter
-     (Subp  : Basic_Decl'Class;
-      Data  : Parameter_Data_Type;
-      Edits : in out Text_Edit_Map)
-   is
-      Target_Params_List_Sloc : constant Source_Location_Range :=
-        Get_Subp_Params (Subp).F_Params.Sloc_Range;
-   begin
-      if Data.Type_Indication /= Null_Unbounded_String then
+      if Subp_Params.Is_Null then
          Safe_Insert
            (Edits     => Edits,
-            File_Name => Subp.Unit.Get_Filename,
-            Edit      =>
-              (Location  => Source_Location_Range'
-                (Start_Line   => Target_Params_List_Sloc.Start_Line,
-                 End_Line     => Target_Params_List_Sloc.Start_Line,
-                 Start_Column => Target_Params_List_Sloc.Start_Column,
-                 End_Column   => Target_Params_List_Sloc.Start_Column),
-               Text     => Image (Data) & "; "));
+            File_Name => Target.Unit.Get_Filename,
+            Edit      => Text_Edit'
+              (Location =>
+                 Make_Range
+                   (End_Sloc (Subp_Spec.Sloc_Range),
+                    End_Sloc (Subp_Spec.Sloc_Range)),
+               Text     => " (" & Self.New_Parameter & ")"));
+         return;
       end if;
-   end Add_As_First_Parameter;
 
-   ---------------------------
-   -- Add_As_Last_Parameter --
-   ---------------------------
+      for Param_Spec of Subp_Params.F_Params loop
 
-   procedure Add_As_Last_Parameter
-     (Subp  : Basic_Decl'Class;
-      Data  : Parameter_Data_Type;
-      Edits : in out Text_Edit_Map)
-   is
-      Target_Params_List_Sloc : constant Source_Location_Range :=
-        Get_Subp_Params (Subp).F_Params.Sloc_Range;
+         Is_First_Parameter := True;
+         Total_Param_Spec_Parameters :=
+           Count_Param_Spec_Parameters (Param_Spec.As_Param_Spec);
+         Param_Spec_Parameter_Idx := 1;
+         Is_Last_Param_Spec :=
+           Param_Spec_Parameter_Idx = Total_Param_Specs;
 
-   begin
-      Safe_Insert
-        (Edits     => Edits,
-         File_Name => Subp.Unit.Get_Filename,
-         Edit      => Text_Edit'
-           (Location => Source_Location_Range'
-             (Start_Line   => Target_Params_List_Sloc.End_Line,
-              End_Line     => Target_Params_List_Sloc.End_Line,
-              Start_Column => Target_Params_List_Sloc.End_Column,
-              End_Column   => Target_Params_List_Sloc.End_Column),
-            Text     => "; " & Image (Data)));
-   end Add_As_Last_Parameter;
+         for Parameter of Param_Spec.F_Ids loop
+            Is_Last_Parameter :=
+              Param_Spec_Parameter_Idx = Total_Param_Spec_Parameters;
 
-   -------------------
-   -- Add_Parameter --
-   -------------------
+            if Parameter_Idx = Self.Relative_Position.Index then
+               if Is_First_Parameter
+                 and then Is_Last_Parameter
+                 and then Is_First_Param_Spec
+                 and then Is_Last_Param_Spec
+               then
+                  case Self.Relative_Position.Side is
+                     when Before =>
+                        Safe_Insert
+                          (Edits     => Edits,
+                           File_Name => Target.Unit.Get_Filename,
+                           Edit      => Text_Edit'
+                             (Location =>
+                                Make_Range
+                                  (Start_Sloc (Parameter.Sloc_Range),
+                                   Start_Sloc (Parameter.Sloc_Range)),
+                              Text     => Self.New_Parameter & "; "));
 
-   procedure Add_Parameter
-     (Subp  : Basic_Decl'Class;
-      Data  : Parameter_Data_Type;
-      Index : Positive;
-      Edits : in out Text_Edit_Map)
-   is
-      Current_Parameter_Index : Positive := 1;
-      Param_Spec_Ids_Length : Positive;
+                     when After =>
+                        Safe_Insert
+                          (Edits     => Edits,
+                           File_Name => Target.Unit.Get_Filename,
+                           Edit      => Text_Edit'
+                             (Location =>
+                                Make_Range
+                                  (End_Sloc (Param_Spec.Sloc_Range),
+                                   End_Sloc (Param_Spec.Sloc_Range)),
+                              Text     => "; " & Self.New_Parameter));
+                  end case;
 
-   begin
-      for Param_Spec of Get_Subp_Params (Subp).F_Params loop
-         Param_Spec_Ids_Length := Length (Param_Spec.F_Ids);
+                  return;
 
-         if Index = Current_Parameter_Index then
-            Safe_Insert
-              (Edits     => Edits,
-               File_Name => Subp.Unit.Get_Filename,
-               Edit      => Text_Edit'
-                 (Location => Source_Location_Range'
-                   (Start_Line   => Param_Spec.Sloc_Range.Start_Line,
-                    End_Line     => Param_Spec.Sloc_Range.Start_Line,
-                    Start_Column => Param_Spec.Sloc_Range.Start_Column,
-                    End_Column   => Param_Spec.Sloc_Range.Start_Column),
-                  Text     => Image (Data) & "; "));
-            exit;
+               elsif (Is_First_Parameter
+                      and then Is_Last_Parameter
+                      and then Is_First_Param_Spec
+                      and then not Is_Last_Param_Spec)
+                 or else (Is_First_Parameter
+                          and then Is_Last_Parameter
+                          and then not Is_First_Param_Spec
+                          and then not Is_Last_Param_Spec)
+                 or else (Is_First_Parameter
+                          and then Is_Last_Parameter
+                          and then not Is_First_Param_Spec
+                          and then Is_Last_Param_Spec)
+               then
+                  case Self.Relative_Position.Side is
+                     when Before =>
+                        Safe_Insert
+                          (Edits     => Edits,
+                           File_Name => Target.Unit.Get_Filename,
+                           Edit      => Text_Edit'
+                             (Location =>
+                                Make_Range
+                                  (Start_Sloc (Parameter.Sloc_Range),
+                                   Start_Sloc (Parameter.Sloc_Range)),
+                              Text     => Self.New_Parameter & "; "));
 
-         elsif Index in
-           Current_Parameter_Index + 1 ..
-             Current_Parameter_Index + Param_Spec_Ids_Length - 1
-         then
-            declare
-               Last_Parameter        : Defining_Name :=
-                 No_Defining_Name;
-               Before_Last_Parameter : Defining_Name :=
-                 No_Defining_Name;
+                     when After =>
+                        Safe_Insert
+                          (Edits     => Edits,
+                           File_Name => Target.Unit.Get_Filename,
+                           Edit      => Text_Edit'
+                             (Location =>
+                                Make_Range
+                                  (End_Sloc (Param_Spec.Sloc_Range),
+                                   End_Sloc (Param_Spec.Sloc_Range)),
+                              Text     => "; " & Self.New_Parameter));
+                  end case;
 
-               Mode_Text    : constant String :=
-                 To_String (Param_Spec.F_Mode.Text);
-               Subtype_Text : constant String :=
-                 To_String (Param_Spec.F_Type_Expr.Text);
-            begin
-               for Param of Param_Spec.F_Ids loop
-                  if Current_Parameter_Index = Index - 1 then
-                     Before_Last_Parameter := Param.As_Defining_Name;
+                  return;
 
-                  elsif Current_Parameter_Index = Index then
-                     Last_Parameter := Param.As_Defining_Name;
-                     exit;
-                  end if;
+               elsif Is_First_Parameter
+                 and then not Is_Last_Parameter
+                 and then Is_First_Param_Spec
+               then
+                  Assert (Self.Relative_Position.Side = Before);
 
-                  Current_Parameter_Index := Current_Parameter_Index + 1;
-               end loop;
+                  Safe_Insert
+                    (Edits     => Edits,
+                     File_Name => Target.Unit.Get_Filename,
+                     Edit      => Text_Edit'
+                       (Location =>
+                          Make_Range
+                            (Start_Sloc (Parameter.Sloc_Range),
+                             Start_Sloc (Parameter.Sloc_Range)),
+                        Text     => Self.New_Parameter & "; "));
 
-               Safe_Insert
-                 (Edits     => Edits,
-                  File_Name => Subp.Unit.Get_Filename,
-                  Edit      => Text_Edit'
-                    (Location =>
-                      (Before_Last_Parameter.Sloc_Range.End_Line,
-                       Last_Parameter.Sloc_Range.Start_Line,
-                       Before_Last_Parameter.Sloc_Range.End_Column,
-                       Last_Parameter.Sloc_Range.Start_Column),
-                     Text     =>
-                       To_Unbounded_String
-                         (" : " & Mode_Text & " " & Subtype_Text & "; ")
-                          & Image (Data) & "; "));
-            end;
-            exit;
+                  return;
 
-         end if;
+               elsif not Is_First_Parameter
+                 and then Is_Last_Parameter
+                 and then not Is_Last_Param_Spec
+               then
+                  case Self.Relative_Position.Side is
+                     when Before =>
+                        Aliased_Text :=
+                          (if Param_Spec.F_Has_Aliased.Kind
+                             in Ada_Aliased_Absent_Range
+                           then Null_Unbounded_String
+                           else +Param_Spec.F_Has_Aliased.Text & " ");
+                        Mode_Text :=
+                          (if Param_Spec.F_Mode.Kind
+                             in Ada_Mode_Default_Range
+                           then Null_Unbounded_String
+                           else +Param_Spec.F_Mode.Text & " ");
+                        Type_Expr_Text := +Param_Spec.F_Type_Expr.Text;
+                        Default_Text :=
+                          (if Param_Spec.F_Default_Expr.Is_Null
+                           then Null_Unbounded_String
+                           else " := " & (+Param_Spec.F_Default_Expr.Text));
 
-         Current_Parameter_Index :=
-           Current_Parameter_Index + Param_Spec_Ids_Length;
+                        Safe_Insert
+                          (Edits     => Edits,
+                           File_Name => Target.Unit.Get_Filename,
+                           Edit      => Text_Edit'
+                             (Location =>
+                                Make_Range
+                                  (End_Sloc (Previous_Parameter.Sloc_Range),
+                                   Start_Sloc (Parameter.Sloc_Range)),
+                              Text     =>
+                                 " : " & Aliased_Text & Mode_Text
+                                 & Type_Expr_Text & Default_Text & "; "));
+                        Safe_Insert
+                          (Edits     => Edits,
+                           File_Name => Target.Unit.Get_Filename,
+                           Edit      => Text_Edit'
+                             (Location =>
+                                Make_Range
+                                  (Start_Sloc (Parameter.Sloc_Range),
+                                   Start_Sloc (Parameter.Sloc_Range)),
+                              Text     => Self.New_Parameter & "; "));
+
+                     when After =>
+                        Safe_Insert
+                          (Edits     => Edits,
+                           File_Name => Target.Unit.Get_Filename,
+                           Edit      => Text_Edit'
+                             (Location =>
+                                Make_Range
+                                  (End_Sloc (Param_Spec.Sloc_Range),
+                                   End_Sloc (Param_Spec.Sloc_Range)),
+                              Text     => "; " & Self.New_Parameter));
+                  end case;
+
+                  return;
+
+               elsif Is_First_Parameter
+                 and then not Is_Last_Parameter
+                 and then not Is_First_Param_Spec
+               then
+                  Assert (Self.Relative_Position.Side = Before);
+
+                  Safe_Insert
+                    (Edits     => Edits,
+                     File_Name => Target.Unit.Get_Filename,
+                     Edit      => Text_Edit'
+                       (Location =>
+                          Make_Range
+                            (Start_Sloc (Parameter.Sloc_Range),
+                             Start_Sloc (Parameter.Sloc_Range)),
+                        Text     => Self.New_Parameter & "; "));
+
+                  return;
+
+               elsif not Is_First_Parameter
+                 and then not Is_Last_Parameter
+               then
+                  Assert (Self.Relative_Position.Side = Before);
+
+                  Aliased_Text :=
+                    (if Param_Spec.F_Has_Aliased.Kind
+                       in Ada_Aliased_Absent_Range
+                     then Null_Unbounded_String
+                     else +Param_Spec.F_Has_Aliased.Text & " ");
+                  Mode_Text :=
+                    (if Param_Spec.F_Mode.Kind in Ada_Mode_Default_Range
+                     then Null_Unbounded_String
+                     else +Param_Spec.F_Mode.Text & " ");
+                  Type_Expr_Text := +Param_Spec.F_Type_Expr.Text;
+                  Default_Text :=
+                    (if Param_Spec.F_Default_Expr.Is_Null
+                     then Null_Unbounded_String
+                     else " := " & (+Param_Spec.F_Default_Expr.Text));
+
+                  Safe_Insert
+                    (Edits     => Edits,
+                     File_Name => Target.Unit.Get_Filename,
+                     Edit      => Text_Edit'
+                       (Location =>
+                          Make_Range
+                            (End_Sloc (Previous_Parameter.Sloc_Range),
+                             Start_Sloc (Parameter.Sloc_Range)),
+                        Text     => " : " & Aliased_Text & Mode_Text
+                                    & Type_Expr_Text & Default_Text  & "; "));
+                  Safe_Insert
+                    (Edits     => Edits,
+                     File_Name => Target.Unit.Get_Filename,
+                     Edit      => Text_Edit'
+                       (Location =>
+                          Make_Range
+                            (Start_Sloc (Parameter.Sloc_Range),
+                             Start_Sloc (Parameter.Sloc_Range)),
+                        Text     => Self.New_Parameter & "; "));
+
+                  return;
+
+               elsif not Is_First_Parameter
+                 and then Is_Last_Parameter
+                 and then Is_Last_Param_Spec
+               then
+                  case Self.Relative_Position.Side is
+                     when Before =>
+                        Aliased_Text :=
+                          (if Param_Spec.F_Has_Aliased.Kind
+                             in Ada_Aliased_Absent_Range
+                           then Null_Unbounded_String
+                           else +Param_Spec.F_Has_Aliased.Text & " ");
+                        Mode_Text :=
+                          (if Param_Spec.F_Mode.Kind
+                             in Ada_Mode_Default_Range
+                           then Null_Unbounded_String
+                           else +Param_Spec.F_Mode.Text & " ");
+                        Type_Expr_Text := +Param_Spec.F_Type_Expr.Text;
+                        Default_Text :=
+                          (if Param_Spec.F_Default_Expr.Is_Null then
+                              Null_Unbounded_String
+                           else " := " & (+Param_Spec.F_Default_Expr.Text));
+
+                        Safe_Insert
+                          (Edits     => Edits,
+                           File_Name => Target.Unit.Get_Filename,
+                           Edit      => Text_Edit'
+                             (Location =>
+                                Make_Range
+                                  (End_Sloc (Previous_Parameter.Sloc_Range),
+                                   Start_Sloc (Parameter.Sloc_Range)),
+                              Text     => " : " & Aliased_Text & Mode_Text
+                                 & Type_Expr_Text & Default_Text  & "; "));
+                        Safe_Insert
+                          (Edits     => Edits,
+                           File_Name => Target.Unit.Get_Filename,
+                           Edit      => Text_Edit'
+                             (Location =>
+                                Make_Range
+                                  (Start_Sloc (Parameter.Sloc_Range),
+                                   Start_Sloc (Parameter.Sloc_Range)),
+                              Text     => Self.New_Parameter & "; "));
+
+                     when After =>
+                        Safe_Insert
+                          (Edits     => Edits,
+                           File_Name => Target.Unit.Get_Filename,
+                           Edit      => Text_Edit'
+                             (Location =>
+                                Make_Range
+                                  (End_Sloc (Param_Spec.Sloc_Range),
+                                   End_Sloc (Param_Spec.Sloc_Range)),
+                              Text     => "; " & Self.New_Parameter));
+                  end case;
+
+                  return;
+               end if;
+
+               raise Program_Error;
+            end if;
+
+            Previous_Parameter := Parameter.As_Defining_Name;
+            Param_Spec_Parameter_Idx := Param_Spec_Parameter_Idx + 1;
+            Parameter_Idx := Parameter_Idx + 1;
+            Is_First_Parameter := False;
+         end loop;
+
+         Param_Spec_Idx := Param_Spec_Idx + 1;
+         Is_First_Param_Spec := False;
+         Is_Last_Param_Spec := Total_Param_Specs = Param_Spec_Idx;
       end loop;
-   end Add_Parameter;
+   end Add_Full_Parameter_Specification;
+
+   ------------------------------
+   -- Add_Parameter_Identifier --
+   ------------------------------
+
+   procedure Add_Parameter_Defining_Id_Or_Ids
+     (Self   : Parameter_Adder;
+      Target : Basic_Decl'Class;
+      Edits  : in out Text_Edit_Map)
+   is
+      Subp_Spec   : constant Libadalang.Analysis.Subp_Spec :=
+        Get_Subp_Spec (Target).As_Subp_Spec;
+      Subp_Params : constant Params :=
+        (if Subp_Spec.Is_Null then No_Params else Subp_Spec.F_Subp_Params);
+
+      Parameter_Idx  : Positive := 1;
+
+   begin
+      if Subp_Params.Is_Null then
+         raise Assertion_Error with
+           "Cannot add an identifier as a parameter of a subprogram "
+           & "without parameters";
+      end if;
+
+      for Param_Spec of Subp_Params.F_Params loop
+         for Parameter of Param_Spec.F_Ids loop
+            if Parameter_Idx = Self.Relative_Position.Index then
+               case Self.Relative_Position.Side is
+                  when Before =>
+                     Safe_Insert
+                       (Edits     => Edits,
+                        File_Name => Target.Unit.Get_Filename,
+                        Edit      => Text_Edit'
+                          (Location =>
+                             Make_Range
+                               (Start_Sloc (Parameter.Sloc_Range),
+                                Start_Sloc (Parameter.Sloc_Range)),
+                           Text     => Self.New_Parameter & ", "));
+
+                  when After =>
+                     Safe_Insert
+                       (Edits     => Edits,
+                        File_Name => Target.Unit.Get_Filename,
+                        Edit      => Text_Edit'
+                          (Location =>
+                             Make_Range
+                               (End_Sloc (Parameter.Sloc_Range),
+                                End_Sloc (Parameter.Sloc_Range)),
+                           Text     => ", " & Self.New_Parameter));
+               end case;
+
+               return;
+            end if;
+
+            Parameter_Idx := Parameter_Idx + 1;
+         end loop;
+      end loop;
+
+      raise Assertion_Error with
+        "Bug detected: Unreachable code. Failed to add an Identifier as a new "
+        & "parameter due to not finding the target parameter index.";
+   end Add_Parameter_Defining_Id_Or_Ids;
 
    ------------
    -- Create --
