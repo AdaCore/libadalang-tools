@@ -6751,6 +6751,9 @@ package body Test.Skeleton is
       Elem_Span : constant Source_Location_Range :=
         Subp.Subp_Declaration.Sloc_Range;
    begin
+      if Omit_Sloc then
+         return;
+      end if;
       S_Put
         (Span,
          "--  " &
