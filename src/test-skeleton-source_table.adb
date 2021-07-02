@@ -1367,6 +1367,10 @@ package body Test.Skeleton.Source_Table is
                Next (I_Cur);
             end loop;
 
+            S_Put (0, "with ""aunit"";");
+            Put_New_Line;
+            Put_New_Line;
+
             S_Put
               (0,
                "project "
@@ -1707,6 +1711,10 @@ package body Test.Skeleton.Source_Table is
                end if;
                Next (I_Cur);
             end loop;
+
+            S_Put (0, "with ""aunit"";");
+            Put_New_Line;
+            Put_New_Line;
 
             S_Put
               (0,

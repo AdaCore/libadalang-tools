@@ -2621,6 +2621,10 @@ package body Test.Harness is
             & """;");
          Put_New_Line;
          Put_New_Line;
+         S_Put (0, "with ""aunit"";");
+         Put_New_Line;
+         Put_New_Line;
+
          S_Put
            (0,
             "project "
