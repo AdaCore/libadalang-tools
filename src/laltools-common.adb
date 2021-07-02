@@ -310,11 +310,11 @@ package body Laltools.Common is
       end loop;
 
       if Is_Param then
-         All_References.Append
+         All_References.Append_Vector
            (Find_All_Param_References_In_Subp_Hierarchy
               (Definition.P_Canonical_Part, Units));
       elsif Is_Subp then
-         All_References.Append
+         All_References.Append_Vector
            (Find_All_Subp_References_In_Subp_Hierarchy
               (Definition.P_Canonical_Part.P_Basic_Decl, Units));
       end if;

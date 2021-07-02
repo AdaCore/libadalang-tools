@@ -1219,9 +1219,10 @@ package body Test.Skeleton is
 
          if not Type_Data.Main_Type_Abstract then
             Suite_Data_List.Test_Types.Append
-              ((TT_Info       => Test_Type,
-                Test_Package  => Test_Package,
-                Original_Type => Type_Data.Main_Type_Elem));
+              (Test_Type_Info_Wrapper'
+                 (TT_Info       => Test_Type,
+                  Test_Package  => Test_Package,
+                  Original_Type => Type_Data.Main_Type_Elem));
          end if;
 
          return Over;
