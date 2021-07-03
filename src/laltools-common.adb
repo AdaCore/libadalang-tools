@@ -309,15 +309,19 @@ package body Laltools.Common is
          All_References.Append (Ref (Reference).As_Base_Id);
       end loop;
 
-      if Is_Param then
-         All_References.Append_Vector
-           (Find_All_Param_References_In_Subp_Hierarchy
-              (Definition.P_Canonical_Part, Units));
-      elsif Is_Subp then
-         All_References.Append_Vector
-           (Find_All_Subp_References_In_Subp_Hierarchy
-              (Definition.P_Canonical_Part.P_Basic_Decl, Units));
-      end if;
+      declare
+         Vector : constant Base_Id_Vectors.Vector :=
+           (if Is_Param then Find_All_Param_References_In_Subp_Hierarchy
+              (Definition.P_Canonical_Part, Units)
+            elsif Is_Subp then Find_All_Subp_References_In_Subp_Hierarchy
+              (Definition.P_Canonical_Part.P_Basic_Decl, Units)
+            else
+               Base_Id_Vectors.Empty_Vector);
+      begin
+         for X of Vector loop
+            All_References.Append (X);
+         end loop;
+      end;
 
       return All_References;
    end Find_All_References_For_Renaming;
