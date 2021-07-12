@@ -21,10 +21,13 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Characters.Handling; use Ada.Characters.Handling;
+with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with GNATCOLL.Opt_Parse; use GNATCOLL.Opt_Parse;
+with GNATCOLL.Projects; use GNATCOLL.Projects;
 with GNATCOLL.VFS; use GNATCOLL.VFS;
 
 with Langkit_Support.Slocs; use Langkit_Support.Slocs;
@@ -135,14 +138,20 @@ procedure Safe_Rename is
       NN : constant Unbounded_String := New_Name.Get;
       Rename_Algorithm : constant Unbounded_String := Algorithm.Get;
 
-      Files : constant GNATCOLL.VFS.File_Array_Access :=
-        Context.Provider.Project.Root_Project.Source_Files;
+      All_Sources : constant GNATCOLL.VFS.File_Array_Access :=
+        Context.Provider.Project.Root_Project.Source_Files (Recursive => True);
+      Set : File_Info_Set;
 
-      Main_Unit       : Analysis_Unit;
-      Node            : Ada_Node;
-      Number_Of_Units : constant Positive := Files'Length;
-      Units_Index     : Positive := 1;
-      Units           : Analysis_Unit_Array (1 .. Number_Of_Units);
+      package Analysis_Unit_Vectors is new Ada.Containers.Vectors
+        (Index_Type   => Positive,
+         Element_Type => Analysis_Unit,
+         "="          => "=");
+
+      subtype Analysis_Unit_Vector is Analysis_Unit_Vectors.Vector;
+
+      Units     : Analysis_Unit_Vector;
+      Main_Unit : Analysis_Unit;
+      Node      : Ada_Node;
 
       References : Renamable_References;
 
@@ -154,36 +163,58 @@ procedure Safe_Rename is
 
       Put_Line ("# Renaming node " & Image (Node.Full_Sloc_Image));
 
-      for File of Files.all loop
-         declare
-            Filename : constant Filesystem_String := File.Full_Name;
+      for J in All_Sources'Range loop
+         Set := Context.Provider.Project.Info_Set (All_Sources (J));
 
-         begin
-            Units (Units_Index) :=
-              Node.Unit.Context.Get_From_File (String (Filename));
-            Units_Index := Units_Index + 1;
-         end;
+         if not Set.Is_Empty then
+            --  The file can be listed in several projects with different
+            --  Info_Sets, in the case of aggregate projects. However, assume
+            --  that the language is the same in all projects, so look only at
+            --  the first entry in the set.
+
+            declare
+               Info : constant File_Info'Class :=
+                 File_Info'Class (Set.First_Element);
+               Filename : constant Filesystem_String :=
+                 All_Sources (J).Full_Name;
+
+            begin
+               if To_Lower (Info.Language) = "ada" then
+                  Units.Append
+                    (Jobs (1).Analysis_Ctx.Get_From_File (String (Filename)));
+               end if;
+            end;
+         end if;
       end loop;
 
-      if Rename_Algorithm = "map_references" then
-         References := Find_All_Renamable_References
-           (Node           => Node,
-            New_Name       => To_Unbounded_Text
-              (To_Text (Ada.Strings.Unbounded.To_String (NN))),
-            Units          => Units,
-            Algorithm_Kind => Map_References);
+      declare
+         Units_Array : Analysis_Unit_Array (1 .. Integer (Units.Length));
 
-      elsif Rename_Algorithm = "analyse_ast" then
-         References := Find_All_Renamable_References
-           (Node           => Node,
-            New_Name       => To_Unbounded_Text
-              (To_Text (Ada.Strings.Unbounded.To_String (NN))),
-            Units          => Units,
-            Algorithm_Kind => Analyse_AST);
+      begin
+         for J in 1 .. Units.Length loop
+            Units_Array (Integer (J)) := Units.Element (Integer (J));
+         end loop;
 
-      else
-         Put_Line ("Unrecognized algorithm");
-      end if;
+         if Rename_Algorithm = "map_references" then
+            References := Find_All_Renamable_References
+              (Node           => Node,
+               New_Name       => To_Unbounded_Text
+                 (To_Text (Ada.Strings.Unbounded.To_String (NN))),
+               Units          => Units_Array,
+               Algorithm_Kind => Map_References);
+
+         elsif Rename_Algorithm = "analyse_ast" then
+            References := Find_All_Renamable_References
+              (Node           => Node,
+               New_Name       => To_Unbounded_Text
+                 (To_Text (Ada.Strings.Unbounded.To_String (NN))),
+               Units          => Units_Array,
+               Algorithm_Kind => Analyse_AST);
+
+         else
+            Put_Line ("Unrecognized algorithm");
+         end if;
+      end;
 
       PP (References);
       New_Line;
