@@ -777,7 +777,9 @@ package body Pp.Actions is
            when Ada_Entry_Spec =>
              L ("!?[# (~~)]~?~~~"),
            when Ada_Entry_Body =>
-             L ("entry !?[# (~~)]~?~~~[# when !]# is$",
+             L ("entry !?[# (~~)]~?~~~[#",
+                Aspects,
+                " when !]# is$",
                 "!",
                 "!",
                 "end !1/"),
