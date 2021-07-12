@@ -669,10 +669,19 @@ package body Laltools.Refactor.Safe_Rename is
 
       for Comp_Unit of Compilation_Units loop
          declare
-            Unit_Decl : constant Basic_Decl := Comp_Unit.P_Decl;
-
+            Unit_Decl : constant Basic_Decl :=
+              (if not Comp_Unit.P_Decl.Is_Null then
+                  Comp_Unit.P_Decl.P_Canonical_Part
+               else
+                  No_Basic_Decl);
+            Unit_Decl_Parent : constant Basic_Decl :=
+              (if not Unit_Decl.Is_Null then
+                  Unit_Decl.P_Parent_Basic_Decl
+               else
+                  No_Basic_Decl);
          begin
-            if Unit_Decl.P_Canonical_Part /= Parent_Package.As_Basic_Decl
+            if not Unit_Decl.Is_Null
+              and then not Unit_Decl_Parent.Is_Null
               and then Unit_Decl.P_Parent_Basic_Decl.Unit = Parent_Package.Unit
             then
                declare
