@@ -154,16 +154,14 @@ package body Laltools.Refactor.Subprogram_Signature is
      (Subp  : Basic_Decl'Class;
       Data  : Parameter_Data_Type;
       Edits : in out Text_Edit_Map)
-     with Pre => Subp.P_Is_Subprogram
-     or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
+     with Pre => Is_Subprogram (Subp);
    --  Adds a parameter defined by 'Data' as the first parameter
 
    procedure Add_As_Last_Parameter
      (Subp  : Basic_Decl'Class;
       Data  : Parameter_Data_Type;
       Edits : in out Text_Edit_Map)
-     with Pre => Subp.P_Is_Subprogram
-     or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
+     with Pre => Is_Subprogram (Subp);
    --  Adds a parameter defined by 'Data' as the last parameter
 
    procedure Add_Parameter
@@ -171,16 +169,14 @@ package body Laltools.Refactor.Subprogram_Signature is
       Data  : Parameter_Data_Type;
       Index : Positive;
       Edits : in out Text_Edit_Map)
-     with Pre => Subp.P_Is_Subprogram
-     or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
+     with Pre => Is_Subprogram (Subp);
    --  Adds a parameter defined by 'Data' to position defined by 'Index'
 
    procedure Add_To_Empty_Params
      (Subp  : Basic_Decl'Class;
       Data  : Parameter_Data_Type;
       Edits : in out Text_Edit_Map)
-     with Pre => Subp.P_Is_Subprogram
-     or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
+     with Pre => Is_Subprogram (Subp);
    --  Adds a parameter defined by 'Data' as the first parameter of a 'Subp'
    --  that has no parameters
 
@@ -219,8 +215,7 @@ package body Laltools.Refactor.Subprogram_Signature is
      (Subp                      : Basic_Decl'Class;
       Param_Spec_Indices_Ranges : Param_Spec_Indices_Ranges_Type)
       return Source_Location_Range_Set
-     with Pre => (Subp.P_Is_Subprogram
-                  or else Subp.Kind in Ada_Generic_Subp_Decl_Range)
+     with Pre => Is_Subprogram (Subp)
                  and then Param_Spec_Indices_Ranges'Length > 0;
    --  Returns a map with the source location range of the Param_Spec nodes
    --  with indices given by Param_Spec_Indices_Ranges. If maximum value of
@@ -231,8 +226,7 @@ package body Laltools.Refactor.Subprogram_Signature is
      (Subp : Basic_Decl'Class)
       return Source_Location_Range
    is (Get_Subp_Params (Subp).Sloc_Range)
-     with Pre => Subp.P_Is_Subprogram
-                 or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
+     with Pre => Is_Subprogram (Subp);
    --  If 'Subp' has a Params node, then returns its source location range.
    --  Otherwise returns No_Source_Location_Range.
 
@@ -240,8 +234,7 @@ package body Laltools.Refactor.Subprogram_Signature is
      (Subp                     : Basic_Decl'Class;
       Parameter_Indices_Ranges : Parameter_Indices_Ranges_Type)
       return Source_Location_Range_Set
-     with Pre => (Subp.P_Is_Subprogram
-                  or else Subp.Kind in Ada_Generic_Subp_Decl_Range)
+     with Pre => Is_Subprogram (Subp)
                  and then Parameter_Indices_Ranges'Length > 0;
    --  Returns a set with the source location range of the parameters with
    --  indices given by 'Parameter_Indices_Ranges'.
@@ -980,7 +973,7 @@ package body Laltools.Refactor.Subprogram_Signature is
 
       Parent_Subp_Decl := Aux_Node.As_Subp_Spec.P_Parent_Basic_Decl;
 
-      if not Parent_Subp_Decl.P_Is_Subprogram then
+      if not Is_Subprogram (Parent_Subp_Decl) then
          return False;
       end if;
 
@@ -1100,7 +1093,7 @@ package body Laltools.Refactor.Subprogram_Signature is
 
       Parent_Subp_Decl := Aux_Node.As_Subp_Spec.P_Parent_Basic_Decl;
 
-      if not Parent_Subp_Decl.P_Is_Subprogram then
+      if not Is_Subprogram (Parent_Subp_Decl) then
          return False;
       end if;
 
@@ -1338,9 +1331,7 @@ package body Laltools.Refactor.Subprogram_Signature is
 
       Parent_Subp_Decl := Aux_Node.As_Subp_Spec.P_Parent_Basic_Decl;
 
-      if not (Parent_Subp_Decl.P_Is_Subprogram
-              or else Parent_Subp_Decl.Kind in Ada_Generic_Subp_Decl_Range)
-      then
+      if not Is_Subprogram (Parent_Subp_Decl) then
          return False;
       end if;
 
@@ -1438,9 +1429,7 @@ package body Laltools.Refactor.Subprogram_Signature is
 
       begin
          if Params_Length = 0 then
-            if Relative_Subp.P_Is_Subprogram
-              or else Relative_Subp.Kind in Ada_Generic_Subp_Decl_Range
-            then
+            if Is_Subprogram (Relative_Subp) then
                Add_To_Empty_Params
                  (Relative_Subp, New_Parameter, Edits);
 
@@ -1451,9 +1440,7 @@ package body Laltools.Refactor.Subprogram_Signature is
             end if;
 
          elsif Parameter_Index = 1 then
-            if Relative_Subp.P_Is_Subprogram
-              or else Relative_Subp.Kind in Ada_Generic_Subp_Decl_Range
-            then
+            if Is_Subprogram (Relative_Subp) then
                Add_As_First_Parameter
                  (Relative_Subp, New_Parameter, Edits);
 
@@ -1464,9 +1451,7 @@ package body Laltools.Refactor.Subprogram_Signature is
             end if;
 
          elsif Parameter_Index = Params_Length + 1 then
-            if Relative_Subp.P_Is_Subprogram
-              or else Relative_Subp.Kind in Ada_Generic_Subp_Decl_Range
-            then
+            if Is_Subprogram (Subp) then
                Add_As_Last_Parameter
                  (Relative_Subp, New_Parameter, Edits);
 
@@ -1479,8 +1464,7 @@ package body Laltools.Refactor.Subprogram_Signature is
          else
             Assert (Parameter_Index in 2 .. Params_Length);
 
-            if Relative_Subp.P_Is_Subprogram
-              or else Relative_Subp.Kind in Ada_Generic_Subp_Decl_Range
+            if Is_Subprogram (Relative_Subp)
             then
                Add_Parameter
                  (Relative_Subp,
@@ -1534,9 +1518,7 @@ package body Laltools.Refactor.Subprogram_Signature is
            Find_Subp_Body (Relative_Subp);
 
       begin
-         if Relative_Subp.P_Is_Subprogram
-           or else Relative_Subp.Kind in Ada_Generic_Subp_Decl_Range
-         then
+         if Is_Subprogram (Relative_Subp) then
             Change_Mode
               (Relative_Subp,
                Parameter_Indices_Range,
@@ -1593,9 +1575,7 @@ package body Laltools.Refactor.Subprogram_Signature is
            Find_Subp_Body (Relative_Subp);
 
       begin
-         if Relative_Subp.P_Is_Subprogram
-           or else Relative_Subp.Kind in Ada_Generic_Subp_Decl_Range
-         then
+         if Is_Subprogram (Relative_Subp) then
             Move_Backward
               (Relative_Subp, Parameter_Index, Edits);
 
@@ -2061,9 +2041,7 @@ package body Laltools.Refactor.Subprogram_Signature is
 
       procedure Decl_Callback (Relative_Subp : Basic_Decl'Class) is
       begin
-         if Relative_Subp.P_Is_Subprogram
-           or else Relative_Subp.Kind in Ada_Generic_Subp_Decl_Range
-         then
+         if Is_Subprogram (Relative_Subp) then
             for Relative_Subp_Part of Relative_Subp.P_All_Parts loop
                for Sloc of
                  Parameters_SLOC (Relative_Subp_Part, Parameter_Indices_Ranges)
@@ -2129,9 +2107,7 @@ package body Laltools.Refactor.Subprogram_Signature is
 
       procedure Decl_Callback (Relative_Subp : Basic_Decl'Class) is
       begin
-         if Relative_Subp.P_Is_Subprogram
-           or else Relative_Subp.Kind in Ada_Generic_Subp_Decl_Range
-         then
+         if Is_Subprogram (Relative_Subp) then
             for Relative_Subp_Part of Relative_Subp.P_All_Parts loop
                Safe_Insert
                  (Edits     => Edits,

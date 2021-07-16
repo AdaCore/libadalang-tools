@@ -21,8 +21,6 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Laltools.Common; use Laltools.Common;
-
 package body Laltools.Call_Hierarchy is
 
    ---------------------------

@@ -64,9 +64,8 @@ package Laltools.Refactor.Subprogram_Signature is
       Requires_Type   : out Boolean)
       return Boolean
      with Pre => not Node.Is_Null,
-     Post => (if Is_Add_Parameter_Available'Result then
-                (Subp.P_Is_Subprogram
-                 or else Subp.Kind in Ada_Generic_Subp_Decl_Range));
+          Post => (if Is_Add_Parameter_Available'Result then
+                     Is_Subprogram (Subp));
    --  Checks if from 'Node' we can add a parameter. If so, then returns True
    --  'Subp', 'Parameter_Index' and 'Requires_Type' will have the
    --  necessary data to create a Parameter_Adder object or to call
@@ -89,9 +88,8 @@ package Laltools.Refactor.Subprogram_Signature is
       Mode_Alternatives       : out Mode_Alternatives_Type)
       return Boolean
      with Pre => not Node.Is_Null,
-     Post => (if Is_Change_Mode_Available'Result then
-                (Subp.P_Is_Subprogram
-                 or else Subp.Kind in Ada_Generic_Subp_Decl_Range));
+          Post => (if Is_Change_Mode_Available'Result then
+                     Is_Subprogram (Subp));
    --  Checks if from 'Node' we can unambiguously identify a parameter or a
    --  group of parameters. If so, then returns True. 'Subp',
    --  'Parameter_Indices_Range' and 'Mode_Alternatives' will have the
@@ -117,9 +115,8 @@ package Laltools.Refactor.Subprogram_Signature is
       Move_Directions : out Move_Direction_Availability_Type)
       return Boolean
      with Pre => not Node.Is_Null,
-     Post => (if Is_Move_Parameter_Available'Result then
-                (Subp.P_Is_Subprogram
-                 or else Subp.Kind in Ada_Generic_Subp_Decl_Range));
+          Post => (if Is_Move_Parameter_Available'Result then
+                     Is_Subprogram (Subp));
    --  Checks if from 'Node' we can unambiguously identify a parameter. If so,
    --  then returns True. 'Subp', 'Parameter_Index' and 'Move_Directions' will
    --  have the necessary data to create a Parameter_Mover object or to call
@@ -130,10 +127,9 @@ package Laltools.Refactor.Subprogram_Signature is
       Subp                    : out Basic_Decl;
       Parameter_Indices_Range : out Parameter_Indices_Range_Type)
       return Boolean
-     with Pre => not Node.Is_Null,
-     Post => (if Is_Remove_Parameter_Available'Result
-                then (Subp.P_Is_Subprogram
-                  or else Subp.Kind in Ada_Generic_Subp_Decl_Range));
+     with Pre  => not Node.Is_Null,
+          Post => (if Is_Remove_Parameter_Available'Result then
+                     Is_Subprogram (Subp));
    --  Checks if from 'Node' we can unambiguously identify a parameter. If so,
    --  then returns True.
    --  Example 1:
@@ -157,8 +153,7 @@ package Laltools.Refactor.Subprogram_Signature is
       Parameter_Index : Positive;
       Units           : Analysis_Unit_Array)
       return Text_Edit_Map
-     with Pre => Subp.P_Is_Subprogram
-     or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
+     with Pre => Is_Subprogram (Subp);
    --  Adds a parameter defined by 'New_Parameter' to position defined by
    --  'Index'. The new parameter is added to the entire subprogram hierarchy,
    --  as well as, all renames hierarchy.
@@ -169,8 +164,7 @@ package Laltools.Refactor.Subprogram_Signature is
       New_Mode                : Ada_Mode;
       Units                   : Analysis_Unit_Array)
       return Text_Edit_Map
-     with Pre => Subp.P_Is_Subprogram
-     or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
+     with Pre => Is_Subprogram (Subp);
    --  Changes the parameter mode of the parameters defined by
    --  'Parameter_Indices_Range' to 'New_Mode'. The new mode is added to the
    --  entire subprogram hierarchy, as well as, all renames hierarchy.
@@ -180,8 +174,7 @@ package Laltools.Refactor.Subprogram_Signature is
       Parameter_Index : Positive;
       Units           : Analysis_Unit_Array)
       return Text_Edit_Map
-     with Pre => Subp.P_Is_Subprogram
-     or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
+     with Pre => Is_Subprogram (Subp);
    --  Moves the parameter defined by 'Parameter_Index' backward. The
    --  parameter is moved backward in the entire subprogram hierarchy, as
    --  well as, all renames hierarchy.
@@ -201,8 +194,7 @@ package Laltools.Refactor.Subprogram_Signature is
       Parameter_Index : Positive;
       Units           : Analysis_Unit_Array)
       return Text_Edit_Map
-     with Pre => Subp.P_Is_Subprogram
-     or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
+     with Pre => Is_Subprogram (Subp);
    --  Removes the parameter defined by Parameter_Index. The parameter is
    --  removed in the entire subprogram hierarchy, as well as, all renames
    --  hierarchy.
@@ -221,8 +213,7 @@ package Laltools.Refactor.Subprogram_Signature is
       Parameter_Indices_Ranges : Parameter_Indices_Ranges_Type;
       Units                    : Analysis_Unit_Array)
       return Text_Edit_Map
-     with Pre => Subp.P_Is_Subprogram
-     or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
+     with Pre => Is_Subprogram (Subp);
    --  Removes the parameters defined by 'Parameter_Indices_Ranges'. The
    --  parameter is removed in the entire subprogram hierarchy, as well as, all
    --  renames hierarchy.
@@ -231,8 +222,7 @@ package Laltools.Refactor.Subprogram_Signature is
      (Subp                    : Basic_Decl'Class;
       Units                   : Analysis_Unit_Array)
       return Text_Edit_Map
-     with Pre => Subp.P_Is_Subprogram
-     or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
+     with Pre => Is_Subprogram (Subp);
    --  Removes all parameters os 'Subp'. The parameters are removed in the
    --  entire subprogram hierarchy, as well as, all renames hierarchy.
 

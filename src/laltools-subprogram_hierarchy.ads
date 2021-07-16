@@ -29,6 +29,8 @@
 with Libadalang.Analysis; use Libadalang.Analysis;
 with Libadalang.Common; use Libadalang.Common;
 
+with Laltools.Common; use Laltools.Common;
+
 package Laltools.Subprogram_Hierarchy is
 
    type Generic_Subp_Instantiation_Array is
@@ -42,7 +44,7 @@ package Laltools.Subprogram_Hierarchy is
       Exclude_Itself     : Boolean := True;
       Imprecise_Fallback : Boolean := False)
       return Basic_Decl_Array
-     with Pre => Subp.P_Is_Subprogram;
+     with Pre => Is_Subprogram (Subp);
    --  Returns all subprogram declarations that 'Subp' overrides
 
    function Find_Generic_Subp_Instantiations
@@ -113,10 +115,9 @@ package Laltools.Subprogram_Hierarchy is
          Cancel          : in out Boolean) := null;
       Include_Base_Subps : Boolean := True;
       Include_Overrides  : Boolean := True)
-     with Pre =>
-       (Subp.P_Is_Subprogram
-        or else Subp.Kind in Ada_Generic_Subp_Decl_Range)
-       and then (if Find_Calls then Calls_Callback /= null else True);
+     with Pre => Is_Subprogram (Subp)
+                 and then (if Find_Calls then Calls_Callback /= null
+                           else True);
    --  Finds the all relatives of 'Subp' (overwritten subprograms,
    --  overwritting subprogram, renames and generic instantiations) and calls
    --  'Decl_Callback' on them. If 'Find_Calls' then also calls

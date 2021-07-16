@@ -283,8 +283,7 @@ package Laltools.Common is
    --  have failed.
 
    function Find_Subp_Body (Subp : Basic_Decl'Class) return Base_Subp_Body
-     with Pre => Subp.P_Is_Subprogram
-     or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
+     with Pre => Is_Subprogram (Subp);
    --  If Subp is of kind Ada_Subp_Decl or Ada_Generic_Subp_Decl then
    --  returns its body part, if is exists. Otherwise return No_Base_Subp_Body.
 
@@ -435,8 +434,7 @@ package Laltools.Common is
      (Subp            : Basic_Decl'Class;
       Parameter_Index : Positive)
       return Text_Type
-     with Pre => Subp.P_Is_Subprogram
-     or else Subp.Kind in Ada_Generic_Subp_Decl_Range;
+     with Pre => Is_Subprogram (Subp);
    --  Returns the name of the parameters associated to 'Parameter_Index'.
    --  Is 'Parameter_Index' is > than the amount of parameters 'Subp' has, then
    --  return an empty Text_Type.
@@ -450,16 +448,12 @@ package Laltools.Common is
    --  Gets the Ada_Node_List of a Declarative_Part associated to a Subp_Body.
 
    function Get_Subp_Params (Subp : Basic_Decl'Class) return Params
-     with Pre => (not Subp.Is_Null
-                  and then (Subp.P_Is_Subprogram
-                    or else Subp.Kind in Ada_Generic_Subp_Decl_Range));
+     with Pre => Is_Subprogram (Subp);
    --  Gets the Params node associatedof 'Subp', if it exists.
    --  If it doesn't exist returns No_Params.
 
    function Get_Subp_Spec (Subp : Basic_Decl'Class) return Subp_Spec
-     with Pre => (not Subp.Is_Null
-                  and then (Subp.P_Is_Subprogram
-                    or else Subp.Kind in Ada_Generic_Subp_Decl_Range));
+     with Pre => Is_Subprogram (Subp);
    --  Gets the Subp_Spec node associated to a subprogram
 
    function Get_Task_Body_Declarative_Part (Task_B : Task_Body)
