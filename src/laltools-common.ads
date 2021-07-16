@@ -532,6 +532,13 @@ package Laltools.Common is
    function Is_Structure (Node : Basic_Decl) return Boolean;
    --  Return True if the type contains a record part.
 
+   function Is_Subprogram (Decl : Basic_Decl'Class) return Boolean is
+     (not Decl.Is_Null
+      and then (Decl.P_Is_Subprogram
+                or else Decl.Kind in Ada_Generic_Subp_Decl_Range)
+      and then not (Decl.Kind in Ada_Enum_Literal_Decl_Range));
+   --  Checks if Decl is a subprogram excluding enum literals
+
    function Is_Type_Derivation (Node : Ada_Node) return Boolean
    is
      (not Node.Parent.Is_Null

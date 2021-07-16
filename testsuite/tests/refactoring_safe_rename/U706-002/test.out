@@ -1,0 +1,16 @@
+# Renaming node main.adb:3:19: 
+References:
+Unit:main.adb
+Line: 3
+Source Location Range:
+Start_Line: 3
+Start_Column: 19
+End_Line: 3
+End_Column: 22
+Line: 5
+Source Location Range:
+Start_Line: 5
+Start_Column: 26
+End_Line: 5
+End_Column: 29
+

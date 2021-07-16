@@ -1,0 +1,5 @@
+description: |
+    This test checks if the safe rename tool correctly renames an enum
+    literal
+
+driver: shell_script

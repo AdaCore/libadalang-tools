@@ -530,9 +530,7 @@ package body Laltools.Refactor.Safe_Rename is
             if Decl.Kind in Ada_Basic_Decl then
                --  Filter the nodes that are not Basic_Decl
 
-               if Decl.As_Basic_Decl.P_Is_Subprogram
-                 or else Decl.Kind in Ada_Generic_Subp_Decl_Range
-               then
+               if Is_Subprogram (Decl.As_Basic_Decl) then
                   --  If Decl is a subprogram, then not only check the name but
                   --  also its signature.
 
@@ -569,7 +567,7 @@ package body Laltools.Refactor.Safe_Rename is
             return No_Defining_Name;
          end if;
 
-         if Def_Basic_Decl.P_Is_Subprogram then
+         if Is_Subprogram (Def_Basic_Decl) then
             return Check_Subp_Rename_Conflicts (Scope);
 
          else
@@ -578,9 +576,7 @@ package body Laltools.Refactor.Safe_Rename is
       end Process_Scope;
 
    begin
-      if Def_Basic_Decl.P_Is_Subprogram
-        or else Def_Basic_Decl.Kind in Ada_Generic_Subp_Decl_Range
-      then
+      if Is_Subprogram (Def_Basic_Decl) then
          Original_Subp_Spec := Get_Subp_Spec (Def_Basic_Decl);
       end if;
 
@@ -1023,10 +1019,7 @@ package body Laltools.Refactor.Safe_Rename is
    is
       Canonical_Decl : constant Basic_Decl :=
         Self.Canonical_Definition.P_Basic_Decl;
-      Is_Subprogram  : constant Boolean :=
-        Canonical_Decl.P_Is_Subprogram
-        or else Self.Canonical_Definition.P_Basic_Decl.Kind
-          in Ada_Generic_Subp_Decl_Range;
+      Is_Subp        : constant Boolean := Is_Subprogram (Canonical_Decl);
 
       Possible_Problem : Hiding_Name;
       Found_Problem    : Boolean := False;
@@ -1047,14 +1040,13 @@ package body Laltools.Refactor.Safe_Rename is
       procedure Check_Declarative_Part
         (Decl_Part : Declarative_Part'Class) is
       begin
-         if Is_Subprogram then
+         if Is_Subp then
             for Decl of Decl_Part.F_Decls loop
                --  Conflicts can only exist with subprograms and not with other
                --  kind of declarations.
 
                if Decl.Kind in Ada_Basic_Decl
-                 and then (Decl.As_Basic_Decl.P_Is_Subprogram
-                           or else Decl.Kind in Ada_Generic_Subp_Decl_Range)
+                 and then Is_Subprogram (Decl.As_Basic_Decl)
                then
                   if Decl.Kind in Ada_Subp_Renaming_Decl_Range then
                      declare
@@ -1105,9 +1097,7 @@ package body Laltools.Refactor.Safe_Rename is
                --  subprograms.
 
                if Decl.Kind in Ada_Basic_Decl
-                 and then (not (Decl.As_Basic_Decl.P_Is_Subprogram
-                                or else Decl.Kind in
-                                  Ada_Generic_Subp_Decl_Range))
+                 and then not Is_Subprogram (Decl.As_Basic_Decl)
                then
                   if Check_Rename_Conflict
                     (Self.New_Name,
@@ -1175,9 +1165,7 @@ package body Laltools.Refactor.Safe_Rename is
       --  If we are renaming a subprogram, it only becomes hidden by another
       --  subprogram that is type conformant.
 
-      Is_Subp : constant Boolean :=
-        Canonical_Decl.P_Is_Subprogram
-        or else Canonical_Decl.Kind in Ada_Generic_Subp_Decl_Range;
+      Is_Subp : constant Boolean := Is_Subprogram (Canonical_Decl);
       Spec    : constant Subp_Spec :=
         (if Is_Subp then
             Get_Subp_Spec (Canonical_Decl)
