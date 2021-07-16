@@ -32,7 +32,6 @@ with Ada.Text_IO;
 with GNAT.Directory_Operations;
 
 with GNATCOLL.VFS;      use GNATCOLL.VFS;
-with GNATCOLL.Projects.Aux;
 with GNATCOLL.Traces;
 
 with Utils.Command_Lines.Common;     use Utils.Command_Lines.Common;
@@ -84,14 +83,11 @@ package body Utils.Projects is
    procedure Process_Project
      (Cmd                       : in out Command_Line;
       Global_Report_Dir         :    out String_Ref;
-      Compiler_Options          :    out String_List_Access;
-      Project_RTS               :    out String_Access;
       Preprocessing_Allowed     :        Boolean;
       My_Project_Tree           : in out Project_Tree;
       Tool_Package_Name         :        String;
       Compute_Project_Closure   :        Boolean;
-      Callback                  :        Parse_Callback;
-      Tool_Temp_Dir             :        String);
+      Callback                  :        Parse_Callback);
 
    function Project_File_Name (Cmd : Command_Line) return String is
       Name : String renames Arg (Cmd, Project_File).all;
@@ -120,17 +116,13 @@ package body Utils.Projects is
    procedure Process_Project
      (Cmd                       : in out Command_Line;
       Global_Report_Dir         :    out String_Ref;
-      Compiler_Options          :    out String_List_Access;
-      Project_RTS               :    out String_Access;
       Preprocessing_Allowed     :        Boolean;
       My_Project_Tree           : in out Project_Tree;
       Tool_Package_Name         :        String;
       Compute_Project_Closure   :        Boolean;
-      Callback                  :        Parse_Callback;
-      Tool_Temp_Dir             :        String)
+      Callback                  :        Parse_Callback)
    is
       use String_Access_Vectors;
-      Compiler_Options_Vector : String_Access_Vector;
 
       procedure Initialize_Environment;
       --  Initializes the environment for extracting the information from the
@@ -181,20 +173,6 @@ package body Utils.Projects is
       --  recomputes the view of the project with these values of external
       --  variables.
 
-      procedure Extract_Compilation_Attributes;
-      --  Extracts and stores as compiler options the attributes that may be
-      --  needed to call the compiler from the tool to create the tree.
-      --
-      --  This extracts and stores options corresponding to the following
-      --  attributes:
-      --     Builder.Global_Configuration_Pragmas
-      --     Builder.Global_Config_File
-      --     Compiler.Local_Configuration_Pragmas
-      --     Compiler.Local_Config_File
-      --
-      --  ??? Should we extract anything more then global configuration file
-      --  here???
-
       procedure Extract_Tool_Options;
       --  Extracts tool attributes from the project file. The default does the
       --  following: * if there is exactly one source file specified, tries to
@@ -211,16 +189,6 @@ package body Utils.Projects is
       --  as a parameter of '--aggregated_project_file option' (which is
       --  supposed to be a (non-aggregate) project aggregated by
       --  My_Project_Tree.
-
-      procedure Create_Configuration_File;
-      procedure Create_Mapping_File;
-      --  Create the configuration/mapping file for the project and adds the
-      --  corresponding option to the list of options used to create the tree.
-      --
-      --  These procedures form the important parameters for the
-      --  compiler call to create the tree, so the caller should call to
-      --  ASIS_US.Compiler_Options.Set_Arg_List after the calls to these
-      --  subprograms.????????????????
 
       procedure Set_Global_Result_Dirs;
       --  Sets the directory to place the global tool results into.
@@ -600,114 +568,6 @@ package body Utils.Projects is
          end if;
       end Set_External_Values;
 
-      ------------------------------------
-      -- Extract_Compilation_Attributes --
-      ------------------------------------
-
-      procedure Extract_Compilation_Attributes is
-         Proj      : Project_Type := My_Project_Tree.Root_Project;
-         Attr_Proj : Project_Type;
-
-         --  Attributes to check:
-         Builder_Global_Configuration_Pragmas : constant Attribute_Pkg_String
-           := Build (Builder_Package, "Global_Configuration_Pragmas");
-         Builder_Global_Config_File : constant Attribute_Pkg_String
-           := Build (Builder_Package, "Global_Config_File");
-
-         Needs_RTS : Boolean := False;
-      begin
-         if Has_Attribute (Proj, Builder_Global_Configuration_Pragmas) then
-            Attr_Proj :=
-              Attribute_Project
-                (Project   => Proj,
-                 Attribute => Builder_Global_Configuration_Pragmas);
-
-            declare
-               Attr_Val : constant String :=
-                 Attribute_Value (Proj, Builder_Global_Configuration_Pragmas);
-            begin
-               Append
-                 (Compiler_Options_Vector,
-                  new String'
-                    ("-gnatec=" &
-                     Normalize_Pathname
-                       (Name      => Attr_Val,
-                        Directory =>
-                          GNAT.Directory_Operations.Dir_Name
-                            (Display_Full_Name (Project_Path (Attr_Proj))))));
-            end;
-         end if;
-
-         if Has_Attribute (Proj, Builder_Global_Config_File, "ada") then
-            Attr_Proj :=
-              Attribute_Project
-                (Project   => Proj,
-                 Index     => "ada",
-                 Attribute => Builder_Global_Config_File);
-
-            declare
-               Attr_Val : constant String :=
-                 Attribute_Value (Proj, Builder_Global_Config_File, "ada");
-            begin
-               Append
-                 (Compiler_Options_Vector,
-                  new String'
-                    ("-gnatec=" &
-                     Normalize_Pathname
-                       (Name      => Attr_Val,
-                        Directory =>
-                          GNAT.Directory_Operations.Dir_Name
-                            (Display_Full_Name (Project_Path (Attr_Proj))))));
-            end;
-         end if;
-
-         Needs_RTS := Has_Attribute (Proj, Runtime_Attribute, Index => "Ada");
-
-         while not Needs_RTS and then Proj /= No_Project loop
-            Proj      := Extended_Project (Proj);
-            Needs_RTS :=
-              Has_Attribute (Proj, Runtime_Attribute, Index => "Ada");
-         end loop;
-
-         if Needs_RTS then
-            --  ???There is some code duplication with
-            --  Utils.Compiler_Options.Get_Full_Path_To_RTS,
-            --  needs refactoring
-            declare
-               Dirs : constant File_Array :=
-                 Project_Env.Predefined_Object_Path;
-               Idx : Natural;
-            begin
-               for J in Dirs'Range loop
-                  Idx := Index (Dirs (J).Display_Full_Name, "adalib");
-
-                  if Idx /= 0 then
-                     declare
-                        Result : constant String := Dirs (J).Display_Full_Name;
-                        F_Idx  : constant Positive := Result'First;
-                     begin
-                        Append
-                          (Compiler_Options_Vector,
-                           new String'
-                             ("--RTS=" &
-                              Trim (Result (F_Idx .. Idx - 2), Both)));
-
-                        Project_RTS := new String'(Get_Runtime (Proj));
-
-                        goto Done;
-                     end;
-                  end if;
-               end loop;
-
-               Cmd_Error
-                 ("cannot detect the full path to runtime " &
-                  "from Runtime attribute");
-               <<Done>>
-               null;
-            end;
-         end if;
-      end Extract_Compilation_Attributes;
-
       --------------------------
       -- Extract_Tool_Options --
       --------------------------
@@ -772,54 +632,6 @@ package body Utils.Projects is
             --  switches.
          end if;
       end Extract_Tool_Options;
-
-      -------------------------------
-      -- Create_Configuration_File --
-      -------------------------------
-
-      procedure Create_Configuration_File is
-         use GNAT.Directory_Operations;
-         Cur_Dir : constant String := Get_Current_Dir;
-      begin
-         Change_Dir (Tool_Temp_Dir);
-         --  Create it in the temp dir so it gets deleted at the end
-
-         declare
-            Config_Name : constant String :=
-              GNATCOLL.Projects.Aux.Create_Config_Pragmas_File
-                (My_Project_Tree.Root_Project);
-         begin
-            Append
-              (Compiler_Options_Vector,
-               new String'("-gnatec=" & Config_Name));
-         end;
-
-         Change_Dir (Cur_Dir);
-      end Create_Configuration_File;
-
-      -------------------------
-      -- Create_Mapping_File --
-      -------------------------
-
-      procedure Create_Mapping_File is
-         use GNAT.Directory_Operations;
-         Cur_Dir : constant String := Get_Current_Dir;
-      begin
-         Change_Dir (Tool_Temp_Dir);
-         --  Create it in the temp dir so it gets deleted at the end
-
-         declare
-            Mapping_Name : constant String :=
-              GNATCOLL.Projects.Aux.Create_Ada_Mapping_File
-                (My_Project_Tree.Root_Project);
-         begin
-            Append
-              (Compiler_Options_Vector,
-               new String'("-gnatem=" & Mapping_Name));
-         end;
-
-         Change_Dir (Cur_Dir);
-      end Create_Mapping_File;
 
       ----------------------------
       -- Set_Global_Result_Dirs --
@@ -1095,15 +907,10 @@ package body Utils.Projects is
          --  project itself.
 
       else
-         Extract_Compilation_Attributes;
          Extract_Tool_Options;
          Get_Sources_From_Project;
-         Create_Mapping_File;
-         Create_Configuration_File;
          Set_Global_Result_Dirs;
          Set_Individual_Source_Options;
-         Compiler_Options :=
-           new Argument_List'(To_Array (Compiler_Options_Vector));
       end if;
 
    end Process_Project;
@@ -1254,15 +1061,12 @@ package body Utils.Projects is
    procedure Process_Command_Line
      (Cmd                             : in out Command_Line;
       Global_Report_Dir               :    out String_Ref;
-      Compiler_Options                :    out String_List_Access;
-      Project_RTS                     :    out String_Access;
       The_Project_Tree                :    out not null Project_Tree_Access;
       The_Project_Env                : out not null Project_Environment_Access;
       Preprocessing_Allowed           :        Boolean;
       Tool_Package_Name               :        String;
       Compute_Project_Closure         :        Boolean        := True;
       Callback                        :        Parse_Callback := null;
-      Tool_Temp_Dir                   :        String;
       Print_Help                      : not null access procedure)
    is
       --  We have to Parse the command line BEFORE we Parse the project file,
@@ -1382,17 +1186,11 @@ package body Utils.Projects is
             Process_Project
               (Cmd,
                Global_Report_Dir,
-               Compiler_Options,
-               Project_RTS,
                Preprocessing_Allowed,
                My_Project_Tree,
                Tool_Package_Name,
                Compute_Project_Closure,
-               Callback,
-               Tool_Temp_Dir);
-         else
-            Compiler_Options := new Argument_List'(1 .. 0 => <>);
-            --  Leave Individual_Source_Options and Result_Dirs empty
+               Callback);
          end if;
 
          --  Now Parse again, so command-line args override project file args

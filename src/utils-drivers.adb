@@ -80,8 +80,6 @@ package body Utils.Drivers is
       end Local_Callback;
 
       Global_Report_Dir         : String_Ref;
-      Compiler_Options          : GNAT.OS_Lib.Argument_List_Access;
-      Custom_RTS                : GNAT.OS_Lib.String_Access;
 
       procedure Include_One (File_Name : String);
       --  Include File_Name in the Ignored set below
@@ -135,14 +133,11 @@ package body Utils.Drivers is
       Process_Command_Line
         (Cmd,
          Global_Report_Dir,
-         Compiler_Options,
-         Project_RTS               => Custom_RTS,
          The_Project_Tree          => Tool.Project_Tree,
          The_Project_Env           => Tool.Project_Env,
          Preprocessing_Allowed     => Preprocessing_Allowed,
          Tool_Package_Name         => Tool_Package_Name,
          Callback                  => Local_Callback'Unrestricted_Access,
-         Tool_Temp_Dir             => Environment.Tool_Temp_Dir.all,
          Print_Help                => Print_Help'Access);
 --      Utils.Command_Lines.Common.Post.Postprocess_Common (Cmd);
 
