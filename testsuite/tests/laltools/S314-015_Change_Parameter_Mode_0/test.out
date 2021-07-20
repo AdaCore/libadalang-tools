@@ -21,7 +21,7 @@ Changing mode of parameter I to in out
 main.adb
 8:11-8:14 
 8:28-8:28 ; I : in out Integer
-19:11-19:14 in out
+19:11-19:14  in out
 main_package.adb
 5:11-5:14 
 5:28-5:28 ; I : in out Integer
@@ -45,19 +45,19 @@ main_package.ads
 Changing mode of parameters D, E, F to out
 main.adb
 7:11-7:13  :  Integer; 
-7:22-7:22 out
-17:17-17:19 out
+7:22-7:22  out
+17:17-17:19  out
 main_package.adb
 4:8-4:10  :  Integer; 
-4:19-4:19 out
+4:19-4:19  out
 main_package.ads
-4:17-4:19 out
+4:17-4:19  out
 
 Changing mode of parameters N, O, P to out
 main_package.adb
 13:8-13:10  :  Integer; 
-13:16-13:16 out
-13:29-13:29 out
+13:16-13:16  out
+13:29-13:29  out
 main_package.ads
-9:29-9:29 out
+9:29-9:29  out
 

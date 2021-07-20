@@ -2595,7 +2595,10 @@ package body Laltools.Refactor.Subprogram_Signature is
                             Param_Spec.F_Mode.Sloc_Range.Start_Column,
                           End_Column   =>
                             Param_Spec.F_Mode.Sloc_Range.End_Column),
-                        Text     => New_Mode_Text));
+                        Text       => (if New_Mode_Text = "" then
+                                          Null_Unbounded_String
+                                       else
+                                          " " & New_Mode_Text)));
                end if;
 
                N_Of_Parameters_Left := 0;
@@ -2735,7 +2738,10 @@ package body Laltools.Refactor.Subprogram_Signature is
                         File_Name => Subp.Unit.Get_Filename,
                         Edit      =>
                           (Location => Param_Spec.F_Mode.Sloc_Range,
-                           Text     => New_Mode_Text));
+                           Text     => (if New_Mode_Text = "" then
+                                          Null_Unbounded_String
+                                       else
+                                          " " & New_Mode_Text)));
                   end if;
 
                   Safe_Insert
@@ -2790,7 +2796,7 @@ package body Laltools.Refactor.Subprogram_Signature is
                         File_Name => Subp.Unit.Get_Filename,
                         Edit      => Text_Edit'
                           (Location => Param_Spec.F_Mode.Sloc_Range,
-                           Text     => New_Mode_Text));
+                           Text     => " " & New_Mode_Text));
                   end if;
 
                   Safe_Insert
