@@ -100,7 +100,8 @@ package Laltools.Subprogram_Hierarchy is
      with Pre => not Subp.Is_Null
      and then Subp.Kind in Ada_Subp_Body_Range
        | Ada_Subp_Decl_Range
-         | Ada_Expr_Function_Range;
+       | Ada_Null_Subp_Decl_Range
+       | Ada_Expr_Function_Range;
    --  If Subp is a primitive subrogram of a type, then returns an array
    --  with all declaration overriding or that are being overridden by Subp.
 
