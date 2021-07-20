@@ -1,0 +1,5 @@
+project p is
+   package gnattest is
+      for GNATtest_Switches use ("--test-duration", "--exit-status=on");
+   end gnattest; 
+end p;
