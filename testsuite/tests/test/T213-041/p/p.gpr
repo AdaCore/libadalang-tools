@@ -1,0 +1,10 @@
+project p is
+
+   for Source_Dirs use (".");
+   for Languages use ("Ada");
+
+  package Builder is
+     for Global_Configuration_Pragmas use "suppress.adc";
+   end Builder;
+   
+end p;
