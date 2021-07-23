@@ -1,0 +1,7 @@
+project p is
+
+   package Gnattest is
+      for GnatTest_Switches use ("--test-case-only");
+   end Gnattest;
+
+end p;

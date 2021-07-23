@@ -1833,7 +1833,8 @@ package body Test.Skeleton is
                               Suite_Data_List.ITR_List.Append
                                 (Test_Routine_Wrapper);
                            end loop;
-                        else
+
+                        elsif not Test_Case_Only then
                            --  There were no test_Cases, we just need
                            --  to add the single inherited test.
 
