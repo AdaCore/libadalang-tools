@@ -926,12 +926,14 @@ package body Test.Skeleton is
                declare
                   Gen_Name : constant Libadalang.Analysis.Name :=
                     Node.As_Generic_Package_Instantiation.F_Generic_Pkg_Name;
-                  Gen_Decl : constant Basic_Decl :=
+                  Gen_Decl : Basic_Decl :=
                     Gen_Name.P_Relative_Name.As_Name.P_Referenced_Decl;
                begin
                   if Gen_Decl.Is_Null then
                      return Over;
                   end if;
+
+                  Gen_Decl := Gen_Decl.P_Get_Uninstantiated_Node.As_Basic_Decl;
 
                   --  No processing for instantiations of nested generics,
                   --  also if corresponding generic is not processed (or going
@@ -1080,12 +1082,14 @@ package body Test.Skeleton is
             declare
                Gen_Name : constant Libadalang.Analysis.Name :=
                  Node.As_Generic_Package_Instantiation.F_Generic_Pkg_Name;
-               Gen_Decl : constant Basic_Decl :=
+               Gen_Decl : Basic_Decl :=
                  Gen_Name.P_Relative_Name.As_Name.P_Referenced_Decl;
             begin
                if Gen_Decl.Is_Null then
                   return Over;
                end if;
+
+               Gen_Decl := Gen_Decl.P_Get_Uninstantiated_Node.As_Basic_Decl;
 
                --  No processing for instantiations of nested generics,
                --  also if corresponding generic is not processed (or going
@@ -1109,7 +1113,11 @@ package body Test.Skeleton is
                   & Trim (First_Column_Number (Node)'Img, Both)
                   & ":");
 
+               Increase_Indent
+                 (Me,
+                  "traversing instantiation " & Node.Image);
                Traverse (Gen_Decl, Get_Records'Access);
+               Decrease_Indent (Me);
 
                Inside_Inst := False;
                Free (Instance_Nesting);
@@ -1310,12 +1318,14 @@ package body Test.Skeleton is
             declare
                Gen_Name : constant Libadalang.Analysis.Name :=
                  Node.As_Generic_Package_Instantiation.F_Generic_Pkg_Name;
-               Gen_Decl : constant Basic_Decl :=
+               Gen_Decl : Basic_Decl :=
                  Gen_Name.P_Relative_Name.As_Name.P_Referenced_Decl;
             begin
                if Gen_Decl.Is_Null then
                   return Over;
                end if;
+
+               Gen_Decl := Gen_Decl.P_Get_Uninstantiated_Node.As_Basic_Decl;
 
                --  No processing for instantiations of nested generics,
                --  also if corresponding generic is not processed (or going
@@ -1339,7 +1349,10 @@ package body Test.Skeleton is
                   & Trim (First_Column_Number (Node)'Img, Both)
                   & ":");
 
+               Increase_Indent
+                 (Me, "traversing instantiation " & Node.Image);
                Traverse (Gen_Decl, Get_Subprograms'Access);
+               Decrease_Indent (Me);
 
                Inside_Inst := False;
                Free (Instance_Nesting);
