@@ -574,6 +574,7 @@ package body Pp.Formatting is
       Tokns_To_Buffer (Lines_Data.Out_Buf, New_Tokns, Cmd);
 
       Final_Check (Lines_Data_P, Src_Buf, Cmd);
+
    end Do_Comments_Only;
 
    Post_Tree_Phases_Done : exception;
@@ -2984,7 +2985,8 @@ package body Pp.Formatting is
             end Set_Cur_Indent;
 
             function Next_Is_Action (Tok : Tokn_Cursor) return Boolean is
-               (Kind (Next (Tok)) in Res_Procedure | Res_Function);
+              (not After_Last (Next (Tok)) and then
+               Kind (Next (Tok)) in Res_Procedure | Res_Function);
 
             use Source_Message_Vectors;
 
@@ -2994,6 +2996,7 @@ package body Pp.Formatting is
          --  Start of processing for Insert_Whole_Line_Comment
 
          begin
+
             --  Processing in preparation for Copy_Pp_Off_Regions. That depends on
             --  an alternating sequence: OFF, ON, OFF, ON, .... So we check that
             --  here, and abort processing if it's not true.
@@ -3052,6 +3055,21 @@ package body Pp.Formatting is
                     Is_Blank_Line (Prev_ss (Src_Tok))
                   then
                      null;
+
+                     --  Handling the case where a new comment is added after
+                     --  a sequence of ");" and separated by a blank line from
+                     --  an action. In this case the associated with the action
+                     --  is kept and the comment is aligned with this action.
+
+                  elsif Prev_Indentation_Affect_Comments and then
+                    Is_Blank_Line (Prev_ss (Src_Tok)) and then
+                    Next_Is_Action (New_Tok) and then
+                    Kind (New_Tok) = Enabled_LB_Token and then
+                    Kind (Prev (New_Tok)) = ';' and then
+                    Kind (Prev (Prev (New_Tok))) = ')'
+                  then
+                     null;
+
                   else
                      Indentation := Natural'Max (Indentation,
                                                  Before_Indentation);
@@ -3067,13 +3085,20 @@ package body Pp.Formatting is
             pragma Assert ((Indentation mod PP_Indentation (Cmd)) = 0);
 
             --  If we're inside something parenthesized, add an extra level
-            if Kind (New_Tok) = ')'
-              and then Kind (Next (Next (New_Tok))) = Res_Is
+            --  (Note : this is a particular alignment case handled to avoid
+            --   regressions in internal-testsuite tests MB20-050 and R504-012)
+
+            if Kind (New_Tok) = ')' and then
+              (Kind (Next (Next (New_Tok))) = Res_Is
+               or else (Kind (Next (New_Tok)) = Disabled_LB_Token and then
+                        Kind (Next (Next (New_Tok))) = Spaces and then
+                        Kind (Next (Next (Next (New_Tok)))) = Res_Return))
             then
                Indentation := Indentation + PP_Indentation (Cmd);
             end if;
 
             Set_Cur_Indent;
+
             if Is_Blank_Line (Prev_ss (Src_Tok))
               or else Kind (Last (New_Tokns'Access)) /= Enabled_LB_Token
             then
@@ -3195,6 +3220,7 @@ package body Pp.Formatting is
             end;
 
             Reset_Indentation;
+
          end Insert_Whole_Line_Comment;
 
          procedure Insert_Preprocessor_Directive is
@@ -3293,7 +3319,6 @@ package body Pp.Formatting is
       --  Start of processing for Insert_Comments_And_Blank_Lines
 
       begin
-
          pragma Debug
            (Format_Debug_Output
               (Lines_Data, "before Insert_Comments_And_Blank_Lines"));
@@ -3769,6 +3794,7 @@ package body Pp.Formatting is
                        Line_Break_Token_Index (New_Tok);
                      LB : Line_Break renames All_LB (Index);
                   begin
+
                      --  If a Disabled_LB_Token is found and the switch
                      --  --preserve-line-breaks is used then we do not want
                      --  to change it in Enabled_LB_Token even is if it is
