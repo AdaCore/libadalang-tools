@@ -26,6 +26,7 @@
 
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Indefinite_Ordered_Maps;
+with Ada.Containers.Hashed_Sets;
 with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Ordered_Sets;
 with Ada.Containers.Vectors;
@@ -106,6 +107,12 @@ package Laltools.Common is
      (Index_Type   => Natural,
       Element_Type => Param_Data,
       "="          => "=");
+
+   package Node_Sets is new Ada.Containers.Hashed_Sets
+     (Element_Type        => Ada_Node,
+      Hash                => Hash,
+      Equivalent_Elements => "=",
+      "="                 => "=");
 
    package References_Sets is new Ada.Containers.Ordered_Sets
      (Element_Type => Base_Id,
