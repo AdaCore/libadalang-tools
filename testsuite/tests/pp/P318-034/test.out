@@ -51,7 +51,7 @@ procedure test_main is
       c : Integer; -- test docu
       d : Integer -- very long test documentation with much characters, which build words that hopefully make sense together
       -- and caused a line break --- this is shifted to the front
-         )
+      )
       return Integer -- some sum
    is
    begin

@@ -3067,8 +3067,9 @@ package body Pp.Formatting is
             pragma Assert ((Indentation mod PP_Indentation (Cmd)) = 0);
 
             --  If we're inside something parenthesized, add an extra level
-
-            if Kind (New_Tok) = ')' then
+            if Kind (New_Tok) = ')'
+              and then Kind (Next (Next (New_Tok))) = Res_Is
+            then
                Indentation := Indentation + PP_Indentation (Cmd);
             end if;
 
