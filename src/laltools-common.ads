@@ -93,21 +93,6 @@ package Laltools.Common is
 
    subtype Declarative_Part_Vector is Declarative_Part_Vectors.Vector;
 
-   type Param_Data is record
-      Param_Mode : Mode;
-      Param_Type : Basic_Decl;
-   end record;
-
-   function "=" (Left, Right : Param_Data) return Boolean;
-   --  Returns True is the type of both parameters is the same, and then if
-   --  it's mode is also the same or equivalent. In and default modes are
-   --  equivalent.
-
-   package Param_Data_Vectors is new Ada.Containers.Vectors
-     (Index_Type   => Natural,
-      Element_Type => Param_Data,
-      "="          => "=");
-
    package Node_Sets is new Ada.Containers.Hashed_Sets
      (Element_Type        => Ada_Node,
       Hash                => Hash,
@@ -144,15 +129,6 @@ package Laltools.Common is
    subtype Source_Location_Range_Map is
      Source_Location_Range_Maps.Map;
 
-   function Are_Subprograms_Type_Conformant
-     (Subp_A      : Subp_Spec;
-      Subp_B      : Subp_Spec;
-      Check_Modes : Boolean := False)
-      return Boolean;
-   --  Checks if Subp_A and Subp_B are type conformant. Check_Modes is a flag
-   --  that defines in the mode of each parameter is also checked. In such
-   --  check, In and default mode are considered the same.
-
    function Compilation_Unit_Hash (Comp_Unit : Compilation_Unit)
                                    return Ada.Containers.Hash_Type;
    --  Casts Comp_Unit as Ada_Node and uses Hash from Libadalang.Analysis.
@@ -171,18 +147,6 @@ package Laltools.Common is
    function Count_Subp_Parameters (Subp_Params : Params) return Natural
      with Pre => not Subp_Params.Is_Null;
    --  Returns the amount of parameters 'Subp_Params' has.
-
-   function Create_Param_Data_Vector
-     (Parameters : Params)
-      return Param_Data_Vectors.Vector;
-   --  Creates a vector of Param_Data (mode and type) of each parameter of
-   --  Params.
-
-   function Create_Param_Type_Vector
-     (Parameters : Params)
-      return Basic_Decl_Vectors.Vector;
-   --  Creates a vector of the associated Basic_Decl of each parameter of
-   --  Params.
 
    procedure Find_All_References
      (Node     : Defining_Name'Class;
@@ -460,7 +424,10 @@ package Laltools.Common is
    --  If it doesn't exist returns No_Params.
 
    function Get_Subp_Spec (Subp : Basic_Decl'Class) return Subp_Spec
-     with Pre => Is_Subprogram (Subp);
+     with Pre => Is_Subprogram (Subp)
+                 or else (not Subp.Is_Null
+                          and then Subp.Kind in
+                            Ada_Generic_Subp_Instantiation);
    --  Gets the Subp_Spec node associated to a subprogram
 
    function Get_Task_Body_Declarative_Part (Task_B : Task_Body)
@@ -588,12 +555,4 @@ package Laltools.Common is
    function Resolve_Name_Precisely (Name_Node : Name) return Defining_Name;
    --  Return the definition node (canonical part) of the given name.
 
-   function Subprograms_Have_Same_Signature
-     (Subp_A      : Subp_Decl;
-      Subp_B      : Subp_Decl;
-      Check_Modes : Boolean := False)
-      return Boolean;
-   --  Checks if Subp_A and Subp_B have the same name and are type
-   --  conformant. Check_Modes is a flag that defines in the mode of
-   --  each parameter is also checked.
 end Laltools.Common;

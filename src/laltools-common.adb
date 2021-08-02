@@ -54,68 +54,6 @@ package body Laltools.Common is
       return Left.Start_Line < Right.Start_Line;
    end "<";
 
-   -------
-   -- = --
-   -------
-
-   function "=" (Left, Right : Param_Data)
-                 return Boolean
-   is
-      Same_Type       : constant Boolean :=
-        Left.Param_Type = Right.Param_Type;
-      Same_Mode       : constant Boolean :=
-        Left.Param_Mode.Kind = Right.Param_Mode.Kind;
-      Equivalent_Mode : constant Boolean :=
-        Left.Param_Mode.Kind in Ada_Mode_Default | Ada_Mode_In
-        and then Right.Param_Mode.Kind in Ada_Mode_Default | Ada_Mode_In;
-
-   begin
-      return Same_Type and then (Same_Mode or else Equivalent_Mode);
-   end "=";
-
-   -------------------------------------
-   -- Are_Subprograms_Type_Conformant --
-   -------------------------------------
-
-   function Are_Subprograms_Type_Conformant
-     (Subp_A      : Subp_Spec;
-      Subp_B      : Subp_Spec;
-      Check_Modes : Boolean := False)
-      return Boolean
-   is
-      use type Param_Data_Vectors.Vector;
-      use type Basic_Decl_Vectors.Vector;
-
-   begin
-      if Subp_A.F_Subp_Kind /= Subp_A.F_Subp_Kind
-      then
-         return False;
-      end if;
-
-      case Check_Modes is
-         when True =>
-            if Create_Param_Data_Vector (Subp_A.F_Subp_Params) /=
-              Create_Param_Data_Vector (Subp_B.F_Subp_Params)
-            then
-               return False;
-            end if;
-
-         when False =>
-            if Create_Param_Type_Vector (Subp_A.F_Subp_Params) /=
-              Create_Param_Type_Vector (Subp_B.F_Subp_Params)
-            then
-               return False;
-            end if;
-      end case;
-
-      --  If we are checking procedures then they are type conformant.
-      --  Otherwise, finally check if the return type is the same.
-
-      return Subp_A.F_Subp_Kind in Ada_Subp_Kind_Procedure_Range
-        or else (Subp_A.F_Subp_Kind in Ada_Subp_Kind_Function_Range
-                 and then Subp_A.P_Return_Type = Subp_B.P_Return_Type);
-   end Are_Subprograms_Type_Conformant;
-
    ---------------------------
    -- Compilation_Unit_Hash --
    ---------------------------
@@ -199,61 +137,6 @@ package body Laltools.Common is
          end loop;
       end return;
    end Count_Subp_Parameters;
-
-   ------------------------------
-   -- Create_Param_Data_Vector --
-   ------------------------------
-
-   function Create_Param_Data_Vector
-     (Parameters : Params)
-      return Param_Data_Vectors.Vector
-   is
-      Param_Vector : Param_Data_Vectors.Vector;
-      use type Ada_Node;
-   begin
-      if Parameters = No_Params or else
-        Parameters.F_Params = No_Param_Spec_List
-      then
-         return Param_Vector;
-      end if;
-      for Param of Parameters.F_Params loop
-         declare
-            Data : constant Param_Data :=
-              (Param_Mode => Param.F_Mode,
-               Param_Type => Param.F_Type_Expr.P_Type_Name.
-                 P_Referenced_Decl (False).P_Canonical_Part);
-         begin
-            for Dummy of Param.F_Ids loop
-               Param_Vector.Append (New_Item => Data);
-            end loop;
-         end;
-      end loop;
-      return Param_Vector;
-   end Create_Param_Data_Vector;
-
-   ------------------------------
-   -- Create_Param_Type_Vector --
-   ------------------------------
-
-   function Create_Param_Type_Vector
-     (Parameters : Params)
-      return Basic_Decl_Vectors.Vector
-   is
-      Param_Types : Basic_Decl_Vectors.Vector;
-   begin
-      if Parameters = No_Params or else
-        Parameters.F_Params = No_Param_Spec_List
-      then
-         return Param_Types;
-      end if;
-      for P of Parameters.F_Params loop
-         for Dummy of P.F_Ids loop
-            Param_Types.Append
-              (P.F_Type_Expr.P_Type_Name.P_Referenced_Decl.P_Canonical_Part);
-         end loop;
-      end loop;
-      return Param_Types;
-   end Create_Param_Type_Vector;
 
    -------------------------
    -- Find_All_References --
@@ -1715,27 +1598,13 @@ package body Laltools.Common is
    -- Get_Subp_Spec --
    -------------------
 
-   function Get_Subp_Spec (Subp : Basic_Decl'Class) return Subp_Spec is
+   function Get_Subp_Spec (Subp : Basic_Decl'Class) return Subp_Spec
+   is
+      Spec : constant Base_Subp_Spec :=
+        Subp.P_Subp_Spec_Or_Null (True);
+
    begin
-      case Subp.Kind is
-         when Ada_Base_Subp_Body =>
-            return Subp.As_Base_Subp_Body.F_Subp_Spec;
-
-         when Ada_Classic_Subp_Decl =>
-            return Subp.As_Classic_Subp_Decl.F_Subp_Spec;
-
-         when Ada_Generic_Subp_Internal_Range =>
-            return Subp.As_Generic_Subp_Internal.F_Subp_Spec;
-
-         when Ada_Subp_Body_Stub_Range =>
-            return Subp.As_Subp_Body_Stub.F_Subp_Spec;
-
-         when Ada_Generic_Subp_Decl_Range =>
-            return Subp.As_Generic_Subp_Decl.F_Subp_Decl.F_Subp_Spec;
-
-         when others =>
-            raise Assertion_Error;
-      end case;
+      return (if Spec.Is_Null then No_Subp_Spec else Spec.As_Subp_Spec);
    end Get_Subp_Spec;
 
    ------------------------------------
@@ -2372,21 +2241,5 @@ package body Laltools.Common is
          end return;
       end if;
    end Resolve_Name_Precisely;
-
-   -------------------------------------
-   -- Subprograms_Have_Same_Signature --
-   -------------------------------------
-
-   function Subprograms_Have_Same_Signature
-     (Subp_A      : Subp_Decl;
-      Subp_B      : Subp_Decl;
-      Check_Modes : Boolean := False)
-      return Boolean is
-   begin
-      return Subp_A.P_Defining_Name.F_Name.As_Identifier.Text =
-        Subp_B.P_Defining_Name.F_Name.As_Identifier.Text and then
-        Are_Subprograms_Type_Conformant
-          (Subp_A.F_Subp_Spec, Subp_B.F_Subp_Spec, Check_Modes);
-   end Subprograms_Have_Same_Signature;
 
 end Laltools.Common;

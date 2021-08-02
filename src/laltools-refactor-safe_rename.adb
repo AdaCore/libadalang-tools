@@ -25,15 +25,64 @@ with Ada.Assertions; use Ada.Assertions;
 
 with Ada.Characters.Latin_1; use Ada.Characters.Latin_1;
 
+with Ada.Containers.Vectors;
+
 with Ada.Strings.Unbounded.Text_IO; use Ada.Strings.Unbounded.Text_IO;
 
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Libadalang.Common; use Libadalang.Common;
 
-with Laltools.Subprogram_Hierarchy; use Laltools.Subprogram_Hierarchy;
-
 package body Laltools.Refactor.Safe_Rename is
+
+   function Equivalent_Parameter_Mode (L, R : Ada_Mode) return Boolean is
+      (L = R
+       or else (L = Ada_Mode_In and then R = Ada_Mode_Default)
+       or else (L = Ada_Mode_Default and then R = Ada_Mode_In));
+   --  Returns True if L and R are the same or if both are either Ada_Mode_In
+   --  or Ada_Mode_Default.
+
+   --  Data type used to compared subprogram signatures
+   --  The type definition of a parameter cannot be stored as an Ada_Node
+   --  since the equality comparision between the same node with and
+   --  without generic context will result False. Their have however, is
+   --  the same.
+
+   type Parameter_Data is
+      record
+         Has_Aliased          : Boolean;
+         Mode                 : Ada_Mode;
+         Type_Definition_Hash : Ada.Containers.Hash_Type;
+      end record;
+
+   function Equivalent_Parameter_Data
+     (L, R : Parameter_Data)
+      return Boolean;
+   --  Returns True if L and R are the same, using the
+   --  Equivalent_Parameter_Mode function to evaluate the equality of the Mode
+   --  component.
+
+   package Parameter_Data_Vectors is new Ada.Containers.Vectors
+     (Index_Type   => Natural,
+      Element_Type => Parameter_Data,
+      "="          => Equivalent_Parameter_Data);
+
+   subtype Parameter_Data_Vector is Parameter_Data_Vectors.Vector;
+
+   function Create_Parameter_Data_Vector
+     (Parameters : Params)
+      return Parameter_Data_Vector;
+   --  Creates a vector with the Parameter_Data of each parameter of
+   --  Parameters.
+
+   function Are_Subprograms_Type_Conformant
+     (Subp_A      : Subp_Spec;
+      Subp_B      : Subp_Spec;
+      Check_Modes : Boolean := False)
+      return Boolean;
+   --  Checks if Subp_A and Subp_B are type conformant. Check_Modes is a flag
+   --  that defines in the mode of each parameter is also checked. In such
+   --  check, In and Default mode are considered the same.
 
    function Check_Rename_Conflict
      (New_Name : Unbounded_Text_Type;
@@ -44,12 +93,18 @@ package body Laltools.Refactor.Safe_Rename is
    --  FIXME: Do a case insensitive comparison
 
    function Check_Subp_Rename_Conflict
-     (Subp_A   : Subp_Spec;
+     (Subp_A   : Basic_Decl'Class;
       New_Name : Unbounded_Text_Type;
-      Subp_B   : Subp_Spec)
-      return Boolean;
+      Subp_B   : Basic_Decl'Class)
+      return Boolean
+     with Pre => (Is_Subprogram (Subp_A) or else Subp_A.Kind
+                    in Ada_Generic_Subp_Instantiation_Range)
+                 and then (Is_Subprogram (Subp_B) or else
+                             Subp_B.Kind in
+                               Ada_Generic_Subp_Instantiation_Range);
    --  Checks if renaming Subp_A to New_Name causes a conflict with Subp_B.
    --  This includes checking if both subprograms are type conformant.
+   --  FIXME: Do a case insensitive comparison.
 
    procedure Initialize_Unit_Slocs_Maps
      (Unit_References      : out Unit_Slocs_Maps.Map;
@@ -72,27 +127,151 @@ package body Laltools.Refactor.Safe_Rename is
       end if;
    end "<";
 
+   -------------------------------------
+   -- Are_Subprograms_Type_Conformant --
+   -------------------------------------
+
+   function Are_Subprograms_Type_Conformant
+     (Subp_A      : Subp_Spec;
+      Subp_B      : Subp_Spec;
+      Check_Modes : Boolean := False)
+      return Boolean
+   is
+      package Hash_Vectors is new Ada.Containers.Vectors
+        (Index_Type   => Natural,
+         Element_Type => Ada.Containers.Hash_Type);
+
+      subtype Hash_Vector is Hash_Vectors.Vector;
+
+      function Create_Hash_Vector (Parameters : Params)
+                                   return Hash_Vector;
+      --  Creates a vector with the hash of the type declaration of each
+      --  parameter of Parameters.
+
+      ------------------------
+      -- Create_Hash_Vector --
+      ------------------------
+
+      function Create_Hash_Vector (Parameters : Params)
+                                   return Hash_Vector
+      is
+         Param_Type_Hash : Hash_Type;
+
+      begin
+         return Hashes : Hash_Vector do
+            if not Parameters.Is_Null then
+               for Param_Spec of Parameters.F_Params loop
+                  Param_Type_Hash :=
+                    Hash (Param_Spec.F_Type_Expr.P_Designated_Type_Decl.
+                            As_Ada_Node);
+
+                  for Unsued_Id of Param_Spec.F_Ids loop
+                     Hashes.Append (Param_Type_Hash);
+                  end loop;
+               end loop;
+            end if;
+         end return;
+      end Create_Hash_Vector;
+
+      use type Hash_Vectors.Vector;
+      use type Parameter_Data_Vectors.Vector;
+
+   begin
+      if Subp_A.F_Subp_Kind /= Subp_A.F_Subp_Kind
+      then
+         return False;
+      end if;
+
+      case Check_Modes is
+         when True =>
+            if Create_Parameter_Data_Vector (Subp_A.F_Subp_Params) /=
+              Create_Parameter_Data_Vector (Subp_B.F_Subp_Params)
+            then
+               return False;
+            end if;
+
+         when False =>
+            if Create_Hash_Vector (Subp_A.F_Subp_Params) /=
+              Create_Hash_Vector (Subp_B.F_Subp_Params)
+            then
+               return False;
+            end if;
+      end case;
+
+      --  If we are checking procedures then they are type conformant.
+      --  Otherwise, finally check if the return type is the same.
+
+      return Subp_A.F_Subp_Kind in Ada_Subp_Kind_Procedure_Range
+        or else (Subp_A.F_Subp_Kind in Ada_Subp_Kind_Function_Range
+                 and then Hash (Subp_A.P_Return_Type.As_Ada_Node) =
+                     Hash (Subp_B.P_Return_Type.As_Ada_Node));
+   end Are_Subprograms_Type_Conformant;
+
    --------------------------------
    -- Check_Subp_Rename_Conflict --
    --------------------------------
 
    function Check_Subp_Rename_Conflict
-     (Subp_A   : Subp_Spec;
+     (Subp_A   : Basic_Decl'Class;
       New_Name : Unbounded_Text_Type;
-      Subp_B   : Subp_Spec)
-      return Boolean is
+      Subp_B   : Basic_Decl'Class)
+      return Boolean
+   is
+      Subp_A_Spec : constant Subp_Spec := Get_Subp_Spec (Subp_A);
+      Subp_B_Spec : constant Subp_Spec := Get_Subp_Spec (Subp_B);
+      Subp_B_Name : constant Text_Type := Subp_B.P_Defining_Name.F_Name.Text;
+
    begin
       if Subp_A = Subp_B
-        or else Text (Subp_B.F_Subp_Name.F_Name) /= To_Text (New_Name)
+        or else Subp_B_Name /= To_Text (New_Name)
       then
          return False;
       end if;
 
       --  Subp_B name is the name as New_Name, therefore, we need to check if
       --  both subprograms are type conformant.
-
-      return Are_Subprograms_Type_Conformant (Subp_A, Subp_B, False);
+      return Are_Subprograms_Type_Conformant (Subp_A_Spec, Subp_B_Spec, False);
    end Check_Subp_Rename_Conflict;
+
+   ----------------------------------
+   -- Create_Parameter_Data_Vector --
+   ----------------------------------
+
+   function Create_Parameter_Data_Vector
+     (Parameters : Params)
+      return Parameter_Data_Vector is
+   begin
+      return Parameters_Data : Parameter_Data_Vector do
+         if not Parameters.Is_Null then
+            for Param_Spec of Parameters.F_Params loop
+               for Parameter of Param_Spec.F_Ids loop
+                  Parameters_Data.Append
+                    (Parameter_Data'
+                     (Has_Aliased          => Param_Spec.F_Has_Aliased,
+                      Mode                 => Param_Spec.F_Mode.Kind,
+                      Type_Definition_Hash => Hash
+                       (Param_Spec.F_Type_Expr.P_Designated_Type_Decl.
+                          As_Ada_Node)));
+               end loop;
+            end loop;
+         end if;
+      end return;
+   end Create_Parameter_Data_Vector;
+
+   -------------------------------
+   -- Equivalent_Parameter_Data --
+   -------------------------------
+
+   function Equivalent_Parameter_Data
+     (L, R : Parameter_Data)
+      return Boolean
+   is
+      use type Ada.Containers.Hash_Type;
+   begin
+      return L.Has_Aliased = R.Has_Aliased
+        and then Equivalent_Parameter_Mode (L.Mode, R.Mode)
+        and then L.Type_Definition_Hash = R.Type_Definition_Hash;
+   end Equivalent_Parameter_Data;
 
    ----------
    -- Diff --
@@ -482,13 +661,18 @@ package body Laltools.Refactor.Safe_Rename is
       Local_Scopes : Ada_Node_List_Vectors.Vector renames
         Find_Local_Scopes (Self.Canonical_Definition.P_Basic_Decl);
 
-      Def_Basic_Decl : constant Basic_Decl :=
+      Canonical_Decl : constant Basic_Decl :=
         Self.Canonical_Definition.P_Basic_Decl;
 
       --  If Self.Canonical_Definition is associated to a subprogram, then its
       --  spec is needed to check for collisions with other subprograms.
 
-      Original_Subp_Spec : Subp_Spec := No_Subp_Spec;
+      Is_Subp : constant Boolean :=
+        Is_Subprogram (Canonical_Decl)
+        or else Canonical_Decl.Kind in Ada_Generic_Subp_Instantiation_Range;
+
+      Canonical_Subp_Spec : constant Subp_Spec :=
+        (if Is_Subp then Get_Subp_Spec (Canonical_Decl) else No_Subp_Spec);
 
       function Check_Rename_Conflicts (Scope : Ada_Node_List)
                                        return Defining_Name;
@@ -538,30 +722,30 @@ package body Laltools.Refactor.Safe_Rename is
         (Scope : Ada_Node_List)
          return Defining_Name is
       begin
-         Assert (Original_Subp_Spec /= No_Subp_Spec);
+         Assert (Canonical_Subp_Spec /= No_Subp_Spec);
 
          for Decl of Scope loop
             if Decl.Kind in Ada_Basic_Decl then
                --  Filter the nodes that are not Basic_Decl
 
-               if Is_Subprogram (Decl.As_Basic_Decl) then
+               if Is_Subprogram (Decl.As_Basic_Decl) or else
+                 Decl.Kind in Ada_Generic_Subp_Instantiation
+               then
                   --  If Decl is a subprogram, then not only check the name but
                   --  also its signature.
 
                   if Check_Subp_Rename_Conflict
-                    (Original_Subp_Spec,
+                    (Canonical_Decl,
                      Self.New_Name,
-                     Get_Subp_Spec (Decl.As_Basic_Decl))
+                     Decl.As_Basic_Decl)
                   then
                      return Decl.As_Basic_Decl.P_Defining_Name;
                   end if;
 
                else
-                  --  Otherwise just check the name
-
                   for Definition of Decl.As_Basic_Decl.P_Defining_Names loop
                      if Check_Rename_Conflict (Self.New_Name, Definition) then
-                        return Definition;
+                        return Decl.As_Basic_Decl.P_Defining_Name;
                      end if;
                   end loop;
                end if;
@@ -581,7 +765,8 @@ package body Laltools.Refactor.Safe_Rename is
             return No_Defining_Name;
          end if;
 
-         if Is_Subprogram (Def_Basic_Decl) then
+         if Is_Subp then
+            Assert (not Canonical_Subp_Spec.Is_Null);
             return Check_Subp_Rename_Conflicts (Scope);
 
          else
@@ -590,8 +775,13 @@ package body Laltools.Refactor.Safe_Rename is
       end Process_Scope;
 
    begin
-      if Is_Subprogram (Def_Basic_Decl) then
-         Original_Subp_Spec := Get_Subp_Spec (Def_Basic_Decl);
+      --  If we're renaming a Generic_Subp_Instantiation whose
+      --  Generic_Subp_Decl does not exist, then Original_Subp_Spec will be
+      --  null. In that case, there isn't enough information to check for
+      --  conflicts.
+
+      if Is_Subp and then Canonical_Subp_Spec.Is_Null then
+         return No_Rename_Problem;
       end if;
 
       for Scope of Local_Scopes loop
@@ -877,10 +1067,10 @@ package body Laltools.Refactor.Safe_Rename is
          Subp_Spec_B  : Subp_Spec)
          return Boolean
       is
-         Subp_A_Params : Param_Data_Vectors.Vector;
-         Subp_B_Params : Param_Data_Vectors.Vector;
+         Subp_A_Params : Parameter_Data_Vector;
+         Subp_B_Params : Parameter_Data_Vector;
 
-         use type Param_Data_Vectors.Vector;
+         use type Parameter_Data_Vectors.Vector;
 
       begin
          if Subp_Spec_A.F_Subp_Kind /= Subp_Spec_B.F_Subp_Kind then
@@ -888,9 +1078,9 @@ package body Laltools.Refactor.Safe_Rename is
          end if;
 
          Subp_A_Params :=
-           Create_Param_Data_Vector (Subp_Spec_A.F_Subp_Params);
+           Create_Parameter_Data_Vector (Subp_Spec_A.F_Subp_Params);
          Subp_B_Params :=
-           Create_Param_Data_Vector (Subp_Spec_B.F_Subp_Params);
+           Create_Parameter_Data_Vector (Subp_Spec_B.F_Subp_Params);
 
          case Subp_Spec_A.F_Subp_Kind is
             when Ada_Subp_Kind_Procedure =>
@@ -936,8 +1126,8 @@ package body Laltools.Refactor.Safe_Rename is
 
                   else
                      if Subp_B_Params.Is_Empty or else
-                       Subp_B_Params.First_Element.Param_Type /=
-                         Base_Type.P_Canonical_Part
+                       Subp_B_Params.First_Element.Type_Definition_Hash /=
+                         Hash (Base_Type.P_Canonical_Part.As_Ada_Node)
                      then
                         return False;
                      else
@@ -1061,14 +1251,23 @@ package body Laltools.Refactor.Safe_Rename is
    is
       Canonical_Decl : constant Basic_Decl :=
         Self.Canonical_Definition.P_Basic_Decl;
-      Is_Subp        : constant Boolean := Is_Subprogram (Canonical_Decl);
+
+      --  If we are renaming a subprogram, it only hides another subprogram
+      --  that is type conformant.
+
+      Is_Subp : constant Boolean :=
+        Is_Subprogram (Canonical_Decl)
+        or else Canonical_Decl.Kind in Ada_Generic_Subp_Instantiation_Range;
+
+      Canonical_Subp_Spec : constant Subp_Spec :=
+        (if Is_Subp then Get_Subp_Spec (Canonical_Decl) else No_Subp_Spec);
 
       Possible_Problem : Hiding_Name;
       Found_Problem    : Boolean := False;
 
       Visible_Declarative_Parts   : constant Declarative_Part_Vector :=
         Get_CU_Visible_Declarative_Parts
-          (Node       => Self.Canonical_Definition.P_Basic_Decl,
+          (Node       => Canonical_Decl,
            Skip_First => True);
       Use_Units_Public_Parts : constant Declarative_Part_Vector :=
         Get_Use_Units_Public_Parts (Self.Canonical_Definition);
@@ -1083,67 +1282,21 @@ package body Laltools.Refactor.Safe_Rename is
         (Decl_Part : Declarative_Part'Class) is
       begin
          if Is_Subp then
+            Assert (not Canonical_Subp_Spec.Is_Null);
+
             for Decl of Decl_Part.F_Decls loop
                --  Conflicts can only exist with subprograms and not with other
                --  kind of declarations.
 
                if Decl.Kind in Ada_Basic_Decl
-                 and then Is_Subprogram (Decl.As_Basic_Decl)
+                 and then (Is_Subprogram (Decl.As_Basic_Decl)
+                           or else Decl.Kind in
+                             Ada_Generic_Subp_Instantiation_Range)
                then
-                  if Decl.Kind in Ada_Subp_Renaming_Decl_Range then
-                     declare
-                        Unwinded_Decl : constant Basic_Decl :=
-                          Final_Renamed_Subp
-                            (Decl.As_Subp_Renaming_Decl);
-
-                     begin
-                        if not Unwinded_Decl.Is_Null
-                          and then Check_Subp_Rename_Conflict
-                            (Subp_A   => Get_Subp_Spec (Canonical_Decl),
-                             New_Name => Self.New_Name,
-                             Subp_B   => Get_Subp_Spec (Unwinded_Decl))
-                        then
-                           Possible_Problem :=
-                             (Canonical_Definition =>
-                                Self.Canonical_Definition,
-                              New_Name             => Self.New_Name,
-                              Conflicting_Id       =>
-                                Decl.As_Basic_Decl.P_Canonical_Part.
-                                  P_Defining_Name.F_Name);
-                           Found_Problem := True;
-                           return;
-                        end if;
-                     end;
-                  else
-                     if Check_Subp_Rename_Conflict
-                       (Subp_A   => Get_Subp_Spec (Canonical_Decl),
-                        New_Name => Self.New_Name,
-                        Subp_B   => Get_Subp_Spec (Decl.As_Basic_Decl))
-                     then
-                        Possible_Problem :=
-                          (Canonical_Definition => Self.Canonical_Definition,
-                           New_Name             => Self.New_Name,
-                           Conflicting_Id       =>
-                             Decl.As_Basic_Decl.P_Canonical_Part.
-                               P_Defining_Name.F_Name);
-                        Found_Problem := True;
-                        return;
-                     end if;
-                  end if;
-               end if;
-            end loop;
-
-         else
-            for Decl of Decl_Part.F_Decls loop
-               --  Conflicts can exists with any kind of declaration except
-               --  subprograms.
-
-               if Decl.Kind in Ada_Basic_Decl
-                 and then not Is_Subprogram (Decl.As_Basic_Decl)
-               then
-                  if Check_Rename_Conflict
-                    (Self.New_Name,
-                     Decl.As_Basic_Decl.P_Canonical_Part.P_Defining_Name)
+                  if Check_Subp_Rename_Conflict
+                    (Subp_A   => Canonical_Decl,
+                     New_Name => Self.New_Name,
+                     Subp_B   => Decl.As_Basic_Decl)
                   then
                      Possible_Problem :=
                        (Canonical_Definition => Self.Canonical_Definition,
@@ -1154,6 +1307,29 @@ package body Laltools.Refactor.Safe_Rename is
                      Found_Problem := True;
                      return;
                   end if;
+               end if;
+            end loop;
+
+         else
+            for Decl of Decl_Part.F_Decls loop
+               --  Conflicts can exists with any kind of declaration except
+               --  subprograms
+
+               if Decl.Kind in Ada_Basic_Decl
+                 and then not (Is_Subprogram (Decl.As_Basic_Decl)
+                               or else Decl.Kind in
+                                 Ada_Generic_Subp_Instantiation_Range)
+               then
+                  for Definition of Decl.As_Basic_Decl.P_Defining_Names loop
+                     if Check_Rename_Conflict (Self.New_Name, Definition) then
+                        Possible_Problem :=
+                          (Canonical_Definition => Self.Canonical_Definition,
+                           New_Name             => Self.New_Name,
+                           Conflicting_Id       => Definition.F_Name);
+                        Found_Problem := True;
+                        return;
+                     end if;
+                  end loop;
                end if;
             end loop;
          end if;
@@ -1191,6 +1367,16 @@ package body Laltools.Refactor.Safe_Rename is
       Canonical_Decl : constant Basic_Decl :=
         Self.Canonical_Definition.P_Basic_Decl;
 
+      --  If we are renaming a subprogram, it only becomes hidden by another
+      --  subprogram that is type conformant.
+
+      Is_Subp : constant Boolean :=
+        Is_Subprogram (Canonical_Decl)
+        or else Canonical_Decl.Kind in Ada_Generic_Subp_Instantiation_Range;
+
+      Canonical_Subp_Spec : constant Subp_Spec :=
+        (if Is_Subp then Get_Subp_Spec (Canonical_Decl) else No_Subp_Spec);
+
       Nested_Declarative_Parts : constant Declarative_Part_Vector :=
         Find_Nested_Scopes (Canonical_Decl);
       Own_Declarative_Part     : constant Declarative_Part_Vector :=
@@ -1204,17 +1390,8 @@ package body Laltools.Refactor.Safe_Rename is
         := Find_Local_Scopes (Self.Canonical_Definition.P_Basic_Decl);
       Ref_Visible_Declarative_Parts : Declarative_Part_Vectors.Vector;
 
-      --  If we are renaming a subprogram, it only becomes hidden by another
-      --  subprogram that is type conformant.
-
-      Is_Subp : constant Boolean := Is_Subprogram (Canonical_Decl);
-      Spec    : constant Subp_Spec :=
-        (if Is_Subp then
-            Get_Subp_Spec (Canonical_Decl)
-         else
-            No_Subp_Spec);
-
-      function Check_Conflict (Definition : Defining_Name) return Boolean;
+      function Check_Conflict (Definition : Defining_Name'Class)
+                               return Boolean;
       --  Delegates to Check_Subp_Rename_Conflict after doing necessary
       --  convertions between node types.
 
@@ -1222,31 +1399,46 @@ package body Laltools.Refactor.Safe_Rename is
       -- Check_Conflict --
       --------------------
 
-      function Check_Conflict (Definition : Defining_Name) return Boolean is
+      function Check_Conflict (Definition : Defining_Name'Class) return Boolean
+      is
+         Definition_Decl    : constant Basic_Decl :=
+           Definition.P_Basic_Decl;
+         Are_Both_Subps     : constant Boolean :=
+           Is_Subp
+           and then (Is_Subprogram (Definition_Decl)
+                     or else Definition_Decl.Kind in
+                       Ada_Generic_Subp_Instantiation_Range);
+         Are_Both_Not_Subps : constant Boolean :=
+           not Is_Subp
+           and then not (Is_Subprogram (Definition_Decl)
+                         or else Definition_Decl.Kind in
+                           Ada_Generic_Subp_Instantiation_Range);
       begin
-         if Is_Subp then
-            if Definition.P_Basic_Decl.Kind = Ada_Subp_Body then
-               return Check_Subp_Rename_Conflict
-                 (Subp_A   => Spec,
-                  New_Name => Self.New_Name,
-                  Subp_B   =>
-                    Definition.P_Basic_Decl.As_Subp_Body.F_Subp_Spec);
+         if Are_Both_Subps then
+            return Check_Subp_Rename_Conflict
+              (Subp_A   => Canonical_Decl,
+               New_Name => Self.New_Name,
+               Subp_B   => Definition_Decl);
 
-            elsif Definition.P_Basic_Decl.Kind = Ada_Subp_Decl then
-               return Check_Subp_Rename_Conflict
-                 (Subp_A   => Spec,
-                  New_Name => Self.New_Name,
-                  Subp_B   =>
-                    Definition.P_Basic_Decl.As_Subp_Decl.F_Subp_Spec);
-            end if;
+         elsif Are_Both_Not_Subps then
+            return Check_Rename_Conflict
+              (New_Name => Self.New_Name,
+               Target   => Definition);
          end if;
 
-         return Check_Rename_Conflict
-           (New_Name => Self.New_Name,
-            Target   => Definition);
+         return False;
       end Check_Conflict;
 
    begin
+      --  If we're renaming a Generic_Subp_Instantiation whose
+      --  Generic_Subp_Decl does not exist, then Original_Subp_Spec will be
+      --  null. In that case, there isn't enough information to check for
+      --  conflicts.
+
+      if Is_Subp and then Canonical_Subp_Spec.Is_Null then
+         return No_Rename_Problem;
+      end if;
+
       --  First: Check if there is a declaration with the same name as
       --  Self.New_Name in the nested declarative parts that have visibility of
       --  Self.Canonical_Definition.

@@ -1,0 +1,5 @@
+description: |
+    This test checks if the safe rename tool correctly handles
+    renames of generic subprogram instantiations.
+
+driver: shell_script

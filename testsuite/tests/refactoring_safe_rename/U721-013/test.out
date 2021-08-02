@@ -1,0 +1,262 @@
+# Renaming node baz.ads:5:14: 
+References:
+Unit:baz.adb
+Line: 3
+Source Location Range:
+Start_Line: 3
+Start_Column: 14
+End_Line: 3
+End_Column: 18
+Unit:baz.ads
+Line: 5
+Source Location Range:
+Start_Line: 5
+Start_Column: 14
+End_Line: 5
+End_Column: 18
+Problems:
+Renaming Swap to Integer_Swap hides <Id "Integer_Swap" bar.ads:5:14-5:26>
+
+# Renaming node baz.ads:5:14: 
+References:
+Unit:baz.adb
+Line: 3
+Source Location Range:
+Start_Line: 3
+Start_Column: 14
+End_Line: 3
+End_Column: 18
+Unit:baz.ads
+Line: 5
+Source Location Range:
+Start_Line: 5
+Start_Column: 14
+End_Line: 5
+End_Column: 18
+Problems:
+Renaming Swap to I_Swap hides <Id "I_Swap" bar.ads:6:14-6:20>
+
+# Renaming node baz.ads:5:14: 
+References:
+Unit:baz.adb
+Line: 3
+Source Location Range:
+Start_Line: 3
+Start_Column: 14
+End_Line: 3
+End_Column: 18
+Unit:baz.ads
+Line: 5
+Source Location Range:
+Start_Line: 5
+Start_Column: 14
+End_Line: 5
+End_Column: 18
+
+# Renaming node main.adb:7:8: 
+References:
+Unit:__standard
+Line: 4
+Source Location Range:
+Start_Line: 4
+Start_Column: 8
+End_Line: 4
+End_Column: 15
+Unit:bar.ads
+Line: 5
+Source Location Range:
+Start_Line: 5
+Start_Column: 40
+End_Line: 5
+End_Column: 47
+Line: 6
+Source Location Range:
+Start_Line: 6
+Start_Column: 36
+End_Line: 6
+End_Column: 43
+Line: 11
+Source Location Range:
+Start_Line: 11
+Start_Column: 49
+End_Line: 11
+End_Column: 56
+Unit:baz.adb
+Line: 3
+Source Location Range:
+Start_Line: 3
+Start_Column: 27
+End_Line: 3
+End_Column: 34
+Unit:baz.ads
+Line: 5
+Source Location Range:
+Start_Line: 5
+Start_Column: 27
+End_Line: 5
+End_Column: 34
+Unit:main.adb
+Line: 6
+Source Location Range:
+Start_Line: 6
+Start_Column: 8
+End_Line: 6
+End_Column: 15
+Line: 7
+Source Location Range:
+Start_Line: 7
+Start_Column: 8
+End_Line: 7
+End_Column: 15
+Line: 8
+Source Location Range:
+Start_Line: 8
+Start_Column: 34
+End_Line: 8
+End_Column: 41
+Line: 10
+Source Location Range:
+Start_Line: 10
+Start_Column: 38
+End_Line: 10
+End_Column: 45
+Line: 11
+Source Location Range:
+Start_Line: 11
+Start_Column: 41
+End_Line: 11
+End_Column: 48
+Line: 12
+Source Location Range:
+Start_Line: 12
+Start_Column: 43
+End_Line: 12
+End_Column: 50
+
+# Renaming node main.adb:7:8: 
+References:
+Unit:__standard
+Line: 4
+Source Location Range:
+Start_Line: 4
+Start_Column: 8
+End_Line: 4
+End_Column: 15
+Unit:bar.ads
+Line: 5
+Source Location Range:
+Start_Line: 5
+Start_Column: 40
+End_Line: 5
+End_Column: 47
+Line: 6
+Source Location Range:
+Start_Line: 6
+Start_Column: 36
+End_Line: 6
+End_Column: 43
+Line: 11
+Source Location Range:
+Start_Line: 11
+Start_Column: 49
+End_Line: 11
+End_Column: 56
+Unit:baz.adb
+Line: 3
+Source Location Range:
+Start_Line: 3
+Start_Column: 27
+End_Line: 3
+End_Column: 34
+Unit:baz.ads
+Line: 5
+Source Location Range:
+Start_Line: 5
+Start_Column: 27
+End_Line: 5
+End_Column: 34
+Unit:main.adb
+Line: 6
+Source Location Range:
+Start_Line: 6
+Start_Column: 8
+End_Line: 6
+End_Column: 15
+Line: 7
+Source Location Range:
+Start_Line: 7
+Start_Column: 8
+End_Line: 7
+End_Column: 15
+Line: 8
+Source Location Range:
+Start_Line: 8
+Start_Column: 34
+End_Line: 8
+End_Column: 41
+Line: 10
+Source Location Range:
+Start_Line: 10
+Start_Column: 38
+End_Line: 10
+End_Column: 45
+Line: 11
+Source Location Range:
+Start_Line: 11
+Start_Column: 41
+End_Line: 11
+End_Column: 48
+Line: 12
+Source Location Range:
+Start_Line: 12
+Start_Column: 43
+End_Line: 12
+End_Column: 50
+
+# Renaming node bar.ads:5:14: 
+References:
+Unit:bar.ads
+Line: 5
+Source Location Range:
+Start_Line: 5
+Start_Column: 14
+End_Line: 5
+End_Column: 26
+Line: 6
+Source Location Range:
+Start_Line: 6
+Start_Column: 53
+End_Line: 6
+End_Column: 65
+Unit:main.adb
+Line: 15
+Source Location Range:
+Start_Line: 15
+Start_Column: 4
+End_Line: 15
+End_Column: 16
+Problems:
+Renaming Integer_Swap to Integer_Copy_To will hide it by <Id "Integer_Copy_To" bar.ads:11:17-11:32>
+
+# Renaming node main.adb:10:14: 
+References:
+Unit:main.adb
+Line: 10
+Source Location Range:
+Start_Line: 10
+Start_Column: 14
+End_Line: 10
+End_Column: 20
+Problems:
+Renaming Inst_1 to Inst_2 creates a name collision with <Id "Inst_2" main.adb:11:14-11:20>
+
+# Renaming node main.adb:10:14: 
+References:
+Unit:main.adb
+Line: 10
+Source Location Range:
+Start_Line: 10
+Start_Column: 14
+End_Line: 10
+End_Column: 20
+
