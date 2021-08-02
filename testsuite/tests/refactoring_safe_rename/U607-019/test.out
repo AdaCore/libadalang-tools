@@ -1,4 +1,6 @@
 # Renaming node baz.ads:3:18: 
+WARNING: File qux_1.ads not found
+WARNING: File qux_2.ads not found
 References:
 Unit:baz.adb
 Line: 3
