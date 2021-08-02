@@ -3169,10 +3169,20 @@ package body Pp.Formatting is
                   --  for the current line break indentation.
 
                   if Insert_Blank_Lines (Cmd) and then
-                    LB.Indentation = 0 and then
-                    LB.Indentation < Cur_Indentation
+                    LB.Indentation = 0
                   then
-                     LB.Indentation := Cur_Indentation;
+
+                     if LB.Indentation < Cur_Indentation then
+                        LB.Indentation := Cur_Indentation;
+
+                     elsif Cur_Indentation = 0 and then
+                       LB.Indentation < Indentation
+                     then
+                        --  Update the indentation level for current line break
+                        --  to the expected level after this comment.
+                        LB.Indentation := Indentation;
+                     end if;
+
                   end if;
 
                   Append_Tokn
@@ -3189,6 +3199,7 @@ package body Pp.Formatting is
                                and then Kind (Prev (Src_Tok)) in
                                  True_End_Of_Line)
                then
+
                   --  U329-016
                   --  Avoid adding an empty line after a whole line comment
                   --  betweeen two value assignments of enumerations, unless
@@ -3319,6 +3330,7 @@ package body Pp.Formatting is
       --  Start of processing for Insert_Comments_And_Blank_Lines
 
       begin
+
          pragma Debug
            (Format_Debug_Output
               (Lines_Data, "before Insert_Comments_And_Blank_Lines"));

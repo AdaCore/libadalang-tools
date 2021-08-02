@@ -1,0 +1,4 @@
+description:
+    gnatpp test
+
+driver: shell_script
