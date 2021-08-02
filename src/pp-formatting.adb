@@ -2988,6 +2988,23 @@ package body Pp.Formatting is
               (not After_Last (Next (Tok)) and then
                Kind (Next (Tok)) in Res_Procedure | Res_Function);
 
+            function Next_Is_Begin (Tok : Tokn_Cursor) return Boolean is
+              (not After_Last (Next (Tok)) and then
+               Kind (Next (Tok)) = Res_Begin);
+
+            function Next_Is_End (Tok : Tokn_Cursor) return Boolean is
+              (not After_Last (Next (Tok)) and then
+               Kind (Next (Tok)) = Res_End);
+
+            function Next_Is_Inside_Case (Tok : Tokn_Cursor) return Boolean
+            is
+              (not After_Last (Next (Tok)) and then
+               Kind (Next (Tok)) in Res_Case | Res_When);
+
+            function Next_Is_Inside_If (Tok : Tokn_Cursor) return Boolean is
+              (not After_Last (Next (Tok)) and then
+               Kind (Next (Tok)) in Res_Else | Res_Elsif);
+
             use Source_Message_Vectors;
 
             Other_Sloc : constant String := Sloc_Image (Sloc (Last_Pp_Off_On));
@@ -3058,17 +3075,28 @@ package body Pp.Formatting is
 
                      --  Handling the case where a new comment is added after
                      --  a sequence of ");" and separated by a blank line from
-                     --  an action. In this case the associated with the action
-                     --  is kept and the comment is aligned with this action.
+                     --  a code line. In this case the alignment will be based
+                     --  on the following line indentation.
 
                   elsif Prev_Indentation_Affect_Comments and then
                     Is_Blank_Line (Prev_ss (Src_Tok)) and then
-                    Next_Is_Action (New_Tok) and then
                     Kind (New_Tok) = Enabled_LB_Token and then
                     Kind (Prev (New_Tok)) = ';' and then
                     Kind (Prev (Prev (New_Tok))) = ')'
                   then
-                     null;
+                     --  Preserve the maximal indentation level when
+                     --  the current ');' is followed by an IF statement
+                     --  part or a CASE statement part or a BEGIN or END
+                     --  keyword align with the following line of code otherwise
+                     --  (i.e., keep the after indentation level)
+                     if Next_Is_Begin (New_Tok) or else
+                       Next_Is_End (New_Tok) or else
+                       Next_Is_Inside_If (New_Tok) or else
+                       Next_Is_Inside_Case (New_Tok)
+                     then
+                        Indentation := Natural'Max (Indentation,
+                                                    Before_Indentation);
+                     end if;
 
                   else
                      Indentation := Natural'Max (Indentation,
@@ -3228,6 +3256,7 @@ package body Pp.Formatting is
                     (Lines_Data_P,
                      Org => "Append_Temp_ in Insert_Whole_Line_Comment 3");
                end if;
+
             end;
 
             Reset_Indentation;
@@ -3330,7 +3359,6 @@ package body Pp.Formatting is
       --  Start of processing for Insert_Comments_And_Blank_Lines
 
       begin
-
          pragma Debug
            (Format_Debug_Output
               (Lines_Data, "before Insert_Comments_And_Blank_Lines"));
@@ -3394,6 +3422,7 @@ package body Pp.Formatting is
          --  Any other mismatch is considered to be a bug.
 
          loop
+
             pragma Assert (Kind (New_Tok) not in Comment_Kind);
             Manage_Paren_Stack;
 
@@ -3777,6 +3806,7 @@ package body Pp.Formatting is
          Clear (Lines_Data.All_LBI);
          Clear (Enabled_LBI);
          Clear (Syntax_LBI);
+
       end Insert_Comments_And_Blank_Lines;
 
       procedure Insert_Indentation (Lines_Data_P : Lines_Data_Ptr;
