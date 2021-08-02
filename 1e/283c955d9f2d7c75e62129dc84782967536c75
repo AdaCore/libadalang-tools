@@ -1,0 +1,7 @@
+Code-Review+2: Vasiliy Fofanov <fofanov@adacore.com>
+Code-Review-1: CI Builder <ci-builder@adacore.com>
+Submitted-by: Feodor Rybin <frybin@adacore.com>
+Submitted-at: Mon, 02 Aug 2021 15:26:38 +0200
+Reviewed-on: https://git.adacore.com/c/libadalang-tools/+/99064
+Project: libadalang-tools
+Branch: refs/heads/master
