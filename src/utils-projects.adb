@@ -23,6 +23,8 @@
 
 with Ada.Characters.Handling;
 with Ada.Command_Line;
+with Ada.Containers.Indefinite_Ordered_Sets;
+with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Directories;
 with Ada.Environment_Variables;
 with Ada.Strings;       use Ada.Strings;
@@ -33,6 +35,9 @@ with GNAT.Directory_Operations;
 
 with GNATCOLL.VFS;      use GNATCOLL.VFS;
 with GNATCOLL.Traces;
+
+with Libadalang.Analysis;            use Libadalang.Analysis;
+with Libadalang.Project_Provider;    use Libadalang.Project_Provider;
 
 with Utils.Command_Lines.Common;     use Utils.Command_Lines.Common;
 with Utils.Environment;
@@ -85,6 +90,7 @@ package body Utils.Projects is
       Global_Report_Dir         :    out String_Ref;
       Preprocessing_Allowed     :        Boolean;
       My_Project_Tree           : in out Project_Tree;
+      My_Project_Env            :        Project_Environment_Access;
       Tool_Package_Name         :        String;
       Compute_Project_Closure   :        Boolean;
       Callback                  :        Parse_Callback);
@@ -118,6 +124,7 @@ package body Utils.Projects is
       Global_Report_Dir         :    out String_Ref;
       Preprocessing_Allowed     :        Boolean;
       My_Project_Tree           : in out Project_Tree;
+      My_Project_Env            :        Project_Environment_Access;
       Tool_Package_Name         :        String;
       Compute_Project_Closure   :        Boolean;
       Callback                  :        Parse_Callback)
@@ -387,9 +394,11 @@ package body Utils.Projects is
          Proj   : constant Project_Type := Project (F_Info);
          Attr   : constant Attribute_Pkg_String :=
            Build ("", "externally_built");
+
+         use Ada.Characters.Handling;
       begin
          if Has_Attribute (Proj, Attr) then
-            if Attribute_Value (Proj, Attr) = "true" then
+            if To_Lower (Attribute_Value (Proj, Attr)) = "true" then
                return True;
             end if;
          end if;
@@ -401,32 +410,111 @@ package body Utils.Projects is
       ----------------------------
 
       procedure Get_Files_From_Closure is
-         --  ????See Store_Files_From_Closure in asis_ul-projects.adb.
-         Closure_Files : GNATCOLL.VFS.File_Array_Access;
-         Main_Files    : GNATCOLL.VFS.File_Array_Access;
-         Status        : Status_Type;
+         Provider : constant Unit_Provider_Reference :=
+           Create_Project_Unit_Provider
+             (Tree             => My_Project_Tree'Unchecked_Access,
+              Env              => My_Project_Env,
+              Is_Project_Owner => False);
+
+         Ctx  : constant Analysis_Context :=
+           Create_Context (Unit_Provider => Provider);
+
+         Main_Full : constant String :=
+           My_Project_Tree.Create
+             (+Main_Unit_Name (Cmd).all).Display_Full_Name;
+
+         package String_Sets is new
+           Ada.Containers.Indefinite_Ordered_Sets (String);
+         use String_Sets;
+
+         Closure : Set;
+         --  Cumulative closure of given main(s)
+
+         package Spec_To_Separates_Maps is new
+           Ada.Containers.Indefinite_Ordered_Maps (String, Set);
+         use Spec_To_Separates_Maps;
+
+         Separates : Map;
+         --  Stores all separates from the project hierarchy. At the moment
+         --  P_Unit_Dependencies does not return units containing separates
+         --  so we need to add them manually: once we have a spec that
+         --  corresponds to any separates added to the closure, we need
+         --  to add corresponding separates as well.
+
+         procedure Update_Closure (New_Source : String);
+         --  Calculate unit dependencies with LAL, for resulting specs
+         --  recursively process bodies if they exist.
+
+         function Is_Source_Of_Interest (Full_Name : String) return Boolean;
+         --  Checks whether given file is a source of user project. Filters out
+         --  runtime units, sources from externally built projects and unknown
+         --  files that are not sources of any project.
+
+         ---------------------------
+         -- Is_Source_Of_Interest --
+         ---------------------------
+
+         function Is_Source_Of_Interest (Full_Name : String) return Boolean
+         is
+            Inf : constant File_Info :=
+              My_Project_Tree.Info (Create (+Full_Name));
+         begin
+            return Inf.Project /= No_Project
+              and then not Is_Externally_Built (Create (+Full_Name));
+         end Is_Source_Of_Interest;
+
+         --------------------
+         -- Update_Closure --
+         --------------------
+
+         procedure Update_Closure (New_Source : String) is
+            Unit : Analysis_Unit;
+            CU   : Compilation_Unit;
+         begin
+            if Closure.Contains (New_Source)
+              or else not Is_Source_Of_Interest (New_Source)
+            then
+               return;
+            end if;
+
+            Closure.Insert (New_Source);
+
+            Unit := Ctx.Get_From_File (New_Source);
+            CU   := Unit.Root.As_Compilation_Unit;
+
+            for Dep of CU.P_Unit_Dependencies loop
+
+               declare
+                  Src    : constant String       := Dep.Unit.Get_Filename;
+                  Src_VF : constant Virtual_File := Create (+Src);
+                  Inf    : constant File_Info    :=
+                    My_Project_Tree.Info (Src_VF);
+               begin
+
+                  if not Closure.Contains (Src)
+                    and then Is_Source_Of_Interest (Src)
+                  then
+                     Closure.Insert (Src);
+                     if Inf.Unit_Part = Unit_Spec then
+                        Update_Closure
+                          (My_Project_Tree.Other_File (Src_VF).
+                               Display_Full_Name);
+
+                        if Separates.Contains (Src) then
+                           for Sep of Separates.Element (Src) loop
+                              Update_Closure (Sep);
+                           end loop;
+                        end if;
+                     end if;
+                  end if;
+
+               end;
+
+            end loop;
+
+         end Update_Closure;
+
       begin
-         Append (Main_Files, Create (+Main_Unit_Name (Cmd).all));
-         Get_Closures
-           (My_Project_Tree.Root_Project,
-            Main_Files,
-            All_Projects => True,
-            Include_Externally_Built => False,
-            Status => Status,
-            Result => Closure_Files);
-
-         case Status is
-            when Error =>
-               Cmd_Error_No_Tool_Name
-                 ("could not get closure of " & Main_Unit_Name (Cmd).all);
-            when Incomplete_Closure =>
-               Cmd_Error_No_Tool_Name
-                 ("could not get complete closure of " &
-                    Main_Unit_Name (Cmd).all);
-            when Success =>
-               null;
-         end case;
-
          --  We first need to erase the Main_Unit_Name from the command
          --  line, because we're about to append the actual files.
          --  Otherwise, if the Main_Unit_Name is "foo.adb", it would be
@@ -434,20 +522,68 @@ package body Utils.Projects is
          --  "foo" (possibly an executable file) as an Ada source file:
          Clear_File_Names (Cmd);
 
+         --  Populating Separates. This is a temporary solution until
+         --  P_Unit_Dependencies starts returning separates.
+         declare
+            Sources : File_Array_Access :=
+              My_Project_Tree.Root_Project.Source_Files (Recursive => True);
+            Tmp_Set : Set;
+            Spec_VF : Virtual_File;
+         begin
+            for Src of Sources.all loop
+
+               if My_Project_Tree.Info (Src).Unit_Part = Unit_Separate
+               then
+                  Spec_VF := My_Project_Tree.Other_File (Src);
+
+                  if Separates.Contains (Spec_VF.Display_Full_Name) then
+                     Tmp_Set := Separates.Element (Spec_VF.Display_Full_Name);
+                     Tmp_Set.Include (Src.Display_Full_Name);
+                     Separates.Replace (Spec_VF.Display_Full_Name, Tmp_Set);
+                  else
+                     Tmp_Set.Include (Src.Display_Full_Name);
+                     Separates.Include (Spec_VF.Display_Full_Name, Tmp_Set);
+                  end if;
+
+                  Tmp_Set.Clear;
+               end if;
+            end loop;
+
+            Unchecked_Free (Sources);
+         end;
+
+         Update_Closure (Main_Full);
+
+         --  If main is a spec we also need to include the corresponding body
+         --  in the closure if it exists.
+         if My_Project_Tree.Info (Create (+Main_Full)).Unit_Part = Unit_Spec
+         then
+            declare
+               Main_Other : constant String :=
+                 My_Project_Tree.Other_File
+                   (Create (+Main_Full)).Display_Full_Name;
+            begin
+               if Is_Source_Of_Interest (Main_Other) then
+                  Update_Closure (Main_Other);
+               end if;
+            end;
+         end if;
+
          if Debug_Flag_U then
             Formatted_Output.Put ("Closure:\n");
          end if;
-         for I in Closure_Files'Range loop
-            Append_File_Name (Cmd, Closure_Files (I).Display_Full_Name);
+         for Src of Closure loop
+            Append_File_Name (Cmd, Src);
             if Debug_Flag_U then
-               Formatted_Output.Put
-                 ("\1\n", Closure_Files (I).Display_Full_Name);
+               Formatted_Output.Put ("\1\n", Src);
             end if;
          end loop;
 
-         --  Clean-up
-         Unchecked_Free (Main_Files);
-         Unchecked_Free (Closure_Files);
+      exception
+         when others =>
+            Cmd_Error_No_Tool_Name
+              ("could not get closure of " & Main_Unit_Name (Cmd).all);
+            raise;
       end Get_Files_From_Closure;
 
       ------------------------------
@@ -1188,6 +1324,7 @@ package body Utils.Projects is
                Global_Report_Dir,
                Preprocessing_Allowed,
                My_Project_Tree,
+               Project_Env,
                Tool_Package_Name,
                Compute_Project_Closure,
                Callback);
