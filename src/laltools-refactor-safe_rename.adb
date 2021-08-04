@@ -282,77 +282,91 @@ package body Laltools.Refactor.Safe_Rename is
       Problems : Rename_Problem_Vectors.Vector;
 
    begin
-      --  These are commons checks that need to happens independently of the
-      --  kind of construct that we are renaming.
+      --  If we're renaming an enum literal, just check for collisions within
+      --  the Enum_Literal_Decl_List.
 
-      Problem_Finders.Append
-        (Name_Collision_Finder'
-           (Canonical_Definition => Self.Canonical_Definition,
-            New_Name             => Self.New_Name));
-      Problem_Finders.Append
-        (Collision_With_Compilation_Unit_Finder'
-           (Units_Length         => Self.Units'Length,
-            Canonical_Definition => Self.Canonical_Definition,
-            New_Name             => Self.New_Name,
-            Units                => Self.Units));
-      Problem_Finders.Append
-        (Name_Hiding_Finder'
-           (Canonical_Definition => Self.Canonical_Definition,
-            New_Name             => Self.New_Name));
-
-      --  If we're trying to rename a subprogram, then check if this subprogram
-      --  will collide with a compilation unit or if it will override another
-      --  one.
-
-      if Self.Canonical_Definition.P_Basic_Decl.Kind in
-        Ada_Subp_Body | Ada_Subp_Decl
-      then
+      if Self.Canonical_Definition.Parent.Kind in Ada_Enum_Literal_Decl then
          Problem_Finders.Append
-           (Compilation_Unit_Collision_Finder'
-              (Units_Length         => Self.Units'Length,
-               Canonical_Definition => Self.Canonical_Definition,
-               New_Name             => Self.New_Name,
-               Units                => Self.Units));
-         Problem_Finders.Append
-           (Subp_Overriding_Finder'
+           (Enum_Name_Collision_Finder'
               (Canonical_Definition => Self.Canonical_Definition,
                New_Name             => Self.New_Name));
 
-         --  If we're trying to rename a package, then check if this package
-         --  defines a compilation unit, and if so, look for conflicts with
-         --  other compilation units.
+      else
 
-      elsif Self.Canonical_Definition.P_Basic_Decl.Kind in
-        Ada_Package_Decl
-      then
+         --  These are commons checks that need to happens independently of the
+         --  kind of construct that we are renaming.
+
          Problem_Finders.Append
-           (Compilation_Unit_Collision_Finder'
+           (Name_Collision_Finder'
+              (Canonical_Definition => Self.Canonical_Definition,
+               New_Name             => Self.New_Name));
+         Problem_Finders.Append
+           (Collision_With_Compilation_Unit_Finder'
               (Units_Length         => Self.Units'Length,
                Canonical_Definition => Self.Canonical_Definition,
                New_Name             => Self.New_Name,
                Units                => Self.Units));
-
-         --  If we're trying to rename a subprogram parameter, then check if
-         --  its subtype indication has the same name.
-
-      elsif Self.Canonical_Definition.P_Basic_Decl.Kind in Ada_Param_Spec then
          Problem_Finders.Append
-           (Param_Spec_Collision_Finder'
+           (Name_Hiding_Finder'
               (Canonical_Definition => Self.Canonical_Definition,
-               New_Name             => Self.New_Name,
-               Reference            => No_Base_Id));
-      end if;
+               New_Name             => Self.New_Name));
 
-      Problem_Finders.Append
-        (Subtype_Indication_Collision_Finder'
-           (Canonical_Definition => Self.Canonical_Definition,
-            References           => Self.Original_References_Ids,
-            New_Name             => Self.New_Name));
-      Problem_Finders.Append
-        (Name_Hidden_Finder'
-           (Canonical_Definition => Self.Canonical_Definition,
-            References           => Self.Original_References_Ids,
-            New_Name             => Self.New_Name));
+         --  If we're trying to rename a subprogram, then check if this
+         --  subprogram will collide with a compilation unit or if it will
+         --  override another one.
+
+         if Self.Canonical_Definition.P_Basic_Decl.Kind in
+           Ada_Subp_Body | Ada_Subp_Decl
+         then
+            Problem_Finders.Append
+              (Compilation_Unit_Collision_Finder'
+                 (Units_Length         => Self.Units'Length,
+                  Canonical_Definition => Self.Canonical_Definition,
+                  New_Name             => Self.New_Name,
+                  Units                => Self.Units));
+            Problem_Finders.Append
+              (Subp_Overriding_Finder'
+                 (Canonical_Definition => Self.Canonical_Definition,
+                  New_Name             => Self.New_Name));
+
+            --  If we're trying to rename a package, then check if this package
+            --  defines a compilation unit, and if so, look for conflicts with
+            --  other compilation units.
+
+         elsif Self.Canonical_Definition.P_Basic_Decl.Kind in
+           Ada_Package_Decl
+         then
+            Problem_Finders.Append
+              (Compilation_Unit_Collision_Finder'
+                 (Units_Length         => Self.Units'Length,
+                  Canonical_Definition => Self.Canonical_Definition,
+                  New_Name             => Self.New_Name,
+                  Units                => Self.Units));
+
+            --  If we're trying to rename a subprogram parameter, then check if
+            --  its subtype indication has the same name.
+
+         elsif Self.Canonical_Definition.P_Basic_Decl.Kind in
+           Ada_Param_Spec
+         then
+            Problem_Finders.Append
+              (Param_Spec_Collision_Finder'
+                 (Canonical_Definition => Self.Canonical_Definition,
+                  New_Name             => Self.New_Name,
+                  Reference            => No_Base_Id));
+         end if;
+
+         Problem_Finders.Append
+           (Subtype_Indication_Collision_Finder'
+              (Canonical_Definition => Self.Canonical_Definition,
+               References           => Self.Original_References_Ids,
+               New_Name             => Self.New_Name));
+         Problem_Finders.Append
+           (Name_Hidden_Finder'
+              (Canonical_Definition => Self.Canonical_Definition,
+               References           => Self.Original_References_Ids,
+               New_Name             => Self.New_Name));
+      end if;
 
       for Finder of Problem_Finders loop
          declare
@@ -593,6 +607,34 @@ package body Laltools.Refactor.Safe_Rename is
                   Conflicting_Id       => Conflicting_Definition.F_Name);
             end if;
          end;
+      end loop;
+
+      return No_Rename_Problem;
+   end Find;
+
+   ----------
+   -- Find --
+   ----------
+
+   overriding
+   function Find
+     (Self : Enum_Name_Collision_Finder)
+      return Rename_Problem'Class is
+   begin
+      for Enum_Literal of
+        Self.Canonical_Definition.Parent.Parent.As_Enum_Literal_Decl_List
+      loop
+         if Enum_Literal.P_Defining_Name /= Self.Canonical_Definition then
+            if Check_Rename_Conflict
+              (New_Name => Self.New_Name,
+               Target   => Enum_Literal.P_Defining_Name)
+            then
+               return Name_Collision'
+                 (Canonical_Definition => Self.Canonical_Definition,
+                  New_Name             => Self.New_Name,
+                  Conflicting_Id       => Enum_Literal.P_Defining_Name.F_Name);
+            end if;
+         end if;
       end loop;
 
       return No_Rename_Problem;

@@ -1,0 +1,22 @@
+# Renaming node main.adb:2:17: 
+References:
+Unit:main.adb
+Line: 2
+Source Location Range:
+Start_Line: 2
+Start_Column: 17
+End_Line: 2
+End_Column: 18
+Problems:
+Renaming A to B creates a name collision with <Id "B" main.adb:2:20-2:21>
+
+# Renaming node main.adb:2:17: 
+References:
+Unit:main.adb
+Line: 2
+Source Location Range:
+Start_Line: 2
+Start_Column: 17
+End_Line: 2
+End_Column: 18
+

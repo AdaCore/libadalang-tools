@@ -304,6 +304,17 @@ private
    function Find (Self : Name_Collision_Finder) return Rename_Problem'Class;
    --  Find name collisions created by a rename operation in the same scope.
 
+   type Enum_Name_Collision_Finder is new Specific_Problem_Finder with
+      record
+         Canonical_Definition : Defining_Name;
+         New_Name             : Unbounded_Text_Type;
+      end record;
+
+   overriding
+   function Find (Self : Enum_Name_Collision_Finder)
+                  return Rename_Problem'Class;
+   --  Find name collisions created by a rename operation of an enum literal
+
    type Collision_With_Compilation_Unit_Finder (Units_Length : Integer) is new
      Specific_Problem_Finder with
       record
