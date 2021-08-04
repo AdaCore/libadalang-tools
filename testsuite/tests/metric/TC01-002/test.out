@@ -51,6 +51,7 @@ CompilationUnit[1:1-8:9]
 |  |  |  |  |  |  |  |  |  |  |  Id[3:24-3:31]: Integer
 |  |  |  |  |  |  |  |  |  |  |f_constraint: <null>
 |  |  |  |  |  |  |  |  |  |f_default_expr: <null>
+|  |  |  |  |  |  |  |  |  |f_aspects: <null>
 |  |  |  |  |  |  |  |  |  ParamSpec[3:33-3:43]
 |  |  |  |  |  |  |  |  |  |f_ids:
 |  |  |  |  |  |  |  |  |  |  DefiningNameList[3:33-3:35]
@@ -69,6 +70,7 @@ CompilationUnit[1:1-8:9]
 |  |  |  |  |  |  |  |  |  |  |  Id[3:38-3:43]: Float
 |  |  |  |  |  |  |  |  |  |  |f_constraint: <null>
 |  |  |  |  |  |  |  |  |  |f_default_expr: <null>
+|  |  |  |  |  |  |  |  |  |f_aspects: <null>
 |  |  |  |  |  |  |f_subp_returns: <null>
 |  |  |  |  |  |f_aspects: <null>
 |  |  |  |  |  |f_decls:
@@ -210,6 +212,7 @@ CompilationUnit[1:1-8:9]
 |  |  |  |  |  |  |  |  |  |  |  Id[3:24-3:31]: Integer
 |  |  |  |  |  |  |  |  |  |  |f_constraint: <null>
 |  |  |  |  |  |  |  |  |  |f_default_expr: <null>
+|  |  |  |  |  |  |  |  |  |f_aspects: <null>
 |  |  |  |  |  |  |  |  |  ParamSpec[3:33-3:43]
 |  |  |  |  |  |  |  |  |  |f_ids:
 |  |  |  |  |  |  |  |  |  |  DefiningNameList[3:33-3:35]
@@ -228,6 +231,7 @@ CompilationUnit[1:1-8:9]
 |  |  |  |  |  |  |  |  |  |  |  Id[3:38-3:43]: Float
 |  |  |  |  |  |  |  |  |  |  |f_constraint: <null>
 |  |  |  |  |  |  |  |  |  |f_default_expr: <null>
+|  |  |  |  |  |  |  |  |  |f_aspects: <null>
 |  |  |  |  |  |  |f_subp_returns: <null>
 |  |  |  |  |  |f_aspects: <null>
 |  |  |  |  |  |f_decls:
@@ -461,6 +465,7 @@ Units remaining: 4     CompilationUnit[1:1-5:9]
 |  |  |  |  |  |  |  |  |  |  |  Id[3:24-3:31]: Integer
 |  |  |  |  |  |  |  |  |  |  |f_constraint: <null>
 |  |  |  |  |  |  |  |  |  |f_default_expr: <null>
+|  |  |  |  |  |  |  |  |  |f_aspects: <null>
 |  |  |  |  |  |  |  |  |  ParamSpec[3:33-3:43]
 |  |  |  |  |  |  |  |  |  |f_ids:
 |  |  |  |  |  |  |  |  |  |  DefiningNameList[3:33-3:35]
@@ -479,6 +484,7 @@ Units remaining: 4     CompilationUnit[1:1-5:9]
 |  |  |  |  |  |  |  |  |  |  |  Id[3:38-3:43]: Float
 |  |  |  |  |  |  |  |  |  |  |f_constraint: <null>
 |  |  |  |  |  |  |  |  |  |f_default_expr: <null>
+|  |  |  |  |  |  |  |  |  |f_aspects: <null>
 |  |  |  |  |  |  |f_subp_returns: <null>
 |  |  |  |  |  |f_aspects: <null>
 |  |  |f_private_part: <null>
@@ -592,6 +598,7 @@ CompilationUnit[1:1-5:9]
 |  |  |  |  |  |  |  |  |  |  |  Id[3:24-3:31]: Integer
 |  |  |  |  |  |  |  |  |  |  |f_constraint: <null>
 |  |  |  |  |  |  |  |  |  |f_default_expr: <null>
+|  |  |  |  |  |  |  |  |  |f_aspects: <null>
 |  |  |  |  |  |  |  |  |  ParamSpec[3:33-3:43]
 |  |  |  |  |  |  |  |  |  |f_ids:
 |  |  |  |  |  |  |  |  |  |  DefiningNameList[3:33-3:35]
@@ -610,6 +617,7 @@ CompilationUnit[1:1-5:9]
 |  |  |  |  |  |  |  |  |  |  |  Id[3:38-3:43]: Float
 |  |  |  |  |  |  |  |  |  |  |f_constraint: <null>
 |  |  |  |  |  |  |  |  |  |f_default_expr: <null>
+|  |  |  |  |  |  |  |  |  |f_aspects: <null>
 |  |  |  |  |  |  |f_subp_returns: <null>
 |  |  |  |  |  |f_aspects: <null>
 |  |  |f_private_part: <null>
