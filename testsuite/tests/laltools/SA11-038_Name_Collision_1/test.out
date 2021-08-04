@@ -17,11 +17,6 @@ Unit:b-z.ads
 Line: 1
 Source Location Range:
 Start_Line: 1
-Start_Column: 9
-End_Line: 1
-End_Column: 12
-Source Location Range:
-Start_Line: 1
 Start_Column: 11
 End_Line: 1
 End_Column: 12
@@ -69,11 +64,6 @@ End_Line: 10
 End_Column: 8
 Unit:b-z.ads
 Line: 1
-Source Location Range:
-Start_Line: 1
-Start_Column: 9
-End_Line: 1
-End_Column: 12
 Source Location Range:
 Start_Line: 1
 Start_Column: 11
@@ -125,11 +115,6 @@ Unit:b-z.ads
 Line: 1
 Source Location Range:
 Start_Line: 1
-Start_Column: 9
-End_Line: 1
-End_Column: 12
-Source Location Range:
-Start_Line: 1
 Start_Column: 11
 End_Line: 1
 End_Column: 12
@@ -175,11 +160,6 @@ End_Line: 10
 End_Column: 8
 Unit:b-z.ads
 Line: 1
-Source Location Range:
-Start_Line: 1
-Start_Column: 9
-End_Line: 1
-End_Column: 12
 Source Location Range:
 Start_Line: 1
 Start_Column: 11
@@ -229,11 +209,6 @@ End_Line: 10
 End_Column: 8
 Unit:b-z.ads
 Line: 1
-Source Location Range:
-Start_Line: 1
-Start_Column: 9
-End_Line: 1
-End_Column: 12
 Source Location Range:
 Start_Line: 1
 Start_Column: 11

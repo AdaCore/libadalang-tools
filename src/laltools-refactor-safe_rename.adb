@@ -1871,8 +1871,14 @@ package body Laltools.Refactor.Safe_Rename is
    begin
       --  P_Find_All_References does not include Canonical_Definition own
       --  reference, so add it here.
+      --  If Canonical_Definition is a dotted name, this means that we're
+      --  trying to rename its suffix.
 
-      Add_Node (Canonical_Definition);
+      if Canonical_Definition.F_Name.Kind in Ada_Dotted_Name_Range then
+         Add_Node (Canonical_Definition.F_Name.As_Dotted_Name.F_Suffix);
+      else
+         Add_Node (Canonical_Definition);
+      end if;
 
       for Reference of References loop
          Add_Node (Reference);

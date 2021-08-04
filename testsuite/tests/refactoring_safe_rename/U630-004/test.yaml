@@ -1,0 +1,5 @@
+description: |
+    This test checks if the safe rename tools correctly handles renaming an
+    identifier of a dotted name.
+
+driver: shell_script
