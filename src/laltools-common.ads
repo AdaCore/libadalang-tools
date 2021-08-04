@@ -93,6 +93,11 @@ package Laltools.Common is
 
    subtype Declarative_Part_Vector is Declarative_Part_Vectors.Vector;
 
+   package Node_Vectors is new Ada.Containers.Vectors
+     (Index_Type   => Natural,
+      Element_Type => Ada_Node,
+      "="          => "=");
+
    package Node_Sets is new Ada.Containers.Hashed_Sets
      (Element_Type        => Ada_Node,
       Hash                => Hash,
