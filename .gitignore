@@ -2,6 +2,7 @@
 obj
 bin
 lib.*
+lib
 
 # Testsuite output
 out
@@ -13,3 +14,9 @@ testsuite/out
 # External ASIS testsuite
 asis-testsuite
 testsuite/tests/asis
+
+# Internal testsuite
+internal_testsuite
+
+# Clang artifacts
+.clang-format
