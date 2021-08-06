@@ -697,7 +697,7 @@ package body Test.Harness is
             "for Origin_Project use """
             & (+Relative_Path
                  (Create (+Source_Prj),
-                   Create (+Normalize_Pathname (Harness_Dir.all))))
+                   Create (+Harness_Dir.all)))
             & """;");
       Put_New_Line;
       Put_New_Line;

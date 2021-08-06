@@ -220,6 +220,7 @@ package body Test.Actions is
             Tmp := new String'
               (GNAT.OS_Lib.Normalize_Pathname
                  (File.all,
+                  Resolve_Links  => False,
                   Case_Sensitive => False));
             if not GNAT.OS_Lib.Is_Regular_File (Tmp.all) then
                Cmd_Error_No_Help ("cannot find " & Tmp.all);
@@ -239,6 +240,7 @@ package body Test.Actions is
             Test.Common.Environment_Dir := new String'
               (Normalize_Pathname
                  (Arg (Cmd, Copy_Environment).all,
+                  Resolve_Links  => False,
                   Case_Sensitive => False));
             if not Is_Directory (Test.Common.Environment_Dir.all) then
                Cmd_Error_No_Help
@@ -652,6 +654,7 @@ package body Test.Actions is
          Test.Common.Harness_Dir_Str := new String'
            (Normalize_Pathname
               (Tmp.all,
+               Resolve_Links  => False,
                Case_Sensitive => False)
             & Directory_Separator);
          Free (Tmp);
@@ -660,6 +663,7 @@ package body Test.Actions is
          Test.Common.Harness_Dir_Str := new String'
            (Normalize_Pathname
               (Root_Prj.Object_Dir.Display_Full_Name & Tmp.all,
+               Resolve_Links  => False,
                Case_Sensitive => False)
             & Directory_Separator);
          Free (Tmp);
@@ -668,7 +672,9 @@ package body Test.Actions is
       for Dir of Root_Prj.Source_Dirs (Recursive => True) loop
          if Test.Common.Harness_Dir_Str.all =
            Normalize_Pathname
-             (Dir.Display_Full_Name, Case_Sensitive => False)
+             (Dir.Display_Full_Name,
+              Resolve_Links  => False,
+              Case_Sensitive => False)
            & Directory_Separator
          then
             Cmd_Error_No_Help
@@ -740,12 +746,14 @@ package body Test.Actions is
          Test.Common.Additional_Tests_Prj := new String'
            (Normalize_Pathname
               (Arg (Cmd, Additional_Tests).all,
+               Resolve_Links  => False,
                Case_Sensitive => False));
       elsif Root_Prj.Has_Attribute (Build_Att_String ("additional_tests")) then
          Test.Common.Additional_Tests_Prj := new String'
            (Normalize_Pathname
               (Root_Prj.Attribute_Value
                    (Build_Att_String ("additional_tests")),
+               Resolve_Links  => False,
                Case_Sensitive => False));
       end if;
 
@@ -971,6 +979,7 @@ package body Test.Actions is
             F_Path : constant String :=
               Normalize_Pathname
                 (Name           => Value (Idx + 1 .. Value'Last),
+                 Resolve_Links  => False,
                  Case_Sensitive => False);
          begin
             if not Is_Regular_File (F_Path) then
@@ -1006,6 +1015,7 @@ package body Test.Actions is
          F_Path : constant String :=
            Normalize_Pathname
              (Name           => Value,
+              Resolve_Links  => False,
               Case_Sensitive => False);
       begin
          if not Is_Regular_File (F_Path) then
@@ -1124,6 +1134,7 @@ package body Test.Actions is
             Left_Str : constant String :=
               Normalize_Pathname
                 (Name           => Left.all (J).Display_Full_Name,
+                 Resolve_Links  => False,
                  Case_Sensitive => False);
          begin
             for K in Right'Range loop
@@ -1131,6 +1142,7 @@ package body Test.Actions is
                if Left_Str =
                  Normalize_Pathname
                    (Name           => Right (K).Display_Full_Name,
+                    Resolve_Links  => False,
                     Case_Sensitive => False)
                then
                   Test.Common.Report_Std
@@ -1346,8 +1358,10 @@ package body Test.Actions is
          Root_Length := Maximin_Root.all'Length;
 
          Separate_Root_Dir := new String'
-           (Normalize_Pathname (Name => Separate_Root_Dir.all,
-                                Case_Sensitive => False));
+           (Normalize_Pathname
+              (Name           => Separate_Root_Dir.all,
+               Resolve_Links  => False,
+               Case_Sensitive => False));
 
          Test.Skeleton.Source_Table.Reset_Location_Iterator;
 
