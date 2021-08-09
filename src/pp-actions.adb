@@ -873,8 +873,8 @@ package body Pp.Actions is
              L ("delta !? ~~~"),
            when Ada_Digits_Constraint =>
              L ("digits !? ~~~"),
-           when Ada_Discriminant_Assoc => null,
-           when Ada_Discriminant_Constraint | Ada_Index_Constraint =>
+           when Ada_Composite_Constraint_Assoc => null,
+           when Ada_Composite_Constraint =>
              L ("?[#(~,#1 ~)]~"),
            when Ada_Range_Constraint =>
              L ("!"),
@@ -3198,7 +3198,7 @@ package body Pp.Actions is
 
                   when Ada_Pragma_Argument_Assoc |
                     Ada_Aspect_Assoc |
-                    Ada_Discriminant_Assoc       |
+                    Ada_Composite_Constraint_Assoc |
                     Ada_Aggregate_Assoc |
                     Ada_Param_Assoc =>
                      null;
@@ -4088,9 +4088,9 @@ package body Pp.Actions is
             else
                declare
                   Single_Name : constant Boolean :=
-                    (if Tree.Kind = Ada_Discriminant_Assoc
+                    (if Tree.Kind = Ada_Composite_Constraint_Assoc
                        then Subtree_Count
-                         (Tree.As_Discriminant_Assoc.F_Ids) = 1
+                         (Tree.As_Composite_Constraint_Assoc.F_Ids) = 1
                      elsif Tree.Kind = Ada_Aggregate_Assoc
                        then Subtree_Count
                         (Tree.As_Aggregate_Assoc.F_Designators) = 1
@@ -4744,7 +4744,7 @@ package body Pp.Actions is
             --  Do_Subtype_Indication.
             if Arg (Cmd, RM_Style_Spacing)
               and then Present (Subtree (Tree, 3))
-              and then Subtree (Tree, 3).Kind = Ada_Index_Constraint
+              and then Subtree (Tree, 3).Kind = Ada_Composite_Constraint
             then
                Interpret_Alt_Template (Subtype_Ind_Index_Alt);
             else
@@ -4969,7 +4969,7 @@ package body Pp.Actions is
 
             when Ada_Param_Assoc |
               Ada_Aggregate_Assoc |
-              Ada_Discriminant_Assoc |
+              Ada_Composite_Constraint_Assoc |
               Ada_Pragma_Argument_Assoc =>
                Do_Assoc;
 
