@@ -170,10 +170,6 @@ private
                   return Refactoring_Diagnotic_Vector is abstract;
    --  Finds problems caused by renaming a definition.
 
-   function Get_Original_References (Self : in out Problem_Finder_Algorithm)
-                                     return Unit_Slocs_Maps.Map is abstract;
-   --  Gets all references of a definition before attempting to rename it.
-
    package Unit_Buffers is new Ada.Containers.Indefinite_Hashed_Maps
      (Key_Type        => Analysis_Unit,
       Element_Type    => Unbounded_String,
@@ -205,6 +201,7 @@ private
      (Self                 : out Reference_Mapper;
       Canonical_Definition : Defining_Name;
       New_Name             : Unbounded_Text_Type;
+      Original_References  : Unit_Slocs_Maps.Map;
       Units                : Analysis_Unit_Array)
      with Pre => Canonical_Definition /= No_Defining_Name
      and then Canonical_Definition.P_Canonical_Part = Canonical_Definition;
@@ -219,13 +216,6 @@ private
    --  IMPORTANT NOTE: This function reparses all analysis units given to the
    --  Initialize procedure. All active references of nodes created before
    --  running thiss function will then be unreferenced.
-
-   overriding
-   function Get_Original_References
-     (Self : in out Reference_Mapper)
-      return Unit_Slocs_Maps.Map is (Self.Original_References);
-   --  Returns a map, ordered by filename and line number, of references before
-   --  doing the rename.
 
    procedure Update_Canonical_Definition (Self : in out Reference_Mapper);
    --  Function Find of Self calls Parse_Temporary_Buffers which will
@@ -250,15 +240,15 @@ private
          Canonical_Definition    : Defining_Name;
          New_Name                : Unbounded_Text_Type;
          Units                   : Analysis_Unit_Array (1 .. Units_Length);
-         Original_References     : Unit_Slocs_Maps.Map;
          Original_References_Ids : Base_Id_Vectors.Vector;
       end record;
 
    procedure Initialize
-     (Self                 : out AST_Analyser;
-      Canonical_Definition : Defining_Name;
-      New_Name             : Unbounded_Text_Type;
-      Units                : Analysis_Unit_Array)
+     (Self                    : out AST_Analyser;
+      Canonical_Definition    : Defining_Name;
+      New_Name                : Unbounded_Text_Type;
+      Original_References_Ids : Base_Id_Vectors.Vector;
+      Units                   : Analysis_Unit_Array)
      with Pre => Canonical_Definition /= No_Defining_Name
      and then Canonical_Definition.P_Canonical_Part = Canonical_Definition;
    --  Initializes the Reference_Mapper algorithm by filling its elements
@@ -269,13 +259,6 @@ private
                   return Refactoring_Diagnotic_Vector;
    --  Finds problems caused by renaming a definition. The strategy of this
    --  algorithm is to analyse the AST and look for specific problems.
-
-   overriding
-   function Get_Original_References
-     (Self : in out AST_Analyser)
-      return Unit_Slocs_Maps.Map is (Self.Original_References);
-   --  Returns a map, ordered by filename and line number, of references before
-   --  doing the rename.
 
    type Specific_Problem_Finder is interface;
 
