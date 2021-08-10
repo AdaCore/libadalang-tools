@@ -455,10 +455,10 @@ package body Laltools.Refactor.Safe_Rename is
    overriding
    function Find
      (Self : in out AST_Analyser)
-      return Rename_Problem_Vectors.Vector
+      return Refactoring_Diagnotic_Vector
    is
       Problem_Finders : Specific_Rename_Problem_Finder_Vectors.Vector;
-      Problems : Rename_Problem_Vectors.Vector;
+      Problems : Refactoring_Diagnotic_Vector;
 
    begin
       --  If we're renaming an enum literal, just check for collisions within
@@ -567,9 +567,9 @@ package body Laltools.Refactor.Safe_Rename is
    overriding
    function Find
      (Self : in out Reference_Mapper)
-      return Rename_Problem_Vectors.Vector
+      return Refactoring_Diagnotic_Vector
    is
-      function Create_Problems return Rename_Problem_Vectors.Vector;
+      function Create_Problems return Refactoring_Diagnotic_Vector;
       --  For every Sloc found in Self.References_Diff create either a
       --  Missing_Reference or New_Reference object and add it to a vector.
 
@@ -577,11 +577,11 @@ package body Laltools.Refactor.Safe_Rename is
       -- Create_Problems --
       ---------------------
 
-      function Create_Problems return Rename_Problem_Vectors.Vector is
+      function Create_Problems return Refactoring_Diagnotic_Vector is
          use Unit_Slocs_Maps;
          C : Cursor;
       begin
-         return Result : Rename_Problem_Vectors.Vector do
+         return Result : Refactoring_Diagnotic_Vector do
             --  Self.References_Diff.Minus contains all the references that
             --  would be lost.
 
@@ -1621,6 +1621,9 @@ package body Laltools.Refactor.Safe_Rename is
    is
       Canonical_Definition : Defining_Name := No_Defining_Name;
 
+      Original_References_Ids : Base_Id_Vectors.Vector;
+      Original_References     : Unit_Slocs_Maps.Map;
+
       function Initialize_Algorithm return Problem_Finder_Algorithm'Class;
       --  Returns an initialized Problem_Finder_Algorithm depending on
       --  Algorithm_Kind.
@@ -1639,15 +1642,17 @@ package body Laltools.Refactor.Safe_Rename is
                Algorithm.Initialize
                  (Canonical_Definition => Canonical_Definition,
                   New_Name             => New_Name,
+                  Original_References  => Original_References,
                   Units                => Units);
             end return;
 
          when Analyse_AST =>
             return Algorithm : AST_Analyser (Units_Length => Units'Length) do
                Algorithm.Initialize
-                 (Canonical_Definition => Canonical_Definition,
-                  New_Name             => New_Name,
-                  Units                => Units);
+                 (Canonical_Definition     => Canonical_Definition,
+                  New_Name                 => New_Name,
+                  Original_References_Ids  => Original_References_Ids,
+                  Units                    => Units);
             end return;
          end case;
       end Initialize_Algorithm;
@@ -1660,13 +1665,21 @@ package body Laltools.Refactor.Safe_Rename is
       Canonical_Definition :=
         Resolve_Name_Precisely (Get_Node_As_Name (Node.As_Ada_Node));
 
+      Original_References_Ids :=
+        Find_All_References_For_Renaming (Canonical_Definition, Units);
+
+      Initialize_Unit_Slocs_Maps
+        (Unit_References      => Original_References,
+         Canonical_Definition => Canonical_Definition,
+         References           => Original_References_Ids);
+
       declare
          Algorithm : Problem_Finder_Algorithm'Class := Initialize_Algorithm;
-         Problems  : constant Rename_Problem_Vectors.Vector := Algorithm.Find;
+         Problems  : constant Refactoring_Diagnotic_Vector := Algorithm.Find;
 
       begin
          return Renamable_References'
-           (References => Algorithm.Get_Original_References,
+           (References => Original_References,
             Problems   => Problems);
       end;
    end Find_All_Renamable_References;
@@ -1676,20 +1689,16 @@ package body Laltools.Refactor.Safe_Rename is
    ----------------
 
    procedure Initialize
-     (Self                 : out AST_Analyser;
-      Canonical_Definition : Defining_Name;
-      New_Name             : Unbounded_Text_Type;
-      Units                : Analysis_Unit_Array) is
+     (Self                    : out AST_Analyser;
+      Canonical_Definition    : Defining_Name;
+      New_Name                : Unbounded_Text_Type;
+      Original_References_Ids : Base_Id_Vectors.Vector;
+      Units                   : Analysis_Unit_Array) is
    begin
       Self.Canonical_Definition    := Canonical_Definition;
       Self.New_Name                := New_Name;
       Self.Units                   := Units;
-      Self.Original_References_Ids :=
-        Find_All_References_For_Renaming (Canonical_Definition, Units);
-      Initialize_Unit_Slocs_Maps
-        (Unit_References      => Self.Original_References,
-         Canonical_Definition => Canonical_Definition,
-         References           => Self.Original_References_Ids);
+      Self.Original_References_Ids := Original_References_Ids;
    end Initialize;
 
    ----------------
@@ -1700,6 +1709,7 @@ package body Laltools.Refactor.Safe_Rename is
      (Self                 : out Reference_Mapper;
       Canonical_Definition : Defining_Name;
       New_Name             : Unbounded_Text_Type;
+      Original_References  : Unit_Slocs_Maps.Map;
       Units                : Analysis_Unit_Array)
    is
       procedure Initialize_Temporary_Buffers;
@@ -1801,11 +1811,7 @@ package body Laltools.Refactor.Safe_Rename is
       Self.Original_Name             :=
         To_Unbounded_Text (Canonical_Definition.F_Name.Text);
       Self.New_Name                  := New_Name;
-      Initialize_Unit_Slocs_Maps
-        (Unit_References      => Self.Original_References,
-         Canonical_Definition => Canonical_Definition,
-         References           =>
-           Find_All_References_For_Renaming (Canonical_Definition, Units));
+      Self.Original_References       := Original_References;
       Initialize_Temporary_Buffers;
    end Initialize;
 
