@@ -108,6 +108,7 @@ package body Utils.Tools is
                Err_Out.Put
                  ("\1\n", Langkit_Support.Diagnostics.To_Pretty_String (D));
             end loop;
+            Per_Invalid_File_Action (Tool, Cmd, File_Name);
 
          else
             pragma Assert (not Root (Unit).Is_Null);

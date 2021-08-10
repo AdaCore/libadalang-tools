@@ -58,6 +58,12 @@ package Utils.Tools is
    --  BOM_Seen is True if there was a BOM at the start of the file;
    --  the BOM is not included in Input.
 
+   procedure Per_Invalid_File_Action
+     (Tool : in out Tool_State;
+      Cmd : Command_Line;
+      File_Name : String) is null;
+   --  Called for invalid sources that don't make it to Per_File_Action
+
    procedure Process_File
      (Tool : in out Tool_State'Class;
       Cmd : in out Command_Line;

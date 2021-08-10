@@ -21,7 +21,10 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Command_Line;
 with Ada.Containers; use type Ada.Containers.Count_Type;
+with Ada.Environment_Variables;
+
 with Interfaces; use type Interfaces.Unsigned_16;
 
 with GNAT.OS_Lib; use GNAT.OS_Lib;
@@ -57,6 +60,13 @@ with Ada.Text_IO;
 with Ada.Strings.Fixed;
 
 package body Test.Actions is
+
+   Strict_Execution : Boolean := False;
+   --  Indicates whether exit status should depend on invalid sources detected
+
+   Source_Processing_Failed : Boolean := False;
+   --  Indicates whether at least one of sources was either rejected by
+   --  lal parser or an unpredicted error happened during its processing.
 
    SPT : GNATCOLL.Projects.Project_Tree renames
      Test.Common.Source_Project_Tree;
@@ -490,6 +500,11 @@ package body Test.Actions is
       Test.Common.Show_Test_Duration := Arg (Cmd, Test_Duration);
       Test.Common.Relocatable_Harness := Arg (Cmd, Relocatable_Harness);
 
+      Strict_Execution := Arg (Cmd, Strict)
+        or else (Ada.Environment_Variables.Exists ("GNATTEST_STRICT")
+                  and then Ada.Environment_Variables.Value
+                    ("GNATTEST_STRICT") = "TRUE");
+
       --  Command line support
 
       if not Arg (Cmd, Command_Line_Support) then
@@ -824,6 +839,10 @@ package body Test.Actions is
          Test.Common.Generate_Common_File;
          Test.Mapping.Generate_Mapping_File;
       end if;
+
+      if Strict_Execution and then Source_Processing_Failed then
+         Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
+      end if;
    end Final;
 
    ---------------------
@@ -852,6 +871,20 @@ package body Test.Actions is
          Test.Skeleton.Process_Source (Unit);
       end if;
    end Per_File_Action;
+
+   -----------------------------
+   -- Per_Invalid_File_Action --
+   -----------------------------
+
+   overriding procedure Per_Invalid_File_Action
+     (Tool      : in out Test_Tool;
+      Cmd       :        Command_Line;
+      File_Name :        String)
+   is
+      pragma Unreferenced (Tool, Cmd, File_Name);
+   begin
+      Source_Processing_Failed := True;
+   end Per_Invalid_File_Action;
 
    ---------------
    -- Tool_Help --

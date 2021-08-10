@@ -46,6 +46,10 @@ private
       Unit : Analysis_Unit);
    overriding procedure Final (Tool : in out Test_Tool; Cmd : Command_Line);
    overriding procedure Tool_Help (Tool : Test_Tool);
+   overriding procedure Per_Invalid_File_Action
+     (Tool      : in out Test_Tool;
+      Cmd       :        Command_Line;
+      File_Name :        String);
 
    type Test_Tool is new Tool_State with null record;
 
