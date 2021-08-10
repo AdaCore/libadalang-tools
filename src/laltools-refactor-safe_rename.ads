@@ -54,10 +54,6 @@ package Laltools.Refactor.Safe_Rename is
      (Self.Conflicting_Id.Sloc_Range);
    --  Return a location in the file where Self happens.
 
-   package Rename_Problem_Vectors is new Ada.Containers.Indefinite_Vectors
-     (Index_Type   => Natural,
-      Element_Type => Rename_Problem'Class);
-
    type Problem_Finder_Algorithm_Kind is
      (Map_References,
       Analyse_AST);
@@ -89,7 +85,7 @@ package Laltools.Refactor.Safe_Rename is
    type Renamable_References is
       record
          References : Unit_Slocs_Maps.Map;
-         Problems   : Rename_Problem_Vectors.Vector;
+         Problems   : Refactoring_Diagnotic_Vector;
       end record;
 
    function Find_All_Renamable_References
@@ -171,7 +167,7 @@ private
    type Problem_Finder_Algorithm is interface;
 
    function Find (Self : in out Problem_Finder_Algorithm)
-                  return Rename_Problem_Vectors.Vector is abstract;
+                  return Refactoring_Diagnotic_Vector is abstract;
    --  Finds problems caused by renaming a definition.
 
    function Get_Original_References (Self : in out Problem_Finder_Algorithm)
@@ -217,7 +213,7 @@ private
 
    overriding
    function Find (Self : in out Reference_Mapper)
-                  return Rename_Problem_Vectors.Vector;
+                  return Refactoring_Diagnotic_Vector;
    --  Finds problems caused by renaming a definition. The strategy of this
    --  algorithm is to compare references before and after the rename.
    --  IMPORTANT NOTE: This function reparses all analysis units given to the
@@ -270,7 +266,7 @@ private
 
    overriding
    function Find (Self : in out AST_Analyser)
-                  return Rename_Problem_Vectors.Vector;
+                  return Refactoring_Diagnotic_Vector;
    --  Finds problems caused by renaming a definition. The strategy of this
    --  algorithm is to analyse the AST and look for specific problems.
 
