@@ -37,22 +37,26 @@ with Laltools.Common; use Laltools.Common;
 
 package Laltools.Refactor is
 
-   type Refactor_Problem is interface;
+   type Refactoring_Diagnotic is interface;
 
-   function Filename (Self : Refactor_Problem) return String is abstract;
+   function Filename (Self : Refactoring_Diagnotic) return String is abstract;
    --  Returns the filename of the analysis unit where Self happens.
 
    function Location
-     (Self : Refactor_Problem)
+     (Self : Refactoring_Diagnotic)
       return Source_Location_Range is abstract;
    --  Return a location in the file where Self happens.
 
-   function Info (Self : Refactor_Problem) return String is abstract;
+   function Info (Self : Refactoring_Diagnotic) return String is abstract;
    --  Returns a human readable message with the description of Self.
 
-   package Refactor_Problem_Vectors is new Ada.Containers.Indefinite_Vectors
-     (Index_Type   => Natural,
-      Element_Type => Refactor_Problem'Class);
+   package Refactoring_Diagnotic_Vectors is new
+     Ada.Containers.Indefinite_Vectors
+       (Index_Type   => Natural,
+        Element_Type => Refactoring_Diagnotic'Class);
+
+   subtype Refactoring_Diagnotic_Vector is
+     Refactoring_Diagnotic_Vectors.Vector;
 
    type Text_Edit is
       record

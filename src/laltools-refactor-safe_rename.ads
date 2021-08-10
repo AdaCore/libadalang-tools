@@ -36,7 +36,7 @@ with Langkit_Support.Text; use Langkit_Support.Text;
 
 package Laltools.Refactor.Safe_Rename is
 
-   type Rename_Problem is abstract new Refactor_Problem with
+   type Rename_Problem is abstract new Refactoring_Diagnotic with
       record
          Canonical_Definition : Defining_Name;
          New_Name             : Unbounded_Text_Type;
