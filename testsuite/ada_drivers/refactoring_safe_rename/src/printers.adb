@@ -21,8 +21,10 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Directories; use Ada.Directories;
+with Ada.Text_IO; use Ada.Text_IO;
+
+with Langkit_Support.Slocs; use Langkit_Support.Slocs;
 
 package body Printers is
 
@@ -30,82 +32,42 @@ package body Printers is
    -- PP --
    --------
 
-   procedure PP (Sloc : Source_Location_Range) is
+   procedure PP (Edits : Refactoring_Edits) is
+
+      use Text_Edit_Ordered_Maps;
+
+      procedure PP (C : Cursor);
+
+      --------
+      -- PP --
+      --------
+
+      procedure PP (C : Cursor) is
+         Previous_Line : Line_Number := 0;
+
+      begin
+         Put_Line ("Unit:" & Simple_Name (Key (C)));
+         for Text_Edit of Element (C) loop
+            if Previous_Line /= Text_Edit.Location.Start_Line then
+               Put_Line ("Line:" & Text_Edit.Location.Start_Line'Image);
+            end if;
+            Previous_Line := Text_Edit.Location.Start_Line;
+            Put_Line ("Source Location Range:");
+            Put_Line ("Start_Line:" & Text_Edit.Location.Start_Line'Image);
+            Put_Line ("Start_Column:" & Text_Edit.Location.Start_Column'Image);
+            Put_Line ("End_Line:" & Text_Edit.Location.End_Line'Image);
+            Put_Line ("End_Column:" & Text_Edit.Location.End_Column'Image);
+         end loop;
+      end PP;
+
    begin
-      Put_Line ("Start_Line:" & Sloc.Start_Line'Image);
-      Put_Line ("Start_Column:" & Sloc.Start_Column'Image);
-      Put_Line ("End_Line:" & Sloc.End_Line'Image);
-      Put_Line ("End_Column:" & Sloc.End_Column'Image);
-   end PP;
-
-   --------
-   -- PP --
-   --------
-
-   procedure PP (Set : Slocs_Sets.Set)
-   is
-      use Slocs_Sets;
-      C : Cursor := Set.First;
-   begin
-      while Has_Element (C) loop
-         Put_Line ("Source Location Range:");
-         PP (Constant_Reference (Set, C));
-         Next (C);
-      end loop;
-   end PP;
-
-   --------
-   -- PP --
-   --------
-
-   procedure PP (Map : Slocs_Maps.Map)
-   is
-      use Slocs_Maps;
-      C : Cursor := Map.First;
-   begin
-      while Has_Element (C) loop
-         Put_Line ("Line:" & Key (C)'Image);
-         PP (Constant_Reference (Map, C));
-         Next (C);
-      end loop;
-   end PP;
-
-   --------
-   -- PP --
-   --------
-
-   procedure PP (Map : Unit_Slocs_Ordered_Maps.Map)
-   is
-      use Unit_Slocs_Ordered_Maps;
-      C : Cursor := Map.First;
-   begin
-      while Has_Element (C) loop
-         Put_Line ("Unit:" & Simple_Name (Key (C).Get_Filename));
-         PP (Constant_Reference (Map, C));
-         Next (C);
-      end loop;
-   end PP;
-
-   --------
-   -- PP --
-   --------
-
-   procedure PP (References : Renamable_References) is
-      Ordered_References : Unit_Slocs_Ordered_Maps.Map;
-
-      C : Unit_Slocs_Maps.Cursor := References.References.First;
-   begin
-      while Unit_Slocs_Maps.Has_Element (C) loop
-         Ordered_References.Insert
-           (Unit_Slocs_Maps.Key (C),
-            Unit_Slocs_Maps.Constant_Reference (References.References, C));
-         Unit_Slocs_Maps.Next (C);
-      end loop;
       Put_Line ("References:");
-      PP (Ordered_References);
-      if not References.Problems.Is_Empty then
+      Edits.Text_Edits.Iterate
+        (PP'Access);
+
+      if not Edits.Diagnostics.Is_Empty then
          Put_Line ("Problems:");
-         for Problem of References.Problems loop
+         for Problem of Edits.Diagnostics loop
             Put_Line (Problem.Info);
          end loop;
       end if;

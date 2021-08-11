@@ -144,6 +144,7 @@ package Laltools.Refactor is
          File_Creations : File_Creation_Ordered_Set;
          File_Deletions : File_Deletion_Ordered_Set;
          File_Renames   : File_Rename_Ordered_Set;
+         Diagnostics    : Refactoring_Diagnotic_Vector;
       end record;
 
    procedure Merge

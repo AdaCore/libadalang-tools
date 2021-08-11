@@ -24,33 +24,10 @@
 --  This package contains pretty print utilities of datastructures used by
 --  procedure Rename.
 
-with Ada.Containers.Ordered_Maps;
-
-with Laltools.Refactor.Safe_Rename; use Laltools.Refactor.Safe_Rename;
-
-with Langkit_Support.Slocs; use Langkit_Support.Slocs;
-
-with Libadalang.Analysis; use Libadalang.Analysis;
+with Laltools.Refactor; use Laltools.Refactor;
 
 package Printers is
 
-   function "<" (Left, Right : Analysis_Unit) return Boolean is
-     (Left.Get_Filename < Right.Get_Filename);
-
-   package Unit_Slocs_Ordered_Maps is new Ada.Containers.Ordered_Maps
-     (Key_Type        => Analysis_Unit,
-      Element_Type    => Slocs_Maps.Map,
-      "<"             => "<",
-      "="             => Slocs_Maps."=");
-
-   procedure PP (Sloc : Source_Location_Range);
-
-   procedure PP (Set : Slocs_Sets.Set);
-
-   procedure PP (Map : Slocs_Maps.Map);
-
-   procedure PP (Map : Unit_Slocs_Ordered_Maps.Map);
-
-   procedure PP (References : Renamable_References);
+   procedure PP (Edits : Refactoring_Edits);
 
 end Printers;

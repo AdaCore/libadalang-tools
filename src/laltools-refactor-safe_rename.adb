@@ -1608,82 +1608,6 @@ package body Laltools.Refactor.Safe_Rename is
       return No_Rename_Problem;
    end Find;
 
-   -----------------------------------
-   -- Find_All_Renamable_References --
-   -----------------------------------
-
-   function Find_All_Renamable_References
-     (Node           : Ada_Node'Class;
-      New_Name       : Unbounded_Text_Type;
-      Units          : Analysis_Unit_Array;
-      Algorithm_Kind : Problem_Finder_Algorithm_Kind)
-      return Renamable_References
-   is
-      Canonical_Definition : Defining_Name := No_Defining_Name;
-
-      Original_References_Ids : Base_Id_Vectors.Vector;
-      Original_References     : Unit_Slocs_Maps.Map;
-
-      function Initialize_Algorithm return Problem_Finder_Algorithm'Class;
-      --  Returns an initialized Problem_Finder_Algorithm depending on
-      --  Algorithm_Kind.
-
-      --------------------------
-      -- Initialize_Algorithm --
-      --------------------------
-
-      function Initialize_Algorithm return Problem_Finder_Algorithm'Class is
-      begin
-         case Algorithm_Kind is
-         when Map_References =>
-            return Algorithm : Reference_Mapper
-              (Units_Length => Units'Length)
-            do
-               Algorithm.Initialize
-                 (Canonical_Definition => Canonical_Definition,
-                  New_Name             => New_Name,
-                  Original_References  => Original_References,
-                  Units                => Units);
-            end return;
-
-         when Analyse_AST =>
-            return Algorithm : AST_Analyser (Units_Length => Units'Length) do
-               Algorithm.Initialize
-                 (Canonical_Definition     => Canonical_Definition,
-                  New_Name                 => New_Name,
-                  Original_References_Ids  => Original_References_Ids,
-                  Units                    => Units);
-            end return;
-         end case;
-      end Initialize_Algorithm;
-
-   begin
-      if not Is_Renamable (Node) then
-         return References : Renamable_References;
-      end if;
-
-      Canonical_Definition :=
-        Resolve_Name_Precisely (Get_Node_As_Name (Node.As_Ada_Node));
-
-      Original_References_Ids :=
-        Find_All_References_For_Renaming (Canonical_Definition, Units);
-
-      Initialize_Unit_Slocs_Maps
-        (Unit_References      => Original_References,
-         Canonical_Definition => Canonical_Definition,
-         References           => Original_References_Ids);
-
-      declare
-         Algorithm : Problem_Finder_Algorithm'Class := Initialize_Algorithm;
-         Problems  : constant Refactoring_Diagnotic_Vector := Algorithm.Find;
-
-      begin
-         return Renamable_References'
-           (References => Original_References,
-            Problems   => Problems);
-      end;
-   end Find_All_Renamable_References;
-
    ----------------
    -- Initialize --
    ----------------
@@ -2035,5 +1959,106 @@ package body Laltools.Refactor.Safe_Rename is
          raise Program_Error;
       end if;
    end Update_Canonical_Definition;
+
+   --------------
+   -- Refactor --
+   --------------
+
+   function Refactor
+     (Self           : Safe_Renamer;
+      Analysis_Units : access function return Analysis_Unit_Array)
+      return Refactoring_Edits
+   is
+      Edits : Refactoring_Edits;
+
+      Units : constant Analysis_Unit_Array := Analysis_Units.all;
+
+      Original_References_Ids : constant Base_Id_Vectors.Vector :=
+        Find_All_References_For_Renaming (Self.Canonical_Definition, Units);
+
+      function Initialize_Algorithm return Problem_Finder_Algorithm'Class;
+      --  Returns an initialized Problem_Finder_Algorithm depending on
+      --  Algorithm_Kind.
+
+      --------------------------
+      -- Initialize_Algorithm --
+      --------------------------
+
+      function Initialize_Algorithm return Problem_Finder_Algorithm'Class
+      is
+         Original_References : Unit_Slocs_Maps.Map;
+
+      begin
+         case Self.Algorithm is
+            when Map_References =>
+               return Algorithm : Reference_Mapper
+                 (Units_Length => Units'Length)
+               do
+                  Initialize_Unit_Slocs_Maps
+                    (Unit_References      => Original_References,
+                     Canonical_Definition => Self.Canonical_Definition,
+                     References           => Original_References_Ids);
+
+                  Algorithm.Initialize
+                    (Canonical_Definition => Self.Canonical_Definition,
+                     New_Name             => Self.New_Name,
+                     Original_References  => Original_References,
+                     Units                => Units);
+               end return;
+
+            when Analyse_AST =>
+               return Algorithm : AST_Analyser (Units'Length) do
+                  Algorithm.Initialize
+                    (Canonical_Definition     => Self.Canonical_Definition,
+                     New_Name                 => Self.New_Name,
+                     Original_References_Ids  => Original_References_Ids,
+                     Units                    => Units);
+               end return;
+         end case;
+      end Initialize_Algorithm;
+
+      Algorithm : Problem_Finder_Algorithm'Class := Initialize_Algorithm;
+
+   begin
+      Self.Add_To_Edits (Edits, Original_References_Ids);
+      Edits.Diagnostics := Algorithm.Find;
+
+      return Edits;
+   end Refactor;
+
+   -------------------------
+   -- Create_Safe_Renamer --
+   -------------------------
+
+   function Create_Safe_Renamer
+     (Definition : Defining_Name'Class;
+      New_Name   : Unbounded_Text_Type;
+      Algorithm  : Problem_Finder_Algorithm_Kind)
+      return Safe_Renamer is
+     ((Definition.P_Canonical_Part, New_Name, Algorithm));
+
+   ------------------
+   -- Add_To_Edits --
+   ------------------
+
+   procedure Add_To_Edits
+     (Self       : Safe_Renamer;
+      Edits      : in out Refactoring_Edits;
+      References : Base_Id_Vectors.Vector)
+   is
+      New_Name : constant Unbounded_String :=
+        Ada.Strings.Unbounded.To_Unbounded_String
+          (To_UTF8 (To_Text (Self.New_Name)));
+
+   begin
+      for Reference of References loop
+         Safe_Insert
+           (Edits     => Edits.Text_Edits,
+            File_Name => Reference.Unit.Get_Filename,
+            Edit      => Text_Edit'
+              (Location => Reference.Sloc_Range,
+               Text     => New_Name));
+      end loop;
+   end Add_To_Edits;
 
 end Laltools.Refactor.Safe_Rename;
