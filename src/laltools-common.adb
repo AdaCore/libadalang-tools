@@ -543,7 +543,8 @@ package body Laltools.Common is
 
             declare
                Pkg_Body : constant Package_Body :=
-                 Parent_Declarative_Part_Owner.As_Package_Decl.P_Body_Part;
+                 Parent_Declarative_Part_Owner.As_Base_Package_Decl.
+                   P_Body_Part;
 
             begin
                if not Pkg_Body.Is_Null then
@@ -1188,7 +1189,7 @@ package body Laltools.Common is
 
             declare
                Pkg_Body : constant Package_Body :=
-                 Node.As_Package_Decl.P_Body_Part;
+                 Node.As_Base_Package_Decl.P_Body_Part;
 
             begin
                if not Pkg_Body.Is_Null then
