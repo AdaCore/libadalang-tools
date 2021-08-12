@@ -97,11 +97,7 @@ package Laltools.Subprogram_Hierarchy is
       Include_Base_Subps : Boolean := True;
       Include_Overrides  : Boolean := True)
       return Basic_Decl_Array
-     with Pre => not Subp.Is_Null
-     and then Subp.Kind in Ada_Subp_Body_Range
-       | Ada_Subp_Decl_Range
-       | Ada_Null_Subp_Decl_Range
-       | Ada_Expr_Function_Range;
+     with Pre => Is_Subprogram (Subp);
    --  If Subp is a primitive subrogram of a type, then returns an array
    --  with all declaration overriding or that are being overridden by Subp.
 
