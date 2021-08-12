@@ -22,6 +22,7 @@
 ------------------------------------------------------------------------------
 
 with Ada.Directories; use Ada.Directories;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Langkit_Support.Slocs; use Langkit_Support.Slocs;
@@ -64,7 +65,15 @@ package body Printers is
       Put_Line ("References:");
       Edits.Text_Edits.Iterate
         (PP'Access);
-
+      if not Edits.File_Renames.Is_Empty then
+         Put_Line ("File renames:");
+         for File_Rename of Edits.File_Renames loop
+            Put_Line
+              (Simple_Name (To_String (File_Rename.Filepath))
+               & " -> "
+               & Simple_Name (To_String (File_Rename.New_Name)));
+         end loop;
+      end if;
       if not Edits.Diagnostics.Is_Empty then
          Put_Line ("Problems:");
          for Problem of Edits.Diagnostics loop

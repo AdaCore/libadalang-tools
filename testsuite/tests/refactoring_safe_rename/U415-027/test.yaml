@@ -1,0 +1,5 @@
+description: |
+    This test checks if the safe rename tool correctly renames a top
+    level declaration and all the files associated to it.
+
+driver: shell_script

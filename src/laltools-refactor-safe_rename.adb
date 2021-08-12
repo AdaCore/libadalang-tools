@@ -23,17 +23,32 @@
 
 with Ada.Assertions; use Ada.Assertions;
 
+with Ada.Characters.Handling; use Ada.Characters.Handling;
 with Ada.Characters.Latin_1; use Ada.Characters.Latin_1;
 
 with Ada.Containers.Vectors;
 
+with Ada.Directories; use Ada.Directories;
+
+with Ada.Strings; use Ada.Strings;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Strings.Unbounded.Text_IO; use Ada.Strings.Unbounded.Text_IO;
+with Ada.Strings.UTF_Encoding; use Ada.Strings.UTF_Encoding;
 
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Libadalang.Common; use Libadalang.Common;
 
 package body Laltools.Refactor.Safe_Rename is
+
+   function "+"
+     (T : Text_Type)
+      return Unbounded_Text_Type renames To_Unbounded_Text;
+   function "+" (Text : Text_Type) return UTF_8_String renames To_UTF8;
+   function "+" (UT : Unbounded_Text_Type) return Text_Type renames To_Text;
+   function "+"
+     (Source : String)
+      return Unbounded_String renames To_Unbounded_String;
 
    function Equivalent_Parameter_Mode (L, R : Ada_Mode) return Boolean is
       (L = R
@@ -538,12 +553,12 @@ package body Laltools.Refactor.Safe_Rename is
          Problem_Finders.Append
            (Subtype_Indication_Collision_Finder'
               (Canonical_Definition => Self.Canonical_Definition,
-               References           => Self.Original_References_Ids,
+               References           => Self.References,
                New_Name             => Self.New_Name));
          Problem_Finders.Append
            (Name_Hidden_Finder'
               (Canonical_Definition => Self.Canonical_Definition,
-               References           => Self.Original_References_Ids,
+               References           => Self.References,
                New_Name             => Self.New_Name));
       end if;
 
@@ -1613,16 +1628,16 @@ package body Laltools.Refactor.Safe_Rename is
    ----------------
 
    procedure Initialize
-     (Self                    : out AST_Analyser;
-      Canonical_Definition    : Defining_Name;
-      New_Name                : Unbounded_Text_Type;
-      Original_References_Ids : Base_Id_Vectors.Vector;
-      Units                   : Analysis_Unit_Array) is
+     (Self                 : out AST_Analyser;
+      Canonical_Definition : Defining_Name;
+      New_Name             : Unbounded_Text_Type;
+      References           : Base_Id_Vectors.Vector;
+      Units                : Analysis_Unit_Array) is
    begin
-      Self.Canonical_Definition    := Canonical_Definition;
-      Self.New_Name                := New_Name;
-      Self.Units                   := Units;
-      Self.Original_References_Ids := Original_References_Ids;
+      Self.Canonical_Definition := Canonical_Definition;
+      Self.New_Name             := New_Name;
+      Self.Units                := Units;
+      Self.References           := References;
    end Initialize;
 
    ----------------
@@ -1960,6 +1975,17 @@ package body Laltools.Refactor.Safe_Rename is
       end if;
    end Update_Canonical_Definition;
 
+   -------------------------
+   -- Create_Safe_Renamer --
+   -------------------------
+
+   function Create_Safe_Renamer
+     (Definition : Defining_Name'Class;
+      New_Name   : Unbounded_Text_Type;
+      Algorithm  : Problem_Finder_Algorithm_Kind)
+      return Safe_Renamer is
+     ((Definition.P_Canonical_Part, New_Name, Algorithm));
+
    --------------
    -- Refactor --
    --------------
@@ -1973,12 +1999,12 @@ package body Laltools.Refactor.Safe_Rename is
 
       Units : constant Analysis_Unit_Array := Analysis_Units.all;
 
-      Original_References_Ids : constant Base_Id_Vectors.Vector :=
+      References : constant Base_Id_Vectors.Vector :=
         Find_All_References_For_Renaming (Self.Canonical_Definition, Units);
 
       function Initialize_Algorithm return Problem_Finder_Algorithm'Class;
       --  Returns an initialized Problem_Finder_Algorithm depending on
-      --  Algorithm_Kind.
+      --  Self.Algorithm.
 
       --------------------------
       -- Initialize_Algorithm --
@@ -1986,7 +2012,7 @@ package body Laltools.Refactor.Safe_Rename is
 
       function Initialize_Algorithm return Problem_Finder_Algorithm'Class
       is
-         Original_References : Unit_Slocs_Maps.Map;
+         References_Map : Unit_Slocs_Maps.Map;
 
       begin
          case Self.Algorithm is
@@ -1995,24 +2021,24 @@ package body Laltools.Refactor.Safe_Rename is
                  (Units_Length => Units'Length)
                do
                   Initialize_Unit_Slocs_Maps
-                    (Unit_References      => Original_References,
+                    (Unit_References      => References_Map,
                      Canonical_Definition => Self.Canonical_Definition,
-                     References           => Original_References_Ids);
+                     References           => References);
 
                   Algorithm.Initialize
                     (Canonical_Definition => Self.Canonical_Definition,
                      New_Name             => Self.New_Name,
-                     Original_References  => Original_References,
+                     Original_References  => References_Map,
                      Units                => Units);
                end return;
 
             when Analyse_AST =>
                return Algorithm : AST_Analyser (Units'Length) do
                   Algorithm.Initialize
-                    (Canonical_Definition     => Self.Canonical_Definition,
-                     New_Name                 => Self.New_Name,
-                     Original_References_Ids  => Original_References_Ids,
-                     Units                    => Units);
+                    (Canonical_Definition => Self.Canonical_Definition,
+                     New_Name             => Self.New_Name,
+                     References           => References,
+                     Units                => Units);
                end return;
          end case;
       end Initialize_Algorithm;
@@ -2020,35 +2046,31 @@ package body Laltools.Refactor.Safe_Rename is
       Algorithm : Problem_Finder_Algorithm'Class := Initialize_Algorithm;
 
    begin
-      Self.Add_To_Edits (Edits, Original_References_Ids);
+      Self.Add_References_To_Edits (References, Edits);
+
+      --  If Self.Canonical_Definition is a top level declaration then its
+      --  file name and all other file names of its references that are
+      --  top level declarations need to be renamed.
+
+      if Self.Is_Top_Level_Decl (Self.Canonical_Definition.P_Basic_Decl) then
+         Self.Add_Files_Rename_To_Edits (References, Edits);
+      end if;
+
       Edits.Diagnostics := Algorithm.Find;
 
       return Edits;
    end Refactor;
 
-   -------------------------
-   -- Create_Safe_Renamer --
-   -------------------------
+   -----------------------------
+   -- Add_References_To_Edits --
+   -----------------------------
 
-   function Create_Safe_Renamer
-     (Definition : Defining_Name'Class;
-      New_Name   : Unbounded_Text_Type;
-      Algorithm  : Problem_Finder_Algorithm_Kind)
-      return Safe_Renamer is
-     ((Definition.P_Canonical_Part, New_Name, Algorithm));
-
-   ------------------
-   -- Add_To_Edits --
-   ------------------
-
-   procedure Add_To_Edits
+   procedure Add_References_To_Edits
      (Self       : Safe_Renamer;
-      Edits      : in out Refactoring_Edits;
-      References : Base_Id_Vectors.Vector)
+      References : Base_Id_Vectors.Vector;
+      Edits      : in out Refactoring_Edits)
    is
-      New_Name : constant Unbounded_String :=
-        Ada.Strings.Unbounded.To_Unbounded_String
-          (To_UTF8 (To_Text (Self.New_Name)));
+      New_Name : constant Unbounded_String := +(+(+Self.New_Name));
 
    begin
       for Reference of References loop
@@ -2059,6 +2081,218 @@ package body Laltools.Refactor.Safe_Rename is
               (Location => Reference.Sloc_Range,
                Text     => New_Name));
       end loop;
-   end Add_To_Edits;
+   end Add_References_To_Edits;
+
+   -----------------------
+   -- Is_Top_Level_Decl --
+   -----------------------
+
+   function Is_Top_Level_Decl
+     (Self : Safe_Renamer;
+      Decl : Basic_Decl'Class)
+      return Boolean
+   is
+      Top_Level_Decl : constant Basic_Decl :=
+        (if not Decl.Is_Null then Decl.P_Top_Level_Decl (Decl.Unit)
+         else No_Basic_Decl);
+
+   begin
+      --  References of Self.Canonical_Definition can include
+      --  Generic_Package_Internal and Generic_Subp_Internal nodes,
+      --  whose parents (Generic_Package_Decl and Generic_Subp_Decl
+      --  respectively) might be top level declarations.
+
+      return not Top_Level_Decl.Is_Null
+        and then (Decl = Top_Level_Decl
+                  or else (Decl.Kind in
+                             Ada_Generic_Package_Internal_Range
+                             | Ada_Generic_Subp_Internal_Range
+                           and then not Decl.Parent.Is_Null
+                           and then Decl.Parent.Kind in
+                             Ada_Generic_Decl
+                           and then Decl.Parent.As_Basic_Decl =
+                             Top_Level_Decl));
+   end Is_Top_Level_Decl;
+
+   -------------------------------
+   -- Add_Files_Rename_To_Edits --
+   -------------------------------
+
+   procedure Add_Files_Rename_To_Edits
+     (Self       : Safe_Renamer;
+      References : Base_Id_Vectors.Vector;
+      Edits      : in out Refactoring_Edits)
+   is
+      File_Rename : Laltools.Refactor.File_Rename;
+
+      function New_File_Name (Reference : Base_Id) return String;
+      --  Computes the new file name based on the old one, on the
+      --  `Self.Canonical_Definition` text, and on `Self.New_Name`.
+      --  Example:
+      --  `Self.Canonical_Definition.F_Name.Text`: Foo.Bar_Baz
+      --  `Self.New_Name`: Qux
+      --  Old filename: foo-bar_baz.ads
+      --  New filename: foo-qux.ads
+      --
+      --  If any exception is raised when computing the new file name,
+      --  and empty string is returned.
+      --
+      --  TODO: Improve this function by using the naming scheme defined in
+      --  the Naming package of the project file.
+
+      -------------------
+      -- New_File_Name --
+      -------------------
+
+      function New_File_Name (Reference : Base_Id) return String
+      is
+         Unit_Old_Filename : constant String :=
+           Reference.Unit.Get_Filename;
+         Directory_Name    : constant String :=
+           Containing_Directory (Unit_Old_Filename);
+         File_Extension    : constant String := Extension (Unit_Old_Filename);
+
+         New_Definition_Name : Unbounded_Text_Type;
+
+         Parent : Ada_Node;
+
+         Parent_Dotted_Name : Dotted_Name;
+
+         function Transform (Old_Definition_Name : String) return String;
+         --  Transforms all characters to lower case and replaces all `.` by
+         --  `-`.
+
+         ---------------
+         -- Transform --
+         ---------------
+
+         function Transform (Old_Definition_Name : String) return String
+         is
+            New_Definition_Name : String (Old_Definition_Name'Range);
+
+         begin
+            for J in Old_Definition_Name'Range loop
+               if Old_Definition_Name (J) = '.' then
+                  New_Definition_Name (J) := '-';
+               else
+                  New_Definition_Name (J) :=
+                    To_Lower (Old_Definition_Name (J));
+               end if;
+            end loop;
+
+            return New_Definition_Name;
+         end Transform;
+
+      begin
+         if Reference.Parent.Kind in Ada_Dotted_Name then
+            Parent_Dotted_Name := Reference.Parent.As_Dotted_Name;
+
+            --  There are three cases:
+
+            --  1) Foo.Bar - We want to rename Foo and it is the first name
+
+            if Parent_Dotted_Name.F_Prefix = Reference then
+               New_Definition_Name := Self.New_Name;
+
+               --  Each parent of `Parent_Dotted_Name` that is an
+               --  `Ada_Dotted_Name` has a suffix.
+
+               Parent := Reference.Parent;
+
+               while Parent.Kind in Ada_Dotted_Name_Range loop
+                  Append (New_Definition_Name, ".");
+                  Append
+                    (New_Definition_Name,
+                     +Parent.As_Dotted_Name.F_Suffix.Text);
+
+                  Parent := Parent.Parent;
+               end loop;
+
+            --  2) Bar.Foo.Baz - We want to rename Foo and it is in the middle
+
+            elsif Parent_Dotted_Name.F_Suffix = Reference
+              and then Parent_Dotted_Name.Parent.Kind in Ada_Dotted_Name
+            then
+               --  `Parent_Dotted_Name` already has all the prefixes needed
+
+               New_Definition_Name :=
+                 +Parent_Dotted_Name.F_Prefix.Text & "." & Self.New_Name;
+               Parent := Reference.Parent;
+
+               --  Each parent of `Parent_Dotted_Name` that is an
+               --  `Ada_Dotted_Name` has a suffix.
+
+               Parent := Parent.Parent;
+
+               while Parent.Kind in Ada_Dotted_Name_Range loop
+                  Append (New_Definition_Name, ".");
+                  Append
+                    (New_Definition_Name,
+                     +Parent.As_Dotted_Name.F_Suffix.Text);
+
+                  Parent := Parent.Parent;
+               end loop;
+
+            --  3) Bar.Foo - We want to rename Foo and it is the last name
+
+            elsif Parent_Dotted_Name.F_Suffix = Reference
+              and then not (Parent_Dotted_Name.Parent.Kind in Ada_Dotted_Name)
+            then
+               --  `Parent_Dotted_Name` already has all the prefixes needed
+
+               New_Definition_Name :=
+                 +Parent_Dotted_Name.F_Prefix.Text & "." & Self.New_Name;
+
+            --  4) Logic error in this algorithm
+
+            else
+               raise Program_Error;
+            end if;
+
+            return Compose
+              (Directory_Name,
+               Transform (+(+New_Definition_Name)),
+               File_Extension);
+
+         else
+            return Compose
+              (Directory_Name,
+               Transform (+(+Self.New_Name)),
+               File_Extension);
+         end if;
+
+      exception
+         when others =>
+            return "";
+      end New_File_Name;
+
+   begin
+      for Reference of References loop
+         declare
+            Enclosing_Defining_Name : constant Defining_Name :=
+              Reference.P_Enclosing_Defining_Name;
+            Enclosing_Basic_Decl    : constant Basic_Decl :=
+              (if Enclosing_Defining_Name.Is_Null then No_Basic_Decl
+               else Enclosing_Defining_Name.P_Basic_Decl);
+
+         begin
+            if Self.Is_Top_Level_Decl (Enclosing_Basic_Decl) then
+               File_Rename.Filepath :=
+                 To_Unbounded_String (Reference.Unit.Get_Filename);
+               File_Rename.New_Name :=
+                 To_Unbounded_String (New_File_Name (Reference));
+
+               --  If there was an error computing the new name, an empty
+               --  string was returned.
+
+               if File_Rename.New_Name /= Null_Unbounded_String
+                 and then not Edits.File_Renames.Contains (File_Rename)
+               then
+                  Edits.File_Renames.Insert (File_Rename);
+               end if;
+            end if;
+         end;
+      end loop;
+   end Add_Files_Rename_To_Edits;
 
 end Laltools.Refactor.Safe_Rename;
