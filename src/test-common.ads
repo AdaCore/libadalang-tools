@@ -344,4 +344,11 @@ package Test.Common is
    Quiet : Boolean := False;
    --  Supresses non-critical output
 
+   Strict_Execution : Boolean := False;
+   --  Indicates whether exit status should depend on invalid sources detected
+
+   Source_Processing_Failed : Boolean := False;
+   --  Indicates whether at least one of sources was either rejected by
+   --  lal parser or an unpredicted error happened during its processing.
+
 end Test.Common;

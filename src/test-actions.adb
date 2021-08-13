@@ -61,13 +61,6 @@ with Ada.Strings.Fixed;
 
 package body Test.Actions is
 
-   Strict_Execution : Boolean := False;
-   --  Indicates whether exit status should depend on invalid sources detected
-
-   Source_Processing_Failed : Boolean := False;
-   --  Indicates whether at least one of sources was either rejected by
-   --  lal parser or an unpredicted error happened during its processing.
-
    SPT : GNATCOLL.Projects.Project_Tree renames
      Test.Common.Source_Project_Tree;
 
@@ -500,7 +493,7 @@ package body Test.Actions is
       Test.Common.Show_Test_Duration := Arg (Cmd, Test_Duration);
       Test.Common.Relocatable_Harness := Arg (Cmd, Relocatable_Harness);
 
-      Strict_Execution := Arg (Cmd, Strict)
+      Test.Common.Strict_Execution := Arg (Cmd, Strict)
         or else (Ada.Environment_Variables.Exists ("GNATTEST_STRICT")
                   and then Ada.Environment_Variables.Value
                     ("GNATTEST_STRICT") = "TRUE");
@@ -840,7 +833,9 @@ package body Test.Actions is
          Test.Mapping.Generate_Mapping_File;
       end if;
 
-      if Strict_Execution and then Source_Processing_Failed then
+      if Test.Common.Strict_Execution
+        and then Test.Common.Source_Processing_Failed
+      then
          Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
       end if;
    end Final;
@@ -883,7 +878,7 @@ package body Test.Actions is
    is
       pragma Unreferenced (Tool, Cmd, File_Name);
    begin
-      Source_Processing_Failed := True;
+      Test.Common.Source_Processing_Failed := True;
    end Per_Invalid_File_Action;
 
    ---------------

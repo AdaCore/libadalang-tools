@@ -30,11 +30,13 @@ with Test.Skeleton.Source_Table;
 
 with Libadalang.Analysis;  use Libadalang.Analysis;
 with Libadalang.Common;    use Libadalang.Common;
+with Langkit_Support.Errors;
 with Langkit_Support.Text; use Langkit_Support.Text;
 
 with GNAT.OS_Lib;                use GNAT.OS_Lib;
 with GNAT.SHA1;
 with GNAT.Directory_Operations;  use GNAT.Directory_Operations;
+with GNAT.Traceback.Symbolic;
 
 with Ada.Containers.Multiway_Trees;
 with Ada.Containers.Doubly_Linked_Lists;
@@ -42,6 +44,7 @@ with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Indefinite_Vectors;
 with Ada.Containers.Indefinite_Ordered_Sets;
 
+with Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings; use Ada.Strings;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
@@ -338,6 +341,55 @@ package body Test.Stub is
       Stub_Data_File_Body : String)
    is
       Data : Data_Holder;
+
+      procedure Cleanup;
+      --  Frees global and temporary variables
+
+      procedure Report_And_Exclude (Ex : Ada.Exceptions.Exception_Occurrence);
+      --  Reports problematic source with exception information and exludes
+      --  the source from furter attempts at stubbing it.
+
+      -------------
+      -- Cleanup --
+      -------------
+
+      procedure Cleanup is
+      begin
+         Dictionary.Clear;
+         Free (Local_Stub_Unit_Mapping.Stub_Data_File_Name);
+         Free (Local_Stub_Unit_Mapping.Orig_Body_File_Name);
+         Free (Local_Stub_Unit_Mapping.Stub_Body_File_Name);
+         Local_Stub_Unit_Mapping.Entities.Clear;
+         Local_Stub_Unit_Mapping.D_Setters.Clear;
+         Local_Stub_Unit_Mapping.D_Bodies.Clear;
+
+         Data.Elem_Tree.Clear;
+         Data.Flat_List.Clear;
+         Data.Limited_Withed_Units.Clear;
+      end Cleanup;
+
+      ------------------------
+      -- Report_And_Exclude --
+      ------------------------
+
+      procedure Report_And_Exclude
+        (Ex : Ada.Exceptions.Exception_Occurrence) is
+      begin
+         if Strict_Execution then
+            Report_Err
+              (Ada.Exceptions.Exception_Name (Ex)
+               & " : "
+               & Ada.Exceptions.Exception_Message (Ex)
+               & ASCII.LF
+               & GNAT.Traceback.Symbolic.Symbolic_Traceback (Ex));
+         end if;
+
+         --  If it failed once it will fail again most likely, no point
+         --  in duplicating the errors. Adding the unit to default stub
+         --  exclusion list to avoid further attempts to process it.
+         Store_Default_Excluded_Stub (Base_Name (Pack.Unit.Get_Filename));
+      end Report_And_Exclude;
+
    begin
 
       Gather_Data (Pack, Data);
@@ -359,17 +411,32 @@ package body Test.Stub is
 
       Add_Stub_List (Pack.Unit.Get_Filename, Local_Stub_Unit_Mapping);
 
-      Dictionary.Clear;
-      Free (Local_Stub_Unit_Mapping.Stub_Data_File_Name);
-      Free (Local_Stub_Unit_Mapping.Orig_Body_File_Name);
-      Free (Local_Stub_Unit_Mapping.Stub_Body_File_Name);
-      Local_Stub_Unit_Mapping.Entities.Clear;
-      Local_Stub_Unit_Mapping.D_Setters.Clear;
-      Local_Stub_Unit_Mapping.D_Bodies.Clear;
+      Cleanup;
 
-      Data.Elem_Tree.Clear;
-      Data.Flat_List.Clear;
-      Data.Limited_Withed_Units.Clear;
+   exception
+      when Ex : Langkit_Support.Errors.Property_Error =>
+
+         Source_Processing_Failed := True;
+
+         Report_Err ("lal error while creating stub for "
+                     & Base_Name (Pack.Unit.Get_Filename));
+         Report_Err ("source file may be incomplete/invalid");
+
+         Report_And_Exclude (Ex);
+         Cleanup;
+         raise Stub_Processing_Error;
+
+      when Ex : others =>
+
+         Source_Processing_Failed := True;
+
+         Report_Err ("unexpected error while creating stub for "
+                     & Base_Name (Pack.Unit.Get_Filename));
+
+         Report_And_Exclude (Ex);
+         Cleanup;
+         raise Stub_Processing_Error;
+
    end Process_Unit;
 
    -----------------

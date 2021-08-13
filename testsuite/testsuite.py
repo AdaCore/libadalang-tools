@@ -62,6 +62,8 @@ class Testsuite(e3.testsuite.Testsuite):
                 os.path.join(script_dir, '..', '..', 'valgrind'))
             os.environ["PATH"] = valgrind_dir + os.pathsep + os.environ["PATH"]
 
+        # Turn on strict mode for gnattest to catch real errors
+        os.environ["GNATTEST_STRICT"] = "TRUE"
 
 if __name__ == '__main__':
     Testsuite(os.path.dirname(__file__)).testsuite_main()

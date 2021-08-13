@@ -35,4 +35,9 @@ package Test.Stub is
    --  Processes corresponding spec and body,
    --  (re)creates stub body and stub data package.
 
+   Stub_Processing_Error : exception;
+   --  Indicates that an unhandled error occured during the processing of given
+   --  unit and stub has not being generated partially or completely and thus
+   --  is unusable.
+
 end Test.Stub;

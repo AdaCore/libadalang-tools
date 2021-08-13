@@ -50,6 +50,7 @@ with Langkit_Support.Slocs; use Langkit_Support.Slocs;
 with GNAT.OS_Lib;
 with GNAT.SHA1;
 with GNAT.Directory_Operations; use GNAT.Directory_Operations;
+with GNAT.Traceback.Symbolic;
 
 with Test.Common; use Test.Common;
 with Test.Harness;
@@ -511,6 +512,27 @@ package body Test.Skeleton is
          Package_Name : String)
          return Test.Harness.Data_Holder;
 
+      procedure Cleanup;
+      --  Frees Data components
+
+      procedure Report (Ex : Ada.Exceptions.Exception_Occurrence);
+      --  Reports problematic source with exception information
+
+      procedure Cleanup is
+      begin
+         if Data.Data_Kind = Declaration_Data then
+            Clear (Data.Type_Data_List);
+            Clear (Data.Subp_List);
+            Clear (Data.Package_Data_List);
+            Clear (Data.Subp_Name_Frequency);
+         end if;
+
+         Suite_Data.Test_Types.Clear;
+         Suite_Data.TR_List.Clear;
+         Suite_Data.ITR_List.Clear;
+         Suite_Data.LTR_List.Clear;
+      end Cleanup;
+
       ----------------------------
       -- Get_Test_Packages_List --
       ----------------------------
@@ -659,6 +681,23 @@ package body Test.Skeleton is
          return Suite_Data;
 
       end Get_Suite_Components;
+
+      ------------
+      -- Report --
+      ------------
+
+      procedure Report (Ex : Ada.Exceptions.Exception_Occurrence) is
+      begin
+         if Strict_Execution then
+            Report_Err
+              (Ada.Exceptions.Exception_Name (Ex)
+               & " : "
+               & Ada.Exceptions.Exception_Message (Ex)
+               & ASCII.LF
+               & GNAT.Traceback.Symbolic.Symbolic_Traceback (Ex));
+         end if;
+      end Report;
+
    begin
       if The_Unit.Root.Kind /= Ada_Compilation_Unit then
          --  For example, it can be a Pragma_Node_List for a body source
@@ -752,17 +791,29 @@ package body Test.Skeleton is
          end if;
       end if;
 
-      if Data.Data_Kind = Declaration_Data then
-         Clear (Data.Type_Data_List);
-         Clear (Data.Subp_List);
-         Clear (Data.Package_Data_List);
-         Clear (Data.Subp_Name_Frequency);
-      end if;
+      Cleanup;
 
-      Suite_Data.Test_Types.Clear;
-      Suite_Data.TR_List.Clear;
-      Suite_Data.ITR_List.Clear;
-      Suite_Data.LTR_List.Clear;
+   exception
+      when Ex : Langkit_Support.Errors.Property_Error =>
+
+         Source_Processing_Failed := True;
+
+         Report_Err ("lal error while creating test package for "
+                     & Base_Name (The_Unit.Get_Filename));
+         Report_Err ("source file may be incomplete/invalid");
+
+         Report (Ex);
+         Cleanup;
+
+      when Ex : others =>
+
+         Source_Processing_Failed := True;
+
+         Report_Err ("unexpected error while creating test package for "
+                     & Base_Name (The_Unit.Get_Filename));
+
+         Report (Ex);
+         Cleanup;
    end Process_Source;
 
    -----------------
@@ -7014,7 +7065,7 @@ package body Test.Skeleton is
       procedure Report_Corrupted_Marker is
       begin
          Report_Err
-           ("gnattest: marker corrupted at "
+           ("marker corrupted at "
             & Base_Name (File)
             & ":"
             & Natural'Image (Line_Counter));
@@ -7972,6 +8023,8 @@ package body Test.Skeleton is
       Cur : Ada_Nodes_List.Cursor;
       Str : String_Access;
 
+      Stub_Success : Boolean;
+
       use Ada_Nodes_List;
    begin
       if Is_Empty (List) then
@@ -7986,18 +8039,30 @@ package body Test.Skeleton is
 
          if Get_Source_Body (Str.all) /= "" then
             if not Source_Stubbed (Str.all) then
-               Test.Stub.Process_Unit
-                 (Ada_Nodes_List.Element (Cur),
-                  Get_Source_Stub_Dir (Str.all)
-                  & GNAT.OS_Lib.Directory_Separator
-                  & Base_Name (Get_Source_Body (Str.all)),
-                  Get_Source_Stub_Dir (Str.all)
-                  & GNAT.OS_Lib.Directory_Separator
-                  & Get_Source_Stub_Data_Spec (Str.all),
-                  Get_Source_Stub_Dir (Str.all)
-                  & GNAT.OS_Lib.Directory_Separator
-                  & Get_Source_Stub_Data_Body (Str.all));
-               Mark_Sourse_Stubbed (Str.all);
+               begin
+                  Test.Stub.Process_Unit
+                    (Ada_Nodes_List.Element (Cur),
+                     Get_Source_Stub_Dir (Str.all)
+                     & GNAT.OS_Lib.Directory_Separator
+                     & Base_Name (Get_Source_Body (Str.all)),
+                     Get_Source_Stub_Dir (Str.all)
+                     & GNAT.OS_Lib.Directory_Separator
+                     & Get_Source_Stub_Data_Spec (Str.all),
+                     Get_Source_Stub_Dir (Str.all)
+                     & GNAT.OS_Lib.Directory_Separator
+                     & Get_Source_Stub_Data_Body (Str.all));
+                  Stub_Success := True;
+
+               exception
+                  when Test.Stub.Stub_Processing_Error =>
+                     --  Error message has been printed already
+                     Stub_Success := False;
+               end;
+
+               if Stub_Success then
+                  Mark_Sourse_Stubbed (Str.all);
+               end if;
+
             end if;
          end if;
 
