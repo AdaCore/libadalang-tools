@@ -90,6 +90,13 @@ package Laltools.Refactor is
 
    subtype Text_Edit_Map is Text_Edit_Ordered_Maps.Map;
 
+   function Contains
+     (Edits     : Laltools.Refactor.Text_Edit_Map;
+      File_Name : Laltools.Refactor.File_Name_Type;
+      Edit      : Laltools.Refactor.Text_Edit)
+         return Boolean;
+   --  Returns True if `Edits` already contains `Edit` for `File_Name`
+
    procedure Safe_Insert
      (Edits     : in out Text_Edit_Map;
       File_Name : File_Name_Type;

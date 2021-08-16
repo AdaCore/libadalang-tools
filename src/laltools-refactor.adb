@@ -39,6 +39,18 @@ package body Laltools.Refactor is
    --  Print an Edit_Ordered_Set in an human readable format to the standart
    --  output.
 
+   --------------
+   -- Contains --
+   --------------
+
+   function Contains
+     (Edits     : Laltools.Refactor.Text_Edit_Map;
+      File_Name : Laltools.Refactor.File_Name_Type;
+      Edit      : Laltools.Refactor.Text_Edit)
+         return Boolean
+   is (Edits.Contains (File_Name)
+       and then Edits.Constant_Reference (File_Name).Contains (Edit));
+
    -----------
    -- Image --
    -----------
