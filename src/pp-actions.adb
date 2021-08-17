@@ -2633,6 +2633,9 @@ package body Pp.Actions is
 --                    else PP_Name_Casing (Cmd)),
                      PP_Name_Casing (Cmd),
 
+                  when Ada_Object_Decl =>
+                    PP_Constant_Casing (Cmd),
+
                  when others => PP_Name_Casing (Cmd)));
 
          use Dictionaries;

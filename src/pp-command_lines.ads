@@ -210,6 +210,23 @@ package Pp.Command_Lines is
        Pragma_Upper_Case => +"-pU",
        Pragma_Mixed_Case => +"-pM"));
 
+   type Constant_Casing is
+     (Constant_Case_As_Declared,
+      Constant_Mixed_Case,
+      Constant_Lower_Case,
+      Constant_Upper_Case);
+
+   package Constant_Casing_Switches is new Enum_Switches
+     (Descriptor,
+      Constant_Casing);
+
+   package Constant_Casing_Shorthands is
+      new Constant_Casing_Switches.Set_Shorthands
+       ((Constant_Case_As_Declared => +"-cD",
+         Constant_Lower_Case => +"-cL",
+         Constant_Upper_Case => +"-cU",
+         Constant_Mixed_Case => +"-cM"));
+
    type Pp_Booleans is
      (Alignment,
       Align_Modes,
@@ -415,6 +432,7 @@ package Pp.Command_Lines is
      Type_Casing_Switches,
      Number_Casing_Switches,
      Pragma_Casing_Switches,
+     Constant_Casing_Switches,
      Pp_Nat_Switches;
 
    function Obsolete_Alignment_Switch (Cmd : Command_Line) return Boolean is
@@ -536,6 +554,16 @@ package Pp.Command_Lines is
          when Number_Upper_Case => Upper_Case);
    --  Defines the casing for both defining and usage occurrences of the
    --  named numbers names.
+
+   function PP_Constant_Casing
+     (Cmd : Cmd_Line) return PP_Casing is
+      (case Constant_Casing'(Arg (Cmd)) is
+         when Constant_Case_As_Declared => PP_Name_Casing (Cmd),
+         when Constant_Mixed_Case => Mixed,
+         when Constant_Lower_Case => Lower_Case,
+         when Constant_Upper_Case => Upper_Case);
+   --  Defines the casing for both defining and usage occurrences of constant
+   --  object declarations.
 
    function PP_Indentation (Cmd : Cmd_Line) return Positive is
      (Arg (Cmd, Indentation));

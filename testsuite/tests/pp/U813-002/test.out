@@ -1,0 +1,27 @@
+procedure Main is
+   Foo_Bar : constant Integer := 1;
+   bar_Foo : constant Integer := 1;
+begin
+   null;
+end Main;
+
+procedure Main is
+   FOO_BAR : constant Integer := 1;
+   BAR_FOO : constant Integer := 1;
+begin
+   null;
+end Main;
+
+procedure Main is
+   foo_bar : constant Integer := 1;
+   bar_foo : constant Integer := 1;
+begin
+   null;
+end Main;
+
+procedure Main is
+   Foo_Bar : constant Integer := 1;
+   Bar_Foo : constant Integer := 1;
+begin
+   null;
+end Main;
