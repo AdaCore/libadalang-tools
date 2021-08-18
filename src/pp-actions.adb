@@ -62,6 +62,8 @@ with Utils.Symbols; use Utils.Symbols;
 with Utils.Vectors;
 with Ada.Strings.Wide_Unbounded;
 
+with Laltools.Common;
+
 package body Pp.Actions is
 
    use Utils.Char_Vectors.WChar_Vectors;
@@ -4520,9 +4522,11 @@ package body Pp.Actions is
                end;
             end if;
 
-            --  Skip F_Renaming_Clause, F_Aspects:
+            --  Skip F_Aspects:
+            Index := Index + 1;
+
+            --  Skip F_Renaming_Clause
             if Tree.Kind = Ada_Object_Decl then
-               Index := Index + 1;
                Index := Index + 1;
             end if;
 
@@ -4824,22 +4828,20 @@ package body Pp.Actions is
                return False;
             end if;
 
-            --  ???P_Fully_Qualified_Name_Array sometimes goes into an infinite
-            --  recursion for the following node kinds. Work around this bug
-            --  until it gets fixed in libadalang.
-
-            if Decl.Kind in Ada_Single_Task_Type_Decl |
-              Ada_Entry_Decl |
-              Ada_Param_Spec |
-              Ada_Incomplete_Tagged_Type_Decl |
-              Ada_Discriminant_Spec
-            then
-               return False;
-            end if;
-
             declare
+               --  To check if `Decl` is predefined, we just need to check the
+               --  first name of the fully qualified name.
+               --  P_Fully_Qualified_Name_Array does not support a `Decl` with
+               --  more than one `Defining_Name` node. Therefore, get `Decl`s
+               --  compilation unit root basic declaration, and if this
+               --  declaration is a predefined declaration, then `Decl` is too.
+
+               Root_Decl : constant Basic_Decl :=
+                 Laltools.Common.Get_Compilation_Unit (Decl).P_Decl;
+
                Full : constant Unbounded_Text_Type_Array :=
-                 P_Fully_Qualified_Name_Array (Decl);
+                 P_Fully_Qualified_Name_Array (Root_Decl);
+
                First : constant Text_Type :=
                  (if Full'Length = 0 then "" else To_Text (Full (1)));
             begin
