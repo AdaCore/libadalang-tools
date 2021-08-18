@@ -24,7 +24,6 @@
 --  Common refactoring utilities
 
 with Ada.Containers.Indefinite_Ordered_Maps;
-with Ada.Containers.Indefinite_Vectors;
 with Ada.Containers.Ordered_Sets;
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
@@ -36,23 +35,6 @@ with Libadalang.Analysis; use Libadalang.Analysis;
 with Laltools.Common; use Laltools.Common;
 
 package Laltools.Refactor is
-
-   type Refactor_Problem is interface;
-
-   function Filename (Self : Refactor_Problem) return String is abstract;
-   --  Returns the filename of the analysis unit where Self happens.
-
-   function Location
-     (Self : Refactor_Problem)
-      return Source_Location_Range is abstract;
-   --  Return a location in the file where Self happens.
-
-   function Info (Self : Refactor_Problem) return String is abstract;
-   --  Returns a human readable message with the description of Self.
-
-   package Refactor_Problem_Vectors is new Ada.Containers.Indefinite_Vectors
-     (Index_Type   => Natural,
-      Element_Type => Refactor_Problem'Class);
 
    type Text_Edit is
       record

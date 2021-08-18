@@ -32,6 +32,8 @@ with Ada.Containers.Ordered_Sets;
 
 with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 
+with Laltools.Refactor.Problems; use Laltools.Refactor.Problems;
+
 with Langkit_Support.Text; use Langkit_Support.Text;
 
 package Laltools.Refactor.Safe_Rename is
