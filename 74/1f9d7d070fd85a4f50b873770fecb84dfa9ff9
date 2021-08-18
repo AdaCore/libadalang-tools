@@ -1,0 +1,7 @@
+Code-Review+2: Vadim Godunko <godunko@adacore.com>
+Code-Review-1: CI Builder <ci-builder@adacore.com>
+Submitted-by: João Azevedo <azevedo@adacore.com>
+Submitted-at: Wed, 18 Aug 2021 19:48:56 +0200
+Reviewed-on: https://git.adacore.com/c/libadalang-tools/+/100132
+Project: libadalang-tools
+Branch: refs/heads/master
