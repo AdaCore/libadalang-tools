@@ -3198,6 +3198,9 @@ package body Test.Harness is
         Build ("Emulator", "Board");
       --  Root project and switches of interest for coverage purposes
 
+      Single_Driver : constant Boolean :=
+        not (Stub_Mode_ON or else Separate_Drivers);
+
       Target_Driver : constant String :=
         Base_Name (Root_Prj.Attribute_Value
                    (Compiler_Driver_Attribute, Index => "ada"),
@@ -3321,6 +3324,15 @@ package body Test.Harness is
             Put_New_Line;
          end if;
 
+         S_Put (0, "# Path to the installed gnatcov rts project file.");
+         Put_New_Line;
+         S_Put (0, "# No need to specify it if the project file path was added"
+                & " to the GPR_PROJECT_PATH environment variable.");
+         Put_New_Line;
+         S_Put (0, "GNATCOV_RTS=");
+         Put_New_Line;
+         Put_New_Line;
+
          --  Cross-config specific options
 
          if not Target_Native then
@@ -3430,7 +3442,11 @@ package body Test.Harness is
          end loop;
 
       else
-         S_Put (0, "PRJS=test_driver");
+         S_Put (0, "PRJS=");
+         S_Put (0, Path_To_Unix (
+                +Relative_Path (
+                  GNATCOLL.VFS.Create (+"test_driver"),
+                  GNATCOLL.VFS.Create (+Harness_Dir.all))));
       end if;
 
       Put_New_Line;
@@ -3519,7 +3535,8 @@ package body Test.Harness is
          ASCII.HT
          & "$(GNATCOV) coverage --save-checkpoint=$*-gnattest.ckpt"
          & " --projects=" & Source_Project_Tree.Root_Project.Name
-         & " -P$*.gpr $(GPRFLAGS) $(SWITCHES_COVERAGE) $*-gnattest.trace");
+         & " -P$*.gpr $(GPRFLAGS) $(SWITCHES_COVERAGE) --cancel-annotate"
+         & " $*-gnattest.trace");
       if Separate_Drivers or else Stub_Mode_ON then
          S_Put (0, " --units=@$(dir $*)units.list");
       end if;
@@ -3533,8 +3550,7 @@ package body Test.Harness is
       S_Put (0, ASCII.HT & "@echo -e '\n'Creating coverage report:");
       Put_New_Line;
       declare
-         Pth : constant String :=
-           +Relative_Path
+         Pth : constant String := +Relative_Path
            (Create (+Source_Prj),
             Create (+Harness_Dir.all));
       begin
@@ -3610,10 +3626,10 @@ package body Test.Harness is
          S_Put
            (0,
             ASCII.HT
-            & "$(TARGET)-gnatemu "
-            & "--serial=file:$*-gnattest_td.b64trace "
-            & "$(if $(GNATEMU_BOARD), --board=$(GNATEMU_BOARD),) "
-            & "$*$(EXE_EXT), \");
+            & "$(TARGET)-gnatemu"
+            & " --serial=file:$*-gnattest_td.b64trace"
+            & " $(if $(GNATEMU_BOARD), --board=$(GNATEMU_BOARD),)"
+            & " $*$(EXE_EXT), \");
          Put_New_Line;
       end if;
 
@@ -3622,19 +3638,20 @@ package body Test.Harness is
       S_Put
         (0,
          ASCII.HT
-         & "GNATCOV_TRACE_FILE=$*-gnattest_td.srctrace $*$(EXE_EXT)");
+         & "GNATCOV_TRACE_FILE=$*-gnattest_td.srctrace"
+         & (if Single_Driver then " ./" else " ") & "$*$(EXE_EXT)");
 
       --  Cross, second command, convert base64 trace into regular trace
 
       if not Target_Native then
          S_Put (0, ")");
          Put_New_Line;
-         S_Put (0, ASCII.HT & "$(if $(run_cross), ");
+         S_Put (0, ASCII.HT & "$(if $(run_cross),");
          S_Put
            (0,
             ASCII.HT
-            & "$(GNATCOV) extract-base64-trace $*-gnattest_td.b64trace "
-            & "$*-gnattest_td.srctrace)");
+            & "$(GNATCOV) extract-base64-trace $*-gnattest_td.b64trace"
+            & " $*-gnattest_td.srctrace)");
       end if;
 
       Put_New_Line;
@@ -3650,7 +3667,7 @@ package body Test.Harness is
         (0,
          ASCII.HT
          & "$(GNATCOV) coverage --save-checkpoint=$*-gnattest.ckpt"
-         & " -P$*.gpr $(GPRFLAGS) $(SWITCHES_COVERAGE)"
+         & " -P$*.gpr $(GPRFLAGS) $(SWITCHES_COVERAGE) --cancel-annotate"
          & " --projects=" & Source_Project_Tree.Root_Project.Name
          & " $*-gnattest_td.srctrace");
       if Separate_Drivers or else Stub_Mode_ON then
@@ -3666,8 +3683,7 @@ package body Test.Harness is
       S_Put (0, ASCII.HT & "@echo -e '\n'Creating coverage report:");
       Put_New_Line;
       declare
-         Pth : constant String :=
-           +Relative_Path
+         Pth : constant String := +Relative_Path
            (Create (+Source_Prj),
             Create (+Harness_Dir.all));
       begin
@@ -3703,14 +3719,13 @@ package body Test.Harness is
          Put_New_Line;
       end if;
 
-      if Target_Native then
-         S_Put (0, "coverage: gnatcov-consolidate");
-      else
+      if not Target_Native then
          S_Put (0, "inst-coverage: BUILDERFLAGS+="
-                & "--implicit-with=gnatcov_rts_full");
+                & "--implicit-with=$(if $(GNATCOV_RTS),$(GNATCOV_RTS),"
+                & "gnatcov_rts_full.gpr)");
          Put_New_Line;
-         S_Put (0, "inst-coverage: gnatcov-consolidate");
       end if;
+      S_Put (0, "inst-coverage: gnatcov-consolidate");
       Put_New_Line;
       Put_New_Line;
 
@@ -3723,7 +3738,8 @@ package body Test.Harness is
          Put_New_Line;
          S_Put (0, "inst-coverage-cross: BUILDERFLAGS+="
                 & "--target=$(TARGET) $(RTSFLAG)"
-                & " --implicit-with=gnatcov_rts");
+                & " --implicit-with=$(if $(GNATCOV_RTS),$(GNATCOV_RTS),"
+                & "gnatcov_rts.gpr)");
          Put_New_Line;
          S_Put (0, "inst-coverage-cross: run_cross=cross");
          Put_New_Line;
@@ -3734,9 +3750,11 @@ package body Test.Harness is
          Put_New_Line;
          Put_New_Line;
          S_Put (0, "coverage: bin-coverage-cross");
-         Put_New_Line;
-         Put_New_Line;
+      else
+         S_Put (0, "coverage: inst-coverage");
       end if;
+      Put_New_Line;
+      Put_New_Line;
 
       S_Put (0, "clean: $(patsubst %,%-clean,$(PRJS))");
       Put_New_Line;
