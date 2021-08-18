@@ -60,6 +60,19 @@ package Laltools.Refactor.Safe_Rename is
 
    type Safe_Renamer is new Refactoring_Tool with private;
 
+   function Refactor
+     (Self           : Safe_Renamer;
+      Analysis_Units : access function return Analysis_Unit_Array)
+      return Refactoring_Edits;
+   --  Finds all references of Node and checks for problems caused by renaming
+   --  such references.
+   --  If Node is a primitive subrogram of a type, then the return refereces
+   --  include references of supbprograms that Node is overriding or that is
+   --  being overridden by.
+   --  If Node is a parameter of a subprogram 'Foo' that is a primitive of a
+   --  type, then the return refereces include parameter spec references of
+   --  supbprograms that 'Foo' is overriding or that is being overridden by.
+
    function Create_Safe_Renamer
      (Definition : Defining_Name'Class;
       New_Name   : Unbounded_Text_Type;
@@ -67,24 +80,9 @@ package Laltools.Refactor.Safe_Rename is
       return Safe_Renamer
      with Pre => not Definition.Is_Null;
    --  Safe_Renamer constructor.
-   --  Creates a `Safe_Renamer` object that renames all references of
-   --  `Definition` to `New_Name`.
-   --  Uses the `Algorithm` kind to search for problems causes by the rename.
-
-   overriding
-   function Refactor
-     (Self           : Safe_Renamer;
-      Analysis_Units : access function return Analysis_Unit_Array)
-      return Refactoring_Edits;
-   --  Finds all references of the definition we want to rename and checks for
-   --  problems caused by renaming such references.
-   --  If the definition we want to rename is a primitive subrogram of a type,
-   --  then the return refereces include references of supbprograms that it is
-   --  overriding or that is being overridden by.
-   --  If the definition we want to rename is a parameter of a subprogram
-   --  that is a primitive of a type, then the returned refereces include
-   --  parameter spec references of supbprograms that it is overriding or that
-   --  is being overridden by.
+   --  Creates a Safe_Renamer object that renames all references of
+   --  Definition to New_Name.
+   --  Uses the Algorithm kind to search for problems causes by the rename.
 
 private
 
@@ -225,9 +223,9 @@ private
    --  running thiss function will then be unreferenced.
 
    procedure Update_Canonical_Definition (Self : in out Reference_Mapper);
-   --  Self.Parse_Temporary_Buffers which will invalidate all nodes.
-   --  This procedure restores the canonical definition that the algorithm is\
-   --  checking for rename problems.
+   --  Function Find of Self calls Parse_Temporary_Buffers which will
+   --  invalidates all nodes. This procedure restores the canonical
+   --  definition that the algorithm is checking for rename problems.
 
    procedure Parse_Temporary_Buffers (Self : in out Reference_Mapper);
    --  For every unit, parses a temporary buffer with all the references
@@ -244,18 +242,18 @@ private
    type AST_Analyser (Units_Length : Integer) is new
      Problem_Finder_Algorithm with
       record
-         Canonical_Definition : Defining_Name;
-         New_Name             : Unbounded_Text_Type;
-         Units                : Analysis_Unit_Array (1 .. Units_Length);
-         References           : Base_Id_Vectors.Vector;
+         Canonical_Definition    : Defining_Name;
+         New_Name                : Unbounded_Text_Type;
+         Units                   : Analysis_Unit_Array (1 .. Units_Length);
+         Original_References_Ids : Base_Id_Vectors.Vector;
       end record;
 
    procedure Initialize
-     (Self                 : out AST_Analyser;
-      Canonical_Definition : Defining_Name;
-      New_Name             : Unbounded_Text_Type;
-      References           : Base_Id_Vectors.Vector;
-      Units                : Analysis_Unit_Array)
+     (Self                    : out AST_Analyser;
+      Canonical_Definition    : Defining_Name;
+      New_Name                : Unbounded_Text_Type;
+      Original_References_Ids : Base_Id_Vectors.Vector;
+      Units                   : Analysis_Unit_Array)
      with Pre => Canonical_Definition /= No_Defining_Name
      and then Canonical_Definition.P_Canonical_Part = Canonical_Definition;
    --  Initializes the Reference_Mapper algorithm by filling its elements
@@ -390,33 +388,15 @@ private
 
    type Safe_Renamer is new Refactoring_Tool with
       record
-         --  Canonical Defining_Name that we want to rename
+         --  Canonical Defining_Name to be renamed
          Canonical_Definition : Defining_Name;
          New_Name             : Unbounded_Text_Type;
          Algorithm            : Problem_Finder_Algorithm_Kind;
       end record;
 
-   procedure Add_References_To_Edits
+   procedure Add_To_Edits
      (Self       : Safe_Renamer;
-      References : Base_Id_Vectors.Vector;
-      Edits      : in out Refactoring_Edits);
-   --  Adds `References` to `Edits`
-
-   function Is_Top_Level_Decl
-     (Self : Safe_Renamer;
-      Decl : Basic_Decl'Class)
-      return Boolean;
-   --  True if `Decl` is a unit top level declaration.
-   --  These are the only declarations that lead to also renaming the source
-   --  file.
-
-   procedure Add_Files_Rename_To_Edits
-     (Self       : Safe_Renamer;
-      References : Base_Id_Vectors.Vector;
-      Edits      : in out Refactoring_Edits)
-     with Pre => Self.Is_Top_Level_Decl
-                   (Self.Canonical_Definition.P_Basic_Decl);
-   --  Iterates through all parts of `Self.Canonical_Definition` and adds the
-   --  necessary file renames to `Edits`.
+      Edits      : in out Refactoring_Edits;
+      References : Base_Id_Vectors.Vector);
 
 end Laltools.Refactor.Safe_Rename;

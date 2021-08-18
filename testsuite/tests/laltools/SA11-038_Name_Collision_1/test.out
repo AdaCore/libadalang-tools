@@ -44,9 +44,6 @@ Start_Line: 12
 Start_Column: 6
 End_Line: 12
 End_Column: 7
-File renames:
-b-z.adb -> b-c.adb
-b-z.ads -> b-c.ads
 Problems:
 Renaming B.Z to C creates a name collision with <Id "C" b.ads:3:9-3:10>
 
@@ -96,9 +93,6 @@ Start_Line: 12
 Start_Column: 6
 End_Line: 12
 End_Column: 7
-File renames:
-b-z.adb -> b-c_private.adb
-b-z.ads -> b-c_private.ads
 Problems:
 Renaming B.Z to C_Private creates a name collision with <Id "C_Private" b.ads:25:9-25:18>
 
@@ -148,9 +142,6 @@ Start_Line: 12
 Start_Column: 6
 End_Line: 12
 End_Column: 7
-File renames:
-b-z.adb -> b-k.adb
-b-z.ads -> b-k.ads
 
 # Renaming node b-z.adb:3:16: 
 References:
@@ -198,9 +189,6 @@ Start_Line: 12
 Start_Column: 6
 End_Line: 12
 End_Column: 7
-File renames:
-b-z.adb -> b-r.adb
-b-z.ads -> b-r.ads
 Problems:
 Renaming B.Z to R creates a name collision with <DottedName b-r.ads:1:9-1:12>
 
@@ -250,9 +238,6 @@ Start_Line: 12
 Start_Column: 6
 End_Line: 12
 End_Column: 7
-File renames:
-b-z.adb -> b-u.adb
-b-z.ads -> b-u.ads
 Problems:
 Renaming B.Z to U creates a name collision with <DottedName b-u.adb:3:11-3:14>
 

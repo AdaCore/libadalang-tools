@@ -49,9 +49,6 @@ Start_Line: 2
 Start_Column: 35
 End_Line: 2
 End_Column: 38
-File renames:
-lsp-ada_completion_sets.ads -> ada_lsp-ada_completion_sets.ads
-lsp.ads -> ada_lsp.ads
 
 # Renaming node lsp-ada_completion_sets.ads:1:13: 
 References:
@@ -80,6 +77,4 @@ Start_Line: 2
 Start_Column: 39
 End_Line: 2
 End_Column: 58
-File renames:
-lsp-ada_completion_sets.ads -> lsp-completion_sets.ads
 
