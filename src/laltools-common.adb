@@ -176,7 +176,8 @@ package body Laltools.Common is
       Is_Param : constant Boolean :=
         Definition.P_Basic_Decl.Kind in Ada_Param_Spec_Range;
       Is_Subp  : constant Boolean :=
-        Is_Subprogram (Definition.P_Basic_Decl);
+        Definition.P_Basic_Decl.Kind in
+          Ada_Subp_Body_Range | Ada_Subp_Decl_Range;
    begin
       if Definition.P_Canonical_Part.F_Name.Kind = Ada_Dotted_Name then
          All_References.Append

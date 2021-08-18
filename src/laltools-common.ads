@@ -192,7 +192,8 @@ package Laltools.Common is
      (Subp  : Basic_Decl;
       Units : Analysis_Unit_Array)
       return Base_Id_Vectors.Vector
-     with Pre => Is_Subprogram (Subp);
+     with Pre => not Subp.Is_Null
+     and then Subp.Kind in Ada_Subp_Body_Range | Ada_Subp_Decl_Range;
    --  Retruns a vector with all references of Subp, and if Subp is
    --  a primitive subrogram of a type, then the vector includes references of
    --  supbprograms that Definition is overriding or that is being overridden
