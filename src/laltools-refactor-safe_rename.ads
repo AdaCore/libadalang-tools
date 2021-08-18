@@ -58,12 +58,42 @@ package Laltools.Refactor.Safe_Rename is
      (Map_References,
       Analyse_AST);
 
-   type Safe_Renamer is new Refactoring_Tool with private;
+   function "<" (Left, Right : Source_Location_Range)
+                 return Boolean;
+   --  Starts by comparing if both Left and Right start lines. If equal, start
+   --  columns are compared.
 
-   function Refactor
-     (Self           : Safe_Renamer;
-      Analysis_Units : access function return Analysis_Unit_Array)
-      return Refactoring_Edits;
+   package Slocs_Sets is new Ada.Containers.Ordered_Sets
+     (Element_Type => Source_Location_Range,
+      "<"          => "<");
+
+   package Slocs_Maps is new
+     Ada.Containers.Ordered_Maps
+       (Key_Type     => Positive,
+        Element_Type => Slocs_Sets.Set,
+        "="          => Slocs_Sets."=");
+
+   function "<" (Left, Right : Analysis_Unit) return Boolean is
+     (Left.Get_Filename < Right.Get_Filename);
+
+   package Unit_Slocs_Maps is new Ada.Containers.Ordered_Maps
+     (Key_Type     => Analysis_Unit,
+      Element_Type => Slocs_Maps.Map,
+      "<"          => "<",
+      "="          => Slocs_Maps."=");
+
+   type Renamable_References is
+      record
+         References : Unit_Slocs_Maps.Map;
+         Problems   : Refactoring_Diagnotic_Vector;
+      end record;
+
+   function Find_All_Renamable_References
+     (Node           : Ada_Node'Class;
+      New_Name       : Unbounded_Text_Type;
+      Units          : Analysis_Unit_Array;
+      Algorithm_Kind : Problem_Finder_Algorithm_Kind)
+      return Renamable_References;
    --  Finds all references of Node and checks for problems caused by renaming
    --  such references.
    --  If Node is a primitive subrogram of a type, then the return refereces
@@ -72,17 +102,6 @@ package Laltools.Refactor.Safe_Rename is
    --  If Node is a parameter of a subprogram 'Foo' that is a primitive of a
    --  type, then the return refereces include parameter spec references of
    --  supbprograms that 'Foo' is overriding or that is being overridden by.
-
-   function Create_Safe_Renamer
-     (Definition : Defining_Name'Class;
-      New_Name   : Unbounded_Text_Type;
-      Algorithm  : Problem_Finder_Algorithm_Kind)
-      return Safe_Renamer
-     with Pre => not Definition.Is_Null;
-   --  Safe_Renamer constructor.
-   --  Creates a Safe_Renamer object that renames all references of
-   --  Definition to New_Name.
-   --  Uses the Algorithm kind to search for problems causes by the rename.
 
 private
 
@@ -150,30 +169,6 @@ private
    function Find (Self : in out Problem_Finder_Algorithm)
                   return Refactoring_Diagnotic_Vector is abstract;
    --  Finds problems caused by renaming a definition
-
-   function "<" (Left, Right : Source_Location_Range)
-                    return Boolean;
-   --  Starts by comparing if both Left and Right start lines. If equal, start
-   --  columns are compared.
-
-   package Slocs_Sets is new Ada.Containers.Ordered_Sets
-     (Element_Type => Source_Location_Range,
-      "<"          => "<");
-
-   package Slocs_Maps is new
-     Ada.Containers.Ordered_Maps
-       (Key_Type     => Positive,
-        Element_Type => Slocs_Sets.Set,
-        "="          => Slocs_Sets."=");
-
-   function "<" (Left, Right : Analysis_Unit) return Boolean is
-     (Left.Get_Filename < Right.Get_Filename);
-
-   package Unit_Slocs_Maps is new Ada.Containers.Ordered_Maps
-     (Key_Type     => Analysis_Unit,
-      Element_Type => Slocs_Maps.Map,
-      "<"          => "<",
-      "="          => Slocs_Maps."=");
 
    package Unit_Buffers is new Ada.Containers.Indefinite_Hashed_Maps
      (Key_Type        => Analysis_Unit,
@@ -385,18 +380,5 @@ private
    overriding
    function Find (Self : Name_Hidden_Finder) return Rename_Problem'Class;
    --  Checks if renamin a definition will make it hidden by another one
-
-   type Safe_Renamer is new Refactoring_Tool with
-      record
-         --  Canonical Defining_Name to be renamed
-         Canonical_Definition : Defining_Name;
-         New_Name             : Unbounded_Text_Type;
-         Algorithm            : Problem_Finder_Algorithm_Kind;
-      end record;
-
-   procedure Add_To_Edits
-     (Self       : Safe_Renamer;
-      Edits      : in out Refactoring_Edits;
-      References : Base_Id_Vectors.Vector);
 
 end Laltools.Refactor.Safe_Rename;
