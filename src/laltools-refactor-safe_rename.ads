@@ -36,7 +36,7 @@ with Langkit_Support.Text; use Langkit_Support.Text;
 
 package Laltools.Refactor.Safe_Rename is
 
-   type Rename_Problem is abstract new Refactoring_Diagnotic with
+   type Rename_Problem is abstract new Refactor_Problem with
       record
          Canonical_Definition : Defining_Name;
          New_Name             : Unbounded_Text_Type;
@@ -46,13 +46,17 @@ package Laltools.Refactor.Safe_Rename is
    overriding
    function Filename (Self : Rename_Problem) return String is
      (Self.Conflicting_Id.Unit.Get_Filename);
-   --  Returns the filename of the analysis unit where Self happens
+   --  Returns the filename of the analysis unit where Self happens.
 
    overriding
    function Location (Self : Rename_Problem)
                       return Source_Location_Range is
      (Self.Conflicting_Id.Sloc_Range);
-   --  Return a location in the file where Self happens
+   --  Return a location in the file where Self happens.
+
+   package Rename_Problem_Vectors is new Ada.Containers.Indefinite_Vectors
+     (Index_Type   => Natural,
+      Element_Type => Rename_Problem'Class);
 
    type Problem_Finder_Algorithm_Kind is
      (Map_References,
@@ -85,7 +89,7 @@ package Laltools.Refactor.Safe_Rename is
    type Renamable_References is
       record
          References : Unit_Slocs_Maps.Map;
-         Problems   : Refactoring_Diagnotic_Vector;
+         Problems   : Rename_Problem_Vectors.Vector;
       end record;
 
    function Find_All_Renamable_References
@@ -110,17 +114,17 @@ private
    overriding
    function Filename (Self : Dummy_Rename_Problem) return String is
      ("Dummy rename problem. No filename.");
-   --  This is a dummy function and shall never be used
+   --  This is a dummy function and shall never be used.
 
    overriding
    function Location (Self : Dummy_Rename_Problem)
                       return Source_Location_Range is ((0, 0, 0, 0));
-   --  This is a dummy function and shall never be used
+   --  This is a dummy function and shall never be used.
 
    overriding
    function Info (Self : Dummy_Rename_Problem) return String is
      ("Dummy rename problem");
-   --  This is a dummy function and shall never be used
+   --  This is a dummy function and shall never be used.
 
    No_Rename_Problem : constant Rename_Problem'Class :=
      Dummy_Rename_Problem'
@@ -132,43 +136,47 @@ private
 
    overriding
    function Info (Self : Missing_Reference) return String;
-   --  Returns a human readable message with the description of Self
+   --  Returns a human readable message with the description of Self.
 
    type New_Reference is new Rename_Problem with null record;
 
    overriding
    function Info (Self : New_Reference) return String;
-   --  Returns a human readable message with the description of Self
+   --  Returns a human readable message with the description of Self.
 
    type Name_Collision is new Rename_Problem with null record;
 
    overriding
    function Info (Self : Name_Collision) return String;
-   --  Returns a human readable message with the description of Self
+   --  Returns a human readable message with the description of Self.
 
    type Overriding_Subprogram is new Rename_Problem with null record;
 
    overriding
    function Info (Self : Overriding_Subprogram) return String;
-   --  Returns a human readable message with the description of Self
+   --  Returns a human readable message with the description of Self.
 
    type Hiding_Name is new Rename_Problem with null record;
 
    overriding
    function Info (Self : Hiding_Name) return String;
-   --  Returns a human readable message with the description of Self
+   --  Returns a human readable message with the description of Self.
 
    type Hidden_Name is new Rename_Problem with null record;
 
    overriding
    function Info (Self : Hidden_Name) return String;
-   --  Returns a human readable message with the description of Self
+   --  Returns a human readable message with the description of Self.
 
    type Problem_Finder_Algorithm is interface;
 
    function Find (Self : in out Problem_Finder_Algorithm)
-                  return Refactoring_Diagnotic_Vector is abstract;
-   --  Finds problems caused by renaming a definition
+                  return Rename_Problem_Vectors.Vector is abstract;
+   --  Finds problems caused by renaming a definition.
+
+   function Get_Original_References (Self : in out Problem_Finder_Algorithm)
+                                     return Unit_Slocs_Maps.Map is abstract;
+   --  Gets all references of a definition before attempting to rename it.
 
    package Unit_Buffers is new Ada.Containers.Indefinite_Hashed_Maps
      (Key_Type        => Analysis_Unit,
@@ -201,7 +209,6 @@ private
      (Self                 : out Reference_Mapper;
       Canonical_Definition : Defining_Name;
       New_Name             : Unbounded_Text_Type;
-      Original_References  : Unit_Slocs_Maps.Map;
       Units                : Analysis_Unit_Array)
      with Pre => Canonical_Definition /= No_Defining_Name
      and then Canonical_Definition.P_Canonical_Part = Canonical_Definition;
@@ -210,12 +217,19 @@ private
 
    overriding
    function Find (Self : in out Reference_Mapper)
-                  return Refactoring_Diagnotic_Vector;
+                  return Rename_Problem_Vectors.Vector;
    --  Finds problems caused by renaming a definition. The strategy of this
    --  algorithm is to compare references before and after the rename.
    --  IMPORTANT NOTE: This function reparses all analysis units given to the
    --  Initialize procedure. All active references of nodes created before
    --  running thiss function will then be unreferenced.
+
+   overriding
+   function Get_Original_References
+     (Self : in out Reference_Mapper)
+      return Unit_Slocs_Maps.Map is (Self.Original_References);
+   --  Returns a map, ordered by filename and line number, of references before
+   --  doing the rename.
 
    procedure Update_Canonical_Definition (Self : in out Reference_Mapper);
    --  Function Find of Self calls Parse_Temporary_Buffers which will
@@ -227,7 +241,7 @@ private
    --  renamed.
 
    procedure Parse_Original_Buffers (Self : in out Reference_Mapper);
-   --  For every unit, parses it's original buffer
+   --  For every unit, parses it's original buffer.
 
    procedure Diff (Self : in out Reference_Mapper);
    --  Creates a diff between the original references and the new references
@@ -240,15 +254,15 @@ private
          Canonical_Definition    : Defining_Name;
          New_Name                : Unbounded_Text_Type;
          Units                   : Analysis_Unit_Array (1 .. Units_Length);
+         Original_References     : Unit_Slocs_Maps.Map;
          Original_References_Ids : Base_Id_Vectors.Vector;
       end record;
 
    procedure Initialize
-     (Self                    : out AST_Analyser;
-      Canonical_Definition    : Defining_Name;
-      New_Name                : Unbounded_Text_Type;
-      Original_References_Ids : Base_Id_Vectors.Vector;
-      Units                   : Analysis_Unit_Array)
+     (Self                 : out AST_Analyser;
+      Canonical_Definition : Defining_Name;
+      New_Name             : Unbounded_Text_Type;
+      Units                : Analysis_Unit_Array)
      with Pre => Canonical_Definition /= No_Defining_Name
      and then Canonical_Definition.P_Canonical_Part = Canonical_Definition;
    --  Initializes the Reference_Mapper algorithm by filling its elements
@@ -256,15 +270,22 @@ private
 
    overriding
    function Find (Self : in out AST_Analyser)
-                  return Refactoring_Diagnotic_Vector;
+                  return Rename_Problem_Vectors.Vector;
    --  Finds problems caused by renaming a definition. The strategy of this
    --  algorithm is to analyse the AST and look for specific problems.
+
+   overriding
+   function Get_Original_References
+     (Self : in out AST_Analyser)
+      return Unit_Slocs_Maps.Map is (Self.Original_References);
+   --  Returns a map, ordered by filename and line number, of references before
+   --  doing the rename.
 
    type Specific_Problem_Finder is interface;
 
    function Find (Self : Specific_Problem_Finder)
                   return Rename_Problem'Class is abstract;
-   --  Finds specific problems cause by renaming a definition
+   --  Finds specific problems cause by renaming a definition.
 
    package Specific_Rename_Problem_Finder_Vectors is new
      Ada.Containers.Indefinite_Vectors
@@ -279,7 +300,7 @@ private
 
    overriding
    function Find (Self : Name_Collision_Finder) return Rename_Problem'Class;
-   --  Find name collisions created by a rename operation in the same scope
+   --  Find name collisions created by a rename operation in the same scope.
 
    type Enum_Name_Collision_Finder is new Specific_Problem_Finder with
       record
@@ -344,7 +365,7 @@ private
    overriding
    function Find (Self : Param_Spec_Collision_Finder)
                   return Rename_Problem'Class;
-   --  Checks if renaming a Param_Spec will cause a conflict with its type
+   --  Checks if renaming a Param_Spec will cause a conflict with its type.
 
    type Name_Hiding_Finder is new Specific_Problem_Finder with
       record
@@ -354,7 +375,7 @@ private
 
    overriding
    function Find (Self : Name_Hiding_Finder) return Rename_Problem'Class;
-   --  Checks if renaming a definition will start hiding another one
+   --  Checks if renaming a definition will start hiding another one.
 
    type Subtype_Indication_Collision_Finder is new Specific_Problem_Finder with
       record
@@ -379,6 +400,6 @@ private
 
    overriding
    function Find (Self : Name_Hidden_Finder) return Rename_Problem'Class;
-   --  Checks if renamin a definition will make it hidden by another one
+   --  Checks if renamin a definition will make it hidden by another one.
 
 end Laltools.Refactor.Safe_Rename;
