@@ -39,7 +39,6 @@ package Utils.Command_Lines.Common is
       Incremental,
       Outer_Parallel,
       Rep_Clauses,
-      Update_All,
       Follow_Symbolic_Links,
       No_Objects_Dir,
       Compute_Timing,
@@ -60,12 +59,11 @@ package Utils.Command_Lines.Common is
        Incremental               => null,
        Outer_Parallel            => null,
        Rep_Clauses               => null,
-       Update_All                => +"-U",
        Follow_Symbolic_Links     => +"-eL",
        No_Objects_Dir            => null,
        Compute_Timing            => +"-t",
        Process_RTL_Units         => +"-a",
-       Cargs => +"-cargs"));
+       Cargs                     => +"-cargs"));
 
    type Common_Booleans is (Syntax_Only);
 
@@ -99,6 +97,18 @@ package Utils.Command_Lines.Common is
    package Ada_Version_Shorthands_2 is new Ada_Version_Switches.Set_Shorthands
      ((Ada_2005 => +"-gnat05",
        others => null));
+
+   type Source_Selection_Type is
+     (Update_All, No_Subprojects, No_Source_Selection);
+
+   package Source_Selection_Switches is new Enum_Switches
+     (Common_Descriptor, Source_Selection_Type,
+      Default => Source_Selection_Type'Last);
+
+   package Source_Selection_Shorthands is new
+     Source_Selection_Switches.Set_Shorthands
+       ((Update_All => +"-U",
+         others => null));
 
    type Common_Strings is
      (Project_File,

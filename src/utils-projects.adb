@@ -27,11 +27,13 @@ with Ada.Containers.Indefinite_Ordered_Sets;
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Directories;
 with Ada.Environment_Variables;
+with Ada.Exceptions;
 with Ada.Strings;       use Ada.Strings;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 with Ada.Text_IO;
 
 with GNAT.Directory_Operations;
+with GNAT.Traceback.Symbolic;
 
 with GNATCOLL.VFS;      use GNATCOLL.VFS;
 with GNATCOLL.Traces;
@@ -52,7 +54,7 @@ package body Utils.Projects is
    use Text_IO;
 
    use Common_Flag_Switches, Common_String_Switches,
-     Common_String_Seq_Switches;
+     Common_String_Seq_Switches, Source_Selection_Switches;
 
    My_Project_Tree : aliased Project_Tree;
    Project_Env : Project_Environment_Access;
@@ -61,16 +63,17 @@ package body Utils.Projects is
       Pre => Arg (Cmd, Project_File) /= null;
       --  Returns the project file name with ".gpr" appended if necessary
 
-   function Main_Unit_Name
-     (Cmd : Command_Line) return String_Ref is
+   function Main_Unit_Names
+     (Cmd : Command_Line) return String_Ref_Array is
      (if
-        Arg (Cmd, Update_All)
+        Arg (Cmd) = Update_All
       then
-        (if Num_File_Names (Cmd) = 0 then null else File_Names (Cmd) (1))
-      else null);
-   --  If "-U main_unit" was specified, this returns the main unit. Otherwise
-   --  (-U was not specified, or was specified without a main unit name),
-   --  returns null.
+        (if Num_File_Names (Cmd) = 0 then (1 .. 0 => null)
+         else File_Names (Cmd))
+      else (1 .. 0 => null));
+   --  If "-U main_unit_1 main_unit_2 ..." was specified, this returns the list
+   --  of main units. Otherwise (-U was not specified, or was specified without
+   --  main unit names), returns empty array.
 
    procedure Post_Cmd_Line_1 (Cmd : Command_Line);
    --  This is called by Process_Command_Line after the first pass through
@@ -87,6 +90,7 @@ package body Utils.Projects is
 
    procedure Process_Project
      (Cmd                       : in out Command_Line;
+      Cmd_Text                  :        Argument_List_Access;
       Global_Report_Dir         :    out String_Ref;
       Preprocessing_Allowed     :        Boolean;
       My_Project_Tree           : in out Project_Tree;
@@ -121,6 +125,7 @@ package body Utils.Projects is
 
    procedure Process_Project
      (Cmd                       : in out Command_Line;
+      Cmd_Text                  :        Argument_List_Access;
       Global_Report_Dir         :    out String_Ref;
       Preprocessing_Allowed     :        Boolean;
       My_Project_Tree           : in out Project_Tree;
@@ -419,13 +424,18 @@ package body Utils.Projects is
          Ctx  : constant Analysis_Context :=
            Create_Context (Unit_Provider => Provider);
 
-         Main_Full : constant String :=
-           My_Project_Tree.Create
-             (+Main_Unit_Name (Cmd).all).Display_Full_Name;
+         Mains : constant String_Ref_Array := Main_Unit_Names (Cmd);
+
+         Mains_From_Prj : GNAT.OS_Lib.String_List_Access :=
+           My_Project_Tree.Root_Project.Attribute_Value
+             (Attribute    => Main_Attribute,
+              Use_Extended => True);
 
          package String_Sets is new
            Ada.Containers.Indefinite_Ordered_Sets (String);
          use String_Sets;
+
+         Closure_Incomplete : Boolean := False;
 
          Closure : Set;
          --  Cumulative closure of given main(s)
@@ -440,6 +450,9 @@ package body Utils.Projects is
          --  so we need to add them manually: once we have a spec that
          --  corresponds to any separates added to the closure, we need
          --  to add corresponding separates as well.
+
+         procedure Process_Main_Unit (Main_Full : String);
+         --  Adds closure for given unit to the overall closure
 
          procedure Update_Closure (New_Source : String);
          --  Calculate unit dependencies with LAL, for resulting specs
@@ -462,6 +475,30 @@ package body Utils.Projects is
             return Inf.Project /= No_Project
               and then not Is_Externally_Built (Create (+Full_Name));
          end Is_Source_Of_Interest;
+
+         -----------------------
+         -- Process_Main_Unit --
+         -----------------------
+
+         procedure Process_Main_Unit (Main_Full : String) is
+         begin
+            Update_Closure (Main_Full);
+
+            --  If main is a spec we also need to include the corresponding
+            --  body in the closure if it exists.
+            if My_Project_Tree.Info (Create (+Main_Full)).Unit_Part = Unit_Spec
+            then
+               declare
+                  Main_Other : constant String :=
+                    My_Project_Tree.Other_File
+                      (Create (+Main_Full)).Display_Full_Name;
+               begin
+                  if Is_Source_Of_Interest (Main_Other) then
+                     Update_Closure (Main_Other);
+                  end if;
+               end;
+            end if;
+         end Process_Main_Unit;
 
          --------------------
          -- Update_Closure --
@@ -512,16 +549,25 @@ package body Utils.Projects is
 
             end loop;
 
+         exception
+            when Ex : others =>
+               Closure_Incomplete := True;
+               Formatted_Output.Put
+                 ("\1\n",
+                  "could not get dependencies of "
+                  & GNAT.Directory_Operations.Base_Name (New_Source));
+               if Debug_Flag_U then
+                  Formatted_Output.Put
+                    ("\1\n",
+                     Ada.Exceptions.Exception_Name (Ex)
+                     & " : "
+                     & Ada.Exceptions.Exception_Message (Ex)
+                     & ASCII.LF
+                     & GNAT.Traceback.Symbolic.Symbolic_Traceback (Ex));
+               end if;
          end Update_Closure;
 
       begin
-         --  We first need to erase the Main_Unit_Name from the command
-         --  line, because we're about to append the actual files.
-         --  Otherwise, if the Main_Unit_Name is "foo.adb", it would be
-         --  duplicated, and if it's "foo", then we would try to read
-         --  "foo" (possibly an executable file) as an Ada source file:
-         Clear_File_Names (Cmd);
-
          --  Populating Separates. This is a temporary solution until
          --  P_Unit_Dependencies starts returning separates.
          declare
@@ -552,22 +598,29 @@ package body Utils.Projects is
             Unchecked_Free (Sources);
          end;
 
-         Update_Closure (Main_Full);
-
-         --  If main is a spec we also need to include the corresponding body
-         --  in the closure if it exists.
-         if My_Project_Tree.Info (Create (+Main_Full)).Unit_Part = Unit_Spec
-         then
-            declare
-               Main_Other : constant String :=
-                 My_Project_Tree.Other_File
-                   (Create (+Main_Full)).Display_Full_Name;
-            begin
-               if Is_Source_Of_Interest (Main_Other) then
-                  Update_Closure (Main_Other);
-               end if;
-            end;
+         --  Mains on the command line take precedence over the ones specified
+         --  in the project file.
+         if Mains'Length > 0 then
+            for Main of Mains loop
+               Process_Main_Unit
+                 (My_Project_Tree.Create (+Main.all).Display_Full_Name);
+            end loop;
+         else
+            for Main of Mains_From_Prj.all loop
+               Process_Main_Unit
+                 (My_Project_Tree.Create (+Main.all).Display_Full_Name);
+            end loop;
          end if;
+
+         Free (Mains_From_Prj);
+
+         if Closure_Incomplete then
+            Formatted_Output.Put ("could not get complete closure\n");
+         end if;
+
+         --  We first need to erase the main unit names from the command
+         --  line to avoid dulicates.
+         Clear_File_Names (Cmd);
 
          if Debug_Flag_U then
             Formatted_Output.Put ("Closure:\n");
@@ -582,8 +635,7 @@ package body Utils.Projects is
       exception
          when others =>
             Cmd_Error_No_Tool_Name
-              ("could not get closure of " & Main_Unit_Name (Cmd).all);
-            raise;
+              ("could not get closure of specified sources");
       end Get_Files_From_Closure;
 
       ------------------------------
@@ -601,27 +653,35 @@ package body Utils.Projects is
            Arg_Length (Cmd, Common.Files);
          --  Number of "-files=..." switches on the command line
          Argument_File_Specified : constant Boolean :=
-           (if Arg (Cmd, Update_All) then Num_Files_Switches > 0
+           (if Arg (Cmd) = Update_All then Num_Files_Switches > 0
             else Num_Names > 0 or else Num_Files_Switches > 0);
       --  True if we have source files specified on the command line. If -U
       --  (Update_All) was specified, then the "file name" (if any) is taken
       --  to be the main unit name, not a file name.
 
+         Mains_From_Prj : GNAT.OS_Lib.String_List_Access :=
+           My_Project_Tree.Root_Project.Attribute_Value
+             (Attribute    => Main_Attribute,
+              Use_Extended => True);
+
+         Has_Prj_Mains : constant Boolean := Mains_From_Prj /= null
+           and then Mains_From_Prj.all'Length > 0;
       begin
-         if Arg (Cmd, Update_All) and then Num_Names > 1 then
-            Cmd_Error ("cannot specify more than one main after -U");
-         end if;
 
          --  We get file names from the project file if Compute_Project_Closure
          --  is True, and no file names were given on the command line, either
          --  directly, or via one or more "-files=par_file_name" switches.
 
          if Compute_Project_Closure and then not Argument_File_Specified then
-            if Main_Unit_Name (Cmd) = null then
+            if Arg (Cmd) = No_Subprojects
+              or else (Main_Unit_Names (Cmd)'Length = 0
+                       and then not (Arg (Cmd) = No_Source_Selection
+                                     and then Has_Prj_Mains))
+            then
                Prj := My_Project_Tree.Root_Project;
 
                Files := Prj.Source_Files
-                 (Recursive => Arg (Cmd, Update_All),
+                 (Recursive => Arg (Cmd) /= No_Subprojects,
                   Include_Externally_Built => False);
 
                for F in Files'Range loop
@@ -633,35 +693,20 @@ package body Utils.Projects is
                   end if;
                end loop;
 
-               if Arg (Cmd, Update_All) then
+               if Arg (Cmd) = Update_All then
                   if Num_File_Names (Cmd) = 0 then
                      Cmd_Error
                        (Project_File_Name (Cmd) &
                         "does not contain source files");
                   end if;
-               else
-                  loop
-                     Prj := Extended_Project (Prj);
-                     exit when Prj = No_Project;
-
-                     Unchecked_Free (Files);
-                     Files := Prj.Source_Files (Recursive => False);
-
-                     for F in Files'Range loop
-                        if not Is_Externally_Built (Files (F))
-                          and then Is_Ada_File (Files (F))
-                        then
-                           Append_File_Name (Cmd, Files (F).Display_Base_Name);
-                        end if;
-                     end loop;
-                  end loop;
-
                end if;
 
             else
                Get_Files_From_Closure;
             end if;
          end if;
+
+         Free (Mains_From_Prj);
       end Get_Sources_From_Project;
 
       -------------------------
@@ -921,7 +966,7 @@ package body Utils.Projects is
 
             Scan_Switches;
 
-            if not Arg (Cmd, Update_All)
+            if Arg (Cmd) /= Update_All
               and then Has_Attribute
                 (Project_U,
                  Compiler_Local_Configuration_Pragmas)
@@ -946,7 +991,7 @@ package body Utils.Projects is
                end;
             end if;
 
-            if not Arg (Cmd, Update_All)
+            if Arg (Cmd) /= Update_All
               and then Has_Attribute
                 (Project_U,
                  Compiler_Local_Config_File,
@@ -1035,7 +1080,7 @@ package body Utils.Projects is
               ("argument file cannot be specified for aggregate project");
          end if;
 
-         if Arg (Cmd, Update_All) then
+         if Arg (Cmd) = Update_All then
             Cmd_Error ("'-U' cannot be specified for aggregate project");
          end if;
 
@@ -1044,6 +1089,18 @@ package body Utils.Projects is
 
       else
          Extract_Tool_Options;
+
+         --  Now we need to Parse again, so command-line args override project
+         --  file args. This needs to be done before getting sources from the
+         --  project, as -U/--no-subprojects affect source selection and may
+         --  override each other.
+         Parse
+           (Cmd_Text,
+            Cmd,
+            Phase              => Cmd_Line_2,
+            Callback           => Callback,
+            Collect_File_Names => False);
+
          Get_Sources_From_Project;
          Set_Global_Result_Dirs;
          Set_Individual_Source_Options;
@@ -1321,6 +1378,7 @@ package body Utils.Projects is
          if Arg (Cmd, Project_File) /= null then
             Process_Project
               (Cmd,
+               Cmd_Text,
                Global_Report_Dir,
                Preprocessing_Allowed,
                My_Project_Tree,
@@ -1330,20 +1388,15 @@ package body Utils.Projects is
                Callback);
          end if;
 
-         --  Now Parse again, so command-line args override project file args
+         --  Subsequent call to Parse command line again is performed inside
+         --  Process_Project to happen in time for possible closure
+         --  computation. And if there is no project file we already have
+         --  all the switches from the first command line parsing.
 
 --  Environment has:
 --               if not Mimic_gcc then
 --                  --  Ignore unrecognized switches in the inner invocation
 --                  Error ...
-
-         Parse
-           (Cmd_Text,
-            Cmd,
-            Phase              => Cmd_Line_2,
-            Callback           => Callback,
-            Collect_File_Names => False);
-         --  ????Collect_File_Names = (Phase = Cmd_Line_2).
 
          --  The following could just as well happen before the above
          --  Cmd_Line_2 Parse, because file names and "-files=par_file_name"
