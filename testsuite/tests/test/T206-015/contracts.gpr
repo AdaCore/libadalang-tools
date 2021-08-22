@@ -1,0 +1,9 @@
+project Contracts is
+
+   type T is ("before", "after");
+   Src_Select : T := external ("GNATTEST_SOURCE_SELECT", "before");
+
+   for Source_Dirs use ("src_" & Src_Select);
+
+end Contracts;
+
