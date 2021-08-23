@@ -703,6 +703,10 @@ package body Laltools.Common is
          end if;
 
          return Libadalang.Common.Into;
+
+      exception
+         when Property_Error =>
+            return Libadalang.Common.Into;
       end Matches;
 
       Parent_Node  : Ada_Node := No_Ada_Node;
