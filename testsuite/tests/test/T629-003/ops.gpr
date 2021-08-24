@@ -1,0 +1,11 @@
+with "input";
+
+project Ops is
+   for Source_Dirs use ("src");
+
+   for Source_Files use ("square.adb", "square.ads");
+
+   package Compiler is
+      for Local_Configuration_Pragmas use "gnat.adc";
+   end Compiler;
+end Ops;
