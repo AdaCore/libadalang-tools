@@ -1,0 +1,3 @@
+direct.ads:2:4: error: corresponding test FAILED: Test not implemented. (direct-test_data-tests.adb:44)
+simple.ads:3:4: error: corresponding test FAILED: Test not implemented. (simple-test_data-tests.adb:44)
+2 tests run: 0 passed; 2 failed; 0 crashed.

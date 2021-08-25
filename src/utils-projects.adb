@@ -659,13 +659,38 @@ package body Utils.Projects is
       --  (Update_All) was specified, then the "file name" (if any) is taken
       --  to be the main unit name, not a file name.
 
-         Mains_From_Prj : GNAT.OS_Lib.String_List_Access :=
-           My_Project_Tree.Root_Project.Attribute_Value
-             (Attribute    => Main_Attribute,
-              Use_Extended => True);
+         function Has_Ada_Mains_Only return Boolean;
+         --  Checks that root project has mains specified and all of them
+         --  are Ada mains, no C/C++ or other languages.
 
-         Has_Prj_Mains : constant Boolean := Mains_From_Prj /= null
-           and then Mains_From_Prj.all'Length > 0;
+         ------------------------
+         -- Has_Ada_Mains_Only --
+         ------------------------
+
+         function Has_Ada_Mains_Only return Boolean is
+            Mains_From_Prj : GNAT.OS_Lib.String_List_Access :=
+              My_Project_Tree.Root_Project.Attribute_Value
+                (Attribute    => Main_Attribute,
+                 Use_Extended => True);
+         begin
+            if Mains_From_Prj = null
+              or else Mains_From_Prj.all'Length = 0
+            then
+               Free (Mains_From_Prj);
+               return False;
+            end if;
+
+            for Main of Mains_From_Prj.all loop
+               if not Is_Ada_File (My_Project_Tree.Create (+Main.all)) then
+                  Free (Mains_From_Prj);
+                  return False;
+               end if;
+            end loop;
+
+            Free (Mains_From_Prj);
+            return True;
+         end Has_Ada_Mains_Only;
+
       begin
 
          --  We get file names from the project file if Compute_Project_Closure
@@ -676,7 +701,7 @@ package body Utils.Projects is
             if Arg (Cmd) = No_Subprojects
               or else (Main_Unit_Names (Cmd)'Length = 0
                        and then not (Arg (Cmd) = No_Source_Selection
-                                     and then Has_Prj_Mains))
+                                     and then Has_Ada_Mains_Only))
             then
                Prj := My_Project_Tree.Root_Project;
 
@@ -706,7 +731,6 @@ package body Utils.Projects is
             end if;
          end if;
 
-         Free (Mains_From_Prj);
       end Get_Sources_From_Project;
 
       -------------------------
