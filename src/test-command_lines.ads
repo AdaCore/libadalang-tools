@@ -44,8 +44,6 @@ package Test.Command_Lines is
       Test_Case_Only,
       Omit_Sloc,
       Command_Line_Support,
-      Separates,
-      Transition,
       Test_Duration,
       Relocatable_Harness);
 
