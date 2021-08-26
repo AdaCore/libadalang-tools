@@ -2497,9 +2497,10 @@ package body Pp.Actions is
       Partial   : Boolean)
    is
       function Id_With_Casing
-        (Id                       : W_Str;
-         Kind                     : Opt_ASIS_Elems;
-         Is_Predef                : Boolean)
+        (Id          : W_Str;
+         Kind        : Opt_ASIS_Elems;
+         Is_Predef   : Boolean;
+         Is_Constant : Boolean := False)
          return                     W_Str;
       --  This handles casing of defining names and usage names, converting to
       --  the appropriate case based on command-line options. Kind is the kind of
@@ -2507,6 +2508,9 @@ package body Pp.Actions is
       --
       --  Is_Predef is True if Id is a usage name that denotes a predefined
       --  entity. It is always False for defining names, pragmas, and aspects.
+      --
+      --  If Is_Constant is True when Kind in Ada_Object_Decl_Range, then
+      --  PP_Constant_Casing is used instead of PP_Name_Casing.
       --
       --  This is called early (during Subtree_To_Ada). Casing of reserved words
       --  is handled later, in a separate pass (see Keyword_Casing), because they
@@ -2571,10 +2575,11 @@ package body Pp.Actions is
          Name_VADS_Size'Access);
 
       function Id_With_Casing
-        (Id                       : W_Str;
-         Kind                     : Opt_ASIS_Elems;
-         Is_Predef                : Boolean)
-         return                     W_Str
+        (Id          : W_Str;
+         Kind        : Opt_ASIS_Elems;
+         Is_Predef   : Boolean;
+         Is_Constant : Boolean := False)
+         return W_Str
       is
          pragma Assert (Id'First = 1);
 
@@ -2634,7 +2639,8 @@ package body Pp.Actions is
                      PP_Name_Casing (Cmd),
 
                   when Ada_Object_Decl =>
-                    PP_Constant_Casing (Cmd),
+                     (if Is_Constant then PP_Constant_Casing (Cmd)
+                      else PP_Name_Casing (Cmd)),
 
                  when others => PP_Name_Casing (Cmd)));
 
@@ -4913,10 +4919,16 @@ package body Pp.Actions is
               (if Is_Attr_Name then Parent_Tree.Kind
                elsif Decl.Is_Null then Null_Kind
                else Decl.Kind);
+
+            Is_Constant_Name : constant Boolean :=
+              K in Ada_Object_Decl_Range
+                and then Decl.As_Object_Decl.F_Has_Constant;
+
             With_Casing : constant W_Str :=
               Id_With_Casing
                 (Id_Name (Def_Name), Kind => K,
-                 Is_Predef => Is_Predef (Is_Def_Name, Decl));
+                 Is_Predef => Is_Predef (Is_Def_Name, Decl),
+                 Is_Constant => Is_Constant_Name);
          begin
             Append_And_Put (New_Tokns, Ident, W_Intern (With_Casing));
          end Do_Def_Or_Usage_Name;
