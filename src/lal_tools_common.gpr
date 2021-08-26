@@ -1,6 +1,6 @@
 abstract project LAL_Tools_Common is
 
-   type Build_Mode_Type is ("dev", "prod");
+   type Build_Mode_Type is ("dev", "prod", "AddressSanitizer");
    Build_Mode : Build_Mode_Type := external ("BUILD_MODE", "dev");
 
    Superproject := external ("SUPERPROJECT", "");
@@ -28,7 +28,27 @@ abstract project LAL_Tools_Common is
                --  linking errors when linking the Ada Language Server
                --  "-gnatp"
                "-gnatn2");
+         when "AddressSanitizer" =>
+           for Default_Switches ("Ada") use
+              ("-fPIC",
+               "-gnatyg",
+               "-gnatwae",
+               "-gnatw.u", -- warn inappropriate use of unordered enums
+               "-g",
+               "-O0",
+               "-gnata",
+               "-gnatVa",
+               "-fsanitize=address");
       end case;
    end Compiler;
+
+   package Linker is
+      case Build_Mode is
+         when "AddressSanitizer" =>
+            for Switches ("Ada") use ("-fsanitize=address");
+         when others =>
+            null;
+      end case;
+   end Linker;
 
 end LAL_Tools_Common;
