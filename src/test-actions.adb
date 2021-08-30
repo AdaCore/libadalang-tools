@@ -906,6 +906,7 @@ package body Test.Actions is
       Put (" -Pproject        - Use project file project. Only one such switch can be used\n");
       Put (" -U               - Process all sources of the argument project\n");
       Put (" -U main          - Process the closure of units rooted at unit main\n");
+      Put (" --no-subprojects - Process sources of root project only\n");
       Put (" -Xname=value     - Specify an external reference for argument project file\n");
       Put (" -eL              - Follow all symbolic links when processing project files\n");
       Put (" --target=target  - Specify a target\n");

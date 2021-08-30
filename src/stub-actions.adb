@@ -1677,6 +1677,7 @@ package body Stub.Actions is
       Put ("  -Pproject              Use project file project\n");
       Put ("  -U                     process all sources of the argument project\n");
       Put ("  -U main                process the closure of units rooted at unit main\n");
+      Put ("  --no-subprojects       process sources of root project only\n");
       Put ("  -Xname=value           specify an external reference for argument project file\n");
       Put ("  -eL                    follow all symbolic links when processing project files\n");
       Put ("\n");

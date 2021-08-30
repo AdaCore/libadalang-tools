@@ -9,6 +9,7 @@ options:
   -Pproject              Use project file project
   -U                     process all sources of the argument project
   -U main                process the closure of units rooted at unit main
+  --no-subprojects       process sources of root project only
   -Xname=value           specify an external reference for argument project file
   -eL                    follow all symbolic links when processing project files
 

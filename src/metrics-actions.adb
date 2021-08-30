@@ -4369,6 +4369,7 @@ package body METRICS.Actions is
       Put (" -Pproject        - Use project file project. Only one such switch can be used\n");
       Put (" -U               - process all sources of the argument project\n");
       Put (" -U main          - process the closure of units rooted at unit main\n");
+      Put (" --no-subprojects - Process sources of root project only\n");
       Put (" -Xname=value     - specify an external reference for argument project file\n");
       Put (" --subdirs=dir    - specify subdirectory to place the result files into\n");
       Put (" -eL              - follow all symbolic links when processing project files\n");
