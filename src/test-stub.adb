@@ -522,6 +522,28 @@ package body Test.Stub is
             Generic_Layers_Counter := Generic_Layers_Counter + 1;
          end if;
 
+         if Element.Kind in Ada_Base_Type_Decl then
+            if not Element.As_Basic_Decl.F_Aspects.Is_Null then
+               for Assoc of Element.As_Basic_Decl.F_Aspects.F_Aspect_Assocs
+               loop
+                  if To_Lower (Node_Image (Assoc.F_Id)) = "type_invariant" then
+
+                     Report_Std
+                       ("warning: (gnattest) "
+                        & Base_Name (Assoc.Unit.Get_Filename)
+                        & ":"
+                        & Trim (First_Line_Number (Assoc)'Img, Both)
+                        & ":"
+                        & Trim (First_Column_Number (Assoc)'Img, Both)
+                        & ": type_invariant aspect");
+                     Report_Std
+                       ("this can cause circularity in the test harness", 1);
+                  end if;
+
+               end loop;
+            end if;
+         end if;
+
          Elem_Node.Inside_Protected := Inside_Protected;
 
          if Requires_Body (Element.As_Ada_Node) then

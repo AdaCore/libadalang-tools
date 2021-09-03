@@ -1137,6 +1137,14 @@ package body Test.Common is
             end if;
             Sibl := Sibl.Next_Sibling;
          end loop;
+
+         for Pr of CU.F_Pragmas loop
+            if Check_Name (Node_Image (Pr.As_Pragma_Node.F_Id))
+            then
+               Report_Elab (Pr);
+               return;
+            end if;
+         end loop;
       end Process_CU;
 
       Body_N : Body_Node;
