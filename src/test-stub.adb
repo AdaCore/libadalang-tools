@@ -1345,7 +1345,7 @@ package body Test.Stub is
       if Is_Root (Parent (Cur)) then
          if not Markered_Data.Is_Empty then
             Report_Std
-              (" warning: "
+              (" warning: (gnattest) "
                & Node.Spec_Name.all
                & " has dangling element(s)");
 
@@ -3604,7 +3604,7 @@ package body Test.Stub is
       if not Markered_Subp_Data.Is_Empty then
 
          Report_Std
-           (" warning: "
+           (" warning: (gnattest) "
             & Root_Node.Spec_Name.all
             & "."
             & Stub_Data_Unit_Name
@@ -3733,7 +3733,7 @@ package body Test.Stub is
       if not Markered_Subp_Data.Is_Empty then
 
          Report_Std
-           (" warning: "
+           (" warning: (gnattest) "
             & Root_Node.Spec_Name.all
             & "."
             & Stub_Data_Unit_Name

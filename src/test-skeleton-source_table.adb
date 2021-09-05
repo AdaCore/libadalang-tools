@@ -505,11 +505,9 @@ package body Test.Skeleton.Source_Table is
          SFR := Source_File_Table.Element (SF_Table, SN);
       else
          Report_Std
-           ("warning: "
+           ("warning: (gnattest) "
             & Source_Name
-            & " is not a source of argument project");
-         Report_Std
-           ("         cannot create stub");
+            & " is not a source of argument project, cannot create stub");
 
          return "";
       end if;

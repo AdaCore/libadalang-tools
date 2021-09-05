@@ -3154,7 +3154,7 @@ package body Test.Skeleton is
 
                if Name = null then
                   Report_Std
-                    (" warning: "
+                    ("warning: (gnattest) "
                      & Base_Name (Next.Unit.Get_Filename)
                      & ":"
                      & Trim (First_Line_Number (Next)'Img, Both)
@@ -3201,7 +3201,7 @@ package body Test.Skeleton is
 
                   if Name = null then
                      Report_Std
-                       (" warning: "
+                       ("warning: (gnattest) "
                         & Base_Name (Assoc.Unit.Get_Filename)
                         & ":"
                         & Trim (First_Line_Number (Assoc)'Img, Both)
@@ -5276,7 +5276,8 @@ package body Test.Skeleton is
 
                         if MD.Issue_Warning then
                            Report_Std
-                             (Base_Name (Data.Unit_File_Name.all)
+                             ("warning: (gnattest) "
+                              & Base_Name (Data.Unit_File_Name.all)
                               & ":"
                               & Trim
                                 (First_Line_Number
@@ -5287,7 +5288,7 @@ package body Test.Skeleton is
                                 (First_Column_Number
                                  (Current_Subp.Subp_Declaration)'Img,
                                  Both)
-                              & ": warning: test for "
+                              & ": test for "
                               & MD.Short_Name.all
                               & " at "
                               & Unit_Name.all
@@ -5334,7 +5335,7 @@ package body Test.Skeleton is
 
             if not Markered_Data_Map_Is_Empty then
                Report_Std
-                 (" warning: "
+                 ("warning: (gnattest) "
                   & Unit_Name.all
                   & " has dangling test(s)");
             end if;
@@ -6440,7 +6441,8 @@ package body Test.Skeleton is
 
                            if MD.Issue_Warning then
                               Report_Std
-                                (Base_Name (Data.Unit_File_Name.all)
+                                ("warning: (gnattest) "
+                                 & Base_Name (Data.Unit_File_Name.all)
                                  & ":"
                                  & Trim
                                    (First_Line_Number
@@ -6451,7 +6453,7 @@ package body Test.Skeleton is
                                    (First_Column_Number
                                     (Current_Subp.Subp_Declaration)'Img,
                                     Both)
-                                 & ": warning: test for "
+                                 & ": test for "
                                  & MD.Short_Name.all
                                  & " at "
                                  & Unit_Name.all
@@ -6498,7 +6500,7 @@ package body Test.Skeleton is
 
                if not Markered_Data_Map_Is_Empty then
                   Report_Std
-                    (" warning: "
+                    (" warning: (gnattest) "
                      & Unit_Name.all
                      & " has dangling test(s)");
                end if;
@@ -8602,8 +8604,9 @@ package body Test.Skeleton is
       for GP of Gen_Package_Storage loop
          if not GP.Has_Instantiation then
             Report_Std
-              (GP.Sloc.all
-               & ": warning: no instance of "
+              ("warning: (gnattest) "
+               & GP.Sloc.all
+               & ": no instance of "
                & GP.Name.all);
             Report_Std
               (" corresponding tests are not included into harness");
