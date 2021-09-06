@@ -2633,7 +2633,7 @@ package body Test.Skeleton is
          P_Assoc := Pragma_Params.List_Child
            (PP_First + 2).As_Pragma_Argument_Assoc;
 
-         if To_Lower (Node_Image (P_Assoc.F_Id)) = "requires" then
+         if To_Lower (Node_Image (P_Assoc.F_Expr)) = "requires" then
             Requires := P_Assoc.F_Expr;
          else
             Requires := No_Expr;
