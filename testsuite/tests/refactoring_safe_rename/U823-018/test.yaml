@@ -1,0 +1,6 @@
+description: |
+    This test checks if the safe rename tool correctly handles
+    the rename of a generic package declaration and declarations
+    inside it.
+
+driver: shell_script
