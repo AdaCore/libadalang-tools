@@ -86,5 +86,5 @@ Start_Column: 14
 End_Line: 25
 End_Column: 17
 Problems:
-Renaming Baz to File_Type hides <Id "File_Type" a-textio.ads:65:9-65:18>
+Renaming Baz to File_Type hides <Id "File_Type" a-textio.ads:66:9-66:18>
 
