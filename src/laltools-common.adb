@@ -217,33 +217,71 @@ package body Laltools.Common is
       Units            : Analysis_Unit_Array)
       return Base_Id_Vectors.Vector
    is
-      Parents   : constant Ada_Node_Array := Param_Definition.Parents;
+      --  The semantic parent of this parameter can either be a subprogram
+      --  declaration or an access to a subprogram definition.
+      --  In the latter case, there is no need to rename the parameter in the
+      --  entire hierarchy since Ada allows different names.
+      --
+      --  Example:
+      --
+      --     procedure Bar (Self : A; Baz : access procedure (P : Boolean))
+      --     is abstract;
+      --
+      --     overriding
+      --     procedure Bar (Self : B; Baz : access procedure (Q : Boolean));
+      --
+      --     The parameters of Baz have different names (P and Q) and this is
+      --     allowed. Therefore, only references need to be renamed.
 
-      Subp : constant Basic_Decl :=
-        Parents (Parents'First + 6).As_Basic_Decl;
+      Semantic_Parent         : constant Ada_Node :=
+        Param_Definition.P_Semantic_Parent;
+      Is_Semantic_Parent_Subp : constant Boolean :=
+        not Semantic_Parent.Is_Null
+        and then Semantic_Parent.Kind in Ada_Basic_Decl
+        and then Is_Subprogram (Semantic_Parent.As_Basic_Decl);
+      Semantic_Parent_Subp    : constant Basic_Decl :=
+        (if Is_Semantic_Parent_Subp then Semantic_Parent.As_Basic_Decl
+         else No_Basic_Decl);
 
       Hierarchy : constant Basic_Decl_Array :=
-        Get_Subp_Hierarchy (Subp, Units);
+        (if Is_Semantic_Parent_Subp then
+            Get_Subp_Hierarchy (Semantic_Parent_Subp, Units)
+         else (1 .. 0 => <>));
 
       Param_References : Base_Id_Vectors.Vector;
+
    begin
-      for Decl of Hierarchy loop
-         for Param_Spec of
-           Decl.As_Basic_Subp_Decl.P_Subp_Decl_Spec.P_Params
-         loop
-            for Param of Param_Spec.F_Ids loop
-               if Param_Definition.Text = Param.Text then
-                  Param_References.Append
-                    (Param.P_Canonical_Part.F_Name.As_Base_Id);
-                  for Reference of
-                    Param.P_Canonical_Part.P_Find_All_References (Units)
-                  loop
-                     Param_References.Append (Ref (Reference).As_Base_Id);
-                  end loop;
-               end if;
+      if Is_Semantic_Parent_Subp then
+         --  This is a parameter of a non-anonymous subprogram declaration so
+         --  rename it in whole hierarchy.
+
+         for Decl of Hierarchy loop
+            for Param_Spec of Decl.P_Subp_Spec_Or_Null.P_Params loop
+               for Param of Param_Spec.F_Ids loop
+                  if Param_Definition.Text = Param.Text then
+                     Param_References.Append
+                       (Param.P_Canonical_Part.F_Name.As_Base_Id);
+                     for Reference of
+                       Param.P_Canonical_Part.P_Find_All_References (Units)
+                     loop
+                        Param_References.Append (Ref (Reference).As_Base_Id);
+                     end loop;
+                  end if;
+               end loop;
             end loop;
          end loop;
-      end loop;
+
+      else
+         --  This is a parameter of an access to a subprogram definition, so
+         --  only replace its references.
+
+         for Reference of
+           Param_Definition.P_Canonical_Part.P_Find_All_References (Units)
+         loop
+            Param_References.Append (Ref (Reference).As_Base_Id);
+         end loop;
+      end if;
+
       return Param_References;
    end Find_All_Param_References_In_Subp_Hierarchy;
 

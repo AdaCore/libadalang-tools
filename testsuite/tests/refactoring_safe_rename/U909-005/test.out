@@ -1,0 +1,36 @@
+# Renaming node foo.ads:3:53: 
+References:
+Unit:foo.ads
+Line: 3
+Source Location Range:
+Start_Line: 3
+Start_Column: 53
+End_Line: 3
+End_Column: 54
+
+# Renaming node foo.ads:5:64: 
+References:
+Unit:foo.ads
+Line: 5
+Source Location Range:
+Start_Line: 5
+Start_Column: 64
+End_Line: 5
+End_Column: 65
+
+# Renaming node foo.adb:2:64: 
+References:
+Unit:foo.adb
+Line: 2
+Source Location Range:
+Start_Line: 2
+Start_Column: 64
+End_Line: 2
+End_Column: 65
+Line: 6
+Source Location Range:
+Start_Line: 6
+Start_Column: 12
+End_Line: 6
+End_Column: 13
+

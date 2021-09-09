@@ -1,0 +1,9 @@
+description: |
+    This test checks if the safe rename tool correctly handles
+    the rename of parameters of an access to a subprogram.
+
+    Test output in incomplete. P_Find_All_References on a parameter of an access
+    to a subprogram does not find the canonical part. This will be fixed in
+    U909-017.
+
+driver: shell_script
