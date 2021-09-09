@@ -1097,7 +1097,7 @@ package body Laltools.Refactor.Safe_Rename is
          Subp_B_Params :=
            Create_Parameter_Data_Vector (Subp_Spec_B.F_Subp_Params);
 
-         case Subp_Spec_A.F_Subp_Kind is
+         case Ada_Subp_Kind'(Subp_Spec_A.F_Subp_Kind) is
             when Ada_Subp_Kind_Procedure =>
                --  This is a procedure, so the base and derived type must
                --  be the type of the first parameter. Therefore, simply

@@ -3689,7 +3689,7 @@ package body METRICS.Actions is
                begin
                   Inc (M.Vals (Param_Number), By => Num);
 
-                  case Param_Spec.F_Mode is
+                  case Ada_Mode'(Param_Spec.F_Mode) is
                      when Ada_Mode_Default | Ada_Mode_In =>
                         Inc (M.Vals (In_Parameters), By => Num);
                      when Ada_Mode_Out =>

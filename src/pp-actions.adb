@@ -4003,7 +4003,7 @@ package body Pp.Actions is
          begin
             case Expr.Kind is
                when Ada_Bin_Op | Ada_Relation_Op =>
-                  case Expr.As_Bin_Op.F_Op is
+                  case Ada_Op'(Expr.As_Bin_Op.F_Op) is
                      when Ada_Op_In | Ada_Op_Not_In =>
                         raise Program_Error;
 --  ???Don't treat membership tests as operators, for now
@@ -4163,7 +4163,7 @@ package body Pp.Actions is
             --  operator, except for "+" and "-".
 
             else
-               case F_Op (Expr) is
+               case Ada_Op'(F_Op (Expr)) is
                   when Ada_Op_Plus | Ada_Op_Minus =>
                      Interpret_Alt_Template (Un_Op_No_Space_Alt, Subtrees (Expr));
                   when Ada_Op_Abs | Ada_Op_Not =>
