@@ -1,0 +1,47 @@
+with Ada.Text_IO; use Ada.Text_IO;
+procedure Main is
+   Corge_Garply : Integer  := 1;
+   Foo_Bar      : constant := 1;
+begin
+   Put_Line (Foo_Bar'Image);
+end Main;
+
+with Ada.Text_IO; use Ada.Text_IO;
+procedure Main is
+   Corge_Garply : Integer  := 1;
+   Foo_Bar      : constant := 1;
+begin
+   Put_Line (Foo_Bar'Image);
+end Main;
+
+with Ada.Text_IO; use Ada.Text_IO;
+procedure Main is
+   Corge_Garply : Integer  := 1;
+   foo_Bar      : constant := 1;
+begin
+   Put_Line (foo_Bar'Image);
+end Main;
+
+with Ada.Text_IO; use Ada.Text_IO;
+procedure Main is
+   Corge_Garply : Integer  := 1;
+   FOO_BAR      : constant := 1;
+begin
+   Put_Line (FOO_BAR'Image);
+end Main;
+
+with Ada.Text_IO; use Ada.Text_IO;
+procedure Main is
+   Corge_Garply : Integer  := 1;
+   foo_bar      : constant := 1;
+begin
+   Put_Line (foo_bar'Image);
+end Main;
+
+with Ada.Text_IO; use Ada.Text_IO;
+procedure Main is
+   Corge_Garply : Integer  := 1;
+   Foo_Bar      : constant := 1;
+begin
+   Put_Line (Foo_Bar'Image);
+end Main;

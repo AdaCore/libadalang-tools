@@ -179,7 +179,8 @@ package Pp.Command_Lines is
        Type_Mixed_Case => +"-ntM"));
 
    type Number_Casing is
-     (Number_Case_As_Declared,
+     (Number_Case_As_Constant,
+      Number_Case_As_Declared,
       Number_Lower_Case,
       Number_Upper_Case,
       Number_Mixed_Case);
@@ -190,7 +191,8 @@ package Pp.Command_Lines is
 
    package Number_Casing_Shorthands is
       new Number_Casing_Switches.Set_Shorthands
-     ((Number_Case_As_Declared => +"-nnD",
+     ((Number_Case_As_Constant => +"-nnC",
+       Number_Case_As_Declared => +"-nnD",
        Number_Lower_Case => +"-nnL",
        Number_Upper_Case => +"-nnU",
        Number_Mixed_Case => +"-nnM"));
@@ -211,7 +213,8 @@ package Pp.Command_Lines is
        Pragma_Mixed_Case => +"-pM"));
 
    type Constant_Casing is
-     (Constant_Case_As_Declared,
+     (Constant_Case_As_Non_Constant,
+      Constant_Case_As_Declared,
       Constant_Mixed_Case,
       Constant_Lower_Case,
       Constant_Upper_Case);
@@ -222,7 +225,8 @@ package Pp.Command_Lines is
 
    package Constant_Casing_Shorthands is
       new Constant_Casing_Switches.Set_Shorthands
-       ((Constant_Case_As_Declared => +"-cD",
+       ((Constant_Case_As_Non_Constant => +"-cN",
+         Constant_Case_As_Declared => +"-cD",
          Constant_Lower_Case => +"-cL",
          Constant_Upper_Case => +"-cU",
          Constant_Mixed_Case => +"-cM"));
@@ -545,25 +549,27 @@ package Pp.Command_Lines is
    --  Defines the casing for both defining and usage occurrences of the
    --  type (and subtype???) names.
 
-   function PP_Number_Casing
-     (Cmd : Cmd_Line) return PP_Casing is
-      (case Number_Casing'(Arg (Cmd)) is
-         when Number_Case_As_Declared => PP_Name_Casing (Cmd),
-         when Number_Mixed_Case => Mixed,
-         when Number_Lower_Case => Lower_Case,
-         when Number_Upper_Case => Upper_Case);
-   --  Defines the casing for both defining and usage occurrences of the
-   --  named numbers names.
-
    function PP_Constant_Casing
      (Cmd : Cmd_Line) return PP_Casing is
       (case Constant_Casing'(Arg (Cmd)) is
-         when Constant_Case_As_Declared => PP_Name_Casing (Cmd),
+         when Constant_Case_As_Non_Constant => PP_Name_Casing (Cmd),
+         when Constant_Case_As_Declared => As_Declared,
          when Constant_Mixed_Case => Mixed,
          when Constant_Lower_Case => Lower_Case,
          when Constant_Upper_Case => Upper_Case);
    --  Defines the casing for both defining and usage occurrences of constant
    --  object declarations.
+
+   function PP_Number_Casing
+     (Cmd : Cmd_Line) return PP_Casing is
+      (case Number_Casing'(Arg (Cmd)) is
+         when Number_Case_As_Constant => PP_Constant_Casing (Cmd),
+         when Number_Case_As_Declared => As_Declared,
+         when Number_Mixed_Case => Mixed,
+         when Number_Lower_Case => Lower_Case,
+         when Number_Upper_Case => Upper_Case);
+   --  Defines the casing for both defining and usage occurrences of the
+   --  named numbers names.
 
    function PP_Indentation (Cmd : Cmd_Line) return Positive is
      (Arg (Cmd, Indentation));
