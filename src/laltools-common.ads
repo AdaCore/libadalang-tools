@@ -63,6 +63,12 @@ package Laltools.Common is
       or else Left.Sloc_Range < Right.Sloc_Range);
    --  Use the Sloc to compare two Base_Id nodes when their text is equal.
 
+   function Node_Equal
+     (Left, Right : Libadalang.Analysis.Ada_Node)
+      return Boolean is (Libadalang.Analysis.Full_Sloc_Image (Left)
+                         = Libadalang.Analysis.Full_Sloc_Image (Right));
+   --  Libadalang.Analysis."=" is not enough to fully detect duplicates
+
    type Analysis_Unit_Array_Access is access Analysis_Unit_Array;
 
    package Ada_Node_List_Vectors is new Ada.Containers.Vectors
@@ -101,8 +107,8 @@ package Laltools.Common is
    package Node_Sets is new Ada.Containers.Hashed_Sets
      (Element_Type        => Ada_Node,
       Hash                => Hash,
-      Equivalent_Elements => "=",
-      "="                 => "=");
+      Equivalent_Elements => Node_Equal,
+      "="                 => Node_Equal);
 
    package References_Sets is new Ada.Containers.Ordered_Sets
      (Element_Type => Base_Id,
