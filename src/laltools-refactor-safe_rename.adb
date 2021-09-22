@@ -1582,8 +1582,12 @@ package body Laltools.Refactor.Safe_Rename is
 
       Param_Spec : Libadalang.Analysis.Param_Spec renames
         Self.Canonical_Definition.P_Basic_Decl.As_Param_Spec;
-      Subtype_Indication : Libadalang.Analysis.Subtype_Indication renames
-        Param_Spec.F_Type_Expr.As_Subtype_Indication;
+      Type_Expr : Libadalang.Analysis.Type_Expr renames
+        Param_Spec.F_Type_Expr;
+      Subtype_Indication : constant Libadalang.Analysis.Subtype_Indication :=
+        (if Type_Expr.Kind in Ada_Subtype_Indication
+         then Type_Expr.As_Subtype_Indication
+         else No_Subtype_Indication);
       Param_Spec_List : Libadalang.Analysis.Param_Spec_List renames
         Self.Canonical_Definition.P_Basic_Decl.Parent.As_Param_Spec_List;
 
@@ -1593,6 +1597,7 @@ package body Laltools.Refactor.Safe_Rename is
          --  subtype indication
 
          if Param_Spec.F_Type_Expr.Kind = Ada_Subtype_Indication
+           and then not Subtype_Indication.Is_Null
            and then Subtype_Indication.F_Name.Kind = Ada_Identifier
            and then Subtype_Indication.F_Name.Text = To_Text (Self.New_Name)
          then
