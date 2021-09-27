@@ -369,52 +369,57 @@ package Laltools.Common is
    --  Package_Body.
 
    function Get_Package_Declarative_Parts
-     (Pkg_Decl : Package_Decl)
+     (Pkg_Decl : Base_Package_Decl'Class)
       return Declarative_Part_Vectors.Vector;
-   --  Gets all the Declarative_Parts associated to a Package_Decl
+   --  Gets all the Declarative_Parts associated to a Base_Package_Decl
    --  (public, private and body declarative parts).
 
    function Get_Package_Declarative_Parts
      (Pkg_Body : Package_Body)
       return Declarative_Part_Vectors.Vector
    is (Get_Package_Declarative_Parts
-       (Pkg_Body.P_Canonical_Part.As_Package_Decl));
+       (Pkg_Body.P_Canonical_Part.As_Base_Package_Decl));
    --  Gets all the Declarative_Parts associated to a Package_Body
    --  (public, private and body declarative parts).
 
-   function Get_Package_Decls (Pkg_Decl : Package_Decl)
-                               return Ada_List_Vector;
+   function Get_Package_Decls
+     (Pkg_Decl : Base_Package_Decl'Class)
+      return Ada_List_Vector;
    --  Gets all the Ada_Node_Lists of the Declarative_Parts associated to a
-   --- Package_Decl (public, private and body declarative parts).
+   --  Base_Package_Decl (public, private and body declarative parts).
 
    function Get_Package_Decls
      (Pkg_Body : Package_Body)
       return Ada_List_Vector
-   is (Get_Package_Decls (Pkg_Body.P_Canonical_Part.As_Package_Decl));
+   is (Get_Package_Decls (Pkg_Body.P_Canonical_Part.As_Base_Package_Decl));
    --  Gets all the Ada_Node_Lists of the Declarative_Parts associated to a
    --- Package_Body (public, private and body declarative parts).
 
-   function Get_Package_Decl_Private_Declarative_Part (Pkg_Decl : Package_Decl)
-                                                       return Declarative_Part;
-   --  Gets the private Declarative_Part associated to a Package_Body.
+   function Get_Package_Decl_Private_Declarative_Part
+     (Pkg_Decl : Base_Package_Decl'Class)
+      return Declarative_Part;
+   --  Gets the private Declarative_Part associated to a Package_Body
 
-   function Get_Package_Decl_Private_Decls (Pkg_Decl : Package_Decl)
-                                            return Ada_Node_List;
+   function Get_Package_Decl_Private_Decls
+     (Pkg_Decl : Base_Package_Decl'Class)
+      return Ada_Node_List;
    --  Gets the Ada_Node_List of the private Declarative_Part associated to a
    --  Package_Body, if it exists.
 
-   function Get_Package_Decl_Public_Declarative_Part (Pkg_Decl : Package_Decl)
-                                                      return Declarative_Part;
-   --  Gets the public Declarative_Part associated to a Package_Decl.
+   function Get_Package_Decl_Public_Declarative_Part
+     (Pkg_Decl : Base_Package_Decl'Class)
+      return Declarative_Part;
+   --  Gets the public Declarative_Part associated to a Base_Package_Decl
 
-   function Get_Package_Decl_Public_Decls (Pkg_Decl : Package_Decl)
-                                           return Ada_Node_List;
+   function Get_Package_Decl_Public_Decls
+     (Pkg_Decl : Base_Package_Decl'Class)
+      return Ada_Node_List;
    --  Gets the Ada_Node_List of the the public Declarative_Part associated to
    --  a Package_Decl.
 
    function Get_Param_Spec_Index (Target : Param_Spec) return Positive
      with Pre => not Target.Is_Null;
-   --  Returns the index of 'Target' regardind its parent Param_Spec_List.
+   --  Returns the index of 'Target' regardind its parent Param_Spec_List
 
    function Get_Parameter_Absolute_Index
      (Target : Defining_Name)

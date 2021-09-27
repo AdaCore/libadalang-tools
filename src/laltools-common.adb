@@ -617,8 +617,10 @@ package body Laltools.Common is
 
             begin
                if not Pkg_Decl.Is_Null then
-                  Public_Decl_Part := Pkg_Decl.As_Package_Decl.F_Public_Part;
-                  Private_Decl_Part := Pkg_Decl.As_Package_Decl.F_Private_Part;
+                  Public_Decl_Part :=
+                    Pkg_Decl.As_Base_Package_Decl.F_Public_Part;
+                  Private_Decl_Part :=
+                    Pkg_Decl.As_Base_Package_Decl.F_Private_Part;
                end if;
             end;
 
@@ -1058,8 +1060,9 @@ package body Laltools.Common is
 
             when Ada_Package_Body_Range =>
                declare
-                  Pkg_Decl          : constant Package_Decl :=
-                    Owner.As_Package_Body.P_Canonical_Part.As_Package_Decl;
+                  Pkg_Decl          : constant Base_Package_Decl :=
+                    Owner.As_Package_Body.P_Canonical_Part.
+                      As_Base_Package_Decl;
                   Private_Decl_Part : constant Private_Part :=
                     Pkg_Decl.F_Private_Part;
 
@@ -1085,12 +1088,12 @@ package body Laltools.Common is
             when Ada_Base_Package_Decl =>
                declare
                   Pkg_Body          : constant Package_Body :=
-                    Owner.As_Package_Decl.P_Body_Part;
+                    Owner.As_Base_Package_Decl.P_Body_Part;
                   Private_Decl_Part : constant Private_Part :=
-                    Owner.As_Package_Decl.F_Private_Part;
+                    Owner.As_Base_Package_Decl.F_Private_Part;
 
                begin
-                  Decl_Parts.Append (Owner.As_Package_Decl.F_Public_Part);
+                  Decl_Parts.Append (Owner.As_Base_Package_Decl.F_Public_Part);
 
                   if not Private_Decl_Part.Is_Null then
                      Decl_Parts.Append (Private_Decl_Part);
@@ -1272,8 +1275,10 @@ package body Laltools.Common is
 
             begin
                if not Pkg_Decl.Is_Null then
-                  Public_Decl_Part := Pkg_Decl.As_Package_Decl.F_Public_Part;
-                  Private_Decl_Part := Pkg_Decl.As_Package_Decl.F_Private_Part;
+                  Public_Decl_Part :=
+                    Pkg_Decl.As_Base_Package_Decl.F_Public_Part;
+                  Private_Decl_Part :=
+                    Pkg_Decl.As_Base_Package_Decl.F_Private_Part;
                end if;
             end;
 
@@ -1444,18 +1449,18 @@ package body Laltools.Common is
    ----------------------------------------
 
    function Get_Package_Declarative_Parts
-     (Pkg_Decl : Package_Decl)
+     (Pkg_Decl : Base_Package_Decl'Class)
       return Declarative_Part_Vectors.Vector
    is
       Decls : Declarative_Part_Vectors.Vector;
 
-      --  A Package_Decl always has a Public_Part but might not have a
+      --  A Base_Package_Decl always has a Public_Part but might not have a
       --  Private_Part or an associated Package_Body with a Declarative_Part.
 
       Private_Part : Declarative_Part;
       Body_Part    : Declarative_Part;
    begin
-      if Pkg_Decl = No_Package_Decl then
+      if Pkg_Decl.Is_Null then
          return Decls;
       end if;
 
@@ -1483,7 +1488,7 @@ package body Laltools.Common is
    -----------------------
 
    function Get_Package_Decls
-     (Pkg_Decl : Package_Decl)
+     (Pkg_Decl : Base_Package_Decl'Class)
       return Ada_List_Vector is
    begin
       return Result : Ada_List_Vector do
@@ -1501,14 +1506,10 @@ package body Laltools.Common is
    -----------------------------------------------
 
    function Get_Package_Decl_Private_Declarative_Part
-     (Pkg_Decl : Package_Decl)
-      return Declarative_Part
-   is
-      use type Package_Decl;
+     (Pkg_Decl : Base_Package_Decl'Class)
+      return Declarative_Part is
    begin
-      if Pkg_Decl = No_Package_Decl
-        or else Pkg_Decl.F_Private_Part = No_Private_Part
-      then
+      if Pkg_Decl.Is_Null or else Pkg_Decl.F_Private_Part.Is_Null then
          return No_Declarative_Part;
       end if;
 
@@ -1520,17 +1521,10 @@ package body Laltools.Common is
    ------------------------------------
 
    function Get_Package_Decl_Private_Decls
-     (Pkg_Decl : Package_Decl)
-      return Ada_Node_List
-   is
-      use type Package_Decl;
-      --  use type Private_Part;
-      use type Ada_Node;
+     (Pkg_Decl : Base_Package_Decl'Class)
+      return Ada_Node_List is
    begin
-      if Pkg_Decl = No_Package_Decl
-      --  or else Pkg_Decl.F_Private_Part = No_Private_Part
-        or else Pkg_Decl.F_Private_Part.As_Ada_Node = No_Ada_Node
-      then
+      if Pkg_Decl.Is_Null or else Pkg_Decl.F_Private_Part.Is_Null then
          return No_Ada_Node_List;
       end if;
 
@@ -1542,12 +1536,10 @@ package body Laltools.Common is
    ----------------------------------------------
 
    function Get_Package_Decl_Public_Declarative_Part
-     (Pkg_Decl : Package_Decl)
-      return Declarative_Part
-   is
-      use type Package_Decl;
+     (Pkg_Decl : Base_Package_Decl'Class)
+      return Declarative_Part is
    begin
-      if Pkg_Decl = No_Package_Decl then
+      if Pkg_Decl.Is_Null then
          return No_Declarative_Part;
       end if;
 
@@ -1559,12 +1551,10 @@ package body Laltools.Common is
    -----------------------------------
 
    function Get_Package_Decl_Public_Decls
-     (Pkg_Decl : Package_Decl)
-      return Ada_Node_List
-   is
-      use type Package_Decl;
+     (Pkg_Decl : Base_Package_Decl'Class)
+      return Ada_Node_List is
    begin
-      if Pkg_Decl = No_Package_Decl then
+      if Pkg_Decl.Is_Null then
          return No_Ada_Node_List;
       end if;
 
@@ -1748,7 +1738,8 @@ package body Laltools.Common is
 
       procedure Process_Top_Level_Decl (TLD : Basic_Decl);
       --  Processes the top level declaration of a unit if it is a
-      --  Package_Decl, Generic_Package_Instantiation or a Package_Rename_Decl.
+      --  Base_Package_Decl, Generic_Package_Instantiation or a
+      --  Package_Rename_Decl.
       --  Processes by getting the public part of the package, casting it
       --  as Declarative_Part and adding it to Declarative_Parts.
       --  This package can be recursive up to one time, i.e., it can call
@@ -1766,8 +1757,8 @@ package body Laltools.Common is
       begin
          if not TLD.Is_Null then
             case TLD.Kind is
-               when Ada_Package_Decl_Range =>
-                  Public_Parts.Append (TLD.As_Package_Decl.F_Public_Part);
+               when Ada_Base_Package_Decl =>
+                  Public_Parts.Append (TLD.As_Base_Package_Decl.F_Public_Part);
 
                when Ada_Generic_Package_Instantiation_Range =>
                   --  If TLD is a Generic_Package_Instantiation then we need to

@@ -894,7 +894,7 @@ package body Laltools.Refactor.Safe_Rename is
      (Self : Collision_With_Compilation_Unit_Finder)
       return Rename_Problem'Class
    is
-      Parent_Package : Package_Decl := No_Package_Decl;
+      Parent_Package : Base_Package_Decl := No_Base_Package_Decl;
 
       package Compilation_Unit_Vectors is new Ada.Containers.Indefinite_Vectors
         (Index_Type   => Natural,
@@ -911,11 +911,11 @@ package body Laltools.Refactor.Safe_Rename is
          case Parent.Kind is
             when Ada_Package_Body =>
                Parent_Package :=
-                 Parent.As_Package_Body.P_Canonical_Part.As_Package_Decl;
+                 Parent.As_Package_Body.P_Canonical_Part.As_Base_Package_Decl;
                exit Find_Parent_Package;
 
-            when Ada_Package_Decl =>
-               Parent_Package := Parent.As_Package_Decl;
+            when Ada_Base_Package_Decl =>
+               Parent_Package := Parent.As_Base_Package_Decl;
                exit Find_Parent_Package;
 
             when Ada_Subp_Body | Ada_Task_Body | Ada_Decl_Block =>
@@ -926,7 +926,7 @@ package body Laltools.Refactor.Safe_Rename is
          end case;
       end loop Find_Parent_Package;
 
-      if Parent_Package = No_Package_Decl then
+      if Parent_Package.Is_Null then
          return No_Rename_Problem;
       end if;
 
