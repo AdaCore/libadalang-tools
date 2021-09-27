@@ -54,6 +54,19 @@ package body Laltools.Common is
       return Left.Start_Line < Right.Start_Line;
    end "<";
 
+   ------------------------
+   -- Append_If_Not_Null --
+   ------------------------
+
+   procedure Append_If_Not_Null
+     (Vector : in out Ada_List_Vector;
+      List   : Ada_List'Class) is
+   begin
+      if not List.Is_Null then
+         Vector.Append (List);
+      end if;
+   end Append_If_Not_Null;
+
    ---------------------------
    -- Compilation_Unit_Hash --
    ---------------------------
@@ -342,117 +355,169 @@ package body Laltools.Common is
    -- Find_Local_Scopes --
    -----------------------
 
-   function Find_Local_Scopes (Node : Ada_Node'Class)
-                               return Ada_Node_List_Vectors.Vector
+   function Find_Local_Scopes
+     (Node : Ada_Node'Class)
+      return Ada_List_Vector
    is
-      use type Ada_Node;
-      use type Ada_Node_Kind_Type;
+      Local_Scopes_Owner : Ada_Node;
+
+      procedure Set_Local_Scopes_Owner
+        (Owner : Ada_Node;
+         Stop  : in out Boolean);
+      --  Callback for Find_Matching_Parents that sets
+      --  Parent_Declarative_Part_Or_Decl_Owner and stops the iteration.
+
+      function Is_Local_Scopes_Owner
+        (Node : Ada_Node'Class)
+         return Boolean
+        with Post => (if Is_Local_Scopes_Owner'Result
+                      then Is_Declarative_Part_Owner (Node)
+                           xor Is_Decl_Expr_Owner (Node)
+                           xor Node.Kind in Ada_Classic_Subp_Decl
+                           xor Node.Kind in Ada_Generic_Subp_Decl_Range);
+      --  Return True if Is_Declarative_Part_Owner (Node) or else
+      --  Is_Decl_Expr_Owner (Node) or else Node.Kin in Ada_Subp_Decl_Range.
+
+      function Process_Declarative_Part_Owner
+        (Declarative_Part_Owner : Ada_Node'Class)
+         return Ada_List_Vector;
+      --  Gets all Declarative_Part'Class nodes of Declarative_Part_Owner and
+      --  return a vector with their Ada_Node_List nodes.
+
+      function Process_Decl_Expr_Owner
+        (Decl_Expr_Owner : Expr_Function)
+         return Ada_List_Vector;
+      --  Returns a vector with the Basic_Decl_List of Decl_Expr_Owner
+
+      function Process_Body_Part
+        (Body_Part : Base_Subp_Body)
+         return Ada_List_Vector;
+      --  Checks if Is_Declarative_Part_Owner (Body_Part) or else
+      --  Is_Decl_Expr_Owner (Body_Part), and if so, processes Body_Part
+      --  with Process_Declarative_Part_Owner and Process_Decl_Expr_Owner
+      --  respectively.
+
+      ----------------------------
+      -- Set_Local_Scopes_Owner --
+      ----------------------------
+
+      procedure Set_Local_Scopes_Owner
+        (Owner : Ada_Node;
+         Stop  : in out Boolean) is
+      begin
+         Local_Scopes_Owner := Owner;
+         Stop := True;
+      end Set_Local_Scopes_Owner;
+
+      ---------------------------
+      -- Is_Local_Scopes_Owner --
+      ---------------------------
+
+      function Is_Local_Scopes_Owner
+        (Node : Ada_Node'Class)
+         return Boolean
+      is (not Node.Is_Null
+          and then (Is_Declarative_Part_Owner (Node)
+                    or else Is_Decl_Expr_Owner (Node)
+                    or else Node.Kind in Ada_Classic_Subp_Decl
+            or else Node.Kind in Ada_Generic_Subp_Decl_Range));
+
+      ------------------------------------
+      -- Process_Declarative_Part_Owner --
+      ------------------------------------
+
+      function Process_Declarative_Part_Owner
+        (Declarative_Part_Owner : Ada_Node'Class)
+         return Ada_List_Vector
+      is
+         Declarative_Parts : constant Declarative_Part_Vector :=
+           Get_Declarative_Parts (Declarative_Part_Owner);
+
+      begin
+         return Result : Ada_List_Vector do
+            for Declarative_Part of Declarative_Parts loop
+               Result.Append (Declarative_Part.F_Decls);
+            end loop;
+         end return;
+      end Process_Declarative_Part_Owner;
+
+      -----------------------------
+      -- Process_Decl_Expr_Owner --
+      -----------------------------
+
+      function Process_Decl_Expr_Owner
+        (Decl_Expr_Owner : Expr_Function)
+         return Ada_List_Vector
+      is
+         Decl_Expr : constant Libadalang.Analysis.Decl_Expr :=
+           Decl_Expr_Owner.F_Expr.As_Paren_Expr.
+             F_Expr.As_Decl_Expr;
+
+      begin
+         return Result : Ada_List_Vector do
+            Result.Append (Decl_Expr.F_Decls);
+         end return;
+      end Process_Decl_Expr_Owner;
+
+      -----------------------
+      -- Process_Body_Part --
+      -----------------------
+
+      function Process_Body_Part
+        (Body_Part : Base_Subp_Body)
+         return Ada_List_Vector is
+      begin
+         if Is_Declarative_Part_Owner (Body_Part) then
+            return Process_Declarative_Part_Owner (Body_Part);
+         elsif Is_Decl_Expr_Owner (Body_Part) then
+            return Process_Decl_Expr_Owner (Body_Part.As_Expr_Function);
+         end if;
+
+         return Ada_List_Vectors.Empty;
+      end Process_Body_Part;
+
    begin
-      if Node.Parent = No_Ada_Node
-      then
-         return Local_Scope : Ada_Node_List_Vectors.Vector;
+      Find_Matching_Parents
+        (Node     => Node,
+         Match    => Is_Local_Scopes_Owner'Access,
+         Callback => Set_Local_Scopes_Owner'Access);
+
+      if Local_Scopes_Owner.Is_Null then
+         return Ada_List_Vectors.Empty;
       end if;
 
-      for Parent of Node.Parent.Parents loop
-         case Parent.Kind is
-            when Ada_Package_Body =>
-               --  Local_Scope will have at most three Ada_Node_Array nodes:
-               --  Package body, public part of the package spec and private
-               --  part of the package spec.
-               return Get_Package_Decls (Parent.As_Package_Body);
+      if Is_Declarative_Part_Owner (Local_Scopes_Owner) then
+         return Process_Declarative_Part_Owner (Local_Scopes_Owner);
 
-            when Ada_Package_Decl =>
-               --  Local_Scope will have at most three Ada_Node_Array nodes:
-               --  Package body, public part of the package spec and private
-               --  part of the package spec.
-               return Get_Package_Decls (Parent.As_Package_Decl);
+      elsif Is_Decl_Expr_Owner (Local_Scopes_Owner) then
+         return Process_Decl_Expr_Owner (Local_Scopes_Owner.As_Expr_Function);
 
-            when Ada_Subp_Decl =>
-               return Local_Scope : Ada_Node_List_Vectors.Vector do
-                  Local_Scope.Append
-                    (Get_Subp_Body_Decls
-                       (Parent.As_Subp_Decl.P_Body_Part.As_Subp_Body));
-               end return;
+      elsif Local_Scopes_Owner.Kind in Ada_Classic_Subp_Decl then
+         declare
+            Body_Part : constant Base_Subp_Body :=
+              Local_Scopes_Owner.As_Classic_Subp_Decl.P_Body_Part;
 
-            when Ada_Subp_Body =>
-               return Local_Scope : Ada_Node_List_Vectors.Vector do
-                  Local_Scope.Append
-                    (Get_Subp_Body_Decls (Parent.As_Subp_Body));
-               end return;
+         begin
+            if not Body_Part.Is_Null then
+               return Process_Body_Part (Body_Part);
+            end if;
+         end;
 
-            when Ada_Task_Body =>
-               return Local_Scope : Ada_Node_List_Vectors.Vector do
-                  Local_Scope.Append
-                    (Get_Task_Body_Decls (Parent.As_Task_Body));
-               end return;
+      else
+         Assert (Local_Scopes_Owner.Kind in Ada_Generic_Subp_Decl_Range);
 
-            when Ada_Decl_Block =>
-               return Local_Scope : Ada_Node_List_Vectors.Vector do
-                  Local_Scope.Append
-                    (Get_Decl_Block_Decls (Parent.As_Decl_Block));
-               end return;
+         declare
+            Body_Part : constant Base_Subp_Body :=
+              Local_Scopes_Owner.As_Generic_Subp_Decl.P_Body_Part;
 
-            when others =>
-               null;
-         end case;
-      end loop;
-
-      return Local_Scope : Ada_Node_List_Vectors.Vector;
-   end Find_Local_Scopes;
-
-   -----------------------
-   -- Find_Local_Scopes --
-   -----------------------
-
-   function Find_Local_Scopes (Node : Ada_Node'Class)
-                               return Declarative_Part_Vectors.Vector
-   is
-      use type Ada_Node;
-      use type Ada_Node_Kind_Type;
-   begin
-      if Node.Parent = No_Ada_Node
-      then
-         return Local_Scope : Declarative_Part_Vectors.Vector;
+         begin
+            if not Body_Part.Is_Null then
+               return Process_Body_Part (Body_Part);
+            end if;
+         end;
       end if;
 
-      for Parent of Node.Parent.Parents loop
-         case Parent.Kind is
-            when Ada_Package_Body =>
-               --  Local_Scope will have at most three Ada_Node_Array nodes:
-               --  Package body, public part of the package spec and private
-               --  part of the package spec.
-               return Get_Package_Declarative_Parts (Parent.As_Package_Body);
-
-            when Ada_Package_Decl =>
-               --  Local_Scope will have at most three Ada_Node_Array nodes:
-               --  Package body, public part of the package spec and private
-               --  part of the package spec.
-               return Get_Package_Declarative_Parts (Parent.As_Package_Decl);
-
-            when Ada_Subp_Body =>
-               return Local_Scope : Declarative_Part_Vectors.Vector do
-                  Local_Scope.Append
-                    (Get_Subp_Body_Declarative_Part (Parent.As_Subp_Body));
-               end return;
-
-            when Ada_Task_Body =>
-               return Local_Scope : Declarative_Part_Vectors.Vector do
-                  Local_Scope.Append
-                    (Get_Task_Body_Declarative_Part (Parent.As_Task_Body));
-               end return;
-
-            when Ada_Decl_Block =>
-               return Local_Scope : Declarative_Part_Vectors.Vector do
-                  Local_Scope.Append
-                    (Get_Decl_Block_Declarative_Part (Parent.As_Decl_Block));
-               end return;
-
-            when others =>
-               null;
-         end case;
-      end loop;
-
-      return Local_Scope : Declarative_Part_Vectors.Vector;
+      return Ada_List_Vectors.Empty;
    end Find_Local_Scopes;
 
    ------------------------
@@ -1419,24 +1484,16 @@ package body Laltools.Common is
 
    function Get_Package_Decls
      (Pkg_Decl : Package_Decl)
-      return Ada_Node_List_Vectors.Vector
-   is
-      Decls : Ada_Node_List_Vectors.Vector;
+      return Ada_List_Vector is
    begin
-      Decls.Append (Get_Package_Decl_Public_Decls (Pkg_Decl));
-      declare
-         Private_Decls : constant Ada_Node_List :=
-           Get_Package_Decl_Private_Decls (Pkg_Decl);
-      begin
-         case Private_Decls /= No_Ada_Node_List is
-            when True =>
-               Decls.Append (Private_Decls);
-            when False =>
-               null;
-         end case;
-      end;
-      Decls.Append (Get_Package_Body_Decls (Pkg_Decl.P_Body_Part));
-      return Decls;
+      return Result : Ada_List_Vector do
+         Append_If_Not_Null
+           (Result, Get_Package_Decl_Public_Decls (Pkg_Decl));
+         Append_If_Not_Null
+           (Result, Get_Package_Decl_Private_Decls (Pkg_Decl));
+         Append_If_Not_Null
+           (Result, Get_Package_Body_Decls (Pkg_Decl.P_Body_Part));
+      end return;
    end Get_Package_Decls;
 
    -----------------------------------------------
@@ -1619,15 +1676,7 @@ package body Laltools.Common is
    function Get_Subp_Body_Decls
      (Subp_B : Subp_Body)
       return Ada_Node_List
-   is
-      use type Subp_Body;
-   begin
-      if Subp_B = No_Subp_Body then
-         return No_Ada_Node_List;
-      end if;
-
-      return Subp_B.F_Decls.F_Decls;
-   end Get_Subp_Body_Decls;
+   is (if Subp_B.Is_Null then No_Ada_Node_List else Subp_B.F_Decls.F_Decls);
 
    ---------------------
    -- Get_Subp_Params --
@@ -1926,7 +1975,8 @@ package body Laltools.Common is
    function Is_Declarative_Part_Owner
      (Node : Ada_Node'Class)
       return Boolean
-   is (Node.Kind in
+   is (not Node.Is_Null
+       and then Node.Kind in
          Ada_Decl_Block_Range
            | Ada_Entry_Body_Range
              | Ada_Package_Body_Range
@@ -1936,6 +1986,19 @@ package body Laltools.Common is
                      | Ada_Base_Package_Decl
                        | Ada_Protected_Def_Range
                          | Ada_Task_Def_Range);
+
+   ------------------------
+   -- Is_Decl_Expr_Owner --
+   ------------------------
+   function Is_Decl_Expr_Owner
+     (Node : Ada_Node'Class)
+      return Boolean
+   is (not Node.Is_Null
+       and then Node.Kind in Ada_Expr_Function
+       and then Node.As_Expr_Function.F_Expr.Kind in
+         Ada_Paren_Expr_Range
+       and then Node.As_Expr_Function.F_Expr.As_Paren_Expr.F_Expr.Kind in
+         Ada_Decl_Expr_Range);
 
    ---------------------------------------------------
    -- Is_Definition_Without_Separate_Implementation --

@@ -673,11 +673,11 @@ package body Laltools.Refactor.Safe_Rename is
      (Self : Name_Collision_Finder)
       return Rename_Problem'Class
    is
-      Local_Scopes : Ada_Node_List_Vectors.Vector renames
-        Find_Local_Scopes (Self.Canonical_Definition.P_Basic_Decl);
-
       Canonical_Decl : constant Basic_Decl :=
         Self.Canonical_Definition.P_Basic_Decl;
+
+      Local_Scopes : constant Ada_List_Vector :=
+        Find_Local_Scopes (Canonical_Decl);
 
       --  If Self.Canonical_Definition is associated to a subprogram, then its
       --  spec is needed to check for collisions with other subprograms.
@@ -689,44 +689,66 @@ package body Laltools.Refactor.Safe_Rename is
       Canonical_Subp_Spec : constant Subp_Spec :=
         (if Is_Subp then Get_Subp_Spec (Canonical_Decl) else No_Subp_Spec);
 
-      function Check_Rename_Conflicts (Scope : Ada_Node_List)
-                                       return Defining_Name;
+      function Check_Rename_Conflicts
+        (Scope : Ada_List'Class)
+         return Defining_Name
+        with Pre => not Scope.Is_Null
+                    and then Scope.Kind in Ada_Ada_Node_List
+                                             | Ada_Basic_Decl_List;
       --  For every declaration of Scope, checks if it has the same name
       --  as Self.New_Name. If so, return a the Defining_Name of the
       --  conflicting declaration.
 
-      function Check_Subp_Rename_Conflicts (Scope : Ada_Node_List)
-                                            return Defining_Name;
+      function Check_Subp_Rename_Conflicts
+        (Scope : Ada_List'Class)
+         return Defining_Name;
       --  For every declaration of Scope, checks if it has the same
       --  name as Self.New_Name. Also checks if such declaration is a
       --  subprogram as if so, calls Check_Subp_Rename_Conflict to check
-      --  if both are type conformant (if they have the same signature).
+      --  if both are type conformant (i.e., if they have the same signature).
 
-      function Process_Scope (Scope : Ada_Node_List)
-                              return Defining_Name;
-      --  If Self.Canonical_Definition's declaration is a subprogram,
-      --  then delegates to Check_Subp_Rename_Conflicts, otherwise, to
-      --  Check_Rename_Conflicts.
+      function Process_Scope
+        (Scope : Ada_List'Class)
+         return Defining_Name;
+      --  If Canonical_Decl is a subprogram, then delegates to
+      --  Check_Subp_Rename_Conflicts, otherwise, to Check_Rename_Conflicts.
 
       ----------------------------
       -- Check_Rename_Conflicts --
       ----------------------------
 
-      function Check_Rename_Conflicts (Scope : Ada_Node_List)
-                                       return Defining_Name is
-      begin
-         for Declaration of Scope loop
-            if Declaration.Kind in Ada_Basic_Decl then
-               for Definition of
-                 Declaration.As_Basic_Decl.P_Defining_Names
-               loop
+      function Check_Rename_Conflicts
+        (Scope : Ada_List'Class)
+         return Defining_Name
+      is
+         Result : Defining_Name := No_Defining_Name;
+
+         function Visit (Node : Ada_Node'Class) return Visit_Status;
+         --  Checks if Node is a conflict, and if so, sets Result to it,
+         --  stopping the iterative process.
+
+         -----------
+         -- Visit --
+         -----------
+
+         function Visit (Node : Ada_Node'Class) return Visit_Status is
+         begin
+            if Node.Kind in Ada_Basic_Decl then
+               for Definition of Node.As_Basic_Decl.P_Defining_Names loop
                   if Check_Rename_Conflict (Self.New_Name, Definition) then
-                     return Definition;
+                     Result := Definition;
+                     return Stop;
                   end if;
                end loop;
             end if;
-         end loop;
-         return No_Defining_Name;
+
+            return (if Node = Scope then Into else Over);
+         end Visit;
+
+      begin
+         Scope.Traverse (Visit'Access);
+
+         return Result;
       end Check_Rename_Conflicts;
 
       ---------------------------------
@@ -734,49 +756,67 @@ package body Laltools.Refactor.Safe_Rename is
       ---------------------------------
 
       function Check_Subp_Rename_Conflicts
-        (Scope : Ada_Node_List)
-         return Defining_Name is
-      begin
-         Assert (Canonical_Subp_Spec /= No_Subp_Spec);
+        (Scope : Ada_List'Class)
+         return Defining_Name
+      is
+         Result : Defining_Name := No_Defining_Name;
 
-         for Decl of Scope loop
-            if Decl.Kind in Ada_Basic_Decl then
+         function Visit (Node : Ada_Node'Class) return Visit_Status;
+         --  Checks if Node is a conflict, and if so, sets Result to it,
+         --  stopping the iterative process.
+
+         -----------
+         -- Visit --
+         -----------
+
+         function Visit (Node : Ada_Node'Class) return Visit_Status is
+         begin
+            if Node.Kind in Ada_Basic_Decl then
                --  Filter the nodes that are not Basic_Decl
 
-               if Is_Subprogram (Decl.As_Basic_Decl) or else
-                 Decl.Kind in Ada_Generic_Subp_Instantiation
+               if Is_Subprogram (Node.As_Basic_Decl)
+                 or else Node.Kind in Ada_Generic_Subp_Instantiation
                then
-                  --  If Decl is a subprogram, then not only check the name but
-                  --  also its signature.
+                  --  If Decl is a subprogram, then not only check the name
+                  --  but also its signature.
 
                   if Check_Subp_Rename_Conflict
                     (Canonical_Decl,
                      Self.New_Name,
-                     Decl.As_Basic_Decl)
+                     Node.As_Basic_Decl)
                   then
-                     return Decl.As_Basic_Decl.P_Defining_Name;
+                     Result := Node.As_Basic_Decl.P_Defining_Name;
+                     return Stop;
                   end if;
 
                else
-                  for Definition of Decl.As_Basic_Decl.P_Defining_Names loop
-                     if Check_Rename_Conflict (Self.New_Name, Definition) then
-                        return Decl.As_Basic_Decl.P_Defining_Name;
+                  for Definition of Node.As_Basic_Decl.P_Defining_Names loop
+                     if Check_Rename_Conflict
+                       (Self.New_Name, Definition)
+                     then
+                        Result := Node.As_Basic_Decl.P_Defining_Name;
+                        return Stop;
                      end if;
                   end loop;
                end if;
             end if;
-         end loop;
 
-         return No_Defining_Name;
+            return (if Node = Scope then Into else Over);
+         end Visit;
+
+      begin
+         Scope.Traverse (Visit'Access);
+
+         return Result;
       end Check_Subp_Rename_Conflicts;
 
       -------------------
       -- Process_Scope --
       -------------------
 
-      function Process_Scope (Scope : Ada_Node_List) return Defining_Name is
+      function Process_Scope (Scope : Ada_List'Class) return Defining_Name is
       begin
-         if Scope = No_Ada_Node_List then
+         if Scope.Is_Null then
             return No_Defining_Name;
          end if;
 
@@ -1401,9 +1441,9 @@ package body Laltools.Refactor.Safe_Rename is
             Declarative_Part_Vectors.Empty_Vector);
 
       Stop_Node : Ada_Node := No_Ada_Node;
-      Dec_Visible_Declarative_Parts : constant Declarative_Part_Vectors.Vector
+      Dec_Visible_Declarative_Parts : constant Ada_List_Vector
         := Find_Local_Scopes (Self.Canonical_Definition.P_Basic_Decl);
-      Ref_Visible_Declarative_Parts : Declarative_Part_Vectors.Vector;
+      Ref_Visible_Declarative_Parts : Ada_List_Vector;
 
       function Check_Conflict (Definition : Defining_Name'Class)
                                return Boolean;
@@ -1528,37 +1568,64 @@ package body Laltools.Refactor.Safe_Rename is
                --  Do not look for conflicts in Self.Canonical_Part own
                --  declarative part, since this would be a name collision
                --  conflict already detected by the Name_Collision_Finder.
-
-               if not Declarative_Part_Vectors.Has_Element
-                 (Declarative_Part_Vectors.Find
+               if not Ada_List_Vectors.Has_Element
+                 (Ada_List_Vectors.Find
                     (Dec_Visible_Declarative_Parts, Declarative_Part))
                then
-                  Look_For_Conflicts :
-                  for Declaration of Declarative_Part.F_Decls loop
-                     if Declaration.Kind in Ada_Basic_Decl then
-                        --  If Self.Canonical_Definition is found, then it
-                        --  can't be hidden, so stop the search.
+                  declare
+                     Conflicting_Definition : Defining_Name;
 
-                        if Declaration.As_Basic_Decl.P_Canonical_Part =
-                          Self.Canonical_Definition.P_Basic_Decl
-                          or else Declaration = Stop_Node
-                        then
-                           exit Look_For_Conflicts;
+                     function Visit
+                       (Node : Ada_Node'Class)
+                        return Visit_Status;
+                     --  Checks if Node is a conflict, and if so, sets Result
+                     --  to it, stopping the iterative process.
+
+                     -----------
+                     -- Visit --
+                     -----------
+
+                     function Visit
+                       (Node : Ada_Node'Class)
+                        return Visit_Status is
+                     begin
+                        if Node.Kind in Ada_Basic_Decl then
+                           --  If Self.Canonical_Definition is found, then it
+                           --  can't be hidden, so stop the search.
+
+                           if Node.As_Basic_Decl.P_Canonical_Part =
+                             Self.Canonical_Definition.P_Basic_Decl
+                             or else Node = Stop_Node
+                           then
+                              return Stop;
+                           end if;
+
+                           for Definition of
+                             Node.As_Basic_Decl.P_Defining_Names
+                           loop
+                              if Check_Conflict (Definition) then
+                                 Conflicting_Definition := Definition;
+                                 return Stop;
+                              end if;
+                           end loop;
                         end if;
 
-                        for Definition of
-                          Declaration.As_Basic_Decl.P_Defining_Names
-                        loop
-                           if Check_Conflict (Definition) then
-                              return Hidden_Name'
-                                (Canonical_Definition =>
-                                   Self.Canonical_Definition,
-                                 New_Name             => Self.New_Name,
-                                 Conflicting_Id       => Definition.F_Name);
-                           end if;
-                        end loop;
+                        return
+                          (if Node = Declarative_Part then Into else Over);
+                     end Visit;
+
+                  begin
+                     Declarative_Part.Traverse (Visit'Access);
+
+                     if not Conflicting_Definition.Is_Null then
+                        return Hidden_Name'
+                          (Canonical_Definition =>
+                             Self.Canonical_Definition,
+                           New_Name             => Self.New_Name,
+                           Conflicting_Id       =>
+                             Conflicting_Definition.F_Name);
                      end if;
-                  end loop Look_For_Conflicts;
+                  end;
                else
                   null;
                end if;

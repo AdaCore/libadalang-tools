@@ -71,10 +71,17 @@ package Laltools.Common is
 
    type Analysis_Unit_Array_Access is access Analysis_Unit_Array;
 
-   package Ada_Node_List_Vectors is new Ada.Containers.Vectors
+   package Ada_List_Vectors is new Ada.Containers.Indefinite_Vectors
      (Index_Type   => Natural,
-      Element_Type => Ada_Node_List,
+      Element_Type => Ada_List'Class,
       "="          => "=");
+
+   subtype Ada_List_Vector is Ada_List_Vectors.Vector;
+
+   procedure Append_If_Not_Null
+     (Vector : in out Ada_List_Vector;
+      List   : Ada_List'Class);
+   --  Checks if Ada_List.Is_Null and if not, appends it to Vector
 
    package Base_Id_Vectors is new Ada.Containers.Vectors
      (Index_Type   => Natural,
@@ -223,13 +230,18 @@ package Laltools.Common is
    --  where Match returns True. This iterative process stops if Callback sets
    --  Stop to True.
 
-   function Find_Local_Scopes (Node : Ada_Node'Class)
-                               return Ada_Node_List_Vectors.Vector;
-   --  Find all scopes in Node's compilation unit visible by Node.
-
-   function Find_Local_Scopes (Node : Ada_Node'Class)
-                               return Declarative_Part_Vectors.Vector;
-   --  Find all scopes in Node's compilation unit visible by Node.
+   function Find_Local_Scopes
+     (Node : Ada_Node'Class)
+      return Ada_List_Vector
+     with Post => (for all Scope of Find_Local_Scopes'Result =>
+                   Scope.Kind in Ada_Ada_Node_List_Range
+                                   | Ada_Basic_Decl_List_Range);
+   --  Find all scopes in Node's Compilation_Unit visible by Node. It will not
+   --  contain Node if Node is itself a scope.
+   --  In this context, scope is the Ada_Node_List of a Declarative_Part, or a
+   --  Basic_Decl_List of a Decl_Expr (in Ada 2022, Expr_Function can have a
+   --  Decl_Expr node).
+   --  Returns an empty vector if Node.Is_Null.
 
    function Find_Nested_Scopes (Node : Ada_Node'Class)
                                 return Declarative_Part_Vectors.Vector;
@@ -304,9 +316,15 @@ package Laltools.Common is
 
    function Is_Declarative_Part_Owner
      (Node : Ada_Node'Class)
-      return Boolean
-     with Pre => not Node.Is_Null;
+      return Boolean;
    --  Checks if Node can have a Declarative_Part child
+
+   function Is_Decl_Expr_Owner
+     (Node : Ada_Node'Class)
+      return Boolean
+     with Post => (if Is_Decl_Expr_Owner'Result then
+                     Node.Kind in Ada_Expr_Function_Range);
+   --  Checks if Node is an Expr_Function with a Decl_Expr child
 
    function Get_Declarative_Parts
      (Node : Ada_Node'Class)
@@ -365,13 +383,13 @@ package Laltools.Common is
    --  (public, private and body declarative parts).
 
    function Get_Package_Decls (Pkg_Decl : Package_Decl)
-                               return Ada_Node_List_Vectors.Vector;
+                               return Ada_List_Vector;
    --  Gets all the Ada_Node_Lists of the Declarative_Parts associated to a
    --- Package_Decl (public, private and body declarative parts).
 
    function Get_Package_Decls
      (Pkg_Body : Package_Body)
-      return Ada_Node_List_Vectors.Vector
+      return Ada_List_Vector
    is (Get_Package_Decls (Pkg_Body.P_Canonical_Part.As_Package_Decl));
    --  Gets all the Ada_Node_Lists of the Declarative_Parts associated to a
    --- Package_Body (public, private and body declarative parts).
@@ -426,7 +444,7 @@ package Laltools.Common is
 
    function Get_Subp_Body_Decls (Subp_B : Subp_Body)
                                  return Ada_Node_List;
-   --  Gets the Ada_Node_List of a Declarative_Part associated to a Subp_Body.
+   --  Gets the Ada_Node_List of a Declarative_Part associated to a Subp_Body
 
    function Get_Subp_Params (Subp : Basic_Decl'Class) return Params
      with Pre => Is_Subprogram (Subp);

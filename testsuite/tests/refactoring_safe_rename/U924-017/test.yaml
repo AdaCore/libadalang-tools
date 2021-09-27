@@ -1,0 +1,8 @@
+description: |
+    This test checks if the safe rename tool correctly handles
+    the rename of parameters of an expression function or null
+    subprogram.
+    It also checks if it finds collisions between a parameter
+    of an Expr_Function and a declaration of a DeclExpr.
+
+driver: shell_script
