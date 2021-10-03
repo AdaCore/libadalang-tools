@@ -48,8 +48,7 @@ package body Laltools.Refactor is
       File_Name : Laltools.Refactor.File_Name_Type;
       Edit      : Laltools.Refactor.Text_Edit)
          return Boolean
-   is (Edits.Contains (File_Name)
-       and then Edits.Constant_Reference (File_Name).Contains (Edit));
+   is (Edits.Contains (File_Name) and then Edits (File_Name).Contains (Edit));
 
    -----------
    -- Image --
