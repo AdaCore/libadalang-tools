@@ -91,8 +91,8 @@ package body Laltools.Refactor.Safe_Rename is
    --  Parameters.
 
    function Are_Subprograms_Type_Conformant
-     (Subp_A      : Subp_Spec;
-      Subp_B      : Subp_Spec;
+     (Subp_A      : Basic_Decl'Class;
+      Subp_B      : Basic_Decl'Class;
       Check_Modes : Boolean := False)
       return Boolean;
    --  Checks if Subp_A and Subp_B are type conformant. Check_Modes is a flag
@@ -147,19 +147,64 @@ package body Laltools.Refactor.Safe_Rename is
    -------------------------------------
 
    function Are_Subprograms_Type_Conformant
-     (Subp_A      : Subp_Spec;
-      Subp_B      : Subp_Spec;
+     (Subp_A      : Basic_Decl'Class;
+      Subp_B      : Basic_Decl'Class;
       Check_Modes : Boolean := False)
       return Boolean
    is
+      Subp_A_Spec : constant Base_Subp_Spec := Get_Subp_Spec (Subp_A);
+      Subp_B_Spec : constant Base_Subp_Spec := Get_Subp_Spec (Subp_B);
+
+      Subp_A_Params : constant Params :=
+        (if not Subp_A_Spec.Is_Null then Get_Subp_Spec_Params (Subp_A_Spec)
+         else No_Params);
+      Subp_B_Params : constant Params :=
+        (if not Subp_A_Spec.Is_Null then Get_Subp_Spec_Params (Subp_B_Spec)
+         else No_Params);
+
+      Both_Specs_Not_Null : constant Boolean :=
+        not Subp_A_Spec.Is_Null and then not Subp_B_Spec.Is_Null;
+
+      Both_Entry_Decls : constant Boolean :=
+        (Both_Specs_Not_Null
+         and then Subp_A_Spec.Kind in Ada_Entry_Spec_Range
+         and then Subp_B_Spec.Kind in Ada_Entry_Spec_Range);
+
+      Both_Normal_Subps_Decls : constant Boolean :=
+        (not Both_Entry_Decls
+         and then Both_Specs_Not_Null
+         and then Subp_A_Spec.Kind in Ada_Subp_Spec_Range
+         and then Subp_B_Spec.Kind in Ada_Subp_Spec_Range);
+
+      Both_Procedures : constant Boolean :=
+        (Both_Normal_Subps_Decls
+         and then Subp_A_Spec.As_Subp_Spec.F_Subp_Kind in
+           Ada_Subp_Kind_Procedure_Range
+         and then Subp_B_Spec.As_Subp_Spec.F_Subp_Kind in
+           Ada_Subp_Kind_Procedure_Range);
+
+      Both_Functions : constant Boolean :=
+        (Both_Normal_Subps_Decls
+         and then Subp_A_Spec.As_Subp_Spec.F_Subp_Kind in
+           Ada_Subp_Kind_Function_Range
+         and then Subp_B_Spec.As_Subp_Spec.F_Subp_Kind in
+           Ada_Subp_Kind_Function_Range);
+
+      Both_Params_Null : constant Boolean :=
+        Subp_A_Params.Is_Null and then Subp_B_Params.Is_Null;
+
+      Only_One_Params_Null : constant Boolean :=
+        Subp_A_Params.Is_Null xor Subp_B_Params.Is_Null;
+
       package Hash_Vectors is new Ada.Containers.Vectors
         (Index_Type   => Natural,
          Element_Type => Ada.Containers.Hash_Type);
 
       subtype Hash_Vector is Hash_Vectors.Vector;
 
-      function Create_Hash_Vector (Parameters : Params)
-                                   return Hash_Vector;
+      function Create_Hash_Vector
+        (Parameters : Params)
+         return Hash_Vector;
       --  Creates a vector with the hash of the type declaration of each
       --  parameter of Parameters.
 
@@ -192,34 +237,59 @@ package body Laltools.Refactor.Safe_Rename is
       use type Parameter_Data_Vectors.Vector;
 
    begin
-      if Subp_A.F_Subp_Kind /= Subp_A.F_Subp_Kind
+      --  If any of the subprograms does not have a spec, then this a malformed
+      --  tree. Do not detect collisions on this case, hence, return False.
+      --  Consider two subprograms of different kinds as non type conformant.
+
+      if not Both_Specs_Not_Null
+        or else (not Both_Entry_Decls
+                 and then not Both_Procedures
+                 and then not Both_Functions)
       then
          return False;
       end if;
 
+      --  At this point we know that:
+      --    * both subprogram specs are not null
+      --    * both subprograms are of the same kind
+      --  If they do not have parameters, then:
+      --    * if they're both procedures or entry decls, then they're type
+      --      conformant
+      --    * otherwise, they must both be functions and if they have different
+      --      return types, then they're not type conformant
+      --  If only one has parameters, then they're not type conformant.
+
+      if Both_Params_Null then
+         if Both_Procedures or else Both_Entry_Decls then
+            return True;
+         else
+            Assert (Both_Functions);
+            if Hash (Subp_A_Spec.As_Subp_Spec.P_Return_Type.As_Ada_Node) /=
+                 Hash (Subp_B_Spec.As_Subp_Spec.P_Return_Type.As_Ada_Node)
+            then
+               return False;
+            end if;
+         end if;
+      elsif Only_One_Params_Null then
+         return False;
+      end if;
+
+      --  At this point we know that:
+      --    * both subprogram specs are not null
+      --    * both subprograms are of the same kind
+      --    * both subprograms have parameters
+      --    * if both subprogram are functions, they have the same return type
+      --  The only thing left to check are their parameters.
+
       case Check_Modes is
-         when True =>
-            if Create_Parameter_Data_Vector (Subp_A.F_Subp_Params) /=
-              Create_Parameter_Data_Vector (Subp_B.F_Subp_Params)
-            then
-               return False;
-            end if;
+         when True
+            => return Create_Parameter_Data_Vector (Subp_A_Params) =
+                        Create_Parameter_Data_Vector (Subp_B_Params);
 
-         when False =>
-            if Create_Hash_Vector (Subp_A.F_Subp_Params) /=
-              Create_Hash_Vector (Subp_B.F_Subp_Params)
-            then
-               return False;
-            end if;
+         when False
+            => return Create_Hash_Vector (Subp_A_Params) =
+                        Create_Hash_Vector (Subp_B_Params);
       end case;
-
-      --  If we are checking procedures then they are type conformant.
-      --  Otherwise, finally check if the return type is the same.
-
-      return Subp_A.F_Subp_Kind in Ada_Subp_Kind_Procedure_Range
-        or else (Subp_A.F_Subp_Kind in Ada_Subp_Kind_Function_Range
-                 and then Hash (Subp_A.P_Return_Type.As_Ada_Node) =
-                     Hash (Subp_B.P_Return_Type.As_Ada_Node));
    end Are_Subprograms_Type_Conformant;
 
    --------------------------------
@@ -232,20 +302,16 @@ package body Laltools.Refactor.Safe_Rename is
       Subp_B   : Basic_Decl'Class)
       return Boolean
    is
-      Subp_A_Spec : constant Subp_Spec := Get_Subp_Spec (Subp_A);
-      Subp_B_Spec : constant Subp_Spec := Get_Subp_Spec (Subp_B);
       Subp_B_Name : constant Text_Type := Subp_B.P_Defining_Name.F_Name.Text;
 
    begin
-      if Subp_A = Subp_B
-        or else Subp_B_Name /= To_Text (New_Name)
-      then
+      if Subp_A = Subp_B or else Subp_B_Name /= To_Text (New_Name) then
          return False;
       end if;
 
       --  Subp_B name is the name as New_Name, therefore, we need to check if
       --  both subprograms are type conformant.
-      return Are_Subprograms_Type_Conformant (Subp_A_Spec, Subp_B_Spec, False);
+      return Are_Subprograms_Type_Conformant (Subp_A, Subp_B, False);
    end Check_Subp_Rename_Conflict;
 
    ----------------------------------
@@ -686,8 +752,9 @@ package body Laltools.Refactor.Safe_Rename is
         Is_Subprogram (Canonical_Decl)
         or else Canonical_Decl.Kind in Ada_Generic_Subp_Instantiation_Range;
 
-      Canonical_Subp_Spec : constant Subp_Spec :=
-        (if Is_Subp then Get_Subp_Spec (Canonical_Decl) else No_Subp_Spec);
+      Canonical_Subp_Spec : constant Base_Subp_Spec :=
+        (if Is_Subp then Get_Subp_Spec (Canonical_Decl)
+         else No_Base_Subp_Spec);
 
       function Check_Rename_Conflicts
         (Scope : Ada_List'Class)
@@ -1314,8 +1381,9 @@ package body Laltools.Refactor.Safe_Rename is
         Is_Subprogram (Canonical_Decl)
         or else Canonical_Decl.Kind in Ada_Generic_Subp_Instantiation_Range;
 
-      Canonical_Subp_Spec : constant Subp_Spec :=
-        (if Is_Subp then Get_Subp_Spec (Canonical_Decl) else No_Subp_Spec);
+      Canonical_Subp_Spec : constant Base_Subp_Spec :=
+        (if Is_Subp then Get_Subp_Spec (Canonical_Decl)
+         else No_Base_Subp_Spec);
 
       Possible_Problem : Hiding_Name;
       Found_Problem    : Boolean := False;
@@ -1426,11 +1494,12 @@ package body Laltools.Refactor.Safe_Rename is
       --  subprogram that is type conformant.
 
       Is_Subp : constant Boolean :=
-        Is_Subprogram (Canonical_Decl)
-        or else Canonical_Decl.Kind in Ada_Generic_Subp_Instantiation_Range;
+        (Is_Subprogram (Canonical_Decl)
+         or else Canonical_Decl.Kind in Ada_Generic_Subp_Instantiation_Range);
 
-      Canonical_Subp_Spec : constant Subp_Spec :=
-        (if Is_Subp then Get_Subp_Spec (Canonical_Decl) else No_Subp_Spec);
+      Canonical_Subp_Spec : constant Base_Subp_Spec :=
+        (if Is_Subp then Get_Subp_Spec (Canonical_Decl)
+         else No_Base_Subp_Spec);
 
       Nested_Declarative_Parts : constant Declarative_Part_Vector :=
         Find_Nested_Scopes (Canonical_Decl);

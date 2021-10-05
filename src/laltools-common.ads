@@ -452,16 +452,27 @@ package Laltools.Common is
    --  Gets the Ada_Node_List of a Declarative_Part associated to a Subp_Body
 
    function Get_Subp_Params (Subp : Basic_Decl'Class) return Params
-     with Pre => Is_Subprogram (Subp);
-   --  Gets the Params node associatedof 'Subp', if it exists.
-   --  If it doesn't exist returns No_Params.
-
-   function Get_Subp_Spec (Subp : Basic_Decl'Class) return Subp_Spec
-     with Pre => Is_Subprogram (Subp)
+     with Inline,
+          Pre => Is_Subprogram (Subp)
                  or else (not Subp.Is_Null
                           and then Subp.Kind in
                             Ada_Generic_Subp_Instantiation);
-   --  Gets the Subp_Spec node associated to a subprogram
+   --  Gets the Params node associated to Subp, if it exists.
+   --  If it doesn't exist returns No_Params.
+
+   function Get_Subp_Spec (Subp : Basic_Decl'Class) return Base_Subp_Spec
+     with Inline,
+          Pre => Is_Subprogram (Subp)
+                 or else (not Subp.Is_Null
+                          and then Subp.Kind in
+                            Ada_Generic_Subp_Instantiation);
+   --  Gets the Subp_Spec node associated to Subp
+
+   function Get_Subp_Spec_Params
+     (Subp_Spec : Base_Subp_Spec'Class)
+      return Params;
+   --  Gets the Params node associated to Subp_Spec, if it exists.
+   --  If it doesn't exist returns No_Params.
 
    function Get_Task_Body_Declarative_Part (Task_B : Task_Body)
                                             return Declarative_Part;

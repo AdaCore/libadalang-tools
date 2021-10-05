@@ -1672,21 +1672,40 @@ package body Laltools.Common is
    -- Get_Subp_Params --
    ---------------------
 
-   function Get_Subp_Params (Subp : Basic_Decl'Class) return Params is
-     (Get_Subp_Spec (Subp).F_Subp_Params);
+   function Get_Subp_Params
+     (Subp : Basic_Decl'Class)
+      return Params is
+     (Get_Subp_Spec_Params (Get_Subp_Spec (Subp)));
 
    -------------------
    -- Get_Subp_Spec --
    -------------------
 
-   function Get_Subp_Spec (Subp : Basic_Decl'Class) return Subp_Spec
-   is
-      Spec : constant Base_Subp_Spec :=
-        Subp.P_Subp_Spec_Or_Null (True);
+   function Get_Subp_Spec (Subp : Basic_Decl'Class) return Base_Subp_Spec is
+     (if Subp.Is_Null then No_Base_Subp_Spec
+      else Subp.P_Subp_Spec_Or_Null (True));
 
+   --------------------------
+   -- Get_Subp_Spec_Params --
+   --------------------------
+
+   function Get_Subp_Spec_Params
+     (Subp_Spec : Base_Subp_Spec'Class)
+      return Params is
    begin
-      return (if Spec.Is_Null then No_Subp_Spec else Spec.As_Subp_Spec);
-   end Get_Subp_Spec;
+      if Subp_Spec.Is_Null then
+         return No_Params;
+      end if;
+
+      case Ada_Base_Subp_Spec (Subp_Spec.Kind) is
+         when Ada_Entry_Spec_Range
+            => return Subp_Spec.As_Entry_Spec.F_Entry_Params;
+         when Ada_Enum_Subp_Spec_Range
+            => return No_Params;
+         when Ada_Subp_Spec_Range
+            => return Subp_Spec.As_Subp_Spec.F_Subp_Params;
+      end case;
+   end Get_Subp_Spec_Params;
 
    ------------------------------------
    -- Get_Task_Body_Declarative_Part --

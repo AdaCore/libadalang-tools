@@ -1,0 +1,5 @@
+description: |
+    This test checks if the safe rename tool correctly handles
+    the rename of Entry_Decls.
+
+driver: shell_script
