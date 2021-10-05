@@ -313,7 +313,16 @@ package body Laltools.Common is
       Param_References : Base_Id_Vectors.Vector;
    begin
       for Decl of Hierarchy loop
-         Param_References.Append (Decl.P_Defining_Name.F_Name.As_Base_Id);
+         --  If Decl is a top level declaration then it can be a dotted name
+         --  In that case, consider the suffix as the reference.
+
+         if Decl.P_Defining_Name.F_Name.Kind in Ada_Dotted_Name then
+            Param_References.Append
+              (Decl.P_Defining_Name.F_Name.As_Dotted_Name.F_Suffix);
+         else
+            Param_References.Append (Decl.P_Defining_Name.F_Name.As_Base_Id);
+         end if;
+
          for Reference of
            Decl.P_Defining_Name.P_Find_All_References (Units)
          loop

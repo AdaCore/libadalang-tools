@@ -1,0 +1,5 @@
+description: |
+    This test checks if the safe rename tool correctly handles
+    the rename of top level declaration that is a dotted name.
+
+driver: shell_script
