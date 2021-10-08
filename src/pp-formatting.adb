@@ -1858,8 +1858,8 @@ package body Pp.Formatting is
          function Worthwhile_Line_Break
            (F, X : Line_Break_Index) return Boolean
          is
-            This : constant Positive := Sloc_First (LB_Tok (All_LB (X)));
-            Prev : Positive := Sloc_First (LB_Tok (All_LB (F)));
+            This      : constant Positive := Sloc_First (LB_Tok (All_LB (X)));
+            Prev      : Positive := Sloc_First (LB_Tok (All_LB (F)));
             Threshold : constant Positive := PP_Indent_Continuation (Cmd);
          begin
             if All_LB (F).Hard then
@@ -1906,9 +1906,11 @@ package body Pp.Formatting is
          if Arg (Cmd, Source_Line_Breaks) then
             return;
          end if;
+
          pragma Debug
            (Format_Debug_Output
               (Lines_Data, "before Split_Lines " & Again));
+
          Collect_Line_Breaks
            (Lines_Data_P, New_Tokns,
             Do_All => True, Do_Enabled => False, Do_Syntax => False,
@@ -1950,11 +1952,13 @@ package body Pp.Formatting is
                declare
                   FF : Line_Break_Index := All_LBI (F);
                   LL : Line_Break_Index;
+                  Prev_LL : Line_Break_Index;
                begin
                   --  Loop through line breaks at current level
 
                   for X in 1 .. Last_Index (LB) - 1 loop
                      LL := LB (X);
+                     Prev_LL := LL;
                      pragma Assert (All_LB (LL).Level = Level);
 
                      --  Don't enable the first one, unless it's "worthwhile"
@@ -1978,6 +1982,20 @@ package body Pp.Formatting is
                      then
                         pragma Assert (not All_LB (LL).Enabled);
                         All_LB (LL).Enabled := True;
+                        --  Keep the indentation level of the previous LL if
+                        --  the threshold between the two values is 1
+                        --  (this could be the case of the split line when
+                        --  one or more than one paranthesis are present on the
+                        --  same level having soft line breaks associated)
+                        if Prev_LL /= LL
+                          and then not All_LB (Prev_LL).Enabled
+                          and then (All_LB (Prev_LL).Indentation =
+                                        All_LB (LL).Indentation - 1)
+                        then
+                           All_LB (LL).Indentation :=
+                             All_LB (LL).Indentation - 1;
+                        end if;
+
                         FF := LL;
                      end if;
                   end loop; -- through line breaks at current level
@@ -2531,6 +2549,7 @@ package body Pp.Formatting is
          --          Y);
 
          procedure Manage_Paren_Stack is
+            Crt_Indent : Natural := 0;
          begin
             if New_Tok = Prev_New_Tok then
                return;
@@ -2564,10 +2583,9 @@ package body Pp.Formatting is
 
                --  Add 2 extra spaces to indent at the first character position
                --  inside the paranthesis
-               Push
-                 (Paren_Stack,
-                  (Indent =>
-                     Sloc (New_Tok).First - Sloc (New_Line_Start_Out).First + 2));
+               Crt_Indent :=
+                 Sloc (New_Tok).First - Sloc (New_Line_Start_Out).First + 2;
+               Push (Paren_Stack, (Indent => Crt_Indent));
 
             elsif Kind (New_Tok) = ')' then
                Pop (Paren_Stack);
@@ -3084,6 +3102,7 @@ package body Pp.Formatting is
                     Kind (Prev (New_Tok)) = ';' and then
                     Kind (Prev (Prev (New_Tok))) = ')'
                   then
+
                      --  Preserve the maximal indentation level when
                      --  the current ');' is followed by an IF statement
                      --  part or a CASE statement part or a BEGIN or END
@@ -3422,7 +3441,6 @@ package body Pp.Formatting is
          --  Any other mismatch is considered to be a bug.
 
          loop
-
             pragma Assert (Kind (New_Tok) not in Comment_Kind);
             Manage_Paren_Stack;
 
@@ -3449,7 +3467,6 @@ package body Pp.Formatting is
 
             else
                --  Check for "end;" --> "end Some_Name;" case
-
                if Kind (Src_Tok) = ';'
                  and then
                    Kind (Prev_Lexeme (Src_Tok)) = Res_End
@@ -3512,6 +3529,7 @@ package body Pp.Formatting is
                   Qual_Nesting := Qual_Nesting + 1;
                   Append_Tokn (New_Tokns, Src_Tok);
                   Next_ss (Src_Tok);
+
                elsif Qual_Nesting > 0
                  and then Kind (Src_Tok) = ')'
                  and then Kind (Prev_Lexeme (Src_Tok)) = ')'
@@ -3812,15 +3830,339 @@ package body Pp.Formatting is
       procedure Insert_Indentation (Lines_Data_P : Lines_Data_Ptr;
                                     Cmd : Command_Line)
       is
-         Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
-         All_LB : Line_Break_Vector renames Lines_Data.All_LB;
-         Saved_New_Tokns : Scanner.Tokn_Vec renames Lines_Data.Saved_New_Tokns;
+         function Is_Action_Call_Parameter (Tok : Tokn_Cursor) return Boolean;
+         --  Returns true if the line break token is part of an action call
+         --  parameter..
 
+         function Called_As_Parameter_Of_An_Action_Call (Tok : Tokn_Cursor)
+                                                         return Boolean;
+         --  Returns true if the line break token is part of an action call
+         --  parameter and this call is a parameter of an other action call.
+
+         function Enclosing_Open_Paren (Tok      : Tokn_Cursor;
+                                        OP_Count : Natural) return Tokn_Cursor;
+         --  Returns the enclosing parenthesis corresponding token.
+
+         function Prev_LB_Indentation (Paren : Tokn_Cursor) return Positive;
+         --  Returns the previous indentation of the 1st found line break before
+         --  the given '(' token cursor parameter.
+
+         procedure Adjust_Indentation_After_Comma (Tok : Tokn_Cursor);
+         --  This function adjust the indentation level based on the count of
+         --  the opened parenthesis between two enabled line breaks.
+         --  This is used in order to adjust line breaks indentation in case
+         --  of a call parameter.
+
+         Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
+         All_LB     : Line_Break_Vector renames Lines_Data.All_LB;
+
+         function Enclosing_Open_Paren (Tok      : Tokn_Cursor;
+                                        OP_Count : Natural) return Tokn_Cursor
+         is
+            Index   : constant Line_Break_Index := Line_Break_Token_Index (Tok);
+            LB      : Line_Break renames All_LB (Index);
+            Crt_Tok : Tokn_Cursor := Prev (Tok);
+
+            Crt_OP_Count : Natural     := 0;
+            Crt_CP_Count : Natural     := 0;
+         begin
+            pragma Assert (Kind (Tok) in Line_Break_Token
+                           and then LB.Enabled
+                           and then not Is_Nil (Crt_Tok));
+
+            while not Is_Nil (Crt_Tok) loop
+               if Kind (Crt_Tok) = ')' then
+                  Crt_CP_Count := Crt_CP_Count + 1;
+
+               elsif Kind (Crt_Tok) = '(' then
+                  Crt_OP_Count := Crt_OP_Count + 1;
+               end if;
+
+               if Crt_OP_Count = OP_Count + 1 then
+                  return Crt_Tok;
+               end if;
+
+               exit when Is_Nil (Crt_Tok)
+                 or else
+                   Kind (Crt_Tok)
+                    in Res_For | Res_When | Res_Begin | Res_Is | Colon_Equal;
+
+               Crt_Tok := Prev (Crt_Tok);
+            end loop;
+
+            return Nil_Tokn_Cursor;
+         end Enclosing_Open_Paren;
+
+         function Is_Action_Call_Parameter (Tok : Tokn_Cursor) return Boolean
+         is
+            Index : constant Line_Break_Index := Line_Break_Token_Index (Tok);
+            LB      : Line_Break renames All_LB (Index);
+            Crt_Tok : Tokn_Cursor := Prev (Tok);
+
+            function Pattern_Found (Tok : Tokn_Cursor) return Boolean is
+              ((Kind (Prev (Tok)) = Spaces
+               and then Kind (Prev (Prev (Tok))) = Ident)
+               or else
+                 (Kind (Prev (Tok)) in Line_Break_Token
+                  and then Kind (Prev (Prev (Tok))) = Ident));
+
+            --  Returns True if the pattern "Ident/Spaces/'('" is found
+         begin
+            pragma Assert (Kind (Tok) in Line_Break_Token
+                           and then LB.Enabled
+                           and then not Is_Nil (Crt_Tok)
+                           and then Kind (Crt_Tok) in Arrow | ',');
+
+            while not Is_Nil (Crt_Tok) loop
+               if Kind (Crt_Tok) = '(' then
+                  if Pattern_Found (Crt_Tok) then
+                     return True;
+                  end if;
+               elsif Kind (Crt_Tok) = ')' then
+
+                  if Kind (Prev (Tok)) = ',' then
+                     return False;
+                  end if;
+
+               end if;
+
+               exit when Is_Nil (Crt_Tok)
+                 or else
+                   Kind (Crt_Tok)
+               in Res_For | Res_When | Res_Begin | Res_Is | Colon_Equal |
+                  Res_Package | Res_With;
+
+               Crt_Tok := Prev (Crt_Tok);
+            end loop;
+
+            return False;
+         end Is_Action_Call_Parameter;
+
+         function Called_As_Parameter_Of_An_Action_Call
+           (Tok : Tokn_Cursor) return Boolean
+         is
+            Index : constant Line_Break_Index := Line_Break_Token_Index (Tok);
+            LB      : Line_Break renames All_LB (Index);
+            Crt_Tok : Tokn_Cursor := Prev (Tok);
+
+            function Call_Pattern_Found (Tok : Tokn_Cursor) return Boolean is
+              ((Kind (Prev (Tok)) = Spaces
+               and then Kind (Prev (Prev (Tok))) = Ident)
+               or else
+                 (Kind (Prev (Tok)) in Line_Break_Token
+                  and then Kind (Prev (Prev (Tok))) = Ident));
+
+            Pattern_Found  : Boolean     := False;
+            Call_Ident_Tok : Tokn_Cursor := Nil_Tokn_Cursor;
+            Count          : Natural     := 0;
+         begin
+            pragma Assert (Kind (Tok) in Line_Break_Token
+                           and then LB.Enabled
+                           and then not Is_Nil (Crt_Tok)
+                           and then Kind (Crt_Tok) in Arrow | ',');
+
+            if not Is_Action_Call_Parameter (Tok) then
+               return False;
+            end if;
+
+            while not Is_Nil (Crt_Tok) loop
+               if Kind (Crt_Tok) = '(' then
+                  if Call_Pattern_Found (Crt_Tok) then
+                     Pattern_Found := True;
+                     Call_Ident_Tok := Prev (Prev (Prev (Crt_Tok)));
+                     exit;
+                  end if;
+               end if;
+
+               exit when Is_Nil (Crt_Tok)
+                 or else
+                   Kind (Crt_Tok)
+                     in Res_For | Res_When | Res_Begin | Res_Is | Colon_Equal;
+
+               Crt_Tok := Prev (Crt_Tok);
+            end loop;
+
+            --  Look backward starting from the call to identify if it is a
+            --  a parameter of an other action call
+            if not Pattern_Found then
+               return False;
+            end if;
+
+            Crt_Tok := Call_Ident_Tok;
+            while not Is_Nil (Crt_Tok) loop
+
+               case Kind (Crt_Tok) is
+                  when ',' | Arrow =>
+                     return True;
+                  when ')' =>
+                     Count := Count + 1;
+
+                  when '(' =>
+                     if Count = 0 then
+                        if Call_Pattern_Found (Crt_Tok) then
+                           return True;
+                        end if;
+                     else
+                        Count := Count - 1;
+                     end if;
+
+                  when others => null;
+               end case;
+
+               exit when Is_Nil (Crt_Tok)
+                 or else
+                   Kind (Crt_Tok)
+                     in Res_For | Res_When | Res_Begin | Res_Is | Colon_Equal;
+
+               Crt_Tok := Prev (Crt_Tok);
+            end loop;
+
+            return False;
+
+         end Called_As_Parameter_Of_An_Action_Call;
+
+         function Is_Expected_Token (Tok : Tokn_Cursor) return Boolean
+         is ((Kind (Prev (Tok)) in ',' | '&' | ';' | ''' | Arrow)
+             or else (Kind (Prev (Tok)) = Ident and Kind (Next (Tok)) = '('));
+
+         function Prev_LB_Indentation (Paren : Tokn_Cursor) return Positive
+         is
+            Crt_Tok : Tokn_Cursor := Paren;
+         begin
+            while not Is_Nil (Crt_Tok) loop
+
+               if Kind (Crt_Tok) = Enabled_LB_Token then
+                  declare
+                     Index : constant Line_Break_Index :=
+                       Line_Break_Token_Index (Crt_Tok);
+                     LB : Line_Break renames All_LB (Index);
+                  begin
+                     return LB.Indentation;
+                  end;
+               end if;
+
+               exit when Is_Nil (Crt_Tok)
+                 or else
+                   Kind (Crt_Tok)
+                     in Res_For | Res_When | Res_Begin | Res_Is | Colon_Equal;
+               Prev (Crt_Tok);
+            end loop;
+
+            return 1;
+         end Prev_LB_Indentation;
+
+         procedure Adjust_Indentation_After_Comma (Tok : Tokn_Cursor)
+         is
+            Index    : constant Line_Break_Index := Line_Break_Token_Index (Tok);
+            LB       : Line_Break renames All_LB (Index);
+            Crt_Tok  : Tokn_Cursor := Tok;
+
+            OP_Count  : Natural := 0;
+            CP_Count  : Natural := 0;
+         begin
+            pragma Assert (Kind (Tok) in Line_Break_Token and then LB.Enabled);
+
+            if not Called_As_Parameter_Of_An_Action_Call (Crt_Tok) then
+               return;
+            end if;
+
+            --  Look forward on the line after the current ',' followed by a
+            --  LB and find its specificities in order to adjust the
+            --  indentation value of the line break.
+
+            while not After_Last (Crt_Tok) loop
+               Next (Crt_Tok);
+
+               case Kind (Crt_Tok) is
+                  when Line_Break_Token =>
+                     declare
+                        Crt_Index  : constant Line_Break_Index :=
+                          Line_Break_Token_Index (Crt_Tok);
+                        Crt_LB     : Line_Break renames All_LB (Crt_Index);
+
+                        EP         : Tokn_Cursor := Nil_Tokn_Cursor;
+                        PLB_Indent : Natural     := 0;
+                     begin
+                        if Crt_LB.Enabled
+                          and then Is_Expected_Token (Crt_Tok)
+                        then
+                           EP := Enclosing_Open_Paren (Crt_Tok, OP_Count);
+
+                           if not Is_Nil (EP) then
+                              PLB_Indent := Prev_LB_Indentation (EP);
+
+                              --  The context is supposed to be a parenthesized
+                              --  call and the indentation should be alligned
+                              --  to the parenthesis position + 1.
+                              --  The opened and closed parenthesis could
+                              --  impact the alignement. So, will adjust
+                              --  according to the different situations
+
+                              if OP_Count = 0 and then CP_Count = 0 then
+                                 null;
+
+                              elsif OP_Count /= 0 and then CP_Count = 0 then
+                                 LB.Indentation := LB.Indentation - OP_Count;
+
+                              elsif CP_Count /= 0 and then OP_Count = 0 then
+                                 null;
+
+                              else
+                                 if OP_Count = CP_Count then
+                                    null;
+
+                                 elsif CP_Count > OP_Count then
+                                    LB.Indentation :=
+                                      (if CP_Count - OP_Count >= 1 then
+                                         (LB.Indentation -
+                                              (CP_Count - OP_Count) + 1)
+                                       else
+                                          LB.Indentation);
+
+                                 elsif OP_Count > CP_Count then
+                                    LB.Indentation := LB.Indentation -
+                                      (OP_Count - CP_Count);
+                                 end if;
+                              end if;
+
+                              --  This part will handle the last line of the
+                              --  parenthesized call. Sometime, after Split_Line
+                              --  when more than one parenthesis is found in a
+                              --  line and the max length is exceeded, when the
+                              --  line is splitted the indentation is not
+                              --  updated.
+
+                              if Kind (Prev (Crt_Tok)) = ';'
+                                and then OP_Count /= 0
+                              then
+                                 if LB.Indentation /= PLB_Indent + 1 then
+                                    LB.Indentation := PLB_Indent + OP_Count + 1;
+                                 end if;
+                              end if;
+                           end if;
+
+                           exit;
+                        end if;
+                     end;
+
+                  when '(' =>
+                     OP_Count := OP_Count + 1;
+
+                  when ')' =>
+                     CP_Count := CP_Count + 1;
+
+                  when others => null;
+               end case;
+            end loop;
+         end Adjust_Indentation_After_Comma;
+
+         Saved_New_Tokns : Scanner.Tokn_Vec renames Lines_Data.Saved_New_Tokns;
          New_Tokns : Scanner.Tokn_Vec renames Lines_Data.New_Tokns;
          Ignore : Boolean := Scanner.Move_Tokns
            (Target => Saved_New_Tokns, Source => New_Tokns);
          New_Tok : Tokn_Cursor := First (Saved_New_Tokns'Access);
 
+         --  Start of processing for Insert_Indentation
       begin
          pragma Assert (Is_Empty (New_Tokns));
 
@@ -3842,8 +4184,8 @@ package body Pp.Formatting is
                      --  to change it in Enabled_LB_Token even is if it is
                      --  enabled.
 
-                     if Arg (Cmd, Preserve_Line_Breaks) and then
-                       Kind (New_Tok) = Disabled_LB_Token
+                     if Arg (Cmd, Preserve_Line_Breaks)
+                       and then Kind (New_Tok) = Disabled_LB_Token
                      then
                         null;
                      else
@@ -3908,6 +4250,17 @@ package body Pp.Formatting is
                   pragma Assert (LB.Enabled);
                   pragma Assert (Kind (Next (New_Tok)) /= Spaces);
                begin
+
+                  --  In case of parenthesized expressions
+                  --  (like function or procedure calls where one of the call
+                  --  param is a function call with multiple parameters), the
+                  --  lines of the call having more than one open parenthesis,
+                  --  the related line breaks indentation computed in the
+                  --  previous steps might need to be adjusted.
+                  if Kind (Prev (New_Tok)) = ',' then
+                     Adjust_Indentation_After_Comma (New_Tok);
+                  end if;
+
                   if Kind (Next (New_Tok)) not in Line_Break_Token then
                      Append_Spaces (New_Tokns, LB.Indentation);
                   end if;
