@@ -709,6 +709,19 @@ package body Utils.Projects is
                  (Recursive => Arg (Cmd) /= No_Subprojects,
                   Include_Externally_Built => False);
 
+               if Arg (Cmd) = No_Subprojects then
+                  Prj := Prj.Extended_Project;
+                  while Prj /= No_Project loop
+                     Append
+                       (Files,
+                        Prj.Source_Files
+                          (Recursive                => False,
+                           Include_Externally_Built => False).all);
+
+                     Prj := Prj.Extended_Project;
+                  end loop;
+               end if;
+
                for F in Files'Range loop
                   if not Is_Externally_Built (Files (F))
                     and then Is_Ada_File (Files (F))
