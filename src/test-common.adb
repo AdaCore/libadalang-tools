@@ -92,12 +92,18 @@ package body Test.Common is
    -- Mangle_Hash --
    -----------------
 
-   function Mangle_Hash (Subp : Ada_Node'Class) return String
+   function Mangle_Hash
+     (Subp               : Ada_Node'Class;
+      Unwind_Controlling : Boolean := True) return String
    is
       Full_Hash : Unbounded_String;
    begin
 
-      Full_Hash := To_Unbounded_String (Mangle_Hash_Full (Subp));
+      Full_Hash :=
+        To_Unbounded_String
+          (Mangle_Hash_Full
+             (Subp,
+              N_Controlling => not Unwind_Controlling));
 
       return
         Test_Routine_Prefix
@@ -116,7 +122,6 @@ package body Test.Common is
       N_Controlling  : Boolean := False;
       For_Stubs      : Boolean := False) return String
    is
-      pragma Unreferenced (N_Controlling);
       Subp_Name : constant String :=
         Common.Node_Image
           (P_Defining_Name (As_Basic_Decl (Subp)));
@@ -295,6 +300,7 @@ package body Test.Common is
                  Subp_Depth < 2 and then not Attr_Flag
                  and then Type_Decl = Tagged_Rec
                  and then not For_Stubs
+                 and then not N_Controlling
                then
                   Type_Decl := Root_Ignore;
                end if;
@@ -353,6 +359,7 @@ package body Test.Common is
                        Subp_Depth < 2 and then not Attr_Flag
                        and then Type_Decl = Tagged_Rec
                        and then not For_Stubs
+                       and then not N_Controlling
                      then
                         Type_Decl := Root_Ignore;
                      end if;

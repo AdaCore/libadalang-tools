@@ -62,10 +62,14 @@ package Test.Common is
       For_Stubs      : Boolean := False) return String;
    --  Returns full hash for given subprogram
 
-   function Mangle_Hash (Subp : Ada_Node'Class) return String;
+   function Mangle_Hash
+     (Subp               : Ada_Node'Class;
+      Unwind_Controlling : Boolean := True) return String;
    --  Returns the name of a given procedure or function with a hash code made
    --  of full ada names of all its parameters and result profile in case of
    --  a function.
+   --  Unwind_Controlling defines wether name of controlling parameter type
+   --  should be replaced with corresponding root type name or not.
 
    function Substring_16 (S : String) return String is
      (S (S'First .. S'First + 15));
