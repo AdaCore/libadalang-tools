@@ -921,7 +921,7 @@ package body Test.Skeleton is
             return Over;
          end if;
 
-         if Is_Private (Node) then
+         if Node.Kind = Ada_Private_Part then
             return Over;
          end if;
 
@@ -1350,10 +1350,6 @@ package body Test.Skeleton is
             return Over;
          end if;
 
-         if Node.Kind = Ada_Private_Part then
-            return Over;
-         end if;
-
          if Node.Kind = Ada_Generic_Formal_Part then
             return Over;
          end if;
@@ -1566,6 +1562,7 @@ package body Test.Skeleton is
             --  In case when owner tagged type is declared in the private part
             --  the check for Elaboration control is not performed
             --  for the type in Get_Records so we need to launch it here.
+
             if Node.Kind = Ada_Expr_Function then
                Owner_Decl := P_Primitive_Subp_Tagged_Type
                  (Node.As_Base_Subp_Body.F_Subp_Spec.As_Base_Subp_Spec);
@@ -1587,9 +1584,9 @@ package body Test.Skeleton is
             Subp.Corresp_Type     := 0;
 
             Subp.Subp_Mangle_Name := new
-              String'(Mangle_Hash (Node));
+              String'(Mangle_Hash (Node, Unwind_Controlling => False));
             Subp.Subp_Full_Hash := new
-              String'(Mangle_Hash_Full (Node));
+              String'(Mangle_Hash_Full (Node, N_Controlling => True));
             Subp.Subp_Hash_V1 := new
               String'(Mangle_Hash_Full (Node, True, True));
             Subp.Subp_Hash_V2_1 := new
