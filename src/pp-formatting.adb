@@ -2956,31 +2956,31 @@ package body Pp.Formatting is
                  or else Arg (Cmd, Comments_Unchanged)
                then
                   Cur_Indentation := Sloc (Src_Tok).Col - 1; -- Keep as in input
-
                else
                   Cur_Indentation := Indentation;
 
-                  --  Try to make comment fit on line. If we're filling it, then
-                  --  rely on that to make it fit. If Cur_Indentation pushes
-                  --  it past Max_Line_Length, and the comment would fit if
-                  --  not indented, then reduce the indentation.
-
                   declare
-                     W : constant Positive := Width (Src_Tok);
+                     W          : constant Positive := Width (Src_Tok);
+                     Src_Indent : constant Positive := Sloc (Src_Tok).Col - 1;
                   begin
+
                      if (not Comment_Filling_Enabled (Cmd)
-                        or else Kind (Src_Tok) /= Fillable_Comment)
-                       and then
-                         Cur_Indentation + W > Arg (Cmd, Max_Line_Length)
+                         or else Kind (Src_Tok) /= Fillable_Comment)
+                       and then Cur_Indentation + W > Arg (Cmd, Max_Line_Length)
                        and then W <= Arg (Cmd, Max_Line_Length)
                      then
+                        --  If the current line length exceeds Max_Line_Length
+                        --  get the minimal indentation level and allign at the
+                        --  left, either choosing the current indentation
+                        --  level either keeping it as in input.
+
                         Cur_Indentation :=
-                          Good_Column (PP_Indentation (Cmd),
-                                       Arg (Cmd, Max_Line_Length) - W);
-                        pragma Assert
-                          ((Cur_Indentation mod PP_Indentation (Cmd)) = 0);
+                          (if Src_Indent mod PP_Indentation (Cmd) = 0
+                           then Natural'Min (Src_Indent, Indentation)
+                           else Indentation);
                      end if;
                   end;
+
                end if;
             end Set_Cur_Indent;
 
@@ -3014,9 +3014,9 @@ package body Pp.Formatting is
 
          begin
 
-            --  Processing in preparation for Copy_Pp_Off_Regions. That depends on
-            --  an alternating sequence: OFF, ON, OFF, ON, .... So we check that
-            --  here, and abort processing if it's not true.
+            --  Processing in preparation for Copy_Pp_Off_Regions. That depends
+            --  on an alternating sequence: OFF, ON, OFF, ON, .... So we check
+            --  that here, and abort processing if it's not true.
 
             case Whole_Line_Comment'(Kind (Src_Tok)) is
                when Pp_Off_Comment =>
@@ -3089,6 +3089,7 @@ package body Pp.Formatting is
                      --  part or a CASE statement part or a BEGIN or END
                      --  keyword align with the following line of code otherwise
                      --  (i.e., keep the after indentation level)
+
                      if Next_Is_Begin (New_Tok) or else
                        Next_Is_End (New_Tok) or else
                        Next_Is_Inside_If (New_Tok) or else
@@ -3258,9 +3259,7 @@ package body Pp.Formatting is
                end if;
 
             end;
-
             Reset_Indentation;
-
          end Insert_Whole_Line_Comment;
 
          procedure Insert_Preprocessor_Directive is
@@ -3697,6 +3696,7 @@ package body Pp.Formatting is
                               Append_Temp_Line_Break
                                 (Lines_Data_P,
                                  Org => "Append_Temp_ Source_Line_Breaks 1");
+
                               Reset_Indentation;
                               New_Line_Start_Out := New_Tok;
 
