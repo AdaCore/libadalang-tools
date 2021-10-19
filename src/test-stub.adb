@@ -44,6 +44,7 @@ with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Indefinite_Vectors;
 with Ada.Containers.Indefinite_Ordered_Sets;
 
+with Ada.Directories;
 with Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings; use Ada.Strings;
@@ -51,6 +52,7 @@ with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 with Ada.Characters.Handling; use Ada.Characters.Handling;
 
 with Utils.Command_Lines; use Utils.Command_Lines;
+with Utils.Environment;
 
 package body Test.Stub is
    Me :         constant Trace_Handle := Create ("Stubs", Default => Off);
@@ -666,9 +668,10 @@ package body Test.Stub is
       Data           : Data_Holder)
    is
 
-      Tmp_File_Name      : constant String :=
-        "gnattest_tmp_stub_body";
-      Success : Boolean;
+      Tmp_File_Name : constant String :=
+        Ada.Directories.Compose
+          (Utils.Environment.Tool_Temp_Dir.all, "gnattest_tmp_stub_body");
+      Success       : Boolean;
 
    begin
       Trace (Me, "generating body of " & Body_File_Name);
@@ -3520,9 +3523,10 @@ package body Test.Stub is
       Root_Node : constant Element_Node :=
         Element_Node_Trees.Element (First_Child (Data.Elem_Tree.Root));
 
-      Tmp_File_Name      : constant String :=
-        "gnattest_tmp_stub_body";
-      Success : Boolean;
+      Tmp_File_Name : constant String :=
+        Ada.Directories.Compose
+          (Utils.Environment.Tool_Temp_Dir.all, "gnattest_tmp_stub_body");
+      Success       : Boolean;
 
       Cur    : Element_Node_Lists.Cursor;
       MD_Cur : Markered_Data_Maps.Cursor;

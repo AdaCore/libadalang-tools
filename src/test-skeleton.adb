@@ -39,6 +39,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with Ada.Characters.Handling; use Ada.Characters.Handling;
+with Ada.Directories;
 with Ada.Exceptions;
 with Ada.Strings; use Ada.Strings;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
@@ -58,6 +59,7 @@ with Test.Skeleton.Source_Table; use Test.Skeleton.Source_Table;
 with Test.Mapping; use Test.Mapping;
 with Test.Stub;
 with Utils.Command_Lines; use Utils.Command_Lines;
+with Utils.Environment;
 
 package body Test.Skeleton is
    Me                : constant Trace_Handle :=
@@ -3563,7 +3565,8 @@ package body Test.Skeleton is
         Get_Source_Output_Dir (Data.Unit_File_Name.all);
 
       Tmp_File_Name      : constant String :=
-        "gnattest_tmp_test_package";
+        Ada.Directories.Compose
+          (Utils.Environment.Tool_Temp_Dir.all, "gnattest_tmp_test_package");
 
       Test_File_Name : String_Access;
       Data_Unit_Name : String_Access;
