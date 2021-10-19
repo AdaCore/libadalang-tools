@@ -305,7 +305,7 @@ package body ada_main is
 --  BEGIN Object file/option list
    --   C:\Projects\gps_test\Test069_refactoring\obj\native\stream_buffer.2.o
    --   C:\Projects\gps_test\Test069_refactoring\obj\native\test_queues.1.o
---   C:\Projects\gps_test\Test069_refactoring\obj\native\test_refactoring.2.o
+   --   C:\Projects\gps_test\Test069_refactoring\obj\native\test_refactoring.2.o
    --   C:\Projects\gps_test\Test069_refactoring\obj\native\test069.2.o
    --   -LC:\Projects\gps_test\Test069_refactoring\obj\native\
    --   -LC:\Projects\gps_test\Test069_refactoring\obj\native\
