@@ -22,5 +22,5 @@
 ------------------------------------------------------------------------------
 
 package TGen is
-   Version : constant := 0.0;
+   Version : constant String := "0.0";
 end TGen;

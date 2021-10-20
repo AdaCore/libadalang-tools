@@ -21,55 +21,20 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Langkit_Support.Text;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-package body TGen.Types is
+package TGen.Types.Translation is
 
-   package Text renames Langkit_Support.Text;
+   type Translation_Result (Success : Boolean := False) is record
+      case Success is
+         when True =>
+            Res : Typ_Acc;
+         when False =>
+            Diagnostics : Unbounded_String :=
+              To_Unbounded_String ("Error during translation");
+      end case;
+   end record;
 
-   function Image (Self : Typ) return String is
-   begin
-      return Text.Image (Self.Name.Text);
-   end Image;
+   function Translate (N : LAL.Type_Expr) return Translation_Result;
 
-   function Image (Self : Signed_Int_Typ) return String is
-   begin
-      return
-        (Typ (Self).Image & ": Signed Integer range" & Self.Rang.Min'Image &
-         " .." & Self.Rang.Max'Image);
-   end Image;
-
-   function Image (Self : Mod_Int_Typ) return String is
-   begin
-      return
-        (Typ (Self).Image & ": Modular Integer mod" & Self.Mod_Value'Image);
-   end Image;
-
-   function Image (Self : Float_Typ) return String is
-   begin
-      return
-        (Typ (Self).Image & ": Real Type digits" & Self.Precision'Image &
-         (if Self.Has_Range then
-            " range" & Self.Rang.Min'Image & " .." & Self.Rang.Max'Image
-          else ""));
-   end Image;
-
-   function Image (Self : Ordinary_Fixed_Typ) return String is
-   begin
-      return
-        (Typ (Self).Image & ": Ordinary Fixed Point delta" &
-         Self.Delta_Value'Image & " range" & Self.Rang.Min'Image & " .." &
-         Self.Rang.Max'Image);
-   end Image;
-
-   function Image (Self : Decimal_Fixed_Typ) return String is
-   begin
-      return
-        Typ (Self).Image & ": Decimal Fixed Point delta" &
-        Self.Delta_Value'Image & " digits" & Self.Digits_Value'Image &
-        (if Self.Has_Range then
-           " range" & Self.Rang.Min'Image & " .." & Self.Rang.Max'Image
-         else "");
-   end Image;
-
-end TGen.Types;
+end TGen.Types.Translation;

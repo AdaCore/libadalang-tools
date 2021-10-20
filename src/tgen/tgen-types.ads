@@ -25,6 +25,8 @@ with Libadalang.Analysis;
 
 with Ada.Unchecked_Deallocation;
 
+with Ada.Containers.Ordered_Maps;
+
 package TGen.Types is
 
    package LAL renames Libadalang.Analysis;
@@ -49,23 +51,18 @@ package TGen.Types is
 
    type Enum_Typ is new Discrete_Typ with null record;
 
-   type Enum_Lit is record
-
-      Pos : Natural;
-      Id  : LAL.Identifier;
-
-   end record;
-
-   type Enum_Lit_Arr is array (Natural range <>) of Enum_Lit;
-
-   type Enum_Lit_Acc is access Enum_Lit_Arr;
-
    type Char_Typ is new Enum_Typ with null record;
 
    type Bool_Typ is new Enum_Typ with null record;
 
+   function "=" (Left, Right : LAL.Defining_Name) return Boolean is
+     (Left.Text = Right.Text);
+
+   package Enum_Literal_Maps is new Ada.Containers.Ordered_Maps
+     (Key_Type => Natural, Element_Type => LAL.Defining_Name);
+
    type Other_Enum_Typ is new Enum_Typ with record
-      Litterals : Enum_Lit_Acc;
+      Literals : Enum_Literal_Maps.Map;
    end record;
 
    type Int_Typ is new Discrete_Typ with null record;
