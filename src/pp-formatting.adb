@@ -2986,7 +2986,12 @@ package body Pp.Formatting is
 
             function Next_Is_Action (Tok : Tokn_Cursor) return Boolean is
               (not After_Last (Next (Tok)) and then
-               Kind (Next (Tok)) in Res_Procedure | Res_Function);
+               Kind (Next (Tok))
+               in Res_Procedure | Res_Function | Res_Overriding);
+
+            function Next_Is_Type (Tok : Tokn_Cursor) return Boolean is
+              (not After_Last (Next (Tok)) and then
+               Kind (Next (Tok)) = Res_Type);
 
             function Next_Is_Begin (Tok : Tokn_Cursor) return Boolean is
               (not After_Last (Next (Tok)) and then
@@ -3069,7 +3074,12 @@ package body Pp.Formatting is
 
                   if not Prev_Indentation_Affect_Comments and then
                     Next_Is_Action (New_Tok) and then
-                    Is_Blank_Line (Prev_ss (Src_Tok))
+                    (Is_Blank_Line (Prev_ss (Src_Tok))
+                     or else
+                       (Kind (Src_Tok) = Other_Whole_Line_Comment and then
+                        Kind (New_Tok) = Enabled_LB_Token and then
+                        Kind (Prev (New_Tok)) = ';'))
+
                   then
                      null;
 
@@ -3098,6 +3108,17 @@ package body Pp.Formatting is
                         Indentation := Natural'Max (Indentation,
                                                     Before_Indentation);
                      end if;
+
+                     --  Preserve the following type indentation level when
+                     --  the current ';' is followed by a type declaration
+
+                  elsif Prev_Indentation_Affect_Comments and then
+                    Is_Blank_Line (Prev_ss (Src_Tok)) and then
+                    Kind (New_Tok) = Enabled_LB_Token and then
+                    Kind (Prev (New_Tok)) = ';' and then
+                    Next_Is_Type (Next_ss (New_Tok))
+                  then
+                     Indentation := After_Indentation;
 
                   else
                      Indentation := Natural'Max (Indentation,
@@ -3421,7 +3442,6 @@ package body Pp.Formatting is
          --  Any other mismatch is considered to be a bug.
 
          loop
-
             pragma Assert (Kind (New_Tok) not in Comment_Kind);
             Manage_Paren_Stack;
 
