@@ -72,4 +72,22 @@ package body TGen.Types is
          else "");
    end Image;
 
+   function Image (Self : Bool_Typ) return String is
+   begin
+      return Typ (Self).Image & ": Boolean";
+   end Image;
+
+   function Image (Self : Char_Typ) return String is
+   begin
+      return Typ (Self).Image & ": Char";
+   end Image;
+
+   function Image (Self : Other_Enum_Typ) return String is
+   begin
+      return
+        Typ (Self).Image & ": Enum range "
+        & Text.Image (Self.Literals.First_Element.Text)
+        & " .. " & Text.Image (Self.Literals.Last_Element.Text);
+   end Image;
+
 end TGen.Types;

@@ -53,7 +53,11 @@ package TGen.Types is
 
    type Char_Typ is new Enum_Typ with null record;
 
+   function Image (Self : Char_Typ) return String;
+
    type Bool_Typ is new Enum_Typ with null record;
+
+   function Image (Self : Bool_Typ) return String;
 
    function "=" (Left, Right : LAL.Defining_Name) return Boolean is
      (Left.Text = Right.Text);
@@ -64,6 +68,8 @@ package TGen.Types is
    type Other_Enum_Typ is new Enum_Typ with record
       Literals : Enum_Literal_Maps.Map;
    end record;
+
+   function Image (Self : Other_Enum_Typ) return String;
 
    type Int_Typ is new Discrete_Typ with null record;
 

@@ -93,10 +93,9 @@ package body TGen.Types.Translation is
 
       Index : Natural := 0;
 
-      Max : constant Natural :=
-        Natural'Value (High_Bound (Decl.P_Discrete_Range).P_Eval_As_Int.Image);
-      Min : constant Natural :=
-        Natural'Value (Low_Bound (Decl.P_Discrete_Range).P_Eval_As_Int.Image);
+      Rang : constant Discrete_Range := Decl.P_Discrete_Range;
+
+      Max, Min : Natural;
 
    begin
       for Literal of Root_Enum_Decl.As_Type_Decl.F_Type_Def.As_Enum_Type_Def
@@ -106,13 +105,19 @@ package body TGen.Types.Translation is
          Index := Index + 1;
       end loop;
 
-      for Pos in Enum_Lits.First_Key .. Min - 1 loop
-         Enum_Lits.Delete (Pos);
-      end loop;
+      if (not Is_Null (High_Bound (Rang)))
+        and then not Is_Null (Low_Bound (Rang))
+      then
+         Max := Natural'Value (High_Bound (Rang).P_Eval_As_Int.Image);
+         Min := Natural'Value (Low_Bound (Rang).P_Eval_As_Int.Image);
+         for Pos in Enum_Lits.First_Key .. Min - 1 loop
+            Enum_Lits.Delete (Pos);
+         end loop;
 
-      for Pos in Max + 1 .. Enum_Lits.Last_Key loop
-         Enum_Lits.Delete (Pos);
-      end loop;
+         for Pos in Max + 1 .. Enum_Lits.Last_Key loop
+            Enum_Lits.Delete (Pos);
+         end loop;
+      end if;
 
       return
         (Success => True,
