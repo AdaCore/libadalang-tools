@@ -3,19 +3,12 @@ with "langkit_support.gpr";
 
 with "lal_tools_common.gpr";
 
-library project TGen is
-
-   type Library_Type_Type is ("static", "static-pic", "relocatable");
-   Library_Type : Library_Type_Type := external ("LIBRARY_TYPE", "static");
+project TGen is
 
    for Source_Dirs use ("tgen");
    for Object_Dir use "../obj/tgen";
-   for Library_Kind use Library_Type;
-   for Library_Dir use "../lib";
-   for Library_Name use "tgen";
-  
+   for Main use ("tgen_app.adb");
+
    package Compiler renames LAL_Tools_Common.Compiler;
 
 end TGen;
-
-
