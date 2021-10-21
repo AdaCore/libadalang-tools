@@ -7,6 +7,12 @@ Start_Line: 1
 Start_Column: 11
 End_Line: 1
 End_Column: 14
+Line: 4
+Source Location Range:
+Start_Line: 4
+Start_Column: 5
+End_Line: 4
+End_Column: 8
 Unit:foo-qux-garply.adb
 Line: 1
 Source Location Range:
@@ -14,6 +20,12 @@ Start_Line: 1
 Start_Column: 11
 End_Line: 1
 End_Column: 14
+Line: 4
+Source Location Range:
+Start_Line: 4
+Start_Column: 5
+End_Line: 4
+End_Column: 8
 Unit:foo-qux.adb
 Line: 1
 Source Location Range:
@@ -173,6 +185,12 @@ Start_Line: 1
 Start_Column: 15
 End_Line: 1
 End_Column: 18
+Line: 4
+Source Location Range:
+Start_Line: 4
+Start_Column: 9
+End_Line: 4
+End_Column: 12
 Unit:foo-qux.adb
 Line: 1
 Source Location Range:
