@@ -35,8 +35,8 @@ package body TGen.Types is
    function Image (Self : Signed_Int_Typ) return String is
    begin
       return
-        (Typ (Self).Image & ": Signed Integer range" & Self.Rang.Min'Image &
-         " .." & Self.Rang.Max'Image);
+        (Typ (Self).Image & ": Signed Integer range" &
+         Self.Range_Value.Min'Image & " .." & Self.Range_Value.Max'Image);
    end Image;
 
    function Image (Self : Mod_Int_Typ) return String is
@@ -48,9 +48,10 @@ package body TGen.Types is
    function Image (Self : Float_Typ) return String is
    begin
       return
-        (Typ (Self).Image & ": Real Type digits" & Self.Precision'Image &
+        (Typ (Self).Image & ": Real Type digits" & Self.Digits_Value'Image &
          (if Self.Has_Range then
-            " range" & Self.Rang.Min'Image & " .." & Self.Rang.Max'Image
+            " range" & Self.Range_Value.Min'Image & " .." &
+            Self.Range_Value.Max'Image
           else ""));
    end Image;
 
@@ -58,8 +59,8 @@ package body TGen.Types is
    begin
       return
         (Typ (Self).Image & ": Ordinary Fixed Point delta" &
-         Self.Delta_Value'Image & " range" & Self.Rang.Min'Image & " .." &
-         Self.Rang.Max'Image);
+         Self.Delta_Value'Image & " range" & Self.Range_Value.Min'Image &
+         " .." & Self.Range_Value.Max'Image);
    end Image;
 
    function Image (Self : Decimal_Fixed_Typ) return String is
@@ -68,7 +69,8 @@ package body TGen.Types is
         Typ (Self).Image & ": Decimal Fixed Point delta" &
         Self.Delta_Value'Image & " digits" & Self.Digits_Value'Image &
         (if Self.Has_Range then
-           " range" & Self.Rang.Min'Image & " .." & Self.Rang.Max'Image
+           " range" & Self.Range_Value.Min'Image & " .." &
+           Self.Range_Value.Max'Image
          else "");
    end Image;
 
@@ -85,9 +87,9 @@ package body TGen.Types is
    function Image (Self : Other_Enum_Typ) return String is
    begin
       return
-        Typ (Self).Image & ": Enum range "
-        & Text.Image (Self.Literals.First_Element.Text)
-        & " .. " & Text.Image (Self.Literals.Last_Element.Text);
+        Typ (Self).Image & ": Enum range " &
+        Text.Image (Self.Literals.First_Element.Text) & " .. " &
+        Text.Image (Self.Literals.Last_Element.Text);
    end Image;
 
 end TGen.Types;

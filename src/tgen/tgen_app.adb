@@ -21,7 +21,7 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO;           use Ada.Text_IO;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with Libadalang.Analysis;
@@ -45,8 +45,7 @@ procedure TGen_App is
    function Visit (Node : LAL.Ada_Node'Class) return Visit_Status;
 
    package App is new Helpers.App
-     (Name         => "Libgen",
-      Description  => "Type generation value for Ada",
+     (Name         => "Libgen", Description => "Type generation value for Ada",
       Process_Unit => Process_Unit);
 
    procedure Process_Unit
@@ -74,8 +73,9 @@ procedure TGen_App is
    begin
       if Kind (Node) in Ada_Subp_Spec_Range then
          Put_Line ("Found subprogram spec :");
-         Put_Line ("Subprogram Name : "
-                   & Text.Image (Node.As_Subp_Spec.F_Subp_Name.Text));
+         Put_Line
+           ("Subprogram Name : " &
+            Text.Image (Node.As_Subp_Spec.F_Subp_Name.Text));
          if Is_Null (Node.As_Subp_Spec.F_Subp_Params) then
             return Over;
          end if;

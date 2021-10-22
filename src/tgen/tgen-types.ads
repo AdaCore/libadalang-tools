@@ -74,7 +74,7 @@ package TGen.Types is
    type Int_Typ is new Discrete_Typ with null record;
 
    type Signed_Int_Typ is new Int_Typ with record
-      Rang : Int_Range;
+      Range_Value : Int_Range;
    end record;
 
    function Image (Self : Signed_Int_Typ) return String;
@@ -88,10 +88,10 @@ package TGen.Types is
    type Real_Typ is new Scalar_Typ with null record;
 
    type Float_Typ (Has_Range : Boolean) is new Real_Typ with record
-      Precision : Natural;
+      Digits_Value : Natural;
       case Has_Range is
          when True =>
-            Rang : Float_Range;
+            Range_Value : Float_Range;
          when False =>
             null;
       end case;
@@ -101,7 +101,7 @@ package TGen.Types is
 
    type Ordinary_Fixed_Typ is new Real_Typ with record
       Delta_Value : Long_Float;
-      Rang        : Float_Range;
+      Range_Value : Float_Range;
    end record;
 
    function Image (Self : Ordinary_Fixed_Typ) return String;
@@ -111,7 +111,7 @@ package TGen.Types is
       Digits_Value : Natural;
       case Has_Range is
          when True =>
-            Rang : Float_Range;
+            Range_Value : Float_Range;
          when others =>
             null;
       end case;
