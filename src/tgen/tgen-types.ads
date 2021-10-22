@@ -25,99 +25,18 @@ with Libadalang.Analysis;
 
 with Ada.Unchecked_Deallocation;
 
-with Ada.Containers.Ordered_Maps;
-
 package TGen.Types is
 
    package LAL renames Libadalang.Analysis;
-
-   type Int_Range is record
-      Min, Max : Integer;
-   end record;
-
-   type Float_Range is record
-      Min, Max : Long_Float;
-   end record;
-
    type Typ is tagged record
       Name : LAL.Defining_Name;
    end record;
 
    function Image (Self : Typ) return String;
 
-   type Scalar_Typ is new Typ with null record;
+   type Scalar_Typ (Is_Static : Boolean) is new Typ with null record;
 
    type Discrete_Typ is new Scalar_Typ with null record;
-
-   type Enum_Typ is new Discrete_Typ with null record;
-
-   type Char_Typ is new Enum_Typ with null record;
-
-   function Image (Self : Char_Typ) return String;
-
-   type Bool_Typ is new Enum_Typ with null record;
-
-   function Image (Self : Bool_Typ) return String;
-
-   function "=" (Left, Right : LAL.Defining_Name) return Boolean is
-     (Left.Text = Right.Text);
-
-   package Enum_Literal_Maps is new Ada.Containers.Ordered_Maps
-     (Key_Type => Natural, Element_Type => LAL.Defining_Name);
-
-   type Other_Enum_Typ is new Enum_Typ with record
-      Literals : Enum_Literal_Maps.Map;
-   end record;
-
-   function Image (Self : Other_Enum_Typ) return String;
-
-   type Int_Typ is new Discrete_Typ with null record;
-
-   type Signed_Int_Typ is new Int_Typ with record
-      Range_Value : Int_Range;
-   end record;
-
-   function Image (Self : Signed_Int_Typ) return String;
-
-   type Mod_Int_Typ is new Int_Typ with record
-      Mod_Value : Integer;
-   end record;
-
-   function Image (Self : Mod_Int_Typ) return String;
-
-   type Real_Typ is new Scalar_Typ with null record;
-
-   type Float_Typ (Has_Range : Boolean) is new Real_Typ with record
-      Digits_Value : Natural;
-      case Has_Range is
-         when True =>
-            Range_Value : Float_Range;
-         when False =>
-            null;
-      end case;
-   end record;
-
-   function Image (Self : Float_Typ) return String;
-
-   type Ordinary_Fixed_Typ is new Real_Typ with record
-      Delta_Value : Long_Float;
-      Range_Value : Float_Range;
-   end record;
-
-   function Image (Self : Ordinary_Fixed_Typ) return String;
-
-   type Decimal_Fixed_Typ (Has_Range : Boolean) is new Real_Typ with record
-      Delta_Value  : Long_Float;
-      Digits_Value : Natural;
-      case Has_Range is
-         when True =>
-            Range_Value : Float_Range;
-         when others =>
-            null;
-      end case;
-   end record;
-
-   function Image (Self : Decimal_Fixed_Typ) return String;
 
    type Access_Typ is new Typ with null record;
 

@@ -21,15 +21,25 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Langkit_Support.Text;
+package body TGen.Int_Types is
 
-package body TGen.Types is
-
-   package Text renames Langkit_Support.Text;
-
-   function Image (Self : Typ) return String is
+   function Image (Self : Signed_Int_Typ) return String is
    begin
-      return Text.Image (Self.Name.Text);
+      return
+        (Typ (Self).Image & ": Signed Integer"
+         & (if Self.Is_Static
+            then " range " & Self.Range_Value.Min'Image & " .."
+                 & Self.Range_Value.Max'Image
+            else " (non static)"));
    end Image;
 
-end TGen.Types;
+   function Image (Self : Mod_Int_Typ) return String is
+   begin
+      return
+        (Typ (Self).Image & ": Modular Integer"
+         & (if Self.Is_Static
+            then " mod" & Self.Mod_Value'Image
+            else "(non static)"));
+   end Image;
+
+end TGen.Int_Types;

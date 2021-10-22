@@ -21,15 +21,38 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Langkit_Support.Text;
+with TGen.Types;        use TGen.Types;
 
-package body TGen.Types is
+package TGen.Int_Types is
 
-   package Text renames Langkit_Support.Text;
+   type Int_Range is record
+      Min, Max : Integer;
+   end record;
 
-   function Image (Self : Typ) return String is
-   begin
-      return Text.Image (Self.Name.Text);
-   end Image;
+   type Int_Typ is new Discrete_Typ with null record;
 
-end TGen.Types;
+   type Signed_Int_Typ (Is_Static : Boolean) is new
+     Int_Typ (Is_Static => Is_Static) with record
+      case Is_Static is
+         when True =>
+            Range_Value : Int_Range;
+         when others =>
+            null;
+      end case;
+   end record;
+
+   function Image (Self : Signed_Int_Typ) return String;
+
+   type Mod_Int_Typ (Is_Static : Boolean) is new
+     Int_Typ (Is_Static => Is_Static) with record
+      case Is_Static is
+         when True =>
+            Mod_Value : Integer;
+         when others =>
+            null;
+      end case;
+   end record;
+
+   function Image (Self : Mod_Int_Typ) return String;
+
+end TGen.Int_Types;

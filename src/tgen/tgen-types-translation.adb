@@ -29,6 +29,10 @@ with Langkit_Support.Text;
 with Libadalang.Common;    use Libadalang.Common;
 with Libadalang.Expr_Eval; use Libadalang.Expr_Eval;
 
+with TGen.Int_Types; use TGen.Int_Types;
+with TGen.Real_Types; use TGen.Real_Types;
+with TGen.Enum_Types; use TGen.Enum_Types;
+
 package body TGen.Types.Translation is
    use LAL;
 
@@ -70,7 +74,9 @@ package body TGen.Types.Translation is
            (Success => True,
             Res     =>
               new Mod_Int_Typ'
-                (Name => Decl.P_Defining_Name, Mod_Value => Max));
+                (Is_Static => True,
+                 Name      => Decl.P_Defining_Name,
+                 Mod_Value => Max));
       else
          declare
             Min : constant Integer :=
@@ -80,7 +86,8 @@ package body TGen.Types.Translation is
               (Success => True,
                Res     =>
                  new Signed_Int_Typ'
-                   (Name        => Decl.P_Defining_Name,
+                   (Is_Static   => True,
+                    Name        => Decl.P_Defining_Name,
                     Range_Value => (Min => Min, Max => Max)));
          end;
       end if;
@@ -128,7 +135,9 @@ package body TGen.Types.Translation is
         (Success => True,
          Res     =>
            new Other_Enum_Typ'
-             (Name => Decl.P_Defining_Name, Literals => Enum_Lits));
+             (Is_Static => True,
+              Name      => Decl.P_Defining_Name,
+              Literals  => Enum_Lits));
    end Translate_Enum_Decl;
 
    --------------------------
@@ -331,14 +340,19 @@ package body TGen.Types.Translation is
            (Success => True,
             Res     =>
               new Float_Typ'
-                (Has_Range    => True, Name => Decl.P_Defining_Name,
-                 Digits_Value => Digits_Value, Range_Value => Range_Value));
+                (Is_Static    => True,
+                 Has_Range    => True,
+                 Name         => Decl.P_Defining_Name,
+                 Digits_Value => Digits_Value,
+                 Range_Value  => Range_Value));
       else
          return
            (Success => True,
             Res     =>
               new Float_Typ'
-                (Has_Range    => False, Name => Decl.P_Defining_Name,
+                (Is_Static    => True,
+                 Has_Range    => False,
+                 Name         => Decl.P_Defining_Name,
                  Digits_Value => Digits_Value));
       end if;
    exception
@@ -376,7 +390,9 @@ package body TGen.Types.Translation is
       then
          return
            (Success => True,
-            Res     => new Bool_Typ'(Name => Type_Decl_Node.P_Defining_Name));
+            Res     => new Bool_Typ'
+              (Is_Static => True,
+               Name      => Type_Decl_Node.P_Defining_Name));
       elsif Type_Decl_Node.P_Is_Enum_Type then
          declare
             Root_Type_Name : constant String :=
@@ -389,7 +405,9 @@ package body TGen.Types.Translation is
                return
                  (Success => True,
                   Res     =>
-                    new Char_Typ'(Name => Type_Decl_Node.P_Defining_Name));
+                    new Char_Typ'
+                      (Is_Static => True,
+                       Name      => Type_Decl_Node.P_Defining_Name));
             else
                return Translate_Enum_Decl (Type_Decl_Node, Root_Type);
             end if;

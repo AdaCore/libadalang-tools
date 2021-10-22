@@ -21,15 +21,64 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Langkit_Support.Text;
+with TGen.Types;        use TGen.Types;
 
-package body TGen.Types is
+package TGen.Real_Types is
 
-   package Text renames Langkit_Support.Text;
+   type Float_Range is record
+      Min, Max : Long_Float;
+   end record;
 
-   function Image (Self : Typ) return String is
-   begin
-      return Text.Image (Self.Name.Text);
-   end Image;
+   type Real_Typ is new Scalar_Typ with null record;
 
-end TGen.Types;
+   type Float_Typ (Is_Static, Has_Range : Boolean) is new
+     Real_Typ (Is_Static => Is_Static) with record
+      case Is_Static is
+         when True =>
+            Digits_Value : Natural;
+            case Has_Range is
+               when True =>
+                  Range_Value : Float_Range;
+               when False =>
+                  null;
+            end case;
+         when others =>
+            null;
+      end case;
+   end record;
+
+   function Image (Self : Float_Typ) return String;
+
+   type Ordinary_Fixed_Typ (Is_Static : Boolean) is new
+     Real_Typ (Is_Static => Is_Static) with record
+      case Is_Static is
+         when True =>
+            Delta_Value : Long_Float;
+            Range_Value : Float_Range;
+         when others =>
+            null;
+      end case;
+   end record;
+
+   function Image (Self : Ordinary_Fixed_Typ) return String;
+
+   type Decimal_Fixed_Typ (Is_Static, Has_Range : Boolean) is new
+     Real_Typ (Is_Static => Is_Static) with record
+      case Is_Static is
+         when True =>
+            Delta_Value  : Long_Float;
+            Digits_Value : Natural;
+            case Has_Range is
+               when True =>
+                  Range_Value : Float_Range;
+               when others =>
+                  null;
+            end case;
+         when others =>
+            null;
+      end case;
+   end record;
+
+   function Image (Self : Decimal_Fixed_Typ) return String;
+
+end TGen.Real_Types;

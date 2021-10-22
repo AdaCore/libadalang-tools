@@ -21,15 +21,34 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Langkit_Support.Text;
+package body TGen.Real_Types is
 
-package body TGen.Types is
+   function Image (Self : Float_Typ) return String is
+     (Typ (Self).Image & ": Real Type"
+      & (if Self.Is_Static
+         then " digits" & Self.Digits_Value'Image
+              & (if Self.Has_Range
+                 then " range" & Self.Range_Value.Min'Image & " .."
+                       & Self.Range_Value.Max'Image
+                 else "")
+         else " (non static)"));
 
-   package Text renames Langkit_Support.Text;
+   function Image (Self : Ordinary_Fixed_Typ) return String is
+     (Typ (Self).Image & ": Ordinary Fixed Point"
+      & (if Self.Is_Static
+         then " delta " & Self.Delta_Value'Image & " range"
+              & Self.Range_Value.Min'Image & " .." & Self.Range_Value.Max'Image
+         else " (non static)"));
 
-   function Image (Self : Typ) return String is
-   begin
-      return Text.Image (Self.Name.Text);
-   end Image;
+   function Image (Self : Decimal_Fixed_Typ) return String is
+     (Typ (Self).Image & ": Decimal Fixed Point"
+      & (if Self.Is_Static
+         then " delta" & Self.Delta_Value'Image & " digits"
+              & Self.Digits_Value'Image
+              & (if Self.Has_Range
+                 then " range" & Self.Range_Value.Min'Image & " .."
+                      & Self.Range_Value.Max'Image
+                 else "")
+         else " (non static)"));
 
-end TGen.Types;
+end TGen.Real_Types;

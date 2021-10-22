@@ -23,13 +23,28 @@
 
 with Langkit_Support.Text;
 
-package body TGen.Types is
+package body TGen.Enum_Types is
 
    package Text renames Langkit_Support.Text;
 
-   function Image (Self : Typ) return String is
+   function Image (Self : Bool_Typ) return String is
    begin
-      return Text.Image (Self.Name.Text);
+      return Typ (Self).Image & ": Boolean";
    end Image;
 
-end TGen.Types;
+   function Image (Self : Char_Typ) return String is
+   begin
+      return Typ (Self).Image & ": Char";
+   end Image;
+
+   function Image (Self : Other_Enum_Typ) return String is
+   begin
+      return
+        Typ (Self).Image & ": Enum"
+        & (if Self.Is_Static
+           then " range " & Text.Image (Self.Literals.First_Element.Text)
+                & " .. " & Text.Image (Self.Literals.Last_Element.Text)
+           else " (non static)");
+   end Image;
+
+end TGen.Enum_Types;
