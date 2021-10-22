@@ -365,6 +365,8 @@ package body TGen.Types.Translation is
    function Translate (N : LAL.Type_Expr) return Translation_Result is
       Type_Decl_Node : Base_Type_Decl;
       Root_Type      : Base_Type_Decl;
+
+      Is_Static : Boolean;
    begin
       if Kind (N) in Ada_Anonymous_Type then
          return
@@ -372,18 +374,27 @@ package body TGen.Types.Translation is
             Diagnostics => +"Anonymous types not supported yet");
       end if;
 
+      --  It's best to work on the full view of the type that we are trying to
+      --  translate.
+
       Type_Decl_Node :=
         N.As_Subtype_Indication.P_Designated_Type_Decl.P_Full_View;
       Root_Type := Type_Decl_Node.P_Root_Type;
 
-      if not Type_Decl_Node.P_Is_Static_Decl then
-         return
-           (Success     => False,
-            Diagnostics => +"Non static subtypes not supported yet");
-      end if;
+      --  Relevant only for Scalar types / array bounds
+
+      Is_Static := Type_Decl_Node.P_Is_Static_Decl;
 
       if Type_Decl_Node.P_Is_Int_Type then
-         return Translate_Int_Decl (Type_Decl_Node);
+         if Is_Static then
+            return Translate_Int_Decl (Type_Decl_Node);
+         else
+            return (Success => True,
+                    Res     => new Int_Typ'
+                      (Is_Static => False,
+                       Name      => Type_Decl_Node.P_Defining_Name));
+         end if;
+
       elsif P_Is_Derived_Type
           (Node       => Type_Decl_Node,
            Other_Type => Type_Decl_Node.P_Bool_Type.As_Base_Type_Decl)
@@ -394,6 +405,12 @@ package body TGen.Types.Translation is
               (Is_Static => True,
                Name      => Type_Decl_Node.P_Defining_Name));
       elsif Type_Decl_Node.P_Is_Enum_Type then
+         if not Is_Static then
+            return (Success => True,
+                        Res => new Other_Enum_Typ'
+                          (Is_Static => False,
+                           Name      => Type_Decl_Node.P_Defining_Name));
+         end if;
          declare
             Root_Type_Name : constant String :=
               Text.Image (Root_Type.P_Unique_Identifying_Name);
@@ -414,7 +431,15 @@ package body TGen.Types.Translation is
          end;
 
       elsif Type_Decl_Node.P_Is_Float_Type then
-         return Translate_Float_Decl (Type_Decl_Node);
+         if Is_Static then
+            return Translate_Float_Decl (Type_Decl_Node);
+         else
+            return (Success => True,
+                    Res     => new Float_Typ'
+                      (Is_Static => False,
+                       Has_Range => False,
+                       Name      => Type_Decl_Node.P_Defining_Name));
+         end if;
       end if;
 
       return (Success => False, Diagnostics => +"Unknown type kind");

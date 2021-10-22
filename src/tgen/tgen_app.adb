@@ -84,13 +84,16 @@ procedure TGen_App is
             declare
                Res : constant Translation_Result :=
                  Translate (Param.F_Type_Expr);
+               Typ : TGen.Types.Typ_Acc;
             begin
                Put_Line ("Param" & Param_Number'Image & " : ");
                if Res.Success then
                   Put_Line (Res.Res.Image);
+                  Typ := Res.Res;
                else
                   Put_Line (To_String (Res.Diagnostics));
                end if;
+               TGen.Types.Free (Typ);
             end;
             Param_Number := Param_Number + 1;
          end loop;
