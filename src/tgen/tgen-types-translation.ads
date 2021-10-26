@@ -35,6 +35,8 @@ package TGen.Types.Translation is
       end case;
    end record;
 
-   function Translate (N : LAL.Type_Expr) return Translation_Result;
+   function Translate
+     (N       : LAL.Type_Expr;
+      Verbose : Boolean := False) return Translation_Result;
 
 end TGen.Types.Translation;

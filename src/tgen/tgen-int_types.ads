@@ -21,7 +21,7 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with TGen.Types;        use TGen.Types;
+with TGen.Types; use TGen.Types;
 
 package TGen.Int_Types is
 
