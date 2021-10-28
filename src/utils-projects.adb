@@ -1423,6 +1423,11 @@ package body Utils.Projects is
                Tool_Package_Name,
                Compute_Project_Closure,
                Callback);
+
+            Environment.Create_Temp_Dir
+              (My_Project_Tree.Root_Project.Object_Dir.Display_Full_Name);
+         else
+            Environment.Create_Temp_Dir;
          end if;
 
          --  Subsequent call to Parse command line again is performed inside

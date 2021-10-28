@@ -32,10 +32,12 @@ use Utils.String_Utilities.String_Vectors;
 
 package Utils.Environment is
 
-   procedure Create_Temp_Dir;
+   procedure Create_Temp_Dir (Obj_Dir : String := "");
    --  Creates the temporary directory for all the compilations performed by
    --  the tool. Raises Fatal_Error if creating of the temporary directory
    --  failed because of any reason. Sets Utils.Environment.Tool_Temp_Dir.
+   --  If a non-empty Obj_Dir is specified, temporary directory is created
+   --  inside the Obj_Dir.
 
    procedure Copy_Gnat_Adc;
    --  Copies the "gnat.adc" file from the Tool_Current_Dir to the

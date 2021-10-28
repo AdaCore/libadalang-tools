@@ -128,7 +128,6 @@ package body Utils.Drivers is
    --  Start of processing for Driver
 
    begin
-      Environment.Create_Temp_Dir;
 
       Process_Command_Line
         (Cmd,
