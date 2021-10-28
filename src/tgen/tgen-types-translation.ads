@@ -39,4 +39,8 @@ package TGen.Types.Translation is
      (N       : LAL.Type_Expr;
       Verbose : Boolean := False) return Translation_Result;
 
+   function Translate
+     (N : LAL.Base_Type_Decl;
+      Verbose : Boolean := False) return Translation_Result;
+
 end TGen.Types.Translation;

@@ -83,7 +83,7 @@ procedure TGen_App is
          for Param of Node.As_Subp_Spec.F_Subp_Params.F_Params loop
             declare
                Res : constant Translation_Result :=
-                 Translate (Param.F_Type_Expr);
+                 Translate (Param.F_Type_Expr, Verbose => True);
                Typ : TGen.Types.Typ_Acc;
             begin
                Put_Line ("Param" & Param_Number'Image & " : ");

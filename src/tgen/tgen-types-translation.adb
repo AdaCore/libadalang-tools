@@ -29,9 +29,9 @@ with Langkit_Support.Text;
 with Libadalang.Common;    use Libadalang.Common;
 with Libadalang.Expr_Eval; use Libadalang.Expr_Eval;
 
-with TGen.Int_Types;  use TGen.Int_Types;
-with TGen.Real_Types; use TGen.Real_Types;
-with TGen.Enum_Types; use TGen.Enum_Types;
+with TGen.Int_Types;   use TGen.Int_Types;
+with TGen.Real_Types;  use TGen.Real_Types;
+with TGen.Enum_Types;  use TGen.Enum_Types;
 
 package body TGen.Types.Translation is
    use LAL;
@@ -65,7 +65,7 @@ package body TGen.Types.Translation is
      (Decl : Base_Type_Decl) return Translation_Result with
       Pre => Decl.P_Is_Static_Decl and then Decl.P_Is_Fixed_Point;
 
-   procedure Translate_Float_Range_Spec
+   procedure Translate_Float_Range
      (Decl     :     Base_Type_Decl; Has_Range : out Boolean;
       Min, Max : out Long_Float);
 
@@ -229,7 +229,7 @@ package body TGen.Types.Translation is
       Min, Max     : Long_Float;
    begin
       Find_Digits (Decl, Digits_Value);
-      Translate_Float_Range_Spec (Decl, Has_Range, Min, Max);
+      Translate_Float_Range (Decl, Has_Range, Min, Max);
       if Has_Range then
          return
            (Success => True,
@@ -260,6 +260,10 @@ package body TGen.Types.Translation is
                 (Is_Static => False, Has_Range => False,
                  Name      => Decl.P_Defining_Name));
    end Translate_Float_Decl;
+
+   -----------------------------------
+   -- Translate_Ordinary_Fixed_Decl --
+   -----------------------------------
 
    function Translate_Ordinary_Fixed_Decl
      (Decl : Base_Type_Decl) return Translation_Result
@@ -362,7 +366,7 @@ package body TGen.Types.Translation is
       end Find_Delta;
 
    begin
-      Translate_Float_Range_Spec (Decl, Has_Range, Min, Max);
+      Translate_Float_Range (Decl, Has_Range, Min, Max);
       pragma Assert (Has_Range);
       Find_Delta (Decl, Delta_Value);
       return
@@ -389,10 +393,17 @@ package body TGen.Types.Translation is
                 (Is_Static => False, Name => Decl.P_Defining_Name));
    end Translate_Ordinary_Fixed_Decl;
 
+   ----------------------------------
+   -- Translate_Decimal_Fixed_Decl --
+   ----------------------------------
+
    function Translate_Decimal_Fixed_Decl
      (Decl : Base_Type_Decl) return Translation_Result
    is
    begin
+      --  ??? Actually implement this, should be similar to Ordinary
+      --  fixed points
+
       return (Success => True,
               Res     => new Decimal_Fixed_Typ'
                 (Is_Static => False,
@@ -400,7 +411,11 @@ package body TGen.Types.Translation is
                  Name      => Decl.P_Defining_Name));
    end Translate_Decimal_Fixed_Decl;
 
-   procedure Translate_Float_Range_Spec
+   ---------------------------
+   -- Translate_Float_Range --
+   ---------------------------
+
+   procedure Translate_Float_Range
      (Decl     :     Base_Type_Decl; Has_Range : out Boolean;
       Min, Max : out Long_Float)
    is
@@ -455,7 +470,7 @@ package body TGen.Types.Translation is
               Kind_Name (Decl);
          end if;
          if Is_Null (Parent_Type.F_Constraint) then
-            Translate_Float_Range_Spec
+            Translate_Float_Range
               (Parent_Type.P_Designated_Type_Decl, Has_Range, Min, Max);
             return;
          end if;
@@ -473,7 +488,7 @@ package body TGen.Types.Translation is
                if Is_Null
                    (Parent_Type.F_Constraint.As_Digits_Constraint.F_Range)
                then
-                  Translate_Float_Range_Spec
+                  Translate_Float_Range
                     (Parent_Type.P_Designated_Type_Decl, Has_Range, Min, Max);
                   return;
                end if;
@@ -483,7 +498,7 @@ package body TGen.Types.Translation is
                if Is_Null
                    (Parent_Type.F_Constraint.As_Delta_Constraint.F_Range)
                then
-                  Translate_Float_Range_Spec
+                  Translate_Float_Range
                     (Parent_Type.P_Designated_Type_Decl, Has_Range, Min, Max);
                   return;
                end if;
@@ -507,7 +522,7 @@ package body TGen.Types.Translation is
          --  formed AST.
 
          when Ada_Attribute_Ref =>
-            Translate_Float_Range_Spec
+            Translate_Float_Range
               (Range_Spec_Val.F_Range.As_Attribute_Ref.F_Prefix
                  .P_Referenced_Decl
                  .As_Base_Type_Decl,
@@ -533,56 +548,76 @@ package body TGen.Types.Translation is
               with "Unexpected expression kind for real range constraint: " &
               Kind_Name (Range_Spec_Val.F_Range);
       end case;
-   end Translate_Float_Range_Spec;
+   end Translate_Float_Range;
+
+   ---------------
+   -- Translate --
+   ---------------
 
    function Translate
      (N : LAL.Type_Expr; Verbose : Boolean := False) return Translation_Result
    is
       Type_Decl_Node : Base_Type_Decl;
-      Root_Type      : Base_Type_Decl;
-
-      Is_Static : Boolean;
    begin
-      Verbose_Diag := Verbose;
       if Kind (N) in Ada_Anonymous_Type then
          return
            (Success     => False,
             Diagnostics => +"Anonymous types not supported yet");
       end if;
 
-      --  It's best to work on the full view of the type that we are trying to
-      --  translate.
+      --  For now, work on the full view of the type that we are trying to
+      --  translate. If this proves useless/problematic this can be revisited.
 
       Type_Decl_Node :=
         N.As_Subtype_Indication.P_Designated_Type_Decl.P_Full_View;
-      Root_Type := Type_Decl_Node.P_Root_Type;
 
+      return Translate (Type_Decl_Node, Verbose);
+   exception
+      when Exc : Property_Error =>
+         return (Success     => False,
+                 Diagnostics => +"Error translating " & N.Image & " : "
+                                 & Ada.Exceptions.Exception_Message (Exc));
+   end Translate;
+
+   ---------------
+   -- Translate --
+   ---------------
+
+   function Translate
+     (N       : LAL.Base_Type_Decl;
+      Verbose : Boolean := False) return Translation_Result
+   is
+      Root_Type : constant Base_Type_Decl := N.P_Root_Type;
+      Is_Static : Boolean;
       --  Relevant only for Scalar types / array bounds
 
-      Is_Static := Type_Decl_Node.P_Is_Static_Decl;
+   begin
+      Verbose_Diag := Verbose;
 
-      if Type_Decl_Node.P_Is_Int_Type then
+      Is_Static := N.P_Is_Static_Decl;
+
+      if N.P_Is_Int_Type then
          if Is_Static then
-            return Translate_Int_Decl (Type_Decl_Node);
+            return Translate_Int_Decl (N);
          else
             return
               (Success => True,
                Res     =>
                  new Int_Typ'
                    (Is_Static => False,
-                    Name      => Type_Decl_Node.P_Defining_Name));
+                    Name      => N.P_Defining_Name));
          end if;
 
       elsif P_Is_Derived_Type
-          (Node       => Type_Decl_Node,
-           Other_Type => Type_Decl_Node.P_Bool_Type.As_Base_Type_Decl)
+          (Node       => N,
+           Other_Type => N.P_Bool_Type.As_Base_Type_Decl)
       then
          return
            (Success => True,
             Res     =>
               new Bool_Typ'
-                (Is_Static => True, Name => Type_Decl_Node.P_Defining_Name));
-      elsif Type_Decl_Node.P_Is_Enum_Type then
+                (Is_Static => True, Name => N.P_Defining_Name));
+      elsif N.P_Is_Enum_Type then
 
          if not Is_Static then
             return
@@ -590,7 +625,7 @@ package body TGen.Types.Translation is
                Res     =>
                  new Other_Enum_Typ'
                    (Is_Static => False,
-                    Name      => Type_Decl_Node.P_Defining_Name));
+                    Name      => N.P_Defining_Name));
          end if;
          declare
             Root_Type_Name : constant String :=
@@ -605,48 +640,48 @@ package body TGen.Types.Translation is
                   Res     =>
                     new Char_Typ'
                       (Is_Static => True,
-                       Name      => Type_Decl_Node.P_Defining_Name));
+                       Name      => N.P_Defining_Name));
             else
-               return Translate_Enum_Decl (Type_Decl_Node, Root_Type);
+               return Translate_Enum_Decl (N, Root_Type);
             end if;
          end;
 
-      elsif Type_Decl_Node.P_Is_Float_Type then
+      elsif N.P_Is_Float_Type then
          if Is_Static then
-            return Translate_Float_Decl (Type_Decl_Node);
+            return Translate_Float_Decl (N);
          else
             return
               (Success => True,
                Res     =>
                  new Float_Typ'
                    (Is_Static => False, Has_Range => False,
-                    Name      => Type_Decl_Node.P_Defining_Name));
+                    Name      => N.P_Defining_Name));
          end if;
 
-      elsif Type_Decl_Node.P_Is_Fixed_Point then
+      elsif N.P_Is_Fixed_Point then
          if Kind (Root_Type.As_Type_Decl.F_Type_Def) in
              Ada_Ordinary_Fixed_Point_Def_Range
          then
             if Is_Static then
-               return Translate_Ordinary_Fixed_Decl (Type_Decl_Node);
+               return Translate_Ordinary_Fixed_Decl (N);
             else
                return
                  (Success => True,
                   Res     =>
                     new Ordinary_Fixed_Typ'
                       (Is_Static => False,
-                       Name      => Type_Decl_Node.P_Defining_Name));
+                       Name      => N.P_Defining_Name));
             end if;
          else
             if Is_Static then
-               return Translate_Decimal_Fixed_Decl (Type_Decl_Node);
+               return Translate_Decimal_Fixed_Decl (N);
             else
                return
                  (Success => True,
                   Res     =>
                     new Decimal_Fixed_Typ'
                       (Is_Static => False, Has_Range => False,
-                       Name      => Type_Decl_Node.P_Defining_Name));
+                       Name      => N.P_Defining_Name));
             end if;
          end if;
       end if;
