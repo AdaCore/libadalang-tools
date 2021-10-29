@@ -9,6 +9,12 @@ project TGen is
    for Object_Dir use "../obj/tgen";
    for Main use ("tgen_app.adb");
 
-   package Compiler renames LAL_Tools_Common.Compiler;
+   package Compiler is
+      for Default_Switches ("Ada") use ("-gnat2022");
+   end Compiler;
+
+   package Binder is
+      for Default_Switches ("Ada") use ("-Es");
+   end Binder;
 
 end TGen;
