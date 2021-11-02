@@ -38,11 +38,16 @@ package TGen.Types is
 
    type Discrete_Typ is new Scalar_Typ with null record;
 
+   function Lit_Image (Self : Discrete_Typ; Lit : Integer) return String;
+   --  Returns the image of the Litteral whose "position" is Lit. For integer
+   --  types, this is simply Lit'Image, for enum types, this correponds to
+   --  the image of the enum litteral at position Lit.
+
    type Access_Typ is new Typ with null record;
 
    type Composite_Typ is new Typ with null record;
 
-   type Typ_Acc is access Typ'Class;
+   type Typ_Acc is access all Typ'Class;
 
    procedure Free is new Ada.Unchecked_Deallocation (Typ'Class, Typ_Acc);
 

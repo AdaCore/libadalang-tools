@@ -33,9 +33,13 @@ package TGen.Enum_Types is
 
    function Image (Self : Char_Typ) return String;
 
+   function Lit_Image (Self : Char_Typ; Lit : Integer) return String;
+
    type Bool_Typ is new Enum_Typ with null record;
 
    function Image (Self : Bool_Typ) return String;
+
+   function Lit_Image (Self : Bool_Typ; Lit : Integer) return String;
 
    function "=" (Left, Right : LAL.Defining_Name) return Boolean is
      (Left.Text = Right.Text);
@@ -54,5 +58,7 @@ package TGen.Enum_Types is
    end record;
 
    function Image (Self : Other_Enum_Typ) return String;
+
+   function Lit_Image (Self : Other_Enum_Typ; Lit : Integer) return String;
 
 end TGen.Enum_Types;

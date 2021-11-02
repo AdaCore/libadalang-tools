@@ -21,45 +21,51 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Langkit_Support.Text;
+with TGen.Types; use TGen.Types;
+with TGen.Int_Types;
 
-package body TGen.Enum_Types is
+package TGen.Array_Types is
 
-   package Text renames Langkit_Support.Text;
+   type Array_Typ is new Composite_Typ with null record;
 
-   function Image (Self : Bool_Typ) return String is
-   begin
-      return Typ (Self).Image & ": Boolean";
-   end Image;
+   type Index_Typ_Arr is array (Positive range <>) of Typ_Acc;
 
-   function Lit_Image (Self : Bool_Typ; Lit : Integer) return String is
-      (if Lit = 0 then "False" else "True");
-   --  This isn't strictly correct, but this function should only be called
-   --  with values of Lit being 0 or 1, given that these are the values that
-   --  LAL will return when evaluating boolean static values.
+   type Index_Constraints
+     (Present : Boolean := False; Static : Boolean := False) is record
+      case Present is
+         when True =>
+            case Static is
+               when True =>
+                  Discrete_Range : TGen.Int_Types.Int_Range;
+                  --  Index constraints are supposed to apply to any discrete
+                  --  type, not only integers but we'll represent index
+                  --  constraints on an enum type by the index of the
+                  --  corresponding litterals that appear in the range.
+               when others =>
+                  null;
+            end case;
+         when others =>
+            null;
+      end case;
+   end record;
 
-   function Image (Self : Char_Typ) return String is
-   begin
-      return Typ (Self).Image & ": Char";
-   end Image;
+   type Index_Constraint_Arr is array (Positive range <>) of Index_Constraints;
 
-   function Lit_Image (Self : Char_Typ; Lit : Integer) return String is
-      Res : constant String := (1 => Character'Val (Lit));
-   begin
-      return Res;
-   end Lit_Image;
+   type Unconstrained_Array_Typ (Num_Dims : Positive) is new
+     Array_Typ with record
+      Index_Types    : Index_Typ_Arr (1 .. Num_Dims);
+      Component_Type : Typ_Acc;
+   end record;
 
-   function Image (Self : Other_Enum_Typ) return String is
-   begin
-      return
-        Typ (Self).Image & ": Enum"
-        & (if Self.Is_Static
-           then " range " & Text.Image (Self.Literals.First_Element.Text)
-                & " .. " & Text.Image (Self.Literals.Last_Element.Text)
-           else " (non static)");
-   end Image;
+   function Image (Self : Unconstrained_Array_Typ) return String;
 
-   function Lit_Image (Self : Other_Enum_Typ; Lit : Integer) return String is
-      (Text.Image (Self.Literals.Element (Lit).Text));
+   type Constrained_Array_Typ (Num_Dims : Positive) is new
+     Array_Typ with record
+      Index_Types : Index_Typ_Arr (1 .. Num_Dims);
+      Index_Constraints : Index_Constraint_Arr (1 .. Num_Dims);
+      Component_Type : Typ_Acc;
+   end record;
 
-end TGen.Enum_Types;
+   function Image (Self : Constrained_Array_Typ) return String;
+
+end TGen.Array_Types;

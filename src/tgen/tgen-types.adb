@@ -32,4 +32,7 @@ package body TGen.Types is
       return Text.Image (Self.Name.Text);
    end Image;
 
+   function Lit_Image
+     (Self : Discrete_Typ; Lit : Integer) return String is (Lit'Image);
+
 end TGen.Types;

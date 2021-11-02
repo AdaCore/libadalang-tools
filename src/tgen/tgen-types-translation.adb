@@ -32,6 +32,7 @@ with Libadalang.Expr_Eval; use Libadalang.Expr_Eval;
 with TGen.Int_Types;   use TGen.Int_Types;
 with TGen.Real_Types;  use TGen.Real_Types;
 with TGen.Enum_Types;  use TGen.Enum_Types;
+with TGen.Array_Types; use TGen.Array_Types;
 
 package body TGen.Types.Translation is
    use LAL;
@@ -68,6 +69,10 @@ package body TGen.Types.Translation is
    procedure Translate_Float_Range
      (Decl     :     Base_Type_Decl; Has_Range : out Boolean;
       Min, Max : out Long_Float);
+
+   function Translate_Array_Decl
+     (Decl : Base_Type_Decl) return Translation_Result with
+      Pre => Decl.P_Is_Array_Type;
 
    ------------------------
    -- Translate_Int_Decl --
@@ -550,6 +555,272 @@ package body TGen.Types.Translation is
       end case;
    end Translate_Float_Range;
 
+   --------------------------
+   -- Translate_Array_Decl --
+   --------------------------
+
+   function Translate_Array_Decl
+    (Decl : Base_Type_Decl) return Translation_Result
+   is
+      function Translate_Constrained
+        (Decl : Base_Type_Decl) return Translation_Result;
+
+      function Translate_Unconstrained
+        (Def : Array_Type_Def; Name : Defining_Name) return Translation_Result;
+
+      function Translate_Constrained
+         (Decl : Base_Type_Decl) return Translation_Result
+      is
+         Cmp_Typ_Def : Component_Def;
+         Indices_Constraints : Constraint_List;
+         Num_Indices : Positive;
+      begin
+         --  Here we either have a constrained array type decl, or a subtype
+         --  decl that constrains a previous unconstrained array type decl.
+
+         if Kind (Decl) = Ada_Type_Decl then
+            Cmp_Typ_Def :=
+              Decl.As_Type_Decl.F_Type_Def.As_Array_Type_Def.F_Component_Type;
+            Indices_Constraints :=
+              Decl.As_Type_Decl.F_Type_Def.As_Array_Type_Def.F_Indices
+                  .As_Constrained_Array_Indices.F_List;
+         else
+            Cmp_Typ_Def :=
+              Decl.As_Subtype_Decl.F_Subtype.P_Designated_Type_Decl
+                  .As_Type_Decl.F_Type_Def.As_Array_Type_Def.F_Component_Type;
+            Indices_Constraints :=
+              Decl.As_Subtype_Decl.F_Subtype.F_Constraint.As_Index_Constraint
+                  .F_Constraints;
+         end if;
+         Num_Indices := Indices_Constraints.Last_Child_Index;
+
+         declare
+            type Array_Acc is access all Constrained_Array_Typ;
+            Res : constant Array_Acc :=
+              new Constrained_Array_Typ (Num_Indices);
+
+            Component_Typ : constant Translation_Result :=
+              Translate (Cmp_Typ_Def.F_Type_Expr);
+              --  This ignores any constraints on the element type that may
+              --  appear in the component definition.
+
+            Current_Index : Positive := 1;
+
+            Index_Typ                      : Base_Type_Decl;
+            Has_Constraints                : Boolean;
+            Constraints_Static             : Boolean;
+            Range_Exp                      : Expr;
+            Constraint_Min, Constraint_Max : Integer;
+
+            Failure_Reason : Unbounded_String;
+         begin
+            if not Component_Typ.Success then
+               return (Success     => False,
+                       Diagnostics => "Failed to translate component type of"
+                                      & " array decl : "
+                                      & Component_Typ.Diagnostics);
+            end if;
+            Res.Component_Type := Component_Typ.Res;
+
+            for Constraint of Indices_Constraints loop
+               case Kind (Constraint) is
+                  when Ada_Subtype_Indication =>
+                     Index_Typ :=
+                       Constraint.As_Subtype_Indication.P_Designated_Type_Decl;
+
+                     if Is_Null (Constraint.As_Subtype_Indication.F_Constraint)
+                     then
+                        Has_Constraints := False;
+                     elsif not Constraint.As_Subtype_Indication.F_Constraint
+                               .As_Range_Constraint.F_Range.F_Range
+                               .P_Is_Static_Expr
+                     then
+                        Has_Constraints := True;
+                        Constraints_Static := False;
+                     elsif Kind (Constraint.As_Subtype_Indication.F_Constraint
+                                 .As_Range_Constraint.F_Range.F_Range)
+                                 in Ada_Attribute_Ref | Ada_Bin_Op
+                     then
+                        Range_Exp :=
+                          Constraint.As_Subtype_Indication.F_Constraint
+                                    .As_Range_Constraint.F_Range.F_Range;
+
+                        Has_Constraints := True;
+                        Constraints_Static := True;
+
+                     end if;
+                  when Ada_Bin_Op =>
+                     Index_Typ :=
+                       Constraint.As_Bin_Op.F_Left.P_Expression_Type;
+                     Has_Constraints := True;
+                     if Constraint.As_Expr.P_Is_Static_Expr then
+                        Constraints_Static := True;
+                        Range_Exp := Constraint.As_Expr;
+                     else
+                        Constraints_Static := False;
+                     end if;
+
+                  when Ada_Attribute_Ref =>
+                     Index_Typ :=
+                       Constraint.As_Attribute_Ref.F_Prefix
+                       .P_Name_Designated_Type;
+                     Has_Constraints := True;
+                     if Constraint.As_Expr.P_Is_Static_Expr then
+                        Constraints_Static := True;
+                        Range_Exp := Constraint.As_Expr;
+                     else
+                        Constraints_Static := False;
+                     end if;
+                  when others =>
+                     Failure_Reason :=
+                       +"Unexpected constraint kind for a constrained array: "
+                       & Kind_Name (Constraint);
+                     goto Failed_UC_Translation;
+               end case;
+
+               declare
+                  Index_Trans : constant Translation_Result :=
+                    Translate (Index_Typ);
+               begin
+                  if not Index_Trans.Success then
+                     Failure_Reason :=
+                       "Failed to translate type of the index dimention"
+                       & Current_Index'Image & ": " & Index_Trans.Diagnostics;
+                     goto Failed_UC_Translation;
+                  end if;
+                  Res.Index_Types (Current_Index) := Index_Trans.Res;
+               end;
+
+               if Has_Constraints and then Constraints_Static then
+                  --  We should only encouter either a Bin Op (A .. B) or a
+                  --  range attribute reference according to RM 3.5 (2).
+
+                  if Kind (Range_Exp) = Ada_Bin_Op then
+                     Constraint_Min := Integer'Value
+                       (Range_Exp.As_Bin_Op.F_Left.P_Eval_As_Int.Image);
+                     Constraint_Max := Integer'Value
+                       (Range_Exp.As_Bin_Op.F_Right.P_Eval_As_Int.Image);
+                  else
+                     Constraint_Min := Integer'Value
+                       (Low_Bound (Range_Exp.As_Attribute_Ref.F_Prefix
+                        .P_Name_Designated_Type.P_Discrete_Range)
+                        .P_Eval_As_Int.Image);
+                     Constraint_Min := Integer'Value
+                       (High_Bound (Range_Exp.As_Attribute_Ref.F_Prefix
+                        .P_Name_Designated_Type.P_Discrete_Range)
+                        .P_Eval_As_Int.Image);
+                  end if;
+               end if;
+
+               if not Has_Constraints then
+                  Res.Index_Constraints (Current_Index) :=
+                    (Present => False, Static => False);
+               elsif not Constraints_Static then
+                  Res.Index_Constraints (Current_Index) :=
+                    (Present => True, Static => False);
+               else
+                  Res.Index_Constraints (Current_Index) :=
+                    (Present        => True,
+                     Static         => True,
+                     Discrete_Range => (Min => Constraint_Min,
+                                        Max => Constraint_Max));
+               end if;
+               Current_Index := Current_Index + 1;
+            end loop;
+
+            Res.Name := Decl.P_Defining_Name;
+            return (Success => True, Res => Typ_Acc (Res));
+
+            <<Failed_UC_Translation>>
+            return (Success => False, Diagnostics => Failure_Reason);
+         end;
+      end Translate_Constrained;
+
+      function Translate_Unconstrained
+        (Def : Array_Type_Def; Name : Defining_Name) return Translation_Result
+      is
+         Indices_List : constant Unconstrained_Array_Index_List :=
+           Def.F_Indices.As_Unconstrained_Array_Indices.F_Types;
+         Num_Indices  : constant Positive := Indices_List.Last_Child_Index;
+         type Array_Acc is access Unconstrained_Array_Typ;
+         Res          : constant Array_Acc :=
+           new Unconstrained_Array_Typ (Num_Indices);
+
+         Failure_Reason : Unbounded_String;
+
+         Element_Type : constant Translation_Result :=
+           Translate (Def.F_Component_Type.F_Type_Expr);
+           --  This ignores any constraints on the element type that may appear
+           --  in the component definition.
+
+         Current_Index_Type : Positive := 1;
+      begin
+         if not Element_Type.Success then
+            return
+              (Success     => False,
+               Diagnostics => "Could not translate element type for array: "
+                              & Element_Type.Diagnostics);
+         end if;
+         Res.all.Component_Type := Element_Type.Res;
+         for Index of Indices_List loop
+            declare
+               Index_Type : constant Translation_Result :=
+                 Translate (Index.F_Subtype_Indication.As_Type_Expr);
+            begin
+               if Index_Type.Success then
+                  Res.Index_Types (Current_Index_Type) := Index_Type.Res;
+                  Current_Index_Type := Current_Index_Type + 1;
+               else
+                  Failure_Reason := Index_Type.Diagnostics;
+                  goto Failed_Translation;
+               end if;
+            end;
+         end loop;
+
+         Res.Name := Name;
+         return (Success => True, Res => Typ_Acc (Res));
+
+         <<Failed_Translation>>
+         return (Success => False,
+                 Diagnostics => "Failed to translate the type of the"
+                                & Current_Index_Type'Image & "index dimention"
+                                & ": " & Failure_Reason);
+
+      end Translate_Unconstrained;
+
+   begin
+      case Kind (Decl) is
+         when Ada_Subtype_Decl =>
+            return Translate_Constrained (Decl);
+
+         when Ada_Type_Decl =>
+            case Kind (Decl.As_Type_Decl.F_Type_Def
+                       .As_Array_Type_Def.F_Indices) is
+               when Ada_Constrained_Array_Indices =>
+                  return Translate_Constrained (Decl);
+
+               when Ada_Unconstrained_Array_Indices =>
+                  return Translate_Unconstrained
+                    (Decl.As_Type_Decl.F_Type_Def.As_Array_Type_Def,
+                     Decl.P_Defining_Name);
+
+               when others =>
+                  return
+                    (Success     => False,
+                     Diagnostics =>
+                       +"Unexpected array indices for array type def:"
+                        & Kind_Name (Decl.As_Type_Decl.F_Type_Def
+                                     .As_Array_Type_Def.F_Indices));
+            end case;
+
+         when others =>
+            return
+              (Success     => False,
+               Diagnostics => +"Unexpected base type decl kind for an array:"
+                              & Kind_Name (Decl));
+      end case;
+   end Translate_Array_Decl;
+
    ---------------
    -- Translate --
    ---------------
@@ -684,6 +955,9 @@ package body TGen.Types.Translation is
                        Name      => N.P_Defining_Name));
             end if;
          end if;
+
+      elsif N.P_Is_Array_Type then
+         return Translate_Array_Decl (N);
       end if;
 
       return (Success => False, Diagnostics => +"Unknown type kind");
