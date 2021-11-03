@@ -28,7 +28,7 @@ package TGen.Array_Types is
 
    type Array_Typ is new Composite_Typ with null record;
 
-   type Index_Typ_Arr is array (Positive range <>) of Typ_Acc;
+   type Index_Typ_Arr is array (Positive range <>) of TGen.Types.SP.Ref;
 
    type Index_Constraints
      (Present : Boolean := False; Static : Boolean := False) is record
@@ -54,7 +54,7 @@ package TGen.Array_Types is
    type Unconstrained_Array_Typ (Num_Dims : Positive) is new
      Array_Typ with record
       Index_Types    : Index_Typ_Arr (1 .. Num_Dims);
-      Component_Type : Typ_Acc;
+      Component_Type : TGen.Types.SP.Ref;
    end record;
 
    function Image (Self : Unconstrained_Array_Typ) return String;
@@ -63,7 +63,7 @@ package TGen.Array_Types is
      Array_Typ with record
       Index_Types : Index_Typ_Arr (1 .. Num_Dims);
       Index_Constraints : Index_Constraint_Arr (1 .. Num_Dims);
-      Component_Type : Typ_Acc;
+      Component_Type : TGen.Types.SP.Ref;
    end record;
 
    function Image (Self : Constrained_Array_Typ) return String;

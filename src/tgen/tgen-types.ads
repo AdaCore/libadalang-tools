@@ -25,6 +25,8 @@ with Libadalang.Analysis;
 
 with Ada.Unchecked_Deallocation;
 
+with GNATCOLL.Refcount; use GNATCOLL.Refcount;
+
 package TGen.Types is
 
    package LAL renames Libadalang.Analysis;
@@ -47,8 +49,10 @@ package TGen.Types is
 
    type Composite_Typ is new Typ with null record;
 
-   type Typ_Acc is access all Typ'Class;
+   package SP is new Shared_Pointers (Element_Type => Typ'Class);
 
-   procedure Free is new Ada.Unchecked_Deallocation (Typ'Class, Typ_Acc);
+   --  type Typ_Acc is access all Typ'Class;
+
+   --  procedure Free is new Ada.Unchecked_Deallocation (Typ'Class, Typ_Acc);
 
 end TGen.Types;

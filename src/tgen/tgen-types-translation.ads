@@ -28,7 +28,7 @@ package TGen.Types.Translation is
    type Translation_Result (Success : Boolean := False) is record
       case Success is
          when True =>
-            Res : Typ_Acc;
+            Res : SP.Ref;
          when False =>
             Diagnostics : Unbounded_String :=
               To_Unbounded_String ("Error during translation");
@@ -42,5 +42,7 @@ package TGen.Types.Translation is
    function Translate
      (N : LAL.Base_Type_Decl;
       Verbose : Boolean := False) return Translation_Result;
+
+   procedure Print_Cache_Stats;
 
 end TGen.Types.Translation;

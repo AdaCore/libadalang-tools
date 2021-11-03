@@ -82,18 +82,15 @@ procedure TGen_App is
          Put_Line ("Params:");
          for Param of Node.As_Subp_Spec.F_Subp_Params.F_Params loop
             declare
-               Res : constant Translation_Result :=
+               Trans_Res : constant Translation_Result :=
                  Translate (Param.F_Type_Expr, Verbose => True);
-               Typ : TGen.Types.Typ_Acc;
             begin
                Put_Line ("Param" & Param_Number'Image & " : ");
-               if Res.Success then
-                  Put_Line (Res.Res.Image);
-                  Typ := Res.Res;
+               if Trans_Res.Success then
+                  Put_Line (Trans_Res.Res.Get.Image);
                else
-                  Put_Line (To_String (Res.Diagnostics));
+                  Put_Line (To_String (Trans_Res.Diagnostics));
                end if;
-               TGen.Types.Free (Typ);
             end;
             Param_Number := Param_Number + 1;
          end loop;
@@ -105,4 +102,5 @@ procedure TGen_App is
 
 begin
    App.Run;
+   TGen.Types.Translation.Print_Cache_Stats;
 end TGen_App;

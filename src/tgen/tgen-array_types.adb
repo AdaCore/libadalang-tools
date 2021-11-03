@@ -25,13 +25,15 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 package body TGen.Array_Types is
 
+   use TGen.Types.SP;
+
    function Image (Self : Unconstrained_Array_Typ) return String is
       Res : Unbounded_String :=
         To_Unbounded_String (Typ (Self).Image & " : array (");
    begin
       for J in Self.Index_Types'Range loop
-         if Self.Index_Types (J) /= null then
-            Res := Res & Typ (Self.Index_Types (J).all).Image;
+         if Self.Index_Types (J) /= SP.Null_Ref then
+            Res := Res & Typ (Self.Index_Types (J).Get.Element.all).Image;
          else
             Res := Res & "null type ..";
          end if;
@@ -41,7 +43,7 @@ package body TGen.Array_Types is
             Res := Res & " range <>) ";
          end if;
       end loop;
-      Res := Res & "of " & Self.Component_Type.Image;
+      Res := Res & "of " & Self.Component_Type.Get.Image;
       return To_String (Res);
    end Image;
 
@@ -50,17 +52,18 @@ package body TGen.Array_Types is
         To_Unbounded_String (Typ (Self).Image & " : array (");
    begin
       for J in Self.Index_Types'Range loop
-         if Self.Index_Types (J) /= null then
-            Res := Res & Typ (Self.Index_Types (J).all).Image;
+         if Self.Index_Types (J) /= SP.Null_Ref then
+            Res := Res & Typ (Self.Index_Types (J).Get.Element.all).Image;
             if Self.Index_Constraints (J).Present
               and then Self.Index_Constraints (J).Static
             then
-               Res := Res & " range "
-                      & Discrete_Typ'Class (Self.Index_Types (J).all).Lit_Image
-                        (Self.Index_Constraints (J).Discrete_Range.Min)
-                      & " .. "
-                      & Discrete_Typ'Class (Self.Index_Types (J).all).Lit_Image
-                        (Self.Index_Constraints (J).Discrete_Range.Max);
+               Res :=
+                 Res & " range "
+                 & Discrete_Typ'Class (Self.Index_Types (J).Get.Element.all)
+                   .Lit_Image (Self.Index_Constraints (J).Discrete_Range.Min)
+                 & " .. "
+                 & Discrete_Typ'Class (Self.Index_Types (J).Get.Element.all)
+                   .Lit_Image (Self.Index_Constraints (J).Discrete_Range.Max);
             end if;
          else
             Res := Res & "null type ..";
@@ -72,8 +75,8 @@ package body TGen.Array_Types is
             Res := Res & ") ";
          end if;
       end loop;
-      Res := Res & "of " & (if Self.Component_Type /= null
-                            then Self.Component_Type.Image
+      Res := Res & "of " & (if Self.Component_Type /= SP.Null_Ref
+                            then Self.Component_Type.Get.Image
                             else "null type ..");
       return To_String (Res);
    end Image;

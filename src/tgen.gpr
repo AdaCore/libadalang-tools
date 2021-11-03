@@ -1,6 +1,8 @@
 with "libadalang.gpr";
 with "langkit_support.gpr";
 
+with "gnatcoll.gpr";
+
 with "lal_tools_common.gpr";
 
 project TGen is
