@@ -25,7 +25,7 @@ TESTSUITE_PROJECTS = \
    testsuite/ada_drivers/suppress_separate/suppress_separate.gpr
 
 ALL_PROJECTS = \
-   $(LIB_PROJECTS) $(TESTSUITE_PROJECTS)
+   $(LIB_PROJECTS) $(TESTSUITE_PROJECTS) $(BIN_PROJECTS)
 
 .PHONY: lib
 lib:
