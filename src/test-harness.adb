@@ -231,19 +231,17 @@ package body Test.Harness is
       S_Put (3, "for Source_Files use ();");
       Put_New_Line;
 
-      if RTS_Path.all /= "" then
-         if RTS_Attribute_Val = null then
-            S_Put (3, "for Runtime (""Ada"") use """ &
-                     RTS_Path.all & """;");
-         else
-            S_Put
-              (3,
-               "for Runtime (""Ada"") use """ & RTS_Attribute_Val.all & """;");
-         end if;
+      if RTS_Attribute_Val.all /= "" then
+         S_Put
+           (3,
+            "for Runtime (""Ada"") use """ & RTS_Attribute_Val.all & """;");
          Put_New_Line;
       end if;
 
-      --  Need to treat Target the same way.
+      if Target_Val.all /= "" then
+         S_Put (3, "for Target use """ & Target_Val.all & """;");
+         Put_New_Line;
+      end if;
 
       Put_New_Line;
       S_Put
