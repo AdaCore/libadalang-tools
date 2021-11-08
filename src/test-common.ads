@@ -303,6 +303,8 @@ package Test.Common is
    RTS_Path : GNAT.OS_Lib.String_Access := new String'("");
    RTS_Attribute_Val : GNAT.OS_Lib.String_Access;
 
+   Target_Val  : GNAT.OS_Lib.String_Access;
+
    Has_Test_Cases : Boolean := False;
 
    Separate_Drivers : Boolean := False;

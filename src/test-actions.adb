@@ -264,6 +264,11 @@ package body Test.Actions is
 
       SPT := GNATCOLL.Projects.Project_Tree (Tool.Project_Tree.all);
 
+      Test.Common.Target_Val :=
+        new String'(SPT.Root_Project.Get_Target (Default_To_Host => False));
+      Test.Common.RTS_Attribute_Val :=
+        new String'(SPT.Root_Project.Get_Runtime);
+
       --  Most output directories should be calculated relatively to original
       --  object dirs, so possible side effect of --subdirs must be undone.
       if Arg (Cmd, Subdirs) /= null then
