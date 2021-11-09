@@ -1,0 +1,6 @@
+description:
+    gnattest test
+
+driver:  python_script
+control:
+    - [SKIP, "env.platform != 'x86_64-linux'", "linux 64 only"]
