@@ -220,6 +220,17 @@ package body Test.Actions is
          end if;
 
          for File of File_Names (Cmd) loop
+
+            if GNAT.Directory_Operations.File_Extension
+              (File.all) in ".ads" | ".adb"
+            then
+               --  No project is specified but there are argument sources.
+               --  Most probably user forgot to specify the project, and since
+               --  gnattest cannot work without a project file it only makes
+               --  sense to stop here.
+               Cmd_Error_No_Help ("project file not specified");
+            end if;
+
             Tmp := new String'
               (GNAT.OS_Lib.Normalize_Pathname
                  (File.all,
