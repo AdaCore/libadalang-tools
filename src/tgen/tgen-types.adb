@@ -25,14 +25,26 @@ with Langkit_Support.Text;
 
 package body TGen.Types is
 
+   use LAL;
    package Text renames Langkit_Support.Text;
 
    function Image (Self : Typ) return String is
    begin
-      return Text.Image (Self.Name.Text);
+      return (if Self.Name = No_Defining_Name
+              then "Anonymous"
+              else Text.Image (Self.Name.Text));
    end Image;
+
+   function Kind (Self : Typ) return Typ_Kind is (Invalid_Kind);
+
+   function Image (Self : Access_Typ) return String is
+     (Typ (Self).Image & ": access type");
 
    function Lit_Image
      (Self : Discrete_Typ; Lit : Integer) return String is (Lit'Image);
+
+   function Low_Bound (Self : Discrete_Typ) return Integer is (0);
+
+   function High_Bound (Self : Discrete_Typ) return Integer is (0);
 
 end TGen.Types;

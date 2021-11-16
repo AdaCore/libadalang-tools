@@ -38,6 +38,10 @@ package body TGen.Enum_Types is
    --  with values of Lit being 0 or 1, given that these are the values that
    --  LAL will return when evaluating boolean static values.
 
+   function High_Bound (Self : Bool_Typ) return Integer is (1);
+   --  1 is the value representing True for boolean in the LAL static
+   --  expression evaluator so use this value for now.
+
    function Image (Self : Char_Typ) return String is
    begin
       return Typ (Self).Image & ": Char";
@@ -48,6 +52,12 @@ package body TGen.Enum_Types is
    begin
       return Res;
    end Lit_Image;
+
+   function High_Bound (Self : Char_Typ) return Integer is
+     (Character'Pos (Character'Last));
+   --  Although Char_Typ represents Character, Wide_Character and
+   --  Wide_Wide_Character, we'll conservatively use Character'Last as the high
+   --  bound.
 
    function Image (Self : Other_Enum_Typ) return String is
    begin
@@ -61,5 +71,11 @@ package body TGen.Enum_Types is
 
    function Lit_Image (Self : Other_Enum_Typ; Lit : Integer) return String is
       (Text.Image (Self.Literals.Element (Lit).Text));
+
+   function Low_Bound (Self : Other_Enum_Typ) return Integer is
+     (Self.Literals.First_Key);
+
+   function High_Bound (Self : Other_Enum_Typ) return Integer is
+     (Self.Literals.Last_Key);
 
 end TGen.Enum_Types;

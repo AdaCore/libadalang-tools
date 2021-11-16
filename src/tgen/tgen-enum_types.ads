@@ -35,11 +35,33 @@ package TGen.Enum_Types is
 
    function Lit_Image (Self : Char_Typ; Lit : Integer) return String;
 
+   function High_Bound (Self : Char_Typ) return Integer with
+     Pre => Self.Is_Static;
+
+   function Kind (Self : Char_Typ) return Typ_Kind is (Char_Kind);
+
+   function As_Char_Typ (Self : SP.Ref) return Char_Typ'Class is
+     (Char_Typ'Class (Self.Unchecked_Get.all)) with
+     Pre => (not SP.Is_Null (Self))
+            and then (Self.Get.Kind in Char_Kind);
+   pragma Inline (As_Char_Typ);
+
    type Bool_Typ is new Enum_Typ with null record;
 
    function Image (Self : Bool_Typ) return String;
 
    function Lit_Image (Self : Bool_Typ; Lit : Integer) return String;
+
+   function High_Bound (Self : Bool_Typ) return Integer with
+     Pre => Self.Is_Static;
+
+   function Kind (Self : Bool_Typ) return Typ_Kind is (Bool_Kind);
+
+   function As_Bool_Typ (Self : SP.Ref) return Bool_Typ'Class is
+     (Bool_Typ'Class (Self.Unchecked_Get.all)) with
+     Pre => (not SP.Is_Null (Self))
+            and then (Self.Get.Kind in Bool_Kind);
+   pragma Inline (As_Bool_Typ);
 
    function "=" (Left, Right : LAL.Defining_Name) return Boolean is
      (Left.Text = Right.Text);
@@ -60,5 +82,19 @@ package TGen.Enum_Types is
    function Image (Self : Other_Enum_Typ) return String;
 
    function Lit_Image (Self : Other_Enum_Typ; Lit : Integer) return String;
+
+   function Low_Bound (Self : Other_Enum_Typ) return Integer with
+     Pre => Self.Is_Static;
+
+   function High_Bound (Self : Other_Enum_Typ) return Integer with
+     Pre => Self.Is_Static;
+
+   function Kind (Self : Other_Enum_Typ) return Typ_Kind is (Enum_Kind);
+
+   function As_Other_Enum_Typ (Self : SP.Ref) return Other_Enum_Typ'Class is
+     (Other_Enum_Typ'Class (Self.Unchecked_Get.all)) with
+     Pre => (not SP.Is_Null (Self))
+            and then (Self.Get.Kind in Enum_Kind);
+   pragma Inline (As_Other_Enum_Typ);
 
 end TGen.Enum_Types;

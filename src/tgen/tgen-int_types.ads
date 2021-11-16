@@ -41,7 +41,22 @@ package TGen.Int_Types is
       end case;
    end record;
 
+   function Low_Bound (Self : Signed_Int_Typ) return Integer with
+     Pre => Self.Is_Static;
+
+   function High_Bound (Self : Signed_Int_Typ) return Integer with
+     Pre => Self.Is_Static;
+
    function Image (Self : Signed_Int_Typ) return String;
+
+   function Kind (Self : Signed_Int_Typ) return Typ_Kind is (Signed_Int_Kind);
+
+   function As_Signed_Int_Typ (Self : SP.Ref)
+     return Signed_Int_Typ'Class is
+     (Signed_Int_Typ'Class (Self.Unchecked_Get.all)) with
+     Pre => (not SP.Is_Null (Self))
+            and then (Self.Get.Kind in Signed_Int_Kind);
+   pragma Inline (As_Signed_Int_Typ);
 
    type Mod_Int_Typ (Is_Static : Boolean) is new
      Int_Typ (Is_Static => Is_Static) with record
@@ -54,5 +69,16 @@ package TGen.Int_Types is
    end record;
 
    function Image (Self : Mod_Int_Typ) return String;
+
+   function High_Bound (Self : Mod_Int_Typ) return Integer with
+     Pre => Self.Is_Static;
+
+   function Kind (Self : Mod_Int_Typ) return Typ_Kind is (Mod_Int_Kind);
+
+   function As_Mod_Int_Typ (Self : SP.Ref) return Mod_Int_Typ'Class is
+     (Mod_Int_Typ'Class (Self.Unchecked_Get.all)) with
+     Pre => (not SP.Is_Null (Self))
+            and then (Self.Get.Kind in Mod_Int_Kind);
+   pragma Inline (As_Mod_Int_Typ);
 
 end TGen.Int_Types;

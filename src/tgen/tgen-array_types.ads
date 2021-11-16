@@ -59,6 +59,16 @@ package TGen.Array_Types is
 
    function Image (Self : Unconstrained_Array_Typ) return String;
 
+   function Kind (Self : Unconstrained_Array_Typ) return Typ_Kind is
+     (Unconstrained_Array_Kind);
+
+   function As_Unconstrained_Array_Typ (Self : SP.Ref)
+     return Unconstrained_Array_Typ'Class is
+     (Unconstrained_Array_Typ'Class (Self.Unchecked_Get.all)) with
+     Pre => (not SP.Is_Null (Self))
+            and then (Self.Get.Kind in Unconstrained_Array_Kind);
+   pragma Inline (As_Unconstrained_Array_Typ);
+
    type Constrained_Array_Typ (Num_Dims : Positive) is new
      Array_Typ with record
       Index_Types : Index_Typ_Arr (1 .. Num_Dims);
@@ -67,5 +77,15 @@ package TGen.Array_Types is
    end record;
 
    function Image (Self : Constrained_Array_Typ) return String;
+
+   function Kind (Self : Constrained_Array_Typ) return Typ_Kind is
+     (Constrained_Array_Kind);
+
+   function As_Constrained_Array_Typ (Self : SP.Ref)
+     return Constrained_Array_Typ'Class is
+     (Constrained_Array_Typ'Class (Self.Unchecked_Get.all)) with
+     Pre => (not SP.Is_Null (Self))
+            and then (Self.Get.Kind in Constrained_Array_Kind);
+   pragma Inline (As_Constrained_Array_Typ);
 
 end TGen.Array_Types;

@@ -49,6 +49,14 @@ package TGen.Real_Types is
 
    function Image (Self : Float_Typ) return String;
 
+   function Kind (Self : Float_Typ) return Typ_Kind is (Float_Kind);
+
+   function As_Float_Typ (Self : SP.Ref) return Float_Typ'Class is
+     (Float_Typ'Class (Self.Unchecked_Get.all)) with
+     Pre => (not SP.Is_Null (Self))
+            and then (Self.Get.Kind in Float_Kind);
+   pragma Inline (As_Float_Typ);
+
    type Ordinary_Fixed_Typ (Is_Static : Boolean) is new
      Real_Typ (Is_Static => Is_Static) with record
       case Is_Static is
@@ -61,6 +69,15 @@ package TGen.Real_Types is
    end record;
 
    function Image (Self : Ordinary_Fixed_Typ) return String;
+
+   function Kind (Self : Ordinary_Fixed_Typ) return Typ_Kind is (Fixed_Kind);
+
+   function As_Ordinary_Fixed_Typ (Self : SP.Ref)
+     return Ordinary_Fixed_Typ'Class is
+     (Ordinary_Fixed_Typ'Class (Self.Unchecked_Get.all)) with
+     Pre => (not SP.Is_Null (Self))
+            and then (Self.Get.Kind in Fixed_Kind);
+   pragma Inline (As_Ordinary_Fixed_Typ);
 
    type Decimal_Fixed_Typ (Is_Static, Has_Range : Boolean) is new
      Real_Typ (Is_Static => Is_Static) with record
@@ -80,5 +97,14 @@ package TGen.Real_Types is
    end record;
 
    function Image (Self : Decimal_Fixed_Typ) return String;
+
+   function Kind (Self : Decimal_Fixed_Typ) return Typ_Kind is (Decimal_Kind);
+
+   function As_Decimal_Fixed_Typ (Self : SP.Ref)
+     return Decimal_Fixed_Typ'Class is
+     (Decimal_Fixed_Typ'Class (Self.Unchecked_Get.all)) with
+     Pre => (not SP.Is_Null (Self))
+            and then (Self.Get.Kind in Decimal_Kind);
+   pragma Inline (As_Decimal_Fixed_Typ);
 
 end TGen.Real_Types;

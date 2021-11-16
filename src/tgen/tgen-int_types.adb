@@ -33,6 +33,12 @@ package body TGen.Int_Types is
             else " (non static)"));
    end Image;
 
+   function Low_Bound (Self : Signed_Int_Typ) return Integer is
+     (Self.Range_Value.Min);
+
+   function High_Bound (Self : Signed_Int_Typ) return Integer is
+     (Self.Range_Value.Max);
+
    function Image (Self : Mod_Int_Typ) return String is
    begin
       return
@@ -41,5 +47,7 @@ package body TGen.Int_Types is
             then " mod" & Self.Mod_Value'Image
             else "(non static)"));
    end Image;
+
+   function High_Bound (Self : Mod_Int_Typ) return Integer is (Self.Mod_Value);
 
 end TGen.Int_Types;

@@ -30,10 +30,11 @@ with Langkit_Support.Text;
 with Libadalang.Common;    use Libadalang.Common;
 with Libadalang.Expr_Eval; use Libadalang.Expr_Eval;
 
-with TGen.Int_Types;   use TGen.Int_Types;
-with TGen.Real_Types;  use TGen.Real_Types;
-with TGen.Enum_Types;  use TGen.Enum_Types;
-with TGen.Array_Types; use TGen.Array_Types;
+with TGen.Int_Types;    use TGen.Int_Types;
+with TGen.Real_Types;   use TGen.Real_Types;
+with TGen.Enum_Types;   use TGen.Enum_Types;
+with TGen.Array_Types;  use TGen.Array_Types;
+with TGen.Record_Types; use TGen.Record_Types;
 
 package body TGen.Types.Translation is
    use LAL;
@@ -67,24 +68,30 @@ package body TGen.Types.Translation is
      (To_Unbounded_String (Str));
 
    function Translate_Int_Decl
-     (Decl : Base_Type_Decl) return Translation_Result with
+     (Decl      : Base_Type_Decl;
+      Type_Name : Defining_Name) return Translation_Result with
       Pre => Decl.P_Is_Static_Decl and then Decl.P_Is_Int_Type;
 
    function Translate_Enum_Decl
-     (Decl : Base_Type_Decl; Root_Enum_Decl : Base_Type_Decl)
+     (Decl           : Base_Type_Decl;
+      Root_Enum_Decl : Base_Type_Decl;
+      Type_Name      : Defining_Name)
       return Translation_Result with
       Pre => Decl.P_Is_Static_Decl and then Decl.P_Is_Enum_Type;
 
    function Translate_Float_Decl
-     (Decl : Base_Type_Decl) return Translation_Result with
+     (Decl      : Base_Type_Decl;
+      Type_Name : Defining_Name) return Translation_Result with
       Pre => Decl.P_Is_Static_Decl and then Decl.P_Is_Float_Type;
 
    function Translate_Ordinary_Fixed_Decl
-     (Decl : Base_Type_Decl) return Translation_Result with
+     (Decl      : Base_Type_Decl;
+      Type_Name : Defining_Name) return Translation_Result with
       Pre => Decl.P_Is_Static_Decl and then Decl.P_Is_Fixed_Point;
 
    function Translate_Decimal_Fixed_Decl
-     (Decl : Base_Type_Decl) return Translation_Result with
+     (Decl      : Base_Type_Decl;
+      Type_Name : Defining_Name) return Translation_Result with
       Pre => Decl.P_Is_Static_Decl and then Decl.P_Is_Fixed_Point;
 
    procedure Translate_Float_Range
@@ -92,15 +99,22 @@ package body TGen.Types.Translation is
       Min, Max : out Long_Float);
 
    function Translate_Array_Decl
-     (Decl : Base_Type_Decl) return Translation_Result with
+     (Decl      : Base_Type_Decl;
+      Type_Name : Defining_Name) return Translation_Result with
       Pre => Decl.P_Is_Array_Type;
+
+   function Translate_Record_Decl
+     (Decl      : Base_Type_Decl;
+      Type_Name : Defining_Name) return Translation_Result with
+      Pre => Decl.P_Is_Record_Type;
 
    ------------------------
    -- Translate_Int_Decl --
    ------------------------
 
    function Translate_Int_Decl
-     (Decl : Base_Type_Decl) return Translation_Result
+     (Decl      : Base_Type_Decl;
+      Type_Name : Defining_Name) return Translation_Result
    is
       Rang : constant Discrete_Range := Decl.P_Discrete_Range;
 
@@ -113,7 +127,7 @@ package body TGen.Types.Translation is
       if Is_Null (Low_Bound (Rang)) then
          Res.Res.Set
          (Mod_Int_Typ'(Is_Static => True,
-                       Name      => Decl.P_Defining_Name,
+                       Name      => Type_Name,
                        Mod_Value => Max));
       else
          declare
@@ -122,7 +136,7 @@ package body TGen.Types.Translation is
          begin
             Res.Res.Set
               (Signed_Int_Typ'(Is_Static   => True,
-                               Name        => Decl.P_Defining_Name,
+                               Name        => Type_Name,
                                Range_Value => (Min => Min, Max => Max)));
          end;
       end if;
@@ -134,7 +148,9 @@ package body TGen.Types.Translation is
    -------------------------
 
    function Translate_Enum_Decl
-     (Decl : Base_Type_Decl; Root_Enum_Decl : Base_Type_Decl)
+     (Decl           : Base_Type_Decl;
+      Root_Enum_Decl : Base_Type_Decl;
+      Type_Name      : Defining_Name)
       return Translation_Result
    is
       Enum_Lits : Enum_Literal_Maps.Map;
@@ -170,7 +186,7 @@ package body TGen.Types.Translation is
       return Res : Translation_Result (Success => True) do
          Res.Res.Set
            (Other_Enum_Typ'(Is_Static => True,
-                            Name      => Decl.P_Defining_Name,
+                            Name      => Type_Name,
                             Literals  => Enum_Lits));
       end return;
    end Translate_Enum_Decl;
@@ -180,7 +196,8 @@ package body TGen.Types.Translation is
    --------------------------
 
    function Translate_Float_Decl
-     (Decl : Base_Type_Decl) return Translation_Result
+     (Decl      : Base_Type_Decl;
+      Type_Name : Defining_Name) return Translation_Result
    is
 
       procedure Find_Digits
@@ -212,7 +229,9 @@ package body TGen.Types.Translation is
          if Kind (Decl) in Ada_Subtype_Decl_Range then
             Parent_Type := Decl.As_Subtype_Decl.F_Subtype;
 
-         elsif Kind (Decl.As_Type_Decl.F_Type_Def) in Ada_Derived_Type_Def then
+         elsif Kind (Decl.As_Type_Decl.F_Type_Def) in
+                 Ada_Derived_Type_Def_Range
+         then
             Parent_Type :=
               Decl.As_Type_Decl.F_Type_Def.As_Derived_Type_Def
                 .F_Subtype_Indication;
@@ -235,7 +254,7 @@ package body TGen.Types.Translation is
                   Find_Digits
                     (Parent_Type.P_Designated_Type_Decl, Digits_Value);
                   return;
-               when Ada_Digits_Constraint =>
+               when Ada_Digits_Constraint_Range =>
                   Constraints := Parent_Type.F_Constraint.As_Digits_Constraint;
                   Digits_Value :=
                     Natural'Value (Constraints.F_Digits.P_Eval_As_Int.Image);
@@ -263,14 +282,14 @@ package body TGen.Types.Translation is
          Res.Res.Set
            (Float_Typ'(Is_Static    => True,
                        Has_Range    => True,
-                       Name         => Decl.P_Defining_Name,
+                       Name         => Type_Name,
                        Digits_Value => Digits_Value,
                        Range_Value  => (Min => Min, Max => Max)));
       else
          Res.Res.Set
            (Float_Typ'(Is_Static    => True,
                        Has_Range    => False,
-                       Name         => Decl.P_Defining_Name,
+                       Name         => Type_Name,
                        Digits_Value => Digits_Value));
       end if;
       return Res;
@@ -284,7 +303,7 @@ package body TGen.Types.Translation is
          Res.Res.Set
            (Float_Typ'(Is_Static => False,
                        Has_Range => False,
-                       Name      => Decl.P_Defining_Name));
+                       Name      => Type_Name));
          return Res;
    end Translate_Float_Decl;
 
@@ -293,7 +312,8 @@ package body TGen.Types.Translation is
    -----------------------------------
 
    function Translate_Ordinary_Fixed_Decl
-     (Decl : Base_Type_Decl) return Translation_Result
+     (Decl      : Base_Type_Decl;
+      Type_Name : Defining_Name) return Translation_Result
    is
       Min, Max    : Long_Float;
       Delta_Value : Long_Float;
@@ -325,14 +345,14 @@ package body TGen.Types.Translation is
             --  Ordinary_Fixed_Point_Def.
 
             pragma Assert
-              (Kind (Decl.As_Type_Decl.F_Type_Def) =
-               Ada_Ordinary_Fixed_Point_Def);
+              (Kind (Decl.As_Type_Decl.F_Type_Def) in
+               Ada_Ordinary_Fixed_Point_Def_Range);
             Delta_Expr :=
               Decl.As_Type_Decl.F_Type_Def.As_Ordinary_Fixed_Point_Def.F_Delta;
 
-         elsif Kind (Decl) = Ada_Subtype_Decl
+         elsif Kind (Decl) in Ada_Subtype_Decl_Range
            or else
-           (Kind (Decl) = Ada_Type_Decl
+           (Kind (Decl) in Ada_Type_Decl_Range
             and then Kind (Decl.As_Type_Decl.F_Type_Def) =
               Ada_Derived_Type_Def)
          then
@@ -341,7 +361,7 @@ package body TGen.Types.Translation is
             --  subtype indication for a constraint, or look at the delta of
             --  the parent subtype.
 
-            if Kind (Decl) = Ada_Subtype_Decl then
+            if Kind (Decl) in Ada_Subtype_Decl_Range then
                Subtype_Ind := Decl.As_Subtype_Decl.F_Subtype;
             else
                Subtype_Ind :=
@@ -356,11 +376,11 @@ package body TGen.Types.Translation is
             end if;
             Subtype_Constraint := Subtype_Ind.F_Constraint;
             case Kind (Subtype_Constraint) is
-               when Ada_Delta_Constraint =>
+               when Ada_Delta_Constraint_Range =>
                   Delta_Expr :=
                     Subtype_Constraint.As_Delta_Constraint.F_Digits;
 
-               when Ada_Range_Constraint =>
+               when Ada_Range_Constraint_Range =>
 
                   --  If we only have range constraints then look for the delta
                   --  value on the subtype designated by the subtype
@@ -400,7 +420,7 @@ package body TGen.Types.Translation is
       return Res : Translation_Result (Success => True) do
          Res.Res.Set
            (Ordinary_Fixed_Typ'(Is_Static   => True,
-                                Name        => Decl.P_Defining_Name,
+                                Name        => Type_Name,
                                 Delta_Value => Delta_Value,
                                 Range_Value => (Min => Min, Max => Max)));
       end return;
@@ -417,7 +437,7 @@ package body TGen.Types.Translation is
          return Res : Translation_Result (Success => True) do
             Res.Res.Set
               (Ordinary_Fixed_Typ'(Is_Static => False,
-                                   Name      => Decl.P_Defining_Name));
+                                   Name      => Type_Name));
          end return;
    end Translate_Ordinary_Fixed_Decl;
 
@@ -426,7 +446,8 @@ package body TGen.Types.Translation is
    ----------------------------------
 
    function Translate_Decimal_Fixed_Decl
-     (Decl : Base_Type_Decl) return Translation_Result
+     (Decl      : Base_Type_Decl;
+      Type_Name : Defining_Name) return Translation_Result
    is
    begin
       --  ??? Actually implement this, should be similar to Ordinary
@@ -435,7 +456,7 @@ package body TGen.Types.Translation is
          Res.Res.Set
            (Decimal_Fixed_Typ'(Is_Static => False,
                                Has_Range => False,
-                               Name      => Decl.P_Defining_Name));
+                               Name      => Type_Name));
       end return;
    end Translate_Decimal_Fixed_Decl;
 
@@ -456,10 +477,10 @@ package body TGen.Types.Translation is
          --  Decl is the root, type, so it is a type decl
 
          case Kind (Decl.As_Type_Decl.F_Type_Def) is
-            when Ada_Floating_Point_Def =>
+            when Ada_Floating_Point_Def_Range =>
                Range_Spec_Val :=
                  Decl.As_Type_Decl.F_Type_Def.As_Floating_Point_Def.F_Range;
-            when Ada_Ordinary_Fixed_Point_Def =>
+            when Ada_Ordinary_Fixed_Point_Def_Range =>
                Range_Spec_Val :=
                  Decl.As_Type_Decl.F_Type_Def.As_Ordinary_Fixed_Point_Def
                    .F_Range;
@@ -477,8 +498,9 @@ package body TGen.Types.Translation is
          end if;
 
       else
-         if Kind (Decl) = Ada_Type_Decl
-           and then Kind (Decl.As_Type_Decl.F_Type_Def) in Ada_Derived_Type_Def
+         if Kind (Decl) in Ada_Type_Decl_Range
+           and then Kind (Decl.As_Type_Decl.F_Type_Def) in
+                      Ada_Derived_Type_Def_Range
          then
 
             --  Decl is a derived type decl, look at the constraints in the
@@ -487,7 +509,7 @@ package body TGen.Types.Translation is
             Parent_Type :=
               Decl.As_Type_Decl.F_Type_Def.As_Derived_Type_Def
                 .F_Subtype_Indication;
-         elsif Kind (Decl) = Ada_Subtype_Decl then
+         elsif Kind (Decl) in Ada_Subtype_Decl_Range then
 
             --  Same but for a subtype declaration
 
@@ -509,10 +531,10 @@ package body TGen.Types.Translation is
          --  constraint defined.
 
          case Kind (Parent_Type.F_Constraint) is
-            when Ada_Range_Constraint =>
+            when Ada_Range_Constraint_Range =>
                Range_Spec_Val :=
                  Parent_Type.F_Constraint.As_Range_Constraint.F_Range;
-            when Ada_Digits_Constraint =>
+            when Ada_Digits_Constraint_Range =>
                if Is_Null
                    (Parent_Type.F_Constraint.As_Digits_Constraint.F_Range)
                then
@@ -522,7 +544,7 @@ package body TGen.Types.Translation is
                end if;
                Range_Spec_Val :=
                  Parent_Type.F_Constraint.As_Digits_Constraint.F_Range;
-            when Ada_Delta_Constraint =>
+            when Ada_Delta_Constraint_Range =>
                if Is_Null
                    (Parent_Type.F_Constraint.As_Delta_Constraint.F_Range)
                then
@@ -549,14 +571,14 @@ package body TGen.Types.Translation is
          --  "Min .. Max" or "Name'Range", and assume we are analyzing a well
          --  formed AST.
 
-         when Ada_Attribute_Ref =>
+         when Ada_Attribute_Ref_Range =>
             Translate_Float_Range
               (Range_Spec_Val.F_Range.As_Attribute_Ref.F_Prefix
                  .P_Referenced_Decl
                  .As_Base_Type_Decl,
                Has_Range, Min, Max);
 
-         when Ada_Bin_Op =>
+         when Ada_Bin_Op_Range =>
             declare
                Min_Eval : constant Eval_Result :=
                  Expr_Eval (Range_Spec_Val.F_Range.As_Bin_Op.F_Left);
@@ -583,29 +605,33 @@ package body TGen.Types.Translation is
    --------------------------
 
    function Translate_Array_Decl
-    (Decl : Base_Type_Decl) return Translation_Result
+    (Decl       : Base_Type_Decl;
+      Type_Name : Defining_Name) return Translation_Result
    is
       function Translate_Constrained
-        (Decl : Base_Type_Decl) return Translation_Result;
+        (Decl      : Base_Type_Decl;
+         Type_Name : Defining_Name) return Translation_Result;
 
       function Translate_Unconstrained
-        (Def : Array_Type_Def; Name : Defining_Name) return Translation_Result;
+        (Def : Array_Type_Def;
+         Type_Name : Defining_Name) return Translation_Result;
 
       ---------------------------
       -- Translate_Constrained --
       ---------------------------
 
       function Translate_Constrained
-         (Decl : Base_Type_Decl) return Translation_Result
+         (Decl      : Base_Type_Decl;
+          Type_Name : Defining_Name) return Translation_Result
       is
-         Cmp_Typ_Def : Component_Def;
+         Cmp_Typ_Def         : Component_Def;
          Indices_Constraints : Constraint_List;
-         Num_Indices : Positive;
+         Num_Indices         : Positive;
       begin
          --  Here we either have a constrained array type decl, or a subtype
          --  decl that constrains a previous unconstrained array type decl.
 
-         if Kind (Decl) = Ada_Type_Decl then
+         if Kind (Decl) in Ada_Type_Decl_Range then
             Cmp_Typ_Def :=
               Decl.As_Type_Decl.F_Type_Def.As_Array_Type_Def.F_Component_Type;
             Indices_Constraints :=
@@ -649,7 +675,7 @@ package body TGen.Types.Translation is
 
             for Constraint of Indices_Constraints loop
                case Kind (Constraint) is
-                  when Ada_Subtype_Indication =>
+                  when Ada_Subtype_Indication_Range =>
                      Index_Typ :=
                        Constraint.As_Subtype_Indication.P_Designated_Type_Decl;
 
@@ -664,7 +690,7 @@ package body TGen.Types.Translation is
                         Constraints_Static := False;
                      elsif Kind (Constraint.As_Subtype_Indication.F_Constraint
                                  .As_Range_Constraint.F_Range.F_Range)
-                                 in Ada_Attribute_Ref | Ada_Bin_Op
+                                 in Ada_Attribute_Ref_Range | Ada_Bin_Op_Range
                      then
                         Range_Exp :=
                           Constraint.As_Subtype_Indication.F_Constraint
@@ -674,7 +700,7 @@ package body TGen.Types.Translation is
                         Constraints_Static := True;
 
                      end if;
-                  when Ada_Bin_Op =>
+                  when Ada_Bin_Op_Range =>
                      Index_Typ :=
                        Constraint.As_Bin_Op.F_Left.P_Expression_Type;
                      Has_Constraints := True;
@@ -685,7 +711,7 @@ package body TGen.Types.Translation is
                         Constraints_Static := False;
                      end if;
 
-                  when Ada_Attribute_Ref =>
+                  when Ada_Attribute_Ref_Range =>
                      Index_Typ :=
                        Constraint.As_Attribute_Ref.F_Prefix
                        .P_Name_Designated_Type;
@@ -720,7 +746,7 @@ package body TGen.Types.Translation is
                   --  We should only encouter either a Bin Op (A .. B) or a
                   --  range attribute reference according to RM 3.5 (2).
 
-                  if Kind (Range_Exp) = Ada_Bin_Op then
+                  if Kind (Range_Exp) in Ada_Bin_Op_Range then
                      Constraint_Min := Integer'Value
                        (Range_Exp.As_Bin_Op.F_Left.P_Eval_As_Int.Image);
                      Constraint_Max := Integer'Value
@@ -753,7 +779,7 @@ package body TGen.Types.Translation is
                Current_Index := Current_Index + 1;
             end loop;
 
-            Res_Typ.Name := Decl.P_Defining_Name;
+            Res_Typ.Name := Type_Name;
 
             return Res : Translation_Result (Success => True) do
                Res.Res.Set (Res_Typ);
@@ -769,7 +795,8 @@ package body TGen.Types.Translation is
       -----------------------------
 
       function Translate_Unconstrained
-        (Def : Array_Type_Def; Name : Defining_Name) return Translation_Result
+        (Def       : Array_Type_Def;
+         Type_Name : Defining_Name) return Translation_Result
       is
          Indices_List : constant Unconstrained_Array_Index_List :=
            Def.F_Indices.As_Unconstrained_Array_Indices.F_Types;
@@ -810,7 +837,7 @@ package body TGen.Types.Translation is
             end;
          end loop;
 
-         Res_Typ.Name := Name;
+         Res_Typ.Name := Type_Name;
          return Res : Translation_Result (Success => True) do
             Res.Res.Set (Res_Typ);
          end return;
@@ -827,19 +854,19 @@ package body TGen.Types.Translation is
 
    begin
       case Kind (Decl) is
-         when Ada_Subtype_Decl =>
-            return Translate_Constrained (Decl);
+         when Ada_Subtype_Decl_Range =>
+            return Translate_Constrained (Decl, Type_Name);
 
-         when Ada_Type_Decl =>
+         when Ada_Type_Decl_Range =>
             case Kind (Decl.As_Type_Decl.F_Type_Def
                        .As_Array_Type_Def.F_Indices) is
-               when Ada_Constrained_Array_Indices =>
-                  return Translate_Constrained (Decl);
+               when Ada_Constrained_Array_Indices_Range =>
+                  return Translate_Constrained (Decl, Type_Name);
 
-               when Ada_Unconstrained_Array_Indices =>
+               when Ada_Unconstrained_Array_Indices_Range =>
                   return Translate_Unconstrained
                     (Decl.As_Type_Decl.F_Type_Def.As_Array_Type_Def,
-                     Decl.P_Defining_Name);
+                     Type_Name);
 
                when others =>
                   return
@@ -858,6 +885,205 @@ package body TGen.Types.Translation is
       end case;
    end Translate_Array_Decl;
 
+   ---------------------------
+   -- Translate_Record_Decl --
+   ---------------------------
+
+   function Translate_Record_Decl
+     (Decl      : Base_Type_Decl;
+      Type_Name : Defining_Name) return Translation_Result
+   is
+
+      function Translate_Component_Decl_List
+        (Decl_List : Ada_Node_List;
+         Res       : in out Component_Maps.Map) return Unbounded_String;
+
+      function Translate_Component_Decl_List
+        (Decl_List : Ada_Node_List;
+         Res       : in out Component_Maps.Map) return Unbounded_String
+      is
+         Current_Typ : Translation_Result;
+         Comp_Decl : Component_Decl;
+      begin
+         for Decl of Decl_List loop
+            Comp_Decl := Decl.As_Component_Decl;
+            Current_Typ := Translate (Comp_Decl.F_Component_Def.F_Type_Expr);
+            if not Current_Typ.Success then
+               return "Failed to translate type of component"
+                      & Comp_Decl.Image & ": " & Current_Typ.Diagnostics;
+            end if;
+            for Id of Comp_Decl.F_Ids loop
+               Res.Insert (Key => Id.As_Defining_Name,
+                           New_Item => Current_Typ.Res);
+            end loop;
+         end loop;
+         return Null_Unbounded_String;
+      end Translate_Component_Decl_List;
+
+      Actual_Decl : Type_Decl;
+      --  The type decl where the components of the array are actually defined.
+      --  For now we don't support tagged types, and thus record extension, so
+      --  the whole list of components is available in a single type
+      --  declaration. Other subtypes or derived types may only add
+      --  discriminant constraints or rebind discriminants.
+
+      Failure_Reason : Unbounded_String;
+   begin
+
+      --  First the simple case of an undiscriminated record
+
+      if Kind (Decl.P_Root_Type) in Ada_Type_Decl_Range
+        and then Kind (Decl.P_Root_Type.As_Type_Decl.F_Type_Def)
+                   in Ada_Record_Type_Def_Range
+        and then Is_Null (Decl.P_Root_Type.As_Type_Decl.F_Discriminants)
+      then
+         Actual_Decl := Decl.P_Root_Type.As_Type_Decl;
+
+         declare
+            Trans_Res : Nondiscriminated_Record_Typ;
+            Comp_List : constant Ada_Node_List :=
+              Actual_Decl.F_Type_Def.As_Record_Type_Def.F_Record_Def
+              .F_Components.F_Components;
+         begin
+
+            Failure_Reason := Translate_Component_Decl_List
+               (Comp_List, Trans_Res.Component_Types);
+
+            if Failure_Reason = Null_Unbounded_String then
+               Trans_Res.Name := Type_Name;
+
+               return Res : Translation_Result (Success => True) do
+                  Res.Res.Set (Trans_Res);
+               end return;
+
+            else
+               return (Success => False,
+                 Diagnostics => Failure_Reason);
+            end if;
+         end;
+
+      else
+         --  Now the rest. The constraints in the subtype definitions in the
+         --  component declarations are not handled yet. Neither are subtype
+         --  definitions with discriminant constraints.
+
+         Actual_Decl := Decl.P_Root_Type.As_Type_Decl;
+
+         declare
+
+            Record_Shapes : constant Shape_Array :=
+              Decl.P_Shapes (Include_Discriminants => False);
+
+            Trans_Res : Discriminated_Record_Typ (Record_Shapes'Length);
+
+            Discriminant_List : constant Discriminant_Spec_List :=
+              Actual_Decl.F_Discriminants.As_Known_Discriminant_Part
+              .F_Discr_Specs;
+            --  ??? We assume that we only have known discriminants for the
+            --  moment as we are supposed to be translating the full view of
+            --  the type, will need to revisit this to double check.
+
+            Current_Type  : Translation_Result;
+            Current_Shape : LAL.Shape;
+            Cur_Discr_Val : Discriminant_Values;
+            Comp_Decl     : Component_Decl;
+         begin
+
+            --  First translate the list of discriminants
+
+            for Spec of Discriminant_List loop
+               Current_Type := Translate (Spec.F_Type_Expr, Verbose_Diag);
+               if not Current_Type.Success then
+                  Failure_Reason := "Failed to translate discriminant spec "
+                                    & Spec.Image & ": "
+                                    & Current_Type.Diagnostics;
+                  goto Failed_Discr_Rec_Translation;
+               end if;
+               for Def_Name of Spec.F_Ids loop
+                  Trans_Res.Discriminant_Types.Insert
+                    (Key      => Def_Name.As_Defining_Name,
+                     New_Item => Current_Type.Res);
+               end loop;
+            end loop;
+
+            --  Then process the shapes.
+            --  For each shape, translate each component decl, and add it in
+            --  the corresponding shape component map. Also add it to the
+            --  global list of components.
+
+            for J in Record_Shapes'Range loop
+               Current_Shape := Record_Shapes (J);
+
+               --  First translate the component types and include them in the
+               --  global component map.
+
+               for Decl of Components (Current_Shape) loop
+                  Comp_Decl := Decl.As_Component_Decl;
+                  Current_Type := Translate
+                    (Comp_Decl.F_Component_Def.F_Type_Expr);
+                  if not Current_Type.Success then
+                     Failure_Reason := "Failed to translate type of component"
+                                       & Comp_Decl.Image & ": "
+                                       & Current_Type.Diagnostics;
+                     goto Failed_Discr_Rec_Translation;
+                  end if;
+                  for Id of Comp_Decl.F_Ids loop
+                     Trans_Res.Shapes (J).Components.Insert
+                     (Key => Id.As_Defining_Name,
+                      New_Item => Current_Type.Res);
+                  end loop;
+               end loop;
+
+               declare
+                  use Component_Maps;
+                  Cur : Cursor := Trans_Res.Shapes (J).Components.First;
+               begin
+                  while Has_Element (Cur) loop
+
+                     --  We use Include instead of Insert here because a
+                     --  component may appear in multiple shapes, so it is
+                     --  legitimate to attempt to insert the same component
+                     --  multiple times.
+
+                     Trans_Res.Component_Types.Include
+                       (Key      => Component_Maps.Key (Cur),
+                        New_Item => Component_Maps.Element (Cur));
+                     Next (Cur);
+                  end loop;
+               end;
+
+               --  Then process the discriminant values. We store the "raw"
+               --  LAL choice nodes to be able to call P_Choice_Matches on them
+               --  later once we have actual values for the discriminants.
+
+               for Discriminant_Index in
+               Discriminants_Values (Current_Shape)'Range
+               loop
+                  Cur_Discr_Val :=
+                  Discriminants_Values (Current_Shape) (Discriminant_Index);
+
+                  Trans_Res.Shapes (J).Discriminant_Choices.Insert
+                  (Discriminant_Index,
+                     (Defining_Name =>
+                       Discriminant (Cur_Discr_Val).P_Referenced_Defining_Name,
+                     Choices        =>
+                       Values (Cur_Discr_Val).As_Alternatives_List));
+               end loop;
+            end loop;
+
+            Trans_Res.Name := Type_Name;
+            return Res : Translation_Result (Success => True) do
+               Res.Res.Set (Trans_Res);
+            end return;
+
+            <<Failed_Discr_Rec_Translation>>
+            return (Success => False,
+                    Diagnostics => Failure_Reason);
+
+         end;
+      end if;
+   end Translate_Record_Decl;
+
    ---------------
    -- Translate --
    ---------------
@@ -867,17 +1093,17 @@ package body TGen.Types.Translation is
    is
       Type_Decl_Node : Base_Type_Decl;
    begin
-      if Kind (N) in Ada_Anonymous_Type then
-         return
-           (Success     => False,
-            Diagnostics => +"Anonymous types not supported yet");
+      if Kind (N) in Ada_Anonymous_Type_Range then
+         Type_Decl_Node := N.As_Anonymous_Type.F_Type_Decl.As_Base_Type_Decl;
+      else
+
+         --  For now, work on the full view of the type that we are trying to
+         --  translate. If this proves useless/problematic this can be
+         --  revisited.
+
+         Type_Decl_Node :=
+           N.As_Subtype_Indication.P_Designated_Type_Decl.P_Full_View;
       end if;
-
-      --  For now, work on the full view of the type that we are trying to
-      --  translate. If this proves useless/problematic this can be revisited.
-
-      Type_Decl_Node :=
-        N.As_Subtype_Indication.P_Designated_Type_Decl.P_Full_View;
 
       return Translate (Type_Decl_Node, Verbose);
    exception
@@ -936,17 +1162,22 @@ package body TGen.Types.Translation is
       Is_Static : Boolean;
       --  Relevant only for Scalar types / array bounds
 
+      Type_Name : constant Defining_Name :=
+        (if not (Kind (N) in Ada_Anonymous_Type_Decl_Range)
+         then N.P_Defining_Name
+         else No_Defining_Name);
+
    begin
       Verbose_Diag := Verbose;
       Is_Static := N.P_Is_Static_Decl;
 
       if N.P_Is_Int_Type then
          if Is_Static then
-            return Translate_Int_Decl (N);
+            return Translate_Int_Decl (N, Type_Name);
          else
             return Res : Translation_Result (Success => True) do
                Res.Res.Set (Int_Typ'(Is_Static => False,
-                                     Name      => N.P_Defining_Name));
+                                     Name      => Type_Name));
             end return;
          end if;
 
@@ -956,14 +1187,14 @@ package body TGen.Types.Translation is
       then
          return Res : Translation_Result (Success => True) do
             Res.Res.Set (Bool_Typ'(Is_Static => True,
-                                   Name      => N.P_Defining_Name));
+                                   Name      => Type_Name));
          end return;
       elsif N.P_Is_Enum_Type then
 
          if not Is_Static then
             return Res : Translation_Result (Success => True) do
                Res.Res.Set (Other_Enum_Typ'(Is_Static => False,
-                                            Name      => N.P_Defining_Name));
+                                            Name      => Type_Name));
             end return;
          end if;
          declare
@@ -977,22 +1208,22 @@ package body TGen.Types.Translation is
                return Res : Translation_Result (Success => True) do
                   Res.Res.Set (Char_Typ'
                       (Is_Static => True,
-                       Name      => N.P_Defining_Name));
+                       Name      => Type_Name));
                end return;
             else
-               return Translate_Enum_Decl (N, Root_Type);
+               return Translate_Enum_Decl (N, Root_Type, Type_Name);
             end if;
          end;
 
       elsif N.P_Is_Float_Type then
          if Is_Static then
-            return Translate_Float_Decl (N);
+            return Translate_Float_Decl (N, Type_Name);
          else
             return Res : Translation_Result (Success => True) do
                Res.Res.Set
                  (Float_Typ'(Is_Static => False,
                              Has_Range => False,
-                             Name      => N.P_Defining_Name));
+                             Name      => Type_Name));
             end return;
          end if;
 
@@ -1001,29 +1232,37 @@ package body TGen.Types.Translation is
              Ada_Ordinary_Fixed_Point_Def_Range
          then
             if Is_Static then
-               return Translate_Ordinary_Fixed_Decl (N);
+               return Translate_Ordinary_Fixed_Decl (N, Type_Name);
             else
                return Res : Translation_Result (Success => True) do
                   Res.Res.Set
                     (Ordinary_Fixed_Typ'(Is_Static => False,
-                                         Name      => N.P_Defining_Name));
+                                         Name      => Type_Name));
                end return;
             end if;
          else
             if Is_Static then
-               return Translate_Decimal_Fixed_Decl (N);
+               return Translate_Decimal_Fixed_Decl (N, Type_Name);
             else
                return Res : Translation_Result (Success => True) do
                   Res.Res.Set
                     (Decimal_Fixed_Typ'(Is_Static => False,
                                         Has_Range => False,
-                                        Name      => N.P_Defining_Name));
+                                        Name      => Type_Name));
                end return;
             end if;
          end if;
 
       elsif N.P_Is_Array_Type then
-         return Translate_Array_Decl (N);
+         return Translate_Array_Decl (N, Type_Name);
+
+      elsif N.P_Is_Record_Type then
+         return Translate_Record_Decl (N, Type_Name);
+
+      elsif N.P_Is_Access_Type then
+         return Res : Translation_Result (Success => True) do
+            Res.Res.Set (Access_Typ'(Name => Type_Name));
+         end return;
       end if;
 
       return (Success => False, Diagnostics => +"Unknown type kind");

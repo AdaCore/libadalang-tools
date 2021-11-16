@@ -89,7 +89,7 @@ procedure TGen_App is
                if Trans_Res.Success then
                   Put_Line (Trans_Res.Res.Get.Image);
                else
-                  Put_Line (To_String (Trans_Res.Diagnostics));
+                  Put_Line ("Failed: " & To_String (Trans_Res.Diagnostics));
                end if;
             end;
             Param_Number := Param_Number + 1;
