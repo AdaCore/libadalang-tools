@@ -46,4 +46,8 @@ package Utils is
    --  an exception propagates out of the main procedure, that's just a bug
    --  which should be reported normally.
 
+   Syntax_Errors : Boolean := False;
+   --  This is set True if one of the analyzed source files has syntax errors.
+   --  The purpose is to set a proper Exit Code at the end of the execution.
+
 end Utils;

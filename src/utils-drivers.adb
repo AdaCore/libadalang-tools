@@ -79,7 +79,7 @@ package body Utils.Drivers is
          end if;
       end Local_Callback;
 
-      Global_Report_Dir         : String_Ref;
+      Global_Report_Dir   : String_Ref;
 
       procedure Include_One (File_Name : String);
       --  Include File_Name in the Ignored set below
@@ -95,7 +95,10 @@ package body Utils.Drivers is
       procedure Process_Files is
          N_File_Names : constant Natural :=
            Num_File_Names (Cmd) - Arg_Length (Cmd, Ignore);
-         Counter : Natural := N_File_Names;
+
+         Counter        : Natural := N_File_Names;
+         Has_Syntax_Err : Boolean := False;
+
          use Directories;
       begin
          --  First compute the Ignored set by looking at all the --ignored
@@ -114,8 +117,13 @@ package body Utils.Drivers is
                end if;
 
                Counter := Counter - 1;
-               Process_File (Tool, Cmd, F_Name.all, Counter);
+               Has_Syntax_Err := False;
+               Process_File (Tool, Cmd, F_Name.all, Counter, Has_Syntax_Err);
+               if Has_Syntax_Err and then not Utils.Syntax_Errors then
+                  Utils.Syntax_Errors := True;
+               end if;
             end if;
+
          end loop;
          pragma Assert (Counter = 0);
       end Process_Files;

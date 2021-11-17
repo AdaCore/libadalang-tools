@@ -36,11 +36,12 @@ with Utils.String_Utilities; use Utils.String_Utilities;
 package body Utils.Tools is
 
    procedure Process_File
-     (Tool : in out Tool_State'Class;
-      Cmd : in out Command_Line;
-      File_Name : String;
-      Counter : Natural;
-      Reparse : Boolean := False)
+     (Tool         : in out Tool_State'Class;
+      Cmd          : in out Command_Line;
+      File_Name    : String;
+      Counter      : Natural;
+      Syntax_Error : out Boolean;
+      Reparse      : Boolean := False)
    is
       use GNAT.OS_Lib, GNAT.Byte_Order_Mark;
       --  We read the file into a String, and convert to wide
@@ -101,7 +102,10 @@ package body Utils.Tools is
          Unit : constant Analysis_Unit :=
            Get_From_File (Tool.Context, File_Name, Reparse => Reparse);
       begin
+         Syntax_Error := False;
+
          if Has_Diagnostics (Unit) then
+            Syntax_Error := True;
             Err_Out.Put ("Syntax errors in \1\n", File_Name);
 
             for D of Diagnostics (Unit) loop

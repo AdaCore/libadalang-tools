@@ -65,11 +65,12 @@ package Utils.Tools is
    --  Called for invalid sources that don't make it to Per_File_Action
 
    procedure Process_File
-     (Tool : in out Tool_State'Class;
-      Cmd : in out Command_Line;
-      File_Name : String;
-      Counter : Natural;
-      Reparse : Boolean := False);
+     (Tool         : in out Tool_State'Class;
+      Cmd          : in out Command_Line;
+      File_Name    : String;
+      Counter      : Natural;
+      Syntax_Error : out Boolean;
+      Reparse      : Boolean := False);
    --  This class-wide procedure takes care of some bookkeeping, and then
    --  dispatches to Per_File_Action.
    --

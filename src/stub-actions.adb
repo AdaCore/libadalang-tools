@@ -1217,7 +1217,8 @@ package body Stub.Actions is
       end Write_Output_File;
 
       procedure Process_New_Body is
-         Body_Cmd : Cmd_Line := Copy_Command_Line (Cmd);
+         Body_Cmd       : Cmd_Line := Copy_Command_Line (Cmd);
+         Has_Syntax_Err : Boolean := False;
       begin
          Clear_File_Names (Body_Cmd);
          Append_File_Name (Body_Cmd, Output_Name);
@@ -1229,7 +1230,9 @@ package body Stub.Actions is
          --  (Subunits), the body is new, so Reparse doesn't matter.
 
          Process_File
-           (Tool, Body_Cmd, Output_Name, Counter => 1, Reparse => True);
+           (Tool, Body_Cmd, Output_Name, Counter => 1,
+            Syntax_Error => Has_Syntax_Err,
+            Reparse => True);
       end Process_New_Body;
 
       procedure Update_Body is
