@@ -666,6 +666,16 @@ package body Pp.Actions is
            when Ada_Enum_Lit_Synth_Type_Expr => null,
             --  ???The above are not used
 
+           when Ada_Predefined_Bin_Op_Spec => null,
+           when Ada_Predefined_Un_Op_Spec => null,
+           when Ada_Synthetic_Formal_Param_Decl => null,
+           when Ada_Synthetic_Subp_Decl => null,
+           when Ada_Synthetic_Defining_Name => null,
+           when Ada_Synthetic_Identifier => null,
+           when Ada_Synthetic_Type_Expr => null,
+            --  The above nodes are specific to synthetic predefined operators
+            --  and will never appear in source code.
+
            when Ada_Iterated_Assoc => null,
            when Ada_Bracket_Aggregate => null,
            when Ada_Bracket_Delta_Aggregate => null,
