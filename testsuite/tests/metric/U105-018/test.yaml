@@ -1,0 +1,4 @@
+description:
+    gnatmetric test
+
+driver: shell_script

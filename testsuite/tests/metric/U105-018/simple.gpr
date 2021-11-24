@@ -1,0 +1,5 @@
+project Simple is
+   for Object_Dir use "obj/" & external("mode", "debug");
+   for Source_Dirs use (".");
+end Simple;
+

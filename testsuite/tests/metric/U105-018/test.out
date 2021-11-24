@@ -1,0 +1,74 @@
+Line metrics summed over 1 units
+  all lines            : 4
+  code lines           : 4
+  comment lines        : 0
+  end-of-line comments : 0
+  comment percentage   : 0.00
+  blank lines          : 0
+
+Average lines in body: 4.00
+
+Element metrics summed over 1 units
+  all statements      : 1
+  all declarations    : 1
+  logical SLOC        : 2
+
+ 1 public subprograms in 1 units
+
+ 1 subprogram bodies in 1 units
+
+Average cyclomatic complexity: 1.00
+
+Coupling metrics:
+=================
+   Unit Simple (/simple.adb)
+      control fan-out coupling  : 0
+      control fan-in coupling   : 0
+      unit fan-out coupling     : 0
+      unit fan-in coupling      : 0
+Metrics computed for /simple.adb
+containing procedure body Simple
+
+=== Code line metrics ===
+  all lines           : 4
+  code lines          : 4
+  comment lines       : 0
+  end-of-line comments: 0
+  comment percentage  : 0.00
+  blank lines         : 0
+
+Average lines in body: 4.00
+
+Simple (procedure body - library item at lines  1: 4)
+
+=== Code line metrics ===
+   all lines           : 4
+   code lines          : 4
+   comment lines       : 0
+   end-of-line comments: 0
+   comment percentage  : 0.00
+   blank lines         : 0
+
+=== Element metrics ===
+   public subprograms       : 1
+   all subprogram bodies    : 1
+   all statements           : 1
+   all declarations         : 1
+   logical SLOC             : 2
+   maximal construct nesting: 1
+   all parameters           : 0
+
+=== Complexity metrics ===
+   statement complexity     : 1
+   expression complexity    : 0
+   cyclomatic complexity    : 1
+   essential complexity     : 1
+   maximum loop nesting     : 0
+   extra exit points        : 0
+
+=== Average complexity metrics ===
+      statement_complexity     :  1.00
+      expression_complexity    :  0.00
+      cyclomatic_complexity    :  1.00
+      essential_complexity     :  1.00
+      max_loop_nesting         :  0.00
