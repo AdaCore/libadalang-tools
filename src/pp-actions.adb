@@ -1102,7 +1102,7 @@ package body Pp.Actions is
            when Ada_Use_Type_Clause =>
              L ("use? ~~~ type[# ?~,# ~~]"),
            when Ada_With_Clause =>
-             L ("?~~ ~?~~ ~with ^?~, ~~"),
+             L ("?~~ ~?~~ ~with ^?~,# ~~"),
                --  Note: the tab ('^') is ignored for limited/private 'with's
                --  (see Append_Tab).
 
