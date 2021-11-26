@@ -21,12 +21,12 @@ Average cyclomatic complexity: 1.00
 
 Coupling metrics:
 =================
-   Unit Simple (/simple.adb)
+   Unit Simple (simple.adb)
       control fan-out coupling  : 0
       control fan-in coupling   : 0
       unit fan-out coupling     : 0
       unit fan-in coupling      : 0
-Metrics computed for /simple.adb
+Metrics computed for simple.adb
 containing procedure body Simple
 
 === Code line metrics ===
