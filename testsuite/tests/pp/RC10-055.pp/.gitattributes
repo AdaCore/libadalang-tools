@@ -1,0 +1,4 @@
+./crlf.ads text eol=crlf
+./lf.ads text eol=lf
+./mixed.ads binary
+expected/*.ads text
