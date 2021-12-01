@@ -21,60 +21,42 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with GNAT.Random_Numbers;
+with Ada.Directories;
+with Ada.Environment_Variables;
 
-with TGen.Strings; use TGen.Strings;
-with TGen.Random; use TGen.Random;
+with GNATCOLL.VFS;      use GNATCOLL.VFS;
+with GNATCOLL.Projects; use GNATCOLL.Projects;
 
-package body TGen.Int_Types is
+package TGen.Files is
 
-   function Image (Self : Signed_Int_Typ) return String is
-   begin
-      return
-        (Typ (Self).Image & ": Signed Integer"
-         & (if Self.Is_Static
-            then " range " & Big_Int.To_String (Self.Range_Value.Min) & " .."
-                 & Big_Int.To_String (Self.Range_Value.Max)
-            else " (non static)"));
-   end Image;
+   Prj_Tree : Project_Tree_Access;
 
-   function Low_Bound (Self : Signed_Int_Typ) return Big_Integer is
-     (Self.Range_Value.Min);
+   Strat_ADB        : constant Filesystem_String :=
+     "strat.adb";
 
-   function High_Bound (Self : Signed_Int_Typ) return Big_Integer is
-     (Self.Range_Value.Max);
+   Strat_Template_ADB : constant Filesystem_String :=
+     "strat.adb.tmpl";
 
-   function Image (Self : Mod_Int_Typ) return String is
-   begin
-      return
-        (Typ (Self).Image & ": Modular Integer"
-         & (if Self.Is_Static
-            then " mod" & Big_Int.To_String (Self.Mod_Value)
-            else "(non static)"));
-   end Image;
+   Type_Strat_Template_ADB : constant Filesystem_String :=
+     "type-strat.adb.tmpl";
 
-   function High_Bound (Self : Mod_Int_Typ) return Big_Integer is
-     (Self.Mod_Value);
+   Test_Proc_Template_ADB : constant Filesystem_String :=
+     "test_procedure.adb.tmpl";
 
-   function Gen return T
-   is
-      function Rand is new GNAT.Random_Numbers.Random_Discrete (T);
-   begin
-      return Rand (Generator_Instance);
-   end Gen;
+   function Get_Tmpl_Directory return Virtual_File;
 
-   function "+" (Text : Unbounded_Text_Type) return String is
-     (To_UTF8 (To_Text (Text)));
+   function Get_Template_Strat_ADB return Virtual_File is
+     (Get_Tmpl_Directory / "strat.adb.tmpl");
 
-   function "+" (Text : Text_Type) return String is
-     (To_UTF8 (Text));
+   function Get_Template_Test_ADB return Virtual_File is
+      (Get_Tmpl_Directory / Test_Proc_Template_ADB);
 
-   function Generate_Random_Strategy (Self : Int_Typ) return String
-   is
-   begin
-      return "function "
-        & Qualified_To_Unique_Name (Self.Type_Name)
-        & " is new TGen.Int_Types.Gen;";
-   end Generate_Random_Strategy;
+   function Get_Template_Type_Strat_ADB return Virtual_File is
+     (Get_Tmpl_Directory / Type_Strat_Template_ADB);
 
-end TGen.Int_Types;
+   function "/" (Dir, Name : String) return String is
+     (Ada.Directories.Compose (Dir, Name));
+   --  Likewise, without the "dir shouldn't be empty" constraint but
+   --  checking that the path components are valid when not empty.
+
+end TGen.Files;

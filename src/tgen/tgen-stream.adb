@@ -49,6 +49,7 @@ package body TGen.Stream is
    begin
       Stream.Write_Pos := 1;
       Stream.Read_Pos := 1;
+      Stream.Written_Chunk_Size := 0;
    end Flush;
 
    procedure Initialize (Stream : out Buffer_Stream) is
@@ -87,6 +88,7 @@ package body TGen.Stream is
       Stream.Buffer (Stream.Write_Pos .. Stream.Write_Pos + Chunk_Size - 1) :=
         Item;
       Stream.Write_Pos := Stream.Write_Pos + Chunk_Size;
+      Stream.Written_Chunk_Size := Chunk_Size;
    end Write;
 
 end TGen.Stream;

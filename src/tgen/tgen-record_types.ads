@@ -27,8 +27,11 @@ with Ada.Containers.Ordered_Sets;
 
 with Libadalang.Analysis;
 
+with TGen.Strategies; use TGen.Strategies;
 with TGen.Types; use TGen.Types;
 with TGen.Int_Types;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Streams; use Ada.Streams;
 
 package TGen.Record_Types is
 
@@ -186,5 +189,24 @@ package TGen.Record_Types is
      Pre => (not SP.Is_Null (Self))
             and then (Self.Get.Kind in Disc_Record_Kind);
    pragma Inline (As_Discriminated_Record_Typ);
+
+   generic
+      type Discriminant_Type is (<>);
+
+      type Discriminated_Record_Type (D : Discriminant_Type) is private;
+
+      with function Gen return Discriminant_Type;
+
+      with function Gen
+        (D_Value : Discriminant_Type) return Discriminated_Record_Type;
+
+   package Random_Discriminated_Record_Strategy is
+      type Random_Discriminated_Record_Strategy_Type is
+        new Random_Strategy_Type with null record;
+      overriding procedure Gen
+        (Strat : Random_Discriminated_Record_Strategy_Type;
+         Stream : access Root_Stream_Type'Class);
+      Strat : aliased Random_Discriminated_Record_Strategy_Type;
+   end Random_Discriminated_Record_Strategy;
 
 end TGen.Record_Types;

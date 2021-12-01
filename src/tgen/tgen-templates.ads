@@ -21,60 +21,54 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with GNAT.Random_Numbers;
+with Templates_Parser;
+with Ada.Finalization;
 
-with TGen.Strings; use TGen.Strings;
-with TGen.Random; use TGen.Random;
+package TGen.Templates is
 
-package body TGen.Int_Types is
+   type Translator is interface;
 
-   function Image (Self : Signed_Int_Typ) return String is
-   begin
-      return
-        (Typ (Self).Image & ": Signed Integer"
-         & (if Self.Is_Static
-            then " range " & Big_Int.To_String (Self.Range_Value.Min) & " .."
-                 & Big_Int.To_String (Self.Range_Value.Max)
-            else " (non static)"));
-   end Image;
+   type Context is new Ada.Finalization.Limited_Controlled with null record;
 
-   function Low_Bound (Self : Signed_Int_Typ) return Big_Integer is
-     (Self.Range_Value.Min);
+   procedure Translate
+     (Self  : Translator;
+      Table : in out Templates_Parser.Translate_Set)
+   is abstract;
+   --  Creates associations between template tags and the data they should be
+   --  filled with.
 
-   function High_Bound (Self : Signed_Int_Typ) return Big_Integer is
-     (Self.Range_Value.Max);
+   type Translator_Container (Next : access constant Translator'Class) is
+     abstract new Translator with null record;
+   --  This container type can be used to chain 'Translator's together and
+   --  pass the request to 'Translate' the 'Parameters_Data' through all the
+   --  linked translators.
 
-   function Image (Self : Mod_Int_Typ) return String is
-   begin
-      return
-        (Typ (Self).Image & ": Modular Integer"
-         & (if Self.Is_Static
-            then " mod" & Big_Int.To_String (Self.Mod_Value)
-            else "(non static)"));
-   end Image;
+   overriding
+   procedure Translate
+     (Self  : Translator_Container;
+      Table : in out Templates_Parser.Translate_Set);
+   --  Dispaches a call to Translate_Helper and and then to 'Next.Translate'
+   --  if 'Next' is not null.
 
-   function High_Bound (Self : Mod_Int_Typ) return Big_Integer is
-     (Self.Mod_Value);
+   procedure Translate_Helper
+     (Self  : Translator_Container;
+      Table : in out Templates_Parser.Translate_Set) is abstract;
+   --  Fill Table with tag-value(s) associations
 
-   function Gen return T
-   is
-      function Rand is new GNAT.Random_Numbers.Random_Discrete (T);
-   begin
-      return Rand (Generator_Instance);
-   end Gen;
+   type Source_Code_Generator is interface;
 
-   function "+" (Text : Unbounded_Text_Type) return String is
-     (To_UTF8 (To_Text (Text)));
+   function Generate_Source_Code
+     (Self    : Source_Code_Generator;
+      Ctx     : Context'Class) return Wide_Wide_String
+   is abstract;
+   --  Generates a source code file
 
-   function "+" (Text : Text_Type) return String is
-     (To_UTF8 (Text));
+   type Source_Code_File_Generator is interface;
 
-   function Generate_Random_Strategy (Self : Int_Typ) return String
-   is
-   begin
-      return "function "
-        & Qualified_To_Unique_Name (Self.Type_Name)
-        & " is new TGen.Int_Types.Gen;";
-   end Generate_Random_Strategy;
+   procedure Generate_Source_Code
+     (Self    : Source_Code_File_Generator;
+      Ctx     : Context'Class)
+   is abstract;
+   --  Generates a source code file
 
-end TGen.Int_Types;
+end TGen.Templates;

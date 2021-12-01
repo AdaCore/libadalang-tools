@@ -24,6 +24,8 @@
 with Ada.Containers.Vectors;
 with Ada.Streams; use Ada.Streams;
 
+with TGen.Types; use TGen.Types;
+
 package TGen.Strategies is
 
    type Strategy_Type is interface;
@@ -48,6 +50,10 @@ package TGen.Strategies is
 
    generic
       type T is (<>);
+   function Random_Discrete_Gen return T;
+
+   generic
+      type T is (<>);
    package Random_Discrete_Strategy is
       type Random_Discrete_Strategy_Type is
         new Random_Strategy_Type with null record;
@@ -56,6 +62,25 @@ package TGen.Strategies is
          Stream : access Root_Stream_Type'Class);
       Strat : aliased Random_Discrete_Strategy_Type;
    end Random_Discrete_Strategy;
+
+   generic
+      type T is digits <>;
+   package Random_Float_Strategy is
+      type Random_Float_Strategy_Type is
+        new Random_Strategy_Type with null record;
+      overriding procedure Gen
+        (Strat : Random_Float_Strategy_Type;
+         Stream : access Root_Stream_Type'Class);
+      Strat : aliased Random_Float_Strategy_Type;
+   end Random_Float_Strategy;
+
+   generic
+      type Index_Type is (<>);
+      type Element_Type is private;
+      type Array_Type is array (Index_Type range <>) of Element_Type;
+      with function Gen return Element_Type is <>;
+   function Random_Constrained_Array_Gen
+        (LB : Index_Type; UB : Index_Type) return Array_Type;
 
    generic
       type Index_Type is (<>);
@@ -78,5 +103,16 @@ package TGen.Strategies is
      Ada.Containers.Vectors
        (Index_Type => Natural,
         Element_Type => Strategy_Acc);
+
+   generic
+      Strategies : Strategy_Vectors.Vector;
+   package Random_Record_Strategy is
+      type Random_Record_Strategy_Type is
+        new Random_Strategy_Type with null record;
+      overriding procedure Gen
+        (Strat : Random_Record_Strategy_Type;
+         Stream : access Root_Stream_Type'Class);
+      Strat : aliased Random_Record_Strategy_Type;
+   end Random_Record_Strategy;
 
 end TGen.Strategies;

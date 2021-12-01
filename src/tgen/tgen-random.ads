@@ -23,58 +23,9 @@
 
 with GNAT.Random_Numbers;
 
-with TGen.Strings; use TGen.Strings;
-with TGen.Random; use TGen.Random;
+package TGen.Random is
+   pragma Elaborate_Body;
 
-package body TGen.Int_Types is
+   Generator_Instance : GNAT.Random_Numbers.Generator;
 
-   function Image (Self : Signed_Int_Typ) return String is
-   begin
-      return
-        (Typ (Self).Image & ": Signed Integer"
-         & (if Self.Is_Static
-            then " range " & Big_Int.To_String (Self.Range_Value.Min) & " .."
-                 & Big_Int.To_String (Self.Range_Value.Max)
-            else " (non static)"));
-   end Image;
-
-   function Low_Bound (Self : Signed_Int_Typ) return Big_Integer is
-     (Self.Range_Value.Min);
-
-   function High_Bound (Self : Signed_Int_Typ) return Big_Integer is
-     (Self.Range_Value.Max);
-
-   function Image (Self : Mod_Int_Typ) return String is
-   begin
-      return
-        (Typ (Self).Image & ": Modular Integer"
-         & (if Self.Is_Static
-            then " mod" & Big_Int.To_String (Self.Mod_Value)
-            else "(non static)"));
-   end Image;
-
-   function High_Bound (Self : Mod_Int_Typ) return Big_Integer is
-     (Self.Mod_Value);
-
-   function Gen return T
-   is
-      function Rand is new GNAT.Random_Numbers.Random_Discrete (T);
-   begin
-      return Rand (Generator_Instance);
-   end Gen;
-
-   function "+" (Text : Unbounded_Text_Type) return String is
-     (To_UTF8 (To_Text (Text)));
-
-   function "+" (Text : Text_Type) return String is
-     (To_UTF8 (Text));
-
-   function Generate_Random_Strategy (Self : Int_Typ) return String
-   is
-   begin
-      return "function "
-        & Qualified_To_Unique_Name (Self.Type_Name)
-        & " is new TGen.Int_Types.Gen;";
-   end Generate_Random_Strategy;
-
-end TGen.Int_Types;
+end TGen.Random;

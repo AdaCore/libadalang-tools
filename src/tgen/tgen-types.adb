@@ -21,6 +21,8 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Strings.Fixed;
+
 with Langkit_Support.Text;
 
 package body TGen.Types is
@@ -49,5 +51,22 @@ package body TGen.Types is
 
    function High_Bound (Self : Discrete_Typ) return Big_Integer is
      (Big_Zero);
+
+   function Package_Name (Self : Typ) return String is
+      Type_Parent_Package : constant Text_Type :=
+        Self.Name.P_Top_Level_Decl (Self.Name.Unit).P_Defining_Name.Text;
+   begin
+      return Image (Type_Parent_Package);
+   end Package_Name;
+
+   function Dot_To_Underscore (C : Character) return Character is
+     ((if C = '.' then '_' else C));
+
+   function Slug (Self : Typ) return String is
+   begin
+      return Ada.Strings.Fixed.Translate
+        (Source => TO_UTF8 (Self.Name.P_Fully_Qualified_Name),
+         Mapping => Dot_To_Underscore'Access);
+   end Slug;
 
 end TGen.Types;

@@ -1,18 +1,39 @@
 with "libadalang.gpr";
-with "langkit_support.gpr";
+with "langkit_support.gpr"; 
+with "templates_parser.gpr";
 
 with "gnatcoll.gpr";
+with "gnatfuzz.gpr";
 
 with "lal_tools_common.gpr";
 
 project TGen is
-
-   for Source_Dirs use ("tgen");
+        
+   type Build_Mode_Type is ("dev", "prod");
+   Build_Mode : Build_Mode_Type := external ("BUILD_MODE", "dev"); 
+   
+   for Source_Dirs use ("tgen", "tgen/templates");
    for Object_Dir use "../obj/tgen";
    for Main use ("tgen_app.adb");
 
+   for Languages use ("Ada", "Templates");
+   
+   package Naming is
+      for Implementation_Suffix ("Templates") use ".tmpl";
+   end Naming;
+   
    package Compiler is
-      for Default_Switches ("Ada") use ("-gnat2022");
+      for Driver ("Templates") use "";  
+      case Build_Mode is
+         when "dev" =>
+            for Switches ("Ada") use
+              ("-gnatf", "-g", "-gnaty", "-gnat2022",
+               "-gnata");
+         when "prod" =>
+            for Switches ("Ada") use
+              ("-gnatf", "-gnatwa", "-O2", "-gnaty", "-gnat2022",
+               "-gnata");
+      end case;
    end Compiler;
 
    package Binder is

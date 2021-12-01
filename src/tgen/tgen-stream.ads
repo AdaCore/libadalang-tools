@@ -60,6 +60,8 @@ private
       Write_Pos : Stream_Element_Offset := 1;
 
       Read_Pos : Stream_Element_Offset := 1;
-   end record;
+
+      Written_Chunk_Size : Stream_Element_Offset := 0;
+   end record with Type_Invariant => Read_Pos <= Write_Pos;
 
 end TGen.Stream;

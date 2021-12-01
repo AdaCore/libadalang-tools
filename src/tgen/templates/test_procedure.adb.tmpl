@@ -1,0 +1,33 @@
+procedure @_TEST_PROC_NAME_@ is
+   Value_Stream : TGen.Stream.Buffer_Stream;
+ @@TABLE@@
+   package @_STRATEGY_NAME_@ is new Strategy (T => @_TYPE_NAME_@, Gen => @_GEN_SUBP_NAME_@);
+   @@END_TABLE@@
+   @_PROC_NAME_@_Strategies : TGen.Strategies.Strategy_Vector :=
+      [
+      @@TABLE@@
+      @@IF@@ @_TABLE_LINE_@ = @_NUMBER_LINE_@
+         @_STRATEGY_NAME_@.Strat
+      @@ELSE@@
+         @_STRATEGY_NAME_@.Strat,
+      @@END_IF@@
+      @@END_TABLE@@
+      ];
+   procedure @_PROC_NAME_@_Wrapper is
+      @@TABLE@@
+      @_PARAM_NAME_@ : @_TYPE_NAME_@'Input (Value_Stream);
+      @@END_TABLE@@
+   begin
+      @_PROC_QUALIFIED_NAME_@ (
+      @@TABLE@@
+      @@IF@@ @_TABLE_LINE_@ = @_NUMBER_LINE_@
+         @_PARAM_NAME_@
+      @@ELSE@@
+         @_PARAM_NAME_@,
+      @@END_IF@@
+      @@END_TABLE@@
+      );
+   end @_PROC_NAME_@_Wrapper;
+begin
+   TGen.Test_Runner (Value_Stream, @_PROC_NAME_@_Strategies, @_PROC_NAME_@_Wrapper'Access);
+end @_TEST_PROC_NAME_@;

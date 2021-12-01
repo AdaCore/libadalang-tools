@@ -312,4 +312,15 @@ package body TGen.Record_Types is
 
    end Image;
 
+   package body Random_Discriminated_Record_Strategy is
+
+      procedure Gen
+        (Strat : Random_Discriminated_Record_Strategy_Type;
+         Stream : access Root_Stream_Type'Class) is
+      begin
+         Discriminated_Record_Type'Output (Stream, Gen (Gen));
+      end Gen;
+
+   end Random_Discriminated_Record_Strategy;
+
 end TGen.Record_Types;

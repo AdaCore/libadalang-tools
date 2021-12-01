@@ -68,6 +68,29 @@ package TGen.Types is
 
    function Image (Self : Typ) return String;
 
+   function Fully_Qualified_Name (Self : Typ) return Text_Type is
+     (Self.Name.P_Basic_Decl.P_Fully_Qualified_Name);
+
+   function Parent_Package (Self : Typ) return Text_Type is
+     (Self.Name.P_Basic_Decl.P_Top_Level_Decl (Self.Name.Unit).
+          P_Defining_Name.F_Name.Text);
+
+   function Type_Name (Self : Typ) return Text_Type is
+      (Self.Name.F_Name.Text);
+
+   function "<" (L : Typ'Class; R : Typ'Class) return Boolean is
+     (L.Name.P_Fully_Qualified_Name < R.Name.P_Fully_Qualified_Name);
+
+   function Slug (Self : Typ) return String;
+   --  Return a unique identifier for the type
+
+   function Package_Name (Self : Typ) return String;
+   --  Return the package name this type belongs to
+
+   function Generate_Random_Strategy (Self : Typ) return String is ("");
+
+   function Type_Image (Self : Typ) return String is ("");
+
    function Kind (Self : Typ) return Typ_Kind;
 
    type Scalar_Typ (Is_Static : Boolean) is new Typ with null record;

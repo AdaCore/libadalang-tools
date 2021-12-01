@@ -31,6 +31,8 @@ package TGen.Int_Types is
 
    type Int_Typ is new Discrete_Typ with null record;
 
+   overriding function Generate_Random_Strategy (Self : Int_Typ) return String;
+
    type Signed_Int_Typ (Is_Static : Boolean) is new
      Int_Typ (Is_Static => Is_Static) with record
       case Is_Static is
@@ -80,5 +82,9 @@ package TGen.Int_Types is
      Pre => (not SP.Is_Null (Self))
             and then (Self.Get.Kind in Mod_Int_Kind);
    pragma Inline (As_Mod_Int_Typ);
+
+   generic
+      type T is (<>);
+   function Gen return T;
 
 end TGen.Int_Types;

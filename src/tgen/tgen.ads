@@ -21,6 +21,12 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with Libadalang.Analysis; use Libadalang.Analysis;
+with Libadalang.Common;
+with Libadalang.Rewriting; use Libadalang.Rewriting;
+
+with Langkit_Support.Text; use Langkit_Support.Text;
+
 package TGen is
    Version : constant String := "0.0";
 end TGen;
