@@ -41,10 +41,13 @@ package body TGen.Types is
      (Typ (Self).Image & ": access type");
 
    function Lit_Image
-     (Self : Discrete_Typ; Lit : Integer) return String is (Lit'Image);
+     (Self : Discrete_Typ; Lit : Big_Integer) return String is
+     (Big_Int.To_String (Lit));
 
-   function Low_Bound (Self : Discrete_Typ) return Integer is (0);
+   function Low_Bound (Self : Discrete_Typ) return Big_Integer is
+     (Big_Zero);
 
-   function High_Bound (Self : Discrete_Typ) return Integer is (0);
+   function High_Bound (Self : Discrete_Typ) return Big_Integer is
+     (Big_Zero);
 
 end TGen.Types;

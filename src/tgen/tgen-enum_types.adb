@@ -32,13 +32,14 @@ package body TGen.Enum_Types is
       return Typ (Self).Image & ": Boolean";
    end Image;
 
-   function Lit_Image (Self : Bool_Typ; Lit : Integer) return String is
-      (if Lit = 0 then "False" else "True");
+   function Lit_Image (Self : Bool_Typ; Lit : Big_Integer) return String is
+      (if Big_Int."=" (Lit, Big_Zero) then "False" else "True");
    --  This isn't strictly correct, but this function should only be called
    --  with values of Lit being 0 or 1, given that these are the values that
    --  LAL will return when evaluating boolean static values.
 
-   function High_Bound (Self : Bool_Typ) return Integer is (1);
+   function High_Bound (Self : Bool_Typ) return Big_Integer is
+     (Big_Int.To_Big_Integer (1));
    --  1 is the value representing True for boolean in the LAL static
    --  expression evaluator so use this value for now.
 
@@ -47,14 +48,18 @@ package body TGen.Enum_Types is
       return Typ (Self).Image & ": Char";
    end Image;
 
-   function Lit_Image (Self : Char_Typ; Lit : Integer) return String is
-      Res : constant String := (1 => Character'Val (Lit));
+   function Lit_Image (Self : Char_Typ; Lit : Big_Integer) return String is
+      Res : constant String :=
+        (1 => Character'Val (Long_Long_Integer'Value
+                               (Big_Int.To_String (Lit))));
+      --  Wide_Wide_Character is 32 bits wide so we should be fine with
+      --  Long_Long_Integer
    begin
       return Res;
    end Lit_Image;
 
-   function High_Bound (Self : Char_Typ) return Integer is
-     (Character'Pos (Character'Last));
+   function High_Bound (Self : Char_Typ) return Big_Integer is
+     (Big_Int.To_Big_Integer (Character'Pos (Character'Last)));
    --  Although Char_Typ represents Character, Wide_Character and
    --  Wide_Wide_Character, we'll conservatively use Character'Last as the high
    --  bound.
@@ -69,13 +74,14 @@ package body TGen.Enum_Types is
            else " (non static)");
    end Image;
 
-   function Lit_Image (Self : Other_Enum_Typ; Lit : Integer) return String is
+   function Lit_Image
+     (Self : Other_Enum_Typ; Lit : Big_Integer) return String is
       (Text.Image (Self.Literals.Element (Lit).Text));
 
-   function Low_Bound (Self : Other_Enum_Typ) return Integer is
+   function Low_Bound (Self : Other_Enum_Typ) return Big_Integer is
      (Self.Literals.First_Key);
 
-   function High_Bound (Self : Other_Enum_Typ) return Integer is
+   function High_Bound (Self : Other_Enum_Typ) return Big_Integer is
      (Self.Literals.Last_Key);
 
 end TGen.Enum_Types;

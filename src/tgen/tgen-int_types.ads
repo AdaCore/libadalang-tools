@@ -26,7 +26,7 @@ with TGen.Types; use TGen.Types;
 package TGen.Int_Types is
 
    type Int_Range is record
-      Min, Max : Integer;
+      Min, Max : Big_Integer;
    end record;
 
    type Int_Typ is new Discrete_Typ with null record;
@@ -41,10 +41,10 @@ package TGen.Int_Types is
       end case;
    end record;
 
-   function Low_Bound (Self : Signed_Int_Typ) return Integer with
+   function Low_Bound (Self : Signed_Int_Typ) return Big_Integer with
      Pre => Self.Is_Static;
 
-   function High_Bound (Self : Signed_Int_Typ) return Integer with
+   function High_Bound (Self : Signed_Int_Typ) return Big_Integer with
      Pre => Self.Is_Static;
 
    function Image (Self : Signed_Int_Typ) return String;
@@ -62,7 +62,7 @@ package TGen.Int_Types is
      Int_Typ (Is_Static => Is_Static) with record
       case Is_Static is
          when True =>
-            Mod_Value : Integer;
+            Mod_Value : Big_Integer;
          when others =>
             null;
       end case;
@@ -70,7 +70,7 @@ package TGen.Int_Types is
 
    function Image (Self : Mod_Int_Typ) return String;
 
-   function High_Bound (Self : Mod_Int_Typ) return Integer with
+   function High_Bound (Self : Mod_Int_Typ) return Big_Integer with
      Pre => Self.Is_Static;
 
    function Kind (Self : Mod_Int_Typ) return Typ_Kind is (Mod_Int_Kind);

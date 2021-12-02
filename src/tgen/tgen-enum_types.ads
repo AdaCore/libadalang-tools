@@ -33,9 +33,9 @@ package TGen.Enum_Types is
 
    function Image (Self : Char_Typ) return String;
 
-   function Lit_Image (Self : Char_Typ; Lit : Integer) return String;
+   function Lit_Image (Self : Char_Typ; Lit : Big_Integer) return String;
 
-   function High_Bound (Self : Char_Typ) return Integer with
+   function High_Bound (Self : Char_Typ) return Big_Integer with
      Pre => Self.Is_Static;
 
    function Kind (Self : Char_Typ) return Typ_Kind is (Char_Kind);
@@ -50,9 +50,9 @@ package TGen.Enum_Types is
 
    function Image (Self : Bool_Typ) return String;
 
-   function Lit_Image (Self : Bool_Typ; Lit : Integer) return String;
+   function Lit_Image (Self : Bool_Typ; Lit : Big_Integer) return String;
 
-   function High_Bound (Self : Bool_Typ) return Integer with
+   function High_Bound (Self : Bool_Typ) return Big_Integer with
      Pre => Self.Is_Static;
 
    function Kind (Self : Bool_Typ) return Typ_Kind is (Bool_Kind);
@@ -67,7 +67,9 @@ package TGen.Enum_Types is
      (Left.Text = Right.Text);
 
    package Enum_Literal_Maps is new Ada.Containers.Ordered_Maps
-     (Key_Type => Natural, Element_Type => LAL.Defining_Name);
+     (Key_Type     => Big_Integer,
+      Element_Type => LAL.Defining_Name,
+       "<"         => Big_Int."<");
 
    type Other_Enum_Typ (Is_Static : Boolean) is new
      Enum_Typ (Is_Static => Is_Static) with record
@@ -81,12 +83,12 @@ package TGen.Enum_Types is
 
    function Image (Self : Other_Enum_Typ) return String;
 
-   function Lit_Image (Self : Other_Enum_Typ; Lit : Integer) return String;
+   function Lit_Image (Self : Other_Enum_Typ; Lit : Big_Integer) return String;
 
-   function Low_Bound (Self : Other_Enum_Typ) return Integer with
+   function Low_Bound (Self : Other_Enum_Typ) return Big_Integer with
      Pre => Self.Is_Static;
 
-   function High_Bound (Self : Other_Enum_Typ) return Integer with
+   function High_Bound (Self : Other_Enum_Typ) return Big_Integer with
      Pre => Self.Is_Static;
 
    function Kind (Self : Other_Enum_Typ) return Typ_Kind is (Enum_Kind);

@@ -111,24 +111,25 @@ package body TGen.Types.Translation is
    procedure Apply_Record_Subtype_Decl
      (Decl : Subtype_Indication;
       Res  : in out Discriminated_Record_Typ) with
-     Pre => Kind (Decl.Parent) in Ada_Subtype_Decl_Range
-           and then Res.Constrained;
-   --  Record the discriminant constraints of Decl in Res. For this, the type
-   --  on which you want to apply constraints must be able to accept them
+      Pre => Kind (Decl.Parent) in Ada_Subtype_Decl_Range
+         and then Res.Constrained;
+      --  Record the discriminant constraints of Decl in Res. For this, the
+      --  type on which you want to apply constraints must be able to accept
+      --  them.
 
    function Apply_Record_Derived_Type_Decl
      (Decl : Type_Decl'Class;
       From : Discriminated_Record_Typ) return Discriminated_Record_Typ with
-     Pre => Kind (Decl.F_Type_Def) in Ada_Derived_Type_Def_Range
-           and then From.Constrained;
+      Pre => Kind (Decl.F_Type_Def) in Ada_Derived_Type_Def_Range
+         and then From.Constrained;
    --  Apply the effects of the record type derivation defined in Decl.
    --  If any discriminant constraints are present, this filters out the
    --  incompatible shapes, and renames discriminant which correspond
    --  between the ancestor type and the child type.
 
    function Record_Constrained
-   (Decl : Base_Type_Decl;
-    Root : Base_Type_Decl) return Boolean;
+     (Decl : Base_Type_Decl;
+      Root : Base_Type_Decl) return Boolean;
    --  Returns True if Decl has discriminants constraints at some stage in the
    --  chain of subtype definitions / type derivations.
 
@@ -142,8 +143,8 @@ package body TGen.Types.Translation is
    is
       Rang : constant Discrete_Range := Decl.P_Discrete_Range;
 
-      Max : constant Integer :=
-        Integer'Value (High_Bound (Rang).P_Eval_As_Int.Image);
+      Max : constant Big_Integer :=
+        Big_Int.From_String (High_Bound (Rang).P_Eval_As_Int.Image);
       --  Since Decl is a static subtype, its bounds are also static
       --  expressions according to RM 4.9(26/2).
       Res : Translation_Result (Success => True);
@@ -155,8 +156,8 @@ package body TGen.Types.Translation is
                        Mod_Value => Max));
       else
          declare
-            Min : constant Integer :=
-              Integer'Value (Low_Bound (Rang).P_Eval_As_Int.Image);
+            Min : constant Big_Integer :=
+              Big_Int.From_String (Low_Bound (Rang).P_Eval_As_Int.Image);
          begin
             Res.Res.Set
               (Signed_Int_Typ'(Is_Static   => True,
@@ -177,33 +178,40 @@ package body TGen.Types.Translation is
       Type_Name      : Defining_Name)
       return Translation_Result
    is
+      package Long_Long_Conversion is
+        new Big_Int.Signed_Conversions (Int => Long_Long_Integer);
+
+      use Long_Long_Conversion;
+
       Enum_Lits : Enum_Literal_Maps.Map;
 
-      Index : Natural := 0;
+      Index : Long_Long_Integer := 0;
 
       Rang : constant Discrete_Range := Decl.P_Discrete_Range;
 
-      Max, Min : Natural;
+      Max, Min : Long_Long_Integer;
 
    begin
       for Literal of Root_Enum_Decl.As_Type_Decl.F_Type_Def.As_Enum_Type_Def
         .F_Enum_Literals
       loop
-         Enum_Lits.Insert (Index, Literal.F_Name);
+         Enum_Lits.Insert (To_Big_Integer (Index), Literal.F_Name);
          Index := Index + 1;
       end loop;
 
       if (not Is_Null (High_Bound (Rang)))
         and then not Is_Null (Low_Bound (Rang))
       then
-         Max := Natural'Value (High_Bound (Rang).P_Eval_As_Int.Image);
-         Min := Natural'Value (Low_Bound (Rang).P_Eval_As_Int.Image);
-         for Pos in Enum_Lits.First_Key .. Min - 1 loop
-            Enum_Lits.Delete (Pos);
+         Max :=
+           Long_Long_Integer'Value (High_Bound (Rang).P_Eval_As_Int.Image);
+         Min :=
+           Long_Long_Integer'Value (Low_Bound (Rang).P_Eval_As_Int.Image);
+         for Pos in From_Big_Integer (Enum_Lits.First_Key) .. Min - 1 loop
+            Enum_Lits.Delete (To_Big_Integer (Pos));
          end loop;
 
-         for Pos in Max + 1 .. Enum_Lits.Last_Key loop
-            Enum_Lits.Delete (Pos);
+         for Pos in Max + 1 .. From_Big_Integer (Enum_Lits.Last_Key) loop
+            Enum_Lits.Delete (To_Big_Integer (Pos));
          end loop;
       end if;
 
@@ -722,7 +730,7 @@ package body TGen.Types.Translation is
                Has_Constraints                : Boolean;
                Constraints_Static             : Boolean;
                Range_Exp                      : Expr;
-               Constraint_Min, Constraint_Max : Integer;
+               Constraint_Min, Constraint_Max : Big_Integer;
 
                Failure_Reason : Unbounded_String;
             begin
@@ -739,8 +747,9 @@ package body TGen.Types.Translation is
                for Constraint of Constraint_Nodes loop
                   case Kind (Constraint) is
                      when Ada_Subtype_Indication_Range =>
-                        Index_Typ := Constraint.As_Subtype_Indication
-                                     .P_Designated_Type_Decl;
+                        Index_Typ :=
+                          Constraint.As_Subtype_Indication
+                          .P_Designated_Type_Decl;
 
                         if Is_Null
                              (Constraint.As_Subtype_Indication.F_Constraint)
@@ -816,16 +825,16 @@ package body TGen.Types.Translation is
                      --  range attribute reference according to RM 3.5 (2).
 
                      if Kind (Range_Exp) in Ada_Bin_Op_Range then
-                        Constraint_Min := Integer'Value
+                        Constraint_Min := Big_Int.From_String
                         (Range_Exp.As_Bin_Op.F_Left.P_Eval_As_Int.Image);
-                        Constraint_Max := Integer'Value
+                        Constraint_Max := Big_Int.From_String
                         (Range_Exp.As_Bin_Op.F_Right.P_Eval_As_Int.Image);
                      else
-                        Constraint_Min := Integer'Value
+                        Constraint_Min := Big_Int.From_String
                         (Low_Bound (Range_Exp.As_Attribute_Ref.F_Prefix
                            .P_Name_Designated_Type.P_Discrete_Range)
                            .P_Eval_As_Int.Image);
-                        Constraint_Min := Integer'Value
+                        Constraint_Min := Big_Int.From_String
                         (High_Bound (Range_Exp.As_Attribute_Ref.F_Prefix
                            .P_Name_Designated_Type.P_Discrete_Range)
                            .P_Eval_As_Int.Image);
@@ -1022,15 +1031,14 @@ package body TGen.Types.Translation is
                Res.Discriminant_Constraint.Include
                   (Id.P_Referenced_Defining_Name,
                   (Kind    => Static,
-                     Int_Val => Integer'Value (Assoc.As_Discriminant_Assoc
-                                             .F_Discr_Expr.P_Eval_As_Int
-                                             .Image)));
+                     Int_Val => Big_Int.From_String
+                       (Assoc.As_Discriminant_Assoc.F_Discr_Expr.P_Eval_As_Int
+                        .Image)));
             end loop;
          else
             for Id of Assoc.As_Discriminant_Assoc.F_Ids loop
                Res.Discriminant_Constraint.Include
-                 (Id.P_Referenced_Defining_Name,
-                  (Kind => Non_Static));
+                 (Id.P_Referenced_Defining_Name, (Kind => Non_Static));
             end loop;
          end if;
       end loop;
@@ -1041,8 +1049,8 @@ package body TGen.Types.Translation is
    ------------------------------------
 
    function Apply_Record_Derived_Type_Decl
-      (Decl  : Type_Decl'Class;
-      From  : Discriminated_Record_Typ) return Discriminated_Record_Typ
+     (Decl : Type_Decl'Class;
+      From : Discriminated_Record_Typ) return Discriminated_Record_Typ
    is
 
       use Discriminant_Constraint_Maps;
@@ -1120,9 +1128,9 @@ package body TGen.Types.Translation is
                for Id of Assoc.As_Discriminant_Assoc.F_Ids loop
                   Constraints_Map.Insert
                      (Key      => Id.P_Referenced_Defining_Name,
-                     New_Item =>
+                      New_Item =>
                         (Kind    => Static,
-                        Int_Val => Integer'Value
+                         Int_Val => Big_Int.From_String
                            (Assoc.As_Discriminant_Assoc.F_Discr_Expr
                            .P_Eval_As_Int.Image)));
                end loop;

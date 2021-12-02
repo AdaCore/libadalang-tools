@@ -23,6 +23,7 @@
 
 with Libadalang.Analysis;
 
+with Ada.Numerics.Big_Numbers.Big_Integers;
 with Ada.Unchecked_Deallocation;
 
 with GNATCOLL.Refcount; use GNATCOLL.Refcount;
@@ -35,6 +36,7 @@ limited with TGen.Real_Types;
 package TGen.Types is
 
    package LAL renames Libadalang.Analysis;
+   package Big_Int renames Ada.Numerics.Big_Numbers.Big_Integers;
    type Typ is tagged record
       Name : LAL.Defining_Name;
    end record;
@@ -72,13 +74,15 @@ package TGen.Types is
 
    type Discrete_Typ is new Scalar_Typ with null record;
 
-   function Low_Bound (Self : Discrete_Typ) return Integer with
+   subtype Big_Integer is Big_Int.Big_Integer;
+
+   function Low_Bound (Self : Discrete_Typ) return Big_Integer with
      Pre => Self.Is_Static;
 
-   function High_Bound (Self : Discrete_Typ) return Integer with
+   function High_Bound (Self : Discrete_Typ) return Big_Integer with
      Pre => Self.Is_Static;
 
-   function Lit_Image (Self : Discrete_Typ; Lit : Integer) return String;
+   function Lit_Image (Self : Discrete_Typ; Lit : Big_Integer) return String;
    --  Returns the image of the Litteral whose "position" is Lit. For integer
    --  types, this is simply Lit'Image, for enum types, this correponds to
    --  the image of the enum litteral at position Lit.
@@ -97,7 +101,7 @@ package TGen.Types is
             and then (Self.Get.Kind in Discrete_Typ_Range);
    pragma Inline (As_Discrete_Typ);
 
-   --  As_<Target>_Typ functions are useful to view a certain Tobjetc of type
+   --  As_<Target>_Typ functions are useful to view a certain objetc of type
    --  Typ'Class wrapped in a smart pointer as a <Target>_Typ, and thus be able
    --  to access the components and primitives defined for that particular
    --  type. The return value is the object encapsulated in the smart pointer,
@@ -113,7 +117,7 @@ package TGen.Types is
    record
       case Kind is
          when Static =>
-            Int_Val : Integer;
+            Int_Val : Big_Integer;
             --  The static integer value of the constraint
 
          when Discriminant =>
@@ -133,5 +137,8 @@ package TGen.Types is
    type Discrete_Range_Constraint is record
       Low_Bound, High_Bound : Constraint_Value;
    end record;
+
+   Big_Zero : constant Big_Integer :=
+     Ada.Numerics.Big_Numbers.Big_Integers.To_Big_Integer (0);
 
 end TGen.Types;

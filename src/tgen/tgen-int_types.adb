@@ -28,15 +28,15 @@ package body TGen.Int_Types is
       return
         (Typ (Self).Image & ": Signed Integer"
          & (if Self.Is_Static
-            then " range " & Self.Range_Value.Min'Image & " .."
-                 & Self.Range_Value.Max'Image
+            then " range " & Big_Int.To_String (Self.Range_Value.Min) & " .."
+                 & Big_Int.To_String (Self.Range_Value.Max)
             else " (non static)"));
    end Image;
 
-   function Low_Bound (Self : Signed_Int_Typ) return Integer is
+   function Low_Bound (Self : Signed_Int_Typ) return Big_Integer is
      (Self.Range_Value.Min);
 
-   function High_Bound (Self : Signed_Int_Typ) return Integer is
+   function High_Bound (Self : Signed_Int_Typ) return Big_Integer is
      (Self.Range_Value.Max);
 
    function Image (Self : Mod_Int_Typ) return String is
@@ -44,10 +44,11 @@ package body TGen.Int_Types is
       return
         (Typ (Self).Image & ": Modular Integer"
          & (if Self.Is_Static
-            then " mod" & Self.Mod_Value'Image
+            then " mod" & Big_Int.To_String (Self.Mod_Value)
             else "(non static)"));
    end Image;
 
-   function High_Bound (Self : Mod_Int_Typ) return Integer is (Self.Mod_Value);
+   function High_Bound (Self : Mod_Int_Typ) return Big_Integer is
+     (Self.Mod_Value);
 
 end TGen.Int_Types;

@@ -23,10 +23,10 @@
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-with GNATCOLL.GMP.Integers;
-
 with Libadalang.Common;
 with Langkit_Support.Text;
+
+with GNATCOLL.GMP.Integers;
 
 package body TGen.Record_Types is
 
@@ -36,7 +36,7 @@ package body TGen.Record_Types is
 
    function Check_Others
      (Designator : LAL.Others_Designator;
-      Val        : GNATCOLL.GMP.Integers.Big_Integer) return Boolean;
+      Val        : Big_Integer) return Boolean;
    --  Check if Val Satisfies this "others" choice. This is done by
    --  checking that Val staisfies all the other choices of the variant.
 
@@ -71,15 +71,17 @@ package body TGen.Record_Types is
 
    function Check_Others
      (Designator : LAL.Others_Designator;
-      Val        : GNATCOLL.GMP.Integers.Big_Integer) return Boolean
+      Val        : Big_Integer) return Boolean
    is
       use LAL;
+      use GNATCOLL.GMP.Integers;
       Variant_Root : constant Variant_List :=
          Designator.Parent.Parent.Parent.As_Variant_List;
    begin
       for Variant of Variant_Root loop
          for Choice of Variant.As_Variant.F_Choices loop
-            if Choice /= Designator and then Choice.P_Choice_Match (Val)
+            if Choice /= Designator
+              and then Choice.P_Choice_Match (Make (Big_Int.To_String (Val)))
             then
                return False;
             end if;
@@ -128,11 +130,6 @@ package body TGen.Record_Types is
       Discriminant_Values : Discriminant_Constraint_Maps.Map)
       return Component_Maps.Map
    is
-      use Discriminant_Choices_Maps;
-      use Discriminant_Constraint_Maps;
-      use Shape_Maps;
-      use GNATCOLL.GMP.Integers;
-      use LAL;
    begin
       --  First Check that the values passed satisfy the constraints, if there
       --  are any.
@@ -175,7 +172,6 @@ package body TGen.Record_Types is
       package LALCO renames Libadalang.Common;
 
       Discr_Cur : Cursor;
-      Discr_Val : Big_Integer;
    begin
       for Choice of Shp.Discriminant_Choices loop
          Discr_Cur := Discriminant_Values.Find (Choice.Defining_Name);
@@ -192,11 +188,14 @@ package body TGen.Record_Types is
          --  Otherwise, check that the static value we have satisfies at least
          --  one of the alternatives.
 
-         Discr_Val.Set (Element (Discr_Cur).Int_Val'Image);
          for Alternative of Choice.Choices loop
             if (if Kind (Alternative) in LALCO.Ada_Others_Designator_Range
-                then Check_Others (Alternative.As_Others_Designator, Discr_Val)
-                else Alternative.P_Choice_Match (Discr_Val))
+                then Check_Others
+                       (Alternative.As_Others_Designator,
+                        Element (Discr_Cur).Int_Val)
+                else Alternative.P_Choice_Match
+                       (Make (Big_Int.To_String
+                                (Element (Discr_Cur).Int_Val))))
             then
                goto Next_Choice;
             end if;
@@ -261,7 +260,7 @@ package body TGen.Record_Types is
          declare
             Discr_Vals : Discriminant_Constraint_Maps.Map;
             Filtered_Components : Component_Maps.Map;
-            Current_Lit : Integer;
+            Current_Lit : Big_Integer;
             Current_Constraint : Discriminant_Constraint_Maps.Cursor;
          begin
             Current_Component := Self.Discriminant_Types.First;
