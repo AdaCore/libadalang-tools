@@ -55,15 +55,20 @@ package body TGen.Array_Types is
          if Self.Index_Types (J) /= SP.Null_Ref then
             Res := Res & Typ (Self.Index_Types (J).Get.Element.all).Image;
             if Self.Index_Constraints (J).Present
-              and then Self.Index_Constraints (J).Static
+              and then Self.Index_Constraints (J)
+                       .Discrete_Range.Low_Bound.Kind = Static
+              and then Self.Index_Constraints (J)
+                       .Discrete_Range.High_Bound.Kind = Static
             then
                Res :=
                  Res & " range "
-                 & Discrete_Typ'Class (Self.Index_Types (J).Get.Element.all)
-                   .Lit_Image (Self.Index_Constraints (J).Discrete_Range.Min)
+                 & As_Discrete_Typ (Self.Index_Types (J)).Lit_Image
+                     (Self.Index_Constraints (J).Discrete_Range.Low_Bound
+                      .Int_Val)
                  & " .. "
-                 & Discrete_Typ'Class (Self.Index_Types (J).Get.Element.all)
-                   .Lit_Image (Self.Index_Constraints (J).Discrete_Range.Max);
+                 & As_Discrete_Typ (Self.Index_Types (J)).Lit_Image
+                     (Self.Index_Constraints (J).Discrete_Range.High_Bound
+                      .Int_Val);
             end if;
          else
             Res := Res & "null type ..";

@@ -108,6 +108,30 @@ package body TGen.Types.Translation is
       Type_Name : Defining_Name) return Translation_Result with
       Pre => Decl.P_Is_Record_Type;
 
+   procedure Apply_Record_Subtype_Decl
+     (Decl : Subtype_Indication;
+      Res  : in out Discriminated_Record_Typ) with
+     Pre => Kind (Decl.Parent) in Ada_Subtype_Decl_Range
+           and then Res.Constrained;
+   --  Record the discriminant constraints of Decl in Res. For this, the type
+   --  on which you want to apply constraints must be able to accept them
+
+   function Apply_Record_Derived_Type_Decl
+     (Decl : Type_Decl'Class;
+      From : Discriminated_Record_Typ) return Discriminated_Record_Typ with
+     Pre => Kind (Decl.F_Type_Def) in Ada_Derived_Type_Def_Range
+           and then From.Constrained;
+   --  Apply the effects of the record type derivation defined in Decl.
+   --  If any discriminant constraints are present, this filters out the
+   --  incompatible shapes, and renames discriminant which correspond
+   --  between the ancestor type and the child type.
+
+   function Record_Constrained
+   (Decl : Base_Type_Decl;
+    Root : Base_Type_Decl) return Boolean;
+   --  Returns True if Decl has discriminants constraints at some stage in the
+   --  chain of subtype definitions / type derivations.
+
    ------------------------
    -- Translate_Int_Decl --
    ------------------------
@@ -474,7 +498,7 @@ package body TGen.Types.Translation is
    begin
       if Decl = Root then
 
-         --  Decl is the root, type, so it is a type decl
+         --  Decl is the root type, it is a type decl
 
          case Kind (Decl.As_Type_Decl.F_Type_Def) is
             when Ada_Floating_Point_Def_Range =>
@@ -579,6 +603,10 @@ package body TGen.Types.Translation is
                Has_Range, Min, Max);
 
          when Ada_Bin_Op_Range =>
+            pragma Assert
+              (Range_Spec_Val.F_Range.As_Bin_Op.F_Left.P_Is_Static_Expr);
+            pragma Assert
+              (Range_Spec_Val.F_Range.As_Bin_Op.F_Right.P_Is_Static_Expr);
             declare
                Min_Eval : constant Eval_Result :=
                  Expr_Eval (Range_Spec_Val.F_Range.As_Bin_Op.F_Left);
@@ -625,168 +653,215 @@ package body TGen.Types.Translation is
           Type_Name : Defining_Name) return Translation_Result
       is
          Cmp_Typ_Def         : Component_Def;
-         Indices_Constraints : Constraint_List;
-         Num_Indices         : Positive;
+
+         type Local_Ada_Node_List is array (Positive range <>) of Ada_Node;
+
+         Num_Indices         : Natural := 0;
       begin
          --  Here we either have a constrained array type decl, or a subtype
          --  decl that constrains a previous unconstrained array type decl.
 
-         if Kind (Decl) in Ada_Type_Decl_Range then
-            Cmp_Typ_Def :=
-              Decl.As_Type_Decl.F_Type_Def.As_Array_Type_Def.F_Component_Type;
-            Indices_Constraints :=
-              Decl.As_Type_Decl.F_Type_Def.As_Array_Type_Def.F_Indices
-                  .As_Constrained_Array_Indices.F_List;
-         else
-            Cmp_Typ_Def :=
-              Decl.As_Subtype_Decl.F_Subtype.P_Designated_Type_Decl
-                  .As_Type_Decl.F_Type_Def.As_Array_Type_Def.F_Component_Type;
-            Indices_Constraints :=
-              Decl.As_Subtype_Decl.F_Subtype.F_Constraint.As_Index_Constraint
-                  .F_Constraints;
-         end if;
-         Num_Indices := Indices_Constraints.Last_Child_Index;
+         while not Is_Null (Decl.P_Index_Type (Num_Indices)) loop
+            Num_Indices := Num_Indices + 1;
+         end loop;
 
          declare
-            Res_Typ : Constrained_Array_Typ (Num_Indices);
 
-            Component_Typ : constant Translation_Result :=
-              Translate (Cmp_Typ_Def.F_Type_Expr, Verbose_Diag);
-              --  This ignores any constraints on the element type that may
-              --  appear in the component definition.
-
+            Constraint_Nodes : Local_Ada_Node_List (1 .. Num_Indices);
             Current_Index : Positive := 1;
 
-            Index_Typ                      : Base_Type_Decl;
-            Has_Constraints                : Boolean;
-            Constraints_Static             : Boolean;
-            Range_Exp                      : Expr;
-            Constraint_Min, Constraint_Max : Integer;
-
-            Failure_Reason : Unbounded_String;
          begin
-            if not Component_Typ.Success then
-               return (Success     => False,
-                       Diagnostics => "Failed to translate component type of"
-                                      & " array decl : "
-                                      & Component_Typ.Diagnostics);
+
+            if Kind (Decl) in Ada_Type_Decl_Range then
+               Cmp_Typ_Def :=
+               Decl.As_Type_Decl.F_Type_Def.As_Array_Type_Def.F_Component_Type;
+
+               for Constraint of Decl.As_Type_Decl.F_Type_Def.As_Array_Type_Def
+                                .F_Indices.As_Constrained_Array_Indices.F_List
+               loop
+                  Constraint_Nodes (Current_Index) := Constraint.As_Ada_Node;
+                  Current_Index := Current_Index + 1;
+               end loop;
+            else
+               Cmp_Typ_Def :=
+                 Decl.As_Subtype_Decl.F_Subtype.P_Designated_Type_Decl
+                 .As_Type_Decl.F_Type_Def.As_Array_Type_Def.F_Component_Type;
+               if Kind (Decl.As_Subtype_Decl.F_Subtype.F_Constraint)
+                  in Ada_Index_Constraint_Range
+               then
+                  for Constraint of Decl.As_Subtype_Decl.F_Subtype.F_Constraint
+                                    .As_Index_Constraint.F_Constraints
+                  loop
+                     Constraint_Nodes (Current_Index) :=
+                       Constraint.As_Ada_Node;
+                     Current_Index := Current_Index + 1;
+                  end loop;
+               else
+                  pragma Assert
+                  (Kind (Decl.As_Subtype_Decl.F_Subtype.F_Constraint)
+                     in Ada_Discriminant_Constraint_Range);
+                  for Assoc of Decl.As_Subtype_Decl.F_Subtype.F_Constraint
+                               .As_Discriminant_Constraint.F_Constraints
+                  loop
+                     Constraint_Nodes (Current_Index) :=
+                       Assoc.As_Discriminant_Assoc.F_Discr_Expr.As_Ada_Node;
+                     Current_Index := Current_Index + 1;
+                  end loop;
+               end if;
             end if;
-            Res_Typ.Component_Type := Component_Typ.Res;
 
-            for Constraint of Indices_Constraints loop
-               case Kind (Constraint) is
-                  when Ada_Subtype_Indication_Range =>
-                     Index_Typ :=
-                       Constraint.As_Subtype_Indication.P_Designated_Type_Decl;
+            declare
+               Res_Typ : Constrained_Array_Typ (Num_Indices);
 
-                     if Is_Null (Constraint.As_Subtype_Indication.F_Constraint)
-                     then
-                        Has_Constraints := False;
-                     elsif not Constraint.As_Subtype_Indication.F_Constraint
-                               .As_Range_Constraint.F_Range.F_Range
-                               .P_Is_Static_Expr
-                     then
-                        Has_Constraints := True;
-                        Constraints_Static := False;
-                     elsif Kind (Constraint.As_Subtype_Indication.F_Constraint
+               Component_Typ : constant Translation_Result :=
+               Translate (Cmp_Typ_Def.F_Type_Expr, Verbose_Diag);
+               --  This ignores any constraints on the element type that may
+               --  appear in the component definition.
+
+               Index_Typ                      : Base_Type_Decl;
+               Has_Constraints                : Boolean;
+               Constraints_Static             : Boolean;
+               Range_Exp                      : Expr;
+               Constraint_Min, Constraint_Max : Integer;
+
+               Failure_Reason : Unbounded_String;
+            begin
+
+               Current_Index := 1;
+               if not Component_Typ.Success then
+                  return (Success     => False,
+                        Diagnostics => "Failed to translate component type of"
+                                       & " array decl : "
+                                       & Component_Typ.Diagnostics);
+               end if;
+               Res_Typ.Component_Type := Component_Typ.Res;
+
+               for Constraint of Constraint_Nodes loop
+                  case Kind (Constraint) is
+                     when Ada_Subtype_Indication_Range =>
+                        Index_Typ := Constraint.As_Subtype_Indication
+                                     .P_Designated_Type_Decl;
+
+                        if Is_Null
+                             (Constraint.As_Subtype_Indication.F_Constraint)
+                        then
+                           Has_Constraints := False;
+                        elsif not Constraint.As_Subtype_Indication.F_Constraint
+                                 .As_Range_Constraint.F_Range.F_Range
+                                 .P_Is_Static_Expr
+                        then
+                           Has_Constraints := True;
+                           Constraints_Static := False;
+                        elsif Kind
+                                (Constraint.As_Subtype_Indication.F_Constraint
                                  .As_Range_Constraint.F_Range.F_Range)
                                  in Ada_Attribute_Ref_Range | Ada_Bin_Op_Range
-                     then
-                        Range_Exp :=
-                          Constraint.As_Subtype_Indication.F_Constraint
-                                    .As_Range_Constraint.F_Range.F_Range;
+                        then
+                           Range_Exp :=
+                           Constraint.As_Subtype_Indication.F_Constraint
+                                       .As_Range_Constraint.F_Range.F_Range;
 
+                           Has_Constraints := True;
+                           Constraints_Static := True;
+
+                        end if;
+                     when Ada_Bin_Op_Range =>
+                        Index_Typ :=
+                        Constraint.As_Bin_Op.F_Left.P_Expression_Type;
                         Has_Constraints := True;
-                        Constraints_Static := True;
+                        if Constraint.As_Expr.P_Is_Static_Expr then
+                           Constraints_Static := True;
+                           Range_Exp := Constraint.As_Expr;
+                        else
+                           Constraints_Static := False;
+                        end if;
 
+                     when Ada_Attribute_Ref_Range =>
+                        Index_Typ :=
+                        Constraint.As_Attribute_Ref.F_Prefix
+                        .P_Name_Designated_Type;
+                        Has_Constraints := True;
+                        if Constraint.As_Expr.P_Is_Static_Expr then
+                           Constraints_Static := True;
+                           Range_Exp := Constraint.As_Expr;
+                        else
+                           Constraints_Static := False;
+                        end if;
+                     when Ada_Identifier_Range =>
+                        Index_Typ := Constraint.As_Identifier.P_Referenced_Decl
+                                     .As_Base_Type_Decl;
+                        Has_Constraints := False;
+                     when others =>
+                        Failure_Reason :=
+                        +"Unexpected constraint kind for a constrained array: "
+                        & Kind_Name (Constraint);
+                        goto Failed_UC_Translation;
+                  end case;
+
+                  declare
+                     Index_Trans : constant Translation_Result :=
+                     Translate (Index_Typ, Verbose_Diag);
+                  begin
+                     if not Index_Trans.Success then
+                        Failure_Reason :=
+                        "Failed to translate type of the index dimention"
+                        & Current_Index'Image & ": " & Index_Trans.Diagnostics;
+                        goto Failed_UC_Translation;
                      end if;
-                  when Ada_Bin_Op_Range =>
-                     Index_Typ :=
-                       Constraint.As_Bin_Op.F_Left.P_Expression_Type;
-                     Has_Constraints := True;
-                     if Constraint.As_Expr.P_Is_Static_Expr then
-                        Constraints_Static := True;
-                        Range_Exp := Constraint.As_Expr;
+                     Res_Typ.Index_Types (Current_Index) := Index_Trans.Res;
+                  end;
+
+                  if Has_Constraints and then Constraints_Static then
+                     --  We should only encouter either a Bin Op (A .. B) or a
+                     --  range attribute reference according to RM 3.5 (2).
+
+                     if Kind (Range_Exp) in Ada_Bin_Op_Range then
+                        Constraint_Min := Integer'Value
+                        (Range_Exp.As_Bin_Op.F_Left.P_Eval_As_Int.Image);
+                        Constraint_Max := Integer'Value
+                        (Range_Exp.As_Bin_Op.F_Right.P_Eval_As_Int.Image);
                      else
-                        Constraints_Static := False;
+                        Constraint_Min := Integer'Value
+                        (Low_Bound (Range_Exp.As_Attribute_Ref.F_Prefix
+                           .P_Name_Designated_Type.P_Discrete_Range)
+                           .P_Eval_As_Int.Image);
+                        Constraint_Min := Integer'Value
+                        (High_Bound (Range_Exp.As_Attribute_Ref.F_Prefix
+                           .P_Name_Designated_Type.P_Discrete_Range)
+                           .P_Eval_As_Int.Image);
                      end if;
-
-                  when Ada_Attribute_Ref_Range =>
-                     Index_Typ :=
-                       Constraint.As_Attribute_Ref.F_Prefix
-                       .P_Name_Designated_Type;
-                     Has_Constraints := True;
-                     if Constraint.As_Expr.P_Is_Static_Expr then
-                        Constraints_Static := True;
-                        Range_Exp := Constraint.As_Expr;
-                     else
-                        Constraints_Static := False;
-                     end if;
-                  when others =>
-                     Failure_Reason :=
-                       +"Unexpected constraint kind for a constrained array: "
-                       & Kind_Name (Constraint);
-                     goto Failed_UC_Translation;
-               end case;
-
-               declare
-                  Index_Trans : constant Translation_Result :=
-                    Translate (Index_Typ, Verbose_Diag);
-               begin
-                  if not Index_Trans.Success then
-                     Failure_Reason :=
-                       "Failed to translate type of the index dimention"
-                       & Current_Index'Image & ": " & Index_Trans.Diagnostics;
-                     goto Failed_UC_Translation;
                   end if;
-                  Res_Typ.Index_Types (Current_Index) := Index_Trans.Res;
-               end;
 
-               if Has_Constraints and then Constraints_Static then
-                  --  We should only encouter either a Bin Op (A .. B) or a
-                  --  range attribute reference according to RM 3.5 (2).
-
-                  if Kind (Range_Exp) in Ada_Bin_Op_Range then
-                     Constraint_Min := Integer'Value
-                       (Range_Exp.As_Bin_Op.F_Left.P_Eval_As_Int.Image);
-                     Constraint_Max := Integer'Value
-                       (Range_Exp.As_Bin_Op.F_Right.P_Eval_As_Int.Image);
+                  if not Has_Constraints then
+                     Res_Typ.Index_Constraints (Current_Index) :=
+                     (Present => False);
+                  elsif not Constraints_Static then
+                     Res_Typ.Index_Constraints (Current_Index) :=
+                     (Present        => True,
+                        Discrete_range =>
+                        (Low_Bound  => (Kind => Non_Static),
+                           High_Bound => (Kind => Non_Static)));
                   else
-                     Constraint_Min := Integer'Value
-                       (Low_Bound (Range_Exp.As_Attribute_Ref.F_Prefix
-                        .P_Name_Designated_Type.P_Discrete_Range)
-                        .P_Eval_As_Int.Image);
-                     Constraint_Min := Integer'Value
-                       (High_Bound (Range_Exp.As_Attribute_Ref.F_Prefix
-                        .P_Name_Designated_Type.P_Discrete_Range)
-                        .P_Eval_As_Int.Image);
+                     Res_Typ.Index_Constraints (Current_Index) :=
+                     (Present        => True,
+                        Discrete_Range =>
+                        (Low_Bound  => (Kind    => Static,
+                                          Int_Val => Constraint_Min),
+                           High_Bound => (Kind    => Static,
+                                          Int_Val => Constraint_Max)));
                   end if;
-               end if;
+                  Current_Index := Current_Index + 1;
+               end loop;
 
-               if not Has_Constraints then
-                  Res_Typ.Index_Constraints (Current_Index) :=
-                    (Present => False, Static => False);
-               elsif not Constraints_Static then
-                  Res_Typ.Index_Constraints (Current_Index) :=
-                    (Present => True, Static => False);
-               else
-                  Res_Typ.Index_Constraints (Current_Index) :=
-                    (Present        => True,
-                     Static         => True,
-                     Discrete_Range => (Min => Constraint_Min,
-                                        Max => Constraint_Max));
-               end if;
-               Current_Index := Current_Index + 1;
-            end loop;
+               Res_Typ.Name := Type_Name;
 
-            Res_Typ.Name := Type_Name;
+               return Res : Translation_Result (Success => True) do
+                  Res.Res.Set (Res_Typ);
+               end return;
 
-            return Res : Translation_Result (Success => True) do
-               Res.Res.Set (Res_Typ);
-            end return;
-
-            <<Failed_UC_Translation>>
-            return (Success => False, Diagnostics => Failure_Reason);
+               <<Failed_UC_Translation>>
+               return (Success => False, Diagnostics => Failure_Reason);
+            end;
          end;
       end Translate_Constrained;
 
@@ -885,6 +960,303 @@ package body TGen.Types.Translation is
       end case;
    end Translate_Array_Decl;
 
+   ------------------------
+   -- Record_Constrained --
+   ------------------------
+
+   function Record_Constrained
+      (Decl : Base_Type_Decl;
+      Root : Base_Type_Decl) return Boolean
+   is
+      Ancestor_Type : Subtype_Indication;
+   begin
+      --  The original Decl of a record is not constrained.
+
+      if Decl = Root then
+         return False;
+      end if;
+      case Kind (Decl) is
+         when Ada_Subtype_Decl_Range =>
+            Ancestor_Type := Decl.As_Subtype_Decl.F_Subtype;
+         when Ada_Type_Decl =>
+            pragma Assert (Kind (Decl.As_Type_Decl.F_Type_Def)
+                           in Ada_Derived_Type_Def_Range);
+            Ancestor_Type := Decl.As_Type_Decl.F_Type_Def
+                              .As_Derived_Type_Def.F_Subtype_Indication;
+         when others =>
+            return False;
+            --  we should not be able to end up in here, but if we do,
+            --  simply ignore the constraints.
+      end case;
+
+      if Is_Null (Ancestor_Type.F_Constraint) then
+         return Record_Constrained
+            (Ancestor_Type.P_Designated_Type_Decl, Root);
+      else
+         pragma Assert (Kind (Ancestor_Type.F_Constraint)
+                        in Ada_Discriminant_Constraint_Range);
+         return True;
+      end if;
+   end Record_Constrained;
+
+   -------------------------------
+   -- Apply_Record_Subtype_Decl --
+   -------------------------------
+
+   procedure Apply_Record_Subtype_Decl
+      (Decl : Subtype_Indication;
+      Res  : in out Discriminated_Record_Typ)
+   is
+      Constraints : Assoc_List;
+   begin
+      if Is_Null (Decl.F_Constraint) then
+         return;
+      end if;
+
+      Constraints := Decl.F_Constraint.As_Discriminant_Constraint
+                     .F_Constraints;
+
+      for Assoc of Constraints loop
+         if Assoc.As_Discriminant_Assoc.F_Discr_Expr.P_Is_Static_Expr then
+            for Id of Assoc.As_Discriminant_Assoc.F_Ids loop
+               Res.Discriminant_Constraint.Include
+                  (Id.P_Referenced_Defining_Name,
+                  (Kind    => Static,
+                     Int_Val => Integer'Value (Assoc.As_Discriminant_Assoc
+                                             .F_Discr_Expr.P_Eval_As_Int
+                                             .Image)));
+            end loop;
+         else
+            for Id of Assoc.As_Discriminant_Assoc.F_Ids loop
+               Res.Discriminant_Constraint.Include
+                 (Id.P_Referenced_Defining_Name,
+                  (Kind => Non_Static));
+            end loop;
+         end if;
+      end loop;
+   end Apply_Record_Subtype_Decl;
+
+   ------------------------------------
+   -- Apply_Record_Derived_Type_Decl --
+   ------------------------------------
+
+   function Apply_Record_Derived_Type_Decl
+      (Decl  : Type_Decl'Class;
+      From  : Discriminated_Record_Typ) return Discriminated_Record_Typ
+   is
+
+      use Discriminant_Constraint_Maps;
+
+      Constraints_Map : Discriminant_Constraint_Maps.Map;
+      Discr_Renaming_Map : Discriminant_Constraint_Maps.Map;
+      Constraint_Cur : Cursor;
+   begin
+      --  There are three cases here:
+      --  1. There is no known discriminant part, and no discriminant
+      --     constraints. In that case, simply forward the type as is, with
+      --     all of its discriminants and constraints
+      --
+      --  2. There is no known discriminant part, but we have a set of
+      --     discriminant constraints. In that case, The type should become
+      --     a non discriminated record type. We don't do this here, as we
+      --     may have non-static constraints which prevent us from
+      --     determining the actual components of the record, so we keep
+      --     a Discriminated record type, but we'll prune the incompatible
+      --     shapes as best as we can.
+      --
+      --  3. We have a known discriminant part and discriminant constraints,
+      --     so the resulting type is a non constrained discriminated record
+      --     type, but as with the previous case, some of the constraints
+      --     may not be static, so we'll prune the incompatible shapes as
+      --     best as possible.
+      --
+      --  Case 2 and 3 will be handled together given that we do not
+      --  change the type to undiscriminated/nonconstrained_record_typ.
+      --
+      --  There cannot be a case where we have a known discriminant part but
+      --  no discriminant constraints as we do not deal with tagged types.
+
+      --  Case 1:
+
+      if Is_Null (Decl.F_Type_Def.As_Derived_Type_Def.F_Subtype_Indication
+                  .F_Constraint)
+      then
+         return From;
+      end if;
+
+      --  Case 2 & 3:
+
+      --  First build a discriminant constraint map to filter out
+      --  the unachievable shapes.
+
+      return New_Typ : Discriminated_Record_Typ (Constrained => True) do
+         for Assoc of Decl.F_Type_Def.As_Derived_Type_Def
+                        .F_Subtype_Indication.F_Constraint
+                        .As_Discriminant_Constraint.F_Constraints
+         loop
+            if Kind (Assoc.As_Discriminant_Assoc.F_Discr_Expr) in Ada_Name
+               and then not Is_Null (Assoc.As_Discriminant_Assoc.F_Discr_Expr
+                                    .As_Name.P_Referenced_Defining_Name)
+               and then Kind (Assoc.As_Discriminant_Assoc.F_Discr_Expr
+                                    .As_Name.P_Referenced_Defining_Name
+                                    .Parent.Parent) in
+                        Ada_Discriminant_Spec_Range
+            then
+               --  Case of a Discriminant correspondance
+               for Id of Assoc.As_Discriminant_Assoc.F_Ids loop
+                  Discr_Renaming_Map.Insert
+                     (Key      => Id.P_Referenced_Defining_Name,
+                      New_Item =>
+                       (Kind          => Discriminant,
+                        Disc_Name     => Assoc.As_Discriminant_Assoc
+                                          .F_Discr_Expr.As_Name
+                                          .P_Referenced_Defining_Name,
+                        Enclosing_Typ => SP.Null_Ref));
+               end loop;
+            elsif Assoc.As_Discriminant_Assoc.F_Discr_Expr.P_Is_Static_Expr
+            then
+               --  Static value in the discriminant constraint
+
+               for Id of Assoc.As_Discriminant_Assoc.F_Ids loop
+                  Constraints_Map.Insert
+                     (Key      => Id.P_Referenced_Defining_Name,
+                     New_Item =>
+                        (Kind    => Static,
+                        Int_Val => Integer'Value
+                           (Assoc.As_Discriminant_Assoc.F_Discr_Expr
+                           .P_Eval_As_Int.Image)));
+               end loop;
+            else
+               --  Non static value
+
+               for Id of Assoc.As_Discriminant_Assoc.F_Ids loop
+                  Constraints_Map.Insert
+                     (Key => Id.P_Referenced_Defining_Name,
+                      New_Item => (Kind => Non_Static));
+               end loop;
+            end if;
+         end loop;
+
+         --  Then copy the shapes, discriminant types and non static
+         --  discriminant constraints to the new type
+         --  Also rebuild the list of components while copying the shapes
+
+         declare
+            use Shape_Maps;
+            use Component_Maps;
+            New_Shape_Index : Positive := 1;
+            Shape_Cur       : Shape_Maps.Cursor := From.Shapes.First;
+            Component_Cur   : Component_Maps.Cursor;
+            Inserted        : Boolean;
+
+            procedure Update_Choice_Discriminant
+              (Index : Positive; Choice : in out Discriminant_Choice_Entry);
+            --  Replace the discriminant name in Choice if it is present in
+            --  Discr_Renaming_Map.
+
+            procedure Update_Shape_Discriminants
+              (Index : Positive; Current_Shape : in out Record_Types.Shape);
+            --  Go through all the choices of the shape to rename the
+            --  associated discriminant according to Discr_Renaming_Map.
+
+            --------------------------------
+            -- Update_Shape_Discriminants --
+            --------------------------------
+
+            procedure Update_Shape_Discriminants
+              (Index : Positive; Current_Shape : in out Record_Types.Shape)
+            is
+               use Discriminant_Choices_Maps;
+               Choice_Cur : Discriminant_Choices_Maps.Cursor;
+            begin
+               Choice_Cur := Current_Shape.Discriminant_Choices.First;
+               while Has_Element (Choice_Cur) loop
+                  Current_Shape.Discriminant_Choices.Update_Element
+                     (Choice_Cur, Update_Choice_Discriminant'Access);
+                  Next (Choice_Cur);
+               end loop;
+            end Update_Shape_Discriminants;
+
+            --------------------------------
+            -- Update_Choice_Discriminant --
+            --------------------------------
+
+            procedure Update_Choice_Discriminant
+              (Index : Positive; Choice : in out Discriminant_Choice_Entry)
+            is
+               use Discriminant_Constraint_Maps;
+               Renaming_Cur : Discriminant_Constraint_Maps.Cursor;
+            begin
+               Renaming_Cur := Discr_Renaming_Map.Find (Choice.Defining_Name);
+               if Has_Element (Renaming_Cur) then
+                  Choice.defining_Name := Element (Renaming_Cur).Disc_Name;
+               end if;
+            end Update_Choice_Discriminant;
+
+         begin
+            for Current_Shape of From.Shapes loop
+               if Shape_Matches (Element (Shape_Cur), Constraints_Map) then
+
+                  --  Insert the new shape in the new type
+
+                  New_Typ.Shapes.Insert
+                    (Key      => New_Shape_Index,
+                     New_Item => Current_Shape,
+                     Position => Shape_Cur,
+                     Inserted => Inserted);
+                  New_Shape_Index := New_Shape_Index + 1;
+
+                  --  Replace all discriminants that have correspondance to the
+                  --  new name in the shape we just inserted
+
+                  New_Typ.Shapes.Update_Element
+                    (Shape_Cur, Update_Shape_Discriminants'Access);
+
+                  --  and register all of the components in the global map.
+
+                  Component_Cur := Current_Shape.Components.First;
+                  while Has_Element (Component_Cur) loop
+                     New_Typ.Component_Types.Include
+                       (Key (Component_Cur), Element (Component_Cur));
+                     Next (Component_Cur);
+                  end loop;
+               end if;
+            end loop;
+         end;
+
+         --  Fill out discriminant types
+
+         Constraint_Cur := Discr_Renaming_Map.First;
+         while Has_Element (Constraint_Cur) loop
+            if Element (Constraint_Cur).Kind = Discriminant then
+               New_Typ.Discriminant_Types.Insert
+                  (Key     => Element (Constraint_Cur).Disc_Name,
+                   New_Item => From.Discriminant_Types.Element
+                                 (Key (Constraint_Cur)));
+               --  TODO: propagate new discriminant name in the components
+               Next (Constraint_Cur);
+            end if;
+         end loop;
+
+         --  Then the non static constraints
+         --  We also need to copy the corresponding discriminant type.
+
+         Constraint_Cur := Constraints_Map.First;
+         while Has_Element (Constraint_Cur) loop
+            if Element (Constraint_Cur).Kind = Non_Static then
+               New_Typ.Discriminant_Constraint.Insert
+                  (Key (Constraint_Cur), Element (Constraint_Cur));
+               New_Typ.Discriminant_Types.Insert
+                  (Key     =>  Key (Constraint_Cur),
+                   New_Item => From.Discriminant_Types.Element
+                                 (Key (Constraint_Cur)));
+            end if;
+            Next (Constraint_Cur);
+         end loop;
+
+      end return;
+   end Apply_Record_Derived_Type_Decl;
+
    ---------------------------
    -- Translate_Record_Decl --
    ---------------------------
@@ -897,6 +1269,16 @@ package body TGen.Types.Translation is
       function Translate_Component_Decl_List
         (Decl_List : Ada_Node_List;
          Res       : in out Component_Maps.Map) return Unbounded_String;
+      --  Translate the list of components of Decl into Res
+
+      procedure Apply_Constraints
+        (Decl, Root : Base_Type_Decl; Res : in out Discriminated_Record_Typ);
+      --  Modify Res to include all the discriminant constraints present in
+      --  the type derivation / subtype decl chain.
+
+      -----------------------------------
+      -- Transalte_Component_Decl_List --
+      -----------------------------------
 
       function Translate_Component_Decl_List
         (Decl_List : Ada_Node_List;
@@ -920,6 +1302,55 @@ package body TGen.Types.Translation is
          return Null_Unbounded_String;
       end Translate_Component_Decl_List;
 
+      -----------------------
+      -- Apply_Constraints --
+      -----------------------
+
+      procedure Apply_Constraints
+        (Decl, Root : Base_Type_Decl; Res : in out Discriminated_Record_Typ)
+      is
+      begin
+         --  The original Decl of a record is not constrained.
+
+         if Decl = Root then
+            return;
+         end if;
+
+         case Kind (Decl) is
+            when Ada_Type_Decl_Range =>
+
+               --  First apply constraints of the ancestor type
+
+               Apply_Constraints
+                 (Decl.As_Type_Decl.F_Type_Def.As_Derived_Type_Def
+                  .F_Subtype_Indication.F_Name.P_Name_Designated_Type,
+                  Root,
+                  Res);
+
+               --  Then apply the effects of the type derivation
+
+               Res := Apply_Record_Derived_Type_Decl (Decl.As_Type_Decl, Res);
+
+            when Ada_Subtype_Decl_Range =>
+
+               --  First apply the constraints of the ancestor type
+
+               Apply_Constraints
+                 (Decl.As_Subtype_Decl.F_Subtype.F_Name.P_Name_Designated_Type,
+                  Root,
+                  Res);
+
+               --  The register the eventual constraints imposed by the subtype
+               --  definition
+
+               Apply_Record_Subtype_Decl (Decl.As_Subtype_Decl.F_Subtype, Res);
+
+            when others =>
+               --  This should not be rechable
+               null;
+         end case;
+      end Apply_Constraints;
+
       Actual_Decl : Type_Decl;
       --  The type decl where the components of the array are actually defined.
       --  For now we don't support tagged types, and thus record extension, so
@@ -928,6 +1359,9 @@ package body TGen.Types.Translation is
       --  discriminant constraints or rebind discriminants.
 
       Failure_Reason : Unbounded_String;
+
+   --  Start of processing for Translate_Record_Decl;
+
    begin
 
       --  First the simple case of an undiscriminated record
@@ -964,8 +1398,7 @@ package body TGen.Types.Translation is
 
       else
          --  Now the rest. The constraints in the subtype definitions in the
-         --  component declarations are not handled yet. Neither are subtype
-         --  definitions with discriminant constraints.
+         --  component declarations are not handled yet.
 
          Actual_Decl := Decl.P_Root_Type.As_Type_Decl;
 
@@ -974,7 +1407,9 @@ package body TGen.Types.Translation is
             Record_Shapes : constant Shape_Array :=
               Decl.P_Shapes (Include_Discriminants => False);
 
-            Trans_Res : Discriminated_Record_Typ (Record_Shapes'Length);
+            Trans_Res : Discriminated_Record_Typ
+              (Constrained => Record_Constrained
+                                (Decl, Actual_Decl.As_Base_Type_Decl));
 
             Discriminant_List : constant Discriminant_Spec_List :=
               Actual_Decl.F_Discriminants.As_Known_Discriminant_Part
@@ -985,6 +1420,7 @@ package body TGen.Types.Translation is
 
             Current_Type  : Translation_Result;
             Current_Shape : LAL.Shape;
+            Translated_Shape : Record_Types.Shape;
             Cur_Discr_Val : Discriminant_Values;
             Comp_Decl     : Component_Decl;
          begin
@@ -992,6 +1428,9 @@ package body TGen.Types.Translation is
             --  First translate the list of discriminants
 
             for Spec of Discriminant_List loop
+               if not Is_Null (Spec.F_Default_Expr) then
+                  Trans_Res.Mutable := True;
+               end if;
                Current_Type := Translate (Spec.F_Type_Expr, Verbose_Diag);
                if not Current_Type.Success then
                   Failure_Reason := "Failed to translate discriminant spec "
@@ -1014,6 +1453,10 @@ package body TGen.Types.Translation is
             for J in Record_Shapes'Range loop
                Current_Shape := Record_Shapes (J);
 
+               --  Reset the current shape variable.
+               Translated_Shape.Components.Clear;
+               Translated_Shape.Discriminant_Choices.Clear;
+
                --  First translate the component types and include them in the
                --  global component map.
 
@@ -1028,7 +1471,7 @@ package body TGen.Types.Translation is
                      goto Failed_Discr_Rec_Translation;
                   end if;
                   for Id of Comp_Decl.F_Ids loop
-                     Trans_Res.Shapes (J).Components.Insert
+                     Translated_Shape.Components.Insert
                      (Key => Id.As_Defining_Name,
                       New_Item => Current_Type.Res);
                   end loop;
@@ -1036,7 +1479,7 @@ package body TGen.Types.Translation is
 
                declare
                   use Component_Maps;
-                  Cur : Cursor := Trans_Res.Shapes (J).Components.First;
+                  Cur : Cursor := Translated_Shape.Components.First;
                begin
                   while Has_Element (Cur) loop
 
@@ -1062,16 +1505,44 @@ package body TGen.Types.Translation is
                   Cur_Discr_Val :=
                   Discriminants_Values (Current_Shape) (Discriminant_Index);
 
-                  Trans_Res.Shapes (J).Discriminant_Choices.Insert
+                  Translated_Shape.Discriminant_Choices.Insert
                   (Discriminant_Index,
                      (Defining_Name =>
                        Discriminant (Cur_Discr_Val).P_Referenced_Defining_Name,
                      Choices        =>
                        Values (Cur_Discr_Val).As_Alternatives_List));
                end loop;
+               Trans_Res.Shapes.Insert (J, Translated_Shape);
             end loop;
 
+            --  If the record is actually a constrained type, reccord the
+            --  constraints now.
+
+            if Trans_Res.Constrained then
+               Apply_Constraints
+                 (Decl, Actual_Decl.As_Base_Type_Decl, Trans_Res);
+            end if;
+
             Trans_Res.Name := Type_Name;
+
+            --  Apply_Constraints can actully return a type that isn't
+            --  discriminated or that isn't constrained, so lets try to
+            --  convert Trans_Res to the correct kind depending on the
+            --  attributes.
+
+            if Trans_Res.Discriminant_Types.Is_Empty then
+               if Trans_Res.Discriminant_Constraint.Is_Empty then
+
+                  --  Normally only checking for the discriminant is sufficient
+                  --  to check if Trans_Res will is actually a non
+                  --  discriminated type, but we may have some lingering non
+                  --  static cosntraints that don't allow us to determine
+                  --  what the final list of components is.
+
+                  null;
+               end if;
+            end if;
+
             return Res : Translation_Result (Success => True) do
                Res.Res.Set (Trans_Res);
             end return;
@@ -1092,6 +1563,7 @@ package body TGen.Types.Translation is
      (N : LAL.Type_Expr; Verbose : Boolean := False) return Translation_Result
    is
       Type_Decl_Node : Base_Type_Decl;
+      Intermediate_Result : Translation_Result;
    begin
       if Kind (N) in Ada_Anonymous_Type_Range then
          Type_Decl_Node := N.As_Anonymous_Type.F_Type_Decl.As_Base_Type_Decl;
@@ -1105,7 +1577,17 @@ package body TGen.Types.Translation is
            N.As_Subtype_Indication.P_Designated_Type_Decl.P_Full_View;
       end if;
 
-      return Translate (Type_Decl_Node, Verbose);
+      Intermediate_Result := translate (Type_Decl_Node, Verbose);
+
+      if not Intermediate_Result.Success
+        or else Kind (N) in Ada_Anonymous_Type
+        or else Is_Null (N.As_Subtype_Indication.F_Constraint)
+      then
+         return Intermediate_Result;
+      else
+         --  TODO: Implement constraint translation for anonymous subtypes
+         return Intermediate_Result;
+      end if;
    exception
       when Exc : Property_Error =>
          return (Success     => False,
@@ -1273,7 +1755,7 @@ package body TGen.Types.Translation is
            (Success     => False,
             Diagnostics =>
               +"Error translating " & N.Image & " : " &
-              Ada.Exceptions.Exception_Message (Exc));
+              Ada.Exceptions.Exception_Information (Exc));
 
    end Translate_Internal;
 

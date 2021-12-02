@@ -23,6 +23,7 @@
 
 with Ada.Containers.Hashed_Maps;
 with Ada.Containers.Ordered_Maps;
+with Ada.Containers.Ordered_Sets;
 
 with Libadalang.Analysis;
 
@@ -32,6 +33,11 @@ with TGen.Int_Types;
 package TGen.Record_Types is
 
    package LAL renames Libadalang.Analysis;
+
+   Discriminant_Value_Error : exception;
+   --  Will be raised each time an illegal value is used for a discriminant,
+   --  either because it is outside the bounds of the type of the discriminant
+   --  or because it does not respect the discriminant constraints of a record.
 
    function Hash_Defining_Name
      (Node : LAL.Defining_Name) return Ada.Containers.Hash_Type is
@@ -48,7 +54,7 @@ package TGen.Record_Types is
       "="             => SP."=");
    --  Maps for discriminants and components, from their defining name to
    --  their type translation. Since the order of the elements in these maps is
-   --  not specified, initiallyzing a record with a positional aggregate will
+   --  not specified, initialyzing a record with a positional aggregate will
    --  very likely result in an error, a named association should be used
    --  instead.
 
@@ -72,19 +78,6 @@ package TGen.Record_Types is
             and then (Self.Get.Kind in Non_Disc_Record_Kind);
    pragma Inline (As_Nondiscriminated_Record_Typ);
 
-   --  WIP
-   --  type Discriminant_Constraint (Static : Boolean := False) is record
-   --     case Static is
-   --        when True =>
-   --           Val : Integer;
-   --        when False =>
-   --           Name : LAL.Defining_Name;
-   --     end case;
-   --  end record;
-   --  --  Represents discriminant constraints. In case the value used to
-   --   constrain
-   --  --  a discriminant isn't static, fill it with
-
    type Discriminant_Choice_Entry is record
       Defining_Name : LAL.Defining_Name;
       Choices       : LAL.Alternatives_List;
@@ -97,60 +90,24 @@ package TGen.Record_Types is
    --  a discriminant may appear multiple time in the variant parts.
 
    type Shape is record
+
       Components : Component_Maps.Map;
       --  List of components present for the given variant choices
 
       Discriminant_Choices : Discriminant_Choices_Maps.Map;
       --  List of alternatives to be satisfied by each discriminent so that the
       --  record has the components defined above.
+
    end record;
+
+   package Shape_Maps is new Ada.Containers.Ordered_Maps
+     (Key_Type => Positive, Element_Type => Shape);
 
    type Shape_Arr is array (Positive range <>) of Shape;
 
-   ---  WIP
-   --  type Constraint_Value_Kind is (Static, Discriminant, Non_Static);
-
-   --  type Constraint_Value (Kind : Constraint_Value_Kind := Non_Static) is
-   --  record
-   --     case Kind is
-   --        when Static =>
-   --           Int_Val : Integer;
-   --           --  The static value of the constraint
-
-   --        when Discriminant =>
-   --           Disc_Val : LAL.Defining_Name;
-   --           --  The defining name of the discriminant that appears in this
-   --           --  context.
-
-   --        when Non_Static =>
-   --           null;
-   --           --  We don't have any useful info that we can provide here.
-   --           --  May be revisited.
-   --     end case;
-   --  end record;
-
-   type Discriminated_Record_Typ (Num_Shapes : Positive) is
-     new Record_Typ with record
-
-      Discriminant_Types : Component_Maps.Map;
-      --  Map from discriminant defining names to their type translation
-
-      Shapes : Shape_Arr (1 .. Num_Shapes);
-      --  Different (possible or not) shapes for the record, depending on the
-      --  discrete choices expressed in the variant parts.
-
-   end record;
-   --  Num_Shapes is the number of distinct shapes the record can have,
-   --  depending on the discrete choices expressed in each variant part.
-   --
-   --  The component Component_Types of a Discriminated_Record_Typ is the full
-   --  set of components that are present in the type declaration
-   --  (excluding discriminants which have their own map), but they are not
-   --  all present for a given set of discriminant values.
-
-   package Discriminant_Values_Maps is new Ada.Containers.Hashed_Maps
+   package Discriminant_Constraint_Maps is new Ada.Containers.Hashed_Maps
      (Key_Type        => LAL.Defining_Name,
-      Element_Type    => Integer,
+      Element_Type    => Constraint_Value,
       Hash            => Hash_Defining_Name,
       Equivalent_Keys => Equivalent_Keys);
    --  Maps to represent discriminant constraints. Each entry specifies the
@@ -158,12 +115,65 @@ package TGen.Record_Types is
    --  key. For enumeration types used as discriminants, this is the 'Pos value
    --  of the corresponding literal.
 
+   type Discriminated_Record_Typ (Constrained : Boolean)
+   is
+     new Record_Typ with record
+
+      Mutable : Boolean := False;
+      --  Whether this is a mutable type or not.
+
+      Discriminant_Types : Component_Maps.Map;
+      --  Map from discriminant defining names to their type translation
+
+      Shapes : Shape_Maps.Map;
+      --  Different (possible or not) shapes for the record, depending on the
+      --  discrete choices expressed in the variant parts.
+
+      case Constrained is
+         when True =>
+            Discriminant_Constraint : Discriminant_Constraint_Maps.Map;
+            --  Constraints associated to this record type. Not all the
+            --  defining names in Discriminant_Types will be present in this
+            --  map, because discriminant correspondance (See RM 3.7 (18))
+            --  defined in type derivation are represented by simply "renaming"
+            --  one of the discriminants of the ancestor part, which is then
+            --  not constrained.
+
+         when others =>
+            null;
+      end case;
+   end record;
+   --  The component Component_Types of a Discriminated_Record_Typ is the full
+   --  set of components that are present in the type declaration
+   --  (excluding discriminants which have their own map), but they are not
+   --  all present for a given set of discriminant values. To get the component
+   --  that are present given a certain set of discriminants, use the
+   --  Components function defined bellow.
+
+   function Constraints_Respected
+     (Self                : Discriminated_Record_Typ;
+      Discriminant_Values : Discriminant_Constraint_Maps.Map)
+      return Boolean;
+   --  Check whether the values given for the discriminants in
+   --  Discriminant_Values respect the constraints that may already exist for
+   --  Self. If Self has any non-static constraints or constraints bound to
+   --  a discriminant of an enclosing type, then they are always considered to
+   --  be satisfied.
+
    function Components
      (Self                : Discriminated_Record_Typ;
-      Discriminant_Values : Discriminant_Values_Maps.Map)
+      Discriminant_Values : Discriminant_Constraint_Maps.Map)
       return Component_Maps.Map;
    --  Given a set of Discriminant_Values for the discriminants of Self, return
    --  the set of components that are actually present in the record.
+   --  Note that this does not resolves the eventual constraints on the
+   --  components that depend on discriminants.
+
+   function Shape_Matches
+     (Shp : Shape;
+      Discriminant_Values : Discriminant_Constraint_Maps.Map) return Boolean;
+    --  Given the set of (incomplete) discriminant values, return whether this
+    --  shape is achievable.
 
    function Image (Self : Discriminated_Record_Typ) return String;
 

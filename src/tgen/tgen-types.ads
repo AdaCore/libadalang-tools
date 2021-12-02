@@ -101,6 +101,37 @@ package TGen.Types is
    --  Typ'Class wrapped in a smart pointer as a <Target>_Typ, and thus be able
    --  to access the components and primitives defined for that particular
    --  type. The return value is the object encapsulated in the smart pointer,
-   --  so under no circumstance shoult it be freed.
+   --  so under no circumstances should it be freed.
+
+   type Constraint_Value_Kind is (Static, Discriminant, Non_Static);
+   --  Constraint kind. Discriminant means that the constraint value is the
+   --  value of one of the discriminants of the enclosing record type. Does not
+   --  make sense if the constraints are not applied to a component of a
+   --  discriminated record type.
+
+   type Constraint_Value (Kind : Constraint_Value_Kind := Non_Static) is
+   record
+      case Kind is
+         when Static =>
+            Int_Val : Integer;
+            --  The static integer value of the constraint
+
+         when Discriminant =>
+            Disc_Name : LAL.Defining_Name;
+            Enclosing_Typ : SP.Ref;
+            --  The defining name of the discriminant that appears in this
+            --  context, as well as a reference to the enclosing record type
+            --  in which the discriminant is defined.
+
+         when Non_Static =>
+            null;
+            --  We don't have any useful info that we can provide here.
+            --  May be revisited.
+      end case;
+   end record;
+
+   type Discrete_Range_Constraint is record
+      Low_Bound, High_Bound : Constraint_Value;
+   end record;
 
 end TGen.Types;

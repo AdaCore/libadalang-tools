@@ -22,7 +22,6 @@
 ------------------------------------------------------------------------------
 
 with TGen.Types; use TGen.Types;
-with TGen.Int_Types;
 
 package TGen.Array_Types is
 
@@ -30,20 +29,10 @@ package TGen.Array_Types is
 
    type Index_Typ_Arr is array (Positive range <>) of TGen.Types.SP.Ref;
 
-   type Index_Constraints
-     (Present : Boolean := False; Static : Boolean := False) is record
+   type Index_Constraints (Present : Boolean := False) is record
       case Present is
          when True =>
-            case Static is
-               when True =>
-                  Discrete_Range : TGen.Int_Types.Int_Range;
-                  --  Index constraints are supposed to apply to any discrete
-                  --  type, not only integers but we'll represent index
-                  --  constraints on an enum type by the index of the
-                  --  corresponding litterals that appear in the range.
-               when others =>
-                  null;
-            end case;
+            Discrete_Range : Discrete_Range_Constraint;
          when others =>
             null;
       end case;
