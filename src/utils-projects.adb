@@ -1409,6 +1409,26 @@ package body Utils.Projects is
                      Cmd_Error ("file not found: " & File_Name.all);
                   end if;
 
+                  declare
+                     F_Inf : constant File_Info := Info (My_Project_Tree, Res);
+                     Proj  : constant Project_Type := Project (F_Inf);
+                     Attr  : constant Attribute_Pkg_String :=
+                       Build ("", "externally_built");
+
+                     use Ada.Characters.Handling;
+                  begin
+                     if Has_Attribute (Proj, Attr) then
+                        if
+                          To_Lower (Attribute_Value (Proj, Attr)) = "true"
+                        then
+                           Cmd_Error_No_Help
+                             (File_Name.all
+                              & " is from externally built project "
+                              & Proj.Name);
+                        end if;
+                     end if;
+                  end;
+
                   File_Name := new String'(Res.Display_Full_Name);
                end;
             end if;

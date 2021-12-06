@@ -6,3 +6,4 @@ package
 return Integer 
 is (2);
 end Q;
+gnatpp: q.ads is from externally built project Q
