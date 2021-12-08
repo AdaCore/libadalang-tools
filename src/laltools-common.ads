@@ -26,6 +26,7 @@
 
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Indefinite_Ordered_Maps;
+with Ada.Containers.Indefinite_Hashed_Sets;
 with Ada.Containers.Hashed_Sets;
 with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Ordered_Sets;
@@ -84,6 +85,17 @@ package Laltools.Common is
      (Vector : in out Ada_List_Vector;
       List   : Ada_List'Class);
    --  Checks if Ada_List.Is_Null and if not, appends it to Vector
+
+   function Hash (Node : Ada_List'Class) return Ada.Containers.Hash_Type is
+     (Hash (Node.As_Ada_Node));
+
+   package Ada_List_Hashed_Sets is new Ada.Containers.Indefinite_Hashed_Sets
+     (Element_Type => Ada_List'Class,
+      Hash => Hash,
+      Equivalent_Elements => "=",
+      "=" => "=");
+
+   subtype Ada_List_Hashed_Set is Ada_List_Hashed_Sets.Set;
 
    package Base_Id_Vectors is new Ada.Containers.Vectors
      (Index_Type   => Natural,
@@ -239,18 +251,132 @@ package Laltools.Common is
    --  where Match returns True. This iterative process stops if Callback sets
    --  Stop to True.
 
-   function Find_Local_Scopes
+   function Is_Scopes_Owner
      (Node : Ada_Node'Class)
-      return Ada_List_Vector
-     with Post => (for all Scope of Find_Local_Scopes'Result =>
-                   Scope.Kind in Ada_Ada_Node_List_Range
-                                   | Ada_Basic_Decl_List_Range);
-   --  Find all scopes in Node's Compilation_Unit visible by Node. It will not
-   --  contain Node if Node is itself a scope.
-   --  In this context, scope is the Ada_Node_List of a Declarative_Part, or a
-   --  Basic_Decl_List of a Decl_Expr (in Ada 2022, Expr_Function can have a
-   --  Decl_Expr node).
+      return Boolean;
+   --  Checks if Candidate is a Declarative_Part owner, an Expr_Function that
+   --  constains a Decl_Expr, or a declaration that can have a Params node.
+
+   function Get_Params (Node : Ada_Node'Class) return Params;
+   --  If Node is a Params owner, returns it. Otherwise, returns null.
+   --  In this context, a Params owner is a subprogram, Entry_Decl, Entry_Body
+   --  or Accept_Stmt whose spec has a Params node.
+
+   function Find_Other_Part
+     (List : Param_Spec_List'Class)
+      return Param_Spec_List;
+   --  If List's parent declaration has another part, finds its
+   --  Param_Spec_List.
+
+   function Find_Enclosing_Declarative_Parts
+     (Node : Ada_Node'Class)
+      return Ada_List_Hashed_Set
+     with Post => (for all List of Find_Enclosing_Declarative_Parts'Result =>
+                     List.Kind in Ada_Ada_Node_List_Range
+                                     | Ada_Basic_Decl_List_Range);
+   --  Finds the Declarative_Parts or Decl_Expr of the first scope visible by
+   --  Node. In this context, scope is the nearest union of Ada_List'Class
+   --  nodes where declarations can be done.
+   --  So a scope can be the union of a Declarative_Part, a Basic_Decl_List of
+   --  a Decl_Expr (in Ada 2022, Expr_Function can have a Decl_Expr node) or a
+   --  Param_Spec_List.
    --  Returns an empty vector if Node.Is_Null.
+   --
+   --  Example:
+   --
+   --     procedure Foo (B : Bar);
+   --     procedure Foo (B : Bar) is
+   --        C : Corge;
+   --     begin
+   --        null;
+   --        declare
+   --           D : Delta;
+   --        begin
+   --           null;
+   --        end;
+   --     end Foo;
+   --
+   --     When called on C, B or or the first null, it returns Foo's
+   --     Declarative_Part.
+   --
+   --     procedure Foo (A : Bar);
+   --     procedure Foo (A : Bar) is
+   --        function Qux (B, C : Integer) return Integer (B + C);
+   --     begin
+   --        null;
+   --     end Foo;
+   --
+   --     When called on B returns empty since the first scope only contains
+   --     Qux's Param_Spec_List.
+
+   function Find_Enclosing_Param_Spec_Lists
+     (Node : Ada_Node'Class)
+      return Ada_List_Hashed_Set
+     with Post => (for all List of Find_Enclosing_Param_Spec_Lists'Result =>
+                     List.Kind in Ada_Param_Spec_List_Range);
+   --  Finds the Param_Spec_List associated to the first scope visible by Node.
+   --  In this context, scope is the nearest union of Ada_List'Class nodes
+   --  where declarations can be done. So a scope can be the union of a
+   --  Declarative_Part, a Basic_Decl_List of a Decl_Expr (in Ada 2022,
+   --  Expr_Function can have a Decl_Expr node) or a Param_Spec_List.
+   --  Returns an empty vector if Node.Is_Null.
+   --
+   --  Example:
+   --
+   --     procedure Foo (B : Bar);
+   --     procedure Foo (B : Bar) is
+   --        C : Corge;
+   --     begin
+   --        null;
+   --        declare
+   --           D : Delta;
+   --        begin
+   --           null;
+   --        end;
+   --     end Foo;
+   --
+   --     When called on C, B or or the first null, it returns Foo's
+   --     Param_Spec_List.
+   --     When called on D or the second null, returns an empty set since
+   --     the declare block (first visible scope) does not have an associated
+   --     Param_Spec_List.
+
+   function Find_Enclosing_Scopes
+     (Node : Ada_Node'Class)
+      return Ada_List_Hashed_Set
+     with Post => (for all List of Find_Enclosing_Scopes'Result =>
+                     List.Kind in Ada_Ada_Node_List_Range
+                                    | Ada_Basic_Decl_List_Range
+                                    | Ada_Param_Spec_List_Range);
+   --  Union between Find_Enclosing_Declarative_Parts and
+   --  Find_Enclosing_Param_Spec_Lists.
+
+   function Find_Visible_Declarative_Parts
+     (Node : Ada_Node'Class)
+      return Ada_List_Hashed_Set
+     with Post => (for all List of Find_Visible_Declarative_Parts'Result =>
+                     List.Kind in Ada_Ada_Node_List_Range
+                                   | Ada_Basic_Decl_List_Range);
+   --  Find all Declarative_Part and Decl_Expr nodes visible by Node
+   --  (excluding the ones visible by a use clause).
+   --  Returns an empty vector if Node.Is_Null.
+
+   function Find_Visible_Param_Spec_Lists
+     (Node : Ada_Node'Class)
+      return Ada_List_Hashed_Set
+     with Post => (for all List of Find_Visible_Param_Spec_Lists'Result =>
+                     List.Kind in Ada_Param_Spec_List_Range);
+   --  Find all Param_Spec_List visible by Node
+
+   function Find_Visible_Scopes
+     (Node : Ada_Node'Class)
+      return Ada_List_Hashed_Set
+     with Post => (for all List of Find_Visible_Scopes'Result =>
+                     List.Kind in Ada_Ada_Node_List_Range
+                                    | Ada_Basic_Decl_List_Range
+                                    | Ada_Param_Spec_List_Range);
+   --  Union between Find_Visible_Declarative_Parts and
+   --  Find_Visible_Param_Spec_Lists.
 
    function Find_Nested_Scopes (Node : Ada_Node'Class)
                                 return Declarative_Part_Vectors.Vector;
@@ -303,14 +429,6 @@ package Laltools.Common is
    --  or No_Source_Location if Pack_Name is already withed.
    --  Last indicates if the location is after the last with/use clause.
 
-   function Get_CU_Visible_Declarative_Parts
-     (Node : Ada_Node'Class;
-      Skip_First : Boolean := False)
-      return Declarative_Part_Vectors.Vector;
-   --  Returns a vector with all Declarative_Parts in Node's compilation unit
-   --  visible by Node. If Skip_First is True, then Node's first
-   --  Declarative_Part parent is skipped.
-
    function Get_Decl_Block_Declarative_Part (Decl_B : Decl_Block)
                                              return Declarative_Part;
    --  Gets the Declarative_Part of a Decl_Block.
@@ -329,6 +447,11 @@ package Laltools.Common is
      with Post => (if Is_Decl_Expr_Owner'Result then
                      Node.Kind in Ada_Expr_Function_Range);
    --  Checks if Node is an Expr_Function with a Decl_Expr child
+
+   function Is_Params_Owner
+     (Node : Ada_Node'Class)
+      return Boolean;
+   --  Checks if Node can have a Params child
 
    function Get_Declarative_Part
      (Node         : Ada_Node'Class;

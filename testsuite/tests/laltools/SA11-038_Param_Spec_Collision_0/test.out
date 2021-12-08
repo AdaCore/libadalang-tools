@@ -21,6 +21,7 @@ Start_Column: 19
 End_Line: 3
 End_Column: 25
 Problems:
+Renaming My_Bar to Bar hides <Id "Bar" a.ads:2:9-2:12>
 Renaming My_Bar to Bar creates a name collision with <Id "Bar" a.ads:2:9-2:12>
 
 # Renaming node a.ads:4:23: 

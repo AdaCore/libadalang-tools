@@ -742,11 +742,19 @@ package body Laltools.Refactor.Safe_Rename is
       Canonical_Decl : constant Basic_Decl :=
         Self.Canonical_Definition.P_Basic_Decl;
 
-      Local_Scopes : constant Ada_List_Vector :=
-        Find_Local_Scopes (Canonical_Decl);
+      --  If Canonical_Decl.Kind in Ada_Param_Spec_Range, then do nothing.
+      --  In this case, there can only be collision with other parameters
+      --  or with its type indication. Such collision are detected by the
+      --  Param_Spec_Collision_Finder.
 
-      --  If Self.Canonical_Definition is associated to a subprogram, then its
-      --  spec is needed to check for collisions with other subprograms.
+      Local_Scopes : constant Ada_List_Hashed_Set :=
+        (if Canonical_Decl.Kind in Ada_Param_Spec_Range then
+            Ada_List_Hashed_Sets.Empty_Set
+         else
+            Find_Enclosing_Declarative_Parts (Canonical_Decl));
+
+      --  If Self.Canonical_Decl is a subprogram, then its Spec node is needed
+      --  check for collisions with other subprograms.
 
       Is_Subp : constant Boolean :=
         Is_Subprogram (Canonical_Decl)
@@ -761,7 +769,8 @@ package body Laltools.Refactor.Safe_Rename is
          return Defining_Name
         with Pre => not Scope.Is_Null
                     and then Scope.Kind in Ada_Ada_Node_List
-                                             | Ada_Basic_Decl_List;
+                                             | Ada_Basic_Decl_List_Range
+                                             | Ada_Param_Spec_List_Range;
       --  For every declaration of Scope, checks if it has the same name
       --  as Self.New_Name. If so, return a the Defining_Name of the
       --  conflicting declaration.
@@ -1371,6 +1380,8 @@ package body Laltools.Refactor.Safe_Rename is
      (Self : Name_Hiding_Finder)
       return Rename_Problem'Class
    is
+      use Ada_List_Hashed_Sets;
+
       Canonical_Decl : constant Basic_Decl :=
         Self.Canonical_Definition.P_Basic_Decl;
 
@@ -1388,26 +1399,32 @@ package body Laltools.Refactor.Safe_Rename is
       Possible_Problem : Hiding_Name;
       Found_Problem    : Boolean := False;
 
-      Visible_Declarative_Parts   : constant Declarative_Part_Vector :=
-        Get_CU_Visible_Declarative_Parts
-          (Node       => Canonical_Decl,
-           Skip_First => True);
+      --  These are the scopes where declarations can get hidden by
+      --  Canonical_Decl.
+      Parent_Scopes : constant Ada_List_Hashed_Set :=
+        Difference
+          (Find_Visible_Scopes (Canonical_Decl),
+           Find_Enclosing_Scopes (Canonical_Decl));
+
+      Stop_Node : constant Basic_Decl := Canonical_Decl.P_Parent_Basic_Decl;
       Use_Units_Public_Parts : constant Declarative_Part_Vector :=
         Get_Use_Units_Public_Parts (Self.Canonical_Definition);
 
-      procedure Check_Declarative_Part
-        (Decl_Part : Declarative_Part'Class);
+      procedure Check_Scope
+        (Scope : Ada_List'Class);
       --  Checks if Decl_Part contains any declaration that can be hidden by
       --  Canonical_Decl. If so, Possible_Problem is filled with the
       --  appropriate information and Found_Problem is set to True.
 
-      procedure Check_Declarative_Part
-        (Decl_Part : Declarative_Part'Class) is
+      procedure Check_Scope
+        (Scope : Ada_List'Class) is
       begin
          if Is_Subp then
             Assert (not Canonical_Subp_Spec.Is_Null);
 
-            for Decl of Decl_Part.F_Decls loop
+            for Decl of Scope.Children loop
+               exit when Decl = Stop_Node;
+
                --  Conflicts can only exist with subprograms and not with other
                --  kind of declarations.
 
@@ -1434,7 +1451,9 @@ package body Laltools.Refactor.Safe_Rename is
             end loop;
 
          else
-            for Decl of Decl_Part.F_Decls loop
+            for Decl of Scope.Children loop
+               exit when Decl = Stop_Node;
+
                --  Conflicts can exists with any kind of declaration except
                --  subprograms
 
@@ -1456,11 +1475,11 @@ package body Laltools.Refactor.Safe_Rename is
                end if;
             end loop;
          end if;
-      end Check_Declarative_Part;
+      end Check_Scope;
 
    begin
-      for Decl_Part of Visible_Declarative_Parts loop
-         Check_Declarative_Part (Decl_Part);
+      for Scope of Parent_Scopes loop
+         Check_Scope (Scope);
          exit when Found_Problem;
       end loop;
 
@@ -1469,7 +1488,7 @@ package body Laltools.Refactor.Safe_Rename is
       end if;
 
       for Decl_Part of Use_Units_Public_Parts loop
-         Check_Declarative_Part (Decl_Part);
+         Check_Scope (Decl_Part.F_Decls);
          exit when Found_Problem;
       end loop;
 
@@ -1487,6 +1506,8 @@ package body Laltools.Refactor.Safe_Rename is
    overriding
    function Find (Self : Name_Hidden_Finder) return Rename_Problem'Class
    is
+      use Ada_List_Hashed_Sets;
+
       Canonical_Decl : constant Basic_Decl :=
         Self.Canonical_Definition.P_Basic_Decl;
 
@@ -1510,9 +1531,9 @@ package body Laltools.Refactor.Safe_Rename is
             Declarative_Part_Vectors.Empty_Vector);
 
       Stop_Node : Ada_Node := No_Ada_Node;
-      Dec_Visible_Declarative_Parts : constant Ada_List_Vector
-        := Find_Local_Scopes (Self.Canonical_Definition.P_Basic_Decl);
-      Ref_Visible_Declarative_Parts : Ada_List_Vector;
+      Canonical_Definition_Local_Scopes : constant Ada_List_Hashed_Set :=
+        Find_Visible_Scopes (Canonical_Decl);
+      Reference_Local_Scopes : Ada_List_Hashed_Set;
 
       function Check_Conflict (Definition : Defining_Name'Class)
                                return Boolean;
@@ -1614,7 +1635,21 @@ package body Laltools.Refactor.Safe_Rename is
       --  another definition.
 
       for Reference of Self.References loop
-         if Reference.Parent.Parent.Parent.Kind /= Ada_Param_Spec then
+         Reference_Local_Scopes :=
+           Difference
+             (Find_Visible_Scopes (Reference),
+              Find_Enclosing_Scopes (Reference));
+
+         for Scope of
+           Difference
+             (Reference_Local_Scopes, Canonical_Definition_Local_Scopes)
+         loop
+            --  Do not look for conflicts in Self.Canonical_Part own
+            --  local scopes, since this would be a name collision
+            --  conflict already detected by the Name_Collision_Finder.
+
+            --  Reference is only hidden by a declaration that is declared
+            --  before it.
             Find_Stop_Node :
             for Parent of Reference.Parents loop
                if Parent.Kind in
@@ -1625,81 +1660,58 @@ package body Laltools.Refactor.Safe_Rename is
                end if;
             end loop Find_Stop_Node;
 
-            if Stop_Node /= No_Ada_Node
-              and then Stop_Node.Kind = Ada_Param_Spec
-            then
-               Stop_Node := Stop_Node.Parent.Parent.Parent.Parent;
-            end if;
+            declare
+               Conflicting_Definition : Defining_Name := No_Defining_Name;
 
-            Ref_Visible_Declarative_Parts := Find_Local_Scopes (Stop_Node);
+               function Visit
+                 (Node : Ada_Node'Class)
+                     return Visit_Status;
+               --  Checks if Node is a conflict, and if so, sets Result
+               --  to it, stopping the iterative process.
 
-            for Declarative_Part of Ref_Visible_Declarative_Parts loop
-               --  Do not look for conflicts in Self.Canonical_Part own
-               --  declarative part, since this would be a name collision
-               --  conflict already detected by the Name_Collision_Finder.
-               if not Ada_List_Vectors.Has_Element
-                 (Ada_List_Vectors.Find
-                    (Dec_Visible_Declarative_Parts, Declarative_Part))
-               then
-                  declare
-                     Conflicting_Definition : Defining_Name;
+               -----------
+               -- Visit --
+               -----------
 
-                     function Visit
-                       (Node : Ada_Node'Class)
-                        return Visit_Status;
-                     --  Checks if Node is a conflict, and if so, sets Result
-                     --  to it, stopping the iterative process.
+               function Visit
+                 (Node : Ada_Node'Class)
+                     return Visit_Status is
+               begin
+                  if Node.Kind in Ada_Basic_Decl then
+                     --  If Self.Canonical_Definition is found, then it
+                     --  can't be hidden, so stop the search.
 
-                     -----------
-                     -- Visit --
-                     -----------
-
-                     function Visit
-                       (Node : Ada_Node'Class)
-                        return Visit_Status is
-                     begin
-                        if Node.Kind in Ada_Basic_Decl then
-                           --  If Self.Canonical_Definition is found, then it
-                           --  can't be hidden, so stop the search.
-
-                           if Node.As_Basic_Decl.P_Canonical_Part =
-                             Self.Canonical_Definition.P_Basic_Decl
-                             or else Node = Stop_Node
-                           then
-                              return Stop;
-                           end if;
-
-                           for Definition of
-                             Node.As_Basic_Decl.P_Defining_Names
-                           loop
-                              if Check_Conflict (Definition) then
-                                 Conflicting_Definition := Definition;
-                                 return Stop;
-                              end if;
-                           end loop;
-                        end if;
-
-                        return
-                          (if Node = Declarative_Part then Into else Over);
-                     end Visit;
-
-                  begin
-                     Declarative_Part.Traverse (Visit'Access);
-
-                     if not Conflicting_Definition.Is_Null then
-                        return Hidden_Name'
-                          (Canonical_Definition =>
-                             Self.Canonical_Definition,
-                           New_Name             => Self.New_Name,
-                           Conflicting_Id       =>
-                             Conflicting_Definition.F_Name);
+                     if Node.As_Basic_Decl.P_Canonical_Part =
+                       Self.Canonical_Definition.P_Basic_Decl
+                       or else Node = Stop_Node
+                     then
+                        return Stop;
                      end if;
-                  end;
-               else
-                  null;
+
+                     for Definition of
+                       Node.As_Basic_Decl.P_Defining_Names
+                     loop
+                        if Check_Conflict (Definition) then
+                           Conflicting_Definition := Definition;
+                           return Stop;
+                        end if;
+                     end loop;
+                  end if;
+
+                  return (if Node = Scope then Into else Over);
+               end Visit;
+
+            begin
+               Scope.Traverse (Visit'Access);
+
+               if not Conflicting_Definition.Is_Null then
+                  return Hidden_Name'
+                    (Canonical_Definition => Self.Canonical_Definition,
+                     New_Name             => Self.New_Name,
+                     Conflicting_Id       => Conflicting_Definition.F_Name);
                end if;
-            end loop;
-         end if;
+            end;
+         end loop;
       end loop;
 
       return No_Rename_Problem;
@@ -1718,7 +1730,7 @@ package body Laltools.Refactor.Safe_Rename is
 
       Param_Spec : Libadalang.Analysis.Param_Spec renames
         Self.Canonical_Definition.P_Basic_Decl.As_Param_Spec;
-      Type_Expr : Libadalang.Analysis.Type_Expr renames
+      Type_Expr  : Libadalang.Analysis.Type_Expr renames
         Param_Spec.F_Type_Expr;
       Subtype_Indication : constant Libadalang.Analysis.Subtype_Indication :=
         (if Type_Expr.Kind in Ada_Subtype_Indication
@@ -1726,6 +1738,16 @@ package body Laltools.Refactor.Safe_Rename is
          else No_Subtype_Indication);
       Param_Spec_List : Libadalang.Analysis.Param_Spec_List renames
         Self.Canonical_Definition.P_Basic_Decl.Parent.As_Param_Spec_List;
+      Declarative_Part : constant Libadalang.Analysis.Declarative_Part :=
+        (if Is_Declarative_Part_Owner (Param_Spec.P_Parent_Basic_Decl) then
+            Get_Declarative_Part (Param_Spec.P_Parent_Basic_Decl)
+         elsif Is_Declarative_Part_Owner
+           (Param_Spec.P_Parent_Basic_Decl.P_Next_Part_For_Decl)
+         then
+            Get_Declarative_Part
+              (Param_Spec.P_Parent_Basic_Decl.P_Next_Part_For_Decl)
+         else
+            No_Declarative_Part);
 
    begin
       if Self.Canonical_Definition.P_Basic_Decl.Kind = Ada_Param_Spec then
@@ -1759,6 +1781,72 @@ package body Laltools.Refactor.Safe_Rename is
                end if;
             end loop;
          end loop;
+
+         --  Possible problem 3: Renaming a parameter to the same name of
+         --  a declaration of its subprogram declarative part
+
+         if not Declarative_Part.Is_Null then
+            for Decl of Declarative_Part.F_Decls loop
+               if Decl.Kind in Ada_Basic_Decl then
+                  for Defining_Name
+                    of Decl.As_Basic_Decl.P_Defining_Names
+                  loop
+                     if Defining_Name.F_Name.Text =
+                       To_Text (Self.New_Name)
+                     then
+                        return Name_Collision'
+                          (Canonical_Definition => Self.Canonical_Definition,
+                           New_Name             => Self.New_Name,
+                           Conflicting_Id       => Defining_Name.F_Name);
+                     end if;
+                  end loop;
+               end if;
+            end loop;
+         end if;
+
+         --  Possible problem 4: Renaming a parameter to the same name of
+         --  a declaration of its subprogram declarative part
+         --  Example:
+         --
+         --  function ComputeSquarePlusCube (X : Integer) return Integer is
+         --    (declare T : constant Integer := X;
+         --     begin T * T * (1 + T));
+
+         declare
+            Subp_Canonical_Part : constant Basic_Decl :=
+              Param_Spec.P_Parent_Basic_Decl;
+            Expression_Function : constant Expr_Function :=
+              (if Subp_Canonical_Part.Kind in Ada_Expr_Function_Range then
+                  Subp_Canonical_Part.As_Expr_Function
+               elsif not Subp_Canonical_Part.P_Next_Part_For_Decl.Is_Null
+                      and then Subp_Canonical_Part.P_Next_Part_For_Decl.Kind in
+                                 Ada_Expr_Function_Range
+               then
+                  Subp_Canonical_Part.P_Next_Part_For_Decl.As_Expr_Function
+               else No_Expr_Function);
+         begin
+            if not Expression_Function.Is_Null
+              and then Is_Decl_Expr_Owner (Expression_Function)
+            then
+               for Decl of
+                 Expression_Function.F_Expr.As_Paren_Expr.F_Expr.As_Decl_Expr.
+                   F_Decls
+               loop
+                  for Defining_Name
+                    of Decl.As_Basic_Decl.P_Defining_Names
+                  loop
+                     if Defining_Name.F_Name.Text =
+                       To_Text (Self.New_Name)
+                     then
+                        return Name_Collision'
+                          (Canonical_Definition => Self.Canonical_Definition,
+                           New_Name             => Self.New_Name,
+                           Conflicting_Id       => Defining_Name.F_Name);
+                     end if;
+                  end loop;
+               end loop;
+            end if;
+         end;
       end if;
 
       return No_Rename_Problem;

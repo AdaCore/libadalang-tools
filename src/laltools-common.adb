@@ -396,174 +396,326 @@ package body Laltools.Common is
          return No_Defining_Name;
    end Find_Canonical_Part;
 
-   -----------------------
-   -- Find_Local_Scopes --
-   -----------------------
+   ---------------------
+   -- Is_Scopes_Owner --
+   ---------------------
 
-   function Find_Local_Scopes
+   function Is_Scopes_Owner
      (Node : Ada_Node'Class)
-      return Ada_List_Vector
-   is
-      Local_Scopes_Owner : Ada_Node;
+      return Boolean
+   is (not Node.Is_Null
+       and then (Is_Declarative_Part_Owner (Node)
+                 or else Is_Decl_Expr_Owner (Node)
+                 or else Is_Params_Owner (Node)));
 
-      procedure Set_Local_Scopes_Owner
+   -----------------
+   --  Get_Params --
+   -----------------
+
+   function Get_Params (Node : Ada_Node'Class) return Params is
+   begin
+      if Node.Is_Null then
+         return No_Params;
+      end if;
+
+      --  Check if Node has a Subp_Spec
+
+      if Node.Kind in Ada_Basic_Decl
+        and then not Node.As_Basic_Decl.P_Subp_Spec_Or_Null.Is_Null
+        and then Node.As_Basic_Decl.P_Subp_Spec_Or_Null.Kind in
+          Ada_Subp_Spec_Range
+      then
+         return Node.As_Basic_Decl.P_Subp_Spec_Or_Null.As_Subp_Spec.
+           F_Subp_Params;
+      end if;
+
+      --  Check for Entry_Decl / Accept_Stmt / Entry_Body
+
+      if Node.Kind in Ada_Entry_Decl_Range then
+         return Node.As_Entry_Decl.F_Spec.F_Entry_Params;
+
+      elsif Node.Kind in Ada_Accept_Stmt_Range then
+         if not Node.As_Accept_Stmt.F_Params.Is_Null then
+            return Node.As_Accept_Stmt.F_Params.F_Params;
+         end if;
+         return No_Params;
+
+      elsif Node.Kind in Ada_Entry_Body_Range then
+         if not Node.As_Entry_Body.F_Params.Is_Null then
+            return Node.As_Entry_Body.F_Params.F_Params;
+         end if;
+         return No_Params;
+
+      else
+         return No_Params;
+      end if;
+   end Get_Params;
+
+   ---------------------
+   -- Find_Other_Part --
+   ---------------------
+
+   function Find_Other_Part
+     (List : Param_Spec_List'Class)
+      return Param_Spec_List is
+   begin
+      if List.Is_Null then
+         return No_Param_Spec_List;
+      end if;
+
+      declare
+         Parent_Basic_Decl                   : constant Basic_Decl :=
+           List.P_Parent_Basic_Decl;
+         Parent_Basic_Decl_Other_Part        : constant Basic_Decl :=
+           (if not Parent_Basic_Decl.P_Next_Part_For_Decl.Is_Null then
+               Parent_Basic_Decl.P_Next_Part_For_Decl
+            elsif not Parent_Basic_Decl.P_Previous_Part_For_Decl.Is_Null then
+               Parent_Basic_Decl.P_Previous_Part_For_Decl
+            else
+               No_Basic_Decl);
+         Parent_Basic_Decl_Other_Part_Params : constant Params :=
+           Get_Params (Parent_Basic_Decl_Other_Part);
+      begin
+         --  If Parent_Basic_Decl does not have another part,
+         --  or if it has but for some reason it does not have Params,
+         --  return null.
+
+         if Parent_Basic_Decl_Other_Part_Params.Is_Null then
+            return No_Param_Spec_List;
+         end if;
+
+         return Parent_Basic_Decl_Other_Part_Params.F_Params;
+      end;
+   end Find_Other_Part;
+
+   procedure Include_If_Not_Null
+     (Set     : in out Ada_List_Hashed_Set;
+      Element : Param_Spec_List'Class);
+   --  Checks if List is null, and if not, includes it in
+   --  Enclosing_Param_Spec_List.
+
+   procedure Include_If_Not_Null
+     (Set     : in out Ada_List_Hashed_Set;
+      Element : Param_Spec_List'Class) is
+   begin
+      if not Element.Is_Null then
+         Set.Include (Element);
+      end if;
+   end Include_If_Not_Null;
+
+   ----------------------------------
+   -- Find_Enclosing_Declarative_Parts --
+   ----------------------------------
+
+   function Find_Enclosing_Declarative_Parts
+     (Node : Ada_Node'Class)
+      return Ada_List_Hashed_Set
+   is
+      Enclosing_Declarative_Parts : Ada_List_Hashed_Set;
+
+      procedure Process_Scopes_Owner
         (Owner : Ada_Node;
          Stop  : in out Boolean);
-      --  Callback for Find_Matching_Parents that sets
-      --  Parent_Declarative_Part_Or_Decl_Owner and stops the iteration.
+      --  Checks if Owner has declarative parts, appending them to
+      --  Enclosing_Declarative_Parts if so. If it doesn't, checks if its
+      --  body part (if existent) has declarative parts, also appending them to
+      --  Enclosing_Declarative_Parts.
 
-      function Is_Local_Scopes_Owner
-        (Node : Ada_Node'Class)
-         return Boolean
-        with Post => (if Is_Local_Scopes_Owner'Result
-                      then Is_Declarative_Part_Owner (Node)
-                           xor Is_Decl_Expr_Owner (Node)
-                           xor Node.Kind in Ada_Classic_Subp_Decl
-                           xor Node.Kind in Ada_Generic_Subp_Decl_Range);
-      --  Return True if Is_Declarative_Part_Owner (Node) or else
-      --  Is_Decl_Expr_Owner (Node) or else Node.Kin in Ada_Subp_Decl_Range.
+      --------------------------
+      -- Process_Scopes_Owner --
+      --------------------------
 
-      function Process_Declarative_Part_Owner
-        (Declarative_Part_Owner : Ada_Node'Class)
-         return Ada_List_Vector;
-      --  Gets all Declarative_Part'Class nodes of Declarative_Part_Owner and
-      --  return a vector with their Ada_Node_List nodes.
-
-      function Process_Decl_Expr_Owner
-        (Decl_Expr_Owner : Expr_Function)
-         return Ada_List_Vector;
-      --  Returns a vector with the Basic_Decl_List of Decl_Expr_Owner
-
-      function Process_Body_Part
-        (Body_Part : Base_Subp_Body)
-         return Ada_List_Vector;
-      --  Checks if Is_Declarative_Part_Owner (Body_Part) or else
-      --  Is_Decl_Expr_Owner (Body_Part), and if so, processes Body_Part
-      --  with Process_Declarative_Part_Owner and Process_Decl_Expr_Owner
-      --  respectively.
-
-      ----------------------------
-      -- Set_Local_Scopes_Owner --
-      ----------------------------
-
-      procedure Set_Local_Scopes_Owner
+      procedure Process_Scopes_Owner
         (Owner : Ada_Node;
          Stop  : in out Boolean) is
       begin
-         Local_Scopes_Owner := Owner;
-         Stop := True;
-      end Set_Local_Scopes_Owner;
-
-      ---------------------------
-      -- Is_Local_Scopes_Owner --
-      ---------------------------
-
-      function Is_Local_Scopes_Owner
-        (Node : Ada_Node'Class)
-         return Boolean
-      is (not Node.Is_Null
-          and then (Is_Declarative_Part_Owner (Node)
-                    or else Is_Decl_Expr_Owner (Node)
-                    or else Node.Kind in Ada_Classic_Subp_Decl
-            or else Node.Kind in Ada_Generic_Subp_Decl_Range));
-
-      ------------------------------------
-      -- Process_Declarative_Part_Owner --
-      ------------------------------------
-
-      function Process_Declarative_Part_Owner
-        (Declarative_Part_Owner : Ada_Node'Class)
-         return Ada_List_Vector
-      is
-         Declarative_Parts : constant Declarative_Part_Vector :=
-           Get_Declarative_Parts (Declarative_Part_Owner);
-
-      begin
-         return Result : Ada_List_Vector do
-            for Declarative_Part of Declarative_Parts loop
-               Result.Append (Declarative_Part.F_Decls);
+         if Is_Declarative_Part_Owner (Owner) then
+            --  Owner has a Declarative_Part, include in the result and stop
+            for Declarative_Part of Get_Declarative_Parts (Owner) loop
+               Enclosing_Declarative_Parts.Include (Declarative_Part.F_Decls);
             end loop;
-         end return;
-      end Process_Declarative_Part_Owner;
 
-      -----------------------------
-      -- Process_Decl_Expr_Owner --
-      -----------------------------
+         elsif Is_Decl_Expr_Owner (Owner) then
+            --  Owner has a Decl_Expr, include in the result and stop
+            Enclosing_Declarative_Parts.Include
+              (Owner.As_Expr_Function.F_Expr.As_Paren_Expr.F_Expr.
+                 As_Decl_Expr.F_Decls);
 
-      function Process_Decl_Expr_Owner
-        (Decl_Expr_Owner : Expr_Function)
-         return Ada_List_Vector
-      is
-         Decl_Expr : constant Libadalang.Analysis.Decl_Expr :=
-           Decl_Expr_Owner.F_Expr.As_Paren_Expr.
-             F_Expr.As_Decl_Expr;
-
-      begin
-         return Result : Ada_List_Vector do
-            Result.Append (Decl_Expr.F_Decls);
-         end return;
-      end Process_Decl_Expr_Owner;
-
-      -----------------------
-      -- Process_Body_Part --
-      -----------------------
-
-      function Process_Body_Part
-        (Body_Part : Base_Subp_Body)
-         return Ada_List_Vector is
-      begin
-         if Is_Declarative_Part_Owner (Body_Part) then
-            return Process_Declarative_Part_Owner (Body_Part);
-         elsif Is_Decl_Expr_Owner (Body_Part) then
-            return Process_Decl_Expr_Owner (Body_Part.As_Expr_Function);
+         elsif Owner.Kind in Ada_Basic_Decl
+           and then not Owner.As_Basic_Decl.P_Body_Part_For_Decl.Is_Null
+           and then Is_Scopes_Owner (Owner.As_Basic_Decl.P_Body_Part_For_Decl)
+         then
+            --  Owner does not have a Declarative_Part nor a Decl_Expr,
+            --  therefore, its a Params owner (see Is_Scopes_Owner) with a
+            --  body part. Recursevily call this function to process that
+            --  body since it might have a declarative part.
+            Process_Scopes_Owner
+              (Owner.As_Basic_Decl.P_Body_Part_For_Decl.As_Ada_Node, Stop);
          end if;
 
-         return Ada_List_Vectors.Empty;
-      end Process_Body_Part;
+         Stop := True;
+      end Process_Scopes_Owner;
 
    begin
       Find_Matching_Parents
         (Node     => Node,
-         Match    => Is_Local_Scopes_Owner'Access,
-         Callback => Set_Local_Scopes_Owner'Access);
+         Match    => Is_Scopes_Owner'Access,
+         Callback => Process_Scopes_Owner'Access);
 
-      if Local_Scopes_Owner.Is_Null then
-         return Ada_List_Vectors.Empty;
-      end if;
+      return Enclosing_Declarative_Parts;
+   end Find_Enclosing_Declarative_Parts;
 
-      if Is_Declarative_Part_Owner (Local_Scopes_Owner) then
-         return Process_Declarative_Part_Owner (Local_Scopes_Owner);
+   -------------------------------------
+   -- Find_Enclosing_Param_Spec_Lists --
+   -------------------------------------
 
-      elsif Is_Decl_Expr_Owner (Local_Scopes_Owner) then
-         return Process_Decl_Expr_Owner (Local_Scopes_Owner.As_Expr_Function);
+   function Find_Enclosing_Param_Spec_Lists
+     (Node : Ada_Node'Class)
+      return Ada_List_Hashed_Set
+   is
+      Enclosing_Param_Spec_Lists : Ada_List_Hashed_Set;
+      Parent_Params             : Params := No_Params;
+      Parent_Param_Spec_List    : Param_Spec_List := No_Param_Spec_List;
 
-      elsif Local_Scopes_Owner.Kind in Ada_Classic_Subp_Decl then
-         declare
-            Body_Part : constant Base_Subp_Body :=
-              Local_Scopes_Owner.As_Classic_Subp_Decl.P_Body_Part;
+   begin
+      for Parent of Node.Parents (With_Self => False) loop
+         Parent_Params := Get_Params (Parent);
 
-         begin
-            if not Body_Part.Is_Null then
-               return Process_Body_Part (Body_Part);
-            end if;
-         end;
+         if not Parent_Params.Is_Null then
+            Parent_Param_Spec_List := Parent_Params.F_Params;
+            Include_If_Not_Null
+              (Enclosing_Param_Spec_Lists, Parent_Param_Spec_List);
+            Include_If_Not_Null
+              (Enclosing_Param_Spec_Lists,
+               Find_Other_Part (Parent_Param_Spec_List));
+         end if;
 
-      else
-         Assert (Local_Scopes_Owner.Kind in Ada_Generic_Subp_Decl_Range);
+         --  Node's enclosing declarative part does not have an associated
+         --  Param_Spec_List, or we found a Param_Spec_List.
+         exit when not Parent_Param_Spec_List.Is_Null
+                     or else Is_Declarative_Part_Owner (Parent);
+      end loop;
 
-         declare
-            Body_Part : constant Base_Subp_Body :=
-              Local_Scopes_Owner.As_Generic_Subp_Decl.P_Body_Part;
+      return Enclosing_Param_Spec_Lists;
+   end Find_Enclosing_Param_Spec_Lists;
 
-         begin
-            if not Body_Part.Is_Null then
-               return Process_Body_Part (Body_Part);
-            end if;
-         end;
-      end if;
+   ---------------------------
+   -- Find_Enclosing_Scopes --
+   ---------------------------
 
-      return Ada_List_Vectors.Empty;
-   end Find_Local_Scopes;
+   function Find_Enclosing_Scopes
+     (Node : Ada_Node'Class)
+      return Ada_List_Hashed_Set
+   is (Ada_List_Hashed_Sets.Union
+       (Find_Enclosing_Declarative_Parts (Node),
+          Find_Enclosing_Param_Spec_Lists (Node)));
+
+   ------------------------------------
+   -- Find_Visible_Declarative_Parts --
+   ------------------------------------
+
+   function Find_Visible_Declarative_Parts
+     (Node : Ada_Node'Class)
+      return Ada_List_Hashed_Set
+   is
+      --  TODO: Process_Scopes_Owner is very similar to the one defined in
+      --  Find_Enclosing_Declarative_Parts. It does the exact same thing expect
+      --  that it does it for all matching parents (not only the first match).
+      --  Find a way to refactor this and remove the duplicated code.
+
+      Visible_Declarative_Parts : Ada_List_Hashed_Set;
+
+      procedure Process_Scopes_Owner
+        (Owner : Ada_Node;
+         Stop  : in out Boolean);
+      --  Checks if Owner has declarative parts, appending them to
+      --  Enclosing_Declarative_Parts if so. If it doesn't, checks if its
+      --  body part (if existent) has declarative parts, also appending them to
+      --  Enclosing_Declarative_Parts.
+
+      --------------------------
+      -- Process_Scopes_Owner --
+      --------------------------
+
+      procedure Process_Scopes_Owner
+        (Owner : Ada_Node;
+         Stop  : in out Boolean) is
+      begin
+         if Is_Declarative_Part_Owner (Owner) then
+            --  Owner has a Declarative_Part, include in the result and
+            --  continue with the next parent
+            for Declarative_Part of Get_Declarative_Parts (Owner) loop
+               Visible_Declarative_Parts.Include (Declarative_Part.F_Decls);
+            end loop;
+
+         elsif Is_Decl_Expr_Owner (Owner) then
+            --  Owner has a Decl_Expr, include in the result and continue with
+            --  the next parent
+            Visible_Declarative_Parts.Include
+              (Owner.As_Expr_Function.F_Expr.As_Paren_Expr.F_Expr.
+                 As_Decl_Expr.F_Decls);
+
+         elsif Owner.Kind in Ada_Basic_Decl
+           and then not Owner.As_Basic_Decl.P_Body_Part_For_Decl.Is_Null
+           and then Is_Scopes_Owner (Owner.As_Basic_Decl.P_Body_Part_For_Decl)
+         then
+            --  Owner does not have a Declarative_Part nor a Decl_Expr,
+            --  therefore, its a Params owner (see Is_Scopes_Owner) with a
+            --  body part. Recursevily call this function to process that
+            --  body since it might have a declarative part.
+            Process_Scopes_Owner
+              (Owner.As_Basic_Decl.P_Body_Part_For_Decl.As_Ada_Node, Stop);
+         end if;
+      end Process_Scopes_Owner;
+
+   begin
+      Find_Matching_Parents
+        (Node     => Node,
+         Match    => Is_Scopes_Owner'Access,
+         Callback => Process_Scopes_Owner'Access);
+
+      return Visible_Declarative_Parts;
+   end Find_Visible_Declarative_Parts;
+
+   ------------------------------
+   -- Find_Visible_Param_Specs --
+   ------------------------------
+
+   function Find_Visible_Param_Spec_Lists
+     (Node : Ada_Node'Class)
+      return Ada_List_Hashed_Set
+   is
+      Visible_Param_Spec_Lists  : Ada_List_Hashed_Set;
+      Parent_Params             : Params := No_Params;
+      Parent_Param_Spec_List    : Param_Spec_List := No_Param_Spec_List;
+
+   begin
+      for Parent of Node.Parents (With_Self => False) loop
+         Parent_Params := Get_Params (Parent);
+
+         if not Parent_Params.Is_Null then
+            Parent_Param_Spec_List := Parent_Params.F_Params;
+            Include_If_Not_Null
+              (Visible_Param_Spec_Lists, Parent_Param_Spec_List);
+            Include_If_Not_Null
+              (Visible_Param_Spec_Lists,
+               Find_Other_Part (Parent_Param_Spec_List));
+         end if;
+      end loop;
+
+      return Visible_Param_Spec_Lists;
+   end Find_Visible_Param_Spec_Lists;
+
+   -------------------------
+   -- Find_Visible_Scopes --
+   -------------------------
+
+   function Find_Visible_Scopes
+     (Node : Ada_Node'Class)
+      return Ada_List_Hashed_Set
+   is (Ada_List_Hashed_Sets.Union
+       (Find_Visible_Declarative_Parts (Node),
+          Find_Visible_Param_Spec_Lists (Node)));
 
    ------------------------
    -- Find_Nested_Scopes --
@@ -1031,183 +1183,21 @@ package body Laltools.Common is
         (Parent : Ada_Node;
          Stop   : in out Boolean))
    is
-      Stop   : Boolean := False;
       Parent : Ada_Node :=
-        (if Node.Is_Null then No_Ada_Node else Node.As_Ada_Node);
+        (if Node.Is_Null then No_Ada_Node else Node.Parent);
+      Stop   : Boolean := False;
 
    begin
       while not Stop loop
-         Parent := Parent.Parent;
-
          exit when Parent.Is_Null;
 
          if Match (Parent) then
             Callback (Parent, Stop);
          end if;
+
+         Parent := Parent.Parent;
       end loop;
    end Find_Matching_Parents;
-
-   --------------------------------------
-   -- Get_CU_Visible_Declarative_Parts --
-   --------------------------------------
-
-   function Get_CU_Visible_Declarative_Parts
-     (Node       : Ada_Node'Class;
-      Skip_First : Boolean := False)
-      return Declarative_Part_Vectors.Vector
-   is
-      Decl_Parts : Declarative_Part_Vector;
-
-      Parent : Ada_Node := No_Ada_Node;
-
-      procedure Ignore_First (Owner : Ada_Node; Stop : in out Boolean);
-      --  This procedure is used as a Callback of Find_Matching_Parents.
-      --  It simply sets Parent to the first matching parent and stops the
-      --  iterative process.
-
-      procedure Append_Declarative_Parts
-        (Owner : Ada_Node;
-         Stop : in out Boolean);
-      --  This procedure is used as a Callback of Find_Matching_Parents and it
-      --  will add every Declarative_Part of Owner to Decl_Parts, including
-      --  the Public_Part and Private_Part (if existent) if Owner kind is in
-      --  Ada_Package_Body_Range, Ada_Base_Package_Decl,
-      --  Ada_Protected_Def_Range, Ada_Protected_Def_Range or
-      --  Ada_Task_Def_Range.
-
-      ------------------
-      -- Ignore_First --
-      ------------------
-
-      procedure Ignore_First (Owner : Ada_Node; Stop : in out Boolean) is
-      begin
-         Stop := True;
-         Parent := Owner;
-      end Ignore_First;
-
-      ------------------------------
-      -- Append_Declarative_Parts --
-      ------------------------------
-
-      procedure Append_Declarative_Parts
-        (Owner : Ada_Node;
-         Stop  : in out Boolean)
-      is
-         pragma Unreferenced (Stop);
-
-      begin
-         case Owner.Kind is
-            when Ada_Decl_Block_Range =>
-               Decl_Parts.Append (Owner.As_Decl_Block.F_Decls);
-
-            when Ada_Entry_Body_Range =>
-               Decl_Parts.Append (Owner.As_Entry_Body.F_Decls);
-
-            when Ada_Package_Body_Range =>
-               declare
-                  Pkg_Decl          : constant Base_Package_Decl :=
-                    Owner.As_Package_Body.P_Canonical_Part.
-                      As_Base_Package_Decl;
-                  Private_Decl_Part : constant Private_Part :=
-                    Pkg_Decl.F_Private_Part;
-
-               begin
-                  Decl_Parts.Append (Pkg_Decl.F_Public_Part);
-
-                  if not Private_Decl_Part.Is_Null then
-                     Decl_Parts.Append (Private_Decl_Part);
-                  end if;
-
-                  Decl_Parts.Append (Owner.As_Package_Body.F_Decls);
-               end;
-
-            when Ada_Protected_Body_Range =>
-               Decl_Parts.Append (Owner.As_Protected_Body.F_Decls);
-
-            when Ada_Subp_Body_Range =>
-               Decl_Parts.Append (Owner.As_Subp_Body.F_Decls);
-
-            when Ada_Task_Body_Range =>
-               Decl_Parts.Append (Owner.As_Task_Body.F_Decls);
-
-            when Ada_Base_Package_Decl =>
-               declare
-                  Pkg_Body          : constant Package_Body :=
-                    Owner.As_Base_Package_Decl.P_Body_Part;
-                  Private_Decl_Part : constant Private_Part :=
-                    Owner.As_Base_Package_Decl.F_Private_Part;
-
-               begin
-                  Decl_Parts.Append (Owner.As_Base_Package_Decl.F_Public_Part);
-
-                  if not Private_Decl_Part.Is_Null then
-                     Decl_Parts.Append (Private_Decl_Part);
-                  end if;
-
-                  if not Pkg_Body.Is_Null then
-                     Decl_Parts.Append (Pkg_Body.F_Decls);
-                  end if;
-               end;
-
-            when Ada_Protected_Def_Range =>
-               declare
-                  Private_Decl_Part : constant Private_Part :=
-                    Owner.As_Protected_Def.F_Private_Part;
-               begin
-                  Decl_Parts.Append (Owner.As_Protected_Def.F_Public_Part);
-
-                  if not Private_Decl_Part.Is_Null then
-                     Decl_Parts.Append (Private_Decl_Part);
-                  end if;
-               end;
-
-            when Ada_Task_Def_Range =>
-               declare
-                  Private_Decl_Part : constant Private_Part :=
-                    Owner.As_Task_Def.F_Private_Part;
-               begin
-                  Decl_Parts.Append (Owner.As_Task_Def.F_Public_Part);
-
-                  if not Private_Decl_Part.Is_Null then
-                     Decl_Parts.Append (Private_Decl_Part);
-                  end if;
-               end;
-
-            when others =>
-               raise Assertion_Error;
-         end case;
-      end Append_Declarative_Parts;
-
-   begin
-      if Node.Is_Null then
-         return Decl_Parts;
-      end if;
-
-      --  For detecting if a declaration hides another one, we are not
-      --  interested in the first declarative part since any conflicts there
-      --  would be considered name collisions.
-
-      if Skip_First then
-         Find_Matching_Parents
-           (Node     => Node,
-            Match    => Is_Declarative_Part_Owner'Access,
-            Callback => Ignore_First'Access);
-
-         if Parent.Is_Null then
-            return Decl_Parts;
-         end if;
-
-      else
-         Parent := Node.As_Ada_Node;
-      end if;
-
-      Find_Matching_Parents
-        (Node     => Parent,
-         Match    => Is_Declarative_Part_Owner'Access,
-         Callback => Append_Declarative_Parts'Access);
-
-      return Decl_Parts;
-   end Get_CU_Visible_Declarative_Parts;
 
    -------------------------------------
    -- Get_Decl_Block_Declarative_Part --
@@ -2096,15 +2086,32 @@ package body Laltools.Common is
    ------------------------
    -- Is_Decl_Expr_Owner --
    ------------------------
+
    function Is_Decl_Expr_Owner
      (Node : Ada_Node'Class)
       return Boolean
    is (not Node.Is_Null
        and then Node.Kind in Ada_Expr_Function
-       and then Node.As_Expr_Function.F_Expr.Kind in
-         Ada_Paren_Expr_Range
+       and then Node.As_Expr_Function.F_Expr.Kind in Ada_Paren_Expr_Range
        and then Node.As_Expr_Function.F_Expr.As_Paren_Expr.F_Expr.Kind in
          Ada_Decl_Expr_Range);
+
+   ---------------------
+   -- Is_Params_Owner --
+   ---------------------
+
+   function Is_Params_Owner
+     (Node : Ada_Node'Class)
+      return Boolean
+   is (not Node.Is_Null
+       and then ((Node.Kind in Ada_Basic_Decl
+                  and then not Node.As_Basic_Decl.P_Subp_Spec_Or_Null.Is_Null
+                  and then Node.As_Basic_Decl.P_Subp_Spec_Or_Null.Kind in
+                             Ada_Subp_Spec_Range)
+                 or else Node.Kind in
+                           Ada_Entry_Decl_Range
+                             | Ada_Accept_Stmt_Range
+                             | Ada_Entry_Body_Range));
 
    ---------------------------------------------------
    -- Is_Definition_Without_Separate_Implementation --

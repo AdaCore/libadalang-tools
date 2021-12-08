@@ -1,0 +1,86 @@
+# Renaming node main.adb:6:16: 
+References:
+Unit:main.adb
+Line: 6
+Source Location Range:
+Start_Line: 6
+Start_Column: 16
+End_Line: 6
+End_Column: 17
+Line: 7
+Source Location Range:
+Start_Line: 7
+Start_Column: 11
+End_Line: 7
+End_Column: 12
+
+# Renaming node main.adb:6:16: 
+References:
+Unit:main.adb
+Line: 6
+Source Location Range:
+Start_Line: 6
+Start_Column: 16
+End_Line: 6
+End_Column: 17
+Line: 7
+Source Location Range:
+Start_Line: 7
+Start_Column: 11
+End_Line: 7
+End_Column: 12
+Problems:
+Renaming X to A hides <Id "A" main.adb:4:4-4:5>
+
+# Renaming node main.adb:6:16: 
+References:
+Unit:main.adb
+Line: 6
+Source Location Range:
+Start_Line: 6
+Start_Column: 16
+End_Line: 6
+End_Column: 17
+Line: 7
+Source Location Range:
+Start_Line: 7
+Start_Column: 11
+End_Line: 7
+End_Column: 12
+Problems:
+Renaming X to Y creates a name collision with <Id "Y" main.adb:6:29-6:30>
+
+# Renaming node main.adb:6:16: 
+References:
+Unit:main.adb
+Line: 6
+Source Location Range:
+Start_Line: 6
+Start_Column: 16
+End_Line: 6
+End_Column: 17
+Line: 7
+Source Location Range:
+Start_Line: 7
+Start_Column: 11
+End_Line: 7
+End_Column: 12
+Problems:
+Renaming X to Z creates a name collision with <Id "Z" main.adb:6:32-6:33>
+
+# Renaming node main.adb:6:16: 
+References:
+Unit:main.adb
+Line: 6
+Source Location Range:
+Start_Line: 6
+Start_Column: 16
+End_Line: 6
+End_Column: 17
+Line: 7
+Source Location Range:
+Start_Line: 7
+Start_Column: 11
+End_Line: 7
+End_Column: 12
+
