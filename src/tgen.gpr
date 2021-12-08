@@ -3,9 +3,6 @@ with "langkit_support.gpr";
 with "templates_parser.gpr";
 
 with "gnatcoll.gpr";
-with "gnatfuzz.gpr";
-
-with "lal_tools_common.gpr";
 
 project TGen is
         

@@ -28,8 +28,8 @@ with Ada.Containers.Vectors;
 
 with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with Ada.Strings.Unbounded.Less_Case_Insensitive;
-with Ada.Strings.Unbounded.Equal_Case_Insensitive;
+with Ada.Strings.Less_Case_Insensitive;
+with Ada.Strings.Equal_Case_Insensitive;
 
 with GNATCOLL.Projects; use GNATCOLL.Projects;
 
@@ -41,10 +41,10 @@ package TGen.Strings is
       "<"          => Ada.Strings.Unbounded."<",
       "="          => Ada.Strings.Unbounded."=");
 
-   package String_Sets is new Ada.Containers.Ordered_Sets
-     (Element_Type => Ada.Strings.Unbounded.Unbounded_String,
-      "<" => Ada.Strings.Unbounded.Less_Case_Insensitive,
-      "=" => Ada.Strings.Unbounded.Equal_Case_Insensitive);
+   package String_Sets is new Ada.Containers.Indefinite_Ordered_Sets
+     (Element_Type => String,
+      "<" => Ada.Strings.Less_Case_Insensitive,
+      "=" => Ada.Strings.Equal_Case_Insensitive);
 
    package String_Vectors is new Ada.Containers.Vectors
      (Index_Type   => Positive,

@@ -1,4 +1,4 @@
-procedure @_TEST_PROC_NAME_@ is
+declare
    Value_Stream : TGen.Stream.Buffer_Stream;
  @@TABLE@@
    package @_STRATEGY_NAME_@ is new Strategy (T => @_TYPE_NAME_@, Gen => @_GEN_SUBP_NAME_@);
@@ -29,5 +29,5 @@ procedure @_TEST_PROC_NAME_@ is
       );
    end @_PROC_NAME_@_Wrapper;
 begin
-   TGen.Test_Runner (Value_Stream, @_PROC_NAME_@_Strategies, @_PROC_NAME_@_Wrapper'Access);
-end @_TEST_PROC_NAME_@;
+   TGen.Engine.Test_Runner (Value_Stream, @_PROC_NAME_@_Strategies, @_PROC_NAME_@_Wrapper'Access);
+end;

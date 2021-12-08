@@ -24,6 +24,7 @@
 with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Ordered_Sets;
 with Ada.Containers.Vectors;
+with Ada.Finalization;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Strings.Wide_Wide_Unbounded;
 
@@ -42,52 +43,47 @@ with TGen.Files; use TGen.Files;
 
 package TGen.Gen_Strategies is
 
-   type Generation_Context is record
-      Project : Project_Type;
+   type Generation_Context is new TGen.Templates.Context with record
+      Output_Dir : Unbounded_String;
 
-      Output_Dir : Ada.Strings.Unbounded.Unbounded_String;
+      Packages_Data : Package_Data_Set;
+
+      Required_Type_Strategies : Type_Vectors_Map;
    end record;
 
-   GC : Generation_Context;
+   procedure Initialize
+     (Context : in out Generation_Context;
+      Output_Dir : Unbounded_String);
 
-   function Get_Gen_Directory (Prj : Project_Type) return Virtual_File is
+   overriding procedure Finalize (Context : in out Generation_Context);
+
+   type Generated_Body is
+      record
+         With_Clauses : String_Sets.Set;
+         Generated_Body : Unbounded_Text_Type;
+      end record;
+
+   function Generate_Test_For
+     (Context   : in out Generation_Context;
+      Subp      : Subp_Decl) return Generated_Body;
+   --  Generate a body for the given procedure. Generation of artifact files
+   --  (containing generation procedures) is deferred to the finalization of
+   --  the Context. Return the generated body and the needed `with` clauses to
+   --  insert with the body.
+
+   function Get_Gen_Directory (Ctx : Generation_Context) return Virtual_File is
      (GNATCOLL.VFS.Create
-        (Filesystem_String (TGen.Strings."+" (GC.Output_Dir))));
+        (Filesystem_String (TGen.Strings."+" (Ctx.Output_Dir))));
 
-   function Get_Strat_ADB (Prj : Project_Type) return Virtual_File is
-     (Get_Gen_Directory (Prj) / Strat_ADB);
+   procedure Prepare_Output_Dirs (Context : Generation_Context);
 
-   function Gen_File (File : String) return Virtual_File is
-     (Get_Gen_Directory (Prj_Tree.Root_Project) /
+   function Get_Strat_ADB (Ctx : Generation_Context) return Virtual_File is
+     (Get_Gen_Directory (Ctx) / Strat_ADB);
+
+   function Gen_File
+     (Ctx : Generation_Context; File : String) return Virtual_File is
+     (Get_Gen_Directory (Ctx) /
           Filesystem_String (File));
-
-   procedure Prepare_Output_Dirs (GC : Generation_Context);
-
-   function "<" (L : Defining_Name; R : Defining_Name) return Boolean is
-     (Image (L.P_Fully_Qualified_Name) < Image (R.P_Fully_Qualified_Name));
-
-   function "<" (L, R : SP.Ref) return Boolean is
-     (L.Get.Name < R.Get.Name);
-
-   function "=" (L, R : SP.Ref) return Boolean is
-     (L.Get.Name = R.Get.Name);
-
-   package Typ_Sets is new Ada.Containers.Ordered_Sets
-     (Element_Type => SP.Ref,
-      "=" => SP."=");
-
-   subtype Typ_Set is Typ_Sets.Set;
-
-   package Type_Vectors_Maps is new Ada.Containers.Ordered_Maps
-     (Key_Type => Unbounded_Text_Type,
-      Element_Type => Typ_Set,
-      "<" => Ada.Strings.Wide_Wide_Unbounded."<",
-      "=" => Typ_Sets."=");
-
-   subtype Type_Vectors_Map is Type_Vectors_Maps.Map;
-
-   Required_Type_Strategies : Type_Vectors_Map;
-   --  Type for which we must generate generation strategies
 
    type Type_Data is
       record
@@ -262,6 +258,11 @@ package TGen.Gen_Strategies is
          Table : in out Templates_Parser.Translate_Set);
    end Test_Generator;
 
-   procedure Generate_Type_Strategies;
+   function Indent (Amount : Natural; Str : String) return String;
+
+   function Number_Of_Lines (Str : String) return Natural;
+
+   procedure Generate_Type_Strategies
+     (Context : Generation_Context);
 
 end TGen.Gen_Strategies;

@@ -21,54 +21,18 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Templates_Parser;
-with Ada.Finalization;
+package body TGen.Files is
 
-package TGen.Templates is
+   function Get_Tmpl_Directory return Virtual_File is
+   begin
+      if not Ada.Environment_Variables.Exists ("TGEN_TEMPLATE_PATH") then
+         raise Program_Error
+           with "Set the TGEN_TEMPLATE_PATH environment variable to point to"
+           & " tgen templates directory.";
+      end if;
+      return GNATCOLL.VFS.Create
+        (Filesystem_String
+           (Ada.Environment_Variables.Value ("TGEN_TEMPLATE_PATH")));
+   end Get_Tmpl_Directory;
 
-   type Translator is interface;
-
-   type Context is new Ada.Finalization.Controlled with null record;
-
-   procedure Translate
-     (Self  : Translator;
-      Table : in out Templates_Parser.Translate_Set)
-   is abstract;
-   --  Creates associations between template tags and the data they should be
-   --  filled with.
-
-   type Translator_Container (Next : access constant Translator'Class) is
-     abstract new Translator with null record;
-   --  This container type can be used to chain 'Translator's together and
-   --  pass the request to 'Translate' the 'Parameters_Data' through all the
-   --  linked translators.
-
-   overriding
-   procedure Translate
-     (Self  : Translator_Container;
-      Table : in out Templates_Parser.Translate_Set);
-   --  Dispaches a call to Translate_Helper and and then to 'Next.Translate'
-   --  if 'Next' is not null.
-
-   procedure Translate_Helper
-     (Self  : Translator_Container;
-      Table : in out Templates_Parser.Translate_Set) is abstract;
-   --  Fill Table with tag-value(s) associations
-
-   type Source_Code_Generator is interface;
-
-   function Generate_Source_Code
-     (Self    : Source_Code_Generator;
-      Ctx     : Context'Class) return Wide_Wide_String
-   is abstract;
-   --  Generates a source code file
-
-   type Source_Code_File_Generator is interface;
-
-   procedure Generate_Source_Code
-     (Self    : Source_Code_File_Generator;
-      Ctx     : Context'Class)
-   is abstract;
-   --  Generates a source code file
-
-end TGen.Templates;
+end TGen.Files;

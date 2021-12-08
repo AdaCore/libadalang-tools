@@ -25,6 +25,9 @@ with Ada.Calendar;
 with Ada.Characters.Latin_9;
 with Ada.Characters;
 with Ada.Directories;
+with Ada.Strings.Fixed;
+with Ada.Strings.Maps;
+with Ada.Text_IO;
 with Ada.Wide_Wide_Text_IO; use Ada.Wide_Wide_Text_IO;
 
 with GNAT.Calendar;
@@ -32,12 +35,12 @@ with GNAT.OS_Lib; use GNAT.OS_Lib;
 
 with Templates_Parser; use Templates_Parser;
 
-with Test.Common;
-
 with TGen.Files;             use TGen.Files;
 with TGen.Strings;           use TGen.Strings;
 with TGen.Types.Translation; use TGen.Types.Translation;
 with TGen.Types;             use TGen.Types;
+with Libadalang.Common; use Libadalang.Common;
+with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 
 package body TGen.Gen_Strategies is
 
@@ -45,14 +48,43 @@ package body TGen.Gen_Strategies is
    -- Prepare_Output_Dirs --
    -------------------------
 
-   procedure Prepare_Output_Dirs (GC : Generation_Context) is
-      Output_Dir : constant String := +(GC.Output_Dir);
+   procedure Prepare_Output_Dirs (Context : Generation_Context) is
+      Output_Dir : constant String :=
+        +(Context.Output_Dir);
    begin
       if not Ada.Directories.Exists (Output_Dir)
       then
+         Ada.Text_IO.Put_Line ("Creating " & Output_Dir);
          Ada.Directories.Create_Path (Output_Dir);
       end if;
    end Prepare_Output_Dirs;
+
+   procedure Initialize
+     (Context : in out Generation_Context;
+      Output_Dir : Unbounded_String) is
+   begin
+      Context.Output_Dir := Output_Dir;
+      Prepare_Output_Dirs (Context);
+   end Initialize;
+
+   --------------
+   -- Finalize --
+   --------------
+
+   procedure Finalize (Context : in out Generation_Context) is
+   begin
+      for Package_Data of Context.Packages_Data loop
+         declare
+            Strat_Generator : constant Strategy_Generator.Strat_Generator :=
+              Strategy_Generator.Create
+                (Get_Strat_ADB (Context),
+                 Get_Template_Strat_ADB,
+                 Package_Data);
+         begin
+            Strat_Generator.Generate_Source_Code (Context);
+         end;
+      end loop;
+   end Finalize;
 
    package body Strategy_Generator is
 
@@ -124,33 +156,7 @@ package body TGen.Gen_Strategies is
                     Gen_Param_Function_Name (Subp_Data, Param);
                   Fun_Body : String :=
                     " renames " & " Gen_" & (+Param.Type_Fully_Qualified_Name);
-
-                  Typ_Parent_Package : Unbounded_Text_Type :=
-                    To_Unbounded_Text (Param.Type_Repr.Get.Parent_Package);
-
-                  procedure Add_To_Set
-                    (Parent_Pkg_Name : Unbounded_Text_Type;
-                     TS : in out Typ_Set);
-
-                  procedure Add_To_Set
-                    (Parent_Pkg_Name : Unbounded_Text_Type;
-                     TS : in out Typ_Set)
-                  is
-                  begin
-                     if not TS.Contains (Param.Type_Repr) then
-                        TS.Insert (Param.Type_Repr);
-                     end if;
-                  end Add_To_Set;
-
                begin
-                  if not Required_Type_Strategies.Contains (Typ_Parent_Package)
-                  then
-                     Required_Type_Strategies.Insert
-                       (Typ_Parent_Package, Typ_Sets.Empty);
-                  end if;
-                  Required_Type_Strategies.Update_Element
-                    (Required_Type_Strategies.Find (Typ_Parent_Package),
-                     Add_To_Set'Access);
 
                   Templates_Parser.Append
                     (Param_Strategy_Vector_Tag,
@@ -162,19 +168,7 @@ package body TGen.Gen_Strategies is
       begin
 
          for Subp_Data of Self.Pkg_Data.Subprograms loop
-
-            declare
-               T_Generator : constant Test_Generator.Test_Generator :=
-                 Test_Generator.Create
-                   (Get_Template_Test_ADB,
-                    Subp_Data);
-               Ctx : TGen.Templates.Context;
-               Str : Wide_Wide_String :=
-                  T_Generator.Generate_Source_Code (Ctx);
-            begin
-               Gen_Strategies (Subp_Data);
-               Put_Line ("File is " & Str);
-            end;
+            Gen_Strategies (Subp_Data);
          end loop;
          Templates_Parser.Insert
            (Table,
@@ -186,7 +180,8 @@ package body TGen.Gen_Strategies is
       -- Strat_Text_Template --
       -------------------------
 
-      function Strat_Text_Template (Self : Strat_Generator) return Text_Type
+      function Strat_Text_Template
+        (Self : Strat_Generator) return Text_Type
       is
          use GNATCOLL.VFS;
 
@@ -446,20 +441,21 @@ package body TGen.Gen_Strategies is
       end Translate_Helper;
    end Type_Strategy_Generator;
 
-   procedure Generate_Type_Strategies is
+   procedure Generate_Type_Strategies
+     (Context : Generation_Context) is
       use Type_Vectors_Maps;
    begin
-      for Typ in Required_Type_Strategies.Iterate loop
+      for Typ in Context.Required_Type_Strategies.Iterate loop
          declare
             TSG : constant Type_Strategy_Generator.Type_Strat_Generator :=
               Type_Strategy_Generator.Create
                 (Gen_File
-                   (Test.Common.Unit_To_File_Name
+                   (Context,
+                    Unit_To_File_Name
                       (Type_Strat_Package_Name
                            (+Type_Vectors_Maps.Key (Typ))) & ".adb"),
                  Get_Template_Type_Strat_ADB,
                  Element (Typ));
-            Context : TGen.Templates.Context;
          begin
             TSG.Generate_Source_Code (Context);
          end;
@@ -467,6 +463,8 @@ package body TGen.Gen_Strategies is
    end Generate_Type_Strategies;
 
    package body Test_Generator is
+
+      Ctx : Generation_Context;
 
       function Generate_Source_Code
         (Self    : Test_Generator;
@@ -476,8 +474,6 @@ package body TGen.Gen_Strategies is
 
          TS : aliased constant Test_Translator :=
            Create_Test_Translator (Self.Subp);
-
-         Test_Proc_Name_Tag : constant String := "TEST_PROC_NAME";
 
          Proc_Name_Tag : constant String := "PROC_NAME";
 
@@ -490,12 +486,6 @@ package body TGen.Gen_Strategies is
 
          --  All the tables are translated. Now translate the individual
          --  tags.
-
-         Templates_Parser.Insert
-           (Table,
-            Templates_Parser.Assoc
-              (Test_Proc_Name_Tag,
-               ("Test_" & (+Self.Subp.Name))));
 
          Templates_Parser.Insert
            (Table,
@@ -590,5 +580,129 @@ package body TGen.Gen_Strategies is
               (Param_Name_Tag, Param_Name_Vector_Tag));
       end Translate_Helper;
    end Test_Generator;
+
+   function Get_Parent_Package (Node : Ada_Node) return Package_Decl is
+      Parent_Node : Ada_Node := Node.P_Semantic_Parent;
+   begin
+      while not Parent_Node.Is_Null
+        and then Kind (Parent_Node) /= Ada_Package_Decl
+      loop
+         Parent_Node := Parent_Node.P_Semantic_Parent;
+      end loop;
+
+      return Parent_Node.As_Package_Decl;
+   end Get_Parent_Package;
+
+   function Get_With_Clauses (Subp : Subprogram_Data) return String_Sets.Set
+   is
+      Res : String_Sets.Set;
+   begin
+      Res.Insert ("TGen.Stream");
+      Res.Insert ("TGen.Engine");
+      Res.Insert (To_UTF8 (To_Text (Subp.Parent_Package)));
+      return Res;
+   end Get_With_Clauses;
+
+   function Indent (Amount : Natural; Str : String) return String is
+      Res : Unbounded_String;
+      Indent : String (1 .. Amount) := (others => ' ');
+   begin
+      for C of Str loop
+         Append (Res, C);
+         if C = Ada.Characters.Latin_9.LF then
+            Append (Res, Indent);
+         end if;
+      end loop;
+      return +Res;
+   end Indent;
+
+   function Number_Of_Lines (Str : String) return Natural is
+   begin
+      return Ada.Strings.Fixed.Count
+        (Str,
+         Ada.Strings.Maps.To_Set
+           (Ada.Characters.Latin_9.LF));
+   end Number_Of_Lines;
+
+   function Generate_Test_For
+     (Context : in out Generation_Context;
+      Subp    : Subp_Decl) return Generated_Body is
+
+      Pkg : Package_Decl := Get_Parent_Package (Subp.As_Ada_Node);
+      Pkg_Data : Package_Data;
+
+      Res : Generated_Body;
+   begin
+      if Pkg.Is_Null then
+         raise Program_Error with
+           "Unable to find parent package of node "
+           & Image (Subp.Full_Sloc_Image);
+      end if;
+
+      Pkg_Data.Pkg_Name := Pkg;
+
+      if not Context.Packages_Data.Contains (Pkg_Data) then
+         Context.Packages_Data.Insert (Pkg_Data);
+      else
+         Pkg_Data := Package_Data_Sets.Element
+           (Context.Packages_Data.Find (Pkg_Data));
+      end if;
+
+      declare
+         Subp_Data : Subprogram_Data :=
+           Extract_Subprogram_Data (Subp);
+
+         Test_Gen : Test_Generator.Test_Generator :=
+           Test_Generator.Create
+             (Test_Template_File => Get_Template_Test_ADB, Subp => Subp_Data);
+
+      begin
+
+         Res.Generated_Body :=
+           Unbounded_Text_Type'
+             (To_Unbounded_Wide_Wide_String
+                (Test_Gen.Generate_Source_Code (Context)));
+
+         Pkg_Data.Subprograms.Append (Subp_Data);
+
+         for Param of Subp_Data.Parameters_Data loop
+            declare
+               procedure Add_To_Set
+                 (Parent_Pkg_Name : Unbounded_Text_Type;
+                  TS : in out Typ_Set);
+
+               procedure Add_To_Set
+                 (Parent_Pkg_Name : Unbounded_Text_Type;
+                  TS : in out Typ_Set)
+               is
+               begin
+                  if not TS.Contains (Param.Type_Repr) then
+                     TS.Insert (Param.Type_Repr);
+                  end if;
+               end Add_To_Set;
+
+               Typ_Parent_Package : Unbounded_Text_Type :=
+                 To_Unbounded_Text (Param.Type_Repr.Get.Parent_Package);
+
+            begin
+
+               if not Context.Required_Type_Strategies.
+                 Contains (Typ_Parent_Package)
+               then
+                  Context.Required_Type_Strategies.Insert
+                    (Typ_Parent_Package, Typ_Sets.Empty);
+               end if;
+               Context.Required_Type_Strategies.Update_Element
+                 (Context.Required_Type_Strategies.Find (Typ_Parent_Package),
+                  Add_To_Set'Access);
+            end;
+         end loop;
+
+         Res.With_Clauses := Get_With_Clauses (Subp_Data);
+      end;
+
+      return Res;
+
+   end Generate_Test_For;
 
 end TGen.Gen_Strategies;

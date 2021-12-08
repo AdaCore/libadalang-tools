@@ -21,9 +21,10 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Containers.Ordered_Maps;
+with Ada.Containers.Ordered_Sets;
 with Ada.Containers.Vectors;
-
-with Laltools.Common; use Laltools.Common;
+with Ada.Strings.Wide_Wide_Unbounded;
 
 with TGen.Types; use TGen.Types;
 
@@ -90,6 +91,14 @@ package TGen.Gen_Strategies_Utils is
          Pkg_Name : Package_Decl;
       end record;
 
+   function "<" (L, R : Package_Data) return Boolean is
+     (L.Pkg_Name.P_Fully_Qualified_Name < R.Pkg_Name.P_Fully_Qualified_Name);
+
+   package Package_Data_Sets is new Ada.Containers.Ordered_Sets
+     (Element_Type => Package_Data);
+
+   subtype Package_Data_Set is Package_Data_Sets.Set;
+
    function Extract_Package_Data
      (Pkg_Decl : Package_Decl)
       return Package_Data;
@@ -97,13 +106,13 @@ package TGen.Gen_Strategies_Utils is
    function Extract_Subprogram_Data
      (Subp : Basic_Decl'Class)
       return Subprogram_Data
-     with Pre => not Subp.Is_Null and then Is_Subprogram (Subp);
+     with Pre => not Subp.Is_Null;
    --  Extracts a Subprogram_Data object from Subp
 
    function Extract_Parameters_Data
      (Subp : Basic_Decl'Class)
       return Parameters_Data_Vector
-     with Pre => not Subp.Is_Null and then Is_Subprogram (Subp);
+     with Pre => not Subp.Is_Null;
    --  Returns a vector of Parameters_Data objects extracted from each
    --  parameter of Subp.
 
@@ -123,5 +132,68 @@ package TGen.Gen_Strategies_Utils is
 
    function Type_Strat_Package_Name (Package_Name : String) return String is
      (Package_Name & ".Type_Strategies");
+
+   package Param_Vectors_Maps is new Ada.Containers.Ordered_Maps
+     (Key_Type => Unbounded_Text_Type,
+      Element_Type => Parameters_Data_Vector,
+      "<" => Ada.Strings.Wide_Wide_Unbounded."<",
+      "=" => Parameters_Data_Vectors."=");
+
+   subtype Param_Vector_Map is Param_Vectors_Maps.Map;
+
+   function "<" (L : Defining_Name; R : Defining_Name) return Boolean is
+     (Image (L.P_Fully_Qualified_Name) < Image (R.P_Fully_Qualified_Name));
+
+   function "<" (L, R : SP.Ref) return Boolean is
+     (L.Get.Name < R.Get.Name);
+
+   function "=" (L, R : SP.Ref) return Boolean is
+     (L.Get.Name = R.Get.Name);
+
+   package Typ_Sets is new Ada.Containers.Ordered_Sets
+     (Element_Type => SP.Ref,
+      "=" => SP."=");
+
+   subtype Typ_Set is Typ_Sets.Set;
+
+   package Type_Vectors_Maps is new Ada.Containers.Ordered_Maps
+     (Key_Type => Unbounded_Text_Type,
+      Element_Type => Typ_Set,
+      "<" => Ada.Strings.Wide_Wide_Unbounded."<",
+      "=" => Typ_Sets."=");
+
+   subtype Type_Vectors_Map is Type_Vectors_Maps.Map;
+
+   function Unit_To_File_Name (Old : String) return String;
+
+   function Is_Subprogram (Decl : Basic_Decl'Class) return Boolean is
+     (not Decl.Is_Null
+      and then (Decl.P_Is_Subprogram
+                or else Decl.Kind in Ada_Generic_Subp_Decl_Range)
+      and then not (Decl.Kind in Ada_Enum_Literal_Decl_Range));
+   --  Checks if Decl is a subprogram excluding enum literals
+
+   function Get_Subp_Params (Subp : Basic_Decl'Class) return Params
+     with Inline,
+          Pre => Is_Subprogram (Subp)
+                 or else (not Subp.Is_Null
+                          and then Subp.Kind in
+                            Ada_Generic_Subp_Instantiation);
+   --  Gets the Params node associated to Subp, if it exists.
+   --  If it doesn't exist returns No_Params.
+
+   function Get_Subp_Spec (Subp : Basic_Decl'Class) return Base_Subp_Spec
+     with Inline,
+          Pre => Is_Subprogram (Subp)
+                 or else (not Subp.Is_Null
+                          and then Subp.Kind in
+                            Ada_Generic_Subp_Instantiation);
+   --  Gets the Subp_Spec node associated to Subp
+
+   function Get_Subp_Spec_Params
+     (Subp_Spec : Base_Subp_Spec'Class)
+      return Params;
+   --  Gets the Params node associated to Subp_Spec, if it exists.
+   --  If it doesn't exist returns No_Params.
 
 end TGen.Gen_Strategies_Utils;

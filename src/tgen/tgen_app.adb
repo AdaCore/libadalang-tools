@@ -48,6 +48,8 @@ procedure TGen_App is
 
    package Text renames Langkit_Support.Text;
 
+   GC : Generation_Context;
+
    procedure App_Setup
      (Context : App_Context; Jobs : App_Job_Context_Array);
 
@@ -91,16 +93,15 @@ procedure TGen_App is
    is
       Prj : Project_Type renames Context.Provider.Project.Root_Project;
    begin
-      GC :=
-        (Project => Prj, Output_Dir  => +Project_Output_Dir (Prj));
-      Prepare_Output_Dirs (GC);
+      Initialize (GC, +Project_Output_Dir
+                  (Context.Provider.Project.Root_Project));
    end App_Setup;
 
    procedure App_Post_Process
      (Context : Helpers.App_Context; Jobs : Helpers.App_Job_Context_Array)
    is
    begin
-      Generate_Type_Strategies;
+      Generate_Type_Strategies (GC);
    end App_Post_Process;
 
    procedure Process_Unit
@@ -133,7 +134,7 @@ procedure TGen_App is
 
             Strat_Generator : constant Strategy_Generator.Strat_Generator :=
               Strategy_Generator.Create
-                (Get_Strat_ADB (Prj_Tree.Root_Project),
+                (Get_Strat_ADB (GC),
                  Get_Template_Strat_ADB,
                  Extract_Package_Data (Node.As_Package_Decl));
 

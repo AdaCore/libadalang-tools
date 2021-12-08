@@ -21,7 +21,12 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Characters.Handling; use Ada.Characters.Handling;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+
 with TGen.Types.Translation; use TGen.Types.Translation;
+
+with TGen.Strings; use TGen.Strings;
 
 package body TGen.Gen_Strategies_Utils is
 
@@ -83,6 +88,8 @@ package body TGen.Gen_Strategies_Utils is
 
       use type Package_Data_Vectors.Vector;
 
+      function Visit (Node : Ada_Node'Class) return Visit_Status;
+
       function Visit (Node : Ada_Node'Class) return Visit_Status is
       begin
          if Kind (Node) in Ada_Package_Decl then
@@ -91,7 +98,9 @@ package body TGen.Gen_Strategies_Utils is
                  (Extract_Package_Data (Node.As_Package_Decl)));
             return Into;
          elsif Kind (Node) in Ada_Subp_Decl then
-            Subprograms.Append (Extract_Subprogram_Data (Node.As_Basic_Decl));
+            Subprograms.Append
+              (Extract_Subprogram_Data
+                 (Node.As_Basic_Decl));
             return Over;
          end if;
          return Over;
@@ -126,6 +135,9 @@ package body TGen.Gen_Strategies_Utils is
       Index : Positive := 1;
 
    begin
+      if Subp_Params.Is_Null then
+         return Params_Data;
+      end if;
       for Subp_Param_Spec of Subp_Params.F_Params loop
          declare
             Parameters_Type : constant Defining_Name :=
@@ -182,4 +194,72 @@ package body TGen.Gen_Strategies_Utils is
       return Params_Data;
    end Extract_Parameters_Data;
 
+   --  This is duplicated code from lal_tools. For now we want to avoid
+   --  bringing a dependency to lal_tools.
+
+   -----------------------
+   -- Unit_To_File_Name --
+   -----------------------
+
+   function Unit_To_File_Name (Old : String) return String is
+      T : String_Access;
+   begin
+      T := new String'(Old);
+      for J in T.all'First .. T.all'Last loop
+         if T.all (J) = '.' then
+            if J = T.all'First + 1 and then
+              T.all (J - 1) in 'a' | 's' | 'i' | 'g' | 'A' | 'S' | 'I' | 'G'
+            then
+               T.all (J) := '~';
+            else
+               T.all (J) := '-';
+            end if;
+         end if;
+      end loop;
+
+      return To_Lower (T.all);
+   end Unit_To_File_Name;
+
+   ---------------------
+   -- Get_Subp_Params --
+   ---------------------
+
+   function Get_Subp_Params
+     (Subp : Basic_Decl'Class)
+      return Params is
+     (Get_Subp_Spec_Params (Get_Subp_Spec (Subp)));
+
+   -------------------
+   -- Get_Subp_Spec --
+   -------------------
+
+   function Get_Subp_Spec (Subp : Basic_Decl'Class) return Base_Subp_Spec is
+     (if Subp.Is_Null then No_Base_Subp_Spec
+      else Subp.P_Subp_Spec_Or_Null (True));
+
+   --------------------------
+   -- Get_Subp_Spec_Params --
+   --------------------------
+
+   function Get_Subp_Spec_Params
+     (Subp_Spec : Base_Subp_Spec'Class)
+      return Params is
+   begin
+      if Subp_Spec.Is_Null then
+         return No_Params;
+      end if;
+
+      case Ada_Base_Subp_Spec (Subp_Spec.Kind) is
+         when Ada_Entry_Spec_Range
+            => return Subp_Spec.As_Entry_Spec.F_Entry_Params;
+         when Ada_Enum_Subp_Spec_Range
+            => return No_Params;
+         when Ada_Subp_Spec_Range
+            => return Subp_Spec.As_Subp_Spec.F_Subp_Params;
+         when Ada_Predefined_Bin_Op_Spec
+            => return No_Params;
+         when Ada_Predefined_Un_Op_Spec
+            => return No_Params;
+      end case;
+   end Get_Subp_Spec_Params;
 end TGen.Gen_Strategies_Utils;
