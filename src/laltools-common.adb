@@ -1137,6 +1137,7 @@ package body Laltools.Common is
       Res                  : Source_Location := Start_Sloc (Node.Sloc_Range);
       Searching_Insert_Loc : Boolean := True;
    begin
+      Last := False;
       for N of Node.F_Prelude loop
          if N.Kind in Ada_With_Clause_Range then
             --  Handle list of packages: "with A, B, C;"
