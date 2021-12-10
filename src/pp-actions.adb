@@ -827,6 +827,8 @@ package body Pp.Actions is
            when Ada_Object_Decl |
                Ada_Extended_Return_Stmt_Object_Decl =>
              L ("?~,# ~~ ^:? ~~~? ~~~? ~~~ !? ^2:=[# ~~]~!", Aspects),
+           when Ada_No_Type_Rename_Object_Decl =>
+             raise Constraint_Error with "not handled",
            when Ada_Package_Renaming_Decl =>
              L ("package !!", Aspects),
            when Ada_Single_Protected_Decl =>
