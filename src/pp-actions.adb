@@ -827,6 +827,7 @@ package body Pp.Actions is
            when Ada_Object_Decl |
                Ada_Extended_Return_Stmt_Object_Decl =>
              L ("?~,# ~~ ^:? ~~~? ~~~? ~~~ !? ^2:=[# ~~]~!", Aspects),
+           when Ada_No_Type_Object_Renaming_Decl => null,
            when Ada_Package_Renaming_Decl =>
              L ("package !!", Aspects),
            when Ada_Single_Protected_Decl =>
