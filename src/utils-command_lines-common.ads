@@ -21,7 +21,6 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Utils.Command_Lines; use Utils.Command_Lines;
 with System.WCh_Con;
 
 package Utils.Command_Lines.Common is
