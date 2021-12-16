@@ -103,6 +103,10 @@ package body TGen.Types.Translation is
       Type_Name : Defining_Name) return Translation_Result with
       Pre => Decl.P_Is_Array_Type;
 
+   --  procedure Apply_Index_Constraints
+   --    (Arr_Typ : Constrained_Array_Typ,
+   --     )
+
    function Translate_Record_Decl
      (Decl      : Base_Type_Decl;
       Type_Name : Defining_Name) return Translation_Result with
@@ -693,7 +697,8 @@ package body TGen.Types.Translation is
             else
                Cmp_Typ_Def :=
                  Decl.As_Subtype_Decl.F_Subtype.P_Designated_Type_Decl
-                 .As_Type_Decl.F_Type_Def.As_Array_Type_Def.F_Component_Type;
+                 .P_Root_Type.As_Type_Decl.F_Type_Def.As_Array_Type_Def
+                 .F_Component_Type;
                if Kind (Decl.As_Subtype_Decl.F_Subtype.F_Constraint)
                   in Ada_Index_Constraint_Range
                then
@@ -1026,7 +1031,30 @@ package body TGen.Types.Translation is
                      .F_Constraints;
 
       for Assoc of Constraints loop
-         if Assoc.As_Discriminant_Assoc.F_Discr_Expr.P_Is_Static_Expr then
+         if Kind (Assoc.As_Discriminant_Assoc.F_Discr_Expr) in Ada_Name
+           and then not Is_Null (Assoc.As_Discriminant_Assoc.F_Discr_Expr
+                                 .As_Name.P_Referenced_Defining_Name)
+           and then Kind (Assoc.As_Discriminant_Assoc.F_Discr_Expr.As_Name
+                          .P_Referenced_Defining_Name.Parent.Parent) in
+                    Ada_Discriminant_Spec_Range
+         then
+            --  Case of a constraint referencing a discriminant of the
+            --  enclosing type.
+
+            for Id of Assoc.As_Discriminant_Assoc.F_Ids loop
+               Res.Discriminant_Constraint.Include
+                 (Key      => Id.P_Referenced_Defining_Name,
+                  New_Item => (Kind          => Discriminant,
+                               Disc_Name     => Assoc.As_Discriminant_Assoc
+                                                .F_Discr_Expr.As_Name
+                                                .P_Referenced_Defining_Name));
+
+            end loop;
+
+         elsif Assoc.As_Discriminant_Assoc.F_Discr_Expr.P_Is_Static_Expr then
+
+            --  Case of a static cosntraint
+
             for Id of Assoc.As_Discriminant_Assoc.F_Ids loop
                Res.Discriminant_Constraint.Include
                   (Id.P_Referenced_Defining_Name,
@@ -1036,11 +1064,14 @@ package body TGen.Types.Translation is
                         .Image)));
             end loop;
          else
+            --  Case of a non static constraint
+
             for Id of Assoc.As_Discriminant_Assoc.F_Ids loop
                Res.Discriminant_Constraint.Include
                  (Id.P_Referenced_Defining_Name, (Kind => Non_Static));
             end loop;
          end if;
+
       end loop;
    end Apply_Record_Subtype_Decl;
 
@@ -1098,6 +1129,12 @@ package body TGen.Types.Translation is
       --  the unachievable shapes.
 
       return New_Typ : Discriminated_Record_Typ (Constrained => True) do
+         New_Typ.Mutable :=
+           (not Is_Null (Decl.F_Discriminants))
+           and then (not Is_Null
+             (Decl.F_Discriminants.As_Known_Discriminant_Part.F_Discr_Specs
+              .First_Child.As_Discriminant_Spec.F_Default_Expr));
+
          for Assoc of Decl.F_Type_Def.As_Derived_Type_Def
                         .F_Subtype_Indication.F_Constraint
                         .As_Discriminant_Constraint.F_Constraints
@@ -1118,8 +1155,7 @@ package body TGen.Types.Translation is
                        (Kind          => Discriminant,
                         Disc_Name     => Assoc.As_Discriminant_Assoc
                                           .F_Discr_Expr.As_Name
-                                          .P_Referenced_Defining_Name,
-                        Enclosing_Typ => SP.Null_Ref));
+                                          .P_Referenced_Defining_Name));
                end loop;
             elsif Assoc.As_Discriminant_Assoc.F_Discr_Expr.P_Is_Static_Expr
             then
@@ -1197,7 +1233,7 @@ package body TGen.Types.Translation is
             begin
                Renaming_Cur := Discr_Renaming_Map.Find (Choice.Defining_Name);
                if Has_Element (Renaming_Cur) then
-                  Choice.defining_Name := Element (Renaming_Cur).Disc_Name;
+                  Choice.Defining_Name := Element (Renaming_Cur).Disc_Name;
                end if;
             end Update_Choice_Discriminant;
 
@@ -1585,17 +1621,42 @@ package body TGen.Types.Translation is
            N.As_Subtype_Indication.P_Designated_Type_Decl.P_Full_View;
       end if;
 
-      Intermediate_Result := translate (Type_Decl_Node, Verbose);
+      Intermediate_Result := Translate (Type_Decl_Node, Verbose);
 
       if not Intermediate_Result.Success
         or else Kind (N) in Ada_Anonymous_Type
         or else Is_Null (N.As_Subtype_Indication.F_Constraint)
       then
          return Intermediate_Result;
-      else
-         --  TODO: Implement constraint translation for anonymous subtypes
-         return Intermediate_Result;
       end if;
+      case Intermediate_Result.Res.Get.Kind is
+         when Disc_Record_Kind =>
+            declare
+               Constrained_Typ : Discriminated_Record_Typ
+                                   (Constrained => True);
+               Ancestor : constant Discriminated_Record_Typ'Class :=
+                 As_Discriminated_Record_Typ (Intermediate_Result.Res);
+            begin
+               Constrained_Typ.Discriminant_Types :=
+                 Ancestor.Discriminant_Types.Copy;
+               Constrained_Typ.Component_Types :=
+                 Ancestor.Component_Types.Copy;
+               Constrained_Typ.Shapes := Ancestor.Shapes.Copy;
+               Constrained_Typ.Mutable := Ancestor.Mutable;
+               if Ancestor.Constrained then
+                  Constrained_Typ.Discriminant_Constraint :=
+                    Ancestor.Discriminant_Constraint.Copy;
+               end if;
+               Apply_Record_Subtype_Decl
+                 (N.As_Subtype_Indication, Constrained_Typ);
+               Constrained_Typ.Name := No_Defining_Name;
+               return Res : Translation_Result (Success => True) do
+                  Res.Res.Set (Constrained_Typ);
+               end return;
+            end;
+         when others =>
+            return Intermediate_Result;
+      end case;
    exception
       when Exc : Property_Error =>
          return (Success     => False,
@@ -1747,7 +1808,13 @@ package body TGen.Types.Translation is
          return Translate_Array_Decl (N, Type_Name);
 
       elsif N.P_Is_Record_Type then
-         return Translate_Record_Decl (N, Type_Name);
+         if N.P_Is_Tagged_Type then
+            return Res : Translation_Result (Success => True) do
+               Res.Res.Set (Unsupported_Typ'(Name => Type_Name));
+            end return;
+         else
+            return Translate_Record_Decl (N, Type_Name);
+         end if;
 
       elsif N.P_Is_Access_Type then
          return Res : Translation_Result (Success => True) do

@@ -54,7 +54,8 @@ package TGen.Types is
                      Unconstrained_Array_Kind,
                      Constrained_Array_Kind,
                      Disc_Record_Kind,
-                     Non_Disc_Record_Kind);
+                     Non_Disc_Record_Kind,
+                     Unsupported);
 
    subtype Discrete_Typ_Range is Typ_Kind range Signed_Int_Kind .. Enum_Kind;
 
@@ -145,10 +146,8 @@ package TGen.Types is
 
          when Discriminant =>
             Disc_Name : LAL.Defining_Name;
-            Enclosing_Typ : SP.Ref;
             --  The defining name of the discriminant that appears in this
-            --  context, as well as a reference to the enclosing record type
-            --  in which the discriminant is defined.
+            --  context.
 
          when Non_Static =>
             null;
@@ -163,5 +162,9 @@ package TGen.Types is
 
    Big_Zero : constant Big_Integer :=
      Ada.Numerics.Big_Numbers.Big_Integers.To_Big_Integer (0);
+
+   type Unsupported_Typ is new Typ with null record;
+
+   function Kind (Self : Unsupported_Typ) return Typ_Kind is (Unsupported);
 
 end TGen.Types;

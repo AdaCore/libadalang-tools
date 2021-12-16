@@ -65,7 +65,7 @@ package body TGen.Types is
    function Slug (Self : Typ) return String is
    begin
       return Ada.Strings.Fixed.Translate
-        (Source => TO_UTF8 (Self.Name.P_Fully_Qualified_Name),
+        (Source => To_UTF8 (Self.Name.P_Fully_Qualified_Name),
          Mapping => Dot_To_Underscore'Access);
    end Slug;
 
