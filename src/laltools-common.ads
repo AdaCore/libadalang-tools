@@ -420,6 +420,18 @@ package Laltools.Common is
       return Compilation_Unit;
    --  Returns the Compilation_Unit associated to Node
 
+   package Compilation_Unit_Vectors is new Ada.Containers.Vectors
+     (Index_Type   => Natural,
+      Element_Type => Compilation_Unit,
+      "="          => "=");
+
+   subtype Compilation_Unit_Vector is Compilation_Unit_Vectors.Vector;
+
+   function Get_Compilation_Units
+     (Analysis_Unit : Libadalang.Analysis.Analysis_Unit)
+      return Compilation_Unit_Vector;
+   --  Returns a vector with all Compilation_Unit nodes of Analysis_Unit
+
    function Get_Insert_With_Location
      (Node      : Compilation_Unit'Class;
       Pack_Name : Text_Type;

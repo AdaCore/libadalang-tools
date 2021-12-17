@@ -1,0 +1,7 @@
+project Default is
+   for Main use ("main.adb");
+   package Naming is
+      for Specification ("Bar") use "bar.ada" at 1;
+      for Implementation ("Bar") use "bar.ada" at 2;
+   end Naming;
+end Default;

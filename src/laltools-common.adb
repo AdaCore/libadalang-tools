@@ -1100,7 +1100,7 @@ package body Laltools.Common is
 
    function Get_Compilation_Unit
      (Node : Ada_Node'Class)
-         return Compilation_Unit
+      return Compilation_Unit
    is
       C_Unit : Ada_Node :=
         (if Node.Is_Null then No_Ada_Node else Node.As_Ada_Node);
@@ -1122,6 +1122,33 @@ package body Laltools.Common is
 
       return C_Unit.As_Compilation_Unit;
    end Get_Compilation_Unit;
+
+   ---------------------------
+   -- Get_Compilation_Units --
+   ---------------------------
+
+   function Get_Compilation_Units
+     (Analysis_Unit : Libadalang.Analysis.Analysis_Unit)
+      return Compilation_Unit_Vector
+   is
+      Root : constant Ada_Node :=
+        (if Analysis_Unit = No_Analysis_Unit then No_Ada_Node
+         else Analysis_Unit.Root);
+   begin
+      return Compilation_Units : Compilation_Unit_Vector do
+         if not Root.Is_Null then
+            case Root.Kind is
+               when Ada_Compilation_Unit =>
+                  Compilation_Units.Append (Root.As_Compilation_Unit);
+               when Ada_Compilation_Unit_List =>
+                  for Node of Root.As_Compilation_Unit_List loop
+                     Compilation_Units.Append (Node.As_Compilation_Unit);
+                  end loop;
+               when others => null;
+            end case;
+         end if;
+      end return;
+   end Get_Compilation_Units;
 
    ------------------------------
    -- Get_Insert_With_Location --
@@ -1904,8 +1931,7 @@ package body Laltools.Common is
          --  Compilation_Units, so it safe to try to get the top level
          --  declaration and process it.
 
-         Process_Top_Level_Decl
-           (Used_Unit.P_Top_Level_Decl (Used_Unit.Unit));
+         Process_Top_Level_Decl (Used_Unit.P_Decl);
       end loop;
 
       return Public_Parts;

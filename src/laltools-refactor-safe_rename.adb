@@ -1135,30 +1135,31 @@ package body Laltools.Refactor.Safe_Rename is
       --  an already existing Package/Subprogram that also defines
       --  a compilation unit and both share the same parent package.
 
-      for Unit of Self.Units loop
-         if Unit.Root.As_Compilation_Unit.P_Decl.P_Parent_Basic_Decl.Unit =
-           Parent_Unit
-         then
-            declare
-               --  Get the suffix of the declaration of this unit and check.
+      for Analysis_Unit of Self.Units loop
+         for Compilation_Unit of Get_Compilation_Units (Analysis_Unit) loop
+            if Compilation_Unit.P_Decl.P_Parent_Basic_Decl.Unit =
+                 Parent_Unit
+            then
+               declare
+                  --  Get the suffix of the declaration of this unit and check
 
-               Unit_Decl_Identifier : constant Identifier :=
-                 Get_Defining_Name_Id
-                   (Unit.Root.As_Compilation_Unit.P_Decl.P_Defining_Name);
+                  Unit_Decl_Identifier : constant Identifier :=
+                    Get_Defining_Name_Id
+                      (Compilation_Unit.P_Decl.P_Defining_Name);
 
-            begin
-               --  Check if Self.New_Name is already used by this unit.
+               begin
+                  --  Check if Self.New_Name is already used by this unit
 
-               if Unit_Decl_Identifier.Text = To_Text (Self.New_Name) then
-                  return Name_Collision'
-                    (Canonical_Definition => Self.Canonical_Definition,
-                     New_Name             => Self.New_Name,
-                     Conflicting_Id       =>
-                       Unit.Root.As_Compilation_Unit.P_Decl.
-                         P_Defining_Name.F_Name);
-               end if;
-            end;
-         end if;
+                  if Unit_Decl_Identifier.Text = To_Text (Self.New_Name) then
+                     return Name_Collision'
+                       (Canonical_Definition => Self.Canonical_Definition,
+                        New_Name             => Self.New_Name,
+                        Conflicting_Id       =>
+                          Compilation_Unit.P_Decl.P_Defining_Name.F_Name);
+                  end if;
+               end;
+            end if;
+         end loop;
       end loop;
       return No_Rename_Problem;
    end Find;

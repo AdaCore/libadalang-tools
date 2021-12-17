@@ -1,0 +1,5 @@
+description: |
+    This test checks if the safe rename tool correctly handles
+    analysis units with multiple compilation units.
+
+driver: shell_script
