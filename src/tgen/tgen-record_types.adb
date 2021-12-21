@@ -34,17 +34,28 @@ package body TGen.Record_Types is
 
    LF : constant String := (1 => ASCII.LF);
 
+   Pad : constant Unbounded_String := 3 * ' ';
+
    function Check_Others
      (Designator : LAL.Others_Designator;
       Val        : Big_Integer) return Boolean;
    --  Check if Val Satisfies this "others" choice. This is done by
    --  checking that Val staisfies all the other choices of the variant.
 
+   function PP_Variant
+   (Var     : Variant_Part_Acc;
+    Padding : Natural := 0) return Unbounded_String;
+
    -----------
    -- Image --
    -----------
 
-   function Image (Self : Nondiscriminated_Record_Typ) return String is
+   function Image (Self : Record_Typ) return String is
+      (Image_Internal (Self, 0));
+
+   function Image_Internal
+     (Self : Record_Typ; Padding : Natural := 0) return String
+   is
       use Component_Maps;
       Str : Unbounded_String := To_Unbounded_String (Typ (Self).Image);
       Current_Component : Cursor;
@@ -55,15 +66,55 @@ package body TGen.Record_Types is
          Str               := Str & ": record" & LF;
          Current_Component := Self.Component_Types.First;
          while Has_Element (Current_Component) loop
-            Str :=
-              Str & "   " & Text.Image (Key (Current_Component).Text) & ": " &
-              Element (Current_Component).Get.Image & LF;
+            Str := (Padding + 1) * Pad
+                   & Text.Image (Key (Current_Component).Text) & " : ";
+            if Element (Current_Component).Get.Kind in Record_Typ_Range then
+               Str := Str & String'(As_Record_Typ (Element (Current_Component))
+                            .Image_Internal (Padding + 1)) & LF;
+            else
+               Str := Str & Element (Current_Component).Get.Image & LF;
+            end if;
             Next (Current_Component);
          end loop;
-         Str := Str & "end record" & LF;
+         Str := Str & "end record";
       end if;
       return To_String (Str);
-   end Image;
+   end Image_Internal;
+
+   ------------------
+   -- Free_Variant --
+   ------------------
+
+   procedure Free_Variant (Var : in out Variant_Part_Acc) is
+      use Variant_Choice_Maps;
+      procedure Free is new Ada.Unchecked_Deallocation
+         (Variant_Part, Variant_Part_Acc);
+
+      procedure Destroy_Var_Choice
+        (Idx : Positive; Var_Choice : in out Variant_Choice);
+
+      ------------------------
+      -- Destroy_Var_Choice --
+      ------------------------
+
+      procedure Destroy_Var_Choice
+        (Idx : Positive; Var_Choice : in out Variant_Choice)
+      is
+      begin
+         if Var_Choice.Variant /= null then
+            Free_Variant (Var_Choice.Variant);
+         end if;
+      end Destroy_Var_Choice;
+
+      Cur : Cursor := Var.Variant_Choices.First;
+   begin
+      while Has_Element (Cur) loop
+         Var.Variant_Choices.Update_Element
+           (Cur, Destroy_Var_Choice'Access);
+         Next (Cur);
+      end loop;
+      Free (Var);
+   end Free_Variant;
 
    ------------------
    -- Check_Others --
@@ -131,92 +182,62 @@ package body TGen.Record_Types is
       return Component_Maps.Map
    is
    begin
-      --  First Check that the values passed satisfy the constraints, if there
-      --  are any.
-
-      if Self.Constrained
-        and then not Self.Constraints_Respected (Discriminant_Values)
-      then
-         raise Discriminant_Value_Error;
-      end if;
-
-      --  The try to find a shape that matches all of the discriminant values.
-      --  If the values are not all static, then the first shape that matches
-      --  will be returned.
-
-      for Current_Shape of Self.Shapes loop
-         if Shape_Matches (Current_Shape, Discriminant_Values) then
-            return Current_Shape.Components;
-         end if;
-      end loop;
-
-      --  If we reach this point, it means that the values supplied for the
-      --  discriminants do not satisfy any of the choice combinations for each
-      --  shape, so at least one of the discriminant values is out of bounds
-      --  for the type of the corresponding discriminant.
-
-      raise Discriminant_Value_Error with "Discriminant values match no shape";
+      return Self.Component_Types;
    end Components;
 
-   -------------------
-   -- Shape_Matches --
-   -------------------
+   ----------------
+   -- PP_Variant --
+   ----------------
 
-   function Shape_Matches
-     (Shp : Shape;
-      Discriminant_Values : Discriminant_Constraint_Maps.Map) return Boolean
+   function PP_Variant
+     (Var     : Variant_Part_Acc;
+      Padding : Natural := 0) return Unbounded_String
    is
-      use GNATCOLL.GMP.Integers;
-      use Discriminant_Constraint_Maps;
-      use LAL;
-      package LALCO renames Libadalang.Common;
-
-      Discr_Cur : Cursor;
+      Res : Unbounded_String := (Padding * Pad) & "case ";
+      Comp_Cur : Component_Maps.Cursor;
    begin
-      for Choice of Shp.Discriminant_Choices loop
-         Discr_Cur := Discriminant_Values.Find (Choice.Defining_Name);
-
-         --  Non static constrait or constraint based on a discriminant satify
-         --  all choices.
-
-         if not Has_Element (Discr_Cur)
-           or else Element (Discr_Cur).Kind in Non_Static | Discriminant
-         then
-            goto Next_Choice;
-         end if;
-
-         --  Otherwise, check that the static value we have satisfies at least
-         --  one of the alternatives.
-
-         for Alternative of Choice.Choices loop
-            if (if Kind (Alternative) in LALCO.Ada_Others_Designator_Range
-                then Check_Others
-                       (Alternative.As_Others_Designator,
-                        Element (Discr_Cur).Int_Val)
-                else Alternative.P_Choice_Match
-                       (Make (Big_Int.To_String
-                                (Element (Discr_Cur).Int_Val))))
+      Res := Res & Text.Image (Var.Discr_Name.Text) & " is" & LF;
+      for Var_Choice of Var.Variant_Choices loop
+         Res := Res & (Padding + 2) * Pad & "when "
+                & Text.Image (Var_Choice.Alternatives.Text) & " => " & LF;
+         Comp_Cur := Var_Choice.Components.First;
+         while Component_Maps.Has_Element (Comp_Cur) loop
+            Res := Res & (Padding + 3) * Pad &
+                   Text.Image (Component_Maps.Key (Comp_Cur).Text)
+                   & " : ";
+            if Component_Maps.Element (Comp_Cur).Get.Kind in Record_Typ_Range
             then
-               goto Next_Choice;
+               Res := Res & String'(As_Record_Typ (
+                                    Component_Maps.Element (Comp_Cur))
+                                    .Image_Internal (Padding + 3));
+            else
+               Res := Res & Component_Maps.Element (Comp_Cur).Get.Image;
             end if;
+            Component_Maps.Next (Comp_Cur);
+            Res := Res & LF;
          end loop;
-
-         --  If we reach here, it means that we have a static discriminant
-         --  value that does not satisfy any of the alternatives. This shape
-         --  is thus not compatible with the Discriminant_Values.
-
-         return False;
-
-         <<Next_Choice>>
+         if Var_Choice.Variant /= null then
+            Res := Res & PP_Variant (Var_Choice.Variant, Padding + 3);
+         end if;
       end loop;
-      return True;
-   end Shape_Matches;
+      Res := Res & (Padding + 1) * Pad & "end case" & LF;
+      return Res;
+   end PP_Variant;
 
    -----------
    -- Image --
    -----------
 
    function Image (Self : Discriminated_Record_Typ) return String is
+      (Image_Internal (Self, 0));
+
+   --------------------
+   -- Image_Internal --
+   --------------------
+
+   function Image_Internal
+     (Self : Discriminated_Record_Typ; Padding : Natural := 0) return String
+   is
       use Component_Maps;
       use Discriminant_Constraint_Maps;
       Str : Unbounded_String := To_Unbounded_String (Typ (Self).Image);
@@ -236,81 +257,29 @@ package body TGen.Record_Types is
       end loop;
       Str := Str & ")" & LF;
       if Self.Component_Types.Is_Empty then
-         Str := Str & ": no components";
+         Str := Str & Padding * Pad & " no components";
       else
          Current_Component := Self.Component_Types.First;
          while Has_Element (Current_Component) loop
             Str :=
-              Str & "   " & Text.Image (Key (Current_Component).Text) & ": " &
-              Element (Current_Component).Get.Image & LF;
+              Str & (Padding + 1) * Pad
+              & Text.Image (Key (Current_Component).Text) & " : ";
+            if Element (Current_Component).Get.Kind in Record_Typ_Range then
+               Str := Str & String'(As_Record_Typ (Element (Current_Component))
+                                       .Image_Internal (Padding + 1));
+            else
+               Str := Str & Element (Current_Component).Get.Image & LF;
+            end if;
             Next (Current_Component);
          end loop;
-         Str := Str & "end record" & LF;
+         if Self.Variant /= null then
+            Str := Str & (Padding + 1) * Pad
+                   & PP_Variant (Self.Variant, Padding + 1);
+         end if;
+         Str := Str & "end record";
       end if;
-
-      --  If all discriminants are of a discrete and static type, then display
-      --  the components associated with all discriminants set the current
-      --  constraint, if it exists, or the the lowest bound of the type.
-
-      if (for all Discr of Self.Discriminant_Types =>
-           (Discr.Get.Kind in Discrete_Typ_Range)
-           and then As_Discrete_Typ (Discr).Is_Static)
-      then
-         Str := Str & LF & "Components for discriminants (";
-         declare
-            Discr_Vals : Discriminant_Constraint_Maps.Map;
-            Filtered_Components : Component_Maps.Map;
-            Current_Lit : Big_Integer;
-            Current_Constraint : Discriminant_Constraint_Maps.Cursor;
-         begin
-            Current_Component := Self.Discriminant_Types.First;
-            loop
-               exit when not Has_Element (Current_Component);
-               declare
-                  Current_Typ : constant Discrete_Typ'Class :=
-                    As_Discrete_Typ (Element (Current_Component));
-               begin
-                  if Self.Constrained then
-                     Current_Constraint :=
-                       Self.Discriminant_Constraint.Find
-                         (Key (Current_Component));
-                     if Has_Element (Current_Constraint)
-                       and then Element (Current_Constraint).Kind = Static
-                     then
-                        Current_Lit := Element (Current_Constraint).Int_Val;
-                     else
-                        Current_Lit := Current_Typ.Low_Bound;
-                     end if;
-                  else
-                     Current_Lit := Current_Typ.Low_Bound;
-                  end if;
-                  Discr_Vals.Insert
-                  (Key (Current_Component),
-                   (Kind => Static, Int_Val => Current_Lit));
-                  Str := Str & Text.Image (Key (Current_Component).Text)
-                         & " => "
-                         & As_Discrete_Typ (Element (Current_Component))
-                           .Lit_Image (Current_Lit);
-                  Next (Current_Component);
-                  exit when not Has_Element (Current_Component);
-                  Str := Str & ", ";
-               end;
-            end loop;
-            Str := Str & ")" & LF;
-            Filtered_Components := Self.Components (Discr_Vals);
-
-            Current_Component := Filtered_Components.First;
-            while Has_Element (Current_Component) loop
-               Str :=
-               Str & "   " & Text.Image (Key (Current_Component).Text) & LF;
-               Next (Current_Component);
-            end loop;
-         end;
-      end if;
-
       return To_String (Str);
-
-   end Image;
+   end Image_Internal;
 
    package body Random_Discriminated_Record_Strategy is
 

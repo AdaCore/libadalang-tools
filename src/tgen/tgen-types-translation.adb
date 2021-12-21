@@ -25,6 +25,8 @@ with Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Containers.Hashed_Maps;
 
+with GNATCOLL.GMP.Integers;
+
 with Langkit_Support.Text;
 
 with Libadalang.Common;    use Libadalang.Common;
@@ -103,6 +105,19 @@ package body TGen.Types.Translation is
       Type_Name : Defining_Name) return Translation_Result with
       Pre => Decl.P_Is_Array_Type;
 
+   function Translate_Component_Decl_List
+     (Decl_List : Ada_Node_List;
+      Res       : in out Component_Maps.Map) return Unbounded_String;
+      --  Translate the list of components of Decl into Res.
+      --  If the returned string is empty then the results are valid, otherwise
+      --  and error occured during translation and the contents of Res should
+      --  not be used. The returned string contains the diagnostics of the
+      --  translation
+
+   function Translate_Variant_Part
+     (Node : LAL.Variant_Part) return Record_Types.Variant_Part with
+   Pre => (not Node.Is_Null);
+
    --  procedure Apply_Index_Constraints
    --    (Arr_Typ : Constrained_Array_Typ,
    --     )
@@ -117,19 +132,29 @@ package body TGen.Types.Translation is
       Res  : in out Discriminated_Record_Typ) with
       Pre => Kind (Decl.Parent) in Ada_Subtype_Decl_Range
          and then Res.Constrained;
-      --  Record the discriminant constraints of Decl in Res. For this, the
-      --  type on which you want to apply constraints must be able to accept
-      --  them.
+   --  Record the discriminant constraints of Decl in Res. For this, the
+   --  type on which you want to apply constraints must be able to accept
+   --  them.
 
    function Apply_Record_Derived_Type_Decl
      (Decl : Type_Decl'Class;
-      From : Discriminated_Record_Typ) return Discriminated_Record_Typ with
+      From : in out Discriminated_Record_Typ)
+      return Discriminated_Record_Typ with
       Pre => Kind (Decl.F_Type_Def) in Ada_Derived_Type_Def_Range
          and then From.Constrained;
    --  Apply the effects of the record type derivation defined in Decl.
    --  If any discriminant constraints are present, this filters out the
    --  incompatible shapes, and renames discriminant which correspond
    --  between the ancestor type and the child type.
+
+   procedure Filter_Variant_Part
+     (Variant       : in out Variant_Part_Acc;
+      TL_Components : in out Component_Maps.Map;
+      Constraints   : Discriminant_Constraint_Maps.Map;
+      Renaming      : Discriminant_Constraint_Maps.Map);
+   --  Filter the unreachable shapes of Variant based on the constraints in
+   --  Constraints, and rename the variant part discriminant based on the
+   --  mapping in Renaming.
 
    function Record_Constrained
      (Decl : Base_Type_Decl;
@@ -1075,13 +1100,177 @@ package body TGen.Types.Translation is
       end loop;
    end Apply_Record_Subtype_Decl;
 
+   -------------------------
+   -- Filter_Variant_Part --
+   -------------------------
+
+   procedure Filter_Variant_Part
+     (Variant       : in out Variant_Part_Acc;
+      TL_Components : in out Component_Maps.Map;
+      Constraints   : Discriminant_Constraint_Maps.Map;
+      Renaming      : Discriminant_Constraint_Maps.Map)
+   is
+      use Variant_Choice_Maps;
+
+      Choice_Cur : Cursor := Variant.Variant_Choices.First;
+
+      procedure Filter_Variant_Choice
+        (Index : Positive; Var_Choice : in out Variant_Choice);
+
+      function Alt_List_Match
+        (List : Alternatives_List;
+         Val  : GNATCOLL.GMP.Integers.Big_Integer) return Boolean;
+
+      procedure Delete_Nested_Variant
+        (Index : Positive; Var_Choice : in out Variant_Choice);
+
+      ---------------------------
+      -- Filter_Variant_Choice --
+      ---------------------------
+
+      procedure Filter_Variant_Choice
+        (Index : Positive; Var_Choice : in out Variant_Choice)
+      is
+      begin
+         if Var_Choice.Variant /= null then
+            Filter_Variant_Part
+              (Var_Choice.Variant,
+               Var_Choice.Components,
+               Constraints,
+               Renaming);
+         end if;
+      end Filter_Variant_Choice;
+
+      --------------------
+      -- Alt_List_Match --
+      --------------------
+
+      function Alt_List_Match
+        (List : Alternatives_List;
+         Val  : GNATCOLL.GMP.Integers.Big_Integer) return Boolean
+      is
+         Current_Alt : Ada_Node := List.First_Child;
+      begin
+         while not Current_Alt.Is_Null loop
+            if Current_Alt.P_Choice_Match (Val) then
+               return True;
+            end if;
+            Current_Alt := Current_Alt.Next_Sibling;
+         end loop;
+         return False;
+      end Alt_List_Match;
+
+      ---------------------------
+      -- Delete_Nested_Variant --
+      ---------------------------
+
+      procedure Delete_Nested_Variant
+        (Index : Positive; Var_Choice : in out Variant_Choice)
+      is
+      begin
+         if Var_Choice.Variant /= null then
+            Free_Variant (Var_Choice.Variant);
+         end if;
+      end Delete_Nested_Variant;
+
+      Needs_Renaming : constant Boolean :=
+        Renaming.Contains (Variant.Discr_Name);
+
+   begin
+      --  Rename the discriminant name associated with this variant part if it
+      --  is in the renaming map.
+
+      if Needs_Renaming then
+         Variant.Discr_Name := Renaming.Element (Variant.Discr_Name).Disc_Name;
+      end if;
+
+      if Needs_Renaming
+         or else (not Constraints.Contains (Variant.Discr_Name))
+         or else not (Constraints.Element (Variant.Discr_Name).Kind in Static)
+      then
+
+         --  If the discriminant name associated with this variant part is
+         --  not in the constraint map, or is in the constraint map but the
+         --  constraint is not static, simply update the eventual nested
+         --  variant parts.
+
+         while Has_Element (Choice_Cur) loop
+            Variant.Variant_Choices.Update_Element
+              (Choice_Cur, Filter_Variant_Choice'Access);
+            Next (Choice_Cur);
+         end loop;
+      else
+
+         --  Otherwise, check for each choice if it matches the constraint.
+         --  If it does (there should only be one possible match), update
+         --  the possibly nested variant parts, otherwise, free the possibly
+         --  nested variant as the choice will be deleted.
+         --  Once this is done, merge the components in the only remaning
+         --  Choice to the top level components, and the the variant access
+         --  to point to the nested variant part of the choice, if it exists.
+
+         declare
+            Discr_Val : constant GNATCOLL.GMP.Integers.Big_Integer :=
+               GNATCOLL.GMP.Integers.Make
+                  (Big_Int.To_String
+                    (Constraints.Element (Variant.Discr_Name).Int_Val));
+            Match_Cur : Cursor := No_Element;
+            Old_Variant : Variant_Part_Acc := Variant;
+         begin
+            while Has_Element (Choice_Cur) loop
+               if (not Has_Element (Match_Cur))
+                 and then Alt_List_Match
+                           (Element (Choice_Cur).Alternatives, Discr_Val)
+               then
+                  Match_Cur := Choice_Cur;
+                  Variant.Variant_Choices.Update_Element
+                    (Choice_Cur, Filter_Variant_Choice'Access);
+               else
+                  Variant.Variant_Choices.Update_Element
+                    (Choice_Cur, Delete_Nested_Variant'Access);
+               end if;
+               Next (Choice_Cur);
+            end loop;
+            declare
+               Match_Choice : Variant_Choice := Element (Match_Cur);
+               Comp_Cur : Component_Maps.Cursor :=
+                 Match_Choice.Components.First;
+
+               procedure Set_Null
+                 (Index : Positive; Var_Choice : in out Variant_Choice);
+
+               procedure Set_Null
+                 (Index : Positive; Var_Choice : in out Variant_Choice) is
+               begin
+                  Var_Choice.Variant := null;
+               end Set_Null;
+            begin
+               while Component_Maps.Has_Element (Comp_Cur) loop
+                  TL_Components.Insert
+                    (Component_Maps.Key (Comp_Cur),
+                     Component_Maps.Element (Comp_Cur));
+                  Component_Maps.Next (Comp_Cur);
+               end loop;
+               if Match_Choice.Variant /= null then
+                  Variant := Match_Choice.Variant;
+                  Old_Variant.Variant_Choices.Update_Element
+                     (Match_Cur, Set_Null'Access);
+               else
+                  Variant := null;
+               end if;
+               Free_Variant (Old_Variant);
+            end;
+         end;
+      end if;
+   end Filter_Variant_Part;
+
    ------------------------------------
    -- Apply_Record_Derived_Type_Decl --
    ------------------------------------
 
    function Apply_Record_Derived_Type_Decl
      (Decl : Type_Decl'Class;
-      From : Discriminated_Record_Typ) return Discriminated_Record_Typ
+      From : in out Discriminated_Record_Typ) return Discriminated_Record_Typ
    is
 
       use Discriminant_Constraint_Maps;
@@ -1181,92 +1370,21 @@ package body TGen.Types.Translation is
             end if;
          end loop;
 
-         --  Then copy the shapes, discriminant types and non static
-         --  discriminant constraints to the new type
-         --  Also rebuild the list of components while copying the shapes
+         --  Copy over the components that are always present
 
-         declare
-            use Shape_Maps;
-            use Component_Maps;
-            New_Shape_Index : Positive := 1;
-            Shape_Cur       : Shape_Maps.Cursor := From.Shapes.First;
-            Component_Cur   : Component_Maps.Cursor;
-            Inserted        : Boolean;
+         New_Typ.Component_Types.Move (From.Component_Types);
 
-            procedure Update_Choice_Discriminant
-              (Index : Positive; Choice : in out Discriminant_Choice_Entry);
-            --  Replace the discriminant name in Choice if it is present in
-            --  Discr_Renaming_Map.
+         --  Then filter the variant part tree to remove any unreachable shape
 
-            procedure Update_Shape_Discriminants
-              (Index : Positive; Current_Shape : in out Record_Types.Shape);
-            --  Go through all the choices of the shape to rename the
-            --  associated discriminant according to Discr_Renaming_Map.
+         if From.Variant /= null then
+            New_Typ.Variant := From.Variant;
+            Filter_Variant_Part
+              (New_Typ.Variant,
+               New_Typ.Component_Types,
+               Constraints_Map,
+               Discr_Renaming_Map);
 
-            --------------------------------
-            -- Update_Shape_Discriminants --
-            --------------------------------
-
-            procedure Update_Shape_Discriminants
-              (Index : Positive; Current_Shape : in out Record_Types.Shape)
-            is
-               use Discriminant_Choices_Maps;
-               Choice_Cur : Discriminant_Choices_Maps.Cursor;
-            begin
-               Choice_Cur := Current_Shape.Discriminant_Choices.First;
-               while Has_Element (Choice_Cur) loop
-                  Current_Shape.Discriminant_Choices.Update_Element
-                     (Choice_Cur, Update_Choice_Discriminant'Access);
-                  Next (Choice_Cur);
-               end loop;
-            end Update_Shape_Discriminants;
-
-            --------------------------------
-            -- Update_Choice_Discriminant --
-            --------------------------------
-
-            procedure Update_Choice_Discriminant
-              (Index : Positive; Choice : in out Discriminant_Choice_Entry)
-            is
-               use Discriminant_Constraint_Maps;
-               Renaming_Cur : Discriminant_Constraint_Maps.Cursor;
-            begin
-               Renaming_Cur := Discr_Renaming_Map.Find (Choice.Defining_Name);
-               if Has_Element (Renaming_Cur) then
-                  Choice.Defining_Name := Element (Renaming_Cur).Disc_Name;
-               end if;
-            end Update_Choice_Discriminant;
-
-         begin
-            for Current_Shape of From.Shapes loop
-               if Shape_Matches (Element (Shape_Cur), Constraints_Map) then
-
-                  --  Insert the new shape in the new type
-
-                  New_Typ.Shapes.Insert
-                    (Key      => New_Shape_Index,
-                     New_Item => Current_Shape,
-                     Position => Shape_Cur,
-                     Inserted => Inserted);
-                  New_Shape_Index := New_Shape_Index + 1;
-
-                  --  Replace all discriminants that have correspondance to the
-                  --  new name in the shape we just inserted
-
-                  New_Typ.Shapes.Update_Element
-                    (Shape_Cur, Update_Shape_Discriminants'Access);
-
-                  --  and register all of the components in the global map.
-
-                  Component_Cur := Current_Shape.Components.First;
-                  while Has_Element (Component_Cur) loop
-                     New_Typ.Component_Types.Include
-                       (Key (Component_Cur), Element (Component_Cur));
-                     Next (Component_Cur);
-                  end loop;
-               end if;
-            end loop;
-         end;
+         end if;
 
          --  Fill out discriminant types
 
@@ -1277,7 +1395,6 @@ package body TGen.Types.Translation is
                   (Key     => Element (Constraint_Cur).Disc_Name,
                    New_Item => From.Discriminant_Types.Element
                                  (Key (Constraint_Cur)));
-               --  TODO: propagate new discriminant name in the components
                Next (Constraint_Cur);
             end if;
          end loop;
@@ -1297,9 +1414,72 @@ package body TGen.Types.Translation is
             end if;
             Next (Constraint_Cur);
          end loop;
-
       end return;
    end Apply_Record_Derived_Type_Decl;
+
+   -----------------------------------
+   -- Transalte_Component_Decl_List --
+   -----------------------------------
+
+   function Translate_Component_Decl_List
+     (Decl_List : Ada_Node_List;
+      Res       : in out Component_Maps.Map) return Unbounded_String
+   is
+      Current_Typ : Translation_Result;
+      Comp_Decl : Component_Decl;
+   begin
+      for Decl of Decl_List loop
+         Comp_Decl := Decl.As_Component_Decl;
+         Current_Typ := Translate (Comp_Decl.F_Component_Def.F_Type_Expr);
+         if not Current_Typ.Success then
+            return "Failed to translate type of component"
+                     & Comp_Decl.Image & ": " & Current_Typ.Diagnostics;
+         end if;
+         for Id of Comp_Decl.F_Ids loop
+            Res.Insert (Key => Id.As_Defining_Name,
+                        New_Item => Current_Typ.Res);
+         end loop;
+      end loop;
+      return Null_Unbounded_String;
+   end Translate_Component_Decl_List;
+
+   function Translate_Variant_Part
+     (Node : LAL.Variant_Part) return Record_Types.Variant_Part
+   is
+      Res        : Record_Types.Variant_Part;
+      Choice_Num : Positive := 1;
+   begin
+      Res.Discr_Name := Node.F_Discr_Name.P_Referenced_Defining_Name;
+
+      for Var_Choice of Node.F_Variant loop
+         declare
+            Choice_Trans : Variant_Choice;
+
+            Has_Variant : constant Boolean :=
+              not Var_Choice.As_Variant.F_Components.F_Variant_Part.Is_Null;
+
+            Diagnostics : constant Unbounded_String :=
+              Translate_Component_Decl_List
+                (Var_Choice.As_Variant.F_Components.F_Components,
+                 Choice_Trans.Components);
+         begin
+            if Diagnostics /= Null_Unbounded_String then
+               raise Translation_Error with
+                 "error while translating Variant part: "
+                 & To_String (Diagnostics);
+            end if;
+            Choice_Trans.Alternatives := Var_Choice.F_Choices;
+            if Has_Variant then
+               Choice_Trans.Variant := new Record_Types.Variant_Part'
+                   (Translate_Variant_Part (Var_Choice.As_Variant
+                    .F_Components.F_Variant_Part));
+            end if;
+            Res.Variant_Choices.Insert (Choice_Num, Choice_Trans);
+            Choice_Num := Choice_Num + 1;
+         end;
+      end loop;
+      return Res;
+   end Translate_Variant_Part;
 
    ---------------------------
    -- Translate_Record_Decl --
@@ -1310,41 +1490,10 @@ package body TGen.Types.Translation is
       Type_Name : Defining_Name) return Translation_Result
    is
 
-      function Translate_Component_Decl_List
-        (Decl_List : Ada_Node_List;
-         Res       : in out Component_Maps.Map) return Unbounded_String;
-      --  Translate the list of components of Decl into Res
-
       procedure Apply_Constraints
         (Decl, Root : Base_Type_Decl; Res : in out Discriminated_Record_Typ);
       --  Modify Res to include all the discriminant constraints present in
       --  the type derivation / subtype decl chain.
-
-      -----------------------------------
-      -- Transalte_Component_Decl_List --
-      -----------------------------------
-
-      function Translate_Component_Decl_List
-        (Decl_List : Ada_Node_List;
-         Res       : in out Component_Maps.Map) return Unbounded_String
-      is
-         Current_Typ : Translation_Result;
-         Comp_Decl : Component_Decl;
-      begin
-         for Decl of Decl_List loop
-            Comp_Decl := Decl.As_Component_Decl;
-            Current_Typ := Translate (Comp_Decl.F_Component_Def.F_Type_Expr);
-            if not Current_Typ.Success then
-               return "Failed to translate type of component"
-                      & Comp_Decl.Image & ": " & Current_Typ.Diagnostics;
-            end if;
-            for Id of Comp_Decl.F_Ids loop
-               Res.Insert (Key => Id.As_Defining_Name,
-                           New_Item => Current_Typ.Res);
-            end loop;
-         end loop;
-         return Null_Unbounded_String;
-      end Translate_Component_Decl_List;
 
       -----------------------
       -- Apply_Constraints --
@@ -1441,16 +1590,11 @@ package body TGen.Types.Translation is
          end;
 
       else
-         --  Now the rest. The constraints in the subtype definitions in the
-         --  component declarations are not handled yet.
+         --  Now the rest
 
          Actual_Decl := Decl.P_Root_Type.As_Type_Decl;
 
          declare
-
-            Record_Shapes : constant Shape_Array :=
-              Decl.P_Shapes (Include_Discriminants => False);
-
             Trans_Res : Discriminated_Record_Typ
               (Constrained => Record_Constrained
                                 (Decl, Actual_Decl.As_Base_Type_Decl));
@@ -1463,10 +1607,10 @@ package body TGen.Types.Translation is
             --  the type, will need to revisit this to double check.
 
             Current_Type  : Translation_Result;
-            Current_Shape : LAL.Shape;
-            Translated_Shape : Record_Types.Shape;
             Cur_Discr_Val : Discriminant_Values;
-            Comp_Decl     : Component_Decl;
+            Comp_Decl     : constant Component_List :=
+              Actual_Decl.F_Type_Def.As_Record_Type_Def.F_Record_Def
+              .F_Components;
          begin
 
             --  First translate the list of discriminants
@@ -1489,75 +1633,24 @@ package body TGen.Types.Translation is
                end loop;
             end loop;
 
-            --  Then process the shapes.
-            --  For each shape, translate each component decl, and add it in
-            --  the corresponding shape component map. Also add it to the
-            --  global list of components.
+            --  Then the components always present
 
-            for J in Record_Shapes'Range loop
-               Current_Shape := Record_Shapes (J);
+            Failure_Reason :=
+              Translate_Component_Decl_List
+                (Comp_Decl.F_Components, Trans_Res.Component_Types);
 
-               --  Reset the current shape variable.
-               Translated_Shape.Components.Clear;
-               Translated_Shape.Discriminant_Choices.Clear;
+            if Failure_Reason /= Null_Unbounded_String then
+               return (Success => False,
+                    Diagnostics => Failure_Reason);
+            end if;
 
-               --  First translate the component types and include them in the
-               --  global component map.
+            --  And then the variant part if any
 
-               for Decl of Components (Current_Shape) loop
-                  Comp_Decl := Decl.As_Component_Decl;
-                  Current_Type := Translate
-                    (Comp_Decl.F_Component_Def.F_Type_Expr);
-                  if not Current_Type.Success then
-                     Failure_Reason := "Failed to translate type of component"
-                                       & Comp_Decl.Image & ": "
-                                       & Current_Type.Diagnostics;
-                     goto Failed_Discr_Rec_Translation;
-                  end if;
-                  for Id of Comp_Decl.F_Ids loop
-                     Translated_Shape.Components.Insert
-                     (Key => Id.As_Defining_Name,
-                      New_Item => Current_Type.Res);
-                  end loop;
-               end loop;
-
-               declare
-                  use Component_Maps;
-                  Cur : Cursor := Translated_Shape.Components.First;
-               begin
-                  while Has_Element (Cur) loop
-
-                     --  We use Include instead of Insert here because a
-                     --  component may appear in multiple shapes, so it is
-                     --  legitimate to attempt to insert the same component
-                     --  multiple times.
-
-                     Trans_Res.Component_Types.Include
-                       (Key      => Component_Maps.Key (Cur),
-                        New_Item => Component_Maps.Element (Cur));
-                     Next (Cur);
-                  end loop;
-               end;
-
-               --  Then process the discriminant values. We store the "raw"
-               --  LAL choice nodes to be able to call P_Choice_Matches on them
-               --  later once we have actual values for the discriminants.
-
-               for Discriminant_Index in
-               Discriminants_Values (Current_Shape)'Range
-               loop
-                  Cur_Discr_Val :=
-                  Discriminants_Values (Current_Shape) (Discriminant_Index);
-
-                  Translated_Shape.Discriminant_Choices.Insert
-                  (Discriminant_Index,
-                     (Defining_Name =>
-                       Discriminant (Cur_Discr_Val).P_Referenced_Defining_Name,
-                     Choices        =>
-                       Values (Cur_Discr_Val).As_Alternatives_List));
-               end loop;
-               Trans_Res.Shapes.Insert (J, Translated_Shape);
-            end loop;
+            if not Comp_Decl.F_Variant_Part.Is_Null then
+               Trans_Res.Variant :=
+                 new Record_Types.Variant_Part'
+                   (Translate_Variant_Part (Comp_Decl.F_Variant_Part));
+            end if;
 
             --  If the record is actually a constrained type, reccord the
             --  constraints now.
@@ -1594,9 +1687,13 @@ package body TGen.Types.Translation is
             <<Failed_Discr_Rec_Translation>>
             return (Success => False,
                     Diagnostics => Failure_Reason);
-
          end;
       end if;
+      exception
+         when Exc : Translation_Error =>
+            return (Success => False,
+                    Diagnostics => To_Unbounded_String
+                       (Ada.Exceptions.Exception_Message (Exc)));
    end Translate_Record_Decl;
 
    ---------------
@@ -1641,7 +1738,7 @@ package body TGen.Types.Translation is
                  Ancestor.Discriminant_Types.Copy;
                Constrained_Typ.Component_Types :=
                  Ancestor.Component_Types.Copy;
-               Constrained_Typ.Shapes := Ancestor.Shapes.Copy;
+               Constrained_Typ.Variant := Ancestor.Variant;
                Constrained_Typ.Mutable := Ancestor.Mutable;
                if Ancestor.Constrained then
                   Constrained_Typ.Discriminant_Constraint :=
