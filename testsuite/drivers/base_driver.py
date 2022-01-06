@@ -31,6 +31,7 @@ class BaseDriver(DiffTestDriver):
         "metric",
         "stub",
         "test",
+        "check",
         "laltools",
         "refactoring_add_parameter",
         "refactoring_remove_parameter",
