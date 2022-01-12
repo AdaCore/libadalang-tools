@@ -21,6 +21,7 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Numerics.Big_Numbers.Big_Integers;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with Libadalang.Common;
@@ -31,6 +32,8 @@ with GNATCOLL.GMP.Integers;
 package body TGen.Record_Types is
 
    package Text renames Langkit_Support.Text;
+
+   package Big_Int renames Ada.Numerics.Big_Numbers.Big_Integers;
 
    LF : constant String := (1 => ASCII.LF);
 
@@ -45,6 +48,13 @@ package body TGen.Record_Types is
    function PP_Variant
    (Var     : Variant_Part_Acc;
     Padding : Natural := 0) return Unbounded_String;
+
+   procedure Fill_Components
+     (Self        : Variant_Part;
+      Constraints : Discriminant_Constraint_Maps.Map;
+      Res         : in out Component_Maps.Map);
+   --  Fill Res with the list of components in Self that are present given
+   --  a map of discriminant constraints.
 
    -----------
    -- Image --
@@ -172,18 +182,64 @@ package body TGen.Record_Types is
       return True;
    end Constraints_Respected;
 
-   ----------------
-   -- Components --
-   ----------------
+   ---------------------
+   -- Fill_Components --
+   ---------------------
 
    function Components
      (Self                : Discriminated_Record_Typ;
       Discriminant_Values : Discriminant_Constraint_Maps.Map)
       return Component_Maps.Map
    is
+      Res : Component_Maps.Map := Self.Component_Types.Copy;
    begin
-      return Self.Component_Types;
+      if Self.Variant /= null then
+         Fill_Components (Self.Variant.all, Discriminant_Values, Res);
+      end if;
+      return Res;
    end Components;
+
+   procedure Fill_Components
+     (Self        : Variant_Part;
+      Constraints : Discriminant_Constraint_Maps.Map;
+      Res         : in out Component_Maps.Map)
+   is
+      Disc_Val_Cur : constant Discriminant_Constraint_Maps.Cursor :=
+        Constraints.Find (Self.Discr_Name);
+      Discr_Val : GNATCOLL.GMP.Integers.Big_Integer;
+   begin
+      if Discriminant_Constraint_Maps.Has_Element (Disc_Val_Cur)
+        and then Discriminant_Constraint_Maps.Element (Disc_Val_Cur).Kind
+                 = Static
+      then
+         Discr_Val.Set
+           (Big_Int.To_String (Discriminant_Constraint_Maps.Element
+                               (Disc_Val_Cur).Int_Val));
+      else
+         raise Discriminant_Value_Error;
+      end if;
+      for Choice of Self.Variant_Choices loop
+         declare
+            Choice_Matches : constant Boolean :=
+              (for some Alt of Choice.Alternatives
+                 => Alt.P_Choice_Match (Discr_Val));
+            Comp_Cur : Component_Maps.Cursor := Choice.Components.First;
+         begin
+            if Choice_Matches then
+               while Component_Maps.Has_Element (Comp_Cur) loop
+                  Res.Insert
+                    (Component_Maps.Key (Comp_Cur),
+                     Component_Maps.Element (Comp_Cur));
+                  Component_Maps.Next (Comp_Cur);
+               end loop;
+               if Choice.Variant /= null then
+                  Fill_Components (Choice.Variant.all, Constraints, Res);
+               end if;
+            end if;
+            exit when Choice_Matches;
+         end;
+      end loop;
+   end Fill_Components;
 
    ----------------
    -- PP_Variant --
@@ -280,6 +336,17 @@ package body TGen.Record_Types is
       end if;
       return To_String (Str);
    end Image_Internal;
+
+   ------------------
+   -- Free_Content --
+   ------------------
+
+   procedure Free_Content (Self : in out Discriminated_Record_Typ) is
+   begin
+      if Self.Variant /= null then
+         Free_Variant (Self.Variant);
+      end if;
+   end Free_Content;
 
    package body Random_Discriminated_Record_Strategy is
 

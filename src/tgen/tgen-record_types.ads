@@ -182,8 +182,8 @@ package TGen.Record_Types is
       return Component_Maps.Map;
    --  Given a set of Discriminant_Values for the discriminants of Self, return
    --  the set of components that are actually present in the record.
-   --  Note that this does not resolves the eventual constraints on the
-   --  components that depend on discriminants.
+   --  Raises Discriminant_Value_Error if the unique set of components cannot
+   --  be determined from the list of discriminant values.
 
    function Image (Self : Discriminated_Record_Typ) return String;
 
@@ -192,6 +192,8 @@ package TGen.Record_Types is
 
    function Kind (Self : Discriminated_Record_Typ) return Typ_Kind is
      (Disc_Record_Kind);
+
+   procedure Free_Content (Self : in out Discriminated_Record_Typ);
 
    function As_Discriminated_Record_Typ
      (Self : SP.Ref) return Discriminated_Record_Typ'Class is

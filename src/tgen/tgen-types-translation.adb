@@ -1667,8 +1667,8 @@ package body TGen.Types.Translation is
             --  convert Trans_Res to the correct kind depending on the
             --  attributes.
 
-            if Trans_Res.Discriminant_Types.Is_Empty then
-               if Trans_Res.Discriminant_Constraint.Is_Empty then
+            if Trans_Res.Discriminant_Constraint.Is_Empty then
+               if Trans_Res.Discriminant_Types.Is_Empty then
 
                   --  Normally only checking for the discriminant is sufficient
                   --  to check if Trans_Res will is actually a non
@@ -1676,7 +1676,32 @@ package body TGen.Types.Translation is
                   --  static cosntraints that don't allow us to determine
                   --  what the final list of components is.
 
-                  null;
+                  if Trans_Res.Variant /= null then
+                     Free_Variant (Trans_Res.Variant);
+                  end if;
+
+                  return Res : Translation_Result (Success => True) do
+                     Res.Res.Set (Nondiscriminated_Record_Typ'
+                       (Name            => Trans_Res.Name,
+                        Component_Types => Trans_Res.Component_Types));
+                  end return;
+
+               else
+                  return Res : Translation_Result (Success => True) do
+                     declare
+                        Rec_Typ : Discriminated_Record_Typ
+                          (Constrained => False);
+                     begin
+                        Rec_Typ.Component_Types.Move
+                          (Trans_Res.Component_Types);
+                        Rec_Typ.Discriminant_Types.Move
+                          (Trans_Res.Discriminant_Types);
+                        Rec_Typ.Variant := Trans_Res.Variant;
+                        Rec_Typ.Name := Trans_Res.Name;
+                        Rec_Typ.Mutable := Trans_Res.Mutable;
+                        Res.Res.Set (Rec_Typ);
+                     end;
+                  end return;
                end if;
             end if;
 
@@ -1685,6 +1710,9 @@ package body TGen.Types.Translation is
             end return;
 
             <<Failed_Discr_Rec_Translation>>
+            if Trans_Res.Variant /= null then
+               Free_Variant (Trans_Res.Variant);
+            end if;
             return (Success => False,
                     Diagnostics => Failure_Reason);
          end;

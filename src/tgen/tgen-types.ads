@@ -94,6 +94,8 @@ package TGen.Types is
 
    function Kind (Self : Typ) return Typ_Kind;
 
+   procedure Free_Content (Self : in out Typ) is null;
+
    type Scalar_Typ (Is_Static : Boolean) is new Typ with null record;
 
    type Discrete_Typ is new Scalar_Typ with null record;
@@ -117,7 +119,10 @@ package TGen.Types is
 
    type Composite_Typ is new Typ with null record;
 
-   package SP is new Shared_Pointers (Element_Type => Typ'Class);
+   procedure Free_Content_Wide (Self : in out Typ'Class);
+
+   package SP is new Shared_Pointers
+     (Element_Type => Typ'Class, Release => Free_Content_Wide);
 
    function As_Discrete_Typ (Self : SP.Ref) return Discrete_Typ'Class is
      (Discrete_Typ'Class (Self.Unchecked_Get.all)) with

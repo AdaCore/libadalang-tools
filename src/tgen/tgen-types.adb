@@ -30,6 +30,10 @@ package body TGen.Types is
    use LAL;
    package Text renames Langkit_Support.Text;
 
+   -----------
+   -- Image --
+   -----------
+
    function Image (Self : Typ) return String is
    begin
       return (if Self.Name = No_Defining_Name
@@ -37,20 +41,44 @@ package body TGen.Types is
               else Text.Image (Self.Name.Text));
    end Image;
 
+   ----------
+   -- Kind --
+   ----------
+
    function Kind (Self : Typ) return Typ_Kind is (Invalid_Kind);
+
+   -----------
+   -- Image --
+   -----------
 
    function Image (Self : Access_Typ) return String is
      (Typ (Self).Image & ": access type");
+
+   ---------------
+   -- Lit_Image --
+   ---------------
 
    function Lit_Image
      (Self : Discrete_Typ; Lit : Big_Integer) return String is
      (Big_Int.To_String (Lit));
 
+   ---------------
+   -- Low_Bound --
+   ---------------
+
    function Low_Bound (Self : Discrete_Typ) return Big_Integer is
      (Big_Zero);
 
+   ----------------
+   -- High_Bound --
+   ----------------
+
    function High_Bound (Self : Discrete_Typ) return Big_Integer is
      (Big_Zero);
+
+   ------------------
+   -- Package_Name --
+   ------------------
 
    function Package_Name (Self : Typ) return String is
       Type_Parent_Package : constant Text_Type :=
@@ -59,8 +87,16 @@ package body TGen.Types is
       return Image (Type_Parent_Package);
    end Package_Name;
 
+   -----------------------
+   -- Dot_To_Underscore --
+   -----------------------
+
    function Dot_To_Underscore (C : Character) return Character is
      ((if C = '.' then '_' else C));
+
+   ----------
+   -- Slug --
+   ----------
 
    function Slug (Self : Typ) return String is
    begin
@@ -68,5 +104,14 @@ package body TGen.Types is
         (Source => To_UTF8 (Self.Name.P_Fully_Qualified_Name),
          Mapping => Dot_To_Underscore'Access);
    end Slug;
+
+   ------------------
+   -- Free_Content --
+   ------------------
+
+   procedure Free_Content_Wide (Self : in out Typ'Class) is
+   begin
+      Self.Free_Content;
+   end Free_Content_Wide;
 
 end TGen.Types;
