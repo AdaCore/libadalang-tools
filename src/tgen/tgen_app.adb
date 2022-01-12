@@ -34,6 +34,7 @@ with Libadalang.Analysis;
 with Libadalang.Common; use Libadalang.Common;
 with Libadalang.Helpers; use Libadalang.Helpers;
 
+with TGen.Context;              use TGen.Context;
 with TGen.Files;                use TGen.Files;
 with TGen.Gen_Strategies;       use TGen.Gen_Strategies;
 with TGen.Gen_Strategies_Utils; use TGen.Gen_Strategies_Utils;
@@ -68,26 +69,6 @@ procedure TGen_App is
       App_Setup    => App_Setup,
       App_Post_Process => App_Post_Process);
 
-   ------------------------
-   -- Project_Output_Dir --
-   ------------------------
-
-   function Project_Output_Dir (Project : Project_Type) return String is
-      use type GNATCOLL.VFS.Filesystem_String;
-      Obj_Dir : constant String := +Project.Object_Dir.Full_Name;
-   begin
-      if Obj_Dir'Length = 0 then
-         return "";
-      else
-         declare
-            Prj_Name : constant String :=
-               Ada.Characters.Handling.To_Lower (Project.Name);
-         begin
-            return Obj_Dir / Prj_Name & "-tgen";
-         end;
-      end if;
-   end Project_Output_Dir;
-
    procedure App_Setup
      (Context : App_Context; Jobs : App_Job_Context_Array)
    is
@@ -102,6 +83,7 @@ procedure TGen_App is
    is
    begin
       Generate_Type_Strategies (GC);
+      Generate_Artifacts (GC);
    end App_Post_Process;
 
    procedure Process_Unit
@@ -129,21 +111,7 @@ procedure TGen_App is
       Param_Number : Positive := 1;
 
    begin
-      if Kind (Node) in Ada_Package_Decl then
-         declare
-
-            Strat_Generator : constant Strategy_Generator.Strat_Generator :=
-              Strategy_Generator.Create
-                (Get_Strat_ADB (GC),
-                 Get_Template_Strat_ADB,
-                 Extract_Package_Data (Node.As_Package_Decl));
-
-            Context : TGen.Templates.Context;
-         begin
-            Strat_Generator.Generate_Source_Code (Context);
-            return Over;
-         end;
-      elsif Kind (Node) in Ada_Subp_Spec_Range then
+      if Kind (Node) in Ada_Subp_Spec_Range then
          Put_Line ("Found subprogram spec :");
          Put_Line
            ("Subprogram Name : " &
@@ -167,6 +135,11 @@ procedure TGen_App is
             end;
             Param_Number := Param_Number + 1;
          end loop;
+         return Over;
+      elsif Kind (Node) in Ada_Subp_Decl then
+
+         Generate_Test_Vectors
+           (GC, 10, Extract_Subprogram_Data (Node.As_Basic_Decl));
          return Over;
       else
          return Into;

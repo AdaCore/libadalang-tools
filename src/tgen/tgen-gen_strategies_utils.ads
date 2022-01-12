@@ -26,78 +26,13 @@ with Ada.Containers.Ordered_Sets;
 with Ada.Containers.Vectors;
 with Ada.Strings.Wide_Wide_Unbounded;
 
+with TGen.Context; use TGen.Context;
+with TGen.Strings; use TGen.Strings;
 with TGen.Types; use TGen.Types;
 
 package TGen.Gen_Strategies_Utils is
 
    use Libadalang.Common;
-
-   function "+" (Text : Unbounded_Text_Type) return String is
-     (To_UTF8 (To_Text (Text)));
-
-   function "+" (Text : Text_Type) return String is
-     (To_UTF8 (Text));
-
-   type Parameter_Data is
-      record
-         Name                      : Unbounded_Text_Type;
-         Index                     : Positive;
-         Type_Name                 : Unbounded_Text_Type;
-         Type_Fully_Qualified_Name : Unbounded_Text_Type;
-         Type_Parent_Package       : Unbounded_Text_Type;
-         Type_Repr : SP.Ref;
-      end record;
-
-   package Parameters_Data_Vectors is new Ada.Containers.Vectors
-     (Index_Type   => Positive,
-      Element_Type => Parameter_Data,
-      "="          => "=");
-
-   subtype Parameters_Data_Vector is Parameters_Data_Vectors.Vector;
-
-   type Subprogram_Data (Kind : Ada_Subp_Kind := Ada_Subp_Kind_Procedure) is
-      record
-         Name                 : Unbounded_Text_Type;
-         Fully_Qualified_Name : Unbounded_Text_Type;
-         Parent_Package       : Unbounded_Text_Type;
-         Parameters_Data      : Parameters_Data_Vector;
-         case Kind is
-            when Ada_Subp_Kind_Function =>
-               Return_Type_Fully_Qualified_Name : Unbounded_Text_Type;
-               Return_Type_Parent_Package       : Unbounded_Text_Type;
-            when Ada_Subp_Kind_Procedure =>
-               null;
-         end case;
-      end record;
-
-   package Subprograms_Data_Vectors is new Ada.Containers.Vectors
-     (Index_Type => Positive,
-      Element_Type => Subprogram_Data);
-
-   subtype Subprograms_Data_Vector is Subprograms_Data_Vectors.Vector;
-
-   type Package_Data;
-
-   type Package_Data_Acc is access all Package_Data;
-
-   package Package_Data_Vectors is new Ada.Containers.Vectors
-     (Index_Type => Positive,
-      Element_Type => Package_Data_Acc);
-
-   type Package_Data is
-      record
-         Subpackages : Package_Data_Vectors.Vector;
-         Subprograms : Subprograms_Data_Vectors.Vector;
-         Pkg_Name : Package_Decl;
-      end record;
-
-   function "<" (L, R : Package_Data) return Boolean is
-     (L.Pkg_Name.P_Fully_Qualified_Name < R.Pkg_Name.P_Fully_Qualified_Name);
-
-   package Package_Data_Sets is new Ada.Containers.Ordered_Sets
-     (Element_Type => Package_Data);
-
-   subtype Package_Data_Set is Package_Data_Sets.Set;
 
    function Extract_Package_Data
      (Pkg_Decl : Package_Decl)
@@ -116,22 +51,30 @@ package TGen.Gen_Strategies_Utils is
    --  Returns a vector of Parameters_Data objects extracted from each
    --  parameter of Subp.
 
-   function Gen_Param_Function_Name
-     (Subp_Data : Subprogram_Data;
-      Param : Parameter_Data) return String is
-     ((+Subp_Data.Parent_Package) & "_" & (+Subp_Data.Name) & "_"
-      & (+Param.Name));
+   function Gen_Random_Function_Name
+     (T : Typ'Class) return String is
+      ("Gen_" & (+T.Type_Name));
 
    function Strat_Param_Name
      (Subp_Data : Subprogram_Data; Param : Parameter_Data) return String is
-     ("Strat_" & (+Subp_Data.Parent_Package) & "_" & (+Subp_Data.Name) & "_"
-      & (+Param.Name));
+     ("Strat_" & (+Param.Name));
 
    function Param_Strat_Package_Name (Package_Name : String) return String is
      (Package_Name & ".Param_Strategies");
 
    function Type_Strat_Package_Name (Package_Name : String) return String is
      (Package_Name & ".Type_Strategies");
+
+   function Gen_Param_Function_Name
+     (Subp_Data : Subprogram_Data;
+      Param : Parameter_Data) return String is
+     ((+Subp_Data.Name) & "_" & (+Param.Name));
+
+   function Gen_Param_Full_Function_Name
+     (Subp_Data : Subprogram_Data;
+      Param : Parameter_Data) return String is
+     (Param_Strat_Package_Name (+Subp_Data.Parent_Package) & "."
+      & (+Subp_Data.Name) & "_" & (+Param.Name));
 
    package Param_Vectors_Maps is new Ada.Containers.Ordered_Maps
      (Key_Type => Unbounded_Text_Type,
@@ -140,29 +83,6 @@ package TGen.Gen_Strategies_Utils is
       "=" => Parameters_Data_Vectors."=");
 
    subtype Param_Vector_Map is Param_Vectors_Maps.Map;
-
-   function "<" (L : Defining_Name; R : Defining_Name) return Boolean is
-     (Image (L.P_Fully_Qualified_Name) < Image (R.P_Fully_Qualified_Name));
-
-   function "<" (L, R : SP.Ref) return Boolean is
-     (L.Get.Name < R.Get.Name);
-
-   function "=" (L, R : SP.Ref) return Boolean is
-     (L.Get.Name = R.Get.Name);
-
-   package Typ_Sets is new Ada.Containers.Ordered_Sets
-     (Element_Type => SP.Ref,
-      "=" => SP."=");
-
-   subtype Typ_Set is Typ_Sets.Set;
-
-   package Type_Vectors_Maps is new Ada.Containers.Ordered_Maps
-     (Key_Type => Unbounded_Text_Type,
-      Element_Type => Typ_Set,
-      "<" => Ada.Strings.Wide_Wide_Unbounded."<",
-      "=" => Typ_Sets."=");
-
-   subtype Type_Vectors_Map is Type_Vectors_Maps.Map;
 
    function Unit_To_File_Name (Old : String) return String;
 

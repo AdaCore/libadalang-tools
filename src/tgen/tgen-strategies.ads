@@ -104,6 +104,8 @@ package TGen.Strategies is
        (Index_Type => Natural,
         Element_Type => Strategy_Acc);
 
+   subtype Strategy_Vector is Strategy_Vectors.Vector;
+
    generic
       Strategies : Strategy_Vectors.Vector;
    package Random_Record_Strategy is

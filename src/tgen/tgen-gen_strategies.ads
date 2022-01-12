@@ -28,6 +28,7 @@ with Ada.Finalization;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Strings.Wide_Wide_Unbounded;
 
+with GNATCOLL.JSON;     use GNATCOLL.JSON;
 with GNATCOLL.Projects; use GNATCOLL.Projects;
 with GNATCOLL.VFS;      use GNATCOLL.VFS;
 
@@ -35,6 +36,7 @@ with Libadalang.Analysis; use Libadalang.Analysis;
 
 with Templates_Parser;
 
+with TGen.Context;              use TGen.Context;
 with TGen.Gen_Strategies_Utils; use TGen.Gen_Strategies_Utils;
 with TGen.Strings;              use TGen.Strings;
 with TGen.Templates;            use TGen.Templates;
@@ -43,19 +45,16 @@ with TGen.Files; use TGen.Files;
 
 package TGen.Gen_Strategies is
 
-   type Generation_Context is new TGen.Templates.Context with record
-      Output_Dir : Unbounded_String;
-
-      Packages_Data : Package_Data_Set;
-
-      Required_Type_Strategies : Type_Vectors_Map;
-   end record;
-
    procedure Initialize
      (Context : in out Generation_Context;
       Output_Dir : Unbounded_String);
 
-   overriding procedure Finalize (Context : in out Generation_Context);
+   procedure Generate_Artifacts (Context : in out Generation_Context);
+
+   procedure Generate_Test_Vectors
+     (Context  : in out Generation_Context;
+      Nb_Tests : Positive;
+      Subp     : Subprogram_Data);
 
    type Generated_Body is
       record
@@ -63,8 +62,9 @@ package TGen.Gen_Strategies is
          Generated_Body : Unbounded_Text_Type;
       end record;
 
-   function Generate_Test_For
+   function Generate_Tests_For
      (Context   : in out Generation_Context;
+      Nb_Tests  : Positive;
       Subp      : Subp_Decl) return Generated_Body;
    --  Generate a body for the given procedure. Generation of artifact files
    --  (containing generation procedures) is deferred to the finalization of
@@ -74,8 +74,6 @@ package TGen.Gen_Strategies is
    function Get_Gen_Directory (Ctx : Generation_Context) return Virtual_File is
      (GNATCOLL.VFS.Create
         (Filesystem_String (TGen.Strings."+" (Ctx.Output_Dir))));
-
-   procedure Prepare_Output_Dirs (Context : Generation_Context);
 
    function Get_Strat_ADB (Ctx : Generation_Context) return Virtual_File is
      (Get_Gen_Directory (Ctx) / Strat_ADB);
@@ -139,9 +137,8 @@ package TGen.Gen_Strategies is
       --  template.
 
       function Create
-        (Strat_Source_File    : GNATCOLL.VFS.Virtual_File;
-         Strat_Template_File  : GNATCOLL.VFS.Virtual_File;
-         Pkg_Data         : Package_Data)
+        (Context : Generation_Context;
+         Pkg_Data : Package_Data)
          return Strat_Generator;
       --  Constructor of a DF_Generator. 'DF_Source_File' is the output
       --  Fuzz Test Harness source file and 'DF_Template_File' is the template
@@ -150,8 +147,10 @@ package TGen.Gen_Strategies is
    private
       type Strat_Generator is new Source_Code_File_Generator with
          record
-            Strat_Source_File   : GNATCOLL.VFS.Virtual_File;
-            Strat_Template_File : GNATCOLL.VFS.Virtual_File;
+            Strat_Source_File_ADS : GNATCOLL.VFS.Virtual_File;
+            Strat_Source_File_ADB : GNATCOLL.VFS.Virtual_File;
+            Strat_Template_File_ADS   : GNATCOLL.VFS.Virtual_File;
+            Strat_Template_File_ADB : GNATCOLL.VFS.Virtual_File;
             Pkg_Data            : Package_Data;
          end record;
 
@@ -263,6 +262,9 @@ package TGen.Gen_Strategies is
    function Number_Of_Lines (Str : String) return Natural;
 
    procedure Generate_Type_Strategies
+     (Context : Generation_Context);
+
+   procedure Dump_JSON
      (Context : Generation_Context);
 
 end TGen.Gen_Strategies;

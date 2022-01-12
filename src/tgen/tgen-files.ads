@@ -24,6 +24,9 @@
 with Ada.Directories;
 with Ada.Environment_Variables;
 
+with TGen.Context; use TGen.Context;
+with TGen.Strings; use TGen.Strings;
+
 with GNATCOLL.VFS;      use GNATCOLL.VFS;
 with GNATCOLL.Projects; use GNATCOLL.Projects;
 
@@ -37,8 +40,8 @@ package TGen.Files is
    Strat_Template_ADB : constant Filesystem_String :=
      "strat.adb.tmpl";
 
-   Type_Strat_Template_ADB : constant Filesystem_String :=
-     "type-strat.adb.tmpl";
+   Type_Strat_Template_ADS : constant Filesystem_String :=
+     "type-strat.ads.tmpl";
 
    Test_Proc_Template_ADB : constant Filesystem_String :=
      "test_procedure.adb.tmpl";
@@ -48,15 +51,30 @@ package TGen.Files is
    function Get_Template_Strat_ADB return Virtual_File is
      (Get_Tmpl_Directory / "strat.adb.tmpl");
 
+   function Get_Template_Strat_ADS return Virtual_File is
+     (Get_Tmpl_Directory / "strat.ads.tmpl");
+
    function Get_Template_Test_ADB return Virtual_File is
       (Get_Tmpl_Directory / Test_Proc_Template_ADB);
 
-   function Get_Template_Type_Strat_ADB return Virtual_File is
-     (Get_Tmpl_Directory / Type_Strat_Template_ADB);
+   function Get_Template_Type_Strat_ADS return Virtual_File is
+     (Get_Tmpl_Directory / Type_Strat_Template_ADS);
+
+   function Get_Output_Dir (Context : Generation_Context) return Virtual_File
+     is (GNATCOLL.VFS.Create (Filesystem_String (+Context.Output_Dir)));
+
+   function Get_JSON_Name
+     (Context   : Generation_Context;
+      Unit_Name : String) return Virtual_File
+     is (Get_Output_Dir (Context) / Filesystem_String (Unit_Name & ".json"));
 
    function "/" (Dir, Name : String) return String is
      (Ada.Directories.Compose (Dir, Name));
    --  Likewise, without the "dir shouldn't be empty" constraint but
    --  checking that the path components are valid when not empty.
+
+   procedure Prepare_Output_Dirs (Context : Generation_Context);
+
+   function Project_Output_Dir (Project : Project_Type) return String;
 
 end TGen.Files;

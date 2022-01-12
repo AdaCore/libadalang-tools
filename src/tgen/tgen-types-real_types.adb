@@ -21,7 +21,12 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-package body TGen.Real_Types is
+with GNAT.Random_Numbers;
+
+with TGen.Strings; use TGen.Strings;
+with TGen.Random; use TGen.Random;
+
+package body TGen.Types.Real_Types is
 
    function Image (Self : Float_Typ) return String is
      (Typ (Self).Image & ": Real Type"
@@ -51,4 +56,35 @@ package body TGen.Real_Types is
                  else "")
          else " (non static)"));
 
-end TGen.Real_Types;
+   function Gen_Float return T is
+      function Rand is new GNAT.Random_Numbers.Random_Float (T);
+   begin
+      return Rand (Generator_Instance);
+   end Gen_Float;
+
+   function Generate_Random_Strategy (Self : Float_Typ) return String
+   is
+   begin
+      return "function Gen_"
+        & Qualified_To_Unique_Name (Self.Type_Name)
+        & " is new TGen.Real_Types.Gen_Float ( "
+        & (+Self.Fully_Qualified_Name) & ");";
+   end Generate_Random_Strategy;
+
+   function Generate_Static
+     (Self : Float_Typ) return JSON_Value is
+   begin
+      if not Self.Is_Static or not Self.Has_Range then
+         raise Program_Error with "Cannot generate values for non static type "
+           & Image (Self);
+      end if;
+      declare
+         type Float_Type is new Long_Float
+           range Self.Range_Value.Min .. Self.Range_Value.Max;
+         function Rand_Value is new Gen_Float (Float_Type);
+      begin
+         return Create (Long_Float (Rand_Value));
+      end;
+   end Generate_Static;
+
+end TGen.Types.Real_Types;

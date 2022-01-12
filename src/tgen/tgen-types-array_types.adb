@@ -23,7 +23,7 @@
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-package body TGen.Array_Types is
+package body TGen.Types.Array_Types is
 
    use TGen.Types.SP;
 
@@ -86,4 +86,4 @@ package body TGen.Array_Types is
       return To_String (Res);
    end Image;
 
-end TGen.Array_Types;
+end TGen.Types.Array_Types;

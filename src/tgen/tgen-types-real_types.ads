@@ -23,7 +23,7 @@
 
 with TGen.Types; use TGen.Types;
 
-package TGen.Real_Types is
+package TGen.Types.Real_Types is
 
    type Float_Range is record
       Min, Max : Long_Float;
@@ -107,4 +107,14 @@ package TGen.Real_Types is
             and then (Self.Get.Kind in Decimal_Kind);
    pragma Inline (As_Decimal_Fixed_Typ);
 
-end TGen.Real_Types;
+   generic
+      type T is digits <>;
+   function Gen_Float return T;
+
+   overriding function Generate_Static
+     (Self : Float_Typ) return JSON_Value;
+
+   overriding function Generate_Random_Strategy
+     (Self : Float_Typ) return String;
+
+end TGen.Types.Real_Types;

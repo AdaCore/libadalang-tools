@@ -30,11 +30,11 @@ with Libadalang.Analysis;
 
 with TGen.Strategies; use TGen.Strategies;
 with TGen.Types; use TGen.Types;
-with TGen.Int_Types;
+with TGen.Types.Int_Types;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Streams; use Ada.Streams;
 
-package TGen.Record_Types is
+package TGen.Types.Record_Types is
 
    package LAL renames Libadalang.Analysis;
 
@@ -145,8 +145,8 @@ package TGen.Record_Types is
       --  Map from discriminant defining names to their type translation
 
       Variant : Variant_Part_Acc;
-      --  Variant part associaited with the record. Null if there is no variant
-      --  part in this reccord.
+      --  Variant part associated with the record. Null if there is no variant
+      --  part in this record.
 
       case Constrained is
          when True =>
@@ -202,6 +202,12 @@ package TGen.Record_Types is
             and then (Self.Get.Kind in Disc_Record_Kind);
    pragma Inline (As_Discriminated_Record_Typ);
 
+   type Integer_Array is array (Integer range <>) of Integer;
+
+   type A (I : Integer) is record
+      T : Integer_Array (1 .. I);
+   end record;
+
    generic
       type Discriminant_Type is (<>);
 
@@ -221,4 +227,4 @@ package TGen.Record_Types is
       Strat : aliased Random_Discriminated_Record_Strategy_Type;
    end Random_Discriminated_Record_Strategy;
 
-end TGen.Record_Types;
+end TGen.Types.Record_Types;

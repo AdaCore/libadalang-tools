@@ -29,7 +29,7 @@ with Langkit_Support.Text;
 
 with GNATCOLL.GMP.Integers;
 
-package body TGen.Record_Types is
+package body TGen.Types.Record_Types is
 
    package Text renames Langkit_Support.Text;
 
@@ -359,4 +359,4 @@ package body TGen.Record_Types is
 
    end Random_Discriminated_Record_Strategy;
 
-end TGen.Record_Types;
+end TGen.Types.Record_Types;

@@ -21,6 +21,9 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Characters.Handling;
+with Ada.Text_IO;
+
 package body TGen.Files is
 
    function Get_Tmpl_Directory return Virtual_File is
@@ -34,5 +37,40 @@ package body TGen.Files is
         (Filesystem_String
            (Ada.Environment_Variables.Value ("TGEN_TEMPLATE_PATH")));
    end Get_Tmpl_Directory;
+
+   -------------------------
+   -- Prepare_Output_Dirs --
+   -------------------------
+
+   procedure Prepare_Output_Dirs (Context : Generation_Context) is
+      Output_Dir : constant String :=
+        +(Context.Output_Dir);
+   begin
+      if not Ada.Directories.Exists (Output_Dir)
+      then
+         Ada.Text_IO.Put_Line ("Creating " & Output_Dir);
+         Ada.Directories.Create_Path (Output_Dir);
+      end if;
+   end Prepare_Output_Dirs;
+
+   ------------------------
+   -- Project_Output_Dir --
+   ------------------------
+
+   function Project_Output_Dir (Project : Project_Type) return String is
+      use type GNATCOLL.VFS.Filesystem_String;
+      Obj_Dir : constant String := +Project.Object_Dir.Full_Name;
+   begin
+      if Obj_Dir'Length = 0 then
+         return "";
+      else
+         declare
+            Prj_Name : constant String :=
+               Ada.Characters.Handling.To_Lower (Project.Name);
+         begin
+            return Obj_Dir / Prj_Name & "-tgen";
+         end;
+      end if;
+   end Project_Output_Dir;
 
 end TGen.Files;

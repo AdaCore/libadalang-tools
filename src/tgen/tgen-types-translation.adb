@@ -32,11 +32,11 @@ with Langkit_Support.Text;
 with Libadalang.Common;    use Libadalang.Common;
 with Libadalang.Expr_Eval; use Libadalang.Expr_Eval;
 
-with TGen.Int_Types;    use TGen.Int_Types;
-with TGen.Real_Types;   use TGen.Real_Types;
-with TGen.Enum_Types;   use TGen.Enum_Types;
-with TGen.Array_Types;  use TGen.Array_Types;
-with TGen.Record_Types; use TGen.Record_Types;
+with TGen.Types.Int_Types;    use TGen.Types.Int_Types;
+with TGen.Types.Real_Types;   use TGen.Types.Real_Types;
+with TGen.Types.Enum_Types;   use TGen.Types.Enum_Types;
+with TGen.Types.Array_Types;  use TGen.Types.Array_Types;
+with TGen.Types.Record_Types; use TGen.Types.Record_Types;
 
 package body TGen.Types.Translation is
    use LAL;
@@ -552,6 +552,8 @@ package body TGen.Types.Translation is
          end case;
 
          if Is_Null (Range_Spec_Val) then
+            --  ???: shouldn't this also set Is_Static to False?
+
             Has_Range := False;
             Min       := 0.0;
             Max       := 0.0;

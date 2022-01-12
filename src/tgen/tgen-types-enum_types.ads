@@ -25,7 +25,7 @@ with Ada.Containers.Ordered_Maps;
 
 with TGen.Types;        use TGen.Types;
 
-package TGen.Enum_Types is
+package TGen.Types.Enum_Types is
 
    type Enum_Typ is new Discrete_Typ with null record;
 
@@ -99,4 +99,4 @@ package TGen.Enum_Types is
             and then (Self.Get.Kind in Enum_Kind);
    pragma Inline (As_Other_Enum_Typ);
 
-end TGen.Enum_Types;
+end TGen.Types.Enum_Types;

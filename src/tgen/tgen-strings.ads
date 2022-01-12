@@ -68,6 +68,12 @@ package TGen.Strings is
       return String
       renames Ada.Strings.Unbounded.To_String;
 
+   function "+" (Text : Unbounded_Text_Type) return String is
+     (To_UTF8 (To_Text (Text)));
+
+   function "+" (Text : Text_Type) return String is
+     (To_UTF8 (Text));
+
    -----------------------
    -- Dot_To_Underscore --
    -----------------------

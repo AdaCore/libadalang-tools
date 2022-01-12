@@ -94,6 +94,16 @@ package body TGen.Types is
    function Dot_To_Underscore (C : Character) return Character is
      ((if C = '.' then '_' else C));
 
+   ---------------------
+   -- Generate_Static --
+   ---------------------
+
+   function Generate_Static (Self : Typ) return JSON_Value is
+   begin
+      raise Program_Error with "Static strategy not implemented";
+      return JSON_Null;
+   end Generate_Static;
+
    ----------
    -- Slug --
    ----------

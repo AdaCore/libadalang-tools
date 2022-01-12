@@ -2,7 +2,7 @@
 --                                                                          --
 --                                  TGen                                    --
 --                                                                          --
---                       Copyright (C) 2022, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- TGen  is  free software; you can redistribute it and/or modify it  under --
 -- under  terms of  the  GNU General  Public License  as  published by  the --
@@ -26,7 +26,7 @@ with GNAT.Random_Numbers;
 with TGen.Strings; use TGen.Strings;
 with TGen.Random; use TGen.Random;
 
-package body TGen.Int_Types is
+package body TGen.Types.Int_Types is
 
    function Image (Self : Signed_Int_Typ) return String is
    begin
@@ -56,25 +56,37 @@ package body TGen.Int_Types is
    function High_Bound (Self : Mod_Int_Typ) return Big_Integer is
      (Self.Mod_Value);
 
-   function Gen return T
+   function Generate_Random_Strategy (Self : Int_Typ) return String
    is
+   begin
+      return "function Gen_"
+        & Qualified_To_Unique_Name (Self.Type_Name)
+        & " is new TGen.Int_Types.Gen ( " & (+Self.Fully_Qualified_Name)
+        & ");";
+   end Generate_Random_Strategy;
+
+   function Gen return T is
       function Rand is new GNAT.Random_Numbers.Random_Discrete (T);
    begin
       return Rand (Generator_Instance);
    end Gen;
 
-   function "+" (Text : Unbounded_Text_Type) return String is
-     (To_UTF8 (To_Text (Text)));
-
-   function "+" (Text : Text_Type) return String is
-     (To_UTF8 (Text));
-
-   function Generate_Random_Strategy (Self : Int_Typ) return String
+   function Generate_Static (Self : Signed_Int_Typ) return JSON_Value
    is
-   begin
-      return "function "
-        & Qualified_To_Unique_Name (Self.Type_Name)
-        & " is new TGen.Int_Types.Gen;";
-   end Generate_Random_Strategy;
+      --  TODO: use Long_Long_Long_Integer (as it is the biggest possible type
+      --  for which ranges can be defined), and as support to it in
+      --  GNATCOLL.JSON.
 
-end TGen.Int_Types;
+      package LLLI_Conversions is
+        new Big_Int.Signed_Conversions (Int => Long_Long_Integer);
+
+      type T is new Long_Long_Integer
+      range LLLI_Conversions.From_Big_Integer (Self.Range_Value.Min) ..
+        LLLI_Conversions.From_Big_Integer (Self.Range_Value.Max);
+
+      function Rand is new Gen (T);
+   begin
+      return Create (Long_Long_Integer (Rand));
+   end Generate_Static;
+
+end TGen.Types.Int_Types;

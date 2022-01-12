@@ -23,7 +23,7 @@
 
 with Langkit_Support.Text;
 
-package body TGen.Enum_Types is
+package body TGen.Types.Enum_Types is
 
    package Text renames Langkit_Support.Text;
 
@@ -84,4 +84,4 @@ package body TGen.Enum_Types is
    function High_Bound (Self : Other_Enum_Typ) return Big_Integer is
      (Self.Literals.Last_Key);
 
-end TGen.Enum_Types;
+end TGen.Types.Enum_Types;

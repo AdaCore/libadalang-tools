@@ -2,7 +2,7 @@
 --                                                                          --
 --                                  TGen                                    --
 --                                                                          --
---                       Copyright (C) 2022, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- TGen  is  free software; you can redistribute it and/or modify it  under --
 -- under  terms of  the  GNU General  Public License  as  published by  the --
@@ -23,7 +23,7 @@
 
 with TGen.Types; use TGen.Types;
 
-package TGen.Int_Types is
+package TGen.Types.Int_Types is
 
    type Int_Range is record
       Min, Max : Big_Integer;
@@ -87,4 +87,7 @@ package TGen.Int_Types is
       type T is (<>);
    function Gen return T;
 
-end TGen.Int_Types;
+   overriding function Generate_Static
+     (Self : Signed_Int_Typ) return JSON_Value;
+
+end TGen.Types.Int_Types;

@@ -23,7 +23,7 @@
 
 with TGen.Types; use TGen.Types;
 
-package TGen.Array_Types is
+package TGen.Types.Array_Types is
 
    type Array_Typ is new Composite_Typ with null record;
 
@@ -77,4 +77,4 @@ package TGen.Array_Types is
             and then (Self.Get.Kind in Constrained_Array_Kind);
    pragma Inline (As_Constrained_Array_Typ);
 
-end TGen.Array_Types;
+end TGen.Types.Array_Types;

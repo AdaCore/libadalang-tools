@@ -26,13 +26,16 @@ with Libadalang.Analysis;
 with Ada.Numerics.Big_Numbers.Big_Integers;
 with Ada.Unchecked_Deallocation;
 
+with GNATCOLL.JSON; use GNATCOLL.JSON;
 with GNATCOLL.Refcount; use GNATCOLL.Refcount;
 
-limited with Tgen.Int_Types;
-limited with Tgen.Enum_Types;
-limited with Tgen.Array_Types;
-limited with Tgen.Record_Types;
-limited with TGen.Real_Types;
+limited with Tgen.Types.Array_Types;
+limited with Tgen.Types.Enum_Types;
+limited with Tgen.Types.Int_Types;
+limited with TGen.Types.Real_Types;
+limited with Tgen.Types.Record_Types;
+with TGen.Strings; use TGen.Strings;
+
 package TGen.Types is
 
    package LAL renames Libadalang.Analysis;
@@ -72,12 +75,22 @@ package TGen.Types is
    function Fully_Qualified_Name (Self : Typ) return Text_Type is
      (Self.Name.P_Basic_Decl.P_Fully_Qualified_Name);
 
-   function Parent_Package (Self : Typ) return Text_Type is
+   function Parent_Package_Name (Self : Typ) return Text_Type is
      (Self.Name.P_Basic_Decl.P_Top_Level_Decl (Self.Name.Unit).
           P_Defining_Name.F_Name.Text);
 
+   function Parent_Package_Fully_Qualified_Name
+     (Self : Typ) return Text_Type
+   is
+     (Self.Name.P_Basic_Decl.P_Top_Level_Decl (Self.Name.Unit).
+          P_Fully_Qualified_Name);
+
    function Type_Name (Self : Typ) return Text_Type is
-      (Self.Name.F_Name.Text);
+     (Self.Name.F_Name.Text);
+
+   function Gen_Random_Function_Name
+     (Self : Typ) return String is
+      ("Gen_" & Qualified_To_Unique_Name (Self.Fully_Qualified_Name));
 
    function "<" (L : Typ'Class; R : Typ'Class) return Boolean is
      (L.Name.P_Fully_Qualified_Name < R.Name.P_Fully_Qualified_Name);
@@ -89,6 +102,11 @@ package TGen.Types is
    --  Return the package name this type belongs to
 
    function Generate_Random_Strategy (Self : Typ) return String is ("");
+
+   function Generate_Static (Self : Typ) return JSON_Value;
+   --  Generate statically a value of the given Typ. Default function returns
+   --  an error. Derivation of this function should also generate an error if
+   --  the type is not static.
 
    function Type_Image (Self : Typ) return String is ("");
 
