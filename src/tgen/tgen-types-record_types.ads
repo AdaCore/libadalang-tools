@@ -127,7 +127,7 @@ package TGen.Types.Record_Types is
    procedure Free_Variant (Var : in out Variant_Part_Acc);
 
    package Variant_Choice_Maps is new Ada.Containers.Ordered_Maps
-      (Key_Type => Positive, Element_Type => Variant_Choice);
+     (Key_Type => Positive, Element_Type => Variant_Choice);
 
    type Variant_Part is record
       Discr_Name : LAL.Defining_Name;
@@ -203,10 +203,6 @@ package TGen.Types.Record_Types is
    pragma Inline (As_Discriminated_Record_Typ);
 
    type Integer_Array is array (Integer range <>) of Integer;
-
-   type A (I : Integer) is record
-      T : Integer_Array (1 .. I);
-   end record;
 
    generic
       type Discriminant_Type is (<>);
