@@ -1654,7 +1654,7 @@ package body TGen.Types.Translation is
                    (Translate_Variant_Part (Comp_Decl.F_Variant_Part));
             end if;
 
-            --  If the record is actually a constrained type, reccord the
+            --  If the record is actually a constrained type, record the
             --  constraints now.
 
             if Trans_Res.Constrained then
@@ -1664,18 +1664,20 @@ package body TGen.Types.Translation is
 
             Trans_Res.Name := Type_Name;
 
-            --  Apply_Constraints can actully return a type that isn't
+            --  Apply_Constraints can actually return a type that isn't
             --  discriminated or that isn't constrained, so lets try to
             --  convert Trans_Res to the correct kind depending on the
             --  attributes.
 
-            if Trans_Res.Discriminant_Constraint.Is_Empty then
+            if Trans_Res.Constrained
+              and then Trans_Res.Discriminant_Constraint.Is_Empty
+            then
                if Trans_Res.Discriminant_Types.Is_Empty then
 
                   --  Normally only checking for the discriminant is sufficient
                   --  to check if Trans_Res will is actually a non
                   --  discriminated type, but we may have some lingering non
-                  --  static cosntraints that don't allow us to determine
+                  --  static constraints that don't allow us to determine
                   --  what the final list of components is.
 
                   if Trans_Res.Variant /= null then
