@@ -138,9 +138,16 @@ procedure TGen_App is
          return Over;
       elsif Kind (Node) in Ada_Subp_Decl then
 
-         Generate_Test_Vectors
-           (GC, 10, Extract_Subprogram_Data (Node.As_Basic_Decl));
-         return Over;
+         begin
+            Generate_Test_Vectors
+              (GC, 10, Extract_Subprogram_Data (Node.As_Basic_Decl));
+            return Into;
+         exception
+            when Program_Error =>
+               Put_Line ("Could not generate testcase values for procedure "
+                         & (+Node.As_Subp_Decl.P_Fully_Qualified_Name));
+               return Into;
+         end;
       else
          return Into;
       end if;
