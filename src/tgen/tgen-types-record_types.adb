@@ -312,28 +312,32 @@ package body TGen.Types.Record_Types is
          Str := Str & "; ";
       end loop;
       Str := Str & ")" & LF;
-      if Self.Component_Types.Is_Empty then
-         Str := Str & Padding * Pad & " no components";
+      if Self.Component_Types.Is_Empty and Self.Variant = null then
+         Str := Str & Padding * Pad & " no components" & LF;
       else
-         Current_Component := Self.Component_Types.First;
-         while Has_Element (Current_Component) loop
-            Str :=
-              Str & (Padding + 1) * Pad
-              & Text.Image (Key (Current_Component).Text) & " : ";
-            if Element (Current_Component).Get.Kind in Record_Typ_Range then
-               Str := Str & String'(As_Record_Typ (Element (Current_Component))
+         if not Self.Component_Types.Is_Empty then
+            Current_Component := Self.Component_Types.First;
+            while Has_Element (Current_Component) loop
+               Str :=
+                 Str & (Padding + 1) * Pad
+                 & Text.Image (Key (Current_Component).Text) & " : ";
+               if Element (Current_Component).Get.Kind in Record_Typ_Range then
+                  Str := Str
+                    & String'(As_Record_Typ (Element (Current_Component))
                                        .Image_Internal (Padding + 1));
-            else
-               Str := Str & Element (Current_Component).Get.Image & LF;
-            end if;
-            Next (Current_Component);
-         end loop;
+               else
+                  Str := Str & Element (Current_Component).Get.Image & LF;
+               end if;
+               Next (Current_Component);
+            end loop;
+         end if;
+
          if Self.Variant /= null then
             Str := Str & (Padding + 1) * Pad
-                   & PP_Variant (Self.Variant, Padding + 1);
+              & PP_Variant (Self.Variant, Padding + 1);
          end if;
-         Str := Str & "end record";
       end if;
+      Str := Str & "end record";
       return To_String (Str);
    end Image_Internal;
 
