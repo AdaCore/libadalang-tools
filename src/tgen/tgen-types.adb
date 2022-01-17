@@ -98,10 +98,10 @@ package body TGen.Types is
    -- Generate_Static --
    ---------------------
 
-   function Generate_Static (Self : Typ) return JSON_Value is
+   function Generate_Static (Self : Typ) return String is
    begin
       raise Program_Error with "Static strategy not implemented";
-      return JSON_Null;
+      return "";
    end Generate_Static;
 
    ----------

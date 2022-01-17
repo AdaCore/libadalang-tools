@@ -112,7 +112,7 @@ package TGen.Types.Real_Types is
    function Gen_Float return T;
 
    overriding function Generate_Static
-     (Self : Float_Typ) return JSON_Value;
+     (Self : Float_Typ) return String;
 
    overriding function Generate_Random_Strategy
      (Self : Float_Typ) return String;

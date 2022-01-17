@@ -71,8 +71,7 @@ package body TGen.Types.Real_Types is
         & (+Self.Fully_Qualified_Name) & ");";
    end Generate_Random_Strategy;
 
-   function Generate_Static
-     (Self : Float_Typ) return JSON_Value is
+   function Generate_Static (Self : Float_Typ) return String is
    begin
       if not Self.Is_Static or not Self.Has_Range then
          raise Program_Error with "Cannot generate values for non static type "
@@ -83,7 +82,7 @@ package body TGen.Types.Real_Types is
            range Self.Range_Value.Min .. Self.Range_Value.Max;
          function Rand_Value is new Gen_Float (Float_Type);
       begin
-         return Create (Long_Float (Rand_Value));
+         return Long_Float'Image (Long_Float (Rand_Value));
       end;
    end Generate_Static;
 

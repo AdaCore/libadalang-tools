@@ -22,6 +22,8 @@
 ------------------------------------------------------------------------------
 
 with Ada.Numerics.Big_Numbers.Big_Integers;
+with Ada.Strings;           use Ada.Strings;
+with Ada.Strings.Maps;      use Ada.Strings.Maps;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with Libadalang.Common;
@@ -55,6 +57,11 @@ package body TGen.Types.Record_Types is
       Res         : in out Component_Maps.Map);
    --  Fill Res with the list of components in Self that are present given
    --  a map of discriminant constraints.
+
+   procedure Append_Value_For_Component
+     (Component_Name : LAL.Defining_Name;
+      Value          : String;
+      Rec            : in out Unbounded_String);
 
    -----------
    -- Image --
@@ -90,6 +97,60 @@ package body TGen.Types.Record_Types is
       end if;
       return To_String (Str);
    end Image_Internal;
+
+   --------------------------------
+   -- Append_Value_For_Component --
+   --------------------------------
+
+   procedure Append_Value_For_Component
+     (Component_Name : LAL.Defining_Name;
+      Value          : String;
+      Rec            : in out Unbounded_String) is
+   begin
+      Append (Rec, +Component_Name.F_Name.Text);
+      Append (Rec, " => ");
+      Append (Rec, Value);
+      Append (Rec, ", ");
+   end Append_Value_For_Component;
+
+   ---------------------
+   -- Generate_Static --
+   ---------------------
+
+   function Generate_Static (Self : Record_Typ) return String is
+      use Component_Maps;
+      Result : Unbounded_String;
+   begin
+      for C in Self.Component_Types.Iterate loop
+         declare
+            Component_Name : LAL.Defining_Name := Key (C);
+            Component_Type : Typ'Class := Element (C).Get;
+         begin
+            Append_Value_For_Component
+              (Component_Name,
+               Component_Type.Generate_Static,
+               Result);
+         end;
+      end loop;
+      return +Result;
+   end Generate_Static;
+
+   ---------------------
+   -- Generate_Static --
+   ---------------------
+
+   function Generate_Static (Self : Nondiscriminated_Record_Typ) return String
+   is
+      Result : Unbounded_String;
+      Generated_Value : String := Record_Typ'Class (Self).Generate_Static;
+   begin
+      Append (Result, "(");
+      Append (Result, Generated_Value);
+      Trim (Result, Right);
+      Trim (Result, Null_Set, To_Set (','));
+      Append (Result, ")");
+      return +Result;
+   end Generate_Static;
 
    ------------------
    -- Free_Variant --
@@ -351,6 +412,52 @@ package body TGen.Types.Record_Types is
          Free_Variant (Self.Variant);
       end if;
    end Free_Content;
+
+   function Generate_Static
+     (Self : Discriminated_Record_Typ) return String
+   is
+      Record_Components : Component_Maps.Map;
+      Discriminant_Values : Discriminant_Constraint_Maps.Map;
+      Result : Unbounded_String;
+      use Component_Maps;
+      use Ada.Numerics.Big_Numbers.Big_Integers;
+   begin
+      Append (Result, "(");
+      for C in Self.Discriminant_Types.Iterate loop
+         declare
+            A : Big_Integer;
+            Discriminant_Name : LAL.Defining_Name :=  Key (C);
+            Discriminant_Typ : Typ'Class := Element (C).Get;
+            Generated_Value : String := Discriminant_Typ.Generate_Static;
+         begin
+            Discriminant_Values.Insert
+              (Discriminant_Name,
+               Constraint_Value'
+                 (Kind => Static,
+                  Int_Val => From_String (Generated_Value)));
+            Append_Value_For_Component
+              (Discriminant_Name,
+               Generated_Value,
+               Result);
+         end;
+      end loop;
+
+      Record_Components := Components (Self, Discriminant_Values);
+      declare
+         Record_Shape : Typ'Class :=
+           Record_Typ'
+             (Name => Self.Name, Component_Types => Record_Components);
+         Generated_Value : String := Record_Shape.Generate_Static;
+      begin
+         Append (Result, Generated_Value);
+      end;
+
+      Trim (Result, Right);
+      Trim (Result, Null_Set, To_Set (','));
+      Append (Result, ")");
+
+      return +Result;
+   end Generate_Static;
 
    package body Random_Discriminated_Record_Strategy is
 

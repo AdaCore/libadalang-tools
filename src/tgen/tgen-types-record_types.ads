@@ -70,6 +70,11 @@ package TGen.Types.Record_Types is
 
    function Image (Self : Record_Typ) return String;
 
+   overriding function Generate_Static (Self : Record_Typ) return String;
+   --  Static generation for record types. Return an unusable value as it has
+   --  an ending "," that needs to be removed afterwards. Is used for code
+   --  factoring purposes.
+
    function Image_Internal
      (Self    : Record_Typ;
       Padding : Natural := 0) return String;
@@ -92,6 +97,9 @@ package TGen.Types.Record_Types is
      Pre => (not SP.Is_Null (Self))
             and then (Self.Get.Kind in Non_Disc_Record_Kind);
    pragma Inline (As_Nondiscriminated_Record_Typ);
+
+   overriding function Generate_Static
+     (Self : Nondiscriminated_Record_Typ) return String;
 
    type Discriminant_Choice_Entry is record
       Defining_Name : LAL.Defining_Name;
@@ -186,6 +194,9 @@ package TGen.Types.Record_Types is
    --  be determined from the list of discriminant values.
 
    function Image (Self : Discriminated_Record_Typ) return String;
+
+   overriding function Generate_Static
+     (Self : Discriminated_Record_Typ) return String;
 
    function Image_Internal
      (Self : Discriminated_Record_Typ; Padding : Natural := 0) return String;

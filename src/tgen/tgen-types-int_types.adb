@@ -71,7 +71,7 @@ package body TGen.Types.Int_Types is
       return Rand (Generator_Instance);
    end Gen;
 
-   function Generate_Static (Self : Signed_Int_Typ) return JSON_Value
+   function Generate_Static (Self : Signed_Int_Typ) return String
    is
       --  TODO: use Long_Long_Long_Integer (as it is the biggest possible type
       --  for which ranges can be defined), and as support to it in
@@ -86,7 +86,7 @@ package body TGen.Types.Int_Types is
 
       function Rand is new Gen (T);
    begin
-      return Create (Long_Long_Integer (Rand));
+      return Long_Long_Integer'Image (Long_Long_Integer (Rand));
    end Generate_Static;
 
 end TGen.Types.Int_Types;

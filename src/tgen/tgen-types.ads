@@ -103,10 +103,11 @@ package TGen.Types is
 
    function Generate_Random_Strategy (Self : Typ) return String is ("");
 
-   function Generate_Static (Self : Typ) return JSON_Value;
-   --  Generate statically a value of the given Typ. Default function returns
-   --  an error. Derivation of this function should also generate an error if
-   --  the type is not static.
+   function Generate_Static (Self : Typ) return String;
+   --  Generate statically a value of the given Typ and returns its string
+   --  representation, so that it can be inlined in a program that want to use
+   --  it. Default function returns an error. Derivation of this function
+   --  should also generate an error if the type is not static.
 
    function Type_Image (Self : Typ) return String is ("");
 

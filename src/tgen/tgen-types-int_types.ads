@@ -88,6 +88,6 @@ package TGen.Types.Int_Types is
    function Gen return T;
 
    overriding function Generate_Static
-     (Self : Signed_Int_Typ) return JSON_Value;
+     (Self : Signed_Int_Typ) return String;
 
 end TGen.Types.Int_Types;
