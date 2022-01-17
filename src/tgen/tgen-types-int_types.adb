@@ -68,7 +68,7 @@ package body TGen.Types.Int_Types is
    function Gen return T is
       function Rand is new GNAT.Random_Numbers.Random_Discrete (T);
    begin
-      return Rand (Generator_Instance);
+      return Rand (Generator_Instance, T'First, T'Last);
    end Gen;
 
    function Generate_Static (Self : Signed_Int_Typ) return String
