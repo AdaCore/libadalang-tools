@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$id": "unit_testcases.schema.json",
+  "title": "Unit testcases",
+  "@comment": "Testcases for a whole Ada unit",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "subp_id": {
+        "$comment": "a unique identifier for the subprogram, passed to TGen when asked to generate testcases",
+        "type": "number"
+      },
+      "subp_name": {
+        "$comment": "Simple name for human readability",
+        "type": "string"
+      },
+      "testcases": {
+        "@comment": "Testcases for a single subprogram",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "params": {
+              "type": "array",
+              "$comment":"There should be one item for each of the parameters of the subprogram",
+              "items": {
+                "$comment": "A param of the subprogram, with value if it is an 'in' or 'inout' param",
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "mode": {
+                    "enum": ["in", "inout", "out"]
+                  },
+                  "value": {
+                    "$comment": "This should be a valid Ada expression for the parameter. '-- FILL ME' indicates that the value should be filed by the user",
+                    "type": "string"
+                  }
+                },
+                "if": {
+                  "properties": {
+                    "mode": {
+                      "enum": ["in", "inout"]
+                    }
+                  },
+                  "required": ["name", "mode"]
+                },
+                "then": {
+                  "required": ["value"]
+                },
+                "else": {
+                  "required": ["name", "mode"]
+                }
+              }
+            },
+            "return_name": {
+              "$comment": "the name to give to the variable accepting the return value of the function, if any",
+              "type": "string"
+            },
+            "requires": {
+              "$comment": "A valid Ada boolean expression to check the validity of the outputs of the subprogram.",
+              "type": "string"
+            }
+          },
+          "required": ["params"]
+        }
+      }
+    },
+    "required": ["subp_id", "subp_name", "testcases"]
+  }
+}

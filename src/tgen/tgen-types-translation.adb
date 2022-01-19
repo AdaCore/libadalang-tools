@@ -23,6 +23,7 @@
 
 with Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Strings.Unbounded;
 with Ada.Containers.Hashed_Maps;
 
 with GNATCOLL.GMP.Integers;
@@ -115,12 +116,18 @@ package body TGen.Types.Translation is
       --  translation
 
    function Translate_Variant_Part
-     (Node : LAL.Variant_Part) return Record_Types.Variant_Part with
-   Pre => (not Node.Is_Null);
+     (Node          : LAL.Variant_Part;
+      Discriminants : Component_Maps.Map)
+     return Record_Types.Variant_Part with
+     Pre => (not Node.Is_Null);
 
-   --  procedure Apply_Index_Constraints
-   --    (Arr_Typ : Constrained_Array_Typ,
-   --     )
+   procedure Subtract_Choice_From_Other
+     (Others_Cur : Variant_Choice_Maps.Cursor;
+      Choice     : Variant_Choice;
+      Map        : in out Variant_Choice_Maps.Map);
+   --  Subtract the Integer ranges that correspond to the matching alternatives
+   --  in Choice.Alternatives_Set from the corresponding set in the variant
+   --  choice denoted by Others_Cur
 
    function Translate_Record_Decl
      (Decl      : Base_Type_Decl;
@@ -1419,6 +1426,160 @@ package body TGen.Types.Translation is
       end return;
    end Apply_Record_Derived_Type_Decl;
 
+   --------------------------------
+   -- Subtract_Choice_From_Other --
+   --------------------------------
+
+   procedure Subtract_Choice_From_Other
+     (Others_Cur : Variant_Choice_Maps.Cursor;
+      Choice     : Variant_Choice;
+      Map        : in out Variant_Choice_Maps.Map)
+   is
+      use Alternatives_Sets;
+      New_Set : Alternatives_Sets.Set;
+      Cur_Alt : Cursor := Choice.Alternatives_Set.First;
+      Cur_Others_Segment : Cursor;
+
+      type Subtraction_Result is array (Positive range <>) of Int_Range;
+
+      procedure Update_Set (Key : Positive; Other_Var : in out Variant_Choice);
+
+      procedure Get_Set (Key : Positive; Other_Var : in out Variant_Choice);
+
+      function Overlap (L, R : Int_Range) return Boolean;
+
+      function "-" (L : Int_Range; R : Int_Range) return Subtraction_Result;
+
+      -------------
+      -- Get_Set --
+      -------------
+
+      procedure Get_Set (Key : Positive; Other_Var : in out Variant_Choice) is
+      begin
+         New_Set.Move (Other_Var.Alternatives_Set);
+      end Get_Set;
+
+      ----------------
+      -- Update_Set --
+      ----------------
+
+      procedure Update_Set
+        (Key : Positive; Other_Var : in out Variant_Choice)
+      is
+      begin
+         Other_Var.Alternatives_Set.Move (New_Set);
+      end Update_Set;
+
+      -------------
+      -- Overlap --
+      -------------
+
+      function Overlap (L, R : Int_Range) return Boolean is
+         use Big_Int;
+      begin
+         return R.Min <= L.Max and then L.Min <= R.Max;
+      end Overlap;
+
+      ---------
+      -- "-" --
+      ---------
+
+      function "-" (L : Int_Range; R : Int_Range) return Subtraction_Result is
+         use Big_Int;
+         One : constant Big_Integer := To_Big_Integer (1);
+      begin
+         if not Overlap (L, R) then
+            return (1 => L);
+         elsif R.Min <= L.Min  and then L.Max <= R.Max then
+            return (1 .. 0 => <>);
+         elsif L.Min < R.Min
+              and then R.Min <= L.Max
+              and then L.Max <= R.Max
+         then
+            return (1 => (Min => L.Min, Max => R.Min - One));
+         elsif R.Min <= L.Min
+              and then L.Min <= R.Max
+              and then R.Max < L.Max
+         then
+            return (1 => (Min => R.Max + One, Max => L.Max));
+         else
+            return (1 => (Min => L.Min, Max => R.Min - One),
+                    2 => (Min => R.Max + One, Max => L.Max));
+         end if;
+      end "-";
+   begin
+      --  Get the map so it is easier to modify
+      Map.Update_Element (Others_Cur, Get_Set'Access);
+
+      Cur_Others_Segment := New_Set.First;
+
+      while Has_Element (Cur_Alt) loop
+         --  Move the cursor in the "others" set until we have an intersection
+         --  or we are past the current alternative range
+
+         while Has_Element (Cur_Others_Segment)
+              and then not Overlap
+                             (Element (Cur_Others_Segment), Element (Cur_Alt))
+              and then Element (Cur_Others_Segment) < Element (Cur_Alt)
+         loop
+            Next (Cur_Others_Segment);
+         end loop;
+
+         exit when not Has_Element (Cur_Others_Segment);
+
+         declare
+            Sub_Res : constant Subtraction_Result :=
+              Element (Cur_Others_Segment) - Element (Cur_Alt);
+            --  Compute difference
+
+            Delete_Cur : Cursor := Cur_Others_Segment;
+            --  Save current position to delete the current range if needed
+
+            New_Elt_Cur : Cursor;
+            Inserted : Boolean;
+         begin
+            if Sub_Res'Length /= 0 then
+
+               --  Here if there is an intersection between the current others
+               --  range and the current alternative range. Prefetch the next
+               --  others range and delete the current others range.
+
+               Next (Cur_Others_Segment);
+               New_Set.Delete (Delete_Cur);
+
+               if Sub_Res'Length = 1 then
+
+                  --  Single element from the difference, it is either before
+                  --  the current alternative range or after.
+                  --  If it is after however, it will be befor what we
+                  --  currently have in Cur_Others_Segment, so it needs to be
+                  --  the next range to to be checked against the next
+                  --  alternative range.
+
+                  New_Set.Insert (Sub_Res (1), New_Elt_Cur, Inserted);
+                  if Sub_Res (1) < Element (Cur_Others_Segment) then
+                     Cur_Others_Segment := New_Elt_Cur;
+                  end if;
+               else
+                  --  If there are two ranges resulting from the difference,
+                  --  then we have both cases described above, and we already
+                  --  know that the next element that needs to be processed is
+                  --  Sub_Res (2), so update Cur_Others_Segment to point to it.
+
+                  New_Set.Insert (Sub_Res (1));
+                  New_Set.Insert (Sub_Res (2), Cur_Others_Segment, Inserted);
+               end if;
+            end if;
+         end;
+         Next (Cur_Alt);
+      end loop;
+
+      --  Store back the map in the variant_choice record.
+
+      Map.Update_Element (Others_Cur, Update_Set'Access);
+
+   end Subtract_Choice_From_Other;
+
    -----------------------------------
    -- Transalte_Component_Decl_List --
    -----------------------------------
@@ -1446,10 +1607,17 @@ package body TGen.Types.Translation is
    end Translate_Component_Decl_List;
 
    function Translate_Variant_Part
-     (Node : LAL.Variant_Part) return Record_Types.Variant_Part
+     (Node          : LAL.Variant_Part;
+      Discriminants : Component_Maps.Map)
+     return Record_Types.Variant_Part
    is
+      use Variant_Choice_Maps;
       Res        : Record_Types.Variant_Part;
       Choice_Num : Positive := 1;
+      Choice_Min : Big_Int.Big_Integer;
+      Choice_Max : Big_Int.Big_Integer;
+      Others_Cur : Cursor := No_Element;
+      Inserted   : Boolean := False;
    begin
       Res.Discr_Name := Node.F_Discr_Name.P_Referenced_Defining_Name;
 
@@ -1471,15 +1639,64 @@ package body TGen.Types.Translation is
                  & To_String (Diagnostics);
             end if;
             Choice_Trans.Alternatives := Var_Choice.F_Choices;
+            for Alt of Var_Choice.F_Choices loop
+               case Alt.Kind is
+                  when Ada_Bin_Op =>
+                     Choice_Min := Big_Int.From_String
+                       (Alt.As_Bin_Op.F_Left.P_Eval_As_Int.Image);
+                     Choice_Max := Big_Int.From_String
+                       (Alt.As_Bin_Op.F_Right.P_Eval_As_Int.Image);
+                     Choice_Trans.Alternatives_Set.Insert
+                        ((Min => Choice_Min, Max => Choice_Max));
+                  when Ada_Expr'First .. Ada_Null_Record_Aggregate
+                      | Ada_Relation_Op .. Ada_Un_Op =>
+                     Choice_Min := Big_Int.From_String
+                       (Alt.As_Expr.P_Eval_As_Int.Image);
+                     Choice_Trans.Alternatives_Set.Insert
+                       ((Min => Choice_Min, Max => Choice_Min));
+                  when Ada_Others_Designator_Range =>
+                     Choice_Trans.Alternatives_Set.Clear;
+                     if not Component_Maps.Has_Element
+                          (Discriminants.Find (Res.Discr_Name))
+                     then
+                        raise Translation_Error with
+                          "Unknown discriminant name";
+                     end if;
+
+                     --  This is not realy accurate for enum types if the
+                     --  various enum litteral positions are not contiguous.
+
+                     Choice_Trans.Alternatives_Set.Insert
+                       ((Min => As_Discrete_Typ
+                           (Discriminants.Element (Res.Discr_Name)).Low_Bound,
+                         Max => As_Discrete_Typ
+                           (Discriminants.Element (Res.Discr_Name)).High_Bound)
+                       );
+                  when others =>
+                     raise Translation_Error with
+                       "Unexpected node kind for a variant choice" & Alt.Image;
+               end case;
+               exit when Alt.Kind in Ada_Others_Designator_Range;
+            end loop;
             if Has_Variant then
                Choice_Trans.Variant := new Record_Types.Variant_Part'
                    (Translate_Variant_Part (Var_Choice.As_Variant
-                    .F_Components.F_Variant_Part));
+                    .F_Components.F_Variant_Part, Discriminants));
             end if;
-            Res.Variant_Choices.Insert (Choice_Num, Choice_Trans);
+            Res.Variant_Choices.Insert
+              (Choice_Num, Choice_Trans, Others_Cur, Inserted);
             Choice_Num := Choice_Num + 1;
          end;
       end loop;
+
+      if Has_Element (Others_Cur) then
+         for Choice_Cur in Res.Variant_Choices.Iterate loop
+            exit when Choice_Cur = Others_Cur;
+            Subtract_Choice_From_Other
+              (Others_Cur, Element (Choice_Cur), Res.Variant_Choices);
+         end loop;
+      end if;
+
       return Res;
    end Translate_Variant_Part;
 
@@ -1651,7 +1868,8 @@ package body TGen.Types.Translation is
             if not Comp_Decl.F_Variant_Part.Is_Null then
                Trans_Res.Variant :=
                  new Record_Types.Variant_Part'
-                   (Translate_Variant_Part (Comp_Decl.F_Variant_Part));
+                   (Translate_Variant_Part
+                     (Comp_Decl.F_Variant_Part, Trans_Res.Discriminant_Types));
             end if;
 
             --  If the record is actually a constrained type, record the

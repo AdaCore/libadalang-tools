@@ -29,6 +29,14 @@ package TGen.Types.Int_Types is
       Min, Max : Big_Integer;
    end record;
 
+   function "<" (L, R : Int_Range) return Boolean is
+     (if Big_Int."=" (L.Min, R.Min)
+      then Big_Int."<" (L.Max, R.Max)
+      else Big_Int."<" (L.Min, R.Min));
+
+   function "=" (L, R : Int_Range) return Boolean is
+     (Big_Int."=" (L.Min, R.Min) and then Big_Int."=" (L.Max, R.Max));
+
    type Int_Typ is new Discrete_Typ with null record;
 
    overriding function Generate_Random_Strategy (Self : Int_Typ) return String;

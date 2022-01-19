@@ -122,12 +122,19 @@ package TGen.Types.Record_Types is
    --  key. For enumeration types used as discriminants, this is the 'Pos value
    --  of the corresponding literal.
 
+   package Alternatives_Sets is new Ada.Containers.Ordered_Sets (
+     Element_Type => TGen.Types.Int_Types.Int_Range,
+     "<"          => TGen.Types.Int_Types."<",
+     "="          => TGen.Types.Int_Types."="
+   );
+
    type Variant_Part;
 
    type Variant_Part_Acc is access Variant_Part;
 
    type Variant_Choice is record
       Alternatives : LAL.Alternatives_List;
+      Alternatives_Set : Alternatives_Sets.Set;
       Components : Component_Maps.Map;
       Variant : Variant_Part_Acc;
    end record;
