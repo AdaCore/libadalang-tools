@@ -1642,12 +1642,19 @@ package body TGen.Types.Translation is
             for Alt of Var_Choice.F_Choices loop
                case Alt.Kind is
                   when Ada_Bin_Op =>
-                     Choice_Min := Big_Int.From_String
-                       (Alt.As_Bin_Op.F_Left.P_Eval_As_Int.Image);
-                     Choice_Max := Big_Int.From_String
-                       (Alt.As_Bin_Op.F_Right.P_Eval_As_Int.Image);
-                     Choice_Trans.Alternatives_Set.Insert
-                        ((Min => Choice_Min, Max => Choice_Max));
+                     if Alt.As_Bin_Op.F_Op.Kind in Ada_Op_Double_Dot then
+                        Choice_Min := Big_Int.From_String
+                          (Alt.As_Bin_Op.F_Left.P_Eval_As_Int.Image);
+                        Choice_Max := Big_Int.From_String
+                         (Alt.As_Bin_Op.F_Right.P_Eval_As_Int.Image);
+                        Choice_Trans.Alternatives_Set.Insert
+                          ((Min => Choice_Min, Max => Choice_Max));
+                     else
+                        Choice_Min := Big_Int.From_String
+                          (Alt.As_Expr.P_Eval_As_Int.Image);
+                        Choice_Trans.Alternatives_Set.Insert
+                          ((Min => Choice_Min, Max => Choice_Min));
+                     end if;
                   when Ada_Expr'First .. Ada_Null_Record_Aggregate
                       | Ada_Relation_Op .. Ada_Un_Op =>
                      Choice_Min := Big_Int.From_String
