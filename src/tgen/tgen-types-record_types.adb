@@ -21,15 +21,22 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Containers; use Ada.Containers;
+with Ada.Containers.Doubly_Linked_Lists;
+
 with Ada.Numerics.Big_Numbers.Big_Integers;
 with Ada.Strings;           use Ada.Strings;
+with Ada.Strings.Fixed;     use Ada.Strings.Fixed;
 with Ada.Strings.Maps;      use Ada.Strings.Maps;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with Libadalang.Common;
+with Libadalang.Expr_Eval; use Libadalang.Expr_Eval;
 with Langkit_Support.Text;
 
 with GNATCOLL.GMP.Integers;
+
+with TGen.Context; use TGen.Context;
 
 package body TGen.Types.Record_Types is
 
@@ -302,6 +309,81 @@ package body TGen.Types.Record_Types is
       end loop;
    end Fill_Components;
 
+   type A (I : Integer) is record
+      case I is
+         when 1 .. 2 | 3 =>
+            null;
+         when others =>
+            null;
+      end case;
+   end record;
+
+   type B (I : Character) is record
+      case I is
+         when others =>
+            null;
+      end case;
+   end record;
+
+   function "+" (I : GNATCOLL.GMP.Integers.Big_Integer) return Big_Integer is
+     (Big_Int.From_String (GNATCOLL.GMP.Integers.Image (I)));
+
+   --  function Interval_Of_Alternative (Alt : Expr) return Interval;
+   --
+   --  function Interval_Of_Alternative (Alt : Expr) return Interval is
+   --     use Libadalang.Common;
+   --     L : Big_Integer;
+   --     R : Big_Integer;
+   --  begin
+   --
+   --     --  Special cases
+   --
+   --     case Alt.Kind is
+   --        when Ada_Bin_Op =>
+   --           case Alt.As_Bin_Op.F_Op is
+   --
+   --              --  Range
+   --
+   --              when Ada_Op_Double_Dot =>
+   --                 L := +As_Int (Expr_Eval (Alt.As_Bin_Op.F_Left));
+   --                 R := +As_Int (Expr_Eval (Alt.As_Bin_Op.F_Right));
+   --                 return Interval'(Int, L, R);
+   --              when others => null;
+   --           end case;
+   --        when others => null;
+   --     end case;
+   --
+   --     --  Default: evaluation of the node and singleton interval
+   --
+   --     L := +As_Int (Expr_Eval (Alt));
+   --     return Interval'(Int, L, L);
+   --  end Interval_Of_Alternative;
+   --
+   --  function Intervals_Of_Variant
+   --    (Disc_Record       : Discriminated_Record_Typ;
+   --     Covered_Intervals : Interval_Set;
+   --     Variant_Part      : Variant_Part;
+   --     Choice            : Variant_Choice) return Interval_Set;
+   --
+   --  function Intervals_Of_Variant
+   --    (Disc_Record       : Discriminated_Record_Typ;
+   --     Covered_Intervals : Interval_Set;
+   --     Variant_Part      : Variant_Part;
+   --     Choice            : Variant_Choice) return Interval_Set is
+   --     Result : Interval_Set;
+   --  begin
+   --     for Alt of Choice.Alternatives loop
+   --        if Alt.Kind = Ada_Others_Designator then
+   --           for Interval of Covered_Intervals loop
+   --              null;
+   --           end loop;
+   --        else
+   --           Result.Insert (Interval_Of_Alternative (Alt.As_Expr));
+   --        end if;
+   --     end loop;
+   --     return Result;
+   --  end Intervals_Of_Variant;
+
    ----------------
    -- PP_Variant --
    ----------------
@@ -413,6 +495,29 @@ package body TGen.Types.Record_Types is
       end if;
    end Free_Content;
 
+   Has_Generated_Shapes : Boolean := False;
+   Generated_Shapes : String_Set;
+   Last_Generated_Shape : Count_Type := 0;
+
+   package Alternative_Constraint_Maps is new Ada.Containers.Ordered_Maps
+     (Key_Type => LAL.Defining_Name,
+      Element_Type => Alternatives_Set,
+      "="          => Alternatives_Sets."=");
+   subtype Alternative_Constraint_Map is Alternative_Constraint_Maps.Map;
+
+   function Generate_All_Shapes
+     (Components       : Component_Map;
+      Disc_Constraints : Alternative_Constraint_Map;
+      Variant          : Variant_Part_Acc) return String_Set;
+
+   function Generate_All_Shapes_Wrapper
+     (Components       : Component_Map;
+      Disc_Constraints : Alternative_Constraint_Map;
+      Variant          : Variant_Part_Acc) return String_Set;
+   --  Function that generates records of all the possible shapes. If this
+   --  record has records as component, it will not generate all the possible
+   --  shapes for the subrecord. TODO: think about this.
+
    function Generate_Static
      (Self : Discriminated_Record_Typ) return String
    is
@@ -421,7 +526,28 @@ package body TGen.Types.Record_Types is
       Result : Unbounded_String;
       use Component_Maps;
       use Ada.Numerics.Big_Numbers.Big_Integers;
+      use type Ada.Containers.Count_Type;
    begin
+      if not Has_Generated_Shapes then
+         Generated_Shapes :=
+           Generate_All_Shapes_Wrapper
+             (Self.Component_Types,
+              Alternative_Constraint_Maps.Empty_Map,
+              Self.Variant);
+      end if;
+      if Last_Generated_Shape < Generated_Shapes.Length then
+         declare
+            I : Count_Type := 0;
+         begin
+            for Shape of Generated_Shapes loop
+               if I = Last_Generated_Shape then
+                  Last_Generated_Shape := Last_Generated_Shape + 1;
+                  return Shape;
+               end if;
+               I := I + 1;
+            end loop;
+         end;
+      end if;
       Append (Result, "(");
       for C in Self.Discriminant_Types.Iterate loop
          declare
@@ -458,6 +584,123 @@ package body TGen.Types.Record_Types is
 
       return +Result;
    end Generate_Static;
+
+   function Generate_Value_In_Alternatives
+     (Alt_Set : Alternatives_Set) return Big_Integer;
+   --  Pulls a value from a list of sets. TODO: make it random
+
+   function Generate_Value_In_Alternatives
+     (Alt_Set : Alternatives_Set) return Big_Integer is
+   begin
+      return Alt_Set.First_Element.Min;
+   end Generate_Value_In_Alternatives;
+
+   function Generate_All_Shapes
+     (Components       : Component_Map;
+      Disc_Constraints : Alternative_Constraint_Map;
+      Variant          : Variant_Part_Acc) return String_Set
+   is
+      use Alternative_Constraint_Maps;
+      use Component_Maps;
+      use Ada.Numerics.Big_Numbers.Big_Integers;
+      Result : String_Set;
+   begin
+
+      --  If the variant is null, we reached a leaf of the record. Use the
+      --  discriminant constraints and the list of components to generate the
+      --  expected shape.
+
+      if Variant = null then
+
+         declare
+            Res : Unbounded_String;
+         begin
+
+            --  First, let's take care of the discriminants. Simply, we
+            --  generate the first value of the first interval for each
+            --  discriminant constraint (TODO: pull a random value in the list
+            --  of intervals).
+
+            for Disc_Constraint in Disc_Constraints.Iterate loop
+               declare
+                  Disc_Name : LAL.Defining_Name :=
+                    Key (Disc_Constraint);
+                  Alt_Set : Alternatives_Set :=
+                    Element (Disc_Constraint);
+               begin
+                  Append_Value_For_Component
+                    (Disc_Name,
+                     To_String (Generate_Value_In_Alternatives (Alt_Set)),
+                     Res);
+               end;
+            end loop;
+
+            --  Then, generate all the values for the components
+
+            for Comp in Components.Iterate loop
+               declare
+                  Comp_Name : LAL.Defining_Name := Key (Comp);
+                  Comp_Typ  : Typ'Class := Element (Comp).Get;
+               begin
+                  Append_Value_For_Component
+                    (Comp_Name,
+                     Comp_Typ.Generate_Static,
+                     Res);
+               end;
+            end loop;
+
+            return String_Sets.To_Set (+Res);
+         end;
+
+      end if;
+
+      for Variant_Choice of Variant.Variant_Choices loop
+
+         declare
+
+            Extended_Components : Component_Map := Components.Copy;
+            Extended_Constraints : Alternative_Constraint_Map :=
+              Disc_Constraints.Copy;
+         begin
+         --  We have the interval values for this variant choice: put
+         --  them in the Disc_Constraints.
+
+            Extended_Constraints.Insert
+              (Variant.Discr_Name,
+               Variant_Choice.Alt_Set);
+
+            --  Insert the new components
+
+            for Comp in Variant_Choice.Components.Iterate loop
+               Extended_Components.Insert (Key (Comp), Element (Comp));
+            end loop;
+
+            Result.Union
+              (Generate_All_Shapes
+                 (Extended_Components,
+                  Extended_Constraints,
+                  Variant_Choice.Variant));
+         end;
+      end loop;
+      return Result;
+   end Generate_All_Shapes;
+
+   function Generate_All_Shapes_Wrapper
+     (Components       : Component_Map;
+      Disc_Constraints : Alternative_Constraint_Map;
+      Variant          : Variant_Part_Acc) return String_Set
+   is
+      Shapes : String_Set :=
+        Generate_All_Shapes (Components, Disc_Constraints, Variant);
+      Result : String_Set;
+   begin
+      for Shape of Shapes loop
+         Result.Insert ("("
+                        & Trim (Trim (Shape, Right), Null_Set, To_Set (','))
+                        & ")");
+      end loop;
+      return Result;
+   end Generate_All_Shapes_Wrapper;
 
    package body Random_Discriminated_Record_Strategy is
 

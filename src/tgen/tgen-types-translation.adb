@@ -126,7 +126,7 @@ package body TGen.Types.Translation is
       Choice     : Variant_Choice;
       Map        : in out Variant_Choice_Maps.Map);
    --  Subtract the Integer ranges that correspond to the matching alternatives
-   --  in Choice.Alternatives_Set from the corresponding set in the variant
+   --  in Choice.Alt_Set from the corresponding set in the variant
    --  choice denoted by Others_Cur
 
    function Translate_Record_Decl
@@ -1436,8 +1436,8 @@ package body TGen.Types.Translation is
       Map        : in out Variant_Choice_Maps.Map)
    is
       use Alternatives_Sets;
-      New_Set : Alternatives_Sets.Set;
-      Cur_Alt : Cursor := Choice.Alternatives_Set.First;
+      New_Set : Alternatives_Set;
+      Cur_Alt : Cursor := Choice.Alt_Set.First;
       Cur_Others_Segment : Cursor;
 
       type Subtraction_Result is array (Positive range <>) of Int_Range;
@@ -1456,7 +1456,7 @@ package body TGen.Types.Translation is
 
       procedure Get_Set (Key : Positive; Other_Var : in out Variant_Choice) is
       begin
-         New_Set.Move (Other_Var.Alternatives_Set);
+         New_Set.Move (Other_Var.Alt_Set);
       end Get_Set;
 
       ----------------
@@ -1467,7 +1467,7 @@ package body TGen.Types.Translation is
         (Key : Positive; Other_Var : in out Variant_Choice)
       is
       begin
-         Other_Var.Alternatives_Set.Move (New_Set);
+         Other_Var.Alt_Set.Move (New_Set);
       end Update_Set;
 
       -------------
@@ -1647,22 +1647,22 @@ package body TGen.Types.Translation is
                           (Alt.As_Bin_Op.F_Left.P_Eval_As_Int.Image);
                         Choice_Max := Big_Int.From_String
                          (Alt.As_Bin_Op.F_Right.P_Eval_As_Int.Image);
-                        Choice_Trans.Alternatives_Set.Insert
+                        Choice_Trans.Alt_Set.Insert
                           ((Min => Choice_Min, Max => Choice_Max));
                      else
                         Choice_Min := Big_Int.From_String
                           (Alt.As_Expr.P_Eval_As_Int.Image);
-                        Choice_Trans.Alternatives_Set.Insert
+                        Choice_Trans.Alt_Set.Insert
                           ((Min => Choice_Min, Max => Choice_Min));
                      end if;
                   when Ada_Expr'First .. Ada_Null_Record_Aggregate
                       | Ada_Relation_Op .. Ada_Un_Op =>
                      Choice_Min := Big_Int.From_String
                        (Alt.As_Expr.P_Eval_As_Int.Image);
-                     Choice_Trans.Alternatives_Set.Insert
+                     Choice_Trans.Alt_Set.Insert
                        ((Min => Choice_Min, Max => Choice_Min));
                   when Ada_Others_Designator_Range =>
-                     Choice_Trans.Alternatives_Set.Clear;
+                     Choice_Trans.Alt_Set.Clear;
                      if not Component_Maps.Has_Element
                           (Discriminants.Find (Res.Discr_Name))
                      then
@@ -1673,7 +1673,7 @@ package body TGen.Types.Translation is
                      --  This is not realy accurate for enum types if the
                      --  various enum litteral positions are not contiguous.
 
-                     Choice_Trans.Alternatives_Set.Insert
+                     Choice_Trans.Alt_Set.Insert
                        ((Min => As_Discrete_Typ
                            (Discriminants.Element (Res.Discr_Name)).Low_Bound,
                          Max => As_Discrete_Typ

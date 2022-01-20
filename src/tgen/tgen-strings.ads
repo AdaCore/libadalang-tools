@@ -45,6 +45,7 @@ package TGen.Strings is
      (Element_Type => String,
       "<" => Ada.Strings.Less_Case_Insensitive,
       "=" => Ada.Strings.Equal_Case_Insensitive);
+   subtype String_Set is String_Sets.Set;
 
    package String_Vectors is new Ada.Containers.Vectors
      (Index_Type   => Positive,

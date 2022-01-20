@@ -56,6 +56,7 @@ package TGen.Types.Record_Types is
       Hash            => Hash_Defining_Name,
       Equivalent_Keys => Equivalent_Keys,
       "="             => SP."=");
+   subtype Component_Map is Component_Maps.Map;
    --  Maps for discriminants and components, from their defining name to
    --  their type translation. Since the order of the elements in these maps is
    --  not specified, initialyzing a record with a positional aggregate will
@@ -106,6 +107,38 @@ package TGen.Types.Record_Types is
       Choices       : LAL.Alternatives_List;
    end record;
 
+   type Interval_Kind is (Int, Float);
+
+   type Interval (Kind : Interval_Kind := Int) is record
+      case Kind is
+         when Int =>
+            Min_Value : Big_Integer;
+            Max_Value : Big_Integer;
+         when others =>
+            null;
+      end case;
+   end record;
+
+   use type Big_Integer;
+
+   function "=" (L, R : Interval) return Boolean is
+     (L.Min_Value = R.Min_Value and then L.Max_Value = R.Max_Value);
+
+   function "<" (L, R : Interval) return Boolean is
+     (L.Min_Value < R.Min_Value);
+   --  We assume the intervals are disjoint
+
+   package Interval_Sets is new Ada.Containers.Ordered_Sets
+     (Element_Type => Interval);
+   subtype Interval_Set is Interval_Sets.Set;
+
+   use Ada.Numerics.Big_Numbers.Big_Integers;
+
+   Empty_Interval : Interval :=
+     (Kind => Int,
+      Min_Value => To_Big_Integer (0),
+      Max_Value => To_Big_Integer (-1));
+
    package Discriminant_Choices_Maps is new Ada.Containers.Ordered_Maps
      (Key_Type        => Positive,
       Element_Type    => Discriminant_Choice_Entry);
@@ -122,11 +155,11 @@ package TGen.Types.Record_Types is
    --  key. For enumeration types used as discriminants, this is the 'Pos value
    --  of the corresponding literal.
 
-   package Alternatives_Sets is new Ada.Containers.Ordered_Sets (
-     Element_Type => TGen.Types.Int_Types.Int_Range,
-     "<"          => TGen.Types.Int_Types."<",
-     "="          => TGen.Types.Int_Types."="
-   );
+   package Alternatives_Sets is new Ada.Containers.Ordered_Sets
+     (Element_Type => TGen.Types.Int_Types.Int_Range,
+      "<"          => TGen.Types.Int_Types."<",
+      "="          => TGen.Types.Int_Types."=");
+   subtype Alternatives_Set is Alternatives_Sets.Set;
 
    type Variant_Part;
 
@@ -134,9 +167,13 @@ package TGen.Types.Record_Types is
 
    type Variant_Choice is record
       Alternatives : LAL.Alternatives_List;
-      Alternatives_Set : Alternatives_Sets.Set;
-      Components : Component_Maps.Map;
+      Alt_Set      : Alternatives_Set;
+      Components   : Component_Maps.Map;
+
       Variant : Variant_Part_Acc;
+      --  Variant part associated to this variant choice. Null if there is no
+      --  variant part in this variant choice.
+
    end record;
 
    procedure Free_Variant (Var : in out Variant_Part_Acc);
