@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -1783,7 +1783,7 @@ package body Pp.Actions is
             Indent_Soft_Alt => L ("[#"),
             Outdent_Alt => L ("]"),
             Soft_Alt => L ("#"),
-            For_Loop_Spec_Stmt_Alt => L ("for ! !? ~~~ !"),
+            For_Loop_Spec_Stmt_Alt => L ("for ! !? ~~~ !? when ~~~"),
             For_Loop_Spec_Quant_Alt => L ("! !? ~~~ !#"),
             Tab_2_Alt => L ("^2"),
             Tab_3_Alt => L ("^3"),
