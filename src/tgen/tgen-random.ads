@@ -21,11 +21,24 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with Interfaces; use Interfaces;
+
 with GNAT.Random_Numbers;
 
 package TGen.Random is
    pragma Elaborate_Body;
 
    Generator_Instance : GNAT.Random_Numbers.Generator;
+
+   function Draw_Bits (N : Positive) return Unsigned_128
+     with Pre => N <= Unsigned_128'Size;
+   --  Return N random Bits as an Unsigned_128, up to a maximum of 128 bits
+
+   function Draw_Bits (N : Positive) return Unsigned_64
+     with Pre => N <= Unsigned_64'Size;
+   --  Return N random Bits as an Unsigned_64, up to a maximum of 64 bits
+
+   function Biased_Coin (P_True : Float) return Boolean;
+   --  Return True with probability P
 
 end TGen.Random;

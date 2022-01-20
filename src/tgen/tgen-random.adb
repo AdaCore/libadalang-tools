@@ -21,7 +21,93 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with GNAT.Random_Numbers;
+
+with Ada.Numerics.Generic_Elementary_Functions;
+
 package body TGen.Random is
+
+   function Draw_Bits (N : Positive) return Unsigned_128 is
+      function Rand is new GNAT.Random_Numbers.Random_Discrete (Unsigned_128);
+   begin
+      return Rand (Generator_Instance, Min => 0, Max => 2 ** N);
+   end Draw_Bits;
+
+   function Draw_Bits (N : Positive) return Unsigned_64 is
+      function Rand is new GNAT.Random_Numbers.Random_Discrete (Unsigned_64);
+   begin
+      return Rand (Generator_Instance, Min => 0, Max => 2 ** N);
+   end Draw_Bits;
+
+   package Value_Functions is new Ada.Numerics.Generic_Elementary_Functions
+     (Float);
+   use Value_Functions;
+
+   function Biased_Coin (P_True : Float) return Boolean is
+      Bits : Positive;
+      Size : Unsigned_64;
+      P    : Float := P_True;
+   begin
+      if P <= 0.0 then
+         return False;
+      elsif P >= 1.0 then
+         return True;
+      else
+         --  Meaningful draw
+
+         Bits :=
+           Positive (Float'Ceiling
+                     (Log (X => Float'Min (P, 1.0 - P), Base => 2.0)));
+
+         if Bits >= 64 then
+            --  Let's avoid large draws and treat that as effectively zero.
+            --  We draw only 64 bits anyway so we won't have enough precision
+            --  to pull 1's.
+
+            return False;
+         end if;
+
+         Size := 2 ** Bits;
+
+         while True loop
+            declare
+               Falsey : Unsigned_64 :=
+                 Unsigned_64 (Float'Floor (Float (Size) * (1.0 - P)));
+               --  Number of Falsey parts
+
+               Truthy : Unsigned_64 :=
+                 Unsigned_64 (Float'Floor (Float (Size) * P));
+               --  Number of Truthy parts.
+
+               Remainder : Float :=
+                 ((Float (Size) * P) - Float (Truthy));
+
+               Partial : Boolean;
+               --  Whether Falsey + Truthy makes the whole size. If this is
+               --  not the case, we will have to dump one value and to draw
+               --  again if this value if picked, using the Remainder as our
+               --  new probability P to pick True.
+
+               Draw : Unsigned_64 := Draw_Bits (Bits);
+            begin
+               if Falsey + Truthy = Size then
+                  Partial := False;
+               else
+                  Partial := True;
+               end if;
+
+               if Partial and then Draw = Unsigned_64 (Size - 1) then
+                  P := Remainder;
+                  goto Continue;
+               end if;
+
+               return Draw >= Falsey;
+            end;
+            <<Continue>>
+         end loop;
+      end if;
+      raise Program_Error with "unreachable code";
+   end Biased_Coin;
 
 begin
    GNAT.Random_Numbers.Reset (Generator_Instance);
