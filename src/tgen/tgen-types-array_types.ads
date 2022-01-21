@@ -51,6 +51,9 @@ package TGen.Types.Array_Types is
    function Kind (Self : Unconstrained_Array_Typ) return Typ_Kind is
      (Unconstrained_Array_Kind);
 
+   overriding function Generate_Static
+     (Self : Unconstrained_Array_Typ) return String;
+
    function As_Unconstrained_Array_Typ (Self : SP.Ref)
      return Unconstrained_Array_Typ'Class is
      (Unconstrained_Array_Typ'Class (Self.Unchecked_Get.all)) with

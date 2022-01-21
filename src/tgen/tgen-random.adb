@@ -65,7 +65,7 @@ package body TGen.Random is
 
          Bits :=
            Positive (Float'Ceiling
-                     (Log (X => Float'Min (P, 1.0 - P), Base => 2.0)));
+                     (-Log (X => Float'Min (P, 1.0 - P), Base => 2.0)));
 
          if Bits >= 64 then
             --  Let's avoid large draws and treat that as effectively zero.
@@ -122,7 +122,7 @@ package body TGen.Random is
    ----------
 
    function Many
-     (Min_Size, Max_Size, Average_Size : Positive) return Many_Type
+     (Min_Size, Max_Size, Average_Size : Natural) return Many_Type
    is
    begin
       return Many_Type'
@@ -148,7 +148,7 @@ package body TGen.Random is
       end if;
 
       if Self.Count >= Self.Max_Size then
-         return True;
+         return False;
       end if;
 
       Should_Continue := Biased_Coin (Self.Stopping_Value);

@@ -41,12 +41,14 @@ package TGen.Random is
    function Biased_Coin (P_True : Float) return Boolean;
    --  Return True with probability P
 
-   type Many_Type is private;
+   type Many_Type is tagged private;
 
    function Many
-     (Min_Size, Max_Size, Average_Size : Positive) return Many_Type
+     (Min_Size, Max_Size, Average_Size : Natural) return Many_Type
      with Pre => Min_Size >= 0 and then Average_Size >= Min_Size and then
      Max_Size >= Average_Size;
+
+   function Count (Elements : Many_Type) return Natural;
 
    function More (Self : in out Many_Type) return Boolean;
 
@@ -56,5 +58,7 @@ private
       Count              : Natural;
       Stopping_Value     : Float;
    end record;
+
+   function Count (Elements : Many_Type) return Natural is (Elements.Count);
 
 end TGen.Random;
