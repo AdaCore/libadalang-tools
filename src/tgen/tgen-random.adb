@@ -27,6 +27,10 @@ with Ada.Numerics.Generic_Elementary_Functions;
 
 package body TGen.Random is
 
+   ---------------
+   -- Draw_Bits --
+   ---------------
+
    function Draw_Bits (N : Positive) return Unsigned_128 is
       function Rand is new GNAT.Random_Numbers.Random_Discrete (Unsigned_128);
    begin
@@ -43,8 +47,12 @@ package body TGen.Random is
      (Float);
    use Value_Functions;
 
+   -----------------
+   -- Biased_Coin --
+   -----------------
+
    function Biased_Coin (P_True : Float) return Boolean is
-      Bits : Positive;
+      Bits : Natural;
       Size : Unsigned_64;
       P    : Float := P_True;
    begin
@@ -108,6 +116,49 @@ package body TGen.Random is
       end if;
       raise Program_Error with "unreachable code";
    end Biased_Coin;
+
+   ----------
+   -- Many --
+   ----------
+
+   function Many
+     (Min_Size, Max_Size, Average_Size : Positive) return Many_Type
+   is
+   begin
+      return Many_Type'
+        (Min_Size, Max_Size,
+         Count          => 0,
+         Stopping_Value => 1.0 - 1.0 / Float (1 + Average_Size));
+   end Many;
+
+   ----------
+   -- More --
+   ----------
+
+   function More (Self : in out Many_Type) return Boolean
+   is
+      Should_Continue : Boolean;
+   begin
+      if Self.Min_Size = Self.Max_Size then
+         return Self.Count < Self.Min_Size;
+      end if;
+
+      if Self.Count < Self.Min_Size then
+         return True;
+      end if;
+
+      if Self.Count >= Self.Max_Size then
+         return True;
+      end if;
+
+      Should_Continue := Biased_Coin (Self.Stopping_Value);
+
+      if Should_Continue then
+         Self.Count := Self.Count + 1;
+      end if;
+
+      return Should_Continue;
+   end More;
 
 begin
    GNAT.Random_Numbers.Reset (Generator_Instance);
