@@ -26,10 +26,12 @@ with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Ordered_Sets;
 with Ada.Containers.Vectors;
 
-with Ada.Strings.Fixed;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with Ada.Strings.Less_Case_Insensitive;
+with Ada.Strings;           use Ada.Strings;
 with Ada.Strings.Equal_Case_Insensitive;
+with Ada.Strings.Fixed;     use Ada.Strings.Fixed;
+with Ada.Strings.Less_Case_Insensitive;
+with Ada.Strings.Maps;      use Ada.Strings.Maps;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with GNATCOLL.Projects; use GNATCOLL.Projects;
 
@@ -74,6 +76,16 @@ package TGen.Strings is
 
    function "+" (Text : Text_Type) return String is
      (To_UTF8 (Text));
+
+   function Remove_Trailing_Comma_And_Spaces
+     (Text : Unbounded_String) return Unbounded_String is
+     (Trim (Trim (Text, Right), Null_Set, To_Set (',')));
+
+   function Remove_Trailing_Comma_And_Spaces
+     (Text : String) return String is
+     (Trim (Trim (Text, Right), Null_Set, To_Set (',')));
+   --  Remove the trailing spaces and comma of the given Text, e.g. passing
+   --  "[a, b, " will return "[a, b".
 
    -----------------------
    -- Dot_To_Underscore --
