@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2001-2021, AdaCore                    --
+--                      Copyright (C) 2001-2022, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -1982,6 +1982,7 @@ package body Pp.Formatting is
                      then
                         pragma Assert (not All_LB (LL).Enabled);
                         All_LB (LL).Enabled := True;
+                        All_LB (LL).Affects_Comments := True;
                         --  Keep the indentation level of the previous LL if
                         --  the threshold between the two values is 1
                         --  (this could be the case of the split line when
@@ -2183,6 +2184,7 @@ package body Pp.Formatting is
                            and then Looking_At_Paren_Or_Comma (Prev_LB))
                      then
                         Prev_LB.Enabled := True;
+                        Prev_LB.Affects_Comments := True;
                      end if;
                   end;
                end loop;
@@ -2391,6 +2393,24 @@ package body Pp.Formatting is
          --  Check if the current line construct contains a simple or multiple
          --  named aggregate association
          --  (i.e., something like "X => val1," or "X | Y => val2,")
+
+         function LB_Needs_To_Be_Enabled (Src_Tok : Tokn_Cursor) return Boolean;
+
+         function LB_Needs_To_Be_Enabled (Src_Tok : Tokn_Cursor) return Boolean
+         is
+         begin
+            return
+              Kind (Src_Tok) = Other_Whole_Line_Comment
+              and then Kind (Prev_ss (Src_Tok)) = True_End_Of_Line
+              and then
+                (Kind (Prev (Prev_ss (Src_Tok))) = ','
+                 or else Kind (Prev (Prev_ss (Src_Tok))) = End_Of_Line_Comment
+                 or else
+                   (Kind (Prev (Prev_ss (Src_Tok))) = True_End_Of_Line
+                    and then
+                    Kind (Prev
+                          (Prev (Prev_ss (Src_Tok)))) = End_Of_Line_Comment));
+         end LB_Needs_To_Be_Enabled;
 
          procedure Reset_Indentation is
          begin
@@ -2966,6 +2986,7 @@ package body Pp.Formatting is
             end Look_Before;
 
             Indentation : Natural;
+            Corrected_Indentation : Natural := 0;
 
             procedure Set_Cur_Indent is
             begin
@@ -3139,6 +3160,67 @@ package body Pp.Formatting is
                   then
                      Indentation := After_Indentation;
 
+                     --  This is for the situation where no Enabled_LB_Token
+                     --  is present and the indentation information
+                     --  is held by Disabled_LB_Token. In this situation,
+                     --  since if this information affects comments then this
+                     --  information should be used to compute the right
+                     --  indentation value.
+
+                  elsif Prev_Indentation_Affect_Comments and then
+                    Kind (Src_Tok) = Other_Whole_Line_Comment
+                    and then (Kind (New_Tok) = Ident
+                              or else Kind (New_Tok) = Res_Others
+                              or else Kind (New_Tok) = Res_When
+                              or else Kind (New_Tok) = Numeric_Literal)
+                    and then Kind (Prev (Prev (New_Tok))) = Disabled_LB_Token
+                    and then Kind (Prev (Prev (Prev (New_Tok)))) = ','
+                  then
+
+                     --  The corrected indentation is based on an already
+                     --  set value on the LB Indentation and is used to adjust
+                     --  the Cur_Indentation in case of a parathesized context.
+
+                     declare
+                        P : constant Tokn_Cursor := Prev (Prev (New_Tok));
+                        LB : Line_Break renames
+                          All_LB (Line_Break_Token_Index (P));
+                     begin
+                        if LB.Enabled and then LB.Affects_Comments then
+                           Corrected_Indentation := LB.Indentation;
+                           Indentation := Corrected_Indentation;
+                        else
+                           Indentation :=
+                             Natural'Max (Indentation,
+                                          Before_Indentation);
+                        end if;
+                     end;
+
+                  --  Whole line comment between last aggregate parameter and
+                  --  closing parathesis should be aligned with the others
+                  --  aggregates and closing parenthesis should have the right
+                  --  indentation too.
+
+                  elsif Prev_Indentation_Affect_Comments
+                    and then Kind (Src_Tok) = Other_Whole_Line_Comment
+                    and then Kind (Prev (New_Tok)) = Ident
+                    and then Kind (New_Tok) = ')'
+                    and then Kind (Next (New_Tok)) = ';'
+                    and then
+                      Kind (Prev (Prev (Prev (New_Tok)))) = Disabled_LB_Token
+                  then
+                     declare
+                        P : constant Tokn_Cursor := Prev (Prev (Prev (New_Tok)));
+                        LB : Line_Break renames
+                          All_LB (Line_Break_Token_Index (P));
+                     begin
+                        if LB.Enabled and then LB.Affects_Comments then
+                           Indentation := LB.Indentation;
+                           Corrected_Indentation := Indentation;
+                        end if;
+
+                     end;
+
                   else
                      Indentation := Natural'Max (Indentation,
                                                  Before_Indentation);
@@ -3149,7 +3231,6 @@ package body Pp.Formatting is
 
             --  Make sure Indentation is a multiple of PP_Indentation; otherwise
             --  style checking complains "(style) bad column".
-
             Indentation := Good_Column (PP_Indentation (Cmd), Indentation);
             pragma Assert ((Indentation mod PP_Indentation (Cmd)) = 0);
 
@@ -3164,6 +3245,16 @@ package body Pp.Formatting is
                         Kind (Next (Next (Next (New_Tok)))) = Res_Return))
             then
                Indentation := Indentation + PP_Indentation (Cmd);
+            end if;
+
+            --  V111-001:
+            --  This is needed to take into account the paranthesis level and
+            --  add 1 to be inside of the paranthesis for the next line
+            --  indentation (see above for Corrected_Indentation value)
+            if Corrected_Indentation /= 0
+              and then Corrected_Indentation /= Indentation
+            then
+               Indentation := Corrected_Indentation;
             end if;
 
             Set_Cur_Indent;
@@ -3230,6 +3321,7 @@ package body Pp.Formatting is
                     (if not Arg (Cmd, Source_Line_Breaks) then
                        Kind (Prev (New_Tok)) = Disabled_LB_Token));
             begin
+
                if LB.Tok = New_Tok then
 
                   --  The inserted LB.Indentation is set to 0 when the LB is
@@ -3258,6 +3350,29 @@ package body Pp.Formatting is
                     (New_Tokns, False_End_Of_Line, "whole line extra");
                   --  This is needed because every comment in New_Tokns must
                   --  be followed by EOL_Token.
+
+               elsif (Kind (New_Tok) = Ident
+                      or else Kind (New_Tok) = Res_Others
+                      or else Kind (New_Tok) = Numeric_Literal)
+                 and then Kind (New_Tok) = Kind (Src_Tok)
+                 and then Kind (Prev (Prev (Src_Tok))) in True_End_Of_Line
+                 and then Kind
+                   (Prev (Prev (Prev (Src_Tok)))) = Other_Whole_Line_Comment
+                 and then Kind (Prev (Prev (Prev (New_Tok)))) in ','
+                 and then Kind (Prev (Prev (New_Tok))) in Disabled_LB_Token
+               then
+
+                  --  V111-001
+                  --  Avoid adding an empty line after a whole line comment
+                  --  between two parameters
+                  --  A (X => 1,
+                  --     --  whole line comment
+                  --     False);
+                  --  In case of paranthesized expressions (like paramaters of
+                  --  and action call) the indentation must be corrected if this
+                  --  was not already taken as set in the Disabled_LB_Token
+                  --  Indentation field.
+                  null;
 
                elsif Kind (Prev (New_Tok)) in Spaces
                  and then Kind (Prev (Prev (New_Tok))) in Disabled_LB_Token
@@ -3288,7 +3403,18 @@ package body Pp.Formatting is
                   --
                   --  literal_bar => literal_bar_value,
                   --  ...
+                  null;
 
+               elsif Arg (Cmd, Source_Line_Breaks)
+                 and then Kind (Src_Tok) = True_End_Of_Line
+                 and then Kind (Prev (Src_Tok)) = True_End_Of_Line
+                 and then Kind (Prev (Prev (Src_Tok))) = Other_Whole_Line_Comment
+                 and then Kind (Next_ss (Src_Tok)) = Kind (New_Tok)
+                 and then Kind (Prev (Prev (New_Tok))) = Disabled_LB_Token
+                 and then Kind (Prev (Prev (Prev (New_Tok)))) = ','
+               then
+                  --  The Disabled_LB_Token was enabled and will match the
+                  --  True_End_Of_Line between the source token and a blank line
                   null;
 
                else
@@ -3297,8 +3423,8 @@ package body Pp.Formatting is
                     (Lines_Data_P,
                      Org => "Append_Temp_ in Insert_Whole_Line_Comment 3");
                end if;
-
             end;
+
             Reset_Indentation;
          end Insert_Whole_Line_Comment;
 
@@ -3614,7 +3740,6 @@ package body Pp.Formatting is
                --  in a row.)
 
                elsif Kind (Src_Tok) in EOL_Token then
-
                   pragma Assert
                     (not Is_Blank_Line (Src_Tok)
                      or else Arg (Cmd, Source_Line_Breaks));
@@ -3762,6 +3887,7 @@ package body Pp.Formatting is
                            Indentation : Natural := 0;
                            P : Tokn_Cursor := New_Tok;
                         begin
+
                            case Kind (New_Tok) is
                               when Res_Is | Comment_Kind =>
                                  Indentation := Before_Indentation;
@@ -3774,6 +3900,13 @@ package body Pp.Formatting is
                                     LB : Line_Break renames
                                       All_LB (Line_Break_Token_Index (P));
                                  begin
+                                    if Kind (P) = Disabled_LB_Token
+                                      and then LB_Needs_To_Be_Enabled (Src_Tok)
+                                    then
+                                       LB.Enabled := True;
+                                       LB.Affects_Comments := True;
+                                    end if;
+
                                     Indentation := LB.Indentation;
                                  end;
                            end case;
@@ -3789,6 +3922,72 @@ package body Pp.Formatting is
                   end if;
 
                elsif Kind (Src_Tok) in Whole_Line_Comment then
+
+                  --  In the context of call parameters or aggregate association
+                  --  having a whole line comment inserted in between the
+                  --  elements the present Disabled_LB_Token should be enabled
+                  --  and the indentation needs to be updated in the current
+                  --  token context
+                  --  In a paranthesized context, the indentation level should
+                  --  be increased by 1 related to the last left paranthesis
+                  --  position
+
+                  if Kind (Src_Tok) = Other_Whole_Line_Comment
+                    and then (Kind (New_Tok) = Ident
+                              or else Kind (New_Tok) = Res_Others
+                              or else Kind (New_Tok) = Res_When
+                              or else Kind (New_Tok) = Numeric_Literal
+                              or else Kind (New_Tok) = ')')
+                    and then Kind (Prev (Prev (New_Tok))) = Disabled_LB_Token
+                    and then (Kind (Prev (Prev (Prev (New_Tok)))) = ','
+                              or else Kind (Prev (Prev (Prev (New_Tok)))) = ';')
+                    and then not
+                      (Kind (Prev_ss (Src_Tok)) = True_End_Of_Line
+                       and then
+                         (Kind (Prev (Prev_ss (Src_Tok))) = End_Of_Line_Comment
+                          or (Kind (Prev (Prev_ss (Src_Tok))) = True_End_Of_Line
+                              and
+                                (not After_Last (Prev (Prev_ss (Src_Tok)))
+                                 and then
+                                 Kind (Prev (Prev (Prev_ss (Src_Tok)))) =
+                                   End_Of_Line_Comment))))
+                  then
+                     declare
+                        P : constant Tokn_Cursor := Prev (Prev (New_Tok));
+                        LB : Line_Break renames
+                          All_LB (Line_Break_Token_Index (P));
+                     begin
+                        LB.Enabled := True;
+                        LB.Affects_Comments := True;
+
+                        if not Is_Empty (Paren_Stack) then
+                           --  Nothing to do here since these situations
+                           --  are handled by other means
+                           if Arg (Cmd, Comments_Unchanged)
+                             or else
+                               Kind
+                                 (Prev (Prev (Prev (Prev (New_Tok))))) = ')'
+                           then
+                              null;
+
+                           elsif Arg (Cmd, Source_Line_Breaks) then
+                              if Kind (New_Tok) = Res_When then
+                                 Cur_Indentation := LB.Indentation;
+                              elsif Kind (New_Tok) = Ident then
+                                 Cur_Indentation :=
+                                   L_Paren_Indentation_For_Preserve;
+                              end if;
+
+                           else
+                              LB.Indentation :=
+                                L_Paren_Indentation_For_Preserve + 1;
+                              Cur_Indentation := LB.Indentation;
+                           end if;
+                        end if;
+                     end;
+
+                  end if;
+
                   Insert_Whole_Line_Comment;
 
                elsif Kind (Src_Tok) = Preprocessor_Directive then

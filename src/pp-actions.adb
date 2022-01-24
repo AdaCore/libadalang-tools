@@ -717,7 +717,8 @@ package body Pp.Actions is
            when Ada_Component_Decl =>
              L ("?~,# ~~ ^: !? ^2:=[# ~~]~", Aspects),
            when Ada_Discriminant_Spec =>
-             L ("?~,# ~~ ^: !? ^2:=[# ~~]~"),
+             L ("?~,# ~~ ^: !? ^2:=[# ~~]~? with [# ~~]~"),
+             --  Adding [aspects_specifications] support for this node kind
            when Ada_Params => null,
            when Ada_Param_Spec => null,
            when Ada_Base_Package_Decl =>
@@ -1084,7 +1085,7 @@ package body Pp.Actions is
            when Ada_Unknown_Discriminant_Part =>
              L (" #(<>)"),
            when Ada_Access_To_Subp_Def =>
-             L ("?~~ ~access? ~~~ !"),
+             L ("?~~ ~access? ~~~ !", Aspects),
            when Ada_Anonymous_Type_Decl =>
              L ("//!", Aspects),
            when Ada_Synth_Anonymous_Type_Decl => null,
@@ -1784,7 +1785,7 @@ package body Pp.Actions is
             Outdent_Alt => L ("]"),
             Soft_Alt => L ("#"),
             For_Loop_Spec_Stmt_Alt => L ("for ! !? ~~~ !? when ~~~"),
-            For_Loop_Spec_Quant_Alt => L ("! !? ~~~ !#"),
+            For_Loop_Spec_Quant_Alt => L ("! !? ~~~ !#? when ~~~"),
             Tab_2_Alt => L ("^2"),
             Tab_3_Alt => L ("^3"),
             AM_Tab_4_Alt => L (" ^4:=[# !]"),
@@ -1795,9 +1796,13 @@ package body Pp.Actions is
               L ("? when ~~ =>~$" & "{?~;$~;$~}"),
             Select_Or_When_Alt =>
             L ("or? when ~~ =>~$" & "{?~;$~;$~}"),
-            Call_Threshold_Alt => L ("!?[$0(~,$0~)]~"),
-             --  We use $0 instead of $ here, so that the indentation of these
-             --  will not affect following comments.
+            Call_Threshold_Alt => L ("!?[$(~,$~)]~"),
+               --  We use $ instead of $0 here, so that the indentation of
+               --  these will affect following comments.
+               --  Not sure why we had this before (so I comment it out)
+               --  Call_Threshold_Alt => L ("!?[$0(~,$0~)]~"),
+               --   --  We use $0 instead of $ here, so that the indentation of
+               --   --  these will not affect following comments.
             Call_Alt => L ("!?[# (~,#1 ~)]~"),
             Par_Threshold_Alt => L ("?[$(~;$~)]~"),
             Par_Alt => L ("?[# (~;#1 ~)]~"),
@@ -3565,6 +3570,7 @@ package body Pp.Actions is
          --  Start of processing for Interpret_Template
 
          begin
+
             while Inst_Index <= TT.Instructions'Last loop
                Inst := TT.Instructions (Inst_Index);
 
