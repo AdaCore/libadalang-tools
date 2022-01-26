@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                     Copyright (C) 2021-2022, AdaCore                     --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -2438,7 +2438,7 @@ package body Laltools.Common is
             when Error =>
                Imprecise := True;
                return No_Defining_Name;
-            when Noref =>
+            when No_Ref =>
                return No_Defining_Name;
          end case;
 
