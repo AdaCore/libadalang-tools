@@ -3728,7 +3728,7 @@ package body Test.Skeleton is
          --  Look for the correct subprogram in the unit JSON value using the
          --  full hash of the subprogram. If not found, return false.
          for Val of Unit_Content loop
-            if Val.Get ("UID") = Subp.Subp_Full_Hash.all then
+            if String'(Val.Get ("UID")) = Subp.Subp_Full_Hash.all then
                Subp_Content := Val;
                exit;
             end if;
