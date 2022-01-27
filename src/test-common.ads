@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2011-2021, AdaCore                    --
+--                      Copyright (C) 2011-2022, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -39,6 +39,8 @@ with GNATCOLL.Projects;
 
 with Ada.Sequential_IO;
 with Langkit_Support.Slocs; use Langkit_Support.Slocs;
+
+with TGen.Context;
 
 package Test.Common is
 
@@ -356,5 +358,15 @@ package Test.Common is
    Source_Processing_Failed : Boolean := False;
    --  Indicates whether at least one of sources was either rejected by
    --  lal parser or an unpredicted error happened during its processing.
+
+   Generate_Test_Vectors : Boolean := False;
+   --  Indicates that we should use TGen to generate tests vectors for the
+   --  supported subprograms.
+
+   JSON_Test_Dir : String_Access;
+   --  Dir in which the test vector in json format should be stored / looked up
+
+   TGen_Ctx : TGen.Context.Generation_Context;
+   --  Shared context for test vectors generation.
 
 end Test.Common;

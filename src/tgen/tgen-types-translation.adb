@@ -1557,7 +1557,9 @@ package body TGen.Types.Translation is
                   --  alternative range.
 
                   New_Set.Insert (Sub_Res (1), New_Elt_Cur, Inserted);
-                  if Sub_Res (1) < Element (Cur_Others_Segment) then
+                  if Has_Element (Cur_Others_Segment)
+                    and then Sub_Res (1) < Element (Cur_Others_Segment)
+                  then
                      Cur_Others_Segment := New_Elt_Cur;
                   end if;
                else
@@ -1616,6 +1618,7 @@ package body TGen.Types.Translation is
       Choice_Num : Positive := 1;
       Choice_Min : Big_Int.Big_Integer;
       Choice_Max : Big_Int.Big_Integer;
+      Has_Others : Boolean := False;
       Others_Cur : Cursor := No_Element;
       Inserted   : Boolean := False;
    begin
@@ -1663,6 +1666,7 @@ package body TGen.Types.Translation is
                        ((Min => Choice_Min, Max => Choice_Min));
                   when Ada_Others_Designator_Range =>
                      Choice_Trans.Alt_Set.Clear;
+                     Has_Others := True;
                      if not Component_Maps.Has_Element
                           (Discriminants.Find (Res.Discr_Name))
                      then
@@ -1690,8 +1694,13 @@ package body TGen.Types.Translation is
                    (Translate_Variant_Part (Var_Choice.As_Variant
                     .F_Components.F_Variant_Part, Discriminants));
             end if;
-            Res.Variant_Choices.Insert
-              (Choice_Num, Choice_Trans, Others_Cur, Inserted);
+            if Has_Others then
+               Res.Variant_Choices.Insert
+                 (Choice_Num, Choice_Trans, Others_Cur, Inserted);
+            else
+               Res.Variant_Choices.Insert
+                 (Choice_Num, Choice_Trans);
+            end if;
             Choice_Num := Choice_Num + 1;
          end;
       end loop;

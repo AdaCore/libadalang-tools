@@ -54,7 +54,8 @@ package TGen.Gen_Strategies is
    procedure Generate_Test_Vectors
      (Context  : in out Generation_Context;
       Nb_Tests : Positive;
-      Subp     : Subprogram_Data);
+      Subp     : Subprogram_Data;
+      Subp_UID : Unbounded_String := Null_Unbounded_String);
 
    type Generated_Body is
       record

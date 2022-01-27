@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2019-2021, AdaCore                    --
+--                      Copyright (C) 2019-2022, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -58,6 +58,9 @@ with GNAT.Directory_Operations;
 with Ada.Characters.Handling; use Ada.Characters.Handling;
 with Ada.Text_IO;
 with Ada.Strings.Fixed;
+with Ada.Strings.Unbounded;
+
+with TGen.Gen_Strategies;
 
 package body Test.Actions is
 
@@ -732,6 +735,35 @@ package body Test.Actions is
          when Root_Mode   =>
             Check_Separate_Root;
       end case;
+
+      --  Test vectors
+
+      if Arg (Cmd, Gen_Test_Vectors) then
+         Test.Common.Generate_Test_Vectors := True;
+         Test.Common.JSON_Test_Dir := new String'
+           (Test.Common.Harness_Dir_Str.all & "JSON_tests"
+            & GNAT.OS_Lib.Directory_Separator);
+         if Debug_Flag_1 then
+            Put ("Requested test vectors generation at \1\n",
+                 Test.Common.JSON_Test_Dir.all);
+         end if;
+
+         declare
+            Dir : File_Array_Access;
+         begin
+            Append
+              (Dir, GNATCOLL.VFS.Create (+Test.Common.JSON_Test_Dir.all));
+            Test.Common.Create_Dirs (Dir);
+         exception
+            when GNAT.Directory_Operations.Directory_Error =>
+               Cmd_Error_No_Help ("cannot create JSON test directory");
+         end;
+
+         TGen.Gen_Strategies.Initialize
+           (Test.Common.TGen_Ctx,
+            Ada.Strings.Unbounded.To_Unbounded_String
+              (Test.Common.JSON_Test_Dir.all));
+      end if;
 
       if Common.Stub_Mode_ON then
          Check_Stub;

@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2011-2021, AdaCore                    --
+--                      Copyright (C) 2011-2022, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -44,6 +44,7 @@ with Ada.Exceptions;
 with Ada.Strings; use Ada.Strings;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 
+with GNATCOLL.JSON; use GNATCOLL.JSON;
 with GNATCOLL.Traces; use GNATCOLL.Traces;
 with GNATCOLL.VFS; use GNATCOLL.VFS;
 with Langkit_Support.Slocs; use Langkit_Support.Slocs;
@@ -51,6 +52,7 @@ with Langkit_Support.Slocs; use Langkit_Support.Slocs;
 with GNAT.OS_Lib;
 with GNAT.SHA1;
 with GNAT.Directory_Operations; use GNAT.Directory_Operations;
+with GNAT.Strings;
 with GNAT.Traceback.Symbolic;
 
 with Test.Common; use Test.Common;
@@ -60,6 +62,10 @@ with Test.Mapping; use Test.Mapping;
 with Test.Stub;
 with Utils.Command_Lines; use Utils.Command_Lines;
 with Utils.Environment;
+
+with TGen.Context;
+with TGen.Gen_Strategies;
+with TGen.Gen_Strategies_Utils;
 
 package body Test.Skeleton is
    Me                : constant Trace_Handle :=
@@ -499,6 +505,8 @@ package body Test.Skeleton is
       Suite_Data_List   : Suites_Data_Type;
       Suite_Data        : Test.Harness.Data_Holder;
 
+      Subp_Cur : Subp_Data_List.Cursor;
+
       Apropriate_Source : Boolean;
 
       CU : Compilation_Unit;
@@ -723,6 +731,29 @@ package body Test.Skeleton is
          --  dependencies.
          if Stub_Mode_ON then
             Process_Stubs (Data.Units_To_Stub);
+         end if;
+
+         if Generate_Test_Vectors then
+            Subp_Cur := Data.Subp_List.First;
+            while Subp_Cur /= Subp_Data_List.No_Element loop
+               declare
+                  Subp_Data : constant TGen.Context.Subprogram_Data :=
+                     TGen.Gen_Strategies_Utils.Extract_Subprogram_Data
+                       (Element (Subp_Cur).Subp_Declaration.As_Basic_Decl);
+               begin
+                  TGen.Gen_Strategies.Generate_Test_Vectors
+                    (TGen_Ctx,
+                     10,
+                     Subp_Data,
+                     Ada.Strings.Unbounded.To_Unbounded_String
+                       (Element (Subp_Cur).Subp_Full_Hash.all));
+               exception
+                  when Exc : Program_Error =>
+                     Report (Exc);
+               end;
+               Subp_Data_List.Next (Subp_Cur);
+            end loop;
+            TGen.Gen_Strategies.Generate_Artifacts (TGen_Ctx);
          end if;
 
          declare
@@ -3660,6 +3691,10 @@ package body Test.Skeleton is
          Body_Declarations, -- /01/
          Body_Statements);  -- /02/
 
+      function Unparse_Test_Vectors (Subp : Subp_Info) return Boolean;
+      --  Lookup test vectors in JSON format and try to unparse them in the
+      --  test wrappers. Returns false if there is no test vectors to unparse.
+
       procedure Put_Persistent_Section (PS_Type : Persistent_Section_Type);
       --  Puts persistent section of given kind surrounded with read-only
       --  markers and corresponding specific Id.
@@ -3671,6 +3706,101 @@ package body Test.Skeleton is
       procedure Put_Stub_Data_Import;
       --  Put with and use clauses for Stub_Data packages of units stubbed
       --  for current UUT.
+
+      function Unparse_Test_Vectors (Subp : Subp_Info) return Boolean is
+         JSON_Unit_File : constant Virtual_File := GNATCOLL.VFS.Create
+           (+(Test.Common.JSON_Test_Dir.all & Data.Unit_Full_Name.all
+            & ".json"));
+         Unit_File_Content : GNAT.Strings.String_Access :=
+           GNATCOLL.VFS.Read_File (JSON_Unit_File);
+         Unit_Content : constant JSON_Array := Read
+           (Unit_File_Content.all, +JSON_Unit_File.Full_Name).Get;
+         Subp_Content : JSON_Value := JSON_Null;
+         Subp_Vectors : JSON_Array;
+         Single_Vec   : JSON_Array;
+         Test_Count   : Positive := 1;
+         Is_Function  : Boolean;
+      begin
+
+         if Unit_Content = Empty_Array then
+            return False;
+         end if;
+         --  Look for the correct subprogram in the unit JSON value using the
+         --  full hash of the subprogram. If not found, return false.
+         for Val of Unit_Content loop
+            if Val.Get ("UID") = Subp.Subp_Full_Hash.all then
+               Subp_Content := Val;
+               exit;
+            end if;
+         end loop;
+
+         if Subp_Content = JSON_Null
+           or else Subp_Content.Get ("values").Get = Empty_Array
+         then
+            return False;
+         end if;
+
+         Is_Function := Subp_Content.Has_Field ("return_type");
+
+         --  unparse each test vector
+
+         S_Put (6, "--  Autogenerated test vectors");
+         New_Line_Count;
+         New_Line_Count;
+
+         Subp_Vectors := Subp_Content.Get ("values").Get;
+
+         for Test_Vec of Subp_Vectors loop
+            Single_Vec := Test_Vec.Get;
+            S_Put (6, "Test_" & Trim (Test_Count'Image, Both) & ":");
+            New_Line_Count;
+            S_Put (6, "declare");
+            New_Line_Count;
+            for Param of Single_Vec loop
+               S_Put (8, Param.Get ("name") & " : " & Param.Get ("type_name")
+                 & " := " & Param.Get ("value") & ";");
+               New_Line_Count;
+            end loop;
+            if Is_Function then
+               S_Put (9, "Ret_Val : " & Subp_Content.Get ("return_type")
+                         & ";");
+               New_Line_Count;
+            end if;
+            S_Put (6, "begin");
+            New_Line_Count;
+            S_Put (9, (if Is_Function then "Ret_Val := " else "")
+                      & Subp_Content.Get ("fully_qualified_name") & " (");
+            for Param_Id in Single_Vec loop
+               S_Put (0, Array_Element (Single_Vec, Param_Id).Get ("name"));
+               if Array_Has_Element (Single_Vec, Param_Id + 1) then
+                  S_Put (0, ", ");
+               end if;
+            end loop;
+            S_Put (0, ");");
+            New_Line_Count;
+            S_Put (6, "exception");
+            New_Line_Count;
+            S_Put (9, "when Exc : others =>");
+            New_Line_Count;
+            S_Put (12, "AUnit.Assertions.Assert");
+            New_Line_Count;
+            S_Put (14, "(False,");
+            New_Line_Count;
+            S_Put (15, """Test_" & Trim (Test_Count'Image, Both)
+                       & " crashed: "" & Ada.Exceptions.Exception_Information"
+                     & " (Exc));");
+            New_Line_Count;
+            S_Put (6, "end Test_" & Trim (Test_Count'Image, Both) & ";");
+            New_Line_Count;
+            New_Line_Count;
+            Test_Count := Test_Count + 1;
+         end loop;
+
+         GNAT.Strings.Free (Unit_File_Content);
+
+         return True;
+
+      end Unparse_Test_Vectors;
 
       procedure Put_Persistent_Section (PS_Type : Persistent_Section_Type) is
          UH     : Unique_Hash;
@@ -3904,6 +4034,8 @@ package body Test.Skeleton is
             Next (S_Cur);
          end loop;
       end Put_Stub_Data_Import;
+
+      Unparse_Success : Boolean := False;
 
       use GNAT.OS_Lib;
    begin
@@ -5136,6 +5268,10 @@ package body Test.Skeleton is
             New_Line_Count;
             S_Put (0, "with System.Assertions;");
             New_Line_Count;
+            if Test.Common.Generate_Test_Vectors then
+               S_Put (0, "with Ada.Exceptions;");
+               New_Line_Count;
+            end if;
             if Stub_Mode_ON then
                Put_Stub_Data_Import;
             end if;
@@ -5264,14 +5400,21 @@ package body Test.Skeleton is
                            New_Line_Count;
                            Setters_Set.Clear;
                         end if;
-                        S_Put (6, "AUnit.Assertions.Assert");
-                        New_Line_Count;
-                        S_Put
-                          (8, "(Gnattest_Generated.Default_Assert_Value,");
-                        New_Line_Count;
-                        S_Put (9,  """Test not implemented."");");
-                        New_Line_Count;
-                        New_Line_Count;
+
+                        if Test.Common.Generate_Test_Vectors then
+                           Unparse_Success := Unparse_Test_Vectors
+                             (Subp_Data_List.Element (Subp_Cur));
+                        end if;
+                        if not Unparse_Success then
+                           S_Put (6, "AUnit.Assertions.Assert");
+                           New_Line_Count;
+                           S_Put
+                           (8, "(Gnattest_Generated.Default_Assert_Value,");
+                           New_Line_Count;
+                           S_Put (9,  """Test not implemented."");");
+                           New_Line_Count;
+                           New_Line_Count;
+                        end if;
                      else
 
                         if MD.Issue_Warning then
@@ -6306,6 +6449,10 @@ package body Test.Skeleton is
                New_Line_Count;
                S_Put (0, "with System.Assertions;");
                New_Line_Count;
+               if Test.Common.Generate_Test_Vectors then
+                  S_Put (0, "with Ada.Exceptions;");
+                  New_Line_Count;
+               end if;
                if Stub_Mode_ON then
                   Put_Stub_Data_Import;
                end if;
@@ -6429,14 +6576,20 @@ package body Test.Skeleton is
                               New_Line_Count;
                               Setters_Set.Clear;
                            end if;
-                           S_Put (6, "AUnit.Assertions.Assert");
-                           New_Line_Count;
-                           S_Put
-                             (8, "(Gnattest_Generated.Default_Assert_Value,");
-                           New_Line_Count;
-                           S_Put (9,  """Test not implemented."");");
-                           New_Line_Count;
-                           New_Line_Count;
+                           if Test.Common.Generate_Test_Vectors then
+                              Unparse_Success := Unparse_Test_Vectors
+                                (Current_Subp);
+                           end if;
+                           if not Unparse_Success then
+                              S_Put (6, "AUnit.Assertions.Assert");
+                              New_Line_Count;
+                              S_Put
+                              (8, "(Gnattest_Generated.Default_Assert_Value,");
+                              New_Line_Count;
+                              S_Put (9,  """Test not implemented."");");
+                              New_Line_Count;
+                              New_Line_Count;
+                           end if;
                         else
 
                            if MD.Issue_Warning then

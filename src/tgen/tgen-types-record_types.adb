@@ -90,7 +90,7 @@ package body TGen.Types.Record_Types is
          Str               := Str & ": record" & LF;
          Current_Component := Self.Component_Types.First;
          while Has_Element (Current_Component) loop
-            Str := (Padding + 1) * Pad
+            Str := Str & (Padding + 1) * Pad
                    & Text.Image (Key (Current_Component).Text) & " : ";
             if Element (Current_Component).Get.Kind in Record_Typ_Range then
                Str := Str & String'(As_Record_Typ (Element (Current_Component))
@@ -149,7 +149,7 @@ package body TGen.Types.Record_Types is
    function Generate_Static (Self : Nondiscriminated_Record_Typ) return String
    is
       Result : Unbounded_String;
-      Generated_Value : String := Record_Typ'Class (Self).Generate_Static;
+      Generated_Value : String := Record_Typ (Self).Generate_Static;
    begin
       Append (Result, "(");
       Append (Result, Generated_Value);

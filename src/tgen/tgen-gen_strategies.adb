@@ -801,10 +801,11 @@ package body TGen.Gen_Strategies is
    procedure Generate_Test_Vectors
      (Context  : in out Generation_Context;
       Nb_Tests : Positive;
-      Subp     : Subprogram_Data)
+      Subp     : Subprogram_Data;
+      Subp_UID : Unbounded_String := Null_Unbounded_String)
    is
       Function_JSON     : JSON_Value := Create_Object;
-      Test_Vectors_JSON : JSON_Array;
+      Test_Vectors_JSON : JSON_Array := Empty_Array;
       Test_Vector_JSON : JSON_Array;
    begin
       for J in 1 .. Nb_Tests loop
@@ -814,17 +815,25 @@ package body TGen.Gen_Strategies is
                Param_JSON : JSON_Value := Create_Object;
             begin
                Param_JSON.Set_Field ("name", Create (+Param.Name));
+               Param_JSON.Set_Field ("type_name", Create (+Param.Type_Name));
                Param_JSON.Set_Field
                  ("value", Param.Type_Repr.Get.Generate_Static);
                Append (Test_Vector_JSON, Param_JSON);
             end;
          end loop;
-         Append (Test_Vectors_JSON, Create (Test_Vector_JSON));
+         if not Is_Empty (Test_Vector_JSON) then
+            Append (Test_Vectors_JSON, Create (Test_Vector_JSON));
+         end if;
       end loop;
 
       Function_JSON.Set_Field
         ("fully_qualified_name", +Subp.Fully_Qualified_Name);
       Function_JSON.Set_Field ("package_name", +Subp.Parent_Package);
+      Function_JSON.Set_Field ("UID", +Subp_UID);
+      if Subp.Kind = Ada_Subp_Kind_Function then
+         Function_JSON.Set_Field
+           ("return_type", Create (+Subp.Return_Type_Fully_Qualified_Name));
+      end if;
       Function_JSON.Set_Field ("values", Test_Vectors_JSON);
 
       if not Context.Test_Vectors.Contains (Subp.Parent_Package) then
