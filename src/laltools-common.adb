@@ -106,7 +106,6 @@ package body Laltools.Common is
            and then C /= '_';
       end Is_Word_Delimiter;
 
-      use type Column_Number;
    begin
       if Idx < T'First then
          return False;
@@ -199,7 +198,6 @@ package body Laltools.Common is
          Stop      : in out Boolean))
    is
       Stop : Boolean := False;
-      use type Defining_Name;
    begin
       if Node.As_Defining_Name = No_Defining_Name then
          return;
@@ -379,7 +377,6 @@ package body Laltools.Common is
       return Defining_Name
    is
       Canonical : Defining_Name;
-      use type Defining_Name;
    begin
       Canonical :=
         Definition.P_Canonical_Part (Imprecise_Fallback => Imprecise_Fallback);
@@ -906,7 +903,6 @@ package body Laltools.Common is
       return Defining_Name
    is
       Next   : Defining_Name;
-      use type Defining_Name;
    begin
       Next :=
         Definition.P_Next_Part (Imprecise_Fallback => Imprecise_Fallback);
@@ -933,7 +929,6 @@ package body Laltools.Common is
       return Defining_Name
    is
       Next   : Defining_Name;
-      use type Defining_Name;
    begin
       Next :=
         Definition.P_Previous_Part (Imprecise_Fallback => Imprecise_Fallback);
@@ -958,8 +953,6 @@ package body Laltools.Common is
       Trace      : GNATCOLL.Traces.Trace_Handle)
       return Defining_Name
    is
-      use type Defining_Name;
-
       Qualified_Name : constant Langkit_Support.Text.Text_Type :=
         Definition.P_Basic_Decl.P_Fully_Qualified_Name;
       --  The name that we'll try to match
@@ -1232,10 +1225,7 @@ package body Laltools.Common is
    -------------------------------------
 
    function Get_Decl_Block_Declarative_Part
-     (Decl_B : Decl_Block)
-      return Declarative_Part
-   is
-      use type Decl_Block;
+     (Decl_B : Decl_Block) return Declarative_Part is
    begin
       if Decl_B = No_Decl_Block then
          return No_Declarative_Part;
@@ -1248,11 +1238,7 @@ package body Laltools.Common is
    -- Get_Decl_Block_Decls --
    --------------------------
 
-   function Get_Decl_Block_Decls
-     (Decl_B : Decl_Block)
-      return Ada_Node_List
-   is
-      use type Decl_Block;
+   function Get_Decl_Block_Decls (Decl_B : Decl_Block) return Ada_Node_List is
    begin
       if Decl_B = No_Decl_Block then
          return No_Ada_Node_List;
@@ -1439,9 +1425,7 @@ package body Laltools.Common is
    --------------------------
 
    function Get_Defining_Name_Id (Definition : Defining_Name)
-                                  return Identifier
-   is
-      use type Ada_Node_Kind_Type;
+                                  return Identifier is
    begin
       case Definition.F_Name.Kind is
          when Ada_Identifier =>
@@ -1465,7 +1449,6 @@ package body Laltools.Common is
       Node : constant Ada_Node :=
         Libadalang.Iterators.Find_First
           (Decl, Libadalang.Iterators.Kind_Is (Ada_Identifier));
-      use type Ada_Node;
    begin
       if Node /= No_Ada_Node then
          return Node.As_Identifier;
@@ -1493,7 +1476,6 @@ package body Laltools.Common is
 
    function Get_Name_As_Defining (Name_Node : Name)
                                   return Defining_Name is
-      use type Name;
    begin
       if Name_Node = No_Name or else not Name_Node.P_Is_Defining
       then
@@ -1509,7 +1491,6 @@ package body Laltools.Common is
 
    function Get_Node_As_Name (Node : Ada_Node)
                               return Name is
-      use type Ada_Node;
    begin
       if Node = No_Ada_Node
         or else Node.Kind not in Ada_Name
@@ -1525,10 +1506,7 @@ package body Laltools.Common is
    -------------------------------------
 
    function Get_Package_Body_Declative_Part
-     (Pkg_Body : Package_Body)
-      return Declarative_Part
-   is
-      use type Package_Body;
+     (Pkg_Body : Package_Body) return Declarative_Part is
    begin
       if Pkg_Body = No_Package_Body then
          return No_Declarative_Part;
@@ -1541,11 +1519,8 @@ package body Laltools.Common is
    -- Get_Package_Body_Decls --
    ----------------------------
 
-   function Get_Package_Body_Decls
-     (Pkg_Body : Package_Body)
-      return Ada_Node_List
-   is
-      use type Package_Body;
+   function Get_Package_Body_Decls (Pkg_Body : Package_Body)
+      return Ada_Node_List is
    begin
       if Pkg_Body = No_Package_Body then
          return No_Ada_Node_List;
@@ -1757,10 +1732,7 @@ package body Laltools.Common is
    ------------------------------------
 
    function Get_Subp_Body_Declarative_Part
-     (Subp_B : Subp_Body)
-      return Declarative_Part
-   is
-      use type Subp_Body;
+     (Subp_B : Subp_Body) return Declarative_Part is
    begin
       if Subp_B = No_Subp_Body then
          return No_Declarative_Part;
@@ -1826,10 +1798,7 @@ package body Laltools.Common is
    ------------------------------------
 
    function Get_Task_Body_Declarative_Part
-     (Task_B : Task_Body)
-      return Declarative_Part
-   is
-      use type Task_Body;
+     (Task_B : Task_Body) return Declarative_Part is
    begin
       if Task_B = No_Task_Body then
          return No_Declarative_Part;
@@ -1843,10 +1812,7 @@ package body Laltools.Common is
    -------------------------
 
    function Get_Task_Body_Decls
-     (Task_B : Task_Body)
-      return Ada_Node_List
-   is
-      use type Task_Body;
+     (Task_B : Task_Body) return Ada_Node_List is
    begin
       if Task_B = No_Task_Body then
          return No_Ada_Node_List;
@@ -2023,7 +1989,6 @@ package body Laltools.Common is
    -------------------
 
    function Is_Access_Ref (Node : Ada_Node) return Boolean is
-      use type Ada_Node_Kind_Type;
    begin
       if Node.Parent.Is_Null then
          return False;
@@ -2059,10 +2024,7 @@ package body Laltools.Common is
    function Is_Call
      (Node      : Ada_Node'Class;
       Trace     : GNATCOLL.Traces.Trace_Handle;
-      Imprecise : in out Boolean) return Boolean
-   is
-      use type Ada_Node;
-      use type Ada_Node_Kind_Type;
+      Imprecise : in out Boolean) return Boolean is
    begin
       return Node.As_Ada_Node /= No_Ada_Node
         and then Node.Kind in Ada_Name
@@ -2075,10 +2037,7 @@ package body Laltools.Common is
    -- Is_Constant --
    -----------------
 
-   function Is_Constant
-     (Node : Basic_Decl) return Boolean is
-      use type Ada_Node;
-      use type Ada_Node_Kind_Type;
+   function Is_Constant (Node : Basic_Decl) return Boolean is
    begin
       for Child of Node.Children loop
          if Child /= No_Ada_Node
@@ -2169,9 +2128,6 @@ package body Laltools.Common is
    is
       Definition     : Defining_Name;
       This_Imprecise : Boolean := False;
-      use type Ada_Node;
-      use type Defining_Name;
-      use type Ada_Node_Kind_Type;
    begin
       if Node.As_Ada_Node /= No_Ada_Node
         and then Node.Kind in Ada_Name
@@ -2194,8 +2150,6 @@ package body Laltools.Common is
    function Is_Renamable (Node : Ada_Node'Class) return Boolean is
       Node_Name : constant Libadalang.Analysis.Name
         := Get_Node_As_Name (Node.As_Ada_Node);
-      use type Libadalang.Analysis.Name;
-      use type Defining_Name;
    begin
       --  Only consider renamable if a precise definition is found
       return Node_Name /= No_Name and then
@@ -2208,10 +2162,7 @@ package body Laltools.Common is
    -- Is_Structure --
    ------------------
 
-   function Is_Structure
-     (Node : Basic_Decl) return Boolean is
-      use type Ada_Node;
-      use type Ada_Node_Kind_Type;
+   function Is_Structure (Node : Basic_Decl) return Boolean is
    begin
       for Child of Node.Children loop
          if Child /= No_Ada_Node
@@ -2298,8 +2249,6 @@ package body Laltools.Common is
       Next_Part  : Defining_Name;
       Loop_Count : Natural := 0;
       Parents    : constant Ada_Node_Array := Definition.Parents;
-
-      use type Defining_Name;
    begin
       --  If this happens to be the definition of a subprogram that
       --  does not call for a body, let's consider that this *is* the
@@ -2417,7 +2366,6 @@ package body Laltools.Common is
    is
       Result : Defining_Name;
       Failsafe_Result : Refd_Def;
-      use type Defining_Name;
    begin
       Imprecise := False;
 
@@ -2462,12 +2410,7 @@ package body Laltools.Common is
    -- Resolve_Name_Precisely --
    ----------------------------
 
-   function Resolve_Name_Precisely
-     (Name_Node : Name)
-      return Defining_Name
-   is
-      use type Name;
-      use type Defining_Name;
+   function Resolve_Name_Precisely (Name_Node : Name) return Defining_Name is
    begin
       if Name_Node = No_Name then
          return No_Defining_Name;

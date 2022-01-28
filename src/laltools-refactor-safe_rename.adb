@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                     Copyright (C) 2021-2022, AdaCore                     --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -345,9 +345,7 @@ package body Laltools.Refactor.Safe_Rename is
 
    function Equivalent_Parameter_Data
      (L, R : Parameter_Data)
-      return Boolean
-   is
-      use type Ada.Containers.Hash_Type;
+      return Boolean is
    begin
       return L.Has_Aliased = R.Has_Aliased
         and then Equivalent_Parameter_Mode (L.Mode, R.Mode)
@@ -499,7 +497,6 @@ package body Laltools.Refactor.Safe_Rename is
       end Process_Slocs;
 
       use Unit_Slocs_Maps;
-      use type Ada.Containers.Count_Type;
 
    begin
       C1 := Before.First;
@@ -1282,8 +1279,6 @@ package body Laltools.Refactor.Safe_Rename is
       First_Type      : Type_Decl := No_Type_Decl;
       Base_Type       : Base_Type_Decl := No_Base_Type_Decl;
 
-      use type Ada_Node_Kind_Type;
-
    begin
       if Self.Canonical_Definition.P_Basic_Decl.Kind = Ada_Subp_Decl then
          Subprogram_Spec :=
@@ -1727,8 +1722,6 @@ package body Laltools.Refactor.Safe_Rename is
      (Self : Param_Spec_Collision_Finder)
       return Rename_Problem'Class
    is
-      use type Ada_Node_Kind_Type;
-
       Param_Spec : Libadalang.Analysis.Param_Spec renames
         Self.Canonical_Definition.P_Basic_Decl.As_Param_Spec;
       Type_Expr  : Libadalang.Analysis.Type_Expr renames
