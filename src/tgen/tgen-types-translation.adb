@@ -1594,6 +1594,9 @@ package body TGen.Types.Translation is
       Comp_Decl : Component_Decl;
    begin
       for Decl of Decl_List loop
+         if Kind (Decl) in Ada_Null_Component_Decl then
+            return Null_Unbounded_String;
+         end if;
          Comp_Decl := Decl.As_Component_Decl;
          Current_Typ := Translate (Comp_Decl.F_Component_Def.F_Type_Expr);
          if not Current_Typ.Success then
