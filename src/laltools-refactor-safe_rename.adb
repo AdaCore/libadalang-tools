@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                       Copyright (C) 2022, AdaCore                        --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -1195,7 +1195,7 @@ package body Laltools.Refactor.Safe_Rename is
          use type Parameter_Data_Vectors.Vector;
 
       begin
-         if Subp_Spec_A.F_Subp_Kind /= Subp_Spec_B.F_Subp_Kind then
+         if Subp_Spec_A.F_Subp_Kind.Kind /= Subp_Spec_B.F_Subp_Kind.Kind then
             return False;
          end if;
 
