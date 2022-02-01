@@ -21,6 +21,7 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Containers.Vectors;
 with Ada.Containers.Hashed_Maps;
 with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Ordered_Sets;
@@ -47,14 +48,11 @@ package TGen.Types.Record_Types is
      (Node : LAL.Defining_Name) return Ada.Containers.Hash_Type is
        (Node.As_Ada_Node.Hash);
 
-   function Equivalent_Keys (L, R : LAL.Defining_Name) return Boolean is
-     (LAL."=" (L, R));
-
    package Component_Maps is new Ada.Containers.Hashed_Maps
      (Key_Type        => LAL.Defining_Name,
       Element_Type    => SP.Ref,
       Hash            => Hash_Defining_Name,
-      Equivalent_Keys => Equivalent_Keys,
+      Equivalent_Keys => LAL."=",
       "="             => SP."=");
    subtype Component_Map is Component_Maps.Map;
    --  Maps for discriminants and components, from their defining name to
@@ -62,6 +60,12 @@ package TGen.Types.Record_Types is
    --  not specified, initialyzing a record with a positional aggregate will
    --  very likely result in an error, a named association should be used
    --  instead.
+
+   package Component_Vectors is new Ada.Containers.Vectors
+     (Index_Type   => Positive,
+      Element_Type => LAL.Defining_Name,
+      "="          => LAL."=");
+   subtype Component_Vector is Component_Vectors.Vector;
 
    type Record_Typ is new Composite_Typ with record
 
@@ -149,7 +153,7 @@ package TGen.Types.Record_Types is
      (Key_Type        => LAL.Defining_Name,
       Element_Type    => Constraint_Value,
       Hash            => Hash_Defining_Name,
-      Equivalent_Keys => Equivalent_Keys);
+      Equivalent_Keys => LAL."=");
    --  Maps to represent discriminant constraints. Each entry specifies the
    --  value given to the discriminant of which the defining name is used as
    --  key. For enumeration types used as discriminants, this is the 'Pos value
@@ -242,6 +246,12 @@ package TGen.Types.Record_Types is
    overriding function Generate_Static
      (Self : Discriminated_Record_Typ) return String;
 
+   overriding function Generate_Random_Strategy
+     (Self : Discriminated_Record_Typ) return String;
+
+   overriding function Generate_Constrained_Random_Strategy
+     (Self : Discriminated_Record_Typ) return String;
+
    function Image_Internal
      (Self : Discriminated_Record_Typ; Padding : Natural := 0) return String;
 
@@ -250,14 +260,16 @@ package TGen.Types.Record_Types is
 
    procedure Free_Content (Self : in out Discriminated_Record_Typ);
 
+   overriding function Is_Constrained
+     (Self : Discriminated_Record_Typ) return Boolean
+     is (True);
+
    function As_Discriminated_Record_Typ
      (Self : SP.Ref) return Discriminated_Record_Typ'Class is
      (Discriminated_Record_Typ'Class (Self.Unchecked_Get.all)) with
      Pre => (not SP.Is_Null (Self))
             and then (Self.Get.Kind in Disc_Record_Kind);
    pragma Inline (As_Discriminated_Record_Typ);
-
-   type Integer_Array is array (Integer range <>) of Integer;
 
    generic
       type Discriminant_Type is (<>);

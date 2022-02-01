@@ -67,6 +67,12 @@ package TGen.Context is
          end case;
       end record;
 
+   function To_String
+     (Subp : Subprogram_Data) return String
+     with Pre => Subp.Kind = Ada_Subp_Kind_Function;
+   --  Return a string representation of the spec of the subprogram, e.g.
+   --  "function Foo (Bar : Integer) return Natural".
+
    package Subprograms_Data_Vectors is new Ada.Containers.Vectors
      (Index_Type => Positive,
       Element_Type => Subprogram_Data);
@@ -111,7 +117,6 @@ package TGen.Context is
    package Typ_Sets is new Ada.Containers.Ordered_Sets
      (Element_Type => SP.Ref,
       "=" => SP."=");
-
    subtype Typ_Set is Typ_Sets.Set;
 
    package Type_Vectors_Maps is new Ada.Containers.Ordered_Maps
@@ -125,8 +130,6 @@ package TGen.Context is
    --  General purpose context for test value generation purposes
 
    type Generation_Context is new TGen.Templates.Context with record
-      Output_Dir : Unbounded_String;
-      --  Directory for generated artifacts
 
       Test_Vectors : Unit_To_JSON_Map;
       --  JSON holding the generated test vectors, one for each unit

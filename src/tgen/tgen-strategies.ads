@@ -37,7 +37,7 @@ package TGen.Strategies is
    type Random_Strategy_Type is abstract new Strategy_Type with null record;
 
    generic
-      type T is private;
+      type T (<>) is private;
       with function Gen return T is <>;
    package Random_Strategy_Generic is
       type Random_Strategy_Generic_Type is

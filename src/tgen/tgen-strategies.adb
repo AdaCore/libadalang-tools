@@ -41,7 +41,7 @@ package body TGen.Strategies is
          Stream : access Root_Stream_Type'Class)
       is
       begin
-         T'Write (Stream, Gen);
+         T'Output (Stream, Gen);
       end Gen;
    end Random_Strategy_Generic;
 

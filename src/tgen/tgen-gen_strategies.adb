@@ -38,6 +38,7 @@ with Libadalang.Common; use Libadalang.Common;
 
 with Templates_Parser; use Templates_Parser;
 
+with TGen.Gen_Types_Value;   use TGen.Gen_Types_Value;
 with TGen.Files;             use TGen.Files;
 with TGen.Strings;           use TGen.Strings;
 with TGen.Types.Translation; use TGen.Types.Translation;
@@ -45,11 +46,17 @@ with TGen.Types;             use TGen.Types;
 
 package body TGen.Gen_Strategies is
 
+   ----------------
+   -- Initialize --
+   ----------------
+
    procedure Initialize
-     (Context : in out Generation_Context;
+     (Context    : in out Generation_Context;
+      Project    : Project_Type;
       Output_Dir : Unbounded_String) is
    begin
       Context.Output_Dir := Output_Dir;
+      Context.Project := Project;
       Prepare_Output_Dirs (Context);
    end Initialize;
 
@@ -107,16 +114,20 @@ package body TGen.Gen_Strategies is
             Strat_Source_File_ADS : Virtual_File :=
               Gen_File
                 (Context,
-                 Unit_To_File_Name
-                   (Param_Strat_Package_Name
-                      (+Pkg_Data.Pkg_Name.P_Fully_Qualified_Name)) & ".ads");
+                 Unit_To_Filename
+                   (Context.Project,
+                    Param_Strat_Package_Name
+                      (+Pkg_Data.Pkg_Name.P_Fully_Qualified_Name),
+                    Unit_Spec));
 
             Strat_Source_File_ADB : Virtual_File :=
               Gen_File
                 (Context,
-                 Unit_To_File_Name
-                   (Param_Strat_Package_Name
-                      (+Pkg_Data.Pkg_Name.P_Fully_Qualified_Name)) & ".adb");
+                 Unit_To_Filename
+                   (Context.Project,
+                    Param_Strat_Package_Name
+                      (+Pkg_Data.Pkg_Name.P_Fully_Qualified_Name),
+                   Unit_Body));
 
             Strat_ADS_File_Descriptor : constant GNAT.OS_Lib.File_Descriptor :=
               GNAT.OS_Lib.Create_File
@@ -341,175 +352,54 @@ package body TGen.Gen_Strategies is
       return S;
    end Distinct_Type_Parent_Package;
 
-   package body Type_Strategy_Generator is
-
-      function Type_Strat_Text_Template
-        (Self : Type_Strat_Generator) return Text_Type;
-
-      -------------------------
-      -- Type_Strat_Text_Template --
-      -------------------------
-
-      function Type_Strat_Text_Template
-        (Self : Type_Strat_Generator) return Text_Type
-      is
-         use GNATCOLL.VFS;
-
-         TS   : aliased constant Type_Strategy_Translator :=
-           Create_Type_Strategy_Translator (Self.Types);
-
-         Package_Name_Tag : constant String := "PACKAGE_NAME";
-
-         Table : Templates_Parser.Translate_Set;
-
-      begin
-         TS.Translate (Table);
-
-         --  All the tables are translated. Now translate the individual
-         --  tags.
-
-         Templates_Parser.Insert
-           (Table,
-            Templates_Parser.Assoc
-              (Package_Name_Tag,
-               (+Self.Types.First_Element.Get.Parent_Package_Name)));
-
-         return
-           To_Text
-             (Templates_Parser.Parse
-                (Filename          => +Self.Type_Strat_Template_File.Full_Name,
-                 Translations      => Table,
-                 Cached            => True,
-                 Keep_Unknown_Tags => True));
-      end Type_Strat_Text_Template;
-
-      overriding
-      procedure Generate_Source_Code
-        (Self    : Type_Strat_Generator;
-         Ctx : TGen.Templates.Context'Class)
-      --  Generates the Data Factory source file based on the Data Factory
-      --  template.
-      is
-         use GNATCOLL.VFS;
-         Strat_Context : constant Analysis_Context := Create_Context;
-         Strat_Unit    : constant Analysis_Unit :=
-           Strat_Context.Get_From_File
-             (+Self.Type_Strat_Source_File.Full_Name);
-
-         --  RW_Context_Handle : Rewriting_Handle :=
-         --    Start_Rewriting (Strat_Context);
-         --  RW_Unit_Handle    : constant Unit_Rewriting_Handle :=
-         --    Handle (Strat_Unit);
-         --
-         --  Strat_Unit_Root_Node : constant Node_Rewriting_Handle :=
-         --    Create_From_Template
-         --      (Handle    => RW_Context_Handle,
-         --       Template  => Self.Strat_Text_Template,
-         --       Arguments => (1 .. 0 => No_Node_Rewriting_Handle),
-         --       Rule      => Compilation_Unit_Rule);
-
-         Type_Strat_Writable_File : Writable_File :=
-           Write_File (Self.Type_Strat_Source_File);
-
-      begin
-         --  Set_Root (RW_Unit_Handle, Strat_Unit_Root_Node);
-         --
-         --  if Apply (RW_Context_Handle).Success then
-         --     null;
-         --  else
-         --     raise Program_Error;
-         --  end if;
-
-         Write
-           (Type_Strat_Writable_File,
-            To_UTF8 (Self.Type_Strat_Text_Template)
-            & Ada.Characters.Latin_9.LF);
-
-         Close (Type_Strat_Writable_File);
-      end Generate_Source_Code;
-
-      function Create
-        (Type_Strat_Source_File    : GNATCOLL.VFS.Virtual_File;
-         Type_Strat_Template_File  : GNATCOLL.VFS.Virtual_File;
-         Types                     : Typ_Set)
-         return Type_Strat_Generator
-      is
-         use type Ada.Calendar.Time;
-
-      begin
-         if Type_Strat_Template_File.File_Time_Stamp = GNAT.Calendar.No_Time
-         then
-            raise Program_Error with "Template file does not exists.";
-         end if;
-
-         declare
-            use GNATCOLL.VFS;
-
-            --  Create the output file for the Fuzz Test Harness. If the file
-            --  already exists, it is overwritten.
-
-            Type_Strat_File_Descriptor : constant GNAT.OS_Lib.File_Descriptor
-              :=
-                GNAT.OS_Lib.Create_File
-                  (+Type_Strat_Source_File.Full_Name, GNAT.OS_Lib.Text);
-            pragma Unreferenced (Type_Strat_File_Descriptor);
-
-         begin
-            null;
-         end;
-
-         return Type_Strat_Generator'
-           (Type_Strat_Source_File, Type_Strat_Template_File, Types);
-      end Create;
-
-      function Create_Type_Strategy_Translator
-        (Types : Typ_Set;
-         Next  : access constant Translator'Class := null)
-         return Type_Strategy_Translator
-         is
-           ((Next, Types));
-      --  With_Type_Parent_Package_Table_Translator constructor
-
-      procedure Translate_Helper
-        (Self  : Type_Strategy_Translator;
-         Table : in out Templates_Parser.Translate_Set)
-      is
-         use type Templates_Parser.Vector_Tag;
-
-         Type_Strategy_Tag : constant String := "TYPE_STRATEGY";
-
-         Type_Strategy_Vector_Tag : Templates_Parser.Vector_Tag;
-      begin
-         for T of Self.Types loop
-            Templates_Parser.Append
-              (Type_Strategy_Vector_Tag,
-               T.Get.Generate_Random_Strategy);
-         end loop;
-
-         Templates_Parser.Insert
-           (Table,
-            Templates_Parser.Assoc
-              (Type_Strategy_Tag, Type_Strategy_Vector_Tag));
-      end Translate_Helper;
-   end Type_Strategy_Generator;
+   ------------------------------
+   -- Generate_Type_Strategies --
+   ------------------------------
 
    procedure Generate_Type_Strategies
      (Context : Generation_Context) is
       use Type_Vectors_Maps;
    begin
-      for Typ in Context.Required_Type_Strategies.Iterate loop
+      --  for Typ in Context.Required_Type_Strategies.Iterate loop
+      --     declare
+      --        TSG : constant Type_Strategy_Generator.Type_Strat_Generator :=
+      --          Type_Strategy_Generator.Create
+      --            (Gen_File
+      --               (Context,
+      --                Unit_To_File_Name
+      --                  (Type_Strat_Package_Name
+      --                       (+Type_Vectors_Maps.Key (Typ))) & ".ads"),
+      --             Get_Template_Type_Strat_ADS,
+      --             Element (Typ));
+      --     begin
+      --        TSG.Generate_Source_Code (Context);
+      --     end;
+      --  end loop;
+      for C in Context.Required_Type_Strategies.Iterate loop
          declare
-            TSG : constant Type_Strategy_Generator.Type_Strat_Generator :=
-              Type_Strategy_Generator.Create
-                (Gen_File
-                   (Context,
-                    Unit_To_File_Name
-                      (Type_Strat_Package_Name
-                           (+Type_Vectors_Maps.Key (Typ))) & ".ads"),
-                 Get_Template_Type_Strat_ADS,
-                 Element (Typ));
+            Pkg_Name : Unbounded_String :=
+              +Type_Strat_Package_Name (+Type_Vectors_Maps.Key (C));
+
+            Types : Typ_Set := Element (C);
+            --  All types for which we should generate generation function
+
+            Type_Depends : Typ_Set;
+            --  All the type dependencies we need to generate an object of
+            --  any of the given types in Types.
+
          begin
-            TSG.Generate_Source_Code (Context);
+            for T of Types loop
+               Type_Depends.Union (Get_All_Types (T.Get));
+            end loop;
+            declare
+               TSG : constant Type_Value_Generator :=
+                 Create
+                   (Pkg_Name,
+                    Types,
+                    Type_Depends);
+            begin
+               TSG.Generate_Source_Code (Context);
+            end;
          end;
       end loop;
    end Generate_Type_Strategies;
@@ -705,6 +595,7 @@ package body TGen.Gen_Strategies is
            "Unable to find parent package of node "
            & Image (Subp.Full_Sloc_Image);
       end if;
+      Context.Codegen_Required := True;
 
       Pkg_Data.Pkg_Name := Pkg;
 
@@ -735,6 +626,13 @@ package body TGen.Gen_Strategies is
 
          for Param of Subp_Data.Parameters_Data loop
             declare
+
+               Param_Type : SP.Ref := Param.Type_Repr;
+               Type_Depends : Typ_Set := Get_All_Types (Param_Type.Get);
+               Typ_Parent_Package : Unbounded_Text_Type :=
+                 To_Unbounded_Text
+                   (Param_Type.Get.Parent_Package_Name);
+
                procedure Add_To_Set
                  (Parent_Pkg_Name : Unbounded_Text_Type;
                   TS : in out Typ_Set);
@@ -744,16 +642,12 @@ package body TGen.Gen_Strategies is
                   TS : in out Typ_Set)
                is
                begin
-                  if not TS.Contains (Param.Type_Repr) then
-                     TS.Insert (Param.Type_Repr);
+                  if not TS.Contains (Param_Type) then
+                     TS.Insert (Param_Type);
                   end if;
                end Add_To_Set;
 
-               Typ_Parent_Package : Unbounded_Text_Type :=
-                 To_Unbounded_Text (Param.Type_Repr.Get.Parent_Package_Name);
-
             begin
-
                if not Context.Required_Type_Strategies.
                  Contains (Typ_Parent_Package)
                then
@@ -761,7 +655,8 @@ package body TGen.Gen_Strategies is
                     (Typ_Parent_Package, Typ_Sets.Empty);
                end if;
                Context.Required_Type_Strategies.Update_Element
-                 (Context.Required_Type_Strategies.Find (Typ_Parent_Package),
+                 (Context.Required_Type_Strategies.Find
+                    (Typ_Parent_Package),
                   Add_To_Set'Access);
             end;
          end loop;

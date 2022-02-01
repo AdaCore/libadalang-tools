@@ -21,6 +21,8 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+
 with GNAT.Random_Numbers;
 
 with TGen.Strings; use TGen.Strings;
@@ -56,19 +58,41 @@ package body TGen.Types.Real_Types is
                  else "")
          else " (non static)"));
 
-   function Gen_Float return T is
+   function Gen return T is
       function Rand is new GNAT.Random_Numbers.Random_Float (T);
    begin
       return Rand (Generator_Instance);
-   end Gen_Float;
+   end Gen;
+
+   ------------------------------
+   -- Generate_Random_Strategy --
+   ------------------------------
 
    function Generate_Random_Strategy (Self : Float_Typ) return String
    is
+      Result : Unbounded_String;
+      F_Name : constant String := Self.Gen_Random_Function_Name;
+      Indent : Natural := 0;
    begin
-      return "function Gen_"
-        & Qualified_To_Unique_Name (Self.Type_Name)
-        & " is new TGen.Real_Types.Gen_Float ( "
-        & (+Self.Fully_Qualified_Name) & ");";
+      Write_Line
+        (Result,
+         "function " & F_Name & " return " & (+Self.Fully_Qualified_Name),
+         Indent);
+      Indent := @ + 3;
+      Write_Line (Result, "is", Indent);
+      Indent := @ + 3;
+      Write_Line
+        (Result,
+         "function Gen is new TGen.Types.Real_Types.Gen ("
+         & (+Self.Fully_Qualified_Name) & ");",
+         Indent);
+      Indent := @ - 3;
+      Write_Line (Result, "begin", Indent);
+      Indent := @ + 3;
+      Write_Line (Result, "return Gen;", Indent);
+      Indent := @ - 3;
+      Write_Line (Result, "end " & F_Name & ";", Indent);
+      return +Result;
    end Generate_Random_Strategy;
 
    function Generate_Static (Self : Float_Typ) return String is
@@ -80,7 +104,7 @@ package body TGen.Types.Real_Types is
       declare
          type Float_Type is new Long_Float
            range Self.Range_Value.Min .. Self.Range_Value.Max;
-         function Rand_Value is new Gen_Float (Float_Type);
+         function Rand_Value is new Gen (Float_Type);
       begin
          return Long_Float'Image (Long_Float (Rand_Value));
       end;

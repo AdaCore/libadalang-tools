@@ -46,7 +46,8 @@ with TGen.Files; use TGen.Files;
 package TGen.Gen_Strategies is
 
    procedure Initialize
-     (Context : in out Generation_Context;
+     (Context    : in out Generation_Context;
+      Project    : Project_Type;
       Output_Dir : Unbounded_String);
 
    procedure Generate_Artifacts (Context : in out Generation_Context);
@@ -71,18 +72,6 @@ package TGen.Gen_Strategies is
    --  (containing generation procedures) is deferred to the finalization of
    --  the Context. Return the generated body and the needed `with` clauses to
    --  insert with the body.
-
-   function Get_Gen_Directory (Ctx : Generation_Context) return Virtual_File is
-     (GNATCOLL.VFS.Create
-        (Filesystem_String (TGen.Strings."+" (Ctx.Output_Dir))));
-
-   function Get_Strat_ADB (Ctx : Generation_Context) return Virtual_File is
-     (Get_Gen_Directory (Ctx) / Strat_ADB);
-
-   function Gen_File
-     (Ctx : Generation_Context; File : String) return Virtual_File is
-     (Get_Gen_Directory (Ctx) /
-          Filesystem_String (File));
 
    type Type_Data is
       record
@@ -172,51 +161,6 @@ package TGen.Gen_Strategies is
         (Self  : Param_Strategy_Translator;
          Table : in out Templates_Parser.Translate_Set);
    end Strategy_Generator;
-
-   package Type_Strategy_Generator is
-      type Type_Strat_Generator is new Source_Code_File_Generator with private;
-
-      overriding
-      procedure Generate_Source_Code
-        (Self    : Type_Strat_Generator;
-         Ctx : TGen.Templates.Context'Class);
-      --  Generates the Data Factory source file based on the Data Factory
-      --  template.
-
-      function Create
-        (Type_Strat_Source_File    : GNATCOLL.VFS.Virtual_File;
-         Type_Strat_Template_File  : GNATCOLL.VFS.Virtual_File;
-         Types                     : Typ_Set)
-         return Type_Strat_Generator;
-      --  Constructor of a DF_Generator. 'DF_Source_File' is the output
-      --  Fuzz Test Harness source file and 'DF_Template_File' is the template
-      --  used to generate it.
-
-   private
-      type Type_Strat_Generator is new Source_Code_File_Generator with
-         record
-            Type_Strat_Source_File   : GNATCOLL.VFS.Virtual_File;
-            Type_Strat_Template_File : GNATCOLL.VFS.Virtual_File;
-            Types            : Typ_Set;
-         end record;
-
-      type Type_Strategy_Translator is new
-        Translator_Container with
-         record
-            Types : Typ_Set;
-         end record;
-
-      function Create_Type_Strategy_Translator
-        (Types : Typ_Set;
-         Next  : access constant Translator'Class := null)
-         return Type_Strategy_Translator;
-      --  With_Type_Parent_Package_Table_Translator constructor
-
-      overriding
-      procedure Translate_Helper
-        (Self  : Type_Strategy_Translator;
-         Table : in out Templates_Parser.Translate_Set);
-   end Type_Strategy_Generator;
 
    package Test_Generator is
       type Test_Generator is new Source_Code_Generator with private;

@@ -21,65 +21,51 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Finalization;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-with GNATCOLL.Projects; use GNATCOLL.Projects;
+with TGen.Strings; use TGen.Strings;
 
-with Templates_Parser;
+package body TGen.Context is
 
-package TGen.Templates is
+   ---------------
+   -- To_String --
+   ---------------
 
-   type Translator is interface;
+   function To_String (Subp : Subprogram_Data) return String is
+      Res : Unbounded_String;
+      I : Natural := 0;
+   begin
+      Write_Line (Res, "function " & (+Subp.Name), I);
+      I := I + 3;
+      S_Write (Res, "(", I);
 
-   type Context is new Ada.Finalization.Controlled with record
+      --  Append the discriminants as parameters
 
-      Project : Project_Type;
+      for Param_Cursor in Subp.Parameters_Data.Iterate loop
+         declare
+            use Parameters_Data_Vectors;
 
-      Output_Dir : Unbounded_String;
-      --  Directory for generated artifacts
+            Param_Data : Parameter_Data := Element (Param_Cursor);
+            Param_Name : Unbounded_Text_Type := Param_Data.Name;
+            Param_Type : Typ'Class := Param_Data.Type_Repr.Get;
+         begin
+            S_Write (Res, (+Param_Name) & " : ", I);
+            Write (Res, +Param_Type.Fully_Qualified_Name);
+            if Next (Param_Cursor) = Parameters_Data_Vectors.No_Element then
+               Write (Res, ")");
+               Write
+                 (Res,
+                  " return "
+                  & (+Subp.Return_Type_Fully_Qualified_Name));
+               I := I - 3;
+               New_Line (Res);
+            else
+               Write (Res, ";");
+            end if;
+         end;
+      end loop;
 
-   end record;
+      return +Res;
+   end To_String;
 
-   procedure Translate
-     (Self  : Translator;
-      Table : in out Templates_Parser.Translate_Set)
-   is abstract;
-   --  Creates associations between template tags and the data they should be
-   --  filled with.
-
-   type Translator_Container (Next : access constant Translator'Class) is
-     abstract new Translator with null record;
-   --  This container type can be used to chain 'Translator's together and
-   --  pass the request to 'Translate' the 'Parameters_Data' through all the
-   --  linked translators.
-
-   overriding
-   procedure Translate
-     (Self  : Translator_Container;
-      Table : in out Templates_Parser.Translate_Set);
-   --  Dispaches a call to Translate_Helper and and then to 'Next.Translate'
-   --  if 'Next' is not null.
-
-   procedure Translate_Helper
-     (Self  : Translator_Container;
-      Table : in out Templates_Parser.Translate_Set) is abstract;
-   --  Fill Table with tag-value(s) associations
-
-   type Source_Code_Generator is interface;
-
-   function Generate_Source_Code
-     (Self    : Source_Code_Generator;
-      Ctx     : Context'Class) return Wide_Wide_String
-   is abstract;
-   --  Generates a source code file
-
-   type Source_Code_File_Generator is interface;
-
-   procedure Generate_Source_Code
-     (Self    : Source_Code_File_Generator;
-      Ctx     : Context'Class)
-   is abstract;
-   --  Generates a source code file
-
-end TGen.Templates;
+end TGen.Context;

@@ -30,6 +30,9 @@ with TGen.Context; use TGen.Context;
 with TGen.Strings; use TGen.Strings;
 with TGen.Types; use TGen.Types;
 
+with GNATCOLL.VFS;
+with GNATCOLL.Projects; use GNATCOLL.Projects;
+
 package TGen.Gen_Strategies_Utils is
 
    use Libadalang.Common;
@@ -62,8 +65,7 @@ package TGen.Gen_Strategies_Utils is
    function Param_Strat_Package_Name (Package_Name : String) return String is
      (Package_Name & ".Param_Strategies");
 
-   function Type_Strat_Package_Name (Package_Name : String) return String is
-     (Package_Name & ".Type_Strategies");
+   function Type_Strat_Package_Name (Package_Name : String) return String;
 
    function Gen_Param_Function_Name
      (Subp_Data : Subprogram_Data;
@@ -84,7 +86,10 @@ package TGen.Gen_Strategies_Utils is
 
    subtype Param_Vector_Map is Param_Vectors_Maps.Map;
 
-   function Unit_To_File_Name (Old : String) return String;
+   function Unit_To_Filename
+     (Project   : Project_Type;
+      Unit_Name : String;
+      Part      : Unit_Parts) return String;
 
    function Is_Subprogram (Decl : Basic_Decl'Class) return Boolean is
      (not Decl.Is_Null
@@ -115,5 +120,10 @@ package TGen.Gen_Strategies_Utils is
       return Params;
    --  Gets the Params node associated to Subp_Spec, if it exists.
    --  If it doesn't exist returns No_Params.
+
+   function Get_All_Types (Self : Typ'Class) return Typ_Set;
+   --  Return the set of all types a type is composed of
+
+   function Gen_Constrained_Function (Self : Typ'Class) return Subprogram_Data;
 
 end TGen.Gen_Strategies_Utils;

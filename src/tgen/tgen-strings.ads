@@ -74,8 +74,14 @@ package TGen.Strings is
    function "+" (Text : Unbounded_Text_Type) return String is
      (To_UTF8 (To_Text (Text)));
 
+   function "+" (Str : String) return Unbounded_Text_Type is
+     (To_Unbounded_Text (From_UTF8 (Str)));
+
    function "+" (Text : Text_Type) return String is
      (To_UTF8 (Text));
+
+   function "+" (Str : String) return Text_Type is
+     (From_UTF8 (Str));
 
    function Remove_Trailing_Comma_And_Spaces
      (Text : Unbounded_String) return Unbounded_String is
@@ -87,10 +93,6 @@ package TGen.Strings is
    --  Remove the trailing spaces and comma of the given Text, e.g. passing
    --  "[a, b, " will return "[a, b".
 
-   -----------------------
-   -- Dot_To_Underscore --
-   -----------------------
-
    function Dot_To_Underscore (C : Character) return Character is
      ((if C = '.' then '_' else C));
 
@@ -99,4 +101,19 @@ package TGen.Strings is
               (Source  => To_UTF8 (Qualified_Name),
                Mapping => Dot_To_Underscore'Access));
 
+   procedure New_Line (Str : in out Unbounded_String);
+
+   procedure Write_Line
+     (Str  : in out Unbounded_String;
+      Add  : String;
+      Span : Natural);
+
+   procedure S_Write
+     (Str  : in out Unbounded_String;
+      Add  : String;
+      Span : Natural);
+
+   procedure Write
+     (Str  : in out Unbounded_String;
+      Add  : String);
 end TGen.Strings;

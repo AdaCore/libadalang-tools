@@ -22,11 +22,12 @@
 ------------------------------------------------------------------------------
 
 with Ada.Characters.Handling; use Ada.Characters.Handling;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Strings.Unbounded;   use Ada.Strings.Unbounded;
 
-with TGen.Types.Translation; use TGen.Types.Translation;
-
-with TGen.Strings; use TGen.Strings;
+with TGen.Strings;            use TGen.Strings;
+with TGen.Types;              use TGen.Types;
+with TGen.Types.Record_Types; use TGen.Types.Record_Types;
+with TGen.Types.Translation;  use TGen.Types.Translation;
 
 package body TGen.Gen_Strategies_Utils is
 
@@ -197,28 +198,23 @@ package body TGen.Gen_Strategies_Utils is
    --  This is duplicated code from lal_tools. For now we want to avoid
    --  bringing a dependency to lal_tools.
 
-   -----------------------
-   -- Unit_To_File_Name --
-   -----------------------
+   ----------------------
+   -- Unit_To_Filename --
+   ----------------------
 
-   function Unit_To_File_Name (Old : String) return String is
-      T : String_Access;
+   function Unit_To_Filename
+     (Project   : Project_Type;
+      Unit_Name : String;
+      Part      : Unit_Parts) return String
+   is
+      use GNATCOLL.VFS;
    begin
-      T := new String'(Old);
-      for J in T.all'First .. T.all'Last loop
-         if T.all (J) = '.' then
-            if J = T.all'First + 1 and then
-              T.all (J - 1) in 'a' | 's' | 'i' | 'g' | 'A' | 'S' | 'I' | 'G'
-            then
-               T.all (J) := '~';
-            else
-               T.all (J) := '-';
-            end if;
-         end if;
-      end loop;
-
-      return To_Lower (T.all);
-   end Unit_To_File_Name;
+      return +Project.File_From_Unit
+        (Unit_Name => Unit_Name,
+         Part      => Part,
+         Language  => "Ada",
+         File_Must_Exist => False);
+   end Unit_To_Filename;
 
    ---------------------
    -- Get_Subp_Params --
@@ -262,4 +258,113 @@ package body TGen.Gen_Strategies_Utils is
             => return No_Params;
       end case;
    end Get_Subp_Spec_Params;
+
+   -----------------------------
+   -- Type_Strat_Package_Name --
+   -----------------------------
+
+   function Type_Strat_Package_Name (Package_Name : String) return String is
+   begin
+      if Package_Name = "Standard" then
+         return "Standard_Type_Strategies";
+      else
+         return Package_Name & ".Type_Strategies";
+      end if;
+   end Type_Strat_Package_Name;
+
+
+   -------------------
+   -- Get_All_Types --
+   -------------------
+
+   function Get_All_Types (Self : Typ'Class) return Typ_Set is
+      Result : Typ_Set;
+   begin
+      case Kind (Self) is
+         when Non_Disc_Record_Kind =>
+            for Comp of Nondiscriminated_Record_Typ (Self).Component_Types loop
+               Result.Insert (Comp);
+            end loop;
+         when Disc_Record_Kind =>
+            declare
+               R : Discriminated_Record_Typ := Discriminated_Record_Typ (Self);
+            begin
+               for T of R.Component_Types loop
+                  Result.Insert (T);
+               end loop;
+
+               for T of R.Discriminant_Types loop
+                  Result.Insert (T);
+               end loop;
+
+               if R.Variant /= null then
+                  for V of R.Variant.Variant_Choices loop
+                     Result.Union
+                       (Get_All_Types
+                          (Discriminated_Record_Typ'
+                               (Constrained        => False,
+                                Name               => R.Name,
+                                Component_Types    => V.Components,
+                                Mutable            => False,
+                                Discriminant_Types => Component_Maps.Empty_Map,
+                                Variant            => V.Variant)));
+                  end loop;
+               end if;
+            end;
+
+            --  TODO: add arrays
+
+         when others =>
+            null;
+      end case;
+
+      return Result;
+   end Get_All_Types;
+
+   ------------------------------
+   -- Gen_Constrained_Function --
+   ------------------------------
+
+   function Gen_Constrained_Function (Self : Typ'Class) return Subprogram_Data
+   is
+      Result : Subprogram_Data (Ada_Subp_Kind_Function);
+      F_Prefix : constant String := "Constrained_";
+      Ret_Type : constant String := +(Self.Fully_Qualified_Name);
+   begin
+      case Self.Kind is
+         when Disc_Record_Kind =>
+            declare
+               Disc_Record : Discriminated_Record_Typ :=
+                 Discriminated_Record_Typ (Self);
+               F_Name : constant Unbounded_Text_Type :=
+                 +(F_Prefix & Self.Gen_Random_Function_Name);
+               Index  : Positive := 1;
+            begin
+               Result.Name := F_Name;
+               Result.Return_Type_Fully_Qualified_Name := +Ret_Type;
+               for D in Disc_Record.Discriminant_Types.Iterate loop
+                  declare
+                     use Component_Maps;
+
+                     D_Name : constant String := +Key (D).F_Name.Text;
+                     D_Type : SP.Ref := Element (D);
+                     P      : Parameter_Data;
+                  begin
+                     P.Name := +D_Name;
+                     P.Index := Index;
+                     P.Type_Repr := D_Type;
+                     Result.Parameters_Data.Append (P);
+                     Index := Index + 1;
+                  end;
+               end loop;
+            end;
+
+         --  TODO arrays
+
+         when others =>
+            raise Program_Error with "Type not constrained";
+      end case;
+      return Result;
+   end Gen_Constrained_Function;
+
 end TGen.Gen_Strategies_Utils;

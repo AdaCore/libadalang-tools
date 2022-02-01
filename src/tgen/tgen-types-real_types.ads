@@ -109,7 +109,7 @@ package TGen.Types.Real_Types is
 
    generic
       type T is digits <>;
-   function Gen_Float return T;
+   function Gen return T;
 
    overriding function Generate_Static
      (Self : Float_Typ) return String;

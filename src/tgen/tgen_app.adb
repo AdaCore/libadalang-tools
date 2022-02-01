@@ -74,8 +74,9 @@ procedure TGen_App is
    is
       Prj : Project_Type renames Context.Provider.Project.Root_Project;
    begin
-      Initialize (GC, +Project_Output_Dir
-                  (Context.Provider.Project.Root_Project));
+      Initialize (GC, Context.Provider.Project.Root_Project,
+                  +Project_Output_Dir
+                    (Context.Provider.Project.Root_Project));
    end App_Setup;
 
    procedure App_Post_Process

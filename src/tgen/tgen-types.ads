@@ -90,7 +90,7 @@ package TGen.Types is
 
    function Gen_Random_Function_Name
      (Self : Typ) return String is
-      ("Gen_" & Qualified_To_Unique_Name (Self.Fully_Qualified_Name));
+     ("Gen_" & Qualified_To_Unique_Name (Self.Fully_Qualified_Name));
 
    function "<" (L : Typ'Class; R : Typ'Class) return Boolean is
      (L.Name.P_Fully_Qualified_Name < R.Name.P_Fully_Qualified_Name);
@@ -101,7 +101,15 @@ package TGen.Types is
    function Package_Name (Self : Typ) return String;
    --  Return the package name this type belongs to
 
+   function Is_Constrained (Self : Typ) return Boolean is (False);
+   --  An array type with indefinite bounds must be constrained, a discriminant
+   --  record type must be constrained.
+
    function Generate_Random_Strategy (Self : Typ) return String is ("");
+
+   function Generate_Constrained_Random_Strategy
+     (Self : Typ) return String is ("")
+     with Pre => Self.Is_Constrained;
 
    function Generate_Static (Self : Typ) return String;
    --  Generate statically a value of the given Typ and returns its string

@@ -23,7 +23,7 @@
 
 package body TGen.Engine is
 
-   MAX_TESTS : constant Positive := 200;
+   MAX_TESTS : constant Positive := 1;
 
    procedure Test_Runner
      (Strategies : Strategy_Vectors.Vector;

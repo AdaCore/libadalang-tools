@@ -24,8 +24,9 @@
 with Ada.Directories;
 with Ada.Environment_Variables;
 
-with TGen.Context; use TGen.Context;
-with TGen.Strings; use TGen.Strings;
+with TGen.Context;   use TGen.Context;
+with TGen.Strings;   use TGen.Strings;
+with TGen.Templates; use TGen.Templates;
 
 with GNATCOLL.VFS;      use GNATCOLL.VFS;
 with GNATCOLL.Projects; use GNATCOLL.Projects;
@@ -42,6 +43,9 @@ package TGen.Files is
 
    Type_Strat_Template_ADS : constant Filesystem_String :=
      "type-strat.ads.tmpl";
+
+   Type_Strat_Template_ADB : constant Filesystem_String :=
+     "type-strat.adb.tmpl";
 
    Test_Proc_Template_ADB : constant Filesystem_String :=
      "test_procedure.adb.tmpl";
@@ -60,11 +64,15 @@ package TGen.Files is
    function Get_Template_Type_Strat_ADS return Virtual_File is
      (Get_Tmpl_Directory / Type_Strat_Template_ADS);
 
-   function Get_Output_Dir (Context : Generation_Context) return Virtual_File
-     is (GNATCOLL.VFS.Create (Filesystem_String (+Context.Output_Dir)));
+   function Get_Template_Type_Strat_ADB return Virtual_File is
+     (Get_Tmpl_Directory / Type_Strat_Template_ADB);
+
+   function Get_Output_Dir
+     (Context : TGen.Templates.Context'Class) return Virtual_File
+   is (GNATCOLL.VFS.Create (Filesystem_String (+Context.Output_Dir)));
 
    function Get_JSON_Name
-     (Context   : Generation_Context;
+     (Context   : TGen.Templates.Context'Class;
       Unit_Name : String) return Virtual_File
      is (Get_Output_Dir (Context) / Filesystem_String (Unit_Name & ".json"));
 
@@ -76,5 +84,12 @@ package TGen.Files is
    procedure Prepare_Output_Dirs (Context : Generation_Context);
 
    function Project_Output_Dir (Project : Project_Type) return String;
+
+   function Get_Strat_ADB (Ctx : Generation_Context) return Virtual_File is
+     (Get_Output_Dir (Ctx) / Strat_ADB);
+
+   function Gen_File
+     (Ctx : TGen.Templates.Context'Class; File : String) return Virtual_File is
+     (Get_Output_Dir (Ctx) / Filesystem_String (File));
 
 end TGen.Files;

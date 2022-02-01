@@ -21,6 +21,7 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Characters.Latin_1;
 with Ada.Containers; use Ada.Containers;
 with Ada.Containers.Doubly_Linked_Lists;
 
@@ -37,6 +38,7 @@ with Langkit_Support.Text;
 with GNATCOLL.GMP.Integers;
 
 with TGen.Context; use TGen.Context;
+with TGen.Gen_Strategies_Utils; use TGen.Gen_Strategies_Utils;
 
 package body TGen.Types.Record_Types is
 
@@ -327,62 +329,6 @@ package body TGen.Types.Record_Types is
 
    function "+" (I : GNATCOLL.GMP.Integers.Big_Integer) return Big_Integer is
      (Big_Int.From_String (GNATCOLL.GMP.Integers.Image (I)));
-
-   --  function Interval_Of_Alternative (Alt : Expr) return Interval;
-   --
-   --  function Interval_Of_Alternative (Alt : Expr) return Interval is
-   --     use Libadalang.Common;
-   --     L : Big_Integer;
-   --     R : Big_Integer;
-   --  begin
-   --
-   --     --  Special cases
-   --
-   --     case Alt.Kind is
-   --        when Ada_Bin_Op =>
-   --           case Alt.As_Bin_Op.F_Op is
-   --
-   --              --  Range
-   --
-   --              when Ada_Op_Double_Dot =>
-   --                 L := +As_Int (Expr_Eval (Alt.As_Bin_Op.F_Left));
-   --                 R := +As_Int (Expr_Eval (Alt.As_Bin_Op.F_Right));
-   --                 return Interval'(Int, L, R);
-   --              when others => null;
-   --           end case;
-   --        when others => null;
-   --     end case;
-   --
-   --     --  Default: evaluation of the node and singleton interval
-   --
-   --     L := +As_Int (Expr_Eval (Alt));
-   --     return Interval'(Int, L, L);
-   --  end Interval_Of_Alternative;
-   --
-   --  function Intervals_Of_Variant
-   --    (Disc_Record       : Discriminated_Record_Typ;
-   --     Covered_Intervals : Interval_Set;
-   --     Variant_Part      : Variant_Part;
-   --     Choice            : Variant_Choice) return Interval_Set;
-   --
-   --  function Intervals_Of_Variant
-   --    (Disc_Record       : Discriminated_Record_Typ;
-   --     Covered_Intervals : Interval_Set;
-   --     Variant_Part      : Variant_Part;
-   --     Choice            : Variant_Choice) return Interval_Set is
-   --     Result : Interval_Set;
-   --  begin
-   --     for Alt of Choice.Alternatives loop
-   --        if Alt.Kind = Ada_Others_Designator then
-   --           for Interval of Covered_Intervals loop
-   --              null;
-   --           end loop;
-   --        else
-   --           Result.Insert (Interval_Of_Alternative (Alt.As_Expr));
-   --        end if;
-   --     end loop;
-   --     return Result;
-   --  end Intervals_Of_Variant;
 
    ----------------
    -- PP_Variant --
@@ -701,6 +647,238 @@ package body TGen.Types.Record_Types is
       end loop;
       return Result;
    end Generate_All_Shapes_Wrapper;
+
+   ------------------------------------------
+   -- Generate_Constrained_Random_Strategy --
+   ------------------------------------------
+
+   function Generate_Constrained_Random_Strategy
+     (Self : Discriminated_Record_Typ) return String
+   is
+      use Component_Maps;
+
+      Function_String : Unbounded_String;
+      Indentation : Unbounded_String := +"";
+      Rec_Name : constant String := "Rec";
+
+      procedure A (Str : String);
+      procedure NL;
+      procedure I;
+      procedure UI;
+      procedure Pp_Components (Components : Component_Maps.Map);
+      procedure Pp_Variant
+        (Components : Component_Vector;
+         Variant    : Variant_Part);
+
+      procedure A (Str : String) is
+      begin
+         Append (Function_String, Str);
+      end A;
+
+      procedure NL is
+      begin
+         Append (Function_String, Ada.Characters.Latin_1.LF & (+Indentation));
+      end NL;
+
+      procedure I is
+      begin
+         Append (Indentation, "   ");
+      end I;
+
+      procedure UI is
+      begin
+         Indentation := Head (Indentation, Length (Indentation) - 3);
+      end UI;
+
+      procedure Pp_Components (Components : Component_Maps.Map) is
+      begin
+         for Component in Components.Iterate loop
+            declare
+               Component_Name : LAL.Defining_Name := Key (Component);
+               Component_Type : Typ'Class := Element (Component).Get;
+            begin
+               A ((+Component_Name.F_Name.Text) & " : ");
+               A ((+Component_Type.Fully_Qualified_Name) & " :=");
+               I;
+               NL;
+               A (Component_Type.Gen_Random_Function_Name & ";");
+               UI;
+            end;
+         end loop;
+      end Pp_Components;
+
+      procedure Pp_Variant
+        (Components : Component_Vector;
+         Variant    : Variant_Part) is
+         use Variant_Choice_Maps;
+
+      begin
+         A ("case " & (+Self.Variant.Discr_Name.F_Name.Text) & " is ");
+         I;
+         NL;
+         for Choice of Variant.Variant_Choices loop
+            declare
+               use Component_Maps;
+               use Component_Vectors;
+
+               New_Components : Component_Vector := Components.Copy;
+            begin
+               for C in Choice.Components.Iterate loop
+                  Append (New_Components, Key (C));
+               end loop;
+               A ("when " & (+Choice.Alternatives.Text) & " => ");
+               I;
+               NL;
+               if Choice.Components.Length /= 0 then
+                  A ("declare");
+                  I;
+                  NL;
+                  Pp_Components (Choice.Components);
+                  UI;
+                  NL;
+                  A ("begin");
+                  I;
+               end if;
+
+               if Choice.Variant /= null then
+                  Pp_Variant (New_Components, Choice.Variant.all);
+
+               else
+                  if New_Components.Length = 0 then
+                     A ("null;");
+                  end if;
+                  for C of New_Components loop
+                     NL;
+                     A (Rec_Name & "." & (+C.F_Name.Text)
+                        & " := " & (+C.F_Name.Text) & ";");
+                  end loop;
+               end if;
+
+               if Choice.Components.Length /= 0 then
+                  UI;
+                  NL;
+                  A ("end;");
+               end if;
+               UI;
+               NL;
+            end;
+         end loop;
+         UI;
+         NL;
+         A ("end case;");
+         NL;
+      end Pp_Variant;
+
+      Constrained_Function : constant Subprogram_Data :=
+        Gen_Constrained_Function (Self);
+   begin
+
+      A (To_String (Constrained_Function));
+      A ("is");
+      I;
+      NL;
+      A (Rec_Name & " : " & (+Self.Fully_Qualified_Name));
+
+      --  Then add the discriminants to the record type declaration
+
+      if Self.Discriminant_Types.Length > 0 then
+         A (" (");
+         for Disc in Self.Discriminant_Types.Iterate loop
+            A (+Key (Disc).F_Name.Text);
+            if Next (Disc) /= No_Element then
+               A (", ");
+               NL;
+            end if;
+            A (");");
+         end loop;
+      end if;
+
+      --  Now generate a function that is similar to the record declaration:
+      --  generate the different variant parts, and when there are no more
+      --  variant, assign the list of generated components to the resulting
+      --  record.
+
+      UI;
+      NL;
+      A ("begin");
+      I;
+      NL;
+
+      Pp_Components (Self.Component_Types);
+      if Self.Variant /= null then
+         Pp_Variant (Component_Vectors.Empty, Self.Variant.all);
+      end if;
+
+      A ("return " & Rec_Name & ";");
+      UI;
+      NL;
+      A ("end " & (+Constrained_Function.Name) & ";");
+
+      return +Function_String;
+   end Generate_Constrained_Random_Strategy;
+
+   ------------------------------
+   -- Generate_Random_Strategy --
+   ------------------------------
+
+   function Generate_Random_Strategy
+     (Self : Discriminated_Record_Typ) return String
+   is
+      Result : Unbounded_String;
+      F_Name : constant String := Self.Gen_Random_Function_Name;
+      Indentation : Natural := 0;
+
+      Constrained_Function : Subprogram_Data :=
+        Gen_Constrained_Function (Self);
+   begin
+
+      Write_Line
+        (Result,
+         "function " & F_Name & " return " & (+Self.Fully_Qualified_Name),
+         Indentation);
+
+      Write_Line (Result, "is", Indentation);
+      Write_Line (Result, "begin", Indentation);
+
+      Indentation := Indentation + 3;
+
+      Write_Line
+        (Result, "return " & (+Constrained_Function.Name), Indentation);
+
+      Indentation := Indentation + 3;
+
+      S_Write (Result, "( ", Indentation);
+
+
+      --  Expected parameters are discriminant values; pass them
+
+      for Disc_Cursor in Self.Discriminant_Types.Iterate loop
+         declare
+            use Component_Maps;
+
+            Disc_Name : constant String :=
+              +Key (Disc_Cursor).F_Name.Text;
+            Disc_Type : Typ'Class := Element (Disc_Cursor).Get;
+
+            Suffix : constant String :=
+              (if Next (Disc_Cursor) = No_Element then ");" else " ,");
+         begin
+            Write_Line
+              (Result,
+               Disc_Name & " => "
+               & Disc_Type.Gen_Random_Function_Name
+               & Suffix,
+               Indentation);
+         end;
+      end loop;
+
+      Indentation := Indentation - 6;
+      Write_Line
+        (Result,
+         "end " & F_Name & ";",
+         Indentation);
+      return +Result;
+   end Generate_Random_Strategy;
 
    package body Random_Discriminated_Record_Strategy is
 

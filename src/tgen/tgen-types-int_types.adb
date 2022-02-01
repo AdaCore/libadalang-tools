@@ -21,6 +21,8 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+
 with GNAT.Random_Numbers;
 
 with TGen.Strings; use TGen.Strings;
@@ -56,13 +58,35 @@ package body TGen.Types.Int_Types is
    function High_Bound (Self : Mod_Int_Typ) return Big_Integer is
      (Self.Mod_Value);
 
+   ------------------------------
+   -- Generate_Random_Strategy --
+   ------------------------------
+
    function Generate_Random_Strategy (Self : Int_Typ) return String
    is
+      Result : Unbounded_String;
+      F_Name : constant String := Self.Gen_Random_Function_Name;
+      Indent : Natural := 0;
    begin
-      return "function Gen_"
-        & Qualified_To_Unique_Name (Self.Type_Name)
-        & " is new TGen.Int_Types.Gen ( " & (+Self.Fully_Qualified_Name)
-        & ");";
+      Write_Line
+        (Result,
+         "function " & F_Name & " return " & (+Self.Fully_Qualified_Name),
+         Indent);
+      Indent := @ + 3;
+      Write_Line (Result, "is", Indent);
+      Indent := @ + 3;
+      Write_Line
+        (Result,
+         "function Gen is new TGen.Types.Int_Types.Gen ("
+         & (+Self.Fully_Qualified_Name) & ");",
+         Indent);
+      Indent := @ - 3;
+      Write_Line (Result, "begin", Indent);
+      Indent := @ + 3;
+      Write_Line (Result, "return Gen;", Indent);
+      Indent := @ - 3;
+      Write_Line (Result, "end " & F_Name & ";", Indent);
+      return +Result;
    end Generate_Random_Strategy;
 
    function Gen return T is
