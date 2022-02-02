@@ -1,4 +1,3 @@
-import difflib
 import os
 import os.path
 
@@ -36,6 +35,7 @@ class BaseDriver(DiffTestDriver):
         "refactoring_add_parameter",
         "refactoring_remove_parameter",
         "refactoring_safe_rename",
+        "refactoring_extract_subprogram",
     } | WIP_TOOLS
 
     @property

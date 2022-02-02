@@ -1,0 +1,26 @@
+Extracting as a ADA_SUBP_KIND_PROCEDURE:
+main.adb
+25:1-25:1 
+      procedure Extracted;
+
+      procedure Extracted is
+      begin
+         null;
+      end Extracted;
+
+
+26:7-26:12 Extracted;
+
+Extracting as a ADA_SUBP_KIND_PROCEDURE:
+main.adb
+48:1-48:1 
+      procedure Extracted_2;
+
+      procedure Extracted_2 is
+      begin
+         null;
+      end Extracted_2;
+
+
+49:7-49:12 Extracted_2;
+
