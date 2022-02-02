@@ -1,0 +1,6 @@
+description: |
+    This test checks if the safe rename tool correctly handles
+    interfaces with the same subprogram signature (appart from
+    the tagged type).
+
+driver: shell_script

@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -391,7 +391,7 @@ package body Laltools.Subprogram_Hierarchy is
       end if;
 
       if not Include_Base_Subps and not Include_Overrides then
-         Hierarchy.Insert (Subp.P_Canonical_Part);
+         Hierarchy.Include (Subp.P_Canonical_Part);
       end if;
 
       if Include_Base_Subps and Include_Overrides then
@@ -401,20 +401,20 @@ package body Laltools.Subprogram_Hierarchy is
 
          begin
             if Root_Subps'Length = 0 then
-               Hierarchy.Insert (Subp.P_Canonical_Part);
+               Hierarchy.Include (Subp.P_Canonical_Part);
 
                for Subp_Override of Subp.P_Find_All_Overrides (Units) loop
-                  Hierarchy.Insert (Subp_Override);
+                  Hierarchy.Include (Subp_Override);
                end loop;
 
             else
                for Root_Subp of Root_Subps loop
-                  Hierarchy.Insert (Root_Subp);
+                  Hierarchy.Include (Root_Subp);
 
                   for Root_Subp_Override
                     of Root_Subp.P_Find_All_Overrides (Units)
                   loop
-                     Hierarchy.Insert (Root_Subp_Override);
+                     Hierarchy.Include (Root_Subp_Override);
                   end loop;
                end loop;
             end if;
@@ -422,10 +422,10 @@ package body Laltools.Subprogram_Hierarchy is
       end if;
 
       if Include_Overrides and not Include_Base_Subps then
-         Hierarchy.Insert (Subp);
+         Hierarchy.Include (Subp);
 
          for Override of Subp.P_Find_All_Overrides (Units) loop
-            Hierarchy.Insert (Override.As_Basic_Decl);
+            Hierarchy.Include (Override.As_Basic_Decl);
          end loop;
 
          return Hierarchy_As_Array;
@@ -438,16 +438,16 @@ package body Laltools.Subprogram_Hierarchy is
 
          begin
             if Root_Subps'Length = 0 then
-               Hierarchy.Insert (Subp.P_Canonical_Part);
+               Hierarchy.Include (Subp.P_Canonical_Part);
 
             else
                for Root_Subp of Root_Subps loop
-                  Hierarchy.Insert (Root_Subp);
+                  Hierarchy.Include (Root_Subp);
 
                   for Root_Subp_Override
                     of Root_Subp.P_Find_All_Overrides (Units)
                   loop
-                     Hierarchy.Insert (Root_Subp_Override);
+                     Hierarchy.Include (Root_Subp_Override);
                   end loop;
                end loop;
 
