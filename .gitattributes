@@ -1,8 +1,6 @@
 # Mark all Ada sources as a text
 *.ad[sb] text
 
-testsuite/tests/**/* no-precommit-check
-
 # The standard Python pre-commit check would flag the use
 # of the "GPS" API.
 scripts/gs_pp_mode.py no-precommit-check
