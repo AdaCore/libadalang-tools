@@ -6,7 +6,7 @@ declare
    @@END_TABLE@@
 
    @@IF@@ @_HAS_PARAMS_@
-     @_PROC_NAME_@_Strategies : TGen.Strategies.Strategy_Vector :=
+   @_PROC_NAME_@_Strategies : TGen.Strategies.Strategy_Vector :=
       @@INLINE(         [)(,)(];)@@
       @@TABLE@@
       @_STRATEGY_NAME_@.Strat'Unchecked_Access
@@ -16,11 +16,34 @@ declare
    @@ELSE@@
       @_PROC_NAME_@_Strategies : TGen.Strategies.Strategy_Vector;
    @@END_IF@@
+
+   function Is_Valid
+   @@INLINE(         \()(,)(\))@@
+   @@TABLE@@
+   @_PARAM_NAME_@ : @_TYPE_NAME_@
+   @@END_TABLE@@
+   @@END_INLINE@@
+      return Boolean
+   is (@_PRECONDITION_EXPRESSION_@);
+
    procedure @_PROC_NAME_@_Wrapper is
       @@TABLE@@
       @_PARAM_NAME_@ : @_TYPE_NAME_@ := @_TYPE_NAME_@'Input (Value_Stream'Unchecked_Access);
       @@END_TABLE@@
    begin
+
+      --  Check that the generated values make the precondition hold. If that's
+      --  not the case, notify the engine that it needs to regenerate values.
+
+      if not Is_Valid
+      @@INLINE(         \()(,)(\))@@
+      @@TABLE@@
+      @_PARAM_NAME_@
+      @@END_TABLE@@
+      @@END_INLINE@@
+      then
+         raise TGen.Engine.Invalid_Generation_Error;
+      end if;
       @@IF@@ @_HAS_PARAMS_@
       @_PROC_QUALIFIED_NAME_@
       @@INLINE(         \()(,)(\);)@@

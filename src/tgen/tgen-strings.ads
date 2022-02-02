@@ -71,17 +71,21 @@ package TGen.Strings is
       return String
       renames Ada.Strings.Unbounded.To_String;
 
+   function "+" (Text : Text_Type) return String renames To_UTF8;
+
+   function "+" (Str : String) return Text_Type renames From_UTF8;
+
+   function "+" (T : Text_Type) return Unbounded_Text_Type
+                 renames To_Unbounded_Text;
+
+   function "+" (T : Unbounded_Text_Type) return Text_Type
+                 renames To_Text;
+
    function "+" (Text : Unbounded_Text_Type) return String is
-     (To_UTF8 (To_Text (Text)));
+     (+(+Text));
 
    function "+" (Str : String) return Unbounded_Text_Type is
-     (To_Unbounded_Text (From_UTF8 (Str)));
-
-   function "+" (Text : Text_Type) return String is
-     (To_UTF8 (Text));
-
-   function "+" (Str : String) return Text_Type is
-     (From_UTF8 (Str));
+     (+(+Str));
 
    function Remove_Trailing_Comma_And_Spaces
      (Text : Unbounded_String) return Unbounded_String is

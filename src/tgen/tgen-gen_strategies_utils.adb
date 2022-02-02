@@ -49,33 +49,41 @@ package body TGen.Gen_Strategies_Utils is
       Params_Data          : constant Parameters_Data_Vector :=
         Extract_Parameters_Data (Subp);
       Kind                 : constant Ada_Subp_Kind := Spec.F_Subp_Kind;
-
-      function "+" (T : Text_Type) return Unbounded_Text_Type
-        renames To_Unbounded_Text;
+      Precondition         : Unbounded_Text_Type;
 
       Result : Subprogram_Data (Kind);
    begin
+      begin
+         Precondition := +Subp.P_Get_Aspect_Spec_Expr (+String'("Pre")).Text;
+      exception
+         when E : Property_Error =>
+            --  No precondition => generated values are always valid
+
+            Precondition := +String'("True");
+      end;
       case Kind is
          when Ada_Subp_Kind_Function =>
             return
-              (Kind => Ada_Subp_Kind_Function,
-               Name => +Name,
-               Fully_Qualified_Name => +Fully_Qualified_Name,
-               Parent_Package => +Parent_Package,
-               Parameters_Data => Params_Data,
+              (Kind                             => Ada_Subp_Kind_Function,
+               Name                             => +Name,
+               Fully_Qualified_Name             => +Fully_Qualified_Name,
+               Parent_Package                   => +Parent_Package,
+               Parameters_Data                  => Params_Data,
                Return_Type_Fully_Qualified_Name =>
                   +Spec.P_Return_Type.P_Fully_Qualified_Name,
-               Return_Type_Parent_Package =>
+               Return_Type_Parent_Package       =>
                   +Spec.P_Top_Level_Decl (Spec.P_Return_Type.Unit).
-                     P_Fully_Qualified_Name);
+                   P_Fully_Qualified_Name,
+               Precondition                     => Precondition);
 
          when Ada_Subp_Kind_Procedure =>
             return
-              (Kind => Ada_Subp_Kind_Procedure,
-               Name => +Name,
+              (Kind                 => Ada_Subp_Kind_Procedure,
+               Name                 => +Name,
                Fully_Qualified_Name => +Fully_Qualified_Name,
-               Parent_Package => +Parent_Package,
-               Parameters_Data => Params_Data);
+               Parent_Package       => +Parent_Package,
+               Parameters_Data      => Params_Data,
+               Precondition         => Precondition);
       end case;
       return Result;
    end Extract_Subprogram_Data;

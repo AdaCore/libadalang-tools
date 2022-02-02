@@ -21,12 +21,18 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Text_IO;
+
 package body TGen.Engine is
 
-   MAX_TESTS : constant Positive := 1;
+   MAX_TESTS : constant Positive := 10;
+
+   -----------------
+   -- Test_Runner --
+   -----------------
 
    procedure Test_Runner
-     (Strategies : Strategy_Vectors.Vector;
+     (Strategies   : Strategy_Vectors.Vector;
       Value_Stream : access Flushable_Stream'Class;
       Wrapped_Test : access procedure)
    is
@@ -35,7 +41,15 @@ package body TGen.Engine is
          for Strat of Strategies loop
             Strat.Gen (Value_Stream);
          end loop;
-         Wrapped_Test.all;
+         begin
+            Wrapped_Test.all;
+         exception
+            when E : Invalid_Generation_Error =>
+               Ada.Text_IO.Put_Line
+                 ("Generated values do not respect the precondition. "
+                  & "Regenerating...");
+         end;
+
          Value_Stream.Flush;
       end loop;
    end Test_Runner;

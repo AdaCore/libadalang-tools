@@ -167,21 +167,20 @@ package TGen.Gen_Strategies is
 
       overriding
       function Generate_Source_Code
-        (Self    : Test_Generator;
-         Ctx : TGen.Templates.Context'Class) return Wide_Wide_String;
+        (Self : Test_Generator;
+         Ctx  : TGen.Templates.Context'Class) return Wide_Wide_String;
       --  Generates the Data Factory source file based on the Data Factory
       --  template.
 
       function Create
-        (Test_Template_File  : GNATCOLL.VFS.Virtual_File;
-         Subp                     : Subprogram_Data)
-         return Test_Generator;
+        (Test_Template_File : GNATCOLL.VFS.Virtual_File;
+         Subp               : Subprogram_Data) return Test_Generator;
 
    private
       type Test_Generator is new Source_Code_Generator with
          record
             Test_Template_File : GNATCOLL.VFS.Virtual_File;
-            Subp            : Subprogram_Data;
+            Subp               : Subprogram_Data;
          end record;
 
       type Test_Translator is new
@@ -192,7 +191,7 @@ package TGen.Gen_Strategies is
 
       function Create_Test_Translator
         (Subp : Subprogram_Data;
-         Next  : access constant Translator'Class := null)
+         Next : access constant Translator'Class := null)
          return Test_Translator;
       --  With_Type_Parent_Package_Table_Translator constructor
 

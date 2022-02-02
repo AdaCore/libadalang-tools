@@ -424,6 +424,8 @@ package body TGen.Gen_Strategies is
 
          Has_Params_Tag : constant String := "HAS_PARAMS";
 
+         Precondition_Tag : String := "PRECONDITION_EXPRESSION";
+
          Table : Templates_Parser.Translate_Set;
 
       begin
@@ -436,19 +438,25 @@ package body TGen.Gen_Strategies is
            (Table,
             Templates_Parser.Assoc
               (Proc_Name_Tag,
-               (+Self.Subp.Name)));
+               +Self.Subp.Name));
 
          Templates_Parser.Insert
            (Table,
             Templates_Parser.Assoc
               (Proc_Qualified_Name_Tag,
-               (+Self.Subp.Fully_Qualified_Name)));
+               +Self.Subp.Fully_Qualified_Name));
 
          Templates_Parser.Insert
            (Table,
             Templates_Parser.Assoc
               (Has_Params_Tag,
                Self.Subp.Parameters_Data.Length > 0));
+
+         Templates_Parser.Insert
+           (Table,
+            Templates_Parser.Assoc
+              (Precondition_Tag,
+               +Self.Subp.Precondition));
 
          return
            To_Text
@@ -482,11 +490,9 @@ package body TGen.Gen_Strategies is
          use type Templates_Parser.Vector_Tag;
 
          Strategy_Name_Tag : String := "STRATEGY_NAME";
-
          Strategy_Name_Vector_Tag : Templates_Parser.Vector_Tag;
 
          Type_Name_Tag : String := "TYPE_NAME";
-
          Type_Name_Vector_Tag : Templates_Parser.Vector_Tag;
 
          Gen_Subp_Name_Tag : String := "GEN_SUBP_NAME";
@@ -623,6 +629,8 @@ package body TGen.Gen_Strategies is
 
          Pkg_Data.Subprograms.Append (Subp_Data);
          Context.Packages_Data.Replace (Pkg_Data);
+
+         --  Register parameters' type in the context
 
          for Param of Subp_Data.Parameters_Data loop
             declare

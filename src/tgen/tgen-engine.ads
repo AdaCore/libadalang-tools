@@ -26,8 +26,10 @@ with TGen.Stream; use TGen.Stream;
 
 package TGen.Engine is
 
+   Invalid_Generation_Error : exception;
+
    procedure Test_Runner
-     (Strategies : Strategy_Vectors.Vector;
+     (Strategies   : Strategy_Vectors.Vector;
       Value_Stream : access Flushable_Stream'Class;
       Wrapped_Test : access procedure);
 

@@ -58,6 +58,7 @@ package TGen.Context is
          Fully_Qualified_Name : Unbounded_Text_Type;
          Parent_Package       : Unbounded_Text_Type;
          Parameters_Data      : Parameters_Data_Vector;
+         Precondition         : Unbounded_Text_Type;
          case Kind is
             when Ada_Subp_Kind_Function =>
                Return_Type_Fully_Qualified_Name : Unbounded_Text_Type;
