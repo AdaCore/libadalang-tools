@@ -1,0 +1,7 @@
+{
+    "[ada]": {
+        "editor.tabSize": 3,
+    },
+    "ada.projectFile": "src/build.gpr"
+}
+
