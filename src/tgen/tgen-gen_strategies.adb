@@ -601,7 +601,6 @@ package body TGen.Gen_Strategies is
            "Unable to find parent package of node "
            & Image (Subp.Full_Sloc_Image);
       end if;
-      Context.Codegen_Required := True;
 
       Pkg_Data.Pkg_Name := Pkg;
 

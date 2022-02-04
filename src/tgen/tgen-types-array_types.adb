@@ -115,7 +115,8 @@ package body TGen.Types.Array_Types is
 
       function Draw
         (Self : Array_Strategy_Type;
-         Data : Data_Type) return Array_Type;
+         Data : Data_Type;
+         Dimension_Sizes : out Nat_Array) return Array_Type;
 
    end Array_Strategy_Package;
 
@@ -148,8 +149,8 @@ package body TGen.Types.Array_Types is
 
       function Draw
         (Self : Array_Strategy_Type;
-         Data : Data_Type) return Array_Type is
-         Dimension_Sizes : Nat_Array (1 .. Self.Dimensions);
+         Data : Data_Type;
+         Dimension_Sizes : out Nat_Array) return Array_Type is
          Arr_Length : Natural := 0;
       begin
 
@@ -261,12 +262,25 @@ package body TGen.Types.Array_Types is
       return Res;
    end Reshape_2;
 
-   ---------------------
-   -- Generate_Static --
-   ---------------------
+   function Generate_Static_Common
+     (Self : Array_Typ'Class;
+      Constrained : Boolean;
+      Constraints : Index_Constraint_Arr) return String;
 
-   function Generate_Static (Self : Unconstrained_Array_Typ) return String is
+   package Big_Integer_Conversion is new Big_Int.Signed_Conversions (Natural);
 
+   function "+" (BI : Big_Integer) return Natural renames
+     Big_Integer_Conversion.From_Big_Integer;
+
+   ----------------------------
+   -- Generate_Static_Common --
+   ----------------------------
+
+   function Generate_Static_Common
+     (Self : Array_Typ'Class;
+      Constrained : Boolean;
+      Constraints : Index_Constraint_Arr) return String
+   is
       function Generate_Component_Wrapper
         (Data : Data_Type with Unreferenced) return Unbounded_String is
           (+Self.Component_Type.Get.Generate_Static);
@@ -293,28 +307,89 @@ package body TGen.Types.Array_Types is
          Index_Type_1 => Natural,
          Array_Type   => Array_Type,
          Reshaped_Array_Type => Expected_Array_Type);
+
+      Sizes : Size_Interval_Array :=
+        (for I in 1 .. Self.Num_Dims =>
+            (if not Constrained then
+              (Min_Size => 0, Max_Size => 10)
+            else
+               (Min_Size => +Length (Constraints (I)),
+                Max_Size => +Length (Constraints (I)))));
+
+      Strat : Array_Strategy_Type := Array_Strategy (Sizes);
+
+      Dimension_Sizes : Nat_Array (1 .. Self.Num_Dims);
+
+      Random_Arr : Array_Type := Strat.Draw (Data, Dimension_Sizes);
+
+      procedure Pp_Arr
+        (Arr   : Array_Type;
+         Index : in out Positive;
+         Sizes : Nat_Array);
+
+      procedure Pp_Arr
+        (Arr   : Array_Type;
+         Index : in out Positive;
+         Sizes : Nat_Array)
+      is
+      begin
+         if Sizes'Length = 0 then
+            raise Program_Error with "Array dimension can't be 0";
+         end if;
+
+         Append (Res, "[");
+         for I in 1 .. Sizes (Sizes'First) loop
+            if Sizes'Length = 1 then
+               Append (Res, +Arr (Index));
+               Index := @ + 1;
+            else
+               Pp_Arr (Arr, Index, Sizes (Sizes'First + 1 .. Sizes'Last));
+            end if;
+            Append (Res, ", ");
+         end loop;
+         Res := Remove_Trailing_Comma_And_Spaces (Res);
+         Append (Res, "]");
+      end Pp_Arr;
+
+      procedure Pp_Arr_Wrapper (Arr : Array_Type; Sizes : Nat_Array);
+
+      procedure Pp_Arr_Wrapper (Arr : Array_Type; Sizes : Nat_Array) is
+         Ignore : Positive := 1;
+      begin
+         Pp_Arr (Arr, Ignore, Sizes);
+      end Pp_Arr_Wrapper;
+
    begin
       if Self.Num_Dims > 2 then
          raise Program_Error with "Dimension not supported";
       end if;
 
-      if Self.Num_Dims = 1 then
-         --  In that case, no need to reshape it
+      Pp_Arr_Wrapper (Random_Arr, Dimension_Sizes);
 
-         declare
-            Strat : Array_Strategy_Type :=
-              Array_Strategy ([ (Min_Size => 0, Max_Size => 10) ]);
-            Random_Arr : Array_Type := Strat.Draw (Data);
-         begin
-            Append (Res, "[");
-            for Elem of Random_Arr loop
-               Append (Res, +(Elem & ","));
-            end loop;
-            Res := Remove_Trailing_Comma_And_Spaces (Res);
-            Append (Res, "]");
-         end;
-      end if;
       return +Res;
+   end Generate_Static_Common;
+
+   ---------------------
+   -- Generate_Static --
+   ---------------------
+
+   function Generate_Static (Self : Unconstrained_Array_Typ) return String is
+
+      No_Constraints : Index_Constraint_Arr (2 .. 1);
+   begin
+
+      return Generate_Static_Common (Self, False, No_Constraints);
    end Generate_Static;
+
+   ---------------------
+   -- Generate_Static --
+   ---------------------
+
+   function Generate_Static
+     (Self : Constrained_Array_Typ) return String is
+   begin
+      return Generate_Static_Common (Self, True, Self.Index_Constraints);
+   end Generate_Static;
+
 
 end TGen.Types.Array_Types;
