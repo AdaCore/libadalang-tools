@@ -122,9 +122,9 @@ package body TGen.Types.Translation is
      Pre => (not Node.Is_Null);
 
    procedure Subtract_Choice_From_Other
-     (Others_Cur : Variant_Choice_Maps.Cursor;
+     (Others_Cur : Variant_Choice_Lists.Cursor;
       Choice     : Variant_Choice;
-      Map        : in out Variant_Choice_Maps.Map);
+      List        : in out Variant_Choice_Lists.List);
    --  Subtract the Integer ranges that correspond to the matching alternatives
    --  in Choice.Alt_Set from the corresponding set in the variant
    --  choice denoted by Others_Cur
@@ -1119,27 +1119,23 @@ package body TGen.Types.Translation is
       Constraints   : Discriminant_Constraint_Maps.Map;
       Renaming      : Discriminant_Constraint_Maps.Map)
    is
-      use Variant_Choice_Maps;
+      use Variant_Choice_Lists;
 
       Choice_Cur : Cursor := Variant.Variant_Choices.First;
 
-      procedure Filter_Variant_Choice
-        (Index : Positive; Var_Choice : in out Variant_Choice);
+      procedure Filter_Variant_Choice (Var_Choice : in out Variant_Choice);
 
       function Alt_List_Match
         (List : Alternatives_List;
          Val  : GNATCOLL.GMP.Integers.Big_Integer) return Boolean;
 
-      procedure Delete_Nested_Variant
-        (Index : Positive; Var_Choice : in out Variant_Choice);
+      procedure Delete_Nested_Variant (Var_Choice : in out Variant_Choice);
 
       ---------------------------
       -- Filter_Variant_Choice --
       ---------------------------
 
-      procedure Filter_Variant_Choice
-        (Index : Positive; Var_Choice : in out Variant_Choice)
-      is
+      procedure Filter_Variant_Choice (Var_Choice : in out Variant_Choice) is
       begin
          if Var_Choice.Variant /= null then
             Filter_Variant_Part
@@ -1173,9 +1169,7 @@ package body TGen.Types.Translation is
       -- Delete_Nested_Variant --
       ---------------------------
 
-      procedure Delete_Nested_Variant
-        (Index : Positive; Var_Choice : in out Variant_Choice)
-      is
+      procedure Delete_Nested_Variant (Var_Choice : in out Variant_Choice) is
       begin
          if Var_Choice.Variant /= null then
             Free_Variant (Var_Choice.Variant);
@@ -1245,11 +1239,9 @@ package body TGen.Types.Translation is
                Comp_Cur : Component_Maps.Cursor :=
                  Match_Choice.Components.First;
 
-               procedure Set_Null
-                 (Index : Positive; Var_Choice : in out Variant_Choice);
+               procedure Set_Null (Var_Choice : in out Variant_Choice);
 
-               procedure Set_Null
-                 (Index : Positive; Var_Choice : in out Variant_Choice) is
+               procedure Set_Null (Var_Choice : in out Variant_Choice) is
                begin
                   Var_Choice.Variant := null;
                end Set_Null;
@@ -1431,9 +1423,9 @@ package body TGen.Types.Translation is
    --------------------------------
 
    procedure Subtract_Choice_From_Other
-     (Others_Cur : Variant_Choice_Maps.Cursor;
+     (Others_Cur : Variant_Choice_Lists.Cursor;
       Choice     : Variant_Choice;
-      Map        : in out Variant_Choice_Maps.Map)
+      List       : in out Variant_Choice_Lists.List)
    is
       use Alternatives_Sets;
       New_Set : Alternatives_Set;
@@ -1442,9 +1434,9 @@ package body TGen.Types.Translation is
 
       type Subtraction_Result is array (Positive range <>) of Int_Range;
 
-      procedure Update_Set (Key : Positive; Other_Var : in out Variant_Choice);
+      procedure Update_Set (Other_Var : in out Variant_Choice);
 
-      procedure Get_Set (Key : Positive; Other_Var : in out Variant_Choice);
+      procedure Get_Set (Other_Var : in out Variant_Choice);
 
       function Overlap (L, R : Int_Range) return Boolean;
 
@@ -1454,7 +1446,7 @@ package body TGen.Types.Translation is
       -- Get_Set --
       -------------
 
-      procedure Get_Set (Key : Positive; Other_Var : in out Variant_Choice) is
+      procedure Get_Set (Other_Var : in out Variant_Choice) is
       begin
          New_Set.Move (Other_Var.Alt_Set);
       end Get_Set;
@@ -1464,7 +1456,7 @@ package body TGen.Types.Translation is
       ----------------
 
       procedure Update_Set
-        (Key : Positive; Other_Var : in out Variant_Choice)
+        (Other_Var : in out Variant_Choice)
       is
       begin
          Other_Var.Alt_Set.Move (New_Set);
@@ -1508,8 +1500,8 @@ package body TGen.Types.Translation is
          end if;
       end "-";
    begin
-      --  Get the map so it is easier to modify
-      Map.Update_Element (Others_Cur, Get_Set'Access);
+      --  Get the List so it is easier to modify
+      List.Update_Element (Others_Cur, Get_Set'Access);
 
       Cur_Others_Segment := New_Set.First;
 
@@ -1576,9 +1568,9 @@ package body TGen.Types.Translation is
          Next (Cur_Alt);
       end loop;
 
-      --  Store back the map in the variant_choice record.
+      --  Store back the List in the variant_choice record.
 
-      Map.Update_Element (Others_Cur, Update_Set'Access);
+      List.Update_Element (Others_Cur, Update_Set'Access);
 
    end Subtract_Choice_From_Other;
 
@@ -1616,13 +1608,11 @@ package body TGen.Types.Translation is
       Discriminants : Component_Maps.Map)
      return Record_Types.Variant_Part
    is
-      use Variant_Choice_Maps;
+      use Variant_Choice_Lists;
       Res        : Record_Types.Variant_Part;
-      Choice_Num : Positive := 1;
       Choice_Min : Big_Int.Big_Integer;
       Choice_Max : Big_Int.Big_Integer;
       Has_Others : Boolean := False;
-      Others_Cur : Cursor := No_Element;
       Inserted   : Boolean := False;
    begin
       Res.Discr_Name := Node.F_Discr_Name.P_Referenced_Defining_Name;
@@ -1697,22 +1687,17 @@ package body TGen.Types.Translation is
                    (Translate_Variant_Part (Var_Choice.As_Variant
                     .F_Components.F_Variant_Part, Discriminants));
             end if;
-            if Has_Others then
-               Res.Variant_Choices.Insert
-                 (Choice_Num, Choice_Trans, Others_Cur, Inserted);
-            else
-               Res.Variant_Choices.Insert
-                 (Choice_Num, Choice_Trans);
-            end if;
-            Choice_Num := Choice_Num + 1;
+            Res.Variant_Choices.Append (Choice_Trans);
          end;
       end loop;
 
-      if Has_Element (Others_Cur) then
+      if Has_Others then
          for Choice_Cur in Res.Variant_Choices.Iterate loop
-            exit when Choice_Cur = Others_Cur;
+            exit when Choice_Cur = Res.Variant_Choices.Last;
             Subtract_Choice_From_Other
-              (Others_Cur, Element (Choice_Cur), Res.Variant_Choices);
+              (Res.Variant_Choices.Last,
+               Element (Choice_Cur),
+               Res.Variant_Choices);
          end loop;
       end if;
 

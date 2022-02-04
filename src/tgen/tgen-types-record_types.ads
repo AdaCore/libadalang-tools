@@ -24,6 +24,7 @@
 with Ada.Containers.Vectors;
 with Ada.Containers.Hashed_Maps;
 with Ada.Containers.Ordered_Maps;
+with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Ordered_Sets;
 with Ada.Unchecked_Deallocation;
 
@@ -111,38 +112,6 @@ package TGen.Types.Record_Types is
       Choices       : LAL.Alternatives_List;
    end record;
 
-   type Interval_Kind is (Int, Float);
-
-   type Interval (Kind : Interval_Kind := Int) is record
-      case Kind is
-         when Int =>
-            Min_Value : Big_Integer;
-            Max_Value : Big_Integer;
-         when others =>
-            null;
-      end case;
-   end record;
-
-   use type Big_Integer;
-
-   function "=" (L, R : Interval) return Boolean is
-     (L.Min_Value = R.Min_Value and then L.Max_Value = R.Max_Value);
-
-   function "<" (L, R : Interval) return Boolean is
-     (L.Min_Value < R.Min_Value);
-   --  We assume the intervals are disjoint
-
-   package Interval_Sets is new Ada.Containers.Ordered_Sets
-     (Element_Type => Interval);
-   subtype Interval_Set is Interval_Sets.Set;
-
-   use Ada.Numerics.Big_Numbers.Big_Integers;
-
-   Empty_Interval : Interval :=
-     (Kind => Int,
-      Min_Value => To_Big_Integer (0),
-      Max_Value => To_Big_Integer (-1));
-
    package Discriminant_Choices_Maps is new Ada.Containers.Ordered_Maps
      (Key_Type        => Positive,
       Element_Type    => Discriminant_Choice_Entry);
@@ -182,12 +151,12 @@ package TGen.Types.Record_Types is
 
    procedure Free_Variant (Var : in out Variant_Part_Acc);
 
-   package Variant_Choice_Maps is new Ada.Containers.Ordered_Maps
-     (Key_Type => Positive, Element_Type => Variant_Choice);
+   package Variant_Choice_Lists is new Ada.Containers.Doubly_Linked_Lists
+     (Element_Type => Variant_Choice);
 
    type Variant_Part is record
       Discr_Name : LAL.Defining_Name;
-      Variant_Choices : Variant_Choice_Maps.Map;
+      Variant_Choices : Variant_Choice_Lists.List;
    end record;
 
    type Discriminated_Record_Typ (Constrained : Boolean)

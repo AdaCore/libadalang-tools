@@ -166,19 +166,17 @@ package body TGen.Types.Record_Types is
    ------------------
 
    procedure Free_Variant (Var : in out Variant_Part_Acc) is
-      use Variant_Choice_Maps;
+      use Variant_Choice_Lists;
       procedure Free is new Ada.Unchecked_Deallocation
          (Variant_Part, Variant_Part_Acc);
 
-      procedure Destroy_Var_Choice
-        (Idx : Positive; Var_Choice : in out Variant_Choice);
+      procedure Destroy_Var_Choice (Var_Choice : in out Variant_Choice);
 
       ------------------------
       -- Destroy_Var_Choice --
       ------------------------
 
-      procedure Destroy_Var_Choice
-        (Idx : Positive; Var_Choice : in out Variant_Choice)
+      procedure Destroy_Var_Choice (Var_Choice : in out Variant_Choice)
       is
       begin
          if Var_Choice.Variant /= null then
@@ -710,7 +708,7 @@ package body TGen.Types.Record_Types is
       procedure Pp_Variant
         (Components : Component_Vector;
          Variant    : Variant_Part) is
-         use Variant_Choice_Maps;
+         use Variant_Choice_Lists;
 
       begin
          A ("case " & (+Self.Variant.Discr_Name.F_Name.Text) & " is ");

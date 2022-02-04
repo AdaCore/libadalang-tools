@@ -25,9 +25,12 @@ with TGen.Types; use TGen.Types;
 
 package TGen.Types.Array_Types is
 
-   type Array_Typ is new Composite_Typ with null record;
-
    type Index_Typ_Arr is array (Positive range <>) of TGen.Types.SP.Ref;
+
+   type Array_Typ (Num_Dims : Positive) is new Composite_Typ with record
+      Index_Types : Index_Typ_Arr (1 .. Num_Dims);
+      Component_Type : TGen.Types.SP.Ref;
+   end record;
 
    type Index_Constraints (Present : Boolean := False) is record
       case Present is
@@ -40,11 +43,7 @@ package TGen.Types.Array_Types is
 
    type Index_Constraint_Arr is array (Positive range <>) of Index_Constraints;
 
-   type Unconstrained_Array_Typ (Num_Dims : Positive) is new
-     Array_Typ with record
-      Index_Types    : Index_Typ_Arr (1 .. Num_Dims);
-      Component_Type : TGen.Types.SP.Ref;
-   end record;
+   type Unconstrained_Array_Typ is new Array_Typ with null record;
 
    function Image (Self : Unconstrained_Array_Typ) return String;
 
@@ -62,10 +61,8 @@ package TGen.Types.Array_Types is
    pragma Inline (As_Unconstrained_Array_Typ);
 
    type Constrained_Array_Typ (Num_Dims : Positive) is new
-     Array_Typ with record
-      Index_Types : Index_Typ_Arr (1 .. Num_Dims);
+     Array_Typ (Num_Dims => Num_Dims) with record
       Index_Constraints : Index_Constraint_Arr (1 .. Num_Dims);
-      Component_Type : TGen.Types.SP.Ref;
    end record;
 
    function Image (Self : Constrained_Array_Typ) return String;
