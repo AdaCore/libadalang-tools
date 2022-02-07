@@ -1795,14 +1795,10 @@ package body Pp.Actions is
             Select_When_Alt =>
               L ("? when ~~ =>~$" & "{?~;$~;$~}"),
             Select_Or_When_Alt =>
-            L ("or? when ~~ =>~$" & "{?~;$~;$~}"),
-            Call_Threshold_Alt => L ("!?[$(~,$~)]~"),
-               --  We use $ instead of $0 here, so that the indentation of
-               --  these will affect following comments.
-               --  Not sure why we had this before (so I comment it out)
-               --  Call_Threshold_Alt => L ("!?[$0(~,$0~)]~"),
-               --   --  We use $0 instead of $ here, so that the indentation of
-               --   --  these will not affect following comments.
+              L ("or? when ~~ =>~$" & "{?~;$~;$~}"),
+            Call_Threshold_Alt => L ("!?[$0(~,$0~)]~"),
+                --  We use $0 instead of $ here, so that the indentation of
+                --  these will not affect following comments.
             Call_Alt => L ("!?[# (~,#1 ~)]~"),
             Par_Threshold_Alt => L ("?[$(~;$~)]~"),
             Par_Alt => L ("?[# (~;#1 ~)]~"),
