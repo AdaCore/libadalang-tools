@@ -50,6 +50,10 @@ package body TGen.Types.Record_Types is
 
    Pad : constant Unbounded_String := 3 * ' ';
 
+   Debug_Variant_Set : constant Boolean := False;
+   --  Display the alternatives as intervals instead of source text. For
+   --  debug purposes
+
    function Check_Others
      (Designator : LAL.Others_Designator;
       Val        : Big_Integer) return Boolean;
@@ -341,8 +345,18 @@ package body TGen.Types.Record_Types is
    begin
       Res := Res & Text.Image (Var.Discr_Name.Text) & " is" & LF;
       for Var_Choice of Var.Variant_Choices loop
-         Res := Res & (Padding + 2) * Pad & "when "
-                & Text.Image (Var_Choice.Alternatives.Text) & " => " & LF;
+         Res := Res & (Padding + 2) * Pad & "when ";
+         if Debug_Variant_Set then
+            Res := Res & "[";
+            for Rng of Var_Choice.Alt_Set loop
+               Res := Res & "[" & Big_Int.To_String (Rng.Min) & ", "
+                     & Big_Int.To_String (Rng.Max) & "],";
+            end loop;
+            Res := Res & "] => " & LF;
+         else
+            Res := Res & Text.Image (Var_Choice.Alternatives.Text)
+                   & " => " & LF;
+         end if;
          Comp_Cur := Var_Choice.Components.First;
          while Component_Maps.Has_Element (Comp_Cur) loop
             Res := Res & (Padding + 3) * Pad &

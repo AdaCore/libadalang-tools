@@ -29,6 +29,10 @@ package TGen.Types.Int_Types is
       Min, Max : Big_Integer;
    end record;
 
+   function To_String (Rang : Int_Range) return String is
+     ("[" & Big_Int.To_String (Rang.Min) & ", "
+      & Big_Int.To_String (Rang.Max) & "]");
+
    function "<" (L, R : Int_Range) return Boolean is
      (if Big_Int."=" (L.Min, R.Min)
       then Big_Int."<" (L.Max, R.Max)

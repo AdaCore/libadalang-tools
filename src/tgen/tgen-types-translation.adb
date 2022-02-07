@@ -1500,12 +1500,13 @@ package body TGen.Types.Translation is
          end if;
       end "-";
    begin
-      --  Get the List so it is easier to modify
+      --  Get the Set so it is easier to modify
       List.Update_Element (Others_Cur, Get_Set'Access);
 
       Cur_Others_Segment := New_Set.First;
 
       while Has_Element (Cur_Alt) loop
+
          --  Move the cursor in the "others" set until we have an intersection
          --  or we are past the current alternative range
 
@@ -1518,7 +1519,6 @@ package body TGen.Types.Translation is
          end loop;
 
          exit when not Has_Element (Cur_Others_Segment);
-
          declare
             Sub_Res : constant Subtraction_Result :=
               Element (Cur_Others_Segment) - Element (Cur_Alt);
@@ -1530,7 +1530,9 @@ package body TGen.Types.Translation is
             New_Elt_Cur : Cursor;
             Inserted : Boolean;
          begin
-            if Sub_Res'Length /= 0 then
+            if Sub_Res'Length /= 1
+              or else Sub_Res (1) /= Element (Cur_Others_Segment)
+            then
 
                --  Here if there is an intersection between the current others
                --  range and the current alternative range. Prefetch the next
@@ -1549,12 +1551,10 @@ package body TGen.Types.Translation is
                   --  alternative range.
 
                   New_Set.Insert (Sub_Res (1), New_Elt_Cur, Inserted);
-                  if Has_Element (Cur_Others_Segment)
-                    and then Sub_Res (1) < Element (Cur_Others_Segment)
-                  then
+                  if Element (Cur_Alt) < Element (New_Elt_Cur) then
                      Cur_Others_Segment := New_Elt_Cur;
                   end if;
-               else
+               elsif Sub_Res'Length = 2 then
                   --  If there are two ranges resulting from the difference,
                   --  then we have both cases described above, and we already
                   --  know that the next element that needs to be processed is
