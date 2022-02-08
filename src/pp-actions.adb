@@ -825,8 +825,10 @@ package body Pp.Actions is
              L ("!", Aspects),
            when Ada_Number_Decl =>
              L ("?~,# ~~ ^: constant ^2:=[# !]"),
-           when Ada_Object_Decl |
-               Ada_Extended_Return_Stmt_Object_Decl =>
+           when Ada_Object_Decl =>
+              L ("?~,# ~~ ^:[#1? ~~~? ~~~? ~~~ !]? ^2:=[# ~~]~!"
+           , Aspects),
+           when Ada_Extended_Return_Stmt_Object_Decl =>
              L ("?~,# ~~ ^:? ~~~? ~~~? ~~~ !? ^2:=[# ~~]~!", Aspects),
            when Ada_No_Type_Object_Renaming_Decl => null,
            when Ada_Package_Renaming_Decl =>

@@ -282,19 +282,19 @@ package body Pp.Actions is
 
      (Pipe,
       --  Sends the output into Stderr.
-   Output,
+      Output,
       --  Creates the file with the name specified in 'o' option. If the
       --  file with the given name already exists, does not erase it and gives
       --  up.
-   Output_Force,
+      Output_Force,
       --  Creates the file with the name specified in 'o' option. If the
       --  file with the given name already exists, erases the old file and
       --  replaces it with the pretty-printed source.
-   Replace_Backup,
+      Replace_Backup,
       --  Replaces the argument source with the pretty-printed source. The
       --  original source is stored in the file <arg_source>.npp. If the file
       --  with such a name already exists, gnatpp gives up.
-   Replace_Force_Backup,
+      Replace_Force_Backup,
       --  Replaces the argument source with the pretty-printed source. The
       --  original source is stored in the file <arg_source>.npp. If the file
       --  with such a name already exists, gnatpp overrides it.
@@ -302,7 +302,7 @@ package body Pp.Actions is
       Replace,
       --  Replaces the argument source with the pretty-printed source. The
       --  original source is not stored in any back-up file.
-   Output_Directory);
+      Output_Directory);
    --  Put the result into <arg_source_simple_name> in directory Out_Dir.
 
    NPP_Suffix : constant String := ".npp";
@@ -1337,14 +1337,14 @@ package body Pp.Actions is
             Spec_Alt           => L ("!? ~~~?~~~?[*#+2 return_] ~~~"),
             --  The above is the only place "one space in/outdent" is used (the
             --  "*" and "_" characters). This is to deal with something like:
-         --
-         --     function Some_Function
-         --       (A_Parameter       : A_Parameter_Type;
-         --        Another_Parameter : Another_Parameter_Type)
-         --        return Result_Type;
-         --       ^ Here we want the "return" indented one character
-         --       | with respect to the "(", even though it is not
-         --         inside the parentheses.
+            --
+            --     function Some_Function
+            --       (A_Parameter       : A_Parameter_Type;
+            --        Another_Parameter : Another_Parameter_Type)
+            --        return Result_Type;
+            --       ^ Here we want the "return" indented one character
+            --       | with respect to the "(", even though it is not
+            --         inside the parentheses.
 
             Subtype_Ind_Index_Alt      => L ("?~~ ~!?~~~"),
             Subtype_Ind_Alt            => L ("?~~ ~!? ~~~"),
