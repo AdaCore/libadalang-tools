@@ -2400,10 +2400,10 @@ package body Pp.Formatting is
          is
          begin
             return
-              Kind (Src_Tok) = Other_Whole_Line_Comment
+              Kind (Src_Tok) in Other_Whole_Line_Comment | Fillable_Comment
               and then Kind (Prev_ss (Src_Tok)) = True_End_Of_Line
               and then
-                (Kind (Prev (Prev_ss (Src_Tok))) = ','
+                (Kind (Prev (Prev_ss (Src_Tok))) in  ','
                  or else Kind (Prev (Prev_ss (Src_Tok))) = End_Of_Line_Comment
                  or else
                    (Kind (Prev (Prev_ss (Src_Tok))) = True_End_Of_Line
@@ -3168,17 +3168,18 @@ package body Pp.Formatting is
                      --  indentation value.
 
                   elsif Prev_Indentation_Affect_Comments and then
-                    Kind (Src_Tok) = Other_Whole_Line_Comment
+                    (Kind (Src_Tok) = Other_Whole_Line_Comment
+                     or else Kind (Src_Tok) = Fillable_Comment)
                     and then (Kind (New_Tok) = Ident
                               or else Kind (New_Tok) = Res_Others
                               or else Kind (New_Tok) = Res_When
                               or else Kind (New_Tok) = Numeric_Literal)
                     and then Kind (Prev (Prev (New_Tok))) = Disabled_LB_Token
-                    and then Kind (Prev (Prev (Prev (New_Tok)))) = ','
+                    and then Kind (Prev (Prev (Prev (New_Tok)))) in  ',' | ';'
                   then
 
-                     --  The corrected indentation is based on an already
-                     --  set value on the LB Indentation and is used to adjust
+                     --  The corrected indentation is based on an already set
+                     --  value on the LB Indentation and it is used to adjust
                      --  the Cur_Indentation in case of a parathesized context.
 
                      declare
@@ -3187,8 +3188,14 @@ package body Pp.Formatting is
                           All_LB (Line_Break_Token_Index (P));
                      begin
                         if LB.Enabled and then LB.Affects_Comments then
-                           Corrected_Indentation := LB.Indentation;
-                           Indentation := Corrected_Indentation;
+                           --  Do nothing when ');' is detected before
+                           if not
+                             (Kind (Prev (Prev (Prev (New_Tok)))) = ';' and then
+                              Kind (Prev (Prev (Prev (Prev (New_Tok))))) = ')')
+                           then
+                              Corrected_Indentation := LB.Indentation;
+                              Indentation := Corrected_Indentation;
+                           end if;
                         else
                            Indentation :=
                              Natural'Max (Indentation,
@@ -3202,7 +3209,8 @@ package body Pp.Formatting is
                   --  indentation too.
 
                   elsif Prev_Indentation_Affect_Comments
-                    and then Kind (Src_Tok) = Other_Whole_Line_Comment
+                    and then (Kind (Src_Tok) = Other_Whole_Line_Comment
+                              or else Kind (Src_Tok) = Fillable_Comment)
                     and then Kind (Prev (New_Tok)) = Ident
                     and then Kind (New_Tok) = ')'
                     and then Kind (Next (New_Tok)) = ';'
@@ -3356,9 +3364,12 @@ package body Pp.Formatting is
                       or else Kind (New_Tok) = Numeric_Literal)
                  and then Kind (New_Tok) = Kind (Src_Tok)
                  and then Kind (Prev (Prev (Src_Tok))) in True_End_Of_Line
-                 and then Kind
-                   (Prev (Prev (Prev (Src_Tok)))) = Other_Whole_Line_Comment
-                 and then Kind (Prev (Prev (Prev (New_Tok)))) in ','
+                 and then (Kind
+                           (Prev (Prev (Prev (Src_Tok)))) =
+                             Other_Whole_Line_Comment
+                           or else Kind (Prev (Prev (Prev (Src_Tok)))) =
+                             Fillable_Comment)
+                 and then Kind (Prev (Prev (Prev (New_Tok)))) in ',' | ';'
                  and then Kind (Prev (Prev (New_Tok))) in Disabled_LB_Token
                then
 
@@ -3408,7 +3419,9 @@ package body Pp.Formatting is
                elsif Arg (Cmd, Source_Line_Breaks)
                  and then Kind (Src_Tok) = True_End_Of_Line
                  and then Kind (Prev (Src_Tok)) = True_End_Of_Line
-                 and then Kind (Prev (Prev (Src_Tok))) = Other_Whole_Line_Comment
+                 and then
+                   (Kind (Prev (Prev (Src_Tok))) = Other_Whole_Line_Comment
+                    or else Kind (Prev (Prev (Src_Tok))) = Fillable_Comment)
                  and then Kind (Next_ss (Src_Tok)) = Kind (New_Tok)
                  and then Kind (Prev (Prev (New_Tok))) = Disabled_LB_Token
                  and then Kind (Prev (Prev (Prev (New_Tok)))) = ','
@@ -3932,7 +3945,8 @@ package body Pp.Formatting is
                   --  be increased by 1 related to the last left paranthesis
                   --  position
 
-                  if Kind (Src_Tok) = Other_Whole_Line_Comment
+                  if (Kind (Src_Tok) = Other_Whole_Line_Comment
+                      or else Kind (Src_Tok) = Fillable_Comment)
                     and then (Kind (New_Tok) = Ident
                               or else Kind (New_Tok) = Res_Others
                               or else Kind (New_Tok) = Res_When
@@ -3967,6 +3981,7 @@ package body Pp.Formatting is
                              or else
                                Kind
                                  (Prev (Prev (Prev (Prev (New_Tok))))) = ')'
+                             or else Kind (Src_Tok) = Fillable_Comment
                            then
                               null;
 
