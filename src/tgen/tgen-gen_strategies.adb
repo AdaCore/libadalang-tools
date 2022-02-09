@@ -709,6 +709,7 @@ package body TGen.Gen_Strategies is
       Function_JSON     : JSON_Value := Create_Object;
       Test_Vectors_JSON : JSON_Array := Empty_Array;
       Test_Vector_JSON : JSON_Array;
+      Disc_Context : Disc_Value_Map;
    begin
       for J in 1 .. Nb_Tests loop
          Test_Vector_JSON := Empty_Array;
@@ -719,7 +720,7 @@ package body TGen.Gen_Strategies is
                Param_JSON.Set_Field ("name", Create (+Param.Name));
                Param_JSON.Set_Field ("type_name", Create (+Param.Type_Name));
                Param_JSON.Set_Field
-                 ("value", Param.Type_Repr.Get.Generate_Static);
+                 ("value", Param.Type_Repr.Get.Generate_Static (Disc_Context));
                Append (Test_Vector_JSON, Param_JSON);
             end;
          end loop;

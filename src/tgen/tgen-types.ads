@@ -23,7 +23,10 @@
 
 with Libadalang.Analysis;
 
+with Ada.Containers;
+with Ada.Containers.Hashed_Maps;
 with Ada.Numerics.Big_Numbers.Big_Integers;
+with Ada.Strings.Wide_Wide_Hash;
 with Ada.Unchecked_Deallocation;
 
 with GNATCOLL.JSON; use GNATCOLL.JSON;
@@ -70,7 +73,54 @@ package TGen.Types is
    subtype Record_Typ_Range
      is Typ_Kind range Disc_Record_Kind .. Non_Disc_Record_Kind;
 
+   subtype Big_Integer is Big_Int.Big_Integer;
+
+   type Constraint_Value_Kind is (Static, Discriminant, Non_Static);
+   --  Constraint kind. Discriminant means that the constraint value is the
+   --  value of one of the discriminants of the enclosing record type. Does not
+   --  make sense if the constraints are not applied to a component of a
+   --  discriminated record type.
+
+   type Constraint_Value (Kind : Constraint_Value_Kind := Non_Static) is
+      record
+         case Kind is
+            when Static =>
+               Int_Val : Big_Integer;
+               --  The static integer value of the constraint
+
+            when Discriminant =>
+               Disc_Name : LAL.Defining_Name;
+               --  The defining name of the discriminant that appears in this
+               --  context.
+
+            when Non_Static =>
+               null;
+               --  We don't have any useful info that we can provide here.
+               --  May be revisited.
+         end case;
+      end record;
+
+   type Discrete_Range_Constraint is record
+      Low_Bound, High_Bound : Constraint_Value;
+   end record;
+
+   function Hash (Name : LAL.Defining_Name) return Ada.Containers.Hash_Type is
+     (Ada.Strings.Wide_Wide_Hash (Name.Text));
+
+   function Equivalent_Keys (Left, Right : LAL.Defining_Name) return Boolean is
+     (Left.Text = Right.Text);
+
+   package Disc_Value_Maps is new Ada.Containers.Hashed_Maps
+     (Key_Type        => LAL.Defining_Name,
+      Element_Type    => Big_Integer,
+      Hash            => Hash,
+      Equivalent_Keys => Equivalent_Keys,
+      "="             => Big_Int."=");
+   subtype Disc_Value_Map is Disc_Value_Maps.Map;
+
    function Image (Self : Typ) return String;
+
+   function Is_Anonymous (Self : Typ) return Boolean;
 
    function Fully_Qualified_Name (Self : Typ) return Text_Type is
      (Self.Name.P_Basic_Decl.P_Fully_Qualified_Name);
@@ -111,7 +161,9 @@ package TGen.Types is
      (Self : Typ) return String is ("")
      with Pre => Self.Is_Constrained;
 
-   function Generate_Static (Self : Typ) return String;
+   function Generate_Static
+     (Self         : Typ;
+      Disc_Context : Disc_Value_Map) return String;
    --  Generate statically a value of the given Typ and returns its string
    --  representation, so that it can be inlined in a program that want to use
    --  it. Default function returns an error. Derivation of this function
@@ -126,8 +178,6 @@ package TGen.Types is
    type Scalar_Typ (Is_Static : Boolean) is new Typ with null record;
 
    type Discrete_Typ is new Scalar_Typ with null record;
-
-   subtype Big_Integer is Big_Int.Big_Integer;
 
    function Low_Bound (Self : Discrete_Typ) return Big_Integer with
      Pre => Self.Is_Static;
@@ -162,35 +212,6 @@ package TGen.Types is
    --  to access the components and primitives defined for that particular
    --  type. The return value is the object encapsulated in the smart pointer,
    --  so under no circumstances should it be freed.
-
-   type Constraint_Value_Kind is (Static, Discriminant, Non_Static);
-   --  Constraint kind. Discriminant means that the constraint value is the
-   --  value of one of the discriminants of the enclosing record type. Does not
-   --  make sense if the constraints are not applied to a component of a
-   --  discriminated record type.
-
-   type Constraint_Value (Kind : Constraint_Value_Kind := Non_Static) is
-   record
-      case Kind is
-         when Static =>
-            Int_Val : Big_Integer;
-            --  The static integer value of the constraint
-
-         when Discriminant =>
-            Disc_Name : LAL.Defining_Name;
-            --  The defining name of the discriminant that appears in this
-            --  context.
-
-         when Non_Static =>
-            null;
-            --  We don't have any useful info that we can provide here.
-            --  May be revisited.
-      end case;
-   end record;
-
-   type Discrete_Range_Constraint is record
-      Low_Bound, High_Bound : Constraint_Value;
-   end record;
 
    Big_Zero : constant Big_Integer :=
      Ada.Numerics.Big_Numbers.Big_Integers.To_Big_Integer (0);

@@ -112,7 +112,8 @@ package TGen.Types.Real_Types is
    function Gen return T;
 
    overriding function Generate_Static
-     (Self : Float_Typ) return String;
+     (Self         : Float_Typ;
+      Disc_Context : Disc_Value_Map) return String;
 
    overriding function Generate_Random_Strategy
      (Self : Float_Typ) return String;

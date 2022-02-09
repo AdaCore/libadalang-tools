@@ -43,8 +43,6 @@ package TGen.Types.Array_Types is
 
    type Index_Constraint_Arr is array (Positive range <>) of Index_Constraints;
 
-   type Unconstrained_Array_Typ is new Array_Typ with null record;
-
    type Unconstrained_Array_Typ (Num_Dims : Positive) is
      new Array_Typ (Num_Dims) with null record;
 
@@ -54,7 +52,8 @@ package TGen.Types.Array_Types is
      (Unconstrained_Array_Kind);
 
    overriding function Generate_Static
-     (Self : Unconstrained_Array_Typ) return String;
+     (Self         : Unconstrained_Array_Typ;
+      Disc_Context : Disc_Value_Map) return String;
 
    function As_Unconstrained_Array_Typ (Self : SP.Ref)
      return Unconstrained_Array_Typ'Class is
@@ -62,17 +61,6 @@ package TGen.Types.Array_Types is
      Pre => (not SP.Is_Null (Self))
             and then (Self.Get.Kind in Unconstrained_Array_Kind);
    pragma Inline (As_Unconstrained_Array_Typ);
-
-   type Index_Constraints (Present : Boolean := False) is record
-      case Present is
-         when True =>
-            Discrete_Range : Discrete_Range_Constraint;
-         when others =>
-            null;
-      end case;
-   end record;
-
-   type Index_Constraint_Arr is array (Positive range <>) of Index_Constraints;
 
    use type Big_Integer;
 
@@ -98,7 +86,8 @@ package TGen.Types.Array_Types is
      (Constrained_Array_Kind);
 
    overriding function Generate_Static
-     (Self : Constrained_Array_Typ) return String;
+     (Self         : Constrained_Array_Typ;
+      Disc_Context : Disc_Value_Map) return String;
 
    function As_Constrained_Array_Typ (Self : SP.Ref)
      return Constrained_Array_Typ'Class is

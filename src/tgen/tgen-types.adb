@@ -41,6 +41,15 @@ package body TGen.Types is
               else Text.Image (Self.Name.Text));
    end Image;
 
+   ------------------
+   -- Is_Anonymous --
+   ------------------
+
+   function Is_Anonymous (Self : Typ) return Boolean is
+   begin
+      return Self.Name = No_Defining_Name;
+   end Is_Anonymous;
+
    ----------
    -- Kind --
    ----------
@@ -98,7 +107,8 @@ package body TGen.Types is
    -- Generate_Static --
    ---------------------
 
-   function Generate_Static (Self : Typ) return String is
+   function Generate_Static (Self         : Typ;
+                             Disc_Context : Disc_Value_Map) return String is
    begin
       raise Program_Error with "Static strategy not implemented";
       return "";

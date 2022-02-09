@@ -263,9 +263,10 @@ package body TGen.Types.Array_Types is
    end Reshape_2;
 
    function Generate_Static_Common
-     (Self : Array_Typ'Class;
-      Constrained : Boolean;
-      Constraints : Index_Constraint_Arr) return String;
+     (Self         : Array_Typ'Class;
+      Disc_Context : Disc_Value_Map;
+      Constrained  : Boolean;
+      Constraints  : Index_Constraint_Arr) return String;
 
    package Big_Integer_Conversion is new Big_Int.Signed_Conversions (Natural);
 
@@ -278,12 +279,13 @@ package body TGen.Types.Array_Types is
 
    function Generate_Static_Common
      (Self : Array_Typ'Class;
+      Disc_Context : Disc_Value_Map;
       Constrained : Boolean;
       Constraints : Index_Constraint_Arr) return String
    is
       function Generate_Component_Wrapper
         (Data : Data_Type with Unreferenced) return Unbounded_String is
-          (+Self.Component_Type.Get.Generate_Static);
+          (+Self.Component_Type.Get.Generate_Static (Disc_Context));
 
       Res : Unbounded_String;
 
@@ -373,12 +375,15 @@ package body TGen.Types.Array_Types is
    -- Generate_Static --
    ---------------------
 
-   function Generate_Static (Self : Unconstrained_Array_Typ) return String is
+   function Generate_Static
+     (Self         : Unconstrained_Array_Typ;
+      Disc_Context : Disc_Value_Map) return String is
 
       No_Constraints : Index_Constraint_Arr (2 .. 1);
    begin
 
-      return Generate_Static_Common (Self, False, No_Constraints);
+      return Generate_Static_Common
+        (Self, Disc_Context, False, No_Constraints);
    end Generate_Static;
 
    ---------------------
@@ -386,9 +391,11 @@ package body TGen.Types.Array_Types is
    ---------------------
 
    function Generate_Static
-     (Self : Constrained_Array_Typ) return String is
+     (Self         : Constrained_Array_Typ;
+      Disc_Context : Disc_Value_Map) return String is
    begin
-      return Generate_Static_Common (Self, True, Self.Index_Constraints);
+      return Generate_Static_Common
+        (Self, Disc_Context, True, Self.Index_Constraints);
    end Generate_Static;
 
 

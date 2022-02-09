@@ -137,8 +137,7 @@ package body TGen.Types.Translation is
    procedure Apply_Record_Subtype_Decl
      (Decl : Subtype_Indication;
       Res  : in out Discriminated_Record_Typ) with
-      Pre => Kind (Decl.Parent) in Ada_Subtype_Decl_Range
-         and then Res.Constrained;
+      Pre => Res.Constrained;
    --  Record the discriminant constraints of Decl in Res. For this, the
    --  type on which you want to apply constraints must be able to accept
    --  them.
@@ -1053,7 +1052,7 @@ package body TGen.Types.Translation is
 
    procedure Apply_Record_Subtype_Decl
       (Decl : Subtype_Indication;
-      Res  : in out Discriminated_Record_Typ)
+       Res  : in out Discriminated_Record_Typ)
    is
       Constraints : Assoc_List;
    begin
@@ -1087,7 +1086,7 @@ package body TGen.Types.Translation is
 
          elsif Assoc.As_Discriminant_Assoc.F_Discr_Expr.P_Is_Static_Expr then
 
-            --  Case of a static cosntraint
+            --  Case of a static constraint
 
             for Id of Assoc.As_Discriminant_Assoc.F_Ids loop
                Res.Discriminant_Constraint.Include

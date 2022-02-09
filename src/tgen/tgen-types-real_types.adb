@@ -95,7 +95,10 @@ package body TGen.Types.Real_Types is
       return +Result;
    end Generate_Random_Strategy;
 
-   function Generate_Static (Self : Float_Typ) return String is
+   function Generate_Static
+     (Self         : Float_Typ;
+      Disc_Context : Disc_Value_Map) return String is
+
    begin
       if not Self.Is_Static or not Self.Has_Range then
          raise Program_Error with "Cannot generate values for non static type "

@@ -66,7 +66,7 @@ package body TGen.Types.Record_Types is
 
    procedure Fill_Components
      (Self        : Variant_Part;
-      Constraints : Discriminant_Constraint_Maps.Map;
+      Constraints : Disc_Value_Map;
       Res         : in out Component_Maps.Map);
    --  Fill Res with the list of components in Self that are present given
    --  a map of discriminant constraints.
@@ -130,7 +130,10 @@ package body TGen.Types.Record_Types is
    -- Generate_Static --
    ---------------------
 
-   function Generate_Static (Self : Record_Typ) return String is
+   function Generate_Static
+     (Self         : Record_Typ;
+      Disc_Context : Disc_Value_Map) return String
+   is
       use Component_Maps;
       Result : Unbounded_String;
    begin
@@ -141,7 +144,7 @@ package body TGen.Types.Record_Types is
          begin
             Append_Value_For_Component
               (Component_Name,
-               Component_Type.Generate_Static,
+               Component_Type.Generate_Static (Disc_Context),
                Result);
          end;
       end loop;
@@ -152,10 +155,13 @@ package body TGen.Types.Record_Types is
    -- Generate_Static --
    ---------------------
 
-   function Generate_Static (Self : Nondiscriminated_Record_Typ) return String
+   function Generate_Static
+     (Self         : Nondiscriminated_Record_Typ;
+      Disc_Context : Disc_Value_Map) return String
    is
       Result : Unbounded_String;
-      Generated_Value : String := Record_Typ (Self).Generate_Static;
+      Generated_Value : String :=
+        Record_Typ (Self).Generate_Static (Disc_Context);
    begin
       Append (Result, "(");
       Append (Result, Generated_Value);
@@ -229,11 +235,14 @@ package body TGen.Types.Record_Types is
 
    function Constraints_Respected
      (Self                : Discriminated_Record_Typ;
-      Discriminant_Values : Discriminant_Constraint_Maps.Map)
-      return Boolean
+      Discriminant_Values : Disc_Value_Map) return Boolean
    is
       use Discriminant_Constraint_Maps;
-      Constraint_Cur, Value_Cur : Cursor;
+      use Disc_Value_Maps;
+      use Ada.Numerics.Big_Numbers.Big_Integers;
+
+      Constraint_Cur : Discriminant_Constraint_Maps.Cursor;
+      Value_Cur : Disc_Value_Maps.Cursor;
    begin
       if not Self.Constrained then
          return True;
@@ -242,9 +251,11 @@ package body TGen.Types.Record_Types is
       Constraint_Cur := Self.Discriminant_Constraint.First;
       while Has_Element (Constraint_Cur) loop
          if Element (Constraint_Cur).Kind = Static then
-            Value_Cur := Discriminant_Values.Find (Key (Constraint_Cur));
+            Value_Cur :=
+              Discriminant_Values.Find (Key (Constraint_Cur));
             if Has_Element (Value_Cur)
-              and then Element (Value_Cur) /= Element (Constraint_Cur)
+              and then
+                Element (Value_Cur) /= Element (Constraint_Cur).Int_Val
             then
                return False;
             end if;
@@ -260,8 +271,7 @@ package body TGen.Types.Record_Types is
 
    function Components
      (Self                : Discriminated_Record_Typ;
-      Discriminant_Values : Discriminant_Constraint_Maps.Map)
-      return Component_Maps.Map
+      Discriminant_Values : Disc_Value_Map) return Component_Maps.Map
    is
       Res : Component_Maps.Map := Self.Component_Types.Copy;
    begin
@@ -271,24 +281,23 @@ package body TGen.Types.Record_Types is
       return Res;
    end Components;
 
+   ---------------------
+   -- Fill_Components --
+   ---------------------
+
    procedure Fill_Components
      (Self        : Variant_Part;
-      Constraints : Discriminant_Constraint_Maps.Map;
+      Constraints : Disc_Value_Map;
       Res         : in out Component_Maps.Map)
    is
-      Disc_Val_Cur : constant Discriminant_Constraint_Maps.Cursor :=
+      Disc_Val_Cur : constant Disc_Value_Maps.Cursor :=
         Constraints.Find (Self.Discr_Name);
       Discr_Val : GNATCOLL.GMP.Integers.Big_Integer;
    begin
-      if Discriminant_Constraint_Maps.Has_Element (Disc_Val_Cur)
-        and then Discriminant_Constraint_Maps.Element (Disc_Val_Cur).Kind
-                 = Static
+      if Disc_Value_Maps.Has_Element (Disc_Val_Cur)
       then
          Discr_Val.Set
-           (Big_Int.To_String (Discriminant_Constraint_Maps.Element
-                               (Disc_Val_Cur).Int_Val));
-      else
-         raise Discriminant_Value_Error;
+           (Big_Int.To_String (Disc_Value_Maps.Element (Disc_Val_Cur)));
       end if;
       for Choice of Self.Variant_Choices loop
          declare
@@ -465,33 +474,106 @@ package body TGen.Types.Record_Types is
 
    function Generate_All_Shapes
      (Components       : Component_Map;
+      Discr            : Component_Map;
       Disc_Constraints : Alternative_Constraint_Map;
-      Variant          : Variant_Part_Acc) return String_Set;
+      Variant          : Variant_Part_Acc;
+      Disc_Context     : Disc_Value_Map) return String_Set;
 
    function Generate_All_Shapes_Wrapper
      (Components       : Component_Map;
+      Discr            : Component_Map;
       Disc_Constraints : Alternative_Constraint_Map;
-      Variant          : Variant_Part_Acc) return String_Set;
+      Variant          : Variant_Part_Acc;
+      Disc_Context     : Disc_Value_Map) return String_Set;
    --  Function that generates records of all the possible shapes. If this
    --  record has records as component, it will not generate all the possible
    --  shapes for the subrecord. TODO: think about this.
 
    function Generate_Static
-     (Self : Discriminated_Record_Typ) return String
+     (Self         : Discriminated_Record_Typ;
+      Disc_Context : Disc_Value_Map) return String
    is
       Record_Components : Component_Maps.Map;
-      Discriminant_Values : Discriminant_Constraint_Maps.Map;
+      Discriminant_Values : Disc_Value_Map;
       Result : Unbounded_String;
       use Component_Maps;
       use Ada.Numerics.Big_Numbers.Big_Integers;
       use type Ada.Containers.Count_Type;
+      Extended_Context : Disc_Value_Map := Disc_Context.Copy;
    begin
+
+      --  If this is a constrained subtype, then we know the shape of the
+      --  discriminant according to the constraints in Disc_Context.
+
+      if Self.Constrained then
+
+         for Cursor in Self.Discriminant_Constraint.Iterate loop
+            declare
+               use Discriminant_Constraint_Maps;
+               D_Name : LAL.Defining_Name := Key (Cursor);
+               Constraint : Constraint_Value := Element (Cursor);
+            begin
+               case Constraint.Kind is
+
+                  when Static =>
+
+                     --  Static constraint:
+                     --  type A (I : Integer) is null record;
+                     --  subtype B is A (10);
+                     --
+                     --  Simply pick the literal constraint value.
+
+                     Discriminant_Values.Insert (D_Name, Constraint.Int_Val);
+
+                  when Discriminant =>
+
+                     --  Discriminant constraint:
+                     --  type A (I : Integer) is null record;
+                     --  subtype B (J : Integer) is A (J);
+                     --
+                     --  In this case, we get the constraint value from the
+                     --  discriminant context.
+
+                     Discriminant_Values.Insert
+                       (D_Name, Disc_Context.Element (D_Name));
+                  when others =>
+                     raise Program_Error
+                       with "Non_Static constrained not supported";
+               end case;
+            end;
+         end loop;
+
+         Append (Result, "(");
+         for C in Self.Discriminant_Types.Iterate loop
+            declare
+               A : Big_Integer;
+               Discriminant_Name : LAL.Defining_Name :=  Key (C);
+               Discriminant_Typ : Typ'Class := Element (C).Get;
+               Generated_Value : String :=
+                 To_String (Discriminant_Values.Element (Discriminant_Name));
+            begin
+               Append_Value_For_Component
+                 (Discriminant_Name,
+                  Generated_Value,
+                  Result);
+            end;
+         end loop;
+
+         goto Generate_Record;
+      end if;
+
+      --  Otherwise, generate the set of possible shapes. TODO: use a generator
+      --  to implement it as the current approach (using a global variable) is
+      --  not robust at all.
+
       if not Has_Generated_Shapes then
          Generated_Shapes :=
            Generate_All_Shapes_Wrapper
              (Self.Component_Types,
+              Self.Discriminant_Types,
               Alternative_Constraint_Maps.Empty_Map,
-              Self.Variant);
+              Self.Variant,
+              Disc_Context);
       end if;
       if Last_Generated_Shape < Generated_Shapes.Length then
          declare
@@ -506,19 +588,23 @@ package body TGen.Types.Record_Types is
             end loop;
          end;
       end if;
+
+      --  If all shapes were generated, generate random values
+
       Append (Result, "(");
       for C in Self.Discriminant_Types.Iterate loop
          declare
             A : Big_Integer;
             Discriminant_Name : LAL.Defining_Name :=  Key (C);
             Discriminant_Typ : Typ'Class := Element (C).Get;
-            Generated_Value : String := Discriminant_Typ.Generate_Static;
+            Generated_Value : String :=
+              Discriminant_Typ.Generate_Static (Disc_Context);
          begin
             Discriminant_Values.Insert
               (Discriminant_Name,
-               Constraint_Value'
-                 (Kind => Static,
-                  Int_Val => From_String (Generated_Value)));
+               From_String (Generated_Value));
+            Extended_Context.Insert
+              (Discriminant_Name, From_String (Generated_Value));
             Append_Value_For_Component
               (Discriminant_Name,
                Generated_Value,
@@ -526,12 +612,14 @@ package body TGen.Types.Record_Types is
          end;
       end loop;
 
+      <<Generate_Record>>
       Record_Components := Components (Self, Discriminant_Values);
       declare
          Record_Shape : Typ'Class :=
            Record_Typ'
              (Name => Self.Name, Component_Types => Record_Components);
-         Generated_Value : String := Record_Shape.Generate_Static;
+         Generated_Value : String :=
+           Record_Shape.Generate_Static (Extended_Context);
       begin
          Append (Result, Generated_Value);
       end;
@@ -555,8 +643,10 @@ package body TGen.Types.Record_Types is
 
    function Generate_All_Shapes
      (Components       : Component_Map;
+      Discr            : Component_Map;
       Disc_Constraints : Alternative_Constraint_Map;
-      Variant          : Variant_Part_Acc) return String_Set
+      Variant          : Variant_Part_Acc;
+      Disc_Context     : Disc_Value_Map) return String_Set
    is
       use Alternative_Constraint_Maps;
       use Component_Maps;
@@ -571,6 +661,7 @@ package body TGen.Types.Record_Types is
       if Variant = null then
 
          declare
+            New_Disc_Context : Disc_Value_Map := Disc_Context.Copy;
             Res : Unbounded_String;
          begin
 
@@ -578,6 +669,8 @@ package body TGen.Types.Record_Types is
             --  generate the first value of the first interval for each
             --  discriminant constraint (TODO: pull a random value in the list
             --  of intervals).
+            --
+            --  Append them to the Disc_Context.
 
             for Disc_Constraint in Disc_Constraints.Iterate loop
                declare
@@ -585,11 +678,36 @@ package body TGen.Types.Record_Types is
                     Key (Disc_Constraint);
                   Alt_Set : Alternatives_Set :=
                     Element (Disc_Constraint);
+                  Value : Big_Integer :=
+                    Generate_Value_In_Alternatives (Alt_Set);
                begin
+                  New_Disc_Context.Insert (Disc_Name, Value);
                   Append_Value_For_Component
                     (Disc_Name,
-                     To_String (Generate_Value_In_Alternatives (Alt_Set)),
+                     To_String (Value),
                      Res);
+               end;
+            end loop;
+
+            --  Then, generate all the discriminant that have no constraints,
+            --  i.e. no variant associated.
+
+            for Disc in Discr.Iterate loop
+               declare
+                  Disc_Name : LAL.Defining_Name := Key (Disc);
+                  Disc_Typ  : Typ'Class := Element (Disc).Get;
+               begin
+                  if not Disc_Constraints.Contains (Disc_Name) then
+                     declare
+                        Value : Big_Integer :=
+                          From_String
+                            (Disc_Typ.Generate_Static (Disc_Context));
+                     begin
+                        New_Disc_Context.Insert (Disc_Name, Value);
+                        Append_Value_For_Component
+                          (Disc_Name, To_String (Value), Res);
+                     end;
+                  end if;
                end;
             end loop;
 
@@ -602,7 +720,7 @@ package body TGen.Types.Record_Types is
                begin
                   Append_Value_For_Component
                     (Comp_Name,
-                     Comp_Typ.Generate_Static,
+                     Comp_Typ.Generate_Static (New_Disc_Context),
                      Res);
                end;
             end loop;
@@ -636,8 +754,10 @@ package body TGen.Types.Record_Types is
             Result.Union
               (Generate_All_Shapes
                  (Extended_Components,
+                  Discr,
                   Extended_Constraints,
-                  Variant_Choice.Variant));
+                  Variant_Choice.Variant,
+                  Disc_Context));
          end;
       end loop;
       return Result;
@@ -645,11 +765,14 @@ package body TGen.Types.Record_Types is
 
    function Generate_All_Shapes_Wrapper
      (Components       : Component_Map;
+      Discr            : Component_Map;
       Disc_Constraints : Alternative_Constraint_Map;
-      Variant          : Variant_Part_Acc) return String_Set
+      Variant          : Variant_Part_Acc;
+      Disc_Context     : Disc_Value_Map) return String_Set
    is
       Shapes : String_Set :=
-        Generate_All_Shapes (Components, Disc_Constraints, Variant);
+        Generate_All_Shapes
+          (Components, Discr, Disc_Constraints, Variant, Disc_Context);
       Result : String_Set;
    begin
       for Shape of Shapes loop

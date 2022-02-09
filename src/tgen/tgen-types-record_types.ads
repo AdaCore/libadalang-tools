@@ -76,7 +76,9 @@ package TGen.Types.Record_Types is
 
    function Image (Self : Record_Typ) return String;
 
-   overriding function Generate_Static (Self : Record_Typ) return String;
+   overriding function Generate_Static
+     (Self         : Record_Typ;
+      Disc_Context : Disc_Value_Map) return String;
    --  Static generation for record types. Return an unusable value as it has
    --  an ending "," that needs to be removed afterwards. Is used for code
    --  factoring purposes.
@@ -105,7 +107,8 @@ package TGen.Types.Record_Types is
    pragma Inline (As_Nondiscriminated_Record_Typ);
 
    overriding function Generate_Static
-     (Self : Nondiscriminated_Record_Typ) return String;
+     (Self         : Nondiscriminated_Record_Typ;
+      Disc_Context : Disc_Value_Map) return String;
 
    type Discriminant_Choice_Entry is record
       Defining_Name : LAL.Defining_Name;
@@ -193,7 +196,7 @@ package TGen.Types.Record_Types is
 
    function Constraints_Respected
      (Self                : Discriminated_Record_Typ;
-      Discriminant_Values : Discriminant_Constraint_Maps.Map)
+      Discriminant_Values : Disc_Value_Map)
       return Boolean;
    --  Check whether the values given for the discriminants in
    --  Discriminant_Values respect the constraints that may already exist for
@@ -203,7 +206,7 @@ package TGen.Types.Record_Types is
 
    function Components
      (Self                : Discriminated_Record_Typ;
-      Discriminant_Values : Discriminant_Constraint_Maps.Map)
+      Discriminant_Values : Disc_Value_Map)
       return Component_Maps.Map;
    --  Given a set of Discriminant_Values for the discriminants of Self, return
    --  the set of components that are actually present in the record.
@@ -213,7 +216,8 @@ package TGen.Types.Record_Types is
    function Image (Self : Discriminated_Record_Typ) return String;
 
    overriding function Generate_Static
-     (Self : Discriminated_Record_Typ) return String;
+     (Self         : Discriminated_Record_Typ;
+      Disc_Context : Disc_Value_Map) return String;
 
    overriding function Generate_Random_Strategy
      (Self : Discriminated_Record_Typ) return String;

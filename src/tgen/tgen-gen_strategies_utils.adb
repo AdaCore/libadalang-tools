@@ -297,12 +297,19 @@ package body TGen.Gen_Strategies_Utils is
             declare
                R : Discriminated_Record_Typ := Discriminated_Record_Typ (Self);
             begin
+
+               --  For now, we do not insert anonymous types. Left as a TODO
+
                for T of R.Component_Types loop
-                  Result.Insert (T);
+                  if not T.Get.Is_Anonymous then
+                     Result.Insert (T);
+                  end if;
                end loop;
 
                for T of R.Discriminant_Types loop
-                  Result.Insert (T);
+                  if not T.Get.Is_Anonymous then
+                     Result.Insert (T);
+                  end if;
                end loop;
 
                if R.Variant /= null then

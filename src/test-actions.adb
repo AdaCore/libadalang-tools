@@ -761,6 +761,7 @@ package body Test.Actions is
 
          TGen.Gen_Strategies.Initialize
            (Test.Common.TGen_Ctx,
+            Root_Prj,
             Ada.Strings.Unbounded.To_Unbounded_String
               (Test.Common.JSON_Test_Dir.all));
       end if;

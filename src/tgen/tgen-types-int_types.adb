@@ -95,7 +95,9 @@ package body TGen.Types.Int_Types is
       return Rand (Generator_Instance, T'First, T'Last);
    end Gen;
 
-   function Generate_Static (Self : Signed_Int_Typ) return String
+   function Generate_Static
+     (Self         : Signed_Int_Typ;
+      Disc_Context : Disc_Value_Map) return String
    is
       --  TODO: use Long_Long_Long_Integer (as it is the biggest possible type
       --  for which ranges can be defined), and as support to it in
